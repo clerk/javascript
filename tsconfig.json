@@ -24,7 +24,7 @@
     "types": ["node"],
     "baseUrl": "packages",
     "paths": {
-      "@sentry/*": ["*/src"]
+      "@clerk/*": ["*/src"]
     },
     "noErrorTruncation": true
   },
