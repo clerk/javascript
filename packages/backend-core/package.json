@@ -1,6 +1,6 @@
 {
   "name": "@clerk/backend-core",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
@@ -11,8 +11,8 @@
   "main": "dist/cjs/index.js",
   "module": "dist/mjs/index.js",
   "devDependencies": {
+    "@types/node": "^16.11.12",
     "rimraf": "^3.0.2",
-    "typescript": "^4.5.2",
-    "@types/node": "^16.11.12"
+    "typescript": "^4.5.2"
   }
 }
