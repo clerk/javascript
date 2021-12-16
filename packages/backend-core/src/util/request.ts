@@ -11,8 +11,8 @@ export function checkCrossOrigin(
 
   // Need to append the protocol if not exists for URL parse to work correctly
   if (
-    !initialHost.startsWith("http://") &&
-    !initialHost.startsWith("https://")
+    !initialHost.startsWith('http://') &&
+    !initialHost.startsWith('https://')
   ) {
     initialHost = `https://${initialHost}`;
   }
@@ -27,7 +27,7 @@ export function checkCrossOrigin(
     port = hostURL.port;
   }
 
-  if (port && port !== "80" && port !== "443") {
+  if (port && port !== '80' && port !== '443') {
     forwardedHost = `${forwardedHost}:${port}`;
   }
 

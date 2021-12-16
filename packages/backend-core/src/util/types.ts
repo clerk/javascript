@@ -51,11 +51,11 @@ export interface JWTHeader {
   alg: string | Algorithm;
   typ?: string;
   cty?: string;
-  crit?: Array<string | Exclude<keyof JWTHeader, "crit">>;
+  crit?: Array<string | Exclude<keyof JWTHeader, 'crit'>>;
   kid?: string;
   jku?: string;
   x5u?: string | string[];
-  "x5t#S256"?: string;
+  'x5t#S256'?: string;
   x5t?: string;
   x5c?: string | string[];
 }

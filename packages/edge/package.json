@@ -37,11 +37,10 @@
   },
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "node ./scripts/info.cjs && tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && ./moduleTypeFix",
-    "pack": "npm pack"
+    "build": "node ./scripts/info.cjs && tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && ./moduleTypeFix"
   },
   "dependencies": {
-    "@clerk/backend-core": "^0.0.2",
+    "@clerk/backend-core": "workspace:^",
     "@peculiar/webcrypto": "^1.2.3",
     "next": "^12.0.7"
   },

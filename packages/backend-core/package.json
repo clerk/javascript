@@ -1,16 +1,21 @@
 {
   "name": "@clerk/backend-core",
-  "version": "0.0.2",
+  "version": "0.0.1",
   "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && ./moduleTypeFix",
-    "pack": "npm pack"
+    "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && ./moduleTypeFix"
   },
   "type": "module",
   "main": "dist/cjs/index.js",
   "module": "dist/mjs/index.js",
+  "dependencies": {
+    "camelcase-keys": "^7.0.1",
+    "query-string": "^7.0.1",
+    "snakecase-keys": "^5.1.2"
+  },
   "devDependencies": {
+    "@peculiar/webcrypto": "^1.2.3",
     "@types/node": "^16.11.12",
     "rimraf": "^3.0.2",
     "typescript": "^4.5.2"

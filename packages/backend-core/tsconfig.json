@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
       "lib": ["ES2020", "DOM"],
+      "target": "ES2019",
       "strict": true,
       "declaration": true,
       "declarationMap": true,
@@ -11,7 +12,8 @@
       "removeComments": true,
       "baseUrl": "src",
       "moduleResolution": "node",
-      "resolveJsonModule": true
+      "resolveJsonModule": true,
+      "allowSyntheticDefaultImports": true
     },
     "include": ["src"],
     "exclude": ["node_modules", "dist"]

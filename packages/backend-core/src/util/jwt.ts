@@ -1,7 +1,10 @@
-import { JWTPayload } from "./types";
+import { JWTPayload } from './types';
 const DEFAULT_ALLOWED_CLOCK_SKEW = 10;
 
-export function isExpired(payload: JWTPayload, allowedClerkSkew = DEFAULT_ALLOWED_CLOCK_SKEW) {
+export function isExpired(
+  payload: JWTPayload,
+  allowedClerkSkew = DEFAULT_ALLOWED_CLOCK_SKEW
+) {
   // verify exp+nbf claims
   const now = Date.now() / 1000;
 
@@ -15,7 +18,7 @@ export function isExpired(payload: JWTPayload, allowedClerkSkew = DEFAULT_ALLOWE
 }
 
 export function checkClaims(claims: JWTPayload) {
-  if (!claims.iss || !claims.iss.startsWith("https://clerk")) {
+  if (!claims.iss || !claims.iss.startsWith('https://clerk')) {
     throw new Error(`Invalid issuer: ${claims.iss}`);
   }
 }

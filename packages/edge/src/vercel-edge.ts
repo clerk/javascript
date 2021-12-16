@@ -1,28 +1,33 @@
 import {
-  INTERSTITIAL_METHOD,
-  INTERSTITIAL_URL,
-  SDK_USER_AGENT,
-} from "./consts/interstitial";
-import { NextRequest, NextFetchEvent, NextResponse } from "next/server";
-import { API_KEY, AuthStatus, Session, Base } from "@clerk/backend-core";
+  PACKAGE_REPO,
+} from './consts';
+import { NextRequest, NextFetchEvent, NextResponse } from 'next/server';
+import {
+  AuthStatus,
+  Session,
+  Base,
+  RemoteClerk,
+} from '@clerk/backend-core';
+import { LIB_NAME, LIB_VERSION } from 'info';
 
 type Middleware = (
   req: NextRequest,
   event: NextFetchEvent
 ) => Response | void | Promise<Response | void>;
 
-/** 
- * 
+/**
+ *
  * Required implementations for the runtime:
  * 1. Import Key
  * 2. Verify Signature
  * 3. Decode Base64
- * 4. Fetch Interstitial
- * 
+ * 4. ClerkAPI export with fetcher implementation
+ * 5. Fetch Interstitial
+ *
  */
 
 const importKey = async (jwk: JsonWebKey, algorithm: Algorithm) => {
-  return await crypto.subtle.importKey("jwk", jwk, algorithm, true, ["verify"]);
+  return await crypto.subtle.importKey('jwk', jwk, algorithm, true, ['verify']);
 };
 
 const verifySignature = async (
@@ -36,18 +41,6 @@ const verifySignature = async (
 
 const decodeBase64 = (base64: string) => atob(base64);
 
-async function fetchInterstitial() {
-  const response = await fetch(INTERSTITIAL_URL, {
-    method: INTERSTITIAL_METHOD,
-    headers: {
-      Authorization: `Bearer ${API_KEY}`,
-      "user-agent": SDK_USER_AGENT,
-    },
-  });
-
-  return response.text();
-}
-
 /** Base initialization */
 
 const vercelEdgeBase = new Base(importKey, verifySignature, decodeBase64);
@@ -55,6 +48,30 @@ const vercelEdgeBase = new Base(importKey, verifySignature, decodeBase64);
 /** Export standalone verifySessionToken */
 
 export const verifySessionToken = vercelEdgeBase.verifySessionToken;
+
+/** Export RemoteClerk API client */
+
+export const ClerkAPI = new RemoteClerk({
+  libName: LIB_NAME,
+  libVersion: LIB_VERSION,
+  packageRepo: PACKAGE_REPO,
+  fetcher: (url, { method, authorization, contentType, userAgent, body }) => {
+    return fetch(url, {
+      method,
+      headers: {
+        authorization: authorization,
+        'Content-Type': contentType,
+        'User-Agent': userAgent,
+      },
+      ...(body && { body: JSON.stringify(body) }),
+    }).then(body => body.json());
+  },
+});
+
+async function fetchInterstitial() {
+  const response = await ClerkAPI.fetchInterstitial<Response>();
+  return response.text();
+}
 
 /** Export middleware wrapper */
 
@@ -64,25 +81,25 @@ export function withSession(handler: Middleware) {
   return async function clerkAuth(req: NextRequest, event: NextFetchEvent) {
     const { status, session, interstitial } = await vercelEdgeBase.getAuthState(
       {
-        cookieToken: req.cookies["__session"],
-        clientUat: req.cookies["__client_uat"],
-        headerToken: req.headers.get("authorization"),
-        origin: req.headers.get("origin"),
-        host: req.headers.get("host"),
-        forwardedPort: req.headers.get("x-forwarded-port"),
-        forwardedHost: req.headers.get("x-forwarded-host"),
-        referrer: req.headers.get("referrer"),
+        cookieToken: req.cookies['__session'],
+        clientUat: req.cookies['__client_uat'],
+        headerToken: req.headers.get('authorization'),
+        origin: req.headers.get('origin'),
+        host: req.headers.get('host'),
+        forwardedPort: req.headers.get('x-forwarded-port'),
+        forwardedHost: req.headers.get('x-forwarded-host'),
+        referrer: req.headers.get('referrer'),
         fetchInterstitial,
       }
     );
 
     if (status === AuthStatus.SignedOut) {
-      handler(req, event);
+      return handler(req, event);
     }
 
     if (status === AuthStatus.Interstitial) {
       return new NextResponse(interstitial, {
-        headers: { "Content-Type": "text/html" },
+        headers: { 'Content-Type': 'text/html' },
         status: 401,
       });
     }
@@ -90,7 +107,7 @@ export function withSession(handler: Middleware) {
     if (status === AuthStatus.SignedIn) {
       // @ts-ignore
       req.session = session;
-      handler(req, event);
+      return handler(req, event);
     }
   };
 }

@@ -26,6 +26,7 @@
     "paths": {
       "@clerk/*": ["*/src"]
     },
+    "target": "ES2019",
     "noErrorTruncation": true
   },
   "exclude": ["node_modules", "tmp", "dist"]
