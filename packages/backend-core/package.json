@@ -1,0 +1,18 @@
+{
+  "name": "@clerk/backend-core",
+  "version": "0.0.1",
+  "license": "MIT",
+  "scripts": {
+    "prebuild": "rimraf dist",
+    "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && ./moduleTypeFix",
+    "pack": "npm pack"
+  },
+  "type": "module",
+  "main": "dist/cjs/index.js",
+  "module": "dist/mjs/index.js",
+  "devDependencies": {
+    "rimraf": "^3.0.2",
+    "typescript": "^4.5.2",
+    "@types/node": "^16.11.12"
+  }
+}

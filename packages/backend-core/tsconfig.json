@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+      "lib": ["ES2020", "DOM"],
+      "strict": true,
+      "declaration": true,
+      "declarationMap": true,
+      "forceConsistentCasingInFileNames": true,
+      "noUnusedLocals": true,
+      "noUnusedParameters": true,
+      "sourceMap": false,
+      "removeComments": true,
+      "baseUrl": "src",
+      "moduleResolution": "node",
+      "resolveJsonModule": true
+    },
+    "include": ["src"],
+    "exclude": ["node_modules", "dist"]
+  }
+  
