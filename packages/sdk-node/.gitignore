@@ -2,8 +2,8 @@
 .DS_Store
 .idea
 node_modules
-coverage
 dist
-.tgz
+esm
+coverage
 .env
 .env.local
