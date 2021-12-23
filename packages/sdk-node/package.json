@@ -1,0 +1,83 @@
+{
+  "version": "2.2.1",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "module": "esm/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "esm",
+    "instance.js",
+    "instance.d.ts",
+    "package.json"
+  ],
+  "engines": {
+    "node": ">=12"
+  },
+  "scripts": {
+    "build:es5": "node ./scripts/info.js && tsc -p tsconfig.build.json",
+    "build:esm": "node ./scripts/info.js && tsc -p tsconfig.esm.json",
+    "build": "run-p build:es5 build:esm",
+    "prebuild": "rimraf dist esm coverage",
+    "test": "jest",
+    "lint": "eslint ./src --ext .ts",
+    "publishPackage": "node ./scripts/publish.js"
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "name": "@clerk/clerk-sdk-node",
+  "author": {
+    "name": "Clerk, Inc.",
+    "email": "developers@clerk.dev",
+    "url": "https://github.com/clerkinc/clerk-sdk-node"
+  },
+  "devDependencies": {
+    "@types/cookies": "^0.7.7",
+    "@types/express": "^4.17.11",
+    "@types/jest": "^26.0.20",
+    "@types/jsonwebtoken": "^8.5.6",
+    "@typescript-eslint/eslint-plugin": "^5.5.0",
+    "@typescript-eslint/parser": "^5.5.0",
+    "eslint": "^8.3.0",
+    "eslint-config-prettier": "^8.3.0",
+    "jest": "^27.4.0",
+    "nock": "^13.0.7",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.5.0",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^27.0.7",
+    "typescript": "^4.1.3"
+  },
+  "dependencies": {
+    "@clerk/backend-core": "workspace:*",
+    "@peculiar/webcrypto": "^1.2.3",
+    "camelcase-keys": "^6.2.2",
+    "cookies": "^0.8.0",
+    "got": "^11.8.2",
+    "jsonwebtoken": "^8.5.1",
+    "jwks-rsa": "^2.0.4",
+    "snakecase-keys": "^3.2.1",
+    "tslib": "^2.3.1"
+  },
+  "description": "Clerk (clerk.dev) server SDK for usage with node",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerkinc/clerk-sdk-node.git"
+  },
+  "keywords": [
+    "clerk",
+    "sdk",
+    "node"
+  ],
+  "bugs": {
+    "url": "https://github.com/clerkinc/clerk-sdk-node/issues"
+  },
+  "homepage": "https://github.com/clerkinc/clerk-sdk-node#readme",
+  "publishConfig": {
+    "access": "public"
+  }
+}

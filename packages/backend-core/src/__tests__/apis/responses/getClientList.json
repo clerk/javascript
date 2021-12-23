@@ -1,0 +1,40 @@
+[
+    {
+        "object": "client",
+        "id": "client_isalwaysright",
+        "session_ids": ["sess_swag"],
+        "sessions": [{
+            "id": "sess_swag",
+            "clientId": "client_isalwaysright",
+            "userId": "user_player1",
+            "status": "active",
+            "lastActiveAt": 1610706634,
+            "expireAt": 1630846634,
+            "abandonAt": 1630846634
+        }],
+        "sign_in_attempt_id": null,
+        "sign_up_attempt_id": null,
+        "last_active_session_id": "sess_swag",
+        "created_at": 1613593529,
+        "updated_at": 1613593529
+    },
+    {
+        "object": "client",
+        "id": "client_keysersoze",
+        "session_ids": ["sess_mood"],
+        "sessions": [{
+            "id": "sess_mood",
+            "clientId": "client_keysersoze",
+            "userId": "user_player2",
+            "status": "active",
+            "lastActiveAt": 1610706634,
+            "expireAt": 1630846634,
+            "abandonAt": 1630846634
+        }],
+        "sign_in_attempt_id": "sia_qwerty",
+        "sign_up_attempt_id": null,
+        "last_active_session_id": null,
+        "created_at": 1612308722,
+        "updated_at": 1612308722
+    }
+]

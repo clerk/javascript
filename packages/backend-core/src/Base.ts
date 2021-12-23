@@ -31,14 +31,14 @@ type AuthState = {
 };
 
 type AuthStateParams = {
-  cookieToken: string;
-  clientUat: string;
-  headerToken: string | null;
-  origin: string | null;
-  host: string | null;
-  forwardedHost: string | null;
-  forwardedPort: string | null;
-  referrer: string | null;
+  cookieToken?: string;
+  clientUat?: string;
+  headerToken?: string | null;
+  origin?: string | null;
+  host?: string | null;
+  forwardedHost?: string | null;
+  forwardedPort?: string | null;
+  referrer?: string | null;
   fetchInterstitial: () => Promise<string>;
 };
 
@@ -219,6 +219,11 @@ export class Base {
     }
 
     if (clientUat === '0') {
+      return { status: AuthStatus.SignedOut };
+    }
+
+    // TODO: Is this a valid check here ?
+    if(!cookieToken){
       return { status: AuthStatus.SignedOut };
     }
 

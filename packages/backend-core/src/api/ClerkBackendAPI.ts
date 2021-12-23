@@ -14,7 +14,7 @@ const defaultApiVersion = process.env.CLERK_API_VERSION || 'v1';
 const defaultServerApiUrl =
   process.env.CLERK_API_URL || 'https://api.clerk.dev';
 
-type RemoteClerkProps = {
+type ClerkBackendAPIProps = {
   apiKey?: string;
   serverApiUrl?: string;
   apiVersion?: string;
@@ -24,10 +24,10 @@ type RemoteClerkProps = {
   packageRepo: string;
 };
 
-export class RemoteClerk {
+export class ClerkBackendAPI {
   private _restClient: RestClient;
   // singleton instance
-  static _instance: RemoteClerk;
+  static _instance: ClerkBackendAPI;
 
   // TODO we may not need to instantiate these any more if they keep no state
   // private api instances
@@ -47,7 +47,7 @@ export class RemoteClerk {
     libName,
     libVersion,
     packageRepo,
-  }: RemoteClerkProps) {
+  }: ClerkBackendAPIProps) {
     //   if (!apiKey) {
     //     throw Error(SupportMessages.API_KEY_NOT_FOUND);
     //   }
@@ -68,9 +68,9 @@ export class RemoteClerk {
   }
 
   // // For use as singleton, always returns the same instance
-  // static getInstance(): RemoteClerk {
+  // static getInstance(): ClerkBackendAPI {
   //   if (!this._instance) {
-  //     this._instance = new RemoteClerk();
+  //     this._instance = new ClerkBackendAPI();
   //   }
 
   //   return this._instance;

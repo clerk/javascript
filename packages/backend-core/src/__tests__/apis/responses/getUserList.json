@@ -1,0 +1,102 @@
+[
+  {
+    "object": "user",
+    "id": "user_noone",
+    "username": null,
+    "first_name": "Kyle",
+    "last_name": "Reese",
+    "gender": "",
+    "birthday": "",
+    "profile_image_url": "https://lh3.googleusercontent.com/-MvTefx9nU6o/BBBBBBBBBBI/BBBBBBBBBBB/ereRAMWiew8hQ5IaSVdTZWm1Y1G1z0T_P7Q/s96-c/photo.jpg",
+    "primary_email_address_id": "idn_alpha",
+    "primary_phone_number_id": "idn_omega",
+    "password_enabled": false,
+    "two_factor_enabled": true,
+    "email_addresses": [
+      {
+        "id": "idn_clark",
+        "email_address": "kyle@tech.com",
+        "verification": {
+          "status": "verified",
+          "strategy": "from_oauth_google",
+          "external_verification_redirect_url": null
+        },
+        "linked_to": [
+          {
+            "type": "oauth_google",
+            "id": "idn_t800"
+          }
+        ]
+      },
+      {
+        "id": "idn_invision",
+        "email_address": "john@tech.com",
+        "verification": {
+          "status": "verified",
+          "strategy": "email_code",
+          "external_verification_redirect_url": null,
+          "attempts": 1,
+          "expire_at": 1613830889
+        },
+        "linked_to": []
+      }
+    ],
+    "phone_numbers": [
+      {
+        "id": "idn_callme",
+        "phone_number": "+19515551001",
+        "reserved_for_second_factor": true,
+        "verification": {
+          "status": "verified",
+          "strategy": "phone_code",
+          "external_verification_redirect_url": null,
+          "attempts": 1,
+          "expireAt": 1613831075
+        },
+        "linked_to": []
+      },
+      {
+        "id": "idn_maybe",
+        "phone_number": "+19515551002",
+        "reserved_for_second_factor": false,
+        "verification": {
+          "status": "verified",
+          "strategy": "phone_code",
+          "external_verification_redirect_url": null,
+          "attempts": 1,
+          "expireAt": 1613831855
+        },
+        "linked_to": []
+      }
+    ],
+    "external_accounts": [
+      {
+        "object": "google_account",
+        "id": "gac_googlyeyes",
+        "google_id": "1234567890",
+        "approved_scopes": "email https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid profile",
+        "email_address": "kyle@tech.com",
+        "given_name": "Kyle",
+        "family_name": "Reese",
+        "picture": "https://lh3.googleusercontent.com/-MvTefx9nU6o/BBBBBBBBBBI/BBBBBBBBBBB/ereRAMWiew8hQ5IaSVdTZWm1Y1G1z0T_P7Q/s96-c/photo.jpg"
+      },
+      {
+        "object": "facebook_account",
+        "id": "fbac_xavier",
+        "facebook_id": "",
+        "approved_scopes": "email",
+        "email_address": "kyle@tech.com",
+        "first_name": "Kyle",
+        "last_name": "Reese",
+        "picture": "https://platform-lookaside.fbsbx.com/platform/profilepic/?asid=16357923188267094&height=50&width=50&ext=2319847405&hash=AeQyoXRpxMMso8vNHSw"
+      }
+    ],
+    "public_metadata": {
+      "zodiac_sign": "leo",
+      "ascendant": "scorpio"
+    },
+    "private_metadata": {},
+    "created_at": 1611948436,
+    "updated_at": 1611948436
+  }
+]

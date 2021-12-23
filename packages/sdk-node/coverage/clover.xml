@@ -1,0 +1,666 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1639997192877" clover="3.2.0">
+  <project timestamp="1639997192877" name="All files">
+    <metrics statements="543" coveredstatements="425" conditionals="195" coveredconditionals="75" methods="142" coveredmethods="95" elements="880" coveredelements="595" complexity="0" loc="543" ncloc="543" packages="5" files="34" classes="34"/>
+    <package name="src">
+      <metrics statements="228" coveredstatements="152" conditionals="103" coveredconditionals="37" methods="67" coveredmethods="31"/>
+      <file name="Clerk.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/Clerk.ts">
+        <metrics statements="156" coveredstatements="84" conditionals="103" coveredconditionals="37" methods="35" coveredmethods="17"/>
+        <line num="3" count="12" type="stmt"/>
+        <line num="4" count="12" type="stmt"/>
+        <line num="5" count="12" type="stmt"/>
+        <line num="8" count="12" type="stmt"/>
+        <line num="9" count="12" type="stmt"/>
+        <line num="12" count="12" type="stmt"/>
+        <line num="13" count="12" type="stmt"/>
+        <line num="14" count="12" type="stmt"/>
+        <line num="15" count="12" type="stmt"/>
+        <line num="16" count="12" type="stmt"/>
+        <line num="17" count="12" type="stmt"/>
+        <line num="18" count="12" type="stmt"/>
+        <line num="21" count="12" type="stmt"/>
+        <line num="24" count="12" type="stmt"/>
+        <line num="26" count="12" type="cond" truecount="2" falsecount="0"/>
+        <line num="27" count="12" type="cond" truecount="2" falsecount="0"/>
+        <line num="29" count="12" type="cond" truecount="2" falsecount="0"/>
+        <line num="30" count="12" type="stmt"/>
+        <line num="41" count="12" type="stmt"/>
+        <line num="71" count="14" type="cond" truecount="1" falsecount="0"/>
+        <line num="72" count="1" type="stmt"/>
+        <line num="75" count="13" type="stmt"/>
+        <line num="82" count="13" type="stmt"/>
+        <line num="95" count="35" type="cond" truecount="1" falsecount="0"/>
+        <line num="96" count="9" type="stmt"/>
+        <line num="99" count="35" type="stmt"/>
+        <line num="105" count="0" type="stmt"/>
+        <line num="109" count="0" type="stmt"/>
+        <line num="113" count="0" type="stmt"/>
+        <line num="117" count="0" type="stmt"/>
+        <line num="123" count="10" type="cond" truecount="1" falsecount="0"/>
+        <line num="124" count="8" type="stmt"/>
+        <line num="128" count="10" type="stmt"/>
+        <line num="132" count="10" type="cond" truecount="1" falsecount="0"/>
+        <line num="133" count="8" type="stmt"/>
+        <line num="136" count="10" type="stmt"/>
+        <line num="140" count="10" type="cond" truecount="1" falsecount="0"/>
+        <line num="141" count="8" type="stmt"/>
+        <line num="144" count="10" type="stmt"/>
+        <line num="148" count="10" type="cond" truecount="1" falsecount="0"/>
+        <line num="149" count="8" type="stmt"/>
+        <line num="151" count="10" type="stmt"/>
+        <line num="155" count="10" type="cond" truecount="1" falsecount="0"/>
+        <line num="156" count="8" type="stmt"/>
+        <line num="159" count="10" type="stmt"/>
+        <line num="163" count="10" type="cond" truecount="1" falsecount="0"/>
+        <line num="164" count="8" type="stmt"/>
+        <line num="167" count="10" type="stmt"/>
+        <line num="171" count="10" type="cond" truecount="1" falsecount="0"/>
+        <line num="172" count="8" type="stmt"/>
+        <line num="175" count="10" type="stmt"/>
+        <line num="181" count="2" type="stmt"/>
+        <line num="182" count="2" type="cond" truecount="0" falsecount="1"/>
+        <line num="183" count="0" type="stmt"/>
+        <line num="186" count="2" type="stmt"/>
+        <line num="193" count="0" type="stmt"/>
+        <line num="194" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="195" count="0" type="stmt"/>
+        <line num="198" count="0" type="stmt"/>
+        <line num="199" count="0" type="stmt"/>
+        <line num="203" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="207" count="0" type="stmt"/>
+        <line num="210" count="0" type="stmt"/>
+        <line num="217" count="1" type="stmt"/>
+        <line num="219" count="1" type="cond" truecount="2" falsecount="0"/>
+        <line num="220" count="0" type="stmt"/>
+        <line num="226" count="1" type="stmt"/>
+        <line num="228" count="1" type="cond" truecount="2" falsecount="0"/>
+        <line num="229" count="0" type="stmt"/>
+        <line num="232" count="1" type="stmt"/>
+        <line num="239" count="2" type="stmt"/>
+        <line num="240" count="2" type="stmt"/>
+        <line num="242" count="0" type="stmt"/>
+        <line num="250" count="2" type="cond" truecount="0" falsecount="1"/>
+        <line num="251" count="0" type="stmt"/>
+        <line num="254" count="2" type="stmt"/>
+        <line num="255" count="2" type="stmt"/>
+        <line num="257" count="0" type="stmt"/>
+        <line num="262" count="0" type="stmt"/>
+        <line num="266" count="0" type="stmt"/>
+        <line num="271" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="272" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="273" count="0" type="stmt"/>
+        <line num="276" count="0" type="stmt"/>
+        <line num="278" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="282" count="0" type="stmt"/>
+        <line num="285" count="0" type="stmt"/>
+        <line num="287" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="288" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="289" count="0" type="stmt"/>
+        <line num="292" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="293" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="294" count="0" type="stmt"/>
+        <line num="297" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="298" count="0" type="stmt"/>
+        <line num="301" count="0" type="stmt"/>
+        <line num="305" count="0" type="stmt"/>
+        <line num="309" count="0" type="stmt"/>
+        <line num="315" count="0" type="stmt"/>
+        <line num="316" count="0" type="stmt"/>
+        <line num="317" count="0" type="stmt"/>
+        <line num="326" count="4" type="stmt"/>
+        <line num="328" count="4" type="stmt"/>
+        <line num="329" count="4" type="stmt"/>
+        <line num="330" count="2" type="stmt"/>
+        <line num="331" count="2" type="stmt"/>
+        <line num="332" count="2" type="stmt"/>
+        <line num="333" count="2" type="cond" truecount="1" falsecount="1"/>
+        <line num="335" count="2" type="cond" truecount="3" falsecount="1"/>
+        <line num="336" count="2" type="stmt"/>
+        <line num="339" count="2" type="cond" truecount="2" falsecount="1"/>
+        <line num="340" count="0" type="stmt"/>
+        <line num="343" count="2" type="cond" truecount="1" falsecount="2"/>
+        <line num="344" count="0" type="stmt"/>
+        <line num="347" count="2" type="cond" truecount="1" falsecount="0"/>
+        <line num="348" count="2" type="stmt"/>
+        <line num="349" count="2" type="cond" truecount="0" falsecount="1"/>
+        <line num="350" count="0" type="stmt"/>
+        <line num="354" count="2" type="stmt"/>
+        <line num="356" count="2" type="stmt"/>
+        <line num="360" count="2" type="stmt"/>
+        <line num="364" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="368" count="0" type="stmt"/>
+        <line num="369" count="0" type="stmt"/>
+        <line num="372" count="0" type="cond" truecount="0" falsecount="3"/>
+        <line num="373" count="0" type="stmt"/>
+        <line num="376" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="377" count="0" type="stmt"/>
+        <line num="380" count="0" type="stmt"/>
+        <line num="382" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="389" count="0" type="stmt"/>
+        <line num="391" count="0" type="stmt"/>
+        <line num="395" count="0" type="stmt"/>
+        <line num="398" count="0" type="stmt"/>
+        <line num="403" count="2" type="cond" truecount="0" falsecount="1"/>
+        <line num="404" count="0" type="stmt"/>
+        <line num="407" count="2" type="stmt"/>
+        <line num="409" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="410" count="1" type="stmt"/>
+        <line num="412" count="1" type="stmt"/>
+        <line num="417" count="4" type="stmt"/>
+        <line num="423" count="1" type="stmt"/>
+        <line num="431" count="0" type="stmt"/>
+        <line num="433" count="0" type="stmt"/>
+        <line num="434" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="435" count="0" type="stmt"/>
+        <line num="438" count="0" type="stmt"/>
+        <line num="448" count="0" type="stmt"/>
+        <line num="453" count="0" type="stmt"/>
+        <line num="454" count="0" type="stmt"/>
+        <line num="459" count="0" type="stmt"/>
+        <line num="462" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="464" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="469" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="470" count="0" type="stmt"/>
+        <line num="480" count="0" type="stmt"/>
+      </file>
+      <file name="index.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/index.ts">
+        <metrics statements="51" coveredstatements="47" conditionals="0" coveredconditionals="0" methods="18" coveredmethods="7"/>
+        <line num="1" count="7" type="stmt"/>
+        <line num="3" count="7" type="stmt"/>
+        <line num="4" count="7" type="stmt"/>
+        <line num="5" count="7" type="stmt"/>
+        <line num="6" count="7" type="stmt"/>
+        <line num="7" count="7" type="stmt"/>
+        <line num="8" count="7" type="stmt"/>
+        <line num="9" count="7" type="stmt"/>
+        <line num="10" count="7" type="stmt"/>
+        <line num="13" count="7" type="stmt"/>
+        <line num="17" count="7" type="stmt"/>
+        <line num="18" count="7" type="stmt"/>
+        <line num="19" count="7" type="stmt"/>
+        <line num="20" count="7" type="stmt"/>
+        <line num="21" count="7" type="stmt"/>
+        <line num="22" count="7" type="stmt"/>
+        <line num="23" count="7" type="stmt"/>
+        <line num="27" count="7" type="stmt"/>
+        <line num="29" count="10" type="stmt"/>
+        <line num="30" count="11" type="stmt"/>
+        <line num="31" count="8" type="stmt"/>
+        <line num="32" count="7" type="stmt"/>
+        <line num="33" count="7" type="stmt"/>
+        <line num="34" count="7" type="stmt"/>
+        <line num="35" count="10" type="stmt"/>
+        <line num="36" count="7" type="stmt"/>
+        <line num="37" count="11" type="stmt"/>
+        <line num="38" count="8" type="stmt"/>
+        <line num="39" count="15" type="stmt"/>
+        <line num="40" count="7" type="stmt"/>
+        <line num="45" count="7" type="stmt"/>
+        <line num="47" count="7" type="stmt"/>
+        <line num="48" count="7" type="stmt"/>
+        <line num="49" count="7" type="stmt"/>
+        <line num="51" count="7" type="stmt"/>
+        <line num="52" count="7" type="stmt"/>
+        <line num="53" count="7" type="stmt"/>
+        <line num="54" count="7" type="stmt"/>
+        <line num="66" count="7" type="stmt"/>
+        <line num="67" count="7" type="stmt"/>
+        <line num="68" count="7" type="stmt"/>
+        <line num="73" count="7" type="stmt"/>
+        <line num="74" count="7" type="stmt"/>
+        <line num="79" count="7" type="stmt"/>
+        <line num="80" count="0" type="stmt"/>
+        <line num="83" count="7" type="stmt"/>
+        <line num="84" count="0" type="stmt"/>
+        <line num="87" count="7" type="stmt"/>
+        <line num="88" count="0" type="stmt"/>
+        <line num="91" count="7" type="stmt"/>
+        <line num="92" count="0" type="stmt"/>
+      </file>
+      <file name="info.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/info.ts">
+        <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="3" count="12" type="stmt"/>
+        <line num="4" count="12" type="stmt"/>
+      </file>
+      <file name="instance.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/instance.ts">
+        <metrics statements="19" coveredstatements="19" conditionals="0" coveredconditionals="0" methods="14" coveredmethods="7"/>
+        <line num="1" count="10" type="stmt"/>
+        <line num="3" count="10" type="stmt"/>
+        <line num="13" count="10" type="stmt"/>
+        <line num="14" count="10" type="stmt"/>
+        <line num="15" count="10" type="stmt"/>
+        <line num="18" count="10" type="stmt"/>
+        <line num="19" count="10" type="stmt"/>
+        <line num="20" count="13" type="stmt"/>
+        <line num="21" count="14" type="stmt"/>
+        <line num="22" count="11" type="stmt"/>
+        <line num="23" count="10" type="stmt"/>
+        <line num="24" count="10" type="stmt"/>
+        <line num="25" count="10" type="stmt"/>
+        <line num="26" count="13" type="stmt"/>
+        <line num="27" count="10" type="stmt"/>
+        <line num="28" count="14" type="stmt"/>
+        <line num="29" count="11" type="stmt"/>
+        <line num="30" count="18" type="stmt"/>
+        <line num="31" count="10" type="stmt"/>
+      </file>
+    </package>
+    <package name="src.apis">
+      <metrics statements="41" coveredstatements="34" conditionals="8" coveredconditionals="1" methods="20" coveredmethods="17"/>
+      <file name="AbstractApi.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/apis/AbstractApi.ts">
+        <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="3" count="12" type="stmt"/>
+        <line num="7" count="56" type="stmt"/>
+      </file>
+      <file name="AllowlistIdentifierApi.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/apis/AllowlistIdentifierApi.ts">
+        <metrics statements="6" coveredstatements="6" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="3"/>
+        <line num="1" count="12" type="stmt"/>
+        <line num="4" count="12" type="stmt"/>
+        <line num="11" count="12" type="stmt"/>
+        <line num="15" count="1" type="stmt"/>
+        <line num="24" count="1" type="stmt"/>
+        <line num="34" count="1" type="stmt"/>
+      </file>
+      <file name="ClientApi.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/apis/ClientApi.ts">
+        <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="3"/>
+        <line num="1" count="12" type="stmt"/>
+        <line num="4" count="12" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="13" count="1" type="stmt"/>
+        <line num="20" count="1" type="stmt"/>
+      </file>
+      <file name="EmailApi.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/apis/EmailApi.ts">
+        <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="1" count="12" type="stmt"/>
+        <line num="10" count="12" type="stmt"/>
+        <line num="12" count="1" type="stmt"/>
+      </file>
+      <file name="InvitationApi.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/apis/InvitationApi.ts">
+        <metrics statements="6" coveredstatements="6" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="3"/>
+        <line num="1" count="12" type="stmt"/>
+        <line num="4" count="12" type="stmt"/>
+        <line num="10" count="12" type="stmt"/>
+        <line num="12" count="1" type="stmt"/>
+        <line num="19" count="1" type="stmt"/>
+        <line num="27" count="1" type="stmt"/>
+      </file>
+      <file name="SMSMessageApi.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/apis/SMSMessageApi.ts">
+        <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="1" count="12" type="stmt"/>
+        <line num="9" count="12" type="stmt"/>
+        <line num="11" count="1" type="stmt"/>
+      </file>
+      <file name="SessionApi.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/apis/SessionApi.ts">
+        <metrics statements="6" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="3"/>
+        <line num="1" count="12" type="stmt"/>
+        <line num="9" count="12" type="stmt"/>
+        <line num="13" count="1" type="stmt"/>
+        <line num="21" count="1" type="stmt"/>
+        <line num="28" count="0" type="stmt"/>
+        <line num="38" count="1" type="stmt"/>
+      </file>
+      <file name="UserApi.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/apis/UserApi.ts">
+        <metrics statements="10" coveredstatements="4" conditionals="8" coveredconditionals="1" methods="4" coveredmethods="2"/>
+        <line num="1" count="12" type="stmt"/>
+        <line num="29" count="12" type="stmt"/>
+        <line num="31" count="6" type="stmt"/>
+        <line num="39" count="1" type="stmt"/>
+        <line num="51" count="0" type="cond" truecount="0" falsecount="3"/>
+        <line num="52" count="0" type="stmt"/>
+        <line num="55" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="59" count="0" type="stmt"/>
+        <line num="62" count="0" type="stmt"/>
+        <line num="70" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="src.constants">
+      <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <file name="SupportMessages.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/constants/SupportMessages.ts">
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="1" count="12" type="stmt"/>
+      </file>
+    </package>
+    <package name="src.resources">
+      <metrics statements="183" coveredstatements="168" conditionals="36" coveredconditionals="19" methods="32" coveredmethods="31"/>
+      <file name="AllowlistIdentifier.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/resources/AllowlistIdentifier.ts">
+        <metrics statements="9" coveredstatements="9" conditionals="1" coveredconditionals="0" methods="2" coveredmethods="2"/>
+        <line num="1" count="13" type="stmt"/>
+        <line num="2" count="13" type="stmt"/>
+        <line num="11" count="13" type="stmt"/>
+        <line num="12" count="13" type="stmt"/>
+        <line num="14" count="13" type="stmt"/>
+        <line num="17" count="7" type="stmt"/>
+        <line num="21" count="5" type="stmt"/>
+        <line num="22" count="5" type="stmt"/>
+        <line num="23" count="5" type="stmt"/>
+      </file>
+      <file name="Client.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/resources/Client.ts">
+        <metrics statements="16" coveredstatements="16" conditionals="3" coveredconditionals="3" methods="3" coveredmethods="3"/>
+        <line num="1" count="14" type="stmt"/>
+        <line num="2" count="14" type="stmt"/>
+        <line num="3" count="14" type="stmt"/>
+        <line num="5" count="14" type="stmt"/>
+        <line num="9" count="14" type="stmt"/>
+        <line num="19" count="14" type="stmt"/>
+        <line num="20" count="14" type="stmt"/>
+        <line num="23" count="14" type="stmt"/>
+        <line num="27" count="14" type="stmt"/>
+        <line num="32" count="11" type="stmt"/>
+        <line num="36" count="6" type="stmt"/>
+        <line num="38" count="6" type="stmt"/>
+        <line num="39" count="6" type="stmt"/>
+        <line num="40" count="6" type="stmt"/>
+        <line num="42" count="6" type="cond" truecount="2" falsecount="0"/>
+        <line num="44" count="6" type="stmt"/>
+      </file>
+      <file name="Email.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/resources/Email.ts">
+        <metrics statements="9" coveredstatements="9" conditionals="1" coveredconditionals="0" methods="2" coveredmethods="2"/>
+        <line num="1" count="13" type="stmt"/>
+        <line num="2" count="13" type="stmt"/>
+        <line num="11" count="13" type="stmt"/>
+        <line num="12" count="13" type="stmt"/>
+        <line num="15" count="13" type="stmt"/>
+        <line num="18" count="3" type="stmt"/>
+        <line num="22" count="2" type="stmt"/>
+        <line num="23" count="2" type="stmt"/>
+        <line num="24" count="2" type="stmt"/>
+      </file>
+      <file name="EmailAddress.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/resources/EmailAddress.ts">
+        <metrics statements="11" coveredstatements="11" conditionals="3" coveredconditionals="2" methods="3" coveredmethods="3"/>
+        <line num="1" count="15" type="stmt"/>
+        <line num="3" count="15" type="stmt"/>
+        <line num="8" count="15" type="stmt"/>
+        <line num="9" count="15" type="stmt"/>
+        <line num="20" count="15" type="stmt"/>
+        <line num="21" count="15" type="stmt"/>
+        <line num="23" count="15" type="stmt"/>
+        <line num="28" count="15" type="stmt"/>
+        <line num="31" count="15" type="stmt"/>
+        <line num="35" count="14" type="stmt"/>
+        <line num="39" count="7" type="cond" truecount="1" falsecount="1"/>
+      </file>
+      <file name="Enums.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/resources/Enums.ts">
+        <metrics statements="3" coveredstatements="3" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+        <line num="1" count="17" type="cond" truecount="2" falsecount="0"/>
+        <line num="2" count="17" type="stmt"/>
+        <line num="3" count="17" type="stmt"/>
+      </file>
+      <file name="ExternalAccount.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/resources/ExternalAccount.ts">
+        <metrics statements="33" coveredstatements="25" conditionals="5" coveredconditionals="2" methods="2" coveredmethods="2"/>
+        <line num="2" count="14" type="stmt"/>
+        <line num="10" count="14" type="stmt"/>
+        <line num="11" count="14" type="stmt"/>
+        <line num="14" count="14" type="stmt"/>
+        <line num="17" count="14" type="stmt"/>
+        <line num="21" count="14" type="stmt"/>
+        <line num="23" count="14" type="stmt"/>
+        <line num="24" count="14" type="stmt"/>
+        <line num="25" count="14" type="stmt"/>
+        <line num="27" count="14" type="cond" truecount="2" falsecount="2"/>
+        <line num="29" count="7" type="stmt"/>
+        <line num="30" count="7" type="stmt"/>
+        <line num="31" count="7" type="stmt"/>
+        <line num="32" count="7" type="stmt"/>
+        <line num="33" count="7" type="stmt"/>
+        <line num="34" count="7" type="stmt"/>
+        <line num="35" count="7" type="stmt"/>
+        <line num="38" count="7" type="stmt"/>
+        <line num="39" count="7" type="stmt"/>
+        <line num="40" count="7" type="stmt"/>
+        <line num="41" count="7" type="stmt"/>
+        <line num="42" count="7" type="stmt"/>
+        <line num="43" count="7" type="stmt"/>
+        <line num="44" count="7" type="stmt"/>
+        <line num="47" count="0" type="stmt"/>
+        <line num="48" count="0" type="stmt"/>
+        <line num="49" count="0" type="stmt"/>
+        <line num="50" count="0" type="stmt"/>
+        <line num="51" count="0" type="stmt"/>
+        <line num="52" count="0" type="stmt"/>
+        <line num="53" count="0" type="stmt"/>
+        <line num="56" count="0" type="stmt"/>
+        <line num="59" count="14" type="stmt"/>
+      </file>
+      <file name="IdentificationLink.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/resources/IdentificationLink.ts">
+        <metrics statements="9" coveredstatements="9" conditionals="1" coveredconditionals="0" methods="2" coveredmethods="2"/>
+        <line num="1" count="16" type="stmt"/>
+        <line num="2" count="16" type="stmt"/>
+        <line num="11" count="16" type="stmt"/>
+        <line num="12" count="16" type="stmt"/>
+        <line num="14" count="16" type="stmt"/>
+        <line num="17" count="7" type="stmt"/>
+        <line num="21" count="7" type="stmt"/>
+        <line num="22" count="7" type="stmt"/>
+        <line num="23" count="7" type="stmt"/>
+      </file>
+      <file name="Invitation.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/resources/Invitation.ts">
+        <metrics statements="9" coveredstatements="9" conditionals="1" coveredconditionals="0" methods="2" coveredmethods="2"/>
+        <line num="1" count="13" type="stmt"/>
+        <line num="2" count="13" type="stmt"/>
+        <line num="11" count="13" type="stmt"/>
+        <line num="12" count="13" type="stmt"/>
+        <line num="14" count="13" type="stmt"/>
+        <line num="17" count="7" type="stmt"/>
+        <line num="21" count="5" type="stmt"/>
+        <line num="22" count="5" type="stmt"/>
+        <line num="23" count="5" type="stmt"/>
+      </file>
+      <file name="JSON.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/resources/JSON.ts">
+        <metrics statements="15" coveredstatements="15" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+        <line num="10" count="14" type="cond" truecount="2" falsecount="0"/>
+        <line num="11" count="14" type="stmt"/>
+        <line num="12" count="14" type="stmt"/>
+        <line num="13" count="14" type="stmt"/>
+        <line num="14" count="14" type="stmt"/>
+        <line num="15" count="14" type="stmt"/>
+        <line num="16" count="14" type="stmt"/>
+        <line num="17" count="14" type="stmt"/>
+        <line num="18" count="14" type="stmt"/>
+        <line num="19" count="14" type="stmt"/>
+        <line num="20" count="14" type="stmt"/>
+        <line num="21" count="14" type="stmt"/>
+        <line num="22" count="14" type="stmt"/>
+        <line num="23" count="14" type="stmt"/>
+        <line num="24" count="14" type="stmt"/>
+      </file>
+      <file name="PhoneNumber.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/resources/PhoneNumber.ts">
+        <metrics statements="11" coveredstatements="10" conditionals="3" coveredconditionals="2" methods="3" coveredmethods="2"/>
+        <line num="1" count="15" type="stmt"/>
+        <line num="3" count="15" type="stmt"/>
+        <line num="8" count="15" type="stmt"/>
+        <line num="9" count="15" type="stmt"/>
+        <line num="20" count="15" type="stmt"/>
+        <line num="21" count="15" type="stmt"/>
+        <line num="23" count="15" type="stmt"/>
+        <line num="28" count="15" type="stmt"/>
+        <line num="31" count="15" type="stmt"/>
+        <line num="35" count="14" type="stmt"/>
+        <line num="40" count="0" type="cond" truecount="1" falsecount="1"/>
+      </file>
+      <file name="SMSMessage.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/resources/SMSMessage.ts">
+        <metrics statements="9" coveredstatements="9" conditionals="1" coveredconditionals="0" methods="2" coveredmethods="2"/>
+        <line num="1" count="13" type="stmt"/>
+        <line num="2" count="13" type="stmt"/>
+        <line num="11" count="13" type="stmt"/>
+        <line num="12" count="13" type="stmt"/>
+        <line num="15" count="13" type="stmt"/>
+        <line num="18" count="3" type="stmt"/>
+        <line num="22" count="2" type="stmt"/>
+        <line num="23" count="2" type="stmt"/>
+        <line num="24" count="2" type="stmt"/>
+      </file>
+      <file name="Session.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/resources/Session.ts">
+        <metrics statements="9" coveredstatements="9" conditionals="1" coveredconditionals="0" methods="2" coveredmethods="2"/>
+        <line num="1" count="14" type="stmt"/>
+        <line num="2" count="14" type="stmt"/>
+        <line num="11" count="14" type="stmt"/>
+        <line num="12" count="14" type="stmt"/>
+        <line num="15" count="14" type="stmt"/>
+        <line num="18" count="16" type="stmt"/>
+        <line num="22" count="10" type="stmt"/>
+        <line num="23" count="10" type="stmt"/>
+        <line num="24" count="10" type="stmt"/>
+      </file>
+      <file name="User.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/resources/User.ts">
+        <metrics statements="21" coveredstatements="21" conditionals="7" coveredconditionals="4" methods="5" coveredmethods="5"/>
+        <line num="1" count="14" type="stmt"/>
+        <line num="2" count="14" type="stmt"/>
+        <line num="3" count="14" type="stmt"/>
+        <line num="5" count="14" type="stmt"/>
+        <line num="9" count="14" type="stmt"/>
+        <line num="10" count="14" type="stmt"/>
+        <line num="11" count="14" type="stmt"/>
+        <line num="23" count="14" type="stmt"/>
+        <line num="24" count="14" type="stmt"/>
+        <line num="29" count="14" type="stmt"/>
+        <line num="35" count="14" type="stmt"/>
+        <line num="42" count="9" type="stmt"/>
+        <line num="46" count="7" type="stmt"/>
+        <line num="48" count="7" type="stmt"/>
+        <line num="49" count="7" type="stmt"/>
+        <line num="50" count="7" type="stmt"/>
+        <line num="52" count="14" type="cond" truecount="1" falsecount="1"/>
+        <line num="53" count="14" type="cond" truecount="1" falsecount="1"/>
+        <line num="55" count="7" type="cond" truecount="1" falsecount="1"/>
+        <line num="56" count="14" type="stmt"/>
+        <line num="59" count="7" type="stmt"/>
+      </file>
+      <file name="Verification.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/resources/Verification.ts">
+        <metrics statements="19" coveredstatements="13" conditionals="5" coveredconditionals="2" methods="2" coveredmethods="2"/>
+        <line num="8" count="16" type="stmt"/>
+        <line num="9" count="16" type="stmt"/>
+        <line num="11" count="16" type="stmt"/>
+        <line num="14" count="28" type="stmt"/>
+        <line num="18" count="28" type="stmt"/>
+        <line num="20" count="28" type="cond" truecount="1" falsecount="1"/>
+        <line num="21" count="28" type="stmt"/>
+        <line num="22" count="28" type="stmt"/>
+        <line num="24" count="28" type="cond" truecount="1" falsecount="1"/>
+        <line num="25" count="0" type="stmt"/>
+        <line num="29" count="28" type="stmt"/>
+        <line num="31" count="28" type="stmt"/>
+        <line num="32" count="28" type="stmt"/>
+        <line num="34" count="0" type="stmt"/>
+        <line num="35" count="0" type="stmt"/>
+        <line num="36" count="0" type="stmt"/>
+        <line num="37" count="0" type="stmt"/>
+        <line num="38" count="0" type="stmt"/>
+        <line num="41" count="28" type="stmt"/>
+      </file>
+    </package>
+    <package name="src.utils">
+      <metrics statements="90" coveredstatements="70" conditionals="48" coveredconditionals="18" methods="23" coveredmethods="16"/>
+      <file name="Associations.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/utils/Associations.ts">
+        <metrics statements="6" coveredstatements="6" conditionals="1" coveredconditionals="1" methods="2" coveredmethods="2"/>
+        <line num="1" count="17" type="stmt"/>
+        <line num="3" count="17" type="stmt"/>
+        <line num="4" count="58" type="stmt"/>
+        <line num="5" count="116" type="cond" truecount="1" falsecount="0"/>
+        <line num="6" count="86" type="stmt"/>
+        <line num="8" count="116" type="stmt"/>
+      </file>
+      <file name="Deserializer.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/utils/Deserializer.ts">
+        <metrics statements="22" coveredstatements="21" conditionals="10" coveredconditionals="9" methods="3" coveredmethods="3"/>
+        <line num="1" count="13" type="stmt"/>
+        <line num="2" count="13" type="stmt"/>
+        <line num="3" count="13" type="stmt"/>
+        <line num="4" count="13" type="stmt"/>
+        <line num="5" count="13" type="stmt"/>
+        <line num="6" count="13" type="stmt"/>
+        <line num="7" count="13" type="stmt"/>
+        <line num="8" count="13" type="stmt"/>
+        <line num="9" count="13" type="stmt"/>
+        <line num="12" count="13" type="stmt"/>
+        <line num="13" count="31" type="cond" truecount="2" falsecount="0"/>
+        <line num="14" count="16" type="stmt"/>
+        <line num="16" count="17" type="stmt"/>
+        <line num="23" count="33" type="cond" truecount="7" falsecount="1"/>
+        <line num="25" count="5" type="stmt"/>
+        <line num="27" count="6" type="stmt"/>
+        <line num="29" count="2" type="stmt"/>
+        <line num="31" count="5" type="stmt"/>
+        <line num="33" count="7" type="stmt"/>
+        <line num="35" count="6" type="stmt"/>
+        <line num="37" count="2" type="stmt"/>
+        <line num="39" count="0" type="stmt"/>
+      </file>
+      <file name="ErrorHandler.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/utils/ErrorHandler.ts">
+        <metrics statements="10" coveredstatements="2" conditionals="26" coveredconditionals="0" methods="2" coveredmethods="0"/>
+        <line num="1" count="12" type="stmt"/>
+        <line num="3" count="12" type="stmt"/>
+        <line num="4" count="0" type="cond" truecount="0" falsecount="10"/>
+        <line num="5" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="6" count="0" type="cond" truecount="0" falsecount="8"/>
+        <line num="9" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="10" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="11" count="0" type="stmt"/>
+        <line num="14" count="0" type="stmt"/>
+        <line num="17" count="0" type="stmt"/>
+      </file>
+      <file name="Errors.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/utils/Errors.ts">
+        <metrics statements="9" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="0"/>
+        <line num="1" count="12" type="stmt"/>
+        <line num="6" count="0" type="stmt"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="8" count="0" type="stmt"/>
+        <line num="24" count="12" type="stmt"/>
+        <line num="30" count="0" type="stmt"/>
+        <line num="31" count="0" type="stmt"/>
+        <line num="32" count="0" type="stmt"/>
+        <line num="36" count="0" type="stmt"/>
+      </file>
+      <file name="Filter.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/utils/Filter.ts">
+        <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="3"/>
+        <line num="1" count="17" type="stmt"/>
+        <line num="5" count="44" type="stmt"/>
+        <line num="6" count="354" type="stmt"/>
+        <line num="8" count="296" type="stmt"/>
+        <line num="9" count="296" type="stmt"/>
+      </file>
+      <file name="Logger.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/utils/Logger.ts">
+        <metrics statements="13" coveredstatements="10" conditionals="3" coveredconditionals="2" methods="6" coveredmethods="5"/>
+        <line num="4" count="13" type="cond" truecount="2" falsecount="0"/>
+        <line num="5" count="13" type="stmt"/>
+        <line num="6" count="13" type="stmt"/>
+        <line num="7" count="13" type="stmt"/>
+        <line num="8" count="13" type="stmt"/>
+        <line num="17" count="13" type="stmt"/>
+        <line num="19" count="0" type="stmt"/>
+        <line num="23" count="6" type="stmt"/>
+        <line num="27" count="1" type="stmt"/>
+        <line num="31" count="1" type="stmt"/>
+        <line num="35" count="8" type="cond" truecount="0" falsecount="1"/>
+        <line num="36" count="0" type="stmt"/>
+        <line num="43" count="0" type="stmt"/>
+      </file>
+      <file name="RestClient.ts" path="/Users/peterperlepes/Documents/clerk/javascript/packages/sdk-node/src/utils/RestClient.ts">
+        <metrics statements="25" coveredstatements="24" conditionals="8" coveredconditionals="6" methods="4" coveredmethods="3"/>
+        <line num="1" count="12" type="stmt"/>
+        <line num="2" count="12" type="stmt"/>
+        <line num="3" count="12" type="stmt"/>
+        <line num="4" count="12" type="stmt"/>
+        <line num="5" count="12" type="stmt"/>
+        <line num="6" count="12" type="stmt"/>
+        <line num="8" count="12" type="stmt"/>
+        <line num="9" count="12" type="stmt"/>
+        <line num="10" count="12" type="stmt"/>
+        <line num="11" count="12" type="stmt"/>
+        <line num="12" count="12" type="stmt"/>
+        <line num="22" count="12" type="stmt"/>
+        <line num="34" count="13" type="stmt"/>
+        <line num="35" count="13" type="stmt"/>
+        <line num="36" count="13" type="stmt"/>
+        <line num="37" count="13" type="cond" truecount="1" falsecount="1"/>
+        <line num="41" count="21" type="stmt"/>
+        <line num="43" count="21" type="cond" truecount="1" falsecount="0"/>
+        <line num="44" count="6" type="stmt"/>
+        <line num="50" count="21" type="stmt"/>
+        <line num="61" count="21" type="cond" truecount="1" falsecount="0"/>
+        <line num="62" count="6" type="stmt"/>
+        <line num="66" count="21" type="stmt"/>
+        <line num="68" count="21" type="cond" truecount="1" falsecount="1"/>
+        <line num="70" count="0" type="stmt"/>
+      </file>
+    </package>
+  </project>
+</coverage>

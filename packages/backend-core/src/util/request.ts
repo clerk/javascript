@@ -1,8 +1,8 @@
 export function checkCrossOrigin(
-  origin: string | null,
-  initialHost: string | null,
-  forwardedHost: string | null,
-  port: string | null
+  origin?: string | null,
+  initialHost?: string | null,
+  forwardedHost?: string | null,
+  port?: string | null
 ) {
   // TODO: Does a request without Host, count as false or should we throw ?
   if (!origin || !initialHost) {

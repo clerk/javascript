@@ -1,0 +1,19 @@
+{
+    "object": "client",
+    "id": "client_server",
+    "session_ids": ["sess_onthebeach"],
+    "sessions": [{
+        "id": "sess_onthebeach",
+        "clientId": "client_server",
+        "userId": "user_player1",
+        "status": "active",
+        "lastActiveAt": 1610706634,
+        "expireAt": 1630846634,
+        "abandonAt": 1630846634
+    }],
+    "sign_in_attempt_id": "sia_cheepthrills",
+    "sign_up_attempt_id": null,
+    "last_active_session_id": null,
+    "created_at": 1610706634,
+    "updated_at": 1610706634
+}

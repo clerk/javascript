@@ -6,7 +6,7 @@ import {
   AuthStatus,
   Session,
   Base,
-  RemoteClerk,
+  ClerkBackendAPI,
 } from '@clerk/backend-core';
 import { LIB_NAME, LIB_VERSION } from 'info';
 
@@ -49,9 +49,9 @@ const vercelEdgeBase = new Base(importKey, verifySignature, decodeBase64);
 
 export const verifySessionToken = vercelEdgeBase.verifySessionToken;
 
-/** Export RemoteClerk API client */
+/** Export ClerkBackendAPI API client */
 
-export const ClerkAPI = new RemoteClerk({
+export const ClerkAPI = new ClerkBackendAPI({
   libName: LIB_NAME,
   libVersion: LIB_VERSION,
   packageRepo: PACKAGE_REPO,

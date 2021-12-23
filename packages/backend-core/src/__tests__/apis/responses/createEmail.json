@@ -1,0 +1,10 @@
+{
+  "object": "email",
+  "id": "ema_yeehaw",
+  "from_email_name": "accounting",
+  "to_email_address": "chuck@norris.com",
+  "email_address_id": "idn_whatever",
+  "subject": "Your account is in good standing!",
+  "body": "Click <a href=\"https://www.knowyourmeme.com/\">here</a> to see your most recent transactions.",
+  "status": "queued"
+}
