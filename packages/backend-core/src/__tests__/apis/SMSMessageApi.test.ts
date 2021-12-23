@@ -1,7 +1,8 @@
 import nock from 'nock';
 import snakecaseKeys from 'snakecase-keys';
-import { TestBackendAPIClient } from '../TestBackendAPI';
+
 import { SMSMessage } from '../../api/resources';
+import { TestBackendAPIClient } from '../TestBackendAPI';
 
 test('createSMSMessage() sends an SMS message', async () => {
   const phoneNumberId = 'idn_random';

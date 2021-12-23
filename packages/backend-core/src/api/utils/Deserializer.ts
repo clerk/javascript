@@ -1,8 +1,8 @@
-import { ObjectType } from '../resources/JSON';
 import { AllowlistIdentifier } from '../resources/AllowlistIdentifier';
 import { Client } from '../resources/Client';
 import { Email } from '../resources/Email';
 import { Invitation } from '../resources/Invitation';
+import { ObjectType } from '../resources/JSON';
 import { Session } from '../resources/Session';
 import { SMSMessage } from '../resources/SMSMessage';
 import { User } from '../resources/User';

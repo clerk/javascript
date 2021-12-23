@@ -1,11 +1,10 @@
 import camelcaseKeys from 'camelcase-keys';
-import filterKeys from '../utils/Filter';
-import associationDefaults from '../utils/Associations';
 
+import associationDefaults from '../utils/Associations';
+import filterKeys from '../utils/Filter';
 import { Association } from './Enums';
 import type { ClientJSON } from './JSON';
 import type { ClientProps } from './Props';
-
 import { Session } from './Session';
 
 interface ClientAssociations {

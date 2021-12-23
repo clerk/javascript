@@ -1,6 +1,6 @@
 import camelcaseKeys from 'camelcase-keys';
-import filterKeys from '../utils/Filter';
 
+import filterKeys from '../utils/Filter';
 import type { SMSMessageJSON } from './JSON';
 import type { SMSMessageProps } from './Props';
 

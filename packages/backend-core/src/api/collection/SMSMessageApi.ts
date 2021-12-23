@@ -1,5 +1,5 @@
-import { AbstractApi } from './AbstractApi';
 import { SMSMessage } from '../resources/SMSMessage';
+import { AbstractApi } from './AbstractApi';
 
 type SMSParams = {
   phoneNumberId: string;

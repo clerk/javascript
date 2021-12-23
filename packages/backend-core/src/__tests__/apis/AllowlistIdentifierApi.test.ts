@@ -1,6 +1,7 @@
 import nock from 'nock';
-import { TestBackendAPIClient } from '../TestBackendAPI';
+
 import { AllowlistIdentifier } from '../../api/resources';
+import { TestBackendAPIClient } from '../TestBackendAPI';
 
 test('getAllowlistIdentifierList() returns a list of allowlist identifiers', async () => {
   nock('https://api.clerk.dev')

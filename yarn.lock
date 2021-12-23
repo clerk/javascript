@@ -505,6 +505,7 @@ __metadata:
     "@typescript-eslint/parser": ^5.5.0
     eslint: 8.2.0
     eslint-config-prettier: 8.1.0
+    eslint-plugin-simple-import-sort: ^7.0.0
     jest: 27.2.3
     prettier: ^2.3.1
     ts-jest: 27.0.5
@@ -3036,6 +3037,15 @@ __metadata:
   bin:
     eslint-config-prettier: bin/cli.js
   checksum: df4cea3032671995bb5ab07e016169072f7fa59f44a53251664d9ca60951b66cdc872683b5c6a3729c91497c11490ca44a79654b395dd6756beb0c3903a37196
+  languageName: node
+  linkType: hard
+
+"eslint-plugin-simple-import-sort@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "eslint-plugin-simple-import-sort@npm:7.0.0"
+  peerDependencies:
+    eslint: ">=5.0.0"
+  checksum: 6aacb7179c213cd2081950630368d1f3b1dcb4f5674d8b989fe7839e7b317ee521d74761676e8b1a7cab49f20405dbcc9aac05358ae804e6bcba6cbf1daccb3d
   languageName: node
   linkType: hard
 

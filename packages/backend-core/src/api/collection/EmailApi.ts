@@ -1,5 +1,5 @@
-import { AbstractApi } from './AbstractApi';
 import { Email } from '../resources/Email';
+import { AbstractApi } from './AbstractApi';
 
 type EmailParams = {
   fromEmailName: string;

@@ -1,6 +1,7 @@
-import type { Request, Response, NextFunction } from 'express';
-import Clerk from '../Clerk';
+import type { NextFunction,Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
+
+import Clerk from '../Clerk';
 
 const mockNext = jest.fn();
 

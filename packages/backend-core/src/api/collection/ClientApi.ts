@@ -1,5 +1,5 @@
-import { AbstractApi } from './AbstractApi';
 import { Client } from '../resources/Client';
+import { AbstractApi } from './AbstractApi';
 
 export class ClientApi extends AbstractApi {
   public async getClientList() {

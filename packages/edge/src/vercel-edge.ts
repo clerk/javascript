@@ -1,14 +1,15 @@
 import {
-  PACKAGE_REPO,
-} from './consts';
-import { NextRequest, NextFetchEvent, NextResponse } from 'next/server';
-import {
   AuthStatus,
-  Session,
   Base,
   ClerkBackendAPI,
+  Session,
 } from '@clerk/backend-core';
 import { LIB_NAME, LIB_VERSION } from 'info';
+import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
+
+import {
+  PACKAGE_REPO,
+} from './consts';
 
 type Middleware = (
   req: NextRequest,

@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+
 import { ClerkBackendAPI } from '../api/ClerkBackendAPI';
 
 const defaultApiKey = process.env.CLERK_API_KEY || '';

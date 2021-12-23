@@ -1,6 +1,6 @@
 import camelcaseKeys from 'camelcase-keys';
-import filterKeys from '../utils/Filter';
 
+import filterKeys from '../utils/Filter';
 import type { InvitationJSON } from './JSON';
 import type { InvitationProps } from './Props';
 

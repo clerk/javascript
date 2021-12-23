@@ -1,14 +1,13 @@
 import camelcaseKeys from 'camelcase-keys';
-import filterKeys from '../utils/Filter';
+
 import associationDefaults from '../utils/Associations';
-
-import { Association } from './Enums';
-import type { ExternalAccountJSON, UserJSON } from './JSON';
-import type { UserProps } from './Props';
-
+import filterKeys from '../utils/Filter';
 import { EmailAddress } from './EmailAddress';
+import { Association } from './Enums';
 import { ExternalAccount } from './ExternalAccount';
+import type { ExternalAccountJSON, UserJSON } from './JSON';
 import { PhoneNumber } from './PhoneNumber';
+import type { UserProps } from './Props';
 
 interface UserAssociations {
   emailAddresses: EmailAddress[];

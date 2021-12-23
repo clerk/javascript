@@ -1,6 +1,7 @@
 import nock from 'nock';
-import { TestBackendAPIClient } from '../TestBackendAPI';
+
 import { User } from '../../api/resources';
+import { TestBackendAPIClient } from '../TestBackendAPI';
 
 test('getUserList() returns a list of users', async () => {
   nock('https://api.clerk.dev')

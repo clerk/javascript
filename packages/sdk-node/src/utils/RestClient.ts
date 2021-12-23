@@ -1,9 +1,10 @@
 import got, { HTTPAlias } from 'got';
+import * as querystring from 'querystring';
+import snakecaseKeys from 'snakecase-keys';
+
+import { LIB_NAME, LIB_VERSION } from '../info';
 import deserialize from './Deserializer';
 import handleError from './ErrorHandler';
-import snakecaseKeys from 'snakecase-keys';
-import * as querystring from 'querystring';
-import { LIB_NAME, LIB_VERSION } from '../info';
 
 const packageName = LIB_NAME;
 const packageVersion = LIB_VERSION;

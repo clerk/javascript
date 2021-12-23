@@ -1,5 +1,5 @@
-import { AbstractApi } from './AbstractApi';
 import { Session } from '../resources/Session';
+import { AbstractApi } from './AbstractApi';
 
 type QueryParams = {
   clientId?: string;

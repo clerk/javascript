@@ -1,12 +1,10 @@
 import associationDefaults from '../utils/Associations';
-
 import { Association } from './Enums';
-import type { Nullable } from './Nullable';
-import type { PhoneNumberJSON, IdentificationLinkJSON } from './JSON';
-import type { PhoneNumberProps } from './Props';
-
-import { Verification } from './Verification';
 import { IdentificationLink } from './IdentificationLink';
+import type { IdentificationLinkJSON,PhoneNumberJSON } from './JSON';
+import type { Nullable } from './Nullable';
+import type { PhoneNumberProps } from './Props';
+import { Verification } from './Verification';
 
 interface PhoneNumberAssociations {
   verification: Nullable<Verification>;

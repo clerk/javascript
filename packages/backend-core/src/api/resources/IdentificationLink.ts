@@ -1,6 +1,6 @@
 import camelcaseKeys from 'camelcase-keys';
-import filterKeys from '../utils/Filter';
 
+import filterKeys from '../utils/Filter';
 import type { IdentificationLinkJSON } from './JSON';
 import type { IdentificationLinkProps } from './Props';
 

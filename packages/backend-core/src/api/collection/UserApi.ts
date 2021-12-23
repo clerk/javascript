@@ -1,5 +1,5 @@
-import { AbstractApi } from './AbstractApi';
 import { User } from '../resources/User';
+import { AbstractApi } from './AbstractApi';
 
 interface UserParams {
   firstName?: string;

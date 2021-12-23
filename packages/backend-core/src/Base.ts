@@ -1,9 +1,10 @@
 import type { CryptoKey as PeculiarCryptoKey } from '@peculiar/webcrypto';
-import { isExpired, checkClaims } from './util/jwt';
-import { isDevelopmentOrStaging, isProduction } from './util/clerkApiKey';
-import { checkCrossOrigin } from './util/request';
-import { JWTPayload, JWT } from './util/types';
+
 import { parse } from './util/base64url';
+import { isDevelopmentOrStaging, isProduction } from './util/clerkApiKey';
+import { checkClaims,isExpired } from './util/jwt';
+import { checkCrossOrigin } from './util/request';
+import { JWT,JWTPayload } from './util/types';
 
 export const API_KEY = process.env.CLERK_API_KEY || '';
 

@@ -1,6 +1,6 @@
 import camelcaseKeys from 'camelcase-keys';
-import filterKeys from '../utils/Filter';
 
+import filterKeys from '../utils/Filter';
 import type { EmailJSON } from './JSON';
 import type { EmailProps } from './Props';
 

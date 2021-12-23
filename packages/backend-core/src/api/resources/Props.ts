@@ -1,13 +1,12 @@
-import { Nullable } from './Nullable';
-
 import {
   SignInFactorStrategy,
   SignInIdentifier,
   SignInStatus,
-  SignUpIdentificationRequirements,
   SignUpAttributeRequirements,
+  SignUpIdentificationRequirements,
   SignUpStatus,
 } from './Enums';
+import { Nullable } from './Nullable';
 
 export interface ClerkProps {
   id: Nullable<string>;

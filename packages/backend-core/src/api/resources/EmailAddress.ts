@@ -1,12 +1,10 @@
 import associationDefaults from '../utils/Associations';
-
 import { Association } from './Enums';
-import type { Nullable } from './Nullable';
-import type { EmailAddressJSON } from './JSON';
-import type { EmailAddressProps } from './Props';
-
-import { Verification } from './Verification';
 import { IdentificationLink } from './IdentificationLink';
+import type { EmailAddressJSON } from './JSON';
+import type { Nullable } from './Nullable';
+import type { EmailAddressProps } from './Props';
+import { Verification } from './Verification';
 
 interface EmailAddressAssociations {
   verification: Nullable<Verification>;

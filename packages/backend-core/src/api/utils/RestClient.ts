@@ -1,7 +1,8 @@
+import * as querystring from 'query-string';
+import snakecaseKeys from 'snakecase-keys';
+
 import deserialize from './Deserializer';
 import handleError from './ErrorHandler';
-import snakecaseKeys from 'snakecase-keys';
-import * as querystring from 'query-string';
 
 export const INTERSTITIAL_METHOD = 'GET';
 const SERVER_API_URL = 'https://api.clerk.dev';

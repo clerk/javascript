@@ -1,17 +1,16 @@
 ﻿// libs
-import type { Request, Response, NextFunction } from 'express';
-import Cookies from 'cookies';
 import { AuthStatus, ClerkBackendAPI, ClerkFetcher, Session } from '@clerk/backend-core';
+import Cookies from 'cookies';
+import type { NextFunction,Request, Response } from 'express';
+import got from 'got';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import jwks, { JwksClient } from 'jwks-rsa';
 
-// utils
-import Logger from './utils/Logger';
-
-import { ClerkServerError } from './utils/Errors';
 import { SupportMessages } from './constants/SupportMessages';
 import { LIB_NAME, LIB_VERSION } from './info';
-import got from 'got';
+import { ClerkServerError } from './utils/Errors';
+// utils
+import Logger from './utils/Logger';
 
 const defaultApiKey = process.env.CLERK_API_KEY || '';
 const defaultApiVersion = process.env.CLERK_API_VERSION || 'v1';
@@ -29,8 +28,8 @@ export type RequireSessionProp<T> = T & { session: Session };
 export type WithSessionClaimsProp<T> = T & { sessionClaims?: JwtPayload };
 export type RequireSessionClaimsProp<T> = T & { sessionClaims: JwtPayload };
 
-import { Crypto, CryptoKey } from "@peculiar/webcrypto";
 import { Base } from "@clerk/backend-core";
+import { Crypto, CryptoKey } from "@peculiar/webcrypto";
 
 const crypto = new Crypto();
 

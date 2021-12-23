@@ -1,4 +1,3 @@
-import Clerk from '../Clerk';
 import { AllowlistIdentifierApi } from '../apis/AllowlistIdentifierApi';
 import { ClientApi } from '../apis/ClientApi';
 import { EmailApi } from '../apis/EmailApi';
@@ -6,6 +5,7 @@ import { InvitationApi } from '../apis/InvitationApi';
 import { SessionApi } from '../apis/SessionApi';
 import { SMSMessageApi } from '../apis/SMSMessageApi';
 import { UserApi } from '../apis/UserApi';
+import Clerk from '../Clerk';
 
 test('getInstance() getter returns a Clerk instance', () => {
   const clerk = Clerk.getInstance();

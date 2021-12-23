@@ -1,6 +1,7 @@
 import nock from 'nock';
-import { TestBackendAPIClient } from '../TestBackendAPI';
+
 import { Session } from '../../api/resources';
+import { TestBackendAPIClient } from '../TestBackendAPI';
 
 test('getSessionList() returns a list of sessions', async () => {
   nock('https://api.clerk.dev')

@@ -1,5 +1,5 @@
-import { AbstractApi } from './AbstractApi';
 import { Invitation } from '../resources/Invitation';
+import { AbstractApi } from './AbstractApi';
 
 const basePath = '/invitations';
 

@@ -1,6 +1,6 @@
 import camelcaseKeys from 'camelcase-keys';
-import filterKeys from '../utils/Filter';
 
+import filterKeys from '../utils/Filter';
 import type { SessionJSON } from './JSON';
 import { SessionProps } from './Props';
 

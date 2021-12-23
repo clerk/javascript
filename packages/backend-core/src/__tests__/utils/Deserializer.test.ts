@@ -1,6 +1,5 @@
 // import { User } from '../../resources/User';
 
-import deserialize from '../../api/utils/Deserializer';
 import {
   AllowlistIdentifier,
   Client,
@@ -9,6 +8,7 @@ import {
   Session,
   SMSMessage,
 } from '../../api/resources';
+import deserialize from '../../api/utils/Deserializer';
 
 const allowlistIdentifierJSON = {
   object: 'allowlist_identifier',

@@ -1,6 +1,6 @@
 import {
-  SignInIdentifier,
   SignInFactorStrategy,
+  SignInIdentifier,
   SignInStatus,
   SignUpAttributeRequirements,
   SignUpIdentificationRequirements,

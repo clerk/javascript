@@ -1,5 +1,5 @@
-import { AbstractApi } from './AbstractApi';
 import { AllowlistIdentifier } from '../resources/AllowlistIdentifier';
+import { AbstractApi } from './AbstractApi';
 
 const basePath = '/allowlist_identifiers';
 

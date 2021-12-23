@@ -3,9 +3,9 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
     tsconfigRootDir: __dirname,
-    project: ['./tsconfig.json'],
+    project: ['./tsconfig.json', './packages/*/tsconfig.json'],
   },
-  plugins: ['@typescript-eslint'],
+  plugins: ['@typescript-eslint', 'simple-import-sort'],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
@@ -13,7 +13,9 @@ module.exports = {
     'prettier',
   ],
   rules: {
-    '@typescript-eslint/no-unsafe-assignment': "warn",
-    '@typescript-eslint/no-unsafe-call': "warn"
+    '@typescript-eslint/no-unsafe-assignment': 'warn',
+    'simple-import-sort/imports': 'error',
+    '@typescript-eslint/no-unsafe-call': 'off',
+    '@typescript-eslint/no-unsafe-member-access': 'off'
   }
 };

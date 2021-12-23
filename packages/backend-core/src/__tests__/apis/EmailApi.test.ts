@@ -1,7 +1,8 @@
 import nock from 'nock';
 import snakecaseKeys from 'snakecase-keys';
-import { TestBackendAPIClient } from '../TestBackendAPI';
+
 import { Email } from '../../api/resources';
+import { TestBackendAPIClient } from '../TestBackendAPI';
 
 test('createEmail() sends an email', async () => {
   const fromEmailName = 'accounting';

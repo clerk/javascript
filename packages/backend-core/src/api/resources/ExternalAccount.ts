@@ -1,6 +1,5 @@
 import type { ExternalAccountJSON } from './JSON';
 import { ObjectType } from './JSON';
-
 import type { ExternalAccountProps } from './Props';
 
 interface ExternalAccountPayload extends ExternalAccountProps {}
