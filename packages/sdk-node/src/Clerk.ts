@@ -1,10 +1,15 @@
-﻿// libs
-import { AuthStatus, ClerkBackendAPI, ClerkFetcher, Session } from '@clerk/backend-core';
+﻿import {
+  AuthStatus,
+  ClerkBackendAPI,
+  ClerkFetcher,
+  Session,
+} from '@clerk/backend-core';
 import Cookies from 'cookies';
-import type { NextFunction,Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import got from 'got';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import jwks, { JwksClient } from 'jwks-rsa';
+import querystring from 'querystring';
 
 import { SupportMessages } from './constants/SupportMessages';
 import { LIB_NAME, LIB_VERSION } from './info';
@@ -28,16 +33,16 @@ export type RequireSessionProp<T> = T & { session: Session };
 export type WithSessionClaimsProp<T> = T & { sessionClaims?: JwtPayload };
 export type RequireSessionClaimsProp<T> = T & { sessionClaims: JwtPayload };
 
-import { Base } from "@clerk/backend-core";
-import { Crypto, CryptoKey } from "@peculiar/webcrypto";
+import { Base } from '@clerk/backend-core';
+import { Crypto, CryptoKey } from '@peculiar/webcrypto';
 
 const crypto = new Crypto();
 
 const decodeBase64 = (base64: string) =>
-  Buffer.from(base64, "base64").toString("binary");
+  Buffer.from(base64, 'base64').toString('binary');
 
 const importKey = async (jwk: JsonWebKey, algorithm: Algorithm) => {
-  return await crypto.subtle.importKey("jwk", jwk, algorithm, true, ["verify"]);
+  return await crypto.subtle.importKey('jwk', jwk, algorithm, true, ['verify']);
 };
 
 const verifySignature = async (
@@ -51,11 +56,7 @@ const verifySignature = async (
 
 /** Base initialization */
 
-const nodeBase = new Base(
-  importKey,
-  verifySignature,
-  decodeBase64
-);
+const nodeBase = new Base(importKey, verifySignature, decodeBase64);
 
 export default class Clerk extends ClerkBackendAPI {
   // private _restClient: RestClient;
@@ -89,7 +90,7 @@ export default class Clerk extends ClerkBackendAPI {
           'Content-Type': contentType,
           'User-Agent': userAgent,
         },
-        ...(body && { form: body })
+        ...(body && { body: querystring.stringify(body) }),
       });
     };
 
@@ -119,11 +120,9 @@ export default class Clerk extends ClerkBackendAPI {
     // });
 
     //   const key = await this._jwksClient.getSigningKey(decoded.header.kid);
-  //   const verified = jwt.verify(token, key.getPublicKey(), {
-  //     algorithms: algorithms as jwt.Algorithm[],
-  //   }) as JwtPayload;
-
-
+    //   const verified = jwt.verify(token, key.getPublicKey(), {
+    //     algorithms: algorithms as jwt.Algorithm[],
+    //   }) as JwtPayload;
   }
 
   // For use as singleton, always returns the same instance
@@ -160,8 +159,6 @@ export default class Clerk extends ClerkBackendAPI {
   expressWithSession(
     { onError }: MiddlewareOptions = { onError: this.defaultOnError }
   ): (req: Request, res: Response, next: NextFunction) => Promise<void> {
-    
-
     function signedOut() {
       throw new Error('Unauthenticated');
     }
@@ -175,36 +172,32 @@ export default class Clerk extends ClerkBackendAPI {
       const cookies = new Cookies(req, res);
 
       try {
-        const { status, session, interstitial } = await nodeBase.getAuthState(
-          {
-            cookieToken: cookies.get('__session') as string,
-            clientUat: cookies.get('__client_uat') as string,
-            headerToken: req.headers.authorization?.replace('Bearer ', ''),
-            origin: req.headers.origin,
-            host: req.headers.host,
-            forwardedPort: req.headers['x-forwarded-port'] as string,
-            forwardedHost: req.headers['x-forwarded-host'] as string,
-            referrer: req.headers.referer,
-            fetchInterstitial: () => this.fetchInterstitial(),
-          }
-        );
+        const { status, session, interstitial } = await nodeBase.getAuthState({
+          cookieToken: cookies.get('__session') as string,
+          clientUat: cookies.get('__client_uat') as string,
+          headerToken: req.headers.authorization?.replace('Bearer ', ''),
+          origin: req.headers.origin,
+          host: req.headers.host,
+          forwardedPort: req.headers['x-forwarded-port'] as string,
+          forwardedHost: req.headers['x-forwarded-host'] as string,
+          referrer: req.headers.referer,
+          userAgent: req.headers['user-agent'] as string,
+          fetchInterstitial: () => this.fetchInterstitial(),
+        });
 
-        if(status === AuthStatus.SignedOut){
+        if (status === AuthStatus.SignedOut) {
           return signedOut();
         }
 
-        if(status === AuthStatus.SignedIn){
+        if (status === AuthStatus.SignedIn) {
           // @ts-ignore
           req.session = session;
           return next();
         }
 
-        
-
         res.writeHead(401, { 'Content-Type': 'text/html' });
         res.write(interstitial);
         res.end();
-
       } catch (error) {
         // Session will not be set on request
 

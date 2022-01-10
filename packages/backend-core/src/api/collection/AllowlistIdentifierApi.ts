@@ -27,6 +27,7 @@ export class AllowlistIdentifierApi extends AbstractApi {
   }
 
   public async deleteAllowlistIdentifier(allowlistIdentifierId: string) {
+    this.requireId(allowlistIdentifierId);
     return this._restClient.makeRequest<AllowlistIdentifier>({
       method: 'DELETE',
       path: `${basePath}/${allowlistIdentifierId}`,

@@ -81,3 +81,9 @@ test('deleteAllowlistIdentifier() deletes an allowlist identifier', async () => 
     })
   );
 });
+
+test('deleteAllowlistIdentifier() throws an error without allowlist identifier ID', async () => {
+  await expect(
+    TestBackendAPIClient.allowlistIdentifiers.deleteAllowlistIdentifier('')
+  ).rejects.toThrow('A valid ID is required.');
+});

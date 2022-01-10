@@ -63,6 +63,18 @@ test('getSession() returns a single session', async () => {
   expect(session).toEqual(expected);
 });
 
+test('getSession() throws an error without session ID', async () => {
+  await expect(TestBackendAPIClient.sessions.getSession('')).rejects.toThrow(
+    'A valid ID is required.'
+  );
+});
+
+test('revokeSession() throws an error without session ID', async () => {
+  await expect(TestBackendAPIClient.sessions.revokeSession('')).rejects.toThrow(
+    'A valid ID is required.'
+  );
+});
+
 test('verifySession() returns a session if verified', async () => {
   const expected = new Session({
     id: 'sess_oops',
@@ -88,4 +100,10 @@ test('verifySession() returns a session if verified', async () => {
   );
 
   expect(session).toEqual(expected);
+});
+
+test('verifySession() throws an error without session ID', async () => {
+  await expect(
+    TestBackendAPIClient.sessions.verifySession('', '')
+  ).rejects.toThrow('A valid ID is required.');
 });

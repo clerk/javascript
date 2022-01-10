@@ -16,6 +16,7 @@ export class SessionApi extends AbstractApi {
   }
 
   public async getSession(sessionId: string) {
+    this.requireId(sessionId);
     return this._restClient.makeRequest<Session>({
       method: 'GET',
       path: `/sessions/${sessionId}`,
@@ -23,6 +24,7 @@ export class SessionApi extends AbstractApi {
   }
 
   public async revokeSession(sessionId: string) {
+    this.requireId(sessionId);
     return this._restClient.makeRequest<Session>({
       method: 'POST',
       path: `/sessions/${sessionId}/revoke`,
@@ -30,6 +32,7 @@ export class SessionApi extends AbstractApi {
   }
 
   public async verifySession(sessionId: string, token: string) {
+    this.requireId(sessionId);
     return this._restClient.makeRequest<Session>({
       method: 'POST',
       path: `/sessions/${sessionId}/verify`,

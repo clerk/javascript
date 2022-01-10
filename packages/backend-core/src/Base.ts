@@ -2,9 +2,9 @@ import type { CryptoKey as PeculiarCryptoKey } from '@peculiar/webcrypto';
 
 import { parse } from './util/base64url';
 import { isDevelopmentOrStaging, isProduction } from './util/clerkApiKey';
-import { checkClaims,isExpired } from './util/jwt';
+import { checkClaims, isExpired } from './util/jwt';
 import { checkCrossOrigin } from './util/request';
-import { JWT,JWTPayload } from './util/types';
+import { JWT, JWTPayload } from './util/types';
 
 export const API_KEY = process.env.CLERK_API_KEY || '';
 
@@ -32,14 +32,25 @@ type AuthState = {
 };
 
 type AuthStateParams = {
+  /* Client token cookie value */
   cookieToken?: string;
+  /* Client uat cookie value */
   clientUat?: string;
+  /* Client token header value */
   headerToken?: string | null;
+  /* Request origin header value */
   origin?: string | null;
+  /* Request host header value */
   host?: string | null;
+  /* Request forwarded host value */
   forwardedHost?: string | null;
+  /* Request forwarded port value */
   forwardedPort?: string | null;
+  /* Request referrer */
   referrer?: string | null;
+  /* Request user-agent value */
+  userAgent?: string | null;
+  /* HTTP utility for fetching a text/html string */
   fetchInterstitial: () => Promise<string>;
 };
 
@@ -167,6 +178,13 @@ export class Base {
     return payload;
   };
 
+  /**
+   *
+   * Retrieve the authentication state for a request by using client specific information.
+   *
+   * @param {AuthStateParams}
+   * @returns {Promise<AuthState>}
+   */
   getAuthState = async ({
     cookieToken,
     clientUat,
@@ -176,6 +194,7 @@ export class Base {
     forwardedHost,
     forwardedPort,
     referrer,
+    userAgent,
     fetchInterstitial,
   }: AuthStateParams): Promise<AuthState> => {
     const isCrossOrigin = checkCrossOrigin(
@@ -184,13 +203,6 @@ export class Base {
       forwardedHost,
       forwardedPort
     );
-    if (headerToken && !this.decodeJwt(headerToken)) {
-      return { status: AuthStatus.SignedOut };
-    }
-
-    if (!headerToken && isCrossOrigin) {
-      return { status: AuthStatus.SignedOut };
-    }
 
     let sessionClaims;
     if (headerToken) {
@@ -205,6 +217,19 @@ export class Base {
         };
       }
 
+      return { status: AuthStatus.SignedOut };
+    }
+
+    // In development or staging environments only, based on the request's
+    // User Agent, detect non-browser requests (e.g. scripts). If there
+    // is no Authorization header, consider the user as signed out and
+    // prevent interstitial rendering
+    if (isDevelopmentOrStaging(API_KEY) && !userAgent?.startsWith('Mozilla/')) {
+      return { status: AuthStatus.SignedOut };
+    }
+
+    // In cross-origin requests the use of Authorization header is mandatory
+    if (isCrossOrigin) {
       return { status: AuthStatus.SignedOut };
     }
 
@@ -224,7 +249,7 @@ export class Base {
     }
 
     // TODO: Is this a valid check here ?
-    if(!cookieToken){
+    if (!cookieToken) {
       return { status: AuthStatus.SignedOut };
     }
 

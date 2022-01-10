@@ -5,6 +5,7 @@ const basePath = '/invitations';
 
 type CreateParams = {
   emailAddress: string;
+  redirectUrl?: string;
 };
 
 export class InvitationApi extends AbstractApi {
@@ -24,6 +25,7 @@ export class InvitationApi extends AbstractApi {
   }
 
   public async revokeInvitation(invitationId: string) {
+    this.requireId(invitationId);
     return this._restClient.makeRequest<Invitation>({
       method: 'POST',
       path: `${basePath}/${invitationId}/revoke`,

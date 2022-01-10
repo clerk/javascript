@@ -1,0 +1,46 @@
+{
+    "id": "user_1oBNj55jOjSK9rOYrT5QHqj7eaK",
+    "object": "user",
+    "username": null,
+    "first_name": "Boss",
+    "last_name": "Clerk",
+    "profile_image_url": "https://images.clerk.services/clerk/default-profile.svg",
+    "primary_email_address_id": "idn_1oBNgISXFbSf5m0uP2Wl0qWtNGX",
+    "primary_phone_number_id": null,
+    "password_enabled": true,
+    "two_factor_enabled": false,
+    "email_addresses": [
+        {
+            "id": "idn_1oBNgISXFbSf5m0uP2Wl0qWtNGX",
+            "object": "email_address",
+            "email_address": "boss@clerk.dev",
+            "verification": {
+                "status": "verified",
+                "strategy": "email_code",
+                "attempts": 1,
+                "expire_at": 1612756733
+            },
+            "linked_to": []
+        }
+    ],
+    "phone_numbers": [
+        {
+            "id": "idn_1q8Uq8Mc4t7WWMy9Z6Og0gNJVui",
+            "object": "phone_number",
+            "phone_number": "+15555555555",
+            "reserved_for_second_factor": false,
+            "verification": {
+                "status": "verified",
+                "strategy": "phone_code",
+                "attempts": 1,
+                "expire_at": 1616461499
+            },
+            "linked_to": []
+        }
+    ],
+    "external_accounts": [],
+    "public_metadata": {},
+    "private_metadata": {},
+    "created_at": 1612756155,
+    "updated_at": 1612756155
+}

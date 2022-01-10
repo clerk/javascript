@@ -6,4 +6,10 @@ export abstract class AbstractApi {
   constructor(restClient: RestClient) {
     this._restClient = restClient;
   }
+
+  protected requireId(id: string) {
+    if (!id) {
+      throw new Error('A valid ID is required.');
+    }
+  }
 }

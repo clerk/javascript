@@ -1,4 +1,11 @@
-# Clerk node SDK
+<p align="center">
+  <a href="https://clerk.dev/" target="_blank" align="center">
+    <img src="../../docs/clerk-logo.svg" height="50">
+  </a>
+  <br />
+</p>
+
+# Clerk Node.js SDK
 
 Thank you for choosing [Clerk](https://clerk.dev/) for your authentication, session & user management needs!
 
@@ -46,6 +53,7 @@ the <a href="https://docs.clerk.dev/reference/backend-api-reference" target="_bl
   - [User operations](#user-operations)
     - [getUserList()](#getuserlist)
     - [getUser(userId)](#getuseruserid)
+    - [createUser(params)](#createuserparams)
     - [updateUser(userId, params)](#updateuseruserid-params)
     - [deleteUser(userId)](#deleteuseruserid)
   - [Email operations](#email-operations)
@@ -177,8 +185,8 @@ const clerk = pkg.default;
 
 clerk.emails
   .createEmail({ fromEmailName, subject, body, emailAddressId })
-  .then(email => console.log(email))
-  .catch(error => console.error(error));
+  .then((email) => console.log(email))
+  .catch((error) => console.error(error));
 ```
 
 Or if you prefer a resource sub-api directly:
@@ -189,8 +197,8 @@ const { clients } = pkg;
 
 clients
   .getClient(clientId)
-  .then(client => console.log(client))
-  .catch(error => console.error(error));
+  .then((client) => console.log(client))
+  .catch((error) => console.error(error));
 ```
 
 #### Setters
@@ -236,8 +244,8 @@ const clerk = new Clerk({ apiKey: 'your-eyes-only' });
 
 clerk.smsMessages
   .createSMSMessage({ message, phoneNumberId })
-  .then(smsMessage => console.log(smsMessage))
-  .catch(error => console.error(error));
+  .then((smsMessage) => console.log(smsMessage))
+  .catch((error) => console.error(error));
 ```
 
 ### Examples
@@ -254,7 +262,8 @@ Allowlist operations are exposed by the `allowlistIdentifiers` sub-api (`clerk.a
 Retrieves the list of allowlist identifiers.
 
 ```ts
-const allowlistIdentifiers = await clerk.allowlistIdentifiers.getAllowlistIdentifierList();
+const allowlistIdentifiers =
+  await clerk.allowlistIdentifiers.getAllowlistIdentifierList();
 ```
 
 #### createAllowlistIdentifier(params)
@@ -271,17 +280,17 @@ You can also control if you want to notify the owner of the `identifier`, by set
 
 ```ts
 const allowlistIdentifier = await createAllowlistIdentifier({
-  identifier: "test@example.com",
+  identifier: 'test@example.com',
   notify: false,
 });
 ```
 
 #### deleteAllowlistIdentifier(allowlistIdentifierId)
 
-Deletes an allowlist identifier, specified by the `allowlistIdentifierId` parameter.
+Deletes an allowlist identifier, specified by the `allowlistIdentifierId` parameter. Throws an error if the `allowlistIdentifierId` parameter is invalid.
 
 ```ts
-await deleteAllowlistIdentifier("alid_randomid");
+await deleteAllowlistIdentifier('alid_randomid');
 ```
 
 ### Client operations
@@ -298,7 +307,7 @@ const clients = await clerk.clients.getClientList();
 
 #### getClient(clientId)
 
-Retrieves a single client by its id:
+Retrieves a single client by its id, if the id is valid. Throws an error otherwise.
 
 ```ts
 const clientID = 'my-client-id';
@@ -332,20 +341,25 @@ Creates a new invitation for the given email address and sends the invitation em
 
 Keep in mind that you cannot create an invitation if there is already one for the given email address. Also, trying to create an invitation for an email address that already exists in your application will result in an error.
 
+You can optionally pass a `redirectUrl` parameter when creating the invitation and the invitee will be redirected there after they click the invitation email link.
+
 ```js
 const invitation = await clerk.invitations.createInvitation({
-  emailAddress: "invite@example.com",
+  emailAddress: 'invite@example.com',
+  redirectUrl: 'https://optionally-redirect-here',
 });
 ```
 
 #### revokeInvitation(invitationId)
 
-Revokes the invitation with the provided `invitationId`. Revoking an invitation makes the invitation email link unusable. However, it doesn't prevent the user from signing up if they follow the sign up flow.
+Revokes the invitation with the provided `invitationId`. Throws an error if `invitationId` is invalid.
+
+Revoking an invitation makes the invitation email link unusable. However, it doesn't prevent the user from signing up if they follow the sign up flow.
 
 Only active (i.e. non-revoked) invitations can be revoked.
 
 ```js
-const invitation = await clerk.invitations.revokeInvitation("inv_some-id");
+const invitation = await clerk.invitations.revokeInvitation('inv_some-id');
 ```
 
 ### Session operations
@@ -370,7 +384,7 @@ const sessions = await clerk.sessions.getSessionList({ clientId, sessionId });
 
 #### getSession(sessionId)
 
-Retrieves a single session by its id:
+Retrieves a single session by its id, if the id is valid. Throws an error otherwise.
 
 ```ts
 const session = await clerk.sessions.getSession(sessionId);
@@ -378,7 +392,9 @@ const session = await clerk.sessions.getSession(sessionId);
 
 #### revokeSession(sessionId)
 
-Revokes a session given its id. User will be signed out from the particular client the referred to:
+Revokes a session given its id, if the id is valid. Throws an error otherwise.
+
+User will be signed out from the particular client the referred to.
 
 ```ts
 const sessionId = 'my-session-id';
@@ -387,7 +403,7 @@ const session = await clerk.sessions.revokeSession(sessionId);
 
 #### verifySession(sessionId, sessionToken)
 
-Verifies whether a session with a given id corresponds to the provided session token:
+Verifies whether a session with a given id corresponds to the provided session token. Throws an error if the provided id is invalid.
 
 ```ts
 const sessionId = 'my-session-id';
@@ -428,16 +444,37 @@ If these filters are included, the response will contain only users that own any
 
 #### getUser(userId)
 
-Retrieves a single user by their id:
+Retrieves a single user by their id, if the id is valid. Throws an error otherwise.
 
 ```ts
 const userId = 'my-user-id';
 const user = await clerk.users.getUser(userId);
 ```
 
+#### createUser(params)
+
+Creates a user. Your user management settings determine how you should setup your user model.
+
+Any email address and phone number created using this method will be automatically marked as verified.
+
+Available parameters are:
+
+- _externalId_ The ID of the user you use in in your external systems. Must be unique across your instance.
+- _emailAddress[]_ Email addresses to add to the user. Must be unique across your instance. The first email address will be set as the users primary email address.
+- _phoneNumber[]_ Phone numbers that will be added to the user. Must be unique across your instance. The first phone number will be set as the users primary phone number.
+- _username_ The username to give to the user. It must be unique across your instance.
+- _password_ The plaintext password to give the user.
+- _firstName_ User's first name.
+- _lastName_ User's last name.
+- _publicMetadata_ Metadata saved on the user, that is visible to both your Frontend and Backend APIs.
+- _privateMetadata_ Metadata saved on the user, that is only visible to your Backend API.
+- _unsafeMetadata_ Metadata saved on the user, that can be updated from both the Frontend and Backend APIs. Note: Since this data can be modified from the frontend, it is not guaranteed to be safe.
+
 #### updateUser(userId, params)
 
-Updates a user with a given id with attribute values provided in a params object:
+Updates a user with a given id with attribute values provided in a params object.
+
+The provided id must be valid, otherwise an error will be thrown.
 
 ```ts
 const userId = 'my-user-id';
@@ -459,7 +496,7 @@ Supported user attributes for update are:
 
 #### deleteUser(userId)
 
-Deletes a user given their id:
+Deletes a user given their id, if the id is valid. Throws an error otherwise.
 
 ```ts
 const userId = 'my-user-id';
@@ -514,7 +551,7 @@ For usage with <a href="https://github.com/expressjs/express" target="_blank">Ex
 middlewares that can be used in the standard manner:
 
 ```ts
-import { ClerkWithSession } from 'sdk-server-node';
+import { ClerkWithSession } from '@clerk/clerk-sdk-node';
 
 // Initialize express app the usual way
 
@@ -537,7 +574,7 @@ Where `clerk` is your own instance.
 If you prefer that the middleware renders a 401 (Unauthenticated) itself, you can use the following variant instead:
 
 ```ts
-import { ClerkExpressRequireSession } from 'sdk-server-node';
+import { ClerkExpressRequireSession } from '@clerk/clerk-sdk-node';
 
 app.use(ClerkExpressRequireSession());
 ```

@@ -15,12 +15,19 @@ const defaultServerApiUrl =
   process.env.CLERK_API_URL || 'https://api.clerk.dev';
 
 type ClerkBackendAPIProps = {
+  /* Backend API key */
   apiKey?: string;
+  /* Backend API URL */
   serverApiUrl?: string;
+  /* Backend API version */
   apiVersion?: string;
+  /* HTTP fetch implementation (not specific to window.fetch API) */
   fetcher: ClerkFetcher;
+  /* Library/SDK name */
   libName: string;
+  /* Library/SDK semver version string */
   libVersion: string;
+  /* Library/SDK repository URL */
   packageRepo: string;
 };
 

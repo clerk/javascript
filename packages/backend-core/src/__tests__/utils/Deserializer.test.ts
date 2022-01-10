@@ -1,5 +1,3 @@
-// import { User } from '../../resources/User';
-
 import {
   AllowlistIdentifier,
   Client,

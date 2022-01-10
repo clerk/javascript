@@ -1,4 +1,5 @@
 import nock from 'nock';
+import snakecaseKeys from 'snakecase-keys';
 
 import { User } from '../../api/resources';
 import { TestBackendAPIClient } from '../TestBackendAPI';
@@ -124,4 +125,41 @@ test('getUser() returns a single user', async () => {
 
   const expectedPublicMetadata = { zodiac_sign: 'leo', ascendant: 'scorpio' };
   expect(user.publicMetadata).toEqual(expectedPublicMetadata);
+});
+
+test('getUser() throws an error without user ID', async () => {
+  await expect(TestBackendAPIClient.users.getUser('')).rejects.toThrow(
+    'A valid ID is required.'
+  );
+});
+
+test('updateUser() throws an error without user ID', async () => {
+  await expect(TestBackendAPIClient.users.updateUser('', {})).rejects.toThrow(
+    'A valid ID is required.'
+  );
+});
+
+test('deleteUser() throws an error without user ID', async () => {
+  await expect(TestBackendAPIClient.users.deleteUser('')).rejects.toThrow(
+    'A valid ID is required.'
+  );
+});
+
+test('createUser() creates a user', async () => {
+  const params = {
+    emailAddress: ['boss@clerk.dev'],
+    phoneNumber: ['+15555555555'],
+    password: '123456',
+    firstName: 'Boss',
+    lastName: 'Clerk',
+  };
+
+  nock('https://api.clerk.dev')
+    .post('/v1/users', snakecaseKeys(params))
+    .replyWithFile(200, __dirname + '/responses/createUser.json', {
+      'Content-Type': '',
+    });
+
+  const user = await TestBackendAPIClient.users.createUser(params);
+  expect(user.firstName).toEqual('Boss');
 });
