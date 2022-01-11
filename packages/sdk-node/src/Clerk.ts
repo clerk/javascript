@@ -90,6 +90,7 @@ export default class Clerk extends ClerkBackendAPI {
           'Content-Type': contentType,
           'User-Agent': userAgent,
         },
+        // @ts-ignore
         ...(body && { body: querystring.stringify(body) }),
       });
     };
