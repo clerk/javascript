@@ -70,8 +70,7 @@ export {
 } from './utils/Errors';
 
 // Export Logger
-import Logger from './utils/Logger';
-export { Logger };
+export { default as Logger } from './utils/Logger';
 
 // Export setters for the default singleton instance
 // Useful if you only have access to a sub-api instance

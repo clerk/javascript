@@ -14,8 +14,8 @@ export {
   ClerkServerError,
   ClerkServerErrorJSON,
 } from './utils/Errors';
-import Logger from './utils/Logger';
-export { Logger };
+export { default as Logger } from './utils/Logger';
+
 export {
   AllowlistIdentifier,
   Client,

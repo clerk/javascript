@@ -4,12 +4,10 @@ import {
   ClerkBackendAPI,
   Session,
 } from '@clerk/backend-core';
-import { LIB_NAME, LIB_VERSION } from 'info';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 
-import {
-  PACKAGE_REPO,
-} from './consts';
+import { PACKAGE_REPO } from './constants';
+import { LIB_NAME, LIB_VERSION } from './info';
 
 type Middleware = (
   req: NextRequest,
@@ -65,7 +63,7 @@ export const ClerkAPI = new ClerkBackendAPI({
         'User-Agent': userAgent,
       },
       ...(body && { body: JSON.stringify(body) }),
-    }).then(body => body.json());
+    }).then((body) => body.json());
   },
 });
 
