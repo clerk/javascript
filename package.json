@@ -16,6 +16,7 @@
     "@types/node": "14.14.33",
     "@typescript-eslint/eslint-plugin": "^5.5.0",
     "@typescript-eslint/parser": "^5.5.0",
+    "conventional-changelog-conventionalcommits": "^4.6.3",
     "eslint": "8.2.0",
     "eslint-config-prettier": "8.1.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",
