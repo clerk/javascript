@@ -9,6 +9,9 @@
   "license": "MIT",
   "private": true,
   "devDependencies": {
+    "@commitlint/cli": "^16.0.2",
+    "@commitlint/config-conventional": "^16.0.0",
+    "@commitlint/config-lerna-scopes": "^16.0.0",
     "@types/jest": "27.0.2",
     "@types/node": "14.14.33",
     "@typescript-eslint/eslint-plugin": "^5.5.0",
@@ -16,6 +19,7 @@
     "eslint": "8.2.0",
     "eslint-config-prettier": "8.1.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",
+    "husky": "^7.0.4",
     "jest": "27.2.3",
     "lerna": "^4.0.0",
     "prettier": "^2.3.1",
@@ -26,7 +30,8 @@
     "lint-fix": "eslint . --ext .ts",
     "bump": "lerna version --no-git-tag-version --no-push",
     "build": "lerna run build",
-    "test": "lerna run test"
+    "test": "lerna run test",
+    "prepare": "husky install"
   },
   "engines": {
     "node": ">=16.8.0",
