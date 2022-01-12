@@ -11,7 +11,7 @@ module.exports = {
     'scope-enum': async (ctx) => [
       2,
       'always',
-      [...(await getPackages(ctx)), 'repo'],
+      [...(await getPackages(ctx)), 'repo', 'release'],
     ],
   },
 };

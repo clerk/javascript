@@ -28,7 +28,7 @@
   },
   "scripts": {
     "lint-fix": "eslint . --ext .ts",
-    "bump": "lerna version --no-git-tag-version --no-push",
+    "bump": "lerna version --no-push",
     "build": "lerna run build",
     "test": "lerna run test",
     "prepare": "husky install"
