@@ -5,10 +5,11 @@
   Session,
 } from '@clerk/backend-core';
 import Cookies from 'cookies';
+import deepmerge from 'deepmerge';
 import type { NextFunction, Request, Response } from 'express';
-import got from 'got';
+import got, { OptionsOfJSONResponseBody } from 'got';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import jwks, { JwksClient } from 'jwks-rsa';
+import jwks from 'jwks-rsa';
 import querystring from 'querystring';
 
 import { SupportMessages } from './constants/SupportMessages';
@@ -21,7 +22,7 @@ const defaultApiKey = process.env.CLERK_API_KEY || '';
 const defaultApiVersion = process.env.CLERK_API_VERSION || 'v1';
 const defaultServerApiUrl =
   process.env.CLERK_API_URL || 'https://api.clerk.dev';
-const defaultJWKSCacheMaxAge = 3600000; // 1 hour
+const JWKS_MAX_AGE = 3600000; // 1 hour
 const packageRepo = 'https://github.com/clerkinc/clerk-sdk-node';
 
 export type MiddlewareOptions = {
@@ -54,13 +55,8 @@ const verifySignature = async (
   return await crypto.subtle.verify(algorithm, key, signature, data);
 };
 
-/** Base initialization */
-
-const nodeBase = new Base(importKey, verifySignature, decodeBase64);
-
 export default class Clerk extends ClerkBackendAPI {
-  // private _restClient: RestClient;
-  private _jwksClient: JwksClient;
+  base: Base;
 
   // singleton instance
   static _instance: Clerk;
@@ -70,7 +66,7 @@ export default class Clerk extends ClerkBackendAPI {
     serverApiUrl = defaultServerApiUrl,
     apiVersion = defaultApiVersion,
     httpOptions = {},
-    jwksCacheMaxAge = defaultJWKSCacheMaxAge,
+    jwksCacheMaxAge = JWKS_MAX_AGE,
   }: {
     apiKey?: string;
     serverApiUrl?: string;
@@ -82,16 +78,22 @@ export default class Clerk extends ClerkBackendAPI {
       url,
       { method, authorization, contentType, userAgent, body }
     ) => {
-      return got(url, {
-        method,
-        responseType: 'json',
-        headers: {
-          authorization,
-          'Content-Type': contentType,
-          'User-Agent': userAgent,
+      const finalHTTPOptions = deepmerge(
+        {
+          method,
+          responseType: 'json',
+          headers: {
+            authorization,
+            'Content-Type': contentType,
+            'User-Agent': userAgent,
+          },
+          // @ts-ignore
+          ...(body && { body: querystring.stringify(body) }),
         },
-        ...(body && { body: querystring.stringify(body) }),
-      });
+        httpOptions
+      ) as OptionsOfJSONResponseBody;
+
+      return got(url, finalHTTPOptions);
     };
 
     super({
@@ -108,21 +110,48 @@ export default class Clerk extends ClerkBackendAPI {
       throw Error(SupportMessages.API_KEY_NOT_FOUND);
     }
 
-    // TBD: Add jwk client as an argument to getAuthState ?
-    // this._jwksClient = jwks({
-    //   jwksUri: `${serverApiUrl}/${apiVersion}/jwks`,
-    //   requestHeaders: {
-    //     Authorization: `Bearer ${apiKey}`,
-    //   },
-    //   timeout: 5000,
-    //   cache: true,
-    //   cacheMaxAge: jwksCacheMaxAge,
-    // });
+    const loadCryptoKey = async (token: string) => {
+      const decoded = jwt.decode(token, { complete: true });
+      if (!decoded) {
+        throw new Error(`Failed to decode token: ${token}`);
+      }
 
-    //   const key = await this._jwksClient.getSigningKey(decoded.header.kid);
-    //   const verified = jwt.verify(token, key.getPublicKey(), {
-    //     algorithms: algorithms as jwt.Algorithm[],
-    //   }) as JwtPayload;
+      const jwksClient = jwks({
+        jwksUri: `${serverApiUrl}/${apiVersion}/jwks`,
+        requestHeaders: {
+          Authorization: `Bearer ${defaultApiKey}`,
+        },
+        timeout: 5000,
+        cache: true,
+        cacheMaxAge: jwksCacheMaxAge,
+      });
+
+      const encoder = new TextEncoder();
+
+      return await crypto.subtle.importKey(
+        'raw',
+        encoder.encode(
+          (
+            await jwksClient.getSigningKey(decoded.header.kid)
+          ).getPublicKey() as string
+        ),
+        {
+          name: 'RSASSA-PKCS1-v1_5',
+          hash: 'SHA-256',
+        },
+        true,
+        ['verify']
+      );
+    };
+
+    /** Base initialization */
+
+    this.base = new Base(
+      importKey,
+      verifySignature,
+      decodeBase64,
+      loadCryptoKey
+    );
   }
 
   // For use as singleton, always returns the same instance
@@ -172,18 +201,19 @@ export default class Clerk extends ClerkBackendAPI {
       const cookies = new Cookies(req, res);
 
       try {
-        const { status, session, interstitial } = await nodeBase.getAuthState({
-          cookieToken: cookies.get('__session') as string,
-          clientUat: cookies.get('__client_uat') as string,
-          headerToken: req.headers.authorization?.replace('Bearer ', ''),
-          origin: req.headers.origin,
-          host: req.headers.host,
-          forwardedPort: req.headers['x-forwarded-port'] as string,
-          forwardedHost: req.headers['x-forwarded-host'] as string,
-          referrer: req.headers.referer,
-          userAgent: req.headers['user-agent'] as string,
-          fetchInterstitial: () => this.fetchInterstitial(),
-        });
+        const { status, session, interstitial, sessionClaims } =
+          await this.base.getAuthState({
+            cookieToken: cookies.get('__session') as string,
+            clientUat: cookies.get('__client_uat') as string,
+            headerToken: req.headers.authorization?.replace('Bearer ', ''),
+            origin: req.headers.origin,
+            host: req.headers.host,
+            forwardedPort: req.headers['x-forwarded-port'] as string,
+            forwardedHost: req.headers['x-forwarded-host'] as string,
+            referrer: req.headers.referer,
+            userAgent: req.headers['user-agent'] as string,
+            fetchInterstitial: () => this.fetchInterstitial(),
+          });
 
         if (status === AuthStatus.SignedOut) {
           return signedOut();
@@ -192,6 +222,8 @@ export default class Clerk extends ClerkBackendAPI {
         if (status === AuthStatus.SignedIn) {
           // @ts-ignore
           req.session = session;
+          // @ts-ignore
+          req.sessionClaims = sessionClaims;
           return next();
         }
 

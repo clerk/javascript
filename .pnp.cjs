@@ -902,6 +902,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@typescript-eslint/parser", "virtual:741cead45f55954a45f37a2caecbcc0a526ec48f52e0bc8ed655e34523095ff3680820084e6476ab975a5a3d0d84297111a55441cb139ee8a44706c2be539ec6#npm:5.7.0"],
             ["camelcase-keys", "npm:6.2.2"],
             ["cookies", "npm:0.8.0"],
+            ["deepmerge", "npm:4.2.2"],
             ["eslint", "npm:8.5.0"],
             ["eslint-config-prettier", "virtual:741cead45f55954a45f37a2caecbcc0a526ec48f52e0bc8ed655e34523095ff3680820084e6476ab975a5a3d0d84297111a55441cb139ee8a44706c2be539ec6#npm:8.3.0"],
             ["got", "npm:11.8.3"],

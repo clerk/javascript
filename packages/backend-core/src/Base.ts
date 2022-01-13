@@ -11,6 +11,7 @@ export const API_KEY = process.env.CLERK_API_KEY || '';
 type ImportKeyFunction = (
   ...args: any[]
 ) => Promise<CryptoKey | PeculiarCryptoKey>;
+type LoadCryptoKeyFunction = (token: string) => Promise<CryptoKey>;
 type DecodeBase64Function = (base64Encoded: string) => string;
 type VerifySignatureFunction = (...args: any[]) => Promise<boolean>;
 
@@ -29,6 +30,7 @@ type AuthState = {
   status: AuthStatus;
   session?: Session;
   interstitial?: string;
+  sessionClaims?: JWTPayload;
 };
 
 type AuthStateParams = {
@@ -58,20 +60,25 @@ export class Base {
   importKeyFunction: ImportKeyFunction;
   verifySignatureFunction: VerifySignatureFunction;
   decodeBase64Function: DecodeBase64Function;
+  loadCryptoKeyFunction?: LoadCryptoKeyFunction;
+
   /**
    * Creates an instance of a Clerk Base.
    * @param {ImportKeyFunction} importKeyFunction Function to import a PEM. Should have a similar result to crypto.subtle.importKey
+   * @param {LoadCryptoKeyFunction} loadCryptoKeyFunction Function load a PK CryptoKey from the host environment. Used for JWK clients etc.
    * @param {VerifySignatureFunction} verifySignatureFunction Function to verify a CryptoKey or a similar structure later on. Should have a similar result to crypto.subtle.verify
    * @param {DecodeBase64Function} decodeBase64Function Function to decode a Base64 string. Similar to atob
    */
   constructor(
     importKeyFunction: ImportKeyFunction,
     verifySignatureFunction: VerifySignatureFunction,
-    decodeBase64Function: DecodeBase64Function
+    decodeBase64Function: DecodeBase64Function,
+    loadCryptoKeyFunction?: LoadCryptoKeyFunction
   ) {
     this.importKeyFunction = importKeyFunction;
     this.verifySignatureFunction = verifySignatureFunction;
     this.decodeBase64Function = decodeBase64Function;
+    this.loadCryptoKeyFunction = loadCryptoKeyFunction;
   }
 
   /**
@@ -81,14 +88,16 @@ export class Base {
    * The public key will be supplied in the form of CryptoKey or will be loaded from the CLERK_JWT_KEY environment variable.
    *
    * @param {string} token
-   * @param {CryptoKey | null} [key]
    * @return {Promise<JWTPayload>} claims
    */
-  verifySessionToken = async (
-    token: string,
-    key?: CryptoKey | null
-  ): Promise<JWTPayload> => {
-    const availableKey = key || (await this.loadPublicKey());
+  verifySessionToken = async (token: string): Promise<JWTPayload> => {
+    // Try to load the PK from supplied function and
+    // if there is no custom load function
+    // try to load from the environment.
+    const availableKey = this.loadCryptoKeyFunction
+      ? await this.loadCryptoKeyFunction(token)
+      : await this.loadCryptoKeyFromEnv();
+
     const claims = await this.verifyJwt(availableKey, token);
     checkClaims(claims);
     return claims;
@@ -96,11 +105,12 @@ export class Base {
 
   /**
    *
-   * Construct the RSA public key from the PEM retrieved from the CLERK_JWT_KEY environment variable.
+   * Modify the RSA public key from the PEM retrieved from the CLERK_JWT_KEY environment variable
+   * and return a contructed CryptoKey.
    * You will find that at your application dashboard (https://dashboard.clerk.dev) under Settings ->  API keys
    *
    */
-  loadPublicKey = async (): Promise<CryptoKey> => {
+  loadCryptoKeyFromEnv = async (): Promise<CryptoKey> => {
     const key = process.env.CLERK_JWT_KEY;
     if (!key) {
       throw new Error('Missing jwt key');
@@ -214,6 +224,7 @@ export class Base {
             id: sessionClaims.sid as string,
             userId: sessionClaims.sub as string,
           },
+          sessionClaims,
         };
       }
 
@@ -267,6 +278,7 @@ export class Base {
           id: sessionClaims.sid as string,
           userId: sessionClaims.sub as string,
         },
+        sessionClaims,
       };
     }
 

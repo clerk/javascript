@@ -16,6 +16,7 @@ module.exports = {
     '@typescript-eslint/no-unsafe-assignment': 'warn',
     'simple-import-sort/imports': 'error',
     '@typescript-eslint/no-unsafe-call': 'off',
-    '@typescript-eslint/no-unsafe-member-access': 'off'
-  }
+    '@typescript-eslint/no-unsafe-member-access': 'off',
+    '@typescript-eslint/no-unsafe-return': 'warn',
+  },
 };

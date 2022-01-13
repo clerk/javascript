@@ -465,6 +465,7 @@ __metadata:
     "@typescript-eslint/parser": ^5.5.0
     camelcase-keys: ^6.2.2
     cookies: ^0.8.0
+    deepmerge: ^4.2.2
     eslint: ^8.3.0
     eslint-config-prettier: ^8.3.0
     got: ^11.8.2
