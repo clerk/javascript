@@ -8,6 +8,7 @@ This script will use `lerna version` to check which packages need to be updated 
 
 The command will guide you through the version changes that are detected and will:
 - Bump the package versions.
+- Run the `version` hook updating the version info files.
 - Create new tags and a "release" commit.
 - Push the commit and tags to the origin.
 
