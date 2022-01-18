@@ -38,3 +38,9 @@ For package specific details on installation, architecture and usage usage, you 
 - [`@clerk/clerk-sdk-node`](https://github.com/clerkinc/javascript/tree/main/packages/sdk-node): SDK for native Node.js environment and frameworks.
 
 Additionally there are packages which act as shared utilities or building blocks.
+
+## Setup
+- Clone the repository.
+- `npm install`.
+
+\* See the [docs folder](./docs) for additional repository documentation.

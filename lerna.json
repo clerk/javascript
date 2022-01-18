@@ -1,0 +1,14 @@
+{
+    "version": "independent",
+    "packages": [
+        "packages/*"
+    ],
+    "command": {
+        "version": {
+            "message": "chore(release): Publish"
+        }
+    },
+    "changelogPreset": {
+        "name": "conventionalcommits"
+    }
+}
