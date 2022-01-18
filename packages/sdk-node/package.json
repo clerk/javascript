@@ -1,5 +1,5 @@
 {
-  "version": "2.6.0",
+  "version": "2.6.2",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "esm/index.js",
@@ -57,6 +57,7 @@
     "@peculiar/webcrypto": "^1.2.3",
     "camelcase-keys": "^6.2.2",
     "cookies": "^0.8.0",
+    "deepmerge": "^4.2.2",
     "got": "^11.8.2",
     "jsonwebtoken": "^8.5.1",
     "jwks-rsa": "^2.0.4",

@@ -1,3 +1,4 @@
+import { AuthStatus } from '@clerk/backend-core';
 import type { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
@@ -5,12 +6,19 @@ import Clerk from '../Clerk';
 
 const mockNext = jest.fn();
 
-const mockClaims = {
+const mockAuthStateClaims = {
   iss: 'https://clerk.issuer',
   sub: 'subject',
   sid: 'session_id',
 };
-const mockToken = jwt.sign(mockClaims, 'mock-secret');
+
+const mockAuthState = {
+  sessionClaims: mockAuthStateClaims,
+  session: { id: mockAuthStateClaims.sid, userId: mockAuthStateClaims.sub },
+  status: AuthStatus.SignedIn,
+};
+
+const mockToken = jwt.sign(mockAuthStateClaims, 'mock-secret');
 
 afterEach(() => {
   mockNext.mockReset();
@@ -53,16 +61,16 @@ test('expressWithSession with Authorization header', async () => {
   const res = {} as Response;
 
   const clerk = Clerk.getInstance();
-  clerk.verifyToken = jest.fn().mockReturnValue(mockClaims);
+  clerk.base.getAuthState = jest.fn().mockReturnValueOnce(mockAuthState);
 
   await clerk.expressWithSession()(req, res, mockNext as NextFunction);
 
   // @ts-ignore
-  expect(req.sessionClaims).toEqual(mockClaims);
+  expect(req.sessionClaims).toEqual(mockAuthStateClaims);
   // @ts-ignore
-  expect(req.session.id).toEqual(mockClaims.sid);
+  expect(req.session.id).toEqual(mockAuthStateClaims.sid);
   // @ts-ignore
-  expect(req.session.userId).toEqual(mockClaims.sub);
+  expect(req.session.userId).toEqual(mockAuthStateClaims.sub);
 
   expect(mockNext).toHaveBeenCalledWith(); // 0 args
 });
@@ -73,16 +81,16 @@ test('expressWithSession with Authorization header in Bearer format', async () =
   const res = {} as Response;
 
   const clerk = Clerk.getInstance();
-  clerk.verifyToken = jest.fn().mockReturnValue(mockClaims);
+  clerk.base.getAuthState = jest.fn().mockReturnValueOnce(mockAuthState);
 
   await clerk.expressWithSession()(req, res, mockNext as NextFunction);
 
   // @ts-ignore
-  expect(req.sessionClaims).toEqual(mockClaims);
+  expect(req.sessionClaims).toEqual(mockAuthStateClaims);
   // @ts-ignore
-  expect(req.session.id).toEqual(mockClaims.sid);
+  expect(req.session.id).toEqual(mockAuthStateClaims.sid);
   // @ts-ignore
-  expect(req.session.userId).toEqual(mockClaims.sub);
+  expect(req.session.userId).toEqual(mockAuthStateClaims.sub);
 
   expect(mockNext).toHaveBeenCalledWith(); // 0 args
 });
