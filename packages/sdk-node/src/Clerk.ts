@@ -36,11 +36,9 @@ export type RequireSessionClaimsProp<T> = T & { sessionClaims: JwtPayload };
 
 import { Base } from '@clerk/backend-core';
 import { Crypto, CryptoKey } from '@peculiar/webcrypto';
+import { decodeBase64, toSPKIDer } from './utils/crypto';
 
 const crypto = new Crypto();
-
-const decodeBase64 = (base64: string) =>
-  Buffer.from(base64, 'base64').toString('binary');
 
 const importKey = async (jwk: JsonWebKey, algorithm: Algorithm) => {
   return await crypto.subtle.importKey('jwk', jwk, algorithm, true, ['verify']);
@@ -123,15 +121,12 @@ export default class Clerk extends ClerkBackendAPI {
         cacheMaxAge: jwksCacheMaxAge,
       });
 
-      const encoder = new TextEncoder();
+      const signingKey = await jwksClient.getSigningKey(decoded.header.kid)
+      const pubKey = signingKey.getPublicKey()
 
       return await crypto.subtle.importKey(
-        'raw',
-        encoder.encode(
-          (
-            await jwksClient.getSigningKey(decoded.header.kid)
-          ).getPublicKey() as string
-        ),
+        'spki',
+        toSPKIDer(pubKey),
         {
           name: 'RSASSA-PKCS1-v1_5',
           hash: 'SHA-256',
