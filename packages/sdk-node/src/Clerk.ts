@@ -71,27 +71,24 @@ export default class Clerk extends ClerkBackendAPI {
     apiKey?: string;
     serverApiUrl?: string;
     apiVersion?: string;
-    httpOptions?: object;
+    httpOptions?: OptionsOfJSONResponseBody;
     jwksCacheMaxAge?: number;
   } = {}) {
     const fetcher: ClerkFetcher = (
       url,
       { method, authorization, contentType, userAgent, body }
     ) => {
-      const finalHTTPOptions = deepmerge(
-        {
-          method,
-          responseType: 'json',
-          headers: {
-            authorization,
-            'Content-Type': contentType,
-            'User-Agent': userAgent,
-          },
-          // @ts-ignore
-          ...(body && { body: querystring.stringify(body) }),
+      const finalHTTPOptions = deepmerge(httpOptions, {
+        method,
+        responseType: 'json',
+        headers: {
+          authorization,
+          'Content-Type': contentType,
+          'User-Agent': userAgent,
         },
-        httpOptions
-      ) as OptionsOfJSONResponseBody;
+        // @ts-ignore
+        ...(body && { body: querystring.stringify(body) }),
+      }) as OptionsOfJSONResponseBody;
 
       return got(url, finalHTTPOptions);
     };
@@ -282,7 +279,7 @@ export default class Clerk extends ClerkBackendAPI {
     return async (
       req: WithSessionProp<Request> | WithSessionClaimsProp<Request>,
       res: Response,
-      next: NextFunction
+      next?: NextFunction
     ) => {
       try {
         await this._runMiddleware(
@@ -312,5 +309,9 @@ export default class Clerk extends ClerkBackendAPI {
     { onError }: MiddlewareOptions = { onError: this.strictOnError }
   ) {
     return this.withSession(handler, { onError });
+  }
+
+  set httpOptions(value: OptionsOfJSONResponseBody) {
+    this.httpOptions = value;
   }
 }
