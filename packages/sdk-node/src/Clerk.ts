@@ -88,7 +88,7 @@ export default class Clerk extends ClerkBackendAPI {
         ...(body && { body: querystring.stringify(body) }),
       }) as OptionsOfJSONResponseBody;
 
-      return got(url, finalHTTPOptions);
+      return got(url, finalHTTPOptions).then(data => data.body);
     };
 
     super({
