@@ -2,6 +2,12 @@
 
 _Version updates and publishing is managed using Lerna._
 
+## TLDR
+1. `npm run bump`
+2. `npm run release`
+
+## Commands explanation
+
 After all the features have been merged and we want to create a new release, we use `npm run bump`.
 
 This script will use `lerna version` to check which packages need to be updated and in what way based on the updates since the previous release.
