@@ -1,6 +1,6 @@
 {
   "name": "@clerk/backend-core",
-  "version": "0.1.0-alpha.3",
+  "version": "0.1.0",
   "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
