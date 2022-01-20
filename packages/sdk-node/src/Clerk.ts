@@ -127,7 +127,7 @@ export default class Clerk extends ClerkBackendAPI {
 
       return await crypto.subtle.importKey(
         'spki',
-        toSPKIDer(pubKey),
+        toSPKIDer(pubKey as string),
         {
           name: 'RSASSA-PKCS1-v1_5',
           hash: 'SHA-256',
