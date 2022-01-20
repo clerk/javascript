@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.1.1](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.1.0...@clerk/backend-core@0.1.1) (2022-01-20)
+
+
+### Bug Fixes
+
+* **backend-core:** Fix User resource attributes - unsafeMetadata ([c566647](https://github.com/clerkinc/javascript/commit/c5666476908f0b4477f277d8e26bc53c28da8249))
+
+
+
 ## [0.1.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.1.0-alpha.3...@clerk/backend-core@0.1.0) (2022-01-20)
 
 **Note:** Version bump only for package @clerk/backend-core
