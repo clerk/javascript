@@ -17,6 +17,10 @@ type RequestOptions = {
   bodyParams?: object;
 };
 
+/*
+ * HTTP fetch implementation (not specific to window.fetch API).
+ * The fetcher implementation should return the response body, not the whole response.
+ */
 export type ClerkFetcher = (
   url: string,
   options: {

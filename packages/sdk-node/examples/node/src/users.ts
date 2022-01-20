@@ -1,15 +1,6 @@
 // Usage:
-// From examples/node, transpile files by running `tsc`
-// To run:
-// node --require dotenv/config dist/users.js
-
-import { setClerkServerApiUrl, users } from '@clerk/clerk-sdk-node';
-
-const serverApiUrl = process.env.CLERK_API_URL || '';
-const userId = process.env.USER_ID || '';
-const userIdToDelete = process.env.USER_ID_TO_DELETE || '';
-
-setClerkServerApiUrl(serverApiUrl);
+// From examples/node, run files with "npm test ./src/users.ts"
+import { users } from '@clerk/clerk-sdk-node';
 
 console.log('Create user');
 const createdUser = await users.createUser({
@@ -31,19 +22,20 @@ const createdUser = await users.createUser({
   password: '123456+ABCd',
 });
 console.log(createdUser);
+const createdUserId = createdUser.id as string;
 
 console.log('Get user list');
-let userList = await users.getUserList();
+const userList = await users.getUserList();
 console.log(userList);
 
 console.log('Get single user');
-let user = await users.getUser(userId);
+const user = await users.getUser(createdUserId);
 console.log(user);
 
 try {
   console.log('Update user');
 
-  let updatedUser = await users.updateUser(userId, {
+  const updatedUser = await users.updateUser(createdUserId, {
     firstName: 'Kyle',
     lastName: 'Reese',
     publicMetadata: {
@@ -59,7 +51,7 @@ try {
 
 try {
   console.log('Delete user');
-  let deletedUser = await users.deleteUser(userIdToDelete);
+  const deletedUser = await users.deleteUser(createdUserId);
   console.log(deletedUser);
 } catch (error) {
   console.log(error);

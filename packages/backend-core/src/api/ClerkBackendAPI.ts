@@ -21,7 +21,10 @@ type ClerkBackendAPIProps = {
   serverApiUrl?: string;
   /* Backend API version */
   apiVersion?: string;
-  /* HTTP fetch implementation (not specific to window.fetch API) */
+  /*
+   * HTTP fetch implementation (not specific to window.fetch API).
+   * The fetcher implementation should return the response body, not the whole response.
+   */
   fetcher: ClerkFetcher;
   /* Library/SDK name */
   libName: string;

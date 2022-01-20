@@ -1,24 +1,17 @@
 // Usage:
-// From examples/node, transpile files by running `tsc`
-// To run:
-// node --require dotenv/config dist/emails.js
-
-import { emails,setClerkServerApiUrl } from '@clerk/clerk-sdk-node';
-
-const serverApiUrl = process.env.CLERK_API_URL || '';
-
-setClerkServerApiUrl(serverApiUrl);
+// From examples/node, run files with "npm test ./src/emails.ts"
+import { emails } from '@clerk/clerk-sdk-node';
 
 console.log('Create email');
 
-const emailAddressId = process.env.EMAIL_ADDRESS_ID || '';
+const emailAddressId = "idn_23eTZpjqKYgn6qijHVXw0veiOgB";
 const fromEmailName = 'sales';
 const subject = 'Amazing offer!';
 const body =
   'Click <a href="https://www.thisiswhyimbroke.com/">here</a> to find out more!';
 
 try {
-  let email = await emails.createEmail({
+  const email = await emails.createEmail({
     emailAddressId,
     fromEmailName,
     subject,

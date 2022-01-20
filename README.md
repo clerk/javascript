@@ -42,5 +42,6 @@ Additionally there are packages which act as shared utilities or building blocks
 ## Setup
 - Clone the repository.
 - `npm install`.
+- `npm run build`.
 
 \* See the [docs folder](./docs) for additional repository documentation.

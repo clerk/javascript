@@ -12,7 +12,8 @@
     "declaration": false,
     "moduleResolution": "node",
     "target": "es2017",
-    "skipLibCheck": false
+    "skipLibCheck": false,
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]

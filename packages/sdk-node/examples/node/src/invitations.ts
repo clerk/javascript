@@ -1,13 +1,6 @@
 // Usage:
-// From examples/node, transpile files by running `tsc`
-// To run:
-// node --require dotenv/config dist/invitations.js
-
-import { invitations,setClerkServerApiUrl } from '@clerk/clerk-sdk-node';
-
-const serverApiUrl = process.env.CLERK_API_URL || '';
-
-setClerkServerApiUrl(serverApiUrl);
+// From examples/node, run files with "npm test ./src/invitations.ts"
+import { invitations } from '@clerk/clerk-sdk-node';
 
 // Create an invitation
 await invitations.createInvitation({
@@ -19,9 +12,10 @@ const { id } = await invitations.createInvitation({
   emailAddress: 'will-be-revoked@example.com',
 });
 
-// Revoke the last invitation
-await invitations.revokeInvitation(String(id));
-
 // Get invitation list
-let invitationList = await invitations.getInvitationList();
+const invitationList = await invitations.getInvitationList();
 console.log(invitationList);
+
+// Revoke the last invitation
+const revokedInvitation = await invitations.revokeInvitation(String(id));
+console.log(revokedInvitation);

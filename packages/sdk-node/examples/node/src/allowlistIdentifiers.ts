@@ -1,8 +1,5 @@
 // Usage:
-// From examples/node, transpile files by running `tsc`
-// To run:
-// node --require dotenv/config dist/allowlistIdentifiers.js
-
+// From examples/node, run files with "npm test ./src/allowlistIdentifiers.ts"
 import {
   allowlistIdentifiers,
   setClerkServerApiUrl,
@@ -28,6 +25,6 @@ const { id } = await allowlistIdentifiers.createAllowlistIdentifier({
 await allowlistIdentifiers.deleteAllowlistIdentifier(String(id));
 
 // Get allowlist identifier list
-let allowlistIdentifierList =
+const allowlistIdentifierList =
   await allowlistIdentifiers.getAllowlistIdentifierList();
 console.log(allowlistIdentifierList);
