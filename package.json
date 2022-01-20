@@ -30,12 +30,14 @@
   "scripts": {
     "lint-fix": "eslint . --ext .ts",
     "bump": "lerna version --conventional-commits",
+    "bump-prerelease": "lerna version --conventional-commits --conventional-prerelease",
     "prerelease": "lerna run build",
     "release": "lerna publish from-git",
     "build": "lerna run build",
     "test": "lerna run test",
     "prepare": "husky install",
-    "version": "./scripts/version-info.sh"
+    "version": "./scripts/version-info.sh",
+    "lerna": "lerna"
   },
   "engines": {
     "node": ">=16.8.0",

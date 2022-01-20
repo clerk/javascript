@@ -36,6 +36,7 @@ export type RequireSessionClaimsProp<T> = T & { sessionClaims: JwtPayload };
 
 import { Base } from '@clerk/backend-core';
 import { Crypto, CryptoKey } from '@peculiar/webcrypto';
+
 import { decodeBase64, toSPKIDer } from './utils/crypto';
 
 const crypto = new Crypto();
