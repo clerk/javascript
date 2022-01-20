@@ -84,7 +84,7 @@ export function withSession(handler: Middleware) {
         clientUat: req.cookies['__client_uat'],
         headerToken: req.headers.get('authorization'),
         origin: req.headers.get('origin'),
-        host: req.headers.get('host'),
+        host: req.headers.get('host') as string,
         forwardedPort: req.headers.get('x-forwarded-port'),
         forwardedHost: req.headers.get('x-forwarded-host'),
         referrer: req.headers.get('referrer'),

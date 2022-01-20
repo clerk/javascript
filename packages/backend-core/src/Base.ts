@@ -43,7 +43,7 @@ type AuthStateParams = {
   /* Request origin header value */
   origin?: string | null;
   /* Request host header value */
-  host?: string | null;
+  host: string;
   /* Request forwarded host value */
   forwardedHost?: string | null;
   /* Request forwarded port value */

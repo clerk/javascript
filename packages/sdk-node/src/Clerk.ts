@@ -200,12 +200,12 @@ export default class Clerk extends ClerkBackendAPI {
             clientUat: cookies.get('__client_uat') as string,
             headerToken: req.headers.authorization?.replace('Bearer ', ''),
             origin: req.headers.origin,
-            host: req.headers.host,
+            host: req.headers.host as string,
             forwardedPort: req.headers['x-forwarded-port'] as string,
             forwardedHost: req.headers['x-forwarded-host'] as string,
             referrer: req.headers.referer,
             userAgent: req.headers['user-agent'] as string,
-            fetchInterstitial: () => this.base.fetchInterstitial(),
+            fetchInterstitial: () => this.fetchInterstitial(),
           });
 
         if (status === AuthStatus.SignedOut) {
