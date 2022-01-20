@@ -132,6 +132,7 @@ export interface UserProps extends ClerkProps {
   // externalAccounts: GoogleAccountProps[];
   publicMetadata: Record<string, unknown>;
   privateMetadata: Record<string, unknown>;
+  unsafeMetadata: Record<string, unknown>;
   createdAt: Nullable<number>;
   updatedAt: Nullable<number>;
 }
