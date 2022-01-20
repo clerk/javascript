@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.7.0-alpha.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@2.7.0-alpha.2...@clerk/clerk-sdk-node@2.7.0-alpha.3) (2022-01-20)
+
+
+### Bug Fixes
+
+* **backend-core:** Fix build issue ([2b60c40](https://github.com/clerkinc/javascript/commit/2b60c409fc450c77aa9585e96131de11f5924f50))
+
+
+
 ## [2.7.0-alpha.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@2.7.0-alpha.1...@clerk/clerk-sdk-node@2.7.0-alpha.2) (2022-01-20)
 
 
