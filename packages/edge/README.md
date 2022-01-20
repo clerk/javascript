@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://clerk.dev/" target="_blank" align="center">
-    <img src="../../docs/clerk-logo.svg" height="50">
+    <img src="https://images.clerk.dev/static/clerk.svg" height="50">
   </a>
   <br />
 </p>

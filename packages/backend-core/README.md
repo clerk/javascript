@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://clerk.dev/" target="_blank" align="center">
-    <img src="../../docs/clerk-logo.svg" height="50">
+    <img src="https://images.clerk.dev/static/clerk.svg" height="50">
   </a>
   <br />
 </p>
@@ -37,7 +37,7 @@ This package is used as the base building block for Clerk JavaScript SDKs and en
 
 <p align="center">
   <a href="https://clerk.dev/" target="_blank" align="center">
-    <img src="./docs/core-sdk.png" height="350">
+    <img src="https://images.clerk.dev/static/backend_api_architecture.png" height="350">
   </a>
   <br />
 </p>

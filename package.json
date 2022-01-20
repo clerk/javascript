@@ -33,6 +33,7 @@
     "bump-prerelease": "lerna version --conventional-commits --conventional-prerelease",
     "bump-graduate": "lerna version --conventional-graduate",
     "prerelease": "lerna run build",
+    "prerelease-pre": "lerna run build",
     "release-pre": "lerna publish from-package --dist-tag prerelease",
     "release": "lerna publish from-git",
     "build": "lerna run build",
