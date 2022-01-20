@@ -39,6 +39,7 @@ export class User {
     'twoFactorEnabled',
     'publicMetadata',
     'privateMetadata',
+    'unsafeMetadata',
     'createdAt',
     'updatedAt',
   ];
@@ -52,6 +53,7 @@ export class User {
   static defaults = {
     publicMetadata: {},
     privateMetadata: {},
+    unsafeMetadata: {},
     ...associationDefaults(User.associations),
   };
 
