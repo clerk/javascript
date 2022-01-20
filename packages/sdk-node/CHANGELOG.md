@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [2.7.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@2.7.0...@clerk/clerk-sdk-node@2.7.1) (2022-01-20)
+
+
+### Bug Fixes
+
+* **clerk-sdk-node:** Restore verifyToken utility ([e22ef8a](https://github.com/clerkinc/javascript/commit/e22ef8aa3f4db1e14391f88bb924a82f6b17ba6a))
+
+
+
 ## [2.7.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@2.7.0-alpha.3...@clerk/clerk-sdk-node@2.7.0) (2022-01-20)
 
 **Note:** Version bump only for package @clerk/clerk-sdk-node
