@@ -1,5 +1,6 @@
 ﻿import {
   AuthStatus,
+  Base,
   ClerkBackendAPI,
   ClerkFetcher,
   Session,
@@ -9,7 +10,7 @@ import deepmerge from 'deepmerge';
 import type { NextFunction, Request, Response } from 'express';
 import got, { OptionsOfJSONResponseBody } from 'got';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import jwks from 'jwks-rsa';
+import jwks, { JwksClient } from 'jwks-rsa';
 import querystring from 'querystring';
 
 import { SupportMessages } from './constants/SupportMessages';
@@ -34,7 +35,6 @@ export type RequireSessionProp<T> = T & { session: Session };
 export type WithSessionClaimsProp<T> = T & { sessionClaims?: JwtPayload };
 export type RequireSessionClaimsProp<T> = T & { sessionClaims: JwtPayload };
 
-import { Base } from '@clerk/backend-core';
 import { Crypto, CryptoKey } from '@peculiar/webcrypto';
 
 import { decodeBase64, toSPKIDer } from './utils/crypto';
@@ -57,9 +57,11 @@ const verifySignature = async (
 export default class Clerk extends ClerkBackendAPI {
   base: Base;
 
+  _jwksClient: JwksClient;
+
   // singleton instance
   static _instance: Clerk;
-
+  
   constructor({
     apiKey = defaultApiKey,
     serverApiUrl = defaultServerApiUrl,
@@ -106,28 +108,29 @@ export default class Clerk extends ClerkBackendAPI {
       throw Error(SupportMessages.API_KEY_NOT_FOUND);
     }
 
+    this._jwksClient = jwks({
+      jwksUri: `${serverApiUrl}/${apiVersion}/jwks`,
+      requestHeaders: {
+        Authorization: `Bearer ${defaultApiKey}`,
+      },
+      timeout: 5000,
+      cache: true,
+      cacheMaxAge: jwksCacheMaxAge,
+    });
+
+
     const loadCryptoKey = async (token: string) => {
       const decoded = jwt.decode(token, { complete: true });
       if (!decoded) {
         throw new Error(`Failed to decode token: ${token}`);
       }
-
-      const jwksClient = jwks({
-        jwksUri: `${serverApiUrl}/${apiVersion}/jwks`,
-        requestHeaders: {
-          Authorization: `Bearer ${defaultApiKey}`,
-        },
-        timeout: 5000,
-        cache: true,
-        cacheMaxAge: jwksCacheMaxAge,
-      });
-
-      const signingKey = await jwksClient.getSigningKey(decoded.header.kid)
+      
+      const signingKey = await this._jwksClient.getSigningKey(decoded.header.kid)
       const pubKey = signingKey.getPublicKey()
 
       return await crypto.subtle.importKey(
         'spki',
-        toSPKIDer(pubKey as string),
+        toSPKIDer(pubKey),
         {
           name: 'RSASSA-PKCS1-v1_5',
           hash: 'SHA-256',
@@ -145,6 +148,30 @@ export default class Clerk extends ClerkBackendAPI {
       decodeBase64,
       loadCryptoKey
     );
+  }
+
+  async verifyToken(token: string): Promise<JwtPayload> {
+    const decoded = jwt.decode(token, { complete: true });
+    if (!decoded) {
+      throw new Error(`Failed to verify token: ${token}`);
+    }
+
+    const key = await this._jwksClient.getSigningKey(decoded.header.kid);
+    const verified = jwt.verify(token, key.getPublicKey(), {
+      algorithms: ['RS256'],
+    });
+
+    if(typeof verified === 'string' || !verified.iss){
+      throw new Error('Malformed token');
+    }
+
+    if (
+      !(verified.iss?.lastIndexOf('https://clerk.', 0) === 0)
+    ) {
+      throw new Error(`Invalid issuer: ${verified.iss}`);
+    }
+
+    return verified;
   }
 
   // For use as singleton, always returns the same instance
