@@ -1,11 +1,13 @@
 export function checkCrossOrigin(
-  origin?: string | null,
-  initialHost?: string | null,
+  origin: string | null | undefined,
+  initialHost: string,
   forwardedHost?: string | null,
   port?: string | null
 ) {
-  // TODO: Does a request without Host, count as false or should we throw ?
-  if (!origin || !initialHost) {
+
+  // Remove request's protocol
+  origin = origin?.trim().replace(/(^\w+:|^)\/\//, '');
+  if (!origin) {
     return false;
   }
 

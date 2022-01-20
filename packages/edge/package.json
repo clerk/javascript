@@ -17,11 +17,8 @@
     "vercel-edge",
     "dist"
   ],
-  "homepage": "https://clerk.dev",
+  "homepage": "https://github.com/clerkinc/javascript/tree/main/packages/edge",
   "author": "Clerk",
-  "bugs": {
-    "email": "support@clerk.dev"
-  },
   "type": "module",
   "main": "dist/cjs/index.js",
   "module": "dist/mjs/index.js",
@@ -54,5 +51,12 @@
     "@types/node": "^16.11.12",
     "rimraf": "^3.0.2",
     "typescript": "^4.5.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/clerkinc/javascript.git"
+  },
+  "bugs": {
+    "url": "https://github.com/clerkinc/javascript/issues"
   }
 }

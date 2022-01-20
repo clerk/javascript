@@ -205,7 +205,7 @@ export default class Clerk extends ClerkBackendAPI {
             forwardedHost: req.headers['x-forwarded-host'] as string,
             referrer: req.headers.referer,
             userAgent: req.headers['user-agent'] as string,
-            fetchInterstitial: () => this.fetchInterstitial(),
+            fetchInterstitial: () => this.base.fetchInterstitial(),
           });
 
         if (status === AuthStatus.SignedOut) {

@@ -30,5 +30,13 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/clerkinc/javascript.git"
+  },
+  "bugs": {
+    "url": "https://github.com/clerkinc/javascript/issues"
+  },
+  "homepage": "https://github.com/clerkinc/javascript/tree/main/packages/backend-core"
 }
