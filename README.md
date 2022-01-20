@@ -7,7 +7,7 @@
 
 # Official Clerk JavaScript SDKs
 
-This repository contains all the Clerk JavaScript SDKs under the `@clerk/` namespace.
+This repository contains all the Clerk JavaScript SDKs under the `@clerk/` namespace. Visit [https://clerk.dev](https://clerk.dev) to signup for an account.
 
 ---
 
