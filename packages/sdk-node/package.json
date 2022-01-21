@@ -78,7 +78,7 @@
   "bugs": {
     "url": "https://github.com/clerkinc/javascript/issues"
   },
-  "homepage": "https://github.com/clerkinc/javascript/tree/main/packages/sdk-node",
+  "homepage": "https://clerk.dev/",
   "publishConfig": {
     "access": "public"
   }
