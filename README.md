@@ -36,6 +36,11 @@ For package specific details on installation, architecture and usage usage, you 
 - [`@clerk/backend-core`](https://github.com/clerkinc/javascript/tree/main/packages/backend-core): Functionalities regarded as "core" for Clerk to operate with. _Authentication resolution, API Resources etc._
 - [`@clerk/edge`](https://github.com/clerkinc/javascript/tree/main/packages/edge): Top level SDK for edge environments containing all required helpers and middleware.
 - [`@clerk/clerk-sdk-node`](https://github.com/clerkinc/javascript/tree/main/packages/sdk-node): SDK for native Node.js environment and frameworks.
+- `@clerk/nextjs` _Coming soon_
+- `@clerk/types` _Coming soon_
+- `@clerk/react` _Coming soon_
+- ...
+
 
 Additionally there are packages which act as shared utilities or building blocks.
 

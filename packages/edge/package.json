@@ -17,7 +17,7 @@
     "vercel-edge",
     "dist"
   ],
-  "homepage": "https://github.com/clerkinc/javascript/tree/main/packages/edge",
+  "homepage": "https://clerk.dev/",
   "author": "Clerk",
   "type": "module",
   "main": "dist/cjs/index.js",
