@@ -8,10 +8,12 @@ import { ExternalAccount } from './ExternalAccount';
 import type { ExternalAccountJSON, UserJSON } from './JSON';
 import { PhoneNumber } from './PhoneNumber';
 import type { UserProps } from './Props';
+import { Web3Wallet } from './Web3Wallet';
 
 interface UserAssociations {
   emailAddresses: EmailAddress[];
   phoneNumbers: PhoneNumber[];
+  web3Wallets: Web3Wallet[];
   externalAccounts: ExternalAccount[];
 }
 
@@ -31,6 +33,7 @@ export class User {
     'primaryEmailAddressId',
     'primaryEmailAddressId',
     'primaryPhoneNumberId',
+    'primaryWeb3WalletId',
     'passwordEnabled',
     'twoFactorEnabled',
     'passwordEnabled',
@@ -47,6 +50,7 @@ export class User {
   static associations = {
     emailAddresses: Association.HasMany,
     phoneNumbers: Association.HasMany,
+    web3Wallets: Association.HasMany,
     externalAccounts: Association.HasMany,
   };
 
@@ -74,7 +78,9 @@ export class User {
     obj.phoneNumbers = (data.phone_numbers || []).map((x) =>
       PhoneNumber.fromJSON(x)
     );
-
+    obj.web3Wallets = (data.web3_wallets || []).map((x) =>
+      Web3Wallet.fromJSON(x)
+    );
     obj.externalAccounts = (data.external_accounts || []).map(
       (x: ExternalAccountJSON) => ExternalAccount.fromJSON(x)
     );

@@ -3,19 +3,32 @@ export enum Association {
   HasMany = 'HasMany',
 }
 
+export type OAuthProvider =
+  | 'facebook'
+  | 'google'
+  | 'hubspot'
+  | 'github'
+  | 'tiktok'
+  | 'gitlab'
+  | 'discord'
+  | 'twitter'
+  | 'twitch';
+
+export type OAuthStrategy = `oauth_${OAuthProvider}`;
+
 export type SignInIdentifier =
   | 'username'
   | 'email_address'
   | 'phone_number'
-  | 'oauth_google'
-  | 'oauth_facebook';
+  | 'web3_wallet'
+  | OAuthStrategy;
 
 export type SignInFactorStrategy =
   | 'password'
-  | 'oauth_google'
-  | 'oauth_facebook'
+  | 'email_link'
   | 'phone_code'
-  | 'email_code';
+  | 'email_code'
+  | OAuthStrategy;
 
 export type SignInStatus =
   | 'needs_identifier'
@@ -28,9 +41,9 @@ export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
 export type SignUpIdentificationRequirements = (
   | 'email_address'
   | 'phone_number'
+  | 'web3_wallet'
   | 'username'
-  | 'oauth_google'
-  | 'oauth_facebook'
+  | OAuthStrategy
 )[][];
 
 export type SignUpAttributeRequirements = (

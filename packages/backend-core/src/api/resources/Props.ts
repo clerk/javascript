@@ -1,3 +1,4 @@
+import { Nullable } from '../../util/nullable';
 import {
   SignInFactorStrategy,
   SignInIdentifier,
@@ -6,7 +7,6 @@ import {
   SignUpIdentificationRequirements,
   SignUpStatus,
 } from './Enums';
-import { Nullable } from './Nullable';
 
 export interface ClerkProps {
   id: Nullable<string>;
@@ -143,4 +143,9 @@ export interface VerificationProps {
   externalVerificationRedirectURL: Nullable<URL>;
   attempts: Nullable<number>;
   expireAt: Nullable<number>;
+  nonce: Nullable<string>;
+}
+
+export interface Web3WalletProps extends ClerkProps {
+  web3Wallet: Nullable<string>;
 }

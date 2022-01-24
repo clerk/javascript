@@ -1,8 +1,8 @@
+import type { Nullable } from '../../util/nullable';
 import associationDefaults from '../utils/Associations';
 import { Association } from './Enums';
 import { IdentificationLink } from './IdentificationLink';
-import type { IdentificationLinkJSON,PhoneNumberJSON } from './JSON';
-import type { Nullable } from './Nullable';
+import type { IdentificationLinkJSON, PhoneNumberJSON } from './JSON';
 import type { PhoneNumberProps } from './Props';
 import { Verification } from './Verification';
 

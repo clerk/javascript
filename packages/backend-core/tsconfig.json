@@ -1,21 +1,22 @@
 {
-    "compilerOptions": {
-      "lib": ["ES2020", "DOM"],
-      "target": "ES2019",
-      "strict": true,
-      "declaration": true,
-      "declarationMap": true,
-      "noUnusedLocals": true,
-      "noUnusedParameters": true,
-      "sourceMap": false,
-      "removeComments": true,
-      "baseUrl": "src",
-      "moduleResolution": "node",
-      "resolveJsonModule": true,
-      "allowSyntheticDefaultImports": true,
-      "esModuleInterop": true
-    },
-    "include": ["src"],
-    "exclude": ["node_modules", "dist"]
-  }
-  
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": "src",
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "importHelpers": true,
+    "lib": ["ES2020", "DOM"],
+    "moduleResolution": "node",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "removeComments": true,
+    "resolveJsonModule": true,
+    "sourceMap": false,
+    "strict": true,
+    "target": "ES2019"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}
