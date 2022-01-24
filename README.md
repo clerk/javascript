@@ -9,6 +9,10 @@
 
 This repository contains all the Clerk JavaScript SDKs under the `@clerk/` namespace. Visit [https://clerk.dev](https://clerk.dev) to signup for an account.
 
+[![chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://discord.com/invite/b5rXHjAg7A)
+[![documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://docs.clerk.dev)
+[![twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
+
 ---
 
 **Clerk is Hiring!**
@@ -41,10 +45,10 @@ For package specific details on installation, architecture and usage usage, you 
 - `@clerk/react` _Coming soon_
 - ...
 
-
 Additionally there are packages which act as shared utilities or building blocks.
 
 ## Setup
+
 - Clone the repository.
 - `npm install`.
 - `npm run build`.
