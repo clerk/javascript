@@ -1,5 +1,5 @@
 ---
-name: "\U00003F Question"
+name: "❓ Question"
 about: Ask a question about Clerk.
 title: ''
 labels: 'Status: Question'
