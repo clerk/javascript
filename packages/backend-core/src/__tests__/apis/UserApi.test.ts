@@ -103,25 +103,29 @@ test('getUserList() with phone numbers returns a list of users', async () => {
 });
 
 test('getUser() returns a single user', async () => {
-  const expected = new User({
-    id: 'user_noone',
-  });
-
   nock('https://api.clerk.dev')
-    .get(`/v1/users/${expected.id}`)
+    .get(`/v1/users/user_deadbeef`)
     .replyWithFile(200, __dirname + '/responses/getUser.json', {
       'Content-Type': 'application/x-www-form-urlencoded',
     });
 
-  const user = await TestBackendAPIClient.users.getUser(expected.id as string);
-
-  // expect(user).toMatchObject(expected);
+  const user = await TestBackendAPIClient.users.getUser('user_deadbeef');
 
   expect(user).toBeInstanceOf(User);
 
   expect(user.externalAccounts.length).toEqual(2);
   expect(user.externalAccounts[0].provider).toEqual('google');
   expect(user.externalAccounts[1].provider).toEqual('facebook');
+
+  expect(user.web3Wallets.length).toEqual(1);
+  expect(user.web3Wallets[0].web3Wallet).toEqual(
+    '0x0000000000000000000000000000000000000000'
+  );
+  expect(user.web3Wallets[0].verification).toMatchObject({
+    attempts: 1,
+    expireAt: expect.any(Number),
+    nonce: 'l6i2keszfr0yftb0aghwxye8xdxmec2x4m86elc5',
+  });
 
   const expectedPublicMetadata = { zodiac_sign: 'leo', ascendant: 'scorpio' };
   expect(user.publicMetadata).toEqual(expectedPublicMetadata);

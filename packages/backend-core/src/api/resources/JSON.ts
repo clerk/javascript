@@ -12,9 +12,9 @@ export enum ObjectType {
   Client = 'client',
   Email = 'email',
   EmailAddress = 'email_address',
+  ExternalAccount = 'external_account',
   FacebookAccount = 'facebook_account',
   GoogleAccount = 'google_account',
-  ExternalAccount = 'external_account',
   Invitation = 'invitation',
   PhoneNumber = 'phone_number',
   Session = 'session',
@@ -22,6 +22,7 @@ export enum ObjectType {
   SignUpAttempt = 'sign_up_attempt',
   SmsMessage = 'sms_message',
   User = 'user',
+  Web3Wallet = 'web3_wallet',
 }
 
 export interface ClerkResourceJSON {
@@ -120,6 +121,12 @@ export interface PhoneNumberJSON extends ClerkResourceJSON {
   verification: VerificationJSON | null;
 }
 
+export interface Web3WalletJSON extends ClerkResourceJSON {
+  object: ObjectType.Web3Wallet;
+  web3_wallet: string;
+  verification: VerificationJSON | null;
+}
+
 export interface SessionJSON extends ClerkResourceJSON {
   object: ObjectType.Session;
   client_id: string;
@@ -151,6 +158,8 @@ export interface SignUpJSON extends ClerkResourceJSON {
   email_address_verification: VerificationJSON | null;
   phone_number: string | null;
   phone_number_verification: VerificationJSON | null;
+  web3_wallet: string | null;
+  web3_wallet_verification: VerificationJSON | null;
   external_account_strategy: string | null;
   external_account_verification: VerificationJSON | null;
   external_account: any;
@@ -179,10 +188,12 @@ export interface UserJSON extends ClerkResourceJSON {
   profile_image_url: string;
   primary_email_address_id: string;
   primary_phone_number_id: string;
+  primary_web3_wallet_id: string;
   password_enabled: boolean;
   two_factor_enabled: boolean;
   email_addresses: EmailAddressJSON[];
   phone_numbers: PhoneNumberJSON[];
+  web3_wallets: Web3WalletJSON[];
   external_accounts: GoogleAccountJSON[];
   public_metadata: Record<string, unknown>;
   private_metadata: Record<string, unknown>;
@@ -192,9 +203,10 @@ export interface UserJSON extends ClerkResourceJSON {
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {
-  status: string;
-  strategy: string;
-  external_verification_redirect_url: string;
   attempts: number;
   expire_at: number;
+  external_verification_redirect_url: string;
+  nonce: string;
+  status: string;
+  strategy: string;
 }

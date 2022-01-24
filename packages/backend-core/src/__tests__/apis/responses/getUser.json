@@ -1,6 +1,6 @@
 {
   "object": "user",
-  "id": "user_noone",
+  "id": "user_deadbeef",
   "username": null,
   "first_name": "Kyle",
   "last_name": "Reese",
@@ -66,6 +66,20 @@
         "expireAt": 1613831855
       },
       "linked_to": []
+    }
+  ],
+  "web3_wallets": [
+    {
+      "id": "idn_240KZI4L5vZEXO3KWDz2kJlV4Vw",
+      "object": "web3_wallet",
+      "web3_wallet": "0x0000000000000000000000000000000000000000",
+      "verification": {
+        "status": "verified",
+        "strategy": "web3_metamask_signature",
+        "attempts": 1,
+        "expire_at": 1642762718086,
+        "nonce": "l6i2keszfr0yftb0aghwxye8xdxmec2x4m86elc5"
+      }
     }
   ],
   "external_accounts": [

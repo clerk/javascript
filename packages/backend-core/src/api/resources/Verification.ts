@@ -7,11 +7,12 @@ export interface Verification extends VerificationPayload {}
 
 export class Verification {
   static attributes = [
-    'status',
-    'strategy',
-    'externalVerificationRedirectURL',
     'attempts',
     'expireAt',
+    'externalVerificationRedirectURL',
+    'nonce',
+    'status',
+    'strategy',
   ];
 
   static defaults = {};
@@ -36,12 +37,14 @@ export class Verification {
       }
       obj.attempts = data.attempts;
       obj.expireAt = data.expire_at;
+      obj.nonce = data.nonce;
     } else {
       obj.status = null;
       obj.strategy = null;
       obj.externalVerificationRedirectURL = null;
       obj.attempts = null;
       obj.expireAt = null;
+      obj.nonce = null;
     }
 
     return new Verification(obj as VerificationPayload);
