@@ -5,6 +5,8 @@ title: ''
 labels: 'Status: Feature Request'
 ---
 
+<!-- You can also find us on Discord https://discord.com/invite/b5rXHjAg7A -->
+
 ## Package
 
 - [ ] `@clerk/backend-core`
