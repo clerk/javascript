@@ -8,7 +8,7 @@
 import Cookies from 'cookies';
 import deepmerge from 'deepmerge';
 import type { NextFunction, Request, Response } from 'express';
-import got, { OptionsOfJSONResponseBody } from 'got';
+import got, { OptionsOfUnknownResponseBody } from 'got';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import jwks, { JwksClient } from 'jwks-rsa';
 import querystring from 'querystring';
@@ -72,7 +72,7 @@ export default class Clerk extends ClerkBackendAPI {
     apiKey?: string;
     serverApiUrl?: string;
     apiVersion?: string;
-    httpOptions?: OptionsOfJSONResponseBody;
+    httpOptions?: OptionsOfUnknownResponseBody;
     jwksCacheMaxAge?: number;
   } = {}) {
     const fetcher: ClerkFetcher = (
@@ -81,7 +81,7 @@ export default class Clerk extends ClerkBackendAPI {
     ) => {
       const finalHTTPOptions = deepmerge(httpOptions, {
         method,
-        responseType: 'json',
+        responseType: contentType === 'text/html' ? 'text' : 'json',
         headers: {
           authorization,
           'Content-Type': contentType,
@@ -89,7 +89,7 @@ export default class Clerk extends ClerkBackendAPI {
         },
         // @ts-ignore
         ...(body && { body: querystring.stringify(body) }),
-      }) as OptionsOfJSONResponseBody;
+      }) as OptionsOfUnknownResponseBody;
 
       return got(url, finalHTTPOptions).then(data => data.body);
     };
@@ -334,7 +334,7 @@ export default class Clerk extends ClerkBackendAPI {
     return this.withSession(handler, { onError });
   }
 
-  set httpOptions(value: OptionsOfJSONResponseBody) {
+  set httpOptions(value: OptionsOfUnknownResponseBody) {
     this.httpOptions = value;
   }
 }
