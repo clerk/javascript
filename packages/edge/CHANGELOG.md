@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.1.2](https://github.com/clerkinc/javascript/compare/@clerk/edge@0.1.1...@clerk/edge@0.1.2) (2022-01-25)
+
+
+### Reverts
+
+* Revert "chore(release): Publish" ([df705e0](https://github.com/clerkinc/javascript/commit/df705e011f025e044c61aad2983e90afd94d5662))
+
+
+
 ### [0.1.1](https://github.com/clerkinc/javascript/compare/@clerk/edge@0.1.0...@clerk/edge@0.1.1) (2022-01-20)
 
 **Note:** Version bump only for package @clerk/edge

@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.1.1...@clerk/backend-core@0.2.0) (2022-01-25)
+
+
+### Features
+
+* **backend-core:** Add Web3Wallet support ([220e438](https://github.com/clerkinc/javascript/commit/220e438e6b7be2bb39849dfd8492b3dbf4909f43))
+
+
+### Bug Fixes
+
+* **backend-core:** Additional exp skew checks ([4ebfcc9](https://github.com/clerkinc/javascript/commit/4ebfcc9bc1852230e57671b02d3f57b9b6ef04c9))
+* **backend-core:** Consistent error messages ([f4a4805](https://github.com/clerkinc/javascript/commit/f4a4805136233a9d491be1ae8691091151418107))
+* **backend-core:** Correct Nullable export ([1395691](https://github.com/clerkinc/javascript/commit/1395691360ad52fb236ea1f2917289c9e317751d))
+* **backend-core:** Remove nbf check temporarily ([1a6229a](https://github.com/clerkinc/javascript/commit/1a6229a66ed980fddc60ee5cbd026cb5cf6cf7bb))
+
+
+### Reverts
+
+* Revert "chore(release): Publish" ([df705e0](https://github.com/clerkinc/javascript/commit/df705e011f025e044c61aad2983e90afd94d5662))
+
+
+
 ### [0.1.1](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.1.0...@clerk/backend-core@0.1.1) (2022-01-20)
 
 

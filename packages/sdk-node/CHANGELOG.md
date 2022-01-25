@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [2.7.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@2.7.2...@clerk/clerk-sdk-node@2.7.3) (2022-01-25)
+
+
+### Bug Fixes
+
+* **clerk-sdk-node:** Correctly pass responseType on got options for interstitial logic ([6fd58bb](https://github.com/clerkinc/javascript/commit/6fd58bb31083fd28bba06b7224e1d5f30df68bbb))
+
+
+### Reverts
+
+* Revert "chore(release): Publish" ([df705e0](https://github.com/clerkinc/javascript/commit/df705e011f025e044c61aad2983e90afd94d5662))
+
+
+
 ### [2.7.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@2.7.1...@clerk/clerk-sdk-node@2.7.2) (2022-01-20)
 
 **Note:** Version bump only for package @clerk/clerk-sdk-node
