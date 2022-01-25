@@ -244,27 +244,49 @@ export class Base {
       return { status: AuthStatus.SignedOut };
     }
 
-    if (isDevelopmentOrStaging(API_KEY) && (!referrer || isCrossOrigin)) {
+
+    // First load of development. Could be logged in on Clerk-hosted UI. 
+    if (isDevelopmentOrStaging(API_KEY) && !clientUat) {
       return {
         status: AuthStatus.Interstitial,
         interstitial: await fetchInterstitial(),
       };
     }
 
-    if (isProduction(API_KEY) && !clientUat) {
+    // Potentially arriving after a sign-in or sign-out on Clerk-hosted UI.
+    if (isDevelopmentOrStaging(API_KEY) && !referrer) {
+      return {
+        status: AuthStatus.Interstitial,
+        interstitial: await fetchInterstitial(),
+      };
+    }
+
+    // Probably first load for production
+    if (isProduction(API_KEY) && !clientUat && !cookieToken) {
       return { status: AuthStatus.SignedOut };
     }
+
+    // Signed out on a different subdomain but Clerk.js has not run to remove the cookie yet.
+    // TBD: Can enable if we do not want the __session cookie to be inspected.
+    // if (clientUat === '0' && cookieToken) {
+    //   return {
+    //     status: AuthStatus.Interstitial,
+    //     interstitial: await fetchInterstitial(),
+    //   };
+    // }
 
     if (clientUat === '0') {
       return { status: AuthStatus.SignedOut };
     }
 
-    // TODO: Is this a valid check here ?
-    if (!cookieToken) {
-      return { status: AuthStatus.SignedOut };
+    if (isProduction(API_KEY) && clientUat && !cookieToken) {
+      return {
+        status: AuthStatus.Interstitial,
+        interstitial: await fetchInterstitial(),
+      };
     }
 
-    sessionClaims = await this.verifySessionToken(cookieToken);
+    sessionClaims = await this.verifySessionToken(cookieToken as string);
 
     if (
       cookieToken &&
