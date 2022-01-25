@@ -1,9 +1,7 @@
 import { JWTPayload } from './types';
-const DEFAULT_ALLOWED_CLOCK_SKEW = 10;
 
 export function isExpired(
-  payload: JWTPayload,
-  allowedClerkSkew = DEFAULT_ALLOWED_CLOCK_SKEW
+  payload: JWTPayload
 ) {
   // verify exp+nbf claims
   const now = Date.now() / 1000;
@@ -12,9 +10,7 @@ export function isExpired(
     throw new Error(`Expired token`);
   }
 
-  if (payload.nbf && now < payload.nbf + allowedClerkSkew) {
-    throw new Error(`Expired token`);
-  }
+  // TODO: Error handling logic based on nbf attribute and clock skew.
 }
 
 export function checkClaims(claims: JWTPayload) {
