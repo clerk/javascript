@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.1.2](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.1.1...@clerk/backend-core@0.1.2) (2022-01-25)
+
+
+### Features
+
+* **backend-core:** Add Web3Wallet support ([220e438](https://github.com/clerkinc/javascript/commit/220e438e6b7be2bb39849dfd8492b3dbf4909f43))
+
+
+
 ### [0.1.1](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.1.0...@clerk/backend-core@0.1.1) (2022-01-20)
 
 
