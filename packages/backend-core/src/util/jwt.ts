@@ -9,16 +9,16 @@ export function isExpired(
   const now = Date.now() / 1000;
 
   if (payload.exp && now > payload.exp + additionalClockSkew) {
-    throw new Error(`Expired token`);
+    throw new Error(`Token is expired`);
   }
 
   if (payload.nbf && now < payload.nbf - additionalClockSkew) {
-    throw new Error(`Token not active yet`);
+    throw new Error(`Token is not active yet`);
   }
 }
 
 export function checkClaims(claims: JWTPayload) {
   if (!claims.iss || !claims.iss.startsWith('https://clerk')) {
-    throw new Error(`Invalid issuer: ${claims.iss}`);
+    throw new Error(`Issuer is invalid: ${claims.iss}`);
   }
 }
