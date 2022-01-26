@@ -244,8 +244,7 @@ export class Base {
       return { status: AuthStatus.SignedOut };
     }
 
-
-    // First load of development. Could be logged in on Clerk-hosted UI. 
+    // First load of development. Could be logged in on Clerk-hosted UI.
     if (isDevelopmentOrStaging(API_KEY) && !clientUat) {
       return {
         status: AuthStatus.Interstitial,
@@ -254,7 +253,16 @@ export class Base {
     }
 
     // Potentially arriving after a sign-in or sign-out on Clerk-hosted UI.
-    if (isDevelopmentOrStaging(API_KEY) && (!referrer || checkCrossOrigin(new URL(referrer).origin, host, forwardedHost, forwardedPort))) {
+    if (
+      isDevelopmentOrStaging(API_KEY) &&
+      (!referrer ||
+        checkCrossOrigin(
+          new URL(referrer).origin,
+          host,
+          forwardedHost,
+          forwardedPort
+        ))
+    ) {
       return {
         status: AuthStatus.Interstitial,
         interstitial: await fetchInterstitial(),
