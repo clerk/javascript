@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [2.7.4](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@2.7.3...@clerk/clerk-sdk-node@2.7.4) (2022-01-26)
+
+
+### Reverts
+
+* Revert "chore(release): Publish" ([df705e0](https://github.com/clerkinc/javascript/commit/df705e011f025e044c61aad2983e90afd94d5662))
+
+
+
 ### [2.7.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@2.7.2...@clerk/clerk-sdk-node@2.7.3) (2022-01-25)
 
 

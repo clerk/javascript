@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.2.1](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.2.0...@clerk/backend-core@0.2.1) (2022-01-26)
+
+
+### Bug Fixes
+
+* **backend-core:** Address the case for cross-origin development in authState ([fd6dc37](https://github.com/clerkinc/javascript/commit/fd6dc37a49c04b191889d32441bc9345bee01362))
+* **backend-core:** Enhancement of the auth state algorithm ([27caa19](https://github.com/clerkinc/javascript/commit/27caa1988e12d0b2562bb97c04439adc0467983d))
+
+
+
 ## [0.2.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.1.1...@clerk/backend-core@0.2.0) (2022-01-25)
 
 
