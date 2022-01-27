@@ -56,6 +56,7 @@ const verifySignature = async (
 
 export default class Clerk extends ClerkBackendAPI {
   base: Base;
+  httpOptions: OptionsOfUnknownResponseBody;
 
   _jwksClient: JwksClient;
 
@@ -79,7 +80,7 @@ export default class Clerk extends ClerkBackendAPI {
       url,
       { method, authorization, contentType, userAgent, body }
     ) => {
-      const finalHTTPOptions = deepmerge(httpOptions, {
+      const finalHTTPOptions = deepmerge(this.httpOptions, {
         method,
         responseType: contentType === 'text/html' ? 'text' : 'json',
         headers: {
@@ -107,6 +108,8 @@ export default class Clerk extends ClerkBackendAPI {
     if (!apiKey) {
       throw Error(SupportMessages.API_KEY_NOT_FOUND);
     }
+
+    this.httpOptions = httpOptions;
 
     this._jwksClient = jwks({
       jwksUri: `${serverApiUrl}/${apiVersion}/jwks`,
@@ -331,9 +334,5 @@ export default class Clerk extends ClerkBackendAPI {
     { onError }: MiddlewareOptions = { onError: this.strictOnError }
   ) {
     return this.withSession(handler, { onError });
-  }
-
-  set httpOptions(value: OptionsOfUnknownResponseBody) {
-    this.httpOptions = value;
   }
 }
