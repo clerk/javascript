@@ -5,8 +5,6 @@ import clerk, { clients } from '@clerk/clerk-sdk-node';
 const clientId = process.env.CLIENT_ID || '';
 const sessionToken = process.env.SESSION_TOKEN || '';
 
-// setClerkServerApiUrl(serverApiUrl);
-
 console.log('Get client list');
 const clientList = await clients.getClientList();
 console.log(clientList);
