@@ -76,7 +76,11 @@ async function fetchInterstitial() {
 
 export type NextRequestWithSession = NextRequest & { session: Session };
 
-export function withSession(handler: Middleware, authorizedParties?: string[]) {
+export type MiddlewareOptions = {
+  authorizedParties?: string[];
+};
+
+export function withSession(handler: Middleware, { authorizedParties }: MiddlewareOptions) {
   return async function clerkAuth(req: NextRequest, event: NextFetchEvent) {
     const { status, session, interstitial } = await vercelEdgeBase.getAuthState(
       {
