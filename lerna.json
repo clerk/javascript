@@ -5,7 +5,18 @@
     ],
     "command": {
         "version": {
-            "message": "chore(release): Publish"
+            "message": "chore(release): Publish",
+            "allowBranch": [
+                "main",
+                "next"
+            ],
+            "conventionalCommits": true
+        },
+        "publish": {
+            "allowBranch": [
+                "main",
+                "next"
+            ]
         }
     },
     "changelogPreset": {

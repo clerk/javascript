@@ -25,19 +25,20 @@
     "lerna": "^4.0.0",
     "prettier": "^2.3.1",
     "ts-jest": "27.0.5",
+    "turbo": "^1.0.29",
     "typescript": "^4.5.2"
   },
   "scripts": {
     "lint-fix": "eslint . --ext .ts",
-    "bump": "lerna version --conventional-commits",
-    "bump:next": "lerna version --conventional-commits --conventional-prerelease",
-    "graduate:next": "lerna version --conventional-commits --conventional-graduate",
+    "bump": "lerna version",
+    "bump:next": "lerna version --conventional-prerelease",
+    "graduate:next": "lerna version --conventional-graduate",
     "release": "lerna publish from-git",
-    "prerelease": "lerna run build",
+    "prerelease": "turbo run build",
     "release:next": "lerna publish from-package --dist-tag next",
-    "prerelease:next": "lerna run build",
-    "build": "lerna run build",
-    "test": "lerna run test",
+    "prerelease:next": "turbo run build",
+    "build": "turbo run build",
+    "test": "turbo run test",
     "prepare": "husky install",
     "version": "./scripts/version-info.sh",
     "lerna": "lerna"
@@ -45,5 +46,20 @@
   "engines": {
     "node": ">=16.8.0",
     "npm": ">=8"
+  },
+  "turbo": {
+    "npmClient": "npm",
+    "baseBranch": "origin/main",
+    "pipeline": {
+      "build": {
+        "dependsOn": [
+          "^build"
+        ],
+        "outputs": []
+      },
+      "test": {
+        "outputs": []
+      }
+    }
   }
 }

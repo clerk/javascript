@@ -61,7 +61,7 @@ export default class Clerk extends ClerkBackendAPI {
 
   // singleton instance
   static _instance: Clerk;
-  
+
   constructor({
     apiKey = defaultApiKey,
     serverApiUrl = defaultServerApiUrl,
@@ -91,7 +91,7 @@ export default class Clerk extends ClerkBackendAPI {
         ...(body && { body: querystring.stringify(body) }),
       }) as OptionsOfUnknownResponseBody;
 
-      return got(url, finalHTTPOptions).then(data => data.body);
+      return got(url, finalHTTPOptions).then((data) => data.body);
     };
 
     super({
@@ -118,15 +118,16 @@ export default class Clerk extends ClerkBackendAPI {
       cacheMaxAge: jwksCacheMaxAge,
     });
 
-
     const loadCryptoKey = async (token: string) => {
       const decoded = jwt.decode(token, { complete: true });
       if (!decoded) {
         throw new Error(`Failed to decode token: ${token}`);
       }
-      
-      const signingKey = await this._jwksClient.getSigningKey(decoded.header.kid)
-      const pubKey = signingKey.getPublicKey()
+
+      const signingKey = await this._jwksClient.getSigningKey(
+        decoded.header.kid
+      );
+      const pubKey = signingKey.getPublicKey();
 
       return await crypto.subtle.importKey(
         'spki',
@@ -161,13 +162,11 @@ export default class Clerk extends ClerkBackendAPI {
       algorithms: ['RS256'],
     });
 
-    if(typeof verified === 'string' || !verified.iss){
+    if (typeof verified === 'string' || !verified.iss) {
       throw new Error('Malformed token');
     }
 
-    if (
-      !(verified.iss?.lastIndexOf('https://clerk.', 0) === 0)
-    ) {
+    if (!(verified.iss?.lastIndexOf('https://clerk.', 0) === 0)) {
       throw new Error(`Invalid issuer: ${verified.iss}`);
     }
 
