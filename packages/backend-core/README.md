@@ -86,6 +86,15 @@ examplePlatformBase.getAuthState(...);
 
 The `Base` utilities include the building blocks for developing any extra logic and middleware required for the target platform.
 
+### Validate the Authorized Party of a session token
+Clerk's JWT session token, contains the azp claim, which equals the Origin of the request during token generation. You can provide a list of whitelisted origins to verify against, during every token verification, to protect your application of the subdomain cookie leaking attack. You can find an example below:
+
+```ts
+const authorizedParties = ['http://localhost:3000', 'https://example.com']
+
+examplePlatformBase.verifySessionToken(token> { authorizedParties });
+```
+
 ### Clerk API Resources
 
 API resource management is also provided by this package through the [ClerkBackendAPI](./src/api/ClerkBackendAPI.ts) class. For more information on the API resources you can checkout the [resource documentation page](https://docs.clerk.dev/reference/backend-api-reference).

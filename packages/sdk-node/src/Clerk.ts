@@ -28,6 +28,7 @@ const packageRepo = 'https://github.com/clerkinc/clerk-sdk-node';
 
 export type MiddlewareOptions = {
   onError?: Function;
+  authorizedParties?: string[];
 };
 
 export type WithSessionProp<T> = T & { session?: Session };
@@ -154,7 +155,7 @@ export default class Clerk extends ClerkBackendAPI {
     );
   }
 
-  async verifyToken(token: string): Promise<JwtPayload> {
+  async verifyToken(token: string, authorizedParties?: string[]): Promise<JwtPayload> {
     const decoded = jwt.decode(token, { complete: true });
     if (!decoded) {
       throw new Error(`Failed to verify token: ${token}`);
@@ -169,8 +170,14 @@ export default class Clerk extends ClerkBackendAPI {
       throw new Error('Malformed token');
     }
 
-    if (!(verified.iss?.lastIndexOf('https://clerk.', 0) === 0)) {
-      throw new Error(`Invalid issuer: ${verified.iss}`);
+    if (!verified.iss || !verified.iss.startsWith('https://clerk')) {
+      throw new Error(`Issuer is invalid: ${verified.iss}`);
+    }
+
+    if (verified.azp && authorizedParties && authorizedParties.length > 0) {
+      if (!authorizedParties.includes(verified.azp as string)) {
+        throw new Error(`Authorized party is invalid: ${verified.azp}`);
+      }
     }
 
     return verified;
@@ -208,7 +215,7 @@ export default class Clerk extends ClerkBackendAPI {
   }
 
   expressWithSession(
-    { onError }: MiddlewareOptions = { onError: this.defaultOnError }
+    { onError, authorizedParties }: MiddlewareOptions = { onError: this.defaultOnError }
   ): (req: Request, res: Response, next: NextFunction) => Promise<void> {
     function signedOut() {
       throw new Error('Unauthenticated');
@@ -234,6 +241,7 @@ export default class Clerk extends ClerkBackendAPI {
             forwardedHost: req.headers['x-forwarded-host'] as string,
             referrer: req.headers.referer,
             userAgent: req.headers['user-agent'] as string,
+            authorizedParties: authorizedParties,
             fetchInterstitial: () => this.fetchInterstitial(),
           });
 
@@ -274,9 +282,9 @@ export default class Clerk extends ClerkBackendAPI {
   }
 
   expressRequireSession(
-    { onError }: MiddlewareOptions = { onError: this.strictOnError }
+    { onError, authorizedParties }: MiddlewareOptions = { onError: this.strictOnError }
   ) {
-    return this.expressWithSession({ onError });
+    return this.expressWithSession({ onError, authorizedParties });
   }
 
   // Credits to https://nextjs.org/docs/api-routes/api-middlewares
@@ -299,7 +307,7 @@ export default class Clerk extends ClerkBackendAPI {
   // Set the session on the request and then call provided handler
   withSession(
     handler: Function,
-    { onError }: MiddlewareOptions = { onError: this.defaultOnError }
+    { onError, authorizedParties }: MiddlewareOptions = { onError: this.defaultOnError }
   ) {
     return async (
       req: WithSessionProp<Request> | WithSessionClaimsProp<Request>,
@@ -310,7 +318,7 @@ export default class Clerk extends ClerkBackendAPI {
         await this._runMiddleware(
           req,
           res,
-          this.expressWithSession({ onError })
+          this.expressWithSession({ onError, authorizedParties })
         );
         return handler(req, res, next);
       } catch (error) {
@@ -331,8 +339,8 @@ export default class Clerk extends ClerkBackendAPI {
   // Stricter version, short-circuits if session can't be determined
   requireSession(
     handler: Function,
-    { onError }: MiddlewareOptions = { onError: this.strictOnError }
+    { onError, authorizedParties }: MiddlewareOptions = { onError: this.strictOnError }
   ) {
-    return this.withSession(handler, { onError });
+    return this.withSession(handler, { onError, authorizedParties });
   }
 }
