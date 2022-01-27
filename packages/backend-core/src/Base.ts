@@ -52,6 +52,8 @@ type AuthStateParams = {
   referrer?: string | null;
   /* Request user-agent value */
   userAgent?: string | null;
+  /* A list of authorized parties to validate against the session token azp claim */
+  authorizedParties?: string[]
   /* HTTP utility for fetching a text/html string */
   fetchInterstitial: () => Promise<string>;
 };
@@ -88,9 +90,10 @@ export class Base {
    * The public key will be supplied in the form of CryptoKey or will be loaded from the CLERK_JWT_KEY environment variable.
    *
    * @param {string} token
+   * @param authorizedParties
    * @return {Promise<JWTPayload>} claims
    */
-  verifySessionToken = async (token: string): Promise<JWTPayload> => {
+  verifySessionToken = async (token: string, authorizedParties?: string[]): Promise<JWTPayload> => {
     // Try to load the PK from supplied function and
     // if there is no custom load function
     // try to load from the environment.
@@ -99,7 +102,7 @@ export class Base {
       : await this.loadCryptoKeyFromEnv();
 
     const claims = await this.verifyJwt(availableKey, token);
-    checkClaims(claims);
+    checkClaims(claims, authorizedParties);
     return claims;
   };
 
@@ -207,6 +210,7 @@ export class Base {
     forwardedPort,
     referrer,
     userAgent,
+    authorizedParties,
     fetchInterstitial,
   }: AuthStateParams): Promise<AuthState> => {
     const isCrossOrigin = checkCrossOrigin(
@@ -218,7 +222,7 @@ export class Base {
 
     let sessionClaims;
     if (headerToken) {
-      sessionClaims = await this.verifySessionToken(headerToken);
+      sessionClaims = await this.verifySessionToken(headerToken, authorizedParties);
       if (sessionClaims) {
         return {
           status: AuthStatus.SignedIn,
@@ -296,7 +300,7 @@ export class Base {
       };
     }
 
-    sessionClaims = await this.verifySessionToken(cookieToken as string);
+    sessionClaims = await this.verifySessionToken(cookieToken as string, authorizedParties);
 
     if (
       cookieToken &&

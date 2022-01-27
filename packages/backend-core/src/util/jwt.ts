@@ -17,8 +17,14 @@ export function isExpired(
   }
 }
 
-export function checkClaims(claims: JWTPayload) {
+export function checkClaims(claims: JWTPayload, authorizedParties?: string[]) {
   if (!claims.iss || !claims.iss.startsWith('https://clerk')) {
     throw new Error(`Issuer is invalid: ${claims.iss}`);
+  }
+
+  if (claims.azp && authorizedParties && authorizedParties.length !== 0) {
+    if (!authorizedParties.includes(claims.azp as string)) {
+      throw new Error(`Authorized party is invalid: ${claims.azp}`);
+    }
   }
 }
