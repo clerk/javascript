@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.2.2](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.2.1...@clerk/backend-core@0.2.2) (2022-01-28)
+
+
+### Bug Fixes
+
+* **backend-core:** Remove the no-referrer check for interstitial ([4853caa](https://github.com/clerkinc/javascript/commit/4853caaf859b918faea66d83ec5c8aa430f09d9a))
+
+
+
 ### [0.2.1](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.2.0...@clerk/backend-core@0.2.1) (2022-01-26)
 
 

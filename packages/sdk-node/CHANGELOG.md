@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [2.7.5](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@2.7.4...@clerk/clerk-sdk-node@2.7.5) (2022-01-28)
+
+
+### Bug Fixes
+
+* **clerk-sdk-node:** Restore the setClerkHttpOptions capability ([ff9f518](https://github.com/clerkinc/javascript/commit/ff9f51860895033f5fe8a4fc12a18b0b204ad472))
+
+
+
 ### [2.7.4](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@2.7.3...@clerk/clerk-sdk-node@2.7.4) (2022-01-26)
 
 
