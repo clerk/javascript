@@ -80,7 +80,7 @@ export type MiddlewareOptions = {
   authorizedParties?: string[];
 };
 
-export function withSession(handler: Middleware, { authorizedParties }: MiddlewareOptions) {
+export function withSession(handler: Middleware, { authorizedParties }: MiddlewareOptions = { authorizedParties: []}) {
   return async function clerkAuth(req: NextRequest, event: NextFetchEvent) {
     const { status, session, interstitial } = await vercelEdgeBase.getAuthState(
       {
