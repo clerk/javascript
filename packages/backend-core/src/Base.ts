@@ -192,6 +192,8 @@ export class Base {
    *
    * Retrieve the authentication state for a request by using client specific information.
    *
+   * @throws {Error} Token expired, Wrong azp, Malformed token. All of these cases should result in signed out state.
+   *
    * @param {AuthStateParams}
    * @returns {Promise<AuthState>}
    */
@@ -255,13 +257,13 @@ export class Base {
     // Potentially arriving after a sign-in or sign-out on Clerk-hosted UI.
     if (
       isDevelopmentOrStaging(API_KEY) &&
-      (!referrer ||
-        checkCrossOrigin(
-          new URL(referrer).origin,
-          host,
-          forwardedHost,
-          forwardedPort
-        ))
+      referrer &&
+      checkCrossOrigin(
+        new URL(referrer).origin,
+        host,
+        forwardedHost,
+        forwardedPort
+      )
     ) {
       return {
         status: AuthStatus.Interstitial,
