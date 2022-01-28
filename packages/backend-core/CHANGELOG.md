@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.0-alpha.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.2.1...@clerk/backend-core@0.3.0-alpha.0) (2022-01-28)
+
+
+### Features
+
+* **backend-core,clerk-sdk-node,edge:** Add support to verify azp session token claim ([c180476](https://github.com/clerkinc/javascript/commit/c180476ac25143a8b08224f080dba0f847ddbd2f))
+
+
+### Bug Fixes
+
+* **backend-core:** Remove the no-referrer check for interstitial ([4853caa](https://github.com/clerkinc/javascript/commit/4853caaf859b918faea66d83ec5c8aa430f09d9a))
+
+
+
 ### [0.2.1](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.2.0...@clerk/backend-core@0.2.1) (2022-01-26)
 
 

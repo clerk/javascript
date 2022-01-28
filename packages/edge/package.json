@@ -1,6 +1,6 @@
 {
   "name": "@clerk/edge",
-  "version": "0.1.3",
+  "version": "0.2.0-alpha.0",
   "license": "MIT",
   "description": "Clerk.dev SDK for Edge/Serverless authentication",
   "keywords": [
@@ -37,7 +37,7 @@
     "build": "node ./scripts/info.cjs && tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && ./moduleTypeFix"
   },
   "dependencies": {
-    "@clerk/backend-core": "^0.2.1",
+    "@clerk/backend-core": "^0.3.0-alpha.0",
     "@peculiar/webcrypto": "^1.2.3",
     "next": "^12.0.7"
   },
