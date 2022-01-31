@@ -1,0 +1,359 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<SignUpVerify/> verify email address renders the sign up verification form 1`] = `
+Array [
+  <div
+    className="cl-auth-form-header"
+    style={Object {}}
+  >
+    <div
+      className="cl-auth-form-header-logo"
+    >
+      <div
+        className="cl-logo"
+        title="My test app"
+      >
+        My test app
+      </div>
+    </div>
+  </div>,
+  <div
+    className="cl-auth-form-body"
+  >
+    <label
+      className="label cl-auth-form-message"
+    >
+      Enter the 6-digit code sent to
+      <br />
+      <strong>
+        jdoe@example.com
+      </strong>
+    </label>
+    <div
+      className="cl-otp-input"
+    >
+      <div
+        className="inputContainer"
+        data-test-id="otp-container"
+      >
+        <input
+          aria-label="Enter verification code. Digit 1"
+          autoComplete="one-time-code"
+          autoFocus={true}
+          className="input codeInput"
+          disabled={false}
+          inputMode="numeric"
+          maxLength={1}
+          name="codeInput-0"
+          onChange={[Function]}
+          onFocus={[Function]}
+          onInput={[Function]}
+          onKeyDown={[Function]}
+          onPaste={[Function]}
+          type="text"
+          value=" "
+        />
+        <input
+          aria-label="Digit 2"
+          autoComplete="one-time-code"
+          autoFocus={false}
+          className="input codeInput"
+          disabled={false}
+          inputMode="numeric"
+          maxLength={1}
+          name="codeInput-1"
+          onChange={[Function]}
+          onFocus={[Function]}
+          onInput={[Function]}
+          onKeyDown={[Function]}
+          onPaste={[Function]}
+          type="text"
+          value=" "
+        />
+        <input
+          aria-label="Digit 3"
+          autoComplete="one-time-code"
+          autoFocus={false}
+          className="input codeInput"
+          disabled={false}
+          inputMode="numeric"
+          maxLength={1}
+          name="codeInput-2"
+          onChange={[Function]}
+          onFocus={[Function]}
+          onInput={[Function]}
+          onKeyDown={[Function]}
+          onPaste={[Function]}
+          type="text"
+          value=" "
+        />
+        <input
+          aria-label="Digit 4"
+          autoComplete="one-time-code"
+          autoFocus={false}
+          className="input codeInput"
+          disabled={false}
+          inputMode="numeric"
+          maxLength={1}
+          name="codeInput-3"
+          onChange={[Function]}
+          onFocus={[Function]}
+          onInput={[Function]}
+          onKeyDown={[Function]}
+          onPaste={[Function]}
+          type="text"
+          value=" "
+        />
+        <input
+          aria-label="Digit 5"
+          autoComplete="one-time-code"
+          autoFocus={false}
+          className="input codeInput"
+          disabled={false}
+          inputMode="numeric"
+          maxLength={1}
+          name="codeInput-4"
+          onChange={[Function]}
+          onFocus={[Function]}
+          onInput={[Function]}
+          onKeyDown={[Function]}
+          onPaste={[Function]}
+          type="text"
+          value=" "
+        />
+        <input
+          aria-label="Digit 6"
+          autoComplete="one-time-code"
+          autoFocus={false}
+          className="input codeInput"
+          disabled={false}
+          inputMode="numeric"
+          maxLength={1}
+          name="codeInput-5"
+          onChange={[Function]}
+          onFocus={[Function]}
+          onInput={[Function]}
+          onKeyDown={[Function]}
+          onPaste={[Function]}
+          type="text"
+          value=" "
+        />
+      </div>
+      <div
+        className="statusContainer"
+      >
+        <button
+          className="button link primary resendCode"
+          disabled={false}
+          onClick={[Function]}
+        >
+          Resend Code
+        </button>
+      </div>
+    </div>
+  </div>,
+]
+`;
+
+exports[`<SignUpVerify/> verify email address renders the sign up verification form but prefers email_link if exists 1`] = `
+<div
+  className="cl-auth-form-body cl-auth-form-body-center cl-verification-page-container"
+>
+  <div
+    className="cl-verification-page-container"
+    data-test-id="magicLink-waiting-screen"
+  >
+    <div
+      className="cl-verification-page-icon-container"
+    >
+      <svg
+        data-filename="../shared/assets/icons/mail-open.svg"
+      />
+    </div>
+    <h1
+      className="cl-verification-page-header"
+    >
+      Check your email
+    </h1>
+    <p
+      className="cl-verification-page-text"
+    >
+      A sign-up link has been sent to
+      <br />
+      <span
+        className="cl-verification-page-identifier"
+      >
+        jdoe@example.com
+      </span>
+    </p>
+    <p
+      className="cl-verification-page-text"
+    >
+      Click the link in the email to continue signing up, then return to
+          this tab.
+    </p>
+    <button
+      className="button link primary disabled cl-verify-page-resend-button"
+      disabled={true}
+      onClick={[Function]}
+    >
+      Resend magic link
+    </button>
+  </div>
+</div>
+`;
+
+exports[`<SignUpVerify/> verify phone number renders the sign up verification form 1`] = `
+Array [
+  <div
+    className="cl-auth-form-header"
+    style={Object {}}
+  >
+    <div
+      className="cl-auth-form-header-logo"
+    >
+      <div
+        className="cl-logo"
+        title="My test app"
+      >
+        My test app
+      </div>
+    </div>
+  </div>,
+  <div
+    className="cl-auth-form-body"
+  >
+    <label
+      className="label cl-auth-form-message"
+    >
+      Enter the 6-digit code sent to
+      <br />
+      <strong>
+        +123456789
+      </strong>
+    </label>
+    <div
+      className="cl-otp-input"
+    >
+      <div
+        className="inputContainer"
+        data-test-id="otp-container"
+      >
+        <input
+          aria-label="Enter verification code. Digit 1"
+          autoComplete="one-time-code"
+          autoFocus={true}
+          className="input codeInput"
+          disabled={false}
+          inputMode="numeric"
+          maxLength={1}
+          name="codeInput-0"
+          onChange={[Function]}
+          onFocus={[Function]}
+          onInput={[Function]}
+          onKeyDown={[Function]}
+          onPaste={[Function]}
+          type="text"
+          value=" "
+        />
+        <input
+          aria-label="Digit 2"
+          autoComplete="one-time-code"
+          autoFocus={false}
+          className="input codeInput"
+          disabled={false}
+          inputMode="numeric"
+          maxLength={1}
+          name="codeInput-1"
+          onChange={[Function]}
+          onFocus={[Function]}
+          onInput={[Function]}
+          onKeyDown={[Function]}
+          onPaste={[Function]}
+          type="text"
+          value=" "
+        />
+        <input
+          aria-label="Digit 3"
+          autoComplete="one-time-code"
+          autoFocus={false}
+          className="input codeInput"
+          disabled={false}
+          inputMode="numeric"
+          maxLength={1}
+          name="codeInput-2"
+          onChange={[Function]}
+          onFocus={[Function]}
+          onInput={[Function]}
+          onKeyDown={[Function]}
+          onPaste={[Function]}
+          type="text"
+          value=" "
+        />
+        <input
+          aria-label="Digit 4"
+          autoComplete="one-time-code"
+          autoFocus={false}
+          className="input codeInput"
+          disabled={false}
+          inputMode="numeric"
+          maxLength={1}
+          name="codeInput-3"
+          onChange={[Function]}
+          onFocus={[Function]}
+          onInput={[Function]}
+          onKeyDown={[Function]}
+          onPaste={[Function]}
+          type="text"
+          value=" "
+        />
+        <input
+          aria-label="Digit 5"
+          autoComplete="one-time-code"
+          autoFocus={false}
+          className="input codeInput"
+          disabled={false}
+          inputMode="numeric"
+          maxLength={1}
+          name="codeInput-4"
+          onChange={[Function]}
+          onFocus={[Function]}
+          onInput={[Function]}
+          onKeyDown={[Function]}
+          onPaste={[Function]}
+          type="text"
+          value=" "
+        />
+        <input
+          aria-label="Digit 6"
+          autoComplete="one-time-code"
+          autoFocus={false}
+          className="input codeInput"
+          disabled={false}
+          inputMode="numeric"
+          maxLength={1}
+          name="codeInput-5"
+          onChange={[Function]}
+          onFocus={[Function]}
+          onInput={[Function]}
+          onKeyDown={[Function]}
+          onPaste={[Function]}
+          type="text"
+          value=" "
+        />
+      </div>
+      <div
+        className="statusContainer"
+      >
+        <button
+          className="button link primary resendCode"
+          disabled={false}
+          onClick={[Function]}
+        >
+          Resend Code
+        </button>
+      </div>
+    </div>
+  </div>,
+]
+`;

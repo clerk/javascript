@@ -1,0 +1,58 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders the add method card 1`] = `
+<div
+  className="card card cl-themed-card"
+>
+  <div
+    className="titleContainer"
+  >
+    <h1
+      className="title"
+    >
+      Add method
+    </h1>
+    <p
+      className="subtitle"
+    >
+      Set up a new 2-step verification method
+    </p>
+  </div>
+  <div
+    className="cl-titled-card-list"
+  >
+    <div
+      className="cl-list-item elementContainer"
+      disabled={false}
+    >
+      <div
+        className="title"
+      >
+        SMS code
+      </div>
+      <div
+        className="listItem line"
+      >
+        <div
+          className="start"
+        >
+          <div>
+            <div>
+              Receive a verification code via SMS when signing in
+            </div>
+            <button
+              className="button link primary cl-link-button"
+              onClick={[Function]}
+            >
+              Add SMS code verification
+            </button>
+          </div>
+        </div>
+        <div
+          className="iconContainer"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+`;

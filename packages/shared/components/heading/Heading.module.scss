@@ -1,0 +1,41 @@
+@import '../styles/variables';
+
+.heading {
+  margin: 0;
+}
+
+.h1 {
+  font-size: 2.5rem;
+  font-weight: $semibold-weight;
+  line-height: 3.125rem;
+}
+
+.h2 {
+  font-size: 2rem;
+  font-weight: $semibold-weight;
+  line-height: 2.5rem;
+}
+
+.h3 {
+  font-size: 1.75rem;
+  font-weight: $semibold-weight;
+  line-height: 2.1875rem;
+}
+
+.h4 {
+  font-size: 1.5em;
+  font-weight: $semibold-weight;
+  line-height: 1.875rem;
+}
+
+.h5 {
+  font-size: 1em;
+  font-weight: $semibold-weight;
+  line-height: 1.875rem;
+}
+
+.h6 {
+  font-size: 0.5em;
+  font-weight: $semibold-weight;
+  line-height: 1.875rem;
+}

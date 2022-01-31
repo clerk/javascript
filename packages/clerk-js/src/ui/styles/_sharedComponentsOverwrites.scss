@@ -1,0 +1,29 @@
+/*
+ * This file contains necessary overwrites in @clerk/shared components
+ * in order to use them in Clerk JS Authentication components, namely
+ * <SignIn/>, <SignUp/>, <UserButton/>, <UserProfile/>.
+ *
+ * After migrating fully to @clerk/shared components some of these styles
+ * will be consolidated with the original shared component styles.
+ */
+
+@import 'injections';
+
+// Overwrites:
+// https://github.com/clerkinc/clerk_ui/blob/854ff4aef34ed9656bdfa9de14ec584696d8f77f/packages/shared/components/form/Form.module.scss#L10
+fieldset + fieldset {
+  margin-top: 0;
+}
+
+.otp-input {
+  button {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+button {
+  &:hover {
+    filter: none;
+  }
+}

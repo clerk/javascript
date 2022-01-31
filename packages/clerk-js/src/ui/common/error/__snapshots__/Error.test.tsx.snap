@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Error/> renders the error component 1`] = `
+<div
+  className="cl-error"
+>
+  Foo
+</div>
+`;

@@ -1,0 +1,447 @@
+@use 'sass:math';
+
+$min-width: 320px;
+$content-width-xl: 840px;
+$content-width-lg: 620px;
+
+&.user-profile {
+  display: flex;
+  min-width: 320px;
+  background-color: $theme-accounts-background-color;
+
+  .navbar {
+    display: flex;
+    margin-top: 3rem;
+    list-style: none;
+    flex-direction: column;
+  }
+
+  .navbar-link {
+    display: inline-block;
+    border-left: 4px solid #e5e5e5;
+    width: 300px;
+    // Border radius should be more than the max navbar-link height
+    // in order to achieve the desired rounder corner effect.
+    // $theme-border-radius can be 1em (normal) or 0.5em (compact)
+    // We use a high enough value to support arbitrary link heights
+    // even with "Spacing" set to "compact"
+    border-radius: 0 calc(#{$theme-border-radius} * 999)
+      calc(#{$theme-border-radius} * 999) 0;
+    padding: themed-padding(1rem 2rem);
+    color: $cl-gray-light-3;
+    font-weight: $semibold-weight;
+    @include text-ellipsis;
+
+    &.active {
+      color: $theme-primary;
+      background-color: $theme-primary-l2;
+      border-left: 4px solid $theme-primary;
+    }
+
+    > .icon {
+      position: relative;
+      margin-right: 0.5rem;
+      bottom: 2px;
+    }
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .main {
+    min-width: 320px;
+    width: $content-width-xl;
+    margin: 3em auto 0 auto;
+    padding-bottom: 1.5em;
+
+    @include media(upto large) {
+      width: $content-width-lg;
+    }
+
+    @include media(upto small) {
+      margin: 1.5em 1em 0;
+      width: auto;
+    }
+
+    .spinner {
+      border: 3px solid var(--clerk-primary);
+      border-right-color: transparent;
+      width: 26px;
+      height: 26px;
+      border-radius: math.div(26px, 2);
+      position: absolute;
+      top: 50%;
+      right: 50%;
+      transform: translate(0, -50%);
+    }
+  }
+
+  @include media(upto medium) {
+    flex-direction: column;
+
+    .navbar {
+      margin-top: 0;
+      flex-direction: row;
+      min-height: 3em;
+    }
+
+    .navbar-link {
+      padding: themed-padding(0.75rem 2rem);
+      width: auto;
+      flex-grow: 1;
+      border-left: none;
+      border-bottom: 4px solid #e5e5e5;
+      //border-radius: 12px 12px 0 0;
+      border-radius: calc(#{$theme-border-radius} * 1.5)
+        calc(#{$theme-border-radius} * 1.5) 0 0;
+      text-align: center;
+
+      > .icon {
+        width: 1em;
+        height: 1.125em;
+      }
+
+      &.active {
+        color: $theme-primary;
+        background-color: $theme-primary-l2;
+        border-left: none;
+        border-bottom: 4px solid $theme-primary;
+      }
+    }
+  }
+
+  .image {
+    justify-content: flex-start;
+    border-radius: 50%;
+    height: 64px;
+    width: 64px;
+    color: $themed-font-color-l1;
+  }
+
+  .left-icon-wrapper {
+    margin-right: 10px;
+    height: 1.5rem;
+  }
+}
+
+.themed-card + .powered-by-clerk {
+  margin-top: 1.5em;
+}
+
+.titled-card-list {
+  margin: 0 -2em;
+
+  @include media(upto small) {
+    margin: 0 -1.5em;
+  }
+}
+
+// New, extract into module during the refactor
+.list-item {
+  padding-left: 2em;
+
+  @include media(upto small) {
+    padding-left: 1.5em;
+  }
+
+  @include media(xxsmall) {
+    padding: 2em 1em;
+  }
+
+  .list-item-entry div:not(:last-of-type) {
+    margin-bottom: 0.5rem;
+  }
+
+  .list-item-subtitle {
+    margin-top: 0.2em;
+    font-size: 0.875em;
+    color: $cl-gray-light-3;
+  }
+}
+
+.phone-item,
+.email-item {
+  display: flex;
+  flex-wrap: wrap;
+  @include text-ellipsis;
+  @include media(upto xsmall) {
+    display: block;
+  }
+}
+
+.tags {
+  margin-left: 0.375rem;
+
+  .tag {
+    margin-right: 0;
+  }
+
+  @include media(upto xsmall) {
+    margin-left: 0;
+    .tag {
+      margin: 0.375em 0.375em 0 0;
+    }
+  }
+}
+
+.phone-item {
+  font-weight: $semibold-weight;
+}
+
+.ident-detail {
+  font-size: 1.25em;
+  font-weight: $semibold-weight;
+  @include text-ellipsis;
+  display: flex;
+  flex-wrap: wrap;
+  @include media(upto xsmall) {
+    display: block;
+  }
+}
+
+.connection-info {
+  font-size: 0.875em;
+  color: $cl-gray-light-3;
+  margin-top: 0.25em;
+  flex-basis: 100%;
+}
+
+.list-card {
+  padding: 1.5em 0;
+
+  .empty-list-item {
+    padding: 3em 0;
+    text-align: center;
+  }
+}
+
+.empty-list-item {
+  color: $themed-font-color-l1;
+}
+
+.list-card .add-resource-button {
+  width: 100%;
+  margin: 1em 0 -1.5em 0;
+  padding: themed-padding(1.5em 0em 1.5em 2em);
+  font-weight: $semibold-weight;
+  display: flex;
+  justify-content: flex-start;
+  border-radius: 0 !important;
+}
+
+.remove-button {
+  padding: 0;
+
+  svg {
+    margin-right: 0.625em;
+  }
+}
+
+.primary-status-container {
+  display: flex;
+  justify-content: space-between;
+
+  .description {
+    display: flex;
+
+    svg {
+      color: $cl-gray-light-3;
+      width: 1.5em;
+      height: 1.5em;
+      margin-right: 1em;
+      flex-shrink: 0;
+    }
+  }
+
+  .text {
+    font-size: 1em;
+    white-space: initial;
+  }
+
+  .text .title {
+    font-weight: $semibold-weight;
+  }
+
+  .text .subtitle {
+    font-size: 0.925em;
+  }
+}
+
+.verifiable-field-card {
+  form {
+    margin: 3em 0 0 0;
+    max-width: unset;
+  }
+
+  .copy-text {
+    margin: 0.5rem 0 1rem 0;
+    line-height: 1.25rem;
+
+    .tip {
+      margin: 1rem 0 0 0;
+      font-size: 0.875rem;
+      color: $themed-font-color-l1;
+    }
+  }
+
+  .identifier {
+    font-weight: $semibold-weight;
+  }
+
+  .verify-email-container {
+    margin-top: 1rem;
+    margin-right: -2rem;
+    width: unset; // account for List.Item margin
+  }
+}
+
+.two-step-verification {
+  padding: 3em 2em;
+
+  .phone-select .phone-select-row {
+    padding: 1em 1em 1em 0;
+    border-radius: $theme-border-radius;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  .add-phone {
+    margin-top: 0.625em;
+  }
+
+  .message {
+    margin: 2em 0 3em 0;
+  }
+}
+
+.form-button-group {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+  margin-top: 2em;
+
+  & button:last-of-type {
+    margin-right: 1em;
+  }
+
+  & button:only-child {
+    margin-right: 0;
+  }
+
+  button {
+    border-radius: $theme-border-radius;
+  }
+}
+
+.editable-field {
+  form {
+    max-width: unset;
+  }
+}
+
+.link-button {
+  margin-top: 0.25em;
+  padding: 0;
+}
+
+.page-heading {
+  display: flex;
+  margin-bottom: 2.625em;
+
+  .back-button {
+    margin-right: 0.625em;
+  }
+
+  .title {
+    font-size: 2.5em;
+    font-weight: $semibold-weight;
+  }
+
+  .subtitle {
+    font-weight: $font-weight-normal;
+    font-size: 1.25em;
+    color: $cl-gray-light-3;
+    margin: 0;
+  }
+
+  @include media(upto small) {
+    .title {
+      font-size: 1.75em;
+      margin: 0;
+    }
+
+    .subtitle {
+      font-size: 1em;
+    }
+  }
+}
+
+// devices and activity components
+.activity-icon {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  @include media(upto xsmall) {
+    display: none;
+  }
+
+  svg {
+    margin-top: -1.5rem;
+  }
+
+  &.activity-icon-desktop svg {
+    width: 7rem;
+    height: 4rem;
+  }
+
+  &.activity-icon-mobile svg {
+    width: 2rem;
+    height: 4rem;
+  }
+}
+
+.activity-description {
+  .activity-prop {
+    color: $themed-font-color-l1;
+    margin: 0 0 0.025rem 0;
+    line-height: normal;
+    @include text-ellipsis;
+  }
+
+  .activity-type {
+    position: relative;
+    color: $themed-font-color;
+    font-weight: $semibold-weight;
+    margin: 0 0 0.125rem 0;
+    overflow: visible;
+  }
+
+  .tag {
+    position: absolute;
+    padding-top: 0.125rem;
+    padding-bottom: 0.125rem;
+  }
+
+  .activity-last-active-at {
+    font-size: 0.875rem;
+  }
+
+  .activity-last-active-at {
+    text-transform: none;
+
+    &:first-letter {
+      text-transform: uppercase;
+    }
+  }
+}
+
+.phone-input-container {
+  max-width: 278px;
+}

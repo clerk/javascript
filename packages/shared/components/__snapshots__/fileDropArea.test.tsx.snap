@@ -1,0 +1,81 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly if multiple types are accepted 1`] = `
+<div
+  className="dropArea"
+  onDragEnter={[Function]}
+  onDragLeave={[Function]}
+  onDragOver={[Function]}
+  onDrop={[Function]}
+>
+  <svg
+    data-filename="assets/icons/image-default.svg"
+  />
+  <p>
+    Drag file here, or
+  </p>
+  <div
+    style={
+      Object {
+        "visibility": "visible",
+      }
+    }
+  >
+    <button
+      className="button text primary hoverable small"
+      onClick={[Function]}
+    >
+      <svg
+        data-filename="assets/icons/upload.svg"
+      />
+       Select file to upload
+    </button>
+    <input
+      accept="image/gif,image/png"
+      className="fileInput"
+      onChange={[Function]}
+      type="file"
+    />
+  </div>
+</div>
+`;
+
+exports[`renders correctly if only jpeg is accepted 1`] = `
+<div
+  className="dropArea"
+  onDragEnter={[Function]}
+  onDragLeave={[Function]}
+  onDragOver={[Function]}
+  onDrop={[Function]}
+>
+  <svg
+    data-filename="assets/icons/image-default.svg"
+  />
+  <p>
+    Drag file here, or
+  </p>
+  <div
+    style={
+      Object {
+        "visibility": "visible",
+      }
+    }
+  >
+    <button
+      className="button text primary hoverable small"
+      onClick={[Function]}
+    >
+      <svg
+        data-filename="assets/icons/upload.svg"
+      />
+       Select file to upload
+    </button>
+    <input
+      accept="image/jpeg"
+      className="fileInput"
+      onChange={[Function]}
+      type="file"
+    />
+  </div>
+</div>
+`;

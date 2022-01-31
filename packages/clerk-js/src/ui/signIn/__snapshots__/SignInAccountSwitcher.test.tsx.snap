@@ -1,0 +1,46 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<SignInAccountSwitcher/> takes a screenshot for the start screen 1`] = `
+<div
+  className="cl-sing-in-account-switcher"
+>
+  <div
+    className="cl-auth-form-header"
+    style={Object {}}
+  >
+    <div
+      className="cl-auth-form-header-logo"
+    >
+      <div
+        className="cl-logo"
+      />
+    </div>
+  </div>
+  <p>
+    Select an account to continue
+  </p>
+  <div
+    className="cl-active-accounts-manager"
+  >
+    <div
+      className="cl-account-switcher"
+    >
+      <button
+        className="button text primary hoverable cl-account-switcher-button cl-account-switcher-add-button"
+        onClick={[Function]}
+      >
+        <div
+          className="cl-account-switcher-add-button-icon"
+        >
+          <svg
+            data-filename="../shared/assets/icons/user-plus.svg"
+          />
+        </div>
+        <span>
+          Add account
+        </span>
+      </button>
+    </div>
+  </div>
+</div>
+`;

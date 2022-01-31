@@ -1,0 +1,53 @@
+@import '../styles/main';
+
+.card {
+  padding: 3em 2em;
+
+  + .card {
+    margin-top: 2em;
+  }
+
+  @include media(upto small) {
+    padding: 2em 1.5em;
+  }
+
+  @include media(xxsmall) {
+    padding: 2em 1em;
+  }
+}
+
+.titleContainer {
+  margin-bottom: 1.25em;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+
+  font-size: 2rem;
+  font-weight: $semibold-weight !important;
+  margin: 0 !important;
+
+  > img {
+    height: 2rem;
+  }
+}
+
+.subtitle {
+  color: $themed-font-color-l1;
+  font-size: 1.25rem;
+  font-style: normal;
+  font-weight: $normal-weight;
+  line-height: 1.5em;
+  margin: 0;
+}
+
+@include media(upto small) {
+  .title {
+    font-size: 1.25rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+}

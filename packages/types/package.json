@@ -1,0 +1,45 @@
+{
+  "name": "@clerk/types",
+  "version": "1.23.0",
+  "license": "MIT",
+  "description": "Clerk.dev Types",
+  "keywords": [
+    "clerk",
+    "react",
+    "auth",
+    "authentication",
+    "passwordless",
+    "session",
+    "jwt",
+    "types"
+  ],
+  "homepage": "https://clerk.dev",
+  "author": "Clerk",
+  "bugs": {
+    "email": "support@clerk.dev"
+  },
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "prepare": "yarn build",
+    "prepublish": "yarn prepare",
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch",
+    "docs:build": "typedoc --out out ./src/index.ts --categorizeByGroup false",
+    "docs:watch": "typedoc --out out ./src/index.ts --categorizeByGroup false --watch"
+  },
+  "devDependencies": {
+    "typedoc": "^0.20.36",
+    "typescript": "4.5.2"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "allowJs": false,
+    "baseUrl": "src",
+    "declaration": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "module": "esnext",
+    "moduleResolution": "Node",
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": true,
+    "paths": {
+      "ui/*": ["ui/*"],
+      "core/*": ["core/*"],
+      "utils/*": ["utils/*"],
+      "types/*": ["types/*"],
+      "testUtils": ["../../../shared/utils/testUtils"]
+    },
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "strict": true,
+    "target": "ES2017",
+    "useUnknownInCatchVariables": false
+  },
+  "exclude": ["node_modules"],
+  "include": ["src/**/*"]
+}

@@ -1,0 +1,268 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Dropdown/> does not show caret if showCaret is set to false 1`] = `
+<div
+  className="container"
+  onBlur={[Function]}
+  onKeyDown={[Function]}
+>
+  <button
+    aria-expanded={false}
+    aria-haspopup="true"
+    className="trigger"
+    onClick={[Function]}
+    type="button"
+  >
+    <span
+      className="label placeholder"
+    >
+      Select...
+    </span>
+  </button>
+</div>
+`;
+
+exports[`<Dropdown/> renders the active dropdown 1`] = `
+<div
+  className="container"
+  onBlur={[Function]}
+  onKeyDown={[Function]}
+>
+  <button
+    aria-expanded={true}
+    aria-haspopup="true"
+    className="trigger active"
+    onClick={[Function]}
+    type="button"
+  >
+    <span
+      className="label"
+    >
+      Bar
+    </span>
+    <svg
+      data-filename="assets/icons/caret.svg"
+    />
+  </button>
+  <ul
+    className="itemList"
+    role="listbox"
+    tabIndex={-1}
+  >
+    <li
+      aria-selected={false}
+      className="item"
+      onMouseDown={[Function]}
+      role="option"
+    >
+      Foo
+    </li>
+    <li
+      aria-selected={true}
+      className="item selected"
+      onMouseDown={[Function]}
+      role="option"
+    >
+      Bar
+    </li>
+    <li
+      aria-selected={false}
+      className="item"
+      onMouseDown={[Function]}
+      role="option"
+    >
+      Qux
+    </li>
+  </ul>
+</div>
+`;
+
+exports[`<Dropdown/> renders the inactive dropdown 1`] = `
+<div
+  className="container"
+  onBlur={[Function]}
+  onKeyDown={[Function]}
+>
+  <button
+    aria-expanded={false}
+    aria-haspopup="true"
+    className="trigger"
+    onClick={[Function]}
+    type="button"
+  >
+    <span
+      className="label placeholder"
+    >
+      Select...
+    </span>
+    <svg
+      data-filename="assets/icons/caret.svg"
+    />
+  </button>
+</div>
+`;
+
+exports[`<Dropdown/> shows placeholder whenever selectedOption is not found 1`] = `
+<div
+  className="container"
+  onBlur={[Function]}
+  onKeyDown={[Function]}
+>
+  <button
+    aria-expanded={false}
+    aria-haspopup="true"
+    className="trigger"
+    onClick={[Function]}
+    type="button"
+  >
+    <span
+      className="label placeholder"
+    >
+      Select...
+    </span>
+    <svg
+      data-filename="assets/icons/caret.svg"
+    />
+  </button>
+</div>
+`;
+
+exports[`Searchable <Dropdown /> renders searchable Dropdown 1`] = `
+<div
+  className="container"
+  onBlur={[Function]}
+  onKeyDown={[Function]}
+>
+  <div
+    className="trigger"
+    onClick={[Function]}
+    onFocus={[Function]}
+    tabIndex={0}
+  >
+    <input
+      aria-autocomplete="list"
+      aria-expanded={false}
+      aria-haspopup="listbox"
+      autoComplete="off"
+      className="searchInput"
+      data-no-focus={true}
+      onBlur={[Function]}
+      onChange={[Function]}
+      role="combobox"
+      tabIndex={0}
+      type="text"
+      value=""
+    />
+    <span
+      className="label searchDisplay placeholder"
+    >
+      
+    </span>
+    <svg
+      data-filename="assets/icons/caret.svg"
+    />
+  </div>
+</div>
+`;
+
+exports[`Searchable <Dropdown /> renders searchable Dropdown with native select element 1`] = `
+<div
+  className="container"
+  onBlur={[Function]}
+  onKeyDown={[Function]}
+>
+  <div
+    className="trigger"
+    onClick={[Function]}
+    onFocus={[Function]}
+    tabIndex={0}
+  >
+    <input
+      aria-autocomplete="list"
+      aria-expanded={false}
+      aria-haspopup="listbox"
+      autoComplete="off"
+      className="searchInput"
+      data-no-focus={true}
+      onBlur={[Function]}
+      onChange={[Function]}
+      role="combobox"
+      tabIndex={0}
+      type="text"
+      value=""
+    />
+    <span
+      className="label searchDisplay placeholder"
+    >
+      
+    </span>
+    <svg
+      data-filename="assets/icons/caret.svg"
+    />
+  </div>
+  <select
+    className="nativeSelect"
+    name="native-dropdown-picker"
+    onChange={[Function]}
+  >
+    <option
+      value="foo"
+    >
+      foo
+    </option>
+    <option
+      value="bar"
+    >
+      bar
+    </option>
+    <option
+      value="qux"
+    >
+      qux
+    </option>
+    <option
+      value="clerk"
+    >
+      clerk
+    </option>
+  </select>
+</div>
+`;
+
+exports[`Searchable <Dropdown /> renders tertiary Dropdown 1`] = `
+<div
+  className="container"
+  onBlur={[Function]}
+  onKeyDown={[Function]}
+>
+  <div
+    className="trigger"
+    onClick={[Function]}
+    onFocus={[Function]}
+    tabIndex={0}
+  >
+    <input
+      aria-autocomplete="list"
+      aria-expanded={false}
+      aria-haspopup="listbox"
+      autoComplete="off"
+      className="searchInput"
+      data-no-focus={true}
+      onBlur={[Function]}
+      onChange={[Function]}
+      role="combobox"
+      tabIndex={0}
+      type="text"
+      value=""
+    />
+    <span
+      className="label searchDisplay placeholder"
+    >
+      
+    </span>
+    <svg
+      data-filename="assets/icons/caret.svg"
+    />
+  </div>
+</div>
+`;

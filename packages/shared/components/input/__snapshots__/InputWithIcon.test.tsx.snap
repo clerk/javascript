@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<InputWithIcon/> renders the controlled input along with the icon 1`] = `
+<div
+  className="container left"
+>
+  <div
+    className="iconContainer"
+  >
+    <svg
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <polyline
+        points="20 6 9 17 4 12"
+      />
+    </svg>
+  </div>
+  <input
+    className="input"
+    onChange={[Function]}
+    placeholder="Select..."
+    type="text"
+  />
+</div>
+`;

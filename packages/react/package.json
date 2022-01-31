@@ -1,0 +1,67 @@
+{
+  "name": "@clerk/clerk-react",
+  "version": "2.9.0",
+  "license": "MIT",
+  "description": "Clerk.dev React library",
+  "keywords": [
+    "clerk",
+    "react",
+    "auth",
+    "authentication",
+    "passwordless",
+    "session",
+    "jwt"
+  ],
+  "homepage": "https://clerk.dev",
+  "author": "Clerk",
+  "bugs": {
+    "email": "support@clerk.dev"
+  },
+  "source": "src/index.ts",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "node ./scripts/info.js && tsc -p tsconfig.build.json",
+    "dev": "node ./scripts/info.js && tsc -p tsconfig.build.json --watch",
+    "prepare": "npm run build",
+    "prepublish": "npm run prepare",
+    "test:coverage": "echo \"Error: no test specified yet\"",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@clerk/types": "^1.23.0",
+    "tslib": "^2.3.1"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "^7.28.1",
+    "@testing-library/jest-dom": "^5.11.6",
+    "@testing-library/react": "^11.2.1",
+    "@testing-library/react-hooks": "^3.4.2",
+    "@testing-library/user-event": "^12.2.2",
+    "@types/jest": "^26.0.15",
+    "@types/node": "^16.11.9",
+    "@types/react": "^16.9.41",
+    "@types/react-dom": "^16.9.8",
+    "@types/react-test-renderer": "^17",
+    "@types/testing-library__jest-dom": "^5",
+    "@types/testing-library__react-hooks": "^3",
+    "jest": "^26.6.3",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "ts-jest": "^26.4.4",
+    "typescript": "4.5.2"
+  },
+  "peerDependencies": {
+    "react": ">=16"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

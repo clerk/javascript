@@ -1,0 +1,137 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<OTP/> renders the OTP form component 1`] = `
+Array [
+  <label
+    className="label cl-auth-form-message"
+  >
+    Enter the 6-digit code sent to
+    <br />
+    <strong>
+      jdoe@example.com
+    </strong>
+  </label>,
+  <div
+    className="cl-otp-input"
+  >
+    <div
+      className="inputContainer"
+      data-test-id="otp-container"
+    >
+      <input
+        aria-label="Enter verification code. Digit 1"
+        autoComplete="one-time-code"
+        autoFocus={true}
+        className="input codeInput"
+        disabled={false}
+        inputMode="numeric"
+        maxLength={1}
+        name="codeInput-0"
+        onChange={[Function]}
+        onFocus={[Function]}
+        onInput={[Function]}
+        onKeyDown={[Function]}
+        onPaste={[Function]}
+        type="text"
+        value="1"
+      />
+      <input
+        aria-label="Digit 2"
+        autoComplete="one-time-code"
+        autoFocus={false}
+        className="input codeInput"
+        disabled={false}
+        inputMode="numeric"
+        maxLength={1}
+        name="codeInput-1"
+        onChange={[Function]}
+        onFocus={[Function]}
+        onInput={[Function]}
+        onKeyDown={[Function]}
+        onPaste={[Function]}
+        type="text"
+        value="2"
+      />
+      <input
+        aria-label="Digit 3"
+        autoComplete="one-time-code"
+        autoFocus={false}
+        className="input codeInput"
+        disabled={false}
+        inputMode="numeric"
+        maxLength={1}
+        name="codeInput-2"
+        onChange={[Function]}
+        onFocus={[Function]}
+        onInput={[Function]}
+        onKeyDown={[Function]}
+        onPaste={[Function]}
+        type="text"
+        value="3"
+      />
+      <input
+        aria-label="Digit 4"
+        autoComplete="one-time-code"
+        autoFocus={false}
+        className="input codeInput"
+        disabled={false}
+        inputMode="numeric"
+        maxLength={1}
+        name="codeInput-3"
+        onChange={[Function]}
+        onFocus={[Function]}
+        onInput={[Function]}
+        onKeyDown={[Function]}
+        onPaste={[Function]}
+        type="text"
+        value="4"
+      />
+      <input
+        aria-label="Digit 5"
+        autoComplete="one-time-code"
+        autoFocus={false}
+        className="input codeInput"
+        disabled={false}
+        inputMode="numeric"
+        maxLength={1}
+        name="codeInput-4"
+        onChange={[Function]}
+        onFocus={[Function]}
+        onInput={[Function]}
+        onKeyDown={[Function]}
+        onPaste={[Function]}
+        type="text"
+        value="5"
+      />
+      <input
+        aria-label="Digit 6"
+        autoComplete="one-time-code"
+        autoFocus={false}
+        className="input codeInput"
+        disabled={false}
+        inputMode="numeric"
+        maxLength={1}
+        name="codeInput-5"
+        onChange={[Function]}
+        onFocus={[Function]}
+        onInput={[Function]}
+        onKeyDown={[Function]}
+        onPaste={[Function]}
+        type="text"
+        value="6"
+      />
+    </div>
+    <div
+      className="statusContainer"
+    >
+      <button
+        className="button link primary resendCode"
+        disabled={false}
+        onClick={[Function]}
+      >
+        Resend Code
+      </button>
+    </div>
+  </div>,
+]
+`;

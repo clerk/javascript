@@ -1,0 +1,77 @@
+@import '../styles/variables';
+
+.control {
+  label {
+    width: 100%;
+  }
+
+  a {
+    cursor: pointer;
+    color: $themed-primary !important;
+  }
+}
+
+.labelContainer {
+  display: inline-flex;
+  flex-direction: column-reverse;
+}
+
+.sublabel,
+.optional,
+.hint {
+  font-weight: $normal-weight;
+}
+
+.label,
+.sublabel {
+  font-size: 1rem;
+  line-height: 1.25rem;
+}
+
+.label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+
+  margin-bottom: 0.25em;
+}
+
+.sublabel {
+  display: inline-block;
+  color: $themed-font-color-l1;
+
+  margin-top: 0.25em;
+  margin-bottom: 0.5em;
+}
+
+.hint {
+}
+
+.optional {
+  margin-right: auto;
+  margin-left: 0.25em;
+
+  color: $gray40;
+  font-size: 0.875em;
+  line-height: 1.5;
+}
+
+.error {
+  display: block;
+  color: $error;
+  font-size: 0.875rem;
+  line-height: 1.125rem;
+  margin-top: 0.25em;
+  margin-bottom: 0.175em;
+  opacity: 0;
+  min-height: 0.825rem;
+  max-height: 0.825rem;
+  transition: all 300ms ease;
+}
+
+.errorVisible {
+  visibility: visible;
+  opacity: 1;
+  max-height: 2.35rem;
+  margin-bottom: 0.625em;
+}

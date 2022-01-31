@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ExpansionIcon /> renders an expansion icon with different Icon 1`] = `<svg />`;
+
+exports[`<ExpansionIcon /> renders simple expansion icon states 1`] = `
+<svg
+  data-filename="assets/icons/caret.svg"
+/>
+`;
+
+exports[`<ExpansionIcon /> renders simple expansion icon states 2`] = `
+<svg
+  data-filename="assets/icons/caret.svg"
+/>
+`;

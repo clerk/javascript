@@ -1,0 +1,69 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ProfilePhoneNumbers/> renders the ProfilePhoneNumbers 1`] = `
+<button
+  className="cl-list-item elementContainer button hoverable"
+  disabled={false}
+  onClick={[Function]}
+>
+  <div
+    className="title"
+  >
+    Phone number
+  </div>
+  <div
+    className="listItem line"
+  >
+    <div
+      className="start"
+    >
+      <div
+        className="cl-list-item-entry"
+      >
+        <div>
+          <span
+            className="container"
+          >
+            +
+            1
+             
+            (123) 4
+          </span>
+          <span
+            className="tag primary sm"
+          >
+            Primary
+          </span>
+          <span
+            className="tag success sm cl-tag"
+          >
+            Verified
+          </span>
+        </div>
+        <div>
+          <span
+            className="container"
+          >
+            +
+            56
+             
+            5678
+          </span>
+          <span
+            className="tag error sm cl-tag"
+          >
+            Unverified
+          </span>
+        </div>
+      </div>
+    </div>
+    <div
+      className="iconContainer"
+    >
+      <svg
+        data-filename="../shared/assets/icons/arrow-right.svg"
+      />
+    </div>
+  </div>
+</button>
+`;

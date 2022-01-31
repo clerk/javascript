@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Salutation renders Salutation 1`] = `
+<div
+  className="cl-user-button-headline"
+>
+  Hi, Jane!
+</div>
+`;

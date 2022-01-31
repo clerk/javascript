@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<EmailAddressVerificationWithMagicLink/> renders the <EmailAddressVerificationWithMagicLink/> component 1`] = `
+<div
+  className="cl-verification-page-container"
+  data-test-id="magicLink-waiting-screen"
+>
+  <div
+    className="cl-verification-page-icon-container"
+  >
+    <svg
+      data-filename="../shared/assets/icons/mail-open.svg"
+    />
+  </div>
+  <h1
+    className="cl-verification-page-header"
+  >
+    Check your email
+  </h1>
+  <p
+    className="cl-verification-page-text"
+  >
+    A verification link has been sent to
+    <br />
+    <span
+      className="cl-verification-page-identifier"
+    >
+      boss@clerk.dev
+    </span>
+  </p>
+  <p
+    className="cl-verification-page-text"
+  >
+    Click the link in the email to verify your new email, then return to
+          this tab.
+  </p>
+  <button
+    className="button link primary disabled cl-verify-page-resend-button"
+    disabled={true}
+    onClick={[Function]}
+  >
+    Resend magic link
+  </button>
+</div>
+`;

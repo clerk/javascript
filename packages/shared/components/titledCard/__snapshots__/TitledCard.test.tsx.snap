@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<TitledCard/> renders the card and its childred 1`] = `
+<div
+  className="card card"
+>
+  <div
+    className="titleContainer"
+  >
+    <h1
+      className="title"
+    >
+      Foo
+    </h1>
+  </div>
+  <div>
+    Foo content
+  </div>
+</div>
+`;

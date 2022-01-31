@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Control/> renders the label along with its control, hints, optional status, and errors 1`] = `
+<div
+  className="control"
+>
+  <label
+    className="label labelContainer"
+  >
+    Foo
+    <span
+      className="sublabel"
+    >
+      bar
+    </span>
+    <span
+      className="label"
+    >
+      foo
+      <span
+        className="optional"
+      >
+        Optional
+      </span>
+      <span
+        className="hint"
+      >
+        qux
+      </span>
+    </span>
+  </label>
+  <span
+    className="error errorVisible"
+    style={
+      Object {
+        "display": "block",
+      }
+    }
+  >
+    this is an error
+  </span>
+</div>
+`;

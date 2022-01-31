@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Header/> renders the header component 1`] = `
+<div
+  className="cl-auth-form-header"
+  style={Object {}}
+>
+  <a
+    aria-label="Back Button"
+    className="cl-back-button cl-back-button-absolute"
+    onClick={[Function]}
+  >
+    <svg
+      data-filename="../shared/assets/icons/arrow-left.svg"
+    />
+  </a>
+  <div
+    className="cl-error"
+    style={Object {}}
+  >
+    Boom
+  </div>
+  <div
+    className="cl-auth-form-header-logo"
+  >
+    <div
+      className="cl-logo"
+    />
+  </div>
+  <div
+    className="cl-auth-form-header-greeting"
+  >
+    <label
+      className="label"
+    >
+      Welcome, 
+      Joe
+    </label>
+  </div>
+</div>
+`;

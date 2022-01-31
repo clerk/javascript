@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<PoweredByClerk /> renders 1`] = `
+<div
+  className="cl-powered-by-clerk-container"
+>
+  <span>
+    Secured by 
+  </span>
+  <a
+    className="cl-powered-by-clerk-logo"
+    href="https://www.clerk.dev?utm_source=clerk&utm_medium=components"
+    rel="noopener"
+    target="_blank"
+  >
+    <svg
+      data-filename="../shared/assets/icons/logo-mark.svg"
+    />
+  </a>
+</div>
+`;

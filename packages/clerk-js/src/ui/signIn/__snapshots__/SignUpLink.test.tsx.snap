@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<SignUpLink/> renders the SignUpLink snapshot 1`] = `
+<div
+  className="cl-auth-form-switch cl-auth-form-link"
+>
+  <span
+    className="cl-auth-form-link-label"
+  >
+    No account yet?
+  </span>
+   
+  <a
+    className=""
+    onClick={[Function]}
+  >
+    Sign up
+  </a>
+</div>
+`;

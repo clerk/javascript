@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "importHelpers": true,
+    "jsx": "react",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "module": "es2020",
+    "moduleResolution": "node",
+    "paths": {
+      "testUtils": ["./utils/testUtils"]
+    },
+    "strict": true,
+    "target": "ES2017"
+  }
+}

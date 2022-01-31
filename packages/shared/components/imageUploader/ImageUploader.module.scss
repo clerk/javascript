@@ -1,0 +1,82 @@
+@import '../styles/variables';
+
+.uploaderWrapper {
+  position: relative;
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media (hover: hover) {
+  .uploaderWrapper:hover .hoverContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+.hoverContainer {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.hoverIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+  stroke: $white;
+}
+
+.helpText {
+  margin-top: 0.5em;
+  color: $gray30;
+}
+
+.helpTextError {
+  color: $error;
+}
+
+@media (hover: none) {
+  .uploaderWrapper {
+    padding-right: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .touchContainer {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0.5rem;
+    border-radius: 50%;
+    background-color: white;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .uploaderWrapper:active .touchContainer,
+  .touchContainer:active {
+    background-color: $primary;
+
+    .touchIcon {
+      stroke: white;
+    }
+  }
+
+  .touchIcon {
+    width: 2rem;
+    height: 2rem;
+    padding: 0.625rem;
+    display: block;
+    stroke: $primary;
+  }
+}
+
+@media (hover: hover) {
+  .touchContainer {
+    display: none;
+  }
+}

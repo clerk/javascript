@@ -1,0 +1,101 @@
+.active-accounts-manager {
+  .active-account-buttonset {
+    width: 100%;
+    display: flex;
+  }
+
+  .account-switcher {
+    margin-top: 1.5rem;
+    margin-bottom: -1.5rem;
+    border-top: 0.125rem solid $gray05;
+    border-bottom: 0.125rem solid $gray05;
+  }
+
+  .sign-out-all {
+    padding-top: 3rem;
+    margin-top: -1.5rem;
+    text-align: center;
+  }
+
+  .active-account-buttonset .accounts-manager-button,
+  .sign-out-all .sign-out-all-button {
+    flex: 1 1 auto;
+    color: $cl-gray-light-3;
+    border: 0.125rem solid $gray05;
+    max-height: 2.625rem;
+    font-size: 0.875rem;
+    filter: none !important;
+
+    &:hover {
+      background-color: lighten($gray05, 1%);
+    }
+
+    svg {
+      height: 1rem;
+      margin-right: 0.425rem;
+      color: $gray20;
+    }
+  }
+
+  .active-account-buttonset .accounts-manager-button {
+    padding-left: 0;
+    padding-right: 0;
+
+    &:first-of-type {
+      margin-right: 0.6rem;
+    }
+  }
+
+  .account-switcher .account-switcher-button {
+    display: flex;
+    text-align: left;
+    justify-content: flex-start;
+    width: 100%;
+    border-radius: 0 !important;
+    height: 4.5rem;
+    filter: none !important;
+
+    .details {
+      display: flex;
+      flex-direction: column;
+      color: $themed-font-color;
+      margin-left: 1rem;
+      line-height: 1.25rem;
+      font-size: 0.875rem;
+
+      span + span {
+        color: $themed-font-color-l1;
+        font-weight: $normal-weight;
+      }
+    }
+
+    &:hover {
+      background-color: lighten($gray05, 1%);
+    }
+  }
+
+  .account-switcher .account-switcher-add-button {
+    color: $themed-font-color-l1;
+    max-height: 3.25rem;
+
+    span {
+      font-size: 0.875rem;
+    }
+
+    .account-switcher-add-button-icon {
+      color: $gray20;
+      width: 2.25rem;
+      height: 2.25rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 1rem;
+      font-size: 1rem;
+      padding-left: 3px;
+    }
+  }
+
+  .powered-by-clerk {
+    margin: 3em 0 -1em 0;
+  }
+}

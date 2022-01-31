@@ -1,0 +1,80 @@
+import React from 'react';
+import { TitledCard } from '@clerk/shared/components/titledCard';
+import { useRouter } from 'ui/router';
+import { useCoreUser } from 'ui/contexts';
+import { PageHeading } from 'ui/userProfile/pageHeading';
+import { svgUrl } from 'ui/common/constants';
+import { List } from '@clerk/shared/components/list';
+import { Avatar } from '@clerk/shared/components/avatar';
+import { ExternalAccountResource } from '@clerk/types';
+
+export function ConnectedAccountDetail(): JSX.Element | null {
+  const user = useCoreUser();
+  const { params } = useRouter();
+
+  let externalAccount: ExternalAccountResource | null = null;
+
+  for (const ea of user.externalAccounts) {
+    if (ea.id == params.connected_account_id) {
+      externalAccount = ea;
+      break;
+    }
+  }
+
+  if (!externalAccount) {
+    return null;
+  }
+
+  const avatarRow = (
+    <List.Item
+      className='cl-list-item'
+      key='photo'
+      itemTitle='Photo'
+      hoverable={false}
+      detail={false}
+    >
+      <Avatar
+        className='cl-image'
+        profileImageUrl={externalAccount.picture}
+        size={32}
+      />
+    </List.Item>
+  );
+
+  const emailAddressRow = (
+    <List.Item
+      className='cl-list-item'
+      key='email'
+      itemTitle='Email'
+      hoverable={false}
+      detail={false}
+    >
+      <div>{externalAccount.emailAddress}</div>
+    </List.Item>
+  );
+
+  return (
+    <>
+      <PageHeading title='Connected account' backTo='./../' />
+      <TitledCard
+        title={
+          <>
+            <img
+              alt={externalAccount.providerTitle()}
+              src={svgUrl(externalAccount.provider)}
+              className='cl-left-icon-wrapper'
+            />
+            &nbsp; {externalAccount.providerTitle()}
+          </>
+        }
+        subtitle=' '
+        className='cl-themed-card'
+      >
+        <List className='cl-titled-card-list'>
+          {avatarRow}
+          {emailAddressRow}
+        </List>
+      </TitledCard>
+    </>
+  );
+}

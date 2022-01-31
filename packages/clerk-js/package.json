@@ -1,0 +1,123 @@
+{
+  "name": "@clerk/clerk-js",
+  "version": "2.11.0",
+  "license": "MIT",
+  "description": "Clerk.dev JS library",
+  "keywords": [
+    "clerk",
+    "auth",
+    "authentication",
+    "passwordless",
+    "session",
+    "jwt"
+  ],
+  "homepage": "https://clerk.dev",
+  "author": "Clerk",
+  "bugs": {
+    "email": "support@clerk.dev"
+  },
+  "jsdelivr": "dist/clerk.browser.js",
+  "main": "dist/clerk.js",
+  "module": "dist/clerk.js",
+  "typings": "dist/types/src/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rm -rf dist && npm run build:bundle && npm run build:declarations && npm run bundlewatch",
+    "build:stats": "npm run build --json > stats.json",
+    "build:bundlewatch": "bundlewatch",
+    "build:bundle": "webpack --config webpack.prod.js",
+    "build:declarations": "tsc --p tsconfig.declarations.json",
+    "check-types": "tsc",
+    "dev": "webpack-dev-server --config webpack.dev.js",
+    "prepare": "npm run test && npm run build",
+    "prepublish": "npm run prepare",
+    "start": "echo \"Noop\"",
+    "test": "jest",
+    "test:coverage": "jest --collectCoverage"
+  },
+  "dependencies": {
+    "@clerk/types": "^1.23.0",
+    "@popperjs/core": "^2.4.4",
+    "browser-tabs-lock": "^1.2.15",
+    "classnames": "^2.3.1",
+    "core-js": "^3.18.3",
+    "deepmerge": "^4.2.2",
+    "js-cookie": "^2.2.1",
+    "qs": "^6.9.4",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "react-popper": "^2.2.3",
+    "regenerator-runtime": "^0.13.7"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.3",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
+    "@babel/plugin-proposal-object-rest-spread": "^7.12.1",
+    "@babel/preset-env": "^7.12.1",
+    "@babel/preset-react": "^7.12.5",
+    "@babel/preset-typescript": "^7.12.1",
+    "@clerk/shared": "^0.0.1",
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.2",
+    "@svgr/webpack": "^5.5.0",
+    "@testing-library/dom": "^7.28.1",
+    "@testing-library/jest-dom": "^5.11.6",
+    "@testing-library/react": "^11.2.1",
+    "@testing-library/react-hooks": "^3.4.2",
+    "@testing-library/user-event": "^12.2.2",
+    "@types/classnames": "^2",
+    "@types/jest": "^26.0.15",
+    "@types/jsonwebtoken": "^8",
+    "@types/qs": "^6.9.3",
+    "@types/react": "^16.9.32",
+    "@types/react-dom": "^16.9.6",
+    "@types/react-test-renderer": "^17",
+    "@types/sass": "^1",
+    "@types/testing-library__jest-dom": "^5",
+    "@types/testing-library__react-hooks": "^3",
+    "@types/webpack-dev-server": "^3",
+    "@types/webpack-env": "^1.15.1",
+    "autoprefixer": "^10.0.1",
+    "babel-loader": "^8.1.0",
+    "babel-plugin-module-resolver": "^4.0.0",
+    "bundlewatch": "^0.3.2",
+    "css-loader": "^5.0.0",
+    "fork-ts-checker-webpack-plugin": "^5.2.1",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^26.6.3",
+    "jsonwebtoken": "^8.5.1",
+    "postcss": "^8.1.4",
+    "postcss-loader": "^4.0.4",
+    "postcss-prefixer": "^2.1.2",
+    "querystring-es3": "^0.2.1",
+    "react-refresh": "^0.9.0",
+    "sass": "^1.28.0",
+    "sass-loader": "^10.0.5",
+    "style-loader": "^2.0.0",
+    "ts-jest": "^26.4.4",
+    "type-fest": "^0.20.2",
+    "typescript": "4.5.2",
+    "webpack": "^5.64.1",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.5.0",
+    "webpack-merge": "^5.8.0"
+  },
+  "browserslist": "last 2 versions, ios_saf > 12, Safari > 12, > 1%, not dead, not ie > 0",
+  "bundlewatch": {
+    "files": [
+      {
+        "path": "./dist/clerk.js",
+        "maxSize": "148kB"
+      },
+      {
+        "path": "./dist/clerk.nocomponents.js",
+        "maxSize": "40kB"
+      }
+    ]
+  }
+}

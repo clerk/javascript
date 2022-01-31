@@ -1,0 +1,50 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+@include disabled;
+
+.inputContainer {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+input.codeInput {
+  @include control;
+  width: 2.68em;
+  height: 3.25em;
+  font-weight: $semibold-weight;
+  font-size: 1.25em;
+  caret-color: $themed-primary;
+  transition: all 100ms ease;
+
+  &:not(:last-child) {
+    margin-right: 0.5em;
+  }
+
+  &.error {
+    border-color: $error;
+  }
+
+  &.verified {
+    transition: all 400ms ease;
+    border-color: $success;
+  }
+}
+
+.statusContainer {
+  margin-top: 2em;
+  min-height: 1.6em;
+  text-align: center;
+  font-weight: $semibold-weight;
+
+  .errorMessage {
+    color: $error;
+  }
+
+  .resendCode {
+    color: $themed-primary;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}

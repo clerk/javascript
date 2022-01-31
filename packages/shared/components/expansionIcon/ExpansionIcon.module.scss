@@ -1,0 +1,9 @@
+@import '../styles/variables';
+
+.caret {
+  transition: transform $transition-duration ease;
+}
+
+.activeCaret {
+  transform: rotate(-180deg);
+}

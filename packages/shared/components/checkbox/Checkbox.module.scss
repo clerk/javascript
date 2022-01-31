@@ -1,0 +1,65 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+$checkbox-size: 24px;
+
+@include disabled;
+
+.container {
+  position: relative;
+  display: inline-block;
+  height: $checkbox-size;
+  min-width: $checkbox-size;
+  line-height: $checkbox-size;
+
+  cursor: pointer;
+
+  input {
+    opacity: 0;
+    height: 0;
+    width: 0;
+
+    &:checked ~ .checkmark {
+      background-color: $primary;
+
+      &:hover {
+        background-color: lighten($primary, 5%);
+      }
+    }
+  }
+}
+
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  height: $checkbox-size;
+  width: $checkbox-size;
+
+  stroke: $white;
+
+  background-color: $gray10;
+
+  border: 0;
+  border-radius: 4px;
+
+  > svg {
+    position: absolute;
+    top: 5px;
+    left: 4px;
+
+    stroke: $white;
+    width: 20px;
+  }
+
+  &:hover {
+    background-color: lighten($gray10, 5%);
+  }
+}
+
+.label {
+  color: $black;
+  font-weight: $semibold-weight;
+  padding-left: $checkbox-size + 10px;
+}

@@ -1,0 +1,58 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+@keyframes itemListIn {
+  0% {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+.itemList {
+  position: absolute;
+  width: 100%;
+  z-index: 10;
+
+  max-height: 200px;
+  overflow-y: auto;
+
+  background: $white;
+  border: 1px solid $gray10;
+  border-radius: 0.5em;
+
+  list-style: none;
+  padding: 0.5em 0;
+  margin: 0.5em 0 0;
+
+  // animation name should be always first
+  // otherwise, css modules will not output correct class
+  animation: itemListIn ease 150ms;
+  transform-origin: top center;
+}
+
+.item {
+  @include text-ellipsis;
+
+  padding: 0.5em 1em;
+  line-height: 1.25rem;
+  cursor: pointer;
+
+  &:hover,
+  &:active {
+    background: $gray05;
+  }
+}
+
+.noResults {
+  color: $themed-font-color-l1;
+}
+
+.selected {
+  font-weight: $semibold-weight;
+  background: $gray05;
+}

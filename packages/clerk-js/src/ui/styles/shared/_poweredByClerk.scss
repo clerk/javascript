@@ -1,0 +1,17 @@
+.powered-by-clerk-container {
+  display: flex;
+  justify-content: center;
+  color: $themed-font-color;
+
+  span {
+    opacity: 0.3;
+    font-size: $font-size-xs;
+  }
+
+  .powered-by-clerk-logo {
+    opacity: 0.2;
+    margin-left: 4px;
+    margin-top: -5px;
+    color: $themed-font-color;
+  }
+}

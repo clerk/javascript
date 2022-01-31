@@ -21,7 +21,6 @@
     "prebuild": "rimraf dist esm coverage",
     "test": "jest",
     "lint": "eslint ./src --ext .ts",
-    "publishPackage": "node ./scripts/publish.js",
     "pack": "npm pack"
   },
   "prettier": {

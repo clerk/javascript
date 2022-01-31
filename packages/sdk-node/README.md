@@ -731,14 +731,6 @@ Please consult the following check-list for some potential quick fixes:
 Note: The strict middleware variants (i.e. the "require session" variants) will produce an erroneous response if the user is not signed in.
 Please ensure you are not mounting them on routes that are meant to be publicly accessible.
 
-## Publishing
-
-There are two ways to publish the package:
-
-1. Run the `publishPackage` [script](./scripts/publish.js) supplying the bump type you wish to do and the changes will happen automatically. Supported ones are `major|minor|patch`.
-   E.g. `yarn publishPackage minor`.
-2. Run the steps described in the [publish script](./scripts/publish.js) manually step by step.
-
 ## Feedback / Issue reporting
 
 Please report issues or open feature request in

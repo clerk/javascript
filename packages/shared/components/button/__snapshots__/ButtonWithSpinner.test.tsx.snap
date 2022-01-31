@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ButtonWithSpinner/> renders the button 1`] = `
+<button
+  className="button solid primary disabled"
+  disabled={true}
+  style={
+    Object {
+      "display": "flex",
+    }
+  }
+  type="submit"
+>
+  <div
+    className="spinner"
+  />
+</button>
+`;

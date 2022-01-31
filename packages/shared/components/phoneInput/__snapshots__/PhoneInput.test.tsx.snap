@@ -1,0 +1,199 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<PhoneInput/> renders the phone input 1`] = `
+<div
+  className="container"
+>
+  <div
+    className="dropdownContainer"
+  >
+    <div
+      className="container dropdown"
+      onBlur={[Function]}
+      onKeyDown={[Function]}
+    >
+      <div
+        className="trigger"
+        onClick={[Function]}
+        onFocus={[Function]}
+        tabIndex={0}
+      >
+        <input
+          aria-autocomplete="list"
+          aria-controls="country-code-picker"
+          aria-expanded={false}
+          aria-haspopup="listbox"
+          autoComplete="off"
+          className="searchInput"
+          data-no-focus={true}
+          onBlur={[Function]}
+          onChange={[Function]}
+          role="combobox"
+          tabIndex={0}
+          type="text"
+          value=""
+        />
+        <span
+          className="label searchDisplay selectedOption"
+        >
+          <div
+            className="optionContainer"
+          >
+            <div
+              className="flag"
+            >
+              🇺🇸
+            </div>
+            <div
+              className="country"
+            >
+              United States
+            </div>
+            <div
+              className="code"
+            >
+              +
+              1
+            </div>
+          </div>
+        </span>
+        <svg
+          data-filename="assets/icons/caret.svg"
+        />
+      </div>
+      <select
+        className="nativeSelect"
+        name="native-dropdown-picker"
+        onChange={[Function]}
+      >
+        <option
+          value="us"
+        >
+          🇺🇸
+           
+          United States
+           (+
+          1
+          )
+        </option>
+        <option
+          value="gb"
+        >
+          🇬🇧
+           
+          United Kingdom
+           (+
+          44
+          )
+        </option>
+        <option
+          value="in"
+        >
+          🇮🇳
+           
+          India
+           (+
+          91
+          )
+        </option>
+      </select>
+    </div>
+  </div>
+  <input
+    autoFocus={true}
+    className="input"
+    maxLength={25}
+    onChange={[Function]}
+    type="tel"
+    value=""
+  />
+</div>
+`;
+
+exports[`<PhoneInput/> renders the phone input when the is dropdown open 1`] = `
+<div>
+  <div
+    class="container"
+  >
+    <div
+      class="dropdownContainer"
+    >
+      <div
+        class="container dropdown"
+      >
+        <div
+          class="trigger"
+          tabindex="0"
+        >
+          <input
+            aria-autocomplete="list"
+            aria-controls="country-code-picker"
+            aria-expanded="false"
+            aria-haspopup="listbox"
+            autocomplete="off"
+            class="searchInput"
+            data-no-focus="true"
+            role="combobox"
+            tabindex="0"
+            type="text"
+            value=""
+          />
+          <span
+            class="label searchDisplay selectedOption"
+          >
+            <div
+              class="optionContainer"
+            >
+              <div
+                class="flag"
+              >
+                🇺🇸
+              </div>
+              <div
+                class="country"
+              >
+                United States
+              </div>
+              <div
+                class="code"
+              >
+                +
+                1
+              </div>
+            </div>
+          </span>
+          <svg
+            data-filename="assets/icons/caret.svg"
+          />
+        </div>
+        <select
+          class="nativeSelect"
+          name="native-dropdown-picker"
+        >
+          <option
+            value="us"
+          >
+            🇺🇸 United States (+1)
+          </option>
+          <option
+            value="gb"
+          >
+            🇬🇧 United Kingdom (+44)
+          </option>
+          <option
+            value="in"
+          >
+            🇮🇳 India (+91)
+          </option>
+        </select>
+      </div>
+    </div>
+    <input
+      class="input"
+      maxlength="25"
+      type="tel"
+      value=""
+    />
+  </div>
+</div>
+`;

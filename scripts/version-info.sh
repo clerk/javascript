@@ -8,5 +8,6 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $SCRIPT_DIR/..
 
 # Run required version scripts (TODO: centralize)
+node ./packages/react/scripts/info.js && git add ./packages/react/src/info.ts
 node ./packages/sdk-node/scripts/info.js && git add ./packages/sdk-node/src/info.ts
 node ./packages/edge/scripts/info.cjs && git add ./packages/edge/src/info.ts

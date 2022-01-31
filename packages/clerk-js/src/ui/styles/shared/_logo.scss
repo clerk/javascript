@@ -1,0 +1,20 @@
+.logo {
+  display: block;
+  width: 100%;
+
+  margin: 0 auto;
+  padding: 0;
+  text-align: center;
+  white-space: nowrap;
+
+  font-size: 3rem;
+  line-height: 3rem;
+  height: 3rem;
+
+  color: $theme-primary;
+
+  > img {
+    height: 100%;
+    vertical-align: initial;
+  }
+}

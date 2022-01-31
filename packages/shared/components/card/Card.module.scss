@@ -1,0 +1,9 @@
+@import '../styles/variables';
+
+.card {
+  margin: 0;
+  background: $themed-background-color;
+  box-shadow: $themed-box-shadow;
+  border-radius: 0.5em;
+  overflow: hidden;
+}

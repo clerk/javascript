@@ -1,0 +1,65 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+$radio-size: 24px;
+
+@include disabled;
+
+.container {
+  position: relative;
+  display: inline-block;
+  height: $radio-size;
+  min-width: $radio-size;
+  line-height: $radio-size;
+
+  cursor: pointer;
+
+  input {
+    opacity: 0;
+    height: 0;
+    width: 0;
+
+    &:checked ~ .checkmark {
+      background-color: $themed-primary;
+    }
+  }
+}
+
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  height: $radio-size;
+  width: $radio-size;
+
+  stroke: $white;
+
+  background-color: $gray10;
+
+  border: 0;
+  border-radius: 50px;
+
+  &:hover {
+    background-color: lighten($gray10, 5%);
+  }
+}
+
+.checkmark:after {
+  content: '';
+  position: absolute;
+  top: 9px;
+  left: 9px;
+
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+  background-color: $white;
+}
+
+.label {
+  color: $black;
+  font-weight: $semibold-weight;
+  padding-left: $radio-size + 10px;
+}

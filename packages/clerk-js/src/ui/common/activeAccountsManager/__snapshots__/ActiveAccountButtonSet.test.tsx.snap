@@ -1,0 +1,38 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ActiveAccountButtonSet renders correctly 1`] = `
+<div
+  className="cl-active-account-buttonset"
+>
+  <button
+    className="button outline primary hoverable cl-accounts-manager-button small"
+    disabled={false}
+    onClick={[MockFunction]}
+    style={
+      Object {
+        "display": "flex",
+      }
+    }
+  >
+    <svg
+      data-filename="../shared/assets/icons/cog.svg"
+    />
+    Manage account
+  </button>
+  <button
+    className="button outline primary hoverable cl-accounts-manager-button small"
+    disabled={false}
+    onClick={[MockFunction]}
+    style={
+      Object {
+        "display": "flex",
+      }
+    }
+  >
+    <svg
+      data-filename="../shared/assets/icons/sign-out.svg"
+    />
+    Sign out
+  </button>
+</div>
+`;

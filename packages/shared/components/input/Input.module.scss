@@ -1,0 +1,13 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+.input {
+  @include control {
+    width: 100%;
+    background-color: $white;
+  }
+}
+
+.error {
+  border-color: $error !important;
+}
