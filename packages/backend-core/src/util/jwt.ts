@@ -2,6 +2,14 @@ import { JWTExpiredError } from '../api/utils/Errors';
 import { JWTPayload } from './types';
 const DEFAULT_ADDITIONAL_CLOCK_SKEW = 0;
 
+/**
+ *
+ *
+ * @export
+ * @param {JWTPayload} payload
+ * @param {*} [additionalClockSkew=DEFAULT_ADDITIONAL_CLOCK_SKEW]
+ * @throws {JWTExpiredError|Error}
+ */
 export function isExpired(
   payload: JWTPayload,
   additionalClockSkew = DEFAULT_ADDITIONAL_CLOCK_SKEW

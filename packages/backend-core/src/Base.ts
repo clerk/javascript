@@ -90,6 +90,7 @@ export class Base {
    *
    * @param {string} token
    * @return {Promise<JWTPayload>} claims
+   * @throws {JWTExpiredError|Error}
    */
   verifySessionToken = async (token: string): Promise<JWTPayload> => {
     // Try to load the PK from supplied function and
