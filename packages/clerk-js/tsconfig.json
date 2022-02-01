@@ -18,13 +18,12 @@
       "ui/*": ["ui/*"],
       "core/*": ["core/*"],
       "utils/*": ["utils/*"],
-      "types/*": ["types/*"],
-      "testUtils": ["../../../shared/utils/testUtils"]
+      "types/*": ["types/*"]
     },
     "resolveJsonModule": true,
     "sourceMap": true,
     "strict": true,
-    "target": "ES2017",
+    "target": "ES2019",
     "useUnknownInCatchVariables": false
   },
   "exclude": ["node_modules"],

@@ -24,7 +24,7 @@ export const AddPhone = ({ standAlone }: AddPhoneProps): JSX.Element => {
   const { navigate } = useNavigate();
   const [error, setError] = React.useState<string | undefined>();
   const twoStepValidPhoneNumbers = React.useMemo(() => {
-    return user.phoneNumbers.filter(ph => {
+    return user.phoneNumbers.filter((ph) => {
       return (
         ph.verification.status === 'verified' && !ph.reservedForSecondFactor
       );
@@ -42,7 +42,7 @@ export const AddPhone = ({ standAlone }: AddPhoneProps): JSX.Element => {
     try {
       setError(undefined);
       await selectedPhone!.setReservedForSecondFactor(
-        !selectedPhone!.reservedForSecondFactor,
+        !selectedPhone!.reservedForSecondFactor
       );
       navigate('../');
     } catch (err) {
@@ -50,13 +50,13 @@ export const AddPhone = ({ standAlone }: AddPhoneProps): JSX.Element => {
     }
   };
 
-  const phoneRows = twoStepValidPhoneNumbers.map(phone => (
+  const phoneRows = twoStepValidPhoneNumbers.map((phone) => (
     <div
       title={phone.phoneNumber}
       onClick={() => setSelectedPhone(phone)}
       key={phone.id}
-      className='cl-phone-select-row'
-      role='button'
+      className="cl-phone-select-row"
+      role="button"
       tabIndex={0}
     >
       <Radio
@@ -67,40 +67,40 @@ export const AddPhone = ({ standAlone }: AddPhoneProps): JSX.Element => {
   ));
   return (
     <>
-      <PageHeading title='Back' backTo='../' />
+      <PageHeading title="Back" backTo="../" />
       <TitledCard
-        className='cl-themed-card cl-two-step-verification'
-        title='Add two-step verification'
-        subtitle='Choose a phone number to receive a verification code'
+        className="cl-themed-card cl-two-step-verification"
+        title="Add two-step verification"
+        subtitle="Choose a phone number to receive a verification code"
       >
         <Error>{error}</Error>
-        <div className='cl-phone-select'>{phoneRows}</div>
+        <div className="cl-phone-select">{phoneRows}</div>
         {!standAlone && (
-          <div className='cl-add-phone'>
-            <Link to='../../../account/phone-numbers/add'>Add new number</Link>
+          <div className="cl-add-phone">
+            <Link to="../../../account/phone-numbers/add">Add new number</Link>
           </div>
         )}
         {standAlone && twoStepValidPhoneNumbers.length === 0 && (
-          <div className='cl-add-phone'>No phone numbers found.</div>
+          <div className="cl-add-phone">No phone numbers found.</div>
         )}
         {standAlone && twoStepValidPhoneNumbers.length === 0 ? null : (
-          <div className='cl-message'>
+          <div className="cl-message">
             A text message with a verification code will be sent to your phone
             number.
-            <div className='cl-tip'>
+            <div className="cl-tip">
               Standard carrier SMS and data fees may apply.
             </div>
           </div>
         )}
-        <div className='cl-form-button-group'>
+        <div className="cl-form-button-group">
           <Button
-            className='primary-button'
+            className="primary-button"
             onClick={onClickContinue}
             disabled={!selectedPhone}
           >
             Continue
           </Button>
-          <Button flavor='text' type='reset' onClick={onClickCancel}>
+          <Button flavor="text" type="reset" onClick={onClickCancel}>
             Cancel
           </Button>
         </div>

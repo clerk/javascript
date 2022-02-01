@@ -27,8 +27,7 @@
   "scripts": {
     "build": "node ./scripts/info.js && tsc -p tsconfig.build.json",
     "dev": "node ./scripts/info.js && tsc -p tsconfig.build.json --watch",
-    "prepare": "npm run build",
-    "prepublish": "npm run prepare",
+    "prepublishOnly": "npm run build",
     "test:coverage": "echo \"Error: no test specified yet\"",
     "test": "jest"
   },

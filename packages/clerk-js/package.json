@@ -28,15 +28,14 @@
     "access": "public"
   },
   "scripts": {
-    "build": "rm -rf dist && npm run build:bundle && npm run build:declarations && npm run bundlewatch",
+    "build": "npm run build:bundle && npm run build:declarations",
     "build:stats": "npm run build --json > stats.json",
-    "build:bundlewatch": "bundlewatch",
+    "bundlewatch": "bundlewatch",
     "build:bundle": "webpack --config webpack.prod.js",
-    "build:declarations": "tsc --p tsconfig.declarations.json",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
     "check-types": "tsc",
     "dev": "webpack-dev-server --config webpack.dev.js",
-    "prepare": "npm run test && npm run build",
-    "prepublish": "npm run prepare",
+    "prepublishOnly": "npm run test && npm run build",
     "start": "echo \"Noop\"",
     "test": "jest",
     "test:coverage": "jest --collectCoverage"

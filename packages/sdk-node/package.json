@@ -18,7 +18,6 @@
     "build:es5": "node ./scripts/info.js && tsc -p tsconfig.build.json",
     "build:esm": "node ./scripts/info.js && tsc -p tsconfig.esm.json",
     "build": "run-p build:es5 build:esm",
-    "prebuild": "rimraf dist esm coverage",
     "test": "jest",
     "lint": "eslint ./src --ext .ts",
     "pack": "npm pack"
@@ -48,7 +47,6 @@
     "nock": "^13.0.7",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.5.0",
-    "rimraf": "^3.0.2",
     "ts-jest": "^27.0.7",
     "typescript": "^4.5.2"
   },

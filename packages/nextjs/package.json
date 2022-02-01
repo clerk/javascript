@@ -29,8 +29,7 @@
     "edge.d.ts"
   ],
   "scripts": {
-    "prepare": "yarn build",
-    "prepublish": "yarn prepare",
+    "prepublishOnly": "npm run build",
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsc -p tsconfig.build.json --watch"
   },

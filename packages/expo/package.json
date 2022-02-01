@@ -27,9 +27,7 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "dev": "tsc -p tsconfig.build.json --watch",
-    "prepare": "npm run build",
-    "prepublish": "npm run prepare"
+    "dev": "tsc -p tsconfig.build.json --watch"
   },
   "dependencies": {
     "@clerk/clerk-js": "^2.11.0",
