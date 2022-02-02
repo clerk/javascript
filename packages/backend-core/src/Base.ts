@@ -1,4 +1,5 @@
 import type { CryptoKey as PeculiarCryptoKey } from '@peculiar/webcrypto';
+import { JWTExpiredError } from './api/utils/Errors';
 
 import { parse } from './util/base64url';
 import { isDevelopmentOrStaging, isProduction } from './util/clerkApiKey';
@@ -89,6 +90,7 @@ export class Base {
    *
    * @param {string} token
    * @return {Promise<JWTPayload>} claims
+   * @throws {JWTExpiredError|Error}
    */
   verifySessionToken = async (token: string): Promise<JWTPayload> => {
     // Try to load the PK from supplied function and
@@ -218,8 +220,8 @@ export class Base {
 
     let sessionClaims;
     if (headerToken) {
-      sessionClaims = await this.verifySessionToken(headerToken);
-      if (sessionClaims) {
+      try {
+        sessionClaims = await this.verifySessionToken(headerToken);
         return {
           status: AuthStatus.SignedIn,
           session: {
@@ -228,9 +230,16 @@ export class Base {
           },
           sessionClaims,
         };
+      } catch (err) {
+        if (err instanceof JWTExpiredError) {
+          return {
+            status: AuthStatus.Interstitial,
+            interstitial: await fetchInterstitial(),
+          };
+        } else {
+          return { status: AuthStatus.SignedOut };
+        }
       }
-
-      return { status: AuthStatus.SignedOut };
     }
 
     // In development or staging environments only, based on the request's
@@ -296,7 +305,18 @@ export class Base {
       };
     }
 
-    sessionClaims = await this.verifySessionToken(cookieToken as string);
+    try {
+      sessionClaims = await this.verifySessionToken(cookieToken as string);
+    } catch (err) {
+      if (err instanceof JWTExpiredError) {
+        return {
+          status: AuthStatus.Interstitial,
+          interstitial: await fetchInterstitial(),
+        };
+      } else {
+        return { status: AuthStatus.SignedOut };
+      }
+    }
 
     if (
       cookieToken &&
