@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.8.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@2.7.5...@clerk/clerk-sdk-node@2.8.0) (2022-02-02)
+
+
+### Features
+
+* **backend-core,clerk-sdk-node,edge:** Add support to verify azp session token claim ([eab1c8c](https://github.com/clerkinc/javascript/commit/eab1c8c8a43960fee2da9c10a52c3915cd37f45c))
+
+
+
 ### [2.7.5](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@2.7.4...@clerk/clerk-sdk-node@2.7.5) (2022-01-28)
 
 

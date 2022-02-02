@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.0](https://github.com/clerkinc/javascript/compare/@clerk/edge@0.1.4...@clerk/edge@0.2.0) (2022-02-02)
+
+
+### Features
+
+* **backend-core,clerk-sdk-node,edge:** Add support to verify azp session token claim ([eab1c8c](https://github.com/clerkinc/javascript/commit/eab1c8c8a43960fee2da9c10a52c3915cd37f45c))
+
+
+
 ### [0.1.4](https://github.com/clerkinc/javascript/compare/@clerk/edge@0.1.3...@clerk/edge@0.1.4) (2022-01-28)
 
 **Note:** Version bump only for package @clerk/edge

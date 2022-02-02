@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.2.2...@clerk/backend-core@0.3.0) (2022-02-02)
+
+
+### Features
+
+* **backend-core,clerk-sdk-node,edge:** Add support to verify azp session token claim ([eab1c8c](https://github.com/clerkinc/javascript/commit/eab1c8c8a43960fee2da9c10a52c3915cd37f45c))
+
+
+### Bug Fixes
+
+* **backend-core:** Add [@throws](https://github.com/throws) jsdoc ([a7edf92](https://github.com/clerkinc/javascript/commit/a7edf923b4fe0bd1bbbfff540c1c870b6aa081b0))
+* **backend-core:** Correct handling of expired tokens ([bf7ed36](https://github.com/clerkinc/javascript/commit/bf7ed361e0a8ee4bf1fb539fd98e8e650cae6209))
+
+
+
 ### [0.2.2](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.2.1...@clerk/backend-core@0.2.2) (2022-01-28)
 
 
