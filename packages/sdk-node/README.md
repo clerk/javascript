@@ -716,6 +716,31 @@ export clerk.withSession(handler);
 export clerk.requireSession(handler);
 ```
 
+## Validate the Authorized Party of a session token
+Clerk's JWT session token, contains the azp claim, which equals the Origin of the request during token generation. You can provide the middlewares with a list of whitelisted origins to verify against, to protect your application of the subdomain cookie leaking attack. You can find an example below:
+
+### Express
+
+```ts
+import { ClerkExpressRequireSession } from '@clerk/clerk-sdk-node';
+
+const authorizedParties = ['http://localhost:3000', 'https://example.com']
+
+app.use(ClerkExpressRequireSession({ authorizedParties }));
+```
+
+### Next
+
+```ts
+const authorizedParties = ['http://localhost:3000', 'https://example.com']
+
+function handler(req: RequireSessionProp<NextApiRequest>, res: NextApiResponse) {
+  // do something with session.userId
+}
+
+export requireSession(handler, { authorizedParties });
+```
+
 ## Troubleshooting
 
 Especially when using the middlewares, a number of common issues may occur.

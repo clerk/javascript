@@ -35,6 +35,11 @@ export interface JWTPayload {
   iat?: number;
 
   /**
+   * JWT Authorized party - [RFC7800#section-3](https://tools.ietf.org/html/rfc7800#section-3).
+   */
+  azp?: string;
+
+  /**
    * Any other JWT Claim Set member.
    */
   [propName: string]: unknown;
