@@ -2,6 +2,7 @@ module.exports = {
   // The root of your source code, typically /src
   // `<rootDir>` is a token Jest substitutes
   roots: ['<rootDir>/src'],
+  testEnvironment: 'jsdom',
 
   // Global settings
   globals: {
@@ -50,6 +51,7 @@ module.exports = {
     '^utils': '<rootDir>/src/utils',
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '^testUtils': '<rootDir>/../../shared/utils/testUtils',
+    '^react$': '<rootDir>/../../node_modules/react',
   },
 
   testPathIgnorePatterns: ['/node_modules/'],

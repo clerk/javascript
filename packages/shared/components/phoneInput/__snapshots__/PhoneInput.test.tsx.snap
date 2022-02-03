@@ -128,7 +128,7 @@ exports[`<PhoneInput/> renders the phone input when the is dropdown open 1`] = `
           <input
             aria-autocomplete="list"
             aria-controls="country-code-picker"
-            aria-expanded="true"
+            aria-expanded="false"
             aria-haspopup="listbox"
             autocomplete="off"
             class="searchInput"
@@ -138,20 +138,8 @@ exports[`<PhoneInput/> renders the phone input when the is dropdown open 1`] = `
             type="text"
             value=""
           />
-          <svg
-            data-filename="assets/icons/caret.svg"
-          />
-        </div>
-        <ul
-          class="itemList"
-          id="country-code-picker"
-          role="listbox"
-          tabindex="-1"
-        >
-          <li
-            aria-selected="true"
-            class="item selected"
-            role="option"
+          <span
+            class="label searchDisplay selectedOption"
           >
             <div
               class="optionContainer"
@@ -173,60 +161,11 @@ exports[`<PhoneInput/> renders the phone input when the is dropdown open 1`] = `
                 1
               </div>
             </div>
-          </li>
-          <li
-            aria-selected="false"
-            class="item"
-            role="option"
-          >
-            <div
-              class="optionContainer"
-            >
-              <div
-                class="flag"
-              >
-                🇬🇧
-              </div>
-              <div
-                class="country"
-              >
-                United Kingdom
-              </div>
-              <div
-                class="code"
-              >
-                +
-                44
-              </div>
-            </div>
-          </li>
-          <li
-            aria-selected="false"
-            class="item"
-            role="option"
-          >
-            <div
-              class="optionContainer"
-            >
-              <div
-                class="flag"
-              >
-                🇮🇳
-              </div>
-              <div
-                class="country"
-              >
-                India
-              </div>
-              <div
-                class="code"
-              >
-                +
-                91
-              </div>
-            </div>
-          </li>
-        </ul>
+          </span>
+          <svg
+            data-filename="assets/icons/caret.svg"
+          />
+        </div>
         <select
           class="nativeSelect"
           name="native-dropdown-picker"

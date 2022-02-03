@@ -5,10 +5,10 @@ import {
   userEvent,
   screen,
   act,
+  waitFor,
 } from '@clerk/shared/testUtils';
 import { EmailAddressVerificationWithOTP } from './EmailAddressVerificationWithOTP';
 import { EmailAddressResource } from '@clerk/types';
-import { waitFor } from '@testing-library/dom';
 
 jest.mock('ui/contexts', () => {
   return {
@@ -55,17 +55,15 @@ describe('<EmailAddressVerificationWithOTP/>', function () {
       />
     );
 
-    await act(async () => {
-      await userEvent.type(
-        screen.getByLabelText('Enter verification code. Digit 1'),
-        '9'
-      );
-      await userEvent.type(screen.getByLabelText('Digit 2'), '9');
-      await userEvent.type(screen.getByLabelText('Digit 3'), '9');
-      await userEvent.type(screen.getByLabelText('Digit 4'), '9');
-      await userEvent.type(screen.getByLabelText('Digit 5'), '9');
-      await userEvent.type(screen.getByLabelText('Digit 6'), '9');
-    });
+    userEvent.type(
+      screen.getByLabelText('Enter verification code. Digit 1'),
+      '1'
+    );
+    userEvent.type(screen.getByLabelText('Digit 2'), '2');
+    userEvent.type(screen.getByLabelText('Digit 3'), '3');
+    userEvent.type(screen.getByLabelText('Digit 4'), '4');
+    userEvent.type(screen.getByLabelText('Digit 5'), '5');
+    userEvent.type(screen.getByLabelText('Digit 6'), '6');
 
     await waitFor(() => {
       expect(mockOnVerificationCompleteHandler).toHaveBeenCalled();

@@ -77,13 +77,11 @@ describe('<SignInFactorTwo/>', () => {
   it('renders the factorTWO screen and enters a code', async () => {
     render(<SignInFactorTwo />);
 
-    await act(async () => {
-      const text = '123456';
-      const inputs = screen.getAllByRole('textbox');
-      for (const [i, input] of inputs.entries()) {
-        await userEvent.type(input, text[i]);
-      }
-    });
+    const text = '123456';
+    const inputs = screen.getAllByRole('textbox');
+    for (const [i, input] of inputs.entries()) {
+      userEvent.type(input, text[i]);
+    }
 
     await waitFor(() => {
       expect(mockSetSession).toHaveBeenCalledTimes(1);

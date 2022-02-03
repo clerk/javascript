@@ -232,13 +232,11 @@ describe('<SignInFactorOne/>', () => {
         email_address_id: 'deadbeef',
       } as SignInFactor);
 
-      await act(async () => {
-        const text = '123456';
-        const inputs = screen.getAllByRole('textbox');
-        for (const [i, input] of inputs.entries()) {
-          await userEvent.type(input, text[i]);
-        }
-      });
+      const text = '123456';
+      const inputs = screen.getAllByRole('textbox');
+      for (const [i, input] of inputs.entries()) {
+        userEvent.type(input, text[i]);
+      }
 
       await waitFor(() => {
         expect(mockAttemptFirstFactor).toHaveBeenCalledTimes(1);
@@ -481,13 +479,11 @@ describe('<SignInFactorOne/>', () => {
         phone_number_id: 'deadbeef',
       } as SignInFactor);
 
-      await act(async () => {
-        const text = '123456';
-        const inputs = screen.getAllByRole('textbox');
-        for (const [i, input] of inputs.entries()) {
-          await userEvent.type(input, text[i]);
-        }
-      });
+      const text = '123456';
+      const inputs = screen.getAllByRole('textbox');
+      for (const [i, input] of inputs.entries()) {
+        userEvent.type(input, text[i]);
+      }
 
       await waitFor(() => {
         expect(mockAttemptFirstFactor).toHaveBeenCalledTimes(1);

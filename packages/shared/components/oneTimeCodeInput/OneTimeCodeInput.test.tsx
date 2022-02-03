@@ -215,8 +215,8 @@ describe('<OneTimeCodeInput/>', () => {
     );
     const inputs = screen.getAllByRole('textbox');
     inputs.forEach((input) => expect(input).toHaveClass('verified'));
-    await waitFor(() => expect(afterVerifyCallback).toHaveBeenCalled());
     jest.runOnlyPendingTimers();
+    await waitFor(() => expect(afterVerifyCallback).toHaveBeenCalled());
     jest.useRealTimers();
   });
 
