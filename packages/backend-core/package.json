@@ -16,11 +16,11 @@
   },
   "devDependencies": {
     "@peculiar/webcrypto": "^1.2.3",
-    "@types/jest": "^27.0.3",
+    "@types/jest": "^27.4.0",
     "@types/node": "^16.11.12",
     "@types/node-fetch": "^2",
     "got": "^11.0.0",
-    "jest": "^27.4.5",
+    "jest": "^27.4.7",
     "nock": "^13.2.1",
     "node-fetch": "^2.6.0",
     "ts-jest": "^27.1.2",

@@ -32,6 +32,8 @@
     "docs:watch": "typedoc --out out ./src/index.ts --categorizeByGroup false --watch"
   },
   "devDependencies": {
+    "@types/jest": "^27.4.0",
+    "jest": "^27.4.7",
     "typedoc": "^0.20.36",
     "typescript": "4.5.2"
   },
