@@ -40,7 +40,8 @@
     "test": "turbo run test",
     "prepare": "husky install",
     "version": "./scripts/version-info.sh",
-    "lerna": "lerna"
+    "lerna": "lerna",
+    "nuke": "rm -r node_modules; for d in packages/*/node_modules; do echo $d; rm -r $d; done"
   },
   "engines": {
     "node": ">=16.8.0",
