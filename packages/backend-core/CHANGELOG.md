@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.3.0...@clerk/backend-core@0.4.0) (2022-02-03)
+
+
+### Features
+
+* **backend-core:** Support for skipPasswordChecks param during user creation ([79798ce](https://github.com/clerkinc/javascript/commit/79798ce1deab13e2272579919848a81c682a0590))
+
+
+
 ## [0.3.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.2.2...@clerk/backend-core@0.3.0) (2022-02-02)
 
 
