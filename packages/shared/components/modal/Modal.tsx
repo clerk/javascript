@@ -1,10 +1,11 @@
-import React from 'react';
 import cn from 'classnames';
+import React from 'react';
+
 import { useDetectClickOutside, useDomRef } from '../../hooks';
-import { Portal } from '../portal';
-import { ModalContext } from './context';
-import { CloseButton, CloseButtonProps } from './CloseButton';
 import { noop } from '../../utils';
+import { Portal } from '../portal';
+import { CloseButton, CloseButtonProps } from './CloseButton';
+import { ModalContext } from './context';
 // @ts-ignore
 import styles from './Modal.module.scss';
 

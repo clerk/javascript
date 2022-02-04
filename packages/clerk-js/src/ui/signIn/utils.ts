@@ -1,10 +1,10 @@
-import { PREFERRED_SIGN_IN_STRATEGIES } from 'ui/common';
 import { titleize } from '@clerk/shared/utils/string';
 import {
   PreferredSignInStrategy,
   SignInFactor,
   SignInResource,
 } from '@clerk/types';
+import { PREFERRED_SIGN_IN_STRATEGIES } from 'ui/common';
 import {
   otpPrefFactorComparator,
   passwordPrefFactorComparator,

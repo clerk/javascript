@@ -1,5 +1,6 @@
-import { BaseResource } from './Base';
 import type { ImageJSON, ImageResource } from '@clerk/types';
+
+import { BaseResource } from './Base';
 
 export class Image extends BaseResource implements ImageResource {
   id?: string;

@@ -1,7 +1,8 @@
-import * as React from 'react';
 import { render, renderJSON, screen, userEvent } from '@clerk/shared/testUtils';
-import { OneTimeCodeInput } from './OneTimeCodeInput';
 import { waitFor } from '@testing-library/dom';
+import * as React from 'react';
+
+import { OneTimeCodeInput } from './OneTimeCodeInput';
 
 const noop = () => {
   //

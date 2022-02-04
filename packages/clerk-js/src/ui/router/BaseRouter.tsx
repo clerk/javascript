@@ -1,12 +1,13 @@
+import qs from 'qs';
 import React from 'react';
 import { useCoreClerk } from 'ui/contexts';
-import { getQueryParams, trimTrailingSlash } from 'utils';
-import { newPaths } from './newPaths';
-import { RouteContext } from './RouteContext';
-import { Route } from './Route';
-import { match } from './pathToRegexp';
-import qs from 'qs';
 import { useWindowEventListener } from 'ui/hooks';
+import { getQueryParams, trimTrailingSlash } from 'utils';
+
+import { newPaths } from './newPaths';
+import { match } from './pathToRegexp';
+import { Route } from './Route';
+import { RouteContext } from './RouteContext';
 
 interface BaseRouterProps {
   basePath: string;

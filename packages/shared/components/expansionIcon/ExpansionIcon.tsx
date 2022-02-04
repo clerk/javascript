@@ -1,10 +1,10 @@
-import React from 'react';
 import cn from 'classnames';
+import React from 'react';
 
-// @ts-ignore
-import styles from './ExpansionIcon.module.scss';
 import { CaretIcon } from '../../assets/icons';
 import type { SvgrComponent } from '../../assets/icons/svg';
+// @ts-ignore
+import styles from './ExpansionIcon.module.scss';
 
 type ExpansionIconProps = {
   isExpanded: boolean;

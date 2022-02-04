@@ -1,10 +1,5 @@
+import { SignInFactor, SignInResource } from '@clerk/types';
 import React from 'react';
-import {
-  useCoreClerk,
-  useCoreSignIn,
-  useEnvironment,
-  useSignInContext,
-} from 'ui/contexts';
 import {
   buildMagicLinkRedirectUrl,
   ExpiredRetryMagicLinkWaitingScreen,
@@ -13,9 +8,14 @@ import {
   MagicLinkVerificationStatusModal,
   MagicLinkWaitingScreen,
 } from 'ui/common';
+import {
+  useCoreClerk,
+  useCoreSignIn,
+  useEnvironment,
+  useSignInContext,
+} from 'ui/contexts';
+import { useMagicLink,useNavigate } from 'ui/hooks';
 import { SignInFactorOneFooter } from 'ui/signIn/factorOne/SignInFactorOneFooter';
-import { SignInFactor, SignInResource } from '@clerk/types';
-import { useNavigate, useMagicLink } from 'ui/hooks';
 
 type SignInFactorOneMagicLinkProps = {
   handleShowAllStrategies: () => any;

@@ -1,12 +1,12 @@
+import { SignInJSON,SignUpJSON } from '@clerk/types';
+import { waitFor } from '@testing-library/dom';
 import Clerk from 'core/clerk';
-import { SignUpJSON, SignInJSON } from '@clerk/types';
-import { DisplayConfig } from 'core/resources/DisplayConfig';
 import { Client } from 'core/resources/Client';
+import { DisplayConfig } from 'core/resources/DisplayConfig';
 import { Environment } from 'core/resources/Environment';
+import { MagicLinkErrorCode } from 'core/resources/Error';
 import { SignIn } from 'core/resources/SignIn';
 import { SignUp } from 'core/resources/SignUp';
-import { waitFor } from '@testing-library/dom';
-import { MagicLinkErrorCode } from 'core/resources/Error';
 
 const mockClientFetch = jest.fn();
 const mockEnvironmentFetch = jest.fn();

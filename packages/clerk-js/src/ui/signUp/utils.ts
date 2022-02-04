@@ -1,8 +1,8 @@
 import type {
   EnvironmentResource,
   IdentificationStrategy,
-  ToggleTypeWithRequire,
   SignInStrategyName,
+  ToggleTypeWithRequire,
 } from '@clerk/types';
 
 type FieldKeys =

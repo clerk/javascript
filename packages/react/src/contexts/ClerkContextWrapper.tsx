@@ -1,8 +1,9 @@
-import React from 'react';
 import { ClientResource, Resources } from '@clerk/types';
+import React from 'react';
+
 import IsomorphicClerk from '../isomorphicClerk';
-import { IsomorphicClerkContext } from './IsomorphicClerkContext';
 import { ClientContext } from './ClientContext';
+import { IsomorphicClerkContext } from './IsomorphicClerkContext';
 import { SessionContext } from './SessionContext';
 import { UserContext } from './UserContext';
 

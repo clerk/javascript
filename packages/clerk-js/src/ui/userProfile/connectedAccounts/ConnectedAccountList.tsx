@@ -1,8 +1,9 @@
-import { TitledCard } from '@clerk/shared/components/titledCard';
-import { useCoreUser } from 'ui/contexts';
-import React from 'react';
-import { PageHeading } from 'ui/userProfile/pageHeading';
 import { List } from '@clerk/shared/components/list';
+import { TitledCard } from '@clerk/shared/components/titledCard';
+import React from 'react';
+import { useCoreUser } from 'ui/contexts';
+import { PageHeading } from 'ui/userProfile/pageHeading';
+
 import { ConnectedAccountListItem } from './ConnectedAccountListItem';
 
 export function ConnectedAccountList(): JSX.Element {

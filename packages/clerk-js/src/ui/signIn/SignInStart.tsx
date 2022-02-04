@@ -1,5 +1,15 @@
+import { Control } from '@clerk/shared/components/control';
+import { Form } from '@clerk/shared/components/form';
+import { Input, InputType } from '@clerk/shared/components/input';
+import { PhoneInput } from '@clerk/shared/components/phoneInput';
+import {
+  ClerkAPIError,
+  OAuthStrategy,
+  SignInParams,
+  Web3Strategy,
+} from '@clerk/types';
+import cn from 'classnames';
 import React from 'react';
-import { useNavigate } from 'ui/hooks';
 import {
   buildRequest,
   FieldState,
@@ -10,28 +20,19 @@ import {
   useFieldState,
   withRedirectToHome,
 } from 'ui/common';
+import { Body, Header } from 'ui/common/authForms';
+import { ERROR_CODES } from 'ui/common/constants';
 import {
   useCoreClerk,
   useCoreSignIn,
   useEnvironment,
   useSignInContext,
 } from 'ui/contexts';
-import { Body, Header } from 'ui/common/authForms';
-import { ERROR_CODES } from 'ui/common/constants';
-import { OAuth, Web3 } from './strategies';
-import { SignUpLink } from './SignUpLink';
-import { Control } from '@clerk/shared/components/control';
-import { Form } from '@clerk/shared/components/form';
-import { Input, InputType } from '@clerk/shared/components/input';
-import { PhoneInput } from '@clerk/shared/components/phoneInput';
+import { useNavigate } from 'ui/hooks';
 import { useSupportEmail } from 'ui/hooks/useSupportEmail';
-import {
-  ClerkAPIError,
-  OAuthStrategy,
-  SignInParams,
-  Web3Strategy,
-} from '@clerk/types';
-import cn from 'classnames';
+
+import { SignUpLink } from './SignUpLink';
+import { OAuth, Web3 } from './strategies';
 
 export function _SignInStart(): JSX.Element {
   const environment = useEnvironment();

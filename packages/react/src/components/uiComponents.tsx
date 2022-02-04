@@ -1,12 +1,13 @@
-import React from 'react';
 import {
   SignInProps,
   SignUpProps,
   UserButtonProps,
   UserProfileProps,
 } from '@clerk/types';
-import { MountProps, WithClerkProp } from '../types';
+import React from 'react';
+
 import { withClerk } from '../contexts';
+import { MountProps, WithClerkProp } from '../types';
 
 // README: <Portal/> should be a class pure component in order for mount and unmount
 // lifecycle props to be invoked correctly. Replacing the class component with a

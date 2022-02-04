@@ -1,7 +1,8 @@
-import * as React from 'react';
-import { ProfilePhoneNumbers } from './ProfilePhoneNumbers';
 import { renderJSON } from '@clerk/shared/testUtils';
 import { PhoneNumberResource, UserResource } from '@clerk/types';
+import * as React from 'react';
+
+import { ProfilePhoneNumbers } from './ProfilePhoneNumbers';
 
 const mockNavigate = jest.fn();
 jest.mock('ui/hooks', () => ({

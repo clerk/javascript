@@ -1,5 +1,6 @@
-import React from 'react';
 import cn from 'classnames';
+import React from 'react';
+
 import { useInput } from '../../hooks/useInput';
 // @ts-ignore
 import styles from './Switch.module.scss';

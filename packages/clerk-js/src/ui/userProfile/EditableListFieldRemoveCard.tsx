@@ -1,9 +1,9 @@
+import { Button } from '@clerk/shared/components/button';
+import { PhoneViewer } from '@clerk/shared/components/phoneInput';
+import { TitledCard } from '@clerk/shared/components/titledCard';
 import React from 'react';
 import { handleError } from 'ui/common';
 import { Error } from 'ui/common/error';
-import { Button } from '@clerk/shared/components/button';
-import { TitledCard } from '@clerk/shared/components/titledCard';
-import { PhoneViewer } from '@clerk/shared/components/phoneInput';
 
 interface EditableListFieldRemoveCardProps {
   type: 'phone' | 'email';

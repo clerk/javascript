@@ -1,9 +1,9 @@
-import React from 'react';
-import { useNavigate } from 'ui/hooks';
-import { useCoreUser } from 'ui/contexts';
 import { List } from '@clerk/shared/components/list';
-import { Tag, VerificationStatusTag } from '@clerk/shared/components/tag';
 import { PhoneViewer } from '@clerk/shared/components/phoneInput';
+import { Tag, VerificationStatusTag } from '@clerk/shared/components/tag';
+import React from 'react';
+import { useCoreUser } from 'ui/contexts';
+import { useNavigate } from 'ui/hooks';
 
 export function ProfilePhoneNumbers(): JSX.Element {
   const { navigate } = useNavigate();

@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   render,
   renderJSON,
@@ -6,7 +5,9 @@ import {
   userEvent,
   waitFor,
 } from '@clerk/shared/testUtils';
+import React from 'react';
 import { FieldState } from 'ui/common';
+
 import { Password } from './Password';
 
 describe('<Password/>', () => {

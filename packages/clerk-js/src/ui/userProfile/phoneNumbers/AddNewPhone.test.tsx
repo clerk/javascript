@@ -1,6 +1,7 @@
+import { renderJSON } from '@clerk/shared/testUtils';
 import { PhoneNumberResource, UserResource } from '@clerk/types';
 import React from 'react';
-import { renderJSON } from '@clerk/shared/testUtils';
+
 import { AddNewPhone } from './AddNewPhone';
 
 const mockNavigate = jest.fn();

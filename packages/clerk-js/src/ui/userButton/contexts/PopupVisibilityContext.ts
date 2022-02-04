@@ -1,5 +1,5 @@
-import React from 'react';
 import { noop } from '@clerk/shared/utils';
+import React from 'react';
 
 type PopupVisibility = {
   isPopupVisible: boolean;

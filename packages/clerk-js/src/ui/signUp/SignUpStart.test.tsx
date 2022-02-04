@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   render,
   renderJSON,
@@ -6,11 +5,13 @@ import {
   userEvent,
   waitFor,
 } from '@clerk/shared/testUtils';
-import { SignUpStart } from './SignUpStart';
-import { useCoreSignUp } from 'ui/contexts';
 import { titleize } from '@clerk/shared/utils/string';
 import { Session } from 'core/resources';
 import { AuthConfig } from 'core/resources/AuthConfig';
+import React from 'react';
+import { useCoreSignUp } from 'ui/contexts';
+
+import { SignUpStart } from './SignUpStart';
 
 const navigateMock = jest.fn();
 const mockCreateRequest = jest.fn();

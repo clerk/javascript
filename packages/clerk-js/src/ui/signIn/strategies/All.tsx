@@ -1,10 +1,11 @@
-import React from 'react';
 import { Button } from '@clerk/shared/components/button';
-import { OAuth } from './OAuth';
 import { OAuthStrategy, SignInFactor, SignInStrategyName } from '@clerk/types';
+import React from 'react';
 import { Separator } from 'ui/common';
 import { useSupportEmail } from 'ui/hooks/useSupportEmail';
 import { allStrategiesButtonsComparator } from 'ui/signIn/strategies/factorSortingUtils';
+
+import { OAuth } from './OAuth';
 
 export function getButtonLabel(factor: SignInFactor): string {
   switch (factor.strategy) {

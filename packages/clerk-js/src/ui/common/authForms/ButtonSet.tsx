@@ -1,6 +1,6 @@
+import { ButtonWithSpinner } from '@clerk/shared/components/button';
 import React from 'react';
 import { svgUrl } from 'ui/common/constants';
-import { ButtonWithSpinner } from '@clerk/shared/components/button';
 
 type Flow = 'sign-in' | 'sign-up';
 

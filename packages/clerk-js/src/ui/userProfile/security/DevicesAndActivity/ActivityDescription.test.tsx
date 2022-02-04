@@ -1,6 +1,6 @@
+import { render, renderJSON, screen } from '@clerk/shared/testUtils';
 import { SessionActivity } from '@clerk/types';
 import * as React from 'react';
-import { render, renderJSON, screen } from '@clerk/shared/testUtils';
 import { ActivityDescription } from 'ui/userProfile/security/DevicesAndActivity/ActivityDescription';
 
 const date = new Date('1/1/2021 18:00 GMT+2');

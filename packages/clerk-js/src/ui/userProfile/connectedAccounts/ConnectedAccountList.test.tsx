@@ -1,8 +1,9 @@
-import React from 'react';
 import { renderJSON } from '@clerk/shared/testUtils';
-import { ConnectedAccountList } from './ConnectedAccountList';
-import { ExternalAccount } from 'core/resources/ExternalAccount';
 import { ExternalAccountResource, UserResource } from '@clerk/types';
+import { ExternalAccount } from 'core/resources/ExternalAccount';
+import React from 'react';
+
+import { ConnectedAccountList } from './ConnectedAccountList';
 
 const mockNavigate = jest.fn();
 jest.mock('ui/hooks', () => ({

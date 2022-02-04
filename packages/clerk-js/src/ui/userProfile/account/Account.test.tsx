@@ -1,7 +1,8 @@
-import React from 'react';
-import { Account } from './Account';
 import { render, screen } from '@clerk/shared/testUtils';
 import type { AuthConfigResource, UserResource } from '@clerk/types';
+import React from 'react';
+
+import { Account } from './Account';
 
 const mockEnvironment = jest.fn();
 

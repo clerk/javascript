@@ -1,9 +1,8 @@
-import React from 'react';
-import { useNavigate } from 'ui/hooks';
 import { Button } from '@clerk/shared/components/button';
 import { List } from '@clerk/shared/components/list';
 import { TitledCard } from '@clerk/shared/components/titledCard';
-
+import React from 'react';
+import { useNavigate } from 'ui/hooks';
 import {
   TwoStepMethod,
   TwoStepMethodsToDisplayDataMap,

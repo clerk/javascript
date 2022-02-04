@@ -1,6 +1,7 @@
-import * as React from 'react';
-import { PageHeading } from './PageHeading';
 import { renderJSON } from '@clerk/shared/testUtils';
+import * as React from 'react';
+
+import { PageHeading } from './PageHeading';
 
 jest.mock('ui/router/RouteContext');
 

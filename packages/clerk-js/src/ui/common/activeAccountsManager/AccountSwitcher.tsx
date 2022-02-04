@@ -1,9 +1,9 @@
-import React from 'react';
 // @ts-ignore
 import { default as UserPlusIcon } from '@clerk/shared/assets/icons/user-plus.svg';
-import { Button } from '@clerk/shared/components/button';
 import { Avatar } from '@clerk/shared/components/avatar';
+import { Button } from '@clerk/shared/components/button';
 import { SessionResource } from '@clerk/types';
+import React from 'react';
 
 type AccountSwitcherProps = {
   sessions: SessionResource[];

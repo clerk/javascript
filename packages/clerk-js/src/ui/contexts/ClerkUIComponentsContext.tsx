@@ -1,15 +1,15 @@
-import React from 'react';
-import { useNavigate } from 'ui/hooks';
-import type { ParsedQs } from 'ui/router';
-import { useRouter } from 'ui/router';
-import { useEnvironment } from 'ui/contexts';
-import { buildAuthQueryString, parseAuthProp } from 'ui/common';
 import {
   SignInProps,
   SignUpProps,
   UserButtonProps,
   UserProfileProps,
 } from '@clerk/types';
+import React from 'react';
+import { buildAuthQueryString, parseAuthProp } from 'ui/common';
+import { useEnvironment } from 'ui/contexts';
+import { useNavigate } from 'ui/hooks';
+import type { ParsedQs } from 'ui/router';
+import { useRouter } from 'ui/router';
 
 export type SignInCtx = SignInProps & {
   componentName: 'SignIn';

@@ -1,13 +1,13 @@
-import React from 'react';
 import { Control } from '@clerk/shared/components/control';
 import { Form } from '@clerk/shared/components/form';
 import { Input } from '@clerk/shared/components/input';
 import { TitledCard } from '@clerk/shared/components/titledCard';
+import React from 'react';
 import { handleError, useFieldState } from 'ui/common';
-import { PageHeading } from 'ui/userProfile/pageHeading';
-import { useNavigate } from 'ui/hooks';
-import { useCoreUser } from 'ui/contexts';
 import { Error } from 'ui/common/error';
+import { useCoreUser } from 'ui/contexts';
+import { useNavigate } from 'ui/hooks';
+import { PageHeading } from 'ui/userProfile/pageHeading';
 
 interface EditableFieldProps {
   label: string;

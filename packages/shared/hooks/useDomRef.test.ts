@@ -1,4 +1,5 @@
 import { renderHook } from '@clerk/shared/testUtils';
+
 import { useDomRef } from './useDomRef';
 
 describe('useDomRef(querySelector)', () => {

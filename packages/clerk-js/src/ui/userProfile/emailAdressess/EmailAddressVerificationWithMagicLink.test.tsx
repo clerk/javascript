@@ -1,8 +1,9 @@
-import React from 'react';
-import { renderJSON, render } from '@clerk/shared/testUtils';
-import { EmailAddressVerificationWithMagicLink } from './EmailAddressVerificationWithMagicLink';
+import { render,renderJSON } from '@clerk/shared/testUtils';
 import { EmailAddressResource } from '@clerk/types';
 import { waitFor } from '@testing-library/dom';
+import React from 'react';
+
+import { EmailAddressVerificationWithMagicLink } from './EmailAddressVerificationWithMagicLink';
 
 jest.mock('ui/contexts', () => {
   return {

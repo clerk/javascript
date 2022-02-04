@@ -1,5 +1,6 @@
-import { clerkCoreErrorExpiredToken } from './errors';
 import type { TokenResource } from '@clerk/types';
+
+import { clerkCoreErrorExpiredToken } from './errors';
 
 interface TokenCacheKeyJSON {
   audience?: string;

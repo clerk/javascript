@@ -1,23 +1,7 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { SIGN_UP_IN_PRESERVED_PARAMS } from 'core/constants';
-import { clerkUIErrorDOMElementNotFound } from 'core/errors';
-import type {
-  SignInCtx,
-  SignUpCtx,
-  UserButtonCtx,
-  UserProfileCtx,
-} from 'ui/contexts';
-import { EnvironmentProvider, OptionsProvider } from 'ui/contexts';
-import { VirtualRouter } from 'ui/router';
-import Portal from './Portal';
-import { SignIn, SignInModal } from './signIn';
-import { SignUp, SignUpModal } from './signUp';
-import { UserButton } from './userButton';
-import { UserProfile } from './userProfile';
+import './styles/clerk.scss';
+
 import { Modal } from '@clerk/shared/components/modal';
 import { camelToSnakeKeys } from '@clerk/shared/utils/object';
-
 import type {
   Clerk,
   ClerkOptions,
@@ -29,10 +13,26 @@ import type {
   UserButtonProps,
   UserProfileProps,
 } from '@clerk/types';
-
-import './styles/clerk.scss';
-import { CoreClerkContextWrapper } from './contexts/CoreClerkContextWrapper';
+import { SIGN_UP_IN_PRESERVED_PARAMS } from 'core/constants';
+import { clerkUIErrorDOMElementNotFound } from 'core/errors';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import type {
+  SignInCtx,
+  SignUpCtx,
+  UserButtonCtx,
+  UserProfileCtx,
+} from 'ui/contexts';
+import { EnvironmentProvider, OptionsProvider } from 'ui/contexts';
+import { VirtualRouter } from 'ui/router';
 import { injectTheme } from 'utils/theming';
+
+import { CoreClerkContextWrapper } from './contexts/CoreClerkContextWrapper';
+import Portal from './Portal';
+import { SignIn, SignInModal } from './signIn';
+import { SignUp, SignUpModal } from './signUp';
+import { UserButton } from './userButton';
+import { UserProfile } from './userProfile';
 
 export interface MountProps<T> {
   key: string;

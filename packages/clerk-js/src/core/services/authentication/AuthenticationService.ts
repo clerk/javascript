@@ -4,13 +4,14 @@ import {
   SessionResource,
   TokenResource,
 } from '@clerk/types';
+import { clerkCoreErrorTokenRefreshFailed } from 'core/errors';
 import {
   CookieHandler,
   createCookieHandler,
   runWithExponentialBackOff,
 } from 'utils';
+
 import { AuthenticationPoller } from './AuthenticationPoller';
-import { clerkCoreErrorTokenRefreshFailed } from 'core/errors';
 
 type AuthVersion = 1 | 2;
 type InitParams = {

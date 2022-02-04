@@ -1,4 +1,5 @@
 import { SignInFactor, SignInStrategyName } from '@clerk/types';
+
 import {
   allStrategiesButtonsComparator,
   otpPrefFactorComparator,

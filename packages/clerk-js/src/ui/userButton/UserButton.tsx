@@ -1,14 +1,15 @@
-import React from 'react';
-import cn from 'classnames';
-import { usePopper } from 'react-popper';
-import { useCoreUser, withCoreUserGuard } from 'ui/contexts';
-import { UserButtonPopup } from './UserButtonPopup';
 import { Avatar } from '@clerk/shared/components/avatar';
-import { Portal } from 'ui/common';
 import { useDetectClickOutside } from '@clerk/shared/hooks';
-import { PopupVisibilityContext } from './contexts/PopupVisibilityContext';
-import { determineIdentifier } from './utils';
 import type { UserButtonProps } from '@clerk/types';
+import cn from 'classnames';
+import React from 'react';
+import { usePopper } from 'react-popper';
+import { Portal } from 'ui/common';
+import { useCoreUser, withCoreUserGuard } from 'ui/contexts';
+
+import { PopupVisibilityContext } from './contexts/PopupVisibilityContext';
+import { UserButtonPopup } from './UserButtonPopup';
+import { determineIdentifier } from './utils';
 
 const userButtonPopperOptions = {
   placement: 'bottom-end',

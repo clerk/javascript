@@ -1,7 +1,7 @@
-import React from 'react';
-import { useRouter } from 'next/router';
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import { ClerkOptions, ClerkThemeOptions } from '@clerk/types';
+import { useRouter } from 'next/router';
+import React from 'react';
 
 export * from '@clerk/clerk-react';
 

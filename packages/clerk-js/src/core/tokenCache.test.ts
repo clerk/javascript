@@ -1,7 +1,8 @@
+import { TokenResource } from '@clerk/types';
+import jwtGen from 'jsonwebtoken';
+
 import { Token } from './resources/Token';
 import { MemoryTokenCache } from './tokenCache';
-import jwtGen from 'jsonwebtoken';
-import { TokenResource } from '@clerk/types';
 
 // This is required since abstract TS methods are undefined in Jest
 jest.mock('./resources/Base', () => {

@@ -1,7 +1,8 @@
-import { BaseRouter } from './BaseRouter';
-import { stripOrigin, trimTrailingSlash } from 'utils';
-import { useCoreClerk } from 'ui/contexts';
 import React from 'react';
+import { useCoreClerk } from 'ui/contexts';
+import { stripOrigin, trimTrailingSlash } from 'utils';
+
+import { BaseRouter } from './BaseRouter';
 
 interface PathRouterProps {
   basePath: string;

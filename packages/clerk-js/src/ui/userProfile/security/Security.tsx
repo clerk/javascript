@@ -1,9 +1,10 @@
-import React from 'react';
 import { List } from '@clerk/shared/components/list';
 import { TitledCard } from '@clerk/shared/components/titledCard';
-import { useNavigate } from 'ui/hooks';
+import React from 'react';
 import { useCoreUser, useEnvironment } from 'ui/contexts';
+import { useNavigate } from 'ui/hooks';
 import { PageHeading } from 'ui/userProfile/pageHeading';
+
 import { ActiveDevicesCard } from './DevicesAndActivity/ActiveDevicesCard';
 
 export function Security(): JSX.Element {

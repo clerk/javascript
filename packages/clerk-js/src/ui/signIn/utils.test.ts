@@ -1,4 +1,5 @@
 import { SignInResource } from '@clerk/types';
+
 import { determineSalutation, determineStartingSignInFactor } from './utils';
 
 describe('determineStrategy(signIn, displayConfig)', () => {

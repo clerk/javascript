@@ -1,12 +1,13 @@
-import { BaseResource } from './Base';
-import { AuthConfig } from './AuthConfig';
-import { DisplayConfig } from './DisplayConfig';
 import type {
   AuthConfigResource,
   DisplayConfigResource,
   EnvironmentJSON,
   EnvironmentResource,
 } from '@clerk/types';
+
+import { AuthConfig } from './AuthConfig';
+import { BaseResource } from './Base';
+import { DisplayConfig } from './DisplayConfig';
 
 export class Environment extends BaseResource implements EnvironmentResource {
   private static instance: Environment;

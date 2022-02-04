@@ -1,8 +1,4 @@
-import * as React from 'react';
-import { PartialDeep } from 'type-fest';
-import { useEnvironment } from 'ui/contexts';
 import { mocked, renderJSON } from '@clerk/shared/testUtils';
-import { Security } from 'ui/userProfile/security/Security';
 import {
   EnvironmentResource,
   SessionActivity,
@@ -10,6 +6,10 @@ import {
   SessionWithActivitiesResource,
   UserResource,
 } from '@clerk/types';
+import * as React from 'react';
+import { PartialDeep } from 'type-fest';
+import { useEnvironment } from 'ui/contexts';
+import { Security } from 'ui/userProfile/security/Security';
 
 const sessionWithActivities: Partial<SessionWithActivitiesResource> = {
   id: 'sess_id',

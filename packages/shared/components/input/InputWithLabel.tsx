@@ -1,5 +1,6 @@
-import React from 'react';
 import cn from 'classnames';
+import React from 'react';
+
 import { Input, InputProps } from './Input';
 // @ts-ignore
 import styles from './InputWithLabel.module.scss';

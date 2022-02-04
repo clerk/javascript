@@ -1,6 +1,7 @@
+import { renderJSON } from '@clerk/shared/testUtils';
 import { EmailAddressResource, UserResource } from '@clerk/types';
 import React from 'react';
-import { renderJSON } from '@clerk/shared/testUtils';
+
 import { EmailList } from './EmailList';
 
 jest.mock('ui/router/RouteContext');

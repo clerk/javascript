@@ -1,5 +1,6 @@
-import React from 'react';
 import { renderJSON } from '@clerk/shared/testUtils';
+import React from 'react';
+
 import { PhoneViewer } from './PhoneViewer';
 
 describe('<PhoneViewer/>', () => {

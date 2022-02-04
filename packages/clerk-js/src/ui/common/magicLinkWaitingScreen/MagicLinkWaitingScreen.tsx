@@ -1,17 +1,17 @@
-import React from 'react';
-import cn from 'classnames';
-import {
-  ButtonWithTimer,
-  ButtonWithTimerProps,
-} from '@clerk/shared/components/button';
 // @ts-ignore
 import { default as ExclamationTriangle } from '@clerk/shared/assets/icons/exclamation-triangle.svg';
-// @ts-ignore
-import { default as TickShield } from '@clerk/shared/assets/icons/tick-shield.svg';
 // @ts-ignore
 import { default as MailOpen } from '@clerk/shared/assets/icons/mail-open.svg';
 // @ts-ignore
 import { default as SwitchArrows } from '@clerk/shared/assets/icons/switch-arrows.svg';
+// @ts-ignore
+import { default as TickShield } from '@clerk/shared/assets/icons/tick-shield.svg';
+import {
+  ButtonWithTimer,
+  ButtonWithTimerProps,
+} from '@clerk/shared/components/button';
+import cn from 'classnames';
+import React from 'react';
 
 const RESEND_BUTTON_DELAY_IN_MS = 15000;
 

@@ -1,12 +1,12 @@
-import React from 'react';
-import { TitledCard } from '@clerk/shared/components/titledCard';
-import { useRouter } from 'ui/router';
-import { useCoreUser } from 'ui/contexts';
-import { PageHeading } from 'ui/userProfile/pageHeading';
-import { svgUrl } from 'ui/common/constants';
-import { List } from '@clerk/shared/components/list';
 import { Avatar } from '@clerk/shared/components/avatar';
+import { List } from '@clerk/shared/components/list';
+import { TitledCard } from '@clerk/shared/components/titledCard';
 import { ExternalAccountResource } from '@clerk/types';
+import React from 'react';
+import { svgUrl } from 'ui/common/constants';
+import { useCoreUser } from 'ui/contexts';
+import { useRouter } from 'ui/router';
+import { PageHeading } from 'ui/userProfile/pageHeading';
 
 export function ConnectedAccountDetail(): JSX.Element | null {
   const user = useCoreUser();

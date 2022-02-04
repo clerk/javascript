@@ -1,10 +1,9 @@
-import React from 'react';
-import { ButtonWithSpinner } from '@clerk/shared/components/button';
-
 // @ts-ignore
 import { default as CogIcon } from '@clerk/shared/assets/icons/cog.svg';
 // @ts-ignore
 import { default as SignOutIcon } from '@clerk/shared/assets/icons/sign-out.svg';
+import { ButtonWithSpinner } from '@clerk/shared/components/button';
+import React from 'react';
 
 type ActiveAccountButtonSetProps = {
   handleSignout: () => void;

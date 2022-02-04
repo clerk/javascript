@@ -1,7 +1,8 @@
-import React from 'react';
 import { Avatar, AvatarProps } from '@clerk/shared/components/avatar';
 import { ImageUploader } from '@clerk/shared/components/imageUploader';
+import React from 'react';
 import { useCoreUser } from 'ui/contexts';
+
 //@ts-ignore
 import styles from './AvatarWithUploader.module.scss';
 

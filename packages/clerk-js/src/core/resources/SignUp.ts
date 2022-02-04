@@ -1,3 +1,5 @@
+import { camelToSnakeKeys } from '@clerk/shared/utils/object';
+import { Poller } from '@clerk/shared/utils/poller';
 import type {
   AuthenticateWithRedirectParams,
   CreateMagicLinkFlowReturn,
@@ -14,23 +16,22 @@ import type {
   StartMagicLinkFlowParams,
   VerificationAttemptParams,
 } from '@clerk/types';
-import { BaseResource } from './Base';
-import { SignUpVerifications } from './Verification';
-import { camelToSnakeKeys } from '@clerk/shared/utils/object';
-import { Poller } from '@clerk/shared/utils/poller';
-import {
-  getMetamaskIdentifier,
-  GenerateSignatureParams,
-  generateSignatureWithMetamask,
-  windowNavigate,
-} from 'utils';
-import { normalizeUnsafeMetadata } from 'utils/resourceParams';
 import {
   clerkMissingOptionError,
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from 'core/errors';
+import {
+  GenerateSignatureParams,
+  generateSignatureWithMetamask,
+  getMetamaskIdentifier,
+  windowNavigate,
+} from 'utils';
+import { normalizeUnsafeMetadata } from 'utils/resourceParams';
+
 import { STRATEGY_WEB3_METAMASK_SIGNATURE } from '../constants';
+import { BaseResource } from './Base';
+import { SignUpVerifications } from './Verification';
 
 declare global {
   interface Window {

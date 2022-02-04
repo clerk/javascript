@@ -1,18 +1,19 @@
-import React from 'react';
 import { SignInFactor } from '@clerk/types';
-import { useCoreSignIn, useEnvironment, useSignInContext } from 'ui/contexts';
-import { ErrorScreen } from './strategies';
-import { determineStartingSignInFactor } from './utils';
+import React from 'react';
 import {
   LoadingScreen,
   shouldDisableStrategy,
   withRedirectToHome,
 } from 'ui/common';
+import { useCoreSignIn, useEnvironment, useSignInContext } from 'ui/contexts';
 import {
   AllFirstFactorStrategies,
   SignInFactorOneInputBased,
   SignInFactorOneMagicLink,
 } from 'ui/signIn/factorOne';
+
+import { ErrorScreen } from './strategies';
+import { determineStartingSignInFactor } from './utils';
 
 function _SignInFactorOne(): JSX.Element {
   const signInContext = useSignInContext();

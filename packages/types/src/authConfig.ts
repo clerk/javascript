@@ -1,6 +1,6 @@
+import { EmailAddressVerificationStrategy } from './emailAddress';
 import { ClerkResource } from './resource';
 import { IdentificationStrategy, SignInStrategyName } from './signIn';
-import { EmailAddressVerificationStrategy } from './emailAddress';
 
 /**
  * Authentication configuration attributes set.

@@ -1,6 +1,7 @@
-import * as React from 'react';
-import { BackButton } from './BackButton';
 import { renderJSON } from '@clerk/shared/testUtils';
+import * as React from 'react';
+
+import { BackButton } from './BackButton';
 
 jest.mock('ui/router/RouteContext');
 

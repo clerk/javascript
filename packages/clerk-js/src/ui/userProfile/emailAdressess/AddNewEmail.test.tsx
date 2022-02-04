@@ -1,6 +1,7 @@
+import { renderJSON } from '@clerk/shared/testUtils';
 import { EmailAddressResource, UserResource } from '@clerk/types';
 import React from 'react';
-import { renderJSON } from '@clerk/shared/testUtils';
+
 import { AddNewEmail } from './AddNewEmail';
 
 const mockNavigate = jest.fn();

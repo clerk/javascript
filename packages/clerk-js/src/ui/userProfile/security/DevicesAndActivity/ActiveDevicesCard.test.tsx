@@ -1,10 +1,10 @@
+import { renderJSON } from '@clerk/shared/testUtils';
 import {
   SessionActivity,
   SessionWithActivitiesResource,
   UserResource,
 } from '@clerk/types';
 import * as React from 'react';
-import { renderJSON } from '@clerk/shared/testUtils';
 import { ActiveDevicesCard } from 'ui/userProfile/security/DevicesAndActivity/ActiveDevicesCard';
 
 const sessionWithActivities = {

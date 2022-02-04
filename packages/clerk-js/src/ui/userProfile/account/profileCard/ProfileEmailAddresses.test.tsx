@@ -1,7 +1,8 @@
-import * as React from 'react';
-import { ProfileEmailAddresses } from './ProfileEmailAddresses';
 import { renderJSON } from '@clerk/shared/testUtils';
 import { EmailAddressResource, UserResource } from '@clerk/types';
+import * as React from 'react';
+
+import { ProfileEmailAddresses } from './ProfileEmailAddresses';
 
 const mockNavigate = jest.fn();
 jest.mock('ui/hooks', () => ({

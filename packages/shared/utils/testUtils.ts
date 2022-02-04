@@ -1,8 +1,10 @@
+import '@testing-library/jest-dom/extend-expect';
+
+import { render, RenderOptions } from '@testing-library/react';
 import React from 'react';
 import renderer from 'react-test-renderer';
-import { render, RenderOptions } from '@testing-library/react';
+
 import { noop } from '../utils';
-import '@testing-library/jest-dom/extend-expect';
 
 // Wrap components with test providers
 const customRender = (ui: React.ReactElement, options?: RenderOptions) => {

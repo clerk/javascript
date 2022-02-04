@@ -1,13 +1,14 @@
-import { TitledCard } from '@clerk/shared/components/titledCard';
-import { VerificationStatusTag } from '@clerk/shared/components/tag';
-import { useRouter } from 'ui/router';
-import { useCoreUser } from 'ui/contexts';
-import React from 'react';
-import { PageHeading } from 'ui/userProfile/pageHeading';
-import { List } from '@clerk/shared/components/list';
 import { Button } from '@clerk/shared/components/button';
-import { Connections, PrimaryTag } from '../util';
+import { List } from '@clerk/shared/components/list';
+import { VerificationStatusTag } from '@clerk/shared/components/tag';
+import { TitledCard } from '@clerk/shared/components/titledCard';
 import { EmailAddressResource } from '@clerk/types';
+import React from 'react';
+import { useCoreUser } from 'ui/contexts';
+import { useRouter } from 'ui/router';
+import { PageHeading } from 'ui/userProfile/pageHeading';
+
+import { Connections, PrimaryTag } from '../util';
 
 type EmailListItemProps = {
   emailAddress: EmailAddressResource;

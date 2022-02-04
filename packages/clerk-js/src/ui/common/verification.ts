@@ -1,5 +1,5 @@
 import { ClerkAPIError } from '@clerk/types';
-import { getGlobalError, getClerkAPIErrorMessage } from 'ui/common';
+import { getClerkAPIErrorMessage,getGlobalError } from 'ui/common';
 
 export const VerificationErrorMessage = {
   Incorrect: 'Incorrect, try again',

@@ -1,13 +1,13 @@
-import { TitledCard } from '@clerk/shared/components/titledCard';
-import { useRouter } from 'ui/router';
-import { useCoreUser } from 'ui/contexts';
-import React from 'react';
-import { PageHeading } from 'ui/userProfile/pageHeading';
-import { List } from '@clerk/shared/components/list';
-import { Tag, VerificationStatusTag } from '@clerk/shared/components/tag';
 import { Button } from '@clerk/shared/components/button';
+import { List } from '@clerk/shared/components/list';
 import { PhoneViewer } from '@clerk/shared/components/phoneInput';
+import { Tag, VerificationStatusTag } from '@clerk/shared/components/tag';
+import { TitledCard } from '@clerk/shared/components/titledCard';
 import { PhoneNumberResource } from '@clerk/types';
+import React from 'react';
+import { useCoreUser } from 'ui/contexts';
+import { useRouter } from 'ui/router';
+import { PageHeading } from 'ui/userProfile/pageHeading';
 
 export const PhoneList = (): JSX.Element => {
   const user = useCoreUser();

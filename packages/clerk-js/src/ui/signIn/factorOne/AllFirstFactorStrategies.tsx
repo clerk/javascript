@@ -1,7 +1,7 @@
+import { SignInFactor } from '@clerk/types';
 import React from 'react';
 import { Body, Header, PoweredByClerk } from 'ui/common';
 import { All } from 'ui/signIn/strategies';
-import { SignInFactor } from '@clerk/types';
 
 type AllFirstFactorStrategiesProps = {
   factors: SignInFactor[];

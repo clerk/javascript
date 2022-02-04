@@ -1,9 +1,10 @@
+import { render, renderJSON,screen, userEvent } from '@clerk/shared/testUtils';
 import { EmailAddressResource } from '@clerk/types';
-import React from 'react';
-import { screen, render, userEvent, renderJSON } from '@clerk/shared/testUtils';
-import { ClerkAPIResponseError } from 'core/resources/Error';
-import { EmailDetail } from './EmailDetail';
 import { SignInStrategyName } from '@clerk/types';
+import { ClerkAPIResponseError } from 'core/resources/Error';
+import React from 'react';
+
+import { EmailDetail } from './EmailDetail';
 
 const mockNavigate = jest.fn();
 const mockUseCoreUser = jest.fn();

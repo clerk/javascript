@@ -1,12 +1,9 @@
-import React from 'react';
+import { Control } from '@clerk/shared/components/control';
 import { Form } from '@clerk/shared/components/form';
-import {
-  useCoreClerk,
-  useCoreSignUp,
-  useEnvironment,
-  useSignUpContext,
-} from 'ui/contexts';
-import { ERROR_CODES } from 'ui/common/constants';
+import { Input } from '@clerk/shared/components/input';
+import { PhoneInput } from '@clerk/shared/components/phoneInput';
+import { OAuthStrategy, SignUpResource, Web3Strategy } from '@clerk/types';
+import React from 'react';
 import type { FieldState } from 'ui/common';
 import {
   buildRequest,
@@ -18,21 +15,25 @@ import {
   useFieldState,
   withRedirectToHome,
 } from 'ui/common';
-import { useNavigate } from 'ui/hooks';
 import { Body, Header } from 'ui/common/authForms';
+import { ERROR_CODES } from 'ui/common/constants';
+import {
+  useCoreClerk,
+  useCoreSignUp,
+  useEnvironment,
+  useSignUpContext,
+} from 'ui/contexts';
+import { useNavigate } from 'ui/hooks';
+import { getClerkQueryParam } from 'utils/getClerkQueryParam';
+
+import { SignInLink } from './SignInLink';
 import { SignUpOAuth } from './SignUpOAuth';
 import { SignUpWeb3 } from './SignUpWeb3';
-import { SignInLink } from './SignInLink';
 import {
   determineFirstPartyFields,
   determineOauthOptions,
   determineWeb3Options,
 } from './utils';
-import { Control } from '@clerk/shared/components/control';
-import { Input } from '@clerk/shared/components/input';
-import { PhoneInput } from '@clerk/shared/components/phoneInput';
-import { getClerkQueryParam } from 'utils/getClerkQueryParam';
-import { OAuthStrategy, SignUpResource, Web3Strategy } from '@clerk/types';
 
 type ActiveIdentifier = 'emailAddress' | 'phoneNumber';
 

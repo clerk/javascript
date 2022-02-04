@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   act,
   render,
@@ -7,6 +6,8 @@ import {
   userEvent,
   waitFor,
 } from '@clerk/shared/testUtils';
+import React from 'react';
+
 import { SignInFactorTwo } from './SignInFactorTwo';
 
 const mockSetSession = jest.fn().mockReturnValue({

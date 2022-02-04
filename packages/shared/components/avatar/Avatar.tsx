@@ -1,8 +1,9 @@
-import React from 'react';
 import cn from 'classnames';
+import React from 'react';
+
+import { isRetinaDisplay } from '../../utils/isRetinaDisplay';
 //@ts-ignore
 import styles from './Avatar.module.scss';
-import { isRetinaDisplay } from '../../utils/isRetinaDisplay';
 
 const CLERK_DEFAULT_AVATAR =
   'https://images.clerk.services/clerk/default-profile.svg';

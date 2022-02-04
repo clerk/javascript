@@ -1,24 +1,24 @@
-import React from 'react';
-import { Error } from 'ui/common/error';
-import { useNavigate } from 'ui/hooks';
-import {
-  verificationErrorMessage,
-  handleError,
-  useFieldState,
-} from 'ui/common';
-import { PageHeading } from 'ui/userProfile/pageHeading';
 import { Button } from '@clerk/shared/components/button';
+import { Control } from '@clerk/shared/components/control';
 import { Form } from '@clerk/shared/components/form';
 import { InputWithIcon } from '@clerk/shared/components/input';
-import { Control } from '@clerk/shared/components/control';
 import {
   OneTimeCodeInput,
   VerifyCodeHandler,
 } from '@clerk/shared/components/oneTimeCodeInput';
+import { PhoneInput, PhoneViewer } from '@clerk/shared/components/phoneInput';
 import { TitledCard } from '@clerk/shared/components/titledCard';
 import { Wizard } from '@clerk/shared/components/wizard';
-import { PhoneInput, PhoneViewer } from '@clerk/shared/components/phoneInput';
 import { VerificationResource } from '@clerk/types';
+import React from 'react';
+import {
+  handleError,
+  useFieldState,
+  verificationErrorMessage,
+} from 'ui/common';
+import { Error } from 'ui/common/error';
+import { useNavigate } from 'ui/hooks';
+import { PageHeading } from 'ui/userProfile/pageHeading';
 
 export interface ListValue {
   id: string;

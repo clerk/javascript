@@ -1,10 +1,10 @@
+import { isMagicLinkError, MagicLinkErrorCode } from 'core/resources/Error';
 import React, { useEffect, useState } from 'react';
+import type { MagicLinkVerificationStatusModalProps } from 'ui/common';
+import { MagicLinkVerificationStatusModal } from 'ui/common';
 import { useCoreClerk } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
-import { MagicLinkVerificationStatusModal } from 'ui/common';
-import type { MagicLinkVerificationStatusModalProps } from 'ui/common';
 import type { VerificationStatus } from 'utils/getClerkQueryParam';
-import { isMagicLinkError, MagicLinkErrorCode } from 'core/resources/Error';
 
 type VerifyMagicLinkProps = Pick<
   MagicLinkVerificationStatusModalProps,

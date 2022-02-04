@@ -1,18 +1,18 @@
-import React from 'react';
 import cn from 'classnames';
-import { useDetectClickOutside } from '../../hooks';
+import React from 'react';
 
+import { useDetectClickOutside } from '../../hooks';
+import { ExpansionIcon } from '../expansionIcon';
 // @ts-ignore
 import styles from './Dropdown.module.scss';
 import { DropdownList } from './DropdownList';
+import type { DropdownComparator, DropdownOption } from './types';
 import {
   defaultComparator,
   findSelectedOptionIndex,
   getOptionLabel,
   makeComparator,
 } from './util';
-import type { DropdownComparator, DropdownOption } from './types';
-import { ExpansionIcon } from '../expansionIcon';
 
 const getNativeOption = (o: DropdownOption) => {
   if (typeof o === 'string') {

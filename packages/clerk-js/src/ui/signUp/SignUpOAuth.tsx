@@ -1,13 +1,13 @@
+import type { OAuthProvider,OAuthStrategy } from '@clerk/types';
 import React from 'react';
-import { useCoreSignUp, useEnvironment, useSignUpContext } from 'ui/contexts';
 import {
-  handleError,
   buildSSOCallbackURL,
   ButtonSet,
   ButtonSetOptions,
   getOAuthProviderData,
+  handleError,
 } from 'ui/common';
-import type { OAuthStrategy, OAuthProvider } from '@clerk/types';
+import { useCoreSignUp, useEnvironment, useSignUpContext } from 'ui/contexts';
 
 export type OauthProps = {
   oauthOptions: string[];

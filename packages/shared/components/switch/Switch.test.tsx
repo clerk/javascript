@@ -1,5 +1,6 @@
+import { render, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
 import * as React from 'react';
-import { render, userEvent, screen, waitFor } from '@clerk/shared/testUtils';
+
 import { Switch } from './Switch';
 
 describe('<Switch/>', () => {

@@ -1,6 +1,9 @@
+import { camelToSnakeKeys } from '@clerk/shared/utils/object';
+import { Poller } from '@clerk/shared/utils/poller';
 import type {
   AttemptFactorParams,
   AuthenticateWithRedirectParams,
+  CreateMagicLinkFlowReturn,
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
   SignInFactor,
@@ -8,30 +11,28 @@ import type {
   SignInJSON,
   SignInParams,
   SignInResource,
+  SignInStartMagicLinkFlowParams,
   SignInStatus,
   UserData,
   VerificationResource,
-  SignInStartMagicLinkFlowParams,
-  CreateMagicLinkFlowReturn,
   Web3SignatureFactor,
 } from '@clerk/types';
-import { BaseResource } from './Base';
-import { Verification } from './Verification';
-import { camelToSnakeKeys } from '@clerk/shared/utils/object';
-import {
-  getMetamaskIdentifier,
-  GenerateSignatureParams,
-  generateSignatureWithMetamask,
-  windowNavigate,
-} from 'utils';
 import {
   clerkInvalidStrategy,
   clerkMissingOptionError,
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from 'core/errors';
-import { Poller } from '@clerk/shared/utils/poller';
+import {
+  GenerateSignatureParams,
+  generateSignatureWithMetamask,
+  getMetamaskIdentifier,
+  windowNavigate,
+} from 'utils';
+
 import { STRATEGY_WEB3_METAMASK_SIGNATURE } from '../constants';
+import { BaseResource } from './Base';
+import { Verification } from './Verification';
 
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';

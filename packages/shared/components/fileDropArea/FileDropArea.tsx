@@ -1,8 +1,9 @@
 import React from 'react';
-import { Button } from '../button';
-import { Spinner } from '../spinner';
+
 import { ImageDefaultIcon, UploadIcon } from '../../assets/icons';
 import { SupportedMimeType } from '../../utils/mimeTypeExtensions';
+import { Button } from '../button';
+import { Spinner } from '../spinner';
 //@ts-ignore
 import styles from './FileDropArea.module.scss';
 

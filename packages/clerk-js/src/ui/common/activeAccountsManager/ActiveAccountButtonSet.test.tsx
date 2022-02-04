@@ -1,7 +1,8 @@
-import React from 'react';
-import { ActiveAccountButtonSet } from './ActiveAccountButtonSet';
-import { renderJSON, render } from '@clerk/shared/testUtils';
+import { render,renderJSON } from '@clerk/shared/testUtils';
 import { fireEvent } from '@testing-library/react';
+import React from 'react';
+
+import { ActiveAccountButtonSet } from './ActiveAccountButtonSet';
 
 describe('ActiveAccountButtonSet', () => {
   it('renders correctly', () => {

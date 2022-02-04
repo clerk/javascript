@@ -1,5 +1,6 @@
-import * as React from 'react';
 import { renderJSON } from '@clerk/shared/testUtils';
+import * as React from 'react';
+
 import { List } from './List';
 
 describe('<List/>', () => {

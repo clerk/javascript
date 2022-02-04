@@ -1,5 +1,5 @@
-import React from 'react';
 import type { ClerkOptions } from '@clerk/types';
+import React from 'react';
 
 export const OptionsContext = React.createContext<ClerkOptions>({});
 

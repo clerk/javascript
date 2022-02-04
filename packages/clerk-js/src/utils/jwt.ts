@@ -1,4 +1,5 @@
 import { JWT, JWTClaims } from '@clerk/types';
+
 import { urlDecodeB64 } from './encoders';
 
 export function decode(token: string): JWT {

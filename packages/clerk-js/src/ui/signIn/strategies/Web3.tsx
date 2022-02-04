@@ -1,12 +1,12 @@
+import { Web3Provider, Web3Strategy } from '@clerk/types';
 import React from 'react';
-import { useCoreClerk, useEnvironment, useSignInContext } from 'ui/contexts';
 import {
   ButtonSet,
   ButtonSetOptions,
-  handleError,
   getWeb3ProviderData,
+  handleError,
 } from 'ui/common';
-import { Web3Provider, Web3Strategy } from '@clerk/types';
+import { useCoreClerk, useEnvironment, useSignInContext } from 'ui/contexts';
 
 export type Web3Props = {
   web3Options: Web3Strategy[];

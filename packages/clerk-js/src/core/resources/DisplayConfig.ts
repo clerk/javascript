@@ -5,6 +5,7 @@ import type {
   ImageJSON,
   PreferredSignInStrategy,
 } from '@clerk/types';
+
 import { BaseResource } from './Base';
 
 export class DisplayConfig

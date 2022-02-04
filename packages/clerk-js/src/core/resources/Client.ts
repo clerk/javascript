@@ -5,12 +5,13 @@ import type {
   SignInResource,
   SignUpResource,
 } from '@clerk/types';
+import { unixEpochToDate } from 'utils/date';
+
+import { SessionTokenCache } from '../tokenCache';
 import { BaseResource } from './Base';
 import { Session } from './Session';
-import { SignUp } from './SignUp';
 import { SignIn } from './SignIn';
-import { unixEpochToDate } from 'utils/date';
-import { SessionTokenCache } from '../tokenCache';
+import { SignUp } from './SignUp';
 
 export class Client extends BaseResource implements ClientResource {
   private static instance: Client;

@@ -1,6 +1,7 @@
-import { BaseResource } from './Base';
-import { decode } from 'utils';
 import type { JWT, TokenJSON, TokenResource } from '@clerk/types';
+import { decode } from 'utils';
+
+import { BaseResource } from './Base';
 
 export class Token extends BaseResource implements TokenResource {
   pathRoot = 'tokens';

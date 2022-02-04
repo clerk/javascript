@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
-import { PhoneNumberResource } from '@clerk/types';
-import { handleError } from 'ui/common';
-import { useCoreUser } from 'ui/contexts';
-import { TitledCard } from '@clerk/shared/components/titledCard';
-import { Tag } from '@clerk/shared/components/tag';
-import { List } from '@clerk/shared/components/list';
-import {
-  TwoStepMethod,
-  TwoStepMethodsToDisplayDataMap,
-} from 'ui/userProfile/security/twoStepVerificationTypes';
-import { PhoneViewer } from '@clerk/shared/components/phoneInput';
-import { Popover } from '@clerk/shared/components/popover';
-import { Menu } from '@clerk/shared/components/menu';
-import { Error as ErrorComponent } from 'ui/common/error';
 // @ts-ignore
 import { default as BinIcon } from '@clerk/shared/assets/icons/bin.svg';
 // @ts-ignore
 import { default as CheckCircleIcon } from '@clerk/shared/assets/icons/check-circle.svg';
+import { List } from '@clerk/shared/components/list';
+import { Menu } from '@clerk/shared/components/menu';
+import { PhoneViewer } from '@clerk/shared/components/phoneInput';
+import { Popover } from '@clerk/shared/components/popover';
+import { Tag } from '@clerk/shared/components/tag';
+import { TitledCard } from '@clerk/shared/components/titledCard';
+import { PhoneNumberResource } from '@clerk/types';
+import React, { useState } from 'react';
+import { handleError } from 'ui/common';
+import { Error as ErrorComponent } from 'ui/common/error';
+import { useCoreUser } from 'ui/contexts';
+import {
+  TwoStepMethod,
+  TwoStepMethodsToDisplayDataMap,
+} from 'ui/userProfile/security/twoStepVerificationTypes';
 
 export function ActiveMethodsCard(): JSX.Element | null {
   const [error, setError] = useState<string | undefined>();

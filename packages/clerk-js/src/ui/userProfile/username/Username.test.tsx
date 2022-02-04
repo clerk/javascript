@@ -1,7 +1,8 @@
-import * as React from 'react';
 import { renderJSON } from '@clerk/shared/testUtils';
-import { Username } from './Username';
 import { UserResource } from '@clerk/types';
+import * as React from 'react';
+
+import { Username } from './Username';
 
 const mockNavigate = jest.fn();
 

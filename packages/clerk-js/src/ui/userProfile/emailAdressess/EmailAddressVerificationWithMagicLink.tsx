@@ -1,8 +1,8 @@
-import React from 'react';
-import { useUserProfileContext } from 'ui/contexts';
-import { buildMagicLinkRedirectUrl, MagicLinkWaitingScreen } from 'ui/common';
-import { EmailAddressResource } from '@clerk/types';
 import { noop } from '@clerk/shared/utils/noop';
+import { EmailAddressResource } from '@clerk/types';
+import React from 'react';
+import { buildMagicLinkRedirectUrl, MagicLinkWaitingScreen } from 'ui/common';
+import { useUserProfileContext } from 'ui/contexts';
 import { useMagicLink } from 'ui/hooks';
 
 type EmailAddressVerificationWithMagicLinkProps = {

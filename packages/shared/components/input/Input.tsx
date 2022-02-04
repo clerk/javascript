@@ -1,5 +1,6 @@
 import cn from 'classnames';
 import React from 'react';
+
 import { useInput } from '../../hooks';
 // @ts-ignore
 import styles from './Input.module.scss';

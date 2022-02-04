@@ -1,7 +1,7 @@
-import React from 'react';
-import { useNavigate } from 'ui/hooks';
-import { useCoreSession, useEnvironment } from 'ui/contexts';
 import { SignInProps, SignUpProps } from '@clerk/types';
+import React from 'react';
+import { useCoreSession, useEnvironment } from 'ui/contexts';
+import { useNavigate } from 'ui/hooks';
 
 export function withRedirectToHome<P extends SignInProps | SignUpProps>(
   Component: React.ComponentType<P>,

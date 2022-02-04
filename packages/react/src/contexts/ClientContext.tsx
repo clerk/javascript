@@ -1,10 +1,11 @@
-import React, { useContext } from 'react';
 import {
   ClientResource,
   SessionResource,
   SignInResource,
   SignUpResource,
 } from '@clerk/types';
+import React, { useContext } from 'react';
+
 import {
   assertClerkLoadedGuarantee,
   assertWrappedByClerkProvider,

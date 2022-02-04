@@ -1,5 +1,6 @@
-import * as React from 'react';
 import { render, renderJSON, screen, userEvent } from '@clerk/shared/testUtils';
+import * as React from 'react';
+
 import { ServerIcon } from '../../assets/icons';
 import { Menu } from './Menu';
 

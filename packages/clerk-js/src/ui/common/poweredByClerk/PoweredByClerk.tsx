@@ -1,8 +1,8 @@
-import React from 'react';
-import cn from 'classnames';
-import { useEnvironment } from 'ui/contexts';
 // @ts-ignore
 import { default as LogoMarkIcon } from '@clerk/shared/assets/icons/logo-mark.svg';
+import cn from 'classnames';
+import React from 'react';
+import { useEnvironment } from 'ui/contexts';
 
 export type PoweredByClerkProps = {
   className?: string;

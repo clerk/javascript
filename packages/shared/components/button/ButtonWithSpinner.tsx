@@ -1,6 +1,7 @@
 import React from 'react';
-import { Button, ButtonProps } from './Button';
+
 import { Spinner } from '../spinner';
+import { Button, ButtonProps } from './Button';
 
 export type ButtonWithSpinnerProps = {
   isLoading?: boolean;

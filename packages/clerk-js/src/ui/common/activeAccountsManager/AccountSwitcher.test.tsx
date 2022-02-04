@@ -1,8 +1,9 @@
-import React from 'react';
-import AccountSwitcher from './AccountSwitcher';
 import { render, renderJSON } from '@clerk/shared/testUtils';
-import { fireEvent } from '@testing-library/react';
 import { SessionResource } from '@clerk/types';
+import { fireEvent } from '@testing-library/react';
+import React from 'react';
+
+import AccountSwitcher from './AccountSwitcher';
 
 const sessions = [
   {

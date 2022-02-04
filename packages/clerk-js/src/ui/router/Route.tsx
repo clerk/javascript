@@ -1,8 +1,9 @@
 import React from 'react';
-import { RouteContext, useRouter } from './RouteContext';
+import { trimTrailingSlash } from 'utils';
+
 import { newPaths } from './newPaths';
 import { match } from './pathToRegexp';
-import { trimTrailingSlash } from 'utils';
+import { RouteContext, useRouter } from './RouteContext';
 
 interface RouteGuardProps {
   canActivate: () => boolean;

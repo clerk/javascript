@@ -1,12 +1,12 @@
 import React from 'react';
-import { useNavigate } from 'ui/hooks';
 import { Header, withRedirectToHome } from 'ui/common';
+import { ActiveAccountsManager } from 'ui/common/activeAccountsManager/ActiveAccountsManager';
 import {
   useCoreSessionList,
   useEnvironment,
   useSignInContext,
 } from 'ui/contexts';
-import { ActiveAccountsManager } from 'ui/common/activeAccountsManager/ActiveAccountsManager';
+import { useNavigate } from 'ui/hooks';
 
 function _SignInAccountSwitcher(): JSX.Element | null {
   const { displayConfig } = useEnvironment();

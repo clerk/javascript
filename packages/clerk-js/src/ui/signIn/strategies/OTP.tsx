@@ -1,12 +1,12 @@
-import React from 'react';
-import { useCoreSignIn } from 'ui/contexts';
 import { Label } from '@clerk/shared/components/label';
-import { FieldState } from 'ui/common';
 import {
   OneTimeCodeInput,
   VerifyCodeHandler,
 } from '@clerk/shared/components/oneTimeCodeInput';
 import { SignInFactor } from '@clerk/types';
+import React from 'react';
+import { FieldState } from 'ui/common';
+import { useCoreSignIn } from 'ui/contexts';
 
 export type OTPProps = {
   code: FieldState<string>;

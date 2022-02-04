@@ -1,12 +1,13 @@
 /* eslint-disable react/display-name */
 
-import React from 'react';
 import {
   render,
   screen,
-  waitFor,
   userEvent,
+  waitFor,
 } from '@clerk/shared/utils/testUtils';
+import React from 'react';
+
 import { SignInWithMetamaskButton } from './SignInWithMetamaskButton';
 
 const mockAuthenticatewithMetamask = jest.fn();

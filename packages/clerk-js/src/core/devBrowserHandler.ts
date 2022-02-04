@@ -1,14 +1,15 @@
 import {
-  DEV_BROWSER_SSO_JWT_HTTP_HEADER,
-  DEV_BROWSER_SSO_JWT_KEY,
-  DEV_BROWSER_SSO_JWT_PARAMETER,
-} from './constants';
-import {
   buildURL,
   createCookieHandler,
   isDevOrStagingUrl,
   runIframe,
 } from 'utils';
+
+import {
+  DEV_BROWSER_SSO_JWT_HTTP_HEADER,
+  DEV_BROWSER_SSO_JWT_KEY,
+  DEV_BROWSER_SSO_JWT_PARAMETER,
+} from './constants';
 import { clerkErrorDevInitFailed } from './errors';
 import { FapiClient } from './fapiClient';
 

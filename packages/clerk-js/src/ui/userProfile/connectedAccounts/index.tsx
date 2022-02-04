@@ -1,5 +1,6 @@
 import React from 'react';
 import { Route } from 'ui/router';
+
 import { ConnectedAccountDetail } from './ConnectedAccountDetail';
 import { ConnectedAccountList } from './ConnectedAccountList';
 

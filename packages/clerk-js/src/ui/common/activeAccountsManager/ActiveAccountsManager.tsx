@@ -1,13 +1,14 @@
-import React from 'react';
-import { useCoreClerk, useEnvironment } from 'ui/contexts';
-import AccountSwitcher from './AccountSwitcher';
-import SignOutAll from './SignOutAll';
-import { useNavigate } from 'ui/hooks';
-import { PoweredByClerk } from 'ui/common';
-import { ActiveAccountButtonSet } from './ActiveAccountButtonSet';
-import { useUserButtonPopupVisibility } from 'ui/userButton/contexts/PopupVisibilityContext';
 import { ActiveSessionResource, SessionResource } from '@clerk/types';
+import React from 'react';
+import { PoweredByClerk } from 'ui/common';
+import { useCoreClerk, useEnvironment } from 'ui/contexts';
+import { useNavigate } from 'ui/hooks';
+import { useUserButtonPopupVisibility } from 'ui/userButton/contexts/PopupVisibilityContext';
 import { windowNavigate } from 'utils';
+
+import AccountSwitcher from './AccountSwitcher';
+import { ActiveAccountButtonSet } from './ActiveAccountButtonSet';
+import SignOutAll from './SignOutAll';
 
 interface ActiveAccountsManagerProps {
   sessions: SessionResource[];

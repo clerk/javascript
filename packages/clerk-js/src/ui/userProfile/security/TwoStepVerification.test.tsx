@@ -1,6 +1,7 @@
+import { renderJSON } from '@clerk/shared/testUtils';
 import { PhoneNumberResource, UserResource } from '@clerk/types';
 import * as React from 'react';
-import { renderJSON } from '@clerk/shared/testUtils';
+
 import { TwoStepVerification } from './TwoStepVerification';
 
 jest.mock('ui/router/RouteContext');

@@ -1,7 +1,8 @@
-import React from 'react';
 import { render, screen, waitFor } from '@clerk/shared/testUtils';
-import { SignOutButton } from './SignOutButton';
 import { userEvent } from '@clerk/shared/utils/testUtils';
+import React from 'react';
+
+import { SignOutButton } from './SignOutButton';
 
 const mockSignOutOne = jest.fn();
 const originalError = console.error;

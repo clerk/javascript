@@ -1,13 +1,14 @@
-import React, { useContext } from 'react';
 import type { LoadedClerk } from '@clerk/types';
+import React, { useContext } from 'react';
+
+import { hocChildrenNotAFunctionError } from '../errors';
 import IsomorphicClerk from '../isomorphicClerk';
+import { inBrowser } from '../utils';
 import {
   assertClerkLoadedGuarantee,
   assertWrappedByClerkProvider,
 } from './assertHelpers';
 import { StructureContext, StructureContextStates } from './StructureContext';
-import { inBrowser } from '../utils';
-import { hocChildrenNotAFunctionError } from '../errors';
 
 type IsomorphicClerkContextValue = {
   value: IsomorphicClerk;

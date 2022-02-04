@@ -1,11 +1,12 @@
+import type { UserProfileProps } from '@clerk/types';
 import React from 'react';
+import { PoweredByClerk } from 'ui/common';
 import { withCoreUserGuard } from 'ui/contexts';
-import { DefaultNavBarLinks } from './NavBarLinks';
+
 import { AccountRoutes } from './account';
+import { DefaultNavBarLinks } from './NavBarLinks';
 import { SecurityRoutes } from './security';
 import { VerifyMagicLinkRoutes } from './VerifyMagicLink';
-import type { UserProfileProps } from '@clerk/types';
-import { PoweredByClerk } from 'ui/common';
 
 const UserProfile = withCoreUserGuard<UserProfileProps>(
   ({ hideNavigation, only }) => {

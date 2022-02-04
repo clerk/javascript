@@ -1,26 +1,27 @@
+import { Label } from '@clerk/shared/components/label';
+import {
+  OneTimeCodeInput,
+  VerifyCodeHandler,
+} from '@clerk/shared/components/oneTimeCodeInput';
 import React from 'react';
+import {
+  getGlobalError,
+  handleError,
+  isVerificationExpiredError,
+  PoweredByClerk,
+  shouldDisableStrategy,
+  useFieldState,
+  VerificationErrorMessage,
+  withRedirectToHome,
+} from 'ui/common';
+import { Body, Header } from 'ui/common/authForms';
 import {
   useCoreClerk,
   useCoreSignUp,
   useEnvironment,
   useSignUpContext,
 } from 'ui/contexts';
-import { Body, Header } from 'ui/common/authForms';
-import {
-  handleError,
-  PoweredByClerk,
-  useFieldState,
-  withRedirectToHome,
-  shouldDisableStrategy,
-  getGlobalError,
-  isVerificationExpiredError,
-  VerificationErrorMessage,
-} from 'ui/common';
-import { Label } from '@clerk/shared/components/label';
-import {
-  OneTimeCodeInput,
-  VerifyCodeHandler,
-} from '@clerk/shared/components/oneTimeCodeInput';
+
 import { SignUpVerifyEmailAddressWithMagicLink } from './SignUpVerifyEmailAddressWithMagicLink';
 
 const emailLinkStrategy = 'email_link';

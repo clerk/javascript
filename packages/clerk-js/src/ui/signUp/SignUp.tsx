@@ -1,19 +1,20 @@
+import { SignUpProps } from '@clerk/types';
 import React from 'react';
-import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from 'ui/router';
 import { VerifyMagicLink } from 'ui/common';
-import { SignUpStart } from './SignUpStart';
-import {
-  SignUpVerifyEmailAddress,
-  SignUpVerifyPhoneNumber,
-} from './SignUpVerify';
+import { SSOCallback } from 'ui/common/SSOCallback';
 import {
   ComponentContext,
   useCoreClerk,
   useSignUpContext,
   withCoreSessionSwitchGuard,
 } from 'ui/contexts';
-import { SignUpProps } from '@clerk/types';
-import { SSOCallback } from 'ui/common/SSOCallback';
+import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from 'ui/router';
+
+import { SignUpStart } from './SignUpStart';
+import {
+  SignUpVerifyEmailAddress,
+  SignUpVerifyPhoneNumber,
+} from './SignUpVerify';
 
 function RedirectToSignUp() {
   const { redirectToSignUp } = useCoreClerk();

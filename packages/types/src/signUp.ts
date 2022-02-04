@@ -1,21 +1,21 @@
-import { AuthenticateWithRedirectParams, OAuthStrategy } from './oauth';
-import { ClerkResource } from './resource';
-import { SnakeToCamel } from './utils';
-import {
-  VerificationAttemptParams,
-  VerificationResource,
-  StartMagicLinkFlowParams,
-  CreateMagicLinkFlowReturn,
-} from './verification';
-import { Web3Strategy } from './web3';
-import {
-  PhoneNumberVerificationStrategy,
-  PreparePhoneNumberVerificationParams,
-} from './phoneNumber';
 import {
   EmailAddressVerificationStrategy,
   PrepareEmailAddressVerificationParams,
 } from './emailAddress';
+import { AuthenticateWithRedirectParams, OAuthStrategy } from './oauth';
+import {
+  PhoneNumberVerificationStrategy,
+  PreparePhoneNumberVerificationParams,
+} from './phoneNumber';
+import { ClerkResource } from './resource';
+import { SnakeToCamel } from './utils';
+import {
+  CreateMagicLinkFlowReturn,
+  StartMagicLinkFlowParams,
+  VerificationAttemptParams,
+  VerificationResource,
+} from './verification';
+import { Web3Strategy } from './web3';
 import { AuthenticateWithWeb3Params } from './web3Wallet';
 
 export interface SignUpResource extends ClerkResource {

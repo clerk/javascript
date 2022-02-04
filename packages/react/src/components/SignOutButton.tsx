@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { withClerk } from '../contexts';
 import { SignOutButtonProps, WithClerkProp } from '../types';
 import {

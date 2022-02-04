@@ -1,8 +1,8 @@
-import React from 'react';
-import { useNavigate } from 'ui/hooks';
-import { svgUrl } from 'ui/common/constants';
 import { List } from '@clerk/shared/components/list';
 import type { ExternalAccountResource } from '@clerk/types';
+import React from 'react';
+import { svgUrl } from 'ui/common/constants';
+import { useNavigate } from 'ui/hooks';
 
 type ConnectedAccountListItemProps = {
   externalAccount: ExternalAccountResource;

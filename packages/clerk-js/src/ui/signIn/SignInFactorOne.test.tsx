@@ -1,5 +1,3 @@
-import * as React from 'react';
-import { PartialDeep } from 'type-fest';
 import {
   act,
   mocked,
@@ -8,19 +6,22 @@ import {
   userEvent,
   waitFor,
 } from '@clerk/shared/testUtils';
-import { SignInFactorOne } from './SignInFactorOne';
 import {
   EnvironmentResource,
   LoadedClerk,
   SignInFactor,
   SignInResource,
 } from '@clerk/types';
+import * as React from 'react';
+import { PartialDeep } from 'type-fest';
 import {
   useCoreClerk,
   useCoreSignIn,
   useEnvironment,
   useSignInContext,
 } from 'ui/contexts';
+
+import { SignInFactorOne } from './SignInFactorOne';
 
 const mockNavigate = jest.fn();
 const mockNavigateAfterSignIn = jest.fn();

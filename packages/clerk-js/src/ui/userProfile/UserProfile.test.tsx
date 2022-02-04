@@ -1,3 +1,4 @@
+import { renderJSON } from '@clerk/shared/testUtils';
 import {
   Clerk,
   EmailAddressResource,
@@ -9,11 +10,11 @@ import {
   SignInResource,
   SignUpResource,
 } from '@clerk/types';
-import ReactDOM from 'react-dom';
 import { AuthConfig } from 'core/resources/AuthConfig';
 import { ExternalAccount } from 'core/resources/ExternalAccount';
 import React from 'react';
-import { renderJSON } from '@clerk/shared/testUtils';
+import ReactDOM from 'react-dom';
+
 import { UserProfile } from './UserProfile';
 
 const mockNavigate = jest.fn();

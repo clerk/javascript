@@ -1,11 +1,12 @@
-import React from 'react';
 import cn from 'classnames';
-// @ts-ignore
-import styles from './OneTimeCodeInput.module.scss';
+import React from 'react';
+
+import { noop } from '../../utils';
+import { Button } from '../button';
 import { Input } from '../input';
 import { Spinner } from '../spinner';
-import { Button } from '../button';
-import { noop } from '../../utils';
+// @ts-ignore
+import styles from './OneTimeCodeInput.module.scss';
 
 const BLANK_CHAR = ' ';
 const PRINTABLE_CHARS_REGEX = /^[a-z0-9!"#$%&'()*+,./:;<=>?@[\] ^_`{|}~-]*$/i;

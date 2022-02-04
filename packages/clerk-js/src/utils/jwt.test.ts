@@ -1,5 +1,6 @@
-import { decode } from './jwt';
 import jwtGen from 'jsonwebtoken';
+
+import { decode } from './jwt';
 
 const jwt = jwtGen.sign(
   {

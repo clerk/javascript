@@ -1,5 +1,5 @@
-import React from 'react';
 import cn from 'classnames';
+import React from 'react';
 
 // @ts-ignore
 import styles from './Spinner.module.scss';

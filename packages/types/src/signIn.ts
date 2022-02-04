@@ -1,13 +1,13 @@
+import { EmailAddressVerificationStrategy } from './emailAddress';
+import { AuthenticateWithRedirectParams, OAuthStrategy } from './oauth';
 import { ClerkResource } from './resource';
 import { SnakeToCamel } from './utils';
 import {
-  VerificationResource,
-  StartMagicLinkFlowParams,
   CreateMagicLinkFlowReturn,
+  StartMagicLinkFlowParams,
+  VerificationResource,
 } from './verification';
 import { Web3Strategy } from './web3';
-import { AuthenticateWithRedirectParams, OAuthStrategy } from './oauth';
-import { EmailAddressVerificationStrategy } from './emailAddress';
 import { AuthenticateWithWeb3Params } from './web3Wallet';
 
 export interface SignInResource extends ClerkResource {

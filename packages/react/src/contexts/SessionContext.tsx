@@ -1,11 +1,12 @@
 import { ActiveSessionResource, SessionResource } from '@clerk/types';
 import React, { useContext } from 'react';
+
+import { hocChildrenNotAFunctionError } from '../errors';
+import { inBrowser } from '../utils';
 import {
   assertUserGuarantee,
   assertWrappedByClerkProvider,
 } from './assertHelpers';
-import { inBrowser } from '../utils';
-import { hocChildrenNotAFunctionError } from '../errors';
 import { StructureContext, StructureContextStates } from './StructureContext';
 
 type SessionTypes = ActiveSessionResource | null | undefined;

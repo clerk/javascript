@@ -1,14 +1,14 @@
-import React from 'react';
-import { List } from '@clerk/shared/components/list';
-import { SkeletonLoader } from '@clerk/shared/components/skeletonLoader/SkeletonLoader';
-import { SessionWithActivitiesResource } from '@clerk/types';
-import { ActivityIcon } from 'ui/userProfile/security/DevicesAndActivity/ActivityIcon';
-import { ActivityDescription } from 'ui/userProfile/security/DevicesAndActivity/ActivityDescription';
-import { Menu } from '@clerk/shared/components/menu';
-import { Popover } from '@clerk/shared/components/popover';
 // @ts-ignore
 import { default as SignOutIcon } from '@clerk/shared/assets/icons/sign-out.svg';
+import { List } from '@clerk/shared/components/list';
+import { Menu } from '@clerk/shared/components/menu';
+import { Popover } from '@clerk/shared/components/popover';
+import { SkeletonLoader } from '@clerk/shared/components/skeletonLoader/SkeletonLoader';
+import { SessionWithActivitiesResource } from '@clerk/types';
 import { SessionResource } from '@clerk/types';
+import React from 'react';
+import { ActivityDescription } from 'ui/userProfile/security/DevicesAndActivity/ActivityDescription';
+import { ActivityIcon } from 'ui/userProfile/security/DevicesAndActivity/ActivityIcon';
 
 export function ActivityListItem(props: {
   sessionWithActivities: SessionWithActivitiesResource;

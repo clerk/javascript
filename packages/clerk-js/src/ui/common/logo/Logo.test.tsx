@@ -1,6 +1,3 @@
-import * as React from 'react';
-import { Logo } from './Logo';
-import { useEnvironment } from 'ui/contexts/EnvironmentContext';
 import {
   fireEvent,
   mocked,
@@ -8,8 +5,12 @@ import {
   renderJSON,
   screen,
 } from '@clerk/shared/testUtils';
-import { PartialDeep } from 'type-fest';
 import { EnvironmentResource } from '@clerk/types';
+import * as React from 'react';
+import { PartialDeep } from 'type-fest';
+import { useEnvironment } from 'ui/contexts/EnvironmentContext';
+
+import { Logo } from './Logo';
 
 jest.mock('ui/contexts/EnvironmentContext', () => {
   return {

@@ -1,10 +1,11 @@
+import type { Clerk, ClerkAPIErrorJSON, ClientJSON } from '@clerk/types';
 import qs from 'qs';
-import { clerkNetworkError } from './errors';
 import {
   buildEmailAddress as buildEmailAddressUtil,
   buildURL as buildUrlUtil,
 } from 'utils';
-import type { Clerk, ClerkAPIErrorJSON, ClientJSON } from '@clerk/types';
+
+import { clerkNetworkError } from './errors';
 
 export type HTTPMethod =
   | 'CONNECT'

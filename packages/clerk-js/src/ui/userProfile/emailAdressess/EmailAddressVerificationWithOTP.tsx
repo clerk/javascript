@@ -1,11 +1,11 @@
-import React from 'react';
-import { EmailAddressResource } from '@clerk/types';
-import { noop } from '@clerk/shared/utils/noop';
-import { verificationErrorMessage, useFieldState } from 'ui/common';
 import {
   OneTimeCodeInput,
   VerifyCodeHandler,
 } from '@clerk/shared/components/oneTimeCodeInput';
+import { noop } from '@clerk/shared/utils/noop';
+import { EmailAddressResource } from '@clerk/types';
+import React from 'react';
+import { useFieldState,verificationErrorMessage } from 'ui/common';
 
 type EmailAddressVerificationWithOTPProps = {
   email: EmailAddressResource;

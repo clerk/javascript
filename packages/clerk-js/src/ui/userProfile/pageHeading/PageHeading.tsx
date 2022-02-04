@@ -1,7 +1,7 @@
-import React from 'react';
-import cn from 'classnames';
-import { BackButton } from 'ui/common/backButton';
 import { Heading } from '@clerk/shared/components/heading';
+import cn from 'classnames';
+import React from 'react';
+import { BackButton } from 'ui/common/backButton';
 
 export type PageHeadingProps = {
   title: string;

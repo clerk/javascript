@@ -1,6 +1,6 @@
+import type { LoadedClerk } from '@clerk/types';
 import React from 'react';
 import { assertContextExists } from 'ui/contexts/utils';
-import type { LoadedClerk } from '@clerk/types';
 
 const excludedProps = ['user', 'session', 'client'] as const;
 

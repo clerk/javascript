@@ -1,6 +1,6 @@
 import React from 'react';
-import { Route } from 'ui/router';
 import { VerifyMagicLink } from 'ui/common';
+import { Route } from 'ui/router';
 
 export const VerifyMagicLinkRoutes = (): JSX.Element => {
   return (

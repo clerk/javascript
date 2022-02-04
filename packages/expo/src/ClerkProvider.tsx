@@ -1,11 +1,13 @@
 import './polyfills';
-import React from 'react';
+
 import {
   ClerkProvider as ClerkReactProvider,
   ClerkProviderProps as ClerkReactProviderProps,
 } from '@clerk/clerk-react';
-import { buildClerk } from './singleton';
+import React from 'react';
+
 import type { TokenCache } from './cache';
+import { buildClerk } from './singleton';
 
 export type ClerkProviderProps = ClerkReactProviderProps & {
   children: React.ReactNode;

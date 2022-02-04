@@ -1,8 +1,9 @@
-import React from 'react';
 import cn from 'classnames';
+import React from 'react';
+
+import { Switch } from '../switch';
 // @ts-ignore
 import styles from './Radio.module.scss';
-import { Switch } from '../switch';
 
 export type RadioProps = {
   ref?: React.Ref<HTMLInputElement>;

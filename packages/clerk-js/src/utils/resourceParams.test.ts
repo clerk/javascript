@@ -1,5 +1,6 @@
-import { normalizeUnsafeMetadata } from './resourceParams';
 import { UpdateUserParams } from '@clerk/types';
+
+import { normalizeUnsafeMetadata } from './resourceParams';
 
 describe('normalizeUnsafeMetadata', () => {
   it('handles unsafe_metadata', () => {

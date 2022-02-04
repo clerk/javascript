@@ -1,8 +1,8 @@
-import React from 'react';
-import { Form } from '@clerk/shared/components/form';
-import { FieldState } from 'ui/common';
 import { Control } from '@clerk/shared/components/control';
+import { Form } from '@clerk/shared/components/form';
 import { Input } from '@clerk/shared/components/input';
+import React from 'react';
+import { FieldState } from 'ui/common';
 
 export type PasswordProps = {
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => Promise<void>;

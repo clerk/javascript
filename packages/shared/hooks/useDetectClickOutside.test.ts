@@ -1,5 +1,6 @@
-import React from 'react';
 import { renderHook } from '@clerk/shared/testUtils';
+import React from 'react';
+
 import { useDetectClickOutside } from './useDetectClickOutside';
 
 describe('useDetectClickOutside(el, defaultActive)', () => {

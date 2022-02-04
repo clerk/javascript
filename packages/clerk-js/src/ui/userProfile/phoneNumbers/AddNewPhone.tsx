@@ -1,6 +1,6 @@
 import React from 'react';
-import { AddVerifiableField } from 'ui/userProfile/AddVerifiableField';
 import { useCoreUser } from 'ui/contexts';
+import { AddVerifiableField } from 'ui/userProfile/AddVerifiableField';
 
 export const AddNewPhone = (): JSX.Element => {
   const user = useCoreUser();

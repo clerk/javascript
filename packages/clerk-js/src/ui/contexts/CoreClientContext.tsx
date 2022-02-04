@@ -1,10 +1,10 @@
-import React from 'react';
 import {
   ClientResource,
   SessionResource,
-  SignUpResource,
   SignInResource,
+  SignUpResource,
 } from '@clerk/types';
+import React from 'react';
 import { assertContextExists } from 'ui/contexts/utils';
 
 type CoreClientContextValue = { value: ClientResource };

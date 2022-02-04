@@ -1,4 +1,7 @@
+import cn from 'classnames';
 import React from 'react';
+
+import { IsoToCountryMap } from './countryCodeData';
 // @ts-ignore
 import styles from './PhoneViewer.module.scss';
 import {
@@ -6,8 +9,6 @@ import {
   getCountryIsoFromFormattedNumber,
   getFlagEmojiFromCountryIso,
 } from './utils';
-import { IsoToCountryMap } from './countryCodeData';
-import cn from 'classnames';
 
 export interface PhoneViewerProps {
   phoneNumber: string;

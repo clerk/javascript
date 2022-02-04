@@ -1,10 +1,5 @@
+import { SignUpResource } from '@clerk/types';
 import React from 'react';
-import {
-  useCoreClerk,
-  useCoreSignUp,
-  useEnvironment,
-  useSignUpContext,
-} from 'ui/contexts';
 import {
   Body,
   buildMagicLinkRedirectUrl,
@@ -15,7 +10,12 @@ import {
   PoweredByClerk,
 } from 'ui/common';
 import { Error } from 'ui/common/error';
-import { SignUpResource } from '@clerk/types';
+import {
+  useCoreClerk,
+  useCoreSignUp,
+  useEnvironment,
+  useSignUpContext,
+} from 'ui/contexts';
 import { useMagicLink } from 'ui/hooks';
 
 export function SignUpVerifyEmailAddressWithMagicLink(): JSX.Element {

@@ -1,8 +1,9 @@
 import { ClerkAPIResponseError } from 'core/resources/Error';
+
 import {
-  verificationErrorMessage,
-  VerificationErrorMessage,
   isVerificationExpiredError,
+  VerificationErrorMessage,
+  verificationErrorMessage,
 } from './verification';
 
 describe('ui/common/verification', () => {

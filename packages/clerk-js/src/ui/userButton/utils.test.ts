@@ -1,4 +1,5 @@
 import { UserResource } from '@clerk/types';
+
 import { determineIdentifier } from './utils';
 
 describe('UserButton utils', () => {

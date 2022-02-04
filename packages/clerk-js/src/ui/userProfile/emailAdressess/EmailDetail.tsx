@@ -1,24 +1,25 @@
+// @ts-ignore
+import { default as BinIcon } from '@clerk/shared/assets/icons/bin.svg';
+// @ts-ignore
+import { default as MailIcon } from '@clerk/shared/assets/icons/mail.svg';
+import { Button } from '@clerk/shared/components/button';
+import { List } from '@clerk/shared/components/list';
+import { VerificationStatusTag } from '@clerk/shared/components/tag';
+import { TitledCard } from '@clerk/shared/components/titledCard';
+import { Toggle } from '@clerk/shared/components/toggle';
 import React from 'react';
-import { useNavigate } from 'ui/hooks';
-import { useRouter } from 'ui/router';
 import { handleError } from 'ui/common';
 import { Error } from 'ui/common/error';
 import { useCoreUser, useEnvironment } from 'ui/contexts';
-import { EditableListFieldRemoveCard } from '../EditableListFieldRemoveCard';
-import { PageHeading } from 'ui/userProfile/pageHeading';
-import { VerificationStatusTag } from '@clerk/shared/components/tag';
-import { List } from '@clerk/shared/components/list';
-import { TitledCard } from '@clerk/shared/components/titledCard';
-import { Toggle } from '@clerk/shared/components/toggle';
-import { Button } from '@clerk/shared/components/button';
-import { Connections, PrimaryTag } from '../util';
-import { EmailAddressVerificationWithOTP } from 'ui/userProfile/emailAdressess/EmailAddressVerificationWithOTP';
+import { useNavigate } from 'ui/hooks';
+import { useRouter } from 'ui/router';
 import { EmailAddressVerificationWithMagicLink } from 'ui/userProfile/emailAdressess/EmailAddressVerificationWithMagicLink';
+import { EmailAddressVerificationWithOTP } from 'ui/userProfile/emailAdressess/EmailAddressVerificationWithOTP';
 import { magicLinksEnabledForInstance } from 'ui/userProfile/emailAdressess/utils';
-// @ts-ignore
-import { default as MailIcon } from '@clerk/shared/assets/icons/mail.svg';
-// @ts-ignore
-import { default as BinIcon } from '@clerk/shared/assets/icons/bin.svg';
+import { PageHeading } from 'ui/userProfile/pageHeading';
+
+import { EditableListFieldRemoveCard } from '../EditableListFieldRemoveCard';
+import { Connections, PrimaryTag } from '../util';
 
 export function EmailDetail(): JSX.Element | null {
   const environment = useEnvironment();

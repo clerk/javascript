@@ -1,5 +1,6 @@
-import React from 'react';
 import { UserResource } from '@clerk/types';
+import React from 'react';
+
 import { determineIdentifier } from './utils';
 
 type SalutationProps = {

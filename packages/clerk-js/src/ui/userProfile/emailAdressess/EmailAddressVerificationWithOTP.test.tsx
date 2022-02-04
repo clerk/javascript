@@ -1,14 +1,15 @@
-import React from 'react';
 import {
-  renderJSON,
-  render,
-  userEvent,
-  screen,
   act,
+  render,
+  renderJSON,
+  screen,
+  userEvent,
   waitFor,
 } from '@clerk/shared/testUtils';
-import { EmailAddressVerificationWithOTP } from './EmailAddressVerificationWithOTP';
 import { EmailAddressResource } from '@clerk/types';
+import React from 'react';
+
+import { EmailAddressVerificationWithOTP } from './EmailAddressVerificationWithOTP';
 
 jest.mock('ui/contexts', () => {
   return {

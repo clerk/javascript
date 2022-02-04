@@ -1,5 +1,6 @@
-import { BaseRouter } from './BaseRouter';
 import React from 'react';
+
+import { BaseRouter } from './BaseRouter';
 
 export const VIRTUAL_ROUTER_BASE_PATH = 'CLERK-ROUTER/VIRTUAL';
 

@@ -1,7 +1,7 @@
-import React from 'react';
 import cn from 'classnames';
-import { Label } from '../label';
+import React from 'react';
 
+import { Label } from '../label';
 // @ts-ignore
 import styles from './Control.module.scss';
 

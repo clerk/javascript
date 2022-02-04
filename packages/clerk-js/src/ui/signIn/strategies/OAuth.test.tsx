@@ -1,7 +1,8 @@
-import React from 'react';
 import { render, renderJSON, screen, userEvent } from '@clerk/shared/testUtils';
-import { OAuth } from './OAuth';
 import { titleize } from '@clerk/shared/utils/string';
+import React from 'react';
+
+import { OAuth } from './OAuth';
 
 const mockAuthenticateWithRedirect = jest.fn();
 

@@ -1,7 +1,8 @@
 import React from 'react';
 import { PageHeading } from 'ui/userProfile/pageHeading';
-import { AddMethodCard } from './AddMethodCard';
 import { ActiveMethodsCard } from 'ui/userProfile/security/ActiveMethodsCard';
+
+import { AddMethodCard } from './AddMethodCard';
 
 export function TwoStepVerification(): JSX.Element {
   return (

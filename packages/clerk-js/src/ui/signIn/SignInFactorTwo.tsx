@@ -1,22 +1,23 @@
-import React from 'react';
-import { useCoreClerk, useCoreSignIn, useSignInContext } from 'ui/contexts';
-import {
-  Body,
-  handleError,
-  Header,
-  useFieldState,
-  withRedirectToHome,
-  getGlobalError,
-  isVerificationExpiredError,
-  VerificationErrorMessage,
-} from 'ui/common';
 import { Label } from '@clerk/shared/components/label';
 import {
   OneTimeCodeInput,
   VerifyCodeHandler,
 } from '@clerk/shared/components/oneTimeCodeInput';
-import { determineSalutation } from './utils';
 import { PhoneCodeFactor, SignInResource } from '@clerk/types';
+import React from 'react';
+import {
+  Body,
+  getGlobalError,
+  handleError,
+  Header,
+  isVerificationExpiredError,
+  useFieldState,
+  VerificationErrorMessage,
+  withRedirectToHome,
+} from 'ui/common';
+import { useCoreClerk, useCoreSignIn, useSignInContext } from 'ui/contexts';
+
+import { determineSalutation } from './utils';
 
 type SignInUiProps = Pick<
   SignInResource,

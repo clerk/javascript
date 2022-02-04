@@ -1,11 +1,11 @@
 import { EmailAddressResource } from './emailAddress';
 import { ExternalAccountResource } from './externalAccount';
+import { ImageResource } from './image';
 import { UserJSON } from './json';
 import { PhoneNumberResource } from './phoneNumber';
 import { ClerkResource } from './resource';
 import { SessionWithActivitiesResource } from './session';
-import { JWTService, GetUserTokenOptions } from './token';
-import { ImageResource } from './image';
+import { GetUserTokenOptions,JWTService } from './token';
 import { SnakeToCamel } from './utils';
 import { Web3WalletResource } from './web3Wallet';
 

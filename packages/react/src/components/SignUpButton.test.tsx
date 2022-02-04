@@ -1,7 +1,8 @@
-import React from 'react';
 import { render, screen, waitFor } from '@clerk/shared/testUtils';
-import { SignUpButton } from './SignUpButton';
 import { userEvent } from '@clerk/shared/utils/testUtils';
+import React from 'react';
+
+import { SignUpButton } from './SignUpButton';
 
 const mockRedirectToSignUp = jest.fn();
 const originalError = console.error;

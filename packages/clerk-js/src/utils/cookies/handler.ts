@@ -1,11 +1,11 @@
 import { addYears } from '@clerk/shared/utils/date';
+import type { ClientResource } from '@clerk/types';
 import { buildURL, getAllETLDs, getETLDPlusOne } from 'utils';
+
 import { clientCookie } from './client';
+import { clientUatCookie } from './client_uat';
 import { inittedCookie } from './initted';
 import { sessionCookie } from './session';
-import { clientUatCookie } from './client_uat';
-
-import type { ClientResource } from '@clerk/types';
 
 const COOKIE_PATH = '/';
 export type CookieHandler = ReturnType<typeof createCookieHandler>;

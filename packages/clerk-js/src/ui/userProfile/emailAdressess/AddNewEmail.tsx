@@ -1,20 +1,20 @@
-import React from 'react';
-import { useCoreUser, useEnvironment } from 'ui/contexts';
-import { PageHeading } from 'ui/userProfile/pageHeading';
-import { Error } from 'ui/common/error';
-import { TitledCard } from '@clerk/shared/components/titledCard';
-import { Form } from '@clerk/shared/components/form';
-import { InputWithIcon } from '@clerk/shared/components/input';
-import { Control } from '@clerk/shared/components/control';
-import { handleError, useFieldState } from 'ui/common';
-import { EmailAddressResource } from '@clerk/types';
-import { useNavigate } from 'ui/hooks';
-import { Button } from '@clerk/shared/components/button';
-import { EmailAddressVerificationWithMagicLink } from 'ui/userProfile/emailAdressess/EmailAddressVerificationWithMagicLink';
-import { EmailAddressVerificationWithOTP } from 'ui/userProfile/emailAdressess/EmailAddressVerificationWithOTP';
 // @ts-ignore
 import { default as MailIcon } from '@clerk/shared/assets/icons/mail.svg';
+import { Button } from '@clerk/shared/components/button';
+import { Control } from '@clerk/shared/components/control';
+import { Form } from '@clerk/shared/components/form';
+import { InputWithIcon } from '@clerk/shared/components/input';
+import { TitledCard } from '@clerk/shared/components/titledCard';
+import { EmailAddressResource } from '@clerk/types';
+import React from 'react';
+import { handleError, useFieldState } from 'ui/common';
+import { Error } from 'ui/common/error';
+import { useCoreUser, useEnvironment } from 'ui/contexts';
+import { useNavigate } from 'ui/hooks';
+import { EmailAddressVerificationWithMagicLink } from 'ui/userProfile/emailAdressess/EmailAddressVerificationWithMagicLink';
+import { EmailAddressVerificationWithOTP } from 'ui/userProfile/emailAdressess/EmailAddressVerificationWithOTP';
 import { magicLinksEnabledForInstance } from 'ui/userProfile/emailAdressess/utils';
+import { PageHeading } from 'ui/userProfile/pageHeading';
 
 enum Step {
   EnterEmailAddress = 0,

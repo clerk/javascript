@@ -1,11 +1,3 @@
-import { inBrowser, isConstructor, loadScript } from './utils';
-import { noFrontendApiError } from './errors';
-import type {
-  BrowserClerk,
-  BrowserClerkConstructor,
-  ClerkProp,
-  IsomorphicClerkOptions,
-} from './types';
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
@@ -22,6 +14,15 @@ import type {
   UserProfileProps,
   UserResource,
 } from '@clerk/types';
+
+import { noFrontendApiError } from './errors';
+import type {
+  BrowserClerk,
+  BrowserClerkConstructor,
+  ClerkProp,
+  IsomorphicClerkOptions,
+} from './types';
+import { inBrowser, isConstructor, loadScript } from './utils';
 
 export interface Global {
   Clerk?: BrowserClerk;

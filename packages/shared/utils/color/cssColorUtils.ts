@@ -1,3 +1,5 @@
+import { Color, HslaColor, RgbaColor,TransparentColor } from '@clerk/types';
+
 import {
   isHSLColor,
   isRGBColor,
@@ -6,7 +8,6 @@ import {
   isValidHslaString,
   isValidRgbaString,
 } from './predicates';
-import { Color, HslaColor, TransparentColor, RgbaColor } from '@clerk/types';
 
 const CLEAN_HSLA_REGEX = /[hsla()]/g;
 const CLEAN_RGBA_REGEX = /[rgba()]/g;

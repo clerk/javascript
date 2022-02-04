@@ -1,9 +1,9 @@
-import React from 'react';
-import { Error } from 'ui/common/error';
-import { Logo } from 'ui/common';
 import { Label } from '@clerk/shared/components/label';
-import { BackButton } from 'ui/common/backButton';
 import cn from 'classnames';
+import React from 'react';
+import { Logo } from 'ui/common';
+import { BackButton } from 'ui/common/backButton';
+import { Error } from 'ui/common/error';
 
 export type HeaderProps = {
   showBack?: boolean;

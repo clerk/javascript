@@ -1,10 +1,10 @@
-import { BaseResource } from 'core/resources/Base';
 import type {
   SessionActivity,
   SessionActivityJSON,
   SessionWithActivitiesJSON,
   SessionWithActivitiesResource,
 } from '@clerk/types';
+import { BaseResource } from 'core/resources/Base';
 import { unixEpochToDate } from 'utils/date';
 
 const mapSessionActivityJSONToSessionActivity = (

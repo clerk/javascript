@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
+
+import { useLocalStorage } from '../../hooks';
+import { Dropdown, DropdownOption, DropdownSelection } from '../dropdown';
+import { DropdownComparator } from '../dropdown/types';
+import { Input, InputProps } from '../input';
+import { CountryEntry, IsoToCountryMap } from './countryCodeData';
 // @ts-ignore
 import styles from './PhoneInput.module.scss';
-import { Input, InputProps } from '../input';
-import { Dropdown, DropdownOption, DropdownSelection } from '../dropdown';
-import { CountryEntry, IsoToCountryMap } from './countryCodeData';
-import { useLocalStorage } from '../../hooks';
 import {
   extractDigits,
   formatPhoneNumber,
   getFlagEmojiFromCountryIso,
 } from './utils';
-import { DropdownComparator } from '../dropdown/types';
 
 export type PhoneInputProps = InputProps & {
   handlePhoneChange: (phoneWithCode: string) => any;

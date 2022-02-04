@@ -1,6 +1,6 @@
+import { render, renderJSON } from '@clerk/shared/testUtils';
 import { SessionActivity } from '@clerk/types';
 import * as React from 'react';
-import { render, renderJSON } from '@clerk/shared/testUtils';
 import { ActivityIcon } from 'ui/userProfile/security/DevicesAndActivity/ActivityIcon';
 
 describe('<ActivityIcon/>', () => {

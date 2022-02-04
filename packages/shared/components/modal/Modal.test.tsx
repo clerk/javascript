@@ -1,5 +1,6 @@
+import { fireEvent,render, screen } from '@clerk/shared/testUtils';
 import * as React from 'react';
-import { render, screen, fireEvent } from '@clerk/shared/testUtils';
+
 import { Modal } from './Modal';
 
 describe('<Modal/>', () => {

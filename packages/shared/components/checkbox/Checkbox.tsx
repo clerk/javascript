@@ -1,9 +1,10 @@
-import React from 'react';
 import cn from 'classnames';
+import React from 'react';
+
+import { CheckmarkIcon } from '../../assets/icons';
 import { useInput } from '../../hooks';
 // @ts-ignore
 import styles from './Checkbox.module.scss';
-import { CheckmarkIcon } from '../../assets/icons';
 
 export type CheckboxProps = {
   name?: string;

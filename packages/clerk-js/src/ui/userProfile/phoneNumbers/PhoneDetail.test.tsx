@@ -1,8 +1,9 @@
+import { render, renderJSON,screen, userEvent } from '@clerk/shared/testUtils';
 import { PhoneNumberResource } from '@clerk/types';
-import React from 'react';
-import { screen, render, userEvent, renderJSON } from '@clerk/shared/testUtils';
-import { PhoneDetail } from './PhoneDetail';
 import { ClerkAPIResponseError } from 'core/resources/Error';
+import React from 'react';
+
+import { PhoneDetail } from './PhoneDetail';
 
 const mockNavigate = jest.fn();
 jest.mock('ui/hooks', () => ({

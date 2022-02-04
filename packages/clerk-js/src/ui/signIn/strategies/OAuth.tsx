@@ -1,5 +1,5 @@
+import type { OAuthProvider, OAuthStrategy } from '@clerk/types';
 import React from 'react';
-import { useCoreSignIn, useEnvironment, useSignInContext } from 'ui/contexts';
 import {
   buildSSOCallbackURL,
   ButtonSet,
@@ -7,7 +7,7 @@ import {
   getOAuthProviderData,
   handleError,
 } from 'ui/common';
-import type { OAuthProvider, OAuthStrategy } from '@clerk/types';
+import { useCoreSignIn, useEnvironment, useSignInContext } from 'ui/contexts';
 
 export type OauthProps = {
   oauthOptions: OAuthStrategy[];

@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { multipleChildrenInButtonComponent } from '../errors';
 
 export const assertSingleChild = (children: React.ReactNode) => (

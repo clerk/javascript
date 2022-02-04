@@ -1,4 +1,3 @@
-import * as React from 'react';
 import {
   act,
   render,
@@ -6,6 +5,8 @@ import {
   screen,
   userEvent,
 } from '@clerk/shared/testUtils';
+import * as React from 'react';
+
 import { ButtonWithTimer } from './ButtonWithTimer';
 
 describe('<ButtonWithTimer/>', () => {

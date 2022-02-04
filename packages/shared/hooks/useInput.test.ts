@@ -1,4 +1,5 @@
 import { renderHook } from '@clerk/shared/testUtils';
+
 import { useInput } from './useInput';
 
 describe('useInput(callback)', () => {

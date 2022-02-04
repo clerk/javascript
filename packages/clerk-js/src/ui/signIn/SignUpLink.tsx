@@ -1,6 +1,6 @@
 import React from 'react';
-import { Link } from 'ui/router';
 import { useSignInContext } from 'ui/contexts';
+import { Link } from 'ui/router';
 
 export function SignUpLink(): JSX.Element {
   const { signUpUrl } = useSignInContext();

@@ -1,6 +1,7 @@
+import { renderJSON } from '@clerk/shared/testUtils';
 import type { SvgrComponent } from 'assets/icons/svg';
 import * as React from 'react';
-import { renderJSON } from '@clerk/shared/testUtils';
+
 import { ExpansionIcon } from './ExpansionIcon';
 
 describe('<ExpansionIcon />', () => {

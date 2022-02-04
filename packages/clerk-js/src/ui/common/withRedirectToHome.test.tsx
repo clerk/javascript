@@ -1,9 +1,10 @@
-import React from 'react';
 import { render, screen } from '@clerk/shared/testUtils';
-import { withRedirectToHome } from './withRedirectToHome';
-import { AuthConfig } from 'core/resources/AuthConfig';
 import { EnvironmentResource } from '@clerk/types';
+import { AuthConfig } from 'core/resources/AuthConfig';
+import React from 'react';
 import { useCoreSession, useEnvironment } from 'ui/contexts';
+
+import { withRedirectToHome } from './withRedirectToHome';
 
 const mockNavigate = jest.fn();
 jest.mock('ui/hooks', () => ({

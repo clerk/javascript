@@ -1,15 +1,15 @@
+import { Button } from '@clerk/shared/components/button';
+import { PhoneViewer } from '@clerk/shared/components/phoneInput';
+import { Radio } from '@clerk/shared/components/radio';
+import { TitledCard } from '@clerk/shared/components/titledCard';
+import { PhoneNumberResource } from '@clerk/types';
 import React from 'react';
-import { useNavigate } from 'ui/hooks';
-import { Link } from 'ui/router';
 import { handleError } from 'ui/common';
 import { Error } from 'ui/common/error';
 import { useCoreUser } from 'ui/contexts';
+import { useNavigate } from 'ui/hooks';
+import { Link } from 'ui/router';
 import { PageHeading } from 'ui/userProfile/pageHeading';
-import { Button } from '@clerk/shared/components/button';
-import { TitledCard } from '@clerk/shared/components/titledCard';
-import { PhoneViewer } from '@clerk/shared/components/phoneInput';
-import { Radio } from '@clerk/shared/components/radio';
-import { PhoneNumberResource } from '@clerk/types';
 
 // This is a temp workaround to make the standalone version
 // of the security pages (<UserProfile only='security'/>) to work correctly

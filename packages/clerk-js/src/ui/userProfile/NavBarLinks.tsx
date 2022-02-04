@@ -1,9 +1,9 @@
-import React from 'react';
-import { Link, LinkProps } from 'ui/router';
 // @ts-ignore
 import { default as ShieldIcon } from '@clerk/shared/assets/icons/shield.svg';
 // @ts-ignore
 import { default as UserIcon } from '@clerk/shared/assets/icons/user.svg';
+import React from 'react';
+import { Link, LinkProps } from 'ui/router';
 
 export interface NavbarLinkOptions {
   icon: JSX.Element;

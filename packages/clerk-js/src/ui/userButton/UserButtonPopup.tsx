@@ -1,4 +1,6 @@
+import { Avatar } from '@clerk/shared/components/avatar';
 import React from 'react';
+import { ActiveAccountsManager } from 'ui/common/activeAccountsManager/ActiveAccountsManager';
 import {
   useCoreSession,
   useCoreSessionList,
@@ -6,8 +8,7 @@ import {
   useUserButtonContext,
   withCoreUserGuard,
 } from 'ui/contexts';
-import { ActiveAccountsManager } from 'ui/common/activeAccountsManager/ActiveAccountsManager';
-import { Avatar } from '@clerk/shared/components/avatar';
+
 import { Salutation } from './Salutation';
 
 function UserButtonPopupBase(): JSX.Element | null {

@@ -1,12 +1,13 @@
 import { UserResource } from '@clerk/types';
 import React, { useContext } from 'react';
-import { StructureContext, StructureContextStates } from './StructureContext';
+
 import { hocChildrenNotAFunctionError } from '../errors';
 import { inBrowser } from '../utils';
 import {
   assertUserGuarantee,
   assertWrappedByClerkProvider,
 } from './assertHelpers';
+import { StructureContext, StructureContextStates } from './StructureContext';
 
 type UserTypes = UserResource | null | undefined;
 type UserContextValue = { value: UserTypes };

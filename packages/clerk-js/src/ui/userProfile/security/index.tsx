@@ -1,11 +1,12 @@
-import { Route } from 'ui/router';
 import React from 'react';
-import { ChangePassword } from './ChangePassword';
+import { useEnvironment } from 'ui/contexts';
+import { Route } from 'ui/router';
+import { AddNewPhone } from 'ui/userProfile/phoneNumbers/AddNewPhone';
+
 import { AddPhone } from './AddPhone';
+import { ChangePassword } from './ChangePassword';
 import { Security } from './Security';
 import { TwoStepVerification } from './TwoStepVerification';
-import { AddNewPhone } from 'ui/userProfile/phoneNumbers/AddNewPhone';
-import { useEnvironment } from 'ui/contexts';
 
 export { AddPhone, ChangePassword, TwoStepVerification, Security };
 

@@ -1,12 +1,13 @@
-import { BaseResource } from './Base';
-import { Verification } from './Verification';
-import { IdentificationLink } from './IdentificationLink';
 import type {
   IdentificationLinkResource,
   PhoneNumberJSON,
   PhoneNumberResource,
   VerificationResource,
 } from '@clerk/types';
+
+import { BaseResource } from './Base';
+import { IdentificationLink } from './IdentificationLink';
+import { Verification } from './Verification';
 
 export class PhoneNumber extends BaseResource implements PhoneNumberResource {
   id!: string;

@@ -1,8 +1,9 @@
-import React from 'react';
 import cn from 'classnames';
+import React from 'react';
+
+import { titleize } from '../../utils';
 // @ts-ignore
 import styles from './Tag.module.scss';
-import { titleize } from '../../utils';
 
 export type TagProps = React.PropsWithChildren<{
   color: 'primary' | 'warning' | 'success' | 'error';

@@ -1,9 +1,9 @@
-import React from 'react';
 import { render } from '@clerk/shared/testUtils';
-import { AuthConfig } from 'core/resources/AuthConfig';
-import { SignIn } from 'ui/signIn/SignIn';
-import { Session } from 'core/resources/Session';
 import { EnvironmentResource } from '@clerk/types';
+import { AuthConfig } from 'core/resources/AuthConfig';
+import { Session } from 'core/resources/Session';
+import React from 'react';
+import { SignIn } from 'ui/signIn/SignIn';
 
 const mockNavigate = jest.fn();
 

@@ -1,6 +1,7 @@
+import { renderJSON } from '@clerk/shared/testUtils';
 import { UserResource } from '@clerk/types';
 import React from 'react';
-import { renderJSON } from '@clerk/shared/testUtils';
+
 import { Salutation } from './Salutation';
 
 describe('Salutation', () => {

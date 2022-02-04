@@ -1,5 +1,5 @@
-import React from 'react';
 import type { ParsedQs } from 'qs';
+import React from 'react';
 
 export interface RouteContextValue {
   fullPath: string;

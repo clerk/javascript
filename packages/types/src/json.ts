@@ -3,6 +3,7 @@
  */
 
 import { ToggleType, ToggleTypeWithRequire } from './authConfig';
+import { EmailAddressVerificationStrategy } from './emailAddress';
 import { OAuthStrategy } from './oauth';
 import { SessionStatus } from './session';
 import {
@@ -24,7 +25,6 @@ import {
   HexColor,
 } from './theme';
 import { VerificationStatus } from './verification';
-import { EmailAddressVerificationStrategy } from './emailAddress';
 
 export interface ClerkResourceJSON {
   // TODO: Shall we make this optional?

@@ -1,5 +1,6 @@
+import { render, screen, userEvent,waitFor } from '@clerk/shared/testUtils';
 import * as React from 'react';
-import { screen, render, waitFor, userEvent } from '@clerk/shared/testUtils';
+
 import { Checkbox } from './Checkbox';
 
 describe('<Checkbox/>', () => {

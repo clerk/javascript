@@ -1,29 +1,5 @@
-import packageJSON from '../../package.json';
-import {
-  appendAsQueryParams,
-  CLERK_BEFORE_UNLOAD_EVENT,
-  ignoreEventValue,
-  isAccountsHostedPages,
-  isDevOrStagingUrl,
-  isError,
-  isReactNative,
-  stripOrigin,
-  validateFrontendApi,
-  windowNavigate,
-} from 'utils';
-import {
-  clerkErrorInitFailed,
-  clerkErrorInvalidFrontendApi,
-  clerkErrorNoFrontendApi,
-  clerkOAuthCallbackDidNotCompleteSignInSIgnUp,
-} from './errors';
-import { Client } from 'core/resources/Client';
-import { Environment } from 'core/resources/Environment';
 import { LocalStorageBroadcastChannel } from '@clerk/shared/utils/localStorageBroadcastChannel';
 import { noop } from '@clerk/shared/utils/noop';
-import { memoizeListenerCallback } from 'utils/memoizeStateListenerCallback';
-import { getClerkQueryParam } from 'utils/getClerkQueryParam';
-import type Components from '../ui';
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
@@ -47,17 +23,42 @@ import type {
   UserProfileProps,
   UserResource,
 } from '@clerk/types';
+import { Client } from 'core/resources/Client';
+import { Environment } from 'core/resources/Environment';
+import { MagicLinkError, MagicLinkErrorCode } from 'core/resources/Error';
+import { AuthenticationService } from 'core/services';
+import { ERROR_CODES } from 'ui/common/constants';
+import {
+  appendAsQueryParams,
+  CLERK_BEFORE_UNLOAD_EVENT,
+  ignoreEventValue,
+  isAccountsHostedPages,
+  isDevOrStagingUrl,
+  isError,
+  isReactNative,
+  stripOrigin,
+  validateFrontendApi,
+  windowNavigate,
+} from 'utils';
+import { getClerkQueryParam } from 'utils/getClerkQueryParam';
+import { memoizeListenerCallback } from 'utils/memoizeStateListenerCallback';
+
+import packageJSON from '../../package.json';
+import type Components from '../ui';
+import createDevBrowserHandler, {
+  DevBrowserHandler,
+} from './devBrowserHandler';
+import {
+  clerkErrorInitFailed,
+  clerkErrorInvalidFrontendApi,
+  clerkErrorNoFrontendApi,
+  clerkOAuthCallbackDidNotCompleteSignInSIgnUp,
+} from './errors';
 import createFapiClient, {
   FapiClient,
   FapiRequestCallback,
 } from './fapiClient';
 import { BaseResource } from './resources/Base';
-import createDevBrowserHandler, {
-  DevBrowserHandler,
-} from './devBrowserHandler';
-import { AuthenticationService } from 'core/services';
-import { MagicLinkError, MagicLinkErrorCode } from 'core/resources/Error';
-import { ERROR_CODES } from 'ui/common/constants';
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 

@@ -1,5 +1,6 @@
-import React from 'react';
 import { renderJSON } from '@clerk/shared/testUtils';
+import React from 'react';
+
 import { SignUpLink } from './SignUpLink';
 
 jest.mock('ui/contexts/ClerkUIComponentsContext', () => ({

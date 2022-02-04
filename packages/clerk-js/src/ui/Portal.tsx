@@ -1,8 +1,8 @@
+import { clerkErrorPathRouterMissingPath } from 'core/errors';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { HashRouter, PathRouter } from 'ui/router';
 import { ComponentContext, ComponentContextValue } from 'ui/contexts';
-import { clerkErrorPathRouterMissingPath } from 'core/errors';
+import { HashRouter, PathRouter } from 'ui/router';
 
 type PortalProps<
   CtxType extends ComponentContextValue,

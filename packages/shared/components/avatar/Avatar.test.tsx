@@ -1,7 +1,8 @@
-import * as React from 'react';
 import { render, renderJSON, screen } from '@clerk/shared/testUtils';
-import { Avatar } from './Avatar';
 import { fireEvent } from '@testing-library/dom';
+import * as React from 'react';
+
+import { Avatar } from './Avatar';
 
 describe('<Avatar/>', () => {
   it('renders the image ', () => {

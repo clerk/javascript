@@ -1,6 +1,18 @@
+// @ts-ignore
+import { default as BinIcon } from '@clerk/shared/assets/icons/bin.svg';
+// @ts-ignore
+import { default as PhoneIcon } from '@clerk/shared/assets/icons/phone.svg';
+import { Button } from '@clerk/shared/components/button';
+import { List } from '@clerk/shared/components/list';
+import {
+  OneTimeCodeInput,
+  VerifyCodeHandler,
+} from '@clerk/shared/components/oneTimeCodeInput';
+import { PhoneViewer } from '@clerk/shared/components/phoneInput';
+import { VerificationStatusTag } from '@clerk/shared/components/tag';
+import { TitledCard } from '@clerk/shared/components/titledCard';
+import { Toggle } from '@clerk/shared/components/toggle';
 import React from 'react';
-import { useNavigate } from 'ui/hooks';
-import { useRouter } from 'ui/router';
 import {
   handleError,
   useFieldState,
@@ -8,22 +20,11 @@ import {
 } from 'ui/common';
 import { Error } from 'ui/common/error';
 import { useCoreUser } from 'ui/contexts';
-import { EditableListFieldRemoveCard } from '../EditableListFieldRemoveCard';
+import { useNavigate } from 'ui/hooks';
+import { useRouter } from 'ui/router';
 import { PageHeading } from 'ui/userProfile/pageHeading';
-import { Button } from '@clerk/shared/components/button';
-import { VerificationStatusTag } from '@clerk/shared/components/tag';
-import { List } from '@clerk/shared/components/list';
-import { TitledCard } from '@clerk/shared/components/titledCard';
-import { Toggle } from '@clerk/shared/components/toggle';
-import {
-  OneTimeCodeInput,
-  VerifyCodeHandler,
-} from '@clerk/shared/components/oneTimeCodeInput';
-import { PhoneViewer } from '@clerk/shared/components/phoneInput';
-// @ts-ignore
-import { default as BinIcon } from '@clerk/shared/assets/icons/bin.svg';
-// @ts-ignore
-import { default as PhoneIcon } from '@clerk/shared/assets/icons/phone.svg';
+
+import { EditableListFieldRemoveCard } from '../EditableListFieldRemoveCard';
 import { PrimaryTag } from '../util';
 
 export const PhoneDetail = (): JSX.Element => {

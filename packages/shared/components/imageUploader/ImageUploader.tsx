@@ -1,12 +1,13 @@
+import cn from 'classnames';
 import React from 'react';
+
 import { CameraIcon } from '../../assets/icons';
-import { Modal } from '../modal';
-import { TitledCard } from '../titledCard';
+import { toSentence } from '../../utils/array';
+import { extension, SupportedMimeType } from '../../utils/mimeTypeExtensions';
 import { Button } from '../button';
 import { FileDropArea } from '../fileDropArea';
-import cn from 'classnames';
-import { extension, SupportedMimeType } from '../../utils/mimeTypeExtensions';
-import { toSentence } from '../../utils/array';
+import { Modal } from '../modal';
+import { TitledCard } from '../titledCard';
 //@ts-ignore
 import styles from './ImageUploader.module.scss';
 

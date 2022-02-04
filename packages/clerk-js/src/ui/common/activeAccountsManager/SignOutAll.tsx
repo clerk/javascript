@@ -1,7 +1,7 @@
-import React from 'react';
-import { Button } from '@clerk/shared/components/button';
 // @ts-ignore
 import { default as SignOutIcon } from '@clerk/shared/assets/icons/sign-out.svg';
+import { Button } from '@clerk/shared/components/button';
+import React from 'react';
 
 type SignOutAllProps = {
   handleSignOutAll: () => void;

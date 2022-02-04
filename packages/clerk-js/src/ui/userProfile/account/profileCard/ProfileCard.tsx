@@ -1,14 +1,15 @@
-import React from 'react';
-import { TitledCard } from '@clerk/shared/components/titledCard';
-import { useEnvironment, useCoreUser } from 'ui/contexts';
 import { List } from '@clerk/shared/components/list';
-import { useNavigate } from 'ui/hooks';
+import { TitledCard } from '@clerk/shared/components/titledCard';
+import type { UserResource } from '@clerk/types';
+import { ExternalAccountResource } from '@clerk/types';
+import React from 'react';
 import { svgUrl } from 'ui/common/constants';
+import { useCoreUser,useEnvironment } from 'ui/contexts';
+import { useNavigate } from 'ui/hooks';
+
 import { AvatarWithUploader } from '../avatarWithUploader';
 import { ProfileEmailAddresses } from './ProfileEmailAddresses';
 import { ProfilePhoneNumbers } from './ProfilePhoneNumbers';
-import { ExternalAccountResource } from '@clerk/types';
-import type { UserResource } from '@clerk/types';
 
 // Since only Metamask wallet is supported for now, we assume that the user has only
 // one Web3 wallet address. When we add support for more wallets, this logic should be

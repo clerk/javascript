@@ -1,9 +1,9 @@
-import React from 'react';
 import cn from 'classnames';
-import type { DropdownOption } from './types';
+import React from 'react';
 
 // @ts-ignore
 import styles from './DropdownList.module.scss';
+import type { DropdownOption } from './types';
 import { getOptionLabel } from './util';
 
 const NoResultsItem = () => (

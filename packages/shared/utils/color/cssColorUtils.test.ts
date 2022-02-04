@@ -1,10 +1,11 @@
+import { Color } from 'react-color';
+
 import {
   colorToSameTypeString,
   hexStringToRgbaColor,
   stringToHslaColor,
   stringToSameTypeColor,
 } from './cssColorUtils';
-import { Color } from 'react-color';
 
 describe('stringToHslaColor(color)', function () {
   const hsla = { h: 195, s: 1, l: 0.5 };

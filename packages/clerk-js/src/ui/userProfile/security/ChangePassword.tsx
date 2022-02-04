@@ -1,13 +1,13 @@
-import React from 'react';
-import { TitledCard } from '@clerk/shared/components/titledCard';
-import { useEnvironment, useCoreUser } from 'ui/contexts';
-import { useNavigate } from 'ui/hooks';
-import { handleError, useFieldState } from 'ui/common';
-import { Error } from 'ui/common/error';
-import { PageHeading } from 'ui/userProfile/pageHeading';
+import { Control } from '@clerk/shared/components/control';
 import { Form } from '@clerk/shared/components/form';
 import { Input } from '@clerk/shared/components/input';
-import { Control } from '@clerk/shared/components/control';
+import { TitledCard } from '@clerk/shared/components/titledCard';
+import React from 'react';
+import { handleError, useFieldState } from 'ui/common';
+import { Error } from 'ui/common/error';
+import { useCoreUser,useEnvironment } from 'ui/contexts';
+import { useNavigate } from 'ui/hooks';
+import { PageHeading } from 'ui/userProfile/pageHeading';
 
 export function ChangePassword(): JSX.Element {
   const user = useCoreUser();

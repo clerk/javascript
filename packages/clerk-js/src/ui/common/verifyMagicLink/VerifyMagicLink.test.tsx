@@ -1,8 +1,8 @@
+import { render, renderJSON, screen, waitFor } from '@clerk/shared/testUtils';
+import { MagicLinkError, MagicLinkErrorCode } from 'core/resources/Error';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { render, renderJSON, screen, waitFor } from '@clerk/shared/testUtils';
 import { VerifyMagicLink } from 'ui/common';
-import { MagicLinkError, MagicLinkErrorCode } from 'core/resources/Error';
 
 const mockHandleMagicLinkVerification = jest.fn();
 

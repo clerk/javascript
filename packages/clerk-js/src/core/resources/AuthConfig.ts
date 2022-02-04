@@ -1,4 +1,3 @@
-import { BaseResource } from './Base';
 import type {
   AuthConfigJSON,
   AuthConfigResource,
@@ -8,6 +7,8 @@ import type {
   ToggleType,
   ToggleTypeWithRequire,
 } from '@clerk/types';
+
+import { BaseResource } from './Base';
 
 export class AuthConfig extends BaseResource implements AuthConfigResource {
   id!: string;

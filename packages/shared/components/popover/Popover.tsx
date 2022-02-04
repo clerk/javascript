@@ -1,9 +1,9 @@
-import React from 'react';
 import cn from 'classnames';
+import React from 'react';
 import { usePopper } from 'react-popper';
+
 import { MoreVerticalIcon } from '../../assets/icons';
 import { useDetectClickOutside } from '../../hooks';
-
 // @ts-ignore
 import styles from './Popover.module.scss';
 

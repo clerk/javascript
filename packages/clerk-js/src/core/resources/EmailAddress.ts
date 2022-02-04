@@ -1,17 +1,18 @@
-import { BaseResource } from './Base';
-import { Verification } from './Verification';
-import { IdentificationLink } from './IdentificationLink';
+import { Poller } from '@clerk/shared/utils/poller';
 import type {
+  CreateMagicLinkFlowReturn,
   EmailAddressJSON,
   EmailAddressResource,
   IdentificationLinkResource,
   PrepareEmailAddressVerificationParams,
-  VerificationResource,
   StartMagicLinkFlowParams,
-  CreateMagicLinkFlowReturn,
+  VerificationResource,
 } from '@clerk/types';
 import { clerkVerifyEmailAddressCalledBeforeCreate } from 'core/errors';
-import { Poller } from '@clerk/shared/utils/poller';
+
+import { BaseResource } from './Base';
+import { IdentificationLink } from './IdentificationLink';
+import { Verification } from './Verification';
 
 export class EmailAddress extends BaseResource implements EmailAddressResource {
   id!: string;

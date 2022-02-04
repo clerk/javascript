@@ -1,7 +1,8 @@
+import { renderJSON } from '@clerk/shared/testUtils';
 import { UserResource } from '@clerk/types';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { renderJSON } from '@clerk/shared/testUtils';
+
 import { UserButton } from './UserButton';
 
 jest.mock('ui/contexts', () => {

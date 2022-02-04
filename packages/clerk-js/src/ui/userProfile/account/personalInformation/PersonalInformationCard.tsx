@@ -1,9 +1,8 @@
+import { List } from '@clerk/shared/components/list';
+import { TitledCard } from '@clerk/shared/components/titledCard';
 import React from 'react';
 import { useCoreUser } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
-import { List } from '@clerk/shared/components/list';
-
-import { TitledCard } from '@clerk/shared/components/titledCard';
 
 export const PersonalInformationCard = (): JSX.Element => {
   const user = useCoreUser();

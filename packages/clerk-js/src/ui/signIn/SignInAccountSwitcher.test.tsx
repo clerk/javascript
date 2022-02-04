@@ -1,7 +1,8 @@
-import React from 'react';
 import { renderJSON } from '@clerk/shared/testUtils';
-import { SignInAccountSwitcher } from './SignInAccountSwitcher';
 import { Session } from 'core/resources';
+import React from 'react';
+
+import { SignInAccountSwitcher } from './SignInAccountSwitcher';
 
 const navigateMock = jest.fn();
 const mockCreateRequest = jest.fn();

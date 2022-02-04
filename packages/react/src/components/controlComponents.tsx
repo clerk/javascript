@@ -1,8 +1,9 @@
+import { HandleOAuthCallbackParams } from '@clerk/types';
 import React from 'react';
-import type { RedirectToProps, WithClerkProp } from '../types';
+
 import { withClerk, withUser } from '../contexts';
 import { useUserContext } from '../contexts/UserContext';
-import { HandleOAuthCallbackParams } from '@clerk/types';
+import type { RedirectToProps, WithClerkProp } from '../types';
 
 export const SignedIn: React.FC = withUser(({ children }) => {
   return <>{children}</>;

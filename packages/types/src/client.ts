@@ -1,7 +1,7 @@
 import { ClerkResource } from './resource';
 import { ActiveSessionResource, SessionResource } from './session';
-import { SignUpResource } from './signUp';
 import { SignInResource } from './signIn';
+import { SignUpResource } from './signUp';
 
 export interface ClientResource extends ClerkResource {
   sessions: SessionResource[];

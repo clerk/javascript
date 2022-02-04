@@ -1,5 +1,3 @@
-import React from 'react';
-import { ClerkAPIResponseError } from 'core/resources/Error';
 import {
   mocked,
   render,
@@ -8,10 +6,13 @@ import {
   userEvent,
   waitFor,
 } from '@clerk/shared/testUtils';
-import { SignInStart } from './SignInStart';
 import { titleize } from '@clerk/shared/utils/string';
-import { useCoreSignIn } from 'ui/contexts';
 import { EnvironmentResource, SignInResource } from '@clerk/types';
+import { ClerkAPIResponseError } from 'core/resources/Error';
+import React from 'react';
+import { useCoreSignIn } from 'ui/contexts';
+
+import { SignInStart } from './SignInStart';
 
 const mockNavigate = jest.fn();
 const mockCreateRequest = jest.fn();

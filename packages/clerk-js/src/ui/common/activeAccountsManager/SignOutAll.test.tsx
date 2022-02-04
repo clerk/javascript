@@ -1,7 +1,8 @@
-import React from 'react';
-import SignOutAll from './SignOutAll';
-import { renderJSON, render } from '@clerk/shared/testUtils';
+import { render,renderJSON } from '@clerk/shared/testUtils';
 import { fireEvent } from '@testing-library/react';
+import React from 'react';
+
+import SignOutAll from './SignOutAll';
 
 describe('SignOutAll', () => {
   it('renders correctly', () => {

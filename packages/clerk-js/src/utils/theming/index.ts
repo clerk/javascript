@@ -1,5 +1,6 @@
 import { DeepPartial, DisplayThemeJSON } from '@clerk/types';
 import deepmerge from 'deepmerge';
+
 import { injectCSSProperties } from './injectCSSProperties';
 import { loadFonts } from './loadFonts';
 

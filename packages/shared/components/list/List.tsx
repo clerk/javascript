@@ -1,8 +1,9 @@
-import React from 'react';
 import cn from 'classnames';
+import React from 'react';
+
+import { ArrowRightIcon } from '../../assets/icons';
 // @ts-ignore
 import styles from './List.module.scss';
-import { ArrowRightIcon } from '../../assets/icons';
 
 export type ListProps = React.PropsWithChildren<{
   className?: string;

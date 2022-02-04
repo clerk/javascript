@@ -1,6 +1,7 @@
-import React from 'react';
-import { ImageUploader } from './ImageUploader';
 import { renderJSON } from '@clerk/shared/testUtils';
+import React from 'react';
+
+import { ImageUploader } from './ImageUploader';
 
 describe('ImageUploader', () => {
   it('renders correctly', () => {

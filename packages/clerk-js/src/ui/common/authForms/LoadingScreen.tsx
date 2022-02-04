@@ -1,6 +1,6 @@
+import { Spinner } from '@clerk/shared/components/spinner';
 import React from 'react';
 import { Body, Header } from 'ui/common/authForms';
-import { Spinner } from '@clerk/shared/components/spinner';
 
 type LoadingScreenProps = {
   showHeader?: boolean;

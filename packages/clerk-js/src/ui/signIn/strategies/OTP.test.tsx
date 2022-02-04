@@ -1,7 +1,8 @@
+import { noop, render, renderJSON, waitFor } from '@clerk/shared/testUtils';
 import { SignInFactor } from '@clerk/types';
 import React from 'react';
-import { noop, render, renderJSON, waitFor } from '@clerk/shared/testUtils';
 import { FieldState } from 'ui/common';
+
 import { OTP } from './OTP';
 
 jest.mock('ui/contexts', () => {

@@ -1,14 +1,15 @@
-import React from 'react';
-import { noop, renderJSON, render } from '@clerk/shared/testUtils';
-import {
-  SignUpVerifyEmailAddress,
-  SignUpVerifyPhoneNumber,
-} from './SignUpVerify';
+import { noop, render,renderJSON } from '@clerk/shared/testUtils';
 import {
   SessionResource,
   SignInStrategyName,
   SignUpResource,
 } from '@clerk/types';
+import React from 'react';
+
+import {
+  SignUpVerifyEmailAddress,
+  SignUpVerifyPhoneNumber,
+} from './SignUpVerify';
 
 const navigateMock = jest.fn();
 const mockSetSession = jest.fn();

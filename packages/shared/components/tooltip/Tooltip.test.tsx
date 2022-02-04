@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   act,
   render,
@@ -6,6 +5,8 @@ import {
   userEvent,
   waitFor,
 } from '@clerk/shared/testUtils';
+import React from 'react';
+
 import { Tooltip } from './Tooltip';
 
 describe('<Tooltip/>', () => {

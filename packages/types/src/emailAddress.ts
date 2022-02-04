@@ -1,9 +1,9 @@
 import { IdentificationLinkResource } from './identificationLink';
 import { ClerkResource } from './resource';
 import {
-  VerificationResource,
-  StartMagicLinkFlowParams,
   CreateMagicLinkFlowReturn,
+  StartMagicLinkFlowParams,
+  VerificationResource,
 } from './verification';
 
 export type EmailAddressVerificationStrategy = 'email_code' | 'email_link';

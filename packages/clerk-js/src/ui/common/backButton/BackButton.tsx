@@ -1,9 +1,9 @@
-import React from 'react';
-import cn from 'classnames';
-import { Link } from 'ui/router';
-import { Icon } from 'ui/common/icon';
 // @ts-ignore
 import { default as ArrowLeftIcon } from '@clerk/shared/assets/icons/arrow-left.svg';
+import cn from 'classnames';
+import React from 'react';
+import { Icon } from 'ui/common/icon';
+import { Link } from 'ui/router';
 
 export type BackButtonProps = {
   to?: string;

@@ -1,6 +1,7 @@
+import { renderJSON } from '@clerk/shared/testUtils';
 import { PhoneNumberResource, UserResource } from '@clerk/types';
 import * as React from 'react';
-import { renderJSON } from '@clerk/shared/testUtils';
+
 import { ActiveMethodsCard } from './ActiveMethodsCard';
 
 jest.mock('ui/contexts/CoreUserContext', () => {

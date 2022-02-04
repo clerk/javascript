@@ -1,4 +1,5 @@
 import { renderHook } from '@clerk/shared/testUtils';
+
 import { useMounted } from './useMounted';
 
 describe('useMounted()', () => {

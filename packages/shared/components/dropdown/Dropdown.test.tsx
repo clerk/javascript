@@ -1,4 +1,3 @@
-import * as React from 'react';
 import {
   act,
   fireEvent,
@@ -7,6 +6,8 @@ import {
   screen,
   userEvent,
 } from '@clerk/shared/testUtils';
+import * as React from 'react';
+
 import { Dropdown } from './Dropdown';
 import { DropdownComparator, DropdownOption } from './types';
 

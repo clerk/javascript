@@ -1,9 +1,10 @@
-import React from 'react';
 import type { Clerk, LoadedClerk, Resources } from '@clerk/types';
-import { assertClerkSingletonExists } from 'ui/contexts/utils';
+import React from 'react';
 import { CoreClientContext } from 'ui/contexts/CoreClientContext';
 import { CoreSessionContext } from 'ui/contexts/CoreSessionContext';
 import { CoreUserContext } from 'ui/contexts/CoreUserContext';
+import { assertClerkSingletonExists } from 'ui/contexts/utils';
+
 import { CoreClerkContext } from './CoreClerkContext';
 
 type CoreClerkContextWrapperProps = {

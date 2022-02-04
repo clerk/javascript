@@ -1,7 +1,7 @@
-import React from 'react';
 import { Tag } from '@clerk/shared/components/tag';
 import { formatRelative } from '@clerk/shared/utils/date';
 import { SessionActivity } from '@clerk/types';
+import React from 'react';
 
 export type ActivityDescriptionProps = {
   sessionActivity: SessionActivity;

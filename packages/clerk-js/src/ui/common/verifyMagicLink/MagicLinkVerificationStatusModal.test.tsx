@@ -1,6 +1,7 @@
+import { render, renderJSON, screen, waitFor } from '@clerk/shared/testUtils';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { render, renderJSON, screen, waitFor } from '@clerk/shared/testUtils';
+
 import { MagicLinkVerificationStatusModal } from './MagicLinkVerificationStatusModal';
 
 jest.mock('ui/contexts/EnvironmentContext', () => {

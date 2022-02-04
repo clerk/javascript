@@ -1,5 +1,6 @@
-import * as React from 'react';
 import { fireEvent, render, screen } from '@clerk/shared/testUtils';
+import * as React from 'react';
+
 import { Tabs } from './Tabs';
 
 describe('<Tabs/>', () => {

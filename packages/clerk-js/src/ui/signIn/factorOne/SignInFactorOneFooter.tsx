@@ -1,6 +1,6 @@
+import { Button } from '@clerk/shared/components/button';
 import React from 'react';
 import { Footer, PoweredByClerk } from 'ui/common';
-import { Button } from '@clerk/shared/components/button';
 
 type SignInFactorOneFooterProps = {
   handleAnotherMethodClicked: () => void;

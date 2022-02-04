@@ -1,7 +1,8 @@
-import React from 'react';
 import { renderJSON } from '@clerk/shared/testUtils';
-import { UserButtonPopup } from './UserButtonPopup';
 import { SessionResource, UserResource } from '@clerk/types';
+import React from 'react';
+
+import { UserButtonPopup } from './UserButtonPopup';
 
 const defaultSessions = [
   {

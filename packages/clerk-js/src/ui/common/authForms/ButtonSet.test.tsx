@@ -1,8 +1,9 @@
+import { render, renderJSON, screen } from '@clerk/shared/testUtils';
+import { titleize } from '@clerk/shared/utils/string';
 import userEvent from '@testing-library/user-event';
 import * as React from 'react';
-import { render, renderJSON, screen } from '@clerk/shared/testUtils';
+
 import { ButtonSet } from './ButtonSet';
-import { titleize } from '@clerk/shared/utils/string';
 
 function MockIcon() {
   return (

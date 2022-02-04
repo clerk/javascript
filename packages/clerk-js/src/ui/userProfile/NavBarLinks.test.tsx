@@ -1,5 +1,6 @@
-import * as React from 'react';
 import { renderJSON } from '@clerk/shared/testUtils';
+import * as React from 'react';
+
 import { DefaultNavBarLinks } from './NavBarLinks';
 
 jest.mock('ui/router/RouteContext');

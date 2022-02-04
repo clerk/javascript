@@ -1,19 +1,19 @@
+import { SignInProps } from '@clerk/types';
 import React from 'react';
-
-import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from 'ui/router';
+import { VerifyMagicLink } from 'ui/common';
+import { SSOCallback } from 'ui/common/SSOCallback';
 import {
   ComponentContext,
   useCoreClerk,
   useSignInContext,
   withCoreSessionSwitchGuard,
 } from 'ui/contexts';
-import { VerifyMagicLink } from 'ui/common';
+import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from 'ui/router';
+import { SignInFactorOne } from 'ui/signIn/SignInFactorOne';
+
 import { SignInAccountSwitcher } from './SignInAccountSwitcher';
 import { SignInFactorTwo } from './SignInFactorTwo';
 import { SignInStart } from './SignInStart';
-import { SignInProps } from '@clerk/types';
-import { SSOCallback } from 'ui/common/SSOCallback';
-import { SignInFactorOne } from 'ui/signIn/SignInFactorOne';
 
 function RedirectToSignIn() {
   const { redirectToSignIn } = useCoreClerk();

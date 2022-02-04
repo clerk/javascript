@@ -1,12 +1,4 @@
-import { BaseResource } from './Base';
-import { EmailAddress } from './EmailAddress';
-import { PhoneNumber } from './PhoneNumber';
-import { UserTokenCache } from '../tokenCache';
-import { Web3Wallet } from './Web3Wallet';
-import { ExternalAccount } from './ExternalAccount';
-import { Token } from './Token';
-import { Image } from './Image';
-import { SessionWithActivities } from 'core/resources/SessionWithActivities';
+import { camelToSnakeKeys } from '@clerk/shared/utils/object';
 import type {
   EmailAddressResource,
   ExternalAccountResource,
@@ -19,9 +11,18 @@ import type {
   UserResource,
   Web3WalletResource,
 } from '@clerk/types';
+import { SessionWithActivities } from 'core/resources/SessionWithActivities';
 import { unixEpochToDate } from 'utils/date';
 import { normalizeUnsafeMetadata } from 'utils/resourceParams';
-import { camelToSnakeKeys } from '@clerk/shared/utils/object';
+
+import { UserTokenCache } from '../tokenCache';
+import { BaseResource } from './Base';
+import { EmailAddress } from './EmailAddress';
+import { ExternalAccount } from './ExternalAccount';
+import { Image } from './Image';
+import { PhoneNumber } from './PhoneNumber';
+import { Token } from './Token';
+import { Web3Wallet } from './Web3Wallet';
 
 export class User extends BaseResource implements UserResource {
   pathRoot = '/me';

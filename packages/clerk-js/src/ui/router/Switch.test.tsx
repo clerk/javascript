@@ -1,5 +1,5 @@
-import React from 'react';
 import { render, screen } from '@clerk/shared/testUtils';
+import React from 'react';
 import { HashRouter, Route, Switch } from 'ui/router';
 
 const mockNavigate = jest.fn();

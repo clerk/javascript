@@ -1,5 +1,6 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
+
 import { FileDropArea } from './fileDropArea';
 
 it('renders correctly if only jpeg is accepted', () => {

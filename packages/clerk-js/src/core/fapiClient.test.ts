@@ -1,5 +1,6 @@
-import createFapiClient from './fapiClient';
 import type { Clerk } from '@clerk/types';
+
+import createFapiClient from './fapiClient';
 
 const fapiClient = createFapiClient({
   frontendApi: 'clerk.example.com',

@@ -1,11 +1,12 @@
 import React from 'react';
 import { Route } from 'ui/router';
-import { Account } from './Account';
-import { NameRoutes } from 'ui/userProfile/name';
-import { UsernameRoutes } from 'ui/userProfile/username';
-import { EmailAddressesRoutes } from 'ui/userProfile/emailAdressess';
-import { PhoneNumbersRoutes } from 'ui/userProfile/phoneNumbers';
 import { ConnectedAccountsRoutes } from 'ui/userProfile/connectedAccounts';
+import { EmailAddressesRoutes } from 'ui/userProfile/emailAdressess';
+import { NameRoutes } from 'ui/userProfile/name';
+import { PhoneNumbersRoutes } from 'ui/userProfile/phoneNumbers';
+import { UsernameRoutes } from 'ui/userProfile/username';
+
+import { Account } from './Account';
 
 export { Account };
 

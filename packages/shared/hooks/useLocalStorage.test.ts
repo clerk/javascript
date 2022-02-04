@@ -1,6 +1,7 @@
 import { renderHook } from '@clerk/shared/testUtils';
-import { useLocalStorage } from './useLocalStorage';
 import TestRenderer from 'react-test-renderer';
+
+import { useLocalStorage } from './useLocalStorage';
 
 const { act } = TestRenderer;
 

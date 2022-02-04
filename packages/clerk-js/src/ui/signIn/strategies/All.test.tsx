@@ -1,8 +1,9 @@
-import React from 'react';
 import { render, renderJSON, screen, userEvent } from '@clerk/shared/testUtils';
-import { All } from './All';
-import { Session } from 'core/resources';
 import { SignInFactor } from '@clerk/types';
+import { Session } from 'core/resources';
+import React from 'react';
+
+import { All } from './All';
 
 jest.mock('ui/contexts', () => {
   return {

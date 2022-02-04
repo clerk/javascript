@@ -1,8 +1,8 @@
-import { TitledCard } from '@clerk/shared/components/titledCard';
-import React from 'react';
 import { List } from '@clerk/shared/components/list';
-import { useCoreSession, useCoreUser, withCoreUserGuard } from 'ui/contexts';
+import { TitledCard } from '@clerk/shared/components/titledCard';
 import { SessionWithActivitiesResource } from '@clerk/types';
+import React from 'react';
+import { useCoreSession, useCoreUser, withCoreUserGuard } from 'ui/contexts';
 import {
   ActivityListItem,
   ActivityListItemSkeleton,

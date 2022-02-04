@@ -1,11 +1,10 @@
-import React from 'react';
-import cn from 'classnames';
-
 // @ts-ignore
 import { default as DesktopIcon } from '@clerk/shared/assets/icons/desktop.svg';
 // @ts-ignore
 import { default as MobileIcon } from '@clerk/shared/assets/icons/mobile.svg';
 import { SessionActivity } from '@clerk/types';
+import cn from 'classnames';
+import React from 'react';
 
 export function ActivityIcon({
   sessionActivity,

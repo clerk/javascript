@@ -1,9 +1,9 @@
+import type { AuthConfigResource } from '@clerk/types';
 import React from 'react';
 import { useEnvironment } from 'ui/contexts';
-import { PageHeading } from 'ui/userProfile/pageHeading';
-import { ProfileCard } from 'ui/userProfile/account/profileCard';
 import { PersonalInformationCard } from 'ui/userProfile/account/personalInformation';
-import type { AuthConfigResource } from '@clerk/types';
+import { ProfileCard } from 'ui/userProfile/account/profileCard';
+import { PageHeading } from 'ui/userProfile/pageHeading';
 
 export const Account = (): JSX.Element => {
   const { authConfig } = useEnvironment();

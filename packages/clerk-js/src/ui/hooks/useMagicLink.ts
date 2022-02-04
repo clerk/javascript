@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   CreateMagicLinkFlowReturn,
   EmailAddressResource,
@@ -7,6 +6,7 @@ import {
   SignUpResource,
   StartMagicLinkFlowParams,
 } from '@clerk/types';
+import React from 'react';
 
 type MagicLinkable = SignUpResource | EmailAddressResource | SignInResource;
 type UseMagicLinkSignInReturn = CreateMagicLinkFlowReturn<

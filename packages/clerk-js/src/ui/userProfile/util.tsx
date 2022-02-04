@@ -1,7 +1,7 @@
-import React from 'react';
 import { Tag } from '@clerk/shared/components/tag';
 import { titleize } from '@clerk/shared/utils';
 import { IdentificationLinkResource } from '@clerk/types';
+import React from 'react';
 
 type ConnectionsProps = {
   linkedResources: IdentificationLinkResource[];

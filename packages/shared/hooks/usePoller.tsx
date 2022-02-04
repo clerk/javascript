@@ -1,4 +1,5 @@
 import React from 'react';
+
 import type { PollerCallback, PollerStop } from '../utils/poller';
 import { Poller } from '../utils/poller';
 

@@ -1,14 +1,15 @@
-import { Client } from './Client';
-import { ClerkAPIResponseError } from './Error';
-import { clerkMissingFapiClientInResources } from '../errors';
-import type Clerk from '../clerk';
+import type { ClerkAPIErrorJSON, ClerkResourceJSON } from '@clerk/types';
 import type {
   FapiClient,
   FapiRequestInit,
   FapiResponseJSON,
   HTTPMethod,
 } from 'core/fapiClient';
-import type { ClerkAPIErrorJSON, ClerkResourceJSON } from '@clerk/types';
+
+import type Clerk from '../clerk';
+import { clerkMissingFapiClientInResources } from '../errors';
+import { Client } from './Client';
+import { ClerkAPIResponseError } from './Error';
 
 export type BaseFetchOptions = { forceUpdateClient?: boolean };
 

@@ -1,4 +1,5 @@
 import { EnvironmentResource } from '@clerk/types';
+
 import {
   determineFirstPartyFields,
   determineOauthOptions,

@@ -1,4 +1,4 @@
-import React from 'react';
+import { VerifyCodeHandler } from '@clerk/shared/components/oneTimeCodeInput';
 import {
   AttemptFactorParams,
   EmailCodeFactor,
@@ -7,15 +7,16 @@ import {
   SignInFactor,
   SignInStrategyName,
 } from '@clerk/types';
-import { useCoreClerk, useCoreSignIn, useSignInContext } from 'ui/contexts';
-import { Body, Header } from 'ui/common/authForms';
+import React from 'react';
 import { handleError, useFieldState } from 'ui/common';
-import { useSupportEmail } from 'ui/hooks/useSupportEmail';
+import { Body, Header } from 'ui/common/authForms';
+import { useCoreClerk, useCoreSignIn, useSignInContext } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
+import { useSupportEmail } from 'ui/hooks/useSupportEmail';
+import { SignInFactorOneFooter } from 'ui/signIn/factorOne/SignInFactorOneFooter';
+
 import { OTP, Password } from './../strategies';
 import { determineSalutation } from './../utils';
-import { VerifyCodeHandler } from '@clerk/shared/components/oneTimeCodeInput';
-import { SignInFactorOneFooter } from 'ui/signIn/factorOne/SignInFactorOneFooter';
 
 // TODO: https://www.notion.so/clerkdev/c8719edf0d5041e0b4d263a7ee574b7c
 const factorNeedsPrepare = (factor: SignInFactor) => {

@@ -1,15 +1,16 @@
 // @ts-ignore
 import Clerk from '@clerk/clerk-js/dist/clerk.nocomponents';
-import {
-  TokenCache,
-  getToken as getTokenFromMemory,
-  saveToken as saveTokenInMemory,
-} from './cache';
 import type {
   FapiRequestInit,
   FapiResponse,
 } from '@clerk/clerk-js/dist/types/src/core/fapiClient';
 import type { ClerkProp } from '@clerk/clerk-react';
+
+import {
+  getToken as getTokenFromMemory,
+  saveToken as saveTokenInMemory,
+  TokenCache,
+} from './cache';
 
 const KEY = '__clerk_client_jwt';
 

@@ -1,5 +1,6 @@
+import { fireEvent, render, screen } from '@clerk/shared/testUtils';
 import * as React from 'react';
-import { render, fireEvent, screen } from '@clerk/shared/testUtils';
+
 import { Toggle } from './Toggle';
 
 describe('<Toggle/>', () => {

@@ -1,8 +1,9 @@
-import React from 'react';
-import { ActiveAccountsManager } from './ActiveAccountsManager';
 import { mocked, renderJSON } from '@clerk/shared/testUtils';
 import { EnvironmentResource, SessionResource } from '@clerk/types';
+import React from 'react';
 import { useEnvironment } from 'ui/contexts';
+
+import { ActiveAccountsManager } from './ActiveAccountsManager';
 
 const session = {
   id: 'deadbeef',
