@@ -61,6 +61,7 @@ export const ClerkAPI = new ClerkBackendAPI({
         authorization: authorization,
         'Content-Type': contentType,
         'User-Agent': userAgent,
+        'X-Clerk-SDK': `vercel-edge/${LIB_VERSION}`,
       },
       ...(body && { body: JSON.stringify(body) }),
     }).then((body) => body.json());

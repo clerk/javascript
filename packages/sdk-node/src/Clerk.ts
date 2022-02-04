@@ -88,6 +88,7 @@ export default class Clerk extends ClerkBackendAPI {
           authorization,
           'Content-Type': contentType,
           'User-Agent': userAgent,
+          'X-Clerk-SDK': `node/${LIB_VERSION}`,
         },
         // @ts-ignore
         ...(body && { body: querystring.stringify(body) }),
