@@ -4,7 +4,7 @@ import { usePopper } from 'react-popper';
 import { useCoreUser, withCoreUserGuard } from 'ui/contexts';
 import { UserButtonPopup } from './UserButtonPopup';
 import { Avatar } from '@clerk/shared/components/avatar';
-import { Portal } from '@clerk/shared/components/portal';
+import { Portal } from 'ui/common';
 import { useDetectClickOutside } from '@clerk/shared/hooks';
 import { PopupVisibilityContext } from './contexts/PopupVisibilityContext';
 import { determineIdentifier } from './utils';

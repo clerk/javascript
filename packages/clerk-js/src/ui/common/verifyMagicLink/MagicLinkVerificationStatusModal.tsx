@@ -1,5 +1,4 @@
 import React from 'react';
-import { Portal } from '@clerk/shared/components/portal';
 import { Spinner } from '@clerk/shared/components/spinner';
 import {
   ExpiredMagicLinkWaitingScreen,
@@ -8,6 +7,7 @@ import {
   PoweredByClerk,
   VerifiedMagicLinkWaitingScreen,
   VerifiedSwitchTabMagicLinkWaitingScreen,
+  Portal
 } from 'ui/common';
 import { VerificationStatus } from 'utils/getClerkQueryParam';
 

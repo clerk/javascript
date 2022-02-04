@@ -35,7 +35,6 @@
     "prerelease": "turbo run build test",
     "release:next": "lerna publish from-package --dist-tag next",
     "prerelease:next": "turbo run build",
-    "prebuild": "lerna exec --stream -- rimraf dist esm coverage",
     "build": "turbo run build",
     "test": "turbo run test",
     "prepare": "husky install",

@@ -10,7 +10,7 @@ import type {
 } from 'ui/contexts';
 import { EnvironmentProvider, OptionsProvider } from 'ui/contexts';
 import { VirtualRouter } from 'ui/router';
-import Portal from './portal';
+import Portal from './Portal';
 import { SignIn, SignInModal } from './signIn';
 import { SignUp, SignUpModal } from './signUp';
 import { UserButton } from './userButton';
