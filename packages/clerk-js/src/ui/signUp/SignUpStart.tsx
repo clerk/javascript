@@ -42,10 +42,8 @@ function _SignUpStart(): JSX.Element {
   const environment = useEnvironment();
   const { setSession } = useCoreClerk();
   const { navigateAfterSignUp } = useSignUpContext();
-  const [
-    emailOrPhoneActive,
-    setEmailOrPhoneActive,
-  ] = React.useState<ActiveIdentifier>('emailAddress');
+  const [emailOrPhoneActive, setEmailOrPhoneActive] =
+    React.useState<ActiveIdentifier>('emailAddress');
   const signUp = useCoreSignUp();
   const [isLoading, setIsLoading] = React.useState(false);
   const formFields = {
@@ -112,15 +110,14 @@ function _SignUpStart(): JSX.Element {
     void handleOauthError();
   });
 
-  const handleChangeActive = (type: ActiveIdentifier) => (
-    e: React.MouseEvent,
-  ) => {
-    e.preventDefault();
-    if (!fields.emailOrPhone) {
-      return;
-    }
-    setEmailOrPhoneActive(type);
-  };
+  const handleChangeActive =
+    (type: ActiveIdentifier) => (e: React.MouseEvent) => {
+      e.preventDefault();
+      if (!fields.emailOrPhone) {
+        return;
+      }
+      setEmailOrPhoneActive(type);
+    };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -320,11 +317,13 @@ function _SignUpStart(): JSX.Element {
               submitButtonClassName='cl-sign-up-button'
               submitButtonLabel='Sign up'
             >
-              {nameField}
-              {usernameField}
-              {emailAddressField}
-              {phoneNumberField}
-              {passwordField}
+              <>
+                {nameField}
+                {usernameField}
+                {emailAddressField}
+                {phoneNumberField}
+                {passwordField}
+              </>
             </Form>
           </>
         )}
