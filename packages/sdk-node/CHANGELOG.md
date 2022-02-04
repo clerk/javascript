@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.9.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@2.8.1...@clerk/clerk-sdk-node@2.9.0) (2022-02-04)
+
+
+### Features
+
+* **clerk-sdk-node:** Add custom header X-Clerk-SDK in request for SDK version ([84986d8](https://github.com/clerkinc/javascript/commit/84986d8522c00da3671a19dec7b914f99c3cc133))
+
+
+
 ### [2.8.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@2.8.0...@clerk/clerk-sdk-node@2.8.1) (2022-02-03)
 
 **Note:** Version bump only for package @clerk/clerk-sdk-node
