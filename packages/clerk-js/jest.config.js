@@ -50,7 +50,7 @@ module.exports = {
     '^utils/(.*)$': '<rootDir>/src/utils/$1',
     '^utils': '<rootDir>/src/utils',
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-    '^react$': '<rootDir>node_modules/react',
+    '^react$': '<rootDir>../../node_modules/react',
   },
 
   testPathIgnorePatterns: ['/node_modules/'],
