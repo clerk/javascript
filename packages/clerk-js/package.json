@@ -11,11 +11,7 @@
     "session",
     "jwt"
   ],
-  "homepage": "https://clerk.dev",
   "author": "Clerk",
-  "bugs": {
-    "email": "support@clerk.dev"
-  },
   "jsdelivr": "dist/clerk.browser.js",
   "main": "dist/clerk.js",
   "module": "dist/clerk.js",
@@ -118,5 +114,13 @@
         "maxSize": "40kB"
       }
     ]
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/clerkinc/javascript.git"
+  },
+  "bugs": {
+    "url": "https://github.com/clerkinc/javascript/issues"
+  },
+  "homepage": "https://clerk.dev/"
 }

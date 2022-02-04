@@ -13,11 +13,7 @@
     "jwt",
     "types"
   ],
-  "homepage": "https://clerk.dev",
   "author": "Clerk",
-  "bugs": {
-    "email": "support@clerk.dev"
-  },
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
@@ -43,5 +39,13 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/clerkinc/javascript.git"
+  },
+  "bugs": {
+    "url": "https://github.com/clerkinc/javascript/issues"
+  },
+  "homepage": "https://clerk.dev/"
 }
