@@ -1,0 +1,15 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+.textArea {
+  @include control {
+    width: 100%;
+    background-color: $white;
+  }
+  resize: none;
+  display: block;
+}
+
+.error {
+  border-color: $error !important;
+}

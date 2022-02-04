@@ -1,0 +1,42 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ButtonSet/> renders the sign in button set for the provided options 1`] = `
+<div>
+  <button
+    className="button outline primary"
+    disabled={false}
+    onClick={[Function]}
+    style={
+      Object {
+        "display": "flex",
+      }
+    }
+  >
+    <img
+      alt="Facebook"
+      src="https://images.clerk.dev/static/facebook.svg"
+    />
+    <span>
+      Sign in with Facebook
+    </span>
+  </button>
+  <button
+    className="button outline primary"
+    disabled={false}
+    onClick={[Function]}
+    style={
+      Object {
+        "display": "flex",
+      }
+    }
+  >
+    <img
+      alt="Google"
+      src="https://images.clerk.dev/static/google.svg"
+    />
+    <span>
+      Sign in with Google
+    </span>
+  </button>
+</div>
+`;

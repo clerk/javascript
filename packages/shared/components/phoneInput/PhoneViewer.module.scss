@@ -1,0 +1,12 @@
+@import '../../../shared/components/styles/variables';
+
+.container {
+  display: inline-block;
+}
+
+.flag {
+  font-size: 1.188rem;
+  margin-right: 0.5em;
+  transform: translateY(1px);
+  display: inline-block;
+}

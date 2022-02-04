@@ -1,0 +1,37 @@
+@import '../styles/variables';
+
+.dropArea {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 17.25rem;
+  padding: 4rem 2rem 2rem 2rem;
+  border-radius: 0.5rem;
+  border: 2px solid $gray05;
+  background-color: $gray05;
+  color: $gray30;
+  margin-bottom: 0.5em;
+
+  &.fileHover {
+    color: $primary;
+    background-color: $primary10;
+    border-color: $primary;
+  }
+
+  &.invalid {
+    color: $error;
+    background-color: $error10;
+    border-color: $error;
+  }
+}
+
+.icon {
+  width: 4rem;
+  height: 4rem;
+  margin-bottom: 1.5rem;
+}
+
+.fileInput {
+  display: none;
+}

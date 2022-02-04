@@ -1,0 +1,85 @@
+@import '../styles/main';
+
+@include disabled;
+
+$countryCodePickerWidth: 92px;
+
+.container {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.dropdownContainer {
+  width: $countryCodePickerWidth;
+  position: absolute;
+  height: 100%;
+  margin-left: 0.5em;
+}
+
+.dropdown {
+  height: 100%;
+
+  > div {
+    height: 100%;
+    border: 0;
+    padding: 1em 0;
+  }
+
+  ul {
+    margin-top: 0.3125em !important;
+    width: 250%;
+    @include media(upto xsmall) {
+      width: 200%;
+    }
+  }
+
+  span {
+    width: 100%;
+    padding-left: 0.5rem;
+  }
+
+  // dropdown search input
+  input {
+    padding-left: 15% !important;
+    margin-top: 0.125rem;
+  }
+}
+
+.optionContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: $themed-font-color-l1;
+  height: 1.5em;
+}
+
+.selectedOption .country {
+  display: none;
+}
+
+// flag assets
+//.flag {
+//  width: 1.25em;
+//  height: 0.875em;
+//  margin-right: 0.3125em;
+//  flex-shrink: 0;
+//}
+
+// TODO: replace with assets
+// flag emojis
+.flag {
+  font-size: 1.188rem;
+  margin-right: 0.3125em;
+  flex-shrink: 0;
+}
+
+.country {
+  margin-right: 0.3125em;
+  flex: 1 1 auto;
+  @include text-ellipsis;
+}
+
+.container input {
+  padding-left: calc(#{$countryCodePickerWidth} + 1.5em);
+}

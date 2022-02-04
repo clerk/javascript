@@ -1,0 +1,89 @@
+&.user-button {
+  display: inline-block;
+  height: 2rem;
+  background-color: transparent;
+}
+
+.sign-in-profile-image {
+  display: block;
+  border-radius: 50%;
+}
+
+.user-button-trigger {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+
+  height: 100%;
+  width: 100%;
+  padding: 0;
+  border: none;
+  white-space: nowrap;
+  overflow: hidden;
+
+  background-size: 100%;
+  background-color: transparent;
+
+  > .user-button-avatar {
+    height: 100%;
+    outline: 0;
+    border-radius: 50%;
+  }
+}
+
+&.user-button-popup {
+  z-index: $high-z-index;
+  background-color: $theme-background-color;
+  box-shadow: $cl-box-shadow-lg;
+  border-radius: $theme-border-radius;
+  overflow: hidden;
+  max-width: 98%;
+  width: 380px;
+  padding: 3rem 0;
+}
+
+.user-button-avatar {
+  color: $themed-font-color-l1;
+}
+
+// top section
+.user-button-popup-current-account {
+  padding-right: 2.625rem;
+  padding-left: 2.625rem;
+  text-align: center;
+
+  .user-button-avatar {
+    display: inline-block;
+    margin-bottom: 1rem;
+  }
+
+  .user-button-headline {
+    font-size: 1.5rem;
+    font-weight: $font-weight-bolder;
+    text-align: center;
+
+    @include text-ellipsis;
+  }
+
+  .user-button-identifier {
+    text-align: center;
+    color: $cl-gray-light-3;
+    margin-bottom: 1.5rem;
+  }
+}
+
+&.user-button-popup .active-accounts-manager {
+  .active-account-buttonset {
+    padding-right: 2.625rem;
+    padding-left: 2.625rem;
+
+    @include media(xxsmall) {
+      padding-right: 1rem;
+      padding-left: 1rem;
+    }
+  }
+
+  .sign-out-all {
+    margin-bottom: -1em;
+  }
+}

@@ -1,0 +1,83 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<All/> renders the All sign in methods 1`] = `
+Array [
+  <div
+    className="cl-oauth-button-group"
+  >
+    <button
+      className="button outline primary cl-oauth-button"
+      disabled={false}
+      onClick={[Function]}
+      style={
+        Object {
+          "display": "flex",
+        }
+      }
+    >
+      <img
+        alt="Google"
+        src="https://images.clerk.dev/static/google.svg"
+      />
+      <span>
+        Sign in with Google
+      </span>
+    </button>
+    <button
+      className="button outline primary cl-oauth-button"
+      disabled={false}
+      onClick={[Function]}
+      style={
+        Object {
+          "display": "flex",
+        }
+      }
+    >
+      <img
+        alt="Facebook"
+        src="https://images.clerk.dev/static/facebook.svg"
+      />
+      <span>
+        Sign in with Facebook
+      </span>
+    </button>
+  </div>,
+  <div
+    className="cl-auth-form-separator"
+  />,
+  <button
+    className="button solid primary cl-primary-button"
+    onClick={[Function]}
+  >
+    Send magic link to +1*********9
+  </button>,
+  <button
+    className="button solid primary cl-primary-button"
+    onClick={[Function]}
+  >
+    Email code to j***@e*****.com
+  </button>,
+  <button
+    className="button solid primary cl-primary-button"
+    onClick={[Function]}
+  >
+    Send code to +1*********9
+  </button>,
+  <button
+    className="button solid primary cl-primary-button"
+    onClick={[Function]}
+  >
+    Sign in with your password
+  </button>,
+  <div
+    className="cl-auth-form-link cl-auth-trouble-link"
+  >
+    <a
+      href="mailto:support@clerk.dev"
+      title="Contact support"
+    >
+      I am having trouble signing in
+    </a>
+  </div>,
+]
+`;

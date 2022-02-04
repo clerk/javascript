@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "src",
+    "jsx": "react",
+    "noImplicitReturns": false,
+    "strict": false,
+    "importHelpers": false
+  }
+}

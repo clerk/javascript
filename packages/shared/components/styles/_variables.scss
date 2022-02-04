@@ -1,0 +1,93 @@
+/*
+ * 🎨 Default Colors
+ */
+
+$primary: #335bf1;
+$primary-rgb: 51, 91, 241;
+$primaryActive: #476bf2;
+$primaryHover: #2e52d9;
+$primaryDisabled: #99adf8;
+$font-color: #151515;
+$font-color-rgb: 21, 21, 21;
+
+$white: #ffffff;
+$gray05: #f2f2f2;
+$gray08: #f9f9f9;
+$gray10: #e5e5e5;
+$gray20: #cccccc;
+$gray30: #b3b3b3;
+$gray40: #808080;
+$gray70: #4d4d4d;
+$dark: #030b27;
+$black: #000000;
+$primary10: #ebeffe;
+$success10: #ebfaeb;
+$warning10: #fef9e8;
+$error10: #ffe8e8;
+
+$error05: #fff4f3;
+
+$black-pearl: #051326;
+$success: #36ca36;
+$error: #ff1d17;
+$yellow: #fff9c7;
+$warning: #f5c418;
+
+/*
+* 🖊️ Typography
+*/
+$font-family-monospace: 'Source Code Pro', monospace !default;
+$font-family-sans-serif: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
+  'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
+  'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; //"Source Sans Pro", -apple-system !default;
+
+/*
+* 🏋 Font-weights
+*/
+$thin-weight: 200;
+$normal-weight: 400;
+$semibold-weight: 600;
+$black-weight: 900;
+
+/*
+* 🎥 Animations
+*/
+$transition-duration: 0.4s;
+
+/*
+* 🏁 Grids
+*/
+$grid-maxwidth: 940px;
+$grid-maxwidth-medium: 620px;
+$grid-maxwidth-xsmall: 288px;
+
+$grid-gutter: 20px;
+
+/*
+ * 🎨 Themed Colors (user configurable)
+ * TODO: discuss if we like this approach
+ */
+$themed-primary: var(--clerk-primary, $primary);
+$themed-primary-rgb: var(--clerk-primary-rgb, $primary-rgb);
+
+$themed-font-color: var(--clerk-font-color, $font-color);
+$themed-font-color-rgb: var(--clerk-font-color-rgb, $font-color-rgb);
+$themed-font-color-l1: var(--clerk-font-color-l1, $gray40);
+
+$themed-label-font-weight: var(--clerk-label-font-weight, $semibold-weight);
+
+$themed-button-font-family: var(--clerk-button-font-family, inherit);
+$themed-button-font-color: var(--clerk-button-font-color, $white);
+$themed-button-font-weight: var(--clerk-button-font-weight, $semibold-weight);
+
+$themed-border-radius: var(
+  --clerk-border-radius,
+  0.5em
+); // default from _mixins.scss, revisit w/ variables
+
+$box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.2);
+$themed-background-color: var(--clerk-background-color, $white);
+$themed-box-shadow: var(--clerk-box-shadow, $box-shadow);
+
+// Some high z-index value
+$high-z-index: 2147483647;

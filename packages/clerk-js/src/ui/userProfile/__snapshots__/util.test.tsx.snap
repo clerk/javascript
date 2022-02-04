@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Utility components for EmailAddresses renders email connections 1`] = `
+Array [
+  <div
+    className="cl-connection-info"
+  >
+    Connected to 
+    Google
+  </div>,
+  <div
+    className="cl-connection-info"
+  >
+    Connected to 
+    Facebook
+  </div>,
+]
+`;
+
+exports[`Utility components for EmailAddresses renders the primary tag 1`] = `
+<span
+  className="tag primary sm cl-tag"
+>
+  Primary
+</span>
+`;

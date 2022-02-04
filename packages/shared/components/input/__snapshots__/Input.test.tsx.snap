@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Input/> renders the controlled input with error 1`] = `
+<input
+  className="input error"
+  onChange={[Function]}
+  type="text"
+/>
+`;

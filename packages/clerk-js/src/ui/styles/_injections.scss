@@ -1,0 +1,35 @@
+$theme-primary: var(--clerk-primary);
+$theme-primary-d1: var(--clerk-primary-d1);
+$theme-primary-d2: var(--clerk-primary-d2);
+$theme-primary-l1: var(--clerk-primary-l1);
+$theme-primary-l2: var(--clerk-primary-l2);
+$theme-primary-a1: var(--clerk-primary-a1);
+$theme-primary-a2: var(--clerk-primary-a2);
+
+$theme-font-family: var(--clerk-font-family);
+$theme-font-color: var(--clerk-font-color);
+$theme-font-color-l1: var(--clerk-font-color-l1);
+$theme-label-font-weight: var(--clerk-label-font-weight);
+$theme-border-radius: var(--clerk-border-radius);
+$theme-background-color: var(--clerk-background-color);
+$theme-box-shadow: var(--clerk-box-shadow);
+
+$theme-accounts-background-color: var(--clerk-accounts-background-color);
+
+$theme-button-font-family: var(--clerk-button-font-family);
+$theme-button-font-color: var(--clerk-button-font-color);
+$theme-button-font-weight: var(--clerk-button-font-weight);
+
+$font-size-base: 1rem !default;
+$small-font-size: 80% !default;
+
+$font-weight-lighter: lighter !default;
+$font-weight-light: 300 !default;
+$font-weight-normal: 400 !default;
+$font-weight-bold: 700 !default;
+$font-weight-bolder: bolder !default;
+$font-weight-base: $font-weight-normal !default;
+
+$line-height-base: 1.5 !default;
+
+$white: #fff !default;

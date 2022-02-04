@@ -1,0 +1,59 @@
+@import '../styles/variables';
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  color: $white;
+  margin: 0 0.5em;
+  font-weight: $semibold-weight;
+  line-height: 1rem;
+  border-radius: 0.25em;
+  svg {
+    vertical-align: middle;
+  }
+
+  &:not(:global(.cl-tag)) {
+    & + .tag {
+      margin-left: 0;
+    }
+  }
+}
+
+.icon {
+  margin-right: 0.25em;
+}
+
+.sm {
+  padding: 0.35em 0.5em;
+  font-size: 0.75rem;
+}
+
+.xs {
+  padding: 0.125em 0.5em;
+  font-size: 0.75rem;
+}
+
+.lg {
+  padding: 0.45em 0.6em;
+  font-size: 0.875rem;
+}
+
+.primary {
+  background-color: rgba($primary, 0.12);
+  color: $primary;
+}
+
+.warning {
+  background-color: rgba($warning, 0.12);
+  color: $warning;
+}
+
+.error {
+  background-color: rgba($error, 0.12);
+  color: $error;
+}
+
+.success {
+  background-color: rgba($success, 0.12);
+  color: $success;
+}

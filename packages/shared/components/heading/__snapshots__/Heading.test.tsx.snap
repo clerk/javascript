@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Heading/> renders h1 heading 1`] = `
+<h1
+  className="heading h1"
+>
+  Top heading
+</h1>
+`;

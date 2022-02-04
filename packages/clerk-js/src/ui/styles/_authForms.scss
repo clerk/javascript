@@ -1,0 +1,252 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap&text=signwtholeup');
+
+&.sign-in,
+&.sign-up {
+  will-change: max-height, opacity;
+  padding: 3rem;
+
+  &:empty {
+    display: none;
+  }
+
+  background-color: $theme-background-color;
+  box-shadow: $theme-box-shadow;
+
+  @include media(from small) {
+    border-radius: $theme-border-radius;
+    width: 480px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+  }
+
+  @include media(upto small) {
+    padding: 3rem 1.5rem;
+  }
+
+  @include media(xxsmall) {
+    padding: 3rem 1rem;
+  }
+
+  .hidden {
+    opacity: 0;
+    height: 0;
+    pointer-events: none;
+  }
+}
+
+.field-row {
+  display: flex;
+
+  .half-field {
+    flex: 1 1 auto;
+
+    &:first-child {
+      margin-right: 1em;
+    }
+  }
+
+  @include media(upto xsmall) {
+    display: block;
+    .half-field:first-child {
+      margin-right: 0;
+    }
+  }
+}
+
+.auth-form-header,
+.auth-form-body,
+.auth-form-footer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.auth-form-header {
+  position: relative;
+  text-align: center;
+  padding: 3em 0 0 0;
+  margin-bottom: 3em;
+
+  @include media(upto xsmall) {
+    padding-top: 2em;
+  }
+}
+
+.auth-form-header-condensed {
+  padding-top: 1em;
+}
+
+.auth-form-header-logo {
+  min-height: 48px;
+  margin: 0;
+  padding: 0;
+}
+
+.auth-form-header-greeting {
+  color: $cl-gray-light-3;
+
+  font-size: 1.25rem;
+  line-height: 1.5rem;
+  margin-top: 2rem;
+
+  label {
+    margin: 0;
+  }
+}
+
+.auth-form-body {
+  margin: 0;
+
+  button + button {
+    margin-top: 1em;
+  }
+}
+
+.auth-form-body-compact,
+.auth-form-header-compact {
+  button + button {
+    margin-top: 0.5em;
+  }
+}
+
+.auth-form-footer {
+  margin: 0;
+  align-items: center;
+}
+
+.auth-form-footer + .powered-by-clerk,
+.auth-form-body + .powered-by-clerk,
+.auth-form-body-compact + .powered-by-clerk {
+  margin-top: 3em;
+}
+
+.auth-form-message {
+  text-align: center;
+
+  color: $cl-gray-light-3;
+  font-weight: $normal-weight;
+  font-family: $theme-font-family;
+
+  margin-bottom: 2em;
+
+  strong {
+    color: $cl-black;
+    font-weight: $semibold-weight;
+  }
+}
+
+.auth-form-link {
+  display: block;
+  //margin-bottom: 3em;
+  text-align: center;
+
+  padding-top: 0;
+  padding-bottom: 0;
+  color: $theme-primary;
+  font-size: 1rem;
+  font-weight: $semibold-weight;
+  font-family: $theme-font-family;
+}
+
+.auth-form-link-label {
+  font-weight: $normal-weight;
+  color: $cl-gray-light-3;
+}
+
+.auth-form-switch {
+  margin-top: 2em;
+}
+
+.auth-trouble-link {
+  margin-top: 2em;
+}
+
+.auth-form-spinner {
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+
+  div {
+    border: 2px solid $theme-primary;
+    border-left: 2px solid $theme-primary-l1;
+  }
+}
+
+.auth-form-separator {
+  margin: 2em 0;
+  height: 2px;
+  width: 100%;
+
+  background: linear-gradient(
+    90deg,
+    rgba(229, 229, 229, 0) 0%,
+    #e5e5e5 50%,
+    rgba(229, 229, 229, 0) 100%
+  );
+}
+
+.sign-in-button,
+.sign-up-button,
+.primary-button {
+  display: block;
+  width: 100%;
+  border-radius: $theme-border-radius;
+  border-color: $theme-primary;
+  font-family: $theme-button-font-family; // shared vars
+}
+
+.auth-form-powered-by-clerk {
+  margin-top: 3em;
+}
+
+.oauth-button-group,
+.web3-button-group {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.oauth-button,
+.web3-button {
+  min-width: 240px;
+  margin: 0;
+
+  & + .oauth-button,
+  & + .web3-button {
+    margin-top: 0.5em;
+  }
+}
+
+.oauth-button,
+.web3-button {
+  display: flex;
+  flex-grow: 1;
+  text-align: center;
+  padding: 10px 16px;
+
+  border-width: 1px;
+  border-radius: $theme-border-radius;
+  font-family: $theme-button-font-family;
+
+  color: $cl-gray-light-4;
+  border-color: $cl-gray-light-1;
+  background-color: white;
+
+  span {
+    flex-grow: 1;
+  }
+
+  img,
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background-color: mix(white, $cl-gray-light-1, 50%);
+  }
+}
+
+.auth-form-other-methods {
+  margin-top: 1.5rem;
+}

@@ -1,0 +1,168 @@
+.auth-form-body-center {
+  align-items: center;
+}
+
+.verification-page-container {
+  text-align: center;
+}
+
+.verification-page-text {
+  text-align: center;
+  max-width: 21rem;
+  margin: 0.5rem 0 1rem 0;
+  color: $cl-gray-light-3;
+  font-weight: $normal-weight;
+  font-family: $theme-font-family;
+}
+
+.verification-page-container {
+  width: 100%;
+  flex-direction: column;
+  display: flex;
+  align-items: center;
+}
+
+.verification-page-icon-container {
+  width: 6rem;
+  height: 6rem;
+  border-radius: 50%;
+  background-color: $gray08;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.verification-page-email-icon {
+  color: $theme-primary;
+  height: 1.5625rem;
+  width: 1.5625rem;
+}
+
+.verification-page-header {
+  font-size: 1.25rem;
+  font-weight: $semibold-weight;
+  margin: 1rem 0;
+}
+
+.verification-page-identifier {
+  font-size: 1rem;
+  color: $cl-black;
+  font-weight: $semibold-weight;
+}
+
+.verify-page-container {
+  z-index: 2147483647;
+  position: fixed;
+  top: 0;
+  left: 0;
+  min-height: 100%;
+  min-width: 100%;
+  background-color: unset;
+}
+
+.verify-page-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  animation: blurFadeIn 0.7s forwards;
+}
+
+.verify-page-modal {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  @include media(upto small) {
+    width: 90%;
+    padding: 3rem 1.5rem;
+  }
+  @include media(from small) {
+    border-radius: $theme-border-radius;
+    width: 480px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+  }
+  animation: fadeIn 0.25s forwards;
+}
+
+.verify-page-soft-text {
+  color: $gray40;
+}
+
+.verification-page-email-icon {
+  color: $theme-primary;
+  height: 1.3625rem;
+  width: 1.3625rem;
+}
+
+.verification-page-guard-icon {
+  color: $success;
+  height: 1.4625rem;
+  width: 1.4625rem;
+}
+
+.verification-page-warning-icon {
+  color: $error;
+  height: 1.3625rem;
+  width: 1.3625rem;
+}
+
+.verification-page-switch-icon {
+  color: $theme-primary;
+  height: 1.3625rem;
+  width: 1.3625rem;
+}
+
+.verify-page-content {
+  position: relative;
+}
+
+.verify-page-spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 4px solid $themed-primary;
+  border-left-color: transparent;
+}
+
+.verify-page-powered-by-clerk {
+  margin-top: 4.5rem;
+}
+
+.verify-page-resend-button {
+  margin-top: 0.5rem;
+  min-height: 1.6em;
+  padding-top: 0;
+  padding-bottom: 0;
+  text-align: center;
+  color: $themed-primary;
+  font-weight: $semibold-weight;
+}
+
+@keyframes blurFadeIn {
+  0% {
+    backdrop-filter: blur(0px);
+    background-color: rgba(255, 255, 255, 0);
+  }
+
+  100% {
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 1);
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}

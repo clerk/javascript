@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SignOutAll renders correctly 1`] = `
+<div
+  className="cl-sign-out-all"
+>
+  <button
+    className="button outline primary hoverable cl-sign-out-all-button small"
+    onClick={[MockFunction]}
+  >
+    <svg
+      data-filename="../shared/assets/icons/sign-out.svg"
+    />
+    Sign out of all accounts
+  </button>
+</div>
+`;

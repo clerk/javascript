@@ -37,12 +37,14 @@ yarn add @clerk/clerk-sdk-node
 
 For package specific details on installation, architecture and usage usage, you can refer to the package's README file.
 
-- [`@clerk/backend-core`](https://github.com/clerkinc/javascript/tree/main/packages/backend-core): Functionalities regarded as "core" for Clerk to operate with. _Authentication resolution, API Resources etc._
-- [`@clerk/edge`](https://github.com/clerkinc/javascript/tree/main/packages/edge): Top level SDK for edge environments containing all required helpers and middleware.
-- [`@clerk/clerk-sdk-node`](https://github.com/clerkinc/javascript/tree/main/packages/sdk-node): SDK for native Node.js environment and frameworks.
-- `@clerk/nextjs` _Coming soon_
-- `@clerk/types` _Coming soon_
-- `@clerk/react` _Coming soon_
+- [`@clerk/backend-core`](./packages/backend-core): Functionalities regarded as "core" for Clerk to operate with. _Authentication resolution, API Resources etc._
+- [`@clerk/edge`](./packages/edge): Top level SDK for edge environments containing all required helpers and middleware.
+- [`@clerk/clerk-sdk-node`](./packages/sdk-node): SDK for native Node.js environment and frameworks.
+- [`@clerk/nextjs`](./packages/nextjs): Clerk package for Next.js.  
+- [`@clerk/clerk-js`](./packages/clerk-js): Core JavaScript implementation used by Clerk in the browser.
+- [`@clerk/clerk-react`](./packages/react) Clerk package for React applications.
+- [`@clerk/clerk-expo`](./packages/expo) Clerk package for the Expo universal app framework.
+- [`@clerk/types`](./packages/types) Main TypeScript typings for Clerk libraries.
 - ...
 
 Additionally there are packages which act as shared utilities or building blocks.

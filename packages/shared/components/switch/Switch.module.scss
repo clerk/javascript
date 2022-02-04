@@ -1,0 +1,22 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+$radio-size: 24px;
+
+@include disabled;
+
+.container {
+  position: relative;
+  display: inline-block;
+  height: $radio-size;
+  min-width: $radio-size;
+  line-height: $radio-size;
+
+  cursor: pointer;
+
+  input {
+    opacity: 0;
+    height: 0;
+    width: 0;
+  }
+}

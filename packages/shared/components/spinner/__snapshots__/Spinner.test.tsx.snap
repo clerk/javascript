@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Spinner/> renders the inverted spinner 1`] = `
+<div
+  className="spinner inverted"
+/>
+`;
+
+exports[`<Spinner/> renders the spinner 1`] = `
+<div
+  className="spinner"
+/>
+`;

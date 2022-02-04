@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<DefaultNavBarLinks /> renders the default user profile navigation links 1`] = `
+Array [
+  <a
+    className="cl-navbar-link"
+    onClick={[Function]}
+  >
+    <svg
+      data-filename="../shared/assets/icons/user.svg"
+    />
+    Account
+  </a>,
+  <a
+    className="cl-navbar-link"
+    onClick={[Function]}
+  >
+    <svg
+      data-filename="../shared/assets/icons/shield.svg"
+    />
+    Security
+  </a>,
+]
+`;

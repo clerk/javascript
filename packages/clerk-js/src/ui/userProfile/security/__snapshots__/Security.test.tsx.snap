@@ -1,0 +1,350 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Security/> renders the Security page with 2nd factor enabled 1`] = `
+Array [
+  <div
+    className="cl-page-heading"
+  >
+    <div
+      className="cl-text-container"
+    >
+      <h2
+        className="heading h2 cl-title"
+      >
+        Security
+      </h2>
+      <p
+        className="cl-subtitle"
+      >
+        Manage settings related to account security
+      </p>
+    </div>
+  </div>,
+  <div
+    className="card card cl-themed-card"
+  >
+    <div
+      className="titleContainer"
+    >
+      <h1
+        className="title"
+      >
+        Sign in
+      </h1>
+      <p
+        className="subtitle"
+      >
+        Manage authentication settings
+      </p>
+    </div>
+    <div
+      className="cl-titled-card-list"
+    >
+      <button
+        className="cl-list-item elementContainer button hoverable"
+        disabled={false}
+        onClick={[Function]}
+      >
+        <div
+          className="title"
+        >
+          Password
+        </div>
+        <div
+          className="listItem line"
+        >
+          <div
+            className="start"
+          >
+            <span
+              className="cl-font-semibold"
+            >
+              ••••••••••
+            </span>
+          </div>
+          <div
+            className="iconContainer"
+          >
+            <svg
+              data-filename="../shared/assets/icons/arrow-right.svg"
+            />
+          </div>
+        </div>
+      </button>
+      <button
+        className="cl-list-item elementContainer button hoverable"
+        disabled={false}
+        onClick={[Function]}
+      >
+        <div
+          className="title"
+        >
+          2-step verification
+        </div>
+        <div
+          className="listItem line"
+        >
+          <div
+            className="start"
+          >
+            <div>
+              Currently
+               
+              <span
+                className="cl-font-semibold"
+              >
+                ON
+              </span>
+              <span
+                className="cl-list-item-subtitle"
+              >
+                <br />
+                An additional authentication step is required when signing in
+              </span>
+            </div>
+          </div>
+          <div
+            className="iconContainer"
+          >
+            <svg
+              data-filename="../shared/assets/icons/arrow-right.svg"
+            />
+          </div>
+        </div>
+      </button>
+    </div>
+  </div>,
+  <div
+    className="card card cl-themed-card"
+  >
+    <div
+      className="titleContainer"
+    >
+      <h1
+        className="title"
+      >
+        Active devices
+      </h1>
+      <p
+        className="subtitle"
+      >
+        Manage devices currently signed in to your account
+      </p>
+    </div>
+    <div
+      className="cl-titled-card-list"
+    >
+      <div
+        className="cl-list-item cl-activity-row elementContainer"
+        disabled={false}
+      >
+        <div
+          className="title"
+        >
+          <div
+            className="cl-activity-icon"
+          >
+            <svg
+              aria-labelledby="skeleton-device-aria"
+              height={86}
+              role="img"
+              style={Object {}}
+              viewBox="0 0 84 86"
+              width={84}
+            >
+              <title
+                id="skeleton-device-aria"
+              >
+                Loading...
+              </title>
+              <rect
+                clipPath="url(#skeleton-device-diff)"
+                height="100%"
+                role="presentation"
+                style={
+                  Object {
+                    "fill": "url(#skeleton-device-animated-diff)",
+                  }
+                }
+                width="100%"
+                x="0"
+                y="0"
+              />
+              <defs>
+                <clipPath
+                  id="skeleton-device-diff"
+                >
+                  <rect
+                    height="64"
+                    rx="4"
+                    ry="4"
+                    width="84"
+                    x="0"
+                    y="11"
+                  />
+                </clipPath>
+                <linearGradient
+                  id="skeleton-device-animated-diff"
+                >
+                  <stop
+                    className="backgroundStop"
+                    offset="0%"
+                  >
+                    <animate
+                      attributeName="offset"
+                      dur="1.5s"
+                      keyTimes="0; 0.25; 1"
+                      repeatCount="indefinite"
+                      values="-2; -2; 1"
+                    />
+                  </stop>
+                  <stop
+                    className="foregroundStop"
+                    offset="50%"
+                  >
+                    <animate
+                      attributeName="offset"
+                      dur="1.5s"
+                      keyTimes="0; 0.25; 1"
+                      repeatCount="indefinite"
+                      values="-1; -1; 2"
+                    />
+                  </stop>
+                  <stop
+                    className="backgroundStop"
+                    offset="100%"
+                  >
+                    <animate
+                      attributeName="offset"
+                      dur="1.5s"
+                      keyTimes="0; 0.25; 1"
+                      repeatCount="indefinite"
+                      values="0; 0; 3"
+                    />
+                  </stop>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+        </div>
+        <div
+          className="listItem"
+        >
+          <div
+            className="start"
+          >
+            <svg
+              aria-labelledby="skeleton-text-aria"
+              height={86}
+              role="img"
+              style={Object {}}
+              viewBox="0 0 148 86"
+              width={148}
+            >
+              <title
+                id="skeleton-text-aria"
+              >
+                Loading...
+              </title>
+              <rect
+                clipPath="url(#skeleton-text-diff)"
+                height="100%"
+                role="presentation"
+                style={
+                  Object {
+                    "fill": "url(#skeleton-text-animated-diff)",
+                  }
+                }
+                width="100%"
+                x="0"
+                y="0"
+              />
+              <defs>
+                <clipPath
+                  id="skeleton-text-diff"
+                >
+                  <rect
+                    height="18"
+                    rx="2"
+                    ry="2"
+                    width="64"
+                    x="0"
+                    y="0"
+                  />
+                  <rect
+                    height="18"
+                    rx="2"
+                    ry="2"
+                    width="148"
+                    x="0"
+                    y="24"
+                  />
+                  <rect
+                    height="18"
+                    rx="2"
+                    ry="2"
+                    width="117"
+                    x="0"
+                    y="47"
+                  />
+                  <rect
+                    height="18"
+                    rx="2"
+                    ry="2"
+                    width="53"
+                    x="0"
+                    y="70"
+                  />
+                </clipPath>
+                <linearGradient
+                  id="skeleton-text-animated-diff"
+                >
+                  <stop
+                    className="backgroundStop"
+                    offset="0%"
+                  >
+                    <animate
+                      attributeName="offset"
+                      dur="1.5s"
+                      keyTimes="0; 0.25; 1"
+                      repeatCount="indefinite"
+                      values="-2; -2; 1"
+                    />
+                  </stop>
+                  <stop
+                    className="foregroundStop"
+                    offset="50%"
+                  >
+                    <animate
+                      attributeName="offset"
+                      dur="1.5s"
+                      keyTimes="0; 0.25; 1"
+                      repeatCount="indefinite"
+                      values="-1; -1; 2"
+                    />
+                  </stop>
+                  <stop
+                    className="backgroundStop"
+                    offset="100%"
+                  >
+                    <animate
+                      attributeName="offset"
+                      dur="1.5s"
+                      keyTimes="0; 0.25; 1"
+                      repeatCount="indefinite"
+                      values="0; 0; 3"
+                    />
+                  </stop>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div
+            className="iconContainer"
+          />
+        </div>
+      </div>
+    </div>
+  </div>,
+]
+`;

@@ -1,0 +1,126 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AccountSwitcher renders the account switcher if there are active sessions 1`] = `
+<div
+  className="cl-account-switcher"
+>
+  <button
+    className="button text primary hoverable cl-account-switcher-button"
+    onClick={[Function]}
+  >
+    <img
+      alt="John Doe"
+      className="avatar cl-user-button-avatar"
+      height={36}
+      onError={[Function]}
+      src="http://test.host/profile.png?height=64"
+      title="John Doe"
+      width={36}
+    />
+    <div
+      className="cl-details"
+    >
+      <span>
+        John
+         
+        Doe
+      </span>
+      <span />
+    </div>
+  </button>
+  <button
+    className="button text primary hoverable cl-account-switcher-button"
+    onClick={[Function]}
+  >
+    <img
+      alt="Carla Coe"
+      className="avatar cl-user-button-avatar"
+      height={36}
+      onError={[Function]}
+      src="http://test.host/profile.png?height=64"
+      title="Carla Coe"
+      width={36}
+    />
+    <div
+      className="cl-details"
+    >
+      <span>
+        Carla
+         
+        Coe
+      </span>
+      <span />
+    </div>
+  </button>
+  <button
+    className="button text primary hoverable cl-account-switcher-button cl-account-switcher-add-button"
+    onClick={[MockFunction]}
+  >
+    <div
+      className="cl-account-switcher-add-button-icon"
+    >
+      <svg
+        data-filename="../shared/assets/icons/user-plus.svg"
+      />
+    </div>
+    <span>
+      Add account
+    </span>
+  </button>
+</div>
+`;
+
+exports[`AccountSwitcher renders the account switcher without the capability to add extra accounts on single session mode 1`] = `
+<div
+  className="cl-account-switcher"
+>
+  <button
+    className="button text primary hoverable cl-account-switcher-button"
+    onClick={[Function]}
+  >
+    <img
+      alt="John Doe"
+      className="avatar cl-user-button-avatar"
+      height={36}
+      onError={[Function]}
+      src="http://test.host/profile.png?height=64"
+      title="John Doe"
+      width={36}
+    />
+    <div
+      className="cl-details"
+    >
+      <span>
+        John
+         
+        Doe
+      </span>
+      <span />
+    </div>
+  </button>
+  <button
+    className="button text primary hoverable cl-account-switcher-button"
+    onClick={[Function]}
+  >
+    <img
+      alt="Carla Coe"
+      className="avatar cl-user-button-avatar"
+      height={36}
+      onError={[Function]}
+      src="http://test.host/profile.png?height=64"
+      title="Carla Coe"
+      width={36}
+    />
+    <div
+      className="cl-details"
+    >
+      <span>
+        Carla
+         
+        Coe
+      </span>
+      <span />
+    </div>
+  </button>
+</div>
+`;

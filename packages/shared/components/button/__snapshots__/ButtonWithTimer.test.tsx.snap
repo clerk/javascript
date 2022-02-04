@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ButtonWithTimer/> renders the button 1`] = `
+<button
+  className="button solid primary"
+  disabled={false}
+  onClick={[Function]}
+>
+  Foo
+</button>
+`;

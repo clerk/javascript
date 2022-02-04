@@ -1,0 +1,85 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+$arrow-size: 0.375em;
+
+.container {
+  display: inline-flex;
+  position: relative;
+}
+
+.tip {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.5em;
+
+  border-radius: 0.25em;
+  color: $white;
+  background: $black;
+
+  font-size: 1rem;
+  font-family: $font-family-sans-serif;
+  line-height: 1.25rem;
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.tip::before {
+  content: ' ';
+  left: 50%;
+  border: solid transparent;
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+  border-width: $arrow-size;
+  margin-left: -$arrow-size;
+}
+
+.top {
+  top: -3em;
+}
+
+.top::before {
+  top: 100%;
+  border-top-color: $black;
+}
+
+.right {
+  left: calc(100% + 0.5em);
+  top: 50%;
+  transform: translateX(0) translateY(-50%);
+}
+
+.right::before {
+  left: -$arrow-size;
+  top: 50%;
+  transform: translateX(0) translateY(-50%);
+  border-right-color: $black;
+}
+
+.bottom {
+  bottom: -3em;
+}
+
+.bottom::before {
+  bottom: 100%;
+  border-bottom-color: $black;
+}
+
+/* Absolute positioning */
+.left {
+  left: auto;
+  right: 2em;
+  top: 50%;
+  transform: translateX(0) translateY(-50%);
+}
+
+.left::before {
+  left: auto;
+  right: -(2 * $arrow-size);
+  top: 50%;
+  transform: translateX(0) translateY(-50%);
+  border-left-color: $black;
+}

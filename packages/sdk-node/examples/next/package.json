@@ -11,7 +11,7 @@
     "@clerk/clerk-sdk-node": "file:../../dist",
     "lodash": "^4.17.21",
     "next": "11.0.1",
-    "react": "latest",
-    "react-dom": "latest"
+    "react": "^16",
+    "react-dom": "^16"
   }
 }
