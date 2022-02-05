@@ -292,7 +292,7 @@ export default class Clerk implements ClerkInterface {
     if (this.#unloading) {
       return;
     }
-    this.session = session as ActiveSessionResource | null;
+    this.session = session ;
     this.user = this.session ? this.session.user : null;
 
     this.#emit();
@@ -681,11 +681,11 @@ export default class Clerk implements ClerkInterface {
         s => s.id === client.lastActiveSessionId,
       );
       if (lastActiveSession) {
-        return lastActiveSession as ActiveSessionResource;
+        return lastActiveSession ;
       }
     }
     const session = client.activeSessions[0];
-    return session ? (session as ActiveSessionResource) : null;
+    return session ? (session ) : null;
   };
 
   #setupListeners = (): void => {

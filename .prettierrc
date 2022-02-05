@@ -1,3 +1,18 @@
 {
-  "singleQuote": true
+  "arrowParens": "avoid",
+  "bracketSpacing": true,
+  "jsxSingleQuote": true,
+  "overrides": [
+    {
+      "files": "**/services/*.ts",
+      "options": {
+        "printWidth": 110
+      }
+    }
+  ],
+  "printWidth": 80,
+  "semi": true,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "all"
 }

@@ -19,7 +19,7 @@ export const buildRequest = (
   return request;
 };
 
-export const useFieldState = <T extends any>(
+export const useFieldState = <T>(
   name: string,
   initialState: T,
 ): FieldState<T> => {
@@ -36,7 +36,7 @@ export const useFieldState = <T extends any>(
 };
 
 // TODO: Replace origin useFieldState with this one
-export const useFieldStateV2 = <T extends any>(
+export const useFieldStateV2 = <T>(
   name: string,
   required: boolean,
   initialState: T,

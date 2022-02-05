@@ -13,11 +13,11 @@ module.exports = {
     'prettier',
   ],
   rules: {
+    '@typescript-eslint/no-non-null-assertion': 'warn',
     '@typescript-eslint/no-unsafe-assignment': 'warn',
-    'simple-import-sort/imports': 'error',
     '@typescript-eslint/no-unsafe-call': 'off',
     '@typescript-eslint/no-unsafe-member-access': 'off',
     '@typescript-eslint/no-unsafe-return': 'warn',
-    '@typescript-eslint/no-non-null-assertion': 'warn',
+    'simple-import-sort/imports': 'error',
   },
 };
