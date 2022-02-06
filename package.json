@@ -8,6 +8,11 @@
   "version": "0.0.0",
   "license": "MIT",
   "private": true,
+  "packageManager": "npm@8.4.1",
+  "engines": {
+    "node": ">=16.8.0",
+    "npm": ">=8"
+  },
   "devDependencies": {
     "@commitlint/cli": "^16.0.2",
     "@commitlint/config-conventional": "^16.0.0",
@@ -41,24 +46,5 @@
     "version": "./scripts/version-info.sh",
     "lerna": "lerna",
     "nuke": "rm -r node_modules; for d in packages/*/node_modules; do echo $d; rm -r $d; done"
-  },
-  "engines": {
-    "node": ">=16.8.0",
-    "npm": ">=8"
-  },
-  "turbo": {
-    "npmClient": "npm",
-    "baseBranch": "origin/main",
-    "pipeline": {
-      "build": {
-        "dependsOn": [
-          "^build"
-        ],
-        "outputs": []
-      },
-      "test": {
-        "outputs": []
-      }
-    }
   }
 }
