@@ -16,6 +16,11 @@ labels: 'Status: Triage'
 
 ## Package + Version
 
+- [ ] `@clerk/clerk-js`
+- [ ] `@clerk/clerk-react`
+- [ ] `@clerk/nextjs`
+- [ ] `@clerk/clerk-remix`
+- [ ] `@clerk/clerk-expo`
 - [ ] `@clerk/backend-core`
 - [ ] `@clerk/clerk-sdk-node`
 - [ ] `@clerk/edge`
