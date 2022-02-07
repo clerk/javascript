@@ -30,5 +30,5 @@ export function camelToSnakeKeys<T extends Record<string, unknown>>(obj: T) {
       obj[newName] = camelToSnakeKeys(obj[newName]);
     }
   }
-  return obj as T;
+  return obj ;
 }

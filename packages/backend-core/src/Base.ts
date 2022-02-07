@@ -1,6 +1,6 @@
 import type { CryptoKey as PeculiarCryptoKey } from '@peculiar/webcrypto';
-import { JWTExpiredError } from './api/utils/Errors';
 
+import { JWTExpiredError } from './api/utils/Errors';
 import { parse } from './util/base64url';
 import { isDevelopmentOrStaging, isProduction } from './util/clerkApiKey';
 import { checkClaims, isExpired } from './util/jwt';

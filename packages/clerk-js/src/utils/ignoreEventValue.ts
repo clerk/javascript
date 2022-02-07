@@ -8,7 +8,7 @@ const isEvent = (e: any) => {
   );
 };
 
-export function ignoreEventValue<T extends any>(
+export function ignoreEventValue<T>(
   val: T,
   opts: { requireType?: string } = {},
 ): T | undefined {

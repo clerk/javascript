@@ -59,9 +59,8 @@ function SignUpRoutes(): JSX.Element {
 
 SignUpRoutes.displayName = 'SignUp';
 
-export const SignUp: React.ComponentType<SignUpProps> = withCoreSessionSwitchGuard(
-  SignUpRoutes,
-);
+export const SignUp: React.ComponentType<SignUpProps> =
+  withCoreSessionSwitchGuard(SignUpRoutes);
 
 export const SignUpModal = (props: SignUpProps): JSX.Element => {
   const signUpProps: SignUpProps = {

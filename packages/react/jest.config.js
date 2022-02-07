@@ -32,7 +32,6 @@ module.exports = {
 
   moduleNameMapper: {
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-    '^react$': '<rootDir>../../node_modules/react',
   },
 
   testPathIgnorePatterns: ['/node_modules/'],

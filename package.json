@@ -29,7 +29,7 @@
     "prettier": "^2.3.1",
     "rimraf": "^3.0.2",
     "turbo": "^1",
-    "typescript": "^4.5.2"
+    "typescript": "4.5.5"
   },
   "scripts": {
     "dev": "lerna run dev --parallel --scope @clerk/types --scope @clerk/clerk-react --scope @clerk/clerk-js",
@@ -38,11 +38,11 @@
     "bump:next": "lerna version --conventional-prerelease",
     "graduate:next": "lerna version --conventional-graduate",
     "release": "lerna publish from-git",
-    "prerelease": "turbo run build test",
+    "prerelease": "turbo run build test --concurrency=${TURBO_CONCURRENCY:-2}",
     "release:next": "lerna publish from-package --dist-tag next",
-    "prerelease:next": "turbo run build",
-    "build": "turbo run build",
-    "test": "turbo run test",
+    "prerelease:next": "turbo run build --concurrency=${TURBO_CONCURRENCY:-2}",
+    "build": "turbo run build --concurrency=${TURBO_CONCURRENCY:-2}",
+    "test": "turbo run test --concurrency=${TURBO_CONCURRENCY:-2}",
     "prepare": "husky install",
     "version": "./scripts/version-info.sh",
     "lerna": "lerna",

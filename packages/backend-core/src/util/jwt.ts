@@ -32,7 +32,7 @@ export function checkClaims(claims: JWTPayload, authorizedParties?: string[]) {
   }
 
   if (claims.azp && authorizedParties && authorizedParties.length > 0) {
-    if (!authorizedParties.includes(claims.azp as string)) {
+    if (!authorizedParties.includes(claims.azp )) {
       throw new Error(`Authorized party is invalid: ${claims.azp}`);
     }
   }
