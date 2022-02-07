@@ -1,11 +1,6 @@
 /* eslint-disable react/display-name */
 
-import {
-  render,
-  screen,
-  userEvent,
-  waitFor,
-} from '@clerk/shared/utils/testUtils';
+import { render, screen, userEvent, waitFor } from '@clerk/shared/utils/testUtils';
 import React from 'react';
 
 import { SignInWithMetamaskButton } from './SignInWithMetamaskButton';
@@ -17,11 +12,9 @@ const mockClerk = {
   authenticateWithMetamask: mockAuthenticatewithMetamask,
 } as any;
 
-jest.mock('../contexts', () => {
+jest.mock('./withClerk', () => {
   return {
-    withClerk: (Component: any) => (props: any) => (
-      <Component {...props} clerk={mockClerk} />
-    ),
+    withClerk: (Component: any) => (props: any) => <Component {...props} clerk={mockClerk} />,
   };
 });
 

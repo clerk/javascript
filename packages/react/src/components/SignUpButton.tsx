@@ -1,12 +1,12 @@
 import React from 'react';
 
-import { withClerk } from '../contexts';
 import { SignUpButtonProps, WithClerkProp } from '../types';
 import {
   assertSingleChild,
   normalizeWithDefaultValue,
   safeExecute,
 } from '../utils';
+import { withClerk } from './withClerk';
 
 export const SignUpButton = withClerk(
   ({ clerk, children, ...props }: WithClerkProp<SignUpButtonProps>) => {

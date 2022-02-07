@@ -1,5 +1,4 @@
-import { render, screen, waitFor } from '@clerk/shared/testUtils';
-import { userEvent } from '@clerk/shared/utils/testUtils';
+import { render, screen, userEvent, waitFor } from '@clerk/shared/utils/testUtils';
 import React from 'react';
 
 import { SignOutButton } from './SignOutButton';
@@ -11,7 +10,7 @@ const mockClerk = {
   signOutOne: mockSignOutOne,
 } as any;
 
-jest.mock('../contexts', () => {
+jest.mock('./withClerk', () => {
   return {
     withClerk: (Component: any) => (props: any) => {
       return <Component {...props} clerk={mockClerk} />;
@@ -52,7 +51,7 @@ describe('<SignOutButton />', () => {
         <SignOutButton>
           <button>1</button>
           <button>2</button>
-        </SignOutButton>
+        </SignOutButton>,
       );
     }).toThrow();
   });

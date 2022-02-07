@@ -1,5 +1,4 @@
-import { render, screen, waitFor } from '@clerk/shared/testUtils';
-import { userEvent } from '@clerk/shared/utils/testUtils';
+import { render, screen, userEvent, waitFor } from '@clerk/shared/utils/testUtils';
 import React from 'react';
 
 import { SignInButton } from './SignInButton';
@@ -11,7 +10,7 @@ const mockClerk = {
   redirectToSignIn: mockRedirectToSignIn,
 } as any;
 
-jest.mock('../contexts', () => {
+jest.mock('./withClerk', () => {
   return {
     withClerk: (Component: any) => (props: any) => {
       return <Component {...props} clerk={mockClerk} />;
@@ -79,7 +78,7 @@ describe('<SignInButton/>', () => {
     render(
       <SignInButton>
         <button onClick={handler}>custom button</button>
-      </SignInButton>
+      </SignInButton>,
     );
     const btn = screen.getByText('custom button');
     userEvent.click(btn);
@@ -100,7 +99,7 @@ describe('<SignInButton/>', () => {
         <SignInButton>
           <button>1</button>
           <button>2</button>
-        </SignInButton>
+        </SignInButton>,
       );
     }).toThrow();
   });

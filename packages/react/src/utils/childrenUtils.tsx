@@ -23,7 +23,7 @@ export const normalizeWithDefaultValue = (
   if (!children) {
     children = defaultText;
   }
-  if (typeof (children as any) === 'string') {
+  if (typeof (children ) === 'string') {
     children = <button>{children}</button>;
   }
   return children;
