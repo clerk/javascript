@@ -1,4 +1,4 @@
-import { render,renderJSON } from '@clerk/shared/testUtils';
+import { render, renderJSON } from '@clerk/shared/testUtils';
 import { EmailAddressResource } from '@clerk/types';
 import { waitFor } from '@testing-library/dom';
 import React from 'react';
@@ -38,7 +38,7 @@ describe('<EmailAddressVerificationWithMagicLink/>', function () {
     } as any as EmailAddressResource;
 
     const tree = renderJSON(
-      <EmailAddressVerificationWithMagicLink email={email} />
+      <EmailAddressVerificationWithMagicLink email={email} />,
     );
     expect(tree).toMatchSnapshot();
   });
@@ -47,7 +47,7 @@ describe('<EmailAddressVerificationWithMagicLink/>', function () {
     const mockStartMagicLinkFlow = jest.fn(() =>
       Promise.resolve({
         status: 'verified',
-      })
+      }),
     );
     const mockOnVerificationCompleteHandler = jest.fn();
     const email = {
@@ -65,7 +65,7 @@ describe('<EmailAddressVerificationWithMagicLink/>', function () {
       <EmailAddressVerificationWithMagicLink
         email={email}
         onVerificationComplete={mockOnVerificationCompleteHandler}
-      />
+      />,
     );
 
     await waitFor(() => {
@@ -91,7 +91,7 @@ describe('<EmailAddressVerificationWithMagicLink/>', function () {
       <EmailAddressVerificationWithMagicLink
         email={email}
         onError={mockOnErrorHandler}
-      />
+      />,
     );
 
     await waitFor(() => {

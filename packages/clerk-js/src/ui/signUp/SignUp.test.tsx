@@ -32,7 +32,7 @@ jest.mock('ui/contexts', () => {
             firstFactors: ['email_address', 'oauth_google'],
             singleSessionMode: true,
           } as Partial<AuthConfig>,
-        } as Partial<EnvironmentResource>)
+        } as Partial<EnvironmentResource>),
     ),
     withCoreSessionSwitchGuard: (a: any) => a,
     useCoreSession: () =>

@@ -1,13 +1,13 @@
-import { act,render, screen, userEvent } from '@clerk/shared/testUtils';
+import { act, render, screen, userEvent } from '@clerk/shared/testUtils';
 import React from 'react';
 
-import { Route, useRouter,VirtualRouter } from './';
+import { Route, useRouter, VirtualRouter } from './';
 
 const mockNavigate = jest.fn();
 
 jest.mock('ui/contexts', () => ({
   useCoreClerk: () => ({
-    navigate: jest.fn((to) => {
+    navigate: jest.fn(to => {
       mockNavigate(to);
       if (to) {
         // @ts-ignore
@@ -35,16 +35,16 @@ const ShowPreserved = () => {
   return <div>{`preserved=${queryParams.preserved}`}</div>;
 };
 const Tester = () => (
-  <VirtualRouter preservedParams={['preserved']} startPath="/">
+  <VirtualRouter preservedParams={['preserved']} startPath='/'>
     <Route index>
-      <div id="index">Index</div>
-      <Button to="created?preserved=1">Create</Button>
+      <div id='index'>Index</div>
+      <Button to='created?preserved=1'>Create</Button>
     </Route>
-    <Route path="created">
+    <Route path='created'>
       <div>Created</div>
-      <Button to="../preserved">Preserve</Button>
+      <Button to='../preserved'>Preserve</Button>
     </Route>
-    <Route path="preserved">
+    <Route path='preserved'>
       <ShowPreserved />
     </Route>
   </VirtualRouter>

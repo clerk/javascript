@@ -2,9 +2,7 @@ import { camelToSnakeKeys } from '@clerk/shared/utils/object';
 import type {
   EmailAddressResource,
   ExternalAccountResource,
-  GetUserTokenOptions,
   ImageResource,
-  JWTService,
   PhoneNumberResource,
   UpdateUserParams,
   UserJSON,
@@ -15,13 +13,11 @@ import { SessionWithActivities } from 'core/resources/SessionWithActivities';
 import { unixEpochToDate } from 'utils/date';
 import { normalizeUnsafeMetadata } from 'utils/resourceParams';
 
-import { UserTokenCache } from '../tokenCache';
 import { BaseResource } from './Base';
 import { EmailAddress } from './EmailAddress';
 import { ExternalAccount } from './ExternalAccount';
 import { Image } from './Image';
 import { PhoneNumber } from './PhoneNumber';
-import { Token } from './Token';
 import { Web3Wallet } from './Web3Wallet';
 
 export class User extends BaseResource implements UserResource {
@@ -113,50 +109,6 @@ export class User extends BaseResource implements UserResource {
     return this._basePatch({
       body: normalizeUnsafeMetadata(camelToSnakeKeys(params)),
     });
-  };
-
-  /**
-   * @deprecated `getToken` has been deprecated and will be removed soon.
-   * Use session.getToken({ template }) instead.
-   */
-  getToken = async (
-    service: JWTService,
-    options?: GetUserTokenOptions,
-  ): Promise<string> => {
-    if (!service) {
-      service = 'clerk';
-    }
-
-    const { leewayInSeconds = 10 } = options || {};
-
-    if (leewayInSeconds >= 60) {
-      throw 'Leeway can not exceed the token lifespan (60 seconds)';
-    }
-
-    const cachedEntry = UserTokenCache.get(
-      { tokenId: this.id, audience: service },
-      leewayInSeconds,
-    );
-
-    let tokenResolver;
-
-    if (cachedEntry) {
-      tokenResolver = cachedEntry.tokenResolver;
-    } else {
-      tokenResolver = Token.create(this.path() + '/tokens', {
-        service,
-      });
-
-      UserTokenCache.set({
-        tokenId: this.id,
-        audience: service,
-        tokenResolver,
-      });
-    }
-
-    const token = await tokenResolver;
-
-    return token.jwt.claims.__raw;
   };
 
   getSessions = async (): Promise<SessionWithActivities[]> => {

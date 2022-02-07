@@ -25,7 +25,7 @@ describe('<MagicLinkVerificationStatusModal/>', function () {
   beforeAll(() => {
     jest.useFakeTimers();
     //@ts-ignore
-    ReactDOM.createPortal = (node) => node;
+    ReactDOM.createPortal = node => node;
   });
 
   afterEach(() => {
@@ -34,27 +34,27 @@ describe('<MagicLinkVerificationStatusModal/>', function () {
 
   it('renders the <MagicLinkVerificationStatusModal/> component', function () {
     const tree = renderJSON(
-      <MagicLinkVerificationStatusModal verificationStatus="loading" />
+      <MagicLinkVerificationStatusModal verificationStatus='loading' />,
     );
     expect(tree).toMatchSnapshot();
   });
 
   it('renders and shows correct message if status is verified', async function () {
-    render(<MagicLinkVerificationStatusModal verificationStatus="verified" />);
+    render(<MagicLinkVerificationStatusModal verificationStatus='verified' />);
     await waitFor(() => {
       screen.getByText('Successfully signed in');
     });
   });
 
   it('renders and shows correct message if status is expired', async function () {
-    render(<MagicLinkVerificationStatusModal verificationStatus="expired" />);
+    render(<MagicLinkVerificationStatusModal verificationStatus='expired' />);
     await waitFor(() => {
       screen.getByText('This magic link has expired');
     });
   });
 
   it('renders and shows correct message if status is failed', async function () {
-    render(<MagicLinkVerificationStatusModal verificationStatus="failed" />);
+    render(<MagicLinkVerificationStatusModal verificationStatus='failed' />);
     await waitFor(() => {
       screen.getByText('This magic link is invalid');
     });

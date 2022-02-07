@@ -23,6 +23,7 @@ export class Session extends BaseResource implements SessionResource {
   publicUserData!: PublicUserData;
   expireAt!: Date;
   abandonAt!: Date;
+  createdAt!: Date;
   updatedAt!: Date;
 
   static isSessionResource(resource: unknown): resource is Session {
@@ -50,13 +51,6 @@ export class Session extends BaseResource implements SessionResource {
     });
   };
 
-  revoke = (): Promise<SessionResource> => {
-    SessionTokenCache.clear();
-    return this._basePost({
-      action: 'revoke',
-    });
-  };
-
   touch = (): Promise<SessionResource> => {
     return this._basePost({
       action: 'touch',
@@ -64,8 +58,12 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   getToken = async (options?: GetSessionTokenOptions): Promise<string> => {
-    const { leewayInSeconds = 10, throwOnError = true, template } =
-      options || {};
+    const {
+      leewayInSeconds = 10,
+      throwOnError = true,
+      template,
+      skipCache = false,
+    } = options || {};
 
     if (!template && leewayInSeconds >= 60) {
       throw 'Leeway can not exceed the token lifespan (60 seconds)';
@@ -75,9 +73,12 @@ export class Session extends BaseResource implements SessionResource {
     // and retrieve it using the session id concatenated with the jwt template name.
     // e.g. session id is 'sess_abc12345' and jwt template name is 'haris'
     // The session token ID will be 'sess_abc12345' and the jwt template token ID will be 'sess_abc12345-haris'
+
     const tokenId = template ? `${this.id}-${template}` : this.id;
 
-    const cachedEntry = SessionTokenCache.get({ tokenId }, leewayInSeconds);
+    const cachedEntry = skipCache
+      ? undefined
+      : SessionTokenCache.get({ tokenId }, leewayInSeconds);
 
     let tokenResolver;
 
@@ -117,6 +118,7 @@ export class Session extends BaseResource implements SessionResource {
     this.expireAt = unixEpochToDate(data.expire_at);
     this.abandonAt = unixEpochToDate(data.abandon_at);
     this.lastActiveAt = unixEpochToDate(data.last_active_at);
+    this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     this.user = new User(data.user);
     this.publicUserData = {

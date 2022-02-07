@@ -14,12 +14,12 @@ describe('<MagicLinkWaitingScreen/>', function () {
   it('renders the <MagicLinkWaitingScreen/> component', function () {
     const tree = renderJSON(
       <MagicLinkWaitingScreen
-        header="header"
-        icon="shield"
-        mainText="main text"
-        noticeText="notice text"
-        secondaryText="secondary text"
-      />
+        header='header'
+        icon='shield'
+        mainText='main text'
+        noticeText='notice text'
+        secondaryText='secondary text'
+      />,
     );
     expect(tree).toMatchSnapshot();
   });

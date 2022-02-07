@@ -1,13 +1,14 @@
+import { Portal } from '@clerk/shared/components/portal';
 import { Spinner } from '@clerk/shared/components/spinner';
 import React from 'react';
 import {
   ExpiredMagicLinkWaitingScreen,
   FailedMagicLinkWaitingScreen,
   LoadingScreen,
-  Portal,
   PoweredByClerk,
   VerifiedMagicLinkWaitingScreen,
-  VerifiedSwitchTabMagicLinkWaitingScreen} from 'ui/common';
+  VerifiedSwitchTabMagicLinkWaitingScreen,
+} from 'ui/common';
 import { VerificationStatus } from 'utils/getClerkQueryParam';
 
 // UX - Don't confuse the user

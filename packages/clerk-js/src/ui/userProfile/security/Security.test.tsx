@@ -53,7 +53,7 @@ describe('<Security/>', () => {
   it('renders the Security page with 2nd factor enabled', async () => {
     mocked(
       useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>,
-      true
+      true,
     ).mockImplementation(
       () =>
         ({
@@ -64,7 +64,7 @@ describe('<Security/>', () => {
           displayConfig: {
             branded: true,
           },
-        } as PartialDeep<EnvironmentResource>)
+        } as PartialDeep<EnvironmentResource>),
     );
     const tree = renderJSON(<Security />);
     expect(tree).toMatchSnapshot();

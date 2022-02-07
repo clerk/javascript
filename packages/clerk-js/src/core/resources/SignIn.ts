@@ -118,8 +118,6 @@ export class SignIn extends BaseResource implements SignInResource {
     const startMagicLinkFlow = async ({
       emailAddressId,
       redirectUrl,
-      // DX: Deprecated v2.4.4
-      callbackUrl,
     }: SignInStartMagicLinkFlowParams): Promise<SignInResource> => {
       if (!this.id) {
         clerkVerifyEmailAddressCalledBeforeCreate('SignIn');
@@ -127,8 +125,7 @@ export class SignIn extends BaseResource implements SignInResource {
       await this.prepareFirstFactor({
         strategy: 'email_link',
         email_address_id: emailAddressId,
-        // DX: Deprecated eventually require redirectUrl
-        redirect_url: String(redirectUrl || callbackUrl),
+        redirect_url: redirectUrl,
       });
       return new Promise((resolve, reject) => {
         void run(() => {
@@ -175,15 +172,11 @@ export class SignIn extends BaseResource implements SignInResource {
     strategy,
     redirectUrl,
     redirectUrlComplete,
-    // DX: Deprecated v2.4.4
-    callbackUrl,
-    // DX: Deprecated v2.4.4
-    callbackUrlComplete,
   }: AuthenticateWithRedirectParams): Promise<void> => {
     const { firstFactorVerification } = await this.create({
       strategy,
-      redirect_url: redirectUrl || callbackUrl,
-      action_complete_redirect_url: redirectUrlComplete || callbackUrlComplete,
+      redirect_url: redirectUrl,
+      action_complete_redirect_url: redirectUrlComplete,
     });
     const { status, externalVerificationRedirectURL } = firstFactorVerification;
 

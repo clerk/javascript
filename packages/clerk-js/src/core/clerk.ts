@@ -45,19 +45,14 @@ import { memoizeListenerCallback } from 'utils/memoizeStateListenerCallback';
 
 import packageJSON from '../../package.json';
 import type Components from '../ui';
-import createDevBrowserHandler, {
-  DevBrowserHandler,
-} from './devBrowserHandler';
+import createDevBrowserHandler, { DevBrowserHandler } from './devBrowserHandler';
 import {
   clerkErrorInitFailed,
   clerkErrorInvalidFrontendApi,
   clerkErrorNoFrontendApi,
   clerkOAuthCallbackDidNotCompleteSignInSIgnUp,
 } from './errors';
-import createFapiClient, {
-  FapiClient,
-  FapiRequestCallback,
-} from './fapiClient';
+import createFapiClient, { FapiClient, FapiRequestCallback } from './fapiClient';
 import { BaseResource } from './resources/Base';
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
@@ -74,26 +69,6 @@ const defaultOptions: ClerkOptions & {
 } = {
   polling: true,
   authVersion: 2,
-};
-
-// DX: deprecated <=2.4.2
-// Todo: Remove deprecated returnBack form
-interface RedirectToOverload {
-  (returnBack?: boolean): Promise<unknown>;
-
-  (opts?: RedirectOptions): Promise<unknown>;
-}
-
-// DX: deprecated <=2.4.2
-// Todo: Remove deprecated returnBack form
-const getOptsWithDeprecatedReturnBack = (opts?: boolean | RedirectOptions) => {
-  if (!opts) {
-    return undefined;
-  }
-  if (typeof opts === 'object') {
-    return opts;
-  }
-  return { redirect_url: window.location.href };
 };
 
 export default class Clerk implements ClerkInterface {
@@ -156,9 +131,7 @@ export default class Clerk implements ClerkInterface {
     this.#isReady = true;
   };
 
-  public signOutOne = async (
-    signOutCallback?: SignOutCallback,
-  ): Promise<void> => {
+  public signOutOne = async (signOutCallback?: SignOutCallback): Promise<void> => {
     if (this.#environment?.authConfig.singleSessionMode) {
       return this.signOut(signOutCallback);
     }
@@ -174,9 +147,9 @@ export default class Clerk implements ClerkInterface {
     return this.setSession(null, ignoreEventValue(signOutCallback));
   };
 
-  public openSignIn = (nodeProps?: SignInProps): void => {
+  public openSignIn = (props?: SignInProps): void => {
     this.assertComponentsReady(this.#components);
-    this.#components.openSignIn(nodeProps || {});
+    this.#components.openSignIn(props || {});
   };
 
   public closeSignIn = (): void => {
@@ -184,9 +157,9 @@ export default class Clerk implements ClerkInterface {
     this.#components.closeSignIn();
   };
 
-  public openSignUp = (nodeProps?: SignInProps): void => {
+  public openSignUp = (props?: SignInProps): void => {
     this.assertComponentsReady(this.#components);
-    this.#components.openSignUp(nodeProps || {});
+    this.#components.openSignUp(props || {});
   };
 
   public closeSignUp = (): void => {
@@ -194,57 +167,72 @@ export default class Clerk implements ClerkInterface {
     this.#components.closeSignUp();
   };
 
-  public mountSignIn = (
-    node: HTMLDivElement,
-    nodeProps?: SignInProps,
-  ): void => {
+  public mountSignIn = (node: HTMLDivElement, props?: SignInProps): void => {
     this.assertComponentsReady(this.#components);
-    this.#components.mountSignIn(node, nodeProps || {});
+    this.#components.mountComponent({
+      name: 'SignIn',
+      node,
+      nodeClassName: 'cl-sign-in',
+      props,
+    });
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#components);
-    this.#components.unmountSignIn(node);
+    this.#components.unmountComponent({
+      node,
+    });
   };
 
-  public mountSignUp = (
-    node: HTMLDivElement,
-    signUpProps?: SignUpProps,
-  ): void => {
+  public mountSignUp = (node: HTMLDivElement, props?: SignUpProps): void => {
     this.assertComponentsReady(this.#components);
-    // DX: deprecated <=1.28.0
-    this.#components.mountSignUp(node, signUpProps || {});
+    this.#components.mountComponent({
+      name: 'SignUp',
+      node,
+      nodeClassName: 'cl-sign-up',
+      props,
+    });
   };
 
   public unmountSignUp = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#components);
-    this.#components.unmountSignUp(node);
+    this.#components.unmountComponent({
+      node,
+    });
   };
 
-  public mountUserProfile = (
-    node: HTMLDivElement,
-    userProfileProps?: UserProfileProps,
-  ): void => {
+  public mountUserProfile = (node: HTMLDivElement, props?: UserProfileProps): void => {
     this.assertComponentsReady(this.#components);
-    this.#components.mountUserProfile(node, userProfileProps || {});
+    this.#components.mountComponent({
+      name: 'UserProfile',
+      node,
+      nodeClassName: 'cl-user-profile',
+      props,
+    });
   };
 
   public unmountUserProfile = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#components);
-    this.#components.unmountUserProfile(node);
+    this.#components.unmountComponent({
+      node,
+    });
   };
 
-  public mountUserButton = (
-    node: HTMLDivElement,
-    userButtonProps?: UserButtonProps,
-  ): void => {
+  public mountUserButton = (node: HTMLDivElement, props?: UserButtonProps): void => {
     this.assertComponentsReady(this.#components);
-    this.#components.mountUserButton(node, userButtonProps || {});
+    this.#components.mountComponent({
+      name: 'UserButton',
+      node,
+      nodeClassName: 'cl-user-button',
+      props,
+    });
   };
 
   public unmountUserButton = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#components);
-    this.#components.unmountUserButton(node);
+    this.#components.unmountComponent({
+      node,
+    });
   };
 
   public setSession = async (
@@ -252,16 +240,11 @@ export default class Clerk implements ClerkInterface {
     beforeEmit?: BeforeEmitCallback,
   ): Promise<void> => {
     if (!this.client) {
-      throw new Error(
-        'setSession is being called before the client is loaded. Wait for init.',
-      );
+      throw new Error('setSession is being called before the client is loaded. Wait for init.');
     }
 
     if (typeof session === 'string') {
-      session =
-        (this.client.sessions.find(
-          x => x.id === session,
-        ) as ActiveSessionResource) || null;
+      session = (this.client.sessions.find(x => x.id === session) as ActiveSessionResource) || null;
     }
 
     this.#authService?.setAuthCookiesFromSession(session);
@@ -296,6 +279,7 @@ export default class Clerk implements ClerkInterface {
     this.user = this.session ? this.session.user : null;
 
     this.#emit();
+    this.#resetComponentsState();
   };
 
   public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
@@ -333,31 +317,23 @@ export default class Clerk implements ClerkInterface {
     return await customNavigate(stripOrigin(toURL));
   };
 
-  public redirectToSignIn: RedirectToOverload = async (
-    opts,
-  ): Promise<unknown> => {
+  public redirectToSignIn = async (options?: RedirectOptions): Promise<unknown> => {
+    const opts: RedirectOptions = { ...options, redirectUrl: options?.redirectUrl || window.location.href };
     if (!this.#environment || !this.#environment.displayConfig) {
       return;
     }
     const { signInUrl } = this.#environment.displayConfig;
-    const url = appendAsQueryParams(
-      signInUrl,
-      getOptsWithDeprecatedReturnBack(opts),
-    );
+    const url = appendAsQueryParams(signInUrl, opts);
     return this.navigate(url);
   };
 
-  public redirectToSignUp: RedirectToOverload = async (
-    opts,
-  ): Promise<unknown> => {
+  public redirectToSignUp = async (options?: RedirectOptions): Promise<unknown> => {
+    const opts: RedirectOptions = { ...options, redirectUrl: options?.redirectUrl || window.location.href };
     if (!this.#environment || !this.#environment.displayConfig) {
       return;
     }
     const { signUpUrl } = this.#environment.displayConfig;
-    const url = appendAsQueryParams(
-      signUpUrl,
-      getOptsWithDeprecatedReturnBack(opts),
-    );
+    const url = appendAsQueryParams(signUpUrl, opts);
     return this.navigate(url);
   };
 
@@ -386,24 +362,17 @@ export default class Clerk implements ClerkInterface {
     const newSessionId = getClerkQueryParam('__clerk_created_session');
     const { signIn, signUp, sessions } = this.client;
 
-    const shouldCompleteOnThisDevice = sessions.some(
-      s => s.id === newSessionId,
-    );
+    const shouldCompleteOnThisDevice = sessions.some(s => s.id === newSessionId);
     const shouldContinueOnThisDevice =
-      signIn.status === 'needs_second_factor' ||
-      signUp.status === 'missing_requirements';
+      signIn.status === 'needs_second_factor' || signUp.status === 'missing_requirements';
 
     const navigate = (to: string) =>
-      customNavigate && typeof customNavigate === 'function'
-        ? customNavigate(to)
-        : this.navigate(to);
+      customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
 
     const redirectComplete = params.redirectUrlComplete
       ? () => navigate(params.redirectUrlComplete as string)
       : noop;
-    const redirectContinue = params.redirectUrl
-      ? () => navigate(params.redirectUrl as string)
-      : noop;
+    const redirectContinue = params.redirectUrl ? () => navigate(params.redirectUrl as string) : noop;
 
     if (shouldCompleteOnThisDevice) {
       return this.setSession(newSessionId, redirectComplete);
@@ -439,14 +408,11 @@ export default class Clerk implements ClerkInterface {
       status: signIn.status,
       firstFactorVerificationStatus: firstFactorVerification.status,
       firstFactorVerificationErrorCode: firstFactorVerification.error?.code,
-      firstFactorVerificationSessionId:
-        firstFactorVerification.error?.meta?.sessionId,
+      firstFactorVerificationSessionId: firstFactorVerification.error?.meta?.sessionId,
     };
 
     const navigate = (to: string) =>
-      customNavigate && typeof customNavigate === 'function'
-        ? customNavigate(to)
-        : this.navigate(to);
+      customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
 
     const makeNavigate = (to: string) => () => navigate(to);
 
@@ -457,15 +423,11 @@ export default class Clerk implements ClerkInterface {
     );
 
     const navigateAfterSignIn = makeNavigate(
-      params.afterSignInUrl ||
-        params.redirectUrl ||
-        displayConfig.afterSignInUrl,
+      params.afterSignInUrl || params.redirectUrl || displayConfig.afterSignInUrl,
     );
 
     const navigateAfterSignUp = makeNavigate(
-      params.afterSignUpUrl ||
-        params.redirectUrl ||
-        displayConfig.afterSignUpUrl,
+      params.afterSignUpUrl || params.redirectUrl || displayConfig.afterSignUpUrl,
     );
 
     const userExistsButNeedsToSignIn =
@@ -484,8 +446,7 @@ export default class Clerk implements ClerkInterface {
       }
     }
 
-    const userNeedsToBeCreated =
-      si.firstFactorVerificationStatus === 'transferable';
+    const userNeedsToBeCreated = si.firstFactorVerificationStatus === 'transferable';
 
     if (userNeedsToBeCreated) {
       const res = await signUp.create({ transfer: true });
@@ -502,8 +463,7 @@ export default class Clerk implements ClerkInterface {
     }
 
     const suUserAlreadySignedIn =
-      (su.externalAccountStatus === 'failed' ||
-        su.externalAccountStatus === 'unverified') &&
+      (su.externalAccountStatus === 'failed' || su.externalAccountStatus === 'unverified') &&
       su.externalAccountErrorCode === 'identifier_already_signed_in' &&
       su.externalAccountSessionId;
 
@@ -514,8 +474,7 @@ export default class Clerk implements ClerkInterface {
 
     const userAlreadySignedIn = suUserAlreadySignedIn || siUserAlreadySignedIn;
     if (userAlreadySignedIn) {
-      const sessionId =
-        si.firstFactorVerificationSessionId || su.externalAccountSessionId;
+      const sessionId = si.firstFactorVerificationSessionId || su.externalAccountSessionId;
       if (sessionId) {
         return this.setSession(sessionId, navigateAfterSignIn);
       }
@@ -524,9 +483,7 @@ export default class Clerk implements ClerkInterface {
     return navigateToSignIn();
   };
 
-  public handleUnauthenticated = async (
-    opts = { broadcast: true },
-  ): Promise<unknown> => {
+  public handleUnauthenticated = async (opts = { broadcast: true }): Promise<unknown> => {
     if (!this.client || !this.session) {
       return;
     }
@@ -588,11 +545,8 @@ export default class Clerk implements ClerkInterface {
     this.#emit();
   };
 
-  get __unstable__environment(): null | { displayConfig: any } {
-    if (!this.#environment) {
-      return null;
-    }
-    return { displayConfig: { ...this.#environment.displayConfig } };
+  get __unstable__environment(): EnvironmentResource | null | undefined {
+    return this.#environment;
   }
 
   __unstable__onBeforeRequest(callback: FapiRequestCallback<any>): void {
@@ -613,9 +567,7 @@ export default class Clerk implements ClerkInterface {
     });
 
     const isFapiDevOrStaging = isDevOrStagingUrl(this.frontendApi);
-    const isInAccountsHostedPages = isAccountsHostedPages(
-      window?.location.hostname,
-    );
+    const isInAccountsHostedPages = isAccountsHostedPages(window?.location.hostname);
 
     await this.#devBrowserHandler.setup({ purge: !isFapiDevOrStaging });
 
@@ -643,11 +595,7 @@ export default class Clerk implements ClerkInterface {
         });
 
         if (Clerk.Components) {
-          this.#components = Clerk.Components.render(
-            this,
-            this.#environment,
-            this.#options,
-          );
+          this.#components = Clerk.Components.render(this, this.#environment, this.#options);
         }
 
         break;
@@ -677,9 +625,7 @@ export default class Clerk implements ClerkInterface {
 
   #defaultSession = (client: ClientResource): ActiveSessionResource | null => {
     if (client.lastActiveSessionId) {
-      const lastActiveSession = client.activeSessions.find(
-        s => s.id === client.lastActiveSessionId,
-      );
+      const lastActiveSession = client.activeSessions.find(s => s.id === client.lastActiveSessionId);
       if (lastActiveSession) {
         return lastActiveSession ;
       }
@@ -694,10 +640,7 @@ export default class Clerk implements ClerkInterface {
     }
 
     document.addEventListener('visibilitychange', async () => {
-      if (
-        document.visibilityState === 'visible' &&
-        typeof this.session !== 'undefined'
-      ) {
+      if (document.visibilityState === 'visible' && typeof this.session !== 'undefined') {
         void Promise.all([this.#touchLastActiveSession(this.session)]);
       }
     });
@@ -714,9 +657,7 @@ export default class Clerk implements ClerkInterface {
   };
 
   // TODO: Be more conservative about touches. Throttle, don't touch when only one user, etc
-  #touchLastActiveSession = (
-    session: ActiveSessionResource | null,
-  ): Promise<unknown> => {
+  #touchLastActiveSession = (session: ActiveSessionResource | null): Promise<unknown> => {
     if (!session) {
       return Promise.resolve();
     }
@@ -739,9 +680,12 @@ export default class Clerk implements ClerkInterface {
     this.#broadcastChannel?.postMessage({ type: 'signout' });
   };
 
-  assertComponentsReady(
-    components: Components | null | undefined,
-  ): asserts components is Components {
+  #resetComponentsState = () => {
+    this.closeSignUp();
+    this.closeSignIn();
+  };
+
+  assertComponentsReady(components: Components | null | undefined): asserts components is Components {
     if (!Clerk.Components) {
       throw new Error('ClerkJS was loaded without UI components.');
     }

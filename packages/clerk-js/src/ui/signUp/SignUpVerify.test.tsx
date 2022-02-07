@@ -1,4 +1,4 @@
-import { noop, render,renderJSON } from '@clerk/shared/testUtils';
+import { noop, render, renderJSON } from '@clerk/shared/testUtils';
 import {
   SessionResource,
   SignInStrategyName,
@@ -126,7 +126,7 @@ describe('<SignUpVerify/>', () => {
 
     xit(
       'renders the verifiation screen, types the OTP and attempts an email address verification',
-      noop
+      noop,
     );
   });
 
@@ -138,7 +138,7 @@ describe('<SignUpVerify/>', () => {
 
     xit(
       'renders the verifiation screen, types the OTP and attempts a phone number verification',
-      noop
+      noop,
     );
   });
 });

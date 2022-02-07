@@ -37,10 +37,10 @@ const Button = ({ to, children }: React.PropsWithChildren<{ to: string }>) => {
 };
 
 const Tester = () => (
-  <PathRouter preservedParams={['preserved']} basePath="/foo">
-    <Route path="bar">
-      <Button to="../baz">Internal</Button>
-      <Button to="../../">External</Button>
+  <PathRouter preservedParams={['preserved']} basePath='/foo'>
+    <Route path='bar'>
+      <Button to='../baz'>Internal</Button>
+      <Button to='../../'>External</Button>
     </Route>
   </PathRouter>
 );
@@ -98,7 +98,7 @@ describe('PathRouter', () => {
       });
       expect(mockNavigate).toHaveBeenNthCalledWith(
         1,
-        'https://www.example.com/'
+        'https://www.example.com/',
       );
     });
   });

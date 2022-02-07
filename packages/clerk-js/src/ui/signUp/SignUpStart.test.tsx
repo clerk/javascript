@@ -91,7 +91,7 @@ describe('<SignUpStart/>', () => {
             status: 'unverified',
           },
         },
-      })
+      }),
     );
 
     mockAuthConfig = {
@@ -124,7 +124,7 @@ describe('<SignUpStart/>', () => {
     await userEvent.type(screen.getByLabelText('Username'), 'jdoe');
     await userEvent.type(
       screen.getByLabelText('Email address'),
-      'jdoe@example.com'
+      'jdoe@example.com',
     );
     await userEvent.type(screen.getByLabelText('Password'), 'p@ssW0rd');
 
@@ -156,7 +156,7 @@ describe('<SignUpStart/>', () => {
       userEvent.click(
         screen.getByRole('button', {
           name: regex,
-        })
+        }),
       );
 
       await waitFor(() => {
@@ -167,7 +167,7 @@ describe('<SignUpStart/>', () => {
           redirectUrlComplete: 'http://test.host',
         });
       });
-    }
+    },
   );
 
   it('renders the external account verification error if available', async () => {
@@ -207,7 +207,7 @@ describe('<SignUpStart/>', () => {
     screen.getByRole('button', { name: /Google/ });
     screen.getByRole('button', { name: /Facebook/ });
     expect(
-      screen.queryByRole('button', { name: 'Sign up' })
+      screen.queryByRole('button', { name: 'Sign up' }),
     ).not.toBeInTheDocument();
   });
 
@@ -246,7 +246,7 @@ describe('<SignUpStart/>', () => {
         Promise.resolve({
           status: 'complete',
           emailAddress: 'jdoe@example.com',
-        })
+        }),
       );
       render(<SignUpStart />);
       await waitFor(() => {
@@ -264,7 +264,7 @@ describe('<SignUpStart/>', () => {
               status: 'unverified',
             },
           },
-        })
+        }),
       );
       render(<SignUpStart />);
       await waitFor(() => {
@@ -286,7 +286,7 @@ describe('<SignUpStart/>', () => {
               status: 'unverified',
             },
           },
-        })
+        }),
       );
       render(<SignUpStart />);
       await waitFor(() => {
@@ -305,8 +305,8 @@ describe('<SignUpStart/>', () => {
       await waitFor(() => {
         expect(
           Array.from(labels)
-            .map((l) => l.htmlFor)
-            .includes('phoneNumber')
+            .map(l => l.htmlFor)
+            .includes('phoneNumber'),
         ).toBeFalsy();
       });
     });

@@ -5,8 +5,8 @@ module.exports = {
   entry: {
     clerk: './src/index.ts',
     'clerk.browser': './src/index.browser.ts',
-    'clerk.nocomponents': './src/index.nocomponents.ts',
-    'clerk.nocomponents.browser': './src/index.nocomponents.browser.ts',
+    'clerk.headless': './src/index.headless.ts',
+    'clerk.headless.browser': './src/index.headless.browser.ts',
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],

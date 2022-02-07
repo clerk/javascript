@@ -1,4 +1,4 @@
-import { SignInJSON,SignUpJSON } from '@clerk/types';
+import { SignInJSON, SignUpJSON } from '@clerk/types';
 import { waitFor } from '@testing-library/dom';
 import Clerk from 'core/clerk';
 import { Client } from 'core/resources/Client';
@@ -91,13 +91,13 @@ describe('Clerk singleton', () => {
     });
 
     it('redirects to signInUrl', () => {
-      sut.redirectToSignIn();
-      expect(mockNavigate).toHaveBeenCalledWith('/signInUrl');
+      sut.redirectToSignIn({ redirectUrl: 'https://www.example.com/' });
+      expect(mockNavigate).toHaveBeenCalledWith('/signInUrl#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
     });
 
     it('redirects to signUpUrl', () => {
-      sut.redirectToSignUp();
-      expect(mockNavigate).toHaveBeenCalledWith('/signUpUrl');
+      sut.redirectToSignUp({ redirectUrl: 'https://www.example.com/' });
+      expect(mockNavigate).toHaveBeenCalledWith('/signUpUrl#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
     });
 
     it('redirects to userProfileUrl', () => {
@@ -232,9 +232,7 @@ describe('Clerk singleton', () => {
       const mockSetSession = jest.fn();
       const mockSignUpCreate = jest
         .fn()
-        .mockReturnValue(
-          Promise.resolve({ status: 'complete', createdSessionId: '123' }),
-        );
+        .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
 
       const sut = new Clerk(frontendApi);
       await sut.load({
@@ -301,9 +299,7 @@ describe('Clerk singleton', () => {
       const mockSetSession = jest.fn();
       const mockSignInCreate = jest
         .fn()
-        .mockReturnValue(
-          Promise.resolve({ status: 'complete', createdSessionId: '123' }),
-        );
+        .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
 
       const sut = new Clerk(frontendApi);
       await sut.load({
@@ -408,9 +404,7 @@ describe('Clerk singleton', () => {
       const mockSetSession = jest.fn();
       const mockSignUpCreate = jest
         .fn()
-        .mockReturnValue(
-          Promise.resolve({ status: 'complete', createdSessionId: '123' }),
-        );
+        .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
 
       const sut = new Clerk(frontendApi);
       await sut.load({
@@ -466,9 +460,7 @@ describe('Clerk singleton', () => {
       sut.handleRedirectCallback();
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith(
-          '/' + mockDisplayConfig.signInUrl + '#/factor-two',
-        );
+        expect(mockNavigate).toHaveBeenCalledWith('/' + mockDisplayConfig.signInUrl + '#/factor-two');
       });
     });
 
@@ -661,10 +653,7 @@ describe('Clerk singleton', () => {
       sut.handleMagicLinkVerification({ redirectUrlComplete });
 
       await waitFor(() => {
-        expect(mockSetSession).toHaveBeenCalledWith(
-          createdSessionId,
-          expect.any(Function),
-        );
+        expect(mockSetSession).toHaveBeenCalledWith(createdSessionId, expect.any(Function));
       });
     });
 
@@ -725,10 +714,7 @@ describe('Clerk singleton', () => {
       sut.handleMagicLinkVerification({ redirectUrlComplete });
 
       await waitFor(() => {
-        expect(mockSetSession).toHaveBeenCalledWith(
-          createdSessionId,
-          expect.any(Function),
-        );
+        expect(mockSetSession).toHaveBeenCalledWith(createdSessionId, expect.any(Function));
       });
     });
 
