@@ -12,12 +12,9 @@ export interface SessionResource extends ClerkResource {
   publicUserData: PublicUserData;
   end: () => Promise<SessionResource>;
   remove: () => Promise<SessionResource>;
-  /**
-   *  `revoke` has been deprecated and will be removed soon.
-   */
-  revoke: () => Promise<SessionResource>;
   touch: () => Promise<SessionResource>;
   getToken: (options?: GetSessionTokenOptions) => Promise<string>;
+  createdAt: Date;
   updatedAt: Date;
 }
 

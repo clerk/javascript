@@ -11,6 +11,7 @@ export type GetSessionTokenOptions = {
   leewayInSeconds?: number;
   template?: string;
   throwOnError?: boolean;
+  skipCache?: boolean;
 };
 
 export interface TokenResource extends ClerkResource {
