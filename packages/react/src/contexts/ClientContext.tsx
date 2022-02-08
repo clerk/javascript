@@ -6,41 +6,40 @@ import {
 } from '@clerk/types';
 import React, { useContext } from 'react';
 
+import { makeContextAndHook } from '../utils/makeContextAndHook';
 import {
   assertClerkLoadedGuarantee,
   assertWrappedByClerkProvider,
 } from './assertHelpers';
 import { StructureContext } from './StructureContext';
 
-type ClientContextValue = { value: ClientResource | undefined | null };
-export const ClientContext = React.createContext<
-  ClientContextValue | undefined
->(undefined);
-ClientContext.displayName = 'ClientContext';
+/**
+ * @internal
+ */
+export const [ClientContext, useClientContext] = makeContextAndHook<
+  ClientResource | undefined | null
+>('ClientContext');
 
 export function useSignIn(): SignInResource {
   const structureCtx = useContext(StructureContext);
-  const clientCtx = React.useContext(ClientContext);
-  assertWrappedByClerkProvider(clientCtx);
+  const client = useClientContext();
   assertWrappedByClerkProvider(structureCtx);
   assertClerkLoadedGuarantee(structureCtx.guaranteedLoaded, 'useSignIn()');
-  return (clientCtx.value as ClientResource).signIn;
+  return (client as ClientResource).signIn;
 }
 
 export function useSignUp(): SignUpResource {
   const structureCtx = useContext(StructureContext);
-  const clientCtx = React.useContext(ClientContext);
-  assertWrappedByClerkProvider(clientCtx);
+  const client = useClientContext();
   assertWrappedByClerkProvider(structureCtx);
   assertClerkLoadedGuarantee(structureCtx.guaranteedLoaded, 'useSignUp()');
-  return (clientCtx.value as ClientResource).signUp;
+  return (client as ClientResource).signUp;
 }
 
 export function useSessionList(): SessionResource[] {
   const structureCtx = useContext(StructureContext);
-  const clientCtx = React.useContext(ClientContext);
-  assertWrappedByClerkProvider(clientCtx);
+  const client = useClientContext();
   assertWrappedByClerkProvider(structureCtx);
   assertClerkLoadedGuarantee(structureCtx.guaranteedLoaded, 'useSessionList()');
-  return (clientCtx.value as ClientResource).sessions;
+  return (client as ClientResource).sessions;
 }
