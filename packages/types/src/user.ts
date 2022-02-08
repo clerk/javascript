@@ -5,7 +5,6 @@ import { UserJSON } from './json';
 import { PhoneNumberResource } from './phoneNumber';
 import { ClerkResource } from './resource';
 import { SessionWithActivitiesResource } from './session';
-import { GetUserTokenOptions,JWTService } from './token';
 import { SnakeToCamel } from './utils';
 import { Web3WalletResource } from './web3Wallet';
 
@@ -39,10 +38,6 @@ export interface UserResource extends ClerkResource {
   isPrimaryIdentification: (
     ident: EmailAddressResource | PhoneNumberResource,
   ) => boolean;
-  getToken: (
-    service: JWTService,
-    options?: GetUserTokenOptions,
-  ) => Promise<string>;
   getSessions: () => Promise<SessionWithActivitiesResource[]>;
   setProfileImage: (file: Blob | File) => Promise<ImageResource>;
 }

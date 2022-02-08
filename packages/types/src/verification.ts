@@ -34,12 +34,7 @@ export type VerificationAttemptParams =
   | SignatureVerificationAttemptParam;
 
 export interface StartMagicLinkFlowParams {
-  redirectUrl?: string;
-  // DX: Deprecated v2.4.4
-  /**
-   * @deprecated Use {@link StartMagicLinkFlowParams.redirectUrl} instead.
-   */
-  callbackUrl?: string;
+  redirectUrl: string;
 }
 
 export type CreateMagicLinkFlowReturn<Params, Resource> = {

@@ -1,14 +1,16 @@
-import { OAuthProvider } from './oauth';
+import { OAuthProvider } from '.';
 
 export interface ExternalAccountResource {
   id: string;
+  identificationId: string;
   provider: OAuthProvider;
-  externalId: string;
+  providerUserId: string;
   emailAddress: string;
   approvedScopes: string;
   firstName: string;
   lastName: string;
-  picture: string;
+  avatarUrl: string;
 
+  providerSlug: () => OAuthProvider;
   providerTitle: () => string;
 }
