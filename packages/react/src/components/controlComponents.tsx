@@ -1,64 +1,74 @@
 import { HandleOAuthCallbackParams } from '@clerk/types';
 import React from 'react';
 
-import { withClerk, withUser } from '../contexts';
-import { useUserContext } from '../contexts/UserContext';
+import { useAuthContext } from '../contexts/AuthContext';
+import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
+import { useSessionContext } from '../contexts/SessionContext';
+import { LoadedGuarantee } from '../contexts/StructureContext';
 import type { RedirectToProps, WithClerkProp } from '../types';
+import { withClerk } from './withClerk';
 
-export const SignedIn: React.FC = withUser(({ children }) => {
-  return <>{children}</>;
-}, 'SignedIn');
-
-export const SignedOut: React.FC = withClerk(({ children }) => {
-  const userCtx = useUserContext();
-  return userCtx.value === null ? <>{children}</> : null;
-}, 'SignedOut');
-
-export const ClerkLoaded: React.FC = withClerk(({ children }) => {
-  return <>{children}</>;
-}, 'ClerkLoaded');
-
-export const ClerkLoading: React.FC = ({ children }) => {
-  const userCtx = useUserContext();
-  return userCtx.value === undefined ? <>{children}</> : null;
+export const SignedIn: React.FC = ({ children }) => {
+  const { userId } = useAuthContext();
+  if (userId) {
+    return <>{children}</>;
+  }
+  return null;
 };
 
-// DX: returnBack deprecated <=2.4.2
-// Deprecate the boolean type before removing returnBack
+export const SignedOut: React.FC = ({ children }) => {
+  const { userId } = useAuthContext();
+  if (userId === null) {
+    return <>{children}</>;
+  }
+  return null;
+};
+
+export const ClerkLoaded: React.FC = ({ children }) => {
+  const isomorphicClerk = useIsomorphicClerkContext();
+  if (!isomorphicClerk.loaded) {
+    return null;
+  }
+  return <LoadedGuarantee>{children}</LoadedGuarantee>;
+};
+
+export const ClerkLoading: React.FC = ({ children }) => {
+  const isomorphicClerk = useIsomorphicClerkContext();
+  if (isomorphicClerk.loaded) {
+    return null;
+  }
+  return <>{children}</>;
+};
+
 export const RedirectToSignIn = withClerk(
   ({ clerk, ...props }: WithClerkProp<RedirectToProps>) => {
-    const { returnBack, afterSignUpUrl, redirectUrl, afterSignInUrl } = props;
-    const redirectOptions = { afterSignUpUrl, redirectUrl, afterSignInUrl };
-
     const { client, session } = clerk;
     // TODO: Remove temp use of __unstable__environment
     const { __unstable__environment } = clerk as any;
 
     const hasActiveSessions =
       client.activeSessions && client.activeSessions.length > 0;
+
     React.useEffect(() => {
       if (session === null && hasActiveSessions && __unstable__environment) {
         const { afterSignOutOneUrl } = __unstable__environment.displayConfig;
         void clerk.navigate(afterSignOutOneUrl);
       } else {
-        void clerk.redirectToSignIn((returnBack || redirectOptions) as any);
+        void clerk.redirectToSignIn(props);
       }
     }, []);
+
     return null;
   },
   'RedirectToSignIn',
 );
 
-// DX: returnBack deprecated <=2.4.2
-// Deprecate the boolean type before removing returnBack
 export const RedirectToSignUp = withClerk(
   ({ clerk, ...props }: WithClerkProp<RedirectToProps>) => {
-    const { returnBack, afterSignUpUrl, redirectUrl, afterSignInUrl } = props;
-    const redirectOptions = { afterSignUpUrl, redirectUrl, afterSignInUrl };
-
     React.useEffect(() => {
-      void clerk.redirectToSignUp((returnBack || redirectOptions) as any);
+      void clerk.redirectToSignUp(props);
     }, []);
+
     return null;
   },
   'RedirectToSignUp',
@@ -68,6 +78,7 @@ export const RedirectToUserProfile = withClerk(({ clerk }) => {
   React.useEffect(() => {
     clerk.redirectToUserProfile();
   }, []);
+
   return null;
 }, 'RedirectToUserProfile');
 
@@ -79,7 +90,17 @@ export const AuthenticateWithRedirectCallback = withClerk(
     React.useEffect(() => {
       void clerk.handleRedirectCallback(handleRedirectCallbackParams);
     }, []);
+
     return null;
   },
   'AuthenticateWithRedirectCallback',
 );
+
+export const MultisessionAppSupport: React.FC = ({ children }) => {
+  const session = useSessionContext();
+  return (
+    <React.Fragment key={session ? session.id : 'no-users'}>
+      {children}
+    </React.Fragment>
+  );
+};
