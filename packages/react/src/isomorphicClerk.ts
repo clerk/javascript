@@ -4,9 +4,9 @@ import type {
   ClientResource,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
+  InitialState,
   RedirectOptions,
   Resources,
-  SessionResource,
   SignInProps,
   SignOutCallback,
   SignUpProps,
@@ -22,7 +22,7 @@ import type {
   ClerkProp,
   IsomorphicClerkOptions,
 } from './types';
-import { inBrowser, isConstructor, loadScript } from './utils';
+import { inClientSide, isConstructor, loadScript } from './utils';
 
 export interface Global {
   Clerk?: BrowserClerk;
@@ -54,39 +54,33 @@ export default class IsomorphicClerk {
     MethodName<BrowserClerk>,
     MethodCallback
   >();
+  private loadedListeners: Array<() => void> = [];
 
   private _loaded = false;
 
-  ssrData: string | null = null;
-  ssrClient?: ClientResource;
-  ssrSession?: SessionResource | null;
+  initialState: InitialState | undefined;
+
+  get loaded(): boolean {
+    return this._loaded;
+  }
 
   constructor(
     frontendApi: string,
     options: IsomorphicClerkOptions = {},
     Clerk: ClerkProp = null,
+    initialState?: InitialState,
   ) {
     this.frontendApi = frontendApi;
     this.options = options;
     this.Clerk = Clerk;
-
-    this.mode = inBrowser() ? 'browser' : 'server';
-
-    // TODO: Support SRR for NextJS
-    // const ssrDataNode = document.querySelector(`script[data-clerk="SSR"]`);
-    // if (ssrDataNode) {
-    //   this.ssrData = ssrDataNode.innerHTML;
-    //   const parsedData = JSON.parse(this.ssrData);
-    //   this.ssrClient = parsedData.client;
-    //   this.ssrSession = parsedData.session;
-    // }
+    this.initialState = initialState;
+    this.mode = inClientSide() ? 'browser' : 'server';
   }
 
   async loadClerkJS(): Promise<BrowserClerk | undefined> {
     if (!this.frontendApi) {
       this.throwError(noFrontendApiError);
     }
-
     try {
       if (this.Clerk) {
         // Set a fixed Clerk version
@@ -108,7 +102,11 @@ export default class IsomorphicClerk {
         global.Clerk = c;
       } else {
         // Hot-load latest ClerkJS from Clerk CDN
-        await loadScript(this.frontendApi, this.options.scriptUrl);
+        await loadScript({
+          frontendApi: this.frontendApi,
+          scriptUrl: this.options.clerkJSUrl,
+          scriptVariant: this.options.clerkJSVariant,
+        });
 
         if (!global.Clerk) {
           throw new Error(
@@ -134,6 +132,15 @@ export default class IsomorphicClerk {
       return;
     }
   }
+
+  public addOnLoaded = (cb: () => void) => {
+    this.loadedListeners.push(cb);
+  };
+
+  public emitLoaded = () => {
+    this.loadedListeners.forEach(cb => cb());
+    this.loadedListeners = [];
+  };
 
   // Custom wrapper to throw an error, since we need to apply different handling between
   // production and development builds. In Next.js we can throw a full screen error in
@@ -188,7 +195,7 @@ export default class IsomorphicClerk {
     );
 
     this._loaded = true;
-
+    this.emitLoaded();
     return this.clerkjs;
   };
 
@@ -217,7 +224,6 @@ export default class IsomorphicClerk {
   get user(): UserResource | undefined | null {
     if (this.clerkjs) {
       return this.clerkjs.user;
-      // TODO: add ssr condition
     } else {
       return undefined;
     }
@@ -352,20 +358,6 @@ export default class IsomorphicClerk {
     }
   };
 
-  loadFromServer = (token: string): void => {
-    if (this.mode === 'browser') {
-      void this.throwError(
-        'loadFromServer cannot be called in a browser context.',
-      );
-    }
-
-    this.ssrData = JSON.stringify({
-      client: this.client,
-      session: this.session,
-      token: token,
-    });
-  };
-
   navigate = (to: string): void => {
     const callback = () => this.clerkjs?.navigate(to);
     if (this.clerkjs && this._loaded) {
@@ -375,9 +367,7 @@ export default class IsomorphicClerk {
     }
   };
 
-  // DX: deprecated <=2.4.2
-  // Deprecate the boolean type before removing returnBack
-  redirectToSignIn = (opts: RedirectOptions | boolean): void => {
+  redirectToSignIn = (opts: RedirectOptions): void => {
     const callback = () => this.clerkjs?.redirectToSignIn(opts as any);
     if (this.clerkjs && this._loaded) {
       void callback();
@@ -386,9 +376,7 @@ export default class IsomorphicClerk {
     }
   };
 
-  // DX: deprecated <=2.4.2
-  // Deprecate the boolean type before removing returnBack
-  redirectToSignUp = (opts: RedirectOptions | boolean): void => {
+  redirectToSignUp = (opts: RedirectOptions): void => {
     const callback = () => this.clerkjs?.redirectToSignUp(opts as any);
     if (this.clerkjs && this._loaded) {
       void callback();
