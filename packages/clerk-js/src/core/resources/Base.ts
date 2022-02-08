@@ -94,9 +94,7 @@ export abstract class BaseResource {
       return baseWithId;
     }
 
-    return (
-      baseWithId.replace(/[^/]$/, '$&/') + encodeURIComponent(action as string)
-    );
+    return baseWithId.replace(/[^/]$/, '$&/') + encodeURIComponent(action);
   }
 
   protected abstract fromJSON(data: ClerkResourceJSON | null): this;

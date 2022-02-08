@@ -22,7 +22,7 @@ export function ConnectedAccountListItem({
       <div>
         <img
           alt={externalAccount.providerTitle()}
-          src={svgUrl(externalAccount.provider)}
+          src={svgUrl(externalAccount.providerSlug())}
           className='cl-left-icon-wrapper'
         />
         {externalAccount.emailAddress}

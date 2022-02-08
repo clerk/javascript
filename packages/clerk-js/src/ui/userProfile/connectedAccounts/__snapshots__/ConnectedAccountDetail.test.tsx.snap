@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<ConnectedAccountDetail/> Connected Account Detail renders Facebook account 1`] = `
+exports[`<ConnectedAccountDetail/> Connected Account Detail renders Google account 1`] = `
 Array [
   <div
     className="cl-page-heading"
@@ -37,12 +37,12 @@ Array [
         className="title"
       >
         <img
-          alt="Facebook Account"
+          alt="Google"
           className="cl-left-icon-wrapper"
-          src="https://images.clerk.dev/static/facebook.svg"
+          src="https://images.clerk.dev/static/google.svg"
         />
           
-        Facebook Account
+        Google
       </h1>
       <p
         className="subtitle"
@@ -73,7 +73,7 @@ Array [
               className="avatar cl-image"
               height={32}
               onError={[Function]}
-              src="https://www.gravatar.com/avatar?d=mp"
+              src="http://text.host/avatar.png"
               title=""
               width={32}
             />

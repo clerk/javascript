@@ -1,7 +1,6 @@
 import { render } from '@clerk/shared/testUtils';
 import { EnvironmentResource } from '@clerk/types';
-import { AuthConfig } from 'core/resources/AuthConfig';
-import { Session } from 'core/resources/Session';
+import { AuthConfig, Session } from 'core/resources';
 import React from 'react';
 import { SignIn } from 'ui/signIn/SignIn';
 

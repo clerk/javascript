@@ -1,47 +1,43 @@
 import { renderJSON } from '@clerk/shared/testUtils';
-import { ExternalAccountResource } from '@clerk/types';
-import { ExternalAccount } from 'core/resources/ExternalAccount';
+import type { ExternalAccountResource, UserResource } from '@clerk/types';
 import React from 'react';
 
 import { ConnectedAccountDetail } from './ConnectedAccountDetail';
 
 jest.mock('ui/contexts/CoreUserContext', () => {
   return {
-    useCoreUser: () => {
+    useCoreUser: (): Partial<UserResource> => {
       return {
-        User: {
-          path: '/users/user_1nQu4nZrhHEeolMMRhg4yERFYJx',
-          provider: 'clerk.prod.lclclerk.com',
-          id: 'user_1nQu4nZrhHEeolMMRhg4yERFYJx',
-          username: null,
-        },
-        data: {
-          id: 'user_1nQu4nZrhHEeolMMRhg4yERFYJx',
-          object: 'user',
-          username: null,
-          first_name: 'Peter',
-          last_name: 'Smith',
-        },
+        id: 'user_1nQu4nZrhHEeolMMRhg4yERFYJx',
+        username: null,
+        firstName: 'Peter',
+        lastName: 'Smith',
         externalAccounts: [
-          new ExternalAccount({
+          {
             id: 'fbac_yolo',
             provider: 'facebook',
             approvedScopes: 'email',
+            avatarUrl: 'http://text.host/avatar.png',
             emailAddress: 'peter@gmail.com',
             firstName: 'Peter',
             lastName: 'Smith',
-            externalId: '10147951078263327',
-          } as ExternalAccountResource),
-          new ExternalAccount({
+            providerUserId: '10147951078263327',
+            providerSlug: () => 'facebook',
+            providerTitle: () => 'Facebook',
+          } as ExternalAccountResource,
+          {
             id: 'gac_swag',
             provider: 'google',
             approvedScopes:
               'email https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid profile',
+            avatarUrl: 'http://text.host/avatar.png',
             emailAddress: 'peter@gmail.com',
             firstName: 'Peter',
             lastName: 'Smith',
-            externalId: '112567347150540108741',
-          } as ExternalAccountResource),
+            providerUserId: '112567347150540108741',
+            providerSlug: () => 'google',
+            providerTitle: () => 'Google',
+          } as ExternalAccountResource,
         ],
       };
     },
@@ -52,7 +48,7 @@ jest.mock('ui/router/RouteContext', () => {
   return {
     useRouter: () => {
       return {
-        params: { connected_account_id: 'fbac_yolo' },
+        params: { connected_account_id: 'gac_swag' },
         resolve: () => {
           return {
             toURL: {
@@ -66,7 +62,7 @@ jest.mock('ui/router/RouteContext', () => {
 });
 
 describe('<ConnectedAccountDetail/>', () => {
-  it('Connected Account Detail renders Facebook account', async () => {
+  it('Connected Account Detail renders Google account', async () => {
     const tree = renderJSON(<ConnectedAccountDetail />);
     expect(tree).toMatchSnapshot();
   });

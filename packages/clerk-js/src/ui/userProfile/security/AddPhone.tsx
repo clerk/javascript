@@ -41,8 +41,8 @@ export const AddPhone = ({ standAlone }: AddPhoneProps): JSX.Element => {
   const onClickContinue = async () => {
     try {
       setError(undefined);
-      await selectedPhone!.setReservedForSecondFactor(
-        !selectedPhone!.reservedForSecondFactor,
+      await selectedPhone?.setReservedForSecondFactor(
+        !selectedPhone?.reservedForSecondFactor,
       );
       navigate('../');
     } catch (err) {

@@ -66,7 +66,7 @@ export const PhoneDetail = (): JSX.Element => {
   };
 
   const onPhoneNumberRemove = () => {
-    return phoneIdent!.destroy();
+    return phoneIdent.destroy();
   };
 
   const sendVerificationCode = async () => {
