@@ -119,7 +119,7 @@ Array [
               >
                 <div>
                   <img
-                    alt="Facebook Account"
+                    alt="Facebook"
                     className="cl-left-icon-wrapper"
                     src="https://images.clerk.dev/static/facebook.svg"
                   />
@@ -3348,7 +3348,7 @@ Array [
             >
               <div>
                 <img
-                  alt="Facebook Account"
+                  alt="Facebook"
                   className="cl-left-icon-wrapper"
                   src="https://images.clerk.dev/static/facebook.svg"
                 />
@@ -3395,12 +3395,12 @@ Array [
           className="title"
         >
           <img
-            alt="Facebook Account"
+            alt="Facebook"
             className="cl-left-icon-wrapper"
             src="https://images.clerk.dev/static/facebook.svg"
           />
             
-          Facebook Account
+          Facebook
         </h1>
         <p
           className="subtitle"
