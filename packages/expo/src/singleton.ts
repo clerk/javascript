@@ -1,5 +1,5 @@
 // @ts-ignore
-import Clerk from '@clerk/clerk-js/dist/clerk.nocomponents';
+import Clerk from '@clerk/clerk-js/dist/clerk.headless';
 import type {
   FapiRequestInit,
   FapiResponse,

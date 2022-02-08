@@ -5,6 +5,7 @@ export {
   useSignIn,
   useSignUp,
   useUser,
+  useAuth,
   withClerk,
   withSession,
   withUser,
