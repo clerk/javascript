@@ -22,10 +22,8 @@ export function VerifyMagicLink({
   const { handleMagicLinkVerification } = useCoreClerk();
   const { navigate } = useNavigate();
 
-  const [
-    verificationStatus,
-    setVerificationStatus,
-  ] = useState<VerificationStatus>('loading');
+  const [verificationStatus, setVerificationStatus] =
+    useState<VerificationStatus>('loading');
 
   useEffect(() => {
     const verify = async () => {

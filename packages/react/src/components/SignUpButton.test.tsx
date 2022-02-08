@@ -79,7 +79,7 @@ describe('<SignUpButton/>', () => {
     render(
       <SignUpButton>
         <button onClick={handler}>custom button</button>
-      </SignUpButton>
+      </SignUpButton>,
     );
     const btn = screen.getByText('custom button');
     userEvent.click(btn);
@@ -100,7 +100,7 @@ describe('<SignUpButton/>', () => {
         <SignUpButton>
           <button>1</button>
           <button>2</button>
-        </SignUpButton>
+        </SignUpButton>,
       );
     }).toThrow();
   });

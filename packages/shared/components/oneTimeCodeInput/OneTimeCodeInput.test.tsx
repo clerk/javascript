@@ -21,7 +21,7 @@ describe('<OneTimeCodeInput/>', () => {
         setValue={onChange}
         length={6}
         verifyCodeHandler={noop}
-      />
+      />,
     );
     expect(result).toBeDefined();
   });
@@ -34,7 +34,7 @@ describe('<OneTimeCodeInput/>', () => {
         setValue={onChange}
         length={length}
         verifyCodeHandler={noop}
-      />
+      />,
     );
     const inputs = screen.getAllByRole('textbox');
     expect(inputs.length).toEqual(length);
@@ -47,7 +47,7 @@ describe('<OneTimeCodeInput/>', () => {
         setValue={onChange}
         length={6}
         verifyCodeHandler={noop}
-      />
+      />,
     );
     const inputs = screen.getAllByRole('textbox');
     inputs.forEach((input, i) => {
@@ -66,14 +66,14 @@ describe('<OneTimeCodeInput/>', () => {
         setValue={onChange}
         length={6}
         verifyCodeHandler={noop}
-      />
+      />,
     );
     const inputs = screen.getAllByRole('textbox');
     inputs.forEach((input, i) => {
       if (i === 0) {
         expect(input).toHaveAttribute(
           'aria-label',
-          'Enter verification code. Digit 1'
+          'Enter verification code. Digit 1',
         );
       } else {
         expect(input).toHaveAttribute('aria-label', `Digit ${i + 1}`);
@@ -89,14 +89,14 @@ describe('<OneTimeCodeInput/>', () => {
         numeric={false}
         length={6}
         verifyCodeHandler={noop}
-      />
+      />,
     );
     const inputs = screen.getAllByRole('textbox');
     inputs.forEach((input, i) => {
       if (i === 0) {
         expect(input).toHaveAttribute(
           'aria-label',
-          'Enter verification code. Character 1'
+          'Enter verification code. Character 1',
         );
       } else {
         expect(input).toHaveAttribute('aria-label', `Character ${i + 1}`);
@@ -106,7 +106,7 @@ describe('<OneTimeCodeInput/>', () => {
 
   it('updates value state on keydown', async () => {
     let value = '';
-    const onChange = jest.fn((val) => (value = val));
+    const onChange = jest.fn(val => (value = val));
     const getComponent = () => (
       <OneTimeCodeInput
         value={value}
@@ -131,7 +131,7 @@ describe('<OneTimeCodeInput/>', () => {
 
   it('accepts every printable chars if numeric prop is set to false', async () => {
     let value = '';
-    const onChange = jest.fn((val) => (value = val));
+    const onChange = jest.fn(val => (value = val));
     const getComponent = () => (
       <OneTimeCodeInput
         value={value}
@@ -155,7 +155,7 @@ describe('<OneTimeCodeInput/>', () => {
 
   it('only accepts numbers if numeric prop is set to true', async () => {
     let value = '';
-    const onChange = jest.fn((val) => (value = val));
+    const onChange = jest.fn(val => (value = val));
     const getComponent = () => (
       <OneTimeCodeInput
         value={value}
@@ -179,7 +179,7 @@ describe('<OneTimeCodeInput/>', () => {
 
   it('focuses next input when user enters a char', async () => {
     let value = '';
-    const onChange = jest.fn((val) => (value = val));
+    const onChange = jest.fn(val => (value = val));
     const getComponent = () => (
       <OneTimeCodeInput
         value={value}
@@ -209,13 +209,13 @@ describe('<OneTimeCodeInput/>', () => {
         value={'123123'}
         setValue={onChange}
         length={6}
-        verifyCodeHandler={(verify) => {
+        verifyCodeHandler={verify => {
           verify(afterVerifyCallback);
         }}
-      />
+      />,
     );
     const inputs = screen.getAllByRole('textbox');
-    inputs.forEach((input) => expect(input).toHaveClass('verified'));
+    inputs.forEach(input => expect(input).toHaveClass('verified'));
     jest.runOnlyPendingTimers();
     await waitFor(() => expect(afterVerifyCallback).toHaveBeenCalled());
     jest.useRealTimers();
@@ -231,10 +231,10 @@ describe('<OneTimeCodeInput/>', () => {
         verifyCodeHandler={(_, reject) => {
           reject(errorMessage);
         }}
-      />
+      />,
     );
     const inputs = screen.getAllByRole('textbox');
-    inputs.forEach((input) => expect(input).toHaveClass('error'));
+    inputs.forEach(input => expect(input).toHaveClass('error'));
     const errorContainer = screen.getByText(errorMessage);
     expect(errorContainer).toBeDefined();
     expect(errorContainer).toHaveClass('errorMessage');
@@ -242,7 +242,7 @@ describe('<OneTimeCodeInput/>', () => {
 
   it('resets error state if user enters code while on error state', async () => {
     let value = '123123';
-    const onChange = jest.fn((val) => (value = val));
+    const onChange = jest.fn(val => (value = val));
     const getComponent = () => (
       <OneTimeCodeInput
         value={value}
@@ -257,9 +257,9 @@ describe('<OneTimeCodeInput/>', () => {
 
     render(getComponent());
     const inputs = screen.getAllByRole('textbox');
-    inputs.forEach((input) => expect(input).toHaveClass('error'));
+    inputs.forEach(input => expect(input).toHaveClass('error'));
     userEvent.type(inputs[0], '1');
-    inputs.forEach((input) => expect(input).not.toHaveClass('error'));
+    inputs.forEach(input => expect(input).not.toHaveClass('error'));
   });
 
   it('renders the correct DOM tree', () => {
@@ -269,7 +269,7 @@ describe('<OneTimeCodeInput/>', () => {
         setValue={noop}
         length={6}
         verifyCodeHandler={noop}
-      />
+      />,
     );
     expect(tree).toMatchSnapshot();
   });

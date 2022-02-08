@@ -7,7 +7,10 @@ export type OAuthProvider =
   | 'gitlab'
   | 'discord'
   | 'twitter'
-  | 'twitch';
+  | 'twitch'
+  | 'linkedin'
+  | 'dropbox'
+  | 'bitbucket';
 
 export type OAuthStrategy = `oauth_${OAuthProvider}`;
 

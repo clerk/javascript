@@ -9,7 +9,7 @@ describe('<Radio/>', () => {
     const onChange = jest.fn();
 
     const { rerender } = render(
-      <Radio checked={false} handleChange={onChange} />
+      <Radio checked={false} handleChange={onChange} />,
     );
     const radio = screen.getByRole('radio', { checked: false });
 

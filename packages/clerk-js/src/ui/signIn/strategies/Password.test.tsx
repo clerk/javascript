@@ -21,7 +21,7 @@ describe('<Password/>', () => {
 
   it('renders the password form component', async () => {
     const tree = renderJSON(
-      <Password handleSubmit={jest.fn()} password={passwordInput} />
+      <Password handleSubmit={jest.fn()} password={passwordInput} />,
     );
     expect(tree).toMatchSnapshot();
   });

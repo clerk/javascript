@@ -8,7 +8,7 @@ import { ButtonSet } from './ButtonSet';
 function MockIcon() {
   return (
     <svg>
-      <circle cx="40" cy="40" r="24" />
+      <circle cx='40' cy='40' r='24' />
     </svg>
   );
 }
@@ -34,9 +34,9 @@ describe('<ButtonSet/>', () => {
     const tree = renderJSON(
       <ButtonSet
         options={options}
-        flow="sign-in"
+        flow='sign-in'
         handleClick={mockHandleClick}
-      />
+      />,
     );
     expect(tree).toMatchSnapshot();
   });
@@ -51,9 +51,9 @@ describe('<ButtonSet/>', () => {
       render(
         <ButtonSet
           options={options}
-          flow="sign-up"
+          flow='sign-up'
           handleClick={mockHandleClick}
-        />
+        />,
       );
 
       const regex = new RegExp(`Sign up with ${providerTitle}`, 'i');
@@ -61,6 +61,6 @@ describe('<ButtonSet/>', () => {
       userEvent.click(screen.getByRole('button', { name: regex }));
 
       expect(mockHandleClick.mock.calls[0][1]).toBe(`oauth_${provider}`);
-    }
+    },
   );
 });

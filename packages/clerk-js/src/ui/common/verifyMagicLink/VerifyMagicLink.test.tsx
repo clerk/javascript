@@ -41,7 +41,7 @@ describe('<VerifyMagicLink/>', function () {
   beforeAll(() => {
     jest.useFakeTimers();
     //@ts-ignore
-    ReactDOM.createPortal = (node) => node;
+    ReactDOM.createPortal = node => node;
   });
 
   afterEach(() => {
@@ -66,7 +66,7 @@ describe('<VerifyMagicLink/>', function () {
 
     await waitFor(() => {
       expect(
-        screen.getByText('This magic link has expired')
+        screen.getByText('This magic link has expired'),
       ).toBeInTheDocument();
     });
   });
@@ -80,7 +80,7 @@ describe('<VerifyMagicLink/>', function () {
 
     await waitFor(() => {
       expect(
-        screen.getByText('This magic link is invalid')
+        screen.getByText('This magic link is invalid'),
       ).toBeInTheDocument();
     });
   });

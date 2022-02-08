@@ -19,10 +19,10 @@ export function Portal({
     const classList: string[] = [];
 
     if (className) {
-      className.split(' ').forEach((item) => classList.push(item));
+      className.split(' ').forEach(item => classList.push(item));
     }
 
-    classList.forEach((item) => el.classList.add(item));
+    classList.forEach(item => el.classList.add(item));
 
     host.appendChild(el);
 

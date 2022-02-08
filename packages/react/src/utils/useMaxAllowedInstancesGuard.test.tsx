@@ -29,7 +29,7 @@ describe('Max allowed instances Hook & Hoc', () => {
         render(
           <div>
             <TestingComponent />
-          </div>
+          </div>,
         );
       }).not.toThrowError(ERR);
     });
@@ -40,7 +40,7 @@ describe('Max allowed instances Hook & Hoc', () => {
           <div>
             <TestingComponent />
             <TestingComponent />
-          </div>
+          </div>,
         );
       }).toThrowError(ERR);
     });
@@ -55,7 +55,7 @@ describe('Max allowed instances Hook & Hoc', () => {
     const TestingComp = withMaxAllowedInstancesGuard(
       TestingComponentBase,
       'TestingComp',
-      ERR
+      ERR,
     );
 
     it('renders normally if not used more than N times', () => {
@@ -63,7 +63,7 @@ describe('Max allowed instances Hook & Hoc', () => {
         render(
           <div>
             <TestingComp />
-          </div>
+          </div>,
         );
       }).not.toThrowError(ERR);
     });
@@ -74,7 +74,7 @@ describe('Max allowed instances Hook & Hoc', () => {
           <div>
             <TestingComp />
             <TestingComp />
-          </div>
+          </div>,
         );
       }).toThrowError(ERR);
     });

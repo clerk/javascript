@@ -66,7 +66,7 @@ jest.mock('ui/contexts', () => {
 describe('UserButton', () => {
   beforeAll(() => {
     //@ts-ignore
-    ReactDOM.createPortal = (node) => node;
+    ReactDOM.createPortal = node => node;
   });
 
   it('renders the user button', () => {

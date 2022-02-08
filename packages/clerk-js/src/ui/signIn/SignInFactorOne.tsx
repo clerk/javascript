@@ -23,10 +23,8 @@ function _SignInFactorOne(): JSX.Element {
   const availableFactors = signIn.supportedFirstFactors.filter(
     f => !shouldDisableStrategy(signInContext, f.strategy),
   );
-  const [
-    lastUsedFactor,
-    setLastUsedFactor,
-  ] = React.useState<SignInFactor | null>(null);
+  const [lastUsedFactor, setLastUsedFactor] =
+    React.useState<SignInFactor | null>(null);
   const [currentFactor, setCurrentFactor] = React.useState<
     SignInFactor | undefined | null
   >(() => {

@@ -8,7 +8,7 @@ describe('<Switch/>', () => {
     const handleChangeSpy = jest.fn();
 
     const { rerender } = render(
-      <Switch checked={false} handleChange={handleChangeSpy} />
+      <Switch checked={false} handleChange={handleChangeSpy} />,
     );
     const radio = screen.getByRole('radio', { checked: false });
 

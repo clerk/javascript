@@ -15,7 +15,7 @@ describe('<ExpansionIcon />', () => {
   it('renders an expansion icon with different Icon', () => {
     const mockSvgIcon: SvgrComponent = () => <svg></svg>;
     const tree = renderJSON(
-      <ExpansionIcon isExpanded={false} CustomExpansionIcon={mockSvgIcon} />
+      <ExpansionIcon isExpanded={false} CustomExpansionIcon={mockSvgIcon} />,
     );
     expect(tree).toMatchSnapshot();
   });

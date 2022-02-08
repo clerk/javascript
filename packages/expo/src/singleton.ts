@@ -49,7 +49,7 @@ export function buildClerk({
         if (authHeader) {
           await saveToken(KEY, authHeader);
         }
-      }
+      },
     );
   }
 

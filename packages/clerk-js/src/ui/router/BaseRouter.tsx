@@ -44,7 +44,6 @@ export const BaseRouter = ({
   };
 
   const getMatchData = (path?: string, index?: boolean) => {
-
     const [newIndexPath, newFullPath] = newPaths('', '', path, index);
     const currentPathWithoutSlash = trimTrailingSlash(currentPath);
 
@@ -132,4 +131,3 @@ export const BaseRouter = ({
     </RouteContext.Provider>
   );
 };
-

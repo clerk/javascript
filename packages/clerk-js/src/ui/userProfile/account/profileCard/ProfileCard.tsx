@@ -4,7 +4,7 @@ import type { UserResource } from '@clerk/types';
 import { ExternalAccountResource } from '@clerk/types';
 import React from 'react';
 import { svgUrl } from 'ui/common/constants';
-import { useCoreUser,useEnvironment } from 'ui/contexts';
+import { useCoreUser, useEnvironment } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
 
 import { AvatarWithUploader } from '../avatarWithUploader';

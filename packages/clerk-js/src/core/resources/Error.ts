@@ -1,4 +1,4 @@
-import type { ClerkAPIError,ClerkAPIErrorJSON } from '@clerk/types';
+import type { ClerkAPIError, ClerkAPIErrorJSON } from '@clerk/types';
 
 interface ClerkAPIResponseOptions {
   data: ClerkAPIErrorJSON[];

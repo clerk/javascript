@@ -1,6 +1,6 @@
 import { ClerkAPIResponseError } from 'core/resources/Error';
 
-import { getGlobalError,handleError } from './errorHandler';
+import { getGlobalError, handleError } from './errorHandler';
 import type { FieldState } from './forms';
 
 describe('handleError(err, fields, setGlobalError)', () => {

@@ -52,7 +52,7 @@ describe('<SignOutButton />', () => {
         <SignOutButton>
           <button>1</button>
           <button>2</button>
-        </SignOutButton>
+        </SignOutButton>,
       );
     }).toThrow();
   });

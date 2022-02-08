@@ -11,6 +11,14 @@ const FAILED_TO_LOAD_ERROR = 'Clerk: Failed to load Clerk';
 const MISSING_PROVIDER_ERROR = 'Clerk: Missing provider';
 const MISSING_BODY_ERROR = 'Clerk: Missing <body> element.';
 
+function isStaging(frontendApi: string): boolean {
+  return (
+    frontendApi.endsWith('.lclstage.dev') ||
+    frontendApi.endsWith('.stgstage.dev') ||
+    frontendApi.endsWith('.clerkstage.dev')
+  );
+}
+
 function extractTag(packageJsonVersion: string) {
   return packageJsonVersion.match(/-(.*)\./);
 }
@@ -23,10 +31,12 @@ function getScriptSrc(
     return localScriptSrc;
   }
 
-  const majorVersion = parseInt(LIB_VERSION.split('.')[0], 10);
+  const majorVersion = isStaging(frontendApi)
+    ? 'staging'
+    : parseInt(LIB_VERSION.split('.')[0], 10);
+
   const tag = extractTag(LIB_VERSION);
-  const sourceVersion =
-    tag === null ? majorVersion : tag[0] === 'staging' ? 'staging' : 'next';
+  const sourceVersion = tag === null ? majorVersion : 'next';
 
   return `https://${frontendApi}/npm/@clerk/clerk-js@${sourceVersion}/dist/clerk.browser.js`;
 }

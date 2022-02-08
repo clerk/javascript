@@ -1,6 +1,10 @@
 import type { LoadedClerk } from '@clerk/types';
 import React, { useContext } from 'react';
 
+import {
+  StructureContext,
+  StructureContextStates,
+} from '../contexts/StructureContext';
 import { hocChildrenNotAFunctionError } from '../errors';
 import IsomorphicClerk from '../isomorphicClerk';
 import { inBrowser } from '../utils';
@@ -8,7 +12,6 @@ import {
   assertClerkLoadedGuarantee,
   assertWrappedByClerkProvider,
 } from './assertHelpers';
-import { StructureContext, StructureContextStates } from './StructureContext';
 
 type IsomorphicClerkContextValue = {
   value: IsomorphicClerk;
@@ -27,12 +30,12 @@ export const useClerk = (): LoadedClerk => {
   assertClerkLoadedGuarantee(clerkCtx.value, 'useClerk()');
   //  The value is an instance of IsomorphicClerk, not Clerk
   // TODO: Remove type cast
-  return clerkCtx.value as unknown as LoadedClerk;
+  return (clerkCtx.value as unknown) as LoadedClerk;
 };
 
 export const withClerk = <P extends { clerk: LoadedClerk }>(
   Component: React.ComponentType<P>,
-  displayName?: string
+  displayName?: string,
 ) => {
   displayName =
     displayName || Component.displayName || Component.name || 'Component';
@@ -48,7 +51,7 @@ export const withClerk = <P extends { clerk: LoadedClerk }>(
     assertWrappedByClerkProvider(structureCtx);
     assertWrappedByClerkProvider(clerkCtx);
 
-    const clerk = clerkCtx.value as unknown as LoadedClerk;
+    const clerk = (clerkCtx.value as unknown) as LoadedClerk;
     if (!clerk) {
       return null;
     }
@@ -77,9 +80,9 @@ export const WithClerk: React.FC<{
   children: (clerk: LoadedClerk) => React.ReactNode;
 }> = ({ children }) => (
   <StructureContext.Consumer>
-    {(structureCtx) => (
+    {structureCtx => (
       <IsomorphicClerkContext.Consumer>
-        {(clerkCtx) => {
+        {clerkCtx => {
           if (typeof children !== 'function') {
             throw new Error(hocChildrenNotAFunctionError);
           }
@@ -87,7 +90,7 @@ export const WithClerk: React.FC<{
           assertWrappedByClerkProvider(structureCtx);
           assertWrappedByClerkProvider(clerkCtx);
 
-          const clerk = clerkCtx.value as unknown as LoadedClerk;
+          const clerk = (clerkCtx.value as unknown) as LoadedClerk;
           if (!clerk) {
             return null;
           }

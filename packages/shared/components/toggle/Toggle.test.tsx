@@ -9,7 +9,7 @@ describe('<Toggle/>', () => {
     const onChange = jest.fn();
 
     const { rerender } = render(
-      <Toggle checked={false} handleChange={onChange} />
+      <Toggle checked={false} handleChange={onChange} />,
     );
 
     const checkbox = screen.getByRole('checkbox', { checked: false });

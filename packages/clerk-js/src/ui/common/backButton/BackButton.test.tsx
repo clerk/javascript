@@ -7,7 +7,7 @@ jest.mock('ui/router/RouteContext');
 
 describe('<BackButton/>', () => {
   it('renders the header component', () => {
-    const tree = renderJSON(<BackButton to="foo/bar" className="qux" />);
+    const tree = renderJSON(<BackButton to='foo/bar' className='qux' />);
     expect(tree).toMatchSnapshot();
   });
 });

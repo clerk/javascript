@@ -15,7 +15,7 @@ describe('Utility components for EmailAddresses', () => {
       { id: '456', type: 'oauth_facebook' },
     ];
     const connections = renderJSON(
-      <Connections linkedResources={linkedResources} />
+      <Connections linkedResources={linkedResources} />,
     );
     expect(connections).toMatchSnapshot();
   });

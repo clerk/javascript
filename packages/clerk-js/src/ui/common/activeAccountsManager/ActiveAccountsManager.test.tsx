@@ -80,7 +80,7 @@ describe('ActiveAccountsManager', () => {
   it('renders a switcher with all the available sessions', () => {
     mocked(
       useEnvironment as jest.Mock<EnvironmentResource>,
-      true
+      true,
     ).mockImplementation(() => multiSessionResource as EnvironmentResource);
 
     const tree = renderJSON(
@@ -90,7 +90,7 @@ describe('ActiveAccountsManager', () => {
         navigateAfterSwitchSession={noop}
         userProfileUrl={'user_profile_url'}
         signInUrl={'sign_in_url'}
-      />
+      />,
     );
     expect(tree).toMatchSnapshot();
   });
@@ -98,7 +98,7 @@ describe('ActiveAccountsManager', () => {
   it('does not render active accounts with only a single session', () => {
     mocked(
       useEnvironment as jest.Mock<EnvironmentResource>,
-      true
+      true,
     ).mockImplementation(() => multiSessionResource as EnvironmentResource);
 
     const tree = renderJSON(
@@ -109,7 +109,7 @@ describe('ActiveAccountsManager', () => {
         navigateAfterSwitchSession={noop}
         userProfileUrl={'user_profile_url'}
         signInUrl={'sign_in_url'}
-      />
+      />,
     );
     expect(tree).toMatchSnapshot();
   });
@@ -117,7 +117,7 @@ describe('ActiveAccountsManager', () => {
   it('renders all active sessions even in single session resource mode', () => {
     mocked(
       useEnvironment as jest.Mock<EnvironmentResource>,
-      true
+      true,
     ).mockImplementation(() => singleSessionResource as EnvironmentResource);
 
     const tree = renderJSON(
@@ -128,7 +128,7 @@ describe('ActiveAccountsManager', () => {
         navigateAfterSwitchSession={noop}
         userProfileUrl={'user_profile_url'}
         signInUrl={'sign_in_url'}
-      />
+      />,
     );
     expect(tree).toMatchSnapshot();
   });

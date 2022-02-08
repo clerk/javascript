@@ -5,7 +5,7 @@ import { TitledCard } from '@clerk/shared/components/titledCard';
 import React from 'react';
 import { handleError, useFieldState } from 'ui/common';
 import { Error } from 'ui/common/error';
-import { useCoreUser,useEnvironment } from 'ui/contexts';
+import { useCoreUser, useEnvironment } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
 import { PageHeading } from 'ui/userProfile/pageHeading';
 

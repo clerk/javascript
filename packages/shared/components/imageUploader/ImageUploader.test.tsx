@@ -8,12 +8,12 @@ describe('ImageUploader', () => {
     const mockHandleSuccess = jest.fn();
     const imageUploader = renderJSON(
       <ImageUploader
-        title="Test"
-        subtitle="test"
+        title='Test'
+        subtitle='test'
         handleSuccess={mockHandleSuccess}
       >
         Hello World
-      </ImageUploader>
+      </ImageUploader>,
     );
     expect(imageUploader).toMatchSnapshot();
   });
@@ -22,13 +22,13 @@ describe('ImageUploader', () => {
     const mockHandleSuccess = jest.fn();
     const imageUploader = renderJSON(
       <ImageUploader
-        title="Test"
-        subtitle="test"
+        title='Test'
+        subtitle='test'
         handleSuccess={mockHandleSuccess}
         withResponsiveUploadIndicator={true}
       >
         Hello World
-      </ImageUploader>
+      </ImageUploader>,
     );
     expect(imageUploader).toMatchSnapshot();
   });

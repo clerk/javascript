@@ -1,12 +1,6 @@
-import {
-  act,
-  render,
-  renderJSON,
-  screen,
-  userEvent,
-  waitFor,
-} from '@clerk/shared/testUtils';
+import { render, renderJSON, screen, userEvent } from '@clerk/shared/testUtils';
 import { EmailAddressResource } from '@clerk/types';
+import { waitFor } from '@testing-library/dom';
 import React from 'react';
 
 import { EmailAddressVerificationWithOTP } from './EmailAddressVerificationWithOTP';
@@ -53,12 +47,12 @@ describe('<EmailAddressVerificationWithOTP/>', function () {
       <EmailAddressVerificationWithOTP
         email={email}
         onVerificationComplete={mockOnVerificationCompleteHandler}
-      />
+      />,
     );
 
     userEvent.type(
       screen.getByLabelText('Enter verification code. Digit 1'),
-      '1'
+      '1',
     );
     userEvent.type(screen.getByLabelText('Digit 2'), '2');
     userEvent.type(screen.getByLabelText('Digit 3'), '3');
@@ -84,7 +78,7 @@ describe('<EmailAddressVerificationWithOTP/>', function () {
       <EmailAddressVerificationWithOTP
         email={email}
         onError={mockOnErrorHandler}
-      />
+      />,
     );
 
     await waitFor(() => {

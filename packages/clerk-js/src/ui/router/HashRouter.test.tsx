@@ -39,12 +39,12 @@ const Button = ({ to, children }: React.PropsWithChildren<{ to: string }>) => {
 const Tester = () => (
   <HashRouter preservedParams={['preserved']}>
     <Route index>
-      <div id="index">Index</div>
-      <Button to="foo">Internal</Button>
-      <Button to="/external">External</Button>
+      <div id='index'>Index</div>
+      <Button to='foo'>Internal</Button>
+      <Button to='/external'>External</Button>
     </Route>
-    <Route path="foo">
-      <div id="bar">Bar</div>
+    <Route path='foo'>
+      <div id='bar'>Bar</div>
     </Route>
   </HashRouter>
 );
@@ -105,7 +105,7 @@ describe('HashRouter', () => {
       });
       expect(mockNavigate).toHaveBeenNthCalledWith(
         1,
-        'https://www.example.com/external'
+        'https://www.example.com/external',
       );
     });
   });

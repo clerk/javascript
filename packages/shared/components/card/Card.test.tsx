@@ -8,7 +8,7 @@ describe('<Card/>', () => {
     const tree = renderJSON(
       <Card>
         <div>Foo</div>
-      </Card>
+      </Card>,
     );
     expect(tree).toMatchSnapshot();
   });

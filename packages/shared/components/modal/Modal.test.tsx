@@ -1,4 +1,4 @@
-import { fireEvent,render, screen } from '@clerk/shared/testUtils';
+import { fireEvent, render, screen } from '@clerk/shared/testUtils';
 import * as React from 'react';
 
 import { Modal } from './Modal';
@@ -13,7 +13,7 @@ describe('<Modal/>', () => {
         <Modal.CloseButton>
           <button>Close</button>
         </Modal.CloseButton>
-      </Modal>
+      </Modal>,
     );
 
     expect(screen.queryByText('Foo')).not.toBeInTheDocument();
@@ -32,14 +32,14 @@ describe('<Modal/>', () => {
     const { rerender } = render(
       <Modal active handleClose={handleClose}>
         <div>Foo</div>
-      </Modal>
+      </Modal>,
     );
     expect(screen.queryByText('Foo')).toBeInTheDocument();
 
     rerender(
       <Modal handleClose={handleClose}>
         <div>Foo</div>
-      </Modal>
+      </Modal>,
     );
     expect(screen.queryByText('Foo')).not.toBeInTheDocument();
     expect(handleClose).toHaveBeenCalledTimes(1);

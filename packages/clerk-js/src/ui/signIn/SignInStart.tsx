@@ -62,10 +62,11 @@ export function _SignInStart(): JSX.Element {
       ? FirstFactorConfigs[firstPartyKey].label
       : '';
 
-  const fieldType: InputType = (firstPartyKey &&
-  FirstFactorConfigs[firstPartyKey]
-    ? FirstFactorConfigs[firstPartyKey].fieldType
-    : 'text') as InputType;
+  const fieldType: InputType = (
+    firstPartyKey && FirstFactorConfigs[firstPartyKey]
+      ? FirstFactorConfigs[firstPartyKey].fieldType
+      : 'text'
+  ) as InputType;
 
   const firstFactors = authConfig.firstFactors;
   const web3Options = firstFactors

@@ -39,7 +39,7 @@ jest.mock('ui/contexts', () => {
             firstFactors: ['email_address', 'oauth_google', 'oauth_facebook'],
             singleSessionMode: true,
           } as Partial<AuthConfig>,
-        } as Partial<EnvironmentResource>)
+        } as Partial<EnvironmentResource>),
     ),
     useSignUpContext: jest.fn(),
     useClerk: () => {

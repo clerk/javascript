@@ -5,13 +5,13 @@ import { determineSalutation, determineStartingSignInFactor } from './utils';
 describe('determineStrategy(signIn, displayConfig)', () => {
   describe('with password as the preferred sign in strategy', () => {
     it('selects password if available', () => {
-      const signIn = ({
+      const signIn = {
         supportedFirstFactors: [
           {
             strategy: 'password',
           },
         ],
-      } as unknown) as SignInResource;
+      } as unknown as SignInResource;
       expect(
         determineStartingSignInFactor(
           signIn.supportedFirstFactors,
@@ -24,7 +24,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
     });
 
     it('selects based on user input in the previous step if password is not available', () => {
-      const signIn = ({
+      const signIn = {
         identifier: 'jdoe@example.com',
         supportedFirstFactors: [
           {
@@ -36,7 +36,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
             safe_identifier: 'jdoe@example.com',
           },
         ],
-      } as unknown) as SignInResource;
+      } as unknown as SignInResource;
       expect(
         determineStartingSignInFactor(
           signIn.supportedFirstFactors,
@@ -50,7 +50,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
     });
 
     it('selects by prioritizing email_code if all the above fail', () => {
-      const signIn = ({
+      const signIn = {
         identifier: undefined,
         supportedFirstFactors: [
           {
@@ -62,7 +62,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
             safe_identifier: 'ccoe@example.com',
           },
         ],
-      } as unknown) as SignInResource;
+      } as unknown as SignInResource;
       expect(
         determineStartingSignInFactor(
           signIn.supportedFirstFactors,
@@ -76,7 +76,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
     });
 
     it('selects phone_code if all the above fail', () => {
-      const signIn = ({
+      const signIn = {
         identifier: undefined,
         supportedFirstFactors: [
           {
@@ -84,7 +84,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
             safe_identifier: 'jdoe@example.com',
           },
         ],
-      } as unknown) as SignInResource;
+      } as unknown as SignInResource;
       expect(
         determineStartingSignInFactor(
           signIn.supportedFirstFactors,
@@ -98,10 +98,10 @@ describe('determineStrategy(signIn, displayConfig)', () => {
     });
 
     it('returns null if every other scenario', () => {
-      const signIn = ({
+      const signIn = {
         identifier: undefined,
         supportedFirstFactors: [],
-      } as unknown) as SignInResource;
+      } as unknown as SignInResource;
       expect(
         determineStartingSignInFactor(
           signIn.supportedFirstFactors,
@@ -114,7 +114,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
 
   describe('with OTP as the preferred sign in strategy', () => {
     it('selects based on user input in the previous step', () => {
-      const signIn = ({
+      const signIn = {
         identifier: 'jdoe@example.com',
         supportedFirstFactors: [
           {
@@ -129,7 +129,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
             safe_identifier: 'jdoe@example.com',
           },
         ],
-      } as unknown) as SignInResource;
+      } as unknown as SignInResource;
       expect(
         determineStartingSignInFactor(
           signIn.supportedFirstFactors,
@@ -143,7 +143,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
     });
 
     it('selects by prioritizing email_code if the above fails', () => {
-      const signIn = ({
+      const signIn = {
         identifier: undefined,
         supportedFirstFactors: [
           {
@@ -158,7 +158,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
             safe_identifier: 'ccoe@example.com',
           },
         ],
-      } as unknown) as SignInResource;
+      } as unknown as SignInResource;
       expect(
         determineStartingSignInFactor(
           signIn.supportedFirstFactors,
@@ -172,7 +172,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
     });
 
     it('selects phone_code if all the above fail', () => {
-      const signIn = ({
+      const signIn = {
         identifier: undefined,
         supportedFirstFactors: [
           {
@@ -183,7 +183,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
             safe_identifier: 'jdoe@example.com',
           },
         ],
-      } as unknown) as SignInResource;
+      } as unknown as SignInResource;
       expect(
         determineStartingSignInFactor(
           signIn.supportedFirstFactors,
@@ -197,13 +197,13 @@ describe('determineStrategy(signIn, displayConfig)', () => {
     });
 
     it('selects password as a last resort if available', () => {
-      const signIn = ({
+      const signIn = {
         supportedFirstFactors: [
           {
             strategy: 'password',
           },
         ],
-      } as unknown) as SignInResource;
+      } as unknown as SignInResource;
       expect(
         determineStartingSignInFactor(
           signIn.supportedFirstFactors,
@@ -216,10 +216,10 @@ describe('determineStrategy(signIn, displayConfig)', () => {
     });
 
     it('returns null if every other scenario', () => {
-      const signIn = ({
+      const signIn = {
         identifier: undefined,
         supportedFirstFactors: [],
-      } as unknown) as SignInResource;
+      } as unknown as SignInResource;
       expect(
         determineStartingSignInFactor(
           signIn.supportedFirstFactors,
@@ -232,26 +232,26 @@ describe('determineStrategy(signIn, displayConfig)', () => {
 
   fdescribe('determineSaluation(signIn)', () => {
     it('returns firstname, then lastname or the identifier', () => {
-      let signIn = ({
+      let signIn = {
         identifier: 'jdoe@example.com',
         userData: {
           first_name: 'Joe',
           last_name: 'Doe',
         },
-      } as unknown) as SignInResource;
+      } as unknown as SignInResource;
       expect(determineSalutation(signIn)).toBe('Joe');
 
-      signIn = ({
+      signIn = {
         identifier: 'jdoe@example.com',
         userData: {
           last_name: 'Doe',
         },
-      } as unknown) as SignInResource;
+      } as unknown as SignInResource;
       expect(determineSalutation(signIn)).toBe('Doe');
 
-      signIn = ({
+      signIn = {
         identifier: 'jdoe@example.com',
-      } as unknown) as SignInResource;
+      } as unknown as SignInResource;
       expect(determineSalutation(signIn)).toBe('jdoe@example.com');
     });
   });

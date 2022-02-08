@@ -5,7 +5,7 @@ import {
 import { noop } from '@clerk/shared/utils/noop';
 import { EmailAddressResource } from '@clerk/types';
 import React from 'react';
-import { useFieldState,verificationErrorMessage } from 'ui/common';
+import { useFieldState, verificationErrorMessage } from 'ui/common';
 
 type EmailAddressVerificationWithOTPProps = {
   email: EmailAddressResource;
@@ -34,23 +34,23 @@ export function EmailAddressVerificationWithOTP({
     email
       .attemptVerification(code.value)
       .then(() => verify(onVerificationComplete))
-      .catch((e) => {
+      .catch(e => {
         reject(verificationErrorMessage(e));
       });
   };
 
   return (
     <div className={className}>
-      <div className="cl-copy-text" style={{ marginBottom: '2em' }}>
+      <div className='cl-copy-text' style={{ marginBottom: '2em' }}>
         An email containing a verification code has been sent to{' '}
-        <span className="cl-identifier">{email.emailAddress}</span>.
+        <span className='cl-identifier'>{email.emailAddress}</span>.
       </div>
       <OneTimeCodeInput
         value={code.value}
         setValue={code.setValue}
         verifyCodeHandler={verifyCode}
         onResendCode={prepareVerification}
-        className="cl-otp-input"
+        className='cl-otp-input'
       />
     </div>
   );

@@ -33,9 +33,8 @@ export type ComponentContextValue =
   | SignUpCtx
   | UserButtonCtx;
 
-export const ComponentContext = React.createContext<ComponentContextValue | null>(
-  null,
-);
+export const ComponentContext =
+  React.createContext<ComponentContextValue | null>(null);
 
 export type SignUpContextType = SignUpProps & {
   navigateAfterSignUp: () => any;

@@ -1,4 +1,4 @@
-import { render,renderJSON } from '@clerk/shared/testUtils';
+import { render, renderJSON } from '@clerk/shared/testUtils';
 import { fireEvent } from '@testing-library/react';
 import React from 'react';
 
@@ -12,7 +12,7 @@ describe('ActiveAccountButtonSet', () => {
       <ActiveAccountButtonSet
         handleManageAccount={handleManageAccount}
         handleSignout={handleSignout}
-      />
+      />,
     );
     expect(tree).toMatchSnapshot();
   });
@@ -25,7 +25,7 @@ describe('ActiveAccountButtonSet', () => {
       <ActiveAccountButtonSet
         handleSignout={handleSignout}
         handleManageAccount={handleManageAccount}
-      />
+      />,
     );
 
     const signOutAllButton = activeAccountButtonSet.getByText('Sign out');
@@ -42,7 +42,7 @@ describe('ActiveAccountButtonSet', () => {
       <ActiveAccountButtonSet
         handleSignout={handleSignout}
         handleManageAccount={handleManageAccount}
-      />
+      />,
     );
 
     const signoutButton = activeAccountButtonSet.getByText('Sign out');
@@ -60,7 +60,7 @@ describe('ActiveAccountButtonSet', () => {
       <ActiveAccountButtonSet
         handleSignout={handleSignout}
         handleManageAccount={handleManageAccount}
-      />
+      />,
     );
 
     const manageAccountButton = manageActiveAccount.getByText('Manage account');

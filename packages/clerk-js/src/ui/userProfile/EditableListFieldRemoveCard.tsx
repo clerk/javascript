@@ -13,13 +13,9 @@ interface EditableListFieldRemoveCardProps {
   onRemoved?: () => void;
 }
 
-export const EditableListFieldRemoveCard: React.FC<EditableListFieldRemoveCardProps> = ({
-  type,
-  label,
-  onCancel,
-  onRemove,
-  onRemoved,
-}) => {
+export const EditableListFieldRemoveCard: React.FC<
+  EditableListFieldRemoveCardProps
+> = ({ type, label, onCancel, onRemove, onRemoved }) => {
   const lowerLabel = label.toLowerCase();
   const [error, setError] = React.useState<string | undefined>();
 

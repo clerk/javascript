@@ -1,5 +1,4 @@
 import {
-  act,
   mocked,
   render,
   screen,
@@ -92,7 +91,7 @@ describe('<SignInFactorOne/>', () => {
       (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(
         () => ({
           setSession: mockSetSession,
-        })
+        }),
       );
 
       render(<SignInFactorOne />);
@@ -115,7 +114,7 @@ describe('<SignInFactorOne/>', () => {
         expect(mockSetSession).toHaveBeenCalledTimes(1);
         expect(mockSetSession).toHaveBeenCalledWith(
           'cafebabe',
-          mockNavigateAfterSignIn
+          mockNavigateAfterSignIn,
         );
       });
     });
@@ -155,7 +154,7 @@ describe('<SignInFactorOne/>', () => {
       (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(
         () => ({
           setSession: mockSetSession,
-        })
+        }),
       );
 
       render(<SignInFactorOne />);
@@ -215,13 +214,13 @@ describe('<SignInFactorOne/>', () => {
               verifiedAtClient: '',
               verifiedFromTheSameClient: jest.fn(() => false),
             },
-          } as unknown as SignInResource)
+          } as unknown as SignInResource),
       );
 
       (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(
         () => ({
           setSession: mockSetSession,
-        })
+        }),
       );
 
       render(<SignInFactorOne />);
@@ -250,7 +249,7 @@ describe('<SignInFactorOne/>', () => {
         expect(mockSetSession).toHaveBeenCalledTimes(1);
         expect(mockSetSession).toHaveBeenCalledWith(
           'cafebabe',
-          mockNavigateAfterSignIn
+          mockNavigateAfterSignIn,
         );
       });
     });
@@ -265,7 +264,7 @@ describe('<SignInFactorOne/>', () => {
           firstFactorVerification: {
             status: 'expired',
           },
-        })
+        }),
       );
 
       (
@@ -297,13 +296,13 @@ describe('<SignInFactorOne/>', () => {
               status: null,
               verifiedFromTheSameClient: jest.fn(() => false),
             },
-          } as unknown as SignInResource)
+          } as unknown as SignInResource),
       );
 
       (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(
         () => ({
           setSession: mockSetSession,
-        })
+        }),
       );
 
       render(<SignInFactorOne />);
@@ -328,7 +327,7 @@ describe('<SignInFactorOne/>', () => {
             verifiedAtClient: '',
             verifiedFromTheSameClient: jest.fn(() => false),
           },
-        })
+        }),
       );
 
       (
@@ -360,13 +359,13 @@ describe('<SignInFactorOne/>', () => {
               status: null,
               verifiedFromTheSameClient: jest.fn(() => false),
             },
-          } as unknown as SignInResource)
+          } as unknown as SignInResource),
       );
 
       (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(
         () => ({
           setSession: mockSetSession,
-        })
+        }),
       );
 
       render(<SignInFactorOne />);
@@ -382,7 +381,7 @@ describe('<SignInFactorOne/>', () => {
         expect(mockSetSession).toHaveBeenCalledTimes(1);
         expect(mockSetSession).toHaveBeenCalledWith(
           'cafebabe',
-          mockNavigateAfterSignIn
+          mockNavigateAfterSignIn,
         );
       });
     });
@@ -411,7 +410,7 @@ describe('<SignInFactorOne/>', () => {
               status: null,
               verifiedFromTheSameClient: jest.fn(() => false),
             },
-          } as unknown as SignInResource)
+          } as unknown as SignInResource),
       );
       (useSignInContext as jest.Mock).mockImplementation(() => ({
         signUpUrl: 'http://test.host',
@@ -431,7 +430,7 @@ describe('<SignInFactorOne/>', () => {
 
       mocked(
         useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>,
-        true
+        true,
       ).mockImplementation(() => ({
         authConfig: { singleSessionMode: false },
         displayConfig: {
@@ -441,7 +440,7 @@ describe('<SignInFactorOne/>', () => {
 
       mocked(
         useCoreSignIn as jest.Mock<SignInResource>,
-        true
+        true,
       ).mockImplementation(
         () =>
           ({
@@ -461,12 +460,12 @@ describe('<SignInFactorOne/>', () => {
               verifiedAtClient: '',
               verifiedFromTheSameClient: jest.fn(() => false),
             },
-          } as unknown as SignInResource)
+          } as unknown as SignInResource),
       );
 
       mocked(
         useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>,
-        true
+        true,
       ).mockImplementation(() => ({
         setSession: mockSetSession,
       }));
@@ -508,7 +507,7 @@ describe('<SignInFactorOne/>', () => {
 
       mocked(
         useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>,
-        true
+        true,
       ).mockImplementation(() => ({
         authConfig: { singleSessionMode: false },
         displayConfig: {
@@ -518,7 +517,7 @@ describe('<SignInFactorOne/>', () => {
 
       mocked(
         useCoreSignIn as jest.Mock<SignInResource>,
-        true
+        true,
       ).mockImplementation(
         () =>
           ({
@@ -544,13 +543,13 @@ describe('<SignInFactorOne/>', () => {
               verifiedAtClient: '',
               verifiedFromTheSameClient: jest.fn(() => false),
             },
-          } as unknown as SignInResource)
+          } as unknown as SignInResource),
       );
 
       mocked(
         // @ts-ignore
         useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>,
-        true
+        true,
       ).mockImplementation(() => ({
         setSession: mockSetSession,
       }));
@@ -607,13 +606,13 @@ describe('<SignInFactorOne/>', () => {
               verifiedAtClient: '',
               verifiedFromTheSameClient: jest.fn(() => false),
             },
-          } as unknown as SignInResource)
+          } as unknown as SignInResource),
       );
 
       (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(
         () => ({
           setSession: mockSetSession,
-        })
+        }),
       );
 
       render(<SignInFactorOne />);
@@ -649,7 +648,7 @@ describe('<SignInFactorOne/>', () => {
               status: null,
               verifiedFromTheSameClient: jest.fn(() => false),
             },
-          } as unknown as SignInResource)
+          } as unknown as SignInResource),
       );
       (useSignInContext as jest.Mock).mockImplementation(() => ({
         signUpUrl: 'http://test.host',
@@ -679,7 +678,7 @@ describe('<SignInFactorOne/>', () => {
           ({
             supportedFirstFactors: [],
             status: null,
-          } as unknown as SignInResource)
+          } as unknown as SignInResource),
       );
 
       const { container } = render(<SignInFactorOne />);
@@ -701,7 +700,7 @@ describe('<SignInFactorOne/>', () => {
           ({
             supportedFirstFactors: [],
             status: 'needs_first_factor',
-          } as unknown as SignInResource)
+          } as unknown as SignInResource),
       );
 
       render(<SignInFactorOne />);

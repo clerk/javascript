@@ -10,7 +10,8 @@ import { BaseResource } from './Base';
 
 export class DisplayConfig
   extends BaseResource
-  implements DisplayConfigResource {
+  implements DisplayConfigResource
+{
   id!: string;
   instanceEnvironmentType!: string;
   applicationName!: string;

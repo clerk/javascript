@@ -9,11 +9,11 @@ describe('<PageHeading/>', () => {
   it('renders the header component', () => {
     const tree = renderJSON(
       <PageHeading
-        backTo="foo/bar"
-        title="title"
-        subtitle="subtitle"
-        className="qux"
-      />
+        backTo='foo/bar'
+        title='title'
+        subtitle='subtitle'
+        className='qux'
+      />,
     );
     expect(tree).toMatchSnapshot();
   });

@@ -88,6 +88,18 @@ export const OAUTH_PROVIDERS: OAuthProviders = Object.freeze({
     id: 'twitch',
     name: 'Twitch',
   },
+  linkedin: {
+    id: 'linkedin',
+    name: 'LinkedIn',
+  },
+  dropbox: {
+    id: 'dropbox',
+    name: 'Dropbox',
+  },
+  bitbucket: {
+    id: 'bitbucket',
+    name: 'Bitbucket',
+  },
 });
 
 export function getOAuthProviderData(

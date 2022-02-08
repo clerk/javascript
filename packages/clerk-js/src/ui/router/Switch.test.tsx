@@ -6,7 +6,7 @@ const mockNavigate = jest.fn();
 
 jest.mock('ui/contexts', () => ({
   useCoreClerk: () => ({
-    navigate: jest.fn((to) => {
+    navigate: jest.fn(to => {
       mockNavigate(to);
       if (to) {
         // @ts-ignore
@@ -41,9 +41,9 @@ describe('<Switch >', () => {
       <HashRouter>
         <Switch>
           hey
-          <Route path="first">first</Route>
+          <Route path='first'>first</Route>
         </Switch>
-      </HashRouter>
+      </HashRouter>,
     );
 
     expect(screen.queryByText('hey')).toBeNull();
@@ -55,11 +55,11 @@ describe('<Switch >', () => {
     render(
       <HashRouter>
         <Switch>
-          <Route path="first">first 1</Route>
-          <Route path="first">first 2</Route>
+          <Route path='first'>first 1</Route>
+          <Route path='first'>first 2</Route>
           <Route>catchall</Route>
         </Switch>
-      </HashRouter>
+      </HashRouter>,
     );
 
     expect(screen.queryByText('first 1')).toBeDefined();
@@ -72,11 +72,11 @@ describe('<Switch >', () => {
     render(
       <HashRouter>
         <Switch>
-          <Route path="first">first</Route>
-          <Route path="second">second</Route>
-          <Route path="third">third</Route>
+          <Route path='first'>first</Route>
+          <Route path='second'>second</Route>
+          <Route path='third'>third</Route>
         </Switch>
-      </HashRouter>
+      </HashRouter>,
     );
 
     expect(screen.queryByText('first')).toBeNull();
@@ -89,11 +89,11 @@ describe('<Switch >', () => {
     render(
       <HashRouter>
         <Switch>
-          <Route path="first">first 1</Route>
-          <Route path="first">first 2</Route>
+          <Route path='first'>first 1</Route>
+          <Route path='first'>first 2</Route>
           <Route>catchall</Route>
         </Switch>
-      </HashRouter>
+      </HashRouter>,
     );
 
     expect(screen.queryByText('first 1')).toBeNull();
@@ -107,9 +107,9 @@ describe('<Switch >', () => {
       <HashRouter>
         <Switch>
           <Route>catchall</Route>
-          <Route path="first">first</Route>
+          <Route path='first'>first</Route>
         </Switch>
-      </HashRouter>
+      </HashRouter>,
     );
 
     expect(screen.queryByText('catchall')).toBeDefined();
@@ -122,9 +122,9 @@ describe('<Switch >', () => {
       <HashRouter>
         <Switch>
           <Route index>catchall</Route>
-          <Route path="first">first</Route>
+          <Route path='first'>first</Route>
         </Switch>
-      </HashRouter>
+      </HashRouter>,
     );
 
     expect(screen.queryByText('catchall')).toBeDefined();

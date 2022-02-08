@@ -23,7 +23,8 @@ export function determineFirstPartyFields(
   environment: EnvironmentResource,
   hasInvitation?: boolean,
 ): Fields {
-  const idRequirements = environment.authConfig.identificationRequirements.flat();
+  const idRequirements =
+    environment.authConfig.identificationRequirements.flat();
   const fields: Fields = {};
 
   const idByEmail = idRequirements.includes('email_address');
