@@ -9,7 +9,8 @@ import type {
 } from '@clerk/types';
 
 export interface IsomorphicClerkOptions extends ClerkOptions {
-  scriptUrl?: string;
+  clerkJSUrl?: string;
+  clerkJSVariant?: 'headless' | '';
 }
 
 export interface BrowserClerkConstructor {
@@ -61,9 +62,4 @@ export type SignOutButtonProps = {
   children?: React.ReactNode;
 };
 
-export type RedirectToProps = {
-  /**
-   * @deprecated The returnBack prop has been deprecated and will be removed soon.  Use `redirectUrl` instead.
-   */
-  returnBack?: boolean;
-} & RedirectOptions;
+export type RedirectToProps = RedirectOptions;
