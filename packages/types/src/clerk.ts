@@ -1,3 +1,4 @@
+import { EnvironmentResource } from '.';
 import { ClientResource } from './client';
 import { DisplayThemeJSON } from './json';
 import { ActiveSessionResource } from './session';
@@ -31,6 +32,9 @@ export interface Clerk {
 
   /** Current User. */
   user?: UserResource | null;
+
+  /** Clerk environment. */
+  __unstable__environment?: EnvironmentResource | null;
 
   /**
    * Signs out the current user on single-session instances, or all users on multi-session instances.
@@ -173,31 +177,17 @@ export interface Clerk {
 
   /**
    * Redirects to the configured sign in URL. Retrieved from {@link environment}.
-   * @deprecated Use the new {@link Clerk.redirectToSignIn}  instead;
-   * @param returnBack will appends a query string parameter to the sign in URL so the user can be redirected back to the current page. Defaults to false.
-   */
-  redirectToSignIn(returnBack?: boolean): Promise<unknown>;
-
-  /**
-   * Redirects to the configured sign in URL. Retrieved from {@link environment}.
    *
    * @param opts A {@link RedirectOptions} object
    */
-  redirectToSignIn(opts: RedirectOptions): Promise<unknown>;
-
-  /**
-   * Redirects to the configured sign up URL. Retrieved from {@link environment}.
-   * @deprecated Use the new {@link Clerk.redirectToSignIn}  instead;
-   * @param returnBack will appends a query string parameter to the sign in URL so the user can be redirected back to the current page. Defaults to false.
-   */
-  redirectToSignUp(returnBack?: boolean): Promise<unknown>;
+  redirectToSignIn(opts?: RedirectOptions): Promise<unknown>;
 
   /**
    * Redirects to the configured sign up URL. Retrieved from {@link environment}.
    *
    * @param opts A {@link RedirectOptions} object
    */
-  redirectToSignUp(opts: RedirectOptions): Promise<unknown>;
+  redirectToSignUp(opts?: RedirectOptions): Promise<unknown>;
 
   /**
    * Redirects to the configured user profile URL. Retrieved from {@link environment}.
@@ -272,12 +262,12 @@ export type CustomNavigation = (to: string) => Promise<unknown> | void;
 export type ClerkThemeOptions = DeepSnakeToCamel<DeepPartial<DisplayThemeJSON>>;
 
 export interface ClerkOptions {
+  authVersion?: 1 | 2;
+  navigate?: (to: string) => Promise<unknown> | unknown;
+  polling?: boolean;
   selectInitialSession?: (
     client: ClientResource,
   ) => ActiveSessionResource | null;
-  navigate?: (to: string) => Promise<unknown> | unknown;
-  polling?: boolean;
-  authVersion?: 1 | 2;
   theme?: ClerkThemeOptions;
 }
 
@@ -327,16 +317,6 @@ export type SignInProps = {
    * Used to fill the "Sign up" link in the SignUp component.
    */
   signUpUrl?: string;
-
-  /**
-   * @deprecated Use {@link SignInProps.afterSignInUrl} instead;
-   */
-  afterSignIn?: string | null;
-
-  /**
-   * @deprecated Use {@link SignInProps.signUpUrl} instead;
-   */
-  signUpURL?: string;
 } & RedirectOptions;
 
 export type SignUpProps = {
@@ -355,16 +335,6 @@ export type SignUpProps = {
    * Used to fill the "Sign in" link in the SignUp component.
    */
   signInUrl?: string;
-
-  /**
-   * @deprecated Use {@link SignUpProps.afterSignUpUrl} instead;
-   */
-  afterSignUp?: string | null;
-
-  /**
-   * @deprecated Use {@link SignUpProps.signInUrl} instead;
-   */
-  signInURL?: string;
 } & RedirectOptions;
 
 export type UserProfileProps = {
@@ -423,30 +393,6 @@ export type UserButtonProps = {
    * Multi-session mode only.
    */
   afterSwitchSessionUrl?: string;
-
-  /**
-   * @deprecated Use {@link UserButtonProps.afterSwitchSessionUrl} instead;
-   */
-  afterSwitchSession?: string;
-
-  /**
-   * @deprecated Use {@link UserButtonProps.userProfileUrl} instead;
-   */
-  userProfileURL?: string;
-
-  /**
-   * @deprecated Use {@link UserButtonProps.signInUrl} instead;
-   */ signInURL?: string;
-
-  /**
-   * @deprecated Use {@link UserButtonProps.afterSignOutAllUrl} instead;
-   */
-  afterSignOutAll?: string;
-
-  /**
-   * @deprecated Use {@link UserButtonProps.afterSignOutOneUrl} instead;
-   */
-  afterSignOutOne?: string;
 };
 
 export interface HandleMagicLinkVerificationParams {
@@ -464,7 +410,7 @@ export interface HandleMagicLinkVerificationParams {
    * Callback function to be executed after successful magic link
    * verification on another device.
    */
-  onVerifiedOnOtherDevice?: Function;
+  onVerifiedOnOtherDevice?: () => void;
 }
 
 export interface AuthenticateWithMetamaskParams {
