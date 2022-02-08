@@ -21,5 +21,6 @@ export * from './token';
 export * from './user';
 export * from './utils';
 export * from './verification';
+export * from './ssr';
 export * from './web3';
 export * from './web3Wallet';
