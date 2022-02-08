@@ -5,6 +5,7 @@
 import { ToggleType, ToggleTypeWithRequire } from './authConfig';
 import { EmailAddressVerificationStrategy } from './emailAddress';
 import { OAuthStrategy } from './oauth';
+import { OAuthProvider } from './oauth';
 import { SessionStatus } from './session';
 import {
   IdentificationStrategy,
@@ -181,6 +182,18 @@ export interface Web3WalletJSON extends ClerkResourceJSON {
   verification: VerificationJSON | null;
 }
 
+export interface ExternalAccountJSON extends ClerkResourceJSON {
+  object: 'external_account';
+  provider: OAuthProvider;
+  identification_id: string;
+  provider_user_id: string;
+  approved_scopes: string;
+  email_address: string;
+  first_name: string;
+  last_name: string;
+  avatar_url: string;
+}
+
 export interface UserJSON extends ClerkResourceJSON {
   object: 'user';
   id: string;
@@ -283,37 +296,3 @@ export interface SessionActivityJSON extends ClerkResourceJSON {
   country?: string;
   is_mobile?: boolean;
 }
-
-// TODO: Generalize external account JSON payload to simplify type declarations
-export type ExternalAccountJSON =
-  | {
-      object: 'google_account';
-      id: string;
-      google_id: string;
-      approved_scopes: string;
-      email_address: string;
-      given_name: string;
-      family_name: string;
-      picture: string;
-    }
-  | {
-      object: 'facebook_account';
-      id: string;
-      facebook_id: string;
-      approved_scopes: string;
-      email_address: string;
-      first_name: string;
-      last_name: string;
-      picture: string;
-    }
-  | {
-      object: 'external_account';
-      provider: string;
-      identification_id: string;
-      provider_user_id: string;
-      approved_scopes: string;
-      email_address: string;
-      first_name: string;
-      last_name: string;
-      avatar_url: string;
-    };
