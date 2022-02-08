@@ -6,9 +6,9 @@ import { ButtonWithSpinner } from './ButtonWithSpinner';
 describe('<ButtonWithSpinner/>', () => {
   it('renders the button', () => {
     const tree = renderJSON(
-      <ButtonWithSpinner isLoading type="submit">
+      <ButtonWithSpinner isLoading type='submit'>
         Foo
-      </ButtonWithSpinner>
+      </ButtonWithSpinner>,
     );
     expect(tree).toMatchSnapshot();
   });

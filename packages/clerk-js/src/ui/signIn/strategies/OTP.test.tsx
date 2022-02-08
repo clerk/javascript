@@ -36,14 +36,14 @@ describe('<OTP/>', () => {
 
   it('renders the OTP form component', async () => {
     const tree = renderJSON(
-      <OTP verifyCode={(verify) => verify()} factor={factor} code={code} />
+      <OTP verifyCode={verify => verify()} factor={factor} code={code} />,
     );
     await jest.runAllTimers();
     expect(tree).toMatchSnapshot();
   });
 
   it('renders the OTP form, enters a password verifies the code', async () => {
-    const mockVerify = jest.fn((verify) => verify());
+    const mockVerify = jest.fn(verify => verify());
 
     render(<OTP verifyCode={mockVerify} factor={factor} code={code} />);
 

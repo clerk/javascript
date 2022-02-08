@@ -1,4 +1,4 @@
-import { render, renderJSON,screen, userEvent } from '@clerk/shared/testUtils';
+import { render, renderJSON, screen, userEvent } from '@clerk/shared/testUtils';
 import { PhoneNumberResource } from '@clerk/types';
 import { ClerkAPIResponseError } from 'core/resources/Error';
 import React from 'react';
@@ -94,7 +94,7 @@ describe('<PhoneDetail/>', () => {
     // in this case '999999'.
     userEvent.type(
       screen.getByLabelText('Enter verification code. Digit 1'),
-      '9'
+      '9',
     );
     userEvent.type(screen.getByLabelText('Digit 2'), '9');
     userEvent.type(screen.getByLabelText('Digit 3'), '9');
@@ -103,7 +103,7 @@ describe('<PhoneDetail/>', () => {
     userEvent.type(screen.getByLabelText('Digit 6'), '9');
 
     expect(
-      await screen.findByText('the-long-error-message')
+      await screen.findByText('the-long-error-message'),
     ).toBeInTheDocument();
   });
 });

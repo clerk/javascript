@@ -5,7 +5,7 @@ import { Label } from './Label';
 
 describe('<Label/>', () => {
   it('renders the label text ', () => {
-    const tree = renderJSON(<Label text="Foo" />);
+    const tree = renderJSON(<Label text='Foo' />);
     expect(tree).toMatchSnapshot();
   });
 
@@ -13,7 +13,7 @@ describe('<Label/>', () => {
     const tree = renderJSON(
       <Label>
         <span>Bar</span>
-      </Label>
+      </Label>,
     );
     expect(tree).toMatchSnapshot();
   });

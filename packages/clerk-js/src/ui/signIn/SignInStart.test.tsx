@@ -51,7 +51,7 @@ jest.mock('ui/contexts', () => {
             ],
             firstFactors: ['email_address', 'oauth_google', 'oauth_facebook'],
           },
-        } as any as EnvironmentResource)
+        } as any as EnvironmentResource),
     ),
     useCoreSignIn: jest.fn(() => ({
       allowedFactorOneStrategies: ['password'],
@@ -124,7 +124,7 @@ describe('<SignInStart/>', () => {
       });
 
       const instantPasswordField = container.querySelector(
-        'input#password'
+        'input#password',
       ) as HTMLInputElement;
 
       expect(instantPasswordField).toBeDefined();
@@ -169,7 +169,7 @@ describe('<SignInStart/>', () => {
         }));
 
       const instantPasswordField = container.querySelector(
-        'input#password'
+        'input#password',
       ) as HTMLInputElement;
 
       expect(instantPasswordField).toBeDefined();
@@ -223,7 +223,7 @@ describe('<SignInStart/>', () => {
         }));
 
       const instantPasswordField = container.querySelector(
-        'input#password'
+        'input#password',
       ) as HTMLInputElement;
 
       expect(instantPasswordField).toBeDefined();
@@ -256,7 +256,7 @@ describe('<SignInStart/>', () => {
 
     it.each(['google', 'facebook'])(
       'renders the start screen, presses the %s button and starts an oauth flow',
-      async (provider) => {
+      async provider => {
         const providerTitle = titleize(provider);
 
         render(<SignInStart />);
@@ -276,7 +276,7 @@ describe('<SignInStart/>', () => {
             redirectUrlComplete: 'http://test.host',
           });
         });
-      }
+      },
     );
   });
 
@@ -318,7 +318,7 @@ describe('<SignInStart/>', () => {
         expect(mockSetSession).toHaveBeenNthCalledWith(
           1,
           'deadbeef',
-          mockNavigateAfterSignIn
+          mockNavigateAfterSignIn,
         );
       });
     });
@@ -331,7 +331,7 @@ describe('<SignInStart/>', () => {
 
       mocked(
         useCoreSignIn as jest.Mock<SignInResource>,
-        true
+        true,
       ).mockImplementationOnce(
         () =>
           ({
@@ -342,7 +342,7 @@ describe('<SignInStart/>', () => {
                 longMessage: errorMsg,
               },
             },
-          } as unknown as SignInResource)
+          } as unknown as SignInResource),
       );
 
       render(<SignInStart />);
@@ -358,7 +358,7 @@ describe('<SignInStart/>', () => {
 
       mocked(
         useCoreSignIn as jest.Mock<SignInResource>,
-        true
+        true,
       ).mockImplementationOnce(
         () =>
           ({
@@ -369,7 +369,7 @@ describe('<SignInStart/>', () => {
                 longMessage: errorMsg,
               },
             },
-          } as unknown as SignInResource)
+          } as unknown as SignInResource),
       );
 
       render(<SignInStart />);

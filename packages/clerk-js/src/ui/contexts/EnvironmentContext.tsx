@@ -2,8 +2,9 @@ import { EnvironmentResource } from '@clerk/types';
 import * as React from 'react';
 import { assertContextExists } from 'ui/contexts/utils';
 
-const EnvironmentContext =
-  React.createContext<EnvironmentResource | null>(null);
+const EnvironmentContext = React.createContext<EnvironmentResource | null>(
+  null,
+);
 
 interface EnvironmentProviderProps {
   children: React.ReactNode;

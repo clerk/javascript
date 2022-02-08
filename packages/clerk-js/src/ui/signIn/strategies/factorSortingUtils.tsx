@@ -27,16 +27,16 @@ const STRATEGY_SORT_ORDER_ALL_STRATEGIES_BUTTONS = makeSortingOrderMap([
   'password',
 ] as SignInStrategyName[]);
 
-const makeSortingFunction = (
-  sortingMap: Record<SignInStrategyName, number>,
-) => (a: SignInFactor, b: SignInFactor): number => {
-  const orderA = sortingMap[a.strategy];
-  const orderB = sortingMap[b.strategy];
-  if (orderA === undefined || orderB === undefined) {
-    return 0;
-  }
-  return orderA - orderB;
-};
+const makeSortingFunction =
+  (sortingMap: Record<SignInStrategyName, number>) =>
+  (a: SignInFactor, b: SignInFactor): number => {
+    const orderA = sortingMap[a.strategy];
+    const orderB = sortingMap[b.strategy];
+    if (orderA === undefined || orderB === undefined) {
+      return 0;
+    }
+    return orderA - orderB;
+  };
 
 export const passwordPrefFactorComparator = makeSortingFunction(
   STRATEGY_SORT_ORDER_PASSWORD_PREF,

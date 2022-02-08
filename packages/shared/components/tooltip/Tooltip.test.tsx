@@ -24,7 +24,7 @@ describe('<Tooltip/>', () => {
     render(
       <Tooltip content={messageText}>
         <button>Hover me</button>
-      </Tooltip>
+      </Tooltip>,
     );
 
     userEvent.hover(screen.getByText(/Hover me/i));
@@ -35,7 +35,7 @@ describe('<Tooltip/>', () => {
     });
 
     await waitFor(() =>
-      expect(screen.getByText(messageText)).toBeInTheDocument()
+      expect(screen.getByText(messageText)).toBeInTheDocument(),
     );
 
     userEvent.unhover(screen.getByText(/Hover me/i));

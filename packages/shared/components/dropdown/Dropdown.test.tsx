@@ -30,9 +30,9 @@ describe('<Dropdown/>', () => {
     const tree = renderJSON(
       <Dropdown
         options={options}
-        placeholder="Select..."
+        placeholder='Select...'
         handleChange={onChange}
-      />
+      />,
     );
 
     expect(tree).toMatchSnapshot();
@@ -46,9 +46,9 @@ describe('<Dropdown/>', () => {
         active
         defaultSelectedIndex={1}
         options={options}
-        placeholder="Select..."
+        placeholder='Select...'
         handleChange={onChange}
-      />
+      />,
     );
 
     expect(tree).toMatchSnapshot();
@@ -57,11 +57,11 @@ describe('<Dropdown/>', () => {
   it('shows placeholder whenever selectedOption is not found', () => {
     const tree = renderJSON(
       <Dropdown
-        name="opt"
+        name='opt'
         options={options}
-        placeholder="Select..."
+        placeholder='Select...'
         selectedOption={'invalid'}
-      />
+      />,
     );
 
     expect(tree).toMatchSnapshot();
@@ -73,10 +73,10 @@ describe('<Dropdown/>', () => {
     const tree = renderJSON(
       <Dropdown
         options={options}
-        placeholder="Select..."
+        placeholder='Select...'
         handleChange={onChange}
         showCaret={false}
-      />
+      />,
     );
 
     expect(tree).toMatchSnapshot();
@@ -87,11 +87,11 @@ describe('<Dropdown/>', () => {
 
     render(
       <Dropdown
-        name="opt"
+        name='opt'
         options={options}
-        placeholder="Select..."
+        placeholder='Select...'
         handleChange={onChange}
-      />
+      />,
     );
 
     let trigger = screen.getByText('Select...');
@@ -141,11 +141,11 @@ describe('<Dropdown/>', () => {
 
     render(
       <Dropdown
-        name="opt"
+        name='opt'
         options={options}
-        placeholder="Select..."
+        placeholder='Select...'
         handleChange={onChange}
-      />
+      />,
     );
 
     const trigger = screen.getAllByRole('button')[0];
@@ -179,11 +179,11 @@ describe('<Dropdown/>', () => {
 
     render(
       <Dropdown
-        name="opt"
+        name='opt'
         options={options}
-        placeholder="Select..."
+        placeholder='Select...'
         handleChange={onChange}
-      />
+      />,
     );
 
     const trigger = screen.getAllByRole('button')[0];
@@ -228,13 +228,13 @@ describe('Searchable <Dropdown />', () => {
 
   it('renders tertiary Dropdown', () => {
     const tree = renderJSON(
-      <Dropdown tertiary options={options} searchable={true} />
+      <Dropdown tertiary options={options} searchable={true} />,
     );
     expect(tree).toMatchSnapshot();
   });
 
   it('renders searchable Dropdown with native select element', () => {
-    const withNativeOptions: DropdownOption[] = options.map((o) =>
+    const withNativeOptions: DropdownOption[] = options.map(o =>
       typeof o === 'string'
         ? o
         : {
@@ -244,10 +244,10 @@ describe('Searchable <Dropdown />', () => {
                 {o.value}
               </option>
             ),
-          }
+          },
     );
     const tree = renderJSON(
-      <Dropdown options={withNativeOptions} searchable={true} />
+      <Dropdown options={withNativeOptions} searchable={true} />,
     );
     expect(tree).toMatchSnapshot();
   });
@@ -261,7 +261,7 @@ describe('Searchable <Dropdown />', () => {
         handleChange={onChange}
         options={options}
         searchable={true}
-      />
+      />,
     );
 
     const input = screen.getByRole('combobox');
@@ -280,7 +280,7 @@ describe('Searchable <Dropdown />', () => {
         handleChange={onChange}
         options={options}
         searchable={true}
-      />
+      />,
     );
 
     const input = screen.getByRole('combobox');
@@ -306,7 +306,7 @@ describe('Searchable <Dropdown />', () => {
         options={options}
         searchable={true}
         customComparator={customComparator}
-      />
+      />,
     );
 
     const input = screen.getByRole('combobox');
@@ -327,7 +327,7 @@ describe('Searchable <Dropdown />', () => {
         options={options}
         searchable={true}
         active={true}
-      />
+      />,
     );
 
     const input = screen.getByRole('combobox');
@@ -348,7 +348,7 @@ describe('Searchable <Dropdown />', () => {
         options={options}
         searchable={true}
         selectedOption={'bar'}
-      />
+      />,
     );
 
     const input = screen.getByRole('combobox');

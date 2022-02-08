@@ -22,13 +22,13 @@ const mockUseCoreSignIn = jest.fn(
   () =>
     ({
       status: null,
-    } as SignInResource)
+    } as SignInResource),
 );
 const mockUseCoreSignUp = jest.fn(
   () =>
     ({
       status: null,
-    } as SignUpResource)
+    } as SignUpResource),
 );
 
 const mockUseCoreSessionList = jest.fn(() => [] as SessionResource[]);
@@ -160,7 +160,7 @@ jest.mock('ui/router', () => {
 });
 
 // @ts-ignore
-ReactDOM.createPortal = (node) => node;
+ReactDOM.createPortal = node => node;
 
 describe('<UserProfileContent />', () => {
   it('renders the UserProfileContent', async () => {

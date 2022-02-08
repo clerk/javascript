@@ -1,4 +1,4 @@
-import type { OAuthProvider,OAuthStrategy } from '@clerk/types';
+import type { OAuthProvider, OAuthStrategy } from '@clerk/types';
 import React from 'react';
 import {
   buildSSOCallbackURL,

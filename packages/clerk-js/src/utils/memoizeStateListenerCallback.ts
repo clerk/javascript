@@ -69,7 +69,7 @@ function resourceChanged<T extends AcceptedResource | undefined | null>(
 }
 
 function getSameOrUpdatedResource<
-  T extends UserResource | ClientResource | SessionResource | undefined | null
+  T extends UserResource | ClientResource | SessionResource | undefined | null,
 >(prev: T, next: T): T {
   return resourceChanged(prev, next) ? next : prev;
 }

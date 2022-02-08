@@ -6,7 +6,7 @@ export * from './errorHandler';
 export * from './forms';
 export * from './logo';
 export * from './magicLinkWaitingScreen';
-export * from './Portal'
+export * from './Portal';
 export * from './poweredByClerk';
 export * from './redirects';
 export * from './verification';

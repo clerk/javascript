@@ -4,7 +4,7 @@ import type { UserResource } from '@clerk/types';
 import { ExternalAccountResource } from '@clerk/types';
 import React from 'react';
 import { svgUrl } from 'ui/common/constants';
-import { useCoreUser,useEnvironment } from 'ui/contexts';
+import { useCoreUser, useEnvironment } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
 
 import { AvatarWithUploader } from '../avatarWithUploader';
@@ -19,6 +19,10 @@ function getWeb3WalletAddress(user: UserResource): string {
     return user.web3Wallets[0] ? user.web3Wallets[0].web3Wallet : '';
   }
   return '';
+}
+
+function checkIfSectionIsOn(section: string) {
+  return section === 'on' || section === 'required';
 }
 
 export function ProfileCard(): JSX.Element {
@@ -97,9 +101,9 @@ export function ProfileCard(): JSX.Element {
   );
 
   const showWebWallet = !!web3Wallet;
-  const showUsername = authConfig.username === 'on';
-  const showEmail = authConfig.emailAddress === 'on';
-  const showPhone = authConfig.phoneNumber === 'on';
+  const showUsername = checkIfSectionIsOn(authConfig.username);
+  const showEmail = checkIfSectionIsOn(authConfig.emailAddress);
+  const showPhone = checkIfSectionIsOn(authConfig.phoneNumber);
 
   return (
     <TitledCard

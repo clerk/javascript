@@ -22,7 +22,7 @@ describe('<Logo/>', () => {
   it('does not render the image logo while loading', () => {
     mocked(
       useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>,
-      true
+      true,
     ).mockImplementation(() => ({
       displayConfig: {
         applicationName: 'Foo',
@@ -43,7 +43,7 @@ describe('<Logo/>', () => {
   it('renders the image logo', () => {
     mocked(
       useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>,
-      true
+      true,
     ).mockImplementation(() => ({
       displayConfig: {
         applicationName: 'Foo',
@@ -59,7 +59,7 @@ describe('<Logo/>', () => {
   it('renders the text logo', () => {
     mocked(
       useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>,
-      true
+      true,
     ).mockImplementation(() => ({
       displayConfig: {
         applicationName: 'Foo',

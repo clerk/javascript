@@ -1,4 +1,4 @@
-import { urlDecodeB64,urlEncodeB64 } from './encoders';
+import { urlDecodeB64, urlEncodeB64 } from './encoders';
 
 describe('base 64', () => {
   it('encodes and decodes a string', () => {

@@ -3,11 +3,8 @@ import createDevBrowserHandler, {
 } from './devBrowserHandler';
 
 describe('detBrowserHandler', () => {
-  const {
-    getDevBrowserJWT,
-    setDevBrowserJWT,
-    removeDevBrowserJWT,
-  } = createDevBrowserHandler({} as CreateDevBrowserHandlerOptions);
+  const { getDevBrowserJWT, setDevBrowserJWT, removeDevBrowserJWT } =
+    createDevBrowserHandler({} as CreateDevBrowserHandlerOptions);
 
   describe('localStorage', () => {
     beforeEach(() => {

@@ -37,7 +37,7 @@ describe('AccountSwitcher', () => {
         isSingleSession={false}
         handleAccountClick={handleAccountClick}
         handleAddAccountClick={handleAddAccountClick}
-      />
+      />,
     );
     expect(tree).toMatchSnapshot();
   });
@@ -52,7 +52,7 @@ describe('AccountSwitcher', () => {
         isSingleSession={true}
         handleAccountClick={handleAccountClick}
         handleAddAccountClick={handleAddAccountClick}
-      />
+      />,
     );
     expect(tree).toMatchSnapshot();
   });
@@ -67,7 +67,7 @@ describe('AccountSwitcher', () => {
         isSingleSession={false}
         handleAccountClick={handleAccountClick}
         handleAddAccountClick={handleAddAccountClick}
-      />
+      />,
     );
 
     const addAccountButton = accountSwitcher.getByText('Add account');
@@ -78,7 +78,7 @@ describe('AccountSwitcher', () => {
 
   it('changes to the other active account', () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const handleAccountClick = jest.fn((_session) => undefined);
+    const handleAccountClick = jest.fn(_session => undefined);
     const handleAddAccountClick = jest.fn();
 
     const accountSwitcher = render(
@@ -87,12 +87,12 @@ describe('AccountSwitcher', () => {
         isSingleSession={false}
         handleAccountClick={handleAccountClick}
         handleAddAccountClick={handleAddAccountClick}
-      />
+      />,
     );
 
     const additionalSessionIdentifier = `${sessions[1].publicUserData.firstName} ${sessions[1].publicUserData.lastName}`;
     const additionalSessionElement = accountSwitcher.getByText(
-      additionalSessionIdentifier
+      additionalSessionIdentifier,
     );
     fireEvent.click(additionalSessionElement);
     expect(handleAccountClick.mock.calls[0][0]).toBe(sessions[1]);

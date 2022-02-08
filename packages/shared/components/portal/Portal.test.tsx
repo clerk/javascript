@@ -6,9 +6,9 @@ import { Portal } from './Portal';
 describe('<Portal/>', () => {
   it('injects the portal to DOM and renders its children', () => {
     const { baseElement } = render(
-      <Portal className="bar">
+      <Portal className='bar'>
         <div>Foo</div>
-      </Portal>
+      </Portal>,
     );
     expect(screen.getByText('Foo')).toBeInTheDocument();
     expect(baseElement.querySelector('div.bar')).toBeTruthy();

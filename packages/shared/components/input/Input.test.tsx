@@ -8,7 +8,11 @@ describe('<Input/>', () => {
     const onChange = jest.fn();
 
     render(
-      <Input type="text" handleChange={onChange} placeholder="Type some text" />
+      <Input
+        type='text'
+        handleChange={onChange}
+        placeholder='Type some text'
+      />,
     );
 
     const htmlInput = screen.getByRole('textbox');
@@ -21,7 +25,7 @@ describe('<Input/>', () => {
   });
 
   it('renders the controlled input with error', () => {
-    const tree = renderJSON(<Input type="text" hasError />);
+    const tree = renderJSON(<Input type='text' hasError />);
     expect(tree).toMatchSnapshot();
   });
 });

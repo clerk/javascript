@@ -33,10 +33,8 @@ export function ActiveAccountsManager({
   const { authConfig } = useEnvironment();
   const { navigate } = useNavigate();
   const [signoutInProgress, setSignoutInProgress] = React.useState(false);
-  const [
-    managementNavigationInProgress,
-    setManagementNavigationInProgress,
-  ] = React.useState(false);
+  const [managementNavigationInProgress, setManagementNavigationInProgress] =
+    React.useState(false);
   const { setPopupVisible } = useUserButtonPopupVisibility();
 
   const handleSignOutSingle = () => {

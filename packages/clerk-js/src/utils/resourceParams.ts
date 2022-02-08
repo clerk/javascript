@@ -1,7 +1,7 @@
 export function normalizeUnsafeMetadata<
   T extends Record<string, unknown> & {
     unsafe_metadata?: Record<string, unknown>;
-  }
+  },
 >(params: T) {
   const { unsafe_metadata } = { ...params };
   const unsafeMetadataJSON = unsafe_metadata

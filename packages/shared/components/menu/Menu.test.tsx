@@ -14,12 +14,12 @@ describe('<Menu/>', () => {
   ];
 
   it('renders the menu options', () => {
-    const tree = renderJSON(<Menu options={options} className="foo" />);
+    const tree = renderJSON(<Menu options={options} className='foo' />);
     expect(tree).toMatchSnapshot();
   });
 
   it('triggers the option callback upon clicking on it', () => {
-    const opts = options.map((o) => ({
+    const opts = options.map(o => ({
       ...o,
       handleSelect: jest.fn(),
     }));

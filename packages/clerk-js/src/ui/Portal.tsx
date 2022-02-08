@@ -6,7 +6,7 @@ import { HashRouter, PathRouter } from 'ui/router';
 
 type PortalProps<
   CtxType extends ComponentContextValue,
-  PropsType = Omit<CtxType, 'componentName'>
+  PropsType = Omit<CtxType, 'componentName'>,
 > = {
   node: HTMLDivElement;
   component:
@@ -17,16 +17,11 @@ type PortalProps<
 } & Pick<CtxType, 'componentName'>;
 
 export default class Portal<
-  CtxType extends ComponentContextValue
+  CtxType extends ComponentContextValue,
 > extends React.PureComponent<PortalProps<CtxType>> {
   render(): React.ReactPortal {
-    const {
-      props,
-      component,
-      componentName,
-      node,
-      preservedParams,
-    } = this.props;
+    const { props, component, componentName, node, preservedParams } =
+      this.props;
 
     const el = (
       <ComponentContext.Provider

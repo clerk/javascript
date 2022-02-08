@@ -31,7 +31,7 @@ jest.mock('./countryCodeData', () => {
           code: '91',
           pattern: '.....-.....',
         },
-      })
+      }),
     ),
   };
 });
@@ -44,14 +44,14 @@ describe('<PhoneInput/>', () => {
 
   it('renders the phone input', () => {
     const tree = renderJSON(
-      <PhoneInput handlePhoneChange={handlePhoneChange} />
+      <PhoneInput handlePhoneChange={handlePhoneChange} />,
     );
     expect(tree).toMatchSnapshot();
   });
 
   it('renders the phone input when the is dropdown open', () => {
     const { container } = render(
-      <PhoneInput handlePhoneChange={handlePhoneChange} />
+      <PhoneInput handlePhoneChange={handlePhoneChange} />,
     );
     const countryOption = screen.getByText('United States');
     expect(countryOption).toBeInTheDocument();

@@ -9,12 +9,12 @@ describe('<Form/>', () => {
     const tree = renderJSON(
       <Form>
         <div>
-          <input type="text" name="foo" defaultValue="42" />
+          <input type='text' name='foo' defaultValue='42' />
         </div>
         <div>
-          <input type="text" name="bar" defaultValue="42" />
+          <input type='text' name='bar' defaultValue='42' />
         </div>
-      </Form>
+      </Form>,
     );
 
     expect(tree).toMatchSnapshot();
@@ -25,18 +25,18 @@ describe('<Form/>', () => {
       <Form
         handleSubmit={jest.fn()}
         handleReset={jest.fn()}
-        submitButtonLabel="Continue"
-        resetButtonLabel="Cancel"
-        submitButtonClassName="foo"
-        resetButtonClassName="bar"
+        submitButtonLabel='Continue'
+        resetButtonLabel='Cancel'
+        submitButtonClassName='foo'
+        resetButtonClassName='bar'
       >
         <div>
-          <input type="text" name="foo" defaultValue="42" />
+          <input type='text' name='foo' defaultValue='42' />
         </div>
         <div>
-          <input type="text" name="bar" defaultValue="42" />
+          <input type='text' name='bar' defaultValue='42' />
         </div>
-      </Form>
+      </Form>,
     );
 
     expect(tree).toMatchSnapshot();
@@ -47,14 +47,14 @@ describe('<Form/>', () => {
       <Form
         handleSubmit={jest.fn()}
         handleReset={jest.fn()}
-        submitButtonLabel="Continue"
-        resetButtonLabel="Cancel"
-        submitButtonClassName="foo"
-        resetButtonClassName="bar"
+        submitButtonLabel='Continue'
+        resetButtonLabel='Cancel'
+        submitButtonClassName='foo'
+        resetButtonClassName='bar'
       >
         {null}
         {undefined}
-      </Form>
+      </Form>,
     );
 
     expect(tree).toMatchSnapshot();
@@ -71,9 +71,9 @@ describe('<Form/>', () => {
     render(
       <Form handleReset={onReset} handleSubmit={onSubmit}>
         <div>
-          <input type="text" name="foo" defaultValue="42" />
+          <input type='text' name='foo' defaultValue='42' />
         </div>
-      </Form>
+      </Form>,
     );
 
     userEvent.click(screen.getByRole('button', { name: /reset/i }));

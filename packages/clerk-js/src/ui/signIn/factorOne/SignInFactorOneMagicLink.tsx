@@ -14,7 +14,7 @@ import {
   useEnvironment,
   useSignInContext,
 } from 'ui/contexts';
-import { useMagicLink,useNavigate } from 'ui/hooks';
+import { useMagicLink, useNavigate } from 'ui/hooks';
 import { SignInFactorOneFooter } from 'ui/signIn/factorOne/SignInFactorOneFooter';
 
 type SignInFactorOneMagicLinkProps = {

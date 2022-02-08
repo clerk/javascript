@@ -64,7 +64,7 @@ export default class IsomorphicClerk {
   constructor(
     frontendApi: string,
     options: IsomorphicClerkOptions = {},
-    Clerk: ClerkProp = null
+    Clerk: ClerkProp = null,
   ) {
     this.frontendApi = frontendApi;
     this.options = options;
@@ -112,7 +112,7 @@ export default class IsomorphicClerk {
 
         if (!global.Clerk) {
           throw new Error(
-            'Failed to download latest ClerkJS. Contact support@clerk.dev.'
+            'Failed to download latest ClerkJS. Contact support@clerk.dev.',
           );
         }
 
@@ -153,7 +153,7 @@ export default class IsomorphicClerk {
 
     this.clerkjs = clerkjs;
 
-    this.premountMethodCalls.forEach((cb) => cb());
+    this.premountMethodCalls.forEach(cb => cb());
 
     if (this.preopenSignIn !== null) {
       clerkjs.openSignIn(this.preopenSignIn);
@@ -166,25 +166,25 @@ export default class IsomorphicClerk {
     this.premountSignInNodes.forEach(
       (props: SignInProps, node: HTMLDivElement) => {
         clerkjs.mountSignIn(node, props);
-      }
+      },
     );
 
     this.premountSignUpNodes.forEach(
       (props: SignUpProps, node: HTMLDivElement) => {
         clerkjs.mountSignUp(node, props);
-      }
+      },
     );
 
     this.premountUserProfileNodes.forEach(
       (props: UserProfileProps, node: HTMLDivElement) => {
         clerkjs.mountUserProfile(node, props);
-      }
+      },
     );
 
     this.premountUserButtonNodes.forEach(
       (props: UserButtonProps, node: HTMLDivElement) => {
         clerkjs.mountUserButton(node, props);
-      }
+      },
     );
 
     this._loaded = true;
@@ -235,7 +235,7 @@ export default class IsomorphicClerk {
 
   setSession = (
     session: ActiveSessionResource | string | null,
-    beforeEmit?: (session: ActiveSessionResource | null) => void | Promise<any>
+    beforeEmit?: (session: ActiveSessionResource | null) => void | Promise<any>,
   ): Promise<void> => {
     if (this.clerkjs) {
       return this.clerkjs.setSession(session, beforeEmit);
@@ -326,7 +326,7 @@ export default class IsomorphicClerk {
 
   mountUserButton = (
     node: HTMLDivElement,
-    userButtonProps: UserButtonProps
+    userButtonProps: UserButtonProps,
   ): void => {
     if (this.clerkjs && this._loaded) {
       this.clerkjs.mountUserButton(node, userButtonProps);
@@ -355,7 +355,7 @@ export default class IsomorphicClerk {
   loadFromServer = (token: string): void => {
     if (this.mode === 'browser') {
       void this.throwError(
-        'loadFromServer cannot be called in a browser context.'
+        'loadFromServer cannot be called in a browser context.',
       );
     }
 
@@ -416,7 +416,7 @@ export default class IsomorphicClerk {
   };
 
   handleMagicLinkVerification = async (
-    params: HandleMagicLinkVerificationParams
+    params: HandleMagicLinkVerificationParams,
   ): Promise<void> => {
     const callback = () => this.clerkjs?.handleMagicLinkVerification(params);
     if (this.clerkjs && this._loaded) {
@@ -427,7 +427,7 @@ export default class IsomorphicClerk {
   };
 
   authenticateWithMetamask = async (
-    params: AuthenticateWithMetamaskParams
+    params: AuthenticateWithMetamaskParams,
   ): Promise<void> => {
     const callback = () => this.clerkjs?.authenticateWithMetamask(params);
     if (this.clerkjs && this._loaded) {

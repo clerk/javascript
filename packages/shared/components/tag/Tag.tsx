@@ -48,11 +48,11 @@ export function VerificationStatusTag({
   className,
 }: VerificationStatusTagProps): JSX.Element | null {
   return status.match(/expired|unverified|failed/) ? (
-    <Tag className={className} color="error">
+    <Tag className={className} color='error'>
       {titleize(status)}
     </Tag>
   ) : status === 'verified' ? (
-    <Tag className={className} color="success">
+    <Tag className={className} color='success'>
       Verified
     </Tag>
   ) : null;

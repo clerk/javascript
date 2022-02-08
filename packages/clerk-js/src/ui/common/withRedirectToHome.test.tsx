@@ -39,7 +39,7 @@ describe('withRedirectToHome(Component)', () => {
               authConfig: {
                 singleSessionMode: true,
               } as Partial<AuthConfig>,
-            } as Partial<EnvironmentResource>)
+            } as Partial<EnvironmentResource>),
         );
       });
 
@@ -66,7 +66,7 @@ describe('withRedirectToHome(Component)', () => {
               authConfig: {
                 singleSessionMode: false,
               } as Partial<AuthConfig>,
-            } as Partial<EnvironmentResource>)
+            } as Partial<EnvironmentResource>),
         );
       });
 
@@ -92,7 +92,7 @@ describe('withRedirectToHome(Component)', () => {
             authConfig: {
               singleSessionMode: true,
             } as Partial<AuthConfig>,
-          } as Partial<EnvironmentResource>)
+          } as Partial<EnvironmentResource>),
       );
     });
 

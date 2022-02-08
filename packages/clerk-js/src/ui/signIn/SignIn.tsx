@@ -62,9 +62,8 @@ function SignInRoutes(): JSX.Element {
 
 SignInRoutes.displayName = 'SignIn';
 
-export const SignIn: React.ComponentType<SignInProps> = withCoreSessionSwitchGuard(
-  SignInRoutes,
-);
+export const SignIn: React.ComponentType<SignInProps> =
+  withCoreSessionSwitchGuard(SignInRoutes);
 
 export const SignInModal = (props: SignInProps): JSX.Element => {
   const signInProps = {

@@ -23,7 +23,7 @@ describe('<ActivityDescription/>', () => {
         sessionActivity={activity}
         isCurrentSession={true}
         lastActiveAt={date}
-      />
+      />,
     );
 
     screen.getByText(/Safari/);
@@ -39,7 +39,7 @@ describe('<ActivityDescription/>', () => {
         sessionActivity={activity}
         isCurrentSession={true}
         lastActiveAt={date}
-      />
+      />,
     );
     expect(tree).toMatchSnapshot();
   });
@@ -59,7 +59,7 @@ describe('<ActivityDescription/>', () => {
         sessionActivity={activity}
         isCurrentSession={true}
         lastActiveAt={date}
-      />
+      />,
     );
 
     screen.getByText(/123.123.123.123/);
@@ -69,7 +69,7 @@ describe('<ActivityDescription/>', () => {
         sessionActivity={activity}
         isCurrentSession={true}
         lastActiveAt={date}
-      />
+      />,
     );
     expect(tree).toMatchSnapshot();
   });
@@ -82,7 +82,7 @@ describe('<ActivityDescription/>', () => {
         sessionActivity={activity}
         isCurrentSession={true}
         lastActiveAt={date}
-      />
+      />,
     );
 
     screen.getByText(/Web browser/);
@@ -93,7 +93,7 @@ describe('<ActivityDescription/>', () => {
         sessionActivity={activity}
         isCurrentSession={true}
         lastActiveAt={date}
-      />
+      />,
     );
     expect(tree).toMatchSnapshot();
   });

@@ -110,7 +110,8 @@ export default class Clerk implements ClerkInterface {
   #options: ClerkOptions & { authVersion: 1 | 2 } = { authVersion: 2 };
   #isReady = false;
   #unloading = false;
-  #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
+  #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null =
+    null;
   #fapiClient: FapiClient;
   #authService: AuthenticationService | null = null;
   #devBrowserHandler: DevBrowserHandler | null = null;
@@ -292,7 +293,7 @@ export default class Clerk implements ClerkInterface {
     if (this.#unloading) {
       return;
     }
-    this.session = session ;
+    this.session = session as ActiveSessionResource | null;
     this.user = this.session ? this.session.user : null;
 
     this.#emit();
@@ -681,11 +682,11 @@ export default class Clerk implements ClerkInterface {
         s => s.id === client.lastActiveSessionId,
       );
       if (lastActiveSession) {
-        return lastActiveSession ;
+        return lastActiveSession as ActiveSessionResource;
       }
     }
     const session = client.activeSessions[0];
-    return session ? (session ) : null;
+    return session ? (session as ActiveSessionResource) : null;
   };
 
   #setupListeners = (): void => {

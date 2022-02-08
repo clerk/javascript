@@ -1,18 +1,21 @@
 import { UserResource } from '@clerk/types';
 import React, { useContext } from 'react';
 
+import {
+  StructureContext,
+  StructureContextStates,
+} from '../contexts/StructureContext';
 import { hocChildrenNotAFunctionError } from '../errors';
 import { inBrowser } from '../utils';
 import {
   assertUserGuarantee,
   assertWrappedByClerkProvider,
 } from './assertHelpers';
-import { StructureContext, StructureContextStates } from './StructureContext';
 
 type UserTypes = UserResource | null | undefined;
 type UserContextValue = { value: UserTypes };
 export const UserContext = React.createContext<UserContextValue | undefined>(
-  undefined
+  undefined,
 );
 UserContext.displayName = 'UserContext';
 
@@ -65,7 +68,7 @@ export function useUser(options?: {
 
 export const withUser = <P extends { user: UserResource }>(
   Component: React.ComponentType<P>,
-  displayName?: string
+  displayName?: string,
 ) => {
   displayName =
     displayName || Component.displayName || Component.name || 'Component';
@@ -104,9 +107,9 @@ export const WithUser: React.FC<{
   children: (user: UserResource) => React.ReactNode;
 }> = ({ children }) => (
   <StructureContext.Consumer>
-    {(structureCtx) => (
+    {structureCtx => (
       <UserContext.Consumer>
-        {(userCtx) => {
+        {userCtx => {
           if (typeof children !== 'function') {
             throw new Error(hocChildrenNotAFunctionError);
           }

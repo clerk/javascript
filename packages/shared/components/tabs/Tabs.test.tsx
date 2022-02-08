@@ -7,10 +7,10 @@ describe('<Tabs/>', () => {
   it('renders and switchs tabs upon click on their title', async () => {
     const { getByText } = render(
       <Tabs defaultSelectedIndex={1}>
-        <div title="Foo">Foo tab</div>
-        <div title="Bar">Bar tab</div>
-        <div title="Qux">Qux tab</div>
-      </Tabs>
+        <div title='Foo'>Foo tab</div>
+        <div title='Bar'>Bar tab</div>
+        <div title='Qux'>Qux tab</div>
+      </Tabs>,
     );
 
     // Renders table titles

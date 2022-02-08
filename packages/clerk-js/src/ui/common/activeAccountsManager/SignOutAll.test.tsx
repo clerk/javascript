@@ -1,4 +1,4 @@
-import { render,renderJSON } from '@clerk/shared/testUtils';
+import { render, renderJSON } from '@clerk/shared/testUtils';
 import { fireEvent } from '@testing-library/react';
 import React from 'react';
 
@@ -16,7 +16,7 @@ describe('SignOutAll', () => {
     const handleSignOutAll = jest.fn();
 
     const signOutAll = render(
-      <SignOutAll handleSignOutAll={handleSignOutAll} />
+      <SignOutAll handleSignOutAll={handleSignOutAll} />,
     );
 
     const signOutAllButton = signOutAll.getByText('Sign out of all accounts');

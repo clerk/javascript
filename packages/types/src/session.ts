@@ -18,6 +18,7 @@ export interface SessionResource extends ClerkResource {
   revoke: () => Promise<SessionResource>;
   touch: () => Promise<SessionResource>;
   getToken: (options?: GetSessionTokenOptions) => Promise<string>;
+  createdAt: Date;
   updatedAt: Date;
 }
 

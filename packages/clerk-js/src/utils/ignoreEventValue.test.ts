@@ -20,7 +20,7 @@ describe('ignoreNonEventValue', () => {
         target: '',
         currentTarget: '',
         preventDefault: noop,
-      })
+      }),
     ).toEqual(undefined);
   });
 
@@ -36,7 +36,7 @@ describe('ignoreNonEventValue', () => {
         get preventDefault() {
           return null;
         },
-      })
+      }),
     ).toEqual(undefined);
   });
 
@@ -44,7 +44,7 @@ describe('ignoreNonEventValue', () => {
     expect(ignoreEventValue(noop)).toEqual(noop);
     expect(ignoreEventValue(noop, { requireType: 'function' })).toEqual(noop);
     expect(ignoreEventValue(true, { requireType: 'function' })).toEqual(
-      undefined
+      undefined,
     );
     expect(ignoreEventValue(true, { requireType: 'boolean' })).toEqual(true);
   });

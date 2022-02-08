@@ -11,7 +11,7 @@ describe('<List/>', () => {
         <List.Item detail={false} hoverable={false} lines={false}>
           2nd list item
         </List.Item>
-      </List>
+      </List>,
     );
     expect(tree).toMatchSnapshot();
   });

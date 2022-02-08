@@ -43,7 +43,7 @@ export function ButtonSet<T>({
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     i: number,
   ) => {
-    handleClick(e, (options[i].strategy as unknown) as T);
+    handleClick(e, options[i].strategy as unknown as T);
     setIsLoading(() => {
       const newState = [...isLoading];
       newState[i] = true;

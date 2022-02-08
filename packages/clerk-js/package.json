@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "2.11.0",
+  "version": "2.13.0",
   "license": "MIT",
   "description": "Clerk.dev JS library",
   "keywords": [
@@ -37,7 +37,7 @@
     "test:coverage": "jest --collectCoverage"
   },
   "dependencies": {
-    "@clerk/types": "^1.23.0",
+    "@clerk/types": "^1.25.0",
     "@popperjs/core": "^2.4.4",
     "browser-tabs-lock": "^1.2.15",
     "classnames": "^2.3.1",

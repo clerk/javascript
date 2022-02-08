@@ -1,4 +1,4 @@
-import { render, screen, userEvent,waitFor } from '@clerk/shared/testUtils';
+import { render, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
 import * as React from 'react';
 
 import { Checkbox } from './Checkbox';
@@ -9,7 +9,7 @@ describe('<Checkbox/>', () => {
     const onChange = jest.fn();
 
     const { rerender } = render(
-      <Checkbox checked={false} handleChange={onChange} />
+      <Checkbox checked={false} handleChange={onChange} />,
     );
 
     // checkbox and parent label components

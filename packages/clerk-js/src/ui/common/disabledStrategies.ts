@@ -4,7 +4,7 @@ import type { SignInContextType, SignUpContextType } from 'ui/contexts';
 // disabled ones.
 // This is only for internal use and shouldn't be exposed as a type.
 export function shouldDisableStrategy<
-  T extends SignUpContextType | SignInContextType
+  T extends SignUpContextType | SignInContextType,
 >(ctx: T, strategy: string): boolean {
   const { disabledStrategies } = ctx as T & { disabledStrategies: string[] };
   return disabledStrategies && disabledStrategies.includes(strategy);

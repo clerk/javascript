@@ -15,11 +15,11 @@ export class Image extends BaseResource implements ImageResource {
       fd.append('file', body['file']);
     }
 
-    const json = ((await BaseResource._fetch<ImageJSON>({
+    const json = (await BaseResource._fetch<ImageJSON>({
       path,
       method: 'POST',
       body: fd,
-    })) as unknown) as ImageJSON;
+    })) as unknown as ImageJSON;
 
     return new Image(json);
   }

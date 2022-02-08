@@ -31,7 +31,7 @@ jest.mock('ui/router/RouteContext');
 describe('<OAuth/>', () => {
   it('renders the OAuth buttons', async () => {
     const tree = renderJSON(
-      <OAuth oauthOptions={['oauth_google', 'oauth_facebook']} />
+      <OAuth oauthOptions={['oauth_google', 'oauth_facebook']} />,
     );
     expect(tree).toMatchSnapshot();
   });
@@ -46,7 +46,7 @@ describe('<OAuth/>', () => {
       userEvent.click(
         screen.getByRole('button', {
           name: `${providerTitle} Sign in with ${providerTitle}`,
-        })
+        }),
       );
 
       expect(mockAuthenticateWithRedirect).toHaveBeenCalledWith({
@@ -54,6 +54,6 @@ describe('<OAuth/>', () => {
         redirectUrl: 'http://localhost/#/sso-callback',
         redirectUrlComplete: 'http://test.host',
       });
-    }
+    },
   );
 });

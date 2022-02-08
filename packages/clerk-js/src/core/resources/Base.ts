@@ -96,7 +96,7 @@ export abstract class BaseResource {
     }
 
     return (
-      baseWithId.replace(/[^/]$/, '$&/') + encodeURIComponent(action )
+      baseWithId.replace(/[^/]$/, '$&/') + encodeURIComponent(action as string)
     );
   }
 

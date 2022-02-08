@@ -1,4 +1,4 @@
-import { SignInJSON,SignUpJSON } from '@clerk/types';
+import { SignInJSON, SignUpJSON } from '@clerk/types';
 import { waitFor } from '@testing-library/dom';
 import Clerk from 'core/clerk';
 import { Client } from 'core/resources/Client';
@@ -208,7 +208,7 @@ describe('Clerk singleton', () => {
       mockClientFetch.mockReturnValue(
         Promise.resolve({
           activeSessions: [],
-          signIn: new SignIn(({
+          signIn: new SignIn({
             status: 'needs_identifier',
             first_factor_verification: {
               status: 'transferable',
@@ -224,7 +224,7 @@ describe('Clerk singleton', () => {
             identifier: '',
             user_data: null,
             created_session_id: null,
-          } as any) as SignInJSON),
+          } as any as SignInJSON),
           signUp: new SignUp(null),
         }),
       );
@@ -269,7 +269,7 @@ describe('Clerk singleton', () => {
         Promise.resolve({
           activeSessions: [],
           signIn: new SignIn(null),
-          signUp: new SignUp(({
+          signUp: new SignUp({
             status: 'missing_requirements',
             verifications: {
               external_account: {
@@ -294,7 +294,7 @@ describe('Clerk singleton', () => {
                 message: 'already exists',
               },
             },
-          } as any) as SignUpJSON),
+          } as any as SignUpJSON),
         }),
       );
 
@@ -338,7 +338,7 @@ describe('Clerk singleton', () => {
         Promise.resolve({
           activeSessions: [],
           signIn: new SignIn(null),
-          signUp: new SignUp(({
+          signUp: new SignUp({
             status: 'missing_requirements',
             verifications: {
               external_account: {
@@ -355,7 +355,7 @@ describe('Clerk singleton', () => {
                 },
               },
             },
-          } as any) as SignUpJSON),
+          } as any as SignUpJSON),
         }),
       );
 
@@ -387,7 +387,7 @@ describe('Clerk singleton', () => {
       mockClientFetch.mockReturnValue(
         Promise.resolve({
           activeSessions: [],
-          signIn: new SignIn(({
+          signIn: new SignIn({
             status: 'needs_identifier',
             first_factor_verification: {
               status: 'transferable',
@@ -400,7 +400,7 @@ describe('Clerk singleton', () => {
               },
             },
             second_factor_verification: null,
-          } as any) as SignInJSON),
+          } as any as SignInJSON),
           signUp: new SignUp(null),
         }),
       );
@@ -444,7 +444,7 @@ describe('Clerk singleton', () => {
       mockClientFetch.mockReturnValue(
         Promise.resolve({
           activeSessions: [],
-          signIn: new SignIn(({
+          signIn: new SignIn({
             status: 'needs_second_factor',
             first_factor_verification: {
               status: 'verified',
@@ -453,7 +453,7 @@ describe('Clerk singleton', () => {
               error: null,
             },
             second_factor_verification: null,
-          } as any) as SignInJSON),
+          } as any as SignInJSON),
           signUp: new SignUp(null),
         }),
       );
@@ -486,7 +486,7 @@ describe('Clerk singleton', () => {
       mockClientFetch.mockReturnValue(
         Promise.resolve({
           activeSessions: [],
-          signIn: new SignIn(({
+          signIn: new SignIn({
             status: 'needs_second_factor',
             first_factor_verification: {
               status: 'verified',
@@ -496,7 +496,7 @@ describe('Clerk singleton', () => {
               expire_at: 1631777672389,
             },
             second_factor_verification: null,
-          } as any) as SignInJSON),
+          } as any as SignInJSON),
           signUp: new SignUp(null),
         }),
       );
@@ -530,7 +530,7 @@ describe('Clerk singleton', () => {
         Promise.resolve({
           activeSessions: [],
           signIn: new SignIn(null),
-          signUp: new SignUp(({
+          signUp: new SignUp({
             status: 'missing_requirements',
             verifications: {
               external_account: {
@@ -547,7 +547,7 @@ describe('Clerk singleton', () => {
                 },
               },
             },
-          } as any) as SignUpJSON),
+          } as any as SignUpJSON),
         }),
       );
 
@@ -585,7 +585,7 @@ describe('Clerk singleton', () => {
         Promise.resolve({
           activeSessions: [],
           signIn: new SignIn(null),
-          signUp: new SignUp(({
+          signUp: new SignUp({
             status: 'missing_requirements',
             verifications: {
               external_account: {
@@ -602,7 +602,7 @@ describe('Clerk singleton', () => {
                 },
               },
             },
-          } as any) as SignUpJSON),
+          } as any as SignUpJSON),
         }),
       );
 
@@ -643,9 +643,9 @@ describe('Clerk singleton', () => {
         Promise.resolve({
           activeSessions: [],
           sessions: [{ id: createdSessionId }],
-          signIn: new SignIn(({
+          signIn: new SignIn({
             status: 'completed',
-          } as any) as SignInJSON),
+          } as any as SignInJSON),
           signUp: new SignUp(null),
         }),
       );
@@ -674,9 +674,9 @@ describe('Clerk singleton', () => {
         Promise.resolve({
           activeSessions: [],
           sessions: [],
-          signIn: new SignIn(({
+          signIn: new SignIn({
             status: 'needs_second_factor',
-          } as any) as SignInJSON),
+          } as any as SignInJSON),
           signUp: new SignUp(null),
         }),
       );
@@ -707,9 +707,9 @@ describe('Clerk singleton', () => {
         Promise.resolve({
           activeSessions: [],
           sessions: [{ id: createdSessionId }],
-          signUp: new SignUp(({
+          signUp: new SignUp({
             status: 'completed',
-          } as any) as SignUpJSON),
+          } as any as SignUpJSON),
           signIn: new SignIn(null),
         }),
       );
@@ -738,9 +738,9 @@ describe('Clerk singleton', () => {
         Promise.resolve({
           activeSessions: [],
           sessions: [],
-          signUp: new SignUp(({
+          signUp: new SignUp({
             status: 'missing_requirements',
-          } as any) as SignUpJSON),
+          } as any as SignUpJSON),
           signIn: new SignIn(null),
         }),
       );
@@ -868,9 +868,9 @@ describe('Clerk singleton', () => {
         Promise.resolve({
           activeSessions: [],
           sessions: [{ id: 'sess_123' }],
-          signIn: new SignIn(({
+          signIn: new SignIn({
             status: 'completed',
-          } as any) as SignInJSON),
+          } as any as SignInJSON),
           signUp: new SignUp(null),
         }),
       );

@@ -7,7 +7,8 @@ import {
   Portal,
   PoweredByClerk,
   VerifiedMagicLinkWaitingScreen,
-  VerifiedSwitchTabMagicLinkWaitingScreen} from 'ui/common';
+  VerifiedSwitchTabMagicLinkWaitingScreen,
+} from 'ui/common';
 import { VerificationStatus } from 'utils/getClerkQueryParam';
 
 // UX - Don't confuse the user

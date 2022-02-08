@@ -78,6 +78,7 @@ export class Client extends BaseResource implements ClientResource {
       this.signUp = new SignUp(data.sign_up);
       this.signIn = new SignIn(data.sign_in);
       this.lastActiveSessionId = data.last_active_session_id;
+      this.createdAt = unixEpochToDate(data.created_at);
       this.updatedAt = unixEpochToDate(data.updated_at);
     }
 

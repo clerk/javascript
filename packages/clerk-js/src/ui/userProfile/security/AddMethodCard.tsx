@@ -13,12 +13,8 @@ export function AddMethodCard(): JSX.Element {
   const availableMethods = [TwoStepMethod.SMS];
 
   function buildAddMethodRow(method: TwoStepMethod): JSX.Element {
-    const {
-      buttonTitle,
-      linkPath,
-      note,
-      title,
-    } = TwoStepMethodsToDisplayDataMap[method];
+    const { buttonTitle, linkPath, note, title } =
+      TwoStepMethodsToDisplayDataMap[method];
     return (
       <List.Item
         className='cl-list-item'
