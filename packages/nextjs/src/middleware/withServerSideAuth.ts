@@ -1,36 +1,21 @@
-import { GetServerSidePropsContext } from 'next';
+import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
-import {
-  WithServerSideAuthCallback,
-  WithServerSideAuthOptions,
-  WithServerSideAuthResult,
-} from './types';
-import {
-  getAuthData,
-  injectAuthIntoContext,
-  injectSSRStateIntoProps,
-  sanitizeAuthData,
-} from './utils';
+import { WithServerSideAuthCallback, WithServerSideAuthOptions, WithServerSideAuthResult } from './types';
+import { getAuthData, injectAuthIntoContext, injectSSRStateIntoProps, sanitizeAuthData } from './utils';
 
 const EMPTY_GSSP_RESPONSE = { props: {} };
 
 export function withServerSideAuth<
-  CallbackReturn,
+  CallbackReturn extends GetServerSidePropsResult<any>,
   Options extends WithServerSideAuthOptions,
 >(
   callback: WithServerSideAuthCallback<CallbackReturn, Options>,
   opts?: Options,
 ): WithServerSideAuthResult<CallbackReturn>;
-export function withServerSideAuth(
-  opts?: WithServerSideAuthOptions,
-): WithServerSideAuthResult<void>;
+export function withServerSideAuth(opts?: WithServerSideAuthOptions): WithServerSideAuthResult<void>;
 export function withServerSideAuth(cbOrOptions: any, options?: any): any {
   const cb = typeof cbOrOptions === 'function' ? cbOrOptions : undefined;
-  const opts = options
-    ? options
-    : typeof cbOrOptions !== 'function'
-    ? cbOrOptions
-    : {};
+  const opts = options ? options : typeof cbOrOptions !== 'function' ? cbOrOptions : {};
 
   return async (ctx: GetServerSidePropsContext) => {
     const authData = await getAuthData(ctx, opts);
