@@ -1,4 +1,4 @@
-export const SIGN_UP_IN_PRESERVED_PARAMS = [
+export const PRESERVED_QUERYSTRING_PARAMS = [
   'after_sign_in_url',
   'after_sign_up_url',
   'redirect_url',

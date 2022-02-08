@@ -1,9 +1,3 @@
-import {
-  SignInProps,
-  SignUpProps,
-  UserButtonProps,
-  UserProfileProps,
-} from '@clerk/types';
 import React from 'react';
 import { buildAuthQueryString, parseAuthProp } from 'ui/common';
 import { useEnvironment } from 'ui/contexts';
@@ -11,30 +5,19 @@ import { useNavigate } from 'ui/hooks';
 import type { ParsedQs } from 'ui/router';
 import { useRouter } from 'ui/router';
 
-export type SignInCtx = SignInProps & {
-  componentName: 'SignIn';
-};
-
-export type UserProfileCtx = UserProfileProps & {
-  componentName: 'UserProfile';
-};
-
-export type SignUpCtx = SignUpProps & {
-  componentName: 'SignUp';
-};
-
-export type UserButtonCtx = UserButtonProps & {
-  componentName: 'UserButton';
-};
-
-export type ComponentContextValue =
-  | SignInCtx
-  | UserProfileCtx
-  | SignUpCtx
-  | UserButtonCtx;
+import type {
+  AvailableComponentCtx,
+  SignInCtx,
+  SignInProps,
+  SignUpCtx,
+  SignUpProps,
+  UserButtonCtx,
+  UserProfileCtx,
+  UserProfileProps,
+} from '../types';
 
 export const ComponentContext =
-  React.createContext<ComponentContextValue | null>(null);
+  React.createContext<AvailableComponentCtx | null>(null);
 
 export type SignUpContextType = SignUpProps & {
   navigateAfterSignUp: () => any;
@@ -74,9 +57,7 @@ export const useSignUpContext = (): SignUpContextType => {
 
   const navigateAfterSignUp = () => navigate(afterSignUpUrl);
 
-  // DX: deprecated <=1.28.0
-  // Todo: remove ctx.afterSignIn
-  let signInUrl = ctx.signInUrl || ctx.signInURL || displayConfig.signInUrl;
+  let signInUrl = ctx.signInUrl || displayConfig.signInUrl;
 
   // Add query strings to the sign in URL
   const authQs = buildAuthQueryString({
@@ -139,9 +120,7 @@ export const useSignInContext = (): SignInContextType => {
 
   const navigateAfterSignIn = () => navigate(afterSignInUrl);
 
-  // DX: deprecated <=1.28.0
-  // Todo: remove ctx.signUpURL
-  let signUpUrl = ctx.signUpUrl || ctx.signUpURL || displayConfig.signUpUrl;
+  let signUpUrl = ctx.signUpUrl || displayConfig.signUpUrl;
 
   // Add query strings to the sign in URL
   const authQs = buildAuthQueryString({
@@ -204,26 +183,19 @@ export const useUserButtonContext = () => {
     );
   }
 
-  // DX: deprecated <=1.28.0
-  // Todo: remove deprecated props
-  const signInUrl = ctx.signInUrl || ctx.signInURL || displayConfig.signInUrl;
-  const userProfileUrl =
-    ctx.userProfileUrl || ctx.userProfileURL || displayConfig.userProfileUrl;
+  const signInUrl = ctx.signInUrl || displayConfig.signInUrl;
+  const userProfileUrl = ctx.userProfileUrl || displayConfig.userProfileUrl;
 
   const afterSignOutOneUrl =
-    ctx.afterSignOutOneUrl ||
-    ctx.afterSignOutOne ||
-    displayConfig.afterSignOutOneUrl;
+    ctx.afterSignOutOneUrl || displayConfig.afterSignOutOneUrl;
   const navigateAfterSignOutOne = () => navigate(afterSignOutOneUrl);
 
   const afterSignOutAllUrl =
-    ctx.afterSignOutAllUrl ||
-    ctx.afterSignOutAll ||
-    displayConfig.afterSignOutAllUrl;
+    ctx.afterSignOutAllUrl || displayConfig.afterSignOutAllUrl;
   const navigateAfterSignOutAll = () => navigate(afterSignOutAllUrl);
 
   const afterSwitchSessionUrl = (ctx.afterSwitchSessionUrl =
-    ctx.afterSwitchSession || displayConfig.afterSwitchSessionUrl);
+    displayConfig.afterSwitchSessionUrl);
   const navigateAfterSwitchSession = () => navigate(afterSwitchSessionUrl);
 
   return {

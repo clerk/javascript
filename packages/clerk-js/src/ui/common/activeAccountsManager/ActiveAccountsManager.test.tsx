@@ -81,7 +81,7 @@ describe('ActiveAccountsManager', () => {
     mocked(
       useEnvironment as jest.Mock<EnvironmentResource>,
       true,
-    ).mockImplementation(() => multiSessionResource as EnvironmentResource);
+    ).mockImplementation(() => multiSessionResource);
 
     const tree = renderJSON(
       <ActiveAccountsManager
@@ -99,7 +99,7 @@ describe('ActiveAccountsManager', () => {
     mocked(
       useEnvironment as jest.Mock<EnvironmentResource>,
       true,
-    ).mockImplementation(() => multiSessionResource as EnvironmentResource);
+    ).mockImplementation(() => multiSessionResource);
 
     const tree = renderJSON(
       <ActiveAccountsManager
@@ -118,7 +118,7 @@ describe('ActiveAccountsManager', () => {
     mocked(
       useEnvironment as jest.Mock<EnvironmentResource>,
       true,
-    ).mockImplementation(() => singleSessionResource as EnvironmentResource);
+    ).mockImplementation(() => singleSessionResource);
 
     const tree = renderJSON(
       <ActiveAccountsManager

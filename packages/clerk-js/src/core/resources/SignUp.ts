@@ -119,16 +119,13 @@ export class SignUp extends BaseResource implements SignUpResource {
 
     const startMagicLinkFlow = async ({
       redirectUrl,
-      // DX: Deprecated v2.4.4
-      callbackUrl,
     }: StartMagicLinkFlowParams): Promise<SignUpResource> => {
       if (!this.id) {
         clerkVerifyEmailAddressCalledBeforeCreate('SignUp');
       }
       await this.prepareEmailAddressVerification({
         strategy: 'email_link',
-        // DX: Deprecated eventually require redirectUrl
-        redirect_url: String(redirectUrl || callbackUrl),
+        redirect_url: redirectUrl,
       });
 
       return new Promise((resolve, reject) => {
@@ -224,15 +221,11 @@ export class SignUp extends BaseResource implements SignUpResource {
     strategy,
     redirectUrl,
     redirectUrlComplete,
-    // DX: Deprecated v2.4.4
-    callbackUrl,
-    // DX: Deprecated v2.4.4
-    callbackUrlComplete,
   }: AuthenticateWithRedirectParams): Promise<void> => {
     const { verifications } = await this.create({
       strategy,
-      redirect_url: redirectUrl || callbackUrl,
-      action_complete_redirect_url: redirectUrlComplete || callbackUrlComplete,
+      redirect_url: redirectUrl,
+      action_complete_redirect_url: redirectUrlComplete,
     });
     const { externalAccount } = verifications;
     const { status, externalVerificationRedirectURL } = externalAccount;

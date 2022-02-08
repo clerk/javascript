@@ -35,7 +35,7 @@ export function ConnectedAccountDetail(): JSX.Element | null {
     >
       <Avatar
         className='cl-image'
-        profileImageUrl={externalAccount.picture}
+        profileImageUrl={externalAccount.avatarUrl}
         size={32}
       />
     </List.Item>
@@ -61,7 +61,7 @@ export function ConnectedAccountDetail(): JSX.Element | null {
           <>
             <img
               alt={externalAccount.providerTitle()}
-              src={svgUrl(externalAccount.provider)}
+              src={svgUrl(externalAccount.providerSlug())}
               className='cl-left-icon-wrapper'
             />
             &nbsp; {externalAccount.providerTitle()}
