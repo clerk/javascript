@@ -10,10 +10,5 @@
     "outDir": "./dist",
     "declarationDir": "./dist/types"
   },
-  "exclude": [
-    "node_modules",
-    "**/*.test.ts",
-    "**/*.test.tsx"
-  ]
+  "exclude": ["node_modules", "**/*.test.ts", "**/*.test.tsx"]
 }
-

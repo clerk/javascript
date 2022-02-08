@@ -91,13 +91,17 @@ describe('Clerk singleton', () => {
     });
 
     it('redirects to signInUrl', () => {
-      sut.redirectToSignIn();
-      expect(mockNavigate).toHaveBeenCalledWith('/signInUrl');
+      sut.redirectToSignIn({ redirectUrl: 'https://www.example.com/' });
+      expect(mockNavigate).toHaveBeenCalledWith(
+        '/signInUrl#/?redirect_url=https%3A%2F%2Fwww.example.com%2F',
+      );
     });
 
     it('redirects to signUpUrl', () => {
-      sut.redirectToSignUp();
-      expect(mockNavigate).toHaveBeenCalledWith('/signUpUrl');
+      sut.redirectToSignUp({ redirectUrl: 'https://www.example.com/' });
+      expect(mockNavigate).toHaveBeenCalledWith(
+        '/signUpUrl#/?redirect_url=https%3A%2F%2Fwww.example.com%2F',
+      );
     });
 
     it('redirects to userProfileUrl', () => {

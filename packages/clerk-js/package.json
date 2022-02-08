@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "2.13.2",
+  "version": "3.0.0-alpha.5",
   "license": "MIT",
   "description": "Clerk.dev JS library",
   "keywords": [
@@ -37,7 +37,7 @@
     "test:coverage": "jest --collectCoverage"
   },
   "dependencies": {
-    "@clerk/types": "^1.25.1",
+    "@clerk/types": "^2.0.0-alpha.5",
     "@popperjs/core": "^2.4.4",
     "browser-tabs-lock": "^1.2.15",
     "classnames": "^2.3.1",
@@ -110,7 +110,7 @@
         "maxSize": "148kB"
       },
       {
-        "path": "./dist/clerk.nocomponents.js",
+        "path": "./dist/clerk.headless.js",
         "maxSize": "40kB"
       }
     ]

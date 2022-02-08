@@ -1,6 +1,5 @@
 import { renderJSON } from '@clerk/shared/testUtils';
-import { ExternalAccountResource, UserResource } from '@clerk/types';
-import { ExternalAccount } from 'core/resources/ExternalAccount';
+import type { ExternalAccountResource, UserResource } from '@clerk/types';
 import React from 'react';
 
 import { ConnectedAccountList } from './ConnectedAccountList';
@@ -23,25 +22,31 @@ jest.mock('ui/contexts', () => {
         firstName: 'Peter',
         lastName: 'Smith',
         externalAccounts: [
-          new ExternalAccount({
+          {
             id: 'fbac_yolo',
             provider: 'facebook',
             approvedScopes: 'email',
+            avatarUrl: 'http://text.host/avatar.png',
             emailAddress: 'peter@gmail.com',
             firstName: 'Peter',
             lastName: 'Smith',
-            externalId: '10147951078263327',
-          } as ExternalAccountResource),
-          new ExternalAccount({
+            providerUserId: '10147951078263327',
+            providerSlug: () => 'facebook',
+            providerTitle: () => 'Facebook',
+          } as ExternalAccountResource,
+          {
             id: 'gac_swag',
             provider: 'google',
             approvedScopes:
               'email https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid profile',
+            avatarUrl: 'http://text.host/avatar.png',
             emailAddress: 'peter@gmail.com',
             firstName: 'Peter',
             lastName: 'Smith',
-            externalId: '112567347150540108741',
-          } as ExternalAccountResource),
+            providerUserId: '112567347150540108741',
+            providerSlug: () => 'google',
+            providerTitle: () => 'Google',
+          } as ExternalAccountResource,
         ],
       };
     },

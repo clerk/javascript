@@ -1,6 +1,6 @@
 import { render, screen } from '@clerk/shared/testUtils';
 import { EnvironmentResource } from '@clerk/types';
-import { AuthConfig } from 'core/resources/AuthConfig';
+import { AuthConfig } from 'core/resources';
 import React from 'react';
 import { useCoreSession, useEnvironment } from 'ui/contexts';
 

@@ -6,8 +6,7 @@ import {
   waitFor,
 } from '@clerk/shared/testUtils';
 import { titleize } from '@clerk/shared/utils/string';
-import { Session } from 'core/resources';
-import { AuthConfig } from 'core/resources/AuthConfig';
+import { AuthConfig, Session } from 'core/resources';
 import React from 'react';
 import { useCoreSignUp } from 'ui/contexts';
 

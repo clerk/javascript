@@ -51,13 +51,6 @@ export class Session extends BaseResource implements SessionResource {
     });
   };
 
-  revoke = (): Promise<SessionResource> => {
-    SessionTokenCache.clear();
-    return this._basePost({
-      action: 'revoke',
-    });
-  };
-
   touch = (): Promise<SessionResource> => {
     return this._basePost({
       action: 'touch',
