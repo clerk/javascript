@@ -44,7 +44,7 @@ Array [
           >
             <div>
               <img
-                alt="Facebook Account"
+                alt="Facebook"
                 className="cl-left-icon-wrapper"
                 src="https://images.clerk.dev/static/facebook.svg"
               />
@@ -73,7 +73,7 @@ Array [
           >
             <div>
               <img
-                alt="Google Account"
+                alt="Google"
                 className="cl-left-icon-wrapper"
                 src="https://images.clerk.dev/static/google.svg"
               />

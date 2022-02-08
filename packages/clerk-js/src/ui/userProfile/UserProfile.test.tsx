@@ -1,4 +1,4 @@
-import { renderJSON } from '@clerk/shared/testUtils';
+import { renderJSONAfterFirstAct } from '@clerk/shared/testUtils';
 import {
   Clerk,
   EmailAddressResource,
@@ -10,8 +10,7 @@ import {
   SignInResource,
   SignUpResource,
 } from '@clerk/types';
-import { AuthConfig } from 'core/resources/AuthConfig';
-import { ExternalAccount } from 'core/resources/ExternalAccount';
+import { AuthConfig } from 'core/resources';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -78,15 +77,17 @@ jest.mock('ui/contexts', () => ({
     return {
       twoFactorEnabled: () => true,
       externalAccounts: [
-        new ExternalAccount({
+        {
           id: 'fbac_yolo',
           provider: 'facebook',
           approvedScopes: 'email',
           emailAddress: 'peter@gmail.com',
           firstName: 'Peter',
           lastName: 'Smith',
-          externalId: '10147951078263327',
-        } as ExternalAccountResource),
+          providerUserId: '10147951078263327',
+          providerSlug: () => 'facebook',
+          providerTitle: () => 'Facebook',
+        } as ExternalAccountResource,
       ],
       phoneNumbers: [
         {
@@ -164,7 +165,7 @@ ReactDOM.createPortal = node => node;
 
 describe('<UserProfileContent />', () => {
   it('renders the UserProfileContent', async () => {
-    const tree = renderJSON(<UserProfile />);
+    const tree = renderJSONAfterFirstAct(<UserProfile />);
     expect(tree).toMatchSnapshot();
   });
 });

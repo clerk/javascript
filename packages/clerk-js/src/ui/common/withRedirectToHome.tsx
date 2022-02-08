@@ -26,7 +26,7 @@ export function withRedirectToHome<P extends SignInProps | SignUpProps>(
       return null;
     }
 
-    return <Component {...(props as P)} />;
+    return <Component {...props} />;
   };
 
   HOC.displayName = `withRedirectToHome(${displayName})`;
