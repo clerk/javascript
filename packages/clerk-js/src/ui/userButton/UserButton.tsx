@@ -1,10 +1,10 @@
 import { Avatar } from '@clerk/shared/components/avatar';
+import { Portal } from '@clerk/shared/components/portal';
 import { useDetectClickOutside } from '@clerk/shared/hooks';
 import type { UserButtonProps } from '@clerk/types';
 import cn from 'classnames';
 import React from 'react';
 import { usePopper } from 'react-popper';
-import { Portal } from 'ui/common';
 import { useCoreUser, withCoreUserGuard } from 'ui/contexts';
 
 import { PopupVisibilityContext } from './contexts/PopupVisibilityContext';

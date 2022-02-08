@@ -62,16 +62,13 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
 
     const startMagicLinkFlow = async ({
       redirectUrl,
-      // DX: Deprecated v2.4.4
-      callbackUrl,
     }: StartMagicLinkFlowParams): Promise<EmailAddressResource> => {
       if (!this.id) {
         clerkVerifyEmailAddressCalledBeforeCreate('SignUp');
       }
       await this.prepareVerification({
         strategy: 'email_link',
-        // DX: Deprecated eventually require redirectUrl
-        redirect_url: String(redirectUrl || callbackUrl),
+        redirect_url: redirectUrl,
       });
       return new Promise((resolve, reject) => {
         void run(() => {

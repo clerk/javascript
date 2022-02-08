@@ -67,7 +67,6 @@ jest.mock('ui/contexts', () => {
       };
     },
     useCoreSignIn: () => ({
-      allowedFactorOneStrategies: ['password'],
       create: mockCreateRequest.mockReturnValueOnce({
         status: 'needs_first_factor',
         firstFactorVerification: { status: 'verified' },

@@ -127,4 +127,3 @@ export function MemoryTokenCache(prefix = KEY_PREFIX): TokenCache {
 }
 
 export const SessionTokenCache = MemoryTokenCache();
-export const UserTokenCache = MemoryTokenCache();

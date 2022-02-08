@@ -76,26 +76,6 @@ const defaultOptions: ClerkOptions & {
   authVersion: 2,
 };
 
-// DX: deprecated <=2.4.2
-// Todo: Remove deprecated returnBack form
-interface RedirectToOverload {
-  (returnBack?: boolean): Promise<unknown>;
-
-  (opts?: RedirectOptions): Promise<unknown>;
-}
-
-// DX: deprecated <=2.4.2
-// Todo: Remove deprecated returnBack form
-const getOptsWithDeprecatedReturnBack = (opts?: boolean | RedirectOptions) => {
-  if (!opts) {
-    return undefined;
-  }
-  if (typeof opts === 'object') {
-    return opts;
-  }
-  return { redirect_url: window.location.href };
-};
-
 export default class Clerk implements ClerkInterface {
   public static Components?: typeof Components;
   public static version: string = packageJSON.version;
@@ -175,9 +155,9 @@ export default class Clerk implements ClerkInterface {
     return this.setSession(null, ignoreEventValue(signOutCallback));
   };
 
-  public openSignIn = (nodeProps?: SignInProps): void => {
+  public openSignIn = (props?: SignInProps): void => {
     this.assertComponentsReady(this.#components);
-    this.#components.openSignIn(nodeProps || {});
+    this.#components.openSignIn(props || {});
   };
 
   public closeSignIn = (): void => {
@@ -185,9 +165,9 @@ export default class Clerk implements ClerkInterface {
     this.#components.closeSignIn();
   };
 
-  public openSignUp = (nodeProps?: SignInProps): void => {
+  public openSignUp = (props?: SignInProps): void => {
     this.assertComponentsReady(this.#components);
-    this.#components.openSignUp(nodeProps || {});
+    this.#components.openSignUp(props || {});
   };
 
   public closeSignUp = (): void => {
@@ -195,57 +175,78 @@ export default class Clerk implements ClerkInterface {
     this.#components.closeSignUp();
   };
 
-  public mountSignIn = (
-    node: HTMLDivElement,
-    nodeProps?: SignInProps,
-  ): void => {
+  public mountSignIn = (node: HTMLDivElement, props?: SignInProps): void => {
     this.assertComponentsReady(this.#components);
-    this.#components.mountSignIn(node, nodeProps || {});
+    this.#components.mountComponent({
+      name: 'SignIn',
+      node,
+      nodeClassName: 'cl-sign-in',
+      props,
+    });
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#components);
-    this.#components.unmountSignIn(node);
+    this.#components.unmountComponent({
+      node,
+    });
   };
 
-  public mountSignUp = (
-    node: HTMLDivElement,
-    signUpProps?: SignUpProps,
-  ): void => {
+  public mountSignUp = (node: HTMLDivElement, props?: SignUpProps): void => {
     this.assertComponentsReady(this.#components);
-    // DX: deprecated <=1.28.0
-    this.#components.mountSignUp(node, signUpProps || {});
+    this.#components.mountComponent({
+      name: 'SignUp',
+      node,
+      nodeClassName: 'cl-sign-up',
+      props,
+    });
   };
 
   public unmountSignUp = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#components);
-    this.#components.unmountSignUp(node);
+    this.#components.unmountComponent({
+      node,
+    });
   };
 
   public mountUserProfile = (
     node: HTMLDivElement,
-    userProfileProps?: UserProfileProps,
+    props?: UserProfileProps,
   ): void => {
     this.assertComponentsReady(this.#components);
-    this.#components.mountUserProfile(node, userProfileProps || {});
+    this.#components.mountComponent({
+      name: 'UserProfile',
+      node,
+      nodeClassName: 'cl-user-profile',
+      props,
+    });
   };
 
   public unmountUserProfile = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#components);
-    this.#components.unmountUserProfile(node);
+    this.#components.unmountComponent({
+      node,
+    });
   };
 
   public mountUserButton = (
     node: HTMLDivElement,
-    userButtonProps?: UserButtonProps,
+    props?: UserButtonProps,
   ): void => {
     this.assertComponentsReady(this.#components);
-    this.#components.mountUserButton(node, userButtonProps || {});
+    this.#components.mountComponent({
+      name: 'UserButton',
+      node,
+      nodeClassName: 'cl-user-button',
+      props,
+    });
   };
 
   public unmountUserButton = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#components);
-    this.#components.unmountUserButton(node);
+    this.#components.unmountComponent({
+      node,
+    });
   };
 
   public setSession = async (
@@ -293,10 +294,11 @@ export default class Clerk implements ClerkInterface {
     if (this.#unloading) {
       return;
     }
-    this.session = session as ActiveSessionResource | null;
+    this.session = session;
     this.user = this.session ? this.session.user : null;
 
     this.#emit();
+    this.#resetComponentsState();
   };
 
   public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
@@ -334,31 +336,33 @@ export default class Clerk implements ClerkInterface {
     return await customNavigate(stripOrigin(toURL));
   };
 
-  public redirectToSignIn: RedirectToOverload = async (
-    opts,
+  public redirectToSignIn = async (
+    options?: RedirectOptions,
   ): Promise<unknown> => {
+    const opts: RedirectOptions = {
+      ...options,
+      redirectUrl: options?.redirectUrl || window.location.href,
+    };
     if (!this.#environment || !this.#environment.displayConfig) {
       return;
     }
     const { signInUrl } = this.#environment.displayConfig;
-    const url = appendAsQueryParams(
-      signInUrl,
-      getOptsWithDeprecatedReturnBack(opts),
-    );
+    const url = appendAsQueryParams(signInUrl, opts);
     return this.navigate(url);
   };
 
-  public redirectToSignUp: RedirectToOverload = async (
-    opts,
+  public redirectToSignUp = async (
+    options?: RedirectOptions,
   ): Promise<unknown> => {
+    const opts: RedirectOptions = {
+      ...options,
+      redirectUrl: options?.redirectUrl || window.location.href,
+    };
     if (!this.#environment || !this.#environment.displayConfig) {
       return;
     }
     const { signUpUrl } = this.#environment.displayConfig;
-    const url = appendAsQueryParams(
-      signUpUrl,
-      getOptsWithDeprecatedReturnBack(opts),
-    );
+    const url = appendAsQueryParams(signUpUrl, opts);
     return this.navigate(url);
   };
 
@@ -591,11 +595,8 @@ export default class Clerk implements ClerkInterface {
     this.#emit();
   };
 
-  get __unstable__environment(): null | { displayConfig: any } {
-    if (!this.#environment) {
-      return null;
-    }
-    return { displayConfig: { ...this.#environment.displayConfig } };
+  get __unstable__environment(): EnvironmentResource | null | undefined {
+    return this.#environment;
   }
 
   __unstable__onBeforeRequest(callback: FapiRequestCallback<any>): void {
@@ -684,11 +685,11 @@ export default class Clerk implements ClerkInterface {
         s => s.id === client.lastActiveSessionId,
       );
       if (lastActiveSession) {
-        return lastActiveSession as ActiveSessionResource;
+        return lastActiveSession;
       }
     }
     const session = client.activeSessions[0];
-    return session ? (session as ActiveSessionResource) : null;
+    return session ? session : null;
   };
 
   #setupListeners = (): void => {
@@ -740,6 +741,11 @@ export default class Clerk implements ClerkInterface {
 
   #broadcastSignOutEvent = () => {
     this.#broadcastChannel?.postMessage({ type: 'signout' });
+  };
+
+  #resetComponentsState = () => {
+    this.closeSignUp();
+    this.closeSignIn();
   };
 
   assertComponentsReady(
