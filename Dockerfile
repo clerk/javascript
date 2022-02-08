@@ -4,7 +4,10 @@ WORKDIR /ui
 
 EXPOSE 4000
 
-COPY ["package.json", "package-lock.json*", "./"]
+# This is a suboptimal way to build a Lerna monorepo Docker container as it doesn't leverage Docker layer caching.
+# It is advisable not to be used for local development.
+COPY . .
+
 RUN npm install
 
 ENTRYPOINT ["npm", "run", "dev"]
