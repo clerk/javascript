@@ -23,12 +23,13 @@ function extractTag(packageJsonVersion: string) {
   return packageJsonVersion.match(/-(.*)\./);
 }
 
-function getScriptSrc(
-  frontendApi: string,
-  localScriptSrc: string | undefined,
-): string {
-  if (localScriptSrc) {
-    return localScriptSrc;
+function getScriptSrc({
+  frontendApi,
+  scriptUrl,
+  scriptVariant = '',
+}: LoadScriptParams): string {
+  if (scriptUrl) {
+    return scriptUrl;
   }
 
   const majorVersion = isStaging(frontendApi)
@@ -38,14 +39,28 @@ function getScriptSrc(
   const tag = extractTag(LIB_VERSION);
   const sourceVersion = tag === null ? majorVersion : 'next';
 
-  return `https://${frontendApi}/npm/@clerk/clerk-js@${sourceVersion}/dist/clerk.browser.js`;
+  if (scriptVariant) {
+    scriptVariant = scriptVariant.replace(/\.+$/, '') as ScriptVariant;
+    scriptVariant += '.';
+  }
+
+  return `https://${frontendApi}/npm/@clerk/clerk-js@${sourceVersion}/dist/clerk.${scriptVariant}browser.js`;
+}
+
+export type ScriptVariant = '' | 'headless';
+
+export interface LoadScriptParams {
+  frontendApi: string;
+  scriptUrl?: string;
+  scriptVariant?: ScriptVariant;
 }
 
 export function loadScript(
-  frontendApi: string,
-  localScriptSrc: string | undefined,
+  params: LoadScriptParams,
 ): Promise<HTMLScriptElement | null> {
   return new Promise((resolve, reject) => {
+    const { frontendApi } = params;
+
     if (global.Clerk) {
       resolve(null);
     }
@@ -55,7 +70,7 @@ export function loadScript(
     }
 
     const script = document.createElement('script');
-    const src = getScriptSrc(frontendApi, localScriptSrc);
+    const src = getScriptSrc(params);
 
     script.setAttribute('data-clerk-frontend-api', frontendApi);
     script.setAttribute('crossorigin', 'anonymous');
