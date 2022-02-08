@@ -1,22 +1,17 @@
 import React from 'react';
 
-import { withClerk } from '../contexts';
 import { SignUpButtonProps, WithClerkProp } from '../types';
 import {
   assertSingleChild,
   normalizeWithDefaultValue,
   safeExecute,
 } from '../utils';
+import { withClerk } from './withClerk';
 
 export const SignUpButton = withClerk(
   ({ clerk, children, ...props }: WithClerkProp<SignUpButtonProps>) => {
-    const {
-      afterSignInUrl,
-      afterSignUpUrl,
-      redirectUrl,
-      mode,
-      ...rest
-    } = props;
+    const { afterSignInUrl, afterSignUpUrl, redirectUrl, mode, ...rest } =
+      props;
 
     children = normalizeWithDefaultValue(children, 'Sign up');
     const child = assertSingleChild(children)('SignUpButton');

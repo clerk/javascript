@@ -1,8 +1,4 @@
-import {
-  noClerkProviderError,
-  noGuaranteedLoadedError,
-  noGuaranteedUserError,
-} from '../errors';
+import { noClerkProviderError, noGuaranteedLoadedError } from '../errors';
 
 export function assertWrappedByClerkProvider(
   contextVal: unknown,
@@ -18,14 +14,5 @@ export function assertClerkLoadedGuarantee(
 ): asserts guarantee {
   if (!guarantee) {
     throw new Error(noGuaranteedLoadedError(hookName));
-  }
-}
-
-export function assertUserGuarantee(
-  guarantee: unknown,
-  hookName: string,
-): asserts guarantee {
-  if (!guarantee) {
-    throw new Error(noGuaranteedUserError(hookName));
   }
 }

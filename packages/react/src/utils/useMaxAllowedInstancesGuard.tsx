@@ -32,7 +32,7 @@ export function withMaxAllowedInstancesGuard<P>(
     'Component';
   const Hoc = (props: P) => {
     useMaxAllowedInstancesGuard(name, error);
-    return <WrappedComponent {...(props as P)} />;
+    return <WrappedComponent {...props} />;
   };
   Hoc.displayName = `withMaxAllowedInstancesGuard(${displayName})`;
   return Hoc;
