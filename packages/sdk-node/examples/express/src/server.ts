@@ -1,7 +1,8 @@
 import {
-  ClerkExpressRequireSession,
-  ClerkExpressWithSession,
-  WithSessionProp,
+  ClerkExpressRequireAuth,
+  ClerkExpressWithAuth,
+  RequireAuthProp,
+  WithAuthProp,
 } from '@clerk/clerk-sdk-node';
 import dotenv from 'dotenv';
 import express, { Application, Request, Response } from 'express';
@@ -14,8 +15,8 @@ const app: Application = express();
 // Root path uses lax middleware
 app.get(
   '/',
-  ClerkExpressWithSession(),
-  (req: WithSessionProp<Request>, res: Response) => {
+  ClerkExpressWithAuth(),
+  (req: WithAuthProp<Request>, res: Response) => {
     res.json(req.session || 'No session detected');
   }
 );
@@ -23,8 +24,8 @@ app.get(
 // /require-session path uses strict middleware
 app.get(
   '/require-session',
-  ClerkExpressRequireSession(),
-  (req: WithSessionProp<Request>, res) => {
+  ClerkExpressRequireAuth(),
+  (req: RequireAuthProp<Request>, res) => {
     res.json(req.session);
   }
 );

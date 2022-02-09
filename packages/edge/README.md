@@ -24,13 +24,13 @@ yarn add @clerk/edge
 Methods for supported platforms can be imported from the specific path:
 
 ```ts
-import { withSession } from '@clerk/edge/vercel-edge';
+import { withAuth } from '@clerk/edge/vercel-edge';
 
 async function handler(req, event) {
   // ...
 }
 
-export const middleware = withSession(handler);
+export const middleware = withAuth(handler);
 ```
 
 ## Supported platforms
@@ -42,32 +42,33 @@ Currently supported environments/platforms:
 To use with [Edge Functions](https://vercel.com/docs/concepts/functions/edge-functions) :
 
 ```ts
-import { withSession } from '@clerk/edge/vercel-edge';
+import { withAuth } from '@clerk/edge/vercel-edge';
 
 async function handler(req, event) {
   // ...
 }
 
-export const middleware = withSession(handler);
+export const middleware = withAuth(handler);
 ```
 
 Supported methods:
 
-- `withSession`
+- `withAuth`
 - `verifySessionToken`
 - Resources API through `ClerkAPI`
 
 ### Validate the Authorized Party of a session token
+
 Clerk's JWT session token, contains the azp claim, which equals the Origin of the request during token generation. You can provide the middlewares with a list of whitelisted origins to verify against, to protect your application of the subdomain cookie leaking attack. You can find an example below:
 
 ```ts
-import { withSession } from '@clerk/edge/vercel-edge';
+import { withAuth } from '@clerk/edge/vercel-edge';
 
-const authorizedParties = ['http://localhost:3000', 'https://example.com']
+const authorizedParties = ['http://localhost:3000', 'https://example.com'];
 
 async function handler(req, event) {
   // ...
 }
 
-export const middleware = withSession(handler, { authorizedParties });
+export const middleware = withAuth(handler, { authorizedParties });
 ```
