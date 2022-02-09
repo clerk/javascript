@@ -560,12 +560,14 @@ export default class Clerk implements ClerkInterface {
       }
     }
 
-    await this.setSession(signInOrSignUp.createdSessionId, () => {
-      if (redirectUrl) {
-        return this.navigate(redirectUrl);
-      }
-      return Promise.resolve();
-    });
+    if (signInOrSignUp.createdSessionId) {
+      await this.setSession(signInOrSignUp.createdSessionId, () => {
+        if (redirectUrl) {
+          return this.navigate(redirectUrl);
+        }
+        return Promise.resolve();
+      });
+    }
   };
 
   updateClient = (newClient: ClientResource): void => {
