@@ -4,8 +4,6 @@ WORKDIR /ui
 
 EXPOSE 4000
 
-# This is a suboptimal way to build a Lerna monorepo Docker container as it doesn't leverage Docker layer caching.
-# It is advisable not to be used for local development.
 COPY ["package.json", "package-lock.json", "./"]
 
 COPY packages/backend-core/package.json ./packages/backend-core/
