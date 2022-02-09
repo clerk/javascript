@@ -1,3 +1,4 @@
+import { ClerkResourceJSON } from './json';
 import { OAuthStrategy } from './oauth';
 import { ClerkResource } from './resource';
 
@@ -43,7 +44,7 @@ export type SignInData = {
   };
 };
 
-type SignUpData = {
+export type SignUpData = {
   allowlist_only: boolean;
 };
 
@@ -55,13 +56,19 @@ export type Attributes = {
   [attribute in Attribute]: AttributeData;
 };
 
-export type UserSettings = {
-  social: OauthProviders;
+export interface UserSettingsJSON extends ClerkResourceJSON {
+  id: never;
+  object: never;
   attributes: Attributes;
+  social: OauthProviders;
   sign_in: SignInData;
   sign_up: SignUpData;
-};
+}
 
-export interface UserSettingsResource extends ClerkResource, UserSettings {
-  id: string;
+export interface UserSettingsResource extends ClerkResource {
+  id: undefined;
+  social: OauthProviders;
+  attributes: Attributes;
+  signIn: SignInData;
+  signUp: SignUpData;
 }

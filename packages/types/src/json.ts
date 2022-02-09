@@ -13,7 +13,7 @@ import {
   SignInIdentifier,
   SignInStatus,
   SignInStrategyName,
-  UserData,
+  UserData
 } from './signIn';
 import { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUp';
 import {
@@ -22,8 +22,9 @@ import {
   EmUnit,
   FontFamily,
   FontWeight,
-  HexColor,
+  HexColor
 } from './theme';
+import { UserSettingsJSON } from './userSettings';
 import { VerificationStatus } from './verification';
 
 export interface ClerkResourceJSON {
@@ -86,6 +87,7 @@ export interface ImageJSON {
 export interface EnvironmentJSON extends ClerkResourceJSON {
   auth_config: AuthConfigJSON;
   display_config: DisplayConfigJSON;
+  user_settings: UserSettingsJSON;
 }
 
 export interface ClientJSON extends ClerkResourceJSON {
@@ -287,33 +289,33 @@ export interface SessionActivityJSON extends ClerkResourceJSON {
 // TODO: Generalize external account JSON payload to simplify type declarations
 export type ExternalAccountJSON =
   | {
-      object: 'google_account';
-      id: string;
-      google_id: string;
-      approved_scopes: string;
-      email_address: string;
-      given_name: string;
-      family_name: string;
-      picture: string;
-    }
+    object: 'google_account';
+    id: string;
+    google_id: string;
+    approved_scopes: string;
+    email_address: string;
+    given_name: string;
+    family_name: string;
+    picture: string;
+  }
   | {
-      object: 'facebook_account';
-      id: string;
-      facebook_id: string;
-      approved_scopes: string;
-      email_address: string;
-      first_name: string;
-      last_name: string;
-      picture: string;
-    }
+    object: 'facebook_account';
+    id: string;
+    facebook_id: string;
+    approved_scopes: string;
+    email_address: string;
+    first_name: string;
+    last_name: string;
+    picture: string;
+  }
   | {
-      object: 'external_account';
-      provider: string;
-      identification_id: string;
-      provider_user_id: string;
-      approved_scopes: string;
-      email_address: string;
-      first_name: string;
-      last_name: string;
-      avatar_url: string;
-    };
+    object: 'external_account';
+    provider: string;
+    identification_id: string;
+    provider_user_id: string;
+    approved_scopes: string;
+    email_address: string;
+    first_name: string;
+    last_name: string;
+    avatar_url: string;
+  };
