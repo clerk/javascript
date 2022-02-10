@@ -1,3 +1,4 @@
+import type { JWTPayload } from '@clerk/backend-core';
 import {
   AuthStatus,
   Base,
@@ -11,7 +12,7 @@ import { LIB_NAME, LIB_VERSION } from './info';
 
 type Middleware = (
   req: NextRequest,
-  event: NextFetchEvent
+  event: NextFetchEvent,
 ) => Response | void | Promise<Response | void>;
 
 /**
@@ -33,7 +34,7 @@ const verifySignature = async (
   algorithm: Algorithm,
   key: CryptoKey,
   signature: Uint8Array,
-  data: Uint8Array
+  data: Uint8Array,
 ) => {
   return await crypto.subtle.verify(algorithm, key, signature, data);
 };
@@ -64,7 +65,7 @@ export const ClerkAPI = new ClerkBackendAPI({
         'X-Clerk-SDK': `vercel-edge/${LIB_VERSION}`,
       },
       ...(body && { body: JSON.stringify(body) }),
-    }).then((body) => body.json());
+    }).then(body => body.json());
   },
 });
 
@@ -75,16 +76,22 @@ async function fetchInterstitial() {
 
 /** Export middleware wrapper */
 
-export type NextRequestWithSession = NextRequest & { session: Session };
+export type NextRequestWithAuth = NextRequest & {
+  session?: Session;
+  sessionClaims?: JWTPayload;
+};
 
 export type MiddlewareOptions = {
   authorizedParties?: string[];
 };
 
-export function withSession(handler: Middleware, { authorizedParties }: MiddlewareOptions = { authorizedParties: []}) {
+export function withAuth(
+  handler: Middleware,
+  { authorizedParties }: MiddlewareOptions = { authorizedParties: [] },
+) {
   return async function clerkAuth(req: NextRequest, event: NextFetchEvent) {
-    const { status, session, interstitial } = await vercelEdgeBase.getAuthState(
-      {
+    const { status, session, interstitial, sessionClaims } =
+      await vercelEdgeBase.getAuthState({
         cookieToken: req.cookies['__session'],
         clientUat: req.cookies['__client_uat'],
         headerToken: req.headers.get('authorization'),
@@ -95,8 +102,7 @@ export function withSession(handler: Middleware, { authorizedParties }: Middlewa
         referrer: req.headers.get('referrer'),
         authorizedParties: authorizedParties,
         fetchInterstitial,
-      }
-    );
+      });
 
     if (status === AuthStatus.SignedOut) {
       return handler(req, event);
@@ -112,6 +118,8 @@ export function withSession(handler: Middleware, { authorizedParties }: Middlewa
     if (status === AuthStatus.SignedIn) {
       // @ts-ignore
       req.session = session;
+      // @ts-ignore
+      req.sessionClaims = sessionClaims;
       return handler(req, event);
     }
   };
