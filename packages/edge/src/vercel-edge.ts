@@ -65,7 +65,7 @@ export const ClerkAPI = new ClerkBackendAPI({
         'X-Clerk-SDK': `vercel-edge/${LIB_VERSION}`,
       },
       ...(body && { body: JSON.stringify(body) }),
-    }).then(body => body.json());
+    }).then(body => (contentType === 'text/html' ? body : body.json()));
   },
 });
 
@@ -97,6 +97,7 @@ export function withAuth(
         headerToken: req.headers.get('authorization'),
         origin: req.headers.get('origin'),
         host: req.headers.get('host') as string,
+        userAgent: req.headers.get('user-agent'),
         forwardedPort: req.headers.get('x-forwarded-port'),
         forwardedHost: req.headers.get('x-forwarded-host'),
         referrer: req.headers.get('referrer'),
