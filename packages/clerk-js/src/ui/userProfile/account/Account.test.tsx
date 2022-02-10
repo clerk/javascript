@@ -1,5 +1,5 @@
 import { render, screen } from '@clerk/shared/testUtils';
-import type { AuthConfigResource, UserResource, UserSettingsResource } from '@clerk/types';
+import type { UserResource, UserSettingsResource } from '@clerk/types';
 import React from 'react';
 
 import { Account } from './Account';

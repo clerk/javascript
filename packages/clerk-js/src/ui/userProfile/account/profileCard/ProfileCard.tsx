@@ -22,7 +22,8 @@ function getWeb3WalletAddress(user: UserResource): string {
 }
 
 export function ProfileCard(): JSX.Element {
-  const { userSettings: { attributes } } = useEnvironment();
+  const { userSettings } = useEnvironment();
+  const { attributes } = userSettings;
   const user = useCoreUser();
   const { navigate } = useNavigate();
   const web3Wallet = getWeb3WalletAddress(user);

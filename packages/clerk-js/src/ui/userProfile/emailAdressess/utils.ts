@@ -5,6 +5,6 @@ export function magicLinksEnabledForInstance(
 ): boolean {
   // TODO: email verification should have a supported strategies field
   const { userSettings } = env;
-  const { attributes: { email_address } } = userSettings;
+  const { email_address } = userSettings.attributes;
   return email_address.enabled && email_address.verifications.includes('email_link');
 }

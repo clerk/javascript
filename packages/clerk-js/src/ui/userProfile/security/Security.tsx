@@ -8,7 +8,8 @@ import { PageHeading } from 'ui/userProfile/pageHeading';
 import { ActiveDevicesCard } from './DevicesAndActivity/ActiveDevicesCard';
 
 export function Security(): JSX.Element {
-  const { userSettings: { attributes } } = useEnvironment();
+  const { userSettings } = useEnvironment();
+  const { attributes } = userSettings;
   const { navigate } = useNavigate();
   const user = useCoreUser();
 
