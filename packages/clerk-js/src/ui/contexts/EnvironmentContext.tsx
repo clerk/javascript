@@ -8,7 +8,7 @@ const EnvironmentContext = React.createContext<EnvironmentResource | null>(
 
 interface EnvironmentProviderProps {
   children: React.ReactNode;
-  value: any;
+  value: EnvironmentResource;
 }
 
 function EnvironmentProvider({

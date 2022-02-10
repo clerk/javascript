@@ -1,6 +1,7 @@
 import { ClerkResourceJSON } from './json';
 import { OAuthStrategy } from './oauth';
 import { ClerkResource } from './resource';
+import { Web3Strategy } from './web3';
 
 type Attribute =
   | 'email_address'
@@ -14,14 +15,9 @@ type Attribute =
 type VerificationStrategy = 'email_link' | 'email_code' | 'phone_code';
 
 type OauthProviderData = {
-  client_id: string;
-  client_secret: string;
-  name: string;
-  provider: string;
   enabled: boolean;
   required: boolean;
   authenticatable: boolean;
-  custom_profile: boolean;
   strategy: OAuthStrategy;
 };
 
@@ -71,4 +67,7 @@ export interface UserSettingsResource extends ClerkResource {
   attributes: Attributes;
   signIn: SignInData;
   signUp: SignUpData;
+  socialProviderStrategies: OAuthStrategy[];
+  web3FirstFactors: Web3Strategy[];
+  standardFormAttributes: Attribute[];
 }
