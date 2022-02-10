@@ -13,12 +13,20 @@ jest.mock('ui/hooks', () => {
 jest.mock('ui/contexts', () => {
   return {
     useEnvironment: () => ({
-      authConfig: {
-        emailAddress: 'required',
-        phoneNumber: 'on',
-        username: 'off',
-      },
       displayConfig: {},
+      userSettings: {
+        attributes: {
+          email_address: {
+            enabled: true
+          },
+          phone_number: {
+            enabled: true
+          },
+          username: {
+            enabled: false
+          },
+        }
+      }
     }),
     useCoreUser: (): Partial<UserResource> => {
       return {
