@@ -7,8 +7,12 @@ import {
   waitFor,
 } from '@clerk/shared/testUtils';
 import { titleize } from '@clerk/shared/utils/string';
-import { EnvironmentResource, SignInResource } from '@clerk/types';
-import { ClerkAPIResponseError } from 'core/resources/Error';
+import {
+  EnvironmentResource,
+  SignInResource,
+  UserSettingsJSON,
+} from '@clerk/types';
+import { ClerkAPIResponseError, UserSettings } from 'core/resources/internal';
 import React from 'react';
 import { useCoreSignIn } from 'ui/contexts';
 
@@ -42,14 +46,36 @@ jest.mock('ui/contexts', () => {
             preferredSignInStrategy: 'otp',
             afterSignInUrl: 'http://test.host',
           },
+          userSettings: new UserSettings({
+            attributes: {
+              email_address: {
+                enabled: true,
+                required: false,
+                used_for_first_factor: true,
+                first_factors: ['email_link'],
+                used_for_second_factor: false,
+                second_factors: [],
+                verifications: ['email_link'],
+                verify_at_sign_up: false,
+              },
+            },
+            social: {
+              oauth_google: {
+                enabled: true,
+                required: false,
+                authenticatable: false,
+                strategy: 'oauth_google',
+              },
+              oauth_facebook: {
+                enabled: true,
+                required: false,
+                authenticatable: false,
+                strategy: 'oauth_facebook',
+              },
+            },
+          } as unknown as UserSettingsJSON),
           authConfig: {
             singleSessionMode: false,
-            identificationStrategies: [
-              'email_address',
-              'oauth_google',
-              'oauth_facebook',
-            ],
-            firstFactors: ['email_address', 'oauth_google', 'oauth_facebook'],
           },
         } as any as EnvironmentResource),
     ),

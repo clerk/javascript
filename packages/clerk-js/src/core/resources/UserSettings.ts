@@ -48,6 +48,10 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
   private getStandardFormAttributes(
     attributes: Attributes,
   ): Array<keyof UserSettingsResource['attributes']> {
+    if (!attributes) {
+      return [];
+    }
+
     return Object.entries(attributes)
       .filter(
         ([name, attr]) =>
@@ -57,6 +61,10 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
   }
 
   private getWeb3FirstFactors(attributes: Attributes): Web3Strategy[] {
+    if (!attributes) {
+      return [];
+    }
+
     return Object.entries(attributes)
       .filter(
         ([name, attr]) => attr.used_for_first_factor && name.startsWith('web3'),
@@ -66,6 +74,9 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
   }
 
   private getSocialProviderStrategies(social: OauthProviders): OAuthStrategy[] {
+    if (!social) {
+      return [];
+    }
     return Object.entries(social)
       .filter(([, desc]) => desc.enabled)
       .map(([, desc]) => desc.strategy)
