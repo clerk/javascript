@@ -3,13 +3,14 @@
   Base,
   ClerkBackendAPI,
   ClerkFetcher,
+  JWTPayload,
   Session,
 } from '@clerk/backend-core';
 import Cookies from 'cookies';
 import deepmerge from 'deepmerge';
 import type { NextFunction, Request, Response } from 'express';
 import got, { OptionsOfUnknownResponseBody } from 'got';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import jwks, { JwksClient } from 'jwks-rsa';
 import querystring from 'querystring';
 
@@ -31,10 +32,24 @@ export type MiddlewareOptions = {
   authorizedParties?: string[];
 };
 
+/** @deprecated DEPRECATED Use WithAuthProp Est. 2.10.0 */
 export type WithSessionProp<T> = T & { session?: Session };
+/** @deprecated DEPRECATED Use RequireAuthProp Est. 2.10.0 */
 export type RequireSessionProp<T> = T & { session: Session };
-export type WithSessionClaimsProp<T> = T & { sessionClaims?: JwtPayload };
-export type RequireSessionClaimsProp<T> = T & { sessionClaims: JwtPayload };
+/** @deprecated DEPRECATED Use WithAuthProp Est. 2.10.0 */
+export type WithSessionClaimsProp<T> = T & { sessionClaims?: JWTPayload };
+/** @deprecated DEPRECATED Use RequireAuthProp Est. 2.10.0 */
+export type RequireSessionClaimsProp<T> = T & { sessionClaims: JWTPayload };
+
+export type WithAuthProp<T> = T & {
+  session?: Session;
+  sessionClaims?: JWTPayload;
+};
+
+export type RequireAuthProp<T> = T & {
+  session: Session;
+  sessionClaims: JWTPayload;
+};
 
 import { Crypto, CryptoKey } from '@peculiar/webcrypto';
 
@@ -159,7 +174,7 @@ export default class Clerk extends ClerkBackendAPI {
   async verifyToken(
     token: string,
     authorizedParties?: string[]
-  ): Promise<JwtPayload> {
+  ): Promise<JWTPayload> {
     const decoded = jwt.decode(token, { complete: true });
     if (!decoded) {
       throw new Error(`Failed to verify token: ${token}`);

@@ -7,6 +7,8 @@ export {
   RequireSessionProp,
   WithSessionClaimsProp,
   RequireSessionClaimsProp,
+  WithAuthProp,
+  RequireAuthProp,
 } from './Clerk';
 
 export {

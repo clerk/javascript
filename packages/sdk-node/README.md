@@ -547,18 +547,18 @@ The error handling is pretty generic at the moment but more fine-grained errors 
 
 ## Express middleware
 
-For usage with <a href="https://github.com/expressjs/express" target="_blank">Express</a>, this package also exports `ClerkExpressWithSession` (lax) & `ClerkExpressRequireSession` (strict)
+For usage with <a href="https://github.com/expressjs/express" target="_blank">Express</a>, this package also exports `ClerkExpressWithAuth` (lax) & `ClerkExpressRequireAuth` (strict)
 middlewares that can be used in the standard manner:
 
 ```ts
-import { ClerkWithSession } from '@clerk/clerk-sdk-node';
+import { ClerkWithAuth } from '@clerk/clerk-sdk-node';
 
 // Initialize express app the usual way
 
-app.use(ClerkWithSession());
+app.use(ClerkWithAuth());
 ```
 
-The `ClerkWithSession` middleware will set the Clerk session on the request object as `req.session` and then call the next middleware.
+The `ClerkWithAuth` middleware will set the Clerk session on the request object as `req.session` and then call the next middleware.
 
 You can then implement your own logic for handling a logged-in or logged-out user in your express endpoints or custom
 middleware, depending on whether your users are trying to access a public or protected resource.
@@ -566,7 +566,7 @@ middleware, depending on whether your users are trying to access a public or pro
 If you want to use the express middleware of your custom `Clerk` instance, you can use:
 
 ```ts
-app.use(clerk.expressWithSession());
+app.use(clerk.expressWithAuth());
 ```
 
 Where `clerk` is your own instance.
@@ -574,9 +574,9 @@ Where `clerk` is your own instance.
 If you prefer that the middleware renders a 401 (Unauthenticated) itself, you can use the following variant instead:
 
 ```ts
-import { ClerkExpressRequireSession } from '@clerk/clerk-sdk-node';
+import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
 
-app.use(ClerkExpressRequireSession());
+app.use(ClerkExpressRequireAuth());
 ```
 
 ### onError option
@@ -635,16 +635,16 @@ The current package also offers a way of making
 your <a href="https://nextjs.org/docs/api-routes/api-middlewares" target="_blank">Next.js api middleware</a> aware of the Clerk Session.
 
 You can define your handler function with the usual signature (`function handler(req, res) {}`) then wrap it
-with `withSession`:
+with `withAuth`:
 
 ```ts
-import { withSession, WithSessionProp } from '@clerk/clerk-sdk-node';
+import { withAuth, WithAuthProp } from '@clerk/clerk-sdk-node';
 ```
 
 Note: Since the request will be extended with a session property, the signature of your handler in TypeScript would be:
 
 ```ts
-function handler(req: WithSessionProp<NextApiRequest>, res: NextApiResponse) {
+function handler(req: WithAuthProp<NextApiRequest>, res: NextApiResponse) {
     if (req.session) {
         // do something with session.userId
     } else {
@@ -652,34 +652,31 @@ function handler(req: WithSessionProp<NextApiRequest>, res: NextApiResponse) {
     }
 }
 
-export withSession(handler);
+export withAuth(handler);
 ```
 
 You can also pass an `onError` handler to the underlying Express middleware that is called (see previous section):
 
 ```ts
-export withSession(handler, { clerk, onError: error => console.log(error) });
+export withAuth(handler, { clerk, onError: error => console.log(error) });
 ```
 
 In case you would like the request to be rejected automatically when no session exists,
 without having to implement such logic yourself, you can opt for the stricter variant:
 
 ```ts
-import clerk, {
-  requireSession,
-  RequireSessionProp,
-} from '@clerk/clerk-sdk-node';
+import clerk, { requireAuth, RequireAuthProp } from '@clerk/clerk-sdk-node';
 ```
 
 In this case your handler can be even simpler because the existence of the session can be assumed, otherwise the
 execution will never reach your handler:
 
 ```ts
-function handler(req: RequireSessionProp<NextApiRequest>, res: NextApiResponse) {
+function handler(req: RequireAuthProp<NextApiRequest>, res: NextApiResponse) {
     // do something with session.userId
 }
 
-export requireSession(handler, { clerk, onError });
+export requireAuth(handler, { clerk, onError });
 ```
 
 Note that by default the error returned will be the Clerk server error encountered (or in case of misconfiguration, the error raised by the SDK itself).
@@ -711,22 +708,23 @@ The aforementioned usage pertains to the singleton case. If you would like to us
 yourself (e.g. named `clerk`), you can use the following syntax instead:
 
 ```ts
-export clerk.withSession(handler);
+export clerk.withAuth(handler);
 // OR
-export clerk.requireSession(handler);
+export clerk.requireAuth(handler);
 ```
 
 ## Validate the Authorized Party of a session token
+
 Clerk's JWT session token, contains the azp claim, which equals the Origin of the request during token generation. You can provide the middlewares with a list of whitelisted origins to verify against, to protect your application of the subdomain cookie leaking attack. You can find an example below:
 
 ### Express
 
 ```ts
-import { ClerkExpressRequireSession } from '@clerk/clerk-sdk-node';
+import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
 
-const authorizedParties = ['http://localhost:3000', 'https://example.com']
+const authorizedParties = ['http://localhost:3000', 'https://example.com'];
 
-app.use(ClerkExpressRequireSession({ authorizedParties }));
+app.use(ClerkExpressRequireAuth({ authorizedParties }));
 ```
 
 ### Next
@@ -734,11 +732,11 @@ app.use(ClerkExpressRequireSession({ authorizedParties }));
 ```ts
 const authorizedParties = ['http://localhost:3000', 'https://example.com']
 
-function handler(req: RequireSessionProp<NextApiRequest>, res: NextApiResponse) {
+function handler(req: RequireAuthProp<NextApiRequest>, res: NextApiResponse) {
   // do something with session.userId
 }
 
-export requireSession(handler, { authorizedParties });
+export requireAuth(handler, { authorizedParties });
 ```
 
 ## Troubleshooting
@@ -753,10 +751,10 @@ Please consult the following check-list for some potential quick fixes:
 - In development mode, do your frontend & API reside on the same domain? Unless the clerk `__session` is sent to your API server, the SDK will fail to authenticate your user.
 - If you are still experiencing issues, it is advisable to set the `CLERK_LOGGING` environment variable to `true` to get additional logging output that may help identify the issue.
 
-Note: The strict middleware variants (i.e. the "require session" variants) will produce an erroneous response if the user is not signed in.
+Note: The strict middleware variants (i.e. the "require auth" variants) will produce an erroneous response if the user is not signed in.
 Please ensure you are not mounting them on routes that are meant to be publicly accessible.
 
 ## Feedback / Issue reporting
 
 Please report issues or open feature request in
-the [github issue section](https://github.com/clerkinc/clerk-sdk-node/issues).
+the [github issue section](https://github.com/clerkinc/javascript/issues).
