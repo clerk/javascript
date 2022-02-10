@@ -16,13 +16,15 @@ import { unixEpochToDate } from 'utils/date';
 import { normalizeUnsafeMetadata } from 'utils/resourceParams';
 
 import { UserTokenCache } from '../tokenCache';
-import { BaseResource } from './Base';
-import { EmailAddress } from './EmailAddress';
-import { ExternalAccount } from './ExternalAccount';
-import { Image } from './Image';
-import { PhoneNumber } from './PhoneNumber';
-import { Token } from './Token';
-import { Web3Wallet } from './Web3Wallet';
+import {
+  BaseResource,
+  EmailAddress,
+  ExternalAccount,
+  Image,
+  PhoneNumber,
+  Token,
+  Web3Wallet,
+} from './internal';
 
 export class User extends BaseResource implements UserResource {
   pathRoot = '/me';

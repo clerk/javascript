@@ -23,9 +23,13 @@ import type {
   UserProfileProps,
   UserResource,
 } from '@clerk/types';
-import { Client } from 'core/resources/Client';
-import { Environment } from 'core/resources/Environment';
-import { MagicLinkError, MagicLinkErrorCode } from 'core/resources/Error';
+import {
+  BaseResource,
+  Client,
+  Environment,
+  MagicLinkError,
+  MagicLinkErrorCode,
+} from 'core/resources/internal';
 import { AuthenticationService } from 'core/services';
 import { ERROR_CODES } from 'ui/common/constants';
 import {
@@ -58,7 +62,6 @@ import createFapiClient, {
   FapiClient,
   FapiRequestCallback,
 } from './fapiClient';
-import { BaseResource } from './resources/Base';
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 
@@ -293,7 +296,7 @@ export default class Clerk implements ClerkInterface {
     if (this.#unloading) {
       return;
     }
-    this.session = session as ActiveSessionResource | null;
+    this.session = session;
     this.user = this.session ? this.session.user : null;
 
     this.#emit();
@@ -684,11 +687,11 @@ export default class Clerk implements ClerkInterface {
         s => s.id === client.lastActiveSessionId,
       );
       if (lastActiveSession) {
-        return lastActiveSession as ActiveSessionResource;
+        return lastActiveSession;
       }
     }
     const session = client.activeSessions[0];
-    return session ? (session as ActiveSessionResource) : null;
+    return session ? session : null;
   };
 
   #setupListeners = (): void => {

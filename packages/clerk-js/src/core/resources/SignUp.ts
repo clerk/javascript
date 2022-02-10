@@ -30,8 +30,7 @@ import {
 import { normalizeUnsafeMetadata } from 'utils/resourceParams';
 
 import { STRATEGY_WEB3_METAMASK_SIGNATURE } from '../constants';
-import { BaseResource } from './Base';
-import { SignUpVerifications } from './Verification';
+import { BaseResource, SignUpVerifications } from './internal';
 
 declare global {
   interface Window {
