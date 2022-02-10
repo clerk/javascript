@@ -54,9 +54,24 @@ function _SignInFactorTwo(): JSX.Element {
     if (status === 'verified' || !signIn) {
       return;
     }
+
+    const secondFactors = signIn.supportedSecondFactors
+      .filter(factor => factor.strategy === 'phone_code')
+      .map(phoneCodeFactor => phoneCodeFactor as PhoneCodeFactor);
+
+    if (secondFactors.length === 0) {
+      return;
+    }
+
+    const defaultIdentifier = secondFactors.find(factor => factor.default);
+    const phoneNumberId = defaultIdentifier
+      ? defaultIdentifier.phone_number_id
+      : secondFactors[0]?.phone_number_id;
+
     signIn
       .prepareSecondFactor({
         strategy: 'phone_code',
+        phone_number_id: phoneNumberId,
       })
       .catch(err => handleError(err, [code], setError));
   };
