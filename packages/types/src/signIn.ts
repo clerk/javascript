@@ -130,7 +130,9 @@ export type PrepareFirstFactorParams =
       action_complete_redirect_url: string;
     });
 
-export type PrepareSecondFactorParams = Pick<PhoneCodeFactor, 'strategy'>;
+export type PrepareSecondFactorParams = Pick<PhoneCodeFactor, 'strategy'> & {
+  phone_number_id?: string;
+};
 
 export type AttemptFactorParams =
   | {
