@@ -57,6 +57,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
   private getSocialProviderStrategies(social: OauthProviders): OAuthStrategy[] {
     return Object.entries(social)
       .filter(([, desc]) => desc.enabled)
-      .map(([, desc]) => desc.strategy);
+      .map(([, desc]) => desc.strategy)
+      .sort();
   }
 }
