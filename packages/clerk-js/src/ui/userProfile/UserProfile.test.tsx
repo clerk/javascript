@@ -12,6 +12,7 @@ import {
 } from '@clerk/types';
 import { AuthConfig } from 'core/resources/AuthConfig';
 import { ExternalAccount } from 'core/resources/ExternalAccount';
+import { UserSettings } from 'core/resources/UserSettings';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -19,16 +20,18 @@ import { UserProfile } from './UserProfile';
 
 const mockNavigate = jest.fn();
 const mockUseCoreSignIn = jest.fn(
-  () =>
-    ({
+  () => (
+    {
       status: null,
-    } as SignInResource),
+    } as SignInResource
+  ),
 );
 const mockUseCoreSignUp = jest.fn(
-  () =>
-    ({
+  () => (
+    {
       status: null,
-    } as SignUpResource),
+    } as SignUpResource
+  ),
 );
 
 const mockUseCoreSessionList = jest.fn(() => [] as SessionResource[]);
@@ -66,11 +69,47 @@ jest.mock('ui/contexts', () => ({
         },
       },
     },
+    userSettings: {
+      attributes: {
+        phone_number: {
+          // this should be true since it is a first factor but keeping it false for the needs of the test case
+          enabled: false,
+          used_for_second_factor: true,
+          second_factors: ['phone_code']
+        },
+        email_address: {
+          // this should be true since it is a first factor but keeping it false for the needs of the test case
+          enabled: false,
+          used_for_first_factor: true,
+          first_factors: ['email_code']
+        },
+        first_name: {
+          enabled: true,
+        },
+        last_name: {
+          enabled: false,
+        },
+        username: {
+          enabled: false,
+        },
+        password: {
+          enabled: false,
+        },
+        web3_wallet: {
+          enabled: false
+        }
+      },
+      social: {
+        oauth_google: {
+          enabled: true,
+        },
+        oauth_facebook: {
+          enabled: true,
+        }
+      }
+    } as Partial<UserSettings>,
     authConfig: {
-      secondFactors: ['phone_code'],
-      singleSessionMode: true,
-      firstFactors: ['email_address', 'oauth_google', 'oauth_facebook'],
-      emailAddressVerificationStrategies: ['email_code'],
+      singleSessionMode: true
     } as Partial<AuthConfig>,
   })),
   withCoreUserGuard: (a: any) => a,
