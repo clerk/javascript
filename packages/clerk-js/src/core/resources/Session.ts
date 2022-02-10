@@ -8,9 +8,7 @@ import type {
 import { unixEpochToDate } from 'utils/date';
 
 import { SessionTokenCache } from '../tokenCache';
-import { BaseResource } from './Base';
-import { Token } from './Token';
-import { User } from './User';
+import { BaseResource, Token, User } from './internal';
 
 export class Session extends BaseResource implements SessionResource {
   pathRoot = '/client/sessions';

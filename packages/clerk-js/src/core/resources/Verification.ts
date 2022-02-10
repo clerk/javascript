@@ -10,8 +10,7 @@ import type {
 } from '@clerk/types';
 import { unixEpochToDate } from 'utils/date';
 
-import { BaseResource } from './Base';
-import { parseError } from './Error';
+import { BaseResource, parseError } from './internal';
 
 export class Verification extends BaseResource implements VerificationResource {
   pathRoot = '';

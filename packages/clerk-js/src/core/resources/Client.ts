@@ -8,10 +8,7 @@ import type {
 import { unixEpochToDate } from 'utils/date';
 
 import { SessionTokenCache } from '../tokenCache';
-import { BaseResource } from './Base';
-import { Session } from './Session';
-import { SignIn } from './SignIn';
-import { SignUp } from './SignUp';
+import { BaseResource, Session, SignIn, SignUp } from './internal';
 
 export class Client extends BaseResource implements ClientResource {
   private static instance: Client;

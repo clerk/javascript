@@ -31,12 +31,6 @@ jest.mock('ui/contexts', () => {
             homeUrl: 'https://www.cnn.com',
           },
           authConfig: {
-            identificationStrategies: [
-              'email_address',
-              'oauth_google',
-              'oauth_facebook',
-            ],
-            firstFactors: ['email_address', 'oauth_google', 'oauth_facebook'],
             singleSessionMode: true,
           } as Partial<AuthConfig>,
         } as Partial<EnvironmentResource>),

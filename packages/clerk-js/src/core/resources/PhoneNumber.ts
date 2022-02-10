@@ -5,9 +5,7 @@ import type {
   VerificationResource,
 } from '@clerk/types';
 
-import { BaseResource } from './Base';
-import { IdentificationLink } from './IdentificationLink';
-import { Verification } from './Verification';
+import { BaseResource, IdentificationLink, Verification } from './internal';
 
 export class PhoneNumber extends BaseResource implements PhoneNumberResource {
   id!: string;
