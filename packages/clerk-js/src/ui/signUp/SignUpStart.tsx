@@ -2,7 +2,7 @@ import { Control } from '@clerk/shared/components/control';
 import { Form } from '@clerk/shared/components/form';
 import { Input } from '@clerk/shared/components/input';
 import { PhoneInput } from '@clerk/shared/components/phoneInput';
-import { OAuthStrategy, SignUpResource, Web3Strategy } from '@clerk/types';
+import { SignUpResource } from '@clerk/types';
 import React from 'react';
 import type { FieldState } from 'ui/common';
 import {
@@ -29,17 +29,14 @@ import { getClerkQueryParam } from 'utils/getClerkQueryParam';
 import { SignInLink } from './SignInLink';
 import { SignUpOAuth } from './SignUpOAuth';
 import { SignUpWeb3 } from './SignUpWeb3';
-import {
-  determineFirstPartyFields,
-  determineOauthOptions,
-  determineWeb3Options,
-} from './utils';
+import { determineFirstPartyFields } from './utils';
 
 type ActiveIdentifier = 'emailAddress' | 'phoneNumber';
 
 function _SignUpStart(): JSX.Element {
   const { navigate } = useNavigate();
   const environment = useEnvironment();
+  const { userSettings } = environment;
   const { setSession } = useCoreClerk();
   const { navigateAfterSignUp } = useSignUpContext();
   const [emailOrPhoneActive, setEmailOrPhoneActive] =
@@ -62,10 +59,12 @@ function _SignUpStart(): JSX.Element {
 
   const [error, setError] = React.useState<string | undefined>();
   const hasInvitationToken = !!formFields.invitationToken.value;
+
   const fields = determineFirstPartyFields(environment, hasInvitationToken);
-  const oauthOptions = determineOauthOptions(environment) as OAuthStrategy[];
-  const web3Options = determineWeb3Options(environment) as Web3Strategy[];
-  const handleInvitationFlow = async () => {
+  const oauthOptions = userSettings.socialProviderStrategies;
+  const web3Options = userSettings.web3FirstFactors;
+
+  const handleInvitationFlow = () => {
     const token = formFields.invitationToken.value;
     if (!token) {
       return;
@@ -149,7 +148,7 @@ function _SignUpStart(): JSX.Element {
     }
   };
 
-  const completeSignUpFlow = async (su: SignUpResource) => {
+  const completeSignUpFlow = (su: SignUpResource) => {
     if (su.status === 'complete') {
       return setSession(su.createdSessionId, navigateAfterSignUp);
     } else if (

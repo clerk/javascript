@@ -112,7 +112,6 @@ describe('determineFirstPartyFields()', () => {
           } as UserSettingsJSON),
         },
         {
-          invitationToken: 'required',
           emailOrPhone: 'required',
           firstName: 'required',
           lastName: 'required',
@@ -142,7 +141,6 @@ describe('determineFirstPartyFields()', () => {
           } as UserSettingsJSON),
         },
         {
-          emailOrPhone: 'required',
           firstName: 'on',
           lastName: 'on',
           password: 'required',
@@ -194,18 +192,14 @@ describe('determineFirstPartyFields()', () => {
       // Email address or phone number cannot be required when there's an
       // invitation token present. Instead, we'll require the invitationToken
       // parameter
-      const {
-        // @ts-ignore
-        emailAddress: ___emailAddress,
-        // @ts-ignore
-        emailOrPhone: ___emailOrPhone,
-        // @ts-ignore
-        phoneNumber: ___phoneNumber,
-        ...expected
-      } = result;
+      const res = { ...result };
+      delete res.emailAddress;
+      delete res.phoneNumber;
+      delete res.emailOrPhone;
+
       expect(
         determineFirstPartyFields(environment as EnvironmentResource, true),
-      ).toEqual({ ...expected, invitationToken: 'required' });
+      ).toEqual({ ...result, invitationToken: 'required' });
     });
   });
 });

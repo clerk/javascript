@@ -6,8 +6,8 @@ import {
   waitFor,
 } from '@clerk/shared/testUtils';
 import { titleize } from '@clerk/shared/utils/string';
-import { Session } from 'core/resources';
-import { AuthConfig } from 'core/resources/AuthConfig';
+import { UserSettingsJSON } from '@clerk/types';
+import { Session, UserSettings } from 'core/resources/internal';
 import React from 'react';
 import { useCoreSignUp } from 'ui/contexts';
 
@@ -17,8 +17,7 @@ const navigateMock = jest.fn();
 const mockCreateRequest = jest.fn();
 const mockSetSession = jest.fn();
 const mockAuthenticateWithRedirect = jest.fn();
-const mockIdentificationRequirements = jest.fn();
-let mockAuthConfig: Partial<AuthConfig>;
+let mockUserSettings: UserSettings;
 
 const oldWindowLocation = window.location;
 const setWindowQueryParams = (params: Array<[string, string]>) => {
@@ -62,7 +61,8 @@ jest.mock('ui/contexts', () => {
         applicationName: 'My test app',
         afterSignUpUrl: 'http://test.host',
       },
-      authConfig: mockAuthConfig,
+      userSettings: mockUserSettings,
+      authConfig: { singleSessionMode: false },
     })),
   };
 });
@@ -79,9 +79,9 @@ describe('<SignUpStart/>', () => {
   const { location } = window;
 
   beforeEach(() => {
-    mockIdentificationRequirements.mockImplementation(() => [
-      ['email_address', 'oauth_google', 'oauth_facebook'],
-    ]);
+    // mockIdentificationRequirements.mockImplementation(() => [
+    //   ['email_address', 'oauth_google', 'oauth_facebook'],
+    // ]);
 
     mockCreateRequest.mockImplementation(() =>
       Promise.resolve({
@@ -94,13 +94,38 @@ describe('<SignUpStart/>', () => {
       }),
     );
 
-    mockAuthConfig = {
-      username: 'on',
-      firstName: 'required',
-      lastName: 'required',
-      password: 'required',
-      identificationRequirements: mockIdentificationRequirements(),
-    };
+    mockUserSettings = new UserSettings({
+      attributes: {
+        username: {
+          enabled: true,
+        },
+        first_name: {
+          enabled: true,
+          required: true,
+        },
+        last_name: {
+          enabled: true,
+          required: true,
+        },
+        password: {
+          enabled: true,
+          required: true,
+        },
+        email_address: {
+          enabled: true,
+        },
+      },
+      social: {
+        oauth_google: {
+          enabled: true,
+          strategy: 'oauth_google',
+        },
+        oauth_facebook: {
+          enabled: true,
+          strategy: 'oauth_facebook',
+        },
+      },
+    } as UserSettingsJSON);
   });
 
   afterEach(() => {
@@ -111,7 +136,7 @@ describe('<SignUpStart/>', () => {
     global.window.location = location;
   });
 
-  it('renders the sign up start screen', async () => {
+  it('renders the sign up start screen', () => {
     const tree = renderJSON(<SignUpStart />);
     expect(tree).toMatchSnapshot();
   });
@@ -119,14 +144,11 @@ describe('<SignUpStart/>', () => {
   it('renders the start screen, types the name, email, and password and creates a sign up attempt', async () => {
     render(<SignUpStart />);
 
-    await userEvent.type(screen.getByLabelText('First name'), 'John');
-    await userEvent.type(screen.getByLabelText('Last name'), 'Doe');
-    await userEvent.type(screen.getByLabelText('Username'), 'jdoe');
-    await userEvent.type(
-      screen.getByLabelText('Email address'),
-      'jdoe@example.com',
-    );
-    await userEvent.type(screen.getByLabelText('Password'), 'p@ssW0rd');
+    userEvent.type(screen.getByLabelText('First name'), 'John');
+    userEvent.type(screen.getByLabelText('Last name'), 'Doe');
+    userEvent.type(screen.getByLabelText('Username'), 'jdoe');
+    userEvent.type(screen.getByLabelText('Email address'), 'jdoe@example.com');
+    userEvent.type(screen.getByLabelText('Password'), 'p@ssW0rd');
 
     userEvent.click(screen.getByRole('button', { name: 'Sign up' }));
 
@@ -170,7 +192,7 @@ describe('<SignUpStart/>', () => {
     },
   );
 
-  it('renders the external account verification error if available', async () => {
+  it('renders the external account verification error if available', () => {
     const errorMsg =
       'You cannot sign up with sokratis.vidros@gmail.com since this is an invitation-only application';
 
@@ -194,14 +216,24 @@ describe('<SignUpStart/>', () => {
     expect(mockCreateRequest).toHaveBeenNthCalledWith(1, {});
   });
 
-  it('only renders the SSO buttons if no other method is supported', async () => {
-    mockIdentificationRequirements.mockImplementation(() => [
-      ['oauth_google', 'oauth_facebook'],
-    ]);
-    mockAuthConfig = {
-      username: 'off',
-      identificationRequirements: mockIdentificationRequirements(),
-    };
+  it('only renders the SSO buttons if no other method is supported', () => {
+    mockUserSettings = new UserSettings({
+      attributes: {
+        username: {
+          enabled: false,
+        },
+      },
+      social: {
+        oauth_google: {
+          enabled: true,
+          strategy: 'oauth_google',
+        },
+        oauth_facebook: {
+          enabled: true,
+          strategy: 'oauth_facebook',
+        },
+      },
+    } as UserSettingsJSON);
 
     render(<SignUpStart />);
     screen.getByRole('button', { name: /Google/ });
@@ -212,7 +244,7 @@ describe('<SignUpStart/>', () => {
   });
 
   describe('when the user does not grant access to their Facebook account', () => {
-    it('renders the external account verification error if available', async () => {
+    it('renders the external account verification error if available', () => {
       const errorMsg = 'You did not grant access to your Facebook account';
 
       (useCoreSignUp as jest.Mock).mockImplementation(() => {
@@ -296,9 +328,14 @@ describe('<SignUpStart/>', () => {
     });
 
     it('does not render the phone number field', async () => {
-      mockIdentificationRequirements.mockImplementation(() => [
-        ['phone_number'],
-      ]);
+      mockUserSettings = new UserSettings({
+        attributes: {
+          phone_number: {
+            enabled: true,
+            required: true,
+          },
+        },
+      } as UserSettingsJSON);
 
       const { container } = render(<SignUpStart />);
       const labels = container.querySelectorAll('label');

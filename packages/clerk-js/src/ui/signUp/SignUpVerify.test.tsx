@@ -74,9 +74,7 @@ jest.mock('ui/contexts', () => {
           },
         },
       } as unknown as UserSettingsJSON),
-      authConfig: {
-        singleSessionMode: false,
-      },
+      authConfig: { singleSessionMode: false },
     })),
     useCoreSession: () => {
       return { id: 'sess_id' } as SessionResource;
