@@ -94,6 +94,9 @@ jest.mock('ui/contexts', () => ({
         },
         password: {
           enabled: false,
+        },
+        web3_wallet: {
+          enabled: false
         }
       },
       social: {

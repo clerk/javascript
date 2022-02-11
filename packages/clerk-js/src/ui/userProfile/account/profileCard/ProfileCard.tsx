@@ -97,7 +97,7 @@ export function ProfileCard(): JSX.Element {
     </List.Item>
   );
 
-  const showWebWallet = !!web3Wallet;
+  const showWebWallet = attributes.web3_wallet.enabled;
   const showUsername = attributes.username.enabled;
   const showEmail = attributes.email_address.enabled;
   const showPhone = attributes.phone_number.enabled;

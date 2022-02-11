@@ -35,6 +35,9 @@ const OTHER_ATTRIBUTES = {
   },
   phone_number: {
     enabled: false
+  },
+  web3_wallet: {
+    enabled: false
   }
 };
 
