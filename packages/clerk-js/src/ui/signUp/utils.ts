@@ -1,9 +1,5 @@
-import type {
-  EnvironmentResource,
-  IdentificationStrategy,
-  SignInStrategyName,
-  ToggleTypeWithRequire,
-} from '@clerk/types';
+import { snakeToCamel } from '@clerk/shared/utils';
+import type { EnvironmentResource, ToggleTypeWithRequire } from '@clerk/types';
 
 type FieldKeys =
   | 'emailOrPhone'
@@ -23,58 +19,25 @@ export function determineFirstPartyFields(
   environment: EnvironmentResource,
   hasInvitation?: boolean,
 ): Fields {
-  const idRequirements =
-    environment.authConfig.identificationRequirements.flat();
-  const fields: Fields = {};
+  const { attributes } = environment.userSettings;
 
-  const idByEmail = idRequirements.includes('email_address');
-  const idByPhone = idRequirements.includes('phone_number');
-  const idByEmailOrPhone = idByEmail && idByPhone;
-  const idByUsername =
-    idRequirements.includes('username') ||
-    environment.authConfig.username === 'on';
-  if (hasInvitation) {
-    fields.invitationToken = 'required';
-  } else if (idByEmailOrPhone) {
+  const fields = Object.entries(attributes)
+    .filter(([, desc]) => desc.enabled)
+    .reduce((acc, [name, desc]) => {
+      const key = snakeToCamel(name) as keyof Fields;
+      acc[key] = desc.required ? 'required' : 'on';
+      return acc;
+    }, {} as Fields);
+
+  if (fields.emailAddress && fields.phoneNumber) {
     fields.emailOrPhone = 'required';
-  } else if (idByEmail) {
-    fields.emailAddress = 'required';
-  } else if (idByPhone) {
-    fields.phoneNumber = 'required';
+    delete fields.emailAddress;
+    delete fields.phoneNumber;
   }
 
-  if (idByEmailOrPhone || idByEmail || idByPhone) {
-    if (idByUsername) {
-      fields.username = environment.authConfig.username;
-    }
-
-    if (environment.authConfig.password === 'required') {
-      fields.password = environment.authConfig.password;
-    }
-
-    if (['on', 'required'].includes(environment.authConfig.firstName)) {
-      fields.firstName = environment.authConfig.firstName;
-    }
-    if (['on', 'required'].includes(environment.authConfig.lastName)) {
-      fields.lastName = environment.authConfig.lastName;
-    }
+  if (hasInvitation) {
+    fields.invitationToken = 'required';
   }
 
   return fields;
-}
-
-export function determineOauthOptions(
-  environment: EnvironmentResource,
-): IdentificationStrategy[] {
-  const idRequirements = [
-    ...new Set(environment.authConfig.identificationRequirements.flat()),
-  ];
-  return idRequirements.filter(fac => fac.startsWith('oauth')).sort();
-}
-
-export function determineWeb3Options(
-  environment: EnvironmentResource,
-): SignInStrategyName[] {
-  const idRequirements = [...new Set(environment.authConfig.firstFactors)];
-  return idRequirements.filter(fac => fac.startsWith('web3')).sort();
 }

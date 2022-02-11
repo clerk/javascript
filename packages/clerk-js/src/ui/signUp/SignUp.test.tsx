@@ -28,8 +28,6 @@ jest.mock('ui/contexts', () => {
             homeUrl: 'https://www.bbc.com',
           },
           authConfig: {
-            identificationStrategies: ['email_address', 'oauth_google'],
-            firstFactors: ['email_address', 'oauth_google'],
             singleSessionMode: true,
           } as Partial<AuthConfig>,
         } as Partial<EnvironmentResource>),
