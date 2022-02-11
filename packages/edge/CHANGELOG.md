@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.3.1-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/edge@0.3.0...@clerk/edge@0.3.1-staging.0) (2022-02-11)
+
+
+### Features
+
+* **clerk-sdk-node:** Deprecate Session named middleware, introduce withAuth, requireAuth ([4e69553](https://github.com/clerkinc/javascript/commit/4e695535e41fe7c135cbf303a0d021e7b7d30f7d))
+
+
+### Bug Fixes
+
+* **edge:** Correct interstitial Content-Type and User-Agent ([12ad4d5](https://github.com/clerkinc/javascript/commit/12ad4d5e2a92c2fdeca733f1f8f4cbbb3b458fbc))
+
+
+
 ## [0.3.0](https://github.com/clerkinc/javascript/compare/@clerk/edge@0.2.1...@clerk/edge@0.3.0) (2022-02-04)
 
 
