@@ -1,9 +1,11 @@
 import { noop, render, renderJSON } from '@clerk/shared/testUtils';
 import {
+  AttributeData,
   SessionResource,
-  SignInStrategyName,
   SignUpResource,
+  UserSettingsJSON,
 } from '@clerk/types';
+import { UserSettings } from 'core/resources/internal';
 import React from 'react';
 
 import {
@@ -25,7 +27,7 @@ const mockStartMagicLinkFlow = jest.fn(() => {
     },
   } as any as SignUpResource);
 });
-let mockFirstFactors: SignInStrategyName[];
+let mockEmailAddressAttribute: Partial<AttributeData>;
 let mockDisabledStrategies: string[] = [];
 
 jest.mock('ui/router/RouteContext');
@@ -37,15 +39,43 @@ jest.mock('ui/contexts', () => {
         applicationName: 'My test app',
         afterSignUpUrl: 'http://test.host',
       },
+      userSettings: new UserSettings({
+        attributes: {
+          first_name: {
+            enabled: true,
+            required: false,
+          },
+          last_name: {
+            enabled: true,
+            required: false,
+          },
+          password: {
+            enabled: true,
+            required: false,
+          },
+          username: {
+            enabled: true,
+            required: false,
+          },
+          email_address: mockEmailAddressAttribute,
+        },
+        social: {
+          oauth_google: {
+            enabled: true,
+            required: false,
+            authenticatable: false,
+            strategy: 'oauth_google',
+          },
+          oauth_facebook: {
+            enabled: true,
+            required: false,
+            authenticatable: false,
+            strategy: 'oauth_facebook',
+          },
+        },
+      } as unknown as UserSettingsJSON),
       authConfig: {
-        username: 'on',
-        firstName: 'required',
-        lastName: 'required',
-        password: 'required',
-        firstFactors: mockFirstFactors,
-        identificationRequirements: [
-          ['email_address', 'phone_address', 'oauth_google', 'oauth_facebook'],
-        ],
+        singleSessionMode: false,
       },
     })),
     useCoreSession: () => {
@@ -105,20 +135,33 @@ describe('<SignUpVerify/>', () => {
   });
 
   describe('verify email address', () => {
-    it('renders the sign up verification form', async () => {
-      mockFirstFactors = ['email_code', 'phone_code', 'password'];
+    it('renders the sign up verification form', () => {
+      mockEmailAddressAttribute = {
+        enabled: true,
+        first_factors: ['email_code'],
+        verifications: ['email_code'],
+      };
+      // mockFirstFactors = ['email_code', 'phone_code', 'password'];
       const tree = renderJSON(<SignUpVerifyEmailAddress />);
       expect(tree).toMatchSnapshot();
     });
 
-    it('renders the sign up verification form but prefers email_link if exists', async () => {
-      mockFirstFactors = ['email_code', 'phone_code', 'password', 'email_link'];
+    it('renders the sign up verification form but prefers email_link if exists', () => {
+      mockEmailAddressAttribute = {
+        enabled: true,
+        first_factors: ['email_link'],
+        verifications: ['email_link'],
+      };
       const tree = renderJSON(<SignUpVerifyEmailAddress />);
       expect(tree).toMatchSnapshot();
     });
 
-    it('can skip disabled verification strategies', async () => {
-      mockFirstFactors = ['email_code', 'phone_code', 'password', 'email_link'];
+    it('can skip disabled verification strategies', () => {
+      mockEmailAddressAttribute = {
+        enabled: true,
+        first_factors: ['email_link'],
+        verifications: ['email_link'],
+      };
       mockDisabledStrategies = ['email_link'];
       const { container } = render(<SignUpVerifyEmailAddress />);
       expect(container.querySelector('.cl-otp-input')).not.toBeNull();
@@ -131,7 +174,7 @@ describe('<SignUpVerify/>', () => {
   });
 
   describe('verify phone number', () => {
-    it('renders the sign up verification form', async () => {
+    it('renders the sign up verification form', () => {
       const tree = renderJSON(<SignUpVerifyPhoneNumber />);
       expect(tree).toMatchSnapshot();
     });
