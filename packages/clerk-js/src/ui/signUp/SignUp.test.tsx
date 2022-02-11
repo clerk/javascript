@@ -27,11 +27,7 @@ jest.mock('ui/contexts', () => {
           displayConfig: {
             homeUrl: 'https://www.bbc.com',
           },
-          authConfig: {
-            identificationStrategies: ['email_address', 'oauth_google'],
-            firstFactors: ['email_address', 'oauth_google'],
-            singleSessionMode: true,
-          } as Partial<AuthConfig>,
+          authConfig: { singleSessionMode: true } as Partial<AuthConfig>,
         } as Partial<EnvironmentResource>),
     ),
     withCoreSessionSwitchGuard: (a: any) => a,
