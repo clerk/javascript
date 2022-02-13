@@ -10,9 +10,11 @@ import {
   SignInResource,
   SignUpResource,
 } from '@clerk/types';
-import { AuthConfig } from 'core/resources/AuthConfig';
-import { ExternalAccount } from 'core/resources/ExternalAccount';
-import { UserSettings } from 'core/resources/UserSettings';
+import {
+  AuthConfig,
+  ExternalAccount,
+  UserSettings,
+} from 'core/resources/internal';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -20,18 +22,16 @@ import { UserProfile } from './UserProfile';
 
 const mockNavigate = jest.fn();
 const mockUseCoreSignIn = jest.fn(
-  () => (
-    {
+  () =>
+    ({
       status: null,
-    } as SignInResource
-  ),
+    } as SignInResource),
 );
 const mockUseCoreSignUp = jest.fn(
-  () => (
-    {
+  () =>
+    ({
       status: null,
-    } as SignUpResource
-  ),
+    } as SignUpResource),
 );
 
 const mockUseCoreSessionList = jest.fn(() => [] as SessionResource[]);
@@ -75,13 +75,13 @@ jest.mock('ui/contexts', () => ({
           // this should be true since it is a first factor but keeping it false for the needs of the test case
           enabled: false,
           used_for_second_factor: true,
-          second_factors: ['phone_code']
+          second_factors: ['phone_code'],
         },
         email_address: {
           // this should be true since it is a first factor but keeping it false for the needs of the test case
           enabled: false,
           used_for_first_factor: true,
-          first_factors: ['email_code']
+          first_factors: ['email_code'],
         },
         first_name: {
           enabled: true,
@@ -96,8 +96,8 @@ jest.mock('ui/contexts', () => ({
           enabled: false,
         },
         web3_wallet: {
-          enabled: false
-        }
+          enabled: false,
+        },
       },
       social: {
         oauth_google: {
@@ -105,11 +105,11 @@ jest.mock('ui/contexts', () => ({
         },
         oauth_facebook: {
           enabled: true,
-        }
-      }
+        },
+      },
     } as Partial<UserSettings>,
     authConfig: {
-      singleSessionMode: true
+      singleSessionMode: true,
     } as Partial<AuthConfig>,
   })),
   withCoreUserGuard: (a: any) => a,

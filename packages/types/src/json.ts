@@ -2,18 +2,14 @@
  * Currently representing API DTOs in their JSON form.
  */
 
-import { ToggleType, ToggleTypeWithRequire } from './authConfig';
-import { EmailAddressVerificationStrategy } from './emailAddress';
 import { OAuthStrategy } from './oauth';
 import { SessionStatus } from './session';
 import {
-  IdentificationStrategy,
   PreferredSignInStrategy,
   SignInFactor,
   SignInIdentifier,
   SignInStatus,
-  SignInStrategyName,
-  UserData
+  UserData,
 } from './signIn';
 import { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUp';
 import {
@@ -22,7 +18,7 @@ import {
   EmUnit,
   FontFamily,
   FontWeight,
-  HexColor
+  HexColor,
 } from './theme';
 import { UserSettingsJSON } from './userSettings';
 import { VerificationStatus } from './verification';
@@ -216,24 +212,9 @@ export interface PublicUserDataJSON extends ClerkResourceJSON {
 export interface SessionWithActivitiesJSON extends Omit<SessionJSON, 'user'> {
   user: null;
   latest_activity: SessionActivityJSON;
-  // activities: SessionActivityJSON[];
 }
 
-export interface AuthConfigJSON {
-  object: 'auth_config';
-  id: string;
-  first_name: ToggleTypeWithRequire;
-  last_name: ToggleTypeWithRequire;
-  email_address: ToggleType;
-  phone_number: ToggleType;
-  username: ToggleType;
-  password: ToggleTypeWithRequire;
-  identification_strategies: IdentificationStrategy[];
-  identification_requirements: IdentificationStrategy[][];
-  password_conditions: any;
-  first_factors: SignInStrategyName[];
-  second_factors: SignInStrategyName[];
-  email_address_verification_strategies: EmailAddressVerificationStrategy[];
+export interface AuthConfigJSON extends ClerkResourceJSON {
   single_session_mode: boolean;
 }
 
@@ -289,33 +270,33 @@ export interface SessionActivityJSON extends ClerkResourceJSON {
 // TODO: Generalize external account JSON payload to simplify type declarations
 export type ExternalAccountJSON =
   | {
-    object: 'google_account';
-    id: string;
-    google_id: string;
-    approved_scopes: string;
-    email_address: string;
-    given_name: string;
-    family_name: string;
-    picture: string;
-  }
+      object: 'google_account';
+      id: string;
+      google_id: string;
+      approved_scopes: string;
+      email_address: string;
+      given_name: string;
+      family_name: string;
+      picture: string;
+    }
   | {
-    object: 'facebook_account';
-    id: string;
-    facebook_id: string;
-    approved_scopes: string;
-    email_address: string;
-    first_name: string;
-    last_name: string;
-    picture: string;
-  }
+      object: 'facebook_account';
+      id: string;
+      facebook_id: string;
+      approved_scopes: string;
+      email_address: string;
+      first_name: string;
+      last_name: string;
+      picture: string;
+    }
   | {
-    object: 'external_account';
-    provider: string;
-    identification_id: string;
-    provider_user_id: string;
-    approved_scopes: string;
-    email_address: string;
-    first_name: string;
-    last_name: string;
-    avatar_url: string;
-  };
+      object: 'external_account';
+      provider: string;
+      identification_id: string;
+      provider_user_id: string;
+      approved_scopes: string;
+      email_address: string;
+      first_name: string;
+      last_name: string;
+      avatar_url: string;
+    };

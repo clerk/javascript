@@ -1,5 +1,5 @@
 import { snakeToCamel } from '@clerk/shared/utils';
-import type { EnvironmentResource, ToggleTypeWithRequire } from '@clerk/types';
+import type { EnvironmentResource } from '@clerk/types';
 
 type FieldKeys =
   | 'emailOrPhone'
@@ -11,8 +11,10 @@ type FieldKeys =
   | 'password'
   | 'invitationToken';
 
+// TODO: Refactor SignUp component and remove
+// this leftover type
 type Fields = {
-  [key in FieldKeys]?: ToggleTypeWithRequire;
+  [key in FieldKeys]?: 'on' | 'off' | 'required';
 };
 
 export function determineFirstPartyFields(
