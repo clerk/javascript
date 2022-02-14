@@ -1,6 +1,6 @@
 {
   "name": "@clerk/backend-core",
-  "version": "0.4.1-staging.0",
+  "version": "0.4.1",
   "license": "MIT",
   "scripts": {
     "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && ./moduleTypeFix",
