@@ -106,7 +106,7 @@ describe('UserSettings', () => {
       },
     } as any as UserSettingsJSON);
 
-    const res = sut.standardFormAttributes;
+    const res = sut.enabledFirstFactorIdentifiers;
     expect(res).toEqual(['email_address', 'phone_number']);
   });
 });

@@ -35,7 +35,7 @@ const FirstFactorConfigs = Object.freeze({
   },
 } as Record<string, { label: string; fieldType: string }>);
 
-export const getInputControlDisplayValues = (attributes: string[]) => {
+export const getIdentifierControlDisplayValues = (attributes: string[]) => {
   const indexKey = attributes.length == 0 ? null : [...attributes].sort().join('_');
   return FirstFactorConfigs[indexKey || 'default'];
 };

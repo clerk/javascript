@@ -23,7 +23,9 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
 
   socialProviderStrategies: OAuthStrategy[] = [];
   web3FirstFactors: Web3Strategy[] = [];
-  standardFormAttributes: Array<keyof UserSettingsResource['attributes']> = [];
+  enabledFirstFactorIdentifiers: Array<
+    keyof UserSettingsResource['attributes']
+  > = [];
 
   public constructor(data: UserSettingsJSON) {
     super();
@@ -39,13 +41,13 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
       data.social,
     );
     this.web3FirstFactors = this.getWeb3FirstFactors(data.attributes);
-    this.standardFormAttributes = this.getStandardFormAttributes(
+    this.enabledFirstFactorIdentifiers = this.getEnabledFirstFactorIdentifiers(
       data.attributes,
     );
     return this;
   }
 
-  private getStandardFormAttributes(
+  private getEnabledFirstFactorIdentifiers(
     attributes: Attributes,
   ): Array<keyof UserSettingsResource['attributes']> {
     if (!attributes) {
@@ -77,6 +79,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     if (!social) {
       return [];
     }
+
     return Object.entries(social)
       .filter(([, desc]) => desc.enabled)
       .map(([, desc]) => desc.strategy)

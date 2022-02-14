@@ -8,7 +8,7 @@ import React from 'react';
 import {
   buildRequest,
   FieldState,
-  getInputControlDisplayValues,
+  getIdentifierControlDisplayValues,
   handleError,
   PoweredByClerk,
   Separator,
@@ -36,19 +36,16 @@ export function _SignInStart(): JSX.Element {
   const instantPassword = useFieldState('password', '');
   const [error, setError] = React.useState<string | undefined>();
 
-  const standardFormAttributes = userSettings.standardFormAttributes;
+  const standardFormAttributes = userSettings.enabledFirstFactorIdentifiers;
   const web3FirstFactors = userSettings.web3FirstFactors;
   const socialProviderStrategies = userSettings.socialProviderStrategies;
 
-  const standardFormFieldInputValues = getInputControlDisplayValues(standardFormAttributes);
+  const identifierInputDisplayValues = getIdentifierControlDisplayValues(standardFormAttributes);
 
   React.useEffect(() => {
     async function handleOauthError() {
       const error = signIn?.firstFactorVerification?.error;
-      if (
-        error?.code === ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP ||
-        error?.code === ERROR_CODES.OAUTH_ACCESS_DENIED
-      ) {
+      if (error?.code === ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP || error?.code === ERROR_CODES.OAUTH_ACCESS_DENIED) {
         setError(error.longMessage);
         // TODO: This is a workaround in order to reset the sign in attempt
         // so that the oauth error does not persist on full page reloads.
@@ -135,12 +132,12 @@ export function _SignInStart(): JSX.Element {
               submitButtonLabel='Continue'
             >
               <Control
-                label={standardFormFieldInputValues.label}
+                label={identifierInputDisplayValues.label}
                 labelClassName='cl-label'
                 error={identifier.error}
                 htmlFor='text-field-identifier'
               >
-                {standardFormFieldInputValues.fieldType === phoneFieldType ? (
+                {identifierInputDisplayValues.fieldType === phoneFieldType ? (
                   <PhoneInput
                     id='text-field-identifier'
                     name='text-field-identifier'
@@ -150,7 +147,7 @@ export function _SignInStart(): JSX.Element {
                   <Input
                     id='text-field-identifier'
                     name='text-field-identifier'
-                    type={standardFormFieldInputValues.fieldType as any}
+                    type={identifierInputDisplayValues.fieldType as any}
                     handleChange={el => identifier.setValue(el.value || '')}
                     value={identifier.value}
                     autoFocus

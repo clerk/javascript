@@ -18,6 +18,11 @@ describe('determineFirstPartyFields()', () => {
               email_address: {
                 enabled: true,
                 required: true,
+                used_for_first_factor: true,
+              },
+              phone_number: {
+                enabled: true,
+                required: false,
               },
               first_name: {
                 enabled: true,
@@ -50,9 +55,14 @@ describe('determineFirstPartyFields()', () => {
         {
           userSettings: new UserSettings({
             attributes: {
+              email_address: {
+                enabled: true,
+                required: false,
+              },
               phone_number: {
                 enabled: true,
                 required: true,
+                used_for_first_factor: true,
               },
               first_name: {
                 enabled: true,
@@ -88,10 +98,12 @@ describe('determineFirstPartyFields()', () => {
               phone_number: {
                 enabled: true,
                 required: true,
+                used_for_first_factor: true,
               },
               email_address: {
                 enabled: true,
                 required: true,
+                used_for_first_factor: true,
               },
               first_name: {
                 enabled: true,
@@ -135,6 +147,12 @@ describe('determineFirstPartyFields()', () => {
                 required: true,
               },
               username: {
+                enabled: true,
+              },
+              email_address: {
+                enabled: true,
+              },
+              phone_number: {
                 enabled: true,
               },
             },
@@ -183,23 +201,19 @@ describe('determineFirstPartyFields()', () => {
     ];
 
     it.each(scenaria)('%s', (___, environment, result) => {
-      expect(
-        determineFirstPartyFields(environment as EnvironmentResource),
-      ).toEqual(result);
+      expect(determineFirstPartyFields(environment as EnvironmentResource)).toEqual(result);
     });
 
     it.each(scenaria)('with invitation, %s', (___, environment, result) => {
       // Email address or phone number cannot be required when there's an
       // invitation token present. Instead, we'll require the invitationToken
       // parameter
-      const res = { ...result };
-      delete res.emailAddress;
-      delete res.phoneNumber;
-      delete res.emailOrPhone;
-
-      expect(
-        determineFirstPartyFields(environment as EnvironmentResource, true),
-      ).toEqual({ ...result, invitationToken: 'required' });
+      const expected = { ...result, invitationToken: 'required' };
+      delete expected.emailAddress;
+      delete expected.phoneNumber;
+      delete expected.emailOrPhone;
+      const res = determineFirstPartyFields(environment as EnvironmentResource, true);
+      expect(res).toMatchObject(expected);
     });
   });
 });
