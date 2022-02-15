@@ -4,11 +4,13 @@ import { AbstractApi } from './AbstractApi';
 interface UserParams {
   firstName?: string;
   lastName?: string;
+  username?: string;
   password?: string;
   primaryEmailAddressID?: string;
   primaryPhoneNumberID?: string;
   publicMetadata?: Record<string, unknown> | string;
   privateMetadata?: Record<string, unknown> | string;
+  unsafeMetadata?: Record<string, unknown> | string;
 }
 
 interface UserListParams {
@@ -103,6 +105,10 @@ export class UserApi extends AbstractApi {
       params.privateMetadata = JSON.stringify(params.privateMetadata);
     }
 
+    if (params.unsafeMetadata && !(typeof params.unsafeMetadata == 'string')) {
+      params.unsafeMetadata = JSON.stringify(params.unsafeMetadata);
+    }
+
     return this._restClient.makeRequest<User>({
       method: 'PATCH',
       path: `/users/${userId}`,
@@ -122,7 +128,7 @@ export class UserApi extends AbstractApi {
 function sanitizeMetadataParams(
   params: UserMetadataParams & {
     [key: string]: Record<string, unknown> | undefined;
-  }
+  },
 ): UserMetadataRequestBody {
   return userMetadataKeys.reduce(
     (res: Record<string, string>, key: string): Record<string, string> => {
@@ -131,6 +137,6 @@ function sanitizeMetadataParams(
       }
       return res;
     },
-    {}
+    {},
   );
 }

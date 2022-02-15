@@ -1,7 +1,7 @@
 {
   "id": "user_1oBNj55jOjSK9rOYrT5QHqj7eaK",
   "object": "user",
-  "username": null,
+  "username": "clerk_boss",
   "first_name": "Boss",
   "last_name": "Clerk",
   "profile_image_url": "https://images.clerk.services/clerk/default-profile.svg",
