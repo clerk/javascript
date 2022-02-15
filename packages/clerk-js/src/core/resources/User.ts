@@ -11,7 +11,6 @@ import type {
   UserResource,
   Web3WalletResource,
 } from '@clerk/types';
-import { SessionWithActivities } from 'core/resources/SessionWithActivities';
 import { unixEpochToDate } from 'utils/date';
 import { normalizeUnsafeMetadata } from 'utils/resourceParams';
 
@@ -22,6 +21,7 @@ import {
   ExternalAccount,
   Image,
   PhoneNumber,
+  SessionWithActivities,
   Token,
   Web3Wallet,
 } from './internal';

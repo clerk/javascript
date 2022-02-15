@@ -1,5 +1,5 @@
 import { ClerkAPIError } from '@clerk/types';
-import { isClerkAPIResponseError } from 'core/resources/Error';
+import { isClerkAPIResponseError } from 'core/resources/internal';
 
 import type { FieldState } from './forms';
 

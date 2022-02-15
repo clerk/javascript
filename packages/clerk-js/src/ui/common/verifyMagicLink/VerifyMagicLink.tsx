@@ -1,4 +1,4 @@
-import { isMagicLinkError, MagicLinkErrorCode } from 'core/resources/Error';
+import { isMagicLinkError, MagicLinkErrorCode } from 'core/resources/internal';
 import React, { useEffect, useState } from 'react';
 import type { MagicLinkVerificationStatusModalProps } from 'ui/common';
 import { MagicLinkVerificationStatusModal } from 'ui/common';
