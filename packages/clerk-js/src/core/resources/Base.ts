@@ -6,10 +6,9 @@ import type {
   HTTPMethod,
 } from 'core/fapiClient';
 
-import type Clerk from '../clerk';
 import { clerkMissingFapiClientInResources } from '../errors';
-import { Client } from './Client';
-import { ClerkAPIResponseError } from './Error';
+import type { Clerk } from './internal';
+import { ClerkAPIResponseError, Client } from './internal';
 
 export type BaseFetchOptions = { forceUpdateClient?: boolean };
 
@@ -95,9 +94,7 @@ export abstract class BaseResource {
       return baseWithId;
     }
 
-    return (
-      baseWithId.replace(/[^/]$/, '$&/') + encodeURIComponent(action as string)
-    );
+    return baseWithId.replace(/[^/]$/, '$&/') + encodeURIComponent(action);
   }
 
   protected abstract fromJSON(data: ClerkResourceJSON | null): this;

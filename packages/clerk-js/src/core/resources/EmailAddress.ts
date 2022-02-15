@@ -10,9 +10,7 @@ import type {
 } from '@clerk/types';
 import { clerkVerifyEmailAddressCalledBeforeCreate } from 'core/errors';
 
-import { BaseResource } from './Base';
-import { IdentificationLink } from './IdentificationLink';
-import { Verification } from './Verification';
+import { BaseResource, IdentificationLink, Verification } from './internal';
 
 export class EmailAddress extends BaseResource implements EmailAddressResource {
   id!: string;

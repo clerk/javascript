@@ -31,8 +31,7 @@ import {
 } from 'utils';
 
 import { STRATEGY_WEB3_METAMASK_SIGNATURE } from '../constants';
-import { BaseResource } from './Base';
-import { Verification } from './Verification';
+import { BaseResource, Verification } from './internal';
 
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';

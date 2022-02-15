@@ -4,8 +4,7 @@ import type {
   Web3WalletResource,
 } from '@clerk/types';
 
-import { BaseResource } from './Base';
-import { Verification } from './Verification';
+import { BaseResource, Verification } from './internal';
 
 export class Web3Wallet extends BaseResource implements Web3WalletResource {
   id!: string;

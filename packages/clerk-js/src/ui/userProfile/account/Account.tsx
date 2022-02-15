@@ -1,4 +1,4 @@
-import type { AuthConfigResource } from '@clerk/types';
+import type { UserSettingsResource } from '@clerk/types';
 import React from 'react';
 import { useEnvironment } from 'ui/contexts';
 import { PersonalInformationCard } from 'ui/userProfile/account/personalInformation';
@@ -6,7 +6,7 @@ import { ProfileCard } from 'ui/userProfile/account/profileCard';
 import { PageHeading } from 'ui/userProfile/pageHeading';
 
 export const Account = (): JSX.Element => {
-  const { authConfig } = useEnvironment();
+  const { userSettings } = useEnvironment();
 
   return (
     <>
@@ -15,13 +15,14 @@ export const Account = (): JSX.Element => {
         subtitle='Manage settings related to your account'
       />
       <ProfileCard />
-      {shouldShowPersonalInformation(authConfig) && <PersonalInformationCard />}
+      {shouldShowPersonalInformation(userSettings) && <PersonalInformationCard />}
     </>
   );
 };
 
 function shouldShowPersonalInformation(
-  authConfig: AuthConfigResource,
+  userSettings: UserSettingsResource,
 ): boolean {
-  return authConfig.firstName !== 'off' || authConfig.lastName !== 'off';
+  const { attributes: { first_name, last_name } } = userSettings;
+  return first_name.enabled || last_name.enabled;
 }
