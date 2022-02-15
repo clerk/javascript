@@ -119,7 +119,7 @@ test('getUser() returns a single user', async () => {
 
   expect(user.web3Wallets.length).toEqual(1);
   expect(user.web3Wallets[0].web3Wallet).toEqual(
-    '0x0000000000000000000000000000000000000000'
+    '0x0000000000000000000000000000000000000000',
   );
   expect(user.web3Wallets[0].verification).toMatchObject({
     attempts: 1,
@@ -133,19 +133,7 @@ test('getUser() returns a single user', async () => {
 
 test('getUser() throws an error without user ID', async () => {
   await expect(TestBackendAPIClient.users.getUser('')).rejects.toThrow(
-    'A valid ID is required.'
-  );
-});
-
-test('updateUser() throws an error without user ID', async () => {
-  await expect(TestBackendAPIClient.users.updateUser('', {})).rejects.toThrow(
-    'A valid ID is required.'
-  );
-});
-
-test('deleteUser() throws an error without user ID', async () => {
-  await expect(TestBackendAPIClient.users.deleteUser('')).rejects.toThrow(
-    'A valid ID is required.'
+    'A valid ID is required.',
   );
 });
 
@@ -166,4 +154,40 @@ test('createUser() creates a user', async () => {
 
   const user = await TestBackendAPIClient.users.createUser(params);
   expect(user.firstName).toEqual('Boss');
+});
+
+test('updateUser() updates a user', async () => {
+  const params = {
+    emailAddress: ['boss@clerk.dev'],
+    phoneNumber: ['+15555555555'],
+    username: 'clerk_boss',
+    password: '123456',
+    firstName: 'Boss',
+    lastName: 'Clerk',
+  };
+
+  nock('https://api.clerk.dev')
+    .patch('/v1/users/user_1oBNj55jOjSK9rOYrT5QHqj7eaK', snakecaseKeys(params))
+    .replyWithFile(200, __dirname + '/responses/updateUser.json', {
+      'Content-Type': '',
+    });
+
+  const user = await TestBackendAPIClient.users.updateUser(
+    'user_1oBNj55jOjSK9rOYrT5QHqj7eaK',
+    params,
+  );
+  expect(user.firstName).toEqual('Boss');
+  expect(user.username).toEqual('clerk_boss');
+});
+
+test('updateUser() throws an error without user ID', async () => {
+  await expect(TestBackendAPIClient.users.updateUser('', {})).rejects.toThrow(
+    'A valid ID is required.',
+  );
+});
+
+test('deleteUser() throws an error without user ID', async () => {
+  await expect(TestBackendAPIClient.users.deleteUser('')).rejects.toThrow(
+    'A valid ID is required.',
+  );
 });
