@@ -5,7 +5,7 @@ import {
   SessionResource,
   UserResource,
 } from '@clerk/types';
-import { Client, Session, User } from 'core/resources';
+import { Client, Session, User } from 'core/resources/internal';
 
 type AcceptedResource = UserResource | ClientResource | SessionResource;
 

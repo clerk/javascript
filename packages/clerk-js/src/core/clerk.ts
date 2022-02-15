@@ -23,9 +23,6 @@ import type {
   UserProfileProps,
   UserResource,
 } from '@clerk/types';
-import { Client } from 'core/resources/Client';
-import { Environment } from 'core/resources/Environment';
-import { MagicLinkError, MagicLinkErrorCode } from 'core/resources/Error';
 import { AuthenticationService } from 'core/services';
 import { ERROR_CODES } from 'ui/common/constants';
 import {
@@ -58,7 +55,13 @@ import createFapiClient, {
   FapiClient,
   FapiRequestCallback,
 } from './fapiClient';
-import { BaseResource } from './resources/Base';
+import {
+  BaseResource,
+  Client,
+  Environment,
+  MagicLinkError,
+  MagicLinkErrorCode,
+} from './resources/internal';
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 
@@ -293,7 +296,7 @@ export default class Clerk implements ClerkInterface {
     if (this.#unloading) {
       return;
     }
-    this.session = session as ActiveSessionResource | null;
+    this.session = session ;
     this.user = this.session ? this.session.user : null;
 
     this.#emit();
