@@ -2,7 +2,7 @@
   "name": "@clerk/types",
   "version": "1.25.2-staging.0",
   "license": "MIT",
-  "description": "Typings for Clerk.dev libraries.",
+  "description": "Typings for Clerk libraries.",
   "keywords": [
     "clerk",
     "react",
