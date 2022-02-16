@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.4.3](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.4.2...@clerk/backend-core@0.4.3) (2022-02-16)
+
+
+### Bug Fixes
+
+* **backend-core:** Include tslib independently ([9511d3e](https://github.com/clerkinc/javascript/commit/9511d3ef5c1f3e862926ee764134056274e1334a))
+
+
+
 ### [0.4.2](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.4.1...@clerk/backend-core@0.4.2) (2022-02-16)
 
 
