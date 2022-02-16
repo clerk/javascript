@@ -8,10 +8,10 @@
   "version": "0.0.0",
   "license": "MIT",
   "private": true,
-  "packageManager": "npm@8.4.1",
+  "packageManager": "npm@8.5.0",
   "engines": {
     "node": ">=16.8.0",
-    "npm": ">=8"
+    "npm": ">=8.5.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^16.0.2",
@@ -39,7 +39,7 @@
     "bump:staging": "lerna version prepatch --preid staging",
     "graduate": "lerna version --conventional-graduate",
     "release:staging": "lerna publish from-package --dist-tag staging",
-    "release": "lerna publish from-git",
+    "release": "lerna publish from-package",
     "prerelease": "turbo run build test --concurrency=${TURBO_CONCURRENCY:-2}",
     "release:next": "lerna publish from-package --dist-tag next",
     "prerelease:next": "turbo run build --concurrency=${TURBO_CONCURRENCY:-2}",

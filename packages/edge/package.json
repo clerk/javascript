@@ -2,7 +2,7 @@
   "name": "@clerk/edge",
   "version": "0.3.3",
   "license": "MIT",
-  "description": "Clerk.dev SDK for Edge/Serverless authentication",
+  "description": "Clerk SDK for serverless and edge environments",
   "keywords": [
     "clerk",
     "typescript",
