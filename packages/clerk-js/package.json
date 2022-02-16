@@ -60,7 +60,7 @@
     "@babel/preset-typescript": "^7.12.1",
     "@clerk/shared": "^0.0.3-staging.0",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.2",
-    "@svgr/webpack": "^5.5.0",
+    "@svgr/webpack": "^6.2.1",
     "@testing-library/dom": "^7.28.1",
     "@testing-library/jest-dom": "^5.11.6",
     "@testing-library/react": "^11.2.1",

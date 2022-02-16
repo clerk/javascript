@@ -13,7 +13,7 @@
   },
   "peerDependencies": {
     "@popperjs/core": "^2.5.4",
-    "@svgr/webpack": "^5.5.0",
+    "@svgr/webpack": "^6.2.1",
     "core-js": "^3.18.3",
     "js-cookie": "^2.2.1",
     "react": "17.0.2",
@@ -29,7 +29,7 @@
     "@clerk/types": "^1.25.2-staging.0",
     "@popperjs/core": "^2.5.4",
     "@sentry/browser": "^6.3.0",
-    "@svgr/webpack": "^5.5.0",
+    "@svgr/webpack": "^6.2.1",
     "@testing-library/dom": "^7.28.1",
     "@testing-library/jest-dom": "^5.11.6",
     "@testing-library/react": "^11.2.1",
