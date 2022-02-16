@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.14.0-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@2.13.3-staging.0...@clerk/clerk-js@2.14.0-staging.0) (2022-02-16)
+
+
+### Features
+
+* **clerk-js:** Import all resources from internal.ts ([#44](https://github.com/clerkinc/javascript/issues/44)) ([5b8f6f8](https://github.com/clerkinc/javascript/commit/5b8f6f81ed3d823840a0c4d3edcbd3c8298d7d42))
+
+
+
 ### [2.13.3-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@2.13.2...@clerk/clerk-js@2.13.3-staging.0) (2022-02-15)
 
 

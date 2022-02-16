@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.4.2](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.4.1...@clerk/backend-core@0.4.2) (2022-02-16)
+
+
+### Bug Fixes
+
+* **backend-core:** Allow username and unsafeMetadata updates via BAPI ([#45](https://github.com/clerkinc/javascript/issues/45)) ([bc89674](https://github.com/clerkinc/javascript/commit/bc8967405ff7ce51bbce32a4686aa64c87c12fed))
+
+
+
 ### [0.4.1](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.4.1-staging.0...@clerk/backend-core@0.4.1) (2022-02-14)
 
 **Note:** Version bump only for package @clerk/backend-core
