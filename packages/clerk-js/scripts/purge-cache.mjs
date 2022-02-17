@@ -18,12 +18,12 @@ try {
     await fetch(
       `https://purge.jsdelivr.net/npm/@clerk/clerk-js@staging/dist/clerk.browser.js`,
     );
-    return;
   } else {
     await fetch(
       `https://purge.jsdelivr.net/npm/@clerk/clerk-js@next/dist/clerk.browser.js`,
     );
   }
+  console.log('🎉 JSDelivr cache for @clerk/clerk-js was successfully purged!');
 } catch (err) {
   console.error('Something went wrong with `postpublish` in clerk-js!');
   console.error(err);
