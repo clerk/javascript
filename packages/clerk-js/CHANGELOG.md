@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [2.14.1-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@2.14.0-staging.0...@clerk/clerk-js@2.14.1-staging.0) (2022-02-17)
+
+**Note:** Version bump only for package @clerk/clerk-js
+
+
+
+
+
 ## [2.14.0-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@2.13.3-staging.0...@clerk/clerk-js@2.14.0-staging.0) (2022-02-16)
 
 
