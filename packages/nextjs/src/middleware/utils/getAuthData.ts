@@ -17,9 +17,7 @@ export async function getAuthData(
 
   const getToken = async (options: GetSessionTokenOptions = {}) => {
     if (options.template) {
-      throw new Error(
-        'Retrieving a JWT template during SSR will be supported soon.',
-      );
+      throw new Error('Retrieving a JWT template during SSR will be supported soon.');
     }
     return cookies['__session'] || null;
   };
@@ -33,19 +31,18 @@ export async function getAuthData(
   };
 
   try {
-    const { status, sessionClaims, interstitial } =
-      await Clerk.base.getAuthState({
-        cookieToken: cookies['__session'],
-        clientUat: cookies['__client_uat'],
-        headerToken: headers.authorization?.replace('Bearer ', ''),
-        origin: headers.origin,
-        host: headers.host as string,
-        forwardedPort: headers['x-forwarded-port'] as string,
-        forwardedHost: headers['x-forwarded-host'] as string,
-        referrer: headers.referer,
-        userAgent: headers['user-agent'] as string,
-        fetchInterstitial: () => Clerk.fetchInterstitial(),
-      });
+    const { status, sessionClaims, interstitial } = await Clerk.base.getAuthState({
+      cookieToken: cookies['__session'],
+      clientUat: cookies['__client_uat'],
+      headerToken: headers.authorization?.replace('Bearer ', ''),
+      origin: headers.origin,
+      host: headers.host as string,
+      forwardedPort: headers['x-forwarded-port'] as string,
+      forwardedHost: headers['x-forwarded-host'] as string,
+      referrer: headers.referer,
+      userAgent: headers['user-agent'] as string,
+      fetchInterstitial: () => Clerk.fetchInterstitial(),
+    });
 
     if (status === AuthStatus.Interstitial) {
       ctx.res.writeHead(401, { 'Content-Type': 'text/html' });
@@ -57,12 +54,10 @@ export async function getAuthData(
       return signedOutState;
     }
 
-    const user = loadUser
-      ? await users.getUser(sessionClaims.sub as string)
-      : undefined;
-    const session = loadSession
-      ? await sessions.getSession(sessionClaims.sid as string)
-      : undefined;
+    const [user, session] = await Promise.all([
+      loadUser ? users.getUser(sessionClaims.sub as string) : Promise.resolve(undefined),
+      loadSession ? await sessions.getSession(sessionClaims.sid as string) : Promise.resolve(undefined),
+    ]);
 
     return {
       sessionId: sessionClaims.sid as string,
