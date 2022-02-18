@@ -1,6 +1,6 @@
 import { Session, User } from '@clerk/backend-core/src';
 import { ServerSideAuth } from '@clerk/types';
-import { LoaderFunction } from 'remix';
+import { LoaderFunction } from '@remix-run/server-runtime';
 
 export type WithClerkState<U = any> = {
   data: U;
