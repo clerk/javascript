@@ -2,7 +2,7 @@ import { AuthStatus, Session, User } from '@clerk/backend-core';
 import Clerk, { sessions, users } from '@clerk/clerk-sdk-node';
 import { GetSessionTokenOptions } from '@clerk/types';
 
-import { GetAuthOptions } from './types';
+import { RootAuthLoaderOptions } from './types';
 import { extractInterstitialHtmlContent, parseCookies } from './utils';
 
 export type AuthData = {
@@ -15,7 +15,7 @@ export type AuthData = {
 
 export async function getAuthData(
   req: Request,
-  opts: GetAuthOptions,
+  opts: RootAuthLoaderOptions = {},
 ): Promise<{ authData: AuthData | null; interstitial?: string }> {
   const { loadSession, loadUser } = opts;
   const { headers } = req;
@@ -60,7 +60,7 @@ export async function getAuthData(
 
     const [user, session] = await Promise.all([
       loadUser ? users.getUser(sessionClaims.sub as string) : Promise.resolve(undefined),
-      loadSession ? await sessions.getSession(sessionClaims.sid as string) : Promise.resolve(undefined),
+      loadSession ? sessions.getSession(sessionClaims.sid as string) : Promise.resolve(undefined),
     ]);
 
     return {
