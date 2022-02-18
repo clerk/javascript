@@ -56,7 +56,7 @@ export async function getAuthData(
 
     const [user, session] = await Promise.all([
       loadUser ? users.getUser(sessionClaims.sub as string) : Promise.resolve(undefined),
-      loadSession ? await sessions.getSession(sessionClaims.sid as string) : Promise.resolve(undefined),
+      loadSession ? sessions.getSession(sessionClaims.sid as string) : Promise.resolve(undefined),
     ]);
 
     return {
