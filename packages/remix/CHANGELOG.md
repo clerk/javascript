@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.0-alpha.1](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.1.0-alpha.0...@clerk/remix@0.1.0-alpha.1) (2022-02-18)
+
+
+### Bug Fixes
+
+* **remix:** Allow no return from `rootAuthLoader` callback ([55f14e0](https://github.com/clerkinc/javascript/commit/55f14e0706eb45b8e6808e7f33d7b430cf3d2afd))
+* **remix:** Make `clerkState` required ([df88977](https://github.com/clerkinc/javascript/commit/df88977531b12d15f245ff2cbc8ce360e4d52b91))
+
+
+
 ## 0.1.0-alpha.0 (2022-02-18)
 
 
