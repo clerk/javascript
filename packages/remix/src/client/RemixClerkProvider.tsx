@@ -11,7 +11,7 @@ export * from '@clerk/clerk-react';
 type RemixClerkProviderProps<ClerkStateT extends { __type: 'clerkState' } = any> = {
   frontendApi: string;
   children: React.ReactNode;
-  clerkState?: ClerkStateT;
+  clerkState: ClerkStateT;
 } & IsomorphicClerkOptions;
 
 export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): JSX.Element {
