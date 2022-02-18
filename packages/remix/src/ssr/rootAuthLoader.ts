@@ -31,11 +31,6 @@ export async function rootAuthLoader(
 
   const callbackResult = await cb?.(injectAuthIntoArgs(args, sanitizeAuthData(authData!)));
 
-  // Pass through empty returns, allowing Remix to throw default error
-  if (!!cb && !callbackResult) {
-    return callbackResult;
-  }
-
   // Pass through custom responses
   if (isResponse(callbackResult)) {
     if (callbackResult.status >= 300 && callbackResult.status < 400) {
