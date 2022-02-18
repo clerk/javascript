@@ -87,7 +87,7 @@ jest.mock('ui/contexts', () => ({
           enabled: true,
         },
         last_name: {
-          enabled: false,
+          enabled: true,
         },
         username: {
           enabled: false,
