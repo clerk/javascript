@@ -1,4 +1,4 @@
-import { noop, render, renderJSON } from '@clerk/shared/testUtils';
+import { render, renderJSON } from '@clerk/shared/testUtils';
 import {
   AttributeData,
   SessionResource,
@@ -133,21 +133,18 @@ describe('<SignUpVerify/>', () => {
   });
 
   describe('verify email address', () => {
-    it('renders the sign up verification form', () => {
+    it('renders the OTP sign up verification form', () => {
       mockEmailAddressAttribute = {
         enabled: true,
-        first_factors: ['email_code'],
         verifications: ['email_code'],
       };
-      // mockFirstFactors = ['email_code', 'phone_code', 'password'];
       const tree = renderJSON(<SignUpVerifyEmailAddress />);
       expect(tree).toMatchSnapshot();
     });
 
-    it('renders the sign up verification form but prefers email_link if exists', () => {
+    it('renders the magic link sign up verification form ', () => {
       mockEmailAddressAttribute = {
         enabled: true,
-        first_factors: ['email_link'],
         verifications: ['email_link'],
       };
       const tree = renderJSON(<SignUpVerifyEmailAddress />);
@@ -157,29 +154,18 @@ describe('<SignUpVerify/>', () => {
     it('can skip disabled verification strategies', () => {
       mockEmailAddressAttribute = {
         enabled: true,
-        first_factors: ['email_link'],
         verifications: ['email_link'],
       };
       mockDisabledStrategies = ['email_link'];
       const { container } = render(<SignUpVerifyEmailAddress />);
       expect(container.querySelector('.cl-otp-input')).not.toBeNull();
     });
-
-    xit(
-      'renders the verifiation screen, types the OTP and attempts an email address verification',
-      noop,
-    );
   });
 
   describe('verify phone number', () => {
-    it('renders the sign up verification form', () => {
+    it('renders the OTP sign up verification form', () => {
       const tree = renderJSON(<SignUpVerifyPhoneNumber />);
       expect(tree).toMatchSnapshot();
     });
-
-    xit(
-      'renders the verifiation screen, types the OTP and attempts a phone number verification',
-      noop,
-    );
   });
 });

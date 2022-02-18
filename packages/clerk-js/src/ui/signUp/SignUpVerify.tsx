@@ -28,10 +28,8 @@ function _SignUpVerifyEmailAddress(): JSX.Element {
   const { userSettings } = useEnvironment();
   const { attributes } = userSettings;
 
-  // TODO: SignUp should have a field similar to SignIn's supportedFirstFactors
-  // listing the available strategies for this signUp
   const emailLinkStrategyEnabled =
-    attributes.email_address.first_factors.includes('email_link');
+    attributes.email_address.verifications.includes('email_link');
   const disableEmailLink = shouldDisableStrategy(
     useSignUpContext(),
     'email_link',
