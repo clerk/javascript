@@ -1,6 +1,6 @@
 {
-  "name": "@clerk/clerk-remix",
-  "version": "3.0.0-alpha.0",
+  "name": "@clerk/remix",
+  "version": "0.0.1-alpha.0",
   "license": "MIT",
   "description": "Clerk.dev SDK for Remix",
   "keywords": [
@@ -19,12 +19,12 @@
   "files": [
     "dist",
     "src",
-    "api.d.ts",
-    "api.js",
+    "api.server.d.ts",
+    "api.server.js",
     "edge.js",
     "edge.d.ts",
-    "ssr.d.ts",
-    "ssr.js"
+    "ssr.server.d.ts",
+    "ssr.server.js"
   ],
   "scripts": {
     "prepublishOnly": "npm run build",

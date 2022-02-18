@@ -2,7 +2,7 @@ import { Session, User } from '@clerk/backend-core/src';
 import { ServerSideAuth } from '@clerk/types';
 import { LoaderFunction } from 'remix';
 
-export type InferRootLoaderData<U = any> = {
+export type WithClerkState<U = any> = {
   data: U;
   clerkState: { __type: 'clerkState' };
 };
