@@ -7,18 +7,12 @@ export type InferRootLoaderData<U = any> = {
   clerkState: { __type: 'clerkState' };
 };
 
-export type GetAuthReturn<Options> = Promise<
-  ServerSideAuth &
-    (Options extends { loadSession: true } ? { session: Session | null } : {}) &
-    (Options extends { loadUser: true } ? { user: User | null } : {})
->;
+export type GetAuthReturn = Promise<ServerSideAuth>;
 
-export type GetAuthOptions = {
+export type RootAuthLoaderOptions = {
   loadUser?: boolean;
   loadSession?: boolean;
 };
-
-export type RootAuthLoaderOptions = GetAuthOptions;
 
 export type RootAuthLoaderCallback<Options> = (args: LoaderFunctionArgsWithAuth<Options>) => LoaderFunctionReturn;
 
