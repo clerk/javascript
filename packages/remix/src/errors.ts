@@ -24,8 +24,8 @@ You're trying to pass an invalid object in "<ClerkProvider clerkState={...}>".
 ${ssrExample}
 `);
 
-export const notUsingSsrWarning = createErrorMessage(`
-You installed Clerk in a Remix project, but it looks like you're not taking full advantage of SSR. If you want to enable SSR, try the following:
+export const noClerkStateError = createErrorMessage(`
+Looks like you didn't pass 'clerkState' to "<ClerkProvider clerkState={...}>".
 
 ${ssrExample}
 `);
