@@ -20,7 +20,12 @@ export type HTTPMethod =
 
 export type FapiRequestInit = RequestInit & {
   path?: string;
-  search?: string;
+  search?:
+    | string
+    | URLSearchParams
+    | string[][]
+    | Record<string, string>
+    | undefined;
   sessionId?: string;
   url?: URL;
 };

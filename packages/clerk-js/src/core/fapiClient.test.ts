@@ -79,6 +79,16 @@ describe('buildUrl(options)', () => {
     ).toBe('https://clerk.example.com/v1/client/foo?_clerk_js_version=42.0.0');
   });
 
+  it('correctly parses search params', () => {
+    expect(
+      fapiClient.buildUrl({ path: '/foo', search: { test: '1' } }).href,
+    ).toBe('https://clerk.example.com/v1/foo?test=1&_clerk_js_version=42.0.0');
+
+    expect(fapiClient.buildUrl({ path: '/foo', search: 'test=2' }).href).toBe(
+      'https://clerk.example.com/v1/foo?test=2&_clerk_js_version=42.0.0',
+    );
+  });
+
   const cases = [
     ['PUT', '_method=PUT'],
     ['PATCH', '_method=PATCH'],
