@@ -6,7 +6,7 @@ import { getAuthData, injectAuthIntoContext, injectSSRStateIntoProps, sanitizeAu
 const EMPTY_GSSP_RESPONSE = { props: {} };
 
 export function withServerSideAuth<
-  CallbackReturn extends GetServerSidePropsResult<any>,
+  CallbackReturn extends GetServerSidePropsResult<any> | Promise<GetServerSidePropsResult<any>>,
   Options extends WithServerSideAuthOptions,
 >(
   callback: WithServerSideAuthCallback<CallbackReturn, Options>,
