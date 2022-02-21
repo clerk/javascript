@@ -7,10 +7,12 @@ import type {
   Clerk as ClerkInterface,
   ClerkOptions,
   ClientResource,
+  CreateOrganizationParams,
   EnvironmentResource,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
   ListenerCallback,
+  OrganizationResource,
   RedirectOptions,
   Resources,
   SignInProps,
@@ -61,6 +63,7 @@ import {
   Environment,
   MagicLinkError,
   MagicLinkErrorCode,
+  Organization,
 } from './resources/internal';
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
@@ -296,7 +299,7 @@ export default class Clerk implements ClerkInterface {
     if (this.#unloading) {
       return;
     }
-    this.session = session ;
+    this.session = session;
     this.user = this.session ? this.session.user : null;
 
     this.#emit();
@@ -571,6 +574,12 @@ export default class Clerk implements ClerkInterface {
         return Promise.resolve();
       });
     }
+  };
+
+  public createOrganization = async ({
+    name,
+  }: CreateOrganizationParams): Promise<OrganizationResource> => {
+    return await Organization.create(name);
   };
 
   updateClient = (newClient: ClientResource): void => {

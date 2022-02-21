@@ -1,3 +1,4 @@
+import { OrganizationResource } from '.';
 import { ClientResource } from './client';
 import { DisplayThemeJSON } from './json';
 import { ActiveSessionResource } from './session';
@@ -226,6 +227,10 @@ export interface Clerk {
   authenticateWithMetamask: (
     params?: AuthenticateWithMetamaskParams,
   ) => Promise<unknown>;
+
+  createOrganization: (
+    params: CreateOrganizationParams,
+  ) => Promise<OrganizationResource>;
 
   /**
    * Handles a 401 response from Frontend API by refreshing the client and session object accordingly
@@ -465,6 +470,10 @@ export interface HandleMagicLinkVerificationParams {
    * verification on another device.
    */
   onVerifiedOnOtherDevice?: Function;
+}
+
+export interface CreateOrganizationParams {
+  name: string;
 }
 
 export interface AuthenticateWithMetamaskParams {

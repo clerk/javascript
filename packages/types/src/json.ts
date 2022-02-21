@@ -300,3 +300,32 @@ export type ExternalAccountJSON =
       last_name: string;
       avatar_url: string;
     };
+
+export interface OrganizationJSON extends ClerkResourceJSON {
+  object: 'organization';
+  id: string;
+  name: string;
+  instance_id: string;
+  created_by: string;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface OrganizationMembershipJSON extends ClerkResourceJSON {
+  object: 'organization_membership';
+  id: string;
+  organization_id: string;
+  user_id: string;
+  role: string;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface OrganizationInvitationJSON extends ClerkResourceJSON {
+  object: 'organization_invitation';
+  id: string;
+  email_address: string;
+  status: string;
+  created_at: number;
+  updated_at: number;
+}
