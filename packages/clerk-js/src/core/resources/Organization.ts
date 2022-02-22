@@ -1,6 +1,6 @@
 import type {
   GetMembersParams,
-  MemberRole,
+  MembershipRole,
   OrganizationInvitationJSON,
   OrganizationJSON,
   OrganizationMembershipJSON,
@@ -131,11 +131,11 @@ export type GetOrganizationParams = {
 
 export type InviteUserParams = {
   emailAddress: string;
-  role: MemberRole;
+  role: MembershipRole;
   redirectUrl?: string;
 };
 
 export type UpdateMembershipParams = {
   userId: string;
-  role: MemberRole;
+  role: MembershipRole;
 };

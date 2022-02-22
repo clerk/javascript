@@ -1,5 +1,5 @@
 import {
-  MemberRole,
+  MembershipRole,
   OrganizationInvitationJSON,
   OrganizationInvitationResource,
   OrganizationInvitationStatus,
@@ -51,7 +51,7 @@ export class OrganizationInvitation
   protected fromJSON(data: OrganizationInvitationJSON): this {
     this.id = data.id;
     this.emailAddress = data.email_address;
-    this.status = data.status as OrganizationInvitationStatus;
+    this.status = data.status;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     return this;
@@ -60,6 +60,6 @@ export class OrganizationInvitation
 
 export type CreateOrganizationInvitationParams = {
   emailAddress: string;
-  role: MemberRole;
+  role: MembershipRole;
   redirectUrl?: string;
 };

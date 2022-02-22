@@ -1,5 +1,5 @@
 import {
-  MemberRole,
+  MembershipRole,
   OrganizationMembershipJSON,
   OrganizationMembershipResource,
 } from '@clerk/types';
@@ -10,7 +10,7 @@ export class OrganizationMembership implements OrganizationMembershipResource {
   name!: string;
   organizationId!: string;
   userId!: string;
-  role!: MemberRole;
+  role!: MembershipRole;
   createdAt!: Date;
   updatedAt!: Date;
 
@@ -22,7 +22,7 @@ export class OrganizationMembership implements OrganizationMembershipResource {
     this.id = data.id;
     this.organizationId = data.organization_id;
     this.userId = data.user_id;
-    this.role = data.role as MemberRole;
+    this.role = data.role;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     return this;

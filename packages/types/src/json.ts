@@ -2,6 +2,7 @@
  * Currently representing API DTOs in their JSON form.
  */
 
+import { MembershipRole, OrganizationInvitationStatus } from '.';
 import { OAuthStrategy } from './oauth';
 import { SessionStatus } from './session';
 import {
@@ -316,7 +317,7 @@ export interface OrganizationMembershipJSON extends ClerkResourceJSON {
   id: string;
   organization_id: string;
   user_id: string;
-  role: string;
+  role: MembershipRole;
   created_at: number;
   updated_at: number;
 }
@@ -325,7 +326,7 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   object: 'organization_invitation';
   id: string;
   email_address: string;
-  status: string;
+  status: OrganizationInvitationStatus;
   created_at: number;
   updated_at: number;
 }
