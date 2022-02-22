@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [2.14.2-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@2.14.1-staging.0...@clerk/clerk-js@2.14.2-staging.0) (2022-02-22)
+
+
+### Features
+
+* **clerk-js:** Allow passing of object style search params on fapiclient ([8144779](https://github.com/clerkinc/javascript/commit/8144779e37ca4b0a61ac1d452ddd0ab7ccf40f27))
+
+
+
 ### [2.14.1-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@2.14.0-staging.0...@clerk/clerk-js@2.14.1-staging.0) (2022-02-17)
 
 **Note:** Version bump only for package @clerk/clerk-js
