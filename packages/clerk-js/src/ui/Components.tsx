@@ -1,5 +1,6 @@
-import './styles/clerk.scss';
-
+/* eslint-disable simple-import-sort/imports */
+/* disable sorting, clerk.scss should always be imported
+/* after dependencies from /shared */
 import { Modal } from '@clerk/shared/components/modal';
 import { camelToSnakeKeys } from '@clerk/shared/utils/object';
 import type {
@@ -33,6 +34,8 @@ import { SignIn, SignInModal } from './signIn';
 import { SignUp, SignUpModal } from './signUp';
 import { UserButton } from './userButton';
 import { UserProfile } from './userProfile';
+
+import './styles/clerk.scss';
 
 export interface MountProps<T> {
   key: string;
