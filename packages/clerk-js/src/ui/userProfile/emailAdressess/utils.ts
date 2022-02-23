@@ -3,9 +3,8 @@ import { EnvironmentResource } from '@clerk/types';
 export function magicLinksEnabledForInstance(
   env: EnvironmentResource,
 ): boolean {
-  const { userSettings } = env;
-  const { email_address } = userSettings.attributes;
-  return (
-    email_address.enabled && email_address.verifications.includes('email_link')
-  );
+  // TODO: email verification should have a supported strategies field
+  const { authConfig } = env;
+  const { emailAddressVerificationStrategies } = authConfig;
+  return emailAddressVerificationStrategies.includes('email_link');
 }

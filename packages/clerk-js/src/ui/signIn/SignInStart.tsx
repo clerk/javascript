@@ -1,14 +1,19 @@
 import { Control } from '@clerk/shared/components/control';
 import { Form } from '@clerk/shared/components/form';
-import { Input } from '@clerk/shared/components/input';
+import { Input, InputType } from '@clerk/shared/components/input';
 import { PhoneInput } from '@clerk/shared/components/phoneInput';
-import { ClerkAPIError, SignInParams } from '@clerk/types';
+import {
+  ClerkAPIError,
+  OAuthStrategy,
+  SignInParams,
+  Web3Strategy,
+} from '@clerk/types';
 import cn from 'classnames';
 import React from 'react';
 import {
   buildRequest,
   FieldState,
-  getIdentifierControlDisplayValues,
+  FirstFactorConfigs,
   handleError,
   PoweredByClerk,
   Separator,
@@ -17,7 +22,12 @@ import {
 } from 'ui/common';
 import { Body, Header } from 'ui/common/authForms';
 import { ERROR_CODES } from 'ui/common/constants';
-import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from 'ui/contexts';
+import {
+  useCoreClerk,
+  useCoreSignIn,
+  useEnvironment,
+  useSignInContext,
+} from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
 import { useSupportEmail } from 'ui/hooks/useSupportEmail';
 
@@ -25,7 +35,7 @@ import { SignUpLink } from './SignUpLink';
 import { OAuth, Web3 } from './strategies';
 
 export function _SignInStart(): JSX.Element {
-  const { userSettings } = useEnvironment();
+  const environment = useEnvironment();
   const { setSession } = useCoreClerk();
   const signIn = useCoreSignIn();
   const { navigate } = useNavigate();
@@ -36,20 +46,50 @@ export function _SignInStart(): JSX.Element {
   const instantPassword = useFieldState('password', '');
   const [error, setError] = React.useState<string | undefined>();
 
-  const standardFormAttributes = userSettings.enabledFirstFactorIdentifiers;
-  const web3FirstFactors = userSettings.web3FirstFactors;
-  const socialProviderStrategies = userSettings.socialProviderStrategies;
-  const passwordBasedInstance = userSettings.instanceIsPasswordBased;
+  const { authConfig } = environment;
 
-  const identifierInputDisplayValues = getIdentifierControlDisplayValues(standardFormAttributes);
+  const firstPartyOptions = authConfig.identificationStrategies.filter(
+    strategy => !strategy.includes('oauth') && !strategy.includes('web3'),
+  );
 
+  const firstPartyKey =
+    firstPartyOptions.length == 0
+      ? null
+      : [...firstPartyOptions].sort().join('_');
+
+  const firstPartyLabel =
+    firstPartyKey && FirstFactorConfigs[firstPartyKey]
+      ? FirstFactorConfigs[firstPartyKey].label
+      : '';
+
+  const fieldType: InputType = (
+    firstPartyKey && FirstFactorConfigs[firstPartyKey]
+      ? FirstFactorConfigs[firstPartyKey].fieldType
+      : 'text'
+  ) as InputType;
+
+  const firstFactors = authConfig.firstFactors;
+  const web3Options = firstFactors
+    .filter(fac => fac.startsWith('web3'))
+    .sort() as Web3Strategy[];
+  const oauthOptions = firstFactors
+    .filter(fac => fac.startsWith('oauth'))
+    .sort() as OAuthStrategy[];
+
+  // TODO: Clean up the following code end
   React.useEffect(() => {
     async function handleOauthError() {
       const error = signIn?.firstFactorVerification?.error;
-      if (error?.code === ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP || error?.code === ERROR_CODES.OAUTH_ACCESS_DENIED) {
+      if (
+        error?.code === ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP ||
+        error?.code === ERROR_CODES.OAUTH_ACCESS_DENIED
+      ) {
         setError(error.longMessage);
-        // TODO: This is a workaround in order to reset the sign in attempt
-        // so that the oauth error does not persist on full page reloads.
+
+        // TODO: This is a hack to reset the sign in attempt so that the oauth error
+        // does not persist on full page reloads.
+        //
+        // We will revise this strategy as part of the Clerk DX epic.
         void (await signIn.create({}));
       }
     }
@@ -57,7 +97,9 @@ export function _SignInStart(): JSX.Element {
     void handleOauthError();
   });
 
-  const buildSignInParams = (fields: Array<FieldState<string>>): SignInParams => {
+  const buildSignInParams = (
+    fields: Array<FieldState<string>>,
+  ): SignInParams => {
     const hasPassword = fields.some(f => f.name === 'password' && !!f.value);
     if (!hasPassword) {
       fields = fields.filter(f => f.name !== 'password');
@@ -94,7 +136,8 @@ export function _SignInStart(): JSX.Element {
     }
     const instantPasswordError: ClerkAPIError = e.errors.find(
       (e: ClerkAPIError) =>
-        e.code === ERROR_CODES.INVALID_STRATEGY_FOR_USER || e.code === ERROR_CODES.FORM_PASSWORD_INCORRECT,
+        e.code === ERROR_CODES.INVALID_STRATEGY_FOR_USER ||
+        e.code === ERROR_CODES.FORM_PASSWORD_INCORRECT,
     );
     const alreadySignedInError: ClerkAPIError = e.errors.find(
       (e: ClerkAPIError) => e.code === 'identifier_already_signed_in',
@@ -110,35 +153,37 @@ export function _SignInStart(): JSX.Element {
     }
   };
 
-  const handleFirstPartySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleFirstPartySubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ) => {
     e.preventDefault();
     return signInWithFields(identifier, instantPassword);
   };
-
-  const hasSocialOrWeb3Buttons = !!socialProviderStrategies.length || !!web3FirstFactors.length;
 
   return (
     <>
       <Header error={error} />
       <Body>
-        <OAuth oauthOptions={socialProviderStrategies} setError={setError} error={error} />
-        <Web3 web3Options={web3FirstFactors} setError={setError} error={error} />
+        <OAuth oauthOptions={oauthOptions} setError={setError} error={error} />
+        <Web3 web3Options={web3Options} setError={setError} error={error} />
 
-        {standardFormAttributes.length > 0 && (
+        {firstPartyOptions.length > 0 && (
           <>
-            {hasSocialOrWeb3Buttons && <Separator />}
+            {(oauthOptions.length > 0 || web3Options.length > 0) && (
+              <Separator />
+            )}
             <Form
               handleSubmit={handleFirstPartySubmit}
               submitButtonClassName='cl-sign-in-button'
               submitButtonLabel='Continue'
             >
               <Control
-                label={identifierInputDisplayValues.label}
+                label={firstPartyLabel}
                 labelClassName='cl-label'
                 error={identifier.error}
                 htmlFor='text-field-identifier'
               >
-                {identifierInputDisplayValues.fieldType === phoneFieldType ? (
+                {fieldType === phoneFieldType ? (
                   <PhoneInput
                     id='text-field-identifier'
                     name='text-field-identifier'
@@ -148,7 +193,7 @@ export function _SignInStart(): JSX.Element {
                   <Input
                     id='text-field-identifier'
                     name='text-field-identifier'
-                    type={identifierInputDisplayValues.fieldType as any}
+                    type={fieldType}
                     handleChange={el => identifier.setValue(el.value || '')}
                     value={identifier.value}
                     autoFocus
@@ -158,28 +203,24 @@ export function _SignInStart(): JSX.Element {
                 )}
               </Control>
 
-              <>
-                {passwordBasedInstance && (
-                  <Control
-                    key='password'
-                    htmlFor='password'
-                    label='Password'
-                    error={instantPassword.error}
-                    className={cn({
-                      'cl-hidden': !instantPassword.value,
-                    })}
-                  >
-                    <Input
-                      id='password'
-                      type='password'
-                      name='password'
-                      value={instantPassword.value}
-                      handleChange={el => instantPassword.setValue(el.value || '')}
-                      tabIndex={-1}
-                    />
-                  </Control>
-                )}
-              </>
+              <Control
+                key='password'
+                htmlFor='password'
+                label='Password'
+                error={instantPassword.error}
+                className={cn({
+                  'cl-hidden': !instantPassword.value,
+                })}
+              >
+                <Input
+                  id='password'
+                  type='password'
+                  name='password'
+                  value={instantPassword.value}
+                  handleChange={el => instantPassword.setValue(el.value || '')}
+                  tabIndex={-1}
+                />
+              </Control>
             </Form>
           </>
         )}

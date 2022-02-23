@@ -3,15 +3,9 @@ import type {
   DisplayConfigResource,
   EnvironmentJSON,
   EnvironmentResource,
-  UserSettingsResource,
 } from '@clerk/types';
 
-import {
-  AuthConfig,
-  BaseResource,
-  DisplayConfig,
-  UserSettings,
-} from './internal';
+import { AuthConfig, BaseResource, DisplayConfig } from './internal';
 
 export class Environment extends BaseResource implements EnvironmentResource {
   private static instance: Environment;
@@ -19,7 +13,6 @@ export class Environment extends BaseResource implements EnvironmentResource {
   pathRoot = '/environment';
   authConfig!: AuthConfigResource;
   displayConfig!: DisplayConfigResource;
-  userSettings!: UserSettingsResource;
 
   public static getInstance(): Environment {
     if (!Environment.instance) {
@@ -57,7 +50,6 @@ export class Environment extends BaseResource implements EnvironmentResource {
     if (data) {
       this.authConfig = new AuthConfig(data.auth_config);
       this.displayConfig = new DisplayConfig(data.display_config);
-      this.userSettings = new UserSettings(data.user_settings);
     }
     return this;
   }

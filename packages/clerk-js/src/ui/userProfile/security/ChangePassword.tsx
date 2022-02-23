@@ -11,8 +11,7 @@ import { PageHeading } from 'ui/userProfile/pageHeading';
 
 export function ChangePassword(): JSX.Element {
   const user = useCoreUser();
-  const { userSettings } = useEnvironment();
-  const { attributes } = userSettings;
+  const { authConfig } = useEnvironment();
   const { navigate } = useNavigate();
 
   const password = useFieldState('password', '');
@@ -33,7 +32,8 @@ export function ChangePassword(): JSX.Element {
     }
   };
 
-  const showRemovePassword = user.passwordEnabled && !attributes.password.required;
+  const showRemovePassword =
+    user.passwordEnabled && authConfig.password !== 'required';
 
   const onClickRemovePassword = async () => {
     try {

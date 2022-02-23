@@ -685,7 +685,7 @@ describe('<SignInFactorOne/>', () => {
       expect(container.querySelector('.cl-auth-form-spinner')).toBeDefined();
     });
 
-    it('renders the fallback screen', () => {
+    it('renders the fallback screen', async () => {
       (
         useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>
       ).mockImplementation(() => ({
