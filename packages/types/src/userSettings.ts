@@ -70,4 +70,5 @@ export interface UserSettingsResource extends ClerkResource {
   socialProviderStrategies: OAuthStrategy[];
   web3FirstFactors: Web3Strategy[];
   enabledFirstFactorIdentifiers: Attribute[];
+  instanceIsPasswordBased: boolean;
 }

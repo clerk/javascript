@@ -32,7 +32,30 @@ describe('UserSettings', () => {
     expect(res).toEqual(['web3_metamask_signature']);
   });
 
-  it('returns enabled social provier strategies', function () {
+  it('returns if the instance is passwordless or password-based', function () {
+    let sut = new UserSettings({
+      attributes: {
+        password: {
+          enabled: true,
+          required: true,
+        },
+      },
+    } as any as UserSettingsJSON);
+
+    expect(sut.instanceIsPasswordBased).toEqual(true);
+
+    sut = new UserSettings({
+      attributes: {
+        password: {
+          enabled: true,
+          required: false,
+        },
+      },
+    } as any as UserSettingsJSON);
+    expect(sut.instanceIsPasswordBased).toEqual(false);
+  });
+
+  it('returns enabled social provider strategies', function () {
     const sut = new UserSettings({
       social: {
         oauth_google: {
