@@ -89,7 +89,7 @@ fdescribe('<SignInStart/>', () => {
         },
         password: {
           enabled: true,
-          used_for_first_factor: false,
+          required: true,
         },
       },
       social: {
@@ -195,10 +195,10 @@ fdescribe('<SignInStart/>', () => {
       expect(instantPasswordField).toBeDefined();
 
       const inputField = screen.getByLabelText('Email address');
-      await userEvent.type(inputField, 'boss@clerk.dev');
+      userEvent.type(inputField, 'boss@clerk.dev');
 
       // simulate password being filled by a pwd manager
-      await userEvent.type(instantPasswordField, 'wrong pass');
+      userEvent.type(instantPasswordField, 'wrong pass');
 
       const signEmailButton = screen.getByRole('button', { name: /Continue/i });
       userEvent.click(signEmailButton);
@@ -269,6 +269,21 @@ fdescribe('<SignInStart/>', () => {
         expect(mockSetSession).not.toHaveBeenCalled();
         expect(mockNavigate).not.toHaveBeenCalledWith('factor-one');
       });
+    });
+
+    it('does not render instant password is instance is passwordless', () => {
+      mockUserSettings = new UserSettings({
+        attributes: {
+          password: {
+            enabled: true,
+            required: false,
+          },
+        },
+      } as unknown as UserSettingsJSON);
+
+      const { container } = render(<SignInStart />);
+      const instantPasswordField = container.querySelector('input#password') as HTMLInputElement;
+      expect(instantPasswordField).toBeNull();
     });
 
     it.each(['google', 'facebook'])(

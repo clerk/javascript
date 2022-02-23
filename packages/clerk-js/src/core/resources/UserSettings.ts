@@ -9,7 +9,7 @@ import type {
   Web3Strategy,
 } from '@clerk/types';
 
-import {BaseResource} from './internal';
+import { BaseResource } from './internal';
 
 /**
  * @internal
@@ -23,13 +23,15 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
 
   socialProviderStrategies: OAuthStrategy[] = [];
   web3FirstFactors: Web3Strategy[] = [];
-  enabledFirstFactorIdentifiers: Array<
-    keyof UserSettingsResource['attributes']
-  > = [];
+  enabledFirstFactorIdentifiers: Array<keyof UserSettingsResource['attributes']> = [];
 
   public constructor(data: UserSettingsJSON) {
     super();
     this.fromJSON(data);
+  }
+
+  get instanceIsPasswordBased() {
+    return this.attributes.password.enabled && this.attributes.password.required;
   }
 
   protected fromJSON(data: UserSettingsJSON): this {
@@ -37,28 +39,19 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     this.attributes = data.attributes;
     this.signIn = data.sign_in;
     this.signUp = data.sign_up;
-    this.socialProviderStrategies = this.getSocialProviderStrategies(
-      data.social,
-    );
+    this.socialProviderStrategies = this.getSocialProviderStrategies(data.social);
     this.web3FirstFactors = this.getWeb3FirstFactors(data.attributes);
-    this.enabledFirstFactorIdentifiers = this.getEnabledFirstFactorIdentifiers(
-      data.attributes,
-    );
+    this.enabledFirstFactorIdentifiers = this.getEnabledFirstFactorIdentifiers(data.attributes);
     return this;
   }
 
-  private getEnabledFirstFactorIdentifiers(
-    attributes: Attributes,
-  ): Array<keyof UserSettingsResource['attributes']> {
+  private getEnabledFirstFactorIdentifiers(attributes: Attributes): Array<keyof UserSettingsResource['attributes']> {
     if (!attributes) {
       return [];
     }
 
     return Object.entries(attributes)
-      .filter(
-        ([name, attr]) =>
-          attr.used_for_first_factor && !name.startsWith('web3'),
-      )
+      .filter(([name, attr]) => attr.used_for_first_factor && !name.startsWith('web3'))
       .map(([name]) => name) as Array<keyof UserSettingsResource['attributes']>;
   }
 
@@ -68,9 +61,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     }
 
     return Object.entries(attributes)
-      .filter(
-        ([name, attr]) => attr.used_for_first_factor && name.startsWith('web3'),
-      )
+      .filter(([name, attr]) => attr.used_for_first_factor && name.startsWith('web3'))
       .map(([, desc]) => desc.first_factors)
       .flat() as any as Web3Strategy[];
   }

@@ -39,6 +39,7 @@ export function _SignInStart(): JSX.Element {
   const standardFormAttributes = userSettings.enabledFirstFactorIdentifiers;
   const web3FirstFactors = userSettings.web3FirstFactors;
   const socialProviderStrategies = userSettings.socialProviderStrategies;
+  const passwordBasedInstance = userSettings.instanceIsPasswordBased;
 
   const identifierInputDisplayValues = getIdentifierControlDisplayValues(standardFormAttributes);
 
@@ -157,24 +158,28 @@ export function _SignInStart(): JSX.Element {
                 )}
               </Control>
 
-              <Control
-                key='password'
-                htmlFor='password'
-                label='Password'
-                error={instantPassword.error}
-                className={cn({
-                  'cl-hidden': !instantPassword.value,
-                })}
-              >
-                <Input
-                  id='password'
-                  type='password'
-                  name='password'
-                  value={instantPassword.value}
-                  handleChange={el => instantPassword.setValue(el.value || '')}
-                  tabIndex={-1}
-                />
-              </Control>
+              <>
+                {passwordBasedInstance && (
+                  <Control
+                    key='password'
+                    htmlFor='password'
+                    label='Password'
+                    error={instantPassword.error}
+                    className={cn({
+                      'cl-hidden': !instantPassword.value,
+                    })}
+                  >
+                    <Input
+                      id='password'
+                      type='password'
+                      name='password'
+                      value={instantPassword.value}
+                      handleChange={el => instantPassword.setValue(el.value || '')}
+                      tabIndex={-1}
+                    />
+                  </Control>
+                )}
+              </>
             </Form>
           </>
         )}
