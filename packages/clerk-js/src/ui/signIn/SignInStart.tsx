@@ -17,9 +17,15 @@ import {
 } from 'ui/common';
 import { Body, Header } from 'ui/common/authForms';
 import { ERROR_CODES } from 'ui/common/constants';
-import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from 'ui/contexts';
+import {
+  useCoreClerk,
+  useCoreSignIn,
+  useEnvironment,
+  useSignInContext,
+} from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
 import { useSupportEmail } from 'ui/hooks/useSupportEmail';
+import { getClerkQueryParam } from 'utils/getClerkQueryParam';
 
 import { SignUpLink } from './SignUpLink';
 import { OAuth, Web3 } from './strategies';
@@ -34,18 +40,50 @@ export function _SignInStart(): JSX.Element {
 
   const identifier = useFieldState('identifier', '');
   const instantPassword = useFieldState('password', '');
+  const organizationTicket = getClerkQueryParam('__clerk_ticket') || '';
   const [error, setError] = React.useState<string | undefined>();
 
   const standardFormAttributes = userSettings.enabledFirstFactorIdentifiers;
   const web3FirstFactors = userSettings.web3FirstFactors;
   const socialProviderStrategies = userSettings.socialProviderStrategies;
 
-  const identifierInputDisplayValues = getIdentifierControlDisplayValues(standardFormAttributes);
+  const identifierInputDisplayValues = getIdentifierControlDisplayValues(
+    standardFormAttributes,
+  );
+
+  React.useEffect(() => {
+    if (!organizationTicket) {
+      return;
+    }
+
+    signIn
+      .create({
+        strategy: 'ticket',
+        ticket: organizationTicket,
+      })
+      .then(res => {
+        switch (res.status) {
+          case 'needs_first_factor':
+            return navigate('factor-one');
+          case 'needs_second_factor':
+            return navigate('factor-two');
+          case 'complete':
+            return setSession(res.createdSessionId, navigateAfterSignIn);
+          default: {
+            const msg = `Response: ${res.status} not supported yet.\nFor more information contact us at ${supportEmail}`;
+            alert(msg);
+          }
+        }
+      });
+  }, []);
 
   React.useEffect(() => {
     async function handleOauthError() {
       const error = signIn?.firstFactorVerification?.error;
-      if (error?.code === ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP || error?.code === ERROR_CODES.OAUTH_ACCESS_DENIED) {
+      if (
+        error?.code === ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP ||
+        error?.code === ERROR_CODES.OAUTH_ACCESS_DENIED
+      ) {
         setError(error.longMessage);
         // TODO: This is a workaround in order to reset the sign in attempt
         // so that the oauth error does not persist on full page reloads.
@@ -56,7 +94,9 @@ export function _SignInStart(): JSX.Element {
     void handleOauthError();
   });
 
-  const buildSignInParams = (fields: Array<FieldState<string>>): SignInParams => {
+  const buildSignInParams = (
+    fields: Array<FieldState<string>>,
+  ): SignInParams => {
     const hasPassword = fields.some(f => f.name === 'password' && !!f.value);
     if (!hasPassword) {
       fields = fields.filter(f => f.name !== 'password');
@@ -93,7 +133,8 @@ export function _SignInStart(): JSX.Element {
     }
     const instantPasswordError: ClerkAPIError = e.errors.find(
       (e: ClerkAPIError) =>
-        e.code === ERROR_CODES.INVALID_STRATEGY_FOR_USER || e.code === ERROR_CODES.FORM_PASSWORD_INCORRECT,
+        e.code === ERROR_CODES.INVALID_STRATEGY_FOR_USER ||
+        e.code === ERROR_CODES.FORM_PASSWORD_INCORRECT,
     );
     const alreadySignedInError: ClerkAPIError = e.errors.find(
       (e: ClerkAPIError) => e.code === 'identifier_already_signed_in',
@@ -109,19 +150,30 @@ export function _SignInStart(): JSX.Element {
     }
   };
 
-  const handleFirstPartySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleFirstPartySubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ) => {
     e.preventDefault();
     return signInWithFields(identifier, instantPassword);
   };
 
-  const hasSocialOrWeb3Buttons = !!socialProviderStrategies.length || !!web3FirstFactors.length;
+  const hasSocialOrWeb3Buttons =
+    !!socialProviderStrategies.length || !!web3FirstFactors.length;
 
   return (
     <>
       <Header error={error} />
       <Body>
-        <OAuth oauthOptions={socialProviderStrategies} setError={setError} error={error} />
-        <Web3 web3Options={web3FirstFactors} setError={setError} error={error} />
+        <OAuth
+          oauthOptions={socialProviderStrategies}
+          setError={setError}
+          error={error}
+        />
+        <Web3
+          web3Options={web3FirstFactors}
+          setError={setError}
+          error={error}
+        />
 
         {standardFormAttributes.length > 0 && (
           <>

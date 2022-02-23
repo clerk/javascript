@@ -47,8 +47,7 @@ export class Organization extends BaseResource implements OrganizationResource {
       .request<OrganizationJSON[]>({
         method: 'GET',
         path: '/me/organizations',
-        // @ts-ignore
-        search: getOrganizationParams,
+        search: JSON.stringify(getOrganizationParams),
       })
       .then(res => {
         const organizationsJSON = res.payload

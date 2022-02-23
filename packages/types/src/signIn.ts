@@ -70,7 +70,8 @@ export type SignInStrategyName =
   | 'phone_code'
   | Web3Strategy
   | EmailAddressVerificationStrategy
-  | OAuthStrategy;
+  | OAuthStrategy
+  | 'ticket';
 
 export type SignInStatus =
   | 'needs_identifier'
@@ -176,6 +177,12 @@ type SignInAttributes = {
    * This is the URL that the user will be redirected to after the OAuth verification completes.
    */
   redirect_url?: string;
+
+  /**
+   * Organization invitation ticket.
+   * The logic is handled by the backend after the token and strategy is sent.
+   */
+  ticket?: string;
 
   /**
    * Optional if the strategy is one of the OAuth providers.
