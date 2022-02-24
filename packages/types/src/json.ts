@@ -2,19 +2,15 @@
  * Currently representing API DTOs in their JSON form.
  */
 
-import { ToggleType, ToggleTypeWithRequire } from './authConfig';
-import { EmailAddressVerificationStrategy } from './emailAddress';
 import { OAuthStrategy } from './oauth';
 import { OrganizationInvitationStatus } from './organizationInvitation';
 import { MembershipRole } from './organizationMembership';
 import { SessionStatus } from './session';
 import {
-  IdentificationStrategy,
   PreferredSignInStrategy,
   SignInFactor,
   SignInIdentifier,
   SignInStatus,
-  SignInStrategyName,
   UserData,
 } from './signIn';
 import { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUp';
@@ -26,6 +22,7 @@ import {
   FontWeight,
   HexColor,
 } from './theme';
+import { UserSettingsJSON } from './userSettings';
 import { VerificationStatus } from './verification';
 
 export interface ClerkResourceJSON {
@@ -88,6 +85,7 @@ export interface ImageJSON {
 export interface EnvironmentJSON extends ClerkResourceJSON {
   auth_config: AuthConfigJSON;
   display_config: DisplayConfigJSON;
+  user_settings: UserSettingsJSON;
 }
 
 export interface ClientJSON extends ClerkResourceJSON {
@@ -217,24 +215,9 @@ export interface PublicUserDataJSON extends ClerkResourceJSON {
 export interface SessionWithActivitiesJSON extends Omit<SessionJSON, 'user'> {
   user: null;
   latest_activity: SessionActivityJSON;
-  // activities: SessionActivityJSON[];
 }
 
-export interface AuthConfigJSON {
-  object: 'auth_config';
-  id: string;
-  first_name: ToggleTypeWithRequire;
-  last_name: ToggleTypeWithRequire;
-  email_address: ToggleType;
-  phone_number: ToggleType;
-  username: ToggleType;
-  password: ToggleTypeWithRequire;
-  identification_strategies: IdentificationStrategy[];
-  identification_requirements: IdentificationStrategy[][];
-  password_conditions: any;
-  first_factors: SignInStrategyName[];
-  second_factors: SignInStrategyName[];
-  email_address_verification_strategies: EmailAddressVerificationStrategy[];
+export interface AuthConfigJSON extends ClerkResourceJSON {
   single_session_mode: boolean;
 }
 

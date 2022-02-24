@@ -1,7 +1,7 @@
 import { renderJSON } from '@clerk/shared/testUtils';
-import { EmailAddressResource, UserResource } from '@clerk/types';
+import { EmailAddressResource, EnvironmentResource, UserResource } from '@clerk/types';
 import React from 'react';
-
+import { PartialDeep } from 'type-fest';
 import { AddNewEmail } from './AddNewEmail';
 
 const mockNavigate = jest.fn();
@@ -51,11 +51,15 @@ jest.mock('ui/contexts/CoreUserContext', () => {
 jest.mock('ui/contexts/EnvironmentContext', () => {
   return {
     useEnvironment: jest.fn(() => ({
-      authConfig: {
-        firstFactors: ['email_link'],
-        emailAddressVerificationStrategies: ['email_link'],
-      },
-    })),
+      userSettings: {
+        attributes: {
+          email_address: {
+            enabled: true,
+            verifications: ['email_link'],
+          }
+        }
+      }
+    }) as PartialDeep<EnvironmentResource>),
   };
 });
 

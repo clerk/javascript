@@ -1,9 +1,5 @@
-import type {
-  EnvironmentResource,
-  IdentificationStrategy,
-  SignInStrategyName,
-  ToggleTypeWithRequire,
-} from '@clerk/types';
+import { snakeToCamel } from '@clerk/shared/utils';
+import type { Attributes, EnvironmentResource } from '@clerk/types';
 
 type FieldKeys =
   | 'emailOrPhone'
@@ -16,69 +12,53 @@ type FieldKeys =
   | 'invitationToken'
   | 'organizationInvitationToken';
 
+// TODO: Refactor SignUp component and remove
+// this leftover type
 type Fields = {
-  [key in FieldKeys]?: ToggleTypeWithRequire;
+  [key in FieldKeys]?: 'on' | 'off' | 'required';
 };
+
+function isEmailOrPhone(attributes: Attributes) {
+  return (
+    attributes.email_address.used_for_first_factor &&
+    attributes.phone_number.used_for_first_factor
+  );
+}
 
 export function determineFirstPartyFields(
   environment: EnvironmentResource,
   hasInvitation?: boolean,
   hasOrganizationInvitation?: boolean,
 ): Fields {
-  const idRequirements =
-    environment.authConfig.identificationRequirements.flat();
+  const { attributes } = environment.userSettings;
+
   const fields: Fields = {};
 
-  const idByEmail = idRequirements.includes('email_address');
-  const idByPhone = idRequirements.includes('phone_number');
-  const idByEmailOrPhone = idByEmail && idByPhone;
-  const idByUsername =
-    idRequirements.includes('username') ||
-    environment.authConfig.username === 'on';
+  Object.entries(attributes)
+    .filter(([key]) => ['username', 'first_name', 'last_name'].includes(key))
+    .filter(([, desc]) => desc.enabled)
+    .forEach(
+      ([key, desc]) =>
+        (fields[snakeToCamel(key) as keyof Fields] = desc.required
+          ? 'required'
+          : 'on'),
+    );
+
   if (hasInvitation) {
     fields.invitationToken = 'required';
   } else if (hasOrganizationInvitation) {
     fields.organizationInvitationToken = 'required';
-  } else if (idByEmailOrPhone) {
+  } else if (isEmailOrPhone(attributes)) {
     fields.emailOrPhone = 'required';
-  } else if (idByEmail) {
+  } else if (attributes.email_address.used_for_first_factor) {
     fields.emailAddress = 'required';
-  } else if (idByPhone) {
+  } else if (attributes.phone_number.used_for_first_factor) {
     fields.phoneNumber = 'required';
   }
 
-  if (idByEmailOrPhone || idByEmail || idByPhone) {
-    if (idByUsername) {
-      fields.username = environment.authConfig.username;
-    }
-
-    if (environment.authConfig.password === 'required') {
-      fields.password = environment.authConfig.password;
-    }
-
-    if (['on', 'required'].includes(environment.authConfig.firstName)) {
-      fields.firstName = environment.authConfig.firstName;
-    }
-    if (['on', 'required'].includes(environment.authConfig.lastName)) {
-      fields.lastName = environment.authConfig.lastName;
-    }
+  if (attributes.password.required) {
+    fields.password = 'required';
   }
 
   return fields;
-}
-
-export function determineOauthOptions(
-  environment: EnvironmentResource,
-): IdentificationStrategy[] {
-  const idRequirements = [
-    ...new Set(environment.authConfig.identificationRequirements.flat()),
-  ];
-  return idRequirements.filter(fac => fac.startsWith('oauth')).sort();
-}
-
-export function determineWeb3Options(
-  environment: EnvironmentResource,
-): SignInStrategyName[] {
-  const idRequirements = [...new Set(environment.authConfig.firstFactors)];
-  return idRequirements.filter(fac => fac.startsWith('web3')).sort();
 }
