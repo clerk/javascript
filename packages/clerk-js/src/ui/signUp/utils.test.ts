@@ -1,28 +1,46 @@
-import { EnvironmentResource } from '@clerk/types';
+import { EnvironmentResource, UserSettingsJSON } from '@clerk/types';
+import { UserSettings } from 'core/resources/UserSettings';
 
-import {
-  determineFirstPartyFields,
-  determineOauthOptions,
-  determineWeb3Options,
-} from './utils';
+import { determineFirstPartyFields } from './utils';
 
 describe('determineFirstPartyFields()', () => {
   // For specs refer to https://www.notion.so/clerkdev/Vocabulary-8f775765258643978f5811c88b140b2d
   // and the current Instance User settings options
   describe('returns first party field based on auth config', () => {
-    type Scenario = [string, Object, Object];
+    type Scenario = [string, any, any];
 
     const scenaria: Scenario[] = [
       [
         'email only option',
         {
-          authConfig: {
-            identificationRequirements: [['email_address']],
-            firstName: 'required',
-            lastName: 'required',
-            password: 'required',
-            username: 'on',
-          },
+          userSettings: new UserSettings({
+            attributes: {
+              email_address: {
+                enabled: true,
+                required: true,
+                used_for_first_factor: true,
+              },
+              phone_number: {
+                enabled: true,
+                required: false,
+              },
+              first_name: {
+                enabled: true,
+                required: true,
+              },
+              last_name: {
+                enabled: true,
+                required: true,
+              },
+              password: {
+                enabled: true,
+                required: true,
+              },
+              username: {
+                enabled: true,
+              },
+            },
+          } as UserSettingsJSON),
         },
         {
           emailAddress: 'required',
@@ -35,13 +53,34 @@ describe('determineFirstPartyFields()', () => {
       [
         'phone only option',
         {
-          authConfig: {
-            identificationRequirements: [['phone_number']],
-            firstName: 'required',
-            lastName: 'required',
-            password: 'required',
-            username: 'on',
-          },
+          userSettings: new UserSettings({
+            attributes: {
+              email_address: {
+                enabled: true,
+                required: false,
+              },
+              phone_number: {
+                enabled: true,
+                required: true,
+                used_for_first_factor: true,
+              },
+              first_name: {
+                enabled: true,
+                required: true,
+              },
+              last_name: {
+                enabled: true,
+                required: true,
+              },
+              password: {
+                enabled: true,
+                required: true,
+              },
+              username: {
+                enabled: true,
+              },
+            },
+          } as UserSettingsJSON),
         },
         {
           phoneNumber: 'required',
@@ -54,13 +93,35 @@ describe('determineFirstPartyFields()', () => {
       [
         'email or phone option',
         {
-          authConfig: {
-            identificationRequirements: [['email_address'], ['phone_number']],
-            firstName: 'required',
-            lastName: 'required',
-            password: 'required',
-            username: 'on',
-          },
+          userSettings: new UserSettings({
+            attributes: {
+              phone_number: {
+                enabled: true,
+                required: true,
+                used_for_first_factor: true,
+              },
+              email_address: {
+                enabled: true,
+                required: true,
+                used_for_first_factor: true,
+              },
+              first_name: {
+                enabled: true,
+                required: true,
+              },
+              last_name: {
+                enabled: true,
+                required: true,
+              },
+              password: {
+                enabled: true,
+                required: true,
+              },
+              username: {
+                enabled: true,
+              },
+            },
+          } as UserSettingsJSON),
         },
         {
           emailOrPhone: 'required',
@@ -73,16 +134,31 @@ describe('determineFirstPartyFields()', () => {
       [
         'optional first and last name',
         {
-          authConfig: {
-            identificationRequirements: [['email_address'], ['phone_number']],
-            firstName: 'on',
-            lastName: 'on',
-            password: 'required',
-            username: 'on',
-          },
+          userSettings: new UserSettings({
+            attributes: {
+              first_name: {
+                enabled: true,
+              },
+              last_name: {
+                enabled: true,
+              },
+              password: {
+                enabled: true,
+                required: true,
+              },
+              username: {
+                enabled: true,
+              },
+              email_address: {
+                enabled: true,
+              },
+              phone_number: {
+                enabled: true,
+              },
+            },
+          } as UserSettingsJSON),
         },
         {
-          emailOrPhone: 'required',
           firstName: 'on',
           lastName: 'on',
           password: 'required',
@@ -92,76 +168,52 @@ describe('determineFirstPartyFields()', () => {
       [
         'no fields enabled',
         {
-          authConfig: {
-            identificationRequirements: [],
-            firstName: 'off',
-            lastName: 'off',
-            password: 'off',
-            username: 'off',
-          },
+          userSettings: new UserSettings({
+            attributes: {
+              phone_number: {
+                enabled: false,
+                required: false,
+              },
+              email_address: {
+                enabled: false,
+                required: false,
+              },
+              first_name: {
+                enabled: false,
+                required: false,
+              },
+              last_name: {
+                enabled: false,
+                required: false,
+              },
+              password: {
+                enabled: false,
+                required: false,
+              },
+              username: {
+                enabled: false,
+              },
+            },
+          } as UserSettingsJSON),
         },
         {},
       ],
     ];
 
     it.each(scenaria)('%s', (___, environment, result) => {
-      expect(
-        determineFirstPartyFields(environment as EnvironmentResource),
-      ).toEqual(result);
+      expect(determineFirstPartyFields(environment as EnvironmentResource)).toEqual(result);
     });
 
     it.each(scenaria)('with invitation, %s', (___, environment, result) => {
       // Email address or phone number cannot be required when there's an
       // invitation token present. Instead, we'll require the invitationToken
       // parameter
-      const {
-        // @ts-ignore 2339
-        emailAddress: ___emailAddress,
-        // @ts-ignore 2339
-        emailOrPhone: ___emailOrPhone,
-        // @ts-ignore 2339
-        phoneNumber: ___phoneNumber,
-        ...expected
-      } = result;
-      expect(
-        determineFirstPartyFields(environment as EnvironmentResource, true),
-      ).toEqual({ ...expected, invitationToken: 'required' });
+      const expected = { ...result, invitationToken: 'required' };
+      delete expected.emailAddress;
+      delete expected.phoneNumber;
+      delete expected.emailOrPhone;
+      const res = determineFirstPartyFields(environment as EnvironmentResource, true);
+      expect(res).toMatchObject(expected);
     });
-  });
-});
-
-describe('determineOauthOptions(environment)', () => {
-  it('returns oauth options based on auth config', () => {
-    const environment = {
-      authConfig: {
-        identificationRequirements: [
-          ['email_address', 'oauth_google', 'oauth_facebook'],
-          ['oauth_google'],
-        ],
-      },
-    } as EnvironmentResource;
-
-    expect(determineOauthOptions(environment)).toEqual([
-      'oauth_facebook',
-      'oauth_google',
-    ]);
-  });
-});
-
-describe('determineWeb3Options(environment)', () => {
-  it('returns web3 options based on auth config', () => {
-    const environment = {
-      authConfig: {
-        firstFactors: [
-          'email_address',
-          'web3_metamask_signature',
-          'oauth_facebook',
-        ],
-      },
-    } as EnvironmentResource;
-
-    expect(determineWeb3Options(environment)).toEqual([
-      'web3_metamask_signature',
-    ]);
   });
 });

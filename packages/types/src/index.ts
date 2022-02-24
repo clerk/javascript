@@ -22,6 +22,7 @@ export * from './signUp';
 export * from './theme';
 export * from './token';
 export * from './user';
+export * from './userSettings';
 export * from './utils';
 export * from './verification';
 export * from './web3';

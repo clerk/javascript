@@ -22,10 +22,8 @@ export function OAuth({
 }: OauthProps): JSX.Element | null {
   const ctx = useSignInContext();
   const signIn = useCoreSignIn();
-  const environment = useEnvironment();
-
-  const { displayConfig } = environment;
-
+  const { displayConfig } = useEnvironment();
+  
   const startOauth = async (e: React.MouseEvent, strategy: OAuthStrategy) => {
     e.preventDefault();
 

@@ -1,5 +1,6 @@
 export type { default as Clerk } from '../clerk';
 export * from './Base';
+export * from './UserSettings';
 export * from './AuthConfig';
 export * from './Client';
 export * from './DisplayConfig';
