@@ -7,26 +7,26 @@ export function withRedirectToHome<P extends SignInProps | SignUpProps>(
   Component: React.ComponentType<P>,
   displayName?: string,
 ): (props: P) => null | JSX.Element {
-  displayName =
-    displayName || Component.displayName || Component.name || 'Component';
+  displayName = displayName || Component.displayName || Component.name || 'Component';
   Component.displayName = displayName;
 
   const HOC = (props: P) => {
     const { navigate } = useNavigate();
     const { authConfig, displayConfig } = useEnvironment();
+    const { singleSessionMode } = authConfig;
     const session = useCoreSession({ avoidUndefinedCheck: true });
 
     React.useEffect(() => {
-      if (authConfig.singleSessionMode && !!session) {
+      if (singleSessionMode && !!session) {
         navigate(displayConfig.homeUrl);
       }
     }, []);
 
-    if (authConfig.singleSessionMode && !!session) {
+    if (singleSessionMode && !!session) {
       return null;
     }
 
-    return <Component {...(props as P)} />;
+    return <Component {...props} />;
   };
 
   HOC.displayName = `withRedirectToHome(${displayName})`;

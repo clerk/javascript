@@ -3,12 +3,7 @@ import { Form } from '@clerk/shared/components/form';
 import { Input } from '@clerk/shared/components/input';
 import { PhoneInput } from '@clerk/shared/components/phoneInput';
 import { noop } from '@clerk/shared/utils';
-import {
-  OAuthStrategy,
-  SignUpParams,
-  SignUpResource,
-  Web3Strategy,
-} from '@clerk/types';
+import { SignUpParams, SignUpResource } from '@clerk/types';
 import React from 'react';
 import type { FieldState } from 'ui/common';
 import {
@@ -35,17 +30,14 @@ import { getClerkQueryParam } from 'utils/getClerkQueryParam';
 import { SignInLink } from './SignInLink';
 import { SignUpOAuth } from './SignUpOAuth';
 import { SignUpWeb3 } from './SignUpWeb3';
-import {
-  determineFirstPartyFields,
-  determineOauthOptions,
-  determineWeb3Options,
-} from './utils';
+import { determineFirstPartyFields } from './utils';
 
 type ActiveIdentifier = 'emailAddress' | 'phoneNumber';
 
 function _SignUpStart(): JSX.Element {
   const { navigate } = useNavigate();
   const environment = useEnvironment();
+  const { userSettings } = environment;
   const { setSession } = useCoreClerk();
   const { navigateAfterSignUp } = useSignUpContext();
   const [emailOrPhoneActive, setEmailOrPhoneActive] =
@@ -81,8 +73,8 @@ function _SignUpStart(): JSX.Element {
     hasInvitationToken,
     hasOrganizationInvitationToken,
   );
-  const oauthOptions = determineOauthOptions(environment) as OAuthStrategy[];
-  const web3Options = determineWeb3Options(environment) as Web3Strategy[];
+  const oauthOptions = userSettings.socialProviderStrategies;
+  const web3Options = userSettings.web3FirstFactors;
 
   const handleTokenFlow = () => {
     const invitationToken = formFields.invitationToken.value;
@@ -191,7 +183,7 @@ function _SignUpStart(): JSX.Element {
     }
   };
 
-  const completeSignUpFlow = async (su: SignUpResource) => {
+  const completeSignUpFlow = (su: SignUpResource) => {
     if (su.status === 'complete') {
       return setSession(su.createdSessionId, navigateAfterSignUp);
     } else if (
