@@ -10,8 +10,11 @@ import {
   SignInResource,
   SignUpResource,
 } from '@clerk/types';
-import { AuthConfig } from 'core/resources/AuthConfig';
-import { ExternalAccount } from 'core/resources/ExternalAccount';
+import {
+  AuthConfig,
+  ExternalAccount,
+  UserSettings,
+} from 'core/resources/internal';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -66,11 +69,47 @@ jest.mock('ui/contexts', () => ({
         },
       },
     },
+    userSettings: {
+      attributes: {
+        phone_number: {
+          // this should be true since it is a first factor but keeping it false for the needs of the test case
+          enabled: false,
+          used_for_second_factor: true,
+          second_factors: ['phone_code'],
+        },
+        email_address: {
+          // this should be true since it is a first factor but keeping it false for the needs of the test case
+          enabled: false,
+          used_for_first_factor: true,
+          first_factors: ['email_code'],
+        },
+        first_name: {
+          enabled: true,
+        },
+        last_name: {
+          enabled: true,
+        },
+        username: {
+          enabled: false,
+        },
+        password: {
+          enabled: false,
+        },
+        web3_wallet: {
+          enabled: false,
+        },
+      },
+      social: {
+        oauth_google: {
+          enabled: true,
+        },
+        oauth_facebook: {
+          enabled: true,
+        },
+      },
+    } as Partial<UserSettings>,
     authConfig: {
-      secondFactors: ['phone_code'],
       singleSessionMode: true,
-      firstFactors: ['email_address', 'oauth_google', 'oauth_facebook'],
-      emailAddressVerificationStrategies: ['email_code'],
     } as Partial<AuthConfig>,
   })),
   withCoreUserGuard: (a: any) => a,

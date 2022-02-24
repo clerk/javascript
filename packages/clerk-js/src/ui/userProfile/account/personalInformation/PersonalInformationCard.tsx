@@ -1,12 +1,23 @@
 import { List } from '@clerk/shared/components/list';
 import { TitledCard } from '@clerk/shared/components/titledCard';
 import React from 'react';
-import { useCoreUser } from 'ui/contexts';
+import { useCoreUser, useEnvironment } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
 
-export const PersonalInformationCard = (): JSX.Element => {
+export const PersonalInformationCard = (): JSX.Element | null => {
   const user = useCoreUser();
   const { navigate } = useNavigate();
+  const { userSettings } = useEnvironment();
+  const {
+    attributes: { first_name, last_name },
+  } = userSettings;
+
+  const hasAtLeastOneAttributeEnable =
+    first_name?.enabled || last_name?.enabled;
+
+  if (!hasAtLeastOneAttributeEnable) {
+    return null;
+  }
 
   const firstNameRow = (
     <List.Item
@@ -30,6 +41,9 @@ export const PersonalInformationCard = (): JSX.Element => {
     </List.Item>
   );
 
+  const showFirstName = first_name.enabled;
+  const showLastName = last_name.enabled;
+
   return (
     <TitledCard
       className='cl-themed-card'
@@ -37,8 +51,8 @@ export const PersonalInformationCard = (): JSX.Element => {
       subtitle='Manage personal information settings'
     >
       <List className='cl-titled-card-list'>
-        {firstNameRow}
-        {lastnameRow}
+        {showFirstName && firstNameRow}
+        {showLastName && lastnameRow}
       </List>
     </TitledCard>
   );

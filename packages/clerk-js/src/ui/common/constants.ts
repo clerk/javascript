@@ -1,42 +1,44 @@
 import type { Web3Provider, OAuthStrategy } from '@clerk/types';
 
-export const FirstFactorConfigs = Object.freeze({
+const FirstFactorConfigs = Object.freeze({
   email_address: {
     label: 'Email address',
-    icon: 'clerk-email',
     fieldType: 'email',
   },
   phone_number: {
     label: 'Phone number',
-    icon: 'clerk-phone',
     fieldType: 'tel',
   },
   username: {
     label: 'Username',
-    icon: 'clerk-person',
     fieldType: 'text',
   },
   email_address_phone_number: {
     label: 'Email or phone',
-    icon: 'clerk-person',
     fieldType: 'text',
   },
   email_address_username: {
     label: 'Email or username',
-    icon: 'clerk-person',
     fieldType: 'text',
   },
   phone_number_username: {
     label: 'Phone number or username',
-    icon: 'clerk-person',
     fieldType: 'text',
   },
   email_address_phone_number_username: {
     label: 'Email, phone, or username',
-    icon: 'clerk-person',
     fieldType: 'text',
   },
-} as Record<string, { label: string; icon: string; fieldType: string }>);
+  default: {
+    label: '',
+    fieldType: 'text',
+  },
+} as Record<string, { label: string; fieldType: string }>);
+
+export const getIdentifierControlDisplayValues = (attributes: string[]) => {
+  const indexKey = attributes.length == 0 ? null : [...attributes].sort().join('_');
+  return FirstFactorConfigs[indexKey || 'default'];
+};
 
 export const PREFERRED_SIGN_IN_STRATEGIES = Object.freeze({
   Password: 'password',
@@ -59,9 +61,7 @@ export const WEB3_PROVIDERS: Web3Providers = Object.freeze({
   },
 });
 
-export function getWeb3ProviderData(
-  name: Web3Provider,
-): Web3ProviderData | undefined | null {
+export function getWeb3ProviderData(name: Web3Provider): Web3ProviderData | undefined | null {
   return WEB3_PROVIDERS[name];
 }
 
