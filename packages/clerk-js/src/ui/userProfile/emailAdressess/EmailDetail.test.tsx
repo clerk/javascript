@@ -1,14 +1,14 @@
 import { render, renderJSON, screen, userEvent } from '@clerk/shared/testUtils';
-import { EmailAddressResource } from '@clerk/types';
-import { SignInStrategyName } from '@clerk/types';
+import { EmailAddressResource, EnvironmentResource, SignInStrategyName, UserSettingsResource } from '@clerk/types';
 import { ClerkAPIResponseError } from 'core/resources/Error';
 import React from 'react';
-
+import { PartialDeep } from 'type-fest';
 import { EmailDetail } from './EmailDetail';
+
 
 const mockNavigate = jest.fn();
 const mockUseCoreUser = jest.fn();
-let mockFirstFactors = [] as SignInStrategyName[];
+let mockFirstFactors = {} as PartialDeep<UserSettingsResource>;
 
 jest.mock('ui/hooks', () => ({
   useNavigate: () => {
@@ -39,11 +39,8 @@ jest.mock('ui/contexts', () => {
   return {
     useCoreUser: () => mockUseCoreUser(),
     useEnvironment: jest.fn(() => ({
-      authConfig: {
-        firstFactors: mockFirstFactors,
-        emailAddressVerificationStrategies: mockFirstFactors,
-      },
-    })),
+      userSettings: mockFirstFactors
+    }) as PartialDeep<EnvironmentResource>),
     useUserProfileContext: jest.fn(() => {
       return {
         routing: 'path',
@@ -75,7 +72,14 @@ describe('<EmailDetail/>', () => {
   });
 
   it('displays verification errors', async () => {
-    mockFirstFactors = ['email_code'];
+    mockFirstFactors = {
+      attributes: {
+        email_address: {
+          used_for_first_factor: true,
+          first_factors: ['email_code']
+        }
+      }
+    }
     mockUseCoreUser.mockImplementation(() => {
       return {
         primaryEmailAddressId: '1',

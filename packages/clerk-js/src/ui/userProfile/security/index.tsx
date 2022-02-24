@@ -19,10 +19,11 @@ export function SecurityRoutes({
   standAlone = false,
   index = false,
 }: SecurityRoutesProps): JSX.Element {
-  const { authConfig } = useEnvironment();
+  const { userSettings } = useEnvironment();
+  const { attributes: { phone_number } } = userSettings;
   const canActivate2svRoutes = () =>
-    authConfig.secondFactors.length > 0 &&
-    authConfig.secondFactors.includes('phone_code');
+    phone_number.used_for_second_factor &&
+    phone_number.second_factors.includes('phone_code');
 
   return (
     <Route

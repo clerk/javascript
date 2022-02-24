@@ -21,9 +21,7 @@ export function Web3({
 }: Web3Props): JSX.Element | null {
   const clerk = useCoreClerk();
   const ctx = useSignInContext();
-  const environment = useEnvironment();
-
-  const { displayConfig } = environment;
+  const { displayConfig } = useEnvironment();
 
   const startWeb3 = async (e: React.MouseEvent) => {
     e.preventDefault();
