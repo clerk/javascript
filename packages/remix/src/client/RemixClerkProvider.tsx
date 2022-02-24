@@ -1,7 +1,7 @@
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import { IsomorphicClerkOptions } from '@clerk/clerk-react/dist/types';
+import { useNavigate } from '@remix-run/react';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { Interstitial } from './Interstitial';
 import { assertValidClerkState, warnForSsr } from './utils';
