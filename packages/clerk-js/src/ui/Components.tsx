@@ -11,19 +11,12 @@ import type {
   EnvironmentResource,
   SignInProps,
   SignUpProps,
-  UserButtonProps,
-  UserProfileProps,
 } from '@clerk/types';
-import { SIGN_UP_IN_PRESERVED_PARAMS } from 'core/constants';
+
+import { PRESERVED_QUERYSTRING_PARAMS } from 'core/constants';
 import { clerkUIErrorDOMElementNotFound } from 'core/errors';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import type {
-  SignInCtx,
-  SignUpCtx,
-  UserButtonCtx,
-  UserProfileCtx,
-} from 'ui/contexts';
 import { EnvironmentProvider, OptionsProvider } from 'ui/contexts';
 import { VirtualRouter } from 'ui/router';
 import { injectTheme } from 'utils/theming';
