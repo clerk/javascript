@@ -1,7 +1,7 @@
-import { invalidRootLoaderCallbackReturn } from '../errors';
+import { invalidRootLoaderCallbackResponseReturn, invalidRootLoaderCallbackReturn } from '../errors';
 import { getAuthData } from './getAuthData';
 import { LoaderFunctionArgs, LoaderFunctionReturn, RootAuthLoaderCallback, RootAuthLoaderOptions } from './types';
-import { injectAuthIntoArgs, isResponse, sanitizeAuthData, wrapClerkState } from './utils';
+import { assertObject, injectAuthIntoArgs, isResponse, sanitizeAuthData, wrapClerkState } from './utils';
 
 export async function rootAuthLoader<Options extends RootAuthLoaderOptions>(
   args: LoaderFunctionArgs,
@@ -31,13 +31,15 @@ export async function rootAuthLoader(
 
   const callbackResult = await cb?.(injectAuthIntoArgs(args, sanitizeAuthData(authData!)));
 
+  assertObject(callbackResult, invalidRootLoaderCallbackReturn);
+
   // Pass through custom responses
   if (isResponse(callbackResult)) {
     if (callbackResult.status >= 300 && callbackResult.status < 400) {
       return callbackResult;
     }
-    throw new Error(invalidRootLoaderCallbackReturn);
+    throw new Error(invalidRootLoaderCallbackResponseReturn);
   }
 
-  return { data: callbackResult, ...wrapClerkState({ __clerk_ssr_state: authData }) };
+  return { ...callbackResult, ...wrapClerkState({ __clerk_ssr_state: authData }) };
 }
