@@ -78,3 +78,12 @@ export function isResponse(value: any): value is Response {
 export const parseCookies = (req: Request) => {
   return cookie.parse(req.headers.get('cookie') || '');
 };
+
+/**
+ * @internal
+ */
+export function assertObject(val: any, error?: string): asserts val is Record<string, unknown> {
+  if (!val || typeof val !== 'object' || Array.isArray(val)) {
+    throw new Error(error || '');
+  }
+}
