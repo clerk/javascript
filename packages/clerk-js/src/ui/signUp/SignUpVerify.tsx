@@ -24,15 +24,18 @@ import {
 
 import { SignUpVerifyEmailAddressWithMagicLink } from './SignUpVerifyEmailAddressWithMagicLink';
 
-function _SignUpVerifyEmailAddress(): JSX.Element {
-  const { userSettings } = useEnvironment();
-  const { attributes } = userSettings;
+const emailLinkStrategy = 'email_link';
 
-  const emailLinkStrategyEnabled =
-    attributes.email_address.verifications.includes('email_link');
+function _SignUpVerifyEmailAddress(): JSX.Element {
+  const { authConfig } = useEnvironment();
+  const { firstFactors } = authConfig;
+
+  // TODO: SignUp should have a field similar to SignIn's supportedFirstFactors
+  // listing the available strategies for this signUp
+  const emailLinkStrategyEnabled = firstFactors.includes(emailLinkStrategy);
   const disableEmailLink = shouldDisableStrategy(
     useSignUpContext(),
-    'email_link',
+    emailLinkStrategy,
   );
 
   if (emailLinkStrategyEnabled && !disableEmailLink) {

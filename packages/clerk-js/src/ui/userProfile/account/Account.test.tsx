@@ -1,5 +1,5 @@
 import { render, screen } from '@clerk/shared/testUtils';
-import type { UserResource, UserSettingsResource } from '@clerk/types';
+import type { AuthConfigResource, UserResource } from '@clerk/types';
 import React from 'react';
 
 import { Account } from './Account';
@@ -26,21 +26,6 @@ jest.mock('ui/hooks', () => {
   };
 });
 
-const OTHER_ATTRIBUTES = {
-  username: {
-    enabled: false,
-  },
-  email_address: {
-    enabled: false
-  },
-  phone_number: {
-    enabled: false
-  },
-  web3_wallet: {
-    enabled: false
-  }
-};
-
 describe('<Account/>', () => {
   afterEach(() => {
     jest.clearAllMocks();
@@ -49,18 +34,9 @@ describe('<Account/>', () => {
   it('renders personal information for auth config that requires name', () => {
     mockEnvironment.mockImplementation(() => {
       return {
-        userSettings: {
-          attributes: {
-            first_name: {
-              enabled: true,
-              required: true
-            },
-            last_name: {
-              enabled: false
-            },
-            ...OTHER_ATTRIBUTES
-          }
-        } as UserSettingsResource,
+        authConfig: {
+          firstName: 'required',
+        } as AuthConfigResource,
       };
     });
     render(<Account />);
@@ -70,17 +46,9 @@ describe('<Account/>', () => {
   it('renders personal information for auth config that has name turned on', () => {
     mockEnvironment.mockImplementation(() => {
       return {
-        userSettings: {
-          attributes: {
-            last_name: {
-              enabled: true,
-            },
-            first_name: {
-              enabled: false,
-            },
-            ...OTHER_ATTRIBUTES
-          }
-        } as UserSettingsResource
+        authConfig: {
+          lastName: 'on',
+        } as AuthConfigResource,
       };
     });
     render(<Account />);
@@ -90,17 +58,10 @@ describe('<Account/>', () => {
   it('does not render personal information for auth config that has named turned off', () => {
     mockEnvironment.mockImplementation(() => {
       return {
-        userSettings: {
-          attributes: {
-            first_name: {
-              enabled: false,
-            },
-            last_name: {
-              enabled: false,
-            },
-            ...OTHER_ATTRIBUTES
-          }
-        } as UserSettingsResource
+        authConfig: {
+          firstName: 'off',
+          lastName: 'off',
+        } as AuthConfigResource,
       };
     });
     render(<Account />);

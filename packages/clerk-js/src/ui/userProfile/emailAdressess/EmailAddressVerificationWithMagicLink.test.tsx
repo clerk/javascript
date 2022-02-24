@@ -7,6 +7,11 @@ import { EmailAddressVerificationWithMagicLink } from './EmailAddressVerificatio
 
 jest.mock('ui/contexts', () => {
   return {
+    useEnvironment: jest.fn(() => ({
+      authConfig: {
+        firstFactors: ['email_link'],
+      },
+    })),
     useUserProfileContext: jest.fn(() => {
       return {
         routing: 'path',
