@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [2.14.4-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@2.14.3...@clerk/clerk-js@2.14.4-staging.0) (2022-02-24)
+
+
+### Reverts
+
+* Revert "fix(clerk-js,clerk-react): Revert user settings work" ([02423f7](https://github.com/clerkinc/javascript/commit/02423f774a5a95472e74d2209b6c4a130cba9ee9))
+
+
+
 ### [2.14.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@2.14.3-staging.0...@clerk/clerk-js@2.14.3) (2022-02-24)
 
 **Note:** Version bump only for package @clerk/clerk-js
