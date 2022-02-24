@@ -7,3 +7,8 @@ export type ClerkState = {
     __clerk_ssr_state: InitialState;
   };
 };
+
+export type WithClerkState<U = any> = {
+  data: U;
+  clerkState: { __type: 'clerkState' };
+};
