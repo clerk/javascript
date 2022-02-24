@@ -705,7 +705,7 @@ describe('<SignInFactorOne/>', () => {
 
       render(<SignInFactorOne />);
 
-      screen.getByText('Unknown error');
+      screen.getByText(/no available authentication method/);
     });
   });
 });
