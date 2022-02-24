@@ -76,6 +76,8 @@ export function _SignInStart(): JSX.Element {
     .filter(fac => fac.startsWith('oauth'))
     .sort() as OAuthStrategy[];
 
+  const passwordBasedInstance = authConfig.password === 'required';
+
   // TODO: Clean up the following code end
   React.useEffect(() => {
     async function handleOauthError() {
@@ -203,24 +205,30 @@ export function _SignInStart(): JSX.Element {
                 )}
               </Control>
 
-              <Control
-                key='password'
-                htmlFor='password'
-                label='Password'
-                error={instantPassword.error}
-                className={cn({
-                  'cl-hidden': !instantPassword.value,
-                })}
-              >
-                <Input
-                  id='password'
-                  type='password'
-                  name='password'
-                  value={instantPassword.value}
-                  handleChange={el => instantPassword.setValue(el.value || '')}
-                  tabIndex={-1}
-                />
-              </Control>
+              <>
+                {passwordBasedInstance && (
+                  <Control
+                    key='password'
+                    htmlFor='password'
+                    label='Password'
+                    error={instantPassword.error}
+                    className={cn({
+                      'cl-hidden': !instantPassword.value,
+                    })}
+                  >
+                    <Input
+                      id='password'
+                      type='password'
+                      name='password'
+                      value={instantPassword.value}
+                      handleChange={el =>
+                        instantPassword.setValue(el.value || '')
+                      }
+                      tabIndex={-1}
+                    />
+                  </Control>
+                )}
+              </>
             </Form>
           </>
         )}
