@@ -43,6 +43,7 @@ jest.mock('ui/contexts', () => {
             afterSignInUrl: 'http://test.host',
           },
           authConfig: {
+            password: 'required',
             singleSessionMode: false,
             identificationStrategies: [
               'email_address',
