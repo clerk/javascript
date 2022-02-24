@@ -1,4 +1,10 @@
-import { render, renderJSON, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
+import {
+  render,
+  renderJSON,
+  screen,
+  userEvent,
+  waitFor,
+} from '@clerk/shared/testUtils';
 import { titleize } from '@clerk/shared/utils/string';
 import { UserSettingsJSON } from '@clerk/types';
 import { Session, UserSettings } from 'core/resources/internal';
@@ -192,7 +198,8 @@ describe('<SignUpStart/>', () => {
   );
 
   it('renders the external account verification error if available', () => {
-    const errorMsg = 'You cannot sign up with sokratis.vidros@gmail.com since this is an invitation-only application';
+    const errorMsg =
+      'You cannot sign up with sokratis.vidros@gmail.com since this is an invitation-only application';
 
     (useCoreSignUp as jest.Mock).mockImplementation(() => {
       return {
@@ -245,7 +252,9 @@ describe('<SignUpStart/>', () => {
     render(<SignUpStart />);
     screen.getByRole('button', { name: /Google/ });
     screen.getByRole('button', { name: /Facebook/ });
-    expect(screen.queryByRole('button', { name: 'Sign up' })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Sign up' }),
+    ).not.toBeInTheDocument();
   });
 
   describe('when the user does not grant access to their Facebook account', () => {
@@ -273,87 +282,94 @@ describe('<SignUpStart/>', () => {
     });
   });
 
-  describe('with __clerk_invitation_token parameter', () => {
-    beforeEach(() => {
-      setWindowQueryParams([['__clerk_invitation_token', '123456']]);
-    });
+  describe('with invitation parameter', () => {
+    function runTokenTests(tokenType: string) {
+      describe(`with ${tokenType}`, () => {
+        beforeEach(() => {
+          setWindowQueryParams([[tokenType, '123456']]);
+        });
 
-    it('it auto-completes sign up flow if sign up is complete after create', async () => {
-      mockCreateRequest.mockImplementation(() =>
-        Promise.resolve({
-          status: 'complete',
-          emailAddress: 'jdoe@example.com',
-        }),
-      );
-      render(<SignUpStart />);
-      await waitFor(() => {
-        expect(mockSetSession).toHaveBeenCalled();
-      });
-    });
+        it('it auto-completes sign up flow if sign up is complete after create', async () => {
+          mockCreateRequest.mockImplementation(() =>
+            Promise.resolve({
+              status: 'complete',
+              emailAddress: 'jdoe@example.com',
+            }),
+          );
+          render(<SignUpStart />);
+          await waitFor(() => {
+            expect(mockSetSession).toHaveBeenCalled();
+          });
+        });
 
-    it('it does not auto-complete sign up flow if sign up if requirements are missing', async () => {
-      mockCreateRequest.mockImplementation(() =>
-        Promise.resolve({
-          status: 'missing_requirements',
-          emailAddress: 'jdoe@example.com',
-          verifications: {
-            emailAddress: {
-              status: 'unverified',
+        it('it does not auto-complete sign up flow if sign up if requirements are missing', async () => {
+          mockCreateRequest.mockImplementation(() =>
+            Promise.resolve({
+              status: 'missing_requirements',
+              emailAddress: 'jdoe@example.com',
+              verifications: {
+                emailAddress: {
+                  status: 'unverified',
+                },
+              },
+            }),
+          );
+          render(<SignUpStart />);
+          await waitFor(() => {
+            expect(mockSetSession).not.toHaveBeenCalled();
+            screen.getByText(/First name/);
+            screen.getByText(/Last name/);
+            screen.getByText(/Password/);
+            screen.getByText(/Username/);
+          });
+        });
+
+        it('it displays email and waits for input if sign up is not complete', async () => {
+          mockCreateRequest.mockImplementation(() =>
+            Promise.resolve({
+              status: 'missing_requirements',
+              emailAddress: 'jdoe@example.com',
+              verifications: {
+                emailAddress: {
+                  status: 'unverified',
+                },
+              },
+            }),
+          );
+          render(<SignUpStart />);
+          await waitFor(() => {
+            const emailInput = screen.getByDisplayValue('jdoe@example.com');
+            expect(emailInput).toBeDisabled();
+          });
+        });
+
+        it('does not render the phone number field', async () => {
+          mockUserSettings = new UserSettings({
+            attributes: {
+              phone_number: {
+                enabled: true,
+                required: true,
+              },
+              password: {
+                required: false,
+              },
             },
-          },
-        }),
-      );
-      render(<SignUpStart />);
-      await waitFor(() => {
-        expect(mockSetSession).not.toHaveBeenCalled();
-        screen.getByText(/First name/);
-        screen.getByText(/Last name/);
-        screen.getByText(/Password/);
-        screen.getByText(/Username/);
-      });
-    });
+          } as UserSettingsJSON);
 
-    it('it displays email and waits for input if sign up is not complete', async () => {
-      mockCreateRequest.mockImplementation(() =>
-        Promise.resolve({
-          status: 'missing_requirements',
-          emailAddress: 'jdoe@example.com',
-          verifications: {
-            emailAddress: {
-              status: 'unverified',
-            },
-          },
-        }),
-      );
-      render(<SignUpStart />);
-      await waitFor(() => {
-        const emailInput = screen.getByDisplayValue('jdoe@example.com');
-        expect(emailInput).toBeDisabled();
+          const { container } = render(<SignUpStart />);
+          const labels = container.querySelectorAll('label');
+          await waitFor(() => {
+            expect(
+              Array.from(labels)
+                .map(l => l.htmlFor)
+                .includes('phoneNumber'),
+            ).toBeFalsy();
+          });
+        });
       });
-    });
+    }
 
-    it('does not render the phone number field', async () => {
-      mockUserSettings = new UserSettings({
-        attributes: {
-          phone_number: {
-            enabled: true,
-            required: true,
-          },
-          password: {
-            required: false,
-          },
-        },
-      } as UserSettingsJSON);
-
-      const { container } = render(<SignUpStart />);
-      const labels = container.querySelectorAll('label');
-      await waitFor(() => {
-        expect(
-          Array.from(labels)
-            .map(l => l.htmlFor)
-            .includes('phoneNumber'),
-        ).toBeFalsy();
-      });
-    });
+    runTokenTests('__clerk_invitation_token');
+    runTokenTests('__clerk_ticket');
   });
 });

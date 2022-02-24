@@ -9,7 +9,8 @@ type FieldKeys =
   | 'firstName'
   | 'lastName'
   | 'password'
-  | 'invitationToken';
+  | 'invitationToken'
+  | 'organizationInvitationToken';
 
 // TODO: Refactor SignUp component and remove
 // this leftover type
@@ -18,20 +19,34 @@ type Fields = {
 };
 
 function isEmailOrPhone(attributes: Attributes) {
-  return attributes.email_address.used_for_first_factor && attributes.phone_number.used_for_first_factor;
+  return (
+    attributes.email_address.used_for_first_factor &&
+    attributes.phone_number.used_for_first_factor
+  );
 }
 
-export function determineFirstPartyFields(environment: EnvironmentResource, hasInvitation?: boolean): Fields {
-  const {attributes} = environment.userSettings;
+export function determineFirstPartyFields(
+  environment: EnvironmentResource,
+  hasInvitation?: boolean,
+  hasOrganizationInvitation?: boolean,
+): Fields {
+  const { attributes } = environment.userSettings;
   const fields: Fields = {};
 
   Object.entries(attributes)
     .filter(([key]) => ['username', 'first_name', 'last_name'].includes(key))
     .filter(([, desc]) => desc.enabled)
-    .forEach(([key, desc]) => (fields[snakeToCamel(key) as keyof Fields] = desc.required ? 'required' : 'on'));
+    .forEach(
+      ([key, desc]) =>
+        (fields[snakeToCamel(key) as keyof Fields] = desc.required
+          ? 'required'
+          : 'on'),
+    );
 
   if (hasInvitation) {
     fields.invitationToken = 'required';
+  } else if (hasOrganizationInvitation) {
+    fields.organizationInvitationToken = 'required';
   } else if (isEmailOrPhone(attributes)) {
     fields.emailOrPhone = 'required';
   } else if (attributes.email_address.used_for_first_factor) {
