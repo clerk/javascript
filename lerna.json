@@ -8,14 +8,16 @@
             "message": "chore(release): Publish",
             "allowBranch": [
                 "main",
-                "next"
+                "next",
+                "staging"
             ],
             "conventionalCommits": true
         },
         "publish": {
             "allowBranch": [
                 "main",
-                "next"
+                "next",
+                "staging"
             ]
         }
     },
