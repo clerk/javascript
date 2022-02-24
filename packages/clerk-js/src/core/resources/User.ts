@@ -12,7 +12,6 @@ import type {
 import { unixEpochToDate } from 'utils/date';
 import { normalizeUnsafeMetadata } from 'utils/resourceParams';
 
-import { UserTokenCache } from '../tokenCache';
 import {
   BaseResource,
   EmailAddress,
@@ -20,7 +19,6 @@ import {
   Image,
   PhoneNumber,
   SessionWithActivities,
-  Token,
   Web3Wallet,
 } from './internal';
 
