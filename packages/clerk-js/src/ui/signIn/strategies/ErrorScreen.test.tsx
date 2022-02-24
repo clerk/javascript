@@ -21,8 +21,8 @@ jest.mock('ui/contexts/EnvironmentContext', () => {
 jest.mock('ui/router/RouteContext');
 
 describe('<Error/>', () => {
-  it('renders the fallback error page', async () => {
-    const tree = renderJSON(<ErrorScreen />);
+  it('renders the fallback error page', () => {
+    const tree = renderJSON(<ErrorScreen message='Unknown error' />);
     expect(tree).toMatchSnapshot();
   });
 });

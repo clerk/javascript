@@ -50,7 +50,9 @@ function _SignInFactorOne(): JSX.Element {
   };
 
   if (!currentFactor && signIn.status) {
-    return <ErrorScreen />;
+    return (
+      <ErrorScreen message="Cannot proceed with sign in. There's no available authentication method." />
+    );
   }
 
   if (!currentFactor) {
