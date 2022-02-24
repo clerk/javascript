@@ -1,7 +1,6 @@
 import { render } from '@clerk/shared/testUtils';
 import { EnvironmentResource } from '@clerk/types';
-import { AuthConfig } from 'core/resources/AuthConfig';
-import { Session } from 'core/resources/Session';
+import { AuthConfig, Session } from 'core/resources/internal';
 import React from 'react';
 import { SignUp } from 'ui/signUp/SignUp';
 
@@ -27,11 +26,7 @@ jest.mock('ui/contexts', () => {
           displayConfig: {
             homeUrl: 'https://www.bbc.com',
           },
-          authConfig: {
-            identificationStrategies: ['email_address', 'oauth_google'],
-            firstFactors: ['email_address', 'oauth_google'],
-            singleSessionMode: true,
-          } as Partial<AuthConfig>,
+          authConfig: { singleSessionMode: true } as Partial<AuthConfig>,
         } as Partial<EnvironmentResource>),
     ),
     withCoreSessionSwitchGuard: (a: any) => a,
