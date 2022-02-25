@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.0-alpha.3](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.1.0-alpha.2...@clerk/remix@0.1.0-alpha.3) (2022-02-25)
+
+
+### Bug Fixes
+
+* **remix:** Make `rootAuthLoader` only throw if a callback exists ([cec342f](https://github.com/clerkinc/javascript/commit/cec342f36d09d7f829589e145e7f4be60aea5d13))
+
+
+
 ## 0.1.0-alpha.2 (2022-02-25)
 
 
