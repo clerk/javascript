@@ -10,7 +10,8 @@ export type OAuthProvider =
   | 'twitch'
   | 'linkedin'
   | 'dropbox'
-  | 'bitbucket';
+  | 'bitbucket'
+  | 'microsoft';
 
 export type OAuthStrategy = `oauth_${OAuthProvider}`;
 

@@ -100,6 +100,10 @@ export const OAUTH_PROVIDERS: OAuthProviders = Object.freeze({
     id: 'bitbucket',
     name: 'Bitbucket',
   },
+  microsoft: {
+    id: 'microsoft',
+    name: 'Microsoft',
+  },
 });
 
 export function getOAuthProviderData(
