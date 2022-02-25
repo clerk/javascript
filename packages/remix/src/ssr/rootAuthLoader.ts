@@ -17,7 +17,7 @@ export async function rootAuthLoader(
   cbOrOptions: any,
   options?: any,
 ): Promise<LoaderFunctionReturn> {
-  const cb = typeof cbOrOptions === 'function' ? cbOrOptions : undefined;
+  const callback = typeof cbOrOptions === 'function' ? cbOrOptions : undefined;
   const opts: RootAuthLoaderOptions = options
     ? options
     : !!cbOrOptions && typeof cbOrOptions !== 'function'
@@ -25,14 +25,17 @@ export async function rootAuthLoader(
     : {};
 
   const { authData, interstitial } = await getAuthData(args.request, opts);
+
   if (interstitial) {
     return wrapClerkState({ __clerk_ssr_interstitial: interstitial });
   }
 
-  const callbackResult = await cb?.(injectAuthIntoArgs(args, sanitizeAuthData(authData!)));
+  if (!callback) {
+    return { ...wrapClerkState({ __clerk_ssr_state: authData }) };
+  }
 
+  const callbackResult = await callback?.(injectAuthIntoArgs(args, sanitizeAuthData(authData!)));
   assertObject(callbackResult, invalidRootLoaderCallbackReturn);
-
   // Pass through custom responses
   if (isResponse(callbackResult)) {
     if (callbackResult.status >= 300 && callbackResult.status < 400) {
