@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [2.14.5-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@2.14.4-staging.0...@clerk/clerk-js@2.14.5-staging.0) (2022-02-25)
+
+
+### Features
+
+* **types:** Add support for oauth_microsoft ([96c1cc6](https://github.com/clerkinc/javascript/commit/96c1cc6817b9bbc6917ea2773498299c1ff9b951))
+
+
+
 ### [2.14.4-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@2.14.3...@clerk/clerk-js@2.14.4-staging.0) (2022-02-24)
 
 
