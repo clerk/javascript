@@ -110,7 +110,7 @@ exports[`<PhoneInput/> renders the phone input 1`] = `
 </div>
 `;
 
-exports[`<PhoneInput/> renders the phone input when the is dropdown open 1`] = `
+exports[`<PhoneInput/> renders the phone input when the dropdown is open 1`] = `
 <div>
   <div
     class="container"

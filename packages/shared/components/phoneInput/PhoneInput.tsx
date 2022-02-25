@@ -80,6 +80,9 @@ export function PhoneInput({
   };
 
   React.useEffect(() => {
+    if (!phoneNumber) {
+      return;
+    }
     const dialCode = IsoToCountryMap.get(selectedIso)?.code || '1';
     handlePhoneChange('+' + extractDigits(`${dialCode}${phoneNumber}`));
   }, [handlePhoneChange, selectedIso, phoneNumber]);
