@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.0-alpha.7](https://github.com/clerkinc/javascript/compare/@clerk/types@1.25.4...@clerk/types@2.0.0-alpha.7) (2022-02-25)
+
+
+### Features
+
+* **nextjs:** Move shared NextJS SSR types to types package ([8b898a1](https://github.com/clerkinc/javascript/commit/8b898a1aa503889921180850292fbfa3c8133ef5))
+
+
+
 ## [2.0.0-alpha.6](https://github.com/clerkinc/javascript/compare/@clerk/types@1.25.1-staging.0...@clerk/types@2.0.0-alpha.6) (2022-02-18)
 
 
