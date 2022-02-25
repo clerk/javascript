@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.0-alpha.7](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@2.11.4...@clerk/nextjs@3.0.0-alpha.7) (2022-02-25)
+
+
+### Features
+
+* **clerk-remix:** Remove load options from `getAuth` ([5c1e23d](https://github.com/clerkinc/javascript/commit/5c1e23db40b7a49b7cec5a1d8206daad160e6361))
+* **nextjs:** Enforce withServerSideAuth callback return type ([260d7cf](https://github.com/clerkinc/javascript/commit/260d7cfd255d6f6ff8d0dc2d32fb490008146804))
+* **nextjs:** Fetch user and session in parallel ([#49](https://github.com/clerkinc/javascript/issues/49)) ([e5c2620](https://github.com/clerkinc/javascript/commit/e5c2620695d489b14e3c513d6773c4527c9baf8b))
+* **nextjs:** Move shared NextJS SSR types to types package ([8b898a1](https://github.com/clerkinc/javascript/commit/8b898a1aa503889921180850292fbfa3c8133ef5))
+* **nextjs:** Strictly type all possible withServerSideAuth return value combinations ([e99c57a](https://github.com/clerkinc/javascript/commit/e99c57adc816a42137c781477e43fe4f372d9d1e))
+
+
+
 ## [3.0.0-alpha.6](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@2.11.1-staging.0...@clerk/nextjs@3.0.0-alpha.6) (2022-02-18)
 
 
