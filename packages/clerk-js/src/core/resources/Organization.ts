@@ -17,6 +17,7 @@ import {
 export class Organization extends BaseResource implements OrganizationResource {
   id!: string;
   name!: string;
+  role!: MembershipRole;
   instanceId!: string;
   createdBy!: string;
   createdAt!: Date;
@@ -115,6 +116,7 @@ export class Organization extends BaseResource implements OrganizationResource {
   protected fromJSON(data: OrganizationJSON): this {
     this.id = data.id;
     this.name = data.name;
+    this.role = data.role;
     this.instanceId = data.instance_id;
     this.createdBy = data.created_by;
     this.createdAt = unixEpochToDate(data.created_at);

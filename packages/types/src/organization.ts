@@ -1,8 +1,9 @@
-import { OrganizationMembershipResource } from '.';
+import { MembershipRole, OrganizationMembershipResource } from '.';
 
 export interface OrganizationResource {
   id: string;
   name: string;
+  role: MembershipRole;
   instanceId: string;
   createdBy: string;
   createdAt: Date;

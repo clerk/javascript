@@ -1,7 +1,8 @@
+import { PublicUserData } from '.';
+
 export interface OrganizationMembershipResource {
   id: string;
-  organizationId: string;
-  userId: string;
+  publicUserData: PublicUserData;
   role: MembershipRole;
   createdAt: Date;
   updatedAt: Date;

@@ -14,6 +14,7 @@ export class OrganizationInvitation
 {
   id!: string;
   emailAddress!: string;
+  organizationId!: string;
   status!: OrganizationInvitationStatus;
   createdAt!: Date;
   updatedAt!: Date;
@@ -42,15 +43,16 @@ export class OrganizationInvitation
     this.fromJSON(data);
   }
 
-  revoke = async (organizationId: string) => {
+  revoke = async () => {
     return await this._basePost({
-      path: `/organizations/${organizationId}/invitations/${this.id}/revoke`,
+      path: `/organizations/${this.organizationId}/invitations/${this.id}/revoke`,
     });
   };
 
   protected fromJSON(data: OrganizationInvitationJSON): this {
     this.id = data.id;
     this.emailAddress = data.email_address;
+    this.organizationId = data.organization_id;
     this.status = data.status;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);

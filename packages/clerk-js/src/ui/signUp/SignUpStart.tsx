@@ -55,7 +55,7 @@ function _SignUpStart(): JSX.Element {
       getClerkQueryParam('__clerk_invitation_token') || '',
     ),
     organizationInvitationToken: useFieldState(
-      'organization_invitation',
+      'ticket',
       getClerkQueryParam('__clerk_ticket') || '',
     ),
   } as const;
@@ -153,6 +153,14 @@ function _SignUpStart(): JSX.Element {
 
     if (fields.emailOrPhone && emailOrPhoneActive === 'phoneNumber') {
       reqFields.push(formFields.phoneNumber);
+    }
+
+    if (fields.organizationInvitationToken) {
+      reqFields.push(
+        // @ts-ignore
+        { name: 'strategy', value: 'ticket', setError: () => ({}) },
+        formFields.emailAddress,
+      );
     }
 
     try {
