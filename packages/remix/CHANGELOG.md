@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.0-alpha.5](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.1.0-alpha.4...@clerk/remix@0.1.0-alpha.5) (2022-02-28)
+
+
+### Reverts
+
+* Revert "fix(remix): Make `getAuth` stop loader execution during interstitial" ([93d3c9b](https://github.com/clerkinc/javascript/commit/93d3c9b13ff225b066fae47f7c15735aef750036))
+
+
+
 ## 0.1.0-alpha.4 (2022-02-28)
 
 
