@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.0.6-alpha.1](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.0.5...@clerk/shared@0.0.6-alpha.1) (2022-02-28)
+
+
+### Bug Fixes
+
+* **shared:** Phone input should start blank ([43f0b06](https://github.com/clerkinc/clerk_docker/commit/43f0b0603608866f6b9e0a37a284c0ea72c0004b))
+
+
+
 ### [0.0.6-alpha.0](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.0.5...@clerk/shared@0.0.6-alpha.0) (2022-02-25)
 
 

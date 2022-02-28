@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.1.0-alpha.4 (2022-02-28)
+
+
+### Features
+
+* **clerk-remix:** Introduce basic clerk-remix structure ([f1ba9bd](https://github.com/clerkinc/javascript/commit/f1ba9bd02c5f107ff9993b120954cc62886d9c04))
+* **clerk-remix:** Introduce ClerkProvider for Remix ([edb0cee](https://github.com/clerkinc/javascript/commit/edb0cee6a5eb5124e0fb3a08d8554c6da9b69899))
+* **clerk-remix:** Introduce global polyfill ([5236bed](https://github.com/clerkinc/javascript/commit/5236bedd39e3d2fccd9466ac4dae715131293e4d))
+* **clerk-remix:** Introduce SSR getAuth for Remix ([bae06b8](https://github.com/clerkinc/javascript/commit/bae06b8846dfafe3b57036efc457435799bfa677))
+* **clerk-remix:** Introduce SSR rootAuthLoader for Remix ([23a10c7](https://github.com/clerkinc/javascript/commit/23a10c75c7590660aea7e8b261b0856affd8d01f))
+* **clerk-remix:** Remove load options from `getAuth` ([246fe76](https://github.com/clerkinc/javascript/commit/246fe76943aedc07bed8510761a286ef324049ec))
+* **clerk-remix:** Rename InferLoaderData to InferRootLoaderData ([e9eb81c](https://github.com/clerkinc/javascript/commit/e9eb81c092999614c1325bc2f196bcbf79f8360c))
+* **remix:** Depend on @remix-run/runtime only ([c5c53cd](https://github.com/clerkinc/javascript/commit/c5c53cd2202924a183b2ba77ef136e2aabab32c1))
+* **remix:** Introduce `ConnectClerk` HOC ([3f020ca](https://github.com/clerkinc/javascript/commit/3f020ca8f41632a24a7dd56caef3872a7b56c054))
+* **remix:** Make `rootAuthLoader` require a Response or object return value ([bf53db5](https://github.com/clerkinc/javascript/commit/bf53db5243542e44db39b6422e3f2ffd6765cd79))
+* **remix:** Move Remix dependencies to `peerDependencies` ([0ee115d](https://github.com/clerkinc/javascript/commit/0ee115db783f2ce10db196fdf5d9933481e7872e))
+
+
+### Bug Fixes
+
+* **remix:** Allow no return from `rootAuthLoader` callback ([4768aa6](https://github.com/clerkinc/javascript/commit/4768aa6bcf19e3a6d1a6d86a26f89b7351927673))
+* **remix:** Make `clerkState` required ([677a255](https://github.com/clerkinc/javascript/commit/677a2556846845e52839b5324a6031edc98dc093))
+* **remix:** Make `getAuth` stop loader execution during interstitial ([16a1be3](https://github.com/clerkinc/javascript/commit/16a1be34cce5c8a5027d957669e0176540e58d3a))
+* **remix:** Make `rootAuthLoader` only throw if a callback exists ([2689f6c](https://github.com/clerkinc/javascript/commit/2689f6ce858cd08365a37678d817e60e889e1acb))
+
+
+
 ## [0.1.0-alpha.3](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.1.0-alpha.2...@clerk/remix@0.1.0-alpha.3) (2022-02-25)
 
 
