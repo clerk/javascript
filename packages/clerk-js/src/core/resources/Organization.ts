@@ -48,7 +48,7 @@ export class Organization extends BaseResource implements OrganizationResource {
       .request<OrganizationJSON[]>({
         method: 'GET',
         path: '/me/organizations',
-        search: JSON.stringify(getOrganizationParams),
+        search: getOrganizationParams as any,
       })
       .then(res => {
         const organizationsJSON = res.payload
@@ -60,28 +60,27 @@ export class Organization extends BaseResource implements OrganizationResource {
   getMembers = async (
     getMemberParams?: GetMembersParams,
   ): Promise<OrganizationMembership[]> => {
-    // @ts-ignore
-    return await BaseResource._fetch<OrganizationMembershipJSON[]>({
+    return await BaseResource._fetch({
       path: `/organizations/${this.id}/memberships`,
       method: 'GET',
-      search: getMemberParams,
+      search: getMemberParams as any,
     })
       .then(res => {
-        const members = res?.response as OrganizationMembershipJSON[];
+        const members =
+          res?.response as unknown as OrganizationMembershipJSON[];
         return members.map(member => new OrganizationMembership(member));
       })
       .catch(() => []);
   };
 
-  getPendingInvitations = async (): Promise<OrganizationInvitation> => {
-    // @ts-ignore
-    return await BaseResource._fetch<OrganizationInvitationJSON[]>({
+  getPendingInvitations = async (): Promise<OrganizationInvitation[]> => {
+    return await BaseResource._fetch({
       path: `/organizations/${this.id}/invitations/pending`,
       method: 'GET',
     })
       .then(res => {
         const pendingInvitations =
-          res?.response as OrganizationInvitationJSON[];
+          res?.response as unknown as OrganizationInvitationJSON[];
         return pendingInvitations.map(
           pendingInvitation => new OrganizationInvitation(pendingInvitation),
         );
@@ -126,8 +125,8 @@ export class Organization extends BaseResource implements OrganizationResource {
 }
 
 export type GetOrganizationParams = {
-  limit: number;
-  offset: number;
+  limit?: number;
+  offset?: number;
 };
 
 export type InviteUserParams = {

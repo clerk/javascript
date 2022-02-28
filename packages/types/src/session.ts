@@ -62,4 +62,5 @@ export interface PublicUserData {
   lastName: string | null;
   profileImageUrl: string;
   identifier: string;
+  userId?: string;
 }

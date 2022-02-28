@@ -10,6 +10,7 @@ import {
   FieldState,
   getIdentifierControlDisplayValues,
   handleError,
+  LoadingScreen,
   PoweredByClerk,
   Separator,
   useFieldState,
@@ -42,6 +43,7 @@ export function _SignInStart(): JSX.Element {
   const instantPassword = useFieldState('password', '');
   const organizationTicket = getClerkQueryParam('__clerk_ticket') || '';
   const [error, setError] = React.useState<string | undefined>();
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const standardFormAttributes = userSettings.enabledFirstFactorIdentifiers;
   const web3FirstFactors = userSettings.web3FirstFactors;
@@ -56,6 +58,7 @@ export function _SignInStart(): JSX.Element {
       return;
     }
 
+    setIsLoading(true);
     signIn
       .create({
         strategy: 'ticket',
@@ -74,6 +77,12 @@ export function _SignInStart(): JSX.Element {
             alert(msg);
           }
         }
+      })
+      .catch(err => {
+        return attemptToRecoverFromSignInError(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   }, []);
 
@@ -159,6 +168,10 @@ export function _SignInStart(): JSX.Element {
 
   const hasSocialOrWeb3Buttons =
     !!socialProviderStrategies.length || !!web3FirstFactors.length;
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <>

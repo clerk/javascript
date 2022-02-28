@@ -24,6 +24,7 @@ export class OrganizationMembership implements OrganizationMembershipResource {
       lastName: data.public_user_data.last_name,
       profileImageUrl: data.public_user_data.profile_image_url,
       identifier: data.public_user_data.identifier,
+      userId: data.public_user_data.user_id,
     };
     this.role = data.role;
     this.createdAt = unixEpochToDate(data.created_at);

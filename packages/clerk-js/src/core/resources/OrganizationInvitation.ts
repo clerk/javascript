@@ -16,6 +16,7 @@ export class OrganizationInvitation
   emailAddress!: string;
   organizationId!: string;
   status!: OrganizationInvitationStatus;
+  role!: MembershipRole;
   createdAt!: Date;
   updatedAt!: Date;
 
@@ -53,6 +54,7 @@ export class OrganizationInvitation
     this.id = data.id;
     this.emailAddress = data.email_address;
     this.organizationId = data.organization_id;
+    this.role = data.role;
     this.status = data.status;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);

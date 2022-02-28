@@ -208,6 +208,7 @@ export interface PublicUserDataJSON extends ClerkResourceJSON {
   last_name: string | null;
   profile_image_url: string;
   identifier: string;
+  user_id?: string;
 }
 
 export interface SessionWithActivitiesJSON extends Omit<SessionJSON, 'user'> {
@@ -328,6 +329,7 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   organization_id: string;
   email_address: string;
   status: OrganizationInvitationStatus;
+  role: MembershipRole;
   created_at: number;
   updated_at: number;
 }

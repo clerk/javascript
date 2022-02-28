@@ -1,7 +1,10 @@
+import { MembershipRole } from '.';
+
 export interface OrganizationInvitationResource {
   id: string;
   emailAddress: string;
   organizationId: string;
+  role: MembershipRole;
   status: OrganizationInvitationStatus;
   createdAt: Date;
   updatedAt: Date;

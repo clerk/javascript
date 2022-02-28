@@ -2,6 +2,7 @@ import { Control } from '@clerk/shared/components/control';
 import { Form } from '@clerk/shared/components/form';
 import { Input } from '@clerk/shared/components/input';
 import { PhoneInput } from '@clerk/shared/components/phoneInput';
+import { noop } from '@clerk/shared/utils';
 import { SignUpParams, SignUpResource } from '@clerk/types';
 import React from 'react';
 import type { FieldState } from 'ui/common';
@@ -156,9 +157,15 @@ function _SignUpStart(): JSX.Element {
     }
 
     if (fields.organizationInvitationToken) {
+      // FIXME: Constructing a fake fields object for strategy.
       reqFields.push(
-        // @ts-ignore
-        { name: 'strategy', value: 'ticket', setError: () => ({}) },
+        {
+          name: 'strategy',
+          value: 'ticket',
+          setError: noop,
+          setValue: noop,
+          error: undefined,
+        },
         formFields.emailAddress,
       );
     }
