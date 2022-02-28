@@ -65,7 +65,3 @@ export const loader: LoaderFunction = args => rootAuthLoader(args, ({ auth }) =>
     return { data: posts };
 })
 `);
-
-export const getAuthInterstitialErrorRendered = createErrorMessage(
-  `This state shouldn't be possible. Please reach out to support@clerk.dev so we can help, or use the links below:`,
-);
