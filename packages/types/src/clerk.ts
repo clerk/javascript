@@ -1,4 +1,4 @@
-import { OrganizationResource } from '.';
+import { MembershipRole, OrganizationResource } from '.';
 import { ClientResource } from './client';
 import { DisplayThemeJSON } from './json';
 import { ActiveSessionResource } from './session';
@@ -471,6 +471,12 @@ export interface HandleMagicLinkVerificationParams {
    */
   onVerifiedOnOtherDevice?: Function;
 }
+
+export type CreateOrganizationInvitationParams = {
+  emailAddress: string;
+  role: MembershipRole;
+  redirectUrl?: string;
+};
 
 export interface CreateOrganizationParams {
   name: string;

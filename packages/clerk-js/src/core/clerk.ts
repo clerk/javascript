@@ -7,6 +7,7 @@ import type {
   Clerk as ClerkInterface,
   ClerkOptions,
   ClientResource,
+  CreateOrganizationInvitationParams,
   CreateOrganizationParams,
   EnvironmentResource,
   HandleMagicLinkVerificationParams,
@@ -64,6 +65,7 @@ import {
   MagicLinkError,
   MagicLinkErrorCode,
   Organization,
+  OrganizationInvitation,
 } from './resources/internal';
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
@@ -617,6 +619,13 @@ export default class Clerk implements ClerkInterface {
   __unstable__onAfterResponse(callback: FapiRequestCallback<any>): void {
     this.#fapiClient.onAfterResponse(callback);
   }
+
+  __unstable_inviteMember = async (
+    organizationId: string,
+    params: CreateOrganizationInvitationParams,
+  ) => {
+    return await OrganizationInvitation.create(organizationId, params);
+  };
 
   #loadInBrowser = async (): Promise<void> => {
     this.#authService = new AuthenticationService(this);
