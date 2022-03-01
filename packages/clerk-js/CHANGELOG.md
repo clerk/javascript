@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.15.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@2.14.3...@clerk/clerk-js@2.15.0) (2022-03-01)
+
+
+### Features
+
+* **types:** Add support for oauth_microsoft ([96c1cc6](https://github.com/clerkinc/javascript/commit/96c1cc6817b9bbc6917ea2773498299c1ff9b951))
+
+
+
 ### [2.14.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@2.14.3-staging.0...@clerk/clerk-js@2.14.3) (2022-02-24)
 
 **Note:** Version bump only for package @clerk/clerk-js
