@@ -12,6 +12,7 @@ Organization {
   "name": "test_name",
   "pathRoot": "",
   "removeMember": [Function],
+  "role": "basic_member",
   "updateMember": [Function],
   "updatedAt": 1970-01-01T00:00:05.678Z,
 }

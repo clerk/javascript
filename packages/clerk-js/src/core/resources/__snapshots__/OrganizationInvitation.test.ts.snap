@@ -5,8 +5,10 @@ OrganizationInvitation {
   "createdAt": 1970-01-01T00:00:12.345Z,
   "emailAddress": "test_email",
   "id": "test_id",
+  "organizationId": "test_organization_id",
   "pathRoot": "",
   "revoke": [Function],
+  "role": "basic_member",
   "status": "pending",
   "updatedAt": 1970-01-01T00:00:05.678Z,
 }

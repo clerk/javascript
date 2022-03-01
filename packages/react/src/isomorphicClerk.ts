@@ -2,8 +2,10 @@ import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
   ClientResource,
+  CreateOrganizationParams,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
+  OrganizationResource,
   RedirectOptions,
   Resources,
   SessionResource,
@@ -434,6 +436,17 @@ export default class IsomorphicClerk {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('authenticateWithMetamask', callback);
+    }
+  };
+
+  createOrganization = async (
+    params: CreateOrganizationParams,
+  ): Promise<OrganizationResource | void> => {
+    const callback = () => this.clerkjs?.createOrganization(params);
+    if (this.clerkjs && this._loaded) {
+      return callback() as Promise<OrganizationResource>;
+    } else {
+      this.premountMethodCalls.set('createOrganization', callback);
     }
   };
 

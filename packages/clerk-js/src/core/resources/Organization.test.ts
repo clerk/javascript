@@ -6,6 +6,7 @@ describe('Organization', () => {
       object: 'organization',
       id: 'test_id',
       name: 'test_name',
+      role: 'basic_member',
       created_at: 12345,
       updated_at: 5678,
       created_by: 'test_user_id',
