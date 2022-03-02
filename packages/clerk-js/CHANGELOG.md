@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.16.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@2.15.0...@clerk/clerk-js@2.16.0) (2022-03-02)
+
+
+### Features
+
+* **types,clerk-js:** Introduce Notion OAuth ([#72](https://github.com/clerkinc/javascript/issues/72)) ([9e556d0](https://github.com/clerkinc/javascript/commit/9e556d00fb41dedbbd05de59947d00c720bb3d95))
+
+
+### Bug Fixes
+
+* **clerk-js:** Clear invalid invitation token value ([0c5dc85](https://github.com/clerkinc/javascript/commit/0c5dc85bd69b1050bf36e7108b38868e22022e61))
+
+
+
 ## [2.15.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@2.14.3...@clerk/clerk-js@2.15.0) (2022-03-01)
 
 

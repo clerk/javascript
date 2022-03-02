@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.27.0](https://github.com/clerkinc/javascript/compare/@clerk/types@1.26.0...@clerk/types@1.27.0) (2022-03-02)
+
+
+### Features
+
+* **types,clerk-js:** Introduce Notion OAuth ([#72](https://github.com/clerkinc/javascript/issues/72)) ([9e556d0](https://github.com/clerkinc/javascript/commit/9e556d00fb41dedbbd05de59947d00c720bb3d95))
+
+
+
 ## [1.26.0](https://github.com/clerkinc/javascript/compare/@clerk/types@1.25.4...@clerk/types@1.26.0) (2022-03-01)
 
 
