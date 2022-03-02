@@ -104,6 +104,10 @@ export const OAUTH_PROVIDERS: OAuthProviders = Object.freeze({
     id: 'microsoft',
     name: 'Microsoft',
   },
+  notion: {
+    id: 'notion',
+    name: 'Notion',
+  },
 });
 
 export function getOAuthProviderData(

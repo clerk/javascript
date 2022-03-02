@@ -11,7 +11,8 @@ export type OAuthProvider =
   | 'linkedin'
   | 'dropbox'
   | 'bitbucket'
-  | 'microsoft';
+  | 'microsoft'
+  | 'notion';
 
 export type OAuthStrategy = `oauth_${OAuthProvider}`;
 
