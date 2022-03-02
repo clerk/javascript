@@ -78,6 +78,7 @@ function _SignUpStart(): JSX.Element {
         void completeSignUpFlow(res);
       })
       .catch(err => {
+        formFields.invitationToken.setValue('');
         handleError(err, [], setError);
       })
       .finally(() => {
