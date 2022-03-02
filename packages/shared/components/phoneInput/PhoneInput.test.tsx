@@ -49,7 +49,7 @@ describe('<PhoneInput/>', () => {
     expect(tree).toMatchSnapshot();
   });
 
-  it('renders the phone input when the is dropdown open', () => {
+  it('renders the phone input when the dropdown is open', () => {
     const { container } = render(
       <PhoneInput handlePhoneChange={handlePhoneChange} />,
     );
@@ -68,10 +68,15 @@ describe('<PhoneInput/>', () => {
     expect(input).toHaveAttribute('maxlength', '25');
   });
 
-  it('emits phone number with country code and no formatting', async () => {
+  it('renders with an empty value', () => {
+    render(<PhoneInput handlePhoneChange={handlePhoneChange} />);
+    expect(handlePhoneChange).not.toHaveBeenCalled();
+  });
+
+  it('emits phone number with country code and no formatting', () => {
     render(<PhoneInput handlePhoneChange={handlePhoneChange} />);
     const input = screen.getByRole('textbox');
-    await userEvent.type(input, '2222222222');
+    userEvent.type(input, '2222222222');
     const lastCall = handlePhoneChange.mock.calls.pop();
     expect(lastCall).toEqual(['+12222222222']);
   });

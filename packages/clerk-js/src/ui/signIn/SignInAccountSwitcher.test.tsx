@@ -28,7 +28,12 @@ jest.mock('ui/contexts', () => {
         },
       },
       authConfig: {
-        singleSessionMode: false,
+        identification_strategies: [
+          'email_address',
+          'oauth_google',
+          'oauth_facebook',
+        ],
+        first_factors: ['email_address', 'oauth_google', 'oauth_facebook'],
       },
     })),
     useSignInContext: () => {

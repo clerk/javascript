@@ -21,9 +21,12 @@ function getWeb3WalletAddress(user: UserResource): string {
   return '';
 }
 
+function checkIfSectionIsOn(section: string) {
+  return section === 'on' || section === 'required';
+}
+
 export function ProfileCard(): JSX.Element {
-  const { userSettings } = useEnvironment();
-  const { attributes } = userSettings;
+  const { authConfig } = useEnvironment();
   const user = useCoreUser();
   const { navigate } = useNavigate();
   const web3Wallet = getWeb3WalletAddress(user);
@@ -97,10 +100,10 @@ export function ProfileCard(): JSX.Element {
     </List.Item>
   );
 
-  const showWebWallet = attributes.web3_wallet.enabled;
-  const showUsername = attributes.username.enabled;
-  const showEmail = attributes.email_address.enabled;
-  const showPhone = attributes.phone_number.enabled;
+  const showWebWallet = !!web3Wallet;
+  const showUsername = checkIfSectionIsOn(authConfig.username);
+  const showEmail = checkIfSectionIsOn(authConfig.emailAddress);
+  const showPhone = checkIfSectionIsOn(authConfig.phoneNumber);
 
   return (
     <TitledCard

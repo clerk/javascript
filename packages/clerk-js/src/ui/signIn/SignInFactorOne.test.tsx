@@ -685,7 +685,7 @@ describe('<SignInFactorOne/>', () => {
       expect(container.querySelector('.cl-auth-form-spinner')).toBeDefined();
     });
 
-    it('renders the fallback screen', () => {
+    it('renders the fallback screen', async () => {
       (
         useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>
       ).mockImplementation(() => ({
@@ -705,7 +705,7 @@ describe('<SignInFactorOne/>', () => {
 
       render(<SignInFactorOne />);
 
-      screen.getByText('Unknown error');
+      screen.getByText(/no available authentication method/);
     });
   });
 });

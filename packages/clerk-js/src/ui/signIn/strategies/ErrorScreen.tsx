@@ -1,12 +1,12 @@
 import React from 'react';
 import { Body, Footer, Header } from 'ui/common/authForms';
 
-export function ErrorScreen(): JSX.Element {
+export function ErrorScreen({ message }: ErrorScreenProps): JSX.Element {
   return (
     <>
       <Header showBack />
       <Body>
-        <div className='cl-auth-form-message'>Unknown error</div>
+        <div className='cl-auth-form-message'>{message}</div>
       </Body>
       <Footer>
         <div className='cl-auth-form-link'>
@@ -19,3 +19,7 @@ export function ErrorScreen(): JSX.Element {
     </>
   );
 }
+
+type ErrorScreenProps = {
+  message: string;
+};

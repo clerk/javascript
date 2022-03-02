@@ -3,6 +3,50 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.15.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@2.14.3...@clerk/clerk-js@2.15.0) (2022-03-01)
+
+
+### Features
+
+* **types:** Add support for oauth_microsoft ([96c1cc6](https://github.com/clerkinc/javascript/commit/96c1cc6817b9bbc6917ea2773498299c1ff9b951))
+
+
+
+### [2.14.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@2.14.3-staging.0...@clerk/clerk-js@2.14.3) (2022-02-24)
+
+**Note:** Version bump only for package @clerk/clerk-js
+
+
+
+
+
+### [2.14.3-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@2.14.2-staging.0...@clerk/clerk-js@2.14.3-staging.0) (2022-02-24)
+
+
+### Features
+
+* **clerk-js:** Introduce `UserSettings.instanceIsPasswordBased` ([f72a555](https://github.com/clerkinc/javascript/commit/f72a555f6adb38870539e9bab63cb638c04517d6))
+
+
+### Bug Fixes
+
+* **clerk-js,clerk-react:** Revert user settings work ([9a70576](https://github.com/clerkinc/javascript/commit/9a70576d1a47f01e6dbbfd8704f321daddcfe590))
+* **clerk-js:** Helpful error message for sign in without factors ([9d8a050](https://github.com/clerkinc/javascript/commit/9d8a050d975fddb3e3163781d010138a888b7bf2))
+* **clerk-js:** Import Clerk CSS after shared css modules/ components ([dde2f3b](https://github.com/clerkinc/javascript/commit/dde2f3b87a0e177967ce13f087806ebff2084ff5))
+* **clerk-js:** Render instant password field for password-based instances only ([586437f](https://github.com/clerkinc/javascript/commit/586437f238723da6f03119e2069989eaabe48ddd))
+* **clerk-js:** Render instant password field for password-based instances only ([a9eefc9](https://github.com/clerkinc/javascript/commit/a9eefc967d4745a54aee0c917ce707b1a51df1be))
+
+
+
+### [2.14.2-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@2.14.1-staging.0...@clerk/clerk-js@2.14.2-staging.0) (2022-02-22)
+
+
+### Features
+
+* **clerk-js:** Allow passing of object style search params on fapiclient ([8144779](https://github.com/clerkinc/javascript/commit/8144779e37ca4b0a61ac1d452ddd0ab7ccf40f27))
+
+
+
 ### [2.14.1-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@2.14.0-staging.0...@clerk/clerk-js@2.14.1-staging.0) (2022-02-17)
 
 **Note:** Version bump only for package @clerk/clerk-js

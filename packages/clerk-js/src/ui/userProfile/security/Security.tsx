@@ -8,16 +8,16 @@ import { PageHeading } from 'ui/userProfile/pageHeading';
 import { ActiveDevicesCard } from './DevicesAndActivity/ActiveDevicesCard';
 
 export function Security(): JSX.Element {
-  const { userSettings } = useEnvironment();
-  const { attributes } = userSettings;
+  const { authConfig } = useEnvironment();
   const { navigate } = useNavigate();
   const user = useCoreUser();
 
-  const showPasswordRow = attributes.password.enabled;
+  const showPasswordRow =
+    authConfig.password === 'on' || authConfig.password === 'required';
 
   const showSecondFactorRow =
-    attributes.phone_number.used_for_second_factor &&
-    attributes.phone_number.second_factors.includes('phone_code');
+    authConfig.secondFactors.length > 0 &&
+    authConfig.secondFactors.includes('phone_code');
 
   const buildPasswordRow = () => (
     <List.Item

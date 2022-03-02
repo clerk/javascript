@@ -55,24 +55,16 @@ describe('<Security/>', () => {
       useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>,
       true,
     ).mockImplementation(
-      () => (
-        {
-          userSettings: {
-            attributes: {
-              phone_number: {
-                used_for_second_factor: true,
-                second_factors: ['phone_code']
-              },
-              password: {
-                enabled: true
-              }
-            }
+      () =>
+        ({
+          authConfig: {
+            secondFactors: ['phone_code'],
+            password: 'on',
           },
           displayConfig: {
             branded: true,
           },
-        } as PartialDeep<EnvironmentResource>
-      )
+        } as PartialDeep<EnvironmentResource>),
     );
     const tree = renderJSON(<Security />);
     expect(tree).toMatchSnapshot();
