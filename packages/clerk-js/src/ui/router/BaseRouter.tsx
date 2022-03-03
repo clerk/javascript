@@ -78,7 +78,7 @@ export const BaseRouter = ({
   useWindowEventListener(refreshEvents, refresh);
 
   // TODO: Look into the real possible types of globalNavigate
-  const baseNavigate = async (toURL: URL): Promise<void> => {
+  const baseNavigate = async (toURL: URL): Promise<unknown> => {
     if (
       toURL.origin !== window.location.origin ||
       !toURL.pathname.startsWith('/' + basePath)
@@ -86,8 +86,7 @@ export const BaseRouter = ({
       if (onExternalNavigate) {
         onExternalNavigate();
       }
-      await externalNavigate(toURL.href);
-      return;
+      return await externalNavigate(toURL.href);
     }
 
     // For internal navigation, preserve any query params
@@ -101,11 +100,9 @@ export const BaseRouter = ({
       });
       toURL.search = qs.stringify(toQueryParams);
     }
-    await internalNavigate(toURL);
-    setRouteParts({
-      path: toURL.pathname,
-      queryString: toURL.search,
-    });
+    const internalNavRes = await internalNavigate(toURL);
+    setRouteParts({ path: toURL.pathname, queryString: toURL.search });
+    return internalNavRes;
   };
 
   return (

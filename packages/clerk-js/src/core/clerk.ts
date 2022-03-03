@@ -1,5 +1,6 @@
 import { LocalStorageBroadcastChannel } from '@clerk/shared/utils/localStorageBroadcastChannel';
 import { noop } from '@clerk/shared/utils/noop';
+import { inClientSide } from '@clerk/shared/utils/ssr';
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
@@ -31,7 +32,8 @@ import { AuthenticationService } from 'core/services';
 import { ERROR_CODES } from 'ui/common/constants';
 import {
   appendAsQueryParams,
-  CLERK_BEFORE_UNLOAD_EVENT,
+  createBeforeUnloadTracker,
+  createPageLifecycle,
   ignoreEventValue,
   isAccountsHostedPages,
   isDevOrStagingUrl,
@@ -92,12 +94,12 @@ export default class Clerk implements ClerkInterface {
   #listeners: Array<(emission: Resources) => void> = [];
   #options: ClerkOptions = {};
   #isReady = false;
-  #unloading = false;
   #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null =
     null;
   #fapiClient: FapiClient;
   #authService: AuthenticationService | null = null;
   #devBrowserHandler: DevBrowserHandler | null = null;
+  #pageLifecycle = createPageLifecycle();
 
   /**
    * @inheritDoc {ClerkInterface.version}
@@ -296,17 +298,21 @@ export default class Clerk implements ClerkInterface {
     //   undefined, then wait for beforeEmit to complete before emitting the new session.
     //   When undefined, neither SignedIn nor SignedOut renders, which avoids flickers or
     //   automatic reloading when reloading shouldn't be happening.
+    const beforeUnloadTracker = createBeforeUnloadTracker();
     if (beforeEmit) {
+      beforeUnloadTracker.startTracking();
       this.session = undefined;
       this.user = undefined;
       this.#emit();
       await beforeEmit(session);
+      beforeUnloadTracker.stopTracking();
     }
 
     //3. Check if hard reloading (onbeforeunload).  If not, set the user/session and emit
-    if (this.#unloading) {
+    if (beforeUnloadTracker.isUnloading()) {
       return;
     }
+
     this.session = session;
     this.user = this.session ? this.session.user : null;
 
@@ -724,21 +730,14 @@ export default class Clerk implements ClerkInterface {
   };
 
   #setupListeners = (): void => {
-    if (typeof document == 'undefined') {
+    if (!inClientSide()) {
       return;
     }
 
-    document.addEventListener('visibilitychange', () => {
-      if (
-        document.visibilityState === 'visible' &&
-        typeof this.session !== 'undefined'
-      ) {
-        void Promise.all([this.#touchLastActiveSession(this.session)]);
+    this.#pageLifecycle.onPageVisible(() => {
+      if (this.session) {
+        void this.#touchLastActiveSession(this.session);
       }
-    });
-
-    window.addEventListener(CLERK_BEFORE_UNLOAD_EVENT, () => {
-      this.#unloading = true;
     });
 
     this.#broadcastChannel?.addEventListener('message', ({ data }) => {
