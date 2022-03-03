@@ -36,6 +36,12 @@ export function Logo(): JSX.Element {
     if (hasLogoImage || !logoContainer || !name) {
       return;
     }
+
+    if (typeof window === 'undefined' || !window.ResizeObserver) {
+      fitTextInOneLine(name, logoContainer, '48px');
+      return;
+    }
+
     const ro = new ResizeObserver(() =>
       fitTextInOneLine(name, logoContainer, '48px'),
     );
