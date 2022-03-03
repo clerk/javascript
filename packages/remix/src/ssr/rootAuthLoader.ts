@@ -26,6 +26,8 @@ export async function rootAuthLoader(
     ? cbOrOptions
     : {};
 
+  const frontendApi = process.env.CLERK_FRONTEND_API || opts.frontendApi;
+
   const { authData, interstitial } = await getAuthData(args.request, opts);
 
   if (interstitial) {
@@ -33,7 +35,7 @@ export async function rootAuthLoader(
   }
 
   if (!callback) {
-    return { ...wrapClerkState({ __clerk_ssr_state: authData }) };
+    return { ...wrapClerkState({ __clerk_ssr_state: authData, __frontendApi: frontendApi }) };
   }
 
   const callbackResult = await callback?.(injectAuthIntoArgs(args, sanitizeAuthData(authData!)));
@@ -47,5 +49,5 @@ export async function rootAuthLoader(
     throw new Error(invalidRootLoaderCallbackResponseReturn);
   }
 
-  return { ...callbackResult, ...wrapClerkState({ __clerk_ssr_state: authData }) };
+  return { ...callbackResult, ...wrapClerkState({ __clerk_ssr_state: authData, __frontendApi: frontendApi }) };
 }

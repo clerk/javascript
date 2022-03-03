@@ -69,3 +69,9 @@ export const loader: LoaderFunction = args => rootAuthLoader(args, ({ auth }) =>
 export const getAuthInterstitialErrorRendered = createErrorMessage(
   `This state shouldn't be possible. Please reach out to support@clerk.dev so we can help, or use the links below:`,
 );
+
+export const noFrontendApiError = createErrorMessage(`
+The CLERK_FRONTEND_API1 environment variable must be set before using Clerk.
+During development, grab the Frontend Api value from the Clerk dashboard, create an .env file and set the CLERK_FRONTEND_API key.
+For production apps, please consult the Remix documentation on environment variables.
+`);
