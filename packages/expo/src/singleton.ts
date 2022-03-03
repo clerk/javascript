@@ -25,8 +25,8 @@ export function buildClerk({
   frontendApi,
   tokenCache,
 }: BuildClerkOptions): ClerkProp {
-  const getToken = tokenCache ? tokenCache.getToken : getTokenFromMemory;
-  const saveToken = tokenCache ? tokenCache.saveToken : saveTokenInMemory;
+  const getToken = (tokenCache && tokenCache.getToken) ?? getTokenFromMemory;
+  const saveToken = (tokenCache && tokenCache.saveToken) ?? saveTokenInMemory;
 
   if (!clerk) {
     clerk = new Clerk(frontendApi);
