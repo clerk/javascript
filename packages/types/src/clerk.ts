@@ -228,9 +228,24 @@ export interface Clerk {
     params?: AuthenticateWithMetamaskParams,
   ) => Promise<unknown>;
 
+  /**
+   * Creates an organization, adding the current user as admin.
+   */
   createOrganization: (
     params: CreateOrganizationParams,
   ) => Promise<OrganizationResource>;
+
+  /**
+   * Retrieves all the organizations the current user is a member of.
+   */
+  getOrganizations: () => Promise<OrganizationResource[]>;
+
+  /**
+   * Retrieves a single organization by id.
+   */
+  getOrganization: (
+    organizationId: string,
+  ) => Promise<OrganizationResource | undefined>;
 
   /**
    * Handles a 401 response from Frontend API by refreshing the client and session object accordingly

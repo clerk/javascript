@@ -40,21 +40,20 @@ export class Organization extends BaseResource implements OrganizationResource {
     return new Organization(json);
   }
 
-  static retrieve(
+  static async retrieve(
     getOrganizationParams?: GetOrganizationParams,
   ): Promise<Organization[]> {
-    return this.clerk
-      .getFapiClient()
-      .request<OrganizationJSON[]>({
-        method: 'GET',
-        path: '/me/organizations',
-        search: getOrganizationParams as any,
-      })
+    return await BaseResource._fetch({
+      path: '/me/organizations',
+      method: 'GET',
+      search: getOrganizationParams as any,
+    })
       .then(res => {
-        const organizationsJSON = res.payload
-          ?.response as unknown as OrganizationJSON[];
+        const organizationsJSON =
+          res?.response as unknown as OrganizationJSON[];
         return organizationsJSON.map(org => new Organization(org));
-      });
+      })
+      .catch(() => []);
   }
 
   getMembers = async (

@@ -9,6 +9,10 @@ type UseOrganizations = {
   createOrganization: (
     params: CreateOrganizationParams,
   ) => Promise<OrganizationResource>;
+  getOrganizations: () => Promise<OrganizationResource[]>;
+  getOrganization: (
+    organizationId: string,
+  ) => Promise<OrganizationResource | undefined>;
 };
 
 export function useOrganizations(): UseOrganizations {
@@ -18,5 +22,7 @@ export function useOrganizations(): UseOrganizations {
 
   return {
     createOrganization: clerk.createOrganization,
+    getOrganizations: clerk.getOrganizations,
+    getOrganization: clerk.getOrganization,
   };
 }

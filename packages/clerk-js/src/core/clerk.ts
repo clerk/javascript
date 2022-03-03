@@ -584,6 +584,18 @@ export default class Clerk implements ClerkInterface {
     return await Organization.create(name);
   };
 
+  public getOrganizations = async (): Promise<OrganizationResource[]> => {
+    return await Organization.retrieve();
+  };
+
+  public getOrganization = async (
+    organizationId: string,
+  ): Promise<OrganizationResource | undefined> => {
+    return (await Organization.retrieve()).find(
+      org => org.id === organizationId,
+    );
+  };
+
   updateClient = (newClient: ClientResource): void => {
     if (!this.client) {
       // This is the first time client is being

@@ -95,6 +95,7 @@ function _SignUpStart(): JSX.Element {
       ? { invitation_token: invitationToken }
       : { strategy: 'ticket', ticket: organizationInvitationToken };
     setIsLoading(true);
+
     signUp
       .create(invitationParams)
       .then(res => {
@@ -102,7 +103,9 @@ function _SignUpStart(): JSX.Element {
         void completeSignUpFlow(res);
       })
       .catch(err => {
+        /* Clear token values when an error occurs in the initial sign up attempt */
         formFields.invitationToken.setValue('');
+        formFields.organizationInvitationToken.setValue('');
         handleError(err, [], setError);
       })
       .finally(() => {

@@ -467,6 +467,26 @@ export default class IsomorphicClerk {
     }
   };
 
+  getOrganizations = async (): Promise<OrganizationResource[] | void> => {
+    const callback = () => this.clerkjs?.getOrganizations();
+    if (this.clerkjs && this._loaded) {
+      return callback() as Promise<OrganizationResource[]>;
+    } else {
+      this.premountMethodCalls.set('getOrganizations', callback);
+    }
+  };
+
+  getOrganization = async (
+    organizationId: string,
+  ): Promise<OrganizationResource | undefined | void> => {
+    const callback = () => this.clerkjs?.getOrganization(organizationId);
+    if (this.clerkjs && this._loaded) {
+      return callback() as Promise<OrganizationResource | undefined>;
+    } else {
+      this.premountMethodCalls.set('getOrganization', callback);
+    }
+  };
+
   signOut = async (signOutCallback?: SignOutCallback): Promise<void> => {
     const callback = () => this.clerkjs?.signOut(signOutCallback);
     if (this.clerkjs && this._loaded) {
