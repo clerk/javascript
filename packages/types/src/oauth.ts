@@ -127,9 +127,19 @@ export function sortedOAuthProviders(sortingArray: OAuthStrategy[]) {
   return OAUTH_PROVIDERS
     .slice()
     .sort(
-      (a, b) =>
-        sortingArray.indexOf(a.strategy) -
-        sortingArray.indexOf(b.strategy),
+      (a, b) => {
+        let aPos = sortingArray.indexOf(a.strategy);
+        if (aPos == -1) {
+          aPos = Number.MAX_SAFE_INTEGER;
+        }
+
+        let bPos = sortingArray.indexOf(b.strategy);
+        if (bPos == -1) {
+          bPos = Number.MAX_SAFE_INTEGER;
+        }
+
+        return aPos - bPos;
+      }
     )
 }
 
