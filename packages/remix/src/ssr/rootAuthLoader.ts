@@ -1,3 +1,5 @@
+import { json } from '@remix-run/server-runtime';
+
 import { invalidRootLoaderCallbackResponseReturn, invalidRootLoaderCallbackReturn } from '../errors';
 import { getAuthData } from './getAuthData';
 import { LoaderFunctionArgs, LoaderFunctionReturn, RootAuthLoaderCallback, RootAuthLoaderOptions } from './types';
@@ -27,7 +29,7 @@ export async function rootAuthLoader(
   const { authData, interstitial } = await getAuthData(args.request, opts);
 
   if (interstitial) {
-    return wrapClerkState({ __clerk_ssr_interstitial: interstitial });
+    throw json(wrapClerkState({ __clerk_ssr_interstitial: interstitial }));
   }
 
   if (!callback) {
@@ -36,6 +38,7 @@ export async function rootAuthLoader(
 
   const callbackResult = await callback?.(injectAuthIntoArgs(args, sanitizeAuthData(authData!)));
   assertObject(callbackResult, invalidRootLoaderCallbackReturn);
+
   // Pass through custom responses
   if (isResponse(callbackResult)) {
     if (callbackResult.status >= 300 && callbackResult.status < 400) {
