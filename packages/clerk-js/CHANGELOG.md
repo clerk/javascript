@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [2.16.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@2.16.0...@clerk/clerk-js@2.16.1) (2022-03-03)
+
+
+### Bug Fixes
+
+* **types:** Consolidate oauth provider types ([bce9ef5](https://github.com/clerkinc/javascript/commit/bce9ef5cbfe02e11fe71db3e34dbf4fd9be9c3ed))
+
+
+
 ## [2.16.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@2.15.0...@clerk/clerk-js@2.16.0) (2022-03-02)
 
 

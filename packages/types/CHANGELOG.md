@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [1.27.1](https://github.com/clerkinc/javascript/compare/@clerk/types@1.27.0...@clerk/types@1.27.1) (2022-03-03)
+
+
+### Bug Fixes
+
+* **types:** Consolidate oauth provider types ([bce9ef5](https://github.com/clerkinc/javascript/commit/bce9ef5cbfe02e11fe71db3e34dbf4fd9be9c3ed))
+
+
+
 ## [1.27.0](https://github.com/clerkinc/javascript/compare/@clerk/types@1.26.0...@clerk/types@1.27.0) (2022-03-02)
 
 
