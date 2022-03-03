@@ -12,9 +12,9 @@ export async function getAuth(argsOrReq: Request | LoaderFunctionArgs): GetAuthR
     throw new Error(noRequestPassedInGetAuth);
   }
   const request = 'request' in argsOrReq ? argsOrReq.request : argsOrReq;
-  const { authData, interstitial } = await getAuthData(request);
+  const { authData, showInterstitial } = await getAuthData(request);
 
-  if (interstitial || !authData) {
+  if (showInterstitial || !authData) {
     throw json(EMPTY_INTERSTITIAL_RESPONSE);
   }
 

@@ -3,7 +3,7 @@ import { json } from '@remix-run/server-runtime';
 import { invalidRootLoaderCallbackResponseReturn, invalidRootLoaderCallbackReturn } from '../errors';
 import { getAuthData } from './getAuthData';
 import { LoaderFunctionArgs, LoaderFunctionReturn, RootAuthLoaderCallback, RootAuthLoaderOptions } from './types';
-import { assertObject, injectAuthIntoArgs, isResponse, sanitizeAuthData, wrapClerkState } from './utils';
+import { assertObject, injectAuthIntoArgs, isRedirect, isResponse, sanitizeAuthData, wrapClerkState } from './utils';
 
 export async function rootAuthLoader<Options extends RootAuthLoaderOptions>(
   args: LoaderFunctionArgs,
@@ -27,11 +27,10 @@ export async function rootAuthLoader(
     : {};
 
   const frontendApi = process.env.CLERK_FRONTEND_API || opts.frontendApi;
+  const { authData, showInterstitial } = await getAuthData(args.request, opts);
 
-  const { authData, interstitial } = await getAuthData(args.request, opts);
-
-  if (interstitial) {
-    throw json(wrapClerkState({ __clerk_ssr_interstitial: interstitial }));
+  if (showInterstitial) {
+    throw json(wrapClerkState({ __clerk_ssr_interstitial: showInterstitial, __frontendApi: frontendApi }));
   }
 
   if (!callback) {
@@ -43,7 +42,7 @@ export async function rootAuthLoader(
 
   // Pass through custom responses
   if (isResponse(callbackResult)) {
-    if (callbackResult.status >= 300 && callbackResult.status < 400) {
+    if (isRedirect(callbackResult)) {
       return callbackResult;
     }
     throw new Error(invalidRootLoaderCallbackResponseReturn);
