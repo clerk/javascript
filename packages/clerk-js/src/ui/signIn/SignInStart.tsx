@@ -15,6 +15,7 @@ import {
   FieldState,
   FirstFactorConfigs,
   handleError,
+  LoadingScreen,
   PoweredByClerk,
   Separator,
   useFieldState,
@@ -30,6 +31,7 @@ import {
 } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
 import { useSupportEmail } from 'ui/hooks/useSupportEmail';
+import { getClerkQueryParam } from 'utils/getClerkQueryParam';
 
 import { SignUpLink } from './SignUpLink';
 import { OAuth, Web3 } from './strategies';
@@ -44,9 +46,44 @@ export function _SignInStart(): JSX.Element {
 
   const identifier = useFieldState('identifier', '');
   const instantPassword = useFieldState('password', '');
+  const organizationTicket = getClerkQueryParam('__clerk_ticket') || '';
   const [error, setError] = React.useState<string | undefined>();
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const { authConfig } = environment;
+
+  React.useEffect(() => {
+    if (!organizationTicket) {
+      return;
+    }
+
+    setIsLoading(true);
+    signIn
+      .create({
+        strategy: 'ticket',
+        ticket: organizationTicket,
+      })
+      .then(res => {
+        switch (res.status) {
+          case 'needs_first_factor':
+            return navigate('factor-one');
+          case 'needs_second_factor':
+            return navigate('factor-two');
+          case 'complete':
+            return setSession(res.createdSessionId, navigateAfterSignIn);
+          default: {
+            const msg = `Response: ${res.status} not supported yet.\nFor more information contact us at ${supportEmail}`;
+            alert(msg);
+          }
+        }
+      })
+      .catch(err => {
+        return attemptToRecoverFromSignInError(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, []);
 
   const firstPartyOptions = authConfig.identificationStrategies.filter(
     strategy => !strategy.includes('oauth') && !strategy.includes('web3'),
@@ -161,6 +198,10 @@ export function _SignInStart(): JSX.Element {
     e.preventDefault();
     return signInWithFields(identifier, instantPassword);
   };
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <>

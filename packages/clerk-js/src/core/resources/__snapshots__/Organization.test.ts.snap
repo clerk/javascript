@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Organization has the same initial properties 1`] = `
+Organization {
+  "createdAt": 1970-01-01T00:00:12.345Z,
+  "createdBy": "test_user_id",
+  "getMembers": [Function],
+  "getPendingInvitations": [Function],
+  "id": "test_id",
+  "instanceId": "test_instance_id",
+  "inviteUser": [Function],
+  "name": "test_name",
+  "pathRoot": "",
+  "removeMember": [Function],
+  "role": "basic_member",
+  "updateMember": [Function],
+  "updatedAt": 1970-01-01T00:00:05.678Z,
+}
+`;

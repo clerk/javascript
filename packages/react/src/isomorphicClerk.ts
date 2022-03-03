@@ -2,8 +2,12 @@ import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
   ClientResource,
+  CreateOrganizationInvitationParams,
+  CreateOrganizationParams,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
+  OrganizationInvitationResource,
+  OrganizationResource,
   RedirectOptions,
   Resources,
   SessionResource,
@@ -233,6 +237,21 @@ export default class IsomorphicClerk {
     }
   }
 
+  __unstable_inviteMember = async (
+    organizationId: string,
+    params: CreateOrganizationInvitationParams,
+  ): Promise<OrganizationInvitationResource | void> => {
+    const callback = () =>
+      // @ts-expect-error
+      this.clerkjs.__unstable_inviteMember(organizationId, params);
+    if (this.clerkjs && this._loaded) {
+      return callback() as Promise<OrganizationInvitationResource>;
+    } else {
+      // @ts-expect-error
+      this.premountMethodCalls.set('__unstable_inviteMember', callback);
+    }
+  };
+
   setSession = (
     session: ActiveSessionResource | string | null,
     beforeEmit?: (session: ActiveSessionResource | null) => void | Promise<any>,
@@ -434,6 +453,37 @@ export default class IsomorphicClerk {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('authenticateWithMetamask', callback);
+    }
+  };
+
+  createOrganization = async (
+    params: CreateOrganizationParams,
+  ): Promise<OrganizationResource | void> => {
+    const callback = () => this.clerkjs?.createOrganization(params);
+    if (this.clerkjs && this._loaded) {
+      return callback() as Promise<OrganizationResource>;
+    } else {
+      this.premountMethodCalls.set('createOrganization', callback);
+    }
+  };
+
+  getOrganizations = async (): Promise<OrganizationResource[] | void> => {
+    const callback = () => this.clerkjs?.getOrganizations();
+    if (this.clerkjs && this._loaded) {
+      return callback() as Promise<OrganizationResource[]>;
+    } else {
+      this.premountMethodCalls.set('getOrganizations', callback);
+    }
+  };
+
+  getOrganization = async (
+    organizationId: string,
+  ): Promise<OrganizationResource | undefined | void> => {
+    const callback = () => this.clerkjs?.getOrganization(organizationId);
+    if (this.clerkjs && this._loaded) {
+      return callback() as Promise<OrganizationResource | undefined>;
+    } else {
+      this.premountMethodCalls.set('getOrganization', callback);
     }
   };
 

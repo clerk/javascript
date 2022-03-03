@@ -2,6 +2,7 @@
  * Currently representing API DTOs in their JSON form.
  */
 
+import { MembershipRole, OrganizationInvitationStatus } from '.';
 import { ToggleType, ToggleTypeWithRequire } from './authConfig';
 import { EmailAddressVerificationStrategy } from './emailAddress';
 import { OAuthStrategy } from './oauth';
@@ -209,6 +210,7 @@ export interface PublicUserDataJSON extends ClerkResourceJSON {
   last_name: string | null;
   profile_image_url: string;
   identifier: string;
+  user_id?: string;
 }
 
 export interface SessionWithActivitiesJSON extends Omit<SessionJSON, 'user'> {
@@ -317,3 +319,34 @@ export type ExternalAccountJSON =
       last_name: string;
       avatar_url: string;
     };
+
+export interface OrganizationJSON extends ClerkResourceJSON {
+  object: 'organization';
+  id: string;
+  name: string;
+  role: MembershipRole;
+  instance_id: string;
+  created_by: string;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface OrganizationMembershipJSON extends ClerkResourceJSON {
+  object: 'organization_membership';
+  id: string;
+  public_user_data: PublicUserDataJSON;
+  role: MembershipRole;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface OrganizationInvitationJSON extends ClerkResourceJSON {
+  object: 'organization_invitation';
+  id: string;
+  organization_id: string;
+  email_address: string;
+  status: OrganizationInvitationStatus;
+  role: MembershipRole;
+  created_at: number;
+  updated_at: number;
+}

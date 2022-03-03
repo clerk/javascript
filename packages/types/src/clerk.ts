@@ -1,3 +1,4 @@
+import { MembershipRole, OrganizationResource } from '.';
 import { ClientResource } from './client';
 import { DisplayThemeJSON } from './json';
 import { ActiveSessionResource } from './session';
@@ -226,6 +227,25 @@ export interface Clerk {
   authenticateWithMetamask: (
     params?: AuthenticateWithMetamaskParams,
   ) => Promise<unknown>;
+
+  /**
+   * Creates an organization, adding the current user as admin.
+   */
+  createOrganization: (
+    params: CreateOrganizationParams,
+  ) => Promise<OrganizationResource>;
+
+  /**
+   * Retrieves all the organizations the current user is a member of.
+   */
+  getOrganizations: () => Promise<OrganizationResource[]>;
+
+  /**
+   * Retrieves a single organization by id.
+   */
+  getOrganization: (
+    organizationId: string,
+  ) => Promise<OrganizationResource | undefined>;
 
   /**
    * Handles a 401 response from Frontend API by refreshing the client and session object accordingly
@@ -465,6 +485,16 @@ export interface HandleMagicLinkVerificationParams {
    * verification on another device.
    */
   onVerifiedOnOtherDevice?: Function;
+}
+
+export type CreateOrganizationInvitationParams = {
+  emailAddress: string;
+  role: MembershipRole;
+  redirectUrl?: string;
+};
+
+export interface CreateOrganizationParams {
+  name: string;
 }
 
 export interface AuthenticateWithMetamaskParams {

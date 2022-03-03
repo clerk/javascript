@@ -7,10 +7,13 @@ import type {
   Clerk as ClerkInterface,
   ClerkOptions,
   ClientResource,
+  CreateOrganizationInvitationParams,
+  CreateOrganizationParams,
   EnvironmentResource,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
   ListenerCallback,
+  OrganizationResource,
   RedirectOptions,
   Resources,
   SignInProps,
@@ -61,6 +64,8 @@ import {
   Environment,
   MagicLinkError,
   MagicLinkErrorCode,
+  Organization,
+  OrganizationInvitation,
 } from './resources/internal';
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
@@ -296,7 +301,7 @@ export default class Clerk implements ClerkInterface {
     if (this.#unloading) {
       return;
     }
-    this.session = session ;
+    this.session = session;
     this.user = this.session ? this.session.user : null;
 
     this.#emit();
@@ -573,6 +578,24 @@ export default class Clerk implements ClerkInterface {
     }
   };
 
+  public createOrganization = async ({
+    name,
+  }: CreateOrganizationParams): Promise<OrganizationResource> => {
+    return await Organization.create(name);
+  };
+
+  public getOrganizations = async (): Promise<OrganizationResource[]> => {
+    return await Organization.retrieve();
+  };
+
+  public getOrganization = async (
+    organizationId: string,
+  ): Promise<OrganizationResource | undefined> => {
+    return (await Organization.retrieve()).find(
+      org => org.id === organizationId,
+    );
+  };
+
   updateClient = (newClient: ClientResource): void => {
     if (!this.client) {
       // This is the first time client is being
@@ -608,6 +631,13 @@ export default class Clerk implements ClerkInterface {
   __unstable__onAfterResponse(callback: FapiRequestCallback<any>): void {
     this.#fapiClient.onAfterResponse(callback);
   }
+
+  __unstable_inviteMember = async (
+    organizationId: string,
+    params: CreateOrganizationInvitationParams,
+  ) => {
+    return await OrganizationInvitation.create(organizationId, params);
+  };
 
   #loadInBrowser = async (): Promise<void> => {
     this.#authService = new AuthenticationService(this);

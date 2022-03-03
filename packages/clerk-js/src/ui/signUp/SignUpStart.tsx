@@ -2,7 +2,13 @@ import { Control } from '@clerk/shared/components/control';
 import { Form } from '@clerk/shared/components/form';
 import { Input } from '@clerk/shared/components/input';
 import { PhoneInput } from '@clerk/shared/components/phoneInput';
-import { OAuthStrategy, SignUpResource, Web3Strategy } from '@clerk/types';
+import { noop } from '@clerk/shared/utils';
+import {
+  OAuthStrategy,
+  SignUpParams,
+  SignUpResource,
+  Web3Strategy,
+} from '@clerk/types';
 import React from 'react';
 import type { FieldState } from 'ui/common';
 import {
@@ -57,28 +63,49 @@ function _SignUpStart(): JSX.Element {
       'invitation_token',
       getClerkQueryParam('__clerk_invitation_token') || '',
     ),
+    organizationInvitationToken: useFieldState(
+      'ticket',
+      getClerkQueryParam('__clerk_ticket') || '',
+    ),
   } as const;
   type FormFieldsKey = keyof typeof formFields;
 
   const [error, setError] = React.useState<string | undefined>();
   const hasInvitationToken = !!formFields.invitationToken.value;
-  const fields = determineFirstPartyFields(environment, hasInvitationToken);
+  const hasOrganizationInvitationToken =
+    !!formFields.organizationInvitationToken.value;
+  const hasToken = hasInvitationToken || hasOrganizationInvitationToken;
+
+  const fields = determineFirstPartyFields(
+    environment,
+    hasInvitationToken,
+    hasOrganizationInvitationToken,
+  );
   const oauthOptions = determineOauthOptions(environment) as OAuthStrategy[];
   const web3Options = determineWeb3Options(environment) as Web3Strategy[];
-  const handleInvitationFlow = async () => {
-    const token = formFields.invitationToken.value;
-    if (!token) {
+
+  const handleTokenFlow = () => {
+    const invitationToken = formFields.invitationToken.value;
+    const organizationInvitationToken =
+      formFields.organizationInvitationToken.value;
+    if (!invitationToken && !organizationInvitationToken) {
       return;
     }
+    const invitationParams: SignUpParams = invitationToken
+      ? { invitation_token: invitationToken }
+      : { strategy: 'ticket', ticket: organizationInvitationToken };
     setIsLoading(true);
+
     signUp
-      .create({ invitation_token: token })
+      .create(invitationParams)
       .then(res => {
         formFields.emailAddress.setValue(res.emailAddress || '');
         void completeSignUpFlow(res);
       })
       .catch(err => {
+        /* Clear token values when an error occurs in the initial sign up attempt */
         formFields.invitationToken.setValue('');
+        formFields.organizationInvitationToken.setValue('');
         handleError(err, [], setError);
       })
       .finally(() => {
@@ -87,7 +114,7 @@ function _SignUpStart(): JSX.Element {
   };
 
   React.useLayoutEffect(() => {
-    void handleInvitationFlow();
+    void handleTokenFlow();
   }, []);
 
   React.useEffect(() => {
@@ -139,6 +166,20 @@ function _SignUpStart(): JSX.Element {
 
     if (fields.emailOrPhone && emailOrPhoneActive === 'phoneNumber') {
       reqFields.push(formFields.phoneNumber);
+    }
+
+    if (fields.organizationInvitationToken) {
+      // FIXME: Constructing a fake fields object for strategy.
+      reqFields.push(
+        {
+          name: 'strategy',
+          value: 'ticket',
+          setError: noop,
+          setValue: noop,
+          error: undefined,
+        },
+        formFields.emailAddress,
+      );
     }
 
     try {
@@ -247,9 +288,11 @@ function _SignUpStart(): JSX.Element {
   ) : null;
 
   const shouldShowEmailAddressField =
-    (hasInvitationToken && !!formFields.emailAddress.value) ||
+    (hasToken && !!formFields.emailAddress.value) ||
     fields.emailAddress ||
     (fields.emailOrPhone && emailOrPhoneActive === 'emailAddress');
+
+  const disabledEmailField = hasToken && !!formFields.emailAddress.value;
 
   const emailAddressField = shouldShowEmailAddressField && (
     <Control
@@ -266,7 +309,7 @@ function _SignUpStart(): JSX.Element {
         name='emailAddress'
         value={formFields.emailAddress.value}
         handleChange={el => formFields.emailAddress.setValue(el.value || '')}
-        disabled={hasInvitationToken && !!formFields.emailAddress.value}
+        disabled={disabledEmailField}
       />
     </Control>
   );
@@ -301,10 +344,10 @@ function _SignUpStart(): JSX.Element {
     <>
       <Header error={error} className='cl-auth-form-header-compact' />
       <Body>
-        {!hasInvitationToken && oauthOptions.length > 0 && (
+        {!hasToken && oauthOptions.length > 0 && (
           <SignUpOAuth oauthOptions={oauthOptions} setError={setError} />
         )}
-        {!hasInvitationToken && web3Options.length > 0 && (
+        {!hasToken && web3Options.length > 0 && (
           <SignUpWeb3 web3Options={web3Options} setError={setError} />
         )}
         {atLeastOneFormField && (

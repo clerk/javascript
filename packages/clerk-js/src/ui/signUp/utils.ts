@@ -13,7 +13,8 @@ type FieldKeys =
   | 'firstName'
   | 'lastName'
   | 'password'
-  | 'invitationToken';
+  | 'invitationToken'
+  | 'organizationInvitationToken';
 
 type Fields = {
   [key in FieldKeys]?: ToggleTypeWithRequire;
@@ -22,6 +23,7 @@ type Fields = {
 export function determineFirstPartyFields(
   environment: EnvironmentResource,
   hasInvitation?: boolean,
+  hasOrganizationInvitation?: boolean,
 ): Fields {
   const idRequirements =
     environment.authConfig.identificationRequirements.flat();
@@ -35,6 +37,8 @@ export function determineFirstPartyFields(
     environment.authConfig.username === 'on';
   if (hasInvitation) {
     fields.invitationToken = 'required';
+  } else if (hasOrganizationInvitation) {
+    fields.organizationInvitationToken = 'required';
   } else if (idByEmailOrPhone) {
     fields.emailOrPhone = 'required';
   } else if (idByEmail) {
