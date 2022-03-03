@@ -1,10 +1,14 @@
 {
   "name": "@clerk/types",
 <<<<<<< HEAD
+<<<<<<< HEAD
   "version": "1.28.0",
 =======
   "version": "1.27.2-staging.0",
 >>>>>>> 86fd142 (chore(release): Publish)
+=======
+  "version": "1.27.3-staging.0",
+>>>>>>> 79137f9 (chore(release): Publish)
   "license": "MIT",
   "description": "Typings for Clerk libraries.",
   "keywords": [
