@@ -1,4 +1,4 @@
-import type { Web3Provider, OAuthStrategy } from '@clerk/types';
+import type { Web3Provider } from '@clerk/types';
 
 export const FirstFactorConfigs = Object.freeze({
   email_address: {

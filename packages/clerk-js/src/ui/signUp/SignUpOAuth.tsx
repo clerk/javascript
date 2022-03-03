@@ -1,4 +1,4 @@
-import type { OAuthProvider, OAuthStrategy } from '@clerk/types';
+import type { OAuthStrategy } from '@clerk/types';
 import { getOAuthProviderData } from '@clerk/types';
 import React from 'react';
 import {
