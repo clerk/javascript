@@ -31,6 +31,11 @@ export function buildClerk({
   if (!clerk) {
     clerk = new Clerk(frontendApi);
 
+    if (!tokenCache) {
+      // Exit early if tokenCache is not provided, assuming web platform
+      return;
+    }
+
     // @ts-expect-error
     clerk.__unstable__onBeforeRequest(async (requestInit: FapiRequestInit) => {
       // https://reactnative.dev/docs/0.61/network#known-issues-with-fetch-and-cookie-based-authentication
