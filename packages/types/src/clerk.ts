@@ -262,7 +262,6 @@ export type CustomNavigation = (to: string) => Promise<unknown> | void;
 export type ClerkThemeOptions = DeepSnakeToCamel<DeepPartial<DisplayThemeJSON>>;
 
 export interface ClerkOptions {
-  authVersion?: 1 | 2;
   navigate?: (to: string) => Promise<unknown> | unknown;
   polling?: boolean;
   selectInitialSession?: (

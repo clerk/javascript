@@ -13,27 +13,20 @@ import {
 
 import { AuthenticationPoller } from './AuthenticationPoller';
 
-type AuthVersion = 1 | 2;
 type InitParams = {
   environment: EnvironmentResource;
-  authVersion?: AuthVersion;
   enablePolling?: boolean;
 };
 
 export class AuthenticationService {
   private enablePolling = true;
-  private authVersion: AuthVersion = 2;
-  private cookies: CookieHandler = createCookieHandler(this.authVersion);
+  private cookies: CookieHandler = createCookieHandler();
   private environment: EnvironmentResource | undefined;
   private poller: AuthenticationPoller | null = null;
-  private get authV2Enabled() {
-    return this.authVersion === 2;
-  }
 
   constructor(private clerk: Clerk) {}
 
   public initAuth = (opts: InitParams): void => {
-    this.authVersion = opts.authVersion || 2;
     this.enablePolling = opts.enablePolling || true;
     this.setAuthCookiesFromSession(this.clerk.session);
     this.setClientUatCookieForDevelopmentInstances();
@@ -45,9 +38,6 @@ export class AuthenticationService {
   public setAuthCookiesFromSession(
     session: SessionResource | undefined | null,
   ): void {
-    if (!this.authV2Enabled) {
-      return;
-    }
     this.updateSessionCookie(session?.lastActiveToken);
     this.setClientUatCookieForDevelopmentInstances();
   }
@@ -63,15 +53,15 @@ export class AuthenticationService {
   }
 
   private refreshTokenOnVisibilityChange() {
-    document.addEventListener('visibilitychange', async () => {
+    document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
-        await this.refreshSessionToken();
+        void this.refreshSessionToken();
       }
     });
   }
 
   private async refreshSessionToken(): Promise<void> {
-    if (!this.authV2Enabled || !this.clerk.session) {
+    if (!this.clerk.session) {
       return;
     }
 
@@ -106,11 +96,7 @@ export class AuthenticationService {
   }
 
   private setClientUatCookieForDevelopmentInstances() {
-    if (
-      this.authV2Enabled &&
-      !this.environment?.isProduction() &&
-      this.inCustomDevelopmentDomain()
-    ) {
+    if (!this.environment?.isProduction() && this.inCustomDevelopmentDomain()) {
       this.cookies.setClientUatCookie(this.clerk.client);
     }
   }
@@ -122,7 +108,6 @@ export class AuthenticationService {
 
   private clearLegacyAuthV1Cookies() {
     if (
-      this.authV2Enabled &&
       this.environment?.isProduction() &&
       this.environment?.onWindowLocationHost()
     ) {
