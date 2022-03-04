@@ -1,8 +1,6 @@
-import {
-  MembershipRole,
-  OrganizationInvitationResource,
-  OrganizationMembershipResource,
-} from '.';
+import { OrganizationInvitationResource } from './organizationInvitation';
+import { OrganizationMembershipResource } from './organizationMembership';
+import { MembershipRole } from './organizationMembership';
 
 export interface OrganizationResource {
   id: string;

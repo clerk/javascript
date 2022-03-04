@@ -1,4 +1,4 @@
-import { PublicUserData } from '.';
+import { PublicUserData } from './session';
 
 export interface OrganizationMembershipResource {
   id: string;

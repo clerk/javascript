@@ -2,10 +2,11 @@
  * Currently representing API DTOs in their JSON form.
  */
 
-import { MembershipRole, OrganizationInvitationStatus } from '.';
 import { ToggleType, ToggleTypeWithRequire } from './authConfig';
 import { EmailAddressVerificationStrategy } from './emailAddress';
 import { OAuthStrategy } from './oauth';
+import { OrganizationInvitationStatus } from './organizationInvitation';
+import { MembershipRole } from './organizationMembership';
 import { SessionStatus } from './session';
 import {
   IdentificationStrategy,

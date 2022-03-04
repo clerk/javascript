@@ -1,6 +1,7 @@
-import { MembershipRole, OrganizationResource } from '.';
 import { ClientResource } from './client';
 import { DisplayThemeJSON } from './json';
+import { OrganizationResource } from './organization';
+import { MembershipRole } from './organizationMembership';
 import { ActiveSessionResource } from './session';
 import { UserResource } from './user';
 import { DeepPartial, DeepSnakeToCamel } from './utils';
