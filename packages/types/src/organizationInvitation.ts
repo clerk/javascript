@@ -1,4 +1,4 @@
-import { MembershipRole } from '.';
+import { MembershipRole } from './organizationMembership';
 
 export interface OrganizationInvitationResource {
   id: string;
