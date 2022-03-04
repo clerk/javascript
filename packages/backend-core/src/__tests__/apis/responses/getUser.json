@@ -91,7 +91,10 @@
       "email_address": "kyle@tech.com",
       "given_name": "Kyle",
       "family_name": "Reese",
-      "picture": "https://lh3.googleusercontent.com/-MvTefx9nU6o/BBBBBBBBBBI/BBBBBBBBBBB/ereRAMWiew8hQ5IaSVdTZWm1Y1G1z0T_P7Q/s96-c/photo.jpg"
+      "picture": "https://lh3.googleusercontent.com/-MvTefx9nU6o/BBBBBBBBBBI/BBBBBBBBBBB/ereRAMWiew8hQ5IaSVdTZWm1Y1G1z0T_P7Q/s96-c/photo.jpg",
+      "username": "tester",
+      "public_metadata": {},
+      "label": null
     },
     {
       "object": "facebook_account",
@@ -101,7 +104,12 @@
       "email_address": "kyle@tech.com",
       "first_name": "Kyle",
       "last_name": "Reese",
-      "picture": "https://platform-lookaside.fbsbx.com/platform/profilepic/?asid=16357923188267094&height=50&width=50&ext=2319847405&hash=AeQyoXRpxMMso8vNHSw"
+      "picture": "https://platform-lookaside.fbsbx.com/platform/profilepic/?asid=16357923188267094&height=50&width=50&ext=2319847405&hash=AeQyoXRpxMMso8vNHSw",
+      "username": null,
+      "public_metadata": {
+        "extra": "more info"
+      },
+      "label": "clerk"
     }
   ],
   "public_metadata": {
