@@ -40,10 +40,17 @@ export interface JWTPayload {
   azp?: string;
 
   /**
+   *
+   */
+  orgs?: Record<string, MembershipRole>;
+
+  /**
    * Any other JWT Claim Set member.
    */
   [propName: string]: unknown;
 }
+
+type MembershipRole = 'admin' | 'basic_member';
 
 export interface JWT {
   header: JWTHeader;
