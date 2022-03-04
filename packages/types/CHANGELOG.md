@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [1.28.1](https://github.com/clerkinc/javascript/compare/@clerk/types@1.28.0...@clerk/types@1.28.1) (2022-03-04)
+
+
+### Bug Fixes
+
+* **clerk-react,clerk-js,types:** Crate of API feedback fixes ([721ce72](https://github.com/clerkinc/javascript/commit/721ce7228c37b012891b2bec8caf290239164d05))
+* **types:** Add OrganizationMembership methods on types ([8bac04c](https://github.com/clerkinc/javascript/commit/8bac04c90ab79c6fb2e319f5c566f421e5984fa7))
+* **types:** Change type import from dot ([a1cdb79](https://github.com/clerkinc/javascript/commit/a1cdb79f9abde74b92911394b50e7d75107a9cfd))
+
+
+
 ## [1.28.0](https://github.com/clerkinc/javascript/compare/@clerk/types@1.27.1...@clerk/types@1.28.0) (2022-03-04)
 
 

@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.8.11](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.8.10...@clerk/clerk-expo@0.8.11) (2022-03-04)
+
+
+### Bug Fixes
+
+* **clerk-expo:** Add early return if tokenCache is not provided ([7a69d87](https://github.com/clerkinc/javascript/commit/7a69d870e5a6a73f34d6989643b55d2ff131536e))
+* **clerk-expo:** Add guard clause for tokenCache methods ([4c0bd54](https://github.com/clerkinc/javascript/commit/4c0bd54248a7248c844f8255120adadea57b5bee))
+
+
+
 ### [0.8.10](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.8.9...@clerk/clerk-expo@0.8.10) (2022-03-04)
 
 **Note:** Version bump only for package @clerk/clerk-expo
