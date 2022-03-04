@@ -1,17 +1,20 @@
-import { AllowlistIdentifier } from '../resources/AllowlistIdentifier';
-import { Client } from '../resources/Client';
-import { Email } from '../resources/Email';
-import { Invitation } from '../resources/Invitation';
+import {
+  AllowlistIdentifier,
+  Client,
+  Email,
+  Invitation,
+  Organization,
+  Session,
+  SMSMessage,
+  User,
+} from '../resources';
 import { ObjectType } from '../resources/JSON';
-import { Session } from '../resources/Session';
-import { SMSMessage } from '../resources/SMSMessage';
-import { User } from '../resources/User';
 import Logger from './Logger';
 
 // FIXME don't return any
 export default function deserialize(data: any): any {
   if (Array.isArray(data)) {
-    return data.map((item) => jsonToObject(item));
+    return data.map(item => jsonToObject(item));
   } else {
     return jsonToObject(data);
   }
@@ -29,6 +32,8 @@ function jsonToObject(item: any): any {
       return Email.fromJSON(item);
     case ObjectType.Invitation:
       return Invitation.fromJSON(item);
+    case ObjectType.Organization:
+      return Organization.fromJSON(item);
     case ObjectType.User:
       return User.fromJSON(item);
     case ObjectType.Session:

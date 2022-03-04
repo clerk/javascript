@@ -63,6 +63,12 @@ export interface InvitationProps extends ClerkProps {
   updatedAt: number;
 }
 
+export interface OrganizationProps extends ClerkProps {
+  name: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
 export interface PhoneNumberProps extends ClerkProps {
   phoneNumber: Nullable<string>;
   // verification: Nullable<VerificationProps>;

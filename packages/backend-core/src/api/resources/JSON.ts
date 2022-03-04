@@ -16,6 +16,7 @@ export enum ObjectType {
   FacebookAccount = 'facebook_account',
   GoogleAccount = 'google_account',
   Invitation = 'invitation',
+  Organization = 'organization',
   PhoneNumber = 'phone_number',
   Session = 'session',
   SignInAttempt = 'sign_in_attempt',
@@ -109,6 +110,13 @@ export interface IdentificationLinkJSON extends ClerkResourceJSON {
 export interface InvitationJSON extends ClerkResourceJSON {
   object: ObjectType.Invitation;
   email_address: string;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface OrganizationJSON extends ClerkResourceJSON {
+  object: ObjectType.Organization;
+  name: string;
   created_at: number;
   updated_at: number;
 }
