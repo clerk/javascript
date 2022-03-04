@@ -44,7 +44,7 @@ export class OrganizationInvitation
     this.fromJSON(data);
   }
 
-  revoke = async () => {
+  revoke = async (): Promise<OrganizationInvitation> => {
     return await this._basePost({
       path: `/organizations/${this.organizationId}/invitations/${this.id}/revoke`,
     });

@@ -334,6 +334,7 @@ export interface OrganizationJSON extends ClerkResourceJSON {
 export interface OrganizationMembershipJSON extends ClerkResourceJSON {
   object: 'organization_membership';
   id: string;
+  organization_id: string;
   public_user_data: PublicUserDataJSON;
   role: MembershipRole;
   created_at: number;

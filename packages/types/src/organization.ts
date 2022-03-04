@@ -1,4 +1,8 @@
-import { MembershipRole, OrganizationMembershipResource } from '.';
+import {
+  MembershipRole,
+  OrganizationInvitationResource,
+  OrganizationMembershipResource,
+} from '.';
 
 export interface OrganizationResource {
   id: string;
@@ -8,12 +12,31 @@ export interface OrganizationResource {
   createdBy: string;
   createdAt: Date;
   updatedAt: Date;
-  getMembers: (
-    params?: GetMembersParams,
+  getMemberships: (
+    params?: GetMembershipsParams,
   ) => Promise<OrganizationMembershipResource[]>;
+  getPendingInvitations: () => Promise<OrganizationInvitationResource[]>;
+  inviteMember: (
+    params: InviteMemberParams,
+  ) => Promise<OrganizationInvitationResource>;
+  updateMember: (
+    params: UpdateMembershipParams,
+  ) => Promise<OrganizationMembershipResource>;
+  removeMember: (userId: string) => Promise<OrganizationMembershipResource>;
 }
 
-export interface GetMembersParams {
+export interface GetMembershipsParams {
   limit?: number;
   offset?: number;
+}
+
+export interface InviteMemberParams {
+  emailAddress: string;
+  role: MembershipRole;
+  redirectUrl?: string;
+}
+
+export interface UpdateMembershipParams {
+  userId: string;
+  role: MembershipRole;
 }

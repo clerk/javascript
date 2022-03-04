@@ -237,21 +237,6 @@ export default class IsomorphicClerk {
     }
   }
 
-  __unstable_inviteMember = async (
-    organizationId: string,
-    params: CreateOrganizationInvitationParams,
-  ): Promise<OrganizationInvitationResource | void> => {
-    const callback = () =>
-      // @ts-expect-error
-      this.clerkjs.__unstable_inviteMember(organizationId, params);
-    if (this.clerkjs && this._loaded) {
-      return callback() as Promise<OrganizationInvitationResource>;
-    } else {
-      // @ts-expect-error
-      this.premountMethodCalls.set('__unstable_inviteMember', callback);
-    }
-  };
-
   setSession = (
     session: ActiveSessionResource | string | null,
     beforeEmit?: (session: ActiveSessionResource | null) => void | Promise<any>,

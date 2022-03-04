@@ -1,5 +1,5 @@
 import type {
-  GetMembersParams,
+  GetMembershipsParams,
   MembershipRole,
   OrganizationInvitationJSON,
   OrganizationJSON,
@@ -56,13 +56,13 @@ export class Organization extends BaseResource implements OrganizationResource {
       .catch(() => []);
   }
 
-  getMembers = async (
-    getMemberParams?: GetMembersParams,
+  getMemberships = async (
+    getMemberhipsParams?: GetMembershipsParams,
   ): Promise<OrganizationMembership[]> => {
     return await BaseResource._fetch({
       path: `/organizations/${this.id}/memberships`,
       method: 'GET',
-      search: getMemberParams as any,
+      search: getMemberhipsParams as any,
     })
       .then(res => {
         const members =
@@ -87,8 +87,8 @@ export class Organization extends BaseResource implements OrganizationResource {
       .catch(() => []);
   };
 
-  inviteUser = async (inviteUserParams: InviteUserParams) => {
-    return await OrganizationInvitation.create(this.id, inviteUserParams);
+  inviteMember = async (inviteMemberParams: InviteMemberParams) => {
+    return await OrganizationInvitation.create(this.id, inviteMemberParams);
   };
 
   updateMember = async ({
@@ -105,10 +105,14 @@ export class Organization extends BaseResource implements OrganizationResource {
     );
   };
 
-  removeMember = async (userId: string) => {
-    return await this._baseDelete({
+  removeMember = async (userId: string): Promise<OrganizationMembership> => {
+    return await BaseResource._fetch({
+      method: 'DELETE',
       path: `/organizations/${this.id}/memberships/${userId}`,
-    });
+    }).then(
+      res =>
+        new OrganizationMembership(res?.response as OrganizationMembershipJSON),
+    );
   };
 
   protected fromJSON(data: OrganizationJSON): this {
@@ -128,7 +132,7 @@ export type GetOrganizationParams = {
   offset?: number;
 };
 
-export type InviteUserParams = {
+export type InviteMemberParams = {
   emailAddress: string;
   role: MembershipRole;
   redirectUrl?: string;
