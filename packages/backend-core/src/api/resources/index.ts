@@ -6,6 +6,7 @@ export * from './Enums';
 export * from './ExternalAccount';
 export * from './IdentificationLink';
 export * from './Invitation';
+export * from './Organization';
 export * from './JSON';
 export * from './PhoneNumber';
 export * from './Props';

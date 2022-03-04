@@ -3,6 +3,7 @@ import {
   Client,
   Email,
   Invitation,
+  Organization,
   Session,
   SMSMessage,
 } from '../../api/resources';
@@ -42,6 +43,14 @@ const invitationJSON = {
   object: 'invitation',
   id: 'inv_randomid',
   email_address: 'invitation@example.com',
+  created_at: 1612378465,
+  updated_at: 1612378465,
+};
+
+const organizationJSON = {
+  object: 'organization',
+  id: 'org_randomid',
+  name: 'Acme Inc',
   created_at: 1612378465,
   updated_at: 1612378465,
 };
@@ -106,6 +115,18 @@ test('deserializes an array of Invitation objects', () => {
   expect(invitations).toBeInstanceOf(Array);
   expect(invitations.length).toBe(1);
   expect(invitations[0]).toBeInstanceOf(Invitation);
+});
+
+test('deserializes an Organization object', () => {
+  const organization = deserialize(organizationJSON);
+  expect(organization).toBeInstanceOf(Organization);
+});
+
+test('deserializes an array of Organization objects', () => {
+  const organizations = deserialize([organizationJSON]);
+  expect(organizations).toBeInstanceOf(Array);
+  expect(organizations.length).toBe(1);
+  expect(organizations[0]).toBeInstanceOf(Organization);
 });
 
 test('deserializes a Session object', () => {
