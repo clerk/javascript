@@ -8,6 +8,7 @@ export interface OrganizationInvitationResource {
   status: OrganizationInvitationStatus;
   createdAt: Date;
   updatedAt: Date;
+  revoke: () => Promise<OrganizationInvitationResource>;
 }
 
 export type OrganizationInvitationStatus = 'pending' | 'accepted' | 'revoked';
