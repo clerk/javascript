@@ -59,6 +59,7 @@ export interface IdentificationLinkProps extends ClerkProps {
 
 export interface InvitationProps extends ClerkProps {
   emailAddress: string;
+  publicMetadata?: Record<string, unknown>;
   createdAt: number;
   updatedAt: number;
 }
