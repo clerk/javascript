@@ -1,37 +1,47 @@
-export function checkCrossOrigin(
-  origin: string | null | undefined,
-  initialHost: string,
-  forwardedHost?: string | null,
-  port?: string | null
-) {
+/**
+ * This function is only used in the case where:
+ * - DevOrStaging key is present
+ * - The request carries referrer information
+ * (This case most of the times signifies redirect from Clerk Auth pages)
+ *
+ */
+export function checkCrossOriginReferrer({
+  referrerURL,
+  host,
+  forwardedHost,
+  forwardedPort,
+  forwardedProto,
+}: {
+  referrerURL: URL;
+  host: string;
+  forwardedHost?: string | null;
+  forwardedPort?: string | null;
+  forwardedProto?: string | null;
+}) {
+  /* The forwarded host prioritised over host to be checked against the referrer.  */
+  const finalURL = convertHostHeaderValueToURL(
+    forwardedHost ? forwardedHost : host,
+  );
 
-  // Remove request's protocol
-  origin = origin?.trim().replace(/(^\w+:|^)\/\//, '');
-  if (!origin) {
-    return false;
+  finalURL.port =
+    forwardedPort ||
+    (forwardedProto && (forwardedProto === 'https' ? '443' : '80')) ||
+    finalURL.port;
+
+  if (finalURL.port !== referrerURL.port) {
+    return true;
+  }
+  if (finalURL.hostname !== referrerURL.hostname) {
+    return true;
   }
 
-  // Need to append the protocol if not exists for URL parse to work correctly
-  if (
-    !initialHost.startsWith('http://') &&
-    !initialHost.startsWith('https://')
-  ) {
-    initialHost = `https://${initialHost}`;
-  }
+  return false;
+}
 
-  const hostURL = new URL(initialHost);
-
-  if (!forwardedHost) {
-    forwardedHost = hostURL.hostname;
-  }
-
-  if (!port) {
-    port = hostURL.port;
-  }
-
-  if (port && port !== '80' && port !== '443') {
-    forwardedHost = `${forwardedHost}:${port}`;
-  }
-
-  return origin !== forwardedHost;
+function convertHostHeaderValueToURL(host: string): URL {
+  /**
+   * The protocol is added for the URL constructor to work properly.
+   * We do not check for the protocol at any point later on.
+   */
+  return new URL(`https://${host}`);
 }

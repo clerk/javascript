@@ -4,7 +4,7 @@ import { JWTExpiredError } from './api/utils/Errors';
 import { parse } from './util/base64url';
 import { isDevelopmentOrStaging, isProduction } from './util/clerkApiKey';
 import { checkClaims, isExpired } from './util/jwt';
-import { checkCrossOrigin } from './util/request';
+import { checkCrossOriginReferrer } from './util/request';
 import { JWT, JWTPayload } from './util/types';
 
 export const API_KEY = process.env.CLERK_API_KEY || '';
@@ -29,11 +29,11 @@ export type Session = {
 
 export type VerifySessionTokenOptions = {
   authorizedParties?: string[];
-}
+};
 
 const verifySessionTokenDefaultOptions: VerifySessionTokenOptions = {
   authorizedParties: [],
-}
+};
 
 type AuthState = {
   status: AuthStatus;
@@ -57,6 +57,8 @@ type AuthStateParams = {
   forwardedHost?: string | null;
   /* Request forwarded port value */
   forwardedPort?: string | null;
+  /* Request forwarded proto value */
+  forwardedProto?: string | null;
   /* Request referrer */
   referrer?: string | null;
   /* Request user-agent value */
@@ -84,7 +86,7 @@ export class Base {
     importKeyFunction: ImportKeyFunction,
     verifySignatureFunction: VerifySignatureFunction,
     decodeBase64Function: DecodeBase64Function,
-    loadCryptoKeyFunction?: LoadCryptoKeyFunction
+    loadCryptoKeyFunction?: LoadCryptoKeyFunction,
   ) {
     this.importKeyFunction = importKeyFunction;
     this.verifySignatureFunction = verifySignatureFunction;
@@ -103,7 +105,12 @@ export class Base {
    * @return {Promise<JWTPayload>} claims
    * @throws {JWTExpiredError|Error}
    */
-  verifySessionToken = async (token: string, { authorizedParties }: VerifySessionTokenOptions = verifySessionTokenDefaultOptions): Promise<JWTPayload> => {
+  verifySessionToken = async (
+    token: string,
+    {
+      authorizedParties,
+    }: VerifySessionTokenOptions = verifySessionTokenDefaultOptions,
+  ): Promise<JWTPayload> => {
     // Try to load the PK from supplied function and
     // if there is no custom load function
     // try to load from the environment.
@@ -166,7 +173,7 @@ export class Base {
     const header = JSON.parse(this.decodeBase64Function(rawHeader));
     const payload = JSON.parse(this.decodeBase64Function(rawPayload));
     const signature = this.decodeBase64Function(
-      rawSignature.replace(/_/g, '/').replace(/-/g, '+')
+      rawSignature.replace(/_/g, '/').replace(/-/g, '+'),
     );
     return {
       header,
@@ -185,7 +192,7 @@ export class Base {
       'RSASSA-PKCS1-v1_5',
       key,
       signature,
-      data
+      data,
     );
     if (!isVerified) {
       throw new Error('Failed to verify token');
@@ -218,22 +225,18 @@ export class Base {
     host,
     forwardedHost,
     forwardedPort,
+    forwardedProto,
     referrer,
     userAgent,
     authorizedParties,
     fetchInterstitial,
   }: AuthStateParams): Promise<AuthState> => {
-    const isCrossOrigin = checkCrossOrigin(
-      origin,
-      host,
-      forwardedHost,
-      forwardedPort
-    );
-
     let sessionClaims;
     if (headerToken) {
       try {
-        sessionClaims = await this.verifySessionToken(headerToken, { authorizedParties });
+        sessionClaims = await this.verifySessionToken(headerToken, {
+          authorizedParties,
+        });
         return {
           status: AuthStatus.SignedIn,
           session: {
@@ -263,7 +266,9 @@ export class Base {
     }
 
     // In cross-origin requests the use of Authorization header is mandatory
-    if (isCrossOrigin) {
+    // TODO: The origin header can be present in same-origin POST, PUT, PATCH requests etc.
+    // Is this check enough for API endpoint authorization ?
+    if (origin) {
       return { status: AuthStatus.SignedOut };
     }
 
@@ -279,12 +284,13 @@ export class Base {
     if (
       isDevelopmentOrStaging(API_KEY) &&
       referrer &&
-      checkCrossOrigin(
-        new URL(referrer).origin,
+      checkCrossOriginReferrer({
+        referrerURL: new URL(referrer),
         host,
         forwardedHost,
-        forwardedPort
-      )
+        forwardedPort,
+        forwardedProto,
+      })
     ) {
       return {
         status: AuthStatus.Interstitial,
@@ -318,7 +324,9 @@ export class Base {
     }
 
     try {
-      sessionClaims = await this.verifySessionToken(cookieToken as string, { authorizedParties });
+      sessionClaims = await this.verifySessionToken(cookieToken as string, {
+        authorizedParties,
+      });
     } catch (err) {
       if (err instanceof JWTExpiredError) {
         return {
