@@ -25,6 +25,21 @@ describe('check cross-origin-referrer request utility', () => {
     expect(checkCrossOriginReferrer({ referrerURL, host })).toEqual(true);
   });
 
+  test('is CO when HTTPS to HTTP with present x-forwarded-proto', () => {
+    const referrerURL = new URL('https://localhost');
+    const host = new URL('http://someserver').host;
+    const forwardedHost = new URL('http://localhost').host;
+    const forwardedProto = 'http';
+    expect(
+      checkCrossOriginReferrer({
+        referrerURL,
+        host,
+        forwardedHost,
+        forwardedProto,
+      }),
+    ).toEqual(true);
+  });
+
   test('is CO when HTTPS to HTTP with forwarded port', () => {
     const referrerURL = new URL('https://localhost');
     const host = new URL('http://localhost').host;

@@ -18,15 +18,14 @@ export function checkCrossOriginReferrer({
   forwardedPort?: string | null;
   forwardedProto?: string | null;
 }) {
-  /* The forwarded host prioritised over host to be checked against the referrer.  */
-  const finalURL = convertHostHeaderValueToURL(
-    forwardedHost ? forwardedHost : host,
-  );
+  if (forwardedProto && forwardedProto !== referrerURL.protocol) {
+    return true;
+  }
 
-  finalURL.port =
-    forwardedPort ||
-    (forwardedProto && (forwardedProto === 'https' ? '443' : '80')) ||
-    finalURL.port;
+  /* The forwarded host prioritised over host to be checked against the referrer.  */
+  const finalURL = convertHostHeaderValueToURL(forwardedHost || host);
+
+  finalURL.port = forwardedPort || finalURL.port;
 
   if (finalURL.port !== referrerURL.port) {
     return true;
