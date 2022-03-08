@@ -441,3 +441,8 @@ $content-width-lg: 620px;
 .phone-input-container {
   max-width: 278px;
 }
+
+.verification-error {
+  color: var(--clerk-font-color-l1);
+  font-size: 0.875rem;
+}

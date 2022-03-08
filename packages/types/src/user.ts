@@ -5,6 +5,7 @@ import { UserJSON } from './json';
 import { PhoneNumberResource } from './phoneNumber';
 import { ClerkResource } from './resource';
 import { SessionWithActivitiesResource } from './session';
+import { OAuthStrategy } from './strategies';
 import { SnakeToCamel } from './utils';
 import { Web3WalletResource } from './web3Wallet';
 
@@ -38,6 +39,9 @@ export interface UserResource extends ClerkResource {
   isPrimaryIdentification: (ident: EmailAddressResource | PhoneNumberResource) => boolean;
   getSessions: () => Promise<SessionWithActivitiesResource[]>;
   setProfileImage: (params: SetProfileImageParams) => Promise<ImageResource>;
+  createExternalAccount: ({ strategy, redirect_url }: { strategy: OAuthStrategy, redirect_url?: string }) => Promise<ExternalAccountResource>;
+  get verifiedExternalAccounts(): ExternalAccountResource[]
+  get unverifiedExternalAccounts(): ExternalAccountResource[]
 }
 
 export type CreateEmailAddressParams = { email: string };

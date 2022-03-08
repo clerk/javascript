@@ -1,6 +1,10 @@
+import associationDefaults from "../utils/Associations";
+import { Association } from './Enums';
 import type { ExternalAccountJSON } from './JSON';
 import { ObjectType } from './JSON';
 import type { ExternalAccountProps } from './Props';
+import { User } from "./User";
+import { Verification } from './Verification'
 
 interface ExternalAccountPayload extends ExternalAccountProps {}
 
@@ -21,7 +25,13 @@ export class ExternalAccount {
     'label',
   ];
 
-  static defaults = {};
+  static associations = {
+    verification: Association.HasOne,
+  }
+
+  static defaults = {
+    ...associationDefaults(User.associations),
+  };
 
   constructor(data: Partial<ExternalAccountPayload> = {}) {
     Object.assign(this, ExternalAccount.defaults, data);
@@ -36,6 +46,10 @@ export class ExternalAccount {
     obj.username = data.username;
     obj.publicMetadata = data.public_metadata;
     obj.label = data.label;
+
+    if (data.verification) {
+      obj.verification = Verification.fromJSON(data.verification);
+    }
 
     switch (data.object) {
       case ObjectType.FacebookAccount: {

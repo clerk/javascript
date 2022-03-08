@@ -147,6 +147,7 @@ export interface ExternalAccountJSON extends ClerkResourceJSON {
   username: string;
   public_metadata: Record<string, unknown>;
   label: string;
+  verification?: VerificationJSON;
 }
 
 export interface UserJSON extends ClerkResourceJSON {

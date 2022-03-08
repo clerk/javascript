@@ -1,5 +1,6 @@
 import { titleize } from '@clerk/shared/utils/string';
-import type { ExternalAccountJSON, ExternalAccountResource, OAuthProvider } from '@clerk/types';
+import type { ExternalAccountJSON, ExternalAccountResource, OAuthProvider, VerificationResource } from '@clerk/types';
+import { Verification } from 'core/resources/Verification';
 
 import { BaseResource } from './Base';
 
@@ -16,6 +17,7 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
   username = '';
   publicMetadata = {};
   label = '';
+  verification: VerificationResource | null = null;
 
   public constructor(data: Partial<ExternalAccountJSON>, pathRoot: string);
   public constructor(data: ExternalAccountJSON, pathRoot: string) {
@@ -38,6 +40,11 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
     this.username = data.username;
     this.publicMetadata = data.public_metadata;
     this.label = data.label;
+
+    if (data.verification) {
+      this.verification = new Verification(data.verification);
+    }
+
     return this;
   }
 

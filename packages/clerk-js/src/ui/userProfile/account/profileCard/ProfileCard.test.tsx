@@ -32,6 +32,8 @@ jest.mock('ui/contexts', () => {
         ],
         phoneNumbers: [],
         externalAccounts: [],
+        verifiedExternalAccounts: [],
+        unverifiedExternalAccounts: [],
         web3Wallets: [{ web3Wallet: '0x123456789' }],
       };
     },
@@ -69,7 +71,7 @@ describe('<ProfileCard/>', () => {
     expect(tree).toMatchSnapshot();
   });
 
-  it('renders the ProfileCard ', () => {
+  it('renders the ProfileCard with enabled settings', () => {
     (useEnvironment as jest.Mock).mockImplementation(() => ({
       displayConfig: {},
       userSettings: {

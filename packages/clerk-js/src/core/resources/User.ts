@@ -2,8 +2,10 @@ import type {
   CreateEmailAddressParams,
   CreatePhoneNumberParams,
   EmailAddressResource,
+  ExternalAccountJSON,
   ExternalAccountResource,
   ImageResource,
+  OAuthStrategy,
   PhoneNumberResource,
   SetProfileImageParams,
   UpdateUserParams,
@@ -111,6 +113,24 @@ export class User extends BaseResource implements UserResource {
     ).create();
   };
 
+  createExternalAccount = async ({
+    strategy,
+    redirect_url,
+  }: {
+    strategy: OAuthStrategy;
+    redirect_url?: string;
+  }): Promise<ExternalAccountResource> => {
+    const json = (
+      await BaseResource._fetch<ExternalAccountJSON>({
+        path: '/me/external_accounts',
+        method: 'POST',
+        body: { strategy, redirect_url } as any,
+      })
+    )?.response as unknown as ExternalAccountJSON;
+
+    return new ExternalAccount(json, this.path() + '/external_accounts');
+  };
+
   update = (params: UpdateUserParams): Promise<UserResource> => {
     return this._basePatch({
       body: normalizeUnsafeMetadata(params),
@@ -138,6 +158,14 @@ export class User extends BaseResource implements UserResource {
   ): Promise<OrganizationMembership[]> => {
     return await OrganizationMembership.retrieve(retrieveMembership);
   };
+
+  get verifiedExternalAccounts() {
+    return this.externalAccounts.filter(externalAccount => externalAccount.verification?.status == 'verified');
+  }
+
+  get unverifiedExternalAccounts() {
+    return this.externalAccounts.filter(externalAccount => externalAccount.verification?.status != 'verified');
+  }
 
   protected fromJSON(data: UserJSON): this {
     this.id = data.id;
