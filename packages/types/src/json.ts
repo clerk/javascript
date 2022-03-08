@@ -4,8 +4,9 @@
 
 import { ToggleType, ToggleTypeWithRequire } from './authConfig';
 import { EmailAddressVerificationStrategy } from './emailAddress';
-import { OAuthStrategy } from './oauth';
-import { OAuthProvider } from './oauth';
+import { OAuthStrategy, OAuthProvider } from './oauth';
+import { OrganizationInvitationStatus } from './organizationInvitation';
+import { MembershipRole } from './organizationMembership';
 import { SessionStatus } from './session';
 import {
   IdentificationStrategy,
@@ -222,6 +223,7 @@ export interface PublicUserDataJSON extends ClerkResourceJSON {
   last_name: string | null;
   profile_image_url: string;
   identifier: string;
+  user_id?: string;
 }
 
 export interface SessionWithActivitiesJSON extends Omit<SessionJSON, 'user'> {
@@ -295,4 +297,79 @@ export interface SessionActivityJSON extends ClerkResourceJSON {
   city?: string;
   country?: string;
   is_mobile?: boolean;
+}
+
+// TODO: Generalize external account JSON payload to simplify type declarations
+export type ExternalAccountJSON =
+  | {
+      object: 'google_account';
+      id: string;
+      google_id: string;
+      approved_scopes: string;
+      email_address: string;
+      given_name: string;
+      family_name: string;
+      picture: string;
+      username?: string;
+      public_metadata: Record<string, unknown>;
+      label?: string;
+    }
+  | {
+      object: 'facebook_account';
+      id: string;
+      facebook_id: string;
+      approved_scopes: string;
+      email_address: string;
+      first_name: string;
+      last_name: string;
+      picture: string;
+      username?: string;
+      public_metadata: Record<string, unknown>;
+      label?: string;
+    }
+  | {
+      object: 'external_account';
+      provider: string;
+      identification_id: string;
+      provider_user_id: string;
+      approved_scopes: string;
+      email_address: string;
+      first_name: string;
+      last_name: string;
+      avatar_url: string;
+      username?: string;
+      public_metadata: Record<string, unknown>;
+      label?: string;
+    };
+
+export interface OrganizationJSON extends ClerkResourceJSON {
+  object: 'organization';
+  id: string;
+  name: string;
+  role: MembershipRole;
+  instance_id: string;
+  created_by: string;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface OrganizationMembershipJSON extends ClerkResourceJSON {
+  object: 'organization_membership';
+  id: string;
+  organization_id: string;
+  public_user_data: PublicUserDataJSON;
+  role: MembershipRole;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface OrganizationInvitationJSON extends ClerkResourceJSON {
+  object: 'organization_invitation';
+  id: string;
+  organization_id: string;
+  email_address: string;
+  status: OrganizationInvitationStatus;
+  role: MembershipRole;
+  created_at: number;
+  updated_at: number;
 }

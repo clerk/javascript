@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@clerk/clerk-react": "^3.0.0-alpha.9",
-    "@clerk/clerk-sdk-node": "^2.9.0",
+    "@clerk/clerk-sdk-node": "^2.9.6",
     "@clerk/types": "^2.0.0-alpha.8",
     "tslib": "^2.3.1"
   },

@@ -115,7 +115,13 @@ test('getUser() returns a single user', async () => {
 
   expect(user.externalAccounts.length).toEqual(2);
   expect(user.externalAccounts[0].provider).toEqual('google');
+  expect(user.externalAccounts[0].username).toEqual('tester');
+  expect(user.externalAccounts[0].publicMetadata).toBeInstanceOf(Object);
+  expect(user.externalAccounts[0].label).toBeNull();
   expect(user.externalAccounts[1].provider).toEqual('facebook');
+  expect(user.externalAccounts[1].username).toBeNull();
+  expect(user.externalAccounts[1].publicMetadata).toMatchObject({'extra': 'more info'});
+  expect(user.externalAccounts[1].label).toEqual('clerk');
 
   expect(user.web3Wallets.length).toEqual(1);
   expect(user.web3Wallets[0].web3Wallet).toEqual(

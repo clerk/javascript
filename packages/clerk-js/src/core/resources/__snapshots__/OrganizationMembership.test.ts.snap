@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`OrganizationMembership has the same initial properties 1`] = `
+OrganizationMembership {
+  "createdAt": 1970-01-01T00:00:12.345Z,
+  "destroy": [Function],
+  "id": "test_id",
+  "organizationId": "test_org_id",
+  "pathRoot": "",
+  "publicUserData": Object {
+    "firstName": "test_first_name",
+    "identifier": "test@identifier.gr",
+    "lastName": "test_last_name",
+    "profileImageUrl": "test_url",
+    "userId": undefined,
+  },
+  "role": "admin",
+  "update": [Function],
+  "updatedAt": 1970-01-01T00:00:05.678Z,
+}
+`;

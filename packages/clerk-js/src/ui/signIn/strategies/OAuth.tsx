@@ -1,10 +1,10 @@
-import type { OAuthProvider, OAuthStrategy } from '@clerk/types';
+import type { OAuthStrategy } from '@clerk/types';
+import { getOAuthProviderData } from '@clerk/types';
 import React from 'react';
 import {
   buildSSOCallbackURL,
   ButtonSet,
   ButtonSetOptions,
-  getOAuthProviderData,
   handleError,
 } from 'ui/common';
 import { useCoreSignIn, useEnvironment, useSignInContext } from 'ui/contexts';
@@ -41,13 +41,13 @@ export function OAuth({
   };
 
   const options = oauthOptions.reduce<ButtonSetOptions[]>((memo, o) => {
-    const key = o.replace('oauth_', '') as OAuthProvider;
-    const data = getOAuthProviderData(key);
+    const data = getOAuthProviderData({ strategy: o });
 
     if (data) {
       memo.push({
-        ...data,
-        strategy: o,
+        id: data.provider,
+        name: data.name,
+        strategy: data.strategy,
       });
     }
 

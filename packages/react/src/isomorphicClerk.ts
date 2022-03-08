@@ -2,8 +2,12 @@ import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
   ClientResource,
+  CreateOrganizationInvitationParams,
+  CreateOrganizationParams,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
+  OrganizationInvitationResource,
+  OrganizationResource,
   InitialState,
   RedirectOptions,
   Resources,
@@ -422,6 +426,37 @@ export default class IsomorphicClerk {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('authenticateWithMetamask', callback);
+    }
+  };
+
+  createOrganization = async (
+    params: CreateOrganizationParams,
+  ): Promise<OrganizationResource | void> => {
+    const callback = () => this.clerkjs?.createOrganization(params);
+    if (this.clerkjs && this._loaded) {
+      return callback() as Promise<OrganizationResource>;
+    } else {
+      this.premountMethodCalls.set('createOrganization', callback);
+    }
+  };
+
+  getOrganizations = async (): Promise<OrganizationResource[] | void> => {
+    const callback = () => this.clerkjs?.getOrganizations();
+    if (this.clerkjs && this._loaded) {
+      return callback() as Promise<OrganizationResource[]>;
+    } else {
+      this.premountMethodCalls.set('getOrganizations', callback);
+    }
+  };
+
+  getOrganization = async (
+    organizationId: string,
+  ): Promise<OrganizationResource | undefined | void> => {
+    const callback = () => this.clerkjs?.getOrganization(organizationId);
+    if (this.clerkjs && this._loaded) {
+      return callback() as Promise<OrganizationResource | undefined>;
+    } else {
+      this.premountMethodCalls.set('getOrganization', callback);
     }
   };
 

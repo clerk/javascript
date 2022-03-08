@@ -20,6 +20,9 @@ export class ExternalAccount
   firstName = '';
   lastName = '';
   avatarUrl = '';
+  username: '';
+  publicMetadata: {};
+  label: '';
 
   public constructor(data: Partial<ExternalAccountJSON>, pathRoot: string);
   public constructor(data: ExternalAccountJSON, pathRoot: string) {
@@ -42,6 +45,9 @@ export class ExternalAccount
       'oauth_',
       '',
     ) as OAuthProvider;
+    this.username = data.username;
+    this.publicMetadata = data.public_metadata;
+    this.label = data.label;
     return this;
   }
 

@@ -16,6 +16,9 @@ export class ExternalAccount {
     'firstName',
     'lastName',
     'picture',
+    'username',
+    'publicMetadata',
+    'label',
   ];
 
   static defaults = {};
@@ -30,6 +33,9 @@ export class ExternalAccount {
     obj.id = data.id;
     obj.approvedScopes = data.approved_scopes;
     obj.emailAddress = data.email_address;
+    obj.username = data.username;
+    obj.publicMetadata = data.public_metadata;
+    obj.label = data.label;
 
     switch (data.object) {
       case ObjectType.FacebookAccount: {

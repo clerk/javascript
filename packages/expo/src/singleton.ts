@@ -25,11 +25,16 @@ export function buildClerk({
   frontendApi,
   tokenCache,
 }: BuildClerkOptions): ClerkProp {
-  const getToken = tokenCache ? tokenCache.getToken : getTokenFromMemory;
-  const saveToken = tokenCache ? tokenCache.saveToken : saveTokenInMemory;
+  const getToken = (tokenCache && tokenCache.getToken) ?? getTokenFromMemory;
+  const saveToken = (tokenCache && tokenCache.saveToken) ?? saveTokenInMemory;
 
   if (!clerk) {
     clerk = new Clerk(frontendApi);
+
+    if (!tokenCache) {
+      // Exit early if tokenCache is not provided, assuming web platform
+      return;
+    }
 
     // @ts-expect-error
     clerk.__unstable__onBeforeRequest(async (requestInit: FapiRequestInit) => {

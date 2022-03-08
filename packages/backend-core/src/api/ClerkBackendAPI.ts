@@ -3,6 +3,7 @@ import {
   ClientApi,
   EmailApi,
   InvitationApi,
+  OrganizationApi,
   SessionApi,
   SMSMessageApi,
   UserApi,
@@ -45,6 +46,7 @@ export class ClerkBackendAPI {
   private _clientApi?: ClientApi;
   private _emailApi?: EmailApi;
   private _invitationApi?: InvitationApi;
+  private _organizationApi?: OrganizationApi;
   private _sessionApi?: SessionApi;
   private _smsMessageApi?: SMSMessageApi;
   private _userApi?: UserApi;
@@ -69,7 +71,7 @@ export class ClerkBackendAPI {
       fetcher,
       libName,
       libVersion,
-      packageRepo
+      packageRepo,
     );
   }
 
@@ -103,7 +105,7 @@ export class ClerkBackendAPI {
   get allowlistIdentifiers(): AllowlistIdentifierApi {
     if (!this._allowlistIdentifierApi) {
       this._allowlistIdentifierApi = new AllowlistIdentifierApi(
-        this._restClient
+        this._restClient,
       );
     }
     return this._allowlistIdentifierApi;
@@ -130,6 +132,13 @@ export class ClerkBackendAPI {
       this._invitationApi = new InvitationApi(this._restClient);
     }
     return this._invitationApi;
+  }
+
+  get organizations(): OrganizationApi {
+    if (!this._organizationApi) {
+      this._organizationApi = new OrganizationApi(this._restClient);
+    }
+    return this._organizationApi;
   }
 
   get sessions(): SessionApi {

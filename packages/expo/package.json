@@ -31,7 +31,7 @@
     "base-64": "^1.0.0"
   },
   "devDependencies": {
-    "@clerk/types": "^1.25.4",
+    "@clerk/types": "^1.28.1",
     "@types/jest": "^27.4.0",
     "@types/node": "^16.11.9",
     "@types/react": "^17.0.39",

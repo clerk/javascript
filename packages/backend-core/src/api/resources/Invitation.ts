@@ -9,7 +9,7 @@ interface InvitationPayload extends InvitationProps {}
 export interface Invitation extends InvitationPayload {}
 
 export class Invitation {
-  static attributes = ['id', 'emailAddress', 'createdAt', 'updatedAt'];
+  static attributes = ['id', 'emailAddress', 'publicMetadata', 'createdAt', 'updatedAt'];
 
   static defaults = [];
 
