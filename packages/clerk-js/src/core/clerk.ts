@@ -71,13 +71,7 @@ declare global {
   }
 }
 
-const defaultOptions: ClerkOptions & {
-  polling: boolean;
-  authVersion: 1 | 2;
-} = {
-  polling: true,
-  authVersion: 2,
-};
+const defaultOptions: ClerkOptions & { polling: boolean } = { polling: true };
 
 export default class Clerk implements ClerkInterface {
   public static Components?: typeof Components;
@@ -90,7 +84,7 @@ export default class Clerk implements ClerkInterface {
   #environment?: EnvironmentResource | null;
   #components?: Components | null;
   #listeners: Array<(emission: Resources) => void> = [];
-  #options: ClerkOptions & { authVersion: 1 | 2 } = { authVersion: 2 };
+  #options: ClerkOptions = {};
   #isReady = false;
   #unloading = false;
   #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null =
@@ -128,7 +122,6 @@ export default class Clerk implements ClerkInterface {
     this.#options = {
       ...defaultOptions,
       ...options,
-      authVersion: options?.authVersion || defaultOptions.authVersion,
     };
 
     if (isReactNative()) {
@@ -615,7 +608,6 @@ export default class Clerk implements ClerkInterface {
 
     this.#devBrowserHandler = createDevBrowserHandler({
       frontendApi: this.frontendApi,
-      authVersion: this.#options.authVersion,
       fapiClient: this.#fapiClient,
     });
 
@@ -644,7 +636,6 @@ export default class Clerk implements ClerkInterface {
         this.updateClient(client);
 
         this.#authService.initAuth({
-          authVersion: this.#options.authVersion,
           enablePolling: this.#options.polling,
           environment: this.#environment,
         });
@@ -700,7 +691,7 @@ export default class Clerk implements ClerkInterface {
       return;
     }
 
-    document.addEventListener('visibilitychange', async () => {
+    document.addEventListener('visibilitychange', () => {
       if (
         document.visibilityState === 'visible' &&
         typeof this.session !== 'undefined'
@@ -713,7 +704,7 @@ export default class Clerk implements ClerkInterface {
       this.#unloading = true;
     });
 
-    this.#broadcastChannel?.addEventListener('message', async ({ data }) => {
+    this.#broadcastChannel?.addEventListener('message', ({ data }) => {
       if (data.type === 'signout') {
         void this.handleUnauthenticated({ broadcast: false });
       }

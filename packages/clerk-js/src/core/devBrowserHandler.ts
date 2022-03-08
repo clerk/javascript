@@ -1,15 +1,6 @@
-import {
-  buildURL,
-  createCookieHandler,
-  isDevOrStagingUrl,
-  runIframe,
-} from 'utils';
+import { buildURL, createCookieHandler, isDevOrStagingUrl, runIframe } from 'utils';
 
-import {
-  DEV_BROWSER_SSO_JWT_HTTP_HEADER,
-  DEV_BROWSER_SSO_JWT_KEY,
-  DEV_BROWSER_SSO_JWT_PARAMETER,
-} from './constants';
+import { DEV_BROWSER_SSO_JWT_HTTP_HEADER, DEV_BROWSER_SSO_JWT_KEY, DEV_BROWSER_SSO_JWT_PARAMETER } from './constants';
 import { clerkErrorDevInitFailed } from './errors';
 import { FapiClient } from './fapiClient';
 
@@ -23,18 +14,15 @@ export interface DevBrowserHandler {
 
 export type CreateDevBrowserHandlerOptions = {
   frontendApi: string;
-  authVersion: 1 | 2;
   fapiClient: FapiClient;
 };
 
 // export type DevBrowserHandler = ReturnType<typeof createDevBrowserHandler>;
 export default function createDevBrowserHandler({
   frontendApi,
-  authVersion,
   fapiClient,
 }: CreateDevBrowserHandlerOptions): DevBrowserHandler {
-  const inAuthV2 = authVersion === 2;
-  const cookieHandler = createCookieHandler(authVersion);
+  const cookieHandler = createCookieHandler();
   function getDevBrowserJWT() {
     return localStorage.getItem(DEV_BROWSER_SSO_JWT_KEY);
   }
@@ -93,14 +81,8 @@ export default function createDevBrowserHandler({
         throw 'Missing token';
       }
 
-      if (inAuthV2) {
-        setDevBrowserJWT(browserToken);
-        cookieHandler.removeSessionCookie();
-      } else {
-        // TODO: Remove legacy Auth V1 handling
-        await cookieHandler.setSSODevBrowserCookie(browserToken);
-        removeDevBrowserJWT();
-      }
+      setDevBrowserJWT(browserToken);
+      cookieHandler.removeSessionCookie();
     } catch (err) {
       clerkErrorDevInitFailed(err.message || err);
     }
@@ -127,43 +109,16 @@ export default function createDevBrowserHandler({
 
     if (devOrStgApi) {
       fapiClient.onBeforeRequest(request => {
-        if (inAuthV2) {
-          const devBrowserJWT = getDevBrowserJWT();
-
-          if (devBrowserJWT) {
-            request.url?.searchParams.set(
-              DEV_BROWSER_SSO_JWT_PARAMETER,
-              devBrowserJWT,
-            );
-          }
-        } else {
-          // TODO: Remove legacy Auth V1 handling
-          const cookie = cookieHandler.getSSODevBrowserCookie();
-          if (cookie) {
-            request.url?.searchParams.set(
-              DEV_BROWSER_SSO_JWT_PARAMETER,
-              cookie,
-            );
-          }
+        const devBrowserJWT = getDevBrowserJWT();
+        if (devBrowserJWT) {
+          request.url?.searchParams.set(DEV_BROWSER_SSO_JWT_PARAMETER, devBrowserJWT);
         }
       });
 
       fapiClient.onAfterResponse((_, response) => {
-        if (inAuthV2) {
-          const newDevBrowserJWT = response?.headers.get(
-            DEV_BROWSER_SSO_JWT_HTTP_HEADER,
-          );
-          if (newDevBrowserJWT) {
-            setDevBrowserJWT(newDevBrowserJWT);
-          }
-        } else {
-          // TODO: Remove legacy Auth V1 handling
-          const newCookie = response?.headers.get(
-            DEV_BROWSER_SSO_JWT_HTTP_HEADER,
-          );
-          if (newCookie) {
-            cookieHandler.setSSODevBrowserCookie(newCookie);
-          }
+        const newDevBrowserJWT = response?.headers.get(DEV_BROWSER_SSO_JWT_HTTP_HEADER);
+        if (newDevBrowserJWT) {
+          setDevBrowserJWT(newDevBrowserJWT);
         }
       });
     }
@@ -173,12 +128,7 @@ export default function createDevBrowserHandler({
     }
 
     // TODO: Remove legacy Auth V1 handling
-    if (
-      !devOrStgHost &&
-      devOrStgApi &&
-      !cookieHandler.getSSODevBrowserCookie() &&
-      !getDevBrowserJWT()
-    ) {
+    if (!devOrStgHost && devOrStgApi && !cookieHandler.getSSODevBrowserCookie() && !getDevBrowserJWT()) {
       return setThirdPartyCookieForDevBrowser();
     }
   }
