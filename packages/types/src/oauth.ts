@@ -12,7 +12,8 @@ export type OAuthProvider =
   | 'dropbox'
   | 'bitbucket'
   | 'microsoft'
-  | 'notion';
+  | 'notion'
+  | 'apple';
 
 export type OAuthStrategy = `oauth_${OAuthProvider}`;
 
@@ -107,6 +108,12 @@ export const OAUTH_PROVIDERS: OAuthProviderData[] = [
     strategy: 'oauth_notion',
     name: 'Notion',
     docsUrl: 'https://docs.clerk.dev/reference/social-login-reference/notion',
+  },
+  {
+    provider: 'apple',
+    strategy: 'oauth_apple',
+    name: 'Apple',
+    docsUrl: 'https://docs.clerk.dev/reference/social-login-reference/apple',
   },
 ];
 

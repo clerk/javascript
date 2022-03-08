@@ -11,6 +11,7 @@ export type OAuthProvider =
   | 'tiktok'
   | 'gitlab'
   | 'discord'
+  | 'apple'
   | 'twitter'
   | 'twitch';
 
