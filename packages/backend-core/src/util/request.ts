@@ -5,20 +5,20 @@
  * (This case most of the times signifies redirect from Clerk Auth pages)
  *
  */
-export function checkCrossOriginReferrer({
-  referrerURL,
+export function checkCrossOrigin({
+  originURL,
   host,
   forwardedHost,
   forwardedPort,
   forwardedProto,
 }: {
-  referrerURL: URL;
+  originURL: URL;
   host: string;
   forwardedHost?: string | null;
   forwardedPort?: string | null;
   forwardedProto?: string | null;
 }) {
-  if (forwardedProto && forwardedProto !== referrerURL.protocol) {
+  if (forwardedProto && forwardedProto !== originURL.protocol) {
     return true;
   }
 
@@ -27,10 +27,10 @@ export function checkCrossOriginReferrer({
 
   finalURL.port = forwardedPort || finalURL.port;
 
-  if (finalURL.port !== referrerURL.port) {
+  if (finalURL.port !== originURL.port) {
     return true;
   }
-  if (finalURL.hostname !== referrerURL.hostname) {
+  if (finalURL.hostname !== originURL.hostname) {
     return true;
   }
 

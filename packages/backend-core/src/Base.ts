@@ -4,7 +4,7 @@ import { JWTExpiredError } from './api/utils/Errors';
 import { parse } from './util/base64url';
 import { isDevelopmentOrStaging, isProduction } from './util/clerkApiKey';
 import { checkClaims, isExpired } from './util/jwt';
-import { checkCrossOriginReferrer } from './util/request';
+import { checkCrossOrigin } from './util/request';
 import { JWT, JWTPayload } from './util/types';
 
 export const API_KEY = process.env.CLERK_API_KEY || '';
@@ -266,9 +266,16 @@ export class Base {
     }
 
     // In cross-origin requests the use of Authorization header is mandatory
-    // TODO: The origin header can be present in same-origin POST, PUT, PATCH requests etc.
-    // Is this check enough for API endpoint authorization ?
-    if (origin) {
+    if (
+      origin &&
+      checkCrossOrigin({
+        originURL: new URL(origin),
+        host,
+        forwardedHost,
+        forwardedPort,
+        forwardedProto,
+      })
+    ) {
       return { status: AuthStatus.SignedOut };
     }
 
@@ -284,8 +291,8 @@ export class Base {
     if (
       isDevelopmentOrStaging(API_KEY) &&
       referrer &&
-      checkCrossOriginReferrer({
-        referrerURL: new URL(referrer),
+      checkCrossOrigin({
+        originURL: new URL(referrer),
         host,
         forwardedHost,
         forwardedPort,
