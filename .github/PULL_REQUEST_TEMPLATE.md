@@ -11,6 +11,7 @@
 - [ ] `@clerk/clerk-js`
 - [ ] `@clerk/clerk-react`
 - [ ] `@clerk/nextjs`
+- [ ] `@clerk/remix`
 - [ ] `@clerk/types`
 - [ ] `@clerk/clerk-expo`
 - [ ] `@clerk/backend-core`
