@@ -14,6 +14,9 @@ export class ExternalAccount implements ExternalAccountResource {
   firstName: string;
   lastName: string;
   picture: string;
+  username?: string;
+  publicMetadata: Record<string, unknown>;
+  label?: string;
 
   constructor(extAccProps: ExternalAccountResource) {
     this.id = extAccProps.id;
@@ -24,6 +27,9 @@ export class ExternalAccount implements ExternalAccountResource {
     this.firstName = extAccProps.firstName;
     this.lastName = extAccProps.lastName;
     this.picture = extAccProps.picture;
+    this.username = extAccProps.username;
+    this.publicMetadata = extAccProps.publicMetadata;
+    this.label = extAccProps.label;
   }
 
   static fromJSON(data: ExternalAccountJSON): ExternalAccount {
@@ -66,6 +72,9 @@ export class ExternalAccount implements ExternalAccountResource {
     // ${provider}_id key in order to set the externalId.
     // @ts-ignore
     obj.externalId = data.provider_user_id || data[`${obj.provider}_id`];
+    obj.username = data.username;
+    obj.publicMetadata = data.public_metadata;
+    obj.label = data.label;
 
     return new ExternalAccount(obj);
   }

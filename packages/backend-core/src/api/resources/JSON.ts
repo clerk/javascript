@@ -74,6 +74,9 @@ export interface FacebookAccountJSON extends ClerkResourceJSON {
   first_name: string;
   last_name: string;
   picture: string;
+  username?: string;
+  public_metadata: Record<string, unknown>;
+  label?: string;
 }
 
 export interface GoogleAccountJSON extends ClerkResourceJSON {
@@ -84,6 +87,9 @@ export interface GoogleAccountJSON extends ClerkResourceJSON {
   given_name: string;
   family_name: string;
   picture: string;
+  username?: string;
+  public_metadata: Record<string, unknown>;
+  label?: string;
 }
 
 export interface ExtAccountJSON extends ClerkResourceJSON {
@@ -96,6 +102,9 @@ export interface ExtAccountJSON extends ClerkResourceJSON {
   first_name: string;
   last_name: string;
   avatar_url: string;
+  username?: string;
+  public_metadata: Record<string, unknown>;
+  label?: string;
 }
 
 export type ExternalAccountJSON =
