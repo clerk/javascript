@@ -1,6 +1,6 @@
 import { render } from '@clerk/shared/testUtils';
 import { EnvironmentResource } from '@clerk/types';
-import { AuthConfig, Session } from 'core/resources';
+import { AuthConfig, Session } from 'core/resources/internal';
 import React from 'react';
 import { SignIn } from 'ui/signIn/SignIn';
 
@@ -30,12 +30,6 @@ jest.mock('ui/contexts', () => {
             homeUrl: 'https://www.cnn.com',
           },
           authConfig: {
-            identificationStrategies: [
-              'email_address',
-              'oauth_google',
-              'oauth_facebook',
-            ],
-            firstFactors: ['email_address', 'oauth_google', 'oauth_facebook'],
             singleSessionMode: true,
           } as Partial<AuthConfig>,
         } as Partial<EnvironmentResource>),

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<SignUpVerify/> verify email address renders the sign up verification form 1`] = `
+exports[`<SignUpVerify/> verify email address renders the OTP sign up verification form 1`] = `
 Array [
   <div
     className="cl-auth-form-header"
@@ -155,7 +155,7 @@ Array [
 ]
 `;
 
-exports[`<SignUpVerify/> verify email address renders the sign up verification form but prefers email_link if exists 1`] = `
+exports[`<SignUpVerify/> verify email address renders the magic link sign up verification form  1`] = `
 <div
   className="cl-auth-form-body cl-auth-form-body-center cl-verification-page-container"
 >
@@ -203,7 +203,7 @@ exports[`<SignUpVerify/> verify email address renders the sign up verification f
 </div>
 `;
 
-exports[`<SignUpVerify/> verify phone number renders the sign up verification form 1`] = `
+exports[`<SignUpVerify/> verify phone number renders the OTP sign up verification form 1`] = `
 Array [
   <div
     className="cl-auth-form-header"

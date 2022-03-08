@@ -1,14 +1,7 @@
-import {
-  mocked,
-  render,
-  renderJSON,
-  screen,
-  userEvent,
-  waitFor,
-} from '@clerk/shared/testUtils';
+import { mocked, render, renderJSON, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
 import { titleize } from '@clerk/shared/utils/string';
-import { EnvironmentResource, SignInResource } from '@clerk/types';
-import { ClerkAPIResponseError } from 'core/resources/Error';
+import { EnvironmentResource, SignInResource, UserSettingsJSON, UserSettingsResource } from '@clerk/types';
+import { ClerkAPIResponseError, UserSettings } from 'core/resources/internal';
 import React from 'react';
 import { useCoreSignIn } from 'ui/contexts';
 
@@ -18,6 +11,7 @@ const mockNavigate = jest.fn();
 const mockCreateRequest = jest.fn();
 const mockAuthenticateWithRedirect = jest.fn();
 const mockNavigateAfterSignIn = jest.fn();
+let mockUserSettings: UserSettingsResource;
 
 jest.mock('ui/router/RouteContext');
 
@@ -42,15 +36,10 @@ jest.mock('ui/contexts', () => {
             preferredSignInStrategy: 'otp',
             afterSignInUrl: 'http://test.host',
           },
+          userSettings: mockUserSettings,
           authConfig: {
             password: 'required',
             singleSessionMode: false,
-            identificationStrategies: [
-              'email_address',
-              'oauth_google',
-              'oauth_facebook',
-            ],
-            firstFactors: ['email_address', 'oauth_google', 'oauth_facebook'],
           },
         } as any as EnvironmentResource),
     ),
@@ -80,9 +69,44 @@ jest.mock('ui/hooks', () => ({
   },
 }));
 
-describe('<SignInStart/>', () => {
+fdescribe('<SignInStart/>', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  beforeEach(() => {
+    mockUserSettings = new UserSettings({
+      attributes: {
+        email_address: {
+          enabled: true,
+          required: false,
+          used_for_first_factor: true,
+          first_factors: ['email_link'],
+          used_for_second_factor: false,
+          second_factors: [],
+          verifications: ['email_link'],
+          verify_at_sign_up: false,
+        },
+        password: {
+          enabled: true,
+          required: true,
+        },
+      },
+      social: {
+        oauth_google: {
+          enabled: true,
+          required: false,
+          authenticatable: false,
+          strategy: 'oauth_google',
+        },
+        oauth_facebook: {
+          enabled: true,
+          required: false,
+          authenticatable: false,
+          strategy: 'oauth_facebook',
+        },
+      },
+    } as unknown as UserSettingsJSON);
   });
 
   describe('when user is not signed in', () => {
@@ -93,7 +117,7 @@ describe('<SignInStart/>', () => {
       });
     });
 
-    it('renders the sign in start screen', async () => {
+    it('renders the sign in start screen', () => {
       const tree = renderJSON(<SignInStart />);
       expect(tree).toMatchSnapshot();
     });
@@ -102,7 +126,7 @@ describe('<SignInStart/>', () => {
       render(<SignInStart />);
 
       const inputField = screen.getByLabelText('Email address');
-      await userEvent.type(inputField, 'boss@clerk.dev');
+      userEvent.type(inputField, 'boss@clerk.dev');
 
       const signEmailButton = screen.getByRole('button', { name: /Continue/i });
       userEvent.click(signEmailButton);
@@ -123,17 +147,15 @@ describe('<SignInStart/>', () => {
         status: 'complete',
       });
 
-      const instantPasswordField = container.querySelector(
-        'input#password',
-      ) as HTMLInputElement;
+      const instantPasswordField = container.querySelector('input#password') as HTMLInputElement;
 
       expect(instantPasswordField).toBeDefined();
 
       const inputField = screen.getByLabelText('Email address');
-      await userEvent.type(inputField, 'boss@clerk.dev');
+      userEvent.type(inputField, 'boss@clerk.dev');
 
       // simulate password being filled by a pwd manager
-      await userEvent.type(instantPasswordField, '123456');
+      userEvent.type(instantPasswordField, '123456');
 
       const signEmailButton = screen.getByRole('button', { name: /Continue/i });
       userEvent.click(signEmailButton);
@@ -168,9 +190,7 @@ describe('<SignInStart/>', () => {
           status: 'needs_first_factor',
         }));
 
-      const instantPasswordField = container.querySelector(
-        'input#password',
-      ) as HTMLInputElement;
+      const instantPasswordField = container.querySelector('input#password') as HTMLInputElement;
 
       expect(instantPasswordField).toBeDefined();
 
@@ -208,8 +228,7 @@ describe('<SignInStart/>', () => {
             data: [
               {
                 code: 'form_password_incorrect',
-                message:
-                  'Password is incorrect. Try again, or use another method.',
+                message: 'Password is incorrect. Try again, or use another method.',
                 meta: {
                   param_name: 'password',
                 },
@@ -222,9 +241,7 @@ describe('<SignInStart/>', () => {
           status: 'needs_first_factor',
         }));
 
-      const instantPasswordField = container.querySelector(
-        'input#password',
-      ) as HTMLInputElement;
+      const instantPasswordField = container.querySelector('input#password') as HTMLInputElement;
 
       expect(instantPasswordField).toBeDefined();
 
@@ -252,6 +269,21 @@ describe('<SignInStart/>', () => {
         expect(mockSetSession).not.toHaveBeenCalled();
         expect(mockNavigate).not.toHaveBeenCalledWith('factor-one');
       });
+    });
+
+    it('does not render instant password is instance is passwordless', () => {
+      mockUserSettings = new UserSettings({
+        attributes: {
+          password: {
+            enabled: true,
+            required: false,
+          },
+        },
+      } as unknown as UserSettingsJSON);
+
+      const { container } = render(<SignInStart />);
+      const instantPasswordField = container.querySelector('input#password') as HTMLInputElement;
+      expect(instantPasswordField).toBeNull();
     });
 
     it.each(['google', 'facebook'])(
@@ -315,24 +347,16 @@ describe('<SignInStart/>', () => {
           identifier: 'boss@clerk.dev',
         });
         expect(mockNavigate).not.toHaveBeenCalled();
-        expect(mockSetSession).toHaveBeenNthCalledWith(
-          1,
-          'deadbeef',
-          mockNavigateAfterSignIn,
-        );
+        expect(mockSetSession).toHaveBeenNthCalledWith(1, 'deadbeef', mockNavigateAfterSignIn);
       });
     });
   });
 
   describe('when the instance is invitation only', () => {
     it('renders the external account verification error if available', async () => {
-      const errorMsg =
-        'You cannot sign up with sokratis.vidros@gmail.com since this is an invitation-only application';
+      const errorMsg = 'You cannot sign up with sokratis.vidros@gmail.com since this is an invitation-only application';
 
-      mocked(
-        useCoreSignIn as jest.Mock<SignInResource>,
-        true,
-      ).mockImplementationOnce(
+      mocked(useCoreSignIn as jest.Mock<SignInResource>, true).mockImplementationOnce(
         () =>
           ({
             create: mockCreateRequest,
@@ -356,10 +380,7 @@ describe('<SignInStart/>', () => {
     it('renders the external account verification error if available', async () => {
       const errorMsg = 'You did not grant access to your Google account';
 
-      mocked(
-        useCoreSignIn as jest.Mock<SignInResource>,
-        true,
-      ).mockImplementationOnce(
+      mocked(useCoreSignIn as jest.Mock<SignInResource>, true).mockImplementationOnce(
         () =>
           ({
             create: mockCreateRequest,
