@@ -27,6 +27,10 @@ import {
   Token,
   Web3Wallet,
 } from './internal';
+import {
+  OrganizationMembership,
+  RetrieveMembershipsParams,
+} from './OrganizationMembership';
 
 export class User extends BaseResource implements UserResource {
   pathRoot = '/me';
@@ -178,10 +182,10 @@ export class User extends BaseResource implements UserResource {
     });
   };
 
-  getOrganizations = async (
-    getOrganizationParams: GetOrganizationParams,
-  ): Promise<Organization[]> => {
-    return await Organization.retrieve(getOrganizationParams);
+  getOrganizationMemberships = async (
+    retrieveMembership: RetrieveMembershipsParams,
+  ): Promise<OrganizationMembership[]> => {
+    return await OrganizationMembership.retrieve(retrieveMembership);
   };
 
   protected fromJSON(data: UserJSON): this {

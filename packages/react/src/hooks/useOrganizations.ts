@@ -1,4 +1,8 @@
-import { CreateOrganizationParams, OrganizationResource } from '@clerk/types';
+import {
+  CreateOrganizationParams,
+  OrganizationMembershipResource,
+  OrganizationResource,
+} from '@clerk/types';
 import { useContext } from 'react';
 
 import { useClerk } from '../contexts';
@@ -9,7 +13,7 @@ type UseOrganizations = {
   createOrganization: (
     params: CreateOrganizationParams,
   ) => Promise<OrganizationResource>;
-  getOrganizations: () => Promise<OrganizationResource[]>;
+  getOrganizationMemberships: () => Promise<OrganizationMembershipResource[]>;
   getOrganization: (
     organizationId: string,
   ) => Promise<OrganizationResource | undefined>;
@@ -22,7 +26,7 @@ export function useOrganizations(): UseOrganizations {
 
   return {
     createOrganization: clerk.createOrganization,
-    getOrganizations: clerk.getOrganizations,
+    getOrganizationMemberships: clerk.getOrganizationMemberships,
     getOrganization: clerk.getOrganization,
   };
 }

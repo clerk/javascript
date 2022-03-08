@@ -5,9 +5,6 @@ import { MembershipRole } from './organizationMembership';
 export interface OrganizationResource {
   id: string;
   name: string;
-  role: MembershipRole;
-  instanceId: string;
-  createdBy: string;
   createdAt: Date;
   updatedAt: Date;
   getMemberships: (

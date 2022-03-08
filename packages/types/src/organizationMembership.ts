@@ -1,8 +1,9 @@
+import { OrganizationResource } from './organization';
 import { PublicUserData } from './session';
 
 export interface OrganizationMembershipResource {
   id: string;
-  organizationId: string;
+  organization: OrganizationResource;
   publicUserData: PublicUserData;
   role: MembershipRole;
   createdAt: Date;

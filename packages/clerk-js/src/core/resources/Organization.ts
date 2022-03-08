@@ -17,9 +17,6 @@ import {
 export class Organization extends BaseResource implements OrganizationResource {
   id!: string;
   name!: string;
-  role!: MembershipRole;
-  instanceId!: string;
-  createdBy!: string;
   createdAt!: Date;
   updatedAt!: Date;
 
@@ -38,22 +35,6 @@ export class Organization extends BaseResource implements OrganizationResource {
     )?.response as unknown as OrganizationJSON;
 
     return new Organization(json);
-  }
-
-  static async retrieve(
-    getOrganizationParams?: GetOrganizationParams,
-  ): Promise<Organization[]> {
-    return await BaseResource._fetch({
-      path: '/me/organizations',
-      method: 'GET',
-      search: getOrganizationParams as any,
-    })
-      .then(res => {
-        const organizationsJSON =
-          res?.response as unknown as OrganizationJSON[];
-        return organizationsJSON.map(org => new Organization(org));
-      })
-      .catch(() => []);
   }
 
   getMemberships = async (
@@ -118,9 +99,6 @@ export class Organization extends BaseResource implements OrganizationResource {
   protected fromJSON(data: OrganizationJSON): this {
     this.id = data.id;
     this.name = data.name;
-    this.role = data.role;
-    this.instanceId = data.instance_id;
-    this.createdBy = data.created_by;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     return this;

@@ -2,11 +2,10 @@ import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
   ClientResource,
-  CreateOrganizationInvitationParams,
   CreateOrganizationParams,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
-  OrganizationInvitationResource,
+  OrganizationMembershipResource,
   OrganizationResource,
   RedirectOptions,
   Resources,
@@ -452,12 +451,14 @@ export default class IsomorphicClerk {
     }
   };
 
-  getOrganizations = async (): Promise<OrganizationResource[] | void> => {
-    const callback = () => this.clerkjs?.getOrganizations();
+  getOrganizationMemberships = async (): Promise<
+    OrganizationMembershipResource[] | void
+  > => {
+    const callback = () => this.clerkjs?.getOrganizationMemberships();
     if (this.clerkjs && this._loaded) {
-      return callback() as Promise<OrganizationResource[]>;
+      return callback() as Promise<OrganizationMembershipResource[]>;
     } else {
-      this.premountMethodCalls.set('getOrganizations', callback);
+      this.premountMethodCalls.set('getOrganizationMemberships', callback);
     }
   };
 

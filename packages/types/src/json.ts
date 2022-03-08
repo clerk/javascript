@@ -317,9 +317,6 @@ export interface OrganizationJSON extends ClerkResourceJSON {
   object: 'organization';
   id: string;
   name: string;
-  role: MembershipRole;
-  instance_id: string;
-  created_by: string;
   created_at: number;
   updated_at: number;
 }
@@ -327,7 +324,7 @@ export interface OrganizationJSON extends ClerkResourceJSON {
 export interface OrganizationMembershipJSON extends ClerkResourceJSON {
   object: 'organization_membership';
   id: string;
-  organization_id: string;
+  organization: OrganizationJSON;
   public_user_data: PublicUserDataJSON;
   role: MembershipRole;
   created_at: number;
