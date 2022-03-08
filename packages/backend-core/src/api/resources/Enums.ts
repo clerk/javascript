@@ -12,7 +12,13 @@ export type OAuthProvider =
   | 'gitlab'
   | 'discord'
   | 'twitter'
-  | 'twitch';
+  | 'twitch'
+  | 'linkedin'
+  | 'dropbox'
+  | 'bitbucket'
+  | 'microsoft'
+  | 'notion'
+  | 'apple';
 
 export type OAuthStrategy = `oauth_${OAuthProvider}`;
 
