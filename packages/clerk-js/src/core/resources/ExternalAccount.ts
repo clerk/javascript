@@ -1,16 +1,9 @@
 import { titleize } from '@clerk/shared/utils/string';
-import type {
-  ExternalAccountJSON,
-  ExternalAccountResource,
-  OAuthProvider,
-} from '@clerk/types';
+import type { ExternalAccountJSON, ExternalAccountResource, OAuthProvider } from '@clerk/types';
 
 import { BaseResource } from './Base';
 
-export class ExternalAccount
-  extends BaseResource
-  implements ExternalAccountResource
-{
+export class ExternalAccount extends BaseResource implements ExternalAccountResource {
   id!: string;
   identificationId!: string;
   provider!: OAuthProvider;
@@ -20,9 +13,9 @@ export class ExternalAccount
   firstName = '';
   lastName = '';
   avatarUrl = '';
-  username: '';
-  publicMetadata: {};
-  label: '';
+  username = '';
+  publicMetadata = {};
+  label = '';
 
   public constructor(data: Partial<ExternalAccountJSON>, pathRoot: string);
   public constructor(data: ExternalAccountJSON, pathRoot: string) {
@@ -41,10 +34,7 @@ export class ExternalAccount
     this.firstName = data.first_name;
     this.lastName = data.last_name;
     // TODO: Send the provider name the `oauth` prefix from FAPI
-    this.provider = (data.provider || '').replace(
-      'oauth_',
-      '',
-    ) as OAuthProvider;
+    this.provider = (data.provider || '').replace('oauth_', '') as OAuthProvider;
     this.username = data.username;
     this.publicMetadata = data.public_metadata;
     this.label = data.label;

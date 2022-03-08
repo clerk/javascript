@@ -2,26 +2,13 @@
  * Currently representing API DTOs in their JSON form.
  */
 
-import { OAuthStrategy, OAuthProvider} from './oauth';
+import { OAuthProvider, OAuthStrategy } from './oauth';
 import { OrganizationInvitationStatus } from './organizationInvitation';
 import { MembershipRole } from './organizationMembership';
 import { SessionStatus } from './session';
-import {
-  PreferredSignInStrategy,
-  SignInFactor,
-  SignInIdentifier,
-  SignInStatus,
-  UserData,
-} from './signIn';
+import { PreferredSignInStrategy, SignInFactor, SignInIdentifier, SignInStatus, UserData } from './signIn';
 import { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUp';
-import {
-  BoxShadow,
-  Color,
-  EmUnit,
-  FontFamily,
-  FontWeight,
-  HexColor,
-} from './theme';
+import { BoxShadow, Color, EmUnit, FontFamily, FontWeight, HexColor } from './theme';
 import { UserSettingsJSON } from './userSettings';
 import { VerificationStatus } from './verification';
 
@@ -191,6 +178,9 @@ export interface ExternalAccountJSON extends ClerkResourceJSON {
   first_name: string;
   last_name: string;
   avatar_url: string;
+  username: string;
+  public_metadata: Record<string, unknown>;
+  label: string;
 }
 
 export interface UserJSON extends ClerkResourceJSON {
@@ -281,49 +271,6 @@ export interface SessionActivityJSON extends ClerkResourceJSON {
   country?: string;
   is_mobile?: boolean;
 }
-
-// TODO: Generalize external account JSON payload to simplify type declarations
-export type ExternalAccountJSON =
-  | {
-      object: 'google_account';
-      id: string;
-      google_id: string;
-      approved_scopes: string;
-      email_address: string;
-      given_name: string;
-      family_name: string;
-      picture: string;
-      username?: string;
-      public_metadata: Record<string, unknown>;
-      label?: string;
-    }
-  | {
-      object: 'facebook_account';
-      id: string;
-      facebook_id: string;
-      approved_scopes: string;
-      email_address: string;
-      first_name: string;
-      last_name: string;
-      picture: string;
-      username?: string;
-      public_metadata: Record<string, unknown>;
-      label?: string;
-    }
-  | {
-      object: 'external_account';
-      provider: string;
-      identification_id: string;
-      provider_user_id: string;
-      approved_scopes: string;
-      email_address: string;
-      first_name: string;
-      last_name: string;
-      avatar_url: string;
-      username?: string;
-      public_metadata: Record<string, unknown>;
-      label?: string;
-    };
 
 export interface OrganizationJSON extends ClerkResourceJSON {
   object: 'organization';

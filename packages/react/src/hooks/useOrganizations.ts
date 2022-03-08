@@ -1,18 +1,14 @@
 import { CreateOrganizationParams, OrganizationResource } from '@clerk/types';
 import { useContext } from 'react';
 
-import { useClerk } from '../contexts';
 import { assertWrappedByClerkProvider } from '../contexts/assertHelpers';
 import { StructureContext } from '../contexts/StructureContext';
+import { useClerk } from './useClerk';
 
 type UseOrganizations = {
-  createOrganization: (
-    params: CreateOrganizationParams,
-  ) => Promise<OrganizationResource>;
+  createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource>;
   getOrganizations: () => Promise<OrganizationResource[]>;
-  getOrganization: (
-    organizationId: string,
-  ) => Promise<OrganizationResource | undefined>;
+  getOrganization: (organizationId: string) => Promise<OrganizationResource | undefined>;
 };
 
 export function useOrganizations(): UseOrganizations {
