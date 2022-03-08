@@ -3,19 +3,18 @@ import { IsomorphicClerkOptions } from '@clerk/clerk-react/dist/types';
 import { useNavigate } from '@remix-run/react';
 import React from 'react';
 
-import { Interstitial } from './Interstitial';
+import { noFrontendApiError } from '../errors';
 import { assertValidClerkState, warnForSsr } from './utils';
 
 export * from '@clerk/clerk-react';
 
-type RemixClerkProviderProps<ClerkStateT extends { __type: 'clerkState' } = any> = {
-  frontendApi: string;
+export type RemixClerkProviderProps<ClerkStateT extends { __type: 'clerkState' } = any> = {
   children: React.ReactNode;
   clerkState: ClerkStateT;
 } & IsomorphicClerkOptions;
 
 export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): JSX.Element {
-  const { frontendApi, clerkJSUrl, clerkState, ...restProps } = rest;
+  const { clerkJSUrl, clerkState, ...restProps } = rest;
   const navigate = useNavigate();
   ReactClerkProvider.displayName = 'ReactClerkProvider';
 
@@ -25,14 +24,15 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
     warnForSsr(clerkState);
   }, []);
 
-  const { __clerk_ssr_interstitial, __clerk_ssr_state } = clerkState?.__internal_clerk_state || {};
-  if (__clerk_ssr_interstitial) {
-    return <Interstitial html={__clerk_ssr_interstitial} />;
+  const { __clerk_ssr_state, __frontendApi } = clerkState?.__internal_clerk_state || {};
+
+  if (!__frontendApi) {
+    throw new Error(noFrontendApiError);
   }
 
   return (
     <ReactClerkProvider
-      frontendApi={frontendApi}
+      frontendApi={__frontendApi}
       clerkJSUrl={clerkJSUrl}
       navigate={to => navigate(to)}
       initialState={__clerk_ssr_state}

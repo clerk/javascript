@@ -5,6 +5,7 @@ import { LoaderFunction } from '@remix-run/server-runtime';
 export type GetAuthReturn = Promise<ServerSideAuth>;
 
 export type RootAuthLoaderOptions = {
+  frontendApi?: string;
   loadUser?: boolean;
   loadSession?: boolean;
 };

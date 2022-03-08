@@ -1,14 +1,11 @@
-import { IsomorphicClerkOptions } from '@clerk/clerk-react/dist/types';
 import { useLoaderData } from '@remix-run/react';
 import React from 'react';
 
-import { ClerkProvider } from './RemixClerkProvider';
+import { ClerkProvider, RemixClerkProviderProps } from './RemixClerkProvider';
 
-type RemixConnectOptions = {
-  frontendApi: string;
-} & Omit<IsomorphicClerkOptions, 'navigate'>;
+type ConnectClerkOptions = Partial<Omit<RemixClerkProviderProps, 'navigate'>>;
 
-export function ConnectClerk(App: () => JSX.Element, opts: RemixConnectOptions) {
+export function ConnectClerk(App: () => JSX.Element, opts: ConnectClerkOptions) {
   return () => {
     const { clerkState } = useLoaderData();
     return (

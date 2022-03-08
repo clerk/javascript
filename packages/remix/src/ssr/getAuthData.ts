@@ -3,7 +3,7 @@ import Clerk, { sessions, users } from '@clerk/clerk-sdk-node';
 import { GetSessionTokenOptions } from '@clerk/types';
 
 import { RootAuthLoaderOptions } from './types';
-import { extractInterstitialHtmlContent, parseCookies } from './utils';
+import { parseCookies } from './utils';
 
 export type AuthData = {
   sessionId: string | null;
@@ -16,7 +16,7 @@ export type AuthData = {
 export async function getAuthData(
   req: Request,
   opts: RootAuthLoaderOptions = {},
-): Promise<{ authData: AuthData | null; interstitial?: string }> {
+): Promise<{ authData: AuthData | null; showInterstitial?: boolean }> {
   const { loadSession, loadUser } = opts;
   const { headers } = req;
   const cookies = parseCookies(req);
@@ -37,7 +37,7 @@ export async function getAuthData(
   };
 
   try {
-    const { status, sessionClaims, interstitial } = await Clerk.base.getAuthState({
+    const { status, sessionClaims } = await Clerk.base.getAuthState({
       cookieToken: cookies['__session'],
       clientUat: cookies['__client_uat'],
       headerToken: headers.get('authorization')?.replace('Bearer ', ''),
@@ -47,11 +47,11 @@ export async function getAuthData(
       forwardedHost: headers.get('x-forwarded-host') as string,
       referrer: headers.get('referer'),
       userAgent: headers.get('user-agent') as string,
-      fetchInterstitial: () => Clerk.fetchInterstitial(),
+      fetchInterstitial: () => Promise.resolve(''),
     });
 
     if (status === AuthStatus.Interstitial) {
-      return { authData: null, interstitial: extractInterstitialHtmlContent(interstitial) };
+      return { authData: null, showInterstitial: true };
     }
 
     if (status === AuthStatus.SignedOut || !sessionClaims) {
