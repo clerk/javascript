@@ -18,6 +18,8 @@ Reference of the methods supported in the Clerk Backend API wrapper. [API refere
   - [getInvitationList()](#getinvitationlist)
   - [createInvitation(params)](#createinvitationparams)
   - [revokeInvitation(invitationId)](#revokeinvitationinvitationId)
+- [Organization operations](#organization-operations)
+  - [createOrganization(params)](#createorganizationparams)
 - [Session operations](#session-operations)
   - [getSessionList({ clientId, userId })](#getsessionlist-clientid-userid-)
   - [getSession(sessionId)](#getsessionsessionid)
@@ -143,6 +145,21 @@ Only active (i.e. non-revoked) invitations can be revoked.
 
 ```js
 const invitation = await clerkAPI.invitations.revokeInvitation('inv_some-id');
+```
+
+## Organization operations
+
+Organization operations are exposed by the `organizations` sub-api (`clerkAPI.organizations`).
+
+#### createOrganization(params)
+
+Creates a new organization with the given name. You need to provide the user ID who is going to be the organization owner. The user will become an administrator for the organization.
+
+```js
+const organization = await clerkAPI.organizations.createOrganization({
+  name: 'Acme Inc',
+  createdBy: 'user_1o4q123qMeCkKKIXcA9h8',
+});
 ```
 
 ## Session operations

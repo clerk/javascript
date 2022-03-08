@@ -6,8 +6,8 @@ import type {
   HTTPMethod,
 } from 'core/fapiClient';
 
-import type Clerk from '../clerk';
 import { clerkMissingFapiClientInResources } from '../errors';
+import type { Clerk } from './internal';
 import { ClerkAPIResponseError, Client } from './internal';
 
 export type BaseFetchOptions = { forceUpdateClient?: boolean };

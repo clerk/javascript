@@ -1,5 +1,6 @@
 export type { default as Clerk } from '../clerk';
 export * from './Base';
+export * from './UserSettings';
 export * from './AuthConfig';
 export * from './Client';
 export * from './DisplayConfig';
@@ -10,6 +11,9 @@ export * from './ExternalAccount';
 export * from './IdentificationLink';
 export * from './Image';
 export * from './PhoneNumber';
+export * from './Organization';
+export * from './OrganizationInvitation';
+export * from './OrganizationMembership';
 export * from './Session';
 export * from './SessionWithActivities';
 export * from './SignIn';

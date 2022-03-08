@@ -16,6 +16,7 @@ export enum ObjectType {
   FacebookAccount = 'facebook_account',
   GoogleAccount = 'google_account',
   Invitation = 'invitation',
+  Organization = 'organization',
   PhoneNumber = 'phone_number',
   Session = 'session',
   SignInAttempt = 'sign_in_attempt',
@@ -73,6 +74,9 @@ export interface FacebookAccountJSON extends ClerkResourceJSON {
   first_name: string;
   last_name: string;
   picture: string;
+  username?: string;
+  public_metadata: Record<string, unknown>;
+  label?: string;
 }
 
 export interface GoogleAccountJSON extends ClerkResourceJSON {
@@ -83,6 +87,9 @@ export interface GoogleAccountJSON extends ClerkResourceJSON {
   given_name: string;
   family_name: string;
   picture: string;
+  username?: string;
+  public_metadata: Record<string, unknown>;
+  label?: string;
 }
 
 export interface ExtAccountJSON extends ClerkResourceJSON {
@@ -95,6 +102,9 @@ export interface ExtAccountJSON extends ClerkResourceJSON {
   first_name: string;
   last_name: string;
   avatar_url: string;
+  username?: string;
+  public_metadata: Record<string, unknown>;
+  label?: string;
 }
 
 export type ExternalAccountJSON =
@@ -109,6 +119,13 @@ export interface IdentificationLinkJSON extends ClerkResourceJSON {
 export interface InvitationJSON extends ClerkResourceJSON {
   object: ObjectType.Invitation;
   email_address: string;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface OrganizationJSON extends ClerkResourceJSON {
+  object: ObjectType.Organization;
+  name: string;
   created_at: number;
   updated_at: number;
 }

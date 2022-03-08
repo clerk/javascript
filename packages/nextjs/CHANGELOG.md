@@ -41,6 +41,55 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
+
+### [2.11.10](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@2.11.9...@clerk/nextjs@2.11.10) (2022-03-04)
+
+**Note:** Version bump only for package @clerk/nextjs
+
+
+
+
+
+### [2.11.9](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@2.11.8...@clerk/nextjs@2.11.9) (2022-03-04)
+
+**Note:** Version bump only for package @clerk/nextjs
+
+
+
+
+
+### [2.11.8](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@2.11.7...@clerk/nextjs@2.11.8) (2022-03-04)
+
+**Note:** Version bump only for package @clerk/nextjs
+
+
+
+
+
+### [2.11.7](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@2.11.6...@clerk/nextjs@2.11.7) (2022-03-03)
+
+**Note:** Version bump only for package @clerk/nextjs
+
+
+
+
+
+### [2.11.6](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@2.11.5...@clerk/nextjs@2.11.6) (2022-03-02)
+
+**Note:** Version bump only for package @clerk/nextjs
+
+
+
+
+
+### [2.11.5](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@2.11.4...@clerk/nextjs@2.11.5) (2022-03-01)
+
+**Note:** Version bump only for package @clerk/nextjs
+
+
+
+
+
 ### [2.11.4](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@2.11.4-staging.0...@clerk/nextjs@2.11.4) (2022-02-24)
 
 **Note:** Version bump only for package @clerk/nextjs

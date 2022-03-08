@@ -2,29 +2,14 @@
  * Currently representing API DTOs in their JSON form.
  */
 
-import { ToggleType, ToggleTypeWithRequire } from './authConfig';
-import { EmailAddressVerificationStrategy } from './emailAddress';
-import { OAuthStrategy } from './oauth';
-import { OAuthProvider } from './oauth';
+import { OAuthProvider, OAuthStrategy } from './oauth';
+import { OrganizationInvitationStatus } from './organizationInvitation';
+import { MembershipRole } from './organizationMembership';
 import { SessionStatus } from './session';
-import {
-  IdentificationStrategy,
-  PreferredSignInStrategy,
-  SignInFactor,
-  SignInIdentifier,
-  SignInStatus,
-  SignInStrategyName,
-  UserData,
-} from './signIn';
+import { PreferredSignInStrategy, SignInFactor, SignInIdentifier, SignInStatus, UserData } from './signIn';
 import { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUp';
-import {
-  BoxShadow,
-  Color,
-  EmUnit,
-  FontFamily,
-  FontWeight,
-  HexColor,
-} from './theme';
+import { BoxShadow, Color, EmUnit, FontFamily, FontWeight, HexColor } from './theme';
+import { UserSettingsJSON } from './userSettings';
 import { VerificationStatus } from './verification';
 
 export interface ClerkResourceJSON {
@@ -87,6 +72,7 @@ export interface ImageJSON {
 export interface EnvironmentJSON extends ClerkResourceJSON {
   auth_config: AuthConfigJSON;
   display_config: DisplayConfigJSON;
+  user_settings: UserSettingsJSON;
 }
 
 export interface ClientJSON extends ClerkResourceJSON {
@@ -192,6 +178,9 @@ export interface ExternalAccountJSON extends ClerkResourceJSON {
   first_name: string;
   last_name: string;
   avatar_url: string;
+  username: string;
+  public_metadata: Record<string, unknown>;
+  label: string;
 }
 
 export interface UserJSON extends ClerkResourceJSON {
@@ -222,29 +211,15 @@ export interface PublicUserDataJSON extends ClerkResourceJSON {
   last_name: string | null;
   profile_image_url: string;
   identifier: string;
+  user_id?: string;
 }
 
 export interface SessionWithActivitiesJSON extends Omit<SessionJSON, 'user'> {
   user: null;
   latest_activity: SessionActivityJSON;
-  // activities: SessionActivityJSON[];
 }
 
-export interface AuthConfigJSON {
-  object: 'auth_config';
-  id: string;
-  first_name: ToggleTypeWithRequire;
-  last_name: ToggleTypeWithRequire;
-  email_address: ToggleType;
-  phone_number: ToggleType;
-  username: ToggleType;
-  password: ToggleTypeWithRequire;
-  identification_strategies: IdentificationStrategy[];
-  identification_requirements: IdentificationStrategy[][];
-  password_conditions: any;
-  first_factors: SignInStrategyName[];
-  second_factors: SignInStrategyName[];
-  email_address_verification_strategies: EmailAddressVerificationStrategy[];
+export interface AuthConfigJSON extends ClerkResourceJSON {
   single_session_mode: boolean;
 }
 
@@ -295,4 +270,36 @@ export interface SessionActivityJSON extends ClerkResourceJSON {
   city?: string;
   country?: string;
   is_mobile?: boolean;
+}
+
+export interface OrganizationJSON extends ClerkResourceJSON {
+  object: 'organization';
+  id: string;
+  name: string;
+  role: MembershipRole;
+  instance_id: string;
+  created_by: string;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface OrganizationMembershipJSON extends ClerkResourceJSON {
+  object: 'organization_membership';
+  id: string;
+  organization_id: string;
+  public_user_data: PublicUserDataJSON;
+  role: MembershipRole;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface OrganizationInvitationJSON extends ClerkResourceJSON {
+  object: 'organization_invitation';
+  id: string;
+  organization_id: string;
+  email_address: string;
+  status: OrganizationInvitationStatus;
+  role: MembershipRole;
+  created_at: number;
+  updated_at: number;
 }

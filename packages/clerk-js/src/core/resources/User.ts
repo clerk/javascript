@@ -16,7 +16,9 @@ import {
   BaseResource,
   EmailAddress,
   ExternalAccount,
+  GetOrganizationParams,
   Image,
+  Organization,
   PhoneNumber,
   SessionWithActivities,
   Web3Wallet,
@@ -126,6 +128,12 @@ export class User extends BaseResource implements UserResource {
     return Image.create(`${this.path()}/profile_image`, {
       file,
     });
+  };
+
+  getOrganizations = async (
+    getOrganizationParams: GetOrganizationParams,
+  ): Promise<Organization[]> => {
+    return await Organization.retrieve(getOrganizationParams);
   };
 
   protected fromJSON(data: UserJSON): this {

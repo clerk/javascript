@@ -3,7 +3,7 @@ export * from './components';
 export * from './hooks';
 export type { ClerkProp } from './types';
 export { isMagicLinkError, MagicLinkErrorCode } from './errors';
-export { useMagicLink } from './useMagicLink';
+export { useMagicLink } from './hooks/useMagicLink';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/naming-convention

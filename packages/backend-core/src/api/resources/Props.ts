@@ -51,6 +51,9 @@ export interface ExternalAccountProps extends ClerkProps {
   firstName: Nullable<string>;
   lastName: Nullable<string>;
   picture: Nullable<string>;
+  username: Nullable<string>;
+  publicMetadata: Record<string, unknown>;
+  label: Nullable<string>;
 }
 
 export interface IdentificationLinkProps extends ClerkProps {
@@ -59,6 +62,13 @@ export interface IdentificationLinkProps extends ClerkProps {
 
 export interface InvitationProps extends ClerkProps {
   emailAddress: string;
+  publicMetadata?: Record<string, unknown>;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface OrganizationProps extends ClerkProps {
+  name: string;
   createdAt: number;
   updatedAt: number;
 }

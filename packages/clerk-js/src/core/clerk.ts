@@ -7,10 +7,12 @@ import type {
   Clerk as ClerkInterface,
   ClerkOptions,
   ClientResource,
+  CreateOrganizationParams,
   EnvironmentResource,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
   ListenerCallback,
+  OrganizationResource,
   RedirectOptions,
   Resources,
   SignInProps,
@@ -61,6 +63,7 @@ import {
   Environment,
   MagicLinkError,
   MagicLinkErrorCode,
+  Organization,
 } from './resources/internal';
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
@@ -568,6 +571,24 @@ export default class Clerk implements ClerkInterface {
         return Promise.resolve();
       });
     }
+  };
+
+  public createOrganization = async ({
+    name,
+  }: CreateOrganizationParams): Promise<OrganizationResource> => {
+    return await Organization.create(name);
+  };
+
+  public getOrganizations = async (): Promise<OrganizationResource[]> => {
+    return await Organization.retrieve();
+  };
+
+  public getOrganization = async (
+    organizationId: string,
+  ): Promise<OrganizationResource | undefined> => {
+    return (await Organization.retrieve()).find(
+      org => org.id === organizationId,
+    );
   };
 
   updateClient = (newClient: ClientResource): void => {

@@ -10,7 +10,9 @@ export interface ExternalAccountResource {
   firstName: string;
   lastName: string;
   avatarUrl: string;
-
+  username?: string;
+  publicMetadata: Record<string, unknown>;
+  label?: string;
   providerSlug: () => OAuthProvider;
   providerTitle: () => string;
 }

@@ -119,11 +119,10 @@ Array [
               >
                 <div>
                   <img
-                    alt="Facebook"
+                    alt="Facebook Account"
                     className="cl-left-icon-wrapper"
                     src="https://images.clerk.dev/static/facebook.svg"
                   />
-                  peter@gmail.com
                 </div>
               </div>
             </div>
@@ -3348,11 +3347,10 @@ Array [
             >
               <div>
                 <img
-                  alt="Facebook"
+                  alt="Facebook Account"
                   className="cl-left-icon-wrapper"
                   src="https://images.clerk.dev/static/facebook.svg"
                 />
-                peter@gmail.com
               </div>
             </div>
             <div
@@ -3395,12 +3393,12 @@ Array [
           className="title"
         >
           <img
-            alt="Facebook"
+            alt="Facebook Account"
             className="cl-left-icon-wrapper"
             src="https://images.clerk.dev/static/facebook.svg"
           />
             
-          Facebook
+          Facebook Account
         </h1>
         <p
           className="subtitle"
@@ -3456,9 +3454,7 @@ Array [
             <div
               className="start"
             >
-              <div>
-                peter@gmail.com
-              </div>
+              <div />
             </div>
             <div
               className="iconContainer"
