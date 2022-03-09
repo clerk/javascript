@@ -15,6 +15,7 @@
     "forceConsistentCasingInFileNames": true,
     "target": "ES2019",
     "moduleResolution": "node",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "lib": ["ES2020"]
   }
 }
