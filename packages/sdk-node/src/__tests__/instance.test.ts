@@ -22,4 +22,23 @@ describe('Custom Clerk instance initialization', () => {
     const Clerk = require('../instance').default;
     expect(() => new Clerk()).not.toThrow(Error);
   });
+
+  test('custom keys overrides process env and default params', () => {
+    jest.resetModules();
+    process.env.CLERK_API_KEY = TEST_API_KEY;
+    const Clerk = require('../instance').default;
+    expect(() => {
+      const customKey = 'custom_key';
+      const customAPIVersion = 'v0';
+      const customAPIUrl = 'https://customdomain.com';
+      const instance = new Clerk({
+        apiKey: customKey,
+        serverApiUrl: customAPIUrl,
+        apiVersion: customAPIVersion,
+      });
+      expect(instance._restClient.apiKey).toBe(customKey);
+      expect(instance._restClient.serverApiUrl).toBe(customAPIUrl);
+      expect(instance._restClient.apiVersion).toBe(customAPIVersion);
+    }).not.toThrow(Error);
+  });
 });
