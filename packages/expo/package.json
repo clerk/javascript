@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-expo",
-  "version": "0.8.3-alpha.2",
+  "version": "0.8.13-alpha.0",
   "license": "MIT",
   "description": "Clerk.dev React Native/Expo library",
   "keywords": [

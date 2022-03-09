@@ -6,9 +6,22 @@ import { OAuthProvider, OAuthStrategy } from './oauth';
 import { OrganizationInvitationStatus } from './organizationInvitation';
 import { MembershipRole } from './organizationMembership';
 import { SessionStatus } from './session';
-import { PreferredSignInStrategy, SignInFactor, SignInIdentifier, SignInStatus, UserData } from './signIn';
+import {
+  PreferredSignInStrategy,
+  SignInFactor,
+  SignInIdentifier,
+  SignInStatus,
+  UserData,
+} from './signIn';
 import { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUp';
-import { BoxShadow, Color, EmUnit, FontFamily, FontWeight, HexColor } from './theme';
+import {
+  BoxShadow,
+  Color,
+  EmUnit,
+  FontFamily,
+  FontWeight,
+  HexColor,
+} from './theme';
 import { UserSettingsJSON } from './userSettings';
 import { VerificationStatus } from './verification';
 
@@ -276,9 +289,6 @@ export interface OrganizationJSON extends ClerkResourceJSON {
   object: 'organization';
   id: string;
   name: string;
-  role: MembershipRole;
-  instance_id: string;
-  created_by: string;
   created_at: number;
   updated_at: number;
 }
@@ -286,7 +296,7 @@ export interface OrganizationJSON extends ClerkResourceJSON {
 export interface OrganizationMembershipJSON extends ClerkResourceJSON {
   object: 'organization_membership';
   id: string;
-  organization_id: string;
+  organization: OrganizationJSON;
   public_user_data: PublicUserDataJSON;
   role: MembershipRole;
   created_at: number;

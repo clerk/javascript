@@ -64,6 +64,7 @@ import {
   MagicLinkError,
   MagicLinkErrorCode,
   Organization,
+  OrganizationMembership,
 } from './resources/internal';
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
@@ -579,16 +580,18 @@ export default class Clerk implements ClerkInterface {
     return await Organization.create(name);
   };
 
-  public getOrganizations = async (): Promise<OrganizationResource[]> => {
-    return await Organization.retrieve();
+  public getOrganizationMemberships = async (): Promise<
+    OrganizationMembership[]
+  > => {
+    return await OrganizationMembership.retrieve();
   };
 
   public getOrganization = async (
     organizationId: string,
-  ): Promise<OrganizationResource | undefined> => {
-    return (await Organization.retrieve()).find(
-      org => org.id === organizationId,
-    );
+  ): Promise<Organization | undefined> => {
+    return (await OrganizationMembership.retrieve()).find(
+      orgMem => orgMem.organization.id === organizationId,
+    )?.organization;
   };
 
   updateClient = (newClient: ClientResource): void => {

@@ -1,3 +1,4 @@
+import { OrganizationMembershipResource } from '.';
 import { EnvironmentResource } from '.';
 import { ClientResource } from './client';
 import { DisplayThemeJSON } from './json';
@@ -229,7 +230,7 @@ export interface Clerk {
   /**
    * Retrieves all the organizations the current user is a member of.
    */
-  getOrganizations: () => Promise<OrganizationResource[]>;
+  getOrganizationMemberships: () => Promise<OrganizationMembershipResource[]>;
 
   /**
    * Retrieves a single organization by id.

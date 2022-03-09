@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [2.9.8](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@2.9.7...@clerk/clerk-sdk-node@2.9.8) (2022-03-09)
+
+
+### Bug Fixes
+
+* **clerk-sdk-node:** Correct initialization params override on custom instance ([4feb7eb](https://github.com/clerkinc/javascript/commit/4feb7eb8be87b2a03c6f5cdd1499982ce7020961))
+
+
+
+### [2.9.7](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@2.9.7-staging.0...@clerk/clerk-sdk-node@2.9.7) (2022-03-09)
+
+**Note:** Version bump only for package @clerk/clerk-sdk-node
+
+
+
+
+
 ### [2.9.6](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@2.9.5...@clerk/clerk-sdk-node@2.9.6) (2022-03-04)
 
 **Note:** Version bump only for package @clerk/clerk-sdk-node

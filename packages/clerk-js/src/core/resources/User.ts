@@ -22,6 +22,8 @@ import {
   PhoneNumber,
   SessionWithActivities,
   Web3Wallet,
+  OrganizationMembership,
+  RetrieveMembershipsParams,
 } from './internal';
 
 export class User extends BaseResource implements UserResource {
@@ -130,10 +132,10 @@ export class User extends BaseResource implements UserResource {
     });
   };
 
-  getOrganizations = async (
-    getOrganizationParams: GetOrganizationParams,
-  ): Promise<Organization[]> => {
-    return await Organization.retrieve(getOrganizationParams);
+  getOrganizationMemberships = async (
+    retrieveMembership: RetrieveMembershipsParams,
+  ): Promise<OrganizationMembership[]> => {
+    return await OrganizationMembership.retrieve(retrieveMembership);
   };
 
   protected fromJSON(data: UserJSON): this {

@@ -113,9 +113,9 @@ export default class Clerk extends ClerkBackendAPI {
     };
 
     super({
-      apiKey: defaultApiKey,
-      apiVersion: defaultApiVersion,
-      serverApiUrl: defaultServerApiUrl,
+      apiKey,
+      apiVersion,
+      serverApiUrl,
       libName: LIB_NAME,
       libVersion: LIB_VERSION,
       packageRepo,

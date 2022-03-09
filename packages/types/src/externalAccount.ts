@@ -1,4 +1,4 @@
-import { OAuthProvider } from '.';
+import { OAuthProvider } from './oauth';
 
 export interface ExternalAccountResource {
   id: string;

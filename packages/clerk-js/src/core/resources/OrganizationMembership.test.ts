@@ -5,10 +5,16 @@ describe('OrganizationMembership', () => {
     const organizationMemberShip = new OrganizationMembership({
       object: 'organization_membership',
       id: 'test_id',
-      organization_id: 'test_org_id',
       created_at: 12345,
       updated_at: 5678,
       role: 'admin',
+      organization: {
+        id: 'test_org_id',
+        name: 'test_name',
+        object: 'organization',
+        created_at: 12345,
+        updated_at: 67890,
+      },
       public_user_data: {
         object: 'public_user_data',
         first_name: 'test_first_name',
