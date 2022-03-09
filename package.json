@@ -18,6 +18,7 @@
     "@commitlint/config-conventional": "^16.0.0",
     "@commitlint/config-lerna-scopes": "^16.0.0",
     "@types/node": "14.14.33",
+    "@types/web": "^0.0.55",
     "@typescript-eslint/eslint-plugin": "^5.5.0",
     "@typescript-eslint/parser": "^5.5.0",
     "conventional-changelog-conventionalcommits": "^4.6.3",
@@ -29,7 +30,7 @@
     "prettier": "^2.3.1",
     "rimraf": "^3.0.2",
     "turbo": "^1.1.5",
-    "typescript": "4.5.5"
+    "typescript": "^4.6.2"
   },
   "scripts": {
     "dev": "lerna run dev --parallel --scope @clerk/types --scope @clerk/clerk-js --scope @clerk/clerk-react --scope @clerk/remix --scope @clerk/nextjs",
