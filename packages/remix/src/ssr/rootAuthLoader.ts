@@ -1,6 +1,7 @@
 import { json } from '@remix-run/server-runtime';
 
 import { invalidRootLoaderCallbackResponseReturn, invalidRootLoaderCallbackReturn } from '../errors';
+import { assertFrontendApi } from '../utils';
 import { getAuthData } from './getAuthData';
 import { LoaderFunctionArgs, LoaderFunctionReturn, RootAuthLoaderCallback, RootAuthLoaderOptions } from './types';
 import { assertObject, injectAuthIntoArgs, isRedirect, isResponse, sanitizeAuthData, wrapClerkState } from './utils';
@@ -27,6 +28,8 @@ export async function rootAuthLoader(
     : {};
 
   const frontendApi = process.env.CLERK_FRONTEND_API || opts.frontendApi;
+  assertFrontendApi(frontendApi);
+
   const { authData, showInterstitial } = await getAuthData(args.request, opts);
 
   if (showInterstitial) {

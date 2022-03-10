@@ -3,8 +3,7 @@ import { IsomorphicClerkOptions } from '@clerk/clerk-react/dist/types';
 import { useNavigate } from '@remix-run/react';
 import React from 'react';
 
-import { noFrontendApiError } from '../errors';
-import { assertValidClerkState, warnForSsr } from './utils';
+import { assertFrontendApi, assertValidClerkState, warnForSsr } from '../utils';
 
 export * from '@clerk/clerk-react';
 
@@ -26,9 +25,7 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
 
   const { __clerk_ssr_state, __frontendApi } = clerkState?.__internal_clerk_state || {};
 
-  if (!__frontendApi) {
-    throw new Error(noFrontendApiError);
-  }
+  assertFrontendApi(__frontendApi);
 
   return (
     <ReactClerkProvider
