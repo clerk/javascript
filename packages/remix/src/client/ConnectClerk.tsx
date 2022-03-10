@@ -3,9 +3,9 @@ import React from 'react';
 
 import { ClerkProvider, RemixClerkProviderProps } from './RemixClerkProvider';
 
-type ConnectClerkOptions = Partial<Omit<RemixClerkProviderProps, 'navigate'>>;
+type ConnectClerkOptions = Partial<Omit<RemixClerkProviderProps, 'navigate' | 'children' | 'clerkState'>>;
 
-export function ConnectClerk(App: () => JSX.Element, opts: ConnectClerkOptions) {
+export function ConnectClerk(App: () => JSX.Element, opts: ConnectClerkOptions = {}) {
   return () => {
     const { clerkState } = useLoaderData();
     return (
