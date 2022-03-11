@@ -30,6 +30,13 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
+### [0.0.13](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.0.12...@clerk/shared@0.0.13) (2022-03-11)
+
+**Note:** Version bump only for package @clerk/shared
+
+
+
+
 
 ### [0.0.12](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.0.12-staging.0...@clerk/shared@0.0.12) (2022-03-09)
 

@@ -11,6 +11,14 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
+### [0.3.8](https://github.com/clerkinc/javascript/compare/@clerk/edge@0.3.7...@clerk/edge@0.3.8) (2022-03-11)
+
+**Note:** Version bump only for package @clerk/edge
+
+
+
+
+
 ### [0.3.7](https://github.com/clerkinc/javascript/compare/@clerk/edge@0.3.7-staging.0...@clerk/edge@0.3.7) (2022-03-09)
 
 **Note:** Version bump only for package @clerk/edge

@@ -24,6 +24,14 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 **Note:** Version bump only for package @clerk/clerk-expo
 
 
+### [0.8.14](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.8.13...@clerk/clerk-expo@0.8.14) (2022-03-11)
+
+**Note:** Version bump only for package @clerk/clerk-expo
+
+
+
+
+
 ### [0.8.13](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.8.13-staging.0...@clerk/clerk-expo@0.8.13) (2022-03-09)
 
 **Note:** Version bump only for package @clerk/clerk-expo

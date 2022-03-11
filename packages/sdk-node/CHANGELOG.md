@@ -10,6 +10,13 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
+### [2.9.9](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@2.9.8...@clerk/clerk-sdk-node@2.9.9) (2022-03-11)
+
+**Note:** Version bump only for package @clerk/clerk-sdk-node
+
+
+
+
 
 ### [2.9.8](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@2.9.7...@clerk/clerk-sdk-node@2.9.8) (2022-03-09)
 
