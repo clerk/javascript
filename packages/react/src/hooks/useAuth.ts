@@ -1,9 +1,9 @@
-import { GetSessionTokenOptions } from '@clerk/types';
+import { GetSessionTokenOptions, SignOut } from '@clerk/types';
 
 import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { invalidStateError } from '../errors';
-import IsomorphicClerk from '../isomorphicClerk';
+import { createGetToken, createSignOut } from './utils';
 
 type GetToken = (options?: GetSessionTokenOptions) => Promise<string | null>;
 
@@ -13,6 +13,7 @@ type UseAuthReturn =
       isSignedIn: undefined;
       userId: undefined;
       sessionId: undefined;
+      signOut: SignOut;
       getToken: GetToken;
     }
   | {
@@ -20,6 +21,7 @@ type UseAuthReturn =
       isSignedIn: false;
       userId: null;
       sessionId: null;
+      signOut: SignOut;
       getToken: GetToken;
     }
   | {
@@ -27,6 +29,7 @@ type UseAuthReturn =
       isSignedIn: true;
       userId: string;
       sessionId: string;
+      signOut: SignOut;
       getToken: GetToken;
     };
 
@@ -75,45 +78,20 @@ export const useAuth: UseAuth = () => {
   const { sessionId, userId } = useAuthContext();
   const isomorphicClerk = useIsomorphicClerkContext();
 
-  const getToken: GetToken = __unstable_getToken(isomorphicClerk);
+  const getToken: GetToken = createGetToken(isomorphicClerk);
+  const signOut: SignOut = createSignOut(isomorphicClerk);
 
   if (sessionId === undefined && userId === undefined) {
-    return {
-      isLoaded: false,
-      isSignedIn: undefined,
-      sessionId,
-      userId,
-      getToken,
-    };
+    return { isLoaded: false, isSignedIn: undefined, sessionId, userId, signOut, getToken };
   }
 
   if (sessionId === null && userId === null) {
-    return { isLoaded: true, isSignedIn: false, sessionId, userId, getToken };
+    return { isLoaded: true, isSignedIn: false, sessionId, userId, signOut, getToken };
   }
 
   if (!!sessionId && !!userId) {
-    return { isLoaded: true, isSignedIn: true, sessionId, userId, getToken };
+    return { isLoaded: true, isSignedIn: true, sessionId, userId, signOut, getToken };
   }
 
   throw new Error(invalidStateError);
 };
-
-/**
- * @internal
- */
-const __unstable_getToken =
-  (isomorphicClerk: IsomorphicClerk) => (options: any) => {
-    const loaded = new Promise<void>(resolve => {
-      if (isomorphicClerk.loaded) {
-        resolve();
-      }
-      isomorphicClerk.addOnLoaded(resolve);
-    });
-
-    return loaded.then(() => {
-      if (isomorphicClerk.session) {
-        return isomorphicClerk.session.getToken(options);
-      }
-      return null;
-    });
-  };

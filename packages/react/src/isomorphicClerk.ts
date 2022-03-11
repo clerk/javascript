@@ -5,13 +5,15 @@ import type {
   CreateOrganizationParams,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
+  InitialState,
   OrganizationMembershipResource,
   OrganizationResource,
-  InitialState,
   RedirectOptions,
   Resources,
   SignInProps,
+  SignOut,
   SignOutCallback,
+  SignOutOptions,
   SignUpProps,
   UserButtonProps,
   UserProfileProps,
@@ -461,21 +463,16 @@ export default class IsomorphicClerk {
     }
   };
 
-  signOut = async (signOutCallback?: SignOutCallback): Promise<void> => {
-    const callback = () => this.clerkjs?.signOut(signOutCallback);
+  signOut: SignOut = async (
+    signOutCallbackOrOptions?: SignOutCallback | SignOutOptions,
+    options?: SignOutOptions,
+  ): Promise<void> => {
+    const callback = () =>
+      this.clerkjs?.signOut(signOutCallbackOrOptions as any, options);
     if (this.clerkjs && this._loaded) {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('signOut', callback);
-    }
-  };
-
-  signOutOne = async (signOutCallback?: SignOutCallback): Promise<void> => {
-    const callback = () => this.clerkjs?.signOutOne(signOutCallback);
-    if (this.clerkjs && this._loaded) {
-      return callback() as Promise<void>;
-    } else {
-      this.premountMethodCalls.set('signOutOne', callback);
     }
   };
 }

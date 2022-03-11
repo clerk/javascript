@@ -1,12 +1,4 @@
-import type {
-  Clerk,
-  ClerkOptions,
-  ClientResource,
-  LoadedClerk,
-  RedirectOptions,
-  SignOutCallback,
-  UserResource,
-} from '@clerk/types';
+import type { Clerk, ClerkOptions, ClientResource, LoadedClerk, RedirectOptions, UserResource } from '@clerk/types';
 
 export interface IsomorphicClerkOptions extends ClerkOptions {
   clerkJSUrl?: string;
@@ -35,11 +27,7 @@ export interface BrowserClerk extends Clerk {
   components: any;
 }
 
-export type ClerkProp =
-  | BrowserClerkConstructor
-  | BrowserClerk
-  | undefined
-  | null;
+export type ClerkProp = BrowserClerkConstructor | BrowserClerk | undefined | null;
 
 type ButtonProps = {
   afterSignInUrl?: string;
@@ -52,14 +40,6 @@ type ButtonProps = {
 export type SignInButtonProps = ButtonProps;
 export type SignUpButtonProps = ButtonProps;
 
-export type SignInWithMetamaskButtonProps = Pick<
-  ButtonProps,
-  'redirectUrl' | 'children'
->;
-
-export type SignOutButtonProps = {
-  signOutCallback?: SignOutCallback;
-  children?: React.ReactNode;
-};
+export type SignInWithMetamaskButtonProps = Pick<ButtonProps, 'redirectUrl' | 'children'>;
 
 export type RedirectToProps = RedirectOptions;

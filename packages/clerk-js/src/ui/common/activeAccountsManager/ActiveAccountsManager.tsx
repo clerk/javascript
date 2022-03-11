@@ -1,7 +1,7 @@
 import { ActiveSessionResource, SessionResource } from '@clerk/types';
 import React from 'react';
 import { PoweredByClerk } from 'ui/common';
-import { useCoreClerk, useEnvironment } from 'ui/contexts';
+import { useCoreClerk, useCoreSession, useEnvironment } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
 import { useUserButtonPopupVisibility } from 'ui/userButton/contexts/PopupVisibilityContext';
 import { windowNavigate } from 'utils';
@@ -29,7 +29,8 @@ export function ActiveAccountsManager({
   userProfileUrl,
   showActiveAccountButtons = true,
 }: ActiveAccountsManagerProps): JSX.Element {
-  const { setSession, signOut, signOutOne } = useCoreClerk();
+  const { setSession, signOut } = useCoreClerk();
+  const { id: currentSessionId } = useCoreSession();
   const { authConfig } = useEnvironment();
   const { navigate } = useNavigate();
   const [signoutInProgress, setSignoutInProgress] = React.useState(false);
@@ -46,8 +47,8 @@ export function ActiveAccountsManager({
       return;
     }
 
-    signOutOne(navigateAfterSignOutOne).catch(() =>
-      setSignoutInProgress(false),
+    signOut(navigateAfterSignOutOne, { sessionId: currentSessionId }).catch(
+      () => setSignoutInProgress(false),
     );
   };
 

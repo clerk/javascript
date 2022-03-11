@@ -1,8 +1,10 @@
-import { EnvironmentResource, OrganizationMembershipResource } from '.';
 import { ClientResource } from './client';
 import { DisplayThemeJSON } from './json';
 import { OrganizationResource } from './organization';
-import { MembershipRole } from './organizationMembership';
+import {
+  MembershipRole,
+  OrganizationMembershipResource,
+} from './organizationMembership';
 import { ActiveSessionResource } from './session';
 import { UserResource } from './user';
 import { DeepPartial, DeepSnakeToCamel } from './utils';
@@ -12,7 +14,21 @@ export type UnsubscribeCallback = () => void;
 export type BeforeEmitCallback = (
   session: ActiveSessionResource | null,
 ) => void | Promise<any>;
+
 export type SignOutCallback = () => void | Promise<any>;
+
+export type SignOutOptions = {
+  /**
+   * Specify a specific session to sign out. Useful for
+   * multi-session applications.
+   */
+  sessionId?: string;
+};
+
+export interface SignOut {
+  (options?: SignOutOptions): Promise<void>;
+  (signOutCallback?: SignOutCallback, options?: SignOutOptions): Promise<void>;
+}
 
 export type SetSession = (
   session: ActiveSessionResource | string | null,
@@ -40,24 +56,13 @@ export interface Clerk {
   /** Current User. */
   user?: UserResource | null;
 
-  /** Clerk environment. */
-  __unstable__environment?: EnvironmentResource | null;
-
   /**
-   * Signs out the current user on single-session instances, or all users on multi-session instances.
-   *
+   * Signs out the current user on single-session instances, or all users on multi-session instances
    * @param signOutCallback - Optional A callback that runs after sign out completes.
+   * @param options - Optional Configuration options, see {@link SignOutOptions}
    * @returns A promise that resolves when the sign out process completes.
    */
-  signOut: (signOutCallback?: SignOutCallback) => Promise<void>;
-
-  /**
-   * Signs out the current user.
-   *
-   * @param signOutCallback - Optional A callback that runs after sign out completes.
-   * @returns A promise that resolves when the sign out process completes.
-   */
-  signOutOne: (signOutCallback?: SignOutCallback) => Promise<void>;
+  signOut: SignOut;
 
   /**
    * Opens the Clerk sign in modal.
