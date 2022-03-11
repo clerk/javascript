@@ -17,6 +17,7 @@ import type {
   Resources,
   SignInProps,
   SignInResource,
+  SignOut,
   SignOutCallback,
   SignUpProps,
   SignUpResource,
@@ -25,6 +26,7 @@ import type {
   UserProfileProps,
   UserResource,
 } from '@clerk/types';
+import { SignOutOptions } from '@clerk/types/src';
 import { AuthenticationService } from 'core/services';
 import { ERROR_CODES } from 'ui/common/constants';
 import {
@@ -137,22 +139,30 @@ export default class Clerk implements ClerkInterface {
     this.#isReady = true;
   };
 
-  public signOutOne = async (
-    signOutCallback?: SignOutCallback,
-  ): Promise<void> => {
-    if (this.#environment?.authConfig.singleSessionMode) {
-      return this.signOut(signOutCallback);
-    }
-    await this.session?.remove();
-    return this.setSession(null, ignoreEventValue(signOutCallback));
-  };
-
-  public signOut = async (signOutCallback?: SignOutCallback): Promise<void> => {
+  public signOut: SignOut = async (
+    callbackOrOptions?: SignOutCallback | SignOutOptions,
+    options?: SignOutOptions,
+  ) => {
     if (!this.client) {
       return;
     }
+    const cb =
+      typeof callbackOrOptions === 'function' ? callbackOrOptions : undefined;
+    const opts =
+      callbackOrOptions && typeof callbackOrOptions === 'object'
+        ? callbackOrOptions
+        : options || {};
+
+    if (opts.sessionId) {
+      const session = this.client.sessions.find(s => s.id === opts.sessionId);
+      await session?.remove();
+      if (this.session?.id === opts.sessionId) {
+        return this.setSession(null, ignoreEventValue(cb));
+      }
+    }
+
     await this.client.destroy();
-    return this.setSession(null, ignoreEventValue(signOutCallback));
+    return this.setSession(null, ignoreEventValue(cb));
   };
 
   public openSignIn = (props?: SignInProps): void => {
