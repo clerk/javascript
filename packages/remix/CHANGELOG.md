@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.0-alpha.6](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.1.0-alpha.5...@clerk/remix@0.1.0-alpha.6) (2022-03-11)
+
+
+### Features
+
+* **remix:** Better server error handling ([#95](https://github.com/clerkinc/javascript/issues/95)) ([4046b29](https://github.com/clerkinc/javascript/commit/4046b291bb93d0f7471138c067cce8cf84cac265))
+* **remix:** Build interstitial locally instead of fetching ([2dd5bb3](https://github.com/clerkinc/javascript/commit/2dd5bb35d532ce6c0d9f19d66d68672e748d4ed8))
+* **remix:** Pass frontendApi from rootAuthLoader ([46a6c47](https://github.com/clerkinc/javascript/commit/46a6c47e0a977219c403327416e6f885ce7cfa4e))
+* **remix:** Throw the insterstitial from ConnectClerkCatchBoundary ([7b07bf0](https://github.com/clerkinc/javascript/commit/7b07bf02c6d9cad695e184a473ba507271f61fc3))
+
+
+### Reverts
+
+* Revert "Revert "fix(remix): Make `getAuth` stop loader execution during interstitial"" ([a0935f3](https://github.com/clerkinc/javascript/commit/a0935f355ff403b10a7f9d3e76957ff39f98f779))
+
+
+
 ## [0.1.0-alpha.5](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.1.0-alpha.4...@clerk/remix@0.1.0-alpha.5) (2022-02-28)
 
 

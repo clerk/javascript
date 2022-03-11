@@ -1,5 +1,5 @@
 {
-  "version": "2.9.8",
+  "version": "2.9.9-alpha.0",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "esm/index.js",

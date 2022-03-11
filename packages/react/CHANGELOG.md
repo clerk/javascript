@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.0-alpha.10](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@2.12.3...@clerk/clerk-react@3.0.0-alpha.10) (2022-03-11)
+
+
+### Features
+
+* **clerk-react:** Add isLoaded to `useOrganizations` hook ([#92](https://github.com/clerkinc/javascript/issues/92)) ([a316c7a](https://github.com/clerkinc/javascript/commit/a316c7a9d66f356639038ce89b5853625e44d4b7))
+* **clerk-remix:** Mark clerk-remix as side-effect free to fix Remix bundling ([c57a902](https://github.com/clerkinc/javascript/commit/c57a9024674a61aa3f2b7e359935e42fc034ffdd))
+
+
+
 ## [3.0.0-alpha.9](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@2.11.4...@clerk/clerk-react@3.0.0-alpha.9) (2022-02-28)
 
 

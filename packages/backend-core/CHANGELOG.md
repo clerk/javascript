@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.5.2...@clerk/backend-core@0.6.0-staging.0) (2022-03-11)
+
+
+### Features
+
+* **types:** Support for oauth_apple ([57b675c](https://github.com/clerkinc/javascript/commit/57b675c762187d1f16cde6d2577bac71f7993438))
+
+
+### Bug Fixes
+
+* **backend-core:** Correctly use the forwarded-proto value ([1dddf13](https://github.com/clerkinc/javascript/commit/1dddf134c2342480d2b406220acffb5fdd54a400))
+* **backend-core:** Make sure to check cross-origin in more cases ([db2360d](https://github.com/clerkinc/javascript/commit/db2360d84fbc9ce4cf62e0698099b59ad4bfc83c))
+* **backend-core:** More robust cross-origin check for dev/prod ([234ac48](https://github.com/clerkinc/javascript/commit/234ac487f56f235760449c755ed29869b511acab))
+
+
+
 ### [0.5.2](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.5.2-staging.0...@clerk/backend-core@0.5.2) (2022-03-09)
 
 **Note:** Version bump only for package @clerk/backend-core
