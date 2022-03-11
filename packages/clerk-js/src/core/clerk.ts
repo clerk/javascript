@@ -143,7 +143,7 @@ export default class Clerk implements ClerkInterface {
     callbackOrOptions?: SignOutCallback | SignOutOptions,
     options?: SignOutOptions,
   ) => {
-    if (!this.client) {
+    if (!this.client || !this.session) {
       return;
     }
     const cb =
@@ -153,16 +153,17 @@ export default class Clerk implements ClerkInterface {
         ? callbackOrOptions
         : options || {};
 
-    if (opts.sessionId) {
-      const session = this.client.sessions.find(s => s.id === opts.sessionId);
-      await session?.remove();
-      if (this.session?.id === opts.sessionId) {
-        return this.setSession(null, ignoreEventValue(cb));
-      }
+    if (!opts.sessionId || this.client.sessions.length === 1) {
+      await this.client.destroy();
+      return this.setSession(null, ignoreEventValue(cb));
     }
 
-    await this.client.destroy();
-    return this.setSession(null, ignoreEventValue(cb));
+    const session = this.client.sessions.find(s => s.id === opts.sessionId);
+    const shouldSignOutCurrent = this.session.id === session?.id;
+    await session?.remove();
+    if (shouldSignOutCurrent) {
+      return this.setSession(null, ignoreEventValue(cb));
+    }
   };
 
   public openSignIn = (props?: SignInProps): void => {

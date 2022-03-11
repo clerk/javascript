@@ -8,11 +8,11 @@ import React from 'react';
 
 import { SignOutButton } from './SignOutButton';
 
-const mockSignOutOne = jest.fn();
+const mockSignOut = jest.fn();
 const originalError = console.error;
 
 const mockClerk = {
-  signOutOne: mockSignOutOne,
+  signOut: mockSignOut,
 } as any;
 
 jest.mock('./withClerk', () => {
@@ -33,7 +33,7 @@ describe('<SignOutButton />', () => {
   });
 
   beforeEach(() => {
-    mockSignOutOne.mockReset();
+    mockSignOut.mockReset();
   });
 
   it('calls clerk.signOutOne when clicked', async () => {
@@ -41,7 +41,7 @@ describe('<SignOutButton />', () => {
     const btn = screen.getByText('Sign out');
     userEvent.click(btn);
     await waitFor(() => {
-      expect(mockSignOutOne).toHaveBeenCalled();
+      expect(mockSignOut).toHaveBeenCalled();
     });
   });
 

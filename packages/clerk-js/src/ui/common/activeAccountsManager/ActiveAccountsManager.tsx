@@ -34,7 +34,8 @@ export function ActiveAccountsManager({
   const { authConfig } = useEnvironment();
   const { navigate } = useNavigate();
   const [signoutInProgress, setSignoutInProgress] = React.useState(false);
-  const [managementNavigationInProgress, setManagementNavigationInProgress] = React.useState(false);
+  const [managementNavigationInProgress, setManagementNavigationInProgress] =
+    React.useState(false);
   const { setPopupVisible } = useUserButtonPopupVisibility();
 
   const handleSignOutSingle = () => {
@@ -46,7 +47,9 @@ export function ActiveAccountsManager({
       return;
     }
 
-    signOut(navigateAfterSignOutOne, { sessionId: currentSessionId }).catch(() => setSignoutInProgress(false));
+    signOut(navigateAfterSignOutOne, { sessionId: currentSessionId }).catch(
+      () => setSignoutInProgress(false),
+    );
   };
 
   const handleManageAccountClick = () => {
@@ -74,7 +77,8 @@ export function ActiveAccountsManager({
     return signOut(navigateAfterSignOutAll);
   };
 
-  const shouldRenderAccountSwitcher = sessions.length || !authConfig.singleSessionMode;
+  const shouldRenderAccountSwitcher =
+    sessions.length || !authConfig.singleSessionMode;
   return (
     <div className='cl-active-accounts-manager'>
       {showActiveAccountButtons && (
@@ -93,7 +97,9 @@ export function ActiveAccountsManager({
           handleAddAccountClick={handleAddAccountClick}
         />
       )}
-      {Boolean(sessions.length) && <SignOutAll handleSignOutAll={handleSignOutAll} />}
+      {Boolean(sessions.length) && (
+        <SignOutAll handleSignOutAll={handleSignOutAll} />
+      )}
       <PoweredByClerk className='cl-powered-by-clerk' />
     </div>
   );
