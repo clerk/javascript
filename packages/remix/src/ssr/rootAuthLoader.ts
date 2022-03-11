@@ -6,20 +6,20 @@ import { getAuthData } from './getAuthData';
 import { LoaderFunctionArgs, LoaderFunctionReturn, RootAuthLoaderCallback, RootAuthLoaderOptions } from './types';
 import { assertObject, injectAuthIntoArgs, isRedirect, isResponse, sanitizeAuthData, wrapClerkState } from './utils';
 
-export async function rootAuthLoader<Options extends RootAuthLoaderOptions>(
-  args: LoaderFunctionArgs,
-  callback: RootAuthLoaderCallback<Options>,
-  options?: Options,
-): Promise<LoaderFunctionReturn>;
-export async function rootAuthLoader(
-  args: LoaderFunctionArgs,
-  options?: RootAuthLoaderOptions,
-): Promise<LoaderFunctionReturn>;
-export async function rootAuthLoader(
+interface RootAuthLoader {
+  <Options extends RootAuthLoaderOptions>(
+    args: LoaderFunctionArgs,
+    callback: RootAuthLoaderCallback<Options>,
+    options?: Options,
+  ): Promise<LoaderFunctionReturn>;
+  (args: LoaderFunctionArgs, options?: RootAuthLoaderOptions): Promise<LoaderFunctionReturn>;
+}
+
+export const rootAuthLoader: RootAuthLoader = async (
   args: LoaderFunctionArgs,
   cbOrOptions: any,
   options?: any,
-): Promise<LoaderFunctionReturn> {
+): Promise<LoaderFunctionReturn> => {
   const callback = typeof cbOrOptions === 'function' ? cbOrOptions : undefined;
   const opts: RootAuthLoaderOptions = options
     ? options
@@ -52,4 +52,4 @@ export async function rootAuthLoader(
   }
 
   return { ...callbackResult, ...wrapClerkState({ __clerk_ssr_state: authData, __frontendApi: frontendApi }) };
-}
+};
