@@ -5,15 +5,18 @@ import { getAuthData, injectAuthIntoContext, injectSSRStateIntoProps, sanitizeAu
 
 const EMPTY_GSSP_RESPONSE = { props: {} };
 
-export function withServerSideAuth<
-  CallbackReturn extends GetServerSidePropsResult<any> | Promise<GetServerSidePropsResult<any>>,
-  Options extends WithServerSideAuthOptions,
->(
-  callback: WithServerSideAuthCallback<CallbackReturn, Options>,
-  opts?: Options,
-): WithServerSideAuthResult<CallbackReturn>;
-export function withServerSideAuth(opts?: WithServerSideAuthOptions): WithServerSideAuthResult<void>;
-export function withServerSideAuth(cbOrOptions: any, options?: any): any {
+interface WithServerSideAuth {
+  <
+    CallbackReturn extends GetServerSidePropsResult<any> | Promise<GetServerSidePropsResult<any>>,
+    Options extends WithServerSideAuthOptions,
+  >(
+    callback: WithServerSideAuthCallback<CallbackReturn, Options>,
+    opts?: Options,
+  ): WithServerSideAuthResult<CallbackReturn>;
+  (opts?: WithServerSideAuthOptions): WithServerSideAuthResult<void>;
+}
+
+export const withServerSideAuth: WithServerSideAuth = (cbOrOptions: any, options?: any): any => {
   const cb = typeof cbOrOptions === 'function' ? cbOrOptions : undefined;
   const opts = options ? options : typeof cbOrOptions !== 'function' ? cbOrOptions : {};
 
@@ -26,4 +29,4 @@ export function withServerSideAuth(cbOrOptions: any, options?: any): any {
     const callbackResult = (await cb?.(contextWithAuth)) || {};
     return injectSSRStateIntoProps(callbackResult, sanitizeAuthData(authData));
   };
-}
+};
