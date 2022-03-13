@@ -1,16 +1,17 @@
-import { camelToSnakeKeys } from '@clerk/shared/utils/object';
+import { deepCamelToSnake } from '@clerk/shared/utils/object';
 import { Poller } from '@clerk/shared/utils/poller';
 import type {
   AuthenticateWithRedirectParams,
   CreateMagicLinkFlowReturn,
   PrepareEmailAddressVerificationParams,
   PreparePhoneNumberVerificationParams,
+  SignUpCreateParams,
   SignUpField,
   SignUpIdentificationField,
   SignUpJSON,
-  SignUpParams,
   SignUpResource,
   SignUpStatus,
+  SignUpUpdateParams,
   SignUpVerificationAttemptParams,
   SignUpVerificationStrategy,
   StartMagicLinkFlowParams,
@@ -72,7 +73,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     // * external_account_action_complete_redirect_url
     return this._basePost({
       path: this.pathRoot,
-      body: normalizeUnsafeMetadata(camelToSnakeKeys(params)),
+      body: normalizeUnsafeMetadata(deepCamelToSnake(params)),
     });
   };
 
@@ -242,7 +243,7 @@ export class SignUp extends BaseResource implements SignUpResource {
 
   update = (params: SignUpParams): Promise<SignUpResource> => {
     return this._basePatch({
-      body: normalizeUnsafeMetadata(camelToSnakeKeys(params)),
+      body: normalizeUnsafeMetadata(deepCamelToSnake(params)),
     });
   };
 
@@ -266,7 +267,6 @@ export class SignUp extends BaseResource implements SignUpResource {
       this.abandonAt = data.abandon_at;
       this.web3wallet = data.web3_wallet;
     }
-
     return this;
   }
 }
