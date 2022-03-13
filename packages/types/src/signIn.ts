@@ -112,42 +112,31 @@ export type PrepareSecondFactorParams = PhoneCodeSecondFactorConfig;
 
 export type AttemptSecondFactorParams = PhoneCodeAttempt;
 
-type SignInAttributes = {
-  /**
-   * An email address, phone or username to identify the attempt.
-   */
-  identifier?: string;
-
-  /**
-   * The first step of the strategy to perform.
-   */
-  strategy?: SignInStrategy;
-
-  /**
-   * Required if the strategy is "password".
-   * The password to attempt to sign in with.
-   */
-  password?: string;
-
-  /**
-   * Required if the strategy is one of the OAuth providers.
-   * This is the URL that the user will be redirected to after the OAuth verification completes.
-   */
-  redirect_url?: string;
-
-  /**
-   * Organization invitation ticket.
-   * The logic is handled by the backend after the token and strategy is sent.
-   */
-  ticket?: string;
-
-  /**
-   * Optional if the strategy is one of the OAuth providers.
-   * If the OAuth verification results in a completed Sign in, this is the URL that
-   * the user will be redirected to.
-   */
-  action_complete_redirect_url?: string;
-} & { transfer: boolean };
+type SignInAttributes = (
+  | {
+      strategy: OAuthStrategy;
+      redirect_url: string;
+      action_complete_redirect_url?: string;
+    }
+  | {
+      strategy: TicketStrategy;
+      ticket: string;
+    }
+  | {
+      strategy: PasswordStrategy;
+      password: string;
+      identifier: string;
+    }
+  | {
+      strategy: PhoneCodeStrategy | EmailCodeStrategy | Web3Strategy;
+      identifier: string;
+    }
+  | {
+      strategy: EmailLinkStrategy;
+      identifier: string;
+      redirect_url?: string;
+    }
+) & { transfer?: boolean };
 
 export type SignInCreateParams = Partial<SnakeToCamel<SignInAttributes> & SignInAttributes>;
 
