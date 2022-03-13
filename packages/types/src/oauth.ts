@@ -1,25 +1,9 @@
-export type OAuthProvider =
-  | 'facebook'
-  | 'google'
-  | 'hubspot'
-  | 'github'
-  | 'tiktok'
-  | 'gitlab'
-  | 'discord'
-  | 'twitter'
-  | 'twitch'
-  | 'linkedin'
-  | 'dropbox'
-  | 'bitbucket'
-  | 'microsoft'
-  | 'notion'
-  | 'apple';
-
-export type OAuthStrategy = `oauth_${OAuthProvider}`;
+import { OAuthProvider } from './providers';
+import { OAuthStrategy } from './strategies';
 
 export interface OAuthProviderData {
   provider: OAuthProvider;
-  strategy: OAuthStrategy,
+  strategy: OAuthStrategy;
   name: string;
   docsUrl: string;
 }
@@ -118,11 +102,14 @@ export const OAUTH_PROVIDERS: OAuthProviderData[] = [
 ];
 
 interface getOAuthProviderDataProps {
-  provider?: OAuthProvider,
-  strategy?: OAuthStrategy,
+  provider?: OAuthProvider;
+  strategy?: OAuthStrategy;
 }
 
-export function getOAuthProviderData({ provider, strategy }: getOAuthProviderDataProps): OAuthProviderData | undefined | null {
+export function getOAuthProviderData({
+  provider,
+  strategy,
+}: getOAuthProviderDataProps): OAuthProviderData | undefined | null {
   if (provider) {
     return OAUTH_PROVIDERS.find(oauth_provider => oauth_provider.provider == provider);
   }
@@ -131,23 +118,19 @@ export function getOAuthProviderData({ provider, strategy }: getOAuthProviderDat
 }
 
 export function sortedOAuthProviders(sortingArray: OAuthStrategy[]) {
-  return OAUTH_PROVIDERS
-    .slice()
-    .sort(
-      (a, b) => {
-        let aPos = sortingArray.indexOf(a.strategy);
-        if (aPos == -1) {
-          aPos = Number.MAX_SAFE_INTEGER;
-        }
+  return OAUTH_PROVIDERS.slice().sort((a, b) => {
+    let aPos = sortingArray.indexOf(a.strategy);
+    if (aPos == -1) {
+      aPos = Number.MAX_SAFE_INTEGER;
+    }
 
-        let bPos = sortingArray.indexOf(b.strategy);
-        if (bPos == -1) {
-          bPos = Number.MAX_SAFE_INTEGER;
-        }
+    let bPos = sortingArray.indexOf(b.strategy);
+    if (bPos == -1) {
+      bPos = Number.MAX_SAFE_INTEGER;
+    }
 
-        return aPos - bPos;
-      }
-    )
+    return aPos - bPos;
+  });
 }
 
 export type AuthenticateWithRedirectParams = {

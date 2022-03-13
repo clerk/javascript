@@ -1,16 +1,18 @@
-import { camelToSnakeKeys } from '@clerk/shared/utils/object';
+import { deepCamelToSnake } from '@clerk/shared/utils/object';
 import { Poller } from '@clerk/shared/utils/poller';
 import type {
-  AttemptFactorParams,
+  AttemptFirstFactorParams,
+  AttemptSecondFactorParams,
   AuthenticateWithRedirectParams,
   CreateMagicLinkFlowReturn,
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
-  SignInFactor,
+  SignInCreateParams,
+  SignInFirstFactor,
   SignInIdentifier,
   SignInJSON,
-  SignInParams,
   SignInResource,
+  SignInSecondFactor,
   SignInStartMagicLinkFlowParams,
   SignInStatus,
   UserData,
@@ -23,12 +25,7 @@ import {
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from 'core/errors';
-import {
-  GenerateSignatureParams,
-  generateSignatureWithMetamask,
-  getMetamaskIdentifier,
-  windowNavigate,
-} from 'utils';
+import { GenerateSignatureParams, generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from 'utils';
 
 import { STRATEGY_WEB3_METAMASK_SIGNATURE } from '../constants';
 import { BaseResource, Verification } from './internal';
@@ -39,11 +36,11 @@ export class SignIn extends BaseResource implements SignInResource {
   id?: string;
   status: SignInStatus | null = null;
   supportedIdentifiers: SignInIdentifier[] = [];
-  identifier: string | null = null;
-  supportedFirstFactors: SignInFactor[] = [];
-  supportedSecondFactors: SignInFactor[] = [];
+  supportedFirstFactors: SignInFirstFactor[] = [];
+  supportedSecondFactors: SignInSecondFactor[] = [];
   firstFactorVerification: VerificationResource = new Verification(null);
   secondFactorVerification: VerificationResource = new Verification(null);
+  identifier: string | null = null;
   createdSessionId: string | null = null;
   userData: UserData = {};
 
@@ -52,17 +49,15 @@ export class SignIn extends BaseResource implements SignInResource {
     this.fromJSON(data);
   }
 
-  create = (params: SignInParams): Promise<this> => {
+  create = (params: SignInCreateParams): Promise<this> => {
     return this._basePost({
       path: this.pathRoot,
-      body: camelToSnakeKeys(params),
+      body: deepCamelToSnake(params),
     });
   };
 
-  prepareFirstFactor = (
-    factor: PrepareFirstFactorParams,
-  ): Promise<SignInResource> => {
-    factor = camelToSnakeKeys(factor);
+  prepareFirstFactor = (factor: PrepareFirstFactorParams): Promise<SignInResource> => {
+    factor = deepCamelToSnake(factor);
     let params: {
       strategy: string;
       email_address_id?: string;
@@ -98,20 +93,15 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
-  attemptFirstFactor = (
-    params: AttemptFactorParams,
-  ): Promise<SignInResource> => {
-    params = camelToSnakeKeys(params);
+  attemptFirstFactor = (params: AttemptFirstFactorParams): Promise<SignInResource> => {
+    params = deepCamelToSnake(params);
     return this._basePost({
       body: params,
       action: 'attempt_first_factor',
     });
   };
 
-  createMagicLinkFlow = (): CreateMagicLinkFlowReturn<
-    SignInStartMagicLinkFlowParams,
-    SignInResource
-  > => {
+  createMagicLinkFlow = (): CreateMagicLinkFlowReturn<SignInStartMagicLinkFlowParams, SignInResource> => {
     const { run, stop } = Poller();
 
     const startMagicLinkFlow = async ({
@@ -147,20 +137,16 @@ export class SignIn extends BaseResource implements SignInResource {
     return { startMagicLinkFlow, cancelMagicLinkFlow: stop };
   };
 
-  prepareSecondFactor = (
-    params: PrepareSecondFactorParams,
-  ): Promise<SignInResource> => {
-    params = camelToSnakeKeys(params);
+  prepareSecondFactor = (params: PrepareSecondFactorParams): Promise<SignInResource> => {
+    params = deepCamelToSnake(params);
     return this._basePost({
       body: params,
       action: 'prepare_second_factor',
     });
   };
 
-  attemptSecondFactor = (
-    params: AttemptFactorParams,
-  ): Promise<SignInResource> => {
-    params = camelToSnakeKeys(params);
+  attemptSecondFactor = (params: AttemptSecondFactorParams): Promise<SignInResource> => {
+    params = deepCamelToSnake(params);
     return this._basePost({
       body: params,
       action: 'attempt_second_factor',
@@ -240,12 +226,8 @@ export class SignIn extends BaseResource implements SignInResource {
       this.identifier = data.identifier;
       this.supportedFirstFactors = data.supported_first_factors;
       this.supportedSecondFactors = data.supported_second_factors;
-      this.firstFactorVerification = new Verification(
-        data.first_factor_verification,
-      );
-      this.secondFactorVerification = new Verification(
-        data.second_factor_verification,
-      );
+      this.firstFactorVerification = new Verification(data.first_factor_verification);
+      this.secondFactorVerification = new Verification(data.second_factor_verification);
       this.createdSessionId = data.created_session_id;
       this.userData = data.user_data;
     }

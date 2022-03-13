@@ -1,119 +1,86 @@
-import { EmailAddressVerificationStrategy } from './emailAddress';
-import { AuthenticateWithRedirectParams, OAuthStrategy } from './oauth';
-import { ClerkResource } from './resource';
-import { SnakeToCamel } from './utils';
 import {
-  CreateMagicLinkFlowReturn,
-  StartMagicLinkFlowParams,
-  VerificationResource,
-} from './verification';
-import { Web3Strategy } from './web3';
+  EmailCodeAttempt,
+  EmailCodeConfig,
+  EmailCodeFactor,
+  EmailLinkConfig,
+  EmailLinkFactor,
+  OAuthConfig,
+  OauthFactor,
+  PasswordAttempt,
+  PasswordFactor,
+  PhoneCodeAttempt,
+  PhoneCodeConfig,
+  PhoneCodeFactor,
+  PhoneCodeSecondFactorConfig,
+  Web3Attempt,
+  Web3SignatureConfig,
+  Web3SignatureFactor,
+} from './factors';
+import { EmailAddressIdentifier, PhoneNumberIdentifier, UsernameIdentifier, Web3WalletIdentifier } from './identifiers';
+import { ClerkResourceJSON, VerificationJSON } from './json';
+import { AuthenticateWithRedirectParams } from './oauth';
+import { ClerkResource } from './resource';
+import {
+  EmailCodeStrategy,
+  EmailLinkStrategy,
+  OAuthStrategy,
+  PasswordStrategy,
+  PhoneCodeStrategy,
+  TicketStrategy,
+  Web3Strategy,
+} from './strategies';
+import { SnakeToCamel } from './utils';
+import { CreateMagicLinkFlowReturn, StartMagicLinkFlowParams, VerificationResource } from './verification';
 import { AuthenticateWithWeb3Params } from './web3Wallet';
 
 export interface SignInResource extends ClerkResource {
   status: SignInStatus | null;
   supportedIdentifiers: SignInIdentifier[];
-  supportedFirstFactors: SignInFactor[];
-  supportedSecondFactors: SignInFactor[];
+  supportedFirstFactors: SignInFirstFactor[];
+  supportedSecondFactors: SignInSecondFactor[];
   firstFactorVerification: VerificationResource;
   secondFactorVerification: VerificationResource;
   identifier: string | null;
   createdSessionId: string | null;
   userData: UserData;
 
-  create: (params: SignInParams) => Promise<SignInResource>;
+  create: (params: SignInCreateParams) => Promise<SignInResource>;
 
-  prepareFirstFactor: (
-    strategy: PrepareFirstFactorParams,
-  ) => Promise<SignInResource>;
+  prepareFirstFactor: (params: PrepareFirstFactorParams) => Promise<SignInResource>;
 
-  attemptFirstFactor: (params: AttemptFactorParams) => Promise<SignInResource>;
+  attemptFirstFactor: (params: AttemptFirstFactorParams) => Promise<SignInResource>;
 
-  prepareSecondFactor: (
-    params: PrepareSecondFactorParams,
-  ) => Promise<SignInResource>;
+  prepareSecondFactor: (params: PrepareSecondFactorParams) => Promise<SignInResource>;
 
-  attemptSecondFactor: (params: AttemptFactorParams) => Promise<SignInResource>;
+  attemptSecondFactor: (params: AttemptSecondFactorParams) => Promise<SignInResource>;
 
-  authenticateWithRedirect: (
-    params: AuthenticateWithRedirectParams,
-  ) => Promise<void>;
+  authenticateWithRedirect: (params: AuthenticateWithRedirectParams) => Promise<void>;
 
-  createMagicLinkFlow: () => CreateMagicLinkFlowReturn<
-    SignInStartMagicLinkFlowParams,
-    SignInResource
-  >;
-
-  authenticateWithWeb3: (
-    params: AuthenticateWithWeb3Params,
-  ) => Promise<SignInResource>;
+  authenticateWithWeb3: (params: AuthenticateWithWeb3Params) => Promise<SignInResource>;
 
   authenticateWithMetamask: () => Promise<SignInResource>;
+
+  createMagicLinkFlow: () => CreateMagicLinkFlowReturn<SignInStartMagicLinkFlowParams, SignInResource>;
 }
 
-export type AttemptFirstFactorWithMagicLinkParams = {
-  email_address_id: string;
-  redirect_url: string;
-  signal?: AbortSignal;
-};
+export type SignInStatus = 'needs_identifier' | 'needs_first_factor' | 'needs_second_factor' | 'complete';
 
 export type SignInIdentifier =
-  | 'username'
-  | 'email_address'
-  | 'phone_number'
-  | 'web3_wallet';
+  | UsernameIdentifier
+  | EmailAddressIdentifier
+  | PhoneNumberIdentifier
+  | Web3WalletIdentifier;
 
-export type IdentificationStrategy = SignInIdentifier | OAuthStrategy;
-
-export type SignInStrategyName =
-  | 'password'
-  | 'phone_code'
+export type SignInStrategy =
+  | PasswordStrategy
+  | PhoneCodeStrategy
+  | EmailCodeStrategy
+  | EmailLinkStrategy
+  | TicketStrategy
   | Web3Strategy
-  | EmailAddressVerificationStrategy
-  | OAuthStrategy
-  | 'ticket';
+  | OAuthStrategy;
 
-export type SignInStatus =
-  | 'needs_identifier'
-  | 'needs_first_factor'
-  | 'needs_second_factor'
-  | 'complete';
-
-export type PreferredSignInStrategy = 'password' | 'otp';
-
-export type EmailCodeFactor = {
-  strategy: Extract<SignInStrategyName, 'email_code'>;
-  email_address_id: string;
-  safe_identifier: string;
-};
-
-export type EmailLinkFactor = {
-  strategy: Extract<SignInStrategyName, 'email_link'>;
-  email_address_id: string;
-  safe_identifier: string;
-};
-
-export type PhoneCodeFactor = {
-  strategy: Extract<SignInStrategyName, 'phone_code'>;
-  phone_number_id: string;
-  safe_identifier: string;
-  default?: boolean;
-};
-
-export type Web3SignatureFactor = {
-  strategy: Extract<SignInStrategyName, Web3Strategy>;
-  web3_wallet_id: string;
-};
-
-export type PasswordFactor = {
-  strategy: Extract<SignInStrategyName, 'password'>;
-};
-
-export type OauthFactor = {
-  strategy: OAuthStrategy;
-};
-
-export type SignInFactor =
+export type SignInFirstFactor =
   | EmailCodeFactor
   | EmailLinkFactor
   | PhoneCodeFactor
@@ -121,39 +88,29 @@ export type SignInFactor =
   | Web3SignatureFactor
   | OauthFactor;
 
-export type PrepareFirstFactorParams =
-  | Omit<EmailCodeFactor, 'safe_identifier'>
-  | (Omit<EmailLinkFactor, 'safe_identifier'> & { redirect_url: string })
-  | Omit<PhoneCodeFactor, 'safe_identifier'>
-  | Web3SignatureFactor
-  | (OauthFactor & {
-      redirect_url: string;
-      action_complete_redirect_url: string;
-    });
-
-export type PrepareSecondFactorParams = Pick<PhoneCodeFactor, 'strategy'> & {
-  phone_number_id?: string;
-};
-
-export type AttemptFactorParams =
-  | {
-      strategy: Extract<SignInStrategyName, 'email_code' | 'phone_code'>;
-      code: string;
-    }
-  | {
-      strategy: Extract<SignInStrategyName, 'password'>;
-      password: string;
-    }
-  | {
-      strategy: Extract<SignInStrategyName, Web3Strategy>;
-      signature: string;
-    };
+export type SignInSecondFactor = PhoneCodeFactor;
 
 export interface UserData {
   first_name?: string;
   last_name?: string;
   profile_image_url?: string;
 }
+
+// TODO: remove?
+export type SignInFactor = SignInFirstFactor | SignInSecondFactor;
+
+export type PrepareFirstFactorParams =
+  | EmailCodeConfig
+  | EmailLinkConfig
+  | PhoneCodeConfig
+  | Web3SignatureConfig
+  | OAuthConfig;
+
+export type AttemptFirstFactorParams = EmailCodeAttempt | PhoneCodeAttempt | PasswordAttempt | Web3Attempt;
+
+export type PrepareSecondFactorParams = PhoneCodeSecondFactorConfig;
+
+export type AttemptSecondFactorParams = PhoneCodeAttempt;
 
 type SignInAttributes = {
   /**
@@ -164,7 +121,7 @@ type SignInAttributes = {
   /**
    * The first step of the strategy to perform.
    */
-  strategy?: SignInStrategyName;
+  strategy?: SignInStrategy;
 
   /**
    * Required if the strategy is "password".
@@ -192,11 +149,23 @@ type SignInAttributes = {
   action_complete_redirect_url?: string;
 } & { transfer: boolean };
 
-export type SignInParams = Partial<
-  SnakeToCamel<SignInAttributes> & SignInAttributes
->;
+export type SignInCreateParams = Partial<SnakeToCamel<SignInAttributes> & SignInAttributes>;
 
-export interface SignInStartMagicLinkFlowParams
-  extends StartMagicLinkFlowParams {
+export interface SignInStartMagicLinkFlowParams extends StartMagicLinkFlowParams {
   emailAddressId: string;
+}
+
+export interface SignInJSON extends ClerkResourceJSON {
+  object: 'sign_in';
+  id: string;
+  status: SignInStatus;
+  supported_identifiers: SignInIdentifier[];
+  supported_external_accounts: OAuthStrategy[];
+  identifier: string;
+  user_data: UserData;
+  supported_first_factors: SignInFirstFactor[];
+  supported_second_factors: SignInSecondFactor[];
+  first_factor_verification: VerificationJSON | null;
+  second_factor_verification: VerificationJSON | null;
+  created_session_id: string | null;
 }

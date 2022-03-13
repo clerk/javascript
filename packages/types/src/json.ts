@@ -2,26 +2,15 @@
  * Currently representing API DTOs in their JSON form.
  */
 
-import { OAuthProvider, OAuthStrategy } from './oauth';
+import { DisplayConfigJSON } from './displayConfig';
 import { OrganizationInvitationStatus } from './organizationInvitation';
 import { MembershipRole } from './organizationMembership';
+import { OAuthProvider } from './providers';
 import { SessionStatus } from './session';
-import {
-  PreferredSignInStrategy,
-  SignInFactor,
-  SignInIdentifier,
-  SignInStatus,
-  UserData,
-} from './signIn';
+import { SignInJSON } from './signIn';
 import { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUp';
-import {
-  BoxShadow,
-  Color,
-  EmUnit,
-  FontFamily,
-  FontWeight,
-  HexColor,
-} from './theme';
+import { OAuthStrategy } from './strategies';
+import { BoxShadow, Color, EmUnit, FontFamily, FontWeight, HexColor } from './theme';
 import { UserSettingsJSON } from './userSettings';
 import { VerificationStatus } from './verification';
 
@@ -50,29 +39,6 @@ export interface DisplayThemeJSON {
   accounts: {
     background_color: Color;
   };
-}
-
-export interface DisplayConfigJSON {
-  object: 'display_config';
-  id: string;
-  instance_environment_type: string;
-  application_name: string;
-  theme: DisplayThemeJSON;
-  preferred_sign_in_strategy: PreferredSignInStrategy;
-  logo_image: ImageJSON;
-  favicon_image: ImageJSON;
-  backend_host: string;
-  home_url: string;
-  sign_in_url: string;
-  sign_up_url: string;
-  user_profile_url: string;
-  after_sign_in_url: string;
-  after_sign_up_url: string;
-  after_sign_out_url: string;
-  after_sign_out_one_url: string;
-  after_sign_out_all_url: string;
-  after_switch_session_url: string;
-  branded: boolean;
 }
 
 export interface ImageJSON {
@@ -135,21 +101,6 @@ export interface SessionJSON extends ClerkResourceJSON {
   public_user_data: PublicUserDataJSON;
   created_at: number;
   updated_at: number;
-}
-
-export interface SignInJSON extends ClerkResourceJSON {
-  object: 'sign_in';
-  id: string;
-  status: SignInStatus;
-  supported_identifiers: SignInIdentifier[];
-  supported_external_accounts: OAuthStrategy[];
-  identifier: string;
-  user_data: UserData;
-  supported_first_factors: SignInFactor[];
-  supported_second_factors: SignInFactor[];
-  first_factor_verification: VerificationJSON | null;
-  second_factor_verification: VerificationJSON | null;
-  created_session_id: string | null;
 }
 
 export interface EmailAddressJSON extends ClerkResourceJSON {
