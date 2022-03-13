@@ -1,22 +1,32 @@
 import {
-  EmailAddressVerificationStrategy,
-  PrepareEmailAddressVerificationParams,
-} from './emailAddress';
-import { AuthenticateWithRedirectParams, OAuthStrategy } from './oauth';
+  BirthdayAttribute,
+  FirstNameAttribute,
+  GenderAttribute,
+  LastNameAttribute,
+  PasswordAttribute,
+} from './attributes';
+import { PrepareEmailAddressVerificationParams } from './emailAddress';
 import {
-  PhoneNumberVerificationStrategy,
-  PreparePhoneNumberVerificationParams,
-} from './phoneNumber';
+  EmailAddressIdentifier,
+  EmailAddressOrPhoneNumberIdentifier,
+  PhoneNumberIdentifier,
+  UsernameIdentifier,
+  Web3WalletIdentifier,
+} from './identifiers';
+import { AuthenticateWithRedirectParams } from './oauth';
+import { PreparePhoneNumberVerificationParams } from './phoneNumber';
 import { ClerkResource } from './resource';
-import { SnakeToCamel } from './utils';
 import {
-  CreateMagicLinkFlowReturn,
-  StartMagicLinkFlowParams,
-  VerificationAttemptParams,
-  VerificationResource,
-} from './verification';
-import { Web3Strategy } from './web3';
-import { AuthenticateWithWeb3Params } from './web3Wallet';
+  EmailCodeStrategy,
+  EmailLinkStrategy,
+  OAuthStrategy,
+  OrganizationTicketStrategy,
+  PhoneCodeStrategy,
+  Web3Strategy,
+} from './strategies';
+import { SnakeToCamel } from './utils';
+import { CreateMagicLinkFlowReturn, StartMagicLinkFlowParams, VerificationResource } from './verification';
+import { AuthenticateWithWeb3Params, GenerateSignature } from './web3Wallet';
 
 export interface SignUpResource extends ClerkResource {
   status: SignUpStatus | null;
@@ -38,95 +48,117 @@ export interface SignUpResource extends ClerkResource {
   createdSessionId: string | null;
   abandonAt: number | null;
 
-  create: (params: SignUpParams) => Promise<SignUpResource>;
+  create: (params: SignUpCreateParams) => Promise<SignUpResource>;
 
-  update: (params: SignUpParams) => Promise<SignUpResource>;
+  update: (params: SignUpUpdateParams) => Promise<SignUpResource>;
 
-  prepareVerification: (
-    strategy: SignUpVerificationStrategy,
-  ) => Promise<SignUpResource>;
+  prepareVerification: (params: PrepareVerificationParams) => Promise<SignUpResource>;
 
-  attemptVerification: (
-    params: SignUpVerificationAttemptParams,
-  ) => Promise<SignUpResource>;
+  attemptVerification: (params: AttemptVerificationParams) => Promise<SignUpResource>;
 
-  prepareEmailAddressVerification: (
-    p?: PrepareEmailAddressVerificationParams,
-  ) => Promise<SignUpResource>;
+  prepareEmailAddressVerification: (params?: PrepareEmailAddressVerificationParams) => Promise<SignUpResource>;
 
-  attemptEmailAddressVerification: (
-    params: VerificationAttemptParams,
-  ) => Promise<SignUpResource>;
+  attemptEmailAddressVerification: (params: AttemptEmailAddressVerificationParams) => Promise<SignUpResource>;
 
-  createMagicLinkFlow: () => CreateMagicLinkFlowReturn<
-    StartMagicLinkFlowParams,
-    SignUpResource
-  >;
+  preparePhoneNumberVerification: (params?: PreparePhoneNumberVerificationParams) => Promise<SignUpResource>;
 
-  preparePhoneNumberVerification: (
-    p?: PreparePhoneNumberVerificationParams,
-  ) => Promise<SignUpResource>;
+  attemptPhoneNumberVerification: (params: AttemptPhoneNumberVerificationParams) => Promise<SignUpResource>;
 
-  attemptPhoneNumberVerification: (
-    params: VerificationAttemptParams,
-  ) => Promise<SignUpResource>;
+  prepareWeb3WalletVerification: () => Promise<SignUpResource>;
 
-  attemptWeb3WalletVerification: (
-    params: AuthenticateWithWeb3Params,
-  ) => Promise<SignUpResource>;
+  attemptWeb3WalletVerification: (params: AttemptWeb3WalletVerificationParams) => Promise<SignUpResource>;
 
-  authenticateWithRedirect: (
-    params: AuthenticateWithRedirectParams,
-  ) => Promise<void>;
+  createMagicLinkFlow: () => CreateMagicLinkFlowReturn<StartMagicLinkFlowParams, SignUpResource>;
 
-  authenticateWithWeb3: (
-    params: AuthenticateWithWeb3Params,
-  ) => Promise<SignUpResource>;
+  authenticateWithRedirect: (params: AuthenticateWithRedirectParams) => Promise<void>;
+
+  authenticateWithWeb3: (params: AuthenticateWithWeb3Params) => Promise<SignUpResource>;
 
   authenticateWithMetamask: () => Promise<SignUpResource>;
 }
 
 export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
 
-export type SignUpField = SignUpAttribute | SignUpIdentificationField;
+export type SignUpField = SignUpAttributeField | SignUpIdentificationField;
 
-export type SignUpIdentificationField =
-  | 'email_address'
-  | 'phone_number'
-  | 'username'
-  | 'email_address_or_phone_number'
-  | 'web3_wallet';
+export type SignUpCreateParams = Partial<SnakeToCamel<SignUpAttributes> & SignUpAttributes>;
 
-export type SignUpIdentification = SignUpIdentificationField | OAuthStrategy;
+export type SignUpUpdateParams = SignUpCreateParams;
 
-export type SignUpAttribute =
-  | 'first_name'
-  | 'last_name'
-  | 'password'
-  | 'birthday'
-  | 'gender';
+export type PrepareVerificationParams =
+  | {
+      strategy: EmailCodeStrategy;
+    }
+  | {
+      strategy: EmailLinkStrategy;
+      redirect_url: string;
+    }
+  | {
+      strategy: PhoneCodeStrategy;
+    }
+  | {
+      strategy: Web3Strategy;
+      // TODO: IS this required?
+      // redirect_url: string;
+    };
 
-type OrganizationSignUpStrategy = 'ticket';
+export type AttemptVerificationParams =
+  | {
+      strategy: EmailCodeStrategy;
+      code: string;
+    }
+  | {
+      strategy: PhoneCodeStrategy;
+      code: string;
+    }
+  | {
+      strategy: Web3Strategy;
+      signature: string;
+    };
 
+export type AttemptEmailAddressVerificationParams = {
+  code: string;
+};
+
+export type AttemptPhoneNumberVerificationParams = {
+  code: string;
+};
+
+export type AttemptWeb3WalletVerificationParams = {
+  generateSignature: GenerateSignature;
+};
+
+export type SignUpAttributeField =
+  | FirstNameAttribute
+  | LastNameAttribute
+  | PasswordAttribute
+  | BirthdayAttribute
+  | GenderAttribute;
+
+// export type SignUpIdentifier =
+export type SignUpVerifiableField =
+  | UsernameIdentifier
+  | EmailAddressIdentifier
+  | PhoneNumberIdentifier
+  | EmailAddressOrPhoneNumberIdentifier
+  | Web3WalletIdentifier;
+
+// why does the identification field hold a 'strategy'?
+export type SignUpIdentificationField = SignUpVerifiableField | OAuthStrategy;
+
+// TODO: Replace with discriminated union type
 export type SignUpAttributes = {
   external_account_strategy: string;
   external_account_redirect_url: string;
   external_account_action_complete_redirect_url: string;
-  strategy: OAuthStrategy | OrganizationSignUpStrategy;
+  strategy: OAuthStrategy | OrganizationTicketStrategy;
   redirect_url: string;
   action_complete_redirect_url: string;
   transfer: boolean;
   unsafe_metadata: Record<string, unknown>;
   invitation_token: string;
   ticket: string;
-} & Record<
-  SignUpAttribute | Exclude<SignUpIdentification, OAuthStrategy>,
-  string
->;
-
-export type SignUpParams = Partial<
-  SnakeToCamel<SignUpAttributes> & SignUpAttributes
->;
+} & Record<SignUpAttributeField | SignUpVerifiableField, string>;
 
 export interface SignUpVerificationsResource {
   emailAddress: SignUpVerificationResource;
@@ -139,16 +171,3 @@ export interface SignUpVerificationResource extends VerificationResource {
   supportedStrategies: string[];
   nextAction: string;
 }
-
-export type SignUpVerificationStrategy =
-  | EmailAddressVerificationStrategy
-  | PhoneNumberVerificationStrategy
-  | Web3Strategy;
-
-export type BaseVerificationAttemptParams = {
-  strategy: SignUpVerificationStrategy;
-};
-
-export type SignUpVerificationAttemptParams = {
-  strategy: SignUpVerificationStrategy;
-} & VerificationAttemptParams;

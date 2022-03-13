@@ -12,12 +12,7 @@ export interface VerificationResource {
   verifiedFromTheSameClient: () => boolean;
 }
 
-export type VerificationStatus =
-  | 'unverified'
-  | 'verified'
-  | 'transferable'
-  | 'failed'
-  | 'expired';
+export type VerificationStatus = 'unverified' | 'verified' | 'transferable' | 'failed' | 'expired';
 
 export interface CodeVerificationAttemptParam {
   code: string;
@@ -29,9 +24,7 @@ export interface SignatureVerificationAttemptParam {
   signature: string;
 }
 
-export type VerificationAttemptParams =
-  | CodeVerificationAttemptParam
-  | SignatureVerificationAttemptParam;
+export type VerificationAttemptParams = CodeVerificationAttemptParam | SignatureVerificationAttemptParam;
 
 export interface StartMagicLinkFlowParams {
   redirectUrl: string;

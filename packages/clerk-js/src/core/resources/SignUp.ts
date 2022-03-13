@@ -1,10 +1,16 @@
 import { deepCamelToSnake } from '@clerk/shared/utils/object';
 import { Poller } from '@clerk/shared/utils/poller';
 import type {
+  AttemptEmailAddressVerificationParams,
+  AttemptPhoneNumberVerificationParams,
+  AttemptVerificationParams,
+  AttemptWeb3WalletVerificationParams,
   AuthenticateWithRedirectParams,
+  AuthenticateWithWeb3Params,
   CreateMagicLinkFlowReturn,
   PrepareEmailAddressVerificationParams,
   PreparePhoneNumberVerificationParams,
+  PrepareVerificationParams,
   SignUpCreateParams,
   SignUpField,
   SignUpIdentificationField,
@@ -12,25 +18,16 @@ import type {
   SignUpResource,
   SignUpStatus,
   SignUpUpdateParams,
-  SignUpVerificationAttemptParams,
-  SignUpVerificationStrategy,
   StartMagicLinkFlowParams,
-  VerificationAttemptParams,
 } from '@clerk/types';
 import {
   clerkMissingOptionError,
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from 'core/errors';
-import {
-  GenerateSignatureParams,
-  generateSignatureWithMetamask,
-  getMetamaskIdentifier,
-  windowNavigate,
-} from 'utils';
+import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from 'utils';
 import { normalizeUnsafeMetadata } from 'utils/resourceParams';
 
-import { STRATEGY_WEB3_METAMASK_SIGNATURE } from '../constants';
 import { BaseResource, SignUpVerifications } from './internal';
 
 declare global {
@@ -66,61 +63,39 @@ export class SignUp extends BaseResource implements SignUpResource {
     this.fromJSON(data);
   }
 
-  create = (params: SignUpParams): Promise<SignUpResource> => {
-    // TODO Add runtime deprecation warnings if anyone is using the old params:
-    // * external_account_strategy
-    // * external_account_redirect_url
-    // * external_account_action_complete_redirect_url
+  create = (params: SignUpCreateParams): Promise<SignUpResource> => {
     return this._basePost({
       path: this.pathRoot,
       body: normalizeUnsafeMetadata(deepCamelToSnake(params)),
     });
   };
 
-  // TODO: Align types, redirect_url should be in object
-  prepareVerification = (
-    strategy: SignUpVerificationStrategy,
-    redirect_url?: string,
-  ): Promise<this> => {
-    const params = { strategy, ...(redirect_url ? { redirect_url } : {}) };
+  prepareVerification = (params: PrepareVerificationParams): Promise<this> => {
     return this._basePost({
       body: params,
       action: 'prepare_verification',
     });
   };
 
-  attemptVerification = (
-    params: SignUpVerificationAttemptParams,
-  ): Promise<SignUpResource> => {
+  attemptVerification = (params: AttemptVerificationParams): Promise<SignUpResource> => {
     return this._basePost({
       body: params,
       action: 'attempt_verification',
     });
   };
 
-  prepareEmailAddressVerification = (
-    p: PrepareEmailAddressVerificationParams = { strategy: 'email_code' },
-  ): Promise<SignUpResource> => {
-    const redirectUrl =
-      p.strategy === 'email_link' ? p.redirect_url : undefined;
-    return this.prepareVerification(p.strategy, redirectUrl);
+  prepareEmailAddressVerification = (params?: PrepareEmailAddressVerificationParams): Promise<SignUpResource> => {
+    return this.prepareVerification(params || { strategy: 'email_code' });
   };
 
-  attemptEmailAddressVerification = (
-    params: VerificationAttemptParams,
-  ): Promise<SignUpResource> => {
+  attemptEmailAddressVerification = (params: AttemptEmailAddressVerificationParams): Promise<SignUpResource> => {
     return this.attemptVerification({ ...params, strategy: 'email_code' });
   };
 
-  createMagicLinkFlow = (): CreateMagicLinkFlowReturn<
-    StartMagicLinkFlowParams,
-    SignUpResource
-  > => {
+  createMagicLinkFlow = (): CreateMagicLinkFlowReturn<StartMagicLinkFlowParams, SignUpResource> => {
     const { run, stop } = Poller();
 
-    const startMagicLinkFlow = async ({
-      redirectUrl,
-    }: StartMagicLinkFlowParams): Promise<SignUpResource> => {
+    const startMagicLinkFlow = async ({ redirectUrl }: StartMagicLinkFlowParams): Promise<SignUpResource> => {
       if (!this.id) {
         clerkVerifyEmailAddressCalledBeforeCreate('SignUp');
       }
@@ -132,7 +107,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       return new Promise((resolve, reject) => {
         void run(() => {
           return this._baseGet({ forceUpdateClient: true })
-            .then(async res => {
+            .then(res => {
               const status = res.verifications.emailAddress.status;
               if (status === 'verified' || status === 'expired') {
                 stop();
@@ -150,27 +125,20 @@ export class SignUp extends BaseResource implements SignUpResource {
     return { startMagicLinkFlow, cancelMagicLinkFlow: stop };
   };
 
-  preparePhoneNumberVerification = (
-    p: PreparePhoneNumberVerificationParams = { strategy: 'phone_code' },
-  ): Promise<SignUpResource> => {
-    return this.prepareVerification(p.strategy);
+  preparePhoneNumberVerification = (params?: PreparePhoneNumberVerificationParams): Promise<SignUpResource> => {
+    return this.prepareVerification(params || { strategy: 'phone_code' });
   };
 
-  attemptPhoneNumberVerification = (
-    params: VerificationAttemptParams,
-  ): Promise<SignUpResource> => {
+  attemptPhoneNumberVerification = (params: AttemptPhoneNumberVerificationParams): Promise<SignUpResource> => {
     return this.attemptVerification({ ...params, strategy: 'phone_code' });
   };
 
   prepareWeb3WalletVerification = (): Promise<SignUpResource> => {
-    return this.prepareVerification(STRATEGY_WEB3_METAMASK_SIGNATURE);
+    return this.prepareVerification({ strategy: 'web3_metamask_signature' });
   };
 
-  attemptWeb3WalletVerification = async ({
-    generateSignature,
-  }: {
-    generateSignature: (options: GenerateSignatureParams) => Promise<string>;
-  }): Promise<SignUpResource> => {
+  attemptWeb3WalletVerification = async (params: AttemptWeb3WalletVerificationParams): Promise<SignUpResource> => {
+    const { generateSignature } = params || {};
     if (!(typeof generateSignature === 'function')) {
       clerkMissingOptionError('generateSignature');
     }
@@ -180,49 +148,25 @@ export class SignUp extends BaseResource implements SignUpResource {
       clerkVerifyWeb3WalletCalledBeforeCreate('SignUp');
     }
 
-    const signature = await generateSignature({
-      identifier: this.web3wallet!,
-      nonce,
-    });
-
-    return this.attemptVerification({
-      signature,
-      strategy: STRATEGY_WEB3_METAMASK_SIGNATURE,
-    });
+    const signature = await generateSignature({ identifier: this.web3wallet!, nonce });
+    return this.attemptVerification({ signature, strategy: 'web3_metamask_signature' });
   };
 
-  public authenticateWithWeb3 = async ({
-    identifier,
-    generateSignature,
-  }: {
-    identifier: string;
-    generateSignature: (opts: GenerateSignatureParams) => Promise<string>;
-  }): Promise<SignUpResource> => {
+  public authenticateWithWeb3 = async (params: AuthenticateWithWeb3Params): Promise<SignUpResource> => {
+    const { generateSignature, identifier } = params || {};
     const web3Wallet = identifier || this.web3wallet!;
-
     await this.create({ web3Wallet });
-
     await this.prepareWeb3WalletVerification();
-
-    return this.attemptWeb3WalletVerification({
-      generateSignature,
-    });
+    return this.attemptWeb3WalletVerification({ generateSignature });
   };
 
   public authenticateWithMetamask = async (): Promise<SignUpResource> => {
     const identifier = await getMetamaskIdentifier();
-
-    return this.authenticateWithWeb3({
-      identifier,
-      generateSignature: generateSignatureWithMetamask,
-    });
+    return this.authenticateWithWeb3({ identifier, generateSignature: generateSignatureWithMetamask });
   };
 
-  public authenticateWithRedirect = async ({
-    strategy,
-    redirectUrl,
-    redirectUrlComplete,
-  }: AuthenticateWithRedirectParams): Promise<void> => {
+  public authenticateWithRedirect = async (params: AuthenticateWithRedirectParams): Promise<void> => {
+    const { redirectUrl, redirectUrlComplete, strategy } = params || {};
     const { verifications } = await this.create({
       strategy,
       redirect_url: redirectUrl,
@@ -241,7 +185,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     }
   };
 
-  update = (params: SignUpParams): Promise<SignUpResource> => {
+  update = (params: SignUpUpdateParams): Promise<SignUpResource> => {
     return this._basePatch({
       body: normalizeUnsafeMetadata(deepCamelToSnake(params)),
     });

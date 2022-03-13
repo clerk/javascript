@@ -31,3 +31,4 @@ export * from './strategies';
 export * from './providers';
 export * from './identifiers';
 export * from './factors';
+export * from './attributes';
