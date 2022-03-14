@@ -71,15 +71,6 @@ export type SignInIdentifier =
   | PhoneNumberIdentifier
   | Web3WalletIdentifier;
 
-export type SignInStrategy =
-  | PasswordStrategy
-  | PhoneCodeStrategy
-  | EmailCodeStrategy
-  | EmailLinkStrategy
-  | TicketStrategy
-  | Web3Strategy
-  | OAuthStrategy;
-
 export type SignInFirstFactor =
   | EmailCodeFactor
   | EmailLinkFactor
@@ -143,6 +134,15 @@ export type SignInCreateParams = Partial<SnakeToCamel<SignInAttributes> & SignIn
 export interface SignInStartMagicLinkFlowParams extends StartMagicLinkFlowParams {
   emailAddressId: string;
 }
+
+export type SignInStrategy =
+  | PasswordStrategy
+  | PhoneCodeStrategy
+  | EmailCodeStrategy
+  | EmailLinkStrategy
+  | TicketStrategy
+  | Web3Strategy
+  | OAuthStrategy;
 
 export interface SignInJSON extends ClerkResourceJSON {
   object: 'sign_in';

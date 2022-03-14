@@ -28,7 +28,7 @@ export * from './verification';
 export * from './ssr';
 export * from './web3Wallet';
 export * from './strategies';
-export * from './providers';
+export * from './web3';
 export * from './identifiers';
 export * from './factors';
 export * from './attributes';

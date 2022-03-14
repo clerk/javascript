@@ -5,7 +5,7 @@ import {
   LastNameAttribute,
   PasswordAttribute,
 } from './attributes';
-import { PrepareEmailAddressVerificationParams } from './emailAddress';
+import { AttemptEmailAddressVerificationParams, PrepareEmailAddressVerificationParams } from './emailAddress';
 import {
   EmailAddressIdentifier,
   EmailAddressOrPhoneNumberIdentifier,
@@ -14,7 +14,7 @@ import {
   Web3WalletIdentifier,
 } from './identifiers';
 import { AuthenticateWithRedirectParams } from './oauth';
-import { PreparePhoneNumberVerificationParams } from './phoneNumber';
+import { AttemptPhoneNumberVerificationParams, PreparePhoneNumberVerificationParams } from './phoneNumber';
 import { ClerkResource } from './resource';
 import {
   EmailCodeStrategy,
@@ -42,7 +42,6 @@ export interface SignUpResource extends ClerkResource {
   emailAddress: string | null;
   phoneNumber: string | null;
   web3wallet: string | null;
-  externalAccount: any;
   hasPassword: boolean;
   unsafeMetadata: Record<string, unknown>;
   createdSessionId: string | null;
@@ -91,15 +90,13 @@ export type PrepareVerificationParams =
     }
   | {
       strategy: EmailLinkStrategy;
-      redirect_url: string;
+      redirect_url?: string;
     }
   | {
       strategy: PhoneCodeStrategy;
     }
   | {
       strategy: Web3Strategy;
-      // TODO: IS this required?
-      // redirect_url: string;
     };
 
 export type AttemptVerificationParams =
@@ -116,14 +113,6 @@ export type AttemptVerificationParams =
       signature: string;
     };
 
-export type AttemptEmailAddressVerificationParams = {
-  code: string;
-};
-
-export type AttemptPhoneNumberVerificationParams = {
-  code: string;
-};
-
 export type AttemptWeb3WalletVerificationParams = {
   generateSignature: GenerateSignature;
 };
@@ -135,7 +124,7 @@ export type SignUpAttributeField =
   | BirthdayAttribute
   | GenderAttribute;
 
-// export type SignUpIdentifier =
+// TODO: SignUpVerifiableField or SignUpIdentifier?
 export type SignUpVerifiableField =
   | UsernameIdentifier
   | EmailAddressIdentifier
@@ -143,7 +132,7 @@ export type SignUpVerifiableField =
   | EmailAddressOrPhoneNumberIdentifier
   | Web3WalletIdentifier;
 
-// why does the identification field hold a 'strategy'?
+// TODO: Does it make sense that the identification *field* holds a *strategy*?
 export type SignUpIdentificationField = SignUpVerifiableField | OAuthStrategy;
 
 // TODO: Replace with discriminated union type

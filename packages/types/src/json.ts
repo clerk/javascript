@@ -3,9 +3,9 @@
  */
 
 import { DisplayConfigJSON } from './displayConfig';
+import { OAuthProvider } from './oauth';
 import { OrganizationInvitationStatus } from './organizationInvitation';
 import { MembershipRole } from './organizationMembership';
-import { OAuthProvider } from './providers';
 import { SessionStatus } from './session';
 import { SignInJSON } from './signIn';
 import { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUp';
