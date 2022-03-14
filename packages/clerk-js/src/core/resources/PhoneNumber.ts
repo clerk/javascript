@@ -4,6 +4,7 @@ import type {
   PhoneNumberResource,
   VerificationResource,
 } from '@clerk/types';
+import { AttemptPhoneNumberVerificationParams, SetReservedForSecondFactorParams } from '@clerk/types/src';
 
 import { BaseResource, IdentificationLink, Verification } from './internal';
 
@@ -22,47 +23,41 @@ export class PhoneNumber extends BaseResource implements PhoneNumberResource {
     this.fromJSON(data);
   }
 
-  create(): Promise<this> {
-    return this._basePost({
+  create = (): Promise<this> =>
+    this._basePost({
       body: { phone_number: this.phoneNumber },
     });
-  }
 
-  prepareVerification(): Promise<PhoneNumberResource> {
+  prepareVerification = (): Promise<PhoneNumberResource> => {
     return this._basePost<PhoneNumberJSON>({
       action: 'prepare_verification',
-      body: {
-        strategy: 'phone_code',
-      },
+      body: { strategy: 'phone_code' },
     });
-  }
+  };
 
-  attemptVerification(code: string): Promise<PhoneNumberResource> {
+  attemptVerification = (params: AttemptPhoneNumberVerificationParams): Promise<PhoneNumberResource> => {
+    const { code } = params || {};
     return this._basePost<PhoneNumberJSON>({
       action: 'attempt_verification',
-      body: {
-        code,
-      },
+      body: { code },
     });
-  }
-
-  setReservedForSecondFactor(reserved: boolean): Promise<PhoneNumberResource> {
+  };
+  setReservedForSecondFactor = (params: SetReservedForSecondFactorParams): Promise<PhoneNumberResource> => {
+    const { reserved } = params || {};
     return this._basePatch<PhoneNumberJSON>({
       body: { reserved_for_second_factor: reserved },
     });
-  }
+  };
 
-  makeDefaultSecondFactor(): Promise<PhoneNumberResource> {
+  makeDefaultSecondFactor = (): Promise<PhoneNumberResource> => {
     return this._basePatch<PhoneNumberJSON>({
       body: { default_second_factor: true },
     });
-  }
+  };
 
-  destroy(): Promise<void> {
-    return this._baseDelete();
-  }
+  destroy = (): Promise<void> => this._baseDelete();
 
-  toString(): string {
+  toString = (): string => {
     // Filter only numbers from the input
     const match = this.phoneNumber.match(/^(\d{3})(\d{3})(\d{4})$/);
 
@@ -71,7 +66,7 @@ export class PhoneNumber extends BaseResource implements PhoneNumberResource {
     }
 
     return this.phoneNumber;
-  }
+  };
 
   protected fromJSON(data: PhoneNumberJSON): this {
     this.id = data.id;
@@ -79,9 +74,7 @@ export class PhoneNumber extends BaseResource implements PhoneNumberResource {
     this.reservedForSecondFactor = data.reserved_for_second_factor;
     this.defaultSecondFactor = data.default_second_factor;
     this.verification = new Verification(data.verification);
-    this.linkedTo = (data.linked_to || []).map(
-      link => new IdentificationLink(link),
-    );
+    this.linkedTo = (data.linked_to || []).map(link => new IdentificationLink(link));
     return this;
   }
 }

@@ -9,6 +9,14 @@ export type PreparePhoneNumberVerificationParams = {
   strategy: PhoneNumberVerificationStrategy;
 };
 
+export type AttemptPhoneNumberVerificationParams = {
+  code: string;
+};
+
+export type SetReservedForSecondFactorParams = {
+  reserved: boolean;
+};
+
 export interface PhoneNumberResource extends ClerkResource {
   id: string;
   phoneNumber: string;
@@ -18,8 +26,8 @@ export interface PhoneNumberResource extends ClerkResource {
   linkedTo: IdentificationLinkResource[];
   toString: () => string;
   prepareVerification: () => Promise<PhoneNumberResource>;
-  attemptVerification: (code: string) => Promise<PhoneNumberResource>;
+  attemptVerification: (params: AttemptPhoneNumberVerificationParams) => Promise<PhoneNumberResource>;
   makeDefaultSecondFactor: () => Promise<PhoneNumberResource>;
-  setReservedForSecondFactor: (reserve: boolean) => Promise<PhoneNumberResource>;
+  setReservedForSecondFactor: (params: SetReservedForSecondFactorParams) => Promise<PhoneNumberResource>;
   destroy: () => Promise<void>;
 }

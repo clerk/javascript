@@ -25,14 +25,10 @@ export const AddPhone = ({ standAlone }: AddPhoneProps): JSX.Element => {
   const [error, setError] = React.useState<string | undefined>();
   const twoStepValidPhoneNumbers = React.useMemo(() => {
     return user.phoneNumbers.filter(ph => {
-      return (
-        ph.verification.status === 'verified' && !ph.reservedForSecondFactor
-      );
+      return ph.verification.status === 'verified' && !ph.reservedForSecondFactor;
     });
   }, [user.phoneNumbers]);
-  const [selectedPhone, setSelectedPhone] = React.useState<
-    PhoneNumberResource | undefined
-  >(undefined);
+  const [selectedPhone, setSelectedPhone] = React.useState<PhoneNumberResource | undefined>(undefined);
 
   const onClickCancel = () => {
     navigate('../');
@@ -41,9 +37,7 @@ export const AddPhone = ({ standAlone }: AddPhoneProps): JSX.Element => {
   const onClickContinue = async () => {
     try {
       setError(undefined);
-      await selectedPhone?.setReservedForSecondFactor(
-        !selectedPhone?.reservedForSecondFactor,
-      );
+      await selectedPhone?.setReservedForSecondFactor({ reserved: !selectedPhone?.reservedForSecondFactor });
       navigate('../');
     } catch (err) {
       handleError(err, [], setError);
@@ -59,10 +53,7 @@ export const AddPhone = ({ standAlone }: AddPhoneProps): JSX.Element => {
       role='button'
       tabIndex={0}
     >
-      <Radio
-        checked={phone.id === selectedPhone?.id}
-        label={<PhoneViewer phoneNumber={phone.phoneNumber} />}
-      />
+      <Radio checked={phone.id === selectedPhone?.id} label={<PhoneViewer phoneNumber={phone.phoneNumber} />} />
     </div>
   ));
   return (
@@ -85,19 +76,12 @@ export const AddPhone = ({ standAlone }: AddPhoneProps): JSX.Element => {
         )}
         {standAlone && twoStepValidPhoneNumbers.length === 0 ? null : (
           <div className='cl-message'>
-            A text message with a verification code will be sent to your phone
-            number.
-            <div className='cl-tip'>
-              Standard carrier SMS and data fees may apply.
-            </div>
+            A text message with a verification code will be sent to your phone number.
+            <div className='cl-tip'>Standard carrier SMS and data fees may apply.</div>
           </div>
         )}
         <div className='cl-form-button-group'>
-          <Button
-            className='primary-button'
-            onClick={onClickContinue}
-            disabled={!selectedPhone}
-          >
+          <Button className='primary-button' onClick={onClickContinue} disabled={!selectedPhone}>
             Continue
           </Button>
           <Button flavor='text' type='reset' onClick={onClickCancel}>
