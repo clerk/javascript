@@ -40,7 +40,7 @@ test('createInvitation() creates an invitation', async () => {
       emailAddress,
       createdAt: resJSON.created_at,
       updatedAt: resJSON.updated_at,
-    })
+    }),
   );
 });
 
@@ -72,7 +72,7 @@ test('createInvitation() accepts a redirectUrl', async () => {
       emailAddress,
       createdAt: resJSON.created_at,
       updatedAt: resJSON.updated_at,
-    })
+    }),
   );
 });
 
@@ -93,7 +93,7 @@ test('createInvitation() accepts publicMetadata', async () => {
   nock('https://api.clerk.dev')
     .post('/v1/invitations', {
       email_address: emailAddress,
-      public_metadata: publicMetadata,
+      public_metadata: JSON.stringify(publicMetadata),
     })
     .reply(200, resJSON);
 
@@ -108,7 +108,7 @@ test('createInvitation() accepts publicMetadata', async () => {
       publicMetadata,
       createdAt: resJSON.created_at,
       updatedAt: resJSON.updated_at,
-    })
+    }),
   );
 });
 
@@ -127,7 +127,7 @@ test('revokeInvitation() revokes an invitation', async () => {
     .reply(200, resJSON);
 
   const invitation = await TestBackendAPIClient.invitations.revokeInvitation(
-    id
+    id,
   );
   expect(invitation).toEqual(
     new Invitation({
@@ -135,12 +135,12 @@ test('revokeInvitation() revokes an invitation', async () => {
       emailAddress: resJSON.email_address,
       createdAt: resJSON.created_at,
       updatedAt: resJSON.updated_at,
-    })
+    }),
   );
 });
 
 test('revokeInvitation() throws an error without invitation ID', async () => {
   await expect(
-    TestBackendAPIClient.invitations.revokeInvitation('')
+    TestBackendAPIClient.invitations.revokeInvitation(''),
   ).rejects.toThrow('A valid ID is required.');
 });

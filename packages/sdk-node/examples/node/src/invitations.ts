@@ -5,6 +5,12 @@ import { invitations } from '@clerk/clerk-sdk-node';
 // Create an invitation
 await invitations.createInvitation({
   emailAddress: 'test@example.com',
+  publicMetadata: {
+    some_metadata: 'test',
+    some_nested: {
+      some_metadata: 'test',
+    },
+  },
 });
 
 // Create another invitation

@@ -21,7 +21,10 @@ export class InvitationApi extends AbstractApi {
     return this._restClient.makeRequest<Invitation>({
       method: 'POST',
       path: basePath,
-      bodyParams: params,
+      bodyParams: {
+        ...params,
+        publicMetadata: JSON.stringify(params.publicMetadata),
+      },
     });
   }
 
