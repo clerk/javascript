@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.6.1](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.6.0...@clerk/backend-core@0.6.1) (2022-03-14)
+
+
+### Bug Fixes
+
+* **clerk-sdk-node:** Properly stringify metadata params in InvitationsAPI ([5fde7cb](https://github.com/clerkinc/javascript/commit/5fde7cbfe2f439d7531a937651351f29523b0dd7))
+
+
+
 ## [0.6.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.5.2...@clerk/backend-core@0.6.0) (2022-03-11)
 
 

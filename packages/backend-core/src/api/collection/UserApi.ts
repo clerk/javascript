@@ -81,7 +81,7 @@ export class UserApi extends AbstractApi {
       path: '/users',
       bodyParams: {
         ...params,
-        ...sanitizeMetadataParams({
+        ...stringifyMetadataParams({
           publicMetadata,
           privateMetadata,
           unsafeMetadata,
@@ -125,7 +125,7 @@ export class UserApi extends AbstractApi {
   }
 }
 
-function sanitizeMetadataParams(
+function stringifyMetadataParams(
   params: UserMetadataParams & {
     [key: string]: Record<string, unknown> | undefined;
   },
