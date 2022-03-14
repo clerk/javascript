@@ -1,5 +1,4 @@
-import { OrganizationMembershipResource } from '.';
-import { EnvironmentResource } from '.';
+import { EnvironmentResource, OrganizationMembershipResource } from '.';
 import { ClientResource } from './client';
 import { DisplayThemeJSON } from './json';
 import { OrganizationResource } from './organization';
@@ -14,6 +13,11 @@ export type BeforeEmitCallback = (
   session: ActiveSessionResource | null,
 ) => void | Promise<any>;
 export type SignOutCallback = () => void | Promise<any>;
+
+export type SetSession = (
+  session: ActiveSessionResource | string | null,
+  beforeEmit?: BeforeEmitCallback,
+) => Promise<void>;
 
 /**
  * Main Clerk SDK object.
@@ -167,10 +171,7 @@ export interface Clerk {
    * @param session Passed session resource object, session id (string version) or null
    * @param beforeEmit Callback run just before the active session is set to the passed object. Can be used to hook up for pre-navigation actions.
    */
-  setSession: (
-    session: ActiveSessionResource | string | null,
-    beforeEmit?: BeforeEmitCallback,
-  ) => Promise<void>;
+  setSession: SetSession;
 
   /**
    * Function used to commit a navigation after certain steps in the Clerk processes.
