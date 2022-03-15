@@ -20,8 +20,8 @@ import {
   EmailCodeStrategy,
   EmailLinkStrategy,
   OAuthStrategy,
-  OrganizationTicketStrategy,
   PhoneCodeStrategy,
+  TicketStrategy,
   Web3Strategy,
 } from './strategies';
 import { SnakeToCamel } from './utils';
@@ -140,7 +140,7 @@ export type SignUpAttributes = {
   external_account_strategy: string;
   external_account_redirect_url: string;
   external_account_action_complete_redirect_url: string;
-  strategy: OAuthStrategy | OrganizationTicketStrategy;
+  strategy: OAuthStrategy | TicketStrategy;
   redirect_url: string;
   action_complete_redirect_url: string;
   transfer: boolean;
