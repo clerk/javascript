@@ -3,7 +3,7 @@ import { Form } from '@clerk/shared/components/form';
 import { Input } from '@clerk/shared/components/input';
 import { PhoneInput } from '@clerk/shared/components/phoneInput';
 import { noop } from '@clerk/shared/utils';
-import { SignUpParams, SignUpResource } from '@clerk/types';
+import { SignUpCreateParams, SignUpResource } from '@clerk/types';
 import React from 'react';
 import type { FieldState } from 'ui/common';
 import {
@@ -83,7 +83,7 @@ function _SignUpStart(): JSX.Element {
     if (!invitationToken && !organizationInvitationToken) {
       return;
     }
-    const invitationParams: SignUpParams = invitationToken
+    const invitationParams: SignUpCreateParams = invitationToken
       ? { invitation_token: invitationToken }
       : { strategy: 'ticket', ticket: organizationInvitationToken };
     setIsLoading(true);

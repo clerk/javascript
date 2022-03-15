@@ -1,28 +1,44 @@
-export type OAuthProvider =
-  | 'facebook'
-  | 'google'
-  | 'hubspot'
-  | 'github'
-  | 'tiktok'
-  | 'gitlab'
-  | 'discord'
-  | 'twitter'
-  | 'twitch'
-  | 'linkedin'
-  | 'dropbox'
-  | 'bitbucket'
-  | 'microsoft'
-  | 'notion'
-  | 'apple';
-
-export type OAuthStrategy = `oauth_${OAuthProvider}`;
+import { OAuthStrategy } from './strategies';
 
 export interface OAuthProviderData {
   provider: OAuthProvider;
-  strategy: OAuthStrategy,
+  strategy: OAuthStrategy;
   name: string;
   docsUrl: string;
 }
+
+export type FacebookOauthProvider = 'facebook';
+export type GoogleOauthProvider = 'google';
+export type HubspotOauthProvider = 'hubspot';
+export type GithubOauthProvider = 'github';
+export type TiktokOauthProvider = 'tiktok';
+export type GitlabOauthProvider = 'gitlab';
+export type DiscordOauthProvider = 'discord';
+export type TwitterOauthProvider = 'twitter';
+export type TwitchOauthProvider = 'twitch';
+export type LinkedinOauthProvider = 'linkedin';
+export type DropboxOauthProvider = 'dropbox';
+export type BitbucketOauthProvider = 'bitbucket';
+export type MicrosoftOauthProvider = 'microsoft';
+export type NotionOauthProvider = 'notion';
+export type AppleOauthProvider = 'apple';
+
+export type OAuthProvider =
+  | FacebookOauthProvider
+  | GoogleOauthProvider
+  | HubspotOauthProvider
+  | GithubOauthProvider
+  | TiktokOauthProvider
+  | GitlabOauthProvider
+  | DiscordOauthProvider
+  | TwitterOauthProvider
+  | TwitchOauthProvider
+  | LinkedinOauthProvider
+  | DropboxOauthProvider
+  | BitbucketOauthProvider
+  | MicrosoftOauthProvider
+  | NotionOauthProvider
+  | AppleOauthProvider;
 
 export const OAUTH_PROVIDERS: OAuthProviderData[] = [
   {
@@ -118,11 +134,14 @@ export const OAUTH_PROVIDERS: OAuthProviderData[] = [
 ];
 
 interface getOAuthProviderDataProps {
-  provider?: OAuthProvider,
-  strategy?: OAuthStrategy,
+  provider?: OAuthProvider;
+  strategy?: OAuthStrategy;
 }
 
-export function getOAuthProviderData({ provider, strategy }: getOAuthProviderDataProps): OAuthProviderData | undefined | null {
+export function getOAuthProviderData({
+  provider,
+  strategy,
+}: getOAuthProviderDataProps): OAuthProviderData | undefined | null {
   if (provider) {
     return OAUTH_PROVIDERS.find(oauth_provider => oauth_provider.provider == provider);
   }
@@ -131,23 +150,19 @@ export function getOAuthProviderData({ provider, strategy }: getOAuthProviderDat
 }
 
 export function sortedOAuthProviders(sortingArray: OAuthStrategy[]) {
-  return OAUTH_PROVIDERS
-    .slice()
-    .sort(
-      (a, b) => {
-        let aPos = sortingArray.indexOf(a.strategy);
-        if (aPos == -1) {
-          aPos = Number.MAX_SAFE_INTEGER;
-        }
+  return OAUTH_PROVIDERS.slice().sort((a, b) => {
+    let aPos = sortingArray.indexOf(a.strategy);
+    if (aPos == -1) {
+      aPos = Number.MAX_SAFE_INTEGER;
+    }
 
-        let bPos = sortingArray.indexOf(b.strategy);
-        if (bPos == -1) {
-          bPos = Number.MAX_SAFE_INTEGER;
-        }
+    let bPos = sortingArray.indexOf(b.strategy);
+    if (bPos == -1) {
+      bPos = Number.MAX_SAFE_INTEGER;
+    }
 
-        return aPos - bPos;
-      }
-    )
+    return aPos - bPos;
+  });
 }
 
 export type AuthenticateWithRedirectParams = {
@@ -155,7 +170,6 @@ export type AuthenticateWithRedirectParams = {
    * One of the supported OAuth providers you can use to authenticate with, eg 'oauth_google'.
    */
   strategy: OAuthStrategy;
-} & {
   /**
    * Full URL or path to the route that will complete the OAuth flow.
    * Typically, this will be a simple `/sso-callback` route that calls `Clerk.handleRedirectCallback`

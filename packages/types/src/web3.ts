@@ -1,3 +1,3 @@
-export type Web3Provider = 'metamask';
+export type MetamaskWeb3Provider = 'metamask';
 
-export type Web3Strategy = `web3_${Web3Provider}_signature`;
+export type Web3Provider = MetamaskWeb3Provider;

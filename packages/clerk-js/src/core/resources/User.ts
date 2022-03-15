@@ -1,4 +1,4 @@
-import { camelToSnakeKeys } from '@clerk/shared/utils/object';
+import { deepCamelToSnake } from '@clerk/shared/utils/object';
 import type {
   EmailAddressResource,
   ExternalAccountResource,
@@ -16,14 +16,12 @@ import {
   BaseResource,
   EmailAddress,
   ExternalAccount,
-  GetOrganizationParams,
   Image,
-  Organization,
+  OrganizationMembership,
   PhoneNumber,
+  RetrieveMembershipsParams,
   SessionWithActivities,
   Web3Wallet,
-  OrganizationMembership,
-  RetrieveMembershipsParams,
 } from './internal';
 
 export class User extends BaseResource implements UserResource {
@@ -113,7 +111,7 @@ export class User extends BaseResource implements UserResource {
 
   update = (params: UpdateUserParams): Promise<UserResource> => {
     return this._basePatch({
-      body: normalizeUnsafeMetadata(camelToSnakeKeys(params)),
+      body: normalizeUnsafeMetadata(deepCamelToSnake(params)),
     });
   };
 

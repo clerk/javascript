@@ -13,10 +13,7 @@ import React, { useState } from 'react';
 import { handleError } from 'ui/common';
 import { Error as ErrorComponent } from 'ui/common/error';
 import { useCoreUser } from 'ui/contexts';
-import {
-  TwoStepMethod,
-  TwoStepMethodsToDisplayDataMap,
-} from 'ui/userProfile/security/twoStepVerificationTypes';
+import { TwoStepMethod, TwoStepMethodsToDisplayDataMap } from 'ui/userProfile/security/twoStepVerificationTypes';
 
 export function ActiveMethodsCard(): JSX.Element | null {
   const [error, setError] = useState<string | undefined>();
@@ -39,11 +36,7 @@ export function ActiveMethodsCard(): JSX.Element | null {
   }
 
   return enabledPhoneNumbers.length === 0 ? null : (
-    <TitledCard
-      className='cl-themed-card'
-      title='Active methods'
-      subtitle={subtitleMessage}
-    >
+    <TitledCard className='cl-themed-card' title='Active methods' subtitle={subtitleMessage}>
       <ErrorComponent>{error}</ErrorComponent>
       <List className='cl-titled-card-list'>
         {enabledPhoneNumbers.map(phone => (
@@ -67,7 +60,7 @@ function PhoneListItem({ phone, onError }: PhoneListItemProps): JSX.Element {
 
   async function remove() {
     try {
-      await phone.setReservedForSecondFactor(false);
+      await phone.setReservedForSecondFactor({ reserved: false });
     } catch (err) {
       onError(err);
     }

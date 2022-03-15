@@ -2,7 +2,7 @@
 /* disable sorting, clerk.scss should always be imported
 /* after dependencies from /shared */
 import { Modal } from '@clerk/shared/components/modal';
-import { camelToSnakeKeys } from '@clerk/shared/utils/object';
+import { deepCamelToSnake } from '@clerk/shared/utils/object';
 import type {
   Clerk,
   ClerkOptions,
@@ -84,7 +84,7 @@ export default class Components extends React.Component<
     /**  Merge theme retrieved from the network with user supplied theme options. */
     injectTheme(
       environment.displayConfig.theme,
-      camelToSnakeKeys(options.theme || {}) as DeepPartial<DisplayThemeJSON>,
+      deepCamelToSnake(options.theme || {}) as DeepPartial<DisplayThemeJSON>,
     );
 
     const clerkRoot = document.createElement('DIV');
