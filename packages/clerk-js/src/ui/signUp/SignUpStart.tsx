@@ -51,53 +51,39 @@ function _SignUpStart(): JSX.Element {
     username: useFieldState('username', ''),
     phoneNumber: useFieldState('phone_number', ''),
     password: useFieldState('password', ''),
-    invitationToken: useFieldState(
-      'invitation_token',
-      getClerkQueryParam('__clerk_invitation_token') || '',
-    ),
-    organizationInvitationToken: useFieldState(
+    ticket: useFieldState(
       'ticket',
-      getClerkQueryParam('__clerk_ticket') || '',
+      getClerkQueryParam('__clerk_ticket') ||
+        getClerkQueryParam('__clerk_invitation_token') ||
+        '',
     ),
   } as const;
   type FormFieldsKey = keyof typeof formFields;
 
   const [error, setError] = React.useState<string | undefined>();
-  const hasInvitationToken = !!formFields.invitationToken.value;
-  const hasOrganizationInvitationToken =
-    !!formFields.organizationInvitationToken.value;
-  const hasToken = hasInvitationToken || hasOrganizationInvitationToken;
+  const hasTicket = !!formFields.ticket.value;
 
-  const fields = determineFirstPartyFields(
-    environment,
-    hasInvitationToken,
-    hasOrganizationInvitationToken,
-  );
+  const fields = determineFirstPartyFields(environment, hasTicket);
   const oauthOptions = userSettings.socialProviderStrategies;
   const web3Options = userSettings.web3FirstFactors;
 
   const handleTokenFlow = () => {
-    const invitationToken = formFields.invitationToken.value;
-    const organizationInvitationToken =
-      formFields.organizationInvitationToken.value;
-    if (!invitationToken && !organizationInvitationToken) {
+    const ticket = formFields.ticket.value;
+    if (!ticket) {
       return;
     }
-    const invitationParams: SignUpCreateParams = invitationToken
-      ? { invitation_token: invitationToken }
-      : { strategy: 'ticket', ticket: organizationInvitationToken };
+    const signUpParams: SignUpCreateParams = { strategy: 'ticket', ticket };
     setIsLoading(true);
 
     signUp
-      .create(invitationParams)
+      .create(signUpParams)
       .then(res => {
         formFields.emailAddress.setValue(res.emailAddress || '');
         void completeSignUpFlow(res);
       })
       .catch(err => {
         /* Clear token values when an error occurs in the initial sign up attempt */
-        formFields.invitationToken.setValue('');
-        formFields.organizationInvitationToken.setValue('');
+        formFields.ticket.setValue('');
         handleError(err, [], setError);
       })
       .finally(() => {
@@ -160,18 +146,15 @@ function _SignUpStart(): JSX.Element {
       reqFields.push(formFields.phoneNumber);
     }
 
-    if (fields.organizationInvitationToken) {
+    if (fields.ticket) {
       // FIXME: Constructing a fake fields object for strategy.
-      reqFields.push(
-        {
-          name: 'strategy',
-          value: 'ticket',
-          setError: noop,
-          setValue: noop,
-          error: undefined,
-        },
-        formFields.emailAddress,
-      );
+      reqFields.push({
+        name: 'strategy',
+        value: 'ticket',
+        setError: noop,
+        setValue: noop,
+        error: undefined,
+      });
     }
 
     try {
@@ -280,11 +263,11 @@ function _SignUpStart(): JSX.Element {
   ) : null;
 
   const shouldShowEmailAddressField =
-    (hasToken && !!formFields.emailAddress.value) ||
+    (hasTicket && !!formFields.emailAddress.value) ||
     fields.emailAddress ||
     (fields.emailOrPhone && emailOrPhoneActive === 'emailAddress');
 
-  const disabledEmailField = hasToken && !!formFields.emailAddress.value;
+  const disabledEmailField = hasTicket && !!formFields.emailAddress.value;
 
   const emailAddressField = shouldShowEmailAddressField && (
     <Control
@@ -336,10 +319,10 @@ function _SignUpStart(): JSX.Element {
     <>
       <Header error={error} className='cl-auth-form-header-compact' />
       <Body>
-        {!hasToken && oauthOptions.length > 0 && (
+        {!hasTicket && oauthOptions.length > 0 && (
           <SignUpOAuth oauthOptions={oauthOptions} setError={setError} />
         )}
-        {!hasToken && web3Options.length > 0 && (
+        {!hasTicket && web3Options.length > 0 && (
           <SignUpWeb3 web3Options={web3Options} setError={setError} />
         )}
         {atLeastOneFormField && (
