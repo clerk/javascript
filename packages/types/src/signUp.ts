@@ -117,7 +117,6 @@ export type SignUpAttributes = {
   action_complete_redirect_url: string;
   transfer: boolean;
   unsafe_metadata: Record<string, unknown>;
-  invitation_token: string;
   ticket: string;
 } & Record<
   SignUpAttribute | Exclude<SignUpIdentification, OAuthStrategy>,

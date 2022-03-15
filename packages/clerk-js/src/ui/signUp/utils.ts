@@ -9,8 +9,7 @@ type FieldKeys =
   | 'firstName'
   | 'lastName'
   | 'password'
-  | 'invitationToken'
-  | 'organizationInvitationToken';
+  | 'ticket';
 
 // TODO: Refactor SignUp component and remove
 // this leftover type
@@ -27,8 +26,7 @@ function isEmailOrPhone(attributes: Attributes) {
 
 export function determineFirstPartyFields(
   environment: EnvironmentResource,
-  hasInvitation?: boolean,
-  hasOrganizationInvitation?: boolean,
+  hasTicket?: boolean,
 ): Fields {
   const { attributes } = environment.userSettings;
 
@@ -44,10 +42,8 @@ export function determineFirstPartyFields(
           : 'on'),
     );
 
-  if (hasInvitation) {
-    fields.invitationToken = 'required';
-  } else if (hasOrganizationInvitation) {
-    fields.organizationInvitationToken = 'required';
+  if (hasTicket) {
+    fields.ticket = 'required';
   } else if (isEmailOrPhone(attributes)) {
     fields.emailOrPhone = 'required';
   } else if (attributes.email_address.used_for_first_factor) {
