@@ -201,18 +201,22 @@ describe('determineFirstPartyFields()', () => {
     ];
 
     it.each(scenaria)('%s', (___, environment, result) => {
-      expect(determineFirstPartyFields(environment as EnvironmentResource)).toEqual(result);
+      expect(
+        determineFirstPartyFields(environment as EnvironmentResource),
+      ).toEqual(result);
     });
 
-    it.each(scenaria)('with invitation, %s', (___, environment, result) => {
-      // Email address or phone number cannot be required when there's an
-      // invitation token present. Instead, we'll require the invitationToken
-      // parameter
-      const expected = { ...result, invitationToken: 'required' };
+    it.each(scenaria)('with ticket, %s', (___, environment, result) => {
+      // Email address or phone number cannot be required when there's a
+      // ticket token present. Instead, we'll require the ticket parameter.
+      const expected = { ...result, ticket: 'required' };
       delete expected.emailAddress;
       delete expected.phoneNumber;
       delete expected.emailOrPhone;
-      const res = determineFirstPartyFields(environment as EnvironmentResource, true);
+      const res = determineFirstPartyFields(
+        environment as EnvironmentResource,
+        true,
+      );
       expect(res).toMatchObject(expected);
     });
   });
