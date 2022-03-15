@@ -1,10 +1,14 @@
 import { render, renderJSON, screen, userEvent } from '@clerk/shared/testUtils';
-import { EmailAddressResource, EnvironmentResource, SignInStrategyName, UserSettingsResource } from '@clerk/types';
+import {
+  EmailAddressResource,
+  EnvironmentResource,
+  UserSettingsResource,
+} from '@clerk/types';
 import { ClerkAPIResponseError } from 'core/resources/Error';
 import React from 'react';
 import { PartialDeep } from 'type-fest';
-import { EmailDetail } from './EmailDetail';
 
+import { EmailDetail } from './EmailDetail';
 
 const mockNavigate = jest.fn();
 const mockUseCoreUser = jest.fn();
@@ -38,9 +42,12 @@ jest.mock('ui/router/RouteContext', () => {
 jest.mock('ui/contexts', () => {
   return {
     useCoreUser: () => mockUseCoreUser(),
-    useEnvironment: jest.fn(() => ({
-      userSettings: mockFirstFactors
-    }) as PartialDeep<EnvironmentResource>),
+    useEnvironment: jest.fn(
+      () =>
+        ({
+          userSettings: mockFirstFactors,
+        } as PartialDeep<EnvironmentResource>),
+    ),
     useUserProfileContext: jest.fn(() => {
       return {
         routing: 'path',
@@ -76,10 +83,10 @@ describe('<EmailDetail/>', () => {
       attributes: {
         email_address: {
           used_for_first_factor: true,
-          first_factors: ['email_code']
-        }
-      }
-    }
+          first_factors: ['email_code'],
+        },
+      },
+    };
     mockUseCoreUser.mockImplementation(() => {
       return {
         primaryEmailAddressId: '1',
@@ -93,7 +100,7 @@ describe('<EmailDetail/>', () => {
             prepareVerification: async () => {
               return null;
             },
-            attemptVerification: async (code: string) => {
+            attemptVerification: async ({ code }: { code: string }) => {
               if (code === '999999') {
                 throw new ClerkAPIResponseError('the-error', {
                   data: [

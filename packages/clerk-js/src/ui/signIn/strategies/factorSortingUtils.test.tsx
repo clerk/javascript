@@ -1,4 +1,4 @@
-import { SignInFactor, SignInStrategyName } from '@clerk/types';
+import { SignInFactor, SignInStrategy } from '@clerk/types';
 
 import {
   allStrategiesButtonsComparator,
@@ -17,7 +17,7 @@ describe('otpPrefFactorComparator(a,b)', function () {
       { strategy: 'email_link', email_address_id: '', safe_identifier: '' },
     ];
 
-    const expectedOrder: SignInStrategyName[] = [
+    const expectedOrder: SignInStrategy[] = [
       'email_link',
       'email_link',
       'email_code',
@@ -43,7 +43,7 @@ describe('passwordPrefFactorComparator(a,b)', function () {
       { strategy: 'email_link', email_address_id: '', safe_identifier: '' },
     ];
 
-    const expectedOrder: SignInStrategyName[] = [
+    const expectedOrder: SignInStrategy[] = [
       'password',
       'password',
       'email_link',
@@ -69,7 +69,7 @@ describe('allStrategiesButtonsComparator(a,b)', function () {
       { strategy: 'email_link', email_address_id: '', safe_identifier: '' },
     ];
 
-    const expectedOrder: SignInStrategyName[] = [
+    const expectedOrder: SignInStrategy[] = [
       'email_link',
       'email_link',
       'email_code',

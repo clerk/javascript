@@ -1,5 +1,5 @@
 import { Button } from '@clerk/shared/components/button';
-import { OAuthStrategy, SignInFactor, SignInStrategyName } from '@clerk/types';
+import { OAuthStrategy, SignInFactor, SignInStrategy } from '@clerk/types';
 import React from 'react';
 import { Separator } from 'ui/common';
 import { useSupportEmail } from 'ui/hooks/useSupportEmail';
@@ -22,13 +22,13 @@ export function getButtonLabel(factor: SignInFactor): string {
   }
 }
 
-const supportedStrategies: SignInStrategyName[] = [
+const supportedStrategies: SignInStrategy[] = [
   'email_code',
   'password',
   'phone_code',
   'email_link',
 ];
-function isSupportedStrategy(strategy: SignInStrategyName): boolean {
+function isSupportedStrategy(strategy: SignInStrategy): boolean {
   return supportedStrategies.includes(strategy);
 }
 

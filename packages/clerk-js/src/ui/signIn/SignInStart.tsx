@@ -2,7 +2,7 @@ import { Control } from '@clerk/shared/components/control';
 import { Form } from '@clerk/shared/components/form';
 import { Input } from '@clerk/shared/components/input';
 import { PhoneInput } from '@clerk/shared/components/phoneInput';
-import { ClerkAPIError, SignInParams } from '@clerk/types';
+import { ClerkAPIError, SignInCreateParams } from '@clerk/types';
 import cn from 'classnames';
 import React from 'react';
 import {
@@ -106,7 +106,7 @@ export function _SignInStart(): JSX.Element {
 
   const buildSignInParams = (
     fields: Array<FieldState<string>>,
-  ): SignInParams => {
+  ): SignInCreateParams => {
     const hasPassword = fields.some(f => f.name === 'password' && !!f.value);
     if (!hasPassword) {
       fields = fields.filter(f => f.name !== 'password');
@@ -114,7 +114,7 @@ export function _SignInStart(): JSX.Element {
     return {
       ...buildRequest(fields),
       ...(hasPassword && { strategy: 'password' }),
-    } as SignInParams;
+    } as SignInCreateParams;
   };
 
   const signInWithFields = async (...fields: Array<FieldState<string>>) => {
