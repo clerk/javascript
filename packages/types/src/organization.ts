@@ -7,6 +7,7 @@ export interface OrganizationResource {
   name: string;
   createdAt: Date;
   updatedAt: Date;
+  update: (params: UpdateOrganizationParams) => Promise<OrganizationResource>;
   getMemberships: (
     params?: GetMembershipsParams,
   ) => Promise<OrganizationMembershipResource[]>;
@@ -34,4 +35,8 @@ export interface InviteMemberParams {
 export interface UpdateMembershipParams {
   userId: string;
   role: MembershipRole;
+}
+
+export interface UpdateOrganizationParams {
+  name: string;
 }

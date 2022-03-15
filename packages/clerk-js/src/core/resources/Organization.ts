@@ -5,6 +5,7 @@ import type {
   OrganizationJSON,
   OrganizationMembershipJSON,
   OrganizationResource,
+  UpdateOrganizationParams,
 } from '@clerk/types';
 import { unixEpochToDate } from 'utils/date';
 
@@ -15,6 +16,8 @@ import {
 } from './internal';
 
 export class Organization extends BaseResource implements OrganizationResource {
+  pathRoot = '/organizations';
+
   id!: string;
   name!: string;
   createdAt!: Date;
@@ -36,6 +39,14 @@ export class Organization extends BaseResource implements OrganizationResource {
 
     return new Organization(json);
   }
+
+  update = async (
+    params: UpdateOrganizationParams,
+  ): Promise<OrganizationResource> => {
+    return this._basePatch({
+      body: params,
+    });
+  };
 
   getMemberships = async (
     getMemberhipsParams?: GetMembershipsParams,
