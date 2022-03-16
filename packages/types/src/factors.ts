@@ -9,26 +9,26 @@ import {
 
 export type EmailCodeFactor = {
   strategy: EmailCodeStrategy;
-  email_address_id: string;
-  safe_identifier: string;
+  emailAddressId: string;
+  safeIdentifier: string;
 };
 
 export type EmailLinkFactor = {
   strategy: EmailLinkStrategy;
-  email_address_id: string;
-  safe_identifier: string;
+  emailAddressId: string;
+  safeIdentifier: string;
 };
 
 export type PhoneCodeFactor = {
   strategy: PhoneCodeStrategy;
-  phone_number_id: string;
-  safe_identifier: string;
+  phoneNumberId: string;
+  safeIdentifier: string;
   default?: boolean;
 };
 
 export type Web3SignatureFactor = {
   strategy: Web3Strategy;
-  web3_wallet_id: string;
+  web3WalletId: string;
 };
 
 export type PasswordFactor = {
@@ -39,15 +39,15 @@ export type OauthFactor = {
   strategy: OAuthStrategy;
 };
 
-export type EmailCodeConfig = Omit<EmailCodeFactor, 'safe_identifier'>;
-export type EmailLinkConfig = Omit<EmailLinkFactor, 'safe_identifier'> & { redirect_url: string };
-export type PhoneCodeConfig = Omit<PhoneCodeFactor, 'safe_identifier'>;
+export type EmailCodeConfig = Omit<EmailCodeFactor, 'safeIdentifier'>;
+export type EmailLinkConfig = Omit<EmailLinkFactor, 'safeIdentifier'> & { redirectUrl: string };
+export type PhoneCodeConfig = Omit<PhoneCodeFactor, 'safeIdentifier'>;
 export type Web3SignatureConfig = Web3SignatureFactor;
-export type OAuthConfig = OauthFactor & { redirect_url: string; action_complete_redirect_url: string };
+export type OAuthConfig = OauthFactor & { redirectUrl: string; actionCompleteRedirect_url: string };
 
 export type PhoneCodeSecondFactorConfig = {
   strategy: PhoneCodeStrategy;
-  phone_number_id?: string;
+  phoneNumberId?: string;
 };
 
 export type EmailCodeAttempt = {

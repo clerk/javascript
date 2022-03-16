@@ -1,4 +1,4 @@
-import { deepCamelToSnake } from '@clerk/shared/utils/object';
+import { deepCamelToSnake, deepSnakeToCamel } from '@clerk/shared/utils/object';
 import { Poller } from '@clerk/shared/utils/poller';
 import type {
   AttemptFirstFactorParams,
@@ -70,18 +70,18 @@ export class SignIn extends BaseResource implements SignInResource {
       case 'email_link':
         params = {
           ...params,
-          email_address_id: factor.email_address_id,
-          redirect_url: factor.redirect_url,
+          email_address_id: factor.emailAddressId,
+          redirect_url: factor.redirectUrl,
         };
         break;
       case 'email_code':
-        params = { ...params, email_address_id: factor.email_address_id };
+        params = { ...params, email_address_id: factor.emailAddressId };
         break;
       case 'phone_code':
-        params = { ...params, phone_number_id: factor.phone_number_id };
+        params = { ...params, phone_number_id: factor.phoneNumberId };
         break;
       case STRATEGY_WEB3_METAMASK_SIGNATURE:
-        params = { ...params, web3_wallet_id: factor.web3_wallet_id };
+        params = { ...params, web3_wallet_id: factor.web3WalletId };
         break;
       default:
         clerkInvalidStrategy('SignIn.prepareFirstFactor', factor.strategy);
@@ -113,8 +113,8 @@ export class SignIn extends BaseResource implements SignInResource {
       }
       await this.prepareFirstFactor({
         strategy: 'email_link',
-        email_address_id: emailAddressId,
-        redirect_url: redirectUrl,
+        emailAddressId: emailAddressId,
+        redirectUrl: redirectUrl,
       });
       return new Promise((resolve, reject) => {
         void run(() => {
@@ -160,8 +160,8 @@ export class SignIn extends BaseResource implements SignInResource {
   }: AuthenticateWithRedirectParams): Promise<void> => {
     const { firstFactorVerification } = await this.create({
       strategy,
-      redirect_url: redirectUrl,
-      action_complete_redirect_url: redirectUrlComplete,
+      redirectUrl: redirectUrl,
+      actionCompleteRedirectUrl: redirectUrlComplete,
     });
     const { status, externalVerificationRedirectURL } = firstFactorVerification;
 
@@ -211,7 +211,6 @@ export class SignIn extends BaseResource implements SignInResource {
 
   public authenticateWithMetamask = async (): Promise<SignInResource> => {
     const identifier = await getMetamaskIdentifier();
-
     return this.authenticateWithWeb3({
       identifier,
       generateSignature: generateSignatureWithMetamask,
@@ -224,12 +223,12 @@ export class SignIn extends BaseResource implements SignInResource {
       this.status = data.status;
       this.supportedIdentifiers = data.supported_identifiers;
       this.identifier = data.identifier;
-      this.supportedFirstFactors = data.supported_first_factors;
-      this.supportedSecondFactors = data.supported_second_factors;
+      this.supportedFirstFactors = deepSnakeToCamel(data.supported_first_factors) as SignInFirstFactor[];
+      this.supportedSecondFactors = deepSnakeToCamel(data.supported_second_factors) as SignInSecondFactor[];
       this.firstFactorVerification = new Verification(data.first_factor_verification);
       this.secondFactorVerification = new Verification(data.second_factor_verification);
       this.createdSessionId = data.created_session_id;
-      this.userData = data.user_data;
+      this.userData = deepSnakeToCamel(data.user_data) as UserData;
     }
     return this;
   }

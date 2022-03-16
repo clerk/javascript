@@ -24,9 +24,9 @@ import {
   TicketStrategy,
   Web3Strategy,
 } from './strategies';
-import { SnakeToCamel } from './utils';
 import { CreateMagicLinkFlowReturn, StartMagicLinkFlowParams, VerificationResource } from './verification';
 import { AuthenticateWithWeb3Params, GenerateSignature } from './web3Wallet';
+import type { SnakeToCamel } from './utils';
 
 export interface SignUpResource extends ClerkResource {
   status: SignUpStatus | null;
@@ -80,17 +80,13 @@ export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
 
 export type SignUpField = SignUpAttributeField | SignUpIdentificationField;
 
-export type SignUpCreateParams = Partial<SnakeToCamel<SignUpAttributes> & SignUpAttributes>;
-
-export type SignUpUpdateParams = SignUpCreateParams;
-
 export type PrepareVerificationParams =
   | {
       strategy: EmailCodeStrategy;
     }
   | {
       strategy: EmailLinkStrategy;
-      redirect_url?: string;
+      redirectUrl?: string;
     }
   | {
       strategy: PhoneCodeStrategy;
@@ -136,19 +132,21 @@ export type SignUpVerifiableField =
 export type SignUpIdentificationField = SignUpVerifiableField | OAuthStrategy;
 
 // TODO: Replace with discriminated union type
-export type SignUpAttributes = Partial<
+export type SignUpCreateParams = Partial<
   {
-    external_account_strategy: string;
-    external_account_redirect_url: string;
-    external_account_action_complete_redirect_url: string;
+    externalAccountStrategy: string;
+    externalAccountRedirectUrl: string;
+    externalAccountActionCompleteRedirectUrl: string;
     strategy: OAuthStrategy | TicketStrategy;
-    redirect_url: string;
-    action_complete_redirect_url: string;
+    redirectUrl: string;
+    actionCompleteRedirectUrl: string;
     transfer: boolean;
-    unsafe_metadata: Record<string, unknown>;
+    unsafeMetadata: Record<string, unknown>;
     ticket: string;
-  } & Record<SignUpAttributeField | SignUpVerifiableField, string>
+  } & SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>
 >;
+
+export type SignUpUpdateParams = SignUpCreateParams;
 
 export interface SignUpVerificationsResource {
   emailAddress: SignUpVerificationResource;

@@ -32,15 +32,23 @@ export interface UserResource extends ClerkResource {
   createdAt: Date | null;
 
   update: (params: UpdateUserParams) => Promise<UserResource>;
-  createEmailAddress: (email: string) => Promise<EmailAddressResource>;
-  createPhoneNumber: (phoneNumber: string) => Promise<PhoneNumberResource>;
+  createEmailAddress: (
+    params: CreateEmailAddressParams,
+  ) => Promise<EmailAddressResource>;
+  createPhoneNumber: (
+    params: CreatePhoneNumberParams,
+  ) => Promise<PhoneNumberResource>;
   twoFactorEnabled: () => boolean;
   isPrimaryIdentification: (
     ident: EmailAddressResource | PhoneNumberResource,
   ) => boolean;
   getSessions: () => Promise<SessionWithActivitiesResource[]>;
-  setProfileImage: (file: Blob | File) => Promise<ImageResource>;
+  setProfileImage: (params: SetProfileImageParams) => Promise<ImageResource>;
 }
+
+export type CreateEmailAddressParams = { email: string };
+export type CreatePhoneNumberParams = { phoneNumber: string };
+export type SetProfileImageParams = { file: Blob | File };
 
 type UpdateUserJSON = Pick<
   UserJSON,
@@ -54,6 +62,4 @@ type UpdateUserJSON = Pick<
   | 'unsafe_metadata'
 >;
 
-export type UpdateUserParams = Partial<
-  SnakeToCamel<UpdateUserJSON> & UpdateUserJSON
->;
+export type UpdateUserParams = Partial<SnakeToCamel<UpdateUserJSON>>;

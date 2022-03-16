@@ -65,7 +65,7 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
       }
       await this.prepareVerification({
         strategy: 'email_link',
-        redirect_url: redirectUrl,
+        redirectUrl: redirectUrl,
       });
       return new Promise((resolve, reject) => {
         void run(() => {

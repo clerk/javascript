@@ -7,12 +7,13 @@ import { OAuthProvider } from './oauth';
 import { OrganizationInvitationStatus } from './organizationInvitation';
 import { MembershipRole } from './organizationMembership';
 import { SessionStatus } from './session';
-import { SignInJSON } from './signIn';
+import { SignInFirstFactor, SignInJSON, SignInSecondFactor } from './signIn';
 import { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUp';
 import { OAuthStrategy } from './strategies';
 import { BoxShadow, Color, EmUnit, FontFamily, FontWeight, HexColor } from './theme';
 import { UserSettingsJSON } from './userSettings';
 import { VerificationStatus } from './verification';
+import { CamelToSnake } from './utils';
 
 export interface ClerkResourceJSON {
   // TODO: Shall we make this optional?
@@ -264,3 +265,12 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   created_at: number;
   updated_at: number;
 }
+
+export interface UserDataJSON {
+  first_name?: string;
+  last_name?: string;
+  profile_image_url?: string;
+}
+
+export type SignInFirstFactorJSON = CamelToSnake<SignInFirstFactor>;
+export type SignInSecondFactorJSON = CamelToSnake<SignInSecondFactor>;
