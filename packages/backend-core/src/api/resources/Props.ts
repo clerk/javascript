@@ -12,6 +12,11 @@ export interface ClerkProps {
   id: Nullable<string>;
 }
 
+export interface TokenProps extends ClerkProps {
+  id: null;
+  jwt: string;
+}
+
 export interface AllowlistIdentifierProps extends ClerkProps {
   identifier: string;
   createdAt: number;
