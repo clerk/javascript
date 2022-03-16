@@ -14,3 +14,4 @@ export * from './Session';
 export * from './SMSMessage';
 export * from './User';
 export * from './Verification';
+export * from './Token';
