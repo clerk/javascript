@@ -1,9 +1,9 @@
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import { IsomorphicClerkOptions } from '@clerk/clerk-react/dist/types';
-import { useNavigate } from '@remix-run/react';
 import React from 'react';
 
 import { assertFrontendApi, assertValidClerkState, warnForSsr } from '../utils';
+import { useAwaitableNavigate } from './useAwaitableNavigate';
 
 export * from '@clerk/clerk-react';
 
@@ -13,8 +13,8 @@ export type RemixClerkProviderProps<ClerkStateT extends { __type: 'clerkState' }
 } & IsomorphicClerkOptions;
 
 export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): JSX.Element {
+  const awaitableNavigate = useAwaitableNavigate();
   const { clerkJSUrl, clerkState, ...restProps } = rest;
-  const navigate = useNavigate();
   ReactClerkProvider.displayName = 'ReactClerkProvider';
 
   assertValidClerkState(clerkState);
@@ -31,7 +31,7 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
     <ReactClerkProvider
       frontendApi={__frontendApi}
       clerkJSUrl={clerkJSUrl}
-      navigate={to => navigate(to)}
+      navigate={awaitableNavigate}
       initialState={__clerk_ssr_state}
       {...restProps}
     >
