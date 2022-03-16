@@ -43,11 +43,10 @@ export class SessionApi extends AbstractApi {
 
   public async getToken(sessionId: string, template: string) {
     this.requireId(sessionId);
-    console.log('sessions api', sessionId, template, `/sessions/${sessionId}/tokens/${template}`);
     return (
       (await this._restClient.makeRequest<Token>({
         method: 'POST',
-        path: `/sessions/${sessionId}/tokens/${template}`,
+        path: `/sessions/${sessionId}/tokens/${template || ''}`,
       })) as any
     ).jwt;
   }

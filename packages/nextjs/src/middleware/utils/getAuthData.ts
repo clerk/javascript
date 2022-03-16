@@ -1,9 +1,25 @@
 import { AuthStatus } from '@clerk/backend-core';
 import Clerk, { sessions, users } from '@clerk/clerk-sdk-node';
-import { GetSessionTokenOptions } from '@clerk/types';
+import { GetToken, GetTokenOptions } from '@clerk/types';
 import { GetServerSidePropsContext } from 'next';
 
 import { AuthData, WithServerSideAuthOptions } from '../types';
+
+/**
+ * @internal
+ * TODO: Share the same impl between nextjs/remix packages
+ */
+const createGetToken =
+  (sessionId?: string, sessionToken?: string): GetToken =>
+  async (options: GetTokenOptions = {}) => {
+    if (!sessionId) {
+      return Promise.resolve(null);
+    }
+    if (options.template) {
+      return sessions.getToken(sessionId, options.template);
+    }
+    return Promise.resolve(sessionToken || null);
+  };
 
 /**
  * @internal
@@ -15,19 +31,12 @@ export async function getAuthData(
   const { headers, cookies } = ctx.req;
   const { loadSession, loadUser } = opts;
 
-  const getToken = async (options: GetSessionTokenOptions = {}) => {
-    if (options.template) {
-      throw new Error('Retrieving a JWT template during SSR will be supported soon.');
-    }
-    return cookies['__session'] || null;
-  };
-
   const signedOutState = {
     sessionId: null,
     session: null,
     userId: null,
     user: null,
-    getToken,
+    getToken: createGetToken(undefined),
   };
 
   try {
@@ -53,6 +62,8 @@ export async function getAuthData(
     if (status === AuthStatus.SignedOut || !sessionClaims) {
       return signedOutState;
     }
+
+    const getToken = createGetToken(sessionClaims.sid as string, cookies['__session']);
 
     const [user, session] = await Promise.all([
       loadUser ? users.getUser(sessionClaims.sub as string) : Promise.resolve(undefined),
