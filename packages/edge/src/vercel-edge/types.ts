@@ -1,0 +1,53 @@
+import type { Session, User } from '@clerk/backend-core';
+import type { GetSessionTokenOptions } from '@clerk/types';
+import type { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
+
+export type WithAuthOptions = {
+  loadUser?: boolean;
+  loadSession?: boolean;
+  authorizedParties?: string[];
+};
+
+export type WithAuthMiddlewareCallback<Return, Options> = (
+  req: RequestWithAuth<Options>,
+  event: NextFetchEvent,
+) => Return;
+
+export type WithAuthMiddlewareResult<CallbackReturn, Options> = (
+  req: RequestWithAuth<Options>,
+  event: NextFetchEvent,
+) => Promise<Awaited<CallbackReturn>>;
+export type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
+
+export type RequestWithAuth<Options extends WithAuthOptions = any> =
+  NextRequest & {
+    auth: MiddlewareAuth;
+  } & (Options extends { loadSession: true }
+      ? { session: Session | null }
+      : {}) &
+    (Options extends { loadUser: true } ? { user: User | null } : {});
+
+export type NextMiddlewareResult = NextResponse | Response | null | undefined;
+
+export type WithAuthNextMiddlewareHandler<Options> = (
+  req: RequestWithAuth<Options>,
+  event: NextFetchEvent,
+) => NextMiddlewareResult | Promise<NextMiddlewareResult>;
+
+export type MiddlewareAuth = {
+  sessionId: string | null;
+  userId: string | null;
+  getToken: (
+    options?: GetSessionTokenOptions,
+  ) => Promise<string | null> | string | null;
+};
+
+export type AuthData = {
+  sessionId: string | null;
+  session: Session | undefined | null;
+  userId: string | null;
+  user: User | undefined | null;
+  getToken: (
+    options?: GetSessionTokenOptions,
+  ) => Promise<string | null> | string | null;
+};
