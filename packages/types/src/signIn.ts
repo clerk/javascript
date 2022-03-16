@@ -17,7 +17,13 @@ import {
   Web3SignatureFactor,
 } from './factors';
 import { EmailAddressIdentifier, PhoneNumberIdentifier, UsernameIdentifier, Web3WalletIdentifier } from './identifiers';
-import { ClerkResourceJSON, VerificationJSON } from './json';
+import {
+  ClerkResourceJSON,
+  SignInFirstFactorJSON,
+  SignInSecondFactorJSON,
+  UserDataJSON,
+  VerificationJSON,
+} from './json';
 import { AuthenticateWithRedirectParams } from './oauth';
 import { ClerkResource } from './resource';
 import {
@@ -29,7 +35,6 @@ import {
   TicketStrategy,
   Web3Strategy,
 } from './strategies';
-import { SnakeToCamel } from './utils';
 import { CreateMagicLinkFlowReturn, StartMagicLinkFlowParams, VerificationResource } from './verification';
 import { AuthenticateWithWeb3Params } from './web3Wallet';
 
@@ -82,9 +87,9 @@ export type SignInFirstFactor =
 export type SignInSecondFactor = PhoneCodeFactor;
 
 export interface UserData {
-  first_name?: string;
-  last_name?: string;
-  profile_image_url?: string;
+  firstName?: string;
+  lastName?: string;
+  profileImageUrl?: string;
 }
 
 export type SignInFactor = SignInFirstFactor | SignInSecondFactor;
@@ -102,11 +107,11 @@ export type PrepareSecondFactorParams = PhoneCodeSecondFactorConfig;
 
 export type AttemptSecondFactorParams = PhoneCodeAttempt;
 
-type SignInAttributes = (
+export type SignInCreateParams = (
   | {
       strategy: OAuthStrategy;
-      redirect_url: string;
-      action_complete_redirect_url?: string;
+      redirectUrl: string;
+      actionCompleteRedirectUrl?: string;
     }
   | {
       strategy: TicketStrategy;
@@ -124,11 +129,12 @@ type SignInAttributes = (
   | {
       strategy: EmailLinkStrategy;
       identifier: string;
-      redirect_url?: string;
+      redirectUrl?: string;
+    }
+  | {
+      identifier: string;
     }
 ) & { transfer?: boolean };
-
-export type SignInCreateParams = Partial<SnakeToCamel<SignInAttributes> & SignInAttributes>;
 
 export interface SignInStartMagicLinkFlowParams extends StartMagicLinkFlowParams {
   emailAddressId: string;
@@ -150,9 +156,9 @@ export interface SignInJSON extends ClerkResourceJSON {
   supported_identifiers: SignInIdentifier[];
   supported_external_accounts: OAuthStrategy[];
   identifier: string;
-  user_data: UserData;
-  supported_first_factors: SignInFirstFactor[];
-  supported_second_factors: SignInSecondFactor[];
+  user_data: UserDataJSON;
+  supported_first_factors: SignInFirstFactorJSON[];
+  supported_second_factors: SignInSecondFactorJSON[];
   first_factor_verification: VerificationJSON | null;
   second_factor_verification: VerificationJSON | null;
   created_session_id: string | null;

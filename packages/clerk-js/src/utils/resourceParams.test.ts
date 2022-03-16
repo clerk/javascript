@@ -5,8 +5,8 @@ import { normalizeUnsafeMetadata } from './resourceParams';
 describe('normalizeUnsafeMetadata', () => {
   it('handles unsafe_metadata', () => {
     const params: UpdateUserParams = {
-      first_name: 'clerk',
-      unsafe_metadata: {
+      firstName: 'clerk',
+      unsafeMetadata: {
         role: 'admin',
       },
     };
@@ -22,7 +22,7 @@ describe('normalizeUnsafeMetadata', () => {
 
   it('handles params without unsafe_metadata', () => {
     const params: UpdateUserParams = {
-      first_name: 'clerk',
+      firstName: 'clerk',
     };
 
     const res = normalizeUnsafeMetadata(params);
@@ -40,8 +40,8 @@ describe('normalizeUnsafeMetadata', () => {
 
   it('handles unsafe_metadata passed as string', () => {
     const params: UpdateUserParams = {
-      first_name: 'clerk',
-      unsafe_metadata: JSON.stringify({
+      firstName: 'clerk',
+      unsafeMetadata: JSON.stringify({
         role: 'admin',
       }) as any,
     };

@@ -1,6 +1,21 @@
 import { deepCamelToSnake, deepSnakeToCamel } from './object';
 
 describe('camelToSnakeKeys', () => {
+  it('creates a copy and does not modify the original', () => {
+    const original = {
+      an_arr: [{ hello_there: 'hey' }],
+      a_nested_object: { a_message: 'hey' },
+    };
+    const originalCopy = { ...original };
+    const res = deepSnakeToCamel(original);
+    expect(res).toStrictEqual({
+      anArr: [{ helloThere: 'hey' }],
+      aNestedObject: { aMessage: 'hey' },
+    });
+    expect(original).toStrictEqual(originalCopy);
+    expect(original === res).toBeFalsy();
+  });
+
   it('transforms camelCased keys to snake_cased', () => {
     expect(deepCamelToSnake({ key: 1, anotherKey: 2 })).toStrictEqual({
       key: 1,

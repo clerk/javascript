@@ -1,9 +1,7 @@
 import { camelToSnake, snakeToCamel } from './string';
 
 const createDeepObjectTransformer = (transform: any) => {
-  const deepTransform = <T extends Record<string, any> | Array<any>>(
-    obj: T,
-  ): any => {
+  const deepTransform = (obj: any): any => {
     if (!obj) {
       return obj;
     }
@@ -17,19 +15,19 @@ const createDeepObjectTransformer = (transform: any) => {
       });
     }
 
-    const keys = Object.keys(obj) as Array<keyof T>;
+    const copy = { ...obj };
+    const keys = Object.keys(copy) as string[];
     for (const oldName of keys) {
-      const newName = transform(oldName.toString()) as keyof T;
+      const newName = transform(oldName.toString());
       if (newName !== oldName) {
-        obj[newName] = obj[oldName];
-        delete obj[oldName];
+        copy[newName] = copy[oldName];
+        delete copy[oldName];
       }
-      if (typeof obj[newName] === 'object') {
-        // @ts-ignore
-        obj[newName] = deepTransform(obj[newName]);
+      if (typeof copy[newName] === 'object') {
+        copy[newName] = deepTransform(copy[newName]);
       }
     }
-    return obj;
+    return copy;
   };
 
   return deepTransform;

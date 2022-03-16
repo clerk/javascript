@@ -1,9 +1,11 @@
-import { deepCamelToSnake } from '@clerk/shared/utils/object';
 import type {
+  CreateEmailAddressParams,
+  CreatePhoneNumberParams,
   EmailAddressResource,
   ExternalAccountResource,
   ImageResource,
   PhoneNumberResource,
+  SetProfileImageParams,
   UpdateUserParams,
   UserJSON,
   UserResource,
@@ -91,7 +93,10 @@ export class User extends BaseResource implements UserResource {
     return enabled;
   };
 
-  createEmailAddress = (email: string): Promise<EmailAddressResource> => {
+  createEmailAddress = (
+    params: CreateEmailAddressParams,
+  ): Promise<EmailAddressResource> => {
+    const { email } = params || {};
     return new EmailAddress(
       {
         email_address: email,
@@ -100,7 +105,10 @@ export class User extends BaseResource implements UserResource {
     ).create();
   };
 
-  createPhoneNumber = (phoneNumber: string): Promise<PhoneNumberResource> => {
+  createPhoneNumber = (
+    params: CreatePhoneNumberParams,
+  ): Promise<PhoneNumberResource> => {
+    const { phoneNumber } = params || {};
     return new PhoneNumber(
       {
         phone_number: phoneNumber,
@@ -111,7 +119,7 @@ export class User extends BaseResource implements UserResource {
 
   update = (params: UpdateUserParams): Promise<UserResource> => {
     return this._basePatch({
-      body: normalizeUnsafeMetadata(deepCamelToSnake(params)),
+      body: normalizeUnsafeMetadata(params),
     });
   };
 
@@ -124,7 +132,8 @@ export class User extends BaseResource implements UserResource {
     return res;
   };
 
-  setProfileImage = (file: Blob | File): Promise<ImageResource> => {
+  setProfileImage = (params: SetProfileImageParams): Promise<ImageResource> => {
+    const { file } = params || {};
     return Image.create(`${this.path()}/profile_image`, {
       file,
     });

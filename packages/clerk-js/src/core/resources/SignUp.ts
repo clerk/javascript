@@ -1,4 +1,3 @@
-import { deepCamelToSnake } from '@clerk/shared/utils/object';
 import { Poller } from '@clerk/shared/utils/poller';
 import type {
   AttemptEmailAddressVerificationParams,
@@ -66,7 +65,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   create = (params: SignUpCreateParams): Promise<SignUpResource> => {
     return this._basePost({
       path: this.pathRoot,
-      body: normalizeUnsafeMetadata(deepCamelToSnake(params)),
+      body: normalizeUnsafeMetadata(params),
     });
   };
 
@@ -101,7 +100,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       }
       await this.prepareEmailAddressVerification({
         strategy: 'email_link',
-        redirect_url: redirectUrl,
+        redirectUrl,
       });
 
       return new Promise((resolve, reject) => {
@@ -169,8 +168,8 @@ export class SignUp extends BaseResource implements SignUpResource {
     const { redirectUrl, redirectUrlComplete, strategy } = params || {};
     const { verifications } = await this.create({
       strategy,
-      redirect_url: redirectUrl,
-      action_complete_redirect_url: redirectUrlComplete,
+      redirectUrl,
+      actionCompleteRedirectUrl: redirectUrlComplete,
     });
     const { externalAccount } = verifications;
     const { status, externalVerificationRedirectURL } = externalAccount;
@@ -187,7 +186,7 @@ export class SignUp extends BaseResource implements SignUpResource {
 
   update = (params: SignUpUpdateParams): Promise<SignUpResource> => {
     return this._basePatch({
-      body: normalizeUnsafeMetadata(deepCamelToSnake(params)),
+      body: normalizeUnsafeMetadata(params),
     });
   };
 
