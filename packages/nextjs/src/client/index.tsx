@@ -12,6 +12,7 @@ type NextClerkProviderProps = {
   children: React.ReactNode;
   theme?: ClerkThemeOptions;
   authVersion?: 1 | 2;
+  frontendApi?: string;
 } & Pick<ClerkOptions, 'selectInitialSession' | 'polling'>;
 
 export function ClerkProvider({
