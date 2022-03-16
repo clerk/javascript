@@ -1,19 +1,14 @@
-import type { JWTPayload } from '@clerk/backend-core';
-import {
-  AuthStatus,
-  Base,
-  ClerkBackendAPI,
-  Session,
-} from '@clerk/backend-core';
+import { AuthStatus, Base } from '@clerk/backend-core';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 
-import { PACKAGE_REPO } from './constants';
-import { LIB_NAME, LIB_VERSION } from './info';
-
-type Middleware = (
-  req: NextRequest,
-  event: NextFetchEvent,
-) => Response | void | Promise<Response | void>;
+import { ClerkAPI } from './ClerkAPI';
+import {
+  NextMiddlewareResult,
+  WithAuthMiddlewareCallback,
+  WithAuthMiddlewareResult,
+  WithAuthOptions,
+} from './types';
+import { getAuthData, injectAuthIntoRequest } from './utils';
 
 /**
  *
@@ -51,23 +46,7 @@ export const verifySessionToken = vercelEdgeBase.verifySessionToken;
 
 /** Export ClerkBackendAPI API client */
 
-export const ClerkAPI = new ClerkBackendAPI({
-  libName: LIB_NAME,
-  libVersion: LIB_VERSION,
-  packageRepo: PACKAGE_REPO,
-  fetcher: (url, { method, authorization, contentType, userAgent, body }) => {
-    return fetch(url, {
-      method,
-      headers: {
-        authorization: authorization,
-        'Content-Type': contentType,
-        'User-Agent': userAgent,
-        'X-Clerk-SDK': `vercel-edge/${LIB_VERSION}`,
-      },
-      ...(body && { body: JSON.stringify(body) }),
-    }).then(body => (contentType === 'text/html' ? body : body.json()));
-  },
-});
+export { ClerkAPI } from './ClerkAPI';
 
 async function fetchInterstitial() {
   const response = await ClerkAPI.fetchInterstitial<Response>();
@@ -76,21 +55,25 @@ async function fetchInterstitial() {
 
 /** Export middleware wrapper */
 
-export type NextRequestWithAuth = NextRequest & {
-  session?: Session;
-  sessionClaims?: JWTPayload;
-};
-
-export type MiddlewareOptions = {
-  authorizedParties?: string[];
-};
+export function withAuth<
+  CallbackReturn extends NextMiddlewareResult,
+  Options extends WithAuthOptions,
+>(
+  handler: WithAuthMiddlewareCallback<CallbackReturn, Options>,
+  options?: Options,
+): WithAuthMiddlewareResult<CallbackReturn, Options>;
 
 export function withAuth(
-  handler: Middleware,
-  { authorizedParties }: MiddlewareOptions = { authorizedParties: [] },
-) {
+  handler: any,
+  options: any = {
+    authorizedParties: [],
+    loadSession: false,
+    loadUser: false,
+  },
+): any {
   return async function clerkAuth(req: NextRequest, event: NextFetchEvent) {
-    const { status, session, interstitial, sessionClaims } =
+    /* Get authentication state */
+    const { status, interstitial, sessionClaims } =
       await vercelEdgeBase.getAuthState({
         cookieToken: req.cookies['__session'],
         clientUat: req.cookies['__client_uat'],
@@ -101,13 +84,9 @@ export function withAuth(
         forwardedPort: req.headers.get('x-forwarded-port'),
         forwardedHost: req.headers.get('x-forwarded-host'),
         referrer: req.headers.get('referrer'),
-        authorizedParties: authorizedParties,
+        authorizedParties: options.authorizedParties,
         fetchInterstitial,
       });
-
-    if (status === AuthStatus.SignedOut) {
-      return handler(req, event);
-    }
 
     if (status === AuthStatus.Interstitial) {
       return new NextResponse(interstitial, {
@@ -116,12 +95,29 @@ export function withAuth(
       });
     }
 
-    if (status === AuthStatus.SignedIn) {
-      // @ts-ignore
-      req.session = session;
-      // @ts-ignore
-      req.sessionClaims = sessionClaims;
-      return handler(req, event);
-    }
+    /* Get authentication related data */
+    const authData = await getAuthData(req, {
+      ...sessionClaims,
+      options,
+    });
+
+    /* Predetermined signed out attributes */
+    const signedOutState = {
+      sessionId: null,
+      session: null,
+      userId: null,
+      user: null,
+    };
+
+    /* Inject the auth state into the NextResponse object */
+    const authRequest = injectAuthIntoRequest(
+      req,
+      status === AuthStatus.SignedOut
+        ? { ...authData, ...signedOutState }
+        : authData,
+    );
+
+    /* In both SignedIn and SignedOut states, we just add the attributes to the request object and passthrough. */
+    return handler(authRequest, event);
   };
 }
