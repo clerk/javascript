@@ -4,7 +4,6 @@
   ClerkBackendAPI,
   ClerkFetcher,
   JWTPayload,
-  Session,
 } from '@clerk/backend-core';
 import Cookies from 'cookies';
 import deepmerge from 'deepmerge';
@@ -32,23 +31,18 @@ export type MiddlewareOptions = {
   authorizedParties?: string[];
 };
 
-/** @deprecated DEPRECATED Use WithAuthProp Est. 2.10.0 */
-export type WithSessionProp<T> = T & { session?: Session };
-/** @deprecated DEPRECATED Use RequireAuthProp Est. 2.10.0 */
-export type RequireSessionProp<T> = T & { session: Session };
-/** @deprecated DEPRECATED Use WithAuthProp Est. 2.10.0 */
-export type WithSessionClaimsProp<T> = T & { sessionClaims?: JWTPayload };
-/** @deprecated DEPRECATED Use RequireAuthProp Est. 2.10.0 */
-export type RequireSessionClaimsProp<T> = T & { sessionClaims: JWTPayload };
-
 export type WithAuthProp<T> = T & {
-  session?: Session;
-  sessionClaims?: JWTPayload;
+  auth: {
+    sessionId: string | null;
+    userId: string | null;
+  };
 };
 
 export type RequireAuthProp<T> = T & {
-  session: Session;
-  sessionClaims: JWTPayload;
+  auth: {
+    sessionId: string;
+    userId: string;
+  };
 };
 
 import { Crypto, CryptoKey } from '@peculiar/webcrypto';
@@ -233,7 +227,7 @@ export default class Clerk extends ClerkBackendAPI {
     return error;
   }
 
-  expressWithSession(
+  expressWithAuth(
     { onError, authorizedParties }: MiddlewareOptions = {
       onError: this.defaultOnError,
     }
@@ -251,7 +245,7 @@ export default class Clerk extends ClerkBackendAPI {
       const cookies = new Cookies(req, res);
 
       try {
-        const { status, session, interstitial, sessionClaims } =
+        const { status, interstitial, sessionClaims } =
           await this.base.getAuthState({
             cookieToken: cookies.get('__session') as string,
             clientUat: cookies.get('__client_uat') as string,
@@ -271,10 +265,12 @@ export default class Clerk extends ClerkBackendAPI {
         }
 
         if (status === AuthStatus.SignedIn) {
-          // @ts-ignore
-          req.session = session;
-          // @ts-ignore
-          req.sessionClaims = sessionClaims;
+          // @ts-expect-error
+          req.auth = {
+            sessionId: sessionClaims?.sid,
+            userId: sessionClaims?.sub,
+          };
+
           return next();
         }
 
@@ -282,7 +278,12 @@ export default class Clerk extends ClerkBackendAPI {
         res.write(interstitial);
         res.end();
       } catch (error) {
-        // Session will not be set on request
+        // Auth object will be set to the signed out auth state
+        // @ts-expect-error
+        req.auth = {
+          sessionId: null,
+          userId: null,
+        };
 
         // Call onError if provided
         if (!onError) {
@@ -302,12 +303,12 @@ export default class Clerk extends ClerkBackendAPI {
     return authenticate.bind(this);
   }
 
-  expressRequireSession(
+  expressRequireAuth(
     { onError, authorizedParties }: MiddlewareOptions = {
       onError: this.strictOnError,
     }
   ) {
-    return this.expressWithSession({ onError, authorizedParties });
+    return this.expressWithAuth({ onError, authorizedParties });
   }
 
   // Credits to https://nextjs.org/docs/api-routes/api-middlewares
@@ -328,14 +329,14 @@ export default class Clerk extends ClerkBackendAPI {
   }
 
   // Set the session on the request and then call provided handler
-  withSession(
+  withAuth(
     handler: Function,
     { onError, authorizedParties }: MiddlewareOptions = {
       onError: this.defaultOnError,
     }
   ) {
     return async (
-      req: WithSessionProp<Request> | WithSessionClaimsProp<Request>,
+      req: WithAuthProp<Request>,
       res: Response,
       next?: NextFunction
     ) => {
@@ -343,7 +344,7 @@ export default class Clerk extends ClerkBackendAPI {
         await this._runMiddleware(
           req,
           res,
-          this.expressWithSession({ onError, authorizedParties })
+          this.expressWithAuth({ onError, authorizedParties })
         );
         return handler(req, res, next);
       } catch (error) {
@@ -362,12 +363,12 @@ export default class Clerk extends ClerkBackendAPI {
   }
 
   // Stricter version, short-circuits if session can't be determined
-  requireSession(
+  requireAuth(
     handler: Function,
     { onError, authorizedParties }: MiddlewareOptions = {
       onError: this.strictOnError,
     }
   ) {
-    return this.withSession(handler, { onError, authorizedParties });
+    return this.withAuth(handler, { onError, authorizedParties });
   }
 }
