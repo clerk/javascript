@@ -4,7 +4,7 @@ import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 import { ClerkAPI } from './ClerkAPI';
 import {
   NextMiddlewareResult,
-  WithEdgeMiddlewareAuthMiddlewareCallback,
+  WithEdgeMiddlewareAuthCallback,
   WithEdgeMiddlewareAuthMiddlewareResult,
   WithEdgeMiddlewareAuthOptions,
 } from './types';
@@ -76,7 +76,7 @@ export function withEdgeMiddlewareAuth<
   CallbackReturn extends NextMiddlewareResult,
   Options extends WithEdgeMiddlewareAuthOptions,
 >(
-  handler: WithEdgeMiddlewareAuthMiddlewareCallback<CallbackReturn, Options>,
+  handler: WithEdgeMiddlewareAuthCallback<CallbackReturn, Options>,
   options?: Options,
 ): WithEdgeMiddlewareAuthMiddlewareResult<CallbackReturn, Options>;
 

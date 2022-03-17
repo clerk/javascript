@@ -8,7 +8,7 @@ export type WithEdgeMiddlewareAuthOptions = {
   authorizedParties?: string[];
 };
 
-export type WithEdgeMiddlewareAuthMiddlewareCallback<Return, Options> = (
+export type WithEdgeMiddlewareAuthCallback<Return, Options> = (
   req: RequestWithAuth<Options>,
   event: NextFetchEvent,
 ) => Return;
