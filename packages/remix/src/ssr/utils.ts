@@ -14,19 +14,15 @@ export const wrapClerkState = (data: any) => {
 };
 
 /**
- * Inject the `auth` attribute to the SSR provided context (ctx) object and
- * `user` and `session` attribute to the request (req) object.
- *
+ * Inject `auth`, `user` and `session` properties into `request`
  * @internal
  */
-export function injectAuthIntoArgs(ctx: LoaderFunctionArgs, authData: AuthData): LoaderFunctionArgsWithAuth {
-  const { user, session, userId, sessionId } = authData;
-  const auth = {
-    userId,
-    sessionId,
-    getToken: authData.getToken,
-  };
-  return { ...ctx, auth, user, session };
+export function injectAuthIntoRequest(args: LoaderFunctionArgs, authData: AuthData): LoaderFunctionArgsWithAuth {
+  const { user, session, userId, sessionId, getToken } = authData;
+  (args.request as any).auth = { userId, sessionId, getToken };
+  (args.request as any).user = user;
+  (args.request as any).session = session;
+  return args as LoaderFunctionArgsWithAuth;
 }
 
 /**

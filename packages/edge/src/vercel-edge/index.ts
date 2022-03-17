@@ -4,9 +4,9 @@ import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 import { ClerkAPI } from './ClerkAPI';
 import {
   NextMiddlewareResult,
-  WithAuthMiddlewareCallback,
-  WithAuthMiddlewareResult,
-  WithAuthOptions,
+  WithEdgeMiddlewareAuthCallback,
+  WithEdgeMiddlewareAuthMiddlewareResult,
+  WithEdgeMiddlewareAuthOptions,
 } from './types';
 import { getAuthData, injectAuthIntoRequest } from './utils';
 
@@ -46,7 +46,24 @@ export const verifySessionToken = vercelEdgeBase.verifySessionToken;
 
 /** Export ClerkBackendAPI API client */
 
-export { ClerkAPI } from './ClerkAPI';
+const allowlistIdentifiers = ClerkAPI.allowlistIdentifiers;
+const clients = ClerkAPI.clients;
+const emails = ClerkAPI.emails;
+const invitations = ClerkAPI.invitations;
+const sessions = ClerkAPI.sessions;
+const smsMessages = ClerkAPI.smsMessages;
+const users = ClerkAPI.users;
+
+// Export sub-api objects
+export {
+  allowlistIdentifiers,
+  clients,
+  emails,
+  invitations,
+  sessions,
+  smsMessages,
+  users,
+};
 
 async function fetchInterstitial() {
   const response = await ClerkAPI.fetchInterstitial<Response>();
@@ -55,15 +72,15 @@ async function fetchInterstitial() {
 
 /** Export middleware wrapper */
 
-export function withAuth<
+export function withEdgeMiddlewareAuth<
   CallbackReturn extends NextMiddlewareResult,
-  Options extends WithAuthOptions,
+  Options extends WithEdgeMiddlewareAuthOptions,
 >(
-  handler: WithAuthMiddlewareCallback<CallbackReturn, Options>,
+  handler: WithEdgeMiddlewareAuthCallback<CallbackReturn, Options>,
   options?: Options,
-): WithAuthMiddlewareResult<CallbackReturn, Options>;
+): WithEdgeMiddlewareAuthMiddlewareResult<CallbackReturn, Options>;
 
-export function withAuth(
+export function withEdgeMiddlewareAuth(
   handler: any,
   options: any = {
     authorizedParties: [],

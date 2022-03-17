@@ -3,11 +3,16 @@ import { GetSessionTokenOptions } from '@clerk/types';
 import { NextRequest } from 'next/server';
 
 import { ClerkAPI } from '../ClerkAPI';
-import { AuthData, WithAuthOptions } from '../types';
+import { AuthData, WithEdgeMiddlewareAuthOptions } from '../types';
 
 export async function getAuthData(
   req: NextRequest,
-  { sid, sub, loadSession, loadUser }: WithAuthOptions & JWTPayload,
+  {
+    sid,
+    sub,
+    loadSession,
+    loadUser,
+  }: WithEdgeMiddlewareAuthOptions & JWTPayload,
 ): Promise<AuthData> {
   const getToken = (options: GetSessionTokenOptions = {}) => {
     if (options.template) {

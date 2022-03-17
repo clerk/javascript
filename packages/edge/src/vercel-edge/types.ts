@@ -2,30 +2,29 @@ import type { Session, User } from '@clerk/backend-core';
 import type { GetSessionTokenOptions } from '@clerk/types';
 import type { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 
-export type WithAuthOptions = {
+export type WithEdgeMiddlewareAuthOptions = {
   loadUser?: boolean;
   loadSession?: boolean;
   authorizedParties?: string[];
 };
 
-export type WithAuthMiddlewareCallback<Return, Options> = (
+export type WithEdgeMiddlewareAuthCallback<Return, Options> = (
   req: RequestWithAuth<Options>,
   event: NextFetchEvent,
 ) => Return;
 
-export type WithAuthMiddlewareResult<CallbackReturn, Options> = (
+export type WithEdgeMiddlewareAuthMiddlewareResult<CallbackReturn, Options> = (
   req: RequestWithAuth<Options>,
   event: NextFetchEvent,
 ) => Promise<Awaited<CallbackReturn>>;
 export type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
 
-export type RequestWithAuth<Options extends WithAuthOptions = any> =
-  NextRequest & {
-    auth: MiddlewareAuth;
-  } & (Options extends { loadSession: true }
-      ? { session: Session | null }
-      : {}) &
-    (Options extends { loadUser: true } ? { user: User | null } : {});
+export type RequestWithAuth<
+  Options extends WithEdgeMiddlewareAuthOptions = any,
+> = NextRequest & {
+  auth: EdgeMiddlewareAuth;
+} & (Options extends { loadSession: true } ? { session: Session | null } : {}) &
+  (Options extends { loadUser: true } ? { user: User | null } : {});
 
 export type NextMiddlewareResult = NextResponse | Response | null | undefined;
 
@@ -34,7 +33,7 @@ export type WithAuthNextMiddlewareHandler<Options> = (
   event: NextFetchEvent,
 ) => NextMiddlewareResult | Promise<NextMiddlewareResult>;
 
-export type MiddlewareAuth = {
+export type EdgeMiddlewareAuth = {
   sessionId: string | null;
   userId: string | null;
   getToken: (

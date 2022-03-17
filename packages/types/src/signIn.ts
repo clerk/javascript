@@ -87,7 +87,6 @@ export interface UserData {
   profile_image_url?: string;
 }
 
-// TODO: remove?
 export type SignInFactor = SignInFirstFactor | SignInSecondFactor;
 
 export type PrepareFirstFactorParams =

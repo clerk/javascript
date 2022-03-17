@@ -136,17 +136,19 @@ export type SignUpVerifiableField =
 export type SignUpIdentificationField = SignUpVerifiableField | OAuthStrategy;
 
 // TODO: Replace with discriminated union type
-export type SignUpAttributes = {
-  external_account_strategy: string;
-  external_account_redirect_url: string;
-  external_account_action_complete_redirect_url: string;
-  strategy: OAuthStrategy | TicketStrategy;
-  redirect_url: string;
-  action_complete_redirect_url: string;
-  transfer: boolean;
-  unsafe_metadata: Record<string, unknown>;
-  ticket: string;
-} & Record<SignUpAttributeField | SignUpVerifiableField, string>;
+export type SignUpAttributes = Partial<
+  {
+    external_account_strategy: string;
+    external_account_redirect_url: string;
+    external_account_action_complete_redirect_url: string;
+    strategy: OAuthStrategy | TicketStrategy;
+    redirect_url: string;
+    action_complete_redirect_url: string;
+    transfer: boolean;
+    unsafe_metadata: Record<string, unknown>;
+    ticket: string;
+  } & Record<SignUpAttributeField | SignUpVerifiableField, string>
+>;
 
 export interface SignUpVerificationsResource {
   emailAddress: SignUpVerificationResource;

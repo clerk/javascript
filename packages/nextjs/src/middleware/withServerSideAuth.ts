@@ -1,7 +1,7 @@
 import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
 import { WithServerSideAuthCallback, WithServerSideAuthOptions, WithServerSideAuthResult } from './types';
-import { getAuthData, injectAuthIntoContext, injectSSRStateIntoProps, sanitizeAuthData } from './utils';
+import { getAuthData, injectAuthIntoRequest, injectSSRStateIntoProps, sanitizeAuthData } from './utils';
 
 const EMPTY_GSSP_RESPONSE = { props: {} };
 
@@ -25,7 +25,7 @@ export const withServerSideAuth: WithServerSideAuth = (cbOrOptions: any, options
     if (!authData) {
       return EMPTY_GSSP_RESPONSE;
     }
-    const contextWithAuth = injectAuthIntoContext(ctx, authData);
+    const contextWithAuth = injectAuthIntoRequest(ctx, authData);
     const callbackResult = (await cb?.(contextWithAuth)) || {};
     return injectSSRStateIntoProps(callbackResult, sanitizeAuthData(authData));
   };
