@@ -1,6 +1,6 @@
 import { Session, User } from '@clerk/backend-core/src';
 import { ServerSideAuth } from '@clerk/types';
-import { LoaderFunction } from '@remix-run/server-runtime';
+import { DataFunctionArgs, LoaderFunction } from '@remix-run/server-runtime';
 
 export type GetAuthReturn = Promise<ServerSideAuth>;
 
@@ -20,11 +20,14 @@ export type RootAuthLoaderCallbackReturn =
   | Promise<Record<string, unknown>>
   | Record<string, unknown>;
 
-export type LoaderFunctionArgs = Parameters<LoaderFunction>[0];
-
+export type LoaderFunctionArgs = DataFunctionArgs;
 export type LoaderFunctionReturn = ReturnType<LoaderFunction>;
 
 export type LoaderFunctionArgsWithAuth<Options extends RootAuthLoaderOptions = any> = LoaderFunctionArgs & {
+  request: RequestWithAuth<Options>;
+};
+
+export type RequestWithAuth<Options extends RootAuthLoaderOptions = any> = LoaderFunctionArgs['request'] & {
   auth: ServerSideAuth;
 } & (Options extends { loadSession: true } ? { session: Session | null } : {}) &
   (Options extends { loadUser: true } ? { user: User | null } : {});
