@@ -4,7 +4,7 @@ import { invalidRootLoaderCallbackResponseReturn, invalidRootLoaderCallbackRetur
 import { assertFrontendApi } from '../utils';
 import { getAuthData } from './getAuthData';
 import { LoaderFunctionArgs, LoaderFunctionReturn, RootAuthLoaderCallback, RootAuthLoaderOptions } from './types';
-import { assertObject, injectAuthIntoArgs, isRedirect, isResponse, sanitizeAuthData, wrapClerkState } from './utils';
+import { assertObject, injectAuthIntoRequest, isRedirect, isResponse, sanitizeAuthData, wrapClerkState } from './utils';
 
 interface RootAuthLoader {
   <Options extends RootAuthLoaderOptions>(
@@ -40,7 +40,7 @@ export const rootAuthLoader: RootAuthLoader = async (
     return { ...wrapClerkState({ __clerk_ssr_state: authData, __frontendApi: frontendApi }) };
   }
 
-  const callbackResult = await callback?.(injectAuthIntoArgs(args, sanitizeAuthData(authData!)));
+  const callbackResult = await callback?.(injectAuthIntoRequest(args, sanitizeAuthData(authData!)));
   assertObject(callbackResult, invalidRootLoaderCallbackReturn);
 
   // Pass through custom responses
