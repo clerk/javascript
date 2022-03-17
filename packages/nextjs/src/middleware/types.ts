@@ -25,6 +25,10 @@ export type AuthData = {
 };
 
 export type ContextWithAuth<Options extends WithServerSideAuthOptions = any> = GetServerSidePropsContext & {
+  req: RequestWithAuth<Options>;
+};
+
+export type RequestWithAuth<Options extends WithServerSideAuthOptions = any> = GetServerSidePropsContext['req'] & {
   auth: ServerSideAuth;
 } & (Options extends { loadSession: true } ? { session: Session | null } : {}) &
   (Options extends { loadUser: true } ? { user: User | null } : {});
