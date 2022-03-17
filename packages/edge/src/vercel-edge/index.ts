@@ -4,9 +4,9 @@ import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 import { ClerkAPI } from './ClerkAPI';
 import {
   NextMiddlewareResult,
-  WithAuthMiddlewareCallback,
-  WithAuthMiddlewareResult,
-  WithAuthOptions,
+  WithEdgeMiddlewareAuthMiddlewareCallback,
+  WithEdgeMiddlewareAuthMiddlewareResult,
+  WithEdgeMiddlewareAuthOptions,
 } from './types';
 import { getAuthData, injectAuthIntoRequest } from './utils';
 
@@ -72,15 +72,15 @@ async function fetchInterstitial() {
 
 /** Export middleware wrapper */
 
-export function withAuth<
+export function withEdgeMiddlewareAuth<
   CallbackReturn extends NextMiddlewareResult,
-  Options extends WithAuthOptions,
+  Options extends WithEdgeMiddlewareAuthOptions,
 >(
-  handler: WithAuthMiddlewareCallback<CallbackReturn, Options>,
+  handler: WithEdgeMiddlewareAuthMiddlewareCallback<CallbackReturn, Options>,
   options?: Options,
-): WithAuthMiddlewareResult<CallbackReturn, Options>;
+): WithEdgeMiddlewareAuthMiddlewareResult<CallbackReturn, Options>;
 
-export function withAuth(
+export function withEdgeMiddlewareAuth(
   handler: any,
   options: any = {
     authorizedParties: [],

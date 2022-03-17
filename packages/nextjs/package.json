@@ -21,8 +21,8 @@
     "src",
     "api.d.ts",
     "api.js",
-    "edge.js",
-    "edge.d.ts",
+    "edge-middleware.js",
+    "edge-middleware.d.ts",
     "ssr.d.ts",
     "ssr.js"
   ],
