@@ -42,6 +42,31 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
+### [1.29.2](https://github.com/clerkinc/javascript/compare/@clerk/types@1.29.2-staging.1...@clerk/types@1.29.2) (2022-03-17)
+
+**Note:** Version bump only for package @clerk/types
+
+
+
+
+
+### [1.29.2-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/types@1.29.2-staging.0...@clerk/types@1.29.2-staging.1) (2022-03-17)
+
+**Note:** Version bump only for package @clerk/types
+
+
+
+
+
+## [1.29.0](https://github.com/clerkinc/javascript/compare/@clerk/types@1.28.3...@clerk/types@1.29.0) (2022-03-11)
+
+
+### Features
+
+* **types:** Support for oauth_apple ([57b675c](https://github.com/clerkinc/javascript/commit/57b675c762187d1f16cde6d2577bac71f7993438))
+
+
+
 ### [1.28.3](https://github.com/clerkinc/javascript/compare/@clerk/types@1.28.3-staging.0...@clerk/types@1.28.3) (2022-03-09)
 
 **Note:** Version bump only for package @clerk/types

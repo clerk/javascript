@@ -1,4 +1,5 @@
 import { AuthStatus, Base } from '@clerk/backend-core';
+import { GetSessionTokenOptions } from '@clerk/types';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 
 import { ClerkAPI } from './ClerkAPI';
@@ -8,7 +9,7 @@ import {
   WithEdgeMiddlewareAuthMiddlewareResult,
   WithEdgeMiddlewareAuthOptions,
 } from './types';
-import { getAuthData, injectAuthIntoRequest } from './utils';
+import { injectAuthIntoRequest } from './utils';
 
 /**
  *
@@ -112,29 +113,46 @@ export function withEdgeMiddlewareAuth(
       });
     }
 
-    /* Get authentication related data */
-    const authData = await getAuthData(req, {
-      ...sessionClaims,
-      options,
-    });
-
-    /* Predetermined signed out attributes */
-    const signedOutState = {
-      sessionId: null,
-      session: null,
-      userId: null,
-      user: null,
+    const getToken = (options: GetSessionTokenOptions = {}) => {
+      if (options.template) {
+        throw new Error(
+          'Retrieving a JWT template during edge runtime will be supported soon.',
+        );
+      }
+      return req.cookies['__session'] || null;
     };
 
-    /* Inject the auth state into the NextResponse object */
-    const authRequest = injectAuthIntoRequest(
-      req,
-      status === AuthStatus.SignedOut
-        ? { ...authData, ...signedOutState }
-        : authData,
-    );
-
     /* In both SignedIn and SignedOut states, we just add the attributes to the request object and passthrough. */
+    if (status === AuthStatus.SignedOut) {
+      /* Predetermined signed out attributes */
+      const signedOutState = {
+        sessionId: null,
+        session: null,
+        userId: null,
+        user: null,
+        getToken,
+      };
+      return handler(injectAuthIntoRequest(req, signedOutState), event);
+    }
+
+    const [user, session] = await Promise.all([
+      options.loadUser
+        ? ClerkAPI.users.getUser(sessionClaims?.sub as string)
+        : Promise.resolve(undefined),
+      options.loadSession
+        ? ClerkAPI.sessions.getSession(sessionClaims?.sid as string)
+        : Promise.resolve(undefined),
+    ]);
+
+    /* Inject the auth state into the NextResponse object */
+    const authRequest = injectAuthIntoRequest(req, {
+      user,
+      session,
+      sessionId: sessionClaims?.sid as string,
+      userId: sessionClaims?.sub as string,
+      getToken,
+    });
+
     return handler(authRequest, event);
   };
 }

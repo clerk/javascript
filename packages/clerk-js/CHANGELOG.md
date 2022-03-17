@@ -36,6 +36,22 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
+### [2.17.6](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@2.17.6-staging.1...@clerk/clerk-js@2.17.6) (2022-03-17)
+
+**Note:** Version bump only for package @clerk/clerk-js
+
+
+
+
+
+### [2.17.6-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@2.17.6-staging.0...@clerk/clerk-js@2.17.6-staging.1) (2022-03-17)
+
+**Note:** Version bump only for package @clerk/clerk-js
+
+
+
+
+
 ### [2.17.4](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@2.17.3...@clerk/clerk-js@2.17.4) (2022-03-11)
 
 **Note:** Version bump only for package @clerk/clerk-js

@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-### [0.0.6-alpha.2](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.0.12...@clerk/shared@0.0.6-alpha.2) (2022-03-11)
+### [0.0.15](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.0.15-staging.1...@clerk/shared@0.0.15) (2022-03-17)
 
 **Note:** Version bump only for package @clerk/shared
 
@@ -11,21 +11,10 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-### [0.0.6-alpha.1](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.0.5...@clerk/shared@0.0.6-alpha.1) (2022-02-28)
+### [0.0.15-staging.1](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.0.15-staging.0...@clerk/shared@0.0.15-staging.1) (2022-03-17)
 
+**Note:** Version bump only for package @clerk/shared
 
-### Bug Fixes
-
-* **shared:** Phone input should start blank ([43f0b06](https://github.com/clerkinc/clerk_docker/commit/43f0b0603608866f6b9e0a37a284c0ea72c0004b))
-
-
-
-### [0.0.6-alpha.0](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.0.5...@clerk/shared@0.0.6-alpha.0) (2022-02-25)
-
-
-### Bug Fixes
-
-* **shared:** Phone input should start blank ([43f0b06](https://github.com/clerkinc/clerk_docker/commit/43f0b0603608866f6b9e0a37a284c0ea72c0004b))
 
 
 
