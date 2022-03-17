@@ -1,6 +1,6 @@
 import { camelToSnake, isIPV4Address } from '@clerk/shared/utils/string';
 import { loadScript } from 'utils';
-import { SignUpResource } from '../../../types/dist';
+import { SignUpResource } from '@clerk/types';
 
 declare global {
   export interface Window {

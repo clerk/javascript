@@ -1,4 +1,4 @@
-import { SignUpResource } from '../../../types/dist';
+import { SignUpResource } from '@clerk/types';
 import {
   appendAsQueryParams,
   buildURL,
