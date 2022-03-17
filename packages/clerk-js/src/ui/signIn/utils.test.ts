@@ -29,11 +29,11 @@ describe('determineStrategy(signIn, displayConfig)', () => {
         supportedFirstFactors: [
           {
             strategy: 'email_code',
-            safe_identifier: 'ccoe@example.com',
+            safeIdentifier: 'ccoe@example.com',
           },
           {
             strategy: 'phone_code',
-            safe_identifier: 'jdoe@example.com',
+            safeIdentifier: 'jdoe@example.com',
           },
         ],
       } as unknown as SignInResource;
@@ -45,7 +45,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
         ),
       ).toEqual({
         strategy: 'phone_code',
-        safe_identifier: 'jdoe@example.com',
+        safeIdentifier: 'jdoe@example.com',
       });
     });
 
@@ -55,11 +55,11 @@ describe('determineStrategy(signIn, displayConfig)', () => {
         supportedFirstFactors: [
           {
             strategy: 'phone_code',
-            safe_identifier: 'jdoe@example.com',
+            safeIdentifier: 'jdoe@example.com',
           },
           {
             strategy: 'email_code',
-            safe_identifier: 'ccoe@example.com',
+            safeIdentifier: 'ccoe@example.com',
           },
         ],
       } as unknown as SignInResource;
@@ -71,7 +71,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
         ),
       ).toEqual({
         strategy: 'email_code',
-        safe_identifier: 'ccoe@example.com',
+        safeIdentifier: 'ccoe@example.com',
       });
     });
 
@@ -81,7 +81,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
         supportedFirstFactors: [
           {
             strategy: 'phone_code',
-            safe_identifier: 'jdoe@example.com',
+            safeIdentifier: 'jdoe@example.com',
           },
         ],
       } as unknown as SignInResource;
@@ -93,7 +93,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
         ),
       ).toEqual({
         strategy: 'phone_code',
-        safe_identifier: 'jdoe@example.com',
+        safeIdentifier: 'jdoe@example.com',
       });
     });
 
@@ -122,11 +122,11 @@ describe('determineStrategy(signIn, displayConfig)', () => {
           },
           {
             strategy: 'email_code',
-            safe_identifier: 'ccoe@example.com',
+            safeIdentifier: 'ccoe@example.com',
           },
           {
             strategy: 'phone_code',
-            safe_identifier: 'jdoe@example.com',
+            safeIdentifier: 'jdoe@example.com',
           },
         ],
       } as unknown as SignInResource;
@@ -138,7 +138,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
         ),
       ).toEqual({
         strategy: 'phone_code',
-        safe_identifier: 'jdoe@example.com',
+        safeIdentifier: 'jdoe@example.com',
       });
     });
 
@@ -151,11 +151,11 @@ describe('determineStrategy(signIn, displayConfig)', () => {
           },
           {
             strategy: 'phone_code',
-            safe_identifier: 'jdoe@example.com',
+            safeIdentifier: 'jdoe@example.com',
           },
           {
             strategy: 'email_code',
-            safe_identifier: 'ccoe@example.com',
+            safeIdentifier: 'ccoe@example.com',
           },
         ],
       } as unknown as SignInResource;
@@ -167,7 +167,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
         ),
       ).toEqual({
         strategy: 'email_code',
-        safe_identifier: 'ccoe@example.com',
+        safeIdentifier: 'ccoe@example.com',
       });
     });
 
@@ -180,7 +180,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
           },
           {
             strategy: 'phone_code',
-            safe_identifier: 'jdoe@example.com',
+            safeIdentifier: 'jdoe@example.com',
           },
         ],
       } as unknown as SignInResource;
@@ -192,7 +192,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
         ),
       ).toEqual({
         strategy: 'phone_code',
-        safe_identifier: 'jdoe@example.com',
+        safeIdentifier: 'jdoe@example.com',
       });
     });
 
@@ -230,13 +230,13 @@ describe('determineStrategy(signIn, displayConfig)', () => {
     });
   });
 
-  fdescribe('determineSaluation(signIn)', () => {
+  describe('determineSalutation(signIn)', () => {
     it('returns firstname, then lastname or the identifier', () => {
       let signIn = {
         identifier: 'jdoe@example.com',
         userData: {
-          first_name: 'Joe',
-          last_name: 'Doe',
+          firstName: 'Joe',
+          lastName: 'Doe',
         },
       } as unknown as SignInResource;
       expect(determineSalutation(signIn)).toBe('Joe');
@@ -244,7 +244,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
       signIn = {
         identifier: 'jdoe@example.com',
         userData: {
-          last_name: 'Doe',
+          lastName: 'Doe',
         },
       } as unknown as SignInResource;
       expect(determineSalutation(signIn)).toBe('Doe');

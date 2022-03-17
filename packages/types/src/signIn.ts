@@ -16,7 +16,12 @@ import {
   Web3SignatureConfig,
   Web3SignatureFactor,
 } from './factors';
-import { EmailAddressIdentifier, PhoneNumberIdentifier, UsernameIdentifier, Web3WalletIdentifier } from './identifiers';
+import {
+  EmailAddressIdentifier,
+  PhoneNumberIdentifier,
+  UsernameIdentifier,
+  Web3WalletIdentifier,
+} from './identifiers';
 import {
   ClerkResourceJSON,
   SignInFirstFactorJSON,
@@ -35,7 +40,11 @@ import {
   TicketStrategy,
   Web3Strategy,
 } from './strategies';
-import { CreateMagicLinkFlowReturn, StartMagicLinkFlowParams, VerificationResource } from './verification';
+import {
+  CreateMagicLinkFlowReturn,
+  StartMagicLinkFlowParams,
+  VerificationResource,
+} from './verification';
 import { AuthenticateWithWeb3Params } from './web3Wallet';
 
 export interface SignInResource extends ClerkResource {
@@ -51,24 +60,43 @@ export interface SignInResource extends ClerkResource {
 
   create: (params: SignInCreateParams) => Promise<SignInResource>;
 
-  prepareFirstFactor: (params: PrepareFirstFactorParams) => Promise<SignInResource>;
+  prepareFirstFactor: (
+    params: PrepareFirstFactorParams,
+  ) => Promise<SignInResource>;
 
-  attemptFirstFactor: (params: AttemptFirstFactorParams) => Promise<SignInResource>;
+  attemptFirstFactor: (
+    params: AttemptFirstFactorParams,
+  ) => Promise<SignInResource>;
 
-  prepareSecondFactor: (params: PrepareSecondFactorParams) => Promise<SignInResource>;
+  prepareSecondFactor: (
+    params: PrepareSecondFactorParams,
+  ) => Promise<SignInResource>;
 
-  attemptSecondFactor: (params: AttemptSecondFactorParams) => Promise<SignInResource>;
+  attemptSecondFactor: (
+    params: AttemptSecondFactorParams,
+  ) => Promise<SignInResource>;
 
-  authenticateWithRedirect: (params: AuthenticateWithRedirectParams) => Promise<void>;
+  authenticateWithRedirect: (
+    params: AuthenticateWithRedirectParams,
+  ) => Promise<void>;
 
-  authenticateWithWeb3: (params: AuthenticateWithWeb3Params) => Promise<SignInResource>;
+  authenticateWithWeb3: (
+    params: AuthenticateWithWeb3Params,
+  ) => Promise<SignInResource>;
 
   authenticateWithMetamask: () => Promise<SignInResource>;
 
-  createMagicLinkFlow: () => CreateMagicLinkFlowReturn<SignInStartMagicLinkFlowParams, SignInResource>;
+  createMagicLinkFlow: () => CreateMagicLinkFlowReturn<
+    SignInStartMagicLinkFlowParams,
+    SignInResource
+  >;
 }
 
-export type SignInStatus = 'needs_identifier' | 'needs_first_factor' | 'needs_second_factor' | 'complete';
+export type SignInStatus =
+  | 'needs_identifier'
+  | 'needs_first_factor'
+  | 'needs_second_factor'
+  | 'complete';
 
 export type SignInIdentifier =
   | UsernameIdentifier
@@ -101,7 +129,11 @@ export type PrepareFirstFactorParams =
   | Web3SignatureConfig
   | OAuthConfig;
 
-export type AttemptFirstFactorParams = EmailCodeAttempt | PhoneCodeAttempt | PasswordAttempt | Web3Attempt;
+export type AttemptFirstFactorParams =
+  | EmailCodeAttempt
+  | PhoneCodeAttempt
+  | PasswordAttempt
+  | Web3Attempt;
 
 export type PrepareSecondFactorParams = PhoneCodeSecondFactorConfig;
 
@@ -134,9 +166,11 @@ export type SignInCreateParams = (
   | {
       identifier: string;
     }
+  | { transfer?: boolean }
 ) & { transfer?: boolean };
 
-export interface SignInStartMagicLinkFlowParams extends StartMagicLinkFlowParams {
+export interface SignInStartMagicLinkFlowParams
+  extends StartMagicLinkFlowParams {
   emailAddressId: string;
 }
 

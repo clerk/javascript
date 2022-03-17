@@ -10,11 +10,11 @@ import { OAuth } from './OAuth';
 export function getButtonLabel(factor: SignInFactor): string {
   switch (factor.strategy) {
     case 'email_link':
-      return `Send magic link to ${factor.safe_identifier}`;
+      return `Send magic link to ${factor.safeIdentifier}`;
     case 'email_code':
-      return `Email code to ${factor.safe_identifier}`;
+      return `Email code to ${factor.safeIdentifier}`;
     case 'phone_code':
-      return `Send code to ${factor.safe_identifier}`;
+      return `Send code to ${factor.safeIdentifier}`;
     case 'password':
       return 'Sign in with your password';
     default:

@@ -35,7 +35,7 @@ export function OTP({
       <Label className='cl-auth-form-message'>
         Enter the 6-digit code sent to
         <br />
-        <strong>{factor.safe_identifier}</strong>
+        <strong>{factor.safeIdentifier}</strong>
       </Label>
       <OneTimeCodeInput
         value={code.value}
