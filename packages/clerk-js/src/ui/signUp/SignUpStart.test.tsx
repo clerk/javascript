@@ -282,11 +282,27 @@ describe('<SignUpStart/>', () => {
     });
   });
 
-  describe('with invitation parameter', () => {
+  describe('with ticket parameter', () => {
     function runTokenTests(tokenType: string) {
       describe(`with ${tokenType}`, () => {
         beforeEach(() => {
           setWindowQueryParams([[tokenType, '123456']]);
+
+          mockUserSettings = new UserSettings({
+            attributes: {
+              email_address: {
+                enabled: true,
+                required: true,
+                used_for_first_factor: true,
+              },
+              phone_number: {
+                enabled: false,
+              },
+              password: {
+                required: false,
+              },
+            },
+          } as UserSettingsJSON);
         });
 
         it('it auto-completes sign up flow if sign up is complete after create', async () => {
@@ -303,6 +319,34 @@ describe('<SignUpStart/>', () => {
         });
 
         it('it does not auto-complete sign up flow if sign up if requirements are missing', async () => {
+          // Require extra fields, like username and password
+          mockUserSettings = new UserSettings({
+            attributes: {
+              email_address: {
+                enabled: true,
+                required: true,
+                used_for_first_factor: true,
+              },
+              phone_number: {
+                enabled: false,
+              },
+              username: {
+                enabled: true,
+                required: true,
+              },
+              first_name: {
+                enabled: true,
+              },
+              last_name: {
+                enabled: true,
+              },
+              password: {
+                enabled: true,
+                required: true,
+              },
+            },
+          } as UserSettingsJSON);
+
           mockCreateRequest.mockImplementation(() =>
             Promise.resolve({
               status: 'missing_requirements',
@@ -317,6 +361,7 @@ describe('<SignUpStart/>', () => {
           render(<SignUpStart />);
           await waitFor(() => {
             expect(mockSetSession).not.toHaveBeenCalled();
+            // Required and optional fields are rendered
             screen.getByText(/First name/);
             screen.getByText(/Last name/);
             screen.getByText(/Password/);
@@ -340,6 +385,51 @@ describe('<SignUpStart/>', () => {
           await waitFor(() => {
             const emailInput = screen.getByDisplayValue('jdoe@example.com');
             expect(emailInput).toBeDisabled();
+          });
+        });
+
+        it('allows the user to submit optional fields before signing up', async () => {
+          // First and last name are optional
+          mockUserSettings = new UserSettings({
+            attributes: {
+              email_address: {
+                enabled: true,
+                required: true,
+                used_for_first_factor: true,
+              },
+              first_name: {
+                enabled: true,
+              },
+              last_name: {
+                enabled: true,
+              },
+              phone_number: {
+                enabled: false,
+              },
+              password: {
+                required: false,
+              },
+            },
+          } as UserSettingsJSON);
+
+          mockCreateRequest.mockImplementation(() =>
+            Promise.resolve({
+              status: 'complete',
+              emailAddress: 'jdoe@example.com',
+            }),
+          );
+
+          render(<SignUpStart />);
+          await waitFor(() => {
+            expect(mockSetSession).not.toHaveBeenCalled();
+            screen.getByText(/First name/);
+            screen.getByText(/Last name/);
+          });
+
+          // Submit the form
+          userEvent.click(screen.getByRole('button', { name: 'Sign up' }));
+          await waitFor(() => {
+            expect(mockSetSession).toHaveBeenCalled();
           });
         });
 
