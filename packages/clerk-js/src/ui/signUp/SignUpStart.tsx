@@ -82,7 +82,7 @@ function _SignUpStart(): JSX.Element {
         void completeSignUpFlow(res);
       })
       .catch(err => {
-        /* Clear token values when an error occurs in the initial sign up attempt */
+        /* Clear ticket values when an error occurs in the initial sign up attempt */
         formFields.ticket.setValue('');
         handleError(err, [], setError);
       })
@@ -92,6 +92,9 @@ function _SignUpStart(): JSX.Element {
   };
 
   React.useLayoutEffect(() => {
+    if (Object.values(fields).filter(f => f === 'on').length) {
+      return;
+    }
     void handleTokenFlow();
   }, []);
 
