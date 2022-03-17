@@ -558,7 +558,7 @@ import { ClerkWithAuth } from '@clerk/clerk-sdk-node';
 app.use(ClerkWithAuth());
 ```
 
-The `ClerkWithAuth` middleware will set the Clerk session on the request object as `req.session` and then call the next middleware.
+The `ClerkWithAuth` middleware will set the Clerk session information on the request object as `req.auth` and then call the next middleware.
 
 You can then implement your own logic for handling a logged-in or logged-out user in your express endpoints or custom
 middleware, depending on whether your users are trying to access a public or protected resource.
@@ -641,12 +641,12 @@ with `withAuth`:
 import { withAuth, WithAuthProp } from '@clerk/clerk-sdk-node';
 ```
 
-Note: Since the request will be extended with a session property, the signature of your handler in TypeScript would be:
+Note: Since the request will be extended with the `auth` property, the signature of your handler in TypeScript would be:
 
 ```ts
 function handler(req: WithAuthProp<NextApiRequest>, res: NextApiResponse) {
-    if (req.session) {
-        // do something with session.userId
+    if (req.auth.sessionId) {
+        // do something with the auth object
     } else {
         // Respond with 401 or similar
     }
@@ -673,7 +673,7 @@ execution will never reach your handler:
 
 ```ts
 function handler(req: RequireAuthProp<NextApiRequest>, res: NextApiResponse) {
-    // do something with session.userId
+    // do something with the auth attributes
 }
 
 export requireAuth(handler, { clerk, onError });
@@ -733,7 +733,7 @@ app.use(ClerkExpressRequireAuth({ authorizedParties }));
 const authorizedParties = ['http://localhost:3000', 'https://example.com']
 
 function handler(req: RequireAuthProp<NextApiRequest>, res: NextApiResponse) {
-  // do something with session.userId
+  // do something with the auth attribute
 }
 
 export requireAuth(handler, { authorizedParties });

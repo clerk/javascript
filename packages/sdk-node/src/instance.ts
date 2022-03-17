@@ -2,14 +2,7 @@ import Clerk from './Clerk';
 
 export default Clerk;
 
-export {
-  WithSessionProp,
-  RequireSessionProp,
-  WithSessionClaimsProp,
-  RequireSessionClaimsProp,
-  WithAuthProp,
-  RequireAuthProp,
-} from './Clerk';
+export { WithAuthProp, RequireAuthProp } from './Clerk';
 
 export {
   HttpError,
