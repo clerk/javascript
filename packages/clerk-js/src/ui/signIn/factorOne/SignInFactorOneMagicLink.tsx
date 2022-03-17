@@ -28,7 +28,7 @@ export function SignInFactorOneMagicLink({
 }: SignInFactorOneMagicLinkProps): JSX.Element {
   const signIn = useCoreSignIn();
   const identifierRef = React.useRef(
-    ('safe_identifier' in currentFactor && currentFactor.safe_identifier) || '',
+    ('safeIdentifier' in currentFactor && currentFactor.safeIdentifier) || '',
   );
   const { setSession } = useCoreClerk();
   const { navigate } = useNavigate();

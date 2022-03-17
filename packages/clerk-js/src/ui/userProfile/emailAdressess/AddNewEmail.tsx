@@ -49,7 +49,7 @@ export function AddNewEmail(): JSX.Element {
   const createEmailAddress = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     return user
-      .createEmailAddress(emailValue.value)
+      .createEmailAddress({ email: emailValue.value })
       .then(res => {
         createdEmailRef.current = res;
         nextStep();

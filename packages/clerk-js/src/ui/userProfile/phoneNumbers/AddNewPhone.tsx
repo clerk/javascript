@@ -35,7 +35,7 @@ export const AddNewPhone = (): JSX.Element => {
           </>
         ),
       }}
-      onAdd={(value: string) => user.createPhoneNumber(value)}
+      onAdd={(value: string) => user.createPhoneNumber({ phoneNumber: value })}
     />
   );
 };

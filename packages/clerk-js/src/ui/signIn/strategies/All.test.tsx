@@ -50,18 +50,18 @@ describe('<All/>', () => {
     },
     {
       strategy: 'email_code',
-      safe_identifier: 'j***@e*****.com',
-      email_address_id: '123',
+      safeIdentifier: 'j***@e*****.com',
+      emailAddressId: '123',
     },
     {
       strategy: 'phone_code',
-      safe_identifier: '+1*********9',
-      phone_number_id: '456',
+      safeIdentifier: '+1*********9',
+      phoneNumberId: '456',
     },
     {
       strategy: 'email_link',
-      safe_identifier: '+1*********9',
-      email_address_id: '456',
+      safeIdentifier: '+1*********9',
+      emailAddressId: '456',
     },
   ];
 

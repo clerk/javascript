@@ -43,17 +43,17 @@ function factorsAreSame(
   }
 
   if (
-    'email_address_id' in prev &&
-    'email_address_id' in cur &&
-    prev.email_address_id !== cur.email_address_id
+    'emailAddressId' in prev &&
+    'emailAddressId' in cur &&
+    prev.emailAddressId !== cur.emailAddressId
   ) {
     return false;
   }
 
   if (
-    'phone_number_id' in prev &&
-    'phone_number_id' in cur &&
-    prev.phone_number_id !== cur.phone_number_id
+    'phoneNumberId' in prev &&
+    'phoneNumberId' in cur &&
+    prev.phoneNumberId !== cur.phoneNumberId
   ) {
     return false;
   }

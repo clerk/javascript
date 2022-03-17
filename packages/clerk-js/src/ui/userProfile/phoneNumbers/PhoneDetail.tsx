@@ -4,13 +4,20 @@ import { default as BinIcon } from '@clerk/shared/assets/icons/bin.svg';
 import { default as PhoneIcon } from '@clerk/shared/assets/icons/phone.svg';
 import { Button } from '@clerk/shared/components/button';
 import { List } from '@clerk/shared/components/list';
-import { OneTimeCodeInput, VerifyCodeHandler } from '@clerk/shared/components/oneTimeCodeInput';
+import {
+  OneTimeCodeInput,
+  VerifyCodeHandler,
+} from '@clerk/shared/components/oneTimeCodeInput';
 import { PhoneViewer } from '@clerk/shared/components/phoneInput';
 import { VerificationStatusTag } from '@clerk/shared/components/tag';
 import { TitledCard } from '@clerk/shared/components/titledCard';
 import { Toggle } from '@clerk/shared/components/toggle';
 import React from 'react';
-import { handleError, useFieldState, verificationErrorMessage } from 'ui/common';
+import {
+  handleError,
+  useFieldState,
+  verificationErrorMessage,
+} from 'ui/common';
 import { Error } from 'ui/common/error';
 import { useCoreUser } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
@@ -29,7 +36,9 @@ export const PhoneDetail = (): JSX.Element => {
   const currentCode = useFieldState('', '');
   const [error, setError] = React.useState<string | undefined>();
 
-  const phoneIdent = user.phoneNumbers.find(pi => pi.id === params.phone_number_id);
+  const phoneIdent = user.phoneNumbers.find(
+    pi => pi.id === params.phone_number_id,
+  );
 
   const verificationStatus = phoneIdent?.verification?.status || '';
   const isVerified = verificationStatus === 'verified';
@@ -79,7 +88,7 @@ export const PhoneDetail = (): JSX.Element => {
 
   const makeIdentPrimary = async () => {
     try {
-      await user.update({ primary_phone_number_id: phoneIdent?.id });
+      await user.update({ primaryPhoneNumberId: phoneIdent?.id });
       setIsPrimary(true);
     } catch (err) {
       handleError(err, [currentCode], setError);
@@ -120,7 +129,9 @@ export const PhoneDetail = (): JSX.Element => {
     <>
       <PageHeading
         title='Phone number'
-        subtitle={isVerified ? 'Manage this phone number' : 'Verify this phone number'}
+        subtitle={
+          isVerified ? 'Manage this phone number' : 'Verify this phone number'
+        }
         backTo='./../'
       />
       {showRemovalPage ? (
@@ -129,13 +140,24 @@ export const PhoneDetail = (): JSX.Element => {
         <TitledCard className='cl-themed-card cl-list-card'>
           <Error style={{ margin: '0 2em' }}>{error}</Error>
           <List>
-            <List.Item className='cl-list-item' hoverable={false} detail={false} lines>
+            <List.Item
+              className='cl-list-item'
+              hoverable={false}
+              detail={false}
+              lines
+            >
               <div>
                 <div className='cl-ident-detail'>
-                  <PhoneViewer phoneNumber={phoneIdent.phoneNumber} showFlag={true} />
+                  <PhoneViewer
+                    phoneNumber={phoneIdent.phoneNumber}
+                    showFlag={true}
+                  />
                   <div className='cl-tags'>
                     {isPrimary && <PrimaryTag />}
-                    <VerificationStatusTag className='cl-tag' status={verificationStatus} />
+                    <VerificationStatusTag
+                      className='cl-tag'
+                      status={verificationStatus}
+                    />
                   </div>
                 </div>
                 <div>{connections}</div>
@@ -143,13 +165,21 @@ export const PhoneDetail = (): JSX.Element => {
             </List.Item>
 
             {isVerified && (
-              <List.Item className='cl-list-item' hoverable={false} detail={false} lines>
+              <List.Item
+                className='cl-list-item'
+                hoverable={false}
+                detail={false}
+                lines
+              >
                 <div className='cl-primary-status-container'>
                   <div className='cl-description'>
                     <PhoneIcon />
                     <div className='cl-text'>
                       <div className='cl-title'>Primary phone</div>
-                      <div className='cl-subtitle'>This phone will receive communications regarding your account.</div>
+                      <div className='cl-subtitle'>
+                        This phone will receive communications regarding your
+                        account.
+                      </div>
                     </div>
                   </div>
                   <Toggle

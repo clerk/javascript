@@ -31,7 +31,7 @@ describe('<OTP/>', () => {
 
   const factor = {
     strategy: 'phone_code',
-    safe_identifier: 'jdoe@example.com',
+    safeIdentifier: 'jdoe@example.com',
   } as SignInFactor;
 
   it('renders the OTP form component', async () => {

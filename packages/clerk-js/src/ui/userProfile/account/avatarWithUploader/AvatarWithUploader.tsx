@@ -11,7 +11,7 @@ type Empty = unknown;
 export const AvatarWithUploader = (props: AvatarProps): JSX.Element => {
   const user = useCoreUser();
   const saveImage = (file: File): Promise<Empty> => {
-    return user.setProfileImage(file).catch(error => {
+    return user.setProfileImage({ file }).catch(error => {
       alert(error);
     });
   };
