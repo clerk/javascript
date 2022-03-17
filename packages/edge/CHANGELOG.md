@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.0](https://github.com/clerkinc/javascript/compare/@clerk/edge@0.3.9...@clerk/edge@0.4.0) (2022-03-17)
+
+
+### Features
+
+* **edge:** First version of new withAuth ([4ef853c](https://github.com/clerkinc/javascript/commit/4ef853c4d2837dfc4a49d3ab6f435e50cca28dc8))
+
+
+
 ### [0.3.9](https://github.com/clerkinc/javascript/compare/@clerk/edge@0.3.8...@clerk/edge@0.3.9) (2022-03-14)
 
 **Note:** Version bump only for package @clerk/edge
