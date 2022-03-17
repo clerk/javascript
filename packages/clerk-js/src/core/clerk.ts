@@ -30,6 +30,7 @@ import { ERROR_CODES } from 'ui/common/constants';
 import {
   appendAsQueryParams,
   CLERK_BEFORE_UNLOAD_EVENT,
+  hasExternalAccountSignUpError,
   ignoreEventValue,
   isAccountsHostedPages,
   isDevOrStagingUrl,
@@ -460,20 +461,22 @@ export default class Clerk implements ClerkInterface {
 
     const navigateToSignIn = makeNavigate(displayConfig.signInUrl);
 
+    const navigateToSignUp = makeNavigate(displayConfig.signUpUrl);
+
     const navigateToFactorTwo = makeNavigate(
       params.secondFactorUrl || displayConfig.signInUrl + '#/factor-two',
     );
 
     const navigateAfterSignIn = makeNavigate(
       params.afterSignInUrl ||
-        params.redirectUrl ||
-        displayConfig.afterSignInUrl,
+      params.redirectUrl ||
+      displayConfig.afterSignInUrl,
     );
 
     const navigateAfterSignUp = makeNavigate(
       params.afterSignUpUrl ||
-        params.redirectUrl ||
-        displayConfig.afterSignUpUrl,
+      params.redirectUrl ||
+      displayConfig.afterSignUpUrl,
     );
 
     const userExistsButNeedsToSignIn =
@@ -527,6 +530,10 @@ export default class Clerk implements ClerkInterface {
       if (sessionId) {
         return this.setSession(sessionId, navigateAfterSignIn);
       }
+    }
+
+    if (hasExternalAccountSignUpError(signUp)) {
+      return navigateToSignUp();
     }
 
     return navigateToSignIn();

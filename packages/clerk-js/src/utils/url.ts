@@ -1,5 +1,6 @@
 import { camelToSnake, isIPV4Address } from '@clerk/shared/utils/string';
 import { loadScript } from 'utils';
+import { SignUpResource } from '../../../types/dist';
 
 declare global {
   export interface Window {
@@ -196,3 +197,8 @@ export const appendAsQueryParams = (
   }
   return base + (params.toString() ? '#/?' + params.toString() : '');
 };
+
+export const hasExternalAccountSignUpError = (signUp: SignUpResource): boolean => {
+  const { externalAccount } = signUp.verifications
+  return !!externalAccount.error;
+}
