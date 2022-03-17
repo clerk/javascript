@@ -183,9 +183,9 @@ export default class Clerk extends ClerkBackendAPI {
     const key = await this._jwksClient.getSigningKey(decoded.header.kid);
     const verified = jwt.verify(token, key.getPublicKey(), {
       algorithms: ['RS256'],
-    });
+    }) as JWTPayload;
 
-    if (typeof verified === 'string' || !verified.iss) {
+    if (typeof verified === 'string') {
       throw new Error('Malformed token');
     }
 
@@ -194,7 +194,7 @@ export default class Clerk extends ClerkBackendAPI {
     }
 
     if (verified.azp && authorizedParties && authorizedParties.length > 0) {
-      if (!authorizedParties.includes(verified.azp as string)) {
+      if (!authorizedParties.includes(verified.azp)) {
         throw new Error(`Authorized party is invalid: ${verified.azp}`);
       }
     }
