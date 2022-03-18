@@ -142,8 +142,8 @@ describe('<SignInFactorOne/>', () => {
         supportedFirstFactors: [
           {
             strategy: 'password',
-            safe_identifier: 'jdoe@example.com',
-            email_address_id: 'deadbeef',
+            safeIdentifier: 'jdoe@example.com',
+            emailAddressId: 'deadbeef',
           } as SignInFactor,
         ],
         attemptFirstFactor: mockAttemptFirstFactor.mockReturnValue({
@@ -201,8 +201,8 @@ describe('<SignInFactorOne/>', () => {
             supportedFirstFactors: [
               {
                 strategy: 'email_code',
-                safe_identifier: 'jdoe@example.com',
-                email_address_id: 'deadbeef',
+                safeIdentifier: 'jdoe@example.com',
+                emailAddressId: 'deadbeef',
               } as SignInFactor,
             ],
             attemptFirstFactor: mockAttemptFirstFactor.mockReturnValue({
@@ -228,8 +228,8 @@ describe('<SignInFactorOne/>', () => {
       expect(mockPrepareFirstFactor).toHaveBeenCalledTimes(1);
       expect(mockPrepareFirstFactor).toHaveBeenCalledWith({
         strategy: 'email_code',
-        safe_identifier: 'jdoe@example.com',
-        email_address_id: 'deadbeef',
+        safeIdentifier: 'jdoe@example.com',
+        emailAddressId: 'deadbeef',
       } as SignInFactor);
 
       const text = '123456';
@@ -288,8 +288,8 @@ describe('<SignInFactorOne/>', () => {
             supportedFirstFactors: [
               {
                 strategy: 'email_link',
-                safe_identifier: 'jdoe@example.com',
-                email_address_id: 'deadbeef',
+                safeIdentifier: 'jdoe@example.com',
+                emailAddressId: 'deadbeef',
               } as SignInFactor,
             ],
             firstFactorVerification: {
@@ -351,8 +351,8 @@ describe('<SignInFactorOne/>', () => {
             supportedFirstFactors: [
               {
                 strategy: 'email_link',
-                safe_identifier: 'jdoe@example.com',
-                email_address_id: 'deadbeef',
+                safeIdentifier: 'jdoe@example.com',
+                emailAddressId: 'deadbeef',
               } as SignInFactor,
             ],
             firstFactorVerification: {
@@ -397,13 +397,13 @@ describe('<SignInFactorOne/>', () => {
             supportedFirstFactors: [
               {
                 strategy: 'email_link',
-                safe_identifier: 'jdoe@example.com',
-                email_address_id: 'deadbeef',
+                safeIdentifier: 'jdoe@example.com',
+                emailAddressId: 'deadbeef',
               } as SignInFactor,
               {
                 strategy: 'email_code',
-                safe_identifier: 'jdoe@example.com',
-                email_address_id: 'deadbeef',
+                safeIdentifier: 'jdoe@example.com',
+                emailAddressId: 'deadbeef',
               } as SignInFactor,
             ],
             firstFactorVerification: {
@@ -448,8 +448,8 @@ describe('<SignInFactorOne/>', () => {
             supportedFirstFactors: [
               {
                 strategy: 'phone_code',
-                safe_identifier: '+1********9',
-                phone_number_id: 'deadbeef',
+                safeIdentifier: '+1********9',
+                phoneNumberId: 'deadbeef',
               } as SignInFactor,
             ],
             attemptFirstFactor: mockAttemptFirstFactor.mockReturnValue({
@@ -475,8 +475,8 @@ describe('<SignInFactorOne/>', () => {
       expect(mockPrepareFirstFactor).toHaveBeenCalledTimes(1);
       expect(mockPrepareFirstFactor).toHaveBeenCalledWith({
         strategy: 'phone_code',
-        safe_identifier: '+1********9',
-        phone_number_id: 'deadbeef',
+        safeIdentifier: '+1********9',
+        phoneNumberId: 'deadbeef',
       } as SignInFactor);
 
       const text = '123456';
@@ -525,13 +525,13 @@ describe('<SignInFactorOne/>', () => {
             supportedFirstFactors: [
               {
                 strategy: 'email_code',
-                safe_identifier: 'ccoe@example.com',
-                email_address_id: 'deadbeef',
+                safeIdentifier: 'ccoe@example.com',
+                emailAddressId: 'deadbeef',
               } as SignInFactor,
               {
                 strategy: 'email_code',
-                safe_identifier: 'jdoe@example.com',
-                email_address_id: 'cafebabe',
+                safeIdentifier: 'jdoe@example.com',
+                emailAddressId: 'cafebabe',
               } as SignInFactor,
             ],
             attemptFirstFactor: mockAttemptFirstFactor.mockReturnValue({
@@ -562,13 +562,13 @@ describe('<SignInFactorOne/>', () => {
       await waitFor(() => {
         expect(mockPrepareFirstFactor).toHaveBeenNthCalledWith(1, {
           strategy: 'email_code',
-          safe_identifier: 'ccoe@example.com',
-          email_address_id: 'deadbeef',
+          safeIdentifier: 'ccoe@example.com',
+          emailAddressId: 'deadbeef',
         } as SignInFactor);
         expect(mockPrepareFirstFactor).toHaveBeenNthCalledWith(2, {
           strategy: 'email_code',
-          safe_identifier: 'jdoe@example.com',
-          email_address_id: 'cafebabe',
+          safeIdentifier: 'jdoe@example.com',
+          emailAddressId: 'cafebabe',
         } as SignInFactor);
       });
     });
@@ -593,8 +593,8 @@ describe('<SignInFactorOne/>', () => {
             supportedFirstFactors: [
               {
                 strategy: 'email_code',
-                safe_identifier: 'ccoe@example.com',
-                email_address_id: 'deadbeef',
+                safeIdentifier: 'ccoe@example.com',
+                emailAddressId: 'deadbeef',
               } as SignInFactor,
             ],
             attemptFirstFactor: mockAttemptFirstFactor.mockReturnValue({
@@ -635,13 +635,13 @@ describe('<SignInFactorOne/>', () => {
             supportedFirstFactors: [
               {
                 strategy: 'email_link',
-                safe_identifier: 'jdoe@example.com',
-                email_address_id: 'deadbeef',
+                safeIdentifier: 'jdoe@example.com',
+                emailAddressId: 'deadbeef',
               } as SignInFactor,
               {
                 strategy: 'email_code',
-                safe_identifier: 'jdoe@example.com',
-                email_address_id: 'deadbeef',
+                safeIdentifier: 'jdoe@example.com',
+                emailAddressId: 'deadbeef',
               } as SignInFactor,
             ],
             firstFactorVerification: {

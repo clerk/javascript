@@ -1,11 +1,11 @@
 import { VerifyCodeHandler } from '@clerk/shared/components/oneTimeCodeInput';
 import {
-  AttemptFactorParams,
+  AttemptFirstFactorParams,
   EmailCodeFactor,
   PasswordFactor,
   PhoneCodeFactor,
   SignInFactor,
-  SignInStrategyName,
+  SignInStrategy,
 } from '@clerk/types';
 import React from 'react';
 import { handleError, useFieldState } from 'ui/common';
@@ -20,7 +20,7 @@ import { determineSalutation } from './../utils';
 
 // TODO: https://www.notion.so/clerkdev/c8719edf0d5041e0b4d263a7ee574b7c
 const factorNeedsPrepare = (factor: SignInFactor) => {
-  const strategiesRequiringPrepare: SignInStrategyName[] = [
+  const strategiesRequiringPrepare: SignInStrategy[] = [
     'email_code',
     'phone_code',
     'email_link',
@@ -43,17 +43,17 @@ function factorsAreSame(
   }
 
   if (
-    'email_address_id' in prev &&
-    'email_address_id' in cur &&
-    prev.email_address_id !== cur.email_address_id
+    'emailAddressId' in prev &&
+    'emailAddressId' in cur &&
+    prev.emailAddressId !== cur.emailAddressId
   ) {
     return false;
   }
 
   if (
-    'phone_number_id' in prev &&
-    'phone_number_id' in cur &&
-    prev.phone_number_id !== cur.phone_number_id
+    'phoneNumberId' in prev &&
+    'phoneNumberId' in cur &&
+    prev.phoneNumberId !== cur.phoneNumberId
   ) {
     return false;
   }
@@ -121,7 +121,7 @@ export function SignInFactorOneInputBased({
 
     const { strategy } = currentFactor;
 
-    let params: AttemptFactorParams;
+    let params: AttemptFirstFactorParams;
     if (strategy === 'password') {
       params = {
         strategy,

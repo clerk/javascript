@@ -3,6 +3,43 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.0-alpha.10](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@2.12.3...@clerk/clerk-react@3.0.0-alpha.10) (2022-03-11)
+
+
+### Features
+
+* **clerk-react:** Add isLoaded to `useOrganizations` hook ([#92](https://github.com/clerkinc/javascript/issues/92)) ([a316c7a](https://github.com/clerkinc/javascript/commit/a316c7a9d66f356639038ce89b5853625e44d4b7))
+* **clerk-remix:** Mark clerk-remix as side-effect free to fix Remix bundling ([c57a902](https://github.com/clerkinc/javascript/commit/c57a9024674a61aa3f2b7e359935e42fc034ffdd))
+
+
+
+## [3.0.0-alpha.9](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@2.11.4...@clerk/clerk-react@3.0.0-alpha.9) (2022-02-28)
+
+
+### Features
+
+* **clerk-remix:** Mark clerk-remix as side-effect free to fix Remix bundling ([c57a902](https://github.com/clerkinc/javascript/commit/c57a9024674a61aa3f2b7e359935e42fc034ffdd))
+
+
+
+## [3.0.0-alpha.8](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@2.11.4...@clerk/clerk-react@3.0.0-alpha.8) (2022-02-25)
+
+
+### Features
+
+* **clerk-remix:** Mark clerk-remix as side-effect free to fix Remix bundling ([287a438](https://github.com/clerkinc/javascript/commit/287a4381d7ebefdf8704e2e29a75ac93f57794c8))
+
+
+
+## [3.0.0-alpha.7](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@2.11.1...@clerk/clerk-react@3.0.0-alpha.7) (2022-02-18)
+
+
+### Features
+
+* **clerk-remix:** Mark clerk-remix as side-effect free to fix Remix bundling ([0d22857](https://github.com/clerkinc/javascript/commit/0d22857197e5d1d2edc4d4df55916009f404dbdd))
+
+
+
 ### [2.12.6](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@2.12.6-staging.1...@clerk/clerk-react@2.12.6) (2022-03-17)
 
 **Note:** Version bump only for package @clerk/clerk-react

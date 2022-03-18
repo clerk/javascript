@@ -66,7 +66,7 @@ export const PhoneDetail = (): JSX.Element => {
   };
 
   const onPhoneNumberRemove = () => {
-    return phoneIdent!.destroy();
+    return phoneIdent.destroy();
   };
 
   const sendVerificationCode = async () => {
@@ -79,7 +79,7 @@ export const PhoneDetail = (): JSX.Element => {
 
   const verifyCode: VerifyCodeHandler = async (verify, reject) => {
     try {
-      await phoneIdent?.attemptVerification(currentCode.value);
+      await phoneIdent?.attemptVerification({ code: currentCode.value });
       verify(() => currentCode.setValue(''));
     } catch (err) {
       reject(verificationErrorMessage(err));
@@ -88,7 +88,7 @@ export const PhoneDetail = (): JSX.Element => {
 
   const makeIdentPrimary = async () => {
     try {
-      await user.update({ primary_phone_number_id: phoneIdent?.id });
+      await user.update({ primaryPhoneNumberId: phoneIdent?.id });
       setIsPrimary(true);
     } catch (err) {
       handleError(err, [currentCode], setError);

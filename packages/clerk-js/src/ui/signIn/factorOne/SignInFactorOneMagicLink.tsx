@@ -1,4 +1,4 @@
-import { SignInFactor, SignInResource } from '@clerk/types';
+import { EmailLinkFactor, SignInFactor, SignInResource } from '@clerk/types';
 import React from 'react';
 import {
   buildMagicLinkRedirectUrl,
@@ -28,7 +28,7 @@ export function SignInFactorOneMagicLink({
 }: SignInFactorOneMagicLinkProps): JSX.Element {
   const signIn = useCoreSignIn();
   const identifierRef = React.useRef(
-    ('safe_identifier' in currentFactor && currentFactor.safe_identifier) || '',
+    ('safeIdentifier' in currentFactor && currentFactor.safeIdentifier) || '',
   );
   const { setSession } = useCoreClerk();
   const { navigate } = useNavigate();
@@ -53,7 +53,7 @@ export function SignInFactorOneMagicLink({
     try {
       hideExpirationScreen();
       const si = await startMagicLinkFlow({
-        emailAddressId: (currentFactor as any).email_address_id,
+        emailAddressId: (currentFactor as EmailLinkFactor).emailAddressId,
         redirectUrl: buildMagicLinkRedirectUrl(
           signInContext,
           displayConfig.signInUrl,

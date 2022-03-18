@@ -2,16 +2,17 @@ import { OAuthProvider } from './oauth';
 
 export interface ExternalAccountResource {
   id: string;
+  identificationId: string;
   provider: OAuthProvider;
-  externalId: string;
+  providerUserId: string;
   emailAddress: string;
   approvedScopes: string;
   firstName: string;
   lastName: string;
-  picture: string;
+  avatarUrl: string;
   username?: string;
   publicMetadata: Record<string, unknown>;
   label?: string;
-
+  providerSlug: () => OAuthProvider;
   providerTitle: () => string;
 }

@@ -1,32 +1,45 @@
 import {
   CreateOrganizationParams,
+  LoadedClerk,
   OrganizationMembershipResource,
   OrganizationResource,
 } from '@clerk/types';
-import { useContext } from 'react';
 
-import { useClerk } from '../contexts';
-import { assertWrappedByClerkProvider } from '../contexts/assertHelpers';
-import { StructureContext } from '../contexts/StructureContext';
+import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 
-type UseOrganizations = {
-  createOrganization: (
-    params: CreateOrganizationParams,
-  ) => Promise<OrganizationResource>;
-  getOrganizationMemberships: () => Promise<OrganizationMembershipResource[]>;
-  getOrganization: (
-    organizationId: string,
-  ) => Promise<OrganizationResource | undefined>;
-};
+type UseOrganizationsReturn =
+  | {
+      isLoaded: false;
+      createOrganization: undefined;
+      getOrganizationMemberships: undefined;
+      getOrganization: undefined;
+    }
+  | {
+      isLoaded: true;
+      createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource>;
+      getOrganizationMemberships: () => Promise<OrganizationMembershipResource[]>;
+      getOrganization: (organizationId: string) => Promise<OrganizationResource | undefined>;
+    };
 
-export function useOrganizations(): UseOrganizations {
-  const structureCtx = useContext(StructureContext);
-  assertWrappedByClerkProvider(structureCtx);
-  const clerk = useClerk();
+type UseOrganizations = () => UseOrganizationsReturn;
 
+export const useOrganizations: UseOrganizations = () => {
+  const isomorphicClerk = useIsomorphicClerkContext();
+
+  if (!isomorphicClerk.loaded) {
+    return {
+      isLoaded: false,
+      createOrganization: undefined,
+      getOrganizationMemberships: undefined,
+      getOrganization: undefined,
+    };
+  }
+
+  const clerk = isomorphicClerk as unknown as LoadedClerk;
   return {
+    isLoaded: true,
     createOrganization: clerk.createOrganization,
     getOrganizationMemberships: clerk.getOrganizationMemberships,
     getOrganization: clerk.getOrganization,
   };
-}
+};

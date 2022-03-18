@@ -66,7 +66,7 @@ export function ProfileCard(): JSX.Element {
               <div key={externalAccount.id}>
                 <img
                   alt={externalAccount.providerTitle()}
-                  src={svgUrl(externalAccount.provider)}
+                  src={svgUrl(externalAccount.providerSlug())}
                   className='cl-left-icon-wrapper'
                 />
                 {externalAccount.emailAddress}

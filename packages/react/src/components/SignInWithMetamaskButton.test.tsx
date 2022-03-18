@@ -17,11 +17,10 @@ const mockClerk = {
   authenticateWithMetamask: mockAuthenticatewithMetamask,
 } as any;
 
-jest.mock('../contexts', () => {
+jest.mock('./withClerk', () => {
   return {
-    withClerk: (Component: any) => (props: any) => (
-      <Component {...props} clerk={mockClerk} />
-    ),
+    withClerk: (Component: any) => (props: any) =>
+      <Component {...props} clerk={mockClerk} />,
   };
 });
 

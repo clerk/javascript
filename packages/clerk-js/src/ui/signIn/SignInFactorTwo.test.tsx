@@ -1,5 +1,4 @@
 import {
-  act,
   render,
   renderJSON,
   screen,
@@ -49,7 +48,7 @@ jest.mock('ui/contexts', () => {
       supportedSecondFactors: [
         {
           strategy: 'phone_code',
-          safe_identifier: '+1********9',
+          safeIdentifier: '+1********9',
         },
       ],
       secondFactorVerification: {

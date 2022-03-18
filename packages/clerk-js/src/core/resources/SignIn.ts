@@ -1,16 +1,18 @@
-import { camelToSnakeKeys } from '@clerk/shared/utils/object';
+import { deepCamelToSnake, deepSnakeToCamel } from '@clerk/shared/utils/object';
 import { Poller } from '@clerk/shared/utils/poller';
 import type {
-  AttemptFactorParams,
+  AttemptFirstFactorParams,
+  AttemptSecondFactorParams,
   AuthenticateWithRedirectParams,
   CreateMagicLinkFlowReturn,
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
-  SignInFactor,
+  SignInCreateParams,
+  SignInFirstFactor,
   SignInIdentifier,
   SignInJSON,
-  SignInParams,
   SignInResource,
+  SignInSecondFactor,
   SignInStartMagicLinkFlowParams,
   SignInStatus,
   UserData,
@@ -23,12 +25,7 @@ import {
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from 'core/errors';
-import {
-  GenerateSignatureParams,
-  generateSignatureWithMetamask,
-  getMetamaskIdentifier,
-  windowNavigate,
-} from 'utils';
+import { GenerateSignatureParams, generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from 'utils';
 
 import { STRATEGY_WEB3_METAMASK_SIGNATURE } from '../constants';
 import { BaseResource, Verification } from './internal';
@@ -39,11 +36,11 @@ export class SignIn extends BaseResource implements SignInResource {
   id?: string;
   status: SignInStatus | null = null;
   supportedIdentifiers: SignInIdentifier[] = [];
-  identifier: string | null = null;
-  supportedFirstFactors: SignInFactor[] = [];
-  supportedSecondFactors: SignInFactor[] = [];
+  supportedFirstFactors: SignInFirstFactor[] = [];
+  supportedSecondFactors: SignInSecondFactor[] = [];
   firstFactorVerification: VerificationResource = new Verification(null);
   secondFactorVerification: VerificationResource = new Verification(null);
+  identifier: string | null = null;
   createdSessionId: string | null = null;
   userData: UserData = {};
 
@@ -52,17 +49,15 @@ export class SignIn extends BaseResource implements SignInResource {
     this.fromJSON(data);
   }
 
-  create = (params: SignInParams): Promise<this> => {
+  create = (params: SignInCreateParams): Promise<this> => {
     return this._basePost({
       path: this.pathRoot,
-      body: camelToSnakeKeys(params),
+      body: deepCamelToSnake(params),
     });
   };
 
-  prepareFirstFactor = (
-    factor: PrepareFirstFactorParams,
-  ): Promise<SignInResource> => {
-    factor = camelToSnakeKeys(factor);
+  prepareFirstFactor = (factor: PrepareFirstFactorParams): Promise<SignInResource> => {
+    factor = deepCamelToSnake(factor);
     let params: {
       strategy: string;
       email_address_id?: string;
@@ -75,18 +70,18 @@ export class SignIn extends BaseResource implements SignInResource {
       case 'email_link':
         params = {
           ...params,
-          email_address_id: factor.email_address_id,
-          redirect_url: factor.redirect_url,
+          email_address_id: factor.emailAddressId,
+          redirect_url: factor.redirectUrl,
         };
         break;
       case 'email_code':
-        params = { ...params, email_address_id: factor.email_address_id };
+        params = { ...params, email_address_id: factor.emailAddressId };
         break;
       case 'phone_code':
-        params = { ...params, phone_number_id: factor.phone_number_id };
+        params = { ...params, phone_number_id: factor.phoneNumberId };
         break;
       case STRATEGY_WEB3_METAMASK_SIGNATURE:
-        params = { ...params, web3_wallet_id: factor.web3_wallet_id };
+        params = { ...params, web3_wallet_id: factor.web3WalletId };
         break;
       default:
         clerkInvalidStrategy('SignIn.prepareFirstFactor', factor.strategy);
@@ -98,36 +93,28 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
-  attemptFirstFactor = (
-    params: AttemptFactorParams,
-  ): Promise<SignInResource> => {
-    params = camelToSnakeKeys(params);
+  attemptFirstFactor = (params: AttemptFirstFactorParams): Promise<SignInResource> => {
+    params = deepCamelToSnake(params);
     return this._basePost({
       body: params,
       action: 'attempt_first_factor',
     });
   };
 
-  createMagicLinkFlow = (): CreateMagicLinkFlowReturn<
-    SignInStartMagicLinkFlowParams,
-    SignInResource
-  > => {
+  createMagicLinkFlow = (): CreateMagicLinkFlowReturn<SignInStartMagicLinkFlowParams, SignInResource> => {
     const { run, stop } = Poller();
 
     const startMagicLinkFlow = async ({
       emailAddressId,
       redirectUrl,
-      // DX: Deprecated v2.4.4
-      callbackUrl,
     }: SignInStartMagicLinkFlowParams): Promise<SignInResource> => {
       if (!this.id) {
         clerkVerifyEmailAddressCalledBeforeCreate('SignIn');
       }
       await this.prepareFirstFactor({
         strategy: 'email_link',
-        email_address_id: emailAddressId,
-        // DX: Deprecated eventually require redirectUrl
-        redirect_url: String(redirectUrl || callbackUrl),
+        emailAddressId: emailAddressId,
+        redirectUrl: redirectUrl,
       });
       return new Promise((resolve, reject) => {
         void run(() => {
@@ -150,20 +137,16 @@ export class SignIn extends BaseResource implements SignInResource {
     return { startMagicLinkFlow, cancelMagicLinkFlow: stop };
   };
 
-  prepareSecondFactor = (
-    params: PrepareSecondFactorParams,
-  ): Promise<SignInResource> => {
-    params = camelToSnakeKeys(params);
+  prepareSecondFactor = (params: PrepareSecondFactorParams): Promise<SignInResource> => {
+    params = deepCamelToSnake(params);
     return this._basePost({
       body: params,
       action: 'prepare_second_factor',
     });
   };
 
-  attemptSecondFactor = (
-    params: AttemptFactorParams,
-  ): Promise<SignInResource> => {
-    params = camelToSnakeKeys(params);
+  attemptSecondFactor = (params: AttemptSecondFactorParams): Promise<SignInResource> => {
+    params = deepCamelToSnake(params);
     return this._basePost({
       body: params,
       action: 'attempt_second_factor',
@@ -174,15 +157,11 @@ export class SignIn extends BaseResource implements SignInResource {
     strategy,
     redirectUrl,
     redirectUrlComplete,
-    // DX: Deprecated v2.4.4
-    callbackUrl,
-    // DX: Deprecated v2.4.4
-    callbackUrlComplete,
   }: AuthenticateWithRedirectParams): Promise<void> => {
     const { firstFactorVerification } = await this.create({
       strategy,
-      redirect_url: redirectUrl || callbackUrl,
-      action_complete_redirect_url: redirectUrlComplete || callbackUrlComplete,
+      redirectUrl: redirectUrl,
+      actionCompleteRedirectUrl: redirectUrlComplete,
     });
     const { status, externalVerificationRedirectURL } = firstFactorVerification;
 
@@ -232,7 +211,6 @@ export class SignIn extends BaseResource implements SignInResource {
 
   public authenticateWithMetamask = async (): Promise<SignInResource> => {
     const identifier = await getMetamaskIdentifier();
-
     return this.authenticateWithWeb3({
       identifier,
       generateSignature: generateSignatureWithMetamask,
@@ -245,16 +223,12 @@ export class SignIn extends BaseResource implements SignInResource {
       this.status = data.status;
       this.supportedIdentifiers = data.supported_identifiers;
       this.identifier = data.identifier;
-      this.supportedFirstFactors = data.supported_first_factors;
-      this.supportedSecondFactors = data.supported_second_factors;
-      this.firstFactorVerification = new Verification(
-        data.first_factor_verification,
-      );
-      this.secondFactorVerification = new Verification(
-        data.second_factor_verification,
-      );
+      this.supportedFirstFactors = deepSnakeToCamel(data.supported_first_factors) as SignInFirstFactor[];
+      this.supportedSecondFactors = deepSnakeToCamel(data.supported_second_factors) as SignInSecondFactor[];
+      this.firstFactorVerification = new Verification(data.first_factor_verification);
+      this.secondFactorVerification = new Verification(data.second_factor_verification);
       this.createdSessionId = data.created_session_id;
-      this.userData = data.user_data;
+      this.userData = deepSnakeToCamel(data.user_data) as UserData;
     }
     return this;
   }

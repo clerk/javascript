@@ -49,7 +49,7 @@ describe('Clerk singleton', () => {
     global.window.location = location;
   });
 
-  beforeEach(async () => {
+  beforeEach(() => {
     const mockAddEventListener = (type: string, callback: (e: any) => void) => {
       if (type === 'message') {
         callback({
@@ -93,13 +93,17 @@ describe('Clerk singleton', () => {
     });
 
     it('redirects to signInUrl', () => {
-      sut.redirectToSignIn();
-      expect(mockNavigate).toHaveBeenCalledWith('/signInUrl');
+      sut.redirectToSignIn({ redirectUrl: 'https://www.example.com/' });
+      expect(mockNavigate).toHaveBeenCalledWith(
+        '/signInUrl#/?redirect_url=https%3A%2F%2Fwww.example.com%2F',
+      );
     });
 
     it('redirects to signUpUrl', () => {
-      sut.redirectToSignUp();
-      expect(mockNavigate).toHaveBeenCalledWith('/signUpUrl');
+      sut.redirectToSignUp({ redirectUrl: 'https://www.example.com/' });
+      expect(mockNavigate).toHaveBeenCalledWith(
+        '/signUpUrl#/?redirect_url=https%3A%2F%2Fwww.example.com%2F',
+      );
     });
 
     it('redirects to userProfileUrl', () => {
@@ -136,6 +140,109 @@ describe('Clerk singleton', () => {
       await waitFor(() => {
         expect(sut.session).not.toBe(undefined);
         expect(sut.session).toBe(null);
+      });
+    });
+  });
+
+  describe('.signOut()', () => {
+    const mockClientDestroy = jest.fn();
+    const mockSession1 = { id: '1', remove: jest.fn(), status: 'active' };
+    const mockSession2 = { id: '2', remove: jest.fn(), status: 'active' };
+
+    beforeEach(() => {
+      mockClientDestroy.mockReset();
+      mockSession1.remove.mockReset();
+      mockSession2.remove.mockReset();
+    });
+
+    it('has no effect if called when no active sessions exist', async () => {
+      const sut = new Clerk(frontendApi);
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [],
+          destroy: mockClientDestroy,
+        }),
+      );
+      await sut.load();
+      await sut.signOut();
+      await waitFor(() => {
+        expect(mockClientDestroy).not.toHaveBeenCalled();
+        expect(mockSession1.remove).not.toHaveBeenCalled();
+      });
+    });
+
+    it('signs out all sessions if no sessionId is passed and multiple sessions are active', async () => {
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [mockSession1, mockSession2],
+          destroy: mockClientDestroy,
+        }),
+      );
+
+      const sut = new Clerk(frontendApi);
+      sut.setSession = jest.fn();
+      await sut.load();
+      await sut.signOut();
+      await waitFor(() => {
+        expect(mockClientDestroy).toHaveBeenCalled();
+        expect(sut.setSession).toHaveBeenCalledWith(null, undefined);
+      });
+    });
+
+    it('signs out all sessions if no sessionId is passed and only one session is active', async () => {
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [mockSession1],
+          destroy: mockClientDestroy,
+        }),
+      );
+
+      const sut = new Clerk(frontendApi);
+      sut.setSession = jest.fn();
+      await sut.load();
+      await sut.signOut();
+      await waitFor(() => {
+        expect(mockClientDestroy).toHaveBeenCalled();
+        expect(mockSession1.remove).not.toHaveBeenCalled();
+        expect(sut.setSession).toHaveBeenCalledWith(null, undefined);
+      });
+    });
+
+    it('only removes the session that corresponds to the passed sessionId if it is not the current', async () => {
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [mockSession1, mockSession2],
+          destroy: mockClientDestroy,
+        }),
+      );
+
+      const sut = new Clerk(frontendApi);
+      sut.setSession = jest.fn();
+      await sut.load();
+      await sut.signOut({ sessionId: '2' });
+      await waitFor(() => {
+        expect(mockSession2.remove).toHaveBeenCalled();
+        expect(mockClientDestroy).not.toHaveBeenCalled();
+        expect(sut.setSession).not.toHaveBeenCalledWith(null, undefined);
+      });
+    });
+
+    it('removes and signs out the session that corresponds to the passed sessionId if it is the current', async () => {
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [mockSession1, mockSession2],
+          destroy: mockClientDestroy,
+        }),
+      );
+
+      const sut = new Clerk(frontendApi);
+      sut.setSession = jest.fn();
+      await sut.load();
+      await sut.signOut({ sessionId: '1' });
+      await waitFor(() => {
+        expect(mockSession1.remove).toHaveBeenCalled();
+        expect(mockClientDestroy).not.toHaveBeenCalled();
+        expect(sut.setSession).toHaveBeenCalledWith(null, undefined);
       });
     });
   });
@@ -191,7 +298,7 @@ describe('Clerk singleton', () => {
   });
 
   describe('.handleRedirectCallback()', () => {
-    beforeEach(async () => {
+    beforeEach(() => {
       mockClientFetch.mockReset();
       mockEnvironmentFetch.mockReset();
     });

@@ -44,7 +44,6 @@ jest.mock('ui/contexts', () => {
         } as any as EnvironmentResource),
     ),
     useCoreSignIn: jest.fn(() => ({
-      allowedFactorOneStrategies: ['password'],
       create: mockCreateRequest,
       attemptFirstFactor: mockFactorOneAttempt.mockReturnValueOnce({
         status: 'complete',

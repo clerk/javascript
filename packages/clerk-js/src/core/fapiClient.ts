@@ -1,4 +1,5 @@
 import type { Clerk, ClerkAPIErrorJSON, ClientJSON } from '@clerk/types';
+import { camelToSnake } from '@clerk/shared/utils';
 import qs from 'qs';
 import {
   buildEmailAddress as buildEmailAddressUtil,
@@ -44,6 +45,15 @@ export type FapiRequestCallback<T> = (
   request: FapiRequestInit,
   response?: FapiResponse<T>,
 ) => void;
+
+const camelToSnakeEncoder: qs.IStringifyOptions['encoder'] = (
+  str,
+  defaultEncoder,
+  _,
+  type,
+) => {
+  return type === 'key' ? camelToSnake(str) : defaultEncoder(str);
+};
 
 // TODO: Move to @clerk/types
 export interface FapiResponseJSON<T> {
@@ -165,7 +175,7 @@ export default function createFapiClient(clerkInstance: Clerk): FapiClient {
     // In case FormData is provided, we don't want to mess with the headers,
     // because for file uploads the header is properly set by the browser.
     if (method !== 'GET' && !(body instanceof FormData)) {
-      requestInit.body = qs.stringify(body);
+      requestInit.body = qs.stringify(body, { encoder: camelToSnakeEncoder });
       // @ts-ignore
       requestInit.headers.set(
         'Content-Type',

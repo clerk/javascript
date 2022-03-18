@@ -1,5 +1,6 @@
 import { Poller } from '@clerk/shared/utils/poller';
 import type {
+  AttemptEmailAddressVerificationParams,
   CreateMagicLinkFlowReturn,
   EmailAddressJSON,
   EmailAddressResource,
@@ -31,26 +32,24 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
     });
   }
 
-  prepareVerification(
-    p: PrepareEmailAddressVerificationParams = { strategy: 'email_code' },
-  ): Promise<this> {
+  prepareVerification = (
+    params?: PrepareEmailAddressVerificationParams,
+  ): Promise<this> => {
     return this._basePost<EmailAddressJSON>({
       action: 'prepare_verification',
-      body: { ...p },
+      body: { ...(params || { strategy: 'email_code' }) },
     });
-  }
+  };
 
-  attemptVerification(code: string): Promise<this>;
-  attemptVerification(params: { code: string }): Promise<this>;
-  attemptVerification(args: string | { code: string }): Promise<this> {
-    const code = typeof args === 'string' ? args : args.code;
+  attemptVerification = (
+    params: AttemptEmailAddressVerificationParams,
+  ): Promise<this> => {
+    const { code } = params || {};
     return this._basePost<EmailAddressJSON>({
       action: 'attempt_verification',
-      body: {
-        code,
-      },
+      body: { code },
     });
-  }
+  };
 
   createMagicLinkFlow = (): CreateMagicLinkFlowReturn<
     StartMagicLinkFlowParams,
@@ -60,16 +59,13 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
 
     const startMagicLinkFlow = async ({
       redirectUrl,
-      // DX: Deprecated v2.4.4
-      callbackUrl,
     }: StartMagicLinkFlowParams): Promise<EmailAddressResource> => {
       if (!this.id) {
         clerkVerifyEmailAddressCalledBeforeCreate('SignUp');
       }
       await this.prepareVerification({
         strategy: 'email_link',
-        // DX: Deprecated eventually require redirectUrl
-        redirect_url: String(redirectUrl || callbackUrl),
+        redirectUrl: redirectUrl,
       });
       return new Promise((resolve, reject) => {
         void run(() => {

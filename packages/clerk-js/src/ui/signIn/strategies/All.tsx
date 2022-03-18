@@ -1,5 +1,5 @@
 import { Button } from '@clerk/shared/components/button';
-import { OAuthStrategy, SignInFactor, SignInStrategyName } from '@clerk/types';
+import { OAuthStrategy, SignInFactor, SignInStrategy } from '@clerk/types';
 import React from 'react';
 import { Separator } from 'ui/common';
 import { useSupportEmail } from 'ui/hooks/useSupportEmail';
@@ -10,11 +10,11 @@ import { OAuth } from './OAuth';
 export function getButtonLabel(factor: SignInFactor): string {
   switch (factor.strategy) {
     case 'email_link':
-      return `Send magic link to ${factor.safe_identifier}`;
+      return `Send magic link to ${factor.safeIdentifier}`;
     case 'email_code':
-      return `Email code to ${factor.safe_identifier}`;
+      return `Email code to ${factor.safeIdentifier}`;
     case 'phone_code':
-      return `Send code to ${factor.safe_identifier}`;
+      return `Send code to ${factor.safeIdentifier}`;
     case 'password':
       return 'Sign in with your password';
     default:
@@ -22,13 +22,13 @@ export function getButtonLabel(factor: SignInFactor): string {
   }
 }
 
-const supportedStrategies: SignInStrategyName[] = [
+const supportedStrategies: SignInStrategy[] = [
   'email_code',
   'password',
   'phone_code',
   'email_link',
 ];
-function isSupportedStrategy(strategy: SignInStrategyName): boolean {
+function isSupportedStrategy(strategy: SignInStrategy): boolean {
   return supportedStrategies.includes(strategy);
 }
 

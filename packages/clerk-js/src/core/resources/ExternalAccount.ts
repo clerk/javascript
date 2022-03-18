@@ -1,85 +1,51 @@
 import { titleize } from '@clerk/shared/utils/string';
-import type {
-  ExternalAccountJSON,
-  ExternalAccountResource,
-  OAuthProvider,
-} from '@clerk/types';
+import type { ExternalAccountJSON, ExternalAccountResource, OAuthProvider } from '@clerk/types';
 
-export class ExternalAccount implements ExternalAccountResource {
-  id: string;
-  provider: OAuthProvider;
-  externalId: string;
-  emailAddress: string;
-  approvedScopes: string;
-  firstName: string;
-  lastName: string;
-  picture: string;
-  username?: string;
-  publicMetadata: Record<string, unknown>;
-  label?: string;
+import { BaseResource } from './Base';
 
-  constructor(extAccProps: ExternalAccountResource) {
-    this.id = extAccProps.id;
-    this.provider = extAccProps.provider;
-    this.externalId = extAccProps.externalId;
-    this.emailAddress = extAccProps.emailAddress;
-    this.approvedScopes = extAccProps.approvedScopes;
-    this.firstName = extAccProps.firstName;
-    this.lastName = extAccProps.lastName;
-    this.picture = extAccProps.picture;
-    this.username = extAccProps.username;
-    this.publicMetadata = extAccProps.publicMetadata;
-    this.label = extAccProps.label;
+export class ExternalAccount extends BaseResource implements ExternalAccountResource {
+  id!: string;
+  identificationId!: string;
+  provider!: OAuthProvider;
+  providerUserId = '';
+  emailAddress = '';
+  approvedScopes = '';
+  firstName = '';
+  lastName = '';
+  avatarUrl = '';
+  username = '';
+  publicMetadata = {};
+  label = '';
+
+  public constructor(data: Partial<ExternalAccountJSON>, pathRoot: string);
+  public constructor(data: ExternalAccountJSON, pathRoot: string) {
+    super();
+    this.pathRoot = pathRoot;
+    this.fromJSON(data);
   }
 
-  static fromJSON(data: ExternalAccountJSON): ExternalAccount {
-    const obj = {} as ExternalAccountResource;
+  protected fromJSON(data: ExternalAccountJSON): this {
+    this.id = data.id;
+    this.identificationId = data.identification_id;
+    this.providerUserId = data.provider_user_id;
+    this.approvedScopes = data.approved_scopes;
+    this.avatarUrl = data.avatar_url;
+    this.emailAddress = data.email_address;
+    this.firstName = data.first_name;
+    this.lastName = data.last_name;
+    // TODO: Send the provider name the `oauth` prefix from FAPI
+    this.provider = (data.provider || '').replace('oauth_', '') as OAuthProvider;
+    this.username = data.username;
+    this.publicMetadata = data.public_metadata;
+    this.label = data.label;
+    return this;
+  }
 
-    // TODO: Remove the switch when we remove the deprecated payload
-    switch (data.object) {
-      case 'google_account':
-        obj.id = data.id;
-        obj.approvedScopes = data.approved_scopes;
-        obj.emailAddress = data.email_address;
-        obj.picture = data.picture;
-        obj.firstName = data.given_name;
-        obj.lastName = data.family_name;
-        obj.provider = 'google' as OAuthProvider;
-        break;
-      case 'facebook_account':
-        obj.id = data.id;
-        obj.approvedScopes = data.approved_scopes;
-        obj.emailAddress = data.email_address;
-        obj.picture = data.picture;
-        obj.firstName = data.first_name;
-        obj.lastName = data.last_name;
-        obj.provider = 'facebook' as OAuthProvider;
-        break;
-      case 'external_account':
-        obj.id = data.identification_id;
-        obj.approvedScopes = data.approved_scopes;
-        obj.emailAddress = data.email_address;
-        obj.picture = data.avatar_url;
-        obj.firstName = data.first_name;
-        obj.lastName = data.last_name;
-        obj.provider = data.provider.replace('oauth_', '') as OAuthProvider;
-    }
-
-    // TODO: Make external account payload generic to avoid the following hack
-    //
-    // The data.object is set to `google|facebook|*_account`. First, we extract
-    // the provider part (google, facebook, etc...) and then we constract the
-    // ${provider}_id key in order to set the externalId.
-    // @ts-ignore
-    obj.externalId = data.provider_user_id || data[`${obj.provider}_id`];
-    obj.username = data.username;
-    obj.publicMetadata = data.public_metadata;
-    obj.label = data.label;
-
-    return new ExternalAccount(obj);
+  providerSlug(): OAuthProvider {
+    return this.provider;
   }
 
   providerTitle(): string {
-    return [titleize(this.provider), 'Account'].join(' ');
+    return [titleize(this.providerSlug()), 'Account'].join(' ');
   }
 }

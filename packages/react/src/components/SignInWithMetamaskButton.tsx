@@ -1,12 +1,12 @@
 import React from 'react';
 
-import { withClerk } from '../contexts';
 import { SignInWithMetamaskButtonProps, WithClerkProp } from '../types';
 import {
   assertSingleChild,
   normalizeWithDefaultValue,
   safeExecute,
 } from '../utils';
+import { withClerk } from './withClerk';
 
 export const SignInWithMetamaskButton = withClerk(
   ({

@@ -1,25 +1,23 @@
 import { IdentificationLinkResource } from './identificationLink';
 import { ClerkResource } from './resource';
+import { EmailCodeStrategy, EmailLinkStrategy } from './strategies';
 import {
   CreateMagicLinkFlowReturn,
   StartMagicLinkFlowParams,
   VerificationResource,
 } from './verification';
 
-export type EmailAddressVerificationStrategy = 'email_code' | 'email_link';
-
 export type PrepareEmailAddressVerificationParams =
   | {
-      strategy: Extract<EmailAddressVerificationStrategy, 'email_code'>;
+      strategy: EmailCodeStrategy;
     }
   | {
-      strategy: Extract<EmailAddressVerificationStrategy, 'email_link'>;
-      redirect_url: string;
+      strategy: EmailLinkStrategy;
+      redirectUrl: string;
     };
 
-export type VerifyEmailAddressWithMagicLinkParams = {
-  redirect_url: string;
-  signal?: AbortSignal;
+export type AttemptEmailAddressVerificationParams = {
+  code: string;
 };
 
 export interface EmailAddressResource extends ClerkResource {
@@ -31,13 +29,12 @@ export interface EmailAddressResource extends ClerkResource {
   prepareVerification: (
     params?: PrepareEmailAddressVerificationParams,
   ) => Promise<EmailAddressResource>;
-
-  attemptVerification(code: string): Promise<EmailAddressResource>;
-  attemptVerification(params: { code: string }): Promise<EmailAddressResource>;
-  createMagicLinkFlow(): CreateMagicLinkFlowReturn<
+  attemptVerification: (
+    params: AttemptEmailAddressVerificationParams,
+  ) => Promise<EmailAddressResource>;
+  createMagicLinkFlow: () => CreateMagicLinkFlowReturn<
     StartMagicLinkFlowParams,
     EmailAddressResource
   >;
-
   destroy: () => Promise<void>;
 }

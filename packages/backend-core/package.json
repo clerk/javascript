@@ -1,6 +1,6 @@
 {
   "name": "@clerk/backend-core",
-  "version": "0.6.1",
+  "version": "0.6.3-staging.0",
   "license": "MIT",
   "description": "Clerk Backend API core resources and authentication utilities for JavaScript environments.",
   "scripts": {
@@ -17,7 +17,7 @@
     "tslib": "^2.3.1"
   },
   "devDependencies": {
-    "@peculiar/webcrypto": "^1.2.3",
+    "@peculiar/webcrypto": "^1.3.2",
     "@types/jest": "^27.4.0",
     "@types/node": "^16.11.12",
     "@types/node-fetch": "^2",
@@ -26,7 +26,7 @@
     "nock": "^13.2.1",
     "node-fetch": "^2.6.0",
     "ts-jest": "^27.1.3",
-    "typescript": "4.5.5"
+    "typescript": "^4.6.2"
   },
   "publishConfig": {
     "access": "public"

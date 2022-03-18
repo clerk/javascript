@@ -123,7 +123,6 @@ Array [
                     className="cl-left-icon-wrapper"
                     src="https://images.clerk.dev/static/facebook.svg"
                   />
-                  peter@gmail.com
                 </div>
               </div>
             </div>
@@ -3352,7 +3351,6 @@ Array [
                   className="cl-left-icon-wrapper"
                   src="https://images.clerk.dev/static/facebook.svg"
                 />
-                peter@gmail.com
               </div>
             </div>
             <div
@@ -3456,9 +3454,7 @@ Array [
             <div
               className="start"
             >
-              <div>
-                peter@gmail.com
-              </div>
+              <div />
             </div>
             <div
               className="iconContainer"

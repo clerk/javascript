@@ -65,13 +65,13 @@ function _SignInFactorTwo(): JSX.Element {
 
     const defaultIdentifier = secondFactors.find(factor => factor.default);
     const phoneNumberId = defaultIdentifier
-      ? defaultIdentifier.phone_number_id
-      : secondFactors[0]?.phone_number_id;
+      ? defaultIdentifier.phoneNumberId
+      : secondFactors[0]?.phoneNumberId;
 
     signIn
       .prepareSecondFactor({
         strategy: 'phone_code',
-        phone_number_id: phoneNumberId,
+        phoneNumberId,
       })
       .catch(err => handleError(err, [code], setError));
   };
@@ -104,8 +104,8 @@ function _SignInFactorTwo(): JSX.Element {
 
   const defaultIdentifier = secondFactors.find(factor => factor.default);
   const cachedSafeIdentifier = defaultIdentifier
-    ? defaultIdentifier.safe_identifier
-    : secondFactors[0]?.safe_identifier;
+    ? defaultIdentifier.safeIdentifier
+    : secondFactors[0]?.safeIdentifier;
 
   return (
     <>

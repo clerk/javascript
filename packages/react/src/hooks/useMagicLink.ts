@@ -37,7 +37,7 @@ function useMagicLink(
     () => resource.createMagicLinkFlow(),
     [resource],
   );
-  
+
   React.useEffect(() => {
     return cancelMagicLinkFlow;
   }, []);

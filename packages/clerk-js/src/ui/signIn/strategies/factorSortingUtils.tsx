@@ -1,4 +1,4 @@
-import { SignInFactor, SignInStrategyName } from '@clerk/types';
+import { SignInFactor, SignInStrategy } from '@clerk/types';
 
 const makeSortingOrderMap = <T extends string>(arr: T[]): Record<T, number> =>
   arr.reduce((acc, k, i) => {
@@ -11,24 +11,24 @@ const STRATEGY_SORT_ORDER_PASSWORD_PREF = makeSortingOrderMap([
   'email_link',
   'email_code',
   'phone_code',
-] as SignInStrategyName[]);
+] as SignInStrategy[]);
 
 const STRATEGY_SORT_ORDER_OTP_PREF = makeSortingOrderMap([
   'email_link',
   'email_code',
   'phone_code',
   'password',
-] as SignInStrategyName[]);
+] as SignInStrategy[]);
 
 const STRATEGY_SORT_ORDER_ALL_STRATEGIES_BUTTONS = makeSortingOrderMap([
   'email_link',
   'email_code',
   'phone_code',
   'password',
-] as SignInStrategyName[]);
+] as SignInStrategy[]);
 
 const makeSortingFunction =
-  (sortingMap: Record<SignInStrategyName, number>) =>
+  (sortingMap: Record<SignInStrategy, number>) =>
   (a: SignInFactor, b: SignInFactor): number => {
     const orderA = sortingMap[a.strategy];
     const orderB = sortingMap[b.strategy];

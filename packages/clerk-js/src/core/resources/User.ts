@@ -1,11 +1,11 @@
-import { camelToSnakeKeys } from '@clerk/shared/utils/object';
 import type {
+  CreateEmailAddressParams,
+  CreatePhoneNumberParams,
   EmailAddressResource,
   ExternalAccountResource,
-  GetUserTokenOptions,
   ImageResource,
-  JWTService,
   PhoneNumberResource,
+  SetProfileImageParams,
   UpdateUserParams,
   UserJSON,
   UserResource,
@@ -14,23 +14,17 @@ import type {
 import { unixEpochToDate } from 'utils/date';
 import { normalizeUnsafeMetadata } from 'utils/resourceParams';
 
-import { UserTokenCache } from '../tokenCache';
 import {
   BaseResource,
   EmailAddress,
   ExternalAccount,
-  GetOrganizationParams,
   Image,
-  Organization,
+  OrganizationMembership,
   PhoneNumber,
+  RetrieveMembershipsParams,
   SessionWithActivities,
-  Token,
   Web3Wallet,
 } from './internal';
-import {
-  OrganizationMembership,
-  RetrieveMembershipsParams,
-} from './OrganizationMembership';
 
 export class User extends BaseResource implements UserResource {
   pathRoot = '/me';
@@ -99,7 +93,10 @@ export class User extends BaseResource implements UserResource {
     return enabled;
   };
 
-  createEmailAddress = (email: string): Promise<EmailAddressResource> => {
+  createEmailAddress = (
+    params: CreateEmailAddressParams,
+  ): Promise<EmailAddressResource> => {
+    const { email } = params || {};
     return new EmailAddress(
       {
         email_address: email,
@@ -108,7 +105,10 @@ export class User extends BaseResource implements UserResource {
     ).create();
   };
 
-  createPhoneNumber = (phoneNumber: string): Promise<PhoneNumberResource> => {
+  createPhoneNumber = (
+    params: CreatePhoneNumberParams,
+  ): Promise<PhoneNumberResource> => {
+    const { phoneNumber } = params || {};
     return new PhoneNumber(
       {
         phone_number: phoneNumber,
@@ -119,52 +119,8 @@ export class User extends BaseResource implements UserResource {
 
   update = (params: UpdateUserParams): Promise<UserResource> => {
     return this._basePatch({
-      body: normalizeUnsafeMetadata(camelToSnakeKeys(params)),
+      body: normalizeUnsafeMetadata(params),
     });
-  };
-
-  /**
-   * @deprecated `getToken` has been deprecated and will be removed soon.
-   * Use session.getToken({ template }) instead.
-   */
-  getToken = async (
-    service: JWTService,
-    options?: GetUserTokenOptions,
-  ): Promise<string> => {
-    if (!service) {
-      service = 'clerk';
-    }
-
-    const { leewayInSeconds = 10 } = options || {};
-
-    if (leewayInSeconds >= 60) {
-      throw 'Leeway can not exceed the token lifespan (60 seconds)';
-    }
-
-    const cachedEntry = UserTokenCache.get(
-      { tokenId: this.id, audience: service },
-      leewayInSeconds,
-    );
-
-    let tokenResolver;
-
-    if (cachedEntry) {
-      tokenResolver = cachedEntry.tokenResolver;
-    } else {
-      tokenResolver = Token.create(this.path() + '/tokens', {
-        service,
-      });
-
-      UserTokenCache.set({
-        tokenId: this.id,
-        audience: service,
-        tokenResolver,
-      });
-    }
-
-    const token = await tokenResolver;
-
-    return token.jwt.claims.__raw;
   };
 
   getSessions = async (): Promise<SessionWithActivities[]> => {
@@ -176,7 +132,8 @@ export class User extends BaseResource implements UserResource {
     return res;
   };
 
-  setProfileImage = (file: Blob | File): Promise<ImageResource> => {
+  setProfileImage = (params: SetProfileImageParams): Promise<ImageResource> => {
+    const { file } = params || {};
     return Image.create(`${this.path()}/profile_image`, {
       file,
     });
@@ -227,7 +184,7 @@ export class User extends BaseResource implements UserResource {
       null;
 
     this.externalAccounts = data.external_accounts.map(
-      ExternalAccount.fromJSON,
+      ea => new ExternalAccount(ea, this.path() + '/external_accounts'),
     );
 
     this.publicMetadata = data.public_metadata;

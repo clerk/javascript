@@ -24,11 +24,17 @@ export enum ObjectType {
   SmsMessage = 'sms_message',
   User = 'user',
   Web3Wallet = 'web3_wallet',
+  Token = 'token',
 }
 
 export interface ClerkResourceJSON {
   object: ObjectType;
   id: string;
+}
+
+export interface TokenJSON {
+  object: ObjectType.Token;
+  jwt: string;
 }
 
 export interface AllowlistIdentifierJSON extends ClerkResourceJSON {
@@ -107,10 +113,7 @@ export interface ExtAccountJSON extends ClerkResourceJSON {
   label?: string;
 }
 
-export type ExternalAccountJSON =
-  | FacebookAccountJSON
-  | GoogleAccountJSON
-  | ExtAccountJSON;
+export type ExternalAccountJSON = FacebookAccountJSON | GoogleAccountJSON | ExtAccountJSON;
 
 export interface IdentificationLinkJSON extends ClerkResourceJSON {
   type: string;

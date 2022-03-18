@@ -63,7 +63,7 @@ export function fitTextInOneLine(
 }
 
 const factorForIdentifier = (i: string | null) => (f: SignInFactor) => {
-  return 'safe_identifier' in f && f.safe_identifier === i;
+  return 'safeIdentifier' in f && f.safeIdentifier === i;
 };
 
 function determineStrategyWhenPasswordIsPreferred(
@@ -119,8 +119,8 @@ export function determineSalutation(signIn: Partial<SignInResource>): string {
   }
 
   return (
-    titleize(signIn.userData?.first_name) ||
-    titleize(signIn.userData?.last_name) ||
+    titleize(signIn.userData?.firstName) ||
+    titleize(signIn.userData?.lastName) ||
     signIn?.identifier ||
     ''
   );

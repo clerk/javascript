@@ -9,7 +9,7 @@ import { sessionCookie } from './session';
 
 const COOKIE_PATH = '/';
 export type CookieHandler = ReturnType<typeof createCookieHandler>;
-export const createCookieHandler = (version: number) => {
+export const createCookieHandler = () => {
   // First party cookie helpers
   const getDevBrowserInittedCookie = () => inittedCookie.get();
 
@@ -55,7 +55,7 @@ export const createCookieHandler = (version: number) => {
   };
 
   // Third party cookie helpers
-  const ssoCookie = version > 1 ? clientCookie : sessionCookie;
+  const ssoCookie = clientCookie;
 
   // TODO: Clean up these cookie handlers after Auth v2 becomes the only authentication method
   // Dev Browser cookie will be handled 100% be local storage
@@ -87,9 +87,7 @@ export const createCookieHandler = (version: number) => {
       ssoCookie.remove({ domain, path: COOKIE_PATH });
     } else {
       // Delete cookie in a best-effort way by iterating all ETLDs
-      getAllETLDs().forEach(domain =>
-        ssoCookie.remove({ domain, path: COOKIE_PATH }),
-      );
+      getAllETLDs().forEach(domain => ssoCookie.remove({ domain, path: COOKIE_PATH }));
     }
   };
 
@@ -119,9 +117,7 @@ export const createCookieHandler = (version: number) => {
     const d = new Date();
     d.setTime(d.getTime() + 1000);
 
-    document.cookie = `__session=check;path=/;domain=${
-      window.location.host
-    };expires=${d.toUTCString()}`;
+    document.cookie = `__session=check;path=/;domain=${window.location.host};expires=${d.toUTCString()}`;
     const cookieExists = document.cookie.indexOf('__session=') === -1;
     document.cookie = `__session=;path=/;domain=${window.location.host};max-age=-1`;
     return cookieExists;

@@ -1,4 +1,5 @@
 import { Session } from '../resources/Session';
+import { Token } from '../resources/Token';
 import { AbstractApi } from './AbstractApi';
 
 type QueryParams = {
@@ -38,5 +39,15 @@ export class SessionApi extends AbstractApi {
       path: `/sessions/${sessionId}/verify`,
       bodyParams: { token },
     });
+  }
+
+  public async getToken(sessionId: string, template: string) {
+    this.requireId(sessionId);
+    return (
+      (await this._restClient.makeRequest<Token>({
+        method: 'POST',
+        path: `/sessions/${sessionId}/tokens/${template || ''}`,
+      })) as any
+    ).jwt;
   }
 }
