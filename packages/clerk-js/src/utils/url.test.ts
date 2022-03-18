@@ -1,7 +1,9 @@
+import { SignUpResource } from '@clerk/types';
 import {
   appendAsQueryParams,
   buildURL,
   getAllETLDs,
+  hasExternalAccountSignUpError,
   isAccountsHostedPages,
   isDevOrStagingUrl,
   trimTrailingSlash,
@@ -227,5 +229,27 @@ describe('getAllETLDs(hostname)', () => {
       'qux.baz',
       'bar.qux.baz',
     ]);
+  });
+});
+
+describe('hasExternalAccountSignUpError(signUpResource)', () => {
+  it('returns true if the signup attempt with external account has an error', () => {
+    expect(hasExternalAccountSignUpError({
+      verifications: {
+        externalAccount: {
+          error: {}
+        }
+      }
+    } as SignUpResource)).toBe(true);
+  });
+
+  it('returns false if there is no signup attempt error on an external account', () => {
+    expect(hasExternalAccountSignUpError({
+      verifications: {
+        externalAccount: {
+          error: null
+        }
+      }
+    } as SignUpResource)).toBe(false);
   });
 });

@@ -734,6 +734,54 @@ describe('Clerk singleton', () => {
         expect(mockNavigate).toHaveBeenCalledWith('/custom-sign-in');
       });
     });
+
+    it('redirects user to signUp url if there is an external account signup attempt has an error', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          onWindowLocationHost: () => false,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [],
+          signIn: new SignIn(null),
+          signUp: new SignUp({
+            status: 'missing_requirements',
+            verifications: {
+              external_account: {
+                status: 'unverified',
+                strategy: 'oauth_google',
+                external_verification_redirect_url: '',
+                error: {
+                  code: 'external_account_not_found',
+                  long_message: 'The External Account was not found.',
+                  message: 'Invalid external account',
+                  meta: {
+                    session_id: 'sess_1yDceUR8SIKtQ0gIOO8fNsW7nhe',
+                  },
+                },
+              },
+            },
+          } as any as SignUpJSON),
+        }),
+      );
+
+      const sut = new Clerk(frontendApi);
+      await sut.load({
+        navigate: mockNavigate,
+      });
+
+      sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('/signUpUrl');
+      });
+    })
   });
 
   describe('.handleMagicLinkVerification()', () => {
