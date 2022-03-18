@@ -1,5 +1,5 @@
 import { JWTPayload } from '@clerk/backend-core';
-import { GetSessionTokenOptions } from '@clerk/types';
+import { ServerGetTokenOptions } from '@clerk/types';
 import { NextRequest } from 'next/server';
 
 import { ClerkAPI } from '../ClerkAPI';
@@ -14,13 +14,13 @@ export async function getAuthData(
     loadUser,
   }: WithEdgeMiddlewareAuthOptions & JWTPayload,
 ): Promise<AuthData> {
-  const getToken = (options: GetSessionTokenOptions = {}) => {
+  const getToken = (options: ServerGetTokenOptions = {}) => {
     if (options.template) {
       throw new Error(
         'Retrieving a JWT template during edge runtime will be supported soon.',
       );
     }
-    return req.cookies['__session'] || null;
+    return Promise.resolve(req.cookies['__session']);
   };
 
   const [user, session] = await Promise.all([
