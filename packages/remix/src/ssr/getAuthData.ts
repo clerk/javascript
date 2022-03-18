@@ -1,6 +1,6 @@
 import { AuthStatus, Session, User } from '@clerk/backend-core';
 import Clerk, { sessions, users } from '@clerk/clerk-sdk-node';
-import { GetToken, GetTokenOptions } from '@clerk/types';
+import { ServerGetToken, ServerGetTokenOptions } from '@clerk/types';
 
 import { RootAuthLoaderOptions } from './types';
 import { parseCookies } from './utils';
@@ -10,7 +10,7 @@ export type AuthData = {
   session: Session | undefined | null;
   userId: string | null;
   user: User | undefined | null;
-  getToken: GetToken;
+  getToken: ServerGetToken;
 };
 
 /**
@@ -18,15 +18,15 @@ export type AuthData = {
  * TODO: Share the same impl between nextjs/remix packages
  */
 const createGetToken =
-  (sessionId?: string, sessionToken?: string): GetToken =>
-  async (options: GetTokenOptions = {}) => {
+  (sessionId?: string, sessionToken?: string): ServerGetToken =>
+  async (options: ServerGetTokenOptions = {}) => {
     if (!sessionId) {
-      return Promise.resolve(null);
+      throw new Error('getToken cannot be called without a session');
     }
     if (options.template) {
       return sessions.getToken(sessionId, options.template);
     }
-    return Promise.resolve(sessionToken || null);
+    return Promise.resolve(sessionToken);
   };
 
 /**
