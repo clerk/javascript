@@ -3,7 +3,7 @@ import { UpdateUserParams } from '@clerk/types';
 import { normalizeUnsafeMetadata } from './resourceParams';
 
 describe('normalizeUnsafeMetadata', () => {
-  it('handles unsafe_metadata', () => {
+  it('handles unsafeMetadata', () => {
     const params: UpdateUserParams = {
       firstName: 'clerk',
       unsafeMetadata: {
@@ -13,21 +13,21 @@ describe('normalizeUnsafeMetadata', () => {
 
     const res = normalizeUnsafeMetadata(params);
     expect(res).toEqual({
-      first_name: 'clerk',
-      unsafe_metadata: JSON.stringify({
+      firstName: 'clerk',
+      unsafeMetadata: JSON.stringify({
         role: 'admin',
       }),
     });
   });
 
-  it('handles params without unsafe_metadata', () => {
+  it('handles params without unsafeMetadata', () => {
     const params: UpdateUserParams = {
       firstName: 'clerk',
     };
 
     const res = normalizeUnsafeMetadata(params);
     expect(res).toEqual({
-      first_name: 'clerk',
+      firstName: 'clerk',
     });
   });
 
@@ -38,7 +38,7 @@ describe('normalizeUnsafeMetadata', () => {
     expect(res).toEqual({});
   });
 
-  it('handles unsafe_metadata passed as string', () => {
+  it('handles unsafeMetadata passed as string', () => {
     const params: UpdateUserParams = {
       firstName: 'clerk',
       unsafeMetadata: JSON.stringify({
@@ -48,8 +48,8 @@ describe('normalizeUnsafeMetadata', () => {
 
     const res = normalizeUnsafeMetadata(params);
     expect(res).toEqual({
-      first_name: 'clerk',
-      unsafe_metadata: JSON.stringify({
+      firstName: 'clerk',
+      unsafeMetadata: JSON.stringify({
         role: 'admin',
       }),
     });
