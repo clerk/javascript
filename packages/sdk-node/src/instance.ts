@@ -4,11 +4,7 @@ export default Clerk;
 
 export { WithAuthProp, RequireAuthProp } from './Clerk';
 
-export {
-  HttpError,
-  ClerkServerError,
-  ClerkServerErrorJSON,
-} from './utils/Errors';
+export { HttpError, ClerkServerError, ClerkServerErrorJSON } from './utils/Errors';
 export { default as Logger } from './utils/Logger';
 
 export {
@@ -25,4 +21,5 @@ export {
   SMSMessage,
   User,
   Verification,
+  Token,
 } from '@clerk/backend-core';

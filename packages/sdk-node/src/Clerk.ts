@@ -1,10 +1,4 @@
-﻿import {
-  AuthStatus,
-  Base,
-  ClerkBackendAPI,
-  ClerkFetcher,
-  JWTPayload,
-} from '@clerk/backend-core';
+﻿import { AuthStatus, Base, ClerkBackendAPI, ClerkFetcher, JWTPayload } from '@clerk/backend-core';
 import Cookies from 'cookies';
 import deepmerge from 'deepmerge';
 import type { NextFunction, Request, Response } from 'express';
@@ -12,18 +6,21 @@ import got, { OptionsOfUnknownResponseBody } from 'got';
 import jwt from 'jsonwebtoken';
 import jwks, { JwksClient } from 'jwks-rsa';
 import querystring from 'querystring';
+import { NextApiRequest, NextApiResponse } from 'next';
 
 import { SupportMessages } from './constants/SupportMessages';
 import { LIB_NAME, LIB_VERSION } from './info';
 import { ClerkServerError } from './utils/Errors';
 // utils
 import Logger from './utils/Logger';
+import { Crypto, CryptoKey } from '@peculiar/webcrypto';
+
+import { decodeBase64, toSPKIDer } from './utils/crypto';
 
 const defaultApiKey = process.env.CLERK_API_KEY || '';
 const defaultApiVersion = process.env.CLERK_API_VERSION || 'v1';
-const defaultServerApiUrl =
-  process.env.CLERK_API_URL || 'https://api.clerk.dev';
-const JWKS_MAX_AGE = 3600000; // 1 hour
+const defaultServerApiUrl = process.env.CLERK_API_URL || 'https://api.clerk.dev';
+const JWKS_MAX_AGE = 1000 * 60 * 60; // 1 hour
 const packageRepo = 'https://github.com/clerkinc/clerk-sdk-node';
 
 export type MiddlewareOptions = {
@@ -31,23 +28,36 @@ export type MiddlewareOptions = {
   authorizedParties?: string[];
 };
 
-export type WithAuthProp<T> = T & {
-  auth: {
-    sessionId: string | null;
-    userId: string | null;
-  };
-};
-
 export type RequireAuthProp<T> = T & {
-  auth: {
-    sessionId: string;
-    userId: string;
-  };
+  auth: { sessionId: string; userId: string };
 };
 
-import { Crypto, CryptoKey } from '@peculiar/webcrypto';
+export type WithAuthProp<T> = T & {
+  auth: { sessionId: string | null; userId: string | null };
+};
 
-import { decodeBase64, toSPKIDer } from './utils/crypto';
+export type RequestWithRequiredAuth = RequireAuthProp<NextApiRequest | null>;
+export type RequestWithAuth = WithAuthProp<NextApiRequest>;
+
+export type WithAuthHandler<Return = any, Request = RequestWithAuth> = (
+  req: Request,
+  res: NextApiResponse,
+  next?: NextFunction,
+) => Return;
+export type WithAuthReturn<Return = any> = (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  next?: NextFunction,
+) => Promise<Awaited<Return>>;
+export type WithAuth = <Return = any>(
+  handler: WithAuthHandler<Return>,
+  options?: MiddlewareOptions,
+) => WithAuthReturn<Return>;
+
+export type RequireAuth = <Return = any>(
+  handler: WithAuthHandler<Return, RequestWithRequiredAuth>,
+  options?: MiddlewareOptions,
+) => WithAuthReturn<Return>;
 
 const crypto = new Crypto();
 
@@ -55,13 +65,12 @@ const importKey = async (jwk: JsonWebKey, algorithm: Algorithm) => {
   return await crypto.subtle.importKey('jwk', jwk, algorithm, true, ['verify']);
 };
 
-const verifySignature = async (
-  algorithm: Algorithm,
-  key: CryptoKey,
-  signature: Uint8Array,
-  data: Uint8Array
-) => {
+const verifySignature = async (algorithm: Algorithm, key: CryptoKey, signature: Uint8Array, data: Uint8Array) => {
   return await crypto.subtle.verify(algorithm, key, signature, data);
+};
+
+const noop = () => {
+  //
 };
 
 export default class Clerk extends ClerkBackendAPI {
@@ -86,10 +95,7 @@ export default class Clerk extends ClerkBackendAPI {
     httpOptions?: OptionsOfUnknownResponseBody;
     jwksCacheMaxAge?: number;
   } = {}) {
-    const fetcher: ClerkFetcher = (
-      url,
-      { method, authorization, contentType, userAgent, body }
-    ) => {
+    const fetcher: ClerkFetcher = (url, { method, authorization, contentType, userAgent, body }) => {
       const finalHTTPOptions = deepmerge(this.httpOptions, {
         method,
         responseType: contentType === 'text/html' ? 'text' : 'json',
@@ -103,7 +109,7 @@ export default class Clerk extends ClerkBackendAPI {
         ...(body && { body: querystring.stringify(body) }),
       }) as OptionsOfUnknownResponseBody;
 
-      return got(url, finalHTTPOptions).then((data) => data.body);
+      return got(url, finalHTTPOptions).then(data => data.body);
     };
 
     super({
@@ -138,9 +144,7 @@ export default class Clerk extends ClerkBackendAPI {
         throw new Error(`Failed to decode token: ${token}`);
       }
 
-      const signingKey = await this._jwksClient.getSigningKey(
-        decoded.header.kid
-      );
+      const signingKey = await this._jwksClient.getSigningKey(decoded.header.kid);
       const pubKey = signingKey.getPublicKey();
 
       return await crypto.subtle.importKey(
@@ -151,24 +155,16 @@ export default class Clerk extends ClerkBackendAPI {
           hash: 'SHA-256',
         },
         true,
-        ['verify']
+        ['verify'],
       );
     };
 
     /** Base initialization */
 
-    this.base = new Base(
-      importKey,
-      verifySignature,
-      decodeBase64,
-      loadCryptoKey
-    );
+    this.base = new Base(importKey, verifySignature, decodeBase64, loadCryptoKey);
   }
 
-  async verifyToken(
-    token: string,
-    authorizedParties?: string[]
-  ): Promise<JWTPayload> {
+  async verifyToken(token: string, authorizedParties?: string[]): Promise<JWTPayload> {
     const decoded = jwt.decode(token, { complete: true });
     if (!decoded) {
       throw new Error(`Failed to verify token: ${token}`);
@@ -196,7 +192,9 @@ export default class Clerk extends ClerkBackendAPI {
     return verified;
   }
 
-  // For use as singleton, always returns the same instance
+  /**
+   * For use as singleton, always returns the same instance
+   */
   static getInstance(): Clerk {
     if (!this._instance) {
       this._instance = new Clerk();
@@ -205,9 +203,9 @@ export default class Clerk extends ClerkBackendAPI {
     return this._instance;
   }
 
-  // Middlewares
-
-  // defaultOnError swallows the error
+  /**
+   * defaultOnError swallows the error
+   */
   defaultOnError(error: Error & { data: any }) {
     Logger.warn(error.message);
 
@@ -216,7 +214,9 @@ export default class Clerk extends ClerkBackendAPI {
     });
   }
 
-  // strictOnError returns the error so that Express will halt the request chain
+  /**
+   * strictOnError returns the error so that Express will halt the request chain
+   */
   strictOnError(error: Error & { data: any }) {
     Logger.error(error.message);
 
@@ -230,35 +230,29 @@ export default class Clerk extends ClerkBackendAPI {
   expressWithAuth(
     { onError, authorizedParties }: MiddlewareOptions = {
       onError: this.defaultOnError,
-    }
+    },
   ): (req: Request, res: Response, next: NextFunction) => Promise<void> {
     function signedOut() {
       throw new Error('Unauthenticated');
     }
 
-    async function authenticate(
-      this: Clerk,
-      req: Request,
-      res: Response,
-      next: NextFunction
-    ): Promise<any> {
+    async function authenticate(this: Clerk, req: Request, res: Response, next: NextFunction): Promise<any> {
       const cookies = new Cookies(req, res);
 
       try {
-        const { status, interstitial, sessionClaims } =
-          await this.base.getAuthState({
-            cookieToken: cookies.get('__session') as string,
-            clientUat: cookies.get('__client_uat') as string,
-            headerToken: req.headers.authorization?.replace('Bearer ', ''),
-            origin: req.headers.origin,
-            host: req.headers.host as string,
-            forwardedPort: req.headers['x-forwarded-port'] as string,
-            forwardedHost: req.headers['x-forwarded-host'] as string,
-            referrer: req.headers.referer,
-            userAgent: req.headers['user-agent'] as string,
-            authorizedParties,
-            fetchInterstitial: () => this.fetchInterstitial(),
-          });
+        const { status, interstitial, sessionClaims } = await this.base.getAuthState({
+          cookieToken: cookies.get('__session') as string,
+          clientUat: cookies.get('__client_uat') as string,
+          headerToken: req.headers.authorization?.replace('Bearer ', ''),
+          origin: req.headers.origin,
+          host: req.headers.host as string,
+          forwardedPort: req.headers['x-forwarded-port'] as string,
+          forwardedHost: req.headers['x-forwarded-host'] as string,
+          referrer: req.headers.referer,
+          userAgent: req.headers['user-agent'] as string,
+          authorizedParties,
+          fetchInterstitial: () => this.fetchInterstitial(),
+        });
 
         if (status === AuthStatus.SignedOut) {
           return signedOut();
@@ -306,69 +300,54 @@ export default class Clerk extends ClerkBackendAPI {
   expressRequireAuth(
     { onError, authorizedParties }: MiddlewareOptions = {
       onError: this.strictOnError,
-    }
+    },
   ) {
     return this.expressWithAuth({ onError, authorizedParties });
   }
 
-  // Credits to https://nextjs.org/docs/api-routes/api-middlewares
-  // Helper method to wait for a middleware to execute before continuing
-  // And to throw an error when an error happens in a middleware
-  // @ts-ignore
-  private _runMiddleware(req, res, fn) {
+  /**
+   * Credits to https://nextjs.org/docs/api-routes/api-middlewares
+   * Helper method to wait for a middleware to execute before continuing
+   * And to throw an error when an error happens in a middleware
+   */
+  private _runMiddleware(req: any, res: any, fn: any) {
     return new Promise((resolve, reject) => {
-      // @ts-ignore
-      fn(req, res, (result) => {
+      fn(req, res, (result: any) => {
         if (result instanceof Error) {
           return reject(result);
         }
-
         return resolve(result);
       });
     });
   }
 
-  // Set the session on the request and then call provided handler
-  withAuth(
-    handler: Function,
-    { onError, authorizedParties }: MiddlewareOptions = {
-      onError: this.defaultOnError,
-    }
-  ) {
-    return async (
-      req: WithAuthProp<Request>,
-      res: Response,
-      next?: NextFunction
-    ) => {
+  /**
+   * Set the session on the request and then call provided handler
+   */
+  withAuth: WithAuth = (handler, options) => {
+    const { onError, authorizedParties } = options || { onError: this.defaultOnError };
+    const authenticatedHandler: WithAuthReturn = async (req, res, next) => {
       try {
-        await this._runMiddleware(
-          req,
-          res,
-          this.expressWithAuth({ onError, authorizedParties })
-        );
-        return handler(req, res, next);
-      } catch (error) {
-        // @ts-ignore
-        const errorData = error.data || { error: error.message };
-        // @ts-ignore
-        res.statusCode = error.statusCode || 401;
-        /**
-         * Res.json is available in express-like environments.
-         * Res.send is available in express-like but also Fastify.
-         */
+        await this._runMiddleware(req, res, this.expressWithAuth({ onError, authorizedParties }));
+        return handler(req as RequestWithAuth, res, next);
+      } catch (e) {
+        const errorData = (e as any).data || { error: (e as any).message };
+        res.statusCode = (e as any).statusCode || 401;
+        // Res.json is available in express-like environments
+        // Res.send is available both in express-like and Fastify
         res.json ? res.json(errorData) : res.send(errorData);
         res.end();
+        return noop;
       }
     };
-  }
+    return authenticatedHandler;
+  };
 
-  // Stricter version, short-circuits if session can't be determined
-  requireAuth(
-    handler: Function,
-    { onError, authorizedParties }: MiddlewareOptions = {
-      onError: this.strictOnError,
-    }
-  ) {
-    return this.withAuth(handler, { onError, authorizedParties });
-  }
+  /**
+   * Stricter version of withAuth, short-circuits if session can't be determined
+   */
+  requireAuth: RequireAuth = (handler, options) => {
+    const { onError, authorizedParties } = options || { onError: this.defaultOnError };
+    return this.withAuth(handler as any, { onError, authorizedParties });
+  };
 }
