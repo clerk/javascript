@@ -1,5 +1,4 @@
 import { AuthStatus, Base } from '@clerk/backend-core';
-import { GetSessionTokenOptions } from '@clerk/types';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 
 import { ClerkAPI } from './ClerkAPI';
@@ -10,6 +9,7 @@ import {
   WithEdgeMiddlewareAuthOptions,
 } from './types';
 import { injectAuthIntoRequest } from './utils';
+import { ServerGetTokenOptions } from '@clerk/types/src';
 
 /**
  *
@@ -113,13 +113,13 @@ export function withEdgeMiddlewareAuth(
       });
     }
 
-    const getToken = (options: GetSessionTokenOptions = {}) => {
+    const getToken = (options: ServerGetTokenOptions = {}) => {
       if (options.template) {
         throw new Error(
           'Retrieving a JWT template during edge runtime will be supported soon.',
         );
       }
-      return req.cookies['__session'] || null;
+      return Promise.resolve(req.cookies['__session']);
     };
 
     /* In both SignedIn and SignedOut states, we just add the attributes to the request object and passthrough. */
