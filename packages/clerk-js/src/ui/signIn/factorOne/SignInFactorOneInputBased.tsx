@@ -96,7 +96,9 @@ export function SignInFactorOneInputBased({
 
     if (shouldPrepare) {
       setLastUsedFactor(currentFactor);
-      signIn.prepareFirstFactor(currentFactor as any);
+      signIn.prepareFirstFactor(
+        currentFactor as EmailCodeFactor | PhoneCodeFactor,
+      );
     }
   }, [currentFactor]);
 

@@ -40,10 +40,15 @@ export type OauthFactor = {
 };
 
 export type EmailCodeConfig = Omit<EmailCodeFactor, 'safeIdentifier'>;
-export type EmailLinkConfig = Omit<EmailLinkFactor, 'safeIdentifier'> & { redirectUrl: string };
+export type EmailLinkConfig = Omit<EmailLinkFactor, 'safeIdentifier'> & {
+  redirectUrl: string;
+};
 export type PhoneCodeConfig = Omit<PhoneCodeFactor, 'safeIdentifier'>;
 export type Web3SignatureConfig = Web3SignatureFactor;
-export type OAuthConfig = OauthFactor & { redirectUrl: string; actionCompleteRedirect_url: string };
+export type OAuthConfig = OauthFactor & {
+  redirectUrl: string;
+  actionCompleteRedirectUrl: string;
+};
 
 export type PhoneCodeSecondFactorConfig = {
   strategy: PhoneCodeStrategy;
