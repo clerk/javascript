@@ -1,5 +1,5 @@
 import { ClerkResource } from './resource';
-import { GetSessionTokenOptions, TokenResource } from './token';
+import { TokenResource } from './token';
 import { UserResource } from './user';
 
 export interface SessionResource extends ClerkResource {
@@ -13,7 +13,7 @@ export interface SessionResource extends ClerkResource {
   end: () => Promise<SessionResource>;
   remove: () => Promise<SessionResource>;
   touch: () => Promise<SessionResource>;
-  getToken: (options?: GetSessionTokenOptions) => Promise<string>;
+  getToken: GetToken;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -60,3 +60,6 @@ export interface PublicUserData {
   identifier: string;
   userId?: string;
 }
+
+export type GetTokenOptions = { template: string; leewayInSeconds?: number; skipCache?: boolean };
+export type GetToken = (options?: GetTokenOptions) => Promise<string>;

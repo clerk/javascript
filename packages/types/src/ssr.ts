@@ -2,13 +2,13 @@ import { SessionJSON, UserJSON } from './json';
 import { SessionResource } from './session';
 import { UserResource } from './user';
 
-export type GetTokenOptions = { template?: string };
-export type GetToken = (options?: GetTokenOptions) => Promise<string | null>;
+export type ServerGetTokenOptions = { template?: string };
+export type ServerGetToken = (options?: ServerGetTokenOptions) => Promise<string>;
 
 export type ServerSideAuth = {
   sessionId: string | null;
   userId: string | null;
-  getToken: GetToken;
+  getToken: ServerGetToken;
 };
 
 type SsrSessionState<SessionType> =
