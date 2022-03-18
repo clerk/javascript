@@ -3,7 +3,7 @@ import { ServerSideAuth } from '@clerk/types';
 import { GetServerSidePropsContext } from 'next';
 
 // TODO: Remove when we're using TS >=4.5
-export type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
+type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
 
 export type WithServerSideAuthOptions = {
   loadUser?: boolean;
