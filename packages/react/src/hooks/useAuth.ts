@@ -1,11 +1,9 @@
-import { GetSessionTokenOptions, SignOut } from '@clerk/types';
+import { GetToken, SignOut } from '@clerk/types';
 
 import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { invalidStateError } from '../errors';
 import { createGetToken, createSignOut } from './utils';
-
-type GetToken = (options?: GetSessionTokenOptions) => Promise<string | null>;
 
 type UseAuthReturn =
   | {
@@ -82,15 +80,36 @@ export const useAuth: UseAuth = () => {
   const signOut: SignOut = createSignOut(isomorphicClerk);
 
   if (sessionId === undefined && userId === undefined) {
-    return { isLoaded: false, isSignedIn: undefined, sessionId, userId, signOut, getToken };
+    return {
+      isLoaded: false,
+      isSignedIn: undefined,
+      sessionId,
+      userId,
+      signOut,
+      getToken,
+    };
   }
 
   if (sessionId === null && userId === null) {
-    return { isLoaded: true, isSignedIn: false, sessionId, userId, signOut, getToken };
+    return {
+      isLoaded: true,
+      isSignedIn: false,
+      sessionId,
+      userId,
+      signOut,
+      getToken,
+    };
   }
 
   if (!!sessionId && !!userId) {
-    return { isLoaded: true, isSignedIn: true, sessionId, userId, signOut, getToken };
+    return {
+      isLoaded: true,
+      isSignedIn: true,
+      sessionId,
+      userId,
+      signOut,
+      getToken,
+    };
   }
 
   throw new Error(invalidStateError);

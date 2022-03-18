@@ -15,13 +15,14 @@ const clerkLoaded = (isomorphicClerk: IsomorphicClerk) => {
 /**
  * @internal
  */
-export const createGetToken = (isomorphicClerk: IsomorphicClerk) => async (options: any) => {
-  await clerkLoaded(isomorphicClerk);
-  if (isomorphicClerk.session) {
+export const createGetToken =
+  (isomorphicClerk: IsomorphicClerk) => async (options: any) => {
+    await clerkLoaded(isomorphicClerk);
+    if (!isomorphicClerk.session) {
+      throw new Error('getToken cannot be called without a session');
+    }
     return isomorphicClerk.session.getToken(options);
-  }
-  return null;
-};
+  };
 
 /**
  * @internal
