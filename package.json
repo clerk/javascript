@@ -34,7 +34,7 @@
     "typescript": "^4.6.2"
   },
   "scripts": {
-    "dev": "lerna run dev --parallel --scope @clerk/types --scope @clerk/clerk-js --scope @clerk/clerk-react --scope @clerk/remix --scope @clerk/nextjs",
+    "dev": "lerna run dev --parallel --ignore @clerk/{expo}",
     "lint-fix": "eslint . --ext .ts",
     "bump": "lerna version",
     "bump:next": "lerna version --conventional-prerelease",
