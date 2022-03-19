@@ -3,6 +3,8 @@
   Base,
   ClerkBackendAPI,
   ClerkFetcher,
+  createGetToken,
+  createSignedOutState,
   JWTPayload,
 } from '@clerk/backend-core';
 import Cookies from 'cookies';
@@ -18,6 +20,9 @@ import { LIB_NAME, LIB_VERSION } from './info';
 import { ClerkServerError } from './utils/Errors';
 // utils
 import Logger from './utils/Logger';
+import { Crypto, CryptoKey } from '@peculiar/webcrypto';
+
+import { decodeBase64, toSPKIDer } from './utils/crypto';
 
 const defaultApiKey = process.env.CLERK_API_KEY || '';
 const defaultApiVersion = process.env.CLERK_API_VERSION || 'v1';
@@ -44,10 +49,6 @@ export type RequireAuthProp<T> = T & {
     userId: string;
   };
 };
-
-import { Crypto, CryptoKey } from '@peculiar/webcrypto';
-
-import { decodeBase64, toSPKIDer } from './utils/crypto';
 
 const crypto = new Crypto();
 
@@ -242,14 +243,16 @@ export default class Clerk extends ClerkBackendAPI {
       res: Response,
       next: NextFunction
     ): Promise<any> {
-      const cookies = new Cookies(req, res);
-
       try {
+        const cookies = new Cookies(req, res);
+        const cookieToken = cookies.get('__session') as string;
+        const headerToken = req.headers.authorization?.replace('Bearer ', '');
+
         const { status, interstitial, sessionClaims } =
           await this.base.getAuthState({
-            cookieToken: cookies.get('__session') as string,
+            cookieToken,
+            headerToken,
             clientUat: cookies.get('__client_uat') as string,
-            headerToken: req.headers.authorization?.replace('Bearer ', ''),
             origin: req.headers.origin,
             host: req.headers.host as string,
             forwardedPort: req.headers['x-forwarded-port'] as string,
@@ -269,6 +272,12 @@ export default class Clerk extends ClerkBackendAPI {
           req.auth = {
             sessionId: sessionClaims?.sid,
             userId: sessionClaims?.sub,
+            getToken: createGetToken({
+              headerToken,
+              cookieToken,
+              sessionId: sessionClaims?.sid,
+              fetcher: (...args) => this.sessions.getToken(...args),
+            }),
           };
 
           return next();
@@ -281,8 +290,9 @@ export default class Clerk extends ClerkBackendAPI {
         // Auth object will be set to the signed out auth state
         // @ts-expect-error
         req.auth = {
-          sessionId: null,
           userId: null,
+          sessionId: null,
+          getToken: createSignedOutState().getToken,
         };
 
         // Call onError if provided
