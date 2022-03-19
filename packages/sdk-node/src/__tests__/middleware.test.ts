@@ -1,8 +1,20 @@
-import { AuthStatus } from '@clerk/backend-core';
 import type { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
 import Clerk from '../Clerk';
+import { AuthStatus } from '@clerk/backend-core';
+
+const mockGetToken = () => {};
+
+jest.mock('@clerk/backend-core', () => {
+  return {
+    ...jest.requireActual('@clerk/backend-core'),
+    createGetToken: () => mockGetToken,
+    createSignedOutState: () => ({
+      getToken: mockGetToken,
+    }),
+  };
+});
 
 const mockNext = jest.fn();
 
@@ -17,11 +29,13 @@ const mockGetAuthStateResult = {
 };
 
 const mockAuthProp = {
+  getToken: mockGetToken,
   userId: 'user_id',
   sessionId: 'session_id',
 };
 
 const mockAuthSignedOutProp = {
+  getToken: mockGetToken,
   userId: null,
   sessionId: null,
 };
