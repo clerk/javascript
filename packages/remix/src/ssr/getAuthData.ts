@@ -1,6 +1,6 @@
-import { AuthStatus, Session, User } from '@clerk/backend-core';
+import { AuthStatus, createGetToken, createSignedOutState, Session, User } from '@clerk/backend-core';
 import Clerk, { sessions, users } from '@clerk/clerk-sdk-node';
-import { ServerGetToken, ServerGetTokenOptions } from '@clerk/types';
+import { ServerGetToken } from '@clerk/types';
 
 import { RootAuthLoaderOptions } from './types';
 import { parseCookies } from './utils';
@@ -15,22 +15,6 @@ export type AuthData = {
 
 /**
  * @internal
- * TODO: Share the same impl between nextjs/remix packages
- */
-const createGetToken =
-  (sessionId?: string, sessionToken?: string): ServerGetToken =>
-  async (options: ServerGetTokenOptions = {}) => {
-    if (!sessionId) {
-      throw new Error('getToken cannot be called without a session');
-    }
-    if (options.template) {
-      return sessions.getToken(sessionId, options.template);
-    }
-    return Promise.resolve(sessionToken);
-  };
-
-/**
- * @internal
  */
 export async function getAuthData(
   req: Request,
@@ -40,19 +24,13 @@ export async function getAuthData(
   const { headers } = req;
   const cookies = parseCookies(req);
 
-  const signedOutState = {
-    sessionId: null,
-    session: null,
-    userId: null,
-    user: null,
-    getToken: createGetToken(undefined),
-  };
-
   try {
+    const cookieToken = cookies['__session'];
+    const headerToken = headers.get('authorization')?.replace('Bearer ', '');
     const { status, sessionClaims } = await Clerk.base.getAuthState({
-      cookieToken: cookies['__session'],
+      cookieToken,
+      headerToken,
       clientUat: cookies['__client_uat'],
-      headerToken: headers.get('authorization')?.replace('Bearer ', ''),
       origin: headers.get('origin'),
       host: headers.get('host') as string,
       forwardedPort: headers.get('x-forwarded-port') as string,
@@ -67,26 +45,25 @@ export async function getAuthData(
     }
 
     if (status === AuthStatus.SignedOut || !sessionClaims) {
-      return { authData: signedOutState };
+      return { authData: createSignedOutState() };
     }
 
-    const getToken = createGetToken(sessionClaims.sid as string, cookies['__session']);
-
+    const sessionId = sessionClaims.sid;
+    const userId = sessionClaims.sub;
     const [user, session] = await Promise.all([
-      loadUser ? users.getUser(sessionClaims.sub as string) : Promise.resolve(undefined),
-      loadSession ? sessions.getSession(sessionClaims.sid as string) : Promise.resolve(undefined),
+      loadUser ? users.getUser(userId) : Promise.resolve(undefined),
+      loadSession ? sessions.getSession(sessionId) : Promise.resolve(undefined),
     ]);
 
-    return {
-      authData: {
-        sessionId: sessionClaims.sid as string,
-        userId: sessionClaims.sub as string,
-        user: user,
-        session: session,
-        getToken,
-      },
-    };
+    const getToken = createGetToken({
+      sessionId,
+      cookieToken,
+      headerToken,
+      fetcher: (...args) => sessions.getToken(...args),
+    });
+
+    return { authData: { sessionId, userId, user, session, getToken } };
   } catch (e) {
-    return { authData: signedOutState };
+    return { authData: createSignedOutState() };
   }
 }

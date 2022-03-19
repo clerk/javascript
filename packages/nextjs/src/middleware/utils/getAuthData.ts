@@ -1,25 +1,8 @@
-import { AuthStatus } from '@clerk/backend-core';
+import { AuthStatus, createGetToken, createSignedOutState } from '@clerk/backend-core';
 import Clerk, { sessions, users } from '@clerk/clerk-sdk-node';
-import { ServerGetToken, ServerGetTokenOptions } from '@clerk/types';
 import { GetServerSidePropsContext } from 'next';
 
 import { AuthData, WithServerSideAuthOptions } from '../types';
-
-/**
- * @internal
- * TODO: Share the same impl between nextjs/remix packages
- */
-const createGetToken =
-  (sessionId?: string, sessionToken?: string): ServerGetToken =>
-  async (options: ServerGetTokenOptions = {}) => {
-    if (!sessionId) {
-      throw new Error('getToken cannot be called without a session');
-    }
-    if (options.template) {
-      return sessions.getToken(sessionId, options.template);
-    }
-    return Promise.resolve(sessionToken);
-  };
 
 /**
  * @internal
@@ -31,19 +14,13 @@ export async function getAuthData(
   const { headers, cookies } = ctx.req;
   const { loadSession, loadUser } = opts;
 
-  const signedOutState = {
-    sessionId: null,
-    session: null,
-    userId: null,
-    user: null,
-    getToken: createGetToken(undefined),
-  };
-
   try {
+    const cookieToken = cookies['__session'];
+    const headerToken = headers.authorization?.replace('Bearer ', '');
     const { status, sessionClaims, interstitial } = await Clerk.base.getAuthState({
-      cookieToken: cookies['__session'],
+      cookieToken,
+      headerToken,
       clientUat: cookies['__client_uat'],
-      headerToken: headers.authorization?.replace('Bearer ', ''),
       origin: headers.origin,
       host: headers.host as string,
       forwardedPort: headers['x-forwarded-port'] as string,
@@ -60,24 +37,26 @@ export async function getAuthData(
     }
 
     if (status === AuthStatus.SignedOut || !sessionClaims) {
-      return signedOutState;
+      return createSignedOutState();
     }
 
-    const getToken = createGetToken(sessionClaims.sid as string, cookies['__session']);
+    const sessionId = sessionClaims.sid;
+    const userId = sessionClaims.sub;
+
+    const getToken = createGetToken({
+      sessionId,
+      headerToken,
+      cookieToken,
+      fetcher: (...args) => sessions.getToken(...args),
+    });
 
     const [user, session] = await Promise.all([
-      loadUser ? users.getUser(sessionClaims.sub as string) : Promise.resolve(undefined),
-      loadSession ? sessions.getSession(sessionClaims.sid as string) : Promise.resolve(undefined),
+      loadUser ? users.getUser(userId) : Promise.resolve(undefined),
+      loadSession ? sessions.getSession(sessionId) : Promise.resolve(undefined),
     ]);
 
-    return {
-      sessionId: sessionClaims.sid as string,
-      userId: sessionClaims.sub as string,
-      user,
-      session,
-      getToken,
-    };
+    return { sessionId, userId, user, session, getToken };
   } catch (err) {
-    return signedOutState;
+    return createSignedOutState();
   }
 }
