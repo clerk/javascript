@@ -26,7 +26,8 @@ export type RequestWithAuth<
 } & (Options extends { loadSession: true } ? { session: Session | null } : {}) &
   (Options extends { loadUser: true } ? { user: User | null } : {});
 
-export type NextMiddlewareResult = NextResponse | Response | null | undefined;
+type NextMiddlewareReturnOptions = NextResponse | Response | null | undefined;
+export type NextMiddlewareResult = NextMiddlewareReturnOptions;
 
 export type WithAuthNextMiddlewareHandler<Options> = (
   req: RequestWithAuth<Options>,
