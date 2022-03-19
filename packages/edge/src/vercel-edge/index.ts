@@ -1,4 +1,4 @@
-import { AuthStatus, Base, createSignedOutState } from '@clerk/backend-core';
+import { AuthStatus, Base, createGetToken, createSignedOutState } from '@clerk/backend-core';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 
 import { ClerkAPI } from './ClerkAPI';
@@ -9,7 +9,6 @@ import {
   WithEdgeMiddlewareAuthOptions,
 } from './types';
 import { injectAuthIntoRequest } from './utils';
-import { ServerGetTokenOptions } from '@clerk/types/src';
 
 /**
  *
@@ -77,11 +76,12 @@ export function withEdgeMiddlewareAuth(
   },
 ): any {
   return async function clerkAuth(req: NextRequest, event: NextFetchEvent) {
-    /* Get authentication state */
+    const cookieToken = req.cookies['__session'];
+    const headerToken = req.headers.get('authorization');
     const { status, interstitial, sessionClaims } = await vercelEdgeBase.getAuthState({
-      cookieToken: req.cookies['__session'],
+      cookieToken,
+      headerToken,
       clientUat: req.cookies['__client_uat'],
-      headerToken: req.headers.get('authorization'),
       origin: req.headers.get('origin'),
       host: req.headers.get('host') as string,
       userAgent: req.headers.get('user-agent'),
@@ -99,13 +99,6 @@ export function withEdgeMiddlewareAuth(
       });
     }
 
-    const getToken = (options: ServerGetTokenOptions = {}) => {
-      if (options.template) {
-        throw new Error('Retrieving a JWT template during edge runtime will be supported soon.');
-      }
-      return Promise.resolve(req.cookies['__session']);
-    };
-
     /* In both SignedIn and SignedOut states, we just add the attributes to the request object and passthrough. */
     if (status === AuthStatus.SignedOut) {
       return handler(injectAuthIntoRequest(req, createSignedOutState()), event);
@@ -119,7 +112,13 @@ export function withEdgeMiddlewareAuth(
       options.loadSession ? ClerkAPI.sessions.getSession(sessionId) : Promise.resolve(undefined),
     ]);
 
-    /* Inject the auth state into the NextResponse object */
+    const getToken = createGetToken({
+      sessionId,
+      cookieToken,
+      headerToken: headerToken || '',
+      fetcher: (...args) => ClerkAPI.sessions.getToken(...args),
+    });
+
     const authRequest = injectAuthIntoRequest(req, { user, session, sessionId, userId, getToken });
     return handler(authRequest, event);
   };
