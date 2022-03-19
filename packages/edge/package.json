@@ -28,8 +28,8 @@
       "require": "./dist/cjs/index.js"
     },
     "./vercel-edge": {
-      "import": "./dist/mjs/vercel-edge.js",
-      "require": "./dist/cjs/vercel-edge.js"
+      "import": "./dist/mjs/vercel-edge/index.js",
+      "require": "./dist/cjs/vercel-edge/index.js"
     }
   },
   "scripts": {
