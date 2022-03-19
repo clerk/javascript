@@ -1,7 +1,13 @@
-# Add files here to ignore them from prettier formatting
-
-/dist
-/coverage
+coverage
+node_modules
+dist
+build
+coverage
 .github
 .idea
 .vscode
+.turbo
+.next
+.cache
+.yalc
+package-lock.json
