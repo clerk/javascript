@@ -1,6 +1,6 @@
 {
   "name": "@clerk/edge",
-  "version": "1.0.1-alpha.1",
+  "version": "1.0.1-alpha.2",
   "license": "MIT",
   "description": "Clerk SDK for serverless and edge environments",
   "keywords": [

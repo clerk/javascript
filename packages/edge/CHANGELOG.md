@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [1.0.1-alpha.2](https://github.com/clerkinc/javascript/compare/@clerk/edge@1.0.1-alpha.1...@clerk/edge@1.0.1-alpha.2) (2022-03-20)
+
+### Bug Fixes
+
+- **edge:** Allow handlers returning promises in `withEdgeMiddlewareAuth` ([d5030ef](https://github.com/clerkinc/javascript/commit/d5030ef46b78dc824d0564c5c7f15ed0ce1a952b))
+
 ### [1.0.1-alpha.1](https://github.com/clerkinc/javascript/compare/@clerk/edge@1.0.1-staging.0...@clerk/edge@1.0.1-alpha.1) (2022-03-20)
 
 ### Features
