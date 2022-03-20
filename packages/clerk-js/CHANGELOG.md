@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.0.1-alpha.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.0.1-staging.0...@clerk/clerk-js@3.0.1-alpha.1) (2022-03-20)
+
+### Bug Fixes
+
+- **clerk-js,clerk-react:** Move error to getToken ([d5f6b26](https://github.com/clerkinc/javascript/commit/d5f6b264cf58ce40c68de298b4c7c564d472001f))
+- **clerk-js:** Fix signIn.prepareFirstFactor params ([e435245](https://github.com/clerkinc/javascript/commit/e4352454028099f0973203aa79e548890c6327bd))
+- **clerk-js:** Make getToken use /user endpoint for integration tokens ([b61213b](https://github.com/clerkinc/javascript/commit/b61213b4c94952e6f21dd8e036aa6815c5c38c06))
+
 ### [3.0.1-alpha.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.0.1-staging.0...@clerk/clerk-js@3.0.1-alpha.0) (2022-03-19)
 
 ### Bug Fixes
