@@ -57,10 +57,8 @@ async function fetchInterstitial() {
   return response.text();
 }
 
-/** Export middleware wrapper */
-
 export function withEdgeMiddlewareAuth<
-  CallbackReturn extends NextMiddlewareResult,
+  CallbackReturn extends NextMiddlewareResult | Promise<NextMiddlewareResult>,
   Options extends WithEdgeMiddlewareAuthOptions,
 >(
   handler: WithEdgeMiddlewareAuthCallback<CallbackReturn, Options>,
