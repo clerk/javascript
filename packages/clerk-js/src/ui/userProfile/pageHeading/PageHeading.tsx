@@ -10,17 +10,20 @@ export type PageHeadingProps = {
   className?: string;
 };
 
-export function PageHeading({
-  title,
-  subtitle,
-  backTo,
-  className,
-}: PageHeadingProps): JSX.Element {
+export function PageHeading({ title, subtitle, backTo, className }: PageHeadingProps): JSX.Element {
   return (
     <div className={cn('cl-page-heading', className)}>
-      {backTo && <BackButton to={backTo} className='cl-back-button' />}
+      {backTo && (
+        <BackButton
+          to={backTo}
+          className='cl-back-button'
+        />
+      )}
       <div className='cl-text-container'>
-        <Heading as={'h2'} className='cl-title'>
+        <Heading
+          as={'h2'}
+          className='cl-title'
+        >
           {title}
         </Heading>
         <p className='cl-subtitle'>{subtitle}</p>

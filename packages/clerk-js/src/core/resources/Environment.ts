@@ -6,12 +6,7 @@ import type {
   UserSettingsResource,
 } from '@clerk/types';
 
-import {
-  AuthConfig,
-  BaseResource,
-  DisplayConfig,
-  UserSettings,
-} from './internal';
+import { AuthConfig, BaseResource, DisplayConfig, UserSettings } from './internal';
 
 export class Environment extends BaseResource implements EnvironmentResource {
   private static instance: Environment;

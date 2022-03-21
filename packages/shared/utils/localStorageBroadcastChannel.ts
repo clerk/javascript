@@ -20,10 +20,7 @@ export class LocalStorageBroadcastChannel<E> {
     }
   };
 
-  public addEventListener = (
-    eventName: 'message',
-    listener: Listener<E>,
-  ): void => {
+  public addEventListener = (eventName: 'message', listener: Listener<E>): void => {
     this.eventTarget.addEventListener(this.prefixEventName(eventName), e => {
       listener(e as MessageEvent);
     });

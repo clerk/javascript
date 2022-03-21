@@ -5,10 +5,7 @@ export type WizardProps = {
   defaultStep?: number;
 };
 
-export function Wizard({
-  children = [],
-  defaultStep = 0,
-}: WizardProps): JSX.Element | null {
+export function Wizard({ children = [], defaultStep = 0 }: WizardProps): JSX.Element | null {
   const [step, setStep] = React.useState(defaultStep);
 
   React.useEffect(() => {

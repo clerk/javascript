@@ -1,9 +1,6 @@
 import './polyfills';
 
-import {
-  ClerkProvider as ClerkReactProvider,
-  ClerkProviderProps as ClerkReactProviderProps,
-} from '@clerk/clerk-react';
+import { ClerkProvider as ClerkReactProvider, ClerkProviderProps as ClerkReactProviderProps } from '@clerk/clerk-react';
 import React from 'react';
 
 import type { TokenCache } from './cache';
@@ -31,7 +28,10 @@ export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
   }
 
   return (
-    <ClerkReactProvider {...rest} Clerk={getClerk()}>
+    <ClerkReactProvider
+      {...rest}
+      Clerk={getClerk()}
+    >
       {children}
     </ClerkReactProvider>
   );

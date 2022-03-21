@@ -10,12 +10,7 @@ import {
   PoweredByClerk,
 } from 'ui/common';
 import { Error } from 'ui/common/error';
-import {
-  useCoreClerk,
-  useCoreSignUp,
-  useEnvironment,
-  useSignUpContext,
-} from 'ui/contexts';
+import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from 'ui/contexts';
 import { useMagicLink } from 'ui/hooks';
 
 export function SignUpVerifyEmailAddressWithMagicLink(): JSX.Element {
@@ -47,10 +42,7 @@ export function SignUpVerifyEmailAddressWithMagicLink(): JSX.Element {
     try {
       hideExpirationScreen();
       const su = await startMagicLinkFlow({
-        redirectUrl: buildMagicLinkRedirectUrl(
-          signUpContext,
-          displayConfig.signUpUrl,
-        ),
+        redirectUrl: buildMagicLinkRedirectUrl(signUpContext, displayConfig.signUpUrl),
       });
       return handleVerificationResult(su);
     } catch (e) {
@@ -76,9 +68,7 @@ export function SignUpVerifyEmailAddressWithMagicLink(): JSX.Element {
   };
 
   if (showVerifyModal) {
-    return (
-      <MagicLinkVerificationStatusModal verificationStatus='verified_switch_tab' />
-    );
+    return <MagicLinkVerificationStatusModal verificationStatus='verified_switch_tab' />;
   }
 
   return (
@@ -86,9 +76,7 @@ export function SignUpVerifyEmailAddressWithMagicLink(): JSX.Element {
       {error && <Error>{error}</Error>}
       <Body className='cl-auth-form-body-center cl-verification-page-container'>
         {showExpiredScreen ? (
-          <ExpiredRetryMagicLinkWaitingScreen
-            onResendButtonClicked={startVerification}
-          />
+          <ExpiredRetryMagicLinkWaitingScreen onResendButtonClicked={startVerification} />
         ) : (
           <MagicLinkWaitingScreen
             icon='mail'
@@ -97,9 +85,7 @@ export function SignUpVerifyEmailAddressWithMagicLink(): JSX.Element {
               <>
                 A sign-up link has been sent to
                 <br />
-                <span className='cl-verification-page-identifier'>
-                  {identifierRef.current}
-                </span>
+                <span className='cl-verification-page-identifier'>{identifierRef.current}</span>
               </>
             }
             secondaryText='Click the link in the email to continue signing up, then return to

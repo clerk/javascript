@@ -57,7 +57,11 @@ export const EditableField = (props: EditableFieldProps) => {
           handleReset={handleCancel}
           buttonGroupClassName='cl-form-button-group'
         >
-          <Control error={currentValue.error} label={label} htmlFor={inputName}>
+          <Control
+            error={currentValue.error}
+            label={label}
+            htmlFor={inputName}
+          >
             <Input
               id={inputName}
               name={inputName}

@@ -10,9 +10,5 @@ export type SpinnerProps = {
 };
 
 export function Spinner({ inverted, className }: SpinnerProps): JSX.Element {
-  return (
-    <div
-      className={cn(styles.spinner, className, { [styles.inverted]: inverted })}
-    />
-  );
+  return <div className={cn(styles.spinner, className, { [styles.inverted]: inverted })} />;
 }

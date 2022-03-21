@@ -38,7 +38,10 @@ export function EmailAddressVerificationWithOTP({
 
   return (
     <div className={className}>
-      <div className='cl-copy-text' style={{ marginBottom: '2em' }}>
+      <div
+        className='cl-copy-text'
+        style={{ marginBottom: '2em' }}
+      >
         An email containing a verification code has been sent to{' '}
         <span className='cl-identifier'>{email.emailAddress}</span>.
       </div>

@@ -5,29 +5,19 @@ import { ComponentContext } from 'ui/contexts';
 import { HashRouter, PathRouter } from 'ui/router';
 import type { AvailableComponentCtx } from 'ui/types';
 
-type PortalProps<
-  CtxType extends AvailableComponentCtx,
-  PropsType = Omit<CtxType, 'componentName'>,
-> = {
+type PortalProps<CtxType extends AvailableComponentCtx, PropsType = Omit<CtxType, 'componentName'>> = {
   node: HTMLDivElement;
-  component:
-    | React.FunctionComponent<PropsType>
-    | React.ComponentClass<PropsType, any>;
+  component: React.FunctionComponent<PropsType> | React.ComponentClass<PropsType, any>;
   props: PropsType & { path?: string; routing?: string };
   preservedParams?: string[];
 } & Pick<CtxType, 'componentName'>;
 
-export default class Portal<
-  CtxType extends AvailableComponentCtx,
-> extends React.PureComponent<PortalProps<CtxType>> {
+export default class Portal<CtxType extends AvailableComponentCtx> extends React.PureComponent<PortalProps<CtxType>> {
   render(): React.ReactPortal {
-    const { props, component, componentName, node, preservedParams } =
-      this.props;
+    const { props, component, componentName, node, preservedParams } = this.props;
 
     const el = (
-      <ComponentContext.Provider
-        value={{ componentName: componentName, ...props } as CtxType}
-      >
+      <ComponentContext.Provider value={{ componentName: componentName, ...props } as CtxType}>
         {React.createElement(component, props)}
       </ComponentContext.Provider>
     );
@@ -42,16 +32,16 @@ export default class Portal<
       }
 
       return ReactDOM.createPortal(
-        <PathRouter preservedParams={preservedParams} basePath={props.path}>
+        <PathRouter
+          preservedParams={preservedParams}
+          basePath={props.path}
+        >
           {el}
         </PathRouter>,
         node,
       );
     }
 
-    return ReactDOM.createPortal(
-      <HashRouter preservedParams={preservedParams}>{el}</HashRouter>,
-      node,
-    );
+    return ReactDOM.createPortal(<HashRouter preservedParams={preservedParams}>{el}</HashRouter>, node);
   }
 }

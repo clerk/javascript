@@ -13,9 +13,13 @@ interface EditableListFieldRemoveCardProps {
   onRemoved?: () => void;
 }
 
-export const EditableListFieldRemoveCard: React.FC<
-  EditableListFieldRemoveCardProps
-> = ({ type, label, onCancel, onRemove, onRemoved }) => {
+export const EditableListFieldRemoveCard: React.FC<EditableListFieldRemoveCardProps> = ({
+  type,
+  label,
+  onCancel,
+  onRemove,
+  onRemoved,
+}) => {
   const lowerLabel = label.toLowerCase();
   const [error, setError] = React.useState<string | undefined>();
 
@@ -40,7 +44,10 @@ export const EditableListFieldRemoveCard: React.FC<
       <div className='cl-copy-text'>
         <p>
           {type === 'phone' ? (
-            <PhoneViewer className='cl-identifier' phoneNumber={lowerLabel} />
+            <PhoneViewer
+              className='cl-identifier'
+              phoneNumber={lowerLabel}
+            />
           ) : (
             <span className='cl-identifier'>{lowerLabel}</span>
           )}{' '}
@@ -48,20 +55,24 @@ export const EditableListFieldRemoveCard: React.FC<
         </p>
         {type === 'email' && (
           <p>
-            You’ll no longer receive communications to this email address, and
-            you cannot use it when signing in to identify yourself.
+            You’ll no longer receive communications to this email address, and you cannot use it when signing in to
+            identify yourself.
           </p>
         )}
         {type === 'phone' && (
           <p>
-            You will no longer receive messages to this number, and you cannot
-            use it when signing in to identify yourself.
+            You will no longer receive messages to this number, and you cannot use it when signing in to identify
+            yourself.
           </p>
         )}
       </div>
       <div className='cl-form-button-group'>
         <Button onClick={updateFieldSubmit}>Remove {type}</Button>
-        <Button flavor='text' type='reset' onClick={onCancel}>
+        <Button
+          flavor='text'
+          type='reset'
+          onClick={onCancel}
+        >
           Cancel
         </Button>
       </div>

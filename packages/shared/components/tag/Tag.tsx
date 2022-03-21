@@ -14,15 +14,7 @@ export type TagProps = React.PropsWithChildren<{
   style?: Record<string, unknown>;
 }>;
 
-export function Tag({
-  color = 'success',
-  size = 'sm',
-  text,
-  children,
-  Icon,
-  className,
-  style,
-}: TagProps): JSX.Element {
+export function Tag({ color = 'success', size = 'sm', text, children, Icon, className, style }: TagProps): JSX.Element {
   return (
     <span
       className={cn(styles.tag, styles[color], styles[size], className)}
@@ -43,16 +35,19 @@ type VerificationStatusTagProps = {
   className?: string;
 };
 
-export function VerificationStatusTag({
-  status,
-  className,
-}: VerificationStatusTagProps): JSX.Element | null {
+export function VerificationStatusTag({ status, className }: VerificationStatusTagProps): JSX.Element | null {
   return status.match(/expired|unverified|failed/) ? (
-    <Tag className={className} color='error'>
+    <Tag
+      className={className}
+      color='error'
+    >
       {titleize(status)}
     </Tag>
   ) : status === 'verified' ? (
-    <Tag className={className} color='success'>
+    <Tag
+      className={className}
+      color='success'
+    >
       Verified
     </Tag>
   ) : null;

@@ -60,7 +60,11 @@ export function ChangePassword(): JSX.Element {
           handleReset={showRemovePassword ? onClickRemovePassword : undefined}
           buttonGroupClassName='cl-form-button-group'
         >
-          <Control error={password.error} htmlFor='password' label='Password'>
+          <Control
+            error={password.error}
+            htmlFor='password'
+            label='Password'
+          >
             <Input
               type='password'
               id='password'

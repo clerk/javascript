@@ -14,9 +14,7 @@ export function ButtonWithTimer({
   children,
   ...rest
 }: ButtonWithTimerProps): JSX.Element {
-  const [isDisabled, setIsDisabled] = React.useState(
-    startingState === 'disabled',
-  );
+  const [isDisabled, setIsDisabled] = React.useState(startingState === 'disabled');
 
   React.useEffect(() => {
     if (startingState === 'disabled') {
@@ -24,9 +22,7 @@ export function ButtonWithTimer({
     }
   }, []);
 
-  const throttledClickHandler: React.MouseEventHandler<HTMLButtonElement> = (
-    ...args
-  ) => {
+  const throttledClickHandler: React.MouseEventHandler<HTMLButtonElement> = (...args) => {
     disableAndToggleAfterDelay();
     onClick?.(...args);
   };
@@ -37,7 +33,11 @@ export function ButtonWithTimer({
   };
 
   return (
-    <Button disabled={isDisabled} onClick={throttledClickHandler} {...rest}>
+    <Button
+      disabled={isDisabled}
+      onClick={throttledClickHandler}
+      {...rest}
+    >
       {children}
     </Button>
   );

@@ -89,17 +89,13 @@ test('getClient() returns a single client', async () => {
       'Content-Type': 'application/x-www-form-urlencoded',
     });
 
-  const client = await TestBackendAPIClient.clients.getClient(
-    expected.id as string
-  );
+  const client = await TestBackendAPIClient.clients.getClient(expected.id as string);
 
   expect(client).toEqual(expected);
 });
 
 test('getClient() throws an error without client ID', async () => {
-  await expect(TestBackendAPIClient.clients.getClient('')).rejects.toThrow(
-    'A valid ID is required.'
-  );
+  await expect(TestBackendAPIClient.clients.getClient('')).rejects.toThrow('A valid ID is required.');
 });
 
 test('verifyClient() returns a client if verified', async () => {

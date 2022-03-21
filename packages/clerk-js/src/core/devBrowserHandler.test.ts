@@ -1,10 +1,9 @@
-import createDevBrowserHandler, {
-  CreateDevBrowserHandlerOptions,
-} from './devBrowserHandler';
+import createDevBrowserHandler, { CreateDevBrowserHandlerOptions } from './devBrowserHandler';
 
 describe('detBrowserHandler', () => {
-  const { getDevBrowserJWT, setDevBrowserJWT, removeDevBrowserJWT } =
-    createDevBrowserHandler({} as CreateDevBrowserHandlerOptions);
+  const { getDevBrowserJWT, setDevBrowserJWT, removeDevBrowserJWT } = createDevBrowserHandler(
+    {} as CreateDevBrowserHandlerOptions,
+  );
 
   describe('localStorage', () => {
     beforeEach(() => {
@@ -22,11 +21,7 @@ describe('detBrowserHandler', () => {
       const mockJWT = 'cafebabe';
 
       expect(setDevBrowserJWT(mockJWT)).toBeUndefined();
-      expect(window.localStorage.setItem).toHaveBeenNthCalledWith(
-        1,
-        'clerk-db-jwt',
-        mockJWT,
-      );
+      expect(window.localStorage.setItem).toHaveBeenNthCalledWith(1, 'clerk-db-jwt', mockJWT);
 
       getDevBrowserJWT();
       expect(window.localStorage.getItem).toHaveBeenCalledTimes(1);

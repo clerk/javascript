@@ -16,12 +16,8 @@ function queryClerkFontVariableDefinitions() {
   document.body.appendChild(tempElem);
 
   const computedStyles = getComputedStyle(tempElem);
-  const hasLocalCssVarForGeneralFontFamily = computedStyles.getPropertyValue(
-    '--clerk-font-family',
-  );
-  const hasLocalCssVarForButtonFontFamily = computedStyles.getPropertyValue(
-    '--clerk-button-font-family',
-  );
+  const hasLocalCssVarForGeneralFontFamily = computedStyles.getPropertyValue('--clerk-font-family');
+  const hasLocalCssVarForButtonFontFamily = computedStyles.getPropertyValue('--clerk-button-font-family');
 
   tempElem.remove();
 
@@ -31,21 +27,11 @@ function queryClerkFontVariableDefinitions() {
   };
 }
 
-export function loadFonts(
-  theme: DisplayThemeJSON,
-  userSuppliedThemeOptions: DeepPartial<DisplayThemeJSON>,
-): void {
+export function loadFonts(theme: DisplayThemeJSON, userSuppliedThemeOptions: DeepPartial<DisplayThemeJSON>): void {
   /** Query the DOM about defined style variable & check user supplied theme prop */
-  const {
-    hasLocalCssVarForButtonFontFamily,
-    hasLocalCssVarForGeneralFontFamily,
-  } = queryClerkFontVariableDefinitions();
-  const hasLocalGeneralFont =
-    userSuppliedThemeOptions.general?.font_family ||
-    hasLocalCssVarForGeneralFontFamily;
-  const hasLocalButtonFont =
-    userSuppliedThemeOptions.buttons?.font_family ||
-    hasLocalCssVarForButtonFontFamily;
+  const { hasLocalCssVarForButtonFontFamily, hasLocalCssVarForGeneralFontFamily } = queryClerkFontVariableDefinitions();
+  const hasLocalGeneralFont = userSuppliedThemeOptions.general?.font_family || hasLocalCssVarForGeneralFontFamily;
+  const hasLocalButtonFont = userSuppliedThemeOptions.buttons?.font_family || hasLocalCssVarForButtonFontFamily;
 
   /** If there is no local font option passed in 'general' or '--clerk-font-family' */
   if (!hasLocalGeneralFont) {

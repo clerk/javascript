@@ -18,13 +18,13 @@ export type MenuProps = {
   style?: any;
 };
 
-export const Menu: React.FC<MenuProps> = ({
-  className,
-  options,
-  style,
-}: MenuProps) => {
+export const Menu: React.FC<MenuProps> = ({ className, options, style }: MenuProps) => {
   return (
-    <ul role='menu' className={cn(styles.menu, className)} style={style}>
+    <ul
+      role='menu'
+      className={cn(styles.menu, className)}
+      style={style}
+    >
       {options.map((option, i) => {
         const onClick = (e: React.MouseEvent<HTMLLIElement>) => {
           e.stopPropagation();
@@ -43,9 +43,7 @@ export const Menu: React.FC<MenuProps> = ({
             onClick={onClick}
             tabIndex={0}
           >
-            {option.icon && (
-              <div className={styles.iconContainer}>{option.icon}</div>
-            )}
+            {option.icon && <div className={styles.iconContainer}>{option.icon}</div>}
             <div>{option.label}</div>
           </li>
         );

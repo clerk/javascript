@@ -12,13 +12,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
           },
         ],
       } as unknown as SignInResource;
-      expect(
-        determineStartingSignInFactor(
-          signIn.supportedFirstFactors,
-          signIn.identifier,
-          'password',
-        ),
-      ).toEqual({
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'password')).toEqual({
         strategy: 'password',
       });
     });
@@ -37,13 +31,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
           },
         ],
       } as unknown as SignInResource;
-      expect(
-        determineStartingSignInFactor(
-          signIn.supportedFirstFactors,
-          signIn.identifier,
-          'password',
-        ),
-      ).toEqual({
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'password')).toEqual({
         strategy: 'phone_code',
         safeIdentifier: 'jdoe@example.com',
       });
@@ -63,13 +51,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
           },
         ],
       } as unknown as SignInResource;
-      expect(
-        determineStartingSignInFactor(
-          signIn.supportedFirstFactors,
-          signIn.identifier,
-          'password',
-        ),
-      ).toEqual({
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'password')).toEqual({
         strategy: 'email_code',
         safeIdentifier: 'ccoe@example.com',
       });
@@ -85,13 +67,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
           },
         ],
       } as unknown as SignInResource;
-      expect(
-        determineStartingSignInFactor(
-          signIn.supportedFirstFactors,
-          signIn.identifier,
-          'password',
-        ),
-      ).toEqual({
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'password')).toEqual({
         strategy: 'phone_code',
         safeIdentifier: 'jdoe@example.com',
       });
@@ -102,13 +78,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
         identifier: undefined,
         supportedFirstFactors: [],
       } as unknown as SignInResource;
-      expect(
-        determineStartingSignInFactor(
-          signIn.supportedFirstFactors,
-          signIn.identifier,
-          'password',
-        ),
-      ).toBeNull();
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'password')).toBeNull();
     });
   });
 
@@ -130,13 +100,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
           },
         ],
       } as unknown as SignInResource;
-      expect(
-        determineStartingSignInFactor(
-          signIn.supportedFirstFactors,
-          signIn.identifier,
-          'otp',
-        ),
-      ).toEqual({
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'otp')).toEqual({
         strategy: 'phone_code',
         safeIdentifier: 'jdoe@example.com',
       });
@@ -159,13 +123,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
           },
         ],
       } as unknown as SignInResource;
-      expect(
-        determineStartingSignInFactor(
-          signIn.supportedFirstFactors,
-          signIn.identifier,
-          'otp',
-        ),
-      ).toEqual({
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'otp')).toEqual({
         strategy: 'email_code',
         safeIdentifier: 'ccoe@example.com',
       });
@@ -184,13 +142,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
           },
         ],
       } as unknown as SignInResource;
-      expect(
-        determineStartingSignInFactor(
-          signIn.supportedFirstFactors,
-          signIn.identifier,
-          'otp',
-        ),
-      ).toEqual({
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'otp')).toEqual({
         strategy: 'phone_code',
         safeIdentifier: 'jdoe@example.com',
       });
@@ -204,13 +156,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
           },
         ],
       } as unknown as SignInResource;
-      expect(
-        determineStartingSignInFactor(
-          signIn.supportedFirstFactors,
-          signIn.identifier,
-          'otp',
-        ),
-      ).toEqual({
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'otp')).toEqual({
         strategy: 'password',
       });
     });
@@ -220,13 +166,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
         identifier: undefined,
         supportedFirstFactors: [],
       } as unknown as SignInResource;
-      expect(
-        determineStartingSignInFactor(
-          signIn.supportedFirstFactors,
-          signIn.identifier,
-          'otp',
-        ),
-      ).toBeNull();
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'otp')).toBeNull();
     });
   });
 

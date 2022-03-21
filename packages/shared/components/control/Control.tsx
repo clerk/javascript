@@ -49,18 +49,20 @@ export function Control({
   });
 
   const hintElement = hint ? (
-    <span className={styles.hint}>
-      {hintOnClickHandler ? <a onClick={hintOnClickHandler}>{hint}</a> : hint}
-    </span>
+    <span className={styles.hint}>{hintOnClickHandler ? <a onClick={hintOnClickHandler}>{hint}</a> : hint}</span>
   ) : null;
 
-  const optionalElement = optional ? (
-    <span className={styles.optional}>Optional</span>
-  ) : null;
+  const optionalElement = optional ? <span className={styles.optional}>Optional</span> : null;
 
   return (
-    <div className={cn(styles.control, className)} style={containerStyle}>
-      <Label htmlFor={htmlFor} className={styles.labelContainer}>
+    <div
+      className={cn(styles.control, className)}
+      style={containerStyle}
+    >
+      <Label
+        htmlFor={htmlFor}
+        className={styles.labelContainer}
+      >
         {childrenWithErrorProp}
         {sublabel && <span className={cn(styles.sublabel)}>{sublabel}</span>}
         {label && (
@@ -72,11 +74,7 @@ export function Control({
         )}
       </Label>
       <span
-        className={cn(
-          styles.error,
-          { [styles.errorVisible]: error },
-          errorClassName,
-        )}
+        className={cn(styles.error, { [styles.errorVisible]: error }, errorClassName)}
         style={errorStyle}
       >
         {error}

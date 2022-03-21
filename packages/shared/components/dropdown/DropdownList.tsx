@@ -6,9 +6,7 @@ import styles from './DropdownList.module.scss';
 import type { DropdownOption } from './types';
 import { getOptionLabel } from './util';
 
-const NoResultsItem = () => (
-  <li className={cn(styles.item, styles.noResults)}>No matches found</li>
-);
+const NoResultsItem = () => <li className={cn(styles.item, styles.noResults)}>No matches found</li>;
 
 export type DropdownListProps = {
   dropdownRef: React.RefObject<HTMLUListElement>;

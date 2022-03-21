@@ -26,9 +26,7 @@ describe('otpPrefFactorComparator(a,b)', function () {
       'password',
     ];
 
-    expect(factors.sort(otpPrefFactorComparator).map(f => f.strategy)).toEqual(
-      expectedOrder,
-    );
+    expect(factors.sort(otpPrefFactorComparator).map(f => f.strategy)).toEqual(expectedOrder);
   });
 });
 
@@ -52,9 +50,7 @@ describe('passwordPrefFactorComparator(a,b)', function () {
       'phone_code',
     ];
 
-    expect(
-      factors.sort(passwordPrefFactorComparator).map(f => f.strategy),
-    ).toEqual(expectedOrder);
+    expect(factors.sort(passwordPrefFactorComparator).map(f => f.strategy)).toEqual(expectedOrder);
   });
 });
 
@@ -78,8 +74,6 @@ describe('allStrategiesButtonsComparator(a,b)', function () {
       'password',
     ];
 
-    expect(
-      factors.sort(allStrategiesButtonsComparator).map(f => f.strategy),
-    ).toEqual(expectedOrder);
+    expect(factors.sort(allStrategiesButtonsComparator).map(f => f.strategy)).toEqual(expectedOrder);
   });
 });

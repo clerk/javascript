@@ -1,8 +1,6 @@
 import React from 'react';
 
-export function useDomRef(
-  querySelector?: string,
-): React.MutableRefObject<HTMLElement | null> {
+export function useDomRef(querySelector?: string): React.MutableRefObject<HTMLElement | null> {
   const root = React.useRef<HTMLElement | null>(null);
 
   React.useEffect(() => {

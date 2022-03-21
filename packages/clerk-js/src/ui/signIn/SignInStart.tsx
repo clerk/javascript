@@ -18,12 +18,7 @@ import {
 } from 'ui/common';
 import { Body, Header } from 'ui/common/authForms';
 import { ERROR_CODES } from 'ui/common/constants';
-import {
-  useCoreClerk,
-  useCoreSignIn,
-  useEnvironment,
-  useSignInContext,
-} from 'ui/contexts';
+import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
 import { useSupportEmail } from 'ui/hooks/useSupportEmail';
 import { getClerkQueryParam } from 'utils/getClerkQueryParam';
@@ -83,17 +78,12 @@ export function _SignInStart(): JSX.Element {
       });
   }, []);
 
-  const identifierInputDisplayValues = getIdentifierControlDisplayValues(
-    standardFormAttributes,
-  );
+  const identifierInputDisplayValues = getIdentifierControlDisplayValues(standardFormAttributes);
 
   React.useEffect(() => {
     async function handleOauthError() {
       const error = signIn?.firstFactorVerification?.error;
-      if (
-        error?.code === ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP ||
-        error?.code === ERROR_CODES.OAUTH_ACCESS_DENIED
-      ) {
+      if (error?.code === ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP || error?.code === ERROR_CODES.OAUTH_ACCESS_DENIED) {
         setError(error.longMessage);
         // TODO: This is a workaround in order to reset the sign in attempt
         // so that the oauth error does not persist on full page reloads.
@@ -104,9 +94,7 @@ export function _SignInStart(): JSX.Element {
     void handleOauthError();
   });
 
-  const buildSignInParams = (
-    fields: Array<FieldState<string>>,
-  ): SignInCreateParams => {
+  const buildSignInParams = (fields: Array<FieldState<string>>): SignInCreateParams => {
     const hasPassword = fields.some(f => f.name === 'password' && !!f.value);
     if (!hasPassword) {
       fields = fields.filter(f => f.name !== 'password');
@@ -143,8 +131,7 @@ export function _SignInStart(): JSX.Element {
     }
     const instantPasswordError: ClerkAPIError = e.errors.find(
       (e: ClerkAPIError) =>
-        e.code === ERROR_CODES.INVALID_STRATEGY_FOR_USER ||
-        e.code === ERROR_CODES.FORM_PASSWORD_INCORRECT,
+        e.code === ERROR_CODES.INVALID_STRATEGY_FOR_USER || e.code === ERROR_CODES.FORM_PASSWORD_INCORRECT,
     );
     const alreadySignedInError: ClerkAPIError = e.errors.find(
       (e: ClerkAPIError) => e.code === 'identifier_already_signed_in',
@@ -160,9 +147,7 @@ export function _SignInStart(): JSX.Element {
     }
   };
 
-  const handleFirstPartySubmit = async (
-    e: React.FormEvent<HTMLFormElement>,
-  ) => {
+  const handleFirstPartySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     return signInWithFields(identifier, instantPassword);
   };
@@ -170,8 +155,7 @@ export function _SignInStart(): JSX.Element {
   if (isLoading) {
     return <LoadingScreen />;
   }
-  const hasSocialOrWeb3Buttons =
-    !!socialProviderStrategies.length || !!web3FirstFactors.length;
+  const hasSocialOrWeb3Buttons = !!socialProviderStrategies.length || !!web3FirstFactors.length;
 
   return (
     <>
@@ -238,9 +222,7 @@ export function _SignInStart(): JSX.Element {
                       type='password'
                       name='password'
                       value={instantPassword.value}
-                      handleChange={el =>
-                        instantPassword.setValue(el.value || '')
-                      }
+                      handleChange={el => instantPassword.setValue(el.value || '')}
                       tabIndex={-1}
                     />
                   </Control>

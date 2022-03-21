@@ -1,10 +1,5 @@
 import { deepSnakeToCamel } from '@clerk/shared/utils';
-import type {
-  PublicUserData,
-  SessionJSON,
-  SessionResource,
-  SessionStatus,
-} from '@clerk/types';
+import type { PublicUserData, SessionJSON, SessionResource, SessionStatus } from '@clerk/types';
 import { GetToken, GetTokenOptions, UserResource } from '@clerk/types/src';
 import { unixEpochToDate } from 'utils/date';
 
@@ -79,16 +74,12 @@ export class Session extends BaseResource implements SessionResource {
     // e.g. session id is 'sess_abc12345' and jwt template name is 'haris'
     // The session token ID will be 'sess_abc12345' and the jwt template token ID will be 'sess_abc12345-haris'
     const tokenId = template ? `${this.id}-${template}` : this.id;
-    const cachedEntry = skipCache
-      ? undefined
-      : SessionTokenCache.get({ tokenId }, leewayInSeconds);
+    const cachedEntry = skipCache ? undefined : SessionTokenCache.get({ tokenId }, leewayInSeconds);
 
     if (cachedEntry) {
       return cachedEntry.tokenResolver.then(res => res.getRawString());
     }
-    const path = template
-      ? `${this.path()}/tokens/${template}`
-      : `${this.path()}/tokens`;
+    const path = template ? `${this.path()}/tokens/${template}` : `${this.path()}/tokens`;
     const tokenResolver = Token.create(path);
     SessionTokenCache.set({ tokenId, tokenResolver });
     return tokenResolver.then(res => res.getRawString());
@@ -109,14 +100,9 @@ export class Session extends BaseResource implements SessionResource {
 
   // Can be removed once `integration_firebase` and `integration_hasura`
   // are no longer supported
-  #handleLegacyIntegrationToken = async (
-    options: GetTokenOptions,
-  ): Promise<string> => {
+  #handleLegacyIntegrationToken = async (options: GetTokenOptions): Promise<string> => {
     const { template, leewayInSeconds } = options;
-    const cachedEntry = SessionTokenCache.get(
-      { tokenId: this.user!.id, audience: template },
-      leewayInSeconds,
-    );
+    const cachedEntry = SessionTokenCache.get({ tokenId: this.user!.id, audience: template }, leewayInSeconds);
     if (cachedEntry) {
       return cachedEntry.tokenResolver.then(res => res.getRawString());
     }
@@ -140,12 +126,8 @@ export class Session extends BaseResource implements SessionResource {
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     this.user = new User(data.user);
-    this.publicUserData = deepSnakeToCamel(
-      data.public_user_data,
-    ) as PublicUserData;
-    this.lastActiveToken = data.last_active_token
-      ? new Token(data.last_active_token)
-      : null;
+    this.publicUserData = deepSnakeToCamel(data.public_user_data) as PublicUserData;
+    this.lastActiveToken = data.last_active_token ? new Token(data.last_active_token) : null;
     return this;
   }
 }

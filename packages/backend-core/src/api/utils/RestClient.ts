@@ -29,7 +29,7 @@ export type ClerkFetcher = (
     contentType: string;
     userAgent: string;
     body?: Record<string, unknown>;
-  }
+  },
 ) => Promise<unknown>;
 
 export default class RestClient {
@@ -46,7 +46,7 @@ export default class RestClient {
     fetcher: ClerkFetcher,
     libName: string,
     libVersion: string,
-    packageRepo: string
+    packageRepo: string,
   ) {
     this.apiKey = apiKey;
     this.serverApiUrl = serverApiUrl;
@@ -59,9 +59,7 @@ export default class RestClient {
     let url = `${this.serverApiUrl}/${this.apiVersion}${requestOptions.path}`;
 
     if (requestOptions.queryParams) {
-      url = `${url}?${querystring.stringify(
-        snakecaseKeys(requestOptions.queryParams)
-      )}`;
+      url = `${url}?${querystring.stringify(snakecaseKeys(requestOptions.queryParams))}`;
     }
 
     let body;
@@ -78,8 +76,8 @@ export default class RestClient {
       userAgent: this.userAgent,
       body,
     })
-      .then((responseData) => deserialize(responseData) as T)
-      .catch((error) => handleError(error));
+      .then(responseData => deserialize(responseData) as T)
+      .catch(error => handleError(error));
   }
 
   fetchInterstitial<T>(): Promise<T> {
@@ -88,6 +86,6 @@ export default class RestClient {
       authorization: `Bearer ${this.apiKey}`,
       contentType: 'text/html',
       userAgent: this.userAgent,
-    }).catch((error) => handleError(error)) as Promise<T>;
+    }).catch(error => handleError(error)) as Promise<T>;
   }
 }

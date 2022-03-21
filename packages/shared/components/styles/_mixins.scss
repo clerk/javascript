@@ -66,6 +66,5 @@
 @mixin transitions {
   transition: color math.div($transition-duration, 2) ease-in-out,
     background-color math.div($transition-duration, 2) ease-in-out,
-    border-color math.div($transition-duration, 2) ease-in-out,
-    box-shadow math.div($transition-duration, 2) ease-in-out;
+    border-color math.div($transition-duration, 2) ease-in-out, box-shadow math.div($transition-duration, 2) ease-in-out;
 }

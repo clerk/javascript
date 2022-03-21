@@ -7,11 +7,7 @@ export type PortalProps = {
   hostEl?: HTMLElement | null;
 };
 
-export function Portal({
-  children,
-  hostEl,
-  className,
-}: PortalProps): JSX.Element {
+export function Portal({ children, hostEl, className }: PortalProps): JSX.Element {
   const el = React.useMemo(() => document.createElement('div'), []);
 
   React.useEffect(() => {

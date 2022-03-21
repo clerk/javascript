@@ -1,10 +1,7 @@
 import { render } from '@clerk/shared/testUtils';
 import React from 'react';
 
-import {
-  useMaxAllowedInstancesGuard,
-  withMaxAllowedInstancesGuard,
-} from './useMaxAllowedInstancesGuard';
+import { useMaxAllowedInstancesGuard, withMaxAllowedInstancesGuard } from './useMaxAllowedInstancesGuard';
 
 const originalError = console.error;
 const ERR = 'usedMoreThanOnceError';
@@ -52,11 +49,7 @@ describe('Max allowed instances Hook & Hoc', () => {
       return <div>hello</div>;
     };
 
-    const TestingComp = withMaxAllowedInstancesGuard(
-      TestingComponentBase,
-      'TestingComp',
-      ERR,
-    );
+    const TestingComp = withMaxAllowedInstancesGuard(TestingComponentBase, 'TestingComp', ERR);
 
     it('renders normally if not used more than N times', () => {
       expect(() => {

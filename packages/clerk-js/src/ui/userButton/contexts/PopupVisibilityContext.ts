@@ -11,5 +11,4 @@ export const PopupVisibilityContext = React.createContext<PopupVisibility>({
   setPopupVisible: noop,
 });
 
-export const useUserButtonPopupVisibility = () =>
-  React.useContext(PopupVisibilityContext);
+export const useUserButtonPopupVisibility = () => React.useContext(PopupVisibilityContext);

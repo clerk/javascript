@@ -66,9 +66,7 @@ export class User extends BaseResource implements UserResource {
     return this.pathRoot;
   }
 
-  isPrimaryIdentification = (
-    ident: EmailAddressResource | PhoneNumberResource | Web3WalletResource,
-  ): boolean => {
+  isPrimaryIdentification = (ident: EmailAddressResource | PhoneNumberResource | Web3WalletResource): boolean => {
     switch (ident.constructor) {
       case EmailAddress:
         return this.primaryEmailAddressId === ident.id;
@@ -93,9 +91,7 @@ export class User extends BaseResource implements UserResource {
     return enabled;
   };
 
-  createEmailAddress = (
-    params: CreateEmailAddressParams,
-  ): Promise<EmailAddressResource> => {
+  createEmailAddress = (params: CreateEmailAddressParams): Promise<EmailAddressResource> => {
     const { email } = params || {};
     return new EmailAddress(
       {
@@ -105,9 +101,7 @@ export class User extends BaseResource implements UserResource {
     ).create();
   };
 
-  createPhoneNumber = (
-    params: CreatePhoneNumberParams,
-  ): Promise<PhoneNumberResource> => {
+  createPhoneNumber = (params: CreatePhoneNumberParams): Promise<PhoneNumberResource> => {
     const { phoneNumber } = params || {};
     return new PhoneNumber(
       {
@@ -156,32 +150,20 @@ export class User extends BaseResource implements UserResource {
     this.profileImageUrl = data.profile_image_url;
     this.username = data.username;
     this.passwordEnabled = data.password_enabled;
-    this.emailAddresses = data.email_addresses.map(
-      ea => new EmailAddress(ea, this.path() + '/email_addresses'),
-    );
+    this.emailAddresses = data.email_addresses.map(ea => new EmailAddress(ea, this.path() + '/email_addresses'));
 
     this.primaryEmailAddressId = data.primary_email_address_id;
-    this.primaryEmailAddress =
-      this.emailAddresses.find(({ id }) => id === this.primaryEmailAddressId) ||
-      null;
+    this.primaryEmailAddress = this.emailAddresses.find(({ id }) => id === this.primaryEmailAddressId) || null;
 
-    this.phoneNumbers = data.phone_numbers.map(
-      ph => new PhoneNumber(ph, this.path() + '/phone_numbers'),
-    );
+    this.phoneNumbers = data.phone_numbers.map(ph => new PhoneNumber(ph, this.path() + '/phone_numbers'));
 
     this.primaryPhoneNumberId = data.primary_phone_number_id;
-    this.primaryPhoneNumber =
-      this.phoneNumbers.find(({ id }) => id === this.primaryPhoneNumberId) ||
-      null;
+    this.primaryPhoneNumber = this.phoneNumbers.find(({ id }) => id === this.primaryPhoneNumberId) || null;
 
-    this.web3Wallets = data.web3_wallets.map(
-      ph => new Web3Wallet(ph, this.path() + '/web3_wallets'),
-    );
+    this.web3Wallets = data.web3_wallets.map(ph => new Web3Wallet(ph, this.path() + '/web3_wallets'));
 
     this.primaryWeb3WalletId = data.primary_web3_wallet_id;
-    this.primaryWeb3Wallet =
-      this.web3Wallets.find(({ id }) => id === this.primaryWeb3WalletId) ||
-      null;
+    this.primaryWeb3Wallet = this.web3Wallets.find(({ id }) => id === this.primaryWeb3WalletId) || null;
 
     this.externalAccounts = data.external_accounts.map(
       ea => new ExternalAccount(ea, this.path() + '/external_accounts'),

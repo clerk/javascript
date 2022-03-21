@@ -7,11 +7,7 @@ import { Input, InputProps } from '../input';
 import { CountryEntry, IsoToCountryMap } from './countryCodeData';
 // @ts-ignore
 import styles from './PhoneInput.module.scss';
-import {
-  extractDigits,
-  formatPhoneNumber,
-  getFlagEmojiFromCountryIso,
-} from './utils';
+import { extractDigits, formatPhoneNumber, getFlagEmojiFromCountryIso } from './utils';
 
 export type PhoneInputProps = InputProps & {
   handlePhoneChange: (phoneWithCode: string) => any;
@@ -39,17 +35,17 @@ const createDropdownOption = (country: CountryEntry): DropdownOption => ({
 });
 
 const createNativeSelectOption = ({ iso, name, code }: CountryEntry) => (
-  <option value={iso} key={iso}>
+  <option
+    value={iso}
+    key={iso}
+  >
     {getFlagEmojiFromCountryIso(iso)} {name} (+{code})
   </option>
 );
 
 const dropdownOptions = [...IsoToCountryMap.values()].map(createDropdownOption);
 
-const countryDropdownComparator: DropdownComparator = (
-  term,
-  option: DropdownOption,
-) => {
+const countryDropdownComparator: DropdownComparator = (term, option: DropdownOption) => {
   let searchVal: string;
   if (typeof option !== 'string') {
     const country = IsoToCountryMap.get(option.value);
@@ -62,17 +58,9 @@ const countryDropdownComparator: DropdownComparator = (
   return (searchVal || '').toLowerCase().includes((term || '').toLowerCase());
 };
 
-export function PhoneInput({
-  handlePhoneChange,
-  hasError,
-  autoFocus = true,
-  ...rest
-}: PhoneInputProps): JSX.Element {
+export function PhoneInput({ handlePhoneChange, hasError, autoFocus = true, ...rest }: PhoneInputProps): JSX.Element {
   const inputRef = React.useRef<HTMLInputElement>(null);
-  const [selectedIso, setSelectedIso] = useLocalStorage<string>(
-    'selectedCountryIso',
-    'us',
-  );
+  const [selectedIso, setSelectedIso] = useLocalStorage<string>('selectedCountryIso', 'us');
   const [phoneNumber, setPhoneNumber] = useState('');
 
   const focusInput = () => {
@@ -102,9 +90,7 @@ export function PhoneInput({
     formatAndSetPhoneNumber(el.value);
   };
 
-  const handleCountrySelection = ({
-    value,
-  }: DropdownSelection | { value: string }) => {
+  const handleCountrySelection = ({ value }: DropdownSelection | { value: string }) => {
     setSelectedIso(value);
   };
 

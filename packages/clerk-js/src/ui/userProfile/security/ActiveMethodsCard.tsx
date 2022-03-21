@@ -36,11 +36,19 @@ export function ActiveMethodsCard(): JSX.Element | null {
   }
 
   return enabledPhoneNumbers.length === 0 ? null : (
-    <TitledCard className='cl-themed-card' title='Active methods' subtitle={subtitleMessage}>
+    <TitledCard
+      className='cl-themed-card'
+      title='Active methods'
+      subtitle={subtitleMessage}
+    >
       <ErrorComponent>{error}</ErrorComponent>
       <List className='cl-titled-card-list'>
         {enabledPhoneNumbers.map(phone => (
-          <PhoneListItem key={phone.id} phone={phone} onError={onError} />
+          <PhoneListItem
+            key={phone.id}
+            phone={phone}
+            onError={onError}
+          />
         ))}
       </List>
     </TitledCard>
@@ -71,7 +79,12 @@ function PhoneListItem({ phone, onError }: PhoneListItemProps): JSX.Element {
       className='cl-list-item'
       hoverable={false}
       itemTitle={title}
-      detailIcon={<Actions onMakeDefault={makeDefault} onRemove={remove} />}
+      detailIcon={
+        <Actions
+          onMakeDefault={makeDefault}
+          onRemove={remove}
+        />
+      }
     >
       <PhoneViewer phoneNumber={phone.phoneNumber} />
       {phone.defaultSecondFactor && <Tag color='primary'>Default</Tag>}

@@ -24,7 +24,10 @@ export const AvatarWithUploader = (props: AvatarProps): JSX.Element => {
       className={styles.wrapper}
       withResponsiveUploadIndicator={true}
     >
-      <Avatar {...props} optimize />
+      <Avatar
+        {...props}
+        optimize
+      />
     </ImageUploader>
   );
 };

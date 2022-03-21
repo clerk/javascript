@@ -1,19 +1,14 @@
 import { ClientResource } from './client';
 import { DisplayThemeJSON } from './json';
 import { OrganizationResource } from './organization';
-import {
-  MembershipRole,
-  OrganizationMembershipResource,
-} from './organizationMembership';
+import { MembershipRole, OrganizationMembershipResource } from './organizationMembership';
 import { ActiveSessionResource } from './session';
 import { UserResource } from './user';
 import { DeepPartial, DeepSnakeToCamel } from './utils';
 
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
-export type BeforeEmitCallback = (
-  session: ActiveSessionResource | null,
-) => void | Promise<any>;
+export type BeforeEmitCallback = (session: ActiveSessionResource | null) => void | Promise<any>;
 
 export type SignOutCallback = () => void | Promise<any>;
 
@@ -122,10 +117,7 @@ export interface Clerk {
    * @param targetNode Target node to mount the UserButton component.
    * @param userButtonProps User button configuration parameters.
    */
-  mountUserButton: (
-    targetNode: HTMLDivElement,
-    userButtonProps?: UserButtonProps,
-  ) => void;
+  mountUserButton: (targetNode: HTMLDivElement, userButtonProps?: UserButtonProps) => void;
 
   /**
    * Unmount a user button component at the target element.
@@ -141,10 +133,7 @@ export interface Clerk {
    * @param targetNode Target to mount the UserProfile component.
    * @param userProfileProps User profile configuration parameters.
    */
-  mountUserProfile: (
-    targetNode: HTMLDivElement,
-    userProfileProps?: UserProfileProps,
-  ) => void;
+  mountUserProfile: (targetNode: HTMLDivElement, userProfileProps?: UserProfileProps) => void;
 
   /**
    * Unmount a user profile component at the target element.
@@ -222,16 +211,12 @@ export interface Clerk {
   /**
    * Authenticates user using their Metamask browser extension
    */
-  authenticateWithMetamask: (
-    params?: AuthenticateWithMetamaskParams,
-  ) => Promise<unknown>;
+  authenticateWithMetamask: (params?: AuthenticateWithMetamaskParams) => Promise<unknown>;
 
   /**
    * Creates an organization, adding the current user as admin.
    */
-  createOrganization: (
-    params: CreateOrganizationParams,
-  ) => Promise<OrganizationResource>;
+  createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource>;
 
   /**
    * Retrieves all the organizations the current user is a member of.
@@ -241,9 +226,7 @@ export interface Clerk {
   /**
    * Retrieves a single organization by id.
    */
-  getOrganization: (
-    organizationId: string,
-  ) => Promise<OrganizationResource | undefined>;
+  getOrganization: (organizationId: string) => Promise<OrganizationResource | undefined>;
 
   /**
    * Handles a 401 response from Frontend API by refreshing the client and session object accordingly
@@ -292,9 +275,7 @@ export type ClerkThemeOptions = DeepSnakeToCamel<DeepPartial<DisplayThemeJSON>>;
 export interface ClerkOptions {
   navigate?: (to: string) => Promise<unknown> | unknown;
   polling?: boolean;
-  selectInitialSession?: (
-    client: ClientResource,
-  ) => ActiveSessionResource | null;
+  selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;
   theme?: ClerkThemeOptions;
 }
 

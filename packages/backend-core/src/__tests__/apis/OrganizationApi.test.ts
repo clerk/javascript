@@ -21,11 +21,10 @@ test('createOrganization() creates an organization', async () => {
     })
     .reply(200, resJSON);
 
-  const organization =
-    await TestBackendAPIClient.organizations.createOrganization({
-      name,
-      createdBy,
-    });
+  const organization = await TestBackendAPIClient.organizations.createOrganization({
+    name,
+    createdBy,
+  });
   expect(organization).toEqual(
     new Organization({
       id: resJSON.id,

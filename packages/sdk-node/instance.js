@@ -1,1 +1,1 @@
-module.exports = require('./dist/instance')
+module.exports = require('./dist/instance');

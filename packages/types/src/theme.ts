@@ -24,9 +24,4 @@ export interface RgbaColor {
   r: number;
 }
 
-export type Color =
-  | string
-  | HexColor
-  | HslaColor
-  | RgbaColor
-  | TransparentColor;
+export type Color = string | HexColor | HslaColor | RgbaColor | TransparentColor;

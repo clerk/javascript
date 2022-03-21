@@ -12,8 +12,7 @@ import RestClient, { ClerkFetcher } from './utils/RestClient';
 
 const defaultApiKey = process.env.CLERK_API_KEY || '';
 const defaultApiVersion = process.env.CLERK_API_VERSION || 'v1';
-const defaultServerApiUrl =
-  process.env.CLERK_API_URL || 'https://api.clerk.dev';
+const defaultServerApiUrl = process.env.CLERK_API_URL || 'https://api.clerk.dev';
 
 type ClerkBackendAPIProps = {
   /* Backend API key */
@@ -64,15 +63,7 @@ export class ClerkBackendAPI {
     //     throw Error(SupportMessages.API_KEY_NOT_FOUND);
     //   }
 
-    this._restClient = new RestClient(
-      apiKey,
-      serverApiUrl,
-      apiVersion,
-      fetcher,
-      libName,
-      libVersion,
-      packageRepo,
-    );
+    this._restClient = new RestClient(apiKey, serverApiUrl, apiVersion, fetcher, libName, libVersion, packageRepo);
   }
 
   fetchInterstitial<T>(): Promise<T> {
@@ -104,9 +95,7 @@ export class ClerkBackendAPI {
   // Lazy sub-api getters
   get allowlistIdentifiers(): AllowlistIdentifierApi {
     if (!this._allowlistIdentifierApi) {
-      this._allowlistIdentifierApi = new AllowlistIdentifierApi(
-        this._restClient,
-      );
+      this._allowlistIdentifierApi = new AllowlistIdentifierApi(this._restClient);
     }
     return this._allowlistIdentifierApi;
   }

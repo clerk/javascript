@@ -19,14 +19,15 @@ export function ConnectedAccountList(): JSX.Element {
 
   return (
     <>
-      <PageHeading title='Connected accounts' backTo='./../' />
+      <PageHeading
+        title='Connected accounts'
+        backTo='./../'
+      />
       <TitledCard className='cl-themed-card cl-list-card'>
         {user.externalAccounts.length > 0 ? (
           <List>{buildExternalAccountRows()}</List>
         ) : (
-          <div className='cl-empty-list-item'>
-            You haven't connected any external accounts yet
-          </div>
+          <div className='cl-empty-list-item'>You haven't connected any external accounts yet</div>
         )}
       </TitledCard>
     </>

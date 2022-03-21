@@ -86,12 +86,18 @@ const Main = withClerk(({ clerk }) => {
       {user ? (
         <>
           <Text>You are signed in</Text>
-          <TouchableOpacity style={styles.button} onPress={handleSignOut}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleSignOut}
+          >
             <Text>Sign out</Text>
           </TouchableOpacity>
         </>
       ) : (
-        <TouchableOpacity style={styles.button} onPress={handleSignIn}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleSignIn}
+        >
           <Text>Sign in</Text>
         </TouchableOpacity>
       )}

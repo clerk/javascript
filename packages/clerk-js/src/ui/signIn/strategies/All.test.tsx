@@ -66,13 +66,23 @@ describe('<All/>', () => {
   ];
 
   it('renders the All sign in methods', async () => {
-    const tree = renderJSON(<All factors={factors} selectFactor={jest.fn()} />);
+    const tree = renderJSON(
+      <All
+        factors={factors}
+        selectFactor={jest.fn()}
+      />,
+    );
     expect(tree).toMatchSnapshot();
   });
 
   it('triggers selectStrategy callback on click', async () => {
     const mockSelectStrategy = jest.fn();
-    render(<All factors={factors} selectFactor={mockSelectStrategy} />);
+    render(
+      <All
+        factors={factors}
+        selectFactor={mockSelectStrategy}
+      />,
+    );
 
     userEvent.click(screen.getByText('Sign in with your password'));
     userEvent.click(screen.getByText('Email code to j***@e*****.com'));

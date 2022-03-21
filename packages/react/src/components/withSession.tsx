@@ -8,8 +8,7 @@ export const withSession = <P extends { session: SessionResource }>(
   Component: React.ComponentType<P>,
   displayName?: string,
 ) => {
-  displayName =
-    displayName || Component.displayName || Component.name || 'Component';
+  displayName = displayName || Component.displayName || Component.name || 'Component';
   Component.displayName = displayName;
   const HOC: React.FC<Omit<P, 'session'>> = (props: Omit<P, 'session'>) => {
     const session = useSessionContext();
@@ -18,7 +17,12 @@ export const withSession = <P extends { session: SessionResource }>(
       return null;
     }
 
-    return <Component {...(props as P)} session={session} />;
+    return (
+      <Component
+        {...(props as P)}
+        session={session}
+      />
+    );
   };
 
   HOC.displayName = `withSession(${displayName})`;

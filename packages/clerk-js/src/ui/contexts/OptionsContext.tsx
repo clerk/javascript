@@ -8,13 +8,8 @@ interface OptionsProviderProps {
   value: any;
 }
 
-function OptionsProvider({
-  children,
-  value,
-}: OptionsProviderProps): JSX.Element {
-  return (
-    <OptionsContext.Provider value={value}>{children}</OptionsContext.Provider>
-  );
+function OptionsProvider({ children, value }: OptionsProviderProps): JSX.Element {
+  return <OptionsContext.Provider value={value}>{children}</OptionsContext.Provider>;
 }
 
 function useOptions(): ClerkOptions {

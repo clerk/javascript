@@ -50,10 +50,7 @@ describe('<EmailAddressVerificationWithOTP/>', function () {
       />,
     );
 
-    userEvent.type(
-      screen.getByLabelText('Enter verification code. Digit 1'),
-      '1',
-    );
+    userEvent.type(screen.getByLabelText('Enter verification code. Digit 1'), '1');
     userEvent.type(screen.getByLabelText('Digit 2'), '2');
     userEvent.type(screen.getByLabelText('Digit 3'), '3');
     userEvent.type(screen.getByLabelText('Digit 4'), '4');

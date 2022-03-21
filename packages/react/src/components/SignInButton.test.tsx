@@ -1,9 +1,4 @@
-import {
-  render,
-  screen,
-  userEvent,
-  waitFor,
-} from '@clerk/shared/utils/testUtils';
+import { render, screen, userEvent, waitFor } from '@clerk/shared/utils/testUtils';
 import React from 'react';
 
 import { SignInButton } from './SignInButton';
@@ -18,7 +13,12 @@ const mockClerk = {
 jest.mock('./withClerk', () => {
   return {
     withClerk: (Component: any) => (props: any) => {
-      return <Component {...props} clerk={mockClerk} />;
+      return (
+        <Component
+          {...props}
+          clerk={mockClerk}
+        />
+      );
     },
   };
 });

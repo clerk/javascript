@@ -2,19 +2,11 @@ import { SignUpProps } from '@clerk/types';
 import React from 'react';
 import { VerifyMagicLink } from 'ui/common';
 import { SSOCallback } from 'ui/common/SSOCallback';
-import {
-  ComponentContext,
-  useCoreClerk,
-  useSignUpContext,
-  withCoreSessionSwitchGuard,
-} from 'ui/contexts';
+import { ComponentContext, useCoreClerk, useSignUpContext, withCoreSessionSwitchGuard } from 'ui/contexts';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from 'ui/router';
 
 import { SignUpStart } from './SignUpStart';
-import {
-  SignUpVerifyEmailAddress,
-  SignUpVerifyPhoneNumber,
-} from './SignUpVerify';
+import { SignUpVerifyEmailAddress, SignUpVerifyPhoneNumber } from './SignUpVerify';
 
 function RedirectToSignUp() {
   const { redirectToSignUp } = useCoreClerk();
@@ -43,9 +35,7 @@ function SignUpRoutes(): JSX.Element {
         />
       </Route>
       <Route path='verify'>
-        <VerifyMagicLink
-          redirectUrlComplete={signUpContext.afterSignUpUrl || undefined}
-        />
+        <VerifyMagicLink redirectUrlComplete={signUpContext.afterSignUpUrl || undefined} />
       </Route>
       <Route index>
         <SignUpStart />
@@ -59,8 +49,7 @@ function SignUpRoutes(): JSX.Element {
 
 SignUpRoutes.displayName = 'SignUp';
 
-export const SignUp: React.ComponentType<SignUpProps> =
-  withCoreSessionSwitchGuard(SignUpRoutes);
+export const SignUp: React.ComponentType<SignUpProps> = withCoreSessionSwitchGuard(SignUpRoutes);
 
 export const SignUpModal = (props: SignUpProps): JSX.Element => {
   const signUpProps: SignUpProps = {
@@ -78,7 +67,10 @@ export const SignUpModal = (props: SignUpProps): JSX.Element => {
             routing: 'virtual',
           }}
         >
-          <SignUp {...signUpProps} routing='virtual' />
+          <SignUp
+            {...signUpProps}
+            routing='virtual'
+          />
         </ComponentContext.Provider>
       </div>
     </Route>

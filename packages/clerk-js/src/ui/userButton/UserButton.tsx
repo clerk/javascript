@@ -67,14 +67,10 @@ export const UserButton = withCoreUserGuard(({ showName }: UserButtonProps) => {
           size={32}
           optimize
         />
-        {showName && (
-          <div className='cl-user-button-fullname'>{identifier}</div>
-        )}
+        {showName && <div className='cl-user-button-fullname'>{identifier}</div>}
       </button>
       <Portal hostEl={document.getElementById('clerk-components')}>
-        <PopupVisibilityContext.Provider
-          value={{ isPopupVisible: isActive, setPopupVisible: setIsActive }}
-        >
+        <PopupVisibilityContext.Provider value={{ isPopupVisible: isActive, setPopupVisible: setIsActive }}>
           <div
             ref={containerRef}
             className='cl-component cl-user-button-popup'

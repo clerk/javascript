@@ -1,8 +1,4 @@
-import {
-  colorToSameTypeString,
-  hexStringToRgbaColor,
-  stringToHslaColor,
-} from '@clerk/shared/utils/color';
+import { colorToSameTypeString, hexStringToRgbaColor, stringToHslaColor } from '@clerk/shared/utils/color';
 import { DisplayThemeJSON } from '@clerk/types';
 import { clerkErrorInvalidColor } from 'core/errors';
 

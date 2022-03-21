@@ -9,5 +9,5 @@ fs.writeFileSync(
 export const LIB_VERSION="${packageJson.version}";
 export const LIB_NAME="${packageJson.name}";
 `,
-  { encoding: 'utf-8' }
+  { encoding: 'utf-8' },
 );

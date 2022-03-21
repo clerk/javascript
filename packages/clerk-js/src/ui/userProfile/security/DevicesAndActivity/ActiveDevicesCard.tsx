@@ -12,27 +12,22 @@ function ActiveDevicesCardBase(): JSX.Element | null {
   // TODO: do we need to keep 'session' just for the id?
   const session = useCoreSession();
   const user = useCoreUser();
-  const [sessionsWithActivities, setSessionsWithActivities] = React.useState<
-    SessionWithActivitiesResource[]
-  >([]);
+  const [sessionsWithActivities, setSessionsWithActivities] = React.useState<SessionWithActivitiesResource[]>([]);
 
   React.useEffect(() => {
     user?.getSessions().then(sa => setSessionsWithActivities(sa));
   }, [user]);
 
-  const currentSessionFirst = (a: SessionWithActivitiesResource) =>
-    a.id === session.id ? -1 : 1;
+  const currentSessionFirst = (a: SessionWithActivitiesResource) => (a.id === session.id ? -1 : 1);
 
   const sessionElements = sessionsWithActivities.length
-    ? sessionsWithActivities
-        .sort(currentSessionFirst)
-        .map(sa => (
-          <ActivityListItem
-            key={sa.id}
-            currentSession={session}
-            sessionWithActivities={sa}
-          />
-        ))
+    ? sessionsWithActivities.sort(currentSessionFirst).map(sa => (
+        <ActivityListItem
+          key={sa.id}
+          currentSession={session}
+          sessionWithActivities={sa}
+        />
+      ))
     : null;
 
   return (
@@ -41,9 +36,7 @@ function ActiveDevicesCardBase(): JSX.Element | null {
       title='Active devices'
       subtitle='Manage devices currently signed in to your account'
     >
-      <List className='cl-titled-card-list'>
-        {sessionElements ? sessionElements : <ActivityListItemSkeleton />}
-      </List>
+      <List className='cl-titled-card-list'>{sessionElements ? sessionElements : <ActivityListItemSkeleton />}</List>
     </TitledCard>
   );
 }

@@ -9,8 +9,7 @@ export const withClerk = <P extends { clerk: LoadedClerk }>(
   Component: React.ComponentType<P>,
   displayName?: string,
 ) => {
-  displayName =
-    displayName || Component.displayName || Component.name || 'Component';
+  displayName = displayName || Component.displayName || Component.name || 'Component';
   Component.displayName = displayName;
   const HOC = (props: Omit<P, 'clerk'>) => {
     const clerk = useIsomorphicClerkContext();
@@ -21,7 +20,10 @@ export const withClerk = <P extends { clerk: LoadedClerk }>(
 
     return (
       <LoadedGuarantee>
-        <Component {...(props as P)} clerk={clerk} />
+        <Component
+          {...(props as P)}
+          clerk={clerk}
+        />
       </LoadedGuarantee>
     );
   };
@@ -42,9 +44,5 @@ export const WithClerk: React.FC<{
     return null;
   }
 
-  return (
-    <LoadedGuarantee>
-      {children(clerk as unknown as LoadedClerk)}
-    </LoadedGuarantee>
-  );
+  return <LoadedGuarantee>{children(clerk as unknown as LoadedClerk)}</LoadedGuarantee>;
 };

@@ -1,13 +1,5 @@
 const MILLISECONDS_IN_DAY = 86400000;
-const DAYS_EN = [
-  'Sunday',
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-];
+const DAYS_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 export function dateTo12HourTime(date: Date): string {
   if (!date) {
@@ -20,11 +12,7 @@ export function dateTo12HourTime(date: Date): string {
   });
 }
 
-export function differenceInCalendarDays(
-  a: Date,
-  b: Date,
-  { absolute = true } = {},
-): number {
+export function differenceInCalendarDays(a: Date, b: Date, { absolute = true } = {}): number {
   if (!a || !b) {
     return 0;
   }
@@ -86,10 +74,7 @@ export function formatRelative(date: Date, relativeTo: Date): string {
   return a.toLocaleDateString();
 }
 
-export function addYears(
-  initialDate: Date | number | string,
-  yearsToAdd: number,
-): Date {
+export function addYears(initialDate: Date | number | string, yearsToAdd: number): Date {
   const date = normalizeDate(initialDate);
   date.setFullYear(date.getFullYear() + yearsToAdd);
   return date;

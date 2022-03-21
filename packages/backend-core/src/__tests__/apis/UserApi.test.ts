@@ -120,13 +120,11 @@ test('getUser() returns a single user', async () => {
   expect(user.externalAccounts[0].label).toBeNull();
   expect(user.externalAccounts[1].provider).toEqual('facebook');
   expect(user.externalAccounts[1].username).toBeNull();
-  expect(user.externalAccounts[1].publicMetadata).toMatchObject({'extra': 'more info'});
+  expect(user.externalAccounts[1].publicMetadata).toMatchObject({ extra: 'more info' });
   expect(user.externalAccounts[1].label).toEqual('clerk');
 
   expect(user.web3Wallets.length).toEqual(1);
-  expect(user.web3Wallets[0].web3Wallet).toEqual(
-    '0x0000000000000000000000000000000000000000',
-  );
+  expect(user.web3Wallets[0].web3Wallet).toEqual('0x0000000000000000000000000000000000000000');
   expect(user.web3Wallets[0].verification).toMatchObject({
     attempts: 1,
     expireAt: expect.any(Number),
@@ -138,9 +136,7 @@ test('getUser() returns a single user', async () => {
 });
 
 test('getUser() throws an error without user ID', async () => {
-  await expect(TestBackendAPIClient.users.getUser('')).rejects.toThrow(
-    'A valid ID is required.',
-  );
+  await expect(TestBackendAPIClient.users.getUser('')).rejects.toThrow('A valid ID is required.');
 });
 
 test('createUser() creates a user', async () => {
@@ -178,22 +174,15 @@ test('updateUser() updates a user', async () => {
       'Content-Type': '',
     });
 
-  const user = await TestBackendAPIClient.users.updateUser(
-    'user_1oBNj55jOjSK9rOYrT5QHqj7eaK',
-    params,
-  );
+  const user = await TestBackendAPIClient.users.updateUser('user_1oBNj55jOjSK9rOYrT5QHqj7eaK', params);
   expect(user.firstName).toEqual('Boss');
   expect(user.username).toEqual('clerk_boss');
 });
 
 test('updateUser() throws an error without user ID', async () => {
-  await expect(TestBackendAPIClient.users.updateUser('', {})).rejects.toThrow(
-    'A valid ID is required.',
-  );
+  await expect(TestBackendAPIClient.users.updateUser('', {})).rejects.toThrow('A valid ID is required.');
 });
 
 test('deleteUser() throws an error without user ID', async () => {
-  await expect(TestBackendAPIClient.users.deleteUser('')).rejects.toThrow(
-    'A valid ID is required.',
-  );
+  await expect(TestBackendAPIClient.users.deleteUser('')).rejects.toThrow('A valid ID is required.');
 });

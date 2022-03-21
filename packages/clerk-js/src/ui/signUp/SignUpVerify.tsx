@@ -1,8 +1,5 @@
 import { Label } from '@clerk/shared/components/label';
-import {
-  OneTimeCodeInput,
-  VerifyCodeHandler,
-} from '@clerk/shared/components/oneTimeCodeInput';
+import { OneTimeCodeInput, VerifyCodeHandler } from '@clerk/shared/components/oneTimeCodeInput';
 import React from 'react';
 import {
   getGlobalError,
@@ -15,12 +12,7 @@ import {
   withRedirectToHome,
 } from 'ui/common';
 import { Body, Header } from 'ui/common/authForms';
-import {
-  useCoreClerk,
-  useCoreSignUp,
-  useEnvironment,
-  useSignUpContext,
-} from 'ui/contexts';
+import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from 'ui/contexts';
 
 import { SignUpVerifyEmailAddressWithMagicLink } from './SignUpVerifyEmailAddressWithMagicLink';
 
@@ -28,12 +20,8 @@ function _SignUpVerifyEmailAddress(): JSX.Element {
   const { userSettings } = useEnvironment();
   const { attributes } = userSettings;
 
-  const emailLinkStrategyEnabled =
-    attributes.email_address.verifications.includes('email_link');
-  const disableEmailLink = shouldDisableStrategy(
-    useSignUpContext(),
-    'email_link',
-  );
+  const emailLinkStrategyEnabled = attributes.email_address.verifications.includes('email_link');
+  const disableEmailLink = shouldDisableStrategy(useSignUpContext(), 'email_link');
 
   if (emailLinkStrategyEnabled && !disableEmailLink) {
     return <SignUpVerifyEmailAddressWithMagicLink />;
@@ -45,11 +33,7 @@ function _SignUpVerifyPhoneNumber(): JSX.Element {
   return VerifyWithOtp({ field: 'phoneNumber' });
 }
 
-function VerifyWithOtp({
-  field,
-}: {
-  field: 'emailAddress' | 'phoneNumber';
-}): JSX.Element {
+function VerifyWithOtp({ field }: { field: 'emailAddress' | 'phoneNumber' }): JSX.Element {
   const { navigateAfterSignUp } = useSignUpContext();
   const { setSession } = useCoreClerk();
   const signUp = useCoreSignUp();
@@ -82,9 +66,7 @@ function VerifyWithOtp({
   };
 
   const prepareVerification = () => {
-    field === 'phoneNumber'
-      ? preparePhoneNumberVerification()
-      : prepareEmailAddressVerification();
+    field === 'phoneNumber' ? preparePhoneNumberVerification() : prepareEmailAddressVerification();
   };
 
   React.useEffect(() => {
@@ -133,10 +115,6 @@ function VerifyWithOtp({
   );
 }
 
-export const SignUpVerifyEmailAddress = withRedirectToHome(
-  _SignUpVerifyEmailAddress,
-);
+export const SignUpVerifyEmailAddress = withRedirectToHome(_SignUpVerifyEmailAddress);
 
-export const SignUpVerifyPhoneNumber = withRedirectToHome(
-  _SignUpVerifyPhoneNumber,
-);
+export const SignUpVerifyPhoneNumber = withRedirectToHome(_SignUpVerifyPhoneNumber);

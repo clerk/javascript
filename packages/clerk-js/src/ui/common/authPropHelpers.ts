@@ -18,12 +18,7 @@ type ParseAuthPropArgs =
       field: keyof Pick<SignUpCtx, 'afterSignUpUrl' | 'afterSignInUrl'>;
     };
 
-export const parseAuthProp = ({
-  ctx,
-  queryParams,
-  displayConfig,
-  field,
-}: ParseAuthPropArgs): string => {
+export const parseAuthProp = ({ ctx, queryParams, displayConfig, field }: ParseAuthPropArgs): string => {
   const snakeCaseField = camelToSnake(field);
 
   // Todo: Dx: Deprecate afterSignIn and afterSignUp legacy fields
@@ -37,9 +32,7 @@ export const parseAuthProp = ({
 
   return (
     (typeof queryParamValue === 'string' ? queryParamValue : null) ||
-    (typeof queryParams.redirect_url === 'string'
-      ? queryParams.redirect_url
-      : null) ||
+    (typeof queryParams.redirect_url === 'string' ? queryParams.redirect_url : null) ||
     ctx[field] ||
     legacyFieldValue ||
     ctx.redirectUrl ||
@@ -53,12 +46,8 @@ interface BuildAuthQueryStringArgs {
   displayConfig: DisplayConfigResource;
 }
 
-export const buildAuthQueryString = (
-  data: BuildAuthQueryStringArgs,
-): string | null => {
-  const parseValue = (
-    field: keyof Omit<BuildAuthQueryStringArgs, 'displayConfig'>,
-  ) => {
+export const buildAuthQueryString = (data: BuildAuthQueryStringArgs): string | null => {
+  const parseValue = (field: keyof Omit<BuildAuthQueryStringArgs, 'displayConfig'>) => {
     const passed = data[field];
     if (!passed) {
       return undefined;

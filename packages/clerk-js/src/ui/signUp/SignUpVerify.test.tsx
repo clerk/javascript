@@ -1,17 +1,9 @@
 import { render, renderJSON } from '@clerk/shared/testUtils';
-import {
-  AttributeData,
-  SessionResource,
-  SignUpResource,
-  UserSettingsJSON,
-} from '@clerk/types';
+import { AttributeData, SessionResource, SignUpResource, UserSettingsJSON } from '@clerk/types';
 import { UserSettings } from 'core/resources/internal';
 import React from 'react';
 
-import {
-  SignUpVerifyEmailAddress,
-  SignUpVerifyPhoneNumber,
-} from './SignUpVerify';
+import { SignUpVerifyEmailAddress, SignUpVerifyPhoneNumber } from './SignUpVerify';
 
 const navigateMock = jest.fn();
 const mockSetSession = jest.fn();

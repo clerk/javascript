@@ -1,8 +1,6 @@
 import React from 'react';
 
-export function useInput(
-  callback: ((el: HTMLInputElement) => void) | null | undefined,
-): {
+export function useInput(callback: ((el: HTMLInputElement) => void) | null | undefined): {
   onChange: (e: React.ChangeEvent) => void;
   onKeyPress: (e: React.KeyboardEvent) => void;
   ref: React.MutableRefObject<HTMLInputElement | null>;
@@ -17,9 +15,7 @@ export function useInput(
   }
 
   function onKeyPress(e: React.KeyboardEvent) {
-    const switcher: HTMLInputElement | null = e.currentTarget.querySelector(
-      'input[type=checkbox], input[type=radio]',
-    );
+    const switcher: HTMLInputElement | null = e.currentTarget.querySelector('input[type=checkbox], input[type=radio]');
 
     if (switcher && !switcher.disabled) {
       const SPACE = 32;

@@ -54,13 +54,7 @@ export function Tooltip({
       onMouseLeave={hideTip}
     >
       {children}
-      {active && (
-        <div
-          className={cn(styles.tip, styles[direction || 'top'], tipClassName)}
-        >
-          {content}
-        </div>
-      )}
+      {active && <div className={cn(styles.tip, styles[direction || 'top'], tipClassName)}>{content}</div>}
     </div>
   );
 }

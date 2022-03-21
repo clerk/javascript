@@ -79,10 +79,7 @@ export const BaseRouter = ({
 
   // TODO: Look into the real possible types of globalNavigate
   const baseNavigate = async (toURL: URL): Promise<unknown> => {
-    if (
-      toURL.origin !== window.location.origin ||
-      !toURL.pathname.startsWith('/' + basePath)
-    ) {
+    if (toURL.origin !== window.location.origin || !toURL.pathname.startsWith('/' + basePath)) {
       if (onExternalNavigate) {
         onExternalNavigate();
       }

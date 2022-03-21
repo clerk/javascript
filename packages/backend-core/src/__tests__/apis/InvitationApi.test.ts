@@ -8,8 +8,7 @@ test('getInvitationList() returns a list of invitations', async () => {
     .get('/v1/invitations')
     .replyWithFile(200, __dirname + '/responses/getInvitationList.json', {});
 
-  const invitationList =
-    await TestBackendAPIClient.invitations.getInvitationList();
+  const invitationList = await TestBackendAPIClient.invitations.getInvitationList();
   expect(invitationList).toBeInstanceOf(Array);
   expect(invitationList.length).toEqual(1);
   expect(invitationList[0]).toBeInstanceOf(Invitation);
@@ -122,13 +121,9 @@ test('revokeInvitation() revokes an invitation', async () => {
     updated_at: 1611948436,
   };
 
-  nock('https://api.clerk.dev')
-    .post(`/v1/invitations/${id}/revoke`)
-    .reply(200, resJSON);
+  nock('https://api.clerk.dev').post(`/v1/invitations/${id}/revoke`).reply(200, resJSON);
 
-  const invitation = await TestBackendAPIClient.invitations.revokeInvitation(
-    id,
-  );
+  const invitation = await TestBackendAPIClient.invitations.revokeInvitation(id);
   expect(invitation).toEqual(
     new Invitation({
       id,
@@ -140,7 +135,5 @@ test('revokeInvitation() revokes an invitation', async () => {
 });
 
 test('revokeInvitation() throws an error without invitation ID', async () => {
-  await expect(
-    TestBackendAPIClient.invitations.revokeInvitation(''),
-  ).rejects.toThrow('A valid ID is required.');
+  await expect(TestBackendAPIClient.invitations.revokeInvitation('')).rejects.toThrow('A valid ID is required.');
 });

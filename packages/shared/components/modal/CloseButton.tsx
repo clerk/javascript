@@ -7,11 +7,7 @@ export type CloseButtonProps = {
   handleClick?: (e: React.MouseEvent) => void;
 };
 
-const CloseButton = ({
-  children,
-  handleClick,
-  ...rest
-}: CloseButtonProps): JSX.Element | null => {
+const CloseButton = ({ children, handleClick, ...rest }: CloseButtonProps): JSX.Element | null => {
   const { close } = React.useContext(ModalContext);
 
   const onClick = (e: React.MouseEvent) => {

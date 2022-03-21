@@ -91,9 +91,7 @@ describe('AccountSwitcher', () => {
     );
 
     const additionalSessionIdentifier = `${sessions[1].publicUserData.firstName} ${sessions[1].publicUserData.lastName}`;
-    const additionalSessionElement = accountSwitcher.getByText(
-      additionalSessionIdentifier,
-    );
+    const additionalSessionElement = accountSwitcher.getByText(additionalSessionIdentifier);
     fireEvent.click(additionalSessionElement);
     expect(handleAccountClick.mock.calls[0][0]).toBe(sessions[1]);
   });

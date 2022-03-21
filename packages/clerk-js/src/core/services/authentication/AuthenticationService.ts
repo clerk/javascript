@@ -1,15 +1,6 @@
-import {
-  Clerk,
-  EnvironmentResource,
-  SessionResource,
-  TokenResource,
-} from '@clerk/types';
+import { Clerk, EnvironmentResource, SessionResource, TokenResource } from '@clerk/types';
 import { clerkCoreErrorTokenRefreshFailed } from 'core/errors';
-import {
-  CookieHandler,
-  createCookieHandler,
-  runWithExponentialBackOff,
-} from 'utils';
+import { CookieHandler, createCookieHandler, runWithExponentialBackOff } from 'utils';
 
 import { AuthenticationPoller } from './AuthenticationPoller';
 
@@ -35,9 +26,7 @@ export class AuthenticationService {
     this.refreshTokenOnVisibilityChange();
   };
 
-  public setAuthCookiesFromSession(
-    session: SessionResource | undefined | null,
-  ): void {
+  public setAuthCookiesFromSession(session: SessionResource | undefined | null): void {
     this.updateSessionCookie(session?.lastActiveToken);
     this.setClientUatCookieForDevelopmentInstances();
   }
@@ -80,14 +69,10 @@ export class AuthenticationService {
   }
 
   private setSessionCookie(token: TokenResource | string) {
-    this.cookies.setSessionCookie(
-      typeof token === 'string' ? token : token.getRawString(),
-    );
+    this.cookies.setSessionCookie(typeof token === 'string' ? token : token.getRawString());
   }
 
-  private updateSessionCookie(
-    token: TokenResource | string | undefined | null,
-  ) {
+  private updateSessionCookie(token: TokenResource | string | undefined | null) {
     return token ? this.setSessionCookie(token) : this.removeSessionCookie();
   }
 
@@ -107,10 +92,7 @@ export class AuthenticationService {
   }
 
   private clearLegacyAuthV1Cookies() {
-    if (
-      this.environment?.isProduction() &&
-      this.environment?.onWindowLocationHost()
-    ) {
+    if (this.environment?.isProduction() && this.environment?.onWindowLocationHost()) {
       void this.cookies.clearLegacyAuthV1SessionCookie();
     }
   }
@@ -130,9 +112,7 @@ export class AuthenticationService {
 
   private isNetworkError(e: any) {
     // TODO: revise during error handling epic
-    const message = ((e.message + e.name || '') as string)
-      .toLowerCase()
-      .replace(/\s+/g, '');
+    const message = ((e.message + e.name || '') as string).toLowerCase().replace(/\s+/g, '');
     return message.includes('networkerror');
   }
 }

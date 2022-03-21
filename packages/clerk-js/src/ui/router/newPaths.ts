@@ -1,9 +1,4 @@
-export const newPaths = (
-  oldIndexPath: string,
-  oldFullPath: string,
-  path?: string,
-  index?: boolean,
-) => {
+export const newPaths = (oldIndexPath: string, oldFullPath: string, path?: string, index?: boolean) => {
   let indexPath = oldIndexPath;
   if (path) {
     indexPath = oldFullPath;

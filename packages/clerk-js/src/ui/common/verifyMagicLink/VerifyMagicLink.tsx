@@ -6,10 +6,7 @@ import { useCoreClerk } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
 import type { VerificationStatus } from 'utils/getClerkQueryParam';
 
-type VerifyMagicLinkProps = Pick<
-  MagicLinkVerificationStatusModalProps,
-  'successHeader'
-> & {
+type VerifyMagicLinkProps = Pick<MagicLinkVerificationStatusModalProps, 'successHeader'> & {
   redirectUrlComplete?: string;
   redirectUrl?: string;
 };
@@ -22,8 +19,7 @@ export function VerifyMagicLink({
   const { handleMagicLinkVerification } = useCoreClerk();
   const { navigate } = useNavigate();
 
-  const [verificationStatus, setVerificationStatus] =
-    useState<VerificationStatus>('loading');
+  const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>('loading');
 
   useEffect(() => {
     const verify = async () => {

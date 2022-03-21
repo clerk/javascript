@@ -9,9 +9,6 @@ export type CardProps = {
   children: React.ReactNode;
 };
 
-export const Card: React.FC<CardProps> = ({
-  children,
-  className,
-}: CardProps) => {
+export const Card: React.FC<CardProps> = ({ children, className }: CardProps) => {
   return <div className={cn(styles.card, className)}>{children}</div>;
 };

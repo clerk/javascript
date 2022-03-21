@@ -1,13 +1,9 @@
 export function clerkNetworkError(url: string, e: Error): never {
-  throw new Error(
-    `ClerkJS: Network error at "${url}" - ${e}. Please try again or contact support@clerk.dev`,
-  );
+  throw new Error(`ClerkJS: Network error at "${url}" - ${e}. Please try again or contact support@clerk.dev`);
 }
 
 export function clerkErrorInitFailed(): never {
-  throw new Error(
-    'ClerkJS: Something went wrong initializing Clerk. Please contact support@clerk.dev',
-  );
+  throw new Error('ClerkJS: Something went wrong initializing Clerk. Please contact support@clerk.dev');
 }
 
 export function clerkErrorDevInitFailed(msg?: string): never {
@@ -35,29 +31,19 @@ export function clerkErrorInvalidFrontendApi(): never {
 }
 
 export function clerkErrorInvalidColor(name: string): never {
-  throw new Error(
-    `ClerkJS: You're using an invalid ${name} color. Change the ${name} color from the dashboard.`,
-  );
+  throw new Error(`ClerkJS: You're using an invalid ${name} color. Change the ${name} color from the dashboard.`);
 }
 
-export function clerkCoreErrorContextProviderNotFound(
-  providerName: string,
-): never {
-  throw new Error(
-    `ClerkJS: You must wrap your application in a <${providerName}> component.`,
-  );
+export function clerkCoreErrorContextProviderNotFound(providerName: string): never {
+  throw new Error(`ClerkJS: You must wrap your application in a <${providerName}> component.`);
 }
 
 export function clerkCoreErrorUserIsNotDefined(): never {
-  throw new Error(
-    'ClerkJS: User is undefined. Try wrapping your component with `withUserGuard`',
-  );
+  throw new Error('ClerkJS: User is undefined. Try wrapping your component with `withUserGuard`');
 }
 
 export function clerkCoreErrorSessionIsNotDefined(): never {
-  throw new Error(
-    'ClerkJS: Session is undefined. Try wrapping your component with `withUserGuard`',
-  );
+  throw new Error('ClerkJS: Session is undefined. Try wrapping your component with `withUserGuard`');
 }
 
 export function clerkCoreErrorNoClerkSingleton(): never {
@@ -65,9 +51,7 @@ export function clerkCoreErrorNoClerkSingleton(): never {
 }
 
 export function clerkUIErrorDOMElementNotFound(): never {
-  throw new Error(
-    'ClerkJS: The target element is empty. Provide a valid DOM element.',
-  );
+  throw new Error('ClerkJS: The target element is empty. Provide a valid DOM element.');
 }
 
 export function clerkMissingFapiClientInResources(): never {
@@ -82,34 +66,19 @@ export function clerkCoreErrorTokenRefreshFailed(message: string): never {
   throw new Error(`ClerkJS: Token refresh failed (error='${message}')`);
 }
 
-export function clerkOAuthCallbackDidNotCompleteSignInSIgnUp(
-  type: 'sign in' | 'sign up',
-): never {
-  throw new Error(
-    `ClerkJS: Something went wrong initializing Clerk during the ${type} flow. Please contact support.`,
-  );
+export function clerkOAuthCallbackDidNotCompleteSignInSIgnUp(type: 'sign in' | 'sign up'): never {
+  throw new Error(`ClerkJS: Something went wrong initializing Clerk during the ${type} flow. Please contact support.`);
 }
 
-export function clerkVerifyEmailAddressCalledBeforeCreate(
-  type: 'SignIn' | 'SignUp',
-): never {
-  throw new Error(
-    `ClerkJS: You need to start a ${type} flow by calling ${type}.create() first.`,
-  );
+export function clerkVerifyEmailAddressCalledBeforeCreate(type: 'SignIn' | 'SignUp'): never {
+  throw new Error(`ClerkJS: You need to start a ${type} flow by calling ${type}.create() first.`);
 }
 
-export function clerkInvalidStrategy(
-  functionaName: string,
-  strategy: string,
-): never {
-  throw new Error(
-    `ClerkJS: Strategy "${strategy}" is not a valid strategy for ${functionaName}.`,
-  );
+export function clerkInvalidStrategy(functionaName: string, strategy: string): never {
+  throw new Error(`ClerkJS: Strategy "${strategy}" is not a valid strategy for ${functionaName}.`);
 }
 
-export function clerkVerifyWeb3WalletCalledBeforeCreate(
-  type: 'SignIn' | 'SignUp',
-): never {
+export function clerkVerifyWeb3WalletCalledBeforeCreate(type: 'SignIn' | 'SignUp'): never {
   throw new Error(
     `ClerkJS: You need to start a ${type} flow by calling ${type}.create({ identifier: 'your web3 wallet address' }) first`,
   );

@@ -8,9 +8,7 @@ type ConnectedAccountListItemProps = {
   externalAccount: ExternalAccountResource;
 };
 
-export function ConnectedAccountListItem({
-  externalAccount,
-}: ConnectedAccountListItemProps): JSX.Element {
+export function ConnectedAccountListItem({ externalAccount }: ConnectedAccountListItemProps): JSX.Element {
   const { navigate } = useNavigate();
 
   return (

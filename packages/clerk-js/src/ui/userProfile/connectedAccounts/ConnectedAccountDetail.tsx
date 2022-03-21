@@ -55,7 +55,10 @@ export function ConnectedAccountDetail(): JSX.Element | null {
 
   return (
     <>
-      <PageHeading title='Connected account' backTo='./../' />
+      <PageHeading
+        title='Connected account'
+        backTo='./../'
+      />
       <TitledCard
         title={
           <>

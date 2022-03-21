@@ -17,10 +17,7 @@ const DEFAULT_CODE_LENGTH = 6;
 type VerifyCallback = (afterVerifyCallback?: () => any) => void;
 type RejectCallback = (errorMessage?: string) => void;
 
-export type VerifyCodeHandler = (
-  verify: VerifyCallback,
-  reject: RejectCallback,
-) => void;
+export type VerifyCodeHandler = (verify: VerifyCallback, reject: RejectCallback) => void;
 
 export interface OneTimeCodeInputProps {
   value: string;
@@ -69,9 +66,7 @@ export function OneTimeCodeInput({
   });
 
   let autofillableOtp: string[] = [];
-  const inputRefs = Array.from({ length }, () =>
-    React.createRef<HTMLInputElement>(),
-  );
+  const inputRefs = Array.from({ length }, () => React.createRef<HTMLInputElement>());
 
   React.useEffect(() => {
     if (value.replace(BLANK_CHAR, '').length !== length) {
@@ -83,10 +78,7 @@ export function OneTimeCodeInput({
     verifyCodeHandler(
       afterVerifyCallback => {
         setVerificationState({ status: 'verified' });
-        timerId = setTimeout(
-          () => afterVerifyCallback?.(),
-          VERIFY_SUCCESS_ACTION_DELAY,
-        );
+        timerId = setTimeout(() => afterVerifyCallback?.(), VERIFY_SUCCESS_ACTION_DELAY);
       },
       err => {
         setVerificationState({ status: 'failed', message: err || 'Failed' });
@@ -134,10 +126,7 @@ export function OneTimeCodeInput({
   }
 
   function focusInput(opts: { index: number } | { dir: 'next' | 'prev' }) {
-    let index =
-      'index' in opts
-        ? opts.index
-        : activeInputIndex + (opts.dir === 'next' ? 1 : -1);
+    let index = 'index' in opts ? opts.index : activeInputIndex + (opts.dir === 'next' ? 1 : -1);
     index = Math.max(Math.min(length - 1, index), 0);
     setActiveInputIndex(index);
     inputRefs[index]?.current?.focus();
@@ -157,10 +146,7 @@ export function OneTimeCodeInput({
 
   function handleOnPaste(e: React.ClipboardEvent<HTMLInputElement>) {
     const clipboardText = e.clipboardData.getData('text/plain') || '';
-    if (
-      clipboardText.length === 0 ||
-      !clipboardText.split('').every(char => isValidInput(char))
-    ) {
+    if (clipboardText.length === 0 || !clipboardText.split('').every(char => isValidInput(char))) {
       return;
     }
 
@@ -198,11 +184,7 @@ export function OneTimeCodeInput({
         return;
     }
 
-    if (
-      isCharacterKeyPress(e.key) &&
-      isValidInput(e.key) &&
-      !isModifierKeyActive(e)
-    ) {
+    if (isCharacterKeyPress(e.key) && isValidInput(e.key) && !isModifierKeyActive(e)) {
       updateCodeValueAt(activeInputIndex, e.key);
       focusInput({ dir: 'next' });
     }
@@ -230,33 +212,27 @@ export function OneTimeCodeInput({
       onKeyDown={handleOnKeyDown}
       onFocus={() => handleOnFocus(i)}
       onPaste={handleOnPaste}
-      autoFocus={
-        autoFocus &&
-        verificationState.status === 'idle' &&
-        i === activeInputIndex
-      }
+      autoFocus={autoFocus && verificationState.status === 'idle' && i === activeInputIndex}
       maxLength={1}
       autoComplete='one-time-code'
       type='text'
       inputMode={numeric ? 'numeric' : 'text'}
       name={`codeInput-${i}`}
-      disabled={
-        verificationState.status === 'loading' ||
-        verificationState.status === 'verified'
-      }
+      disabled={verificationState.status === 'loading' || verificationState.status === 'verified'}
       className={cn(styles.codeInput, {
         [styles.error]: verificationState.status === 'failed',
         [styles.verified]: verificationState.status === 'verified',
       })}
-      aria-label={`${i === 0 ? 'Enter verification code. ' : ''}${
-        numeric ? 'Digit' : 'Character'
-      } ${i + 1}`}
+      aria-label={`${i === 0 ? 'Enter verification code. ' : ''}${numeric ? 'Digit' : 'Character'} ${i + 1}`}
     />
   ));
 
   return (
     <div {...rest}>
-      <div data-test-id='otp-container' className={styles.inputContainer}>
+      <div
+        data-test-id='otp-container'
+        className={styles.inputContainer}
+      >
         {inputFields}
       </div>
       <div className={styles.statusContainer}>
@@ -272,9 +248,7 @@ export function OneTimeCodeInput({
           </Button>
         )}
         {verificationState.status === 'failed' && (
-          <span className={styles.errorMessage}>
-            {verificationState.message}
-          </span>
+          <span className={styles.errorMessage}>{verificationState.message}</span>
         )}
       </div>
     </div>

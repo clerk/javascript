@@ -14,32 +14,27 @@ export type PopoverProps = {
   style?: any;
 };
 
-export const Popover: React.FC<PopoverProps> = ({
-  active,
-  children,
-  className,
-  style,
-}: PopoverProps) => {
+export const Popover: React.FC<PopoverProps> = ({ active, children, className, style }: PopoverProps) => {
   const popperRef = React.useRef(null);
   const referenceRef = React.useRef(null);
   const [isActive, setIsActive] = useDetectClickOutside(popperRef, !!active);
 
-  const { styles: popperStyles, attributes, update } = usePopper(
-    referenceRef.current,
-    popperRef.current,
-    {
-      placement: 'right',
-      modifiers: [
-        {
-          name: 'offset',
-          enabled: true,
-          options: {
-            offset: [28, 10],
-          },
+  const {
+    styles: popperStyles,
+    attributes,
+    update,
+  } = usePopper(referenceRef.current, popperRef.current, {
+    placement: 'right',
+    modifiers: [
+      {
+        name: 'offset',
+        enabled: true,
+        options: {
+          offset: [28, 10],
         },
-      ],
-    },
-  );
+      },
+    ],
+  });
 
   React.useEffect(() => {
     if (typeof update === 'function') {

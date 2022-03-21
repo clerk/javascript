@@ -1,17 +1,8 @@
-import type {
-  SignInProps,
-  SignUpProps,
-  UserButtonProps,
-  UserProfileProps,
-} from '@clerk/types';
+import type { SignInProps, SignUpProps, UserButtonProps, UserProfileProps } from '@clerk/types';
 
 export type { SignInProps, SignUpProps, UserButtonProps, UserProfileProps };
 
-export type AvailableComponentProps =
-  | SignInProps
-  | SignUpProps
-  | UserProfileProps
-  | UserButtonProps;
+export type AvailableComponentProps = SignInProps | SignUpProps | UserProfileProps | UserButtonProps;
 
 export type SignInCtx = SignInProps & {
   componentName: 'SignIn';
@@ -29,8 +20,4 @@ export type UserButtonCtx = UserButtonProps & {
   componentName: 'UserButton';
 };
 
-export type AvailableComponentCtx =
-  | SignInCtx
-  | SignUpCtx
-  | UserButtonCtx
-  | UserProfileCtx;
+export type AvailableComponentCtx = SignInCtx | SignUpCtx | UserButtonCtx | UserProfileCtx;

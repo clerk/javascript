@@ -1,10 +1,4 @@
-import {
-  act,
-  render,
-  renderJSON,
-  screen,
-  userEvent,
-} from '@clerk/shared/testUtils';
+import { act, render, renderJSON, screen, userEvent } from '@clerk/shared/testUtils';
 import * as React from 'react';
 
 import { ButtonWithTimer } from './ButtonWithTimer';
@@ -19,9 +13,7 @@ describe('<ButtonWithTimer/>', () => {
   });
 
   it('renders the button', () => {
-    const tree = renderJSON(
-      <ButtonWithTimer throttleTimeInMs={10}>Foo</ButtonWithTimer>,
-    );
+    const tree = renderJSON(<ButtonWithTimer throttleTimeInMs={10}>Foo</ButtonWithTimer>);
     expect(tree).toMatchSnapshot();
   });
 
@@ -43,7 +35,10 @@ describe('<ButtonWithTimer/>', () => {
 
   it('starts disabled if startingState is provided, becomes enabled after delay, disabled when clicked, and becomes enables again after delay', () => {
     render(
-      <ButtonWithTimer throttleTimeInMs={1000} startingState='disabled'>
+      <ButtonWithTimer
+        throttleTimeInMs={1000}
+        startingState='disabled'
+      >
         Foo
       </ButtonWithTimer>,
     );

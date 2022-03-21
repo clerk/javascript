@@ -22,7 +22,10 @@ export function AllFirstFactorStrategies({
         className='cl-auth-form-header-compact'
       />
       <Body className='cl-auth-form-body-compact'>
-        <All selectFactor={handleSelect} factors={factors} />
+        <All
+          selectFactor={handleSelect}
+          factors={factors}
+        />
       </Body>
       <PoweredByClerk className='cl-powered-by-clerk' />
     </>

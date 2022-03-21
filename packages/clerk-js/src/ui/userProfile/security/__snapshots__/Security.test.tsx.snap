@@ -57,8 +57,7 @@ Array [
             className="start"
           >
             <div>
-              Currently
-               
+              Currently 
               <span
                 className="cl-font-semibold"
               >

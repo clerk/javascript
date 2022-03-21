@@ -19,9 +19,7 @@ export type WithEdgeMiddlewareAuthMiddlewareResult<CallbackReturn, Options> = (
 ) => Promise<Awaited<CallbackReturn>>;
 export type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
 
-export type RequestWithAuth<
-  Options extends WithEdgeMiddlewareAuthOptions = any,
-> = NextRequest & {
+export type RequestWithAuth<Options extends WithEdgeMiddlewareAuthOptions = any> = NextRequest & {
   auth: EdgeMiddlewareAuth;
 } & (Options extends { loadSession: true } ? { session: Session | null } : {}) &
   (Options extends { loadUser: true } ? { user: User | null } : {});

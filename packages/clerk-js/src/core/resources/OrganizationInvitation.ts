@@ -8,10 +8,7 @@ import { unixEpochToDate } from 'utils/date';
 
 import { BaseResource } from './internal';
 
-export class OrganizationInvitation
-  extends BaseResource
-  implements OrganizationInvitationResource
-{
+export class OrganizationInvitation extends BaseResource implements OrganizationInvitationResource {
   id!: string;
   emailAddress!: string;
   organizationId!: string;

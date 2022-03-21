@@ -18,10 +18,7 @@ export type TextAreaProps = {
   React.AriaAttributes;
 
 export const TextArea: React.FC<TextAreaProps> = React.forwardRef(
-  (
-    { name, value, handleChange, className, hasError, ...rest }: TextAreaProps,
-    ref,
-  ) => {
+  ({ name, value, handleChange, className, hasError, ...rest }: TextAreaProps, ref) => {
     function onChange(e: React.ChangeEvent) {
       e.persist();
       if (typeof handleChange === 'function') {

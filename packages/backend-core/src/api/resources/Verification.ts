@@ -6,14 +6,7 @@ interface VerificationPayload extends VerificationProps {}
 export interface Verification extends VerificationPayload {}
 
 export class Verification {
-  static attributes = [
-    'attempts',
-    'expireAt',
-    'externalVerificationRedirectURL',
-    'nonce',
-    'status',
-    'strategy',
-  ];
+  static attributes = ['attempts', 'expireAt', 'externalVerificationRedirectURL', 'nonce', 'status', 'strategy'];
 
   static defaults = {};
 
@@ -29,9 +22,7 @@ export class Verification {
       obj.strategy = data.strategy;
 
       if (data.external_verification_redirect_url) {
-        obj.externalVerificationRedirectURL = new URL(
-          data.external_verification_redirect_url
-        );
+        obj.externalVerificationRedirectURL = new URL(data.external_verification_redirect_url);
       } else {
         obj.externalVerificationRedirectURL = null;
       }

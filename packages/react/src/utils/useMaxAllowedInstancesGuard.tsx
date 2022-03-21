@@ -2,11 +2,7 @@ import React from 'react';
 
 const counts = new Map<string, number>();
 
-export function useMaxAllowedInstancesGuard(
-  name: string,
-  error: string,
-  maxCount = 1,
-): void {
+export function useMaxAllowedInstancesGuard(name: string, error: string, maxCount = 1): void {
   React.useEffect(() => {
     const count = counts.get(name) || 0;
     if (count == maxCount) {
@@ -25,11 +21,7 @@ export function withMaxAllowedInstancesGuard<P>(
   name: string,
   error: string,
 ): React.ComponentType<P> {
-  const displayName =
-    WrappedComponent.displayName ||
-    WrappedComponent.name ||
-    name ||
-    'Component';
+  const displayName = WrappedComponent.displayName || WrappedComponent.name || name || 'Component';
   const Hoc = (props: P) => {
     useMaxAllowedInstancesGuard(name, error);
     return <WrappedComponent {...props} />;

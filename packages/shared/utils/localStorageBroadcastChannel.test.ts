@@ -9,9 +9,7 @@ describe('LocalStorageBroadcastChannel', () => {
       return {
         setItem: jest.fn((key, value) => {
           store[key] = value;
-          window.dispatchEvent(
-            new StorageEvent('storage', { key, newValue: value }),
-          );
+          window.dispatchEvent(new StorageEvent('storage', { key, newValue: value }));
         }),
         removeItem: jest.fn(key => {
           store[key] = undefined;

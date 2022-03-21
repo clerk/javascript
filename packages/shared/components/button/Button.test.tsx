@@ -13,7 +13,10 @@ describe('<Button/>', () => {
 describe("<Button buttonSize='small' />", () => {
   it('renders the small variant', () => {
     const tree = renderJSON(
-      <Button buttonSize='small' type='submit'>
+      <Button
+        buttonSize='small'
+        type='submit'
+      >
         Foo
       </Button>,
     );

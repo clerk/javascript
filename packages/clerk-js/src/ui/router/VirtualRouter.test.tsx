@@ -35,7 +35,10 @@ const ShowPreserved = () => {
   return <div>{`preserved=${queryParams.preserved}`}</div>;
 };
 const Tester = () => (
-  <VirtualRouter preservedParams={['preserved']} startPath='/'>
+  <VirtualRouter
+    preservedParams={['preserved']}
+    startPath='/'
+  >
     <Route index>
       <div id='index'>Index</div>
       <Button to='created?preserved=1'>Create</Button>

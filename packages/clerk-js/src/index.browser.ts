@@ -6,9 +6,7 @@ import Components from './ui';
 Clerk.Components = Components;
 
 const frontendApi =
-  document
-    .querySelector('script[data-clerk-frontend-api]')
-    ?.getAttribute('data-clerk-frontend-api') || '';
+  document.querySelector('script[data-clerk-frontend-api]')?.getAttribute('data-clerk-frontend-api') || '';
 
 window.Clerk = new Clerk(frontendApi);
 

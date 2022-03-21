@@ -44,14 +44,7 @@ export interface SessionActivity {
   isMobile?: boolean;
 }
 
-export type SessionStatus =
-  | 'abandoned'
-  | 'active'
-  | 'ended'
-  | 'expired'
-  | 'removed'
-  | 'replaced'
-  | 'revoked';
+export type SessionStatus = 'abandoned' | 'active' | 'ended' | 'expired' | 'removed' | 'replaced' | 'revoked';
 
 export interface PublicUserData {
   firstName: string | null;

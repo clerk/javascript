@@ -21,10 +21,7 @@ export type GenerateSignatureParams = {
   nonce: string;
 };
 
-export async function generateSignatureWithMetamask({
-  identifier,
-  nonce,
-}: GenerateSignatureParams): Promise<string> {
+export async function generateSignatureWithMetamask({ identifier, nonce }: GenerateSignatureParams): Promise<string> {
   // @ts-ignore
   if (!global.ethereum) {
     // Do nothing when ethereum doesn't exist. We might revise this in the future

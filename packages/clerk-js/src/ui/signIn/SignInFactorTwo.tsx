@@ -1,8 +1,5 @@
 import { Label } from '@clerk/shared/components/label';
-import {
-  OneTimeCodeInput,
-  VerifyCodeHandler,
-} from '@clerk/shared/components/oneTimeCodeInput';
+import { OneTimeCodeInput, VerifyCodeHandler } from '@clerk/shared/components/oneTimeCodeInput';
 import { PhoneCodeFactor, SignInResource } from '@clerk/types';
 import React from 'react';
 import {
@@ -19,10 +16,7 @@ import { useCoreClerk, useCoreSignIn, useSignInContext } from 'ui/contexts';
 
 import { determineSalutation } from './utils';
 
-type SignInUiProps = Pick<
-  SignInResource,
-  'userData' | 'identifier' | 'supportedSecondFactors' | 'status'
->;
+type SignInUiProps = Pick<SignInResource, 'userData' | 'identifier' | 'supportedSecondFactors' | 'status'>;
 
 function _SignInFactorTwo(): JSX.Element {
   const { navigateAfterSignIn } = useSignInContext();
@@ -64,9 +58,7 @@ function _SignInFactorTwo(): JSX.Element {
     }
 
     const defaultIdentifier = secondFactors.find(factor => factor.default);
-    const phoneNumberId = defaultIdentifier
-      ? defaultIdentifier.phoneNumberId
-      : secondFactors[0]?.phoneNumberId;
+    const phoneNumberId = defaultIdentifier ? defaultIdentifier.phoneNumberId : secondFactors[0]?.phoneNumberId;
 
     signIn
       .prepareSecondFactor({
@@ -83,9 +75,7 @@ function _SignInFactorTwo(): JSX.Element {
         code: code.value,
       });
       if (response.status === 'complete') {
-        verify(() =>
-          setSession(response.createdSessionId, navigateAfterSignIn),
-        );
+        verify(() => setSession(response.createdSessionId, navigateAfterSignIn));
       }
     } catch (err) {
       const globalErr = getGlobalError(err);
@@ -103,9 +93,7 @@ function _SignInFactorTwo(): JSX.Element {
     .map(phoneCodeFactor => phoneCodeFactor as PhoneCodeFactor);
 
   const defaultIdentifier = secondFactors.find(factor => factor.default);
-  const cachedSafeIdentifier = defaultIdentifier
-    ? defaultIdentifier.safeIdentifier
-    : secondFactors[0]?.safeIdentifier;
+  const cachedSafeIdentifier = defaultIdentifier ? defaultIdentifier.safeIdentifier : secondFactors[0]?.safeIdentifier;
 
   return (
     <>

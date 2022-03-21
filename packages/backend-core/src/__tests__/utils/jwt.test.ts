@@ -11,9 +11,7 @@ test('check jwt claims with no issuer', () => {
     iat: 1643374280,
   };
 
-  expect(() => checkClaims(dummyClaims)).toThrow(
-    `Issuer is invalid: ${dummyClaims.iss}`,
-  );
+  expect(() => checkClaims(dummyClaims)).toThrow(`Issuer is invalid: ${dummyClaims.iss}`);
 });
 
 test('check jwt claims with invalid issuer', () => {
@@ -26,9 +24,7 @@ test('check jwt claims with invalid issuer', () => {
     iat: 1643374280,
   };
 
-  expect(() => checkClaims(dummyClaims)).toThrow(
-    `Issuer is invalid: ${dummyClaims.iss}`,
-  );
+  expect(() => checkClaims(dummyClaims)).toThrow(`Issuer is invalid: ${dummyClaims.iss}`);
 });
 
 test('check jwt claims with valid issuer', () => {
@@ -56,9 +52,7 @@ test('check jwt claims with invalid azp', () => {
   };
   const authorizedParties: string[] = ['valid-azp', 'another-valid-azp'];
 
-  expect(() => checkClaims(dummyClaims, authorizedParties)).toThrow(
-    `Authorized party is invalid: ${dummyClaims.azp}`,
-  );
+  expect(() => checkClaims(dummyClaims, authorizedParties)).toThrow(`Authorized party is invalid: ${dummyClaims.azp}`);
 });
 
 test('check jwt claims with no azp and no authorized parties', () => {
@@ -113,11 +107,7 @@ test('check jwt claims with no azp and provided authorized parties', () => {
     iat: 1643374280,
   };
 
-  const authorizedParties: string[] = [
-    'a-valid-azp',
-    'valid-azp',
-    'another-valid-azp',
-  ];
+  const authorizedParties: string[] = ['a-valid-azp', 'valid-azp', 'another-valid-azp'];
 
   expect(() => checkClaims(dummyClaims, authorizedParties)).not.toThrow();
 });

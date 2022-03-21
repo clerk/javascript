@@ -1,10 +1,4 @@
-import {
-  act,
-  render,
-  renderJSON,
-  screen,
-  userEvent,
-} from '@clerk/shared/testUtils';
+import { act, render, renderJSON, screen, userEvent } from '@clerk/shared/testUtils';
 import * as React from 'react';
 
 import { PhoneInput } from './PhoneInput';
@@ -43,16 +37,12 @@ describe('<PhoneInput/>', () => {
   });
 
   it('renders the phone input', () => {
-    const tree = renderJSON(
-      <PhoneInput handlePhoneChange={handlePhoneChange} />,
-    );
+    const tree = renderJSON(<PhoneInput handlePhoneChange={handlePhoneChange} />);
     expect(tree).toMatchSnapshot();
   });
 
   it('renders the phone input when the dropdown is open', () => {
-    const { container } = render(
-      <PhoneInput handlePhoneChange={handlePhoneChange} />,
-    );
+    const { container } = render(<PhoneInput handlePhoneChange={handlePhoneChange} />);
     const countryOption = screen.getByText('United States');
     expect(countryOption).toBeInTheDocument();
     userEvent.click(countryOption);

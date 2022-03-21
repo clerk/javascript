@@ -1,10 +1,6 @@
 import { ClerkAPIResponseError } from 'core/resources/Error';
 
-import {
-  isVerificationExpiredError,
-  VerificationErrorMessage,
-  verificationErrorMessage,
-} from './verification';
+import { isVerificationExpiredError, VerificationErrorMessage, verificationErrorMessage } from './verification';
 
 describe('ui/common/verification', () => {
   describe('verificationErrorMessage', () => {
@@ -42,9 +38,7 @@ describe('ui/common/verification', () => {
     });
 
     it('falls back to default error message', () => {
-      expect(verificationErrorMessage(new Error('the error'))).toEqual(
-        VerificationErrorMessage.Incorrect,
-      );
+      expect(verificationErrorMessage(new Error('the error'))).toEqual(VerificationErrorMessage.Incorrect);
     });
   });
 

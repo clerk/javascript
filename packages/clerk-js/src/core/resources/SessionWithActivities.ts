@@ -8,9 +8,7 @@ import { unixEpochToDate } from 'utils/date';
 
 import { BaseResource } from './internal';
 
-const mapSessionActivityJSONToSessionActivity = (
-  data: SessionActivityJSON,
-): SessionActivity => ({
+const mapSessionActivityJSONToSessionActivity = (data: SessionActivityJSON): SessionActivity => ({
   id: data.id,
   deviceType: data.device_type,
   browserName: data.browser_name,
@@ -21,10 +19,7 @@ const mapSessionActivityJSONToSessionActivity = (
   ipAddress: data.ip_address,
 });
 
-export class SessionWithActivities
-  extends BaseResource
-  implements SessionWithActivitiesResource
-{
+export class SessionWithActivities extends BaseResource implements SessionWithActivitiesResource {
   pathRoot = '';
   id!: string;
   status!: string;
@@ -51,11 +46,8 @@ export class SessionWithActivities
       })
       .then(res => {
         // https://www.notion.so/clerkdev/Align-SessionWithActivities-retrieval-with-the-rest-of-Client-API-a043f72f6b9d4344bd2f21dc1d3f79de
-        const sessionWithActivitiesJSON =
-          res.payload as unknown as SessionWithActivitiesJSON[];
-        return sessionWithActivitiesJSON.map(
-          sa => new SessionWithActivities(sa, '/me/sessions'),
-        );
+        const sessionWithActivitiesJSON = res.payload as unknown as SessionWithActivitiesJSON[];
+        return sessionWithActivitiesJSON.map(sa => new SessionWithActivities(sa, '/me/sessions'));
       })
       .catch(() => []);
   }
@@ -70,9 +62,7 @@ export class SessionWithActivities
     this.expireAt = unixEpochToDate(data.expire_at);
     this.abandonAt = unixEpochToDate(data.abandon_at);
     this.lastActiveAt = unixEpochToDate(data.last_active_at);
-    this.latestActivity = mapSessionActivityJSONToSessionActivity(
-      data.latest_activity ?? ({} as SessionActivityJSON),
-    );
+    this.latestActivity = mapSessionActivityJSONToSessionActivity(data.latest_activity ?? ({} as SessionActivityJSON));
     return this;
   }
 }

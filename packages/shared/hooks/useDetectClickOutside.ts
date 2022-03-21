@@ -1,9 +1,6 @@
 import React from 'react';
 
-export type DetectClickOutsideResponse = [
-  boolean,
-  React.Dispatch<React.SetStateAction<boolean>>,
-] & {
+export type DetectClickOutsideResponse = [boolean, React.Dispatch<React.SetStateAction<boolean>>] & {
   isActive: boolean;
   setIsActive: React.Dispatch<React.SetStateAction<boolean>>;
 };
