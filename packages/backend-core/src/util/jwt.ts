@@ -10,10 +10,7 @@ const DEFAULT_ADDITIONAL_CLOCK_SKEW = 0;
  * @param {*} [additionalClockSkew=DEFAULT_ADDITIONAL_CLOCK_SKEW]
  * @throws {JWTExpiredError|Error}
  */
-export function isExpired(
-  payload: JWTPayload,
-  additionalClockSkew = DEFAULT_ADDITIONAL_CLOCK_SKEW
-) {
+export function isExpired(payload: JWTPayload, additionalClockSkew = DEFAULT_ADDITIONAL_CLOCK_SKEW) {
   // verify exp+nbf claims
   const now = Date.now() / 1000;
 
@@ -32,7 +29,7 @@ export function checkClaims(claims: JWTPayload, authorizedParties?: string[]) {
   }
 
   if (claims.azp && authorizedParties && authorizedParties.length > 0) {
-    if (!authorizedParties.includes(claims.azp )) {
+    if (!authorizedParties.includes(claims.azp)) {
       throw new Error(`Authorized party is invalid: ${claims.azp}`);
     }
   }

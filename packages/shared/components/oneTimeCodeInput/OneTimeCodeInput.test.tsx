@@ -71,10 +71,7 @@ describe('<OneTimeCodeInput/>', () => {
     const inputs = screen.getAllByRole('textbox');
     inputs.forEach((input, i) => {
       if (i === 0) {
-        expect(input).toHaveAttribute(
-          'aria-label',
-          'Enter verification code. Digit 1',
-        );
+        expect(input).toHaveAttribute('aria-label', 'Enter verification code. Digit 1');
       } else {
         expect(input).toHaveAttribute('aria-label', `Digit ${i + 1}`);
       }
@@ -94,10 +91,7 @@ describe('<OneTimeCodeInput/>', () => {
     const inputs = screen.getAllByRole('textbox');
     inputs.forEach((input, i) => {
       if (i === 0) {
-        expect(input).toHaveAttribute(
-          'aria-label',
-          'Enter verification code. Character 1',
-        );
+        expect(input).toHaveAttribute('aria-label', 'Enter verification code. Character 1');
       } else {
         expect(input).toHaveAttribute('aria-label', `Character ${i + 1}`);
       }

@@ -13,7 +13,10 @@ export const List: React.FC<ListProps> & { Item: React.FC<ListItemProps> } & {
   EmptyPlaceholder: React.FC;
 } = ({ className, children, ...rest }) => {
   return (
-    <div {...rest} className={className}>
+    <div
+      {...rest}
+      className={className}
+    >
       {children}
     </div>
   );
@@ -66,11 +69,7 @@ const Item: React.FC<ListItemProps> = ({
         {endSlot && <div className={styles.end}>{endSlot}</div>}
         <div className={styles.iconContainer}>
           {detail &&
-            (detailIcon ? (
-              <div className={styles.icon}>{detailIcon}</div>
-            ) : (
-              <ArrowRightIcon className={styles.icon} />
-            ))}
+            (detailIcon ? <div className={styles.icon}>{detailIcon}</div> : <ArrowRightIcon className={styles.icon} />)}
         </div>
       </div>
     </Element>

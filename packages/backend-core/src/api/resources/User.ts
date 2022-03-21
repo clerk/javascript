@@ -72,18 +72,10 @@ export class User {
     const filtered = filterKeys(camelcased, User.attributes);
     Object.assign(obj, filtered);
 
-    obj.emailAddresses = (data.email_addresses || []).map((x) =>
-      EmailAddress.fromJSON(x)
-    );
-    obj.phoneNumbers = (data.phone_numbers || []).map((x) =>
-      PhoneNumber.fromJSON(x)
-    );
-    obj.web3Wallets = (data.web3_wallets || []).map((x) =>
-      Web3Wallet.fromJSON(x)
-    );
-    obj.externalAccounts = (data.external_accounts || []).map(
-      (x: ExternalAccountJSON) => ExternalAccount.fromJSON(x)
-    );
+    obj.emailAddresses = (data.email_addresses || []).map(x => EmailAddress.fromJSON(x));
+    obj.phoneNumbers = (data.phone_numbers || []).map(x => PhoneNumber.fromJSON(x));
+    obj.web3Wallets = (data.web3_wallets || []).map(x => Web3Wallet.fromJSON(x));
+    obj.externalAccounts = (data.external_accounts || []).map((x: ExternalAccountJSON) => ExternalAccount.fromJSON(x));
 
     return new User(obj as UserPayload);
   }

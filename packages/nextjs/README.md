@@ -69,13 +69,7 @@ NEXT_PUBLIC_CLERK_FRONTEND_API=clerk.[your-domain].[tld]
 An implementation of `<ClerkProvider />` with our flexible Control Components to build an authentication flow in `pages/_app.js`:
 
 ```jsx
-import {
-  ClerkProvider,
-  RedirectToSignIn,
-  SignedIn,
-  SignedOut,
-  UserButton
-} from '@clerk/nextjs';
+import { ClerkProvider, RedirectToSignIn, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 
 function MyApp({ Component, pageProps }) {
   return (

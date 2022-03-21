@@ -9,10 +9,7 @@ export type PasswordProps = {
   password: FieldState<string>;
 };
 
-export const Password: React.FC<PasswordProps> = ({
-  handleSubmit,
-  password,
-}) => {
+export const Password: React.FC<PasswordProps> = ({ handleSubmit, password }) => {
   return (
     <Form
       handleSubmit={handleSubmit}

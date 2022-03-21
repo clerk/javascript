@@ -1,19 +1,11 @@
 import React from 'react';
 
 import { SignInWithMetamaskButtonProps, WithClerkProp } from '../types';
-import {
-  assertSingleChild,
-  normalizeWithDefaultValue,
-  safeExecute,
-} from '../utils';
+import { assertSingleChild, normalizeWithDefaultValue, safeExecute } from '../utils';
 import { withClerk } from './withClerk';
 
 export const SignInWithMetamaskButton = withClerk(
-  ({
-    clerk,
-    children,
-    ...props
-  }: WithClerkProp<SignInWithMetamaskButtonProps>) => {
+  ({ clerk, children, ...props }: WithClerkProp<SignInWithMetamaskButtonProps>) => {
     const { redirectUrl, ...rest } = props;
 
     children = normalizeWithDefaultValue(children, 'Sign in with Metamask');

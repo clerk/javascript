@@ -16,8 +16,7 @@ import type {
   UserProfileProps,
 } from '../types';
 
-export const ComponentContext =
-  React.createContext<AvailableComponentCtx | null>(null);
+export const ComponentContext = React.createContext<AvailableComponentCtx | null>(null);
 
 export type SignUpContextType = SignUpProps & {
   navigateAfterSignUp: () => any;
@@ -26,17 +25,13 @@ export type SignUpContextType = SignUpProps & {
   authQueryString: string | null;
 };
 export const useSignUpContext = (): SignUpContextType => {
-  const { componentName, ...ctx } = React.useContext(
-    ComponentContext,
-  ) as SignUpCtx;
+  const { componentName, ...ctx } = React.useContext(ComponentContext) as SignUpCtx;
   const { navigate } = useNavigate();
   const { displayConfig } = useEnvironment();
   const { queryParams } = useRouter();
 
   if (componentName !== 'SignUp') {
-    throw new Error(
-      'Clerk: useSignUpContext called outside of the mounted SignUp component.',
-    );
+    throw new Error('Clerk: useSignUpContext called outside of the mounted SignUp component.');
   }
 
   // Retrieve values passed through props or qs
@@ -89,17 +84,13 @@ export type SignInContextType = SignInProps & {
   authQueryString: string | null;
 };
 export const useSignInContext = (): SignInContextType => {
-  const { componentName, ...ctx } = React.useContext(
-    ComponentContext,
-  ) as SignInCtx;
+  const { componentName, ...ctx } = React.useContext(ComponentContext) as SignInCtx;
   const { navigate } = useNavigate();
   const { displayConfig } = useEnvironment();
   const { queryParams } = useRouter();
 
   if (componentName !== 'SignIn') {
-    throw new Error(
-      'Clerk: useSignInContext called outside of the mounted SignIn component.',
-    );
+    throw new Error('Clerk: useSignInContext called outside of the mounted SignIn component.');
   }
 
   // Retrieve values passed through props or qs
@@ -152,15 +143,11 @@ export type UserProfileContextType = UserProfileProps & {
 // `routing` and `path`
 // TODO: remove if not needed during the components v2 overhaul
 export const useUserProfileContext = (): UserProfileContextType => {
-  const { componentName, ...ctx } = React.useContext(
-    ComponentContext,
-  ) as UserProfileCtx;
+  const { componentName, ...ctx } = React.useContext(ComponentContext) as UserProfileCtx;
   const { queryParams } = useRouter();
 
   if (componentName !== 'UserProfile') {
-    throw new Error(
-      'Clerk: useUserProfileContext called outside of the mounted UserProfile component.',
-    );
+    throw new Error('Clerk: useUserProfileContext called outside of the mounted UserProfile component.');
   }
 
   return {
@@ -171,31 +158,24 @@ export const useUserProfileContext = (): UserProfileContextType => {
 };
 
 export const useUserButtonContext = () => {
-  const { componentName, ...ctx } = React.useContext(
-    ComponentContext,
-  ) as UserButtonCtx;
+  const { componentName, ...ctx } = React.useContext(ComponentContext) as UserButtonCtx;
   const { navigate } = useNavigate();
   const { displayConfig } = useEnvironment();
 
   if (componentName !== 'UserButton') {
-    throw new Error(
-      'Clerk: useUserButtonContext called outside of the mounted UserButton component.',
-    );
+    throw new Error('Clerk: useUserButtonContext called outside of the mounted UserButton component.');
   }
 
   const signInUrl = ctx.signInUrl || displayConfig.signInUrl;
   const userProfileUrl = ctx.userProfileUrl || displayConfig.userProfileUrl;
 
-  const afterSignOutOneUrl =
-    ctx.afterSignOutOneUrl || displayConfig.afterSignOutOneUrl;
+  const afterSignOutOneUrl = ctx.afterSignOutOneUrl || displayConfig.afterSignOutOneUrl;
   const navigateAfterSignOutOne = () => navigate(afterSignOutOneUrl);
 
-  const afterSignOutAllUrl =
-    ctx.afterSignOutAllUrl || displayConfig.afterSignOutAllUrl;
+  const afterSignOutAllUrl = ctx.afterSignOutAllUrl || displayConfig.afterSignOutAllUrl;
   const navigateAfterSignOutAll = () => navigate(afterSignOutAllUrl);
 
-  const afterSwitchSessionUrl = (ctx.afterSwitchSessionUrl =
-    displayConfig.afterSwitchSessionUrl);
+  const afterSwitchSessionUrl = (ctx.afterSwitchSessionUrl = displayConfig.afterSwitchSessionUrl);
   const navigateAfterSwitchSession = () => navigate(afterSwitchSessionUrl);
 
   return {

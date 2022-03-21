@@ -3,10 +3,7 @@ type RunIframeOptions = {
   eventOrigin: string;
 };
 
-export function runIframe<T>({
-  src,
-  eventOrigin,
-}: RunIframeOptions): Promise<T> {
+export function runIframe<T>({ src, eventOrigin }: RunIframeOptions): Promise<T> {
   return new Promise<T>((resolve, reject) => {
     const overlay = document.createElement('div');
     overlay.setAttribute(
@@ -23,11 +20,7 @@ export function runIframe<T>({
       'display: none; position: fixed; z-index: 2147483647; border-radius: 32px; width: 600px; height: 500px; left: 50%; top: 50%; transform: translate(-50%, -50%); border: 0; outline: 0; background-color: white; box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);',
     );
 
-    const iframeAttributes = [
-      'allow-same-origin',
-      'allow-scripts',
-      'allow-top-navigation',
-    ];
+    const iframeAttributes = ['allow-same-origin', 'allow-scripts', 'allow-top-navigation'];
 
     if (typeof document.requestStorageAccess === 'function') {
       iframeAttributes.push('allow-storage-access-by-user-activation');

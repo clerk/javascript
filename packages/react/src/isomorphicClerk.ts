@@ -21,12 +21,7 @@ import type {
 } from '@clerk/types';
 
 import { noFrontendApiError } from './errors';
-import type {
-  BrowserClerk,
-  BrowserClerkConstructor,
-  ClerkProp,
-  IsomorphicClerkOptions,
-} from './types';
+import type { BrowserClerk, BrowserClerkConstructor, ClerkProp, IsomorphicClerkOptions } from './types';
 import { inClientSide, isConstructor, loadScript } from './utils';
 
 export interface Global {
@@ -50,15 +45,9 @@ export default class IsomorphicClerk {
   private preopenSignUp?: null | SignUpProps = null;
   private premountSignInNodes = new Map<HTMLDivElement, SignInProps>();
   private premountSignUpNodes = new Map<HTMLDivElement, SignUpProps>();
-  private premountUserProfileNodes = new Map<
-    HTMLDivElement,
-    UserProfileProps
-  >();
+  private premountUserProfileNodes = new Map<HTMLDivElement, UserProfileProps>();
   private premountUserButtonNodes = new Map<HTMLDivElement, UserButtonProps>();
-  private premountMethodCalls = new Map<
-    MethodName<BrowserClerk>,
-    MethodCallback
-  >();
+  private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
   private loadedListeners: Array<() => void> = [];
 
   private _loaded = false;
@@ -114,9 +103,7 @@ export default class IsomorphicClerk {
         });
 
         if (!global.Clerk) {
-          throw new Error(
-            'Failed to download latest ClerkJS. Contact support@clerk.dev.',
-          );
+          throw new Error('Failed to download latest ClerkJS. Contact support@clerk.dev.');
         }
 
         await global.Clerk.load(this.options);
@@ -175,29 +162,21 @@ export default class IsomorphicClerk {
       clerkjs.openSignUp(this.preopenSignUp);
     }
 
-    this.premountSignInNodes.forEach(
-      (props: SignInProps, node: HTMLDivElement) => {
-        clerkjs.mountSignIn(node, props);
-      },
-    );
+    this.premountSignInNodes.forEach((props: SignInProps, node: HTMLDivElement) => {
+      clerkjs.mountSignIn(node, props);
+    });
 
-    this.premountSignUpNodes.forEach(
-      (props: SignUpProps, node: HTMLDivElement) => {
-        clerkjs.mountSignUp(node, props);
-      },
-    );
+    this.premountSignUpNodes.forEach((props: SignUpProps, node: HTMLDivElement) => {
+      clerkjs.mountSignUp(node, props);
+    });
 
-    this.premountUserProfileNodes.forEach(
-      (props: UserProfileProps, node: HTMLDivElement) => {
-        clerkjs.mountUserProfile(node, props);
-      },
-    );
+    this.premountUserProfileNodes.forEach((props: UserProfileProps, node: HTMLDivElement) => {
+      clerkjs.mountUserProfile(node, props);
+    });
 
-    this.premountUserButtonNodes.forEach(
-      (props: UserButtonProps, node: HTMLDivElement) => {
-        clerkjs.mountUserButton(node, props);
-      },
-    );
+    this.premountUserButtonNodes.forEach((props: UserButtonProps, node: HTMLDivElement) => {
+      clerkjs.mountUserButton(node, props);
+    });
 
     this._loaded = true;
     this.emitLoaded();
@@ -335,10 +314,7 @@ export default class IsomorphicClerk {
     }
   };
 
-  mountUserButton = (
-    node: HTMLDivElement,
-    userButtonProps: UserButtonProps,
-  ): void => {
+  mountUserButton = (node: HTMLDivElement, userButtonProps: UserButtonProps): void => {
     if (this.clerkjs && this._loaded) {
       this.clerkjs.mountUserButton(node, userButtonProps);
     } else {
@@ -408,9 +384,7 @@ export default class IsomorphicClerk {
     }
   };
 
-  handleMagicLinkVerification = async (
-    params: HandleMagicLinkVerificationParams,
-  ): Promise<void> => {
+  handleMagicLinkVerification = async (params: HandleMagicLinkVerificationParams): Promise<void> => {
     const callback = () => this.clerkjs?.handleMagicLinkVerification(params);
     if (this.clerkjs && this._loaded) {
       return callback() as Promise<void>;
@@ -419,9 +393,7 @@ export default class IsomorphicClerk {
     }
   };
 
-  authenticateWithMetamask = async (
-    params: AuthenticateWithMetamaskParams,
-  ): Promise<void> => {
+  authenticateWithMetamask = async (params: AuthenticateWithMetamaskParams): Promise<void> => {
     const callback = () => this.clerkjs?.authenticateWithMetamask(params);
     if (this.clerkjs && this._loaded) {
       return callback() as Promise<void>;
@@ -430,9 +402,7 @@ export default class IsomorphicClerk {
     }
   };
 
-  createOrganization = async (
-    params: CreateOrganizationParams,
-  ): Promise<OrganizationResource | void> => {
+  createOrganization = async (params: CreateOrganizationParams): Promise<OrganizationResource | void> => {
     const callback = () => this.clerkjs?.createOrganization(params);
     if (this.clerkjs && this._loaded) {
       return callback() as Promise<OrganizationResource>;
@@ -441,9 +411,7 @@ export default class IsomorphicClerk {
     }
   };
 
-  getOrganizationMemberships = async (): Promise<
-    OrganizationMembershipResource[] | void
-  > => {
+  getOrganizationMemberships = async (): Promise<OrganizationMembershipResource[] | void> => {
     const callback = () => this.clerkjs?.getOrganizationMemberships();
     if (this.clerkjs && this._loaded) {
       return callback() as Promise<OrganizationMembershipResource[]>;
@@ -452,9 +420,7 @@ export default class IsomorphicClerk {
     }
   };
 
-  getOrganization = async (
-    organizationId: string,
-  ): Promise<OrganizationResource | undefined | void> => {
+  getOrganization = async (organizationId: string): Promise<OrganizationResource | undefined | void> => {
     const callback = () => this.clerkjs?.getOrganization(organizationId);
     if (this.clerkjs && this._loaded) {
       return callback() as Promise<OrganizationResource | undefined>;
@@ -467,8 +433,7 @@ export default class IsomorphicClerk {
     signOutCallbackOrOptions?: SignOutCallback | SignOutOptions,
     options?: SignOutOptions,
   ): Promise<void> => {
-    const callback = () =>
-      this.clerkjs?.signOut(signOutCallbackOrOptions as any, options);
+    const callback = () => this.clerkjs?.signOut(signOutCallbackOrOptions as any, options);
     if (this.clerkjs && this._loaded) {
       return callback() as Promise<void>;
     } else {

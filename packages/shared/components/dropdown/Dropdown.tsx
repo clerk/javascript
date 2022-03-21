@@ -7,17 +7,15 @@ import { ExpansionIcon } from '../expansionIcon';
 import styles from './Dropdown.module.scss';
 import { DropdownList } from './DropdownList';
 import type { DropdownComparator, DropdownOption } from './types';
-import {
-  defaultComparator,
-  findSelectedOptionIndex,
-  getOptionLabel,
-  makeComparator,
-} from './util';
+import { defaultComparator, findSelectedOptionIndex, getOptionLabel, makeComparator } from './util';
 
 const getNativeOption = (o: DropdownOption) => {
   if (typeof o === 'string') {
     return (
-      <option value={o} key={'option-' + o}>
+      <option
+        value={o}
+        key={'option-' + o}
+      >
         {o}
       </option>
     );
@@ -79,10 +77,7 @@ export function Dropdown({
   const selectionRef = React.useRef<HTMLLIElement>(null);
   const searchInputRef = React.useRef<HTMLInputElement>(null);
 
-  const nativeOptions = React.useMemo(
-    () => options.map(getNativeOption).filter(o => o),
-    [options],
-  );
+  const nativeOptions = React.useMemo(() => options.map(getNativeOption).filter(o => o), [options]);
 
   const [selectedIndex, setSelectedIndex] = React.useState(() => {
     if (defaultSelectedIndex != null && defaultSelectedIndex >= 0) {
@@ -90,17 +85,13 @@ export function Dropdown({
     }
 
     return options.findIndex(option => {
-      const preSelectedOption =
-        typeof option === 'string' ? option : option.value;
+      const preSelectedOption = typeof option === 'string' ? option : option.value;
       return preSelectedOption === selectedOption;
     });
   });
 
   const [isActive, setIsActive] = useDetectClickOutside(dropdownRef, !!active);
-  const [isSearchInputActive, setSearchInputActive] = useDetectClickOutside(
-    searchInputRef,
-    false,
-  );
+  const [isSearchInputActive, setSearchInputActive] = useDetectClickOutside(searchInputRef, false);
   const [searchValue, setSearchValue] = React.useState('');
   const displayLabel = getOptionLabel(options[selectedIndex], placeholder);
 
@@ -110,10 +101,7 @@ export function Dropdown({
     setSelectedIndex(0);
   };
 
-  const comparator = makeComparator(
-    searchValue,
-    customComparator || defaultComparator,
-  );
+  const comparator = makeComparator(searchValue, customComparator || defaultComparator);
   const filteredOptions = searchValue ? options.filter(comparator) : options;
 
   React.useEffect(() => {
@@ -132,10 +120,7 @@ export function Dropdown({
       typeof handleChange === 'function'
     ) {
       const selectedOption = options[selectedIndex];
-      const value =
-        typeof selectedOption === 'string'
-          ? selectedOption
-          : selectedOption.value;
+      const value = typeof selectedOption === 'string' ? selectedOption : selectedOption.value;
 
       handleChange({
         name,
@@ -146,11 +131,7 @@ export function Dropdown({
   }, [selectedIndex]);
 
   React.useLayoutEffect(() => {
-    if (
-      !isActive ||
-      !selectionRef.current?.scrollIntoView ||
-      selectedIndex == undefined
-    ) {
+    if (!isActive || !selectionRef.current?.scrollIntoView || selectedIndex == undefined) {
       return;
     }
     selectionRef.current.scrollIntoView({ block: 'nearest' });
@@ -172,11 +153,7 @@ export function Dropdown({
     if (e.key === 'ArrowUp') {
       e.preventDefault();
       if (isActive) {
-        setSelectedIndex((i = 0) =>
-          i - 1 < 0 || i - 1 > filteredOptions.length
-            ? filteredOptions.length - 1
-            : i - 1,
-        );
+        setSelectedIndex((i = 0) => (i - 1 < 0 || i - 1 > filteredOptions.length ? filteredOptions.length - 1 : i - 1));
       } else {
         setIsActive(true);
       }
@@ -237,11 +214,7 @@ export function Dropdown({
 
   return (
     <div
-      className={cn(
-        styles.container,
-        { [styles.disabled]: disabled },
-        className,
-      )}
+      className={cn(styles.container, { [styles.disabled]: disabled }, className)}
       style={style}
       onKeyDown={onKeyDown}
       onBlur={() => isActive && setIsActive(false)}
@@ -272,14 +245,9 @@ export function Dropdown({
           />
           {!isSearchInputActive && (
             <span
-              className={cn(
-                styles.label,
-                styles.searchDisplay,
-                selectedOptionClassname,
-                {
-                  [styles.placeholder]: !options[selectedIndex],
-                },
-              )}
+              className={cn(styles.label, styles.searchDisplay, selectedOptionClassname, {
+                [styles.placeholder]: !options[selectedIndex],
+              })}
             >
               {displayLabel}
             </span>

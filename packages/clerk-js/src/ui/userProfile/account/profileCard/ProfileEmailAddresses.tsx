@@ -22,9 +22,7 @@ export function ProfileEmailAddresses(): JSX.Element {
           {user.emailAddresses.map(emailIdent => (
             <div key={emailIdent.id}>
               {emailIdent.emailAddress}
-              {user.isPrimaryIdentification(emailIdent) && (
-                <Tag color='primary'>Primary</Tag>
-              )}
+              {user.isPrimaryIdentification(emailIdent) && <Tag color='primary'>Primary</Tag>}
               {emailIdent.verification.status && (
                 <VerificationStatusTag
                   className='cl-tag'

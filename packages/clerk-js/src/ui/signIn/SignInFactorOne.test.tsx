@@ -1,24 +1,8 @@
-import {
-  mocked,
-  render,
-  screen,
-  userEvent,
-  waitFor,
-} from '@clerk/shared/testUtils';
-import {
-  EnvironmentResource,
-  LoadedClerk,
-  SignInFactor,
-  SignInResource,
-} from '@clerk/types';
+import { mocked, render, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
+import { EnvironmentResource, LoadedClerk, SignInFactor, SignInResource } from '@clerk/types';
 import * as React from 'react';
 import { PartialDeep } from 'type-fest';
-import {
-  useCoreClerk,
-  useCoreSignIn,
-  useEnvironment,
-  useSignInContext,
-} from 'ui/contexts';
+import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from 'ui/contexts';
 
 import { SignInFactorOne } from './SignInFactorOne';
 
@@ -88,11 +72,9 @@ describe('<SignInFactorOne/>', () => {
         }),
       }));
 
-      (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(
-        () => ({
-          setSession: mockSetSession,
-        }),
-      );
+      (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(() => ({
+        setSession: mockSetSession,
+      }));
 
       render(<SignInFactorOne />);
 
@@ -112,10 +94,7 @@ describe('<SignInFactorOne/>', () => {
 
         expect(mockNavigate).toHaveBeenCalledTimes(0);
         expect(mockSetSession).toHaveBeenCalledTimes(1);
-        expect(mockSetSession).toHaveBeenCalledWith(
-          'cafebabe',
-          mockNavigateAfterSignIn,
-        );
+        expect(mockSetSession).toHaveBeenCalledWith('cafebabe', mockNavigateAfterSignIn);
       });
     });
   });
@@ -151,11 +130,9 @@ describe('<SignInFactorOne/>', () => {
         }),
       }));
 
-      (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(
-        () => ({
-          setSession: mockSetSession,
-        }),
-      );
+      (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(() => ({
+        setSession: mockSetSession,
+      }));
 
       render(<SignInFactorOne />);
 
@@ -185,9 +162,7 @@ describe('<SignInFactorOne/>', () => {
       const mockAttemptFirstFactor = jest.fn();
       const mockSetSession = jest.fn();
 
-      (
-        useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>
-      ).mockImplementation(() => ({
+      (useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>).mockImplementation(() => ({
         authConfig: { singleSessionMode: false },
         displayConfig: {
           preferredSignInStrategy: 'otp',
@@ -217,11 +192,9 @@ describe('<SignInFactorOne/>', () => {
           } as unknown as SignInResource),
       );
 
-      (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(
-        () => ({
-          setSession: mockSetSession,
-        }),
-      );
+      (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(() => ({
+        setSession: mockSetSession,
+      }));
 
       render(<SignInFactorOne />);
 
@@ -247,10 +220,7 @@ describe('<SignInFactorOne/>', () => {
 
         expect(mockNavigate).toHaveBeenCalledTimes(0);
         expect(mockSetSession).toHaveBeenCalledTimes(1);
-        expect(mockSetSession).toHaveBeenCalledWith(
-          'cafebabe',
-          mockNavigateAfterSignIn,
-        );
+        expect(mockSetSession).toHaveBeenCalledWith('cafebabe', mockNavigateAfterSignIn);
       });
     });
   });
@@ -267,9 +237,7 @@ describe('<SignInFactorOne/>', () => {
         }),
       );
 
-      (
-        useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>
-      ).mockImplementation(() => ({
+      (useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>).mockImplementation(() => ({
         authConfig: { singleSessionMode: false },
         displayConfig: {
           preferredSignInStrategy: 'otp',
@@ -299,11 +267,9 @@ describe('<SignInFactorOne/>', () => {
           } as unknown as SignInResource),
       );
 
-      (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(
-        () => ({
-          setSession: mockSetSession,
-        }),
-      );
+      (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(() => ({
+        setSession: mockSetSession,
+      }));
 
       render(<SignInFactorOne />);
 
@@ -330,9 +296,7 @@ describe('<SignInFactorOne/>', () => {
         }),
       );
 
-      (
-        useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>
-      ).mockImplementation(() => ({
+      (useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>).mockImplementation(() => ({
         authConfig: { singleSessionMode: false },
         displayConfig: {
           preferredSignInStrategy: 'otp',
@@ -362,11 +326,9 @@ describe('<SignInFactorOne/>', () => {
           } as unknown as SignInResource),
       );
 
-      (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(
-        () => ({
-          setSession: mockSetSession,
-        }),
-      );
+      (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(() => ({
+        setSession: mockSetSession,
+      }));
 
       render(<SignInFactorOne />);
 
@@ -379,10 +341,7 @@ describe('<SignInFactorOne/>', () => {
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledTimes(0);
         expect(mockSetSession).toHaveBeenCalledTimes(1);
-        expect(mockSetSession).toHaveBeenCalledWith(
-          'cafebabe',
-          mockNavigateAfterSignIn,
-        );
+        expect(mockSetSession).toHaveBeenCalledWith('cafebabe', mockNavigateAfterSignIn);
       });
     });
   });
@@ -428,20 +387,14 @@ describe('<SignInFactorOne/>', () => {
       const mockAttemptFirstFactor = jest.fn();
       const mockSetSession = jest.fn();
 
-      mocked(
-        useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>,
-        true,
-      ).mockImplementation(() => ({
+      mocked(useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>, true).mockImplementation(() => ({
         authConfig: { singleSessionMode: false },
         displayConfig: {
           preferredSignInStrategy: 'otp',
         },
       }));
 
-      mocked(
-        useCoreSignIn as jest.Mock<SignInResource>,
-        true,
-      ).mockImplementation(
+      mocked(useCoreSignIn as jest.Mock<SignInResource>, true).mockImplementation(
         () =>
           ({
             prepareFirstFactor: mockPrepareFirstFactor,
@@ -463,10 +416,7 @@ describe('<SignInFactorOne/>', () => {
           } as unknown as SignInResource),
       );
 
-      mocked(
-        useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>,
-        true,
-      ).mockImplementation(() => ({
+      mocked(useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>, true).mockImplementation(() => ({
         setSession: mockSetSession,
       }));
 
@@ -505,20 +455,14 @@ describe('<SignInFactorOne/>', () => {
       const mockPrepareFirstFactor = jest.fn();
       const mockSetSession = jest.fn();
 
-      mocked(
-        useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>,
-        true,
-      ).mockImplementation(() => ({
+      mocked(useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>, true).mockImplementation(() => ({
         authConfig: { singleSessionMode: false },
         displayConfig: {
           preferredSignInStrategy: 'otp',
         },
       }));
 
-      mocked(
-        useCoreSignIn as jest.Mock<SignInResource>,
-        true,
-      ).mockImplementation(
+      mocked(useCoreSignIn as jest.Mock<SignInResource>, true).mockImplementation(
         () =>
           ({
             prepareFirstFactor: mockPrepareFirstFactor,
@@ -577,9 +521,7 @@ describe('<SignInFactorOne/>', () => {
       const mockAttemptFirstFactor = jest.fn();
       const mockSetSession = jest.fn();
 
-      (
-        useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>
-      ).mockImplementation(() => ({
+      (useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>).mockImplementation(() => ({
         authConfig: { singleSessionMode: false },
         displayConfig: {
           preferredSignInStrategy: 'otp',
@@ -609,11 +551,9 @@ describe('<SignInFactorOne/>', () => {
           } as unknown as SignInResource),
       );
 
-      (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(
-        () => ({
-          setSession: mockSetSession,
-        }),
-      );
+      (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(() => ({
+        setSession: mockSetSession,
+      }));
 
       render(<SignInFactorOne />);
       userEvent.click(screen.getByText('Try another method'));
@@ -664,9 +604,7 @@ describe('<SignInFactorOne/>', () => {
 
   describe('error cases', () => {
     it('renders the loading screen', async () => {
-      (
-        useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>
-      ).mockImplementation(() => ({
+      (useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>).mockImplementation(() => ({
         authConfig: { singleSessionMode: false },
         displayConfig: {
           preferredSignInStrategy: undefined,
@@ -686,9 +624,7 @@ describe('<SignInFactorOne/>', () => {
     });
 
     it('renders the fallback screen', () => {
-      (
-        useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>
-      ).mockImplementation(() => ({
+      (useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>).mockImplementation(() => ({
         authConfig: { singleSessionMode: false },
         displayConfig: {
           preferredSignInStrategy: undefined,

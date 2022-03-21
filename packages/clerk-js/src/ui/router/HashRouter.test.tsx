@@ -103,10 +103,7 @@ describe('HashRouter', () => {
         expect(button).toBeInTheDocument();
         await userEvent.click(button);
       });
-      expect(mockNavigate).toHaveBeenNthCalledWith(
-        1,
-        'https://www.example.com/external',
-      );
+      expect(mockNavigate).toHaveBeenNthCalledWith(1, 'https://www.example.com/external');
     });
   });
 });

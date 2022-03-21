@@ -14,9 +14,7 @@ type CoreClerkContextWrapperProps = {
 
 type CoreClerkContextProviderState = Resources;
 
-export function CoreClerkContextWrapper(
-  props: CoreClerkContextWrapperProps,
-): JSX.Element | null {
+export function CoreClerkContextWrapper(props: CoreClerkContextWrapperProps): JSX.Element | null {
   // TODO: Revise Clerk and LoadedClerk
   const clerk = props.clerk as LoadedClerk;
   assertClerkSingletonExists(clerk);
@@ -40,9 +38,7 @@ export function CoreClerkContextWrapper(
     <CoreClerkContext.Provider value={clerk}>
       <CoreClientContext.Provider value={clientCtx}>
         <CoreSessionContext.Provider value={sessionCtx}>
-          <CoreUserContext.Provider value={userCtx}>
-            {props.children}
-          </CoreUserContext.Provider>
+          <CoreUserContext.Provider value={userCtx}>{props.children}</CoreUserContext.Provider>
         </CoreSessionContext.Provider>
       </CoreClientContext.Provider>
     </CoreClerkContext.Provider>

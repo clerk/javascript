@@ -58,12 +58,7 @@ const importKey = async (jwk: JsonWebKey, algorithm: Algorithm) => {
   //  ...
 };
 
-const verifySignature = async (
-  algorithm: Algorithm,
-  key: CryptoKey,
-  signature: Uint8Array,
-  data: Uint8Array,
-) => {
+const verifySignature = async (algorithm: Algorithm, key: CryptoKey, signature: Uint8Array, data: Uint8Array) => {
   // ...
 };
 

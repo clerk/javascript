@@ -201,9 +201,7 @@ describe('determineFirstPartyFields()', () => {
     ];
 
     it.each(scenaria)('%s', (___, environment, result) => {
-      expect(
-        determineFirstPartyFields(environment as EnvironmentResource),
-      ).toEqual(result);
+      expect(determineFirstPartyFields(environment as EnvironmentResource)).toEqual(result);
     });
 
     it.each(scenaria)('with ticket, %s', (___, environment, result) => {
@@ -213,10 +211,7 @@ describe('determineFirstPartyFields()', () => {
       delete expected.emailAddress;
       delete expected.phoneNumber;
       delete expected.emailOrPhone;
-      const res = determineFirstPartyFields(
-        environment as EnvironmentResource,
-        true,
-      );
+      const res = determineFirstPartyFields(environment as EnvironmentResource, true);
       expect(res).toMatchObject(expected);
     });
   });

@@ -23,8 +23,7 @@ $content-width-lg: 620px;
     // $theme-border-radius can be 1em (normal) or 0.5em (compact)
     // We use a high enough value to support arbitrary link heights
     // even with "Spacing" set to "compact"
-    border-radius: 0 calc(#{$theme-border-radius} * 999)
-      calc(#{$theme-border-radius} * 999) 0;
+    border-radius: 0 calc(#{$theme-border-radius} * 999) calc(#{$theme-border-radius} * 999) 0;
     padding: themed-padding(1rem 2rem);
     color: $cl-gray-light-3;
     font-weight: $semibold-weight;
@@ -92,8 +91,7 @@ $content-width-lg: 620px;
       border-left: none;
       border-bottom: 4px solid #e5e5e5;
       //border-radius: 12px 12px 0 0;
-      border-radius: calc(#{$theme-border-radius} * 1.5)
-        calc(#{$theme-border-radius} * 1.5) 0 0;
+      border-radius: calc(#{$theme-border-radius} * 1.5) calc(#{$theme-border-radius} * 1.5) 0 0;
       text-align: center;
 
       > .icon {

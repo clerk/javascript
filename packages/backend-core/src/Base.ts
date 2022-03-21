@@ -9,9 +9,7 @@ import { JWT, JWTPayload } from './util/types';
 
 export const API_KEY = process.env.CLERK_API_KEY || '';
 
-type ImportKeyFunction = (
-  ...args: any[]
-) => Promise<CryptoKey | PeculiarCryptoKey>;
+type ImportKeyFunction = (...args: any[]) => Promise<CryptoKey | PeculiarCryptoKey>;
 type LoadCryptoKeyFunction = (token: string) => Promise<CryptoKey>;
 type DecodeBase64Function = (base64Encoded: string) => string;
 type VerifySignatureFunction = (...args: any[]) => Promise<boolean>;
@@ -107,9 +105,7 @@ export class Base {
    */
   verifySessionToken = async (
     token: string,
-    {
-      authorizedParties,
-    }: VerifySessionTokenOptions = verifySessionTokenDefaultOptions,
+    { authorizedParties }: VerifySessionTokenOptions = verifySessionTokenDefaultOptions,
   ): Promise<JWTPayload> => {
     // Try to load the PK from supplied function and
     // if there is no custom load function
@@ -172,9 +168,7 @@ export class Base {
     const [rawHeader, rawPayload, rawSignature] = tokenParts;
     const header = JSON.parse(this.decodeBase64Function(rawHeader));
     const payload = JSON.parse(this.decodeBase64Function(rawPayload));
-    const signature = this.decodeBase64Function(
-      rawSignature.replace(/_/g, '/').replace(/-/g, '+'),
-    );
+    const signature = this.decodeBase64Function(rawSignature.replace(/_/g, '/').replace(/-/g, '+'));
     return {
       header,
       payload,
@@ -188,12 +182,7 @@ export class Base {
     const data = encoder.encode([rawHeader, rawPayload].join('.'));
     const signature = parse(rawSignature);
 
-    const isVerified = await this.verifySignatureFunction(
-      'RSASSA-PKCS1-v1_5',
-      key,
-      signature,
-      data,
-    );
+    const isVerified = await this.verifySignatureFunction('RSASSA-PKCS1-v1_5', key, signature, data);
     if (!isVerified) {
       throw new Error('Failed to verify token');
     }
@@ -345,12 +334,7 @@ export class Base {
       }
     }
 
-    if (
-      cookieToken &&
-      clientUat &&
-      sessionClaims?.iat &&
-      sessionClaims.iat >= Number(clientUat)
-    ) {
+    if (cookieToken && clientUat && sessionClaims?.iat && sessionClaims.iat >= Number(clientUat)) {
       return {
         status: AuthStatus.SignedIn,
         session: {

@@ -93,9 +93,8 @@ export function AddNewEmail(): JSX.Element {
         />
       </Control>
       <div className='cl-copy-text'>
-        An email containing a{' '}
-        {magicLinksEnabled ? 'magic link' : 'verification code'} will be sent to
-        your email address.
+        An email containing a {magicLinksEnabled ? 'magic link' : 'verification code'} will be sent to your email
+        address.
       </div>
     </Form>
   );
@@ -120,9 +119,7 @@ export function AddNewEmail(): JSX.Element {
   const finishScreen = step === Step.Finish && (
     <>
       <div className='cl-copy-text'>
-        <span className='cl-identifier'>
-          {emailValue.value} has successfully been added to your account.
-        </span>
+        <span className='cl-identifier'>{emailValue.value} has successfully been added to your account.</span>
       </div>
       <div className='cl-form-button-group'>
         <Button onClick={navigateToCreatedEmailAddress}>Finish</Button>
@@ -130,19 +127,16 @@ export function AddNewEmail(): JSX.Element {
     </>
   );
 
-  const title =
-    magicLinksEnabled && step === Step.VerifyEmailAddress
-      ? undefined
-      : 'Add email';
+  const title = magicLinksEnabled && step === Step.VerifyEmailAddress ? undefined : 'Add email';
 
-  const subtitle =
-    magicLinksEnabled && step === Step.VerifyEmailAddress
-      ? undefined
-      : stepSubtitleMap[step];
+  const subtitle = magicLinksEnabled && step === Step.VerifyEmailAddress ? undefined : stepSubtitleMap[step];
 
   return (
     <>
-      <PageHeading title='Back' backTo='../' />
+      <PageHeading
+        title='Back'
+        backTo='../'
+      />
       <TitledCard
         title={title}
         subtitle={subtitle}

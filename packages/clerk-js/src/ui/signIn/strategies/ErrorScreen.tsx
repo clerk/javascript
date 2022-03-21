@@ -10,9 +10,7 @@ export function ErrorScreen({ message }: ErrorScreenProps): JSX.Element {
       </Body>
       <Footer>
         <div className='cl-auth-form-link'>
-          <span className='cl-auth-form-link-label'>
-            If you’re having trouble signing in, send an email to
-          </span>{' '}
+          <span className='cl-auth-form-link-label'>If you’re having trouble signing in, send an email to</span>{' '}
           <a href='mailto:help@clerk.dev'>help@clerk.dev</a>{' '}
         </div>
       </Footer>

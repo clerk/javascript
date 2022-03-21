@@ -66,21 +66,14 @@ function assertDOMElement(element: HTMLElement): asserts element {
   }
 }
 
-export default class Components extends React.Component<
-  ComponentsProps,
-  ComponentsState
-> {
+export default class Components extends React.Component<ComponentsProps, ComponentsState> {
   state: ComponentsState = {
     signInModal: null,
     signUpModal: null,
     nodes: new Map(),
   };
 
-  static render(
-    clerk: Clerk,
-    environment: EnvironmentResource,
-    options: ClerkOptions,
-  ): Components {
+  static render(clerk: Clerk, environment: EnvironmentResource, options: ClerkOptions): Components {
     /**  Merge theme retrieved from the network with user supplied theme options. */
     injectTheme(
       environment.displayConfig.theme,
@@ -93,7 +86,11 @@ export default class Components extends React.Component<
 
     // eslint-disable-next-line react/no-render-return-value
     return ReactDOM.render<ComponentsProps, Components>(
-      <Components clerk={clerk} environment={environment} options={options} />,
+      <Components
+        clerk={clerk}
+        environment={environment}
+        options={options}
+      />,
       clerkRoot,
     );
   }

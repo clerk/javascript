@@ -12,10 +12,7 @@ type NextClerkProviderProps = {
   children: React.ReactNode;
 } & IsomorphicClerkOptions;
 
-export function ClerkProvider({
-  children,
-  ...rest
-}: NextClerkProviderProps): JSX.Element {
+export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JSX.Element {
   // @ts-expect-error
   // Allow for overrides without making the type public
   const { frontendApi, __clerk_ssr_state, clerkJSUrl, ...restProps } = rest;

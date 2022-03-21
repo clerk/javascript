@@ -8,7 +8,11 @@ describe('<List/>', () => {
     const tree = renderJSON(
       <List>
         <List.Item>1st list item</List.Item>
-        <List.Item detail={false} hoverable={false} lines={false}>
+        <List.Item
+          detail={false}
+          hoverable={false}
+          lines={false}
+        >
           2nd list item
         </List.Item>
       </List>,

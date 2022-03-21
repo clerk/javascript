@@ -18,7 +18,11 @@ describe('<InputWithLabel/>', () => {
 
   it('renders the component input with error', () => {
     const tree = renderJSON(
-      <InputWithLabel type='text' hasError label={'example.com'} />,
+      <InputWithLabel
+        type='text'
+        hasError
+        label={'example.com'}
+      />,
     );
     expect(tree).toMatchSnapshot();
   });

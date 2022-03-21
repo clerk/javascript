@@ -36,7 +36,7 @@ export class ClerkServerError {
     return new ClerkServerError({
       message: data.message,
       longMessage: data.long_message,
-      code: data.code
+      code: data.code,
     });
   }
 }

@@ -26,10 +26,11 @@ export const InputWithLabel: React.FC<InputWithLabelProps> = ({
         [styles.error]: hasError,
       })}
     >
-      <Input hasError={hasError} {...rest} />
-      <span className={cn(styles.tag, styles[placement], tagTheme)}>
-        {label}
-      </span>
+      <Input
+        hasError={hasError}
+        {...rest}
+      />
+      <span className={cn(styles.tag, styles[placement], tagTheme)}>{label}</span>
     </span>
   );
 };

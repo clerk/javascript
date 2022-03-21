@@ -30,7 +30,10 @@ export function Checkbox({
 }: CheckboxProps): JSX.Element {
   const { onChange, onKeyPress, ref } = useInput(handleChange);
   return (
-    <label className={cn(styles.container)} onKeyPress={onKeyPress}>
+    <label
+      className={cn(styles.container)}
+      onKeyPress={onKeyPress}
+    >
       {label && (
         <>
           <span

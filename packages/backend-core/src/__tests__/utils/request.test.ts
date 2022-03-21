@@ -19,9 +19,7 @@ describe('check cross-origin-referrer request utility', () => {
     expect(checkCrossOrigin({ originURL, host })).toEqual(true);
   });
 
-  test.todo(
-    'we cannot detect if the request is CO when HTTPS to HTTP and no other information is carried over',
-  );
+  test.todo('we cannot detect if the request is CO when HTTPS to HTTP and no other information is carried over');
 
   test('is CO when HTTPS to HTTP with present x-forwarded-proto', () => {
     const originURL = new URL('https://localhost');

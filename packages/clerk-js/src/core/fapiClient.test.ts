@@ -69,20 +69,18 @@ describe('buildUrl(options)', () => {
   });
 
   it('adds _clerk_session_id as a query parameter if provided and path does not start with client', () => {
-    expect(
-      fapiClient.buildUrl({ path: '/foo', sessionId: 'sess_42' }).href,
-    ).toBe(
+    expect(fapiClient.buildUrl({ path: '/foo', sessionId: 'sess_42' }).href).toBe(
       'https://clerk.example.com/v1/foo?_clerk_js_version=42.0.0&_clerk_session_id=sess_42',
     );
-    expect(
-      fapiClient.buildUrl({ path: '/client/foo', sessionId: 'sess_42' }).href,
-    ).toBe('https://clerk.example.com/v1/client/foo?_clerk_js_version=42.0.0');
+    expect(fapiClient.buildUrl({ path: '/client/foo', sessionId: 'sess_42' }).href).toBe(
+      'https://clerk.example.com/v1/client/foo?_clerk_js_version=42.0.0',
+    );
   });
 
   it('correctly parses search params', () => {
-    expect(
-      fapiClient.buildUrl({ path: '/foo', search: { test: '1' } }).href,
-    ).toBe('https://clerk.example.com/v1/foo?test=1&_clerk_js_version=42.0.0');
+    expect(fapiClient.buildUrl({ path: '/foo', search: { test: '1' } }).href).toBe(
+      'https://clerk.example.com/v1/foo?test=1&_clerk_js_version=42.0.0',
+    );
 
     expect(fapiClient.buildUrl({ path: '/foo', search: 'test=2' }).href).toBe(
       'https://clerk.example.com/v1/foo?test=2&_clerk_js_version=42.0.0',
@@ -95,14 +93,9 @@ describe('buildUrl(options)', () => {
     ['DELETE', '_method=DELETE'],
   ];
 
-  it.each(cases)(
-    'adds _method as a query parameter when request method is %p',
-    (method, result) => {
-      expect(fapiClient.buildUrl({ path: '/foo', method }).href).toMatch(
-        result,
-      );
-    },
-  );
+  it.each(cases)('adds _method as a query parameter when request method is %p', (method, result) => {
+    expect(fapiClient.buildUrl({ path: '/foo', method }).href).toMatch(result);
+  });
 });
 
 describe('request', () => {
@@ -124,18 +117,12 @@ describe('request', () => {
   });
 
   describe('for production instances', () => {
-    it.todo(
-      'does not append the __dev_session cookie value to the query string',
-    );
-    it.todo(
-      'does not set the __dev_session cookie from the response Clerk-Cookie header',
-    );
+    it.todo('does not append the __dev_session cookie value to the query string');
+    it.todo('does not set the __dev_session cookie from the response Clerk-Cookie header');
   });
 
   describe('for staging or development instances', () => {
     it.todo('appends the __dev_session cookie value to the query string');
-    it.todo(
-      'sets the __dev_session cookie from the response Clerk-Cookie header',
-    );
+    it.todo('sets the __dev_session cookie from the response Clerk-Cookie header');
   });
 });

@@ -5,10 +5,7 @@ import { SignUpResource } from '@clerk/types';
 declare global {
   export interface Window {
     tldts: {
-      getDomain(
-        hostname: string,
-        { allowPrivateDomains }: { allowPrivateDomains: boolean },
-      ): string;
+      getDomain(hostname: string, { allowPrivateDomains }: { allowPrivateDomains: boolean }): string;
     };
   }
 }
@@ -39,9 +36,7 @@ export function isDevOrStagingUrl(url: string | URL): boolean {
   return res;
 }
 
-export function isAccountsHostedPages(
-  url: string | URL = window.location.hostname,
-): boolean {
+export function isAccountsHostedPages(url: string | URL = window.location.hostname): boolean {
   if (!url) {
     return false;
   }
@@ -49,17 +44,13 @@ export function isAccountsHostedPages(
   const hostname = typeof url === 'string' ? url : url.hostname;
   let res = accountsCache.get(hostname);
   if (res === undefined) {
-    res = DEV_OR_STAGING_SUFFIXES.some(
-      s => /^(https?:\/\/)?accounts\./.test(hostname) && hostname.endsWith(s),
-    );
+    res = DEV_OR_STAGING_SUFFIXES.some(s => /^(https?:\/\/)?accounts\./.test(hostname) && hostname.endsWith(s));
     accountsCache.set(hostname, res);
   }
   return res;
 }
 
-export async function getETLDPlusOne(
-  hostname: string = window.location.hostname,
-): Promise<string> {
+export async function getETLDPlusOne(hostname: string = window.location.hostname): Promise<string> {
   if (isIPV4Address(hostname)) {
     return hostname;
   }
@@ -69,12 +60,9 @@ export async function getETLDPlusOne(
   // Reuse dynamic loading of TLDParse library as in useTLDParser
   if (parts.length >= 3) {
     try {
-      await loadScript(
-        'https://cdn.jsdelivr.net/npm/tldts@5/dist/index.umd.min.js',
-        {
-          globalObject: window.tldts,
-        },
-      );
+      await loadScript('https://cdn.jsdelivr.net/npm/tldts@5/dist/index.umd.min.js', {
+        globalObject: window.tldts,
+      });
 
       return window.tldts.getDomain(hostname, {
         allowPrivateDomains: true,
@@ -91,9 +79,7 @@ export async function getETLDPlusOne(
   return hostname;
 }
 
-export function getAllETLDs(
-  hostname: string = window.location.hostname,
-): string[] {
+export function getAllETLDs(hostname: string = window.location.hostname): string[] {
   const parts = hostname.split('.');
   const memo = [];
   const domains = [];
@@ -133,10 +119,7 @@ export function buildURL<B extends boolean>(
   options?: BuildURLOptions<B>,
 ): B extends true ? string : URL;
 
-export function buildURL(
-  params: BuildURLParams,
-  options: BuildURLOptions<boolean> = {},
-): URL | string {
+export function buildURL(params: BuildURLParams, options: BuildURLOptions<boolean> = {}): URL | string {
   const { base, ...rest } = params;
   const url = new URL(base || window.location.href);
   Object.assign(url, rest);
@@ -199,6 +182,6 @@ export const appendAsQueryParams = (
 };
 
 export const hasExternalAccountSignUpError = (signUp: SignUpResource): boolean => {
-  const { externalAccount } = signUp.verifications
+  const { externalAccount } = signUp.verifications;
   return !!externalAccount.error;
-}
+};

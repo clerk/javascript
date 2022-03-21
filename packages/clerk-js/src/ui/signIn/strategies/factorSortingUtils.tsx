@@ -38,12 +38,6 @@ const makeSortingFunction =
     return orderA - orderB;
   };
 
-export const passwordPrefFactorComparator = makeSortingFunction(
-  STRATEGY_SORT_ORDER_PASSWORD_PREF,
-);
-export const otpPrefFactorComparator = makeSortingFunction(
-  STRATEGY_SORT_ORDER_OTP_PREF,
-);
-export const allStrategiesButtonsComparator = makeSortingFunction(
-  STRATEGY_SORT_ORDER_ALL_STRATEGIES_BUTTONS,
-);
+export const passwordPrefFactorComparator = makeSortingFunction(STRATEGY_SORT_ORDER_PASSWORD_PREF);
+export const otpPrefFactorComparator = makeSortingFunction(STRATEGY_SORT_ORDER_OTP_PREF);
+export const allStrategiesButtonsComparator = makeSortingFunction(STRATEGY_SORT_ORDER_ALL_STRATEGIES_BUTTONS);

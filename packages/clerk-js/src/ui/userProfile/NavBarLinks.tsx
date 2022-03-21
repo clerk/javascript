@@ -12,11 +12,13 @@ export interface NavbarLinkOptions {
   to: string;
 }
 
-export function NavbarLink(
-  props: React.PropsWithChildren<Partial<LinkProps>>,
-): JSX.Element {
+export function NavbarLink(props: React.PropsWithChildren<Partial<LinkProps>>): JSX.Element {
   return (
-    <Link {...props} className='cl-navbar-link' activeClassName='cl-active' />
+    <Link
+      {...props}
+      className='cl-navbar-link'
+      activeClassName='cl-active'
+    />
   );
 }
 
@@ -40,7 +42,12 @@ export function renderNavBarLinks(navLinks: NavbarLinkOptions[]): JSX.Element {
     <>
       {navLinks.map(({ to, index, icon, label }, i) => {
         return (
-          <NavbarLink key={`link-${i}`} to={to} toIndex={index} iconSvg={icon}>
+          <NavbarLink
+            key={`link-${i}`}
+            to={to}
+            toIndex={index}
+            iconSvg={icon}
+          >
             {label}
           </NavbarLink>
         );

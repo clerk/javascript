@@ -32,9 +32,7 @@ describe('<EmailAddressVerificationWithMagicLink/>', function () {
       })),
     } as any as EmailAddressResource;
 
-    const tree = renderJSON(
-      <EmailAddressVerificationWithMagicLink email={email} />,
-    );
+    const tree = renderJSON(<EmailAddressVerificationWithMagicLink email={email} />);
     expect(tree).toMatchSnapshot();
   });
 

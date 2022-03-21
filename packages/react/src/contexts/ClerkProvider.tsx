@@ -17,18 +17,8 @@ export interface ClerkProviderProps extends IsomorphicClerkOptions {
 function ClerkProviderBase(props: React.PropsWithChildren<ClerkProviderProps>) {
   const [clerkLoaded, setClerkLoaded] = useState(false);
   const clerk = useMemo(() => {
-    const {
-      frontendApi = '',
-      Clerk: ClerkConstructor,
-      initialState,
-      ...rest
-    } = props;
-    return new IsomorphicClerk(
-      frontendApi,
-      rest,
-      ClerkConstructor,
-      initialState,
-    );
+    const { frontendApi = '', Clerk: ClerkConstructor, initialState, ...rest } = props;
+    return new IsomorphicClerk(frontendApi, rest, ClerkConstructor, initialState);
   }, []);
 
   useEffect(() => {
@@ -37,18 +27,17 @@ function ClerkProviderBase(props: React.PropsWithChildren<ClerkProviderProps>) {
 
   return (
     <StructureContext.Provider value={StructureContextStates.noGuarantees}>
-      <ClerkContextProvider isomorphicClerk={clerk} clerkLoaded={clerkLoaded}>
+      <ClerkContextProvider
+        isomorphicClerk={clerk}
+        clerkLoaded={clerkLoaded}
+      >
         {props.children}
       </ClerkContextProvider>
     </StructureContext.Provider>
   );
 }
 
-const ClerkProvider = withMaxAllowedInstancesGuard(
-  ClerkProviderBase,
-  'ClerkProvider',
-  multipleClerkProvidersError,
-);
+const ClerkProvider = withMaxAllowedInstancesGuard(ClerkProviderBase, 'ClerkProvider', multipleClerkProvidersError);
 
 ClerkProvider.displayName = 'ClerkProvider';
 

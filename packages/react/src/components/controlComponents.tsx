@@ -40,39 +40,32 @@ export const ClerkLoading: React.FC = ({ children }) => {
   return <>{children}</>;
 };
 
-export const RedirectToSignIn = withClerk(
-  ({ clerk, ...props }: WithClerkProp<RedirectToProps>) => {
-    const { client, session } = clerk;
-    // TODO: Remove temp use of __unstable__environment
-    const { __unstable__environment } = clerk as any;
+export const RedirectToSignIn = withClerk(({ clerk, ...props }: WithClerkProp<RedirectToProps>) => {
+  const { client, session } = clerk;
+  // TODO: Remove temp use of __unstable__environment
+  const { __unstable__environment } = clerk as any;
 
-    const hasActiveSessions =
-      client.activeSessions && client.activeSessions.length > 0;
+  const hasActiveSessions = client.activeSessions && client.activeSessions.length > 0;
 
-    React.useEffect(() => {
-      if (session === null && hasActiveSessions && __unstable__environment) {
-        const { afterSignOutOneUrl } = __unstable__environment.displayConfig;
-        void clerk.navigate(afterSignOutOneUrl);
-      } else {
-        void clerk.redirectToSignIn(props);
-      }
-    }, []);
+  React.useEffect(() => {
+    if (session === null && hasActiveSessions && __unstable__environment) {
+      const { afterSignOutOneUrl } = __unstable__environment.displayConfig;
+      void clerk.navigate(afterSignOutOneUrl);
+    } else {
+      void clerk.redirectToSignIn(props);
+    }
+  }, []);
 
-    return null;
-  },
-  'RedirectToSignIn',
-);
+  return null;
+}, 'RedirectToSignIn');
 
-export const RedirectToSignUp = withClerk(
-  ({ clerk, ...props }: WithClerkProp<RedirectToProps>) => {
-    React.useEffect(() => {
-      void clerk.redirectToSignUp(props);
-    }, []);
+export const RedirectToSignUp = withClerk(({ clerk, ...props }: WithClerkProp<RedirectToProps>) => {
+  React.useEffect(() => {
+    void clerk.redirectToSignUp(props);
+  }, []);
 
-    return null;
-  },
-  'RedirectToSignUp',
-);
+  return null;
+}, 'RedirectToSignUp');
 
 export const RedirectToUserProfile = withClerk(({ clerk }) => {
   React.useEffect(() => {
@@ -83,10 +76,7 @@ export const RedirectToUserProfile = withClerk(({ clerk }) => {
 }, 'RedirectToUserProfile');
 
 export const AuthenticateWithRedirectCallback = withClerk(
-  ({
-    clerk,
-    ...handleRedirectCallbackParams
-  }: WithClerkProp<HandleOAuthCallbackParams>) => {
+  ({ clerk, ...handleRedirectCallbackParams }: WithClerkProp<HandleOAuthCallbackParams>) => {
     React.useEffect(() => {
       void clerk.handleRedirectCallback(handleRedirectCallbackParams);
     }, []);
@@ -98,9 +88,5 @@ export const AuthenticateWithRedirectCallback = withClerk(
 
 export const MultisessionAppSupport: React.FC = ({ children }) => {
   const session = useSessionContext();
-  return (
-    <React.Fragment key={session ? session.id : 'no-users'}>
-      {children}
-    </React.Fragment>
-  );
+  return <React.Fragment key={session ? session.id : 'no-users'}>{children}</React.Fragment>;
 };

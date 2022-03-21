@@ -23,18 +23,12 @@ function extractTag(packageJsonVersion: string) {
   return packageJsonVersion.match(/-(.*)\./);
 }
 
-function getScriptSrc({
-  frontendApi,
-  scriptUrl,
-  scriptVariant = '',
-}: LoadScriptParams): string {
+function getScriptSrc({ frontendApi, scriptUrl, scriptVariant = '' }: LoadScriptParams): string {
   if (scriptUrl) {
     return scriptUrl;
   }
 
-  const majorVersion = isStaging(frontendApi)
-    ? 'staging'
-    : parseInt(LIB_VERSION.split('.')[0], 10);
+  const majorVersion = isStaging(frontendApi) ? 'staging' : parseInt(LIB_VERSION.split('.')[0], 10);
 
   const tag = extractTag(LIB_VERSION);
   const sourceVersion = tag === null ? majorVersion : 'next';
@@ -55,9 +49,7 @@ export interface LoadScriptParams {
   scriptVariant?: ScriptVariant;
 }
 
-export function loadScript(
-  params: LoadScriptParams,
-): Promise<HTMLScriptElement | null> {
+export function loadScript(params: LoadScriptParams): Promise<HTMLScriptElement | null> {
   return new Promise((resolve, reject) => {
     const { frontendApi } = params;
 

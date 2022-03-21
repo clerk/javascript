@@ -63,9 +63,7 @@ type GuaranteedUseUserReturn = {
  *   return <div>Hello, {user.firstName}</div>
  * }
  */
-export function useUser<T>(): T extends guaranteed
-  ? GuaranteedUseUserReturn
-  : UseUserReturn {
+export function useUser<T>(): T extends guaranteed ? GuaranteedUseUserReturn : UseUserReturn {
   const user = useUserContext();
 
   if (user === undefined) {

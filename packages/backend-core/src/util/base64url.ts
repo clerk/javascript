@@ -34,9 +34,7 @@ export function parse(input: string): Uint8Array {
   }
 
   // Allocate the output:
-  const out = new Uint8Array(
-    ((end * base64UrlEncoding.bits) / 8) | 0
-  ) ;
+  const out = new Uint8Array(((end * base64UrlEncoding.bits) / 8) | 0);
 
   // Parse the data:
   let bits = 0; // Number of bits currently in the buffer

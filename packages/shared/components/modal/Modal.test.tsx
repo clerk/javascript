@@ -8,7 +8,10 @@ describe('<Modal/>', () => {
     const handleClose = jest.fn();
 
     render(
-      <Modal trigger={<span>Open</span>} handleClose={handleClose}>
+      <Modal
+        trigger={<span>Open</span>}
+        handleClose={handleClose}
+      >
         <div>Foo</div>
         <Modal.CloseButton>
           <button>Close</button>
@@ -30,7 +33,10 @@ describe('<Modal/>', () => {
     const handleClose = jest.fn();
 
     const { rerender } = render(
-      <Modal active handleClose={handleClose}>
+      <Modal
+        active
+        handleClose={handleClose}
+      >
         <div>Foo</div>
       </Modal>,
     );

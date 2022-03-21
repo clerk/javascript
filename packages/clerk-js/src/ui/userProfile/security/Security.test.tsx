@@ -51,10 +51,7 @@ describe('<Security/>', () => {
   });
 
   it('renders the Security page with 2nd factor enabled', async () => {
-    mocked(
-      useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>,
-      true,
-    ).mockImplementation(
+    mocked(useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>, true).mockImplementation(
       () =>
         ({
           userSettings: {
@@ -78,10 +75,7 @@ describe('<Security/>', () => {
   });
 
   it('shows the password section when password is required', () => {
-    mocked(
-      useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>,
-      true,
-    ).mockImplementation(
+    mocked(useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>, true).mockImplementation(
       () =>
         ({
           userSettings: {
@@ -102,10 +96,7 @@ describe('<Security/>', () => {
   });
 
   it('hides the password section when password is not required', () => {
-    mocked(
-      useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>,
-      true,
-    ).mockImplementation(
+    mocked(useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>, true).mockImplementation(
       () =>
         ({
           userSettings: {

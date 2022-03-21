@@ -3,12 +3,7 @@ type CountryIso = string;
 type DialingCode = string;
 type PhonePattern = string;
 
-type PositionalCountryType = [
-  CountryName,
-  CountryIso,
-  DialingCode,
-  PhonePattern?,
-];
+type PositionalCountryType = [CountryName, CountryIso, DialingCode, PhonePattern?];
 
 const data: PositionalCountryType[] = [
   ['United States', 'us', '1', '(...) ...-....'],
@@ -547,12 +542,7 @@ export interface CountryEntry {
   pattern: PhonePattern;
 }
 
-const createEntry = ([
-  name,
-  iso,
-  code,
-  pattern = '',
-]: PositionalCountryType): CountryEntry => ({
+const createEntry = ([name, iso, code, pattern = '']: PositionalCountryType): CountryEntry => ({
   name,
   iso,
   code,

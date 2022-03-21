@@ -33,7 +33,12 @@ export function SkeletonLoader({
   const ariaId = `${id}-aria`;
 
   return (
-    <svg aria-labelledby={ariaId} role='img' style={{ ...style }} {...props}>
+    <svg
+      aria-labelledby={ariaId}
+      role='img'
+      style={{ ...style }}
+      {...props}
+    >
       {title ? <title id={ariaId}>{title}</title> : null}
       <rect
         role='presentation'
@@ -48,7 +53,10 @@ export function SkeletonLoader({
       <defs>
         <clipPath id={clipId}>{children}</clipPath>
         <linearGradient id={gradientId}>
-          <stop offset='0%' className={styles.backgroundStop}>
+          <stop
+            offset='0%'
+            className={styles.backgroundStop}
+          >
             {animate && (
               <animate
                 attributeName='offset'
@@ -60,13 +68,14 @@ export function SkeletonLoader({
             )}
           </stop>
 
-          <stop offset='50%' className={styles.foregroundStop}>
+          <stop
+            offset='50%'
+            className={styles.foregroundStop}
+          >
             {animate && (
               <animate
                 attributeName='offset'
-                values={`${-gradientRatio / 2}; ${-gradientRatio / 2}; ${
-                  1 + gradientRatio / 2
-                }`}
+                values={`${-gradientRatio / 2}; ${-gradientRatio / 2}; ${1 + gradientRatio / 2}`}
                 keyTimes={keyTimes}
                 dur={dur}
                 repeatCount='indefinite'
@@ -74,7 +83,10 @@ export function SkeletonLoader({
             )}
           </stop>
 
-          <stop offset='100%' className={styles.backgroundStop}>
+          <stop
+            offset='100%'
+            className={styles.backgroundStop}
+          >
             {animate && (
               <animate
                 attributeName='offset'

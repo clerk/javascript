@@ -23,9 +23,7 @@ export function ProfilePhoneNumbers(): JSX.Element {
           {user.phoneNumbers.map(phoneIdent => (
             <div key={phoneIdent.id}>
               <PhoneViewer phoneNumber={phoneIdent.phoneNumber} />
-              {user.isPrimaryIdentification(phoneIdent) && (
-                <Tag color='primary'>Primary</Tag>
-              )}
+              {user.isPrimaryIdentification(phoneIdent) && <Tag color='primary'>Primary</Tag>}
               {phoneIdent.verification.status && (
                 <VerificationStatusTag
                   className='cl-tag'

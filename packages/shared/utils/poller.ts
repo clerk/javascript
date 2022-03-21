@@ -11,9 +11,7 @@ export type Poller = {
   stop: PollerStop;
 };
 
-export function Poller(
-  { delayInMs }: PollerOptions = { delayInMs: 1000 },
-): Poller {
+export function Poller({ delayInMs }: PollerOptions = { delayInMs: 1000 }): Poller {
   let timerId: number | undefined;
   let stopped = false;
 
@@ -28,7 +26,7 @@ export function Poller(
     if (stopped) {
       return;
     }
-    timerId = (setTimeout(() => run(cb), delayInMs) as any) as number;
+    timerId = setTimeout(() => run(cb), delayInMs) as any as number;
   };
 
   return { run, stop };

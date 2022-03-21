@@ -8,16 +8,10 @@ export interface OrganizationResource {
   createdAt: Date;
   updatedAt: Date;
   update: (params: UpdateOrganizationParams) => Promise<OrganizationResource>;
-  getMemberships: (
-    params?: GetMembershipsParams,
-  ) => Promise<OrganizationMembershipResource[]>;
+  getMemberships: (params?: GetMembershipsParams) => Promise<OrganizationMembershipResource[]>;
   getPendingInvitations: () => Promise<OrganizationInvitationResource[]>;
-  inviteMember: (
-    params: InviteMemberParams,
-  ) => Promise<OrganizationInvitationResource>;
-  updateMember: (
-    params: UpdateMembershipParams,
-  ) => Promise<OrganizationMembershipResource>;
+  inviteMember: (params: InviteMemberParams) => Promise<OrganizationInvitationResource>;
+  updateMember: (params: UpdateMembershipParams) => Promise<OrganizationMembershipResource>;
   removeMember: (userId: string) => Promise<OrganizationMembershipResource>;
 }
 

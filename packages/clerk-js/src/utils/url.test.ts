@@ -46,12 +46,9 @@ describe('isDevOrStagingUrl(url)', () => {
     [null, false],
   ];
 
-  test.each([...goodUrls, ...badUrls])(
-    '.isDevOrStagingUrl(%s)',
-    (a, expected) => {
-      expect(isDevOrStagingUrl(a as any)).toBe(expected);
-    },
-  );
+  test.each([...goodUrls, ...badUrls])('.isDevOrStagingUrl(%s)', (a, expected) => {
+    expect(isDevOrStagingUrl(a as any)).toBe(expected);
+  });
 });
 
 describe('buildURL(options: URLParams, skipOrigin)', () => {
@@ -160,22 +157,16 @@ describe('appendQueryParams(base,url)', () => {
 
   it('handles URL objects', () => {
     const base = new URL('https://dashboard.clerk.dev');
-    const url = new URL(
-      'https://dashboard.clerk.dev/applications/appid/instances/',
-    );
+    const url = new URL('https://dashboard.clerk.dev/applications/appid/instances/');
     const res = appendAsQueryParams(base, { redirect_url: url });
-    expect(res).toBe(
-      'https://dashboard.clerk.dev/#/?redirect_url=%2Fapplications%2Fappid%2Finstances%2F',
-    );
+    expect(res).toBe('https://dashboard.clerk.dev/#/?redirect_url=%2Fapplications%2Fappid%2Finstances%2F');
   });
 
   it('handles plain strings', () => {
     const base = 'https://dashboard.clerk.dev';
     const url = 'https://dashboard.clerk.dev/applications/appid/instances/';
     const res = appendAsQueryParams(base, { redirect_url: url });
-    expect(res).toBe(
-      'https://dashboard.clerk.dev/#/?redirect_url=%2Fapplications%2Fappid%2Finstances%2F',
-    );
+    expect(res).toBe('https://dashboard.clerk.dev/#/?redirect_url=%2Fapplications%2Fappid%2Finstances%2F');
   });
 
   it('handles multiple params', () => {
@@ -199,57 +190,51 @@ describe('appendQueryParams(base,url)', () => {
   it('converts relative to absolute urls', () => {
     const base = new URL('https://dashboard.clerk.dev');
     const res = appendAsQueryParams(base, { redirect_url: '/test' });
-    expect(res).toBe(
-      'https://dashboard.clerk.dev/#/?redirect_url=http%3A%2F%2Flocalhost%2Ftest',
-    );
+    expect(res).toBe('https://dashboard.clerk.dev/#/?redirect_url=http%3A%2F%2Flocalhost%2Ftest');
   });
 
   it('converts keys from camel to snake case', () => {
     const base = new URL('https://dashboard.clerk.dev');
     const res = appendAsQueryParams(base, { redirectUrl: '/test' });
-    expect(res).toBe(
-      'https://dashboard.clerk.dev/#/?redirect_url=http%3A%2F%2Flocalhost%2Ftest',
-    );
+    expect(res).toBe('https://dashboard.clerk.dev/#/?redirect_url=http%3A%2F%2Flocalhost%2Ftest');
   });
 
   it('keeps origin before appending if base and url have different origin', () => {
     const base = new URL('https://dashboard.clerk.dev');
     const url = new URL('https://www.google.com/something');
     const res = appendAsQueryParams(base, { redirect_url: url });
-    expect(res).toBe(
-      'https://dashboard.clerk.dev/#/?redirect_url=https%3A%2F%2Fwww.google.com%2Fsomething',
-    );
+    expect(res).toBe('https://dashboard.clerk.dev/#/?redirect_url=https%3A%2F%2Fwww.google.com%2Fsomething');
   });
 });
 
 describe('getAllETLDs(hostname)', () => {
   it('returns all ETLDs for a give hostname', () => {
-    expect(getAllETLDs('foo.bar.qux.baz')).toEqual([
-      'baz',
-      'qux.baz',
-      'bar.qux.baz',
-    ]);
+    expect(getAllETLDs('foo.bar.qux.baz')).toEqual(['baz', 'qux.baz', 'bar.qux.baz']);
   });
 });
 
 describe('hasExternalAccountSignUpError(signUpResource)', () => {
   it('returns true if the signup attempt with external account has an error', () => {
-    expect(hasExternalAccountSignUpError({
-      verifications: {
-        externalAccount: {
-          error: {}
-        }
-      }
-    } as SignUpResource)).toBe(true);
+    expect(
+      hasExternalAccountSignUpError({
+        verifications: {
+          externalAccount: {
+            error: {},
+          },
+        },
+      } as SignUpResource),
+    ).toBe(true);
   });
 
   it('returns false if there is no signup attempt error on an external account', () => {
-    expect(hasExternalAccountSignUpError({
-      verifications: {
-        externalAccount: {
-          error: null
-        }
-      }
-    } as SignUpResource)).toBe(false);
+    expect(
+      hasExternalAccountSignUpError({
+        verifications: {
+          externalAccount: {
+            error: null,
+          },
+        },
+      } as SignUpResource),
+    ).toBe(false);
   });
 });

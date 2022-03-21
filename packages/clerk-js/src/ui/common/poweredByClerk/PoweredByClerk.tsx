@@ -8,9 +8,7 @@ export type PoweredByClerkProps = {
   className?: string;
 };
 
-export function PoweredByClerk({
-  className,
-}: PoweredByClerkProps): JSX.Element | null {
+export function PoweredByClerk({ className }: PoweredByClerkProps): JSX.Element | null {
   const { displayConfig } = useEnvironment();
   if (!displayConfig.branded) {
     return null;

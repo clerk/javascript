@@ -19,20 +19,10 @@ interface UserListParams {
   emailAddress?: string[];
   phoneNumber?: string[];
   userId?: string[];
-  orderBy?:
-    | 'created_at'
-    | 'updated_at'
-    | '+created_at'
-    | '+updated_at'
-    | '-created_at'
-    | '-updated_at';
+  orderBy?: 'created_at' | 'updated_at' | '+created_at' | '+updated_at' | '-created_at' | '-updated_at';
 }
 
-const userMetadataKeys = [
-  'publicMetadata',
-  'privateMetadata',
-  'unsafeMetadata',
-];
+const userMetadataKeys = ['publicMetadata', 'privateMetadata', 'unsafeMetadata'];
 
 type UserMetadataParams = {
   publicMetadata?: Record<string, unknown>;
@@ -98,10 +88,7 @@ export class UserApi extends AbstractApi {
       params.publicMetadata = JSON.stringify(params.publicMetadata);
     }
 
-    if (
-      params.privateMetadata &&
-      !(typeof params.privateMetadata == 'string')
-    ) {
+    if (params.privateMetadata && !(typeof params.privateMetadata == 'string')) {
       params.privateMetadata = JSON.stringify(params.privateMetadata);
     }
 
@@ -130,13 +117,10 @@ function stringifyMetadataParams(
     [key: string]: Record<string, unknown> | undefined;
   },
 ): UserMetadataRequestBody {
-  return userMetadataKeys.reduce(
-    (res: Record<string, string>, key: string): Record<string, string> => {
-      if (params[key]) {
-        res[key] = JSON.stringify(params[key]);
-      }
-      return res;
-    },
-    {},
-  );
+  return userMetadataKeys.reduce((res: Record<string, string>, key: string): Record<string, string> => {
+    if (params[key]) {
+      res[key] = JSON.stringify(params[key]);
+    }
+    return res;
+  }, {});
 }

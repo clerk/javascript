@@ -53,12 +53,18 @@ export const AddPhone = ({ standAlone }: AddPhoneProps): JSX.Element => {
       role='button'
       tabIndex={0}
     >
-      <Radio checked={phone.id === selectedPhone?.id} label={<PhoneViewer phoneNumber={phone.phoneNumber} />} />
+      <Radio
+        checked={phone.id === selectedPhone?.id}
+        label={<PhoneViewer phoneNumber={phone.phoneNumber} />}
+      />
     </div>
   ));
   return (
     <>
-      <PageHeading title='Back' backTo='../' />
+      <PageHeading
+        title='Back'
+        backTo='../'
+      />
       <TitledCard
         className='cl-themed-card cl-two-step-verification'
         title='Add two-step verification'
@@ -81,10 +87,18 @@ export const AddPhone = ({ standAlone }: AddPhoneProps): JSX.Element => {
           </div>
         )}
         <div className='cl-form-button-group'>
-          <Button className='primary-button' onClick={onClickContinue} disabled={!selectedPhone}>
+          <Button
+            className='primary-button'
+            onClick={onClickContinue}
+            disabled={!selectedPhone}
+          >
             Continue
           </Button>
-          <Button flavor='text' type='reset' onClick={onClickCancel}>
+          <Button
+            flavor='text'
+            type='reset'
+            onClick={onClickCancel}
+          >
             Cancel
           </Button>
         </div>

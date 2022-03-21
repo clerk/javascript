@@ -18,12 +18,8 @@ export type FormProps = {
   resetButtonClassName?: string;
   buttonGroupClassName?: string;
   buttonGroupToTheRight?: boolean;
-  handleReset?: (
-    e: React.FormEvent<HTMLFormElement>,
-  ) => Promise<unknown> | unknown;
-  handleSubmit?: (
-    e: React.FormEvent<HTMLFormElement>,
-  ) => Promise<unknown> | unknown;
+  handleReset?: (e: React.FormEvent<HTMLFormElement>) => Promise<unknown> | unknown;
+  handleSubmit?: (e: React.FormEvent<HTMLFormElement>) => Promise<unknown> | unknown;
   children: React.ReactElement | React.ReactElement[];
 };
 
@@ -77,7 +73,11 @@ export const Form: React.FC<FormProps> = React.forwardRef(
 
     if (!resetButton && typeof handleReset === 'function') {
       resetButton = (
-        <Button type='reset' flavor='text' className={resetButtonClassName}>
+        <Button
+          type='reset'
+          flavor='text'
+          className={resetButtonClassName}
+        >
           {resetButtonLabel}
         </Button>
       );
@@ -114,30 +114,24 @@ export const Form: React.FC<FormProps> = React.forwardRef(
         onReset={handleFormReset}
         onSubmit={handleFormSubmit}
       >
-        {children.reduce(
-          (
-            memo: Array<React.ReactElement<HTMLFieldSetElement>>,
-            child,
-            index,
-          ) => {
-            if (child) {
-              fieldsetCount++;
-              memo.push(
-                // @ts-ignore
-                <fieldset key={index} ref={index === 0 ? fieldsetRef : null}>
-                  {child}
-                </fieldset>,
-              );
-            }
-            return memo;
-          },
-          [],
-        )}
+        {children.reduce((memo: Array<React.ReactElement<HTMLFieldSetElement>>, child, index) => {
+          if (child) {
+            fieldsetCount++;
+            memo.push(
+              <fieldset
+                key={index}
+                ref={(index === 0 ? fieldsetRef : null) as any}
+              >
+                {child}
+              </fieldset>,
+            );
+          }
+          return memo;
+        }, [])}
         {(submitButton || resetButton) && fieldsetCount > 0 && (
           <fieldset
             className={cn(styles.group, buttonGroupClassName, {
-              [styles.reversed]:
-                (submitButton && resetButton) || buttonGroupToTheRight,
+              [styles.reversed]: (submitButton && resetButton) || buttonGroupToTheRight,
             })}
             disabled={isSubmitting}
           >

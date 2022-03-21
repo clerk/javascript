@@ -1,27 +1,17 @@
 {
-    "version": "independent",
-    "packages": [
-        "packages/*"
-    ],
-    "command": {
-        "version": {
-            "message": "chore(release): Publish",
-            "allowBranch": [
-                "main",
-                "next",
-                "staging"
-            ],
-            "conventionalCommits": true
-        },
-        "publish": {
-            "allowBranch": [
-                "main",
-                "next",
-                "staging"
-            ]
-        }
+  "version": "independent",
+  "packages": ["packages/*"],
+  "command": {
+    "version": {
+      "message": "chore(release): Publish",
+      "allowBranch": ["main", "next", "staging"],
+      "conventionalCommits": true
     },
-    "changelogPreset": {
-        "name": "conventionalcommits"
+    "publish": {
+      "allowBranch": ["main", "next", "staging"]
     }
+  },
+  "changelogPreset": {
+    "name": "conventionalcommits"
+  }
 }

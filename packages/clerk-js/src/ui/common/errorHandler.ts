@@ -14,10 +14,7 @@ function clearFieldErrors(fieldStates: Array<FieldState<string>>) {
   });
 }
 
-function setFieldErrors(
-  fieldStates: Array<FieldState<string>>,
-  errors: ClerkAPIError[],
-) {
+function setFieldErrors(fieldStates: Array<FieldState<string>>, errors: ClerkAPIError[]) {
   if (!errors || errors.length < 1) {
     return;
   }

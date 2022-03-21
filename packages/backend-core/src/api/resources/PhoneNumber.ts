@@ -11,9 +11,7 @@ interface PhoneNumberAssociations {
   linkedTo: IdentificationLink[];
 }
 
-interface PhoneNumberPayload
-  extends PhoneNumberProps,
-    PhoneNumberAssociations {}
+interface PhoneNumberPayload extends PhoneNumberProps, PhoneNumberAssociations {}
 
 export interface PhoneNumber extends PhoneNumberPayload {}
 

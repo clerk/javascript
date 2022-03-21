@@ -78,10 +78,7 @@ const multiSessionResource = {
 
 describe('ActiveAccountsManager', () => {
   it('renders a switcher with all the available sessions', () => {
-    mocked(
-      useEnvironment as jest.Mock<EnvironmentResource>,
-      true,
-    ).mockImplementation(() => multiSessionResource);
+    mocked(useEnvironment as jest.Mock<EnvironmentResource>, true).mockImplementation(() => multiSessionResource);
 
     const tree = renderJSON(
       <ActiveAccountsManager
@@ -96,10 +93,7 @@ describe('ActiveAccountsManager', () => {
   });
 
   it('does not render active accounts with only a single session', () => {
-    mocked(
-      useEnvironment as jest.Mock<EnvironmentResource>,
-      true,
-    ).mockImplementation(() => multiSessionResource);
+    mocked(useEnvironment as jest.Mock<EnvironmentResource>, true).mockImplementation(() => multiSessionResource);
 
     const tree = renderJSON(
       <ActiveAccountsManager
@@ -115,10 +109,7 @@ describe('ActiveAccountsManager', () => {
   });
 
   it('renders all active sessions even in single session resource mode', () => {
-    mocked(
-      useEnvironment as jest.Mock<EnvironmentResource>,
-      true,
-    ).mockImplementation(() => singleSessionResource);
+    mocked(useEnvironment as jest.Mock<EnvironmentResource>, true).mockImplementation(() => singleSessionResource);
 
     const tree = renderJSON(
       <ActiveAccountsManager

@@ -9,10 +9,18 @@ describe('<Form/>', () => {
     const tree = renderJSON(
       <Form>
         <div>
-          <input type='text' name='foo' defaultValue='42' />
+          <input
+            type='text'
+            name='foo'
+            defaultValue='42'
+          />
         </div>
         <div>
-          <input type='text' name='bar' defaultValue='42' />
+          <input
+            type='text'
+            name='bar'
+            defaultValue='42'
+          />
         </div>
       </Form>,
     );
@@ -31,10 +39,18 @@ describe('<Form/>', () => {
         resetButtonClassName='bar'
       >
         <div>
-          <input type='text' name='foo' defaultValue='42' />
+          <input
+            type='text'
+            name='foo'
+            defaultValue='42'
+          />
         </div>
         <div>
-          <input type='text' name='bar' defaultValue='42' />
+          <input
+            type='text'
+            name='bar'
+            defaultValue='42'
+          />
         </div>
       </Form>,
     );
@@ -69,9 +85,16 @@ describe('<Form/>', () => {
     const onSubmit = jest.fn(() => submitPromise);
 
     render(
-      <Form handleReset={onReset} handleSubmit={onSubmit}>
+      <Form
+        handleReset={onReset}
+        handleSubmit={onSubmit}
+      >
         <div>
-          <input type='text' name='foo' defaultValue='42' />
+          <input
+            type='text'
+            name='foo'
+            defaultValue='42'
+          />
         </div>
       </Form>,
     );

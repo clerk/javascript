@@ -1,10 +1,4 @@
-import {
-  render,
-  renderJSON,
-  screen,
-  userEvent,
-  waitFor,
-} from '@clerk/shared/testUtils';
+import { render, renderJSON, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
 import React from 'react';
 
 import { SignInFactorTwo } from './SignInFactorTwo';

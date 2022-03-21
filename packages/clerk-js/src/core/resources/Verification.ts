@@ -40,9 +40,7 @@ export class Verification extends BaseResource implements VerificationResource {
       this.strategy = data.strategy;
       this.nonce = data.nonce || null;
       if (data.external_verification_redirect_url) {
-        this.externalVerificationRedirectURL = new URL(
-          data.external_verification_redirect_url,
-        );
+        this.externalVerificationRedirectURL = new URL(data.external_verification_redirect_url);
       } else {
         this.externalVerificationRedirectURL = null;
       }

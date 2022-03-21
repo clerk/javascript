@@ -9,7 +9,10 @@ export function ConnectClerk(App: () => JSX.Element, opts: ConnectClerkOptions =
   return () => {
     const { clerkState } = useLoaderData();
     return (
-      <ClerkProvider {...opts} clerkState={clerkState}>
+      <ClerkProvider
+        {...opts}
+        clerkState={clerkState}
+      >
         <App />
       </ClerkProvider>
     );

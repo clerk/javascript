@@ -6,7 +6,4 @@ export type DropdownOption =
     }
   | string;
 
-export type DropdownComparator = (
-  term: string,
-  currentOption: DropdownOption,
-) => boolean;
+export type DropdownComparator = (term: string, currentOption: DropdownOption) => boolean;

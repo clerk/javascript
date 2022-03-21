@@ -1,10 +1,4 @@
-import {
-  act,
-  render,
-  screen,
-  userEvent,
-  waitFor,
-} from '@clerk/shared/testUtils';
+import { act, render, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
 import React from 'react';
 
 import { Tooltip } from './Tooltip';
@@ -34,9 +28,7 @@ describe('<Tooltip/>', () => {
       jest.advanceTimersByTime(400);
     });
 
-    await waitFor(() =>
-      expect(screen.getByText(messageText)).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getByText(messageText)).toBeInTheDocument());
 
     userEvent.unhover(screen.getByText(/Hover me/i));
     expect(screen.queryByText(messageText)).not.toBeInTheDocument();

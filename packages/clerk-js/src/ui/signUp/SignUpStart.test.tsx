@@ -1,10 +1,4 @@
-import {
-  render,
-  renderJSON,
-  screen,
-  userEvent,
-  waitFor,
-} from '@clerk/shared/testUtils';
+import { render, renderJSON, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
 import { titleize } from '@clerk/shared/utils/string';
 import { UserSettingsJSON } from '@clerk/types';
 import { Session, UserSettings } from 'core/resources/internal';
@@ -198,8 +192,7 @@ describe('<SignUpStart/>', () => {
   );
 
   it('renders the external account verification error if available', () => {
-    const errorMsg =
-      'You cannot sign up with sokratis.vidros@gmail.com since this is an invitation-only application';
+    const errorMsg = 'You cannot sign up with sokratis.vidros@gmail.com since this is an invitation-only application';
 
     (useCoreSignUp as jest.Mock).mockImplementation(() => {
       return {
@@ -252,9 +245,7 @@ describe('<SignUpStart/>', () => {
     render(<SignUpStart />);
     screen.getByRole('button', { name: /Google/ });
     screen.getByRole('button', { name: /Facebook/ });
-    expect(
-      screen.queryByRole('button', { name: 'Sign up' }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Sign up' })).not.toBeInTheDocument();
   });
 
   describe('when the user does not grant access to their Facebook account', () => {

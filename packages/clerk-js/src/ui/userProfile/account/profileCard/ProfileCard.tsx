@@ -61,18 +61,16 @@ export function ProfileCard(): JSX.Element {
         <div className='cl-empty-list-item'>None</div>
       ) : (
         <div className='cl-list-item-entry'>
-          {user.externalAccounts.map(
-            (externalAccount: ExternalAccountResource) => (
-              <div key={externalAccount.id}>
-                <img
-                  alt={externalAccount.providerTitle()}
-                  src={svgUrl(externalAccount.providerSlug())}
-                  className='cl-left-icon-wrapper'
-                />
-                {externalAccount.emailAddress}
-              </div>
-            ),
-          )}
+          {user.externalAccounts.map((externalAccount: ExternalAccountResource) => (
+            <div key={externalAccount.id}>
+              <img
+                alt={externalAccount.providerTitle()}
+                src={svgUrl(externalAccount.providerSlug())}
+                className='cl-left-icon-wrapper'
+              />
+              {externalAccount.emailAddress}
+            </div>
+          ))}
         </div>
       )}
     </List.Item>

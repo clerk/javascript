@@ -1,10 +1,4 @@
-import {
-  ActiveSessionResource,
-  ClientResource,
-  InitialState,
-  Resources,
-  UserResource,
-} from '@clerk/types';
+import { ActiveSessionResource, ClientResource, InitialState, Resources, UserResource } from '@clerk/types';
 import React from 'react';
 
 import IsomorphicClerk from '../isomorphicClerk';
@@ -42,10 +36,7 @@ export function ClerkContextProvider({
   }, []);
 
   const clerkCtx = React.useMemo(() => ({ value: clerk }), [clerkLoaded]);
-  const clientCtx = React.useMemo(
-    () => ({ value: state.client }),
-    [state.client],
-  );
+  const clientCtx = React.useMemo(() => ({ value: state.client }), [state.client]);
 
   const authCtx = React.useMemo(() => {
     return {
@@ -66,9 +57,7 @@ export function ClerkContextProvider({
       <ClientContext.Provider value={clientCtx}>
         <SessionContext.Provider value={sessionCtx}>
           <AuthContext.Provider value={authCtx}>
-            <UserContext.Provider value={userCtx}>
-              {children}
-            </UserContext.Provider>
+            <UserContext.Provider value={userCtx}>{children}</UserContext.Provider>
           </AuthContext.Provider>
         </SessionContext.Provider>
       </ClientContext.Provider>
@@ -97,13 +86,9 @@ function deriveState(
     const session = initialState.session as any as ActiveSessionResource;
     return { sessionId, session, userId, user };
   }
-  const userId: string | null | undefined = state.user
-    ? state.user.id
-    : state.user;
+  const userId: string | null | undefined = state.user ? state.user.id : state.user;
   const user = state.user;
-  const sessionId: string | null | undefined = state.session
-    ? state.session.id
-    : state.session;
+  const sessionId: string | null | undefined = state.session ? state.session.id : state.session;
   const session = state.session;
   return { sessionId, session, userId, user };
 }

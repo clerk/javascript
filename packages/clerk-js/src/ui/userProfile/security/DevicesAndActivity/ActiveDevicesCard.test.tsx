@@ -1,9 +1,5 @@
 import { renderJSON } from '@clerk/shared/testUtils';
-import {
-  SessionActivity,
-  SessionWithActivitiesResource,
-  UserResource,
-} from '@clerk/types';
+import { SessionActivity, SessionWithActivitiesResource, UserResource } from '@clerk/types';
 import * as React from 'react';
 import { ActiveDevicesCard } from 'ui/userProfile/security/DevicesAndActivity/ActiveDevicesCard';
 

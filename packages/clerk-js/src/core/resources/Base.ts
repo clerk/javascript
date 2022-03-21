@@ -1,10 +1,5 @@
 import type { ClerkAPIErrorJSON, ClerkResourceJSON } from '@clerk/types';
-import type {
-  FapiClient,
-  FapiRequestInit,
-  FapiResponseJSON,
-  HTTPMethod,
-} from 'core/fapiClient';
+import type { FapiClient, FapiRequestInit, FapiResponseJSON, HTTPMethod } from 'core/fapiClient';
 
 import { clerkMissingFapiClientInResources } from '../errors';
 import type { Clerk } from './internal';
@@ -36,8 +31,7 @@ export abstract class BaseResource {
       clerkMissingFapiClientInResources();
     }
 
-    const { payload, status, statusText } =
-      await BaseResource.fapiClient.request<J>(requestInit);
+    const { payload, status, statusText } = await BaseResource.fapiClient.request<J>(requestInit);
 
     // TODO: Link to Client payload piggybacking design document
     if (requestInit.method !== 'GET' || opts.forceUpdateClient) {
@@ -62,9 +56,7 @@ export abstract class BaseResource {
     return null;
   }
 
-  protected static _updateClient<J>(
-    responseJSON: FapiResponseJSON<J> | null,
-  ): void {
+  protected static _updateClient<J>(responseJSON: FapiResponseJSON<J> | null): void {
     if (!responseJSON) {
       return;
     }
@@ -87,8 +79,7 @@ export abstract class BaseResource {
     if (this.isNew()) {
       return base;
     }
-    const baseWithId =
-      base.replace(/[^/]$/, '$&/') + encodeURIComponent(this.id as string);
+    const baseWithId = base.replace(/[^/]$/, '$&/') + encodeURIComponent(this.id as string);
 
     if (!action) {
       return baseWithId;
@@ -99,9 +90,7 @@ export abstract class BaseResource {
 
   protected abstract fromJSON(data: ClerkResourceJSON | null): this;
 
-  protected async _baseGet<J extends ClerkResourceJSON | null>(
-    opts: BaseFetchOptions = {},
-  ): Promise<this> {
+  protected async _baseGet<J extends ClerkResourceJSON | null>(opts: BaseFetchOptions = {}): Promise<this> {
     const json = await BaseResource._fetch<J>(
       {
         method: 'GET',
@@ -126,27 +115,19 @@ export abstract class BaseResource {
     return this.fromJSON((json?.response || json) as J);
   }
 
-  protected async _basePost<J extends ClerkResourceJSON | null>(
-    params: BaseMutateParams = {},
-  ): Promise<this> {
+  protected async _basePost<J extends ClerkResourceJSON | null>(params: BaseMutateParams = {}): Promise<this> {
     return this._baseMutate<J>({ ...params, method: 'POST' });
   }
 
-  protected async _basePut<J extends ClerkResourceJSON | null>(
-    params: BaseMutateParams = {},
-  ): Promise<this> {
+  protected async _basePut<J extends ClerkResourceJSON | null>(params: BaseMutateParams = {}): Promise<this> {
     return this._baseMutate<J>({ ...params, method: 'PUT' });
   }
 
-  protected async _basePatch<J extends ClerkResourceJSON>(
-    params: BaseMutateParams = {},
-  ): Promise<this> {
+  protected async _basePatch<J extends ClerkResourceJSON>(params: BaseMutateParams = {}): Promise<this> {
     return this._baseMutate<J>({ ...params, method: 'PATCH' });
   }
 
-  protected async _baseDelete<J extends ClerkResourceJSON | null>(
-    params: BaseMutateParams = {},
-  ): Promise<void> {
+  protected async _baseDelete<J extends ClerkResourceJSON | null>(params: BaseMutateParams = {}): Promise<void> {
     await this._baseMutate<J>({ ...params, method: 'DELETE' });
   }
 }

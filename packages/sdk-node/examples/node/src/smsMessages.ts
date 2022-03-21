@@ -4,7 +4,6 @@ import { smsMessages } from '@clerk/clerk-sdk-node';
 
 const phoneNumberId = process.env.PHONE_NUMBER_ID || '';
 
-
 try {
   console.log('Create SMS message');
   const message = "I'd buy that for a dollar";

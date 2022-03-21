@@ -36,18 +36,14 @@ export class PhoneNumber extends BaseResource implements PhoneNumberResource {
     });
   };
 
-  attemptVerification = (
-    params: AttemptPhoneNumberVerificationParams,
-  ): Promise<PhoneNumberResource> => {
+  attemptVerification = (params: AttemptPhoneNumberVerificationParams): Promise<PhoneNumberResource> => {
     const { code } = params || {};
     return this._basePost<PhoneNumberJSON>({
       action: 'attempt_verification',
       body: { code },
     });
   };
-  setReservedForSecondFactor = (
-    params: SetReservedForSecondFactorParams,
-  ): Promise<PhoneNumberResource> => {
+  setReservedForSecondFactor = (params: SetReservedForSecondFactorParams): Promise<PhoneNumberResource> => {
     const { reserved } = params || {};
     return this._basePatch<PhoneNumberJSON>({
       body: { reserved_for_second_factor: reserved },
@@ -79,9 +75,7 @@ export class PhoneNumber extends BaseResource implements PhoneNumberResource {
     this.reservedForSecondFactor = data.reserved_for_second_factor;
     this.defaultSecondFactor = data.default_second_factor;
     this.verification = new Verification(data.verification);
-    this.linkedTo = (data.linked_to || []).map(
-      link => new IdentificationLink(link),
-    );
+    this.linkedTo = (data.linked_to || []).map(link => new IdentificationLink(link));
     return this;
   }
 }

@@ -40,7 +40,7 @@ For package specific details on installation, architecture and usage usage, you 
 - [`@clerk/backend-core`](./packages/backend-core): Functionalities regarded as "core" for Clerk to operate with. _Authentication resolution, API Resources etc._
 - [`@clerk/edge`](./packages/edge): Top level SDK for edge environments containing all required helpers and middleware.
 - [`@clerk/clerk-sdk-node`](./packages/sdk-node): SDK for native Node.js environment and frameworks.
-- [`@clerk/nextjs`](./packages/nextjs): Clerk package for Next.js.  
+- [`@clerk/nextjs`](./packages/nextjs): Clerk package for Next.js.
 - [`@clerk/clerk-js`](./packages/clerk-js): Core JavaScript implementation used by Clerk in the browser.
 - [`@clerk/clerk-react`](./packages/react) Clerk package for React applications.
 - [`@clerk/clerk-expo`](./packages/expo) Clerk package for the Expo universal app framework.

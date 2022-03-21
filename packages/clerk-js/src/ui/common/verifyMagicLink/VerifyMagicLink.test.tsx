@@ -65,9 +65,7 @@ describe('<VerifyMagicLink/>', function () {
     render(<VerifyMagicLink />);
 
     await waitFor(() => {
-      expect(
-        screen.getByText('This magic link has expired'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('This magic link has expired')).toBeInTheDocument();
     });
   });
 
@@ -79,9 +77,7 @@ describe('<VerifyMagicLink/>', function () {
     render(<VerifyMagicLink />);
 
     await waitFor(() => {
-      expect(
-        screen.getByText('This magic link is invalid'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('This magic link is invalid')).toBeInTheDocument();
     });
   });
 });

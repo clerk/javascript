@@ -1,2 +1,2 @@
-export * from './dist/instance'
-export { default } from './dist/instance'
+export * from './dist/instance';
+export { default } from './dist/instance';

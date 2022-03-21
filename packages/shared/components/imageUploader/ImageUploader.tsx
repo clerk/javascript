@@ -22,12 +22,7 @@ export type ImageUploaderProps = {
   withResponsiveUploadIndicator?: boolean;
 };
 
-export const IMAGE_UPLOADER_DEFAULT_TYPES: SupportedMimeType[] = [
-  'image/jpeg',
-  'image/png',
-  'image/gif',
-  'image/webp',
-];
+export const IMAGE_UPLOADER_DEFAULT_TYPES: SupportedMimeType[] = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
 function typesToSentence(types: SupportedMimeType[]): string {
   return toSentence(types.map(t => extension(t).toUpperCase()));
@@ -59,23 +54,24 @@ export function ImageUploader({
 
   const typesSentence = typesToSentence(acceptedTypes);
   const helpTexts = {
-    normal: (
-      <p className={styles.helpText}>
-        Upload a {typesSentence} image smaller than 10 MB
-      </p>
-    ),
+    normal: <p className={styles.helpText}>Upload a {typesSentence} image smaller than 10 MB</p>,
     error: (
       <p className={styles.helpTextError}>
-        Upload error. Select a {typesSentence} image smaller than 10MB and try
-        again.
+        Upload error. Select a {typesSentence} image smaller than 10MB and try again.
       </p>
     ),
   };
 
   return (
     <>
-      <Modal active={isModalOpen} handleClose={closeModal}>
-        <TitledCard title={title} subtitle={subtitle}>
+      <Modal
+        active={isModalOpen}
+        handleClose={closeModal}
+      >
+        <TitledCard
+          title={title}
+          subtitle={subtitle}
+        >
           <FileDropArea
             acceptedTypes={acceptedTypes}
             sizeLimitBytes={sizeLimitBytes}
@@ -83,7 +79,10 @@ export function ImageUploader({
             handleError={uploadError}
           />
           {hasFileError ? helpTexts['error'] : helpTexts['normal']}
-          <Button flavor='text' onClick={closeModal}>
+          <Button
+            flavor='text'
+            onClick={closeModal}
+          >
             Close
           </Button>
         </TitledCard>
@@ -95,7 +94,10 @@ export function ImageUploader({
         {children}
         {withResponsiveUploadIndicator && (
           <div className={styles.touchContainer}>
-            <CameraIcon className={styles.touchIcon} viewBox='0 0 24 24' />
+            <CameraIcon
+              className={styles.touchIcon}
+              viewBox='0 0 24 24'
+            />
           </div>
         )}
         <div className={styles.hoverContainer}>

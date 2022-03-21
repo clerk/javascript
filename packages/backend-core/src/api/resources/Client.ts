@@ -45,7 +45,7 @@ export class Client {
     const filtered = filterKeys(camelcased, Client.attributes);
     Object.assign(obj, filtered);
 
-    obj.sessions = (data.sessions || []).map((x) => Session.fromJSON(x));
+    obj.sessions = (data.sessions || []).map(x => Session.fromJSON(x));
 
     return new Client(obj as ClientPayload);
   }

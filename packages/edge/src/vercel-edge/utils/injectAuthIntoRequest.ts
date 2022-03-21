@@ -2,10 +2,7 @@ import { NextRequest } from 'next/server';
 
 import { AuthData, RequestWithAuth } from '../types';
 
-export function injectAuthIntoRequest(
-  req: NextRequest,
-  authData: AuthData,
-): RequestWithAuth {
+export function injectAuthIntoRequest(req: NextRequest, authData: AuthData): RequestWithAuth {
   const { user, session, userId, sessionId, getToken } = authData;
   const auth = {
     userId,

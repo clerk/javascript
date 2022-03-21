@@ -1,5 +1,5 @@
-@use "sass:list";
-@use "sass:map";
+@use 'sass:list';
+@use 'sass:map';
 
 $breakpoints: (
   xxsmall: 0px 320px,
@@ -19,8 +19,7 @@ $breakpoints: (
  */
 @mixin media($args) {
   @if (
-    (list.nth($args, 1) == 'upto' or list.nth($args, 1) == 'from') and not
-      map.has-key($breakpoints, list.nth($args, 2))
+    (list.nth($args, 1) == 'upto' or list.nth($args, 1) == 'from') and not map.has-key($breakpoints, list.nth($args, 2))
   ) {
     @error "Invalid syntax.";
   }

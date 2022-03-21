@@ -9,7 +9,10 @@ describe('<Toggle/>', () => {
     const onChange = jest.fn();
 
     const { rerender } = render(
-      <Toggle checked={false} handleChange={onChange} />,
+      <Toggle
+        checked={false}
+        handleChange={onChange}
+      />,
     );
 
     const checkbox = screen.getByRole('checkbox', { checked: false });
@@ -21,7 +24,12 @@ describe('<Toggle/>', () => {
     fireEvent.click(checkbox);
     expect(onChange).toHaveBeenCalledTimes(1);
 
-    rerender(<Toggle checked handleChange={onChange} />);
+    rerender(
+      <Toggle
+        checked
+        handleChange={onChange}
+      />,
+    );
     expect(checkbox).toHaveProperty('checked', true);
 
     // Clicking from on -> off

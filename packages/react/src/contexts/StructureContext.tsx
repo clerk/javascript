@@ -15,9 +15,7 @@ export const StructureContextStates = Object.freeze({
   }),
 });
 
-export const StructureContext = React.createContext<
-  StructureContextValue | undefined
->(undefined);
+export const StructureContext = React.createContext<StructureContextValue | undefined>(undefined);
 
 StructureContext.displayName = 'StructureContext';
 
@@ -33,8 +31,6 @@ export const LoadedGuarantee: React.FC = ({ children }) => {
     return <>{children}</>;
   }
   return (
-    <StructureContext.Provider value={StructureContextStates.guaranteedLoaded}>
-      {children}
-    </StructureContext.Provider>
+    <StructureContext.Provider value={StructureContextStates.guaranteedLoaded}>{children}</StructureContext.Provider>
   );
 };

@@ -2,25 +2,17 @@ import { buildMagicLinkRedirectUrl, buildSSOCallbackURL } from './redirects';
 
 describe('buildMagicLinkRedirectUrl(routing, baseUrl)', () => {
   it('handles empty routing strategy based routing ', function () {
-    expect(
-      buildMagicLinkRedirectUrl({ path: '', authQueryString: '' } as any, ''),
-    ).toBe('http://localhost/#/verify');
+    expect(buildMagicLinkRedirectUrl({ path: '', authQueryString: '' } as any, '')).toBe('http://localhost/#/verify');
   });
 
   it('returns the magic link redirect url for components using path based routing ', function () {
-    expect(
-      buildMagicLinkRedirectUrl(
-        { routing: 'path', authQueryString: '' } as any,
-        '',
-      ),
-    ).toBe('http://localhost/verify');
+    expect(buildMagicLinkRedirectUrl({ routing: 'path', authQueryString: '' } as any, '')).toBe(
+      'http://localhost/verify',
+    );
 
-    expect(
-      buildMagicLinkRedirectUrl(
-        { routing: 'path', path: '/sign-in', authQueryString: '' } as any,
-        '',
-      ),
-    ).toBe('http://localhost/sign-in/verify');
+    expect(buildMagicLinkRedirectUrl({ routing: 'path', path: '/sign-in', authQueryString: '' } as any, '')).toBe(
+      'http://localhost/sign-in/verify',
+    );
 
     expect(
       buildMagicLinkRedirectUrl(
@@ -121,9 +113,7 @@ describe('buildMagicLinkRedirectUrl(routing, baseUrl)', () => {
         } as any,
         'https://accounts.clerk.dev/sign-in',
       ),
-    ).toBe(
-      'https://accounts.clerk.dev/sign-in/verify?redirectUrl=https://clerk.dev',
-    );
+    ).toBe('https://accounts.clerk.dev/sign-in/verify?redirectUrl=https://clerk.dev');
 
     expect(
       buildMagicLinkRedirectUrl(
@@ -140,34 +130,21 @@ describe('buildSSOCallbackURL(ctx, baseUrl)', () => {
   it('returns the SSO callback URL based on sign in|up component routing or the provided base URL', () => {
     // Default callback URLS
     expect(buildSSOCallbackURL({}, '')).toBe('http://localhost/#/sso-callback');
-    expect(buildSSOCallbackURL({}, 'http://test.host')).toBe(
-      'http://localhost/#/sso-callback',
+    expect(buildSSOCallbackURL({}, 'http://test.host')).toBe('http://localhost/#/sso-callback');
+    expect(buildSSOCallbackURL({ authQueryString: 'redirect_url=%2Ffoo' }, 'http://test.host')).toBe(
+      'http://localhost/#/sso-callback?redirect_url=%2Ffoo',
     );
-    expect(
-      buildSSOCallbackURL(
-        { authQueryString: 'redirect_url=%2Ffoo' },
-        'http://test.host',
-      ),
-    ).toBe('http://localhost/#/sso-callback?redirect_url=%2Ffoo');
 
     // Components mounted with hash routing
-    expect(buildSSOCallbackURL({ routing: 'hash' }, 'http://test.host')).toBe(
-      'http://localhost/#/sso-callback',
+    expect(buildSSOCallbackURL({ routing: 'hash' }, 'http://test.host')).toBe('http://localhost/#/sso-callback');
+    expect(buildSSOCallbackURL({ routing: 'hash', authQueryString: 'redirect_url=%2Ffoo' }, 'http://test.host')).toBe(
+      'http://localhost/#/sso-callback?redirect_url=%2Ffoo',
     );
-    expect(
-      buildSSOCallbackURL(
-        { routing: 'hash', authQueryString: 'redirect_url=%2Ffoo' },
-        'http://test.host',
-      ),
-    ).toBe('http://localhost/#/sso-callback?redirect_url=%2Ffoo');
 
     // Components mounted with path routing
-    expect(
-      buildSSOCallbackURL(
-        { routing: 'path', path: 'sign-in' },
-        'http://test.host',
-      ),
-    ).toBe('http://localhost/sign-in/sso-callback');
+    expect(buildSSOCallbackURL({ routing: 'path', path: 'sign-in' }, 'http://test.host')).toBe(
+      'http://localhost/sign-in/sso-callback',
+    );
     expect(
       buildSSOCallbackURL(
         {
@@ -180,14 +157,9 @@ describe('buildSSOCallbackURL(ctx, baseUrl)', () => {
     ).toBe('http://localhost/sign-in/sso-callback?redirect_url=%2Ffoo');
 
     // Components mounted with virtual routing
+    expect(buildSSOCallbackURL({ routing: 'virtual' }, 'http://test.host')).toBe('http://test.host/#/sso-callback');
     expect(
-      buildSSOCallbackURL({ routing: 'virtual' }, 'http://test.host'),
-    ).toBe('http://test.host/#/sso-callback');
-    expect(
-      buildSSOCallbackURL(
-        { routing: 'virtual', authQueryString: 'redirect_url=%2Ffoo' },
-        'http://test.host',
-      ),
+      buildSSOCallbackURL({ routing: 'virtual', authQueryString: 'redirect_url=%2Ffoo' }, 'http://test.host'),
     ).toBe('http://test.host/#/sso-callback?redirect_url=%2Ffoo');
   });
 });

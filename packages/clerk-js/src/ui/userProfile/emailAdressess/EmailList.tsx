@@ -16,20 +16,22 @@ type EmailListItemProps = {
   isPrimary: boolean;
 };
 
-function EmailListItem({
-  emailAddress,
-  handleClick,
-  isPrimary,
-}: EmailListItemProps): JSX.Element {
+function EmailListItem({ emailAddress, handleClick, isPrimary }: EmailListItemProps): JSX.Element {
   const status = emailAddress.verification.status || '';
 
   return (
-    <List.Item className='cl-list-item' onClick={handleClick}>
+    <List.Item
+      className='cl-list-item'
+      onClick={handleClick}
+    >
       <div className='cl-email-item'>
         {emailAddress.emailAddress}{' '}
         <div className='cl-tags'>
           {isPrimary && <PrimaryTag />}
-          <VerificationStatusTag className='cl-tag' status={status} />
+          <VerificationStatusTag
+            className='cl-tag'
+            status={status}
+          />
         </div>
         <Connections linkedResources={emailAddress.linkedTo} />
       </div>
@@ -59,11 +61,7 @@ export function EmailList(): JSX.Element {
       />
       <TitledCard className='cl-themed-card cl-list-card'>
         {user.emailAddresses.length > 0 && <List>{emailItems}</List>}
-        {user.emailAddresses.length === 0 && (
-          <div className='cl-empty-list-item'>
-            No email addresses to display
-          </div>
-        )}
+        {user.emailAddresses.length === 0 && <div className='cl-empty-list-item'>No email addresses to display</div>}
         <Button
           onClick={() => router.navigate('add')}
           className='cl-add-resource-button'

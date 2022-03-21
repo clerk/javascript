@@ -11,14 +11,10 @@ export type DeepSnakeToCamel<T> = T extends `${infer A}_${infer B}`
   : T;
 
 export type DeepCamelToSnake<T> = T extends `${infer C0}${infer R}`
-  ? `${C0 extends Uppercase<C0>
-      ? '_'
-      : ''}${Lowercase<C0>}${DeepCamelToSnake<R>}`
+  ? `${C0 extends Uppercase<C0> ? '_' : ''}${Lowercase<C0>}${DeepCamelToSnake<R>}`
   : T extends {}
   ? {
-      [K in keyof T as DeepCamelToSnake<Extract<K, string>>]: DeepCamelToSnake<
-        T[K]
-      >;
+      [K in keyof T as DeepCamelToSnake<Extract<K, string>>]: DeepCamelToSnake<T[K]>;
     }
   : T;
 export type CamelToSnake<T> = T extends `${infer C0}${infer R}`

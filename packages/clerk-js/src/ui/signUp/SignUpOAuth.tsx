@@ -1,12 +1,7 @@
 import type { OAuthStrategy } from '@clerk/types';
 import { getOAuthProviderData } from '@clerk/types';
 import React from 'react';
-import {
-  buildSSOCallbackURL,
-  ButtonSet,
-  ButtonSetOptions,
-  handleError,
-} from 'ui/common';
+import { buildSSOCallbackURL, ButtonSet, ButtonSetOptions, handleError } from 'ui/common';
 import { useCoreSignUp, useEnvironment, useSignUpContext } from 'ui/contexts';
 
 export type OauthProps = {
@@ -14,10 +9,7 @@ export type OauthProps = {
   setError: React.Dispatch<React.SetStateAction<string | undefined>>;
 };
 
-export function SignUpOAuth({
-  oauthOptions,
-  setError,
-}: OauthProps): JSX.Element | null {
+export function SignUpOAuth({ oauthOptions, setError }: OauthProps): JSX.Element | null {
   const ctx = useSignUpContext();
   const environment = useEnvironment();
 

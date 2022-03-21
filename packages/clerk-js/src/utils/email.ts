@@ -3,10 +3,7 @@ export type BuildEmailAddressParams = {
   frontendApi: string;
 };
 
-export function buildEmailAddress({
-  localPart,
-  frontendApi,
-}: BuildEmailAddressParams): string {
+export function buildEmailAddress({ localPart, frontendApi }: BuildEmailAddressParams): string {
   const domain = frontendApi ? frontendApi.replace('clerk.', '') : 'clerk.dev';
   return `${localPart}@${domain}`;
 }

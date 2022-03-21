@@ -18,12 +18,7 @@ import {
 } from 'ui/common';
 import { Body, Header } from 'ui/common/authForms';
 import { ERROR_CODES } from 'ui/common/constants';
-import {
-  useCoreClerk,
-  useCoreSignUp,
-  useEnvironment,
-  useSignUpContext,
-} from 'ui/contexts';
+import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
 import { getClerkQueryParam } from 'utils/getClerkQueryParam';
 
@@ -40,8 +35,7 @@ function _SignUpStart(): JSX.Element {
   const { userSettings } = environment;
   const { setSession } = useCoreClerk();
   const { navigateAfterSignUp } = useSignUpContext();
-  const [emailOrPhoneActive, setEmailOrPhoneActive] =
-    React.useState<ActiveIdentifier>('emailAddress');
+  const [emailOrPhoneActive, setEmailOrPhoneActive] = React.useState<ActiveIdentifier>('emailAddress');
   const signUp = useCoreSignUp();
   const [isLoading, setIsLoading] = React.useState(false);
   const formFields = {
@@ -53,9 +47,7 @@ function _SignUpStart(): JSX.Element {
     password: useFieldState('password', ''),
     ticket: useFieldState(
       'ticket',
-      getClerkQueryParam('__clerk_ticket') ||
-        getClerkQueryParam('__clerk_invitation_token') ||
-        '',
+      getClerkQueryParam('__clerk_ticket') || getClerkQueryParam('__clerk_invitation_token') || '',
     ),
   } as const;
   type FormFieldsKey = keyof typeof formFields;
@@ -102,10 +94,7 @@ function _SignUpStart(): JSX.Element {
     async function handleOauthError() {
       const error = signUp.verifications.externalAccount.error;
 
-      if (
-        error?.code === ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP ||
-        error?.code === ERROR_CODES.OAUTH_ACCESS_DENIED
-      ) {
+      if (error?.code === ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP || error?.code === ERROR_CODES.OAUTH_ACCESS_DENIED) {
         setError(error.longMessage);
 
         // TODO: This is a hack to reset the sign in attempt so that the oauth error
@@ -119,25 +108,19 @@ function _SignUpStart(): JSX.Element {
     void handleOauthError();
   });
 
-  const handleChangeActive =
-    (type: ActiveIdentifier) => (e: React.MouseEvent) => {
-      e.preventDefault();
-      if (!fields.emailOrPhone) {
-        return;
-      }
-      setEmailOrPhoneActive(type);
-    };
+  const handleChangeActive = (type: ActiveIdentifier) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!fields.emailOrPhone) {
+      return;
+    }
+    setEmailOrPhoneActive(type);
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const reqFields = Object.entries(fields).reduce(
-      (acc, [k, v]) => [
-        ...acc,
-        ...(v && formFields[k as FormFieldsKey]
-          ? [formFields[k as FormFieldsKey]]
-          : []),
-      ],
+      (acc, [k, v]) => [...acc, ...(v && formFields[k as FormFieldsKey] ? [formFields[k as FormFieldsKey]] : [])],
       [] as Array<FieldState<any>>,
     );
 
@@ -172,15 +155,9 @@ function _SignUpStart(): JSX.Element {
   const completeSignUpFlow = (su: SignUpResource) => {
     if (su.status === 'complete') {
       return setSession(su.createdSessionId, navigateAfterSignUp);
-    } else if (
-      su.emailAddress &&
-      su.verifications.emailAddress.status !== 'verified'
-    ) {
+    } else if (su.emailAddress && su.verifications.emailAddress.status !== 'verified') {
       return navigate('verify-email-address');
-    } else if (
-      su.phoneNumber &&
-      su.verifications.phoneNumber.status !== 'verified'
-    ) {
+    } else if (su.phoneNumber && su.verifications.phoneNumber.status !== 'verified') {
       return navigate('verify-phone-number');
     }
   };
@@ -293,8 +270,7 @@ function _SignUpStart(): JSX.Element {
   );
 
   const phoneNumberField =
-    fields.phoneNumber ||
-    (fields.emailOrPhone && emailOrPhoneActive === 'phoneNumber') ? (
+    fields.phoneNumber || (fields.emailOrPhone && emailOrPhoneActive === 'phoneNumber') ? (
       <Control
         key='phoneNumber'
         htmlFor='phoneNumber'
@@ -311,28 +287,30 @@ function _SignUpStart(): JSX.Element {
       </Control>
     ) : null;
 
-  const atLeastOneFormField =
-    nameField ||
-    usernameField ||
-    emailAddressField ||
-    phoneNumberField ||
-    passwordField;
+  const atLeastOneFormField = nameField || usernameField || emailAddressField || phoneNumberField || passwordField;
 
   return (
     <>
-      <Header error={error} className='cl-auth-form-header-compact' />
+      <Header
+        error={error}
+        className='cl-auth-form-header-compact'
+      />
       <Body>
         {!hasTicket && oauthOptions.length > 0 && (
-          <SignUpOAuth oauthOptions={oauthOptions} setError={setError} />
+          <SignUpOAuth
+            oauthOptions={oauthOptions}
+            setError={setError}
+          />
         )}
         {!hasTicket && web3Options.length > 0 && (
-          <SignUpWeb3 web3Options={web3Options} setError={setError} />
+          <SignUpWeb3
+            web3Options={web3Options}
+            setError={setError}
+          />
         )}
         {atLeastOneFormField && (
           <>
-            {(oauthOptions.length > 0 || web3Options.length > 0) && (
-              <Separator />
-            )}
+            {(oauthOptions.length > 0 || web3Options.length > 0) && <Separator />}
             {/* @ts-ignore */}
             <Form
               handleSubmit={handleSubmit}

@@ -15,10 +15,7 @@ export const WEB_SAFE_FONTS = Object.freeze([
   'Verdana',
 ]);
 
-export function fontLoader(
-  fontFamily: string,
-  weights: Array<number | string> = [],
-): void {
+export function fontLoader(fontFamily: string, weights: Array<number | string> = []): void {
   fontFamily = fontFamily.replace(/"/g, '');
 
   const head = document.getElementsByTagName('head')[0];
@@ -30,11 +27,7 @@ export function fontLoader(
     return;
   }
 
-  if (
-    !document.querySelector(
-      "link[rel=preconnect][href='https://fonts.gstatic.com']",
-    )
-  ) {
+  if (!document.querySelector("link[rel=preconnect][href='https://fonts.gstatic.com']")) {
     const hint = document.createElement('link');
     hint.rel = 'preconnect';
     hint.href = 'https://fonts.gstatic.com';
@@ -48,10 +41,7 @@ export function fontLoader(
     GOOGLE_FONTS_URL +
     qs.stringify(
       {
-        family:
-          weights.length > 0
-            ? `${fontFamily}:wght@${weights.join(';')}`
-            : fontFamily,
+        family: weights.length > 0 ? `${fontFamily}:wght@${weights.join(';')}` : fontFamily,
         display: 'swap',
       },
       {

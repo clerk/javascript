@@ -8,7 +8,11 @@ import { ButtonSet } from './ButtonSet';
 function MockIcon() {
   return (
     <svg>
-      <circle cx='40' cy='40' r='24' />
+      <circle
+        cx='40'
+        cy='40'
+        r='24'
+      />
     </svg>
   );
 }
@@ -41,26 +45,23 @@ describe('<ButtonSet/>', () => {
     expect(tree).toMatchSnapshot();
   });
 
-  it.each(['google', 'facebook'])(
-    'renders the sign up button set and clicks on %s',
-    async (provider: string) => {
-      const providerTitle = titleize(provider);
+  it.each(['google', 'facebook'])('renders the sign up button set and clicks on %s', async (provider: string) => {
+    const providerTitle = titleize(provider);
 
-      const mockHandleClick = jest.fn();
+    const mockHandleClick = jest.fn();
 
-      render(
-        <ButtonSet
-          options={options}
-          flow='sign-up'
-          handleClick={mockHandleClick}
-        />,
-      );
+    render(
+      <ButtonSet
+        options={options}
+        flow='sign-up'
+        handleClick={mockHandleClick}
+      />,
+    );
 
-      const regex = new RegExp(`Sign up with ${providerTitle}`, 'i');
+    const regex = new RegExp(`Sign up with ${providerTitle}`, 'i');
 
-      userEvent.click(screen.getByRole('button', { name: regex }));
+    userEvent.click(screen.getByRole('button', { name: regex }));
 
-      expect(mockHandleClick.mock.calls[0][1]).toBe(`oauth_${provider}`);
-    },
-  );
+    expect(mockHandleClick.mock.calls[0][1]).toBe(`oauth_${provider}`);
+  });
 });

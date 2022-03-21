@@ -22,12 +22,7 @@ export function getButtonLabel(factor: SignInFactor): string {
   }
 }
 
-const supportedStrategies: SignInStrategy[] = [
-  'email_code',
-  'password',
-  'phone_code',
-  'email_link',
-];
+const supportedStrategies: SignInStrategy[] = ['email_code', 'password', 'phone_code', 'email_link'];
 function isSupportedStrategy(strategy: SignInStrategy): boolean {
   return supportedStrategies.includes(strategy);
 }
@@ -39,9 +34,7 @@ export type AllProps = {
 
 export function All({ selectFactor, factors }: AllProps): JSX.Element {
   const supportEmail = useSupportEmail();
-  const firstPartyFactors = factors.filter(
-    f => !f.strategy.startsWith('oauth_'),
-  );
+  const firstPartyFactors = factors.filter(f => !f.strategy.startsWith('oauth_'));
   const oauthFactors = factors.filter(f => f.strategy.startsWith('oauth_'));
   const oauthStrategies = oauthFactors.map(f => f.strategy) as OAuthStrategy[];
 
@@ -68,12 +61,13 @@ export function All({ selectFactor, factors }: AllProps): JSX.Element {
   return (
     <>
       <OAuth oauthOptions={oauthStrategies} />
-      {oauthStrategies.length > 0 && firstPartyButtons.length > 0 && (
-        <Separator />
-      )}
+      {oauthStrategies.length > 0 && firstPartyButtons.length > 0 && <Separator />}
       {firstPartyButtons}
       <div className='cl-auth-form-link cl-auth-trouble-link'>
-        <a href={href} title='Contact support'>
+        <a
+          href={href}
+          title='Contact support'
+        >
           I am having trouble signing in
         </a>
       </div>

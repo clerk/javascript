@@ -33,9 +33,7 @@ describe('<MagicLinkVerificationStatusModal/>', function () {
   });
 
   it('renders the <MagicLinkVerificationStatusModal/> component', function () {
-    const tree = renderJSON(
-      <MagicLinkVerificationStatusModal verificationStatus='loading' />,
-    );
+    const tree = renderJSON(<MagicLinkVerificationStatusModal verificationStatus='loading' />);
     expect(tree).toMatchSnapshot();
   });
 

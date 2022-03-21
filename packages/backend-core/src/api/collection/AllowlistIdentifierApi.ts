@@ -16,9 +16,7 @@ export class AllowlistIdentifierApi extends AbstractApi {
     });
   }
 
-  public async createAllowlistIdentifier(
-    params: AllowlistIdentifierCreateParams
-  ) {
+  public async createAllowlistIdentifier(params: AllowlistIdentifierCreateParams) {
     return this._restClient.makeRequest<AllowlistIdentifier>({
       method: 'POST',
       path: basePath,

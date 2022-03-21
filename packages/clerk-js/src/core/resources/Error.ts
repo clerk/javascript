@@ -5,9 +5,7 @@ interface ClerkAPIResponseOptions {
   status: number;
 }
 
-export function isClerkAPIResponseError(
-  object: any,
-): object is ClerkAPIResponseError {
+export function isClerkAPIResponseError(object: any): object is ClerkAPIResponseError {
   return 'clerkError' in object;
 }
 

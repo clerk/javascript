@@ -103,10 +103,18 @@ export function AddVerifiableField({
       resetButtonLabel='Cancel'
       buttonGroupClassName='cl-form-button-group'
     >
-      <Control label={label} error={currentValue.error} htmlFor={inputName}>
+      <Control
+        label={label}
+        error={currentValue.error}
+        htmlFor={inputName}
+      >
         {type === 'phone' ? (
           <div className='cl-phone-input-container'>
-            <PhoneInput handlePhoneChange={currentValue.setValue} name={inputName} id={inputName} />
+            <PhoneInput
+              handlePhoneChange={currentValue.setValue}
+              name={inputName}
+              id={inputName}
+            />
           </div>
         ) : (
           <>
@@ -132,10 +140,16 @@ export function AddVerifiableField({
 
   const step2Verify = (
     <>
-      <div className='cl-copy-text' style={{ marginBottom: '2em' }}>
+      <div
+        className='cl-copy-text'
+        style={{ marginBottom: '2em' }}
+      >
         {stepText[state.step] + ' '}
         {type === 'phone' ? (
-          <PhoneViewer className='cl-identifier' phoneNumber={currentValue.value} />
+          <PhoneViewer
+            className='cl-identifier'
+            phoneNumber={currentValue.value}
+          />
         ) : (
           <span className='cl-identifier'>{currentValue.value}</span>
         )}
@@ -155,7 +169,10 @@ export function AddVerifiableField({
     <>
       <div className='cl-copy-text'>
         {type === 'phone' ? (
-          <PhoneViewer phoneNumber={currentValue.value} className='cl-identifier' />
+          <PhoneViewer
+            phoneNumber={currentValue.value}
+            className='cl-identifier'
+          />
         ) : (
           <span className='cl-identifier'>{currentValue.value}</span>
         )}{' '}
@@ -169,7 +186,10 @@ export function AddVerifiableField({
 
   return (
     <>
-      <PageHeading title='Back' backTo='../' />
+      <PageHeading
+        title='Back'
+        backTo='../'
+      />
       <TitledCard
         title={`Add ${type}`}
         subtitle={stepTitle[state.step]}

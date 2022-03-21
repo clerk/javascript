@@ -27,9 +27,7 @@ export function ButtonSet<T>({
   handleClick,
   options,
 }: ButtonSetProps<T>): JSX.Element | null {
-  const [isLoading, setIsLoading] = React.useState(() =>
-    options.map(() => false),
-  );
+  const [isLoading, setIsLoading] = React.useState(() => options.map(() => false));
   const alreadyLoading = isLoading.some(o => o);
 
   React.useEffect(() => {
@@ -39,10 +37,7 @@ export function ButtonSet<T>({
     setIsLoading(options.map(() => false));
   }, [alreadyLoading, error, options]);
 
-  const handleOptionClick = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    i: number,
-  ) => {
+  const handleOptionClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, i: number) => {
     handleClick(e, options[i].strategy as unknown as T);
     setIsLoading(() => {
       const newState = [...isLoading];
@@ -67,7 +62,10 @@ export function ButtonSet<T>({
             flavor='outline'
             className={buttonClassName}
           >
-            <img alt={name} src={svgUrl(id)} />
+            <img
+              alt={name}
+              src={svgUrl(id)}
+            />
             <span>{getButtonLabel(flow, name)}</span>
           </ButtonWithSpinner>
         );

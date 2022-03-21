@@ -1,9 +1,5 @@
 import { render, renderJSON, screen, userEvent } from '@clerk/shared/testUtils';
-import {
-  EmailAddressResource,
-  EnvironmentResource,
-  UserSettingsResource,
-} from '@clerk/types';
+import { EmailAddressResource, EnvironmentResource, UserSettingsResource } from '@clerk/types';
 import { ClerkAPIResponseError } from 'core/resources/Error';
 import React from 'react';
 import { PartialDeep } from 'type-fest';
@@ -122,18 +118,13 @@ describe('<EmailDetail/>', () => {
     render(<EmailDetail />);
     // Type a verification code that will throw an error,
     // in this case '999999'.
-    userEvent.type(
-      screen.getByLabelText('Enter verification code. Digit 1'),
-      '9',
-    );
+    userEvent.type(screen.getByLabelText('Enter verification code. Digit 1'), '9');
     userEvent.type(screen.getByLabelText('Digit 2'), '9');
     userEvent.type(screen.getByLabelText('Digit 3'), '9');
     userEvent.type(screen.getByLabelText('Digit 4'), '9');
     userEvent.type(screen.getByLabelText('Digit 5'), '9');
     userEvent.type(screen.getByLabelText('Digit 6'), '9');
 
-    expect(
-      await screen.findByText('the-long-error-message'),
-    ).toBeInTheDocument();
+    expect(await screen.findByText('the-long-error-message')).toBeInTheDocument();
   });
 });

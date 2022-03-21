@@ -11,9 +11,7 @@ interface EmailAddressAssociations {
   linkedTo: IdentificationLink[];
 }
 
-interface EmailAddressPayload
-  extends EmailAddressProps,
-    EmailAddressAssociations {}
+interface EmailAddressPayload extends EmailAddressProps, EmailAddressAssociations {}
 
 export interface EmailAddress extends EmailAddressPayload {}
 
@@ -36,7 +34,7 @@ export class EmailAddress {
       id: data.id,
       emailAddress: data.email_address,
       verification: Verification.fromJSON(data.verification),
-      linkedTo: (data.linked_to || []).map((link) => {
+      linkedTo: (data.linked_to || []).map(link => {
         return IdentificationLink.fromJSON(link);
       }),
     });

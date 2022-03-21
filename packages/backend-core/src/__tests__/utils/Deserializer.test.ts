@@ -1,12 +1,4 @@
-import {
-  AllowlistIdentifier,
-  Client,
-  Email,
-  Invitation,
-  Organization,
-  Session,
-  SMSMessage,
-} from '../../api/resources';
+import { AllowlistIdentifier, Client, Email, Invitation, Organization, Session, SMSMessage } from '../../api/resources';
 import deserialize from '../../api/utils/Deserializer';
 
 const allowlistIdentifierJSON = {

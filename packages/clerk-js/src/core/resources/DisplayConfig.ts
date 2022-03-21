@@ -8,10 +8,7 @@ import type {
 
 import { BaseResource } from './internal';
 
-export class DisplayConfig
-  extends BaseResource
-  implements DisplayConfigResource
-{
+export class DisplayConfig extends BaseResource implements DisplayConfigResource {
   id!: string;
   instanceEnvironmentType!: string;
   applicationName!: string;

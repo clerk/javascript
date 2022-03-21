@@ -2,15 +2,7 @@
  * Tokenizer results.
  */
 interface LexToken {
-  type:
-    | 'OPEN'
-    | 'CLOSE'
-    | 'PATTERN'
-    | 'NAME'
-    | 'CHAR'
-    | 'ESCAPED_CHAR'
-    | 'MODIFIER'
-    | 'END';
+  type: 'OPEN' | 'CLOSE' | 'PATTERN' | 'NAME' | 'CHAR' | 'ESCAPED_CHAR' | 'MODIFIER' | 'END';
   index: number;
   value: string;
 }
@@ -260,10 +252,7 @@ export interface TokensToFunctionOptions {
 /**
  * Compile a string to a template function for the path.
  */
-export function compile<P extends object = object>(
-  str: string,
-  options?: ParseOptions & TokensToFunctionOptions,
-) {
+export function compile<P extends object = object>(str: string, options?: ParseOptions & TokensToFunctionOptions) {
   return tokensToFunction<P>(parse(str, options), options);
 }
 
@@ -304,9 +293,7 @@ export function tokensToFunction<P extends object = object>(
 
       if (Array.isArray(value)) {
         if (!repeat) {
-          throw new TypeError(
-            `Expected "${token.name}" to not repeat, but got an array`,
-          );
+          throw new TypeError(`Expected "${token.name}" to not repeat, but got an array`);
         }
 
         if (value.length === 0) {
@@ -321,9 +308,7 @@ export function tokensToFunction<P extends object = object>(
           const segment = encode(value[j], token);
 
           if (validate && !(matches[i] as RegExp).test(segment)) {
-            throw new TypeError(
-              `Expected all "${token.name}" to match "${token.pattern}", but got "${segment}"`,
-            );
+            throw new TypeError(`Expected all "${token.name}" to match "${token.pattern}", but got "${segment}"`);
           }
 
           path += token.prefix + segment + token.suffix;
@@ -336,9 +321,7 @@ export function tokensToFunction<P extends object = object>(
         const segment = encode(String(value), token);
 
         if (validate && !(matches[i] as RegExp).test(segment)) {
-          throw new TypeError(
-            `Expected "${token.name}" to match "${token.pattern}", but got "${segment}"`,
-          );
+          throw new TypeError(`Expected "${token.name}" to match "${token.pattern}", but got "${segment}"`);
         }
 
         path += token.prefix + segment + token.suffix;
@@ -381,9 +364,7 @@ export type Match<P extends object = object> = false | MatchResult<P>;
 /**
  * The match function takes a string and returns whether it matched the path.
  */
-export type MatchFunction<P extends object = object> = (
-  path: string,
-) => Match<P>;
+export type MatchFunction<P extends object = object> = (path: string) => Match<P>;
 
 /**
  * Create path match function from `path-to-regexp` spec.
@@ -508,11 +489,7 @@ function arrayToRegexp(
 /**
  * Create a path regexp from string input.
  */
-function stringToRegexp(
-  path: string,
-  keys?: Key[],
-  options?: TokensToRegexpOptions & ParseOptions,
-) {
+function stringToRegexp(path: string, keys?: Key[], options?: TokensToRegexpOptions & ParseOptions) {
   return tokensToRegexp(parse(path, options), keys, options);
 }
 
@@ -550,17 +527,8 @@ export interface TokensToRegexpOptions {
 /**
  * Expose a function for taking tokens and returning a RegExp.
  */
-export function tokensToRegexp(
-  tokens: Token[],
-  keys?: Key[],
-  options: TokensToRegexpOptions = {},
-) {
-  const {
-    strict = false,
-    start = true,
-    end = true,
-    encode = (x: string) => x,
-  } = options;
+export function tokensToRegexp(tokens: Token[], keys?: Key[], options: TokensToRegexpOptions = {}) {
+  const { strict = false, start = true, end = true, encode = (x: string) => x } = options;
   const endsWith = `[${escapeString(options.endsWith || '')}]|$`;
   const delimiter = `[${escapeString(options.delimiter || '/#?')}]`;
   let route = start ? '^' : '';
@@ -632,11 +600,7 @@ export type Path = string | RegExp | Array<string | RegExp>;
  * placeholder key descriptions. For example, using `/user/:id`, `keys` will
  * contain `[{ name: 'id', delimiter: '/', optional: false, repeat: false }]`.
  */
-export function pathToRegexp(
-  path: Path,
-  keys?: Key[],
-  options?: TokensToRegexpOptions & ParseOptions,
-) {
+export function pathToRegexp(path: Path, keys?: Key[], options?: TokensToRegexpOptions & ParseOptions) {
   if (path instanceof RegExp) {
     return regexpToRegexp(path, keys);
   }

@@ -17,13 +17,19 @@ export const PhoneList = (): JSX.Element => {
     const verificationStatus = phone.verification.status || '';
     const isPrimary = user.primaryPhoneNumber?.id === phone.id;
     const primaryTag = isPrimary ? (
-      <Tag color='primary' className='cl-tag'>
+      <Tag
+        color='primary'
+        className='cl-tag'
+      >
         Primary
       </Tag>
     ) : null;
 
     const connections = phone.linkedTo.map(connection => (
-      <div key={connection.id} className='cl-connection-info'>
+      <div
+        key={connection.id}
+        className='cl-connection-info'
+      >
         Connected to {connection.type}
       </div>
     ));
@@ -57,12 +63,8 @@ export const PhoneList = (): JSX.Element => {
         backTo='../'
       />
       <TitledCard className='cl-themed-card cl-list-card'>
-        {user.phoneNumbers.length > 0 && (
-          <List>{user.phoneNumbers.map(createPhoneListItem)}</List>
-        )}
-        {user.phoneNumbers.length === 0 && (
-          <div className='cl-empty-list-item'>No phone numbers to display</div>
-        )}
+        {user.phoneNumbers.length > 0 && <List>{user.phoneNumbers.map(createPhoneListItem)}</List>}
+        {user.phoneNumbers.length === 0 && <div className='cl-empty-list-item'>No phone numbers to display</div>}
         <Button
           onClick={() => router.navigate('add')}
           className='cl-add-resource-button'

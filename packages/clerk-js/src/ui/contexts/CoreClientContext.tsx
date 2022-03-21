@@ -1,16 +1,9 @@
-import {
-  ClientResource,
-  SessionResource,
-  SignInResource,
-  SignUpResource,
-} from '@clerk/types';
+import { ClientResource, SessionResource, SignInResource, SignUpResource } from '@clerk/types';
 import React from 'react';
 import { assertContextExists } from 'ui/contexts/utils';
 
 type CoreClientContextValue = { value: ClientResource };
-export const CoreClientContext = React.createContext<
-  CoreClientContextValue | undefined
->(undefined);
+export const CoreClientContext = React.createContext<CoreClientContextValue | undefined>(undefined);
 CoreClientContext.displayName = 'CoreClientContext';
 
 export function useCoreSignIn(): SignInResource {

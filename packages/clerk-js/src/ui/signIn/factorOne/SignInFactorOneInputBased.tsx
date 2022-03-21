@@ -20,20 +20,13 @@ import { determineSalutation } from './../utils';
 
 // TODO: https://www.notion.so/clerkdev/c8719edf0d5041e0b4d263a7ee574b7c
 const factorNeedsPrepare = (factor: SignInFactor) => {
-  const strategiesRequiringPrepare: SignInStrategy[] = [
-    'email_code',
-    'phone_code',
-    'email_link',
-  ];
+  const strategiesRequiringPrepare: SignInStrategy[] = ['email_code', 'phone_code', 'email_link'];
   return strategiesRequiringPrepare.includes(factor.strategy);
 };
 
 // TODO: All this behavior should be grouped
 // in a Factor class or similar
-function factorsAreSame(
-  prev: SignInFactor | null | undefined,
-  cur: SignInFactor,
-) {
+function factorsAreSame(prev: SignInFactor | null | undefined, cur: SignInFactor) {
   if (!prev) {
     return false;
   }
@@ -42,19 +35,11 @@ function factorsAreSame(
     return false;
   }
 
-  if (
-    'emailAddressId' in prev &&
-    'emailAddressId' in cur &&
-    prev.emailAddressId !== cur.emailAddressId
-  ) {
+  if ('emailAddressId' in prev && 'emailAddressId' in cur && prev.emailAddressId !== cur.emailAddressId) {
     return false;
   }
 
-  if (
-    'phoneNumberId' in prev &&
-    'phoneNumberId' in cur &&
-    prev.phoneNumberId !== cur.phoneNumberId
-  ) {
+  if ('phoneNumberId' in prev && 'phoneNumberId' in cur && prev.phoneNumberId !== cur.phoneNumberId) {
     return false;
   }
 
@@ -91,14 +76,11 @@ export function SignInFactorOneInputBased({
     const { status } = signIn.firstFactorVerification;
     const notPreparedYet = status === null;
     const shouldPrepare =
-      factorNeedsPrepare(currentFactor) &&
-      (notPreparedYet || !factorsAreSame(lastUsedFactor, currentFactor));
+      factorNeedsPrepare(currentFactor) && (notPreparedYet || !factorsAreSame(lastUsedFactor, currentFactor));
 
     if (shouldPrepare) {
       setLastUsedFactor(currentFactor);
-      signIn.prepareFirstFactor(
-        currentFactor as EmailCodeFactor | PhoneCodeFactor,
-      );
+      signIn.prepareFirstFactor(currentFactor as EmailCodeFactor | PhoneCodeFactor);
     }
   }, [currentFactor]);
 
@@ -140,9 +122,7 @@ export function SignInFactorOneInputBased({
       const response = await signIn.attemptFirstFactor(params);
 
       if (response.status === 'complete') {
-        verify(() =>
-          setSession(response.createdSessionId, navigateAfterSignIn),
-        );
+        verify(() => setSession(response.createdSessionId, navigateAfterSignIn));
         return;
       } else if (response.status === 'needs_second_factor') {
         verify(() => navigate('../factor-two'));
@@ -168,18 +148,27 @@ export function SignInFactorOneInputBased({
       />
       <Body className='cl-auth-form-body-compact'>
         {currentFactor.strategy === 'password' && (
-          <Password handleSubmit={handlePasswordSubmit} password={password} />
+          <Password
+            handleSubmit={handlePasswordSubmit}
+            password={password}
+          />
         )}
         {currentFactor.strategy === 'email_code' && (
-          <OTP verifyCode={verifyCode} code={code} factor={currentFactor} />
+          <OTP
+            verifyCode={verifyCode}
+            code={code}
+            factor={currentFactor}
+          />
         )}
         {currentFactor.strategy === 'phone_code' && (
-          <OTP verifyCode={verifyCode} code={code} factor={currentFactor} />
+          <OTP
+            verifyCode={verifyCode}
+            code={code}
+            factor={currentFactor}
+          />
         )}
       </Body>
-      <SignInFactorOneFooter
-        handleAnotherMethodClicked={handleAnotherMethodClicked}
-      />
+      <SignInFactorOneFooter handleAnotherMethodClicked={handleAnotherMethodClicked} />
     </>
   );
 }

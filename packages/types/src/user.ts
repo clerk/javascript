@@ -32,16 +32,10 @@ export interface UserResource extends ClerkResource {
   createdAt: Date | null;
 
   update: (params: UpdateUserParams) => Promise<UserResource>;
-  createEmailAddress: (
-    params: CreateEmailAddressParams,
-  ) => Promise<EmailAddressResource>;
-  createPhoneNumber: (
-    params: CreatePhoneNumberParams,
-  ) => Promise<PhoneNumberResource>;
+  createEmailAddress: (params: CreateEmailAddressParams) => Promise<EmailAddressResource>;
+  createPhoneNumber: (params: CreatePhoneNumberParams) => Promise<PhoneNumberResource>;
   twoFactorEnabled: () => boolean;
-  isPrimaryIdentification: (
-    ident: EmailAddressResource | PhoneNumberResource,
-  ) => boolean;
+  isPrimaryIdentification: (ident: EmailAddressResource | PhoneNumberResource) => boolean;
   getSessions: () => Promise<SessionWithActivitiesResource[]>;
   setProfileImage: (params: SetProfileImageParams) => Promise<ImageResource>;
 }

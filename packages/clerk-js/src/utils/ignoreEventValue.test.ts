@@ -43,9 +43,7 @@ describe('ignoreNonEventValue', () => {
   it('only allows values of specified types', () => {
     expect(ignoreEventValue(noop)).toEqual(noop);
     expect(ignoreEventValue(noop, { requireType: 'function' })).toEqual(noop);
-    expect(ignoreEventValue(true, { requireType: 'function' })).toEqual(
-      undefined,
-    );
+    expect(ignoreEventValue(true, { requireType: 'function' })).toEqual(undefined);
     expect(ignoreEventValue(true, { requireType: 'boolean' })).toEqual(true);
   });
 });

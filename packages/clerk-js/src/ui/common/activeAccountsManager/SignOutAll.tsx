@@ -7,9 +7,7 @@ type SignOutAllProps = {
   handleSignOutAll: () => void;
 };
 
-export default function SignOutAll({
-  handleSignOutAll,
-}: SignOutAllProps): JSX.Element {
+export default function SignOutAll({ handleSignOutAll }: SignOutAllProps): JSX.Element {
   return (
     <div className='cl-sign-out-all'>
       <Button

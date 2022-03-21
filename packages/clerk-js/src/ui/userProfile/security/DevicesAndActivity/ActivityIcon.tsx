@@ -6,18 +6,12 @@ import { SessionActivity } from '@clerk/types';
 import cn from 'classnames';
 import React from 'react';
 
-export function ActivityIcon({
-  sessionActivity,
-}: {
-  sessionActivity: SessionActivity;
-}): JSX.Element {
+export function ActivityIcon({ sessionActivity }: { sessionActivity: SessionActivity }): JSX.Element {
   return (
     <div
       className={cn(
         'cl-activity-icon',
-        sessionActivity.isMobile
-          ? 'cl-activity-icon-mobile'
-          : 'cl-activity-icon-desktop',
+        sessionActivity.isMobile ? 'cl-activity-icon-mobile' : 'cl-activity-icon-desktop',
       )}
     >
       {sessionActivity.isMobile ? <MobileIcon /> : <DesktopIcon />}
