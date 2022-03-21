@@ -126,7 +126,7 @@ export default class Clerk extends ClerkBackendAPI {
     this._jwksClient = jwks({
       jwksUri: `${serverApiUrl}/${apiVersion}/jwks`,
       requestHeaders: {
-        Authorization: `Bearer ${defaultApiKey}`,
+        Authorization: `Bearer ${apiKey}`,
       },
       timeout: 5000,
       cache: true,
@@ -158,11 +158,12 @@ export default class Clerk extends ClerkBackendAPI {
 
     /** Base initialization */
 
+    // TODO: More comprehensive base initialization
     this.base = new Base(
       importKey,
       verifySignature,
       decodeBase64,
-      loadCryptoKey
+      process.env.CLERK_JWT_KEY ? undefined : loadCryptoKey
     );
   }
 
