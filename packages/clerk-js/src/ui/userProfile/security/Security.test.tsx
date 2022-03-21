@@ -1,4 +1,4 @@
-import { mocked, renderJSON } from '@clerk/shared/testUtils';
+import { mocked, render, renderJSON, screen } from '@clerk/shared/testUtils';
 import {
   EnvironmentResource,
   SessionActivity,
@@ -55,26 +55,73 @@ describe('<Security/>', () => {
       useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>,
       true,
     ).mockImplementation(
-      () => (
-        {
+      () =>
+        ({
           userSettings: {
             attributes: {
               phone_number: {
                 used_for_second_factor: true,
-                second_factors: ['phone_code']
+                second_factors: ['phone_code'],
               },
               password: {
-                enabled: true
-              }
-            }
+                enabled: true,
+              },
+            },
           },
           displayConfig: {
             branded: true,
           },
-        } as PartialDeep<EnvironmentResource>
-      )
+        } as PartialDeep<EnvironmentResource>),
     );
     const tree = renderJSON(<Security />);
     expect(tree).toMatchSnapshot();
+  });
+
+  it('shows the password section when password is required', () => {
+    mocked(
+      useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>,
+      true,
+    ).mockImplementation(
+      () =>
+        ({
+          userSettings: {
+            attributes: {
+              phone_number: {
+                used_for_second_factor: false,
+              },
+              password: {
+                enabled: true,
+                required: true,
+              },
+            },
+          },
+        } as PartialDeep<EnvironmentResource>),
+    );
+    render(<Security />);
+    expect(screen.getByText('Password')).toBeInTheDocument();
+  });
+
+  it('hides the password section when password is not required', () => {
+    mocked(
+      useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>,
+      true,
+    ).mockImplementation(
+      () =>
+        ({
+          userSettings: {
+            attributes: {
+              phone_number: {
+                used_for_second_factor: false,
+              },
+              password: {
+                enabled: true,
+                required: false,
+              },
+            },
+          },
+        } as PartialDeep<EnvironmentResource>),
+    );
+    render(<Security />);
+    expect(screen.queryByText('Password')).not.toBeInTheDocument();
   });
 });

@@ -13,7 +13,8 @@ export function Security(): JSX.Element {
   const { navigate } = useNavigate();
   const user = useCoreUser();
 
-  const showPasswordRow = attributes.password.enabled;
+  const showPasswordRow =
+    attributes.password.enabled && attributes.password.required;
 
   const showSecondFactorRow =
     attributes.phone_number.used_for_second_factor &&
