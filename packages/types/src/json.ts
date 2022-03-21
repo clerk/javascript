@@ -12,8 +12,8 @@ import { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUp';
 import { OAuthStrategy } from './strategies';
 import { BoxShadow, Color, EmUnit, FontFamily, FontWeight, HexColor } from './theme';
 import { UserSettingsJSON } from './userSettings';
-import { VerificationStatus } from './verification';
 import { CamelToSnake } from './utils';
+import { VerificationStatus } from './verification';
 
 export interface ClerkResourceJSON {
   // TODO: Shall we make this optional?
@@ -86,6 +86,7 @@ export interface SignUpJSON extends ClerkResourceJSON {
   has_password: boolean;
   unsafe_metadata: Record<string, unknown>;
   created_session_id: string | null;
+  created_user_id: string | null;
   abandon_at: number | null;
   verifications: SignUpVerificationsJSON | null;
 }
