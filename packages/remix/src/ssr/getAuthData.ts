@@ -20,7 +20,7 @@ export async function getAuthData(
   req: Request,
   opts: RootAuthLoaderOptions = {},
 ): Promise<{ authData: AuthData | null; showInterstitial?: boolean }> {
-  const { loadSession, loadUser } = opts;
+  const { loadSession, loadUser, jwtKey, authorizedParties } = opts;
   const { headers } = req;
   const cookies = parseCookies(req);
 
@@ -38,6 +38,8 @@ export async function getAuthData(
       referrer: headers.get('referer'),
       userAgent: headers.get('user-agent') as string,
       fetchInterstitial: () => Promise.resolve(''),
+      authorizedParties,
+      jwtKey,
     });
 
     if (status === AuthStatus.Interstitial) {

@@ -25,6 +25,7 @@ import { Crypto, CryptoKey } from '@peculiar/webcrypto';
 import { decodeBase64, toSPKIDer } from './utils/crypto';
 
 const defaultApiKey = process.env.CLERK_API_KEY || '';
+const defaultJWTKey = process.env.CLERK_JWT_KEY;
 const defaultApiVersion = process.env.CLERK_API_VERSION || 'v1';
 const defaultServerApiUrl =
   process.env.CLERK_API_URL || 'https://api.clerk.dev';
@@ -34,6 +35,7 @@ const packageRepo = 'https://github.com/clerkinc/clerk-sdk-node';
 export type MiddlewareOptions = {
   onError?: Function;
   authorizedParties?: string[];
+  jwtKey?: string;
 };
 
 export type WithAuthProp<T> = T & {
@@ -67,6 +69,7 @@ const verifySignature = async (
 
 export default class Clerk extends ClerkBackendAPI {
   base: Base;
+  jwtKey?: string;
   httpOptions: OptionsOfUnknownResponseBody;
 
   _jwksClient: JwksClient;
@@ -76,12 +79,14 @@ export default class Clerk extends ClerkBackendAPI {
 
   constructor({
     apiKey = defaultApiKey,
+    jwtKey = defaultJWTKey,
     serverApiUrl = defaultServerApiUrl,
     apiVersion = defaultApiVersion,
     httpOptions = {},
     jwksCacheMaxAge = JWKS_MAX_AGE,
   }: {
     apiKey?: string;
+    jwtKey?: string;
     serverApiUrl?: string;
     apiVersion?: string;
     httpOptions?: OptionsOfUnknownResponseBody;
@@ -122,6 +127,7 @@ export default class Clerk extends ClerkBackendAPI {
     }
 
     this.httpOptions = httpOptions;
+    this.jwtKey = jwtKey;
 
     this._jwksClient = jwks({
       jwksUri: `${serverApiUrl}/${apiVersion}/jwks`,
@@ -163,7 +169,7 @@ export default class Clerk extends ClerkBackendAPI {
       importKey,
       verifySignature,
       decodeBase64,
-      process.env.CLERK_JWT_KEY ? undefined : loadCryptoKey
+      loadCryptoKey
     );
   }
 
@@ -230,7 +236,7 @@ export default class Clerk extends ClerkBackendAPI {
   }
 
   expressWithAuth(
-    { onError, authorizedParties }: MiddlewareOptions = {
+    { onError, authorizedParties, jwtKey }: MiddlewareOptions = {
       onError: this.defaultOnError,
     }
   ): (req: Request, res: Response, next: NextFunction) => Promise<void> {
@@ -261,6 +267,7 @@ export default class Clerk extends ClerkBackendAPI {
             referrer: req.headers.referer,
             userAgent: req.headers['user-agent'] as string,
             authorizedParties,
+            jwtKey: jwtKey || this.jwtKey,
             fetchInterstitial: () => this.fetchInterstitial(),
           });
 
@@ -315,11 +322,11 @@ export default class Clerk extends ClerkBackendAPI {
   }
 
   expressRequireAuth(
-    { onError, authorizedParties }: MiddlewareOptions = {
+    options: MiddlewareOptions = {
       onError: this.strictOnError,
     }
   ) {
-    return this.expressWithAuth({ onError, authorizedParties });
+    return this.expressWithAuth(options);
   }
 
   // Credits to https://nextjs.org/docs/api-routes/api-middlewares
@@ -342,7 +349,7 @@ export default class Clerk extends ClerkBackendAPI {
   // Set the session on the request and then call provided handler
   withAuth(
     handler: Function,
-    { onError, authorizedParties }: MiddlewareOptions = {
+    options: MiddlewareOptions = {
       onError: this.defaultOnError,
     }
   ) {
@@ -352,11 +359,7 @@ export default class Clerk extends ClerkBackendAPI {
       next?: NextFunction
     ) => {
       try {
-        await this._runMiddleware(
-          req,
-          res,
-          this.expressWithAuth({ onError, authorizedParties })
-        );
+        await this._runMiddleware(req, res, this.expressWithAuth(options));
         return handler(req, res, next);
       } catch (error) {
         // @ts-ignore
@@ -376,10 +379,10 @@ export default class Clerk extends ClerkBackendAPI {
   // Stricter version, short-circuits if session can't be determined
   requireAuth(
     handler: Function,
-    { onError, authorizedParties }: MiddlewareOptions = {
+    options: MiddlewareOptions = {
       onError: this.strictOnError,
     }
   ) {
-    return this.withAuth(handler, { onError, authorizedParties });
+    return this.withAuth(handler, options);
   }
 }

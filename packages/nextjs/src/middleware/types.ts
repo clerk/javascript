@@ -8,6 +8,8 @@ export type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
 export type WithServerSideAuthOptions = {
   loadUser?: boolean;
   loadSession?: boolean;
+  jwtKey?: string;
+  authorizedParties?: string[];
 };
 
 export type WithServerSideAuthCallback<Return, Options> = (context: ContextWithAuth<Options>) => Return;

@@ -12,7 +12,7 @@ export async function getAuthData(
   opts: WithServerSideAuthOptions = {},
 ): Promise<AuthData | null> {
   const { headers, cookies } = ctx.req;
-  const { loadSession, loadUser } = opts;
+  const { loadSession, loadUser, jwtKey, authorizedParties } = opts;
 
   try {
     const cookieToken = cookies['__session'];
@@ -28,6 +28,8 @@ export async function getAuthData(
       referrer: headers.referer,
       userAgent: headers['user-agent'] as string,
       fetchInterstitial: () => Clerk.fetchInterstitial(),
+      jwtKey,
+      authorizedParties,
     });
 
     if (status === AuthStatus.Interstitial) {

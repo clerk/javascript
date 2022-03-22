@@ -8,6 +8,8 @@ export type RootAuthLoaderOptions = {
   frontendApi?: string;
   loadUser?: boolean;
   loadSession?: boolean;
+  jwtKey?: string;
+  authorizedParties?: [];
 };
 
 export type RootAuthLoaderCallback<Options> = (

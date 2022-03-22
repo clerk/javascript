@@ -30,10 +30,6 @@ export type VerifySessionTokenOptions = {
   jwtKey?: string;
 };
 
-const verifySessionTokenDefaultOptions: VerifySessionTokenOptions = {
-  authorizedParties: [],
-};
-
 type AuthState = {
   status: AuthStatus;
   session?: Session;
@@ -108,7 +104,7 @@ export class Base {
    */
   verifySessionToken = async (
     token: string,
-    { authorizedParties, jwtKey }: VerifySessionTokenOptions = verifySessionTokenDefaultOptions,
+    { authorizedParties, jwtKey }: VerifySessionTokenOptions,
   ): Promise<JWTPayload> => {
     /**
      * Priority of JWT key search
