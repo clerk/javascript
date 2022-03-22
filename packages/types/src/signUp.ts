@@ -24,9 +24,9 @@ import {
   TicketStrategy,
   Web3Strategy,
 } from './strategies';
+import type { SnakeToCamel } from './utils';
 import { CreateMagicLinkFlowReturn, StartMagicLinkFlowParams, VerificationResource } from './verification';
 import { AuthenticateWithWeb3Params, GenerateSignature } from './web3Wallet';
-import type { SnakeToCamel } from './utils';
 
 export interface SignUpResource extends ClerkResource {
   status: SignUpStatus | null;
@@ -45,6 +45,7 @@ export interface SignUpResource extends ClerkResource {
   hasPassword: boolean;
   unsafeMetadata: Record<string, unknown>;
   createdSessionId: string | null;
+  createdUserId: string | null;
   abandonAt: number | null;
 
   create: (params: SignUpCreateParams) => Promise<SignUpResource>;
