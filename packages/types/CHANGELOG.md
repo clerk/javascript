@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [1.29.3](https://github.com/clerkinc/javascript/compare/@clerk/types@1.29.2...@clerk/types@1.29.3) (2022-03-22)
+
+
+### Bug Fixes
+
+* **clerk-js:** Add createdUserId attribute to SignUp ([#132](https://github.com/clerkinc/javascript/issues/132)) ([e530c75](https://github.com/clerkinc/javascript/commit/e530c75fb05fd22caca4054a2e2ae0cb5e468476))
+
+
+
 ### [1.29.2](https://github.com/clerkinc/javascript/compare/@clerk/types@1.29.2-staging.1...@clerk/types@1.29.2) (2022-03-17)
 
 **Note:** Version bump only for package @clerk/types

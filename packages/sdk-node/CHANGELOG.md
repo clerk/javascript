@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.10.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@2.9.10...@clerk/clerk-sdk-node@2.10.0) (2022-03-22)
+
+
+### Features
+
+* **clerk-sdk-node:** Enable CLERK_JWT_KEY usage from clerk-sdk-node ([2130afa](https://github.com/clerkinc/javascript/commit/2130afa3fc19cf382b8702a1ed1371abf64dc41d))
+
+
+### Bug Fixes
+
+* **clerk-sdk-node:** Correctly type verifyToken return ([7c14326](https://github.com/clerkinc/javascript/commit/7c14326abb0edbfb56681d74c39f7fd550e15dd4))
+
+
+
 ### [2.9.10](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@2.9.9...@clerk/clerk-sdk-node@2.9.10) (2022-03-14)
 
 

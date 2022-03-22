@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [2.17.7](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@2.17.6...@clerk/clerk-js@2.17.7) (2022-03-22)
+
+
+### Bug Fixes
+
+* **clerk-js:** Add createdUserId attribute to SignUp ([#132](https://github.com/clerkinc/javascript/issues/132)) ([e530c75](https://github.com/clerkinc/javascript/commit/e530c75fb05fd22caca4054a2e2ae0cb5e468476))
+* **clerk-js:** Invitation based sign up optional fields ([864f095](https://github.com/clerkinc/javascript/commit/864f095e2ab6d6ccb6a3ac329f3fc1365b4b155e))
+* **clerk-js:** Redirect user to signUp on external account sign up error ([#118](https://github.com/clerkinc/javascript/issues/118)) ([db0ac47](https://github.com/clerkinc/javascript/commit/db0ac473abf99d0bcc173d2d2af38c5e8bba318b))
+
+
+
 ### [2.17.6](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@2.17.6-staging.1...@clerk/clerk-js@2.17.6) (2022-03-17)
 
 **Note:** Version bump only for package @clerk/clerk-js

@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.6.1...@clerk/backend-core@0.7.0) (2022-03-22)
+
+
+### Features
+
+* **backend-core:** Fix JWTPayload type with Clerk specifications ([2144577](https://github.com/clerkinc/javascript/commit/2144577c8fff668ba872073e89ed17e33460ef82))
+
+
+### Bug Fixes
+
+* **clerk-js:** Add createdUserId attribute to SignUp ([#132](https://github.com/clerkinc/javascript/issues/132)) ([e530c75](https://github.com/clerkinc/javascript/commit/e530c75fb05fd22caca4054a2e2ae0cb5e468476))
+
+
+
 ### [0.6.1](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.6.0...@clerk/backend-core@0.6.1) (2022-03-14)
 
 

@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.4.1](https://github.com/clerkinc/javascript/compare/@clerk/edge@0.4.0...@clerk/edge@0.4.1) (2022-03-22)
+
+
+### Bug Fixes
+
+* **edge:** Correct logic placement about enriching authData with user ([fb2cdef](https://github.com/clerkinc/javascript/commit/fb2cdeff2e6bb2a639936e5bb0cf0fd6a2bf8570))
+
+
+
 ## [0.4.0](https://github.com/clerkinc/javascript/compare/@clerk/edge@0.3.9...@clerk/edge@0.4.0) (2022-03-17)
 
 
