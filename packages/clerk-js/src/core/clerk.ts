@@ -94,7 +94,7 @@ export default class Clerk implements ClerkInterface {
   #fapiClient: FapiClient;
   #authService: AuthenticationService | null = null;
   #devBrowserHandler: DevBrowserHandler | null = null;
-  #pageLifecycle = createPageLifecycle();
+  #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
 
   /**
    * @inheritDoc {ClerkInterface.version}
@@ -598,6 +598,8 @@ export default class Clerk implements ClerkInterface {
       fapiClient: this.#fapiClient,
     });
 
+    this.#pageLifecycle = createPageLifecycle();
+
     const isFapiDevOrStaging = isDevOrStagingUrl(this.frontendApi);
     const isInAccountsHostedPages = isAccountsHostedPages(window?.location.hostname);
 
@@ -670,7 +672,7 @@ export default class Clerk implements ClerkInterface {
       return;
     }
 
-    this.#pageLifecycle.onPageVisible(() => {
+    this.#pageLifecycle?.onPageVisible(() => {
       if (this.session) {
         void this.#touchLastActiveSession(this.session);
       }
