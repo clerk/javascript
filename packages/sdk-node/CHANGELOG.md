@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.1.0-alpha.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.0.1-staging.0...@clerk/clerk-sdk-node@3.1.0-alpha.0) (2022-03-22)
+
+### Features
+
+- **clerk-sdk-node:** Add getToken to sdk-node `auth` ([445def1](https://github.com/clerkinc/javascript/commit/445def148eeaa731dc0b74428d0b9f078e8b9240))
+- **clerk-sdk-node:** Enable CLERK_JWT_KEY usage from clerk-sdk-node ([6151101](https://github.com/clerkinc/javascript/commit/61511019e123f7e9eaa9b44f35fa04ef643090be))
+
 ### [3.0.1-alpha.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.0.1-staging.0...@clerk/clerk-sdk-node@3.0.1-alpha.1) (2022-03-20)
 
 ### Features

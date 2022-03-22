@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.0-alpha.0](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.1.1-staging.0...@clerk/remix@0.2.0-alpha.0) (2022-03-22)
+
+### Features
+
+- **nextjs,remix:** Refactor remix and nextjs getAuthData to use common utils ([d5f5dba](https://github.com/clerkinc/javascript/commit/d5f5dbace577ae617636841ce51e7cccd5d25b95))
+
+### Bug Fixes
+
+- **nextjs,remix:** Make server getToken throw if called with no session ([f7736c1](https://github.com/clerkinc/javascript/commit/f7736c1f4730d713f3fbcedd73e2ef5a1ceee605))
+
 ### [0.1.1-alpha.1](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.1.1-staging.0...@clerk/remix@0.1.1-alpha.1) (2022-03-20)
 
 ### Features

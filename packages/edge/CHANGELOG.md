@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.0-alpha.0](https://github.com/clerkinc/javascript/compare/@clerk/edge@1.0.1-staging.0...@clerk/edge@1.1.0-alpha.0) (2022-03-22)
+
+### Features
+
+- **edge:** Add getToken to edge `withEdgeMiddlewareAuth` ([2039896](https://github.com/clerkinc/javascript/commit/2039896853d2623f298fc33f40f7605789c62544))
+- **edge:** Temporarily hook getToken into `withEdgeMiddlewareAuth` directly ([8ab9c69](https://github.com/clerkinc/javascript/commit/8ab9c69e228a8dc074c1c7c28311b50151bc8410))
+
+### Bug Fixes
+
+- **edge:** Align edge getToken ([0348929](https://github.com/clerkinc/javascript/commit/0348929bf5e329ad53690b81b1f8c50727e8c7e5))
+- **edge:** Allow handlers returning promises in `withEdgeMiddlewareAuth` ([fc4edba](https://github.com/clerkinc/javascript/commit/fc4edbaa1a49d10168ebe083bc0acc6427e21924))
+- **edge:** Fix `exports` package.json config for `vercel-edge` ([fc4f6ba](https://github.com/clerkinc/javascript/commit/fc4f6ba0cbd032915914baeb22b13834bf76a85a))
+- **edge:** Return plain or promise-like possible results ([39733cf](https://github.com/clerkinc/javascript/commit/39733cf6f06652ae70afe4f4e1de7f7eb0f36b59))
+
 ### [1.0.1-alpha.2](https://github.com/clerkinc/javascript/compare/@clerk/edge@1.0.1-alpha.1...@clerk/edge@1.0.1-alpha.2) (2022-03-20)
 
 ### Bug Fixes

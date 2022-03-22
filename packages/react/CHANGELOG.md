@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.0.1-alpha.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@3.0.1-staging.0...@clerk/clerk-react@3.0.1-alpha.2) (2022-03-22)
+
+### Bug Fixes
+
+- **clerk-js,clerk-react:** Move error to getToken ([d5f6b26](https://github.com/clerkinc/javascript/commit/d5f6b264cf58ce40c68de298b4c7c564d472001f))
+- **edge:** Align react getToken ([37a03de](https://github.com/clerkinc/javascript/commit/37a03de81148294909719d4476b0a2ac3642813c))
+
 ### [3.0.1-alpha.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@3.0.1-staging.0...@clerk/clerk-react@3.0.1-alpha.1) (2022-03-20)
 
 ### Bug Fixes
