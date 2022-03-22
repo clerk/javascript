@@ -9,7 +9,8 @@
             "allowBranch": [
                 "main",
                 "next",
-                "staging"
+                "staging",
+                "javascript_sdk_v2"
             ],
             "conventionalCommits": true
         },
@@ -17,7 +18,8 @@
             "allowBranch": [
                 "main",
                 "next",
-                "staging"
+                "staging",
+                "javascript_sdk_v2"
             ]
         }
     },
