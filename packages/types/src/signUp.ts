@@ -36,6 +36,7 @@ export interface SignUpResource extends ClerkResource {
   hasPassword: boolean;
   unsafeMetadata: Record<string, unknown>;
   createdSessionId: string | null;
+  createdUserId: string | null;
   abandonAt: number | null;
 
   create: (params: SignUpParams) => Promise<SignUpResource>;

@@ -119,6 +119,7 @@ export interface SignUpJSON extends ClerkResourceJSON {
   has_password: boolean;
   unsafe_metadata: Record<string, unknown>;
   created_session_id: string | null;
+  created_user_id: string | null;
   abandon_at: number | null;
   verifications: SignUpVerificationsJSON | null;
 }

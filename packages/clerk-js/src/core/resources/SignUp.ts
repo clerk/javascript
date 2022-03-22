@@ -58,6 +58,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   hasPassword = false;
   unsafeMetadata: Record<string, unknown> = {};
   createdSessionId: string | null = null;
+  createdUserId: string | null = null;
   abandonAt: number | null = null;
 
   constructor(data: SignUpJSON | null = null) {
@@ -270,6 +271,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       this.hasPassword = data.has_password;
       this.unsafeMetadata = data.unsafe_metadata;
       this.createdSessionId = data.created_session_id;
+      this.createdUserId = data.created_user_id;
       this.abandonAt = data.abandon_at;
       this.web3wallet = data.web3_wallet;
     }

@@ -115,6 +115,7 @@ export interface SignUpProps {
   externalAccount: any;
   hasPassword: boolean;
   createdSessionId: string | null;
+  createdUserId: string | null;
   abandonAt: number | null;
 }
 

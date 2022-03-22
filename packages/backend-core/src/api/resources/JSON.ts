@@ -183,6 +183,7 @@ export interface SignUpJSON extends ClerkResourceJSON {
   has_password: boolean;
   name_full: string | null;
   created_session_id: string | null;
+  created_user_id: string | null;
   abandon_at: number | null;
 }
 

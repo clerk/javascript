@@ -226,6 +226,7 @@ describe('Clerk singleton', () => {
             identifier: '',
             user_data: null,
             created_session_id: null,
+            created_user_id: null,
           } as any as SignInJSON),
           signUp: new SignUp(null),
         }),
