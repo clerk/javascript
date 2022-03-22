@@ -68,12 +68,12 @@ export function withEdgeMiddlewareAuth<
 export function withEdgeMiddlewareAuth(
   handler: any,
   options: any = {
-    authorizedParties: [],
     loadSession: false,
     loadUser: false,
   },
 ): any {
   return async function clerkAuth(req: NextRequest, event: NextFetchEvent) {
+    const { loadUser, loadSession, jwtKey, authorizedParties } = options;
     const cookieToken = req.cookies['__session'];
     const headerToken = req.headers.get('authorization');
     const { status, interstitial, sessionClaims } = await vercelEdgeBase.getAuthState({
@@ -86,7 +86,8 @@ export function withEdgeMiddlewareAuth(
       forwardedPort: req.headers.get('x-forwarded-port'),
       forwardedHost: req.headers.get('x-forwarded-host'),
       referrer: req.headers.get('referrer'),
-      authorizedParties: options.authorizedParties,
+      authorizedParties,
+      jwtKey,
       fetchInterstitial,
     });
 
@@ -106,8 +107,8 @@ export function withEdgeMiddlewareAuth(
     const userId = sessionClaims!.sub;
 
     const [user, session] = await Promise.all([
-      options.loadUser ? ClerkAPI.users.getUser(userId) : Promise.resolve(undefined),
-      options.loadSession ? ClerkAPI.sessions.getSession(sessionId) : Promise.resolve(undefined),
+      loadUser ? ClerkAPI.users.getUser(userId) : Promise.resolve(undefined),
+      loadSession ? ClerkAPI.sessions.getSession(sessionId) : Promise.resolve(undefined),
     ]);
 
     const getToken = createGetToken({

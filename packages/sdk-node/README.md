@@ -713,6 +713,32 @@ export clerk.withAuth(handler);
 export clerk.requireAuth(handler);
 ```
 
+## Networkless token verification using the JWT verification key
+
+Clerk's JWT session token can be verified in a networkless manner using the JWT verification key. By default Clerk will use our JWKs endpoint to fetch and cache the key for any subsequent verification. If you use the `CLERK_JWT_KEY` environment variable to supply the key, Clerk will pick it up and do networkless verification for session tokens using it.
+
+To learn more about Clerk's token verification you can find more information on our [documentation](https://docs.clerk.dev/popular-guides/validating-session-tokens).
+
+The value of the JWT verification key can also be added on the instance level or on any single middleware call e.g.
+
+```ts
+import { withAuth } from '@clerk/clerk-sdk-node';
+
+const handler = (req, res) => {
+  // ...
+};
+
+withAuth(handler, { jwtKey: 'my_clerk_public_key' });
+```
+
+Custom instance initialization:
+
+```ts
+import Clerk from '@clerk/clerk-sdk-node/instance';
+
+const clerk = new Clerk({ jwtKey: 'my_clerk_public_key' });
+```
+
 ## Validate the Authorized Party of a session token
 
 Clerk's JWT session token, contains the azp claim, which equals the Origin of the request during token generation. You can provide the middlewares with a list of whitelisted origins to verify against, to protect your application of the subdomain cookie leaking attack. You can find an example below:

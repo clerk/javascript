@@ -6,6 +6,7 @@ export type WithEdgeMiddlewareAuthOptions = {
   loadUser?: boolean;
   loadSession?: boolean;
   authorizedParties?: string[];
+  jwtKey?: string;
 };
 
 export type WithEdgeMiddlewareAuthCallback<Return, Options> = (
