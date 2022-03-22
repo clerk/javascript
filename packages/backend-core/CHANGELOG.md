@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0-alpha.1](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.7.0-alpha.0...@clerk/backend-core@0.7.0-alpha.1) (2022-03-22)
+
+### Bug Fixes
+
+- **clerk-js:** Add createdUserId attribute to SignUp ([#132](https://github.com/clerkinc/javascript/issues/132)) ([b1884bd](https://github.com/clerkinc/javascript/commit/b1884bd950d9fcb27505269a09038dd571072a4e))
+
 ## [0.7.0-alpha.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.6.4-staging.0...@clerk/backend-core@0.7.0-alpha.0) (2022-03-22)
 
 ### Features

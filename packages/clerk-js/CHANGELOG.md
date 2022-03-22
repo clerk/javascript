@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.0.1-alpha.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.0.1-alpha.2...@clerk/clerk-js@3.0.1-alpha.3) (2022-03-22)
+
+### Bug Fixes
+
+- **clerk-expo:** Setup createPageLifecycle only in browser environment ([#133](https://github.com/clerkinc/javascript/issues/133)) ([75bd5a1](https://github.com/clerkinc/javascript/commit/75bd5a1ee73d60fe5ed48fe96e2823054376ffd2))
+- **clerk-js:** Add createdUserId attribute to SignUp ([#132](https://github.com/clerkinc/javascript/issues/132)) ([b1884bd](https://github.com/clerkinc/javascript/commit/b1884bd950d9fcb27505269a09038dd571072a4e))
+
 ### [3.0.1-alpha.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.0.1-staging.0...@clerk/clerk-js@3.0.1-alpha.2) (2022-03-22)
 
 ### Bug Fixes
