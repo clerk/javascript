@@ -27,6 +27,7 @@ export type Session = {
 
 export type VerifySessionTokenOptions = {
   authorizedParties?: string[];
+  jwtKey?: string;
 };
 
 const verifySessionTokenDefaultOptions: VerifySessionTokenOptions = {
@@ -65,6 +66,8 @@ type AuthStateParams = {
   authorizedParties?: string[];
   /* HTTP utility for fetching a text/html string */
   fetchInterstitial: () => Promise<string>;
+  /* Value corresponding to the JWT verification key */
+  jwtKey?: string;
 };
 
 export class Base {
@@ -105,14 +108,18 @@ export class Base {
    */
   verifySessionToken = async (
     token: string,
-    { authorizedParties }: VerifySessionTokenOptions = verifySessionTokenDefaultOptions,
+    { authorizedParties, jwtKey }: VerifySessionTokenOptions = verifySessionTokenDefaultOptions,
   ): Promise<JWTPayload> => {
-    // Try to load the PK from supplied function and
-    // if there is no custom load function
-    // try to load from the environment.
-    const availableKey = this.loadCryptoKeyFunction
-      ? await this.loadCryptoKeyFunction(token)
-      : await this.loadCryptoKeyFromEnv();
+    /**
+     * Priority of JWT key search
+     * 1. Use supplied key
+     * 2. Use load function
+     * 3. Try to load from env
+     */
+    const availableKey =
+      !jwtKey && this.loadCryptoKeyFunction
+        ? await this.loadCryptoKeyFunction(token)
+        : await this.loadCryptoKey(jwtKey || process.env.CLERK_JWT_KEY);
 
     const claims = await this.verifyJwt(availableKey, token);
     checkClaims(claims, authorizedParties);
@@ -121,13 +128,12 @@ export class Base {
 
   /**
    *
-   * Modify the RSA public key from the PEM retrieved from the CLERK_JWT_KEY environment variable
-   * and return a contructed CryptoKey.
+   * @param {string} token Clerk JWT verification token
+   * Modify the RSA public key from the Clerk PEM supplied and return a contructed CryptoKey.
    * You will find that at your application dashboard (https://dashboard.clerk.dev) under Settings ->  API keys
    *
    */
-  loadCryptoKeyFromEnv = async (): Promise<CryptoKey> => {
-    const key = process.env.CLERK_JWT_KEY;
+  loadCryptoKey = async (key?: string): Promise<CryptoKey> => {
     if (!key) {
       throw new Error('Missing jwt key');
     }
@@ -219,18 +225,20 @@ export class Base {
     userAgent,
     authorizedParties,
     fetchInterstitial,
+    jwtKey,
   }: AuthStateParams): Promise<AuthState> => {
     let sessionClaims;
     if (headerToken) {
       try {
         sessionClaims = await this.verifySessionToken(headerToken, {
           authorizedParties,
+          jwtKey,
         });
         return {
           status: AuthStatus.SignedIn,
           session: {
-            id: sessionClaims.sid as string,
-            userId: sessionClaims.sub as string,
+            id: sessionClaims.sid,
+            userId: sessionClaims.sub,
           },
           sessionClaims,
         };
@@ -322,6 +330,7 @@ export class Base {
     try {
       sessionClaims = await this.verifySessionToken(cookieToken as string, {
         authorizedParties,
+        jwtKey,
       });
     } catch (err) {
       if (err instanceof JWTExpiredError) {
@@ -334,12 +343,12 @@ export class Base {
       }
     }
 
-    if (cookieToken && clientUat && sessionClaims?.iat && sessionClaims.iat >= Number(clientUat)) {
+    if (cookieToken && clientUat && sessionClaims.iat >= Number(clientUat)) {
       return {
         status: AuthStatus.SignedIn,
         session: {
-          id: sessionClaims.sid as string,
-          userId: sessionClaims.sub as string,
+          id: sessionClaims.sid,
+          userId: sessionClaims.sub,
         },
         sessionClaims,
       };
