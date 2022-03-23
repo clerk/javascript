@@ -1,4 +1,4 @@
-import { SignInProps, SignUpProps, UserButtonProps, UserProfileProps } from '@clerk/types';
+import { SignInProps, SignUpProps, UserButtonProps, UserProfileProps, AvatarWithUploaderProps } from '@clerk/types';
 import React from 'react';
 
 import { MountProps, WithClerkProp } from '../types';
@@ -91,3 +91,13 @@ export const UserButton = withClerk(({ clerk, ...props }: WithClerkProp<UserButt
     />
   );
 }, 'UserButton');
+
+export const AvatarWithUploader = withClerk(({ clerk, ...props }: WithClerkProp<AvatarWithUploaderProps>) => {
+  return (
+    <Portal
+      mount={clerk.mountAvatarWithUploader}
+      unmount={clerk.unmountAvatarWithUploader}
+      props={props}
+    />
+  );
+}, 'AvatarWithUploader');

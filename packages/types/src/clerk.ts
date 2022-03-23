@@ -144,6 +144,22 @@ export interface Clerk {
   unmountUserProfile: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mount an avatar with uploader component at the target element.
+   *
+   * @param targetNode Target to mount the UserProfile component.
+   * @param avatarWithUploaderProps Avatar uploader configuration parameters.
+   */
+  mountAvatarWithUploader: (targetNode: HTMLDivElement, avatarWithUploaderProps?: AvatarWithUploaderProps) => void;
+
+  /**
+   * Unmount a user profile component at the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the UserProfile component from.
+   */
+  unmountAvatarWithUploader: (targetNode: HTMLDivElement) => void;
+
+  /**
    * Register a listener that triggers a callback each time important Clerk resources are changed.
    * Allows to hook up at different steps in the sign up, sign in processes.
    *
@@ -402,6 +418,17 @@ export type UserButtonProps = {
    */
   afterSwitchSessionUrl?: string;
 };
+
+export type AvatarWithUploaderProps = {
+  firstName?: string | null;
+  lastName?: string | null;
+  profileImageUrl?: string;
+  profileImageFetchSize?: number;
+  name?: string | null;
+  size?: number;
+  className?: string;
+  optimize?: boolean;
+}
 
 export interface HandleMagicLinkVerificationParams {
   /**

@@ -4,6 +4,7 @@ import { inClientSide } from '@clerk/shared/utils/ssr';
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
+  AvatarWithUploaderProps,
   BeforeEmitCallback,
   Clerk as ClerkInterface,
   ClerkOptions,
@@ -238,6 +239,23 @@ export default class Clerk implements ClerkInterface {
   };
 
   public unmountUserButton = (node: HTMLDivElement): void => {
+    this.assertComponentsReady(this.#components);
+    this.#components.unmountComponent({
+      node,
+    });
+  };
+
+  public mountAvatarWithUploader = (node: HTMLDivElement, props?: AvatarWithUploaderProps): void => {
+    this.assertComponentsReady(this.#components);
+    this.#components.mountComponent({
+      name: 'AvatarWithUploader',
+      node,
+      nodeClassName: 'cl-avatar-with-uploader',
+      props,
+    });
+  };
+
+  public unmountAvatarWithUploader = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#components);
     this.#components.unmountComponent({
       node,

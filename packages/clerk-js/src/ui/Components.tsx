@@ -28,6 +28,7 @@ import { SignUp, SignUpModal } from './signUp';
 import type { AvailableComponentCtx, AvailableComponentProps } from './types';
 import { UserButton } from './userButton';
 import { UserProfile } from './userProfile';
+import { avatarWithUploader } from "./userProfile/account/avatarWithUploader"
 
 import './styles/clerk.scss';
 
@@ -36,6 +37,7 @@ const AvailableComponents = {
   SignUp,
   UserButton,
   UserProfile,
+  AvatarWithUploader: avatarWithUploader,
 };
 
 type AvailableComponentNames = keyof typeof AvailableComponents;

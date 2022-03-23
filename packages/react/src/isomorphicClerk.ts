@@ -1,6 +1,7 @@
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
+  AvatarWithUploaderProps,
   ClientResource,
   CreateOrganizationParams,
   HandleMagicLinkVerificationParams,
@@ -47,6 +48,7 @@ export default class IsomorphicClerk {
   private premountSignUpNodes = new Map<HTMLDivElement, SignUpProps>();
   private premountUserProfileNodes = new Map<HTMLDivElement, UserProfileProps>();
   private premountUserButtonNodes = new Map<HTMLDivElement, UserButtonProps>();
+  private premountAvatarWithUploaderNodes = new Map<HTMLDivElement, AvatarWithUploaderProps>();
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
   private loadedListeners: Array<() => void> = [];
 
@@ -176,6 +178,10 @@ export default class IsomorphicClerk {
 
     this.premountUserButtonNodes.forEach((props: UserButtonProps, node: HTMLDivElement) => {
       clerkjs.mountUserButton(node, props);
+    });
+
+    this.premountAvatarWithUploaderNodes.forEach((props: AvatarWithUploaderProps, node: HTMLDivElement) => {
+      clerkjs.mountAvatarWithUploader(node, props);
     });
 
     this._loaded = true;
@@ -327,6 +333,22 @@ export default class IsomorphicClerk {
       this.clerkjs.unmountUserButton(node);
     } else {
       this.premountUserButtonNodes.delete(node);
+    }
+  };
+
+  mountAvatarWithUploader = (node: HTMLDivElement, props: AvatarWithUploaderProps): void => {
+    if (this.clerkjs && this._loaded) {
+      this.clerkjs.mountAvatarWithUploader(node, props);
+    } else {
+      this.premountAvatarWithUploaderNodes.set(node, props);
+    }
+  };
+
+  unmountAvatarWithUploader = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this._loaded) {
+      this.clerkjs.unmountAvatarWithUploader(node);
+    } else {
+      this.premountAvatarWithUploaderNodes.delete(node);
     }
   };
 
