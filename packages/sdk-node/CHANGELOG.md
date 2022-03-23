@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.2.0-alpha.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.1.0-alpha.1...@clerk/clerk-sdk-node@3.2.0-alpha.1) (2022-03-23)
+
+### Features
+
+- **backend-core,clerk-sdk-node,nextjs,remix:** Add injected jwtKey option ([53e56e7](https://github.com/clerkinc/javascript/commit/53e56e76d59984d4d3f5b7e1e2d276adb8b2dc77))
+
 ## [3.2.0-alpha.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.1.0-alpha.1...@clerk/clerk-sdk-node@3.2.0-alpha.0) (2022-03-22)
 
 **Note:** Version bump only for package @clerk/clerk-sdk-node

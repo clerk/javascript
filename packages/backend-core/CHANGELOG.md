@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.0-alpha.1](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.7.0-alpha.1...@clerk/backend-core@0.8.0-alpha.1) (2022-03-23)
+
+### Features
+
+- **backend-core,clerk-sdk-node,nextjs,remix:** Add injected jwtKey option ([53e56e7](https://github.com/clerkinc/javascript/commit/53e56e76d59984d4d3f5b7e1e2d276adb8b2dc77))
+- **backend-core:** Add capability for injected JWT key on getAuthState and verifySessionToken ([8b318cc](https://github.com/clerkinc/javascript/commit/8b318cc8cf6f4730c92239d5f9da4d72177449d5))
+
 ## [0.8.0-alpha.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@0.7.0-alpha.1...@clerk/backend-core@0.8.0-alpha.0) (2022-03-22)
 
 **Note:** Version bump only for package @clerk/backend-core

@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.1.0-alpha.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.0.1-alpha.3...@clerk/clerk-js@3.1.0-alpha.0) (2022-03-23)
+
+### Features
+
+- **clerk-js,types:** Rename UserButton params to afterSignOutUrl, afterMultiSessionSingleSignOutUrl ([c4cb76a](https://github.com/clerkinc/javascript/commit/c4cb76a1133fd2308b217cacaffb086b175f6347))
+
+### Bug Fixes
+
+- **clerk-js:** Stop parsing deprecated params from query strings ([8280d96](https://github.com/clerkinc/javascript/commit/8280d96f3cc99290687a551627c675e2b6a1edf0))
+
 ### [3.0.1-alpha.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.0.1-alpha.2...@clerk/clerk-js@3.0.1-alpha.3) (2022-03-22)
 
 ### Bug Fixes

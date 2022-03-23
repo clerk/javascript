@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.0-alpha.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.8.18-alpha.3...@clerk/clerk-expo@0.9.0-alpha.1) (2022-03-23)
+
+### Bug Fixes
+
+- **clerk-expo:** Make Clerk loading smarter ([#136](https://github.com/clerkinc/javascript/issues/136)) ([2405d81](https://github.com/clerkinc/javascript/commit/2405d813b41c1f3c345c894c18e65710891bd710))
+
 ## [0.9.0-alpha.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.8.18-alpha.3...@clerk/clerk-expo@0.9.0-alpha.0) (2022-03-22)
 
 **Note:** Version bump only for package @clerk/clerk-expo
