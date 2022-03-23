@@ -19,7 +19,7 @@ function _SignInAccountSwitcher(): JSX.Element | null {
         <ActiveAccountsManager
           sessions={sessions}
           showActiveAccountButtons={false}
-          navigateAfterSignOutAll={() => {
+          navigateAfterSignOut={() => {
             navigate(displayConfig.afterSignOutAllUrl);
           }}
           navigateAfterSwitchSession={navigateAfterSignIn}

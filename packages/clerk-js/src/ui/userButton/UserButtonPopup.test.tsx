@@ -69,8 +69,8 @@ jest.mock('ui/contexts', () => {
       },
     })),
     useUserButtonContext: jest.fn(() => ({
-      navigateAfterSignOutOne: jest.fn(),
-      navigateAfterSignOutAll: jest.fn(),
+      navigateAfterMultiSessionSingleSignOut: jest.fn(),
+      navigateAfterSignOut: jest.fn(),
       navigateAfterSwitchSession: jest.fn(),
       userProfileURL: 'http://test.host/profile',
       signInUrl: 'http://test.host/signin',

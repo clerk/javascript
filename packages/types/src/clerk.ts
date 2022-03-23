@@ -374,15 +374,15 @@ export type UserButtonProps = {
   showName?: boolean;
 
   /**
-   * Full URL or path to navigate after sign-out is complete
-   * and there are not other active sessions on this client.
+   * Full URL or path to navigate after sign out is complete
    */
-  afterSignOutAllUrl?: string;
+  afterSignOutUrl?: string;
 
   /**
-   * Full URL or path to navigate after sign-out is complete.
+   * Full URL or path to navigate after signing out the current user is complete.
+   * This option applies to multi-session applications.
    */
-  afterSignOutOneUrl?: string;
+  afterMultiSessionSingleSignOutUrl?: string;
 
   /*
    * Full URL or path leading to the

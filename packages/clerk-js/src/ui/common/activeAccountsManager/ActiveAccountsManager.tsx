@@ -12,9 +12,9 @@ import SignOutAll from './SignOutAll';
 
 interface ActiveAccountsManagerProps {
   sessions: SessionResource[];
-  navigateAfterSignOutAll: () => void;
+  navigateAfterSignOut: () => void;
   navigateAfterSwitchSession: () => void;
-  navigateAfterSignOutOne?: () => void;
+  navigateAfterMultiSessionSingleSignOut?: () => void;
   userProfileUrl: string;
   signInUrl: string;
   showActiveAccountButtons?: boolean;
@@ -22,8 +22,8 @@ interface ActiveAccountsManagerProps {
 
 export function ActiveAccountsManager({
   sessions,
-  navigateAfterSignOutAll,
-  navigateAfterSignOutOne,
+  navigateAfterSignOut,
+  navigateAfterMultiSessionSingleSignOut,
   navigateAfterSwitchSession,
   signInUrl,
   userProfileUrl,
@@ -46,7 +46,9 @@ export function ActiveAccountsManager({
       return;
     }
 
-    signOut(navigateAfterSignOutOne, { sessionId: currentSessionId }).catch(() => setSignoutInProgress(false));
+    signOut(navigateAfterMultiSessionSingleSignOut, { sessionId: currentSessionId }).catch(() =>
+      setSignoutInProgress(false),
+    );
   };
 
   const handleManageAccountClick = () => {
@@ -71,7 +73,7 @@ export function ActiveAccountsManager({
   };
 
   const handleSignOutAll = () => {
-    return signOut(navigateAfterSignOutAll);
+    return signOut(navigateAfterSignOut);
   };
 
   const shouldRenderAccountSwitcher = sessions.length || !authConfig.singleSessionMode;

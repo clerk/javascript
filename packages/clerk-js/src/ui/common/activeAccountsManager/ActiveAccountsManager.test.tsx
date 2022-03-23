@@ -83,7 +83,7 @@ describe('ActiveAccountsManager', () => {
     const tree = renderJSON(
       <ActiveAccountsManager
         sessions={sessions}
-        navigateAfterSignOutAll={noop}
+        navigateAfterSignOut={noop}
         navigateAfterSwitchSession={noop}
         userProfileUrl={'user_profile_url'}
         signInUrl={'sign_in_url'}
@@ -99,7 +99,7 @@ describe('ActiveAccountsManager', () => {
       <ActiveAccountsManager
         showActiveAccountButtons={false}
         sessions={[session]}
-        navigateAfterSignOutAll={noop}
+        navigateAfterSignOut={noop}
         navigateAfterSwitchSession={noop}
         userProfileUrl={'user_profile_url'}
         signInUrl={'sign_in_url'}
@@ -115,7 +115,7 @@ describe('ActiveAccountsManager', () => {
       <ActiveAccountsManager
         showActiveAccountButtons={false}
         sessions={[session]}
-        navigateAfterSignOutAll={noop}
+        navigateAfterSignOut={noop}
         navigateAfterSwitchSession={noop}
         userProfileUrl={'user_profile_url'}
         signInUrl={'sign_in_url'}

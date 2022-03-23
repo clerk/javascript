@@ -169,24 +169,24 @@ export const useUserButtonContext = () => {
   const signInUrl = ctx.signInUrl || displayConfig.signInUrl;
   const userProfileUrl = ctx.userProfileUrl || displayConfig.userProfileUrl;
 
-  const afterSignOutOneUrl = ctx.afterSignOutOneUrl || displayConfig.afterSignOutOneUrl;
-  const navigateAfterSignOutOne = () => navigate(afterSignOutOneUrl);
+  const afterMultiSessionSingleSignOutUrl = ctx.afterMultiSessionSingleSignOutUrl || displayConfig.afterSignOutOneUrl;
+  const navigateAfterMultiSessionSingleSignOut = () => navigate(afterMultiSessionSingleSignOutUrl);
 
-  const afterSignOutAllUrl = ctx.afterSignOutAllUrl || displayConfig.afterSignOutAllUrl;
-  const navigateAfterSignOutAll = () => navigate(afterSignOutAllUrl);
+  const afterSignOutUrl = ctx.afterSignOutUrl || displayConfig.afterSignOutAllUrl;
+  const navigateAfterSignOut = () => navigate(afterSignOutUrl);
 
   const afterSwitchSessionUrl = (ctx.afterSwitchSessionUrl = displayConfig.afterSwitchSessionUrl);
   const navigateAfterSwitchSession = () => navigate(afterSwitchSessionUrl);
 
   return {
     ...ctx,
-    navigateAfterSignOutOne,
-    navigateAfterSignOutAll,
+    navigateAfterMultiSessionSingleSignOut,
+    navigateAfterSignOut,
     navigateAfterSwitchSession,
     signInUrl,
     userProfileUrl,
-    afterSignOutOneUrl,
-    afterSignOutAllUrl,
+    afterMultiSessionSingleSignOutUrl,
+    afterSignOutUrl,
     afterSwitchSessionUrl,
   };
 };
