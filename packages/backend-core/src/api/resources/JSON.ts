@@ -25,6 +25,7 @@ export enum ObjectType {
   User = 'user',
   Web3Wallet = 'web3_wallet',
   Token = 'token',
+  TotalCount = 'total_count',
 }
 
 export interface ClerkResourceJSON {

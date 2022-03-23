@@ -186,3 +186,14 @@ test('updateUser() throws an error without user ID', async () => {
 test('deleteUser() throws an error without user ID', async () => {
   await expect(TestBackendAPIClient.users.deleteUser('')).rejects.toThrow('A valid ID is required.');
 });
+
+test('getCount() returns a valid number response', async () => {
+  nock('https://api.clerk.dev')
+    .get(`/v1/users/count`)
+    .replyWithFile(200, __dirname + '/responses/getCount.json', {
+      'Content-Type': 'application/json',
+    });
+
+  const userCount = await TestBackendAPIClient.users.getCount();
+  expect(userCount).toEqual(1);
+});
