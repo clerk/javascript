@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.0-alpha.1](https://github.com/clerkinc/javascript/compare/@clerk/types@2.1.0-alpha.0...@clerk/types@2.1.0-alpha.1) (2022-03-23)
+
+### Features
+
+- **types,clerk-js:** Allow connecting external accounts from the user profile page ([180961b](https://github.com/clerkinc/javascript/commit/180961b61d5f6b75b5bc373f5d644cd0576831a8))
+
 ## [2.1.0-alpha.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.0.1-alpha.3...@clerk/types@2.1.0-alpha.0) (2022-03-23)
 
 ### Features
