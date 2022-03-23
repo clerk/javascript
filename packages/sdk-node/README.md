@@ -415,7 +415,7 @@ const session = await clerk.sessions.verifySession(sessionId, sessionToken);
 
 User operations are exposed by the `users` sub-api (`clerk.users`).
 
-#### getUserList()
+#### getUserList(params?: UserListParams)
 
 Retrieves user list:
 
@@ -423,7 +423,7 @@ Retrieves user list:
 const users = await clerk.users.getUserList();
 ```
 
-Retrieves user list that is ordered and filtered by the number of results:
+Retrieves user list that is ordered and filtered by the number of results. More params can be found at the [UserListParams](https://github.com/clerkinc/javascript/blob/main/packages/backend-core/src/api/collection/UserApi.ts#L25) definition.
 
 ```ts
 const sessions = await clerk.users.getUserList({
@@ -442,6 +442,15 @@ const sessions = await clerk.users.getUserList({ emailAddress, phoneNumber });
 
 If these filters are included, the response will contain only users that own any of these emails and/or phone numbers.
 
+To do a broader match through a list of fields you can use the `query` parameter which partially matches the fields: `userId`, `emailAddress`, `phoneNumber`, `username`, `web3Wallet`, `firstName` and `lastName`.
+
+```ts
+// Matches users with the string `test` matched in multiple user attributes.
+const usersMatchingTest = await clerk.users.getUserList({
+  query: 'test',
+});
+```
+
 #### getUser(userId)
 
 Retrieves a single user by their id, if the id is valid. Throws an error otherwise.
@@ -449,6 +458,16 @@ Retrieves a single user by their id, if the id is valid. Throws an error otherwi
 ```ts
 const userId = 'my-user-id';
 const user = await clerk.users.getUser(userId);
+```
+
+#### getCount(params?: UserCountParams)
+
+Retrieves the total number of users. Can be filtered down adding parameters of the type [UserCountParams](https://github.com/clerkinc/javascript/blob/main/packages/backend-core/src/api/collection/UserApi.ts#L16)
+
+```ts
+const totalUsers = await clerk.users.getCount();
+// Filter down
+const totalUsersMatchingTest = await clerk.users.getCount({ query: 'test' });
 ```
 
 #### createUser(params)

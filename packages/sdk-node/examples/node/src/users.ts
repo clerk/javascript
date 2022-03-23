@@ -49,10 +49,6 @@ try {
   console.log(error);
 }
 
-try {
-  console.log('Delete user');
-  const deletedUser = await users.deleteUser(createdUserId);
-  console.log(deletedUser);
-} catch (error) {
-  console.log(error);
-}
+console.log('Get total count of users');
+const count = await users.getCount();
+console.log(count);

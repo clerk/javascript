@@ -13,14 +13,20 @@ interface UserParams {
   unsafeMetadata?: Record<string, unknown> | string;
 }
 
-interface UserListParams {
-  limit?: number;
-  offset?: number;
+type UserCountParams = {
   emailAddress?: string[];
   phoneNumber?: string[];
+  username?: string[];
+  web3Wallet?: string[];
+  query?: string;
   userId?: string[];
+};
+
+type UserListParams = UserCountParams & {
+  limit?: number;
+  offset?: number;
   orderBy?: 'created_at' | 'updated_at' | '+created_at' | '+updated_at' | '-created_at' | '-updated_at';
-}
+};
 
 const userMetadataKeys = ['publicMetadata', 'privateMetadata', 'unsafeMetadata'];
 
@@ -108,6 +114,14 @@ export class UserApi extends AbstractApi {
     return this._restClient.makeRequest<User>({
       method: 'DELETE',
       path: `/users/${userId}`,
+    });
+  }
+
+  public async getCount(params: UserListParams = {}) {
+    return this._restClient.makeRequest<number>({
+      method: 'GET',
+      path: '/users/count',
+      queryParams: params,
     });
   }
 }
