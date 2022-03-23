@@ -79,7 +79,7 @@ function App() {
     <>
       <h1>Hello Clerk!</h1>
       <SignedIn>
-        <UserButton afterSignOutAllUrl={window.location.href} />
+        <UserButton afterSignOutUrl={window.location.href} />
       </SignedIn>
       <SignedOut>
         <SignInButton mode='modal' />
