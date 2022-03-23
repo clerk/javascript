@@ -22,8 +22,7 @@ export function buildClerk({ frontendApi, tokenCache }: BuildClerkOptions): Cler
     clerk = new Clerk(frontendApi);
 
     if (!tokenCache) {
-      // Exit early if tokenCache is not provided, assuming web platform
-      return;
+      return clerk;
     }
 
     // @ts-expect-error

@@ -9,16 +9,17 @@ import { buildClerk } from './singleton';
 export type ClerkProviderProps = ClerkReactProviderProps & {
   children: React.ReactNode;
   tokenCache?: TokenCache;
+  hotload?: boolean;
 };
 
 export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
-  const { children, tokenCache, ...rest } = props;
+  const { children, tokenCache, hotload, ...rest } = props;
   const frontendApi = props.frontendApi || process.env.CLERK_FRONTEND_API || '';
 
   const clerkRef = React.useRef<ReturnType<typeof buildClerk> | null>(null);
 
   function getClerk() {
-    if (clerkRef.current === null) {
+    if (clerkRef.current === null && !hotload) {
       clerkRef.current = buildClerk({
         frontendApi,
         tokenCache,
