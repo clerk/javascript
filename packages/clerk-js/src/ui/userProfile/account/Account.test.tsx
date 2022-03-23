@@ -15,7 +15,7 @@ jest.mock('ui/contexts', () => {
       displayConfig: {},
     }),
     // @ts-ignore 2352
-    useCoreUser: () => ({ externalAccounts: [] } as UserResource),
+    useCoreUser: () => ({ externalAccounts: [], verifiedExternalAccounts: [], unverifiedExternalAccounts: [] } as UserResource),
     useCoreClerk: jest.fn(),
   };
 });

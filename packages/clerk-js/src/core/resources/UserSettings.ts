@@ -1,6 +1,6 @@
 import type {
   Attributes,
-  OauthProviders,
+  OAuthProviders,
   OAuthStrategy,
   SignInData,
   SignUpData,
@@ -16,7 +16,7 @@ import { BaseResource } from './internal';
  */
 export class UserSettings extends BaseResource implements UserSettingsResource {
   id = undefined;
-  social!: OauthProviders;
+  social!: OAuthProviders;
   attributes!: Attributes;
   signIn!: SignInData;
   signUp!: SignUpData;
@@ -66,7 +66,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
       .flat() as any as Web3Strategy[];
   }
 
-  private getSocialProviderStrategies(social: OauthProviders): OAuthStrategy[] {
+  private getSocialProviderStrategies(social: OAuthProviders): OAuthStrategy[] {
     if (!social) {
       return [];
     }

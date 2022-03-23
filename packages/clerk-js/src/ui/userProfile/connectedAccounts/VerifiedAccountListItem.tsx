@@ -1,14 +1,15 @@
 import { List } from '@clerk/shared/components/list';
+import { VerificationStatusTag } from '@clerk/shared/components/tag';
 import type { ExternalAccountResource } from '@clerk/types';
 import React from 'react';
 import { svgUrl } from 'ui/common/constants';
 import { useNavigate } from 'ui/hooks';
 
-type ConnectedAccountListItemProps = {
+type VerifiedAccountListItemProps = {
   externalAccount: ExternalAccountResource;
 };
 
-export function ConnectedAccountListItem({ externalAccount }: ConnectedAccountListItemProps): JSX.Element {
+export function VerifiedAccountListItem({ externalAccount }: VerifiedAccountListItemProps): JSX.Element {
   const { navigate } = useNavigate();
 
   return (
@@ -23,7 +24,14 @@ export function ConnectedAccountListItem({ externalAccount }: ConnectedAccountLi
           src={svgUrl(externalAccount.providerSlug())}
           className='cl-left-icon-wrapper'
         />
-        {externalAccount.emailAddress}
+        {externalAccount.username || externalAccount.emailAddress}
+
+        {externalAccount.label && ` (${externalAccount.label})`}
+
+        <VerificationStatusTag
+          className='cl-tag'
+          status={externalAccount.verification?.status || 'verified'}
+        />
       </div>
     </List.Item>
   );
