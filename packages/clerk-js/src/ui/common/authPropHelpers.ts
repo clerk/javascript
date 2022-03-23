@@ -20,21 +20,12 @@ type ParseAuthPropArgs =
 
 export const parseAuthProp = ({ ctx, queryParams, displayConfig, field }: ParseAuthPropArgs): string => {
   const snakeCaseField = camelToSnake(field);
-
-  // Todo: Dx: Deprecate afterSignIn and afterSignUp legacy fields
-  const legacyField = field.replace('Url', '');
-  let legacyFieldValue: string | undefined = undefined;
-  if (legacyField in ctx) {
-    // @ts-ignore
-    legacyFieldValue = ctx[legacyField];
-  }
   const queryParamValue = queryParams[snakeCaseField];
 
   return (
     (typeof queryParamValue === 'string' ? queryParamValue : null) ||
     (typeof queryParams.redirect_url === 'string' ? queryParams.redirect_url : null) ||
     ctx[field] ||
-    legacyFieldValue ||
     ctx.redirectUrl ||
     displayConfig[field]
   );
