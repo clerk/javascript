@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.2.0-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.1.2-staging.0...@clerk/clerk-js@3.2.0-staging.0) (2022-03-24)
+
+### Features
+
+- **types,clerk-js,backend-core,clerk-react:** Replace thrown error with null return in getToken ([d972f93](https://github.com/clerkinc/javascript/commit/d972f93684a39abf3619c335cc012b61d5187100))
+
+### Bug Fixes
+
+- **clerk-js:** Force client update on resource reload ([#143](https://github.com/clerkinc/javascript/issues/143)) ([1dd0af2](https://github.com/clerkinc/javascript/commit/1dd0af253466c49dca988f47a6bf30482d4ddcaa))
+
 ### [3.1.1-alpha.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.1.1-staging.0...@clerk/clerk-js@3.1.1-alpha.0) (2022-03-23)
 
 **Note:** Version bump only for package @clerk/clerk-js

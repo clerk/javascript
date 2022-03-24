@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.2.2-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.2.2-staging.0...@clerk/clerk-sdk-node@3.2.2-staging.1) (2022-03-24)
+
+### Bug Fixes
+
+- **clerk-sdk-node:** Add ServerGetToken on AuthProp enhancers ([8af677c](https://github.com/clerkinc/javascript/commit/8af677c615488aa07f807e2cb0706fb210473e6b))
+
 ### [3.2.1-alpha.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.2.1-staging.0...@clerk/clerk-sdk-node@3.2.1-alpha.0) (2022-03-23)
 
 **Note:** Version bump only for package @clerk/clerk-sdk-node

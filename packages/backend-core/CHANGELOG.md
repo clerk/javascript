@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.0-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.0.2-staging.0...@clerk/backend-core@1.1.0-staging.0) (2022-03-24)
+
+### Features
+
+- **types,clerk-js,backend-core,clerk-react:** Replace thrown error with null return in getToken ([d972f93](https://github.com/clerkinc/javascript/commit/d972f93684a39abf3619c335cc012b61d5187100))
+
 ### [1.0.1-alpha.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.0.1-staging.0...@clerk/backend-core@1.0.1-alpha.0) (2022-03-23)
 
 **Note:** Version bump only for package @clerk/backend-core
