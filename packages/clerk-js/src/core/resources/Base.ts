@@ -132,6 +132,6 @@ export abstract class BaseResource {
   }
 
   public async reload(): Promise<this> {
-    return this._baseGet();
+    return this._baseGet({ forceUpdateClient: true });
   }
 }

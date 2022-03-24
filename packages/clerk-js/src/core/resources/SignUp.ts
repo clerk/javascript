@@ -106,7 +106,7 @@ export class SignUp extends BaseResource implements SignUpResource {
 
       return new Promise((resolve, reject) => {
         void run(() => {
-          return this._baseGet({ forceUpdateClient: true })
+          return this.reload()
             .then(res => {
               const status = res.verifications.emailAddress.status;
               if (status === 'verified' || status === 'expired') {

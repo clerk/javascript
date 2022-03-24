@@ -113,7 +113,7 @@ export class SignIn extends BaseResource implements SignInResource {
       });
       return new Promise((resolve, reject) => {
         void run(() => {
-          return this._baseGet({ forceUpdateClient: true })
+          return this.reload()
             .then(res => {
               const status = res.firstFactorVerification.status;
               if (status === 'verified' || status === 'expired') {
