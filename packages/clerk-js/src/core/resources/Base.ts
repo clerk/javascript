@@ -130,4 +130,8 @@ export abstract class BaseResource {
   protected async _baseDelete<J extends ClerkResourceJSON | null>(params: BaseMutateParams = {}): Promise<void> {
     await this._baseMutate<J>({ ...params, method: 'DELETE' });
   }
+
+  public async reload(): Promise<this> {
+    return this._baseGet();
+  }
 }

@@ -710,8 +710,10 @@ export default class Clerk implements ClerkInterface {
   };
 
   #resetComponentsState = () => {
-    this.closeSignUp();
-    this.closeSignIn();
+    if (Clerk.Components) {
+      this.closeSignUp();
+      this.closeSignIn();
+    }
   };
 
   assertComponentsReady(components: Components | null | undefined): asserts components is Components {

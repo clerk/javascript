@@ -1,6 +1,6 @@
 import { render } from '@clerk/shared/testUtils';
 import { EnvironmentResource } from '@clerk/types';
-import { AuthConfig, Session } from 'core/resources/internal';
+import { AuthConfig, DisplayConfig, Session } from 'core/resources/internal';
 import React from 'react';
 import { SignUp } from 'ui/signUp/SignUp';
 
@@ -25,7 +25,7 @@ jest.mock('ui/contexts', () => {
         ({
           displayConfig: {
             homeUrl: 'https://www.bbc.com',
-          },
+          } as Partial<DisplayConfig>,
           authConfig: { singleSessionMode: true } as Partial<AuthConfig>,
         } as Partial<EnvironmentResource>),
     ),
