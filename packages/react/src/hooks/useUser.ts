@@ -7,12 +7,6 @@ type UseUserReturn =
   | { isLoaded: true; isSignedIn: false; user: null }
   | { isLoaded: true; isSignedIn: true; user: UserResource };
 
-type GuaranteedUseUserReturn = {
-  isLoaded: boolean;
-  isSignedIn: boolean;
-  user: UserResource;
-};
-
 /**
  * Returns the current auth state and if a user is signed in, the user object.
  *
@@ -63,16 +57,16 @@ type GuaranteedUseUserReturn = {
  *   return <div>Hello, {user.firstName}</div>
  * }
  */
-export function useUser<T>(): T extends guaranteed ? GuaranteedUseUserReturn : UseUserReturn {
+export function useUser(): UseUserReturn {
   const user = useUserContext();
 
   if (user === undefined) {
-    return { isLoaded: false, isSignedIn: undefined, user: undefined } as any;
+    return { isLoaded: false, isSignedIn: undefined, user: undefined };
   }
 
   if (user === null) {
-    return { isLoaded: true, isSignedIn: false, user: null } as any;
+    return { isLoaded: true, isSignedIn: false, user: null };
   }
 
-  return { isLoaded: true, isSignedIn: true, user } as any;
+  return { isLoaded: true, isSignedIn: true, user };
 }
