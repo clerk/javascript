@@ -20,14 +20,14 @@ type CreateGetToken = (params: {
  */
 export const createGetToken: CreateGetToken = params => {
   const { cookieToken, fetcher, headerToken, sessionId } = params || {};
-  return (options: ServerGetTokenOptions = {}) => {
+  return async (options: ServerGetTokenOptions = {}) => {
     if (!sessionId) {
-      throw new Error('getToken cannot be called without a session.');
+      return null;
     }
     if (options.template) {
       return fetcher(sessionId, options.template);
     }
-    return Promise.resolve(headerToken || cookieToken) as Promise<string>;
+    return (headerToken || cookieToken) as string;
   };
 };
 

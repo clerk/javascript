@@ -55,4 +55,4 @@ export interface PublicUserData {
 }
 
 export type GetTokenOptions = { template: string; leewayInSeconds?: number; skipCache?: boolean };
-export type GetToken = (options?: GetTokenOptions) => Promise<string>;
+export type GetToken = (options?: GetTokenOptions) => Promise<string | null>;

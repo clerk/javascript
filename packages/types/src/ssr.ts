@@ -3,7 +3,7 @@ import { SessionResource } from './session';
 import { UserResource } from './user';
 
 export type ServerGetTokenOptions = { template?: string };
-export type ServerGetToken = (options?: ServerGetTokenOptions) => Promise<string>;
+export type ServerGetToken = (options?: ServerGetTokenOptions) => Promise<string | null>;
 
 export type ServerSideAuth = {
   sessionId: string | null;
