@@ -1,4 +1,4 @@
 export * from './RemixClerkProvider';
-export { ConnectClerk } from './ConnectClerk';
-export * from './ConnectClerkCatchBoundary';
+export { ClerkApp } from './ClerkApp';
+export * from './ClerkCatchBoundary';
 export { WithClerkState } from './types';

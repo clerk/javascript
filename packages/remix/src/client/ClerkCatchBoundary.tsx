@@ -4,7 +4,7 @@ import React from 'react';
 
 import { Interstitial } from './Interstitial';
 
-export function ConnectClerkCatchBoundary(RootCatchBoundary?: () => JSX.Element) {
+export function ClerkCatchBoundary(RootCatchBoundary?: () => JSX.Element) {
   return () => {
     const { data } = useCatch();
     const { __clerk_ssr_interstitial, __frontendApi } = data?.clerkState?.__internal_clerk_state || {};

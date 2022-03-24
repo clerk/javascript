@@ -7,10 +7,10 @@ or come say hi in our discord server: https://rebrand.ly/clerk-discord
 `;
 };
 
-const ssrExample = `Use 'rootAuthLoader' as your root loader. Then, simply wrap the App component with ConnectClerk and make it the default export.
+const ssrExample = `Use 'rootAuthLoader' as your root loader. Then, simply wrap the App component with ClerkApp and make it the default export.
 Example:
 
-import { ConnectClerk } from '@clerk/remix';
+import { ClerkApp } from '@clerk/remix';
 import { rootAuthLoader } from '@clerk/remix/ssr.server';
 
 export const loader: LoaderFunction = args => rootAuthLoader(args)
@@ -23,7 +23,7 @@ function App() {
   );
 }
 
-export default ConnectClerk(App, { frontendApi: '...' });
+export default ClerkApp(App, { frontendApi: '...' });
 `;
 
 export const invalidClerkStatePropError = createErrorMessage(`
