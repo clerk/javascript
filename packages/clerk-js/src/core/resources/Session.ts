@@ -51,9 +51,9 @@ export class Session extends BaseResource implements SessionResource {
     });
   };
 
-  getToken: GetToken = async (options?: GetTokenOptions): Promise<string> => {
+  getToken: GetToken = async (options?: GetTokenOptions): Promise<string | null> => {
     if (!this.user) {
-      throw new Error('You cannot call getToken when user is null');
+      return null;
     }
 
     const { leewayInSeconds = 10, template, skipCache = false } = options || {};
