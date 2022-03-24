@@ -23,6 +23,7 @@ import Logger from './utils/Logger';
 import { Crypto, CryptoKey } from '@peculiar/webcrypto';
 
 import { decodeBase64, toSPKIDer } from './utils/crypto';
+import { ServerGetToken } from '@clerk/types';
 
 const defaultApiKey = process.env.CLERK_API_KEY || '';
 const defaultJWTKey = process.env.CLERK_JWT_KEY;
@@ -42,6 +43,7 @@ export type WithAuthProp<T> = T & {
   auth: {
     sessionId: string | null;
     userId: string | null;
+    getToken: ServerGetToken;
   };
 };
 
@@ -49,6 +51,7 @@ export type RequireAuthProp<T> = T & {
   auth: {
     sessionId: string;
     userId: string;
+    getToken: ServerGetToken;
   };
 };
 
