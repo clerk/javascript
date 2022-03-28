@@ -1,11 +1,11 @@
-import { SessionResource } from '@clerk/types';
+import { ActiveSessionResource } from '@clerk/types';
 
 import { useSessionContext } from '../contexts/SessionContext';
 
 type UseSessionReturn =
   | { isLoaded: false; isSignedIn: undefined; session: undefined }
   | { isLoaded: true; isSignedIn: false; session: null }
-  | { isLoaded: true; isSignedIn: true; session: SessionResource };
+  | { isLoaded: true; isSignedIn: true; session: ActiveSessionResource };
 
 type UseSession = () => UseSessionReturn;
 
