@@ -29,9 +29,10 @@ import {
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from 'core/errors';
-import { GenerateSignatureParams, generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from 'utils';
+import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from 'utils';
 
 import { BaseResource, Verification } from './internal';
+import { AuthenticateWithWeb3Params } from '@clerk/types/src';
 
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';
@@ -146,11 +147,8 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
-  public authenticateWithRedirect = async ({
-    strategy,
-    redirectUrl,
-    redirectUrlComplete,
-  }: AuthenticateWithRedirectParams): Promise<void> => {
+  public authenticateWithRedirect = async (params: AuthenticateWithRedirectParams): Promise<void> => {
+    const { strategy, redirectUrl, redirectUrlComplete } = params || {};
     const { firstFactorVerification } = await this.create({
       strategy,
       redirectUrl: redirectUrl,
@@ -167,13 +165,8 @@ export class SignIn extends BaseResource implements SignInResource {
     }
   };
 
-  public authenticateWithWeb3 = async ({
-    identifier,
-    generateSignature,
-  }: {
-    identifier: string;
-    generateSignature: (opts: GenerateSignatureParams) => Promise<string>;
-  }): Promise<SignInResource> => {
+  public authenticateWithWeb3 = async (params: AuthenticateWithWeb3Params): Promise<SignInResource> => {
+    const { identifier, generateSignature } = params || {};
     if (!(typeof generateSignature === 'function')) {
       clerkMissingOptionError('generateSignature');
     }
