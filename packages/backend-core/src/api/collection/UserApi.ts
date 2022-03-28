@@ -45,6 +45,7 @@ type CreateUserParams = {
   firstName?: string;
   lastName?: string;
   skipPasswordChecks?: boolean;
+  skipPasswordRequirement?: boolean;
 } & UserMetadataParams;
 
 type UserMetadataRequestBody = {
