@@ -32,10 +32,10 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
     });
   }
 
-  prepareVerification = (params?: PrepareEmailAddressVerificationParams): Promise<this> => {
+  prepareVerification = (params: PrepareEmailAddressVerificationParams): Promise<this> => {
     return this._basePost<EmailAddressJSON>({
       action: 'prepare_verification',
-      body: { ...(params || { strategy: 'email_code' }) },
+      body: { ...params },
     });
   };
 
