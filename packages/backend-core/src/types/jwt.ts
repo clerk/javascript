@@ -1,3 +1,4 @@
+/* Clerk-issued JWT payload */
 export interface JWTPayload {
   /**
    * JWT Issuer - [RFC7519#section-4.1.1](https://tools.ietf.org/html/rfc7519#section-4.1.1).

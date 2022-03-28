@@ -7,6 +7,8 @@
   createSignedOutState,
   JWTPayload,
 } from '@clerk/backend-core';
+import { ServerGetToken } from '@clerk/types';
+import { Crypto, CryptoKey } from '@peculiar/webcrypto';
 import Cookies from 'cookies';
 import deepmerge from 'deepmerge';
 import type { NextFunction, Request, Response } from 'express';
@@ -17,13 +19,10 @@ import querystring from 'querystring';
 
 import { SupportMessages } from './constants/SupportMessages';
 import { LIB_NAME, LIB_VERSION } from './info';
+import { decodeBase64, toSPKIDer } from './utils/crypto';
 import { ClerkServerError } from './utils/Errors';
 // utils
 import Logger from './utils/Logger';
-import { Crypto, CryptoKey } from '@peculiar/webcrypto';
-
-import { decodeBase64, toSPKIDer } from './utils/crypto';
-import { ServerGetToken } from '@clerk/types';
 
 const defaultApiKey = process.env.CLERK_API_KEY || '';
 const defaultJWTKey = process.env.CLERK_JWT_KEY;

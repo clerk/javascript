@@ -1,5 +1,5 @@
-import { JWTExpiredError } from '../api/utils/Errors';
-import { JWTPayload } from './types';
+import { JWTPayload } from '../types';
+import { JWTExpiredError } from './errors';
 const DEFAULT_ADDITIONAL_CLOCK_SKEW = 0;
 
 /**

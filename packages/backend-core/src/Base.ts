@@ -1,11 +1,19 @@
 import type { CryptoKey as PeculiarCryptoKey } from '@peculiar/webcrypto';
 
-import { JWTExpiredError } from './api/utils/Errors';
+import {
+  AuthState,
+  AuthStateParams,
+  AuthStatus,
+  BuildAuthenticatedStateOptions,
+  JWT,
+  JWTPayload,
+  VerifySessionTokenOptions,
+} from './types';
 import { parse } from './util/base64url';
 import { isDevelopmentOrStaging, isProduction } from './util/clerkApiKey';
+import { JWTExpiredError, MissingJWTVerificationKeyError } from './util/errors';
 import { checkClaims, isExpired } from './util/jwt';
 import { checkCrossOrigin } from './util/request';
-import { JWT, JWTPayload } from './util/types';
 
 export const API_KEY = process.env.CLERK_API_KEY || '';
 
@@ -13,58 +21,6 @@ type ImportKeyFunction = (...args: any[]) => Promise<CryptoKey | PeculiarCryptoK
 type LoadCryptoKeyFunction = (token: string) => Promise<CryptoKey>;
 type DecodeBase64Function = (base64Encoded: string) => string;
 type VerifySignatureFunction = (...args: any[]) => Promise<boolean>;
-
-export enum AuthStatus {
-  SignedIn = 'Signed in',
-  SignedOut = 'Signed out',
-  Interstitial = 'Interstitial',
-}
-
-export type Session = {
-  id?: string;
-  userId?: string;
-};
-
-export type VerifySessionTokenOptions = {
-  authorizedParties?: string[];
-  jwtKey?: string;
-};
-
-type AuthState = {
-  status: AuthStatus;
-  session?: Session;
-  interstitial?: string;
-  sessionClaims?: JWTPayload;
-};
-
-type AuthStateParams = {
-  /* Client token cookie value */
-  cookieToken?: string;
-  /* Client uat cookie value */
-  clientUat?: string;
-  /* Client token header value */
-  headerToken?: string | null;
-  /* Request origin header value */
-  origin?: string | null;
-  /* Request host header value */
-  host: string;
-  /* Request forwarded host value */
-  forwardedHost?: string | null;
-  /* Request forwarded port value */
-  forwardedPort?: string | null;
-  /* Request forwarded proto value */
-  forwardedProto?: string | null;
-  /* Request referrer */
-  referrer?: string | null;
-  /* Request user-agent value */
-  userAgent?: string | null;
-  /* A list of authorized parties to validate against the session token azp claim */
-  authorizedParties?: string[];
-  /* HTTP utility for fetching a text/html string */
-  fetchInterstitial: () => Promise<string>;
-  /* Value corresponding to the JWT verification key */
-  jwtKey?: string;
-};
 
 export class Base {
   importKeyFunction: ImportKeyFunction;
@@ -223,31 +179,8 @@ export class Base {
     fetchInterstitial,
     jwtKey,
   }: AuthStateParams): Promise<AuthState> => {
-    let sessionClaims;
     if (headerToken) {
-      try {
-        sessionClaims = await this.verifySessionToken(headerToken, {
-          authorizedParties,
-          jwtKey,
-        });
-        return {
-          status: AuthStatus.SignedIn,
-          session: {
-            id: sessionClaims.sid,
-            userId: sessionClaims.sub,
-          },
-          sessionClaims,
-        };
-      } catch (err) {
-        if (err instanceof JWTExpiredError) {
-          return {
-            status: AuthStatus.Interstitial,
-            interstitial: await fetchInterstitial(),
-          };
-        } else {
-          return { status: AuthStatus.SignedOut };
-        }
-      }
+      return this.buildAuthenticatedState(headerToken, { jwtKey, authorizedParties, fetchInterstitial });
     }
 
     // In development or staging environments only, based on the request's
@@ -323,23 +256,32 @@ export class Base {
       };
     }
 
+    const authenticatedState = await this.buildAuthenticatedState(cookieToken as string, {
+      jwtKey,
+      authorizedParties,
+      fetchInterstitial,
+    });
+
+    if (authenticatedState.sessionClaims && authenticatedState.sessionClaims.iat >= Number(clientUat)) {
+      return authenticatedState;
+    }
+
+    return {
+      status: AuthStatus.Interstitial,
+      interstitial: await fetchInterstitial(),
+    };
+  };
+
+  buildAuthenticatedState = async (
+    token: string,
+    { authorizedParties, jwtKey, fetchInterstitial }: BuildAuthenticatedStateOptions,
+  ): Promise<AuthState> => {
     try {
-      sessionClaims = await this.verifySessionToken(cookieToken as string, {
+      const sessionClaims = await this.verifySessionToken(token, {
         authorizedParties,
         jwtKey,
       });
-    } catch (err) {
-      if (err instanceof JWTExpiredError) {
-        return {
-          status: AuthStatus.Interstitial,
-          interstitial: await fetchInterstitial(),
-        };
-      } else {
-        return { status: AuthStatus.SignedOut };
-      }
-    }
 
-    if (cookieToken && clientUat && sessionClaims.iat >= Number(clientUat)) {
       return {
         status: AuthStatus.SignedIn,
         session: {
@@ -348,11 +290,18 @@ export class Base {
         },
         sessionClaims,
       };
+    } catch (err) {
+      if (err instanceof JWTExpiredError) {
+        return {
+          status: AuthStatus.Interstitial,
+          interstitial: await fetchInterstitial(),
+        };
+      } else if (err instanceof MissingJWTVerificationKeyError) {
+        throw Error(
+          'Missing JWT verification key. The key can be found in Dashboard > Settings > API Keys > JWT Verification Key',
+        );
+      }
+      return { status: AuthStatus.SignedOut };
     }
-
-    return {
-      status: AuthStatus.Interstitial,
-      interstitial: await fetchInterstitial(),
-    };
   };
 }
