@@ -98,6 +98,10 @@ export class Session extends BaseResource implements SessionResource {
     return (template || '').startsWith('integration_');
   };
 
+  #removeLegacyIntegrationPrefix = (template: string | undefined): string => {
+    return (template || '').replace('integration_', '');
+  };
+
   // Can be removed once `integration_firebase` and `integration_hasura`
   // are no longer supported
   #handleLegacyIntegrationToken = async (options: GetTokenOptions): Promise<string> => {
@@ -107,7 +111,7 @@ export class Session extends BaseResource implements SessionResource {
       return cachedEntry.tokenResolver.then(res => res.getRawString());
     }
     const resolver = Token.create(this.user!.pathRoot + '/tokens', {
-      service: template,
+      service: this.#removeLegacyIntegrationPrefix(template),
     });
     SessionTokenCache.set({
       tokenId: this.user!.id,
