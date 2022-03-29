@@ -16,7 +16,7 @@ exports[`ActiveAccountsManager does not render active accounts with only a singl
         className="avatar cl-user-button-avatar"
         height={36}
         onError={[Function]}
-        src="http://test.host/profile.png?height=64"
+        src="https://images.clerktest.host/profile.png?height=64"
         title="John Doe"
         width={36}
       />
@@ -113,7 +113,7 @@ exports[`ActiveAccountsManager renders a switcher with all the available session
         className="avatar cl-user-button-avatar"
         height={36}
         onError={[Function]}
-        src="http://test.host/profile.png?height=64"
+        src="https://images.clerktest.host/profile.png?height=64"
         title="John Doe"
         width={36}
       />
@@ -132,15 +132,41 @@ exports[`ActiveAccountsManager renders a switcher with all the available session
       className="button text primary hoverable cl-account-switcher-button"
       onClick={[Function]}
     >
-      <img
-        alt="Carla Coe"
-        className="avatar cl-user-button-avatar"
-        height={36}
-        onError={[Function]}
-        src="http://test.host/profile.png?height=64"
-        title="Carla Coe"
-        width={36}
-      />
+      <svg
+        aria-label="Carla Coe"
+        className="cl-user-button-avatar"
+        style={
+          Object {
+            "height": 36,
+            "width": 36,
+          }
+        }
+        version="1.1"
+        viewBox="0, 0, 100, 100"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <title>
+          Carla Coe
+        </title>
+        <circle
+          cx="50"
+          cy="50"
+          fill="currentColor"
+          r="49"
+          strokeWidth="0"
+        />
+        <text
+          fill="#ffffff"
+          fontFamily="inherit"
+          fontSize="60"
+          fontWeight="400"
+          textAnchor="middle"
+          x="50"
+          y="71.5"
+        >
+          CC
+        </text>
+      </svg>
       <div
         className="cl-details"
       >
@@ -200,7 +226,7 @@ exports[`ActiveAccountsManager renders all active sessions even in single sessio
         className="avatar cl-user-button-avatar"
         height={36}
         onError={[Function]}
-        src="http://test.host/profile.png?height=64"
+        src="https://images.clerktest.host/profile.png?height=64"
         title="John Doe"
         width={36}
       />

@@ -17,7 +17,7 @@ jest.mock('ui/contexts/CoreUserContext', () => {
             id: 'fbac_yolo',
             provider: 'facebook',
             approvedScopes: 'email',
-            avatarUrl: 'http://text.host/avatar.png',
+            avatarUrl: 'http://images.clerktest.host/avatar.png',
             emailAddress: 'peter@gmail.com',
             firstName: 'Peter',
             lastName: 'Smith',
@@ -30,7 +30,7 @@ jest.mock('ui/contexts/CoreUserContext', () => {
             provider: 'google',
             approvedScopes:
               'email https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid profile',
-            avatarUrl: 'http://text.host/avatar.png',
+            avatarUrl: 'http://images.clerktest.host/avatar.png',
             emailAddress: 'peter@gmail.com',
             firstName: 'Peter',
             lastName: 'Smith',

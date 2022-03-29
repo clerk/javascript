@@ -10,7 +10,7 @@ describe('<Avatar/>', () => {
       <Avatar
         firstName='John'
         lastName='Doe'
-        profileImageUrl='http://test.host/avatar.png'
+        profileImageUrl='http://images.clerktest.host/avatar.png'
         optimize
       />,
     );
@@ -43,7 +43,7 @@ describe('<Avatar/>', () => {
       <Avatar
         firstName='John'
         lastName='Doe'
-        profileImageUrl='http://test.host/avatar.png'
+        profileImageUrl='https://images.clerktest.host/avatar.png'
       />,
     );
     const avatar = screen.getByAltText('John Doe');
@@ -55,7 +55,7 @@ describe('<Avatar/>', () => {
       <Avatar
         firstName='John'
         lastName='Doe'
-        profileImageUrl='http://test.host/avatar.png'
+        profileImageUrl='https://images.clerktest.host/avatar.png'
       />,
     );
     const avatar = screen.getByAltText('John Doe');

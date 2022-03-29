@@ -49,7 +49,7 @@ jest.mock('ui/contexts', () => {
         user: {
           firstName: 'John',
           lastName: 'Doe',
-          profileImageUrl: 'http://test.host/profile.png',
+          profileImageUrl: 'https://images.clerktest.host/profile.png',
           primaryEmailAddress: 'jdoe@example.com',
         },
       };
