@@ -1,15 +1,40 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<Avatar/> renders the image  1`] = `
-<img
-  alt="John Doe"
-  className="avatar"
-  height={24}
-  onError={[Function]}
-  src="http://test.host/avatar.png?height=64"
-  title="John Doe"
-  width={24}
-/>
+<svg
+  aria-label="John Doe"
+  style={
+    Object {
+      "height": 24,
+      "width": 24,
+    }
+  }
+  version="1.1"
+  viewBox="0, 0, 100, 100"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <title>
+    John Doe
+  </title>
+  <circle
+    cx="50"
+    cy="50"
+    fill="currentColor"
+    r="49"
+    strokeWidth="0"
+  />
+  <text
+    fill="#ffffff"
+    fontFamily="inherit"
+    fontSize="60"
+    fontWeight="400"
+    textAnchor="middle"
+    x="50"
+    y="71.5"
+  >
+    JD
+  </text>
+</svg>
 `;
 
 exports[`<Avatar/> renders the initials  1`] = `

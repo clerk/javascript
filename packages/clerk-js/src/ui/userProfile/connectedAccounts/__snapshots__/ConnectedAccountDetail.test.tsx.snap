@@ -73,7 +73,7 @@ Array [
               className="avatar cl-image"
               height={32}
               onError={[Function]}
-              src="http://text.host/avatar.png"
+              src="https://www.gravatar.com/avatar?d=mp"
               title=""
               width={32}
             />

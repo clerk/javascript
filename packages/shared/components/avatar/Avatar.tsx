@@ -5,12 +5,10 @@ import { isRetinaDisplay } from '../../utils/isRetinaDisplay';
 //@ts-ignore
 import styles from './Avatar.module.scss';
 
-const CLERK_DEFAULT_AVATAR = 'https://images.clerk.services/clerk/default-profile.svg';
 const GRAVATAR_DEFAULT_AVATAR = 'https://www.gravatar.com/avatar?d=mp';
 
 function hasAvatar(profileImageUrl: string | undefined) {
-  // TODO: Revise this brittle check. Users without avatar should have null or undefined profile_image_url
-  return !!profileImageUrl && profileImageUrl !== CLERK_DEFAULT_AVATAR && profileImageUrl !== GRAVATAR_DEFAULT_AVATAR;
+  return profileImageUrl?.startsWith('https://images.clerk');
 }
 
 function getInitials(
@@ -66,12 +64,17 @@ export function Avatar({
     );
   }
 
-  const optimisedHeight = Math.max(profileImageFetchSize, size) * (isRetinaDisplay() ? 2 : 1);
-
   let src;
 
   if (avatarExists) {
-    src = optimize ? `${profileImageUrl}?height=${optimisedHeight}` : profileImageUrl;
+    if (optimize) {
+      const srcUrl = new URL(profileImageUrl!);
+      const optimizedHeight = Math.max(profileImageFetchSize, size) * (isRetinaDisplay() ? 2 : 1);
+      srcUrl.searchParams.append('height', optimizedHeight.toString());
+      src = srcUrl.toString();
+    } else {
+      src = profileImageUrl;
+    }
   } else {
     src = GRAVATAR_DEFAULT_AVATAR;
   }

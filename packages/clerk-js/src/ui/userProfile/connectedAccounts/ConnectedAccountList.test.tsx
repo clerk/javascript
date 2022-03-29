@@ -43,7 +43,7 @@ jest.mock('ui/contexts', () => {
             id: 'fbac_yolo',
             provider: 'facebook',
             approved_scopes: 'email',
-            avatar_url: 'http://text.host/avatar.png',
+            avatar_url: 'http://images.clerktest.host/avatar.png',
             email_address: 'peter@gmail.com',
             first_name: 'Peter',
             last_name: 'Smith',
@@ -55,7 +55,7 @@ jest.mock('ui/contexts', () => {
             provider: 'google',
             approved_scopes:
               'email https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid profile',
-            avatar_url: 'http://text.host/avatar.png',
+            avatar_url: 'http://images.clerktest.host/avatar.png',
             email_address: 'peter@gmail.com',
             first_name: 'Peter',
             last_name: 'Smith',

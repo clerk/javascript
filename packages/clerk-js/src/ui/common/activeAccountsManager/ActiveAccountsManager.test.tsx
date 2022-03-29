@@ -10,7 +10,7 @@ const session = {
   publicUserData: {
     firstName: 'John',
     lastName: 'Doe',
-    profileImageUrl: 'http://test.host/profile.png',
+    profileImageUrl: 'https://images.clerktest.host/profile.png',
     primaryEmailAddress: 'jdoe@example.com',
   },
 } as any as SessionResource;
