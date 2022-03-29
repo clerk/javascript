@@ -1,5 +1,5 @@
+import { JWTPayload } from '../../types';
 import { checkClaims } from '../../util/jwt';
-import { JWTPayload } from '../../util/types';
 
 test('check jwt claims with no issuer', () => {
   const dummyClaims: JWTPayload = {
