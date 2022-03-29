@@ -16,9 +16,10 @@ export interface ClerkProviderProps extends IsomorphicClerkOptions {
 
 function ClerkProviderBase(props: React.PropsWithChildren<ClerkProviderProps>) {
   const [clerkLoaded, setClerkLoaded] = useState(false);
+
   const clerk = useMemo(() => {
-    const { frontendApi = '', Clerk: ClerkConstructor, initialState, ...rest } = props;
-    return new IsomorphicClerk(frontendApi, rest, ClerkConstructor, initialState);
+    const { frontendApi = '', Clerk: ClerkConstructor, initialState, ...options } = props;
+    return IsomorphicClerk.getOrCreateInstance({ frontendApi, options, Clerk: ClerkConstructor, initialState });
   }, []);
 
   useEffect(() => {
