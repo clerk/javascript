@@ -5,10 +5,11 @@ import { isRetinaDisplay } from '../../utils/isRetinaDisplay';
 //@ts-ignore
 import styles from './Avatar.module.scss';
 
+const CLERK_IMAGE_URL_REGEX = /https\:\/\/images\.(lcl)?clerk/i;
 const GRAVATAR_DEFAULT_AVATAR = 'https://www.gravatar.com/avatar?d=mp';
 
-function hasAvatar(profileImageUrl: string | undefined) {
-  return profileImageUrl?.startsWith('https://images.clerk');
+function hasAvatar(profileImageUrl: string | undefined): boolean {
+  return CLERK_IMAGE_URL_REGEX.test(profileImageUrl!);
 }
 
 function getInitials(
