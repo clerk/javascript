@@ -1,6 +1,6 @@
 {
   "name": "@clerk/remix",
-  "version": "0.3.5-staging.0",
+  "version": "0.3.5-staging.1",
   "license": "MIT",
   "description": "Clerk.dev SDK for Remix",
   "keywords": [
@@ -32,7 +32,7 @@
     "dev": "tsc -p tsconfig.build.json --watch"
   },
   "dependencies": {
-    "@clerk/clerk-react": "^3.2.2-staging.0",
+    "@clerk/clerk-react": "^3.2.2-staging.1",
     "@clerk/clerk-sdk-node": "^3.2.4",
     "@clerk/types": "^2.2.1",
     "cookie": "^0.4.2",
