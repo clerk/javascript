@@ -11,34 +11,46 @@ const FAILED_TO_LOAD_ERROR = 'Clerk: Failed to load Clerk';
 const MISSING_PROVIDER_ERROR = 'Clerk: Missing provider';
 const MISSING_BODY_ERROR = 'Clerk: Missing <body> element.';
 
-function isStaging(frontendApi: string): boolean {
+const NON_STABLE_RELEASE_TAGS = ['staging'];
+
+const extractNonStableTag = (packageVersion: string) => {
+  const tag = packageVersion.match(/-(.*)\./)?.[1];
+  return tag && NON_STABLE_RELEASE_TAGS.includes(tag) ? tag : undefined;
+};
+
+const extractMajorVersion = (packageVersion: string) => {
+  return packageVersion.split('.')[0];
+};
+
+const forceStagingReleaseForClerkFapi = (frontendApi: string): boolean => {
   return (
     frontendApi.endsWith('.lclstage.dev') ||
     frontendApi.endsWith('.stgstage.dev') ||
     frontendApi.endsWith('.clerkstage.dev')
   );
-}
-
-function extractTag(packageJsonVersion: string) {
-  return packageJsonVersion.match(/-(.*)\./);
-}
+};
 
 function getScriptSrc({ frontendApi, scriptUrl, scriptVariant = '' }: LoadScriptParams): string {
   if (scriptUrl) {
     return scriptUrl;
   }
 
-  const majorVersion = isStaging(frontendApi) ? 'staging' : parseInt(LIB_VERSION.split('.')[0], 10);
+  const variant = scriptVariant ? `${scriptVariant.replace(/\.+$/, '')}.` : '';
+  const getUrlForTag = (target: string) => {
+    console.log('target', target);
+    return `https://${frontendApi}/npm/@clerk/clerk-js@${target}/dist/clerk.${variant}browser.js`;
+  };
 
-  const tag = extractTag(LIB_VERSION);
-  const sourceVersion = tag === null ? majorVersion : 'next';
-
-  if (scriptVariant) {
-    scriptVariant = scriptVariant.replace(/\.+$/, '') as ScriptVariant;
-    scriptVariant += '.';
+  if (forceStagingReleaseForClerkFapi(frontendApi)) {
+    return getUrlForTag('staging');
   }
 
-  return `https://${frontendApi}/npm/@clerk/clerk-js@${sourceVersion}/dist/clerk.${scriptVariant}browser.js`;
+  const nonStableTag = extractNonStableTag(LIB_VERSION);
+  if (nonStableTag) {
+    return getUrlForTag(nonStableTag);
+  }
+
+  return getUrlForTag(extractMajorVersion(LIB_VERSION));
 }
 
 export type ScriptVariant = '' | 'headless';
