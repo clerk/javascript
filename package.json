@@ -38,7 +38,7 @@
     "lint-fix": "eslint . --ext .ts",
     "bump": "lerna version",
     "bump:next": "lerna version --conventional-prerelease",
-    "bump:staging": "lerna version prepatch --preid staging --no-changelog",
+    "bump:staging": "lerna version --conventional-prerelease --preid staging --no-changelog",
     "graduate": "lerna version --conventional-graduate",
     "release:staging": "lerna publish from-package --dist-tag staging",
     "release": "lerna publish from-package",
