@@ -104,7 +104,7 @@ export class Base {
    */
   verifySessionToken = async (
     token: string,
-    { authorizedParties, jwtKey }: VerifySessionTokenOptions,
+    { authorizedParties, jwtKey }: VerifySessionTokenOptions = {},
   ): Promise<JWTPayload> => {
     /**
      * Priority of JWT key search
