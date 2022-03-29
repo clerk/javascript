@@ -1,11 +1,12 @@
-import { render, renderJSON, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
+import { mocked, render, renderJSON, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
 import { titleize } from '@clerk/shared/utils/string';
-import { UserSettingsJSON } from '@clerk/types';
+import { SignInResource, UserSettingsJSON } from '@clerk/types';
 import { Session, UserSettings } from 'core/resources/internal';
 import React from 'react';
-import { useCoreSignUp } from 'ui/contexts';
+import { useCoreSignIn, useCoreSignUp } from 'ui/contexts';
 
 import { SignUpStart } from './SignUpStart';
+import { SignInStart } from 'ui/signIn/SignInStart';
 
 const navigateMock = jest.fn();
 const mockCreateRequest = jest.fn();
@@ -269,6 +270,31 @@ describe('<SignUpStart/>', () => {
       render(<SignUpStart />);
 
       expect(screen.getByText(errorMsg)).toBeInTheDocument();
+      expect(mockCreateRequest).toHaveBeenNthCalledWith(1, {});
+    });
+  });
+
+  describe('when a miscellaneous oauth error occurs', () => {
+    it('renders a generic error message', () => {
+      const genericErrorMsg = 'Unable to complete action at this time. If the problem persists please contact support.';
+
+      (useCoreSignUp as jest.Mock).mockImplementation(() => {
+        return {
+          create: mockCreateRequest,
+          verifications: {
+            externalAccount: {
+              error: {
+                code: 'omg_they_killed_kenny',
+                longMessage: 'All hope is lost',
+              },
+            },
+          },
+        };
+      });
+
+      render(<SignUpStart />);
+
+      expect(screen.getByText(genericErrorMsg)).toBeInTheDocument();
       expect(mockCreateRequest).toHaveBeenNthCalledWith(1, {});
     });
   });

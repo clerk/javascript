@@ -83,8 +83,18 @@ export function _SignInStart(): JSX.Element {
   React.useEffect(() => {
     async function handleOauthError() {
       const error = signIn?.firstFactorVerification?.error;
-      if (error?.code === ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP || error?.code === ERROR_CODES.OAUTH_ACCESS_DENIED) {
-        setError(error.longMessage);
+
+      if (error) {
+        switch (error.code) {
+          case ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP:
+          case ERROR_CODES.OAUTH_ACCESS_DENIED:
+            setError(error.longMessage);
+            break;
+          default:
+            // Error from server may be too much information for the end user, so set a generic error
+            setError('Unable to complete action at this time. If the problem persists please contact support.');
+        }
+
         // TODO: This is a workaround in order to reset the sign in attempt
         // so that the oauth error does not persist on full page reloads.
         void (await signIn.create({}));
