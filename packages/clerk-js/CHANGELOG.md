@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.2.3-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.2.2...@clerk/clerk-js@3.2.3-staging.1) (2022-03-29)
+
+### Bug Fixes
+
+- **clerk-js:** Prevent loading if Clerk is already loaded ([5df8b0e](https://github.com/clerkinc/javascript/commit/5df8b0eb8b2618ef44de2990b14925bcd146db7b))
+
 ### [3.2.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.2.2-staging.0...@clerk/clerk-js@3.2.2) (2022-03-29)
 
 **Note:** Version bump only for package @clerk/clerk-js

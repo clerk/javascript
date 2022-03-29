@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.2.2-staging.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@3.2.1...@clerk/clerk-react@3.2.2-staging.2) (2022-03-29)
+
+### Bug Fixes
+
+- **clerk-react:** Make IsomorphicClerk a singleton to prevent reinitialisation ([c9405fc](https://github.com/clerkinc/javascript/commit/c9405fcbdec4e66da723b7f82e153f62b0fcf2aa))
+- **clerk-react:** Make scriptLoader respect non-stable package tags ([e107d38](https://github.com/clerkinc/javascript/commit/e107d381b5d75f4cedd0998a0974f2ce912d3fa7))
+
+### [3.2.2-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@3.2.2-staging.0...@clerk/clerk-react@3.2.2-staging.1) (2022-03-29)
+
+### Bug Fixes
+
+- **clerk-react:** Make scriptLoader respect non-stable package tags ([109ac33](https://github.com/clerkinc/javascript/commit/109ac331bd2d39e204a40b30f9c91f398ea5ca1a))
+
 ### [3.2.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@3.2.1-staging.0...@clerk/clerk-react@3.2.1) (2022-03-28)
 
 **Note:** Version bump only for package @clerk/clerk-react
