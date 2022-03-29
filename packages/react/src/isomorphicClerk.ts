@@ -35,6 +35,13 @@ type MethodName<T> = {
 }[keyof T];
 type MethodCallback = () => void;
 
+type NewIsomorphicClerkParams = {
+  frontendApi: string;
+  options: IsomorphicClerkOptions;
+  Clerk: ClerkProp | null;
+  initialState?: InitialState;
+};
+
 export default class IsomorphicClerk {
   private mode: string;
   private frontendApi: string;
@@ -50,20 +57,29 @@ export default class IsomorphicClerk {
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
   private loadedListeners: Array<() => void> = [];
 
-  private _loaded = false;
+  #loaded = false;
 
   initialState: InitialState | undefined;
 
   get loaded(): boolean {
-    return this._loaded;
+    return this.#loaded;
   }
 
-  constructor(
-    frontendApi: string,
-    options: IsomorphicClerkOptions = {},
-    Clerk: ClerkProp = null,
-    initialState?: InitialState,
-  ) {
+  static #instance: IsomorphicClerk;
+
+  static getOrCreateInstance(params: NewIsomorphicClerkParams) {
+    if (!this.#instance) {
+      this.#instance = new IsomorphicClerk(params);
+    }
+    return this.#instance;
+  }
+
+  constructor(params: NewIsomorphicClerkParams) {
+    if (IsomorphicClerk.#instance) {
+      throw new Error('An IsomorphicClerk instance already exists. Use IsomorphicClerk.getOrCreateInstance instead');
+    }
+
+    const { Clerk = null, frontendApi, initialState, options = {} } = params || {};
     this.frontendApi = frontendApi;
     this.options = options;
     this.Clerk = Clerk;
@@ -72,6 +88,10 @@ export default class IsomorphicClerk {
   }
 
   async loadClerkJS(): Promise<BrowserClerk | undefined> {
+    if (this.#loaded) {
+      return;
+    }
+
     if (!this.frontendApi) {
       this.throwError(noFrontendApiError);
     }
@@ -178,7 +198,7 @@ export default class IsomorphicClerk {
       clerkjs.mountUserButton(node, props);
     });
 
-    this._loaded = true;
+    this.#loaded = true;
     this.emitLoaded();
     return this.clerkjs;
   };
@@ -235,7 +255,7 @@ export default class IsomorphicClerk {
   };
 
   openSignIn = (props?: SignInProps): void => {
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       this.clerkjs.openSignIn(props);
     } else {
       this.preopenSignIn = props;
@@ -243,7 +263,7 @@ export default class IsomorphicClerk {
   };
 
   closeSignIn = (): void => {
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       this.clerkjs.closeSignIn();
     } else {
       this.preopenSignIn = null;
@@ -251,7 +271,7 @@ export default class IsomorphicClerk {
   };
 
   openSignUp = (props?: SignUpProps): void => {
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       this.clerkjs.openSignUp(props);
     } else {
       this.preopenSignUp = props;
@@ -259,7 +279,7 @@ export default class IsomorphicClerk {
   };
 
   closeSignUp = (): void => {
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       this.clerkjs.closeSignUp();
     } else {
       this.preopenSignUp = null;
@@ -267,7 +287,7 @@ export default class IsomorphicClerk {
   };
 
   mountSignIn = (node: HTMLDivElement, props: SignInProps): void => {
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       this.clerkjs.mountSignIn(node, props);
     } else {
       this.premountSignInNodes.set(node, props);
@@ -275,7 +295,7 @@ export default class IsomorphicClerk {
   };
 
   unmountSignIn = (node: HTMLDivElement): void => {
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       this.clerkjs.unmountSignIn(node);
     } else {
       this.premountSignInNodes.delete(node);
@@ -283,7 +303,7 @@ export default class IsomorphicClerk {
   };
 
   mountSignUp = (node: HTMLDivElement, props: SignUpProps): void => {
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       this.clerkjs.mountSignUp(node, props);
     } else {
       this.premountSignUpNodes.set(node, props);
@@ -291,7 +311,7 @@ export default class IsomorphicClerk {
   };
 
   unmountSignUp = (node: HTMLDivElement): void => {
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       this.clerkjs.unmountSignUp(node);
     } else {
       this.premountSignUpNodes.delete(node);
@@ -299,7 +319,7 @@ export default class IsomorphicClerk {
   };
 
   mountUserProfile = (node: HTMLDivElement, props: UserProfileProps): void => {
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       this.clerkjs.mountUserProfile(node, props);
     } else {
       this.premountUserProfileNodes.set(node, props);
@@ -307,7 +327,7 @@ export default class IsomorphicClerk {
   };
 
   unmountUserProfile = (node: HTMLDivElement): void => {
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       this.clerkjs.unmountUserProfile(node);
     } else {
       this.premountUserProfileNodes.delete(node);
@@ -315,7 +335,7 @@ export default class IsomorphicClerk {
   };
 
   mountUserButton = (node: HTMLDivElement, userButtonProps: UserButtonProps): void => {
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       this.clerkjs.mountUserButton(node, userButtonProps);
     } else {
       this.premountUserButtonNodes.set(node, userButtonProps);
@@ -323,7 +343,7 @@ export default class IsomorphicClerk {
   };
 
   unmountUserButton = (node: HTMLDivElement): void => {
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       this.clerkjs.unmountUserButton(node);
     } else {
       this.premountUserButtonNodes.delete(node);
@@ -341,7 +361,7 @@ export default class IsomorphicClerk {
 
   navigate = (to: string): void => {
     const callback = () => this.clerkjs?.navigate(to);
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       void callback();
     } else {
       this.premountMethodCalls.set('navigate', callback);
@@ -350,7 +370,7 @@ export default class IsomorphicClerk {
 
   redirectToSignIn = (opts: RedirectOptions): void => {
     const callback = () => this.clerkjs?.redirectToSignIn(opts as any);
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       void callback();
     } else {
       this.premountMethodCalls.set('redirectToSignIn', callback);
@@ -359,7 +379,7 @@ export default class IsomorphicClerk {
 
   redirectToSignUp = (opts: RedirectOptions): void => {
     const callback = () => this.clerkjs?.redirectToSignUp(opts as any);
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       void callback();
     } else {
       this.premountMethodCalls.set('redirectToSignUp', callback);
@@ -368,7 +388,7 @@ export default class IsomorphicClerk {
 
   redirectToUserProfile = (): void => {
     const callback = () => this.clerkjs?.redirectToUserProfile();
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       callback();
     } else {
       this.premountMethodCalls.set('redirectToUserProfile', callback);
@@ -377,7 +397,7 @@ export default class IsomorphicClerk {
 
   handleRedirectCallback = (params: HandleOAuthCallbackParams): void => {
     const callback = () => this.clerkjs?.handleRedirectCallback(params);
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       void callback();
     } else {
       this.premountMethodCalls.set('handleRedirectCallback', callback);
@@ -386,7 +406,7 @@ export default class IsomorphicClerk {
 
   handleMagicLinkVerification = async (params: HandleMagicLinkVerificationParams): Promise<void> => {
     const callback = () => this.clerkjs?.handleMagicLinkVerification(params);
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('handleMagicLinkVerification', callback);
@@ -395,7 +415,7 @@ export default class IsomorphicClerk {
 
   authenticateWithMetamask = async (params: AuthenticateWithMetamaskParams): Promise<void> => {
     const callback = () => this.clerkjs?.authenticateWithMetamask(params);
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('authenticateWithMetamask', callback);
@@ -404,7 +424,7 @@ export default class IsomorphicClerk {
 
   createOrganization = async (params: CreateOrganizationParams): Promise<OrganizationResource | void> => {
     const callback = () => this.clerkjs?.createOrganization(params);
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       return callback() as Promise<OrganizationResource>;
     } else {
       this.premountMethodCalls.set('createOrganization', callback);
@@ -413,7 +433,7 @@ export default class IsomorphicClerk {
 
   getOrganizationMemberships = async (): Promise<OrganizationMembershipResource[] | void> => {
     const callback = () => this.clerkjs?.getOrganizationMemberships();
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       return callback() as Promise<OrganizationMembershipResource[]>;
     } else {
       this.premountMethodCalls.set('getOrganizationMemberships', callback);
@@ -422,7 +442,7 @@ export default class IsomorphicClerk {
 
   getOrganization = async (organizationId: string): Promise<OrganizationResource | undefined | void> => {
     const callback = () => this.clerkjs?.getOrganization(organizationId);
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       return callback() as Promise<OrganizationResource | undefined>;
     } else {
       this.premountMethodCalls.set('getOrganization', callback);
@@ -434,7 +454,7 @@ export default class IsomorphicClerk {
     options?: SignOutOptions,
   ): Promise<void> => {
     const callback = () => this.clerkjs?.signOut(signOutCallbackOrOptions as any, options);
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('signOut', callback);
