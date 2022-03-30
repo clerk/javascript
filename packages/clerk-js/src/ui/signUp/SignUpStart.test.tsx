@@ -93,6 +93,7 @@ describe('<SignUpStart/>', () => {
       attributes: {
         username: {
           enabled: true,
+          required: true,
         },
         first_name: {
           enabled: true,

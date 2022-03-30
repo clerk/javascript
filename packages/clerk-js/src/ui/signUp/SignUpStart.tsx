@@ -223,6 +223,7 @@ function _SignUpStart(): JSX.Element {
       key='username'
       label='Username'
       error={formFields.username.error}
+      hint={fields.username === 'on' ? 'Optional' : undefined}
     >
       <Input
         id='username'
