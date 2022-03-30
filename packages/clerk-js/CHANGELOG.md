@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.3.0-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.2.2...@clerk/clerk-js@3.3.0-staging.0) (2022-03-30)
+
+### Features
+
+- **clerk-react:** Allow usernames to be optional ([ea4583a](https://github.com/clerkinc/javascript/commit/ea4583a0a86cd1a73fb8408a0b599f31d06adcc8))
+
+### Bug Fixes
+
+- **clerk-js:** Prevent loading if Clerk is already loaded ([849f6b2](https://github.com/clerkinc/javascript/commit/849f6b2cc1b79170573fd30d9d6ff6d070b6d0a5))
+
 ### [3.2.3-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.2.2...@clerk/clerk-js@3.2.3-staging.1) (2022-03-29)
 
 ### Bug Fixes
