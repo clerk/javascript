@@ -43,6 +43,7 @@ export class User {
     'publicMetadata',
     'privateMetadata',
     'unsafeMetadata',
+    'lastSignInAt',
     'createdAt',
     'updatedAt',
   ];

@@ -150,6 +150,7 @@ export interface UserProps extends ClerkProps {
   publicMetadata: Record<string, unknown>;
   privateMetadata: Record<string, unknown>;
   unsafeMetadata: Record<string, unknown>;
+  lastSignInAt: Nullable<number>;
   createdAt: Nullable<number>;
   updatedAt: Nullable<number>;
 }
