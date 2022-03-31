@@ -183,11 +183,14 @@ export class Base {
       return this.buildAuthenticatedState(headerToken, { jwtKey, authorizedParties, fetchInterstitial });
     }
 
+    const isDevelopmentKey = isDevelopmentOrStaging(API_KEY);
+    const isProductionKey = isProduction(API_KEY);
+
     // In development or staging environments only, based on the request's
     // User Agent, detect non-browser requests (e.g. scripts). If there
     // is no Authorization header, consider the user as signed out and
     // prevent interstitial rendering
-    if (isDevelopmentOrStaging(API_KEY) && !userAgent?.startsWith('Mozilla/')) {
+    if (isDevelopmentKey && !userAgent?.startsWith('Mozilla/')) {
       return { status: AuthStatus.SignedOut };
     }
 
@@ -206,7 +209,7 @@ export class Base {
     }
 
     // First load of development. Could be logged in on Clerk-hosted UI.
-    if (isDevelopmentOrStaging(API_KEY) && !clientUat) {
+    if (isDevelopmentKey && !clientUat) {
       return {
         status: AuthStatus.Interstitial,
         interstitial: await fetchInterstitial(),
@@ -215,7 +218,7 @@ export class Base {
 
     // Potentially arriving after a sign-in or sign-out on Clerk-hosted UI.
     if (
-      isDevelopmentOrStaging(API_KEY) &&
+      isDevelopmentKey &&
       referrer &&
       checkCrossOrigin({
         originURL: new URL(referrer),
@@ -232,7 +235,7 @@ export class Base {
     }
 
     // Probably first load for production
-    if (isProduction(API_KEY) && !clientUat && !cookieToken) {
+    if (isProductionKey && !clientUat && !cookieToken) {
       return { status: AuthStatus.SignedOut };
     }
 
@@ -249,7 +252,7 @@ export class Base {
       return { status: AuthStatus.SignedOut };
     }
 
-    if (isProduction(API_KEY) && clientUat && !cookieToken) {
+    if (isProductionKey && clientUat && !cookieToken) {
       return {
         status: AuthStatus.Interstitial,
         interstitial: await fetchInterstitial(),
