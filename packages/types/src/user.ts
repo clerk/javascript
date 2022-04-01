@@ -29,6 +29,7 @@ export interface UserResource extends ClerkResource {
   passwordEnabled: boolean;
   publicMetadata: Record<string, unknown>;
   unsafeMetadata: Record<string, unknown>;
+  lastSignInAt: Date | null;
   updatedAt: Date | null;
   createdAt: Date | null;
 
@@ -39,9 +40,15 @@ export interface UserResource extends ClerkResource {
   isPrimaryIdentification: (ident: EmailAddressResource | PhoneNumberResource) => boolean;
   getSessions: () => Promise<SessionWithActivitiesResource[]>;
   setProfileImage: (params: SetProfileImageParams) => Promise<ImageResource>;
-  createExternalAccount: ({ strategy, redirect_url }: { strategy: OAuthStrategy, redirect_url?: string }) => Promise<ExternalAccountResource>;
-  get verifiedExternalAccounts(): ExternalAccountResource[]
-  get unverifiedExternalAccounts(): ExternalAccountResource[]
+  createExternalAccount: ({
+    strategy,
+    redirect_url,
+  }: {
+    strategy: OAuthStrategy;
+    redirect_url?: string;
+  }) => Promise<ExternalAccountResource>;
+  get verifiedExternalAccounts(): ExternalAccountResource[];
+  get unverifiedExternalAccounts(): ExternalAccountResource[];
 }
 
 export type CreateEmailAddressParams = { email: string };

@@ -50,6 +50,7 @@ export class User extends BaseResource implements UserResource {
   profileImageUrl = '';
   publicMetadata: Record<string, unknown> = {};
   unsafeMetadata: Record<string, unknown> = {};
+  lastSignInAt: Date | null = null;
   updatedAt: Date | null = null;
   createdAt: Date | null = null;
 
@@ -200,8 +201,13 @@ export class User extends BaseResource implements UserResource {
     this.publicMetadata = data.public_metadata;
     this.unsafeMetadata = data.unsafe_metadata;
 
+    if (data.last_sign_in_at) {
+      this.lastSignInAt = unixEpochToDate(data.last_sign_in_at);
+    }
+
     this.updatedAt = unixEpochToDate(data.updated_at);
     this.createdAt = unixEpochToDate(data.created_at);
+
     return this;
   }
 }
