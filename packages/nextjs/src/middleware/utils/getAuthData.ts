@@ -17,7 +17,7 @@ export async function getAuthData(
   try {
     const cookieToken = cookies['__session'];
     const headerToken = headers.authorization?.replace('Bearer ', '');
-    const { status, sessionClaims, interstitial } = await Clerk.base.getAuthState({
+    const { status, sessionClaims, interstitial, errorReason } = await Clerk.base.getAuthState({
       cookieToken,
       headerToken,
       clientUat: cookies['__client_uat'],
@@ -31,6 +31,8 @@ export async function getAuthData(
       jwtKey,
       authorizedParties,
     });
+
+    errorReason && ctx.res.setHeader('Auth-Result', errorReason);
 
     if (status === AuthStatus.Interstitial) {
       ctx.res.writeHead(401, { 'Content-Type': 'text/html' });

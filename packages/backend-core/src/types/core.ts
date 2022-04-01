@@ -1,3 +1,4 @@
+import { AuthErrorReason } from './errors';
 import { JWTPayload } from './jwt';
 
 export enum AuthStatus {
@@ -20,13 +21,18 @@ export type BuildAuthenticatedStateOptions = {
   jwtKey?: string;
   authorizedParties?: string[];
   fetchInterstitial: () => Promise<string>;
+  tokenType: TokenType;
 };
+
+export type TokenType = 'cookie' | 'header';
 
 export type AuthState = {
   status: AuthStatus;
   session?: Session;
   interstitial?: string;
   sessionClaims?: JWTPayload;
+  /* Error reason for signed-out and interstitial states. Would probably be set on the `Auth-Result` response header. */
+  errorReason?: AuthErrorReason;
 };
 
 export type AuthStateParams = {

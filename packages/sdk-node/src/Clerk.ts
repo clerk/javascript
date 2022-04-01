@@ -257,7 +257,7 @@ export default class Clerk extends ClerkBackendAPI {
         const cookieToken = cookies.get('__session') as string;
         const headerToken = req.headers.authorization?.replace('Bearer ', '');
 
-        const { status, interstitial, sessionClaims } =
+        const { status, interstitial, sessionClaims, errorReason } =
           await this.base.getAuthState({
             cookieToken,
             headerToken,
@@ -272,6 +272,8 @@ export default class Clerk extends ClerkBackendAPI {
             jwtKey: jwtKey || this.jwtKey,
             fetchInterstitial: () => this.fetchInterstitial(),
           });
+
+        errorReason && res.setHeader('Auth-Result', errorReason);
 
         if (status === AuthStatus.SignedOut) {
           return signedOut();
