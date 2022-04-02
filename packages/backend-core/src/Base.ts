@@ -155,7 +155,7 @@ export class Base {
 
     const isVerified = await this.verifySignatureFunction('RSASSA-PKCS1-v1_5', key, signature, data);
     if (!isVerified) {
-      throw new TokenVerificationError(TokenVerificationErrorReason.Unverified);
+      throw new TokenVerificationError(TokenVerificationErrorReason.VerificationFailed);
     }
   };
 

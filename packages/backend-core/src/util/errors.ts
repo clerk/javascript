@@ -49,8 +49,8 @@ export function mapErrorReasonResponse(
     case TokenVerificationErrorReason.UnauthorizedParty:
       errorReason = isCookieToken ? AuthErrorReason.CookieUnauthorizedParty : AuthErrorReason.HeaderUnauthorizedParty;
       break;
-    case TokenVerificationErrorReason.Unverified:
-      errorReason = isCookieToken ? AuthErrorReason.CookieUnverified : AuthErrorReason.HeaderUnverified;
+    case TokenVerificationErrorReason.VerificationFailed:
+      errorReason = isCookieToken ? AuthErrorReason.CookieVerificationFailed : AuthErrorReason.HeaderVerificationFailed;
       break;
     case TokenVerificationErrorReason.PublicKeyFetchError:
       errorReason = AuthErrorReason.PublicKeyFetchError;
