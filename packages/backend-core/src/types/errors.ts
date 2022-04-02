@@ -1,13 +1,11 @@
 /* Expected values for the 'Auth-Result' response header */
 export enum AuthErrorReason {
-  KeyMissing = 'key-missing',
   InlineKeyMissing = 'inline-key-missing',
   InlineKeyInvalid = 'inline-key-invalid',
   HeaderExpired = 'header-expired',
   HeaderEarly = 'header-early',
   HeaderInvalid = 'header-invalid',
   HeaderInvalidIssuer = 'header-invalid-issuer',
-  HeaderKeyMismatch = 'header-key-mismatch',
   HeaderMissingNonBrowser = 'header-missing-non-browser',
   HeaderMissingCORS = 'header-missing-cors',
   HeaderUnauthorizedParty = 'header-unauthorized-party',
@@ -21,11 +19,9 @@ export enum AuthErrorReason {
   CookieEarly = 'cookie-early',
   CookieInvalid = 'cookie-invalid',
   CookieInvalidIssuer = 'cookie-invalid-issuer',
-  CookieKeyMismatch = 'cookie-key-mismatch',
   CookieOutDated = 'cookie-outdated',
   CookieUnauthorizedParty = 'cookie-unauthorized-party',
   CookieUnverified = 'cookie-unverified',
-  OriginUnauthorized = 'origin-unauthorized',
   InternalError = 'internal-error',
   PublicKeyFetchError = 'pk-fetch-error',
   Unknown = 'unknown',
@@ -35,6 +31,7 @@ export enum AuthErrorReason {
 export enum TokenVerificationErrorReason {
   Expired,
   Invalid,
+  ImportKeyError,
   JWTKeyMissing,
   MalformedToken,
   Unverified,

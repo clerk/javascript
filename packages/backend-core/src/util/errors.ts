@@ -54,6 +54,9 @@ export function mapErrorReasonResponse(
       break;
     case TokenVerificationErrorReason.PublicKeyFetchError:
       errorReason = AuthErrorReason.PublicKeyFetchError;
+      break;
+    case TokenVerificationErrorReason.ImportKeyError:
+      errorReason = AuthErrorReason.InlineKeyInvalid;
   }
 
   return { errorReason, shouldSignout };

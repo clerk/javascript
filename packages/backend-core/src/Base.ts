@@ -123,7 +123,11 @@ export class Base {
     };
 
     // Based on https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey#subjectpublickeyinfo_import
-    return this.importKeyFunction(jwk, algorithm);
+    try {
+      return this.importKeyFunction(jwk, algorithm);
+    } catch (_) {
+      throw new TokenVerificationError(TokenVerificationErrorReason.ImportKeyError);
+    }
   };
 
   decodeJwt = (token: string): JWT => {
