@@ -9,6 +9,26 @@ import { OAuthStrategy } from './strategies';
 import { SnakeToCamel } from './utils';
 import { Web3WalletResource } from './web3Wallet';
 
+declare global {
+  /**
+   * If you want to provide custom types for the user.publicMetadata object,
+   * simply redeclare this rule in the global namespace.
+   * Every user object will use the provided type.
+   */
+  interface UserPublicMetadata {
+    [k: string]: unknown;
+  }
+
+  /**
+   * If you want to provide custom types for the user.unsafeMetadata object,
+   * simply redeclare this rule in the global namespace.
+   * Every user object will use the provided type.
+   */
+  interface UserUnsafeMetadata {
+    [k: string]: unknown;
+  }
+}
+
 export interface UserResource extends ClerkResource {
   id: string;
   primaryEmailAddressId: string | null;
@@ -27,8 +47,8 @@ export interface UserResource extends ClerkResource {
   web3Wallets: Web3WalletResource[];
   externalAccounts: ExternalAccountResource[];
   passwordEnabled: boolean;
-  publicMetadata: Record<string, unknown>;
-  unsafeMetadata: Record<string, unknown>;
+  publicMetadata: UserPublicMetadata;
+  unsafeMetadata: UserUnsafeMetadata;
   lastSignInAt: Date | null;
   updatedAt: Date | null;
   createdAt: Date | null;
