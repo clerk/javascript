@@ -1,4 +1,5 @@
 import { JWTPayload } from '../../types';
+import { TokenVerificationError } from '../../util/errors';
 import { checkClaims } from '../../util/jwt';
 
 test('check jwt claims with no issuer', () => {
@@ -11,7 +12,7 @@ test('check jwt claims with no issuer', () => {
     iat: 1643374280,
   };
 
-  expect(() => checkClaims(dummyClaims)).toThrow(`Issuer is invalid: ${dummyClaims.iss}`);
+  expect(() => checkClaims(dummyClaims)).toThrow(TokenVerificationError);
 });
 
 test('check jwt claims with invalid issuer', () => {
@@ -24,7 +25,7 @@ test('check jwt claims with invalid issuer', () => {
     iat: 1643374280,
   };
 
-  expect(() => checkClaims(dummyClaims)).toThrow(`Issuer is invalid: ${dummyClaims.iss}`);
+  expect(() => checkClaims(dummyClaims)).toThrow(TokenVerificationError);
 });
 
 test('check jwt claims with valid issuer', () => {
@@ -52,7 +53,7 @@ test('check jwt claims with invalid azp', () => {
   };
   const authorizedParties: string[] = ['valid-azp', 'another-valid-azp'];
 
-  expect(() => checkClaims(dummyClaims, authorizedParties)).toThrow(`Authorized party is invalid: ${dummyClaims.azp}`);
+  expect(() => checkClaims(dummyClaims, authorizedParties)).toThrow(TokenVerificationError);
 });
 
 test('check jwt claims with no azp and no authorized parties', () => {
