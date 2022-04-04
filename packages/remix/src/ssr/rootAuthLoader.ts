@@ -35,7 +35,7 @@ export const rootAuthLoader: RootAuthLoader = async (
   if (showInterstitial) {
     throw json(
       wrapClerkState({ __clerk_ssr_interstitial: showInterstitial, __frontendApi: frontendApi }), 
-      {headers: {"Cache-Control": "no-cache"}}
+      { status: 401 }
     );
   }
 
