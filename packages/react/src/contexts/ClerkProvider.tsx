@@ -3,14 +3,13 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { multipleClerkProvidersError } from '../errors';
 import IsomorphicClerk from '../isomorphicClerk';
-import type { ClerkProp, IsomorphicClerkOptions } from '../types';
+import type { IsomorphicClerkOptions } from '../types';
 import { withMaxAllowedInstancesGuard } from '../utils';
 import { ClerkContextProvider } from './ClerkContextProvider';
 import { StructureContext, StructureContextStates } from './StructureContext';
 
 export interface ClerkProviderProps extends IsomorphicClerkOptions {
   frontendApi?: string;
-  Clerk?: ClerkProp;
   initialState?: InitialState;
 }
 

@@ -1,6 +1,7 @@
 import type { Clerk, ClerkOptions, ClientResource, LoadedClerk, RedirectOptions, UserResource } from '@clerk/types';
 
 export interface IsomorphicClerkOptions extends ClerkOptions {
+  Clerk?: ClerkProp;
   clerkJSUrl?: string;
   clerkJSVariant?: 'headless' | '';
 }
