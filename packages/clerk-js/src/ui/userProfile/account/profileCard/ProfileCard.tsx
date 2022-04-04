@@ -1,5 +1,5 @@
 import { List } from '@clerk/shared/components/list';
-import { VerificationStatusTag } from "@clerk/shared/components/tag";
+import { VerificationStatusTag } from '@clerk/shared/components/tag';
 import { TitledCard } from '@clerk/shared/components/titledCard';
 import type { UserResource } from '@clerk/types';
 import { ExternalAccountResource } from '@clerk/types';
@@ -53,21 +53,19 @@ export function ProfileCard(): JSX.Element {
 
   const buildConnectedAccountsRow = () => {
     const verifiedAccounts = user.verifiedExternalAccounts;
-    const unverifiedAccounts = user.unverifiedExternalAccounts;
 
     return (
-    <List.Item
-      className='cl-list-item'
-      key='connected-accounts'
-      itemTitle='Connected accounts'
-      onClick={() => navigate('connected-accounts')}
-    >
-      {(verifiedAccounts.length + unverifiedAccounts.length) === 0 ? (
-        <div className='cl-empty-list-item'>None</div>
-      ) : (
-        <div className='cl-list-item-entry'>
-          {verifiedAccounts.map(
-            (externalAccount: ExternalAccountResource) => (
+      <List.Item
+        className='cl-list-item'
+        key='connected-accounts'
+        itemTitle='Connected accounts'
+        onClick={() => navigate('connected-accounts')}
+      >
+        {verifiedAccounts.length === 0 ? (
+          <div className='cl-empty-list-item'>None</div>
+        ) : (
+          <div className='cl-list-item-entry'>
+            {verifiedAccounts.map((externalAccount: ExternalAccountResource) => (
               <div key={externalAccount.id}>
                 <img
                   alt={externalAccount.providerTitle()}
@@ -76,27 +74,16 @@ export function ProfileCard(): JSX.Element {
                 />
                 {externalAccount.emailAddress}
 
-                <VerificationStatusTag className='cl-tag' status={externalAccount.verification?.status || 'verified'} />
+                <VerificationStatusTag
+                  className='cl-tag'
+                  status={externalAccount.verification?.status || 'verified'}
+                />
               </div>
-            ),
-          )}
-
-          {unverifiedAccounts.map((externalAccount: ExternalAccountResource) => (
-            <div key={externalAccount.id}>
-              <img
-                alt={externalAccount.providerTitle()}
-                src={svgUrl(externalAccount.providerSlug())}
-                className='cl-left-icon-wrapper'
-              />
-              {externalAccount.emailAddress}
-
-                <VerificationStatusTag className='cl-tag' status={externalAccount.verification?.status || 'unverified'} />
-            </div>
-          ))}
-        </div>
-      )}
-    </List.Item>
-    )
+            ))}
+          </div>
+        )}
+      </List.Item>
+    );
   };
 
   const avatarRow = (
