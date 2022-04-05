@@ -58,7 +58,7 @@ Array [
           onKeyDown={[Function]}
           onPaste={[Function]}
           type="text"
-          value=" "
+          value=""
         />
         <input
           aria-label="Digit 2"
@@ -75,7 +75,7 @@ Array [
           onKeyDown={[Function]}
           onPaste={[Function]}
           type="text"
-          value=" "
+          value=""
         />
         <input
           aria-label="Digit 3"
@@ -92,7 +92,7 @@ Array [
           onKeyDown={[Function]}
           onPaste={[Function]}
           type="text"
-          value=" "
+          value=""
         />
         <input
           aria-label="Digit 4"
@@ -109,7 +109,7 @@ Array [
           onKeyDown={[Function]}
           onPaste={[Function]}
           type="text"
-          value=" "
+          value=""
         />
         <input
           aria-label="Digit 5"
@@ -126,7 +126,7 @@ Array [
           onKeyDown={[Function]}
           onPaste={[Function]}
           type="text"
-          value=" "
+          value=""
         />
         <input
           aria-label="Digit 6"
@@ -143,7 +143,7 @@ Array [
           onKeyDown={[Function]}
           onPaste={[Function]}
           type="text"
-          value=" "
+          value=""
         />
       </div>
       <div

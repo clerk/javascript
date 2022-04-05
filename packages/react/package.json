@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-react",
-  "version": "3.2.2",
+  "version": "3.2.3-staging.2",
   "license": "MIT",
   "description": "Clerk.dev React library",
   "keywords": [
@@ -28,7 +28,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@clerk/types": "^2.3.0",
+    "@clerk/types": "^2.4.0-staging.2",
     "tslib": "^2.3.1"
   },
   "devDependencies": {
