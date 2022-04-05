@@ -138,6 +138,7 @@ export function OneTimeCodeInput({
   }
 
   function handleOnFocus(index: number) {
+    console.log('handleOnFocus', index);
     if (verificationState.status === 'failed') {
       return reset();
     }
@@ -145,6 +146,7 @@ export function OneTimeCodeInput({
   }
 
   function handleWebOtp(code: string | undefined) {
+    console.log('handleWebOtp', code);
     if (!code || code.length !== length) {
       return;
     }
@@ -153,6 +155,7 @@ export function OneTimeCodeInput({
   }
 
   function handleOnPaste(e: React.ClipboardEvent<HTMLInputElement>) {
+    console.log('handleOnPaste', e);
     const clipboardText = e.clipboardData.getData('text/plain') || '';
     if (clipboardText.length === 0 || !clipboardText.split('').every(char => isValidInput(char))) {
       return;
@@ -172,6 +175,7 @@ export function OneTimeCodeInput({
   }
 
   function handleOnKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    console.log('handleOnKeyDown', e);
     switch (e.key) {
       case 'Backspace':
         e.preventDefault();
@@ -193,6 +197,7 @@ export function OneTimeCodeInput({
   }
 
   const handleOnChange = (el: HTMLInputElement) => {
+    console.log('handleOnKeyDown', el);
     const { value } = el;
     if (isValidInput(value)) {
       updateCodeValueAt(activeInputIndex, value);
@@ -200,6 +205,7 @@ export function OneTimeCodeInput({
   };
 
   const handleOnInput = (e: React.FormEvent<HTMLInputElement>) => {
+    console.log('handleOnInput', e);
     if ((e.target as any).value) {
       // If a user selects an input that's already filled
       // and types the same value, the onChange event will not fire,
