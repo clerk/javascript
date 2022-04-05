@@ -30,13 +30,14 @@ export const useWebOTP = ({ onOtpReceived }: UseWebOTPParams) => {
     }
 
     abortControllerRef.current = new AbortController();
+    console.log('this starts running');
     void navigator.credentials
       .get({
         otp: { transport: ['sms'] },
         signal: abortControllerRef.current.signal,
       })
       .then(otp => {
-        console.log('credential code', otp?.code);
+        console.log('credential code', otp, otp?.code);
         if (isMountedRef.current) {
           onOtpReceived(otp?.code);
         }
@@ -45,13 +46,12 @@ export const useWebOTP = ({ onOtpReceived }: UseWebOTPParams) => {
         console.log('webotp exception: ', e);
       });
 
-    return cleanup;
+    // return cleanup;
   }, []);
 
-  const cleanup = () => {
-    abortControllerRef.current?.abort();
-    isMountedRef.current = false;
-  };
-
-  return { stop: cleanup };
+  // const cleanup = () => {
+  //   abortControllerRef.current?.abort();
+  //   isMountedRef.current = false;
+  // };
+  // return { stop: cleanup };
 };

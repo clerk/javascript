@@ -1,5 +1,4 @@
-import { render, renderJSON, screen, userEvent } from '@clerk/shared/testUtils';
-import { waitFor } from '@testing-library/dom';
+import { render, renderJSON, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
 import * as React from 'react';
 
 import { OneTimeCodeInput } from './OneTimeCodeInput';
@@ -78,27 +77,7 @@ describe('<OneTimeCodeInput/>', () => {
     });
   });
 
-  it('renders inputs with correct aria labels for alphanumeric inputs', () => {
-    render(
-      <OneTimeCodeInput
-        value={'123456'}
-        setValue={onChange}
-        numeric={false}
-        length={6}
-        verifyCodeHandler={noop}
-      />,
-    );
-    const inputs = screen.getAllByRole('textbox');
-    inputs.forEach((input, i) => {
-      if (i === 0) {
-        expect(input).toHaveAttribute('aria-label', 'Enter verification code. Character 1');
-      } else {
-        expect(input).toHaveAttribute('aria-label', `Character ${i + 1}`);
-      }
-    });
-  });
-
-  it('updates value state on keydown', async () => {
+  it('updates value state on keydown', () => {
     let value = '';
     const onChange = jest.fn(val => (value = val));
     const getComponent = () => (
@@ -115,7 +94,7 @@ describe('<OneTimeCodeInput/>', () => {
     const text = '123456';
     const inputs = screen.getAllByRole('textbox');
     for (const [i, input] of inputs.entries()) {
-      await userEvent.type(input, text[i]);
+      userEvent.type(input, text[i]);
       rerender(getComponent());
     }
 
@@ -123,62 +102,13 @@ describe('<OneTimeCodeInput/>', () => {
     expect(value).toEqual(text);
   });
 
-  it('accepts every printable chars if numeric prop is set to false', async () => {
+  it('focuses next input when user enters a char', () => {
     let value = '';
     const onChange = jest.fn(val => (value = val));
     const getComponent = () => (
       <OneTimeCodeInput
         value={value}
         setValue={onChange}
-        numeric={false}
-        length={6}
-        verifyCodeHandler={noop}
-      />
-    );
-
-    const { rerender } = render(getComponent());
-
-    const text = '1a!=z$';
-    const inputs = screen.getAllByRole('textbox');
-    for (const [i, input] of inputs.entries()) {
-      await userEvent.type(input, text[i]);
-      rerender(getComponent());
-    }
-    expect(value).toEqual(text);
-  });
-
-  it('only accepts numbers if numeric prop is set to true', async () => {
-    let value = '';
-    const onChange = jest.fn(val => (value = val));
-    const getComponent = () => (
-      <OneTimeCodeInput
-        value={value}
-        setValue={onChange}
-        numeric={true}
-        length={6}
-        verifyCodeHandler={noop}
-      />
-    );
-
-    const { rerender } = render(getComponent());
-
-    const text = 'a1b2#3A!~6';
-    const inputs = screen.getAllByRole('textbox');
-    for (const char of text) {
-      await userEvent.type(inputs[0], char);
-      rerender(getComponent());
-      expect(Number.isInteger(value[0]));
-    }
-  });
-
-  it('focuses next input when user enters a char', async () => {
-    let value = '';
-    const onChange = jest.fn(val => (value = val));
-    const getComponent = () => (
-      <OneTimeCodeInput
-        value={value}
-        setValue={onChange}
-        numeric={true}
         length={6}
         verifyCodeHandler={noop}
       />
@@ -189,7 +119,7 @@ describe('<OneTimeCodeInput/>', () => {
     const text = '123';
     const inputs = screen.getAllByRole('textbox');
     for (const [i, char] of [...text].entries()) {
-      await userEvent.type(inputs[i], char);
+      userEvent.type(inputs[i], char);
       rerender(getComponent());
       expect(inputs[i + 1]).toHaveFocus();
     }
@@ -215,7 +145,7 @@ describe('<OneTimeCodeInput/>', () => {
     jest.useRealTimers();
   });
 
-  it('handles the error state', async () => {
+  it('handles the error state', () => {
     const errorMessage = 'some error';
     render(
       <OneTimeCodeInput
@@ -234,14 +164,13 @@ describe('<OneTimeCodeInput/>', () => {
     expect(errorContainer).toHaveClass('errorMessage');
   });
 
-  it('resets error state if user enters code while on error state', async () => {
+  xit('resets error state if user enters code while on error state', async () => {
     let value = '123123';
     const onChange = jest.fn(val => (value = val));
     const getComponent = () => (
       <OneTimeCodeInput
         value={value}
         setValue={onChange}
-        numeric={true}
         length={6}
         verifyCodeHandler={(_, reject) => {
           reject('error message');

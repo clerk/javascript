@@ -200,6 +200,10 @@ export function OneTimeCodeInput({
   };
 
   const handleOnInput = (e: React.FormEvent<HTMLInputElement>) => {
+    if (verificationState.status === 'failed') {
+      return reset();
+    }
+
     if ((e.target as any).value) {
       // If a user selects an input that's already filled
       // and types the same value, the onChange event will not fire,

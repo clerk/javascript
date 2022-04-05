@@ -41,7 +41,7 @@ exports[`<EmailAddressVerificationWithOTP/> renders the <EmailAddressVerificatio
         onKeyDown={[Function]}
         onPaste={[Function]}
         type="text"
-        value=" "
+        value=""
       />
       <input
         aria-label="Digit 2"
@@ -58,7 +58,7 @@ exports[`<EmailAddressVerificationWithOTP/> renders the <EmailAddressVerificatio
         onKeyDown={[Function]}
         onPaste={[Function]}
         type="text"
-        value=" "
+        value=""
       />
       <input
         aria-label="Digit 3"
@@ -75,7 +75,7 @@ exports[`<EmailAddressVerificationWithOTP/> renders the <EmailAddressVerificatio
         onKeyDown={[Function]}
         onPaste={[Function]}
         type="text"
-        value=" "
+        value=""
       />
       <input
         aria-label="Digit 4"
@@ -92,7 +92,7 @@ exports[`<EmailAddressVerificationWithOTP/> renders the <EmailAddressVerificatio
         onKeyDown={[Function]}
         onPaste={[Function]}
         type="text"
-        value=" "
+        value=""
       />
       <input
         aria-label="Digit 5"
@@ -109,7 +109,7 @@ exports[`<EmailAddressVerificationWithOTP/> renders the <EmailAddressVerificatio
         onKeyDown={[Function]}
         onPaste={[Function]}
         type="text"
-        value=" "
+        value=""
       />
       <input
         aria-label="Digit 6"
@@ -126,7 +126,7 @@ exports[`<EmailAddressVerificationWithOTP/> renders the <EmailAddressVerificatio
         onKeyDown={[Function]}
         onPaste={[Function]}
         type="text"
-        value=" "
+        value=""
       />
     </div>
     <div
