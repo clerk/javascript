@@ -36,13 +36,13 @@ export const useWebOTP = ({ onOtpReceived }: UseWebOTPParams) => {
         signal: abortControllerRef.current.signal,
       })
       .then(otp => {
-        console.log('credential code', otp?.code);
+        console.log('Clerk WebOTP code:', otp?.code);
         if (isMountedRef.current) {
           onOtpReceived(otp?.code);
         }
       })
       .catch(e => {
-        console.log('webotp exception: ', e);
+        console.log('Clerk WebOTP error:', e);
       });
 
     return cleanup;
