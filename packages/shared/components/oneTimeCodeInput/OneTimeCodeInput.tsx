@@ -7,6 +7,7 @@ import { Input } from '../input';
 import { Spinner } from '../spinner';
 // @ts-ignore
 import styles from './OneTimeCodeInput.module.scss';
+import { useWebOTP } from './useWebOTP';
 
 const BLANK_CHAR = '';
 const VERIFY_SUCCESS_ACTION_DELAY = 500;
@@ -46,6 +47,7 @@ export function OneTimeCodeInput({
   resendCodeButtonClassName,
   ...rest
 }: OneTimeCodeInputProps): JSX.Element {
+  useWebOTP({ onOtpReceived: handleWebOtp });
   const inputValues = Array.from({ length }, (_, i) => value[i] || BLANK_CHAR);
   const [activeInputIndex, setActiveInputIndex] = React.useState(0);
   const [canResendCode, setCanResendCode] = React.useState(true);
@@ -140,6 +142,14 @@ export function OneTimeCodeInput({
       return reset();
     }
     focusInput({ index });
+  }
+
+  function handleWebOtp(code: string | undefined) {
+    if (!code || code.length !== length) {
+      return;
+    }
+    updateCode(code);
+    focusInput({ index: length - 1 });
   }
 
   function handleOnPaste(e: React.ClipboardEvent<HTMLInputElement>) {
