@@ -15,7 +15,7 @@ export async function getAuth(argsOrReq: Request | LoaderFunctionArgs): GetAuthR
   const { authData, showInterstitial } = await getAuthData(request);
 
   if (showInterstitial || !authData) {
-    throw json(EMPTY_INTERSTITIAL_RESPONSE);
+    throw json(EMPTY_INTERSTITIAL_RESPONSE, { status: 401 });
   }
 
   return sanitizeAuthData(authData);

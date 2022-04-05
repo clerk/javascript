@@ -33,7 +33,10 @@ export const rootAuthLoader: RootAuthLoader = async (
   const { authData, showInterstitial } = await getAuthData(args.request, opts);
 
   if (showInterstitial) {
-    throw json(wrapClerkState({ __clerk_ssr_interstitial: showInterstitial, __frontendApi: frontendApi }));
+    throw json(
+      wrapClerkState({ __clerk_ssr_interstitial: showInterstitial, __frontendApi: frontendApi }), 
+      { status: 401 }
+    );
   }
 
   if (!callback) {
