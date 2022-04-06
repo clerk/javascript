@@ -7,9 +7,10 @@ import { useNavigate } from 'ui/hooks';
 
 type VerifiedAccountListItemProps = {
   externalAccount: ExternalAccountResource;
+  isDisabled: boolean;
 };
 
-export function VerifiedAccountListItem({ externalAccount }: VerifiedAccountListItemProps): JSX.Element {
+export function VerifiedAccountListItem({ externalAccount, isDisabled }: VerifiedAccountListItemProps): JSX.Element {
   const { navigate } = useNavigate();
 
   return (
@@ -17,6 +18,7 @@ export function VerifiedAccountListItem({ externalAccount }: VerifiedAccountList
       className='cl-list-item'
       key={externalAccount.id}
       onClick={() => navigate(externalAccount.id)}
+      disabled={isDisabled}
     >
       <div>
         <img

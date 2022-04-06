@@ -28,6 +28,7 @@ export function ConnectedAccountList(): JSX.Element {
 
 function ConnectedAccountListRows(): JSX.Element {
   const [error, setError] = useState<string | undefined>();
+  const [busyProvider, setBusyProvider] = useState<OAuthStrategy | null>(null);
   const user = useCoreUser();
   const { navigate } = useNavigate();
   const {
@@ -52,6 +53,7 @@ function ConnectedAccountListRows(): JSX.Element {
 
   const handleConnect = (strategy: OAuthStrategy) => {
     setError(undefined);
+    setBusyProvider(strategy);
 
     user
       .createExternalAccount({ strategy: strategy, redirect_url: window.location.href })
@@ -60,6 +62,7 @@ function ConnectedAccountListRows(): JSX.Element {
       })
       .catch(err => {
         setError(err.message || err);
+        setBusyProvider(null);
         console.log(err);
       });
   };
@@ -77,6 +80,7 @@ function ConnectedAccountListRows(): JSX.Element {
           <VerifiedAccountListItem
             key={externalAccount.id}
             externalAccount={externalAccount}
+            isDisabled={!!busyProvider}
           />
         ))}
 
@@ -85,6 +89,8 @@ function ConnectedAccountListRows(): JSX.Element {
             key={externalAccount.id}
             externalAccount={externalAccount}
             handleConnect={handleConnect}
+            isBusy={busyProvider == `oauth_${externalAccount.provider}`}
+            isDisabled={!!busyProvider}
           />
         ))}
 
@@ -93,6 +99,8 @@ function ConnectedAccountListRows(): JSX.Element {
             key={unconnectedProvider.strategy}
             oauthProviderSettings={unconnectedProvider}
             handleConnect={handleConnect}
+            isBusy={busyProvider == unconnectedProvider.strategy}
+            isDisabled={!!busyProvider}
           />
         ))}
       </List>
