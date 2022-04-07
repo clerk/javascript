@@ -30,17 +30,20 @@ export const rootAuthLoader: RootAuthLoader = async (
   const frontendApi = process.env.CLERK_FRONTEND_API || opts.frontendApi;
   assertFrontendApi(frontendApi);
 
-  const { authData, showInterstitial } = await getAuthData(args.request, opts);
+  const { authData, showInterstitial, errorReason } = await getAuthData(args.request, opts);
 
   if (showInterstitial) {
-    throw json(
-      wrapClerkState({ __clerk_ssr_interstitial: showInterstitial, __frontendApi: frontendApi }), 
-      { status: 401 }
-    );
+    throw json(wrapClerkState({ __clerk_ssr_interstitial: showInterstitial, __frontendApi: frontendApi }), {
+      status: 401,
+      headers: { 'Auth-Result': errorReason || '' },
+    });
   }
 
   if (!callback) {
-    return { ...wrapClerkState({ __clerk_ssr_state: authData, __frontendApi: frontendApi }) };
+    return json(
+      { ...wrapClerkState({ __clerk_ssr_state: authData, __frontendApi: frontendApi }) },
+      { headers: { 'Auth-Result': errorReason || '' } },
+    );
   }
 
   const callbackResult = await callback?.(injectAuthIntoRequest(args, sanitizeAuthData(authData!)));
@@ -54,5 +57,8 @@ export const rootAuthLoader: RootAuthLoader = async (
     throw new Error(invalidRootLoaderCallbackResponseReturn);
   }
 
-  return { ...callbackResult, ...wrapClerkState({ __clerk_ssr_state: authData, __frontendApi: frontendApi }) };
+  return json(
+    { ...callbackResult, ...wrapClerkState({ __clerk_ssr_state: authData, __frontendApi: frontendApi }) },
+    { headers: { 'Auth-Result': errorReason || '' } },
+  );
 };

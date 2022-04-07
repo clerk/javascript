@@ -19,7 +19,7 @@ export type AuthData = {
 export async function getAuthData(
   req: Request,
   opts: RootAuthLoaderOptions = {},
-): Promise<{ authData: AuthData | null; showInterstitial?: boolean }> {
+): Promise<{ authData: AuthData | null; showInterstitial?: boolean; errorReason?: string }> {
   const { loadSession, loadUser, jwtKey, authorizedParties } = opts;
   const { headers } = req;
   const cookies = parseCookies(req);
@@ -27,7 +27,7 @@ export async function getAuthData(
   try {
     const cookieToken = cookies['__session'];
     const headerToken = headers.get('authorization')?.replace('Bearer ', '');
-    const { status, sessionClaims } = await Clerk.base.getAuthState({
+    const { status, sessionClaims, errorReason } = await Clerk.base.getAuthState({
       cookieToken,
       headerToken,
       clientUat: cookies['__client_uat'],
@@ -43,11 +43,11 @@ export async function getAuthData(
     });
 
     if (status === AuthStatus.Interstitial) {
-      return { authData: null, showInterstitial: true };
+      return { authData: null, showInterstitial: true, errorReason };
     }
 
     if (status === AuthStatus.SignedOut || !sessionClaims) {
-      return { authData: createSignedOutState() };
+      return { authData: createSignedOutState(), errorReason };
     }
 
     const sessionId = sessionClaims.sid;
