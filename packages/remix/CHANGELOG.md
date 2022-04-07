@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.3.6](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.3.5...@clerk/remix@0.3.6) (2022-04-07)
+
+### Bug Fixes
+
+- **remix:** Change status for interstitial responses to 401 ([d6de232](https://github.com/clerkinc/javascript/commit/d6de232cc1441c69f240e7fea2f2d59b6fc4f8e6))
+
 ### [0.3.5](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.3.5-staging.0...@clerk/remix@0.3.5) (2022-04-04)
 
 **Note:** Version bump only for package @clerk/remix

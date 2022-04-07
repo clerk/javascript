@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.4.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.4.0...@clerk/clerk-js@3.4.1) (2022-04-07)
+
+### Bug Fixes
+
+- **clerk-js:** Hide unverified accts from profile, skip unverified accts w/o known error from list ([ac28d0d](https://github.com/clerkinc/javascript/commit/ac28d0dcac55ac39ac10dc3a7600c0abd5d65b3c))
+
 ## [3.4.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.4.0-staging.0...@clerk/clerk-js@3.4.0) (2022-04-04)
 
 **Note:** Version bump only for package @clerk/clerk-js

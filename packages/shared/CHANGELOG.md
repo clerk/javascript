@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.0](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.0.21...@clerk/shared@0.1.0) (2022-04-07)
+
+### Features
+
+- **clerk-js,shared:** Autofill OTP using WebOTP on Android ([eb41c34](https://github.com/clerkinc/clerk_docker/commit/eb41c34392ebee5f8b725c4172b2be77b68a0baf))
+- **clerk-js,shared:** Rely on onChange event to fill OTP inputs ([b6811b4](https://github.com/clerkinc/clerk_docker/commit/b6811b4259894bec472953a4b3f0ec50ad7996ab))
+
 ### [0.0.21](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.0.21-staging.0...@clerk/shared@0.0.21) (2022-04-04)
 
 **Note:** Version bump only for package @clerk/shared
