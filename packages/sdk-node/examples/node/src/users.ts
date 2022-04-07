@@ -24,13 +24,15 @@ const createdUser = await users.createUser({
 console.log(createdUser);
 const createdUserId = createdUser.id as string;
 
-console.log('Get user list');
-const userList = await users.getUserList();
-console.log(userList);
-
 console.log('Get single user');
 const user = await users.getUser(createdUserId);
 console.log(user);
+
+await users.deleteUser(createdUserId);
+
+console.log('Get user list');
+const userList = await users.getUserList();
+console.log(userList);
 
 try {
   console.log('Update user');

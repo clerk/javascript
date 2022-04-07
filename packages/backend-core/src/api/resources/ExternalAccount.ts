@@ -1,10 +1,10 @@
-import associationDefaults from "../utils/Associations";
+import associationDefaults from '../utils/Associations';
 import { Association } from './Enums';
 import type { ExternalAccountJSON } from './JSON';
 import { ObjectType } from './JSON';
 import type { ExternalAccountProps } from './Props';
-import { User } from "./User";
-import { Verification } from './Verification'
+import { userAssociations } from './User';
+import { Verification } from './Verification';
 
 interface ExternalAccountPayload extends ExternalAccountProps {}
 
@@ -27,10 +27,10 @@ export class ExternalAccount {
 
   static associations = {
     verification: Association.HasOne,
-  }
+  };
 
   static defaults = {
-    ...associationDefaults(User.associations),
+    ...associationDefaults(userAssociations),
   };
 
   constructor(data: Partial<ExternalAccountPayload> = {}) {

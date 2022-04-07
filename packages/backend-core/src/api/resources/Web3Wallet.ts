@@ -1,15 +1,10 @@
-import type { Nullable } from '../../util/nullable';
 import associationDefaults from '../utils/Associations';
 import { Association } from './Enums';
 import type { Web3WalletJSON } from './JSON';
 import type { Web3WalletProps } from './Props';
 import { Verification } from './Verification';
 
-interface Web3WalletAssociations {
-  verification: Nullable<Verification>;
-}
-
-interface Web3WalletPayload extends Web3WalletProps, Web3WalletAssociations {}
+interface Web3WalletPayload extends Web3WalletProps {}
 
 export interface Web3Wallet extends Web3WalletPayload {}
 

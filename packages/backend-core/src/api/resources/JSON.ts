@@ -141,6 +141,7 @@ export interface PhoneNumberJSON extends ClerkResourceJSON {
   object: ObjectType.PhoneNumber;
   phone_number: string;
   reserved_for_second_factor: boolean;
+  default_second_factor: boolean;
   linked_to: Array<IdentificationLinkJSON>;
   verification: VerificationJSON | null;
 }
@@ -220,6 +221,8 @@ export interface UserJSON extends ClerkResourceJSON {
   phone_numbers: PhoneNumberJSON[];
   web3_wallets: Web3WalletJSON[];
   external_accounts: GoogleAccountJSON[];
+  external_id: string;
+  last_sign_in_at: number;
   public_metadata: Record<string, unknown>;
   private_metadata: Record<string, unknown>;
   unsafe_metadata: Record<string, unknown>;

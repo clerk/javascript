@@ -81,9 +81,9 @@ export interface OrganizationProps extends ClerkProps {
 
 export interface PhoneNumberProps extends ClerkProps {
   phoneNumber: Nullable<string>;
-  // verification: Nullable<VerificationProps>;
+  verification: Nullable<VerificationProps>;
   reservedForSecondFactor: boolean;
-  // linkedTo: Array<IdentificationLinkProps>;
+  linkedTo: IdentificationLinkProps[];
 }
 
 export interface SessionProps extends ClerkProps {
@@ -165,5 +165,7 @@ export interface VerificationProps {
 }
 
 export interface Web3WalletProps extends ClerkProps {
-  web3Wallet: Nullable<string>;
+  id: string;
+  web3Wallet: string;
+  verification: VerificationProps;
 }
