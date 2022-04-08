@@ -101,3 +101,7 @@ export function determineSalutation(signIn: Partial<SignInResource>): string {
 
   return titleize(signIn.userData?.firstName) || titleize(signIn.userData?.lastName) || signIn?.identifier || '';
 }
+
+export function isSignInFactorOne(signInStrategy: string): boolean {
+  return ['email_code', 'email_link', 'phone_code', 'password'].includes(signInStrategy);
+}

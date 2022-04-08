@@ -346,6 +346,7 @@ describe('<SignInFactorOne/>', () => {
     });
   });
 
+  // test scenario for disabled straregy
   describe('skipping verification strategies', () => {
     it('bypasses email_link when passed as disabled strategy', async () => {
       const mockPrepareFirstFactor = jest.fn();
@@ -566,6 +567,47 @@ describe('<SignInFactorOne/>', () => {
       screen.getByText('Try another method');
     });
 
+    it('renders all available strategies when sso sign is available and no other first factor', () => {
+      const mockSetSession = jest.fn();
+      mocked(useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>, true).mockImplementation(() => ({
+        authConfig: { singleSessionMode: false },
+        displayConfig: {
+          preferredSignInStrategy: 'otp',
+        },
+      }));
+
+      const mockPrepareFirstFactor = jest.fn();
+      (useCoreSignIn as jest.Mock<SignInResource>).mockImplementation(
+        () =>
+          ({
+            prepareFirstFactor: mockPrepareFirstFactor,
+            supportedFirstFactors: [
+              {
+                strategy: 'oauth_google',
+              } as SignInFactor,
+            ],
+            firstFactorVerification: {
+              status: null,
+              verifiedFromTheSameClient: jest.fn(() => false),
+            },
+          } as unknown as SignInResource),
+      );
+
+      mocked(
+        // @ts-ignore
+        useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>,
+        true,
+      ).mockImplementation(() => ({
+        setSession: mockSetSession,
+      }));
+
+      const { container } = render(<SignInFactorOne />);
+      expect(container.querySelector('.cl-otp-input')).toBeNull();
+      expect(screen.queryByText('Try another method')).not.toBeInTheDocument();
+      expect(screen.queryByText('Sign in with Google')).toBeInTheDocument();
+    });
+
+    // same as before
     it('skips magic links when disabled strategies contain email_link', async () => {
       const mockPrepareFirstFactor = jest.fn();
       (useCoreSignIn as jest.Mock<SignInResource>).mockImplementation(

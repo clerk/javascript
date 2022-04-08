@@ -5,7 +5,7 @@ import { useCoreSignIn, useEnvironment, useSignInContext } from 'ui/contexts';
 import { AllFirstFactorStrategies, SignInFactorOneInputBased, SignInFactorOneMagicLink } from 'ui/signIn/factorOne';
 
 import { ErrorScreen } from './strategies';
-import { determineStartingSignInFactor } from './utils';
+import { determineStartingSignInFactor, isSignInFactorOne } from './utils';
 
 function _SignInFactorOne(): JSX.Element {
   const signInContext = useSignInContext();
@@ -38,7 +38,7 @@ function _SignInFactorOne(): JSX.Element {
     return <LoadingScreen />;
   }
 
-  if (showAllStrategies) {
+  if (showAllStrategies || !isSignInFactorOne(currentFactor.strategy)) {
     return (
       <AllFirstFactorStrategies
         factors={availableFactors}
