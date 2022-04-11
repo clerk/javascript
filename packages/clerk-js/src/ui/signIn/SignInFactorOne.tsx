@@ -5,7 +5,7 @@ import { useCoreSignIn, useEnvironment } from 'ui/contexts';
 import { AllFirstFactorStrategies, SignInFactorOneInputBased, SignInFactorOneMagicLink } from 'ui/signIn/factorOne';
 
 import { ErrorScreen } from './strategies';
-import { determineStartingSignInFactor, isSignInFactorOne } from './utils';
+import { determineStartingSignInFactor, isContactInfoRelatedStrategy } from './utils';
 
 function _SignInFactorOne(): JSX.Element {
   const signIn = useCoreSignIn();
@@ -16,7 +16,9 @@ function _SignInFactorOne(): JSX.Element {
   const [currentFactor, setCurrentFactor] = React.useState<SignInFactor | undefined | null>(() => {
     return determineStartingSignInFactor(availableFactors, signIn.identifier, preferredSignInStrategy);
   });
-  const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(!currentFactor);
+  const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(
+    !currentFactor || !isContactInfoRelatedStrategy(currentFactor.strategy),
+  );
 
   const handleAlternativeFactorSelect = (selectedFactor: SignInFactor) => {
     setCurrentFactor(selectedFactor);
@@ -37,7 +39,7 @@ function _SignInFactorOne(): JSX.Element {
     return <LoadingScreen />;
   }
 
-  if (showAllStrategies || !isSignInFactorOne(currentFactor.strategy)) {
+  if (showAllStrategies) {
     return (
       <AllFirstFactorStrategies
         factors={availableFactors}

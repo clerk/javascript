@@ -1,5 +1,5 @@
 import { titleize } from '@clerk/shared/utils/string';
-import { PreferredSignInStrategy, SignInFactor, SignInResource } from '@clerk/types';
+import { PreferredSignInStrategy, SignInFactor, SignInResource, SignInStrategy } from '@clerk/types';
 import { PREFERRED_SIGN_IN_STRATEGIES } from 'ui/common';
 import { otpPrefFactorComparator, passwordPrefFactorComparator } from 'ui/signIn/strategies/factorSortingUtils';
 
@@ -102,6 +102,7 @@ export function determineSalutation(signIn: Partial<SignInResource>): string {
   return titleize(signIn.userData?.firstName) || titleize(signIn.userData?.lastName) || signIn?.identifier || '';
 }
 
-export function isSignInFactorOne(signInStrategy: string): boolean {
-  return ['email_code', 'email_link', 'phone_code', 'password'].includes(signInStrategy);
+const supportedStrategies: SignInStrategy[] = ['email_code', 'password', 'phone_code', 'email_link'];
+export function isContactInfoRelatedStrategy(strategy: SignInStrategy): boolean {
+  return supportedStrategies.includes(strategy);
 }
