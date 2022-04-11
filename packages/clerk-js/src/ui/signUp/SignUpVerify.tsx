@@ -6,7 +6,6 @@ import {
   handleError,
   isVerificationExpiredError,
   PoweredByClerk,
-  shouldDisableStrategy,
   useFieldState,
   VerificationErrorMessage,
   withRedirectToHome,
@@ -21,9 +20,8 @@ function _SignUpVerifyEmailAddress(): JSX.Element {
   const { attributes } = userSettings;
 
   const emailLinkStrategyEnabled = attributes.email_address.verifications.includes('email_link');
-  const disableEmailLink = shouldDisableStrategy(useSignUpContext(), 'email_link');
 
-  if (emailLinkStrategyEnabled && !disableEmailLink) {
+  if (emailLinkStrategyEnabled) {
     return <SignUpVerifyEmailAddressWithMagicLink />;
   }
   return VerifyWithOtp({ field: 'emailAddress' });
