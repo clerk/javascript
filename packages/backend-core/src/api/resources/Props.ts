@@ -134,6 +134,7 @@ export interface SMSMessageProps extends ClerkProps {
 }
 
 export interface UserProps extends ClerkProps {
+  externalId: Nullable<string>;
   username: Nullable<string>;
   firstName: Nullable<string>;
   lastName: Nullable<string>;
@@ -144,9 +145,6 @@ export interface UserProps extends ClerkProps {
   primaryPhoneNumberId: Nullable<string>;
   passwordEnabled: boolean;
   twoFactorEnabled: boolean;
-  // emailAddresses: EmailAddressProps[];
-  // phoneNumbers: PhoneNumberProps[];
-  // externalAccounts: GoogleAccountProps[];
   publicMetadata: Record<string, unknown>;
   privateMetadata: Record<string, unknown>;
   unsafeMetadata: Record<string, unknown>;

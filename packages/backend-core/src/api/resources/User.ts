@@ -24,6 +24,7 @@ export interface User extends UserPayload {}
 export class User {
   static attributes = [
     'id',
+    'externalId',
     'username',
     'firstName',
     'lastName',
