@@ -125,6 +125,14 @@ export class UserApi extends AbstractApi {
       queryParams: params,
     });
   }
+
+  public async getUserOauthAccessToken(userId: string, provider: `oauth_${string}`) {
+    this.requireId(userId);
+    return this._restClient.makeRequest<User>({
+      method: 'GET',
+      path: `/users/${userId}/oauth_access_tokens/${provider}`,
+    });
+  }
 }
 
 function stringifyMetadataParams(
