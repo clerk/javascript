@@ -15,6 +15,7 @@ export interface ExternalAccountResource {
   publicMetadata: Record<string, unknown>;
   label?: string;
   verification: VerificationResource | null;
+  destroy: () => Promise<void>;
   providerSlug: () => OAuthProvider;
   providerTitle: () => string;
 }

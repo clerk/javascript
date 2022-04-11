@@ -26,6 +26,8 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
     this.fromJSON(data);
   }
 
+  destroy = (): Promise<void> => this._baseDelete();
+
   protected fromJSON(data: ExternalAccountJSON): this {
     this.id = data.id;
     this.identificationId = data.identification_id;
