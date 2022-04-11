@@ -126,7 +126,7 @@ export class UserApi extends AbstractApi {
     });
   }
 
-  public async getUserOauthAccessTokens(userId: string, provider: `oauth_${string}`) {
+  public async getUserOauthAccessToken(userId: string, provider: `oauth_${string}`) {
     this.requireId(userId);
     return this._restClient.makeRequest<User>({
       method: 'GET',
