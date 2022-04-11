@@ -10,7 +10,7 @@
 <div align="center">
 
 [![Chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://discord.com/invite/b5rXHjAg7A)
-[![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://docs.clerk.dev)
+[![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.dev/docs?utm_source=github&utm_medium=clerk_nextjs)
 [![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
 
 [Changelog](https://github.com/clerkinc/javascript/blob/main/packages/nextjs/CHANGELOG.md)
@@ -94,13 +94,13 @@ function MyApp({ Component, pageProps }) {
 export default MyApp;
 ```
 
-_For further details and examples, please refer to our [Documentation](https://docs.clerk.dev?utm_source=github&utm_medium=clerk_nextjs)._
+_For further details and examples, please refer to our [Documentation](https://clerk.dev/docs?utm_source=github&utm_medium=clerk_nextjs)._
 
 ## Support
 
 You can get in touch with us in any of the following ways:
 
-- Join our official community [Discord server](https://discord.com/invite/b5rXHjAg7A)
+- Join our official community [Discord server](https://discord.com/invite/b5rXHjAg7A)?utm_source=github&utm_medium=clerk_react
 - Open a [GitHub support issue](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=question&template=ask_a_question.md&title=Support%3A+)
 - Contact options listed on [our Support page](https://clerk.dev/support?utm_source=github&utm_medium=clerk_nextjs)
 
