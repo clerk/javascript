@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.4.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.4.1...@clerk/clerk-js@3.4.2) (2022-04-11)
+
+### Bug Fixes
+
+- **clerk-js:** Set provider as busy when initiating oauth connection & prevent further clicks ([a2faf0f](https://github.com/clerkinc/javascript/commit/a2faf0f032d23e1733460eb94ac8fed20f1dc9bb))
+
 ### [3.4.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.4.0...@clerk/clerk-js@3.4.1) (2022-04-07)
 
 ### Bug Fixes
