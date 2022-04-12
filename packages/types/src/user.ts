@@ -31,6 +31,7 @@ declare global {
 
 export interface UserResource extends ClerkResource {
   id: string;
+  externalId: string | null;
   primaryEmailAddressId: string | null;
   primaryEmailAddress: EmailAddressResource | null;
   primaryPhoneNumberId: string | null;

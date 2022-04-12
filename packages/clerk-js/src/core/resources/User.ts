@@ -32,6 +32,7 @@ export class User extends BaseResource implements UserResource {
   pathRoot = '/me';
 
   id = '';
+  externalId: string | null = null;
   username: string | null = null;
   emailAddresses: EmailAddressResource[] = [];
   phoneNumbers: PhoneNumberResource[] = [];
@@ -170,6 +171,7 @@ export class User extends BaseResource implements UserResource {
 
   protected fromJSON(data: UserJSON): this {
     this.id = data.id;
+    this.externalId = data.external_id;
     this.firstName = data.first_name;
     this.lastName = data.last_name;
     if (this.firstName && this.lastName) {

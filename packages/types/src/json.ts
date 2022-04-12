@@ -153,6 +153,7 @@ export interface ExternalAccountJSON extends ClerkResourceJSON {
 export interface UserJSON extends ClerkResourceJSON {
   object: 'user';
   id: string;
+  external_id: string;
   primary_email_address_id: string;
   primary_phone_number_id: string;
   primary_web3_wallet_id: string;
