@@ -346,42 +346,6 @@ describe('<SignInFactorOne/>', () => {
     });
   });
 
-  describe('skipping verification strategies', () => {
-    it('bypasses email_link when passed as disabled strategy', async () => {
-      const mockPrepareFirstFactor = jest.fn();
-      (useCoreSignIn as jest.Mock<SignInResource>).mockImplementation(
-        () =>
-          ({
-            prepareFirstFactor: mockPrepareFirstFactor,
-            supportedFirstFactors: [
-              {
-                strategy: 'email_link',
-                safeIdentifier: 'jdoe@example.com',
-                emailAddressId: 'deadbeef',
-              } as SignInFactor,
-              {
-                strategy: 'email_code',
-                safeIdentifier: 'jdoe@example.com',
-                emailAddressId: 'deadbeef',
-              } as SignInFactor,
-            ],
-            firstFactorVerification: {
-              status: null,
-              verifiedFromTheSameClient: jest.fn(() => false),
-            },
-          } as unknown as SignInResource),
-      );
-      (useSignInContext as jest.Mock).mockImplementation(() => ({
-        signUpUrl: 'http://test.host',
-        navigateAfterSignIn: mockNavigateAfterSignIn,
-        disabledStrategies: ['email_link'],
-      }));
-
-      const { container } = render(<SignInFactorOne />);
-      expect(container.querySelector('.cl-otp-input')).not.toBeNull();
-    });
-  });
-
   describe('2SV passwordless sign in', () => {
     it('renders the sign in screen, enters a password and sets session', async () => {
       const mockAttemptFirstFactor = jest.fn();
@@ -566,7 +530,15 @@ describe('<SignInFactorOne/>', () => {
       screen.getByText('Try another method');
     });
 
-    it('skips magic links when disabled strategies contain email_link', async () => {
+    it('renders all available strategies when sso sign is available and no other first factor', () => {
+      const mockSetSession = jest.fn();
+      mocked(useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>, true).mockImplementation(() => ({
+        authConfig: { singleSessionMode: false },
+        displayConfig: {
+          preferredSignInStrategy: 'otp',
+        },
+      }));
+
       const mockPrepareFirstFactor = jest.fn();
       (useCoreSignIn as jest.Mock<SignInResource>).mockImplementation(
         () =>
@@ -574,14 +546,7 @@ describe('<SignInFactorOne/>', () => {
             prepareFirstFactor: mockPrepareFirstFactor,
             supportedFirstFactors: [
               {
-                strategy: 'email_link',
-                safeIdentifier: 'jdoe@example.com',
-                emailAddressId: 'deadbeef',
-              } as SignInFactor,
-              {
-                strategy: 'email_code',
-                safeIdentifier: 'jdoe@example.com',
-                emailAddressId: 'deadbeef',
+                strategy: 'oauth_google',
               } as SignInFactor,
             ],
             firstFactorVerification: {
@@ -590,15 +555,19 @@ describe('<SignInFactorOne/>', () => {
             },
           } as unknown as SignInResource),
       );
-      (useSignInContext as jest.Mock).mockImplementation(() => ({
-        signUpUrl: 'http://test.host',
-        navigateAfterSignIn: mockNavigateAfterSignIn,
-        disabledStrategies: ['email_link'],
+
+      mocked(
+        // @ts-ignore
+        useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>,
+        true,
+      ).mockImplementation(() => ({
+        setSession: mockSetSession,
       }));
 
-      render(<SignInFactorOne />);
-      userEvent.click(screen.getByText('Try another method'));
-      expect(screen.queryByText('magic link')).toBeNull();
+      const { container } = render(<SignInFactorOne />);
+      expect(container.querySelector('.cl-otp-input')).toBeNull();
+      expect(screen.queryByText('Try another method')).not.toBeInTheDocument();
+      expect(screen.queryByText('Sign in with Google')).toBeInTheDocument();
     });
   });
 

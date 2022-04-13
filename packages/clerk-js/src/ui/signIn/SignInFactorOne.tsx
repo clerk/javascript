@@ -1,23 +1,24 @@
 import { SignInFactor } from '@clerk/types';
 import React from 'react';
-import { LoadingScreen, shouldDisableStrategy, withRedirectToHome } from 'ui/common';
-import { useCoreSignIn, useEnvironment, useSignInContext } from 'ui/contexts';
+import { LoadingScreen, withRedirectToHome } from 'ui/common';
+import { useCoreSignIn, useEnvironment } from 'ui/contexts';
 import { AllFirstFactorStrategies, SignInFactorOneInputBased, SignInFactorOneMagicLink } from 'ui/signIn/factorOne';
 
 import { ErrorScreen } from './strategies';
-import { determineStartingSignInFactor } from './utils';
+import { determineStartingSignInFactor, factorHasLocalStrategy } from './utils';
 
 function _SignInFactorOne(): JSX.Element {
-  const signInContext = useSignInContext();
   const signIn = useCoreSignIn();
   const { displayConfig } = useEnvironment();
   const { preferredSignInStrategy } = displayConfig;
-  const availableFactors = signIn.supportedFirstFactors.filter(f => !shouldDisableStrategy(signInContext, f.strategy));
+  const availableFactors = signIn.supportedFirstFactors;
   const [lastUsedFactor, setLastUsedFactor] = React.useState<SignInFactor | null>(null);
   const [currentFactor, setCurrentFactor] = React.useState<SignInFactor | undefined | null>(() => {
     return determineStartingSignInFactor(availableFactors, signIn.identifier, preferredSignInStrategy);
   });
-  const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(!currentFactor);
+  const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(
+    !currentFactor || !factorHasLocalStrategy(currentFactor),
+  );
 
   const handleAlternativeFactorSelect = (selectedFactor: SignInFactor) => {
     setCurrentFactor(selectedFactor);
@@ -48,10 +49,9 @@ function _SignInFactorOne(): JSX.Element {
     );
   }
 
-  const disableEmailLink = shouldDisableStrategy(signInContext, emailLinkStrategy);
   return (
     <>
-      {currentFactor.strategy === emailLinkStrategy && !disableEmailLink && (
+      {currentFactor.strategy === emailLinkStrategy && (
         <SignInFactorOneMagicLink
           handleShowAllStrategies={() => setShowAllStrategies(true)}
           currentFactor={currentFactor}

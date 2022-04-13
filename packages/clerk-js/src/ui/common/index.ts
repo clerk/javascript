@@ -1,7 +1,6 @@
 export * from './authForms';
 export * from './authPropHelpers';
 export * from './constants';
-export * from './disabledStrategies';
 export * from './errorHandler';
 export * from './forms';
 export * from './logo';

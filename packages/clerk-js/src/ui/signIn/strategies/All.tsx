@@ -1,9 +1,10 @@
 import { Button } from '@clerk/shared/components/button';
-import { OAuthStrategy, SignInFactor, SignInStrategy } from '@clerk/types';
+import { OAuthStrategy, SignInFactor } from '@clerk/types';
 import React from 'react';
 import { Separator } from 'ui/common';
 import { useSupportEmail } from 'ui/hooks/useSupportEmail';
 import { allStrategiesButtonsComparator } from 'ui/signIn/strategies/factorSortingUtils';
+import { factorHasLocalStrategy } from '../utils';
 
 import { OAuth } from './OAuth';
 
@@ -20,11 +21,6 @@ export function getButtonLabel(factor: SignInFactor): string {
     default:
       throw `Invalid sign in strategy: "${factor.strategy}"`;
   }
-}
-
-const supportedStrategies: SignInStrategy[] = ['email_code', 'password', 'phone_code', 'email_link'];
-function isSupportedStrategy(strategy: SignInStrategy): boolean {
-  return supportedStrategies.includes(strategy);
 }
 
 export type AllProps = {
@@ -46,7 +42,7 @@ export function All({ selectFactor, factors }: AllProps): JSX.Element {
   const href = `mailto:${supportEmail}`;
 
   const firstPartyButtons = firstPartyFactors
-    .filter(f => isSupportedStrategy(f.strategy))
+    .filter(factor => factorHasLocalStrategy(factor))
     .sort(allStrategiesButtonsComparator)
     .map((factor, i) => (
       <Button
