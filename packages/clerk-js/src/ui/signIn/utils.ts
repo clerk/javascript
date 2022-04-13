@@ -102,7 +102,10 @@ export function determineSalutation(signIn: Partial<SignInResource>): string {
   return titleize(signIn.userData?.firstName) || titleize(signIn.userData?.lastName) || signIn?.identifier || '';
 }
 
-const supportedStrategies: SignInStrategy[] = ['email_code', 'password', 'phone_code', 'email_link'];
-export function isContactInfoRelatedStrategy(strategy: SignInStrategy): boolean {
-  return supportedStrategies.includes(strategy);
+const localStrategies: SignInStrategy[] = ['email_code', 'password', 'phone_code', 'email_link'];
+export function factorHasLocalStrategy(factor: SignInFactor): boolean {
+  if (!factor) {
+    return false;
+  }
+  return localStrategies.includes(factor.strategy);
 }

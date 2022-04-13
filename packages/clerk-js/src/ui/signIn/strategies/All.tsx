@@ -1,10 +1,10 @@
 import { Button } from '@clerk/shared/components/button';
-import { OAuthStrategy, SignInFactor, SignInStrategy } from '@clerk/types';
+import { OAuthStrategy, SignInFactor } from '@clerk/types';
 import React from 'react';
 import { Separator } from 'ui/common';
 import { useSupportEmail } from 'ui/hooks/useSupportEmail';
 import { allStrategiesButtonsComparator } from 'ui/signIn/strategies/factorSortingUtils';
-import { isContactInfoRelatedStrategy } from '../utils';
+import { factorHasLocalStrategy } from '../utils';
 
 import { OAuth } from './OAuth';
 
@@ -42,7 +42,7 @@ export function All({ selectFactor, factors }: AllProps): JSX.Element {
   const href = `mailto:${supportEmail}`;
 
   const firstPartyButtons = firstPartyFactors
-    .filter(f => isContactInfoRelatedStrategy(f.strategy))
+    .filter(factor => factorHasLocalStrategy(factor))
     .sort(allStrategiesButtonsComparator)
     .map((factor, i) => (
       <Button

@@ -5,7 +5,7 @@ import { useCoreSignIn, useEnvironment } from 'ui/contexts';
 import { AllFirstFactorStrategies, SignInFactorOneInputBased, SignInFactorOneMagicLink } from 'ui/signIn/factorOne';
 
 import { ErrorScreen } from './strategies';
-import { determineStartingSignInFactor, isContactInfoRelatedStrategy } from './utils';
+import { determineStartingSignInFactor, factorHasLocalStrategy } from './utils';
 
 function _SignInFactorOne(): JSX.Element {
   const signIn = useCoreSignIn();
@@ -17,7 +17,7 @@ function _SignInFactorOne(): JSX.Element {
     return determineStartingSignInFactor(availableFactors, signIn.identifier, preferredSignInStrategy);
   });
   const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(
-    !currentFactor || !isContactInfoRelatedStrategy(currentFactor.strategy),
+    !currentFactor || !factorHasLocalStrategy(currentFactor),
   );
 
   const handleAlternativeFactorSelect = (selectedFactor: SignInFactor) => {
