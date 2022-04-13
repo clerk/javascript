@@ -3,13 +3,14 @@ import { IsomorphicClerkOptions } from '@clerk/clerk-react/dist/types';
 import React from 'react';
 
 import { assertFrontendApi, assertValidClerkState, warnForSsr } from '../utils';
+import { ClerkState } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
 
 export * from '@clerk/clerk-react';
 
-export type RemixClerkProviderProps<ClerkStateT extends { __type: 'clerkState' } = any> = {
+export type RemixClerkProviderProps = {
   children: React.ReactNode;
-  clerkState: ClerkStateT;
+  clerkState: ClerkState;
 } & IsomorphicClerkOptions;
 
 export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): JSX.Element {
@@ -18,12 +19,15 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
   ReactClerkProvider.displayName = 'ReactClerkProvider';
 
   assertValidClerkState(clerkState);
+  const { __clerk_ssr_state, __frontendApi, __lastAuthResult } = clerkState?.__internal_clerk_state || {};
 
   React.useEffect(() => {
     warnForSsr(clerkState);
   }, []);
 
-  const { __clerk_ssr_state, __frontendApi } = clerkState?.__internal_clerk_state || {};
+  React.useEffect(() => {
+    (window as any).__clerk_debug = { __lastAuthResult };
+  }, []);
 
   assertFrontendApi(__frontendApi);
 

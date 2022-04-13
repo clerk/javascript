@@ -1,10 +1,16 @@
-import { json } from '@remix-run/server-runtime';
-
 import { invalidRootLoaderCallbackResponseReturn, invalidRootLoaderCallbackReturn } from '../errors';
 import { assertFrontendApi } from '../utils';
 import { getAuthData } from './getAuthData';
 import { LoaderFunctionArgs, LoaderFunctionReturn, RootAuthLoaderCallback, RootAuthLoaderOptions } from './types';
-import { assertObject, injectAuthIntoRequest, isRedirect, isResponse, sanitizeAuthData, wrapClerkState } from './utils';
+import {
+  assertObject,
+  injectAuthIntoRequest,
+  isRedirect,
+  isResponse,
+  returnLoaderResultJsonResponse,
+  sanitizeAuthData,
+  throwInterstitialJsonResponse,
+} from './utils';
 
 interface RootAuthLoader {
   <Options extends RootAuthLoaderOptions>(
@@ -33,20 +39,14 @@ export const rootAuthLoader: RootAuthLoader = async (
   const { authData, showInterstitial, errorReason } = await getAuthData(args.request, opts);
 
   if (showInterstitial) {
-    throw json(wrapClerkState({ __clerk_ssr_interstitial: showInterstitial, __frontendApi: frontendApi }), {
-      status: 401,
-      headers: { 'Auth-Result': errorReason || '' },
-    });
+    throw throwInterstitialJsonResponse({ frontendApi, errorReason });
   }
 
   if (!callback) {
-    return json(
-      { ...wrapClerkState({ __clerk_ssr_state: authData, __frontendApi: frontendApi }) },
-      { headers: { 'Auth-Result': errorReason || '' } },
-    );
+    return returnLoaderResultJsonResponse({ authData, frontendApi, errorReason });
   }
 
-  const callbackResult = await callback?.(injectAuthIntoRequest(args, sanitizeAuthData(authData!)));
+  const callbackResult = await callback(injectAuthIntoRequest(args, sanitizeAuthData(authData!)));
   assertObject(callbackResult, invalidRootLoaderCallbackReturn);
 
   // Pass through custom responses
@@ -57,8 +57,5 @@ export const rootAuthLoader: RootAuthLoader = async (
     throw new Error(invalidRootLoaderCallbackResponseReturn);
   }
 
-  return json(
-    { ...callbackResult, ...wrapClerkState({ __clerk_ssr_state: authData, __frontendApi: frontendApi }) },
-    { headers: { 'Auth-Result': errorReason || '' } },
-  );
+  return returnLoaderResultJsonResponse({ authData, frontendApi, errorReason, callbackResult });
 };
