@@ -167,7 +167,9 @@ export class SignUp extends BaseResource implements SignUpResource {
 
   public authenticateWithRedirect = async (params: AuthenticateWithRedirectParams): Promise<void> => {
     const { redirectUrl, redirectUrlComplete, strategy } = params || {};
-    const { verifications } = await this.create({
+    const authenticateFn = (args: SignUpCreateParams | SignUpUpdateParams) =>
+      this.id ? this.update(args) : this.create(args);
+    const { verifications } = await authenticateFn({
       strategy,
       redirectUrl,
       actionCompleteRedirectUrl: redirectUrlComplete,

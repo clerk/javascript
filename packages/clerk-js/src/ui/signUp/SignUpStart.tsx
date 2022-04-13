@@ -38,6 +38,7 @@ function _SignUpStart(): JSX.Element {
   const [emailOrPhoneActive, setEmailOrPhoneActive] = React.useState<ActiveIdentifier>('emailAddress');
   const signUp = useCoreSignUp();
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isMissingRequirements, setMissingRequirements] = React.useState(false);
   const formFields = {
     firstName: useFieldState('first_name', ''),
     lastName: useFieldState('last_name', ''),
@@ -58,6 +59,9 @@ function _SignUpStart(): JSX.Element {
   const fields = determineFirstPartyFields(environment, hasTicket);
   const oauthOptions = userSettings.socialProviderStrategies;
   const web3Options = userSettings.web3FirstFactors;
+  const isEmailAddressUsedForIdentification = userSettings.enabledFirstFactorIdentifiers.some(
+    i => i === 'email_address',
+  );
 
   const handleTokenFlow = () => {
     const ticket = formFields.ticket.value;
@@ -167,6 +171,8 @@ function _SignUpStart(): JSX.Element {
       return navigate('verify-email-address');
     } else if (su.phoneNumber && su.verifications.phoneNumber.status !== 'verified') {
       return navigate('verify-phone-number');
+    } else if (su.status === 'missing_requirements') {
+      setMissingRequirements(true);
     }
   };
 
@@ -252,7 +258,7 @@ function _SignUpStart(): JSX.Element {
   ) : null;
 
   const shouldShowEmailAddressField =
-    (hasTicket && !!formFields.emailAddress.value) ||
+    (isEmailAddressUsedForIdentification && hasTicket && !!formFields.emailAddress.value) ||
     fields.emailAddress ||
     (fields.emailOrPhone && emailOrPhoneActive === 'emailAddress');
 
@@ -305,7 +311,7 @@ function _SignUpStart(): JSX.Element {
         className='cl-auth-form-header-compact'
       />
       <Body>
-        {!hasTicket && oauthOptions.length > 0 && (
+        {(!hasTicket || (hasTicket && isMissingRequirements)) && oauthOptions.length > 0 && (
           <SignUpOAuth
             oauthOptions={oauthOptions}
             setError={setError}
