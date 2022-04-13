@@ -84,32 +84,38 @@
   ],
   "external_accounts": [
     {
-      "object": "google_account",
+      "object": "external_account",
+      "provider": "google",
       "id": "gac_googlyeyes",
-      "google_id": "1234567890",
+      "identification_id": "1234567890",
+      "provider_user_id": "1234567890",
       "approved_scopes": "email https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid profile",
       "email_address": "kyle@tech.com",
-      "given_name": "Kyle",
-      "family_name": "Reese",
-      "picture": "https://lh3.googleusercontent.com/-MvTefx9nU6o/BBBBBBBBBBI/BBBBBBBBBBB/ereRAMWiew8hQ5IaSVdTZWm1Y1G1z0T_P7Q/s96-c/photo.jpg",
+      "first_name": "Kyle",
+      "last_name": "Reese",
+      "avatar_url": "https://lh3.googleusercontent.com/-MvTefx9nU6o/BBBBBBBBBBI/BBBBBBBBBBB/ereRAMWiew8hQ5IaSVdTZWm1Y1G1z0T_P7Q/s96-c/photo.jpg",
       "username": "tester",
       "public_metadata": {},
-      "label": null
+      "label": null,
+      "verification": null
     },
     {
-      "object": "facebook_account",
+      "object": "external_account",
+      "provider": "facebook",
       "id": "fbac_xavier",
-      "facebook_id": "9876543210",
+      "identification_id": "9876543210",
+      "provider_user_id": "9876543210",
       "approved_scopes": "email",
       "email_address": "kyle@tech.com",
       "first_name": "Kyle",
       "last_name": "Reese",
-      "picture": "https://platform-lookaside.fbsbx.com/platform/profilepic/?asid=16357923188267094&height=50&width=50&ext=2319847405&hash=AeQyoXRpxMMso8vNHSw",
+      "avatar_url": "https://platform-lookaside.fbsbx.com/platform/profilepic/?asid=16357923188267094&height=50&width=50&ext=2319847405&hash=AeQyoXRpxMMso8vNHSw",
       "username": null,
       "public_metadata": {
         "extra": "more info"
       },
-      "label": "clerk"
+      "label": "clerk",
+      "verification": null
     }
   ],
   "public_metadata": {

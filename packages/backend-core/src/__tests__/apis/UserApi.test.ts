@@ -15,11 +15,6 @@ test('getUserList() returns a list of users', async () => {
 
   expect(userList).toBeInstanceOf(Array);
   expect(userList.length).toEqual(1);
-
-  // const expected = new User();
-
-  // expect(userList[0]).toEqual(expected);
-
   expect(userList[0]).toBeInstanceOf(User);
 });
 

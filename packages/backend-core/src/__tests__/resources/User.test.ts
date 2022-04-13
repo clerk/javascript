@@ -66,38 +66,5 @@ const mockUserDTO: UserJSON = {
 
 test('user defaults', function () {
   const user = User.fromJSON(mockUserDTO);
-  expect(user.publicMetadata).toEqual({ gender: 'female' });
-  expect(user.privateMetadata).toEqual({ middleName: 'Test' });
-  expect(user.emailAddresses).toEqual([
-    {
-      emailAddress: 'test@example.com',
-      id: 'idn_27jbYTsvdRnRyc5pFqOeD6ZkZ81',
-      linkedTo: [],
-      verification: {
-        attempts: 0,
-        expireAt: 12345,
-        externalVerificationRedirectURL: null,
-        nonce: '',
-        status: 'verified',
-        strategy: 'email',
-      },
-    },
-  ]);
-  expect(user.phoneNumbers).toEqual([
-    {
-      id: 'idn_27jbYTB1izaVaORupvdREuDqqaZ',
-      linkedTo: [],
-      phoneNumber: '+15555555555',
-      reservedForSecondFactor: false,
-      verification: {
-        attempts: 0,
-        expireAt: 12345,
-        externalVerificationRedirectURL: null,
-        nonce: '',
-        status: 'verified',
-        strategy: 'phone',
-      },
-    },
-  ]);
-  expect(user.externalAccounts).toEqual([]);
+  expect(user).toMatchSnapshot();
 });

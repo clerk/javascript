@@ -13,7 +13,6 @@
   "module": "dist/mjs/index.js",
   "dependencies": {
     "@clerk/types": "^2.5.0",
-    "camelcase-keys": "^7.0.1",
     "query-string": "^7.0.1",
     "snakecase-keys": "^5.1.2",
     "tslib": "^2.3.1"

@@ -1,15 +1,18 @@
 import nock from 'nock';
 
-import { Organization } from '../../api/resources';
+import { ObjectType, Organization, OrganizationJSON } from '../../api/resources';
 import { TestBackendAPIClient } from '../TestBackendAPI';
 
 test('createOrganization() creates an organization', async () => {
   const name = 'Acme Inc';
   const createdBy = 'user_randomid';
-  const resJSON = {
-    object: 'organization',
+  const resJSON: OrganizationJSON = {
+    object: ObjectType.Organization,
+    public_metadata: {},
     id: 'org_randomid',
     name,
+    logo_url: null,
+    slug: null,
     created_at: 1611948436,
     updated_at: 1611948436,
   };
@@ -25,12 +28,5 @@ test('createOrganization() creates an organization', async () => {
     name,
     createdBy,
   });
-  expect(organization).toEqual(
-    new Organization({
-      id: resJSON.id,
-      name,
-      createdAt: resJSON.created_at,
-      updatedAt: resJSON.updated_at,
-    }),
-  );
+  expect(organization).toEqual(new Organization(resJSON.id, name, null, null, resJSON.created_at, resJSON.updated_at));
 });

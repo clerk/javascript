@@ -31,15 +31,7 @@ test('createEmail() sends an email', async () => {
     body,
   });
 
-  const expected = new Email({
-    id: 'ema_yeehaw',
-    fromEmailName,
-    toEmailAddress: 'chuck@norris.com',
-    emailAddressId,
-    subject,
-    body,
-    status: 'queued',
-  });
+  const expected = new Email('ema_yeehaw', fromEmailName, emailAddressId, 'chuck@norris.com', subject, body, 'queued');
 
   expect(email).toEqual(expected);
 });

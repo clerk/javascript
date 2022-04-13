@@ -1,31 +1,10 @@
-import associationDefaults from '../utils/Associations';
-import { Association } from './Enums';
 import type { Web3WalletJSON } from './JSON';
-import type { Web3WalletProps } from './Props';
 import { Verification } from './Verification';
 
-interface Web3WalletPayload extends Web3WalletProps {}
-
-export interface Web3Wallet extends Web3WalletPayload {}
-
 export class Web3Wallet {
-  static attributes = ['id', 'web3Wallet'];
-
-  static associations = {
-    verification: Association.HasOne,
-  };
-
-  static defaults = associationDefaults(Web3Wallet.associations);
-
-  constructor(data: Partial<Web3WalletPayload> = {}) {
-    Object.assign(this, Web3Wallet.defaults, data);
-  }
+  constructor(readonly id: string, readonly web3Wallet: string, readonly verification: Verification | null) {}
 
   static fromJSON(data: Web3WalletJSON): Web3Wallet {
-    return new Web3Wallet({
-      id: data.id,
-      web3Wallet: data.web3_wallet,
-      verification: Verification.fromJSON(data.verification),
-    });
+    return new Web3Wallet(data.id, data.web3_wallet, data.verification && Verification.fromJSON(data.verification));
   }
 }

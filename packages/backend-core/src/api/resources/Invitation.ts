@@ -1,25 +1,23 @@
-import camelcaseKeys from 'camelcase-keys';
-
-import filterKeys from '../utils/Filter';
 import type { InvitationJSON } from './JSON';
-import type { InvitationProps } from './Props';
-
-interface InvitationPayload extends InvitationProps {}
-
-export interface Invitation extends InvitationPayload {}
 
 export class Invitation {
-  static attributes = ['id', 'emailAddress', 'publicMetadata', 'createdAt', 'updatedAt'];
-
-  static defaults = [];
-
-  constructor(data: Partial<InvitationProps> = {}) {
-    Object.assign(this, Invitation.defaults, data);
-  }
+  constructor(
+    readonly id: string,
+    readonly emailAddress: string,
+    readonly publicMetadata: Record<string, unknown> | null,
+    readonly createdAt: number,
+    readonly updatedAt: number,
+    readonly revoked?: boolean,
+  ) {}
 
   static fromJSON(data: InvitationJSON): Invitation {
-    const camelcased = camelcaseKeys(data);
-    const filtered = filterKeys(camelcased, Invitation.attributes);
-    return new Invitation(filtered as InvitationPayload);
+    return new Invitation(
+      data.id,
+      data.email_address,
+      data.public_metadata,
+      data.created_at,
+      data.updated_at,
+      data.revoked,
+    );
   }
 }

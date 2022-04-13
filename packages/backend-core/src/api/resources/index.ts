@@ -9,7 +9,6 @@ export * from './Invitation';
 export * from './Organization';
 export * from './JSON';
 export * from './PhoneNumber';
-export * from './Props';
 export * from './Session';
 export * from './SMSMessage';
 export * from './User';
