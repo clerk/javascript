@@ -1,4 +1,5 @@
 import type {
+  CreateOrganizationParams,
   GetMembershipsParams,
   MembershipRole,
   OrganizationInvitationJSON,
@@ -16,6 +17,7 @@ export class Organization extends BaseResource implements OrganizationResource {
 
   id!: string;
   name!: string;
+  slug!: string;
   publicMetadata: Record<string, unknown> = {};
   createdAt!: Date;
   updatedAt!: Date;
@@ -25,12 +27,26 @@ export class Organization extends BaseResource implements OrganizationResource {
     this.fromJSON(data);
   }
 
-  static async create(name: string): Promise<OrganizationResource> {
+  static async create(params: CreateOrganizationParams): Promise<OrganizationResource>;
+  /**
+   * @deprecated Calling `create` with a string is deprecated. Use an object of type {@link CreateOrganizationParams} instead.
+   */
+  static async create(name: string): Promise<OrganizationResource>;
+  static async create(paramsOrName: string | CreateOrganizationParams): Promise<OrganizationResource> {
+    let name;
+    let slug;
+    if (typeof paramsOrName === 'string') {
+      // DX: Deprecated v3.5.2
+      name = paramsOrName;
+    } else {
+      name = paramsOrName.name;
+      slug = paramsOrName.slug;
+    }
     const json = (
       await BaseResource._fetch<OrganizationJSON>({
         path: '/organizations',
         method: 'POST',
-        body: { name } as any,
+        body: { name, slug } as any,
       })
     )?.response as unknown as OrganizationJSON;
 
@@ -90,6 +106,7 @@ export class Organization extends BaseResource implements OrganizationResource {
   protected fromJSON(data: OrganizationJSON): this {
     this.id = data.id;
     this.name = data.name;
+    this.slug = data.slug;
     this.publicMetadata = data.public_metadata;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);

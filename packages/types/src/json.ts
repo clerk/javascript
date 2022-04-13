@@ -245,6 +245,7 @@ export interface OrganizationJSON extends ClerkResourceJSON {
   object: 'organization';
   id: string;
   name: string;
+  slug: string;
   public_metadata: Record<string, unknown>;
   created_at: number;
   updated_at: number;
