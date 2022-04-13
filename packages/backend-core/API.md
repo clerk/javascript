@@ -151,7 +151,9 @@ Organization operations are exposed by the `organizations` sub-api (`clerkAPI.or
 
 #### createOrganization(params)
 
-Creates a new organization with the given name. You need to provide the user ID who is going to be the organization owner. The user will become an administrator for the organization.
+Creates a new organization with the given name and optional slug.
+
+You need to provide the user ID who is going to be the organization owner. The user will become an administrator for the organization.
 
 Available parameters are:
 
@@ -163,6 +165,7 @@ Available parameters are:
 ```js
 const organization = await clerkAPI.organizations.createOrganization({
   name: 'Acme Inc',
+  slug: 'acme-inc',
   createdBy: 'user_1o4q123qMeCkKKIXcA9h8',
 });
 ```

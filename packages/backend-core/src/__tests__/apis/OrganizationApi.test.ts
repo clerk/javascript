@@ -5,6 +5,7 @@ import { TestBackendAPIClient } from '../TestBackendAPI';
 
 test('createOrganization() creates an organization', async () => {
   const name = 'Acme Inc';
+  const slug = 'acme-inc';
   const createdBy = 'user_randomid';
   const publicMetadata = { public: 'metadata' };
   const privateMetadata = { private: 'metadata' };
@@ -12,6 +13,7 @@ test('createOrganization() creates an organization', async () => {
     object: 'organization',
     id: 'org_randomid',
     name,
+    slug,
     public_metadata: publicMetadata,
     private_metadata: privateMetadata,
     created_at: 1611948436,
@@ -21,6 +23,7 @@ test('createOrganization() creates an organization', async () => {
   nock('https://api.clerk.dev')
     .post('/v1/organizations', {
       name,
+      slug,
       public_metadata: JSON.stringify(publicMetadata),
       private_metadata: JSON.stringify(privateMetadata),
       created_by: createdBy,
@@ -29,6 +32,7 @@ test('createOrganization() creates an organization', async () => {
 
   const organization = await TestBackendAPIClient.organizations.createOrganization({
     name,
+    slug,
     createdBy,
     publicMetadata,
     privateMetadata,
@@ -37,6 +41,7 @@ test('createOrganization() creates an organization', async () => {
     new Organization({
       id: resJSON.id,
       name,
+      slug,
       publicMetadata,
       privateMetadata,
       createdAt: resJSON.created_at,
