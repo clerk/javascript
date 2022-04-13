@@ -1,4 +1,4 @@
-import { renderJSON } from '@clerk/shared/testUtils';
+import { render, renderJSON, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
 import {
   ClerkAPIErrorJSON,
   ExternalAccountJSON,
@@ -9,13 +9,14 @@ import {
   UserSettingsResource,
   VerificationJSON,
 } from '@clerk/types';
-import { User } from 'core/resources/User';
+import { ExternalAccount, User } from 'core/resources';
 import { UserSettings } from 'core/resources/UserSettings';
 import React from 'react';
 
 import { ConnectedAccountList } from './ConnectedAccountList';
 
 const mockNavigate = jest.fn();
+
 jest.mock('ui/hooks', () => ({
   useNavigate: () => {
     return {
@@ -26,10 +27,12 @@ jest.mock('ui/hooks', () => ({
 
 const mockUseEnvironment = jest.fn();
 
+const mockCreateExternalAccount = jest.fn();
+
 jest.mock('ui/contexts', () => {
   return {
     useCoreUser: (): Partial<UserResource> => {
-      return new User({
+      const user = new User({
         object: 'user',
         id: 'user_1nQu4nZrhHEeolMMRhg4yERFYJx',
         username: '',
@@ -80,6 +83,10 @@ jest.mock('ui/contexts', () => {
           } as ExternalAccountJSON,
         ],
       } as unknown as UserJSON);
+
+      user.createExternalAccount = mockCreateExternalAccount;
+
+      return user;
     },
     useEnvironment: () => mockUseEnvironment(),
   };
@@ -178,5 +185,31 @@ describe('<ConnectedAccountList/>', () => {
     mockUseEnvironment.mockImplementation(() => emptyEnvironmentContext);
     const tree = renderJSON(<ConnectedAccountList />);
     expect(tree).toMatchSnapshot();
+  });
+
+  it('navigates to the external account verification URL when the users connects an oauth provider', async () => {
+    mockUseEnvironment.mockImplementation(() => environmentContext);
+
+    render(<ConnectedAccountList />);
+
+    mockCreateExternalAccount.mockImplementation(() => {
+      return Promise.resolve(
+        new ExternalAccount(
+          {
+            verification: {
+              external_verification_redirect_url: 'https://www.foobar.com/',
+            } as VerificationJSON,
+          } as ExternalAccountJSON,
+          '/external_accounts',
+        ),
+      );
+    });
+
+    const connectMSButton = screen.getByRole('button', { name: /Connect Microsoft account/ });
+    userEvent.click(connectMSButton);
+
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith(new URL('https://www.foobar.com/'));
+    });
   });
 });

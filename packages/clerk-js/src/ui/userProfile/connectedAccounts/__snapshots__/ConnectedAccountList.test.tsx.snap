@@ -132,9 +132,13 @@ Array [
           <div
             className="iconContainer"
           >
-            <svg
-              data-filename="../shared/assets/icons/arrow-right.svg"
-            />
+            <div
+              className="icon"
+            >
+              <svg
+                data-filename="../shared/assets/icons/arrow-right.svg"
+              />
+            </div>
           </div>
         </div>
       </button>
@@ -163,9 +167,13 @@ Array [
           <div
             className="iconContainer"
           >
-            <svg
-              data-filename="../shared/assets/icons/arrow-right.svg"
-            />
+            <div
+              className="icon"
+            >
+              <svg
+                data-filename="../shared/assets/icons/arrow-right.svg"
+              />
+            </div>
           </div>
         </div>
       </button>
