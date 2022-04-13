@@ -1,12 +1,11 @@
-import { mocked, render, renderJSON, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
+import { render, renderJSON, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
 import { titleize } from '@clerk/shared/utils/string';
-import { SignInResource, UserSettingsJSON } from '@clerk/types';
+import { UserSettingsJSON } from '@clerk/types';
 import { Session, UserSettings } from 'core/resources/internal';
 import React from 'react';
-import { useCoreSignIn, useCoreSignUp } from 'ui/contexts';
+import { useCoreSignUp } from 'ui/contexts';
 
 import { SignUpStart } from './SignUpStart';
-import { SignInStart } from 'ui/signIn/SignInStart';
 
 const navigateMock = jest.fn();
 const mockCreateRequest = jest.fn();
@@ -321,6 +320,10 @@ describe('<SignUpStart/>', () => {
               },
             },
           } as UserSettingsJSON);
+        });
+
+        afterEach(() => {
+          setWindowQueryParams([]);
         });
 
         it('it auto-completes sign up flow if sign up is complete after create', async () => {

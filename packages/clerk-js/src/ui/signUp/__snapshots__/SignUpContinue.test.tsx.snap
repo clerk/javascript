@@ -1,0 +1,153 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<SignUpContinue/> renders the sign up continue screen 1`] = `
+Array [
+  <div
+    className="cl-auth-form-header cl-auth-form-header-compact"
+    style={Object {}}
+  >
+    <div
+      className="cl-info"
+    >
+      Please fill in the following information to complete your sign-up
+    </div>
+    <div
+      className="cl-auth-form-header-logo"
+    >
+      <div
+        className="cl-logo"
+        title="My test app"
+      >
+        My test app
+      </div>
+    </div>
+  </div>,
+  <div
+    className="cl-auth-form-body"
+  >
+    <form
+      className="form"
+      onReset={[Function]}
+      onSubmit={[Function]}
+    >
+      <fieldset>
+        <div
+          className="cl-field-row"
+        >
+          <div
+            className="control cl-half-field"
+          >
+            <label
+              className="label labelContainer"
+              htmlFor="firstName"
+            >
+              <input
+                className="input"
+                id="firstName"
+                name="firstName"
+                onChange={[Function]}
+                type="text"
+                value=""
+              />
+              <span
+                className="label"
+              >
+                First name
+              </span>
+            </label>
+            <span
+              className="error"
+            />
+          </div>
+          <div
+            className="control cl-half-field"
+          >
+            <label
+              className="label labelContainer"
+              htmlFor="lastName"
+            >
+              <input
+                className="input"
+                id="lastName"
+                name="lastName"
+                onChange={[Function]}
+                type="text"
+                value=""
+              />
+              <span
+                className="label"
+              >
+                Last name
+              </span>
+            </label>
+            <span
+              className="error"
+            />
+          </div>
+        </div>
+        <div
+          className="control"
+        >
+          <label
+            className="label labelContainer"
+            htmlFor="emailAddress"
+          >
+            <input
+              className="input"
+              id="emailAddress"
+              name="emailAddress"
+              onChange={[Function]}
+              type="email"
+              value="bryan@taken.com"
+            />
+            <span
+              className="label"
+            >
+              Email address
+            </span>
+          </label>
+          <span
+            className="error"
+          />
+        </div>
+      </fieldset>
+      <fieldset
+        className="group"
+        disabled={false}
+      >
+        <button
+          className="button solid primary cl-sign-up-button"
+          disabled={false}
+          style={
+            Object {
+              "display": "flex",
+            }
+          }
+        >
+          Sign up
+        </button>
+      </fieldset>
+    </form>
+    <div
+      className="cl-auth-form-footer"
+    >
+      <div
+        className="cl-auth-form-switch cl-auth-form-link"
+      >
+        <span
+          className="cl-auth-form-link-label"
+        >
+          Already have an account?
+        </span>
+         
+        <a
+          className=""
+          onClick={[Function]}
+        >
+          Sign in
+        </a>
+      </div>
+    </div>
+  </div>,
+]
+`;

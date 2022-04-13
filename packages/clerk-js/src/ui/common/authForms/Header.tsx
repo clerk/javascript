@@ -4,6 +4,7 @@ import React from 'react';
 import { Logo } from 'ui/common';
 import { BackButton } from 'ui/common/backButton';
 import { Error } from 'ui/common/error';
+import { Info } from 'ui/common/info';
 
 export type HeaderProps = {
   showBack?: boolean;
@@ -11,6 +12,7 @@ export type HeaderProps = {
   handleBack?: () => void;
   welcomeName?: string;
   error?: string;
+  info?: string;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export function Header({
@@ -18,6 +20,7 @@ export function Header({
   showLogo = true,
   welcomeName,
   error,
+  info,
   handleBack,
   className,
 }: HeaderProps): JSX.Element {
@@ -37,6 +40,7 @@ export function Header({
         />
       )}
       {error && <Error style={errorStyle}>{error}</Error>}
+      {info && <Info>{info}</Info>}
       {showLogo && (
         <div className='cl-auth-form-header-logo'>
           <Logo />
