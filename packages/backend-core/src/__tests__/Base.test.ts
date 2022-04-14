@@ -1,8 +1,8 @@
 import { Base } from '../Base';
 import { AuthErrorReason, AuthStateParams, AuthStatus } from '../types';
 import { TokenVerificationError } from '../util/errors';
+
 const mockCrossOrigin = jest.fn();
-const mockFetchInterstitial = jest.fn();
 const mockIsDevelopmentOrStaging = jest.fn();
 const mockIsProduction = jest.fn();
 
@@ -20,12 +20,10 @@ jest.mock('../util/clerkApiKey', () => ({
 }));
 
 const environmentJWTKey = 'CLERK_JWT_KEY';
-const mockInterstitialValue = '';
 
 /* An otherwise bare state on a request. */
 const defaultAuthState: AuthStateParams = {
   host: 'clerk.dev',
-  fetchInterstitial: () => mockFetchInterstitial(),
   userAgent: 'Mozilla/',
 };
 
@@ -36,7 +34,7 @@ const mockLoadCryptoKeyFunction = jest.fn();
 
 describe('Base verifySessionToken', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    jest.resetAllMocks();
   });
 
   it('uses supplied crypto key function by default when present', async () => {
@@ -50,7 +48,7 @@ describe('Base verifySessionToken', () => {
   });
 
   it('throws on failed public key fetching', () => {
-    mockLoadCryptoKeyFunction.mockImplementationOnce(() => {
+    mockLoadCryptoKeyFunction.mockImplementation(() => {
       throw new Error();
     });
     const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
@@ -93,7 +91,7 @@ describe('Base verifySessionToken', () => {
 
 describe('Base getAuthState', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    jest.resetAllMocks();
   });
 
   it('uses header token if present to build the state', async () => {
@@ -104,7 +102,7 @@ describe('Base getAuthState', () => {
   });
 
   it('returns correct errorReason on failed pk fetching', async () => {
-    mockLoadCryptoKeyFunction.mockImplementationOnce(() => {
+    mockLoadCryptoKeyFunction.mockImplementation(() => {
       throw new Error();
     });
     const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
@@ -118,14 +116,12 @@ describe('Base getAuthState', () => {
   it('returns signed out on development non browser requests', async () => {
     const nonBrowserUserAgent = 'curl';
     const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
-    testBase.buildAuthenticatedState = jest.fn();
-    mockIsDevelopmentOrStaging.mockImplementationOnce(() => true);
+    mockIsDevelopmentOrStaging.mockImplementation(() => true);
     const authStateResult = await testBase.getAuthState({
       ...defaultAuthState,
       userAgent: nonBrowserUserAgent,
       clientUat: '12345',
     });
-    expect(testBase.buildAuthenticatedState).toHaveBeenCalledTimes(0);
     expect(authStateResult).toEqual({
       status: AuthStatus.SignedOut,
       errorReason: AuthErrorReason.HeaderMissingNonBrowser,
@@ -134,7 +130,7 @@ describe('Base getAuthState', () => {
 
   it('returns signed out when no header token is present in cross-origin request', async () => {
     const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
-    mockCrossOrigin.mockImplementationOnce(() => true);
+    mockCrossOrigin.mockImplementation(() => true);
     const authStateResult = await testBase.getAuthState({ ...defaultAuthState, origin: 'https://clerk.dev' });
     expect(mockCrossOrigin).toHaveBeenCalledTimes(1);
     expect(authStateResult).toEqual({ status: AuthStatus.SignedOut, errorReason: AuthErrorReason.HeaderMissingCORS });
@@ -142,68 +138,55 @@ describe('Base getAuthState', () => {
 
   it('returns interstitial when in development we find no clientUat', async () => {
     const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
-    mockFetchInterstitial.mockImplementationOnce(() => Promise.resolve(mockInterstitialValue));
-    mockIsDevelopmentOrStaging.mockImplementationOnce(() => true);
+    mockIsDevelopmentOrStaging.mockImplementation(() => true);
     const authStateResult = await testBase.getAuthState({
       ...defaultAuthState,
-      fetchInterstitial: mockFetchInterstitial,
     });
-
-    expect(mockFetchInterstitial).toHaveBeenCalledTimes(1);
     expect(authStateResult).toEqual({
       status: AuthStatus.Interstitial,
-      interstitial: mockInterstitialValue,
       errorReason: AuthErrorReason.UATMissing,
     });
   });
 
   it('returns signed out on first production load without cookieToken and clientUat', async () => {
     const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
-    mockIsProduction.mockImplementationOnce(() => true);
+    mockIsProduction.mockImplementation(() => true);
     const authStateResult = await testBase.getAuthState({ ...defaultAuthState });
     expect(authStateResult).toEqual({ status: AuthStatus.SignedOut, errorReason: AuthErrorReason.CookieAndUATMissing });
   });
 
   it('returns interstitial on development after auth action on Clerk-hosted UIs', async () => {
     const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
-    mockFetchInterstitial.mockImplementationOnce(() => Promise.resolve(mockInterstitialValue));
-    mockIsDevelopmentOrStaging.mockImplementationOnce(() => true);
-    mockCrossOrigin.mockImplementationOnce(() => true);
+    mockIsDevelopmentOrStaging.mockImplementation(() => true);
+    mockCrossOrigin.mockImplementation(() => true);
     const authStateResult = await testBase.getAuthState({
       ...defaultAuthState,
-      fetchInterstitial: mockFetchInterstitial,
       referrer: 'https://random.clerk.hosted.ui',
       clientUat: '12345',
     });
 
-    expect(mockFetchInterstitial).toHaveBeenCalledTimes(1);
     expect(authStateResult).toEqual({
       status: AuthStatus.Interstitial,
-      interstitial: mockInterstitialValue,
       errorReason: AuthErrorReason.CrossOriginReferrer,
     });
   });
 
   it('returns signed out on clientUat signaled as 0', async () => {
     const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
-    mockIsProduction.mockImplementationOnce(() => true);
+    mockIsProduction.mockImplementation(() => true);
     const authStateResult = await testBase.getAuthState({ ...defaultAuthState, clientUat: '0' });
     expect(authStateResult).toEqual({ status: AuthStatus.SignedOut, errorReason: AuthErrorReason.StandardOut });
   });
 
   it('returns interstitial when on production and have a valid clientUat value without cookieToken', async () => {
     const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
-    mockIsProduction.mockImplementationOnce(() => true);
-    mockFetchInterstitial.mockImplementationOnce(() => Promise.resolve(mockInterstitialValue));
+    mockIsProduction.mockImplementation(() => true);
     const authStateResult = await testBase.getAuthState({
       ...defaultAuthState,
       clientUat: '12345',
-      fetchInterstitial: mockFetchInterstitial,
     });
-    expect(mockFetchInterstitial).toHaveBeenCalledTimes(1);
     expect(authStateResult).toEqual({
       status: AuthStatus.Interstitial,
-      interstitial: mockInterstitialValue,
       errorReason: AuthErrorReason.CookieMissing,
     });
   });
@@ -211,7 +194,7 @@ describe('Base getAuthState', () => {
   it('returns sessionClaims cookieToken is available and clientUat is valid', async () => {
     const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
     const validJwtToken = { sessionClaims: { iat: Number(new Date()) + 50 } };
-    testBase.buildAuthenticatedState = jest.fn().mockImplementationOnce(() => validJwtToken);
+    (testBase as any).buildAuthenticatedState = jest.fn().mockImplementation(() => validJwtToken);
     const authStateResult = await testBase.getAuthState({
       ...defaultAuthState,
       clientUat: String(new Date().getTime()),
@@ -224,18 +207,14 @@ describe('Base getAuthState', () => {
     const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
 
     const validJwtToken = { sessionClaims: { iat: Number(new Date()) - 50 } };
-    testBase.buildAuthenticatedState = jest.fn().mockImplementationOnce(() => validJwtToken);
-    mockFetchInterstitial.mockImplementationOnce(() => Promise.resolve(mockInterstitialValue));
+    (testBase as any).buildAuthenticatedState = jest.fn().mockImplementation(() => validJwtToken);
     const authStateResult = await testBase.getAuthState({
       ...defaultAuthState,
       clientUat: String(new Date().getTime()),
       cookieToken: 'valid_token',
-      fetchInterstitial: mockFetchInterstitial,
     });
-    expect(mockFetchInterstitial).toHaveBeenCalledTimes(1);
     expect(authStateResult).toEqual({
       status: AuthStatus.Interstitial,
-      interstitial: mockInterstitialValue,
       errorReason: AuthErrorReason.CookieOutDated,
     });
   });

@@ -169,13 +169,9 @@ export class Base {
   };
 
   /**
-   *
    * Retrieve the authentication state for a request by using client specific information.
    *
    * @throws {Error} Token expired, Wrong azp, Malformed token. All of these cases should result in signed out state.
-   *
-   * @param {AuthStateParams}
-   * @returns {Promise<AuthState>}
    */
   getAuthState = async ({
     cookieToken,
@@ -189,14 +185,12 @@ export class Base {
     referrer,
     userAgent,
     authorizedParties,
-    fetchInterstitial,
     jwtKey,
   }: AuthStateParams): Promise<AuthState> => {
     if (headerToken) {
       return this.buildAuthenticatedState(headerToken, {
         jwtKey,
         authorizedParties,
-        fetchInterstitial,
         tokenType: 'header',
       });
     }
@@ -230,7 +224,6 @@ export class Base {
     if (isDevelopmentKey && !clientUat) {
       return {
         status: AuthStatus.Interstitial,
-        interstitial: await fetchInterstitial(),
         errorReason: AuthErrorReason.UATMissing,
       };
     }
@@ -249,7 +242,6 @@ export class Base {
     ) {
       return {
         status: AuthStatus.Interstitial,
-        interstitial: await fetchInterstitial(),
         errorReason: AuthErrorReason.CrossOriginReferrer,
       };
     }
@@ -275,7 +267,6 @@ export class Base {
     if (isProductionKey && clientUat && !cookieToken) {
       return {
         status: AuthStatus.Interstitial,
-        interstitial: await fetchInterstitial(),
         errorReason: AuthErrorReason.CookieMissing,
       };
     }
@@ -283,7 +274,6 @@ export class Base {
     const authenticatedState = await this.buildAuthenticatedState(cookieToken as string, {
       jwtKey,
       authorizedParties,
-      fetchInterstitial,
       tokenType: 'cookie',
     });
 
@@ -292,7 +282,6 @@ export class Base {
     } else if (authenticatedState.sessionClaims && authenticatedState.sessionClaims.iat < Number(clientUat)) {
       return {
         status: AuthStatus.Interstitial,
-        interstitial: await fetchInterstitial(),
         errorReason: AuthErrorReason.CookieOutDated,
       };
     } else if (!authenticatedState.sessionClaims) {
@@ -301,14 +290,13 @@ export class Base {
 
     return {
       status: AuthStatus.Interstitial,
-      interstitial: await fetchInterstitial(),
       errorReason: AuthErrorReason.Unknown,
     };
   };
 
   buildAuthenticatedState = async (
     token: string,
-    { authorizedParties, jwtKey, fetchInterstitial, tokenType }: BuildAuthenticatedStateOptions,
+    { authorizedParties, jwtKey, tokenType }: BuildAuthenticatedStateOptions,
   ): Promise<AuthState> => {
     try {
       const sessionClaims = await this.verifySessionToken(token, {
@@ -332,7 +320,6 @@ export class Base {
         }
         return {
           status: AuthStatus.Interstitial,
-          interstitial: await fetchInterstitial(),
           errorReason,
         };
       }

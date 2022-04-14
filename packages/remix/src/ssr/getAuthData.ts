@@ -38,7 +38,6 @@ export async function getAuthData(
       forwardedHost: headers.get('x-forwarded-host') as string,
       referrer: headers.get('referer'),
       userAgent: headers.get('user-agent') as string,
-      fetchInterstitial: () => Promise.resolve(''),
       authorizedParties,
       jwtKey,
     });

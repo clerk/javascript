@@ -48,7 +48,6 @@ export async function getAuthData(
       forwardedHost: returnReferrerAsXForwardedHostToFixLocalDevGatsbyProxy(headers),
       referrer: headers.get('referer') as string,
       userAgent: headers.get('user-agent') as string,
-      fetchInterstitial: () => Promise.resolve(''),
     });
 
     if (status === AuthStatus.Interstitial) {
