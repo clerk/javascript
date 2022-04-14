@@ -1,73 +1,28 @@
 import type { CryptoKey as PeculiarCryptoKey } from '@peculiar/webcrypto';
 
-import { JWTExpiredError } from './api/utils/Errors';
+import {
+  AuthErrorReason,
+  AuthState,
+  AuthStateParams,
+  AuthStatus,
+  BuildAuthenticatedStateOptions,
+  JWT,
+  JWTPayload,
+  TokenVerificationErrorReason,
+  VerifySessionTokenOptions,
+} from './types';
 import { parse } from './util/base64url';
 import { isDevelopmentOrStaging, isProduction } from './util/clerkApiKey';
+import { mapErrorReasonResponse, TokenVerificationError } from './util/errors';
 import { checkClaims, isExpired } from './util/jwt';
 import { checkCrossOrigin } from './util/request';
-import { JWT, JWTPayload } from './util/types';
 
 export const API_KEY = process.env.CLERK_API_KEY || '';
 
-type ImportKeyFunction = (
-  ...args: any[]
-) => Promise<CryptoKey | PeculiarCryptoKey>;
+type ImportKeyFunction = (...args: any[]) => Promise<CryptoKey | PeculiarCryptoKey>;
 type LoadCryptoKeyFunction = (token: string) => Promise<CryptoKey>;
 type DecodeBase64Function = (base64Encoded: string) => string;
 type VerifySignatureFunction = (...args: any[]) => Promise<boolean>;
-
-export enum AuthStatus {
-  SignedIn = 'Signed in',
-  SignedOut = 'Signed out',
-  Interstitial = 'Interstitial',
-}
-
-export type Session = {
-  id?: string;
-  userId?: string;
-};
-
-export type VerifySessionTokenOptions = {
-  authorizedParties?: string[];
-};
-
-const verifySessionTokenDefaultOptions: VerifySessionTokenOptions = {
-  authorizedParties: [],
-};
-
-type AuthState = {
-  status: AuthStatus;
-  session?: Session;
-  interstitial?: string;
-  sessionClaims?: JWTPayload;
-};
-
-type AuthStateParams = {
-  /* Client token cookie value */
-  cookieToken?: string;
-  /* Client uat cookie value */
-  clientUat?: string;
-  /* Client token header value */
-  headerToken?: string | null;
-  /* Request origin header value */
-  origin?: string | null;
-  /* Request host header value */
-  host: string;
-  /* Request forwarded host value */
-  forwardedHost?: string | null;
-  /* Request forwarded port value */
-  forwardedPort?: string | null;
-  /* Request forwarded proto value */
-  forwardedProto?: string | null;
-  /* Request referrer */
-  referrer?: string | null;
-  /* Request user-agent value */
-  userAgent?: string | null;
-  /* A list of authorized parties to validate against the session token azp claim */
-  authorizedParties?: string[];
-  /* HTTP utility for fetching a text/html string */
-  fetchInterstitial: () => Promise<string>;
-};
 
 export class Base {
   importKeyFunction: ImportKeyFunction;
@@ -103,20 +58,29 @@ export class Base {
    * @param {string} token
    * @param {VerifySessionTokenOptions} verifySessionTokenOptions
    * @return {Promise<JWTPayload>} claims
-   * @throws {JWTExpiredError|Error}
+   * @throws {TokenVerificationError|Error}
    */
   verifySessionToken = async (
     token: string,
-    {
-      authorizedParties,
-    }: VerifySessionTokenOptions = verifySessionTokenDefaultOptions,
+    { authorizedParties, jwtKey }: VerifySessionTokenOptions = {},
   ): Promise<JWTPayload> => {
-    // Try to load the PK from supplied function and
-    // if there is no custom load function
-    // try to load from the environment.
-    const availableKey = this.loadCryptoKeyFunction
-      ? await this.loadCryptoKeyFunction(token)
-      : await this.loadCryptoKeyFromEnv();
+    /**
+     * Priority of JWT key search
+     * 1. Use supplied key
+     * 2. Use load function
+     * 3. Try to load from env
+     */
+
+    let availableKey: CryptoKey;
+    if (!jwtKey && this.loadCryptoKeyFunction) {
+      try {
+        availableKey = await this.loadCryptoKeyFunction(token);
+      } catch (_) {
+        throw new TokenVerificationError(TokenVerificationErrorReason.PublicKeyFetchError);
+      }
+    } else {
+      availableKey = await this.loadCryptoKey(jwtKey || process.env.CLERK_JWT_KEY);
+    }
 
     const claims = await this.verifyJwt(availableKey, token);
     checkClaims(claims, authorizedParties);
@@ -125,15 +89,14 @@ export class Base {
 
   /**
    *
-   * Modify the RSA public key from the PEM retrieved from the CLERK_JWT_KEY environment variable
-   * and return a contructed CryptoKey.
+   * @param {string} token Clerk JWT verification token
+   * Modify the RSA public key from the Clerk PEM supplied and return a contructed CryptoKey.
    * You will find that at your application dashboard (https://dashboard.clerk.dev) under Settings ->  API keys
    *
    */
-  loadCryptoKeyFromEnv = async (): Promise<CryptoKey> => {
-    const key = process.env.CLERK_JWT_KEY;
+  loadCryptoKey = async (key?: string): Promise<CryptoKey> => {
     if (!key) {
-      throw new Error('Missing jwt key');
+      throw new TokenVerificationError(TokenVerificationErrorReason.JWTKeyMissing);
     }
 
     // Next.js in development mode currently cannot parse PEM, but it can
@@ -160,21 +123,23 @@ export class Base {
     };
 
     // Based on https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey#subjectpublickeyinfo_import
-    return this.importKeyFunction(jwk, algorithm);
+    try {
+      return this.importKeyFunction(jwk, algorithm);
+    } catch (_) {
+      throw new TokenVerificationError(TokenVerificationErrorReason.ImportKeyError);
+    }
   };
 
   decodeJwt = (token: string): JWT => {
     const tokenParts = token.split('.');
     if (tokenParts.length !== 3) {
-      throw new Error('Malformed token');
+      throw new TokenVerificationError(TokenVerificationErrorReason.MalformedToken);
     }
 
     const [rawHeader, rawPayload, rawSignature] = tokenParts;
     const header = JSON.parse(this.decodeBase64Function(rawHeader));
     const payload = JSON.parse(this.decodeBase64Function(rawPayload));
-    const signature = this.decodeBase64Function(
-      rawSignature.replace(/_/g, '/').replace(/-/g, '+'),
-    );
+    const signature = this.decodeBase64Function(rawSignature.replace(/_/g, '/').replace(/-/g, '+'));
     return {
       header,
       payload,
@@ -188,14 +153,9 @@ export class Base {
     const data = encoder.encode([rawHeader, rawPayload].join('.'));
     const signature = parse(rawSignature);
 
-    const isVerified = await this.verifySignatureFunction(
-      'RSASSA-PKCS1-v1_5',
-      key,
-      signature,
-      data,
-    );
+    const isVerified = await this.verifySignatureFunction('RSASSA-PKCS1-v1_5', key, signature, data);
     if (!isVerified) {
-      throw new Error('Failed to verify token');
+      throw new TokenVerificationError(TokenVerificationErrorReason.VerificationFailed);
     }
   };
 
@@ -230,39 +190,26 @@ export class Base {
     userAgent,
     authorizedParties,
     fetchInterstitial,
+    jwtKey,
   }: AuthStateParams): Promise<AuthState> => {
-    let sessionClaims;
     if (headerToken) {
-      try {
-        sessionClaims = await this.verifySessionToken(headerToken, {
-          authorizedParties,
-        });
-        return {
-          status: AuthStatus.SignedIn,
-          session: {
-            id: sessionClaims.sid as string,
-            userId: sessionClaims.sub as string,
-          },
-          sessionClaims,
-        };
-      } catch (err) {
-        if (err instanceof JWTExpiredError) {
-          return {
-            status: AuthStatus.Interstitial,
-            interstitial: await fetchInterstitial(),
-          };
-        } else {
-          return { status: AuthStatus.SignedOut };
-        }
-      }
+      return this.buildAuthenticatedState(headerToken, {
+        jwtKey,
+        authorizedParties,
+        fetchInterstitial,
+        tokenType: 'header',
+      });
     }
+
+    const isDevelopmentKey = isDevelopmentOrStaging(API_KEY);
+    const isProductionKey = isProduction(API_KEY);
 
     // In development or staging environments only, based on the request's
     // User Agent, detect non-browser requests (e.g. scripts). If there
     // is no Authorization header, consider the user as signed out and
     // prevent interstitial rendering
-    if (isDevelopmentOrStaging(API_KEY) && !userAgent?.startsWith('Mozilla/')) {
-      return { status: AuthStatus.SignedOut };
+    if (isDevelopmentKey && !userAgent?.startsWith('Mozilla/')) {
+      return { status: AuthStatus.SignedOut, errorReason: AuthErrorReason.HeaderMissingNonBrowser };
     }
 
     // In cross-origin requests the use of Authorization header is mandatory
@@ -276,20 +223,21 @@ export class Base {
         forwardedProto,
       })
     ) {
-      return { status: AuthStatus.SignedOut };
+      return { status: AuthStatus.SignedOut, errorReason: AuthErrorReason.HeaderMissingCORS };
     }
 
     // First load of development. Could be logged in on Clerk-hosted UI.
-    if (isDevelopmentOrStaging(API_KEY) && !clientUat) {
+    if (isDevelopmentKey && !clientUat) {
       return {
         status: AuthStatus.Interstitial,
         interstitial: await fetchInterstitial(),
+        errorReason: AuthErrorReason.UATMissing,
       };
     }
 
     // Potentially arriving after a sign-in or sign-out on Clerk-hosted UI.
     if (
-      isDevelopmentOrStaging(API_KEY) &&
+      isDevelopmentKey &&
       referrer &&
       checkCrossOrigin({
         originURL: new URL(referrer),
@@ -302,12 +250,13 @@ export class Base {
       return {
         status: AuthStatus.Interstitial,
         interstitial: await fetchInterstitial(),
+        errorReason: AuthErrorReason.CrossOriginReferrer,
       };
     }
 
     // Probably first load for production
-    if (isProduction(API_KEY) && !clientUat && !cookieToken) {
-      return { status: AuthStatus.SignedOut };
+    if (isProductionKey && !clientUat && !cookieToken) {
+      return { status: AuthStatus.SignedOut, errorReason: AuthErrorReason.CookieAndUATMissing };
     }
 
     // Signed out on a different subdomain but Clerk.js has not run to remove the cookie yet.
@@ -320,50 +269,72 @@ export class Base {
     // }
 
     if (clientUat === '0') {
-      return { status: AuthStatus.SignedOut };
+      return { status: AuthStatus.SignedOut, errorReason: AuthErrorReason.StandardOut };
     }
 
-    if (isProduction(API_KEY) && clientUat && !cookieToken) {
+    if (isProductionKey && clientUat && !cookieToken) {
       return {
         status: AuthStatus.Interstitial,
         interstitial: await fetchInterstitial(),
+        errorReason: AuthErrorReason.CookieMissing,
       };
     }
 
-    try {
-      sessionClaims = await this.verifySessionToken(cookieToken as string, {
-        authorizedParties,
-      });
-    } catch (err) {
-      if (err instanceof JWTExpiredError) {
-        return {
-          status: AuthStatus.Interstitial,
-          interstitial: await fetchInterstitial(),
-        };
-      } else {
-        return { status: AuthStatus.SignedOut };
-      }
-    }
+    const authenticatedState = await this.buildAuthenticatedState(cookieToken as string, {
+      jwtKey,
+      authorizedParties,
+      fetchInterstitial,
+      tokenType: 'cookie',
+    });
 
-    if (
-      cookieToken &&
-      clientUat &&
-      sessionClaims?.iat &&
-      sessionClaims.iat >= Number(clientUat)
-    ) {
+    if (authenticatedState.sessionClaims && authenticatedState.sessionClaims.iat >= Number(clientUat)) {
+      return authenticatedState;
+    } else if (authenticatedState.sessionClaims && authenticatedState.sessionClaims.iat < Number(clientUat)) {
       return {
-        status: AuthStatus.SignedIn,
-        session: {
-          id: sessionClaims.sid as string,
-          userId: sessionClaims.sub as string,
-        },
-        sessionClaims,
+        status: AuthStatus.Interstitial,
+        interstitial: await fetchInterstitial(),
+        errorReason: AuthErrorReason.CookieOutDated,
       };
     }
 
     return {
       status: AuthStatus.Interstitial,
       interstitial: await fetchInterstitial(),
+      errorReason: AuthErrorReason.Unknown,
     };
+  };
+
+  buildAuthenticatedState = async (
+    token: string,
+    { authorizedParties, jwtKey, fetchInterstitial, tokenType }: BuildAuthenticatedStateOptions,
+  ): Promise<AuthState> => {
+    try {
+      const sessionClaims = await this.verifySessionToken(token, {
+        authorizedParties,
+        jwtKey,
+      });
+
+      return {
+        status: AuthStatus.SignedIn,
+        session: {
+          id: sessionClaims.sid,
+          userId: sessionClaims.sub,
+        },
+        sessionClaims,
+      };
+    } catch (err) {
+      if (err instanceof TokenVerificationError) {
+        const { errorReason, shouldSignout } = mapErrorReasonResponse(err.reason, tokenType);
+        if (shouldSignout) {
+          return { status: AuthStatus.SignedOut, errorReason };
+        }
+        return {
+          status: AuthStatus.Interstitial,
+          interstitial: await fetchInterstitial(),
+          errorReason,
+        };
+      }
+      return { status: AuthStatus.SignedOut, errorReason: AuthErrorReason.InternalError };
+    }
   };
 }

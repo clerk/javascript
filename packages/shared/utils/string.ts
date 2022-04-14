@@ -11,9 +11,7 @@ export function titleize(str: string | undefined | null): string {
 }
 
 export function snakeToCamel(str: string): string {
-  return str.replace(/([-_][a-z])/g, match =>
-    match.toUpperCase().replace(/-|_/, ''),
-  );
+  return str.replace(/([-_][a-z])/g, match => match.toUpperCase().replace(/-|_/, ''));
 }
 
 export function camelToSnake(str: string): string {

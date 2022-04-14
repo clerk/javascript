@@ -3,9 +3,12 @@
   Base,
   ClerkBackendAPI,
   ClerkFetcher,
+  createGetToken,
+  createSignedOutState,
   JWTPayload,
-  Session,
 } from '@clerk/backend-core';
+import { ServerGetToken } from '@clerk/types';
+import { Crypto, CryptoKey } from '@peculiar/webcrypto';
 import Cookies from 'cookies';
 import deepmerge from 'deepmerge';
 import type { NextFunction, Request, Response } from 'express';
@@ -16,11 +19,13 @@ import querystring from 'querystring';
 
 import { SupportMessages } from './constants/SupportMessages';
 import { LIB_NAME, LIB_VERSION } from './info';
+import { decodeBase64, toSPKIDer } from './utils/crypto';
 import { ClerkServerError } from './utils/Errors';
 // utils
 import Logger from './utils/Logger';
 
 const defaultApiKey = process.env.CLERK_API_KEY || '';
+const defaultJWTKey = process.env.CLERK_JWT_KEY;
 const defaultApiVersion = process.env.CLERK_API_VERSION || 'v1';
 const defaultServerApiUrl =
   process.env.CLERK_API_URL || 'https://api.clerk.dev';
@@ -30,30 +35,24 @@ const packageRepo = 'https://github.com/clerkinc/clerk-sdk-node';
 export type MiddlewareOptions = {
   onError?: Function;
   authorizedParties?: string[];
+  jwtKey?: string;
 };
 
-/** @deprecated DEPRECATED Use WithAuthProp Est. 2.10.0 */
-export type WithSessionProp<T> = T & { session?: Session };
-/** @deprecated DEPRECATED Use RequireAuthProp Est. 2.10.0 */
-export type RequireSessionProp<T> = T & { session: Session };
-/** @deprecated DEPRECATED Use WithAuthProp Est. 2.10.0 */
-export type WithSessionClaimsProp<T> = T & { sessionClaims?: JWTPayload };
-/** @deprecated DEPRECATED Use RequireAuthProp Est. 2.10.0 */
-export type RequireSessionClaimsProp<T> = T & { sessionClaims: JWTPayload };
-
 export type WithAuthProp<T> = T & {
-  session?: Session;
-  sessionClaims?: JWTPayload;
+  auth: {
+    sessionId: string | null;
+    userId: string | null;
+    getToken: ServerGetToken;
+  };
 };
 
 export type RequireAuthProp<T> = T & {
-  session: Session;
-  sessionClaims: JWTPayload;
+  auth: {
+    sessionId: string;
+    userId: string;
+    getToken: ServerGetToken;
+  };
 };
-
-import { Crypto, CryptoKey } from '@peculiar/webcrypto';
-
-import { decodeBase64, toSPKIDer } from './utils/crypto';
 
 const crypto = new Crypto();
 
@@ -72,6 +71,7 @@ const verifySignature = async (
 
 export default class Clerk extends ClerkBackendAPI {
   base: Base;
+  jwtKey?: string;
   httpOptions: OptionsOfUnknownResponseBody;
 
   _jwksClient: JwksClient;
@@ -81,12 +81,14 @@ export default class Clerk extends ClerkBackendAPI {
 
   constructor({
     apiKey = defaultApiKey,
+    jwtKey = defaultJWTKey,
     serverApiUrl = defaultServerApiUrl,
     apiVersion = defaultApiVersion,
     httpOptions = {},
     jwksCacheMaxAge = JWKS_MAX_AGE,
   }: {
     apiKey?: string;
+    jwtKey?: string;
     serverApiUrl?: string;
     apiVersion?: string;
     httpOptions?: OptionsOfUnknownResponseBody;
@@ -127,11 +129,12 @@ export default class Clerk extends ClerkBackendAPI {
     }
 
     this.httpOptions = httpOptions;
+    this.jwtKey = jwtKey;
 
     this._jwksClient = jwks({
       jwksUri: `${serverApiUrl}/${apiVersion}/jwks`,
       requestHeaders: {
-        Authorization: `Bearer ${defaultApiKey}`,
+        Authorization: `Bearer ${apiKey}`,
       },
       timeout: 5000,
       cache: true,
@@ -163,6 +166,7 @@ export default class Clerk extends ClerkBackendAPI {
 
     /** Base initialization */
 
+    // TODO: More comprehensive base initialization
     this.base = new Base(
       importKey,
       verifySignature,
@@ -183,9 +187,9 @@ export default class Clerk extends ClerkBackendAPI {
     const key = await this._jwksClient.getSigningKey(decoded.header.kid);
     const verified = jwt.verify(token, key.getPublicKey(), {
       algorithms: ['RS256'],
-    });
+    }) as JWTPayload;
 
-    if (typeof verified === 'string' || !verified.iss) {
+    if (typeof verified === 'string') {
       throw new Error('Malformed token');
     }
 
@@ -194,7 +198,7 @@ export default class Clerk extends ClerkBackendAPI {
     }
 
     if (verified.azp && authorizedParties && authorizedParties.length > 0) {
-      if (!authorizedParties.includes(verified.azp as string)) {
+      if (!authorizedParties.includes(verified.azp)) {
         throw new Error(`Authorized party is invalid: ${verified.azp}`);
       }
     }
@@ -233,8 +237,8 @@ export default class Clerk extends ClerkBackendAPI {
     return error;
   }
 
-  expressWithSession(
-    { onError, authorizedParties }: MiddlewareOptions = {
+  expressWithAuth(
+    { onError, authorizedParties, jwtKey }: MiddlewareOptions = {
       onError: this.defaultOnError,
     }
   ): (req: Request, res: Response, next: NextFunction) => Promise<void> {
@@ -248,14 +252,16 @@ export default class Clerk extends ClerkBackendAPI {
       res: Response,
       next: NextFunction
     ): Promise<any> {
-      const cookies = new Cookies(req, res);
-
       try {
-        const { status, session, interstitial, sessionClaims } =
+        const cookies = new Cookies(req, res);
+        const cookieToken = cookies.get('__session') as string;
+        const headerToken = req.headers.authorization?.replace('Bearer ', '');
+
+        const { status, interstitial, sessionClaims, errorReason } =
           await this.base.getAuthState({
-            cookieToken: cookies.get('__session') as string,
+            cookieToken,
+            headerToken,
             clientUat: cookies.get('__client_uat') as string,
-            headerToken: req.headers.authorization?.replace('Bearer ', ''),
             origin: req.headers.origin,
             host: req.headers.host as string,
             forwardedPort: req.headers['x-forwarded-port'] as string,
@@ -263,18 +269,29 @@ export default class Clerk extends ClerkBackendAPI {
             referrer: req.headers.referer,
             userAgent: req.headers['user-agent'] as string,
             authorizedParties,
+            jwtKey: jwtKey || this.jwtKey,
             fetchInterstitial: () => this.fetchInterstitial(),
           });
+
+        errorReason && res.setHeader('Auth-Result', errorReason);
 
         if (status === AuthStatus.SignedOut) {
           return signedOut();
         }
 
         if (status === AuthStatus.SignedIn) {
-          // @ts-ignore
-          req.session = session;
-          // @ts-ignore
-          req.sessionClaims = sessionClaims;
+          // @ts-expect-error
+          req.auth = {
+            sessionId: sessionClaims?.sid,
+            userId: sessionClaims?.sub,
+            getToken: createGetToken({
+              headerToken,
+              cookieToken,
+              sessionId: sessionClaims?.sid,
+              fetcher: (...args) => this.sessions.getToken(...args),
+            }),
+          };
+
           return next();
         }
 
@@ -282,7 +299,13 @@ export default class Clerk extends ClerkBackendAPI {
         res.write(interstitial);
         res.end();
       } catch (error) {
-        // Session will not be set on request
+        // Auth object will be set to the signed out auth state
+        // @ts-expect-error
+        req.auth = {
+          userId: null,
+          sessionId: null,
+          getToken: createSignedOutState().getToken,
+        };
 
         // Call onError if provided
         if (!onError) {
@@ -302,12 +325,12 @@ export default class Clerk extends ClerkBackendAPI {
     return authenticate.bind(this);
   }
 
-  expressRequireSession(
-    { onError, authorizedParties }: MiddlewareOptions = {
+  expressRequireAuth(
+    options: MiddlewareOptions = {
       onError: this.strictOnError,
     }
   ) {
-    return this.expressWithSession({ onError, authorizedParties });
+    return this.expressWithAuth(options);
   }
 
   // Credits to https://nextjs.org/docs/api-routes/api-middlewares
@@ -328,23 +351,19 @@ export default class Clerk extends ClerkBackendAPI {
   }
 
   // Set the session on the request and then call provided handler
-  withSession(
+  withAuth(
     handler: Function,
-    { onError, authorizedParties }: MiddlewareOptions = {
+    options: MiddlewareOptions = {
       onError: this.defaultOnError,
     }
   ) {
     return async (
-      req: WithSessionProp<Request> | WithSessionClaimsProp<Request>,
+      req: WithAuthProp<Request>,
       res: Response,
       next?: NextFunction
     ) => {
       try {
-        await this._runMiddleware(
-          req,
-          res,
-          this.expressWithSession({ onError, authorizedParties })
-        );
+        await this._runMiddleware(req, res, this.expressWithAuth(options));
         return handler(req, res, next);
       } catch (error) {
         // @ts-ignore
@@ -362,12 +381,12 @@ export default class Clerk extends ClerkBackendAPI {
   }
 
   // Stricter version, short-circuits if session can't be determined
-  requireSession(
+  requireAuth(
     handler: Function,
-    { onError, authorizedParties }: MiddlewareOptions = {
+    options: MiddlewareOptions = {
       onError: this.strictOnError,
     }
   ) {
-    return this.withSession(handler, { onError, authorizedParties });
+    return this.withAuth(handler, options);
   }
 }

@@ -4,8 +4,7 @@ import { ClerkBackendAPI } from '../api/ClerkBackendAPI';
 
 const defaultApiKey = process.env.CLERK_API_KEY || '';
 const defaultApiVersion = process.env.CLERK_API_VERSION || 'v1';
-const defaultServerApiUrl =
-  process.env.CLERK_API_URL || 'https://api.clerk.dev';
+const defaultServerApiUrl = process.env.CLERK_API_URL || 'https://api.clerk.dev';
 
 export const TestBackendAPIClient = new ClerkBackendAPI({
   apiKey: defaultApiKey,
@@ -14,10 +13,7 @@ export const TestBackendAPIClient = new ClerkBackendAPI({
   libName: 'test',
   libVersion: '0.0.1',
   packageRepo: 'test',
-  fetcher: async (
-    url,
-    { method, authorization, contentType, userAgent, body }
-  ) => {
+  fetcher: async (url, { method, authorization, contentType, userAgent, body }) => {
     return (
       await fetch(url, {
         method,

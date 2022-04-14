@@ -11,12 +11,7 @@ export type TabTitleProps = {
   setActiveTabIndex: (index: number) => void;
 };
 
-export const TabTitle: React.FC<TabTitleProps> = ({
-  active,
-  title,
-  index,
-  setActiveTabIndex,
-}: TabTitleProps) => {
+export const TabTitle: React.FC<TabTitleProps> = ({ active, title, index, setActiveTabIndex }: TabTitleProps) => {
   return (
     <li
       className={cn(styles.title, {
@@ -36,28 +31,28 @@ export type TabsProps = {
   children: Array<React.ReactElement<{ title: string; role?: string }>>;
 };
 
-export const Tabs: React.FC<TabsProps> = ({
-  children = [],
-  defaultSelectedIndex = 0,
-}: TabsProps) => {
-  const [activeTabIndex, setActiveTabIndex] = React.useState(
-    defaultSelectedIndex,
-  );
+export const Tabs: React.FC<TabsProps> = ({ children = [], defaultSelectedIndex = 0 }: TabsProps) => {
+  const [activeTabIndex, setActiveTabIndex] = React.useState(defaultSelectedIndex);
   if (children.length < 2) {
     return null;
   }
 
   const activeTab = children[activeTabIndex];
-  const clonedActiveTab = activeTab && React.cloneElement(activeTab, {
-    ...activeTab.props,
-    // @ts-ignore
-    title: null, // Delete title attribute
-    role: 'tabpanel',
-  });
+  const clonedActiveTab =
+    activeTab &&
+    React.cloneElement(activeTab, {
+      ...activeTab.props,
+      // @ts-ignore
+      title: null, // Delete title attribute
+      role: 'tabpanel',
+    });
 
   return (
     <div className={styles.container}>
-      <ul className={styles.tabList} role='tablist'>
+      <ul
+        className={styles.tabList}
+        role='tablist'
+      >
         {children.reduce((memo: JSX.Element[], child, index) => {
           if (child) {
             memo.push(

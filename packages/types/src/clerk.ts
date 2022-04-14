@@ -1,18 +1,34 @@
-import { OrganizationMembershipResource } from '.';
 import { ClientResource } from './client';
 import { DisplayThemeJSON } from './json';
 import { OrganizationResource } from './organization';
-import { MembershipRole } from './organizationMembership';
+import { MembershipRole, OrganizationMembershipResource } from './organizationMembership';
 import { ActiveSessionResource } from './session';
 import { UserResource } from './user';
 import { DeepPartial, DeepSnakeToCamel } from './utils';
 
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
-export type BeforeEmitCallback = (
-  session: ActiveSessionResource | null,
-) => void | Promise<any>;
+export type BeforeEmitCallback = (session: ActiveSessionResource | null) => void | Promise<any>;
+
 export type SignOutCallback = () => void | Promise<any>;
+
+export type SignOutOptions = {
+  /**
+   * Specify a specific session to sign out. Useful for
+   * multi-session applications.
+   */
+  sessionId?: string;
+};
+
+export interface SignOut {
+  (options?: SignOutOptions): Promise<void>;
+  (signOutCallback?: SignOutCallback, options?: SignOutOptions): Promise<void>;
+}
+
+export type SetSession = (
+  session: ActiveSessionResource | string | null,
+  beforeEmit?: BeforeEmitCallback,
+) => Promise<void>;
 
 /**
  * Main Clerk SDK object.
@@ -36,20 +52,12 @@ export interface Clerk {
   user?: UserResource | null;
 
   /**
-   * Signs out the current user on single-session instances, or all users on multi-session instances.
-   *
+   * Signs out the current user on single-session instances, or all users on multi-session instances
    * @param signOutCallback - Optional A callback that runs after sign out completes.
+   * @param options - Optional Configuration options, see {@link SignOutOptions}
    * @returns A promise that resolves when the sign out process completes.
    */
-  signOut: (signOutCallback?: SignOutCallback) => Promise<void>;
-
-  /**
-   * Signs out the current user.
-   *
-   * @param signOutCallback - Optional A callback that runs after sign out completes.
-   * @returns A promise that resolves when the sign out process completes.
-   */
-  signOutOne: (signOutCallback?: SignOutCallback) => Promise<void>;
+  signOut: SignOut;
 
   /**
    * Opens the Clerk sign in modal.
@@ -109,10 +117,7 @@ export interface Clerk {
    * @param targetNode Target node to mount the UserButton component.
    * @param userButtonProps User button configuration parameters.
    */
-  mountUserButton: (
-    targetNode: HTMLDivElement,
-    userButtonProps?: UserButtonProps,
-  ) => void;
+  mountUserButton: (targetNode: HTMLDivElement, userButtonProps?: UserButtonProps) => void;
 
   /**
    * Unmount a user button component at the target element.
@@ -128,10 +133,7 @@ export interface Clerk {
    * @param targetNode Target to mount the UserProfile component.
    * @param userProfileProps User profile configuration parameters.
    */
-  mountUserProfile: (
-    targetNode: HTMLDivElement,
-    userProfileProps?: UserProfileProps,
-  ) => void;
+  mountUserProfile: (targetNode: HTMLDivElement, userProfileProps?: UserProfileProps) => void;
 
   /**
    * Unmount a user profile component at the target element.
@@ -163,10 +165,7 @@ export interface Clerk {
    * @param session Passed session resource object, session id (string version) or null
    * @param beforeEmit Callback run just before the active session is set to the passed object. Can be used to hook up for pre-navigation actions.
    */
-  setSession: (
-    session: ActiveSessionResource | string | null,
-    beforeEmit?: BeforeEmitCallback,
-  ) => Promise<void>;
+  setSession: SetSession;
 
   /**
    * Function used to commit a navigation after certain steps in the Clerk processes.
@@ -176,31 +175,17 @@ export interface Clerk {
 
   /**
    * Redirects to the configured sign in URL. Retrieved from {@link environment}.
-   * @deprecated Use the new {@link Clerk.redirectToSignIn}  instead;
-   * @param returnBack will appends a query string parameter to the sign in URL so the user can be redirected back to the current page. Defaults to false.
-   */
-  redirectToSignIn(returnBack?: boolean): Promise<unknown>;
-
-  /**
-   * Redirects to the configured sign in URL. Retrieved from {@link environment}.
    *
    * @param opts A {@link RedirectOptions} object
    */
-  redirectToSignIn(opts: RedirectOptions): Promise<unknown>;
-
-  /**
-   * Redirects to the configured sign up URL. Retrieved from {@link environment}.
-   * @deprecated Use the new {@link Clerk.redirectToSignIn}  instead;
-   * @param returnBack will appends a query string parameter to the sign in URL so the user can be redirected back to the current page. Defaults to false.
-   */
-  redirectToSignUp(returnBack?: boolean): Promise<unknown>;
+  redirectToSignIn(opts?: RedirectOptions): Promise<unknown>;
 
   /**
    * Redirects to the configured sign up URL. Retrieved from {@link environment}.
    *
    * @param opts A {@link RedirectOptions} object
    */
-  redirectToSignUp(opts: RedirectOptions): Promise<unknown>;
+  redirectToSignUp(opts?: RedirectOptions): Promise<unknown>;
 
   /**
    * Redirects to the configured user profile URL. Retrieved from {@link environment}.
@@ -226,16 +211,12 @@ export interface Clerk {
   /**
    * Authenticates user using their Metamask browser extension
    */
-  authenticateWithMetamask: (
-    params?: AuthenticateWithMetamaskParams,
-  ) => Promise<unknown>;
+  authenticateWithMetamask: (params?: AuthenticateWithMetamaskParams) => Promise<unknown>;
 
   /**
    * Creates an organization, adding the current user as admin.
    */
-  createOrganization: (
-    params: CreateOrganizationParams,
-  ) => Promise<OrganizationResource>;
+  createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource>;
 
   /**
    * Retrieves all the organizations the current user is a member of.
@@ -245,9 +226,7 @@ export interface Clerk {
   /**
    * Retrieves a single organization by id.
    */
-  getOrganization: (
-    organizationId: string,
-  ) => Promise<OrganizationResource | undefined>;
+  getOrganization: (organizationId: string) => Promise<OrganizationResource | undefined>;
 
   /**
    * Handles a 401 response from Frontend API by refreshing the client and session object accordingly
@@ -294,12 +273,9 @@ export type CustomNavigation = (to: string) => Promise<unknown> | void;
 export type ClerkThemeOptions = DeepSnakeToCamel<DeepPartial<DisplayThemeJSON>>;
 
 export interface ClerkOptions {
-  selectInitialSession?: (
-    client: ClientResource,
-  ) => ActiveSessionResource | null;
   navigate?: (to: string) => Promise<unknown> | unknown;
   polling?: boolean;
-  authVersion?: 1 | 2;
+  selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;
   theme?: ClerkThemeOptions;
 }
 
@@ -349,16 +325,6 @@ export type SignInProps = {
    * Used to fill the "Sign up" link in the SignUp component.
    */
   signUpUrl?: string;
-
-  /**
-   * @deprecated Use {@link SignInProps.afterSignInUrl} instead;
-   */
-  afterSignIn?: string | null;
-
-  /**
-   * @deprecated Use {@link SignInProps.signUpUrl} instead;
-   */
-  signUpURL?: string;
 } & RedirectOptions;
 
 export type SignUpProps = {
@@ -377,16 +343,6 @@ export type SignUpProps = {
    * Used to fill the "Sign in" link in the SignUp component.
    */
   signInUrl?: string;
-
-  /**
-   * @deprecated Use {@link SignUpProps.afterSignUpUrl} instead;
-   */
-  afterSignUp?: string | null;
-
-  /**
-   * @deprecated Use {@link SignUpProps.signInUrl} instead;
-   */
-  signInURL?: string;
 } & RedirectOptions;
 
 export type UserProfileProps = {
@@ -418,15 +374,15 @@ export type UserButtonProps = {
   showName?: boolean;
 
   /**
-   * Full URL or path to navigate after sign-out is complete
-   * and there are not other active sessions on this client.
+   * Full URL or path to navigate after sign out is complete
    */
-  afterSignOutAllUrl?: string;
+  afterSignOutUrl?: string;
 
   /**
-   * Full URL or path to navigate after sign-out is complete.
+   * Full URL or path to navigate after signing out the current user is complete.
+   * This option applies to multi-session applications.
    */
-  afterSignOutOneUrl?: string;
+  afterMultiSessionSingleSignOutUrl?: string;
 
   /*
    * Full URL or path leading to the
@@ -445,30 +401,6 @@ export type UserButtonProps = {
    * Multi-session mode only.
    */
   afterSwitchSessionUrl?: string;
-
-  /**
-   * @deprecated Use {@link UserButtonProps.afterSwitchSessionUrl} instead;
-   */
-  afterSwitchSession?: string;
-
-  /**
-   * @deprecated Use {@link UserButtonProps.userProfileUrl} instead;
-   */
-  userProfileURL?: string;
-
-  /**
-   * @deprecated Use {@link UserButtonProps.signInUrl} instead;
-   */ signInURL?: string;
-
-  /**
-   * @deprecated Use {@link UserButtonProps.afterSignOutAllUrl} instead;
-   */
-  afterSignOutAll?: string;
-
-  /**
-   * @deprecated Use {@link UserButtonProps.afterSignOutOneUrl} instead;
-   */
-  afterSignOutOne?: string;
 };
 
 export interface HandleMagicLinkVerificationParams {
@@ -486,7 +418,7 @@ export interface HandleMagicLinkVerificationParams {
    * Callback function to be executed after successful magic link
    * verification on another device.
    */
-  onVerifiedOnOtherDevice?: Function;
+  onVerifiedOnOtherDevice?: () => void;
 }
 
 export type CreateOrganizationInvitationParams = {

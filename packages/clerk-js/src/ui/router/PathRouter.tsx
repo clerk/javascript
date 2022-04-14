@@ -10,11 +10,7 @@ interface PathRouterProps {
   children: React.ReactNode;
 }
 
-export const PathRouter = ({
-  basePath,
-  preservedParams,
-  children,
-}: PathRouterProps): JSX.Element | null => {
+export const PathRouter = ({ basePath, preservedParams, children }: PathRouterProps): JSX.Element | null => {
   const { navigate } = useCoreClerk();
   const [stripped, setStripped] = React.useState(false);
   if (!navigate) {
@@ -37,10 +33,7 @@ export const PathRouter = ({
   React.useEffect(() => {
     const effect = async () => {
       if (window.location.hash.startsWith('#/')) {
-        const hashToPath = new URL(
-          window.location.pathname + window.location.hash.substr(1),
-          window.location.href,
-        );
+        const hashToPath = new URL(window.location.pathname + window.location.hash.substr(1), window.location.href);
         hashToPath.pathname = trimTrailingSlash(hashToPath.pathname);
         await navigate(stripOrigin(hashToPath));
         setStripped(true);

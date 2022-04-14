@@ -1,12 +1,7 @@
 import type { OAuthStrategy } from '@clerk/types';
 import { getOAuthProviderData } from '@clerk/types';
 import React from 'react';
-import {
-  buildSSOCallbackURL,
-  ButtonSet,
-  ButtonSetOptions,
-  handleError,
-} from 'ui/common';
+import { buildSSOCallbackURL, ButtonSet, ButtonSetOptions, handleError } from 'ui/common';
 import { useCoreSignIn, useEnvironment, useSignInContext } from 'ui/contexts';
 
 export type OauthProps = {
@@ -15,15 +10,11 @@ export type OauthProps = {
   setError?: React.Dispatch<React.SetStateAction<string | undefined>>;
 };
 
-export function OAuth({
-  oauthOptions,
-  setError,
-  error,
-}: OauthProps): JSX.Element | null {
+export function OAuth({ oauthOptions, setError, error }: OauthProps): JSX.Element | null {
   const ctx = useSignInContext();
   const signIn = useCoreSignIn();
   const { displayConfig } = useEnvironment();
-  
+
   const startOauth = async (e: React.MouseEvent, strategy: OAuthStrategy) => {
     e.preventDefault();
 

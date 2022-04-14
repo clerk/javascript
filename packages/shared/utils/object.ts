@@ -1,34 +1,48 @@
-import { camelToSnake } from './string';
+import { camelToSnake, snakeToCamel } from './string';
+
+const createDeepObjectTransformer = (transform: any) => {
+  const deepTransform = (obj: any): any => {
+    if (!obj) {
+      return obj;
+    }
+
+    if (Array.isArray(obj)) {
+      return obj.map(el => {
+        if (typeof el === 'object' || Array.isArray(el)) {
+          return deepTransform(el);
+        }
+        return el;
+      });
+    }
+
+    const copy = { ...obj };
+    const keys = Object.keys(copy) as string[];
+    for (const oldName of keys) {
+      const newName = transform(oldName.toString());
+      if (newName !== oldName) {
+        copy[newName] = copy[oldName];
+        delete copy[oldName];
+      }
+      if (typeof copy[newName] === 'object') {
+        copy[newName] = deepTransform(copy[newName]);
+      }
+    }
+    return copy;
+  };
+
+  return deepTransform;
+};
 
 /**
- * Transform camelCased object keys to snake_cased.
- * Mostly used for transforming parameter arguments retrieved from the Clerk client methods
- * to forward to the Clerk FAPI which expects snake_cased attributes in the resources.
- *
- * Transformation is DEEP.
- *
+ * Transforms camelCased objects/ arrays to snake_cased.
+ * This function recursively traverses all objects and arrays of the passed value
  * camelCased keys are removed.
- *
- * @param {T} obj Object to transform.
- * @return Same object but with
  */
-export function camelToSnakeKeys<T extends Record<string, unknown>>(obj: T) {
-  if (!obj) {
-    return obj;
-  }
+export const deepCamelToSnake = createDeepObjectTransformer(camelToSnake);
 
-  const keys: Array<keyof T> = Object.keys(obj);
-
-  for (const oldName of keys) {
-    const newName = camelToSnake(oldName.toString()) as keyof T;
-    if (newName !== oldName) {
-      obj[newName] = obj[oldName];
-      delete obj[oldName];
-    }
-    if (typeof obj[newName] === 'object') {
-      // @ts-ignore
-      obj[newName] = camelToSnakeKeys(obj[newName]);
-    }
-  }
-  return obj ;
-}
+/**
+ * Transforms snake_cased objects/ arrays to camelCased.
+ * This function recursively traverses all objects and arrays of the passed value
+ * camelCased keys are removed.
+ */
+export const deepSnakeToCamel = createDeepObjectTransformer(snakeToCamel);

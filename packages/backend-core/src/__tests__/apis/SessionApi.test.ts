@@ -56,23 +56,17 @@ test('getSession() returns a single session', async () => {
       'Content-Type': 'application/x-www-form-urlencoded',
     });
 
-  const session = await TestBackendAPIClient.sessions.getSession(
-    expected.id as string
-  );
+  const session = await TestBackendAPIClient.sessions.getSession(expected.id as string);
 
   expect(session).toEqual(expected);
 });
 
 test('getSession() throws an error without session ID', async () => {
-  await expect(TestBackendAPIClient.sessions.getSession('')).rejects.toThrow(
-    'A valid ID is required.'
-  );
+  await expect(TestBackendAPIClient.sessions.getSession('')).rejects.toThrow('A valid ID is required.');
 });
 
 test('revokeSession() throws an error without session ID', async () => {
-  await expect(TestBackendAPIClient.sessions.revokeSession('')).rejects.toThrow(
-    'A valid ID is required.'
-  );
+  await expect(TestBackendAPIClient.sessions.revokeSession('')).rejects.toThrow('A valid ID is required.');
 });
 
 test('verifySession() returns a session if verified', async () => {
@@ -94,16 +88,11 @@ test('verifySession() returns a session if verified', async () => {
       'Content-Type': 'application/x-www-form-urlencoded',
     });
 
-  const session = await TestBackendAPIClient.sessions.verifySession(
-    expected.id as string,
-    sessionToken
-  );
+  const session = await TestBackendAPIClient.sessions.verifySession(expected.id as string, sessionToken);
 
   expect(session).toEqual(expected);
 });
 
 test('verifySession() throws an error without session ID', async () => {
-  await expect(
-    TestBackendAPIClient.sessions.verifySession('', '')
-  ).rejects.toThrow('A valid ID is required.');
+  await expect(TestBackendAPIClient.sessions.verifySession('', '')).rejects.toThrow('A valid ID is required.');
 });

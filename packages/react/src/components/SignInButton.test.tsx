@@ -1,4 +1,4 @@
-import { render, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
+import { render, screen, userEvent, waitFor } from '@clerk/shared/utils/testUtils';
 import React from 'react';
 
 import { SignInButton } from './SignInButton';
@@ -10,10 +10,15 @@ const mockClerk = {
   redirectToSignIn: mockRedirectToSignIn,
 } as any;
 
-jest.mock('../contexts', () => {
+jest.mock('./withClerk', () => {
   return {
     withClerk: (Component: any) => (props: any) => {
-      return <Component {...props} clerk={mockClerk} />;
+      return (
+        <Component
+          {...props}
+          clerk={mockClerk}
+        />
+      );
     },
   };
 });

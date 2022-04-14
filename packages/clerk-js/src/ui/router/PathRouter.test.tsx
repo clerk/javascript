@@ -37,7 +37,10 @@ const Button = ({ to, children }: React.PropsWithChildren<{ to: string }>) => {
 };
 
 const Tester = () => (
-  <PathRouter preservedParams={['preserved']} basePath='/foo'>
+  <PathRouter
+    preservedParams={['preserved']}
+    basePath='/foo'
+  >
     <Route path='bar'>
       <Button to='../baz'>Internal</Button>
       <Button to='../../'>External</Button>
@@ -96,10 +99,7 @@ describe('PathRouter', () => {
         const button = screen.getByRole('button', { name: /External/i });
         await userEvent.click(button);
       });
-      expect(mockNavigate).toHaveBeenNthCalledWith(
-        1,
-        'https://www.example.com/',
-      );
+      expect(mockNavigate).toHaveBeenNthCalledWith(1, 'https://www.example.com/');
     });
   });
 });

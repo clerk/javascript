@@ -1,7 +1,6 @@
 import { ClerkResourceJSON } from './json';
-import { OAuthStrategy } from './oauth';
 import { ClerkResource } from './resource';
-import { Web3Strategy } from './web3';
+import { OAuthStrategy, Web3Strategy } from './strategies';
 
 type Attribute =
   | 'email_address'
@@ -14,7 +13,7 @@ type Attribute =
 
 type VerificationStrategy = 'email_link' | 'email_code' | 'phone_code';
 
-type OauthProviderData = {
+export type OAuthProviderSettings = {
   enabled: boolean;
   required: boolean;
   authenticatable: boolean;
@@ -44,8 +43,8 @@ export type SignUpData = {
   allowlist_only: boolean;
 };
 
-export type OauthProviders = {
-  [provider in OAuthStrategy]: OauthProviderData;
+export type OAuthProviders = {
+  [provider in OAuthStrategy]: OAuthProviderSettings;
 };
 
 export type Attributes = {
@@ -56,14 +55,14 @@ export interface UserSettingsJSON extends ClerkResourceJSON {
   id: never;
   object: never;
   attributes: Attributes;
-  social: OauthProviders;
+  social: OAuthProviders;
   sign_in: SignInData;
   sign_up: SignUpData;
 }
 
 export interface UserSettingsResource extends ClerkResource {
   id: undefined;
-  social: OauthProviders;
+  social: OAuthProviders;
   attributes: Attributes;
   signIn: SignInData;
   signUp: SignUpData;

@@ -10,7 +10,7 @@
 <div align="center">
 
 [![Chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://discord.com/invite/b5rXHjAg7A)
-[![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://docs.clerk.dev)
+[![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.dev/docs?utm_source=github&utm_medium=clerk_react)
 [![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
 
 [Changelog](https://github.com/clerkinc/javascript/blob/main/packages/react/CHANGELOG.md)
@@ -61,15 +61,9 @@ Clerk requires your application to be wrapped in the `<ClerkProvider/>` context.
 If using Create React App, set `REACT_APP_CLERK_FRONTEND_API` to your Frontend API in your `.env.local` file to make the environment variable accessible on `process.env` and pass it as the `frontendApi` prop.
 
 ```jsx
-import { render } from "react-dom";
+import { render } from 'react-dom';
 
-import {
-  ClerkProvider,
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  UserButton,
-} from "@clerk/clerk-react";
+import { ClerkProvider, SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
 
 const frontendApi = process.env.REACT_APP_CLERK_FRONTEND_API;
 
@@ -77,7 +71,7 @@ render(
   <ClerkProvider frontendApi={frontendApi}>
     <App />
   </ClerkProvider>,
-  document.getElementById("root"),
+  document.getElementById('root'),
 );
 
 function App() {
@@ -85,17 +79,17 @@ function App() {
     <>
       <h1>Hello Clerk!</h1>
       <SignedIn>
-        <UserButton afterSignOutAllUrl={window.location.href} />
+        <UserButton afterSignOutUrl={window.location.href} />
       </SignedIn>
       <SignedOut>
-        <SignInButton mode="modal" />
+        <SignInButton mode='modal' />
       </SignedOut>
     </>
   );
 }
 ```
 
-_For further details and examples, please refer to our [Documentation](https://docs.clerk.dev?utm_source=github&utm_medium=clerk_react)._
+_For further details and examples, please refer to our [Documentation](https://clerk.dev/docs?utm_source=github&utm_medium=clerk_react)._
 
 ## Support
 

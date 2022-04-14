@@ -16,10 +16,7 @@ const defaultOptions: Required<BackoffOptions> = {
 
 const sleep = async (ms: Milliseconds) => new Promise(s => setTimeout(s, ms));
 
-const createExponentialDelayAsyncFn = (opts: {
-  firstDelay: Milliseconds;
-  timeMultiple: number;
-}) => {
+const createExponentialDelayAsyncFn = (opts: { firstDelay: Milliseconds; timeMultiple: number }) => {
   let timesCalled = 0;
 
   const calculateDelayInMs = () => {
@@ -34,10 +31,7 @@ const createExponentialDelayAsyncFn = (opts: {
   };
 };
 
-export const runWithExponentialBackOff = async <T>(
-  callback: () => T,
-  options: BackoffOptions = {},
-): Promise<T> => {
+export const runWithExponentialBackOff = async <T>(callback: () => T, options: BackoffOptions = {}): Promise<T> => {
   let iterationsCount = 0;
   const { maxRetries, shouldRetry, firstDelay, timeMultiple } = {
     ...defaultOptions,

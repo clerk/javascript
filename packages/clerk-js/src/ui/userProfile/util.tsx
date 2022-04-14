@@ -15,7 +15,10 @@ export const Connections = ({ linkedResources }: ConnectionsProps) => {
   return (
     <>
       {linkedResources.map(resource => (
-        <div key={resource.id} className='cl-connection-info'>
+        <div
+          key={resource.id}
+          className='cl-connection-info'
+        >
           Connected to {titleize(resource.type.split('oauth_')[1])}
         </div>
       ))}
@@ -24,7 +27,10 @@ export const Connections = ({ linkedResources }: ConnectionsProps) => {
 };
 
 export const PrimaryTag = () => (
-  <Tag color='primary' className='cl-tag'>
+  <Tag
+    color='primary'
+    className='cl-tag'
+  >
     Primary
   </Tag>
 );

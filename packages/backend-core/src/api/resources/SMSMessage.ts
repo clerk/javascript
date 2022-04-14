@@ -4,13 +4,12 @@ import filterKeys from '../utils/Filter';
 import type { SMSMessageJSON } from './JSON';
 import type { SMSMessageProps } from './Props';
 
-interface SMSMessagePayload extends SMSMessageProps {};
+interface SMSMessagePayload extends SMSMessageProps {}
 
-export interface SMSMessage extends SMSMessagePayload {};
+export interface SMSMessage extends SMSMessagePayload {}
 
 export class SMSMessage {
-  static attributes = ['id', 'fromPhoneNumber', 'toPhoneNumber',
-    'phoneNumberId', 'message', 'status'];
+  static attributes = ['id', 'fromPhoneNumber', 'toPhoneNumber', 'phoneNumberId', 'message', 'status'];
 
   static defaults = {};
 

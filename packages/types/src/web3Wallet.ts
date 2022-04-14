@@ -1,10 +1,5 @@
 import { ClerkResource } from './resource';
 import { VerificationResource } from './verification';
-import { Web3Strategy } from './web3';
-
-export type PrepareWeb3WalletVerificationParams = {
-  strategy: Web3Strategy;
-};
 
 export interface Web3WalletResource extends ClerkResource {
   id: string;
@@ -12,9 +7,11 @@ export interface Web3WalletResource extends ClerkResource {
   verification: VerificationResource;
 }
 
+export type GenerateSignature = (opts: GenerateSignatureParams) => Promise<string>;
+
 export interface AuthenticateWithWeb3Params {
   identifier: string;
-  generateSignature: (opts: GenerateSignatureParams) => Promise<string>;
+  generateSignature: GenerateSignature;
 }
 
 export interface GenerateSignatureParams {

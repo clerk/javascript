@@ -1,7 +1,4 @@
-import {
-  OneTimeCodeInput,
-  VerifyCodeHandler,
-} from '@clerk/shared/components/oneTimeCodeInput';
+import { OneTimeCodeInput, VerifyCodeHandler } from '@clerk/shared/components/oneTimeCodeInput';
 import { noop } from '@clerk/shared/utils/noop';
 import { EmailAddressResource } from '@clerk/types';
 import React from 'react';
@@ -30,9 +27,9 @@ export function EmailAddressVerificationWithOTP({
     return email.prepareVerification({ strategy: 'email_code' }).catch(onError);
   };
 
-  const verifyCode: VerifyCodeHandler = async (verify, reject) => {
+  const verifyCode: VerifyCodeHandler = (verify, reject) => {
     email
-      .attemptVerification(code.value)
+      .attemptVerification({ code: code.value })
       .then(() => verify(onVerificationComplete))
       .catch(e => {
         reject(verificationErrorMessage(e));
@@ -41,7 +38,10 @@ export function EmailAddressVerificationWithOTP({
 
   return (
     <div className={className}>
-      <div className='cl-copy-text' style={{ marginBottom: '2em' }}>
+      <div
+        className='cl-copy-text'
+        style={{ marginBottom: '2em' }}
+      >
         An email containing a verification code has been sent to{' '}
         <span className='cl-identifier'>{email.emailAddress}</span>.
       </div>

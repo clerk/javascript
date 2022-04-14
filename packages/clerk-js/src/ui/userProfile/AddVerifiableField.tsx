@@ -2,20 +2,13 @@ import { Button } from '@clerk/shared/components/button';
 import { Control } from '@clerk/shared/components/control';
 import { Form } from '@clerk/shared/components/form';
 import { InputWithIcon } from '@clerk/shared/components/input';
-import {
-  OneTimeCodeInput,
-  VerifyCodeHandler,
-} from '@clerk/shared/components/oneTimeCodeInput';
+import { OneTimeCodeInput, VerifyCodeHandler } from '@clerk/shared/components/oneTimeCodeInput';
 import { PhoneInput, PhoneViewer } from '@clerk/shared/components/phoneInput';
 import { TitledCard } from '@clerk/shared/components/titledCard';
 import { Wizard } from '@clerk/shared/components/wizard';
 import { VerificationResource } from '@clerk/types';
 import React from 'react';
-import {
-  handleError,
-  useFieldState,
-  verificationErrorMessage,
-} from 'ui/common';
+import { handleError, useFieldState, verificationErrorMessage } from 'ui/common';
 import { Error } from 'ui/common/error';
 import { useNavigate } from 'ui/hooks';
 import { PageHeading } from 'ui/userProfile/pageHeading';
@@ -26,7 +19,7 @@ export interface ListValue {
   toString: () => string;
   destroy: () => Promise<any>;
   prepareVerification: () => Promise<any>;
-  attemptVerification: (code: string) => Promise<any>;
+  attemptVerification: (params: { code: string }) => Promise<any>;
 }
 
 interface AddVerifiableFieldProps {
@@ -86,7 +79,7 @@ export function AddVerifiableField({
 
   const verifyCode: VerifyCodeHandler = async (verify, reject) => {
     try {
-      await state.listVal?.attemptVerification(code.value);
+      await state.listVal?.attemptVerification({ code: code.value });
       verify(() => setState(s => ({ ...s, step: s.step + 1 })));
     } catch (err) {
       reject(verificationErrorMessage(err));
@@ -110,7 +103,11 @@ export function AddVerifiableField({
       resetButtonLabel='Cancel'
       buttonGroupClassName='cl-form-button-group'
     >
-      <Control label={label} error={currentValue.error} htmlFor={inputName}>
+      <Control
+        label={label}
+        error={currentValue.error}
+        htmlFor={inputName}
+      >
         {type === 'phone' ? (
           <div className='cl-phone-input-container'>
             <PhoneInput
@@ -143,7 +140,10 @@ export function AddVerifiableField({
 
   const step2Verify = (
     <>
-      <div className='cl-copy-text' style={{ marginBottom: '2em' }}>
+      <div
+        className='cl-copy-text'
+        style={{ marginBottom: '2em' }}
+      >
         {stepText[state.step] + ' '}
         {type === 'phone' ? (
           <PhoneViewer
@@ -186,7 +186,10 @@ export function AddVerifiableField({
 
   return (
     <>
-      <PageHeading title='Back' backTo='../' />
+      <PageHeading
+        title='Back'
+        backTo='../'
+      />
       <TitledCard
         title={`Add ${type}`}
         subtitle={stepTitle[state.step]}

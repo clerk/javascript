@@ -22,25 +22,11 @@ export type OAuthProvider =
 
 export type OAuthStrategy = `oauth_${OAuthProvider}`;
 
-export type SignInIdentifier =
-  | 'username'
-  | 'email_address'
-  | 'phone_number'
-  | 'web3_wallet'
-  | OAuthStrategy;
+export type SignInIdentifier = 'username' | 'email_address' | 'phone_number' | 'web3_wallet' | OAuthStrategy;
 
-export type SignInFactorStrategy =
-  | 'password'
-  | 'email_link'
-  | 'phone_code'
-  | 'email_code'
-  | OAuthStrategy;
+export type SignInFactorStrategy = 'password' | 'email_link' | 'phone_code' | 'email_code' | OAuthStrategy;
 
-export type SignInStatus =
-  | 'needs_identifier'
-  | 'needs_factor_one'
-  | 'needs_factor_two'
-  | 'complete';
+export type SignInStatus = 'needs_identifier' | 'needs_factor_one' | 'needs_factor_two' | 'complete';
 
 export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
 

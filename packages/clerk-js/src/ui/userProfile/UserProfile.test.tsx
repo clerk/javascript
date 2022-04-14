@@ -1,20 +1,17 @@
-import { renderJSON } from '@clerk/shared/testUtils';
+import { renderJSONAfterFirstAct } from '@clerk/shared/testUtils';
 import {
   Clerk,
   EmailAddressResource,
-  ExternalAccountResource,
+  ExternalAccountJSON,
   PhoneNumberResource,
   SessionActivity,
   SessionResource,
   SessionWithActivitiesResource,
   SignInResource,
   SignUpResource,
+  VerificationJSON,
 } from '@clerk/types';
-import {
-  AuthConfig,
-  ExternalAccount,
-  UserSettings,
-} from 'core/resources/internal';
+import { AuthConfig, ExternalAccount, UserSettings } from 'core/resources/internal';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -55,6 +52,20 @@ const sessionWithActivities: Partial<SessionWithActivitiesResource> = {
     isMobile: false,
   } as any as SessionActivity,
 };
+
+const externalAccount = new ExternalAccount(
+  {
+    id: 'fbac_yolo',
+    provider: 'facebook',
+    approved_scopes: 'email',
+    email_address: 'peter@gmail.com',
+    first_name: 'Peter',
+    last_name: 'Smith',
+    provider_user_id: '10147951078263327',
+    verification: { status: 'verified' } as VerificationJSON,
+  } as unknown as ExternalAccountJSON,
+  '/path',
+);
 
 jest.mock('ui/contexts', () => ({
   useCoreSignIn: () => mockUseCoreSignIn(),
@@ -102,9 +113,15 @@ jest.mock('ui/contexts', () => ({
       social: {
         oauth_google: {
           enabled: true,
+          required: false,
+          authenticatable: true,
+          strategy: 'oauth_google',
         },
         oauth_facebook: {
           enabled: true,
+          required: false,
+          authenticatable: true,
+          strategy: 'oauth_facebook',
         },
       },
     } as Partial<UserSettings>,
@@ -116,17 +133,9 @@ jest.mock('ui/contexts', () => ({
   useCoreUser: () => {
     return {
       twoFactorEnabled: () => true,
-      externalAccounts: [
-        new ExternalAccount({
-          id: 'fbac_yolo',
-          provider: 'facebook',
-          approvedScopes: 'email',
-          emailAddress: 'peter@gmail.com',
-          firstName: 'Peter',
-          lastName: 'Smith',
-          externalId: '10147951078263327',
-        } as ExternalAccountResource),
-      ],
+      externalAccounts: [externalAccount],
+      verifiedExternalAccounts: [externalAccount],
+      unverifiedExternalAccounts: [],
       phoneNumbers: [
         {
           id: '1',
@@ -203,7 +212,7 @@ ReactDOM.createPortal = node => node;
 
 describe('<UserProfileContent />', () => {
   it('renders the UserProfileContent', async () => {
-    const tree = renderJSON(<UserProfile />);
+    const tree = renderJSONAfterFirstAct(<UserProfile />);
     expect(tree).toMatchSnapshot();
   });
 });

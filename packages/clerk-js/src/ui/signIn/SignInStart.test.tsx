@@ -44,7 +44,6 @@ jest.mock('ui/contexts', () => {
         } as any as EnvironmentResource),
     ),
     useCoreSignIn: jest.fn(() => ({
-      allowedFactorOneStrategies: ['password'],
       create: mockCreateRequest,
       attemptFirstFactor: mockFactorOneAttempt.mockReturnValueOnce({
         status: 'complete',
@@ -397,6 +396,30 @@ fdescribe('<SignInStart/>', () => {
       render(<SignInStart />);
 
       expect(screen.getByText(errorMsg)).toBeInTheDocument();
+      expect(mockCreateRequest).toHaveBeenNthCalledWith(1, {});
+    });
+  });
+
+  describe('when a miscellaneous oauth error occurs', () => {
+    it('renders a generic error message', () => {
+      const genericErrorMsg = 'Unable to complete action at this time. If the problem persists please contact support.';
+
+      mocked(useCoreSignIn as jest.Mock<SignInResource>, true).mockImplementationOnce(
+        () =>
+          ({
+            create: mockCreateRequest,
+            firstFactorVerification: {
+              error: {
+                code: 'omg_they_killed_kenny',
+                longMessage: 'All hope is lost',
+              },
+            },
+          } as unknown as SignInResource),
+      );
+
+      render(<SignInStart />);
+
+      expect(screen.getByText(genericErrorMsg)).toBeInTheDocument();
       expect(mockCreateRequest).toHaveBeenNthCalledWith(1, {});
     });
   });

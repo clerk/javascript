@@ -124,6 +124,11 @@ Array [
                     src="https://images.clerk.dev/static/facebook.svg"
                   />
                   peter@gmail.com
+                  <span
+                    className="tag success sm cl-tag"
+                  >
+                    Verified
+                  </span>
                 </div>
               </div>
             </div>
@@ -655,8 +660,7 @@ Array [
           <div
             className="cl-copy-text"
           >
-            An email containing a
-             
+            An email containing a 
             verification code
              will be sent to your email address.
           </div>
@@ -3353,6 +3357,11 @@ Array [
                   src="https://images.clerk.dev/static/facebook.svg"
                 />
                 peter@gmail.com
+                <span
+                  className="tag success sm cl-tag"
+                >
+                  Verified
+                </span>
               </div>
             </div>
             <div
@@ -3361,6 +3370,41 @@ Array [
               <svg
                 data-filename="../shared/assets/icons/arrow-right.svg"
               />
+            </div>
+          </div>
+        </button>
+        <button
+          className="cl-list-item elementContainer button hoverable"
+          disabled={false}
+          onClick={[Function]}
+        >
+          <div
+            className="listItem line"
+          >
+            <div
+              className="start"
+            >
+              <div>
+                <img
+                  alt="oauth_google"
+                  className="cl-left-icon-wrapper"
+                  src="https://images.clerk.dev/static/google.svg"
+                />
+                Connect 
+                Google
+                 account
+              </div>
+            </div>
+            <div
+              className="iconContainer"
+            >
+              <div
+                className="icon"
+              >
+                <svg
+                  data-filename="../shared/assets/icons/arrow-right.svg"
+                />
+              </div>
             </div>
           </div>
         </button>
@@ -3522,8 +3566,7 @@ Array [
               className="start"
             >
               <div>
-                Currently
-                 
+                Currently 
                 <span
                   className="cl-font-semibold"
                 >

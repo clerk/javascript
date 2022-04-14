@@ -2,6 +2,7 @@ import { render, renderJSON, screen, userEvent } from '@clerk/shared/testUtils';
 import { PhoneNumberResource } from '@clerk/types';
 import { ClerkAPIResponseError } from 'core/resources/Error';
 import React from 'react';
+import { useCoreUser } from 'ui/contexts/CoreUserContext';
 
 import { PhoneDetail } from './PhoneDetail';
 
@@ -36,7 +37,6 @@ jest.mock('ui/contexts/CoreUserContext', () => {
     useCoreUser: jest.fn(),
   };
 });
-import { useCoreUser } from 'ui/contexts/CoreUserContext';
 
 describe('<PhoneDetail/>', () => {
   it('renders the list', async () => {
@@ -57,7 +57,7 @@ describe('<PhoneDetail/>', () => {
     expect(tree).toMatchSnapshot();
   });
 
-  it('displays verification errors', async () => {
+  fit('displays verification errors', async () => {
     (useCoreUser as jest.Mock).mockImplementation(() => {
       return {
         primaryEmailAddressId: '1',
@@ -70,7 +70,7 @@ describe('<PhoneDetail/>', () => {
             prepareVerification: async () => {
               return null;
             },
-            attemptVerification: async (code: string) => {
+            attemptVerification: async ({ code }: { code: string }) => {
               if (code === '999999') {
                 throw new ClerkAPIResponseError('the-error', {
                   data: [
@@ -92,18 +92,13 @@ describe('<PhoneDetail/>', () => {
     render(<PhoneDetail />);
     // Type a verification code that will throw an error,
     // in this case '999999'.
-    userEvent.type(
-      screen.getByLabelText('Enter verification code. Digit 1'),
-      '9',
-    );
+    userEvent.type(screen.getByLabelText('Enter verification code. Digit 1'), '9');
     userEvent.type(screen.getByLabelText('Digit 2'), '9');
     userEvent.type(screen.getByLabelText('Digit 3'), '9');
     userEvent.type(screen.getByLabelText('Digit 4'), '9');
     userEvent.type(screen.getByLabelText('Digit 5'), '9');
     userEvent.type(screen.getByLabelText('Digit 6'), '9');
 
-    expect(
-      await screen.findByText('the-long-error-message'),
-    ).toBeInTheDocument();
+    expect(await screen.findByText('the-long-error-message')).toBeInTheDocument();
   });
 });

@@ -1,8 +1,5 @@
 import { Label } from '@clerk/shared/components/label';
-import {
-  OneTimeCodeInput,
-  VerifyCodeHandler,
-} from '@clerk/shared/components/oneTimeCodeInput';
+import { OneTimeCodeInput, VerifyCodeHandler } from '@clerk/shared/components/oneTimeCodeInput';
 import { SignInFactor } from '@clerk/types';
 import React from 'react';
 import { FieldState } from 'ui/common';
@@ -14,11 +11,7 @@ export type OTPProps = {
   factor: SignInFactor;
 };
 
-export function OTP({
-  factor,
-  code,
-  verifyCode,
-}: OTPProps): JSX.Element | null {
+export function OTP({ factor, code, verifyCode }: OTPProps): JSX.Element | null {
   const signIn = useCoreSignIn();
 
   if (factor.strategy !== 'email_code' && factor.strategy !== 'phone_code') {
@@ -35,7 +28,7 @@ export function OTP({
       <Label className='cl-auth-form-message'>
         Enter the 6-digit code sent to
         <br />
-        <strong>{factor.safe_identifier}</strong>
+        <strong>{factor.safeIdentifier}</strong>
       </Label>
       <OneTimeCodeInput
         value={code.value}

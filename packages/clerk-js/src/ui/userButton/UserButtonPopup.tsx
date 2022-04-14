@@ -1,13 +1,7 @@
 import { Avatar } from '@clerk/shared/components/avatar';
 import React from 'react';
 import { ActiveAccountsManager } from 'ui/common/activeAccountsManager/ActiveAccountsManager';
-import {
-  useCoreSession,
-  useCoreSessionList,
-  useCoreUser,
-  useUserButtonContext,
-  withCoreUserGuard,
-} from 'ui/contexts';
+import { useCoreSession, useCoreSessionList, useCoreUser, useUserButtonContext, withCoreUserGuard } from 'ui/contexts';
 
 import { Salutation } from './Salutation';
 
@@ -17,9 +11,7 @@ function UserButtonPopupBase(): JSX.Element | null {
   const user = useCoreUser();
   const userButtonContext = useUserButtonContext();
 
-  const otherSessions = sessions
-    .filter(({ id }) => id !== session.id)
-    .filter(s => s.status === 'active');
+  const otherSessions = sessions.filter(({ id }) => id !== session.id).filter(s => s.status === 'active');
 
   return (
     <>
@@ -33,11 +25,12 @@ function UserButtonPopupBase(): JSX.Element | null {
           optimize
         />
         <Salutation user={user} />
-        <div className='cl-user-button-identifier'>
-          {user.primaryEmailAddress?.toString()}
-        </div>
+        <div className='cl-user-button-identifier'>{user.primaryEmailAddress?.toString()}</div>
       </div>
-      <ActiveAccountsManager sessions={otherSessions} {...userButtonContext} />
+      <ActiveAccountsManager
+        sessions={otherSessions}
+        {...userButtonContext}
+      />
     </>
   );
 }

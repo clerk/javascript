@@ -13,26 +13,22 @@ interface UserParams {
   unsafeMetadata?: Record<string, unknown> | string;
 }
 
-interface UserListParams {
-  limit?: number;
-  offset?: number;
+type UserCountParams = {
   emailAddress?: string[];
   phoneNumber?: string[];
+  username?: string[];
+  web3Wallet?: string[];
+  query?: string;
   userId?: string[];
-  orderBy?:
-    | 'created_at'
-    | 'updated_at'
-    | '+created_at'
-    | '+updated_at'
-    | '-created_at'
-    | '-updated_at';
-}
+};
 
-const userMetadataKeys = [
-  'publicMetadata',
-  'privateMetadata',
-  'unsafeMetadata',
-];
+type UserListParams = UserCountParams & {
+  limit?: number;
+  offset?: number;
+  orderBy?: 'created_at' | 'updated_at' | '+created_at' | '+updated_at' | '-created_at' | '-updated_at';
+};
+
+const userMetadataKeys = ['publicMetadata', 'privateMetadata', 'unsafeMetadata'];
 
 type UserMetadataParams = {
   publicMetadata?: Record<string, unknown>;
@@ -49,6 +45,7 @@ type CreateUserParams = {
   firstName?: string;
   lastName?: string;
   skipPasswordChecks?: boolean;
+  skipPasswordRequirement?: boolean;
 } & UserMetadataParams;
 
 type UserMetadataRequestBody = {
@@ -98,10 +95,7 @@ export class UserApi extends AbstractApi {
       params.publicMetadata = JSON.stringify(params.publicMetadata);
     }
 
-    if (
-      params.privateMetadata &&
-      !(typeof params.privateMetadata == 'string')
-    ) {
+    if (params.privateMetadata && !(typeof params.privateMetadata == 'string')) {
       params.privateMetadata = JSON.stringify(params.privateMetadata);
     }
 
@@ -123,6 +117,22 @@ export class UserApi extends AbstractApi {
       path: `/users/${userId}`,
     });
   }
+
+  public async getCount(params: UserListParams = {}) {
+    return this._restClient.makeRequest<number>({
+      method: 'GET',
+      path: '/users/count',
+      queryParams: params,
+    });
+  }
+
+  public async getUserOauthAccessToken(userId: string, provider: `oauth_${string}`) {
+    this.requireId(userId);
+    return this._restClient.makeRequest<User>({
+      method: 'GET',
+      path: `/users/${userId}/oauth_access_tokens/${provider}`,
+    });
+  }
 }
 
 function stringifyMetadataParams(
@@ -130,13 +140,10 @@ function stringifyMetadataParams(
     [key: string]: Record<string, unknown> | undefined;
   },
 ): UserMetadataRequestBody {
-  return userMetadataKeys.reduce(
-    (res: Record<string, string>, key: string): Record<string, string> => {
-      if (params[key]) {
-        res[key] = JSON.stringify(params[key]);
-      }
-      return res;
-    },
-    {},
-  );
+  return userMetadataKeys.reduce((res: Record<string, string>, key: string): Record<string, string> => {
+    if (params[key]) {
+      res[key] = JSON.stringify(params[key]);
+    }
+    return res;
+  }, {});
 }

@@ -15,7 +15,7 @@ jest.mock('ui/contexts', () => {
       displayConfig: {},
     }),
     // @ts-ignore 2352
-    useCoreUser: () => ({ externalAccounts: [] } as UserResource),
+    useCoreUser: () => ({ externalAccounts: [], verifiedExternalAccounts: [], unverifiedExternalAccounts: [] } as UserResource),
     useCoreClerk: jest.fn(),
   };
 });
@@ -31,14 +31,14 @@ const OTHER_ATTRIBUTES = {
     enabled: false,
   },
   email_address: {
-    enabled: false
+    enabled: false,
   },
   phone_number: {
-    enabled: false
+    enabled: false,
   },
   web3_wallet: {
-    enabled: false
-  }
+    enabled: false,
+  },
 };
 
 describe('<Account/>', () => {
@@ -53,13 +53,13 @@ describe('<Account/>', () => {
           attributes: {
             first_name: {
               enabled: true,
-              required: true
+              required: true,
             },
             last_name: {
-              enabled: false
+              enabled: false,
             },
-            ...OTHER_ATTRIBUTES
-          }
+            ...OTHER_ATTRIBUTES,
+          },
         } as UserSettingsResource,
       };
     });
@@ -78,9 +78,9 @@ describe('<Account/>', () => {
             first_name: {
               enabled: false,
             },
-            ...OTHER_ATTRIBUTES
-          }
-        } as UserSettingsResource
+            ...OTHER_ATTRIBUTES,
+          },
+        } as UserSettingsResource,
       };
     });
     render(<Account />);
@@ -98,9 +98,9 @@ describe('<Account/>', () => {
             last_name: {
               enabled: false,
             },
-            ...OTHER_ATTRIBUTES
-          }
-        } as UserSettingsResource
+            ...OTHER_ATTRIBUTES,
+          },
+        } as UserSettingsResource,
       };
     });
     render(<Account />);

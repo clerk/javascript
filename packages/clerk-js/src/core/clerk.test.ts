@@ -1,14 +1,7 @@
 import { SignInJSON, SignUpJSON } from '@clerk/types';
 import { waitFor } from '@testing-library/dom';
 import Clerk from 'core/clerk';
-import {
-  Client,
-  DisplayConfig,
-  Environment,
-  MagicLinkErrorCode,
-  SignIn,
-  SignUp,
-} from 'core/resources/internal';
+import { Client, DisplayConfig, Environment, MagicLinkErrorCode, SignIn, SignUp } from 'core/resources/internal';
 
 const mockClientFetch = jest.fn();
 const mockEnvironmentFetch = jest.fn();
@@ -49,7 +42,7 @@ describe('Clerk singleton', () => {
     global.window.location = location;
   });
 
-  beforeEach(async () => {
+  beforeEach(() => {
     const mockAddEventListener = (type: string, callback: (e: any) => void) => {
       if (type === 'message') {
         callback({
@@ -93,13 +86,13 @@ describe('Clerk singleton', () => {
     });
 
     it('redirects to signInUrl', () => {
-      sut.redirectToSignIn();
-      expect(mockNavigate).toHaveBeenCalledWith('/signInUrl');
+      sut.redirectToSignIn({ redirectUrl: 'https://www.example.com/' });
+      expect(mockNavigate).toHaveBeenCalledWith('/signInUrl#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
     });
 
     it('redirects to signUpUrl', () => {
-      sut.redirectToSignUp();
-      expect(mockNavigate).toHaveBeenCalledWith('/signUpUrl');
+      sut.redirectToSignUp({ redirectUrl: 'https://www.example.com/' });
+      expect(mockNavigate).toHaveBeenCalledWith('/signUpUrl#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
     });
 
     it('redirects to userProfileUrl', () => {
@@ -136,6 +129,109 @@ describe('Clerk singleton', () => {
       await waitFor(() => {
         expect(sut.session).not.toBe(undefined);
         expect(sut.session).toBe(null);
+      });
+    });
+  });
+
+  describe('.signOut()', () => {
+    const mockClientDestroy = jest.fn();
+    const mockSession1 = { id: '1', remove: jest.fn(), status: 'active' };
+    const mockSession2 = { id: '2', remove: jest.fn(), status: 'active' };
+
+    beforeEach(() => {
+      mockClientDestroy.mockReset();
+      mockSession1.remove.mockReset();
+      mockSession2.remove.mockReset();
+    });
+
+    it('has no effect if called when no active sessions exist', async () => {
+      const sut = new Clerk(frontendApi);
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [],
+          destroy: mockClientDestroy,
+        }),
+      );
+      await sut.load();
+      await sut.signOut();
+      await waitFor(() => {
+        expect(mockClientDestroy).not.toHaveBeenCalled();
+        expect(mockSession1.remove).not.toHaveBeenCalled();
+      });
+    });
+
+    it('signs out all sessions if no sessionId is passed and multiple sessions are active', async () => {
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [mockSession1, mockSession2],
+          destroy: mockClientDestroy,
+        }),
+      );
+
+      const sut = new Clerk(frontendApi);
+      sut.setSession = jest.fn();
+      await sut.load();
+      await sut.signOut();
+      await waitFor(() => {
+        expect(mockClientDestroy).toHaveBeenCalled();
+        expect(sut.setSession).toHaveBeenCalledWith(null, undefined);
+      });
+    });
+
+    it('signs out all sessions if no sessionId is passed and only one session is active', async () => {
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [mockSession1],
+          destroy: mockClientDestroy,
+        }),
+      );
+
+      const sut = new Clerk(frontendApi);
+      sut.setSession = jest.fn();
+      await sut.load();
+      await sut.signOut();
+      await waitFor(() => {
+        expect(mockClientDestroy).toHaveBeenCalled();
+        expect(mockSession1.remove).not.toHaveBeenCalled();
+        expect(sut.setSession).toHaveBeenCalledWith(null, undefined);
+      });
+    });
+
+    it('only removes the session that corresponds to the passed sessionId if it is not the current', async () => {
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [mockSession1, mockSession2],
+          destroy: mockClientDestroy,
+        }),
+      );
+
+      const sut = new Clerk(frontendApi);
+      sut.setSession = jest.fn();
+      await sut.load();
+      await sut.signOut({ sessionId: '2' });
+      await waitFor(() => {
+        expect(mockSession2.remove).toHaveBeenCalled();
+        expect(mockClientDestroy).not.toHaveBeenCalled();
+        expect(sut.setSession).not.toHaveBeenCalledWith(null, undefined);
+      });
+    });
+
+    it('removes and signs out the session that corresponds to the passed sessionId if it is the current', async () => {
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [mockSession1, mockSession2],
+          destroy: mockClientDestroy,
+        }),
+      );
+
+      const sut = new Clerk(frontendApi);
+      sut.setSession = jest.fn();
+      await sut.load();
+      await sut.signOut({ sessionId: '1' });
+      await waitFor(() => {
+        expect(mockSession1.remove).toHaveBeenCalled();
+        expect(mockClientDestroy).not.toHaveBeenCalled();
+        expect(sut.setSession).toHaveBeenCalledWith(null, undefined);
       });
     });
   });
@@ -191,7 +287,7 @@ describe('Clerk singleton', () => {
   });
 
   describe('.handleRedirectCallback()', () => {
-    beforeEach(async () => {
+    beforeEach(() => {
       mockClientFetch.mockReset();
       mockEnvironmentFetch.mockReset();
     });
@@ -226,6 +322,7 @@ describe('Clerk singleton', () => {
             identifier: '',
             user_data: null,
             created_session_id: null,
+            created_user_id: null,
           } as any as SignInJSON),
           signUp: new SignUp(null),
         }),
@@ -234,9 +331,7 @@ describe('Clerk singleton', () => {
       const mockSetSession = jest.fn();
       const mockSignUpCreate = jest
         .fn()
-        .mockReturnValue(
-          Promise.resolve({ status: 'complete', createdSessionId: '123' }),
-        );
+        .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
 
       const sut = new Clerk(frontendApi);
       await sut.load({
@@ -303,9 +398,7 @@ describe('Clerk singleton', () => {
       const mockSetSession = jest.fn();
       const mockSignInCreate = jest
         .fn()
-        .mockReturnValue(
-          Promise.resolve({ status: 'complete', createdSessionId: '123' }),
-        );
+        .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
 
       const sut = new Clerk(frontendApi);
       await sut.load({
@@ -410,9 +503,7 @@ describe('Clerk singleton', () => {
       const mockSetSession = jest.fn();
       const mockSignUpCreate = jest
         .fn()
-        .mockReturnValue(
-          Promise.resolve({ status: 'complete', createdSessionId: '123' }),
-        );
+        .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
 
       const sut = new Clerk(frontendApi);
       await sut.load({
@@ -468,9 +559,7 @@ describe('Clerk singleton', () => {
       sut.handleRedirectCallback();
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith(
-          '/' + mockDisplayConfig.signInUrl + '#/factor-two',
-        );
+        expect(mockNavigate).toHaveBeenCalledWith('/' + mockDisplayConfig.signInUrl + '#/factor-two');
       });
     });
 
@@ -627,6 +716,54 @@ describe('Clerk singleton', () => {
         expect(mockNavigate).toHaveBeenCalledWith('/custom-sign-in');
       });
     });
+
+    it('redirects user to signUp url if there is an external account signup attempt has an error', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          onWindowLocationHost: () => false,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [],
+          signIn: new SignIn(null),
+          signUp: new SignUp({
+            status: 'missing_requirements',
+            verifications: {
+              external_account: {
+                status: 'unverified',
+                strategy: 'oauth_google',
+                external_verification_redirect_url: '',
+                error: {
+                  code: 'external_account_not_found',
+                  long_message: 'The External Account was not found.',
+                  message: 'Invalid external account',
+                  meta: {
+                    session_id: 'sess_1yDceUR8SIKtQ0gIOO8fNsW7nhe',
+                  },
+                },
+              },
+            },
+          } as any as SignUpJSON),
+        }),
+      );
+
+      const sut = new Clerk(frontendApi);
+      await sut.load({
+        navigate: mockNavigate,
+      });
+
+      sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('/signUpUrl');
+      });
+    });
   });
 
   describe('.handleMagicLinkVerification()', () => {
@@ -663,10 +800,7 @@ describe('Clerk singleton', () => {
       sut.handleMagicLinkVerification({ redirectUrlComplete });
 
       await waitFor(() => {
-        expect(mockSetSession).toHaveBeenCalledWith(
-          createdSessionId,
-          expect.any(Function),
-        );
+        expect(mockSetSession).toHaveBeenCalledWith(createdSessionId, expect.any(Function));
       });
     });
 
@@ -727,10 +861,7 @@ describe('Clerk singleton', () => {
       sut.handleMagicLinkVerification({ redirectUrlComplete });
 
       await waitFor(() => {
-        expect(mockSetSession).toHaveBeenCalledWith(
-          createdSessionId,
-          expect.any(Function),
-        );
+        expect(mockSetSession).toHaveBeenCalledWith(createdSessionId, expect.any(Function));
       });
     });
 

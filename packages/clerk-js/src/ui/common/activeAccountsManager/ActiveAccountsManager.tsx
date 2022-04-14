@@ -1,7 +1,7 @@
 import { ActiveSessionResource, SessionResource } from '@clerk/types';
 import React from 'react';
 import { PoweredByClerk } from 'ui/common';
-import { useCoreClerk, useEnvironment } from 'ui/contexts';
+import { useCoreClerk, useCoreSession, useEnvironment } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
 import { useUserButtonPopupVisibility } from 'ui/userButton/contexts/PopupVisibilityContext';
 import { windowNavigate } from 'utils';
@@ -12,9 +12,9 @@ import SignOutAll from './SignOutAll';
 
 interface ActiveAccountsManagerProps {
   sessions: SessionResource[];
-  navigateAfterSignOutAll: () => void;
+  navigateAfterSignOut: () => void;
   navigateAfterSwitchSession: () => void;
-  navigateAfterSignOutOne?: () => void;
+  navigateAfterMultiSessionSingleSignOut?: () => void;
   userProfileUrl: string;
   signInUrl: string;
   showActiveAccountButtons?: boolean;
@@ -22,19 +22,19 @@ interface ActiveAccountsManagerProps {
 
 export function ActiveAccountsManager({
   sessions,
-  navigateAfterSignOutAll,
-  navigateAfterSignOutOne,
+  navigateAfterSignOut,
+  navigateAfterMultiSessionSingleSignOut,
   navigateAfterSwitchSession,
   signInUrl,
   userProfileUrl,
   showActiveAccountButtons = true,
 }: ActiveAccountsManagerProps): JSX.Element {
-  const { setSession, signOut, signOutOne } = useCoreClerk();
+  const { setSession, signOut } = useCoreClerk();
+  const { id: currentSessionId } = useCoreSession();
   const { authConfig } = useEnvironment();
   const { navigate } = useNavigate();
   const [signoutInProgress, setSignoutInProgress] = React.useState(false);
-  const [managementNavigationInProgress, setManagementNavigationInProgress] =
-    React.useState(false);
+  const [managementNavigationInProgress, setManagementNavigationInProgress] = React.useState(false);
   const { setPopupVisible } = useUserButtonPopupVisibility();
 
   const handleSignOutSingle = () => {
@@ -46,7 +46,7 @@ export function ActiveAccountsManager({
       return;
     }
 
-    signOutOne(navigateAfterSignOutOne).catch(() =>
+    signOut(navigateAfterMultiSessionSingleSignOut, { sessionId: currentSessionId }).catch(() =>
       setSignoutInProgress(false),
     );
   };
@@ -73,11 +73,10 @@ export function ActiveAccountsManager({
   };
 
   const handleSignOutAll = () => {
-    return signOut(navigateAfterSignOutAll);
+    return signOut(navigateAfterSignOut);
   };
 
-  const shouldRenderAccountSwitcher =
-    sessions.length || !authConfig.singleSessionMode;
+  const shouldRenderAccountSwitcher = sessions.length || !authConfig.singleSessionMode;
   return (
     <div className='cl-active-accounts-manager'>
       {showActiveAccountButtons && (
@@ -96,9 +95,7 @@ export function ActiveAccountsManager({
           handleAddAccountClick={handleAddAccountClick}
         />
       )}
-      {Boolean(sessions.length) && (
-        <SignOutAll handleSignOutAll={handleSignOutAll} />
-      )}
+      {Boolean(sessions.length) && <SignOutAll handleSignOutAll={handleSignOutAll} />}
       <PoweredByClerk className='cl-powered-by-clerk' />
     </div>
   );

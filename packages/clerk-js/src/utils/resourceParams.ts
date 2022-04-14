@@ -1,16 +1,16 @@
 export function normalizeUnsafeMetadata<
   T extends Record<string, unknown> & {
-    unsafe_metadata?: Record<string, unknown>;
+    unsafeMetadata?: Record<string, unknown>;
   },
 >(params: T) {
-  const { unsafe_metadata } = { ...params };
-  const unsafeMetadataJSON = unsafe_metadata
-    ? typeof unsafe_metadata === 'object'
-      ? JSON.stringify(unsafe_metadata)
-      : unsafe_metadata
+  const { unsafeMetadata } = { ...params };
+  const unsafeMetadataJSON = unsafeMetadata
+    ? typeof unsafeMetadata === 'object'
+      ? JSON.stringify(unsafeMetadata)
+      : unsafeMetadata
     : '';
   return {
     ...params,
-    ...(unsafe_metadata ? { unsafe_metadata: unsafeMetadataJSON } : {}),
+    ...(unsafeMetadata ? { unsafeMetadata: unsafeMetadataJSON } : {}),
   };
 }

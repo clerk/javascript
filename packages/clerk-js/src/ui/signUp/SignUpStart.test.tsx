@@ -1,17 +1,12 @@
-import {
-  render,
-  renderJSON,
-  screen,
-  userEvent,
-  waitFor,
-} from '@clerk/shared/testUtils';
+import { mocked, render, renderJSON, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
 import { titleize } from '@clerk/shared/utils/string';
-import { UserSettingsJSON } from '@clerk/types';
+import { SignInResource, UserSettingsJSON } from '@clerk/types';
 import { Session, UserSettings } from 'core/resources/internal';
 import React from 'react';
-import { useCoreSignUp } from 'ui/contexts';
+import { useCoreSignIn, useCoreSignUp } from 'ui/contexts';
 
 import { SignUpStart } from './SignUpStart';
+import { SignInStart } from 'ui/signIn/SignInStart';
 
 const navigateMock = jest.fn();
 const mockCreateRequest = jest.fn();
@@ -98,6 +93,7 @@ describe('<SignUpStart/>', () => {
       attributes: {
         username: {
           enabled: true,
+          required: true,
         },
         first_name: {
           enabled: true,
@@ -198,8 +194,7 @@ describe('<SignUpStart/>', () => {
   );
 
   it('renders the external account verification error if available', () => {
-    const errorMsg =
-      'You cannot sign up with sokratis.vidros@gmail.com since this is an invitation-only application';
+    const errorMsg = 'You cannot sign up with sokratis.vidros@gmail.com since this is an invitation-only application';
 
     (useCoreSignUp as jest.Mock).mockImplementation(() => {
       return {
@@ -252,9 +247,7 @@ describe('<SignUpStart/>', () => {
     render(<SignUpStart />);
     screen.getByRole('button', { name: /Google/ });
     screen.getByRole('button', { name: /Facebook/ });
-    expect(
-      screen.queryByRole('button', { name: 'Sign up' }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Sign up' })).not.toBeInTheDocument();
   });
 
   describe('when the user does not grant access to their Facebook account', () => {
@@ -282,11 +275,52 @@ describe('<SignUpStart/>', () => {
     });
   });
 
-  describe('with invitation parameter', () => {
+  describe('when a miscellaneous oauth error occurs', () => {
+    it('renders a generic error message', () => {
+      const genericErrorMsg = 'Unable to complete action at this time. If the problem persists please contact support.';
+
+      (useCoreSignUp as jest.Mock).mockImplementation(() => {
+        return {
+          create: mockCreateRequest,
+          verifications: {
+            externalAccount: {
+              error: {
+                code: 'omg_they_killed_kenny',
+                longMessage: 'All hope is lost',
+              },
+            },
+          },
+        };
+      });
+
+      render(<SignUpStart />);
+
+      expect(screen.getByText(genericErrorMsg)).toBeInTheDocument();
+      expect(mockCreateRequest).toHaveBeenNthCalledWith(1, {});
+    });
+  });
+
+  describe('with ticket parameter', () => {
     function runTokenTests(tokenType: string) {
       describe(`with ${tokenType}`, () => {
         beforeEach(() => {
           setWindowQueryParams([[tokenType, '123456']]);
+
+          mockUserSettings = new UserSettings({
+            attributes: {
+              email_address: {
+                enabled: true,
+                required: true,
+                used_for_first_factor: true,
+              },
+              phone_number: {
+                enabled: false,
+              },
+              password: {
+                required: false,
+              },
+            },
+          } as UserSettingsJSON);
         });
 
         it('it auto-completes sign up flow if sign up is complete after create', async () => {
@@ -303,6 +337,34 @@ describe('<SignUpStart/>', () => {
         });
 
         it('it does not auto-complete sign up flow if sign up if requirements are missing', async () => {
+          // Require extra fields, like username and password
+          mockUserSettings = new UserSettings({
+            attributes: {
+              email_address: {
+                enabled: true,
+                required: true,
+                used_for_first_factor: true,
+              },
+              phone_number: {
+                enabled: false,
+              },
+              username: {
+                enabled: true,
+                required: true,
+              },
+              first_name: {
+                enabled: true,
+              },
+              last_name: {
+                enabled: true,
+              },
+              password: {
+                enabled: true,
+                required: true,
+              },
+            },
+          } as UserSettingsJSON);
+
           mockCreateRequest.mockImplementation(() =>
             Promise.resolve({
               status: 'missing_requirements',
@@ -317,6 +379,7 @@ describe('<SignUpStart/>', () => {
           render(<SignUpStart />);
           await waitFor(() => {
             expect(mockSetSession).not.toHaveBeenCalled();
+            // Required and optional fields are rendered
             screen.getByText(/First name/);
             screen.getByText(/Last name/);
             screen.getByText(/Password/);
@@ -340,6 +403,51 @@ describe('<SignUpStart/>', () => {
           await waitFor(() => {
             const emailInput = screen.getByDisplayValue('jdoe@example.com');
             expect(emailInput).toBeDisabled();
+          });
+        });
+
+        it('allows the user to submit optional fields before signing up', async () => {
+          // First and last name are optional
+          mockUserSettings = new UserSettings({
+            attributes: {
+              email_address: {
+                enabled: true,
+                required: true,
+                used_for_first_factor: true,
+              },
+              first_name: {
+                enabled: true,
+              },
+              last_name: {
+                enabled: true,
+              },
+              phone_number: {
+                enabled: false,
+              },
+              password: {
+                required: false,
+              },
+            },
+          } as UserSettingsJSON);
+
+          mockCreateRequest.mockImplementation(() =>
+            Promise.resolve({
+              status: 'complete',
+              emailAddress: 'jdoe@example.com',
+            }),
+          );
+
+          render(<SignUpStart />);
+          await waitFor(() => {
+            expect(mockSetSession).not.toHaveBeenCalled();
+            screen.getByText(/First name/);
+            screen.getByText(/Last name/);
+          });
+
+          // Submit the form
+          userEvent.click(screen.getByRole('button', { name: 'Sign up' }));
+          await waitFor(() => {
+            expect(mockSetSession).toHaveBeenCalled();
           });
         });
 

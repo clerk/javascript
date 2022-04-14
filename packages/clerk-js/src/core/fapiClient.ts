@@ -1,31 +1,15 @@
 import type { Clerk, ClerkAPIErrorJSON, ClientJSON } from '@clerk/types';
+import { camelToSnake } from '@clerk/shared/utils';
 import qs from 'qs';
-import {
-  buildEmailAddress as buildEmailAddressUtil,
-  buildURL as buildUrlUtil,
-} from 'utils';
+import { buildEmailAddress as buildEmailAddressUtil, buildURL as buildUrlUtil } from 'utils';
 
 import { clerkNetworkError } from './errors';
 
-export type HTTPMethod =
-  | 'CONNECT'
-  | 'DELETE'
-  | 'GET'
-  | 'HEAD'
-  | 'OPTIONS'
-  | 'PATCH'
-  | 'POST'
-  | 'PUT'
-  | 'TRACE';
+export type HTTPMethod = 'CONNECT' | 'DELETE' | 'GET' | 'HEAD' | 'OPTIONS' | 'PATCH' | 'POST' | 'PUT' | 'TRACE';
 
 export type FapiRequestInit = RequestInit & {
   path?: string;
-  search?:
-    | string
-    | URLSearchParams
-    | string[][]
-    | Record<string, string>
-    | undefined;
+  search?: string | URLSearchParams | string[][] | Record<string, string> | undefined;
   sessionId?: string;
   url?: URL;
 };
@@ -40,10 +24,11 @@ export type FapiResponse<T> = Response & {
   payload: FapiResponseJSON<T> | null;
 };
 
-export type FapiRequestCallback<T> = (
-  request: FapiRequestInit,
-  response?: FapiResponse<T>,
-) => void;
+export type FapiRequestCallback<T> = (request: FapiRequestInit, response?: FapiResponse<T>) => void;
+
+const camelToSnakeEncoder: qs.IStringifyOptions['encoder'] = (str, defaultEncoder, _, type) => {
+  return type === 'key' ? camelToSnake(str) : defaultEncoder(str);
+};
 
 // TODO: Move to @clerk/types
 export interface FapiResponseJSON<T> {
@@ -86,21 +71,13 @@ export default function createFapiClient(clerkInstance: Clerk): FapiClient {
     }
   }
 
-  async function runAfterResponseCallbacks(
-    requestInit: FapiRequestInit,
-    response: FapiResponse<unknown>,
-  ) {
+  async function runAfterResponseCallbacks(requestInit: FapiRequestInit, response: FapiResponse<unknown>) {
     for await (const callback of onAfterResponseCallbacks) {
       await callback(requestInit, response);
     }
   }
 
-  function buildQueryString({
-    method,
-    path,
-    sessionId,
-    search,
-  }: FapiRequestInit) {
+  function buildQueryString({ method, path, sessionId, search }: FapiRequestInit) {
     const searchParams = new URLSearchParams(search);
     if (clerkInstance.version) {
       searchParams.append('_clerk_js_version', clerkInstance.version);
@@ -146,9 +123,7 @@ export default function createFapiClient(clerkInstance: Clerk): FapiClient {
     });
   }
 
-  async function request<T>(
-    requestInit: FapiRequestInit,
-  ): Promise<FapiResponse<T>> {
+  async function request<T>(requestInit: FapiRequestInit): Promise<FapiResponse<T>> {
     // eslint-disable-next-line prefer-const
     let { method = 'GET', body } = requestInit;
 
@@ -165,12 +140,9 @@ export default function createFapiClient(clerkInstance: Clerk): FapiClient {
     // In case FormData is provided, we don't want to mess with the headers,
     // because for file uploads the header is properly set by the browser.
     if (method !== 'GET' && !(body instanceof FormData)) {
-      requestInit.body = qs.stringify(body);
+      requestInit.body = qs.stringify(body, { encoder: camelToSnakeEncoder });
       // @ts-ignore
-      requestInit.headers.set(
-        'Content-Type',
-        'application/x-www-form-urlencoded',
-      );
+      requestInit.headers.set('Content-Type', 'application/x-www-form-urlencoded');
     }
 
     await runBeforeRequestCallbacks(requestInit);

@@ -9,15 +9,7 @@ interface EmailPayload extends EmailProps {}
 export interface Email extends EmailPayload {}
 
 export class Email {
-  static attributes = [
-    'id',
-    'fromEmailName',
-    'toEmailAddress',
-    'emailAddressId',
-    'subject',
-    'body',
-    'status',
-  ];
+  static attributes = ['id', 'fromEmailName', 'toEmailAddress', 'emailAddressId', 'subject', 'body', 'status'];
 
   static defaults = {};
 

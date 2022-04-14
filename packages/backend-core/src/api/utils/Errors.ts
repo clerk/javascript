@@ -9,13 +9,6 @@ export class HttpError extends Error {
   }
 }
 
-export class JWTExpiredError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'JWTExpiredError';
-  }
-}
-
 export interface ClerkServerErrorProps {
   message: string;
   longMessage: string;

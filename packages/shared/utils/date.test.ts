@@ -1,9 +1,4 @@
-import {
-  addYears,
-  dateTo12HourTime,
-  differenceInCalendarDays,
-  formatRelative,
-} from './date';
+import { addYears, dateTo12HourTime, differenceInCalendarDays, formatRelative } from './date';
 
 describe('date utils', () => {
   describe('dateTo12HourTime(date)', () => {
@@ -22,9 +17,7 @@ describe('date utils', () => {
   });
 
   describe('differenceInCalendarDays(date1, date2)', () => {
-    const cases: Array<
-      [Date | undefined, Date, { absolute: boolean }, number]
-    > = [
+    const cases: Array<[Date | undefined, Date, { absolute: boolean }, number]> = [
       [undefined, new Date(), { absolute: true }, 0],
       [new Date('1/1/2020'), new Date('1/2/2020'), { absolute: true }, 1],
       [new Date('1/1/2020'), new Date('1/3/2020'), { absolute: true }, 2],
@@ -37,33 +30,18 @@ describe('date utils', () => {
       [new Date('1/5/2020'), new Date('1/1/2020'), { absolute: false }, -4],
     ];
 
-    it.each(cases)(
-      '.differenceInCalendarDays(%s,%s) => %s',
-      (a, b, c, expected) => {
-        expect(differenceInCalendarDays(a as Date, b, c)).toBe(expected);
-      },
-    );
+    it.each(cases)('.differenceInCalendarDays(%s,%s) => %s', (a, b, c, expected) => {
+      expect(differenceInCalendarDays(a as Date, b, c)).toBe(expected);
+    });
   });
 
   describe('formatRelative(date)', () => {
     const cases: Array<[Date | undefined, Date | undefined, string]> = [
       [undefined, undefined, ''],
       [new Date('1/1/2020 23:15'), new Date('1/1/2020'), 'today at 11:15 PM'],
-      [
-        new Date('1/5/2020 23:15'),
-        new Date('1/6/2020'),
-        'yesterday at 11:15 PM',
-      ],
-      [
-        new Date('1/3/2020 23:15'),
-        new Date('1/6/2020'),
-        'last Friday at 11:15 PM',
-      ],
-      [
-        new Date('1/7/2020 23:15'),
-        new Date('1/6/2020'),
-        'tomorrow at 11:15 PM',
-      ],
+      [new Date('1/5/2020 23:15'), new Date('1/6/2020'), 'yesterday at 11:15 PM'],
+      [new Date('1/3/2020 23:15'), new Date('1/6/2020'), 'last Friday at 11:15 PM'],
+      [new Date('1/7/2020 23:15'), new Date('1/6/2020'), 'tomorrow at 11:15 PM'],
       [new Date('1/10/2020 23:15'), new Date('1/6/2020'), 'Friday at 11:15 PM'],
       [new Date('12/10/2020 23:15'), new Date('1/6/2020'), '12/10/2020'],
       [new Date('12/10/2020 23:15'), new Date('1/6/2021'), '12/10/2020'],

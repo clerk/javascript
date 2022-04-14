@@ -33,19 +33,13 @@ export function CardTitle({
   return (
     <div className={cn(styles.titleContainer, className)}>
       {title && <h1 className={styles.title}>{title}</h1>}
-      {subtitle && (
-        <p className={cn(styles.subtitle, subtitleClassName)}>{subtitle}</p>
-      )}
+      {subtitle && <p className={cn(styles.subtitle, subtitleClassName)}>{subtitle}</p>}
       {notice && <p className={cn(styles.notice, noticeClassName)}>{notice}</p>}
     </div>
   );
 }
 
-export function TitledCard({
-  children,
-  className,
-  ...titleProps
-}: TitledCardProps): JSX.Element {
+export function TitledCard({ children, className, ...titleProps }: TitledCardProps): JSX.Element {
   return (
     <Card className={cn(styles.card, className)}>
       <CardTitle {...titleProps} />

@@ -10,7 +10,7 @@ describe('<Avatar/>', () => {
       <Avatar
         firstName='John'
         lastName='Doe'
-        profileImageUrl='http://test.host/avatar.png'
+        profileImageUrl='http://images.clerktest.host/avatar.png'
         optimize
       />,
     );
@@ -18,12 +18,22 @@ describe('<Avatar/>', () => {
   });
 
   it('renders the initials ', () => {
-    const tree = renderJSON(<Avatar firstName='John' lastName='Doe' />);
+    const tree = renderJSON(
+      <Avatar
+        firstName='John'
+        lastName='Doe'
+      />,
+    );
     expect(tree).toMatchSnapshot();
   });
 
   it('renders the initials inside an svg if user has no avatar', () => {
-    render(<Avatar firstName='John' lastName='Doe' />);
+    render(
+      <Avatar
+        firstName='John'
+        lastName='Doe'
+      />,
+    );
     const avatar = screen.getByLabelText('John Doe', { selector: 'svg' });
     expect(avatar).toBeDefined();
   });
@@ -33,7 +43,7 @@ describe('<Avatar/>', () => {
       <Avatar
         firstName='John'
         lastName='Doe'
-        profileImageUrl='http://test.host/avatar.png'
+        profileImageUrl='https://images.clerktest.host/avatar.png'
       />,
     );
     const avatar = screen.getByAltText('John Doe');
@@ -45,19 +55,22 @@ describe('<Avatar/>', () => {
       <Avatar
         firstName='John'
         lastName='Doe'
-        profileImageUrl='http://test.host/avatar.png'
+        profileImageUrl='https://images.clerktest.host/avatar.png'
       />,
     );
     const avatar = screen.getByAltText('John Doe');
     expect(avatar).toBeDefined();
     fireEvent.error(avatar);
-    expect(
-      screen.getByLabelText('John Doe', { selector: 'svg' }),
-    ).toBeDefined();
+    expect(screen.getByLabelText('John Doe', { selector: 'svg' })).toBeDefined();
   });
 
   it('renders the the Gravatar default image if avatar or initials are empty', () => {
-    const tree = renderJSON(<Avatar profileImageUrl='' optimize />);
+    const tree = renderJSON(
+      <Avatar
+        profileImageUrl=''
+        optimize
+      />,
+    );
     expect(tree).toMatchSnapshot();
   });
 });

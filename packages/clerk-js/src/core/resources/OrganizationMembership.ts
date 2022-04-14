@@ -8,10 +8,7 @@ import { unixEpochToDate } from 'utils/date';
 
 import { BaseResource, Organization } from './internal';
 
-export class OrganizationMembership
-  extends BaseResource
-  implements OrganizationMembershipResource
-{
+export class OrganizationMembership extends BaseResource implements OrganizationMembershipResource {
   id!: string;
   publicUserData!: PublicUserData;
   organization!: Organization;
@@ -24,20 +21,15 @@ export class OrganizationMembership
     this.fromJSON(data);
   }
 
-  static async retrieve(
-    retrieveMembershipsParams?: RetrieveMembershipsParams,
-  ): Promise<OrganizationMembership[]> {
+  static async retrieve(retrieveMembershipsParams?: RetrieveMembershipsParams): Promise<OrganizationMembership[]> {
     return await BaseResource._fetch({
       path: '/me/organization_memberships',
       method: 'GET',
       search: retrieveMembershipsParams as any,
     })
       .then(res => {
-        const organizationMembershipsJSON =
-          res?.response as unknown as OrganizationMembershipJSON[];
-        return organizationMembershipsJSON.map(
-          orgMem => new OrganizationMembership(orgMem),
-        );
+        const organizationMembershipsJSON = res?.response as unknown as OrganizationMembershipJSON[];
+        return organizationMembershipsJSON.map(orgMem => new OrganizationMembership(orgMem));
       })
       .catch(() => []);
   }
@@ -49,9 +41,7 @@ export class OrganizationMembership
     })) as unknown as OrganizationMembership;
   };
 
-  update = async ({
-    role,
-  }: UpdateOrganizationMembershipParams): Promise<OrganizationMembership> => {
+  update = async ({ role }: UpdateOrganizationMembershipParams): Promise<OrganizationMembership> => {
     return await this._basePatch({
       path: `/organizations/${this.organization.id}/memberships/${this.publicUserData.userId}`,
       body: { role },

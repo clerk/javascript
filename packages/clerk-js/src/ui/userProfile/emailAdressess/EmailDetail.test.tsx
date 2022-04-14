@@ -1,10 +1,10 @@
 import { render, renderJSON, screen, userEvent } from '@clerk/shared/testUtils';
-import { EmailAddressResource, EnvironmentResource, SignInStrategyName, UserSettingsResource } from '@clerk/types';
+import { EmailAddressResource, EnvironmentResource, UserSettingsResource } from '@clerk/types';
 import { ClerkAPIResponseError } from 'core/resources/Error';
 import React from 'react';
 import { PartialDeep } from 'type-fest';
-import { EmailDetail } from './EmailDetail';
 
+import { EmailDetail } from './EmailDetail';
 
 const mockNavigate = jest.fn();
 const mockUseCoreUser = jest.fn();
@@ -38,9 +38,12 @@ jest.mock('ui/router/RouteContext', () => {
 jest.mock('ui/contexts', () => {
   return {
     useCoreUser: () => mockUseCoreUser(),
-    useEnvironment: jest.fn(() => ({
-      userSettings: mockFirstFactors
-    }) as PartialDeep<EnvironmentResource>),
+    useEnvironment: jest.fn(
+      () =>
+        ({
+          userSettings: mockFirstFactors,
+        } as PartialDeep<EnvironmentResource>),
+    ),
     useUserProfileContext: jest.fn(() => {
       return {
         routing: 'path',
@@ -76,10 +79,10 @@ describe('<EmailDetail/>', () => {
       attributes: {
         email_address: {
           used_for_first_factor: true,
-          first_factors: ['email_code']
-        }
-      }
-    }
+          first_factors: ['email_code'],
+        },
+      },
+    };
     mockUseCoreUser.mockImplementation(() => {
       return {
         primaryEmailAddressId: '1',
@@ -93,7 +96,7 @@ describe('<EmailDetail/>', () => {
             prepareVerification: async () => {
               return null;
             },
-            attemptVerification: async (code: string) => {
+            attemptVerification: async ({ code }: { code: string }) => {
               if (code === '999999') {
                 throw new ClerkAPIResponseError('the-error', {
                   data: [
@@ -115,18 +118,13 @@ describe('<EmailDetail/>', () => {
     render(<EmailDetail />);
     // Type a verification code that will throw an error,
     // in this case '999999'.
-    userEvent.type(
-      screen.getByLabelText('Enter verification code. Digit 1'),
-      '9',
-    );
+    userEvent.type(screen.getByLabelText('Enter verification code. Digit 1'), '9');
     userEvent.type(screen.getByLabelText('Digit 2'), '9');
     userEvent.type(screen.getByLabelText('Digit 3'), '9');
     userEvent.type(screen.getByLabelText('Digit 4'), '9');
     userEvent.type(screen.getByLabelText('Digit 5'), '9');
     userEvent.type(screen.getByLabelText('Digit 6'), '9');
 
-    expect(
-      await screen.findByText('the-long-error-message'),
-    ).toBeInTheDocument();
+    expect(await screen.findByText('the-long-error-message')).toBeInTheDocument();
   });
 });

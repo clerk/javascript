@@ -96,8 +96,7 @@ Array [
         <div
           className="cl-copy-text"
         >
-          An email containing a
-           
+          An email containing a 
           magic link
            will be sent to your email address.
         </div>

@@ -1,17 +1,9 @@
 import { render, renderJSON } from '@clerk/shared/testUtils';
-import {
-  AttributeData,
-  SessionResource,
-  SignUpResource,
-  UserSettingsJSON,
-} from '@clerk/types';
+import { AttributeData, SessionResource, SignUpResource, UserSettingsJSON } from '@clerk/types';
 import { UserSettings } from 'core/resources/internal';
 import React from 'react';
 
-import {
-  SignUpVerifyEmailAddress,
-  SignUpVerifyPhoneNumber,
-} from './SignUpVerify';
+import { SignUpVerifyEmailAddress, SignUpVerifyPhoneNumber } from './SignUpVerify';
 
 const navigateMock = jest.fn();
 const mockSetSession = jest.fn();
@@ -149,16 +141,6 @@ describe('<SignUpVerify/>', () => {
       };
       const tree = renderJSON(<SignUpVerifyEmailAddress />);
       expect(tree).toMatchSnapshot();
-    });
-
-    it('can skip disabled verification strategies', () => {
-      mockEmailAddressAttribute = {
-        enabled: true,
-        verifications: ['email_link'],
-      };
-      mockDisabledStrategies = ['email_link'];
-      const { container } = render(<SignUpVerifyEmailAddress />);
-      expect(container.querySelector('.cl-otp-input')).not.toBeNull();
     });
   });
 

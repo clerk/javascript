@@ -5,7 +5,6 @@ import { PartialDeep } from 'type-fest';
 import { useEnvironment } from 'ui/contexts';
 import { ChangePassword } from 'ui/userProfile/security/ChangePassword';
 
-
 jest.mock('ui/hooks', () => ({
   useNavigate: () => ({ navigate: jest.fn() }),
 }));
@@ -15,7 +14,7 @@ jest.mock('ui/router/RouteContext');
 jest.mock('ui/contexts', () => {
   return {
     useCoreUser: (): Partial<UserResource> => ({
-      passwordEnabled: true
+      passwordEnabled: true,
     }),
     useEnvironment: jest.fn(),
   };
@@ -27,16 +26,14 @@ describe('<ChangePassword/>', () => {
   });
 
   it('renders the ChangePassword page with showing remove password cta', async () => {
-    (
-      useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>
-    ).mockImplementation(() => ({
+    (useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>).mockImplementation(() => ({
       userSettings: {
         attributes: {
           password: {
-            enabled: true
-          }
-        }
-      }
+            enabled: true,
+          },
+        },
+      },
     }));
 
     render(<ChangePassword />);
@@ -44,16 +41,14 @@ describe('<ChangePassword/>', () => {
   });
 
   it('renders the ChangePassword page without showing remove password cta', async () => {
-    (
-      useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>
-    ).mockImplementation(() => ({
+    (useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>).mockImplementation(() => ({
       userSettings: {
         attributes: {
           password: {
-            enabled: false
-          }
-        }
-      }
+            enabled: false,
+          },
+        },
+      },
     }));
 
     render(<ChangePassword />);

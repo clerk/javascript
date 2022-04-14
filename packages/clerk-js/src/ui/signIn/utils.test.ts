@@ -12,13 +12,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
           },
         ],
       } as unknown as SignInResource;
-      expect(
-        determineStartingSignInFactor(
-          signIn.supportedFirstFactors,
-          signIn.identifier,
-          'password',
-        ),
-      ).toEqual({
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'password')).toEqual({
         strategy: 'password',
       });
     });
@@ -29,23 +23,17 @@ describe('determineStrategy(signIn, displayConfig)', () => {
         supportedFirstFactors: [
           {
             strategy: 'email_code',
-            safe_identifier: 'ccoe@example.com',
+            safeIdentifier: 'ccoe@example.com',
           },
           {
             strategy: 'phone_code',
-            safe_identifier: 'jdoe@example.com',
+            safeIdentifier: 'jdoe@example.com',
           },
         ],
       } as unknown as SignInResource;
-      expect(
-        determineStartingSignInFactor(
-          signIn.supportedFirstFactors,
-          signIn.identifier,
-          'password',
-        ),
-      ).toEqual({
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'password')).toEqual({
         strategy: 'phone_code',
-        safe_identifier: 'jdoe@example.com',
+        safeIdentifier: 'jdoe@example.com',
       });
     });
 
@@ -55,23 +43,17 @@ describe('determineStrategy(signIn, displayConfig)', () => {
         supportedFirstFactors: [
           {
             strategy: 'phone_code',
-            safe_identifier: 'jdoe@example.com',
+            safeIdentifier: 'jdoe@example.com',
           },
           {
             strategy: 'email_code',
-            safe_identifier: 'ccoe@example.com',
+            safeIdentifier: 'ccoe@example.com',
           },
         ],
       } as unknown as SignInResource;
-      expect(
-        determineStartingSignInFactor(
-          signIn.supportedFirstFactors,
-          signIn.identifier,
-          'password',
-        ),
-      ).toEqual({
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'password')).toEqual({
         strategy: 'email_code',
-        safe_identifier: 'ccoe@example.com',
+        safeIdentifier: 'ccoe@example.com',
       });
     });
 
@@ -81,19 +63,13 @@ describe('determineStrategy(signIn, displayConfig)', () => {
         supportedFirstFactors: [
           {
             strategy: 'phone_code',
-            safe_identifier: 'jdoe@example.com',
+            safeIdentifier: 'jdoe@example.com',
           },
         ],
       } as unknown as SignInResource;
-      expect(
-        determineStartingSignInFactor(
-          signIn.supportedFirstFactors,
-          signIn.identifier,
-          'password',
-        ),
-      ).toEqual({
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'password')).toEqual({
         strategy: 'phone_code',
-        safe_identifier: 'jdoe@example.com',
+        safeIdentifier: 'jdoe@example.com',
       });
     });
 
@@ -102,13 +78,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
         identifier: undefined,
         supportedFirstFactors: [],
       } as unknown as SignInResource;
-      expect(
-        determineStartingSignInFactor(
-          signIn.supportedFirstFactors,
-          signIn.identifier,
-          'password',
-        ),
-      ).toBeNull();
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'password')).toBeNull();
     });
   });
 
@@ -122,23 +92,17 @@ describe('determineStrategy(signIn, displayConfig)', () => {
           },
           {
             strategy: 'email_code',
-            safe_identifier: 'ccoe@example.com',
+            safeIdentifier: 'ccoe@example.com',
           },
           {
             strategy: 'phone_code',
-            safe_identifier: 'jdoe@example.com',
+            safeIdentifier: 'jdoe@example.com',
           },
         ],
       } as unknown as SignInResource;
-      expect(
-        determineStartingSignInFactor(
-          signIn.supportedFirstFactors,
-          signIn.identifier,
-          'otp',
-        ),
-      ).toEqual({
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'otp')).toEqual({
         strategy: 'phone_code',
-        safe_identifier: 'jdoe@example.com',
+        safeIdentifier: 'jdoe@example.com',
       });
     });
 
@@ -151,23 +115,17 @@ describe('determineStrategy(signIn, displayConfig)', () => {
           },
           {
             strategy: 'phone_code',
-            safe_identifier: 'jdoe@example.com',
+            safeIdentifier: 'jdoe@example.com',
           },
           {
             strategy: 'email_code',
-            safe_identifier: 'ccoe@example.com',
+            safeIdentifier: 'ccoe@example.com',
           },
         ],
       } as unknown as SignInResource;
-      expect(
-        determineStartingSignInFactor(
-          signIn.supportedFirstFactors,
-          signIn.identifier,
-          'otp',
-        ),
-      ).toEqual({
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'otp')).toEqual({
         strategy: 'email_code',
-        safe_identifier: 'ccoe@example.com',
+        safeIdentifier: 'ccoe@example.com',
       });
     });
 
@@ -180,19 +138,13 @@ describe('determineStrategy(signIn, displayConfig)', () => {
           },
           {
             strategy: 'phone_code',
-            safe_identifier: 'jdoe@example.com',
+            safeIdentifier: 'jdoe@example.com',
           },
         ],
       } as unknown as SignInResource;
-      expect(
-        determineStartingSignInFactor(
-          signIn.supportedFirstFactors,
-          signIn.identifier,
-          'otp',
-        ),
-      ).toEqual({
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'otp')).toEqual({
         strategy: 'phone_code',
-        safe_identifier: 'jdoe@example.com',
+        safeIdentifier: 'jdoe@example.com',
       });
     });
 
@@ -204,13 +156,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
           },
         ],
       } as unknown as SignInResource;
-      expect(
-        determineStartingSignInFactor(
-          signIn.supportedFirstFactors,
-          signIn.identifier,
-          'otp',
-        ),
-      ).toEqual({
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'otp')).toEqual({
         strategy: 'password',
       });
     });
@@ -220,23 +166,17 @@ describe('determineStrategy(signIn, displayConfig)', () => {
         identifier: undefined,
         supportedFirstFactors: [],
       } as unknown as SignInResource;
-      expect(
-        determineStartingSignInFactor(
-          signIn.supportedFirstFactors,
-          signIn.identifier,
-          'otp',
-        ),
-      ).toBeNull();
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'otp')).toBeNull();
     });
   });
 
-  fdescribe('determineSaluation(signIn)', () => {
+  describe('determineSalutation(signIn)', () => {
     it('returns firstname, then lastname or the identifier', () => {
       let signIn = {
         identifier: 'jdoe@example.com',
         userData: {
-          first_name: 'Joe',
-          last_name: 'Doe',
+          firstName: 'Joe',
+          lastName: 'Doe',
         },
       } as unknown as SignInResource;
       expect(determineSalutation(signIn)).toBe('Joe');
@@ -244,7 +184,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
       signIn = {
         identifier: 'jdoe@example.com',
         userData: {
-          last_name: 'Doe',
+          lastName: 'Doe',
         },
       } as unknown as SignInResource;
       expect(determineSalutation(signIn)).toBe('Doe');

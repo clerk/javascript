@@ -6,6 +6,7 @@ import {
   Organization,
   Session,
   SMSMessage,
+  Token,
   User,
 } from '../resources';
 import { ObjectType } from '../resources/JSON';
@@ -20,8 +21,11 @@ export default function deserialize(data: any): any {
   }
 }
 
-// FIXME don't return any
-// item must have 'object' key
+function getCount(item: { total_count: number }) {
+  return item.total_count;
+}
+
+// TODO: Revise response deserialization
 function jsonToObject(item: any): any {
   switch (item.object) {
     case ObjectType.AllowlistIdentifier:
@@ -40,6 +44,10 @@ function jsonToObject(item: any): any {
       return Session.fromJSON(item);
     case ObjectType.SmsMessage:
       return SMSMessage.fromJSON(item);
+    case ObjectType.Token:
+      return Token.fromJSON(item);
+    case ObjectType.TotalCount:
+      return getCount(item);
     default:
       Logger.error(`Unexpected object type: ${item.object}`);
   }

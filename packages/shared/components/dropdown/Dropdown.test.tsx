@@ -1,11 +1,4 @@
-import {
-  act,
-  fireEvent,
-  render,
-  renderJSON,
-  screen,
-  userEvent,
-} from '@clerk/shared/testUtils';
+import { act, fireEvent, render, renderJSON, screen, userEvent } from '@clerk/shared/testUtils';
 import * as React from 'react';
 
 import { Dropdown } from './Dropdown';
@@ -222,13 +215,22 @@ describe('Searchable <Dropdown />', () => {
   ];
 
   it('renders searchable Dropdown', () => {
-    const tree = renderJSON(<Dropdown options={options} searchable={true} />);
+    const tree = renderJSON(
+      <Dropdown
+        options={options}
+        searchable={true}
+      />,
+    );
     expect(tree).toMatchSnapshot();
   });
 
   it('renders tertiary Dropdown', () => {
     const tree = renderJSON(
-      <Dropdown tertiary options={options} searchable={true} />,
+      <Dropdown
+        tertiary
+        options={options}
+        searchable={true}
+      />,
     );
     expect(tree).toMatchSnapshot();
   });
@@ -240,14 +242,20 @@ describe('Searchable <Dropdown />', () => {
         : {
             ...o,
             nativeOption: (
-              <option value={o.value} key={o.value}>
+              <option
+                value={o.value}
+                key={o.value}
+              >
                 {o.value}
               </option>
             ),
           },
     );
     const tree = renderJSON(
-      <Dropdown options={withNativeOptions} searchable={true} />,
+      <Dropdown
+        options={withNativeOptions}
+        searchable={true}
+      />,
     );
     expect(tree).toMatchSnapshot();
   });
@@ -294,9 +302,7 @@ describe('Searchable <Dropdown />', () => {
     const onChange = jest.fn();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const customComparator = jest.fn(function (term, currentOption) {
-      return (
-        typeof currentOption !== 'string' && currentOption.value === 'clerk'
-      );
+      return typeof currentOption !== 'string' && currentOption.value === 'clerk';
     } as DropdownComparator);
 
     render(

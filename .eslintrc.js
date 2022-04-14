@@ -7,7 +7,7 @@ module.exports = {
   },
   parserOptions: {
     tsconfigRootDir: __dirname,
-    project: ['./tsconfig.json', './packages/*/tsconfig.json'],
+    project: ['./tsconfig.eslint.json'],
   },
   plugins: ['@typescript-eslint', 'simple-import-sort'],
   extends: [
@@ -24,6 +24,7 @@ module.exports = {
     '@typescript-eslint/no-unsafe-member-access': 'off',
     '@typescript-eslint/no-unsafe-return': 'off',
     '@typescript-eslint/restrict-template-expressions': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off',
     'simple-import-sort/imports': 'error',
   },
 };

@@ -15,9 +15,7 @@ describe('SignOutAll', () => {
   it('signs out from all accounts', () => {
     const handleSignOutAll = jest.fn();
 
-    const signOutAll = render(
-      <SignOutAll handleSignOutAll={handleSignOutAll} />,
-    );
+    const signOutAll = render(<SignOutAll handleSignOutAll={handleSignOutAll} />);
 
     const signOutAllButton = signOutAll.getByText('Sign out of all accounts');
     fireEvent.click(signOutAllButton);

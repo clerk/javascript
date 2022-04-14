@@ -1,11 +1,7 @@
 import React from 'react';
 import { Header, withRedirectToHome } from 'ui/common';
 import { ActiveAccountsManager } from 'ui/common/activeAccountsManager/ActiveAccountsManager';
-import {
-  useCoreSessionList,
-  useEnvironment,
-  useSignInContext,
-} from 'ui/contexts';
+import { useCoreSessionList, useEnvironment, useSignInContext } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
 
 function _SignInAccountSwitcher(): JSX.Element | null {
@@ -23,7 +19,7 @@ function _SignInAccountSwitcher(): JSX.Element | null {
         <ActiveAccountsManager
           sessions={sessions}
           showActiveAccountButtons={false}
-          navigateAfterSignOutAll={() => {
+          navigateAfterSignOut={() => {
             navigate(displayConfig.afterSignOutAllUrl);
           }}
           navigateAfterSwitchSession={navigateAfterSignIn}

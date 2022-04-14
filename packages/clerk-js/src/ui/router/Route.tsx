@@ -21,9 +21,7 @@ type GuardedRouteProps = {
   index?: boolean;
 } & RouteGuardProps;
 
-export type RouteProps = React.PropsWithChildren<
-  UnguardedRouteProps | GuardedRouteProps
->;
+export type RouteProps = React.PropsWithChildren<UnguardedRouteProps | GuardedRouteProps>;
 
 const RouteGuard = ({
   canActivate,
@@ -57,12 +55,7 @@ export function Route(props: RouteProps): JSX.Element | null {
     return null;
   }
 
-  const [indexPath, fullPath] = newPaths(
-    router.indexPath,
-    router.fullPath,
-    props.path,
-    props.index,
-  );
+  const [indexPath, fullPath] = newPaths(router.indexPath, router.fullPath, props.path, props.index);
 
   const resolve = (to: string) => {
     const url = new URL(to, window.location.origin + fullPath + '/');
@@ -71,12 +64,7 @@ export function Route(props: RouteProps): JSX.Element | null {
   };
 
   const newGetMatchData = (path?: string, index?: boolean) => {
-    const [newIndexPath, newFullPath] = newPaths(
-      indexPath,
-      fullPath,
-      path,
-      index,
-    );
+    const [newIndexPath, newFullPath] = newPaths(indexPath, fullPath, path, index);
     const currentPath = trimTrailingSlash(router.currentPath);
     const matchResult =
       (path && match(newFullPath + '/:foo*')(currentPath)) ||

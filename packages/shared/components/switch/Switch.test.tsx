@@ -8,7 +8,10 @@ describe('<Switch/>', () => {
     const handleChangeSpy = jest.fn();
 
     const { rerender } = render(
-      <Switch checked={false} handleChange={handleChangeSpy} />,
+      <Switch
+        checked={false}
+        handleChange={handleChangeSpy}
+      />,
     );
     const radio = screen.getByRole('radio', { checked: false });
 
@@ -19,7 +22,12 @@ describe('<Switch/>', () => {
       expect(handleChangeSpy).toHaveBeenCalledTimes(1);
     });
 
-    rerender(<Switch checked handleChange={handleChangeSpy} />);
+    rerender(
+      <Switch
+        checked
+        handleChange={handleChangeSpy}
+      />,
+    );
     expect(radio).toHaveProperty('checked', true);
 
     // Clicking from on -> off

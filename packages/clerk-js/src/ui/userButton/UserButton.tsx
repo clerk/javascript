@@ -1,10 +1,10 @@
 import { Avatar } from '@clerk/shared/components/avatar';
+import { Portal } from '@clerk/shared/components/portal';
 import { useDetectClickOutside } from '@clerk/shared/hooks';
 import type { UserButtonProps } from '@clerk/types';
 import cn from 'classnames';
 import React from 'react';
 import { usePopper } from 'react-popper';
-import { Portal } from 'ui/common';
 import { useCoreUser, withCoreUserGuard } from 'ui/contexts';
 
 import { PopupVisibilityContext } from './contexts/PopupVisibilityContext';
@@ -67,14 +67,10 @@ export const UserButton = withCoreUserGuard(({ showName }: UserButtonProps) => {
           size={32}
           optimize
         />
-        {showName && (
-          <div className='cl-user-button-fullname'>{identifier}</div>
-        )}
+        {showName && <div className='cl-user-button-fullname'>{identifier}</div>}
       </button>
       <Portal hostEl={document.getElementById('clerk-components')}>
-        <PopupVisibilityContext.Provider
-          value={{ isPopupVisible: isActive, setPopupVisible: setIsActive }}
-        >
+        <PopupVisibilityContext.Provider value={{ isPopupVisible: isActive, setPopupVisible: setIsActive }}>
           <div
             ref={containerRef}
             className='cl-component cl-user-button-popup'

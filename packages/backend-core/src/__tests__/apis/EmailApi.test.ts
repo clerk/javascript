@@ -8,8 +8,7 @@ test('createEmail() sends an email', async () => {
   const fromEmailName = 'accounting';
   const emailAddressId = 'idn_whatever';
   const subject = 'Your account is in good standing!';
-  const body =
-    'Click <a href="https://www.knowyourmeme.com/">here</a> to see your most recent transactions.';
+  const body = 'Click <a href="https://www.knowyourmeme.com/">here</a> to see your most recent transactions.';
 
   nock('https://api.clerk.dev')
     .post(
@@ -19,7 +18,7 @@ test('createEmail() sends an email', async () => {
         emailAddressId,
         subject,
         body,
-      })
+      }),
     )
     .replyWithFile(200, __dirname + '/responses/createEmail.json', {
       'Content-Type': 'application/x-www-form-urlencoded',

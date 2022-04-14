@@ -1,10 +1,10 @@
+import { Portal } from '@clerk/shared/components/portal';
 import { Spinner } from '@clerk/shared/components/spinner';
 import React from 'react';
 import {
   ExpiredMagicLinkWaitingScreen,
   FailedMagicLinkWaitingScreen,
   LoadingScreen,
-  Portal,
   PoweredByClerk,
   VerifiedMagicLinkWaitingScreen,
   VerifiedSwitchTabMagicLinkWaitingScreen,
@@ -58,13 +58,12 @@ export function MagicLinkVerificationStatusModal({
     </div>
   );
 
-  const switchTabModal = showModal &&
-    verificationStatus === 'verified_switch_tab' && (
-      <div className='cl-verify-page-modal'>
-        <VerifiedSwitchTabMagicLinkWaitingScreen header={successHeader} />
-        <PoweredByClerk className='cl-verify-page-powered-by-clerk' />
-      </div>
-    );
+  const switchTabModal = showModal && verificationStatus === 'verified_switch_tab' && (
+    <div className='cl-verify-page-modal'>
+      <VerifiedSwitchTabMagicLinkWaitingScreen header={successHeader} />
+      <PoweredByClerk className='cl-verify-page-powered-by-clerk' />
+    </div>
+  );
 
   return (
     <div>

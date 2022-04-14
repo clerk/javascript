@@ -1,6 +1,6 @@
 import { render, screen } from '@clerk/shared/testUtils';
 import { EnvironmentResource } from '@clerk/types';
-import { AuthConfig } from 'core/resources/AuthConfig';
+import { AuthConfig, DisplayConfig } from 'core/resources';
 import React from 'react';
 import { useCoreSession, useEnvironment } from 'ui/contexts';
 
@@ -35,7 +35,7 @@ describe('withRedirectToHome(Component)', () => {
             ({
               displayConfig: {
                 homeUrl: 'http://my-home.com',
-              },
+              } as Partial<DisplayConfig>,
               authConfig: {
                 singleSessionMode: true,
               } as Partial<AuthConfig>,
@@ -62,7 +62,7 @@ describe('withRedirectToHome(Component)', () => {
             ({
               displayConfig: {
                 homeUrl: 'http://my-home.com',
-              },
+              } as Partial<DisplayConfig>,
               authConfig: {
                 singleSessionMode: false,
               } as Partial<AuthConfig>,
@@ -88,7 +88,7 @@ describe('withRedirectToHome(Component)', () => {
           ({
             displayConfig: {
               homeUrl: 'http://my-home.com',
-            },
+            } as Partial<DisplayConfig>,
             authConfig: {
               singleSessionMode: true,
             } as Partial<AuthConfig>,

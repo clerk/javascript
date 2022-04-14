@@ -1,8 +1,4 @@
-import type {
-  VerificationResource,
-  Web3WalletJSON,
-  Web3WalletResource,
-} from '@clerk/types';
+import type { VerificationResource, Web3WalletJSON, Web3WalletResource } from '@clerk/types';
 
 import { BaseResource, Verification } from './internal';
 

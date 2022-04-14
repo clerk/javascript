@@ -4,11 +4,7 @@ import { fitTextInOneLine } from 'ui/signIn/utils';
 
 const LOGO_HEIGHT_BASE = 48;
 
-const calculateLogoRatio = (
-  width: number,
-  height: number,
-  container: HTMLElement,
-) => {
+const calculateLogoRatio = (width: number, height: number, container: HTMLElement) => {
   const ratio = width / height;
   let newHeight = `${LOGO_HEIGHT_BASE}px`;
   if (ratio <= 1) {
@@ -42,9 +38,7 @@ export function Logo(): JSX.Element {
       return;
     }
 
-    const ro = new ResizeObserver(() =>
-      fitTextInOneLine(name, logoContainer, '48px'),
-    );
+    const ro = new ResizeObserver(() => fitTextInOneLine(name, logoContainer, '48px'));
     ro.observe(logoContainer);
     return () => ro.disconnect();
   }, [hasLogoImage, name]);

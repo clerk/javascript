@@ -11,7 +11,10 @@ export const Error: React.FC<ErrorProps> = ({ children, style }) => {
     return null;
   }
   return (
-    <div className='cl-error' style={style}>
+    <div
+      className='cl-error'
+      style={style}
+    >
       {children}
     </div>
   );

@@ -5,13 +5,15 @@ import type {
   CreateOrganizationParams,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
+  InitialState,
   OrganizationMembershipResource,
   OrganizationResource,
   RedirectOptions,
   Resources,
-  SessionResource,
   SignInProps,
+  SignOut,
   SignOutCallback,
+  SignOutOptions,
   SignUpProps,
   UserButtonProps,
   UserProfileProps,
@@ -19,13 +21,8 @@ import type {
 } from '@clerk/types';
 
 import { noFrontendApiError } from './errors';
-import type {
-  BrowserClerk,
-  BrowserClerkConstructor,
-  ClerkProp,
-  IsomorphicClerkOptions,
-} from './types';
-import { inBrowser, isConstructor, loadScript } from './utils';
+import type { BrowserClerk, BrowserClerkConstructor, ClerkProp, IsomorphicClerkOptions } from './types';
+import { inClientSide, isConstructor, loadScript } from './utils';
 
 export interface Global {
   Clerk?: BrowserClerk;
@@ -38,6 +35,13 @@ type MethodName<T> = {
 }[keyof T];
 type MethodCallback = () => void;
 
+type NewIsomorphicClerkParams = {
+  frontendApi: string;
+  options: IsomorphicClerkOptions;
+  Clerk: ClerkProp | null;
+  initialState?: InitialState;
+};
+
 export default class IsomorphicClerk {
   private mode: string;
   private frontendApi: string;
@@ -48,48 +52,49 @@ export default class IsomorphicClerk {
   private preopenSignUp?: null | SignUpProps = null;
   private premountSignInNodes = new Map<HTMLDivElement, SignInProps>();
   private premountSignUpNodes = new Map<HTMLDivElement, SignUpProps>();
-  private premountUserProfileNodes = new Map<
-    HTMLDivElement,
-    UserProfileProps
-  >();
+  private premountUserProfileNodes = new Map<HTMLDivElement, UserProfileProps>();
   private premountUserButtonNodes = new Map<HTMLDivElement, UserButtonProps>();
-  private premountMethodCalls = new Map<
-    MethodName<BrowserClerk>,
-    MethodCallback
-  >();
+  private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
+  private loadedListeners: Array<() => void> = [];
 
-  private _loaded = false;
+  #loaded = false;
 
-  ssrData: string | null = null;
-  ssrClient?: ClientResource;
-  ssrSession?: SessionResource | null;
+  initialState: InitialState | undefined;
 
-  constructor(
-    frontendApi: string,
-    options: IsomorphicClerkOptions = {},
-    Clerk: ClerkProp = null,
-  ) {
+  get loaded(): boolean {
+    return this.#loaded;
+  }
+
+  static #instance: IsomorphicClerk;
+
+  static getOrCreateInstance(params: NewIsomorphicClerkParams) {
+    if (!this.#instance) {
+      this.#instance = new IsomorphicClerk(params);
+    }
+    return this.#instance;
+  }
+
+  constructor(params: NewIsomorphicClerkParams) {
+    if (IsomorphicClerk.#instance) {
+      throw new Error('An IsomorphicClerk instance already exists. Use IsomorphicClerk.getOrCreateInstance instead');
+    }
+
+    const { Clerk = null, frontendApi, initialState, options = {} } = params || {};
     this.frontendApi = frontendApi;
     this.options = options;
     this.Clerk = Clerk;
-
-    this.mode = inBrowser() ? 'browser' : 'server';
-
-    // TODO: Support SRR for NextJS
-    // const ssrDataNode = document.querySelector(`script[data-clerk="SSR"]`);
-    // if (ssrDataNode) {
-    //   this.ssrData = ssrDataNode.innerHTML;
-    //   const parsedData = JSON.parse(this.ssrData);
-    //   this.ssrClient = parsedData.client;
-    //   this.ssrSession = parsedData.session;
-    // }
+    this.initialState = initialState;
+    this.mode = inClientSide() ? 'browser' : 'server';
   }
 
   async loadClerkJS(): Promise<BrowserClerk | undefined> {
+    if (this.#loaded) {
+      return;
+    }
+
     if (!this.frontendApi) {
       this.throwError(noFrontendApiError);
     }
-
     try {
       if (this.Clerk) {
         // Set a fixed Clerk version
@@ -111,12 +116,14 @@ export default class IsomorphicClerk {
         global.Clerk = c;
       } else {
         // Hot-load latest ClerkJS from Clerk CDN
-        await loadScript(this.frontendApi, this.options.scriptUrl);
+        await loadScript({
+          frontendApi: this.frontendApi,
+          scriptUrl: this.options.clerkJSUrl,
+          scriptVariant: this.options.clerkJSVariant,
+        });
 
         if (!global.Clerk) {
-          throw new Error(
-            'Failed to download latest ClerkJS. Contact support@clerk.dev.',
-          );
+          throw new Error('Failed to download latest ClerkJS. Contact support@clerk.dev.');
         }
 
         await global.Clerk.load(this.options);
@@ -137,6 +144,15 @@ export default class IsomorphicClerk {
       return;
     }
   }
+
+  public addOnLoaded = (cb: () => void) => {
+    this.loadedListeners.push(cb);
+  };
+
+  public emitLoaded = () => {
+    this.loadedListeners.forEach(cb => cb());
+    this.loadedListeners = [];
+  };
 
   // Custom wrapper to throw an error, since we need to apply different handling between
   // production and development builds. In Next.js we can throw a full screen error in
@@ -166,32 +182,24 @@ export default class IsomorphicClerk {
       clerkjs.openSignUp(this.preopenSignUp);
     }
 
-    this.premountSignInNodes.forEach(
-      (props: SignInProps, node: HTMLDivElement) => {
-        clerkjs.mountSignIn(node, props);
-      },
-    );
+    this.premountSignInNodes.forEach((props: SignInProps, node: HTMLDivElement) => {
+      clerkjs.mountSignIn(node, props);
+    });
 
-    this.premountSignUpNodes.forEach(
-      (props: SignUpProps, node: HTMLDivElement) => {
-        clerkjs.mountSignUp(node, props);
-      },
-    );
+    this.premountSignUpNodes.forEach((props: SignUpProps, node: HTMLDivElement) => {
+      clerkjs.mountSignUp(node, props);
+    });
 
-    this.premountUserProfileNodes.forEach(
-      (props: UserProfileProps, node: HTMLDivElement) => {
-        clerkjs.mountUserProfile(node, props);
-      },
-    );
+    this.premountUserProfileNodes.forEach((props: UserProfileProps, node: HTMLDivElement) => {
+      clerkjs.mountUserProfile(node, props);
+    });
 
-    this.premountUserButtonNodes.forEach(
-      (props: UserButtonProps, node: HTMLDivElement) => {
-        clerkjs.mountUserButton(node, props);
-      },
-    );
+    this.premountUserButtonNodes.forEach((props: UserButtonProps, node: HTMLDivElement) => {
+      clerkjs.mountUserButton(node, props);
+    });
 
-    this._loaded = true;
-
+    this.#loaded = true;
+    this.emitLoaded();
     return this.clerkjs;
   };
 
@@ -220,7 +228,6 @@ export default class IsomorphicClerk {
   get user(): UserResource | undefined | null {
     if (this.clerkjs) {
       return this.clerkjs.user;
-      // TODO: add ssr condition
     } else {
       return undefined;
     }
@@ -248,7 +255,7 @@ export default class IsomorphicClerk {
   };
 
   openSignIn = (props?: SignInProps): void => {
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       this.clerkjs.openSignIn(props);
     } else {
       this.preopenSignIn = props;
@@ -256,7 +263,7 @@ export default class IsomorphicClerk {
   };
 
   closeSignIn = (): void => {
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       this.clerkjs.closeSignIn();
     } else {
       this.preopenSignIn = null;
@@ -264,7 +271,7 @@ export default class IsomorphicClerk {
   };
 
   openSignUp = (props?: SignUpProps): void => {
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       this.clerkjs.openSignUp(props);
     } else {
       this.preopenSignUp = props;
@@ -272,7 +279,7 @@ export default class IsomorphicClerk {
   };
 
   closeSignUp = (): void => {
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       this.clerkjs.closeSignUp();
     } else {
       this.preopenSignUp = null;
@@ -280,7 +287,7 @@ export default class IsomorphicClerk {
   };
 
   mountSignIn = (node: HTMLDivElement, props: SignInProps): void => {
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       this.clerkjs.mountSignIn(node, props);
     } else {
       this.premountSignInNodes.set(node, props);
@@ -288,7 +295,7 @@ export default class IsomorphicClerk {
   };
 
   unmountSignIn = (node: HTMLDivElement): void => {
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       this.clerkjs.unmountSignIn(node);
     } else {
       this.premountSignInNodes.delete(node);
@@ -296,7 +303,7 @@ export default class IsomorphicClerk {
   };
 
   mountSignUp = (node: HTMLDivElement, props: SignUpProps): void => {
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       this.clerkjs.mountSignUp(node, props);
     } else {
       this.premountSignUpNodes.set(node, props);
@@ -304,7 +311,7 @@ export default class IsomorphicClerk {
   };
 
   unmountSignUp = (node: HTMLDivElement): void => {
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       this.clerkjs.unmountSignUp(node);
     } else {
       this.premountSignUpNodes.delete(node);
@@ -312,7 +319,7 @@ export default class IsomorphicClerk {
   };
 
   mountUserProfile = (node: HTMLDivElement, props: UserProfileProps): void => {
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       this.clerkjs.mountUserProfile(node, props);
     } else {
       this.premountUserProfileNodes.set(node, props);
@@ -320,18 +327,15 @@ export default class IsomorphicClerk {
   };
 
   unmountUserProfile = (node: HTMLDivElement): void => {
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       this.clerkjs.unmountUserProfile(node);
     } else {
       this.premountUserProfileNodes.delete(node);
     }
   };
 
-  mountUserButton = (
-    node: HTMLDivElement,
-    userButtonProps: UserButtonProps,
-  ): void => {
-    if (this.clerkjs && this._loaded) {
+  mountUserButton = (node: HTMLDivElement, userButtonProps: UserButtonProps): void => {
+    if (this.clerkjs && this.#loaded) {
       this.clerkjs.mountUserButton(node, userButtonProps);
     } else {
       this.premountUserButtonNodes.set(node, userButtonProps);
@@ -339,7 +343,7 @@ export default class IsomorphicClerk {
   };
 
   unmountUserButton = (node: HTMLDivElement): void => {
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       this.clerkjs.unmountUserButton(node);
     } else {
       this.premountUserButtonNodes.delete(node);
@@ -355,45 +359,27 @@ export default class IsomorphicClerk {
     }
   };
 
-  loadFromServer = (token: string): void => {
-    if (this.mode === 'browser') {
-      void this.throwError(
-        'loadFromServer cannot be called in a browser context.',
-      );
-    }
-
-    this.ssrData = JSON.stringify({
-      client: this.client,
-      session: this.session,
-      token: token,
-    });
-  };
-
   navigate = (to: string): void => {
     const callback = () => this.clerkjs?.navigate(to);
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       void callback();
     } else {
       this.premountMethodCalls.set('navigate', callback);
     }
   };
 
-  // DX: deprecated <=2.4.2
-  // Deprecate the boolean type before removing returnBack
-  redirectToSignIn = (opts: RedirectOptions | boolean): void => {
+  redirectToSignIn = (opts: RedirectOptions): void => {
     const callback = () => this.clerkjs?.redirectToSignIn(opts as any);
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       void callback();
     } else {
       this.premountMethodCalls.set('redirectToSignIn', callback);
     }
   };
 
-  // DX: deprecated <=2.4.2
-  // Deprecate the boolean type before removing returnBack
-  redirectToSignUp = (opts: RedirectOptions | boolean): void => {
+  redirectToSignUp = (opts: RedirectOptions): void => {
     const callback = () => this.clerkjs?.redirectToSignUp(opts as any);
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       void callback();
     } else {
       this.premountMethodCalls.set('redirectToSignUp', callback);
@@ -402,7 +388,7 @@ export default class IsomorphicClerk {
 
   redirectToUserProfile = (): void => {
     const callback = () => this.clerkjs?.redirectToUserProfile();
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       callback();
     } else {
       this.premountMethodCalls.set('redirectToUserProfile', callback);
@@ -411,83 +397,67 @@ export default class IsomorphicClerk {
 
   handleRedirectCallback = (params: HandleOAuthCallbackParams): void => {
     const callback = () => this.clerkjs?.handleRedirectCallback(params);
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       void callback();
     } else {
       this.premountMethodCalls.set('handleRedirectCallback', callback);
     }
   };
 
-  handleMagicLinkVerification = async (
-    params: HandleMagicLinkVerificationParams,
-  ): Promise<void> => {
+  handleMagicLinkVerification = async (params: HandleMagicLinkVerificationParams): Promise<void> => {
     const callback = () => this.clerkjs?.handleMagicLinkVerification(params);
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('handleMagicLinkVerification', callback);
     }
   };
 
-  authenticateWithMetamask = async (
-    params: AuthenticateWithMetamaskParams,
-  ): Promise<void> => {
+  authenticateWithMetamask = async (params: AuthenticateWithMetamaskParams): Promise<void> => {
     const callback = () => this.clerkjs?.authenticateWithMetamask(params);
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('authenticateWithMetamask', callback);
     }
   };
 
-  createOrganization = async (
-    params: CreateOrganizationParams,
-  ): Promise<OrganizationResource | void> => {
+  createOrganization = async (params: CreateOrganizationParams): Promise<OrganizationResource | void> => {
     const callback = () => this.clerkjs?.createOrganization(params);
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       return callback() as Promise<OrganizationResource>;
     } else {
       this.premountMethodCalls.set('createOrganization', callback);
     }
   };
 
-  getOrganizationMemberships = async (): Promise<
-    OrganizationMembershipResource[] | void
-  > => {
+  getOrganizationMemberships = async (): Promise<OrganizationMembershipResource[] | void> => {
     const callback = () => this.clerkjs?.getOrganizationMemberships();
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       return callback() as Promise<OrganizationMembershipResource[]>;
     } else {
       this.premountMethodCalls.set('getOrganizationMemberships', callback);
     }
   };
 
-  getOrganization = async (
-    organizationId: string,
-  ): Promise<OrganizationResource | undefined | void> => {
+  getOrganization = async (organizationId: string): Promise<OrganizationResource | undefined | void> => {
     const callback = () => this.clerkjs?.getOrganization(organizationId);
-    if (this.clerkjs && this._loaded) {
+    if (this.clerkjs && this.#loaded) {
       return callback() as Promise<OrganizationResource | undefined>;
     } else {
       this.premountMethodCalls.set('getOrganization', callback);
     }
   };
 
-  signOut = async (signOutCallback?: SignOutCallback): Promise<void> => {
-    const callback = () => this.clerkjs?.signOut(signOutCallback);
-    if (this.clerkjs && this._loaded) {
+  signOut: SignOut = async (
+    signOutCallbackOrOptions?: SignOutCallback | SignOutOptions,
+    options?: SignOutOptions,
+  ): Promise<void> => {
+    const callback = () => this.clerkjs?.signOut(signOutCallbackOrOptions as any, options);
+    if (this.clerkjs && this.#loaded) {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('signOut', callback);
-    }
-  };
-
-  signOutOne = async (signOutCallback?: SignOutCallback): Promise<void> => {
-    const callback = () => this.clerkjs?.signOutOne(signOutCallback);
-    if (this.clerkjs && this._loaded) {
-      return callback() as Promise<void>;
-    } else {
-      this.premountMethodCalls.set('signOutOne', callback);
     }
   };
 }

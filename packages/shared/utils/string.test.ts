@@ -1,4 +1,4 @@
-import { isIPV4Address,titleize } from './string';
+import { isIPV4Address, titleize } from './string';
 
 describe('isIPV4Address(str)', () => {
   it('checks if as string is an IP V4', () => {

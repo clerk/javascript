@@ -5,17 +5,11 @@ import { isRetinaDisplay } from '../../utils/isRetinaDisplay';
 //@ts-ignore
 import styles from './Avatar.module.scss';
 
-const CLERK_DEFAULT_AVATAR =
-  'https://images.clerk.services/clerk/default-profile.svg';
+const CLERK_IMAGE_URL_REGEX = /https\:\/\/images\.(lcl)?clerk/i;
 const GRAVATAR_DEFAULT_AVATAR = 'https://www.gravatar.com/avatar?d=mp';
 
-function hasAvatar(profileImageUrl: string | undefined) {
-  // TODO: Revise this brittle check. Users without avatar should have null or undefined profile_image_url
-  return (
-    !!profileImageUrl &&
-    profileImageUrl !== CLERK_DEFAULT_AVATAR &&
-    profileImageUrl !== GRAVATAR_DEFAULT_AVATAR
-  );
+function hasAvatar(profileImageUrl: string | undefined): boolean {
+  return CLERK_IMAGE_URL_REGEX.test(profileImageUrl!);
 }
 
 function getInitials(
@@ -23,10 +17,7 @@ function getInitials(
   lastName: string | null | undefined,
   name: string | null | undefined,
 ) {
-  return (
-    [(firstName || '')[0], (lastName || '')[0]].join('').trim() ||
-    (name || '')[0]
-  );
+  return [(firstName || '')[0], (lastName || '')[0]].join('').trim() || (name || '')[0];
 }
 
 function getFullName(
@@ -74,15 +65,17 @@ export function Avatar({
     );
   }
 
-  const optimisedHeight =
-    Math.max(profileImageFetchSize, size) * (isRetinaDisplay() ? 2 : 1);
-
   let src;
 
   if (avatarExists) {
-    src = optimize
-      ? `${profileImageUrl}?height=${optimisedHeight}`
-      : profileImageUrl;
+    if (optimize) {
+      const srcUrl = new URL(profileImageUrl!);
+      const optimizedHeight = Math.max(profileImageFetchSize, size) * (isRetinaDisplay() ? 2 : 1);
+      srcUrl.searchParams.append('height', optimizedHeight.toString());
+      src = srcUrl.toString();
+    } else {
+      src = profileImageUrl;
+    }
   } else {
     src = GRAVATAR_DEFAULT_AVATAR;
   }
@@ -107,12 +100,7 @@ interface InitialsAvatarFallbackProps {
   initials: string;
 }
 
-function InitialsAvatarFallback({
-  className,
-  size,
-  fullName,
-  initials,
-}: InitialsAvatarFallbackProps) {
+function InitialsAvatarFallback({ className, size, fullName, initials }: InitialsAvatarFallbackProps) {
   return (
     <svg
       className={className}
@@ -123,7 +111,13 @@ function InitialsAvatarFallback({
       aria-label={fullName}
     >
       <title>{fullName}</title>
-      <circle cx='50' cy='50' r='49' fill='currentColor' strokeWidth='0' />
+      <circle
+        cx='50'
+        cy='50'
+        r='49'
+        fill='currentColor'
+        strokeWidth='0'
+      />
       <text
         x='50'
         y='71.5'

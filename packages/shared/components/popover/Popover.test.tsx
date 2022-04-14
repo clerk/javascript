@@ -12,7 +12,10 @@ describe('<Popover/>', () => {
 
   it('renders the trigger and the popover when active', () => {
     const tree = renderJSON(
-      <Popover active className='Foo'>
+      <Popover
+        active
+        className='Foo'
+      >
         Foo
       </Popover>,
     );

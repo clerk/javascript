@@ -35,7 +35,7 @@ export function ConnectedAccountDetail(): JSX.Element | null {
     >
       <Avatar
         className='cl-image'
-        profileImageUrl={externalAccount.picture}
+        profileImageUrl={externalAccount.avatarUrl}
         size={32}
       />
     </List.Item>
@@ -53,15 +53,30 @@ export function ConnectedAccountDetail(): JSX.Element | null {
     </List.Item>
   );
 
+  const usernameRow = (
+    externalAccount.username ?
+      <List.Item
+        className='cl-list-item'
+        key='username'
+        itemTitle='Username'
+        hoverable={false}
+        detail={false}
+      >
+        <div>{externalAccount.username}</div>
+      </List.Item>
+      :
+      <></>
+  )
+
   return (
     <>
-      <PageHeading title='Connected account' backTo='./../' />
+      <PageHeading title='Connected account' backTo='./../'/>
       <TitledCard
         title={
           <>
             <img
               alt={externalAccount.providerTitle()}
-              src={svgUrl(externalAccount.provider)}
+              src={svgUrl(externalAccount.providerSlug())}
               className='cl-left-icon-wrapper'
             />
             &nbsp; {externalAccount.providerTitle()}
@@ -73,6 +88,7 @@ export function ConnectedAccountDetail(): JSX.Element | null {
         <List className='cl-titled-card-list'>
           {avatarRow}
           {emailAddressRow}
+          {usernameRow}
         </List>
       </TitledCard>
     </>

@@ -17,25 +17,19 @@ export const AddNewPhone = (): JSX.Element => {
       stepText={{
         0: (
           <>
-            A text message with a verification code will be sent to your phone
-            number.
-            <div className='cl-tip'>
-              Standard carrier SMS and data fees may apply.
-            </div>
+            A text message with a verification code will be sent to your phone number.
+            <div className='cl-tip'>Standard carrier SMS and data fees may apply.</div>
           </>
         ),
         1: 'A text message with a verification code has been sent to',
         2: (
           <>
-            has successfully been added to your account. You can now receive
-            communications on this phone number.
-            <div className='cl-tip'>
-              Standard carrier SMS and data fees may apply.
-            </div>
+            has successfully been added to your account. You can now receive communications on this phone number.
+            <div className='cl-tip'>Standard carrier SMS and data fees may apply.</div>
           </>
         ),
       }}
-      onAdd={(value: string) => user.createPhoneNumber(value)}
+      onAdd={(value: string) => user.createPhoneNumber({ phoneNumber: value })}
     />
   );
 };

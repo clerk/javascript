@@ -8,8 +8,7 @@ import { Spinner } from '../spinner';
 // @ts-ignore
 import styles from './OneTimeCodeInput.module.scss';
 
-const BLANK_CHAR = ' ';
-const PRINTABLE_CHARS_REGEX = /^[a-z0-9!"#$%&'()*+,./:;<=>?@[\] ^_`{|}~-]*$/i;
+const BLANK_CHAR = '';
 const VERIFY_SUCCESS_ACTION_DELAY = 500;
 const VERIFY_FAILURE_ACTION_DELAY = 2000;
 const DEFAULT_CODE_LENGTH = 6;
@@ -17,10 +16,7 @@ const DEFAULT_CODE_LENGTH = 6;
 type VerifyCallback = (afterVerifyCallback?: () => any) => void;
 type RejectCallback = (errorMessage?: string) => void;
 
-export type VerifyCodeHandler = (
-  verify: VerifyCallback,
-  reject: RejectCallback,
-) => void;
+export type VerifyCodeHandler = (verify: VerifyCallback, reject: RejectCallback) => void;
 
 export interface OneTimeCodeInputProps {
   value: string;
@@ -28,7 +24,6 @@ export interface OneTimeCodeInputProps {
   verifyCodeHandler: VerifyCodeHandler;
   length?: number;
   onResendCode?: () => any;
-  numeric?: boolean;
   autoFocus?: boolean;
   className?: string;
   style?: Record<string, unknown>;
@@ -41,22 +36,12 @@ type Status =
   | { status: 'loading' }
   | { status: 'verified' };
 
-function isModifierKeyActive(e: React.KeyboardEvent<any>) {
-  const modifiersWithoutShift = ['Alt', 'AltGraph', 'Control', 'Meta'];
-  return modifiersWithoutShift.some(mod => e.getModifierState(mod));
-}
-
-function isCharacterKeyPress(key: string) {
-  return key.length === 1 && key.match(PRINTABLE_CHARS_REGEX) !== null;
-}
-
 export function OneTimeCodeInput({
   value,
   setValue,
   length = DEFAULT_CODE_LENGTH,
   onResendCode,
   verifyCodeHandler,
-  numeric = true,
   autoFocus = true,
   resendCodeButtonClassName,
   ...rest
@@ -68,10 +53,11 @@ export function OneTimeCodeInput({
     status: 'idle',
   });
 
-  let autofillableOtp: string[] = [];
-  const inputRefs = Array.from({ length }, () =>
-    React.createRef<HTMLInputElement>(),
-  );
+  React.useEffect(() => {
+    selectInputContentAt(activeInputIndex);
+  }, [activeInputIndex]);
+
+  const inputRefs = Array.from({ length }, () => React.createRef<HTMLInputElement>());
 
   React.useEffect(() => {
     if (value.replace(BLANK_CHAR, '').length !== length) {
@@ -83,10 +69,7 @@ export function OneTimeCodeInput({
     verifyCodeHandler(
       afterVerifyCallback => {
         setVerificationState({ status: 'verified' });
-        timerId = setTimeout(
-          () => afterVerifyCallback?.(),
-          VERIFY_SUCCESS_ACTION_DELAY,
-        );
+        timerId = setTimeout(() => afterVerifyCallback?.(), VERIFY_SUCCESS_ACTION_DELAY);
       },
       err => {
         setVerificationState({ status: 'failed', message: err || 'Failed' });
@@ -97,14 +80,13 @@ export function OneTimeCodeInput({
   }, [length, value]);
 
   React.useEffect(() => {
-    if (verificationState.status === 'failed') {
-      return;
+    if (verificationState.status === 'idle') {
+      focusInput({ index: 0 });
     }
-    inputRefs[activeInputIndex].current?.focus();
-  }, [activeInputIndex, verificationState.status, inputRefs]);
+  }, [verificationState.status]);
 
   function isValidInput(char: string) {
-    return numeric ? char === ' ' || Number.isInteger(+char) : true;
+    return char != undefined && Number.isInteger(+char);
   }
 
   function updateCode(newCode: string) {
@@ -112,6 +94,18 @@ export function OneTimeCodeInput({
       return;
     }
     setValue(newCode);
+  }
+
+  function updateCodeValueAt(index: number, char: string) {
+    const newValues = [...inputValues];
+    newValues[index] = char;
+    const newCode = newValues.join('');
+    // Focus the input after the last valid digit
+    // focusInput({ index: newCode.length + 1 });
+    if (index > newCode.length) {
+      setActiveInputIndex(newCode.length);
+    }
+    updateCode(newCode);
   }
 
   function reset() {
@@ -127,40 +121,38 @@ export function OneTimeCodeInput({
     setCanResendCode(false);
   }
 
-  function updateCodeValueAt(index: number, char: string) {
-    const newValues = [...inputValues];
-    newValues[index] = char;
-    updateCode(newValues.join(''));
-  }
-
   function focusInput(opts: { index: number } | { dir: 'next' | 'prev' }) {
-    let index =
-      'index' in opts
-        ? opts.index
-        : activeInputIndex + (opts.dir === 'next' ? 1 : -1);
-    index = Math.max(Math.min(length - 1, index), 0);
-    setActiveInputIndex(index);
-    inputRefs[index]?.current?.focus();
+    let clampedIndex = 'index' in opts ? opts.index : activeInputIndex + (opts.dir === 'next' ? 1 : -1);
+    clampedIndex = Math.max(Math.min(length - 1, clampedIndex), 0);
+    setActiveInputIndex(clampedIndex);
   }
 
-  function selectInputAt(index: number) {
-    inputRefs[Math.max(Math.min(length - 1, index), 0)].current?.select();
+  function selectInputContentAt(index: number) {
+    const ref = inputRefs[Math.max(Math.min(length - 1, index), 0)].current;
+    if (ref) {
+      ref.focus();
+      ref.select();
+    }
   }
 
   function handleOnFocus(index: number) {
     if (verificationState.status === 'failed') {
-      reset();
-      return;
+      return reset();
     }
     focusInput({ index });
   }
 
+  function handleWebOtp(code: string | undefined) {
+    if (!code || code.length !== length) {
+      return;
+    }
+    updateCode(code);
+    focusInput({ index: length - 1 });
+  }
+
   function handleOnPaste(e: React.ClipboardEvent<HTMLInputElement>) {
     const clipboardText = e.clipboardData.getData('text/plain') || '';
-    if (
-      clipboardText.length === 0 ||
-      !clipboardText.split('').every(char => isValidInput(char))
-    ) {
+    if (clipboardText.length === 0 || !clipboardText.split('').every(char => isValidInput(char))) {
       return;
     }
 
@@ -183,7 +175,6 @@ export function OneTimeCodeInput({
         e.preventDefault();
         updateCodeValueAt(activeInputIndex, BLANK_CHAR);
         focusInput({ dir: 'prev' });
-        selectInputAt(activeInputIndex - 1);
         return;
       case 'ArrowLeft':
         e.preventDefault();
@@ -197,27 +188,25 @@ export function OneTimeCodeInput({
         e.preventDefault();
         return;
     }
-
-    if (
-      isCharacterKeyPress(e.key) &&
-      isValidInput(e.key) &&
-      !isModifierKeyActive(e)
-    ) {
-      updateCodeValueAt(activeInputIndex, e.key);
-      focusInput({ dir: 'next' });
-    }
   }
 
-  const handleIosOtpInput = (e: React.FormEvent<HTMLInputElement>) => {
-    let val = (e.target as any).value as string;
-    if (!val) {
-      return;
+  const handleOnChange = (el: HTMLInputElement) => {
+    const { value } = el;
+    if (isValidInput(value)) {
+      updateCodeValueAt(activeInputIndex, value);
     }
-    val = val.replace(BLANK_CHAR, '');
-    autofillableOtp = [...autofillableOtp, val].filter(c => !!c);
-    if (autofillableOtp.length === length) {
-      const code = autofillableOtp.join('');
-      updateCode(code);
+  };
+
+  const handleOnInput = (e: React.FormEvent<HTMLInputElement>) => {
+    if (verificationState.status === 'failed') {
+      return reset();
+    }
+
+    if ((e.target as any).value) {
+      // If a user selects an input that's already filled
+      // and types the same value, the onChange event will not fire,
+      // but we still want to focus the next
+      focusInput({ dir: 'next' });
     }
   };
 
@@ -226,37 +215,32 @@ export function OneTimeCodeInput({
       key={i}
       ref={inputRefs[i]}
       value={value}
-      onInput={handleIosOtpInput}
+      handleChange={handleOnChange}
+      onInput={handleOnInput}
       onKeyDown={handleOnKeyDown}
       onFocus={() => handleOnFocus(i)}
       onPaste={handleOnPaste}
-      autoFocus={
-        autoFocus &&
-        verificationState.status === 'idle' &&
-        i === activeInputIndex
-      }
+      autoFocus={autoFocus && verificationState.status === 'idle' && i === activeInputIndex}
       maxLength={1}
       autoComplete='one-time-code'
       type='text'
-      inputMode={numeric ? 'numeric' : 'text'}
+      inputMode='numeric'
       name={`codeInput-${i}`}
-      disabled={
-        verificationState.status === 'loading' ||
-        verificationState.status === 'verified'
-      }
+      disabled={verificationState.status === 'loading' || verificationState.status === 'verified'}
       className={cn(styles.codeInput, {
         [styles.error]: verificationState.status === 'failed',
         [styles.verified]: verificationState.status === 'verified',
       })}
-      aria-label={`${i === 0 ? 'Enter verification code. ' : ''}${
-        numeric ? 'Digit' : 'Character'
-      } ${i + 1}`}
+      aria-label={`${i === 0 ? 'Enter verification code. ' : ''}${'Digit'} ${i + 1}`}
     />
   ));
 
   return (
     <div {...rest}>
-      <div data-test-id='otp-container' className={styles.inputContainer}>
+      <div
+        data-test-id='otp-container'
+        className={styles.inputContainer}
+      >
         {inputFields}
       </div>
       <div className={styles.statusContainer}>
@@ -272,9 +256,7 @@ export function OneTimeCodeInput({
           </Button>
         )}
         {verificationState.status === 'failed' && (
-          <span className={styles.errorMessage}>
-            {verificationState.message}
-          </span>
+          <span className={styles.errorMessage}>{verificationState.message}</span>
         )}
       </div>
     </div>

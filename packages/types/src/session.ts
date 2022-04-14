@@ -1,5 +1,5 @@
 import { ClerkResource } from './resource';
-import { GetSessionTokenOptions, TokenResource } from './token';
+import { TokenResource } from './token';
 import { UserResource } from './user';
 
 export interface SessionResource extends ClerkResource {
@@ -12,12 +12,8 @@ export interface SessionResource extends ClerkResource {
   publicUserData: PublicUserData;
   end: () => Promise<SessionResource>;
   remove: () => Promise<SessionResource>;
-  /**
-   *  `revoke` has been deprecated and will be removed soon.
-   */
-  revoke: () => Promise<SessionResource>;
   touch: () => Promise<SessionResource>;
-  getToken: (options?: GetSessionTokenOptions) => Promise<string>;
+  getToken: GetToken;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -48,14 +44,7 @@ export interface SessionActivity {
   isMobile?: boolean;
 }
 
-export type SessionStatus =
-  | 'abandoned'
-  | 'active'
-  | 'ended'
-  | 'expired'
-  | 'removed'
-  | 'replaced'
-  | 'revoked';
+export type SessionStatus = 'abandoned' | 'active' | 'ended' | 'expired' | 'removed' | 'replaced' | 'revoked';
 
 export interface PublicUserData {
   firstName: string | null;
@@ -64,3 +53,6 @@ export interface PublicUserData {
   identifier: string;
   userId?: string;
 }
+
+export type GetTokenOptions = { template?: string; leewayInSeconds?: number; skipCache?: boolean };
+export type GetToken = (options?: GetTokenOptions) => Promise<string | null>;

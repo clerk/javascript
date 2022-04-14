@@ -10,14 +10,9 @@ interface HashRouterProps {
   children: React.ReactNode;
 }
 
-export const HashRouter = ({
-  preservedParams,
-  children,
-}: HashRouterProps): JSX.Element => {
+export const HashRouter = ({ preservedParams, children }: HashRouterProps): JSX.Element => {
   const internalNavigate = (toURL: URL): Promise<void> => {
-    window.location.hash = stripOrigin(toURL).substring(
-      1 + hashRouterBase.length,
-    );
+    window.location.hash = stripOrigin(toURL).substring(1 + hashRouterBase.length);
     return Promise.resolve();
   };
 
@@ -25,18 +20,14 @@ export const HashRouter = ({
     // Create a URL object with the contents of the hash
     // Use the origin because you can't create a url object without protocol and host
     if (window.location.hash.startsWith('#/')) {
-      return new URL(
-        window.location.origin + window.location.hash.substring(1),
-      );
+      return new URL(window.location.origin + window.location.hash.substring(1));
     } else {
       return new URL(window.location.origin);
     }
   };
 
   const getPath = (): string => {
-    return fakeUrl().pathname === '/'
-      ? '/' + hashRouterBase
-      : '/' + hashRouterBase + fakeUrl().pathname;
+    return fakeUrl().pathname === '/' ? '/' + hashRouterBase : '/' + hashRouterBase + fakeUrl().pathname;
   };
 
   const getQueryString = (): string => {

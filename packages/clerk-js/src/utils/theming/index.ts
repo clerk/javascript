@@ -16,10 +16,7 @@ export function injectTheme(
   userSuppliedThemeOptions: DeepPartial<DisplayThemeJSON>,
 ): void {
   /** deepmerge types can get a bit better ;) */
-  const themeOptions = deepmerge(
-    environmentThemeOptions,
-    userSuppliedThemeOptions,
-  ) as DisplayThemeJSON;
+  const themeOptions = deepmerge(environmentThemeOptions, userSuppliedThemeOptions) as DisplayThemeJSON;
 
   loadFonts(themeOptions, userSuppliedThemeOptions);
   injectCSSProperties(themeOptions);

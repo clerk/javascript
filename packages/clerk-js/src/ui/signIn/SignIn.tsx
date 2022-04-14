@@ -2,12 +2,7 @@ import { SignInProps } from '@clerk/types';
 import React from 'react';
 import { VerifyMagicLink } from 'ui/common';
 import { SSOCallback } from 'ui/common/SSOCallback';
-import {
-  ComponentContext,
-  useCoreClerk,
-  useSignInContext,
-  withCoreSessionSwitchGuard,
-} from 'ui/contexts';
+import { ComponentContext, useCoreClerk, useSignInContext, withCoreSessionSwitchGuard } from 'ui/contexts';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from 'ui/router';
 import { SignInFactorOne } from 'ui/signIn/SignInFactorOne';
 
@@ -62,8 +57,7 @@ function SignInRoutes(): JSX.Element {
 
 SignInRoutes.displayName = 'SignIn';
 
-export const SignIn: React.ComponentType<SignInProps> =
-  withCoreSessionSwitchGuard(SignInRoutes);
+export const SignIn: React.ComponentType<SignInProps> = withCoreSessionSwitchGuard(SignInRoutes);
 
 export const SignInModal = (props: SignInProps): JSX.Element => {
   const signInProps = {
@@ -81,7 +75,10 @@ export const SignInModal = (props: SignInProps): JSX.Element => {
             routing: 'virtual',
           }}
         >
-          <SignIn {...signInProps} routing='virtual' />
+          <SignIn
+            {...signInProps}
+            routing='virtual'
+          />
         </ComponentContext.Provider>
       </div>
     </Route>

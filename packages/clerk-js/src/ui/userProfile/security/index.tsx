@@ -15,15 +15,14 @@ type SecurityRoutesProps = {
   index?: boolean;
 };
 
-export function SecurityRoutes({
-  standAlone = false,
-  index = false,
-}: SecurityRoutesProps): JSX.Element {
+export function SecurityRoutes({ standAlone = false, index = false }: SecurityRoutesProps): JSX.Element {
   const { userSettings } = useEnvironment();
-  const { attributes: { phone_number } } = userSettings;
+  const {
+    attributes: { phone_number, password },
+  } = userSettings;
   const canActivate2svRoutes = () =>
-    phone_number.used_for_second_factor &&
-    phone_number.second_factors.includes('phone_code');
+    phone_number.used_for_second_factor && phone_number.second_factors.includes('phone_code');
+  const canActivatePasswordRoutes = () => password.enabled && password.required;
 
   return (
     <Route
@@ -50,7 +49,11 @@ export function SecurityRoutes({
           </Route>
         </Route>
       </Route>
-      <Route path='password'>
+      <Route
+        path='password'
+        canActivate={canActivatePasswordRoutes}
+        fallbackPath='../'
+      >
         <ChangePassword />
       </Route>
     </Route>

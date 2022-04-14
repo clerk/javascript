@@ -7,7 +7,7 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
-    "lib": ["ES2020", "DOM"],
+    "lib": ["ES2020"],
     "moduleResolution": "node",
     "noUnusedLocals": true,
     "noUnusedParameters": true,

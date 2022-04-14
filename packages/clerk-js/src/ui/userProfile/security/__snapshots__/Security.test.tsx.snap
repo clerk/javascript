@@ -48,37 +48,6 @@ Array [
         <div
           className="title"
         >
-          Password
-        </div>
-        <div
-          className="listItem line"
-        >
-          <div
-            className="start"
-          >
-            <span
-              className="cl-font-semibold"
-            >
-              ••••••••••
-            </span>
-          </div>
-          <div
-            className="iconContainer"
-          >
-            <svg
-              data-filename="../shared/assets/icons/arrow-right.svg"
-            />
-          </div>
-        </div>
-      </button>
-      <button
-        className="cl-list-item elementContainer button hoverable"
-        disabled={false}
-        onClick={[Function]}
-      >
-        <div
-          className="title"
-        >
           2-step verification
         </div>
         <div
@@ -88,8 +57,7 @@ Array [
             className="start"
           >
             <div>
-              Currently
-               
+              Currently 
               <span
                 className="cl-font-semibold"
               >

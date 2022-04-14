@@ -6,9 +6,7 @@ type LoadingScreenProps = {
   showHeader?: boolean;
 };
 
-export function LoadingScreen({
-  showHeader = true,
-}: LoadingScreenProps): JSX.Element {
+export function LoadingScreen({ showHeader = true }: LoadingScreenProps): JSX.Element {
   return (
     <>
       {showHeader && <Header showBack />}

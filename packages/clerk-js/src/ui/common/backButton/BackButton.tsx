@@ -11,11 +11,7 @@ export type BackButtonProps = {
   handleClick?: () => void;
 };
 
-export function BackButton({
-  to = '../',
-  className,
-  handleClick,
-}: BackButtonProps): JSX.Element {
+export function BackButton({ to = '../', className, handleClick }: BackButtonProps): JSX.Element {
   const wrappedHandleClick = handleClick
     ? (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
         e.preventDefault();

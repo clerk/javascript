@@ -6,7 +6,10 @@ import { Tag, VerificationStatusTag } from './Tag';
 describe('<Tag/>', () => {
   it('renders tag', () => {
     const tree = renderJSON(
-      <Tag color='primary' size='lg'>
+      <Tag
+        color='primary'
+        size='lg'
+      >
         Foo
       </Tag>,
     );
@@ -18,15 +21,11 @@ describe('<Tag/>', () => {
     expect(verifiedTag).toMatchSnapshot();
 
     ['unverified', 'failed', 'expired'].forEach(status => {
-      const failureStatusTag = renderJSON(
-        <VerificationStatusTag status={status} />,
-      );
+      const failureStatusTag = renderJSON(<VerificationStatusTag status={status} />);
       expect(failureStatusTag).toMatchSnapshot();
     });
 
-    const unrecognizedTag = renderJSON(
-      <VerificationStatusTag status='hello-world' />,
-    );
+    const unrecognizedTag = renderJSON(<VerificationStatusTag status='hello-world' />);
     expect(unrecognizedTag).toMatchSnapshot();
   });
 });

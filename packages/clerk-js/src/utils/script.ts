@@ -4,10 +4,7 @@ type LoadScriptOptions = {
   globalObject?: unknown;
 };
 
-export async function loadScript(
-  src = '',
-  { async, defer, globalObject }: LoadScriptOptions = {},
-) {
+export async function loadScript(src = '', { async, defer, globalObject }: LoadScriptOptions = {}) {
   if (!src) {
     throw 'Missing script src...';
   }

@@ -44,47 +44,17 @@ export {
 
 // Export middleware functions
 
-/** @deprecated DEPRECATED Use ClerkExpressWithAuth Est. 2.10.0 */
-const ClerkExpressWithSession =
-  singletonInstance.expressWithSession.bind(singletonInstance);
-
-/** @deprecated DEPRECATED Use ClerkExpressRequireAuth Est. 2.10.0 */
-const ClerkExpressRequireSession =
-  singletonInstance.expressRequireSession.bind(singletonInstance);
-
-/** @deprecated DEPRECATED Use withAuth Est. 2.10.0 */
-const withSession = singletonInstance.withSession.bind(singletonInstance);
-
-/** @deprecated DEPRECATED Use requireAuth Est. 2.10.0 */
-const requireSession = singletonInstance.requireSession.bind(singletonInstance);
-
 const ClerkExpressWithAuth =
-  singletonInstance.expressWithSession.bind(singletonInstance);
+  singletonInstance.expressWithAuth.bind(singletonInstance);
 const ClerkExpressRequireAuth =
-  singletonInstance.expressRequireSession.bind(singletonInstance);
-const withAuth = singletonInstance.withSession.bind(singletonInstance);
-const requireAuth = singletonInstance.requireSession.bind(singletonInstance);
+  singletonInstance.expressRequireAuth.bind(singletonInstance);
+const withAuth = singletonInstance.withAuth.bind(singletonInstance);
+const requireAuth = singletonInstance.requireAuth.bind(singletonInstance);
 
-export {
-  ClerkExpressWithSession,
-  ClerkExpressRequireSession,
-  ClerkExpressWithAuth,
-  ClerkExpressRequireAuth,
-  withSession,
-  requireSession,
-  withAuth,
-  requireAuth,
-};
+export { ClerkExpressWithAuth, ClerkExpressRequireAuth, withAuth, requireAuth };
 
 // Export wrapper types for Next.js requests
-export {
-  WithSessionProp,
-  RequireSessionProp,
-  WithSessionClaimsProp,
-  RequireSessionClaimsProp,
-  WithAuthProp,
-  RequireAuthProp,
-} from './Clerk';
+export { WithAuthProp, RequireAuthProp } from './Clerk';
 
 // Export Errors
 export {

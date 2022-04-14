@@ -22,9 +22,7 @@ function disableScrollHandlers<T extends HTMLElement>(el: T) {
     const oldWidth = el.clientWidth;
     el.style.overflow = 'hidden';
     const currentWidth = el.clientWidth;
-    const oldPaddingRight = Number.parseInt(
-      oldPaddingRightPx.replace('px', ''),
-    );
+    const oldPaddingRight = Number.parseInt(oldPaddingRightPx.replace('px', ''));
     el.style.paddingRight = currentWidth - oldWidth + oldPaddingRight + 'px';
   };
 
@@ -81,15 +79,11 @@ const Modal: ModalComponent = React.forwardRef(
     const backdropDismissTriggerRef = React.useRef<HTMLDivElement | null>(null);
     const rootEl = useDomRef(rootSelector);
 
-    const [isActive, setIsActive] = useDetectClickOutside(
-      backdropDismissTriggerRef,
-      !!active,
-      () => {
-        if (typeof handleClose === 'function') {
-          handleClose();
-        }
-      },
-    );
+    const [isActive, setIsActive] = useDetectClickOutside(backdropDismissTriggerRef, !!active, () => {
+      if (typeof handleClose === 'function') {
+        handleClose();
+      }
+    });
 
     const open = React.useCallback(() => {
       setIsActive(true);
@@ -127,9 +121,7 @@ const Modal: ModalComponent = React.forwardRef(
       };
 
       const currentRootEl = rootEl.current;
-      const { revertScrollbar, hideScrollbar } = disableScrollHandlers(
-        document.body,
-      );
+      const { revertScrollbar, hideScrollbar } = disableScrollHandlers(document.body);
 
       if (isActive) {
         window.addEventListener('keydown', onKeyDown);

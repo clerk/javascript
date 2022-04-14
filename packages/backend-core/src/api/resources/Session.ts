@@ -9,15 +9,7 @@ interface SessionPayload extends SessionProps {}
 export interface Session extends SessionPayload {}
 
 export class Session {
-  static attributes = [
-    'id',
-    'clientId',
-    'userId',
-    'status',
-    'lastActiveAt',
-    'expireAt',
-    'abandonAt',
-  ];
+  static attributes = ['id', 'clientId', 'userId', 'status', 'lastActiveAt', 'expireAt', 'abandonAt'];
 
   static defaults = {};
 

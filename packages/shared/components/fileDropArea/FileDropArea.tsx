@@ -132,7 +132,10 @@ export function FileDropArea({
 
   const states = {
     idle: (
-      <div className={styles.dropArea} {...areaHandlers}>
+      <div
+        className={styles.dropArea}
+        {...areaHandlers}
+      >
         <ImageDefaultIcon className={styles.icon} />
         <p>Drag file here, or</p>
         {buttonEl()}
@@ -149,14 +152,20 @@ export function FileDropArea({
       </div>
     ),
     invalid: (
-      <div className={`${styles.dropArea} ${styles.invalid}`} {...areaHandlers}>
+      <div
+        className={`${styles.dropArea} ${styles.invalid}`}
+        {...areaHandlers}
+      >
         <ImageDefaultIcon className={styles.icon} />
         <p>Unsupported file type</p>
         {buttonEl()}
       </div>
     ),
     uploading: (
-      <div className={styles.dropArea} {...areaHandlers}>
+      <div
+        className={styles.dropArea}
+        {...areaHandlers}
+      >
         <Spinner />
         <p style={{ marginTop: '3em' }}>Uploading file</p>
       </div>

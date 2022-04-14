@@ -20,10 +20,7 @@ interface TokenCacheValue {
 interface TokenCache {
   set(entry: TokenCacheEntry): void;
 
-  get(
-    cacheKeyJSON: TokenCacheKeyJSON,
-    leeway?: number,
-  ): TokenCacheEntry | undefined;
+  get(cacheKeyJSON: TokenCacheKeyJSON, leeway?: number): TokenCacheEntry | undefined;
 
   clear(): void;
 
@@ -99,10 +96,7 @@ export function MemoryTokenCache(prefix = KEY_PREFIX): TokenCache {
     cache[key] = value;
   };
 
-  const get = (
-    cacheKeyJSON: TokenCacheKeyJSON,
-    leeway = LEEWAY,
-  ): TokenCacheEntry | undefined => {
+  const get = (cacheKeyJSON: TokenCacheKeyJSON, leeway = LEEWAY): TokenCacheEntry | undefined => {
     const cacheKey = new TokenCacheKey(prefix, cacheKeyJSON);
     const key = cacheKey.toKey();
     const value: TokenCacheValue = cache[key];
@@ -112,8 +106,7 @@ export function MemoryTokenCache(prefix = KEY_PREFIX): TokenCache {
     }
 
     const nowSeconds = Math.floor(Date.now() / 1000);
-    const willExpireSoon =
-      value.expiresAt && value.expiresAt - leeway < nowSeconds;
+    const willExpireSoon = value.expiresAt && value.expiresAt - leeway < nowSeconds;
 
     if (willExpireSoon) {
       delete cache[key];
@@ -127,4 +120,3 @@ export function MemoryTokenCache(prefix = KEY_PREFIX): TokenCache {
 }
 
 export const SessionTokenCache = MemoryTokenCache();
-export const UserTokenCache = MemoryTokenCache();

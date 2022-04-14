@@ -1,5 +1,3 @@
-@use 'sass:math';
-
 $min-width: 320px;
 $content-width-xl: 840px;
 $content-width-lg: 620px;
@@ -25,8 +23,7 @@ $content-width-lg: 620px;
     // $theme-border-radius can be 1em (normal) or 0.5em (compact)
     // We use a high enough value to support arbitrary link heights
     // even with "Spacing" set to "compact"
-    border-radius: 0 calc(#{$theme-border-radius} * 999)
-      calc(#{$theme-border-radius} * 999) 0;
+    border-radius: 0 calc(#{$theme-border-radius} * 999) calc(#{$theme-border-radius} * 999) 0;
     padding: themed-padding(1rem 2rem);
     color: $cl-gray-light-3;
     font-weight: $semibold-weight;
@@ -70,7 +67,7 @@ $content-width-lg: 620px;
       border-right-color: transparent;
       width: 26px;
       height: 26px;
-      border-radius: math.div(26px, 2);
+      border-radius: (26px / 2);
       position: absolute;
       top: 50%;
       right: 50%;
@@ -94,8 +91,7 @@ $content-width-lg: 620px;
       border-left: none;
       border-bottom: 4px solid #e5e5e5;
       //border-radius: 12px 12px 0 0;
-      border-radius: calc(#{$theme-border-radius} * 1.5)
-        calc(#{$theme-border-radius} * 1.5) 0 0;
+      border-radius: calc(#{$theme-border-radius} * 1.5) calc(#{$theme-border-radius} * 1.5) 0 0;
       text-align: center;
 
       > .icon {
@@ -444,4 +440,9 @@ $content-width-lg: 620px;
 
 .phone-input-container {
   max-width: 278px;
+}
+
+.verification-error {
+  color: var(--clerk-font-color-l1);
+  font-size: 0.875rem;
 }

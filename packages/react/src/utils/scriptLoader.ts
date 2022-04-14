@@ -11,41 +11,59 @@ const FAILED_TO_LOAD_ERROR = 'Clerk: Failed to load Clerk';
 const MISSING_PROVIDER_ERROR = 'Clerk: Missing provider';
 const MISSING_BODY_ERROR = 'Clerk: Missing <body> element.';
 
-function isStaging(frontendApi: string): boolean {
+const UNSTABLE_RELEASE_TAGS = ['staging'];
+
+const extractNonStableTag = (packageVersion: string) => {
+  const tag = packageVersion.match(/-(.*)\./)?.[1];
+  return tag && UNSTABLE_RELEASE_TAGS.includes(tag) ? tag : undefined;
+};
+
+const extractMajorVersion = (packageVersion: string) => {
+  return packageVersion.split('.')[0];
+};
+
+const forceStagingReleaseForClerkFapi = (frontendApi: string): boolean => {
   return (
     frontendApi.endsWith('.lclstage.dev') ||
     frontendApi.endsWith('.stgstage.dev') ||
     frontendApi.endsWith('.clerkstage.dev')
   );
-}
+};
 
-function extractTag(packageJsonVersion: string) {
-  return packageJsonVersion.match(/-(.*)\./);
-}
-
-function getScriptSrc(
-  frontendApi: string,
-  localScriptSrc: string | undefined,
-): string {
-  if (localScriptSrc) {
-    return localScriptSrc;
+function getScriptSrc({ frontendApi, scriptUrl, scriptVariant = '' }: LoadScriptParams): string {
+  if (scriptUrl) {
+    return scriptUrl;
   }
 
-  const majorVersion = isStaging(frontendApi)
-    ? 'staging'
-    : parseInt(LIB_VERSION.split('.')[0], 10);
+  const variant = scriptVariant ? `${scriptVariant.replace(/\.+$/, '')}.` : '';
+  const getUrlForTag = (target: string) => {
+    return `https://${frontendApi}/npm/@clerk/clerk-js@${target}/dist/clerk.${variant}browser.js`;
+  };
 
-  const tag = extractTag(LIB_VERSION);
-  const sourceVersion = tag === null ? majorVersion : 'next';
+  if (forceStagingReleaseForClerkFapi(frontendApi)) {
+    return getUrlForTag('staging');
+  }
 
-  return `https://${frontendApi}/npm/@clerk/clerk-js@${sourceVersion}/dist/clerk.browser.js`;
+  const nonStableTag = extractNonStableTag(LIB_VERSION);
+  if (nonStableTag) {
+    return getUrlForTag(nonStableTag);
+  }
+
+  return getUrlForTag(extractMajorVersion(LIB_VERSION));
 }
 
-export function loadScript(
-  frontendApi: string,
-  localScriptSrc: string | undefined,
-): Promise<HTMLScriptElement | null> {
+export type ScriptVariant = '' | 'headless';
+
+export interface LoadScriptParams {
+  frontendApi: string;
+  scriptUrl?: string;
+  scriptVariant?: ScriptVariant;
+}
+
+export function loadScript(params: LoadScriptParams): Promise<HTMLScriptElement | null> {
   return new Promise((resolve, reject) => {
+    const { frontendApi } = params;
+
     if (global.Clerk) {
       resolve(null);
     }
@@ -55,7 +73,7 @@ export function loadScript(
     }
 
     const script = document.createElement('script');
-    const src = getScriptSrc(frontendApi, localScriptSrc);
+    const src = getScriptSrc(params);
 
     script.setAttribute('data-clerk-frontend-api', frontendApi);
     script.setAttribute('crossorigin', 'anonymous');

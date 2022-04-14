@@ -24,17 +24,7 @@ export type SwitchComponent = React.ForwardRefExoticComponent<
 
 export const Switch: SwitchComponent = React.forwardRef(
   (
-    {
-      name,
-      value,
-      checked = false,
-      disabled,
-      label,
-      containerClassName,
-      className,
-      Icon,
-      handleChange,
-    }: SwitchProps,
+    { name, value, checked = false, disabled, label, containerClassName, className, Icon, handleChange }: SwitchProps,
     ref,
   ): JSX.Element => {
     const { onChange, onKeyPress } = useInput(handleChange);
@@ -58,7 +48,12 @@ export const Switch: SwitchComponent = React.forwardRef(
           role='radio'
         />
         {label && <span className={cn(className)}>{label}</span>}
-        {Icon && <Icon checked={checked} label={label} />}
+        {Icon && (
+          <Icon
+            checked={checked}
+            label={label}
+          />
+        )}
       </label>
     );
   },

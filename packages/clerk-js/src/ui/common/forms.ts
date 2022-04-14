@@ -9,9 +9,7 @@ export interface FieldState<T> {
   setError: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
-export const buildRequest = (
-  fieldStates: Array<FieldState<string>>,
-): Record<string, any> => {
+export const buildRequest = (fieldStates: Array<FieldState<string>>): Record<string, any> => {
   const request: { [x: string]: any } = {};
   fieldStates.forEach(x => {
     request[x.name] = x.value;
@@ -19,10 +17,7 @@ export const buildRequest = (
   return request;
 };
 
-export const useFieldState = <T>(
-  name: string,
-  initialState: T,
-): FieldState<T> => {
+export const useFieldState = <T>(name: string, initialState: T): FieldState<T> => {
   const [value, setValue] = React.useState<T>(initialState);
   const [error, setError] = React.useState<string | undefined>(undefined);
 
@@ -36,11 +31,7 @@ export const useFieldState = <T>(
 };
 
 // TODO: Replace origin useFieldState with this one
-export const useFieldStateV2 = <T>(
-  name: string,
-  required: boolean,
-  initialState: T,
-): FieldState<T> => {
+export const useFieldStateV2 = <T>(name: string, required: boolean, initialState: T): FieldState<T> => {
   const [value, setValue] = React.useState<T>(initialState);
   const [error, setError] = React.useState<string | undefined>(undefined);
 

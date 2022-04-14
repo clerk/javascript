@@ -2,7 +2,7 @@ import { camelToSnake } from '@clerk/shared/utils';
 import type { DisplayConfigResource } from '@clerk/types';
 import type { ParsedQs } from 'qs';
 import qs from 'qs';
-import type { SignInCtx, SignUpCtx } from 'ui/contexts';
+import type { SignInCtx, SignUpCtx } from 'ui/types';
 
 type ParseAuthPropArgs =
   | {
@@ -18,30 +18,14 @@ type ParseAuthPropArgs =
       field: keyof Pick<SignUpCtx, 'afterSignUpUrl' | 'afterSignInUrl'>;
     };
 
-export const parseAuthProp = ({
-  ctx,
-  queryParams,
-  displayConfig,
-  field,
-}: ParseAuthPropArgs): string => {
+export const parseAuthProp = ({ ctx, queryParams, displayConfig, field }: ParseAuthPropArgs): string => {
   const snakeCaseField = camelToSnake(field);
-
-  // Todo: Dx: Deprecate afterSignIn and afterSignUp legacy fields
-  const legacyField = field.replace('Url', '');
-  let legacyFieldValue: string | undefined = undefined;
-  if (legacyField in ctx) {
-    // @ts-ignore
-    legacyFieldValue = ctx[legacyField];
-  }
   const queryParamValue = queryParams[snakeCaseField];
 
   return (
     (typeof queryParamValue === 'string' ? queryParamValue : null) ||
-    (typeof queryParams.redirect_url === 'string'
-      ? queryParams.redirect_url
-      : null) ||
+    (typeof queryParams.redirect_url === 'string' ? queryParams.redirect_url : null) ||
     ctx[field] ||
-    legacyFieldValue ||
     ctx.redirectUrl ||
     displayConfig[field]
   );
@@ -53,12 +37,8 @@ interface BuildAuthQueryStringArgs {
   displayConfig: DisplayConfigResource;
 }
 
-export const buildAuthQueryString = (
-  data: BuildAuthQueryStringArgs,
-): string | null => {
-  const parseValue = (
-    field: keyof Omit<BuildAuthQueryStringArgs, 'displayConfig'>,
-  ) => {
+export const buildAuthQueryString = (data: BuildAuthQueryStringArgs): string | null => {
+  const parseValue = (field: keyof Omit<BuildAuthQueryStringArgs, 'displayConfig'>) => {
     const passed = data[field];
     if (!passed) {
       return undefined;

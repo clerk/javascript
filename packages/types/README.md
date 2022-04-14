@@ -10,10 +10,10 @@
 <div align="center">
 
 [![Chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://discord.com/invite/b5rXHjAg7A)
-[![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://docs.clerk.dev?utm_source=github&utm_medium=clerk_types)
+[![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.dev/docs?utm_source=github&utm_medium=clerk_types)
 [![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
 
-[Changelog](CHANGELOG.md)
+[Changelog](https://github.com/clerkinc/javascript/blob/main/packages/types/CHANGELOG.md)
 ·
 [Report a Bug](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=bug&template=bug_report.md&title=Bug%3A+)
 ·
@@ -65,7 +65,7 @@ export type OAuthProps = {
 };
 ```
 
-_For further details and examples, please refer to our [Documentation](https://docs.clerk.dev?utm_source=github&utm_medium=clerk_types)._
+_For further details and examples, please refer to our [Documentation](https://clerk.dev/docs?utm_source=github&utm_medium=clerk_types)._
 
 ## Support
 
@@ -77,7 +77,7 @@ You can get in touch with us in any of the following ways:
 
 ## Contributing
 
-We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](docs/CONTRIBUTING.md).
+We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerkinc/javascript/blob/main/packages/types/docs/CONTRIBUTING.md).
 
 ## Security
 
@@ -85,10 +85,10 @@ We're open to all community contributions! If you'd like to contribute in any wa
 
 `@clerk/types` is provided **"as is"** without any **warranty**. Use at your own risk.
 
-_For more information and to report security issues, please refer to our [security documentation](docs/SECURITY.md)._
+_For more information and to report security issues, please refer to our [security documentation](https://github.com/clerkinc/javascript/blob/main/packages/types/docs/SECURITY.md)._
 
 ## License
 
 This project is licensed under the **MIT license**.
 
-See [LICENSE](LICENSE) for more information.
+See [LICENSE](https://github.com/clerkinc/javascript/blob/main/packages/types/LICENSE) for more information.

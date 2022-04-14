@@ -13,11 +13,10 @@ export function Security(): JSX.Element {
   const { navigate } = useNavigate();
   const user = useCoreUser();
 
-  const showPasswordRow = attributes.password.enabled;
+  const showPasswordRow = attributes.password.enabled && attributes.password.required;
 
   const showSecondFactorRow =
-    attributes.phone_number.used_for_second_factor &&
-    attributes.phone_number.second_factors.includes('phone_code');
+    attributes.phone_number.used_for_second_factor && attributes.phone_number.second_factors.includes('phone_code');
 
   const buildPasswordRow = () => (
     <List.Item
@@ -44,8 +43,7 @@ export function Security(): JSX.Element {
         onClick={() => navigate('two-step')}
       >
         <div>
-          Currently{' '}
-          <span className='cl-font-semibold'>{twoFacOn ? 'ON' : 'OFF'}</span>
+          Currently <span className='cl-font-semibold'>{twoFacOn ? 'ON' : 'OFF'}</span>
           {twoFacOn && (
             <span className='cl-list-item-subtitle'>
               <br />

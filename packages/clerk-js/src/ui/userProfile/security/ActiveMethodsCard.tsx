@@ -13,10 +13,7 @@ import React, { useState } from 'react';
 import { handleError } from 'ui/common';
 import { Error as ErrorComponent } from 'ui/common/error';
 import { useCoreUser } from 'ui/contexts';
-import {
-  TwoStepMethod,
-  TwoStepMethodsToDisplayDataMap,
-} from 'ui/userProfile/security/twoStepVerificationTypes';
+import { TwoStepMethod, TwoStepMethodsToDisplayDataMap } from 'ui/userProfile/security/twoStepVerificationTypes';
 
 export function ActiveMethodsCard(): JSX.Element | null {
   const [error, setError] = useState<string | undefined>();
@@ -47,7 +44,11 @@ export function ActiveMethodsCard(): JSX.Element | null {
       <ErrorComponent>{error}</ErrorComponent>
       <List className='cl-titled-card-list'>
         {enabledPhoneNumbers.map(phone => (
-          <PhoneListItem key={phone.id} phone={phone} onError={onError} />
+          <PhoneListItem
+            key={phone.id}
+            phone={phone}
+            onError={onError}
+          />
         ))}
       </List>
     </TitledCard>
@@ -67,7 +68,7 @@ function PhoneListItem({ phone, onError }: PhoneListItemProps): JSX.Element {
 
   async function remove() {
     try {
-      await phone.setReservedForSecondFactor(false);
+      await phone.setReservedForSecondFactor({ reserved: false });
     } catch (err) {
       onError(err);
     }
@@ -78,7 +79,12 @@ function PhoneListItem({ phone, onError }: PhoneListItemProps): JSX.Element {
       className='cl-list-item'
       hoverable={false}
       itemTitle={title}
-      detailIcon={<Actions onMakeDefault={makeDefault} onRemove={remove} />}
+      detailIcon={
+        <Actions
+          onMakeDefault={makeDefault}
+          onRemove={remove}
+        />
+      }
     >
       <PhoneViewer phoneNumber={phone.phoneNumber} />
       {phone.defaultSecondFactor && <Tag color='primary'>Default</Tag>}

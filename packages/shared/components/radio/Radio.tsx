@@ -35,18 +35,7 @@ export type RadioComponent = React.ForwardRefExoticComponent<
 >;
 
 export const Radio: RadioComponent = React.forwardRef(
-  (
-    {
-      name,
-      value,
-      checked = false,
-      disabled,
-      label,
-      className,
-      handleChange,
-    }: RadioProps,
-    ref,
-  ): JSX.Element => (
+  ({ name, value, checked = false, disabled, label, className, handleChange }: RadioProps, ref): JSX.Element => (
     <Switch
       ref={ref}
       name={name}

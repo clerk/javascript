@@ -1,4 +1,4 @@
-import { ClerkServerError, ClerkServerErrorJSON,HttpError } from './Errors';
+import { ClerkServerError, ClerkServerErrorJSON, HttpError } from './Errors';
 
 export default function handleError(error: any): never {
   const statusCode = error?.response?.statusCode || 500;

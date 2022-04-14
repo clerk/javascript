@@ -1,9 +1,3 @@
-import {
-  SignInProps,
-  SignUpProps,
-  UserButtonProps,
-  UserProfileProps,
-} from '@clerk/types';
 import React from 'react';
 import { buildAuthQueryString, parseAuthProp } from 'ui/common';
 import { useEnvironment } from 'ui/contexts';
@@ -11,30 +5,18 @@ import { useNavigate } from 'ui/hooks';
 import type { ParsedQs } from 'ui/router';
 import { useRouter } from 'ui/router';
 
-export type SignInCtx = SignInProps & {
-  componentName: 'SignIn';
-};
+import type {
+  AvailableComponentCtx,
+  SignInCtx,
+  SignInProps,
+  SignUpCtx,
+  SignUpProps,
+  UserButtonCtx,
+  UserProfileCtx,
+  UserProfileProps,
+} from '../types';
 
-export type UserProfileCtx = UserProfileProps & {
-  componentName: 'UserProfile';
-};
-
-export type SignUpCtx = SignUpProps & {
-  componentName: 'SignUp';
-};
-
-export type UserButtonCtx = UserButtonProps & {
-  componentName: 'UserButton';
-};
-
-export type ComponentContextValue =
-  | SignInCtx
-  | UserProfileCtx
-  | SignUpCtx
-  | UserButtonCtx;
-
-export const ComponentContext =
-  React.createContext<ComponentContextValue | null>(null);
+export const ComponentContext = React.createContext<AvailableComponentCtx | null>(null);
 
 export type SignUpContextType = SignUpProps & {
   navigateAfterSignUp: () => any;
@@ -43,17 +25,13 @@ export type SignUpContextType = SignUpProps & {
   authQueryString: string | null;
 };
 export const useSignUpContext = (): SignUpContextType => {
-  const { componentName, ...ctx } = React.useContext(
-    ComponentContext,
-  ) as SignUpCtx;
+  const { componentName, ...ctx } = React.useContext(ComponentContext) as SignUpCtx;
   const { navigate } = useNavigate();
   const { displayConfig } = useEnvironment();
   const { queryParams } = useRouter();
 
   if (componentName !== 'SignUp') {
-    throw new Error(
-      'Clerk: useSignUpContext called outside of the mounted SignUp component.',
-    );
+    throw new Error('Clerk: useSignUpContext called outside of the mounted SignUp component.');
   }
 
   // Retrieve values passed through props or qs
@@ -74,9 +52,7 @@ export const useSignUpContext = (): SignUpContextType => {
 
   const navigateAfterSignUp = () => navigate(afterSignUpUrl);
 
-  // DX: deprecated <=1.28.0
-  // Todo: remove ctx.afterSignIn
-  let signInUrl = ctx.signInUrl || ctx.signInURL || displayConfig.signInUrl;
+  let signInUrl = ctx.signInUrl || displayConfig.signInUrl;
 
   // Add query strings to the sign in URL
   const authQs = buildAuthQueryString({
@@ -108,17 +84,13 @@ export type SignInContextType = SignInProps & {
   authQueryString: string | null;
 };
 export const useSignInContext = (): SignInContextType => {
-  const { componentName, ...ctx } = React.useContext(
-    ComponentContext,
-  ) as SignInCtx;
+  const { componentName, ...ctx } = React.useContext(ComponentContext) as SignInCtx;
   const { navigate } = useNavigate();
   const { displayConfig } = useEnvironment();
   const { queryParams } = useRouter();
 
   if (componentName !== 'SignIn') {
-    throw new Error(
-      'Clerk: useSignInContext called outside of the mounted SignIn component.',
-    );
+    throw new Error('Clerk: useSignInContext called outside of the mounted SignIn component.');
   }
 
   // Retrieve values passed through props or qs
@@ -139,9 +111,7 @@ export const useSignInContext = (): SignInContextType => {
 
   const navigateAfterSignIn = () => navigate(afterSignInUrl);
 
-  // DX: deprecated <=1.28.0
-  // Todo: remove ctx.signUpURL
-  let signUpUrl = ctx.signUpUrl || ctx.signUpURL || displayConfig.signUpUrl;
+  let signUpUrl = ctx.signUpUrl || displayConfig.signUpUrl;
 
   // Add query strings to the sign in URL
   const authQs = buildAuthQueryString({
@@ -173,15 +143,11 @@ export type UserProfileContextType = UserProfileProps & {
 // `routing` and `path`
 // TODO: remove if not needed during the components v2 overhaul
 export const useUserProfileContext = (): UserProfileContextType => {
-  const { componentName, ...ctx } = React.useContext(
-    ComponentContext,
-  ) as UserProfileCtx;
+  const { componentName, ...ctx } = React.useContext(ComponentContext) as UserProfileCtx;
   const { queryParams } = useRouter();
 
   if (componentName !== 'UserProfile') {
-    throw new Error(
-      'Clerk: useUserProfileContext called outside of the mounted UserProfile component.',
-    );
+    throw new Error('Clerk: useUserProfileContext called outside of the mounted UserProfile component.');
   }
 
   return {
@@ -192,49 +158,35 @@ export const useUserProfileContext = (): UserProfileContextType => {
 };
 
 export const useUserButtonContext = () => {
-  const { componentName, ...ctx } = React.useContext(
-    ComponentContext,
-  ) as UserButtonCtx;
+  const { componentName, ...ctx } = React.useContext(ComponentContext) as UserButtonCtx;
   const { navigate } = useNavigate();
   const { displayConfig } = useEnvironment();
 
   if (componentName !== 'UserButton') {
-    throw new Error(
-      'Clerk: useUserButtonContext called outside of the mounted UserButton component.',
-    );
+    throw new Error('Clerk: useUserButtonContext called outside of the mounted UserButton component.');
   }
 
-  // DX: deprecated <=1.28.0
-  // Todo: remove deprecated props
-  const signInUrl = ctx.signInUrl || ctx.signInURL || displayConfig.signInUrl;
-  const userProfileUrl =
-    ctx.userProfileUrl || ctx.userProfileURL || displayConfig.userProfileUrl;
+  const signInUrl = ctx.signInUrl || displayConfig.signInUrl;
+  const userProfileUrl = ctx.userProfileUrl || displayConfig.userProfileUrl;
 
-  const afterSignOutOneUrl =
-    ctx.afterSignOutOneUrl ||
-    ctx.afterSignOutOne ||
-    displayConfig.afterSignOutOneUrl;
-  const navigateAfterSignOutOne = () => navigate(afterSignOutOneUrl);
+  const afterMultiSessionSingleSignOutUrl = ctx.afterMultiSessionSingleSignOutUrl || displayConfig.afterSignOutOneUrl;
+  const navigateAfterMultiSessionSingleSignOut = () => navigate(afterMultiSessionSingleSignOutUrl);
 
-  const afterSignOutAllUrl =
-    ctx.afterSignOutAllUrl ||
-    ctx.afterSignOutAll ||
-    displayConfig.afterSignOutAllUrl;
-  const navigateAfterSignOutAll = () => navigate(afterSignOutAllUrl);
+  const afterSignOutUrl = ctx.afterSignOutUrl || displayConfig.afterSignOutAllUrl;
+  const navigateAfterSignOut = () => navigate(afterSignOutUrl);
 
-  const afterSwitchSessionUrl = (ctx.afterSwitchSessionUrl =
-    ctx.afterSwitchSession || displayConfig.afterSwitchSessionUrl);
+  const afterSwitchSessionUrl = (ctx.afterSwitchSessionUrl = displayConfig.afterSwitchSessionUrl);
   const navigateAfterSwitchSession = () => navigate(afterSwitchSessionUrl);
 
   return {
     ...ctx,
-    navigateAfterSignOutOne,
-    navigateAfterSignOutAll,
+    navigateAfterMultiSessionSingleSignOut,
+    navigateAfterSignOut,
     navigateAfterSwitchSession,
     signInUrl,
     userProfileUrl,
-    afterSignOutOneUrl,
-    afterSignOutAllUrl,
+    afterMultiSessionSingleSignOutUrl,
+    afterSignOutUrl,
     afterSwitchSessionUrl,
   };
 };

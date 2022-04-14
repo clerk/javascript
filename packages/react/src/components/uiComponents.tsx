@@ -1,13 +1,8 @@
-import {
-  SignInProps,
-  SignUpProps,
-  UserButtonProps,
-  UserProfileProps,
-} from '@clerk/types';
+import { SignInProps, SignUpProps, UserButtonProps, UserProfileProps } from '@clerk/types';
 import React from 'react';
 
-import { withClerk } from '../contexts';
 import { MountProps, WithClerkProp } from '../types';
+import { withClerk } from './withClerk';
 
 // README: <Portal/> should be a class pure component in order for mount and unmount
 // lifecycle props to be invoked correctly. Replacing the class component with a
@@ -57,54 +52,42 @@ class Portal extends React.PureComponent<MountProps, {}> {
   }
 }
 
-export const SignIn = withClerk(
-  ({ clerk, ...props }: WithClerkProp<SignInProps>) => {
-    return (
-      <Portal
-        mount={clerk.mountSignIn}
-        unmount={clerk.unmountSignIn}
-        props={props}
-      />
-    );
-  },
-  'SignIn',
-);
+export const SignIn = withClerk(({ clerk, ...props }: WithClerkProp<SignInProps>) => {
+  return (
+    <Portal
+      mount={clerk.mountSignIn}
+      unmount={clerk.unmountSignIn}
+      props={props}
+    />
+  );
+}, 'SignIn');
 
-export const SignUp = withClerk(
-  ({ clerk, ...props }: WithClerkProp<SignUpProps>) => {
-    return (
-      <Portal
-        mount={clerk.mountSignUp}
-        unmount={clerk.unmountSignUp}
-        props={props}
-      />
-    );
-  },
-  'SignUp',
-);
+export const SignUp = withClerk(({ clerk, ...props }: WithClerkProp<SignUpProps>) => {
+  return (
+    <Portal
+      mount={clerk.mountSignUp}
+      unmount={clerk.unmountSignUp}
+      props={props}
+    />
+  );
+}, 'SignUp');
 
-export const UserProfile = withClerk(
-  ({ clerk, ...props }: WithClerkProp<UserProfileProps>) => {
-    return (
-      <Portal
-        mount={clerk.mountUserProfile}
-        unmount={clerk.unmountUserProfile}
-        props={props}
-      />
-    );
-  },
-  'UserProfile',
-);
+export const UserProfile = withClerk(({ clerk, ...props }: WithClerkProp<UserProfileProps>) => {
+  return (
+    <Portal
+      mount={clerk.mountUserProfile}
+      unmount={clerk.unmountUserProfile}
+      props={props}
+    />
+  );
+}, 'UserProfile');
 
-export const UserButton = withClerk(
-  ({ clerk, ...props }: WithClerkProp<UserButtonProps>) => {
-    return (
-      <Portal
-        mount={clerk.mountUserButton}
-        unmount={clerk.unmountUserButton}
-        props={props}
-      />
-    );
-  },
-  'UserButton',
-);
+export const UserButton = withClerk(({ clerk, ...props }: WithClerkProp<UserButtonProps>) => {
+  return (
+    <Portal
+      mount={clerk.mountUserButton}
+      unmount={clerk.unmountUserButton}
+      props={props}
+    />
+  );
+}, 'UserButton');

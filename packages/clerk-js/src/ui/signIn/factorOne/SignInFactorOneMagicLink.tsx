@@ -1,4 +1,4 @@
-import { SignInFactor, SignInResource } from '@clerk/types';
+import { EmailLinkFactor, SignInFactor, SignInResource } from '@clerk/types';
 import React from 'react';
 import {
   buildMagicLinkRedirectUrl,
@@ -8,12 +8,7 @@ import {
   MagicLinkVerificationStatusModal,
   MagicLinkWaitingScreen,
 } from 'ui/common';
-import {
-  useCoreClerk,
-  useCoreSignIn,
-  useEnvironment,
-  useSignInContext,
-} from 'ui/contexts';
+import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from 'ui/contexts';
 import { useMagicLink, useNavigate } from 'ui/hooks';
 import { SignInFactorOneFooter } from 'ui/signIn/factorOne/SignInFactorOneFooter';
 
@@ -27,9 +22,7 @@ export function SignInFactorOneMagicLink({
   currentFactor,
 }: SignInFactorOneMagicLinkProps): JSX.Element {
   const signIn = useCoreSignIn();
-  const identifierRef = React.useRef(
-    ('safe_identifier' in currentFactor && currentFactor.safe_identifier) || '',
-  );
+  const identifierRef = React.useRef(('safeIdentifier' in currentFactor && currentFactor.safeIdentifier) || '');
   const { setSession } = useCoreClerk();
   const { navigate } = useNavigate();
   const { displayConfig } = useEnvironment();
@@ -53,11 +46,8 @@ export function SignInFactorOneMagicLink({
     try {
       hideExpirationScreen();
       const si = await startMagicLinkFlow({
-        emailAddressId: (currentFactor as any).email_address_id,
-        redirectUrl: buildMagicLinkRedirectUrl(
-          signInContext,
-          displayConfig.signInUrl,
-        ),
+        emailAddressId: (currentFactor as EmailLinkFactor).emailAddressId,
+        redirectUrl: buildMagicLinkRedirectUrl(signInContext, displayConfig.signInUrl),
       });
       return handleVerificationResult(si);
     } catch (e) {
@@ -90,18 +80,18 @@ export function SignInFactorOneMagicLink({
   };
 
   if (showVerifyModal) {
-    return (
-      <MagicLinkVerificationStatusModal verificationStatus='verified_switch_tab' />
-    );
+    return <MagicLinkVerificationStatusModal verificationStatus='verified_switch_tab' />;
   }
 
   return (
     <>
-      <Header error={error} showLogo={false} showBack />
+      <Header
+        error={error}
+        showLogo={false}
+        showBack
+      />
       {showExpiredScreen ? (
-        <ExpiredRetryMagicLinkWaitingScreen
-          onResendButtonClicked={startVerification}
-        />
+        <ExpiredRetryMagicLinkWaitingScreen onResendButtonClicked={startVerification} />
       ) : (
         <MagicLinkWaitingScreen
           icon='mail'
@@ -110,18 +100,14 @@ export function SignInFactorOneMagicLink({
             <>
               A sign-in link has been sent to
               <br />
-              <span className='cl-verification-page-identifier'>
-                {identifierRef.current}
-              </span>
+              <span className='cl-verification-page-identifier'>{identifierRef.current}</span>
             </>
           }
           secondaryText='Click the link in the email, then return to this tab.'
           onResendButtonClicked={startVerification}
         />
       )}
-      <SignInFactorOneFooter
-        handleAnotherMethodClicked={handleAnotherMethodClicked}
-      />
+      <SignInFactorOneFooter handleAnotherMethodClicked={handleAnotherMethodClicked} />
     </>
   );
 }

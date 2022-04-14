@@ -6,10 +6,7 @@ import { default as MailOpen } from '@clerk/shared/assets/icons/mail-open.svg';
 import { default as SwitchArrows } from '@clerk/shared/assets/icons/switch-arrows.svg';
 // @ts-ignore
 import { default as TickShield } from '@clerk/shared/assets/icons/tick-shield.svg';
-import {
-  ButtonWithTimer,
-  ButtonWithTimerProps,
-} from '@clerk/shared/components/button';
+import { ButtonWithTimer, ButtonWithTimerProps } from '@clerk/shared/components/button';
 import cn from 'classnames';
 import React from 'react';
 
@@ -44,29 +41,15 @@ export function MagicLinkWaitingScreen({
       data-test-id='magicLink-waiting-screen'
     >
       <div className='cl-verification-page-icon-container'>
-        {icon === 'warning' && (
-          <ExclamationTriangle className='cl-verification-page-warning-icon' />
-        )}
-        {icon === 'shield' && (
-          <TickShield className='cl-verification-page-guard-icon' />
-        )}
-        {icon === 'mail' && (
-          <MailOpen className='cl-verification-page-email-icon' />
-        )}
-        {icon === 'switch' && (
-          <SwitchArrows className='cl-verification-page-switch-icon' />
-        )}
+        {icon === 'warning' && <ExclamationTriangle className='cl-verification-page-warning-icon' />}
+        {icon === 'shield' && <TickShield className='cl-verification-page-guard-icon' />}
+        {icon === 'mail' && <MailOpen className='cl-verification-page-email-icon' />}
+        {icon === 'switch' && <SwitchArrows className='cl-verification-page-switch-icon' />}
       </div>
       <h1 className='cl-verification-page-header'>{header}</h1>
       {mainText && <p className='cl-verification-page-text'>{mainText}</p>}
-      {secondaryText && (
-        <p className='cl-verification-page-text'>{secondaryText}</p>
-      )}
-      {noticeText && (
-        <p className='cl-verification-page-text cl-verify-page-soft-text'>
-          {noticeText}
-        </p>
-      )}
+      {secondaryText && <p className='cl-verification-page-text'>{secondaryText}</p>}
+      {noticeText && <p className='cl-verification-page-text cl-verify-page-soft-text'>{noticeText}</p>}
       {onResendButtonClicked && (
         <ButtonWithTimer
           throttleTimeInMs={RESEND_BUTTON_DELAY_IN_MS}

@@ -9,7 +9,10 @@ describe('<Radio/>', () => {
     const onChange = jest.fn();
 
     const { rerender } = render(
-      <Radio checked={false} handleChange={onChange} />,
+      <Radio
+        checked={false}
+        handleChange={onChange}
+      />,
     );
     const radio = screen.getByRole('radio', { checked: false });
 
@@ -21,7 +24,12 @@ describe('<Radio/>', () => {
     });
 
     // // // checked=true should mean it's checked
-    rerender(<Radio checked handleChange={onChange} />);
+    rerender(
+      <Radio
+        checked
+        handleChange={onChange}
+      />,
+    );
     expect(radio).toHaveProperty('checked', true);
 
     // // Clicking from on -> off

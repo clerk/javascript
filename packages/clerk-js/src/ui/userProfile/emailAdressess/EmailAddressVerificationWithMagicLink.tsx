@@ -28,9 +28,7 @@ export function EmailAddressVerificationWithMagicLink({
 
   function startVerification() {
     const redirectUrl = buildMagicLinkRedirectUrl(profileContext);
-    startMagicLinkFlow({ redirectUrl })
-      .then(onVerificationComplete)
-      .catch(onError);
+    startMagicLinkFlow({ redirectUrl }).then(onVerificationComplete).catch(onError);
   }
 
   return (
@@ -41,9 +39,7 @@ export function EmailAddressVerificationWithMagicLink({
         <>
           A verification link has been sent to
           <br />
-          <span className='cl-verification-page-identifier'>
-            {email.emailAddress}
-          </span>
+          <span className='cl-verification-page-identifier'>{email.emailAddress}</span>
         </>
       }
       secondaryText='Click the link in the email to verify your new email, then return to

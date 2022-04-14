@@ -3,18 +3,14 @@ import { List } from '@clerk/shared/components/list';
 import { TitledCard } from '@clerk/shared/components/titledCard';
 import React from 'react';
 import { useNavigate } from 'ui/hooks';
-import {
-  TwoStepMethod,
-  TwoStepMethodsToDisplayDataMap,
-} from 'ui/userProfile/security/twoStepVerificationTypes';
+import { TwoStepMethod, TwoStepMethodsToDisplayDataMap } from 'ui/userProfile/security/twoStepVerificationTypes';
 
 export function AddMethodCard(): JSX.Element {
   const { navigate } = useNavigate();
   const availableMethods = [TwoStepMethod.SMS];
 
   function buildAddMethodRow(method: TwoStepMethod): JSX.Element {
-    const { buttonTitle, linkPath, note, title } =
-      TwoStepMethodsToDisplayDataMap[method];
+    const { buttonTitle, linkPath, note, title } = TwoStepMethodsToDisplayDataMap[method];
     return (
       <List.Item
         className='cl-list-item'
@@ -43,9 +39,7 @@ export function AddMethodCard(): JSX.Element {
       title='Add method'
       subtitle='Set up a new 2-step verification method'
     >
-      <List className='cl-titled-card-list'>
-        {availableMethods.map(buildAddMethodRow)}
-      </List>
+      <List className='cl-titled-card-list'>{availableMethods.map(buildAddMethodRow)}</List>
     </TitledCard>
   );
 }

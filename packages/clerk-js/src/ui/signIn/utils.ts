@@ -1,14 +1,7 @@
 import { titleize } from '@clerk/shared/utils/string';
-import {
-  PreferredSignInStrategy,
-  SignInFactor,
-  SignInResource,
-} from '@clerk/types';
+import { PreferredSignInStrategy, SignInFactor, SignInResource, SignInStrategy } from '@clerk/types';
 import { PREFERRED_SIGN_IN_STRATEGIES } from 'ui/common';
-import {
-  otpPrefFactorComparator,
-  passwordPrefFactorComparator,
-} from 'ui/signIn/strategies/factorSortingUtils';
+import { otpPrefFactorComparator, passwordPrefFactorComparator } from 'ui/signIn/strategies/factorSortingUtils';
 
 const FONT_SIZE_STEP = 2;
 
@@ -27,13 +20,8 @@ function textWidthForCurrentSize(text: string, parent: HTMLElement) {
   return result;
 }
 
-export function fitTextInOneLine(
-  text: string,
-  containerEl: HTMLElement,
-  defaultSize: string,
-): void {
-  const getContainerFontSize = () =>
-    window.getComputedStyle(containerEl).getPropertyValue('font-size');
+export function fitTextInOneLine(text: string, containerEl: HTMLElement, defaultSize: string): void {
+  const getContainerFontSize = () => window.getComputedStyle(containerEl).getPropertyValue('font-size');
   const decreaseSize = () => {
     const fontSizeWithUnit = getContainerFontSize();
     const newSize = (Number.parseInt(fontSizeWithUnit) - FONT_SIZE_STEP) * 0.85;
@@ -63,7 +51,7 @@ export function fitTextInOneLine(
 }
 
 const factorForIdentifier = (i: string | null) => (f: SignInFactor) => {
-  return 'safe_identifier' in f && f.safe_identifier === i;
+  return 'safeIdentifier' in f && f.safeIdentifier === i;
 };
 
 function determineStrategyWhenPasswordIsPreferred(
@@ -77,14 +65,9 @@ function determineStrategyWhenPasswordIsPreferred(
   return factors.find(factorForIdentifier(identifier)) || selected || null;
 }
 
-function determineStrategyWhenOTPIsPreferred(
-  factors: SignInFactor[],
-  identifier: string | null,
-): SignInFactor | null {
+function determineStrategyWhenOTPIsPreferred(factors: SignInFactor[], identifier: string | null): SignInFactor | null {
   const sortedBasedOnPrefFactor = factors.sort(otpPrefFactorComparator);
-  const forIdentifier = sortedBasedOnPrefFactor.find(
-    factorForIdentifier(identifier),
-  );
+  const forIdentifier = sortedBasedOnPrefFactor.find(factorForIdentifier(identifier));
   if (forIdentifier) {
     return forIdentifier;
   }
@@ -92,9 +75,7 @@ function determineStrategyWhenOTPIsPreferred(
   if (firstBasedOnPref.strategy === 'email_link') {
     return firstBasedOnPref;
   }
-  return (
-    factors.find(factorForIdentifier(identifier)) || firstBasedOnPref || null
-  );
+  return factors.find(factorForIdentifier(identifier)) || firstBasedOnPref || null;
 }
 
 // The algorithm can be found at
@@ -118,10 +99,13 @@ export function determineSalutation(signIn: Partial<SignInResource>): string {
     return '';
   }
 
-  return (
-    titleize(signIn.userData?.first_name) ||
-    titleize(signIn.userData?.last_name) ||
-    signIn?.identifier ||
-    ''
-  );
+  return titleize(signIn.userData?.firstName) || titleize(signIn.userData?.lastName) || signIn?.identifier || '';
+}
+
+const localStrategies: SignInStrategy[] = ['email_code', 'password', 'phone_code', 'email_link'];
+export function factorHasLocalStrategy(factor: SignInFactor): boolean {
+  if (!factor) {
+    return false;
+  }
+  return localStrategies.includes(factor.strategy);
 }

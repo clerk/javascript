@@ -11,18 +11,16 @@ export type LabelProps = {
 } & React.LabelHTMLAttributes<HTMLLabelElement> &
   React.AriaAttributes;
 
-export const Label: React.FC<LabelProps> = ({
-  text,
-  className,
-  children,
-  htmlFor,
-  ...rest
-}: LabelProps) => {
+export const Label: React.FC<LabelProps> = ({ text, className, children, htmlFor, ...rest }: LabelProps) => {
   if (!text && !children) {
     return null;
   }
   return (
-    <label htmlFor={htmlFor} className={cn(styles.label, className)} {...rest}>
+    <label
+      htmlFor={htmlFor}
+      className={cn(styles.label, className)}
+      {...rest}
+    >
       {text || children}
     </label>
   );

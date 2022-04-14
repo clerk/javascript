@@ -1,10 +1,4 @@
-import {
-  render,
-  renderJSON,
-  screen,
-  userEvent,
-  waitFor,
-} from '@clerk/shared/testUtils';
+import { render, renderJSON, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
 import React from 'react';
 import { FieldState } from 'ui/common';
 
@@ -21,7 +15,10 @@ describe('<Password/>', () => {
 
   it('renders the password form component', async () => {
     const tree = renderJSON(
-      <Password handleSubmit={jest.fn()} password={passwordInput} />,
+      <Password
+        handleSubmit={jest.fn()}
+        password={passwordInput}
+      />,
     );
     expect(tree).toMatchSnapshot();
   });
@@ -29,7 +26,12 @@ describe('<Password/>', () => {
   it('renders the password form, enters a password and presses the button', async () => {
     const mockSubmit = jest.fn();
 
-    render(<Password handleSubmit={mockSubmit} password={passwordInput} />);
+    render(
+      <Password
+        handleSubmit={mockSubmit}
+        password={passwordInput}
+      />,
+    );
 
     const inputField = screen.getByLabelText('Password');
     await userEvent.type(inputField, 'SADSD!@D23');

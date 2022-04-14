@@ -46,8 +46,7 @@ Allowlist operations are exposed by the `allowlistIdentifiers` sub-api (`clerkAP
 Retrieves the list of allowlist identifiers.
 
 ```ts
-const allowlistIdentifiers =
-  await clerkAPI.allowlistIdentifiers.getAllowlistIdentifierList();
+const allowlistIdentifiers = await clerkAPI.allowlistIdentifiers.getAllowlistIdentifierList();
 ```
 
 #### createAllowlistIdentifier(params)
@@ -63,11 +62,10 @@ Accepts an `identifier` parameter, which can be:
 You can also control if you want to notify the owner of the `identifier`, by setting the `notify` property to `true`. The `notify` property is not available for wildcard identifiers.
 
 ```ts
-const allowlistIdentifier =
-  await clerkAPI.allowlistIdentifiers.createAllowlistIdentifier({
-    identifier: 'test@example.com',
-    notify: false,
-  });
+const allowlistIdentifier = await clerkAPI.allowlistIdentifiers.createAllowlistIdentifier({
+  identifier: 'test@example.com',
+  notify: false,
+});
 ```
 
 #### deleteAllowlistIdentifier(allowlistIdentifierId)

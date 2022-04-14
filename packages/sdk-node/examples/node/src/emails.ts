@@ -4,7 +4,7 @@ import { emails } from '@clerk/clerk-sdk-node';
 
 console.log('Create email');
 
-const emailAddressId = "idn_23eTZpjqKYgn6qijHVXw0veiOgB";
+const emailAddressId = 'idn_23eTZpjqKYgn6qijHVXw0veiOgB';
 const fromEmailName = 'sales';
 const subject = 'Amazing offer!';
 const body =

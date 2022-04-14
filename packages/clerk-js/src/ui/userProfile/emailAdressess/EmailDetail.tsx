@@ -29,9 +29,7 @@ export function EmailDetail(): JSX.Element | null {
   const [showRemovalPage, setShowRemovalPage] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | undefined>();
 
-  const email = user.emailAddresses.find(
-    ea => ea.id === params.email_address_id,
-  );
+  const email = user.emailAddresses.find(ea => ea.id === params.email_address_id);
 
   const isPrimary = email?.id === user.primaryEmailAddressId;
 
@@ -51,9 +49,7 @@ export function EmailDetail(): JSX.Element | null {
   };
 
   const makeIdentPrimary = async () => {
-    user
-      .update({ primaryEmailAddressId: email.id })
-      .catch(e => handleError(e, [], setError));
+    user.update({ primaryEmailAddressId: email.id }).catch(e => handleError(e, [], setError));
   };
 
   const onErrorHandler = (e: any) => {
@@ -78,9 +74,7 @@ export function EmailDetail(): JSX.Element | null {
     <>
       <PageHeading
         title='Email'
-        subtitle={
-          isVerified ? 'Manage this email address' : 'Verify this email address'
-        }
+        subtitle={isVerified ? 'Manage this email address' : 'Verify this email address'}
         backTo='./../'
       />
       {showRemovalPage && removeEmailAddressScreen}
@@ -123,10 +117,7 @@ export function EmailDetail(): JSX.Element | null {
                     <MailIcon />
                     <div className='cl-text'>
                       <div className='cl-title'>Primary email</div>
-                      <div className='cl-subtitle'>
-                        This email will receive communications regarding your
-                        account.
-                      </div>
+                      <div className='cl-subtitle'>This email will receive communications regarding your account.</div>
                     </div>
                   </div>
                   <Toggle

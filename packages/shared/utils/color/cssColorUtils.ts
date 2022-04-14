@@ -1,4 +1,4 @@
-import { Color, HslaColor, RgbaColor,TransparentColor } from '@clerk/types';
+import { Color, HslaColor, RgbaColor, TransparentColor } from '@clerk/types';
 
 import {
   isHSLColor,
@@ -52,13 +52,8 @@ export const stringToSameTypeColor = (value: string): Color => {
   return '';
 };
 
-export const colorToSameTypeString = (
-  color: Color,
-): string | TransparentColor => {
-  if (
-    typeof color === 'string' &&
-    (isValidHexString(color) || isTransparent(color))
-  ) {
+export const colorToSameTypeString = (color: Color): string | TransparentColor => {
+  if (typeof color === 'string' && (isValidHexString(color) || isTransparent(color))) {
     return color;
   }
 
@@ -83,11 +78,7 @@ export const hexStringToRgbaColor = (hex: string): RgbaColor => {
 
 const rgbaColorToRgbaString = (color: RgbaColor): string => {
   const { a, b, g, r } = color;
-  return color.a === 0
-    ? 'transparent'
-    : color.a != undefined
-    ? `rgba(${r},${g},${b},${a})`
-    : `rgb(${r},${g},${b})`;
+  return color.a === 0 ? 'transparent' : color.a != undefined ? `rgba(${r},${g},${b},${a})` : `rgb(${r},${g},${b})`;
 };
 
 const hslaColorToHslaString = (color: HslaColor): string => {

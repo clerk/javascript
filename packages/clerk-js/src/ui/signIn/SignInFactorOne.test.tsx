@@ -1,24 +1,8 @@
-import {
-  mocked,
-  render,
-  screen,
-  userEvent,
-  waitFor,
-} from '@clerk/shared/testUtils';
-import {
-  EnvironmentResource,
-  LoadedClerk,
-  SignInFactor,
-  SignInResource,
-} from '@clerk/types';
+import { mocked, render, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
+import { EnvironmentResource, LoadedClerk, SignInFactor, SignInResource } from '@clerk/types';
 import * as React from 'react';
 import { PartialDeep } from 'type-fest';
-import {
-  useCoreClerk,
-  useCoreSignIn,
-  useEnvironment,
-  useSignInContext,
-} from 'ui/contexts';
+import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from 'ui/contexts';
 
 import { SignInFactorOne } from './SignInFactorOne';
 
@@ -88,11 +72,9 @@ describe('<SignInFactorOne/>', () => {
         }),
       }));
 
-      (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(
-        () => ({
-          setSession: mockSetSession,
-        }),
-      );
+      (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(() => ({
+        setSession: mockSetSession,
+      }));
 
       render(<SignInFactorOne />);
 
@@ -112,10 +94,7 @@ describe('<SignInFactorOne/>', () => {
 
         expect(mockNavigate).toHaveBeenCalledTimes(0);
         expect(mockSetSession).toHaveBeenCalledTimes(1);
-        expect(mockSetSession).toHaveBeenCalledWith(
-          'cafebabe',
-          mockNavigateAfterSignIn,
-        );
+        expect(mockSetSession).toHaveBeenCalledWith('cafebabe', mockNavigateAfterSignIn);
       });
     });
   });
@@ -142,8 +121,8 @@ describe('<SignInFactorOne/>', () => {
         supportedFirstFactors: [
           {
             strategy: 'password',
-            safe_identifier: 'jdoe@example.com',
-            email_address_id: 'deadbeef',
+            safeIdentifier: 'jdoe@example.com',
+            emailAddressId: 'deadbeef',
           } as SignInFactor,
         ],
         attemptFirstFactor: mockAttemptFirstFactor.mockReturnValue({
@@ -151,11 +130,9 @@ describe('<SignInFactorOne/>', () => {
         }),
       }));
 
-      (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(
-        () => ({
-          setSession: mockSetSession,
-        }),
-      );
+      (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(() => ({
+        setSession: mockSetSession,
+      }));
 
       render(<SignInFactorOne />);
 
@@ -185,9 +162,7 @@ describe('<SignInFactorOne/>', () => {
       const mockAttemptFirstFactor = jest.fn();
       const mockSetSession = jest.fn();
 
-      (
-        useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>
-      ).mockImplementation(() => ({
+      (useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>).mockImplementation(() => ({
         authConfig: { singleSessionMode: false },
         displayConfig: {
           preferredSignInStrategy: 'otp',
@@ -201,8 +176,8 @@ describe('<SignInFactorOne/>', () => {
             supportedFirstFactors: [
               {
                 strategy: 'email_code',
-                safe_identifier: 'jdoe@example.com',
-                email_address_id: 'deadbeef',
+                safeIdentifier: 'jdoe@example.com',
+                emailAddressId: 'deadbeef',
               } as SignInFactor,
             ],
             attemptFirstFactor: mockAttemptFirstFactor.mockReturnValue({
@@ -217,19 +192,17 @@ describe('<SignInFactorOne/>', () => {
           } as unknown as SignInResource),
       );
 
-      (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(
-        () => ({
-          setSession: mockSetSession,
-        }),
-      );
+      (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(() => ({
+        setSession: mockSetSession,
+      }));
 
       render(<SignInFactorOne />);
 
       expect(mockPrepareFirstFactor).toHaveBeenCalledTimes(1);
       expect(mockPrepareFirstFactor).toHaveBeenCalledWith({
         strategy: 'email_code',
-        safe_identifier: 'jdoe@example.com',
-        email_address_id: 'deadbeef',
+        safeIdentifier: 'jdoe@example.com',
+        emailAddressId: 'deadbeef',
       } as SignInFactor);
 
       const text = '123456';
@@ -247,10 +220,7 @@ describe('<SignInFactorOne/>', () => {
 
         expect(mockNavigate).toHaveBeenCalledTimes(0);
         expect(mockSetSession).toHaveBeenCalledTimes(1);
-        expect(mockSetSession).toHaveBeenCalledWith(
-          'cafebabe',
-          mockNavigateAfterSignIn,
-        );
+        expect(mockSetSession).toHaveBeenCalledWith('cafebabe', mockNavigateAfterSignIn);
       });
     });
   });
@@ -267,9 +237,7 @@ describe('<SignInFactorOne/>', () => {
         }),
       );
 
-      (
-        useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>
-      ).mockImplementation(() => ({
+      (useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>).mockImplementation(() => ({
         authConfig: { singleSessionMode: false },
         displayConfig: {
           preferredSignInStrategy: 'otp',
@@ -288,8 +256,8 @@ describe('<SignInFactorOne/>', () => {
             supportedFirstFactors: [
               {
                 strategy: 'email_link',
-                safe_identifier: 'jdoe@example.com',
-                email_address_id: 'deadbeef',
+                safeIdentifier: 'jdoe@example.com',
+                emailAddressId: 'deadbeef',
               } as SignInFactor,
             ],
             firstFactorVerification: {
@@ -299,11 +267,9 @@ describe('<SignInFactorOne/>', () => {
           } as unknown as SignInResource),
       );
 
-      (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(
-        () => ({
-          setSession: mockSetSession,
-        }),
-      );
+      (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(() => ({
+        setSession: mockSetSession,
+      }));
 
       render(<SignInFactorOne />);
 
@@ -330,9 +296,7 @@ describe('<SignInFactorOne/>', () => {
         }),
       );
 
-      (
-        useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>
-      ).mockImplementation(() => ({
+      (useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>).mockImplementation(() => ({
         authConfig: { singleSessionMode: false },
         displayConfig: {
           preferredSignInStrategy: 'otp',
@@ -351,8 +315,8 @@ describe('<SignInFactorOne/>', () => {
             supportedFirstFactors: [
               {
                 strategy: 'email_link',
-                safe_identifier: 'jdoe@example.com',
-                email_address_id: 'deadbeef',
+                safeIdentifier: 'jdoe@example.com',
+                emailAddressId: 'deadbeef',
               } as SignInFactor,
             ],
             firstFactorVerification: {
@@ -362,11 +326,9 @@ describe('<SignInFactorOne/>', () => {
           } as unknown as SignInResource),
       );
 
-      (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(
-        () => ({
-          setSession: mockSetSession,
-        }),
-      );
+      (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(() => ({
+        setSession: mockSetSession,
+      }));
 
       render(<SignInFactorOne />);
 
@@ -379,47 +341,8 @@ describe('<SignInFactorOne/>', () => {
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledTimes(0);
         expect(mockSetSession).toHaveBeenCalledTimes(1);
-        expect(mockSetSession).toHaveBeenCalledWith(
-          'cafebabe',
-          mockNavigateAfterSignIn,
-        );
+        expect(mockSetSession).toHaveBeenCalledWith('cafebabe', mockNavigateAfterSignIn);
       });
-    });
-  });
-
-  describe('skipping verification strategies', () => {
-    it('bypasses email_link when passed as disabled strategy', async () => {
-      const mockPrepareFirstFactor = jest.fn();
-      (useCoreSignIn as jest.Mock<SignInResource>).mockImplementation(
-        () =>
-          ({
-            prepareFirstFactor: mockPrepareFirstFactor,
-            supportedFirstFactors: [
-              {
-                strategy: 'email_link',
-                safe_identifier: 'jdoe@example.com',
-                email_address_id: 'deadbeef',
-              } as SignInFactor,
-              {
-                strategy: 'email_code',
-                safe_identifier: 'jdoe@example.com',
-                email_address_id: 'deadbeef',
-              } as SignInFactor,
-            ],
-            firstFactorVerification: {
-              status: null,
-              verifiedFromTheSameClient: jest.fn(() => false),
-            },
-          } as unknown as SignInResource),
-      );
-      (useSignInContext as jest.Mock).mockImplementation(() => ({
-        signUpUrl: 'http://test.host',
-        navigateAfterSignIn: mockNavigateAfterSignIn,
-        disabledStrategies: ['email_link'],
-      }));
-
-      const { container } = render(<SignInFactorOne />);
-      expect(container.querySelector('.cl-otp-input')).not.toBeNull();
     });
   });
 
@@ -428,28 +351,22 @@ describe('<SignInFactorOne/>', () => {
       const mockAttemptFirstFactor = jest.fn();
       const mockSetSession = jest.fn();
 
-      mocked(
-        useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>,
-        true,
-      ).mockImplementation(() => ({
+      mocked(useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>, true).mockImplementation(() => ({
         authConfig: { singleSessionMode: false },
         displayConfig: {
           preferredSignInStrategy: 'otp',
         },
       }));
 
-      mocked(
-        useCoreSignIn as jest.Mock<SignInResource>,
-        true,
-      ).mockImplementation(
+      mocked(useCoreSignIn as jest.Mock<SignInResource>, true).mockImplementation(
         () =>
           ({
             prepareFirstFactor: mockPrepareFirstFactor,
             supportedFirstFactors: [
               {
                 strategy: 'phone_code',
-                safe_identifier: '+1********9',
-                phone_number_id: 'deadbeef',
+                safeIdentifier: '+1********9',
+                phoneNumberId: 'deadbeef',
               } as SignInFactor,
             ],
             attemptFirstFactor: mockAttemptFirstFactor.mockReturnValue({
@@ -463,10 +380,7 @@ describe('<SignInFactorOne/>', () => {
           } as unknown as SignInResource),
       );
 
-      mocked(
-        useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>,
-        true,
-      ).mockImplementation(() => ({
+      mocked(useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>, true).mockImplementation(() => ({
         setSession: mockSetSession,
       }));
 
@@ -475,8 +389,8 @@ describe('<SignInFactorOne/>', () => {
       expect(mockPrepareFirstFactor).toHaveBeenCalledTimes(1);
       expect(mockPrepareFirstFactor).toHaveBeenCalledWith({
         strategy: 'phone_code',
-        safe_identifier: '+1********9',
-        phone_number_id: 'deadbeef',
+        safeIdentifier: '+1********9',
+        phoneNumberId: 'deadbeef',
       } as SignInFactor);
 
       const text = '123456';
@@ -505,33 +419,27 @@ describe('<SignInFactorOne/>', () => {
       const mockPrepareFirstFactor = jest.fn();
       const mockSetSession = jest.fn();
 
-      mocked(
-        useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>,
-        true,
-      ).mockImplementation(() => ({
+      mocked(useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>, true).mockImplementation(() => ({
         authConfig: { singleSessionMode: false },
         displayConfig: {
           preferredSignInStrategy: 'otp',
         },
       }));
 
-      mocked(
-        useCoreSignIn as jest.Mock<SignInResource>,
-        true,
-      ).mockImplementation(
+      mocked(useCoreSignIn as jest.Mock<SignInResource>, true).mockImplementation(
         () =>
           ({
             prepareFirstFactor: mockPrepareFirstFactor,
             supportedFirstFactors: [
               {
                 strategy: 'email_code',
-                safe_identifier: 'ccoe@example.com',
-                email_address_id: 'deadbeef',
+                safeIdentifier: 'ccoe@example.com',
+                emailAddressId: 'deadbeef',
               } as SignInFactor,
               {
                 strategy: 'email_code',
-                safe_identifier: 'jdoe@example.com',
-                email_address_id: 'cafebabe',
+                safeIdentifier: 'jdoe@example.com',
+                emailAddressId: 'cafebabe',
               } as SignInFactor,
             ],
             attemptFirstFactor: mockAttemptFirstFactor.mockReturnValue({
@@ -562,13 +470,13 @@ describe('<SignInFactorOne/>', () => {
       await waitFor(() => {
         expect(mockPrepareFirstFactor).toHaveBeenNthCalledWith(1, {
           strategy: 'email_code',
-          safe_identifier: 'ccoe@example.com',
-          email_address_id: 'deadbeef',
+          safeIdentifier: 'ccoe@example.com',
+          emailAddressId: 'deadbeef',
         } as SignInFactor);
         expect(mockPrepareFirstFactor).toHaveBeenNthCalledWith(2, {
           strategy: 'email_code',
-          safe_identifier: 'jdoe@example.com',
-          email_address_id: 'cafebabe',
+          safeIdentifier: 'jdoe@example.com',
+          emailAddressId: 'cafebabe',
         } as SignInFactor);
       });
     });
@@ -577,9 +485,7 @@ describe('<SignInFactorOne/>', () => {
       const mockAttemptFirstFactor = jest.fn();
       const mockSetSession = jest.fn();
 
-      (
-        useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>
-      ).mockImplementation(() => ({
+      (useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>).mockImplementation(() => ({
         authConfig: { singleSessionMode: false },
         displayConfig: {
           preferredSignInStrategy: 'otp',
@@ -593,8 +499,8 @@ describe('<SignInFactorOne/>', () => {
             supportedFirstFactors: [
               {
                 strategy: 'email_code',
-                safe_identifier: 'ccoe@example.com',
-                email_address_id: 'deadbeef',
+                safeIdentifier: 'ccoe@example.com',
+                emailAddressId: 'deadbeef',
               } as SignInFactor,
             ],
             attemptFirstFactor: mockAttemptFirstFactor.mockReturnValue({
@@ -609,11 +515,9 @@ describe('<SignInFactorOne/>', () => {
           } as unknown as SignInResource),
       );
 
-      (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(
-        () => ({
-          setSession: mockSetSession,
-        }),
-      );
+      (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(() => ({
+        setSession: mockSetSession,
+      }));
 
       render(<SignInFactorOne />);
       userEvent.click(screen.getByText('Try another method'));
@@ -626,7 +530,15 @@ describe('<SignInFactorOne/>', () => {
       screen.getByText('Try another method');
     });
 
-    it('skips magic links when disabled strategies contain email_link', async () => {
+    it('renders all available strategies when sso sign is available and no other first factor', () => {
+      const mockSetSession = jest.fn();
+      mocked(useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>, true).mockImplementation(() => ({
+        authConfig: { singleSessionMode: false },
+        displayConfig: {
+          preferredSignInStrategy: 'otp',
+        },
+      }));
+
       const mockPrepareFirstFactor = jest.fn();
       (useCoreSignIn as jest.Mock<SignInResource>).mockImplementation(
         () =>
@@ -634,14 +546,7 @@ describe('<SignInFactorOne/>', () => {
             prepareFirstFactor: mockPrepareFirstFactor,
             supportedFirstFactors: [
               {
-                strategy: 'email_link',
-                safe_identifier: 'jdoe@example.com',
-                email_address_id: 'deadbeef',
-              } as SignInFactor,
-              {
-                strategy: 'email_code',
-                safe_identifier: 'jdoe@example.com',
-                email_address_id: 'deadbeef',
+                strategy: 'oauth_google',
               } as SignInFactor,
             ],
             firstFactorVerification: {
@@ -650,23 +555,25 @@ describe('<SignInFactorOne/>', () => {
             },
           } as unknown as SignInResource),
       );
-      (useSignInContext as jest.Mock).mockImplementation(() => ({
-        signUpUrl: 'http://test.host',
-        navigateAfterSignIn: mockNavigateAfterSignIn,
-        disabledStrategies: ['email_link'],
+
+      mocked(
+        // @ts-ignore
+        useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>,
+        true,
+      ).mockImplementation(() => ({
+        setSession: mockSetSession,
       }));
 
-      render(<SignInFactorOne />);
-      userEvent.click(screen.getByText('Try another method'));
-      expect(screen.queryByText('magic link')).toBeNull();
+      const { container } = render(<SignInFactorOne />);
+      expect(container.querySelector('.cl-otp-input')).toBeNull();
+      expect(screen.queryByText('Try another method')).not.toBeInTheDocument();
+      expect(screen.queryByText('Sign in with Google')).toBeInTheDocument();
     });
   });
 
   describe('error cases', () => {
     it('renders the loading screen', async () => {
-      (
-        useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>
-      ).mockImplementation(() => ({
+      (useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>).mockImplementation(() => ({
         authConfig: { singleSessionMode: false },
         displayConfig: {
           preferredSignInStrategy: undefined,
@@ -686,9 +593,7 @@ describe('<SignInFactorOne/>', () => {
     });
 
     it('renders the fallback screen', () => {
-      (
-        useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>
-      ).mockImplementation(() => ({
+      (useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>).mockImplementation(() => ({
         authConfig: { singleSessionMode: false },
         displayConfig: {
           preferredSignInStrategy: undefined,

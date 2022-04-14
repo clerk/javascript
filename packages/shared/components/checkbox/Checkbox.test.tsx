@@ -9,7 +9,10 @@ describe('<Checkbox/>', () => {
     const onChange = jest.fn();
 
     const { rerender } = render(
-      <Checkbox checked={false} handleChange={onChange} />,
+      <Checkbox
+        checked={false}
+        handleChange={onChange}
+      />,
     );
 
     // checkbox and parent label components
@@ -26,7 +29,12 @@ describe('<Checkbox/>', () => {
     });
 
     // // // checked=true should mean it's checked
-    rerender(<Checkbox checked handleChange={onChange} />);
+    rerender(
+      <Checkbox
+        checked
+        handleChange={onChange}
+      />,
+    );
     expect(checkbox).toHaveProperty('checked', true);
 
     // // Clicking from on -> off

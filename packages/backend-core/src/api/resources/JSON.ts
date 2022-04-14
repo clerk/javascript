@@ -24,11 +24,18 @@ export enum ObjectType {
   SmsMessage = 'sms_message',
   User = 'user',
   Web3Wallet = 'web3_wallet',
+  Token = 'token',
+  TotalCount = 'total_count',
 }
 
 export interface ClerkResourceJSON {
   object: ObjectType;
   id: string;
+}
+
+export interface TokenJSON {
+  object: ObjectType.Token;
+  jwt: string;
 }
 
 export interface AllowlistIdentifierJSON extends ClerkResourceJSON {
@@ -77,6 +84,7 @@ export interface FacebookAccountJSON extends ClerkResourceJSON {
   username?: string;
   public_metadata: Record<string, unknown>;
   label?: string;
+  verification?: VerificationJSON;
 }
 
 export interface GoogleAccountJSON extends ClerkResourceJSON {
@@ -90,6 +98,7 @@ export interface GoogleAccountJSON extends ClerkResourceJSON {
   username?: string;
   public_metadata: Record<string, unknown>;
   label?: string;
+  verification?: VerificationJSON;
 }
 
 export interface ExtAccountJSON extends ClerkResourceJSON {
@@ -105,12 +114,10 @@ export interface ExtAccountJSON extends ClerkResourceJSON {
   username?: string;
   public_metadata: Record<string, unknown>;
   label?: string;
+  verification?: VerificationJSON;
 }
 
-export type ExternalAccountJSON =
-  | FacebookAccountJSON
-  | GoogleAccountJSON
-  | ExtAccountJSON;
+export type ExternalAccountJSON = FacebookAccountJSON | GoogleAccountJSON | ExtAccountJSON;
 
 export interface IdentificationLinkJSON extends ClerkResourceJSON {
   type: string;
@@ -183,6 +190,7 @@ export interface SignUpJSON extends ClerkResourceJSON {
   has_password: boolean;
   name_full: string | null;
   created_session_id: string | null;
+  created_user_id: string | null;
   abandon_at: number | null;
 }
 

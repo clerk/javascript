@@ -4,9 +4,7 @@ import React from 'react';
 import { assertContextExists } from 'ui/contexts/utils';
 
 type CoreSessionContextValue = { value: SessionResource | null | undefined };
-export const CoreSessionContext = React.createContext<
-  CoreSessionContextValue | undefined
->(undefined);
+export const CoreSessionContext = React.createContext<CoreSessionContextValue | undefined>(undefined);
 CoreSessionContext.displayName = 'CoreSessionContext';
 
 type Opts = {
@@ -14,13 +12,9 @@ type Opts = {
 };
 
 export function useCoreSession(): SessionResource;
-export function useCoreSession(opts: {
-  avoidUndefinedCheck: true;
-}): SessionResource | null | undefined;
+export function useCoreSession(opts: { avoidUndefinedCheck: true }): SessionResource | null | undefined;
 
-export function useCoreSession(
-  opts?: Opts,
-): SessionResource | null | undefined {
+export function useCoreSession(opts?: Opts): SessionResource | null | undefined {
   const context = React.useContext(CoreSessionContext);
   assertContextExists(context, 'ClerkSessionContextProvider');
   if (!context.value && !!opts && !opts.avoidUndefinedCheck) {
@@ -29,16 +23,14 @@ export function useCoreSession(
   return context.value;
 }
 
-export function withCoreSessionSwitchGuard<P>(
-  Component: React.ComponentType<P>,
-): React.ComponentType<P> {
+export function withCoreSessionSwitchGuard<P>(Component: React.ComponentType<P>): React.ComponentType<P> {
   const Hoc = (props: P) => {
     const context = React.useContext(CoreSessionContext);
     assertContextExists(context, 'CoreSessionContextProvider');
     if (context.value === undefined) {
       return null;
     }
-    return <Component {...(props as P)} />;
+    return <Component {...props} />;
   };
 
   const displayName = Component.displayName || Component.name || 'Component';

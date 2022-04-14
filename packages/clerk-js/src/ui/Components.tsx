@@ -2,7 +2,7 @@
 /* disable sorting, clerk.scss should always be imported
 /* after dependencies from /shared */
 import { Modal } from '@clerk/shared/components/modal';
-import { camelToSnakeKeys } from '@clerk/shared/utils/object';
+import { deepCamelToSnake } from '@clerk/shared/utils/object';
 import type {
   Clerk,
   ClerkOptions,
@@ -11,50 +11,51 @@ import type {
   EnvironmentResource,
   SignInProps,
   SignUpProps,
-  UserButtonProps,
-  UserProfileProps,
 } from '@clerk/types';
-import { SIGN_UP_IN_PRESERVED_PARAMS } from 'core/constants';
+
+import { PRESERVED_QUERYSTRING_PARAMS } from 'core/constants';
 import { clerkUIErrorDOMElementNotFound } from 'core/errors';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import type {
-  SignInCtx,
-  SignUpCtx,
-  UserButtonCtx,
-  UserProfileCtx,
-} from 'ui/contexts';
 import { EnvironmentProvider, OptionsProvider } from 'ui/contexts';
 import { VirtualRouter } from 'ui/router';
 import { injectTheme } from 'utils/theming';
 
 import { CoreClerkContextWrapper } from './contexts/CoreClerkContextWrapper';
-import Portal from './Portal';
+import Portal from './portal';
 import { SignIn, SignInModal } from './signIn';
 import { SignUp, SignUpModal } from './signUp';
+import type { AvailableComponentCtx, AvailableComponentProps } from './types';
 import { UserButton } from './userButton';
 import { UserProfile } from './userProfile';
 
 import './styles/clerk.scss';
 
-export interface MountProps<T> {
+const AvailableComponents = {
+  SignIn,
+  SignUp,
+  UserButton,
+  UserProfile,
+};
+
+type AvailableComponentNames = keyof typeof AvailableComponents;
+
+interface HtmlNodeOptions {
   key: string;
-  props: T;
+  name: AvailableComponentNames;
+  props?: AvailableComponentProps;
 }
 
-export interface ComponentsProps {
+interface ComponentsProps {
   clerk: Clerk;
   environment: EnvironmentResource;
   options: ClerkOptions;
 }
 
-export interface ComponentsState {
+interface ComponentsState {
   signInModal: null | SignInProps;
   signUpModal: null | SignUpProps;
-  signInNodes: Map<HTMLDivElement, MountProps<SignInProps>>;
-  signUpNodes: Map<HTMLDivElement, MountProps<SignUpProps>>;
-  userProfileNodes: Map<HTMLDivElement, MountProps<UserProfileProps>>;
-  userButtonNodes: Map<HTMLDivElement, MountProps<UserButtonProps>>;
+  nodes: Map<HTMLDivElement, HtmlNodeOptions>;
 }
 
 let portalCt = 0;
@@ -65,28 +66,18 @@ function assertDOMElement(element: HTMLElement): asserts element {
   }
 }
 
-export default class Components extends React.Component<
-  ComponentsProps,
-  ComponentsState
-> {
+export default class Components extends React.Component<ComponentsProps, ComponentsState> {
   state: ComponentsState = {
     signInModal: null,
     signUpModal: null,
-    signInNodes: new Map<HTMLDivElement, MountProps<SignInProps>>(),
-    signUpNodes: new Map<HTMLDivElement, MountProps<SignUpProps>>(),
-    userProfileNodes: new Map<HTMLDivElement, MountProps<UserProfileProps>>(),
-    userButtonNodes: new Map<HTMLDivElement, MountProps<UserButtonProps>>(),
+    nodes: new Map(),
   };
 
-  static render(
-    clerk: Clerk,
-    environment: EnvironmentResource,
-    options: ClerkOptions,
-  ): Components {
+  static render(clerk: Clerk, environment: EnvironmentResource, options: ClerkOptions): Components {
     /**  Merge theme retrieved from the network with user supplied theme options. */
     injectTheme(
       environment.displayConfig.theme,
-      camelToSnakeKeys(options.theme || {}) as DeepPartial<DisplayThemeJSON>,
+      deepCamelToSnake(options.theme || {}) as DeepPartial<DisplayThemeJSON>,
     );
 
     const clerkRoot = document.createElement('DIV');
@@ -95,7 +86,11 @@ export default class Components extends React.Component<
 
     // eslint-disable-next-line react/no-render-return-value
     return ReactDOM.render<ComponentsProps, Components>(
-      <Components clerk={clerk} environment={environment} options={options} />,
+      <Components
+        clerk={clerk}
+        environment={environment}
+        options={options}
+      />,
       clerkRoot,
     );
   }
@@ -120,161 +115,52 @@ export default class Components extends React.Component<
     this.setState({ signUpModal: null });
   };
 
-  mountSignIn = (node: HTMLDivElement, nodeProps: SignInProps): void => {
+  mountComponent = ({
+    name,
+    node,
+    nodeClassName,
+    props,
+  }: {
+    name: AvailableComponentNames;
+    node: HTMLDivElement;
+    nodeClassName: string;
+    props?: AvailableComponentProps;
+  }): void => {
     assertDOMElement(node);
-    Components._addMountNodeClass(node, 'cl-sign-in');
-    this.setState(state => {
-      const signInNodes = new Map(state.signInNodes);
-      portalCt = portalCt + 1;
-      signInNodes.set(node, {
-        key: `p${portalCt}`,
-        props: nodeProps,
-      });
-      return { signInNodes };
+    Components._addMountNodeClass(node, nodeClassName);
+    this.setState(({ nodes }) => {
+      (portalCt = portalCt + 1),
+        nodes.set(node, {
+          key: `p${portalCt}`,
+          name,
+          props,
+        });
+      return { nodes };
     });
   };
 
-  unmountSignIn = (node: HTMLDivElement): void => {
-    this.setState(state => {
-      const newNodes = new Map(state.signInNodes);
-      newNodes.delete(node);
-      return { signInNodes: newNodes };
-    });
-  };
-
-  mountSignUp = (node: HTMLDivElement, signUpProps: SignUpProps): void => {
-    assertDOMElement(node);
-    Components._addMountNodeClass(node, 'cl-sign-up');
-    this.setState(state => {
-      const signUpNodes = new Map(state.signUpNodes);
-      portalCt = portalCt + 1;
-      signUpNodes.set(node, {
-        key: `p${portalCt}`,
-        props: signUpProps,
-      });
-      return { signUpNodes };
-    });
-  };
-
-  unmountSignUp = (node: HTMLDivElement): void => {
-    this.setState(state => {
-      const newNodes = new Map(state.signUpNodes);
-      newNodes.delete(node);
-      return { signUpNodes: newNodes };
-    });
-  };
-
-  mountUserProfile = (
-    node: HTMLDivElement,
-    userProfileProps: UserProfileProps,
-  ): void => {
-    assertDOMElement(node);
-    Components._addMountNodeClass(node, 'cl-user-profile');
-    this.setState(state => {
-      const userProfileNodes = new Map(state.userProfileNodes);
-      portalCt = portalCt + 1;
-      userProfileNodes.set(node, {
-        key: `p${portalCt}`,
-        props: userProfileProps,
-      });
-      return { userProfileNodes };
-    });
-  };
-
-  unmountUserProfile = (node: HTMLDivElement): void => {
-    this.setState(state => {
-      const newNodes = new Map(state.userProfileNodes);
-      newNodes.delete(node);
-      return { userProfileNodes: newNodes };
-    });
-  };
-
-  mountUserButton = (
-    node: HTMLDivElement,
-    userButtonProps: UserButtonProps,
-  ): void => {
-    assertDOMElement(node);
-    Components._addMountNodeClass(node, 'cl-user-button');
-    this.setState(state => {
-      const userButtonNodes = new Map(state.userButtonNodes);
-      portalCt = portalCt + 1;
-      userButtonNodes.set(node, {
-        key: `p${portalCt}`,
-        props: userButtonProps,
-      });
-      return { userButtonNodes };
-    });
-  };
-
-  unmountUserButton = (node: HTMLDivElement): void => {
-    this.setState(state => {
-      const newNodes = new Map(state.userButtonNodes);
-      newNodes.delete(node);
-      return { userButtonNodes: newNodes };
+  unmountComponent = ({ node }: { node: HTMLDivElement }): void => {
+    this.setState(({ nodes }) => {
+      nodes.delete(node);
+      return { nodes };
     });
   };
 
   render(): JSX.Element {
-    const {
-      signInModal,
-      signUpModal,
-      signInNodes,
-      signUpNodes,
-      userProfileNodes,
-      userButtonNodes,
-    } = this.state;
+    const { signInModal, signUpModal, nodes } = this.state;
 
-    const mountedSignInNodes = [...signInNodes.keys()].map(k => {
-      const data = signInNodes.get(k) as MountProps<SignInProps>;
-      return (
-        <Portal<SignInCtx>
-          componentName='SignIn'
-          key={data.key}
-          component={SignIn}
-          props={data.props}
-          node={k}
-          preservedParams={SIGN_UP_IN_PRESERVED_PARAMS}
-        />
-      );
-    });
+    const mountedNodes: JSX.Element[] = [];
 
-    const mountedSignUpNodes = [...signUpNodes.keys()].map(k => {
-      const data = signUpNodes.get(k) as MountProps<SignUpProps>;
-      return (
-        <Portal<SignUpCtx>
-          componentName='SignUp'
-          key={data.key}
-          component={SignUp}
-          props={data.props}
-          node={k}
-          preservedParams={SIGN_UP_IN_PRESERVED_PARAMS}
-        />
-      );
-    });
-
-    const mountedUserProfileNodes = [...userProfileNodes.keys()].map(k => {
-      const data = userProfileNodes.get(k) as MountProps<UserProfileProps>;
-      return (
-        <Portal<UserProfileCtx>
-          componentName='UserProfile'
-          key={data.key}
-          component={UserProfile}
-          props={data.props}
-          node={k}
-        />
-      );
-    });
-
-    const mountedUserButtonNodes = [...userButtonNodes.keys()].map(k => {
-      const data = userButtonNodes.get(k) as MountProps<UserButtonProps>;
-      return (
-        <Portal<UserButtonCtx>
-          componentName='UserButton'
-          key={data.key}
-          component={UserButton}
-          props={data.props}
-          node={k}
-        />
+    nodes.forEach(({ key, name, props }, node) => {
+      mountedNodes.push(
+        <Portal<AvailableComponentCtx>
+          componentName={name}
+          key={key}
+          component={AvailableComponents[name]}
+          props={props || {}}
+          node={node}
+          preservedParams={PRESERVED_QUERYSTRING_PARAMS}
+        />,
       );
     });
 
@@ -286,7 +172,7 @@ export default class Components extends React.Component<
         modalClassname='cl-modal-container'
       >
         <VirtualRouter
-          preservedParams={SIGN_UP_IN_PRESERVED_PARAMS}
+          preservedParams={PRESERVED_QUERYSTRING_PARAMS}
           onExternalNavigate={() => this.closeSignIn()}
           startPath='/sign-in'
         >
@@ -308,7 +194,7 @@ export default class Components extends React.Component<
         modalClassname='cl-modal-container'
       >
         <VirtualRouter
-          preservedParams={SIGN_UP_IN_PRESERVED_PARAMS}
+          preservedParams={PRESERVED_QUERYSTRING_PARAMS}
           onExternalNavigate={() => this.closeSignUp()}
           startPath='/sign-up'
         >
@@ -326,10 +212,7 @@ export default class Components extends React.Component<
       <CoreClerkContextWrapper clerk={this.props.clerk}>
         <EnvironmentProvider value={this.props.environment}>
           <OptionsProvider value={this.props.options}>
-            {mountedSignInNodes}
-            {mountedSignUpNodes}
-            {mountedUserProfileNodes}
-            {mountedUserButtonNodes}
+            {mountedNodes}
             {signInModal && mountedSignInModal}
             {signUpModal && mountedSignUpModal}
           </OptionsProvider>

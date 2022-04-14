@@ -1,28 +1,36 @@
 import React from 'react';
 
+import { assertWrappedByClerkProvider } from './assertHelpers';
+
 export interface StructureContextValue {
   guaranteedLoaded: boolean;
-  guaranteedUser: boolean;
 }
 
-// TODO: alternatively, split it into a context
-// per protected provider
 export const StructureContextStates = Object.freeze({
   noGuarantees: Object.freeze({
     guaranteedLoaded: false,
-    guaranteedUser: false,
   }),
   guaranteedLoaded: Object.freeze({
     guaranteedLoaded: true,
-    guaranteedUser: false,
-  }),
-  guaranteedAll: Object.freeze({
-    guaranteedLoaded: true,
-    guaranteedUser: true,
   }),
 });
 
-export const StructureContext = React.createContext<
-  StructureContextValue | undefined
->(undefined);
+export const StructureContext = React.createContext<StructureContextValue | undefined>(undefined);
+
 StructureContext.displayName = 'StructureContext';
+
+const useStructureContext = (): StructureContextValue => {
+  const structureCtx = React.useContext(StructureContext);
+  assertWrappedByClerkProvider(structureCtx);
+  return structureCtx;
+};
+
+export const LoadedGuarantee: React.FC = ({ children }) => {
+  const structure = useStructureContext();
+  if (structure.guaranteedLoaded) {
+    return <>{children}</>;
+  }
+  return (
+    <StructureContext.Provider value={StructureContextStates.guaranteedLoaded}>{children}</StructureContext.Provider>
+  );
+};

@@ -9,11 +9,7 @@ import type {
 } from '@clerk/types';
 import { unixEpochToDate } from 'utils/date';
 
-import {
-  BaseResource,
-  OrganizationInvitation,
-  OrganizationMembership,
-} from './internal';
+import { BaseResource, OrganizationInvitation, OrganizationMembership } from './internal';
 
 export class Organization extends BaseResource implements OrganizationResource {
   pathRoot = '/organizations';
@@ -40,25 +36,20 @@ export class Organization extends BaseResource implements OrganizationResource {
     return new Organization(json);
   }
 
-  update = async (
-    params: UpdateOrganizationParams,
-  ): Promise<OrganizationResource> => {
+  update = async (params: UpdateOrganizationParams): Promise<OrganizationResource> => {
     return this._basePatch({
       body: params,
     });
   };
 
-  getMemberships = async (
-    getMemberhipsParams?: GetMembershipsParams,
-  ): Promise<OrganizationMembership[]> => {
+  getMemberships = async (getMemberhipsParams?: GetMembershipsParams): Promise<OrganizationMembership[]> => {
     return await BaseResource._fetch({
       path: `/organizations/${this.id}/memberships`,
       method: 'GET',
       search: getMemberhipsParams as any,
     })
       .then(res => {
-        const members =
-          res?.response as unknown as OrganizationMembershipJSON[];
+        const members = res?.response as unknown as OrganizationMembershipJSON[];
         return members.map(member => new OrganizationMembership(member));
       })
       .catch(() => []);
@@ -70,11 +61,8 @@ export class Organization extends BaseResource implements OrganizationResource {
       method: 'GET',
     })
       .then(res => {
-        const pendingInvitations =
-          res?.response as unknown as OrganizationInvitationJSON[];
-        return pendingInvitations.map(
-          pendingInvitation => new OrganizationInvitation(pendingInvitation),
-        );
+        const pendingInvitations = res?.response as unknown as OrganizationInvitationJSON[];
+        return pendingInvitations.map(pendingInvitation => new OrganizationInvitation(pendingInvitation));
       })
       .catch(() => []);
   };
@@ -83,28 +71,19 @@ export class Organization extends BaseResource implements OrganizationResource {
     return await OrganizationInvitation.create(this.id, inviteMemberParams);
   };
 
-  updateMember = async ({
-    userId,
-    role,
-  }: UpdateMembershipParams): Promise<OrganizationMembership> => {
+  updateMember = async ({ userId, role }: UpdateMembershipParams): Promise<OrganizationMembership> => {
     return await BaseResource._fetch({
       method: 'PATCH',
       path: `/organizations/${this.id}/memberships/${userId}`,
       body: { role } as any,
-    }).then(
-      res =>
-        new OrganizationMembership(res?.response as OrganizationMembershipJSON),
-    );
+    }).then(res => new OrganizationMembership(res?.response as OrganizationMembershipJSON));
   };
 
   removeMember = async (userId: string): Promise<OrganizationMembership> => {
     return await BaseResource._fetch({
       method: 'DELETE',
       path: `/organizations/${this.id}/memberships/${userId}`,
-    }).then(
-      res =>
-        new OrganizationMembership(res?.response as OrganizationMembershipJSON),
-    );
+    }).then(res => new OrganizationMembership(res?.response as OrganizationMembershipJSON));
   };
 
   protected fromJSON(data: OrganizationJSON): this {

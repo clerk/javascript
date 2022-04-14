@@ -415,7 +415,7 @@ const session = await clerk.sessions.verifySession(sessionId, sessionToken);
 
 User operations are exposed by the `users` sub-api (`clerk.users`).
 
-#### getUserList()
+#### getUserList(params?: UserListParams)
 
 Retrieves user list:
 
@@ -423,7 +423,7 @@ Retrieves user list:
 const users = await clerk.users.getUserList();
 ```
 
-Retrieves user list that is ordered and filtered by the number of results:
+Retrieves user list that is ordered and filtered by the number of results. More params can be found at the [UserListParams](https://github.com/clerkinc/javascript/blob/main/packages/backend-core/src/api/collection/UserApi.ts#L25) definition.
 
 ```ts
 const sessions = await clerk.users.getUserList({
@@ -442,6 +442,15 @@ const sessions = await clerk.users.getUserList({ emailAddress, phoneNumber });
 
 If these filters are included, the response will contain only users that own any of these emails and/or phone numbers.
 
+To do a broader match through a list of fields you can use the `query` parameter which partially matches the fields: `userId`, `emailAddress`, `phoneNumber`, `username`, `web3Wallet`, `firstName` and `lastName`.
+
+```ts
+// Matches users with the string `test` matched in multiple user attributes.
+const usersMatchingTest = await clerk.users.getUserList({
+  query: 'test',
+});
+```
+
 #### getUser(userId)
 
 Retrieves a single user by their id, if the id is valid. Throws an error otherwise.
@@ -449,6 +458,16 @@ Retrieves a single user by their id, if the id is valid. Throws an error otherwi
 ```ts
 const userId = 'my-user-id';
 const user = await clerk.users.getUser(userId);
+```
+
+#### getCount(params?: UserCountParams)
+
+Retrieves the total number of users. Can be filtered down adding parameters of the type [UserCountParams](https://github.com/clerkinc/javascript/blob/main/packages/backend-core/src/api/collection/UserApi.ts#L16)
+
+```ts
+const totalUsers = await clerk.users.getCount();
+// Filter down
+const totalUsersMatchingTest = await clerk.users.getCount({ query: 'test' });
 ```
 
 #### createUser(params)
@@ -558,7 +577,7 @@ import { ClerkWithAuth } from '@clerk/clerk-sdk-node';
 app.use(ClerkWithAuth());
 ```
 
-The `ClerkWithAuth` middleware will set the Clerk session on the request object as `req.session` and then call the next middleware.
+The `ClerkWithAuth` middleware will set the Clerk session information on the request object as `req.auth` and then call the next middleware.
 
 You can then implement your own logic for handling a logged-in or logged-out user in your express endpoints or custom
 middleware, depending on whether your users are trying to access a public or protected resource.
@@ -641,12 +660,12 @@ with `withAuth`:
 import { withAuth, WithAuthProp } from '@clerk/clerk-sdk-node';
 ```
 
-Note: Since the request will be extended with a session property, the signature of your handler in TypeScript would be:
+Note: Since the request will be extended with the `auth` property, the signature of your handler in TypeScript would be:
 
 ```ts
 function handler(req: WithAuthProp<NextApiRequest>, res: NextApiResponse) {
-    if (req.session) {
-        // do something with session.userId
+    if (req.auth.sessionId) {
+        // do something with the auth object
     } else {
         // Respond with 401 or similar
     }
@@ -673,7 +692,7 @@ execution will never reach your handler:
 
 ```ts
 function handler(req: RequireAuthProp<NextApiRequest>, res: NextApiResponse) {
-    // do something with session.userId
+    // do something with the auth attributes
 }
 
 export requireAuth(handler, { clerk, onError });
@@ -713,6 +732,32 @@ export clerk.withAuth(handler);
 export clerk.requireAuth(handler);
 ```
 
+## Networkless token verification using the JWT verification key
+
+Clerk's JWT session token can be verified in a networkless manner using the JWT verification key. By default Clerk will use our JWKs endpoint to fetch and cache the key for any subsequent verification. If you use the `CLERK_JWT_KEY` environment variable to supply the key, Clerk will pick it up and do networkless verification for session tokens using it.
+
+To learn more about Clerk's token verification you can find more information on our [documentation](https://docs.clerk.dev/popular-guides/validating-session-tokens).
+
+The value of the JWT verification key can also be added on the instance level or on any single middleware call e.g.
+
+```ts
+import { withAuth } from '@clerk/clerk-sdk-node';
+
+const handler = (req, res) => {
+  // ...
+};
+
+withAuth(handler, { jwtKey: 'my_clerk_public_key' });
+```
+
+Custom instance initialization:
+
+```ts
+import Clerk from '@clerk/clerk-sdk-node/instance';
+
+const clerk = new Clerk({ jwtKey: 'my_clerk_public_key' });
+```
+
 ## Validate the Authorized Party of a session token
 
 Clerk's JWT session token, contains the azp claim, which equals the Origin of the request during token generation. You can provide the middlewares with a list of whitelisted origins to verify against, to protect your application of the subdomain cookie leaking attack. You can find an example below:
@@ -733,7 +778,7 @@ app.use(ClerkExpressRequireAuth({ authorizedParties }));
 const authorizedParties = ['http://localhost:3000', 'https://example.com']
 
 function handler(req: RequireAuthProp<NextApiRequest>, res: NextApiResponse) {
-  // do something with session.userId
+  // do something with the auth attribute
 }
 
 export requireAuth(handler, { authorizedParties });

@@ -10,7 +10,7 @@ const session = {
   publicUserData: {
     firstName: 'John',
     lastName: 'Doe',
-    profileImageUrl: 'http://test.host/profile.png',
+    profileImageUrl: 'https://images.clerktest.host/profile.png',
     primaryEmailAddress: 'jdoe@example.com',
   },
 } as any as SessionResource;
@@ -78,15 +78,12 @@ const multiSessionResource = {
 
 describe('ActiveAccountsManager', () => {
   it('renders a switcher with all the available sessions', () => {
-    mocked(
-      useEnvironment as jest.Mock<EnvironmentResource>,
-      true,
-    ).mockImplementation(() => multiSessionResource as EnvironmentResource);
+    mocked(useEnvironment as jest.Mock<EnvironmentResource>, true).mockImplementation(() => multiSessionResource);
 
     const tree = renderJSON(
       <ActiveAccountsManager
         sessions={sessions}
-        navigateAfterSignOutAll={noop}
+        navigateAfterSignOut={noop}
         navigateAfterSwitchSession={noop}
         userProfileUrl={'user_profile_url'}
         signInUrl={'sign_in_url'}
@@ -96,16 +93,13 @@ describe('ActiveAccountsManager', () => {
   });
 
   it('does not render active accounts with only a single session', () => {
-    mocked(
-      useEnvironment as jest.Mock<EnvironmentResource>,
-      true,
-    ).mockImplementation(() => multiSessionResource as EnvironmentResource);
+    mocked(useEnvironment as jest.Mock<EnvironmentResource>, true).mockImplementation(() => multiSessionResource);
 
     const tree = renderJSON(
       <ActiveAccountsManager
         showActiveAccountButtons={false}
         sessions={[session]}
-        navigateAfterSignOutAll={noop}
+        navigateAfterSignOut={noop}
         navigateAfterSwitchSession={noop}
         userProfileUrl={'user_profile_url'}
         signInUrl={'sign_in_url'}
@@ -115,16 +109,13 @@ describe('ActiveAccountsManager', () => {
   });
 
   it('renders all active sessions even in single session resource mode', () => {
-    mocked(
-      useEnvironment as jest.Mock<EnvironmentResource>,
-      true,
-    ).mockImplementation(() => singleSessionResource as EnvironmentResource);
+    mocked(useEnvironment as jest.Mock<EnvironmentResource>, true).mockImplementation(() => singleSessionResource);
 
     const tree = renderJSON(
       <ActiveAccountsManager
         showActiveAccountButtons={false}
         sessions={[session]}
-        navigateAfterSignOutAll={noop}
+        navigateAfterSignOut={noop}
         navigateAfterSwitchSession={noop}
         userProfileUrl={'user_profile_url'}
         signInUrl={'sign_in_url'}

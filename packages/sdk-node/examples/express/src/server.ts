@@ -17,7 +17,7 @@ app.get(
   '/',
   ClerkExpressWithAuth(),
   (req: WithAuthProp<Request>, res: Response) => {
-    res.json(req.session || 'No session detected');
+    res.json(req.auth);
   }
 );
 
@@ -26,7 +26,7 @@ app.get(
   '/require-session',
   ClerkExpressRequireAuth(),
   (req: RequireAuthProp<Request>, res) => {
-    res.json(req.session);
+    res.json(req.auth);
   }
 );
 

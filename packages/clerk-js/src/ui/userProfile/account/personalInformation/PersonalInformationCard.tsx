@@ -12,8 +12,7 @@ export const PersonalInformationCard = (): JSX.Element | null => {
     attributes: { first_name, last_name },
   } = userSettings;
 
-  const hasAtLeastOneAttributeEnable =
-    first_name?.enabled || last_name?.enabled;
+  const hasAtLeastOneAttributeEnable = first_name?.enabled || last_name?.enabled;
 
   if (!hasAtLeastOneAttributeEnable) {
     return null;

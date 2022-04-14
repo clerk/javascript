@@ -1,10 +1,4 @@
-import {
-  fireEvent,
-  mocked,
-  render,
-  renderJSON,
-  screen,
-} from '@clerk/shared/testUtils';
+import { fireEvent, mocked, render, renderJSON, screen } from '@clerk/shared/testUtils';
 import { EnvironmentResource } from '@clerk/types';
 import * as React from 'react';
 import { PartialDeep } from 'type-fest';
@@ -20,10 +14,7 @@ jest.mock('ui/contexts/EnvironmentContext', () => {
 
 describe('<Logo/>', () => {
   it('does not render the image logo while loading', () => {
-    mocked(
-      useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>,
-      true,
-    ).mockImplementation(() => ({
+    mocked(useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>, true).mockImplementation(() => ({
       displayConfig: {
         applicationName: 'Foo',
         logoImage: {
@@ -41,10 +32,7 @@ describe('<Logo/>', () => {
   });
 
   it('renders the image logo', () => {
-    mocked(
-      useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>,
-      true,
-    ).mockImplementation(() => ({
+    mocked(useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>, true).mockImplementation(() => ({
       displayConfig: {
         applicationName: 'Foo',
         logoImage: {
@@ -57,10 +45,7 @@ describe('<Logo/>', () => {
   });
 
   it('renders the text logo', () => {
-    mocked(
-      useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>,
-      true,
-    ).mockImplementation(() => ({
+    mocked(useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>, true).mockImplementation(() => ({
       displayConfig: {
         applicationName: 'Foo',
       },

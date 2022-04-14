@@ -15,7 +15,10 @@ export const InputWithIcon: React.FC<InputWithIconProps> = React.forwardRef(
     return (
       <div className={cn(styles.container, styles[position])}>
         <div className={styles.iconContainer}>{Icon}</div>
-        <Input ref={ref} {...rest} />
+        <Input
+          ref={ref}
+          {...rest}
+        />
       </div>
     );
   },

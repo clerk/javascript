@@ -50,16 +50,19 @@ jest.mock('ui/contexts/CoreUserContext', () => {
 
 jest.mock('ui/contexts/EnvironmentContext', () => {
   return {
-    useEnvironment: jest.fn(() => ({
-      userSettings: {
-        attributes: {
-          email_address: {
-            enabled: true,
-            verifications: ['email_link'],
-          }
-        }
-      }
-    }) as PartialDeep<EnvironmentResource>),
+    useEnvironment: jest.fn(
+      () =>
+        ({
+          userSettings: {
+            attributes: {
+              email_address: {
+                enabled: true,
+                verifications: ['email_link'],
+              },
+            },
+          },
+        } as PartialDeep<EnvironmentResource>),
+    ),
   };
 });
 

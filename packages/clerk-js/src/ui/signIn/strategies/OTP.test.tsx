@@ -31,12 +31,16 @@ describe('<OTP/>', () => {
 
   const factor = {
     strategy: 'phone_code',
-    safe_identifier: 'jdoe@example.com',
+    safeIdentifier: 'jdoe@example.com',
   } as SignInFactor;
 
   it('renders the OTP form component', async () => {
     const tree = renderJSON(
-      <OTP verifyCode={verify => verify()} factor={factor} code={code} />,
+      <OTP
+        verifyCode={verify => verify()}
+        factor={factor}
+        code={code}
+      />,
     );
     await jest.runAllTimers();
     expect(tree).toMatchSnapshot();
@@ -45,7 +49,13 @@ describe('<OTP/>', () => {
   it('renders the OTP form, enters a password verifies the code', async () => {
     const mockVerify = jest.fn(verify => verify());
 
-    render(<OTP verifyCode={mockVerify} factor={factor} code={code} />);
+    render(
+      <OTP
+        verifyCode={mockVerify}
+        factor={factor}
+        code={code}
+      />,
+    );
 
     await waitFor(() => {
       expect(mockVerify).toHaveBeenCalledTimes(1);

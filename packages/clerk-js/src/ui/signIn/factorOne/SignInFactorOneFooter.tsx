@@ -6,9 +6,7 @@ type SignInFactorOneFooterProps = {
   handleAnotherMethodClicked: () => void;
 };
 
-export function SignInFactorOneFooter({
-  handleAnotherMethodClicked,
-}: SignInFactorOneFooterProps): JSX.Element {
+export function SignInFactorOneFooter({ handleAnotherMethodClicked }: SignInFactorOneFooterProps): JSX.Element {
   return (
     <>
       <Footer>

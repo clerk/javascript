@@ -50,29 +50,39 @@ describe('<All/>', () => {
     },
     {
       strategy: 'email_code',
-      safe_identifier: 'j***@e*****.com',
-      email_address_id: '123',
+      safeIdentifier: 'j***@e*****.com',
+      emailAddressId: '123',
     },
     {
       strategy: 'phone_code',
-      safe_identifier: '+1*********9',
-      phone_number_id: '456',
+      safeIdentifier: '+1*********9',
+      phoneNumberId: '456',
     },
     {
       strategy: 'email_link',
-      safe_identifier: '+1*********9',
-      email_address_id: '456',
+      safeIdentifier: '+1*********9',
+      emailAddressId: '456',
     },
   ];
 
   it('renders the All sign in methods', async () => {
-    const tree = renderJSON(<All factors={factors} selectFactor={jest.fn()} />);
+    const tree = renderJSON(
+      <All
+        factors={factors}
+        selectFactor={jest.fn()}
+      />,
+    );
     expect(tree).toMatchSnapshot();
   });
 
   it('triggers selectStrategy callback on click', async () => {
     const mockSelectStrategy = jest.fn();
-    render(<All factors={factors} selectFactor={mockSelectStrategy} />);
+    render(
+      <All
+        factors={factors}
+        selectFactor={mockSelectStrategy}
+      />,
+    );
 
     userEvent.click(screen.getByText('Sign in with your password'));
     userEvent.click(screen.getByText('Email code to j***@e*****.com'));

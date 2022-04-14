@@ -26,12 +26,6 @@ export function ExpansionIcon({
 }: ExpansionIconProps): JSX.Element {
   const Icon = CustomExpansionIcon || CaretIcon;
   return (
-    <Icon
-      className={cn(
-        styles.caret,
-        { [transitionClassName || styles.activeCaret]: isExpanded },
-        iconClassName,
-      )}
-    />
+    <Icon className={cn(styles.caret, { [transitionClassName || styles.activeCaret]: isExpanded }, iconClassName)} />
   );
 }

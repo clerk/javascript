@@ -14,7 +14,12 @@ describe('<Menu/>', () => {
   ];
 
   it('renders the menu options', () => {
-    const tree = renderJSON(<Menu options={options} className='foo' />);
+    const tree = renderJSON(
+      <Menu
+        options={options}
+        className='foo'
+      />,
+    );
     expect(tree).toMatchSnapshot();
   });
 

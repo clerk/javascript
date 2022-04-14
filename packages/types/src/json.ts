@@ -2,27 +2,17 @@
  * Currently representing API DTOs in their JSON form.
  */
 
-import { OAuthStrategy } from './oauth';
+import { DisplayConfigJSON } from './displayConfig';
+import { OAuthProvider } from './oauth';
 import { OrganizationInvitationStatus } from './organizationInvitation';
 import { MembershipRole } from './organizationMembership';
 import { SessionStatus } from './session';
-import {
-  PreferredSignInStrategy,
-  SignInFactor,
-  SignInIdentifier,
-  SignInStatus,
-  UserData,
-} from './signIn';
+import { SignInFirstFactor, SignInJSON, SignInSecondFactor } from './signIn';
 import { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUp';
-import {
-  BoxShadow,
-  Color,
-  EmUnit,
-  FontFamily,
-  FontWeight,
-  HexColor,
-} from './theme';
+import { OAuthStrategy } from './strategies';
+import { BoxShadow, Color, EmUnit, FontFamily, FontWeight, HexColor } from './theme';
 import { UserSettingsJSON } from './userSettings';
+import { CamelToSnake } from './utils';
 import { VerificationStatus } from './verification';
 
 export interface ClerkResourceJSON {
@@ -50,29 +40,6 @@ export interface DisplayThemeJSON {
   accounts: {
     background_color: Color;
   };
-}
-
-export interface DisplayConfigJSON {
-  object: 'display_config';
-  id: string;
-  instance_environment_type: string;
-  application_name: string;
-  theme: DisplayThemeJSON;
-  preferred_sign_in_strategy: PreferredSignInStrategy;
-  logo_image: ImageJSON;
-  favicon_image: ImageJSON;
-  backend_host: string;
-  home_url: string;
-  sign_in_url: string;
-  sign_up_url: string;
-  user_profile_url: string;
-  after_sign_in_url: string;
-  after_sign_up_url: string;
-  after_sign_out_url: string;
-  after_sign_out_one_url: string;
-  after_sign_out_all_url: string;
-  after_switch_session_url: string;
-  branded: boolean;
 }
 
 export interface ImageJSON {
@@ -119,6 +86,7 @@ export interface SignUpJSON extends ClerkResourceJSON {
   has_password: boolean;
   unsafe_metadata: Record<string, unknown>;
   created_session_id: string | null;
+  created_user_id: string | null;
   abandon_at: number | null;
   verifications: SignUpVerificationsJSON | null;
 }
@@ -135,21 +103,6 @@ export interface SessionJSON extends ClerkResourceJSON {
   public_user_data: PublicUserDataJSON;
   created_at: number;
   updated_at: number;
-}
-
-export interface SignInJSON extends ClerkResourceJSON {
-  object: 'sign_in';
-  id: string;
-  status: SignInStatus;
-  supported_identifiers: SignInIdentifier[];
-  supported_external_accounts: OAuthStrategy[];
-  identifier: string;
-  user_data: UserData;
-  supported_first_factors: SignInFactor[];
-  supported_second_factors: SignInFactor[];
-  first_factor_verification: VerificationJSON | null;
-  second_factor_verification: VerificationJSON | null;
-  created_session_id: string | null;
 }
 
 export interface EmailAddressJSON extends ClerkResourceJSON {
@@ -181,9 +134,26 @@ export interface Web3WalletJSON extends ClerkResourceJSON {
   verification: VerificationJSON | null;
 }
 
+export interface ExternalAccountJSON extends ClerkResourceJSON {
+  object: 'external_account';
+  provider: OAuthProvider;
+  identification_id: string;
+  provider_user_id: string;
+  approved_scopes: string;
+  email_address: string;
+  first_name: string;
+  last_name: string;
+  avatar_url: string;
+  username: string;
+  public_metadata: Record<string, unknown>;
+  label: string;
+  verification?: VerificationJSON;
+}
+
 export interface UserJSON extends ClerkResourceJSON {
   object: 'user';
   id: string;
+  external_id: string;
   primary_email_address_id: string;
   primary_phone_number_id: string;
   primary_web3_wallet_id: string;
@@ -200,6 +170,7 @@ export interface UserJSON extends ClerkResourceJSON {
   last_name: string;
   public_metadata: Record<string, unknown>;
   unsafe_metadata: Record<string, unknown>;
+  last_sign_in_at: number | null;
   updated_at: number;
   created_at: number;
 }
@@ -270,49 +241,6 @@ export interface SessionActivityJSON extends ClerkResourceJSON {
   is_mobile?: boolean;
 }
 
-// TODO: Generalize external account JSON payload to simplify type declarations
-export type ExternalAccountJSON =
-  | {
-      object: 'google_account';
-      id: string;
-      google_id: string;
-      approved_scopes: string;
-      email_address: string;
-      given_name: string;
-      family_name: string;
-      picture: string;
-      username?: string;
-      public_metadata: Record<string, unknown>;
-      label?: string;
-    }
-  | {
-      object: 'facebook_account';
-      id: string;
-      facebook_id: string;
-      approved_scopes: string;
-      email_address: string;
-      first_name: string;
-      last_name: string;
-      picture: string;
-      username?: string;
-      public_metadata: Record<string, unknown>;
-      label?: string;
-    }
-  | {
-      object: 'external_account';
-      provider: string;
-      identification_id: string;
-      provider_user_id: string;
-      approved_scopes: string;
-      email_address: string;
-      first_name: string;
-      last_name: string;
-      avatar_url: string;
-      username?: string;
-      public_metadata: Record<string, unknown>;
-      label?: string;
-    };
-
 export interface OrganizationJSON extends ClerkResourceJSON {
   object: 'organization';
   id: string;
@@ -341,3 +269,12 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   created_at: number;
   updated_at: number;
 }
+
+export interface UserDataJSON {
+  first_name?: string;
+  last_name?: string;
+  profile_image_url?: string;
+}
+
+export type SignInFirstFactorJSON = CamelToSnake<SignInFirstFactor>;
+export type SignInSecondFactorJSON = CamelToSnake<SignInSecondFactor>;

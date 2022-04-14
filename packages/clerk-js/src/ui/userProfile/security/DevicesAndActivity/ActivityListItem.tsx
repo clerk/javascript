@@ -14,11 +14,7 @@ export function ActivityListItem(props: {
   sessionWithActivities: SessionWithActivitiesResource;
   currentSession: SessionResource | null | undefined;
 }): JSX.Element {
-  const {
-    latestActivity: sessionActivity,
-    lastActiveAt,
-    id,
-  } = props.sessionWithActivities;
+  const { latestActivity: sessionActivity, lastActiveAt, id } = props.sessionWithActivities;
   const isCurrentSession = id === props.currentSession?.id;
 
   return (
@@ -44,10 +40,7 @@ export function ActivityListItem(props: {
   );
 }
 
-function PopoverMenu(props: {
-  isCurrent: boolean;
-  sessionWithActivities: SessionWithActivitiesResource;
-}) {
+function PopoverMenu(props: { isCurrent: boolean; sessionWithActivities: SessionWithActivitiesResource }) {
   if (props.isCurrent) {
     return null;
   }
@@ -90,7 +83,14 @@ export function ActivityListItemSkeleton(): JSX.Element {
             viewBox='0 0 84 86'
             id='skeleton-device'
           >
-            <rect x='0' y='11' rx='4' ry='4' width='84' height='64' />
+            <rect
+              x='0'
+              y='11'
+              rx='4'
+              ry='4'
+              width='84'
+              height='64'
+            />
           </SkeletonLoader>
         </div>
       }
@@ -101,10 +101,38 @@ export function ActivityListItemSkeleton(): JSX.Element {
         viewBox='0 0 148 86'
         id='skeleton-text'
       >
-        <rect x='0' y='0' rx='2' ry='2' width='64' height='18' />
-        <rect x='0' y='24' rx='2' ry='2' width='148' height='18' />
-        <rect x='0' y='47' rx='2' ry='2' width='117' height='18' />
-        <rect x='0' y='70' rx='2' ry='2' width='53' height='18' />
+        <rect
+          x='0'
+          y='0'
+          rx='2'
+          ry='2'
+          width='64'
+          height='18'
+        />
+        <rect
+          x='0'
+          y='24'
+          rx='2'
+          ry='2'
+          width='148'
+          height='18'
+        />
+        <rect
+          x='0'
+          y='47'
+          rx='2'
+          ry='2'
+          width='117'
+          height='18'
+        />
+        <rect
+          x='0'
+          y='70'
+          rx='2'
+          ry='2'
+          width='53'
+          height='18'
+        />
       </SkeletonLoader>
     </List.Item>
   );

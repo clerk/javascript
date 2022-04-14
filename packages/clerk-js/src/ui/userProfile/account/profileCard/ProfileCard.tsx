@@ -1,4 +1,5 @@
 import { List } from '@clerk/shared/components/list';
+import { VerificationStatusTag } from '@clerk/shared/components/tag';
 import { TitledCard } from '@clerk/shared/components/titledCard';
 import type { UserResource } from '@clerk/types';
 import { ExternalAccountResource } from '@clerk/types';
@@ -50,19 +51,21 @@ export function ProfileCard(): JSX.Element {
     </List.Item>
   );
 
-  const buildConnectedAccountsRow = () => (
-    <List.Item
-      className='cl-list-item'
-      key='connected-accounts'
-      itemTitle='Connected accounts'
-      onClick={() => navigate('connected-accounts')}
-    >
-      {user.externalAccounts.length === 0 ? (
-        <div className='cl-empty-list-item'>None</div>
-      ) : (
-        <div className='cl-list-item-entry'>
-          {user.externalAccounts.map(
-            (externalAccount: ExternalAccountResource) => (
+  const buildConnectedAccountsRow = () => {
+    const verifiedAccounts = user.verifiedExternalAccounts;
+
+    return (
+      <List.Item
+        className='cl-list-item'
+        key='connected-accounts'
+        itemTitle='Connected accounts'
+        onClick={() => navigate('connected-accounts')}
+      >
+        {verifiedAccounts.length === 0 ? (
+          <div className='cl-empty-list-item'>None</div>
+        ) : (
+          <div className='cl-list-item-entry'>
+            {verifiedAccounts.map((externalAccount: ExternalAccountResource) => (
               <div key={externalAccount.id}>
                 <img
                   alt={externalAccount.providerTitle()}
@@ -70,13 +73,18 @@ export function ProfileCard(): JSX.Element {
                   className='cl-left-icon-wrapper'
                 />
                 {externalAccount.emailAddress}
+
+                <VerificationStatusTag
+                  className='cl-tag'
+                  status={externalAccount.verification?.status || 'verified'}
+                />
               </div>
-            ),
-          )}
-        </div>
-      )}
-    </List.Item>
-  );
+            ))}
+          </div>
+        )}
+      </List.Item>
+    );
+  };
 
   const avatarRow = (
     <List.Item

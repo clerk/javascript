@@ -2,9 +2,7 @@ import { renderJSON } from '@clerk/shared/testUtils';
 import { EmailAddressResource, UserResource } from '@clerk/types';
 import * as React from 'react';
 import { PartialDeep } from 'type-fest';
-import {
-  useEnvironment
-} from 'ui/contexts';
+import { useEnvironment } from 'ui/contexts';
 
 import { ProfileCard } from './ProfileCard';
 
@@ -34,7 +32,9 @@ jest.mock('ui/contexts', () => {
         ],
         phoneNumbers: [],
         externalAccounts: [],
-        web3Wallets: [{ web3Wallet: '0x123456789' }]
+        verifiedExternalAccounts: [],
+        unverifiedExternalAccounts: [],
+        web3Wallets: [{ web3Wallet: '0x123456789' }],
       };
     },
     useCoreClerk: jest.fn(),
@@ -46,19 +46,19 @@ jest.mock('ui/contexts', () => {
   userSettings: {
     attributes: {
       email_address: {
-        enabled: true
+        enabled: true,
       },
       phone_number: {
-        enabled: true
+        enabled: true,
       },
       username: {
-        enabled: false
+        enabled: false,
       },
       web3_wallet: {
-        enabled: false
-      }
-    }
-  }
+        enabled: false,
+      },
+    },
+  },
 }));
 
 describe('<ProfileCard/>', () => {
@@ -71,25 +71,25 @@ describe('<ProfileCard/>', () => {
     expect(tree).toMatchSnapshot();
   });
 
-  it('renders the ProfileCard ', () => {
+  it('renders the ProfileCard with enabled settings', () => {
     (useEnvironment as jest.Mock).mockImplementation(() => ({
       displayConfig: {},
       userSettings: {
         attributes: {
           email_address: {
-            enabled: true
+            enabled: true,
           },
           phone_number: {
-            enabled: true
+            enabled: true,
           },
           username: {
-            enabled: false
+            enabled: false,
           },
           web3_wallet: {
-            enabled: true
-          }
-        }
-      }
+            enabled: true,
+          },
+        },
+      },
     }));
 
     const tree = renderJSON(<ProfileCard />);

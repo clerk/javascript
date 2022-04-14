@@ -12,6 +12,11 @@ export interface ClerkProps {
   id: Nullable<string>;
 }
 
+export interface TokenProps extends ClerkProps {
+  id: null;
+  jwt: string;
+}
+
 export interface AllowlistIdentifierProps extends ClerkProps {
   identifier: string;
   createdAt: number;
@@ -54,6 +59,7 @@ export interface ExternalAccountProps extends ClerkProps {
   username: Nullable<string>;
   publicMetadata: Record<string, unknown>;
   label: Nullable<string>;
+  verification?: Nullable<VerificationProps>;
 }
 
 export interface IdentificationLinkProps extends ClerkProps {
@@ -115,6 +121,7 @@ export interface SignUpProps {
   externalAccount: any;
   hasPassword: boolean;
   createdSessionId: string | null;
+  createdUserId: string | null;
   abandonAt: number | null;
 }
 
@@ -127,6 +134,7 @@ export interface SMSMessageProps extends ClerkProps {
 }
 
 export interface UserProps extends ClerkProps {
+  externalId: Nullable<string>;
   username: Nullable<string>;
   firstName: Nullable<string>;
   lastName: Nullable<string>;
@@ -137,12 +145,10 @@ export interface UserProps extends ClerkProps {
   primaryPhoneNumberId: Nullable<string>;
   passwordEnabled: boolean;
   twoFactorEnabled: boolean;
-  // emailAddresses: EmailAddressProps[];
-  // phoneNumbers: PhoneNumberProps[];
-  // externalAccounts: GoogleAccountProps[];
   publicMetadata: Record<string, unknown>;
   privateMetadata: Record<string, unknown>;
   unsafeMetadata: Record<string, unknown>;
+  lastSignInAt: Nullable<number>;
   createdAt: Nullable<number>;
   updatedAt: Nullable<number>;
 }

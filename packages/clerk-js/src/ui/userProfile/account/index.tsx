@@ -15,10 +15,7 @@ type AccountRoutesProps = {
   index?: boolean;
 };
 
-export function AccountRoutes({
-  standAlone = false,
-  index = false,
-}: AccountRoutesProps): JSX.Element {
+export function AccountRoutes({ standAlone = false, index = false }: AccountRoutesProps): JSX.Element {
   return (
     <Route
       path={standAlone ? 'profile' : 'account'}

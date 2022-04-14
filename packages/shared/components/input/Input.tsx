@@ -44,18 +44,7 @@ export type InputProps = {
   React.AriaAttributes;
 
 export const Input: React.FC<InputProps> = React.forwardRef(
-  (
-    {
-      type = 'text',
-      name,
-      value,
-      handleChange,
-      className,
-      hasError,
-      ...rest
-    }: InputProps,
-    ref,
-  ) => {
+  ({ type = 'text', name, value, handleChange, className, hasError, ...rest }: InputProps, ref) => {
     const { onChange } = useInput(handleChange);
 
     return (
