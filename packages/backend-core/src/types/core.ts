@@ -20,8 +20,6 @@ export type VerifySessionTokenOptions = {
 export type BuildAuthenticatedStateOptions = {
   jwtKey?: string;
   authorizedParties?: string[];
-  fetchInterstitial: () => Promise<string>;
-  tokenType: TokenType;
 };
 
 export type TokenType = 'cookie' | 'header';
@@ -29,7 +27,6 @@ export type TokenType = 'cookie' | 'header';
 export type AuthState = {
   status: AuthStatus;
   session?: Session;
-  interstitial?: string;
   sessionClaims?: JWTPayload;
   /* Error reason for signed-out and interstitial states. Would probably be set on the `Auth-Result` response header. */
   errorReason?: AuthErrorReason;
@@ -58,8 +55,6 @@ export type AuthStateParams = {
   userAgent?: string | null;
   /* A list of authorized parties to validate against the session token azp claim */
   authorizedParties?: string[];
-  /* HTTP utility for fetching a text/html string */
-  fetchInterstitial: () => Promise<string>;
   /* Value corresponding to the JWT verification key */
   jwtKey?: string;
 };

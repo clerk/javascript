@@ -8,14 +8,23 @@ import {
   BuildAuthenticatedStateOptions,
   JWT,
   JWTPayload,
+  TokenType,
   TokenVerificationErrorReason,
   VerifySessionTokenOptions,
 } from './types';
 import { parse } from './util/base64url';
-import { isDevelopmentOrStaging, isProduction } from './util/clerkApiKey';
 import { mapErrorReasonResponse, TokenVerificationError } from './util/errors';
+import {
+  crossOriginRequestWithoutCors,
+  hasClientUatButCookieIsMissingInProd,
+  isNormalSignedOutState,
+  nonBrowserRequestInDevRule,
+  potentialFirstLoadInDevWhenUATMissing,
+  potentialFirstRequestOnProductionEnvironment,
+  potentialRequestAfterSignInOrOurFromClerkHostedUiInDev,
+  runInterstitialRules,
+} from './util/interstitialRules';
 import { checkClaims, isExpired } from './util/jwt';
-import { checkCrossOrigin } from './util/request';
 
 export const API_KEY = process.env.CLERK_API_KEY || '';
 
@@ -49,16 +58,9 @@ export class Base {
     this.loadCryptoKeyFunction = loadCryptoKeyFunction;
   }
 
-  /**
-   *
+  /*
    * Verify the session token retrieved using the public key.
-   *
    * The public key will be supplied in the form of CryptoKey or will be loaded from the CLERK_JWT_KEY environment variable.
-   *
-   * @param {string} token
-   * @param {VerifySessionTokenOptions} verifySessionTokenOptions
-   * @return {Promise<JWTPayload>} claims
-   * @throws {TokenVerificationError|Error}
    */
   verifySessionToken = async (
     token: string,
@@ -88,14 +90,13 @@ export class Base {
   };
 
   /**
-   *
-   * @param {string} token Clerk JWT verification token
+   * @param jwt Clerk JWT verification token
    * Modify the RSA public key from the Clerk PEM supplied and return a contructed CryptoKey.
    * You will find that at your application dashboard (https://dashboard.clerk.dev) under Settings ->  API keys
    *
    */
-  loadCryptoKey = async (key?: string): Promise<CryptoKey> => {
-    if (!key) {
+  loadCryptoKey = async (jwt?: string): Promise<CryptoKey> => {
+    if (!jwt) {
       throw new TokenVerificationError(TokenVerificationErrorReason.JWTKeyMissing);
     }
 
@@ -109,7 +110,7 @@ export class Base {
     // JWK https://datatracker.ietf.org/doc/html/rfc7517
     const jwk = {
       kty: 'RSA',
-      n: key
+      n: jwt
         .slice(RSA_PREFIX.length, RSA_SUFFIX.length * -1)
         .replace(/\+/g, '-')
         .replace(/\//g, '_'),
@@ -169,172 +170,65 @@ export class Base {
   };
 
   /**
-   *
    * Retrieve the authentication state for a request by using client specific information.
    *
-   * @throws {Error} Token expired, Wrong azp, Malformed token. All of these cases should result in signed out state.
-   *
-   * @param {AuthStateParams}
-   * @returns {Promise<AuthState>}
+   * @throws Token expired, Wrong azp, Malformed token. All of these cases should result in signed out state.
    */
-  getAuthState = async ({
-    cookieToken,
-    clientUat,
-    headerToken,
-    origin,
-    host,
-    forwardedHost,
-    forwardedPort,
-    forwardedProto,
-    referrer,
-    userAgent,
-    authorizedParties,
-    fetchInterstitial,
-    jwtKey,
-  }: AuthStateParams): Promise<AuthState> => {
-    if (headerToken) {
-      return this.buildAuthenticatedState(headerToken, {
-        jwtKey,
-        authorizedParties,
-        fetchInterstitial,
-        tokenType: 'header',
-      });
-    }
-
-    const isDevelopmentKey = isDevelopmentOrStaging(API_KEY);
-    const isProductionKey = isProduction(API_KEY);
-
-    // In development or staging environments only, based on the request's
-    // User Agent, detect non-browser requests (e.g. scripts). If there
-    // is no Authorization header, consider the user as signed out and
-    // prevent interstitial rendering
-    if (isDevelopmentKey && !userAgent?.startsWith('Mozilla/')) {
-      return { status: AuthStatus.SignedOut, errorReason: AuthErrorReason.HeaderMissingNonBrowser };
-    }
-
-    // In cross-origin requests the use of Authorization header is mandatory
-    if (
-      origin &&
-      checkCrossOrigin({
-        originURL: new URL(origin),
-        host,
-        forwardedHost,
-        forwardedPort,
-        forwardedProto,
-      })
-    ) {
-      return { status: AuthStatus.SignedOut, errorReason: AuthErrorReason.HeaderMissingCORS };
-    }
-
-    // First load of development. Could be logged in on Clerk-hosted UI.
-    if (isDevelopmentKey && !clientUat) {
-      return {
-        status: AuthStatus.Interstitial,
-        interstitial: await fetchInterstitial(),
-        errorReason: AuthErrorReason.UATMissing,
-      };
-    }
-
-    // Potentially arriving after a sign-in or sign-out on Clerk-hosted UI.
-    if (
-      isDevelopmentKey &&
-      referrer &&
-      checkCrossOrigin({
-        originURL: new URL(referrer),
-        host,
-        forwardedHost,
-        forwardedPort,
-        forwardedProto,
-      })
-    ) {
-      return {
-        status: AuthStatus.Interstitial,
-        interstitial: await fetchInterstitial(),
-        errorReason: AuthErrorReason.CrossOriginReferrer,
-      };
-    }
-
-    // Probably first load for production
-    if (isProductionKey && !clientUat && !cookieToken) {
-      return { status: AuthStatus.SignedOut, errorReason: AuthErrorReason.CookieAndUATMissing };
-    }
-
-    // Signed out on a different subdomain but Clerk.js has not run to remove the cookie yet.
-    // TBD: Can enable if we do not want the __session cookie to be inspected.
-    // if (clientUat === '0' && cookieToken) {
-    //   return {
-    //     status: AuthStatus.Interstitial,
-    //     interstitial: await fetchInterstitial(),
-    //   };
-    // }
-
-    if (clientUat === '0') {
-      return { status: AuthStatus.SignedOut, errorReason: AuthErrorReason.StandardOut };
-    }
-
-    if (isProductionKey && clientUat && !cookieToken) {
-      return {
-        status: AuthStatus.Interstitial,
-        interstitial: await fetchInterstitial(),
-        errorReason: AuthErrorReason.CookieMissing,
-      };
-    }
-
-    const authenticatedState = await this.buildAuthenticatedState(cookieToken as string, {
-      jwtKey,
-      authorizedParties,
-      fetchInterstitial,
-      tokenType: 'cookie',
-    });
-
-    if (authenticatedState.sessionClaims && authenticatedState.sessionClaims.iat >= Number(clientUat)) {
-      return authenticatedState;
-    } else if (authenticatedState.sessionClaims && authenticatedState.sessionClaims.iat < Number(clientUat)) {
-      return {
-        status: AuthStatus.Interstitial,
-        interstitial: await fetchInterstitial(),
-        errorReason: AuthErrorReason.CookieOutDated,
-      };
-    }
-
-    return {
-      status: AuthStatus.Interstitial,
-      interstitial: await fetchInterstitial(),
-      errorReason: AuthErrorReason.Unknown,
-    };
+  getAuthState = async (params: AuthStateParams): Promise<AuthState> => {
+    return params.headerToken
+      ? this.handleRequestWithTokenInHeader(params)
+      : this.handleRequestWithTokenInCookie(params);
   };
 
-  buildAuthenticatedState = async (
-    token: string,
-    { authorizedParties, jwtKey, fetchInterstitial, tokenType }: BuildAuthenticatedStateOptions,
-  ): Promise<AuthState> => {
+  private handleRequestWithTokenInHeader = async (params: AuthStateParams) => {
     try {
-      const sessionClaims = await this.verifySessionToken(token, {
-        authorizedParties,
-        jwtKey,
-      });
-
-      return {
-        status: AuthStatus.SignedIn,
-        session: {
-          id: sessionClaims.sid,
-          userId: sessionClaims.sub,
-        },
-        sessionClaims,
-      };
+      return await this.buildAuthenticatedState(params.headerToken as string, params);
     } catch (err) {
-      if (err instanceof TokenVerificationError) {
-        const { errorReason, shouldSignout } = mapErrorReasonResponse(err.reason, tokenType);
-        if (shouldSignout) {
-          return { status: AuthStatus.SignedOut, errorReason };
-        }
-        return {
-          status: AuthStatus.Interstitial,
-          interstitial: await fetchInterstitial(),
-          errorReason,
-        };
-      }
-      return { status: AuthStatus.SignedOut, errorReason: AuthErrorReason.InternalError };
+      return this.handleVerifySessionError(err, 'header');
     }
+  };
+
+  private handleRequestWithTokenInCookie = async (params: AuthStateParams) => {
+    const signedOutOrInterstitial = runInterstitialRules(params, API_KEY, [
+      nonBrowserRequestInDevRule,
+      crossOriginRequestWithoutCors,
+      potentialFirstLoadInDevWhenUATMissing,
+      potentialRequestAfterSignInOrOurFromClerkHostedUiInDev,
+      potentialFirstRequestOnProductionEnvironment,
+      isNormalSignedOutState,
+      hasClientUatButCookieIsMissingInProd,
+    ]);
+
+    if (signedOutOrInterstitial) {
+      return signedOutOrInterstitial;
+    }
+
+    try {
+      const authenticatedState = await this.buildAuthenticatedState(params.cookieToken as string, params);
+      if (!params.clientUat || this.cookieTokenIsOutdated(authenticatedState.sessionClaims, params.clientUat)) {
+        return { status: AuthStatus.Interstitial, errorReason: AuthErrorReason.CookieOutDated };
+      }
+      return authenticatedState;
+    } catch (err) {
+      return this.handleVerifySessionError(err, 'cookie');
+    }
+  };
+
+  private cookieTokenIsOutdated(jwt: JWTPayload, clientUat: string) {
+    return jwt.iat < Number.parseInt(clientUat);
+  }
+
+  private handleVerifySessionError = (err: unknown, type: TokenType) => {
+    if (err instanceof TokenVerificationError) {
+      const { errorReason, shouldSignout } = mapErrorReasonResponse(err.reason, type);
+      return { status: shouldSignout ? AuthStatus.SignedOut : AuthStatus.Interstitial, errorReason };
+    }
+    return { status: AuthStatus.SignedOut, errorReason: AuthErrorReason.InternalError };
+  };
+
+  private buildAuthenticatedState = async (token: string, options: BuildAuthenticatedStateOptions) => {
+    const sessionClaims = await this.verifySessionToken(token, options);
+    const session = { id: sessionClaims.sid, userId: sessionClaims.sub };
+    return { status: AuthStatus.SignedIn, session, sessionClaims };
   };
 }
