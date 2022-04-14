@@ -7,13 +7,15 @@ import { Interstitial } from './Interstitial';
 export function ClerkCatchBoundary(RootCatchBoundary?: () => JSX.Element) {
   return () => {
     const { data } = useCatch();
-    const { __clerk_ssr_interstitial, __frontendApi } = data?.clerkState?.__internal_clerk_state || {};
+    const { __clerk_ssr_interstitial, __frontendApi, __lastAuthResult } =
+      data?.clerkState?.__internal_clerk_state || {};
 
     if (__clerk_ssr_interstitial) {
       return (
         <Interstitial
           frontendApi={__frontendApi}
           version={LIB_VERSION}
+          debugData={{ __lastAuthResult }}
         />
       );
     }
