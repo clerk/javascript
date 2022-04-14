@@ -76,7 +76,7 @@ export function withEdgeMiddlewareAuth(
     const { loadUser, loadSession, jwtKey, authorizedParties } = options;
     const cookieToken = req.cookies['__session'];
     const headerToken = req.headers.get('authorization');
-    const { status, interstitial, sessionClaims } = await vercelEdgeBase.getAuthState({
+    const { status, sessionClaims } = await vercelEdgeBase.getAuthState({
       cookieToken,
       headerToken,
       clientUat: req.cookies['__client_uat'],
@@ -88,11 +88,10 @@ export function withEdgeMiddlewareAuth(
       referrer: req.headers.get('referrer'),
       authorizedParties,
       jwtKey,
-      fetchInterstitial,
     });
 
     if (status === AuthStatus.Interstitial) {
-      return new NextResponse(interstitial, {
+      return new NextResponse(await fetchInterstitial(), {
         headers: { 'Content-Type': 'text/html' },
         status: 401,
       });

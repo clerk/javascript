@@ -17,7 +17,7 @@ export async function getAuthData(
   try {
     const cookieToken = cookies['__session'];
     const headerToken = headers.authorization?.replace('Bearer ', '');
-    const { status, sessionClaims, interstitial, errorReason } = await Clerk.base.getAuthState({
+    const { status, sessionClaims, errorReason } = await Clerk.base.getAuthState({
       cookieToken,
       headerToken,
       clientUat: cookies['__client_uat'],
@@ -27,7 +27,6 @@ export async function getAuthData(
       forwardedHost: headers['x-forwarded-host'] as string,
       referrer: headers.referer,
       userAgent: headers['user-agent'] as string,
-      fetchInterstitial: () => Clerk.fetchInterstitial(),
       jwtKey,
       authorizedParties,
     });
@@ -36,7 +35,7 @@ export async function getAuthData(
 
     if (status === AuthStatus.Interstitial) {
       ctx.res.writeHead(401, { 'Content-Type': 'text/html' });
-      ctx.res.end(interstitial);
+      ctx.res.end(await Clerk.fetchInterstitial());
       return null;
     }
 
