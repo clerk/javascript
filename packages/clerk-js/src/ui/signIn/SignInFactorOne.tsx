@@ -40,10 +40,11 @@ function _SignInFactorOne(): JSX.Element {
   }
 
   if (showAllStrategies) {
+    const shouldHideAllStrategies = factorHasLocalStrategy(currentFactor);
     return (
       <AllFirstFactorStrategies
         factors={availableFactors}
-        handleBack={handleBackButtonClicked}
+        handleBack={shouldHideAllStrategies ? handleBackButtonClicked : null}
         handleSelect={handleAlternativeFactorSelect}
       />
     );
