@@ -6,6 +6,7 @@ describe('Organization', () => {
       object: 'organization',
       id: 'test_id',
       name: 'test_name',
+      public_metadata: { public: 'metadata' },
       created_at: 12345,
       updated_at: 5678,
     });

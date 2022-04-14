@@ -9,6 +9,9 @@ Organization {
   "inviteMember": [Function],
   "name": "test_name",
   "pathRoot": "/organizations",
+  "publicMetadata": Object {
+    "public": "metadata",
+  },
   "removeMember": [Function],
   "update": [Function],
   "updateMember": [Function],
