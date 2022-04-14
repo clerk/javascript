@@ -76,7 +76,7 @@ export function withEdgeMiddlewareAuth(
     const { loadUser, loadSession, jwtKey, authorizedParties } = options;
     const cookieToken = req.cookies['__session'];
     const headerToken = req.headers.get('authorization');
-    const { status, interstitial, sessionClaims } = await vercelEdgeBase.getAuthState({
+    const { status, interstitial, sessionClaims, errorReason } = await vercelEdgeBase.getAuthState({
       cookieToken,
       headerToken,
       clientUat: req.cookies['__client_uat'],
@@ -93,14 +93,18 @@ export function withEdgeMiddlewareAuth(
 
     if (status === AuthStatus.Interstitial) {
       return new NextResponse(interstitial, {
-        headers: { 'Content-Type': 'text/html' },
+        headers: { 'Content-Type': 'text/html', 'Auth-Result': errorReason || '' },
         status: 401,
       });
     }
 
-    /* In both SignedIn and SignedOut states, we just add the attributes to the request object and passthrough. */
     if (status === AuthStatus.SignedOut) {
-      return handler(injectAuthIntoRequest(req, createSignedOutState()), event);
+      const response = (await handler(
+        injectAuthIntoRequest(req, createSignedOutState()),
+        event,
+      )) as NextMiddlewareResult;
+      response?.headers.set('Auth-Result', errorReason || '');
+      return response;
     }
 
     const sessionId = sessionClaims!.sid;
