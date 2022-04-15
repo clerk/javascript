@@ -16,6 +16,7 @@ export class Organization extends BaseResource implements OrganizationResource {
 
   id!: string;
   name!: string;
+  publicMetadata: Record<string, unknown> = {};
   createdAt!: Date;
   updatedAt!: Date;
 
@@ -89,6 +90,7 @@ export class Organization extends BaseResource implements OrganizationResource {
   protected fromJSON(data: OrganizationJSON): this {
     this.id = data.id;
     this.name = data.name;
+    this.publicMetadata = data.public_metadata;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     return this;
