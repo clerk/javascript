@@ -1,4 +1,5 @@
 import { AuthStatus, createGetToken, createSignedOutState, Session, User } from '@clerk/backend-core';
+import { isDevelopmentOrStaging } from '@clerk/backend-core/src/util/clerkApiKey';
 import Clerk, { sessions, users } from '@clerk/clerk-sdk-node';
 import { ServerGetToken } from '@clerk/types';
 import { GetServerDataProps } from 'gatsby';
@@ -36,6 +37,7 @@ export async function getAuthData(
   try {
     const cookieToken = cookies['__session'];
     const headerToken = (headers.get('authorization') as string)?.replace('Bearer ', '');
+
     const { status, sessionClaims, errorReason } = await Clerk.base.getAuthState({
       cookieToken,
       headerToken,
@@ -43,7 +45,7 @@ export async function getAuthData(
       origin: headers.get('origin') as string,
       host: headers.get('host') as string,
       forwardedPort: headers.get('x-forwarded-port') as string,
-      forwardedHost: headers.get('x-forwarded-host') as string,
+      forwardedHost: returnReferrerAsXForwardedHostToFixLocalDevGatsbyProxy(headers),
       referrer: headers.get('referer') as string,
       userAgent: headers.get('user-agent') as string,
       fetchInterstitial: () => Promise.resolve(''),
@@ -74,3 +76,23 @@ export async function getAuthData(
     return { authData: createSignedOutState() };
   }
 }
+
+const returnReferrerAsXForwardedHostToFixLocalDevGatsbyProxy = (headers: Map<string, unknown>) => {
+  const forwardedHost = headers.get('x-forwarded-host') as string;
+  if (forwardedHost) {
+    return forwardedHost;
+  }
+
+  const referrerUrl = new URL(headers.get('referer') as string);
+  const hostUrl = new URL('https://' + (headers.get('host') as string));
+
+  if (
+    process.env.NODE_ENV === 'development' &&
+    isDevelopmentOrStaging(process.env.CLERK_API_KEY || '') &&
+    hostUrl.hostname === referrerUrl.hostname
+  ) {
+    return referrerUrl.host;
+  }
+
+  return forwardedHost;
+};

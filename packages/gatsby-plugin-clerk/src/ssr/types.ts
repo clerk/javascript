@@ -2,6 +2,8 @@ import type { Session, User } from '@clerk/clerk-sdk-node';
 import { ServerSideAuth } from '@clerk/types';
 import { GetServerDataProps } from 'gatsby';
 
+export type WithServerAuthResult<CallbackReturn> = (props: GetServerDataProps) => Promise<Awaited<CallbackReturn>>;
+
 export type GetServerDataPropsWithAuth<Options extends WithServerAuthOptions = any> = GetServerDataProps & {
   auth: ServerSideAuth;
 } & (Options extends { loadSession: true } ? { session: Session | null } : {}) &

@@ -4,11 +4,15 @@ import React from 'react';
 import { ClerkProvider } from './GatsbyClerkProvider';
 
 export const wrapPageElement: GatsbyBrowser['wrapPageElement'] = ({ element, props }, options) => {
-  const clerkSsrState = (props.serverData as any)?.clerkState || {};
+  let clerkSsrState: any;
+  if ((props.serverData as any).clerkState) {
+    clerkSsrState = (props.serverData as any).clerkState;
+    delete (props.serverData as any).clerkState;
+  }
 
   return (
     <ClerkProvider
-      clerkState={clerkSsrState}
+      clerkState={clerkSsrState || {}}
       {...(options as any)}
     >
       {element}
