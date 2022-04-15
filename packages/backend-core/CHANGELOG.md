@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.3.1...@clerk/backend-core@1.4.0) (2022-04-15)
+
+### Features
+
+- **backend-core:** Organization metadata ([0a15019](https://github.com/clerkinc/javascript/commit/0a1501904ce8f6fda30bed95030e72cac631a4d9))
+
 ### [1.3.1](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.3.1-staging.0...@clerk/backend-core@1.3.1) (2022-04-15)
 
 **Note:** Version bump only for package @clerk/backend-core
