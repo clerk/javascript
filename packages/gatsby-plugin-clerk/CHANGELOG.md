@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.0-alpha.2](https://github.com/clerkinc/javascript/compare/gatsby-plugin-clerk@3.0.0-alpha.1...gatsby-plugin-clerk@3.0.0-alpha.2) (2022-04-15)
+
+### Bug Fixes
+
+- **gatsby-plugin-clerk:** Do not access serverData if null ([1ebd905](https://github.com/clerkinc/javascript/commit/1ebd9053d0ded1dad38d02593b2dddad9e29326c))
+
 ## 3.0.0-alpha.1 (2022-04-15)
 
 ### Features
