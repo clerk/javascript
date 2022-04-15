@@ -5,9 +5,9 @@ import { ClerkProvider } from './GatsbyClerkProvider';
 
 export const wrapPageElement: GatsbyBrowser['wrapPageElement'] = ({ element, props }, options) => {
   let clerkSsrState: any;
-  if ((props.serverData as any).clerkState) {
-    clerkSsrState = (props.serverData as any).clerkState;
-    delete (props.serverData as any).clerkState;
+  if ((props.serverData as any)?.clerkState) {
+    clerkSsrState = (props.serverData as any)?.clerkState;
+    delete (props.serverData as any)?.clerkState;
   }
 
   return (
