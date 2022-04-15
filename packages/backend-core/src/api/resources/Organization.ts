@@ -7,7 +7,7 @@ import type { OrganizationProps } from './Props';
 interface OrganizationPayload extends OrganizationProps {}
 
 export class Organization {
-  static attributes = ['id', 'name', 'createdAt', 'updatedAt'];
+  static attributes = ['id', 'name', 'publicMetadata', 'privateMetadata', 'createdAt', 'updatedAt'];
 
   static defaults = [];
 
