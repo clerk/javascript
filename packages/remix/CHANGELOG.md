@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.3.10-alpha.0](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.3.9...@clerk/remix@0.3.10-alpha.0) (2022-04-15)
+
+### Features
+
+- **gatsby-plugin-clerk:** Introduce basic structure ([a1c215b](https://github.com/clerkinc/javascript/commit/a1c215bba609107233e1596315136d77c491a74e))
+
 ### [0.3.9](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.3.8...@clerk/remix@0.3.9) (2022-04-15)
 
 **Note:** Version bump only for package @clerk/remix
