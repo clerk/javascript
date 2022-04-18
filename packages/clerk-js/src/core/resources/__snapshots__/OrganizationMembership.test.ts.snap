@@ -17,6 +17,7 @@ OrganizationMembership {
       "public": "metadata",
     },
     "removeMember": [Function],
+    "slug": "test_slug",
     "update": [Function],
     "updateMember": [Function],
     "updatedAt": 1970-01-01T00:01:07.890Z,

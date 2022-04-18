@@ -16,6 +16,7 @@ declare global {
 export interface OrganizationResource {
   id: string;
   name: string;
+  slug: string;
   publicMetadata: OrganizationPublicMetadata;
   createdAt: Date;
   updatedAt: Date;

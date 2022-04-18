@@ -11,6 +11,7 @@ describe('OrganizationMembership', () => {
       organization: {
         id: 'test_org_id',
         name: 'test_name',
+        slug: 'test_slug',
         public_metadata: { public: 'metadata' },
         object: 'organization',
         created_at: 12345,
