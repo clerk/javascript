@@ -61,7 +61,7 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
       return new Promise((resolve, reject) => {
         void run(() => {
           return this.reload()
-            .then(async res => {
+            .then(res => {
               if (res.verification.status === 'verified') {
                 stop();
                 resolve(res);
