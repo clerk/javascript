@@ -1,5 +1,6 @@
-import { ArrowRightIcon } from '@clerk/shared/assets/icons';
 import { List } from '@clerk/shared/components/list';
+import { Menu } from '@clerk/shared/components/menu';
+import { Popover } from '@clerk/shared/components/popover';
 import { Spinner } from '@clerk/shared/components/spinner';
 import { VerificationStatusTag } from '@clerk/shared/components/tag';
 import type { ExternalAccountResource } from '@clerk/types';
@@ -10,6 +11,7 @@ import { svgUrl } from 'ui/common/constants';
 type UnverifiedAccountListItemProps = {
   externalAccount: ExternalAccountResource;
   handleConnect: (strategy: OAuthStrategy) => void;
+  handleDisconnect: (externalAccount: ExternalAccountResource) => void;
   isBusy: boolean;
   isDisabled: boolean;
 };
@@ -17,15 +19,32 @@ type UnverifiedAccountListItemProps = {
 export function UnverifiedAccountListItem({
   externalAccount,
   handleConnect,
+  handleDisconnect,
   isBusy,
   isDisabled,
 }: UnverifiedAccountListItemProps): JSX.Element {
+  const popoverMenu = (
+    <Popover>
+      <Menu
+        options={[
+          {
+            label: <span>Reconnect</span>,
+            handleSelect: () => handleConnect(`oauth_${externalAccount.provider}`),
+          },
+          {
+            label: <span>Disconnect</span>,
+            handleSelect: () => handleDisconnect(externalAccount),
+          },
+        ]}
+      />
+    </Popover>
+  );
+
   return (
     <List.Item
       className='cl-list-item'
       key={externalAccount.id}
-      onClick={() => handleConnect(`oauth_${externalAccount.provider}`)}
-      detailIcon={isBusy ? <Spinner /> : <ArrowRightIcon />}
+      detailIcon={isBusy ? <Spinner /> : popoverMenu}
       disabled={isDisabled}
     >
       <div>

@@ -1,6 +1,6 @@
 import { List } from '@clerk/shared/components/list';
 import { TitledCard } from '@clerk/shared/components/titledCard';
-import { OAuthProvider, OAuthStrategy } from '@clerk/types';
+import { ExternalAccountResource, OAuthProvider, OAuthStrategy } from '@clerk/types';
 import React, { useState } from 'react';
 import { Error } from 'ui/common/error';
 import { useCoreUser, useEnvironment } from 'ui/contexts';
@@ -67,6 +67,10 @@ function ConnectedAccountListRows(): JSX.Element {
       });
   };
 
+  const handleDisconnect = (externalAccount: ExternalAccountResource) => {
+    return externalAccount.destroy();
+  };
+
   if (availableProviders.length == 0) {
     return <div className='cl-empty-list-item'>There are no available external account providers</div>;
   }
@@ -89,6 +93,7 @@ function ConnectedAccountListRows(): JSX.Element {
             key={externalAccount.id}
             externalAccount={externalAccount}
             handleConnect={handleConnect}
+            handleDisconnect={handleDisconnect}
             isBusy={busyProvider == `oauth_${externalAccount.provider}`}
             isDisabled={!!busyProvider}
           />
