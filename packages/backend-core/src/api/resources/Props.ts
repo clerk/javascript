@@ -75,6 +75,7 @@ export interface InvitationProps extends ClerkProps {
 
 export interface OrganizationProps extends ClerkProps {
   name: string;
+  slug: Nullable<string>;
   publicMetadata: Record<string, unknown>;
   privateMetadata: Record<string, unknown>;
   createdAt: number;

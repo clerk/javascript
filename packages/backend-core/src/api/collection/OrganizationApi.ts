@@ -10,6 +10,7 @@ type OrganizationMetadataParams = {
 
 type CreateParams = {
   name: string;
+  slug?: string;
   createdBy: string;
 } & OrganizationMetadataParams;
 
