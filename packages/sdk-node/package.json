@@ -1,5 +1,5 @@
 {
-  "version": "3.3.5-alpha.0",
+  "version": "3.3.5",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "esm/index.js",
@@ -47,8 +47,8 @@
     "typescript": "^4.6.2"
   },
   "dependencies": {
-    "@clerk/backend-core": "^1.4.1-alpha.0",
-    "@clerk/types": "^2.6.1-alpha.0",
+    "@clerk/backend-core": "^1.5.0",
+    "@clerk/types": "^2.7.0",
     "@peculiar/webcrypto": "^1.2.3",
     "camelcase-keys": "^6.2.2",
     "cookies": "^0.8.0",
