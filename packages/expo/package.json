@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-expo",
-  "version": "0.9.13-staging.1",
+  "version": "0.9.13",
   "license": "MIT",
   "description": "Clerk.dev React Native/Expo library",
   "keywords": [
@@ -26,12 +26,12 @@
     "dev": "tsc -p tsconfig.build.json --watch"
   },
   "dependencies": {
-    "@clerk/clerk-js": "^3.7.1-staging.1",
-    "@clerk/clerk-react": "^3.2.8-staging.1",
+    "@clerk/clerk-js": "^3.7.1",
+    "@clerk/clerk-react": "^3.2.8",
     "base-64": "^1.0.0"
   },
   "devDependencies": {
-    "@clerk/types": "^2.7.1-staging.1",
+    "@clerk/types": "^2.7.1",
     "@types/jest": "^27.4.0",
     "@types/node": "^16.11.9",
     "@types/react": "^17.0.39",
