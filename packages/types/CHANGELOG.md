@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [2.7.1-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/types@2.7.1-staging.0...@clerk/types@2.7.1-staging.1) (2022-04-19)
+
+### Bug Fixes
+
+- **clerk-js:** Pass rotating_token_nonce correctly to FAPIClient ([370cb0e](https://github.com/clerkinc/javascript/commit/370cb0e26bccd524c44b9e7fc0e15521193f514f))
+
 ## [2.7.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.6.1-alpha.0...@clerk/types@2.7.0) (2022-04-18)
 
 ### Features
