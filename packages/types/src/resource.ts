@@ -5,5 +5,5 @@ export type ClerkResourceReloadParams = {
 export interface ClerkResource {
   readonly id?: string;
   pathRoot: string;
-  reload(p: ClerkResourceReloadParams): Promise<this>;
+  reload(p?: ClerkResourceReloadParams): Promise<this>;
 }

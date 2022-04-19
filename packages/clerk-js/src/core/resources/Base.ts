@@ -95,6 +95,7 @@ export abstract class BaseResource {
       {
         method: 'GET',
         path: this.path(),
+        rotatingTokenNonce: opts.rotatingTokenNonce,
       },
       opts,
     );
