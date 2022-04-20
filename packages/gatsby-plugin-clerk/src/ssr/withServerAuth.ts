@@ -14,11 +14,15 @@ interface WithServerAuth {
 
 export const withServerAuth: WithServerAuth = (cbOrOptions: any, options?: any): any => {
   const callback = typeof cbOrOptions === 'function' ? cbOrOptions : undefined;
-  const opts = options ? options : typeof cbOrOptions !== 'function' ? cbOrOptions : {};
+  const opts = (options ? options : typeof cbOrOptions !== 'function' ? cbOrOptions : {}) || {};
+
   return async (props: GetServerDataProps) => {
-    const { authData, showInterstitial } = await getAuthData(props, opts);
+    const { authData, showInterstitial, errorReason } = await getAuthData(props, opts);
     if (showInterstitial) {
-      return injectSSRStateIntoProps({}, { __clerk_ssr_interstitial: true });
+      return injectSSRStateIntoProps(
+        { headers: { 'Cache-Control': 'no-cache', 'Auth-Result': errorReason } },
+        { __clerk_ssr_interstitial: true },
+      );
     }
     const contextWithAuth = injectAuthIntoContext(props, authData);
     const callbackResult = (await callback?.(contextWithAuth)) || {};
