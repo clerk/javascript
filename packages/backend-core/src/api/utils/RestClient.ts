@@ -64,7 +64,7 @@ export default class RestClient {
     }
 
     let body;
-    if (requestOptions.bodyParams) {
+    if (requestOptions.bodyParams && requestOptions.contentType !== 'multipart/form-data') {
       body = snakecaseKeys(requestOptions.bodyParams);
     }
 

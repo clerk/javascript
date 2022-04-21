@@ -1,3 +1,4 @@
+import FormData from 'form-data';
 import { Organization } from '../resources/Organization';
 import { AbstractApi } from './AbstractApi';
 
@@ -43,14 +44,15 @@ export class OrganizationApi extends AbstractApi {
   public async updateOrganizationLogo(organizationId: string, { file, uploaderUserId }: UpdateLogoParams) {
     this.requireId(organizationId);
 
+    const body = new FormData();
+    body.append('file', file);
+    body.append('uploader_user_id', uploaderUserId);
+
     return this._restClient.makeRequest<Organization>({
       method: 'PUT',
       path: `${basePath}/${organizationId}/logo`,
       contentType: 'multipart/form-data',
-      bodyParams: {
-        file,
-        uploaderUserId,
-      },
+      bodyParams: body,
     });
   }
 }
