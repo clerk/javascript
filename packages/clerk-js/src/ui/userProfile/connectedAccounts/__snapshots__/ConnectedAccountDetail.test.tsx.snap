@@ -28,7 +28,7 @@ Array [
     </div>
   </div>,
   <div
-    className="card card cl-themed-card"
+    className="card card cl-themed-card cl-list-card"
   >
     <div
       className="titleContainer"
@@ -36,13 +36,21 @@ Array [
       <h1
         className="title"
       >
-        <img
-          alt="Google"
-          className="cl-left-icon-wrapper"
-          src="https://images.clerk.dev/static/google.svg"
-        />
-          
-        Google
+        <div
+          style={
+            Object {
+              "paddingLeft": "1em",
+            }
+          }
+        >
+          <img
+            alt="Google"
+            className="cl-left-icon-wrapper"
+            src="https://images.clerk.dev/static/google.svg"
+          />
+            
+          Google
+        </div>
       </h1>
       <p
         className="subtitle"
@@ -50,9 +58,7 @@ Array [
          
       </p>
     </div>
-    <div
-      className="cl-titled-card-list"
-    >
+    <div>
       <div
         className="cl-list-item elementContainer"
         disabled={false}
@@ -108,6 +114,16 @@ Array [
         </div>
       </div>
     </div>
+    <button
+      className="button text error hoverable cl-add-resource-button cl-remove-button"
+      onClick={[Function]}
+      type="button"
+    >
+      <svg
+        data-filename="../shared/assets/icons/bin.svg"
+      />
+      Disconnect
+    </button>
   </div>,
 ]
 `;

@@ -6,7 +6,7 @@ import { handleError } from 'ui/common';
 import { Error } from 'ui/common/error';
 
 interface EditableListFieldRemoveCardProps {
-  type: 'phone' | 'email';
+  type: 'phone' | 'email' | 'external account';
   label: string;
   onCancel: () => void;
   onRemove: () => Promise<any>;
@@ -65,6 +65,7 @@ export const EditableListFieldRemoveCard: React.FC<EditableListFieldRemoveCardPr
             yourself.
           </p>
         )}
+        {type === 'external account' && <p>You will no longer be able to sign in using this connected account.</p>}
       </div>
       <div className='cl-form-button-group'>
         <Button onClick={updateFieldSubmit}>Remove {type}</Button>
