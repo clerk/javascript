@@ -20,6 +20,7 @@ OrganizationMembership {
       "public": "metadata",
     },
     "removeMember": [Function],
+    "setLogo": [Function],
     "slug": "test_slug",
     "update": [Function],
     "updateMember": [Function],
