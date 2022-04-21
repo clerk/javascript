@@ -19,6 +19,11 @@ type OrganizationMetadataRequestBody = {
   privateMetadata?: string;
 };
 
+type UpdateLogoParams = {
+  file: File | Blob;
+  uploaderUserId: string;
+};
+
 export class OrganizationApi extends AbstractApi {
   public async createOrganization(params: CreateParams) {
     const { publicMetadata, privateMetadata } = params;
@@ -31,6 +36,20 @@ export class OrganizationApi extends AbstractApi {
           publicMetadata,
           privateMetadata,
         }),
+      },
+    });
+  }
+
+  public async updateOrganizationLogo(organizationId: string, { file, uploaderUserId }: UpdateLogoParams) {
+    this.requireId(organizationId);
+
+    return this._restClient.makeRequest<Organization>({
+      method: 'PUT',
+      path: `${basePath}/${organizationId}/logo`,
+      contentType: 'multipart/form-data',
+      bodyParams: {
+        file,
+        uploaderUserId,
       },
     });
   }

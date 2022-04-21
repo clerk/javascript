@@ -134,6 +134,7 @@ export interface OrganizationJSON extends ClerkResourceJSON {
   object: ObjectType.Organization;
   name: string;
   slug: string | null;
+  logo_url: string | null;
   public_metadata: Record<string, unknown>;
   private_metadata: Record<string, unknown>;
   created_at: number;

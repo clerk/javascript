@@ -20,6 +20,7 @@ Reference of the methods supported in the Clerk Backend API wrapper. [API refere
   - [revokeInvitation(invitationId)](#revokeinvitationinvitationId)
 - [Organization operations](#organization-operations)
   - [createOrganization(params)](#createorganizationparams)
+  - [updateOrganizationLogo(organizationId, params)](#updateorganizationlogoorganizationid-params)
 - [Session operations](#session-operations)
   - [getSessionList({ clientId, userId })](#getsessionlist-clientid-userid-)
   - [getSession(sessionId)](#getsessionsessionid)
@@ -167,6 +168,21 @@ const organization = await clerkAPI.organizations.createOrganization({
   name: 'Acme Inc',
   slug: 'acme-inc',
   createdBy: 'user_1o4q123qMeCkKKIXcA9h8',
+});
+```
+
+#### updateOrganizationLogo(organizationId, params)
+
+Sets or updates the logo for the organization specified by the `organizationId` parameter.
+
+You need to provide the image file for the logo as a `file` parameter and specify the user ID for the logo uploader as `uploaderUserId`.
+
+The uploader must be an administrator in the organization.
+
+```js
+const organization = await clerkAPI.organizations.updateOrganizationLogo({
+  file: new Blob(),
+  uploaderUserId: 'user_1o4q123qMeCkKKIXcA9h8',
 });
 ```
 

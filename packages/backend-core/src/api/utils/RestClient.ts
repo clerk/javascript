@@ -8,11 +8,12 @@ export const INTERSTITIAL_METHOD = 'GET';
 const SERVER_API_URL = 'https://api.clerk.dev';
 const INTERSTITIAL_path = 'v1/internal/interstitial';
 const INTERSTITIAL_URL = `${SERVER_API_URL}/${INTERSTITIAL_path}`;
-const API_CONTENT_TYPE = 'application/x-www-form-urlencoded';
+const DEFAULT_API_CONTENT_TYPE = 'application/x-www-form-urlencoded';
 
 type RequestOptions = {
   method: 'GET' | 'POST' | 'PATCH' | 'DELETE' | 'PUT';
   path: string;
+  contentType?: string;
   queryParams?: object;
   bodyParams?: object;
 };
@@ -72,7 +73,7 @@ export default class RestClient {
     return this.fetcher(url, {
       method: requestOptions.method,
       authorization: `Bearer ${this.apiKey}`,
-      contentType: API_CONTENT_TYPE,
+      contentType: requestOptions.contentType || DEFAULT_API_CONTENT_TYPE,
       userAgent: this.userAgent,
       body,
     })
