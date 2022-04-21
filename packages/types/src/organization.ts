@@ -17,6 +17,7 @@ export interface OrganizationResource {
   id: string;
   name: string;
   slug: string;
+  logoUrl: string;
   publicMetadata: OrganizationPublicMetadata;
   createdAt: Date;
   updatedAt: Date;

@@ -10,6 +10,7 @@ describe('OrganizationMembership', () => {
       role: 'admin',
       organization: {
         id: 'test_org_id',
+        logo_url: 'https://path-to-logo.png',
         name: 'test_name',
         slug: 'test_slug',
         public_metadata: { public: 'metadata' },
