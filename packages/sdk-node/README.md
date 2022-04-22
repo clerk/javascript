@@ -1,25 +1,40 @@
 <p align="center">
-  <a href="https://clerk.dev/" target="_blank" align="center">
-    <img src="https://images.clerk.dev/static/clerk.svg" height="50">
+  <a href="https://clerk.dev?utm_source=github&utm_medium=clerk_sdk_node" target="_blank" rel="noopener noreferrer">
+    <img src="https://images.clerk.dev/static/clerk.svg" alt="Clerk logo" height="50">
   </a>
   <br />
 </p>
 
-# Clerk Node.js SDK
+# @clerk/clerk-sdk-node
 
-Thank you for choosing [Clerk](https://clerk.dev/) for your authentication, session & user management needs!
+<div align="center">
 
-This SDK allows you to call the Clerk server API from node / JS / TS code without having to implement the calls
-yourself.
+[![Chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://discord.com/invite/b5rXHjAg7A)
+[![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.dev/docs?utm_source=github&utm_medium=clerk_sdk_node)
+[![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
 
-To gain a better understanding of the underlying API calls the SDK makes, feel free to consult
-the <a href="https://docs.clerk.dev/reference/backend-api-reference" target="_blank">official Clerk server API documentation</a>.
+[Changelog](https://github.com/clerkinc/javascript/blob/main/packages/sdk-node/CHANGELOG.md)
+·
+[Report a Bug](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=bug&template=bug_report.md&title=Bug%3A+)
+·
+[Request a Feature](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=Feature%3A+)
+·
+[Ask a Question](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=question&template=ask_a_question.md&title=Support%3A+)
+
+</div>
+
+---
+
+## Overview
+
+[Clerk](https://clerk.dev?utm_source=github&utm_medium=clerk_sdk_node) is the easiest way to add authentication and user management to your Node application. To gain a better understanding API and the SDK, refer to 
+the <a href="https://reference.clerk.dev/reference/backend-api-reference" target="_blank">official Backend API documentation</a>.
 
 ## Table of contents
 
-- [Internal implementation details](#internal-implementation-details)
 - [Installation](#installation)
 - [Resource types](#resource-types)
+- [Internal implementation details](#internal-implementation-details)
 - [Usage](#usage)
   - [Options & ENV vars available](#options--env-vars-available)
     - [tl;dr](#tldr)
@@ -44,14 +59,14 @@ the <a href="https://docs.clerk.dev/reference/backend-api-reference" target="_bl
   - [Invitation operations](#invitation-operations)
     - [getInvitationList()](#getinvitationlist)
     - [createInvitation(params)](#createinvitationparams)
-    - [revokeInvitation(invitationId)](#revokeinvitationinvitationId)
+    - [revokeInvitation(invitationId)](#revokeinvitationinvitationid)
   - [Session operations](#session-operations)
     - [getSessionList({ clientId, userId })](#getsessionlist-clientid-userid-)
     - [getSession(sessionId)](#getsessionsessionid)
     - [revokeSession(sessionId)](#revokesessionsessionid)
     - [verifySession(sessionId, sessionToken)](#verifysessionsessionid-sessiontoken)
   - [User operations](#user-operations)
-    - [getUserList()](#getuserlist)
+    - [getUserList()](#getuserlistparams-userlistparams)
     - [getUser(userId)](#getuseruserid)
     - [createUser(params)](#createuserparams)
     - [updateUser(userId, params)](#updateuseruserid-params)
@@ -67,20 +82,6 @@ the <a href="https://docs.clerk.dev/reference/backend-api-reference" target="_bl
 - [Next](#next)
 - [Troubleshooting](#troubleshooting)
 - [Feedback / Issue reporting](#feedback--issue-reporting)
-
-Internal implementation details
-
-This project is written in <a href="https://www.typescriptlang.org/" target="_blank">TypeScript</a> and built
-with <a href="https://github.com/formium/tsdx" target="_blank">tsdx</a>.
-
-CJS, ESM, and UMD module builds are provided.
-
-The http client used by the sdk is <a href="https://github.com/sindresorhus/got" target="_blank">got</a>.
-
-All resource operations are mounted as sub-APIs on a `Clerk` class and return promises that either resolve with their
-expected resource types or reject with the error types described below.
-
-The sub-APIs are also importable directly if you don't want to go through the `Clerk` class.
 
 ## Installation
 
@@ -110,6 +111,20 @@ The following types are not directly manipulable but can be passed as params to 
 | ------------ | --------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
 | EmailAddress | email address, a user may have a primary & several secondary          | email address id can be provided to `emails` sub-api to specify the recipient     |
 | PhoneNumber  | E.164 telephone number, a user may have a primary & several secondary | phone number id can be provided to `smsMessages` sub-api to specify the recipient |
+
+## Internal implementation details
+
+This project is written in <a href="https://www.typescriptlang.org/" target="_blank">TypeScript</a> and built
+with <a href="https://github.com/formium/tsdx" target="_blank">tsdx</a>.
+
+CJS, ESM, and UMD module builds are provided.
+
+The http client used by the sdk is <a href="https://github.com/sindresorhus/got" target="_blank">got</a>.
+
+All resource operations are mounted as sub-APIs on a `Clerk` class and return promises that either resolve with their
+expected resource types or reject with the error types described below.
+
+The sub-APIs are also importable directly if you don't want to go through the `Clerk` class.
 
 ## Usage
 
