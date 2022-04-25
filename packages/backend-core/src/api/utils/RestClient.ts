@@ -64,7 +64,7 @@ export default class RestClient {
 
     let body;
     if (requestOptions.bodyParams) {
-      body = snakecaseKeys(requestOptions.bodyParams);
+      body = snakecaseKeys(requestOptions.bodyParams) as Record<string, unknown>;
     }
 
     // TODO improve error handling
