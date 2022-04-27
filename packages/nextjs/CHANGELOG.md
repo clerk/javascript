@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.4.0](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@3.3.7...@clerk/nextjs@3.4.0) (2022-04-27)
+
+### Features
+
+- **nextjs:** Fix opts parsing in withServerSideAuth ([1eecb81](https://github.com/clerkinc/javascript/commit/1eecb81439809fd4536d4b7d2f65d4fed6c6137b))
+
 ### [3.3.7](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@3.3.6...@clerk/nextjs@3.3.7) (2022-04-22)
 
 ### Bug Fixes
