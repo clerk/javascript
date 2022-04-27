@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.2.9](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@3.2.8...@clerk/clerk-react@3.2.9) (2022-04-27)
+
+### Bug Fixes
+
+- **clerk-react:** Type updates for React 18 ([6d5c0bf](https://github.com/clerkinc/javascript/commit/6d5c0bf33e17885cacd97320c385cf06ca4f5adf))
+
 ### [3.2.8](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@3.2.8-staging.1...@clerk/clerk-react@3.2.8) (2022-04-19)
 
 **Note:** Version bump only for package @clerk/clerk-react
