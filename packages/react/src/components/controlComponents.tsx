@@ -8,7 +8,7 @@ import { LoadedGuarantee } from '../contexts/StructureContext';
 import type { RedirectToProps, WithClerkProp } from '../types';
 import { withClerk } from './withClerk';
 
-export const SignedIn: React.FC<React.PropsWithChildren<unknown>> = ({ children }) => {
+export const SignedIn = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
   const { userId } = useAuthContext();
   if (userId) {
     return <>{children}</>;
@@ -16,7 +16,7 @@ export const SignedIn: React.FC<React.PropsWithChildren<unknown>> = ({ children 
   return null;
 };
 
-export const SignedOut: React.FC<React.PropsWithChildren<unknown>> = ({ children }) => {
+export const SignedOut = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
   const { userId } = useAuthContext();
   if (userId === null) {
     return <>{children}</>;
@@ -24,7 +24,7 @@ export const SignedOut: React.FC<React.PropsWithChildren<unknown>> = ({ children
   return null;
 };
 
-export const ClerkLoaded: React.FC<React.PropsWithChildren<unknown>> = ({ children }) => {
+export const ClerkLoaded = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
   const isomorphicClerk = useIsomorphicClerkContext();
   if (!isomorphicClerk.loaded) {
     return null;
@@ -32,7 +32,7 @@ export const ClerkLoaded: React.FC<React.PropsWithChildren<unknown>> = ({ childr
   return <LoadedGuarantee>{children}</LoadedGuarantee>;
 };
 
-export const ClerkLoading: React.FC<React.PropsWithChildren<unknown>> = ({ children }) => {
+export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
   const isomorphicClerk = useIsomorphicClerkContext();
   if (isomorphicClerk.loaded) {
     return null;
@@ -86,7 +86,7 @@ export const AuthenticateWithRedirectCallback = withClerk(
   'AuthenticateWithRedirectCallback',
 );
 
-export const MultisessionAppSupport: React.FC<React.PropsWithChildren<unknown>> = ({ children }) => {
+export const MultisessionAppSupport = ({ children }: React.PropsWithChildren<unknown>): JSX.Element => {
   const session = useSessionContext();
   return <React.Fragment key={session ? session.id : 'no-users'}>{children}</React.Fragment>;
 };

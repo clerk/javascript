@@ -9,11 +9,12 @@ import { ClerkContextProvider } from './ClerkContextProvider';
 import { StructureContext, StructureContextStates } from './StructureContext';
 
 export interface ClerkProviderProps extends IsomorphicClerkOptions {
+  children: React.ReactNode;
   frontendApi?: string;
   initialState?: InitialState;
 }
 
-function ClerkProviderBase(props: React.PropsWithChildren<ClerkProviderProps>) {
+function ClerkProviderBase(props: ClerkProviderProps): JSX.Element {
   const [clerkLoaded, setClerkLoaded] = useState(false);
 
   const clerk = useMemo(() => {
