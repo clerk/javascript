@@ -295,6 +295,8 @@ export class Base {
         interstitial: await fetchInterstitial(),
         errorReason: AuthErrorReason.CookieOutDated,
       };
+    } else if (!authenticatedState.sessionClaims) {
+      return authenticatedState;
     }
 
     return {
