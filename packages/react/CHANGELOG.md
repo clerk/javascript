@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.2.10](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@3.2.9...@clerk/clerk-react@3.2.10) (2022-04-27)
+
+### Bug Fixes
+
+- **clerk-react:** Define global in window if not defined ([48da3ac](https://github.com/clerkinc/javascript/commit/48da3ac087406a97380f28c4c9e1057e04eb106f))
+
 ### [3.2.9](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@3.2.8...@clerk/clerk-react@3.2.9) (2022-04-27)
 
 ### Bug Fixes

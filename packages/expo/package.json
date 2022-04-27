@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-expo",
-  "version": "0.9.15",
+  "version": "0.9.16",
   "license": "MIT",
   "description": "Clerk.dev React Native/Expo library",
   "keywords": [
@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@clerk/clerk-js": "^3.8.0",
-    "@clerk/clerk-react": "^3.2.9",
+    "@clerk/clerk-react": "^3.2.10",
     "base-64": "^1.0.0"
   },
   "devDependencies": {
