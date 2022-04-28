@@ -103,6 +103,10 @@ export class Organization extends BaseResource implements OrganizationResource {
     }).then(res => new OrganizationMembership(res?.response as OrganizationMembershipJSON));
   };
 
+  destroy = async (): Promise<void> => {
+    return this._baseDelete();
+  };
+
   protected fromJSON(data: OrganizationJSON): this {
     this.id = data.id;
     this.name = data.name;

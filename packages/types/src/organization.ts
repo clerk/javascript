@@ -26,6 +26,7 @@ export interface OrganizationResource {
   inviteMember: (params: InviteMemberParams) => Promise<OrganizationInvitationResource>;
   updateMember: (params: UpdateMembershipParams) => Promise<OrganizationMembershipResource>;
   removeMember: (userId: string) => Promise<OrganizationMembershipResource>;
+  destroy: () => Promise<void>;
 }
 
 export interface GetMembershipsParams {
