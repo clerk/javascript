@@ -84,6 +84,14 @@ export class Organization extends BaseResource implements OrganizationResource {
       .catch(() => []);
   };
 
+  addMember = async ({ userId, role }: AddMemberParams) => {
+    return await BaseResource._fetch({
+      method: 'POST',
+      path: `/organizations/${this.id}/memberships`,
+      body: { userId, role } as any,
+    }).then(res => new OrganizationMembership(res?.response as OrganizationMembershipJSON));
+  };
+
   inviteMember = async (inviteMemberParams: InviteMemberParams) => {
     return await OrganizationInvitation.create(this.id, inviteMemberParams);
   };
@@ -121,6 +129,11 @@ export class Organization extends BaseResource implements OrganizationResource {
 export type GetOrganizationParams = {
   limit?: number;
   offset?: number;
+};
+
+export type AddMemberParams = {
+  userId: string;
+  role: MembershipRole;
 };
 
 export type InviteMemberParams = {

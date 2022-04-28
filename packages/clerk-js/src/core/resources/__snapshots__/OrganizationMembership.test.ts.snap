@@ -6,6 +6,7 @@ OrganizationMembership {
   "destroy": [Function],
   "id": "test_id",
   "organization": Organization {
+    "addMember": [Function],
     "createdAt": 1970-01-01T00:00:12.345Z,
     "destroy": [Function],
     "getMemberships": [Function],
