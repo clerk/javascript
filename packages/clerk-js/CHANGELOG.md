@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.9.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.8.1-staging.0...@clerk/clerk-js@3.9.0) (2022-04-28)
+
+### Features
+
+- **clerk-js:** Add members to organizations ([d6787b6](https://github.com/clerkinc/javascript/commit/d6787b659744ea2ca178d6cf7df488be265d7a69))
+- **clerk-js:** Delete organizations ([7cb1bea](https://github.com/clerkinc/javascript/commit/7cb1beaf12b293b9fde541855eb2cda81e0d6be4))
+
 ## [3.8.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.8.0-staging.0...@clerk/clerk-js@3.8.0) (2022-04-22)
 
 **Note:** Version bump only for package @clerk/clerk-js
