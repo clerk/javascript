@@ -23,6 +23,7 @@ export interface OrganizationResource {
   update: (params: UpdateOrganizationParams) => Promise<OrganizationResource>;
   getMemberships: (params?: GetMembershipsParams) => Promise<OrganizationMembershipResource[]>;
   getPendingInvitations: () => Promise<OrganizationInvitationResource[]>;
+  addMember: (params: AddMemberParams) => Promise<OrganizationMembershipResource>;
   inviteMember: (params: InviteMemberParams) => Promise<OrganizationInvitationResource>;
   updateMember: (params: UpdateMembershipParams) => Promise<OrganizationMembershipResource>;
   removeMember: (userId: string) => Promise<OrganizationMembershipResource>;
@@ -32,6 +33,11 @@ export interface OrganizationResource {
 export interface GetMembershipsParams {
   limit?: number;
   offset?: number;
+}
+
+export interface AddMemberParams {
+  userId: string;
+  role: MembershipRole;
 }
 
 export interface InviteMemberParams {
