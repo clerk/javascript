@@ -18,7 +18,7 @@ interface WithServerSideAuth {
 
 export const withServerSideAuth: WithServerSideAuth = (cbOrOptions: any, options?: any): any => {
   const cb = typeof cbOrOptions === 'function' ? cbOrOptions : undefined;
-  const opts = options ? options : typeof cbOrOptions !== 'function' ? cbOrOptions : {};
+  const opts = (options ? options : typeof cbOrOptions !== 'function' ? cbOrOptions : {}) || {};
 
   return async (ctx: GetServerSidePropsContext) => {
     const authData = await getAuthData(ctx, opts);

@@ -10,6 +10,7 @@ const NO_FRONTEND_API_ERR =
 
 type NextClerkProviderProps = {
   children: React.ReactNode;
+  frontendApi?: string;
 } & IsomorphicClerkOptions;
 
 export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JSX.Element {

@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.3.8](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.3.7...@clerk/clerk-sdk-node@3.3.8) (2022-04-27)
+
+**Note:** Version bump only for package @clerk/clerk-sdk-node
+
+### [3.3.7](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.3.6...@clerk/clerk-sdk-node@3.3.7) (2022-04-22)
+
+**Note:** Version bump only for package @clerk/clerk-sdk-node
+
+### [3.3.6](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.3.6-staging.1...@clerk/clerk-sdk-node@3.3.6) (2022-04-19)
+
+**Note:** Version bump only for package @clerk/clerk-sdk-node
+
+### [3.3.6-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.3.6-staging.0...@clerk/clerk-sdk-node@3.3.6-staging.1) (2022-04-19)
+
+**Note:** Version bump only for package @clerk/clerk-sdk-node
+
+### [3.3.5](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.3.5-alpha.0...@clerk/clerk-sdk-node@3.3.5) (2022-04-18)
+
+**Note:** Version bump only for package @clerk/clerk-sdk-node
+
+### [3.3.5-alpha.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.3.4...@clerk/clerk-sdk-node@3.3.5-alpha.0) (2022-04-15)
+
+**Note:** Version bump only for package @clerk/clerk-sdk-node
+
+### [3.3.4](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.3.3...@clerk/clerk-sdk-node@3.3.4) (2022-04-15)
+
+**Note:** Version bump only for package @clerk/clerk-sdk-node
+
+### [3.3.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.3.3-staging.0...@clerk/clerk-sdk-node@3.3.3) (2022-04-15)
+
+**Note:** Version bump only for package @clerk/clerk-sdk-node
+
 ### [3.3.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.3.2-staging.0...@clerk/clerk-sdk-node@3.3.2) (2022-04-13)
 
 **Note:** Version bump only for package @clerk/clerk-sdk-node

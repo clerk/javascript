@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [2.7.1](https://github.com/clerkinc/javascript/compare/@clerk/types@2.7.1-staging.1...@clerk/types@2.7.1) (2022-04-19)
+
+**Note:** Version bump only for package @clerk/types
+
+### [2.7.1-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/types@2.7.1-staging.0...@clerk/types@2.7.1-staging.1) (2022-04-19)
+
+### Bug Fixes
+
+- **clerk-js:** Pass rotating_token_nonce correctly to FAPIClient ([370cb0e](https://github.com/clerkinc/javascript/commit/370cb0e26bccd524c44b9e7fc0e15521193f514f))
+
+## [2.7.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.6.1-alpha.0...@clerk/types@2.7.0) (2022-04-18)
+
+### Features
+
+- **clerk-js:** Organization slugs ([7f0e771](https://github.com/clerkinc/javascript/commit/7f0e771036815885b01da095979cf39da212503f))
+
+### [2.6.1-alpha.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.6.0...@clerk/types@2.6.1-alpha.0) (2022-04-15)
+
+**Note:** Version bump only for package @clerk/types
+
+## [2.6.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.6.0-staging.0...@clerk/types@2.6.0) (2022-04-15)
+
+**Note:** Version bump only for package @clerk/types
+
 ## [2.5.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.5.0-staging.0...@clerk/types@2.5.0) (2022-04-13)
 
 **Note:** Version bump only for package @clerk/types

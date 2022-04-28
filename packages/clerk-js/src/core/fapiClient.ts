@@ -1,5 +1,5 @@
-import type { Clerk, ClerkAPIErrorJSON, ClientJSON } from '@clerk/types';
 import { camelToSnake } from '@clerk/shared/utils';
+import type { Clerk, ClerkAPIErrorJSON, ClientJSON } from '@clerk/types';
 import qs from 'qs';
 import { buildEmailAddress as buildEmailAddressUtil, buildURL as buildUrlUtil } from 'utils';
 
@@ -11,6 +11,7 @@ export type FapiRequestInit = RequestInit & {
   path?: string;
   search?: string | URLSearchParams | string[][] | Record<string, string> | undefined;
   sessionId?: string;
+  rotatingTokenNonce?: string;
   url?: URL;
 };
 
@@ -18,13 +19,14 @@ type FapiQueryStringParameters = {
   _method?: string;
   _clerk_session_id?: string;
   _clerk_js_version?: string;
+  rotating_token_nonce?: string;
 };
 
 export type FapiResponse<T> = Response & {
   payload: FapiResponseJSON<T> | null;
 };
 
-export type FapiRequestCallback<T> = (request: FapiRequestInit, response?: FapiResponse<T>) => void;
+export type FapiRequestCallback<T> = (request: FapiRequestInit, response?: FapiResponse<T>) => Promise<void> | void;
 
 const camelToSnakeEncoder: qs.IStringifyOptions['encoder'] = (str, defaultEncoder, _, type) => {
   return type === 'key' ? camelToSnake(str) : defaultEncoder(str);
@@ -77,10 +79,14 @@ export default function createFapiClient(clerkInstance: Clerk): FapiClient {
     }
   }
 
-  function buildQueryString({ method, path, sessionId, search }: FapiRequestInit) {
+  function buildQueryString({ method, path, sessionId, search, rotatingTokenNonce }: FapiRequestInit) {
     const searchParams = new URLSearchParams(search);
     if (clerkInstance.version) {
       searchParams.append('_clerk_js_version', clerkInstance.version);
+    }
+
+    if (rotatingTokenNonce) {
+      searchParams.append('rotating_token_nonce', rotatingTokenNonce);
     }
 
     // Due to a known Safari bug regarding CORS requests, we are forced to always use GET or POST method.

@@ -116,7 +116,3 @@ _For more information and to report security issues, please refer to our [securi
 This project is licensed under the **MIT license**.
 
 See [LICENSE](https://github.com/clerkinc/javascript/blob/main/packages/react/LICENSE) for more information.
-
-```
-
-```

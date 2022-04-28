@@ -429,6 +429,7 @@ export type CreateOrganizationInvitationParams = {
 
 export interface CreateOrganizationParams {
   name: string;
+  slug?: string;
 }
 
 export interface AuthenticateWithMetamaskParams {

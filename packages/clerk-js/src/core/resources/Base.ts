@@ -1,18 +1,18 @@
-import type { ClerkAPIErrorJSON, ClerkResourceJSON } from '@clerk/types';
+import type { ClerkAPIErrorJSON, ClerkResourceJSON, ClerkResourceReloadParams } from '@clerk/types';
 import type { FapiClient, FapiRequestInit, FapiResponseJSON, HTTPMethod } from 'core/fapiClient';
 
 import { clerkMissingFapiClientInResources } from '../errors';
 import type { Clerk } from './internal';
 import { ClerkAPIResponseError, Client } from './internal';
 
-export type BaseFetchOptions = { forceUpdateClient?: boolean };
+export type BaseFetchOptions = ClerkResourceReloadParams & { forceUpdateClient?: boolean };
 
-interface BaseMutateParams {
+export type BaseMutateParams = {
   action?: string;
   body?: any;
   method?: HTTPMethod;
   path?: string;
-}
+};
 
 export abstract class BaseResource {
   static clerk: Clerk;
@@ -95,6 +95,7 @@ export abstract class BaseResource {
       {
         method: 'GET',
         path: this.path(),
+        rotatingTokenNonce: opts.rotatingTokenNonce,
       },
       opts,
     );
@@ -131,7 +132,8 @@ export abstract class BaseResource {
     await this._baseMutate<J>({ ...params, method: 'DELETE' });
   }
 
-  public async reload(): Promise<this> {
-    return this._baseGet({ forceUpdateClient: true });
+  public async reload(params?: ClerkResourceReloadParams): Promise<this> {
+    const { rotatingTokenNonce } = params || {};
+    return this._baseGet({ forceUpdateClient: true, rotatingTokenNonce });
   }
 }

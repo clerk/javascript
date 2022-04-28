@@ -548,8 +548,8 @@ export default class Clerk implements ClerkInterface {
     }
   };
 
-  public createOrganization = async ({ name }: CreateOrganizationParams): Promise<OrganizationResource> => {
-    return await Organization.create(name);
+  public createOrganization = async ({ name, slug }: CreateOrganizationParams): Promise<OrganizationResource> => {
+    return Organization.create({ name, slug });
   };
 
   public getOrganizationMemberships = async (): Promise<OrganizationMembership[]> => {

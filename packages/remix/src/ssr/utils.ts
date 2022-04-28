@@ -1,17 +1,8 @@
+import { json } from '@remix-run/server-runtime';
 import cookie from 'cookie';
 
 import { AuthData } from './getAuthData';
 import { LoaderFunctionArgs, LoaderFunctionArgsWithAuth } from './types';
-
-/**
- * Wraps obscured clerk internals with a readable `clerkState` key.
- * This is intended to be passed by the user into <ClerkProvider>
- *
- * @internal
- */
-export const wrapClerkState = (data: any) => {
-  return { clerkState: { __internal_clerk_state: { ...data } } };
-};
 
 /**
  * Inject `auth`, `user` and `session` properties into `request`
@@ -75,3 +66,46 @@ export function assertObject(val: any, error?: string): asserts val is Record<st
     throw new Error(error || '');
   }
 }
+
+/**
+ * @internal
+ */
+export const throwInterstitialJsonResponse = (opts: { frontendApi: string; errorReason: string | undefined }) => {
+  throw json(
+    wrapWithClerkState({
+      __clerk_ssr_interstitial: true,
+      __frontendApi: opts.frontendApi,
+      __lastAuthResult: opts.errorReason,
+    }),
+    { status: 401 },
+  );
+};
+
+/**
+ * @internal
+ */
+export const returnLoaderResultJsonResponse = (opts: {
+  authData: AuthData | null;
+  frontendApi: string;
+  errorReason: string | undefined;
+  callbackResult?: any;
+}) => {
+  return json({
+    ...(opts.callbackResult || {}),
+    ...wrapWithClerkState({
+      __clerk_ssr_state: opts.authData,
+      __frontendApi: opts.frontendApi,
+      __lastAuthResult: opts.errorReason || '',
+    }),
+  });
+};
+
+/**
+ * Wraps obscured clerk internals with a readable `clerkState` key.
+ * This is intended to be passed by the user into <ClerkProvider>
+ *
+ * @internal
+ */
+export const wrapWithClerkState = (data: any) => {
+  return { clerkState: { __internal_clerk_state: { ...data } } };
+};

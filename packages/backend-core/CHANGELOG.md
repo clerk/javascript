@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [1.5.3](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.5.2...@clerk/backend-core@1.5.3) (2022-04-27)
+
+**Note:** Version bump only for package @clerk/backend-core
+
+### [1.5.2](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.5.1...@clerk/backend-core@1.5.2) (2022-04-22)
+
+### Bug Fixes
+
+- **nextjs,backend-core:** Fix handleError parsing ([4eb9732](https://github.com/clerkinc/javascript/commit/4eb97324d9153aa91492982d00bb76b8592947c7))
+
+### [1.5.1](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.5.1-staging.1...@clerk/backend-core@1.5.1) (2022-04-19)
+
+**Note:** Version bump only for package @clerk/backend-core
+
+### [1.5.1-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.5.1-staging.0...@clerk/backend-core@1.5.1-staging.1) (2022-04-19)
+
+**Note:** Version bump only for package @clerk/backend-core
+
+## [1.5.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.4.1-alpha.0...@clerk/backend-core@1.5.0) (2022-04-18)
+
+### Features
+
+- **backend-core:** Organization slug ([d81fb71](https://github.com/clerkinc/javascript/commit/d81fb71bce990d85fdc917ecff7480e9c4b2690a))
+
+### [1.4.1-alpha.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.4.0...@clerk/backend-core@1.4.1-alpha.0) (2022-04-15)
+
+**Note:** Version bump only for package @clerk/backend-core
+
+## [1.4.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.3.1...@clerk/backend-core@1.4.0) (2022-04-15)
+
+### Features
+
+- **backend-core:** Organization metadata ([0a15019](https://github.com/clerkinc/javascript/commit/0a1501904ce8f6fda30bed95030e72cac631a4d9))
+
+### [1.3.1](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.3.1-staging.0...@clerk/backend-core@1.3.1) (2022-04-15)
+
+**Note:** Version bump only for package @clerk/backend-core
+
 ## [1.3.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.3.0-staging.0...@clerk/backend-core@1.3.0) (2022-04-13)
 
 **Note:** Version bump only for package @clerk/backend-core

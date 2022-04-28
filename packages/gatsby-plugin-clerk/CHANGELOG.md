@@ -1,0 +1,19 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.0.0-alpha.2](https://github.com/clerkinc/javascript/compare/gatsby-plugin-clerk@3.0.0-alpha.1...gatsby-plugin-clerk@3.0.0-alpha.2) (2022-04-15)
+
+### Bug Fixes
+
+- **gatsby-plugin-clerk:** Do not access serverData if null ([1ebd905](https://github.com/clerkinc/javascript/commit/1ebd9053d0ded1dad38d02593b2dddad9e29326c))
+
+## 3.0.0-alpha.1 (2022-04-15)
+
+### Features
+
+- **gatsby-plugin-clerk:** Introduce basic structure ([a1c215b](https://github.com/clerkinc/javascript/commit/a1c215bba609107233e1596315136d77c491a74e))
+- **gatsby-plugin-clerk:** Introduce withServerAuth Gatsby SSR helper ([0c24b65](https://github.com/clerkinc/javascript/commit/0c24b650f1b9a1859f5eabe5ab71054ea29b309b))
+- **gatsby-plugin-clerk:** Make gatsby develop proxy work with interstitial ([9a452e3](https://github.com/clerkinc/javascript/commit/9a452e3db90291f3aee00fd9d2ab75ff327add64))
+- **gatsby-plugin-clerk:** Wrap page element with GatsbyClerkProvider during SSR/CSR ([1ee5503](https://github.com/clerkinc/javascript/commit/1ee55035780a3b21095b64ac4a44402d034a02c5))

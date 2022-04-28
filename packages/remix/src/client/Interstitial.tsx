@@ -13,13 +13,14 @@ const getScriptUrl = (frontendApi: string, libVersion: string) => {
   return `https://${frontendApi}/npm/@clerk/clerk-js@${major}/dist/clerk.browser.js`;
 };
 
-const createInterstitialHTMLString = (frontendApi: string, libVersion: string) => {
+const createInterstitialHTMLString = (frontendApi: string, libVersion: string, debugData: any) => {
   return `
     <head>
         <meta charset="UTF-8" />
     </head>
     <body>
         <script>
+            window.__clerk_debug = ${JSON.stringify(debugData || {})};
             window.startClerk = async () => {
                 const Clerk = window.Clerk;
                 try {
@@ -42,6 +43,10 @@ const createInterstitialHTMLString = (frontendApi: string, libVersion: string) =
 `;
 };
 
-export function Interstitial({ frontendApi, version }: { frontendApi: string; version: string }) {
-  return <html dangerouslySetInnerHTML={{ __html: createInterstitialHTMLString(frontendApi, version) }} />;
+export function Interstitial(opts: { frontendApi: string; version: string; debugData: any }) {
+  return (
+    <html
+      dangerouslySetInnerHTML={{ __html: createInterstitialHTMLString(opts.frontendApi, opts.version, opts.debugData) }}
+    />
+  );
 }

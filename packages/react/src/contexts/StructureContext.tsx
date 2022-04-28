@@ -25,7 +25,7 @@ const useStructureContext = (): StructureContextValue => {
   return structureCtx;
 };
 
-export const LoadedGuarantee: React.FC = ({ children }) => {
+export const LoadedGuarantee: React.FC<React.PropsWithChildren<unknown>> = ({ children }) => {
   const structure = useStructureContext();
   if (structure.guaranteedLoaded) {
     return <>{children}</>;

@@ -142,16 +142,6 @@ describe('<SignUpVerify/>', () => {
       const tree = renderJSON(<SignUpVerifyEmailAddress />);
       expect(tree).toMatchSnapshot();
     });
-
-    it('can skip disabled verification strategies', () => {
-      mockEmailAddressAttribute = {
-        enabled: true,
-        verifications: ['email_link'],
-      };
-      mockDisabledStrategies = ['email_link'];
-      const { container } = render(<SignUpVerifyEmailAddress />);
-      expect(container.querySelector('.cl-otp-input')).not.toBeNull();
-    });
   });
 
   describe('verify phone number', () => {

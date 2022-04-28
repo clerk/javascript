@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.3.13](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.3.12...@clerk/remix@0.3.13) (2022-04-27)
+
+**Note:** Version bump only for package @clerk/remix
+
+### [0.3.12](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.3.11...@clerk/remix@0.3.12) (2022-04-22)
+
+**Note:** Version bump only for package @clerk/remix
+
+### [0.3.11](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.3.11-staging.1...@clerk/remix@0.3.11) (2022-04-19)
+
+**Note:** Version bump only for package @clerk/remix
+
+### [0.3.11-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.3.11-staging.0...@clerk/remix@0.3.11-staging.1) (2022-04-19)
+
+**Note:** Version bump only for package @clerk/remix
+
+### [0.3.10](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.3.10-alpha.0...@clerk/remix@0.3.10) (2022-04-18)
+
+**Note:** Version bump only for package @clerk/remix
+
+### [0.3.10-alpha.0](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.3.9...@clerk/remix@0.3.10-alpha.0) (2022-04-15)
+
+### Features
+
+- **gatsby-plugin-clerk:** Introduce basic structure ([a1c215b](https://github.com/clerkinc/javascript/commit/a1c215bba609107233e1596315136d77c491a74e))
+
+### [0.3.9](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.3.8...@clerk/remix@0.3.9) (2022-04-15)
+
+**Note:** Version bump only for package @clerk/remix
+
+### [0.3.8](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.3.8-staging.1...@clerk/remix@0.3.8) (2022-04-15)
+
+**Note:** Version bump only for package @clerk/remix
+
 ### [0.3.7](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.3.7-staging.0...@clerk/remix@0.3.7) (2022-04-13)
 
 **Note:** Version bump only for package @clerk/remix

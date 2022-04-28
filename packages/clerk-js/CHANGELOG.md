@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.8.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.8.0-staging.0...@clerk/clerk-js@3.8.0) (2022-04-22)
+
+**Note:** Version bump only for package @clerk/clerk-js
+
+### [3.7.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.7.1-staging.1...@clerk/clerk-js@3.7.1) (2022-04-19)
+
+**Note:** Version bump only for package @clerk/clerk-js
+
+### [3.7.1-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.7.1-staging.0...@clerk/clerk-js@3.7.1-staging.1) (2022-04-19)
+
+### Bug Fixes
+
+- **clerk-js:** Pass rotating_token_nonce correctly to FAPIClient ([370cb0e](https://github.com/clerkinc/javascript/commit/370cb0e26bccd524c44b9e7fc0e15521193f514f))
+
+## [3.7.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.6.1-alpha.0...@clerk/clerk-js@3.7.0) (2022-04-18)
+
+### Features
+
+- **clerk-js:** Organization slugs ([7f0e771](https://github.com/clerkinc/javascript/commit/7f0e771036815885b01da095979cf39da212503f))
+
+### [3.6.1-alpha.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.6.0...@clerk/clerk-js@3.6.1-alpha.0) (2022-04-15)
+
+**Note:** Version bump only for package @clerk/clerk-js
+
+## [3.6.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.6.0-staging.0...@clerk/clerk-js@3.6.0) (2022-04-15)
+
+**Note:** Version bump only for package @clerk/clerk-js
+
 ## [3.5.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.5.0-staging.0...@clerk/clerk-js@3.5.0) (2022-04-13)
 
 **Note:** Version bump only for package @clerk/clerk-js

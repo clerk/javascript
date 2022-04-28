@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.2.9](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@3.2.8...@clerk/clerk-react@3.2.9) (2022-04-27)
+
+### Bug Fixes
+
+- **clerk-react:** Type updates for React 18 ([6d5c0bf](https://github.com/clerkinc/javascript/commit/6d5c0bf33e17885cacd97320c385cf06ca4f5adf))
+
+### [3.2.8](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@3.2.8-staging.1...@clerk/clerk-react@3.2.8) (2022-04-19)
+
+**Note:** Version bump only for package @clerk/clerk-react
+
+### [3.2.8-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@3.2.8-staging.0...@clerk/clerk-react@3.2.8-staging.1) (2022-04-19)
+
+**Note:** Version bump only for package @clerk/clerk-react
+
+### [3.2.7](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@3.2.7-alpha.0...@clerk/clerk-react@3.2.7) (2022-04-18)
+
+**Note:** Version bump only for package @clerk/clerk-react
+
+### [3.2.7-alpha.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@3.2.6...@clerk/clerk-react@3.2.7-alpha.0) (2022-04-15)
+
+**Note:** Version bump only for package @clerk/clerk-react
+
+### [3.2.6](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@3.2.5...@clerk/clerk-react@3.2.6) (2022-04-15)
+
+### Bug Fixes
+
+- **clerk-react:** Explicitly type children for React.FC components ([#199](https://github.com/clerkinc/javascript/issues/199)) ([9fb2ce4](https://github.com/clerkinc/javascript/commit/9fb2ce46e1e7f60fd31deae43fd1afaf5a1abc62))
+
+### [3.2.5](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@3.2.5-staging.0...@clerk/clerk-react@3.2.5) (2022-04-15)
+
+**Note:** Version bump only for package @clerk/clerk-react
+
 ### [3.2.4](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@3.2.4-staging.0...@clerk/clerk-react@3.2.4) (2022-04-13)
 
 **Note:** Version bump only for package @clerk/clerk-react

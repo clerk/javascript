@@ -151,11 +151,21 @@ Organization operations are exposed by the `organizations` sub-api (`clerkAPI.or
 
 #### createOrganization(params)
 
-Creates a new organization with the given name. You need to provide the user ID who is going to be the organization owner. The user will become an administrator for the organization.
+Creates a new organization with the given name and optional slug.
+
+You need to provide the user ID who is going to be the organization owner. The user will become an administrator for the organization.
+
+Available parameters are:
+
+- _name_ The name for the organization.
+- _createdBy_ The ID of the user who is going to be the organization administrator.
+- _publicMetadata_ Metadata saved on the organization, that is visible to both your Frontend and Backend APIs.
+- _privateMetadata_ Metadata saved on the organization, that is only visible to your Backend API.
 
 ```js
 const organization = await clerkAPI.organizations.createOrganization({
   name: 'Acme Inc',
+  slug: 'acme-inc',
   createdBy: 'user_1o4q123qMeCkKKIXcA9h8',
 });
 ```
