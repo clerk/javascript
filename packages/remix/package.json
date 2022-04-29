@@ -52,8 +52,7 @@
   },
   "peerDependencies": {
     "@remix-run/react": "^1.2.1",
-    "@remix-run/server-runtime": "^1.2.1",
-    "remix": ">=1.2.1"
+    "@remix-run/server-runtime": "^1.2.1"
   },
   "engines": {
     "node": ">=16"
