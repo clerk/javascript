@@ -19,15 +19,15 @@ function useMagicLink(resource: EmailAddressResource): UseMagicLinkEmailAddressR
 function useMagicLink(
   resource: MagicLinkable,
 ): UseMagicLinkSignInReturn | UseMagicLinkSignUpReturn | UseMagicLinkEmailAddressReturn {
-  const { startMagicLinkFlow, cancelMagicLinkFlow } = React.useMemo(() => resource.createMagicLinkFlow(), [resource]);
+  const flow = React.useMemo(() => resource?.createMagicLinkFlow(), [resource]);
 
   React.useEffect(() => {
-    return cancelMagicLinkFlow;
+    return flow?.cancelMagicLinkFlow;
   }, []);
 
   return {
-    startMagicLinkFlow,
-    cancelMagicLinkFlow,
+    startMagicLinkFlow: flow?.startMagicLinkFlow,
+    cancelMagicLinkFlow: flow?.cancelMagicLinkFlow,
   } as UseMagicLinkSignInReturn | UseMagicLinkSignUpReturn | UseMagicLinkEmailAddressReturn;
 }
 
