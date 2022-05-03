@@ -32,12 +32,14 @@ const mockAuthProp = {
   getToken: mockGetToken,
   userId: 'user_id',
   sessionId: 'session_id',
+  claims: mockGetAuthStateClaims,
 };
 
 const mockAuthSignedOutProp = {
   getToken: mockGetToken,
   userId: null,
   sessionId: null,
+  claims: null,
 };
 
 const mockToken = jwt.sign(mockGetAuthStateClaims, 'mock-secret');

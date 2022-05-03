@@ -59,7 +59,7 @@ export async function getAuthData(
       loadSession ? sessions.getSession(sessionId) : Promise.resolve(undefined),
     ]);
 
-    return { sessionId, userId, user, session, getToken };
+    return { sessionId, userId, user, session, getToken, claims: sessionClaims };
   } catch (err) {
     return createSignedOutState();
   }

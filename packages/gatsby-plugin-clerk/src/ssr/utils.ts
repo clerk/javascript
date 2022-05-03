@@ -9,6 +9,8 @@ import { GetServerDataPropsWithAuth } from './types';
  */
 export function injectAuthIntoContext(context: GetServerDataProps, authData: AuthData): GetServerDataPropsWithAuth {
   const { user, session, ...auth } = authData || {};
+  // FIXME: Add auth.claims addition
+  // @ts-ignore
   return { ...context, auth, user, session };
 }
 

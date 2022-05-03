@@ -11,6 +11,7 @@ export type AuthData = {
   userId: string | null;
   user: User | undefined | null;
   getToken: ServerGetToken;
+  claims: Record<string, unknown> | null;
 };
 
 /**
@@ -64,7 +65,7 @@ export async function getAuthData(
       fetcher: (...args) => sessions.getToken(...args),
     });
 
-    return { authData: { sessionId, userId, user, session, getToken } };
+    return { authData: { sessionId, userId, user, session, getToken, claims: sessionClaims } };
   } catch (e) {
     return { authData: createSignedOutState() };
   }
