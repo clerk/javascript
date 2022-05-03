@@ -244,6 +244,7 @@ export interface SessionActivityJSON extends ClerkResourceJSON {
 export interface OrganizationJSON extends ClerkResourceJSON {
   object: 'organization';
   id: string;
+  logo_url: string;
   name: string;
   slug: string;
   public_metadata: Record<string, unknown>;

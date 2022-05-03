@@ -17,6 +17,7 @@ export interface OrganizationResource {
   id: string;
   name: string;
   slug: string;
+  logoUrl: string;
   publicMetadata: OrganizationPublicMetadata;
   createdAt: Date;
   updatedAt: Date;
@@ -28,6 +29,7 @@ export interface OrganizationResource {
   updateMember: (params: UpdateMembershipParams) => Promise<OrganizationMembershipResource>;
   removeMember: (userId: string) => Promise<OrganizationMembershipResource>;
   destroy: () => Promise<void>;
+  setLogo: (params: SetOrganizationLogoParams) => Promise<OrganizationResource>;
 }
 
 export interface GetMembershipsParams {
@@ -53,4 +55,8 @@ export interface UpdateMembershipParams {
 
 export interface UpdateOrganizationParams {
   name: string;
+}
+
+export interface SetOrganizationLogoParams {
+  file: Blob | File;
 }
