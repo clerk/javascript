@@ -17,20 +17,29 @@ export interface OrganizationResource {
   id: string;
   name: string;
   slug: string;
+  logoUrl: string;
   publicMetadata: OrganizationPublicMetadata;
   createdAt: Date;
   updatedAt: Date;
   update: (params: UpdateOrganizationParams) => Promise<OrganizationResource>;
   getMemberships: (params?: GetMembershipsParams) => Promise<OrganizationMembershipResource[]>;
   getPendingInvitations: () => Promise<OrganizationInvitationResource[]>;
+  addMember: (params: AddMemberParams) => Promise<OrganizationMembershipResource>;
   inviteMember: (params: InviteMemberParams) => Promise<OrganizationInvitationResource>;
   updateMember: (params: UpdateMembershipParams) => Promise<OrganizationMembershipResource>;
   removeMember: (userId: string) => Promise<OrganizationMembershipResource>;
+  destroy: () => Promise<void>;
+  setLogo: (params: SetOrganizationLogoParams) => Promise<OrganizationResource>;
 }
 
 export interface GetMembershipsParams {
   limit?: number;
   offset?: number;
+}
+
+export interface AddMemberParams {
+  userId: string;
+  role: MembershipRole;
 }
 
 export interface InviteMemberParams {
@@ -46,4 +55,8 @@ export interface UpdateMembershipParams {
 
 export interface UpdateOrganizationParams {
   name: string;
+}
+
+export interface SetOrganizationLogoParams {
+  file: Blob | File;
 }

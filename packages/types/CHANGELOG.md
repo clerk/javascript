@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.8.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.7.1...@clerk/types@2.8.0) (2022-04-28)
+
+### Features
+
+- **clerk-js:** Add members to organizations ([d6787b6](https://github.com/clerkinc/javascript/commit/d6787b659744ea2ca178d6cf7df488be265d7a69))
+- **clerk-js:** Delete organizations ([7cb1bea](https://github.com/clerkinc/javascript/commit/7cb1beaf12b293b9fde541855eb2cda81e0d6be4))
+
 ### [2.7.1](https://github.com/clerkinc/javascript/compare/@clerk/types@2.7.1-staging.1...@clerk/types@2.7.1) (2022-04-19)
 
 **Note:** Version bump only for package @clerk/types

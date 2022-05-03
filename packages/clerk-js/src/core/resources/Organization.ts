@@ -7,6 +7,7 @@ import type {
   OrganizationMembershipJSON,
   OrganizationResource,
   UpdateOrganizationParams,
+  SetOrganizationLogoParams,
 } from '@clerk/types';
 import { unixEpochToDate } from 'utils/date';
 
@@ -18,6 +19,7 @@ export class Organization extends BaseResource implements OrganizationResource {
   id!: string;
   name!: string;
   slug!: string;
+  logoUrl!: string;
   publicMetadata: Record<string, unknown> = {};
   createdAt!: Date;
   updatedAt!: Date;
@@ -84,6 +86,14 @@ export class Organization extends BaseResource implements OrganizationResource {
       .catch(() => []);
   };
 
+  addMember = async ({ userId, role }: AddMemberParams) => {
+    return await BaseResource._fetch({
+      method: 'POST',
+      path: `/organizations/${this.id}/memberships`,
+      body: { userId, role } as any,
+    }).then(res => new OrganizationMembership(res?.response as OrganizationMembershipJSON));
+  };
+
   inviteMember = async (inviteMemberParams: InviteMemberParams) => {
     return await OrganizationInvitation.create(this.id, inviteMemberParams);
   };
@@ -103,10 +113,26 @@ export class Organization extends BaseResource implements OrganizationResource {
     }).then(res => new OrganizationMembership(res?.response as OrganizationMembershipJSON));
   };
 
+  destroy = async (): Promise<void> => {
+    return this._baseDelete();
+  };
+
+  setLogo = async ({ file }: SetOrganizationLogoParams): Promise<OrganizationResource> => {
+    const body = new FormData();
+    body.append('file', file);
+
+    return await BaseResource._fetch({
+      path: `/organizations/${this.id}/logo`,
+      method: 'PUT',
+      body,
+    }).then(res => new Organization(res?.response as OrganizationJSON));
+  };
+
   protected fromJSON(data: OrganizationJSON): this {
     this.id = data.id;
     this.name = data.name;
     this.slug = data.slug;
+    this.logoUrl = data.logo_url;
     this.publicMetadata = data.public_metadata;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
@@ -117,6 +143,11 @@ export class Organization extends BaseResource implements OrganizationResource {
 export type GetOrganizationParams = {
   limit?: number;
   offset?: number;
+};
+
+export type AddMemberParams = {
+  userId: string;
+  role: MembershipRole;
 };
 
 export type InviteMemberParams = {
