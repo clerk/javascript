@@ -1,6 +1,6 @@
 import { addYears } from '@clerk/shared/utils/date';
 import type { ClientResource } from '@clerk/types';
-import { buildURL, getAllETLDs, getETLDPlusOne } from 'utils';
+import { buildURL, getAllETLDs } from 'utils';
 
 import { clientCookie } from './client';
 import { clientUatCookie } from './client_uat';
@@ -57,38 +57,10 @@ export const createCookieHandler = () => {
   // Third party cookie helpers
   const ssoCookie = clientCookie;
 
-  // TODO: Clean up these cookie handlers after Auth v2 becomes the only authentication method
-  // Dev Browser cookie will be handled 100% be local storage
-  const getSSODevBrowserCookie = () => ssoCookie.get();
-
-  const setSSODevBrowserCookie = async (token: string) => {
-    const domain = await getETLDPlusOne();
-    const expires = addYears(Date.now(), 1);
-    const path = COOKIE_PATH;
-    const inIframe = window.location !== window.parent.location;
-    const sameSite = inIframe ? 'None' : 'Lax';
-    const secure = sameSite === 'None' || window.location.protocol === 'https:';
-
-    return ssoCookie.set(token, {
-      domain,
-      expires,
-      path,
-      sameSite,
-      secure,
-    });
-  };
-
-  const removeAllDevBrowserCookies = async (strict = true) => {
+  const removeAllDevBrowserCookies = () => {
     inittedCookie.remove({ path: COOKIE_PATH });
-
-    if (strict) {
-      // Delete cookie accurately by calculating the ETLD+1 domain
-      const domain = await getETLDPlusOne();
-      ssoCookie.remove({ domain, path: COOKIE_PATH });
-    } else {
-      // Delete cookie in a best-effort way by iterating all ETLDs
-      getAllETLDs().forEach(domain => ssoCookie.remove({ domain, path: COOKIE_PATH }));
-    }
+    // Delete cookie in a best-effort way by iterating all ETLDs
+    getAllETLDs().forEach(domain => ssoCookie.remove({ domain, path: COOKIE_PATH }));
   };
 
   const clearLegacyAuthV1SessionCookie = async () => {
@@ -129,8 +101,6 @@ export const createCookieHandler = () => {
     setSessionCookie,
     setClientUatCookie,
     removeSessionCookie,
-    getSSODevBrowserCookie,
-    setSSODevBrowserCookie,
     removeAllDevBrowserCookies,
     clearLegacyAuthV1SessionCookie,
   };
