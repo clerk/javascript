@@ -74,7 +74,7 @@ Array [
             htmlFor="text-field-identifier"
           >
             <input
-              autoFocus={true}
+              autoFocus={false}
               className="input"
               id="text-field-identifier"
               maxLength={255}
