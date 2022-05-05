@@ -64,17 +64,16 @@ export default class IsomorphicClerk {
   static #instance: IsomorphicClerk;
 
   static getOrCreateInstance(params: NewIsomorphicClerkParams) {
-    if (!this.#instance) {
+    // During SSR: a new instance should be created for every request
+    // During CSR: use the cached instance for the whole lifetime of the app
+    // This method should be idempotent in both scenarios
+    if (!inClientSide() || !this.#instance) {
       this.#instance = new IsomorphicClerk(params);
     }
     return this.#instance;
   }
 
   constructor(params: NewIsomorphicClerkParams) {
-    if (IsomorphicClerk.#instance) {
-      throw new Error('An IsomorphicClerk instance already exists. Use IsomorphicClerk.getOrCreateInstance instead');
-    }
-
     const { Clerk = null, frontendApi, options = {} } = params || {};
     this.frontendApi = frontendApi;
     this.options = options;
