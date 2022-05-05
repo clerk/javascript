@@ -5,7 +5,6 @@ import type {
   CreateOrganizationParams,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
-  InitialState,
   OrganizationMembershipResource,
   OrganizationResource,
   RedirectOptions,
@@ -39,7 +38,6 @@ type NewIsomorphicClerkParams = {
   frontendApi: string;
   options: IsomorphicClerkOptions;
   Clerk: ClerkProp | null;
-  initialState?: InitialState;
 };
 
 export default class IsomorphicClerk {
@@ -59,8 +57,6 @@ export default class IsomorphicClerk {
 
   #loaded = false;
 
-  initialState: InitialState | undefined;
-
   get loaded(): boolean {
     return this.#loaded;
   }
@@ -79,11 +75,10 @@ export default class IsomorphicClerk {
       throw new Error('An IsomorphicClerk instance already exists. Use IsomorphicClerk.getOrCreateInstance instead');
     }
 
-    const { Clerk = null, frontendApi, initialState, options = {} } = params || {};
+    const { Clerk = null, frontendApi, options = {} } = params || {};
     this.frontendApi = frontendApi;
     this.options = options;
     this.Clerk = Clerk;
-    this.initialState = initialState;
     this.mode = inClientSide() ? 'browser' : 'server';
   }
 

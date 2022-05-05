@@ -10,20 +10,17 @@ import { UserContext } from './UserContext';
 
 type ClerkContextWrapperProps = {
   isomorphicClerk: IsomorphicClerk;
+  initialState: InitialState | undefined;
   children: React.ReactNode;
   clerkLoaded: boolean;
 };
 
 type ClerkContextProviderState = Resources;
 
-export function ClerkContextProvider({
-  isomorphicClerk,
-  children,
-  clerkLoaded,
-}: ClerkContextWrapperProps): JSX.Element | null {
+export function ClerkContextProvider(props: ClerkContextWrapperProps): JSX.Element | null {
+  const { isomorphicClerk, children, clerkLoaded, initialState } = props;
   const clerk = isomorphicClerk;
 
-  const initialState = clerk.initialState;
   const [state, setState] = React.useState<ClerkContextProviderState>({
     client: clerk.client as ClientResource,
     session: clerk.session,
