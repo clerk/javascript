@@ -209,7 +209,7 @@ export function _SignInStart(): JSX.Element {
                     type={identifierInputDisplayValues.fieldType as any}
                     handleChange={el => identifier.setValue(el.value || '')}
                     value={identifier.value}
-                    autoFocus
+                    autoFocus={!hasSocialOrWeb3Buttons}
                     minLength={1}
                     maxLength={255}
                   />

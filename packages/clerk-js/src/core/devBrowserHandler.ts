@@ -88,9 +88,9 @@ export default function createDevBrowserHandler({
     }
   }
 
-  async function clear(strict = true) {
+  async function clear() {
     removeDevBrowserJWT();
-    await cookieHandler.removeAllDevBrowserCookies(strict);
+    await cookieHandler.removeAllDevBrowserCookies();
   }
 
   async function setup({ purge }: { purge: boolean }): Promise<void> {
@@ -101,10 +101,7 @@ export default function createDevBrowserHandler({
       // Note 1: When setup runs for production instances, clear will work only in staging and production Clerk environments
       // as lclclerk.com is not in the PSL yet.  As a result we can't delete the .(prod|dev).lclclerk.com cookie
       // that is set from auth V1 applications in local environment
-
-      // Note 2: Production instances should clear dev browser cookies in a best-effort way to avoid resolving tldts library
-      // from CDN so as not to cause extra latency to the application bootstrapping.
-      await clear(devOrStgApi);
+      await clear();
     }
 
     if (devOrStgApi) {
@@ -127,8 +124,7 @@ export default function createDevBrowserHandler({
       return setFirstPartyCookieForDevBrowser();
     }
 
-    // TODO: Remove legacy Auth V1 handling
-    if (!devOrStgHost && devOrStgApi && !cookieHandler.getSSODevBrowserCookie() && !getDevBrowserJWT()) {
+    if (!devOrStgHost && devOrStgApi && !getDevBrowserJWT()) {
       return setThirdPartyCookieForDevBrowser();
     }
   }

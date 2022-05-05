@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "main": "index.js",
   "module": "index.js",
@@ -26,7 +26,7 @@
     "@babel/core": "^7.13.14",
     "@babel/preset-env": "^7.13.12",
     "@babel/preset-react": "^7.13.13",
-    "@clerk/types": "^2.8.0",
+    "@clerk/types": "^2.9.0",
     "@popperjs/core": "^2.5.4",
     "@sentry/browser": "^6.3.0",
     "@svgr/webpack": "^6.2.1",
