@@ -42,7 +42,7 @@ test('createOrganization() creates an organization', async () => {
     new Organization(
       resJSON.id,
       name,
-      null,
+      slug,
       null,
       resJSON.created_at,
       resJSON.updated_at,
