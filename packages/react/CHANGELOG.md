@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.2.13-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@3.2.12...@clerk/clerk-react@3.2.13-staging.0) (2022-05-05)
+
+### Bug Fixes
+
+- **clerk-react:** Make getOrCreateInstance handle both SSR and CSR instantiation ([8f9481c](https://github.com/clerkinc/javascript/commit/8f9481cf088c63b3cd3192cb1396596a98b11980))
+- **clerk-react:** Make isomorphicClerk loading idempotent ([221919c](https://github.com/clerkinc/javascript/commit/221919ceab5ad1631073f8ba7564c869ebf7a890))
+- **clerk-react:** Pass initialState directly to ClerkContextProvider ([cb777d4](https://github.com/clerkinc/javascript/commit/cb777d4651710fda248036fdc5398e0dac7aa337))
+
 ### [3.2.12](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@3.2.12-staging.0...@clerk/clerk-react@3.2.12) (2022-05-05)
 
 **Note:** Version bump only for package @clerk/clerk-react
