@@ -34,14 +34,14 @@ type MethodName<T> = {
 }[keyof T];
 type MethodCallback = () => void;
 
-type NewIsomorphicClerkParams = {
+export type NewIsomorphicClerkParams = {
   frontendApi: string;
   options: IsomorphicClerkOptions;
   Clerk: ClerkProp | null;
 };
 
 export default class IsomorphicClerk {
-  private mode: string;
+  private mode: 'browser' | 'server';
   private frontendApi: string;
   private options: IsomorphicClerkOptions;
   private Clerk: ClerkProp;
@@ -80,10 +80,11 @@ export default class IsomorphicClerk {
     this.options = options;
     this.Clerk = Clerk;
     this.mode = inClientSide() ? 'browser' : 'server';
+    void this.loadClerkJS();
   }
 
   async loadClerkJS(): Promise<BrowserClerk | undefined> {
-    if (this.#loaded) {
+    if (this.mode !== 'browser' || this.#loaded) {
       return;
     }
 
