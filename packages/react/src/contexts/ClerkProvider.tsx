@@ -18,8 +18,8 @@ function ClerkProviderBase(props: ClerkProviderProps): JSX.Element {
   const [clerkLoaded, setClerkLoaded] = useState(false);
 
   const clerk = useMemo(() => {
-    const { frontendApi = '', Clerk: ClerkConstructor, initialState, ...options } = props;
-    return IsomorphicClerk.getOrCreateInstance({ frontendApi, options, Clerk: ClerkConstructor, initialState });
+    const { frontendApi = '', Clerk: ClerkConstructor, ...options } = props;
+    return IsomorphicClerk.getOrCreateInstance({ frontendApi, options, Clerk: ClerkConstructor });
   }, []);
 
   useEffect(() => {
@@ -29,6 +29,7 @@ function ClerkProviderBase(props: ClerkProviderProps): JSX.Element {
   return (
     <StructureContext.Provider value={StructureContextStates.noGuarantees}>
       <ClerkContextProvider
+        initialState={props.initialState}
         isomorphicClerk={clerk}
         clerkLoaded={clerkLoaded}
       >
