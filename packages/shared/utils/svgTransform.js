@@ -9,7 +9,7 @@ module.exports = {
     const code = babel.transform(
       `
         import React from 'react';
-        export default () => (<svg data-filename="${path.relative(process.cwd(), filename)}" />);
+        export default () => (<svg data-filename="${path.relative(process.cwd(), filename).replace(/\\/g, '/')}" />);
       `,
       {
         filename,

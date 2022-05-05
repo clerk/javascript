@@ -33,7 +33,7 @@
     }
   },
   "scripts": {
-    "build": "node ./scripts/info.cjs && tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && ./moduleTypeFix"
+    "build": "node ./scripts/info.cjs && tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && node moduleTypeFix.js"
   },
   "dependencies": {
     "@clerk/backend-core": "^1.9.2",

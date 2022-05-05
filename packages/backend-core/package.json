@@ -4,7 +4,7 @@
   "license": "MIT",
   "description": "Clerk Backend API core resources and authentication utilities for JavaScript environments.",
   "scripts": {
-    "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && ./moduleTypeFix",
+    "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && node moduleTypeFix.js",
     "dev": "tsc -p tsconfig.esm.json --watch",
     "test": "jest"
   },
