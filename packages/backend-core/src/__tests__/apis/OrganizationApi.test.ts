@@ -49,3 +49,40 @@ test('createOrganization() creates an organization', async () => {
     }),
   );
 });
+
+test('updateOrganizationMetadata() updates organization metadata', async () => {
+  const id = 'org_randomid';
+  const publicMetadata = { hello: 'world' };
+  const privateMetadata = { goodbye: 'world' };
+  const resJSON = {
+    object: 'organization',
+    id,
+    name: 'Org',
+    public_metadata: publicMetadata,
+    private_metadata: privateMetadata,
+    created_at: 1611948436,
+    updated_at: 1611948436,
+  };
+
+  nock('https://api.clerk.dev')
+    .patch(`/v1/organizations/${id}/metadata`, {
+      public_metadata: JSON.stringify(publicMetadata),
+      private_metadata: JSON.stringify(privateMetadata),
+    })
+    .reply(200, resJSON);
+
+  const organization = await TestBackendAPIClient.organizations.updateOrganizationMetadata(id, {
+    publicMetadata,
+    privateMetadata,
+  });
+  expect(organization).toEqual(
+    new Organization({
+      id,
+      name: resJSON.name,
+      publicMetadata,
+      privateMetadata,
+      createdAt: resJSON.created_at,
+      updatedAt: resJSON.updated_at,
+    }),
+  );
+});

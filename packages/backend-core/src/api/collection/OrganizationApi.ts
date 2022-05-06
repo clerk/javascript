@@ -19,6 +19,8 @@ type OrganizationMetadataRequestBody = {
   privateMetadata?: string;
 };
 
+type UpdateMetadataParams = OrganizationMetadataParams;
+
 export class OrganizationApi extends AbstractApi {
   public async createOrganization(params: CreateParams) {
     const { publicMetadata, privateMetadata } = params;
@@ -32,6 +34,16 @@ export class OrganizationApi extends AbstractApi {
           privateMetadata,
         }),
       },
+    });
+  }
+
+  public async updateOrganizationMetadata(organizationId: string, params: UpdateMetadataParams) {
+    this.requireId(organizationId);
+
+    return this._restClient.makeRequest<Organization>({
+      method: 'PATCH',
+      path: `${basePath}/${organizationId}/metadata`,
+      bodyParams: stringifyMetadataParams(params),
     });
   }
 }
