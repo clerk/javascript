@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.10.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.9.0...@clerk/types@2.10.0) (2022-05-06)
+
+### Features
+
+- **nextjs,clerk-sdk-node,remix:** Add claims attribute to req.auth ([c695529](https://github.com/clerkinc/javascript/commit/c695529089f55baef72b86e3b73b8cd9f4f58e6d))
+
 ## [2.9.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.9.0-staging.0...@clerk/types@2.9.0) (2022-05-05)
 
 **Note:** Version bump only for package @clerk/types

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.0](https://github.com/clerkinc/javascript/compare/@clerk/edge@1.3.8...@clerk/edge@1.4.0) (2022-05-06)
+
+### Features
+
+- **nextjs,clerk-sdk-node,remix:** Add claims attribute to req.auth ([c695529](https://github.com/clerkinc/javascript/commit/c695529089f55baef72b86e3b73b8cd9f4f58e6d))
+
 ### [1.3.8](https://github.com/clerkinc/javascript/compare/@clerk/edge@1.3.8-staging.0...@clerk/edge@1.3.8) (2022-05-05)
 
 **Note:** Version bump only for package @clerk/edge

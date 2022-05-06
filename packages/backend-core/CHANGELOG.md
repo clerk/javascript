@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.5.6...@clerk/backend-core@1.6.0) (2022-05-06)
+
+### Features
+
+- **backend-core:** Update organization metadata ([ad496f9](https://github.com/clerkinc/javascript/commit/ad496f95b27dd6286f94399d485bbcd774d90a2d))
+- **nextjs,clerk-sdk-node,remix:** Add claims attribute to req.auth ([c695529](https://github.com/clerkinc/javascript/commit/c695529089f55baef72b86e3b73b8cd9f4f58e6d))
+
 ### [1.5.6](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.5.6-staging.0...@clerk/backend-core@1.5.6) (2022-05-05)
 
 **Note:** Version bump only for package @clerk/backend-core
