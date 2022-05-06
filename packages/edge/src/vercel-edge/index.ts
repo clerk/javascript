@@ -122,7 +122,14 @@ export function withEdgeMiddlewareAuth(
       fetcher: (...args) => ClerkAPI.sessions.getToken(...args),
     });
 
-    const authRequest = injectAuthIntoRequest(req, { user, session, sessionId, userId, getToken });
+    const authRequest = injectAuthIntoRequest(req, {
+      user,
+      session,
+      sessionId,
+      userId,
+      getToken,
+      claims: sessionClaims as Record<string, unknown>,
+    });
     return handler(authRequest, event);
   };
 }

@@ -9,6 +9,7 @@ export type ServerSideAuth = {
   sessionId: string | null;
   userId: string | null;
   getToken: ServerGetToken;
+  claims: Record<string, unknown> | null;
 };
 
 type SsrSessionState<SessionType> =

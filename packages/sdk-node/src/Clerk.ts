@@ -43,6 +43,7 @@ export type WithAuthProp<T> = T & {
     sessionId: string | null;
     userId: string | null;
     getToken: ServerGetToken;
+    claims: Record<string, unknown> | null;
   };
 };
 
@@ -51,6 +52,7 @@ export type RequireAuthProp<T> = T & {
     sessionId: string;
     userId: string;
     getToken: ServerGetToken;
+    claims: Record<string, unknown>;
   };
 };
 
@@ -290,6 +292,7 @@ export default class Clerk extends ClerkBackendAPI {
               sessionId: sessionClaims?.sid,
               fetcher: (...args) => this.sessions.getToken(...args),
             }),
+            claims: sessionClaims,
           };
 
           return next();
@@ -305,6 +308,7 @@ export default class Clerk extends ClerkBackendAPI {
           userId: null,
           sessionId: null,
           getToken: createSignedOutState().getToken,
+          claims: null,
         };
 
         // Call onError if provided
