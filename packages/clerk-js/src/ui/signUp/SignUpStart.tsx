@@ -302,7 +302,12 @@ function _SignUpStart(): JSX.Element {
       </Control>
     ) : null;
 
-  const atLeastOneFormField = nameField || usernameField || emailAddressField || phoneNumberField || passwordField;
+  const atLeastOneAuthFactor =
+    userSettings.attributes.email_address.used_for_first_factor ||
+    userSettings.attributes.phone_number.used_for_first_factor ||
+    (userSettings.attributes.password.required && userSettings.attributes.username.required);
+
+  const showFormFields = atLeastOneAuthFactor || !oauthOptions.length;
 
   return (
     <>
@@ -323,7 +328,7 @@ function _SignUpStart(): JSX.Element {
             setError={setError}
           />
         )}
-        {atLeastOneFormField && (
+        {showFormFields && (
           <>
             {(oauthOptions.length > 0 || web3Options.length > 0) && <Separator />}
             {/* @ts-ignore */}
