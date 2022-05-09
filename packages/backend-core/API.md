@@ -20,7 +20,8 @@ Reference of the methods supported in the Clerk Backend API wrapper. [API refere
   - [revokeInvitation(invitationId)](#revokeinvitationinvitationId)
 - [Organization operations](#organization-operations)
   - [createOrganization(params)](#createorganizationparams)
-  - [updateOrganizationMetadata(params)](#updateorganizationmetadataparams)
+  - [updateOrganization(organizationId, params)](#updateorganizationorganizationid-params)
+  - [updateOrganizationMetadata(organizationId, params)](#updateorganizationmetadataorganizationid-params)
 - [Session operations](#session-operations)
   - [getSessionList({ clientId, userId })](#getsessionlist-clientid-userid-)
   - [getSession(sessionId)](#getsessionsessionid)
@@ -171,7 +172,21 @@ const organization = await clerkAPI.organizations.createOrganization({
 });
 ```
 
-#### updateOrganizationMetadata(params)
+#### updateOrganization(organizationId, params)
+
+Update the organization specified by `organizationId`.
+
+Available parameters are:
+
+- _name_ The name for the organization.
+
+```js
+const organization = await clerkAPI.organizations.updateOrganization('org_1o4q123qMeCkKKIXcA9h8', {
+  name: 'Acme Inc',
+});
+```
+
+#### updateOrganizationMetadata(organizationId, params)
 
 Update an organization's metadata attributes by merging existing values with the provided parameters.
 
@@ -183,7 +198,7 @@ Available parameters are:
 - _privateMetadata_ Metadata saved on the organization, that is only visible to your Backend API.
 
 ```js
-const organization = await clerkAPI.organizations.updateOrganizationMetadata({
+const organization = await clerkAPI.organizations.updateOrganizationMetadata('org_1o4q123qMeCkKKIXcA9h8', {
   publicMetadata: { color: 'blue' },
   privateMetadata: { sandbox_mode: true },
 });

@@ -19,6 +19,10 @@ type OrganizationMetadataRequestBody = {
   privateMetadata?: string;
 };
 
+type UpdateParams = {
+  name?: string;
+};
+
 type UpdateMetadataParams = OrganizationMetadataParams;
 
 export class OrganizationApi extends AbstractApi {
@@ -34,6 +38,15 @@ export class OrganizationApi extends AbstractApi {
           privateMetadata,
         }),
       },
+    });
+  }
+
+  public async updateOrganization(organizationId: string, params: UpdateParams) {
+    this.requireId(organizationId);
+    return this._restClient.makeRequest<Organization>({
+      method: 'PATCH',
+      path: `${basePath}/${organizationId}`,
+      bodyParams: params,
     });
   }
 

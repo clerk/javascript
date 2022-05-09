@@ -50,6 +50,30 @@ test('createOrganization() creates an organization', async () => {
   );
 });
 
+test('updateOrganization() updates organization', async () => {
+  const id = 'org_randomid';
+  const name = 'New name';
+  const resJSON = {
+    object: 'organization',
+    id,
+    name,
+    created_at: 1611948436,
+    updated_at: 1611948436,
+  };
+
+  nock('https://api.clerk.dev').patch(`/v1/organizations/${id}`, { name }).reply(200, resJSON);
+
+  const organization = await TestBackendAPIClient.organizations.updateOrganization(id, { name });
+  expect(organization).toEqual(
+    new Organization({
+      id,
+      name: resJSON.name,
+      createdAt: resJSON.created_at,
+      updatedAt: resJSON.updated_at,
+    }),
+  );
+});
+
 test('updateOrganizationMetadata() updates organization metadata', async () => {
   const id = 'org_randomid';
   const publicMetadata = { hello: 'world' };
