@@ -1,27 +1,29 @@
 ﻿import {
+  APIRequestOptions,
   AuthStatus,
   Base,
+  ClerkAPIResponseError,
   ClerkBackendAPI,
-  ClerkFetcher,
   createGetToken,
   createSignedOutState,
+  Logger,
 } from '@clerk/backend-core';
 import { ClerkJWTClaims, ServerGetToken } from '@clerk/types';
-import { Crypto, CryptoKey } from '@peculiar/webcrypto';
 import Cookies from 'cookies';
-import deepmerge from 'deepmerge';
+import deepMerge from 'deepmerge';
 import type { NextFunction, Request, Response } from 'express';
-import got, { OptionsOfUnknownResponseBody } from 'got';
 import jwt from 'jsonwebtoken';
 import jwks, { JwksClient } from 'jwks-rsa';
-import querystring from 'querystring';
+import fetch from 'node-fetch';
 
 import { SupportMessages } from './constants/SupportMessages';
 import { LIB_NAME, LIB_VERSION } from './info';
-import { decodeBase64, toSPKIDer } from './utils/crypto';
-import { ClerkServerError } from './utils/Errors';
-// utils
-import Logger from './utils/Logger';
+import {
+  decodeBase64,
+  importJSONWebKey,
+  importPKIKey,
+  verifySignature,
+} from './utils';
 
 const defaultApiKey = process.env.CLERK_API_KEY || '';
 const defaultJWTKey = process.env.CLERK_JWT_KEY;
@@ -29,13 +31,6 @@ const defaultApiVersion = process.env.CLERK_API_VERSION || 'v1';
 const defaultServerApiUrl =
   process.env.CLERK_API_URL || 'https://api.clerk.dev';
 const JWKS_MAX_AGE = 3600000; // 1 hour
-const packageRepo = 'https://github.com/clerkinc/clerk-sdk-node';
-
-export type MiddlewareOptions = {
-  onError?: Function;
-  authorizedParties?: string[];
-  jwtKey?: string;
-};
 
 export type WithAuthProp<T> = T & {
   auth: {
@@ -55,25 +50,25 @@ export type RequireAuthProp<T> = T & {
   };
 };
 
-const crypto = new Crypto();
+export type Middleware = (
+  req: WithAuthProp<Request>,
+  res: Response,
+  next: NextFunction
+) => Promise<void>;
 
-const importKey = async (jwk: JsonWebKey, algorithm: Algorithm) => {
-  return await crypto.subtle.importKey('jwk', jwk, algorithm, true, ['verify']);
+export type MiddlewareOptions = {
+  onError?: (error: ClerkAPIResponseError) => unknown;
+  authorizedParties?: string[];
+  jwtKey?: string;
 };
 
-const verifySignature = async (
-  algorithm: Algorithm,
-  key: CryptoKey,
-  signature: Uint8Array,
-  data: Uint8Array
-) => {
-  return await crypto.subtle.verify(algorithm, key, signature, data);
-};
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const noop: NextFunction = () => {};
 
 export default class Clerk extends ClerkBackendAPI {
   base: Base;
   jwtKey?: string;
-  httpOptions: OptionsOfUnknownResponseBody;
+  httpOptions: RequestInit;
 
   _jwksClient: JwksClient;
 
@@ -83,46 +78,71 @@ export default class Clerk extends ClerkBackendAPI {
   constructor({
     apiKey = defaultApiKey,
     jwtKey = defaultJWTKey,
-    serverApiUrl = defaultServerApiUrl,
+    apiUrl = defaultServerApiUrl,
     apiVersion = defaultApiVersion,
     httpOptions = {},
     jwksCacheMaxAge = JWKS_MAX_AGE,
   }: {
     apiKey?: string;
     jwtKey?: string;
-    serverApiUrl?: string;
+    apiUrl?: string;
     apiVersion?: string;
-    httpOptions?: OptionsOfUnknownResponseBody;
+    httpOptions?: RequestInit;
     jwksCacheMaxAge?: number;
   } = {}) {
-    const fetcher: ClerkFetcher = (
-      url,
-      { method, authorization, contentType, userAgent, body }
-    ) => {
-      const finalHTTPOptions = deepmerge(this.httpOptions, {
-        method,
-        responseType: contentType === 'text/html' ? 'text' : 'json',
-        headers: {
-          authorization,
-          'Content-Type': contentType,
-          'User-Agent': userAgent,
-          'X-Clerk-SDK': `node/${LIB_VERSION}`,
-        },
-        // @ts-ignore
-        ...(body && { body: querystring.stringify(body) }),
-      }) as OptionsOfUnknownResponseBody;
-
-      return got(url, finalHTTPOptions).then((data) => data.body);
-    };
-
     super({
       apiKey,
       apiVersion,
-      serverApiUrl,
+      apiUrl,
       libName: LIB_NAME,
       libVersion: LIB_VERSION,
-      packageRepo,
-      fetcher,
+      apiClient: {
+        async request<T>(options: APIRequestOptions) {
+          const { url, method, queryParams, headerParams, bodyParams } =
+            options;
+          // Build final URL with search parameters
+          const finalUrl = new URL(url || '');
+
+          if (queryParams) {
+            for (const [key, val] of Object.entries(
+              queryParams as Record<string, string | string[]>
+            )) {
+              // Support array values for queryParams such as { foo: [42, 43] }
+              if (val) {
+                [val]
+                  .flat()
+                  .forEach((v) => finalUrl.searchParams.append(key, v));
+              }
+            }
+          }
+
+          const response = await fetch(finalUrl.href, {
+            method,
+            headers: headerParams as Record<string, string>,
+            ...(bodyParams &&
+              Object.keys(bodyParams).length > 0 && {
+                body: JSON.stringify(bodyParams),
+              }),
+          });
+
+          // Parse JSON or Text response.
+          const isJSONResponse =
+            headerParams && headerParams['Content-Type'] === 'application/json';
+          const data = (await (isJSONResponse
+            ? response.json()
+            : response.text())) as T;
+
+          // Check for errors
+          if (!response.ok) {
+            throw new ClerkAPIResponseError(response.statusText, {
+              data: (data as any)?.errors || data,
+              status: response.status,
+            });
+          }
+
+          return data;
+        },
+      },
     });
 
     if (!apiKey) {
@@ -133,7 +153,7 @@ export default class Clerk extends ClerkBackendAPI {
     this.jwtKey = jwtKey;
 
     this._jwksClient = jwks({
-      jwksUri: `${serverApiUrl}/${apiVersion}/jwks`,
+      jwksUri: `${apiUrl}/${apiVersion}/jwks`,
       requestHeaders: {
         Authorization: `Bearer ${apiKey}`,
       },
@@ -151,25 +171,15 @@ export default class Clerk extends ClerkBackendAPI {
       const signingKey = await this._jwksClient.getSigningKey(
         decoded.header.kid
       );
-      const pubKey = signingKey.getPublicKey();
+      const publicKey = signingKey.getPublicKey();
 
-      return await crypto.subtle.importKey(
-        'spki',
-        toSPKIDer(pubKey),
-        {
-          name: 'RSASSA-PKCS1-v1_5',
-          hash: 'SHA-256',
-        },
-        true,
-        ['verify']
-      );
+      return importPKIKey(publicKey);
     };
 
     /** Base initialization */
-
     // TODO: More comprehensive base initialization
     this.base = new Base(
-      importKey,
+      importJSONWebKey,
       verifySignature,
       decodeBase64,
       loadCryptoKey
@@ -219,33 +229,35 @@ export default class Clerk extends ClerkBackendAPI {
   // Middlewares
 
   // defaultOnError swallows the error
-  defaultOnError(error: Error & { data: any }) {
+  protected defaultOnError = (error: ClerkAPIResponseError) => {
     Logger.warn(error.message);
 
-    (error.data || []).forEach((serverError: ClerkServerError) => {
-      Logger.warn(serverError.longMessage);
-    });
-  }
+    (error.errors || []).forEach(({ message, longMessage }) =>
+      Logger.warn(longMessage || message)
+    );
+  };
 
   // strictOnError returns the error so that Express will halt the request chain
-  strictOnError(error: Error & { data: any }) {
+  protected strictOnError = (error: ClerkAPIResponseError) => {
     Logger.error(error.message);
 
-    (error.data || []).forEach((serverError: ClerkServerError) => {
-      Logger.error(serverError.longMessage);
-    });
+    (error.errors || []).forEach(({ message, longMessage }) =>
+      Logger.error(longMessage || message)
+    );
 
     return error;
-  }
+  };
 
-  expressWithAuth(
-    { onError, authorizedParties, jwtKey }: MiddlewareOptions = {
-      onError: this.defaultOnError,
-    }
-  ): (req: Request, res: Response, next: NextFunction) => Promise<void> {
+  // Middlewares
+
+  expressWithAuth(options?: MiddlewareOptions): Middleware {
     function signedOut() {
       throw new Error('Unauthenticated');
     }
+
+    options = deepMerge(options || {}, { onError: this.defaultOnError });
+
+    const { onError, authorizedParties, jwtKey } = options;
 
     async function authenticate(
       this: Clerk,
@@ -315,7 +327,7 @@ export default class Clerk extends ClerkBackendAPI {
           return next();
         }
 
-        const err = await onError(error);
+        const err = await onError(error as any);
 
         if (err) {
           next(err);
@@ -328,12 +340,10 @@ export default class Clerk extends ClerkBackendAPI {
     return authenticate.bind(this);
   }
 
-  expressRequireAuth(
-    options: MiddlewareOptions = {
-      onError: this.strictOnError,
-    }
-  ) {
-    return this.expressWithAuth(options);
+  expressRequireAuth(options?: MiddlewareOptions) {
+    return this.expressWithAuth(
+      deepMerge(options || {}, { onError: this.strictOnError })
+    );
   }
 
   // Credits to https://nextjs.org/docs/api-routes/api-middlewares
@@ -354,12 +364,7 @@ export default class Clerk extends ClerkBackendAPI {
   }
 
   // Set the session on the request and then call provided handler
-  withAuth(
-    handler: Function,
-    options: MiddlewareOptions = {
-      onError: this.defaultOnError,
-    }
-  ) {
+  withAuth(handler: Middleware, options?: MiddlewareOptions) {
     return async (
       req: WithAuthProp<Request>,
       res: Response,
@@ -367,7 +372,7 @@ export default class Clerk extends ClerkBackendAPI {
     ) => {
       try {
         await this._runMiddleware(req, res, this.expressWithAuth(options));
-        return handler(req, res, next);
+        return handler(req, res, next || noop);
       } catch (error) {
         // @ts-ignore
         const errorData = error.data || { error: error.message };
@@ -384,12 +389,10 @@ export default class Clerk extends ClerkBackendAPI {
   }
 
   // Stricter version, short-circuits if session can't be determined
-  requireAuth(
-    handler: Function,
-    options: MiddlewareOptions = {
-      onError: this.strictOnError,
-    }
-  ) {
-    return this.withAuth(handler, options);
+  requireAuth(handler: Middleware, options?: MiddlewareOptions) {
+    return this.withAuth(
+      handler,
+      deepMerge(options || {}, { onError: this.strictOnError })
+    );
   }
 }

@@ -9,7 +9,7 @@ import {
   WithEdgeMiddlewareAuthMiddlewareResult,
   WithEdgeMiddlewareAuthOptions,
 } from './types';
-import { injectAuthIntoRequest } from './utils';
+import { injectAuthIntoRequest } from './utils/injectAuthIntoRequest';
 import { interstitialResponse, signedOutResponse } from './utils/responses';
 
 /**
@@ -56,8 +56,7 @@ const users = ClerkAPI.users;
 export { allowlistIdentifiers, clients, emails, invitations, organizations, sessions, smsMessages, users };
 
 async function fetchInterstitial() {
-  const response = await ClerkAPI.fetchInterstitial<Response>();
-  return response.text();
+  return ClerkAPI.fetchInterstitial<string>();
 }
 
 export function withEdgeMiddlewareAuth<
