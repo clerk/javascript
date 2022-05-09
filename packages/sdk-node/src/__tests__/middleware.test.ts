@@ -1,10 +1,10 @@
+import { AuthStatus } from '@clerk/backend-core';
 import type { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
 import Clerk from '../Clerk';
-import { AuthStatus } from '@clerk/backend-core';
 
-const mockGetToken = () => {};
+const mockGetToken = jest.fn();
 
 jest.mock('@clerk/backend-core', () => {
   return {
