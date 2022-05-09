@@ -60,6 +60,7 @@ const createInterstitialHTMLString = (frontendApi: string, libVersion: string, d
                 script.setAttribute('data-clerk-frontend-api', '${frontendApi}');
                 script.async = true;
                 script.src = '${getScriptUrl(frontendApi, libVersion)}';
+                script.crossOrigin = '';
                 script.addEventListener('load', startClerk);
                 document.body.appendChild(script);
             })();
