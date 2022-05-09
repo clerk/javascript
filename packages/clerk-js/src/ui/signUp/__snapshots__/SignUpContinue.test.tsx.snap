@@ -94,6 +94,7 @@ Array [
           >
             <input
               className="input"
+              disabled={false}
               id="emailAddress"
               name="emailAddress"
               onChange={[Function]}

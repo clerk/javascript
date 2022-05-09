@@ -113,6 +113,7 @@ describe('<SignUpStart/>', () => {
         },
         phone_number: {
           enabled: true,
+          required: false,
         },
       },
       social: {
@@ -220,14 +221,26 @@ describe('<SignUpStart/>', () => {
       attributes: {
         username: {
           enabled: false,
+          required: false,
+        },
+        first_name: {
+          enabled: false,
+          required: false,
+        },
+        last_name: {
+          enabled: false,
+          required: false,
         },
         email_address: {
           enabled: true,
+          required: false,
         },
         phone_number: {
           enabled: true,
+          required: false,
         },
         password: {
+          enabled: false,
           required: false,
         },
       },
@@ -314,8 +327,22 @@ describe('<SignUpStart/>', () => {
               },
               phone_number: {
                 enabled: false,
+                required: false,
+              },
+              username: {
+                enabled: false,
+                required: false,
+              },
+              first_name: {
+                enabled: false,
+                required: false,
+              },
+              last_name: {
+                enabled: false,
+                required: false,
               },
               password: {
+                enabled: false,
                 required: false,
               },
             },
@@ -350,6 +377,7 @@ describe('<SignUpStart/>', () => {
               },
               phone_number: {
                 enabled: false,
+                required: false,
               },
               username: {
                 enabled: true,
@@ -357,9 +385,11 @@ describe('<SignUpStart/>', () => {
               },
               first_name: {
                 enabled: true,
+                required: false,
               },
               last_name: {
                 enabled: true,
+                required: false,
               },
               password: {
                 enabled: true,
@@ -418,16 +448,24 @@ describe('<SignUpStart/>', () => {
                 required: true,
                 used_for_first_factor: true,
               },
+              phone_number: {
+                enabled: false,
+                required: false,
+              },
+              username: {
+                enabled: false,
+                required: false,
+              },
               first_name: {
                 enabled: true,
+                required: false,
               },
               last_name: {
                 enabled: true,
-              },
-              phone_number: {
-                enabled: false,
+                required: false,
               },
               password: {
+                enabled: false,
                 required: false,
               },
             },
@@ -457,15 +495,28 @@ describe('<SignUpStart/>', () => {
         it('does not render the phone number field', async () => {
           mockUserSettings = new UserSettings({
             attributes: {
+              email_address: {
+                used_for_first_factor: false,
+              },
               phone_number: {
                 enabled: true,
                 required: true,
                 used_for_first_factor: true,
               },
-              email_address: {
-                used_for_first_factor: false,
+              username: {
+                enabled: false,
+                required: false,
+              },
+              first_name: {
+                enabled: false,
+                required: false,
+              },
+              last_name: {
+                enabled: false,
+                required: false,
               },
               password: {
+                enabled: false,
                 required: false,
               },
             },
@@ -488,7 +539,7 @@ describe('<SignUpStart/>', () => {
     runTokenTests('__clerk_ticket');
   });
 
-  it('hides sign up form when no at least an oauth is enabled and no auth factor is enabled', async () => {
+  it('hides sign up form when no at least an oauth is enabled and no auth factor is enabled', () => {
     mockUserSettings = new UserSettings({
       attributes: {
         phone_number: {
@@ -500,6 +551,7 @@ describe('<SignUpStart/>', () => {
           used_for_first_factor: false,
         },
         password: {
+          enabled: false,
           required: false,
         },
         username: {

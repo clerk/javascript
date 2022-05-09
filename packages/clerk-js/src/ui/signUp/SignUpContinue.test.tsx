@@ -86,6 +86,7 @@ describe('<SignUpContinue/>', () => {
         },
         phone_number: {
           enabled: true,
+          required: false,
         },
       },
       social: {
@@ -177,7 +178,7 @@ describe('<SignUpContinue/>', () => {
 
     const firstNameInput = screen.getByLabelText('First name');
     userEvent.clear(firstNameInput);
-    userEvent.type(screen.getByLabelText('First name'), 'Bryan');
+    userEvent.type(firstNameInput, 'Bryan');
 
     const lastNameInput = screen.getByLabelText('Last name');
     userEvent.clear(lastNameInput);
@@ -221,6 +222,77 @@ describe('<SignUpContinue/>', () => {
     render(<SignUpContinue />);
 
     expect(screen.queryByText('Email address')).not.toBeInTheDocument();
+  });
+
+  it('redirects to the phone verification step if the user completes their sign up by providing their phone', async () => {
+    mockUserSettings = new UserSettings({
+      attributes: {
+        username: {
+          enabled: true,
+          required: false,
+        },
+        first_name: {
+          enabled: true,
+          required: false,
+        },
+        last_name: {
+          enabled: true,
+          required: false,
+        },
+        password: {
+          enabled: true,
+          required: true,
+        },
+        email_address: {
+          enabled: true,
+          required: false,
+          used_for_first_factor: false,
+        },
+        phone_number: {
+          enabled: true,
+          required: true,
+          used_for_first_factor: true,
+        },
+      },
+      social: {
+        oauth_google: {
+          enabled: true,
+          strategy: 'oauth_google',
+        },
+        oauth_facebook: {
+          enabled: true,
+          strategy: 'oauth_facebook',
+        },
+      },
+    } as UserSettingsJSON);
+
+    mockUpdateRequest.mockImplementation(() =>
+      Promise.resolve({
+        phoneNumber: '+15615551001',
+        verifications: {
+          phoneNumber: {
+            status: 'unverified',
+          },
+        },
+      }),
+    );
+
+    render(<SignUpContinue />);
+
+    const phoneNumberInput = screen.getByRole('textbox');
+    userEvent.clear(phoneNumberInput);
+    userEvent.type(phoneNumberInput, '5615551001');
+
+    userEvent.click(screen.getByRole('button', { name: 'Sign up' }));
+
+    await waitFor(() => {
+      expect(mockUpdateRequest).toHaveBeenCalledTimes(1);
+      expect(mockUpdateRequest).toHaveBeenCalledWith({
+        phone_number: '+15615551001',
+      });
+      expect(navigateMock).toHaveBeenCalledTimes(1);
+      expect(navigateMock).toHaveBeenCalledWith('http://test.host/sign-up/verify-phone-number');
+    });
   });
 
   it('skips the password input if there is a verified external account', () => {
@@ -283,6 +355,7 @@ describe('<SignUpContinue/>', () => {
         },
         phone_number: {
           enabled: true,
+          required: false,
         },
       },
       social: {
@@ -299,6 +372,7 @@ describe('<SignUpContinue/>', () => {
 
     render(<SignUpContinue />);
 
+    expect(screen.queryByText('Phone number')).not.toBeInTheDocument();
     expect(screen.queryByText('First name')).not.toBeInTheDocument();
     expect(screen.queryByText('Last name')).not.toBeInTheDocument();
     expect(screen.queryByText('Username')).not.toBeInTheDocument();
