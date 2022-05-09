@@ -2,14 +2,28 @@ import { AuthStatus, Base, createGetToken, createSignedOutState } from '@clerk/b
 import { ClerkJWTClaims } from '@clerk/types';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 
-import { ClerkAPI } from './ClerkAPI';
+import { ClerkAPI } from './ClerkApi';
 import {
+  AuthData,
   NextMiddlewareResult,
+  RequestWithAuth,
   WithEdgeMiddlewareAuthCallback,
   WithEdgeMiddlewareAuthMiddlewareResult,
   WithEdgeMiddlewareAuthOptions,
 } from './types';
-import { injectAuthIntoRequest } from './utils';
+
+export function injectAuthIntoRequest(req: NextRequest, authData: AuthData): RequestWithAuth {
+  const { user, session, userId, sessionId, getToken, claims } = authData;
+  const auth = {
+    userId,
+    sessionId,
+    getToken,
+    claims,
+  };
+
+  /* Object.assign is used here as NextRequest properties also include Symbols */
+  return Object.assign(req, { auth, user, session });
+}
 
 /**
  *
@@ -55,8 +69,7 @@ const users = ClerkAPI.users;
 export { allowlistIdentifiers, clients, emails, invitations, organizations, sessions, smsMessages, users };
 
 async function fetchInterstitial() {
-  const response = await ClerkAPI.fetchInterstitial<Response>();
-  return response.text();
+  return ClerkAPI.fetchInterstitial<string>();
 }
 
 export function withEdgeMiddlewareAuth<
