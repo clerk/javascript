@@ -2,7 +2,7 @@ import { List } from '@clerk/shared/components/list';
 import { TitledCard } from '@clerk/shared/components/titledCard';
 import { ExternalAccountResource, OAuthProvider, OAuthStrategy } from '@clerk/types';
 import React, { useState } from 'react';
-import { Error } from 'ui/common/error';
+import { Alert } from 'ui/common/alert';
 import { useCoreUser, useEnvironment } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
 import { PageHeading } from 'ui/userProfile/pageHeading';
@@ -77,7 +77,7 @@ function ConnectedAccountListRows(): JSX.Element {
 
   return (
     <>
-      <Error>{error}</Error>
+      <Alert type='error'>{error}</Alert>
 
       <List>
         {verifiedAccounts.map(externalAccount => (

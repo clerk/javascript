@@ -7,9 +7,17 @@ Array [
     style={Object {}}
   >
     <div
-      className="cl-info"
+      style={
+        Object {
+          "marginTop": "-4em",
+        }
+      }
     >
-      Please fill in the following information to complete your sign-up
+      <div
+        className="cl-info"
+      >
+        Please fill in the following information to complete your sign-up
+      </div>
     </div>
     <div
       className="cl-auth-form-header-logo"

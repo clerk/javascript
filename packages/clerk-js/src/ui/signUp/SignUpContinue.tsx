@@ -10,6 +10,7 @@ import {
   useFieldState,
   withRedirectToHome,
 } from 'ui/common';
+import { Alert } from 'ui/common/alert';
 import { Body, Header } from 'ui/common/authForms';
 import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
@@ -124,10 +125,22 @@ function _SignUpContinue(): JSX.Element | null {
   return (
     <>
       <Header
-        error={error}
-        info={'Please fill in the following information to complete your sign-up'}
+        alert={
+          <>
+            <Alert type='info'>Please fill in the following information to complete your sign-up</Alert>
+            {error && (
+              <Alert
+                type='error'
+                style={{ marginTop: '1em' }}
+              >
+                {error}
+              </Alert>
+            )}
+          </>
+        }
         className='cl-auth-form-header-compact'
       />
+
       <Body>
         {showOauthProviders && (
           <SignUpOAuth
@@ -156,6 +169,7 @@ function _SignUpContinue(): JSX.Element | null {
             />
           </>
         )}
+
         <Footer>
           <SignInLink />
           <PoweredByClerk className='cl-auth-form-powered-by-clerk' />

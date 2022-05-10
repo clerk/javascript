@@ -11,7 +11,7 @@ import { TitledCard } from '@clerk/shared/components/titledCard';
 import { PhoneNumberResource } from '@clerk/types';
 import React, { useState } from 'react';
 import { handleError } from 'ui/common';
-import { Error as ErrorComponent } from 'ui/common/error';
+import { Alert } from 'ui/common/alert';
 import { useCoreUser } from 'ui/contexts';
 import { TwoStepMethod, TwoStepMethodsToDisplayDataMap } from 'ui/userProfile/security/twoStepVerificationTypes';
 
@@ -41,7 +41,8 @@ export function ActiveMethodsCard(): JSX.Element | null {
       title='Active methods'
       subtitle={subtitleMessage}
     >
-      <ErrorComponent>{error}</ErrorComponent>
+      <Alert type='error'>{error}</Alert>
+
       <List className='cl-titled-card-list'>
         {enabledPhoneNumbers.map(phone => (
           <PhoneListItem

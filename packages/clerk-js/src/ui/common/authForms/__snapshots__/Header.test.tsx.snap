@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<Header/> renders the header component 1`] = `
+exports[`<Header/> renders a header component with everything enabled 1`] = `
 <div
   className="cl-auth-form-header"
   style={Object {}}
@@ -15,10 +15,13 @@ exports[`<Header/> renders the header component 1`] = `
     />
   </a>
   <div
-    className="cl-error"
     style={Object {}}
   >
-    Boom
+    <div
+      className="cl-error"
+    >
+      boom
+    </div>
   </div>
   <div
     className="cl-auth-form-header-logo"
@@ -36,6 +39,21 @@ exports[`<Header/> renders the header component 1`] = `
       Welcome, 
       Joe
     </label>
+  </div>
+</div>
+`;
+
+exports[`<Header/> renders a plain header 1`] = `
+<div
+  className="cl-auth-form-header"
+  style={Object {}}
+>
+  <div
+    className="cl-auth-form-header-logo"
+  >
+    <div
+      className="cl-logo"
+    />
   </div>
 </div>
 `;

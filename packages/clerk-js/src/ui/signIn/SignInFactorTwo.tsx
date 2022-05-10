@@ -15,6 +15,7 @@ import {
 import { useCoreClerk, useCoreSignIn, useSignInContext } from 'ui/contexts';
 
 import { determineSalutation } from './utils';
+import { Alert } from 'ui/common/alert';
 
 type SignInUiProps = Pick<SignInResource, 'userData' | 'identifier' | 'supportedSecondFactors' | 'status'>;
 
@@ -98,7 +99,7 @@ function _SignInFactorTwo(): JSX.Element {
   return (
     <>
       <Header
-        error={error}
+        alert={error && <Alert type='error'>{error}</Alert>}
         showBack
         welcomeName={determineSalutation(cachedSignInRef.current)}
       />

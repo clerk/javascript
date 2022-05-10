@@ -25,6 +25,7 @@ import { getClerkQueryParam } from 'utils/getClerkQueryParam';
 
 import { SignUpLink } from './SignUpLink';
 import { OAuth, Web3 } from './strategies';
+import { Alert } from 'ui/common/alert';
 
 export function _SignInStart(): JSX.Element {
   const { userSettings } = useEnvironment();
@@ -169,13 +170,15 @@ export function _SignInStart(): JSX.Element {
 
   return (
     <>
-      <Header error={error} />
+      <Header alert={error && <Alert type='error'>{error}</Alert>} />
+
       <Body>
         <OAuth
           oauthOptions={socialProviderStrategies}
           setError={setError}
           error={error}
         />
+
         <Web3
           web3Options={web3FirstFactors}
           setError={setError}

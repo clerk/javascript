@@ -1,5 +1,6 @@
 import { renderJSON } from '@clerk/shared/testUtils';
 import * as React from 'react';
+import { Alert } from 'ui/common/alert';
 
 import { Header } from './Header';
 
@@ -20,14 +21,22 @@ jest.mock('ui/contexts/EnvironmentContext', () => {
 jest.mock('ui/router/RouteContext');
 
 describe('<Header/>', () => {
-  it('renders the header component', () => {
+  it('renders a header component with everything enabled', () => {
     const tree = renderJSON(
       <Header
-        error='Boom'
+        alert={<Alert type='error'>boom</Alert>}
         showBack
+        showLogo
         welcomeName='Joe'
       />,
     );
+
+    expect(tree).toMatchSnapshot();
+  });
+
+  it('renders a plain header', () => {
+    const tree = renderJSON(<Header />);
+
     expect(tree).toMatchSnapshot();
   });
 });

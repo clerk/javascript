@@ -5,7 +5,7 @@ import { TitledCard } from '@clerk/shared/components/titledCard';
 import { PhoneNumberResource } from '@clerk/types';
 import React from 'react';
 import { handleError } from 'ui/common';
-import { Error } from 'ui/common/error';
+import { Alert } from 'ui/common/alert';
 import { useCoreUser } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
 import { Link } from 'ui/router';
@@ -70,7 +70,8 @@ export const AddPhone = ({ standAlone }: AddPhoneProps): JSX.Element => {
         title='Add two-step verification'
         subtitle='Choose a phone number to receive a verification code'
       >
-        <Error>{error}</Error>
+        <Alert type='error'>{error}</Alert>
+
         <div className='cl-phone-select'>{phoneRows}</div>
         {!standAlone && (
           <div className='cl-add-phone'>

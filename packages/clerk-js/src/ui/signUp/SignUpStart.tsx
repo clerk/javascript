@@ -12,6 +12,7 @@ import {
   useFieldState,
   withRedirectToHome,
 } from 'ui/common';
+import { Alert } from 'ui/common/alert';
 import { Body, Header } from 'ui/common/authForms';
 import { ERROR_CODES } from 'ui/common/constants';
 import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from 'ui/contexts';
@@ -191,9 +192,10 @@ function _SignUpStart(): JSX.Element {
   return (
     <>
       <Header
-        error={error}
+        alert={error && <Alert type='error'>{error}</Alert>}
         className='cl-auth-form-header-compact'
       />
+
       <Body>
         {(!hasTicket || (hasTicket && isMissingRequirements)) && oauthOptions.length > 0 && (
           <SignUpOAuth

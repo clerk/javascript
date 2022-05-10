@@ -8,6 +8,7 @@ import {
   MagicLinkVerificationStatusModal,
   MagicLinkWaitingScreen,
 } from 'ui/common';
+import { Alert } from 'ui/common/alert';
 import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from 'ui/contexts';
 import { useMagicLink, useNavigate } from 'ui/hooks';
 import { SignInFactorOneFooter } from 'ui/signIn/factorOne/SignInFactorOneFooter';
@@ -86,7 +87,7 @@ export function SignInFactorOneMagicLink({
   return (
     <>
       <Header
-        error={error}
+        alert={error && <Alert type='error'>{error}</Alert>}
         showLogo={false}
         showBack
       />
