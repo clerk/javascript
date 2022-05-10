@@ -17,11 +17,12 @@ Reference of the methods supported in the Clerk Backend API wrapper. [API refere
 - [Invitation operations](#invitation-operations)
   - [getInvitationList()](#getinvitationlist)
   - [createInvitation(params)](#createinvitationparams)
-  - [revokeInvitation(invitationId)](#revokeinvitationinvitationId)
+  - [revokeInvitation(invitationId)](#revokeinvitationinvitationid)
 - [Organization operations](#organization-operations)
   - [createOrganization(params)](#createorganizationparams)
   - [updateOrganization(organizationId, params)](#updateorganizationorganizationid-params)
   - [updateOrganizationMetadata(organizationId, params)](#updateorganizationmetadataorganizationid-params)
+  - [deleteOrganization(organizationId)](#deleteorganizationorganizationid)
 - [Session operations](#session-operations)
   - [getSessionList({ clientId, userId })](#getsessionlist-clientid-userid-)
   - [getSession(sessionId)](#getsessionsessionid)
@@ -202,6 +203,14 @@ const organization = await clerkAPI.organizations.updateOrganizationMetadata('or
   publicMetadata: { color: 'blue' },
   privateMetadata: { sandbox_mode: true },
 });
+```
+
+#### deleteOrganization(organizationId)
+
+Delete an organization with the provided `organizationId`. This action cannot be undone.
+
+```js
+await clerkAPI.organizations.deleteOrganization(organizationId);
 ```
 
 ## Session operations

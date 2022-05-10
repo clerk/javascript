@@ -110,3 +110,9 @@ test('updateOrganizationMetadata() updates organization metadata', async () => {
     }),
   );
 });
+
+test('deleteOrganization() deletes organization', async () => {
+  const id = 'org_randomid';
+  nock('https://api.clerk.dev').delete(`/v1/organizations/${id}`).reply(200, {});
+  await TestBackendAPIClient.organizations.deleteOrganization(id);
+});

@@ -59,6 +59,13 @@ export class OrganizationApi extends AbstractApi {
       bodyParams: stringifyMetadataParams(params),
     });
   }
+
+  public async deleteOrganization(organizationId: string) {
+    return this._restClient.makeRequest<Organization>({
+      method: 'DELETE',
+      path: `${basePath}/${organizationId}`,
+    });
+  }
 }
 
 function stringifyMetadataParams(
