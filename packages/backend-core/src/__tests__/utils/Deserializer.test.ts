@@ -1,4 +1,13 @@
-import { AllowlistIdentifier, Client, Email, Invitation, Organization, Session, SMSMessage } from '../../api/resources';
+import {
+  AllowlistIdentifier,
+  Client,
+  Email,
+  Invitation,
+  Organization,
+  OrganizationMembership,
+  Session,
+  SMSMessage,
+} from '../../api/resources';
 import deserialize from '../../api/utils/Deserializer';
 
 const allowlistIdentifierJSON = {
@@ -43,6 +52,24 @@ const organizationJSON = {
   object: 'organization',
   id: 'org_randomid',
   name: 'Acme Inc',
+  slug: 'acme-inc',
+  logo_url: null,
+  created_at: 1612378465,
+  updated_at: 1612378465,
+};
+
+const organizationMembershipJSON = {
+  object: 'organization_membership',
+  id: 'orgmem_randomid',
+  role: 'basic_member',
+  organization: organizationJSON,
+  public_user_data: {
+    first_name: 'John',
+    last_name: 'Doe',
+    profile_image_url: 'https://url-to-image.png',
+    identifier: 'johndoe@example.com',
+    user_id: 'user_randomid',
+  },
   created_at: 1612378465,
   updated_at: 1612378465,
 };
@@ -119,6 +146,27 @@ test('deserializes an array of Organization objects', () => {
   expect(organizations).toBeInstanceOf(Array);
   expect(organizations.length).toBe(1);
   expect(organizations[0]).toBeInstanceOf(Organization);
+});
+
+test('deserializes an OrganizationMembership object', () => {
+  const organizationMembership = deserialize(organizationMembershipJSON);
+  expect(organizationMembership).toBeInstanceOf(OrganizationMembership);
+});
+
+test('deserializes an array of OrganizationMembership objects', () => {
+  const organizationMemberships = deserialize([organizationMembershipJSON]);
+  expect(organizationMemberships).toBeInstanceOf(Array);
+  expect(organizationMemberships.length).toBe(1);
+  expect(organizationMemberships[0]).toBeInstanceOf(OrganizationMembership);
+});
+
+test('deserializes a paginated response of OrganizationMembership objects', () => {
+  const organizationMemberships = deserialize({
+    data: [organizationMembershipJSON],
+  });
+  expect(organizationMemberships).toBeInstanceOf(Array);
+  expect(organizationMemberships.length).toBe(1);
+  expect(organizationMemberships[0]).toBeInstanceOf(OrganizationMembership);
 });
 
 test('deserializes a Session object', () => {
