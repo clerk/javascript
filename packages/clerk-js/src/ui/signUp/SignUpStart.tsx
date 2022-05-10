@@ -302,12 +302,7 @@ function _SignUpStart(): JSX.Element {
       </Control>
     ) : null;
 
-  const atLeastOneAuthFactor =
-    userSettings.attributes.email_address.used_for_first_factor ||
-    userSettings.attributes.phone_number.used_for_first_factor ||
-    (userSettings.attributes.password.required && userSettings.attributes.username.required);
-
-  const showFormFields = atLeastOneAuthFactor || !oauthOptions.length;
+  const showFormFields = userSettings.hasValidAuthFactor || (!oauthOptions.length && !web3Options.length);
 
   return (
     <>

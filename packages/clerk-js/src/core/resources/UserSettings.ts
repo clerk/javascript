@@ -34,6 +34,14 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     return this.attributes.password.enabled && this.attributes.password.required;
   }
 
+  get hasValidAuthFactor() {
+    return (
+      this.attributes.email_address.used_for_first_factor ||
+      this.attributes.phone_number.used_for_first_factor ||
+      (this.attributes.password.required && this.attributes.username.required)
+    );
+  }
+
   protected fromJSON(data: UserSettingsJSON): this {
     this.social = data.social;
     this.attributes = data.attributes;
