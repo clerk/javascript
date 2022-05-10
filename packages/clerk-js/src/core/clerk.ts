@@ -541,9 +541,11 @@ export default class Clerk implements ClerkInterface {
   };
 
   public authenticateWithMetamask = async ({ redirectUrl }: AuthenticateWithMetamaskParams = {}): Promise<void> => {
-    if (!this.client) {
+    if (!this.client || !this.#environment) {
       return;
     }
+
+    const { signUpUrl } = this.#environment.displayConfig;
 
     let signInOrSignUp: SignInResource | SignUpResource;
     try {
@@ -551,6 +553,14 @@ export default class Clerk implements ClerkInterface {
     } catch (err) {
       if (isError(err, ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND)) {
         signInOrSignUp = await this.client.signUp.authenticateWithMetamask();
+
+        if (
+          signInOrSignUp.verifications.web3Wallet.status === 'verified' &&
+          signInOrSignUp.status === 'missing_requirements'
+        ) {
+          // @ts-ignore
+          return this.navigate(signUpUrl + '/continue');
+        }
       } else {
         throw err;
       }

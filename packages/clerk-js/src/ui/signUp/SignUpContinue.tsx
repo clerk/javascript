@@ -65,6 +65,7 @@ function _SignUpContinue(): JSX.Element | null {
 
   const hasEmail = !!formState.emailAddress.value;
   const hasVerifiedExternalAccount = signUp.verifications?.externalAccount?.status == 'verified';
+  const hasVerifiedWeb3 = signUp.verifications?.web3Wallet?.status == 'verified';
 
   const fields = determineActiveFields({
     environment,
@@ -119,8 +120,7 @@ function _SignUpContinue(): JSX.Element | null {
   };
 
   const showOauthProviders = !hasVerifiedExternalAccount && oauthOptions.length > 0;
-
-  const showWeb3Providers = web3Options.length > 0;
+  const showWeb3Providers = !hasVerifiedWeb3 && web3Options.length > 0;
 
   return (
     <>
