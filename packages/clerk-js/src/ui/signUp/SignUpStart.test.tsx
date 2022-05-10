@@ -457,6 +457,10 @@ describe('<SignUpStart/>', () => {
               phone_number: {
                 enabled: true,
                 required: true,
+                used_for_first_factor: true,
+              },
+              email_address: {
+                used_for_first_factor: false,
               },
               password: {
                 required: false,
@@ -479,5 +483,46 @@ describe('<SignUpStart/>', () => {
 
     runTokenTests('__clerk_invitation_token');
     runTokenTests('__clerk_ticket');
+  });
+
+  it('hides sign up form when no at least an oauth is enabled and no auth factor is enabled', async () => {
+    mockUserSettings = new UserSettings({
+      attributes: {
+        phone_number: {
+          enabled: true,
+          required: true,
+          used_for_first_factor: false,
+        },
+        email_address: {
+          used_for_first_factor: false,
+        },
+        password: {
+          required: false,
+        },
+        username: {
+          enabled: true,
+          required: true,
+        },
+        first_name: {
+          enabled: true,
+          required: true,
+        },
+        last_name: {
+          enabled: true,
+          required: true,
+        },
+      },
+      social: {
+        oauth_google: {
+          authenticatable: true,
+          enabled: true,
+          required: false,
+          strategy: 'oauth_google',
+        },
+      },
+    } as UserSettingsJSON);
+
+    render(<SignUpStart />);
+    expect(screen.queryByRole('button', { name: 'Sign up' })).not.toBeInTheDocument();
   });
 });
