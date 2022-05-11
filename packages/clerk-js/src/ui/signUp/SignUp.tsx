@@ -31,11 +31,12 @@ function SignUpRoutes(): JSX.Element {
         <SSOCallback
           afterSignUpUrl={signUpContext.afterSignUpUrl}
           afterSignInUrl={signUpContext.afterSignInUrl}
+          redirectUrl={signUpContext.redirectUrl}
           secondFactorUrl={signUpContext.signInUrl + '#/factor-two'}
         />
       </Route>
       <Route path='verify'>
-        <VerifyMagicLink redirectUrlComplete={signUpContext.afterSignUpUrl || undefined} />
+        <VerifyMagicLink redirectUrlComplete={signUpContext.afterSignUpUrl || signUpContext.redirectUrl || undefined} />
       </Route>
       <Route index>
         <SignUpStart />
