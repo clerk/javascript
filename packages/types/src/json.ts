@@ -99,6 +99,7 @@ export interface SessionJSON extends ClerkResourceJSON {
   abandon_at: number;
   last_active_at: number;
   last_active_token: TokenJSON;
+  last_active_organization_id: string | null;
   user: UserJSON;
   public_user_data: PublicUserDataJSON;
   created_at: number;
