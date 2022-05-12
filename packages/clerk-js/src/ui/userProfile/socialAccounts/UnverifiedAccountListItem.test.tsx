@@ -1,6 +1,7 @@
 import { act, screen } from '@clerk/shared/testUtils';
 import { render, userEvent } from '@clerk/shared/utils/testUtils';
 import { ExternalAccountResource } from '@clerk/types';
+import { waitFor } from '@testing-library/dom';
 import React from 'react';
 
 import { UnverifiedAccountListItem } from './UnverifiedAccountListItem';
@@ -27,6 +28,8 @@ describe('<UnverifiedAccountListItem/>', () => {
 
     await act(async () => {
       await userEvent.click(screen.getByRole('button', { expanded: false }));
+    });
+    await act(async () => {
       await userEvent.click(screen.getByText('Disconnect'));
     });
 
@@ -46,9 +49,11 @@ describe('<UnverifiedAccountListItem/>', () => {
 
     await act(async () => {
       await userEvent.click(screen.getByRole('button', { expanded: false }));
-      await userEvent.click(screen.getByText('Reconnect'));
+    });
+    await act(async () => {
+      await userEvent.click(await screen.getByText('Reconnect'));
     });
 
     expect(mockHandleConnect).toHaveBeenCalled();
-  });
+  }, 15000);
 });

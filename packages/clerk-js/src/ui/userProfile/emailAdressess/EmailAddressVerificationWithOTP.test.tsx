@@ -50,12 +50,12 @@ describe('<EmailAddressVerificationWithOTP/>', function () {
       />,
     );
 
-    userEvent.type(screen.getByLabelText('Enter verification code. Digit 1'), '1');
-    userEvent.type(screen.getByLabelText('Digit 2'), '2');
-    userEvent.type(screen.getByLabelText('Digit 3'), '3');
-    userEvent.type(screen.getByLabelText('Digit 4'), '4');
-    userEvent.type(screen.getByLabelText('Digit 5'), '5');
-    userEvent.type(screen.getByLabelText('Digit 6'), '6');
+    await userEvent.type(screen.getByLabelText('Enter verification code. Digit 1'), '1');
+    await userEvent.type(screen.getByLabelText('Digit 2'), '2');
+    await userEvent.type(screen.getByLabelText('Digit 3'), '3');
+    await userEvent.type(screen.getByLabelText('Digit 4'), '4');
+    await userEvent.type(screen.getByLabelText('Digit 5'), '5');
+    await userEvent.type(screen.getByLabelText('Digit 6'), '6');
 
     await waitFor(() => {
       expect(mockOnVerificationCompleteHandler).toHaveBeenCalled();

@@ -115,7 +115,6 @@ Array [
                 className="cl-left-icon-wrapper"
                 src="https://images.clerk.dev/static/github.svg"
               />
-              
               <span
                 className="tag error sm cl-tag"
               >

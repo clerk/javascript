@@ -93,7 +93,8 @@ describe('VirtualRouter', () => {
         const createButton = screen.getByRole('button', { name: /Create/i });
         expect(createButton).toBeInTheDocument();
         await userEvent.click(createButton);
-
+      });
+      await act(async () => {
         const preserveButton = screen.getByRole('button', {
           name: /Preserve/i,
         });

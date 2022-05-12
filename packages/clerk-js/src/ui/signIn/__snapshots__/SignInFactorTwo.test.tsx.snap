@@ -22,7 +22,6 @@ Array [
         className="cl-logo"
       />
     </div>
-    
   </div>,
   <div
     className="cl-auth-form-body"

@@ -37,7 +37,7 @@ describe('<Password/>', () => {
     await userEvent.type(inputField, 'SADSD!@D23');
 
     const button = screen.getByRole('button', { name: /Sign in/i });
-    userEvent.click(button);
+    await userEvent.click(button);
 
     await waitFor(() => {
       expect(mockSubmit).toHaveBeenCalledTimes(1);

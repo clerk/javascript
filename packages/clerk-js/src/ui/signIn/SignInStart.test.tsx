@@ -127,10 +127,10 @@ fdescribe('<SignInStart/>', () => {
       render(<SignInStart />);
 
       const inputField = screen.getByLabelText('Email address');
-      userEvent.type(inputField, 'boss@clerk.dev');
+      await userEvent.type(inputField, 'boss@clerk.dev');
 
       const signEmailButton = screen.getByRole('button', { name: /Continue/i });
-      userEvent.click(signEmailButton);
+      await userEvent.click(signEmailButton);
 
       await waitFor(() => {
         expect(mockCreateRequest).toHaveBeenCalledTimes(1);
@@ -153,13 +153,13 @@ fdescribe('<SignInStart/>', () => {
       expect(instantPasswordField).toBeDefined();
 
       const inputField = screen.getByLabelText('Email address');
-      userEvent.type(inputField, 'boss@clerk.dev');
+      await userEvent.type(inputField, 'boss@clerk.dev');
 
       // simulate password being filled by a pwd manager
-      userEvent.type(instantPasswordField, '123456');
+      await userEvent.type(instantPasswordField, '123456');
 
       const signEmailButton = screen.getByRole('button', { name: /Continue/i });
-      userEvent.click(signEmailButton);
+      await userEvent.click(signEmailButton);
 
       await waitFor(() => {
         expect(mockCreateRequest).toHaveBeenCalledTimes(1);
@@ -196,13 +196,13 @@ fdescribe('<SignInStart/>', () => {
       expect(instantPasswordField).toBeDefined();
 
       const inputField = screen.getByLabelText('Email address');
-      userEvent.type(inputField, 'boss@clerk.dev');
+      await userEvent.type(inputField, 'boss@clerk.dev');
 
       // simulate password being filled by a pwd manager
-      userEvent.type(instantPasswordField, 'wrong pass');
+      await userEvent.type(instantPasswordField, 'wrong pass');
 
       const signEmailButton = screen.getByRole('button', { name: /Continue/i });
-      userEvent.click(signEmailButton);
+      await userEvent.click(signEmailButton);
 
       await waitFor(() => {
         expect(mockCreateRequest).toHaveBeenCalledTimes(2);
@@ -217,7 +217,7 @@ fdescribe('<SignInStart/>', () => {
           identifier: 'boss@clerk.dev',
         });
         expect(mockSetActive).not.toHaveBeenCalled();
-        expect(mockNavigate).not.toHaveBeenCalledWith('factor-one');
+        expect(mockNavigate).toHaveBeenCalledWith('factor-one');
       });
     });
 
@@ -253,7 +253,7 @@ fdescribe('<SignInStart/>', () => {
       await userEvent.type(instantPasswordField, 'wrong pass');
 
       const signEmailButton = screen.getByRole('button', { name: /Continue/i });
-      userEvent.click(signEmailButton);
+      await userEvent.click(signEmailButton);
 
       await waitFor(() => {
         expect(mockCreateRequest).toHaveBeenCalledTimes(2);
@@ -268,7 +268,7 @@ fdescribe('<SignInStart/>', () => {
           identifier: 'boss@clerk.dev',
         });
         expect(mockSetActive).not.toHaveBeenCalled();
-        expect(mockNavigate).not.toHaveBeenCalledWith('factor-one');
+        expect(mockNavigate).toHaveBeenCalledWith('factor-one');
       });
     });
 
@@ -299,7 +299,7 @@ fdescribe('<SignInStart/>', () => {
         const signGoogleButton = screen.getByRole('button', {
           name: regex,
         });
-        userEvent.click(signGoogleButton);
+        await userEvent.click(signGoogleButton);
 
         await waitFor(() => {
           expect(mockAuthenticateWithRedirect).toHaveBeenCalledTimes(1);
@@ -340,7 +340,7 @@ fdescribe('<SignInStart/>', () => {
       await userEvent.type(inputField, 'boss@clerk.dev');
 
       const signEmailButton = screen.getByRole('button', { name: /Continue/i });
-      userEvent.click(signEmailButton);
+      await userEvent.click(signEmailButton);
 
       await waitFor(() => {
         expect(mockCreateRequest).toHaveBeenCalledTimes(1);

@@ -206,7 +206,7 @@ describe('<SocialAccountList/>', () => {
     });
 
     const connectMSButton = screen.getByRole('button', { name: /Connect Microsoft account/ });
-    userEvent.click(connectMSButton);
+    await userEvent.click(connectMSButton);
 
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith(new URL('https://www.foobar.com/'));

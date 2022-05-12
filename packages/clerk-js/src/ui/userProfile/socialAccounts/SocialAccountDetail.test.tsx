@@ -86,11 +86,11 @@ describe('<SocialAccountDetail/>', () => {
     expect(tree).toMatchSnapshot();
   });
 
-  it('Unlink Google Social Account', () => {
+  it('Unlink Google Social Account', async () => {
     render(<SocialAccountDetail />);
 
-    userEvent.click(screen.getByText('Unlink'));
-    userEvent.click(screen.getByText('Unlink social account', { selector: 'button' }));
+    await userEvent.click(screen.getByText('Unlink'));
+    await userEvent.click(screen.getByText('Unlink social account', { selector: 'button' }));
     expect(mockGoogleDestroy).toHaveBeenCalled();
   });
 });

@@ -92,12 +92,12 @@ describe('<PhoneDetail/>', () => {
     render(<PhoneDetail />);
     // Type a verification code that will throw an error,
     // in this case '999999'.
-    userEvent.type(screen.getByLabelText('Enter verification code. Digit 1'), '9');
-    userEvent.type(screen.getByLabelText('Digit 2'), '9');
-    userEvent.type(screen.getByLabelText('Digit 3'), '9');
-    userEvent.type(screen.getByLabelText('Digit 4'), '9');
-    userEvent.type(screen.getByLabelText('Digit 5'), '9');
-    userEvent.type(screen.getByLabelText('Digit 6'), '9');
+    await userEvent.type(screen.getByLabelText('Enter verification code. Digit 1'), '9');
+    await userEvent.type(screen.getByLabelText('Digit 2'), '9');
+    await userEvent.type(screen.getByLabelText('Digit 3'), '9');
+    await userEvent.type(screen.getByLabelText('Digit 4'), '9');
+    await userEvent.type(screen.getByLabelText('Digit 5'), '9');
+    await userEvent.type(screen.getByLabelText('Digit 6'), '9');
 
     expect(await screen.findByText('the-long-error-message')).toBeInTheDocument();
   });

@@ -81,10 +81,10 @@ describe('<SignInFactorOne/>', () => {
 
       const inputField = screen.getByLabelText('Password');
       userEvent.clear(inputField);
-      userEvent.type(inputField, 'p@ssW0rD');
+      await userEvent.type(inputField, 'p@ssW0rD');
 
       const button = screen.getByRole('button', { name: /Sign in/i });
-      userEvent.click(button);
+      await userEvent.click(button);
 
       await waitFor(() => {
         expect(mockAttemptFirstFactor).toHaveBeenCalledTimes(1);
@@ -142,10 +142,10 @@ describe('<SignInFactorOne/>', () => {
 
       const inputField = screen.getByLabelText('Password');
       userEvent.clear(inputField);
-      userEvent.type(inputField, 'p@ssW0rD');
+      await userEvent.type(inputField, 'p@ssW0rD');
 
       const button = screen.getByRole('button', { name: /Sign in/i });
-      userEvent.click(button);
+      await userEvent.click(button);
 
       await waitFor(() => {
         expect(mockAttemptFirstFactor).toHaveBeenCalledTimes(1);
@@ -212,7 +212,7 @@ describe('<SignInFactorOne/>', () => {
       const text = '123456';
       const inputs = screen.getAllByRole('textbox');
       for (const [i, input] of inputs.entries()) {
-        userEvent.type(input, text[i]);
+        await userEvent.type(input, text[i]);
       }
 
       await waitFor(() => {
@@ -406,7 +406,7 @@ describe('<SignInFactorOne/>', () => {
       const text = '123456';
       const inputs = screen.getAllByRole('textbox');
       for (const [i, input] of inputs.entries()) {
-        userEvent.type(input, text[i]);
+        await userEvent.type(input, text[i]);
       }
 
       await waitFor(() => {
@@ -474,8 +474,8 @@ describe('<SignInFactorOne/>', () => {
 
       render(<SignInFactorOne />);
 
-      userEvent.click(screen.getByText('Try another method'));
-      userEvent.click(screen.getByText('Email code to jdoe@example.com'));
+      await userEvent.click(screen.getByText('Try another method'));
+      await userEvent.click(screen.getByText('Email code to jdoe@example.com'));
 
       await waitFor(() => {
         expect(mockPrepareFirstFactor).toHaveBeenNthCalledWith(1, {
@@ -530,13 +530,13 @@ describe('<SignInFactorOne/>', () => {
       }));
 
       render(<SignInFactorOne />);
-      userEvent.click(screen.getByText('Try another method'));
+      await userEvent.click(screen.getByText('Try another method'));
       screen.getByText('Email code to ccoe@example.com');
 
       expect(screen.queryByText('Try another method')).toBeNull();
       const backButton = screen.getByLabelText(/Back Button/);
       expect(backButton).toBeDefined();
-      userEvent.click(backButton);
+      await userEvent.click(backButton);
       screen.getByText('Try another method');
     });
 

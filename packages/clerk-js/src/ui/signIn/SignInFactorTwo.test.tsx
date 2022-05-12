@@ -74,7 +74,7 @@ describe('<SignInFactorTwo/>', () => {
     const text = '123456';
     const inputs = screen.getAllByRole('textbox');
     for (const [i, input] of inputs.entries()) {
-      userEvent.type(input, text[i]);
+      await userEvent.type(input, text[i]);
     }
 
     await waitFor(() => {

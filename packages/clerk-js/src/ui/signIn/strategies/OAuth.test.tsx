@@ -39,7 +39,7 @@ describe('<OAuth/>', () => {
 
     render(<OAuth oauthOptions={['oauth_google', 'oauth_facebook']} />);
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: `${providerTitle} Sign in with ${providerTitle}`,
       }),

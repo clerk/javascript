@@ -60,7 +60,7 @@ describe('<ButtonSet/>', () => {
 
     const regex = new RegExp(`Sign up with ${providerTitle}`, 'i');
 
-    userEvent.click(screen.getByRole('button', { name: regex }));
+    await userEvent.click(screen.getByRole('button', { name: regex }));
 
     expect(mockHandleClick.mock.calls[0][1]).toBe(`oauth_${provider}`);
   });

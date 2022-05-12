@@ -34,7 +34,7 @@
     "@testing-library/jest-dom": "^5.11.6",
     "@testing-library/react": "^13.2.0",
     "@testing-library/react-hooks": "^3.4.2",
-    "@testing-library/user-event": "^12.2.2",
+    "@testing-library/user-event": "^14.1.1",
     "@types/babel__core": "^7",
     "@types/babel__preset-env": "^7",
     "@types/classnames": "^2",
@@ -57,7 +57,7 @@
     "react-color": "2.19.3",
     "react-dom": "^18.1.0",
     "react-popper": "^2.2.4",
-    "react-test-renderer": "17.0.2",
+    "react-test-renderer": "^18.1.0",
     "ts-jest": "^27.1.3"
   }
 }

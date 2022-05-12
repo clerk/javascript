@@ -98,9 +98,9 @@ describe('<All/>', () => {
       />,
     );
 
-    userEvent.click(screen.getByText('Sign in with your password'));
-    userEvent.click(screen.getByText('Email code to j***@e*****.com'));
-    userEvent.click(screen.getByText('Send code to +1*********9'));
+    await userEvent.click(screen.getByText('Sign in with your password'));
+    await userEvent.click(screen.getByText('Email code to j***@e*****.com'));
+    await userEvent.click(screen.getByText('Send code to +1*********9'));
 
     expect(mockSelectStrategy).toHaveBeenCalledTimes(3);
   });
