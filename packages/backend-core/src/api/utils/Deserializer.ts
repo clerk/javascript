@@ -4,6 +4,7 @@ import {
   Email,
   Invitation,
   Organization,
+  OrganizationMembership,
   Session,
   SMSMessage,
   Token,
@@ -13,12 +14,22 @@ import { ObjectType } from '../resources/JSON';
 import Logger from './Logger';
 
 // FIXME don't return any
-export default function deserialize(data: any): any {
-  if (Array.isArray(data)) {
-    return data.map(item => jsonToObject(item));
+export default function deserialize(payload: any): any {
+  if (Array.isArray(payload)) {
+    return payload.map(item => jsonToObject(item));
+  } else if (isPaginated(payload)) {
+    return payload.data.map(item => jsonToObject(item));
   } else {
-    return jsonToObject(data);
+    return jsonToObject(payload);
   }
+}
+
+type PaginatedResponse = {
+  data: Array<object>;
+};
+
+function isPaginated(payload: any): payload is PaginatedResponse {
+  return <PaginatedResponse>payload.data !== undefined;
 }
 
 function getCount(item: { total_count: number }) {
@@ -38,6 +49,8 @@ function jsonToObject(item: any): any {
       return Invitation.fromJSON(item);
     case ObjectType.Organization:
       return Organization.fromJSON(item);
+    case ObjectType.OrganizationMembership:
+      return OrganizationMembership.fromJSON(item);
     case ObjectType.User:
       return User.fromJSON(item);
     case ObjectType.Session:

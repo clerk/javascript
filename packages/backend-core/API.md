@@ -23,6 +23,10 @@ Reference of the methods supported in the Clerk Backend API wrapper. [API refere
   - [updateOrganization(organizationId, params)](#updateorganizationorganizationid-params)
   - [updateOrganizationMetadata(organizationId, params)](#updateorganizationmetadataorganizationid-params)
   - [deleteOrganization(organizationId)](#deleteorganizationorganizationid)
+  - [getOrganizationMembershipList(params)](#getorganizationmembershiplistparams)
+  - [createOrganizationMembership(params)](#createorganizationmembershipparams)
+  - [updateOrganizationMembership(params)](#updateorganizationmembershipparams)
+  - [deleteOrganizationMembership(params)](#deleteorganizationmembershipparams)
 - [Session operations](#session-operations)
   - [getSessionList({ clientId, userId })](#getsessionlist-clientid-userid-)
   - [getSession(sessionId)](#getsessionsessionid)
@@ -211,6 +215,69 @@ Delete an organization with the provided `organizationId`. This action cannot be
 
 ```js
 await clerkAPI.organizations.deleteOrganization(organizationId);
+```
+
+#### getOrganizationMembershipList(params)
+
+Get a list of memberships for the organization with the provided `organizationId`.
+
+The method supports pagination via optional `limit` and `offset` parameters. The method parameters are:
+
+- _organizationId_ The unique ID of the organization to retrieve the memberships for
+- _limit_ Optionally put a limit on the number of results returned
+- _offset_ Optionally skip some results
+
+```js
+const memberships = await clerkAPI.organizations.getOrganizationMemberships({
+  organizationId: 'org_1o4q123qMeCkKKIXcA9h8',
+});
+```
+
+#### createOrganizationMembership(params)
+
+Create a membership for the organization specified by `organizationId`. Effectively adds a user to an organization.
+
+Available parameters:
+
+- _organizationId_ The ID of the organization to add a member to.
+- _userId_ The ID of the user that will be added to the organization.
+- _role_ The role of the new member in the organization
+
+```js
+const membership = await clerkAPI.organizations.createOrganizationMembership({
+  organizationId: 'org_1o4q123qMeCkKKIXcA9h8',
+  userId: 'user_1o4q123qMeCkKKIXcA9h8',
+  role: 'basic_member',
+});
+```
+
+#### updateOrganizationMembership(params)
+
+Updates the organization membership of the user with `userId` for the organization with `organizationId`.
+
+Available parameters:
+
+- _organizationId_ The ID of the organization that the membership belongs to.
+- _userId_ The ID of the user who's a member of the organization.
+- _role_ The role of the organization member.
+
+```js
+const membership = await clerkAPI.organizations.updateOrganizationMembership({
+  organizationId: 'org_1o4q123qMeCkKKIXcA9h8',
+  userId: 'user_1o4q123qMeCkKKIXcA9h8',
+  role: 'admin',
+});
+```
+
+#### deleteOrganizationMembership(params)
+
+Deletes an organization membership, specified by the `organizationId` and `userId` parameters.
+
+```js
+const membership = await clerkAPI.organizations.deleteOrganizationMembership({
+  organizationId: 'org_1o4q123qMeCkKKIXcA9h8',
+  userId: 'user_1o4q123qMeCkKKIXcA9h8',
+});
 ```
 
 ## Session operations

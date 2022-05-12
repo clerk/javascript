@@ -1,4 +1,5 @@
-import { Organization } from '../resources/Organization';
+import { Organization, OrganizationMembership } from '../resources';
+import { OrganizationMembershipRole } from '../resources/Enums';
 import { AbstractApi } from './AbstractApi';
 
 const basePath = '/organizations';
@@ -24,6 +25,25 @@ type UpdateParams = {
 };
 
 type UpdateMetadataParams = OrganizationMetadataParams;
+
+type GetOrganizationMembershipListParams = {
+  organizationId: string;
+  limit?: number;
+  offset?: number;
+};
+
+type CreateOrganizationMembershipParams = {
+  organizationId: string;
+  userId: string;
+  role: OrganizationMembershipRole;
+};
+
+type UpdateOrganizationMembershipParams = CreateOrganizationMembershipParams;
+
+type DeleteOrganizationMembershipParams = {
+  organizationId: string;
+  userId: string;
+};
 
 export class OrganizationApi extends AbstractApi {
   public async createOrganization(params: CreateParams) {
@@ -64,6 +84,54 @@ export class OrganizationApi extends AbstractApi {
     return this._restClient.makeRequest<Organization>({
       method: 'DELETE',
       path: `${basePath}/${organizationId}`,
+    });
+  }
+
+  public async getOrganizationMembershipList(params: GetOrganizationMembershipListParams) {
+    const { organizationId, limit, offset } = params;
+    this.requireId(organizationId);
+
+    return this._restClient.makeRequest<OrganizationMembership[]>({
+      method: 'GET',
+      path: `${basePath}/${organizationId}/memberships`,
+      queryParams: { limit, offset },
+    });
+  }
+
+  public async createOrganizationMembership(params: CreateOrganizationMembershipParams) {
+    const { organizationId, userId, role } = params;
+    this.requireId(organizationId);
+
+    return this._restClient.makeRequest<OrganizationMembership>({
+      method: 'POST',
+      path: `${basePath}/${organizationId}/memberships`,
+      bodyParams: {
+        userId,
+        role,
+      },
+    });
+  }
+
+  public async updateOrganizationMembership(params: UpdateOrganizationMembershipParams) {
+    const { organizationId, userId, role } = params;
+    this.requireId(organizationId);
+
+    return this._restClient.makeRequest<OrganizationMembership>({
+      method: 'PATCH',
+      path: `${basePath}/${organizationId}/memberships/${userId}`,
+      bodyParams: {
+        role,
+      },
+    });
+  }
+
+  public async deleteOrganizationMembership(params: DeleteOrganizationMembershipParams) {
+    const { organizationId, userId } = params;
+    this.requireId(organizationId);
+
+    return this._restClient.makeRequest<OrganizationMembership>({
+      method: 'DELETE',
+      path: `${basePath}/${organizationId}/memberships/${userId}`,
     });
   }
 }

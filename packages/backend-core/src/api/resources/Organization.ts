@@ -6,6 +6,8 @@ import type { OrganizationProps } from './Props';
 
 interface OrganizationPayload extends OrganizationProps {}
 
+export interface Organization extends OrganizationPayload {}
+
 export class Organization {
   static attributes = ['id', 'name', 'slug', 'publicMetadata', 'privateMetadata', 'createdAt', 'updatedAt'];
 
