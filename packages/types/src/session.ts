@@ -8,6 +8,7 @@ export interface SessionResource extends ClerkResource {
   expireAt: Date;
   abandonAt: Date;
   lastActiveToken: TokenResource | null;
+  lastActiveOrganizationId: string | null;
   user: UserResource | null;
   publicUserData: PublicUserData;
   end: () => Promise<SessionResource>;
