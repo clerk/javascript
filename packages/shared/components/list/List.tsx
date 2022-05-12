@@ -9,7 +9,7 @@ export type ListProps = React.PropsWithChildren<{
   className?: string;
 }>;
 
-export const List: React.FC<ListProps> & { Item: React.FC<ListItemProps> } & {
+export const List: React.FC<ListProps> & { Item: React.FC<React.PropsWithChildren<ListItemProps>> } & {
   EmptyPlaceholder: React.FC;
 } = ({ className, children, ...rest }) => {
   return (
@@ -33,7 +33,7 @@ export type ListItemProps = {
   className?: string;
 };
 
-const Item: React.FC<ListItemProps> = ({
+const Item: React.FC<React.PropsWithChildren<ListItemProps>> = ({
   detail = true,
   hoverable = true,
   lines = true,
@@ -78,7 +78,7 @@ const Item: React.FC<ListItemProps> = ({
 
 List.Item = Item;
 
-const EmptyPlaceholder: React.FC = ({ children }) => {
+const EmptyPlaceholder: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
   return <div className={styles.empty}>{children || 'None'}</div>;
 };
 
