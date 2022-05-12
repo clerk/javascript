@@ -7,6 +7,7 @@ const allowlistIdentifiers = singletonInstance.allowlistIdentifiers;
 const clients = singletonInstance.clients;
 const emails = singletonInstance.emails;
 const invitations = singletonInstance.invitations;
+const organizations = singletonInstance.organizations;
 const sessions = singletonInstance.sessions;
 const smsMessages = singletonInstance.smsMessages;
 const users = singletonInstance.users;
@@ -20,6 +21,7 @@ export {
   clients,
   emails,
   invitations,
+  organizations,
   sessions,
   smsMessages,
   users,
@@ -35,6 +37,9 @@ export {
   ExternalAccount,
   IdentificationLink,
   Invitation,
+  Organization,
+  OrganizationMembership,
+  OrganizationMembershipPublicUserData,
   PhoneNumber,
   Session,
   SMSMessage,
