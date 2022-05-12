@@ -45,12 +45,13 @@ const allowlistIdentifiers = ClerkAPI.allowlistIdentifiers;
 const clients = ClerkAPI.clients;
 const emails = ClerkAPI.emails;
 const invitations = ClerkAPI.invitations;
+const organizations = ClerkAPI.organizations;
 const sessions = ClerkAPI.sessions;
 const smsMessages = ClerkAPI.smsMessages;
 const users = ClerkAPI.users;
 
 // Export sub-api objects
-export { allowlistIdentifiers, clients, emails, invitations, sessions, smsMessages, users };
+export { allowlistIdentifiers, clients, emails, invitations, organizations, sessions, smsMessages, users };
 
 async function fetchInterstitial() {
   const response = await ClerkAPI.fetchInterstitial<Response>();
