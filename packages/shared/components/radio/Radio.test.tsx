@@ -17,7 +17,7 @@ describe('<Radio/>', () => {
     const radio = screen.getByRole('radio', { checked: false });
 
     // // Clicking from off -> on
-    userEvent.click(radio);
+    await userEvent.click(radio);
 
     await waitFor(() => {
       expect(onChange).toHaveBeenCalledTimes(1);
@@ -33,7 +33,7 @@ describe('<Radio/>', () => {
     expect(radio).toHaveProperty('checked', true);
 
     // // Clicking from on -> off
-    userEvent.click(radio);
+    await userEvent.click(radio);
     // // TODO: onChange should have been called twice. Investigate further.
     await waitFor(() => {
       expect(onChange).toHaveBeenCalledTimes(1);

@@ -99,11 +99,11 @@ describe('<Form/>', () => {
       </Form>,
     );
 
-    userEvent.click(screen.getByRole('button', { name: /reset/i }));
+    await userEvent.click(screen.getByRole('button', { name: /reset/i }));
     await act(() => resetPromise);
     expect(onReset).toHaveBeenCalledTimes(1);
 
-    userEvent.click(screen.getByRole('button', { name: /submit/i }));
+    await userEvent.click(screen.getByRole('button', { name: /submit/i }));
     await act(() => submitPromise);
     expect(onSubmit).toHaveBeenCalledTimes(1);
   });

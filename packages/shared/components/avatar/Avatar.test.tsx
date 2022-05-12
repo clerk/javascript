@@ -61,7 +61,7 @@ describe('<Avatar/>', () => {
     const avatar = screen.getByAltText('John Doe');
     expect(avatar).toBeDefined();
     fireEvent.error(avatar);
-    expect(screen.getByLabelText('John Doe', { selector: 'svg' })).toBeDefined();
+    expect(screen.findByLabelText('John Doe', { selector: 'svg' })).toBeDefined();
   });
 
   it('renders the the Gravatar default image if avatar or initials are empty', () => {

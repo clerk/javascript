@@ -129,7 +129,7 @@ describe('<Dropdown/>', () => {
     expect(screen.queryByText('Qux')).not.toBeInTheDocument();
   });
 
-  it('selects an option upon selecting it with the keyboard', () => {
+  it('selects an option upon selecting it with the keyboard', async () => {
     const onChange = jest.fn();
 
     render(
@@ -142,7 +142,7 @@ describe('<Dropdown/>', () => {
     );
 
     const trigger = screen.getAllByRole('button')[0];
-    userEvent.click(trigger);
+    await userEvent.click(trigger);
     expect(onChange).not.toHaveBeenCalled();
 
     expect(screen.getByText('Bar')).toBeInTheDocument();
@@ -167,7 +167,7 @@ describe('<Dropdown/>', () => {
     expect(screen.queryByText('Qux')).not.toBeInTheDocument();
   });
 
-  it('selects the last option using ArrowUp on the keyboard', () => {
+  it('selects the last option using ArrowUp on the keyboard', async () => {
     const onChange = jest.fn();
 
     render(
@@ -180,7 +180,7 @@ describe('<Dropdown/>', () => {
     );
 
     const trigger = screen.getAllByRole('button')[0];
-    userEvent.click(trigger);
+    await userEvent.click(trigger);
     expect(onChange).not.toHaveBeenCalled();
 
     expect(screen.getByText('Bar')).toBeInTheDocument();
@@ -260,7 +260,7 @@ describe('Searchable <Dropdown />', () => {
     expect(tree).toMatchSnapshot();
   });
 
-  it('list supplied options', () => {
+  it('list supplied options', async () => {
     const onChange = jest.fn();
 
     render(
@@ -273,7 +273,7 @@ describe('Searchable <Dropdown />', () => {
     );
 
     const input = screen.getByRole('combobox');
-    act(() => userEvent.click(input));
+    await act(async () => await userEvent.click(input));
     expect(screen.getByText('Bar')).toBeInTheDocument();
     expect(screen.getByText('Foo')).toBeInTheDocument();
     expect(screen.getByText('Qux')).toBeInTheDocument();
@@ -292,7 +292,7 @@ describe('Searchable <Dropdown />', () => {
     );
 
     const input = screen.getByRole('combobox');
-    await act(() => userEvent.type(input, 'ba'));
+    await act(async () => await userEvent.type(input, 'ba'));
     expect(screen.getByText('Bar')).toBeInTheDocument();
     expect(screen.queryByText('Foo')).not.toBeInTheDocument();
     expect(screen.queryByText('Qux')).not.toBeInTheDocument();
@@ -316,7 +316,7 @@ describe('Searchable <Dropdown />', () => {
     );
 
     const input = screen.getByRole('combobox');
-    await act(() => userEvent.type(input, 'cle'));
+    await act(async () => await userEvent.type(input, 'cle'));
     expect(screen.getByText('Clerk')).toBeInTheDocument();
     expect(screen.queryByText('Bar')).not.toBeInTheDocument();
     expect(screen.queryByText('Foo')).not.toBeInTheDocument();
@@ -337,7 +337,7 @@ describe('Searchable <Dropdown />', () => {
     );
 
     const input = screen.getByRole('combobox');
-    await act(() => userEvent.type(input, 'random123'));
+    await act(async () => await userEvent.type(input, 'random123'));
     expect(screen.getByText('No matches found')).toBeInTheDocument();
     expect(screen.queryByText('Bar')).not.toBeInTheDocument();
     expect(screen.queryByText('Foo')).not.toBeInTheDocument();
@@ -360,8 +360,8 @@ describe('Searchable <Dropdown />', () => {
     const input = screen.getByRole('combobox');
     expect(screen.queryByText('Bar')).toBeInTheDocument();
 
-    userEvent.click(input);
-    await act(() => userEvent.type(input, 'random'));
+    await userEvent.click(input);
+    await act(async () => await userEvent.type(input, 'random'));
     fireEvent.blur(input);
     expect(screen.queryByText('Bar')).toBeInTheDocument();
   });

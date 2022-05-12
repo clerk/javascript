@@ -155,9 +155,7 @@ exports[`Searchable <Dropdown /> renders searchable Dropdown 1`] = `
     />
     <span
       className="label searchDisplay placeholder"
-    >
-      
-    </span>
+    />
     <svg
       data-filename="assets/icons/caret.svg"
     />
@@ -193,9 +191,7 @@ exports[`Searchable <Dropdown /> renders searchable Dropdown with native select 
     />
     <span
       className="label searchDisplay placeholder"
-    >
-      
-    </span>
+    />
     <svg
       data-filename="assets/icons/caret.svg"
     />
@@ -257,9 +253,7 @@ exports[`Searchable <Dropdown /> renders tertiary Dropdown 1`] = `
     />
     <span
       className="label searchDisplay placeholder"
-    >
-      
-    </span>
+    />
     <svg
       data-filename="assets/icons/caret.svg"
     />

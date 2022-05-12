@@ -17,11 +17,11 @@ describe('<ButtonWithTimer/>', () => {
     expect(tree).toMatchSnapshot();
   });
 
-  it('is enabled by default, becomes disabled when clicked, and becomes enables again after delay', () => {
+  it('is enabled by default, becomes disabled when clicked, and becomes enables again after delay', async () => {
     render(<ButtonWithTimer throttleTimeInMs={1000}>Foo</ButtonWithTimer>);
     const btn = screen.getByRole('button');
     expect(btn).toBeEnabled();
-    userEvent.click(btn);
+    await userEvent.click(btn);
     expect(btn).toBeDisabled();
     act(() => {
       jest.advanceTimersByTime(500);
@@ -33,7 +33,7 @@ describe('<ButtonWithTimer/>', () => {
     expect(btn).toBeEnabled();
   });
 
-  it('starts disabled if startingState is provided, becomes enabled after delay, disabled when clicked, and becomes enables again after delay', () => {
+  it('starts disabled if startingState is provided, becomes enabled after delay, disabled when clicked, and becomes enables again after delay', async () => {
     render(
       <ButtonWithTimer
         throttleTimeInMs={1000}
@@ -48,7 +48,7 @@ describe('<ButtonWithTimer/>', () => {
       jest.advanceTimersByTime(1000);
     });
     expect(btn).toBeEnabled();
-    userEvent.click(btn);
+    await userEvent.click(btn);
     expect(btn).toBeDisabled();
     act(() => {
       jest.advanceTimersByTime(500);

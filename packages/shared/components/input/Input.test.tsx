@@ -4,7 +4,7 @@ import * as React from 'react';
 import { Input } from './Input';
 
 describe('<Input/>', () => {
-  it('renders the controlled input', () => {
+  it('renders the controlled input', async () => {
     const onChange = jest.fn();
 
     render(
@@ -19,7 +19,7 @@ describe('<Input/>', () => {
     expect(htmlInput).toHaveProperty('type', 'text');
     expect(htmlInput).toHaveProperty('placeholder', 'Type some text');
 
-    userEvent.type(htmlInput, 'Hello, World!');
+    await userEvent.type(htmlInput, 'Hello, World!');
 
     expect(onChange).toHaveBeenCalledTimes('Hello, World!'.length);
   });

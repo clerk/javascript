@@ -23,7 +23,7 @@ describe('<Menu/>', () => {
     expect(tree).toMatchSnapshot();
   });
 
-  it('triggers the option callback upon clicking on it', () => {
+  it('triggers the option callback upon clicking on it', async () => {
     const opts = options.map(o => ({
       ...o,
       handleSelect: jest.fn(),
@@ -32,11 +32,11 @@ describe('<Menu/>', () => {
     render(<Menu options={opts} />);
 
     const trigger1 = screen.getByText('Foo');
-    userEvent.click(trigger1);
+    await userEvent.click(trigger1);
     expect(opts[0].handleSelect).toHaveBeenCalledTimes(1);
 
     const trigger2 = screen.getByText('Bar');
-    userEvent.click(trigger2);
+    await userEvent.click(trigger2);
     expect(opts[0].handleSelect).toHaveBeenCalledTimes(1);
   });
 });

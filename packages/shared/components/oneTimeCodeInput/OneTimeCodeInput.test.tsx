@@ -77,7 +77,7 @@ describe('<OneTimeCodeInput/>', () => {
     });
   });
 
-  it('updates value state on keydown', () => {
+  it('updates value state on keydown', async () => {
     let value = '';
     const onChange = jest.fn(val => (value = val));
     const getComponent = () => (
@@ -94,7 +94,7 @@ describe('<OneTimeCodeInput/>', () => {
     const text = '123456';
     const inputs = screen.getAllByRole('textbox');
     for (const [i, input] of inputs.entries()) {
-      userEvent.type(input, text[i]);
+      await userEvent.type(input, text[i]);
       rerender(getComponent());
     }
 
@@ -102,7 +102,7 @@ describe('<OneTimeCodeInput/>', () => {
     expect(value).toEqual(text);
   });
 
-  it('focuses next input when user enters a char', () => {
+  it('focuses next input when user enters a char', async () => {
     let value = '';
     const onChange = jest.fn(val => (value = val));
     const getComponent = () => (
@@ -119,7 +119,7 @@ describe('<OneTimeCodeInput/>', () => {
     const text = '123';
     const inputs = screen.getAllByRole('textbox');
     for (const [i, char] of [...text].entries()) {
-      userEvent.type(inputs[i], char);
+      await userEvent.type(inputs[i], char);
       rerender(getComponent());
       expect(inputs[i + 1]).toHaveFocus();
     }
@@ -181,7 +181,7 @@ describe('<OneTimeCodeInput/>', () => {
     render(getComponent());
     const inputs = screen.getAllByRole('textbox');
     inputs.forEach(input => expect(input).toHaveClass('error'));
-    userEvent.type(inputs[0], '1');
+    await userEvent.type(inputs[0], '1');
     inputs.forEach(input => expect(input).not.toHaveClass('error'));
   });
 

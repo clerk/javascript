@@ -22,7 +22,7 @@ describe('<Checkbox/>', () => {
     expect(checkbox).toHaveProperty('checked', false);
 
     // // Clicking from off -> on
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     await waitFor(() => {
       expect(onChange).toHaveBeenCalledTimes(1);
@@ -38,7 +38,7 @@ describe('<Checkbox/>', () => {
     expect(checkbox).toHaveProperty('checked', true);
 
     // // Clicking from on -> off
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     await waitFor(() => {
       expect(onChange).toHaveBeenCalledTimes(2);
