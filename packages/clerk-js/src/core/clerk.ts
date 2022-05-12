@@ -446,8 +446,13 @@ export default class Clerk implements ClerkInterface {
 
     const navigateToSignUp = makeNavigate(displayConfig.signUpUrl);
 
-    const navigateToFactorTwo = makeNavigate(params.secondFactorUrl || displayConfig.signInUrl + '#/factor-two');
-
+    const navigateToFactorTwo = makeNavigate(
+      params.secondFactorUrl ||
+        (displayConfig.signInUrl.includes('#/?')
+          ? displayConfig.signInUrl.replace('#/?', '#/factor-two?')
+          : displayConfig.signInUrl + '#/factor-two')
+    );
+    
     const navigateAfterSignIn = makeNavigate(
       params.afterSignInUrl || params.redirectUrl || displayConfig.afterSignInUrl,
     );
