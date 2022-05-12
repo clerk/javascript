@@ -163,6 +163,7 @@ export interface UserJSON extends ClerkResourceJSON {
   phone_numbers: PhoneNumberJSON[];
   web3_wallets: Web3WalletJSON[];
   external_accounts: ExternalAccountJSON[];
+  organization_memberships: OrganizationMembershipJSON[];
   password_enabled: boolean;
   password: string;
   profile_image_id: string;

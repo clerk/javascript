@@ -8,6 +8,7 @@ import { SessionWithActivitiesResource } from './session';
 import { OAuthStrategy } from './strategies';
 import { SnakeToCamel } from './utils';
 import { Web3WalletResource } from './web3Wallet';
+import { OrganizationMembershipResource } from './organizationMembership';
 
 declare global {
   /**
@@ -47,6 +48,7 @@ export interface UserResource extends ClerkResource {
   phoneNumbers: PhoneNumberResource[];
   web3Wallets: Web3WalletResource[];
   externalAccounts: ExternalAccountResource[];
+  organizationMemberships: OrganizationMembershipResource[];
   passwordEnabled: boolean;
   publicMetadata: UserPublicMetadata;
   unsafeMetadata: UserUnsafeMetadata;

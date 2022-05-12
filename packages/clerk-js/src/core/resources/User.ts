@@ -6,6 +6,7 @@ import type {
   ExternalAccountResource,
   ImageResource,
   OAuthStrategy,
+  OrganizationMembershipResource,
   PhoneNumberResource,
   SetProfileImageParams,
   UpdateUserParams,
@@ -38,6 +39,7 @@ export class User extends BaseResource implements UserResource {
   phoneNumbers: PhoneNumberResource[] = [];
   web3Wallets: Web3WalletResource[] = [];
   externalAccounts: ExternalAccountResource[] = [];
+  organizationMemberships: OrganizationMembershipResource[] = [];
   passwordEnabled = false;
   firstName: string | null = null;
   lastName: string | null = null;
@@ -199,6 +201,8 @@ export class User extends BaseResource implements UserResource {
     this.externalAccounts = data.external_accounts.map(
       ea => new ExternalAccount(ea, this.path() + '/external_accounts'),
     );
+
+    this.organizationMemberships = (data.organization_memberships || []).map(om => new OrganizationMembership(om));
 
     this.publicMetadata = data.public_metadata;
     this.unsafeMetadata = data.unsafe_metadata;
