@@ -48,6 +48,9 @@ export interface Clerk {
   /** Active Session. */
   session?: ActiveSessionResource | null;
 
+  /** Active Organization */
+  organization?: OrganizationResource | null;
+
   /** Current User. */
   user?: UserResource | null;
 

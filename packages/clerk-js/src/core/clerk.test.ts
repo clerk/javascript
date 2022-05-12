@@ -135,8 +135,8 @@ describe('Clerk singleton', () => {
 
   describe('.signOut()', () => {
     const mockClientDestroy = jest.fn();
-    const mockSession1 = { id: '1', remove: jest.fn(), status: 'active' };
-    const mockSession2 = { id: '2', remove: jest.fn(), status: 'active' };
+    const mockSession1 = { id: '1', remove: jest.fn(), status: 'active', user: {} };
+    const mockSession2 = { id: '2', remove: jest.fn(), status: 'active', user: {} };
 
     beforeEach(() => {
       mockClientDestroy.mockReset();
