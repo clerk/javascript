@@ -44,6 +44,7 @@ import {
   validateFrontendApi,
   windowNavigate,
 } from 'utils';
+import { buildURL } from 'utils';
 import { getClerkQueryParam } from 'utils/getClerkQueryParam';
 import { memoizeListenerCallback } from 'utils/memoizeStateListenerCallback';
 
@@ -446,7 +447,10 @@ export default class Clerk implements ClerkInterface {
 
     const navigateToSignUp = makeNavigate(displayConfig.signUpUrl);
 
-    const navigateToFactorTwo = makeNavigate(params.secondFactorUrl || displayConfig.signInUrl + '#/factor-two');
+    const navigateToFactorTwo = makeNavigate(
+      params.secondFactorUrl ||
+        buildURL({ base: displayConfig.signInUrl, hashPath: '/factor-two' }, { stringify: true }),
+    );
 
     const navigateAfterSignIn = makeNavigate(
       params.afterSignInUrl || params.redirectUrl || displayConfig.afterSignInUrl,

@@ -1,5 +1,5 @@
 const SEPARATOR = '/';
-const MUTLIPLE_SEPARATOR_REGEX = new RegExp(SEPARATOR + '{1,}', 'g');
+const MULTIPLE_SEPARATOR_REGEX = new RegExp(SEPARATOR + '{1,}', 'g');
 
 type PathString = string | null | undefined;
 
@@ -7,5 +7,5 @@ export function joinPaths(a: PathString, b: PathString): string {
   return [a, b]
     .filter(p => p)
     .join(SEPARATOR)
-    .replace(MUTLIPLE_SEPARATOR_REGEX, SEPARATOR);
+    .replace(MULTIPLE_SEPARATOR_REGEX, SEPARATOR);
 }
