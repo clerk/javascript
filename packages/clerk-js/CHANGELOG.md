@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.11.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.10.2...@clerk/clerk-js@3.11.0) (2022-05-13)
+
+### Features
+
+- **clerk-js:** Add shortcut to active org in Clerk singleton ([03e68d4](https://github.com/clerkinc/javascript/commit/03e68d4667e7abcd006c4a3a2a2fe7f65bfca417))
+
 ### [3.10.4](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.10.2...@clerk/clerk-js@3.10.4) (2022-05-12)
 
 **Note:** Version bump only for package @clerk/clerk-js

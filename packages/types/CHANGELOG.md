@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.13.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.10.1...@clerk/types@2.13.0) (2022-05-13)
+
+### Features
+
+- **clerk-js:** Add shortcut to active org in Clerk singleton ([03e68d4](https://github.com/clerkinc/javascript/commit/03e68d4667e7abcd006c4a3a2a2fe7f65bfca417))
+- **types:** Introduce Web3 provider types and helpers ([8291d75](https://github.com/clerkinc/javascript/commit/8291d75a7f3172d05f76c0f9aeb08aab98e7d81c))
+
 ## [2.12.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.10.1...@clerk/types@2.12.0) (2022-05-12)
 
 ### Features

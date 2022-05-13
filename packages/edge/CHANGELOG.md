@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.0](https://github.com/clerkinc/javascript/compare/@clerk/edge@1.4.1...@clerk/edge@1.5.0) (2022-05-13)
+
+### Features
+
+- **edge:** Expose organization API methods ([7bc9546](https://github.com/clerkinc/javascript/commit/7bc95464fef9d1e99da942a2a1e6e75c030832f9))
+
 ### [1.4.3](https://github.com/clerkinc/javascript/compare/@clerk/edge@1.4.1...@clerk/edge@1.4.3) (2022-05-12)
 
 **Note:** Version bump only for package @clerk/edge

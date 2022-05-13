@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.8.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.7.0...@clerk/backend-core@1.8.0) (2022-05-13)
+
+### Features
+
+- **backend-core:** Organization memberships ([fdab06a](https://github.com/clerkinc/javascript/commit/fdab06adda33725f8cc7c8b872e1eaacb72155ca))
+
 ### [1.7.2](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.7.0...@clerk/backend-core@1.7.2) (2022-05-12)
 
 **Note:** Version bump only for package @clerk/backend-core
