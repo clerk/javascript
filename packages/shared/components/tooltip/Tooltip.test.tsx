@@ -30,7 +30,9 @@ describe('<Tooltip/>', () => {
 
     await waitFor(() => expect(screen.getByText(messageText)).toBeInTheDocument());
 
-    userEvent.unhover(screen.getByText(/Hover me/i));
+    act(() => {
+      userEvent.unhover(screen.getByText(/Hover me/i));
+    });
     expect(screen.queryByText(messageText)).not.toBeInTheDocument();
   });
 });

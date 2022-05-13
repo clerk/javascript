@@ -48,7 +48,6 @@ export const Button = React.forwardRef(
     if (buttonSize) {
       classNames.push(styles[buttonSize]);
     }
-
     return (
       <button
         {...rest}

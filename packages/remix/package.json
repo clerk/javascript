@@ -55,7 +55,7 @@
     "@remix-run/server-runtime": "^1.2.1"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=16"
   },
   "publishConfig": {
     "access": "public"

@@ -70,7 +70,7 @@ exports[`<PhoneInput/> renders the phone input 1`] = `
           value="us"
         >
           🇺🇸
-          
+           
           United States
            (+
           1
@@ -80,7 +80,7 @@ exports[`<PhoneInput/> renders the phone input 1`] = `
           value="gb"
         >
           🇬🇧
-          
+           
           United Kingdom
            (+
           44
@@ -90,7 +90,7 @@ exports[`<PhoneInput/> renders the phone input 1`] = `
           value="in"
         >
           🇮🇳
-          
+           
           India
            (+
           91
@@ -235,7 +235,7 @@ exports[`<PhoneInput/> renders the phone input when the dropdown is open 1`] = `
             value="us"
           >
             🇺🇸
-            
+             
             United States
              (+
             1
@@ -245,7 +245,7 @@ exports[`<PhoneInput/> renders the phone input when the dropdown is open 1`] = `
             value="gb"
           >
             🇬🇧
-            
+             
             United Kingdom
              (+
             44
@@ -255,7 +255,7 @@ exports[`<PhoneInput/> renders the phone input when the dropdown is open 1`] = `
             value="in"
           >
             🇮🇳
-            
+             
             India
              (+
             91

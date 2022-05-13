@@ -10,7 +10,7 @@
   "private": true,
   "packageManager": "npm@8.5.0",
   "engines": {
-    "node": ">=14",
+    "node": ">=16.8.0",
     "npm": ">=8.5.0"
   },
   "devDependencies": {
