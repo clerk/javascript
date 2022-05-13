@@ -31,7 +31,7 @@
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "check-types": "tsc",
     "dev": "webpack-dev-server --config webpack.dev.js",
-    "prepublishOnly": "npm run test && npm run build",
+    "prepublishOnly": "npm run build",
     "postpublish": "node ./scripts/purge-cache.mjs",
     "start": "echo \"Noop\"",
     "test": "jest",
