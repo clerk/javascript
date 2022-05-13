@@ -409,7 +409,7 @@ describe('Clerk singleton', () => {
 
       await waitFor(() => {
         expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true });
-        expect(mockNavigate).toHaveBeenCalledWith('/signUpUrl#/continue');
+        expect(mockNavigate).toHaveBeenCalledWith('/sign-up#/continue');
       });
     });
 

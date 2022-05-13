@@ -460,8 +460,9 @@ export default class Clerk implements ClerkInterface {
       params.afterSignUpUrl || params.redirectUrl || displayConfig.afterSignUpUrl,
     );
 
-    const navigateToContinueSignUp = makeNavigate(displayConfig.signUpUrl + '/continue');
-    const navigateToContinueSignUpForTransfer = makeNavigate(displayConfig.signUpUrl + '#/continue');
+    const navigateToContinueSignUp = makeNavigate(
+      buildURL({ base: displayConfig.signUpUrl, hashPath: '/continue' }, { stringify: true }),
+    );
 
     const userExistsButNeedsToSignIn =
       su.externalAccountStatus === 'transferable' && su.externalAccountErrorCode === 'external_account_exists';
@@ -486,7 +487,7 @@ export default class Clerk implements ClerkInterface {
         case 'complete':
           return this.setSession(res.createdSessionId, navigateAfterSignUp);
         case 'missing_requirements':
-          return navigateToContinueSignUpForTransfer();
+          return navigateToContinueSignUp();
         default:
           clerkOAuthCallbackDidNotCompleteSignInSIgnUp('sign in');
       }
