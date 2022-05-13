@@ -558,8 +558,7 @@ export default class Clerk implements ClerkInterface {
           signInOrSignUp.verifications.web3Wallet.status === 'verified' &&
           signInOrSignUp.status === 'missing_requirements'
         ) {
-          // @ts-ignore
-          return this.navigate(signUpUrl + '/continue');
+          await this.navigate(buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true }));
         }
       } else {
         throw err;
