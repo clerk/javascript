@@ -1,7 +1,6 @@
 import { act, screen } from '@clerk/shared/testUtils';
 import { render, userEvent } from '@clerk/shared/utils/testUtils';
 import { ExternalAccountResource } from '@clerk/types';
-import { waitFor } from '@testing-library/dom';
 import React from 'react';
 
 import { UnverifiedAccountListItem } from './UnverifiedAccountListItem';
@@ -55,5 +54,5 @@ describe('<UnverifiedAccountListItem/>', () => {
     });
 
     expect(mockHandleConnect).toHaveBeenCalled();
-  }, 15000);
+  });
 });

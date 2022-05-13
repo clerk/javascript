@@ -16,9 +16,9 @@
     "@svgr/webpack": "^6.2.1",
     "core-js": "^3.18.3",
     "js-cookie": "^2.2.1",
-    "react": ">=16",
+    "react": ">=16.8",
     "react-color": "2.19.3",
-    "react-dom": ">=16",
+    "react-dom": ">=16.8",
     "react-popper": "^2.2.4",
     "regenerator-runtime": "^0.13.7"
   },

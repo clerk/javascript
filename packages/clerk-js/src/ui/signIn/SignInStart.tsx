@@ -101,7 +101,6 @@ export function _SignInStart(): JSX.Element {
 
         // TODO: This is a workaround in order to reset the sign in attempt
         // so that the oauth error does not persist on full page reloads.
-        console.log('useeffect');
         void (await signIn.create({}));
       }
     }
@@ -123,7 +122,6 @@ export function _SignInStart(): JSX.Element {
   const signInWithFields = async (...fields: Array<FieldState<string>>) => {
     try {
       const res = await signIn.create(buildSignInParams(fields));
-      console.log('wat', res);
       switch (res.status) {
         case 'needs_first_factor':
           return navigate('factor-one');
@@ -140,7 +138,6 @@ export function _SignInStart(): JSX.Element {
         }
       }
     } catch (e) {
-      console.log('wat', e);
       return attemptToRecoverFromSignInError(e);
     }
   };
