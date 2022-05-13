@@ -1,4 +1,5 @@
 import { SignUpResource } from '@clerk/types';
+
 import {
   appendAsQueryParams,
   buildURL,
@@ -23,7 +24,8 @@ describe('isAccountsHostedPages(url)', () => {
   ];
 
   test.each(goodUrls)('.isAccountsHostedPages(%s)', (a, expected) => {
-    expect(isAccountsHostedPages(a as any)).toBe(expected);
+    // @ts-ignore
+    expect(isAccountsHostedPages(a)).toBe(expected);
   });
 });
 
@@ -47,7 +49,8 @@ describe('isDevOrStagingUrl(url)', () => {
   ];
 
   test.each([...goodUrls, ...badUrls])('.isDevOrStagingUrl(%s)', (a, expected) => {
-    expect(isDevOrStagingUrl(a as any)).toBe(expected);
+    // @ts-ignore
+    expect(isDevOrStagingUrl(a)).toBe(expected);
   });
 });
 
@@ -136,6 +139,51 @@ describe('buildURL(options: URLParams, skipOrigin)', () => {
         { stringify: true },
       ),
     ).toBe('http://test.host/foo%3Fbar=42?my-search');
+    expect(
+      buildURL(
+        {
+          base: 'http://test.host/',
+          pathname: '/foo?bar=42',
+          search: 'my-search=42',
+          hashPath: '/qux',
+          hashSearch: 'my-hash-search=42',
+        },
+        { stringify: true },
+      ),
+    ).toBe('http://test.host/foo%3Fbar=42?my-search=42#/qux?my-hash-search=42');
+    expect(
+      buildURL(
+        {
+          base: 'http://test.host/',
+          pathname: '/foo?bar=42',
+          search: 'my-search=42',
+          hash: 'my-hash',
+          hashPath: '/qux',
+          hashSearch: 'my-hash-search=42',
+        },
+        { stringify: true },
+      ),
+    ).toBe('http://test.host/foo%3Fbar=42?my-search=42#my-hash/qux?my-hash-search=42');
+    expect(
+      buildURL(
+        {
+          base: 'http://test.host/',
+          hash: '?my-hash-search=42',
+          hashPath: '/foo',
+        },
+        { stringify: true },
+      ),
+    ).toBe('http://test.host/#/foo?my-hash-search=42');
+    expect(
+      buildURL(
+        {
+          base: 'http://test.host/foo?my-search=42#my-hash?my-hash-search-1=42',
+          hashPath: '/qux',
+          hashSearch: 'my-hash-search-2=42',
+        },
+        { stringify: true },
+      ),
+    ).toBe('http://test.host/foo?my-search=42#my-hash/qux?my-hash-search-1=42&my-hash-search-2=42');
   });
 });
 
