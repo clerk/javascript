@@ -864,7 +864,7 @@ describe('Clerk singleton', () => {
       sut.handleRedirectCallback();
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/signUpUrl/continue');
+        expect(mockNavigate).toHaveBeenCalledWith('/sign-up#/continue');
       });
     });
   });
