@@ -49,6 +49,7 @@ export class Session extends BaseResource implements SessionResource {
   touch = (): Promise<SessionResource> => {
     return this._basePost({
       action: 'touch',
+      body: { active_organization_id: this.lastActiveOrganizationId },
     });
   };
 
