@@ -32,7 +32,7 @@ function SignUpRoutes(): JSX.Element {
           afterSignUpUrl={signUpContext.afterSignUpUrl}
           afterSignInUrl={signUpContext.afterSignInUrl}
           redirectUrl={signUpContext.redirectUrl}
-          secondFactorUrl={signUpContext.signInUrl + '#/factor-two'}
+          secondFactorUrl={signUpContext.secondFactorUrl}
         />
       </Route>
       <Route path='verify'>

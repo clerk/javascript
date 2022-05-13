@@ -33,13 +33,39 @@ describe('Clerk singleton', () => {
   let mockNavigate = jest.fn();
 
   const mockDisplayConfig = {
-    signInUrl: 'signInUrl',
-    signUpUrl: 'signUpUrl',
-    userProfileUrl: 'userProfileUrl',
+    signInUrl: 'http://test.host/sign-in',
+    signUpUrl: 'http://test.host/sign-up',
+    userProfileUrl: 'http://test.host/user-profile',
   } as DisplayConfig;
 
+  let mockWindowLocation;
+  let mockHref: jest.Mock;
+
+  beforeEach(() => {
+    mockHref = jest.fn();
+    mockWindowLocation = {
+      host: 'test.host',
+      hostname: 'test.host',
+      origin: 'http://test.host',
+      get href() {
+        return 'http://test.host';
+      },
+      set href(v: string) {
+        mockHref(v);
+      },
+    } as any;
+
+    Object.defineProperty(global.window, 'location', {
+      value: mockWindowLocation,
+    });
+
+    // sut = new Clerk(frontendApi);
+  });
+
   afterAll(() => {
-    global.window.location = location;
+    Object.defineProperty(global.window, 'location', {
+      value: oldWindowLocation,
+    });
   });
 
   beforeEach(() => {
@@ -87,17 +113,17 @@ describe('Clerk singleton', () => {
 
     it('redirects to signInUrl', () => {
       sut.redirectToSignIn({ redirectUrl: 'https://www.example.com/' });
-      expect(mockNavigate).toHaveBeenCalledWith('/signInUrl#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
+      expect(mockNavigate).toHaveBeenCalledWith('/sign-in#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
     });
 
     it('redirects to signUpUrl', () => {
       sut.redirectToSignUp({ redirectUrl: 'https://www.example.com/' });
-      expect(mockNavigate).toHaveBeenCalledWith('/signUpUrl#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
+      expect(mockNavigate).toHaveBeenCalledWith('/sign-up#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
     });
 
     it('redirects to userProfileUrl', () => {
       sut.redirectToUserProfile();
-      expect(mockNavigate).toHaveBeenCalledWith('/userProfileUrl');
+      expect(mockNavigate).toHaveBeenCalledWith('/user-profile');
     });
   });
 
@@ -237,34 +263,15 @@ describe('Clerk singleton', () => {
   });
 
   describe('.navigate(to)', () => {
-    let mockWindowLocation;
-    let mockHref: jest.Mock;
     let sut: Clerk;
 
     beforeEach(() => {
-      mockHref = jest.fn();
-      mockWindowLocation = {
-        host: 'www.origin1.com',
-        hostname: 'www.origin1.com',
-        origin: 'https://www.origin1.com',
-        get href() {
-          return 'https://www.origin1.com';
-        },
-        set href(v: string) {
-          mockHref(v);
-        },
-      } as any;
-
-      Object.defineProperty(global.window, 'location', {
-        value: mockWindowLocation,
-      });
-
       sut = new Clerk(frontendApi);
     });
 
     it('uses window location if a custom navigate is not defined', async () => {
       await sut.load();
-      const toUrl = 'https://www.origin1.com/';
+      const toUrl = 'http://test.host/';
       await sut.navigate(toUrl);
       expect(mockHref).toHaveBeenCalledWith(toUrl);
     });
@@ -278,7 +285,7 @@ describe('Clerk singleton', () => {
 
     it('wraps custom navigate method in a promise if provided and it sync', async () => {
       await sut.load({ navigate: mockNavigate });
-      const toUrl = 'https://www.origin1.com/path#hash';
+      const toUrl = 'http://test.host/path#hash';
       const res = sut.navigate(toUrl);
       expect(res.then).toBeDefined();
       expect(mockHref).not.toHaveBeenCalled();
@@ -559,7 +566,7 @@ describe('Clerk singleton', () => {
       sut.handleRedirectCallback();
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/' + mockDisplayConfig.signInUrl + '#/factor-two');
+        expect(mockNavigate).toHaveBeenCalledWith('/sign-in#/factor-two');
       });
     });
 
@@ -761,13 +768,13 @@ describe('Clerk singleton', () => {
       sut.handleRedirectCallback();
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/signUpUrl');
+        expect(mockNavigate).toHaveBeenCalledWith('/sign-up');
       });
     });
   });
 
   describe('.handleMagicLinkVerification()', () => {
-    beforeEach(async () => {
+    beforeEach(() => {
       mockClientFetch.mockReset();
       mockEnvironmentFetch.mockReset();
     });
