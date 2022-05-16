@@ -53,6 +53,12 @@ type CreateOrganizationInvitationParams = {
   redirectUrl?: string;
 };
 
+type GetPendingOrganizationInvitationListParams = {
+  organizationId: string;
+  limit?: number;
+  offset?: number;
+};
+
 export class OrganizationApi extends AbstractApi {
   public async createOrganization(params: CreateParams) {
     const { publicMetadata, privateMetadata } = params;
@@ -140,6 +146,17 @@ export class OrganizationApi extends AbstractApi {
     return this._restClient.makeRequest<OrganizationMembership>({
       method: 'DELETE',
       path: `${basePath}/${organizationId}/memberships/${userId}`,
+    });
+  }
+
+  public async getPendingOrganizationInvitationList(params: GetPendingOrganizationInvitationListParams) {
+    const { organizationId, limit, offset } = params;
+    this.requireId(organizationId);
+
+    return this._restClient.makeRequest<OrganizationInvitation[]>({
+      method: 'GET',
+      path: `${basePath}/${organizationId}/invitations/pending`,
+      queryParams: { limit, offset },
     });
   }
 

@@ -23,6 +23,7 @@ Reference of the methods supported in the Clerk Backend API wrapper. [API refere
   - [updateOrganization(organizationId, params)](#updateorganizationorganizationid-params)
   - [updateOrganizationMetadata(organizationId, params)](#updateorganizationmetadataorganizationid-params)
   - [deleteOrganization(organizationId)](#deleteorganizationorganizationid)
+  - [getPendingOrganizationInvitationList(params)](#getpendingorganizationinvitationlistparams)
   - [createOrganizationInvitation(params)](#createorganizationinvitationparams)
   - [getOrganizationMembershipList(params)](#getorganizationmembershiplistparams)
   - [createOrganizationMembership(params)](#createorganizationmembershipparams)
@@ -216,6 +217,22 @@ Delete an organization with the provided `organizationId`. This action cannot be
 
 ```js
 await clerkAPI.organizations.deleteOrganization(organizationId);
+```
+
+#### getPendingOrganizationInvitationList(params)
+
+Retrieve a list of pending organization invitations for the organization specified by `organizationId`.
+
+The method supports pagination via optional `limit` and `offset` parameters. The method parameters are:
+
+- _organizationId_ The unique ID of the organization to retrieve the pending invitations for
+- _limit_ Optionally put a limit on the number of results returned
+- _offset_ Optionally skip some results
+
+```ts
+const invitations = await clerkAPI.organizations.getPendingOrganizationInvitationList({
+  organizationId: 'org_1o4q123qMeCkKKIXcA9h8',
+});
 ```
 
 #### createOrganizationInvitation(params)

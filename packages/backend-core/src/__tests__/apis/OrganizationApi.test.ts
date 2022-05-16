@@ -335,3 +335,31 @@ test('createOrganizationInvitation() creates an invitation for an organization',
     }),
   );
 });
+
+test('getPendingOrganizationInvitationList() returns a list of organization memberships', async () => {
+  const organizationId = 'org_randomid';
+  const resJSON = [
+    {
+      object: 'organization_invitation',
+      id: 'orginv_randomid',
+      role: 'basic_member',
+      email_address: 'invited@example.org',
+      organization_id: organizationId,
+      status: 'pending',
+      redirect_url: null,
+      created_at: 1612378465,
+      updated_at: 1612378465,
+    },
+  ];
+
+  nock('https://api.clerk.dev')
+    .get(new RegExp(`/v1/organizations/${organizationId}/invitations/pending`))
+    .reply(200, resJSON);
+
+  const organizationInvitationList = await TestBackendAPIClient.organizations.getPendingOrganizationInvitationList({
+    organizationId,
+  });
+  expect(organizationInvitationList).toBeInstanceOf(Array);
+  expect(organizationInvitationList.length).toEqual(1);
+  expect(organizationInvitationList[0]).toBeInstanceOf(OrganizationInvitation);
+});
