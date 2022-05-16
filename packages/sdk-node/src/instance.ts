@@ -21,6 +21,7 @@ export {
   Invitation,
   Nullable,
   Organization,
+  OrganizationInvitation,
   OrganizationMembership,
   OrganizationMembershipPublicUserData,
   PhoneNumber,

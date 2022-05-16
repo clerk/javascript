@@ -38,6 +38,7 @@ export {
   IdentificationLink,
   Invitation,
   Organization,
+  OrganizationInvitation,
   OrganizationMembership,
   OrganizationMembershipPublicUserData,
   PhoneNumber,
