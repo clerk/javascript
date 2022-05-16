@@ -7,6 +7,7 @@ export * from './ExternalAccount';
 export * from './IdentificationLink';
 export * from './Invitation';
 export * from './Organization';
+export * from './OrganizationInvitation';
 export * from './OrganizationMembership';
 export * from './JSON';
 export * from './PhoneNumber';

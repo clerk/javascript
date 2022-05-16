@@ -23,6 +23,7 @@ Reference of the methods supported in the Clerk Backend API wrapper. [API refere
   - [updateOrganization(organizationId, params)](#updateorganizationorganizationid-params)
   - [updateOrganizationMetadata(organizationId, params)](#updateorganizationmetadataorganizationid-params)
   - [deleteOrganization(organizationId)](#deleteorganizationorganizationid)
+  - [createOrganizationInvitation(params)](#createorganizationinvitationparams)
   - [getOrganizationMembershipList(params)](#getorganizationmembershiplistparams)
   - [createOrganizationMembership(params)](#createorganizationmembershipparams)
   - [updateOrganizationMembership(params)](#updateorganizationmembershipparams)
@@ -215,6 +216,30 @@ Delete an organization with the provided `organizationId`. This action cannot be
 
 ```js
 await clerkAPI.organizations.deleteOrganization(organizationId);
+```
+
+#### createOrganizationInvitation(params)
+
+Create an invitation to join an organization and send an email to the email address of the invited member.
+
+You must pass the ID of the user that invites the new member as `inviterUserId`. The inviter user must be an administrator in the organization.
+
+Available parameters:
+
+- _organizationId_ The unique ID of the organization the invitation is about.
+- _emailAddress_ The email address of the member that's going to be invited to join the organization.
+- _role_ The new member's role in the organization.
+- _inviterUserId_ The ID of the organization administrator that invites the new member.
+- _redirectUrl_ An optional URL to redirect to after the invited member clicks the link from the invitation email.
+
+```js
+const invitation = await clerkAPI.organizations.createOrganizationInvitation({
+  organizationId: 'org_1o4q123qMeCkKKIXcA9h8',
+  inviterUserId: 'user_1o4q123qMeCkKKIXcA9h8',
+  emailAddress: 'invited@example.org',
+  role: 'basic_member',
+  redirectUrl: 'https://example.org',
+});
 ```
 
 #### getOrganizationMembershipList(params)

@@ -1,5 +1,6 @@
 import { Nullable } from '../../util/nullable';
 import {
+  OrganizationInvitationStatus,
   OrganizationMembershipRole,
   SignInFactorStrategy,
   SignInIdentifier,
@@ -79,6 +80,16 @@ export interface OrganizationProps extends ClerkProps {
   slug: Nullable<string>;
   publicMetadata: Record<string, unknown>;
   privateMetadata: Record<string, unknown>;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface OrganizationInvitationProps extends ClerkProps {
+  emailAddress: string;
+  organizationId: string;
+  status: OrganizationInvitationStatus;
+  role: OrganizationMembershipRole;
+  redirectUrl: Nullable<string>;
   createdAt: number;
   updatedAt: number;
 }

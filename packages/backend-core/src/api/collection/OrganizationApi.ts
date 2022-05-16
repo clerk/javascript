@@ -1,4 +1,4 @@
-import { Organization, OrganizationMembership } from '../resources';
+import { Organization, OrganizationInvitation, OrganizationMembership } from '../resources';
 import { OrganizationMembershipRole } from '../resources/Enums';
 import { AbstractApi } from './AbstractApi';
 
@@ -43,6 +43,14 @@ type UpdateOrganizationMembershipParams = CreateOrganizationMembershipParams;
 type DeleteOrganizationMembershipParams = {
   organizationId: string;
   userId: string;
+};
+
+type CreateOrganizationInvitationParams = {
+  organizationId: string;
+  inviterUserId: string;
+  emailAddress: string;
+  role: OrganizationMembershipRole;
+  redirectUrl?: string;
 };
 
 export class OrganizationApi extends AbstractApi {
@@ -132,6 +140,17 @@ export class OrganizationApi extends AbstractApi {
     return this._restClient.makeRequest<OrganizationMembership>({
       method: 'DELETE',
       path: `${basePath}/${organizationId}/memberships/${userId}`,
+    });
+  }
+
+  public async createOrganizationInvitation(params: CreateOrganizationInvitationParams) {
+    const { organizationId, ...bodyParams } = params;
+    this.requireId(organizationId);
+
+    return this._restClient.makeRequest<OrganizationInvitation>({
+      method: 'POST',
+      path: `${basePath}/${organizationId}/invitations`,
+      bodyParams,
     });
   }
 }
