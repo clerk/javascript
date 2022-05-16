@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.14.0-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.13.0...@clerk/types@2.14.0-staging.0) (2022-05-17)
+
+### Features
+
+- **types:** Include new organization role `guest_member` ([ba7f27b](https://github.com/clerkinc/javascript/commit/ba7f27b42be283f9b7b4126cecc8d93ab9a6f04e))
+
+### Bug Fixes
+
+- **clerk-js:** Navigate to sign up continue in web3 ([460ba1c](https://github.com/clerkinc/javascript/commit/460ba1cc82bbad6197224ca71ad39302564408b4))
+
 ## [2.13.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.10.1...@clerk/types@2.13.0) (2022-05-13)
 
 ### Features
