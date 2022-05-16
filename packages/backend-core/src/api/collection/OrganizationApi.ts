@@ -9,6 +9,11 @@ type OrganizationMetadataParams = {
   privateMetadata?: Record<string, unknown>;
 };
 
+type GetOrganizationListParams = {
+  limit?: number;
+  offset?: number;
+};
+
 type CreateParams = {
   name: string;
   slug?: string;
@@ -66,6 +71,14 @@ type RevokeOrganizationInvitationParams = {
 };
 
 export class OrganizationApi extends AbstractApi {
+  public async getOrganizationList(params?: GetOrganizationListParams) {
+    return this._restClient.makeRequest<Organization[]>({
+      method: 'GET',
+      path: basePath,
+      queryParams: params,
+    });
+  }
+
   public async createOrganization(params: CreateParams) {
     const { publicMetadata, privateMetadata } = params;
     return this._restClient.makeRequest<Organization>({

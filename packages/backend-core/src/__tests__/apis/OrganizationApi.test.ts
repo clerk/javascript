@@ -9,6 +9,29 @@ import {
 import { OrganizationInvitationStatus, OrganizationMembershipRole } from '../../api/resources/Enums';
 import { TestBackendAPIClient } from '../TestBackendAPI';
 
+test('getOrganizationList() retrieves a list of organizations', async () => {
+  const resJSON = {
+    data: [
+      {
+        object: 'organization',
+        id: 'org_randomid',
+        name: 'Acme Inc',
+        slug: 'acme-inc',
+        public_metadata: {},
+        private_metadata: {},
+        created_at: 1611948436,
+        updated_at: 1611948436,
+      },
+    ],
+  };
+  nock('https://api.clerk.dev').get('/v1/organizations?').reply(200, resJSON);
+
+  const organizationList = await TestBackendAPIClient.organizations.getOrganizationList();
+  expect(organizationList).toBeInstanceOf(Array);
+  expect(organizationList.length).toEqual(1);
+  expect(organizationList[0]).toBeInstanceOf(Organization);
+});
+
 test('createOrganization() creates an organization', async () => {
   const name = 'Acme Inc';
   const slug = 'acme-inc';
