@@ -87,8 +87,10 @@ export type SignInContextType = SignInProps & {
   navigateAfterSignIn: () => any;
   queryParams: ParsedQs;
   signUpUrl: string;
+  signUpContinueUrl: string;
   authQueryString: string | null;
 };
+
 export const useSignInContext = (): SignInContextType => {
   const { componentName, ...ctx } = React.useContext(ComponentContext) as SignInCtx;
   const { navigate } = useNavigate();
@@ -129,12 +131,15 @@ export const useSignInContext = (): SignInContextType => {
     signUpUrl += `#/?${authQs}`;
   }
 
+  const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
+
   return {
     ...ctx,
     signUpUrl,
     afterSignInUrl,
     afterSignUpUrl,
     navigateAfterSignIn,
+    signUpContinueUrl,
     queryParams,
     authQueryString: authQs,
   };

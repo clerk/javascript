@@ -541,12 +541,17 @@ export default class Clerk implements ClerkInterface {
     return this.setSession(null);
   };
 
-  public authenticateWithMetamask = async ({ redirectUrl }: AuthenticateWithMetamaskParams = {}): Promise<void> => {
+  public authenticateWithMetamask = async ({
+    redirectUrl,
+    signUpContinueUrl,
+    customNavigate,
+  }: AuthenticateWithMetamaskParams = {}): Promise<void> => {
     if (!this.client || !this.#environment) {
       return;
     }
 
-    const { signUpUrl } = this.#environment.displayConfig;
+    const navigate = (to: string) =>
+      customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
 
     let signInOrSignUp: SignInResource | SignUpResource;
     try {
@@ -556,10 +561,11 @@ export default class Clerk implements ClerkInterface {
         signInOrSignUp = await this.client.signUp.authenticateWithMetamask();
 
         if (
-          signInOrSignUp.verifications.web3Wallet.status === 'verified' &&
-          signInOrSignUp.status === 'missing_requirements'
+          signUpContinueUrl &&
+          signInOrSignUp.status === 'missing_requirements' &&
+          signInOrSignUp.verifications.web3Wallet.status === 'verified'
         ) {
-          await this.navigate(buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true }));
+          await navigate(signUpContinueUrl);
         }
       } else {
         throw err;
@@ -569,7 +575,7 @@ export default class Clerk implements ClerkInterface {
     if (signInOrSignUp.createdSessionId) {
       await this.setSession(signInOrSignUp.createdSessionId, () => {
         if (redirectUrl) {
-          return this.navigate(redirectUrl);
+          return navigate(redirectUrl);
         }
         return Promise.resolve();
       });

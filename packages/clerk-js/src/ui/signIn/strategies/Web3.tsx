@@ -2,6 +2,8 @@ import { Web3Provider, Web3Strategy } from '@clerk/types';
 import React from 'react';
 import { ButtonSet, ButtonSetOptions, getWeb3ProviderData, handleError } from 'ui/common';
 import { useCoreClerk, useEnvironment, useSignInContext } from 'ui/contexts';
+import { useNavigate } from 'ui/hooks';
+import { buildURL } from 'utils/url';
 
 export type Web3Props = {
   web3Options: Web3Strategy[];
@@ -12,14 +14,16 @@ export type Web3Props = {
 export function Web3({ error, setError, web3Options }: Web3Props): JSX.Element | null {
   const clerk = useCoreClerk();
   const ctx = useSignInContext();
-  const { displayConfig } = useEnvironment();
+  const { navigate } = useNavigate();
 
   const startWeb3 = async (e: React.MouseEvent) => {
     e.preventDefault();
 
     try {
       await clerk.authenticateWithMetamask({
-        redirectUrl: ctx.afterSignInUrl || displayConfig.afterSignInUrl,
+        customNavigate: navigate,
+        redirectUrl: ctx.afterSignInUrl!,
+        signUpContinueUrl: ctx.signUpContinueUrl,
       });
     } catch (err) {
       handleError(err, [], setError);

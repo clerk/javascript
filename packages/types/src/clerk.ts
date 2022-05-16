@@ -437,6 +437,8 @@ export interface CreateOrganizationParams {
 
 export interface AuthenticateWithMetamaskParams {
   redirectUrl?: string;
+  signUpContinueUrl?: string;
+  customNavigate?: (to: string) => Promise<unknown>;
 }
 
 export interface LoadedClerk extends Clerk {
