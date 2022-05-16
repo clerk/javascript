@@ -19,6 +19,7 @@ Reference of the methods supported in the Clerk Backend API wrapper. [API refere
   - [createInvitation(params)](#createinvitationparams)
   - [revokeInvitation(invitationId)](#revokeinvitationinvitationid)
 - [Organization operations](#organization-operations)
+  - [getOrganizationList()](#getorganizationlist)
   - [createOrganization(params)](#createorganizationparams)
   - [updateOrganization(organizationId, params)](#updateorganizationorganizationid-params)
   - [updateOrganizationMetadata(organizationId, params)](#updateorganizationmetadataorganizationid-params)
@@ -158,6 +159,20 @@ const invitation = await clerkAPI.invitations.revokeInvitation('inv_some-id');
 ## Organization operations
 
 Organization operations are exposed by the `organizations` sub-api (`clerkAPI.organizations`).
+
+#### getOrganizationList()
+
+Retrieves a list of organizations for an instance.
+
+The instance is determined by the API key you've provided when configuring the API. You can either set the `CLERK_API_KEY` environment variable, or provide the `apiKey` property explicitly when configuring the API client.
+
+Results can be paginated by providing an optional `limit` and `offset` pair of parameters.
+
+Results will be ordered by descending creation date. Most recent organizations will be first in the list.
+
+```ts
+const organizations = await clerkAPI.organizations.getOrganizationList();
+```
 
 #### createOrganization(params)
 
