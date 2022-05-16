@@ -25,6 +25,7 @@ Reference of the methods supported in the Clerk Backend API wrapper. [API refere
   - [deleteOrganization(organizationId)](#deleteorganizationorganizationid)
   - [getPendingOrganizationInvitationList(params)](#getpendingorganizationinvitationlistparams)
   - [createOrganizationInvitation(params)](#createorganizationinvitationparams)
+  - [revokeOrganizationInvitation(params)](#revokeorganizationinvitationparams)
   - [getOrganizationMembershipList(params)](#getorganizationmembershiplistparams)
   - [createOrganizationMembership(params)](#createorganizationmembershipparams)
   - [updateOrganizationMembership(params)](#updateorganizationmembershipparams)
@@ -256,6 +257,26 @@ const invitation = await clerkAPI.organizations.createOrganizationInvitation({
   emailAddress: 'invited@example.org',
   role: 'basic_member',
   redirectUrl: 'https://example.org',
+});
+```
+
+#### revokeOrganizationInvitation(params)
+
+Revoke a pending organization invitation for the organization specified by `organizationId`.
+
+The requesting user must be an administrator in the organization.
+
+The method parameters are:
+
+- _organizationId_ The ID of the organization that the invitation belongs to.
+- _invitationId_ The ID of the pending organization invitation to be revoked.
+- _requestingUserId_ The ID of the user that revokes the invitation. Must be an administrator.
+
+```ts
+const invitation = await clerkAPI.organizations.revokeOrganizationInvitation({
+  organizationId: 'org_1o4q123qMeCkKKIXcA9h8',
+  invitationId: 'orginv_4o4q9883qMeFggTKIXcAArr',
+  requestingUserId: 'user_1o4q123qMeCkKKIXcA9h8',
 });
 ```
 

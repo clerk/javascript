@@ -59,6 +59,12 @@ type GetPendingOrganizationInvitationListParams = {
   offset?: number;
 };
 
+type RevokeOrganizationInvitationParams = {
+  organizationId: string;
+  invitationId: string;
+  requestingUserId: string;
+};
+
 export class OrganizationApi extends AbstractApi {
   public async createOrganization(params: CreateParams) {
     const { publicMetadata, privateMetadata } = params;
@@ -168,6 +174,19 @@ export class OrganizationApi extends AbstractApi {
       method: 'POST',
       path: `${basePath}/${organizationId}/invitations`,
       bodyParams,
+    });
+  }
+
+  public async revokeOrganizationInvitation(params: RevokeOrganizationInvitationParams) {
+    const { organizationId, invitationId, requestingUserId } = params;
+    this.requireId(organizationId);
+
+    return this._restClient.makeRequest<OrganizationInvitation>({
+      method: 'POST',
+      path: `${basePath}/${organizationId}/invitations/${invitationId}/revoke`,
+      bodyParams: {
+        requestingUserId,
+      },
     });
   }
 }
