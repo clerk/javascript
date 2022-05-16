@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.12.0-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.11.0...@clerk/clerk-js@3.12.0-staging.0) (2022-05-16)
+
+### Features
+
+- **clerk-js:** Session touch should include the active organization ([664030c](https://github.com/clerkinc/javascript/commit/664030c3f4aedbd5e886d8ada906b64ac2ed06b5))
+
 ## [3.11.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.10.2...@clerk/clerk-js@3.11.0) (2022-05-13)
 
 ### Features
