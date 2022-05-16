@@ -4,6 +4,7 @@ import {
   Email,
   Invitation,
   Organization,
+  OrganizationInvitation,
   OrganizationMembership,
   Session,
   SMSMessage,
@@ -49,6 +50,8 @@ function jsonToObject(item: any): any {
       return Invitation.fromJSON(item);
     case ObjectType.Organization:
       return Organization.fromJSON(item);
+    case ObjectType.OrganizationInvitation:
+      return OrganizationInvitation.fromJSON(item);
     case ObjectType.OrganizationMembership:
       return OrganizationMembership.fromJSON(item);
     case ObjectType.User:

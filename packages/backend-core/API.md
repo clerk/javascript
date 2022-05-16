@@ -23,6 +23,9 @@ Reference of the methods supported in the Clerk Backend API wrapper. [API refere
   - [updateOrganization(organizationId, params)](#updateorganizationorganizationid-params)
   - [updateOrganizationMetadata(organizationId, params)](#updateorganizationmetadataorganizationid-params)
   - [deleteOrganization(organizationId)](#deleteorganizationorganizationid)
+  - [getPendingOrganizationInvitationList(params)](#getpendingorganizationinvitationlistparams)
+  - [createOrganizationInvitation(params)](#createorganizationinvitationparams)
+  - [revokeOrganizationInvitation(params)](#revokeorganizationinvitationparams)
   - [getOrganizationMembershipList(params)](#getorganizationmembershiplistparams)
   - [createOrganizationMembership(params)](#createorganizationmembershipparams)
   - [updateOrganizationMembership(params)](#updateorganizationmembershipparams)
@@ -215,6 +218,66 @@ Delete an organization with the provided `organizationId`. This action cannot be
 
 ```js
 await clerkAPI.organizations.deleteOrganization(organizationId);
+```
+
+#### getPendingOrganizationInvitationList(params)
+
+Retrieve a list of pending organization invitations for the organization specified by `organizationId`.
+
+The method supports pagination via optional `limit` and `offset` parameters. The method parameters are:
+
+- _organizationId_ The unique ID of the organization to retrieve the pending invitations for
+- _limit_ Optionally put a limit on the number of results returned
+- _offset_ Optionally skip some results
+
+```ts
+const invitations = await clerkAPI.organizations.getPendingOrganizationInvitationList({
+  organizationId: 'org_1o4q123qMeCkKKIXcA9h8',
+});
+```
+
+#### createOrganizationInvitation(params)
+
+Create an invitation to join an organization and send an email to the email address of the invited member.
+
+You must pass the ID of the user that invites the new member as `inviterUserId`. The inviter user must be an administrator in the organization.
+
+Available parameters:
+
+- _organizationId_ The unique ID of the organization the invitation is about.
+- _emailAddress_ The email address of the member that's going to be invited to join the organization.
+- _role_ The new member's role in the organization.
+- _inviterUserId_ The ID of the organization administrator that invites the new member.
+- _redirectUrl_ An optional URL to redirect to after the invited member clicks the link from the invitation email.
+
+```js
+const invitation = await clerkAPI.organizations.createOrganizationInvitation({
+  organizationId: 'org_1o4q123qMeCkKKIXcA9h8',
+  inviterUserId: 'user_1o4q123qMeCkKKIXcA9h8',
+  emailAddress: 'invited@example.org',
+  role: 'basic_member',
+  redirectUrl: 'https://example.org',
+});
+```
+
+#### revokeOrganizationInvitation(params)
+
+Revoke a pending organization invitation for the organization specified by `organizationId`.
+
+The requesting user must be an administrator in the organization.
+
+The method parameters are:
+
+- _organizationId_ The ID of the organization that the invitation belongs to.
+- _invitationId_ The ID of the pending organization invitation to be revoked.
+- _requestingUserId_ The ID of the user that revokes the invitation. Must be an administrator.
+
+```ts
+const invitation = await clerkAPI.organizations.revokeOrganizationInvitation({
+  organizationId: 'org_1o4q123qMeCkKKIXcA9h8',
+  invitationId: 'orginv_4o4q9883qMeFggTKIXcAArr',
+  requestingUserId: 'user_1o4q123qMeCkKKIXcA9h8',
+});
 ```
 
 #### getOrganizationMembershipList(params)

@@ -1,4 +1,5 @@
 import {
+  OrganizationInvitationStatus,
   OrganizationMembershipRole,
   SignInFactorStrategy,
   SignInIdentifier,
@@ -18,6 +19,7 @@ export enum ObjectType {
   GoogleAccount = 'google_account',
   Invitation = 'invitation',
   Organization = 'organization',
+  OrganizationInvitation = 'organization_invitation',
   OrganizationMembership = 'organization_membership',
   PhoneNumber = 'phone_number',
   Session = 'session',
@@ -140,6 +142,14 @@ export interface OrganizationJSON extends ClerkResourceJSON {
   private_metadata: Record<string, unknown>;
   created_at: number;
   updated_at: number;
+}
+
+export interface OrganizationInvitationJSON extends ClerkResourceJSON {
+  email_address: string;
+  organization_id: string;
+  role: OrganizationMembershipRole;
+  redirect_url: string | null;
+  status: OrganizationInvitationStatus;
 }
 
 export interface OrganizationMembershipJSON extends ClerkResourceJSON {

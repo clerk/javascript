@@ -1,7 +1,12 @@
 import nock from 'nock';
 
-import { Organization, OrganizationMembership, OrganizationMembershipPublicUserData } from '../../api/resources';
-import { OrganizationMembershipRole } from '../../api/resources/Enums';
+import {
+  Organization,
+  OrganizationInvitation,
+  OrganizationMembership,
+  OrganizationMembershipPublicUserData,
+} from '../../api/resources';
+import { OrganizationInvitationStatus, OrganizationMembershipRole } from '../../api/resources/Enums';
 import { TestBackendAPIClient } from '../TestBackendAPI';
 
 test('createOrganization() creates an organization', async () => {
@@ -288,4 +293,110 @@ test('deleteOrganizationMembership() deletes an organization', async () => {
   const userId = 'user_randomid';
   nock('https://api.clerk.dev').delete(`/v1/organizations/${organizationId}/memberships/${userId}`).reply(200, {});
   await TestBackendAPIClient.organizations.deleteOrganizationMembership({ organizationId, userId });
+});
+
+test('createOrganizationInvitation() creates an invitation for an organization', async () => {
+  const organizationId = 'org_randomid';
+  const role: OrganizationMembershipRole = 'basic_member';
+  const status: OrganizationInvitationStatus = 'pending';
+  const emailAddress = 'invitation@example.com';
+  const redirectUrl = 'https://example.com';
+  const resJSON = {
+    object: 'organization_invitation',
+    id: 'orginv_randomid',
+    role,
+    status,
+    email_address: emailAddress,
+    redirect_url: redirectUrl,
+    organization_id: organizationId,
+    created_at: 1612378465,
+    updated_at: 1612378465,
+  };
+
+  nock('https://api.clerk.dev').post(`/v1/organizations/${organizationId}/invitations`).reply(200, resJSON);
+
+  const orgInvitation = await TestBackendAPIClient.organizations.createOrganizationInvitation({
+    organizationId,
+    emailAddress,
+    role,
+    redirectUrl,
+    inviterUserId: 'user_randomid',
+  });
+  expect(orgInvitation).toEqual(
+    new OrganizationInvitation({
+      id: resJSON.id,
+      role: resJSON.role,
+      organizationId,
+      emailAddress,
+      redirectUrl,
+      status: resJSON.status,
+      createdAt: resJSON.created_at,
+      updatedAt: resJSON.updated_at,
+    }),
+  );
+});
+
+test('getPendingOrganizationInvitationList() returns a list of organization memberships', async () => {
+  const organizationId = 'org_randomid';
+  const resJSON = [
+    {
+      object: 'organization_invitation',
+      id: 'orginv_randomid',
+      role: 'basic_member',
+      email_address: 'invited@example.org',
+      organization_id: organizationId,
+      status: 'pending',
+      redirect_url: null,
+      created_at: 1612378465,
+      updated_at: 1612378465,
+    },
+  ];
+
+  nock('https://api.clerk.dev')
+    .get(new RegExp(`/v1/organizations/${organizationId}/invitations/pending`))
+    .reply(200, resJSON);
+
+  const organizationInvitationList = await TestBackendAPIClient.organizations.getPendingOrganizationInvitationList({
+    organizationId,
+  });
+  expect(organizationInvitationList).toBeInstanceOf(Array);
+  expect(organizationInvitationList.length).toEqual(1);
+  expect(organizationInvitationList[0]).toBeInstanceOf(OrganizationInvitation);
+});
+
+test('revokeOrganizationInvitation() revokes an organization invitation', async () => {
+  const organizationId = 'org_randomid';
+  const invitationId = 'orginv_randomid';
+  const resJSON = {
+    object: 'organization_invitation',
+    id: invitationId,
+    role: 'basic_member' as OrganizationMembershipRole,
+    email_address: 'invited@example.org',
+    organization_id: organizationId,
+    status: 'revoked' as OrganizationInvitationStatus,
+    redirect_url: null,
+    created_at: 1612378465,
+    updated_at: 1612378465,
+  };
+  nock('https://api.clerk.dev')
+    .post(`/v1/organizations/${organizationId}/invitations/${invitationId}/revoke`)
+    .reply(200, resJSON);
+
+  const orgInvitation = await TestBackendAPIClient.organizations.revokeOrganizationInvitation({
+    organizationId,
+    invitationId,
+    requestingUserId: 'user_randomid',
+  });
+  expect(orgInvitation).toEqual(
+    new OrganizationInvitation({
+      id: resJSON.id,
+      role: resJSON.role,
+      organizationId,
+      emailAddress: resJSON.email_address,
+      redirectUrl: resJSON.redirect_url,
+      status: resJSON.status,
+      createdAt: resJSON.created_at,
+      updatedAt: resJSON.updated_at,
+    }),
+  );
 });

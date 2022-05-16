@@ -1,4 +1,4 @@
-import { Organization, OrganizationMembership } from '../resources';
+import { Organization, OrganizationInvitation, OrganizationMembership } from '../resources';
 import { OrganizationMembershipRole } from '../resources/Enums';
 import { AbstractApi } from './AbstractApi';
 
@@ -43,6 +43,26 @@ type UpdateOrganizationMembershipParams = CreateOrganizationMembershipParams;
 type DeleteOrganizationMembershipParams = {
   organizationId: string;
   userId: string;
+};
+
+type CreateOrganizationInvitationParams = {
+  organizationId: string;
+  inviterUserId: string;
+  emailAddress: string;
+  role: OrganizationMembershipRole;
+  redirectUrl?: string;
+};
+
+type GetPendingOrganizationInvitationListParams = {
+  organizationId: string;
+  limit?: number;
+  offset?: number;
+};
+
+type RevokeOrganizationInvitationParams = {
+  organizationId: string;
+  invitationId: string;
+  requestingUserId: string;
 };
 
 export class OrganizationApi extends AbstractApi {
@@ -132,6 +152,41 @@ export class OrganizationApi extends AbstractApi {
     return this._restClient.makeRequest<OrganizationMembership>({
       method: 'DELETE',
       path: `${basePath}/${organizationId}/memberships/${userId}`,
+    });
+  }
+
+  public async getPendingOrganizationInvitationList(params: GetPendingOrganizationInvitationListParams) {
+    const { organizationId, limit, offset } = params;
+    this.requireId(organizationId);
+
+    return this._restClient.makeRequest<OrganizationInvitation[]>({
+      method: 'GET',
+      path: `${basePath}/${organizationId}/invitations/pending`,
+      queryParams: { limit, offset },
+    });
+  }
+
+  public async createOrganizationInvitation(params: CreateOrganizationInvitationParams) {
+    const { organizationId, ...bodyParams } = params;
+    this.requireId(organizationId);
+
+    return this._restClient.makeRequest<OrganizationInvitation>({
+      method: 'POST',
+      path: `${basePath}/${organizationId}/invitations`,
+      bodyParams,
+    });
+  }
+
+  public async revokeOrganizationInvitation(params: RevokeOrganizationInvitationParams) {
+    const { organizationId, invitationId, requestingUserId } = params;
+    this.requireId(organizationId);
+
+    return this._restClient.makeRequest<OrganizationInvitation>({
+      method: 'POST',
+      path: `${basePath}/${organizationId}/invitations/${invitationId}/revoke`,
+      bodyParams: {
+        requestingUserId,
+      },
     });
   }
 }
