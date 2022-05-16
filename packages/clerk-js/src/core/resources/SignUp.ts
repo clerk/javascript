@@ -138,7 +138,12 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   attemptWeb3WalletVerification = async (params: AttemptWeb3WalletVerificationParams): Promise<SignUpResource> => {
-    const { generateSignature } = params || {};
+    const { signature, generateSignature } = params || {};
+
+    if (signature) {
+      return this.attemptVerification({ signature, strategy: 'web3_metamask_signature' });
+    }
+
     if (!(typeof generateSignature === 'function')) {
       clerkMissingOptionError('generateSignature');
     }
@@ -148,8 +153,8 @@ export class SignUp extends BaseResource implements SignUpResource {
       clerkVerifyWeb3WalletCalledBeforeCreate('SignUp');
     }
 
-    const signature = await generateSignature({ identifier: this.web3wallet!, nonce });
-    return this.attemptVerification({ signature, strategy: 'web3_metamask_signature' });
+    const generatedSignature = await generateSignature({ identifier: this.web3wallet!, nonce });
+    return this.attemptVerification({ signature: generatedSignature, strategy: 'web3_metamask_signature' });
   };
 
   public authenticateWithWeb3 = async (params: AuthenticateWithWeb3Params): Promise<SignUpResource> => {
@@ -157,7 +162,14 @@ export class SignUp extends BaseResource implements SignUpResource {
     const web3Wallet = identifier || this.web3wallet!;
     await this.create({ web3Wallet });
     await this.prepareWeb3WalletVerification();
-    return this.attemptWeb3WalletVerification({ generateSignature });
+
+    const { nonce } = this.verifications.web3Wallet;
+    if (!nonce) {
+      clerkVerifyWeb3WalletCalledBeforeCreate('SignUp');
+    }
+
+    const signature = await generateSignature({ identifier, nonce });
+    return this.attemptWeb3WalletVerification({ signature });
   };
 
   public authenticateWithMetamask = async (): Promise<SignUpResource> => {
