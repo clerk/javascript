@@ -3,25 +3,24 @@ import cn from 'classnames';
 import React from 'react';
 import { Logo } from 'ui/common';
 import { BackButton } from 'ui/common/backButton';
-import { Error } from 'ui/common/error';
 
 export type HeaderProps = {
   showBack?: boolean;
   showLogo?: boolean;
   handleBack?: () => void;
   welcomeName?: string;
-  error?: string;
+  alert?: React.ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export function Header({
   showBack,
   showLogo = true,
   welcomeName,
-  error,
+  alert,
   handleBack,
   className,
 }: HeaderProps): JSX.Element {
-  const errorStyle = showBack ? {} : { marginTop: '-4em' };
+  const alertStyle = showBack ? {} : { marginTop: '-4em' };
   const containerStyle = showLogo || welcomeName ? {} : { marginBottom: '0' };
 
   return (
@@ -36,12 +35,15 @@ export function Header({
           handleClick={handleBack}
         />
       )}
-      {error && <Error style={errorStyle}>{error}</Error>}
+
+      {alert && <div style={alertStyle}>{alert}</div>}
+
       {showLogo && (
         <div className='cl-auth-form-header-logo'>
           <Logo />
         </div>
       )}
+
       {welcomeName && (
         <div className='cl-auth-form-header-greeting'>
           <Label>Welcome, {welcomeName}</Label>

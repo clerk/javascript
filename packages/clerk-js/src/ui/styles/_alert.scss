@@ -1,0 +1,23 @@
+%alert {
+  padding: 1em;
+  margin-bottom: 1em;
+  border-radius: 0.5em;
+  font-size: 1rem;
+  line-height: 1.25rem;
+  font-weight: $semibold-weight;
+  text-align: center;
+}
+
+.info {
+  @extend %alert;
+
+  color: $primary;
+  background-color: #e8fcff;
+}
+
+.error {
+  @extend %alert;
+
+  color: $error;
+  background-color: #ffe8e8;
+}

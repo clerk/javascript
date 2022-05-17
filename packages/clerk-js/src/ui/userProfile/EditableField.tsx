@@ -4,7 +4,7 @@ import { Input } from '@clerk/shared/components/input';
 import { TitledCard } from '@clerk/shared/components/titledCard';
 import React from 'react';
 import { handleError, useFieldState } from 'ui/common';
-import { Error } from 'ui/common/error';
+import { Alert } from 'ui/common/alert';
 import { useCoreUser } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
 import { PageHeading } from 'ui/userProfile/pageHeading';
@@ -49,7 +49,8 @@ export const EditableField = (props: EditableFieldProps) => {
         backTo='../'
       />
       <TitledCard className='cl-themed-card cl-editable-field'>
-        <Error>{error}</Error>
+        <Alert type='error'>{error}</Alert>
+
         <Form
           submitButtonLabel='Save'
           handleSubmit={updateFieldSubmit}

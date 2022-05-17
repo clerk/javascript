@@ -358,6 +358,61 @@ describe('Clerk singleton', () => {
       });
     });
 
+    it('creates a new sign up and navigates to the continue sign-up path if the user was not found during sso signup and there are missing requirements', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          onWindowLocationHost: () => false,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [],
+          signIn: new SignIn({
+            status: 'needs_identifier',
+            first_factor_verification: {
+              status: 'transferable',
+              strategy: 'oauth_google',
+              external_verification_redirect_url: '',
+              error: {
+                code: 'external_account_not_found',
+                long_message: 'The External Account was not found.',
+                message: 'Invalid external account',
+              },
+            },
+            second_factor_verification: null,
+            identifier: '',
+            user_data: null,
+            created_session_id: null,
+            created_user_id: null,
+          } as any as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const mockSignUpCreate = jest.fn().mockReturnValue(Promise.resolve({ status: 'missing_requirements' }));
+
+      const sut = new Clerk(frontendApi);
+      await sut.load({
+        navigate: mockNavigate,
+      });
+      if (!sut.client) {
+        fail('we should always have a client');
+      }
+      sut.client.signUp.create = mockSignUpCreate;
+
+      sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true });
+        expect(mockNavigate).toHaveBeenCalledWith('/sign-up#/continue');
+      });
+    });
+
     it('signs the user in if the user was found during sign up', async () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
@@ -769,6 +824,47 @@ describe('Clerk singleton', () => {
 
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledWith('/sign-up');
+      });
+    });
+
+    it('redirects user to the continue sign-up url if the external account was verified but there are still missing requirements', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          onWindowLocationHost: () => false,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [],
+          signIn: new SignIn(null),
+          signUp: new SignUp({
+            status: 'missing_requirements',
+            verifications: {
+              external_account: {
+                status: 'verified',
+                strategy: 'oauth_google',
+                external_verification_redirect_url: '',
+                error: null,
+              },
+            },
+          } as any as SignUpJSON),
+        }),
+      );
+
+      const sut = new Clerk(frontendApi);
+      await sut.load({
+        navigate: mockNavigate,
+      });
+
+      sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('/sign-up#/continue');
       });
     });
   });

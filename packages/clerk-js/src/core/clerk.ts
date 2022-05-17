@@ -460,6 +460,10 @@ export default class Clerk implements ClerkInterface {
       params.afterSignUpUrl || params.redirectUrl || displayConfig.afterSignUpUrl,
     );
 
+    const navigateToContinueSignUp = makeNavigate(
+      buildURL({ base: displayConfig.signUpUrl, hashPath: '/continue' }, { stringify: true }),
+    );
+
     const userExistsButNeedsToSignIn =
       su.externalAccountStatus === 'transferable' && su.externalAccountErrorCode === 'external_account_exists';
 
@@ -482,6 +486,8 @@ export default class Clerk implements ClerkInterface {
       switch (res.status) {
         case 'complete':
           return this.setSession(res.createdSessionId, navigateAfterSignUp);
+        case 'missing_requirements':
+          return navigateToContinueSignUp();
         default:
           clerkOAuthCallbackDidNotCompleteSignInSIgnUp('sign in');
       }
@@ -509,6 +515,10 @@ export default class Clerk implements ClerkInterface {
       }
     }
 
+    if (su.externalAccountStatus === 'verified' && su.status == 'missing_requirements') {
+      return navigateToContinueSignUp();
+    }
+
     if (hasExternalAccountSignUpError(signUp)) {
       return navigateToSignUp();
     }
@@ -531,10 +541,17 @@ export default class Clerk implements ClerkInterface {
     return this.setSession(null);
   };
 
-  public authenticateWithMetamask = async ({ redirectUrl }: AuthenticateWithMetamaskParams = {}): Promise<void> => {
-    if (!this.client) {
+  public authenticateWithMetamask = async ({
+    redirectUrl,
+    signUpContinueUrl,
+    customNavigate,
+  }: AuthenticateWithMetamaskParams = {}): Promise<void> => {
+    if (!this.client || !this.#environment) {
       return;
     }
+
+    const navigate = (to: string) =>
+      customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
 
     let signInOrSignUp: SignInResource | SignUpResource;
     try {
@@ -542,6 +559,14 @@ export default class Clerk implements ClerkInterface {
     } catch (err) {
       if (isError(err, ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND)) {
         signInOrSignUp = await this.client.signUp.authenticateWithMetamask();
+
+        if (
+          signUpContinueUrl &&
+          signInOrSignUp.status === 'missing_requirements' &&
+          signInOrSignUp.verifications.web3Wallet.status === 'verified'
+        ) {
+          await navigate(signUpContinueUrl);
+        }
       } else {
         throw err;
       }
@@ -550,7 +575,7 @@ export default class Clerk implements ClerkInterface {
     if (signInOrSignUp.createdSessionId) {
       await this.setSession(signInOrSignUp.createdSessionId, () => {
         if (redirectUrl) {
-          return this.navigate(redirectUrl);
+          return navigate(redirectUrl);
         }
         return Promise.resolve();
       });

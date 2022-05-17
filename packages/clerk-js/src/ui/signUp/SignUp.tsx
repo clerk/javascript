@@ -4,7 +4,9 @@ import { VerifyMagicLink } from 'ui/common';
 import { SSOCallback } from 'ui/common/SSOCallback';
 import { ComponentContext, useCoreClerk, useSignUpContext, withCoreSessionSwitchGuard } from 'ui/contexts';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from 'ui/router';
+import { buildURL } from 'utils/url';
 
+import { SignUpContinue } from './SignUpContinue';
 import { SignUpStart } from './SignUpStart';
 import { SignUpVerifyEmailAddress, SignUpVerifyPhoneNumber } from './SignUpVerify';
 
@@ -37,6 +39,9 @@ function SignUpRoutes(): JSX.Element {
       </Route>
       <Route path='verify'>
         <VerifyMagicLink redirectUrlComplete={signUpContext.afterSignUpUrl || signUpContext.redirectUrl || undefined} />
+      </Route>
+      <Route path='continue'>
+        <SignUpContinue />
       </Route>
       <Route index>
         <SignUpStart />

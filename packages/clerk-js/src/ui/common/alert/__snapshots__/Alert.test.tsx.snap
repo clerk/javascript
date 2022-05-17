@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`alert for error renders an error alert 1`] = `
+<div
+  className="cl-info"
+>
+  Bar
+</div>
+`;
+
+exports[`alert for info renders an info alert 1`] = `
+<div
+  className="cl-error"
+>
+  Foo
+</div>
+`;

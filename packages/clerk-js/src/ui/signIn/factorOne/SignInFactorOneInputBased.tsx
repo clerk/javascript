@@ -9,6 +9,7 @@ import {
 } from '@clerk/types';
 import React from 'react';
 import { handleError, useFieldState } from 'ui/common';
+import { Alert } from 'ui/common/alert';
 import { Body, Header } from 'ui/common/authForms';
 import { useCoreClerk, useCoreSignIn, useSignInContext } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
@@ -141,11 +142,12 @@ export function SignInFactorOneInputBased({
   return (
     <>
       <Header
-        error={error}
+        alert={error && <Alert type='error'>{error}</Alert>}
         showBack
         welcomeName={determineSalutation(signIn)}
         className='cl-auth-form-header-compact'
       />
+
       <Body className='cl-auth-form-body-compact'>
         {currentFactor.strategy === 'password' && (
           <Password
