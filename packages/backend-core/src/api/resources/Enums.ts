@@ -24,7 +24,7 @@ export type OAuthStrategy = `oauth_${OAuthProvider}`;
 
 export type OrganizationInvitationStatus = 'pending' | 'accepted' | 'revoked';
 
-export type OrganizationMembershipRole = 'basic_member' | 'admin';
+export type OrganizationMembershipRole = 'basic_member' | 'guest_member' | 'admin';
 
 export type SignInIdentifier = 'username' | 'email_address' | 'phone_number' | 'web3_wallet' | OAuthStrategy;
 

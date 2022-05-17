@@ -12,7 +12,7 @@ export interface OrganizationMembershipResource {
   update: (updateParams: UpdateOrganizationMembershipParams) => Promise<OrganizationMembershipResource>;
 }
 
-export type MembershipRole = 'admin' | 'basic_member';
+export type MembershipRole = 'admin' | 'basic_member' | 'guest_member';
 
 export type UpdateOrganizationMembershipParams = {
   role: MembershipRole;
