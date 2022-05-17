@@ -200,14 +200,14 @@ describe('<SignUpContinue/>', () => {
     render(<SignUpContinue />);
 
     const firstNameInput = screen.getByLabelText('First name');
-    userEvent.clear(firstNameInput);
-    userEvent.type(firstNameInput, 'Bryan');
+    await userEvent.clear(firstNameInput);
+    await userEvent.type(firstNameInput, 'Bryan');
 
     const lastNameInput = screen.getByLabelText('Last name');
-    userEvent.clear(lastNameInput);
-    userEvent.type(lastNameInput, 'Mills');
+    await userEvent.clear(lastNameInput);
+    await userEvent.type(lastNameInput, 'Mills');
 
-    userEvent.click(screen.getByRole('button', { name: 'Sign up' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Sign up' }));
 
     await waitFor(() => {
       expect(mockUpdateRequest).toHaveBeenCalledTimes(1);
@@ -324,10 +324,10 @@ describe('<SignUpContinue/>', () => {
     render(<SignUpContinue />);
 
     const phoneNumberInput = screen.getByRole('textbox');
-    userEvent.clear(phoneNumberInput);
-    userEvent.type(phoneNumberInput, '5615551001');
+    await userEvent.clear(phoneNumberInput);
+    await userEvent.type(phoneNumberInput, '5615551001');
 
-    userEvent.click(screen.getByRole('button', { name: 'Sign up' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Sign up' }));
 
     await waitFor(() => {
       expect(mockUpdateRequest).toHaveBeenCalledTimes(1);
