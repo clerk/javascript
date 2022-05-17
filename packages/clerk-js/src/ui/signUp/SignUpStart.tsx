@@ -19,22 +19,21 @@ import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from 'u
 import { useNavigate } from 'ui/hooks';
 import { getClerkQueryParam } from 'utils/getClerkQueryParam';
 
+import { SignInLink } from './SignInLink';
+import { SignUpForm } from './SignUpForm';
 import {
   ActiveIdentifier,
   determineActiveFields,
   emailOrPhoneUsedForFF,
   getInitialActiveIdentifier,
   showFormFields,
-} from './sign_up_form_helpers';
-import { SignInLink } from './SignInLink';
-import { SignUpForm } from './SignUpForm';
+} from './signUpFormHelpers';
 import { SignUpOAuth } from './SignUpOAuth';
 import { SignUpWeb3 } from './SignUpWeb3';
 
 function _SignUpStart(): JSX.Element {
   const { navigate } = useNavigate();
-  const environment = useEnvironment();
-  const { userSettings } = environment;
+  const { userSettings } = useEnvironment();
   const { attributes } = userSettings;
   const { setSession } = useCoreClerk();
   const { navigateAfterSignUp } = useSignUpContext();
@@ -65,7 +64,7 @@ function _SignUpStart(): JSX.Element {
   const hasEmail = !!formState.emailAddress.value;
 
   const fields = determineActiveFields({
-    environment,
+    attributes,
     hasTicket,
     hasEmail,
     activeCommIdentifierType,
@@ -102,7 +101,8 @@ function _SignUpStart(): JSX.Element {
   };
 
   React.useLayoutEffect(() => {
-    if (Object.values(fields).filter(f => f.enabled && !f.required).length) {
+    // Don't proceed with token flow if there are still optional fields to fill in
+    if (Object.values(fields).some(f => f && !f.required)) {
       return;
     }
 
@@ -149,11 +149,11 @@ function _SignUpStart(): JSX.Element {
     e.preventDefault();
 
     const fieldsToSubmit = Object.entries(fields).reduce(
-      (acc, [k, v]) => [...acc, ...(v.enabled && formState[k as FormStateKey] ? [formState[k as FormStateKey]] : [])],
+      (acc, [k, v]) => [...acc, ...(v && formState[k as FormStateKey] ? [formState[k as FormStateKey]] : [])],
       [] as Array<FieldState<any>>,
     );
 
-    if (fields.ticket.enabled) {
+    if (fields.ticket) {
       // fieldsToSubmit: Constructing a fake fields object for strategy.
       fieldsToSubmit.push({
         name: 'strategy',

@@ -201,6 +201,10 @@
   flex-direction: column;
 }
 
+.oauth-button-group + .web3-button-group {
+  margin-top: 0.5em;
+}
+
 .oauth-button,
 .web3-button {
   min-width: 240px;

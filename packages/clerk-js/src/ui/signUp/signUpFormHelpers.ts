@@ -1,51 +1,42 @@
-import type { Attributes, EnvironmentResource, SignUpResource } from '@clerk/types';
+import { camelToSnake } from '@clerk/shared/utils';
+import type { Attributes, SignUpResource } from '@clerk/types';
 import { UserSettingsResource } from '@clerk/types';
 import { FieldState } from 'ui/common';
 
 export type ActiveIdentifier = 'emailAddress' | 'phoneNumber' | null | undefined;
 
-export type FieldKeys = 'emailAddress' | 'phoneNumber' | 'username' | 'firstName' | 'lastName' | 'password' | 'ticket';
+const FieldKeys = ['emailAddress', 'phoneNumber', 'username', 'firstName', 'lastName', 'password', 'ticket'];
+export type FieldKey = typeof FieldKeys[number];
 
 export type FormState<T> = {
-  [key in FieldKeys]: FieldState<T>;
+  [key in FieldKey]: FieldState<T>;
 };
 
 export type Field = {
-  enabled: boolean;
+  disabled?: boolean;
   required: boolean;
-  showAsDisabled?: boolean;
 };
 
 export type Fields = {
-  [key in FieldKeys]: Field;
+  [key in FieldKey]: Field | undefined;
 };
 
 type FieldDeterminationProps = {
-  environment: EnvironmentResource;
+  attributes: Attributes;
   activeCommIdentifierType?: ActiveIdentifier;
   hasTicket?: boolean;
   hasEmail?: boolean;
   signUp?: SignUpResource | undefined;
 };
 
-export function determineActiveFields({
-  environment,
-  activeCommIdentifierType,
-  hasTicket = false,
-  hasEmail = false,
-}: FieldDeterminationProps): Fields {
-  const { userSettings } = environment;
-  const { attributes } = userSettings;
-
-  return {
-    emailAddress: getEmailAddressField(attributes, hasTicket, hasEmail, activeCommIdentifierType),
-    phoneNumber: getPhoneNumberField(attributes, hasTicket, activeCommIdentifierType),
-    username: getUserNameField(attributes),
-    firstName: getFirstNameField(attributes),
-    lastName: getLastNameField(attributes),
-    password: getPasswordField(attributes),
-    ticket: getTicketField(hasTicket),
-  };
+export function determineActiveFields(fieldProps: FieldDeterminationProps): Fields {
+  return FieldKeys.reduce((fields: Fields, fieldKey: string) => {
+    const field = getField(fieldKey, fieldProps);
+    if (field) {
+      fields[fieldKey] = field;
+    }
+    return fields;
+  }, {} as Fields);
 }
 
 // If continuing with an existing sign-up, show only fields absolutely necessary to minimize fiction
@@ -57,34 +48,34 @@ export function minimizeFieldsForExistingSignup(fields: Fields, signUp: SignUpRe
     const hasVerifiedWeb3Wallet = signUp.verifications?.web3Wallet?.status == 'verified';
 
     if (hasVerifiedEmail) {
-      fields.emailAddress.enabled = false;
+      delete fields.emailAddress;
     }
 
     if (hasVerifiedPhone) {
-      fields.phoneNumber.enabled = false;
+      delete fields.phoneNumber;
     }
 
     if (hasVerifiedExternalAccount || hasVerifiedWeb3Wallet) {
-      fields.password.enabled = false;
+      delete fields.password;
     }
 
     if (signUp.firstName) {
-      fields.firstName.enabled = false;
+      delete fields.firstName;
     }
 
     if (signUp.lastName) {
-      fields.lastName.enabled = false;
+      delete fields.lastName;
     }
 
     if (signUp.username) {
-      fields.username.enabled = false;
+      delete fields.username;
     }
 
-    // Remove any non-required fields
+    // Hide any non-required fields
     Object.entries(fields).forEach(([k, v]) => {
-      if (!v.required) {
+      if (v && !v.required) {
         // @ts-ignore
-        fields[k].enabled = false;
+        delete fields[k];
       }
     });
   }
@@ -114,75 +105,102 @@ export function emailOrPhoneUsedForFF(attributes: Attributes) {
   return attributes.email_address.used_for_first_factor && attributes.phone_number.used_for_first_factor;
 }
 
+function getField(fieldKey: FieldKey, fieldProps: FieldDeterminationProps): Field | undefined {
+  switch (fieldKey) {
+    case 'emailAddress':
+      return getEmailAddressField(fieldProps);
+    case 'phoneNumber':
+      return getPhoneNumberField(fieldProps);
+    case 'password':
+      return getPasswordField(fieldProps.attributes);
+    case 'ticket':
+      return getTicketField(fieldProps.hasTicket);
+    case 'username':
+    case 'firstName':
+    case 'lastName':
+      return getGenericField(fieldKey, fieldProps.attributes);
+    default:
+      return;
+  }
+}
+
 // TODO revisit when attributes.email_address.required becomes effective
-function getEmailAddressField(
-  attributes: Attributes,
-  hasTicket: boolean,
-  hasEmail: boolean,
-  activeCommIdentifierType: ActiveIdentifier,
-): Field {
-  const enabled =
+function getEmailAddressField({
+  attributes,
+  hasTicket,
+  hasEmail,
+  activeCommIdentifierType,
+}: FieldDeterminationProps): Field | undefined {
+  const show =
     (!hasTicket || (hasTicket && hasEmail)) &&
     attributes.email_address.enabled &&
     attributes.email_address.used_for_first_factor &&
     activeCommIdentifierType == 'emailAddress';
 
+  if (!show) {
+    return;
+  }
+
   return {
-    enabled: enabled,
-    required: enabled, // as far as the FE is concerned the email address is required, if enabled
-    showAsDisabled: hasTicket && hasEmail,
+    required: true, // as far as the FE is concerned the email address is required, if shown
+    disabled: !!hasTicket && !!hasEmail,
   };
 }
 
 // TODO revisit when attributes.phone_number.required becomes effective
-function getPhoneNumberField(
-  attributes: Attributes,
-  hasTicket: boolean,
-  activeCommIdentifierType: ActiveIdentifier,
-): Field {
-  const enabled =
+function getPhoneNumberField({
+  attributes,
+  hasTicket,
+  activeCommIdentifierType,
+}: FieldDeterminationProps): Field | undefined {
+  const show =
     !hasTicket &&
     attributes.phone_number.enabled &&
     attributes.phone_number.used_for_first_factor &&
     activeCommIdentifierType == 'phoneNumber';
 
+  if (!show) {
+    return;
+  }
+
   return {
-    enabled: enabled,
-    required: enabled, // as far as the FE is concerned the phone number is required, if enabled
+    required: true, // as far as the FE is concerned the phone number is required, if shown
   };
 }
 
-function getUserNameField(attributes: Attributes): Field {
-  return {
-    enabled: attributes.username.enabled,
-    required: attributes.username.required,
-  };
-}
+// Currently, password is always enabled so only show if required
+function getPasswordField(attributes: Attributes): Field | undefined {
+  const show = attributes.password.enabled && attributes.password.required;
 
-function getFirstNameField(attributes: Attributes): Field {
-  return {
-    enabled: attributes.first_name.enabled,
-    required: attributes.first_name.required,
-  };
-}
+  if (!show) {
+    return;
+  }
 
-function getLastNameField(attributes: Attributes): Field {
   return {
-    enabled: attributes.last_name.enabled,
-    required: attributes.last_name.required,
-  };
-}
-
-function getPasswordField(attributes: Attributes): Field {
-  return {
-    enabled: attributes.password.enabled,
     required: attributes.password.required,
   };
 }
 
-function getTicketField(hasTicket: boolean): Field {
+function getTicketField(hasTicket?: boolean): Field | undefined {
+  if (!hasTicket) {
+    return;
+  }
+
   return {
-    enabled: hasTicket,
-    required: hasTicket,
+    required: true,
+  };
+}
+
+function getGenericField(fieldKey: FieldKey, attributes: Attributes): Field | undefined {
+  const attrKey = camelToSnake(fieldKey);
+
+  // @ts-ignore
+  if (!attributes[attrKey].enabled) {
+    return;
+  }
+
+  return {
+    // @ts-ignore
+    required: attributes[attrKey].required,
   };
 }

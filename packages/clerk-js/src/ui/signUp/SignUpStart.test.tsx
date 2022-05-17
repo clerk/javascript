@@ -240,7 +240,7 @@ describe('<SignUpStart/>', () => {
           required: false,
         },
         password: {
-          enabled: false,
+          enabled: true,
           required: false,
         },
       },
@@ -260,6 +260,7 @@ describe('<SignUpStart/>', () => {
     screen.getByRole('button', { name: /Google/ });
     screen.getByRole('button', { name: /Facebook/ });
     expect(screen.queryByRole('button', { name: 'Sign up' })).not.toBeInTheDocument();
+    expect(screen.queryByText('Password')).not.toBeInTheDocument();
   });
 
   describe('when the user does not grant access to their Facebook account', () => {
@@ -342,7 +343,7 @@ describe('<SignUpStart/>', () => {
                 required: false,
               },
               password: {
-                enabled: false,
+                enabled: true,
                 required: false,
               },
             },
@@ -353,20 +354,22 @@ describe('<SignUpStart/>', () => {
           setWindowQueryParams([]);
         });
 
-        it('it auto-completes sign up flow if sign up is complete after create', async () => {
+        it('it auto-completes sign up flow if sign-up is complete after create', async () => {
           mockCreateRequest.mockImplementation(() =>
             Promise.resolve({
               status: 'complete',
               emailAddress: 'jdoe@example.com',
             }),
           );
+
           render(<SignUpStart />);
+
           await waitFor(() => {
             expect(mockSetSession).toHaveBeenCalled();
           });
         });
 
-        it('it does not auto-complete sign up flow if sign up if requirements are missing', async () => {
+        it('it does not auto-complete sign up flow if sign up requirements are missing', async () => {
           // Require extra fields, like username and password
           mockUserSettings = new UserSettings({
             attributes: {
@@ -465,7 +468,7 @@ describe('<SignUpStart/>', () => {
                 required: false,
               },
               password: {
-                enabled: false,
+                enabled: true,
                 required: false,
               },
             },
@@ -479,10 +482,12 @@ describe('<SignUpStart/>', () => {
           );
 
           render(<SignUpStart />);
+
           await waitFor(() => {
             expect(mockSetSession).not.toHaveBeenCalled();
             screen.getByText(/First name/);
             screen.getByText(/Last name/);
+            expect(screen.queryByText('Password')).not.toBeInTheDocument();
           });
 
           // Submit the form
@@ -516,7 +521,7 @@ describe('<SignUpStart/>', () => {
                 required: false,
               },
               password: {
-                enabled: false,
+                enabled: true,
                 required: false,
               },
             },
@@ -551,7 +556,7 @@ describe('<SignUpStart/>', () => {
           used_for_first_factor: false,
         },
         password: {
-          enabled: false,
+          enabled: true,
           required: false,
         },
         username: {
@@ -579,5 +584,6 @@ describe('<SignUpStart/>', () => {
 
     render(<SignUpStart />);
     expect(screen.queryByRole('button', { name: 'Sign up' })).not.toBeInTheDocument();
+    expect(screen.queryByText('Password')).not.toBeInTheDocument();
   });
 });

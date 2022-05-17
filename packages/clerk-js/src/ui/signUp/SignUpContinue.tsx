@@ -16,6 +16,7 @@ import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from 'u
 import { useNavigate } from 'ui/hooks';
 import { SignUpForm } from 'ui/signUp/SignUpForm';
 
+import { SignInLink } from './SignInLink';
 import {
   ActiveIdentifier,
   determineActiveFields,
@@ -23,15 +24,13 @@ import {
   getInitialActiveIdentifier,
   minimizeFieldsForExistingSignup,
   showFormFields,
-} from './sign_up_form_helpers';
-import { SignInLink } from './SignInLink';
+} from './signUpFormHelpers';
 import { SignUpOAuth } from './SignUpOAuth';
 import { SignUpWeb3 } from './SignUpWeb3';
 
 function _SignUpContinue(): JSX.Element | null {
   const { navigate } = useNavigate();
-  const environment = useEnvironment();
-  const { displayConfig, userSettings } = environment;
+  const { displayConfig, userSettings } = useEnvironment();
   const { attributes } = userSettings;
   const { setSession } = useCoreClerk();
   const { navigateAfterSignUp } = useSignUpContext();
@@ -68,7 +67,7 @@ function _SignUpContinue(): JSX.Element | null {
   const hasVerifiedWeb3 = signUp.verifications?.web3Wallet?.status == 'verified';
 
   const fields = determineActiveFields({
-    environment,
+    attributes,
     hasEmail,
     activeCommIdentifierType,
     signUp,
@@ -93,7 +92,7 @@ function _SignUpContinue(): JSX.Element | null {
     e.preventDefault();
 
     const fieldsToSubmit = Object.entries(fields).reduce(
-      (acc, [k, v]) => [...acc, ...(v.enabled && formState[k as FormStateKey] ? [formState[k as FormStateKey]] : [])],
+      (acc, [k, v]) => [...acc, ...(v && formState[k as FormStateKey] ? [formState[k as FormStateKey]] : [])],
       [] as Array<FieldState<any>>,
     );
 
