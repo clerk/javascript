@@ -14,6 +14,12 @@ export type AuthData = {
   claims: Record<string, unknown> | null;
 };
 
+const userCache: Record<string, Promise<User>> = {};
+
+const loadClerkUser = (userId: string, requestId?: string) => {
+  return requestId ? userCache[requestId] || (userCache[requestId] = users.getUser(userId)) : users.getUser(userId);
+};
+
 /**
  * @internal
  */
@@ -21,7 +27,7 @@ export async function getAuthData(
   req: Request,
   opts: RootAuthLoaderOptions = {},
 ): Promise<{ authData: AuthData | null; showInterstitial?: boolean; errorReason?: string }> {
-  const { loadSession, loadUser, jwtKey, authorizedParties } = opts;
+  const { loadSession, loadUser, jwtKey, authorizedParties, requestId } = opts;
   const { headers } = req;
   const cookies = parseCookies(req);
 
@@ -54,7 +60,7 @@ export async function getAuthData(
     const sessionId = sessionClaims.sid;
     const userId = sessionClaims.sub;
     const [user, session] = await Promise.all([
-      loadUser ? users.getUser(userId) : Promise.resolve(undefined),
+      loadUser ? loadClerkUser(userId, requestId) : Promise.resolve(undefined),
       loadSession ? sessions.getSession(sessionId) : Promise.resolve(undefined),
     ]);
 

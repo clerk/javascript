@@ -10,6 +10,7 @@ export type RootAuthLoaderOptions = {
   loadSession?: boolean;
   jwtKey?: string;
   authorizedParties?: [];
+  requestId?: string;
 };
 
 export type RootAuthLoaderCallback<Options> = (
