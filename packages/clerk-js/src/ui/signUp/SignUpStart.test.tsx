@@ -1,12 +1,11 @@
-import { mocked, render, renderJSON, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
+import { render, renderJSON, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
 import { titleize } from '@clerk/shared/utils/string';
-import { SignInResource, UserSettingsJSON } from '@clerk/types';
+import { UserSettingsJSON } from '@clerk/types';
 import { Session, UserSettings } from 'core/resources/internal';
 import React from 'react';
-import { useCoreSignIn, useCoreSignUp } from 'ui/contexts';
+import { useCoreSignUp } from 'ui/contexts';
 
 import { SignUpStart } from './SignUpStart';
-import { SignInStart } from 'ui/signIn/SignInStart';
 
 const navigateMock = jest.fn();
 const mockCreateRequest = jest.fn();
@@ -114,6 +113,7 @@ describe('<SignUpStart/>', () => {
         },
         phone_number: {
           enabled: true,
+          required: false,
         },
       },
       social: {
@@ -221,14 +221,26 @@ describe('<SignUpStart/>', () => {
       attributes: {
         username: {
           enabled: false,
+          required: false,
+        },
+        first_name: {
+          enabled: false,
+          required: false,
+        },
+        last_name: {
+          enabled: false,
+          required: false,
         },
         email_address: {
           enabled: true,
+          required: false,
         },
         phone_number: {
           enabled: true,
+          required: false,
         },
         password: {
+          enabled: false,
           required: false,
         },
       },
@@ -315,12 +327,30 @@ describe('<SignUpStart/>', () => {
               },
               phone_number: {
                 enabled: false,
+                required: false,
+              },
+              username: {
+                enabled: false,
+                required: false,
+              },
+              first_name: {
+                enabled: false,
+                required: false,
+              },
+              last_name: {
+                enabled: false,
+                required: false,
               },
               password: {
+                enabled: false,
                 required: false,
               },
             },
           } as UserSettingsJSON);
+        });
+
+        afterEach(() => {
+          setWindowQueryParams([]);
         });
 
         it('it auto-completes sign up flow if sign up is complete after create', async () => {
@@ -347,6 +377,7 @@ describe('<SignUpStart/>', () => {
               },
               phone_number: {
                 enabled: false,
+                required: false,
               },
               username: {
                 enabled: true,
@@ -354,9 +385,11 @@ describe('<SignUpStart/>', () => {
               },
               first_name: {
                 enabled: true,
+                required: false,
               },
               last_name: {
                 enabled: true,
+                required: false,
               },
               password: {
                 enabled: true,
@@ -415,16 +448,24 @@ describe('<SignUpStart/>', () => {
                 required: true,
                 used_for_first_factor: true,
               },
+              phone_number: {
+                enabled: false,
+                required: false,
+              },
+              username: {
+                enabled: false,
+                required: false,
+              },
               first_name: {
                 enabled: true,
+                required: false,
               },
               last_name: {
                 enabled: true,
-              },
-              phone_number: {
-                enabled: false,
+                required: false,
               },
               password: {
+                enabled: false,
                 required: false,
               },
             },
@@ -454,11 +495,28 @@ describe('<SignUpStart/>', () => {
         it('does not render the phone number field', async () => {
           mockUserSettings = new UserSettings({
             attributes: {
+              email_address: {
+                used_for_first_factor: false,
+              },
               phone_number: {
                 enabled: true,
                 required: true,
+                used_for_first_factor: true,
+              },
+              username: {
+                enabled: false,
+                required: false,
+              },
+              first_name: {
+                enabled: false,
+                required: false,
+              },
+              last_name: {
+                enabled: false,
+                required: false,
               },
               password: {
+                enabled: false,
                 required: false,
               },
             },
@@ -479,5 +537,47 @@ describe('<SignUpStart/>', () => {
 
     runTokenTests('__clerk_invitation_token');
     runTokenTests('__clerk_ticket');
+  });
+
+  it('hides sign up form when no at least an oauth is enabled and no auth factor is enabled', () => {
+    mockUserSettings = new UserSettings({
+      attributes: {
+        phone_number: {
+          enabled: true,
+          required: true,
+          used_for_first_factor: false,
+        },
+        email_address: {
+          used_for_first_factor: false,
+        },
+        password: {
+          enabled: false,
+          required: false,
+        },
+        username: {
+          enabled: true,
+          required: true,
+        },
+        first_name: {
+          enabled: true,
+          required: true,
+        },
+        last_name: {
+          enabled: true,
+          required: true,
+        },
+      },
+      social: {
+        oauth_google: {
+          authenticatable: true,
+          enabled: true,
+          required: false,
+          strategy: 'oauth_google',
+        },
+      },
+    } as UserSettingsJSON);
+
+    render(<SignUpStart />);
+    expect(screen.queryByRole('button', { name: 'Sign up' })).not.toBeInTheDocument();
   });
 });

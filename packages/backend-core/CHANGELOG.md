@@ -3,6 +3,60 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.9.0-staging.2](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.8.0...@clerk/backend-core@1.9.0-staging.2) (2022-05-18)
+
+### Features
+
+- **backend-core:** Create organization invitation ([cb717c6](https://github.com/clerkinc/javascript/commit/cb717c649a7d747b9754426ae769b1f628c474ec))
+- **backend-core:** Get pending organization invitations ([d2ccb00](https://github.com/clerkinc/javascript/commit/d2ccb005a4cec30f05ff5de480edec93fa10400b))
+- **backend-core:** Retrieve instance organizations ([a24c4d3](https://github.com/clerkinc/javascript/commit/a24c4d3b1459d28cd7f950864d7347a8875d9c9c))
+- **backend-core:** Revoke an organization invitation ([988701a](https://github.com/clerkinc/javascript/commit/988701a7e7d739c3fd5e447a16c37cc58e3150f4))
+- **types:** Include new organization role `guest_member` ([ba7f27b](https://github.com/clerkinc/javascript/commit/ba7f27b42be283f9b7b4126cecc8d93ab9a6f04e))
+
+## [1.9.0-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.8.0...@clerk/backend-core@1.9.0-staging.1) (2022-05-17)
+
+### Features
+
+- **backend-core:** Create organization invitation ([cb717c6](https://github.com/clerkinc/javascript/commit/cb717c649a7d747b9754426ae769b1f628c474ec))
+- **backend-core:** Get pending organization invitations ([d2ccb00](https://github.com/clerkinc/javascript/commit/d2ccb005a4cec30f05ff5de480edec93fa10400b))
+- **backend-core:** Retrieve instance organizations ([a24c4d3](https://github.com/clerkinc/javascript/commit/a24c4d3b1459d28cd7f950864d7347a8875d9c9c))
+- **backend-core:** Revoke an organization invitation ([988701a](https://github.com/clerkinc/javascript/commit/988701a7e7d739c3fd5e447a16c37cc58e3150f4))
+- **types:** Include new organization role `guest_member` ([ba7f27b](https://github.com/clerkinc/javascript/commit/ba7f27b42be283f9b7b4126cecc8d93ab9a6f04e))
+
+## [1.9.0-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.8.0...@clerk/backend-core@1.9.0-staging.0) (2022-05-16)
+
+### Features
+
+- **backend-core:** Create organization invitation ([cb717c6](https://github.com/clerkinc/javascript/commit/cb717c649a7d747b9754426ae769b1f628c474ec))
+- **backend-core:** Get pending organization invitations ([d2ccb00](https://github.com/clerkinc/javascript/commit/d2ccb005a4cec30f05ff5de480edec93fa10400b))
+- **backend-core:** Retrieve instance organizations ([a24c4d3](https://github.com/clerkinc/javascript/commit/a24c4d3b1459d28cd7f950864d7347a8875d9c9c))
+- **backend-core:** Revoke an organization invitation ([988701a](https://github.com/clerkinc/javascript/commit/988701a7e7d739c3fd5e447a16c37cc58e3150f4))
+
+## [1.8.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.7.0...@clerk/backend-core@1.8.0) (2022-05-13)
+
+### Features
+
+- **backend-core:** Organization memberships ([fdab06a](https://github.com/clerkinc/javascript/commit/fdab06adda33725f8cc7c8b872e1eaacb72155ca))
+
+### [1.7.2](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.7.0...@clerk/backend-core@1.7.2) (2022-05-12)
+
+**Note:** Version bump only for package @clerk/backend-core
+
+### [1.7.1](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.7.0...@clerk/backend-core@1.7.1) (2022-05-12)
+
+**Note:** Version bump only for package @clerk/backend-core
+
+## [1.7.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.7.0-staging.0...@clerk/backend-core@1.7.0) (2022-05-11)
+
+**Note:** Version bump only for package @clerk/backend-core
+
+## [1.6.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.5.6...@clerk/backend-core@1.6.0) (2022-05-06)
+
+### Features
+
+- **backend-core:** Update organization metadata ([ad496f9](https://github.com/clerkinc/javascript/commit/ad496f95b27dd6286f94399d485bbcd774d90a2d))
+- **nextjs,clerk-sdk-node,remix:** Add claims attribute to req.auth ([c695529](https://github.com/clerkinc/javascript/commit/c695529089f55baef72b86e3b73b8cd9f4f58e6d))
+
 ### [1.5.6](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.5.6-staging.0...@clerk/backend-core@1.5.6) (2022-05-05)
 
 **Note:** Version bump only for package @clerk/backend-core

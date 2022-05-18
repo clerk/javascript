@@ -4,6 +4,7 @@ import { useEnvironment } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
 import type { ParsedQs } from 'ui/router';
 import { useRouter } from 'ui/router';
+import { buildURL } from 'utils/url';
 
 import type {
   AvailableComponentCtx,
@@ -22,6 +23,7 @@ export type SignUpContextType = SignUpProps & {
   navigateAfterSignUp: () => any;
   queryParams: ParsedQs;
   signInUrl: string;
+  secondFactorUrl: string;
   authQueryString: string | null;
 };
 export const useSignUpContext = (): SignUpContextType => {
@@ -66,9 +68,13 @@ export const useSignUpContext = (): SignUpContextType => {
     signInUrl += `#/?${authQs}`;
   }
 
+  // TODO: Avoid building this url again to remove duplicate code. Get it from window.Clerk instead.
+  const secondFactorUrl = buildURL({ base: signInUrl, hashPath: '/factor-two' }, { stringify: true });
+
   return {
     ...ctx,
     signInUrl,
+    secondFactorUrl,
     afterSignUpUrl,
     afterSignInUrl,
     navigateAfterSignUp,
@@ -81,8 +87,10 @@ export type SignInContextType = SignInProps & {
   navigateAfterSignIn: () => any;
   queryParams: ParsedQs;
   signUpUrl: string;
+  signUpContinueUrl: string;
   authQueryString: string | null;
 };
+
 export const useSignInContext = (): SignInContextType => {
   const { componentName, ...ctx } = React.useContext(ComponentContext) as SignInCtx;
   const { navigate } = useNavigate();
@@ -123,12 +131,15 @@ export const useSignInContext = (): SignInContextType => {
     signUpUrl += `#/?${authQs}`;
   }
 
+  const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
+
   return {
     ...ctx,
     signUpUrl,
     afterSignInUrl,
     afterSignUpUrl,
     navigateAfterSignIn,
+    signUpContinueUrl,
     queryParams,
     authQueryString: authQs,
   };

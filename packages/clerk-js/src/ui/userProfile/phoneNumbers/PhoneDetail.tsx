@@ -11,7 +11,7 @@ import { TitledCard } from '@clerk/shared/components/titledCard';
 import { Toggle } from '@clerk/shared/components/toggle';
 import React from 'react';
 import { handleError, useFieldState, verificationErrorMessage } from 'ui/common';
-import { Error } from 'ui/common/error';
+import { Alert } from 'ui/common/alert';
 import { useCoreUser } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
 import { useRouter } from 'ui/router';
@@ -130,7 +130,13 @@ export const PhoneDetail = (): JSX.Element => {
         removalPage
       ) : (
         <TitledCard className='cl-themed-card cl-list-card'>
-          <Error style={{ margin: '0 2em' }}>{error}</Error>
+          <Alert
+            type='error'
+            style={{ margin: '0 2em' }}
+          >
+            {error}
+          </Alert>
+
           <List>
             <List.Item
               className='cl-list-item'

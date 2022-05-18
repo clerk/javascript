@@ -33,13 +33,39 @@ describe('Clerk singleton', () => {
   let mockNavigate = jest.fn();
 
   const mockDisplayConfig = {
-    signInUrl: 'signInUrl',
-    signUpUrl: 'signUpUrl',
-    userProfileUrl: 'userProfileUrl',
+    signInUrl: 'http://test.host/sign-in',
+    signUpUrl: 'http://test.host/sign-up',
+    userProfileUrl: 'http://test.host/user-profile',
   } as DisplayConfig;
 
+  let mockWindowLocation;
+  let mockHref: jest.Mock;
+
+  beforeEach(() => {
+    mockHref = jest.fn();
+    mockWindowLocation = {
+      host: 'test.host',
+      hostname: 'test.host',
+      origin: 'http://test.host',
+      get href() {
+        return 'http://test.host';
+      },
+      set href(v: string) {
+        mockHref(v);
+      },
+    } as any;
+
+    Object.defineProperty(global.window, 'location', {
+      value: mockWindowLocation,
+    });
+
+    // sut = new Clerk(frontendApi);
+  });
+
   afterAll(() => {
-    global.window.location = location;
+    Object.defineProperty(global.window, 'location', {
+      value: oldWindowLocation,
+    });
   });
 
   beforeEach(() => {
@@ -87,17 +113,17 @@ describe('Clerk singleton', () => {
 
     it('redirects to signInUrl', () => {
       sut.redirectToSignIn({ redirectUrl: 'https://www.example.com/' });
-      expect(mockNavigate).toHaveBeenCalledWith('/signInUrl#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
+      expect(mockNavigate).toHaveBeenCalledWith('/sign-in#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
     });
 
     it('redirects to signUpUrl', () => {
       sut.redirectToSignUp({ redirectUrl: 'https://www.example.com/' });
-      expect(mockNavigate).toHaveBeenCalledWith('/signUpUrl#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
+      expect(mockNavigate).toHaveBeenCalledWith('/sign-up#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
     });
 
     it('redirects to userProfileUrl', () => {
       sut.redirectToUserProfile();
-      expect(mockNavigate).toHaveBeenCalledWith('/userProfileUrl');
+      expect(mockNavigate).toHaveBeenCalledWith('/user-profile');
     });
   });
 
@@ -135,8 +161,8 @@ describe('Clerk singleton', () => {
 
   describe('.signOut()', () => {
     const mockClientDestroy = jest.fn();
-    const mockSession1 = { id: '1', remove: jest.fn(), status: 'active' };
-    const mockSession2 = { id: '2', remove: jest.fn(), status: 'active' };
+    const mockSession1 = { id: '1', remove: jest.fn(), status: 'active', user: {} };
+    const mockSession2 = { id: '2', remove: jest.fn(), status: 'active', user: {} };
 
     beforeEach(() => {
       mockClientDestroy.mockReset();
@@ -237,34 +263,15 @@ describe('Clerk singleton', () => {
   });
 
   describe('.navigate(to)', () => {
-    let mockWindowLocation;
-    let mockHref: jest.Mock;
     let sut: Clerk;
 
     beforeEach(() => {
-      mockHref = jest.fn();
-      mockWindowLocation = {
-        host: 'www.origin1.com',
-        hostname: 'www.origin1.com',
-        origin: 'https://www.origin1.com',
-        get href() {
-          return 'https://www.origin1.com';
-        },
-        set href(v: string) {
-          mockHref(v);
-        },
-      } as any;
-
-      Object.defineProperty(global.window, 'location', {
-        value: mockWindowLocation,
-      });
-
       sut = new Clerk(frontendApi);
     });
 
     it('uses window location if a custom navigate is not defined', async () => {
       await sut.load();
-      const toUrl = 'https://www.origin1.com/';
+      const toUrl = 'http://test.host/';
       await sut.navigate(toUrl);
       expect(mockHref).toHaveBeenCalledWith(toUrl);
     });
@@ -278,7 +285,7 @@ describe('Clerk singleton', () => {
 
     it('wraps custom navigate method in a promise if provided and it sync', async () => {
       await sut.load({ navigate: mockNavigate });
-      const toUrl = 'https://www.origin1.com/path#hash';
+      const toUrl = 'http://test.host/path#hash';
       const res = sut.navigate(toUrl);
       expect(res.then).toBeDefined();
       expect(mockHref).not.toHaveBeenCalled();
@@ -348,6 +355,61 @@ describe('Clerk singleton', () => {
       await waitFor(() => {
         expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true });
         expect(mockSetSession).toHaveBeenCalled();
+      });
+    });
+
+    it('creates a new sign up and navigates to the continue sign-up path if the user was not found during sso signup and there are missing requirements', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          onWindowLocationHost: () => false,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [],
+          signIn: new SignIn({
+            status: 'needs_identifier',
+            first_factor_verification: {
+              status: 'transferable',
+              strategy: 'oauth_google',
+              external_verification_redirect_url: '',
+              error: {
+                code: 'external_account_not_found',
+                long_message: 'The External Account was not found.',
+                message: 'Invalid external account',
+              },
+            },
+            second_factor_verification: null,
+            identifier: '',
+            user_data: null,
+            created_session_id: null,
+            created_user_id: null,
+          } as any as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const mockSignUpCreate = jest.fn().mockReturnValue(Promise.resolve({ status: 'missing_requirements' }));
+
+      const sut = new Clerk(frontendApi);
+      await sut.load({
+        navigate: mockNavigate,
+      });
+      if (!sut.client) {
+        fail('we should always have a client');
+      }
+      sut.client.signUp.create = mockSignUpCreate;
+
+      sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true });
+        expect(mockNavigate).toHaveBeenCalledWith('/sign-up#/continue');
       });
     });
 
@@ -559,7 +621,7 @@ describe('Clerk singleton', () => {
       sut.handleRedirectCallback();
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/' + mockDisplayConfig.signInUrl + '#/factor-two');
+        expect(mockNavigate).toHaveBeenCalledWith('/sign-in#/factor-two');
       });
     });
 
@@ -761,13 +823,54 @@ describe('Clerk singleton', () => {
       sut.handleRedirectCallback();
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/signUpUrl');
+        expect(mockNavigate).toHaveBeenCalledWith('/sign-up');
+      });
+    });
+
+    it('redirects user to the continue sign-up url if the external account was verified but there are still missing requirements', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          onWindowLocationHost: () => false,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [],
+          signIn: new SignIn(null),
+          signUp: new SignUp({
+            status: 'missing_requirements',
+            verifications: {
+              external_account: {
+                status: 'verified',
+                strategy: 'oauth_google',
+                external_verification_redirect_url: '',
+                error: null,
+              },
+            },
+          } as any as SignUpJSON),
+        }),
+      );
+
+      const sut = new Clerk(frontendApi);
+      await sut.load({
+        navigate: mockNavigate,
+      });
+
+      sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('/sign-up#/continue');
       });
     });
   });
 
   describe('.handleMagicLinkVerification()', () => {
-    beforeEach(async () => {
+    beforeEach(() => {
       mockClientFetch.mockReset();
       mockEnvironmentFetch.mockReset();
     });

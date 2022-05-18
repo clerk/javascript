@@ -55,6 +55,143 @@ describe('UserSettings', () => {
     expect(sut.instanceIsPasswordBased).toEqual(false);
   });
 
+  it('returns true if the instance has a valid email address auth factor', function () {
+    let sut = new UserSettings({
+      attributes: {
+        email_address: {
+          enabled: true,
+          required: true,
+          used_for_first_factor: false,
+        },
+        phone_number: {
+          enabled: true,
+          required: true,
+          used_for_first_factor: false,
+        },
+        password: {
+          enabled: true,
+          required: false,
+        },
+      },
+    } as any as UserSettingsJSON);
+
+    expect(sut.hasValidAuthFactor).toEqual(false);
+
+    sut = new UserSettings({
+      attributes: {
+        email_address: {
+          enabled: true,
+          required: true,
+          used_for_first_factor: true,
+        },
+        phone_number: {
+          enabled: true,
+          required: true,
+          used_for_first_factor: false,
+        },
+        password: {
+          enabled: true,
+          required: false,
+        },
+      },
+    } as any as UserSettingsJSON);
+    expect(sut.hasValidAuthFactor).toEqual(true);
+  });
+
+  it('returns true if the instance has a valid phone number auth factor', function () {
+    let sut = new UserSettings({
+      attributes: {
+        email_address: {
+          enabled: true,
+          required: true,
+          used_for_first_factor: false,
+        },
+        phone_number: {
+          enabled: true,
+          required: true,
+          used_for_first_factor: false,
+        },
+        password: {
+          enabled: true,
+          required: false,
+        },
+      },
+    } as any as UserSettingsJSON);
+
+    expect(sut.hasValidAuthFactor).toEqual(false);
+
+    sut = new UserSettings({
+      attributes: {
+        email_address: {
+          enabled: true,
+          required: true,
+          used_for_first_factor: false,
+        },
+        phone_number: {
+          enabled: true,
+          required: true,
+          used_for_first_factor: true,
+        },
+        password: {
+          enabled: true,
+          required: false,
+        },
+      },
+    } as any as UserSettingsJSON);
+    expect(sut.hasValidAuthFactor).toEqual(true);
+  });
+
+  it('returns true if the instance has username and password auth factor', function () {
+    let sut = new UserSettings({
+      attributes: {
+        email_address: {
+          enabled: true,
+          required: true,
+          used_for_first_factor: false,
+        },
+        phone_number: {
+          enabled: true,
+          required: true,
+          used_for_first_factor: false,
+        },
+        password: {
+          enabled: true,
+          required: false,
+        },
+        username: {
+          enabled: true,
+          required: false,
+        },
+      },
+    } as any as UserSettingsJSON);
+
+    expect(sut.hasValidAuthFactor).toEqual(false);
+
+    sut = new UserSettings({
+      attributes: {
+        email_address: {
+          enabled: true,
+          required: true,
+          used_for_first_factor: false,
+        },
+        phone_number: {
+          enabled: true,
+          required: true,
+          used_for_first_factor: true,
+        },
+        password: {
+          enabled: true,
+          required: true,
+        },
+        username: {
+          enabled: true,
+          required: true,
+        },
+      },
+    } as any as UserSettingsJSON);
+    expect(sut.hasValidAuthFactor).toEqual(true);
+  });
+
   it('returns enabled social provider strategies', function () {
     const sut = new UserSettings({
       social: {

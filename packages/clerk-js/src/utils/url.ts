@@ -1,6 +1,8 @@
 import { camelToSnake, isIPV4Address } from '@clerk/shared/utils/string';
 import { loadScript } from 'utils';
 import { SignUpResource } from '@clerk/types';
+import { getQueryParams } from './querystring';
+import { joinPaths } from './path';
 
 declare global {
   export interface Window {
@@ -9,6 +11,9 @@ declare global {
     };
   }
 }
+
+// This is used as a dummy base when we need to invoke "new URL()" but we don't care about the URL origin.
+const DUMMY_URL_BASE = 'http://clerk-dummy';
 
 export const DEV_OR_STAGING_SUFFIXES = [
   '.lcl.dev',
@@ -94,6 +99,8 @@ export function getAllETLDs(hostname: string = window.location.hostname): string
 
 interface BuildURLParams extends Partial<URL> {
   base?: string;
+  hashPath?: string;
+  hashSearch?: string;
 }
 
 interface BuildURLOptions<T> {
@@ -105,7 +112,11 @@ interface BuildURLOptions<T> {
  *
  * buildURL(params: URLParams, options: BuildURLOptions): string
  *
- * Builds a URL safely by using the native URL() constructor.
+ * Builds a URL safely by using the native URL() constructor. It can
+ * also build a secondary path and search URL that lives inside the hash
+ * of the main URL. For example:
+ *
+ * https://foo.com/bar?qux=42#/hash-bar?hash-qux=42
  *
  * References:
  * https://developer.mozilla.org/en-US/docs/Web/API/URL
@@ -120,9 +131,33 @@ export function buildURL<B extends boolean>(
 ): B extends true ? string : URL;
 
 export function buildURL(params: BuildURLParams, options: BuildURLOptions<boolean> = {}): URL | string {
-  const { base, ...rest } = params;
-  const url = new URL(base || window.location.href);
+  const { base, hashPath, hashSearch, ...rest } = params;
+
+  const url = new URL(base || '', window.location.href);
   Object.assign(url, rest);
+
+  // Treat that hash part of the main URL as if it's another URL with a pathname and a search.
+  // Another nested hash inside the top level hash (e.g. #my-hash#my-second-hash) is currently
+  // not supported as there is no use case for it yet.
+  if (hashPath || hashSearch) {
+    // Parse the hash to a URL object
+    const dummyUrlForHash = new URL(DUMMY_URL_BASE + url.hash.substring(1));
+
+    // Join the current hash path and with the provided one
+    dummyUrlForHash.pathname = joinPaths(dummyUrlForHash.pathname, hashPath || '');
+
+    // Merge search params
+    const hashSearchParams = getQueryParams(hashSearch || '');
+    for (const [key, val] of Object.entries(hashSearchParams)) {
+      dummyUrlForHash.searchParams.append(key, val as string);
+    }
+
+    // Keep just the pathname and the search
+    const newHash = dummyUrlForHash.href.replace(DUMMY_URL_BASE, '');
+
+    // Assign them to the hash of the main url
+    url.hash = newHash;
+  }
 
   const { stringify, skipOrigin } = options;
   if (stringify) {

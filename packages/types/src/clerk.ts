@@ -48,6 +48,9 @@ export interface Clerk {
   /** Active Session. */
   session?: ActiveSessionResource | null;
 
+  /** Active Organization */
+  organization?: OrganizationResource | null;
+
   /** Current User. */
   user?: UserResource | null;
 
@@ -434,6 +437,8 @@ export interface CreateOrganizationParams {
 
 export interface AuthenticateWithMetamaskParams {
   redirectUrl?: string;
+  signUpContinueUrl?: string;
+  customNavigate?: (to: string) => Promise<unknown>;
 }
 
 export interface LoadedClerk extends Clerk {

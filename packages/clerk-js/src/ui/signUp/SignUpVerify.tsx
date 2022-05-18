@@ -10,6 +10,7 @@ import {
   VerificationErrorMessage,
   withRedirectToHome,
 } from 'ui/common';
+import { Alert } from 'ui/common/alert';
 import { Body, Header } from 'ui/common/authForms';
 import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from 'ui/contexts';
 
@@ -93,13 +94,15 @@ function VerifyWithOtp({ field }: { field: 'emailAddress' | 'phoneNumber' }): JS
 
   return (
     <>
-      <Header error={error} />
+      <Header alert={error && <Alert type='error'>{error}</Alert>} />
+
       <Body>
         <Label className='cl-auth-form-message'>
           Enter the 6-digit code sent to
           <br />
           <strong>{identifierRef.current}</strong>
         </Label>
+
         <OneTimeCodeInput
           value={codeState.value}
           setValue={codeState.setValue}
@@ -108,6 +111,7 @@ function VerifyWithOtp({ field }: { field: 'emailAddress' | 'phoneNumber' }): JS
           className={'cl-otp-input'}
         />
       </Body>
+
       <PoweredByClerk className='cl-powered-by-clerk' />
     </>
   );

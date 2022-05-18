@@ -5,7 +5,6 @@ import type {
   CreateOrganizationParams,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
-  InitialState,
   OrganizationMembershipResource,
   OrganizationResource,
   RedirectOptions,
@@ -35,15 +34,14 @@ type MethodName<T> = {
 }[keyof T];
 type MethodCallback = () => void;
 
-type NewIsomorphicClerkParams = {
+export type NewIsomorphicClerkParams = {
   frontendApi: string;
   options: IsomorphicClerkOptions;
   Clerk: ClerkProp | null;
-  initialState?: InitialState;
 };
 
 export default class IsomorphicClerk {
-  private mode: string;
+  private mode: 'browser' | 'server';
   private frontendApi: string;
   private options: IsomorphicClerkOptions;
   private Clerk: ClerkProp;
@@ -59,8 +57,6 @@ export default class IsomorphicClerk {
 
   #loaded = false;
 
-  initialState: InitialState | undefined;
-
   get loaded(): boolean {
     return this.#loaded;
   }
@@ -68,27 +64,26 @@ export default class IsomorphicClerk {
   static #instance: IsomorphicClerk;
 
   static getOrCreateInstance(params: NewIsomorphicClerkParams) {
-    if (!this.#instance) {
+    // During SSR: a new instance should be created for every request
+    // During CSR: use the cached instance for the whole lifetime of the app
+    // This method should be idempotent in both scenarios
+    if (!inClientSide() || !this.#instance) {
       this.#instance = new IsomorphicClerk(params);
     }
     return this.#instance;
   }
 
   constructor(params: NewIsomorphicClerkParams) {
-    if (IsomorphicClerk.#instance) {
-      throw new Error('An IsomorphicClerk instance already exists. Use IsomorphicClerk.getOrCreateInstance instead');
-    }
-
-    const { Clerk = null, frontendApi, initialState, options = {} } = params || {};
+    const { Clerk = null, frontendApi, options = {} } = params || {};
     this.frontendApi = frontendApi;
     this.options = options;
     this.Clerk = Clerk;
-    this.initialState = initialState;
     this.mode = inClientSide() ? 'browser' : 'server';
+    void this.loadClerkJS();
   }
 
   async loadClerkJS(): Promise<BrowserClerk | undefined> {
-    if (this.#loaded) {
+    if (this.mode !== 'browser' || this.#loaded) {
       return;
     }
 

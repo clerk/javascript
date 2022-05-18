@@ -1,11 +1,13 @@
 import type {
   CreateEmailAddressParams,
   CreatePhoneNumberParams,
+  CreateWeb3WalletParams,
   EmailAddressResource,
   ExternalAccountJSON,
   ExternalAccountResource,
   ImageResource,
   OAuthStrategy,
+  OrganizationMembershipResource,
   PhoneNumberResource,
   SetProfileImageParams,
   UpdateUserParams,
@@ -38,6 +40,7 @@ export class User extends BaseResource implements UserResource {
   phoneNumbers: PhoneNumberResource[] = [];
   web3Wallets: Web3WalletResource[] = [];
   externalAccounts: ExternalAccountResource[] = [];
+  organizationMemberships: OrganizationMembershipResource[] = [];
   passwordEnabled = false;
   firstName: string | null = null;
   lastName: string | null = null;
@@ -112,6 +115,16 @@ export class User extends BaseResource implements UserResource {
         phone_number: phoneNumber,
       },
       this.path() + '/phone_numbers/',
+    ).create();
+  };
+
+  createWeb3Wallet = (params: CreateWeb3WalletParams): Promise<Web3WalletResource> => {
+    const { web3Wallet } = params || {};
+    return new Web3Wallet(
+      {
+        web3_wallet: web3Wallet,
+      },
+      this.path() + '/web3_wallets/',
     ).create();
   };
 
@@ -199,6 +212,8 @@ export class User extends BaseResource implements UserResource {
     this.externalAccounts = data.external_accounts.map(
       ea => new ExternalAccount(ea, this.path() + '/external_accounts'),
     );
+
+    this.organizationMemberships = (data.organization_memberships || []).map(om => new OrganizationMembership(om));
 
     this.publicMetadata = data.public_metadata;
     this.unsafeMetadata = data.unsafe_metadata;

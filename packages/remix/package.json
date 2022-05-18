@@ -1,6 +1,6 @@
 {
   "name": "@clerk/remix",
-  "version": "0.3.16",
+  "version": "0.5.0-staging.0",
   "license": "MIT",
   "description": "Clerk.dev SDK for Remix",
   "keywords": [
@@ -32,9 +32,9 @@
     "dev": "tsc -p tsconfig.build.json --watch"
   },
   "dependencies": {
-    "@clerk/clerk-react": "^3.2.12",
-    "@clerk/clerk-sdk-node": "^3.3.11",
-    "@clerk/types": "^2.9.0",
+    "@clerk/clerk-react": "^3.2.18-staging.1",
+    "@clerk/clerk-sdk-node": "^3.6.0-staging.2",
+    "@clerk/types": "^2.14.0-staging.1",
     "cookie": "^0.5.0",
     "tslib": "^2.3.1"
   },
@@ -52,8 +52,7 @@
   },
   "peerDependencies": {
     "@remix-run/react": "^1.2.1",
-    "@remix-run/server-runtime": "^1.2.1",
-    "remix": ">=1.2.1"
+    "@remix-run/server-runtime": "^1.2.1"
   },
   "engines": {
     "node": ">=16"

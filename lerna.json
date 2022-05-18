@@ -4,11 +4,11 @@
   "command": {
     "version": {
       "message": "chore(release): Publish",
-      "allowBranch": ["main", "next", "staging"],
+      "allowBranch": ["main", "next", "staging", "release"],
       "conventionalCommits": true
     },
     "publish": {
-      "allowBranch": ["main", "next", "staging"]
+      "allowBranch": ["main", "next", "staging", "release"]
     }
   },
   "changelogPreset": {

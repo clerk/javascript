@@ -33,6 +33,7 @@ function SignInRoutes(): JSX.Element {
         <SSOCallback
           afterSignInUrl={signInContext.afterSignInUrl}
           afterSignUpUrl={signInContext.afterSignUpUrl}
+          redirectUrl={signInContext.redirectUrl}
           secondFactorUrl={'../factor-two'}
         />
       </Route>
@@ -41,7 +42,7 @@ function SignInRoutes(): JSX.Element {
       </Route>
       <Route path='verify'>
         <VerifyMagicLink
-          redirectUrlComplete={signInContext.afterSignInUrl || undefined}
+          redirectUrlComplete={signInContext.afterSignInUrl || signInContext.redirectUrl || undefined}
           redirectUrl='../factor-two'
         />
       </Route>

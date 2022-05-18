@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.9.24-staging.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.9.23...@clerk/clerk-expo@0.9.24-staging.3) (2022-05-18)
+
+**Note:** Version bump only for package @clerk/clerk-expo
+
+### [0.9.24-staging.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.9.23...@clerk/clerk-expo@0.9.24-staging.2) (2022-05-17)
+
+**Note:** Version bump only for package @clerk/clerk-expo
+
+### [0.9.24-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.9.23...@clerk/clerk-expo@0.9.24-staging.1) (2022-05-16)
+
+**Note:** Version bump only for package @clerk/clerk-expo
+
+### [0.9.23](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.9.20...@clerk/clerk-expo@0.9.23) (2022-05-13)
+
+**Note:** Version bump only for package @clerk/clerk-expo
+
+### [0.9.22](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.9.20...@clerk/clerk-expo@0.9.22) (2022-05-12)
+
+**Note:** Version bump only for package @clerk/clerk-expo
+
+### [0.9.21](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.9.20...@clerk/clerk-expo@0.9.21) (2022-05-12)
+
+**Note:** Version bump only for package @clerk/clerk-expo
+
+### [0.9.20](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.9.20-staging.1...@clerk/clerk-expo@0.9.20) (2022-05-11)
+
+**Note:** Version bump only for package @clerk/clerk-expo
+
+### [0.9.20-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.9.20-staging.0...@clerk/clerk-expo@0.9.20-staging.1) (2022-05-11)
+
+**Note:** Version bump only for package @clerk/clerk-expo
+
+### [0.9.19](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.9.18...@clerk/clerk-expo@0.9.19) (2022-05-06)
+
+**Note:** Version bump only for package @clerk/clerk-expo
+
+### [0.9.19-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.9.18...@clerk/clerk-expo@0.9.19-staging.0) (2022-05-05)
+
+**Note:** Version bump only for package @clerk/clerk-expo
+
 ### [0.9.18](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.9.18-staging.0...@clerk/clerk-expo@0.9.18) (2022-05-05)
 
 **Note:** Version bump only for package @clerk/clerk-expo

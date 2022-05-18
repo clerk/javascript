@@ -3,6 +3,67 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.12.0-staging.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.11.0...@clerk/clerk-js@3.12.0-staging.2) (2022-05-18)
+
+### Features
+
+- **clerk-js:** Make sign up flow resumable ([bfe0d8c](https://github.com/clerkinc/javascript/commit/bfe0d8cb917d9be3441b7f8a9473e905310fe6e4))
+- **clerk-js:** Make sign up flow resumable for Web3 providers ([cf49066](https://github.com/clerkinc/javascript/commit/cf4906692cb1ae4eb41ac44a6d2dae64aba97fea))
+- **clerk-js:** Replace Error & Info component with a single Alert component ([8c34d21](https://github.com/clerkinc/javascript/commit/8c34d2176fcc9eca346b6be91ff5dd1987929c28))
+- **clerk-js:** Session touch should include the active organization ([664030c](https://github.com/clerkinc/javascript/commit/664030c3f4aedbd5e886d8ada906b64ac2ed06b5))
+- **types,clerk-js:** Enhance Web3 wallet resource with relevant operations ([a166716](https://github.com/clerkinc/javascript/commit/a166716db44db8e765e67c154093c9d3c3f24c75))
+
+### Bug Fixes
+
+- **clerk-js:** Navigate to sign up continue in web3 ([460ba1c](https://github.com/clerkinc/javascript/commit/460ba1cc82bbad6197224ca71ad39302564408b4))
+
+## [3.12.0-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.11.0...@clerk/clerk-js@3.12.0-staging.1) (2022-05-17)
+
+### Features
+
+- **clerk-js:** Make sign up flow resumable ([bfe0d8c](https://github.com/clerkinc/javascript/commit/bfe0d8cb917d9be3441b7f8a9473e905310fe6e4))
+- **clerk-js:** Make sign up flow resumable for Web3 providers ([cf49066](https://github.com/clerkinc/javascript/commit/cf4906692cb1ae4eb41ac44a6d2dae64aba97fea))
+- **clerk-js:** Replace Error & Info component with a single Alert component ([8c34d21](https://github.com/clerkinc/javascript/commit/8c34d2176fcc9eca346b6be91ff5dd1987929c28))
+- **clerk-js:** Session touch should include the active organization ([664030c](https://github.com/clerkinc/javascript/commit/664030c3f4aedbd5e886d8ada906b64ac2ed06b5))
+
+### Bug Fixes
+
+- **clerk-js:** Navigate to sign up continue in web3 ([460ba1c](https://github.com/clerkinc/javascript/commit/460ba1cc82bbad6197224ca71ad39302564408b4))
+
+## [3.12.0-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.11.0...@clerk/clerk-js@3.12.0-staging.0) (2022-05-16)
+
+### Features
+
+- **clerk-js:** Session touch should include the active organization ([664030c](https://github.com/clerkinc/javascript/commit/664030c3f4aedbd5e886d8ada906b64ac2ed06b5))
+
+## [3.11.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.10.2...@clerk/clerk-js@3.11.0) (2022-05-13)
+
+### Features
+
+- **clerk-js:** Add shortcut to active org in Clerk singleton ([03e68d4](https://github.com/clerkinc/javascript/commit/03e68d4667e7abcd006c4a3a2a2fe7f65bfca417))
+
+### [3.10.4](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.10.2...@clerk/clerk-js@3.10.4) (2022-05-12)
+
+**Note:** Version bump only for package @clerk/clerk-js
+
+### [3.10.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.10.2...@clerk/clerk-js@3.10.3) (2022-05-12)
+
+**Note:** Version bump only for package @clerk/clerk-js
+
+### [3.10.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.10.2-staging.1...@clerk/clerk-js@3.10.2) (2022-05-11)
+
+**Note:** Version bump only for package @clerk/clerk-js
+
+### [3.10.2-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.10.2-staging.0...@clerk/clerk-js@3.10.2-staging.1) (2022-05-11)
+
+### Bug Fixes
+
+- **clerk-js:** Use redirect_url across all auth flows ([#229](https://github.com/clerkinc/javascript/issues/229)) ([5dfdc2d](https://github.com/clerkinc/javascript/commit/5dfdc2dd395728ec8b6afaddb13d2ca9bb6d48fb))
+
+### [3.10.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.10.0...@clerk/clerk-js@3.10.1) (2022-05-06)
+
+**Note:** Version bump only for package @clerk/clerk-js
+
 ## [3.10.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.10.0-staging.0...@clerk/clerk-js@3.10.0) (2022-05-05)
 
 **Note:** Version bump only for package @clerk/clerk-js

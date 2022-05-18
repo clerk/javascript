@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "3.10.0",
+  "version": "3.12.0-staging.2",
   "license": "MIT",
   "description": "Clerk.dev JS library",
   "keywords": [
@@ -31,14 +31,14 @@
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "check-types": "tsc",
     "dev": "webpack-dev-server --config webpack.dev.js",
-    "prepublishOnly": "npm run test && npm run build",
+    "prepublishOnly": "npm run build",
     "postpublish": "node ./scripts/purge-cache.mjs",
     "start": "echo \"Noop\"",
     "test": "jest",
     "test:coverage": "jest --collectCoverage"
   },
   "dependencies": {
-    "@clerk/types": "^2.9.0",
+    "@clerk/types": "^2.14.0-staging.1",
     "@popperjs/core": "^2.4.4",
     "browser-tabs-lock": "^1.2.15",
     "classnames": "^2.3.1",
@@ -58,7 +58,7 @@
     "@babel/preset-env": "^7.12.1",
     "@babel/preset-react": "^7.12.5",
     "@babel/preset-typescript": "^7.12.1",
-    "@clerk/shared": "^0.2.1",
+    "@clerk/shared": "^0.2.7-staging.1",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.2",
     "@svgr/webpack": "^6.2.1",
     "@testing-library/dom": "^7.28.1",

@@ -24,6 +24,7 @@ export type AuthData = {
   userId: string | null;
   user: User | undefined | null;
   getToken: (...args: any) => Promise<string | null>;
+  claims: Record<string, unknown> | null;
 };
 
 export type ContextWithAuth<Options extends WithServerSideAuthOptions = any> = GetServerSidePropsContext & {

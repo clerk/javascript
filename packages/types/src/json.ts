@@ -99,6 +99,7 @@ export interface SessionJSON extends ClerkResourceJSON {
   abandon_at: number;
   last_active_at: number;
   last_active_token: TokenJSON;
+  last_active_organization_id: string | null;
   user: UserJSON;
   public_user_data: PublicUserDataJSON;
   created_at: number;
@@ -163,6 +164,7 @@ export interface UserJSON extends ClerkResourceJSON {
   phone_numbers: PhoneNumberJSON[];
   web3_wallets: Web3WalletJSON[];
   external_accounts: ExternalAccountJSON[];
+  organization_memberships: OrganizationMembershipJSON[];
   password_enabled: boolean;
   password: string;
   profile_image_id: string;

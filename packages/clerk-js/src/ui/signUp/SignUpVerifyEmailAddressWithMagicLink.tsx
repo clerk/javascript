@@ -9,7 +9,7 @@ import {
   MagicLinkWaitingScreen,
   PoweredByClerk,
 } from 'ui/common';
-import { Error } from 'ui/common/error';
+import { Alert } from 'ui/common/alert';
 import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from 'ui/contexts';
 import { useMagicLink } from 'ui/hooks';
 
@@ -73,7 +73,8 @@ export function SignUpVerifyEmailAddressWithMagicLink(): JSX.Element {
 
   return (
     <>
-      {error && <Error>{error}</Error>}
+      {error && <Alert type='error'>{error}</Alert>}
+
       <Body className='cl-auth-form-body-center cl-verification-page-container'>
         {showExpiredScreen ? (
           <ExpiredRetryMagicLinkWaitingScreen onResendButtonClicked={startVerification} />

@@ -3,7 +3,7 @@ import { PhoneViewer } from '@clerk/shared/components/phoneInput';
 import { TitledCard } from '@clerk/shared/components/titledCard';
 import React from 'react';
 import { handleError } from 'ui/common';
-import { Error } from 'ui/common/error';
+import { Alert } from 'ui/common/alert';
 
 interface EditableListFieldRemoveCardProps {
   type: 'phone' | 'email' | 'external account';
@@ -40,7 +40,8 @@ export const EditableListFieldRemoveCard: React.FC<EditableListFieldRemoveCardPr
       subtitle='Confirm removal'
       className='cl-themed-card cl-verifiable-field-card'
     >
-      <Error>{error}</Error>
+      <Alert type='error'>{error}</Alert>
+
       <div className='cl-copy-text'>
         <p>
           {type === 'phone' ? (

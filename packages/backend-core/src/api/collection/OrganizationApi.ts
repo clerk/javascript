@@ -1,4 +1,5 @@
-import { Organization } from '../resources/Organization';
+import { Organization, OrganizationInvitation, OrganizationMembership } from '../resources';
+import { OrganizationMembershipRole } from '../resources/Enums';
 import { AbstractApi } from './AbstractApi';
 
 const basePath = '/organizations';
@@ -6,6 +7,11 @@ const basePath = '/organizations';
 type OrganizationMetadataParams = {
   publicMetadata?: Record<string, unknown>;
   privateMetadata?: Record<string, unknown>;
+};
+
+type GetOrganizationListParams = {
+  limit?: number;
+  offset?: number;
 };
 
 type CreateParams = {
@@ -19,7 +25,62 @@ type OrganizationMetadataRequestBody = {
   privateMetadata?: string;
 };
 
+type GetOrganizationParams = { organizationId: string } | { slug: string };
+
+type UpdateParams = {
+  name?: string;
+};
+
+type UpdateMetadataParams = OrganizationMetadataParams;
+
+type GetOrganizationMembershipListParams = {
+  organizationId: string;
+  limit?: number;
+  offset?: number;
+};
+
+type CreateOrganizationMembershipParams = {
+  organizationId: string;
+  userId: string;
+  role: OrganizationMembershipRole;
+};
+
+type UpdateOrganizationMembershipParams = CreateOrganizationMembershipParams;
+
+type DeleteOrganizationMembershipParams = {
+  organizationId: string;
+  userId: string;
+};
+
+type CreateOrganizationInvitationParams = {
+  organizationId: string;
+  inviterUserId: string;
+  emailAddress: string;
+  role: OrganizationMembershipRole;
+  redirectUrl?: string;
+};
+
+type GetPendingOrganizationInvitationListParams = {
+  organizationId: string;
+  limit?: number;
+  offset?: number;
+};
+
+type RevokeOrganizationInvitationParams = {
+  organizationId: string;
+  invitationId: string;
+  requestingUserId: string;
+};
+
 export class OrganizationApi extends AbstractApi {
+  public async getOrganizationList(params?: GetOrganizationListParams) {
+    return this._restClient.makeRequest<Organization[]>({
+      method: 'GET',
+      path: basePath,
+      queryParams: params,
+    });
+  }
+
   public async createOrganization(params: CreateParams) {
     const { publicMetadata, privateMetadata } = params;
     return this._restClient.makeRequest<Organization>({
@@ -31,6 +92,125 @@ export class OrganizationApi extends AbstractApi {
           publicMetadata,
           privateMetadata,
         }),
+      },
+    });
+  }
+
+  public async getOrganization(params: GetOrganizationParams) {
+    const organizationIdOrSlug = 'organizationId' in params ? params.organizationId : params.slug;
+    this.requireId(organizationIdOrSlug);
+
+    return this._restClient.makeRequest<Organization>({
+      method: 'GET',
+      path: `${basePath}/${organizationIdOrSlug}`,
+    });
+  }
+
+  public async updateOrganization(organizationId: string, params: UpdateParams) {
+    this.requireId(organizationId);
+    return this._restClient.makeRequest<Organization>({
+      method: 'PATCH',
+      path: `${basePath}/${organizationId}`,
+      bodyParams: params,
+    });
+  }
+
+  public async updateOrganizationMetadata(organizationId: string, params: UpdateMetadataParams) {
+    this.requireId(organizationId);
+
+    return this._restClient.makeRequest<Organization>({
+      method: 'PATCH',
+      path: `${basePath}/${organizationId}/metadata`,
+      bodyParams: stringifyMetadataParams(params),
+    });
+  }
+
+  public async deleteOrganization(organizationId: string) {
+    return this._restClient.makeRequest<Organization>({
+      method: 'DELETE',
+      path: `${basePath}/${organizationId}`,
+    });
+  }
+
+  public async getOrganizationMembershipList(params: GetOrganizationMembershipListParams) {
+    const { organizationId, limit, offset } = params;
+    this.requireId(organizationId);
+
+    return this._restClient.makeRequest<OrganizationMembership[]>({
+      method: 'GET',
+      path: `${basePath}/${organizationId}/memberships`,
+      queryParams: { limit, offset },
+    });
+  }
+
+  public async createOrganizationMembership(params: CreateOrganizationMembershipParams) {
+    const { organizationId, userId, role } = params;
+    this.requireId(organizationId);
+
+    return this._restClient.makeRequest<OrganizationMembership>({
+      method: 'POST',
+      path: `${basePath}/${organizationId}/memberships`,
+      bodyParams: {
+        userId,
+        role,
+      },
+    });
+  }
+
+  public async updateOrganizationMembership(params: UpdateOrganizationMembershipParams) {
+    const { organizationId, userId, role } = params;
+    this.requireId(organizationId);
+
+    return this._restClient.makeRequest<OrganizationMembership>({
+      method: 'PATCH',
+      path: `${basePath}/${organizationId}/memberships/${userId}`,
+      bodyParams: {
+        role,
+      },
+    });
+  }
+
+  public async deleteOrganizationMembership(params: DeleteOrganizationMembershipParams) {
+    const { organizationId, userId } = params;
+    this.requireId(organizationId);
+
+    return this._restClient.makeRequest<OrganizationMembership>({
+      method: 'DELETE',
+      path: `${basePath}/${organizationId}/memberships/${userId}`,
+    });
+  }
+
+  public async getPendingOrganizationInvitationList(params: GetPendingOrganizationInvitationListParams) {
+    const { organizationId, limit, offset } = params;
+    this.requireId(organizationId);
+
+    return this._restClient.makeRequest<OrganizationInvitation[]>({
+      method: 'GET',
+      path: `${basePath}/${organizationId}/invitations/pending`,
+      queryParams: { limit, offset },
+    });
+  }
+
+  public async createOrganizationInvitation(params: CreateOrganizationInvitationParams) {
+    const { organizationId, ...bodyParams } = params;
+    this.requireId(organizationId);
+
+    return this._restClient.makeRequest<OrganizationInvitation>({
+      method: 'POST',
+      path: `${basePath}/${organizationId}/invitations`,
+      bodyParams,
+    });
+  }
+
+  public async revokeOrganizationInvitation(params: RevokeOrganizationInvitationParams) {
+    const { organizationId, invitationId, requestingUserId } = params;
+    this.requireId(organizationId);
+
+    return this._restClient.makeRequest<OrganizationInvitation>({
+      method: 'POST',
+      path: `${basePath}/${organizationId}/invitations/${invitationId}/revoke`,
+      bodyParams: {
+        requestingUserId,
       },
     });
   }

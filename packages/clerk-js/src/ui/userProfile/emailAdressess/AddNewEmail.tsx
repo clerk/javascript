@@ -8,7 +8,7 @@ import { TitledCard } from '@clerk/shared/components/titledCard';
 import { EmailAddressResource } from '@clerk/types';
 import React from 'react';
 import { handleError, useFieldState } from 'ui/common';
-import { Error } from 'ui/common/error';
+import { Alert } from 'ui/common/alert';
 import { useCoreUser, useEnvironment } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
 import { EmailAddressVerificationWithMagicLink } from 'ui/userProfile/emailAdressess/EmailAddressVerificationWithMagicLink';
@@ -142,7 +142,8 @@ export function AddNewEmail(): JSX.Element {
         subtitle={subtitle}
         className='cl-themed-card cl-verifiable-field-card'
       >
-        <Error>{error}</Error>
+        <Alert type='error'>{error}</Alert>
+
         {enterEmailForm}
         {verifyEmailScreen}
         {finishScreen}

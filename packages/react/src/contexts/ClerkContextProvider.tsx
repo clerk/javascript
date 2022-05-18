@@ -1,29 +1,25 @@
 import { ActiveSessionResource, ClientResource, InitialState, Resources, UserResource } from '@clerk/types';
 import React from 'react';
 
-import IsomorphicClerk from '../isomorphicClerk';
+import IsomorphicClerk, { NewIsomorphicClerkParams } from '../isomorphicClerk';
 import { AuthContext } from './AuthContext';
 import { ClientContext } from './ClientContext';
 import { IsomorphicClerkContext } from './IsomorphicClerkContext';
 import { SessionContext } from './SessionContext';
 import { UserContext } from './UserContext';
 
-type ClerkContextWrapperProps = {
-  isomorphicClerk: IsomorphicClerk;
+type ClerkContextProvider = {
+  isomorphicClerkOptions: NewIsomorphicClerkParams;
+  initialState: InitialState | undefined;
   children: React.ReactNode;
-  clerkLoaded: boolean;
 };
 
 type ClerkContextProviderState = Resources;
 
-export function ClerkContextProvider({
-  isomorphicClerk,
-  children,
-  clerkLoaded,
-}: ClerkContextWrapperProps): JSX.Element | null {
-  const clerk = isomorphicClerk;
+export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element | null {
+  const { isomorphicClerkOptions, initialState, children } = props;
+  const { isomorphicClerk: clerk, loaded: clerkLoaded } = useLoadedIsomorphicClerk(isomorphicClerkOptions);
 
-  const initialState = clerk.initialState;
   const [state, setState] = React.useState<ClerkContextProviderState>({
     client: clerk.client as ClientResource,
     session: clerk.session,
@@ -64,6 +60,17 @@ export function ClerkContextProvider({
     </IsomorphicClerkContext.Provider>
   );
 }
+
+const useLoadedIsomorphicClerk = (options: NewIsomorphicClerkParams) => {
+  const [loaded, setLoaded] = React.useState(false);
+  const isomorphicClerk = React.useMemo(() => IsomorphicClerk.getOrCreateInstance(options), []);
+
+  React.useEffect(() => {
+    isomorphicClerk.addOnLoaded(() => setLoaded(true));
+  }, []);
+
+  return { isomorphicClerk, loaded };
+};
 
 // This should be provided from isomorphicClerk
 // TODO: move inside isomorphicClerk

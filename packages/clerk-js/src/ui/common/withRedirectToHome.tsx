@@ -3,7 +3,7 @@ import React from 'react';
 import { useCoreSession, useEnvironment } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
 
-export function withRedirectToHome<P extends SignInProps | SignUpProps>(
+export function withRedirectToHome<P extends SignInProps | SignUpProps | { continueExisting?: boolean }>(
   Component: React.ComponentType<P>,
   displayName?: string,
 ): (props: P) => null | JSX.Element {

@@ -45,12 +45,13 @@ const allowlistIdentifiers = ClerkAPI.allowlistIdentifiers;
 const clients = ClerkAPI.clients;
 const emails = ClerkAPI.emails;
 const invitations = ClerkAPI.invitations;
+const organizations = ClerkAPI.organizations;
 const sessions = ClerkAPI.sessions;
 const smsMessages = ClerkAPI.smsMessages;
 const users = ClerkAPI.users;
 
 // Export sub-api objects
-export { allowlistIdentifiers, clients, emails, invitations, sessions, smsMessages, users };
+export { allowlistIdentifiers, clients, emails, invitations, organizations, sessions, smsMessages, users };
 
 async function fetchInterstitial() {
   const response = await ClerkAPI.fetchInterstitial<Response>();
@@ -122,7 +123,14 @@ export function withEdgeMiddlewareAuth(
       fetcher: (...args) => ClerkAPI.sessions.getToken(...args),
     });
 
-    const authRequest = injectAuthIntoRequest(req, { user, session, sessionId, userId, getToken });
+    const authRequest = injectAuthIntoRequest(req, {
+      user,
+      session,
+      sessionId,
+      userId,
+      getToken,
+      claims: sessionClaims as Record<string, unknown>,
+    });
     return handler(authRequest, event);
   };
 }

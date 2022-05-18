@@ -13,6 +13,7 @@ export class Session extends BaseResource implements SessionResource {
   status!: SessionStatus;
   lastActiveAt!: Date;
   lastActiveToken!: Token | null;
+  lastActiveOrganizationId!: string | null;
   user!: UserResource | null;
   publicUserData!: PublicUserData;
   expireAt!: Date;
@@ -48,6 +49,7 @@ export class Session extends BaseResource implements SessionResource {
   touch = (): Promise<SessionResource> => {
     return this._basePost({
       action: 'touch',
+      body: { active_organization_id: this.lastActiveOrganizationId },
     });
   };
 
@@ -127,6 +129,7 @@ export class Session extends BaseResource implements SessionResource {
     this.expireAt = unixEpochToDate(data.expire_at);
     this.abandonAt = unixEpochToDate(data.abandon_at);
     this.lastActiveAt = unixEpochToDate(data.last_active_at);
+    this.lastActiveOrganizationId = data.last_active_organization_id;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     this.user = new User(data.user);

@@ -3,6 +3,51 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.6.0-staging.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.5.0...@clerk/clerk-sdk-node@3.6.0-staging.2) (2022-05-18)
+
+### Features
+
+- **backend-core:** Retrieve instance organizations ([a24c4d3](https://github.com/clerkinc/javascript/commit/a24c4d3b1459d28cd7f950864d7347a8875d9c9c))
+- **clerk-sdk-node:** Export organization invitation ([07ac214](https://github.com/clerkinc/javascript/commit/07ac214ce8604859b359e073ae19e0d713650c22))
+
+## [3.6.0-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.5.0...@clerk/clerk-sdk-node@3.6.0-staging.1) (2022-05-17)
+
+### Features
+
+- **backend-core:** Retrieve instance organizations ([a24c4d3](https://github.com/clerkinc/javascript/commit/a24c4d3b1459d28cd7f950864d7347a8875d9c9c))
+- **clerk-sdk-node:** Export organization invitation ([07ac214](https://github.com/clerkinc/javascript/commit/07ac214ce8604859b359e073ae19e0d713650c22))
+
+## [3.6.0-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.5.0...@clerk/clerk-sdk-node@3.6.0-staging.0) (2022-05-16)
+
+### Features
+
+- **backend-core:** Retrieve instance organizations ([a24c4d3](https://github.com/clerkinc/javascript/commit/a24c4d3b1459d28cd7f950864d7347a8875d9c9c))
+- **clerk-sdk-node:** Export organization invitation ([07ac214](https://github.com/clerkinc/javascript/commit/07ac214ce8604859b359e073ae19e0d713650c22))
+
+## [3.5.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.4.1...@clerk/clerk-sdk-node@3.5.0) (2022-05-13)
+
+### Features
+
+- **clerk-sdk-node:** Organizations operations ([339ecdb](https://github.com/clerkinc/javascript/commit/339ecdbf472df2930ecdddd440cee1b26b32c9bf))
+
+### [3.4.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.4.1...@clerk/clerk-sdk-node@3.4.3) (2022-05-12)
+
+**Note:** Version bump only for package @clerk/clerk-sdk-node
+
+### [3.4.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.4.1...@clerk/clerk-sdk-node@3.4.2) (2022-05-12)
+
+**Note:** Version bump only for package @clerk/clerk-sdk-node
+
+### [3.4.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.4.1-staging.0...@clerk/clerk-sdk-node@3.4.1) (2022-05-11)
+
+**Note:** Version bump only for package @clerk/clerk-sdk-node
+
+## [3.4.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.3.11...@clerk/clerk-sdk-node@3.4.0) (2022-05-06)
+
+### Features
+
+- **nextjs,clerk-sdk-node,remix:** Add claims attribute to req.auth ([c695529](https://github.com/clerkinc/javascript/commit/c695529089f55baef72b86e3b73b8cd9f4f58e6d))
+
 ### [3.3.11](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.3.11-staging.0...@clerk/clerk-sdk-node@3.3.11) (2022-05-05)
 
 **Note:** Version bump only for package @clerk/clerk-sdk-node

@@ -8,6 +8,7 @@ import { SessionWithActivitiesResource } from './session';
 import { OAuthStrategy } from './strategies';
 import { SnakeToCamel } from './utils';
 import { Web3WalletResource } from './web3Wallet';
+import { OrganizationMembershipResource } from './organizationMembership';
 
 declare global {
   /**
@@ -47,6 +48,7 @@ export interface UserResource extends ClerkResource {
   phoneNumbers: PhoneNumberResource[];
   web3Wallets: Web3WalletResource[];
   externalAccounts: ExternalAccountResource[];
+  organizationMemberships: OrganizationMembershipResource[];
   passwordEnabled: boolean;
   publicMetadata: UserPublicMetadata;
   unsafeMetadata: UserUnsafeMetadata;
@@ -57,6 +59,7 @@ export interface UserResource extends ClerkResource {
   update: (params: UpdateUserParams) => Promise<UserResource>;
   createEmailAddress: (params: CreateEmailAddressParams) => Promise<EmailAddressResource>;
   createPhoneNumber: (params: CreatePhoneNumberParams) => Promise<PhoneNumberResource>;
+  createWeb3Wallet: (params: CreateWeb3WalletParams) => Promise<Web3WalletResource>;
   twoFactorEnabled: () => boolean;
   isPrimaryIdentification: (ident: EmailAddressResource | PhoneNumberResource) => boolean;
   getSessions: () => Promise<SessionWithActivitiesResource[]>;
@@ -74,6 +77,7 @@ export interface UserResource extends ClerkResource {
 
 export type CreateEmailAddressParams = { email: string };
 export type CreatePhoneNumberParams = { phoneNumber: string };
+export type CreateWeb3WalletParams = { web3Wallet: string };
 export type SetProfileImageParams = { file: Blob | File };
 
 type UpdateUserJSON = Pick<

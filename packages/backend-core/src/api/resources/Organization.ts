@@ -1,5 +1,7 @@
 import type { OrganizationJSON } from './JSON';
 
+export interface Organization extends OrganizationPayload {}
+
 export class Organization {
   constructor(
     readonly id: string,

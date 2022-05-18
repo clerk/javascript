@@ -9,7 +9,7 @@ import { Wizard } from '@clerk/shared/components/wizard';
 import { VerificationResource } from '@clerk/types';
 import React from 'react';
 import { handleError, useFieldState, verificationErrorMessage } from 'ui/common';
-import { Error } from 'ui/common/error';
+import { Alert } from 'ui/common/alert';
 import { useNavigate } from 'ui/hooks';
 import { PageHeading } from 'ui/userProfile/pageHeading';
 
@@ -195,7 +195,8 @@ export function AddVerifiableField({
         subtitle={stepTitle[state.step]}
         className='cl-themed-card cl-verifiable-field-card'
       >
-        <Error>{error}</Error>
+        <Alert type='error'>{error}</Alert>
+
         <Wizard defaultStep={state.step}>
           {step1EnterValue}
           {step2Verify}

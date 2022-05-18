@@ -46,7 +46,7 @@ export interface JWTPayload {
   [propName: string]: unknown;
 }
 
-type MembershipRole = 'admin' | 'basic_member';
+type MembershipRole = 'admin' | 'basic_member' | 'guest_member';
 
 export interface JWT {
   header: JWTHeader;

@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [1.5.1-staging.2](https://github.com/clerkinc/javascript/compare/@clerk/edge@1.5.0...@clerk/edge@1.5.1-staging.2) (2022-05-18)
+
+**Note:** Version bump only for package @clerk/edge
+
+### [1.5.1-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/edge@1.5.0...@clerk/edge@1.5.1-staging.1) (2022-05-17)
+
+**Note:** Version bump only for package @clerk/edge
+
+### [1.5.1-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/edge@1.5.0...@clerk/edge@1.5.1-staging.0) (2022-05-16)
+
+**Note:** Version bump only for package @clerk/edge
+
+## [1.5.0](https://github.com/clerkinc/javascript/compare/@clerk/edge@1.4.1...@clerk/edge@1.5.0) (2022-05-13)
+
+### Features
+
+- **edge:** Expose organization API methods ([7bc9546](https://github.com/clerkinc/javascript/commit/7bc95464fef9d1e99da942a2a1e6e75c030832f9))
+
+### [1.4.3](https://github.com/clerkinc/javascript/compare/@clerk/edge@1.4.1...@clerk/edge@1.4.3) (2022-05-12)
+
+**Note:** Version bump only for package @clerk/edge
+
+### [1.4.2](https://github.com/clerkinc/javascript/compare/@clerk/edge@1.4.1...@clerk/edge@1.4.2) (2022-05-12)
+
+**Note:** Version bump only for package @clerk/edge
+
+### [1.4.1](https://github.com/clerkinc/javascript/compare/@clerk/edge@1.4.1-staging.0...@clerk/edge@1.4.1) (2022-05-11)
+
+**Note:** Version bump only for package @clerk/edge
+
+## [1.4.0](https://github.com/clerkinc/javascript/compare/@clerk/edge@1.3.8...@clerk/edge@1.4.0) (2022-05-06)
+
+### Features
+
+- **nextjs,clerk-sdk-node,remix:** Add claims attribute to req.auth ([c695529](https://github.com/clerkinc/javascript/commit/c695529089f55baef72b86e3b73b8cd9f4f58e6d))
+
 ### [1.3.8](https://github.com/clerkinc/javascript/compare/@clerk/edge@1.3.8-staging.0...@clerk/edge@1.3.8) (2022-05-05)
 
 **Note:** Version bump only for package @clerk/edge

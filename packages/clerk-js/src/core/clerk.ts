@@ -44,6 +44,7 @@ import {
   validateFrontendApi,
   windowNavigate,
 } from 'utils';
+import { buildURL } from 'utils';
 import { getClerkQueryParam } from 'utils/getClerkQueryParam';
 import { memoizeListenerCallback } from 'utils/memoizeStateListenerCallback';
 
@@ -82,6 +83,7 @@ export default class Clerk implements ClerkInterface {
   public static version: string = packageJSON.version;
   public client?: ClientResource;
   public session?: ActiveSessionResource | null;
+  public organization?: OrganizationResource | null;
   public user?: UserResource | null;
   public frontendApi: string;
 
@@ -281,6 +283,7 @@ export default class Clerk implements ClerkInterface {
     if (beforeEmit) {
       beforeUnloadTracker.startTracking();
       this.session = undefined;
+      this.organization = undefined;
       this.user = undefined;
       this.#emit();
       await beforeEmit(session);
@@ -293,6 +296,9 @@ export default class Clerk implements ClerkInterface {
     }
 
     this.session = session;
+    this.organization = (this.session?.user.organizationMemberships || [])
+      .map(om => om.organization)
+      .find(org => org.id === this.session?.lastActiveOrganizationId);
     this.user = this.session ? this.session.user : null;
 
     this.#emit();
@@ -441,7 +447,10 @@ export default class Clerk implements ClerkInterface {
 
     const navigateToSignUp = makeNavigate(displayConfig.signUpUrl);
 
-    const navigateToFactorTwo = makeNavigate(params.secondFactorUrl || displayConfig.signInUrl + '#/factor-two');
+    const navigateToFactorTwo = makeNavigate(
+      params.secondFactorUrl ||
+        buildURL({ base: displayConfig.signInUrl, hashPath: '/factor-two' }, { stringify: true }),
+    );
 
     const navigateAfterSignIn = makeNavigate(
       params.afterSignInUrl || params.redirectUrl || displayConfig.afterSignInUrl,
@@ -449,6 +458,10 @@ export default class Clerk implements ClerkInterface {
 
     const navigateAfterSignUp = makeNavigate(
       params.afterSignUpUrl || params.redirectUrl || displayConfig.afterSignUpUrl,
+    );
+
+    const navigateToContinueSignUp = makeNavigate(
+      buildURL({ base: displayConfig.signUpUrl, hashPath: '/continue' }, { stringify: true }),
     );
 
     const userExistsButNeedsToSignIn =
@@ -473,6 +486,8 @@ export default class Clerk implements ClerkInterface {
       switch (res.status) {
         case 'complete':
           return this.setSession(res.createdSessionId, navigateAfterSignUp);
+        case 'missing_requirements':
+          return navigateToContinueSignUp();
         default:
           clerkOAuthCallbackDidNotCompleteSignInSIgnUp('sign in');
       }
@@ -500,6 +515,10 @@ export default class Clerk implements ClerkInterface {
       }
     }
 
+    if (su.externalAccountStatus === 'verified' && su.status == 'missing_requirements') {
+      return navigateToContinueSignUp();
+    }
+
     if (hasExternalAccountSignUpError(signUp)) {
       return navigateToSignUp();
     }
@@ -522,10 +541,17 @@ export default class Clerk implements ClerkInterface {
     return this.setSession(null);
   };
 
-  public authenticateWithMetamask = async ({ redirectUrl }: AuthenticateWithMetamaskParams = {}): Promise<void> => {
-    if (!this.client) {
+  public authenticateWithMetamask = async ({
+    redirectUrl,
+    signUpContinueUrl,
+    customNavigate,
+  }: AuthenticateWithMetamaskParams = {}): Promise<void> => {
+    if (!this.client || !this.#environment) {
       return;
     }
+
+    const navigate = (to: string) =>
+      customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
 
     let signInOrSignUp: SignInResource | SignUpResource;
     try {
@@ -533,6 +559,14 @@ export default class Clerk implements ClerkInterface {
     } catch (err) {
       if (isError(err, ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND)) {
         signInOrSignUp = await this.client.signUp.authenticateWithMetamask();
+
+        if (
+          signUpContinueUrl &&
+          signInOrSignUp.status === 'missing_requirements' &&
+          signInOrSignUp.verifications.web3Wallet.status === 'verified'
+        ) {
+          await navigate(signUpContinueUrl);
+        }
       } else {
         throw err;
       }
@@ -541,7 +575,7 @@ export default class Clerk implements ClerkInterface {
     if (signInOrSignUp.createdSessionId) {
       await this.setSession(signInOrSignUp.createdSessionId, () => {
         if (redirectUrl) {
-          return this.navigate(redirectUrl);
+          return navigate(redirectUrl);
         }
         return Promise.resolve();
       });
@@ -569,6 +603,9 @@ export default class Clerk implements ClerkInterface {
         (this.#options.selectInitialSession
           ? this.#options.selectInitialSession(newClient)
           : this.#defaultSession(newClient)) || null;
+      this.organization = (this.session?.user.organizationMemberships || [])
+        .map(om => om.organization)
+        .find(org => org.id === this.session?.lastActiveOrganizationId);
       this.user = this.session ? this.session.user : null;
     }
     this.client = newClient;
@@ -576,6 +613,9 @@ export default class Clerk implements ClerkInterface {
     if (this.session) {
       const lastId = this.session.id;
       this.session = newClient.activeSessions.find(x => x.id === lastId);
+      this.organization = (this.session?.user.organizationMemberships || [])
+        .map(om => om.organization)
+        .find(org => org.id === this.session?.lastActiveOrganizationId);
       this.user = this.session ? this.session.user : null;
     }
 

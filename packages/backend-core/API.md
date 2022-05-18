@@ -17,9 +17,21 @@ Reference of the methods supported in the Clerk Backend API wrapper. [API refere
 - [Invitation operations](#invitation-operations)
   - [getInvitationList()](#getinvitationlist)
   - [createInvitation(params)](#createinvitationparams)
-  - [revokeInvitation(invitationId)](#revokeinvitationinvitationId)
+  - [revokeInvitation(invitationId)](#revokeinvitationinvitationid)
 - [Organization operations](#organization-operations)
+  - [getOrganizationList()](#getorganizationlist)
   - [createOrganization(params)](#createorganizationparams)
+  - [getOrganization(params)](#getorganizationparams)
+  - [updateOrganization(organizationId, params)](#updateorganizationorganizationid-params)
+  - [updateOrganizationMetadata(organizationId, params)](#updateorganizationmetadataorganizationid-params)
+  - [deleteOrganization(organizationId)](#deleteorganizationorganizationid)
+  - [getPendingOrganizationInvitationList(params)](#getpendingorganizationinvitationlistparams)
+  - [createOrganizationInvitation(params)](#createorganizationinvitationparams)
+  - [revokeOrganizationInvitation(params)](#revokeorganizationinvitationparams)
+  - [getOrganizationMembershipList(params)](#getorganizationmembershiplistparams)
+  - [createOrganizationMembership(params)](#createorganizationmembershipparams)
+  - [updateOrganizationMembership(params)](#updateorganizationmembershipparams)
+  - [deleteOrganizationMembership(params)](#deleteorganizationmembershipparams)
 - [Session operations](#session-operations)
   - [getSessionList({ clientId, userId })](#getsessionlist-clientid-userid-)
   - [getSession(sessionId)](#getsessionsessionid)
@@ -149,6 +161,20 @@ const invitation = await clerkAPI.invitations.revokeInvitation('inv_some-id');
 
 Organization operations are exposed by the `organizations` sub-api (`clerkAPI.organizations`).
 
+#### getOrganizationList()
+
+Retrieves a list of organizations for an instance.
+
+The instance is determined by the API key you've provided when configuring the API. You can either set the `CLERK_API_KEY` environment variable, or provide the `apiKey` property explicitly when configuring the API client.
+
+Results can be paginated by providing an optional `limit` and `offset` pair of parameters.
+
+Results will be ordered by descending creation date. Most recent organizations will be first in the list.
+
+```ts
+const organizations = await clerkAPI.organizations.getOrganizationList();
+```
+
 #### createOrganization(params)
 
 Creates a new organization with the given name and optional slug.
@@ -167,6 +193,192 @@ const organization = await clerkAPI.organizations.createOrganization({
   name: 'Acme Inc',
   slug: 'acme-inc',
   createdBy: 'user_1o4q123qMeCkKKIXcA9h8',
+});
+```
+
+#### getOrganization(params)
+
+Fetch an organization whose ID or slug matches the one provided in the parameters.
+
+The method accepts either the organization ID or slug in the parameters, but not both at the same time. See the snippet below for a usage example.
+
+The instance that the organization belongs to is determined by the API key you've provided when configuring the API. You can either set the `CLERK_API_KEY` environment variable, or provide the `apiKey` property explicitly when configuring the API client.
+
+Available parameters:
+
+- _organizationId_ The ID of the organization.
+- _slug_ Alternatively, you can provide the slug of the organization.
+
+```ts
+const organizationBySlug = await clerkAPI.organizations.getOrganization({
+  slug: 'acme-inc',
+});
+
+const organizationById = await clerkAPI.organizations.getOrganization({
+  organizationId: 'org_1o4q123qMeCkKKIXcA9h8',
+});
+```
+
+#### updateOrganization(organizationId, params)
+
+Update the organization specified by `organizationId`.
+
+Available parameters are:
+
+- _name_ The name for the organization.
+
+```js
+const organization = await clerkAPI.organizations.updateOrganization('org_1o4q123qMeCkKKIXcA9h8', {
+  name: 'Acme Inc',
+});
+```
+
+#### updateOrganizationMetadata(organizationId, params)
+
+Update an organization's metadata attributes by merging existing values with the provided parameters.
+
+You can remove metadata keys at any level by setting their value to `null`.
+
+Available parameters are:
+
+- _publicMetadata_ Metadata saved on the organization, that is visible to both your Frontend and Backend APIs.
+- _privateMetadata_ Metadata saved on the organization, that is only visible to your Backend API.
+
+```js
+const organization = await clerkAPI.organizations.updateOrganizationMetadata('org_1o4q123qMeCkKKIXcA9h8', {
+  publicMetadata: { color: 'blue' },
+  privateMetadata: { sandbox_mode: true },
+});
+```
+
+#### deleteOrganization(organizationId)
+
+Delete an organization with the provided `organizationId`. This action cannot be undone.
+
+```js
+await clerkAPI.organizations.deleteOrganization(organizationId);
+```
+
+#### getPendingOrganizationInvitationList(params)
+
+Retrieve a list of pending organization invitations for the organization specified by `organizationId`.
+
+The method supports pagination via optional `limit` and `offset` parameters. The method parameters are:
+
+- _organizationId_ The unique ID of the organization to retrieve the pending invitations for
+- _limit_ Optionally put a limit on the number of results returned
+- _offset_ Optionally skip some results
+
+```ts
+const invitations = await clerkAPI.organizations.getPendingOrganizationInvitationList({
+  organizationId: 'org_1o4q123qMeCkKKIXcA9h8',
+});
+```
+
+#### createOrganizationInvitation(params)
+
+Create an invitation to join an organization and send an email to the email address of the invited member.
+
+You must pass the ID of the user that invites the new member as `inviterUserId`. The inviter user must be an administrator in the organization.
+
+Available parameters:
+
+- _organizationId_ The unique ID of the organization the invitation is about.
+- _emailAddress_ The email address of the member that's going to be invited to join the organization.
+- _role_ The new member's role in the organization.
+- _inviterUserId_ The ID of the organization administrator that invites the new member.
+- _redirectUrl_ An optional URL to redirect to after the invited member clicks the link from the invitation email.
+
+```js
+const invitation = await clerkAPI.organizations.createOrganizationInvitation({
+  organizationId: 'org_1o4q123qMeCkKKIXcA9h8',
+  inviterUserId: 'user_1o4q123qMeCkKKIXcA9h8',
+  emailAddress: 'invited@example.org',
+  role: 'basic_member',
+  redirectUrl: 'https://example.org',
+});
+```
+
+#### revokeOrganizationInvitation(params)
+
+Revoke a pending organization invitation for the organization specified by `organizationId`.
+
+The requesting user must be an administrator in the organization.
+
+The method parameters are:
+
+- _organizationId_ The ID of the organization that the invitation belongs to.
+- _invitationId_ The ID of the pending organization invitation to be revoked.
+- _requestingUserId_ The ID of the user that revokes the invitation. Must be an administrator.
+
+```ts
+const invitation = await clerkAPI.organizations.revokeOrganizationInvitation({
+  organizationId: 'org_1o4q123qMeCkKKIXcA9h8',
+  invitationId: 'orginv_4o4q9883qMeFggTKIXcAArr',
+  requestingUserId: 'user_1o4q123qMeCkKKIXcA9h8',
+});
+```
+
+#### getOrganizationMembershipList(params)
+
+Get a list of memberships for the organization with the provided `organizationId`.
+
+The method supports pagination via optional `limit` and `offset` parameters. The method parameters are:
+
+- _organizationId_ The unique ID of the organization to retrieve the memberships for
+- _limit_ Optionally put a limit on the number of results returned
+- _offset_ Optionally skip some results
+
+```js
+const memberships = await clerkAPI.organizations.getOrganizationMemberships({
+  organizationId: 'org_1o4q123qMeCkKKIXcA9h8',
+});
+```
+
+#### createOrganizationMembership(params)
+
+Create a membership for the organization specified by `organizationId`. Effectively adds a user to an organization.
+
+Available parameters:
+
+- _organizationId_ The ID of the organization to add a member to.
+- _userId_ The ID of the user that will be added to the organization.
+- _role_ The role of the new member in the organization
+
+```js
+const membership = await clerkAPI.organizations.createOrganizationMembership({
+  organizationId: 'org_1o4q123qMeCkKKIXcA9h8',
+  userId: 'user_1o4q123qMeCkKKIXcA9h8',
+  role: 'basic_member',
+});
+```
+
+#### updateOrganizationMembership(params)
+
+Updates the organization membership of the user with `userId` for the organization with `organizationId`.
+
+Available parameters:
+
+- _organizationId_ The ID of the organization that the membership belongs to.
+- _userId_ The ID of the user who's a member of the organization.
+- _role_ The role of the organization member.
+
+```js
+const membership = await clerkAPI.organizations.updateOrganizationMembership({
+  organizationId: 'org_1o4q123qMeCkKKIXcA9h8',
+  userId: 'user_1o4q123qMeCkKKIXcA9h8',
+  role: 'admin',
+});
+```
+
+#### deleteOrganizationMembership(params)
+
+Deletes an organization membership, specified by the `organizationId` and `userId` parameters.
+
+```js
+const membership = await clerkAPI.organizations.deleteOrganizationMembership({
+  organizationId: 'org_1o4q123qMeCkKKIXcA9h8',
+  userId: 'user_1o4q123qMeCkKKIXcA9h8',
 });
 ```
 

@@ -9,7 +9,9 @@ import {
   InvitationJSON,
   ObjectType,
   Organization,
+  OrganizationInvitation,
   OrganizationJSON,
+  OrganizationMembership,
   Session,
   SessionJSON,
   SMSMessage,
@@ -49,6 +51,35 @@ const organizationJSON: OrganizationJSON = {
   object: ObjectType.Organization,
   id: 'org_randomid',
   name: 'Acme Inc',
+  slug: 'acme-inc',
+  logo_url: null,
+  created_at: 1612378465,
+  updated_at: 1612378465,
+  public_metadata: { hello: 'world' },
+};
+
+const organizationInvitationJSON = {
+  object: 'organization_invitation',
+  id: 'orginv_randomid',
+  email_address: 'invitation@example.com',
+  organization_id: 'org_randomid',
+  role: 'basic_member',
+  redirectUrl: null,
+  status: 'pending',
+};
+
+const organizationMembershipJSON = {
+  object: 'organization_membership',
+  id: 'orgmem_randomid',
+  role: 'basic_member',
+  organization: organizationJSON,
+  public_user_data: {
+    first_name: 'John',
+    last_name: 'Doe',
+    profile_image_url: 'https://url-to-image.png',
+    identifier: 'johndoe@example.com',
+    user_id: 'user_randomid',
+  },
   created_at: 1612378465,
   updated_at: 1612378465,
   slug: 'OrgRandomId',
@@ -144,6 +175,48 @@ test('deserializes an array of Organization objects', () => {
   expect(organizations).toBeInstanceOf(Array);
   expect(organizations.length).toBe(1);
   expect(organizations[0]).toBeInstanceOf(Organization);
+});
+
+test('deserializes an OrganizationInvitation object', () => {
+  const organizationInvitation = deserialize(organizationInvitationJSON);
+  expect(organizationInvitation).toBeInstanceOf(OrganizationInvitation);
+});
+
+test('deserializes an array of OrganizationInvitation objects', () => {
+  const organizationInvitations = deserialize([organizationInvitationJSON]);
+  expect(organizationInvitations).toBeInstanceOf(Array);
+  expect(organizationInvitations.length).toBe(1);
+  expect(organizationInvitations[0]).toBeInstanceOf(OrganizationInvitation);
+});
+
+test('deserializes a paginated response of OrganizationInvitation objects', () => {
+  const organizationInvitations = deserialize({
+    data: [organizationInvitationJSON],
+  });
+  expect(organizationInvitations).toBeInstanceOf(Array);
+  expect(organizationInvitations.length).toBe(1);
+  expect(organizationInvitations[0]).toBeInstanceOf(OrganizationInvitation);
+});
+
+test('deserializes an OrganizationMembership object', () => {
+  const organizationMembership = deserialize(organizationMembershipJSON);
+  expect(organizationMembership).toBeInstanceOf(OrganizationMembership);
+});
+
+test('deserializes an array of OrganizationMembership objects', () => {
+  const organizationMemberships = deserialize([organizationMembershipJSON]);
+  expect(organizationMemberships).toBeInstanceOf(Array);
+  expect(organizationMemberships.length).toBe(1);
+  expect(organizationMemberships[0]).toBeInstanceOf(OrganizationMembership);
+});
+
+test('deserializes a paginated response of OrganizationMembership objects', () => {
+  const organizationMemberships = deserialize({
+    data: [organizationMembershipJSON],
+  });
+  expect(organizationMemberships).toBeInstanceOf(Array);
+  expect(organizationMemberships.length).toBe(1);
+  expect(organizationMemberships[0]).toBeInstanceOf(OrganizationMembership);
 });
 
 test('deserializes a Session object', () => {

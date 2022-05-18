@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.2.7-staging.1](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.2.6...@clerk/shared@0.2.7-staging.1) (2022-05-18)
+
+**Note:** Version bump only for package @clerk/shared
+
+### [0.2.7-staging.0](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.2.6...@clerk/shared@0.2.7-staging.0) (2022-05-17)
+
+**Note:** Version bump only for package @clerk/shared
+
+### [0.2.6](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.2.3...@clerk/shared@0.2.6) (2022-05-13)
+
+**Note:** Version bump only for package @clerk/shared
+
+### [0.2.5](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.2.3...@clerk/shared@0.2.5) (2022-05-12)
+
+**Note:** Version bump only for package @clerk/shared
+
+### [0.2.4](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.2.3...@clerk/shared@0.2.4) (2022-05-12)
+
+**Note:** Version bump only for package @clerk/shared
+
+### [0.2.3](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.2.3-staging.0...@clerk/shared@0.2.3) (2022-05-11)
+
+**Note:** Version bump only for package @clerk/shared
+
+### [0.2.2](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.2.1...@clerk/shared@0.2.2) (2022-05-06)
+
+**Note:** Version bump only for package @clerk/shared
+
 ### [0.2.1](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.2.1-staging.0...@clerk/shared@0.2.1) (2022-05-05)
 
 **Note:** Version bump only for package @clerk/shared

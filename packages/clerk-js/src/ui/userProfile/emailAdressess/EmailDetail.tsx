@@ -9,7 +9,7 @@ import { TitledCard } from '@clerk/shared/components/titledCard';
 import { Toggle } from '@clerk/shared/components/toggle';
 import React from 'react';
 import { handleError } from 'ui/common';
-import { Error } from 'ui/common/error';
+import { Alert } from 'ui/common/alert';
 import { useCoreUser, useEnvironment } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
 import { useRouter } from 'ui/router';
@@ -80,7 +80,13 @@ export function EmailDetail(): JSX.Element | null {
       {showRemovalPage && removeEmailAddressScreen}
       {!showRemovalPage && (
         <TitledCard className='cl-themed-card cl-list-card cl-verifiable-field-card'>
-          <Error style={{ margin: '0 2em' }}>{error}</Error>
+          <Alert
+            type='error'
+            style={{ margin: '0 2em' }}
+          >
+            {error}
+          </Alert>
+
           <List>
             <List.Item
               className='cl-list-item'

@@ -3,6 +3,56 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.14.0-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/types@2.13.0...@clerk/types@2.14.0-staging.1) (2022-05-18)
+
+### Features
+
+- **types,clerk-js:** Enhance Web3 wallet resource with relevant operations ([a166716](https://github.com/clerkinc/javascript/commit/a166716db44db8e765e67c154093c9d3c3f24c75))
+- **types:** Include new organization role `guest_member` ([ba7f27b](https://github.com/clerkinc/javascript/commit/ba7f27b42be283f9b7b4126cecc8d93ab9a6f04e))
+
+### Bug Fixes
+
+- **clerk-js:** Navigate to sign up continue in web3 ([460ba1c](https://github.com/clerkinc/javascript/commit/460ba1cc82bbad6197224ca71ad39302564408b4))
+
+## [2.14.0-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.13.0...@clerk/types@2.14.0-staging.0) (2022-05-17)
+
+### Features
+
+- **types:** Include new organization role `guest_member` ([ba7f27b](https://github.com/clerkinc/javascript/commit/ba7f27b42be283f9b7b4126cecc8d93ab9a6f04e))
+
+### Bug Fixes
+
+- **clerk-js:** Navigate to sign up continue in web3 ([460ba1c](https://github.com/clerkinc/javascript/commit/460ba1cc82bbad6197224ca71ad39302564408b4))
+
+## [2.13.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.10.1...@clerk/types@2.13.0) (2022-05-13)
+
+### Features
+
+- **clerk-js:** Add shortcut to active org in Clerk singleton ([03e68d4](https://github.com/clerkinc/javascript/commit/03e68d4667e7abcd006c4a3a2a2fe7f65bfca417))
+- **types:** Introduce Web3 provider types and helpers ([8291d75](https://github.com/clerkinc/javascript/commit/8291d75a7f3172d05f76c0f9aeb08aab98e7d81c))
+
+## [2.12.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.10.1...@clerk/types@2.12.0) (2022-05-12)
+
+### Features
+
+- **types:** Introduce Web3 provider types and helpers ([8291d75](https://github.com/clerkinc/javascript/commit/8291d75a7f3172d05f76c0f9aeb08aab98e7d81c))
+
+## [2.11.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.10.1...@clerk/types@2.11.0) (2022-05-12)
+
+### Features
+
+- **types:** Introduce Web3 provider types and helpers ([8291d75](https://github.com/clerkinc/javascript/commit/8291d75a7f3172d05f76c0f9aeb08aab98e7d81c))
+
+### [2.10.1](https://github.com/clerkinc/javascript/compare/@clerk/types@2.10.1-staging.0...@clerk/types@2.10.1) (2022-05-11)
+
+**Note:** Version bump only for package @clerk/types
+
+## [2.10.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.9.0...@clerk/types@2.10.0) (2022-05-06)
+
+### Features
+
+- **nextjs,clerk-sdk-node,remix:** Add claims attribute to req.auth ([c695529](https://github.com/clerkinc/javascript/commit/c695529089f55baef72b86e3b73b8cd9f4f58e6d))
+
 ## [2.9.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.9.0-staging.0...@clerk/types@2.9.0) (2022-05-05)
 
 **Note:** Version bump only for package @clerk/types

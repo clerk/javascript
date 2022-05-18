@@ -70,4 +70,5 @@ export interface UserSettingsResource extends ClerkResource {
   web3FirstFactors: Web3Strategy[];
   enabledFirstFactorIdentifiers: Attribute[];
   instanceIsPasswordBased: boolean;
+  hasValidAuthFactor: boolean;
 }
