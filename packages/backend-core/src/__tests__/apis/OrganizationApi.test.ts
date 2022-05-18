@@ -79,6 +79,50 @@ test('createOrganization() creates an organization', async () => {
   );
 });
 
+test('getOrganization() fetches an organization', async () => {
+  const id = 'org_randomid';
+  const slug = 'acme-inc';
+  const resJSON = {
+    object: 'organization',
+    id,
+    slug,
+    name: 'Acme Inc',
+    public_metadata: {},
+    private_metadata: {},
+    created_at: 1611948436,
+    updated_at: 1611948436,
+  };
+
+  nock('https://api.clerk.dev').get(`/v1/organizations/${id}`).reply(200, resJSON);
+
+  let organization = await TestBackendAPIClient.organizations.getOrganization({ organizationId: id });
+  expect(organization).toEqual(
+    new Organization({
+      id,
+      name: resJSON.name,
+      slug: resJSON.slug,
+      publicMetadata: resJSON.public_metadata,
+      privateMetadata: resJSON.private_metadata,
+      createdAt: resJSON.created_at,
+      updatedAt: resJSON.updated_at,
+    }),
+  );
+
+  nock('https://api.clerk.dev').get(`/v1/organizations/${slug}`).reply(200, resJSON);
+  organization = await TestBackendAPIClient.organizations.getOrganization({ slug });
+  expect(organization).toEqual(
+    new Organization({
+      id,
+      name: resJSON.name,
+      slug: resJSON.slug,
+      publicMetadata: resJSON.public_metadata,
+      privateMetadata: resJSON.private_metadata,
+      createdAt: resJSON.created_at,
+      updatedAt: resJSON.updated_at,
+    }),
+  );
+});
+
 test('updateOrganization() updates organization', async () => {
   const id = 'org_randomid';
   const name = 'New name';

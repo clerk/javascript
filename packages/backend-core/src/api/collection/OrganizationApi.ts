@@ -25,6 +25,8 @@ type OrganizationMetadataRequestBody = {
   privateMetadata?: string;
 };
 
+type GetOrganizationParams = { organizationId: string } | { slug: string };
+
 type UpdateParams = {
   name?: string;
 };
@@ -91,6 +93,16 @@ export class OrganizationApi extends AbstractApi {
           privateMetadata,
         }),
       },
+    });
+  }
+
+  public async getOrganization(params: GetOrganizationParams) {
+    const organizationIdOrSlug = 'organizationId' in params ? params.organizationId : params.slug;
+    this.requireId(organizationIdOrSlug);
+
+    return this._restClient.makeRequest<Organization>({
+      method: 'GET',
+      path: `${basePath}/${organizationIdOrSlug}`,
     });
   }
 

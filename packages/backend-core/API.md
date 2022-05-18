@@ -21,6 +21,7 @@ Reference of the methods supported in the Clerk Backend API wrapper. [API refere
 - [Organization operations](#organization-operations)
   - [getOrganizationList()](#getorganizationlist)
   - [createOrganization(params)](#createorganizationparams)
+  - [getOrganization(params)](#getorganizationparams)
   - [updateOrganization(organizationId, params)](#updateorganizationorganizationid-params)
   - [updateOrganizationMetadata(organizationId, params)](#updateorganizationmetadataorganizationid-params)
   - [deleteOrganization(organizationId)](#deleteorganizationorganizationid)
@@ -192,6 +193,29 @@ const organization = await clerkAPI.organizations.createOrganization({
   name: 'Acme Inc',
   slug: 'acme-inc',
   createdBy: 'user_1o4q123qMeCkKKIXcA9h8',
+});
+```
+
+#### getOrganization(params)
+
+Fetch an organization whose ID or slug matches the one provided in the parameters.
+
+The method accepts either the organization ID or slug in the parameters, but not both at the same time. See the snippet below for a usage example.
+
+The instance that the organization belongs to is determined by the API key you've provided when configuring the API. You can either set the `CLERK_API_KEY` environment variable, or provide the `apiKey` property explicitly when configuring the API client.
+
+Available parameters:
+
+- _organizationId_ The ID of the organization.
+- _slug_ Alternatively, you can provide the slug of the organization.
+
+```ts
+const organizationBySlug = await clerkAPI.organizations.getOrganization({
+  slug: 'acme-inc',
+});
+
+const organizationById = await clerkAPI.organizations.getOrganization({
+  organizationId: 'org_1o4q123qMeCkKKIXcA9h8',
 });
 ```
 
