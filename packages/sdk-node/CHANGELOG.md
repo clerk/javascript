@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.6.0-staging.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.5.0...@clerk/clerk-sdk-node@3.6.0-staging.2) (2022-05-18)
+
+### Features
+
+- **backend-core:** Retrieve instance organizations ([a24c4d3](https://github.com/clerkinc/javascript/commit/a24c4d3b1459d28cd7f950864d7347a8875d9c9c))
+- **clerk-sdk-node:** Export organization invitation ([07ac214](https://github.com/clerkinc/javascript/commit/07ac214ce8604859b359e073ae19e0d713650c22))
+
 ## [3.6.0-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.5.0...@clerk/clerk-sdk-node@3.6.0-staging.1) (2022-05-17)
 
 ### Features

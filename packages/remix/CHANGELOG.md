@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.4.4...@clerk/remix@0.5.0-staging.0) (2022-05-18)
+
+### Features
+
+- **remix:** Add cross origin anonymous to interstitial ([#246](https://github.com/clerkinc/javascript/issues/246)) ([acd7160](https://github.com/clerkinc/javascript/commit/acd7160a7b209fb65243fecb33b848345876585c))
+
 ### [0.4.5-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.4.4...@clerk/remix@0.4.5-staging.1) (2022-05-17)
 
 **Note:** Version bump only for package @clerk/remix
