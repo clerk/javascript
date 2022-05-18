@@ -4,7 +4,7 @@ import { Input } from '@clerk/shared/components/input';
 import { PhoneInput } from '@clerk/shared/components/phoneInput';
 import React from 'react';
 
-import { ActiveIdentifier, Fields, FormState } from './sign_up_form_helpers';
+import { ActiveIdentifier, Fields, FormState } from './signUpFormHelpers';
 
 type SignUpFormProps = {
   fields: Fields;
@@ -28,9 +28,9 @@ export function SignUpForm({
       submitButtonLabel='Sign up'
     >
       <>
-        {(fields.firstName.enabled || fields.lastName.enabled) && (
+        {(fields.firstName || fields.lastName) && (
           <div className='cl-field-row'>
-            {fields.firstName.enabled && (
+            {fields.firstName && (
               <Control
                 className='cl-half-field'
                 htmlFor='firstName'
@@ -48,7 +48,7 @@ export function SignUpForm({
               </Control>
             )}
 
-            {fields.lastName.enabled && (
+            {fields.lastName && (
               <Control
                 className='cl-half-field'
                 htmlFor='lastName'
@@ -68,7 +68,7 @@ export function SignUpForm({
           </div>
         )}
 
-        {fields.username.enabled && (
+        {fields.username && (
           <Control
             htmlFor='username'
             key='username'
@@ -85,7 +85,7 @@ export function SignUpForm({
           </Control>
         )}
 
-        {fields.emailAddress.enabled && (
+        {fields.emailAddress && (
           <Control
             key='emailAddress'
             htmlFor='emailAddress'
@@ -100,12 +100,12 @@ export function SignUpForm({
               name='emailAddress'
               value={formState.emailAddress.value}
               handleChange={el => formState.emailAddress.setValue(el.value || '')}
-              disabled={fields.emailAddress.showAsDisabled}
+              disabled={fields.emailAddress.disabled}
             />
           </Control>
         )}
 
-        {fields.phoneNumber.enabled && (
+        {fields.phoneNumber && (
           <Control
             key='phoneNumber'
             htmlFor='phoneNumber'
@@ -122,7 +122,7 @@ export function SignUpForm({
           </Control>
         )}
 
-        {fields.password.enabled && (
+        {fields.password && (
           <Control
             key='password'
             htmlFor='password'
