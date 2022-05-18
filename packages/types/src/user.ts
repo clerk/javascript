@@ -59,6 +59,7 @@ export interface UserResource extends ClerkResource {
   update: (params: UpdateUserParams) => Promise<UserResource>;
   createEmailAddress: (params: CreateEmailAddressParams) => Promise<EmailAddressResource>;
   createPhoneNumber: (params: CreatePhoneNumberParams) => Promise<PhoneNumberResource>;
+  createWeb3Wallet: (params: CreateWeb3WalletParams) => Promise<Web3WalletResource>;
   twoFactorEnabled: () => boolean;
   isPrimaryIdentification: (ident: EmailAddressResource | PhoneNumberResource) => boolean;
   getSessions: () => Promise<SessionWithActivitiesResource[]>;
@@ -76,6 +77,7 @@ export interface UserResource extends ClerkResource {
 
 export type CreateEmailAddressParams = { email: string };
 export type CreatePhoneNumberParams = { phoneNumber: string };
+export type CreateWeb3WalletParams = { web3Wallet: string };
 export type SetProfileImageParams = { file: Blob | File };
 
 type UpdateUserJSON = Pick<

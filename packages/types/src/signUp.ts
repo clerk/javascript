@@ -26,7 +26,7 @@ import {
 } from './strategies';
 import type { SnakeToCamel } from './utils';
 import { CreateMagicLinkFlowReturn, StartMagicLinkFlowParams, VerificationResource } from './verification';
-import { AuthenticateWithWeb3Params, GenerateSignature } from './web3Wallet';
+import { AttemptWeb3WalletVerificationParams, AuthenticateWithWeb3Params } from './web3Wallet';
 
 export interface SignUpResource extends ClerkResource {
   status: SignUpStatus | null;
@@ -109,10 +109,6 @@ export type AttemptVerificationParams =
       strategy: Web3Strategy;
       signature: string;
     };
-
-export type AttemptWeb3WalletVerificationParams = {
-  generateSignature: GenerateSignature;
-};
 
 export type SignUpAttributeField =
   | FirstNameAttribute
