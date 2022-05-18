@@ -1,32 +1,26 @@
-import camelcaseKeys from 'camelcase-keys';
-
-import filterKeys from '../utils/Filter';
+import { OrganizationInvitationStatus, OrganizationMembershipRole } from './Enums';
 import type { OrganizationInvitationJSON } from './JSON';
-import type { OrganizationInvitationProps } from './Props';
-
-export interface OrganizationInvitation extends OrganizationInvitationProps {}
 
 export class OrganizationInvitation {
-  static attributes = [
-    'id',
-    'emailAddress',
-    'organizationId',
-    'role',
-    'redirectUrl',
-    'status',
-    'createdAt',
-    'updatedAt',
-  ];
+  constructor(
+    readonly id: string,
+    readonly emailAddress: string,
+    readonly role: OrganizationMembershipRole,
+    readonly organizationId: string,
+    readonly createdAt: number,
+    readonly updatedAt: number,
+    readonly status?: OrganizationInvitationStatus, // readonly redirectUrl?: string | null, Sync with Backend schema
+  ) {}
 
-  static defaults = [];
-
-  constructor(data: OrganizationInvitationProps) {
-    Object.assign(this, OrganizationInvitation.defaults, data);
-  }
-
-  static fromJSON(data: OrganizationInvitationJSON): OrganizationInvitation {
-    const camelcased = camelcaseKeys(data);
-    const filtered = filterKeys(camelcased, OrganizationInvitation.attributes);
-    return new OrganizationInvitation(filtered as OrganizationInvitationProps);
+  static fromJSON(data: OrganizationInvitationJSON) {
+    return new OrganizationInvitation(
+      data.id,
+      data.email_address,
+      data.role,
+      data.organization_id,
+      data.created_at,
+      data.updated_at,
+      data.status,
+    );
   }
 }

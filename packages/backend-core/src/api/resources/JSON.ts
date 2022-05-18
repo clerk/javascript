@@ -126,6 +126,8 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   role: OrganizationMembershipRole;
   redirect_url: string | null;
   status: OrganizationInvitationStatus;
+  created_at: number;
+  updated_at: number;
 }
 
 export interface OrganizationMembershipJSON extends ClerkResourceJSON {
