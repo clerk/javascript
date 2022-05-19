@@ -1,8 +1,8 @@
 import { deepSnakeToCamel } from '@clerk/shared/utils';
 import type { PublicUserData, SessionJSON, SessionResource, SessionStatus } from '@clerk/types';
 import { GetToken, GetTokenOptions, UserResource } from '@clerk/types/src';
-import { unixEpochToDate } from 'utils/date';
 
+import { unixEpochToDate } from '../../utils/date';
 import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, Token, User } from './internal';
 

@@ -1,5 +1,6 @@
 import { DisplayThemeJSON } from '@clerk/types';
-import { getButtonCustomCss, getFontCustomCss, getGenericCustomCss, getPrimaryColorVariations } from 'utils/customCss';
+
+import { getButtonCustomCss, getFontCustomCss, getGenericCustomCss, getPrimaryColorVariations } from '../customCss';
 
 export function injectCSSProperties(theme: DisplayThemeJSON): void {
   const customCssStyles = [getPrimaryColorVariations, getFontCustomCss, getButtonCustomCss, getGenericCustomCss]

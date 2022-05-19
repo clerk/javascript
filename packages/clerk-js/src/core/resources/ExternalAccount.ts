@@ -1,8 +1,8 @@
 import { titleize } from '@clerk/shared/utils/string';
 import type { ExternalAccountJSON, ExternalAccountResource, OAuthProvider, VerificationResource } from '@clerk/types';
-import { Verification } from 'core/resources/Verification';
 
 import { BaseResource } from './Base';
+import { Verification } from './Verification';
 
 export class ExternalAccount extends BaseResource implements ExternalAccountResource {
   id!: string;

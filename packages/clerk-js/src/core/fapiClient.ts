@@ -1,8 +1,8 @@
 import { camelToSnake } from '@clerk/shared/utils';
 import type { Clerk, ClerkAPIErrorJSON, ClientJSON } from '@clerk/types';
 import qs from 'qs';
-import { buildEmailAddress as buildEmailAddressUtil, buildURL as buildUrlUtil } from 'utils';
 
+import { buildEmailAddress as buildEmailAddressUtil, buildURL as buildUrlUtil } from '../utils';
 import { clerkNetworkError } from './errors';
 
 export type HTTPMethod = 'CONNECT' | 'DELETE' | 'GET' | 'HEAD' | 'OPTIONS' | 'PATCH' | 'POST' | 'PUT' | 'TRACE';

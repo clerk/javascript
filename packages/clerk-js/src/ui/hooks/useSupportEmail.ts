@@ -1,6 +1,7 @@
 import React from 'react';
-import { useCoreClerk } from 'ui/contexts';
-import { buildEmailAddress } from 'utils';
+
+import { buildEmailAddress } from '../../utils';
+import { useCoreClerk } from '../contexts';
 
 export function useSupportEmail(): string {
   const Clerk = useCoreClerk();

@@ -1,7 +1,7 @@
 import { addYears } from '@clerk/shared/utils/date';
 import type { ClientResource } from '@clerk/types';
-import { buildURL, getAllETLDs } from 'utils';
 
+import { buildURL, getAllETLDs } from '../url';
 import { clientCookie } from './client';
 import { clientUatCookie } from './client_uat';
 import { inittedCookie } from './initted';

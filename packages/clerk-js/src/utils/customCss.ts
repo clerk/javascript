@@ -1,6 +1,7 @@
 import { colorToSameTypeString, hexStringToRgbaColor, stringToHslaColor } from '@clerk/shared/utils/color';
 import { DisplayThemeJSON } from '@clerk/types';
-import { clerkErrorInvalidColor } from 'core/errors';
+
+import { clerkErrorInvalidColor } from '../core/errors';
 
 // TODO: figure out how to make this testable
 

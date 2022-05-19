@@ -1,9 +1,10 @@
-import { clerkErrorPathRouterMissingPath } from 'core/errors';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { ComponentContext } from 'ui/contexts';
-import { HashRouter, PathRouter } from 'ui/router';
-import type { AvailableComponentCtx } from 'ui/types';
+
+import { clerkErrorPathRouterMissingPath } from '../../core/errors';
+import { ComponentContext } from '../contexts';
+import { HashRouter, PathRouter } from '../router';
+import type { AvailableComponentCtx } from '../types';
 
 type PortalProps<CtxType extends AvailableComponentCtx, PropsType = Omit<CtxType, 'componentName'>> = {
   node: HTMLDivElement;

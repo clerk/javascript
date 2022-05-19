@@ -1,7 +1,7 @@
 import React from 'react';
-import { useCoreClerk } from 'ui/contexts';
-import { stripOrigin, trimTrailingSlash } from 'utils';
 
+import { stripOrigin, trimTrailingSlash } from '../../utils';
+import { useCoreClerk } from '../contexts';
 import { BaseRouter } from './BaseRouter';
 
 interface PathRouterProps {

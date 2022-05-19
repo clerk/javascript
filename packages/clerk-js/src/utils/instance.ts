@@ -1,4 +1,4 @@
-import { isDevOrStagingUrl } from 'utils';
+import { isDevOrStagingUrl } from './url';
 
 const FRONTEND_API_DEV_OR_STG_REGEX = /^clerk\.\w+\.[\w-]+\.(\w+.){1,2}(dev|com)$/i;
 

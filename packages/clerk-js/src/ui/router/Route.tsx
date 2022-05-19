@@ -1,6 +1,6 @@
 import React from 'react';
-import { trimTrailingSlash } from 'utils';
 
+import { trimTrailingSlash } from '../../utils';
 import { newPaths } from './newPaths';
 import { match } from './pathToRegexp';
 import { RouteContext, useRouter } from './RouteContext';

@@ -4,8 +4,8 @@ import {
   OrganizationMembershipResource,
   PublicUserData,
 } from '@clerk/types';
-import { unixEpochToDate } from 'utils/date';
 
+import { unixEpochToDate } from '../../utils/date';
 import { BaseResource, Organization } from './internal';
 
 export class OrganizationMembership extends BaseResource implements OrganizationMembershipResource {

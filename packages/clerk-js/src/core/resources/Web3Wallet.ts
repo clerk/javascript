@@ -5,8 +5,8 @@ import type {
   Web3WalletJSON,
   Web3WalletResource,
 } from '@clerk/types';
-import { clerkMissingOptionError, clerkVerifyWeb3WalletCalledBeforeCreate } from 'core/errors';
 
+import { clerkMissingOptionError, clerkVerifyWeb3WalletCalledBeforeCreate } from '../../core/errors';
 import { BaseResource, Verification } from './internal';
 
 export class Web3Wallet extends BaseResource implements Web3WalletResource {

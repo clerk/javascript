@@ -19,14 +19,14 @@ import type {
   SignUpUpdateParams,
   StartMagicLinkFlowParams,
 } from '@clerk/types';
+
+import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from '../../utils';
+import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import {
   clerkMissingOptionError,
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
-} from 'core/errors';
-import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from 'utils';
-import { normalizeUnsafeMetadata } from 'utils/resourceParams';
-
+} from '../errors';
 import { BaseResource, SignUpVerifications } from './internal';
 
 declare global {

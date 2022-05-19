@@ -1,7 +1,8 @@
 import { SessionResource } from '@clerk/types';
-import { clerkCoreErrorSessionIsNotDefined } from 'core/errors';
 import React from 'react';
-import { assertContextExists } from 'ui/contexts/utils';
+
+import { clerkCoreErrorSessionIsNotDefined } from '../../core/errors';
+import { assertContextExists } from './utils';
 
 type CoreSessionContextValue = { value: SessionResource | null | undefined };
 export const CoreSessionContext = React.createContext<CoreSessionContextValue | undefined>(undefined);

@@ -1,6 +1,7 @@
 import { EnvironmentResource } from '@clerk/types';
 import * as React from 'react';
-import { assertContextExists } from 'ui/contexts/utils';
+
+import { assertContextExists } from './utils';
 
 const EnvironmentContext = React.createContext<EnvironmentResource | null>(null);
 

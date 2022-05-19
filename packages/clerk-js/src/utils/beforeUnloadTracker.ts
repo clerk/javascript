@@ -1,4 +1,4 @@
-import { CLERK_BEFORE_UNLOAD_EVENT } from 'utils/windowNavigate';
+import { CLERK_BEFORE_UNLOAD_EVENT } from './windowNavigate';
 
 /**
  * Tracks beforeUnload events.

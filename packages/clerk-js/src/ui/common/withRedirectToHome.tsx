@@ -1,7 +1,8 @@
 import { SignInProps, SignUpProps } from '@clerk/types';
 import React from 'react';
-import { useCoreSession, useEnvironment } from 'ui/contexts';
-import { useNavigate } from 'ui/hooks';
+
+import { useCoreSession, useEnvironment } from '../contexts';
+import { useNavigate } from '../hooks';
 
 export function withRedirectToHome<P extends SignInProps | SignUpProps | { continueExisting?: boolean }>(
   Component: React.ComponentType<P>,

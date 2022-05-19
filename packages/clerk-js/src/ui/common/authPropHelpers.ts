@@ -2,7 +2,8 @@ import { camelToSnake } from '@clerk/shared/utils';
 import type { DisplayConfigResource } from '@clerk/types';
 import type { ParsedQs } from 'qs';
 import qs from 'qs';
-import type { SignInCtx, SignUpCtx } from 'ui/types';
+
+import type { SignInCtx, SignUpCtx } from '../types';
 
 type ParseAuthPropArgs =
   | {

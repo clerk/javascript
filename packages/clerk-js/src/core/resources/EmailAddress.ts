@@ -9,8 +9,8 @@ import type {
   StartMagicLinkFlowParams,
   VerificationResource,
 } from '@clerk/types';
-import { clerkVerifyEmailAddressCalledBeforeCreate } from 'core/errors';
 
+import { clerkVerifyEmailAddressCalledBeforeCreate } from '../errors';
 import { BaseResource, IdentificationLink, Verification } from './internal';
 
 export class EmailAddress extends BaseResource implements EmailAddressResource {

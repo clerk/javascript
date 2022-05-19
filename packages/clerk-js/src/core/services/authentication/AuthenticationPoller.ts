@@ -1,4 +1,4 @@
-import { SafeLock } from 'utils';
+import { SafeLock } from '../../../utils';
 
 const REFRESH_SESSION_TOKEN_LOCK_KEY = 'clerk.lock.refreshSessionToken';
 const INTERVAL_IN_MS = 5 * 1000;

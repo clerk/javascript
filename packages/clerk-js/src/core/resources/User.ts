@@ -15,9 +15,9 @@ import type {
   UserResource,
   Web3WalletResource,
 } from '@clerk/types';
-import { unixEpochToDate } from 'utils/date';
-import { normalizeUnsafeMetadata } from 'utils/resourceParams';
 
+import { unixEpochToDate } from '../../utils/date';
+import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import {
   BaseResource,
   EmailAddress,

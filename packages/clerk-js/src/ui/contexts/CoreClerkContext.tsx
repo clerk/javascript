@@ -1,6 +1,7 @@
 import type { LoadedClerk } from '@clerk/types';
 import React from 'react';
-import { assertContextExists } from 'ui/contexts/utils';
+
+import { assertContextExists } from './utils';
 
 export type CoreClerkProps = LoadedClerk;
 

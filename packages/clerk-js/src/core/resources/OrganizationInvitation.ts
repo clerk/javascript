@@ -4,8 +4,8 @@ import {
   OrganizationInvitationResource,
   OrganizationInvitationStatus,
 } from '@clerk/types';
-import { unixEpochToDate } from 'utils/date';
 
+import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';
 
 export class OrganizationInvitation extends BaseResource implements OrganizationInvitationResource {
