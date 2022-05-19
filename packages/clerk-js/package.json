@@ -34,7 +34,9 @@
     "postpublish": "node ./scripts/purge-cache.mjs",
     "start": "echo \"Noop\"",
     "test": "jest",
-    "test:coverage": "jest --collectCoverage"
+    "test:coverage": "jest --collectCoverage",
+    "build:v4": "webpack --config webpack.dev.v4.js",
+    "dev:v4": "webpack serve --config webpack.dev.v4.js"
   },
   "dependencies": {
     "@clerk/types": "^2.14.0-staging.1",
