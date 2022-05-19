@@ -148,7 +148,6 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   email_address: string;
   organization_id: string;
   role: OrganizationMembershipRole;
-  redirect_url: string | null;
   status: OrganizationInvitationStatus;
 }
 
