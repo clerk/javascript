@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.12.0-staging.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.12.0-staging.2...@clerk/clerk-js@3.12.0-staging.3) (2022-05-19)
+
+### Bug Fixes
+
+- **clerk-js:** Fix password field display logic, fix margin between oauth & web3 providers ([fe601a4](https://github.com/clerkinc/javascript/commit/fe601a495f4bead1dc7dd8b37bdb8aa45566d143))
+
 ## [3.12.0-staging.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.11.0...@clerk/clerk-js@3.12.0-staging.2) (2022-05-18)
 
 ### Features

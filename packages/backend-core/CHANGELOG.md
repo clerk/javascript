@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.9.0-staging.3](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.9.0-staging.2...@clerk/backend-core@1.9.0-staging.3) (2022-05-19)
+
+### Features
+
+- **backend-core:** Get organization by ID or slug ([354720a](https://github.com/clerkinc/javascript/commit/354720aa5f3bc6a12a84ee0b0b1e296951d3fc9c))
+
 ## [1.9.0-staging.2](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.8.0...@clerk/backend-core@1.9.0-staging.2) (2022-05-18)
 
 ### Features
