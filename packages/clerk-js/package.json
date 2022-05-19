@@ -24,12 +24,11 @@
     "access": "public"
   },
   "scripts": {
-    "build": "npm run build:bundle && npm run build:declarations",
+    "build": "npm run build:bundle && npm run build:declarations && npm run bundlewatch",
     "build:stats": "npm run build --json > stats.json",
     "bundlewatch": "bundlewatch",
     "build:bundle": "webpack --config webpack.prod.js",
     "build:declarations": "tsc -p tsconfig.declarations.json",
-    "check-types": "tsc",
     "dev": "webpack-dev-server --config webpack.dev.js",
     "prepublishOnly": "npm run build",
     "postpublish": "node ./scripts/purge-cache.mjs",
@@ -112,11 +111,11 @@
     "files": [
       {
         "path": "./dist/clerk.js",
-        "maxSize": "148kB"
+        "maxSize": "162kB"
       },
       {
         "path": "./dist/clerk.headless.js",
-        "maxSize": "40kB"
+        "maxSize": "50kB"
       }
     ]
   },
