@@ -1,11 +1,11 @@
 import React from 'react';
-import { buildAuthQueryString, parseAuthProp } from 'ui/common';
-import { useEnvironment } from 'ui/contexts';
-import { useNavigate } from 'ui/hooks';
-import type { ParsedQs } from 'ui/router';
-import { useRouter } from 'ui/router';
-import { buildURL } from 'utils/url';
 
+import { buildURL } from '../../utils/url';
+import { buildAuthQueryString, parseAuthProp } from '../common/authPropHelpers';
+import { useEnvironment } from '../contexts';
+import { useNavigate } from '../hooks';
+import type { ParsedQs } from '../router';
+import { useRouter } from '../router';
 import type {
   AvailableComponentCtx,
   SignInCtx,

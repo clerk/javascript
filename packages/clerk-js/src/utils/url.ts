@@ -1,8 +1,9 @@
 import { camelToSnake, isIPV4Address } from '@clerk/shared/utils/string';
-import { loadScript } from 'utils';
 import { SignUpResource } from '@clerk/types';
-import { getQueryParams } from './querystring';
+
+import { loadScript } from '../utils';
 import { joinPaths } from './path';
+import { getQueryParams } from './querystring';
 
 declare global {
   export interface Window {

@@ -1,7 +1,8 @@
 import { UserResource } from '@clerk/types';
-import { clerkCoreErrorUserIsNotDefined } from 'core/errors';
 import * as React from 'react';
-import { assertContextExists } from 'ui/contexts/utils';
+
+import { clerkCoreErrorUserIsNotDefined } from '../../core/errors';
+import { assertContextExists } from './utils';
 
 type CoreUserContextValue = { value: UserResource | undefined | null };
 export const CoreUserContext = React.createContext<CoreUserContextValue | undefined>(undefined);

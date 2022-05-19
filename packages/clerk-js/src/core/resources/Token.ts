@@ -1,6 +1,6 @@
 import type { JWT, TokenJSON, TokenResource } from '@clerk/types';
-import { decode } from 'utils';
 
+import { decode } from '../../utils';
 import { BaseResource } from './internal';
 
 export class Token extends BaseResource implements TokenResource {

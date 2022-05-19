@@ -1,6 +1,6 @@
 import React from 'react';
-import { stripOrigin } from 'utils';
 
+import { stripOrigin } from '../../utils';
 import { BaseRouter } from './BaseRouter';
 
 export const hashRouterBase = 'CLERK-ROUTER/HASH';

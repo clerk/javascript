@@ -1,5 +1,6 @@
 import { DeepPartial, DisplayThemeJSON } from '@clerk/types';
-import { fontLoader } from 'utils/customFont';
+
+import { fontLoader } from '../customFont';
 
 /**
  * In the case the client has overridden any fonts using CSS variables,

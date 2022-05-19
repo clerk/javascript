@@ -1,6 +1,7 @@
 import React from 'react';
-import { useCoreClerk } from 'ui/contexts';
-import { RouteContext } from 'ui/router';
+
+import { useCoreClerk } from '../contexts';
+import { RouteContext } from '../router';
 
 export function useNavigate(): { navigate: any } {
   const Clerk = useCoreClerk();

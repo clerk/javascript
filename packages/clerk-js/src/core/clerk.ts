@@ -28,12 +28,15 @@ import type {
   UserResource,
 } from '@clerk/types';
 import { SignOutOptions } from '@clerk/types/src';
-import { AuthenticationService } from 'core/services';
-import { ERROR_CODES } from 'ui/common/constants';
+
+import packageJSON from '../../package.json';
+import type Components from '../ui';
 import {
   appendAsQueryParams,
+  buildURL,
   createBeforeUnloadTracker,
   createPageLifecycle,
+  getClerkQueryParam,
   hasExternalAccountSignUpError,
   ignoreEventValue,
   isAccountsHostedPages,
@@ -43,13 +46,9 @@ import {
   stripOrigin,
   validateFrontendApi,
   windowNavigate,
-} from 'utils';
-import { buildURL } from 'utils';
-import { getClerkQueryParam } from 'utils/getClerkQueryParam';
-import { memoizeListenerCallback } from 'utils/memoizeStateListenerCallback';
-
-import packageJSON from '../../package.json';
-import type Components from '../ui';
+} from '../utils';
+import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
+import { ERROR_CODES } from './constants';
 import createDevBrowserHandler, { DevBrowserHandler } from './devBrowserHandler';
 import {
   clerkErrorInitFailed,
@@ -67,6 +66,7 @@ import {
   Organization,
   OrganizationMembership,
 } from './resources/internal';
+import { AuthenticationService } from './services';
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 

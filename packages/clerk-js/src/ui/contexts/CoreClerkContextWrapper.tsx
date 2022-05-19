@@ -1,11 +1,11 @@
 import type { Clerk, LoadedClerk, Resources } from '@clerk/types';
 import React from 'react';
-import { CoreClientContext } from 'ui/contexts/CoreClientContext';
-import { CoreSessionContext } from 'ui/contexts/CoreSessionContext';
-import { CoreUserContext } from 'ui/contexts/CoreUserContext';
-import { assertClerkSingletonExists } from 'ui/contexts/utils';
 
 import { CoreClerkContext } from './CoreClerkContext';
+import { CoreClientContext } from './CoreClientContext';
+import { CoreSessionContext } from './CoreSessionContext';
+import { CoreUserContext } from './CoreUserContext';
+import { assertClerkSingletonExists } from './utils';
 
 type CoreClerkContextWrapperProps = {
   clerk: Clerk;

@@ -8,8 +8,8 @@ import type {
   VerificationResource,
   VerificationStatus,
 } from '@clerk/types';
-import { unixEpochToDate } from 'utils/date';
 
+import { unixEpochToDate } from '../../utils/date';
 import { BaseResource, parseError } from './internal';
 
 export class Verification extends BaseResource implements VerificationResource {

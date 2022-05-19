@@ -23,16 +23,16 @@ import type {
   Web3SignatureConfig,
   Web3SignatureFactor,
 } from '@clerk/types';
+import { AuthenticateWithWeb3Params } from '@clerk/types/src';
+
+import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from '../../utils';
 import {
   clerkInvalidStrategy,
   clerkMissingOptionError,
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
-} from 'core/errors';
-import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from 'utils';
-
+} from '../errors';
 import { BaseResource, Verification } from './internal';
-import { AuthenticateWithWeb3Params } from '@clerk/types/src';
 
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';

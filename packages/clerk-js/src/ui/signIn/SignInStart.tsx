@@ -16,6 +16,7 @@ import {
   useFieldState,
   withRedirectToHome,
 } from 'ui/common';
+import { Alert } from 'ui/common/alert';
 import { Body, Header } from 'ui/common/authForms';
 import { ERROR_CODES } from 'ui/common/constants';
 import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from 'ui/contexts';
@@ -25,7 +26,6 @@ import { getClerkQueryParam } from 'utils/getClerkQueryParam';
 
 import { SignUpLink } from './SignUpLink';
 import { OAuth, Web3 } from './strategies';
-import { Alert } from 'ui/common/alert';
 
 export function _SignInStart(): JSX.Element {
   const { userSettings } = useEnvironment();
@@ -171,7 +171,6 @@ export function _SignInStart(): JSX.Element {
   return (
     <>
       <Header alert={error && <Alert type='error'>{error}</Alert>} />
-
       <Body>
         <OAuth
           oauthOptions={socialProviderStrategies}

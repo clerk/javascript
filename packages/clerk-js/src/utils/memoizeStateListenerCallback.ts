@@ -1,5 +1,6 @@
 import { ClientResource, ListenerCallback, Resources, SessionResource, UserResource } from '@clerk/types';
-import { Client, Session, User } from 'core/resources/internal';
+
+import { Client, Session, User } from '../core/resources/internal';
 
 type AcceptedResource = UserResource | ClientResource | SessionResource;
 

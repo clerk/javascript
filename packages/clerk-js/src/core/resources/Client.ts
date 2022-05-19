@@ -1,6 +1,6 @@
 import type { ActiveSessionResource, ClientJSON, ClientResource, SignInResource, SignUpResource } from '@clerk/types';
-import { unixEpochToDate } from 'utils/date';
 
+import { unixEpochToDate } from '../../utils/date';
 import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, Session, SignIn, SignUp } from './internal';
 

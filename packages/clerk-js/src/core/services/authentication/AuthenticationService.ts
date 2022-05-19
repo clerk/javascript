@@ -1,7 +1,7 @@
 import { Clerk, EnvironmentResource, SessionResource, TokenResource } from '@clerk/types';
-import { clerkCoreErrorTokenRefreshFailed } from 'core/errors';
-import { CookieHandler, createCookieHandler, runWithExponentialBackOff } from 'utils';
 
+import { CookieHandler, createCookieHandler, runWithExponentialBackOff } from '../../../utils';
+import { clerkCoreErrorTokenRefreshFailed } from '../../errors';
 import { AuthenticationPoller } from './AuthenticationPoller';
 
 type InitParams = {

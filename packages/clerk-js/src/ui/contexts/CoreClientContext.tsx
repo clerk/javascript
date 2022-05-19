@@ -1,6 +1,7 @@
 import { ClientResource, SessionResource, SignInResource, SignUpResource } from '@clerk/types';
 import React from 'react';
-import { assertContextExists } from 'ui/contexts/utils';
+
+import { assertContextExists } from './utils';
 
 type CoreClientContextValue = { value: ClientResource };
 export const CoreClientContext = React.createContext<CoreClientContextValue | undefined>(undefined);

@@ -2,20 +2,12 @@ import { Label } from '@clerk/shared/components/label';
 import { OneTimeCodeInput, VerifyCodeHandler } from '@clerk/shared/components/oneTimeCodeInput';
 import { PhoneCodeFactor, SignInResource } from '@clerk/types';
 import React from 'react';
-import {
-  Body,
-  getGlobalError,
-  handleError,
-  Header,
-  isVerificationExpiredError,
-  useFieldState,
-  VerificationErrorMessage,
-  withRedirectToHome,
-} from 'ui/common';
+import { Body, getGlobalError, handleError, Header, useFieldState, withRedirectToHome } from 'ui/common';
+import { Alert } from 'ui/common/alert';
+import { isVerificationExpiredError, VerificationErrorMessage } from 'ui/common/verification';
 import { useCoreClerk, useCoreSignIn, useSignInContext } from 'ui/contexts';
 
 import { determineSalutation } from './utils';
-import { Alert } from 'ui/common/alert';
 
 type SignInUiProps = Pick<SignInResource, 'userData' | 'identifier' | 'supportedSecondFactors' | 'status'>;
 

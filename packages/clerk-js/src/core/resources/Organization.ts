@@ -6,11 +6,11 @@ import type {
   OrganizationJSON,
   OrganizationMembershipJSON,
   OrganizationResource,
-  UpdateOrganizationParams,
   SetOrganizationLogoParams,
+  UpdateOrganizationParams,
 } from '@clerk/types';
-import { unixEpochToDate } from 'utils/date';
 
+import { unixEpochToDate } from '../../utils/date';
 import { BaseResource, OrganizationInvitation, OrganizationMembership } from './internal';
 
 export class Organization extends BaseResource implements OrganizationResource {

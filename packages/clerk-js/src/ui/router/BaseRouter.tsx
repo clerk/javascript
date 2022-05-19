@@ -1,9 +1,9 @@
 import qs from 'qs';
 import React from 'react';
-import { useCoreClerk } from 'ui/contexts';
-import { useWindowEventListener } from 'ui/hooks';
-import { getQueryParams, trimTrailingSlash } from 'utils';
 
+import { getQueryParams, trimTrailingSlash } from '../../utils';
+import { useCoreClerk } from '../contexts';
+import { useWindowEventListener } from '../hooks';
 import { newPaths } from './newPaths';
 import { match } from './pathToRegexp';
 import { Route } from './Route';

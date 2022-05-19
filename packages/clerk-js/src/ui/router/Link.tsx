@@ -1,6 +1,6 @@
 import React from 'react';
-import { Icon } from 'ui/common/icon';
 
+import { Icon } from '../common/icon';
 import { useRouter } from './RouteContext';
 
 export type LinkProps = React.PropsWithChildren<{
