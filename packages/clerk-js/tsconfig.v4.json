@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.stable.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "@emotion/react"
+  },
+  "exclude": ["node_modules"],
+  "include": ["src/**/*"]
+}
