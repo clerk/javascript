@@ -7,16 +7,7 @@ import type { OrganizationInvitationProps } from './Props';
 export interface OrganizationInvitation extends OrganizationInvitationProps {}
 
 export class OrganizationInvitation {
-  static attributes = [
-    'id',
-    'emailAddress',
-    'organizationId',
-    'role',
-    'redirectUrl',
-    'status',
-    'createdAt',
-    'updatedAt',
-  ];
+  static attributes = ['id', 'emailAddress', 'organizationId', 'role', 'status', 'createdAt', 'updatedAt'];
 
   static defaults = [];
 

@@ -89,7 +89,6 @@ export interface OrganizationInvitationProps extends ClerkProps {
   organizationId: string;
   status: OrganizationInvitationStatus;
   role: OrganizationMembershipRole;
-  redirectUrl: Nullable<string>;
   createdAt: number;
   updatedAt: number;
 }
