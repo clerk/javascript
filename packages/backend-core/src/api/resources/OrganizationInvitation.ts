@@ -9,7 +9,7 @@ export class OrganizationInvitation {
     readonly organizationId: string,
     readonly createdAt: number,
     readonly updatedAt: number,
-    readonly status?: OrganizationInvitationStatus, // readonly redirectUrl?: string | null, Sync with Backend schema
+    readonly status?: OrganizationInvitationStatus,
   ) {}
 
   static fromJSON(data: OrganizationInvitationJSON) {
