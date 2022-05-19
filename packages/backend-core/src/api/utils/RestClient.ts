@@ -1,3 +1,4 @@
+import type FormData from 'form-data';
 import * as querystring from 'query-string';
 import snakecaseKeys from 'snakecase-keys';
 
@@ -13,8 +14,10 @@ const API_CONTENT_TYPE = 'application/x-www-form-urlencoded';
 type RequestOptions = {
   method: 'GET' | 'POST' | 'PATCH' | 'DELETE' | 'PUT';
   path: string;
+  contentType?: string;
   queryParams?: object;
   bodyParams?: object;
+  formData?: FormData;
 };
 
 /*
@@ -28,7 +31,7 @@ export type ClerkFetcher = (
     authorization: string;
     contentType: string;
     userAgent: string;
-    body?: Record<string, unknown>;
+    body?: Record<string, unknown> | FormData;
   },
 ) => Promise<unknown>;
 
@@ -65,6 +68,9 @@ export default class RestClient {
     let body;
     if (requestOptions.bodyParams) {
       body = snakecaseKeys(requestOptions.bodyParams) as Record<string, unknown>;
+    }
+    if (requestOptions.formData) {
+      body = requestOptions.formData as FormData;
     }
 
     // TODO improve error handling

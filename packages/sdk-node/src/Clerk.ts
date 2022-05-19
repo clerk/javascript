@@ -12,6 +12,7 @@ import { Crypto, CryptoKey } from '@peculiar/webcrypto';
 import Cookies from 'cookies';
 import deepmerge from 'deepmerge';
 import type { NextFunction, Request, Response } from 'express';
+import FormData from 'form-data';
 import got, { OptionsOfUnknownResponseBody } from 'got';
 import jwt from 'jsonwebtoken';
 import jwks, { JwksClient } from 'jwks-rsa';
@@ -100,18 +101,28 @@ export default class Clerk extends ClerkBackendAPI {
       url,
       { method, authorization, contentType, userAgent, body }
     ) => {
+      const isMultiPartForm = isFormData(body);
+
       const finalHTTPOptions = deepmerge(this.httpOptions, {
         method,
         responseType: contentType === 'text/html' ? 'text' : 'json',
         headers: {
           authorization,
-          'Content-Type': contentType,
+          ...(!isMultiPartForm && { 'Content-Type': contentType }),
+          // 'Content-Type': contentType,
           'User-Agent': userAgent,
           'X-Clerk-SDK': `node/${LIB_VERSION}`,
         },
-        // @ts-ignore
-        ...(body && { body: querystring.stringify(body) }),
       }) as OptionsOfUnknownResponseBody;
+      if (body) {
+        if (isMultiPartForm) {
+          // @ts-ignore
+          finalHTTPOptions.body = body;
+        } else {
+          // @ts-ignore
+          finalHTTPOptions.body = querystring.stringify(body);
+        }
+      }
 
       return got(url, finalHTTPOptions).then((data) => data.body);
     };
@@ -394,3 +405,29 @@ export default class Clerk extends ClerkBackendAPI {
     return this.withAuth(handler, options);
   }
 }
+
+/* eslint-disable */
+function isFormData(value: unknown): value is FormData {
+  return value instanceof FormData;
+  // return (value as any).append !== undefined;
+  // return (
+  //   (value as FormData) &&
+  //   isFunction((value as FormData).constructor) &&
+  //   /* eslint-disable @typescript-eslint/unbound-method */
+  //   isFunction((value as FormData).append) &&
+  //   isFunction((value as FormData).delete) &&
+  //   isFunction((value as FormData).entries) &&
+  //   isFunction((value as FormData).get) &&
+  //   isFunction((value as FormData).set) &&
+  //   isFunction((value as FormData).values) &&
+  //   isFunction((value as FormData).has) &&
+  //   isFunction((value as FormData).getAll)
+  //   /* eslint-enable */
+  // );
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+// function isFunction(value: unknown): value is Function {
+//   // eslint-disable-next-line @typescript-eslint/ban-types
+//   return typeof value === 'function';
+// }

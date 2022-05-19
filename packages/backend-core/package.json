@@ -14,6 +14,7 @@
   "dependencies": {
     "@clerk/types": "^2.14.0-staging.1",
     "camelcase-keys": "^7.0.1",
+    "form-data": "^4.0.0",
     "query-string": "^7.0.1",
     "snakecase-keys": "^5.1.2",
     "tslib": "^2.3.1"

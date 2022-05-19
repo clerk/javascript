@@ -1,3 +1,5 @@
+import FormData from 'form-data';
+
 import { Organization, OrganizationInvitation, OrganizationMembership } from '../resources';
 import { OrganizationMembershipRole } from '../resources/Enums';
 import { AbstractApi } from './AbstractApi';
@@ -29,6 +31,12 @@ type GetOrganizationParams = { organizationId: string } | { slug: string };
 
 type UpdateParams = {
   name?: string;
+};
+
+type UpdateLogoParams = {
+  // file: ReadableStream;
+  file: Blob;
+  uploaderUserId: string;
 };
 
 type UpdateMetadataParams = OrganizationMetadataParams;
@@ -115,6 +123,20 @@ export class OrganizationApi extends AbstractApi {
     });
   }
 
+  public async updateOrganizationLogo(organizationId: string, { file, uploaderUserId }: UpdateLogoParams) {
+    this.requireId(organizationId);
+
+    const formData = new FormData();
+    // @ts-ignore
+    formData.append('file', file);
+    formData.append('uploader_user_id', uploaderUserId);
+
+    return this._restClient.makeRequest<Organization>({
+      method: 'PUT',
+      path: `${basePath}/${organizationId}/logo`,
+      formData,
+    });
+  }
   public async updateOrganizationMetadata(organizationId: string, params: UpdateMetadataParams) {
     this.requireId(organizationId);
 
