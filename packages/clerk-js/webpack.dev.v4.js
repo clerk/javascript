@@ -13,6 +13,9 @@ module.exports = env => {
     plugins: [
       new ReactRefreshWebpackPlugin({ overlay: { sockHost: 'js.lclclerk.com' } }),
       ...defineConstants({ mode, packageJSON }),
+      new webpack.ProvidePlugin({
+        jsx: ['@emotion/react', 'jsx'],
+      }),
     ],
     devtool: isProduction ? undefined : 'eval-cheap-source-map',
     entry: './src/index.browser.v4.ts',
@@ -35,6 +38,7 @@ const loadTypescriptWithESBuild = {
       options: {
         loader: 'tsx',
         target: 'ES2019',
+        tsconfigRaw: require('./tsconfig.v4.json'),
       },
     },
   ],
