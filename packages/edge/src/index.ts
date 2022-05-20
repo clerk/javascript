@@ -1,1 +1,1 @@
-export * from './node';
+export * from './vercel-edge';
