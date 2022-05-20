@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.9.0-staging.4](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.9.0-staging.3...@clerk/backend-core@1.9.0-staging.4) (2022-05-20)
+
+### Features
+
+- **backend-core:** Conform organization structures to the new form ([fbb5a12](https://github.com/clerkinc/javascript/commit/fbb5a122247441add4b9a41b9af00ce7c11e1858))
+- **backend-core:** New Resource class structure ([fd84550](https://github.com/clerkinc/javascript/commit/fd845509d70f67ed11bdfae998c9a727ab8c6a8d))
+
+### Bug Fixes
+
+- **backend-core:** Remove redirect_url parameter from Organization invitation resource ([afacf7b](https://github.com/clerkinc/javascript/commit/afacf7b62f1a75cd347d623c2e8abc09b334f56d))
+- **backend-core:** Resources cleanup ([1a16181](https://github.com/clerkinc/javascript/commit/1a1618105366d69c3ab1a031a325882651279a98))
+- **backend-core:** Update tests for Organization ([cb7f328](https://github.com/clerkinc/javascript/commit/cb7f3283ae7dd0a58492e54625a073a209eb73f9))
+
 ## [1.9.0-staging.3](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.9.0-staging.2...@clerk/backend-core@1.9.0-staging.3) (2022-05-19)
 
 ### Features

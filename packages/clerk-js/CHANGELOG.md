@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.12.0-staging.4](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.12.0-staging.3...@clerk/clerk-js@3.12.0-staging.4) (2022-05-20)
+
+### Bug Fixes
+
+- **clerk-js:** Refactor imports to stop bundling shared when not used ([b0d5e73](https://github.com/clerkinc/javascript/commit/b0d5e73ff718c43382cbf6f2ad23ae9627a8eb9a))
+
 ## [3.12.0-staging.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.12.0-staging.2...@clerk/clerk-js@3.12.0-staging.3) (2022-05-19)
 
 ### Bug Fixes
