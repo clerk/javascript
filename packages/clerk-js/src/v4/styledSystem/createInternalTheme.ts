@@ -6,13 +6,15 @@ type ThemeWithPrefix<Theme> = {
   };
 };
 
-const createInternalTheme = <T extends Record<string, any>>(theme: T): ThemeWithPrefix<T> => {
-  return Object.fromEntries(
-    Object.entries(theme).map(([scale, values]) => [
-      scale,
-      Object.fromEntries(Object.entries(values).map(([name, value]) => [`$${name}`, value])),
-    ]),
-  ) as any;
+const createInternalTheme = <T extends Record<string, any>>(theme: T): ThemeWithPrefix<Readonly<T>> => {
+  return Object.freeze(
+    Object.fromEntries(
+      Object.entries(theme).map(([scale, values]) => [
+        scale,
+        Object.fromEntries(Object.entries(values).map(([name, value]) => [`$${name}`, value])),
+      ]),
+    ) as any,
+  );
 };
 
 export { createInternalTheme };
