@@ -7,21 +7,19 @@ const stylesWithTheme = css(theme => ({
   display: 'flex',
   flexDirection: 'column',
   minWidth: theme.sizes.$96,
-  paddingRight: theme.sizes.$8,
-  paddingLeft: theme.sizes.$8,
-  paddingTop: theme.sizes.$10,
-  paddingBottom: theme.sizes.$10,
+  // paddingRight: theme.sizes.$8,
+  // paddingLeft: theme.sizes.$8,
+  // paddingTop: theme.sizes.$10,
+  // paddingBottom: theme.sizes.$10,
+  py: theme.sizes.$10,
+  px: theme.sizes.$8,
   borderRadius: theme.radii.$2xl,
   boxShadow: theme.shadows.$boxShadow1,
 }));
 
-const stylesWithCssObject = css({
-  backgroundColor: 'red',
-});
-
-const stylesWithStringTemplate = css`
-  background-color: yellow;
-`;
+// const stylesWithCssObject = css({
+//   backgroundColor: 'fuchsia',
+// });
 
 export const CardPrimitive = (props: PrimitiveProps<'div'>): JSX.Element => {
   return (
