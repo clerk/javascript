@@ -15,7 +15,7 @@ export const baseTheme = createInternalTheme({
   sizes,
   space,
   shadows,
-} as const);
+});
 
 type BaseTheme = typeof baseTheme;
 
