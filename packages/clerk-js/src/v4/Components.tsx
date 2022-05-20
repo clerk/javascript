@@ -18,13 +18,10 @@ import { EnvironmentProvider, OptionsProvider } from '../ui/contexts';
 import { CoreClerkContextWrapper } from '../ui/contexts/CoreClerkContextWrapper';
 import Portal from '../ui/portal';
 import { VirtualRouter } from '../ui/router';
-// import { SignUp, SignUpModal } from '../ui/signUp';
 import type { AvailableComponentCtx, AvailableComponentProps } from '../ui/types';
 import { injectTheme } from '../utils/theming';
 import { SignIn, SignInModal } from './signIn';
-// import { SignIn, SignInModal } from './signIn';
-// import { UserButton } from '../ui/userButton';
-// import { UserProfile } from '../ui/userProfile';
+import { EmotionCacheProvider, EmotionThemeProvider } from './styledSystem';
 
 const Modal = (props: any) => {
   return <div {...props}>modal {props.children}</div>;
@@ -208,15 +205,19 @@ export default class Components extends React.Component<ComponentsProps, Compone
     );
 
     return (
-      <CoreClerkContextWrapper clerk={this.props.clerk}>
-        <EnvironmentProvider value={this.props.environment}>
-          <OptionsProvider value={this.props.options}>
-            {mountedNodes}
-            {signInModal && mountedSignInModal}
-            {signUpModal && mountedSignUpModal}
-          </OptionsProvider>
-        </EnvironmentProvider>
-      </CoreClerkContextWrapper>
+      <EmotionCacheProvider>
+        <EmotionThemeProvider>
+          <CoreClerkContextWrapper clerk={this.props.clerk}>
+            <EnvironmentProvider value={this.props.environment}>
+              <OptionsProvider value={this.props.options}>
+                {mountedNodes}
+                {signInModal && mountedSignInModal}
+                {signUpModal && mountedSignUpModal}
+              </OptionsProvider>
+            </EnvironmentProvider>
+          </CoreClerkContextWrapper>
+        </EmotionThemeProvider>
+      </EmotionCacheProvider>
     );
   }
 }
