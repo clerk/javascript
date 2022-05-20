@@ -1,46 +1,45 @@
-import camelcaseKeys from 'camelcase-keys';
-
 import { Organization } from '../resources';
-import filterKeys from '../utils/Filter';
+import { OrganizationMembershipRole } from './Enums';
 import type { OrganizationMembershipJSON, OrganizationMembershipPublicUserDataJSON } from './JSON';
-import type { OrganizationMembershipProps, OrganizationMembershipPublicUserDataProps } from './Props';
-
-export interface OrganizationMembership extends OrganizationMembershipProps {
-  organization: Organization;
-  publicUserData: OrganizationMembershipPublicUserData;
-}
 
 export class OrganizationMembership {
-  static attributes = ['id', 'role', 'organization', 'publicUserData', 'createdAt', 'updatedAt'];
+  constructor(
+    readonly id: string,
+    readonly role: OrganizationMembershipRole,
+    readonly createdAt: number,
+    readonly updatedAt: number,
+    readonly organization: Organization,
+    readonly publicUserData?: OrganizationMembershipPublicUserData | null,
+  ) {}
 
-  static defaults = [];
-
-  constructor(data: OrganizationMembershipProps) {
-    Object.assign(this, OrganizationMembership.defaults, data);
-  }
-
-  static fromJSON(data: OrganizationMembershipJSON): OrganizationMembership {
-    const camelcased = camelcaseKeys(data);
-    const filtered = filterKeys(camelcased, OrganizationMembership.attributes);
-    filtered.organization = Organization.fromJSON(data.organization);
-    filtered.publicUserData = OrganizationMembershipPublicUserData.fromJSON(data.public_user_data);
-    return new OrganizationMembership(filtered as OrganizationMembershipProps);
+  static fromJSON(data: OrganizationMembershipJSON) {
+    return new OrganizationMembership(
+      data.id,
+      data.role,
+      data.created_at,
+      data.updated_at,
+      Organization.fromJSON(data.organization),
+      OrganizationMembershipPublicUserData.fromJSON(data.public_user_data),
+    );
   }
 }
 
-export interface OrganizationMembershipPublicUserData extends OrganizationMembershipPublicUserDataProps {}
-
 export class OrganizationMembershipPublicUserData {
-  static attributes = ['identifier', 'firstName', 'lastName', 'profileImageUrl', 'userId'];
-  static defaults = [];
+  constructor(
+    readonly identifier: string,
+    readonly firstName: string | null,
+    readonly lastName: string | null,
+    readonly profileImageUrl: string,
+    readonly userId: string,
+  ) {}
 
-  constructor(data: Partial<OrganizationMembershipPublicUserDataProps> = {}) {
-    Object.assign(this, OrganizationMembershipPublicUserData.defaults, data);
-  }
-
-  static fromJSON(data: OrganizationMembershipPublicUserDataJSON): OrganizationMembershipPublicUserData {
-    const camelcased = camelcaseKeys(data);
-    const filtered = filterKeys(camelcased, OrganizationMembershipPublicUserData.attributes);
-    return new OrganizationMembershipPublicUserData(filtered as OrganizationMembershipPublicUserDataProps);
+  static fromJSON(data: OrganizationMembershipPublicUserDataJSON) {
+    return new OrganizationMembershipPublicUserData(
+      data.identifier,
+      data.first_name,
+      data.last_name,
+      data.profile_image_url,
+      data.user_id,
+    );
   }
 }

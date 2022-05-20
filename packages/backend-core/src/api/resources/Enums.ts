@@ -1,8 +1,3 @@
-export enum Association {
-  HasOne = 'HasOne',
-  HasMany = 'HasMany',
-}
-
 export type OAuthProvider =
   | 'facebook'
   | 'google'

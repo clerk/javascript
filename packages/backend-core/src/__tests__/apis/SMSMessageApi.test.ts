@@ -19,13 +19,14 @@ test('createSMSMessage() sends an SMS message', async () => {
     message,
   });
 
-  const expected = new SMSMessage({
-    fromPhoneNumber: '+19516231001',
-    toPhoneNumber: '+306957178227',
-    phoneNumberId,
+  const expected = new SMSMessage(
+    'test_sms_message_id',
+    '+19516231001',
+    '+306957178227',
     message,
-    status: 'queued',
-  });
+    'queued',
+    phoneNumberId,
+  );
 
   expect(smsMessage).toMatchObject(expected);
 });

@@ -39,12 +39,7 @@ test('createAllowlistIdentifier() creates an allowlist identifier', async () => 
     notify: false,
   });
   expect(allowlistIdentifier).toEqual(
-    new AllowlistIdentifier({
-      id: resJSON.id,
-      identifier,
-      createdAt: resJSON.created_at,
-      updatedAt: resJSON.updated_at,
-    }),
+    new AllowlistIdentifier(resJSON.id, identifier, resJSON.created_at, resJSON.updated_at),
   );
 });
 
@@ -62,12 +57,7 @@ test('deleteAllowlistIdentifier() deletes an allowlist identifier', async () => 
 
   const allowlistIdentifier = await TestBackendAPIClient.allowlistIdentifiers.deleteAllowlistIdentifier(id);
   expect(allowlistIdentifier).toEqual(
-    new AllowlistIdentifier({
-      id,
-      identifier: resJSON.identifier,
-      createdAt: resJSON.created_at,
-      updatedAt: resJSON.updated_at,
-    }),
+    new AllowlistIdentifier(id, resJSON.identifier, resJSON.created_at, resJSON.updated_at),
   );
 });
 

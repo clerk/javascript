@@ -11,7 +11,6 @@ export * from './OrganizationInvitation';
 export * from './OrganizationMembership';
 export * from './JSON';
 export * from './PhoneNumber';
-export * from './Props';
 export * from './Session';
 export * from './SMSMessage';
 export * from './User';

@@ -1,43 +1,23 @@
 import type { VerificationJSON } from './JSON';
-import type { VerificationProps } from './Props';
-
-interface VerificationPayload extends VerificationProps {}
-
-export interface Verification extends VerificationPayload {}
 
 export class Verification {
-  static attributes = ['attempts', 'expireAt', 'externalVerificationRedirectURL', 'nonce', 'status', 'strategy'];
+  constructor(
+    readonly status: string,
+    readonly strategy: string,
+    readonly externalVerificationRedirectURL: URL | null = null,
+    readonly attempts: number | null = null,
+    readonly expireAt: number | null = null,
+    readonly nonce: string | null = null,
+  ) {}
 
-  static defaults = {};
-
-  constructor(data: Partial<VerificationPayload> = {}) {
-    Object.assign(this, Verification.defaults, data);
-  }
-
-  static fromJSON(data: VerificationJSON | null): Verification {
-    const obj: Record<string, any> = {};
-
-    if (data) {
-      obj.status = data.status;
-      obj.strategy = data.strategy;
-
-      if (data.external_verification_redirect_url) {
-        obj.externalVerificationRedirectURL = new URL(data.external_verification_redirect_url);
-      } else {
-        obj.externalVerificationRedirectURL = null;
-      }
-      obj.attempts = data.attempts;
-      obj.expireAt = data.expire_at;
-      obj.nonce = data.nonce;
-    } else {
-      obj.status = null;
-      obj.strategy = null;
-      obj.externalVerificationRedirectURL = null;
-      obj.attempts = null;
-      obj.expireAt = null;
-      obj.nonce = null;
-    }
-
-    return new Verification(obj as VerificationPayload);
+  static fromJSON(data: VerificationJSON): Verification {
+    return new Verification(
+      data.status,
+      data.strategy,
+      data.external_verification_redirect_url ? new URL(data.external_verification_redirect_url) : null,
+      data.attempts,
+      data.expire_at,
+      data.nonce,
+    );
   }
 }

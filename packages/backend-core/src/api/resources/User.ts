@@ -1,84 +1,61 @@
-import camelcaseKeys from 'camelcase-keys';
-
-import associationDefaults from '../utils/Associations';
-import filterKeys from '../utils/Filter';
 import { EmailAddress } from './EmailAddress';
-import { Association } from './Enums';
 import { ExternalAccount } from './ExternalAccount';
 import type { ExternalAccountJSON, UserJSON } from './JSON';
 import { PhoneNumber } from './PhoneNumber';
-import type { UserProps } from './Props';
 import { Web3Wallet } from './Web3Wallet';
 
-interface UserAssociations {
-  emailAddresses: EmailAddress[];
-  phoneNumbers: PhoneNumber[];
-  web3Wallets: Web3Wallet[];
-  externalAccounts: ExternalAccount[];
-}
-
-interface UserPayload extends UserProps, UserAssociations {}
-
-export interface User extends UserPayload {}
-
 export class User {
-  static attributes = [
-    'id',
-    'externalId',
-    'username',
-    'firstName',
-    'lastName',
-    'gender',
-    'birthday',
-    'profileImageUrl',
-    'primaryEmailAddressId',
-    'primaryEmailAddressId',
-    'primaryPhoneNumberId',
-    'primaryWeb3WalletId',
-    'passwordEnabled',
-    'twoFactorEnabled',
-    'passwordEnabled',
-    'passwordEnabled',
-    'passwordEnabled',
-    'twoFactorEnabled',
-    'publicMetadata',
-    'privateMetadata',
-    'unsafeMetadata',
-    'lastSignInAt',
-    'createdAt',
-    'updatedAt',
-  ];
-
-  static associations = {
-    emailAddresses: Association.HasMany,
-    phoneNumbers: Association.HasMany,
-    web3Wallets: Association.HasMany,
-    externalAccounts: Association.HasMany,
-  };
-
-  static defaults = {
-    publicMetadata: {},
-    privateMetadata: {},
-    unsafeMetadata: {},
-    ...associationDefaults(User.associations),
-  };
-
-  constructor(data: Partial<UserPayload> = {}) {
-    Object.assign(this, User.defaults, data);
-  }
+  constructor(
+    readonly id: string,
+    readonly passwordEnabled: boolean,
+    readonly twoFactorEnabled: boolean,
+    readonly createdAt: number,
+    readonly updatedAt: number,
+    readonly profileImageUrl: string,
+    readonly gender: string,
+    readonly birthday: string,
+    readonly primaryEmailAddressId: string | null,
+    readonly primaryPhoneNumberId: string | null,
+    readonly primaryWeb3WalletId: string | null,
+    readonly lastSignInAt: number | null,
+    readonly externalId: string | null,
+    readonly username: string | null,
+    readonly firstName: string | null,
+    readonly lastName: string | null,
+    readonly publicMetadata: Record<string, unknown> = {},
+    readonly privateMetadata: Record<string, unknown> = {},
+    readonly unsafeMetadata: Record<string, unknown> = {},
+    readonly emailAddresses: EmailAddress[] = [],
+    readonly phoneNumbers: PhoneNumber[] = [],
+    readonly web3Wallets: Web3Wallet[] = [],
+    readonly externalAccounts: ExternalAccount[] = [],
+  ) {}
 
   static fromJSON(data: UserJSON): User {
-    const obj: Record<string, any> = {};
-
-    const camelcased = camelcaseKeys(data);
-    const filtered = filterKeys(camelcased, User.attributes);
-    Object.assign(obj, filtered);
-
-    obj.emailAddresses = (data.email_addresses || []).map(x => EmailAddress.fromJSON(x));
-    obj.phoneNumbers = (data.phone_numbers || []).map(x => PhoneNumber.fromJSON(x));
-    obj.web3Wallets = (data.web3_wallets || []).map(x => Web3Wallet.fromJSON(x));
-    obj.externalAccounts = (data.external_accounts || []).map((x: ExternalAccountJSON) => ExternalAccount.fromJSON(x));
-
-    return new User(obj as UserPayload);
+    return new User(
+      data.id,
+      data.password_enabled,
+      data.two_factor_enabled,
+      data.created_at,
+      data.updated_at,
+      data.profile_image_url,
+      data.gender,
+      data.birthday,
+      data.primary_email_address_id,
+      data.primary_phone_number_id,
+      data.primary_web3_wallet_id,
+      data.last_sign_in_at,
+      data.external_id,
+      data.username,
+      data.first_name,
+      data.last_name,
+      data.public_metadata,
+      data.private_metadata,
+      data.unsafe_metadata,
+      (data.email_addresses || []).map(x => EmailAddress.fromJSON(x)),
+      (data.phone_numbers || []).map(x => PhoneNumber.fromJSON(x)),
+      (data.web3_wallets || []).map(x => Web3Wallet.fromJSON(x)),
+      (data.external_accounts || []).map((x: ExternalAccountJSON) => ExternalAccount.fromJSON(x)),
+    );
   }
 }

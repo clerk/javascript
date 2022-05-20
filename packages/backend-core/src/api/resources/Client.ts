@@ -1,52 +1,32 @@
-import camelcaseKeys from 'camelcase-keys';
-
-import associationDefaults from '../utils/Associations';
-import filterKeys from '../utils/Filter';
-import { Association } from './Enums';
 import type { ClientJSON } from './JSON';
-import type { ClientProps } from './Props';
 import { Session } from './Session';
 
-interface ClientAssociations {
-  sessions: Session[];
-}
-
-interface ClientPayload extends ClientProps, ClientAssociations {}
-
-export interface Client extends ClientPayload {}
-
 export class Client {
-  static attributes = [
-    'id',
-    'sessionIds',
-    'signUpAttemptId',
-    'signInAttemptId',
-    'lastActiveSessionId',
-    'createdAt',
-    'updatedAt',
-  ];
-
-  static associations = {
-    sessions: Association.HasMany,
-  };
-
-  static defaults = {
-    ...associationDefaults(Client.associations),
-  };
-
-  constructor(data: Partial<ClientPayload> = {}) {
-    Object.assign(this, Client.defaults, data);
-  }
+  constructor(
+    readonly id: string,
+    readonly sessionIds: string[],
+    readonly sessions: Session[],
+    readonly signInAttemptId: string | null,
+    readonly signUpAttemptId: string | null,
+    readonly signInId: string | null,
+    readonly signUpId: string | null,
+    readonly lastActiveSessionId: string | null,
+    readonly createdAt: number,
+    readonly updatedAt: number,
+  ) {}
 
   static fromJSON(data: ClientJSON): Client {
-    const obj: Record<string, any> = {};
-
-    const camelcased = camelcaseKeys(data);
-    const filtered = filterKeys(camelcased, Client.attributes);
-    Object.assign(obj, filtered);
-
-    obj.sessions = (data.sessions || []).map(x => Session.fromJSON(x));
-
-    return new Client(obj as ClientPayload);
+    return new Client(
+      data.id,
+      data.session_ids,
+      data.sessions.map(x => Session.fromJSON(x)),
+      data.sign_in_attempt_id,
+      data.sign_up_attempt_id,
+      data.sign_in_id,
+      data.sign_up_id,
+      data.last_active_session_id,
+      data.created_at,
+      data.updated_at,
+    );
   }
 }

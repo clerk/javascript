@@ -1,9 +1,13 @@
 import nock from 'nock';
 
 import {
+  ObjectType,
   Organization,
   OrganizationInvitation,
+  OrganizationInvitationJSON,
+  OrganizationJSON,
   OrganizationMembership,
+  OrganizationMembershipJSON,
   OrganizationMembershipPublicUserData,
 } from '../../api/resources';
 import { OrganizationInvitationStatus, OrganizationMembershipRole } from '../../api/resources/Enums';
@@ -38,11 +42,12 @@ test('createOrganization() creates an organization', async () => {
   const createdBy = 'user_randomid';
   const publicMetadata = { public: 'metadata' };
   const privateMetadata = { private: 'metadata' };
-  const resJSON = {
-    object: 'organization',
+  const resJSON: OrganizationJSON = {
+    object: ObjectType.Organization,
     id: 'org_randomid',
     name,
     slug,
+    logo_url: null,
     public_metadata: publicMetadata,
     private_metadata: privateMetadata,
     created_at: 1611948436,
@@ -66,26 +71,17 @@ test('createOrganization() creates an organization', async () => {
     publicMetadata,
     privateMetadata,
   });
-  expect(organization).toEqual(
-    new Organization({
-      id: resJSON.id,
-      name,
-      slug,
-      publicMetadata,
-      privateMetadata,
-      createdAt: resJSON.created_at,
-      updatedAt: resJSON.updated_at,
-    }),
-  );
+  expect(organization).toEqual(Organization.fromJSON(resJSON));
 });
 
 test('getOrganization() fetches an organization', async () => {
   const id = 'org_randomid';
   const slug = 'acme-inc';
-  const resJSON = {
-    object: 'organization',
+  const resJSON: OrganizationJSON = {
+    object: ObjectType.Organization,
     id,
     slug,
+    logo_url: null,
     name: 'Acme Inc',
     public_metadata: {},
     private_metadata: {},
@@ -96,69 +92,49 @@ test('getOrganization() fetches an organization', async () => {
   nock('https://api.clerk.dev').get(`/v1/organizations/${id}`).reply(200, resJSON);
 
   let organization = await TestBackendAPIClient.organizations.getOrganization({ organizationId: id });
-  expect(organization).toEqual(
-    new Organization({
-      id,
-      name: resJSON.name,
-      slug: resJSON.slug,
-      publicMetadata: resJSON.public_metadata,
-      privateMetadata: resJSON.private_metadata,
-      createdAt: resJSON.created_at,
-      updatedAt: resJSON.updated_at,
-    }),
-  );
+  expect(organization).toEqual(Organization.fromJSON(resJSON));
 
   nock('https://api.clerk.dev').get(`/v1/organizations/${slug}`).reply(200, resJSON);
   organization = await TestBackendAPIClient.organizations.getOrganization({ slug });
-  expect(organization).toEqual(
-    new Organization({
-      id,
-      name: resJSON.name,
-      slug: resJSON.slug,
-      publicMetadata: resJSON.public_metadata,
-      privateMetadata: resJSON.private_metadata,
-      createdAt: resJSON.created_at,
-      updatedAt: resJSON.updated_at,
-    }),
-  );
+  expect(organization).toEqual(Organization.fromJSON(resJSON));
 });
 
 test('updateOrganization() updates organization', async () => {
   const id = 'org_randomid';
   const name = 'New name';
-  const resJSON = {
-    object: 'organization',
+  const slug = 'acme-inc';
+  const resJSON: OrganizationJSON = {
+    object: ObjectType.Organization,
     id,
     name,
+    slug,
     created_at: 1611948436,
     updated_at: 1611948436,
+    logo_url: null,
+    public_metadata: {},
   };
 
   nock('https://api.clerk.dev').patch(`/v1/organizations/${id}`, { name }).reply(200, resJSON);
 
   const organization = await TestBackendAPIClient.organizations.updateOrganization(id, { name });
-  expect(organization).toEqual(
-    new Organization({
-      id,
-      name: resJSON.name,
-      createdAt: resJSON.created_at,
-      updatedAt: resJSON.updated_at,
-    }),
-  );
+  expect(organization).toEqual(Organization.fromJSON(resJSON));
 });
 
 test('updateOrganizationMetadata() updates organization metadata', async () => {
   const id = 'org_randomid';
+  const slug = 'acme-inc';
   const publicMetadata = { hello: 'world' };
   const privateMetadata = { goodbye: 'world' };
-  const resJSON = {
-    object: 'organization',
+  const resJSON: OrganizationJSON = {
+    object: ObjectType.Organization,
     id,
+    slug,
     name: 'Org',
     public_metadata: publicMetadata,
     private_metadata: privateMetadata,
     created_at: 1611948436,
     updated_at: 1611948436,
+    logo_url: null,
   };
 
   nock('https://api.clerk.dev')
@@ -172,16 +148,7 @@ test('updateOrganizationMetadata() updates organization metadata', async () => {
     publicMetadata,
     privateMetadata,
   });
-  expect(organization).toEqual(
-    new Organization({
-      id,
-      name: resJSON.name,
-      publicMetadata,
-      privateMetadata,
-      createdAt: resJSON.created_at,
-      updatedAt: resJSON.updated_at,
-    }),
-  );
+  expect(organization).toEqual(Organization.fromJSON(resJSON));
 });
 
 test('deleteOrganization() deletes organization', async () => {
@@ -235,14 +202,15 @@ test('createOrganizationMembership() creates a membership for an organization', 
   const organizationId = 'org_randomid';
   const userId = 'user_randomid';
   const role: OrganizationMembershipRole = 'basic_member';
-  const resJSON = {
-    object: 'organization_membership',
+  const resJSON: OrganizationMembershipJSON = {
+    object: ObjectType.OrganizationMembership,
     id: 'orgmem_randomid',
     role,
     organization: {
-      object: 'organization',
+      object: ObjectType.Organization,
       id: organizationId,
       name: 'Acme Inc',
+      logo_url: null,
       slug: 'acme-inc',
       public_metadata: {},
       private_metadata: {},
@@ -267,43 +235,21 @@ test('createOrganizationMembership() creates a membership for an organization', 
     userId,
     role,
   });
-  expect(orgMembership).toEqual(
-    new OrganizationMembership({
-      id: resJSON.id,
-      role: resJSON.role,
-      organization: new Organization({
-        id: resJSON.organization.id,
-        name: resJSON.organization.name,
-        slug: resJSON.organization.slug,
-        publicMetadata: resJSON.organization.public_metadata,
-        privateMetadata: resJSON.organization.private_metadata,
-        createdAt: resJSON.organization.created_at,
-        updatedAt: resJSON.organization.updated_at,
-      }),
-      publicUserData: new OrganizationMembershipPublicUserData({
-        identifier: resJSON.public_user_data.identifier,
-        firstName: resJSON.public_user_data.first_name,
-        lastName: resJSON.public_user_data.last_name,
-        profileImageUrl: resJSON.public_user_data.profile_image_url,
-        userId: resJSON.public_user_data.user_id,
-      }),
-      createdAt: resJSON.created_at,
-      updatedAt: resJSON.updated_at,
-    }),
-  );
+  expect(orgMembership).toEqual(OrganizationMembership.fromJSON(resJSON));
 });
 
 test('updateOrganizationMembership() updates an organization membership', async () => {
   const organizationId = 'org_randomid';
   const userId = 'user_randomid';
   const role: OrganizationMembershipRole = 'basic_member';
-  const resJSON = {
-    object: 'organization_membership',
+  const resJSON: OrganizationMembershipJSON = {
+    object: ObjectType.OrganizationMembership,
     id: 'orgmem_randomid',
     role,
     organization: {
-      object: 'organization',
+      object: ObjectType.Organization,
       id: organizationId,
+      logo_url: null,
       name: 'Acme Inc',
       slug: 'acme-inc',
       public_metadata: {},
@@ -329,30 +275,7 @@ test('updateOrganizationMembership() updates an organization membership', async 
     userId,
     role,
   });
-  expect(orgMembership).toEqual(
-    new OrganizationMembership({
-      id: resJSON.id,
-      role: resJSON.role,
-      organization: new Organization({
-        id: resJSON.organization.id,
-        name: resJSON.organization.name,
-        slug: resJSON.organization.slug,
-        publicMetadata: resJSON.organization.public_metadata,
-        privateMetadata: resJSON.organization.private_metadata,
-        createdAt: resJSON.organization.created_at,
-        updatedAt: resJSON.organization.updated_at,
-      }),
-      publicUserData: new OrganizationMembershipPublicUserData({
-        identifier: resJSON.public_user_data.identifier,
-        firstName: resJSON.public_user_data.first_name,
-        lastName: resJSON.public_user_data.last_name,
-        profileImageUrl: resJSON.public_user_data.profile_image_url,
-        userId: resJSON.public_user_data.user_id,
-      }),
-      createdAt: resJSON.created_at,
-      updatedAt: resJSON.updated_at,
-    }),
-  );
+  expect(orgMembership).toEqual(OrganizationMembership.fromJSON(resJSON));
 });
 
 test('deleteOrganizationMembership() deletes an organization', async () => {
@@ -368,8 +291,8 @@ test('createOrganizationInvitation() creates an invitation for an organization',
   const status: OrganizationInvitationStatus = 'pending';
   const emailAddress = 'invitation@example.com';
   const redirectUrl = 'https://example.com';
-  const resJSON = {
-    object: 'organization_invitation',
+  const resJSON: OrganizationInvitationJSON = {
+    object: ObjectType.OrganizationInvitation,
     id: 'orginv_randomid',
     role,
     status,
@@ -388,24 +311,14 @@ test('createOrganizationInvitation() creates an invitation for an organization',
     redirectUrl,
     inviterUserId: 'user_randomid',
   });
-  expect(orgInvitation).toEqual(
-    new OrganizationInvitation({
-      id: resJSON.id,
-      role: resJSON.role,
-      organizationId,
-      emailAddress,
-      status: resJSON.status,
-      createdAt: resJSON.created_at,
-      updatedAt: resJSON.updated_at,
-    }),
-  );
+  expect(orgInvitation).toEqual(OrganizationInvitation.fromJSON(resJSON));
 });
 
 test('getPendingOrganizationInvitationList() returns a list of organization memberships', async () => {
   const organizationId = 'org_randomid';
-  const resJSON = [
+  const resJSON: OrganizationInvitationJSON[] = [
     {
-      object: 'organization_invitation',
+      object: ObjectType.OrganizationInvitation,
       id: 'orginv_randomid',
       role: 'basic_member',
       email_address: 'invited@example.org',
@@ -431,13 +344,13 @@ test('getPendingOrganizationInvitationList() returns a list of organization memb
 test('revokeOrganizationInvitation() revokes an organization invitation', async () => {
   const organizationId = 'org_randomid';
   const invitationId = 'orginv_randomid';
-  const resJSON = {
-    object: 'organization_invitation',
+  const resJSON: OrganizationInvitationJSON = {
+    object: ObjectType.OrganizationInvitation,
     id: invitationId,
-    role: 'basic_member' as OrganizationMembershipRole,
+    role: 'basic_member',
     email_address: 'invited@example.org',
     organization_id: organizationId,
-    status: 'revoked' as OrganizationInvitationStatus,
+    status: 'revoked',
     created_at: 1612378465,
     updated_at: 1612378465,
   };
@@ -450,15 +363,5 @@ test('revokeOrganizationInvitation() revokes an organization invitation', async 
     invitationId,
     requestingUserId: 'user_randomid',
   });
-  expect(orgInvitation).toEqual(
-    new OrganizationInvitation({
-      id: resJSON.id,
-      role: resJSON.role,
-      organizationId,
-      emailAddress: resJSON.email_address,
-      status: resJSON.status,
-      createdAt: resJSON.created_at,
-      updatedAt: resJSON.updated_at,
-    }),
-  );
+  expect(orgInvitation).toEqual(OrganizationInvitation.fromJSON(resJSON));
 });

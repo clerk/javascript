@@ -1,0 +1,65 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`user defaults 1`] = `
+User {
+  "birthday": "",
+  "createdAt": 12345,
+  "emailAddresses": Array [
+    EmailAddress {
+      "emailAddress": "test@example.com",
+      "id": "idn_27jbYTsvdRnRyc5pFqOeD6ZkZ81",
+      "linkedTo": Array [],
+      "verification": Verification {
+        "attempts": 0,
+        "expireAt": 12345,
+        "externalVerificationRedirectURL": null,
+        "nonce": "",
+        "status": "verified",
+        "strategy": "email",
+      },
+    },
+  ],
+  "externalAccounts": Array [],
+  "externalId": "a-unique-id",
+  "firstName": "Test",
+  "gender": "",
+  "id": "user_27jbYRV0tbvGovC63JFqaAqZsMy",
+  "lastName": "Test",
+  "lastSignInAt": 12345,
+  "passwordEnabled": true,
+  "phoneNumbers": Array [
+    PhoneNumber {
+      "defaultSecondFactor": false,
+      "id": "idn_27jbYTB1izaVaORupvdREuDqqaZ",
+      "linkedTo": Array [],
+      "phoneNumber": "+15555555555",
+      "reservedForSecondFactor": false,
+      "verification": Verification {
+        "attempts": 0,
+        "expireAt": 12345,
+        "externalVerificationRedirectURL": null,
+        "nonce": "",
+        "status": "verified",
+        "strategy": "phone",
+      },
+    },
+  ],
+  "primaryEmailAddressId": "idn_27jbYTsvdRnRyc5pFqOeD6ZkZ81",
+  "primaryPhoneNumberId": "idn_27jbYTB1izaVaORupvdREuDqqaZ",
+  "primaryWeb3WalletId": "test_web3wallet",
+  "privateMetadata": Object {
+    "middleName": "Test",
+  },
+  "profileImageUrl": "https://www.gravatar.com/avatar?d=mp",
+  "publicMetadata": Object {
+    "gender": "female",
+  },
+  "twoFactorEnabled": false,
+  "unsafeMetadata": Object {
+    "unsafe": "metadata",
+  },
+  "updatedAt": 12345,
+  "username": "test001",
+  "web3Wallets": Array [],
+}
+`;

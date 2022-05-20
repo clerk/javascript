@@ -1,37 +1,34 @@
 import {
   AllowlistIdentifier,
+  AllowlistIdentifierJSON,
   Client,
+  ClientJSON,
   Email,
+  EmailJSON,
   Invitation,
+  InvitationJSON,
+  ObjectType,
   Organization,
   OrganizationInvitation,
+  OrganizationJSON,
   OrganizationMembership,
   Session,
+  SessionJSON,
   SMSMessage,
+  SMSMessageJSON,
 } from '../../api/resources';
 import deserialize from '../../api/utils/Deserializer';
 
-const allowlistIdentifierJSON = {
-  object: 'allowlist_identifier',
+const allowlistIdentifierJSON: AllowlistIdentifierJSON = {
+  object: ObjectType.AllowlistIdentifier,
   id: 'alid_wxyz',
   identifier: 'test@example.com',
   created_at: 1612378465,
   updated_at: 1612378465,
 };
 
-const clientJSON = {
-  object: 'client',
-  id: 'client_wxyz',
-  session_ids: ['sess_abcd', 'sess_efgh'],
-  sign_in_attempt_id: null,
-  sign_up_attempt_id: null,
-  last_active_session_id: 'sess_efgh',
-  created_at: 1612378465,
-  updated_at: 1612378465,
-};
-
-const emailJSON = {
-  object: 'email',
+const emailJSON: EmailJSON = {
+  object: ObjectType.Email,
   id: 'ema_dvorak',
   from_email_name: 'sales',
   to_email_address: 'accounting@cyberdyne.com',
@@ -41,22 +38,24 @@ const emailJSON = {
   status: 'queued',
 };
 
-const invitationJSON = {
-  object: 'invitation',
+const invitationJSON: InvitationJSON = {
+  object: ObjectType.Invitation,
   id: 'inv_randomid',
   email_address: 'invitation@example.com',
   created_at: 1612378465,
   updated_at: 1612378465,
+  public_metadata: null,
 };
 
-const organizationJSON = {
-  object: 'organization',
+const organizationJSON: OrganizationJSON = {
+  object: ObjectType.Organization,
   id: 'org_randomid',
   name: 'Acme Inc',
   slug: 'acme-inc',
   logo_url: null,
   created_at: 1612378465,
   updated_at: 1612378465,
+  public_metadata: { hello: 'world' },
 };
 
 const organizationInvitationJSON = {
@@ -83,10 +82,13 @@ const organizationMembershipJSON = {
   },
   created_at: 1612378465,
   updated_at: 1612378465,
+  slug: 'OrgRandomId',
+  logo_url: null,
+  public_metadata: { hello: 'world' },
 };
 
-const sessionJSON = {
-  object: 'session',
+const sessionJSON: SessionJSON = {
+  object: ObjectType.Session,
   id: 'sess_efgh',
   client_id: 'client_wxyz',
   user_id: 'user_rock',
@@ -94,10 +96,26 @@ const sessionJSON = {
   last_active_at: 1612378465,
   expire_at: 1612378465,
   abandon_at: 1612378465,
+  created_at: 1612378465,
+  updated_at: 1612378465,
 };
 
-const smsMessageJSON = {
-  object: 'sms_message',
+const clientJSON: ClientJSON = {
+  object: ObjectType.Client,
+  id: 'client_wxyz',
+  session_ids: ['sess_abcd', 'sess_efgh'],
+  sessions: [sessionJSON],
+  sign_in_attempt_id: null,
+  sign_up_attempt_id: null,
+  sign_in_id: null,
+  sign_up_id: null,
+  last_active_session_id: 'sess_efgh',
+  created_at: 1612378465,
+  updated_at: 1612378465,
+};
+
+const smsMessageJSON: SMSMessageJSON = {
+  object: ObjectType.SmsMessage,
   id: 'sms_qwerty',
   from_phone_number: '+12345551001',
   to_phone_number: '+12345551001',

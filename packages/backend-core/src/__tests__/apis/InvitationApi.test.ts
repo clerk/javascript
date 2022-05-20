@@ -1,6 +1,6 @@
 import nock from 'nock';
 
-import { Invitation } from '../../api/resources';
+import { Invitation, InvitationJSON, ObjectType } from '../../api/resources';
 import { TestBackendAPIClient } from '../TestBackendAPI';
 
 test('getInvitationList() returns a list of invitations', async () => {
@@ -16,12 +16,13 @@ test('getInvitationList() returns a list of invitations', async () => {
 
 test('createInvitation() creates an invitation', async () => {
   const emailAddress = 'test@example.com';
-  const resJSON = {
-    object: 'invitation',
+  const resJSON: InvitationJSON = {
+    object: ObjectType.Invitation,
     id: 'inv_randomid',
     email_address: emailAddress,
     created_at: 1611948436,
     updated_at: 1611948436,
+    public_metadata: null,
   };
 
   nock('https://api.clerk.dev')
@@ -33,24 +34,18 @@ test('createInvitation() creates an invitation', async () => {
   const invitation = await TestBackendAPIClient.invitations.createInvitation({
     emailAddress,
   });
-  expect(invitation).toEqual(
-    new Invitation({
-      id: resJSON.id,
-      emailAddress,
-      createdAt: resJSON.created_at,
-      updatedAt: resJSON.updated_at,
-    }),
-  );
+  expect(invitation).toEqual(new Invitation(resJSON.id, emailAddress, null, resJSON.created_at, resJSON.updated_at));
 });
 
 test('createInvitation() accepts a redirectUrl', async () => {
   const emailAddress = 'test@example.com';
-  const resJSON = {
-    object: 'invitation',
+  const resJSON: InvitationJSON = {
+    object: ObjectType.Invitation,
     id: 'inv_randomid',
     email_address: emailAddress,
     created_at: 1611948436,
     updated_at: 1611948436,
+    public_metadata: null,
   };
   const redirectUrl = 'http://redirect.org';
 
@@ -65,14 +60,7 @@ test('createInvitation() accepts a redirectUrl', async () => {
     emailAddress,
     redirectUrl,
   });
-  expect(invitation).toEqual(
-    new Invitation({
-      id: resJSON.id,
-      emailAddress,
-      createdAt: resJSON.created_at,
-      updatedAt: resJSON.updated_at,
-    }),
-  );
+  expect(invitation).toEqual(new Invitation(resJSON.id, emailAddress, null, resJSON.created_at, resJSON.updated_at));
 });
 
 test('createInvitation() accepts publicMetadata', async () => {
@@ -101,22 +89,17 @@ test('createInvitation() accepts publicMetadata', async () => {
     publicMetadata,
   });
   expect(invitation).toEqual(
-    new Invitation({
-      id: resJSON.id,
-      emailAddress,
-      publicMetadata,
-      createdAt: resJSON.created_at,
-      updatedAt: resJSON.updated_at,
-    }),
+    new Invitation(resJSON.id, emailAddress, publicMetadata, resJSON.created_at, resJSON.updated_at),
   );
 });
 
 test('revokeInvitation() revokes an invitation', async () => {
   const id = 'inv_randomid';
-  const resJSON = {
-    object: 'invitation',
+  const resJSON: InvitationJSON = {
+    object: ObjectType.Invitation,
     id,
     email_address: 'test@example.com',
+    public_metadata: null,
     created_at: 1611948436,
     updated_at: 1611948436,
   };
@@ -124,14 +107,7 @@ test('revokeInvitation() revokes an invitation', async () => {
   nock('https://api.clerk.dev').post(`/v1/invitations/${id}/revoke`).reply(200, resJSON);
 
   const invitation = await TestBackendAPIClient.invitations.revokeInvitation(id);
-  expect(invitation).toEqual(
-    new Invitation({
-      id,
-      emailAddress: resJSON.email_address,
-      createdAt: resJSON.created_at,
-      updatedAt: resJSON.updated_at,
-    }),
-  );
+  expect(invitation).toEqual(new Invitation(id, resJSON.email_address, null, resJSON.created_at, resJSON.updated_at));
 });
 
 test('revokeInvitation() throws an error without invitation ID', async () => {

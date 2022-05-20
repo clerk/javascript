@@ -15,73 +15,85 @@ test('getClientList() returns a list of clients', async () => {
   expect(clientList).toBeInstanceOf(Array);
   expect(clientList.length).toEqual(2);
 
-  const expected1 = new Client({
-    id: 'client_isalwaysright',
-    sessionIds: ['sess_swag'],
-    sessions: [
+  const expected1 = new Client(
+    'client_isalwaysright',
+    ['sess_swag'],
+    [
       {
         id: 'sess_swag',
         clientId: 'client_isalwaysright',
         userId: 'user_player1',
         status: 'active',
-        lastActiveAt: 1610706634,
+        lastActiveAt: 1630846634,
         expireAt: 1630846634,
         abandonAt: 1630846634,
+        createdAt: 1630846634,
+        updatedAt: 1630846634,
       },
     ],
-    signInAttemptId: null,
-    signUpAttemptId: null,
-    lastActiveSessionId: 'sess_swag',
-    createdAt: 1613593529,
-    updatedAt: 1613593529,
-  });
+    null,
+    null,
+    null,
+    null,
+    'sess_swag',
+    1630846634,
+    1630846634,
+  );
 
-  const expected2 = new Client({
-    id: 'client_keysersoze',
-    sessionIds: ['sess_mood'],
-    sessions: [
+  const expected2 = new Client(
+    'client_keysersoze',
+    ['sess_mood'],
+    [
       {
         id: 'sess_mood',
         clientId: 'client_keysersoze',
         userId: 'user_player2',
         status: 'active',
-        lastActiveAt: 1610706634,
+        lastActiveAt: 1630846634,
         expireAt: 1630846634,
         abandonAt: 1630846634,
+        createdAt: 1630846634,
+        updatedAt: 1630846634,
       },
     ],
-    signInAttemptId: 'sia_qwerty',
-    signUpAttemptId: null,
-    lastActiveSessionId: null,
-    createdAt: 1612308722,
-    updatedAt: 1612308722,
-  });
+    'sia_qwerty',
+    null,
+    null,
+    null,
+    null,
+    1630846634,
+    1630846634,
+  );
 
   expect(clientList[0]).toEqual(expected1);
   expect(clientList[1]).toEqual(expected2);
 });
 
 test('getClient() returns a single client', async () => {
-  const expected = new Client({
-    id: 'client_server',
-    sessionIds: ['sess_onthebeach'],
-    sessions: [
+  const expected = new Client(
+    'client_server',
+    ['sess_onthebeach'],
+    [
       {
         id: 'sess_onthebeach',
         clientId: 'client_server',
         userId: 'user_player1',
         status: 'active',
-        lastActiveAt: 1610706634,
+        lastActiveAt: 1630846634,
         expireAt: 1630846634,
         abandonAt: 1630846634,
+        createdAt: 1630846634,
+        updatedAt: 1630846634,
       },
     ],
-    signInAttemptId: 'sia_cheepthrills',
-    signUpAttemptId: null,
-    lastActiveSessionId: null,
-    createdAt: 1610706634,
-    updatedAt: 1610706634,
-  });
+    'sia_cheepthrills',
+    null,
+    null,
+    null,
+    null,
+    1630846634,
+    1630846634,
+  );
 
   nock('https://api.clerk.dev')
     .get(`/v1/clients/${expected.id}`)
@@ -89,7 +101,7 @@ test('getClient() returns a single client', async () => {
       'Content-Type': 'application/x-www-form-urlencoded',
     });
 
-  const client = await TestBackendAPIClient.clients.getClient(expected.id as string);
+  const client = await TestBackendAPIClient.clients.getClient(expected.id);
 
   expect(client).toEqual(expected);
 });
@@ -99,26 +111,30 @@ test('getClient() throws an error without client ID', async () => {
 });
 
 test('verifyClient() returns a client if verified', async () => {
-  const expected = new Client({
-    id: 'client_server',
-    sessionIds: ['sess_onthebeach'],
-    sessions: [
+  const expected = new Client(
+    'client_server',
+    ['sess_onthebeach'],
+    [
       {
         id: 'sess_onthebeach',
         clientId: 'client_server',
         userId: 'user_player1',
         status: 'active',
-        lastActiveAt: 1610706634,
+        lastActiveAt: 1630846634,
         expireAt: 1630846634,
         abandonAt: 1630846634,
+        createdAt: 1630846634,
+        updatedAt: 1630846634,
       },
     ],
-    signInAttemptId: 'sia_cheepthrills',
-    signUpAttemptId: null,
-    lastActiveSessionId: null,
-    createdAt: 1610706634,
-    updatedAt: 1610706634,
-  });
+    'sia_cheepthrills',
+    null,
+    null,
+    null,
+    null,
+    1630846634,
+    1630846634,
+  );
 
   const sessionToken = 'random_jwt_token';
 

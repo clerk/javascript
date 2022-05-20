@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`email address defaults 1`] = `
+EmailAddress {
+  "emailAddress": "test@example.com",
+  "id": "mock_email_address_id",
+  "linkedTo": Array [],
+  "verification": Verification {
+    "attempts": 0,
+    "expireAt": 12345,
+    "externalVerificationRedirectURL": null,
+    "nonce": "",
+    "status": "verified",
+    "strategy": "email",
+  },
+}
+`;

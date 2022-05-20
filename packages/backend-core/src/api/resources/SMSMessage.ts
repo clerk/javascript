@@ -1,25 +1,23 @@
-import camelcaseKeys from 'camelcase-keys';
-
-import filterKeys from '../utils/Filter';
 import type { SMSMessageJSON } from './JSON';
-import type { SMSMessageProps } from './Props';
-
-interface SMSMessagePayload extends SMSMessageProps {}
-
-export interface SMSMessage extends SMSMessagePayload {}
 
 export class SMSMessage {
-  static attributes = ['id', 'fromPhoneNumber', 'toPhoneNumber', 'phoneNumberId', 'message', 'status'];
-
-  static defaults = {};
-
-  constructor(data: Partial<SMSMessagePayload> = {}) {
-    Object.assign(this, SMSMessage.defaults, data);
-  }
+  constructor(
+    readonly id: string,
+    readonly fromPhoneNumber: string,
+    readonly toPhoneNumber: string,
+    readonly message: string,
+    readonly status: string,
+    readonly phoneNumberId: string | null,
+  ) {}
 
   static fromJSON(data: SMSMessageJSON): SMSMessage {
-    const camelcased = camelcaseKeys(data);
-    const filtered = filterKeys(camelcased, SMSMessage.attributes);
-    return new SMSMessage(filtered as SMSMessagePayload);
+    return new SMSMessage(
+      data.id,
+      data.from_phone_number,
+      data.to_phone_number,
+      data.message,
+      data.status,
+      data.phone_number_id,
+    );
   }
 }
