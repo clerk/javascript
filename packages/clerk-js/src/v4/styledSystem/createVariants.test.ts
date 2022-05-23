@@ -1,3 +1,4 @@
+import { createCssVariables } from './createCssVariables';
 import { createVariants } from './createVariants';
 
 const baseTheme = {
@@ -197,6 +198,27 @@ describe('createVariants', () => {
     expect(res).toEqual({
       fontSize: baseTheme.fontSizes.md,
       backgroundColor: 'gainsboro',
+    });
+  });
+
+  it('sanitizes vss variable keys before use', () => {
+    const { color } = createCssVariables('color');
+    const { applyVariants } = createVariants<typeof baseTheme>(theme => ({
+      variants: {
+        size: {
+          small: { [color]: theme.colors.primary500, fontSize: baseTheme.fontSizes.sm },
+        },
+        color: {
+          blue: { backgroundColor: color },
+        },
+      },
+    }));
+
+    const res = applyVariants({ size: 'small', color: 'blue' })(baseTheme);
+    expect(res).toEqual({
+      fontSize: baseTheme.fontSizes.sm,
+      [color.replace('var(', '').replace(')', '')]: baseTheme.colors.primary500,
+      backgroundColor: color,
     });
   });
 

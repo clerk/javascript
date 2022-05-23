@@ -52,6 +52,7 @@ export const createVariants: CreateVariants = configFn => {
       applyBaseRules(computedStyles, base);
       applyVariantRules(computedStyles, variantsToApply, variants);
       applyCompoundVariantRules(computedStyles, variantsToApply, compoundVariants);
+      sanitizeCssVariables(computedStyles);
       applyCustomCssUtilities(computedStyles);
       return computedStyles;
     };
@@ -95,6 +96,15 @@ const applyCompoundVariantRules = (
   for (const compoundVariant of compoundVariants) {
     if (conditionMatches(compoundVariant, variantsToApply)) {
       Object.assign(computedStyles, compoundVariant.styles);
+    }
+  }
+};
+
+const sanitizeCssVariables = (computedStyles: any) => {
+  for (const key in computedStyles) {
+    if (key.startsWith('var(')) {
+      computedStyles[key.slice(4, -1)] = computedStyles[key];
+      delete computedStyles[key];
     }
   }
 };
