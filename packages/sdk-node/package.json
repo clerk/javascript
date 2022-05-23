@@ -54,7 +54,7 @@
     "cookies": "^0.8.0",
     "deepmerge": "^4.2.2",
     "form-data": "^4.0.0",
-    "got": "^11.8.2",
+    "got": "^12.0.4",
     "jsonwebtoken": "^8.5.1",
     "jwks-rsa": "^2.0.4",
     "snakecase-keys": "^3.2.1",

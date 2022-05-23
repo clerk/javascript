@@ -1,7 +1,7 @@
-import type FormData from 'form-data';
 import * as querystring from 'query-string';
 import snakecaseKeys from 'snakecase-keys';
 
+import type { FormDataLike } from '../../types';
 import deserialize from './Deserializer';
 import handleError from './ErrorHandler';
 
@@ -17,7 +17,7 @@ type RequestOptions = {
   contentType?: string;
   queryParams?: object;
   bodyParams?: object;
-  formData?: FormData;
+  formData?: FormDataLike;
 };
 
 /*
@@ -31,7 +31,7 @@ export type ClerkFetcher = (
     authorization: string;
     contentType: string;
     userAgent: string;
-    body?: Record<string, unknown> | FormData;
+    body?: Record<string, unknown> | FormDataLike;
   },
 ) => Promise<unknown>;
 
@@ -70,7 +70,7 @@ export default class RestClient {
       body = snakecaseKeys(requestOptions.bodyParams) as Record<string, unknown>;
     }
     if (requestOptions.formData) {
-      body = requestOptions.formData as FormData;
+      body = requestOptions.formData;
     }
 
     // TODO improve error handling
@@ -78,7 +78,7 @@ export default class RestClient {
     return this.fetcher(url, {
       method: requestOptions.method,
       authorization: `Bearer ${this.apiKey}`,
-      contentType: API_CONTENT_TYPE,
+      contentType: requestOptions.contentType || API_CONTENT_TYPE,
       userAgent: this.userAgent,
       body,
     })

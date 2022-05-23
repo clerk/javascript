@@ -1,5 +1,4 @@
-import FormData from 'form-data';
-
+import type { FormDataLike } from '../../types';
 import { Organization, OrganizationInvitation, OrganizationMembership } from '../resources';
 import { OrganizationMembershipRole } from '../resources/Enums';
 import { AbstractApi } from './AbstractApi';
@@ -33,10 +32,9 @@ type UpdateParams = {
   name?: string;
 };
 
-type UpdateLogoParams = {
-  // file: ReadableStream;
-  file: Blob;
-  uploaderUserId: string;
+type UpdateLogoParams = FormDataLike;
+type UpdateLogoHeaders = {
+  contentType: string;
 };
 
 type UpdateMetadataParams = OrganizationMetadataParams;
@@ -123,17 +121,17 @@ export class OrganizationApi extends AbstractApi {
     });
   }
 
-  public async updateOrganizationLogo(organizationId: string, { file, uploaderUserId }: UpdateLogoParams) {
+  public async updateOrganizationLogo(
+    organizationId: string,
+    formData: UpdateLogoParams,
+    { contentType }: UpdateLogoHeaders,
+  ) {
     this.requireId(organizationId);
-
-    const formData = new FormData();
-    // @ts-ignore
-    formData.append('file', file);
-    formData.append('uploader_user_id', uploaderUserId);
 
     return this._restClient.makeRequest<Organization>({
       method: 'PUT',
       path: `${basePath}/${organizationId}/logo`,
+      contentType,
       formData,
     });
   }
