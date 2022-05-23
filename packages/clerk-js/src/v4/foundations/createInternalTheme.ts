@@ -6,7 +6,7 @@ type ThemeWithPrefix<Theme> = {
   };
 };
 
-const createInternalTheme = <T extends Record<string, any>>(theme: T): ThemeWithPrefix<Readonly<T>> => {
+const createInternalTheme = <T>(theme: T): ThemeWithPrefix<Readonly<T>> => {
   return Object.freeze(
     Object.fromEntries(
       Object.entries(theme).map(([scale, values]) => [

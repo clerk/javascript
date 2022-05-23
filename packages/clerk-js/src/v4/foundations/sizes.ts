@@ -1,4 +1,4 @@
-const space = {
+const space = Object.freeze({
   px: '1px',
   '0x5': '0.125rem',
   '1': '0.25rem',
@@ -32,23 +32,23 @@ const space = {
   72: '18rem',
   80: '20rem',
   96: '24rem',
-};
+} as const);
 
-const sizes = {
+const sizes = Object.freeze({
   ...space,
   cardContainer: '25rem',
-};
+} as const);
 
-const radii = {
-  none: '0',
-  sm: '0.125rem',
-  base: '0.25rem',
-  md: '0.375rem',
-  lg: '0.5rem',
-  xl: '0.75rem',
-  '2xl': '1rem',
-  '3xl': '1.5rem',
+const radii = Object.freeze({
+  none: '0', // 0px
+  sm: '0.125rem', // 2px
+  base: '0.25rem', // 4px
+  md: '0.375rem', // 6px
+  lg: '0.5rem', // 8px
+  xl: '0.75rem', // 12px
+  '2xl': '1rem', // 16px
+  '3xl': '1.5rem', // 24.px
   full: '9999px',
-};
+} as const);
 
 export { sizes, space, radii };

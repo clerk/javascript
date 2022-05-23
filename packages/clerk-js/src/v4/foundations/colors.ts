@@ -1,4 +1,4 @@
-export const colors = {
+export const colors = Object.freeze({
   whiteAlpha200: 'rgba(255, 255, 255, 0.08)',
   whiteAlpha300: 'rgba(255, 255, 255, 0.16)',
   whiteAlpha400: 'rgba(255, 255, 255, 0.24)',
@@ -57,4 +57,4 @@ export const colors = {
   success700: '#207920',
   success800: '#155115',
   success900: '#0B280B',
-};
+} as const);
