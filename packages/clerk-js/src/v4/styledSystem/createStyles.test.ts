@@ -1,4 +1,4 @@
-import { createStyles } from './createStyles';
+import { createVariants } from './createVariants';
 
 const baseTheme = {
   fontSizes: {
@@ -17,7 +17,7 @@ const baseTheme = {
 
 describe('createVariants', () => {
   it('applies base styles', () => {
-    const { applyVariants } = createStyles<typeof baseTheme>(theme => ({
+    const { applyVariants } = createVariants<typeof baseTheme>(theme => ({
       base: {
         backgroundColor: theme.colors.primary500,
       },
@@ -34,7 +34,7 @@ describe('createVariants', () => {
   });
 
   it('applies variants based on props', () => {
-    const { applyVariants } = createStyles<typeof baseTheme>(theme => ({
+    const { applyVariants } = createVariants<typeof baseTheme>(theme => ({
       variants: {
         size: {
           small: { fontSize: theme.fontSizes.sm },
@@ -52,7 +52,7 @@ describe('createVariants', () => {
   });
 
   it('applies boolean-based variants based on props', () => {
-    const { applyVariants } = createStyles<typeof baseTheme>(theme => ({
+    const { applyVariants } = createVariants<typeof baseTheme>(theme => ({
       variants: {
         size: {
           small: { fontSize: theme.fontSizes.sm },
@@ -72,7 +72,7 @@ describe('createVariants', () => {
   });
 
   it('applies boolean-based variants based on default variants', () => {
-    const { applyVariants } = createStyles<typeof baseTheme>(theme => ({
+    const { applyVariants } = createVariants<typeof baseTheme>(theme => ({
       variants: {
         size: {
           small: { fontSize: theme.fontSizes.sm },
@@ -96,7 +96,7 @@ describe('createVariants', () => {
   });
 
   it('applies falsy boolean-based variants', () => {
-    const { applyVariants } = createStyles<typeof baseTheme>(theme => ({
+    const { applyVariants } = createVariants<typeof baseTheme>(theme => ({
       variants: {
         size: {
           small: { fontSize: theme.fontSizes.sm },
@@ -119,7 +119,7 @@ describe('createVariants', () => {
   });
 
   it('applies variants based on props and default variants if found', () => {
-    const { applyVariants } = createStyles<typeof baseTheme>(theme => ({
+    const { applyVariants } = createVariants<typeof baseTheme>(theme => ({
       variants: {
         size: {
           small: { fontSize: theme.fontSizes.sm },
@@ -143,7 +143,7 @@ describe('createVariants', () => {
   });
 
   it('applies rules from compound variants', () => {
-    const { applyVariants } = createStyles<typeof baseTheme>(theme => ({
+    const { applyVariants } = createVariants<typeof baseTheme>(theme => ({
       variants: {
         size: {
           small: { fontSize: theme.fontSizes.sm },
@@ -172,7 +172,7 @@ describe('createVariants', () => {
   });
 
   it('correctly overrides styles though compound variants rules', () => {
-    const { applyVariants } = createStyles<typeof baseTheme>(theme => ({
+    const { applyVariants } = createVariants<typeof baseTheme>(theme => ({
       variants: {
         size: {
           small: { fontSize: theme.fontSizes.sm },
@@ -201,7 +201,7 @@ describe('createVariants', () => {
   });
 
   it('removes variant keys from passed props', () => {
-    const { filterProps } = createStyles<typeof baseTheme>(theme => ({
+    const { filterProps } = createVariants<typeof baseTheme>(theme => ({
       variants: {
         size: {
           small: { fontSize: theme.fontSizes.sm },

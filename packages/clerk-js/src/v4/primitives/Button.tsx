@@ -1,6 +1,6 @@
-import { createStyles, PrimitiveProps, StyleVariants } from '../styledSystem';
+import { createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
 
-const { applyVariants, filterProps } = createStyles(theme => ({
+const { applyVariants, filterProps } = createVariants(theme => ({
   base: {
     margin: 0,
     padding: 0,
