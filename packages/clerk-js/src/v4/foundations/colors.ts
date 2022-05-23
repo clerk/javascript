@@ -1,4 +1,6 @@
 export const colors = Object.freeze({
+  transparent: 'transparent',
+  white: 'white',
   whiteAlpha200: 'rgba(255, 255, 255, 0.08)',
   whiteAlpha300: 'rgba(255, 255, 255, 0.16)',
   whiteAlpha400: 'rgba(255, 255, 255, 0.24)',
