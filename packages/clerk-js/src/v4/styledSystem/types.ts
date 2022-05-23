@@ -1,5 +1,7 @@
-import { Interpolation, Theme } from '@emotion/react';
+import { Interpolation as _Interpolation, Theme as _Theme } from '@emotion/react';
 import React from 'react';
+
+import { WithCustomCssUtilities } from './customCssUtilities';
 
 type ElementProps = {
   div: React.HTMLAttributes<HTMLDivElement>;
@@ -9,16 +11,17 @@ type ElementProps = {
   p: React.HTMLAttributes<HTMLParagraphElement>;
 };
 
+export type Theme = _Theme;
+export type StyleRule = _Interpolation<Theme>;
+export type StyleRuleWithCustomCssUtils = WithCustomCssUtilities<StyleRule>;
+
 /**
  * Primitives can override their styles using the css prop.
- * For customising layout/theme, prefer using the defined props.
+ * For customising layout/theme, prefer using the props defined on the component.
  */
-type ThemableCssProp = ((params: Theme) => Interpolation<Theme>) | Interpolation<Theme>;
+type ThemableCssProp = ((params: Theme) => StyleRule) | StyleRule;
 type CssProp = { css?: ThemableCssProp };
 
-type AsProp = { as?: React.ElementType };
+export type AsProp = { as?: React.ElementType };
 
-// type CommonProps = {};
-type PrimitiveProps<HtmlT extends keyof ElementProps> = ElementProps[HtmlT] & CssProp;
-
-export type { PrimitiveProps, AsProp };
+export type PrimitiveProps<HtmlT extends keyof ElementProps> = ElementProps[HtmlT] & CssProp;
