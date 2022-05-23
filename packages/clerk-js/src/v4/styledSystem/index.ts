@@ -5,3 +5,4 @@ export * from './types';
 export * from './EmotionCacheProvider';
 export * from './EmotionThemeProvider';
 export * from './css';
+export * from './createStyles';

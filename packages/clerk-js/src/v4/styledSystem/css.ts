@@ -1,10 +1,10 @@
-import type { Interpolation, Theme } from '@emotion/react';
-
 import { applyCustomCssUtilities, WithCustomCssUtilities } from './customCssUtilities';
+import type { StyleRule, Theme } from './types';
 
 interface ThemableCssFn<T> {
-  (params: (theme: Theme) => T): Interpolation<Theme>;
-  (params: T): Interpolation<Theme>;
+  // This is a duplicate definition to help with IDE intellisense
+  (params: (theme: Theme) => T): StyleRule;
+  (params: ((theme: Theme) => T) | T): StyleRule;
 }
 
 /**
@@ -13,14 +13,16 @@ interface ThemableCssFn<T> {
  * and in many cases, TS cannot infer the correct types if not used directly inside
  * JSX. See /primitives for usage examples.
  */
-export const css: ThemableCssFn<WithCustomCssUtilities<Interpolation<Theme>>> = (param): Interpolation<Theme> => {
+export const css: ThemableCssFn<WithCustomCssUtilities<StyleRule>> = (param): StyleRule => {
   return (theme: Theme) => {
-    return applyCustomCssUtilities(typeof param === 'function' ? param(theme) : param);
+    const res = { ...(typeof param === 'function' ? param(theme) : param) };
+    applyCustomCssUtilities(res);
+    return res;
   };
 };
 
 interface StaticCssFn<T> {
-  (params: T): Interpolation<Theme>;
+  (params: T): StyleRule;
 }
 
 /**
@@ -28,6 +30,6 @@ interface StaticCssFn<T> {
  * Can be useful when creating base styles and is
  * useful for resets
  */
-export const staticCss: StaticCssFn<Interpolation<Theme>> = param => {
+export const staticCss: StaticCssFn<StyleRule> = param => {
   return param;
 };
