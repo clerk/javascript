@@ -6,9 +6,10 @@ const { applyVariants } = createVariants(() => ({
   base: {
     boxSizing: 'border-box',
   },
+  variants: {},
 }));
 
-type BoxProps = PrimitiveProps<'div'> & AsProp & StyleVariants<typeof applyVariants>;
+export type BoxProps = PrimitiveProps<'div'> & AsProp & StyleVariants<typeof applyVariants>;
 
 export const Box = React.forwardRef<HTMLDivElement, BoxProps>((props, ref) => {
   const { as: As = 'div', ...rest } = props;

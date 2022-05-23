@@ -20,7 +20,7 @@ type CompoundVariant<V> = {
 
 type CreateVariantsConfig<V> = {
   base?: StyleRuleWithCustomCssUtils;
-  variants?: V;
+  variants: V;
   compoundVariants?: Array<CompoundVariant<V>>;
   defaultVariants?: DefaultVariants<V>;
 };
