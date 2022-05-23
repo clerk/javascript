@@ -34,6 +34,39 @@ describe('createVariants', () => {
     expect(res).toEqual({ fontSize: baseTheme.fontSizes.sm, backgroundColor: baseTheme.colors.primary500 });
   });
 
+  fit('merges nested pseudo-selector objecst', () => {
+    const { applyVariants } = createVariants<typeof baseTheme>(theme => ({
+      base: {
+        backgroundColor: theme.colors.primary500,
+        '&:active': {
+          backgroundColor: theme.colors.success500,
+        },
+      },
+      variants: {
+        size: {
+          small: {
+            fontSize: theme.fontSizes.sm,
+            '&:active': {
+              transform: 'scale(0.98)',
+            },
+          },
+          medium: { fontSize: theme.fontSizes.md },
+        },
+      },
+    }));
+
+    const res = applyVariants({ size: 'small' })(baseTheme);
+    console.log(res);
+    expect(res).toEqual({
+      fontSize: baseTheme.fontSizes.sm,
+      backgroundColor: baseTheme.colors.primary500,
+      '&:active': {
+        backgroundColor: baseTheme.colors.success500,
+        transform: 'scale(0.98)',
+      },
+    });
+  });
+
   it('applies variants based on props', () => {
     const { applyVariants } = createVariants<typeof baseTheme>(theme => ({
       variants: {

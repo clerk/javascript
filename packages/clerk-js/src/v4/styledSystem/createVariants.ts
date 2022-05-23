@@ -1,4 +1,5 @@
 import { applyCustomCssUtilities } from './customCssUtilities';
+import { fastDeepMerge } from './fastDeepMerge';
 import { StyleRuleWithCustomCssUtils, Theme } from './types';
 
 type UnwrapBooleanVariant<T> = T extends 'true' | 'false' ? boolean : T;
@@ -84,7 +85,7 @@ const applyBaseRules = (computedStyles: any, base?: StyleRuleWithCustomCssUtils)
 const applyVariantRules = (computedStyles: any, variantsToApply: Variants, variants: Variants) => {
   for (const key in variantsToApply) {
     // @ts-ignore
-    Object.assign(computedStyles, variants[key][variantsToApply[key]]);
+    fastDeepMerge(variants[key][variantsToApply[key]], computedStyles);
   }
 };
 
@@ -95,7 +96,7 @@ const applyCompoundVariantRules = (
 ) => {
   for (const compoundVariant of compoundVariants) {
     if (conditionMatches(compoundVariant, variantsToApply)) {
-      Object.assign(computedStyles, compoundVariant.styles);
+      fastDeepMerge(computedStyles, compoundVariant.styles);
     }
   }
 };
