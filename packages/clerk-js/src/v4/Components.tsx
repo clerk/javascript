@@ -21,7 +21,7 @@ import { VirtualRouter } from '../ui/router';
 import type { AvailableComponentCtx, AvailableComponentProps } from '../ui/types';
 import { injectTheme } from '../utils/theming';
 import { SignIn, SignInModal } from './signIn';
-import { EmotionCacheProvider, EmotionThemeProvider } from './styledSystem';
+import { StyledSystemProvider } from './styledSystem';
 
 const Modal = (props: any) => {
   return <div {...props}>modal {props.children}</div>;
@@ -205,19 +205,17 @@ export default class Components extends React.Component<ComponentsProps, Compone
     );
 
     return (
-      <EmotionCacheProvider>
-        <EmotionThemeProvider>
-          <CoreClerkContextWrapper clerk={this.props.clerk}>
-            <EnvironmentProvider value={this.props.environment}>
-              <OptionsProvider value={this.props.options}>
-                {mountedNodes}
-                {signInModal && mountedSignInModal}
-                {signUpModal && mountedSignUpModal}
-              </OptionsProvider>
-            </EnvironmentProvider>
-          </CoreClerkContextWrapper>
-        </EmotionThemeProvider>
-      </EmotionCacheProvider>
+      <StyledSystemProvider>
+        <CoreClerkContextWrapper clerk={this.props.clerk}>
+          <EnvironmentProvider value={this.props.environment}>
+            <OptionsProvider value={this.props.options}>
+              {mountedNodes}
+              {signInModal && mountedSignInModal}
+              {signUpModal && mountedSignUpModal}
+            </OptionsProvider>
+          </EnvironmentProvider>
+        </CoreClerkContextWrapper>
+      </StyledSystemProvider>
     );
   }
 }
