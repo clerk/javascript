@@ -4,4 +4,4 @@ export type { CSSObject, Keyframes } from '@emotion/react';
 export * from './types';
 export * from './EmotionCacheProvider';
 export * from './EmotionThemeProvider';
-export * from './createStyles';
+export * from './createVariants';

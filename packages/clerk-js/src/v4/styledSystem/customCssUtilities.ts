@@ -3,10 +3,8 @@
  *  during render.
  */
 const CUSTOM_CSS_UTILITIES = [
-  ['p', (value: any) => ({ paddingTop: value, paddingBottom: value, paddingLeft: value, paddingRight: value })],
   ['px', (value: any) => ({ paddingLeft: value, paddingRight: value })],
   ['py', (value: any) => ({ paddingTop: value, paddingBottom: value })],
-  ['m', (value: any) => ({ marginTop: value, marginBottom: value, marginLeft: value, marginRight: value })],
   ['mx', (value: any) => ({ marginTop: value, marginBottom: value })],
   ['my', (value: any) => ({ marginTop: value, marginBottom: value })],
   ['flexCenter', () => ({ display: 'flex', justifyContent: 'center' })],

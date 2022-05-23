@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { AsProp, createStyles, PrimitiveProps, StyleVariants } from '../styledSystem';
+import { AsProp, createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
 
-const { applyVariants, filterProps } = createStyles(theme => ({
+const { applyVariants, filterProps } = createVariants(theme => ({
   base: {
     boxSizing: 'border-box',
     display: 'flex',

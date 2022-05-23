@@ -42,7 +42,7 @@ interface CreateVariants {
   <T = Theme, V extends Variants = Variants>(param: (theme: T) => CreateVariantsConfig<V>): CreateVariantsReturn<T, V>;
 }
 
-export const createStyles: CreateVariants = configFn => {
+export const createVariants: CreateVariants = configFn => {
   const applyVariants =
     (props: any = {}) =>
     (theme: any) => {
