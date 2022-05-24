@@ -1,4 +1,8 @@
-import { createCssVariables, createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
+import React from 'react';
+
+import { createCssVariables, createVariants, cssutils, PrimitiveProps, StyleVariants } from '../styledSystem';
+import { Flex } from './Flex';
+import { Spinner } from './Spinner';
 
 const { accentColor, accentColorActive, accentColorHover } = createCssVariables(
   'accentColor',
@@ -11,9 +15,18 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     margin: 0,
     padding: 0,
     border: 0,
-    backgroundColor: 'unset',
+    outline: 0,
     cursor: 'pointer',
+    backgroundColor: 'unset',
+    color: 'currentColor',
     borderRadius: theme.radii.$md,
+    ...cssutils.addCenteredFlex('inline-flex'),
+    ...cssutils.addFocusRing(theme),
+    '&:disabled': {
+      cursor: 'not-allowed',
+      pointerEvents: 'none',
+      opacity: theme.opacity.$disabled,
+    },
   },
   variants: {
     colorScheme: {
@@ -32,33 +45,24 @@ const { applyVariants, filterProps } = createVariants(theme => ({
       solid: {
         backgroundColor: accentColor,
         color: theme.colors.$white,
-        '&:hover': {
-          backgroundColor: accentColorHover,
-        },
-        '&:active': {
-          backgroundColor: accentColorActive,
-        },
+        '&:hover': { backgroundColor: accentColorHover },
+        '&:active': { backgroundColor: accentColorActive },
       },
       outline: {
         border: '1px solid',
         borderColor: accentColor,
         color: accentColor,
-        '&:hover': {
-          borderColor: accentColorHover,
-        },
-        '&:active': {
-          borderColor: accentColorActive,
-        },
+        '&:hover': { borderColor: accentColorHover },
+        '&:active': { borderColor: accentColorActive },
       },
       ghost: {
         color: accentColor,
+        '&:hover': { color: accentColorHover },
+        '&:active': { color: accentColorActive },
       },
     },
     size: {
-      md: {
-        py: theme.space.$2x5,
-        px: theme.space.$5,
-      },
+      md: { padding: `${theme.space.$2x5} ${theme.space.$5}` },
     },
   },
   defaultVariants: {
@@ -68,22 +72,30 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   },
 }));
 
-type ButtonProps = PrimitiveProps<'button'> &
-  StyleVariants<typeof applyVariants> & {
-    isLoading?: boolean;
-    isDisabled?: boolean;
-  };
+type OwnProps = PrimitiveProps<'button'> & { isLoading?: boolean; loadingText?: string; isDisabled?: boolean };
+type ButtonProps = OwnProps & StyleVariants<typeof applyVariants>;
 
-const Button = (props: ButtonProps): JSX.Element => {
-  const propsWithoutVariants = filterProps(props);
-  const { isDisabled, isLoading, ...rest } = propsWithoutVariants;
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
+  const parsedProps: ButtonProps = { ...props, isDisabled: props.isDisabled || props.isLoading };
+  const { isLoading, isDisabled, loadingText, children, ...rest } = filterProps(parsedProps);
+
   return (
     <button
       {...rest}
       disabled={isDisabled}
-      css={applyVariants(props)}
-    />
+      css={applyVariants(parsedProps)}
+      ref={ref}
+    >
+      {isLoading ? (
+        <Flex gap={2}>
+          <Spinner />
+          {loadingText || children}
+        </Flex>
+      ) : (
+        children
+      )}
+    </button>
   );
-};
+});
 
 export { Button };
