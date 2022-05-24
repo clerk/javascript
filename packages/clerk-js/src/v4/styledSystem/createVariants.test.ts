@@ -66,6 +66,19 @@ describe('createVariants', () => {
     });
   });
 
+  it('supports termplate literals with references to the theme prop', () => {
+    const { applyVariants } = createVariants<any, typeof baseTheme>(theme => ({
+      variants: {
+        size: {
+          small: { fontSize: `${theme.fontSizes.sm}` },
+        },
+      },
+    }));
+
+    const res = applyVariants({ size: 'small' })(baseTheme);
+    expect(res).toEqual({ fontSize: baseTheme.fontSizes.sm });
+  });
+
   it('applies variants based on props', () => {
     const { applyVariants } = createVariants<any, typeof baseTheme>(theme => ({
       variants: {

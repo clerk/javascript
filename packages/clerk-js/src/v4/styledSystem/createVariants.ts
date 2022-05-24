@@ -141,6 +141,6 @@ const conditionMatches = ({ condition }: CompoundVariant<any>, variants: Variant
 };
 
 const createInfiniteAccessProxy = () => {
-  const proxy: any = new Proxy({}, { get: () => proxy });
+  const proxy: any = new Proxy({}, { get: (_, prop) => (prop === Symbol.toPrimitive ? () => '' : proxy) });
   return proxy;
 };
