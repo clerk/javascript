@@ -1,4 +1,10 @@
-import { createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
+import { createCssVariables, createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
+
+const { accentColor, accentColorActive, accentColorHover } = createCssVariables(
+  'accentColor',
+  'accentColorHover',
+  'accentColorActive',
+);
 
 const { applyVariants, filterProps } = createVariants(theme => ({
   base: {
@@ -6,45 +12,46 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     padding: 0,
     border: 0,
     backgroundColor: 'unset',
-    flexCenter: '',
     cursor: 'pointer',
     borderRadius: theme.radii.$md,
-    my: theme.space.$2x5,
-    '&:disabled': {
-      backgroundColor: theme.colors.$primary200,
-    },
   },
   variants: {
     colorScheme: {
       primary: {
-        '--color': theme.colors.$primary500,
-        '--color-hover': theme.colors.$primary600,
-        '--color-active': theme.colors.$primary300,
+        [accentColorActive]: theme.colors.$primary400,
+        [accentColor]: theme.colors.$primary500,
+        [accentColorHover]: theme.colors.$primary600,
       },
       danger: {
-        '--color': theme.colors.$danger500,
-        '--color-hover': theme.colors.$danger700,
-        '--color-active': theme.colors.$danger300,
+        [accentColorActive]: theme.colors.$danger300,
+        [accentColor]: theme.colors.$danger500,
+        [accentColorHover]: theme.colors.$danger600,
       },
     },
     variant: {
       solid: {
-        backgroundColor: 'var(--color)',
+        backgroundColor: accentColor,
         color: theme.colors.$white,
         '&:hover': {
-          backgroundColor: 'var(--color-hover)',
+          backgroundColor: accentColorHover,
+        },
+        '&:active': {
+          backgroundColor: accentColorActive,
         },
       },
       outline: {
         border: '1px solid',
-        borderColor: 'var(--color)',
-        color: 'var(--color)',
+        borderColor: accentColor,
+        color: accentColor,
         '&:hover': {
-          borderColor: 'var(--color-hover)',
+          borderColor: accentColorHover,
+        },
+        '&:active': {
+          borderColor: accentColorActive,
         },
       },
       ghost: {
-        color: 'var(--color)',
+        color: accentColor,
       },
     },
     size: {
