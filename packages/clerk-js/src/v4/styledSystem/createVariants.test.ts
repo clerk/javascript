@@ -56,7 +56,6 @@ describe('createVariants', () => {
     }));
 
     const res = applyVariants({ size: 'small' })(baseTheme);
-    console.log(res);
     expect(res).toEqual({
       fontSize: baseTheme.fontSizes.sm,
       backgroundColor: baseTheme.colors.primary500,

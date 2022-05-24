@@ -96,7 +96,7 @@ const applyCompoundVariantRules = (
 ) => {
   for (const compoundVariant of compoundVariants) {
     if (conditionMatches(compoundVariant, variantsToApply)) {
-      fastDeepMerge(computedStyles, compoundVariant.styles);
+      fastDeepMerge(compoundVariant.styles, computedStyles);
     }
   }
 };
