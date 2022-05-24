@@ -18,7 +18,7 @@ const baseTheme = {
 
 describe('createVariants', () => {
   it('applies base styles', () => {
-    const { applyVariants } = createVariants<typeof baseTheme>(theme => ({
+    const { applyVariants } = createVariants<any, typeof baseTheme>(theme => ({
       base: {
         backgroundColor: theme.colors.primary500,
       },
@@ -35,7 +35,7 @@ describe('createVariants', () => {
   });
 
   it('merges nested pseudo-selector objecst', () => {
-    const { applyVariants } = createVariants<typeof baseTheme>(theme => ({
+    const { applyVariants } = createVariants<any, typeof baseTheme>(theme => ({
       base: {
         backgroundColor: theme.colors.primary500,
         '&:active': {
@@ -67,7 +67,7 @@ describe('createVariants', () => {
   });
 
   it('applies variants based on props', () => {
-    const { applyVariants } = createVariants<typeof baseTheme>(theme => ({
+    const { applyVariants } = createVariants<any, typeof baseTheme>(theme => ({
       variants: {
         size: {
           small: { fontSize: theme.fontSizes.sm },
@@ -85,7 +85,7 @@ describe('createVariants', () => {
   });
 
   it('applies boolean-based variants based on props', () => {
-    const { applyVariants } = createVariants<typeof baseTheme>(theme => ({
+    const { applyVariants } = createVariants<any, typeof baseTheme>(theme => ({
       variants: {
         size: {
           small: { fontSize: theme.fontSizes.sm },
@@ -105,7 +105,7 @@ describe('createVariants', () => {
   });
 
   it('applies boolean-based variants based on default variants', () => {
-    const { applyVariants } = createVariants<typeof baseTheme>(theme => ({
+    const { applyVariants } = createVariants<any, typeof baseTheme>(theme => ({
       variants: {
         size: {
           small: { fontSize: theme.fontSizes.sm },
@@ -129,7 +129,7 @@ describe('createVariants', () => {
   });
 
   it('applies falsy boolean-based variants', () => {
-    const { applyVariants } = createVariants<typeof baseTheme>(theme => ({
+    const { applyVariants } = createVariants<any, typeof baseTheme>(theme => ({
       variants: {
         size: {
           small: { fontSize: theme.fontSizes.sm },
@@ -152,7 +152,7 @@ describe('createVariants', () => {
   });
 
   it('applies variants based on props and default variants if found', () => {
-    const { applyVariants } = createVariants<typeof baseTheme>(theme => ({
+    const { applyVariants } = createVariants<any, typeof baseTheme>(theme => ({
       variants: {
         size: {
           small: { fontSize: theme.fontSizes.sm },
@@ -176,7 +176,7 @@ describe('createVariants', () => {
   });
 
   it('applies rules from compound variants', () => {
-    const { applyVariants } = createVariants<typeof baseTheme>(theme => ({
+    const { applyVariants } = createVariants<any, typeof baseTheme>(theme => ({
       variants: {
         size: {
           small: { fontSize: theme.fontSizes.sm },
@@ -205,7 +205,7 @@ describe('createVariants', () => {
   });
 
   it('correctly overrides styles though compound variants rules', () => {
-    const { applyVariants } = createVariants<typeof baseTheme>(theme => ({
+    const { applyVariants } = createVariants<any, typeof baseTheme>(theme => ({
       variants: {
         size: {
           small: { fontSize: theme.fontSizes.sm },
@@ -235,7 +235,7 @@ describe('createVariants', () => {
 
   it('sanitizes vss variable keys before use', () => {
     const { color } = createCssVariables('color');
-    const { applyVariants } = createVariants<typeof baseTheme>(theme => ({
+    const { applyVariants } = createVariants<any, typeof baseTheme>(theme => ({
       variants: {
         size: {
           small: { [color]: theme.colors.primary500, fontSize: baseTheme.fontSizes.sm },
@@ -254,8 +254,21 @@ describe('createVariants', () => {
     });
   });
 
+  it('gives access to props inside the config function', () => {
+    type Props = { size: any; color: any; isLoading: boolean };
+    const { applyVariants } = createVariants<Props, typeof baseTheme>((theme, props) => ({
+      base: {
+        color: props.isLoading ? theme.colors.success500 : theme.colors.primary500,
+      },
+      variants: {},
+    }));
+
+    const res = applyVariants({ isLoading: true } as any)(baseTheme);
+    expect(res).toEqual({ color: baseTheme.colors.success500 });
+  });
+
   it('removes variant keys from passed props', () => {
-    const { filterProps } = createVariants<typeof baseTheme>(theme => ({
+    const { filterProps } = createVariants<any, typeof baseTheme>(theme => ({
       variants: {
         size: {
           small: { fontSize: theme.fontSizes.sm },
