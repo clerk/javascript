@@ -30,6 +30,7 @@ const letterSpacings = Object.freeze({
 } as const);
 
 const fontSizes = Object.freeze({
+  xxs: '0.625rem',
   xs: '0.75rem',
   sm: '0.875rem',
   md: '1rem',
@@ -37,6 +38,10 @@ const fontSizes = Object.freeze({
   xl: '1.25rem',
 } as const);
 
+const fontStyles = Object.freeze({
+  normal: 'normal',
+} as const);
+
 const fonts = Object.freeze({} as const);
 
-export { fontSizes, fontWeights, letterSpacings, lineHeights, fonts };
+export { fontSizes, fontWeights, letterSpacings, lineHeights, fonts, fontStyles };

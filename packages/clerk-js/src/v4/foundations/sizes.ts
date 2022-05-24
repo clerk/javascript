@@ -1,4 +1,5 @@
 const space = Object.freeze({
+  xxs: '0.5px',
   px: '1px',
   '0x5': '0.125rem',
   '1': '0.25rem',
@@ -40,6 +41,7 @@ const sizes = Object.freeze({
 } as const);
 
 const radii = Object.freeze({
+  card: '1rem',
   none: '0', // 0px
   sm: '0.125rem', // 2px
   base: '0.25rem', // 4px
