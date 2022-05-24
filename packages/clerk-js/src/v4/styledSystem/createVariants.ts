@@ -40,14 +40,16 @@ type CreateVariantsReturn<T, V extends Variants> = {
 };
 
 interface CreateVariants {
-  <T = Theme, V extends Variants = Variants>(param: (theme: T) => CreateVariantsConfig<V>): CreateVariantsReturn<T, V>;
+  <P, T = Theme, V extends Variants = Variants>(
+    param: (theme: T, props: P) => CreateVariantsConfig<V>,
+  ): CreateVariantsReturn<T, V>;
 }
 
 export const createVariants: CreateVariants = configFn => {
   const applyVariants =
     (props: any = {}) =>
     (theme: any) => {
-      const { base, variants = {}, compoundVariants = [], defaultVariants = {} } = configFn(theme);
+      const { base, variants = {}, compoundVariants = [], defaultVariants = {} } = configFn(theme, props);
       const variantsToApply = calculateVariantsToBeApplied(variants, props, defaultVariants);
       const computedStyles = {};
       applyBaseRules(computedStyles, base);
@@ -63,7 +65,7 @@ export const createVariants: CreateVariants = configFn => {
   // Instead of the theme, we pass an infinite proxy because we only care about
   // the keys of the returned object and not the actual values.
   const fakeProxyTheme = createInfiniteAccessProxy();
-  const variantKeys = Object.keys(configFn(fakeProxyTheme).variants || {});
+  const variantKeys = Object.keys(configFn(fakeProxyTheme, fakeProxyTheme).variants || {});
   const filterProps = (props: any) => getPropsWithoutVariants(props, variantKeys);
   return { applyVariants, filterProps } as any;
 };
