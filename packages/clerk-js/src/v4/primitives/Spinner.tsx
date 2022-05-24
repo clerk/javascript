@@ -57,7 +57,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
   };
 });
 
-export type SpinnerProps = PrimitiveProps<'div'> & StyleVariants<typeof applyVariants>;
+type SpinnerProps = PrimitiveProps<'div'> & StyleVariants<typeof applyVariants>;
 
 export const Spinner = (props: SpinnerProps): JSX.Element => {
   return (
