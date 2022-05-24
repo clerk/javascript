@@ -79,6 +79,36 @@ describe('createVariants', () => {
     expect(res).toEqual({ fontSize: baseTheme.fontSizes.sm });
   });
 
+  it('supports template literals with references to the theme prop', () => {
+    const { applyVariants } = createVariants<any, typeof baseTheme>(theme => ({
+      variants: {
+        size: {
+          small: { fontSize: `${theme.fontSizes.sm}` },
+        },
+      },
+    }));
+
+    const res = applyVariants({ size: 'small' })(baseTheme);
+    expect(res).toEqual({ fontSize: baseTheme.fontSizes.sm });
+  });
+
+  it('respects variant specificity - the variant that comes last wins', () => {
+    const { applyVariants } = createVariants<any, typeof baseTheme>(theme => ({
+      variants: {
+        type: {
+          subtitle: { color: theme.colors.success500, fontSize: theme.fontSizes.sm },
+        },
+        size: {
+          small: { fontSize: `${theme.fontSizes.sm}` },
+          md: { fontSize: `${theme.fontSizes.md}` },
+        },
+      },
+    }));
+
+    const res = applyVariants({ type: 'subtitle', size: 'md' })(baseTheme);
+    expect(res).toEqual({ color: baseTheme.colors.success500, fontSize: baseTheme.fontSizes.md });
+  });
+
   it('applies variants based on props', () => {
     const { applyVariants } = createVariants<any, typeof baseTheme>(theme => ({
       variants: {
