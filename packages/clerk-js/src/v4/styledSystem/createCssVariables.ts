@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-imports
 import hash from '@emotion/hash';
 
 let varHashId = Date.now();

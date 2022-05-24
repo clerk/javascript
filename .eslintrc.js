@@ -26,5 +26,17 @@ module.exports = {
     '@typescript-eslint/restrict-template-expressions': 'off',
     '@typescript-eslint/ban-ts-comment': 'off',
     'simple-import-sort/imports': 'error',
+    'no-restricted-imports': [
+      'error',
+      {
+        patterns: [
+          {
+            group: ['@emotion/*'],
+            message:
+              'Please do not import emotion directly. Import helpers from ./design-system or ./primitives instead.',
+          },
+        ],
+      },
+    ],
   },
 };
