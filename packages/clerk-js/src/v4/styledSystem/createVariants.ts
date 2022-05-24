@@ -1,10 +1,9 @@
-import { applyCustomCssUtilities } from './customCssUtilities';
 import { fastDeepMerge } from './fastDeepMerge';
-import { StyleRuleWithCustomCssUtils, Theme } from './types';
+import { StyleRule, Theme } from './types';
 
 type UnwrapBooleanVariant<T> = T extends 'true' | 'false' ? boolean : T;
 
-type VariantDefinition = Record<string, StyleRuleWithCustomCssUtils>;
+type VariantDefinition = Record<string, StyleRule>;
 
 type Variants = Record<string, VariantDefinition>;
 
@@ -16,18 +15,18 @@ type DefaultVariants<V> = VariantNameToKeyMap<V>;
 
 type CompoundVariant<V> = {
   condition: VariantNameToKeyMap<V>;
-  styles?: StyleRuleWithCustomCssUtils;
+  styles?: StyleRule;
 };
 
 type CreateVariantsConfig<V> = {
-  base?: StyleRuleWithCustomCssUtils;
+  base?: StyleRule;
   variants: V;
   compoundVariants?: Array<CompoundVariant<V>>;
   defaultVariants?: DefaultVariants<V>;
 };
 
 interface ApplyVariants<T, V> {
-  (props?: VariantNameToKeyMap<V>): (theme: T) => StyleRuleWithCustomCssUtils;
+  (props?: VariantNameToKeyMap<V>): (theme: T) => StyleRule;
 }
 
 export type StyleVariants<T extends () => any> = Parameters<T>[0];
@@ -56,7 +55,6 @@ export const createVariants: CreateVariants = configFn => {
       applyVariantRules(computedStyles, variantsToApply, variants);
       applyCompoundVariantRules(computedStyles, variantsToApply, compoundVariants);
       sanitizeCssVariables(computedStyles);
-      applyCustomCssUtilities(computedStyles);
       return computedStyles;
     };
 
@@ -78,7 +76,7 @@ const getPropsWithoutVariants = (props: Record<string, any>, variants: string[])
   return res;
 };
 
-const applyBaseRules = (computedStyles: any, base?: StyleRuleWithCustomCssUtils) => {
+const applyBaseRules = (computedStyles: any, base?: StyleRule) => {
   if (base && typeof base === 'object') {
     Object.assign(computedStyles, base);
   }

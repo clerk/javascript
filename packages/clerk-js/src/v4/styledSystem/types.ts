@@ -1,8 +1,8 @@
 // eslint-disable-next-line no-restricted-imports
-import { Interpolation as _Interpolation, Theme as _Theme } from '@emotion/react';
+import { Interpolation as _Interpolation } from '@emotion/react';
 import React from 'react';
 
-import { WithCustomCssUtilities } from './customCssUtilities';
+import { BaseTheme } from '../foundations';
 
 type ElementProps = {
   div: React.HTMLAttributes<HTMLDivElement>;
@@ -12,9 +12,8 @@ type ElementProps = {
   p: React.HTMLAttributes<HTMLParagraphElement>;
 };
 
-export type Theme = _Theme;
+export type Theme = BaseTheme;
 export type StyleRule = _Interpolation<Theme>;
-export type StyleRuleWithCustomCssUtils = WithCustomCssUtilities<StyleRule>;
 
 /**
  * Primitives can override their styles using the css prop.
