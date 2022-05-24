@@ -7,14 +7,16 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     boxSizing: 'border-box',
     display: 'flex',
     flexDirection: 'column',
-    minWidth: theme.sizes.$96,
-    py: theme.sizes.$10,
-    px: theme.sizes.$8,
+    minWidth: theme.space.$96,
+    padding: `${theme.space.$10} ${theme.space.$8}`,
     borderRadius: theme.radii.$2xl,
+    backgroundColor: theme.colors.$cardBackground,
   },
   variants: {
     elevated: {
-      true: { boxShadow: theme.shadows.$boxShadow1 },
+      true: {
+        filter: `drop-shadow(${theme.shadows.$cardDropShadow})`,
+      },
     },
   },
   defaultVariants: {
