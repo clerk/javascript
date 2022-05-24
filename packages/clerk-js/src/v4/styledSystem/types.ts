@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-imports
 import { Interpolation as _Interpolation, Theme as _Theme } from '@emotion/react';
 import React from 'react';
 
