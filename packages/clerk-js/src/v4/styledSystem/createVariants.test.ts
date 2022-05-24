@@ -34,7 +34,7 @@ describe('createVariants', () => {
     expect(res).toEqual({ fontSize: baseTheme.fontSizes.sm, backgroundColor: baseTheme.colors.primary500 });
   });
 
-  fit('merges nested pseudo-selector objecst', () => {
+  it('merges nested pseudo-selector objecst', () => {
     const { applyVariants } = createVariants<typeof baseTheme>(theme => ({
       base: {
         backgroundColor: theme.colors.primary500,
