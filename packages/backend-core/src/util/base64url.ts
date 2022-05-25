@@ -3,7 +3,7 @@
  * Parse a string to base64 URL encoding.
  *
  * https://github.com/swansontec/rfc4648.js
- * https://stackoverflow.com/questions/54062583/how-to-verify-a-signed-jwt-with-subtlecrypto-of-the-web-crypto-api
+ * https://stackoverflow.com/questions/54062583/how-to-verify-a-signed-jwt-with-subtlecrypto-of-the-web-crypto-API
  *
  * @param {string} input
  * @return {Uint8Array} out

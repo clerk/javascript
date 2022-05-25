@@ -116,13 +116,13 @@ export class Base {
       e: 'AQAB',
     };
 
-    // Algorithm https://developer.mozilla.org/en-US/docs/Web/API/RsaHashedImportParams
+    // Algorithm https://developer.mozilla.org/en-US/docs/Web/api/RsaHashedImportParams
     const algorithm = {
       name: 'RSASSA-PKCS1-v1_5',
       hash: 'SHA-256',
     };
 
-    // Based on https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey#subjectpublickeyinfo_import
+    // Based on https://developer.mozilla.org/en-US/docs/Web/api/SubtleCrypto/importKey#subjectpublickeyinfo_import
     try {
       return this.importKeyFunction(jwk, algorithm);
     } catch (_) {
