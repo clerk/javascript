@@ -37,6 +37,7 @@ const { applyVariants } = createVariants(theme => {
           fontSize: theme.fontSizes.$xxs,
           letterSpacing: theme.space.$xxs,
           lineHeight: theme.lineHeights.$none,
+          textTransform: 'uppercase',
         },
         subheading: {
           // Dashboard/Text/Regular/Regular
