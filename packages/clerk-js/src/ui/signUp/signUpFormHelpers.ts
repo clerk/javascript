@@ -27,6 +27,7 @@ type FieldDeterminationProps = {
   hasTicket?: boolean;
   hasEmail?: boolean;
   signUp?: SignUpResource | undefined;
+  isProgressiveSignUp: boolean;
 };
 
 export function determineActiveFields(fieldProps: FieldDeterminationProps): Fields {
@@ -81,14 +82,19 @@ export function minimizeFieldsForExistingSignup(fields: Fields, signUp: SignUpRe
   }
 }
 
-// TODO revisit when attributes.email_address.required becomes effective
-// TODO revisit when attributes.phone_number.required becomes effective
-export const getInitialActiveIdentifier = (attributes: Attributes): ActiveIdentifier => {
-  if (attributes.email_address.enabled && attributes.email_address.used_for_first_factor) {
+export const getInitialActiveIdentifier = (attributes: Attributes, isProgressiveSignUp: boolean): ActiveIdentifier => {
+  if (emailOrPhone(attributes, isProgressiveSignUp)) {
+    // If we are in the case of Email OR Phone, email takes priority
     return 'emailAddress';
   }
 
-  if (attributes.phone_number.enabled && attributes.phone_number.used_for_first_factor) {
+  const { email_address, phone_number } = attributes;
+
+  if (email_address.enabled && isProgressiveSignUp ? email_address.required : email_address.used_for_first_factor) {
+    return 'emailAddress';
+  }
+
+  if (phone_number.enabled && isProgressiveSignUp ? phone_number.required : phone_number.used_for_first_factor) {
     return 'phoneNumber';
   }
 
@@ -101,8 +107,14 @@ export function showFormFields(userSettings: UserSettingsResource): boolean {
   return userSettings.hasValidAuthFactor || (!socialProviderStrategies.length && !web3FirstFactors.length);
 }
 
-export function emailOrPhoneUsedForFF(attributes: Attributes) {
-  return attributes.email_address.used_for_first_factor && attributes.phone_number.used_for_first_factor;
+export function emailOrPhone(attributes: Attributes, isProgressiveSignUp: boolean) {
+  const { email_address, phone_number } = attributes;
+
+  if (isProgressiveSignUp && (email_address.required || phone_number.required)) {
+    return false;
+  }
+
+  return email_address.used_for_first_factor && phone_number.used_for_first_factor;
 }
 
 function getField(fieldKey: FieldKey, fieldProps: FieldDeterminationProps): Field | undefined {
@@ -124,19 +136,39 @@ function getField(fieldKey: FieldKey, fieldProps: FieldDeterminationProps): Fiel
   }
 }
 
-// TODO revisit when attributes.email_address.required becomes effective
 function getEmailAddressField({
   attributes,
   hasTicket,
   hasEmail,
   activeCommIdentifierType,
+  isProgressiveSignUp,
 }: FieldDeterminationProps): Field | undefined {
-  const show =
-    (!hasTicket || (hasTicket && hasEmail)) &&
-    attributes.email_address.enabled &&
-    attributes.email_address.used_for_first_factor &&
-    activeCommIdentifierType == 'emailAddress';
+  const { email_address } = attributes;
 
+  if (!isProgressiveSignUp) {
+    const show =
+      (!hasTicket || (hasTicket && hasEmail)) &&
+      email_address.enabled &&
+      email_address.used_for_first_factor &&
+      activeCommIdentifierType == 'emailAddress';
+    if (!show) {
+      return;
+    }
+
+    return {
+      required: true, // as far as the FE is concerned the phone number is required, if shown
+      disabled: !!hasTicket && !!hasEmail,
+    };
+  }
+
+  if (emailOrPhone(attributes, isProgressiveSignUp) && activeCommIdentifierType == 'emailAddress') {
+    return {
+      required: true, // as far as the FE is concerned the email address is required, if shown
+      disabled: !!hasTicket && !!hasEmail,
+    };
+  }
+
+  const show = (!hasTicket || (hasTicket && hasEmail)) && email_address.enabled && email_address.required;
   if (!show) {
     return;
   }
@@ -147,18 +179,36 @@ function getEmailAddressField({
   };
 }
 
-// TODO revisit when attributes.phone_number.required becomes effective
 function getPhoneNumberField({
   attributes,
   hasTicket,
   activeCommIdentifierType,
+  isProgressiveSignUp,
 }: FieldDeterminationProps): Field | undefined {
-  const show =
-    !hasTicket &&
-    attributes.phone_number.enabled &&
-    attributes.phone_number.used_for_first_factor &&
-    activeCommIdentifierType == 'phoneNumber';
+  const { phone_number } = attributes;
 
+  if (!isProgressiveSignUp) {
+    const show =
+      !hasTicket &&
+      phone_number.enabled &&
+      phone_number.used_for_first_factor &&
+      activeCommIdentifierType == 'phoneNumber';
+    if (!show) {
+      return;
+    }
+
+    return {
+      required: true, // as far as the FE is concerned the phone number is required, if shown
+    };
+  }
+
+  if (emailOrPhone(attributes, isProgressiveSignUp) && activeCommIdentifierType == 'phoneNumber') {
+    return {
+      required: true, // as far as the FE is concerned the email address is required, if shown
+    };
+  }
+
+  const show = !hasTicket && phone_number.enabled && phone_number.required;
   if (!show) {
     return;
   }

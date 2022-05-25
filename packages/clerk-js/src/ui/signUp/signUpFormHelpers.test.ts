@@ -5,6 +5,7 @@ describe('determineActiveFields()', () => {
   // and the current Instance User settings options
   describe('returns first party field based on auth config', () => {
     type Scenario = [string, any, any];
+    const isProgressiveSignUp = false;
 
     const scenaria: Scenario[] = [
       [
@@ -236,7 +237,8 @@ describe('determineActiveFields()', () => {
       expect(
         determineActiveFields({
           attributes: attributes,
-          activeCommIdentifierType: getInitialActiveIdentifier(attributes),
+          activeCommIdentifierType: getInitialActiveIdentifier(attributes, isProgressiveSignUp),
+          isProgressiveSignUp,
         }),
       ).toEqual(result);
     });
@@ -255,7 +257,8 @@ describe('determineActiveFields()', () => {
       const res = determineActiveFields({
         attributes: attributes,
         hasTicket: true,
-        activeCommIdentifierType: getInitialActiveIdentifier(attributes),
+        activeCommIdentifierType: getInitialActiveIdentifier(attributes, isProgressiveSignUp),
+        isProgressiveSignUp,
       });
 
       expect(res).toMatchObject(expected);
@@ -276,10 +279,138 @@ describe('determineActiveFields()', () => {
         attributes: attributes,
         hasTicket: true,
         hasEmail: true,
-        activeCommIdentifierType: getInitialActiveIdentifier(attributes),
+        activeCommIdentifierType: getInitialActiveIdentifier(attributes, isProgressiveSignUp),
+        isProgressiveSignUp,
       });
 
       expect(res).toMatchObject(expected);
+    });
+  });
+
+  describe('calculates active fields based on user settings for Progressive Sign up', () => {
+    type Scenario = [string, any, any];
+    const isProgressiveSignUp = true;
+
+    const mockDefaultAttributesProgressive = {
+      first_name: {
+        enabled: false,
+        required: false,
+      },
+      last_name: {
+        enabled: false,
+        required: false,
+      },
+      password: {
+        enabled: false,
+        required: false,
+      },
+      username: {
+        enabled: false,
+        required: false,
+      },
+    };
+
+    const scenarios: Scenario[] = [
+      [
+        'email required',
+        {
+          ...mockDefaultAttributesProgressive,
+          email_address: {
+            enabled: true,
+            required: true,
+            used_for_first_factor: false,
+          },
+          phone_number: {
+            enabled: true,
+            required: false,
+            used_for_first_factor: true,
+          },
+        },
+        {
+          emailAddress: {
+            required: true,
+            disabled: false,
+          },
+        },
+      ],
+      [
+        'phone required',
+        {
+          ...mockDefaultAttributesProgressive,
+          email_address: {
+            enabled: true,
+            required: false,
+            used_for_first_factor: true,
+          },
+          phone_number: {
+            enabled: true,
+            required: true,
+            used_for_first_factor: false,
+          },
+        },
+        {
+          phoneNumber: {
+            required: true,
+          },
+        },
+      ],
+      [
+        'email & phone required',
+        {
+          ...mockDefaultAttributesProgressive,
+          phone_number: {
+            enabled: true,
+            required: true,
+            used_for_first_factor: false,
+          },
+          email_address: {
+            enabled: true,
+            required: true,
+            used_for_first_factor: false,
+          },
+        },
+        {
+          emailAddress: {
+            required: true,
+            disabled: false,
+          },
+          phoneNumber: {
+            required: true,
+          },
+        },
+      ],
+      [
+        'email OR phone',
+        {
+          ...mockDefaultAttributesProgressive,
+          phone_number: {
+            enabled: true,
+            required: false,
+            used_for_first_factor: true,
+          },
+          email_address: {
+            enabled: true,
+            required: false,
+            used_for_first_factor: true,
+          },
+        },
+        {
+          emailAddress: {
+            required: true, // email will be toggled on initially
+            disabled: false,
+          },
+        },
+      ],
+    ];
+
+    it.each(scenarios)('%s', (___, attributes, result) => {
+      expect(
+        determineActiveFields({
+          attributes: attributes,
+          activeCommIdentifierType: getInitialActiveIdentifier(attributes, isProgressiveSignUp),
+          isProgressiveSignUp,
+        }),
+      ).toEqual(result);
     });
   });
 });

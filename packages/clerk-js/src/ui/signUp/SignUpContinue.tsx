@@ -20,7 +20,7 @@ import { SignInLink } from './SignInLink';
 import {
   ActiveIdentifier,
   determineActiveFields,
-  emailOrPhoneUsedForFF,
+  emailOrPhone,
   getInitialActiveIdentifier,
   minimizeFieldsForExistingSignup,
   showFormFields,
@@ -35,7 +35,7 @@ function _SignUpContinue(): JSX.Element | null {
   const { setSession } = useCoreClerk();
   const { navigateAfterSignUp } = useSignUpContext();
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
-    getInitialActiveIdentifier(attributes),
+    getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
   const signUp = useCoreSignUp();
 
@@ -65,12 +65,14 @@ function _SignUpContinue(): JSX.Element | null {
   const hasEmail = !!formState.emailAddress.value;
   const hasVerifiedExternalAccount = signUp.verifications?.externalAccount?.status == 'verified';
   const hasVerifiedWeb3 = signUp.verifications?.web3Wallet?.status == 'verified';
+  const isProgressiveSignUp = userSettings.signUp.progressive;
 
   const fields = determineActiveFields({
     attributes,
     hasEmail,
     activeCommIdentifierType,
     signUp,
+    isProgressiveSignUp,
   });
 
   minimizeFieldsForExistingSignup(fields, signUp);
@@ -81,7 +83,7 @@ function _SignUpContinue(): JSX.Element | null {
   const handleChangeActive = (type: ActiveIdentifier) => (e: React.MouseEvent) => {
     e.preventDefault();
 
-    if (!emailOrPhoneUsedForFF(attributes)) {
+    if (!emailOrPhone(attributes, isProgressiveSignUp)) {
       return;
     }
 
@@ -162,7 +164,7 @@ function _SignUpContinue(): JSX.Element | null {
             <SignUpForm
               fields={fields}
               formState={formState}
-              toggleEmailPhone={emailOrPhoneUsedForFF(attributes)}
+              toggleEmailPhone={emailOrPhone(attributes, isProgressiveSignUp)}
               handleSubmit={handleSubmit}
               handleChangeActive={handleChangeActive}
             />

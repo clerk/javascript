@@ -99,6 +99,9 @@ describe('<SignUpContinue/>', () => {
           strategy: 'oauth_facebook',
         },
       },
+      sign_up: {
+        progressive: false,
+      },
     } as UserSettingsJSON);
   });
 
@@ -264,6 +267,9 @@ describe('<SignUpContinue/>', () => {
           strategy: 'oauth_facebook',
         },
       },
+      sign_up: {
+        progressive: false,
+      },
     } as UserSettingsJSON);
 
     mockUpdateRequest.mockImplementation(() =>
@@ -367,6 +373,9 @@ describe('<SignUpContinue/>', () => {
           enabled: true,
           strategy: 'oauth_facebook',
         },
+      },
+      sign_up: {
+        progressive: false,
       },
     } as UserSettingsJSON);
 
