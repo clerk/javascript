@@ -1,5 +1,6 @@
 const transitionDuration = Object.freeze({
   focusRing: '200ms',
+  controls: '100ms',
 } as const);
 
 const transitionProperty = Object.freeze({
