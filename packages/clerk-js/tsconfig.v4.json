@@ -4,7 +4,8 @@
     "declaration": false,
     "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react",
-    "jsxFactory": "jsx"
+    "jsxFactory": "jsx",
+    "jsxFragmentFactory": "React.Fragment"
   },
   "exclude": ["node_modules"],
   "include": ["src/**/*"]
