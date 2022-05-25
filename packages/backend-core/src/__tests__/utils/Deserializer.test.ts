@@ -3,6 +3,7 @@ import {
   AllowlistIdentifierJSON,
   Client,
   ClientJSON,
+  deserialize,
   Email,
   EmailJSON,
   Invitation,
@@ -17,7 +18,6 @@ import {
   SMSMessage,
   SMSMessageJSON,
 } from '../../api/resources';
-import deserialize from '../../api/utils/Deserializer';
 
 const allowlistIdentifierJSON: AllowlistIdentifierJSON = {
   object: ObjectType.AllowlistIdentifier,

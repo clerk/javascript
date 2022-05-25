@@ -13,16 +13,13 @@
   "module": "dist/mjs/index.js",
   "dependencies": {
     "@clerk/types": "^2.16.0",
-    "query-string": "^7.0.1",
     "snakecase-keys": "^5.1.2",
     "tslib": "^2.3.1"
   },
   "devDependencies": {
     "@peculiar/webcrypto": "^1.3.2",
     "@types/jest": "^27.4.0",
-    "@types/node": "^16.11.12",
     "@types/node-fetch": "^2",
-    "got": "^11.0.0",
     "jest": "^27.4.7",
     "nock": "^13.2.1",
     "node-fetch": "^2.6.0",
