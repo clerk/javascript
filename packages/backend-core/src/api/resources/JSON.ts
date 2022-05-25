@@ -22,8 +22,10 @@ export enum ObjectType {
   OrganizationInvitation = 'organization_invitation',
   OrganizationMembership = 'organization_membership',
   PhoneNumber = 'phone_number',
+  RedirectUrl = 'redirect_url',
   Session = 'session',
   SignInAttempt = 'sign_in_attempt',
+  SignInToken = 'sign_in_token',
   SignUpAttempt = 'sign_up_attempt',
   SmsMessage = 'sms_message',
   User = 'user',
@@ -155,10 +157,11 @@ export interface PhoneNumberJSON extends ClerkResourceJSON {
   verification: VerificationJSON | null;
 }
 
-export interface Web3WalletJSON extends ClerkResourceJSON {
-  object: ObjectType.Web3Wallet;
-  web3_wallet: string;
-  verification: VerificationJSON | null;
+export interface RedirectUrlJSON extends ClerkResourceJSON {
+  object: ObjectType.RedirectUrl;
+  url: string;
+  created_at: number;
+  updated_at: number;
 }
 
 export interface SessionJSON extends ClerkResourceJSON {
@@ -174,7 +177,7 @@ export interface SessionJSON extends ClerkResourceJSON {
 }
 
 export interface SignInJSON extends ClerkResourceJSON {
-  object: ObjectType.SignInAttempt;
+  object: ObjectType.SignInToken;
   status: SignInStatus;
   allowed_identifier_types: SignInIdentifier[];
   identifier: string;
@@ -182,6 +185,14 @@ export interface SignInJSON extends ClerkResourceJSON {
   factor_one_verification: VerificationJSON | null;
   factor_two_verification: VerificationJSON | null;
   created_session_id: string | null;
+}
+
+export interface SignInTokenJSON extends ClerkResourceJSON {
+  user_id: string;
+  token: string;
+  status: 'pending' | 'accepted' | 'revoked';
+  created_at: number;
+  updated_at: number;
 }
 
 export interface SignUpJSON extends ClerkResourceJSON {
@@ -250,4 +261,10 @@ export interface VerificationJSON extends ClerkResourceJSON {
   strategy: string;
   verified_at_client?: string;
   // error?
+}
+
+export interface Web3WalletJSON extends ClerkResourceJSON {
+  object: ObjectType.Web3Wallet;
+  web3_wallet: string;
+  verification: VerificationJSON | null;
 }
