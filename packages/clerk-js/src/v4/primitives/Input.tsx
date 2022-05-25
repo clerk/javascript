@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
 import { useInput } from './hooks/useInput';
 
@@ -27,18 +29,20 @@ type InputProps = PrimitiveProps<'input'> &
     hasError?: boolean;
   };
 
-const Input = (props: InputProps): JSX.Element => {
+const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
   const propsWithoutVariants = filterProps(props);
   const { onChange } = useInput(propsWithoutVariants.onChange);
   const { isDisabled, hasError, ...rest } = propsWithoutVariants;
   return (
     <input
       {...rest}
+      ref={ref}
       onChange={onChange}
       disabled={isDisabled}
+      aria-invalid={hasError}
       css={applyVariants(props)}
     />
   );
-};
+});
 
 export { Input };
