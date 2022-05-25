@@ -32,11 +32,19 @@ Reference of the methods supported in the Clerk Backend API wrapper. [API refere
   - [createOrganizationMembership(params)](#createorganizationmembershipparams)
   - [updateOrganizationMembership(params)](#updateorganizationmembershipparams)
   - [deleteOrganizationMembership(params)](#deleteorganizationmembershipparams)
+- [Redirect URLs](#redirect_urls)
+  - [createRedirectUrl](#create-redirect-url)
+  - [getRedirectUrlList](#get-redirect-url-list)
+  - [getRedirectUrl](#get-redirect-url)
+  - [deleteRedirectUrl](#delete-redirect-url)
 - [Session operations](#session-operations)
   - [getSessionList({ clientId, userId })](#getsessionlist-clientid-userid-)
   - [getSession(sessionId)](#getsessionsessionid)
   - [revokeSession(sessionId)](#revokesessionsessionid)
   - [verifySession(sessionId, sessionToken)](#verifysessionsessionid-sessiontoken)
+- [Sign in tokens](#sign-in-tokens)
+  - [createSignInToken({ user_id, expires_in_seconds })](#create-sign-in-token)
+  - [revokeSignInToken(tokenId)](#revoke-sign-in-token)
 - [User operations](#user-operations)
   - [getUserList()](#getuserlist)
   - [getUser(userId)](#getuseruserid)
@@ -382,6 +390,20 @@ const membership = await clerkAPI.organizations.deleteOrganizationMembership({
 });
 ```
 
+## Redirect URLs operations
+
+Redirect URL operations are exposed by the `redirectUrls` sub-api (`clerkAPI.redirectUrls`).
+
+#### createRedirectUrl({ url })
+
+Creates a new redirect URL:
+
+```
+const redirectUrl = await clerkAPI.redirectUrls.createRedirectUrl({ url });
+```
+
+TODO
+
 ## Session operations
 
 Session operations are exposed by the `sessions` sub-api (`clerkAPI.sessions`).
@@ -433,6 +455,10 @@ const sessionId = 'my-session-id';
 const sessionToken = 'my-session-token';
 const session = await clerkAPI.sessions.verifySession(sessionId, sessionToken);
 ```
+
+## Sign in token operations
+
+TODO
 
 ## User operations
 
