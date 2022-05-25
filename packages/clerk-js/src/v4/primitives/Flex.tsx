@@ -43,6 +43,9 @@ const { applyVariants, filterProps } = createVariants(theme => ({
       8: { gap: theme.space.$8 },
       9: { gap: theme.space.$9 },
     },
+    center: {
+      true: { justifyContent: 'center', alignItems: 'center' },
+    },
   },
   defaultVariants: {
     direction: 'row',
@@ -55,11 +58,5 @@ const { applyVariants, filterProps } = createVariants(theme => ({
 type FlexProps = BoxProps & StyleVariants<typeof applyVariants>;
 
 export const Flex = React.forwardRef<HTMLDivElement, FlexProps>((props, ref) => {
-  return (
-    <Box
-      {...filterProps(props)}
-      css={applyVariants(props)}
-      ref={ref}
-    />
-  );
+  return <Box {...filterProps(props)} css={applyVariants(props)} ref={ref} />;
 });
