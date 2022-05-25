@@ -4,14 +4,6 @@ import React from 'react';
 
 import { BaseTheme } from '../foundations';
 
-type ElementProps = {
-  div: React.HTMLAttributes<HTMLDivElement>;
-  input: React.HTMLAttributes<HTMLInputElement>;
-  button: React.HTMLAttributes<HTMLButtonElement>;
-  heading: React.HTMLAttributes<HTMLHeadingElement>;
-  p: React.HTMLAttributes<HTMLParagraphElement>;
-};
-
 export type Theme = BaseTheme;
 export type StyleRule = _Interpolation<Theme>;
 
@@ -24,4 +16,17 @@ type CssProp = { css?: ThemableCssProp };
 
 export type AsProp = { as?: React.ElementType };
 
+type ElementProps = {
+  div: JSX.IntrinsicElements['div'];
+  input: JSX.IntrinsicElements['input'];
+  button: JSX.IntrinsicElements['button'];
+  heading: JSX.IntrinsicElements['h1'];
+  p: JSX.IntrinsicElements['p'];
+  a: JSX.IntrinsicElements['a'];
+};
+
 export type PrimitiveProps<HtmlT extends keyof ElementProps> = ElementProps[HtmlT] & CssProp;
+export type PickSiblingProps<C extends React.FunctionComponent, T extends keyof Parameters<C>[0]> = Pick<
+  Parameters<C>[0],
+  T
+>;

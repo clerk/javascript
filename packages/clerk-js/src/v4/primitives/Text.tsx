@@ -14,7 +14,7 @@ const { applyVariants } = createVariants(theme => {
   return {
     base: {
       boxSizing: 'border-box',
-      color: theme.colors.$black,
+      color: 'currentcolor',
       margin: 0,
     },
     variants: {
@@ -71,9 +71,6 @@ export const Text = (props: TextProps): JSX.Element => {
   const { as: As = 'p', ...rest } = props;
   return (
     // @ts-expect-error
-    <As
-      {...rest}
-      css={applyVariants(props)}
-    />
+    <As {...rest} css={applyVariants(props)} />
   );
 };

@@ -6,3 +6,4 @@ export * from './Heading';
 export * from './Text';
 export * from './Spinner';
 export * from './Input';
+export * from './Link';
