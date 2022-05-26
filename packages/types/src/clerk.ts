@@ -161,6 +161,14 @@ export interface Clerk {
   addListener: (callback: ListenerCallback) => UnsubscribeCallback;
 
   /**
+   * Set the active session and organization explicitly.
+   *
+   * If the session param is `null`, the active session is deleted.
+   * In a similar fashion, if the organization param is `null`, the current organization is removed as active.
+   */
+  setActive: (params: SetActiveParams) => Promise<void>;
+
+  /**
    * Set the current session explicitly.
    *
    * Setting the session to `null` deletes the active session.
@@ -310,6 +318,20 @@ export type RedirectOptions = {
    * to the same value.
    */
   redirectUrl?: string | null;
+};
+
+export type SetActiveParams = {
+  /**
+   * The session resource or session id (string version).
+   * If `null`, the current session is deleted.
+   */
+  session?: ActiveSessionResource | string | null;
+
+  /**
+   * Callback run just before the active session and/or organization is set to the passed object.
+   * Can be used to hook up for pre-navigation actions.
+   */
+  beforeEmit?: BeforeEmitCallback;
 };
 
 export type SignInProps = {
