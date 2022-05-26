@@ -52,7 +52,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   },
 }));
 
-type FlexProps = BoxProps & StyleVariants<typeof applyVariants>;
+export type FlexProps = BoxProps & StyleVariants<typeof applyVariants>;
 
 export const Flex = React.forwardRef<HTMLDivElement, FlexProps>((props, ref) => {
   return (
