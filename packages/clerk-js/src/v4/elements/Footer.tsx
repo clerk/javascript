@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Flex, Text } from '../primitives';
+import { Flex, Link, LinkProps, Text } from '../primitives';
 
 const FooterRoot = (props: React.PropsWithChildren<any>): JSX.Element => {
   return (
@@ -13,7 +13,12 @@ const FooterRoot = (props: React.PropsWithChildren<any>): JSX.Element => {
 };
 
 const FooterAction = (props: React.PropsWithChildren<any>): JSX.Element => {
-  return <Flex {...props} />;
+  return (
+    <Flex
+      {...props}
+      gap={1}
+    />
+  );
 };
 
 const FooterActionText = (props: React.PropsWithChildren<any>): JSX.Element => {
@@ -26,12 +31,11 @@ const FooterActionText = (props: React.PropsWithChildren<any>): JSX.Element => {
   );
 };
 
-const FooterActionLink = (props: React.PropsWithChildren<any>): JSX.Element => {
+const FooterActionLink = (props: React.PropsWithChildren<LinkProps>): JSX.Element => {
   return (
-    <Text
+    <Link
       {...props}
-      as='span'
-      variant='link'
+      colorScheme='primary'
     />
   );
 };
@@ -41,16 +45,16 @@ const FooterLinks = (props: React.PropsWithChildren<any>): JSX.Element => {
     <Flex
       {...props}
       justify='between'
+      gap={4}
     />
   );
 };
 
-const FooterLink = (props: React.PropsWithChildren<any>): JSX.Element => {
+const FooterLink = (props: React.PropsWithChildren<LinkProps>): JSX.Element => {
   return (
-    <Text
+    <Link
       {...props}
-      as='span'
-      variant='link'
+      colorScheme='neutral'
     />
   );
 };
