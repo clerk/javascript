@@ -2,7 +2,7 @@ import React from 'react';
 
 import { createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
 
-const { applyVariants } = createVariants(theme => {
+const { applyVariants, filterProps } = createVariants(theme => {
   // TODO: This name will change based on actual usage
   const smallRegular = {
     fontStyle: theme.fontStyles.$normal,
@@ -47,6 +47,17 @@ const { applyVariants } = createVariants(theme => {
           lineHeight: theme.lineHeights.$shorter,
         },
       },
+      colorScheme: {
+        primary: {
+          color: theme.colors.$primary500,
+        },
+        danger: {
+          color: theme.colors.$danger500,
+        },
+        neutral: {
+          color: theme.colors.$gray500,
+        },
+      },
       size: {
         xss: { fontSize: theme.fontSizes.$xxs },
         xs: { fontSize: theme.fontSizes.$xs },
@@ -71,7 +82,10 @@ export type TextProps = PrimitiveProps<'p'> &
 export const Text = (props: TextProps): JSX.Element => {
   const { as: As = 'p', ...rest } = props;
   return (
-    // @ts-expect-error
-    <As {...rest} css={applyVariants(props)} />
+    // @ts-ignore
+    <As
+      {...filterProps(rest)}
+      css={applyVariants(props)}
+    />
   );
 };
