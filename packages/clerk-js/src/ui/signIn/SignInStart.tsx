@@ -29,7 +29,7 @@ import { OAuth, Web3 } from './strategies';
 
 export function _SignInStart(): JSX.Element {
   const { userSettings } = useEnvironment();
-  const { setSession } = useCoreClerk();
+  const { setActive } = useCoreClerk();
   const signIn = useCoreSignIn();
   const { navigate } = useNavigate();
   const { navigateAfterSignIn } = useSignInContext();
@@ -64,7 +64,10 @@ export function _SignInStart(): JSX.Element {
           case 'needs_second_factor':
             return navigate('factor-two');
           case 'complete':
-            return setSession(res.createdSessionId, navigateAfterSignIn);
+            return setActive({
+              session: res.createdSessionId,
+              beforeEmit: navigateAfterSignIn,
+            });
           default: {
             const msg = `Response: ${res.status} not supported yet.\nFor more information contact us at ${supportEmail}`;
             alert(msg);
@@ -125,7 +128,10 @@ export function _SignInStart(): JSX.Element {
         case 'needs_second_factor':
           return navigate('factor-two');
         case 'complete':
-          return setSession(res.createdSessionId, navigateAfterSignIn);
+          return setActive({
+            session: res.createdSessionId,
+            beforeEmit: navigateAfterSignIn,
+          });
         default: {
           const msg = `Response: ${res.status} not supported yet.\nFor more information contact us at ${supportEmail}`;
           alert(msg);
@@ -152,7 +158,10 @@ export function _SignInStart(): JSX.Element {
       await signInWithFields(identifier);
     } else if (alreadySignedInError) {
       const sid = alreadySignedInError.meta!.sessionId!;
-      await setSession(sid, navigateAfterSignIn);
+      await setActive({
+        session: sid,
+        beforeEmit: navigateAfterSignIn,
+      });
     } else {
       handleError(e, [identifier, instantPassword], setError);
     }

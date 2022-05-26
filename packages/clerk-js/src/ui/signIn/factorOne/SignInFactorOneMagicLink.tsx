@@ -24,7 +24,7 @@ export function SignInFactorOneMagicLink({
 }: SignInFactorOneMagicLinkProps): JSX.Element {
   const signIn = useCoreSignIn();
   const identifierRef = React.useRef(('safeIdentifier' in currentFactor && currentFactor.safeIdentifier) || '');
-  const { setSession } = useCoreClerk();
+  const { setActive } = useCoreClerk();
   const { navigate } = useNavigate();
   const { displayConfig } = useEnvironment();
   const signInContext = useSignInContext();
@@ -69,7 +69,10 @@ export function SignInFactorOneMagicLink({
 
   const completeSignInFlow = async (si: SignInResource) => {
     if (si.status === 'complete') {
-      return setSession(si.createdSessionId, navigateAfterSignIn);
+      return setActive({
+        session: si.createdSessionId,
+        beforeEmit: navigateAfterSignIn,
+      });
     } else if (si.status === 'needs_second_factor') {
       return navigate('../factor-two');
     }
