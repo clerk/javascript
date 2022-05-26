@@ -23,6 +23,7 @@ const HeaderSubtitle = (props: React.PropsWithChildren<any>): JSX.Element => {
     <Text
       {...props}
       variant='subheading'
+      colorScheme='neutral'
     />
   );
 };
