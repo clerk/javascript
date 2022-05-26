@@ -11,6 +11,7 @@ import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '.
 import { useNavigate } from '../../ui/hooks';
 import { useSupportEmail } from '../../ui/hooks/useSupportEmail';
 import { getClerkQueryParam } from '../../utils/getClerkQueryParam';
+import { Card, Flex, Button, SecuredByClerk } from '../primitives';
 
 export function _SignInStart(): JSX.Element {
   const { userSettings } = useEnvironment();
@@ -155,9 +156,18 @@ export function _SignInStart(): JSX.Element {
   const hasSocialOrWeb3Buttons = !!socialProviderStrategies.length || !!web3FirstFactors.length;
 
   return (
-    <div>
-      If you can see this, the dev v4 HMR works
-      <MobileIcon />
+    <div style={{ padding: '100px', width: '100vw' }}>
+      <Card>
+        <SecuredByClerk />
+        <Flex direction='col'>
+          <Button colorScheme='danger'>asd</Button>
+          <Button>asd</Button>
+          <Button>asd</Button>
+          <Button>asd</Button>
+        </Flex>
+        If you can see this, the dev v4 HMR works!!
+        <MobileIcon />
+      </Card>
     </div>
   );
 }
