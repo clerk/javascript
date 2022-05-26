@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
+import { useFormControlContext } from './hooks';
 import { useInput } from './hooks/useInput';
 
 // TODO: Connect with CSS variables
@@ -30,7 +31,8 @@ type InputProps = PrimitiveProps<'input'> &
   };
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
-  const propsWithoutVariants = filterProps(props);
+  const controlInputProps = useFormControlContext();
+  const propsWithoutVariants = filterProps({ ...props, hasError: props.hasError || controlInputProps.hasError });
   const { onChange } = useInput(propsWithoutVariants.onChange);
   const { isDisabled, hasError, ...rest } = propsWithoutVariants;
   return (
@@ -39,8 +41,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
       ref={ref}
       onChange={onChange}
       disabled={isDisabled}
-      aria-invalid={hasError}
-      css={applyVariants(props)}
+      id={props.id || controlInputProps.id}
+      aria-invalid={hasError || controlInputProps.hasError}
+      aria-describedby={controlInputProps.errorMessageId}
+      aria-required={controlInputProps.isRequired}
+      css={applyVariants(propsWithoutVariants)}
     />
   );
 });

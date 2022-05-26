@@ -10,6 +10,7 @@ type ElementProps = {
   button: React.HTMLAttributes<HTMLButtonElement>;
   heading: React.HTMLAttributes<HTMLHeadingElement>;
   p: React.HTMLAttributes<HTMLParagraphElement>;
+  label: React.HTMLAttributes<HTMLLabelElement>;
 };
 
 export type Theme = BaseTheme;
