@@ -34,7 +34,7 @@ function _SignUpVerifyPhoneNumber(): JSX.Element {
 
 function VerifyWithOtp({ field }: { field: 'emailAddress' | 'phoneNumber' }): JSX.Element {
   const { navigateAfterSignUp } = useSignUpContext();
-  const { setSession } = useCoreClerk();
+  const { setActive } = useCoreClerk();
   const signUp = useCoreSignUp();
   const identifierRef = React.useRef(signUp[field] || '');
   const codeState = useFieldState('code', '');
@@ -79,7 +79,12 @@ function VerifyWithOtp({ field }: { field: 'emailAddress' | 'phoneNumber' }): JS
         : attemptEmailAddressVerification());
 
       if (res.status === 'complete') {
-        verify(() => setSession(res.createdSessionId, navigateAfterSignUp));
+        verify(() =>
+          setActive({
+            session: res.createdSessionId,
+            beforeEmit: navigateAfterSignUp,
+          }),
+        );
       }
     } catch (err) {
       const globalErr = getGlobalError(err);

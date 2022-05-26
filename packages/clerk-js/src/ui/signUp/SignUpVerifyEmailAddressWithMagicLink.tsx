@@ -16,7 +16,7 @@ import { useMagicLink } from 'ui/hooks';
 export function SignUpVerifyEmailAddressWithMagicLink(): JSX.Element {
   const signUp = useCoreSignUp();
   const renderHappenedAfterTheDamnedSetSessionFlow = signUp.status === null;
-  const { setSession } = useCoreClerk();
+  const { setActive } = useCoreClerk();
   const identifierRef = React.useRef(signUp.emailAddress);
   const { displayConfig } = useEnvironment();
   const signUpContext = useSignUpContext();
@@ -63,7 +63,10 @@ export function SignUpVerifyEmailAddressWithMagicLink(): JSX.Element {
 
   const completeSignUpFlow = async (su: SignUpResource) => {
     if (su.status === 'complete') {
-      return setSession(su.createdSessionId, navigateAfterSignUp);
+      return setActive({
+        session: su.createdSessionId,
+        beforeEmit: navigateAfterSignUp,
+      });
     }
   };
 

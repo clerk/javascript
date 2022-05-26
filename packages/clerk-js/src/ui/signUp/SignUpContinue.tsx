@@ -32,7 +32,7 @@ function _SignUpContinue(): JSX.Element | null {
   const { navigate } = useNavigate();
   const { displayConfig, userSettings } = useEnvironment();
   const { attributes } = userSettings;
-  const { setSession } = useCoreClerk();
+  const { setActive } = useCoreClerk();
   const { navigateAfterSignUp } = useSignUpContext();
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes),
@@ -108,7 +108,10 @@ function _SignUpContinue(): JSX.Element | null {
 
   const completeSignUpFlow = (su: SignUpResource) => {
     if (su.status === 'complete') {
-      return setSession(su.createdSessionId, navigateAfterSignUp);
+      return setActive({
+        session: su.createdSessionId,
+        beforeEmit: navigateAfterSignUp,
+      });
     } else if (su.emailAddress && su.verifications.emailAddress.status !== 'verified') {
       return navigate(displayConfig.signUpUrl + '/verify-email-address');
     } else if (su.phoneNumber && su.verifications.phoneNumber.status !== 'verified') {

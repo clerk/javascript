@@ -151,14 +151,20 @@ export default class Clerk implements ClerkInterface {
 
     if (!opts.sessionId || this.client.activeSessions.length === 1) {
       await this.client.destroy();
-      return this.setSession(null, ignoreEventValue(cb));
+      return this.setActive({
+        session: null,
+        beforeEmit: ignoreEventValue(cb),
+      });
     }
 
     const session = this.client.activeSessions.find(s => s.id === opts.sessionId);
     const shouldSignOutCurrent = this.session.id === session?.id;
     await session?.remove();
     if (shouldSignOutCurrent) {
-      return this.setSession(null, ignoreEventValue(cb));
+      return this.setActive({
+        session: null,
+        beforeEmit: ignoreEventValue(cb),
+      });
     }
   };
 
@@ -418,7 +424,10 @@ export default class Clerk implements ClerkInterface {
     const redirectContinue = params.redirectUrl ? () => navigate(params.redirectUrl as string) : noop;
 
     if (shouldCompleteOnThisDevice) {
-      return this.setSession(newSessionId, redirectComplete);
+      return this.setActive({
+        session: newSessionId,
+        beforeEmit: redirectComplete,
+      });
     } else if (shouldContinueOnThisDevice) {
       return redirectContinue();
     }
@@ -487,7 +496,10 @@ export default class Clerk implements ClerkInterface {
       const res = await signIn.create({ transfer: true });
       switch (res.status) {
         case 'complete':
-          return this.setSession(res.createdSessionId, navigateAfterSignIn);
+          return this.setActive({
+            session: res.createdSessionId,
+            beforeEmit: navigateAfterSignIn,
+          });
         case 'needs_second_factor':
           return navigateToFactorTwo();
         default:
@@ -501,7 +513,10 @@ export default class Clerk implements ClerkInterface {
       const res = await signUp.create({ transfer: true });
       switch (res.status) {
         case 'complete':
-          return this.setSession(res.createdSessionId, navigateAfterSignUp);
+          return this.setActive({
+            session: res.createdSessionId,
+            beforeEmit: navigateAfterSignUp,
+          });
         case 'missing_requirements':
           return navigateToContinueSignUp();
         default:
@@ -527,7 +542,10 @@ export default class Clerk implements ClerkInterface {
     if (userAlreadySignedIn) {
       const sessionId = si.firstFactorVerificationSessionId || su.externalAccountSessionId;
       if (sessionId) {
-        return this.setSession(sessionId, navigateAfterSignIn);
+        return this.setActive({
+          session: sessionId,
+          beforeEmit: navigateAfterSignIn,
+        });
       }
     }
 
@@ -554,7 +572,7 @@ export default class Clerk implements ClerkInterface {
     if (opts.broadcast) {
       this.#broadcastSignOutEvent();
     }
-    return this.setSession(null);
+    return this.setActive({ session: null });
   };
 
   public authenticateWithMetamask = async ({
@@ -589,11 +607,14 @@ export default class Clerk implements ClerkInterface {
     }
 
     if (signInOrSignUp.createdSessionId) {
-      await this.setSession(signInOrSignUp.createdSessionId, () => {
-        if (redirectUrl) {
-          return navigate(redirectUrl);
-        }
-        return Promise.resolve();
+      await this.setActive({
+        session: signInOrSignUp.createdSessionId,
+        beforeEmit: () => {
+          if (redirectUrl) {
+            return navigate(redirectUrl);
+          }
+          return Promise.resolve();
+        },
       });
     }
   };

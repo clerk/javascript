@@ -243,7 +243,7 @@ export default class IsomorphicClerk {
     beforeEmit?: (session: ActiveSessionResource | null) => void | Promise<any>,
   ): Promise<void> => {
     if (this.clerkjs) {
-      return this.clerkjs.setSession(session, beforeEmit);
+      return this.clerkjs.setActive({ session, beforeEmit });
     } else {
       return Promise.reject();
     }

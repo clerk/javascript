@@ -195,12 +195,12 @@ describe('Clerk singleton', () => {
       );
 
       const sut = new Clerk(frontendApi);
-      sut.setSession = jest.fn();
+      sut.setActive = jest.fn();
       await sut.load();
       await sut.signOut();
       await waitFor(() => {
         expect(mockClientDestroy).toHaveBeenCalled();
-        expect(sut.setSession).toHaveBeenCalledWith(null, undefined);
+        expect(sut.setActive).toHaveBeenCalledWith({ session: null });
       });
     });
 
@@ -213,13 +213,13 @@ describe('Clerk singleton', () => {
       );
 
       const sut = new Clerk(frontendApi);
-      sut.setSession = jest.fn();
+      sut.setActive = jest.fn();
       await sut.load();
       await sut.signOut();
       await waitFor(() => {
         expect(mockClientDestroy).toHaveBeenCalled();
         expect(mockSession1.remove).not.toHaveBeenCalled();
-        expect(sut.setSession).toHaveBeenCalledWith(null, undefined);
+        expect(sut.setActive).toHaveBeenCalledWith({session: null});
       });
     });
 
@@ -232,13 +232,13 @@ describe('Clerk singleton', () => {
       );
 
       const sut = new Clerk(frontendApi);
-      sut.setSession = jest.fn();
+      sut.setActive = jest.fn();
       await sut.load();
       await sut.signOut({ sessionId: '2' });
       await waitFor(() => {
         expect(mockSession2.remove).toHaveBeenCalled();
         expect(mockClientDestroy).not.toHaveBeenCalled();
-        expect(sut.setSession).not.toHaveBeenCalledWith(null, undefined);
+        expect(sut.setActive).not.toHaveBeenCalledWith(null, undefined);
       });
     });
 
@@ -251,13 +251,13 @@ describe('Clerk singleton', () => {
       );
 
       const sut = new Clerk(frontendApi);
-      sut.setSession = jest.fn();
+      sut.setActive = jest.fn();
       await sut.load();
       await sut.signOut({ sessionId: '1' });
       await waitFor(() => {
         expect(mockSession1.remove).toHaveBeenCalled();
         expect(mockClientDestroy).not.toHaveBeenCalled();
-        expect(sut.setSession).toHaveBeenCalledWith(null, undefined);
+        expect(sut.setActive).toHaveBeenCalledWith({session: null});
       });
     });
   });
@@ -299,7 +299,7 @@ describe('Clerk singleton', () => {
       mockEnvironmentFetch.mockReset();
     });
 
-    it('creates a new user and calls setSession if the user was not found during sso signup', async () => {
+    it('creates a new user and calls setActive if the user was not found during sso signup', async () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
@@ -335,7 +335,7 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const mockSetSession = jest.fn();
+      const mockSetActive = jest.fn();
       const mockSignUpCreate = jest
         .fn()
         .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
@@ -348,13 +348,13 @@ describe('Clerk singleton', () => {
         fail('we should always have a client');
       }
       sut.client.signUp.create = mockSignUpCreate;
-      sut.setSession = mockSetSession;
+      sut.setActive = mockSetActive;
 
       sut.handleRedirectCallback();
 
       await waitFor(() => {
         expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true });
-        expect(mockSetSession).toHaveBeenCalled();
+        expect(mockSetActive).toHaveBeenCalled();
       });
     });
 
@@ -457,7 +457,7 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const mockSetSession = jest.fn();
+      const mockSetActive = jest.fn();
       const mockSignInCreate = jest
         .fn()
         .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
@@ -470,17 +470,17 @@ describe('Clerk singleton', () => {
         fail('we should always have a client');
       }
       sut.client.signIn.create = mockSignInCreate;
-      sut.setSession = mockSetSession;
+      sut.setActive = mockSetActive;
 
       sut.handleRedirectCallback();
 
       await waitFor(() => {
         expect(mockSignInCreate).toHaveBeenCalledWith({ transfer: true });
-        expect(mockSetSession).toHaveBeenCalled();
+        expect(mockSetActive).toHaveBeenCalled();
       });
     });
 
-    it('signs the user by calling setSession if the user was already signed in during sign up', async () => {
+    it('signs the user by calling setActive if the user was already signed in during sign up', async () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
@@ -516,21 +516,21 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const mockSetSession = jest.fn();
+      const mockSetActive = jest.fn();
       const sut = new Clerk(frontendApi);
       await sut.load({
         navigate: mockNavigate,
       });
-      sut.setSession = mockSetSession;
+      sut.setActive = mockSetActive;
 
       sut.handleRedirectCallback();
 
       await waitFor(() => {
-        expect(mockSetSession).toHaveBeenCalled();
+        expect(mockSetActive).toHaveBeenCalled();
       });
     });
 
-    it('creates a new user and calls setSession in if the user was found during sign in', async () => {
+    it('creates a new user and calls setActive in if the user was found during sign in', async () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
@@ -562,7 +562,7 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const mockSetSession = jest.fn();
+      const mockSetActive = jest.fn();
       const mockSignUpCreate = jest
         .fn()
         .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
@@ -575,13 +575,13 @@ describe('Clerk singleton', () => {
         fail('we should always have a client');
       }
       sut.client.signUp.create = mockSignUpCreate;
-      sut.setSession = mockSetSession;
+      sut.setActive = mockSetActive;
 
       sut.handleRedirectCallback();
 
       await waitFor(() => {
         expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true });
-        expect(mockSetSession).toHaveBeenCalled();
+        expect(mockSetActive).toHaveBeenCalled();
       });
     });
 
@@ -704,7 +704,7 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const mockSetSession = jest.fn(async (_: any, callback: () => any) => {
+      const mockSetActive = jest.fn(async (_: any, callback: () => any) => {
         await callback();
       });
 
@@ -712,7 +712,7 @@ describe('Clerk singleton', () => {
       await sut.load({
         navigate: mockNavigate,
       });
-      sut.setSession = mockSetSession as any;
+      sut.setActive = mockSetActive as any;
 
       sut.handleRedirectCallback({
         redirectUrl: '/custom-sign-in',
@@ -759,7 +759,7 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const mockSetSession = jest.fn(async (_: any, callback: () => any) => {
+      const mockSetActive = jest.fn(async (_: any, callback: () => any) => {
         await callback();
       });
 
@@ -767,7 +767,7 @@ describe('Clerk singleton', () => {
       await sut.load({
         navigate: mockNavigate,
       });
-      sut.setSession = mockSetSession as any;
+      sut.setActive = mockSetActive as any;
 
       sut.handleRedirectCallback({
         afterSignInUrl: '/custom-sign-in',
@@ -891,19 +891,19 @@ describe('Clerk singleton', () => {
           signUp: new SignUp(null),
         }),
       );
-      const mockSetSession = jest.fn();
+      const mockSetActive = jest.fn();
 
       const sut = new Clerk(frontendApi);
       await sut.load({
         navigate: mockNavigate,
       });
-      sut.setSession = mockSetSession;
+      sut.setActive = mockSetActive;
 
       const redirectUrlComplete = '/redirect-to';
       sut.handleMagicLinkVerification({ redirectUrlComplete });
 
       await waitFor(() => {
-        expect(mockSetSession).toHaveBeenCalledWith(createdSessionId, expect.any(Function));
+        expect(mockSetActive).toHaveBeenCalledWith(createdSessionId, expect.any(Function));
       });
     });
 
@@ -919,19 +919,19 @@ describe('Clerk singleton', () => {
           signUp: new SignUp(null),
         }),
       );
-      const mockSetSession = jest.fn();
+      const mockSetActive = jest.fn();
 
       const sut = new Clerk(frontendApi);
       await sut.load({
         navigate: mockNavigate,
       });
-      sut.setSession = mockSetSession;
+      sut.setActive = mockSetActive;
 
       const redirectUrl = '/2fa';
       sut.handleMagicLinkVerification({ redirectUrl });
 
       await waitFor(() => {
-        expect(mockSetSession).not.toHaveBeenCalled();
+        expect(mockSetActive).not.toHaveBeenCalled();
         expect(mockNavigate).toHaveBeenCalledWith(redirectUrl);
       });
     });
@@ -952,19 +952,19 @@ describe('Clerk singleton', () => {
           signIn: new SignIn(null),
         }),
       );
-      const mockSetSession = jest.fn();
+      const mockSetActive = jest.fn();
 
       const sut = new Clerk(frontendApi);
       await sut.load({
         navigate: mockNavigate,
       });
-      sut.setSession = mockSetSession;
+      sut.setActive = mockSetActive;
 
       const redirectUrlComplete = '/redirect-to';
       sut.handleMagicLinkVerification({ redirectUrlComplete });
 
       await waitFor(() => {
-        expect(mockSetSession).toHaveBeenCalledWith(createdSessionId, expect.any(Function));
+        expect(mockSetActive).toHaveBeenCalledWith(createdSessionId, expect.any(Function));
       });
     });
 
@@ -980,19 +980,19 @@ describe('Clerk singleton', () => {
           signIn: new SignIn(null),
         }),
       );
-      const mockSetSession = jest.fn();
+      const mockSetActive = jest.fn();
 
       const sut = new Clerk(frontendApi);
       await sut.load({
         navigate: mockNavigate,
       });
-      sut.setSession = mockSetSession;
+      sut.setActive = mockSetActive;
 
       const redirectUrl = '/next-up';
       sut.handleMagicLinkVerification({ redirectUrl });
 
       await waitFor(() => {
-        expect(mockSetSession).not.toHaveBeenCalled();
+        expect(mockSetActive).not.toHaveBeenCalled();
         expect(mockNavigate).toHaveBeenCalledWith(redirectUrl);
       });
     });
@@ -1007,18 +1007,18 @@ describe('Clerk singleton', () => {
           signIn: new SignIn(null),
         }),
       );
-      const mockSetSession = jest.fn();
+      const mockSetActive = jest.fn();
 
       const sut = new Clerk(frontendApi);
       await sut.load({
         navigate: mockNavigate,
       });
-      sut.setSession = mockSetSession;
+      sut.setActive = mockSetActive;
 
       await expect(async () => {
         await sut.handleMagicLinkVerification({});
       }).rejects.toThrow(MagicLinkErrorCode.Expired);
-      expect(mockSetSession).not.toHaveBeenCalled();
+      expect(mockSetActive).not.toHaveBeenCalled();
     });
 
     it('throws an error for failed verification status parameter', async () => {
@@ -1031,18 +1031,18 @@ describe('Clerk singleton', () => {
           signIn: new SignIn(null),
         }),
       );
-      const mockSetSession = jest.fn();
+      const mockSetActive = jest.fn();
 
       const sut = new Clerk(frontendApi);
       await sut.load({
         navigate: mockNavigate,
       });
-      sut.setSession = mockSetSession;
+      sut.setActive = mockSetActive;
 
       await expect(async () => {
         await sut.handleMagicLinkVerification({});
       }).rejects.toThrow(MagicLinkErrorCode.Failed);
-      expect(mockSetSession).not.toHaveBeenCalled();
+      expect(mockSetActive).not.toHaveBeenCalled();
     });
 
     it('runs a callback when verified on other device', async () => {
@@ -1058,19 +1058,19 @@ describe('Clerk singleton', () => {
           signIn: new SignIn(null),
         }),
       );
-      const mockSetSession = jest.fn();
+      const mockSetActive = jest.fn();
       const sut = new Clerk(frontendApi);
       await sut.load({
         navigate: mockNavigate,
       });
-      sut.setSession = mockSetSession;
+      sut.setActive = mockSetActive;
       const res = { ping: 'ping' };
       const cb = () => {
         res.ping = 'pong';
       };
       await sut.handleMagicLinkVerification({ onVerifiedOnOtherDevice: cb });
       expect(res.ping).toEqual('pong');
-      expect(mockSetSession).not.toHaveBeenCalled();
+      expect(mockSetActive).not.toHaveBeenCalled();
     });
 
     it('throws an error with no status query parameter', async () => {
@@ -1083,16 +1083,16 @@ describe('Clerk singleton', () => {
           signIn: new SignIn(null),
         }),
       );
-      const mockSetSession = jest.fn();
+      const mockSetActive = jest.fn();
       const sut = new Clerk(frontendApi);
       await sut.load({
         navigate: mockNavigate,
       });
-      sut.setSession = mockSetSession;
+      sut.setActive = mockSetActive;
       await expect(async () => {
         await sut.handleMagicLinkVerification({});
       }).rejects.toThrow(MagicLinkErrorCode.Failed);
-      expect(mockSetSession).not.toHaveBeenCalled();
+      expect(mockSetActive).not.toHaveBeenCalled();
     });
 
     it('throws an error for invalid status query parameter', async () => {
@@ -1110,17 +1110,17 @@ describe('Clerk singleton', () => {
           signUp: new SignUp(null),
         }),
       );
-      const mockSetSession = jest.fn();
+      const mockSetActive = jest.fn();
       const sut = new Clerk(frontendApi);
       await sut.load({
         navigate: mockNavigate,
       });
-      sut.setSession = mockSetSession;
+      sut.setActive = mockSetActive;
 
       await expect(async () => {
         await sut.handleMagicLinkVerification({});
       }).rejects.toThrow(MagicLinkErrorCode.Failed);
-      expect(mockSetSession).not.toHaveBeenCalled();
+      expect(mockSetActive).not.toHaveBeenCalled();
     });
   });
 });

@@ -60,7 +60,7 @@ export function SignInFactorOneInputBased({
   setLastUsedFactor,
   handleShowAllStrategies,
 }: SignInFactorOneInputBasedProps): JSX.Element | null {
-  const { setSession } = useCoreClerk();
+  const { setActive } = useCoreClerk();
   const signIn = useCoreSignIn();
   const code = useFieldState('code', '');
   const password = useFieldState('password', '');
@@ -123,7 +123,12 @@ export function SignInFactorOneInputBased({
       const response = await signIn.attemptFirstFactor(params);
 
       if (response.status === 'complete') {
-        verify(() => setSession(response.createdSessionId, navigateAfterSignIn));
+        verify(() =>
+          setActive({
+            session: response.createdSessionId,
+            beforeEmit: navigateAfterSignIn,
+          }),
+        );
         return;
       } else if (response.status === 'needs_second_factor') {
         verify(() => navigate('../factor-two'));

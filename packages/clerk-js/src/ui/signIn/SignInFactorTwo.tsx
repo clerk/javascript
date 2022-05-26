@@ -13,7 +13,7 @@ type SignInUiProps = Pick<SignInResource, 'userData' | 'identifier' | 'supported
 
 function _SignInFactorTwo(): JSX.Element {
   const { navigateAfterSignIn } = useSignInContext();
-  const { setSession } = useCoreClerk();
+  const { setActive } = useCoreClerk();
   const signIn = useCoreSignIn();
   // after successful verification, the server returns a null SIA
   // so to avoid flickering before the navigation completes
@@ -68,7 +68,12 @@ function _SignInFactorTwo(): JSX.Element {
         code: code.value,
       });
       if (response.status === 'complete') {
-        verify(() => setSession(response.createdSessionId, navigateAfterSignIn));
+        verify(() =>
+          setActive({
+            session: response.createdSessionId,
+            beforeEmit: navigateAfterSignIn,
+          }),
+        );
       }
     } catch (err) {
       const globalErr = getGlobalError(err);

@@ -29,7 +29,7 @@ export function ActiveAccountsManager({
   userProfileUrl,
   showActiveAccountButtons = true,
 }: ActiveAccountsManagerProps): JSX.Element {
-  const { setSession, signOut } = useCoreClerk();
+  const { setActive, signOut } = useCoreClerk();
   const { id: currentSessionId } = useCoreSession();
   const { authConfig } = useEnvironment();
   const { navigate } = useNavigate();
@@ -68,7 +68,10 @@ export function ActiveAccountsManager({
     // In the future, if the passed session is an expired session, we will allow the
     // user to revive it.
     if (session.status === 'active') {
-      setSession(session as ActiveSessionResource, navigateAfterSwitchSession);
+      setActive({
+        session: session as ActiveSessionResource,
+        beforeEmit: navigateAfterSwitchSession,
+      });
     }
   };
 
