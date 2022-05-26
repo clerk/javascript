@@ -3,7 +3,7 @@ import React from 'react';
 import { Text } from '../primitives';
 import { createVariants, cssutils, PickSiblingProps, PrimitiveProps, StyleVariants } from '../styledSystem';
 
-const { applyVariants } = createVariants(theme => ({
+const { applyVariants, filterProps } = createVariants(theme => ({
   base: {
     boxSizing: 'border-box',
     margin: 0,
@@ -22,6 +22,11 @@ const { applyVariants } = createVariants(theme => ({
         '&:hover': { color: theme.colors.$danger400 },
         '&:active': { color: theme.colors.$danger600 },
       },
+      neutral: {
+        color: theme.colors.$gray500,
+        '&:hover': { color: theme.colors.$gray400 },
+        '&:active': { color: theme.colors.$gray600 },
+      },
     },
   },
   defaultVariants: {
@@ -37,13 +42,16 @@ export const Link = (props: LinkProps): JSX.Element => {
   const { isExternal, children, size, ...rest } = props;
   return (
     <a
-      {...rest}
+      {...filterProps(rest)}
       target={isExternal ? '_blank' : undefined}
       rel={isExternal ? 'noopener' : undefined}
       css={applyVariants(props)}
     >
-      <Text variant='link' size={size}>
-        children
+      <Text
+        variant='link'
+        size={size}
+      >
+        {children}
       </Text>
     </a>
   );
