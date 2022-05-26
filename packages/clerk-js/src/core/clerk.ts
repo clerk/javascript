@@ -27,7 +27,7 @@ import type {
   UserProfileProps,
   UserResource,
 } from '@clerk/types';
-import { SignOutOptions } from '@clerk/types/src';
+import { SetActiveParams, SignOutOptions } from '@clerk/types/src';
 
 import packageJSON from '../../package.json';
 import type Components from '../ui';
@@ -250,19 +250,27 @@ export default class Clerk implements ClerkInterface {
     });
   };
 
-  public setSession = async (
-    session: ActiveSessionResource | string | null,
-    beforeEmit?: BeforeEmitCallback,
-  ): Promise<void> => {
+  public setActive = async ({ session, beforeEmit }: SetActiveParams): Promise<void> => {
     if (!this.client) {
-      throw new Error('setSession is being called before the client is loaded. Wait for init.');
+      throw new Error('setActive is being called before the client is loaded. Wait for init.');
+    }
+
+    if (session === undefined) {
+      if (!this.session) {
+        throw new Error(
+          'setActive should either be called with a session param or there should be already an active session.',
+        );
+      }
+      session = this.session;
     }
 
     if (typeof session === 'string') {
       session = (this.client.sessions.find(x => x.id === session) as ActiveSessionResource) || null;
     }
 
-    this.#authService?.setAuthCookiesFromSession(session);
+    if (session) {
+      this.#authService?.setAuthCookiesFromSession(session);
+    }
 
     // If this.session exists, then signout was triggered by the current tab
     // and should emit. Other tabs should not emit the same event again
@@ -271,7 +279,7 @@ export default class Clerk implements ClerkInterface {
     }
 
     //1. setLastActiveSession to passed usersession (add a param)
-    if (typeof document != 'undefined' && document.hasFocus()) {
+    if (session && typeof document != 'undefined' && document.hasFocus()) {
       await this.#touchLastActiveSession(session);
     }
 
@@ -280,7 +288,7 @@ export default class Clerk implements ClerkInterface {
     //   When undefined, neither SignedIn nor SignedOut renders, which avoids flickers or
     //   automatic reloading when reloading shouldn't be happening.
     const beforeUnloadTracker = createBeforeUnloadTracker();
-    if (beforeEmit) {
+    if (session && beforeEmit) {
       beforeUnloadTracker.startTracking();
       this.session = undefined;
       this.organization = undefined;
@@ -303,6 +311,14 @@ export default class Clerk implements ClerkInterface {
 
     this.#emit();
     this.#resetComponentsState();
+  };
+
+  /** @deprecated Use `setActive` instead */
+  public setSession = async (
+    session: ActiveSessionResource | string | null,
+    beforeEmit?: BeforeEmitCallback,
+  ): Promise<void> => {
+    await this.setActive({ session, beforeEmit });
   };
 
   public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
