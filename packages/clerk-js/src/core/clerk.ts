@@ -256,7 +256,7 @@ export default class Clerk implements ClerkInterface {
     });
   };
 
-  public setActive = async ({ session, beforeEmit }: SetActiveParams): Promise<void> => {
+  public setActive = async ({ session, organization, beforeEmit }: SetActiveParams): Promise<void> => {
     if (!this.client) {
       throw new Error('setActive is being called before the client is loaded. Wait for init.');
     }
@@ -274,6 +274,15 @@ export default class Clerk implements ClerkInterface {
       session = (this.client.sessions.find(x => x.id === session) as ActiveSessionResource) || null;
     }
 
+    // At this point, the `session` variable should contain either an `ActiveSessionResource`
+    // or `null`.
+    // We now want to set the last active organization id on that session (if it exists).
+    // However, if the `organization` parameter is not given (i.e. `undefined`), we want
+    // to keep the organization id that the session had.
+    if (session && organization !== undefined) {
+      session.lastActiveOrganizationId = organization;
+    }
+
     if (session) {
       this.#authService?.setAuthCookiesFromSession(session);
     }
@@ -284,7 +293,9 @@ export default class Clerk implements ClerkInterface {
       this.#broadcastSignOutEvent();
     }
 
-    //1. setLastActiveSession to passed usersession (add a param)
+    //1. setLastActiveSession to passed usersession (add a param).
+    //   Note that this will also update the session's active organization
+    //   id.
     if (session && typeof document != 'undefined' && document.hasFocus()) {
       await this.#touchLastActiveSession(session);
     }
