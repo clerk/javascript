@@ -8,7 +8,7 @@ const navigateMock = jest.fn();
 const mockCreateRequest = jest.fn();
 
 const mockFactorOneAttempt = jest.fn();
-const mockSetSession = jest.fn().mockReturnValue({
+const mockSetActive = jest.fn().mockReturnValue({
   status: 'complete',
 });
 
@@ -52,7 +52,7 @@ jest.mock('ui/contexts', () => {
     withCoreUserGuard: (a: any) => a,
     useCoreClerk: () => {
       return {
-        setSession: mockSetSession,
+        setActive: mockSetActive,
       };
     },
     useSignUpContext: () => {

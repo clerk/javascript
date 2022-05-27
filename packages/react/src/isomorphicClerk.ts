@@ -9,6 +9,7 @@ import type {
   OrganizationResource,
   RedirectOptions,
   Resources,
+  SetActiveParams,
   SignInProps,
   SignOut,
   SignOutCallback,
@@ -238,15 +239,20 @@ export default class IsomorphicClerk {
     }
   }
 
+  setActive = ({ session, organization, beforeEmit }: SetActiveParams): Promise<void> => {
+    if (this.clerkjs) {
+      return this.clerkjs.setActive({ session, organization, beforeEmit });
+    } else {
+      return Promise.reject();
+    }
+  };
+
+  /** @deprecated Use `setActive` instead */
   setSession = (
     session: ActiveSessionResource | string | null,
     beforeEmit?: (session: ActiveSessionResource | null) => void | Promise<any>,
   ): Promise<void> => {
-    if (this.clerkjs) {
-      return this.clerkjs.setActive({ session, beforeEmit });
-    } else {
-      return Promise.reject();
-    }
+    return this.setActive({ session, beforeEmit });
   };
 
   openSignIn = (props?: SignInProps): void => {

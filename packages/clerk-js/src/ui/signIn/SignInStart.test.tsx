@@ -51,13 +51,13 @@ jest.mock('ui/contexts', () => {
       authenticateWithRedirect: mockAuthenticateWithRedirect,
     })),
     useCoreClerk: jest.fn(() => ({
-      setSession: mockSetSession,
+      setActive: mockSetActive,
     })),
   };
 });
 
 const mockFactorOneAttempt = jest.fn();
-const mockSetSession = jest.fn().mockReturnValue({
+const mockSetActive = jest.fn().mockReturnValue({
   status: 'complete',
 });
 
@@ -167,7 +167,7 @@ fdescribe('<SignInStart/>', () => {
           password: '123456',
           strategy: 'password',
         });
-        expect(mockSetSession).toHaveBeenCalledTimes(1);
+        expect(mockSetActive).toHaveBeenCalledTimes(1);
         expect(mockNavigate).not.toHaveBeenCalled();
       });
     });
@@ -215,7 +215,7 @@ fdescribe('<SignInStart/>', () => {
         expect(mockCreateRequest).toHaveBeenCalledWith({
           identifier: 'boss@clerk.dev',
         });
-        expect(mockSetSession).not.toHaveBeenCalled();
+        expect(mockSetActive).not.toHaveBeenCalled();
         expect(mockNavigate).not.toHaveBeenCalledWith('factor-one');
       });
     });
@@ -266,7 +266,7 @@ fdescribe('<SignInStart/>', () => {
         expect(mockCreateRequest).toHaveBeenCalledWith({
           identifier: 'boss@clerk.dev',
         });
-        expect(mockSetSession).not.toHaveBeenCalled();
+        expect(mockSetActive).not.toHaveBeenCalled();
         expect(mockNavigate).not.toHaveBeenCalledWith('factor-one');
       });
     });
@@ -347,7 +347,10 @@ fdescribe('<SignInStart/>', () => {
           identifier: 'boss@clerk.dev',
         });
         expect(mockNavigate).not.toHaveBeenCalled();
-        expect(mockSetSession).toHaveBeenNthCalledWith(1, 'deadbeef', mockNavigateAfterSignIn);
+        expect(mockSetActive).toHaveBeenNthCalledWith(1, {
+          session: 'deadbeef',
+          beforeEmit: mockNavigateAfterSignIn,
+        });
       });
     });
   });

@@ -9,7 +9,7 @@ import { SignUpStart } from './SignUpStart';
 
 const navigateMock = jest.fn();
 const mockCreateRequest = jest.fn();
-const mockSetSession = jest.fn();
+const mockSetActive = jest.fn();
 const mockAuthenticateWithRedirect = jest.fn();
 let mockUserSettings: UserSettings;
 
@@ -39,7 +39,7 @@ jest.mock('ui/contexts', () => {
     },
     useCoreClerk: jest.fn(() => ({
       frontendAPI: 'clerk.clerk.dev',
-      setSession: mockSetSession,
+      setActive: mockSetActive,
     })),
     useCoreSignUp: jest.fn(() => ({
       create: mockCreateRequest,
@@ -365,7 +365,7 @@ describe('<SignUpStart/>', () => {
           render(<SignUpStart />);
 
           await waitFor(() => {
-            expect(mockSetSession).toHaveBeenCalled();
+            expect(mockSetActive).toHaveBeenCalled();
           });
         });
 
@@ -414,7 +414,7 @@ describe('<SignUpStart/>', () => {
           );
           render(<SignUpStart />);
           await waitFor(() => {
-            expect(mockSetSession).not.toHaveBeenCalled();
+            expect(mockSetActive).not.toHaveBeenCalled();
             // Required and optional fields are rendered
             screen.getByText(/First name/);
             screen.getByText(/Last name/);
@@ -484,7 +484,7 @@ describe('<SignUpStart/>', () => {
           render(<SignUpStart />);
 
           await waitFor(() => {
-            expect(mockSetSession).not.toHaveBeenCalled();
+            expect(mockSetActive).not.toHaveBeenCalled();
             screen.getByText(/First name/);
             screen.getByText(/Last name/);
             expect(screen.queryByText('Password')).not.toBeInTheDocument();
@@ -493,7 +493,7 @@ describe('<SignUpStart/>', () => {
           // Submit the form
           userEvent.click(screen.getByRole('button', { name: 'Sign up' }));
           await waitFor(() => {
-            expect(mockSetSession).toHaveBeenCalled();
+            expect(mockSetActive).toHaveBeenCalled();
           });
         });
 
