@@ -1,11 +1,11 @@
-import { SetSession, SignUpResource } from '@clerk/types';
+import { SetActive, SetSession, SignUpResource } from '@clerk/types';
 
 import { useClientContext } from '../contexts/ClientContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 
 type UseSignUpReturn =
-  | { isLoaded: false; signUp: undefined; setSession: undefined }
-  | { isLoaded: true; signUp: SignUpResource; setSession: SetSession };
+  | { isLoaded: false; signUp: undefined; setSession: undefined; setActive: undefined }
+  | { isLoaded: true; signUp: SignUpResource; setSession: SetSession; setActive: SetActive };
 
 type UseSignUp = () => UseSignUpReturn;
 
@@ -14,8 +14,13 @@ export const useSignUp: UseSignUp = () => {
   const client = useClientContext();
 
   if (!client) {
-    return { isLoaded: false, signUp: undefined, setSession: undefined };
+    return { isLoaded: false, signUp: undefined, setSession: undefined, setActive: undefined };
   }
 
-  return { isLoaded: true, signUp: client.signUp, setSession: isomorphicClerk.setSession };
+  return {
+    isLoaded: true,
+    signUp: client.signUp,
+    setSession: isomorphicClerk.setSession,
+    setActive: isomorphicClerk.setActive,
+  };
 };

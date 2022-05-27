@@ -6,7 +6,7 @@ import React from 'react';
 import { SignUpVerifyEmailAddress, SignUpVerifyPhoneNumber } from './SignUpVerify';
 
 const navigateMock = jest.fn();
-const mockSetSession = jest.fn();
+const mockSetActive = jest.fn();
 const mockAttemptVerification = jest.fn();
 const mockStartMagicLinkFlow = jest.fn(() => {
   return Promise.resolve({
@@ -74,7 +74,7 @@ jest.mock('ui/contexts', () => {
     withCoreUserGuard: (a: any) => a,
     useCoreClerk: () => {
       return {
-        setSession: mockSetSession,
+        setActive: mockSetActive,
       };
     },
     useSignUpContext: () => {

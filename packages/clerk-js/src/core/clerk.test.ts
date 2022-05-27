@@ -219,7 +219,7 @@ describe('Clerk singleton', () => {
       await waitFor(() => {
         expect(mockClientDestroy).toHaveBeenCalled();
         expect(mockSession1.remove).not.toHaveBeenCalled();
-        expect(sut.setActive).toHaveBeenCalledWith({session: null});
+        expect(sut.setActive).toHaveBeenCalledWith({ session: null });
       });
     });
 
@@ -238,7 +238,9 @@ describe('Clerk singleton', () => {
       await waitFor(() => {
         expect(mockSession2.remove).toHaveBeenCalled();
         expect(mockClientDestroy).not.toHaveBeenCalled();
-        expect(sut.setActive).not.toHaveBeenCalledWith(null, undefined);
+        expect(sut.setActive).not.toHaveBeenCalledWith({
+          session: null,
+        });
       });
     });
 
@@ -257,7 +259,7 @@ describe('Clerk singleton', () => {
       await waitFor(() => {
         expect(mockSession1.remove).toHaveBeenCalled();
         expect(mockClientDestroy).not.toHaveBeenCalled();
-        expect(sut.setActive).toHaveBeenCalledWith({session: null});
+        expect(sut.setActive).toHaveBeenCalledWith({ session: null });
       });
     });
   });
@@ -704,8 +706,8 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const mockSetActive = jest.fn(async (_: any, callback: () => any) => {
-        await callback();
+      const mockSetActive = jest.fn(async (setActiveOpts: any) => {
+        await setActiveOpts.beforeEmit();
       });
 
       const sut = new Clerk(frontendApi);
@@ -759,8 +761,8 @@ describe('Clerk singleton', () => {
         }),
       );
 
-      const mockSetActive = jest.fn(async (_: any, callback: () => any) => {
-        await callback();
+      const mockSetActive = jest.fn(async (setActiveOpts: any) => {
+        await setActiveOpts.beforeEmit();
       });
 
       const sut = new Clerk(frontendApi);
@@ -903,7 +905,10 @@ describe('Clerk singleton', () => {
       sut.handleMagicLinkVerification({ redirectUrlComplete });
 
       await waitFor(() => {
-        expect(mockSetActive).toHaveBeenCalledWith(createdSessionId, expect.any(Function));
+        expect(mockSetActive).toHaveBeenCalledWith({
+          session: createdSessionId,
+          beforeEmit: expect.any(Function),
+        });
       });
     });
 
@@ -964,7 +969,10 @@ describe('Clerk singleton', () => {
       sut.handleMagicLinkVerification({ redirectUrlComplete });
 
       await waitFor(() => {
-        expect(mockSetActive).toHaveBeenCalledWith(createdSessionId, expect.any(Function));
+        expect(mockSetActive).toHaveBeenCalledWith({
+          session: createdSessionId,
+          beforeEmit: expect.any(Function),
+        });
       });
     });
 

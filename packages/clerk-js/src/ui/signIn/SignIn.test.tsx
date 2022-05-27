@@ -6,7 +6,7 @@ import { SignIn } from 'ui/signIn/SignIn';
 
 const mockNavigate = jest.fn();
 
-const mockSetSession = jest.fn().mockReturnValue({
+const mockSetActive = jest.fn().mockReturnValue({
   status: 'complete',
 });
 
@@ -37,7 +37,7 @@ jest.mock('ui/contexts', () => {
     useSignUpContext: jest.fn(),
     useClerk: () => {
       return {
-        setSession: mockSetSession,
+        setActive: mockSetActive,
       };
     },
     withCoreSessionSwitchGuard: (a: any) => a,

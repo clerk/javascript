@@ -44,7 +44,7 @@ describe('<SignInFactorOne/>', () => {
 
   describe('successful password based sign in', () => {
     it('renders the sign in screen, enters a password and sets session', async () => {
-      const mockSetSession = jest.fn();
+      const mockSetActive = jest.fn();
       const mockAttemptFirstFactor = jest.fn();
 
       (useEnvironment as jest.Mock).mockImplementation(() => ({
@@ -73,7 +73,7 @@ describe('<SignInFactorOne/>', () => {
       }));
 
       (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(() => ({
-        setSession: mockSetSession,
+        setActive: mockSetActive,
       }));
 
       render(<SignInFactorOne />);
@@ -93,15 +93,18 @@ describe('<SignInFactorOne/>', () => {
         });
 
         expect(mockNavigate).toHaveBeenCalledTimes(0);
-        expect(mockSetSession).toHaveBeenCalledTimes(1);
-        expect(mockSetSession).toHaveBeenCalledWith('cafebabe', mockNavigateAfterSignIn);
+        expect(mockSetActive).toHaveBeenCalledTimes(1);
+        expect(mockSetActive).toHaveBeenCalledWith({
+          session: 'cafebabe',
+          beforeEmit: mockNavigateAfterSignIn,
+        });
       });
     });
   });
 
   describe('2SV password based sign in', () => {
     it('redirects to /factor-two', async () => {
-      const mockSetSession = jest.fn();
+      const mockSetActive = jest.fn();
       const mockAttemptFirstFactor = jest.fn();
 
       (useEnvironment as jest.Mock).mockImplementation(() => ({
@@ -131,7 +134,7 @@ describe('<SignInFactorOne/>', () => {
       }));
 
       (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(() => ({
-        setSession: mockSetSession,
+        setActive: mockSetActive,
       }));
 
       render(<SignInFactorOne />);
@@ -150,7 +153,7 @@ describe('<SignInFactorOne/>', () => {
           password: 'p@ssW0rD',
         });
 
-        expect(mockSetSession).toHaveBeenCalledTimes(0);
+        expect(mockSetActive).toHaveBeenCalledTimes(0);
         expect(mockNavigate).toHaveBeenCalledTimes(1);
         expect(mockNavigate).toHaveBeenCalledWith('../factor-two');
       });
@@ -160,7 +163,7 @@ describe('<SignInFactorOne/>', () => {
   describe('successful passwordless sign in', () => {
     it('renders the sign in screen, enters a password and sets session', async () => {
       const mockAttemptFirstFactor = jest.fn();
-      const mockSetSession = jest.fn();
+      const mockSetActive = jest.fn();
 
       (useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>).mockImplementation(() => ({
         authConfig: { singleSessionMode: false },
@@ -193,7 +196,7 @@ describe('<SignInFactorOne/>', () => {
       );
 
       (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(() => ({
-        setSession: mockSetSession,
+        setActive: mockSetActive,
       }));
 
       render(<SignInFactorOne />);
@@ -219,15 +222,18 @@ describe('<SignInFactorOne/>', () => {
         });
 
         expect(mockNavigate).toHaveBeenCalledTimes(0);
-        expect(mockSetSession).toHaveBeenCalledTimes(1);
-        expect(mockSetSession).toHaveBeenCalledWith('cafebabe', mockNavigateAfterSignIn);
+        expect(mockSetActive).toHaveBeenCalledTimes(1);
+        expect(mockSetActive).toHaveBeenCalledWith({
+          session: 'cafebabe',
+          beforeEmit: mockNavigateAfterSignIn,
+        });
       });
     });
   });
 
   describe('successful magiclink sign in', () => {
     it('renders the magic link sign in screen, and handles an expired first factor verification', async () => {
-      const mockSetSession = jest.fn();
+      const mockSetActive = jest.fn();
       const mockStartMagicLinkFlow = jest.fn(() =>
         Promise.resolve({
           status: 'needs_factor_one',
@@ -268,7 +274,7 @@ describe('<SignInFactorOne/>', () => {
       );
 
       (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(() => ({
-        setSession: mockSetSession,
+        setActive: mockSetActive,
       }));
 
       render(<SignInFactorOne />);
@@ -277,13 +283,13 @@ describe('<SignInFactorOne/>', () => {
 
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledTimes(0);
-        expect(mockSetSession).toHaveBeenCalledTimes(0);
+        expect(mockSetActive).toHaveBeenCalledTimes(0);
         screen.getByText(/expired/);
       });
     });
 
     it('renders the magic link sign in screen, waits for magic link and sets session', async () => {
-      const mockSetSession = jest.fn();
+      const mockSetActive = jest.fn();
       const mockStartMagicLinkFlow = jest.fn(() =>
         Promise.resolve({
           status: 'complete',
@@ -327,7 +333,7 @@ describe('<SignInFactorOne/>', () => {
       );
 
       (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(() => ({
-        setSession: mockSetSession,
+        setActive: mockSetActive,
       }));
 
       render(<SignInFactorOne />);
@@ -340,8 +346,11 @@ describe('<SignInFactorOne/>', () => {
 
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledTimes(0);
-        expect(mockSetSession).toHaveBeenCalledTimes(1);
-        expect(mockSetSession).toHaveBeenCalledWith('cafebabe', mockNavigateAfterSignIn);
+        expect(mockSetActive).toHaveBeenCalledTimes(1);
+        expect(mockSetActive).toHaveBeenCalledWith({
+          session: 'cafebabe',
+          beforeEmit: mockNavigateAfterSignIn,
+        });
       });
     });
   });
@@ -349,7 +358,7 @@ describe('<SignInFactorOne/>', () => {
   describe('2SV passwordless sign in', () => {
     it('renders the sign in screen, enters a password and sets session', async () => {
       const mockAttemptFirstFactor = jest.fn();
-      const mockSetSession = jest.fn();
+      const mockSetActive = jest.fn();
 
       mocked(useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>, true).mockImplementation(() => ({
         authConfig: { singleSessionMode: false },
@@ -381,7 +390,7 @@ describe('<SignInFactorOne/>', () => {
       );
 
       mocked(useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>, true).mockImplementation(() => ({
-        setSession: mockSetSession,
+        setActive: mockSetActive,
       }));
 
       render(<SignInFactorOne />);
@@ -406,7 +415,7 @@ describe('<SignInFactorOne/>', () => {
           code: '123456',
         });
 
-        expect(mockSetSession).toHaveBeenCalledTimes(0);
+        expect(mockSetActive).toHaveBeenCalledTimes(0);
         expect(mockNavigate).toHaveBeenCalledTimes(1);
         expect(mockNavigate).toHaveBeenCalledWith('../factor-two');
       });
@@ -417,7 +426,7 @@ describe('<SignInFactorOne/>', () => {
     it('renders the sign in screen and chooses an alternate strategy', async () => {
       const mockAttemptFirstFactor = jest.fn();
       const mockPrepareFirstFactor = jest.fn();
-      const mockSetSession = jest.fn();
+      const mockSetActive = jest.fn();
 
       mocked(useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>, true).mockImplementation(() => ({
         authConfig: { singleSessionMode: false },
@@ -459,7 +468,7 @@ describe('<SignInFactorOne/>', () => {
         useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>,
         true,
       ).mockImplementation(() => ({
-        setSession: mockSetSession,
+        setActive: mockSetActive,
       }));
 
       render(<SignInFactorOne />);
@@ -483,7 +492,7 @@ describe('<SignInFactorOne/>', () => {
 
     it('goes back to default factorOne screen after hitting back on alternate strategy screen', async () => {
       const mockAttemptFirstFactor = jest.fn();
-      const mockSetSession = jest.fn();
+      const mockSetActive = jest.fn();
 
       (useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>).mockImplementation(() => ({
         authConfig: { singleSessionMode: false },
@@ -516,7 +525,7 @@ describe('<SignInFactorOne/>', () => {
       );
 
       (useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>).mockImplementation(() => ({
-        setSession: mockSetSession,
+        setActive: mockSetActive,
       }));
 
       render(<SignInFactorOne />);
@@ -531,7 +540,7 @@ describe('<SignInFactorOne/>', () => {
     });
 
     it('renders all available strategies when sso sign is available and no other first factor', () => {
-      const mockSetSession = jest.fn();
+      const mockSetActive = jest.fn();
       mocked(useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>, true).mockImplementation(() => ({
         authConfig: { singleSessionMode: false },
         displayConfig: {
@@ -561,7 +570,7 @@ describe('<SignInFactorOne/>', () => {
         useCoreClerk as jest.Mock<PartialDeep<LoadedClerk>>,
         true,
       ).mockImplementation(() => ({
-        setSession: mockSetSession,
+        setActive: mockSetActive,
       }));
 
       const { container } = render(<SignInFactorOne />);

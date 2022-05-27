@@ -8,7 +8,7 @@ const mockNavigate = jest.fn();
 
 jest.mock('ui/router/RouteContext');
 
-const mockSetSession = jest.fn().mockReturnValue({
+const mockSetActive = jest.fn().mockReturnValue({
   status: 'complete',
 });
 
@@ -36,7 +36,7 @@ jest.mock('ui/contexts', () => {
       } as Partial<Session>),
     useCoreClerk: () => ({
       redirectToSignUp: jest.fn(),
-      setSession: mockSetSession,
+      setActive: mockSetActive,
     }),
     useCoreSignIn: jest.fn(),
   };

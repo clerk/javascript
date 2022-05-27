@@ -8,7 +8,7 @@ import { SignUpContinue } from './SignUpContinue';
 
 const navigateMock = jest.fn();
 const mockUpdateRequest = jest.fn();
-const mockSetSession = jest.fn();
+const mockSetActive = jest.fn();
 let mockUserSettings: UserSettings;
 
 jest.mock('ui/router/RouteContext');
@@ -28,7 +28,7 @@ jest.mock('ui/contexts', () => {
     },
     useCoreClerk: jest.fn(() => ({
       frontendAPI: 'clerk.clerk.dev',
-      setSession: mockSetSession,
+      setActive: mockSetActive,
     })),
     useCoreSignUp: jest.fn(() => ({
       verifications: {

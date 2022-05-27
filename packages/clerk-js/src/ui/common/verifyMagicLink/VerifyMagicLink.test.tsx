@@ -7,10 +7,10 @@ import { VerifyMagicLink } from 'ui/common';
 const mockHandleMagicLinkVerification = jest.fn();
 
 const mockNavigate = jest.fn();
-const mockSetSession = jest.fn();
+const mockSetActive = jest.fn();
 const mockUseCoreClerk = jest.fn(() => ({
   handleMagicLinkVerification: mockHandleMagicLinkVerification,
-  setSession: mockSetSession,
+  setActive: mockSetActive,
 }));
 
 jest.mock('ui/hooks', () => ({

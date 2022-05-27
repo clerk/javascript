@@ -37,7 +37,7 @@ jest.mock('ui/contexts', () => {
     },
     useCoreClerk: () => {
       return {
-        setSession: jest.fn(),
+        setActive: jest.fn(),
         signOut: jest.fn(),
         signOutOne: jest.fn(),
       };

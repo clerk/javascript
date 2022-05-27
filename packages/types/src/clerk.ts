@@ -166,7 +166,7 @@ export interface Clerk {
    * If the session param is `null`, the active session is deleted.
    * In a similar fashion, if the organization param is `null`, the current organization is removed as active.
    */
-  setActive: (params: SetActiveParams) => Promise<void>;
+  setActive: SetActive;
 
   /**
    * Set the current session explicitly.
@@ -339,6 +339,8 @@ export type SetActiveParams = {
    */
   beforeEmit?: BeforeEmitCallback;
 };
+
+export type SetActive = (params: SetActiveParams) => Promise<void>;
 
 export type SignInProps = {
   /*

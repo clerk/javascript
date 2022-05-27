@@ -3,7 +3,7 @@ import React from 'react';
 
 import { SignInFactorTwo } from './SignInFactorTwo';
 
-const mockSetSession = jest.fn().mockReturnValue({
+const mockSetActive = jest.fn().mockReturnValue({
   status: 'complete',
 });
 const mockFactorOneAttempt = jest.fn();
@@ -57,7 +57,7 @@ jest.mock('ui/contexts', () => {
       prepareSecondFactor: jest.fn(() => Promise.resolve()),
     }),
     useCoreClerk: () => ({
-      setSession: mockSetSession,
+      setActive: mockSetActive,
     }),
   };
 });
@@ -78,7 +78,7 @@ describe('<SignInFactorTwo/>', () => {
     }
 
     await waitFor(() => {
-      expect(mockSetSession).toHaveBeenCalledTimes(1);
+      expect(mockSetActive).toHaveBeenCalledTimes(1);
     });
   });
 });
