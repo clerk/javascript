@@ -322,10 +322,16 @@ export type RedirectOptions = {
 
 export type SetActiveParams = {
   /**
-   * The session resource or session id (string version).
+   * The session resource or session id (string version) to be set as active.
    * If `null`, the current session is deleted.
    */
   session?: ActiveSessionResource | string | null;
+
+  /**
+   * The organization id to be set as active in the current session.
+   * If `null`, the currently active organization is removed as active.
+   */
+  organization?: string | null;
 
   /**
    * Callback run just before the active session and/or organization is set to the passed object.
