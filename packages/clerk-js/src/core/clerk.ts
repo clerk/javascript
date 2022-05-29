@@ -682,6 +682,10 @@ export default class Clerk implements ClerkInterface {
     this.#fapiClient.onAfterResponse(callback);
   }
 
+  __unstable__updateProps({ appearance }: any): void {
+    this.#components?.updateAppearanceProp(appearance);
+  }
+
   #loadInBrowser = async (): Promise<void> => {
     this.#authService = new AuthenticationService(this);
 

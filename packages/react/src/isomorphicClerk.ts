@@ -239,6 +239,14 @@ export default class IsomorphicClerk {
     }
   }
 
+  __unstable__updateProps(props: any): any {
+    if (this.clerkjs) {
+      (this.clerkjs as any).__unstable__updateProps(props);
+    } else {
+      return undefined;
+    }
+  }
+
   setActive = ({ session, organization, beforeEmit }: SetActiveParams): Promise<void> => {
     if (this.clerkjs) {
       return this.clerkjs.setActive({ session, organization, beforeEmit });
