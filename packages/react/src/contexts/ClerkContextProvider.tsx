@@ -26,12 +26,12 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
     user: clerk.user,
     organization: clerk.organization,
   });
-  const derivedState = deriveState(clerkLoaded, state, initialState);
 
   React.useEffect(() => {
     return clerk.addListener(e => setState({ ...e }));
   }, []);
 
+  const derivedState = deriveState(clerkLoaded, state, initialState);
   const clerkCtx = React.useMemo(() => ({ value: clerk }), [clerkLoaded]);
   const clientCtx = React.useMemo(() => ({ value: state.client }), [state.client]);
 
@@ -65,6 +65,12 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
 const useLoadedIsomorphicClerk = (options: NewIsomorphicClerkParams) => {
   const [loaded, setLoaded] = React.useState(false);
   const isomorphicClerk = React.useMemo(() => IsomorphicClerk.getOrCreateInstance(options), []);
+
+  React.useEffect(() => {
+    // @ts-expect-error
+    isomorphicClerk.__unstable__updateProps({ appearance: options.options.appearance });
+    // @ts-expect-error
+  }, [options.options.appearance]);
 
   React.useEffect(() => {
     isomorphicClerk.addOnLoaded(() => setLoaded(true));
