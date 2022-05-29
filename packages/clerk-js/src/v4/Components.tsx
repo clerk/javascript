@@ -21,7 +21,7 @@ const Modal = (props: any) => {
 
 const AvailableComponents = {
   SignIn,
-  // SignUp,
+  SignUp,
   // UserButton,
   // UserProfile,
 };
@@ -209,17 +209,19 @@ export default class Components extends React.Component<ComponentsProps, Compone
     );
 
     return (
-      <StyledSystemProvider>
-        <CoreClerkContextWrapper clerk={this.props.clerk}>
-          <EnvironmentProvider value={this.props.environment}>
-            <OptionsProvider value={this.props.options}>
-              {mountedNodes}
-              {signInModal && mountedSignInModal}
-              {signUpModal && mountedSignUpModal}
-            </OptionsProvider>
-          </EnvironmentProvider>
-        </CoreClerkContextWrapper>
-      </StyledSystemProvider>
+      <AppearanceProvider appearance={this.state.appearance}>
+        <InternalThemeProvider>
+          <CoreClerkContextWrapper clerk={this.props.clerk}>
+            <EnvironmentProvider value={this.props.environment}>
+              <OptionsProvider value={this.props.options}>
+                {mountedNodes}
+                {signInModal && mountedSignInModal}
+                {signUpModal && mountedSignUpModal}
+              </OptionsProvider>
+            </EnvironmentProvider>
+          </CoreClerkContextWrapper>
+        </InternalThemeProvider>
+      </AppearanceProvider>
     );
   }
 }
