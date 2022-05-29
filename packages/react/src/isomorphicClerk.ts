@@ -238,6 +238,14 @@ export default class IsomorphicClerk {
     }
   }
 
+  __unstable__updateProps(props: any): any {
+    if (this.clerkjs) {
+      (this.clerkjs as any).__unstable__updateProps(props);
+    } else {
+      return undefined;
+    }
+  }
+
   setSession = (
     session: ActiveSessionResource | string | null,
     beforeEmit?: (session: ActiveSessionResource | null) => void | Promise<any>,
