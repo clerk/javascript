@@ -17,6 +17,7 @@ export type DeepCamelToSnake<T> = T extends `${infer C0}${infer R}`
       [K in keyof T as DeepCamelToSnake<Extract<K, string>>]: DeepCamelToSnake<T[K]>;
     }
   : T;
+
 export type CamelToSnake<T> = T extends `${infer C0}${infer R}`
   ? `${C0 extends Uppercase<C0> ? '_' : ''}${Lowercase<C0>}${CamelToSnake<R>}`
   : T extends {}
