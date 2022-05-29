@@ -17,6 +17,7 @@ module.exports = {
     'prettier',
   ],
   rules: {
+    curly: 'error',
     '@typescript-eslint/no-non-null-assertion': 'warn',
     '@typescript-eslint/no-unsafe-assignment': 'off',
     '@typescript-eslint/no-unsafe-call': 'off',
