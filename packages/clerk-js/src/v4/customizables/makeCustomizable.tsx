@@ -1,27 +1,37 @@
-import { useContainerMetadata } from '../elements/hooks';
+import { useFlowMetadata } from '../elements/contexts';
+import { useAppearance } from './AppearanceProvider';
+import { generateClassName } from './classGeneration';
+import { ElementDescriptor, ElementId } from './elementDescriptors';
 
-type Customizable<T = {}> = { appearanceKey?: string | string[] } & T;
+type Customizable<T = {}> = {
+  elementDescriptor?: ElementDescriptor;
+  elementId?: ElementId;
+} & T;
+
 type CustomizablePrimitive<T> = React.FunctionComponent<Customizable<T>>;
 
-const fakeGenerateSemanticClassName = (props: any) => {
-  const { appearanceKey, pageMetadata: any } = props;
-  const [first, ...rest] = typeof appearanceKey === 'string' ? [appearanceKey] : appearanceKey;
-  return ['cl', first, rest.map((a: any) => a).join('')].filter(s => s).join('-');
-};
-
 export const makeCustomizable = <P,>(Component: React.FunctionComponent<P>): CustomizablePrimitive<P> => {
-  const CustomizableComponent = (props: Customizable<P>) => {
-    const { appearanceKey, ...restProps } = props;
-    const pageMetadata = useContainerMetadata();
-    const appearance = {} as any; // useAppearance();
-    if (!appearanceKey) {
+  const customizableComponent = (props: Customizable<P>) => {
+    const { elementDescriptor, elementId, ...restProps } = props;
+    const flowMetadata = useFlowMetadata();
+    const { parsedAppearance } = useAppearance();
+
+    if (!elementDescriptor) {
       return <Component {...(restProps as any)} />;
     }
-    const className = fakeGenerateSemanticClassName({ appearanceKey, pageMetadata, appearance });
-    return <Component {...({ ...restProps, className: className + ' 🔒' } as any)} />;
+
+    const { className, css } = generateClassName(parsedAppearance, elementDescriptor, elementId, props, flowMetadata);
+    const generatedClassname = ((restProps as any).className ? (restProps as any).className + ' ' : '') + className;
+    return (
+      <Component
+        css={css}
+        {...(restProps as any)}
+        className={generatedClassname}
+      />
+    );
   };
 
   const displayName = Component.displayName || Component.name || 'Component';
-  CustomizableComponent.displayName = `Customizable${displayName}`.replace('_', '');
-  return CustomizableComponent as CustomizablePrimitive<P>;
+  customizableComponent.displayName = `Customizable${displayName}`.replace('_', '');
+  return customizableComponent as CustomizablePrimitive<P>;
 };
