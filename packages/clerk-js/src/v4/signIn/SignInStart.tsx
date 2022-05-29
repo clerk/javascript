@@ -11,6 +11,9 @@ import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '.
 import { useNavigate } from '../../ui/hooks';
 import { useSupportEmail } from '../../ui/hooks/useSupportEmail';
 import { getClerkQueryParam } from '../../utils/getClerkQueryParam';
+import { Button, descriptors, Flex } from '../customizables';
+import { FlowCard, Footer, Header, SocialButtons } from '../elements';
+import { InternalThemeProvider } from '../styledSystem';
 
 export function _SignInStart(): JSX.Element {
   const { userSettings } = useEnvironment();
@@ -158,16 +161,64 @@ export function _SignInStart(): JSX.Element {
   };
 
   if (isLoading) {
-    // return <LoadingScreen />;
     return <div>is loading</div>;
   }
   const hasSocialOrWeb3Buttons = !!socialProviderStrategies.length || !!web3FirstFactors.length;
 
   return (
-    <div>
-      If you can see this, the dev v4 HMR works
-      <MobileIcon />
-    </div>
+    <InternalThemeProvider>
+      <FlowCard.Root
+        flow='signIn'
+        page='start'
+      >
+        <Header.Root>
+          <Header.Title>Sign in</Header.Title>
+          <Header.Subtitle>to continue to [Appname]</Header.Subtitle>
+        </Header.Root>
+        <Flex
+          direction={'col'}
+          elementDescriptor={descriptors.authOptions}
+        >
+          <SocialButtons.Root />
+          <hr style={{ width: '100%' }} />
+          <Flex>
+            <Button block>this is test</Button>
+          </Flex>
+        </Flex>
+
+        <Footer.Root>
+          <Footer.Action>
+            <Footer.ActionText>No account?</Footer.ActionText>
+            <Footer.ActionLink
+              isExternal
+              href='https://www.google.com'
+            >
+              Sign up
+            </Footer.ActionLink>
+          </Footer.Action>
+          <Footer.Links>
+            <Footer.Link
+              isExternal
+              href='https://www.google.com'
+            >
+              Help
+            </Footer.Link>
+            <Footer.Link
+              isExternal
+              href='https://www.google.com'
+            >
+              Privacy
+            </Footer.Link>
+            <Footer.Link
+              isExternal
+              href='https://www.google.com'
+            >
+              Terms
+            </Footer.Link>
+          </Footer.Links>
+        </Footer.Root>
+      </FlowCard.Root>
+    </InternalThemeProvider>
   );
 }
 
