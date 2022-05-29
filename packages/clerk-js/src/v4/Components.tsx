@@ -10,9 +10,10 @@ import { CoreClerkContextWrapper } from '../ui/contexts/CoreClerkContextWrapper'
 import Portal from '../ui/portal';
 import { VirtualRouter } from '../ui/router';
 import type { AvailableComponentCtx, AvailableComponentProps } from '../ui/types';
-import { AppearanceProvider } from './customizables';
+import { AppearanceProvider } from './customizables/AppearanceProvider';
 import { SignIn, SignInModal } from './signIn';
 import { SignUp } from './signUp';
+import { InternalThemeProvider } from './styledSystem';
 
 const Modal = (props: any) => {
   return <div {...props}>modal {props.children}</div>;
@@ -20,7 +21,7 @@ const Modal = (props: any) => {
 
 const AvailableComponents = {
   SignIn,
-  SignUp,
+  // SignUp,
   // UserButton,
   // UserProfile,
 };
