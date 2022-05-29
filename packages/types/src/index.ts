@@ -32,3 +32,4 @@ export * from './web3';
 export * from './identifiers';
 export * from './factors';
 export * from './attributes';
+export * from './appearance';
