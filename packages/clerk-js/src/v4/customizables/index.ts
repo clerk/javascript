@@ -10,4 +10,4 @@ export const Input = makeCustomizable(Primitives.Input);
 export const Link = makeCustomizable(Primitives.Link);
 export const Text = makeCustomizable(Primitives.Text);
 
-export { ContainerMetadata, useContainerMetadata } from './useContainerMetadata';
+export { descriptors } from './elementDescriptors';
