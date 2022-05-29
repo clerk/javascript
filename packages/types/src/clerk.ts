@@ -1,3 +1,4 @@
+import { Appearance } from './appearance';
 import { ClientResource } from './client';
 import { DisplayThemeJSON } from './json';
 import { OrganizationResource } from './organization';
@@ -294,6 +295,7 @@ export interface ClerkOptions {
   polling?: boolean;
   selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;
   theme?: ClerkThemeOptions;
+  __unstable_appearance?: Appearance;
   /** Optional support email for display in authentication screens */
   supportEmail?: string;
 }

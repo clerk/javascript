@@ -1,14 +1,5 @@
 // import { Modal } from '@clerk/shared/components/modal';
-import { deepCamelToSnake } from '@clerk/shared/utils/object';
-import type {
-  Clerk,
-  ClerkOptions,
-  DeepPartial,
-  DisplayThemeJSON,
-  EnvironmentResource,
-  SignInProps,
-  SignUpProps,
-} from '@clerk/types';
+import type { Appearance, Clerk, ClerkOptions, EnvironmentResource, SignInProps, SignUpProps } from '@clerk/types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -19,9 +10,10 @@ import { CoreClerkContextWrapper } from '../ui/contexts/CoreClerkContextWrapper'
 import Portal from '../ui/portal';
 import { VirtualRouter } from '../ui/router';
 import type { AvailableComponentCtx, AvailableComponentProps } from '../ui/types';
-import { injectTheme } from '../utils/theming';
+import { AppearanceProvider } from './customizables/AppearanceProvider';
 import { SignIn, SignInModal } from './signIn';
-import { StyledSystemProvider } from './styledSystem';
+import { SignUp } from './signUp';
+import { InternalThemeProvider } from './styledSystem';
 
 const Modal = (props: any) => {
   return <div {...props}>modal {props.children}</div>;
@@ -49,6 +41,7 @@ interface ComponentsProps {
 }
 
 interface ComponentsState {
+  appearance: Appearance | undefined;
   signInModal: null | SignInProps;
   signUpModal: null | SignUpProps;
   nodes: Map<HTMLDivElement, HtmlNodeOptions>;
@@ -63,24 +56,18 @@ function assertDOMElement(element: HTMLElement): asserts element {
 }
 
 export default class Components extends React.Component<ComponentsProps, ComponentsState> {
-  state: ComponentsState = {
-    signInModal: null,
-    signUpModal: null,
-    nodes: new Map(),
-  };
-
   static render(clerk: Clerk, environment: EnvironmentResource, options: ClerkOptions): Components {
     /**  Merge theme retrieved from the network with user supplied theme options. */
-    injectTheme(
-      environment.displayConfig.theme,
-      deepCamelToSnake(options.theme || {}) as DeepPartial<DisplayThemeJSON>,
-    );
+    // TODO: Remove all helpers
+    // injectTheme(
+    //   environment.displayConfig.theme,
+    //   deepCamelToSnake(options.theme || {}) as DeepPartial<DisplayThemeJSON>,
+    // );
 
     const clerkRoot = document.createElement('DIV');
     clerkRoot.setAttribute('id', 'clerk-components');
     document.body.appendChild(clerkRoot);
 
-    // eslint-disable-next-line react/no-render-return-value
     return ReactDOM.render<ComponentsProps, Components>(
       <Components
         clerk={clerk}
@@ -89,6 +76,16 @@ export default class Components extends React.Component<ComponentsProps, Compone
       />,
       clerkRoot,
     );
+  }
+
+  constructor(props: ComponentsProps) {
+    super(props);
+    this.state = {
+      appearance: props.options.appearance,
+      signInModal: null,
+      signUpModal: null,
+      nodes: new Map(),
+    };
   }
 
   private static _addMountNodeClass(node: HTMLDivElement, className: string) {
@@ -140,6 +137,13 @@ export default class Components extends React.Component<ComponentsProps, Compone
       nodes.delete(node);
       return { nodes };
     });
+  };
+
+  updateAppearanceProp = (appearance: Appearance | undefined) => {
+    this.setState(state => ({
+      ...state,
+      appearance,
+    }));
   };
 
   render(): JSX.Element {
