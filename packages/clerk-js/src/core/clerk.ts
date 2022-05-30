@@ -761,6 +761,9 @@ export default class Clerk implements ClerkInterface {
   }
 
   __unstable__updateProps({ appearance }: any): void {
+    // The expect-error directive below is safe since `updateAppearanceProp` is only used
+    // in the v4 build. This will be removed when v4 becomes the main stable version
+    // @ts-expect-error
     this.#components?.updateAppearanceProp(appearance);
   }
 
