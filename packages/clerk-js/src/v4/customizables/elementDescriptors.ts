@@ -5,11 +5,21 @@ export const ID_CLASS_PREFIX = 'cl-id-';
 export const OBJ_KEY_DELIMITER = '__';
 
 /**
+ * Enforces that an array contains ALL keys of T
+ */
+const containsAllOfType =
+  <T>() =>
+  <U extends Readonly<T[]>>(array: U & ([T] extends [U[number]] ? unknown : 'Invalid')) =>
+    array;
+
+const containsAllElementsConfigKeys = containsAllOfType<keyof ElementsConfig>();
+
+/**
  * This object is strictly typed using the ElementsConfig type
  * and is used as the single source of truth to generate the
  * descriptor map
  */
-export const APPEARANCE_KEYS: Readonly<Array<keyof ElementsConfig>> = [
+export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'root',
   'card',
   'header',
@@ -22,9 +32,9 @@ export const APPEARANCE_KEYS: Readonly<Array<keyof ElementsConfig>> = [
   'form',
   'form-input',
   'form-buttonPrimary',
-] as const;
+] as const);
 
-type TargettableClassname<K extends keyof ElementsConfig> = `cl-${K}`;
+type TargettableClassname<K extends keyof ElementsConfig> = `${typeof CLASS_PREFIX}${K}`;
 type AllowedIds<T extends keyof ElementsConfig> = ElementsConfig[T]['ids'];
 type AllowedStates<T extends keyof ElementsConfig> = ElementsConfig[T]['states'];
 type ObjectKeyWithState<K extends keyof ElementsConfig> = StateSelectors<K, ElementsConfig[K]['states']>;
