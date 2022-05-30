@@ -10,4 +10,5 @@ export const Input = makeCustomizable(Primitives.Input);
 export const Link = makeCustomizable(Primitives.Link);
 export const Text = makeCustomizable(Primitives.Text);
 
+export { AppearanceProvider } from './AppearanceContext';
 export { descriptors } from './elementDescriptors';

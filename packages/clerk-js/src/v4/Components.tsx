@@ -10,7 +10,7 @@ import { CoreClerkContextWrapper } from '../ui/contexts/CoreClerkContextWrapper'
 import Portal from '../ui/portal';
 import { VirtualRouter } from '../ui/router';
 import type { AvailableComponentCtx, AvailableComponentProps } from '../ui/types';
-import { AppearanceProvider } from './customizables/AppearanceProvider';
+import { AppearanceProvider } from './customizables';
 import { SignIn, SignInModal } from './signIn';
 import { SignUp } from './signUp';
 import { InternalThemeProvider } from './styledSystem';
