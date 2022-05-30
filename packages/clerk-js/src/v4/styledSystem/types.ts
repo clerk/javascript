@@ -11,7 +11,7 @@ export type StyleRule = _Interpolation<Theme>;
  * Primitives can override their styles using the css prop.
  * For customising layout/theme, prefer using the props defined on the component.
  */
-type ThemableCssProp = ((params: Theme) => StyleRule) | StyleRule;
+export type ThemableCssProp = ((params: Theme) => StyleRule) | StyleRule;
 type CssProp = { css?: ThemableCssProp };
 
 export type AsProp = { as?: React.ElementType };
