@@ -30,17 +30,33 @@ type WithOptions<Ids, States, Jsx> = { ids: Ids; states: States; jsx: Jsx };
 export type StateSelectors<E extends string, S extends ElementState | undefined = never> = S extends never
   ? never
   : `${E}__${S}`;
+
+/**
+ * Create a type union consisting of the base element with all valid ids appended
+ */
 export type IdSelectors<E extends string, Id extends string | undefined = never> = Id extends never
   ? never
   : `${E}__${Id}`;
+
+/**
+ * Create a type union consisting of all base, base+state, base+id, base+id+state combinations
+ */
 type ElementPartsKeys<Name extends string, Opts extends ConfigOptions> =
   | StateSelectors<Name, Opts['states']>
   | IdSelectors<Name, Opts['ids']>
   | StateSelectors<IdSelectors<Name, Opts['ids']>, Opts['states']>;
+
+/**
+ * Create an object type mapping base elements and part combinations (base, base+state, base+id, base+id+state)
+ * to the value they can accept (usually a style rule, a string class or jsx)
+ */
 type Selectors<RootElemName extends string, Opts extends ConfigOptions> =
   | Partial<Record<RootElemName, UserDefinedStyle | Opts['jsx']>>
   | Partial<Record<ElementPartsKeys<RootElemName, Opts>, UserDefinedStyle>>;
 
+/**
+ * Convert a kebab-cased key from ElementsConfig into a camelCased Elements key
+ */
 export type ElementObjectKey<K extends string> = K extends `${infer Parent}-${infer Rest}`
   ? `${Parent}${Capitalize<Rest>}`
   : K;
@@ -48,13 +64,22 @@ export type ElementObjectKey<K extends string> = K extends `${infer Parent}-${in
 /**
  * A map that describes the possible combinations we need to generate
  * for each unique base element
+ * Kebab-case is used to differentiate between the container and child elements
  */
 export type ElementsConfig = {
   root: WithOptions<never, never, never>;
   card: WithOptions<never, never, never>;
+
   header: WithOptions<never, never, never>;
   'header-title': WithOptions<never, never, never>;
   'header-subtitle': WithOptions<never, never, never>;
+
+  footer: WithOptions<never, never, never>;
+  'footer-action': WithOptions<never, never, never>;
+  'footer-actionText': WithOptions<never, never, never>;
+  'footer-actionLink': WithOptions<never, never, never>;
+  'footer-pages': WithOptions<never, never, never>;
+  'footer-pagesLink': WithOptions<'help' | 'terms' | 'privacy', never, never>;
 
   authOptions: WithOptions<never, never, never>;
 

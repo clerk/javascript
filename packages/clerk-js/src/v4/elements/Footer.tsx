@@ -1,10 +1,12 @@
 import React from 'react';
 
-import { Flex, Link, LinkProps, Text } from '../primitives';
+import { descriptors, Flex, Link, Text } from '../customizables';
+import { PropsOfComponent } from '../styledSystem';
 
 const FooterRoot = (props: React.PropsWithChildren<any>): JSX.Element => {
   return (
     <Flex
+      elementDescriptor={descriptors.footer}
       {...props}
       justify='between'
       align='center'
@@ -15,6 +17,7 @@ const FooterRoot = (props: React.PropsWithChildren<any>): JSX.Element => {
 const FooterAction = (props: React.PropsWithChildren<any>): JSX.Element => {
   return (
     <Flex
+      elementDescriptor={descriptors.footerAction}
       {...props}
       gap={1}
     />
@@ -24,6 +27,7 @@ const FooterAction = (props: React.PropsWithChildren<any>): JSX.Element => {
 const FooterActionText = (props: React.PropsWithChildren<any>): JSX.Element => {
   return (
     <Text
+      elementDescriptor={descriptors.footerActionText}
       {...props}
       as='span'
       variant='link'
@@ -31,18 +35,21 @@ const FooterActionText = (props: React.PropsWithChildren<any>): JSX.Element => {
   );
 };
 
-const FooterActionLink = (props: React.PropsWithChildren<LinkProps>): JSX.Element => {
+const FooterActionLink = (props: PropsOfComponent<typeof Link>): JSX.Element => {
   return (
     <Link
+      elementDescriptor={descriptors.footerActionLink}
       {...props}
       colorScheme='primary'
     />
   );
 };
 
+// TODO: Naming?
 const FooterLinks = (props: React.PropsWithChildren<any>): JSX.Element => {
   return (
     <Flex
+      elementDescriptor={descriptors.footerPages}
       {...props}
       justify='between'
       gap={4}
@@ -50,9 +57,10 @@ const FooterLinks = (props: React.PropsWithChildren<any>): JSX.Element => {
   );
 };
 
-const FooterLink = (props: React.PropsWithChildren<LinkProps>): JSX.Element => {
+const FooterLink = (props: PropsOfComponent<typeof Link>): JSX.Element => {
   return (
     <Link
+      elementDescriptor={descriptors.footerPagesLink}
       {...props}
       colorScheme='neutral'
     />

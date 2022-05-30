@@ -1,6 +1,6 @@
 import { useFlowMetadata } from '../elements/contexts';
 import { ThemableCssProp } from '../styledSystem';
-import { useAppearance } from './AppearanceProvider';
+import { useAppearance } from './AppearanceContext';
 import { generateClassName } from './classGeneration';
 import { ElementDescriptor, ElementId } from './elementDescriptors';
 
