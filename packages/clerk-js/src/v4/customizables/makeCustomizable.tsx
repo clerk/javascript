@@ -1,18 +1,21 @@
 import { useFlowMetadata } from '../elements/contexts';
+import { ThemableCssProp } from '../styledSystem';
 import { useAppearance } from './AppearanceProvider';
 import { generateClassName } from './classGeneration';
 import { ElementDescriptor, ElementId } from './elementDescriptors';
 
-type Customizable<T = {}> = {
+type Customizable<T = {}> = T & {
   elementDescriptor?: ElementDescriptor;
   elementId?: ElementId;
-} & T;
+  css?: never;
+  weakCss?: ThemableCssProp;
+};
 
 type CustomizablePrimitive<T> = React.FunctionComponent<Customizable<T>>;
 
 export const makeCustomizable = <P,>(Component: React.FunctionComponent<P>): CustomizablePrimitive<P> => {
   const customizableComponent = (props: Customizable<P>) => {
-    const { elementDescriptor, elementId, ...restProps } = props;
+    const { elementDescriptor, elementId, weakCss, ...restProps } = props;
     const flowMetadata = useFlowMetadata();
     const { parsedAppearance } = useAppearance();
 
@@ -22,6 +25,8 @@ export const makeCustomizable = <P,>(Component: React.FunctionComponent<P>): Cus
 
     const { className, css } = generateClassName(parsedAppearance, elementDescriptor, elementId, props, flowMetadata);
     const generatedClassname = ((restProps as any).className ? (restProps as any).className + ' ' : '') + className;
+    css.unshift(weakCss);
+
     return (
       <Component
         css={css}
