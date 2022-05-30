@@ -15,7 +15,6 @@ type AppearanceProviderProps = React.PropsWithChildren<{
 }>;
 
 const AppearanceProvider = (props: AppearanceProviderProps) => {
-  console.log('AppearanceProvider', props.appearance);
   const value = React.useMemo(
     () => ({ value: { parsedAppearance: props.appearance as ParsedAppearance } }),
     [props.appearance],
