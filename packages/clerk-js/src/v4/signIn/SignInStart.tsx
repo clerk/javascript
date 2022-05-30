@@ -13,7 +13,6 @@ import { useSupportEmail } from '../../ui/hooks/useSupportEmail';
 import { getClerkQueryParam } from '../../utils/getClerkQueryParam';
 import { Button, descriptors, Flex } from '../customizables';
 import { FlowCard, Footer, Header, SocialButtons } from '../elements';
-import { InternalThemeProvider } from '../styledSystem';
 
 export function _SignInStart(): JSX.Element {
   const { userSettings } = useEnvironment();
@@ -166,59 +165,58 @@ export function _SignInStart(): JSX.Element {
   const hasSocialOrWeb3Buttons = !!socialProviderStrategies.length || !!web3FirstFactors.length;
 
   return (
-    <InternalThemeProvider>
-      <FlowCard.Root
-        flow='signIn'
-        page='start'
+    <FlowCard.Root
+      flow='signIn'
+      page='start'
+    >
+      <Header.Root>
+        <Header.Title>Sign in</Header.Title>
+        <Header.Subtitle>to continue to [Appname]</Header.Subtitle>
+      </Header.Root>
+      <Flex
+        direction={'col'}
+        elementDescriptor={descriptors.authOptions}
       >
-        <Header.Root>
-          <Header.Title>Sign in</Header.Title>
-          <Header.Subtitle>to continue to [Appname]</Header.Subtitle>
-        </Header.Root>
-        <Flex
-          direction={'col'}
-          elementDescriptor={descriptors.authOptions}
-        >
-          <SocialButtons.Root />
-          <hr style={{ width: '100%' }} />
-          <Flex>
-            <Button block>this is test</Button>
-          </Flex>
+        <SocialButtons.Root />
+        <Flex>
+          <Button block>this is test</Button>
         </Flex>
-
-        <Footer.Root>
-          <Footer.Action>
-            <Footer.ActionText>No account?</Footer.ActionText>
-            <Footer.ActionLink
-              isExternal
-              href='https://www.google.com'
-            >
-              Sign up
-            </Footer.ActionLink>
-          </Footer.Action>
-          <Footer.Links>
-            <Footer.Link
-              isExternal
-              href='https://www.google.com'
-            >
-              Help
-            </Footer.Link>
-            <Footer.Link
-              isExternal
-              href='https://www.google.com'
-            >
-              Privacy
-            </Footer.Link>
-            <Footer.Link
-              isExternal
-              href='https://www.google.com'
-            >
-              Terms
-            </Footer.Link>
-          </Footer.Links>
-        </Footer.Root>
-      </FlowCard.Root>
-    </InternalThemeProvider>
+      </Flex>
+      <Footer.Root>
+        <Footer.Action>
+          <Footer.ActionText>No account?</Footer.ActionText>
+          <Footer.ActionLink
+            isExternal
+            href='https://www.google.com'
+          >
+            Sign up
+          </Footer.ActionLink>
+        </Footer.Action>
+        <Footer.Links>
+          <Footer.Link
+            elementId={descriptors.footerPagesLink.setId('help')}
+            isExternal
+            href='https://www.google.com'
+          >
+            Help
+          </Footer.Link>
+          <Footer.Link
+            elementId={descriptors.footerPagesLink.setId('privacy')}
+            isExternal
+            href='https://www.google.com'
+          >
+            Privacy
+          </Footer.Link>
+          <Footer.Link
+            elementId={descriptors.footerPagesLink.setId('terms')}
+            isExternal
+            href='https://www.google.com'
+          >
+            Terms
+          </Footer.Link>
+        </Footer.Links>
+      </Footer.Root>
+    </FlowCard.Root>
   );
 }
 

@@ -13,7 +13,6 @@ import type { AvailableComponentCtx, AvailableComponentProps } from '../ui/types
 import { AppearanceProvider } from './customizables';
 import { SignIn, SignInModal } from './signIn';
 import { SignUp } from './signUp';
-import { InternalThemeProvider } from './styledSystem';
 
 const Modal = (props: any) => {
   return <div {...props}>modal {props.children}</div>;
@@ -210,17 +209,15 @@ export default class Components extends React.Component<ComponentsProps, Compone
 
     return (
       <AppearanceProvider appearance={this.state.appearance}>
-        <InternalThemeProvider>
-          <CoreClerkContextWrapper clerk={this.props.clerk}>
-            <EnvironmentProvider value={this.props.environment}>
-              <OptionsProvider value={this.props.options}>
-                {mountedNodes}
-                {signInModal && mountedSignInModal}
-                {signUpModal && mountedSignUpModal}
-              </OptionsProvider>
-            </EnvironmentProvider>
-          </CoreClerkContextWrapper>
-        </InternalThemeProvider>
+        <CoreClerkContextWrapper clerk={this.props.clerk}>
+          <EnvironmentProvider value={this.props.environment}>
+            <OptionsProvider value={this.props.options}>
+              {mountedNodes}
+              {signInModal && mountedSignInModal}
+              {signUpModal && mountedSignUpModal}
+            </OptionsProvider>
+          </EnvironmentProvider>
+        </CoreClerkContextWrapper>
       </AppearanceProvider>
     );
   }
