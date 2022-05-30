@@ -12,47 +12,6 @@ const STATE_PROP_TO_CLASSNAME = Object.freeze({
 
 type PropsWithState = Partial<Record<'isLoading' | 'isDisabled' | 'hasError', any>> & Record<string, any>;
 
-// const appearance: ParsedAppearance = {
-// variables: {},
-// elements: {
-//   card: {
-//     backgroundColor: 'white',
-//     backdropFilter: 'blur(15px)',
-//   },
-//   authOptions: {
-//     margin: '2rem 0',
-//   },
-// },
-// signIn: {
-//   elements: {
-//     card: {
-//       backgroundColor: 'rgba(255,255,255,1.9)',
-//     },
-//   },
-// },
-// signUp: {
-//   elements: {
-//     card: {
-//       backgroundColor: 'rgba(0,0,0,0.78)',
-//     },
-//     headerTitle: {
-//       color: 'white',
-//     },
-//     socialButtonsButtonIcon: {
-//       '&:hover': {
-//         backgroundColor: 'lightgray',
-//       },
-//     },
-//     socialButtonsButtonIcon__github: {
-//       filter: 'invert(1)',
-//     },
-//     socialButtonsButtonIcon__apple: {
-//       filter: 'invert(1)',
-//     },
-//   },
-// },
-// };
-
 export const generateClassName = (
   parsedAppearance: ParsedAppearance,
   elemDescriptor: ElementDescriptor,
@@ -62,14 +21,15 @@ export const generateClassName = (
 ) => {
   const state = getElementState(props);
   let className = '';
-  // stable classes, always add
+  const css: unknown[] = [];
+
   className = addClerkTargettableClassname(className, elemDescriptor);
   className = addClerkTargettableIdClassname(className, elemDescriptor, elemId);
   className = addClerkTargettableStateClass(className, state);
-  // user provided classes
+
   className = addUserProvidedClassnames(className, parsedAppearance, elemDescriptor, elemId, state, flowMetadata);
   className = addEmojiSeparator(className);
-  const css = addUserProvidedStyleRules(parsedAppearance, elemDescriptor, elemId, state, flowMetadata);
+  addUserProvidedStyleRules(css, parsedAppearance, elemDescriptor, elemId, state, flowMetadata);
   return { className, css };
 };
 
@@ -94,16 +54,15 @@ const addEmojiSeparator = (cn: string) => {
 };
 
 const addUserProvidedStyleRules = (
+  css: unknown[],
   appearance: ParsedAppearance,
   elemDescriptor: ElementDescriptor,
   elemId: ElementId | undefined,
   state: ElementState | undefined,
   flowMetadata: FlowMetadata,
 ) => {
-  const css: unknown[] = [];
   addRulesFromElements(css, appearance, elemDescriptor, elemId, state);
   addRulesFromElements(css, appearance[flowMetadata.flow], elemDescriptor, elemId, state);
-  return css;
 };
 
 const addUserProvidedClassnames = (
