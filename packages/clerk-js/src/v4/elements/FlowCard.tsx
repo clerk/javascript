@@ -1,33 +1,43 @@
 import React from 'react';
 
-import { Card, descriptors, Flex } from '../customizables';
+import { Card, descriptors, Flex, useAppearance } from '../customizables';
 import { generateFlowMetadataClassname } from '../customizables/classGeneration';
+import { defaultTheme } from '../foundations';
+import { InternalThemeProvider } from '../styledSystem';
 import { CardStateProvider, FlowMetadata, FlowMetadataProvider } from './contexts';
 
 type FlowCardRootProps = React.PropsWithChildren<FlowMetadata>;
 
 const FlowCardRoot = (props: FlowCardRootProps): JSX.Element => {
-  const { children, flow, page, ...rest } = props;
+  // TODO: useAppearance should transform an appearance -> parseAppearance
+  const { parsedAppearance } = useAppearance();
 
   return (
-    <FlowMetadataProvider
-      flow={flow}
-      page={page}
+    <InternalThemeProvider theme={{ ...defaultTheme, ...parsedAppearance[props.flow]?.variables }}>
+      <FlowMetadataProvider
+        flow={props.flow}
+        page={props.page}
+      >
+        <CardStateProvider>
+          <CardContent {...props} />
+        </CardStateProvider>
+      </FlowMetadataProvider>
+    </InternalThemeProvider>
+  );
+};
+
+const CardContent = (props: FlowCardRootProps) => {
+  const { flow, page, ...rest } = props;
+  return (
+    <Flex
+      elementDescriptor={descriptors.root}
+      className={generateFlowMetadataClassname(props)}
     >
-      <CardStateProvider>
-        <Flex
-          elementDescriptor={descriptors.root}
-          className={generateFlowMetadataClassname(props)}
-        >
-          <Card
-            elementDescriptor={descriptors.card}
-            {...rest}
-          >
-            {children}
-          </Card>
-        </Flex>
-      </CardStateProvider>
-    </FlowMetadataProvider>
+      <Card
+        elementDescriptor={descriptors.card}
+        {...rest}
+      />
+    </Flex>
   );
 };
 
