@@ -1,3 +1,4 @@
+import { createInfiniteAccessProxy } from '../utils';
 import { fastDeepMerge } from './fastDeepMerge';
 import { StyleRule, Theme } from './types';
 
@@ -136,9 +137,4 @@ const conditionMatches = ({ condition }: CompoundVariant<any>, variants: Variant
     }
   }
   return true;
-};
-
-const createInfiniteAccessProxy = () => {
-  const proxy: any = new Proxy({}, { get: (_, prop) => (prop === Symbol.toPrimitive ? () => '' : proxy) });
-  return proxy;
 };
