@@ -14,8 +14,8 @@ type AppearanceProviderProps = React.PropsWithChildren<{
 }>;
 
 const AppearanceProvider = (props: AppearanceProviderProps) => {
-  const value = React.useMemo(
-    () => ({ value: { parsedAppearance: props.appearance as ParsedAppearance } }),
+  const value = useDeepEqualMemo(
+    () => ({ value: { parsedAppearance: transformPublicToInternalAppearance(props.appearance) } }),
     [props.appearance],
   );
   return <AppearanceContext.Provider value={value}>{props.children}</AppearanceContext.Provider>;
