@@ -497,7 +497,8 @@ export default class Clerk implements ClerkInterface {
     );
 
     const navigateToContinueSignUp = makeNavigate(
-      buildURL({ base: displayConfig.signUpUrl, hashPath: '/continue' }, { stringify: true }),
+      params.continueSignUpUrl ||
+        buildURL({ base: displayConfig.signUpUrl, hashPath: '/continue' }, { stringify: true }),
     );
 
     const userExistsButNeedsToSignIn =

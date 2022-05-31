@@ -275,6 +275,11 @@ export type HandleOAuthCallbackParams = {
    * if 2FA is enabled.
    */
   secondFactorUrl?: string;
+
+  /**
+   * Full URL or path to navigate after an incomplete sign up.
+   */
+  continueSignUpUrl?: string | null;
 };
 
 // TODO: Make sure Isomorphic Clerk navigate can work with the correct type:
