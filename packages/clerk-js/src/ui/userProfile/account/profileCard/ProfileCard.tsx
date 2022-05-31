@@ -72,12 +72,8 @@ export function ProfileCard(): JSX.Element {
                   src={svgUrl(externalAccount.provider)}
                   className='cl-left-icon-wrapper'
                 />
-                {externalAccount.emailAddress}
 
-                <VerificationStatusTag
-                  className='cl-tag'
-                  status={externalAccount.verification?.status || 'verified'}
-                />
+                {externalAccount.username || externalAccount.emailAddress}
               </div>
             ))}
           </div>

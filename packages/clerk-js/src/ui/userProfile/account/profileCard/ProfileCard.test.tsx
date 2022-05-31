@@ -1,8 +1,8 @@
 import { renderJSON } from '@clerk/shared/testUtils';
-import { EmailAddressResource, UserResource } from '@clerk/types';
+import { EmailAddressResource, ExternalAccountResource, UserResource } from '@clerk/types';
 import * as React from 'react';
 import { PartialDeep } from 'type-fest';
-import { useEnvironment } from 'ui/contexts';
+import { useCoreUser, useEnvironment } from 'ui/contexts';
 
 import { ProfileCard } from './ProfileCard';
 
@@ -15,33 +15,96 @@ jest.mock('ui/hooks', () => {
 jest.mock('ui/contexts', () => {
   return {
     useEnvironment: jest.fn(),
-    useCoreUser: (): PartialDeep<UserResource> => {
-      return {
-        isPrimaryIdentification: jest.fn(() => true),
-        emailAddresses: [
-          {
-            id: 1,
-            emailAddress: 'clerk@clerk.dev',
-            verification: { status: 'verified' },
-          } as any as EmailAddressResource,
-          {
-            id: 2,
-            emailAddress: 'clerk-unverified@clerk.dev',
-            verification: { status: 'unverified' },
-          } as any as EmailAddressResource,
-        ],
-        phoneNumbers: [],
-        externalAccounts: [],
-        verifiedExternalAccounts: [],
-        unverifiedExternalAccounts: [],
-        web3Wallets: [{ web3Wallet: '0x123456789' }],
-      };
-    },
+    useCoreUser: jest.fn(),
     useCoreClerk: jest.fn(),
   };
 });
 
-(useEnvironment as jest.Mock).mockImplementation(() => ({
+const userWithoutExtAccounts = (): PartialDeep<UserResource> => {
+  return {
+    isPrimaryIdentification: jest.fn(() => true),
+    emailAddresses: [
+      {
+        id: 1,
+        emailAddress: 'clerk@clerk.dev',
+        verification: { status: 'verified' },
+      } as any as EmailAddressResource,
+      {
+        id: 2,
+        emailAddress: 'clerk-unverified@clerk.dev',
+        verification: { status: 'unverified' },
+      } as any as EmailAddressResource,
+    ],
+    phoneNumbers: [],
+    externalAccounts: [],
+    verifiedExternalAccounts: [],
+    unverifiedExternalAccounts: [],
+    web3Wallets: [{ web3Wallet: '0x123456789' }],
+  };
+};
+
+const userWithExtAccounts = (): PartialDeep<UserResource> => {
+  return {
+    isPrimaryIdentification: jest.fn(() => true),
+    emailAddresses: [
+      {
+        id: 1,
+        emailAddress: 'clerk@clerk.dev',
+        verification: { status: 'verified' },
+      } as any as EmailAddressResource,
+      {
+        id: 2,
+        emailAddress: 'clerk-unverified@clerk.dev',
+        verification: { status: 'unverified' },
+      } as any as EmailAddressResource,
+    ],
+    phoneNumbers: [],
+    externalAccounts: [
+      {
+        id: 'eac_google',
+        provider: 'google',
+        emailAddress: 'sanjay@gmail.com',
+        providerTitle: () => 'Google',
+      } as ExternalAccountResource,
+      {
+        id: 'eac_twitch',
+        provider: 'twitch',
+        emailAddress: 'sanjay@gmail.com',
+        username: 'dhalsim',
+        providerTitle: () => 'Twitch',
+      } as ExternalAccountResource,
+      {
+        id: 'eac_facebook',
+        provider: 'facebook',
+      } as ExternalAccountResource,
+    ],
+    verifiedExternalAccounts: [
+      {
+        id: 'eac_google',
+        provider: 'google',
+        emailAddress: 'sanjay@gmail.com',
+        providerTitle: () => 'Google',
+      } as ExternalAccountResource,
+      {
+        id: 'eac_twitch',
+        provider: 'twitch',
+        emailAddress: 'sanjay@gmail.com',
+        username: 'dhalsim',
+        providerTitle: () => 'Twitch',
+      } as ExternalAccountResource,
+    ],
+    unverifiedExternalAccounts: [
+      {
+        id: 'eac_facebook',
+        provider: 'facebook',
+        providerTitle: () => 'Facebook',
+      } as ExternalAccountResource,
+    ],
+    web3Wallets: [{ web3Wallet: '0x123456789' }],
+  };
+};
+
+const envWithoutWeb3wallet = () => ({
   displayConfig: {},
   userSettings: {
     attributes: {
@@ -59,7 +122,27 @@ jest.mock('ui/contexts', () => {
       },
     },
   },
-}));
+});
+
+const envWithWeb3Wallet = () => ({
+  displayConfig: {},
+  userSettings: {
+    attributes: {
+      email_address: {
+        enabled: true,
+      },
+      phone_number: {
+        enabled: true,
+      },
+      username: {
+        enabled: false,
+      },
+      web3_wallet: {
+        enabled: true,
+      },
+    },
+  },
+});
 
 describe('<ProfileCard/>', () => {
   afterEach(() => {
@@ -67,30 +150,24 @@ describe('<ProfileCard/>', () => {
   });
 
   it('renders the ProfileCard', () => {
+    (useEnvironment as jest.Mock).mockImplementation(envWithoutWeb3wallet);
+    (useCoreUser as jest.Mock).mockImplementation(userWithoutExtAccounts);
+
     const tree = renderJSON(<ProfileCard />);
     expect(tree).toMatchSnapshot();
   });
 
-  it('renders the ProfileCard with enabled settings', () => {
-    (useEnvironment as jest.Mock).mockImplementation(() => ({
-      displayConfig: {},
-      userSettings: {
-        attributes: {
-          email_address: {
-            enabled: true,
-          },
-          phone_number: {
-            enabled: true,
-          },
-          username: {
-            enabled: false,
-          },
-          web3_wallet: {
-            enabled: true,
-          },
-        },
-      },
-    }));
+  it('renders the ProfileCard with web3 wallet', () => {
+    (useEnvironment as jest.Mock).mockImplementation(envWithWeb3Wallet);
+    (useCoreUser as jest.Mock).mockImplementation(userWithoutExtAccounts);
+
+    const tree = renderJSON(<ProfileCard />);
+    expect(tree).toMatchSnapshot();
+  });
+
+  it('renders the profile card with verified external accounts', () => {
+    (useEnvironment as jest.Mock).mockImplementation(envWithoutWeb3wallet);
+    (useCoreUser as jest.Mock).mockImplementation(userWithExtAccounts);
 
     const tree = renderJSON(<ProfileCard />);
     expect(tree).toMatchSnapshot();

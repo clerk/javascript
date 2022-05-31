@@ -124,11 +124,6 @@ Array [
                     src="https://images.clerk.dev/static/facebook.svg"
                   />
                   peter@gmail.com
-                  <span
-                    className="tag success sm cl-tag"
-                  >
-                    Verified
-                  </span>
                 </div>
               </div>
             </div>
