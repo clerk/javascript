@@ -85,14 +85,14 @@ export function SignUpForm({
           </Control>
         )}
 
-        {fields.emailAddress && (
+        {fields.emailAddress?.show && (
           <Control
             key='emailAddress'
             htmlFor='emailAddress'
             label='Email address'
             error={formState.emailAddress.error}
-            hint={toggleEmailPhone ? 'Use phone instead' : undefined}
-            hintOnClickHandler={handleChangeActive('phoneNumber')}
+            hint={toggleEmailPhone ? 'Use phone instead' : fields.emailAddress.required ? undefined : 'Optional'}
+            hintOnClickHandler={toggleEmailPhone ? handleChangeActive('phoneNumber') : undefined}
           >
             <Input
               id='emailAddress'
@@ -105,14 +105,14 @@ export function SignUpForm({
           </Control>
         )}
 
-        {fields.phoneNumber && (
+        {fields.phoneNumber?.show && (
           <Control
             key='phoneNumber'
             htmlFor='phoneNumber'
             label='Phone number'
             error={formState.phoneNumber.error}
-            hint={toggleEmailPhone ? 'Use email instead' : undefined}
-            hintOnClickHandler={handleChangeActive('emailAddress')}
+            hint={toggleEmailPhone ? 'Use email instead' : fields.phoneNumber.required ? undefined : 'Optional'}
+            hintOnClickHandler={toggleEmailPhone ? handleChangeActive('emailAddress') : undefined}
           >
             <PhoneInput
               id='phoneNumber'

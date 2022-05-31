@@ -5,6 +5,7 @@ describe('determineActiveFields()', () => {
   // and the current Instance User settings options
   describe('returns first party field based on auth config', () => {
     type Scenario = [string, any, any];
+    const isProgressiveSignUp = false;
 
     const scenaria: Scenario[] = [
       [
@@ -41,6 +42,11 @@ describe('determineActiveFields()', () => {
           emailAddress: {
             required: true,
             disabled: false,
+            show: true,
+          },
+          phoneNumber: {
+            required: true,
+            show: false,
           },
           firstName: {
             required: true,
@@ -87,8 +93,14 @@ describe('determineActiveFields()', () => {
           },
         },
         {
+          emailAddress: {
+            required: true,
+            disabled: false,
+            show: false,
+          },
           phoneNumber: {
             required: true,
+            show: true,
           },
           firstName: {
             required: true,
@@ -138,6 +150,11 @@ describe('determineActiveFields()', () => {
           emailAddress: {
             required: true, // email will be toggled on initially
             disabled: false,
+            show: true,
+          },
+          phoneNumber: {
+            required: true,
+            show: false,
           },
           firstName: {
             required: true,
@@ -184,6 +201,15 @@ describe('determineActiveFields()', () => {
           },
         },
         {
+          emailAddress: {
+            required: true,
+            disabled: false,
+            show: false,
+          },
+          phoneNumber: {
+            required: true,
+            show: false,
+          },
           firstName: {
             required: false,
           },
@@ -228,7 +254,17 @@ describe('determineActiveFields()', () => {
             required: false,
           },
         },
-        {},
+        {
+          emailAddress: {
+            required: true,
+            disabled: false,
+            show: false,
+          },
+          phoneNumber: {
+            required: true,
+            show: false,
+          },
+        },
       ],
     ];
 
@@ -236,7 +272,8 @@ describe('determineActiveFields()', () => {
       expect(
         determineActiveFields({
           attributes: attributes,
-          activeCommIdentifierType: getInitialActiveIdentifier(attributes),
+          activeCommIdentifierType: getInitialActiveIdentifier(attributes, isProgressiveSignUp),
+          isProgressiveSignUp,
         }),
       ).toEqual(result);
     });
@@ -255,7 +292,8 @@ describe('determineActiveFields()', () => {
       const res = determineActiveFields({
         attributes: attributes,
         hasTicket: true,
-        activeCommIdentifierType: getInitialActiveIdentifier(attributes),
+        activeCommIdentifierType: getInitialActiveIdentifier(attributes, isProgressiveSignUp),
+        isProgressiveSignUp,
       });
 
       expect(res).toMatchObject(expected);
@@ -276,10 +314,210 @@ describe('determineActiveFields()', () => {
         attributes: attributes,
         hasTicket: true,
         hasEmail: true,
-        activeCommIdentifierType: getInitialActiveIdentifier(attributes),
+        activeCommIdentifierType: getInitialActiveIdentifier(attributes, isProgressiveSignUp),
+        isProgressiveSignUp,
       });
 
       expect(res).toMatchObject(expected);
+    });
+  });
+
+  describe('calculates active fields based on user settings for Progressive Sign up', () => {
+    type Scenario = [string, any, any];
+    const isProgressiveSignUp = true;
+
+    const mockDefaultAttributesProgressive = {
+      first_name: {
+        enabled: false,
+        required: false,
+      },
+      last_name: {
+        enabled: false,
+        required: false,
+      },
+      password: {
+        enabled: false,
+        required: false,
+      },
+      username: {
+        enabled: false,
+        required: false,
+      },
+    };
+
+    const scenarios: Scenario[] = [
+      [
+        'email required',
+        {
+          ...mockDefaultAttributesProgressive,
+          email_address: {
+            enabled: true,
+            required: true,
+            used_for_first_factor: false,
+          },
+          phone_number: {
+            enabled: false,
+            required: false,
+            used_for_first_factor: true,
+          },
+        },
+        {
+          emailAddress: {
+            required: true,
+            disabled: false,
+            show: true,
+          },
+          phoneNumber: {
+            required: false,
+            show: false,
+          },
+        },
+      ],
+      [
+        'phone required',
+        {
+          ...mockDefaultAttributesProgressive,
+          email_address: {
+            enabled: false,
+            required: false,
+            used_for_first_factor: true,
+          },
+          phone_number: {
+            enabled: true,
+            required: true,
+            used_for_first_factor: false,
+          },
+        },
+        {
+          emailAddress: {
+            required: false,
+            disabled: false,
+            show: false,
+          },
+          phoneNumber: {
+            required: true,
+            show: true,
+          },
+        },
+      ],
+      [
+        'email & phone required',
+        {
+          ...mockDefaultAttributesProgressive,
+          phone_number: {
+            enabled: true,
+            required: true,
+            used_for_first_factor: false,
+          },
+          email_address: {
+            enabled: true,
+            required: true,
+            used_for_first_factor: false,
+          },
+        },
+        {
+          emailAddress: {
+            required: true,
+            disabled: false,
+            show: true,
+          },
+          phoneNumber: {
+            required: true,
+            show: true,
+          },
+        },
+      ],
+      [
+        'email OR phone',
+        {
+          ...mockDefaultAttributesProgressive,
+          phone_number: {
+            enabled: true,
+            required: false,
+            used_for_first_factor: true,
+          },
+          email_address: {
+            enabled: true,
+            required: false,
+            used_for_first_factor: true,
+          },
+        },
+        {
+          emailAddress: {
+            required: false, // email will be toggled on initially
+            disabled: false,
+            show: true,
+          },
+          phoneNumber: {
+            required: false,
+            show: false,
+          },
+        },
+      ],
+      [
+        'email required, phone optional',
+        {
+          ...mockDefaultAttributesProgressive,
+          phone_number: {
+            enabled: true,
+            required: false,
+            used_for_first_factor: true,
+          },
+          email_address: {
+            enabled: true,
+            required: true,
+            used_for_first_factor: true,
+          },
+        },
+        {
+          emailAddress: {
+            required: true,
+            disabled: false,
+            show: true,
+          },
+          phoneNumber: {
+            required: false,
+            show: true,
+          },
+        },
+      ],
+      [
+        'phone required, email optional',
+        {
+          ...mockDefaultAttributesProgressive,
+          phone_number: {
+            enabled: true,
+            required: true,
+            used_for_first_factor: true,
+          },
+          email_address: {
+            enabled: true,
+            required: false,
+            used_for_first_factor: true,
+          },
+        },
+        {
+          emailAddress: {
+            required: false,
+            disabled: false,
+            show: true,
+          },
+          phoneNumber: {
+            required: true,
+            show: true,
+          },
+        },
+      ],
+    ];
+
+    it.each(scenarios)('%s', (___, attributes, result) => {
+      expect(
+        determineActiveFields({
+          attributes: attributes,
+          activeCommIdentifierType: getInitialActiveIdentifier(attributes, isProgressiveSignUp),
+          isProgressiveSignUp,
+        }),
+      ).toEqual(result);
     });
   });
 });

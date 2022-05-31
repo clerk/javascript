@@ -126,6 +126,9 @@ describe('<SignUpStart/>', () => {
           strategy: 'oauth_facebook',
         },
       },
+      sign_up: {
+        progressive: false,
+      },
     } as UserSettingsJSON);
   });
 
@@ -254,6 +257,9 @@ describe('<SignUpStart/>', () => {
           strategy: 'oauth_facebook',
         },
       },
+      sign_up: {
+        progressive: false,
+      },
     } as UserSettingsJSON);
 
     render(<SignUpStart />);
@@ -347,6 +353,9 @@ describe('<SignUpStart/>', () => {
                 required: false,
               },
             },
+            sign_up: {
+              progressive: false,
+            },
           } as UserSettingsJSON);
         });
 
@@ -398,6 +407,9 @@ describe('<SignUpStart/>', () => {
                 enabled: true,
                 required: true,
               },
+            },
+            sign_up: {
+              progressive: false,
             },
           } as UserSettingsJSON);
 
@@ -472,6 +484,9 @@ describe('<SignUpStart/>', () => {
                 required: false,
               },
             },
+            sign_up: {
+              progressive: false,
+            },
           } as UserSettingsJSON);
 
           mockCreateRequest.mockImplementation(() =>
@@ -524,6 +539,9 @@ describe('<SignUpStart/>', () => {
                 enabled: true,
                 required: false,
               },
+            },
+            sign_up: {
+              progressive: false,
             },
           } as UserSettingsJSON);
 
@@ -580,10 +598,160 @@ describe('<SignUpStart/>', () => {
           strategy: 'oauth_google',
         },
       },
+      sign_up: {
+        progressive: false,
+      },
     } as UserSettingsJSON);
 
     render(<SignUpStart />);
     expect(screen.queryByRole('button', { name: 'Sign up' })).not.toBeInTheDocument();
     expect(screen.queryByText('Password')).not.toBeInTheDocument();
+  });
+});
+
+describe('<SignUpStart/> Progressive Sign Up', () => {
+  const mockUserSettingsProgressive = {
+    attributes: {
+      password: {
+        enabled: true,
+        required: false,
+      },
+      username: {
+        enabled: false,
+        required: false,
+      },
+      first_name: {
+        enabled: false,
+        required: false,
+      },
+      last_name: {
+        enabled: false,
+        required: false,
+      },
+    },
+    sign_up: {
+      progressive: true,
+    },
+  } as UserSettingsJSON;
+
+  it('renders email input if required', () => {
+    mockUserSettings = new UserSettings({
+      ...mockUserSettingsProgressive,
+      attributes: {
+        ...mockUserSettingsProgressive.attributes,
+        email_address: {
+          enabled: true,
+          required: true,
+          used_for_first_factor: false,
+        },
+        phone_number: {
+          enabled: false,
+          required: false,
+          used_for_first_factor: true,
+        },
+      },
+    } as UserSettingsJSON);
+
+    render(<SignUpStart />);
+
+    expect(screen.getByText('Email address')).toBeInTheDocument();
+    expect(screen.queryByText('Phone number')).not.toBeInTheDocument();
+  });
+
+  it('renders phone input if required', () => {
+    mockUserSettings = new UserSettings({
+      ...mockUserSettingsProgressive,
+      attributes: {
+        ...mockUserSettingsProgressive.attributes,
+        email_address: {
+          enabled: false,
+          required: false,
+          used_for_first_factor: true,
+        },
+        phone_number: {
+          enabled: true,
+          required: true,
+          used_for_first_factor: false,
+        },
+      },
+    } as UserSettingsJSON);
+
+    render(<SignUpStart />);
+
+    expect(screen.queryByText('Email address')).not.toBeInTheDocument();
+    expect(screen.getByText('Phone number')).toBeInTheDocument();
+  });
+
+  it('renders both email & phone inputs if required', () => {
+    mockUserSettings = new UserSettings({
+      ...mockUserSettingsProgressive,
+      attributes: {
+        ...mockUserSettingsProgressive.attributes,
+        email_address: {
+          enabled: true,
+          required: true,
+          used_for_first_factor: false,
+        },
+        phone_number: {
+          enabled: true,
+          required: true,
+          used_for_first_factor: false,
+        },
+      },
+    } as UserSettingsJSON);
+
+    render(<SignUpStart />);
+
+    expect(screen.getByText('Email address')).toBeInTheDocument();
+    expect(screen.getByText('Phone number')).toBeInTheDocument();
+  });
+
+  it('renders optional email/phone input if email OR phone', () => {
+    mockUserSettings = new UserSettings({
+      ...mockUserSettingsProgressive,
+      attributes: {
+        ...mockUserSettingsProgressive.attributes,
+        email_address: {
+          enabled: true,
+          required: false,
+          used_for_first_factor: true,
+        },
+        phone_number: {
+          enabled: true,
+          required: false,
+          used_for_first_factor: true,
+        },
+      },
+    } as UserSettingsJSON);
+
+    render(<SignUpStart />);
+
+    expect(screen.getByText('Email address')).toBeInTheDocument();
+    userEvent.click(screen.getByText('Use phone instead'));
+    expect(screen.getByText('Phone number')).toBeInTheDocument();
+  });
+  it('renders required phone & optional email inputs', () => {
+    mockUserSettings = new UserSettings({
+      ...mockUserSettingsProgressive,
+      attributes: {
+        ...mockUserSettingsProgressive.attributes,
+        email_address: {
+          enabled: true,
+          required: false,
+          used_for_first_factor: true,
+        },
+        phone_number: {
+          enabled: true,
+          required: true,
+          used_for_first_factor: true,
+        },
+      },
+    } as UserSettingsJSON);
+
+    render(<SignUpStart />);
+
+    expect(screen.getByText('Email address')).toBeInTheDocument();
+    expect(screen.getByText('Optional')).toBeInTheDocument();
+    expect(screen.getByText('Phone number')).toBeInTheDocument();
   });
 });
