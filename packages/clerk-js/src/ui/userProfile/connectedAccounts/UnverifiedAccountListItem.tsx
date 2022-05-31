@@ -53,6 +53,7 @@ export function UnverifiedAccountListItem({
           src={svgUrl(externalAccount.provider)}
           className='cl-left-icon-wrapper'
         />
+
         {externalAccount.username || externalAccount.emailAddress}
 
         {externalAccount.label && ` (${externalAccount.label})`}
