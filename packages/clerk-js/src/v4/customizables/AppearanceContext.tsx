@@ -1,14 +1,13 @@
 import { Appearance } from '@clerk/types/src';
 import React from 'react';
 
-import { makeContextAndHook } from '../elements/utils';
 import { ParsedAppearance } from '../types';
 
 type AppearanceContextValue = {
   parsedAppearance: ParsedAppearance;
 };
 
-const [AppearanceContext, useAppearance] = makeContextAndHook<AppearanceContextValue>('AppearanceContext');
+const [AppearanceContext, useAppearance] = createContextAndHook<AppearanceContextValue>('AppearanceContext');
 
 type AppearanceProviderProps = React.PropsWithChildren<{
   appearance: Appearance | undefined;

@@ -6,7 +6,7 @@ function assertProviderExists(contextVal: unknown, msg: string): asserts context
   }
 }
 
-export function makeContextAndHook<CtxValue>(
+export function createContextAndHook<CtxValue>(
   displayName: string,
   assertCtxFn: (v: unknown, msg: string) => asserts v = assertProviderExists,
 ): [React.Context<{ value: CtxValue } | undefined>, () => CtxValue] {
