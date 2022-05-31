@@ -1,16 +1,10 @@
 import { ElementObjectKey, ElementsConfig, IdSelectors, StateSelectors } from '@clerk/types';
 
+import { containsAllOfType } from '../utils';
+
 export const CLASS_PREFIX = 'cl-';
 export const ID_CLASS_PREFIX = 'cl-id-';
 export const OBJ_KEY_DELIMITER = '__';
-
-/**
- * Enforces that an array contains ALL keys of T
- */
-const containsAllOfType =
-  <T>() =>
-  <U extends Readonly<T[]>>(array: U & ([T] extends [U[number]] ? unknown : 'Invalid')) =>
-    array;
 
 const containsAllElementsConfigKeys = containsAllOfType<keyof ElementsConfig>();
 
