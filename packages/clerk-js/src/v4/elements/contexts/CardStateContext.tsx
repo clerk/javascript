@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { makeContextAndHook } from '../utils';
+import { createContextAndHook } from '../../utils';
 
 type Action = { type: 'block' | 'unblock' };
 
@@ -12,7 +12,7 @@ type CardStateCtxValue = CardState & {
   dispatch: React.Dispatch<Action>;
 };
 
-const [CardStateCtx, useCardState] = makeContextAndHook<CardStateCtxValue>('CardState');
+const [CardStateCtx, useCardState] = createContextAndHook<CardStateCtxValue>('CardState');
 
 const reducer = (state: CardState = { blocked: false }, action: Action): CardState => {
   switch (action.type) {
