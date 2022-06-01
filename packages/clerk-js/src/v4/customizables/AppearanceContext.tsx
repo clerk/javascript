@@ -1,24 +1,23 @@
-import { Appearance } from '@clerk/types/src';
+import { Appearance } from '@clerk/types';
 import React from 'react';
 
-import { ParsedAppearance } from '../types';
+import { createContextAndHook, useDeepEqualMemo } from '../utils';
+import { parseAppearance, ParsedAppearance } from './appearanceAdapter';
 
-type AppearanceContextValue = {
-  parsedAppearance: ParsedAppearance;
-};
+type AppearanceContextValue = ParsedAppearance;
 
 const [AppearanceContext, useAppearance] = createContextAndHook<AppearanceContextValue>('AppearanceContext');
 
 type AppearanceProviderProps = React.PropsWithChildren<{
-  appearance: Appearance | undefined;
+  appearance: Appearance;
 }>;
 
 const AppearanceProvider = (props: AppearanceProviderProps) => {
-  const value = useDeepEqualMemo(
-    () => ({ value: { parsedAppearance: transformPublicToInternalAppearance(props.appearance) } }),
-    [props.appearance],
-  );
-  return <AppearanceContext.Provider value={value}>{props.children}</AppearanceContext.Provider>;
+  const ctxValue = useDeepEqualMemo(() => {
+    return { value: parseAppearance(props.appearance) };
+  }, [props.appearance]);
+
+  return <AppearanceContext.Provider value={ctxValue}>{props.children}</AppearanceContext.Provider>;
 };
 
 export { AppearanceProvider, useAppearance };

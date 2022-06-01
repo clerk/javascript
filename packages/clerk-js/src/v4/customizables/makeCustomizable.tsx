@@ -17,13 +17,13 @@ export const makeCustomizable = <P,>(Component: React.FunctionComponent<P>): Cus
   const customizableComponent = (props: Customizable<P>) => {
     const { elementDescriptor, elementId, weakCss, ...restProps } = props;
     const flowMetadata = useFlowMetadata();
-    const { parsedAppearance } = useAppearance();
+    const { parsedElements } = useAppearance();
 
     if (!elementDescriptor) {
       return <Component {...(restProps as any)} />;
     }
 
-    const { className, css } = generateClassName(parsedAppearance, elementDescriptor, elementId, props, flowMetadata);
+    const { className, css } = generateClassName(parsedElements, elementDescriptor, elementId, props, flowMetadata);
     const generatedClassname = ((restProps as any).className ? (restProps as any).className + ' ' : '') + className;
     css.unshift(weakCss);
 

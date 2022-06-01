@@ -97,7 +97,12 @@ export type Elements = {
   [k in keyof ElementsConfig]: Selectors<ElementObjectKey<k> & string, ElementsConfig[k]>;
 }[keyof ElementsConfig];
 
-export type Variables = { colorPrimary?: ColorOption };
+export type Variables = {
+  colorPrimary?: ColorOption;
+  colorDanger?: ColorOption;
+  colorSuccess?: ColorOption;
+  colorWarning?: ColorOption;
+};
 
 export type Theme = {
   /**
