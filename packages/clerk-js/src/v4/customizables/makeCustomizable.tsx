@@ -14,24 +14,30 @@ type Customizable<T = {}> = T & {
 type CustomizablePrimitive<T> = React.FunctionComponent<Customizable<T>>;
 
 export const makeCustomizable = <P,>(Component: React.FunctionComponent<P>): CustomizablePrimitive<P> => {
-  const customizableComponent = (props: Customizable<P>) => {
-    const { elementDescriptor, elementId, weakCss, ...restProps } = props;
+  const customizableComponent = (props: Customizable<any>) => {
+    const { elementDescriptor, elementId, weakCss, className, ...restProps } = props;
     const flowMetadata = useFlowMetadata();
     const { parsedElements } = useAppearance();
 
     if (!elementDescriptor) {
-      return <Component {...(restProps as any)} />;
+      return (
+        <Component
+          {...restProps}
+          className={className}
+        />
+      );
     }
 
-    const { className, css } = generateClassName(parsedElements, elementDescriptor, elementId, props, flowMetadata);
-    const generatedClassname = ((restProps as any).className ? (restProps as any).className + ' ' : '') + className;
-    css.unshift(weakCss);
+    const generatedStyles = generateClassName(parsedElements, elementDescriptor, elementId, props, flowMetadata);
+    const generatedClassname = generatedStyles.className + (className ? ' ' + (className as string) : '');
+    generatedStyles.css.unshift(weakCss);
 
     return (
       <Component
-        css={css}
-        {...(restProps as any)}
+        css={generatedStyles.css}
+        // always first for better readability in the DOM
         className={generatedClassname}
+        {...restProps}
       />
     );
   };
