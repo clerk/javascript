@@ -2,16 +2,15 @@
 import { Interpolation as _Interpolation } from '@emotion/react';
 import React from 'react';
 
-import { BaseTheme } from '../foundations';
+import { InternalTheme } from '../foundations';
 
-export type Theme = BaseTheme;
-export type StyleRule = _Interpolation<Theme>;
+type StyleRule = Exclude<_Interpolation<InternalTheme>, string | number | boolean>;
 
 /**
  * Primitives can override their styles using the css prop.
  * For customising layout/theme, prefer using the props defined on the component.
  */
-export type ThemableCssProp = ((params: Theme) => StyleRule) | StyleRule;
+type ThemableCssProp = ((params: InternalTheme) => StyleRule) | StyleRule;
 type CssProp = { css?: ThemableCssProp };
 
 export type AsProp = { as?: React.ElementType };
@@ -26,8 +25,8 @@ type ElementProps = {
   label: JSX.IntrinsicElements['label'];
 };
 
-export type PrimitiveProps<HtmlT extends keyof ElementProps> = ElementProps[HtmlT] & CssProp;
-export type PickSiblingProps<C extends React.FunctionComponent, T extends keyof Parameters<C>[0]> = Pick<
-  Parameters<C>[0],
-  T
-  >;
+type PrimitiveProps<HtmlT extends keyof ElementProps> = ElementProps[HtmlT] & CssProp;
+type PickSiblingProps<C extends React.FunctionComponent, T extends keyof Parameters<C>[0]> = Pick<Parameters<C>[0], T>;
+type PropsOfComponent<C extends React.FunctionComponent> = Parameters<C>[0];
+
+export type { InternalTheme, PrimitiveProps, PickSiblingProps, PropsOfComponent, StyleRule, ThemableCssProp };

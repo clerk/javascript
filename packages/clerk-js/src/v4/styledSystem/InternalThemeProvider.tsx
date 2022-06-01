@@ -5,7 +5,7 @@ import { CacheProvider, ThemeProvider } from '@emotion/react';
 import React from 'react';
 
 // TODO: make it customisable
-import { defaultTheme } from '../foundations';
+import { defaultInternalTheme } from '../foundations';
 
 const cache = createCache({
   key: 'cl-internal',
@@ -17,7 +17,7 @@ const cache = createCache({
 // }>;
 
 export const InternalThemeProvider = (props: any) => {
-  const { children, theme = defaultTheme } = props;
+  const { children, theme = defaultInternalTheme } = props;
   return (
     <CacheProvider value={cache}>
       <ThemeProvider theme={theme}>{children}</ThemeProvider>
