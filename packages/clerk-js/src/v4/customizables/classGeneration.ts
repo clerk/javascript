@@ -1,7 +1,7 @@
-import type { ElementState, Theme } from '@clerk/types';
+import type { Elements, ElementState } from '@clerk/types';
 
 import { FlowMetadata } from '../elements/contexts';
-import type { ParsedAppearance } from '../types';
+import { ParsedElements } from './appearanceAdapter';
 import { CLASS_PREFIX, ElementDescriptor, ElementId } from './elementDescriptors';
 
 const STATE_PROP_TO_CLASSNAME = Object.freeze({
@@ -13,7 +13,7 @@ const STATE_PROP_TO_CLASSNAME = Object.freeze({
 type PropsWithState = Partial<Record<'isLoading' | 'isDisabled' | 'hasError', any>> & Record<string, any>;
 
 export const generateClassName = (
-  parsedAppearance: ParsedAppearance,
+  parsedElements: ParsedElements,
   elemDescriptor: ElementDescriptor,
   elemId: ElementId | undefined,
   props: PropsWithState | undefined,
@@ -27,9 +27,9 @@ export const generateClassName = (
   className = addClerkTargettableIdClassname(className, elemDescriptor, elemId);
   className = addClerkTargettableStateClass(className, state);
 
-  className = addUserProvidedClassnames(className, parsedAppearance, elemDescriptor, elemId, state, flowMetadata);
+  className = addUserProvidedClassnames(className, parsedElements, elemDescriptor, elemId, state, flowMetadata);
   className = addEmojiSeparator(className);
-  addUserProvidedStyleRules(css, parsedAppearance, elemDescriptor, elemId, state, flowMetadata);
+  addUserProvidedStyleRules(css, parsedElements, elemDescriptor, elemId, state, flowMetadata);
   return { className, css };
 };
 
@@ -51,30 +51,32 @@ const addClerkTargettableStateClass = (cn: string, state: ElementState | undefin
 
 const addEmojiSeparator = (cn: string) => {
   return cn + ' 🔒️';
+  // return cn + ' ✨️️';
+  // return '⭐ ' + cn + ' ⭐';
 };
 
 const addUserProvidedStyleRules = (
   css: unknown[],
-  appearance: ParsedAppearance,
+  parsedElements: ParsedElements,
   elemDescriptor: ElementDescriptor,
   elemId: ElementId | undefined,
   state: ElementState | undefined,
   flowMetadata: FlowMetadata,
 ) => {
-  addRulesFromElements(css, appearance, elemDescriptor, elemId, state);
-  addRulesFromElements(css, appearance[flowMetadata.flow], elemDescriptor, elemId, state);
+  addRulesFromElements(css, parsedElements.base, elemDescriptor, elemId, state);
+  addRulesFromElements(css, parsedElements[flowMetadata.flow], elemDescriptor, elemId, state);
 };
 
 const addUserProvidedClassnames = (
   cn: string,
-  appearance: ParsedAppearance,
+  parsedElements: ParsedElements,
   elemDescriptor: ElementDescriptor,
   elemId: ElementId | undefined,
   state: ElementState | undefined,
   flowMetadata: FlowMetadata,
 ) => {
-  cn = addClassnamesFromElements(cn, appearance, elemDescriptor, elemId, state);
-  cn = addClassnamesFromElements(cn, appearance[flowMetadata.flow], elemDescriptor, elemId, state);
+  cn = addClassnamesFromElements(cn, parsedElements.base, elemDescriptor, elemId, state);
+  cn = addClassnamesFromElements(cn, parsedElements[flowMetadata.flow], elemDescriptor, elemId, state);
   return cn;
 };
 
@@ -99,49 +101,49 @@ export const generateFlowMetadataClassname = (props: { flow: string; page: strin
 
 const addClassnamesFromElements = (
   cn: string,
-  theme: Theme | undefined,
+  elements: Elements | undefined,
   elemDescriptor: ElementDescriptor,
   elemId: ElementId | undefined,
   state: ElementState | undefined,
 ) => {
-  if (!theme || !theme.elements) {
+  if (!elements) {
     return cn;
   }
 
-  type Key = keyof typeof theme.elements;
-  cn = addIfString(cn, theme.elements[elemDescriptor.objectKey as Key]);
+  type Key = keyof typeof elements;
+  cn = addIfString(cn, elements[elemDescriptor.objectKey as Key]);
   if (elemId) {
-    cn = addIfString(cn, theme.elements[elemDescriptor.getObjectKeyWithId(elemId) as Key]);
+    cn = addIfString(cn, elements[elemDescriptor.getObjectKeyWithId(elemId) as Key]);
   }
   if (state) {
-    cn = addIfString(cn, theme.elements[elemDescriptor.getObjectKeyWithState(state) as Key]);
+    cn = addIfString(cn, elements[elemDescriptor.getObjectKeyWithState(state) as Key]);
   }
   if (elemId && state) {
-    cn = addIfString(cn, theme.elements[elemDescriptor.getObjectKeyWithIdAndState(elemId, state) as Key]);
+    cn = addIfString(cn, elements[elemDescriptor.getObjectKeyWithIdAndState(elemId, state) as Key]);
   }
   return cn;
 };
 
 const addRulesFromElements = (
   css: unknown[],
-  theme: Theme | undefined,
+  elements: Elements | undefined,
   elemDescriptor: ElementDescriptor,
   elemId: ElementId | undefined,
   state: ElementState | undefined,
 ) => {
-  if (!theme || !theme.elements) {
+  if (!elements) {
     return;
   }
 
-  type Key = keyof typeof theme.elements;
-  addIfStyleObject(css, theme.elements[elemDescriptor.objectKey as Key]);
+  type Key = keyof typeof elements;
+  addIfStyleObject(css, elements[elemDescriptor.objectKey as Key]);
   if (elemId) {
-    addIfStyleObject(css, theme.elements[elemDescriptor.getObjectKeyWithId(elemId) as Key]);
+    addIfStyleObject(css, elements[elemDescriptor.getObjectKeyWithId(elemId) as Key]);
   }
   if (state) {
-    addIfStyleObject(css, theme.elements[elemDescriptor.getObjectKeyWithState(state) as Key]);
+    addIfStyleObject(css, elements[elemDescriptor.getObjectKeyWithState(state) as Key]);
   }
   if (elemId && state) {
-    addIfStyleObject(css, theme.elements[elemDescriptor.getObjectKeyWithIdAndState(elemId, state) as Key]);
+    addIfStyleObject(css, elements[elemDescriptor.getObjectKeyWithIdAndState(elemId, state) as Key]);
   }
 };
