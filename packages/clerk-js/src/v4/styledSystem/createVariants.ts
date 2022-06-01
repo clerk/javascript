@@ -1,6 +1,5 @@
-import { createInfiniteAccessProxy } from '../utils';
-import { fastDeepMerge } from './fastDeepMerge';
-import { StyleRule, Theme } from './types';
+import { createInfiniteAccessProxy, fastDeepMergeAndReplace } from '../utils';
+import { InternalTheme, StyleRule } from './types';
 
 type UnwrapBooleanVariant<T> = T extends 'true' | 'false' ? boolean : T;
 
@@ -40,7 +39,7 @@ type CreateVariantsReturn<T, V extends Variants> = {
 };
 
 interface CreateVariants {
-  <P, T = Theme, V extends Variants = Variants>(
+  <P, T = InternalTheme, V extends Variants = Variants>(
     param: (theme: T, props: P) => CreateVariantsConfig<V>,
   ): CreateVariantsReturn<T, V>;
 }
@@ -86,7 +85,7 @@ const applyBaseRules = (computedStyles: any, base?: StyleRule) => {
 const applyVariantRules = (computedStyles: any, variantsToApply: Variants, variants: Variants) => {
   for (const key in variantsToApply) {
     // @ts-ignore
-    fastDeepMerge(variants[key][variantsToApply[key]], computedStyles);
+    fastDeepMergeAndReplace(variants[key][variantsToApply[key]], computedStyles);
   }
 };
 
@@ -97,7 +96,7 @@ const applyCompoundVariantRules = (
 ) => {
   for (const compoundVariant of compoundVariants) {
     if (conditionMatches(compoundVariant, variantsToApply)) {
-      fastDeepMerge(compoundVariant.styles, computedStyles);
+      fastDeepMergeAndReplace(compoundVariant.styles, computedStyles);
     }
   }
 };
