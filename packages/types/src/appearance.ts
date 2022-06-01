@@ -8,8 +8,9 @@ type CSSPseudos = { [K in CSS.Pseudos as `&${K}`]?: CSSObject };
 
 interface CSSObject extends CSSPropertiesWithMultiValues, CSSPseudos {}
 type UserDefinedStyle = string | CSSObject;
-type ColorScale = Partial<Record<50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900, string>>;
-type ColorOption = string | ColorScale;
+export type ColorScale<T = string> = Record<50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900, T>;
+export type ColorScaleWithRequiredBase<T = string> = Partial<ColorScale<T>> & { '500': T };
+export type ColorOption = string | ColorScaleWithRequiredBase;
 
 type LoadingState = 'loading';
 type DisabledState = 'disabled';
