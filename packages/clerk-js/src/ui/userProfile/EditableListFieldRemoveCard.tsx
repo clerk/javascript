@@ -6,7 +6,7 @@ import { handleError } from 'ui/common';
 import { Alert } from 'ui/common/alert';
 
 interface EditableListFieldRemoveCardProps {
-  type: 'phone' | 'email' | 'external account';
+  type: 'phone' | 'email' | 'external_account' | 'web3_wallet';
   label: string;
   onCancel: () => void;
   onRemove: () => Promise<any>;
@@ -34,9 +34,11 @@ export const EditableListFieldRemoveCard: React.FC<EditableListFieldRemoveCardPr
     }
   };
 
+  const formattedType = type.split('_').join(' ');
+
   return (
     <TitledCard
-      title={`Remove ${type}`}
+      title={`Remove ${formattedType}`}
       subtitle='Confirm removal'
       className='cl-themed-card cl-verifiable-field-card'
     >
@@ -66,10 +68,11 @@ export const EditableListFieldRemoveCard: React.FC<EditableListFieldRemoveCardPr
             yourself.
           </p>
         )}
-        {type === 'external account' && <p>You will no longer be able to sign in using this connected account.</p>}
+        {type === 'external_account' && <p>You will no longer be able to sign in using this connected account.</p>}
+        {type === 'web3_wallet' && <p>Remove the connection between this app and your Web3 wallet</p>}
       </div>
       <div className='cl-form-button-group'>
-        <Button onClick={updateFieldSubmit}>Remove {type}</Button>
+        <Button onClick={updateFieldSubmit}>Remove {formattedType}</Button>
         <Button
           flavor='text'
           type='reset'

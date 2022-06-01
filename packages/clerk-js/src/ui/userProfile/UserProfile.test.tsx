@@ -10,6 +10,7 @@ import {
   SignInResource,
   SignUpResource,
   VerificationJSON,
+  Web3WalletResource,
 } from '@clerk/types';
 import { AuthConfig, ExternalAccount, UserSettings } from 'core/resources/internal';
 import React from 'react';
@@ -163,6 +164,12 @@ jest.mock('ui/contexts', () => ({
           verification: { status: 'unverified' },
           linkedTo: [],
         } as any as EmailAddressResource,
+      ],
+      web3Wallets: [
+        {
+          web3Wallet: '0x0000000000000000000000000000000000000000',
+          verification: { status: 'verified' },
+        } as Web3WalletResource,
       ],
       getSessions: () => {
         return Promise.resolve([sessionWithActivities]);

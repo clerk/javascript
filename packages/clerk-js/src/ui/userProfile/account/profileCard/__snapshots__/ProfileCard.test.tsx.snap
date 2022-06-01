@@ -383,11 +383,12 @@ exports[`<ProfileCard/> renders the ProfileCard with web3 wallet 1`] = `
     <button
       className="cl-list-item elementContainer button hoverable"
       disabled={false}
+      onClick={[Function]}
     >
       <div
         className="title"
       >
-        Wallet address
+        Web3 wallet
       </div>
       <div
         className="listItem line"
@@ -395,11 +396,31 @@ exports[`<ProfileCard/> renders the ProfileCard with web3 wallet 1`] = `
         <div
           className="start"
         >
-          0x123456789
+          <div
+            className="cl-list-item-entry"
+          >
+            <div>
+              0x0000000000000000000000000000000000000000
+              <span
+                className="tag primary sm"
+              >
+                Primary
+              </span>
+              <span
+                className="tag success sm cl-tag"
+              >
+                Verified
+              </span>
+            </div>
+          </div>
         </div>
         <div
           className="iconContainer"
-        />
+        >
+          <svg
+            data-filename="../shared/assets/icons/arrow-right.svg"
+          />
+        </div>
       </div>
     </button>
   </div>

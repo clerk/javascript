@@ -1,7 +1,5 @@
 import { List } from '@clerk/shared/components/list';
-import { VerificationStatusTag } from '@clerk/shared/components/tag';
 import { TitledCard } from '@clerk/shared/components/titledCard';
-import type { UserResource } from '@clerk/types';
 import { ExternalAccountResource } from '@clerk/types';
 import React from 'react';
 import { svgUrl } from 'ui/common/constants';
@@ -11,34 +9,13 @@ import { useNavigate } from 'ui/hooks';
 import { AvatarWithUploader } from '../avatarWithUploader';
 import { ProfileEmailAddresses } from './ProfileEmailAddresses';
 import { ProfilePhoneNumbers } from './ProfilePhoneNumbers';
-
-// Since only Metamask wallet is supported for now, we assume that the user has only
-// one Web3 wallet address. When we add support for more wallets, this logic should be
-// refactored.
-function getWeb3WalletAddress(user: UserResource): string {
-  if (user.web3Wallets?.length > 0) {
-    return user.web3Wallets[0] ? user.web3Wallets[0].web3Wallet : '';
-  }
-  return '';
-}
+import { ProfileWeb3Wallets } from './ProfileWeb3Wallets';
 
 export function ProfileCard(): JSX.Element {
   const { userSettings } = useEnvironment();
   const { attributes } = userSettings;
   const user = useCoreUser();
   const { navigate } = useNavigate();
-  const web3Wallet = getWeb3WalletAddress(user);
-
-  const buildWebWalletRow = () => (
-    <List.Item
-      className='cl-list-item'
-      key='web-wallet-name'
-      itemTitle='Wallet address'
-      detail={false}
-    >
-      {web3Wallet}
-    </List.Item>
-  );
 
   const buildUsernameRow = () => (
     <List.Item
@@ -118,7 +95,7 @@ export function ProfileCard(): JSX.Element {
         {showEmail && <ProfileEmailAddresses />}
         {showPhone && <ProfilePhoneNumbers />}
         {buildConnectedAccountsRow()}
-        {showWebWallet && buildWebWalletRow()}
+        {showWebWallet && <ProfileWeb3Wallets />}
       </List>
     </TitledCard>
   );

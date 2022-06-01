@@ -1,5 +1,5 @@
 import { renderJSON } from '@clerk/shared/testUtils';
-import { EmailAddressResource, ExternalAccountResource, UserResource } from '@clerk/types';
+import { EmailAddressResource, ExternalAccountResource, UserResource, Web3WalletResource } from '@clerk/types';
 import * as React from 'react';
 import { PartialDeep } from 'type-fest';
 import { useCoreUser, useEnvironment } from 'ui/contexts';
@@ -39,7 +39,12 @@ const userWithoutExtAccounts = (): PartialDeep<UserResource> => {
     externalAccounts: [],
     verifiedExternalAccounts: [],
     unverifiedExternalAccounts: [],
-    web3Wallets: [{ web3Wallet: '0x123456789' }],
+    web3Wallets: [
+      {
+        web3Wallet: '0x0000000000000000000000000000000000000000',
+        verification: { status: 'verified' },
+      } as Web3WalletResource,
+    ],
   };
 };
 

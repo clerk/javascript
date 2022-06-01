@@ -84,6 +84,18 @@ export function getGlobalError(err: Error): ClerkAPIError | undefined {
   return globalErrors[0];
 }
 
+// Returns the first field API error or undefined if none exists.
+export function getFieldError(err: Error): ClerkAPIError | undefined {
+  if (!isClerkAPIResponseError(err)) {
+    return;
+  }
+  const { fieldErrors } = parseErrors(err.errors);
+  if (!fieldErrors.length) {
+    return;
+  }
+  return fieldErrors[0];
+}
+
 export function getClerkAPIErrorMessage(err: ClerkAPIError): string {
   return err.longMessage || err.message;
 }

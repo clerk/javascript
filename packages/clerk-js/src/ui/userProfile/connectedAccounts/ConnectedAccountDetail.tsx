@@ -76,7 +76,7 @@ export function ConnectedAccountDetail(): JSX.Element | null {
 
   const disconnectExternalAccountScreen = (
     <EditableListFieldRemoveCard
-      type='external account'
+      type='external_account'
       label={externalAccount.providerTitle()}
       onCancel={() => {
         setShowRemovalPage(false);

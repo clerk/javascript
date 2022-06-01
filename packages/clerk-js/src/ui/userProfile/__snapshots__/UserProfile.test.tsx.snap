@@ -3323,6 +3323,281 @@ Array [
         <h2
           className="heading h2 cl-title"
         >
+          Web3 wallets
+        </h2>
+        <p
+          className="cl-subtitle"
+        >
+          Manage web3 wallets associated with your account
+        </p>
+      </div>
+    </div>
+    <div
+      className="card card cl-themed-card cl-list-card"
+    >
+      <div>
+        <button
+          className="cl-list-item elementContainer button hoverable"
+          disabled={false}
+          onClick={[Function]}
+        >
+          <div
+            className="listItem line"
+          >
+            <div
+              className="start"
+            >
+              <div
+                className="cl-web3-wallet-item"
+              >
+                0x0000000000000000000000000000000000000000
+                 
+                <div
+                  className="cl-tags"
+                >
+                  <span
+                    className="tag primary sm cl-tag"
+                  >
+                    Primary
+                  </span>
+                  <span
+                    className="tag success sm cl-tag"
+                  >
+                    Verified
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div
+              className="iconContainer"
+            >
+              <svg
+                data-filename="../shared/assets/icons/arrow-right.svg"
+              />
+            </div>
+          </div>
+        </button>
+      </div>
+    </div>
+    <div
+      className="cl-page-heading"
+    >
+      <svg
+        data-filename="../shared/assets/icons/arrow-left.svg"
+      />
+      <div
+        className="cl-text-container"
+      >
+        <h2
+          className="heading h2 cl-title"
+        >
+          Web3 wallet
+        </h2>
+        <p
+          className="cl-subtitle"
+        >
+          Manage this Web3 wallet
+        </p>
+      </div>
+    </div>
+    <div
+      className="card card cl-themed-card cl-list-card cl-verifiable-field-card"
+    >
+      <div>
+        <div
+          className="cl-list-item elementContainer"
+          disabled={false}
+        >
+          <div
+            className="listItem line"
+          >
+            <div
+              className="start"
+            >
+              <div>
+                <div
+                  className="cl-ident-detail"
+                >
+                  0x0000000000000000000000000000000000000000
+                  <div
+                    className="cl-tags"
+                  >
+                    <span
+                      className="tag primary sm cl-tag"
+                    >
+                      Primary
+                    </span>
+                    <span
+                      className="tag success sm cl-tag"
+                    >
+                      Verified
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              className="iconContainer"
+            />
+          </div>
+        </div>
+        <div
+          className="cl-list-item elementContainer"
+          disabled={false}
+        >
+          <div
+            className="listItem line"
+          >
+            <div
+              className="start"
+            >
+              <div
+                className="cl-primary-status-container"
+              >
+                <div
+                  className="cl-description"
+                >
+                  <svg
+                    data-filename="../shared/assets/icons/mail.svg"
+                  />
+                  <div
+                    className="cl-text"
+                  >
+                    <div
+                      className="cl-title"
+                    >
+                      Primary web3 wallet
+                    </div>
+                  </div>
+                </div>
+                <label
+                  className="container disabled"
+                  onKeyPress={[Function]}
+                >
+                  <span
+                    aria-checked={true}
+                    className="toggle"
+                    role="switch"
+                    tabIndex={0}
+                  >
+                    <input
+                      checked={true}
+                      disabled={true}
+                      name="primary_toggle"
+                      onChange={[Function]}
+                      tabIndex={-1}
+                      type="checkbox"
+                    />
+                    <span
+                      className="slider"
+                    />
+                  </span>
+                </label>
+              </div>
+            </div>
+            <div
+              className="iconContainer"
+            />
+          </div>
+        </div>
+      </div>
+      <button
+        className="button text error hoverable cl-add-resource-button cl-remove-button"
+        onClick={[Function]}
+        type="button"
+      >
+        <svg
+          data-filename="../shared/assets/icons/bin.svg"
+        />
+        Remove
+      </button>
+    </div>
+    <div
+      className="cl-page-heading"
+    >
+      <svg
+        data-filename="../shared/assets/icons/arrow-left.svg"
+      />
+      <div
+        className="cl-text-container"
+      >
+        <h2
+          className="heading h2 cl-title"
+        >
+          Back
+        </h2>
+        <p
+          className="cl-subtitle"
+        />
+      </div>
+    </div>
+    <div
+      className="card card cl-themed-card cl-verifiable-field-card"
+    >
+      <div
+        className="titleContainer"
+      >
+        <h1
+          className="title"
+        >
+          Add web3 wallet
+        </h1>
+        <p
+          className="subtitle"
+        >
+          Connect your web3 wallet
+        </p>
+      </div>
+      <div>
+        <button
+          className="cl-list-item elementContainer button hoverable"
+          disabled={false}
+          onClick={[Function]}
+        >
+          <div
+            className="listItem line"
+          >
+            <div
+              className="start"
+            >
+              <div>
+                <img
+                  alt="metamask"
+                  className="cl-left-icon-wrapper"
+                  src="https://images.clerk.dev/static/metamask.svg"
+                />
+                Connect 
+                Metamask
+                 wallet
+              </div>
+            </div>
+            <div
+              className="iconContainer"
+            >
+              <div
+                className="icon"
+              >
+                <svg
+                  data-filename="../shared/assets/icons/arrow-right.svg"
+                />
+              </div>
+            </div>
+          </div>
+        </button>
+      </div>
+    </div>
+    <div
+      className="cl-page-heading"
+    >
+      <svg
+        data-filename="../shared/assets/icons/arrow-left.svg"
+      />
+      <div
+        className="cl-text-container"
+      >
+        <h2
+          className="heading h2 cl-title"
+        >
           Connected accounts
         </h2>
         <p
