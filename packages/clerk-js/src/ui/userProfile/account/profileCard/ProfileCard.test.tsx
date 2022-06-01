@@ -109,7 +109,7 @@ const userWithExtAccounts = (): PartialDeep<UserResource> => {
   };
 };
 
-const envWithoutWeb3wallet = () => ({
+const envWithEmailPhone = () => ({
   displayConfig: {},
   userSettings: {
     attributes: {
@@ -124,6 +124,37 @@ const envWithoutWeb3wallet = () => ({
       },
       web3_wallet: {
         enabled: false,
+      },
+    },
+  },
+});
+
+const envWithExternalAccount = () => ({
+  displayConfig: {},
+  userSettings: {
+    attributes: {
+      email_address: {
+        enabled: true,
+      },
+      phone_number: {
+        enabled: true,
+      },
+      username: {
+        enabled: false,
+      },
+      web3_wallet: {
+        enabled: false,
+      },
+    },
+    social: {
+      oauth_google: {
+        enabled: true,
+      },
+      oauth_twitch: {
+        enabled: true,
+      },
+      oauth_facebook: {
+        enabled: true,
       },
     },
   },
@@ -155,7 +186,7 @@ describe('<ProfileCard/>', () => {
   });
 
   it('renders the ProfileCard', () => {
-    (useEnvironment as jest.Mock).mockImplementation(envWithoutWeb3wallet);
+    (useEnvironment as jest.Mock).mockImplementation(envWithEmailPhone);
     (useCoreUser as jest.Mock).mockImplementation(userWithoutExtAccounts);
 
     const tree = renderJSON(<ProfileCard />);
@@ -171,7 +202,7 @@ describe('<ProfileCard/>', () => {
   });
 
   it('renders the profile card with verified external accounts', () => {
-    (useEnvironment as jest.Mock).mockImplementation(envWithoutWeb3wallet);
+    (useEnvironment as jest.Mock).mockImplementation(envWithExternalAccount);
     (useCoreUser as jest.Mock).mockImplementation(userWithExtAccounts);
 
     const tree = renderJSON(<ProfileCard />);
