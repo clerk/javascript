@@ -299,6 +299,7 @@ export interface Resources {
   client: ClientResource;
   session?: ActiveSessionResource | null;
   user?: UserResource | null;
+  organization?: OrganizationResource | null;
 }
 
 export type RoutingStrategy = 'path' | 'hash' | 'virtual';

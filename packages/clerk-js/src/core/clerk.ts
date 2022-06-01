@@ -400,6 +400,7 @@ export default class Clerk implements ClerkInterface {
         client: this.client,
         session: this.session,
         user: this.user,
+        organization: this.organization,
       });
     }
 
@@ -846,6 +847,7 @@ export default class Clerk implements ClerkInterface {
           client: this.client,
           session: this.session,
           user: this.user,
+          organization: this.organization,
         });
       }
     }

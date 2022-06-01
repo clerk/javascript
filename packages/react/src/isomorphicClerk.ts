@@ -229,6 +229,14 @@ export default class IsomorphicClerk {
     }
   }
 
+  get organization(): OrganizationResource | undefined | null {
+    if (this.clerkjs) {
+      return this.clerkjs.organization;
+    } else {
+      return undefined;
+    }
+  }
+
   // TODO: Remove temp use of __unstable__environment
   get __unstable__environment(): any {
     if (this.clerkjs) {

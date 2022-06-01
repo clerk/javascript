@@ -23,6 +23,7 @@ export function CoreClerkContextWrapper(props: CoreClerkContextWrapperProps): JS
     client: clerk.client,
     session: clerk.session,
     user: clerk.user,
+    organization: clerk.organization,
   });
 
   React.useEffect(() => {

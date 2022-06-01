@@ -1,8 +1,15 @@
-import { ClientResource, ListenerCallback, Resources, SessionResource, UserResource } from '@clerk/types';
+import {
+  ClientResource,
+  ListenerCallback,
+  OrganizationResource,
+  Resources,
+  SessionResource,
+  UserResource,
+} from '@clerk/types';
 
 import { Client, Session, User } from '../core/resources/internal';
 
-type AcceptedResource = UserResource | ClientResource | SessionResource;
+type AcceptedResource = UserResource | ClientResource | SessionResource | OrganizationResource;
 
 function clientChanged(prev: ClientResource, next: ClientResource): boolean {
   return (
@@ -56,10 +63,9 @@ function resourceChanged<T extends AcceptedResource | undefined | null>(prev: T,
   return true;
 }
 
-function getSameOrUpdatedResource<T extends UserResource | ClientResource | SessionResource | undefined | null>(
-  prev: T,
-  next: T,
-): T {
+function getSameOrUpdatedResource<
+  T extends UserResource | ClientResource | SessionResource | OrganizationResource | undefined | null,
+>(prev: T, next: T): T {
   return resourceChanged(prev, next) ? next : prev;
 }
 
@@ -68,6 +74,7 @@ function stateWithMemoizedResources(cur: Resources, next: Resources): Resources 
     client: getSameOrUpdatedResource(cur.client, next.client),
     session: getSameOrUpdatedResource(cur.session, next.session),
     user: getSameOrUpdatedResource(cur.user, next.user),
+    organization: getSameOrUpdatedResource(cur.organization, next.organization),
   };
 }
 
