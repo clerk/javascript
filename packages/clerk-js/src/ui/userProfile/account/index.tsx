@@ -5,6 +5,7 @@ import { EmailAddressesRoutes } from 'ui/userProfile/emailAdressess';
 import { NameRoutes } from 'ui/userProfile/name';
 import { PhoneNumbersRoutes } from 'ui/userProfile/phoneNumbers';
 import { UsernameRoutes } from 'ui/userProfile/username';
+import { Web3WalletsRoutes } from 'ui/userProfile/web3Wallets';
 
 import { Account } from './Account';
 
@@ -28,6 +29,7 @@ export function AccountRoutes({ standAlone = false, index = false }: AccountRout
       <UsernameRoutes />
       <EmailAddressesRoutes />
       <PhoneNumbersRoutes />
+      <Web3WalletsRoutes />
       <ConnectedAccountsRoutes />
     </Route>
   );

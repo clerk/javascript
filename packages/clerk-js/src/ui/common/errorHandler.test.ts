@@ -1,6 +1,6 @@
 import { ClerkAPIResponseError } from 'core/resources/Error';
 
-import { getGlobalError, handleError } from './errorHandler';
+import { getFieldError, getGlobalError, handleError } from './errorHandler';
 import type { FieldState } from './forms';
 
 describe('handleError(err, fields, setGlobalError)', () => {
@@ -94,5 +94,34 @@ describe('getGlobalError', () => {
     expect(err).toBeUndefined();
 
     expect(getGlobalError(new Error('the error'))).toBeUndefined();
+  });
+});
+
+describe('getFieldError', () => {
+  it('returns the first field error or undefined', () => {
+    const message = 'the message';
+    let err = getFieldError(
+      new ClerkAPIResponseError(message, {
+        data: [
+          { code: 'first', message, meta: { param_name: 'field' } },
+          { code: 'second', message, meta: { param_name: 'field' } },
+        ],
+        status: 400,
+      }),
+    );
+    if (!err) {
+      fail();
+    }
+    expect(err.code).toEqual('first');
+
+    err = getFieldError(
+      new ClerkAPIResponseError(message, {
+        data: [],
+        status: 400,
+      }),
+    );
+    expect(err).toBeUndefined();
+
+    expect(getFieldError(new Error('the error'))).toBeUndefined();
   });
 });
