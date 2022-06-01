@@ -1,5 +1,4 @@
 // @ts-ignore
-import { default as MobileIcon } from '@clerk/shared/assets/icons/arrow-right.svg';
 import { ClerkAPIError, SignInCreateParams } from '@clerk/types';
 import React from 'react';
 
@@ -11,6 +10,11 @@ import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '.
 import { useNavigate } from '../../ui/hooks';
 import { useSupportEmail } from '../../ui/hooks/useSupportEmail';
 import { getClerkQueryParam } from '../../utils/getClerkQueryParam';
+import { Input } from '../primitives';
+import { Card } from '../primitives/Card';
+import { FormControl } from '../primitives/FormControl';
+import { FormErrorText } from '../primitives/FormErrorText';
+import { FormLabel } from '../primitives/FormLabel';
 
 export function _SignInStart(): JSX.Element {
   const { userSettings } = useEnvironment();
@@ -166,7 +170,26 @@ export function _SignInStart(): JSX.Element {
   return (
     <div>
       If you can see this, the dev v4 HMR works
-      <MobileIcon />
+      <Card>
+        <FormControl
+          hasError
+          id='email'
+        >
+          <FormLabel>Email</FormLabel>
+          <Input />
+          <FormErrorText>Email is required</FormErrorText>
+        </FormControl>
+        <br />
+
+        <FormControl
+          isRequired
+          id='username'
+        >
+          <FormLabel>Username</FormLabel>
+          <Input />
+          <FormErrorText>Username is required</FormErrorText>
+        </FormControl>
+      </Card>
     </div>
   );
 }

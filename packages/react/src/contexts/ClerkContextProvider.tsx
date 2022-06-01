@@ -1,10 +1,20 @@
-import { ActiveSessionResource, ClientResource, InitialState, Resources, UserResource } from '@clerk/types';
+import {
+  ActiveSessionResource,
+  ClientResource,
+  InitialState,
+  OrganizationInvitationResource,
+  OrganizationMembershipResource,
+  OrganizationResource,
+  Resources,
+  UserResource,
+} from '@clerk/types';
 import React from 'react';
 
 import IsomorphicClerk, { NewIsomorphicClerkParams } from '../isomorphicClerk';
 import { AuthContext } from './AuthContext';
 import { ClientContext } from './ClientContext';
 import { IsomorphicClerkContext } from './IsomorphicClerkContext';
+import { OrganizationContext } from './OrganizationContext';
 import { SessionContext } from './SessionContext';
 import { UserContext } from './UserContext';
 
@@ -25,6 +35,8 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
     session: clerk.session,
     user: clerk.user,
     organization: clerk.organization,
+    lastOrganizationInvitation: null,
+    lastOrganizationMember: null,
   });
   const derivedState = deriveState(clerkLoaded, state, initialState);
 
@@ -49,13 +61,25 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
     return { value: derivedState.session };
   }, [derivedState.sessionId, derivedState.session]);
 
+  const organizationCtx = React.useMemo(() => {
+    return {
+      value: {
+        organization: derivedState.organization,
+        lastOrganizationInvitation: derivedState.lastOrganizationInvitation,
+        lastOrganizationMember: derivedState.lastOrganizationMember,
+      },
+    };
+  }, [derivedState.organization, derivedState.lastOrganizationInvitation, derivedState.lastOrganizationMember]);
+
   return (
     <IsomorphicClerkContext.Provider value={clerkCtx}>
       <ClientContext.Provider value={clientCtx}>
         <SessionContext.Provider value={sessionCtx}>
-          <AuthContext.Provider value={authCtx}>
-            <UserContext.Provider value={userCtx}>{children}</UserContext.Provider>
-          </AuthContext.Provider>
+          <OrganizationContext.Provider value={organizationCtx}>
+            <AuthContext.Provider value={authCtx}>
+              <UserContext.Provider value={userCtx}>{children}</UserContext.Provider>
+            </AuthContext.Provider>
+          </OrganizationContext.Provider>
         </SessionContext.Provider>
       </ClientContext.Provider>
     </IsomorphicClerkContext.Provider>
@@ -84,6 +108,9 @@ function deriveState(
   sessionId: string | null | undefined;
   session: ActiveSessionResource | null | undefined;
   user: UserResource | null | undefined;
+  organization: OrganizationResource | null | undefined;
+  lastOrganizationInvitation: OrganizationInvitationResource | null | undefined;
+  lastOrganizationMember: OrganizationMembershipResource | null | undefined;
 } {
   if (!clerkLoaded && initialState) {
     const userId = initialState.userId;
@@ -92,11 +119,25 @@ function deriveState(
     const sessionId = initialState.sessionId;
     // TODO: Instantiate an actual session resource
     const session = initialState.session as any as ActiveSessionResource;
-    return { sessionId, session, userId, user };
+
+    // TODO: Fix post-SSR decision
+    const organization = undefined;
+    return {
+      sessionId,
+      session,
+      userId,
+      user,
+      organization,
+      lastOrganizationInvitation: null,
+      lastOrganizationMember: null,
+    };
   }
   const userId: string | null | undefined = state.user ? state.user.id : state.user;
   const user = state.user;
   const sessionId: string | null | undefined = state.session ? state.session.id : state.session;
   const session = state.session;
-  return { sessionId, session, userId, user };
+  const organization = state.organization;
+  const lastOrganizationInvitation = state.lastOrganizationInvitation;
+  const lastOrganizationMember = state.lastOrganizationMember;
+  return { sessionId, session, userId, user, organization, lastOrganizationInvitation, lastOrganizationMember };
 }

@@ -13,6 +13,8 @@ import type {
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
   ListenerCallback,
+  OrganizationInvitationResource,
+  OrganizationMembershipResource,
   OrganizationResource,
   RedirectOptions,
   Resources,
@@ -97,6 +99,8 @@ export default class Clerk implements ClerkInterface {
   #authService: AuthenticationService | null = null;
   #devBrowserHandler: DevBrowserHandler | null = null;
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
+  #lastOrganizationInvitation: OrganizationInvitationResource | null = null;
+  #lastOrganizationMember: OrganizationMembershipResource | null = null;
 
   /**
    * @inheritDoc {ClerkInterface.version}
@@ -408,6 +412,8 @@ export default class Clerk implements ClerkInterface {
         session: this.session,
         user: this.user,
         organization: this.organization,
+        lastOrganizationInvitation: this.#lastOrganizationInvitation,
+        lastOrganizationMember: this.#lastOrganizationMember,
       });
     }
 
@@ -732,6 +738,16 @@ export default class Clerk implements ClerkInterface {
     this.#emit();
   };
 
+  __unstable__invitationUpdate(invitation: OrganizationInvitationResource) {
+    this.#lastOrganizationInvitation = invitation;
+    this.#emit();
+  }
+
+  __unstable__membershipUpdate(membership: OrganizationMembershipResource) {
+    this.#lastOrganizationMember = membership;
+    this.#emit();
+  }
+
   get __unstable__environment(): EnvironmentResource | null | undefined {
     return this.#environment;
   }
@@ -855,6 +871,8 @@ export default class Clerk implements ClerkInterface {
           session: this.session,
           user: this.user,
           organization: this.organization,
+          lastOrganizationInvitation: this.#lastOrganizationInvitation,
+          lastOrganizationMember: this.#lastOrganizationMember,
         });
       }
     }

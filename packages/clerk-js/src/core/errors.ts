@@ -46,6 +46,10 @@ export function clerkCoreErrorSessionIsNotDefined(): never {
   throw new Error('ClerkJS: Session is undefined. Try wrapping your component with `withUserGuard`');
 }
 
+export function clerkCoreErrorOrganizationIsNotDefined(): never {
+  throw new Error('ClerkJS: Organization is undefined. Try wrapping your component with `withUserGuard`');
+}
+
 export function clerkCoreErrorNoClerkSingleton(): never {
   throw new Error('ClerkJS: Clerk is undefined');
 }

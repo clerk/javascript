@@ -1,3 +1,4 @@
+import { ClerkPaginationParams } from './api';
 import { OrganizationInvitationResource } from './organizationInvitation';
 import { OrganizationMembershipResource } from './organizationMembership';
 import { MembershipRole } from './organizationMembership';
@@ -23,7 +24,7 @@ export interface OrganizationResource {
   updatedAt: Date;
   update: (params: UpdateOrganizationParams) => Promise<OrganizationResource>;
   getMemberships: (params?: GetMembershipsParams) => Promise<OrganizationMembershipResource[]>;
-  getPendingInvitations: () => Promise<OrganizationInvitationResource[]>;
+  getPendingInvitations: (params?: GetPendingInvitationsParams) => Promise<OrganizationInvitationResource[]>;
   addMember: (params: AddMemberParams) => Promise<OrganizationMembershipResource>;
   inviteMember: (params: InviteMemberParams) => Promise<OrganizationInvitationResource>;
   updateMember: (params: UpdateMembershipParams) => Promise<OrganizationMembershipResource>;
@@ -32,10 +33,9 @@ export interface OrganizationResource {
   setLogo: (params: SetOrganizationLogoParams) => Promise<OrganizationResource>;
 }
 
-export interface GetMembershipsParams {
-  limit?: number;
-  offset?: number;
-}
+export type GetMembershipsParams = ClerkPaginationParams;
+
+export type GetPendingInvitationsParams = ClerkPaginationParams;
 
 export interface AddMemberParams {
   userId: string;

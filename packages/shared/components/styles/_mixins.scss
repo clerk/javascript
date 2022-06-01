@@ -11,6 +11,7 @@
   border-radius: $themed-border-radius;
   border: 2px solid $gray10;
   color: $themed-font-color;
+
   &::placeholder {
     color: $themed-font-color-l1;
   }
@@ -23,18 +24,19 @@
   outline: none !important;
   outline-offset: 0 !important;
 
-  box-shadow: 0 0 0 2px $color !important;
+  box-shadow: 0 0 0 2px $color  !important;
 
   // For our custom dropdowns
   &[aria-haspopup] {
-    border-color: $color !important;
+    border-color: $color  !important;
     box-shadow: none !important;
   }
 
   $inputTypes: text email tel password;
+
   @each $i in $inputTypes {
     &[type*='#{$i}'] {
-      border-color: $color !important;
+      border-color: $color  !important;
       box-shadow: none !important;
     }
   }

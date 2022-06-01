@@ -1,6 +1,8 @@
 import {
   ClientResource,
   ListenerCallback,
+  OrganizationInvitationResource,
+  OrganizationMembershipResource,
   OrganizationResource,
   Resources,
   SessionResource,
@@ -9,7 +11,13 @@ import {
 
 import { Client, Session, User } from '../core/resources/internal';
 
-type AcceptedResource = UserResource | ClientResource | SessionResource | OrganizationResource;
+type AcceptedResource =
+  | UserResource
+  | ClientResource
+  | SessionResource
+  | OrganizationResource
+  | OrganizationMembershipResource
+  | OrganizationInvitationResource;
 
 function clientChanged(prev: ClientResource, next: ClientResource): boolean {
   return (
@@ -64,7 +72,15 @@ function resourceChanged<T extends AcceptedResource | undefined | null>(prev: T,
 }
 
 function getSameOrUpdatedResource<
-  T extends UserResource | ClientResource | SessionResource | OrganizationResource | undefined | null,
+  T extends
+    | UserResource
+    | ClientResource
+    | SessionResource
+    | OrganizationResource
+    | OrganizationInvitationResource
+    | OrganizationMembershipResource
+    | undefined
+    | null,
 >(prev: T, next: T): T {
   return resourceChanged(prev, next) ? next : prev;
 }
@@ -75,6 +91,11 @@ function stateWithMemoizedResources(cur: Resources, next: Resources): Resources 
     session: getSameOrUpdatedResource(cur.session, next.session),
     user: getSameOrUpdatedResource(cur.user, next.user),
     organization: getSameOrUpdatedResource(cur.organization, next.organization),
+    lastOrganizationInvitation: getSameOrUpdatedResource(
+      cur.lastOrganizationInvitation,
+      next.lastOrganizationInvitation,
+    ),
+    lastOrganizationMember: getSameOrUpdatedResource(cur.lastOrganizationMember, next.lastOrganizationMember),
   };
 }
 
