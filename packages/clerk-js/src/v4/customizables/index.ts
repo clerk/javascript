@@ -9,6 +9,7 @@ export const Heading = makeCustomizable(Primitives.Heading);
 export const Input = makeCustomizable(Primitives.Input);
 export const Link = makeCustomizable(Primitives.Link);
 export const Text = makeCustomizable(Primitives.Text);
+export const Image = makeCustomizable(Primitives.Image);
 
 export { AppearanceProvider, useAppearance } from './AppearanceContext';
 export { descriptors } from './elementDescriptors';
