@@ -295,9 +295,7 @@ export default class Clerk implements ClerkInterface {
       }
     }
 
-    if (session) {
-      this.#authService?.setAuthCookiesFromSession(session);
-    }
+    this.#authService?.setAuthCookiesFromSession(session);
 
     // If this.session exists, then signout was triggered by the current tab
     // and should emit. Other tabs should not emit the same event again
@@ -308,7 +306,7 @@ export default class Clerk implements ClerkInterface {
     //1. setLastActiveSession to passed usersession (add a param).
     //   Note that this will also update the session's active organization
     //   id.
-    if (session && typeof document != 'undefined' && document.hasFocus()) {
+    if (typeof document != 'undefined' && document.hasFocus()) {
       await this.#touchLastActiveSession(session);
     }
 
@@ -317,7 +315,7 @@ export default class Clerk implements ClerkInterface {
     //   When undefined, neither SignedIn nor SignedOut renders, which avoids flickers or
     //   automatic reloading when reloading shouldn't be happening.
     const beforeUnloadTracker = createBeforeUnloadTracker();
-    if (session && beforeEmit) {
+    if (beforeEmit) {
       beforeUnloadTracker.startTracking();
       this.session = undefined;
       this.organization = undefined;
