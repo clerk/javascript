@@ -1,13 +1,13 @@
 import React from 'react';
 
-import { makeContextAndHook } from '../utils';
+import { createContextAndHook } from '../../utils';
 
 type FlowMetadata = {
   flow: 'signIn' | 'signUp';
   page: 'start' | 'emailOtp' | 'phoneOtp';
 };
 
-const [FlowMetadataCtx, useFlowMetadata] = makeContextAndHook<FlowMetadata>('FlowMetadata');
+const [FlowMetadataCtx, useFlowMetadata] = createContextAndHook<FlowMetadata>('FlowMetadata');
 
 const FlowMetadataProvider = (props: React.PropsWithChildren<FlowMetadata>) => {
   const { flow, page } = props;
