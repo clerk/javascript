@@ -175,7 +175,7 @@ export function _SignInStart(): JSX.Element {
       </Header.Root>
       <Flex
         direction={'col'}
-        elementDescriptor={descriptors.authOptions}
+        elementDescriptor={descriptors.main}
       >
         <SocialButtons.Root />
         <Flex>
