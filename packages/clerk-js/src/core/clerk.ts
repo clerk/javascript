@@ -286,7 +286,13 @@ export default class Clerk implements ClerkInterface {
     // However, if the `organization` parameter is not given (i.e. `undefined`), we want
     // to keep the organization id that the session had.
     if (session && organization !== undefined) {
-      session.lastActiveOrganizationId = organization;
+      if (organization === null) {
+        session.lastActiveOrganizationId = null;
+      } else if (typeof organization === 'string') {
+        session.lastActiveOrganizationId = organization;
+      } else {
+        session.lastActiveOrganizationId = organization.id;
+      }
     }
 
     if (session) {

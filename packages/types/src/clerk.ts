@@ -334,10 +334,10 @@ export type SetActiveParams = {
   session?: ActiveSessionResource | string | null;
 
   /**
-   * The organization id to be set as active in the current session.
+   * The organization resource or organization id (string version) to be set as active in the current session.
    * If `null`, the currently active organization is removed as active.
    */
-  organization?: string | null;
+  organization?: OrganizationResource | string | null;
 
   /**
    * Callback run just before the active session and/or organization is set to the passed object.
