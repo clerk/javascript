@@ -11,15 +11,17 @@ import {
 } from 'ui/common';
 import { Alert } from 'ui/common/alert';
 import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from 'ui/contexts';
-import { useMagicLink } from 'ui/hooks';
+import { useMagicLink, useNavigate } from 'ui/hooks';
+import { completeSignUpFlow } from 'ui/signUp/util';
 
 export function SignUpVerifyEmailAddressWithMagicLink(): JSX.Element {
   const signUp = useCoreSignUp();
   const renderHappenedAfterTheDamnedSetSessionFlow = signUp.status === null;
-  const { setActive } = useCoreClerk();
+  const { setSession } = useCoreClerk();
   const identifierRef = React.useRef(signUp.emailAddress);
   const { displayConfig } = useEnvironment();
   const signUpContext = useSignUpContext();
+  const { navigate } = useNavigate();
   const { navigateAfterSignUp } = signUpContext;
   const [error, setError] = React.useState<string | undefined>();
   const [showVerifyModal, setShowVerifyModal] = React.useState(false);
@@ -57,15 +59,12 @@ export function SignUpVerifyEmailAddressWithMagicLink(): JSX.Element {
     } else if (ver.verifiedFromTheSameClient()) {
       showMagicLinkVerificationModal();
     } else {
-      await completeSignUpFlow(su);
-    }
-  };
-
-  const completeSignUpFlow = async (su: SignUpResource) => {
-    if (su.status === 'complete') {
-      return setActive({
-        session: su.createdSessionId,
-        beforeEmit: navigateAfterSignUp,
+      await completeSignUpFlow({
+        signUp: su,
+        verifyEmailPath: '../verify-email-address',
+        verifyPhonePath: '../verify-phone-number',
+        handleComplete: () => setSession(su.createdSessionId, navigateAfterSignUp),
+        navigate,
       });
     }
   };

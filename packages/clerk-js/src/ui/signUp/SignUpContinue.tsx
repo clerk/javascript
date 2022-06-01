@@ -1,4 +1,3 @@
-import { SignUpResource } from '@clerk/types';
 import React from 'react';
 import type { FieldState } from 'ui/common';
 import {
@@ -15,6 +14,7 @@ import { Body, Header } from 'ui/common/authForms';
 import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
 import { SignUpForm } from 'ui/signUp/SignUpForm';
+import { completeSignUpFlow } from 'ui/signUp/util';
 
 import { SignInLink } from './SignInLink';
 import {
@@ -32,7 +32,7 @@ function _SignUpContinue(): JSX.Element | null {
   const { navigate } = useNavigate();
   const { displayConfig, userSettings } = useEnvironment();
   const { attributes } = userSettings;
-  const { setActive } = useCoreClerk();
+  const { setSession } = useCoreClerk();
   const { navigateAfterSignUp } = useSignUpContext();
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
@@ -102,24 +102,16 @@ function _SignUpContinue(): JSX.Element | null {
       setError(undefined);
       const req = buildRequest(fieldsToSubmit);
       const res = await signUp.update(req);
-      return completeSignUpFlow(res);
+
+      return completeSignUpFlow({
+        signUp: res,
+        verifyEmailPath: '../verify-email-address',
+        verifyPhonePath: '../verify-phone-number',
+        handleComplete: () => setSession(res.createdSessionId, navigateAfterSignUp),
+        navigate,
+      });
     } catch (err) {
       handleError(err, fieldsToSubmit, setError);
-    }
-  };
-
-  const completeSignUpFlow = (su: SignUpResource) => {
-    if (su.status === 'complete') {
-      return setActive({
-        session: su.createdSessionId,
-        beforeEmit: navigateAfterSignUp,
-      });
-    } else if (su.emailAddress && su.verifications.emailAddress.status !== 'verified') {
-      return navigate(displayConfig.signUpUrl + '/verify-email-address');
-    } else if (su.phoneNumber && su.verifications.phoneNumber.status !== 'verified') {
-      return navigate(displayConfig.signUpUrl + '/verify-phone-number');
-    } else if (su.status === 'missing_requirements') {
-      // do nothing
     }
   };
 

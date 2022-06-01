@@ -13,6 +13,8 @@ import {
 import { Alert } from 'ui/common/alert';
 import { Body, Header } from 'ui/common/authForms';
 import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from 'ui/contexts';
+import { useNavigate } from 'ui/hooks';
+import { completeSignUpFlow } from 'ui/signUp/util';
 
 import { SignUpVerifyEmailAddressWithMagicLink } from './SignUpVerifyEmailAddressWithMagicLink';
 
@@ -34,7 +36,8 @@ function _SignUpVerifyPhoneNumber(): JSX.Element {
 
 function VerifyWithOtp({ field }: { field: 'emailAddress' | 'phoneNumber' }): JSX.Element {
   const { navigateAfterSignUp } = useSignUpContext();
-  const { setActive } = useCoreClerk();
+  const { setSession } = useCoreClerk();
+  const { navigate } = useNavigate();
   const signUp = useCoreSignUp();
   const identifierRef = React.useRef(signUp[field] || '');
   const codeState = useFieldState('code', '');
@@ -78,14 +81,13 @@ function VerifyWithOtp({ field }: { field: 'emailAddress' | 'phoneNumber' }): JS
         ? attemptPhoneNumberVerification()
         : attemptEmailAddressVerification());
 
-      if (res.status === 'complete') {
-        verify(() =>
-          setActive({
-            session: res.createdSessionId,
-            beforeEmit: navigateAfterSignUp,
-          }),
-        );
-      }
+      return completeSignUpFlow({
+        signUp: res,
+        verifyEmailPath: '../verify-email-address',
+        verifyPhonePath: '../verify-phone-number',
+        handleComplete: async () => await verify(() => setSession(res.createdSessionId, navigateAfterSignUp)),
+        navigate,
+      });
     } catch (err) {
       const globalErr = getGlobalError(err);
       if (globalErr && isVerificationExpiredError(globalErr)) {

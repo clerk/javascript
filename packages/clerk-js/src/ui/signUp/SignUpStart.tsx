@@ -1,5 +1,5 @@
 import { noop } from '@clerk/shared/utils';
-import { SignUpCreateParams, SignUpResource } from '@clerk/types';
+import { SignUpCreateParams } from '@clerk/types';
 import React from 'react';
 import type { FieldState } from 'ui/common';
 import {
@@ -17,6 +17,7 @@ import { Body, Header } from 'ui/common/authForms';
 import { ERROR_CODES } from 'ui/common/constants';
 import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from 'ui/contexts';
 import { useNavigate } from 'ui/hooks';
+import { completeSignUpFlow } from 'ui/signUp/util';
 import { getClerkQueryParam } from 'utils/getClerkQueryParam';
 
 import { SignInLink } from './SignInLink';
@@ -35,14 +36,14 @@ function _SignUpStart(): JSX.Element {
   const { navigate } = useNavigate();
   const { userSettings } = useEnvironment();
   const { attributes } = userSettings;
-  const { setActive } = useCoreClerk();
+  const { setSession } = useCoreClerk();
   const { navigateAfterSignUp } = useSignUpContext();
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
   const signUp = useCoreSignUp();
   const [isLoading, setIsLoading] = React.useState(false);
-  const [isMissingRequirements, setMissingRequirements] = React.useState(false);
+  const [missingRequirementsWithTicket, setMissingRequirementsWithTicket] = React.useState(false);
 
   const formState = {
     firstName: useFieldState('first_name', ''),
@@ -88,9 +89,22 @@ function _SignUpStart(): JSX.Element {
 
     signUp
       .create(signUpParams)
-      .then(res => {
-        formState.emailAddress.setValue(res.emailAddress || '');
-        void completeSignUpFlow(res);
+      .then(signUp => {
+        formState.emailAddress.setValue(signUp.emailAddress || '');
+
+        // In case we are in a Ticket flow and the sign up is not complete yet, update the state
+        // to render properly the SignUp form with other available options to complete it (e.g. OAuth)
+        if (signUp.status === 'missing_requirements') {
+          setMissingRequirementsWithTicket(true);
+        }
+
+        return completeSignUpFlow({
+          signUp,
+          verifyEmailPath: 'verify-email-address',
+          verifyPhonePath: 'verify-phone-number',
+          handleComplete: () => setSession(signUp.createdSessionId, navigateAfterSignUp),
+          navigate,
+        });
       })
       .catch(err => {
         /* Clear ticket values when an error occurs in the initial sign up attempt */
@@ -169,24 +183,16 @@ function _SignUpStart(): JSX.Element {
     try {
       setError(undefined);
       const res = await signUp.create(buildRequest(fieldsToSubmit));
-      return completeSignUpFlow(res);
+
+      return completeSignUpFlow({
+        signUp: res,
+        verifyEmailPath: 'verify-email-address',
+        verifyPhonePath: 'verify-phone-number',
+        handleComplete: () => setSession(res.createdSessionId, navigateAfterSignUp),
+        navigate,
+      });
     } catch (err) {
       handleError(err, fieldsToSubmit, setError);
-    }
-  };
-
-  const completeSignUpFlow = (su: SignUpResource) => {
-    if (su.status === 'complete') {
-      return setActive({
-        session: su.createdSessionId,
-        beforeEmit: navigateAfterSignUp,
-      });
-    } else if (su.emailAddress && su.verifications.emailAddress.status !== 'verified') {
-      return navigate('verify-email-address');
-    } else if (su.phoneNumber && su.verifications.phoneNumber.status !== 'verified') {
-      return navigate('verify-phone-number');
-    } else if (su.status === 'missing_requirements') {
-      setMissingRequirements(true);
     }
   };
 
@@ -202,7 +208,7 @@ function _SignUpStart(): JSX.Element {
       />
 
       <Body>
-        {(!hasTicket || (hasTicket && isMissingRequirements)) && oauthOptions.length > 0 && (
+        {(!hasTicket || missingRequirementsWithTicket) && oauthOptions.length > 0 && (
           <SignUpOAuth
             oauthOptions={oauthOptions}
             setError={setError}

@@ -8,7 +8,7 @@ import { SignUpContinue } from './SignUpContinue';
 
 const navigateMock = jest.fn();
 const mockUpdateRequest = jest.fn();
-const mockSetActive = jest.fn();
+const mockSetSession = jest.fn();
 let mockUserSettings: UserSettings;
 
 jest.mock('ui/router/RouteContext');
@@ -28,7 +28,7 @@ jest.mock('ui/contexts', () => {
     },
     useCoreClerk: jest.fn(() => ({
       frontendAPI: 'clerk.clerk.dev',
-      setActive: mockSetActive,
+      setSession: mockSetSession,
     })),
     useCoreSignUp: jest.fn(() => ({
       verifications: {
@@ -192,11 +192,8 @@ describe('<SignUpContinue/>', () => {
         firstName: 'Bryan',
         lastName: 'Mills',
         emailAddress: 'bryan@taken.com',
-        verifications: {
-          emailAddress: {
-            status: 'unverified',
-          },
-        },
+        status: 'missing_requirements',
+        unverifiedFields: ['email_address'],
       }),
     );
 
@@ -220,7 +217,7 @@ describe('<SignUpContinue/>', () => {
         email_address: 'bryan@taken.com',
       });
       expect(navigateMock).toHaveBeenCalledTimes(1);
-      expect(navigateMock).toHaveBeenCalledWith('http://test.host/sign-up/verify-email-address');
+      expect(navigateMock).toHaveBeenCalledWith('../verify-email-address');
     });
   });
 
@@ -298,11 +295,8 @@ describe('<SignUpContinue/>', () => {
     mockUpdateRequest.mockImplementation(() =>
       Promise.resolve({
         phoneNumber: '+15615551001',
-        verifications: {
-          phoneNumber: {
-            status: 'unverified',
-          },
-        },
+        status: 'missing_requirements',
+        unverifiedFields: ['phone_number'],
       }),
     );
 
@@ -341,7 +335,7 @@ describe('<SignUpContinue/>', () => {
         phone_number: '+15615551001',
       });
       expect(navigateMock).toHaveBeenCalledTimes(1);
-      expect(navigateMock).toHaveBeenCalledWith('http://test.host/sign-up/verify-phone-number');
+      expect(navigateMock).toHaveBeenCalledWith('../verify-phone-number');
     });
   });
 
