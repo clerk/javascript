@@ -6,8 +6,9 @@ import { handleError } from 'ui/common';
 import { Alert } from 'ui/common/alert';
 
 interface EditableListFieldRemoveCardProps {
-  type: 'phone' | 'email' | 'external_account' | 'web3_wallet';
+  type: 'phone' | 'email' | 'connected_account' | 'web3_wallet';
   label: string;
+  buttonLabel: string;
   onCancel: () => void;
   onRemove: () => Promise<any>;
   onRemoved?: () => void;
@@ -16,11 +17,11 @@ interface EditableListFieldRemoveCardProps {
 export const EditableListFieldRemoveCard: React.FC<EditableListFieldRemoveCardProps> = ({
   type,
   label,
+  buttonLabel,
   onCancel,
   onRemove,
   onRemoved,
 }) => {
-  const lowerLabel = label.toLowerCase();
   const [error, setError] = React.useState<string | undefined>();
 
   const updateFieldSubmit = async () => {
@@ -39,7 +40,6 @@ export const EditableListFieldRemoveCard: React.FC<EditableListFieldRemoveCardPr
   return (
     <TitledCard
       title={`Remove ${formattedType}`}
-      subtitle='Confirm removal'
       className='cl-themed-card cl-verifiable-field-card'
     >
       <Alert type='error'>{error}</Alert>
@@ -49,10 +49,10 @@ export const EditableListFieldRemoveCard: React.FC<EditableListFieldRemoveCardPr
           {type === 'phone' ? (
             <PhoneViewer
               className='cl-identifier'
-              phoneNumber={lowerLabel}
+              phoneNumber={label.toLowerCase()}
             />
           ) : (
-            <span className='cl-identifier'>{lowerLabel}</span>
+            <span className='cl-identifier'>{label}</span>
           )}{' '}
           will be removed from this account.
         </p>
@@ -68,11 +68,15 @@ export const EditableListFieldRemoveCard: React.FC<EditableListFieldRemoveCardPr
             yourself.
           </p>
         )}
-        {type === 'external_account' && <p>You will no longer be able to sign in using this connected account.</p>}
+        {type === 'connected_account' && (
+          <p>Unlink your {label} account, and remove associated personal information.</p>
+        )}
         {type === 'web3_wallet' && <p>Remove the connection between this app and your Web3 wallet</p>}
       </div>
       <div className='cl-form-button-group'>
-        <Button onClick={updateFieldSubmit}>Remove {formattedType}</Button>
+        <Button onClick={updateFieldSubmit}>
+          {buttonLabel} {formattedType}
+        </Button>
         <Button
           flavor='text'
           type='reset'

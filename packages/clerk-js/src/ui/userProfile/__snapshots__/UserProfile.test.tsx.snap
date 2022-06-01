@@ -3509,7 +3509,7 @@ Array [
         <svg
           data-filename="../shared/assets/icons/bin.svg"
         />
-        Remove
+        Unlink
       </button>
     </div>
     <div
@@ -3794,7 +3794,7 @@ Array [
         <svg
           data-filename="../shared/assets/icons/bin.svg"
         />
-        Disconnect
+        Unlink
       </button>
     </div>
     <div

@@ -86,11 +86,11 @@ describe('<ConnectedAccountDetail/>', () => {
     expect(tree).toMatchSnapshot();
   });
 
-  it('Disconnect Google Connected Account', () => {
+  it('Unlink Google Connected Account', () => {
     render(<ConnectedAccountDetail />);
 
-    userEvent.click(screen.getByText('Disconnect'));
-    userEvent.click(screen.getByText('Remove external account', { selector: 'button' }));
+    userEvent.click(screen.getByText('Unlink'));
+    userEvent.click(screen.getByText('Unlink connected account', { selector: 'button' }));
     expect(mockGoogleDestroy).toHaveBeenCalled();
   });
 });
