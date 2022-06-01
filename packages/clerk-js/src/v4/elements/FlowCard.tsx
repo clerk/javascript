@@ -2,18 +2,16 @@ import React from 'react';
 
 import { Card, descriptors, Flex, useAppearance } from '../customizables';
 import { generateFlowMetadataClassname } from '../customizables/classGeneration';
-import { defaultTheme } from '../foundations';
 import { InternalThemeProvider } from '../styledSystem';
 import { CardStateProvider, FlowMetadata, FlowMetadataProvider } from './contexts';
 
 type FlowCardRootProps = React.PropsWithChildren<FlowMetadata>;
 
 const FlowCardRoot = (props: FlowCardRootProps): JSX.Element => {
-  // TODO: useAppearance should transform an appearance -> parseAppearance
-  const { parsedAppearance } = useAppearance();
+  const { parsedInternalTheme } = useAppearance();
 
   return (
-    <InternalThemeProvider theme={{ ...defaultTheme, ...parsedAppearance[props.flow]?.variables }}>
+    <InternalThemeProvider theme={parsedInternalTheme[props.flow]}>
       <FlowMetadataProvider
         flow={props.flow}
         page={props.page}
