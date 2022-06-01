@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.3.0-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@3.3.0-staging.0...@clerk/clerk-react@3.3.0-staging.1) (2022-06-01)
+
+### Bug Fixes
+
+- **clerk-js:** Emit changes in organization to listeners ([798ee62](https://github.com/clerkinc/javascript/commit/798ee622e7961d3aa7f8842184f5fadbcfed517f))
+
 ### [3.2.18](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@3.2.18-staging.1...@clerk/clerk-react@3.2.18) (2022-05-20)
 
 **Note:** Version bump only for package @clerk/clerk-react

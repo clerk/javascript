@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.12.0-staging.6](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.12.0-staging.5...@clerk/clerk-js@3.12.0-staging.6) (2022-06-01)
+
+### Features
+
+- **types,clerk-js:** Introduce web3 wallet operations in UserProfile ([6570a87](https://github.com/clerkinc/javascript/commit/6570a87439d92a59057b2df50ec482511428495e))
+
+### Bug Fixes
+
+- **clerk-js:** Do not show verification status badges for ext accnts on the user profile page ([0fa4f46](https://github.com/clerkinc/javascript/commit/0fa4f462931ca91560d8dc0d16259b910555c741))
+- **clerk-js:** Emit changes in organization to listeners ([798ee62](https://github.com/clerkinc/javascript/commit/798ee622e7961d3aa7f8842184f5fadbcfed517f))
+- **clerk-js:** Fixed bugs in `setActive` caused by new conditions on session ([37f4010](https://github.com/clerkinc/javascript/commit/37f4010362e8af4ea8aa62f8bf925df4527906ef))
+- **types,clerk-js:** Same component navigate after OAuth flow with missing requirements ([39ca6ce](https://github.com/clerkinc/javascript/commit/39ca6cee3a8a160fdf0ca95a713707afee55f1fc))
+
 ## [3.12.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.12.0-staging.4...@clerk/clerk-js@3.12.0) (2022-05-20)
 
 **Note:** Version bump only for package @clerk/clerk-js

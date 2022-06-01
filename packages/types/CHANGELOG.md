@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.15.0-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/types@2.15.0-staging.0...@clerk/types@2.15.0-staging.1) (2022-06-01)
+
+### Features
+
+- **types,clerk-js:** Introduce web3 wallet operations in UserProfile ([6570a87](https://github.com/clerkinc/javascript/commit/6570a87439d92a59057b2df50ec482511428495e))
+
+### Bug Fixes
+
+- **clerk-js:** Emit changes in organization to listeners ([798ee62](https://github.com/clerkinc/javascript/commit/798ee622e7961d3aa7f8842184f5fadbcfed517f))
+- **types,clerk-js:** Same component navigate after OAuth flow with missing requirements ([39ca6ce](https://github.com/clerkinc/javascript/commit/39ca6cee3a8a160fdf0ca95a713707afee55f1fc))
+
 ## [2.14.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.14.0-staging.1...@clerk/types@2.14.0) (2022-05-20)
 
 **Note:** Version bump only for package @clerk/types
