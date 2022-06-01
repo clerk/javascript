@@ -24,6 +24,7 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
     client: clerk.client as ClientResource,
     session: clerk.session,
     user: clerk.user,
+    organization: clerk.organization,
   });
   const derivedState = deriveState(clerkLoaded, state, initialState);
 
