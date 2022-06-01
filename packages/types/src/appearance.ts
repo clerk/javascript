@@ -62,6 +62,8 @@ export type ElementObjectKey<K extends string> = K extends `${infer Parent}-${in
   ? `${Parent}${Capitalize<Rest>}`
   : K;
 
+type FormInputId = 'firstName' | 'lastName' | 'emailAddress' | 'password';
+
 /**
  * A map that describes the possible combinations we need to generate
  * for each unique base element
@@ -75,6 +77,8 @@ export type ElementsConfig = {
   'header-title': WithOptions<never, never, never>;
   'header-subtitle': WithOptions<never, never, never>;
 
+  main: WithOptions<never, never, never>;
+
   footer: WithOptions<never, never, never>;
   'footer-action': WithOptions<never, never, never>;
   'footer-actionText': WithOptions<never, never, never>;
@@ -82,14 +86,13 @@ export type ElementsConfig = {
   'footer-pages': WithOptions<never, never, never>;
   'footer-pagesLink': WithOptions<'help' | 'terms' | 'privacy', never, never>;
 
-  authOptions: WithOptions<never, never, never>;
-
   socialButtons: WithOptions<never, never, never>;
   'socialButtons-buttonIcon': WithOptions<OAuthProvider, LoadingState | DisabledState, never>;
   'socialButtons-buttonBlock': WithOptions<OAuthProvider, LoadingState | DisabledState, never>;
+  'socialButtons-logo': WithOptions<OAuthProvider, LoadingState | DisabledState, never>;
 
   form: WithOptions<never, never, never>;
-  'form-input': WithOptions<never, ErrorState | DisabledState, never>;
+  'form-input': WithOptions<FormInputId, ErrorState | DisabledState, never>;
   'form-buttonPrimary': WithOptions<never, ErrorState | LoadingState, never>;
 };
 
@@ -141,3 +144,9 @@ export type Appearance = Theme & {
    */
   // userProfile?: Theme;
 };
+
+// TODO: Decide if we want to keep this
+type AppearanceFunctionParams = { prefersColorScheme: 'dark' | 'light' };
+export type AppearanceFactory = (params: AppearanceFunctionParams) => Appearance;
+
+export type AppearanceProp = Appearance | AppearanceFactory;
