@@ -51,6 +51,7 @@ export function Web3WalletDetail(): JSX.Element | null {
     <EditableListFieldRemoveCard
       type='web3_wallet'
       label={web3Wallet.web3Wallet}
+      buttonLabel='Unlink'
       onCancel={() => {
         setShowRemovalPage(false);
       }}
@@ -132,7 +133,7 @@ export function Web3WalletDetail(): JSX.Element | null {
             hoverable
           >
             <BinIcon />
-            Remove
+            Unlink
           </Button>
         </TitledCard>
       )}

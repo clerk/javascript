@@ -60,6 +60,7 @@ export function EmailDetail(): JSX.Element | null {
     <EditableListFieldRemoveCard
       type='email'
       label={email.emailAddress}
+      buttonLabel='Remove'
       onCancel={() => {
         setShowRemovalPage(false);
       }}

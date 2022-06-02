@@ -157,37 +157,6 @@ exports[`<ProfileCard/> renders the ProfileCard 1`] = `
         </div>
       </div>
     </button>
-    <button
-      className="cl-list-item elementContainer button hoverable"
-      disabled={false}
-      onClick={[Function]}
-    >
-      <div
-        className="title"
-      >
-        Connected accounts
-      </div>
-      <div
-        className="listItem line"
-      >
-        <div
-          className="start"
-        >
-          <div
-            className="cl-empty-list-item"
-          >
-            None
-          </div>
-        </div>
-        <div
-          className="iconContainer"
-        >
-          <svg
-            data-filename="../shared/assets/icons/arrow-right.svg"
-          />
-        </div>
-      </div>
-    </button>
   </div>
 </div>
 `;
@@ -327,37 +296,6 @@ exports[`<ProfileCard/> renders the ProfileCard with web3 wallet 1`] = `
         className="title"
       >
         Phone number
-      </div>
-      <div
-        className="listItem line"
-      >
-        <div
-          className="start"
-        >
-          <div
-            className="cl-empty-list-item"
-          >
-            None
-          </div>
-        </div>
-        <div
-          className="iconContainer"
-        >
-          <svg
-            data-filename="../shared/assets/icons/arrow-right.svg"
-          />
-        </div>
-      </div>
-    </button>
-    <button
-      className="cl-list-item elementContainer button hoverable"
-      disabled={false}
-      onClick={[Function]}
-    >
-      <div
-        className="title"
-      >
-        Connected accounts
       </div>
       <div
         className="listItem line"

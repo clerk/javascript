@@ -4,6 +4,7 @@ import { Avatar } from '@clerk/shared/components/avatar';
 import { Button } from '@clerk/shared/components/button';
 import { List } from '@clerk/shared/components/list';
 import { TitledCard } from '@clerk/shared/components/titledCard';
+import { titleize } from '@clerk/shared/utils';
 import React from 'react';
 import { svgUrl } from 'ui/common/constants';
 import { useCoreUser } from 'ui/contexts';
@@ -76,8 +77,9 @@ export function ConnectedAccountDetail(): JSX.Element | null {
 
   const disconnectExternalAccountScreen = (
     <EditableListFieldRemoveCard
-      type='external_account'
-      label={externalAccount.providerTitle()}
+      type='connected_account'
+      label={titleize(externalAccount.providerSlug())}
+      buttonLabel='Unlink'
       onCancel={() => {
         setShowRemovalPage(false);
       }}
@@ -124,7 +126,7 @@ export function ConnectedAccountDetail(): JSX.Element | null {
             hoverable
           >
             <BinIcon />
-            Disconnect
+            Unlink
           </Button>
         </TitledCard>
       )}

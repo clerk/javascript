@@ -13,7 +13,7 @@ import { ProfileWeb3Wallets } from './ProfileWeb3Wallets';
 
 export function ProfileCard(): JSX.Element {
   const { userSettings } = useEnvironment();
-  const { attributes } = userSettings;
+  const { attributes, social } = userSettings;
   const user = useCoreUser();
   const { navigate } = useNavigate();
 
@@ -78,10 +78,11 @@ export function ProfileCard(): JSX.Element {
     </List.Item>
   );
 
-  const showWebWallet = attributes.web3_wallet.enabled;
   const showUsername = attributes.username.enabled;
   const showEmail = attributes.email_address.enabled;
   const showPhone = attributes.phone_number.enabled;
+  const showConnectedAccount = social && Object.values(social).filter(p => p.enabled).length > 0;
+  const showWebWallet = attributes.web3_wallet.enabled;
 
   return (
     <TitledCard
@@ -94,7 +95,7 @@ export function ProfileCard(): JSX.Element {
         {showUsername && buildUsernameRow()}
         {showEmail && <ProfileEmailAddresses />}
         {showPhone && <ProfilePhoneNumbers />}
-        {buildConnectedAccountsRow()}
+        {showConnectedAccount && buildConnectedAccountsRow()}
         {showWebWallet && <ProfileWeb3Wallets />}
       </List>
     </TitledCard>

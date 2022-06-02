@@ -109,6 +109,7 @@ export const PhoneDetail = (): JSX.Element => {
     <EditableListFieldRemoveCard
       type='phone'
       label={phoneIdent.phoneNumber}
+      buttonLabel='Remove'
       onCancel={() => {
         setShowRemovalPage(false);
       }}
