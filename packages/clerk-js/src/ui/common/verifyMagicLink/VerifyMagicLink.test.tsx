@@ -32,6 +32,9 @@ jest.mock('ui/contexts', () => {
         branded: true,
       },
     })),
+    useCoreSignUp: jest.fn(() => ({
+      status: 'complete',
+    })),
   };
 });
 

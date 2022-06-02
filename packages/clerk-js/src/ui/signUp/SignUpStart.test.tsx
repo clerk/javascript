@@ -9,7 +9,7 @@ import { SignUpStart } from './SignUpStart';
 
 const navigateMock = jest.fn();
 const mockCreateRequest = jest.fn();
-const mockSetActive = jest.fn();
+const mockSetSession = jest.fn();
 const mockAuthenticateWithRedirect = jest.fn();
 let mockUserSettings: UserSettings;
 
@@ -39,7 +39,7 @@ jest.mock('ui/contexts', () => {
     },
     useCoreClerk: jest.fn(() => ({
       frontendAPI: 'clerk.clerk.dev',
-      setActive: mockSetActive,
+      setSession: mockSetSession,
     })),
     useCoreSignUp: jest.fn(() => ({
       create: mockCreateRequest,
@@ -80,11 +80,8 @@ describe('<SignUpStart/>', () => {
     mockCreateRequest.mockImplementation(() =>
       Promise.resolve({
         emailAddress: 'jdoe@example.com',
-        verifications: {
-          emailAddress: {
-            status: 'unverified',
-          },
-        },
+        status: 'missing_requirements',
+        unverifiedFields: ['email_address'],
       }),
     );
 
@@ -374,7 +371,7 @@ describe('<SignUpStart/>', () => {
           render(<SignUpStart />);
 
           await waitFor(() => {
-            expect(mockSetActive).toHaveBeenCalled();
+            expect(mockSetSession).toHaveBeenCalled();
           });
         });
 
@@ -426,7 +423,7 @@ describe('<SignUpStart/>', () => {
           );
           render(<SignUpStart />);
           await waitFor(() => {
-            expect(mockSetActive).not.toHaveBeenCalled();
+            expect(mockSetSession).not.toHaveBeenCalled();
             // Required and optional fields are rendered
             screen.getByText(/First name/);
             screen.getByText(/Last name/);
@@ -499,7 +496,7 @@ describe('<SignUpStart/>', () => {
           render(<SignUpStart />);
 
           await waitFor(() => {
-            expect(mockSetActive).not.toHaveBeenCalled();
+            expect(mockSetSession).not.toHaveBeenCalled();
             screen.getByText(/First name/);
             screen.getByText(/Last name/);
             expect(screen.queryByText('Password')).not.toBeInTheDocument();
@@ -508,7 +505,7 @@ describe('<SignUpStart/>', () => {
           // Submit the form
           userEvent.click(screen.getByRole('button', { name: 'Sign up' }));
           await waitFor(() => {
-            expect(mockSetActive).toHaveBeenCalled();
+            expect(mockSetSession).toHaveBeenCalled();
           });
         });
 
