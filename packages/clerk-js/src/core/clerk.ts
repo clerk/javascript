@@ -331,9 +331,12 @@ export default class Clerk implements ClerkInterface {
     }
 
     this.session = session;
-    this.organization = (this.session?.user.organizationMemberships || [])
-      .map(om => om.organization)
-      .find(org => org.id === this.session?.lastActiveOrganizationId);
+    this.organization =
+      organization === null
+        ? null
+        : (this.session?.user.organizationMemberships || [])
+            .map(om => om.organization)
+            .find(org => org.id === this.session?.lastActiveOrganizationId);
     this.user = this.session ? this.session.user : null;
 
     this.#emit();
