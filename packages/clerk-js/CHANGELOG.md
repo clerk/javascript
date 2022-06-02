@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.12.0-staging.7](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.12.0-staging.6...@clerk/clerk-js@3.12.0-staging.7) (2022-06-02)
+
+### Features
+
+- **clerk-js:** Support multiple unverified identifiers during Sign up flow ([3ec9dd5](https://github.com/clerkinc/javascript/commit/3ec9dd58379b9e56eccde9ecad1081a69bb7bf6b))
+- **types,clerk-js:** Support required/optional email/phone for Progressive sign up instances ([13da457](https://github.com/clerkinc/javascript/commit/13da4576a08e4e396fa48605ecf61accc06057d5))
+
 ## [3.12.0-staging.6](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.12.0-staging.5...@clerk/clerk-js@3.12.0-staging.6) (2022-06-01)
 
 ### Features

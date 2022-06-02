@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.15.0-staging.2](https://github.com/clerkinc/javascript/compare/@clerk/types@2.15.0-staging.1...@clerk/types@2.15.0-staging.2) (2022-06-02)
+
+### Features
+
+- **types,clerk-js:** Support required/optional email/phone for Progressive sign up instances ([13da457](https://github.com/clerkinc/javascript/commit/13da4576a08e4e396fa48605ecf61accc06057d5))
+
 ## [2.15.0-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/types@2.15.0-staging.0...@clerk/types@2.15.0-staging.1) (2022-06-01)
 
 ### Features
