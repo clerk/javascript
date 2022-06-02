@@ -3,6 +3,9 @@ import type { Attributes, SignUpResource } from '@clerk/types';
 import { UserSettingsResource } from '@clerk/types';
 import { FieldState } from 'ui/common';
 
+/**
+ * ActiveIdentifier denotes which one of the email address or phone number takes priority when enabled
+ */
 export type ActiveIdentifier = 'emailAddress' | 'phoneNumber' | null | undefined;
 
 const FieldKeys = ['emailAddress', 'phoneNumber', 'username', 'firstName', 'lastName', 'password', 'ticket'];
@@ -14,7 +17,14 @@ export type FormState<T> = {
 
 export type Field = {
   disabled?: boolean;
+  /**
+   * Denotes if the corresponding input is required to be filled
+   */
   required: boolean;
+  /**
+   * Denotes if we have to render the corresponding input
+   */
+  show?: boolean;
 };
 
 export type Fields = {
@@ -27,6 +37,7 @@ type FieldDeterminationProps = {
   hasTicket?: boolean;
   hasEmail?: boolean;
   signUp?: SignUpResource | undefined;
+  isProgressiveSignUp: boolean;
 };
 
 export function determineActiveFields(fieldProps: FieldDeterminationProps): Fields {
@@ -81,14 +92,19 @@ export function minimizeFieldsForExistingSignup(fields: Fields, signUp: SignUpRe
   }
 }
 
-// TODO revisit when attributes.email_address.required becomes effective
-// TODO revisit when attributes.phone_number.required becomes effective
-export const getInitialActiveIdentifier = (attributes: Attributes): ActiveIdentifier => {
-  if (attributes.email_address.enabled && attributes.email_address.used_for_first_factor) {
+export const getInitialActiveIdentifier = (attributes: Attributes, isProgressiveSignUp: boolean): ActiveIdentifier => {
+  if (emailOrPhone(attributes, isProgressiveSignUp)) {
+    // If we are in the case of Email OR Phone, email takes priority
     return 'emailAddress';
   }
 
-  if (attributes.phone_number.enabled && attributes.phone_number.used_for_first_factor) {
+  const { email_address, phone_number } = attributes;
+
+  if (email_address.enabled && isProgressiveSignUp ? email_address.required : email_address.used_for_first_factor) {
+    return 'emailAddress';
+  }
+
+  if (phone_number.enabled && isProgressiveSignUp ? phone_number.required : phone_number.used_for_first_factor) {
     return 'phoneNumber';
   }
 
@@ -101,8 +117,14 @@ export function showFormFields(userSettings: UserSettingsResource): boolean {
   return userSettings.hasValidAuthFactor || (!socialProviderStrategies.length && !web3FirstFactors.length);
 }
 
-export function emailOrPhoneUsedForFF(attributes: Attributes) {
-  return attributes.email_address.used_for_first_factor && attributes.phone_number.used_for_first_factor;
+export function emailOrPhone(attributes: Attributes, isProgressiveSignUp: boolean) {
+  const { email_address, phone_number } = attributes;
+
+  if (isProgressiveSignUp) {
+    return email_address.enabled && phone_number.enabled && !email_address.required && !phone_number.required;
+  }
+
+  return email_address.used_for_first_factor && phone_number.used_for_first_factor;
 }
 
 function getField(fieldKey: FieldKey, fieldProps: FieldDeterminationProps): Field | undefined {
@@ -124,47 +146,73 @@ function getField(fieldKey: FieldKey, fieldProps: FieldDeterminationProps): Fiel
   }
 }
 
-// TODO revisit when attributes.email_address.required becomes effective
 function getEmailAddressField({
   attributes,
   hasTicket,
   hasEmail,
   activeCommIdentifierType,
-}: FieldDeterminationProps): Field | undefined {
+  isProgressiveSignUp,
+}: FieldDeterminationProps): Field {
+  if (isProgressiveSignUp) {
+    // If there is no ticket, or there is a ticket along with an email, and email address is enabled,
+    // we have to show it in the SignUp form
+    let show = (!hasTicket || (hasTicket && hasEmail)) && attributes.email_address.enabled;
+    // If we are in the case of Email OR Phone, determine if the initial input has to be the email address
+    // based on the active identifier type.
+    if (emailOrPhone(attributes, isProgressiveSignUp)) {
+      show = show && activeCommIdentifierType === 'emailAddress';
+    }
+
+    return {
+      required: attributes.email_address.required,
+      disabled: !!hasTicket && !!hasEmail,
+      show,
+    };
+  }
+
   const show =
     (!hasTicket || (hasTicket && hasEmail)) &&
     attributes.email_address.enabled &&
     attributes.email_address.used_for_first_factor &&
     activeCommIdentifierType == 'emailAddress';
 
-  if (!show) {
-    return;
-  }
-
   return {
     required: true, // as far as the FE is concerned the email address is required, if shown
     disabled: !!hasTicket && !!hasEmail,
+    show,
   };
 }
 
-// TODO revisit when attributes.phone_number.required becomes effective
 function getPhoneNumberField({
   attributes,
   hasTicket,
   activeCommIdentifierType,
-}: FieldDeterminationProps): Field | undefined {
+  isProgressiveSignUp,
+}: FieldDeterminationProps): Field {
+  if (isProgressiveSignUp) {
+    // If there is no ticket and phone number is enabled, we have to show it in the SignUp form
+    let show = !hasTicket && attributes.phone_number.enabled;
+    // If we are in the case of Email OR Phone, determine if the initial input has to be the phone number
+    // based on the active identifier type.
+    if (emailOrPhone(attributes, isProgressiveSignUp)) {
+      show = show && activeCommIdentifierType === 'phoneNumber';
+    }
+
+    return {
+      required: attributes.phone_number.required,
+      show,
+    };
+  }
+
   const show =
     !hasTicket &&
     attributes.phone_number.enabled &&
     attributes.phone_number.used_for_first_factor &&
     activeCommIdentifierType == 'phoneNumber';
 
-  if (!show) {
-    return;
-  }
-
   return {
     required: true, // as far as the FE is concerned the phone number is required, if shown
+    show,
   };
 }
 

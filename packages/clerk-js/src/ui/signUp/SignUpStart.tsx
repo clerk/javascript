@@ -24,7 +24,7 @@ import { SignUpForm } from './SignUpForm';
 import {
   ActiveIdentifier,
   determineActiveFields,
-  emailOrPhoneUsedForFF,
+  emailOrPhone,
   getInitialActiveIdentifier,
   showFormFields,
 } from './signUpFormHelpers';
@@ -38,7 +38,7 @@ function _SignUpStart(): JSX.Element {
   const { setActive } = useCoreClerk();
   const { navigateAfterSignUp } = useSignUpContext();
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
-    getInitialActiveIdentifier(attributes),
+    getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
   const signUp = useCoreSignUp();
   const [isLoading, setIsLoading] = React.useState(false);
@@ -62,12 +62,14 @@ function _SignUpStart(): JSX.Element {
   const [error, setError] = React.useState<string | undefined>();
   const hasTicket = !!formState.ticket.value;
   const hasEmail = !!formState.emailAddress.value;
+  const isProgressiveSignUp = userSettings.signUp.progressive;
 
   const fields = determineActiveFields({
     attributes,
     hasTicket,
     hasEmail,
     activeCommIdentifierType,
+    isProgressiveSignUp,
   });
 
   const oauthOptions = userSettings.socialProviderStrategies;
@@ -138,7 +140,7 @@ function _SignUpStart(): JSX.Element {
   const handleChangeActive = (type: ActiveIdentifier) => (e: React.MouseEvent) => {
     e.preventDefault();
 
-    if (!emailOrPhoneUsedForFF(attributes)) {
+    if (!emailOrPhone(attributes, isProgressiveSignUp)) {
       return;
     }
 
@@ -149,7 +151,7 @@ function _SignUpStart(): JSX.Element {
     e.preventDefault();
 
     const fieldsToSubmit = Object.entries(fields).reduce(
-      (acc, [k, v]) => [...acc, ...(v && formState[k as FormStateKey] ? [formState[k as FormStateKey]] : [])],
+      (acc, [k, v]) => [...acc, ...(v && formState[k as FormStateKey]?.value ? [formState[k as FormStateKey]] : [])],
       [] as Array<FieldState<any>>,
     );
 
@@ -221,7 +223,7 @@ function _SignUpStart(): JSX.Element {
             <SignUpForm
               fields={fields}
               formState={formState}
-              toggleEmailPhone={emailOrPhoneUsedForFF(attributes)}
+              toggleEmailPhone={emailOrPhone(attributes, isProgressiveSignUp)}
               handleSubmit={handleSubmit}
               handleChangeActive={handleChangeActive}
             />

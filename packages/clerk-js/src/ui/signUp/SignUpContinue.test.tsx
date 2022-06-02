@@ -99,6 +99,9 @@ describe('<SignUpContinue/>', () => {
           strategy: 'oauth_facebook',
         },
       },
+      sign_up: {
+        progressive: false,
+      },
     } as UserSettingsJSON);
   });
 
@@ -161,6 +164,29 @@ describe('<SignUpContinue/>', () => {
   });
 
   it('patches the existing signup when user submits the form', async () => {
+    (useCoreSignUp as jest.Mock).mockImplementation(() => {
+      return {
+        id: 'su_perman',
+        update: mockUpdateRequest,
+        verifications: {
+          externalAccount: {
+            status: 'verified',
+          },
+          emailAddress: {
+            status: 'unverified',
+          },
+          phoneNumber: {
+            status: 'verified',
+          },
+        },
+        firstName: null,
+        lastName: null,
+        emailAddress: 'bryan@taken.com',
+        phoneNumber: '+12125551001',
+        username: 'bryanmills',
+      };
+    });
+
     mockUpdateRequest.mockImplementation(() =>
       Promise.resolve({
         firstName: 'Bryan',
@@ -264,6 +290,9 @@ describe('<SignUpContinue/>', () => {
           strategy: 'oauth_facebook',
         },
       },
+      sign_up: {
+        progressive: false,
+      },
     } as UserSettingsJSON);
 
     mockUpdateRequest.mockImplementation(() =>
@@ -276,6 +305,27 @@ describe('<SignUpContinue/>', () => {
         },
       }),
     );
+
+    (useCoreSignUp as jest.Mock).mockImplementation(() => {
+      return {
+        id: 'su_perman',
+        update: mockUpdateRequest,
+        verifications: {
+          externalAccount: {
+            status: 'verified',
+          },
+          emailAddress: {
+            status: 'verified',
+          },
+          phoneNumber: {
+            status: 'unverified',
+          },
+        },
+        emailAddress: 'bryan@taken.com',
+        phoneNumber: '+15615551001',
+        username: 'bryanmills',
+      };
+    });
 
     render(<SignUpContinue />);
 
@@ -367,6 +417,9 @@ describe('<SignUpContinue/>', () => {
           enabled: true,
           strategy: 'oauth_facebook',
         },
+      },
+      sign_up: {
+        progressive: false,
       },
     } as UserSettingsJSON);
 

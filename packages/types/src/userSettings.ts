@@ -41,6 +41,7 @@ export type SignInData = {
 
 export type SignUpData = {
   allowlist_only: boolean;
+  progressive: boolean;
 };
 
 export type OAuthProviders = {
