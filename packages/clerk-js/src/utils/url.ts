@@ -134,7 +134,17 @@ export function buildURL<B extends boolean>(
 export function buildURL(params: BuildURLParams, options: BuildURLOptions<boolean> = {}): URL | string {
   const { base, hashPath, hashSearch, ...rest } = params;
 
-  const url = new URL(base || '', window.location.href);
+  let fallbackBase = '';
+  // This check is necessary for React native environments where window is undefined.
+  // TODO: Refactor all window and document usages in clerk-js and import them from
+  // a single file that will be mocked easily in React native environments.
+  if (typeof window !== 'undefined' && !!window.location) {
+    fallbackBase = window.location.href;
+  } else {
+    fallbackBase = 'http://react-native-fake-base-url';
+  }
+
+  const url = new URL(base || fallbackBase);
   Object.assign(url, rest);
 
   // Treat that hash part of the main URL as if it's another URL with a pathname and a search.
