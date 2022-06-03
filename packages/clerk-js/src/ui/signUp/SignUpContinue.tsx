@@ -123,7 +123,7 @@ function _SignUpContinue(): JSX.Element | null {
       <Header
         alert={
           <>
-            <Alert type='info'>Please fill in the following information to complete your sign-up</Alert>
+            <Alert type='info'>Please complete the following to sign up</Alert>
             {error && (
               <Alert
                 type='error'
