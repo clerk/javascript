@@ -14,7 +14,7 @@ export const WEB3_PROVIDERS: Web3ProviderData[] = [
   {
     provider: 'metamask',
     strategy: 'web3_metamask_signature',
-    name: 'Metamask',
+    name: 'MetaMask',
   },
 ];
 
