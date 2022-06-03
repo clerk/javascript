@@ -247,6 +247,12 @@ export default class IsomorphicClerk {
     }
   }
 
+  /**
+   * `setActive` can be used to set the active session and/or organization.
+   * It will eventually replace `setSession`.
+   *
+   * @experimental
+   */
   setActive = ({ session, organization, beforeEmit }: SetActiveParams): Promise<void> => {
     if (this.clerkjs) {
       return this.clerkjs.setActive({ session, organization, beforeEmit });
@@ -255,7 +261,6 @@ export default class IsomorphicClerk {
     }
   };
 
-  /** @deprecated Use `setActive` instead */
   setSession = (
     session: ActiveSessionResource | string | null,
     beforeEmit?: (session: ActiveSessionResource | null) => void | Promise<any>,
