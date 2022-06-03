@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.3.0-staging.4](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@3.3.0-staging.3...@clerk/clerk-react@3.3.0-staging.4) (2022-06-03)
+
+### Bug Fixes
+
+- **clerk-react:** Correct annotations in isomorphicClerk for setSession ([56abc04](https://github.com/clerkinc/javascript/commit/56abc04e82ed4adf9f1c366620e08526d52da0f5))
+
 ## [3.3.0-staging.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@3.3.0-staging.2...@clerk/clerk-react@3.3.0-staging.3) (2022-06-03)
 
 **Note:** Version bump only for package @clerk/clerk-react

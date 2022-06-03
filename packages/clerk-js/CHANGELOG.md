@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.12.0-staging.9](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.12.0-staging.8...@clerk/clerk-js@3.12.0-staging.9) (2022-06-03)
+
+### Bug Fixes
+
+- **clerk-js:** If organization is `null`, set the active org as null ([f7bff5c](https://github.com/clerkinc/javascript/commit/f7bff5c586a33e2b45258912924ab27b4ecf6da9))
+- **clerk-js:** Render SignUp form input errors if missing ([bec968c](https://github.com/clerkinc/javascript/commit/bec968c79a34b77ca62d74985e4647d556248644))
+
 ## [3.12.0-staging.8](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.12.0-staging.7...@clerk/clerk-js@3.12.0-staging.8) (2022-06-03)
 
 ### Bug Fixes
