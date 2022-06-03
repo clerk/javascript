@@ -85,7 +85,7 @@ export function SignUpForm({
           </Control>
         )}
 
-        {fields.emailAddress?.show && (
+        {fields.emailAddress && (
           <Control
             key='emailAddress'
             htmlFor='emailAddress'
@@ -105,7 +105,7 @@ export function SignUpForm({
           </Control>
         )}
 
-        {fields.phoneNumber?.show && (
+        {fields.phoneNumber && (
           <Control
             key='phoneNumber'
             htmlFor='phoneNumber'

@@ -165,7 +165,7 @@ function _SignUpStart(): JSX.Element {
     e.preventDefault();
 
     const fieldsToSubmit = Object.entries(fields).reduce(
-      (acc, [k, v]) => [...acc, ...(v && formState[k as FormStateKey]?.value ? [formState[k as FormStateKey]] : [])],
+      (acc, [k, v]) => [...acc, ...(v && formState[k as FormStateKey] ? [formState[k as FormStateKey]] : [])],
       [] as Array<FieldState<any>>,
     );
 

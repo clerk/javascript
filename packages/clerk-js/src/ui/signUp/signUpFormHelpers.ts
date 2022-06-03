@@ -21,10 +21,6 @@ export type Field = {
    * Denotes if the corresponding input is required to be filled
    */
   required: boolean;
-  /**
-   * Denotes if we have to render the corresponding input
-   */
-  show?: boolean;
 };
 
 export type Fields = {
@@ -152,21 +148,25 @@ function getEmailAddressField({
   hasEmail,
   activeCommIdentifierType,
   isProgressiveSignUp,
-}: FieldDeterminationProps): Field {
+}: FieldDeterminationProps): Field | undefined {
   if (isProgressiveSignUp) {
     // If there is no ticket, or there is a ticket along with an email, and email address is enabled,
     // we have to show it in the SignUp form
-    let show = (!hasTicket || (hasTicket && hasEmail)) && attributes.email_address.enabled;
+    const show = (!hasTicket || (hasTicket && hasEmail)) && attributes.email_address.enabled;
+
+    if (!show) {
+      return;
+    }
+
     // If we are in the case of Email OR Phone, determine if the initial input has to be the email address
     // based on the active identifier type.
-    if (emailOrPhone(attributes, isProgressiveSignUp)) {
-      show = show && activeCommIdentifierType === 'emailAddress';
+    if (emailOrPhone(attributes, isProgressiveSignUp) && activeCommIdentifierType !== 'emailAddress') {
+      return;
     }
 
     return {
       required: attributes.email_address.required,
       disabled: !!hasTicket && !!hasEmail,
-      show,
     };
   }
 
@@ -176,10 +176,13 @@ function getEmailAddressField({
     attributes.email_address.used_for_first_factor &&
     activeCommIdentifierType == 'emailAddress';
 
+  if (!show) {
+    return;
+  }
+
   return {
     required: true, // as far as the FE is concerned the email address is required, if shown
     disabled: !!hasTicket && !!hasEmail,
-    show,
   };
 }
 
@@ -188,19 +191,23 @@ function getPhoneNumberField({
   hasTicket,
   activeCommIdentifierType,
   isProgressiveSignUp,
-}: FieldDeterminationProps): Field {
+}: FieldDeterminationProps): Field | undefined {
   if (isProgressiveSignUp) {
     // If there is no ticket and phone number is enabled, we have to show it in the SignUp form
-    let show = !hasTicket && attributes.phone_number.enabled;
+    const show = !hasTicket && attributes.phone_number.enabled;
+
+    if (!show) {
+      return;
+    }
+
     // If we are in the case of Email OR Phone, determine if the initial input has to be the phone number
     // based on the active identifier type.
-    if (emailOrPhone(attributes, isProgressiveSignUp)) {
-      show = show && activeCommIdentifierType === 'phoneNumber';
+    if (emailOrPhone(attributes, isProgressiveSignUp) && activeCommIdentifierType !== 'phoneNumber') {
+      return;
     }
 
     return {
       required: attributes.phone_number.required,
-      show,
     };
   }
 
@@ -210,9 +217,12 @@ function getPhoneNumberField({
     attributes.phone_number.used_for_first_factor &&
     activeCommIdentifierType == 'phoneNumber';
 
+  if (!show) {
+    return;
+  }
+
   return {
     required: true, // as far as the FE is concerned the phone number is required, if shown
-    show,
   };
 }
 
