@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.12.0-staging.11](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.12.0-staging.10...@clerk/clerk-js@3.12.0-staging.11) (2022-06-03)
+
+### Bug Fixes
+
+- **clerk-js:** Teach ClerkJS to work in expo again ([5492b69](https://github.com/clerkinc/javascript/commit/5492b691f4e865223487e86585d8539bbf99dcf3))
+
 ## [3.12.0-staging.10](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.12.0-staging.9...@clerk/clerk-js@3.12.0-staging.10) (2022-06-03)
 
 ### Bug Fixes
