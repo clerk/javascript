@@ -4,7 +4,6 @@ import { VerifyMagicLink } from 'ui/common';
 import { SSOCallback } from 'ui/common/SSOCallback';
 import { ComponentContext, useCoreClerk, useSignUpContext, withCoreSessionSwitchGuard } from 'ui/contexts';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from 'ui/router';
-import { buildURL } from 'utils/url';
 
 import { SignUpContinue } from './SignUpContinue';
 import { SignUpStart } from './SignUpStart';
