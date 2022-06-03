@@ -57,7 +57,7 @@ type Web3Providers = {
 export const WEB3_PROVIDERS: Web3Providers = Object.freeze({
   metamask: {
     id: 'metamask',
-    name: 'Metamask',
+    name: 'MetaMask',
   },
 });
 
