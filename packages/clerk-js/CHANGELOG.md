@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.12.0-staging.10](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.12.0-staging.9...@clerk/clerk-js@3.12.0-staging.10) (2022-06-03)
+
+### Bug Fixes
+
+- **clerk-js:** Apply minor copywriting fixes ([4a1dab4](https://github.com/clerkinc/javascript/commit/4a1dab454908cc90276a67e0f3d43bb625679ee8))
+- **clerk-js:** Apply minor copywriting fixes - pt2 ([49c128b](https://github.com/clerkinc/javascript/commit/49c128b80d0282d0e687470990b36080544dc176))
+
 ## [3.12.0-staging.9](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.12.0-staging.8...@clerk/clerk-js@3.12.0-staging.9) (2022-06-03)
 
 ### Bug Fixes
