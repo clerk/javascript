@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.12.0-staging.8](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.12.0-staging.7...@clerk/clerk-js@3.12.0-staging.8) (2022-06-03)
+
+### Bug Fixes
+
+- **clerk-js,types:** Typo for MetaMask web3 provider name ([922dcb5](https://github.com/clerkinc/javascript/commit/922dcb52f406a17da8038cafaf10353b15aab2bf))
+- **clerk-js:** Improve removal page copyright for connected account and web3 wallet ([bfdfbba](https://github.com/clerkinc/javascript/commit/bfdfbba20fdfcdb86f451902ed12133ee54bd3fe))
+- **clerk-js:** Render UserProfile connected account section only if at least one provider is enabled ([23a127f](https://github.com/clerkinc/javascript/commit/23a127f60b08b7551df05d5ec88980f404e527d0))
+
 ## [3.12.0-staging.7](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.12.0-staging.6...@clerk/clerk-js@3.12.0-staging.7) (2022-06-02)
 
 ### Features

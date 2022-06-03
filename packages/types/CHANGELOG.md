@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.15.0-staging.3](https://github.com/clerkinc/javascript/compare/@clerk/types@2.15.0-staging.2...@clerk/types@2.15.0-staging.3) (2022-06-03)
+
+### Bug Fixes
+
+- **clerk-js,types:** Typo for MetaMask web3 provider name ([922dcb5](https://github.com/clerkinc/javascript/commit/922dcb52f406a17da8038cafaf10353b15aab2bf))
+
 ## [2.15.0-staging.2](https://github.com/clerkinc/javascript/compare/@clerk/types@2.15.0-staging.1...@clerk/types@2.15.0-staging.2) (2022-06-02)
 
 ### Features
