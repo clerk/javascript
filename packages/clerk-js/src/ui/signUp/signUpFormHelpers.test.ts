@@ -42,11 +42,6 @@ describe('determineActiveFields()', () => {
           emailAddress: {
             required: true,
             disabled: false,
-            show: true,
-          },
-          phoneNumber: {
-            required: true,
-            show: false,
           },
           firstName: {
             required: true,
@@ -93,14 +88,8 @@ describe('determineActiveFields()', () => {
           },
         },
         {
-          emailAddress: {
-            required: true,
-            disabled: false,
-            show: false,
-          },
           phoneNumber: {
             required: true,
-            show: true,
           },
           firstName: {
             required: true,
@@ -150,11 +139,6 @@ describe('determineActiveFields()', () => {
           emailAddress: {
             required: true, // email will be toggled on initially
             disabled: false,
-            show: true,
-          },
-          phoneNumber: {
-            required: true,
-            show: false,
           },
           firstName: {
             required: true,
@@ -201,15 +185,6 @@ describe('determineActiveFields()', () => {
           },
         },
         {
-          emailAddress: {
-            required: true,
-            disabled: false,
-            show: false,
-          },
-          phoneNumber: {
-            required: true,
-            show: false,
-          },
           firstName: {
             required: false,
           },
@@ -254,17 +229,7 @@ describe('determineActiveFields()', () => {
             required: false,
           },
         },
-        {
-          emailAddress: {
-            required: true,
-            disabled: false,
-            show: false,
-          },
-          phoneNumber: {
-            required: true,
-            show: false,
-          },
-        },
+        {},
       ],
     ];
 
@@ -365,11 +330,6 @@ describe('determineActiveFields()', () => {
           emailAddress: {
             required: true,
             disabled: false,
-            show: true,
-          },
-          phoneNumber: {
-            required: false,
-            show: false,
           },
         },
       ],
@@ -389,14 +349,8 @@ describe('determineActiveFields()', () => {
           },
         },
         {
-          emailAddress: {
-            required: false,
-            disabled: false,
-            show: false,
-          },
           phoneNumber: {
             required: true,
-            show: true,
           },
         },
       ],
@@ -419,11 +373,9 @@ describe('determineActiveFields()', () => {
           emailAddress: {
             required: true,
             disabled: false,
-            show: true,
           },
           phoneNumber: {
             required: true,
-            show: true,
           },
         },
       ],
@@ -446,11 +398,6 @@ describe('determineActiveFields()', () => {
           emailAddress: {
             required: false, // email will be toggled on initially
             disabled: false,
-            show: true,
-          },
-          phoneNumber: {
-            required: false,
-            show: false,
           },
         },
       ],
@@ -473,11 +420,9 @@ describe('determineActiveFields()', () => {
           emailAddress: {
             required: true,
             disabled: false,
-            show: true,
           },
           phoneNumber: {
             required: false,
-            show: true,
           },
         },
       ],
@@ -500,11 +445,9 @@ describe('determineActiveFields()', () => {
           emailAddress: {
             required: false,
             disabled: false,
-            show: true,
           },
           phoneNumber: {
             required: true,
-            show: true,
           },
         },
       ],
