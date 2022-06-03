@@ -619,7 +619,7 @@ describe('<SignInFactorOne/>', () => {
 
       render(<SignInFactorOne />);
 
-      screen.getByText(/no available authentication method/);
+      screen.getByText(/no available authentication factor/);
     });
   });
 });
