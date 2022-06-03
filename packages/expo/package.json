@@ -26,7 +26,7 @@
     "dev": "tsc -p tsconfig.build.json --watch"
   },
   "dependencies": {
-    "@clerk/clerk-js": "^3.12.0",
+    "@clerk/clerk-js": "^3.12.0-staging.10",
     "@clerk/clerk-react": "^3.3.0-staging.4",
     "base-64": "^1.0.0"
   },
