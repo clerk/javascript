@@ -39,6 +39,7 @@ function SignUpRoutes(): JSX.Element {
       </Route>
       <Route path='verify'>
         <VerifyMagicLink
+          successHeader='Successfully verified email'
           redirectUrlComplete={signUpContext.afterSignUpUrl || signUpContext.redirectUrl || undefined}
           verifyEmailPath='../verify-email-address'
           verifyPhonePath='../verify-phone-number'

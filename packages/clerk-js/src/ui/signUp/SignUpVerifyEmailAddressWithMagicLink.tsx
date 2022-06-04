@@ -70,7 +70,12 @@ export function SignUpVerifyEmailAddressWithMagicLink(): JSX.Element {
   };
 
   if (showVerifyModal) {
-    return <MagicLinkVerificationStatusModal verificationStatus='verified_switch_tab' />;
+    return (
+      <MagicLinkVerificationStatusModal
+        successHeader='Successfully verified email'
+        verificationStatus='verified_switch_tab'
+      />
+    );
   }
 
   return (
