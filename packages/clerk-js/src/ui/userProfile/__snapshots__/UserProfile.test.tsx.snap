@@ -106,7 +106,7 @@ Array [
           <div
             className="title"
           >
-            Connected accounts
+            Social accounts
           </div>
           <div
             className="listItem line"
@@ -3598,7 +3598,7 @@ Array [
         <h2
           className="heading h2 cl-title"
         >
-          Connected accounts
+          Social accounts
         </h2>
         <p
           className="cl-subtitle"
@@ -3692,7 +3692,7 @@ Array [
         <h2
           className="heading h2 cl-title"
         >
-          Connected account
+          Social account
         </h2>
         <p
           className="cl-subtitle"

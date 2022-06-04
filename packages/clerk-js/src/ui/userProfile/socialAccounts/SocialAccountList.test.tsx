@@ -13,7 +13,7 @@ import { ExternalAccount, User } from 'core/resources';
 import { UserSettings } from 'core/resources/UserSettings';
 import React from 'react';
 
-import { ConnectedAccountList } from './ConnectedAccountList';
+import { SocialAccountList } from './SocialAccountList';
 
 const mockNavigate = jest.fn();
 
@@ -170,27 +170,27 @@ jest.mock('ui/router/RouteContext', () => {
   };
 });
 
-describe('<ConnectedAccountList/>', () => {
+describe('<SocialAccountList/>', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('renders a list of Connected Accounts', () => {
+  it('renders a list of Social Accounts', () => {
     mockUseEnvironment.mockImplementation(() => environmentContext);
-    const tree = renderJSON(<ConnectedAccountList />);
+    const tree = renderJSON(<SocialAccountList />);
     expect(tree).toMatchSnapshot();
   });
 
   it('renders an empty list if there are no enabled providers', () => {
     mockUseEnvironment.mockImplementation(() => emptyEnvironmentContext);
-    const tree = renderJSON(<ConnectedAccountList />);
+    const tree = renderJSON(<SocialAccountList />);
     expect(tree).toMatchSnapshot();
   });
 
   it('navigates to the external account verification URL when the users connects an oauth provider', async () => {
     mockUseEnvironment.mockImplementation(() => environmentContext);
 
-    render(<ConnectedAccountList />);
+    render(<SocialAccountList />);
 
     mockCreateExternalAccount.mockImplementation(() => {
       return Promise.resolve(

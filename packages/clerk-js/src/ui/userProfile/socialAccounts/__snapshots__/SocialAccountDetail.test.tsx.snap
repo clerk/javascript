@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<ConnectedAccountDetail/> Connected Account Detail renders Google account 1`] = `
+exports[`<SocialAccountDetail/> Social Account Detail renders Google account 1`] = `
 Array [
   <div
     className="cl-page-heading"
@@ -20,7 +20,7 @@ Array [
       <h2
         className="heading h2 cl-title"
       >
-        Connected account
+        Social account
       </h2>
       <p
         className="cl-subtitle"

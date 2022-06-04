@@ -530,7 +530,7 @@ exports[`<ProfileCard/> renders the profile card with verified external accounts
       <div
         className="title"
       >
-        Connected accounts
+        Social accounts
       </div>
       <div
         className="listItem line"

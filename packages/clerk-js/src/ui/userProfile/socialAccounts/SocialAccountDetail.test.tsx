@@ -2,7 +2,7 @@ import { render, renderJSON, screen, userEvent } from '@clerk/shared/testUtils';
 import type { ExternalAccountResource, UserResource } from '@clerk/types';
 import React from 'react';
 
-import { ConnectedAccountDetail } from './ConnectedAccountDetail';
+import { SocialAccountDetail } from './SocialAccountDetail';
 
 const mockFacebookDestroy = jest.fn();
 const mockGoogleDestroy = jest.fn();
@@ -58,7 +58,7 @@ jest.mock('ui/router/RouteContext', () => {
   return {
     useRouter: () => {
       return {
-        params: { connected_account_id: 'gac_swag' },
+        params: { social_account_id: 'gac_swag' },
         resolve: () => {
           return {
             toURL: {
@@ -80,17 +80,17 @@ jest.mock('ui/hooks', () => ({
   }),
 }));
 
-describe('<ConnectedAccountDetail/>', () => {
-  it('Connected Account Detail renders Google account', () => {
-    const tree = renderJSON(<ConnectedAccountDetail />);
+describe('<SocialAccountDetail/>', () => {
+  it('Social Account Detail renders Google account', () => {
+    const tree = renderJSON(<SocialAccountDetail />);
     expect(tree).toMatchSnapshot();
   });
 
-  it('Unlink Google Connected Account', () => {
-    render(<ConnectedAccountDetail />);
+  it('Unlink Google Social Account', () => {
+    render(<SocialAccountDetail />);
 
     userEvent.click(screen.getByText('Unlink'));
-    userEvent.click(screen.getByText('Unlink connected account', { selector: 'button' }));
+    userEvent.click(screen.getByText('Unlink social account', { selector: 'button' }));
     expect(mockGoogleDestroy).toHaveBeenCalled();
   });
 });

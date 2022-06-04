@@ -13,13 +13,13 @@ import { useRouter } from 'ui/router';
 import { EditableListFieldRemoveCard } from 'ui/userProfile/EditableListFieldRemoveCard';
 import { PageHeading } from 'ui/userProfile/pageHeading';
 
-export function ConnectedAccountDetail(): JSX.Element | null {
+export function SocialAccountDetail(): JSX.Element | null {
   const { navigate } = useNavigate();
   const user = useCoreUser();
   const { params } = useRouter();
   const [showRemovalPage, setShowRemovalPage] = React.useState<boolean>(false);
 
-  const externalAccount = user.externalAccounts.find(ea => ea.id === params.connected_account_id);
+  const externalAccount = user.externalAccounts.find(ea => ea.id === params.social_account_id);
 
   if (!externalAccount) {
     return null;
@@ -77,7 +77,7 @@ export function ConnectedAccountDetail(): JSX.Element | null {
 
   const disconnectExternalAccountScreen = (
     <EditableListFieldRemoveCard
-      type='connected_account'
+      type='social_account'
       label={titleize(externalAccount.providerSlug())}
       buttonLabel='Unlink'
       onCancel={() => {
@@ -93,7 +93,7 @@ export function ConnectedAccountDetail(): JSX.Element | null {
   return (
     <>
       <PageHeading
-        title='Connected account'
+        title='Social account'
         backTo='./../'
       />
       {showRemovalPage && disconnectExternalAccountScreen}

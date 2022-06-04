@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<ConnectedAccountList/> renders a list of Connected Accounts 1`] = `
+exports[`<SocialAccountList/> renders a list of Social Accounts 1`] = `
 Array [
   <div
     className="cl-page-heading"
@@ -20,7 +20,7 @@ Array [
       <h2
         className="heading h2 cl-title"
       >
-        Connected accounts
+        Social accounts
       </h2>
       <p
         className="cl-subtitle"
@@ -198,7 +198,7 @@ Array [
 ]
 `;
 
-exports[`<ConnectedAccountList/> renders an empty list if there are no enabled providers 1`] = `
+exports[`<SocialAccountList/> renders an empty list if there are no enabled providers 1`] = `
 Array [
   <div
     className="cl-page-heading"
@@ -218,7 +218,7 @@ Array [
       <h2
         className="heading h2 cl-title"
       >
-        Connected accounts
+        Social accounts
       </h2>
       <p
         className="cl-subtitle"
