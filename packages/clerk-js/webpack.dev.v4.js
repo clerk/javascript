@@ -3,6 +3,7 @@ const webpack = require('webpack');
 const packageJSON = require('./package.json');
 const path = require('path');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const ReactRefreshTypeScript = require('react-refresh-typescript');
 
 module.exports = env => {
   const mode = env.prod ? 'production' : 'development';
@@ -13,9 +14,6 @@ module.exports = env => {
     plugins: [
       new ReactRefreshWebpackPlugin({ overlay: { sockHost: 'js.lclclerk.com' } }),
       ...defineConstants({ mode, packageJSON }),
-      new webpack.ProvidePlugin({
-        jsx: ['@emotion/react', 'jsx'],
-      }),
     ],
     devtool: isProduction ? undefined : 'eval-cheap-source-map',
     entry: './src/index.browser.v4.ts',
@@ -23,22 +21,23 @@ module.exports = env => {
       extensions: ['.ts', '.tsx', '.js', '.jsx'],
     },
     module: {
-      rules: [loadSvgs, loadTypescriptWithESBuild],
+      rules: [loadSvgs, loadTypescriptWithTsLoader],
     },
     ...devServerOutput,
   };
 };
 
-const loadTypescriptWithESBuild = {
+const loadTypescriptWithTsLoader = {
   test: /\.(ts|js)x?$/,
   exclude: /node_modules/,
   use: [
     {
-      loader: 'esbuild-loader',
+      loader: 'ts-loader',
       options: {
-        loader: 'tsx',
-        target: 'ES2019',
-        tsconfigRaw: require('./tsconfig.v4.json'),
+        transpileOnly: true,
+        getCustomTransformers: () => ({
+          before: [ReactRefreshTypeScript()],
+        }),
       },
     },
   ],
