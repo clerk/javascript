@@ -1,2 +1,2 @@
-import Components from './Components';
-export default Components;
+export { mountComponentRenderer } from './Components';
+export type { ComponentControls, MountComponentRenderer } from './Components';

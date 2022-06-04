@@ -1,9 +1,9 @@
 import 'regenerator-runtime/runtime';
 
 import Clerk from './core/clerk';
-import Components from './v4';
+import { mountComponentRenderer } from './v4';
 
-Clerk.Components = Components as any;
+Clerk.mountComponentRenderer = mountComponentRenderer;
 
 const frontendApi =
   document.querySelector('script[data-clerk-frontend-api]')?.getAttribute('data-clerk-frontend-api') || '';
