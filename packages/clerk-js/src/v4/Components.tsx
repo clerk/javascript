@@ -15,6 +15,25 @@ import { SignIn, SignInModal } from './signIn';
 import { SignUp } from './signUp';
 import { InternalThemeProvider } from './styledSystem';
 
+export type MountComponentRenderer = (
+  clerk: Clerk,
+  environment: EnvironmentResource,
+  options: ClerkOptions,
+) => ComponentControls;
+
+export type ComponentControls = {
+  mountComponent: (params: {
+    name: AvailableComponentNames;
+    node: HTMLDivElement;
+    nodeClassName: string;
+    props?: AvailableComponentProps;
+  }) => void;
+  unmountComponent: (params: { node: HTMLDivElement }) => void;
+  updateAppearanceProp: (appearance: Appearance | undefined) => void;
+  openModal: <T extends 'signIn' | 'signUp'>(modal: T, props: T extends 'signIn' ? SignInProps : SignUpProps) => void;
+  closeModal: (modal: 'signIn' | 'signUp') => void;
+};
+
 const Modal = (props: any) => {
   return <div {...props}>modal {props.children}</div>;
 };
@@ -55,171 +74,151 @@ function assertDOMElement(element: HTMLElement): asserts element {
   }
 }
 
-export default class Components extends React.Component<ComponentsProps, ComponentsState> {
-  static render(clerk: Clerk, environment: EnvironmentResource, options: ClerkOptions): Components {
-    /**  Merge theme retrieved from the network with user supplied theme options. */
-    // TODO: Remove all helpers
-    // injectTheme(
-    //   environment.displayConfig.theme,
-    //   deepCamelToSnake(options.theme || {}) as DeepPartial<DisplayThemeJSON>,
-    // );
+const addMountNodeClass = (node: HTMLDivElement, className: string) => {
+  node.className = 'cl-component ' + className;
+};
 
-    const clerkRoot = document.createElement('DIV');
-    clerkRoot.setAttribute('id', 'clerk-components');
-    document.body.appendChild(clerkRoot);
+export const mountComponentRenderer = (
+  clerk: Clerk,
+  environment: EnvironmentResource,
+  options: ClerkOptions,
+): ComponentControls => {
+  const clerkRoot = document.createElement('div');
+  clerkRoot.setAttribute('id', 'clerk-components');
+  document.body.appendChild(clerkRoot);
 
-    return ReactDOM.render<ComponentsProps, Components>(
-      <Components
-        clerk={clerk}
-        environment={environment}
-        options={options}
-      />,
-      clerkRoot,
-    );
-  }
+  ReactDOM.render<ComponentsProps>(
+    <Components
+      clerk={clerk}
+      environment={environment}
+      options={options}
+    />,
+    clerkRoot,
+  );
 
-  constructor(props: ComponentsProps) {
-    super(props);
-    this.state = {
-      appearance: props.options.appearance,
-      signInModal: null,
-      signUpModal: null,
-      nodes: new Map(),
+  return componentsControls;
+};
+
+const componentsControls = {} as ComponentControls;
+
+const Components = (props: ComponentsProps) => {
+  const [state, setState] = React.useState<ComponentsState>({
+    appearance: props.options.appearance,
+    signInModal: null,
+    signUpModal: null,
+    nodes: new Map(),
+  });
+  const { signInModal, signUpModal, nodes } = state;
+  const mountedNodes: JSX.Element[] = [];
+
+  React.useEffect(() => {
+    componentsControls.mountComponent = params => {
+      const { node, name, nodeClassName, props } = params;
+      assertDOMElement(node);
+      addMountNodeClass(node, nodeClassName);
+      setState(s => {
+        s.nodes.set(node, { key: `p${++portalCt}`, name, props });
+        return { ...s, nodes };
+      });
     };
-  }
 
-  private static _addMountNodeClass(node: HTMLDivElement, className: string) {
-    node.className = 'cl-component ' + className;
-  }
+    componentsControls.unmountComponent = params => {
+      const { node } = params;
+      setState(s => {
+        s.nodes.delete(node);
+        return { ...s, nodes };
+      });
+    };
 
-  openSignIn = (nodeProps: SignInProps = {}): void => {
-    this.setState({ signInModal: nodeProps });
-  };
+    componentsControls.updateAppearanceProp = appearance => {
+      setState(s => ({ ...s, appearance }));
+    };
 
-  closeSignIn = (): void => {
-    this.setState({ signInModal: null });
-  };
+    componentsControls.closeModal = modal => {
+      if (modal === 'signIn') {
+        setState(s => ({ ...s, signInModal: null }));
+      } else {
+        setState(s => ({ ...s, signUpModal: null }));
+      }
+    };
 
-  openSignUp = (nodeProps: SignUpProps = {}): void => {
-    this.setState({ signUpModal: nodeProps });
-  };
+    componentsControls.openModal = (modal, props) => {
+      if (modal === 'signIn') {
+        setState(s => ({ ...s, signInModal: props }));
+      } else {
+        setState(s => ({ ...s, signUpModal: props }));
+      }
+    };
+  }, []);
 
-  closeSignUp = (): void => {
-    this.setState({ signUpModal: null });
-  };
+  nodes.forEach(({ key, name, props }, node) => {
+    mountedNodes.push(
+      <Portal<AvailableComponentCtx>
+        componentName={name}
+        key={key}
+        component={AvailableComponents[name]}
+        props={props || {}}
+        node={node}
+        preservedParams={PRESERVED_QUERYSTRING_PARAMS}
+      />,
+    );
+  });
 
-  mountComponent = ({
-    name,
-    node,
-    nodeClassName,
-    props,
-  }: {
-    name: AvailableComponentNames;
-    node: HTMLDivElement;
-    nodeClassName: string;
-    props?: AvailableComponentProps;
-  }): void => {
-    assertDOMElement(node);
-    Components._addMountNodeClass(node, nodeClassName);
-    this.setState(({ nodes }) => {
-      (portalCt = portalCt + 1),
-        nodes.set(node, {
-          key: `p${portalCt}`,
-          name,
-          props,
-        });
-      return { nodes };
-    });
-  };
-
-  unmountComponent = ({ node }: { node: HTMLDivElement }): void => {
-    this.setState(({ nodes }) => {
-      nodes.delete(node);
-      return { nodes };
-    });
-  };
-
-  updateAppearanceProp = (appearance: Appearance | undefined) => {
-    this.setState(state => ({
-      ...state,
-      appearance,
-    }));
-  };
-
-  render(): JSX.Element {
-    const { signInModal, signUpModal, nodes } = this.state;
-
-    const mountedNodes: JSX.Element[] = [];
-
-    nodes.forEach(({ key, name, props }, node) => {
-      mountedNodes.push(
-        <Portal<AvailableComponentCtx>
-          componentName={name}
-          key={key}
-          component={AvailableComponents[name]}
-          props={props || {}}
-          node={node}
-          preservedParams={PRESERVED_QUERYSTRING_PARAMS}
-        />,
-      );
-    });
-
-    const mountedSignInModal = (
-      <Modal
-        active
-        handleClose={() => this.closeSignIn()}
-        className='cl-modal-backdrop'
-        modalClassname='cl-modal-container'
+  const mountedSignInModal = (
+    <Modal
+      active
+      handleClose={() => componentsControls.closeModal('signIn')}
+      className='cl-modal-backdrop'
+      modalClassname='cl-modal-container'
+    >
+      <VirtualRouter
+        preservedParams={PRESERVED_QUERYSTRING_PARAMS}
+        onExternalNavigate={() => componentsControls.closeModal('signIn')}
+        startPath='/sign-in'
       >
-        <VirtualRouter
-          preservedParams={PRESERVED_QUERYSTRING_PARAMS}
-          onExternalNavigate={() => this.closeSignIn()}
-          startPath='/sign-in'
-        >
-          <SignInModal {...signInModal} />
-          {/*<SignUpModal*/}
-          {/*  afterSignInUrl={signInModal?.afterSignInUrl}*/}
-          {/*  afterSignUpUrl={signInModal?.afterSignUpUrl}*/}
-          {/*  redirectUrl={signInModal?.redirectUrl}*/}
-          {/*/>*/}
-        </VirtualRouter>
-      </Modal>
-    );
+        <SignInModal {...signInModal} />
+        {/*<SignUpModal*/}
+        {/*  afterSignInUrl={signInModal?.afterSignInUrl}*/}
+        {/*  afterSignUpUrl={signInModal?.afterSignUpUrl}*/}
+        {/*  redirectUrl={signInModal?.redirectUrl}*/}
+        {/*/>*/}
+      </VirtualRouter>
+    </Modal>
+  );
 
-    const mountedSignUpModal = (
-      <Modal
-        active
-        handleClose={() => this.closeSignUp()}
-        className='cl-modal-backdrop'
-        modalClassname='cl-modal-container'
+  const mountedSignUpModal = (
+    <Modal
+      active
+      handleClose={() => componentsControls.closeModal('signUp')}
+      className='cl-modal-backdrop'
+      modalClassname='cl-modal-container'
+    >
+      <VirtualRouter
+        preservedParams={PRESERVED_QUERYSTRING_PARAMS}
+        onExternalNavigate={() => componentsControls.closeModal('signUp')}
+        startPath='/sign-up'
       >
-        <VirtualRouter
-          preservedParams={PRESERVED_QUERYSTRING_PARAMS}
-          onExternalNavigate={() => this.closeSignUp()}
-          startPath='/sign-up'
-        >
-          {/*<SignInModal*/}
-          {/*  afterSignInUrl={signUpModal?.afterSignInUrl}*/}
-          {/*  afterSignUpUrl={signUpModal?.afterSignUpUrl}*/}
-          {/*  redirectUrl={signUpModal?.redirectUrl}*/}
-          {/*/>*/}
-          {/*<SignUpModal {...signUpModal} />*/}
-        </VirtualRouter>
-      </Modal>
-    );
+        {/*<SignInModal*/}
+        {/*  afterSignInUrl={signUpModal?.afterSignInUrl}*/}
+        {/*  afterSignUpUrl={signUpModal?.afterSignUpUrl}*/}
+        {/*  redirectUrl={signUpModal?.redirectUrl}*/}
+        {/*/>*/}
+        {/*<SignUpModal {...signUpModal} />*/}
+      </VirtualRouter>
+    </Modal>
+  );
 
-    return (
-      <AppearanceProvider appearance={this.state.appearance}>
-        <CoreClerkContextWrapper clerk={this.props.clerk}>
-          <EnvironmentProvider value={this.props.environment}>
-            <OptionsProvider value={this.props.options}>
-              {mountedNodes}
-              {signInModal && mountedSignInModal}
-              {signUpModal && mountedSignUpModal}
-            </OptionsProvider>
-          </EnvironmentProvider>
-        </CoreClerkContextWrapper>
-      </AppearanceProvider>
-    );
-  }
-}
+  return (
+    <AppearanceProvider appearance={state.appearance}>
+      <CoreClerkContextWrapper clerk={props.clerk}>
+        <EnvironmentProvider value={props.environment}>
+          <OptionsProvider value={props.options}>
+            {mountedNodes}
+            {signInModal && mountedSignInModal}
+            {signUpModal && mountedSignUpModal}
+          </OptionsProvider>
+        </EnvironmentProvider>
+      </CoreClerkContextWrapper>
+    </AppearanceProvider>
+  );
+};
