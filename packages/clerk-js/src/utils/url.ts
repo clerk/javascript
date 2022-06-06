@@ -144,7 +144,7 @@ export function buildURL(params: BuildURLParams, options: BuildURLOptions<boolea
     fallbackBase = 'http://react-native-fake-base-url';
   }
 
-  const url = new URL(base || fallbackBase);
+  const url = new URL(base || '', fallbackBase);
   Object.assign(url, rest);
 
   // Treat that hash part of the main URL as if it's another URL with a pathname and a search.
