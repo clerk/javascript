@@ -6,7 +6,7 @@ import { handleError } from 'ui/common';
 import { Alert } from 'ui/common/alert';
 
 interface EditableListFieldRemoveCardProps {
-  type: 'phone' | 'email' | 'connected_account' | 'web3_wallet';
+  type: 'phone' | 'email' | 'social_account' | 'web3_wallet';
   label: string;
   buttonLabel: string;
   onCancel: () => void;
@@ -68,9 +68,7 @@ export const EditableListFieldRemoveCard: React.FC<EditableListFieldRemoveCardPr
             yourself.
           </p>
         )}
-        {type === 'connected_account' && (
-          <p>Unlink your {label} account, and remove associated personal information.</p>
-        )}
+        {type === 'social_account' && <p>Unlink your {label} account, and remove associated personal information.</p>}
         {type === 'web3_wallet' && <p>Remove the connection between this app and your Web3 wallet</p>}
       </div>
       <div className='cl-form-button-group'>

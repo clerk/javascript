@@ -201,7 +201,7 @@ jest.mock('ui/router', () => {
     Link: ({ children }: any) => <>{children}</>,
     useRouter: () => {
       return {
-        params: { connected_account_id: 'fbac_yolo' },
+        params: { social_account_id: 'fbac_yolo' },
         resolve: () => {
           return {
             toURL: {

@@ -1,9 +1,9 @@
 import React from 'react';
 import { Route } from 'ui/router';
-import { ConnectedAccountsRoutes } from 'ui/userProfile/connectedAccounts';
 import { EmailAddressesRoutes } from 'ui/userProfile/emailAdressess';
 import { NameRoutes } from 'ui/userProfile/name';
 import { PhoneNumbersRoutes } from 'ui/userProfile/phoneNumbers';
+import { SocialAccountsRoutes } from 'ui/userProfile/socialAccounts';
 import { UsernameRoutes } from 'ui/userProfile/username';
 import { Web3WalletsRoutes } from 'ui/userProfile/web3Wallets';
 
@@ -30,7 +30,7 @@ export function AccountRoutes({ standAlone = false, index = false }: AccountRout
       <EmailAddressesRoutes />
       <PhoneNumbersRoutes />
       <Web3WalletsRoutes />
-      <ConnectedAccountsRoutes />
+      <SocialAccountsRoutes />
     </Route>
   );
 }

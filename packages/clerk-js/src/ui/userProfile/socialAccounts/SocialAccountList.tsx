@@ -11,22 +11,22 @@ import { UnconnectedAccountListItem } from './UnconnectedAccountListItem';
 import { UnverifiedAccountListItem } from './UnverifiedAccountListItem';
 import { VerifiedAccountListItem } from './VerifiedAccountListItem';
 
-export function ConnectedAccountList(): JSX.Element {
+export function SocialAccountList(): JSX.Element {
   return (
     <>
       <PageHeading
-        title='Connected accounts'
+        title='Social accounts'
         backTo='../'
       />
 
       <TitledCard className='cl-themed-card cl-list-card'>
-        <ConnectedAccountListRows />
+        <SocialAccountListRows />
       </TitledCard>
     </>
   );
 }
 
-function ConnectedAccountListRows(): JSX.Element {
+function SocialAccountListRows(): JSX.Element {
   const [error, setError] = useState<string | undefined>();
   const [busyProvider, setBusyProvider] = useState<OAuthStrategy | null>(null);
   const user = useCoreUser();
