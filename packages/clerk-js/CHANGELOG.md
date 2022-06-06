@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.13.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.13.0...@clerk/clerk-js@3.13.1) (2022-06-06)
+
+### Bug Fixes
+
+- **clerk-js:** Fix new URL constructor ([d0cc743](https://github.com/clerkinc/javascript/commit/d0cc74330bfbf277fa5529e9e537cad384875653))
+
 ## [3.13.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.12.0-staging.11...@clerk/clerk-js@3.13.0) (2022-06-06)
 
 **Note:** Version bump only for package @clerk/clerk-js
