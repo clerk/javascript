@@ -11,6 +11,8 @@ describe('stringToHslaColor(color)', function () {
     ['00bfff', hsla],
     ['rgb(0, 191, 255)', hsla],
     ['rgba(0, 191, 255, 0.3)', { ...hsla, a: 0.3 }],
+    ['hsla(195, 100%, 50%, 1)', hsla],
+    ['hsla(195, 100%, 50%, 1)', hsla],
   ];
 
   it.each(cases)('.stringToHslaColor(%s) => %s', (a, expected) => {
