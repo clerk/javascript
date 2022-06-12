@@ -3,7 +3,7 @@ import { Appearance, DeepPartial, Elements, Theme } from '@clerk/types';
 import { createInternalTheme, defaultInternalTheme } from '../foundations';
 import { InternalTheme } from '../styledSystem';
 import { fastDeepMergeAndReplace } from '../utils';
-import { transformColorToColorScale } from './transformColorToColorScale';
+import { colorOptionTo500Scale, colorOptionToHslaScale } from './colorOptionToHslaScale';
 
 type ExpandForBaseAndComponents<T> = {
   base: T;
@@ -69,9 +69,13 @@ const createInternalThemeFromVariables = (theme: Theme | undefined): DeepPartial
 
 const createColorScales = (theme: Theme) => {
   return {
-    ...transformColorToColorScale(theme?.variables?.colorPrimary, 'primary'),
-    ...transformColorToColorScale(theme?.variables?.colorDanger, 'danger'),
-    ...transformColorToColorScale(theme?.variables?.colorSuccess, 'success'),
-    ...transformColorToColorScale(theme?.variables?.colorWarning, 'warning'),
+    ...colorOptionToHslaScale(theme?.variables?.colorPrimary, 'primary'),
+    ...colorOptionToHslaScale(theme?.variables?.colorDanger, 'danger'),
+    ...colorOptionToHslaScale(theme?.variables?.colorSuccess, 'success'),
+    ...colorOptionToHslaScale(theme?.variables?.colorWarning, 'warning'),
+    ...colorOptionToHslaScale(theme?.variables?.colorText, 'text'),
+    ...colorOptionTo500Scale(theme?.variables?.colorInputText, 'inputText'),
+    ...colorOptionTo500Scale(theme?.variables?.colorBackground, 'background'),
+    ...colorOptionTo500Scale(theme?.variables?.colorInputBackground, 'inputBackground'),
   };
 };
