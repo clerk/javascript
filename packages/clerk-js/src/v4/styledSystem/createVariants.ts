@@ -39,7 +39,7 @@ type CreateVariantsReturn<T, V extends Variants> = {
 };
 
 interface CreateVariants {
-  <P, T = InternalTheme, V extends Variants = Variants>(
+  <P extends Record<string, any>, T = InternalTheme, V extends Variants = Variants>(
     param: (theme: T, props: P) => CreateVariantsConfig<V>,
   ): CreateVariantsReturn<T, V>;
 }
