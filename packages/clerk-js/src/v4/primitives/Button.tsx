@@ -1,9 +1,8 @@
 import React from 'react';
 
-import { createCssVariables, createVariants, cssutils, PrimitiveProps, StyleVariants } from '../styledSystem';
+import { common, createCssVariables, createVariants, cssutils, PrimitiveProps, StyleVariants } from '../styledSystem';
 import { Flex } from './Flex';
 import { Spinner } from './Spinner';
-import { Text } from './Text';
 
 const vars = createCssVariables('accent', 'accentDark', 'accentDarker', 'accentLighter', 'accentLightest');
 
@@ -14,21 +13,24 @@ const { applyVariants, filterProps } = createVariants(theme => {
       padding: 0,
       border: 0,
       outline: 0,
+      userSelect: 'none',
       cursor: 'pointer',
       backgroundColor: 'unset',
       color: 'currentColor',
       borderRadius: theme.radii.$md,
       ...cssutils.addCenteredFlex('inline-flex'),
-      ...cssutils.addFocusRing(theme),
+      ...common.focusRing(theme),
+      ...common.disabled(theme),
       transitionProperty: theme.transitionProperty.$common,
       transitionDuration: theme.transitionDuration.$controls,
-      '&:disabled': {
-        cursor: 'not-allowed',
-        pointerEvents: 'none',
-        opacity: theme.opacity.$disabled,
-      },
     },
     variants: {
+      textVariant: common.textVariants(theme),
+      size: {
+        iconLg: { height: theme.sizes.$14, width: theme.sizes.$14 },
+        xs: { height: theme.sizes.$1x5, padding: `${theme.space.$1x5} ${theme.space.$1x5}` },
+        md: { height: theme.sizes.$9, padding: `${theme.space.$2x5} ${theme.space.$4}` },
+      },
       colorScheme: {
         primary: {
           [vars.accentLightest]: theme.colors.$primary50,
@@ -45,11 +47,11 @@ const { applyVariants, filterProps } = createVariants(theme => {
           [vars.accentDarker]: theme.colors.$danger700,
         },
         neutral: {
-          [vars.accentLightest]: theme.colors.$gray50,
-          [vars.accentLighter]: theme.colors.$gray100,
-          [vars.accent]: theme.colors.$gray500,
-          [vars.accentDark]: theme.colors.$gray600,
-          [vars.accentDarker]: theme.colors.$gray700,
+          [vars.accentLightest]: theme.colors.$blackAlpha50,
+          [vars.accentLighter]: theme.colors.$blackAlpha300,
+          [vars.accent]: theme.colors.$text500,
+          [vars.accentDark]: theme.colors.$blackAlpha600,
+          [vars.accentDarker]: theme.colors.$blackAlpha700,
         },
       },
       variant: {
@@ -60,8 +62,8 @@ const { applyVariants, filterProps } = createVariants(theme => {
           '&:active': { backgroundColor: vars.accentDarker },
         },
         outline: {
-          border: '1px solid',
-          borderColor: vars.accent,
+          border: theme.borders.$normal,
+          borderColor: vars.accentLighter,
           color: vars.accent,
           '&:hover': { backgroundColor: vars.accentLightest },
           '&:active': { backgroundColor: vars.accentLighter },
@@ -71,15 +73,41 @@ const { applyVariants, filterProps } = createVariants(theme => {
           '&:hover': { backgroundColor: vars.accentLightest },
           '&:active': { backgroundColor: vars.accentLighter },
         },
+        icon: {
+          border: theme.borders.$normal,
+          borderRadius: theme.radii.$lg,
+          borderColor: vars.accentLighter,
+          '&:hover': { backgroundColor: vars.accentLightest },
+          '&:active': { backgroundColor: vars.accentLighter },
+        },
+        ghostIcon: {
+          color: vars.accent,
+          height: theme.sizes.$6,
+          width: theme.sizes.$6,
+          padding: `${theme.space.$1} ${theme.space.$1}`,
+          '&:hover': { color: vars.accentDark },
+          '&:active': { color: vars.accentDarker },
+        },
+        link: {
+          ...common.textVariants(theme).link,
+          height: 'fit-content',
+          width: 'fit-content',
+          textTransform: 'none',
+          padding: 0,
+          color: vars.accent,
+          '&:hover': { textDecoration: 'underline' },
+          '&:active': { color: vars.accentDark },
+        },
       },
-      size: {
-        md: { minHeight: theme.sizes.$9, padding: `${theme.space.$2x5} ${theme.space.$5}` },
+      block: {
+        true: { width: '100%' },
       },
     },
     defaultVariants: {
       colorScheme: 'primary',
       variant: 'solid',
       size: 'md',
+      textVariant: 'buttonLabel',
     },
   };
 });
@@ -93,11 +121,12 @@ type ButtonProps = OwnProps & StyleVariants<typeof applyVariants>;
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
   const parsedProps: ButtonProps = { ...props, isDisabled: props.isDisabled || props.isLoading };
-  const { isLoading, isDisabled, loadingText, icon, children, ...rest } = filterProps(parsedProps);
+  const { isLoading, isDisabled, loadingText, children, ...rest } = filterProps(parsedProps);
 
   return (
     <button
       {...rest}
+      type={rest.type || 'button'}
       disabled={isDisabled}
       css={applyVariants(parsedProps)}
       ref={ref}
@@ -112,16 +141,78 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
             aria-live='polite'
             aria-label={loadingText || 'Loading'}
           />
-          {loadingText && <Text variant='buttonLabel'>{loadingText}</Text>}
+          {loadingText || undefined}
         </Flex>
       )}
-      {!isLoading && (
-        <>
-          <Text variant='buttonLabel'>{children}</Text>
-        </>
-      )}
+      {!isLoading && children}
     </button>
   );
 });
 
-export { Button };
+type BlockButtonIconProps = ButtonProps & { leftIcon?: React.ReactElement; rightIcon: React.ReactElement };
+
+/**
+ * For the state of the right arrow icon in this composite component
+ * we're using CSS variables because we do not want to increase the
+ * CSS rule specificity using a different method like classnames/styles.
+ * `sx` is a "weak style" attribute with a specificity of 1, so it's easily
+ * overridable from the outside
+ */
+const BlockButtonIcon = React.forwardRef<HTMLButtonElement, BlockButtonIconProps>((props, ref) => {
+  const parsedProps: BlockButtonIconProps = { ...props, isDisabled: props.isDisabled || props.isLoading };
+  const { isLoading, isDisabled, loadingText, children, leftIcon, rightIcon, ...rest } = filterProps(parsedProps);
+
+  const leftIconElement = leftIcon
+    ? React.cloneElement(leftIcon, {
+        sx: [leftIcon.props.sx, theme => ({ width: theme.sizes.$4, marginRight: theme.space.$4 })],
+      })
+    : null;
+
+  return (
+    <button
+      {...rest}
+      type={rest.type || 'button'}
+      disabled={isDisabled}
+      css={[
+        applyVariants({ block: true, variant: 'outline', colorScheme: 'neutral', textVariant: 'link', ...parsedProps }),
+        theme => ({
+          color: theme.colors.$text500,
+          '--arrow-opacity': '0',
+          '--arrow-transform': `translateX(-${theme.space.$2});`,
+          '&:hover,&:focus ': {
+            '--arrow-opacity': '1',
+            '--arrow-transform': 'translateX(0px);',
+          },
+        }),
+      ]}
+      ref={ref}
+    >
+      {isLoading ? (
+        <Spinner
+          aria-busy
+          aria-live='polite'
+          aria-label={loadingText || 'Loading'}
+          css={theme => ({ marginRight: theme.space.$4 })}
+        />
+      ) : (
+        leftIconElement
+      )}
+
+      {children}
+
+      {React.cloneElement(rightIcon, {
+        sx: [
+          rightIcon.props.sx,
+          theme => ({
+            color: theme.colors.$gray500,
+            transition: 'all 100ms ease',
+            opacity: `var(--arrow-opacity)`,
+            transform: `var(--arrow-transform)`,
+          }),
+        ],
+      })}
+    </button>
+  );
+});
+
+export { Button, BlockButtonIcon };
