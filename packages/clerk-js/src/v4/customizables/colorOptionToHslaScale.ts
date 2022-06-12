@@ -1,13 +1,12 @@
-import { ColorOption, ColorScale, HslaColor } from '@clerk/types';
-import { HslaColorString } from '@clerk/types/src';
+import { ColorOption, ColorScale, HslaColor, HslaColorString } from '@clerk/types';
 
-import { hslaColorToHslaString, stringToHslaColor } from '../utils';
+import { colors } from '../utils';
 
 const LIGHT_SHADES = ['50', '100', '200', '300', '400'].reverse();
 const DARK_SHADES = ['600', '700', '800', '900'];
 
-const TARGET_L_50_SHADE = 0.97;
-const TARGET_L_900_SHADE = 0.12;
+const TARGET_L_50_SHADE = 97;
+const TARGET_L_900_SHADE = 12;
 
 function createEmptyColorScale<T = undefined>(): ColorScale<T | undefined> {
   return {
@@ -28,7 +27,7 @@ type WithPrefix<T extends Record<string, string>, Prefix extends string> = {
   [k in keyof T as `${Prefix}${k & string}`]: T[k];
 };
 
-export const transformColorToColorScale = <Prefix extends string>(
+export const colorOptionToHslaScale = <Prefix extends string>(
   colorOption: ColorOption | undefined,
   prefix: Prefix,
 ): WithPrefix<ColorScale<HslaColorString>, Prefix> | undefined => {
@@ -46,6 +45,18 @@ export const transformColorToColorScale = <Prefix extends string>(
   return prefixAndStringifyHslaScale(merged, prefix);
 };
 
+export const colorOptionTo500Scale = <Prefix extends string>(
+  colorOption: ColorOption | undefined,
+  prefix: Prefix,
+): WithPrefix<ColorScale<HslaColorString>, Prefix> | undefined => {
+  if (!colorOption || typeof colorOption !== 'string') {
+    return undefined;
+  }
+  const scale = createEmptyColorScale<HslaColor>();
+  scale['500'] = colors.toHslaColor(colorOption);
+  return prefixAndStringifyHslaScale(scale, prefix);
+};
+
 const mergeFilledIntoUserDefinedScale = (
   generated: ColorScale<HslaColor>,
   userDefined: ColorScale<HslaColor>,
@@ -54,16 +65,26 @@ const mergeFilledIntoUserDefinedScale = (
   return Object.fromEntries(Object.entries(userDefined).map(([k, v]) => [k, v || generated[k]]));
 };
 
-const prefixAndStringifyHslaScale = (scale: ColorScale<HslaColor>, prefix: string): ColorScale<HslaColor> => {
-  const entries = Object.entries(scale).map(([k, v]) => [prefix + k, hslaColorToHslaString(v)]);
-  return Object.fromEntries(entries) as ColorScale<HslaColor>;
+const prefixAndStringifyHslaScale = (
+  scale: ColorScale<HslaColor | undefined>,
+  prefix: string,
+): ColorScale<HslaColor> => {
+  const res = {} as ColorScale<HslaColor>;
+  for (const key in scale) {
+    // @ts-expect-error
+    if (scale[key]) {
+      // @ts-expect-error
+      res[prefix + key] = colors.toHslaString(scale[key]);
+    }
+  }
+  return res;
 };
 
 const userDefinedColorToHslaColorScale = (colorOption: ColorOption): ColorScale<HslaColor> => {
   const baseScale = typeof colorOption === 'string' ? { '500': colorOption } : colorOption;
   const hslaScale = createEmptyColorScale();
-  type Key = keyof typeof baseScale;
-  const entries = Object.keys(hslaScale).map(k => [k, stringToHslaColor(baseScale[k as any as Key])]);
+  // @ts-expect-error
+  const entries = Object.keys(hslaScale).map(k => [k, baseScale[k] ? colors.toHslaColor(baseScale[k]) : undefined]);
   return Object.fromEntries(entries) as ColorScale<HslaColor>;
 };
 
@@ -81,11 +102,11 @@ const generateFilledScaleFromBaseHslaColor = (base: HslaColor): ColorScale<HslaC
   const lightPerc = (TARGET_L_50_SHADE - base.l) / LIGHT_SHADES.length;
   const darkPerc = (base.l - TARGET_L_900_SHADE) / DARK_SHADES.length;
 
-  LIGHT_SHADES.forEach((shade, i) => (newScale[shade as any as Key] = changeHslaLightness(base, (i + 1) * lightPerc)));
-  DARK_SHADES.map((shade, i) => (newScale[shade as any as Key] = changeHslaLightness(base, (i + 1) * darkPerc * -1)));
+  LIGHT_SHADES.forEach(
+    (shade, i) => (newScale[shade as any as Key] = colors.changeHslaLightness(base, (i + 1) * lightPerc)),
+  );
+  DARK_SHADES.map(
+    (shade, i) => (newScale[shade as any as Key] = colors.changeHslaLightness(base, (i + 1) * darkPerc * -1)),
+  );
   return newScale as ColorScale<HslaColor>;
-};
-
-const changeHslaLightness = (color: HslaColor, num: number): HslaColor => {
-  return { ...color, l: color.l + num };
 };
