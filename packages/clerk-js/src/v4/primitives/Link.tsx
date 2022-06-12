@@ -1,16 +1,20 @@
 import React from 'react';
 
-import { Text } from '../primitives';
-import { createVariants, cssutils, PickSiblingProps, PrimitiveProps, StyleVariants } from '../styledSystem';
+import { common, createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
 
 const { applyVariants, filterProps } = createVariants(theme => ({
   base: {
     boxSizing: 'border-box',
+    display: 'inline-flex',
+    alignItems: 'center',
     margin: 0,
-    ...cssutils.addFocusRing(theme),
+    cursor: 'pointer',
+    ...common.focusRing(theme),
     '&:hover': { textDecoration: 'underline' },
   },
   variants: {
+    variant: common.textVariants(theme),
+    size: common.fontSizeVariants(theme),
     colorScheme: {
       primary: {
         color: theme.colors.$primary500,
@@ -31,15 +35,15 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   },
   defaultVariants: {
     colorScheme: 'primary',
+    variant: 'link',
   },
 }));
 
-type SiblingProps = PickSiblingProps<typeof Text, 'size'>;
 type OwnProps = { isExternal?: boolean };
-export type LinkProps = PrimitiveProps<'a'> & OwnProps & SiblingProps & StyleVariants<typeof applyVariants>;
+export type LinkProps = PrimitiveProps<'a'> & OwnProps & StyleVariants<typeof applyVariants>;
 
 export const Link = (props: LinkProps): JSX.Element => {
-  const { isExternal, children, size, ...rest } = props;
+  const { isExternal, children, ...rest } = props;
   return (
     <a
       {...filterProps(rest)}
@@ -47,12 +51,7 @@ export const Link = (props: LinkProps): JSX.Element => {
       rel={isExternal ? 'noopener' : undefined}
       css={applyVariants(props)}
     >
-      <Text
-        variant='link'
-        size={size}
-      >
-        {children}
-      </Text>
+      {children}
     </a>
   );
 };
