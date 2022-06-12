@@ -1,0 +1,11 @@
+import { StateProps } from '../styledSystem';
+
+export const applyDataStateProps = (props: any) => {
+  const { hasError, isDisabled, isLoading, ...rest } = props as StateProps;
+  return {
+    'data-error': hasError || undefined,
+    'data-disabled': isDisabled || undefined,
+    'data-loading': isLoading || undefined,
+    ...rest,
+  };
+};
