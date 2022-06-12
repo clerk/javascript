@@ -49,10 +49,8 @@ const addClerkTargettableStateClass = (cn: string, state: ElementState | undefin
   return state ? cn + STATE_PROP_TO_CLASSNAME[state] : cn;
 };
 
-const addEmojiSeparator = (cn: string) => {
-  return cn + ' 🔒️';
-  // return cn + ' ✨️️';
-  // return '⭐ ' + cn + ' ⭐';
+export const appendEmojiSeparator = (generatedCn: string, otherCn?: string) => {
+  return generatedCn + (otherCn ? ' ' + otherCn : '') + ' 🔒️';
 };
 
 const addUserProvidedStyleRules = (
