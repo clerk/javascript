@@ -14,6 +14,7 @@ const space = Object.freeze({
   7: '1.75rem',
   8: '2rem',
   9: '2.25rem',
+  '9x5': '2.375rem',
   10: '2.5rem',
   12: '3rem',
   14: '3.5rem',
@@ -33,6 +34,7 @@ const space = Object.freeze({
   72: '18rem',
   80: '20rem',
   96: '24rem',
+  100: '25rem',
 } as const);
 
 const sizes = Object.freeze({
@@ -51,6 +53,7 @@ const radii = Object.freeze({
   '2xl': '1rem', // 16px
   '3xl': '1.5rem', // 24.px
   full: '9999px',
+  circle: '50%',
 } as const);
 
 export { sizes, space, radii };

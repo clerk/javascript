@@ -1,3 +1,4 @@
+import { borders } from './borders';
 import { colors } from './colors';
 import { opacity } from './opacity';
 import { shadows } from './shadows';
@@ -21,6 +22,7 @@ const defaultInternalThemeFoundations = Object.freeze({
   transitionTiming,
   transitionDuration,
   opacity,
+  borders,
 } as const);
 
 const defaultFoundationsCopy = (): InternalThemeFoundations => {
