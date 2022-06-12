@@ -1,5 +1,6 @@
 import type { SignInContextType, SignUpContextType, UserProfileContextType } from 'ui/contexts';
-import { buildURL } from 'utils';
+
+import { buildURL } from '../../utils/url';
 
 const SSO_CALLBACK_PATH_ROUTE = '/sso-callback';
 const MAGIC_LINK_VERIFY_PATH_ROUTE = '/verify';
