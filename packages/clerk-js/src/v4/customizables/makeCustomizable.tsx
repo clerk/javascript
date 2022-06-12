@@ -1,36 +1,40 @@
+import React from 'react';
+
 import { useFlowMetadata } from '../elements/contexts';
 import { ThemableCssProp } from '../styledSystem';
 import { useAppearance } from './AppearanceContext';
-import { generateClassName } from './classGeneration';
+import { appendEmojiSeparator, generateClassName } from './classGeneration';
 import { ElementDescriptor, ElementId } from './elementDescriptors';
 
 type Customizable<T = {}> = T & {
   elementDescriptor?: ElementDescriptor;
   elementId?: ElementId;
   css?: never;
-  weakCss?: ThemableCssProp;
+  sx?: ThemableCssProp;
 };
 
 type CustomizablePrimitive<T> = React.FunctionComponent<Customizable<T>>;
 
 export const makeCustomizable = <P,>(Component: React.FunctionComponent<P>): CustomizablePrimitive<P> => {
-  const customizableComponent = (props: Customizable<any>) => {
-    const { elementDescriptor, elementId, weakCss, className, ...restProps } = props;
+  const customizableComponent = React.forwardRef((props: Customizable<any>, ref) => {
+    const { elementDescriptor, elementId, sx, className, ...restProps } = props;
     const flowMetadata = useFlowMetadata();
     const { parsedElements } = useAppearance();
 
     if (!elementDescriptor) {
       return (
         <Component
+          css={sx}
           {...restProps}
           className={className}
+          ref={ref}
         />
       );
     }
 
     const generatedStyles = generateClassName(parsedElements, elementDescriptor, elementId, props, flowMetadata);
-    const generatedClassname = generatedStyles.className + (className ? ' ' + (className as string) : '');
-    generatedStyles.css.unshift(weakCss);
+    const generatedClassname = appendEmojiSeparator(generatedStyles.className, className);
+    generatedStyles.css.unshift(sx);
 
     return (
       <Component
@@ -38,9 +42,10 @@ export const makeCustomizable = <P,>(Component: React.FunctionComponent<P>): Cus
         // always first for better readability in the DOM
         className={generatedClassname}
         {...restProps}
+        ref={ref}
       />
     );
-  };
+  });
 
   const displayName = Component.displayName || Component.name || 'Component';
   customizableComponent.displayName = `Customizable${displayName}`.replace('_', '');
