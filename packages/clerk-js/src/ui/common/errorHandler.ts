@@ -47,7 +47,7 @@ function parseErrors(errors: ClerkAPIError[]): ParserErrors {
 export function handleError(
   err: Error,
   fieldStates: Array<FieldState<string>>,
-  setGlobalError?: React.Dispatch<React.SetStateAction<string | undefined>>,
+  setGlobalError?: React.Dispatch<React.SetStateAction<string | undefined>> | ((error: string | undefined) => void),
 ): void {
   // Throw unknown errors
   if (!isClerkAPIResponseError(err)) {
