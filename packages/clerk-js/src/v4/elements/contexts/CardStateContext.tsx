@@ -2,32 +2,50 @@ import React from 'react';
 
 import { createContextAndHook } from '../../utils';
 
-type Action = { type: 'block' | 'unblock' };
+type Action = { type: 'setLoading'; isLoading: boolean } | { type: 'setError'; error: string | undefined };
 
 type CardState = {
-  blocked: boolean;
+  isLoading: boolean;
+  error: string | undefined;
 };
 
 type CardStateCtxValue = CardState & {
-  dispatch: React.Dispatch<Action>;
+  setLoading: () => void;
+  setIdle: () => void;
+  setError: (error: string | undefined) => void;
 };
 
 const [CardStateCtx, useCardState] = createContextAndHook<CardStateCtxValue>('CardState');
 
-const reducer = (state: CardState = { blocked: false }, action: Action): CardState => {
+const initState: CardState = {
+  isLoading: false,
+  error: undefined,
+};
+
+const reducer = (state: CardState, action: Action): CardState => {
   switch (action.type) {
-    case 'block':
-      return { ...state, blocked: true };
-    case 'unblock':
-      return { ...state, blocked: false };
+    case 'setLoading':
+      return { ...state, isLoading: action.isLoading };
+    case 'setError':
+      return { ...state, error: action.error };
     default:
       return state;
   }
 };
 
 const CardStateProvider = (props: React.PropsWithChildren<any>) => {
-  const [cardState, dispatch] = React.useReducer(reducer, { blocked: false });
-  const value = React.useMemo(() => ({ value: { ...cardState, dispatch } }), [cardState]);
+  const [cardState, dispatch] = React.useReducer(reducer, initState);
+
+  const value = React.useMemo(() => {
+    const setLoading = () => dispatch({ type: 'setLoading', isLoading: true });
+    const setIdle = () => dispatch({ type: 'setLoading', isLoading: false });
+    const setError = (error: string | undefined) => {
+      dispatch({ type: 'setError', error });
+    };
+
+    return { value: { ...cardState, setIdle, setLoading, setError } };
+  }, [cardState]);
+
   return <CardStateCtx.Provider value={value}>{props.children}</CardStateCtx.Provider>;
 };
 

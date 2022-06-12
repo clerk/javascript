@@ -2,27 +2,28 @@ import React from 'react';
 
 import { descriptors, Flex, Heading, Text } from '../customizables';
 
-const HeaderRoot = (props: React.PropsWithChildren<any>): JSX.Element => {
+const Root = React.memo((props: React.PropsWithChildren<any>): JSX.Element => {
   return (
     <Flex
       elementDescriptor={descriptors.header}
       {...props}
       direction='col'
       gap={1}
+      // sx={theme => ({ marginBottom: theme.space.$2 })}
     />
   );
-};
+});
 
-const HeaderTitle = (props: React.PropsWithChildren<any>): JSX.Element => {
+const Title = React.memo((props: React.PropsWithChildren<any>): JSX.Element => {
   return (
     <Heading
       elementDescriptor={descriptors.headerTitle}
       {...props}
     />
   );
-};
+});
 
-const HeaderSubtitle = (props: React.PropsWithChildren<any>): JSX.Element => {
+const Subtitle = React.memo((props: React.PropsWithChildren<any>): JSX.Element => {
   return (
     <Text
       elementDescriptor={descriptors.headerSubtitle}
@@ -31,10 +32,10 @@ const HeaderSubtitle = (props: React.PropsWithChildren<any>): JSX.Element => {
       colorScheme='neutral'
     />
   );
-};
+});
 
 export const Header = {
-  Root: HeaderRoot,
-  Title: HeaderTitle,
-  Subtitle: HeaderSubtitle,
+  Root,
+  Title,
+  Subtitle,
 };

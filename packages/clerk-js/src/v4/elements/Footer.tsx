@@ -10,6 +10,7 @@ const FooterRoot = (props: React.PropsWithChildren<any>): JSX.Element => {
       {...props}
       justify='between'
       align='center'
+      sx={theme => ({ marginTop: theme.space.$8 })}
     />
   );
 };
@@ -45,18 +46,6 @@ const FooterActionLink = (props: PropsOfComponent<typeof Link>): JSX.Element => 
   );
 };
 
-// TODO: Naming?
-const FooterLinks = (props: React.PropsWithChildren<any>): JSX.Element => {
-  return (
-    <Flex
-      elementDescriptor={descriptors.footerPages}
-      {...props}
-      justify='between'
-      gap={4}
-    />
-  );
-};
-
 const FooterLink = (props: PropsOfComponent<typeof Link>): JSX.Element => {
   return (
     <Link
@@ -66,6 +55,38 @@ const FooterLink = (props: PropsOfComponent<typeof Link>): JSX.Element => {
     />
   );
 };
+
+const FooterLinks = React.memo((): JSX.Element => {
+  return (
+    <Flex
+      elementDescriptor={descriptors.footerPages}
+      justify='between'
+      gap={4}
+    >
+      <FooterLink
+        elementId={descriptors.footerPagesLink.setId('help')}
+        isExternal
+        href='https://www.google.com'
+      >
+        Help
+      </FooterLink>
+      <FooterLink
+        elementId={descriptors.footerPagesLink.setId('privacy')}
+        isExternal
+        href='https://www.google.com'
+      >
+        Privacy
+      </FooterLink>
+      <FooterLink
+        elementId={descriptors.footerPagesLink.setId('terms')}
+        isExternal
+        href='https://www.google.com'
+      >
+        Terms
+      </FooterLink>
+    </Flex>
+  );
+});
 
 export const Footer = {
   Root: FooterRoot,
