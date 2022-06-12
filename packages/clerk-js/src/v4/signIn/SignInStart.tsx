@@ -1,43 +1,46 @@
-// @ts-ignore
-import { default as MobileIcon } from '@clerk/shared/assets/icons/arrow-right.svg';
 import { ClerkAPIError, SignInCreateParams } from '@clerk/types';
 import React from 'react';
 
 import { ERROR_CODES, getIdentifierControlDisplayValues } from '../../ui/common/constants';
-import { handleError } from '../../ui/common/errorHandler';
-import { buildRequest, FieldState, useFieldState } from '../../ui/common/forms';
 import { withRedirectToHome } from '../../ui/common/withRedirectToHome';
 import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../ui/contexts';
 import { useNavigate } from '../../ui/hooks';
 import { useSupportEmail } from '../../ui/hooks/useSupportEmail';
 import { getClerkQueryParam } from '../../utils/getClerkQueryParam';
-import { Button, descriptors, Flex } from '../customizables';
-import { FlowCard, Footer, Header, SocialButtons } from '../elements';
+import { descriptors, Flex } from '../customizables';
+import { CardAlert, FlowCard, Footer, Form, Header, LoadingCard, withFlowCardContext } from '../elements';
+import { useCardState } from '../elements/contexts';
+import { buildRequest, FormControlState, handleError, isMobileDevice, useFormControl } from '../utils';
+import { SignInSocialButtons } from './SignInSocialButtons';
 
 export function _SignInStart(): JSX.Element {
-  const { userSettings } = useEnvironment();
+  const card = useCardState();
+  const { userSettings, displayConfig } = useEnvironment();
   const { setActive } = useCoreClerk();
   const signIn = useCoreSignIn();
   const { navigate } = useNavigate();
-  const { navigateAfterSignIn } = useSignInContext();
+  const { navigateAfterSignIn, signUpUrl } = useSignInContext();
   const supportEmail = useSupportEmail();
 
-  const identifier = useFieldState('identifier', '');
-  const instantPassword = useFieldState('password', '');
   const organizationTicket = getClerkQueryParam('__clerk_ticket') || '';
-  const [error, setError] = React.useState<string | undefined>();
   const [isLoading, setIsLoading] = React.useState(false);
 
   const standardFormAttributes = userSettings.enabledFirstFactorIdentifiers;
   const web3FirstFactors = userSettings.web3FirstFactors;
   const socialProviderStrategies = userSettings.socialProviderStrategies;
   const passwordBasedInstance = userSettings.instanceIsPasswordBased;
+  const identifierInputDisplayValues = getIdentifierControlDisplayValues(standardFormAttributes);
+
+  const instantPasswordField = useFormControl('password', '', { type: 'password', label: 'Password' });
+  const identifierField = useFormControl('identifier', '', {
+    type: identifierInputDisplayValues.fieldType,
+    label: identifierInputDisplayValues.label,
+  });
 
   React.useEffect(() => {
     if (!organizationTicket) {
       return;
     }
-
     setIsLoading(true);
     signIn
       .create({
@@ -69,8 +72,6 @@ export function _SignInStart(): JSX.Element {
       });
   }, []);
 
-  const identifierInputDisplayValues = getIdentifierControlDisplayValues(standardFormAttributes);
-
   React.useEffect(() => {
     async function handleOauthError() {
       const error = signIn?.firstFactorVerification?.error;
@@ -79,11 +80,11 @@ export function _SignInStart(): JSX.Element {
         switch (error.code) {
           case ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP:
           case ERROR_CODES.OAUTH_ACCESS_DENIED:
-            setError(error.longMessage);
+            card.setError(error.longMessage);
             break;
           default:
             // Error from server may be too much information for the end user, so set a generic error
-            setError('Unable to complete action at this time. If the problem persists please contact support.');
+            card.setError('Unable to complete action at this time. If the problem persists please contact support.');
         }
 
         // TODO: This is a workaround in order to reset the sign in attempt
@@ -95,7 +96,7 @@ export function _SignInStart(): JSX.Element {
     void handleOauthError();
   });
 
-  const buildSignInParams = (fields: Array<FieldState<string>>): SignInCreateParams => {
+  const buildSignInParams = (fields: Array<FormControlState<string>>): SignInCreateParams => {
     const hasPassword = fields.some(f => f.name === 'password' && !!f.value);
     if (!hasPassword) {
       fields = fields.filter(f => f.name !== 'password');
@@ -106,7 +107,7 @@ export function _SignInStart(): JSX.Element {
     } as SignInCreateParams;
   };
 
-  const signInWithFields = async (...fields: Array<FieldState<string>>) => {
+  const signInWithFields = async (...fields: Array<FormControlState<string>>) => {
     try {
       const res = await signIn.create(buildSignInParams(fields));
       switch (res.status) {
@@ -142,7 +143,7 @@ export function _SignInStart(): JSX.Element {
     );
 
     if (instantPasswordError) {
-      await signInWithFields(identifier);
+      await signInWithFields(identifierField);
     } else if (alreadySignedInError) {
       const sid = alreadySignedInError.meta!.sessionId!;
       await setActive({
@@ -150,76 +151,77 @@ export function _SignInStart(): JSX.Element {
         beforeEmit: navigateAfterSignIn,
       });
     } else {
-      handleError(e, [identifier, instantPassword], setError);
+      handleError(e, [identifierField, instantPasswordField], card.setError);
     }
   };
 
   const handleFirstPartySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    return signInWithFields(identifier, instantPassword);
+    return signInWithFields(identifierField, instantPasswordField);
   };
 
   if (isLoading) {
-    return <div>is loading</div>;
+    return <LoadingCard />;
   }
+
   const hasSocialOrWeb3Buttons = !!socialProviderStrategies.length || !!web3FirstFactors.length;
+  const shouldAutofocus = !isMobileDevice() && hasSocialOrWeb3Buttons;
 
   return (
-    <FlowCard.Root
-      flow='signIn'
-      page='start'
-    >
-      <Header.Root>
-        <Header.Title>Sign in</Header.Title>
-        <Header.Subtitle>to continue to [Appname]</Header.Subtitle>
-      </Header.Root>
-      <Flex
-        direction={'col'}
-        elementDescriptor={descriptors.main}
-      >
-        <SocialButtons.Root />
-        <Flex>
-          <Button block>this is test</Button>
+    <FlowCard.OuterContainer>
+      <FlowCard.Content>
+        <CardAlert>{card.error}</CardAlert>
+        <Header.Root>
+          <Header.Title>Sign in</Header.Title>
+          <Header.Subtitle>to continue to {displayConfig.applicationName}</Header.Subtitle>
+        </Header.Root>
+        {/*TODO: extract main in its own component */}
+        <Flex
+          direction={'col'}
+          elementDescriptor={descriptors.main}
+          gap={8}
+          sx={theme => ({ marginTop: theme.space.$8 })}
+        >
+          <SignInSocialButtons />
+          {standardFormAttributes.length && (
+            <Form.Root onSubmit={handleFirstPartySubmit}>
+              <Form.Control
+                {...identifierField.props}
+                autoFocus={shouldAutofocus}
+              />
+              <InstantPasswordControl field={passwordBasedInstance ? instantPasswordField : undefined} />
+              <Form.SubmitButton>Continue</Form.SubmitButton>
+            </Form.Root>
+          )}
         </Flex>
-      </Flex>
-      <Footer.Root>
-        <Footer.Action>
-          <Footer.ActionText>No account?</Footer.ActionText>
-          <Footer.ActionLink
-            isExternal
-            href='https://www.google.com'
-          >
-            Sign up
-          </Footer.ActionLink>
-        </Footer.Action>
-        <Footer.Links>
-          <Footer.Link
-            elementId={descriptors.footerPagesLink.setId('help')}
-            isExternal
-            href='https://www.google.com'
-          >
-            Help
-          </Footer.Link>
-          <Footer.Link
-            elementId={descriptors.footerPagesLink.setId('privacy')}
-            isExternal
-            href='https://www.google.com'
-          >
-            Privacy
-          </Footer.Link>
-          <Footer.Link
-            elementId={descriptors.footerPagesLink.setId('terms')}
-            isExternal
-            href='https://www.google.com'
-          >
-            Terms
-          </Footer.Link>
-        </Footer.Links>
-      </Footer.Root>
-    </FlowCard.Root>
+        <Footer.Root>
+          <Footer.Action>
+            <Footer.ActionText>No account?</Footer.ActionText>
+            <Footer.ActionLink
+              isExternal
+              href={signUpUrl}
+            >
+              Sign up
+            </Footer.ActionLink>
+          </Footer.Action>
+          <Footer.Links />
+        </Footer.Root>
+      </FlowCard.Content>
+    </FlowCard.OuterContainer>
   );
 }
 
-const phoneFieldType = 'tel';
+const InstantPasswordControl = ({ field }: { field?: FormControlState<'password'> }) => {
+  if (!field) {
+    return null;
+  }
+  return (
+    <Form.Control
+      {...field.props}
+      tabIndex={!field.value ? -1 : undefined}
+      sx={!field.value ? { opacity: 0, height: 0, pointerEvents: 'none', marginTop: '-1rem' } : undefined}
+    />
+  );
+};
 
-export const SignInStart = withRedirectToHome(_SignInStart);
+export const SignInStart = withRedirectToHome(withFlowCardContext(_SignInStart, { flow: 'signIn', page: 'start' }));
