@@ -16,23 +16,53 @@ const containsAllElementsConfigKeys = containsAllOfType<keyof ElementsConfig>();
 export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'root',
   'card',
+
   'header',
   'header-title',
   'header-subtitle',
+
   'main',
+
   'footer',
   'footer-action',
   'footer-actionText',
   'footer-actionLink',
   'footer-pages',
   'footer-pagesLink',
+
   'socialButtons',
   'socialButtons-buttonIcon',
   'socialButtons-buttonBlock',
+  'socialButtons-buttonBlockText',
+  'socialButtons-buttonBlockArrow',
   'socialButtons-logo',
+
   'form',
-  'form-input',
+  'form-fieldRow',
+  'form-field',
+  'form-fieldLabelRow',
+  'form-fieldLabel',
+  'form-fieldAction',
+  'form-fieldInput',
+  'form-fieldErrorText',
   'form-buttonPrimary',
+  'form-fieldInputShowPassword',
+  'form-fieldInputShowPasswordIcon',
+
+  'avatar',
+  'avatar-image',
+
+  'identityPreview',
+  'identityPreview-avatar',
+  'identityPreview-text',
+  'identityPreview-icon',
+
+  'alert',
+  'alert-icon',
+  'alert-text',
+
+  'loader',
+  'loader-icon',
 ] as const);
 
 type TargettableClassname<K extends keyof ElementsConfig> = `${typeof CLASS_PREFIX}${K}`;
