@@ -23,10 +23,28 @@ type ElementProps = {
   p: JSX.IntrinsicElements['p'];
   a: JSX.IntrinsicElements['a'];
   label: JSX.IntrinsicElements['label'];
+  img: JSX.IntrinsicElements['img'];
+  form: JSX.IntrinsicElements['form'];
 };
+
+/**
+ * Some elements, like Flex can accept StateProps
+ * simply because they need to be targettable when their container
+ * component has a specific state. We then remove the props
+ * before rendering the element to the DOM
+ */
+type StateProps = Partial<Record<'isDisabled' | 'hasError' | 'isLoading', any>>;
 
 type PrimitiveProps<HtmlT extends keyof ElementProps> = ElementProps[HtmlT] & CssProp;
 type PickSiblingProps<C extends React.FunctionComponent, T extends keyof Parameters<C>[0]> = Pick<Parameters<C>[0], T>;
-type PropsOfComponent<C extends React.FunctionComponent> = Parameters<C>[0];
+type PropsOfComponent<C extends (...args: any[]) => any> = Parameters<C>[0];
 
-export type { InternalTheme, PrimitiveProps, PickSiblingProps, PropsOfComponent, StyleRule, ThemableCssProp };
+export type {
+  InternalTheme,
+  PrimitiveProps,
+  PickSiblingProps,
+  PropsOfComponent,
+  StyleRule,
+  ThemableCssProp,
+  StateProps,
+};
