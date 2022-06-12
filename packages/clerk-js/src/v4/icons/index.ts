@@ -6,3 +6,12 @@
  */
 export { default as ArrowLeftIcon } from './arrow-left.svg';
 export { default as ArrowRightIcon } from './arrow-right.svg';
+export { default as ExclamationTriangle } from './exclamation-triangle.svg';
+export { default as ExclamationCircle } from './exclamation-circle.svg';
+export { default as EyeSlash } from './eye-slash.svg';
+export { default as MagnifyingGlass } from './magnifying-glass.svg';
+export { default as Caret } from './caret.svg';
+export { default as PencilEdit } from './pencil-edit.svg';
+export { default as Email } from './email.svg';
+export { default as TickShield } from './tick-shield.svg';
+export { default as SwitchArrows } from './switch-arrows.svg';
