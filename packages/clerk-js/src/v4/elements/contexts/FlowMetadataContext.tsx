@@ -4,7 +4,16 @@ import { createContextAndHook } from '../../utils';
 
 type FlowMetadata = {
   flow: 'signIn' | 'signUp';
-  page: 'start' | 'emailOtp' | 'phoneOtp';
+  page:
+    | 'start'
+    | 'emailCode'
+    | 'phoneCode'
+    | 'password'
+    | 'emailLink'
+    | 'alternativeMethods'
+    | 'havingTrouble'
+    | 'ssoCallback'
+    | 'emailLinkVerify';
 };
 
 const [FlowMetadataCtx, useFlowMetadata] = createContextAndHook<FlowMetadata>('FlowMetadata');

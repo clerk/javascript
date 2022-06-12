@@ -3,42 +3,53 @@ import React from 'react';
 import { Card, descriptors, Flex, useAppearance } from '../customizables';
 import { generateFlowMetadataClassname } from '../customizables/classGeneration';
 import { InternalThemeProvider } from '../styledSystem';
-import { CardStateProvider, FlowMetadata, FlowMetadataProvider } from './contexts';
+import { CardStateProvider, FlowMetadata, FlowMetadataProvider, useFlowMetadata } from './contexts';
 
 type FlowCardRootProps = React.PropsWithChildren<FlowMetadata>;
 
-const FlowCardRoot = (props: FlowCardRootProps): JSX.Element => {
-  const { parsedInternalTheme } = useAppearance();
-
-  return (
-    <InternalThemeProvider theme={parsedInternalTheme[props.flow]}>
-      <FlowMetadataProvider
-        flow={props.flow}
-        page={props.page}
-      >
-        <CardStateProvider>
-          <CardContent {...props} />
-        </CardStateProvider>
-      </FlowMetadataProvider>
-    </InternalThemeProvider>
-  );
-};
-
-const CardContent = (props: FlowCardRootProps) => {
-  const { flow, page, ...rest } = props;
+const OuterContainer = (props: React.PropsWithChildren<any>) => {
+  const flowMetadata = useFlowMetadata();
+  // TODO: Logo will go here
   return (
     <Flex
       elementDescriptor={descriptors.root}
-      className={generateFlowMetadataClassname(props)}
-    >
-      <Card
-        elementDescriptor={descriptors.card}
-        {...rest}
-      />
-    </Flex>
+      className={generateFlowMetadataClassname(flowMetadata)}
+      {...props}
+    />
+  );
+};
+
+const Content = (props: React.PropsWithChildren<any>) => {
+  return (
+    <Card
+      elementDescriptor={descriptors.card}
+      {...props}
+    />
   );
 };
 
 export const FlowCard = {
-  Root: FlowCardRoot,
+  OuterContainer,
+  Content,
+};
+
+export const withFlowCardContext = <C,>(Component: C, options: FlowMetadata): C => {
+  const { page, flow } = options;
+  const HOC = (props: any) => {
+    const { parsedInternalTheme } = useAppearance();
+    return (
+      <InternalThemeProvider theme={parsedInternalTheme[flow]}>
+        <FlowMetadataProvider
+          flow={flow}
+          page={page}
+        >
+          <CardStateProvider>
+            {/*// @ts-ignore*/}
+            <Component {...props} />
+          </CardStateProvider>
+        </FlowMetadataProvider>
+      </InternalThemeProvider>
+    );
+  };
+  return HOC as any as C;
 };
