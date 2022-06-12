@@ -1,6 +1,7 @@
 import * as CSS from 'csstype';
 
 import { OAuthProvider } from './oauth';
+import { FontFamily } from './theme';
 
 type CSSProperties = CSS.PropertiesFallback<number | string>;
 type CSSPropertiesWithMultiValues = { [K in keyof CSSProperties]: CSSProperties[K] };
@@ -8,14 +9,27 @@ type CSSPseudos = { [K in CSS.Pseudos as `&${K}`]?: CSSObject };
 
 interface CSSObject extends CSSPropertiesWithMultiValues, CSSPseudos {}
 type UserDefinedStyle = string | CSSObject;
-export type ColorScale<T = string> = Record<50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900, T>;
+
+type Shade = '50' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900';
+export type ColorScale<T = string> = Record<Shade, T>;
+export type LightScale<T = string> = Pick<ColorScale<T>, '50' | '100' | '200' | '300' | '400' | '500'>;
+
 export type ColorScaleWithRequiredBase<T = string> = Partial<ColorScale<T>> & { '500': T };
+export type LightScaleWithRequiredBase<T = string> = Partial<LightScale<T>> & { '500': T };
+
 export type ColorOption = string | ColorScaleWithRequiredBase;
+export type LightColorOption = string | LightScaleWithRequiredBase;
+
+export type FontSize = string | { small?: string; base: string; large?: string };
+export type BorderRadius = string | { small?: string; base: string; large?: string };
 
 type LoadingState = 'loading';
 type DisabledState = 'disabled';
 type ErrorState = 'error';
 export type ElementState = LoadingState | DisabledState | ErrorState;
+
+export type AlertId = 'danger' | 'warning';
+export type FieldId = 'firstName' | 'lastName' | 'emailAddress' | 'phoneNumber' | 'password' | 'identifier';
 
 /**
  * A type that describes the states and the ids that we will combine
@@ -62,8 +76,6 @@ export type ElementObjectKey<K extends string> = K extends `${infer Parent}-${in
   ? `${Parent}${Capitalize<Rest>}`
   : K;
 
-type FormInputId = 'firstName' | 'lastName' | 'emailAddress' | 'password';
-
 /**
  * A map that describes the possible combinations we need to generate
  * for each unique base element
@@ -86,14 +98,42 @@ export type ElementsConfig = {
   'footer-pages': WithOptions<never, never, never>;
   'footer-pagesLink': WithOptions<'help' | 'terms' | 'privacy', never, never>;
 
+  // TODO: grid + rows or just socialButtons?
+  // socialButtonsGrid: WithOptions<never, never, never>;
+  // socialButtonsRows: WithOptions<never, never, never>;
   socialButtons: WithOptions<never, never, never>;
   'socialButtons-buttonIcon': WithOptions<OAuthProvider, LoadingState | DisabledState, never>;
   'socialButtons-buttonBlock': WithOptions<OAuthProvider, LoadingState | DisabledState, never>;
+  'socialButtons-buttonBlockText': WithOptions<OAuthProvider, never, never>;
+  'socialButtons-buttonBlockArrow': WithOptions<OAuthProvider, never, never>;
   'socialButtons-logo': WithOptions<OAuthProvider, LoadingState | DisabledState, never>;
 
-  form: WithOptions<never, never, never>;
-  'form-input': WithOptions<FormInputId, ErrorState | DisabledState, never>;
+  form: WithOptions<never, ErrorState, never>;
+  'form-fieldRow': WithOptions<never, never, never>;
+  'form-field': WithOptions<FieldId, ErrorState | DisabledState, never>;
+  'form-fieldLabelRow': WithOptions<FieldId, ErrorState | DisabledState, never>;
+  'form-fieldLabel': WithOptions<FieldId, ErrorState | DisabledState, never>;
+  'form-fieldAction': WithOptions<FieldId, ErrorState | DisabledState, never>;
+  'form-fieldInput': WithOptions<FieldId, ErrorState | DisabledState, never>;
+  'form-fieldErrorText': WithOptions<FieldId, ErrorState | DisabledState, never>;
   'form-buttonPrimary': WithOptions<never, ErrorState | LoadingState, never>;
+  'form-fieldInputShowPassword': WithOptions<never, never, never>;
+  'form-fieldInputShowPasswordIcon': WithOptions<never, never, never>;
+
+  avatar: WithOptions<never, never, never>;
+  'avatar-image': WithOptions<never, never, never>;
+
+  identityPreview: WithOptions<never, never, never>;
+  'identityPreview-avatar': WithOptions<never, never, never>;
+  'identityPreview-text': WithOptions<never, never, never>;
+  'identityPreview-icon': WithOptions<never, never, never>;
+
+  alert: WithOptions<AlertId, never, never>;
+  'alert-icon': WithOptions<AlertId, never, never>;
+  'alert-text': WithOptions<AlertId, never, never>;
+
+  loader: WithOptions<never, never, never>;
+  'loader-icon': WithOptions<never, ErrorState, never>;
 };
 
 export type Elements = {
@@ -101,10 +141,51 @@ export type Elements = {
 }[keyof ElementsConfig];
 
 export type Variables = {
+  /**
+   * The primary color used throughout the components. Set this to your brand color.
+   */
   colorPrimary?: ColorOption;
+  /**
+   * The color used to indicate errors or destructive actions. Set this to your brand's danger color.
+   */
   colorDanger?: ColorOption;
+  /**
+   * The color used to indicate an action that completed successfully or a positive result.
+   */
   colorSuccess?: ColorOption;
+  /**
+   * The color used for potentially destructive actions or when the user's attention is required.
+   */
   colorWarning?: ColorOption;
+  /**
+   * The default text color. The 500 shade is used as the text base. Less important
+   * text (eg: a subtitle) will use lighter shades.
+   */
+  colorText?: LightColorOption;
+  /**
+   * The default text color inside input elements. To customise the input background color, use`colorInputBackground`.
+   */
+  colorInputText?: LightColorOption;
+  /**
+   * The background color for the card container.
+   */
+  colorBackground?: string;
+  /**
+   * The background color for all the input elements.
+   */
+  colorInputBackground?: string;
+  /**
+   * The default font that will be used in all components.
+   */
+  fontFamily?: FontFamily;
+  /**
+   * The size that will be used as the base to calculate the `small` and `large` font sizes
+   */
+  fontSize?: FontSize;
+  /**
+   * The size that will be used as the base to calculate the `small` and `large` border sizes
+   */
+  borderRadius?: BorderRadius;
 };
 
 export type Theme = {
@@ -145,8 +226,7 @@ export type Appearance = Theme & {
   // userProfile?: Theme;
 };
 
-// TODO: Decide if we want to keep this
-type AppearanceFunctionParams = { prefersColorScheme: 'dark' | 'light' };
-export type AppearanceFactory = (params: AppearanceFunctionParams) => Appearance;
-
-export type AppearanceProp = Appearance | AppearanceFactory;
+// TODO: Discuss if we want to release a `prefersColorScheme` based theme switcher
+// type AppearanceFunctionParams = { prefersColorScheme: 'dark' | 'light' };
+// export type AppearanceFactory = (params: AppearanceFunctionParams) => Appearance;
+// export type AppearanceProp = Appearance | AppearanceFactory;
