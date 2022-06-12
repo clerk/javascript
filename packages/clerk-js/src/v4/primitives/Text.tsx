@@ -1,67 +1,27 @@
 import React from 'react';
 
-import { createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
+import { common, createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
 
 const { applyVariants, filterProps } = createVariants(theme => {
-  // TODO: This name will change based on actual usage
-  const smallRegular = {
-    fontStyle: theme.fontStyles.$normal,
-    fontWeight: theme.fontWeights.$normal,
-    fontSize: theme.fontSizes.$xs,
-    lineHeight: theme.lineHeights.$none,
-  };
-
   return {
     base: {
       boxSizing: 'border-box',
-      color: 'currentcolor',
+      color: theme.colors.$text500,
       margin: 0,
     },
     variants: {
-      variant: {
-        label: {
-          // Dashboard/Text / Small / Medium
-          fontStyle: theme.fontStyles.$normal,
-          fontWeight: theme.fontWeights.$medium,
-          fontSize: theme.fontSizes.$xs,
-          lineHeight: theme.lineHeights.$none,
-        },
-        // Dashboard/Text/Small/Regular
-        error: smallRegular,
-        link: smallRegular,
-        hint: smallRegular,
-        buttonLabel: {
-          // Dashboard/Button Small
-          fontStyle: theme.fontStyles.$normal,
-          fontWeight: theme.fontWeights.$semibold,
-          fontSize: theme.fontSizes.$xxs,
-          letterSpacing: theme.space.$xxs,
-          lineHeight: theme.lineHeights.$none,
-          textTransform: 'uppercase',
-        },
-        subheading: {
-          // Dashboard/Text/Regular/Regular
-          fontStyle: theme.fontStyles.$normal,
-          fontWeight: theme.fontWeights.$normal,
-          fontSize: theme.fontSizes.$sm,
-          lineHeight: theme.lineHeights.$shorter,
-        },
-      },
+      variant: common.textVariants(theme),
+      size: common.fontSizeVariants(theme),
       colorScheme: {
         primary: {
-          color: theme.colors.$primary500,
+          color: theme.colors.$text500,
         },
         danger: {
           color: theme.colors.$danger500,
         },
         neutral: {
-          color: theme.colors.$gray500,
+          color: theme.colors.$text400,
         },
-      },
-      size: {
-        xss: { fontSize: theme.fontSizes.$xxs },
-        xs: { fontSize: theme.fontSizes.$xs },
-        sm: { fontSize: theme.fontSizes.$sm },
       },
       truncate: {
         true: {

@@ -6,7 +6,7 @@ const { applyVariants } = createVariants(theme => ({
   base: {
     boxSizing: 'border-box',
     // TODO: Should this be $text?
-    color: `${theme.colors.$black}`,
+    color: `${theme.colors.$text500}`,
     margin: 0,
   },
   variants: {
