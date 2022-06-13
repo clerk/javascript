@@ -42,6 +42,7 @@
     "@clerk/types": "^2.19.1",
     "@emotion/cache": "^11.7.1",
     "@emotion/react": "^11.9.0",
+    "@floating-ui/react-dom-interactions": "^0.6.3",
     "@popperjs/core": "^2.4.4",
     "browser-tabs-lock": "^1.2.15",
     "classnames": "^2.3.1",
