@@ -7,7 +7,7 @@ import { descriptors, Flex, Grid } from '../customizables';
 import { BackLink, BlockButtonWithArrow, CardAlert, FlowCard, Footer, Header, withFlowCardContext } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { allStrategiesButtonsComparator } from '../utils';
-import { HavingTrouble } from './HavingTrouble.';
+import { HavingTrouble } from './HavingTrouble';
 import { SignInSocialButtons } from './SignInSocialButtons';
 
 export type AlternativeMethodsProps = {
