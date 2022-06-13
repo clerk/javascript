@@ -3,7 +3,7 @@ import React from 'react';
 import { withRedirectToHome } from '../../ui/common/withRedirectToHome';
 import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../ui/contexts';
 import { useRouter } from '../../ui/router';
-import { CardWithCodeForm, CardWithCodeFormProps, withFlowCardContext } from '../elements';
+import { VerificationCodeCard, VerificationCodeCardProps, withFlowCardContext } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { handleError } from '../utils';
 
@@ -52,7 +52,7 @@ const SignInFactorTwoPhoneCodeCard = withFlowCardContext(
         .catch(err => handleError(err, [], card.setError));
     };
 
-    const action: CardWithCodeFormProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
+    const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
       return signIn
         .attemptSecondFactor({ strategy: 'phone_code', code })
         .then(async res => {
@@ -66,7 +66,7 @@ const SignInFactorTwoPhoneCodeCard = withFlowCardContext(
     };
 
     return (
-      <CardWithCodeForm
+      <VerificationCodeCard
         cardTitle='Sign in'
         cardSubtitle={`To continue to ${applicationName}`}
         formTitle='Verification code'
