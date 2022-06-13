@@ -9,6 +9,7 @@ export * from './Avatar';
 export * from './CodeControl';
 export * from './BlockButtonWithArrow';
 export * from './TimerButton';
-export * from './CardWithCodeForm';
+export * from './VerificationCodeCard';
 export * from './LoadingCard';
 export * from './ErrorCard';
+export * from './VerificationLinkCard';

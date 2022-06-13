@@ -3,7 +3,7 @@ import React from 'react';
 
 import { ComponentContext, useCoreClerk, useSignInContext, withCoreSessionSwitchGuard } from '../../ui/contexts';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../ui/router';
-import { SignInEmailLinkVerify } from './EmailLinkVerificationCard';
+import { SignInEmailLinkFlowComplete } from '../common/EmailLinkCompleteFlowCard';
 import { SignInFactorOne } from './SignInFactorOne';
 import { SignInFactorTwo } from './SignInFactorTwo';
 import { SignInSSOCallback } from './SignInSSOCallback';
@@ -38,7 +38,7 @@ function SignInRoutes(): JSX.Element {
       </Route>
       <Route path='choose'>{/* TODO: Should be implemented with user button */}</Route>
       <Route path='verify'>
-        <SignInEmailLinkVerify
+        <SignInEmailLinkFlowComplete
           redirectUrlComplete={signInContext.afterSignInUrl || signInContext.redirectUrl || undefined}
           redirectUrl='../factor-two'
         />

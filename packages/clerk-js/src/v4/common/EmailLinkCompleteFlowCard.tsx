@@ -42,7 +42,7 @@ const signUpTexts = {
   },
 };
 
-export const SignInEmailLinkVerify = withFlowCardContext(
+export const SignInEmailLinkFlowComplete = withFlowCardContext(
   (props: Omit<EmailLinkVerifyProps, 'texts'>) => {
     return (
       <EmailLinkVerify
@@ -54,7 +54,7 @@ export const SignInEmailLinkVerify = withFlowCardContext(
   { flow: 'signIn', page: 'emailLinkVerify' },
 );
 
-export const SignUpEmailLinkVerify = withFlowCardContext(
+export const SignUpEmailLinkFlowComplete = withFlowCardContext(
   (props: Omit<EmailLinkVerifyProps, 'texts'>) => {
     return (
       <EmailLinkVerify
