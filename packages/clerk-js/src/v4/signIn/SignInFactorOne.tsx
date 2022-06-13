@@ -7,9 +7,10 @@ import { useRouter } from '../../ui/router';
 import { determineStartingSignInFactor, factorHasLocalStrategy } from '../../ui/signIn/utils';
 import { LoadingCard } from '../elements';
 import { AlternativeMethods } from './AlternativeMethods';
-import { SignInFactorOneEmailCodeCard, SignInFactorOnePhoneCodeCard } from './SignInFactorOneCodeCard';
+import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
 import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
 import { SignInFactorOnePasswordCard } from './SignInFactorOnePasswordCard';
+import { SignInFactorOnePhoneCodeCard } from './SignInFactorOnePhoneCodeCard';
 
 const factorKey = (factor: SignInFactor | null | undefined) => {
   if (!factor) {
