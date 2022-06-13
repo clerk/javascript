@@ -15,8 +15,10 @@ export type SignInFactorOneCodeCard = Pick<CardWithCodeFormProps, 'onShowAlterna
 };
 
 type SignInFactorOneCodeFormProps = SignInFactorOneCodeCard & {
-  codeFormTitle: string;
-  codeFormSubtitle: string;
+  cardTitle: string;
+  cardSubtitle: string;
+  formTitle: string;
+  formSubtitle: string;
 };
 
 export const SignInFactorOneCodeForm = withFlowCardContext(
@@ -62,8 +64,10 @@ export const SignInFactorOneCodeForm = withFlowCardContext(
 
     return (
       <CardWithCodeForm
-        title={props.codeFormTitle}
-        subtitle={props.codeFormSubtitle}
+        cardTitle={props.cardTitle}
+        cardSubtitle={props.cardSubtitle}
+        formTitle={props.formTitle}
+        formSubtitle={props.formSubtitle}
         onCodeEntryFinishedAction={action}
         onResendCodeClicked={prepare}
         safeIdentifier={props.factor.safeIdentifier}
