@@ -10,11 +10,13 @@ import { getClerkQueryParam } from '../../utils/getClerkQueryParam';
 import { descriptors, Flex } from '../customizables';
 import { CardAlert, FlowCard, Footer, Form, Header, LoadingCard, withFlowCardContext } from '../elements';
 import { useCardState } from '../elements/contexts';
+import { useLoadingStatus } from '../hooks';
 import { buildRequest, FormControlState, handleError, isMobileDevice, useFormControl } from '../utils';
 import { SignInSocialButtons } from './SignInSocialButtons';
 
 export function _SignInStart(): JSX.Element {
   const card = useCardState();
+  const status = useLoadingStatus();
   const { userSettings, displayConfig } = useEnvironment();
   const { setActive } = useCoreClerk();
   const signIn = useCoreSignIn();
@@ -23,7 +25,6 @@ export function _SignInStart(): JSX.Element {
   const supportEmail = useSupportEmail();
 
   const organizationTicket = getClerkQueryParam('__clerk_ticket') || '';
-  const [isLoading, setIsLoading] = React.useState(false);
 
   const standardFormAttributes = userSettings.enabledFirstFactorIdentifiers;
   const web3FirstFactors = userSettings.web3FirstFactors;
@@ -31,7 +32,10 @@ export function _SignInStart(): JSX.Element {
   const passwordBasedInstance = userSettings.instanceIsPasswordBased;
   const identifierInputDisplayValues = getIdentifierControlDisplayValues(standardFormAttributes);
 
-  const instantPasswordField = useFormControl('password', '', { type: 'password', label: 'Password' });
+  const instantPasswordField = useFormControl('password', '', {
+    type: 'password',
+    label: 'Password',
+  });
   const identifierField = useFormControl('identifier', '', {
     type: identifierInputDisplayValues.fieldType,
     label: identifierInputDisplayValues.label,
@@ -41,7 +45,8 @@ export function _SignInStart(): JSX.Element {
     if (!organizationTicket) {
       return;
     }
-    setIsLoading(true);
+    status.setLoading();
+    card.setLoading();
     signIn
       .create({
         strategy: 'ticket',
@@ -68,14 +73,14 @@ export function _SignInStart(): JSX.Element {
         return attemptToRecoverFromSignInError(err);
       })
       .finally(() => {
-        setIsLoading(false);
+        status.setIdle();
+        card.setIdle();
       });
   }, []);
 
   React.useEffect(() => {
     async function handleOauthError() {
       const error = signIn?.firstFactorVerification?.error;
-
       if (error) {
         switch (error.code) {
           case ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP:
@@ -86,13 +91,11 @@ export function _SignInStart(): JSX.Element {
             // Error from server may be too much information for the end user, so set a generic error
             card.setError('Unable to complete action at this time. If the problem persists please contact support.');
         }
-
         // TODO: This is a workaround in order to reset the sign in attempt
         // so that the oauth error does not persist on full page reloads.
         void (await signIn.create({}));
       }
     }
-
     void handleOauthError();
   });
 
@@ -146,10 +149,7 @@ export function _SignInStart(): JSX.Element {
       await signInWithFields(identifierField);
     } else if (alreadySignedInError) {
       const sid = alreadySignedInError.meta!.sessionId!;
-      await setActive({
-        session: sid,
-        beforeEmit: navigateAfterSignIn,
-      });
+      await setActive({ session: sid, beforeEmit: navigateAfterSignIn });
     } else {
       handleError(e, [identifierField, instantPasswordField], card.setError);
     }
@@ -160,7 +160,7 @@ export function _SignInStart(): JSX.Element {
     return signInWithFields(identifierField, instantPasswordField);
   };
 
-  if (isLoading) {
+  if (status.isLoading) {
     return <LoadingCard />;
   }
 
@@ -177,7 +177,7 @@ export function _SignInStart(): JSX.Element {
         </Header.Root>
         {/*TODO: extract main in its own component */}
         <Flex
-          direction={'col'}
+          direction='col'
           elementDescriptor={descriptors.main}
           gap={8}
           sx={theme => ({ marginTop: theme.space.$8 })}
