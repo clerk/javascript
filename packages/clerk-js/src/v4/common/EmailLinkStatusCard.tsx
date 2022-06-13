@@ -1,0 +1,104 @@
+import React from 'react';
+
+import { VerificationStatus } from '../../utils/getClerkQueryParam';
+import { descriptors, Flex, Icon, Spinner, Text } from '../customizables';
+import { CardAlert, FlowCard, Header } from '../elements';
+import { useCardState } from '../elements/contexts';
+import { ExclamationTriangle, SwitchArrows, TickShield } from '../icons';
+import { animations, InternalTheme } from '../styledSystem';
+
+type EmailLinkStatusCardProps = React.PropsWithChildren<{
+  title: string;
+  subtitle: string;
+  status: VerificationStatus;
+}>;
+
+const StatusToIcon: Record<Exclude<VerificationStatus, 'loading'>, React.ComponentType> = {
+  verified: TickShield,
+  verified_switch_tab: SwitchArrows,
+  expired: ExclamationTriangle,
+  failed: ExclamationTriangle,
+};
+
+const statusToColor = (theme: InternalTheme, status: Exclude<VerificationStatus, 'loading'>) =>
+  ({
+    verified: theme.colors.$success500,
+    verified_switch_tab: theme.colors.$primary500,
+    expired: theme.colors.$warning500,
+    failed: theme.colors.$danger500,
+  }[status]);
+
+export const EmailLinkStatusCard = (props: EmailLinkStatusCardProps) => {
+  const card = useCardState();
+  return (
+    <FlowCard.OuterContainer>
+      <FlowCard.Content>
+        <CardAlert>{card.error}</CardAlert>
+        <Header.Root>
+          <Header.Title>{props.title}</Header.Title>
+          <Header.Subtitle>{props.subtitle}</Header.Subtitle>
+        </Header.Root>
+        <Flex
+          direction='col'
+          elementDescriptor={descriptors.main}
+          sx={theme => ({ marginTop: theme.space.$8 })}
+        >
+          <StatusRow status={props.status} />
+        </Flex>
+      </FlowCard.Content>
+    </FlowCard.OuterContainer>
+  );
+};
+
+const StatusRow = (props: { status: VerificationStatus }) => {
+  return (
+    <Flex
+      justify='center'
+      align='center'
+      direction='col'
+      gap={8}
+    >
+      {props.status === 'loading' ? (
+        <Spinner
+          size='xl'
+          colorScheme='primary'
+          sx={theme => ({ margin: `${theme.space.$12} 0` })}
+        />
+      ) : (
+        <>
+          <StatusIcon status={props.status} />
+          <Text
+            variant='subheading'
+            colorScheme='neutral'
+          >
+            You may close this tab
+          </Text>
+        </>
+      )}
+    </Flex>
+  );
+};
+
+const StatusIcon = (props: { status: Exclude<VerificationStatus, 'loading'> }) => {
+  const { status } = props;
+
+  return (
+    <Flex
+      justify='center'
+      align='center'
+      sx={theme => ({
+        width: theme.space.$24,
+        height: theme.space.$24,
+        borderRadius: theme.radii.$circle,
+        backgroundColor: theme.colors.$blackAlpha100,
+        color: statusToColor(theme, status),
+        animation: `${animations.dropdownFadeInAndScale} 500ms ease`,
+      })}
+    >
+      <Icon
+        icon={StatusToIcon[status]}
+        sx={theme => ({ height: theme.sizes.$6, width: theme.sizes.$5 })}
+      />
+    </Flex>
+  );
+};
