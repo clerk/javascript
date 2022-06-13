@@ -1,14 +1,15 @@
 import React from 'react';
 
-import { useEnvironment } from '../../ui/contexts';
 import { useRouter } from '../../ui/router';
 import { descriptors, Flex, Text } from '../customizables';
 import { BackLink, CardAlert, FlowCard, Footer, Header, IdentityPreview, TimerButton } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { useLoadingStatus } from '../hooks';
 
-type CardWithEmailLinkFormProps = {
+type VerificationLinkCardProps = {
   safeIdentifier: string;
+  cardTitle: string;
+  cardSubtitle: string;
   formTitle: string;
   formSubtitle: string;
   profileImageUrl?: string;
@@ -16,8 +17,7 @@ type CardWithEmailLinkFormProps = {
   onShowAlternativeMethodsClicked?: React.MouseEventHandler;
 };
 
-export const SignInFactorOneEmailLinkForm = (props: CardWithEmailLinkFormProps) => {
-  const { displayConfig } = useEnvironment();
+export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
   const status = useLoadingStatus();
   const { navigate } = useRouter();
   const card = useCardState();
@@ -32,8 +32,8 @@ export const SignInFactorOneEmailLinkForm = (props: CardWithEmailLinkFormProps) 
         <CardAlert>{card.error}</CardAlert>
         <BackLink onClick={goBack} />
         <Header.Root>
-          <Header.Title>Sign in</Header.Title>
-          <Header.Subtitle>to continue to {displayConfig.applicationName}</Header.Subtitle>
+          <Header.Title>{props.cardTitle}</Header.Title>
+          <Header.Subtitle>{props.cardSubtitle}</Header.Subtitle>
         </Header.Root>
         <IdentityPreview
           identifier={props.safeIdentifier}

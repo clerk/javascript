@@ -6,12 +6,11 @@ import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '.
 import { useMagicLink } from '../../ui/hooks/useMagicLink';
 import { useRouter } from '../../ui/router/RouteContext';
 import { EmailLinkStatusCard } from '../common';
-import { CardWithCodeFormProps, withFlowCardContext } from '../elements';
+import { VerificationCodeCardProps, VerificationLinkCard, withFlowCardContext } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { handleError } from '../utils';
-import { SignInFactorOneEmailLinkForm } from './SignInFactorOneEmailLinkForm';
 
-type SignInFactorOneEmailLinkCardProps = Pick<CardWithCodeFormProps, 'onShowAlternativeMethodsClicked'> & {
+type SignInFactorOneEmailLinkCardProps = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
   factor: EmailLinkFactor;
   factorAlreadyPrepared: boolean;
   onFactorPrepare: () => void;
@@ -19,10 +18,11 @@ type SignInFactorOneEmailLinkCardProps = Pick<CardWithCodeFormProps, 'onShowAlte
 
 export const SignInFactorOneEmailLinkCard = withFlowCardContext(
   (props: SignInFactorOneEmailLinkCardProps) => {
+    const card = useCardState();
     const signIn = useCoreSignIn();
     const signInContext = useSignInContext();
+    const { displayConfig } = useEnvironment();
     const { signInUrl } = useEnvironment().displayConfig;
-    const card = useCardState();
     const { navigate } = useRouter();
     const { navigateAfterSignIn } = useSignInContext();
     const { setActive } = useCoreClerk();
@@ -81,13 +81,15 @@ export const SignInFactorOneEmailLinkCard = withFlowCardContext(
     }
 
     return (
-      <SignInFactorOneEmailLinkForm
+      <VerificationLinkCard
+        cardTitle='Sign in'
+        cardSubtitle={`to continue to ${displayConfig.applicationName}`}
+        formTitle='Verification link'
+        formSubtitle='Click on the verification link sent to your email'
         onResendCodeClicked={restartVerification}
         safeIdentifier={props.factor.safeIdentifier}
         profileImageUrl={signIn.userData.profileImageUrl}
         onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
-        formTitle='Verification link'
-        formSubtitle='Click on the verification link in the email sent to your email'
       />
     );
   },
