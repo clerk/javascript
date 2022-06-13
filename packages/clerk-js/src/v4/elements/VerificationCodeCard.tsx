@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { useEnvironment } from '../../ui/contexts';
 import { useRouter } from '../../ui/router';
 import { descriptors, Flex } from '../customizables';
 import { useLoadingStatus } from '../hooks';
@@ -15,10 +14,12 @@ import { Footer } from './Footer';
 import { Header } from './Header';
 import { IdentityPreview } from './IdentityPreview';
 
-export type CardWithCodeFormProps = {
+export type VerificationCodeCardProps = {
   safeIdentifier: string;
-  subtitle: string;
-  title: string;
+  cardTitle: string;
+  cardSubtitle: string;
+  formTitle: string;
+  formSubtitle: string;
   profileImageUrl?: string;
   onCodeEntryFinishedAction: (
     code: string,
@@ -29,8 +30,7 @@ export type CardWithCodeFormProps = {
   onShowAlternativeMethodsClicked?: React.MouseEventHandler;
 };
 
-export const CardWithCodeForm = (props: CardWithCodeFormProps) => {
-  const { displayConfig } = useEnvironment();
+export const VerificationCodeCard = (props: VerificationCodeCardProps) => {
   const [success, setSuccess] = React.useState(false);
   const status = useLoadingStatus();
   const codeControlState = useFormControl('code', '');
@@ -71,8 +71,8 @@ export const CardWithCodeForm = (props: CardWithCodeFormProps) => {
         <CardAlert>{card.error}</CardAlert>
         <BackLink onClick={goBack} />
         <Header.Root>
-          <Header.Title>Sign in</Header.Title>
-          <Header.Subtitle>to continue to {displayConfig.applicationName}</Header.Subtitle>
+          <Header.Title>{props.cardTitle}</Header.Title>
+          <Header.Subtitle>{props.cardSubtitle}</Header.Subtitle>
         </Header.Root>
         <IdentityPreview
           identifier={props.safeIdentifier}
@@ -87,8 +87,8 @@ export const CardWithCodeForm = (props: CardWithCodeFormProps) => {
           sx={theme => ({ marginTop: theme.space.$8 })}
         >
           <CodeForm
-            title={props.title}
-            subtitle={props.subtitle}
+            title={props.formTitle}
+            subtitle={props.formSubtitle}
             isLoading={status.isLoading}
             success={success}
             codeControl={codeControl}

@@ -4,11 +4,11 @@ import React from 'react';
 import { useCoreClerk, useCoreSignIn, useSignInContext } from '../../ui/contexts';
 import { useSupportEmail } from '../../ui/hooks/useSupportEmail';
 import { useRouter } from '../../ui/router';
-import { CardWithCodeForm, CardWithCodeFormProps, withFlowCardContext } from '../elements';
+import { VerificationCodeCard, VerificationCodeCardProps, withFlowCardContext } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { handleError } from '../utils';
 
-export type SignInFactorOneCodeCard = Pick<CardWithCodeFormProps, 'onShowAlternativeMethodsClicked'> & {
+export type SignInFactorOneCodeCard = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
   factor: EmailCodeFactor | PhoneCodeFactor;
   factorAlreadyPrepared: boolean;
   onFactorPrepare: () => void;
@@ -43,7 +43,7 @@ export const SignInFactorOneCodeForm = withFlowCardContext(
         .catch(err => handleError(err, [], card.setError));
     };
 
-    const action: CardWithCodeFormProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
+    const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
       return signIn
         .attemptFirstFactor({ strategy: props.factor.strategy, code })
         .then(async res => {
@@ -63,7 +63,7 @@ export const SignInFactorOneCodeForm = withFlowCardContext(
     };
 
     return (
-      <CardWithCodeForm
+      <VerificationCodeCard
         cardTitle={props.cardTitle}
         cardSubtitle={props.cardSubtitle}
         formTitle={props.formTitle}
