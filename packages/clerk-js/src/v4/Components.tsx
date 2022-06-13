@@ -12,7 +12,7 @@ import { VirtualRouter } from '../ui/router';
 import type { AvailableComponentCtx, AvailableComponentProps } from '../ui/types';
 import { AppearanceProvider } from './customizables';
 import { SignIn, SignInModal } from './signIn';
-import { SignUp } from './signUp';
+import { SignUp, SignUpModal } from './signUp';
 
 export type MountComponentRenderer = (
   clerk: Clerk,
@@ -73,8 +73,8 @@ function assertDOMElement(element: HTMLElement): asserts element {
   }
 }
 
-const addMountNodeClass = (node: HTMLDivElement, className: string) => {
-  node.className = 'cl-component ' + className;
+const addMountNodeClass = (node: HTMLDivElement) => {
+  node.className = 'cl-component';
 };
 
 export const mountComponentRenderer = (
@@ -112,9 +112,9 @@ const Components = (props: ComponentsProps) => {
 
   React.useEffect(() => {
     componentsControls.mountComponent = params => {
-      const { node, name, nodeClassName, props } = params;
+      const { node, name, props } = params;
       assertDOMElement(node);
-      addMountNodeClass(node, nodeClassName);
+      addMountNodeClass(node);
       setState(s => {
         s.nodes.set(node, { key: `p${++portalCt}`, name, props });
         return { ...s, nodes };
@@ -176,11 +176,11 @@ const Components = (props: ComponentsProps) => {
         startPath='/sign-in'
       >
         <SignInModal {...signInModal} />
-        {/*<SignUpModal*/}
-        {/*  afterSignInUrl={signInModal?.afterSignInUrl}*/}
-        {/*  afterSignUpUrl={signInModal?.afterSignUpUrl}*/}
-        {/*  redirectUrl={signInModal?.redirectUrl}*/}
-        {/*/>*/}
+        <SignUpModal
+          afterSignInUrl={signInModal?.afterSignInUrl}
+          afterSignUpUrl={signInModal?.afterSignUpUrl}
+          redirectUrl={signInModal?.redirectUrl}
+        />
       </VirtualRouter>
     </Modal>
   );
@@ -197,12 +197,12 @@ const Components = (props: ComponentsProps) => {
         onExternalNavigate={() => componentsControls.closeModal('signUp')}
         startPath='/sign-up'
       >
-        {/*<SignInModal*/}
-        {/*  afterSignInUrl={signUpModal?.afterSignInUrl}*/}
-        {/*  afterSignUpUrl={signUpModal?.afterSignUpUrl}*/}
-        {/*  redirectUrl={signUpModal?.redirectUrl}*/}
-        {/*/>*/}
-        {/*<SignUpModal {...signUpModal} />*/}
+        <SignInModal
+          afterSignInUrl={signUpModal?.afterSignInUrl}
+          afterSignUpUrl={signUpModal?.afterSignUpUrl}
+          redirectUrl={signUpModal?.redirectUrl}
+        />
+        <SignUpModal {...signUpModal} />
       </VirtualRouter>
     </Modal>
   );
