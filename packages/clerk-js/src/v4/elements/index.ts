@@ -11,3 +11,4 @@ export * from './BlockButtonWithArrow';
 export * from './TimerButton';
 export * from './CardWithCodeForm';
 export * from './LoadingCard';
+export * from './ErrorCard';

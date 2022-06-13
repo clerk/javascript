@@ -5,7 +5,7 @@ import { withRedirectToHome } from '../../ui/common/withRedirectToHome';
 import { useCoreSignIn, useEnvironment } from '../../ui/contexts';
 import { useRouter } from '../../ui/router';
 import { determineStartingSignInFactor, factorHasLocalStrategy } from '../../ui/signIn/utils';
-import { LoadingCard } from '../elements';
+import { ErrorCard, LoadingCard, withFlowCardContext } from '../elements';
 import { AlternativeMethods } from './AlternativeMethods';
 import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
 import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
@@ -49,17 +49,24 @@ export function _SignInFactorOne(): JSX.Element {
     }
   }, []);
 
-  const toggleAllStrategies = () => setShowAllStrategies(s => !s);
+  if (!currentFactor && signIn.status) {
+    return (
+      <SignInFactorOneErrorCard
+        cardTitle='Cannot sign in'
+        cardSubtitle='An error occurred'
+        message="Cannot proceed with sign in. There's no available authentication factor."
+      />
+    );
+  }
 
+  const toggleAllStrategies = () => setShowAllStrategies(s => !s);
   const handleFactorPrepare = () => {
     lastPreparedFactorKeyRef.current = factorKey(currentFactor);
   };
-
   const selectFactor = (factor: SignInFactor) => {
     setCurrentFactor(factor);
     toggleAllStrategies();
   };
-
   if (showAllStrategies) {
     const canGoBack = factorHasLocalStrategy(currentFactor);
     return (
@@ -108,5 +115,7 @@ export function _SignInFactorOne(): JSX.Element {
       return <LoadingCard />;
   }
 }
+
+const SignInFactorOneErrorCard = withFlowCardContext(ErrorCard, { flow: 'signIn', page: 'havingTrouble' });
 
 export const SignInFactorOne = withRedirectToHome(_SignInFactorOne);
