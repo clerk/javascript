@@ -9,7 +9,7 @@ export const FormControl = (props: React.PropsWithChildren<FormControlProps>) =>
     <Flex
       direction='col'
       {...rest}
-      css={{ position: 'relative' }}
+      css={{ position: 'relative', flex: '1 0 auto' }}
     >
       <FormControlContextProvider {...{ hasError, id, isRequired }}>{props.children}</FormControlContextProvider>
     </Flex>
