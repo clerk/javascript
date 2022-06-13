@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { withRedirectToHome } from '../../ui/common/withRedirectToHome';
-import { useCoreClerk, useCoreSignIn, useSignInContext } from '../../ui/contexts';
+import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../ui/contexts';
 import { useRouter } from '../../ui/router';
 import { CardWithCodeForm, CardWithCodeFormProps, withFlowCardContext } from '../elements';
 import { useCardState } from '../elements/contexts';
@@ -14,31 +14,22 @@ export function _SignInFactorTwo(): JSX.Element {
   React.useEffect(() => {
     // Handle the case where a user lands on alternative methods screen,
     // clicks a social button but then navigates back to signin.
-    // Signin status resets to 'needs_identifier'
+    // SignIn status resets to 'needs_identifier'
     if (signIn.status === 'needs_identifier' || signIn.status === null) {
       void router.navigate('../');
     }
   }, []);
 
-  return (
-    <SignInFactorTwoPhoneCodeCard
-      codeFormTitle='Verification code'
-      codeFormSubtitle='Enter the verification code sent to your phone number'
-    />
-  );
+  return <SignInFactorTwoPhoneCodeCard />;
 }
 
 export const SignInFactorTwo = withRedirectToHome(_SignInFactorTwo);
 
-type SignInFactorTwoPhoneCodeCardProps = Pick<CardWithCodeFormProps, 'onShowAlternativeMethodsClicked'> & {
-  codeFormTitle: string;
-  codeFormSubtitle: string;
-};
-
 const SignInFactorTwoPhoneCodeCard = withFlowCardContext(
-  (props: SignInFactorTwoPhoneCodeCardProps) => {
+  () => {
     const signIn = useCoreSignIn();
     const card = useCardState();
+    const { applicationName } = useEnvironment().displayConfig;
     const { navigateAfterSignIn } = useSignInContext();
     const { setActive } = useCoreClerk();
     const defaultFactor = React.useMemo(() => {
@@ -76,8 +67,10 @@ const SignInFactorTwoPhoneCodeCard = withFlowCardContext(
 
     return (
       <CardWithCodeForm
-        title={props.codeFormTitle}
-        subtitle={props.codeFormSubtitle}
+        cardTitle='Sign in'
+        cardSubtitle={`To continue to ${applicationName}`}
+        formTitle='Verification code'
+        formSubtitle='Enter the verification code sent to your phone number'
         onCodeEntryFinishedAction={action}
         onResendCodeClicked={prepare}
         safeIdentifier={defaultFactor.safeIdentifier}
