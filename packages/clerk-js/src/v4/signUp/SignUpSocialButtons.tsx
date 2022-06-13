@@ -6,7 +6,7 @@ import { useCoreSignUp, useSignUpContext } from '../../ui/contexts';
 import { useEnvironment } from '../../ui/contexts/EnvironmentContext';
 import { SocialButtonsProps, SocialButtonsRoot } from '../elements/SocialButtons';
 
-export const SignUpSocialButtons = (props: SocialButtonsProps) => {
+export const SignUpSocialButtons = React.memo((props: SocialButtonsProps) => {
   const { displayConfig } = useEnvironment();
   const ctx = useSignUpContext();
   const signUp = useCoreSignUp();
@@ -21,4 +21,4 @@ export const SignUpSocialButtons = (props: SocialButtonsProps) => {
       }
     />
   );
-};
+});
