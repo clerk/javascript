@@ -6,7 +6,7 @@ import { useCoreClerk } from '../../ui/contexts';
 import { useNavigate } from '../../ui/hooks';
 import { LoadingCard, withFlowCardContext } from '../elements';
 
-const _SSOCallback = (props: HandleOAuthCallbackParams) => {
+export const SSOCallback = (props: HandleOAuthCallbackParams) => {
   const { handleRedirectCallback } = useCoreClerk();
   const { navigate } = useNavigate();
 
@@ -16,11 +16,3 @@ const _SSOCallback = (props: HandleOAuthCallbackParams) => {
 
   return <LoadingCard />;
 };
-
-export const SignInSSOCallback = withRedirectToHome(
-  withFlowCardContext(_SSOCallback, { flow: 'signIn', page: 'ssoCallback' }),
-);
-
-export const SignUpSSOCallback = withRedirectToHome(
-  withFlowCardContext(_SSOCallback, { flow: 'signUp', page: 'ssoCallback' }),
-);

@@ -3,10 +3,10 @@ import React from 'react';
 
 import { ComponentContext, useCoreClerk, useSignInContext, withCoreSessionSwitchGuard } from '../../ui/contexts';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../ui/router';
-import { SignInSSOCallback } from '../common/';
 import { SignInEmailLinkVerify } from './EmailLinkVerificationCard';
 import { SignInFactorOne } from './SignInFactorOne';
 import { SignInFactorTwo } from './SignInFactorTwo';
+import { SignInSSOCallback } from './SignInSSOCallback';
 import { SignInStart } from './SignInStart';
 
 function RedirectToSignIn() {
