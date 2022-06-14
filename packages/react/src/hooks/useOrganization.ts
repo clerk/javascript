@@ -26,7 +26,7 @@ type UseOrganizationReturn =
       membership: undefined;
     }
   | {
-      isLoaded: true;
+      isLoaded: boolean;
       organization: OrganizationResource | null | undefined;
       invitationList: OrganizationInvitationResource[] | null | undefined;
       membershipList: OrganizationMembershipResource[] | null | undefined;
@@ -65,14 +65,14 @@ export const useOrganization: UseOrganization = ({
     return await clerk.organization?.getMemberships(membershipListParams);
   };
 
-  const { data: invitationList } = useSWR(
+  const { data: invitationList, isValidating: isInvitationsLoading } = useSWR(
     invitationListParams
       ? composeOrganizationResourcesUpdateKey(organization, lastOrganizationInvitation, 'invitations')
       : null,
     pendingInvitations,
   );
 
-  const { data: membershipList } = useSWR(
+  const { data: membershipList, isValidating: isMembershipsLoading } = useSWR(
     membershipListParams
       ? composeOrganizationResourcesUpdateKey(organization, lastOrganizationMember, 'memberships')
       : null,
@@ -80,7 +80,7 @@ export const useOrganization: UseOrganization = ({
   );
 
   return {
-    isLoaded: true,
+    isLoaded: !isMembershipsLoading && !isInvitationsLoading,
     organization,
     membershipList,
     membership: getCurrentOrganizationMembership(session.user.organizationMemberships, organization.id), // your membership in the current org
