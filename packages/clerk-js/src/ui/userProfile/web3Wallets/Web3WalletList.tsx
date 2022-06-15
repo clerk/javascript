@@ -17,7 +17,7 @@ type Web3WalletListItemProps = {
 };
 
 function Web3WalletListItem({ web3Wallet, handleClick, isPrimary }: Web3WalletListItemProps): JSX.Element {
-  const status = web3Wallet.verification.status || '';
+  const status = web3Wallet.verification.status || 'unverified';
 
   return (
     <List.Item

@@ -2,6 +2,7 @@ import { renderJSON } from '@clerk/shared/testUtils';
 import * as React from 'react';
 
 import { Tag, VerificationStatusTag } from './Tag';
+import { VerificationStatus } from '@clerk/types';
 
 describe('<Tag/>', () => {
   it('renders tag', () => {
@@ -20,12 +21,13 @@ describe('<Tag/>', () => {
     const verifiedTag = renderJSON(<VerificationStatusTag status='verified' />);
     expect(verifiedTag).toMatchSnapshot();
 
-    ['unverified', 'failed', 'expired'].forEach(status => {
+    const failureStatuses: VerificationStatus[] = ['unverified', 'failed', 'expired'];
+    failureStatuses.forEach(status => {
       const failureStatusTag = renderJSON(<VerificationStatusTag status={status} />);
       expect(failureStatusTag).toMatchSnapshot();
     });
 
-    const unrecognizedTag = renderJSON(<VerificationStatusTag status='hello-world' />);
+    const unrecognizedTag = renderJSON(<VerificationStatusTag status='transferable' />);
     expect(unrecognizedTag).toMatchSnapshot();
   });
 });

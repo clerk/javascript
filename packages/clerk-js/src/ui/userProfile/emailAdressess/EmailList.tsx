@@ -17,7 +17,7 @@ type EmailListItemProps = {
 };
 
 function EmailListItem({ emailAddress, handleClick, isPrimary }: EmailListItemProps): JSX.Element {
-  const status = emailAddress.verification.status || '';
+  const status = emailAddress.verification.status || 'unverified';
 
   return (
     <List.Item

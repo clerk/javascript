@@ -24,12 +24,10 @@ export function ProfilePhoneNumbers(): JSX.Element {
             <div key={phoneIdent.id}>
               <PhoneViewer phoneNumber={phoneIdent.phoneNumber} />
               {user.isPrimaryIdentification(phoneIdent) && <Tag color='primary'>Primary</Tag>}
-              {phoneIdent.verification.status && (
-                <VerificationStatusTag
-                  className='cl-tag'
-                  status={phoneIdent.verification.status}
-                />
-              )}
+              <VerificationStatusTag
+                className='cl-tag'
+                status={phoneIdent.verification?.status || 'unverified'}
+              />
             </div>
           ))}
         </div>
