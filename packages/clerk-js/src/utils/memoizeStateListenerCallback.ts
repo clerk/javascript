@@ -32,7 +32,17 @@ function sessionChanged(prev: SessionResource, next: SessionResource): boolean {
 }
 
 function userChanged(prev: UserResource, next: UserResource): boolean {
-  return prev.id !== next.id || prev.updatedAt!.getTime() < next.updatedAt!.getTime();
+  return (
+    prev.id !== next.id || prev.updatedAt!.getTime() < next.updatedAt!.getTime() || userMembershipsChanged(next, prev)
+  );
+}
+
+/** User memberships update condition since the user.updatedAt will not be revalidated on organization removals/additions etc. */
+function userMembershipsChanged(prev: UserResource, next: UserResource): boolean {
+  return (
+    prev.organizationMemberships.length !== next.organizationMemberships.length ||
+    prev.organizationMemberships[0]?.updatedAt !== next.organizationMemberships[0]?.updatedAt
+  );
 }
 
 // TODO: Decide if this belongs in the resources
