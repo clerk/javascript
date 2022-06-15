@@ -27,8 +27,8 @@
 
 ## Overview
 
-[Clerk](https://clerk.dev?utm_source=github&utm_medium=clerk_sdk_node) is the easiest way to add authentication and user management to your Node.js application. To gain a better understanding API and the SDK, refer to
-the <a href="https://reference.clerk.dev/reference/backend-api-reference" target="_blank">official Backend API documentation</a>.
+[Clerk](https://clerk.dev?utm_source=github&utm_medium=clerk_sdk_node) is the easiest way to add authentication and user management to your Node.js application. To gain a better understanding of the API and SDK, refer to
+the <a href="https://clerk.dev/docs/reference/node/getting-started?utm_source=github&utm_medium=clerk_sdk_node" target="_blank">Node SDK</a> and <a href="https://reference.clerk.dev/reference/backend-api-reference" target="_blank">Backend API</a> documentation.
 
 ## Getting started
 
