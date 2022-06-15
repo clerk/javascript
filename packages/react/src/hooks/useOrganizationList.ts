@@ -7,7 +7,7 @@ import {
 } from '@clerk/types';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
-import { useSessionContext } from '../contexts/SessionContext';
+import { useUserContext } from '../contexts/UserContext';
 
 type OrganizationList = ReturnType<typeof createOrganizationList>;
 
@@ -24,10 +24,10 @@ type UseOrganizationList = () => UseOrganizationListReturn;
 
 export const useOrganizationList: UseOrganizationList = () => {
   const isomorphicClerk = useIsomorphicClerkContext();
-  const session = useSessionContext();
+  const user = useUserContext();
 
   // TODO: Properly check for SSR user values
-  if (!isomorphicClerk.loaded || !session) {
+  if (!isomorphicClerk.loaded || !user) {
     return { isLoaded: false, organizationList: undefined, createOrganization: undefined, setActive: undefined };
   }
 
@@ -35,7 +35,7 @@ export const useOrganizationList: UseOrganizationList = () => {
 
   return {
     isLoaded: true,
-    organizationList: createOrganizationList(session.user.organizationMemberships),
+    organizationList: createOrganizationList(user.organizationMemberships),
     setActive: clerk.setActive,
     createOrganization: clerk.createOrganization,
   };
