@@ -462,5 +462,65 @@ describe('determineActiveFields()', () => {
         }),
       ).toEqual(result);
     });
+
+    it('phone is shown if enabled in the token case', () => {
+      const [___, attributes, result] = [
+        'email only option',
+        {
+          email_address: {
+            enabled: true,
+            required: true,
+          },
+          phone_number: {
+            enabled: true,
+            required: true,
+          },
+          first_name: {
+            enabled: true,
+            required: true,
+          },
+          last_name: {
+            enabled: true,
+            required: true,
+          },
+          password: {
+            enabled: false,
+            required: false,
+          },
+          username: {
+            enabled: false,
+            required: false,
+          },
+        },
+        {
+          emailAddress: {
+            required: true,
+            disabled: true,
+          },
+          phoneNumber: {
+            required: true,
+          },
+          ticket: {
+            required: true,
+          },
+          firstName: {
+            required: true,
+          },
+          lastName: {
+            required: true,
+          },
+        },
+      ] as Scenario;
+
+      const res = determineActiveFields({
+        attributes: attributes,
+        hasTicket: true,
+        hasEmail: true,
+        activeCommIdentifierType: getInitialActiveIdentifier(attributes, isProgressiveSignUp),
+        isProgressiveSignUp,
+      });
+
+      expect(res).toEqual(result);
+    });
   });
 });

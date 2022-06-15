@@ -194,7 +194,7 @@ function getPhoneNumberField({
 }: FieldDeterminationProps): Field | undefined {
   if (isProgressiveSignUp) {
     // If there is no ticket and phone number is enabled, we have to show it in the SignUp form
-    const show = !hasTicket && attributes.phone_number.enabled;
+    const show = attributes.phone_number.enabled;
 
     if (!show) {
       return;
