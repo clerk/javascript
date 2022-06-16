@@ -186,7 +186,7 @@ export const useUserButtonContext = () => {
   const afterSignOutUrl = ctx.afterSignOutUrl || displayConfig.afterSignOutAllUrl;
   const navigateAfterSignOut = () => navigate(afterSignOutUrl);
 
-  const afterSwitchSessionUrl = (ctx.afterSwitchSessionUrl = displayConfig.afterSwitchSessionUrl);
+  const afterSwitchSessionUrl = ctx.afterSwitchSessionUrl || displayConfig.afterSwitchSessionUrl;
   const navigateAfterSwitchSession = () => navigate(afterSwitchSessionUrl);
 
   return {
