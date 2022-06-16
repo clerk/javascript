@@ -13,7 +13,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "forceConsistentCasingInFileNames": true,
-    "target": "ES2019",
+    "target": "ES2020",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "lib": ["ES2020"]
