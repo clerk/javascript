@@ -2,12 +2,13 @@ import React from 'react';
 
 import { Card, descriptors, Flex, useAppearance } from '../customizables';
 import { generateFlowMetadataClassname } from '../customizables/classGeneration';
-import { InternalThemeProvider } from '../styledSystem';
+import { InternalThemeProvider, PropsOfComponent } from '../styledSystem';
 import { CardStateProvider, FlowMetadata, FlowMetadataProvider, useFlowMetadata } from './contexts';
+import { PoweredByClerkTag } from './PoweredByClerk';
 
 type FlowCardRootProps = React.PropsWithChildren<FlowMetadata>;
 
-const OuterContainer = (props: React.PropsWithChildren<any>) => {
+const OuterContainer = React.forwardRef<HTMLDivElement, React.PropsWithChildren<{}>>((props, ref) => {
   const flowMetadata = useFlowMetadata();
   // TODO: Logo will go here
   return (
@@ -15,16 +16,20 @@ const OuterContainer = (props: React.PropsWithChildren<any>) => {
       elementDescriptor={descriptors.root}
       className={generateFlowMetadataClassname(flowMetadata)}
       {...props}
+      ref={ref}
     />
   );
-};
+});
 
-const Content = (props: React.PropsWithChildren<any>) => {
+const Content = (props: PropsOfComponent<typeof Card>) => {
   return (
     <Card
       elementDescriptor={descriptors.card}
       {...props}
-    />
+    >
+      {props.children}
+      <PoweredByClerkTag />
+    </Card>
   );
 };
 
@@ -33,7 +38,7 @@ export const FlowCard = {
   Content,
 };
 
-export const withFlowCardContext = <C,>(Component: C, options: FlowMetadata): C => {
+export const withFlowCardContext = <C,>(Component: C, options: FlowMetadata & { displayName?: string }): C => {
   const { page, flow } = options;
   const HOC = (props: any) => {
     const { parsedInternalTheme } = useAppearance();
@@ -51,5 +56,10 @@ export const withFlowCardContext = <C,>(Component: C, options: FlowMetadata): C 
       </InternalThemeProvider>
     );
   };
+
+  if (__DEV__) {
+    HOC.displayName = options.displayName || 'FlowCardComponent';
+  }
+
   return HOC as any as C;
 };

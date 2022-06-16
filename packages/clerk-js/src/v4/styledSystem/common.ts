@@ -24,9 +24,27 @@ const textVariants = (theme: InternalTheme) => {
     textTransform: 'uppercase',
   } as const;
 
+  const textExtraSmallRegular = {
+    ...textButtonSmall,
+    fontWeight: theme.fontWeights.$normal,
+    textTransform: 'unset',
+  } as const;
+
+  const textExtraSmallMedium = {
+    ...textButtonSmall,
+    textTransform: 'unset',
+  } as const;
+
   const textRegularRegular = {
     fontStyle: theme.fontStyles.$normal,
     fontWeight: theme.fontWeights.$normal,
+    fontSize: theme.fontSizes.$sm,
+    lineHeight: theme.lineHeights.$shorter,
+  } as const;
+
+  const textRegularMedium = {
+    fontStyle: theme.fontStyles.$normal,
+    fontWeight: theme.fontWeights.$medium,
     fontSize: theme.fontSizes.$sm,
     lineHeight: theme.lineHeights.$shorter,
   } as const;
@@ -47,6 +65,10 @@ const textVariants = (theme: InternalTheme) => {
     buttonLabel: textButtonSmall,
     subheading: textRegularRegular,
     largeInput: textXLargeMedium,
+    secondaryHeading: textRegularMedium,
+    secondarySubheading: textSmallRegular,
+    textExtraSmallMedium,
+    textExtraSmallRegular,
   } as const;
 };
 
