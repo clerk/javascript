@@ -1,8 +1,18 @@
-import { autoUpdate, flip, offset, shift, useDismiss, useFloating } from '@floating-ui/react-dom-interactions';
+import {
+  autoUpdate,
+  flip,
+  offset,
+  shift,
+  useDismiss,
+  useFloating,
+  UseFloatingProps,
+} from '@floating-ui/react-dom-interactions';
 import React from 'react';
 
 type UsePopoverProps = {
   defaultOpen?: boolean;
+  placement?: UseFloatingProps['placement'];
+  offset?: Parameters<typeof offset>[0];
 };
 
 export const usePopover = (props: UsePopoverProps = {}) => {
@@ -11,8 +21,8 @@ export const usePopover = (props: UsePopoverProps = {}) => {
     open,
     onOpenChange: setOpen,
     whileElementsMounted: autoUpdate,
-    placement: 'bottom-start',
-    middleware: [offset(6), flip(), shift()],
+    placement: props.placement || 'bottom-start',
+    middleware: [offset(props.offset || 6), flip(), shift()],
   });
   useDismiss(context);
 
