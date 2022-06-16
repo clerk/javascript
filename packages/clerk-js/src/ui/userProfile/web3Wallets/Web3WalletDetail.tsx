@@ -32,7 +32,7 @@ export function Web3WalletDetail(): JSX.Element | null {
     return null;
   }
 
-  const verificationStatus = web3Wallet.verification?.status || '';
+  const verificationStatus = web3Wallet.verification?.status || 'unverified';
   const isVerified = web3Wallet.verification?.status === 'verified';
 
   const handleRemove = () => {

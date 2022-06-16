@@ -4,6 +4,7 @@ import React from 'react';
 import { titleize } from '../../utils';
 // @ts-ignore
 import styles from './Tag.module.scss';
+import { VerificationStatus } from '@clerk/types';
 
 export type TagProps = React.PropsWithChildren<{
   color: 'primary' | 'warning' | 'success' | 'error';
@@ -31,24 +32,21 @@ export function Tag({ color = 'success', size = 'sm', text, children, Icon, clas
  * TODO: Types will progressively roll out so the status should not be a string
  */
 type VerificationStatusTagProps = {
-  status: string;
+  status: VerificationStatus;
   className?: string;
 };
 
 export function VerificationStatusTag({ status, className }: VerificationStatusTagProps): JSX.Element | null {
-  return status.match(/expired|unverified|failed/) ? (
+  if (status === 'transferable') {
+    return null;
+  }
+
+  return (
     <Tag
       className={className}
-      color='error'
+      color={status === 'verified' ? 'success' : 'error'}
     >
       {titleize(status)}
     </Tag>
-  ) : status === 'verified' ? (
-    <Tag
-      className={className}
-      color='success'
-    >
-      Verified
-    </Tag>
-  ) : null;
+  );
 }

@@ -14,7 +14,7 @@ export const PhoneList = (): JSX.Element => {
   const router = useRouter();
 
   const createPhoneListItem = (phone: PhoneNumberResource) => {
-    const verificationStatus = phone.verification.status || '';
+    const verificationStatus = phone.verification.status || 'unverified';
     const isPrimary = user.primaryPhoneNumber?.id === phone.id;
     const primaryTag = isPrimary ? (
       <Tag

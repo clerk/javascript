@@ -31,7 +31,7 @@ export const PhoneDetail = (): JSX.Element => {
 
   const phoneIdent = user.phoneNumbers.find(pi => pi.id === params.phone_number_id);
 
-  const verificationStatus = phoneIdent?.verification?.status || '';
+  const verificationStatus = phoneIdent?.verification?.status || 'unverified';
   const isVerified = verificationStatus === 'verified';
 
   // TODO: we need this because updating the user obj

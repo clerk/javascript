@@ -23,12 +23,10 @@ export function ProfileEmailAddresses(): JSX.Element {
             <div key={emailIdent.id}>
               {emailIdent.emailAddress}
               {user.isPrimaryIdentification(emailIdent) && <Tag color='primary'>Primary</Tag>}
-              {emailIdent.verification.status && (
-                <VerificationStatusTag
-                  className='cl-tag'
-                  status={emailIdent.verification.status}
-                />
-              )}
+              <VerificationStatusTag
+                className='cl-tag'
+                status={emailIdent.verification?.status || 'unverified'}
+              />
             </div>
           ))}
         </div>

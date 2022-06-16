@@ -37,7 +37,7 @@ export function EmailDetail(): JSX.Element | null {
     return null;
   }
 
-  const verificationStatus = email.verification?.status || '';
+  const verificationStatus = email.verification?.status || 'unverified';
   const isVerified = verificationStatus === 'verified';
 
   const handleRemove = () => {
