@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.14.0-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.14.0-staging.0...@clerk/clerk-js@3.14.0-staging.1) (2022-06-16)
+
+### Bug Fixes
+
+- **clerk-js:** Default verification status to unverified if verification is missing ([cac67a0](https://github.com/clerkinc/javascript/commit/cac67a0199c0058ba23a7b74834dfa55915a42ae))
+
 ### [3.13.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.13.3-staging.0...@clerk/clerk-js@3.13.3) (2022-06-15)
 
 **Note:** Version bump only for package @clerk/clerk-js

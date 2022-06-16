@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.0-staging.1](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.3.0-staging.0...@clerk/shared@0.3.0-staging.1) (2022-06-16)
+
+### Bug Fixes
+
+- **clerk-js:** Default verification status to unverified if verification is missing ([cac67a0](https://github.com/clerkinc/clerk_docker/commit/cac67a0199c0058ba23a7b74834dfa55915a42ae))
+
 ### [0.2.8](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.2.8-staging.3...@clerk/shared@0.2.8) (2022-06-06)
 
 **Note:** Version bump only for package @clerk/shared
