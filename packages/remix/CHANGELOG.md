@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.5.2](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.5.2-staging.0...@clerk/remix@0.5.2) (2022-06-16)
+
+**Note:** Version bump only for package @clerk/remix
+
 ### [0.5.1](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.5.1-staging.4...@clerk/remix@0.5.1) (2022-06-06)
 
 **Note:** Version bump only for package @clerk/remix
