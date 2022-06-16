@@ -10,3 +10,11 @@ export interface ClerkAPIError {
     sessionId?: string;
   };
 }
+
+/**
+ * Pagination params
+ */
+export interface ClerkPaginationParams {
+  limit?: number;
+  offset?: number;
+}

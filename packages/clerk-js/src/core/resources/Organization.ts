@@ -1,6 +1,7 @@
 import type {
   CreateOrganizationParams,
   GetMembershipsParams,
+  GetPendingInvitationsParams,
   MembershipRole,
   OrganizationInvitationJSON,
   OrganizationJSON,
@@ -74,10 +75,13 @@ export class Organization extends BaseResource implements OrganizationResource {
       .catch(() => []);
   };
 
-  getPendingInvitations = async (): Promise<OrganizationInvitation[]> => {
+  getPendingInvitations = async (
+    getPendingInvitationsParams?: GetPendingInvitationsParams,
+  ): Promise<OrganizationInvitation[]> => {
     return await BaseResource._fetch({
       path: `/organizations/${this.id}/invitations/pending`,
       method: 'GET',
+      search: getPendingInvitationsParams as any,
     })
       .then(res => {
         const pendingInvitations = res?.response as unknown as OrganizationInvitationJSON[];
@@ -87,11 +91,13 @@ export class Organization extends BaseResource implements OrganizationResource {
   };
 
   addMember = async ({ userId, role }: AddMemberParams) => {
-    return await BaseResource._fetch({
+    const newMember = await BaseResource._fetch({
       method: 'POST',
       path: `/organizations/${this.id}/memberships`,
       body: { userId, role } as any,
     }).then(res => new OrganizationMembership(res?.response as OrganizationMembershipJSON));
+    OrganizationMembership.clerk.__unstable__membershipUpdate(newMember);
+    return newMember;
   };
 
   inviteMember = async (inviteMemberParams: InviteMemberParams) => {
@@ -99,18 +105,22 @@ export class Organization extends BaseResource implements OrganizationResource {
   };
 
   updateMember = async ({ userId, role }: UpdateMembershipParams): Promise<OrganizationMembership> => {
-    return await BaseResource._fetch({
+    const updatedMember = await BaseResource._fetch({
       method: 'PATCH',
       path: `/organizations/${this.id}/memberships/${userId}`,
       body: { role } as any,
     }).then(res => new OrganizationMembership(res?.response as OrganizationMembershipJSON));
+    OrganizationMembership.clerk.__unstable__membershipUpdate(updatedMember);
+    return updatedMember;
   };
 
   removeMember = async (userId: string): Promise<OrganizationMembership> => {
-    return await BaseResource._fetch({
+    const deletedMember = await BaseResource._fetch({
       method: 'DELETE',
       path: `/organizations/${this.id}/memberships/${userId}`,
     }).then(res => new OrganizationMembership(res?.response as OrganizationMembershipJSON));
+    OrganizationMembership.clerk.__unstable__membershipUpdate(deletedMember);
+    return deletedMember;
   };
 
   destroy = async (): Promise<void> => {

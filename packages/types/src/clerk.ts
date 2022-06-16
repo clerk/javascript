@@ -1,6 +1,7 @@
 import { ClientResource } from './client';
 import { DisplayThemeJSON } from './json';
 import { OrganizationResource } from './organization';
+import { OrganizationInvitationResource } from './organizationInvitation';
 import { MembershipRole, OrganizationMembershipResource } from './organizationMembership';
 import { ActiveSessionResource } from './session';
 import { UserResource } from './user';
@@ -300,6 +301,8 @@ export interface Resources {
   session?: ActiveSessionResource | null;
   user?: UserResource | null;
   organization?: OrganizationResource | null;
+  lastOrganizationInvitation?: OrganizationInvitationResource | null;
+  lastOrganizationMember?: OrganizationMembershipResource | null;
 }
 
 export type RoutingStrategy = 'path' | 'hash' | 'virtual';

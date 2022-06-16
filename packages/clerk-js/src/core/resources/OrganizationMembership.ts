@@ -36,16 +36,20 @@ export class OrganizationMembership extends BaseResource implements Organization
 
   destroy = async (): Promise<OrganizationMembership> => {
     // FIXME: Revise the return type of _baseDelete
-    return (await this._baseDelete({
+    const deletedMembership = (await this._baseDelete({
       path: `/organizations/${this.organization.id}/memberships/${this.publicUserData.userId}`,
     })) as unknown as OrganizationMembership;
+    OrganizationMembership.clerk.__unstable__membershipUpdate(deletedMembership);
+    return deletedMembership;
   };
 
   update = async ({ role }: UpdateOrganizationMembershipParams): Promise<OrganizationMembership> => {
-    return await this._basePatch({
+    const updatedMembership = await this._basePatch({
       path: `/organizations/${this.organization.id}/memberships/${this.publicUserData.userId}`,
       body: { role },
     });
+    OrganizationMembership.clerk.__unstable__membershipUpdate(updatedMembership);
+    return updatedMembership;
   };
 
   protected fromJSON(data: OrganizationMembershipJSON): this {
