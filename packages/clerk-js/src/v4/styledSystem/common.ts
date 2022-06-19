@@ -6,6 +6,7 @@ const textVariants = (theme: InternalTheme) => {
     fontWeight: theme.fontWeights.$normal,
     fontSize: theme.fontSizes.$xs,
     lineHeight: theme.lineHeights.$base,
+    textTransform: 'none',
   } as const;
 
   const textSmallMedium = {
@@ -15,24 +16,22 @@ const textVariants = (theme: InternalTheme) => {
     lineHeight: theme.lineHeights.$base,
   } as const;
 
-  const textButtonSmall = {
+  const textExtraSmallRegular = {
+    fontWeight: theme.fontWeights.$normal,
     fontStyle: theme.fontStyles.$normal,
-    fontWeight: theme.fontWeights.$semibold,
     fontSize: theme.fontSizes.$xxs,
     letterSpacing: theme.space.$xxs,
     lineHeight: theme.lineHeights.$base,
-    textTransform: 'uppercase',
   } as const;
 
-  const textExtraSmallRegular = {
-    ...textButtonSmall,
-    fontWeight: theme.fontWeights.$normal,
-    textTransform: 'unset',
+  const textButtonSmall = {
+    ...textExtraSmallRegular,
+    fontWeight: theme.fontWeights.$semibold,
+    textTransform: 'uppercase',
   } as const;
 
   const textExtraSmallMedium = {
     ...textButtonSmall,
-    textTransform: 'unset',
   } as const;
 
   const textRegularRegular = {
@@ -135,6 +134,12 @@ const disabled = (theme: InternalTheme) => {
   } as const;
 };
 
+const centeredFlex = (display: 'flex' | 'inline-flex') => ({
+  display: display,
+  justifyContent: 'center',
+  alignItems: 'center',
+});
+
 export const common = {
   textVariants,
   fontSizeVariants,
@@ -143,4 +148,5 @@ export const common = {
   focusRingInput,
   disabled,
   borderColor,
+  centeredFlex,
 };
