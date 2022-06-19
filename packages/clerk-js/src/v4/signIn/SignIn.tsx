@@ -4,6 +4,7 @@ import React from 'react';
 import { ComponentContext, useCoreClerk, useSignInContext, withCoreSessionSwitchGuard } from '../../ui/contexts';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../ui/router';
 import { SignInEmailLinkFlowComplete } from '../common/EmailLinkCompleteFlowCard';
+import { SignInAccountSwitcher } from './SignInAccountSwitcher';
 import { SignInFactorOne } from './SignInFactorOne';
 import { SignInFactorTwo } from './SignInFactorTwo';
 import { SignInSSOCallback } from './SignInSSOCallback';
@@ -36,7 +37,9 @@ function SignInRoutes(): JSX.Element {
           secondFactorUrl={'../factor-two'}
         />
       </Route>
-      <Route path='choose'>{/* TODO: Should be implemented with user button */}</Route>
+      <Route path='choose'>
+        <SignInAccountSwitcher />
+      </Route>
       <Route path='verify'>
         <SignInEmailLinkFlowComplete
           redirectUrlComplete={signInContext.afterSignInUrl || signInContext.redirectUrl || undefined}

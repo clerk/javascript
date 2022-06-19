@@ -52,6 +52,10 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'avatar',
   'avatar-image',
 
+  'userButton',
+  'userButton-trigger',
+  'userButton-popover',
+
   'identityPreview',
   'identityPreview-avatar',
   'identityPreview-text',
