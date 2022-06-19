@@ -39,8 +39,8 @@ const parseElements = (appearance: Appearance | undefined = {}): ParsedElements 
     base: { ...appearance.elements },
     signIn: { ...appearance.signIn?.elements },
     signUp: { ...appearance.signUp?.elements },
-    userProfile: {},
-    userButton: {},
+    userButton: { ...appearance?.userButton?.elements },
+    userProfile: { ...appearance?.userProfile?.elements },
   };
 };
 
@@ -54,9 +54,13 @@ const parseVariables = (appearance: Appearance): ParsedInternalTheme => {
   // copy allThemes.base into allThemes.[flow] to be used as the base theme
   fastDeepMergeAndReplace(allThemes.base, allThemes.signIn);
   fastDeepMergeAndReplace(allThemes.base, allThemes.signUp);
+  fastDeepMergeAndReplace(allThemes.base, allThemes.userButton);
+  fastDeepMergeAndReplace(allThemes.base, allThemes.userProfile);
   // apply specific overrides from appearance[flow].variables config
   fastDeepMergeAndReplace(createInternalThemeFromVariables(appearance.signIn), allThemes.signIn);
   fastDeepMergeAndReplace(createInternalThemeFromVariables(appearance.signUp), allThemes.signUp);
+  fastDeepMergeAndReplace(createInternalThemeFromVariables(appearance.userButton), allThemes.userButton);
+  fastDeepMergeAndReplace(createInternalThemeFromVariables(appearance.userProfile), allThemes.userProfile);
   return allThemes;
 };
 
