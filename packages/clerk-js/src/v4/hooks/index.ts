@@ -1,4 +1,4 @@
-export * from './useOAuthProviders';
+export * from './useEnabledThirdPartyProviders';
 export * from './useLoadingStatus';
 export * from './useSafeLayoutEffect';
 export * from './usePopover';

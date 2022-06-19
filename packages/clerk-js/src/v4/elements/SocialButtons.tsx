@@ -1,22 +1,28 @@
-import { OAuthProvider, OAuthStrategy } from '@clerk/types';
+import { OAuthProvider, OAuthStrategy, Web3Provider, Web3Strategy } from '@clerk/types';
 import React from 'react';
 
 import { BlockButtonIcon, Button, descriptors, Flex, Grid, Icon, Image } from '../customizables';
-import { useEnabledOauthProviders, useLoadingStatus } from '../hooks';
+import { useEnabledThirdPartyProviders, useLoadingStatus } from '../hooks';
 import { ArrowRightIcon } from '../icons';
+import { PropsOfComponent } from '../styledSystem';
 import { useCardState } from './contexts';
 
 export type SocialButtonsProps = React.PropsWithChildren<{ buttonVariant?: 'icon' | 'block' }>;
 
 type SocialButtonsRootProps = SocialButtonsProps & {
   oauthCallback: (strategy: OAuthStrategy) => Promise<unknown>;
+  web3Callback: (strategy: Web3Strategy) => Promise<unknown>;
+};
+
+const isWeb3Strategy = (val: string): val is Web3Strategy => {
+  return val.startsWith('web3_');
 };
 
 export const SocialButtonsRoot = React.memo((props: SocialButtonsRootProps): JSX.Element => {
-  const { oauthCallback } = props;
-  const { strategies, displayData } = useEnabledOauthProviders();
+  const { oauthCallback, web3Callback } = props;
+  const { strategies, displayData } = useEnabledThirdPartyProviders();
   const card = useCardState();
-  const status = useLoadingStatus<OAuthStrategy>();
+  const status = useLoadingStatus<string>();
 
   const preferBlockButtons = props.buttonVariant ? props.buttonVariant === 'block' : strategies.length <= 3;
 
@@ -25,18 +31,15 @@ export const SocialButtonsRoot = React.memo((props: SocialButtonsRootProps): JSX
     card.setIdle();
   };
 
-  const startOauth = (strategy: OAuthStrategy) => () => {
+  const startOauth = (strategy: OAuthStrategy | Web3Strategy) => async () => {
     status.setLoading(strategy);
     card.setLoading();
-    return oauthCallback(strategy)
-      .then(res => {
-        setTimeout(reset, 2000);
-        return res;
-      })
-      .catch(err => {
-        reset();
-        throw err;
-      });
+    if (isWeb3Strategy(strategy)) {
+      await web3Callback(strategy);
+    } else {
+      await oauthCallback(strategy);
+    }
+    setTimeout(reset, 2000);
   };
 
   const ButtonElement = preferBlockButtons ? SocialButtonBlock : SocialButtonIcon;
@@ -107,6 +110,12 @@ const ButtonRows = (props: React.PropsWithChildren<any>) => {
   );
 };
 
+type SocialButtonProps = PropsOfComponent<typeof Button> & {
+  icon: React.ReactElement;
+  id: OAuthProvider | Web3Provider;
+  label?: string;
+};
+
 const SocialButtonIcon = (props: SocialButtonProps): JSX.Element => {
   const { icon, label, id, ...rest } = props;
   return (
@@ -122,8 +131,6 @@ const SocialButtonIcon = (props: SocialButtonProps): JSX.Element => {
     </Button>
   );
 };
-
-type SocialButtonProps = Parameters<typeof Button>[0] & { icon: React.ReactElement; id: OAuthProvider; label?: string };
 
 // TODO: Can we refactor this and the BlockButtonWithArrow into 1 button?
 // What about the selectors?
