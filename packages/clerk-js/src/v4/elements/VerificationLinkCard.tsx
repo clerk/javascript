@@ -2,9 +2,15 @@ import React from 'react';
 
 import { useRouter } from '../../ui/router';
 import { descriptors, Flex, Text } from '../customizables';
-import { BackLink, CardAlert, FlowCard, Footer, Header, IdentityPreview, TimerButton } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { useLoadingStatus } from '../hooks';
+import { CardAlert } from './Alert';
+import { BackLink } from './BackLink';
+import { FlowCard } from './FlowCard';
+import { Footer } from './Footer';
+import { Header } from './Header';
+import { IdentityPreview } from './IdentityPreview';
+import { TimerButton } from './TimerButton';
 
 type VerificationLinkCardProps = {
   safeIdentifier: string;
