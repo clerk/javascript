@@ -22,7 +22,10 @@ export const IdentityPreview = (props: IdentityPreviewProps) => {
       sx={theme => ({ marginTop: theme.space.$3x5, marginLeft: theme.space.$2 })}
       {...rest}
     >
-      <Avatar profileImageUrl={refs.current.avatarUrl} />
+      <Avatar
+        profileImageUrl={refs.current.avatarUrl}
+        size={theme => theme.sizes.$6x5}
+      />
       <Text
         variant='hint'
         colorScheme='neutral'

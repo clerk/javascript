@@ -13,7 +13,8 @@ type FlowMetadata = {
     | 'alternativeMethods'
     | 'havingTrouble'
     | 'ssoCallback'
-    | 'emailLinkVerify';
+    | 'emailLinkVerify'
+    | 'accountSwitcher';
 };
 
 const [FlowMetadataCtx, useFlowMetadata] = createContextAndHook<FlowMetadata>('FlowMetadata');
