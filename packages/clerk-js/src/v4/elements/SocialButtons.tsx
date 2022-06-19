@@ -69,22 +69,13 @@ const ButtonGrid = (props: React.PropsWithChildren<any>) => {
   return (
     <Grid
       elementDescriptor={descriptors.socialButtons}
-      columns={6}
       gap={2}
-      sx={{
-        gridAutoRows: '1fr',
-        '&:before': {
-          content: "''",
-          width: 0,
-          paddingBottom: '100%',
-          gridRow: '1/1',
-          gridColumn: '1/1',
-        },
-        '& > :first-of-type': {
-          gridRow: '1/1',
-          gridColumn: '1/1',
-        },
-      }}
+      sx={theme => ({
+        '--cl-socialButtonSize': theme.sizes.$12,
+        '--cl-socialButtonsPerLine': 'auto-fill',
+        gridTemplateColumns: 'repeat(var(--cl-socialButtonsPerLine), minmax(var(--cl-socialButtonSize), 1fr))',
+        gridAutoRows: 'var(--cl-socialButtonSize)',
+      })}
     >
       {props.children}
     </Grid>
@@ -117,7 +108,7 @@ const SocialButtonIcon = (props: SocialButtonProps): JSX.Element => {
       elementId={descriptors.socialButtonsButtonIcon.setId(id)}
       variant='icon'
       colorScheme='neutral'
-      sx={{ padding: 0, height: 'unset' }}
+      sx={{ padding: 0 }}
       {...rest}
     >
       {icon}
