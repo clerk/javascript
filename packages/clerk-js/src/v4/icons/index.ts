@@ -17,3 +17,7 @@ export { default as TickShield } from './tick-shield.svg';
 export { default as SwitchArrows } from './switch-arrows.svg';
 export { default as LogoMark } from './logo-mark.svg';
 export { default as Cog } from './cog.svg';
+export { default as SignOut } from './signout.svg';
+export { default as SignOutDouble } from './signout-double.svg';
+export { default as Plus } from './plus.svg';
+export { default as CogFilled } from './cog-filled.svg';

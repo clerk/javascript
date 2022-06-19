@@ -13,6 +13,7 @@ import type { AvailableComponentCtx, AvailableComponentProps } from '../ui/types
 import { AppearanceProvider } from './customizables';
 import { SignIn, SignInModal } from './signIn';
 import { SignUp, SignUpModal } from './signUp';
+import { UserButton } from './UserButton';
 
 export type MountComponentRenderer = (
   clerk: Clerk,
@@ -40,7 +41,7 @@ const Modal = (props: any) => {
 const AvailableComponents = {
   SignIn,
   SignUp,
-  // UserButton,
+  UserButton,
   // UserProfile,
 };
 
