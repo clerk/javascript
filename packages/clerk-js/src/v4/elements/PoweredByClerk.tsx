@@ -28,6 +28,7 @@ export const PoweredByClerkText = React.memo(() => {
 type PoweredByClerkTagProps = {
   placement?: `${'bottom' | 'top'}-left`;
 };
+
 export const PoweredByClerkTag = React.memo(
   React.forwardRef<HTMLDivElement, PoweredByClerkTagProps>((props, ref) => {
     const { placement = 'top-left' } = props;

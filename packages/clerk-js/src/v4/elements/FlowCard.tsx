@@ -21,14 +21,15 @@ const OuterContainer = React.forwardRef<HTMLDivElement, React.PropsWithChildren<
   );
 });
 
-const Content = (props: PropsOfComponent<typeof Card>) => {
+const Content = (props: PropsOfComponent<typeof Card> & { logoMarkTag?: boolean }) => {
+  const { logoMarkTag = true, ...rest } = props;
   return (
     <Card
       elementDescriptor={descriptors.card}
-      {...props}
+      {...rest}
     >
       {props.children}
-      <PoweredByClerkTag />
+      {logoMarkTag && <PoweredByClerkTag />}
     </Card>
   );
 };
