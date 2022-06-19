@@ -2,7 +2,7 @@ import { OAuthProvider, OAuthStrategy, Web3Provider, Web3Strategy } from '@clerk
 import React from 'react';
 
 import { BlockButtonIcon, Button, descriptors, Flex, Grid, Icon, Image } from '../customizables';
-import { useEnabledThirdPartyProviders, useLoadingStatus } from '../hooks';
+import { useEnabledThirdPartyProviders } from '../hooks';
 import { ArrowRightIcon } from '../icons';
 import { PropsOfComponent } from '../styledSystem';
 import { useCardState } from './contexts';
@@ -22,24 +22,17 @@ export const SocialButtonsRoot = React.memo((props: SocialButtonsRootProps): JSX
   const { oauthCallback, web3Callback } = props;
   const { strategies, displayData } = useEnabledThirdPartyProviders();
   const card = useCardState();
-  const status = useLoadingStatus<string>();
 
   const preferBlockButtons = props.buttonVariant ? props.buttonVariant === 'block' : strategies.length <= 3;
 
-  const reset = () => {
-    status.setIdle();
-    card.setIdle();
-  };
-
   const startOauth = (strategy: OAuthStrategy | Web3Strategy) => async () => {
-    status.setLoading(strategy);
-    card.setLoading();
+    card.setLoading(strategy);
     if (isWeb3Strategy(strategy)) {
       await web3Callback(strategy);
     } else {
       await oauthCallback(strategy);
     }
-    setTimeout(reset, 2000);
+    setTimeout(() => card.setIdle(), 2000);
   };
 
   const ButtonElement = preferBlockButtons ? SocialButtonBlock : SocialButtonIcon;
@@ -52,15 +45,15 @@ export const SocialButtonsRoot = React.memo((props: SocialButtonsRootProps): JSX
           key={strategy}
           id={displayData[strategy].id}
           onClick={startOauth(strategy)}
-          isLoading={status.loadingMetadata === strategy}
-          isDisabled={status.isLoading || card.isLoading}
+          isLoading={card.loadingMetadata === strategy}
+          isDisabled={card.isLoading}
           label={`Continue with ${displayData[strategy].name}`}
           icon={
             <Image
               elementDescriptor={descriptors.socialButtonsLogo}
               elementId={descriptors.socialButtonsLogo.setId(displayData[strategy].id)}
-              isLoading={status.loadingMetadata === strategy}
-              isDisabled={status.isLoading || card.isLoading}
+              isLoading={card.loadingMetadata === strategy}
+              isDisabled={card.isLoading}
               src={displayData[strategy].iconUrl}
               alt={`Sign in with ${displayData[strategy].name}`}
               sx={theme => ({ width: theme.sizes.$5 })}
