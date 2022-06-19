@@ -2,6 +2,7 @@ import * as CSS from 'csstype';
 
 import { OAuthProvider } from './oauth';
 import { FontFamily } from './theme';
+import { Web3Provider } from './web3';
 
 type CSSProperties = CSS.PropertiesFallback<number | string>;
 type CSSPropertiesWithMultiValues = { [K in keyof CSSProperties]: CSSProperties[K] };
@@ -110,11 +111,11 @@ export type ElementsConfig = {
   // socialButtonsGrid: WithOptions<never, never, never>;
   // socialButtonsRows: WithOptions<never, never, never>;
   socialButtons: WithOptions<never, never, never>;
-  'socialButtons-buttonIcon': WithOptions<OAuthProvider, LoadingState | DisabledState, never>;
-  'socialButtons-buttonBlock': WithOptions<OAuthProvider, LoadingState | DisabledState, never>;
-  'socialButtons-buttonBlockText': WithOptions<OAuthProvider, never, never>;
-  'socialButtons-buttonBlockArrow': WithOptions<OAuthProvider, never, never>;
-  'socialButtons-logo': WithOptions<OAuthProvider, LoadingState | DisabledState, never>;
+  'socialButtons-buttonIcon': WithOptions<OAuthProvider | Web3Provider, LoadingState | DisabledState, never>;
+  'socialButtons-buttonBlock': WithOptions<OAuthProvider | Web3Provider, LoadingState | DisabledState, never>;
+  'socialButtons-buttonBlockText': WithOptions<OAuthProvider | Web3Provider, never, never>;
+  'socialButtons-buttonBlockArrow': WithOptions<OAuthProvider | Web3Provider, never, never>;
+  'socialButtons-logo': WithOptions<OAuthProvider | Web3Provider, LoadingState | DisabledState, never>;
 
   form: WithOptions<never, ErrorState, never>;
   'form-fieldRow': WithOptions<never, never, never>;
