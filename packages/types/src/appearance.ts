@@ -26,10 +26,18 @@ export type BorderRadius = string | { small?: string; base: string; large?: stri
 type LoadingState = 'loading';
 type DisabledState = 'disabled';
 type ErrorState = 'error';
-export type ElementState = LoadingState | DisabledState | ErrorState;
+type OpenState = 'open';
+export type ElementState = LoadingState | DisabledState | ErrorState | OpenState;
 
 export type AlertId = 'danger' | 'warning';
-export type FieldId = 'firstName' | 'lastName' | 'emailAddress' | 'phoneNumber' | 'password' | 'identifier';
+export type FieldId =
+  | 'firstName'
+  | 'lastName'
+  | 'emailAddress'
+  | 'phoneNumber'
+  | 'password'
+  | 'identifier'
+  | 'username';
 
 /**
  * A type that describes the states and the ids that we will combine
@@ -122,6 +130,10 @@ export type ElementsConfig = {
 
   avatar: WithOptions<never, never, never>;
   'avatar-image': WithOptions<never, never, never>;
+
+  userButton: WithOptions<never, 'open', never>;
+  'userButton-trigger': WithOptions<never, 'open', never>;
+  'userButton-popover': WithOptions<never, never, never>;
 
   identityPreview: WithOptions<never, never, never>;
   'identityPreview-avatar': WithOptions<never, never, never>;
@@ -218,12 +230,12 @@ export type Appearance = Theme & {
    * Theme overrides that apply only
    * to the `<UserButton/>` component
    */
-  // userButton?: Theme;
+  userButton?: Theme;
   /**
    * Theme overrides that apply only
    * to the `<UserProfile/>` component
    */
-  // userProfile?: Theme;
+  userProfile?: Theme;
 };
 
 // TODO: Discuss if we want to release a `prefersColorScheme` based theme switcher

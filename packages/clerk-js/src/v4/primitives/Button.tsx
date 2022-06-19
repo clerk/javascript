@@ -1,10 +1,11 @@
 import React from 'react';
 
-import { common, createCssVariables, createVariants, cssutils, PrimitiveProps, StyleVariants } from '../styledSystem';
+import { common, createCssVariables, createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
+import { applyDataStateProps } from './applyDataStateProps';
 import { Flex } from './Flex';
 import { Spinner } from './Spinner';
 
-const vars = createCssVariables('accent', 'accentDark', 'accentDarker', 'accentLighter', 'accentLightest');
+const vars = createCssVariables('accent', 'accentDark', 'accentDarker', 'accentLighter', 'accentLightest', 'border');
 
 const { applyVariants, filterProps } = createVariants(theme => {
   return {
@@ -18,8 +19,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
       backgroundColor: 'unset',
       color: 'currentColor',
       borderRadius: theme.radii.$md,
-      ...cssutils.addCenteredFlex('inline-flex'),
-      ...common.focusRing(theme),
+      ...common.centeredFlex('inline-flex'),
       ...common.disabled(theme),
       transitionProperty: theme.transitionProperty.$common,
       transitionDuration: theme.transitionDuration.$controls,
@@ -29,7 +29,8 @@ const { applyVariants, filterProps } = createVariants(theme => {
       size: {
         iconLg: { height: theme.sizes.$14, width: theme.sizes.$14 },
         xs: { height: theme.sizes.$1x5, padding: `${theme.space.$1x5} ${theme.space.$1x5}` },
-        md: { height: theme.sizes.$9, padding: `${theme.space.$2x5} ${theme.space.$4}` },
+        // md: { height: theme.sizes.$9, padding: `${theme.space.$2x5} ${theme.space.$4}` },
+        md: { minHeight: theme.sizes.$9, padding: `${theme.space.$2x5} ${theme.space.$4}` },
       },
       colorScheme: {
         primary: {
@@ -47,6 +48,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
           [vars.accentDarker]: theme.colors.$danger700,
         },
         neutral: {
+          [vars.border]: theme.colors.$blackAlpha200,
           [vars.accentLightest]: theme.colors.$blackAlpha50,
           [vars.accentLighter]: theme.colors.$blackAlpha300,
           [vars.accent]: theme.colors.$text500,
@@ -76,7 +78,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
         icon: {
           border: theme.borders.$normal,
           borderRadius: theme.radii.$lg,
-          borderColor: vars.accentLighter,
+          borderColor: vars.border,
           '&:hover': { backgroundColor: vars.accentLightest },
           '&:active': { backgroundColor: vars.accentLighter },
         },
@@ -98,16 +100,20 @@ const { applyVariants, filterProps } = createVariants(theme => {
           '&:hover': { textDecoration: 'underline' },
           '&:active': { color: vars.accentDark },
         },
+        roundWrapper: { padding: 0, margin: 0, height: 'unset', width: 'unset', minHeight: 'unset' },
       },
       block: {
         true: { width: '100%' },
+      },
+      focusRing: {
+        true: { ...common.focusRing(theme) },
       },
     },
     defaultVariants: {
       colorScheme: 'primary',
       variant: 'solid',
       size: 'md',
-      textVariant: 'buttonLabel',
+      focusRing: true,
     },
   };
 });
@@ -125,7 +131,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
 
   return (
     <button
-      {...rest}
+      {...applyDataStateProps(rest)}
       type={rest.type || 'button'}
       disabled={isDisabled}
       css={applyVariants(parsedProps)}
@@ -149,7 +155,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
   );
 });
 
-type BlockButtonIconProps = ButtonProps & { leftIcon?: React.ReactElement; rightIcon: React.ReactElement };
+type BlockButtonIconProps = ButtonProps & { leftIcon?: React.ReactElement; rightIcon?: React.ReactElement };
 
 /**
  * For the state of the right arrow icon in this composite component
@@ -200,17 +206,18 @@ const BlockButtonIcon = React.forwardRef<HTMLButtonElement, BlockButtonIconProps
 
       {children}
 
-      {React.cloneElement(rightIcon, {
-        sx: [
-          rightIcon.props.sx,
-          theme => ({
-            color: theme.colors.$gray500,
-            transition: 'all 100ms ease',
-            opacity: `var(--arrow-opacity)`,
-            transform: `var(--arrow-transform)`,
-          }),
-        ],
-      })}
+      {rightIcon &&
+        React.cloneElement(rightIcon, {
+          sx: [
+            rightIcon.props.sx,
+            theme => ({
+              color: theme.colors.$gray500,
+              transition: 'all 100ms ease',
+              opacity: `var(--arrow-opacity)`,
+              transform: `var(--arrow-transform)`,
+            }),
+          ],
+        })}
     </button>
   );
 });
