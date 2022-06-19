@@ -63,20 +63,8 @@ export const DropdownItemContainer = (props: React.PropsWithChildren<any>) => {
   return (
     <Flex
       direction='col'
-      sx={theme => ({ overflowY: 'scroll', maxHeight: '15vh', paddingBottom: theme.space.$2 })}
+      sx={theme => ({ overflowY: 'scroll', minHeight: '10rem', maxHeight: '15vh', paddingBottom: theme.space.$2 })}
       {...props}
     />
   );
 };
-
-export const DropdownItem = React.forwardRef((props: React.PropsWithChildren<any>, ref: any) => {
-  return (
-    <Flex
-      ref={ref}
-      justify='center'
-      align='center'
-      sx={theme => ({ padding: `${theme.space.$2} ${theme.space.$4}` })}
-      {...props}
-    />
-  );
-});
