@@ -2,52 +2,37 @@ import React from 'react';
 
 import { createContextAndHook } from '../../utils';
 
-type Action = { type: 'setLoading'; isLoading: boolean } | { type: 'setError'; error: string | undefined };
-
-type CardState = {
-  isLoading: boolean;
-  error: string | undefined;
+type Status = 'idle' | 'loading' | 'error';
+type Metadata = string | undefined;
+type CardStateCtxValue = {
+  state: { status: Status; metadata: Metadata };
+  setState: React.Dispatch<React.SetStateAction<{ status: Status; metadata: Metadata }>>;
 };
 
-type CardStateCtxValue = CardState & {
-  setLoading: () => void;
-  setIdle: () => void;
-  setError: (error: string | undefined) => void;
-};
-
-const [CardStateCtx, useCardState] = createContextAndHook<CardStateCtxValue>('CardState');
-
-const initState: CardState = {
-  isLoading: false,
-  error: undefined,
-};
-
-const reducer = (state: CardState, action: Action): CardState => {
-  switch (action.type) {
-    case 'setLoading':
-      return { ...state, isLoading: action.isLoading };
-    case 'setError':
-      return { ...state, error: action.error };
-    default:
-      return state;
-  }
-};
+const [CardStateCtx, _useCardState] = createContextAndHook<CardStateCtxValue>('CardState');
 
 const CardStateProvider = (props: React.PropsWithChildren<any>) => {
-  const [cardState, dispatch] = React.useReducer(reducer, initState);
+  const [state, setState] = React.useState<{ status: Status; metadata: Metadata }>({
+    status: 'idle',
+    metadata: undefined,
+  });
 
-  const value = React.useMemo(() => {
-    const setLoading = () => dispatch({ type: 'setLoading', isLoading: true });
-    const setIdle = () => dispatch({ type: 'setLoading', isLoading: false });
-    const setError = (error: string | undefined) => {
-      dispatch({ type: 'setError', error });
-    };
-
-    return { value: { ...cardState, setIdle, setLoading, setError } };
-  }, [cardState]);
-
+  const value = React.useMemo(() => ({ value: { state, setState } }), [state, setState]);
   return <CardStateCtx.Provider value={value}>{props.children}</CardStateCtx.Provider>;
 };
 
+const useCardState = () => {
+  const { state, setState } = _useCardState();
+
+  return {
+    setIdle: (metadata?: Metadata) => setState({ status: 'idle', metadata }),
+    setError: (metadata: Metadata) => setState({ status: 'error', metadata }),
+    setLoading: (metadata?: Metadata) => setState({ status: 'loading', metadata }),
+    loadingMetadata: state.status === 'loading' ? state.metadata : undefined,
+    error: state.status === 'error' ? state.metadata : undefined,
+    isLoading: state.status === 'loading',
+    isIdle: state.status === 'idle',
+  };
+};
+
 export { useCardState, CardStateProvider };
-export type { CardState };
