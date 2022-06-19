@@ -8,9 +8,10 @@ const STATE_PROP_TO_CLASSNAME = Object.freeze({
   disabled: ` ${CLASS_PREFIX}disabled`,
   loading: ` ${CLASS_PREFIX}loading`,
   error: ` ${CLASS_PREFIX}error`,
+  open: ` ${CLASS_PREFIX}open`,
 } as const);
 
-type PropsWithState = Partial<Record<'isLoading' | 'isDisabled' | 'hasError', any>> & Record<string, any>;
+type PropsWithState = Partial<Record<'isLoading' | 'isDisabled' | 'hasError' | 'isOpen', any>> & Record<string, any>;
 
 export const generateClassName = (
   parsedElements: ParsedElements,
@@ -28,7 +29,6 @@ export const generateClassName = (
   className = addClerkTargettableStateClass(className, state);
 
   className = addUserProvidedClassnames(className, parsedElements, elemDescriptor, elemId, state, flowMetadata);
-  className = addEmojiSeparator(className);
   addUserProvidedStyleRules(css, parsedElements, elemDescriptor, elemId, state, flowMetadata);
   return { className, css };
 };
@@ -82,13 +82,25 @@ const getElementState = (props: PropsWithState | undefined): ElementState | unde
   if (!props) {
     return undefined;
   }
-  return props.isLoading ? 'loading' : props.hasError ? 'error' : props.isDisabled ? 'disabled' : undefined;
+  if (props.isLoading) {
+    return 'loading';
+  }
+  if (props.hasError) {
+    return 'error';
+  }
+  if (props.isDisabled) {
+    return 'disabled';
+  }
+  if (props.isOpen) {
+    return 'open';
+  }
 };
 
-const addIfString = (cn: string, val?: unknown) => (typeof val === 'string' ? cn + ' ' + val : cn);
+const addStringClassname = (cn: string, val?: unknown) => (typeof val === 'string' ? cn + ' ' + val : cn);
 
-const addIfStyleObject = (css: unknown[], val?: unknown) => {
+const addStyleRuleObject = (css: unknown[], val?: unknown) => {
   val && typeof val === 'object' && css.push(val);
+  // val && typeof val === 'object' && css.push({ '&&': val });
 };
 
 export const generateFlowMetadataClassname = (props: { flow: string; page: string }) => {
@@ -109,15 +121,15 @@ const addClassnamesFromElements = (
   }
 
   type Key = keyof typeof elements;
-  cn = addIfString(cn, elements[elemDescriptor.objectKey as Key]);
+  cn = addStringClassname(cn, elements[elemDescriptor.objectKey as Key]);
   if (elemId) {
-    cn = addIfString(cn, elements[elemDescriptor.getObjectKeyWithId(elemId) as Key]);
+    cn = addStringClassname(cn, elements[elemDescriptor.getObjectKeyWithId(elemId) as Key]);
   }
   if (state) {
-    cn = addIfString(cn, elements[elemDescriptor.getObjectKeyWithState(state) as Key]);
+    cn = addStringClassname(cn, elements[elemDescriptor.getObjectKeyWithState(state) as Key]);
   }
   if (elemId && state) {
-    cn = addIfString(cn, elements[elemDescriptor.getObjectKeyWithIdAndState(elemId, state) as Key]);
+    cn = addStringClassname(cn, elements[elemDescriptor.getObjectKeyWithIdAndState(elemId, state) as Key]);
   }
   return cn;
 };
@@ -134,14 +146,14 @@ const addRulesFromElements = (
   }
 
   type Key = keyof typeof elements;
-  addIfStyleObject(css, elements[elemDescriptor.objectKey as Key]);
+  addStyleRuleObject(css, elements[elemDescriptor.objectKey as Key]);
   if (elemId) {
-    addIfStyleObject(css, elements[elemDescriptor.getObjectKeyWithId(elemId) as Key]);
+    addStyleRuleObject(css, elements[elemDescriptor.getObjectKeyWithId(elemId) as Key]);
   }
   if (state) {
-    addIfStyleObject(css, elements[elemDescriptor.getObjectKeyWithState(state) as Key]);
+    addStyleRuleObject(css, elements[elemDescriptor.getObjectKeyWithState(state) as Key]);
   }
   if (elemId && state) {
-    addIfStyleObject(css, elements[elemDescriptor.getObjectKeyWithIdAndState(elemId, state) as Key]);
+    addStyleRuleObject(css, elements[elemDescriptor.getObjectKeyWithIdAndState(elemId, state) as Key]);
   }
 };
