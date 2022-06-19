@@ -37,6 +37,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
         md: { [thickness]: theme.sizes.$1 },
       },
       size: {
+        sm: { [size]: theme.sizes.$3 },
         md: { [size]: theme.sizes.$4 },
         lg: { [size]: theme.sizes.$6 },
         xl: { [size]: theme.sizes.$8 },
@@ -55,7 +56,6 @@ const { applyVariants, filterProps } = createVariants(theme => {
 });
 
 type SpinnerProps = PrimitiveProps<'div'> & StyleVariants<typeof applyVariants>;
-
 export const Spinner = (props: SpinnerProps) => {
   return (
     <div
