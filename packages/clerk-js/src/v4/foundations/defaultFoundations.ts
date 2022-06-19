@@ -5,6 +5,7 @@ import { shadows } from './shadows';
 import { radii, sizes, space } from './sizes';
 import { transitionDuration, transitionProperty, transitionTiming } from './transitions';
 import { fonts, fontSizes, fontStyles, fontWeights, letterSpacings, lineHeights } from './typography';
+import { zIndices } from './zIndices';
 
 const defaultInternalThemeFoundations = Object.freeze({
   colors,
@@ -23,6 +24,7 @@ const defaultInternalThemeFoundations = Object.freeze({
   transitionDuration,
   opacity,
   borders,
+  zIndices,
 } as const);
 
 const defaultFoundationsCopy = (): InternalThemeFoundations => {
