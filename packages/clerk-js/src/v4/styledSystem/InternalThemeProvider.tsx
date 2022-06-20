@@ -4,23 +4,25 @@ import createCache from '@emotion/cache';
 import { CacheProvider, ThemeProvider } from '@emotion/react';
 import React from 'react';
 
-// TODO: make it customisable
-import { defaultInternalTheme } from '../foundations';
+import { useAppearance } from '../customizables';
+import { useFlowMetadata } from '../elements';
+import { InternalTheme } from '../styledSystem';
 
 const cache = createCache({
   key: 'cl-internal',
   prepend: true,
 });
 
-// type InternalThemeProvider = React.PropsWithChildren<{
-//   userDefinedAppearance?: Appearance;
-// }>;
+type InternalThemeProviderProps = React.PropsWithChildren<{
+  theme?: InternalTheme;
+}>;
 
-export const InternalThemeProvider = (props: any) => {
-  const { children, theme = defaultInternalTheme } = props;
+export const InternalThemeProvider = (props: InternalThemeProviderProps) => {
+  const { parsedInternalTheme } = useAppearance();
+  const { flow } = useFlowMetadata();
   return (
     <CacheProvider value={cache}>
-      <ThemeProvider theme={theme}>{children}</ThemeProvider>
+      <ThemeProvider theme={parsedInternalTheme[flow]}>{props.children}</ThemeProvider>
     </CacheProvider>
   );
 };

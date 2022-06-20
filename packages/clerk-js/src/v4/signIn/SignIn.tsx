@@ -4,6 +4,7 @@ import React from 'react';
 import { ComponentContext, useCoreClerk, useSignInContext, withCoreSessionSwitchGuard } from '../../ui/contexts';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../ui/router';
 import { SignInEmailLinkFlowComplete } from '../common/EmailLinkCompleteFlowCard';
+import { Flow } from '../customizables';
 import { SignInAccountSwitcher } from './SignInAccountSwitcher';
 import { SignInFactorOne } from './SignInFactorOne';
 import { SignInFactorTwo } from './SignInFactorTwo';
@@ -22,37 +23,39 @@ function SignInRoutes(): JSX.Element {
   const signInContext = useSignInContext();
 
   return (
-    <Switch>
-      <Route path='factor-one'>
-        <SignInFactorOne />
-      </Route>
-      <Route path='factor-two'>
-        <SignInFactorTwo />
-      </Route>
-      <Route path='sso-callback'>
-        <SignInSSOCallback
-          afterSignInUrl={signInContext.afterSignInUrl}
-          afterSignUpUrl={signInContext.afterSignUpUrl}
-          redirectUrl={signInContext.redirectUrl}
-          secondFactorUrl={'../factor-two'}
-        />
-      </Route>
-      <Route path='choose'>
-        <SignInAccountSwitcher />
-      </Route>
-      <Route path='verify'>
-        <SignInEmailLinkFlowComplete
-          redirectUrlComplete={signInContext.afterSignInUrl || signInContext.redirectUrl || undefined}
-          redirectUrl='../factor-two'
-        />
-      </Route>
-      <Route index>
-        <SignInStart />
-      </Route>
-      <Route>
-        <RedirectToSignIn />
-      </Route>
-    </Switch>
+    <Flow.Root flow='signIn'>
+      <Switch>
+        <Route path='factor-one'>
+          <SignInFactorOne />
+        </Route>
+        <Route path='factor-two'>
+          <SignInFactorTwo />
+        </Route>
+        <Route path='sso-callback'>
+          <SignInSSOCallback
+            afterSignInUrl={signInContext.afterSignInUrl}
+            afterSignUpUrl={signInContext.afterSignUpUrl}
+            redirectUrl={signInContext.redirectUrl}
+            secondFactorUrl={'../factor-two'}
+          />
+        </Route>
+        <Route path='choose'>
+          <SignInAccountSwitcher />
+        </Route>
+        <Route path='verify'>
+          <SignInEmailLinkFlowComplete
+            redirectUrlComplete={signInContext.afterSignInUrl || signInContext.redirectUrl || undefined}
+            redirectUrl='../factor-two'
+          />
+        </Route>
+        <Route index>
+          <SignInStart />
+        </Route>
+        <Route>
+          <RedirectToSignIn />
+        </Route>
+      </Switch>
+    </Flow.Root>
   );
 }
 

@@ -74,10 +74,6 @@ function assertDOMElement(element: HTMLElement): asserts element {
   }
 }
 
-const addMountNodeClass = (node: HTMLDivElement) => {
-  node.className = 'cl-component';
-};
-
 export const mountComponentRenderer = (
   clerk: Clerk,
   environment: EnvironmentResource,
@@ -115,7 +111,6 @@ const Components = (props: ComponentsProps) => {
     componentsControls.mountComponent = params => {
       const { node, name, props } = params;
       assertDOMElement(node);
-      addMountNodeClass(node);
       setState(s => {
         s.nodes.set(node, { key: `p${++portalCt}`, name, props });
         return { ...s, nodes };

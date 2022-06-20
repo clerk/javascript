@@ -13,8 +13,8 @@ import {
 } from '../../ui/signUp/signUpFormHelpers';
 import { completeSignUpFlow } from '../../ui/signUp/util';
 import { getClerkQueryParam } from '../../utils/getClerkQueryParam';
-import { descriptors, Flex } from '../customizables';
-import { CardAlert, FlowCard, Footer, Header, LoadingCard, withFlowCardContext } from '../elements';
+import { descriptors, Flex, Flow } from '../customizables';
+import { Card, CardAlert, Footer, Header, LoadingCard } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { useLoadingStatus } from '../hooks';
 import { buildRequest, FormControlStateLike, handleError, useFormControl } from '../utils';
@@ -175,8 +175,8 @@ function _SignUpStart(): JSX.Element {
   const canToggleEmailPhone = emailOrPhone(attributes, isProgressiveSignUp);
 
   return (
-    <FlowCard.OuterContainer>
-      <FlowCard.Content>
+    <Flow.Part part='start'>
+      <Card>
         <CardAlert>{card.error}</CardAlert>
         <Header.Root>
           <Header.Title>Create your account</Header.Title>
@@ -211,9 +211,9 @@ function _SignUpStart(): JSX.Element {
           </Footer.Action>
           <Footer.Links />
         </Footer.Root>
-      </FlowCard.Content>
-    </FlowCard.OuterContainer>
+      </Card>
+    </Flow.Part>
   );
 }
 
-export const SignUpStart = withRedirectToHome(withFlowCardContext(_SignUpStart, { flow: 'signUp', page: 'start' }));
+export const SignUpStart = withRedirectToHome(_SignUpStart);

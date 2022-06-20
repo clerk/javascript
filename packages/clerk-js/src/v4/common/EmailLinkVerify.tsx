@@ -49,8 +49,6 @@ export const EmailLinkVerify = (props: EmailLinkVerifyProps) => {
     void startVerification();
   }, []);
 
-  console.log(props.texts, verificationStatus);
-
   return (
     <EmailLinkStatusCard
       title={props.texts[verificationStatus]?.title || ''}

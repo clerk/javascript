@@ -3,7 +3,8 @@ import React from 'react';
 import { withRedirectToHome } from '../../ui/common/withRedirectToHome';
 import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../ui/contexts';
 import { useRouter } from '../../ui/router';
-import { VerificationCodeCard, VerificationCodeCardProps, withFlowCardContext } from '../elements';
+import { Flow } from '../customizables';
+import { VerificationCodeCard, VerificationCodeCardProps } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { handleError } from '../utils';
 
@@ -25,47 +26,47 @@ export function _SignInFactorTwo(): JSX.Element {
 
 export const SignInFactorTwo = withRedirectToHome(_SignInFactorTwo);
 
-const SignInFactorTwoPhoneCodeCard = withFlowCardContext(
-  () => {
-    const signIn = useCoreSignIn();
-    const card = useCardState();
-    const { applicationName } = useEnvironment().displayConfig;
-    const { navigateAfterSignIn } = useSignInContext();
-    const { setActive } = useCoreClerk();
-    const defaultFactor = React.useMemo(() => {
-      const secondFactors = signIn.supportedSecondFactors.filter(factor => factor.strategy === 'phone_code');
-      const defaultIdentifier = secondFactors.find(factor => factor.default);
-      return defaultIdentifier ? defaultIdentifier : secondFactors[0];
-    }, []);
+const SignInFactorTwoPhoneCodeCard = () => {
+  const signIn = useCoreSignIn();
+  const card = useCardState();
+  const { applicationName } = useEnvironment().displayConfig;
+  const { navigateAfterSignIn } = useSignInContext();
+  const { setActive } = useCoreClerk();
+  const defaultFactor = React.useMemo(() => {
+    const secondFactors = signIn.supportedSecondFactors.filter(factor => factor.strategy === 'phone_code');
+    const defaultIdentifier = secondFactors.find(factor => factor.default);
+    return defaultIdentifier ? defaultIdentifier : secondFactors[0];
+  }, []);
 
-    React.useEffect(() => {
-      // TODO: Make sure this id idempotent
-      prepare();
-    }, []);
+  React.useEffect(() => {
+    // TODO: Make sure this id idempotent
+    prepare();
+  }, []);
 
-    const prepare = () => {
-      if (!signIn || signIn.secondFactorVerification.status === 'verified' || !defaultFactor) {
-        return;
-      }
-      void signIn
-        .prepareSecondFactor({ strategy: 'phone_code', phoneNumberId: defaultFactor.phoneNumberId })
-        .catch(err => handleError(err, [], card.setError));
-    };
+  const prepare = () => {
+    if (!signIn || signIn.secondFactorVerification.status === 'verified' || !defaultFactor) {
+      return;
+    }
+    void signIn
+      .prepareSecondFactor({ strategy: 'phone_code', phoneNumberId: defaultFactor.phoneNumberId })
+      .catch(err => handleError(err, [], card.setError));
+  };
 
-    const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
-      return signIn
-        .attemptSecondFactor({ strategy: 'phone_code', code })
-        .then(async res => {
-          await resolve();
-          switch (res.status) {
-            case 'complete':
-              return setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignIn });
-          }
-        })
-        .catch(err => reject(err));
-    };
+  const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
+    return signIn
+      .attemptSecondFactor({ strategy: 'phone_code', code })
+      .then(async res => {
+        await resolve();
+        switch (res.status) {
+          case 'complete':
+            return setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignIn });
+        }
+      })
+      .catch(err => reject(err));
+  };
 
-    return (
+  return (
+    <Flow.Part part='phoneCode2Fa'>
       <VerificationCodeCard
         cardTitle='Sign in'
         cardSubtitle={`To continue to ${applicationName}`}
@@ -77,7 +78,6 @@ const SignInFactorTwoPhoneCodeCard = withFlowCardContext(
         profileImageUrl={signIn.userData.profileImageUrl}
         onShowAlternativeMethodsClicked={undefined}
       />
-    );
-  },
-  { flow: 'signIn', page: 'phoneCode' },
-);
+    </Flow.Part>
+  );
+};

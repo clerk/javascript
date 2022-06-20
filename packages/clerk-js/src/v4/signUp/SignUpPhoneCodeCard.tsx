@@ -1,31 +1,31 @@
 import React from 'react';
 
 import { useCoreSignUp, useEnvironment } from '../../ui/contexts';
-import { withFlowCardContext } from '../elements';
+import { Flow } from '../customizables';
 import { SignUpVerificationCodeForm } from './SignUpVerificationCodeForm';
 
-export const SignUpPhoneCodeCard = withFlowCardContext(
-  () => {
-    const { displayConfig } = useEnvironment();
-    const signUp = useCoreSignUp();
+export const SignUpPhoneCodeCard = () => {
+  const { displayConfig } = useEnvironment();
+  const signUp = useCoreSignUp();
 
-    React.useEffect(() => {
-      // TODO: This prepare method is not idempotent.
-      // We need to make sure that R18 won't trigger this twice
-      void prepare();
-    }, []);
+  React.useEffect(() => {
+    // TODO: This prepare method is not idempotent.
+    // We need to make sure that R18 won't trigger this twice
+    void prepare();
+  }, []);
 
-    const prepare = () => {
-      const phoneVerificationStatus = signUp.verifications.phoneNumber.status;
-      if (!signUp.status || phoneVerificationStatus === 'verified') {
-        return;
-      }
-      return signUp.preparePhoneNumberVerification({ strategy: 'phone_code' });
-    };
+  const prepare = () => {
+    const phoneVerificationStatus = signUp.verifications.phoneNumber.status;
+    if (!signUp.status || phoneVerificationStatus === 'verified') {
+      return;
+    }
+    return signUp.preparePhoneNumberVerification({ strategy: 'phone_code' });
+  };
 
-    const attempt = (code: string) => signUp.attemptPhoneNumberVerification({ code });
+  const attempt = (code: string) => signUp.attemptPhoneNumberVerification({ code });
 
-    return (
+  return (
+    <Flow.Part part='phoneCode'>
       <SignUpVerificationCodeForm
         cardTitle='Verify your phone number'
         cardSubtitle={`to continue to ${displayConfig.applicationName}`}
@@ -35,7 +35,6 @@ export const SignUpPhoneCodeCard = withFlowCardContext(
         attempt={attempt}
         safeIdentifier={signUp.phoneNumber}
       />
-    );
-  },
-  { flow: 'signUp', page: 'phoneCode' },
-);
+    </Flow.Part>
+  );
+};

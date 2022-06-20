@@ -1,13 +1,13 @@
 import React from 'react';
 
 import { useSupportEmail } from '../../ui/hooks/useSupportEmail';
-import { descriptors, Flex, Icon, Text } from '../customizables';
+import { descriptors, Flex, Flow, Icon, Text } from '../customizables';
+import { Card } from '../elements';
 import { Email } from '../icons';
 import { CardAlert } from './Alert';
 import { BackLink } from './BackLink';
 import { BlockButtonWithArrow } from './BlockButtonWithArrow';
 import { useCardState } from './contexts';
-import { FlowCard } from './FlowCard';
 import { Footer } from './Footer';
 import { Header } from './Header';
 
@@ -28,8 +28,8 @@ export const ErrorCard = (props: ErrorCardProps) => {
   };
 
   return (
-    <FlowCard.OuterContainer>
-      <FlowCard.Content>
+    <Flow.Part part='havingTrouble'>
+      <Card>
         <CardAlert>{card.error}</CardAlert>
         {onBackLinkClick && <BackLink onClick={onBackLinkClick} />}
         <Header.Root>
@@ -75,7 +75,7 @@ export const ErrorCard = (props: ErrorCardProps) => {
           <Footer.Action />
           <Footer.Links />
         </Footer.Root>
-      </FlowCard.Content>
-    </FlowCard.OuterContainer>
+      </Card>
+    </Flow.Part>
   );
 };

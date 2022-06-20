@@ -7,8 +7,8 @@ import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '.
 import { useNavigate } from '../../ui/hooks';
 import { useSupportEmail } from '../../ui/hooks/useSupportEmail';
 import { getClerkQueryParam } from '../../utils/getClerkQueryParam';
-import { descriptors, Flex } from '../customizables';
-import { CardAlert, FlowCard, Footer, Form, Header, LoadingCard, withFlowCardContext } from '../elements';
+import { descriptors, Flex, Flow } from '../customizables';
+import { Card, CardAlert, Footer, Form, Header, LoadingCard } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { useLoadingStatus } from '../hooks';
 import { buildRequest, FormControlState, handleError, isMobileDevice, useFormControl } from '../utils';
@@ -36,7 +36,7 @@ export function _SignInStart(): JSX.Element {
     type: 'password',
     label: 'Password',
   });
-  const identifierField = useFormControl('identifier', '', {
+  const identifierField = useFormControl('identifier', 'nikos+1@clerk.dev', {
     type: identifierInputDisplayValues.fieldType,
     label: identifierInputDisplayValues.label,
   });
@@ -168,8 +168,8 @@ export function _SignInStart(): JSX.Element {
   const shouldAutofocus = !isMobileDevice() && hasSocialOrWeb3Buttons;
 
   return (
-    <FlowCard.OuterContainer>
-      <FlowCard.Content>
+    <Flow.Part part='start'>
+      <Card>
         <CardAlert>{card.error}</CardAlert>
         <Header.Root>
           <Header.Title>Sign in</Header.Title>
@@ -206,8 +206,8 @@ export function _SignInStart(): JSX.Element {
           </Footer.Action>
           <Footer.Links />
         </Footer.Root>
-      </FlowCard.Content>
-    </FlowCard.OuterContainer>
+      </Card>
+    </Flow.Part>
   );
 }
 
@@ -224,4 +224,4 @@ const InstantPasswordControl = ({ field }: { field?: FormControlState<'password'
   );
 };
 
-export const SignInStart = withRedirectToHome(withFlowCardContext(_SignInStart, { flow: 'signIn', page: 'start' }));
+export const SignInStart = withRedirectToHome(_SignInStart);

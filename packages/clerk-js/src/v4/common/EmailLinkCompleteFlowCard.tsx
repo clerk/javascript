@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { EmailLinkVerify, EmailLinkVerifyProps } from '../common';
-import { withFlowCardContext } from '../elements';
 
 const signInTexts = {
   verified: {
@@ -42,26 +41,20 @@ const signUpTexts = {
   },
 };
 
-export const SignInEmailLinkFlowComplete = withFlowCardContext(
-  (props: Omit<EmailLinkVerifyProps, 'texts'>) => {
-    return (
-      <EmailLinkVerify
-        {...props}
-        texts={signInTexts}
-      />
-    );
-  },
-  { flow: 'signIn', page: 'emailLinkVerify' },
-);
+export const SignInEmailLinkFlowComplete = (props: Omit<EmailLinkVerifyProps, 'texts'>) => {
+  return (
+    <EmailLinkVerify
+      {...props}
+      texts={signInTexts}
+    />
+  );
+};
 
-export const SignUpEmailLinkFlowComplete = withFlowCardContext(
-  (props: Omit<EmailLinkVerifyProps, 'texts'>) => {
-    return (
-      <EmailLinkVerify
-        {...props}
-        texts={signUpTexts}
-      />
-    );
-  },
-  { flow: 'signUp', page: 'emailLinkVerify' },
-);
+export const SignUpEmailLinkFlowComplete = (props: Omit<EmailLinkVerifyProps, 'texts'>) => {
+  return (
+    <EmailLinkVerify
+      {...props}
+      texts={signUpTexts}
+    />
+  );
+};

@@ -1,10 +1,10 @@
 import { HandleOAuthCallbackParams } from '@clerk/types/src';
 import React from 'react';
 
-import { withRedirectToHome } from '../../ui/common/withRedirectToHome';
 import { useCoreClerk } from '../../ui/contexts';
 import { useNavigate } from '../../ui/hooks';
-import { LoadingCard, withFlowCardContext } from '../elements';
+import { Flow } from '../customizables';
+import { LoadingCard } from '../elements';
 
 export const SSOCallback = (props: HandleOAuthCallbackParams) => {
   const { handleRedirectCallback } = useCoreClerk();
@@ -14,5 +14,9 @@ export const SSOCallback = (props: HandleOAuthCallbackParams) => {
     void handleRedirectCallback({ ...props }, navigate);
   }, []);
 
-  return <LoadingCard />;
+  return (
+    <Flow.Part part='ssoCallback'>
+      <LoadingCard />
+    </Flow.Part>
+  );
 };

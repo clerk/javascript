@@ -12,8 +12,8 @@ import {
   showFormFields,
 } from '../../ui/signUp/signUpFormHelpers';
 import { completeSignUpFlow } from '../../ui/signUp/util';
-import { descriptors, Flex } from '../customizables';
-import { CardAlert, FlowCard, Footer, Header, LoadingCard, withFlowCardContext } from '../elements';
+import { descriptors, Flex, Flow } from '../customizables';
+import { Card, CardAlert, Footer, Header, LoadingCard } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { buildRequest, FormControlStateLike, handleError, useFormControl } from '../utils';
 import { SignUpForm } from './SignUpForm';
@@ -101,8 +101,8 @@ function _SignUpContinue() {
   const showWeb3Providers = !hasVerifiedWeb3 && web3Options.length > 0;
 
   return (
-    <FlowCard.OuterContainer>
-      <FlowCard.Content>
+    <Flow.Part part='complete'>
+      <Card>
         <CardAlert>{card.error}</CardAlert>
         <Header.Root>
           {/* TODO: copy? */}
@@ -116,7 +116,6 @@ function _SignUpContinue() {
           sx={theme => ({ marginTop: theme.space.$8 })}
         >
           {showOauthProviders && <SignUpSocialButtons />}
-          {/*TODO web3 */}
           {showFormFields(userSettings) && (
             <SignUpForm
               handleSubmit={handleSubmit}
@@ -139,12 +138,10 @@ function _SignUpContinue() {
           </Footer.Action>
           <Footer.Links />
         </Footer.Root>
-      </FlowCard.Content>
-    </FlowCard.OuterContainer>
+      </Card>
+    </Flow.Part>
   );
 }
 
 // TODO: flow / page naming
-export const SignUpContinue = withRedirectToHome(
-  withFlowCardContext(_SignUpContinue, { flow: 'signUp', page: 'completeFlow' }),
-);
+export const SignUpContinue = withRedirectToHome(_SignUpContinue);
