@@ -94,6 +94,11 @@ export type ElementsConfig = {
   root: WithOptions<never, never, never>;
   card: WithOptions<never, never, never>;
 
+  logo: WithOptions<never, never, never>;
+  'logo-image': WithOptions<never, never, never>;
+  // outerLogo: WithOptions<never, never, never>;
+  // 'outerLogo-image': WithOptions<never, never, never>;
+
   header: WithOptions<never, never, never>;
   'header-title': WithOptions<never, never, never>;
   'header-subtitle': WithOptions<never, never, never>;

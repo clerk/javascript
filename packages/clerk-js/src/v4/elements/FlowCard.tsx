@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, descriptors, Flex, useAppearance } from '../customizables';
 import { generateFlowMetadataClassname } from '../customizables/classGeneration';
 import { InternalThemeProvider, PropsOfComponent } from '../styledSystem';
+import { ApplicationLogo } from './ApplicationLogo';
 import { CardStateProvider, FlowMetadata, FlowMetadataProvider, useFlowMetadata } from './contexts';
 import { PoweredByClerkTag } from './PoweredByClerk';
 
@@ -28,6 +29,7 @@ const Content = (props: PropsOfComponent<typeof Card> & { logoMarkTag?: boolean 
       elementDescriptor={descriptors.card}
       {...rest}
     >
+      <ApplicationLogo />
       {props.children}
       {logoMarkTag && <PoweredByClerkTag />}
     </Card>

@@ -15,7 +15,7 @@ export { default as PencilEdit } from './pencil-edit.svg';
 export { default as Email } from './email.svg';
 export { default as TickShield } from './tick-shield.svg';
 export { default as SwitchArrows } from './switch-arrows.svg';
-export { default as LogoMark } from './logo-mark.svg';
+export { default as LogoMark } from './logo-mark-new.svg';
 export { default as Cog } from './cog.svg';
 export { default as SignOut } from './signout.svg';
 export { default as SignOutDouble } from './signout-double.svg';
