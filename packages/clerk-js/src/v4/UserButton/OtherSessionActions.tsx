@@ -33,7 +33,12 @@ export const UserPreviewButton = (props: UserPreviewButtonProps) => {
       isDisabled={card.isLoading}
       {...rest}
       sx={[
-        theme => ({ borderRadius: 0, justifyContent: 'space-between', padding: `${theme.space.$4} ${theme.space.$6}` }),
+        theme => ({
+          height: theme.sizes.$14,
+          borderRadius: 0,
+          justifyContent: 'space-between',
+          padding: `${theme.space.$3} ${theme.space.$6}`,
+        }),
         rest.sx,
       ]}
     >

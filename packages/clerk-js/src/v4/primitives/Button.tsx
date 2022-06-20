@@ -29,8 +29,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
       size: {
         iconLg: { height: theme.sizes.$14, width: theme.sizes.$14 },
         xs: { height: theme.sizes.$1x5, padding: `${theme.space.$1x5} ${theme.space.$1x5}` },
-        // md: { height: theme.sizes.$9, padding: `${theme.space.$2x5} ${theme.space.$4}` },
-        md: { minHeight: theme.sizes.$9, padding: `${theme.space.$2x5} ${theme.space.$4}` },
+        md: { height: theme.sizes.$9, padding: `${theme.space.$2x5} ${theme.space.$4}` },
       },
       colorScheme: {
         primary: {

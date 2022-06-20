@@ -18,12 +18,12 @@ const isWeb3Strategy = (val: string): val is Web3Strategy => {
   return val.startsWith('web3_');
 };
 
-export const SocialButtonsRoot = React.memo((props: SocialButtonsRootProps): JSX.Element => {
-  const { oauthCallback, web3Callback } = props;
+export const SocialButtons = React.memo((props: SocialButtonsRootProps): JSX.Element => {
+  const { oauthCallback, web3Callback, buttonVariant } = props;
   const { strategies, displayData } = useEnabledThirdPartyProviders();
   const card = useCardState();
 
-  const preferBlockButtons = props.buttonVariant ? props.buttonVariant === 'block' : strategies.length <= 3;
+  const preferBlockButtons = buttonVariant ? buttonVariant === 'block' : strategies.length <= 3;
 
   const startOauth = (strategy: OAuthStrategy | Web3Strategy) => async () => {
     card.setLoading(strategy);
@@ -108,7 +108,7 @@ const SocialButtonIcon = (props: SocialButtonProps): JSX.Element => {
       elementId={descriptors.socialButtonsButtonIcon.setId(id)}
       variant='icon'
       colorScheme='neutral'
-      sx={{ padding: 0 }}
+      sx={{ padding: 0, height: '100%', width: '100%' }}
       {...rest}
     >
       {icon}

@@ -16,6 +16,7 @@ const OuterContainer = React.forwardRef<HTMLDivElement, React.PropsWithChildren<
     <Flex
       elementDescriptor={descriptors.root}
       className={generateFlowMetadataClassname(flowMetadata)}
+      direction='col'
       {...props}
       ref={ref}
     />
