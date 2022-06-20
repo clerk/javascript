@@ -5,7 +5,7 @@ import { useCoreClerk, useCoreSignIn, useSignInContext } from '../../ui/contexts
 import { useEnvironment } from '../../ui/contexts/EnvironmentContext';
 import { useNavigate } from '../../ui/hooks';
 import { useCardState } from '../elements/contexts';
-import { SocialButtonsProps, SocialButtonsRoot } from '../elements/SocialButtons';
+import { SocialButtons, SocialButtonsProps } from '../elements/SocialButtons';
 import { handleError } from '../utils';
 
 export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
@@ -19,7 +19,7 @@ export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
   const redirectUrlComplete = ctx.afterSignInUrl || displayConfig.afterSignInUrl;
 
   return (
-    <SocialButtonsRoot
+    <SocialButtons
       {...props}
       oauthCallback={strategy => {
         return signIn

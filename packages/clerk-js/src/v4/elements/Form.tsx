@@ -15,7 +15,6 @@ type FormProps = React.PropsWithChildren<{
 
 const FormRoot = (props: FormProps): JSX.Element => {
   const card = useCardState();
-  console.log('FormRoot', card.isLoading);
   const status = useLoadingStatus();
 
   const onSubmit: React.FormEventHandler = async e => {
