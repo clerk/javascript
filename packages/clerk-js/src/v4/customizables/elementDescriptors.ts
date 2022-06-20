@@ -17,6 +17,11 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'root',
   'card',
 
+  'logo',
+  'logo-image',
+  // 'outerLogo',
+  // 'outerLogo-image',
+
   'header',
   'header-title',
   'header-subtitle',
