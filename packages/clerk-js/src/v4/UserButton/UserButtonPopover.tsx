@@ -2,8 +2,8 @@ import { ActiveSessionResource } from '@clerk/types';
 import React from 'react';
 
 import { useCoreSession, useCoreUser, useEnvironment, useUserButtonContext } from '../../ui/contexts';
-import { Card, Flex, Link } from '../customizables';
-import { FlowCard, PoweredByClerkText } from '../elements';
+import { Flex, Flow, Link } from '../customizables';
+import { EmptyCard, PoweredByClerkText } from '../elements';
 import { CogFilled, Plus, SignOut, SignOutDouble } from '../icons';
 import { animations, PropsOfComponent } from '../styledSystem';
 import { Action, Actions } from './CurrentAccountActions';
@@ -132,14 +132,12 @@ const UserButtonLink = (props: PropsOfComponent<typeof Link>) => {
   );
 };
 
-const UserButtonCard = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof Card>>((props, ref) => {
+const UserButtonCard = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof EmptyCard>>((props, ref) => {
   return (
-    <FlowCard.OuterContainer
-      {...props}
-      ref={ref}
-    >
-      <FlowCard.Content
-        logoMarkTag={false}
+    <Flow.Part part='popover'>
+      <EmptyCard
+        {...props}
+        ref={ref}
         sx={theme => ({
           padding: `${theme.space.$6} 0`,
           minWidth: theme.sizes.$94,
@@ -148,7 +146,7 @@ const UserButtonCard = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof 
         })}
       >
         {props.children}
-      </FlowCard.Content>
-    </FlowCard.OuterContainer>
+      </EmptyCard>
+    </Flow.Part>
   );
 });

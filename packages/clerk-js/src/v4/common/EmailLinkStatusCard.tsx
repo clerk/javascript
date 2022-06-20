@@ -1,8 +1,8 @@
 import React from 'react';
 
 import { VerificationStatus } from '../../utils/getClerkQueryParam';
-import { descriptors, Flex, Icon, Spinner, Text } from '../customizables';
-import { CardAlert, FlowCard, Header } from '../elements';
+import { descriptors, Flex, Flow, Icon, Spinner, Text } from '../customizables';
+import { Card, CardAlert, Header } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { ExclamationTriangle, SwitchArrows, TickShield } from '../icons';
 import { animations, InternalTheme } from '../styledSystem';
@@ -31,8 +31,8 @@ const statusToColor = (theme: InternalTheme, status: Exclude<VerificationStatus,
 export const EmailLinkStatusCard = (props: EmailLinkStatusCardProps) => {
   const card = useCardState();
   return (
-    <FlowCard.OuterContainer>
-      <FlowCard.Content>
+    <Flow.Part part='emailLinkStatus'>
+      <Card>
         <CardAlert>{card.error}</CardAlert>
         <Header.Root>
           <Header.Title>{props.title}</Header.Title>
@@ -45,8 +45,8 @@ export const EmailLinkStatusCard = (props: EmailLinkStatusCardProps) => {
         >
           <StatusRow status={props.status} />
         </Flex>
-      </FlowCard.Content>
-    </FlowCard.OuterContainer>
+      </Card>
+    </Flow.Part>
   );
 };
 

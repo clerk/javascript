@@ -1,8 +1,8 @@
 import type { Elements, ElementState } from '@clerk/types';
 
 import { FlowMetadata } from '../elements/contexts';
-import { ParsedElements } from './appearanceAdapter';
 import { CLASS_PREFIX, ElementDescriptor, ElementId } from './elementDescriptors';
+import { ParsedElements } from './parseAppearance';
 
 const STATE_PROP_TO_CLASSNAME = Object.freeze({
   disabled: ` ${CLASS_PREFIX}disabled`,
@@ -94,6 +94,7 @@ const getElementState = (props: PropsWithState | undefined): ElementState | unde
   if (props.isOpen) {
     return 'open';
   }
+  return undefined;
 };
 
 const addStringClassname = (cn: string, val?: unknown) => (typeof val === 'string' ? cn + ' ' + val : cn);
@@ -103,10 +104,15 @@ const addStyleRuleObject = (css: unknown[], val?: unknown) => {
   // val && typeof val === 'object' && css.push({ '&&': val });
 };
 
-export const generateFlowMetadataClassname = (props: { flow: string; page: string }) => {
-  const flowClass = CLASS_PREFIX + props.flow;
-  const pageClass = flowClass + '-' + props.page;
-  return flowClass + ' ' + pageClass;
+export const generateFlowClassname = (props: Pick<FlowMetadata, 'flow'>) => {
+  return CLASS_PREFIX + props.flow + '-root';
+};
+
+export const generateFlowPartClassname = (props: FlowMetadata) => {
+  if (!props.part) {
+    return '';
+  }
+  return CLASS_PREFIX + props.flow + '-' + props.part;
 };
 
 const addClassnamesFromElements = (

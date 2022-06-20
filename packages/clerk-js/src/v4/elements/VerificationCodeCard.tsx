@@ -6,10 +6,10 @@ import { useLoadingStatus } from '../hooks';
 import { handleError, sleep, useFormControl } from '../utils';
 import { CardAlert } from './Alert';
 import { BackLink } from './BackLink';
+import { Card } from './Card';
 import { useCodeControl } from './CodeControl';
 import { CodeForm } from './CodeForm';
 import { useCardState } from './contexts';
-import { FlowCard } from './FlowCard';
 import { Footer } from './Footer';
 import { Header } from './Header';
 import { IdentityPreview } from './IdentityPreview';
@@ -66,49 +66,47 @@ export const VerificationCodeCard = (props: VerificationCodeCardProps) => {
   };
 
   return (
-    <FlowCard.OuterContainer>
-      <FlowCard.Content>
-        <CardAlert>{card.error}</CardAlert>
-        <BackLink onClick={goBack} />
-        <Header.Root>
-          <Header.Title>{props.cardTitle}</Header.Title>
-          <Header.Subtitle>{props.cardSubtitle}</Header.Subtitle>
-        </Header.Root>
-        <IdentityPreview
-          identifier={props.safeIdentifier}
-          avatarUrl={props.profileImageUrl}
-          onClick={goBack}
+    <Card>
+      <CardAlert>{card.error}</CardAlert>
+      <BackLink onClick={goBack} />
+      <Header.Root>
+        <Header.Title>{props.cardTitle}</Header.Title>
+        <Header.Subtitle>{props.cardSubtitle}</Header.Subtitle>
+      </Header.Root>
+      <IdentityPreview
+        identifier={props.safeIdentifier}
+        avatarUrl={props.profileImageUrl}
+        onClick={goBack}
+      />
+      {/*TODO: extract main in its own component */}
+      <Flex
+        direction='col'
+        elementDescriptor={descriptors.main}
+        gap={8}
+        sx={theme => ({ marginTop: theme.space.$8 })}
+      >
+        <CodeForm
+          title={props.formTitle}
+          subtitle={props.formSubtitle}
+          isLoading={status.isLoading}
+          success={success}
+          codeControl={codeControl}
+          onResendCodeClicked={handleResend}
         />
-        {/*TODO: extract main in its own component */}
-        <Flex
-          direction='col'
-          elementDescriptor={descriptors.main}
-          gap={8}
-          sx={theme => ({ marginTop: theme.space.$8 })}
-        >
-          <CodeForm
-            title={props.formTitle}
-            subtitle={props.formSubtitle}
-            isLoading={status.isLoading}
-            success={success}
-            codeControl={codeControl}
-            onResendCodeClicked={handleResend}
-          />
-        </Flex>
-        <Footer.Root>
-          <Footer.Action>
-            {props.onShowAlternativeMethodsClicked && (
-              <Footer.ActionLink
-                isExternal
-                onClick={props.onShowAlternativeMethodsClicked}
-              >
-                Try another method
-              </Footer.ActionLink>
-            )}
-          </Footer.Action>
-          <Footer.Links />
-        </Footer.Root>
-      </FlowCard.Content>
-    </FlowCard.OuterContainer>
+      </Flex>
+      <Footer.Root>
+        <Footer.Action>
+          {props.onShowAlternativeMethodsClicked && (
+            <Footer.ActionLink
+              isExternal
+              onClick={props.onShowAlternativeMethodsClicked}
+            >
+              Try another method
+            </Footer.ActionLink>
+          )}
+        </Footer.Action>
+        <Footer.Links />
+      </Footer.Root>
+    </Card>
   );
 };

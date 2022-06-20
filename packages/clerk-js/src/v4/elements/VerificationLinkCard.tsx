@@ -1,12 +1,12 @@
 import React from 'react';
 
 import { useRouter } from '../../ui/router';
-import { descriptors, Flex, Text } from '../customizables';
+import { descriptors, Flex, Flow, Text } from '../customizables';
+import { Card } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { useLoadingStatus } from '../hooks';
 import { CardAlert } from './Alert';
 import { BackLink } from './BackLink';
-import { FlowCard } from './FlowCard';
 import { Footer } from './Footer';
 import { Header } from './Header';
 import { IdentityPreview } from './IdentityPreview';
@@ -33,8 +33,8 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
   };
 
   return (
-    <FlowCard.OuterContainer>
-      <FlowCard.Content>
+    <Flow.Part part='emailLinkVerify'>
+      <Card>
         <CardAlert>{card.error}</CardAlert>
         <BackLink onClick={goBack} />
         <Header.Root>
@@ -89,7 +89,7 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
           </Footer.Action>
           <Footer.Links />
         </Footer.Root>
-      </FlowCard.Content>
-    </FlowCard.OuterContainer>
+      </Card>
+    </Flow.Part>
   );
 };

@@ -21,5 +21,6 @@ export const Form = makeCustomizable(Primitives.Form);
 export const Icon = makeCustomizable(Primitives.Icon);
 export const Spinner = makeCustomizable(Primitives.Spinner);
 
+export * from './Flow';
 export { AppearanceProvider, useAppearance } from './AppearanceContext';
 export { descriptors } from './elementDescriptors';

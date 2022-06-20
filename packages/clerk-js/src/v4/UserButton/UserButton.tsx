@@ -1,8 +1,7 @@
 import React from 'react';
 
 import { useCoreUser, useUserButtonContext, withCoreUserGuard } from '../../ui/contexts';
-import { descriptors, Flex, Text } from '../customizables';
-import { withFlowCardContext } from '../elements';
+import { descriptors, Flex, Flow, Text } from '../customizables';
 import { usePopover } from '../hooks';
 import { getFullName } from '../utils';
 import { getIdentifier } from './getIdentifier';
@@ -18,27 +17,29 @@ const _UserButton = () => {
   });
 
   return (
-    <Flex
-      elementDescriptor={descriptors.userButton}
-      isOpen={isOpen}
-      align='center'
-      gap={2}
-    >
-      <UserButtonTopLevelIdentifier />
-      <UserButtonTrigger
-        ref={reference}
-        onClick={toggle}
+    <Flow.Root flow='userButton'>
+      <Flex
+        elementDescriptor={descriptors.userButton}
         isOpen={isOpen}
-      />
-      <Portal>
-        <UserButtonPopover
+        align='center'
+        gap={2}
+      >
+        <UserButtonTopLevelIdentifier />
+        <UserButtonTrigger
+          ref={reference}
+          onClick={toggle}
           isOpen={isOpen}
-          close={toggle}
-          ref={floating}
-          style={{ ...styles }}
         />
-      </Portal>
-    </Flex>
+        <Portal>
+          <UserButtonPopover
+            isOpen={isOpen}
+            close={toggle}
+            ref={floating}
+            style={{ ...styles }}
+          />
+        </Portal>
+      </Flex>
+    </Flow.Root>
   );
 };
 
@@ -48,6 +49,4 @@ const UserButtonTopLevelIdentifier = () => {
   return showName ? <Text variant='secondaryHeading'>{getFullName(user) || getIdentifier(user)}</Text> : null;
 };
 
-export const UserButton = withCoreUserGuard(
-  withFlowCardContext(_UserButton, { displayName: 'UserButton', flow: 'userButton' }),
-);
+export const UserButton = withCoreUserGuard(_UserButton);

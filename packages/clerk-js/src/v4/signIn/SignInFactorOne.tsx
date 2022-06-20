@@ -5,7 +5,7 @@ import { withRedirectToHome } from '../../ui/common/withRedirectToHome';
 import { useCoreSignIn, useEnvironment } from '../../ui/contexts';
 import { useRouter } from '../../ui/router';
 import { determineStartingSignInFactor, factorHasLocalStrategy } from '../../ui/signIn/utils';
-import { ErrorCard, LoadingCard, withFlowCardContext } from '../elements';
+import { ErrorCard, LoadingCard } from '../elements';
 import { AlternativeMethods } from './AlternativeMethods';
 import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
 import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
@@ -42,8 +42,8 @@ export function _SignInFactorOne(): JSX.Element {
 
   React.useEffect(() => {
     // Handle the case where a user lands on alternative methods screen,
-    // clicks a social button but then navigates back to signin.
-    // Signin status resets to 'needs_identifier'
+    // clicks a social button but then navigates back to sign in.
+    // SignIn status resets to 'needs_identifier'
     if (signIn.status === 'needs_identifier' || signIn.status === null) {
       void router.navigate('../');
     }
@@ -51,7 +51,7 @@ export function _SignInFactorOne(): JSX.Element {
 
   if (!currentFactor && signIn.status) {
     return (
-      <SignInFactorOneErrorCard
+      <ErrorCard
         cardTitle='Cannot sign in'
         cardSubtitle='An error occurred'
         message="Cannot proceed with sign in. There's no available authentication factor."
@@ -115,7 +115,5 @@ export function _SignInFactorOne(): JSX.Element {
       return <LoadingCard />;
   }
 }
-
-const SignInFactorOneErrorCard = withFlowCardContext(ErrorCard, { flow: 'signIn', page: 'havingTrouble' });
 
 export const SignInFactorOne = withRedirectToHome(_SignInFactorOne);

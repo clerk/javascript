@@ -2,16 +2,16 @@ import { EmailCodeFactor } from '@clerk/types';
 import React from 'react';
 
 import { useEnvironment } from '../../ui/contexts';
-import { withFlowCardContext } from '../elements';
+import { Flow } from '../customizables';
 import { SignInFactorOneCodeCard, SignInFactorOneCodeForm } from './SignInFactorOneCodeForm';
 
 type SignInFactorOneEmailCodeCardProps = SignInFactorOneCodeCard & { factor: EmailCodeFactor };
 
-export const SignInFactorOneEmailCodeCard = withFlowCardContext(
-  (props: SignInFactorOneEmailCodeCardProps) => {
-    const { applicationName } = useEnvironment().displayConfig;
+export const SignInFactorOneEmailCodeCard = (props: SignInFactorOneEmailCodeCardProps) => {
+  const { applicationName } = useEnvironment().displayConfig;
 
-    return (
+  return (
+    <Flow.Part part='emailCode'>
       <SignInFactorOneCodeForm
         {...props}
         cardTitle='Sign in'
@@ -19,7 +19,6 @@ export const SignInFactorOneEmailCodeCard = withFlowCardContext(
         formTitle='Verification code'
         formSubtitle='Enter the verification code sent to your email address'
       />
-    );
-  },
-  { flow: 'signIn', page: 'emailCode' },
-);
+    </Flow.Part>
+  );
+};

@@ -1,5 +1,4 @@
 export * from './contexts';
-export * from './FlowCard';
 export * from './Header';
 export * from './Footer';
 export * from './Alert';
@@ -16,3 +15,4 @@ export * from './ErrorCard';
 export * from './VerificationLinkCard';
 export * from './PoweredByClerk';
 export * from './ApplicationLogo';
+export * from './Card';
