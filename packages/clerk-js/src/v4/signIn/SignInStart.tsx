@@ -180,7 +180,6 @@ export function _SignInStart(): JSX.Element {
           direction='col'
           elementDescriptor={descriptors.main}
           gap={8}
-          sx={theme => ({ marginTop: theme.space.$8 })}
         >
           <SignInSocialButtons />
           {standardFormAttributes.length && (

@@ -186,7 +186,6 @@ function _SignUpStart(): JSX.Element {
           direction='col'
           elementDescriptor={descriptors.main}
           gap={8}
-          sx={theme => ({ marginTop: theme.space.$8 })}
         >
           {(!hasTicket || missingRequirementsWithTicket) && <SignUpSocialButtons />}
           {showFormFields(userSettings) && (

@@ -19,7 +19,7 @@ export const CodeForm = (props: CodeFormProps) => {
   return (
     <Flex
       direction='col'
-      gap={1}
+      gap={2}
     >
       <Flex direction='col'>
         <Text variant='label'>{title}</Text>
@@ -40,7 +40,7 @@ export const CodeForm = (props: CodeFormProps) => {
         startDisabled
         isDisabled={success || isLoading}
         showCounter={!success}
-        sx={theme => ({ marginTop: theme.space.$3 })}
+        sx={theme => ({ marginTop: theme.space.$6 })}
       >
         Resend code
       </TimerButton>

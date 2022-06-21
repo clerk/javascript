@@ -54,7 +54,6 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
           direction='col'
           elementDescriptor={descriptors.main}
           gap={8}
-          sx={theme => ({ marginTop: theme.space.$8 })}
         >
           <SignInSocialButtons />
           <Grid

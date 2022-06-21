@@ -41,7 +41,6 @@ export const ErrorCard = (props: ErrorCardProps) => {
           direction='col'
           elementDescriptor={descriptors.main}
           gap={4}
-          sx={theme => ({ marginTop: theme.space.$8 })}
         >
           {props.message && (
             <Text

@@ -24,14 +24,14 @@ export const IdentityPreview = (props: IdentityPreviewProps) => {
   const refs = React.useRef({ avatarUrl, identifier: formatIdentifier(identifier) });
 
   return (
-    <Flex sx={theme => ({ marginTop: theme.space.$3x5 })}>
+    <Flex sx={theme => ({ marginTop: `-${theme.space.$4}`, marginBottom: theme.space.$8 })}>
       <Flex
         align='center'
         gap={2}
         sx={theme => ({
           maxWidth: '100%',
           backgroundColor: theme.colors.$blackAlpha50,
-          padding: `${theme.space.$2} ${theme.space.$4}`,
+          padding: `${theme.space.$1x5} ${theme.space.$4}`,
           borderRadius: theme.radii.$3xl,
           border: `${theme.borders.$normal} ${theme.colors.$blackAlpha200}`,
         })}

@@ -113,7 +113,6 @@ function _SignUpContinue() {
           direction='col'
           elementDescriptor={descriptors.main}
           gap={8}
-          sx={theme => ({ marginTop: theme.space.$8 })}
         >
           {showOauthProviders && <SignUpSocialButtons />}
           {showFormFields(userSettings) && (

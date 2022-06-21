@@ -50,7 +50,6 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
           direction='col'
           elementDescriptor={descriptors.main}
           gap={8}
-          sx={theme => ({ marginTop: theme.space.$8 })}
         >
           <Flex
             direction='col'
@@ -70,7 +69,7 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
               startDisabled
               isDisabled={status.isLoading || card.isLoading}
               throttleTimeInSec={60}
-              sx={theme => ({ marginTop: theme.space.$3 })}
+              sx={theme => ({ marginTop: theme.space.$8 })}
             >
               Resend link
             </TimerButton>

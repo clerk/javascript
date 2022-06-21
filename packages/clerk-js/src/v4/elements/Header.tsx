@@ -9,7 +9,7 @@ const Root = React.memo((props: React.PropsWithChildren<any>): JSX.Element => {
       {...props}
       direction='col'
       gap={1}
-      // sx={theme => ({ marginBottom: theme.space.$2 })}
+      sx={theme => ({ marginBottom: theme.space.$8 })}
     />
   );
 });

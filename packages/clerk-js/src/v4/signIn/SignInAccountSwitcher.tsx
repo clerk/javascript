@@ -35,7 +35,6 @@ const _SignInAccountSwitcher = () => {
         <Flex
           direction='col'
           elementDescriptor={descriptors.main}
-          sx={theme => ({ marginTop: theme.space.$8 })}
           gap={8}
         >
           <Flex direction='col'>
