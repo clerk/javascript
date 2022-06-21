@@ -3,7 +3,7 @@ import React from 'react';
 import { Button, Flex, Icon, Text } from '../customizables';
 import { PencilEdit } from '../icons';
 import { PropsOfComponent } from '../styledSystem';
-import { stringToFormattedPhoneString } from '../utils';
+import { formatIdentifier } from '../utils';
 import { Avatar } from './Avatar';
 
 type IdentityPreviewProps = {
@@ -11,13 +11,6 @@ type IdentityPreviewProps = {
   identifier: string | null | undefined;
   onClick: React.MouseEventHandler;
 } & PropsOfComponent<typeof Flex>;
-
-const formatIdentifier = (str: string | undefined | null) => {
-  if (!str || str.includes('@') || str.match(/[a-zA-Z]/)) {
-    return str;
-  }
-  return stringToFormattedPhoneString(str);
-};
 
 export const IdentityPreview = (props: IdentityPreviewProps) => {
   const { avatarUrl, identifier, onClick, ...rest } = props;

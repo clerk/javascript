@@ -8,12 +8,6 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     display: 'grid',
   },
   variants: {
-    direction: {
-      row: { flexDirection: 'row' },
-      col: { flexDirection: 'column' },
-      rowReverse: { flexDirection: 'row-reverse' },
-      columnReverse: { flexDirection: 'column-reverse' },
-    },
     align: {
       start: { alignItems: 'flex-start' },
       center: { alignItems: 'center' },
@@ -47,7 +41,6 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     },
   },
   defaultVariants: {
-    direction: 'row',
     align: 'stretch',
     justify: 'stretch',
     wrap: 'noWrap',
