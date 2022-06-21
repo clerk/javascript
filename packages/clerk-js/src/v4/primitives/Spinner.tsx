@@ -9,7 +9,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
   return {
     base: {
       display: 'inline-block',
-      color: 'currentcolor',
+      color: 'currentColor',
       borderRadius: '99999px',
       borderTop: `${thickness} solid currentcolor`,
       borderRight: `${thickness} solid currentcolor`,
