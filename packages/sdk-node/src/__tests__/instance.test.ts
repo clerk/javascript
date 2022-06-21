@@ -37,13 +37,13 @@ describe('Custom Clerk instance initialization', () => {
       const instance = new Clerk({
         apiKey: customAPIKey,
         jwtKey: customJWTKey,
-        serverApiUrl: customAPIUrl,
+        apiUrl: customAPIUrl,
         apiVersion: customAPIVersion,
       });
-      expect(instance._restClient.apiKey).toBe(customAPIKey);
+      expect(instance.apiKey).toBe(customAPIKey);
       expect(instance.jwtKey).toBe(customJWTKey);
-      expect(instance._restClient.serverApiUrl).toBe(customAPIUrl);
-      expect(instance._restClient.apiVersion).toBe(customAPIVersion);
+      expect(instance.apiUrl).toBe(customAPIUrl);
+      expect(instance.apiVersion).toBe(customAPIVersion);
     }).not.toThrow(Error);
   });
 });
