@@ -14,7 +14,7 @@ import {
 import { completeSignUpFlow } from '../../ui/signUp/util';
 import { getClerkQueryParam } from '../../utils/getClerkQueryParam';
 import { descriptors, Flex, Flow } from '../customizables';
-import { Card, CardAlert, Footer, Header, LoadingCard } from '../elements';
+import { Card, CardAlert, Footer, Header, LoadingCard, withCardStateProvider } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { useLoadingStatus } from '../hooks';
 import { buildRequest, FormControlStateLike, handleError, useFormControl } from '../utils';
@@ -59,8 +59,6 @@ function _SignUpStart(): JSX.Element {
     activeCommIdentifierType,
     isProgressiveSignUp,
   });
-
-  const web3Options = userSettings.web3FirstFactors;
 
   const handleTokenFlow = () => {
     if (!ticket.value) {
@@ -215,4 +213,4 @@ function _SignUpStart(): JSX.Element {
   );
 }
 
-export const SignUpStart = withRedirectToHome(_SignUpStart);
+export const SignUpStart = withRedirectToHome(withCardStateProvider(_SignUpStart));

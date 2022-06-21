@@ -1,10 +1,11 @@
 import React from 'react';
 
 import { useEnvironment } from '../../ui/contexts';
+import { withCardStateProvider } from '../elements';
 import { SignUpEmailCodeCard } from './SignUpEmailCodeCard';
 import { SignUpEmailLinkCard } from './SignUpEmailLinkCard';
 
-export const SignUpVerifyEmail = () => {
+export const SignUpVerifyEmail = withCardStateProvider(() => {
   const { userSettings } = useEnvironment();
   const { attributes } = userSettings;
 
@@ -14,4 +15,4 @@ export const SignUpVerifyEmail = () => {
   }
 
   return <SignUpEmailCodeCard />;
-};
+});

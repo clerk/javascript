@@ -13,7 +13,7 @@ import {
 } from '../../ui/signUp/signUpFormHelpers';
 import { completeSignUpFlow } from '../../ui/signUp/util';
 import { descriptors, Flex, Flow } from '../customizables';
-import { Card, CardAlert, Footer, Header, LoadingCard } from '../elements';
+import { Card, CardAlert, Footer, Header, LoadingCard, withCardStateProvider } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { buildRequest, FormControlStateLike, handleError, useFormControl } from '../utils';
 import { SignUpForm } from './SignUpForm';
@@ -143,4 +143,4 @@ function _SignUpContinue() {
 }
 
 // TODO: flow / page naming
-export const SignUpContinue = withRedirectToHome(_SignUpContinue);
+export const SignUpContinue = withRedirectToHome(withCardStateProvider(_SignUpContinue));

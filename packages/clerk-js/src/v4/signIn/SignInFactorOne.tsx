@@ -5,7 +5,7 @@ import { withRedirectToHome } from '../../ui/common/withRedirectToHome';
 import { useCoreSignIn, useEnvironment } from '../../ui/contexts';
 import { useRouter } from '../../ui/router';
 import { determineStartingSignInFactor, factorHasLocalStrategy } from '../../ui/signIn/utils';
-import { ErrorCard, LoadingCard } from '../elements';
+import { ErrorCard, LoadingCard, withCardStateProvider } from '../elements';
 import { AlternativeMethods } from './AlternativeMethods';
 import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
 import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
@@ -116,4 +116,4 @@ export function _SignInFactorOne(): JSX.Element {
   }
 }
 
-export const SignInFactorOne = withRedirectToHome(_SignInFactorOne);
+export const SignInFactorOne = withRedirectToHome(withCardStateProvider(_SignInFactorOne));

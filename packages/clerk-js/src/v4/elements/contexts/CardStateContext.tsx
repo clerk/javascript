@@ -10,8 +10,7 @@ type CardStateCtxValue = {
   setState: React.Dispatch<React.SetStateAction<State>>;
 };
 
-// TODO:
-const [CardStateCtx, _useCardState] = createContextAndHook<CardStateCtxValue>('CardState', { skipCheck: true });
+const [CardStateCtx, _useCardState] = createContextAndHook<CardStateCtxValue>('CardState');
 
 const CardStateProvider = (props: React.PropsWithChildren<any>) => {
   const [state, setState] = React.useState<State>({
@@ -25,7 +24,7 @@ const CardStateProvider = (props: React.PropsWithChildren<any>) => {
 };
 
 const useCardState = () => {
-  const { state, setState } = _useCardState() || { state: {}, setState: () => {} };
+  const { state, setState } = _useCardState();
 
   return {
     setIdle: (metadata?: Metadata) => setState(s => ({ ...s, status: 'idle', metadata })),
@@ -39,3 +38,13 @@ const useCardState = () => {
 };
 
 export { useCardState, CardStateProvider };
+
+export const withCardStateProvider = <T,>(Component: React.ComponentType<T>) => {
+  return (props: T) => {
+    return (
+      <CardStateProvider>
+        <Component {...props} />
+      </CardStateProvider>
+    );
+  };
+};
