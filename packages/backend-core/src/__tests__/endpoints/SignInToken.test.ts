@@ -1,7 +1,7 @@
 import nock from 'nock';
 
 import { SignInToken } from '../../api/resources';
-import { TestClerkAPI } from '../TestClerkApi';
+import { defaultServerAPIUrl, TestClerkAPI } from '../TestClerkApi';
 
 const resJSON = {
   object: 'sign_in_token',
@@ -19,7 +19,7 @@ afterEach(() => {
 });
 
 test('createSignInToken() creates a new sign in token', async () => {
-  nock('https://API.clerk.dev').post('/v1/sign_in_tokens').reply(200, resJSON);
+  nock(defaultServerAPIUrl).post('/v1/sign_in_tokens').reply(200, resJSON);
 
   const signInToken = await TestClerkAPI.signInTokens.createSignInToken({
     user_id: resJSON.user_id,
@@ -30,7 +30,7 @@ test('createSignInToken() creates a new sign in token', async () => {
 });
 
 test('revokeSignInToken() revokes a sign in token', async () => {
-  nock('https://API.clerk.dev').post(`/v1/sign_in_tokens/${resJSON.id}/revoke`).reply(200, resJSON);
+  nock(defaultServerAPIUrl).post(`/v1/sign_in_tokens/${resJSON.id}/revoke`).reply(200, resJSON);
   await TestClerkAPI.signInTokens.revokeSignInToken(resJSON.id);
 });
 
