@@ -4,10 +4,10 @@ import { Button, Flex, Icon, Input, Text } from '../../customizables';
 import { usePopover, useSearchInput } from '../../hooks';
 import { Caret } from '../../icons';
 import { PropsOfComponent } from '../../styledSystem';
+import { getFlagEmojiFromCountryIso } from '../../utils';
 import { CountryEntry, CountryIso, IsoToCountryMap } from './countryCodeData';
 import { DropdownBox, DropdownItemContainer, DropdownSearchbar } from './Dropdown';
 import { useFormattedPhoneNumber } from './useFormattedPhoneNumber';
-import { getFlagEmojiFromCountryIso } from './utils';
 
 const createDropdownOption = (country: CountryEntry) => {
   return {

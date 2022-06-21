@@ -1,4 +1,9 @@
-import { CodeToCountryIsoMap, CountryIso, IsoToCountryMap, SubAreaCodeSets } from './countryCodeData';
+import {
+  CodeToCountryIsoMap,
+  CountryIso,
+  IsoToCountryMap,
+  SubAreaCodeSets,
+} from '../elements/PhoneInput/countryCodeData';
 
 // offset between uppercase ascii and regional indicator symbols
 const OFFSET = 127397;
@@ -62,7 +67,7 @@ function getCountryIsoFromPhoneCode(phoneWithCode: string, fallbackIso: string):
   // try to match more specific codes first
   for (const i of [4, 3, 2]) {
     const potentialCode = phoneWithCode.substring(0, i);
-    const countryIso = CodeToCountryIsoMap.get(potentialCode);
+    const countryIso = CodeToCountryIsoMap.get(potentialCode as any);
     if (countryIso) {
       return countryIso;
     }
@@ -89,11 +94,24 @@ function maxDigitCountForPattern(pattern: string) {
 }
 
 // https://en.wikipedia.org/wiki/E.164
-const MAX_PHONE_NUMBER_LENGTH = 15;
 
+const MAX_PHONE_NUMBER_LENGTH = 15;
 function maxE164CompliantLength(countryCode?: string) {
   const usCountryCode = '1';
   countryCode = countryCode || usCountryCode;
   const codeWithPrefix = countryCode.includes('+') ? countryCode : '+' + countryCode;
   return MAX_PHONE_NUMBER_LENGTH - codeWithPrefix.length;
+}
+
+function parsePhoneString(str: string) {
+  const iso = getCountryIsoFromFormattedNumber(str) as CountryIso;
+  const pattern = IsoToCountryMap.get(iso)?.pattern || '';
+  const code = IsoToCountryMap.get(iso)?.code || '';
+  const number = str.replace(`+${code}`, '');
+  return { iso, pattern, code, number };
+}
+
+export function stringToFormattedPhoneString(str: string): string {
+  const parsed = parsePhoneString(str);
+  return `+${parsed.code} ${formatPhoneNumber(parsed.number, parsed.pattern, parsed.code)}`;
 }

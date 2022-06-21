@@ -11,3 +11,4 @@ export * from './factorSorting';
 export * from './sleep';
 export * from './isMobileDevice';
 export * from './getFullName';
+export * from './phoneUtils';
