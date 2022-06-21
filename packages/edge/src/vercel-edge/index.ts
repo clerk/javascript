@@ -56,7 +56,7 @@ const users = ClerkAPI.users;
 export { allowlistIdentifiers, clients, emails, invitations, organizations, sessions, smsMessages, users };
 
 async function fetchInterstitial() {
-  return ClerkAPI.fetchInterstitial<string>();
+  return ClerkAPI.fetchInterstitial();
 }
 
 export function withEdgeMiddlewareAuth<
