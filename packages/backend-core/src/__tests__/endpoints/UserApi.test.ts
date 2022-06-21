@@ -2,14 +2,14 @@ import nock from 'nock';
 import snakecaseKeys from 'snakecase-keys';
 
 import { User } from '../../api/resources';
-import { TestClerkAPI } from '../TestClerkApi';
+import { defaultServerAPIUrl, TestClerkAPI } from '../TestClerkApi';
 
 afterEach(() => {
   nock.cleanAll();
 });
 
 test('getUserList() returns a list of users', async () => {
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .get('/v1/users')
     .replyWithFile(200, __dirname + '/responses/getUserList.json', {
       'Content-Type': 'application/json',
@@ -23,7 +23,7 @@ test('getUserList() returns a list of users', async () => {
 });
 
 test('getUserList() with limit returns a list of users', async () => {
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .get('/v1/users?limit=1')
     .replyWithFile(200, __dirname + '/responses/getUserList.json', {
       'Content-Type': 'application/json',
@@ -37,7 +37,7 @@ test('getUserList() with limit returns a list of users', async () => {
 });
 
 test('getUserList() with limit and offset returns a list of users', async () => {
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .get('/v1/users?limit=1&offset=1')
     .replyWithFile(200, __dirname + '/responses/getUserList.json', {
       'Content-Type': 'application/json',
@@ -54,7 +54,7 @@ test('getUserList() with limit and offset returns a list of users', async () => 
 });
 
 test('getUserList() with ordering returns a list of users', async () => {
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .get('/v1/users?order_by=%2Bupdated_at')
     .replyWithFile(200, __dirname + '/responses/getUserList.json', {
       'Content-Type': 'application/json',
@@ -70,7 +70,7 @@ test('getUserList() with ordering returns a list of users', async () => {
 });
 
 test('getUserList() with emails returns a list of users', async () => {
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .get('/v1/users?email_address=email1&email_address=email2')
     .replyWithFile(200, __dirname + '/responses/getUserList.json', {
       'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ test('getUserList() with emails returns a list of users', async () => {
 });
 
 test('getUserList() with phone numbers returns a list of users', async () => {
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .get('/v1/users?phone_number=phone1&phone_number=phone2')
     .replyWithFile(200, __dirname + '/responses/getUserList.json', {
       'Content-Type': 'application/json',
@@ -102,7 +102,7 @@ test('getUserList() with phone numbers returns a list of users', async () => {
 });
 
 test('getUser() returns a single user', async () => {
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .get(`/v1/users/user_deadbeef`)
     .replyWithFile(200, __dirname + '/responses/getUser.json', {
       'Content-Type': 'application/json',
@@ -147,7 +147,7 @@ test('createUser() creates a user', async () => {
     lastName: 'Clerk',
   };
 
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .post('/v1/users', snakecaseKeys(params))
     .replyWithFile(200, __dirname + '/responses/createUser.json', {
       'Content-Type': '',
@@ -167,7 +167,7 @@ test('updateUser() updates a user', async () => {
     lastName: 'Clerk',
   };
 
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .patch('/v1/users/user_1oBNj55jOjSK9rOYrT5QHqj7eaK', snakecaseKeys(params))
     .replyWithFile(200, __dirname + '/responses/updateUser.json', {
       'Content-Type': '',
@@ -187,7 +187,7 @@ test('deleteUser() throws an error without user ID', async () => {
 });
 
 test('getCount() returns a valid number response', async () => {
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .get(`/v1/users/count?`)
     .replyWithFile(200, __dirname + '/responses/getCount.json');
 

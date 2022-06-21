@@ -11,7 +11,7 @@ import {
   OrganizationMembershipPublicUserData,
 } from '../../api/resources';
 import { OrganizationInvitationStatus, OrganizationMembershipRole } from '../../api/resources/Enums';
-import { TestClerkAPI } from '../TestClerkApi';
+import { defaultServerAPIUrl, TestClerkAPI } from '../TestClerkApi';
 
 afterEach(() => {
   nock.cleanAll();
@@ -32,7 +32,7 @@ test('getOrganizationList() retrieves a list of organizations', async () => {
       },
     ],
   };
-  nock('https://API.clerk.dev').get('/v1/organizations?').reply(200, resJSON);
+  nock(defaultServerAPIUrl).get('/v1/organizations?').reply(200, resJSON);
 
   const organizationList = await TestClerkAPI.organizations.getOrganizationList();
   expect(organizationList).toBeInstanceOf(Array);
@@ -58,7 +58,7 @@ test('createOrganization() creates an organization', async () => {
     updated_at: 1611948436,
   };
 
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .post('/v1/organizations', {
       name,
       slug,
@@ -93,12 +93,12 @@ test('getOrganization() fetches an organization', async () => {
     updated_at: 1611948436,
   };
 
-  nock('https://API.clerk.dev').get(`/v1/organizations/${id}`).reply(200, resJSON);
+  nock(defaultServerAPIUrl).get(`/v1/organizations/${id}`).reply(200, resJSON);
 
   let organization = await TestClerkAPI.organizations.getOrganization({ organizationId: id });
   expect(organization).toEqual(Organization.fromJSON(resJSON));
 
-  nock('https://API.clerk.dev').get(`/v1/organizations/${slug}`).reply(200, resJSON);
+  nock(defaultServerAPIUrl).get(`/v1/organizations/${slug}`).reply(200, resJSON);
   organization = await TestClerkAPI.organizations.getOrganization({ slug });
   expect(organization).toEqual(Organization.fromJSON(resJSON));
 });
@@ -118,7 +118,7 @@ test('updateOrganization() updates organization', async () => {
     public_metadata: {},
   };
 
-  nock('https://API.clerk.dev').patch(`/v1/organizations/${id}`, { name }).reply(200, resJSON);
+  nock(defaultServerAPIUrl).patch(`/v1/organizations/${id}`, { name }).reply(200, resJSON);
 
   const organization = await TestClerkAPI.organizations.updateOrganization(id, { name });
   expect(organization).toEqual(Organization.fromJSON(resJSON));
@@ -141,7 +141,7 @@ test('updateOrganizationMetadata() updates organization metadata', async () => {
     logo_url: null,
   };
 
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .patch(`/v1/organizations/${id}/metadata`, {
       public_metadata: JSON.stringify(publicMetadata),
       private_metadata: JSON.stringify(privateMetadata),
@@ -157,7 +157,7 @@ test('updateOrganizationMetadata() updates organization metadata', async () => {
 
 test('deleteOrganization() deletes organization', async () => {
   const id = 'org_randomid';
-  nock('https://API.clerk.dev').delete(`/v1/organizations/${id}`).reply(200, {});
+  nock(defaultServerAPIUrl).delete(`/v1/organizations/${id}`).reply(200, {});
   await TestClerkAPI.organizations.deleteOrganization(id);
 });
 
@@ -188,7 +188,7 @@ test('getOrganizationMembershipList() returns a list of organization memberships
     },
   ];
 
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .get(new RegExp(`/v1/organizations/${organizationId}/memberships`))
     .reply(200, resJSON);
 
@@ -232,7 +232,7 @@ test('createOrganizationMembership() creates a membership for an organization', 
     updated_at: 1612378465,
   };
 
-  nock('https://API.clerk.dev').post(`/v1/organizations/${organizationId}/memberships`).reply(200, resJSON);
+  nock(defaultServerAPIUrl).post(`/v1/organizations/${organizationId}/memberships`).reply(200, resJSON);
 
   const orgMembership = await TestClerkAPI.organizations.createOrganizationMembership({
     organizationId,
@@ -272,7 +272,7 @@ test('updateOrganizationMembership() updates an organization membership', async 
     updated_at: 1612378465,
   };
 
-  nock('https://API.clerk.dev').patch(`/v1/organizations/${organizationId}/memberships/${userId}`).reply(200, resJSON);
+  nock(defaultServerAPIUrl).patch(`/v1/organizations/${organizationId}/memberships/${userId}`).reply(200, resJSON);
 
   const orgMembership = await TestClerkAPI.organizations.updateOrganizationMembership({
     organizationId,
@@ -285,7 +285,7 @@ test('updateOrganizationMembership() updates an organization membership', async 
 test('deleteOrganizationMembership() deletes an organization', async () => {
   const organizationId = 'org_randomid';
   const userId = 'user_randomid';
-  nock('https://API.clerk.dev').delete(`/v1/organizations/${organizationId}/memberships/${userId}`).reply(200, {});
+  nock(defaultServerAPIUrl).delete(`/v1/organizations/${organizationId}/memberships/${userId}`).reply(200, {});
   await TestClerkAPI.organizations.deleteOrganizationMembership({ organizationId, userId });
 });
 
@@ -306,7 +306,7 @@ test('createOrganizationInvitation() creates an invitation for an organization',
     updated_at: 1612378465,
   };
 
-  nock('https://API.clerk.dev').post(`/v1/organizations/${organizationId}/invitations`).reply(200, resJSON);
+  nock(defaultServerAPIUrl).post(`/v1/organizations/${organizationId}/invitations`).reply(200, resJSON);
 
   const orgInvitation = await TestClerkAPI.organizations.createOrganizationInvitation({
     organizationId,
@@ -333,7 +333,7 @@ test('getPendingOrganizationInvitationList() returns a list of organization memb
     },
   ];
 
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .get(new RegExp(`/v1/organizations/${organizationId}/invitations/pending`))
     .reply(200, resJSON);
 
@@ -358,7 +358,7 @@ test('revokeOrganizationInvitation() revokes an organization invitation', async 
     created_at: 1612378465,
     updated_at: 1612378465,
   };
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .post(`/v1/organizations/${organizationId}/invitations/${invitationId}/revoke`)
     .reply(200, resJSON);
 

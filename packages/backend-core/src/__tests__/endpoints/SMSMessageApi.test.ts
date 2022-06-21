@@ -2,7 +2,7 @@ import nock from 'nock';
 import snakecaseKeys from 'snakecase-keys';
 
 import { SMSMessage } from '../../api/resources';
-import { TestClerkAPI } from '../TestClerkApi';
+import { defaultServerAPIUrl, TestClerkAPI } from '../TestClerkApi';
 
 afterEach(() => {
   nock.cleanAll();
@@ -12,7 +12,7 @@ test('createSMSMessage() sends an SMS message', async () => {
   const phoneNumberId = 'idn_random';
   const message = 'Press F to pay pespects';
 
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .post('/v1/sms_messages', snakecaseKeys({ phoneNumberId, message }))
     .replyWithFile(200, __dirname + '/responses/createSMSMessage.json', {
       'Content-Type': 'application/json',
