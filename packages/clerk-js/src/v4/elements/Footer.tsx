@@ -32,6 +32,7 @@ const FooterActionText = (props: React.PropsWithChildren<any>): JSX.Element => {
       {...props}
       as='span'
       variant='link'
+      colorScheme='neutral'
     />
   );
 };
