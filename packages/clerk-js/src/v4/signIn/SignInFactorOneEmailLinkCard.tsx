@@ -83,10 +83,10 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
   return (
     <Flow.Part part='emailLink'>
       <VerificationLinkCard
-        cardTitle='Sign in'
+        cardTitle='Check your email'
         cardSubtitle={`to continue to ${displayConfig.applicationName}`}
         formTitle='Verification link'
-        formSubtitle='Click on the verification link sent to your email'
+        formSubtitle='Click on the verification link sent to your email address'
         onResendCodeClicked={restartVerification}
         safeIdentifier={props.factor.safeIdentifier}
         profileImageUrl={signIn.userData.profileImageUrl}

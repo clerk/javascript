@@ -52,7 +52,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
         <CardAlert>{card.error}</CardAlert>
         <BackLink onClick={goBack} />
         <Header.Root>
-          <Header.Title>Sign in</Header.Title>
+          <Header.Title>Enter password</Header.Title>
           <Header.Subtitle>to continue to {displayConfig.applicationName}</Header.Subtitle>
         </Header.Root>
         <IdentityPreview

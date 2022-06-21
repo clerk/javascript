@@ -3,10 +3,10 @@ import React from 'react';
 
 import { useCoreSignIn } from '../../ui/contexts/';
 import { factorHasLocalStrategy } from '../../ui/signIn/utils';
-import { descriptors, Flex, Flow, Grid } from '../customizables';
+import { descriptors, Flex, Flow } from '../customizables';
 import { BackLink, BlockButtonWithArrow, Card, CardAlert, Footer, Header } from '../elements';
 import { useCardState } from '../elements/contexts';
-import { allStrategiesButtonsComparator } from '../utils';
+import { allStrategiesButtonsComparator, formatIdentifier } from '../utils';
 import { HavingTrouble } from './HavingTrouble';
 import { SignInSocialButtons } from './SignInSocialButtons';
 
@@ -56,8 +56,8 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
           gap={8}
         >
           <SignInSocialButtons />
-          <Grid
-            columns={1}
+          <Flex
+            direction='col'
             gap={2}
           >
             {validFactors.map((factor, i) => (
@@ -69,7 +69,7 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
                 {getButtonLabel(factor)}
               </BlockButtonWithArrow>
             ))}
-          </Grid>
+          </Flex>
         </Flex>
         <Footer.Root>
           <Footer.Action>
@@ -90,11 +90,11 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
 export function getButtonLabel(factor: SignInFactor): string {
   switch (factor.strategy) {
     case 'email_link':
-      return `Send verification link to ${factor.safeIdentifier}`;
+      return `Send verification link to ${formatIdentifier(factor.safeIdentifier)}`;
     case 'email_code':
-      return `Send verification code to ${factor.safeIdentifier}`;
+      return `Send verification code to ${formatIdentifier(factor.safeIdentifier)}`;
     case 'phone_code':
-      return `Send verification code to ${factor.safeIdentifier}`;
+      return `Send verification code to ${formatIdentifier(factor.safeIdentifier)}`;
     case 'password':
       return 'Sign in with your password';
     default:
