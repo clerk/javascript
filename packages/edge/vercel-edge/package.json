@@ -1,0 +1,6 @@
+{
+  "name": "vercel-edge",
+  "description": "Clerk for Vercel Edge",
+  "main": "../dist/cjs/vercel-edge/index.js",
+  "module": "../dist/mjs/vercel-edge/index.js"
+}
