@@ -1,7 +1,7 @@
 import nock from 'nock';
 
 import { RedirectUrl } from '../../api/resources';
-import { TestClerkAPI } from '../TestClerkApi';
+import { defaultServerAPIUrl, TestClerkAPI } from '../TestClerkApi';
 
 const resJSON = {
   object: 'redirect_url',
@@ -16,7 +16,7 @@ afterEach(() => {
 });
 
 test('getRedirectUrlList() returns a list of redirect urls', async () => {
-  nock('https://API.clerk.dev').get('/v1/redirect_urls').reply(200, [resJSON]);
+  nock(defaultServerAPIUrl).get('/v1/redirect_urls').reply(200, [resJSON]);
 
   const redirectUrlsList = await TestClerkAPI.redirectUrls.getRedirectUrlList();
   expect(redirectUrlsList).toBeInstanceOf(Array);
@@ -25,7 +25,7 @@ test('getRedirectUrlList() returns a list of redirect urls', async () => {
 });
 
 test('getRedirectUrl() returns a redirect url', async () => {
-  nock('https://API.clerk.dev').get(`/v1/redirect_urls/${resJSON.id}`).reply(200, resJSON);
+  nock(defaultServerAPIUrl).get(`/v1/redirect_urls/${resJSON.id}`).reply(200, resJSON);
 
   const redirectUrl = await TestClerkAPI.redirectUrls.getRedirectUrl(resJSON.id);
   expect(redirectUrl).toBeInstanceOf(RedirectUrl);
@@ -37,7 +37,7 @@ test('getRedirectUrl() throws an error without redirect url ID', async () => {
 });
 
 test('createRedirectUrl() creates a new redirect url', async () => {
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .post(
       '/v1/redirect_urls',
       JSON.stringify({
@@ -53,7 +53,7 @@ test('createRedirectUrl() creates a new redirect url', async () => {
 });
 
 test('deleteRedirectUrl() deletes an redirect url', async () => {
-  nock('https://API.clerk.dev').delete(`/v1/redirect_urls/${resJSON.id}`).reply(200, {});
+  nock(defaultServerAPIUrl).delete(`/v1/redirect_urls/${resJSON.id}`).reply(200, {});
   await TestClerkAPI.redirectUrls.deleteRedirectUrl(resJSON.id);
 });
 

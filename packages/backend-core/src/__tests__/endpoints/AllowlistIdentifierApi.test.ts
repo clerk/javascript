@@ -1,14 +1,14 @@
 import nock from 'nock';
 
 import { AllowlistIdentifier } from '../../api/resources';
-import { TestClerkAPI } from '../TestClerkApi';
+import { defaultServerAPIUrl, TestClerkAPI } from '../TestClerkApi';
 
 afterEach(() => {
   nock.cleanAll();
 });
 
 test('getAllowlistIdentifierList() returns a list of allowlist identifiers', async () => {
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .get('/v1/allowlist_identifiers')
     .replyWithFile(200, __dirname + '/responses/getAllowlistIdentifierList.json', {});
 
@@ -28,7 +28,7 @@ test('createAllowlistIdentifier() creates an allowlist identifier', async () => 
     updated_at: 1611948436,
   };
 
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .post(
       '/v1/allowlist_identifiers',
       JSON.stringify({
@@ -57,7 +57,7 @@ test('deleteAllowlistIdentifier() deletes an allowlist identifier', async () => 
     updated_at: 1611948436,
   };
 
-  nock('https://API.clerk.dev').delete(`/v1/allowlist_identifiers/${id}`).reply(200, resJSON);
+  nock(defaultServerAPIUrl).delete(`/v1/allowlist_identifiers/${id}`).reply(200, resJSON);
 
   const allowlistIdentifier = await TestClerkAPI.allowlistIdentifiers.deleteAllowlistIdentifier(id);
   expect(allowlistIdentifier).toEqual(

@@ -1,14 +1,14 @@
 import nock from 'nock';
 
 import { Session } from '../../api/resources';
-import { TestClerkAPI } from '../TestClerkApi';
+import { defaultServerAPIUrl, TestClerkAPI } from '../TestClerkApi';
 
 afterEach(() => {
   nock.cleanAll();
 });
 
 test('getSessionList() returns a list of sessions', async () => {
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .get('/v1/sessions')
     .replyWithFile(200, __dirname + '/responses/getSessionList.json', {
       'Content-Type': 'application/json',
@@ -60,7 +60,7 @@ test('getSession() returns a single session', async () => {
     1613593533,
   );
 
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .get(`/v1/sessions/${expected.id}`)
     .replyWithFile(200, __dirname + '/responses/getSession.json', {
       'Content-Type': 'application/json',
@@ -94,7 +94,7 @@ test('verifySession() returns a session if verified', async () => {
 
   const sessionToken = 'random_jwt_token';
 
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .post(`/v1/sessions/${expected.id}/verify`, { token: sessionToken })
     .replyWithFile(200, __dirname + '/responses/getSession.json', {
       'Content-Type': 'application/json',

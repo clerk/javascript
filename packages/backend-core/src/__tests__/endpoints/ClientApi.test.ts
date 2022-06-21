@@ -1,14 +1,14 @@
 import nock from 'nock';
 
 import { Client } from '../../api/resources';
-import { TestClerkAPI } from '../TestClerkApi';
+import { defaultServerAPIUrl, TestClerkAPI } from '../TestClerkApi';
 
 afterEach(() => {
   nock.cleanAll();
 });
 
 test('getClientList() returns a list of clients', async () => {
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .get('/v1/clients')
     .replyWithFile(200, __dirname + '/responses/getClientList.json', {
       'Content-Type': 'application/json',
@@ -99,7 +99,7 @@ test('getClient() returns a single client', async () => {
     1630846634,
   );
 
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .get(`/v1/clients/${expected.id}`)
     .replyWithFile(200, __dirname + '/responses/getClient.json', {
       'Content-Type': 'application/json',
@@ -142,7 +142,7 @@ test('verifyClient() returns a client if verified', async () => {
 
   const sessionToken = 'random_jwt_token';
 
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .post(`/v1/clients/verify`, { token: sessionToken })
     .replyWithFile(200, __dirname + '/responses/getClient.json', {
       'Content-Type': 'application/json',

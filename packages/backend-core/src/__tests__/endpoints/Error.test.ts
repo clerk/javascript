@@ -1,7 +1,7 @@
 import nock from 'nock';
 
 import { ClerkAPIResponseError } from '../../api/errors';
-import { TestClerkAPI } from '../TestClerkApi';
+import { defaultServerAPIUrl, TestClerkAPI } from '../TestClerkApi';
 
 const respJSON = {
   errors: [
@@ -21,7 +21,7 @@ afterEach(() => {
 });
 
 test('parses error response', async () => {
-  nock('https://API.clerk.dev').get('/v1/users').reply(400, respJSON);
+  nock(defaultServerAPIUrl).get('/v1/users').reply(400, respJSON);
   try {
     await TestClerkAPI.users.getUserList();
   } catch (err) {
