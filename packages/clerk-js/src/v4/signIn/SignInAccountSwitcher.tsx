@@ -4,7 +4,8 @@ import { withRedirectToHome } from '../../ui/common/withRedirectToHome';
 import { useEnvironment, useSignInContext } from '../../ui/contexts';
 import { useNavigate } from '../../ui/hooks';
 import { Button, descriptors, Flex, Flow, Icon } from '../customizables';
-import { BlockButtonWithArrow, Card, CardAlert, Header } from '../elements';
+import { Card, CardAlert, Header, withCardStateProvider } from '../elements';
+import { ArrowBlockButton } from '../elements/ArrowBlockButton';
 import { useCardState } from '../elements/contexts';
 import { SignOutDouble } from '../icons';
 import { PropsOfComponent } from '../styledSystem';
@@ -46,7 +47,7 @@ const _SignInAccountSwitcher = () => {
               />
             ))}
           </Flex>
-          <BlockButtonWithArrow
+          <ArrowBlockButton
             isDisabled={card.isLoading}
             icon={
               <Icon
@@ -57,13 +58,13 @@ const _SignInAccountSwitcher = () => {
             onClick={handleSignOutAllClicked}
           >
             Sign out of all accounts
-          </BlockButtonWithArrow>
+          </ArrowBlockButton>
         </Flex>
       </Card>
     </Flow.Part>
   );
 };
-export const SignInAccountSwitcher = withRedirectToHome(_SignInAccountSwitcher);
+export const SignInAccountSwitcher = withRedirectToHome(withCardStateProvider(_SignInAccountSwitcher));
 
 type UserPreviewButtonProps = PropsOfComponent<typeof Button> & UserPreviewProps;
 

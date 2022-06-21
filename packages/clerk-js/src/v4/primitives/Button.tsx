@@ -141,11 +141,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
           gap={2}
           center
         >
-          <Spinner
-            aria-busy
-            aria-live='polite'
-            aria-label={loadingText || 'Loading'}
-          />
+          <Spinner aria-label={loadingText || 'Loading'} />
           {loadingText || undefined}
         </Flex>
       )}
@@ -154,71 +150,4 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
   );
 });
 
-type BlockButtonIconProps = ButtonProps & { leftIcon?: React.ReactElement; rightIcon?: React.ReactElement };
-
-/**
- * For the state of the right arrow icon in this composite component
- * we're using CSS variables because we do not want to increase the
- * CSS rule specificity using a different method like classnames/styles.
- * `sx` is a "weak style" attribute with a specificity of 1, so it's easily
- * overridable from the outside
- */
-const BlockButtonIcon = React.forwardRef<HTMLButtonElement, BlockButtonIconProps>((props, ref) => {
-  const parsedProps: BlockButtonIconProps = { ...props, isDisabled: props.isDisabled || props.isLoading };
-  const { isLoading, isDisabled, loadingText, children, leftIcon, rightIcon, ...rest } = filterProps(parsedProps);
-
-  const leftIconElement = leftIcon
-    ? React.cloneElement(leftIcon, {
-        sx: [leftIcon.props.sx, theme => ({ width: theme.sizes.$4, marginRight: theme.space.$4 })],
-      })
-    : null;
-
-  return (
-    <button
-      {...rest}
-      type={rest.type || 'button'}
-      disabled={isDisabled}
-      css={[
-        applyVariants({ block: true, variant: 'outline', colorScheme: 'neutral', textVariant: 'link', ...parsedProps }),
-        theme => ({
-          color: theme.colors.$text500,
-          '--arrow-opacity': '0',
-          '--arrow-transform': `translateX(-${theme.space.$2});`,
-          '&:hover,&:focus ': {
-            '--arrow-opacity': '1',
-            '--arrow-transform': 'translateX(0px);',
-          },
-        }),
-      ]}
-      ref={ref}
-    >
-      {isLoading ? (
-        <Spinner
-          aria-busy
-          aria-live='polite'
-          aria-label={loadingText || 'Loading'}
-          css={theme => ({ marginRight: theme.space.$4 })}
-        />
-      ) : (
-        leftIconElement
-      )}
-
-      {children}
-
-      {rightIcon &&
-        React.cloneElement(rightIcon, {
-          sx: [
-            rightIcon.props.sx,
-            theme => ({
-              color: theme.colors.$gray500,
-              transition: 'all 100ms ease',
-              opacity: `var(--arrow-opacity)`,
-              transform: `var(--arrow-transform)`,
-            }),
-          ],
-        })}
-    </button>
-  );
-});
-
-export { Button, BlockButtonIcon };
+export { Button };

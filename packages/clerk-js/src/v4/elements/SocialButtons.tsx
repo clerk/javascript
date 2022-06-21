@@ -1,10 +1,10 @@
 import { OAuthProvider, OAuthStrategy, Web3Provider, Web3Strategy } from '@clerk/types';
 import React from 'react';
 
-import { BlockButtonIcon, Button, descriptors, Flex, Grid, Icon, Image } from '../customizables';
+import { Button, descriptors, Grid, Image } from '../customizables';
 import { useEnabledThirdPartyProviders } from '../hooks';
-import { ArrowRightIcon } from '../icons';
 import { PropsOfComponent } from '../styledSystem';
+import { ArrowBlockButton } from './ArrowBlockButton';
 import { useCardState } from './contexts';
 
 export type SocialButtonsProps = React.PropsWithChildren<{ buttonVariant?: 'icon' | 'block' }>;
@@ -116,32 +116,20 @@ const SocialButtonIcon = (props: SocialButtonProps): JSX.Element => {
   );
 };
 
-// TODO: Can we refactor this and the BlockButtonWithArrow into 1 button?
-// What about the selectors?
 const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
-  const { icon, label, id, ...rest } = props;
+  const { label, id, ...rest } = props;
+
   return (
-    <BlockButtonIcon
+    <ArrowBlockButton
       elementDescriptor={descriptors.socialButtonsButtonBlock}
       elementId={descriptors.socialButtonsButtonBlock.setId(id)}
-      leftIcon={icon}
-      rightIcon={
-        <Icon
-          elementDescriptor={descriptors.socialButtonsButtonBlockArrow}
-          elementId={descriptors.socialButtonsButtonBlockArrow.setId(id)}
-          icon={ArrowRightIcon}
-        />
-      }
+      textElementDescriptor={descriptors.socialButtonsButtonBlockText}
+      textElementId={descriptors.socialButtonsButtonBlockText.setId(id)}
+      arrowElementDescriptor={descriptors.socialButtonsButtonBlockArrow}
+      arrowElementId={descriptors.socialButtonsButtonBlockArrow.setId(id)}
       {...rest}
     >
-      <Flex
-        elementDescriptor={descriptors.socialButtonsButtonBlockText}
-        elementId={descriptors.socialButtonsButtonBlockText.setId(id)}
-        as='span'
-        sx={{ width: '100%' }}
-      >
-        {label}
-      </Flex>
-    </BlockButtonIcon>
+      {label}
+    </ArrowBlockButton>
   );
 };
