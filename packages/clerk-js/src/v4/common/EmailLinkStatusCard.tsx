@@ -41,7 +41,6 @@ export const EmailLinkStatusCard = (props: EmailLinkStatusCardProps) => {
         <Flex
           direction='col'
           elementDescriptor={descriptors.main}
-          sx={theme => ({ marginTop: theme.space.$8 })}
         >
           <StatusRow status={props.status} />
         </Flex>

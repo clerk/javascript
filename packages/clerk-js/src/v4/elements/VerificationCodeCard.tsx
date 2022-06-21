@@ -83,7 +83,6 @@ export const VerificationCodeCard = (props: VerificationCodeCardProps) => {
         direction='col'
         elementDescriptor={descriptors.main}
         gap={8}
-        sx={theme => ({ marginTop: theme.space.$8 })}
       >
         <CodeForm
           title={props.formTitle}

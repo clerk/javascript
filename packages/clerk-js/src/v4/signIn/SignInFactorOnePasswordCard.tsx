@@ -65,7 +65,6 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
           direction='col'
           elementDescriptor={descriptors.main}
           gap={8}
-          sx={theme => ({ marginTop: theme.space.$8 })}
         >
           <Form.Root onSubmit={handlePasswordSubmit}>
             <Form.Control
