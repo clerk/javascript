@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { Button } from '../customizables';
 import { useSafeLayoutEffect } from '../hooks';
@@ -13,6 +13,7 @@ type TimerButtonProps = PropsOfComponent<typeof Button> & {
 export const TimerButton = (props: TimerButtonProps) => {
   const { onClick: onClickProp, throttleTimeInSec = 30, startDisabled, children, showCounter = true, ...rest } = props;
   const [remainingSeconds, setRemainingSeconds] = React.useState(0);
+  const intervalIdRef = React.useRef<number | undefined>(undefined);
 
   useSafeLayoutEffect(() => {
     if (startDisabled) {
@@ -20,23 +21,27 @@ export const TimerButton = (props: TimerButtonProps) => {
     }
   }, []);
 
+  useEffect(() => {
+    return () => clearInterval(intervalIdRef.current);
+  }, []);
+
   const disable = () => {
     setRemainingSeconds(throttleTimeInSec);
-    const id = setInterval(() => {
+    intervalIdRef.current = setInterval(() => {
       setRemainingSeconds(seconds => {
         if (seconds === 1) {
-          clearInterval(id);
+          clearInterval(intervalIdRef.current);
         }
         return seconds - 1;
       });
-    }, 1000);
+    }, 10);
   };
 
   const handleOnClick: React.MouseEventHandler<HTMLButtonElement> = e => {
     if (remainingSeconds) {
       return;
     }
-    props.onClick?.(e);
+    onClickProp?.(e);
     disable();
   };
 
