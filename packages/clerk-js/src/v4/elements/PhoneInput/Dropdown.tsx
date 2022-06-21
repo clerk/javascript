@@ -38,8 +38,10 @@ export const DropdownBox = React.forwardRef<HTMLDivElement, DropdownBoxProps>((p
 });
 
 export const DropdownSearchbar = (props: PropsOfComponent<typeof InputWithIcon>) => {
-  // @ts-expect-error
-  React.useEffect(() => () => props.onChange({ target: { value: '' } }), []);
+  React.useEffect(() => {
+    // @ts-expect-error
+    return () => props.onChange({ target: { value: '' } });
+  }, []);
 
   return (
     <Flex sx={theme => ({ borderBottom: theme.borders.$normal, borderColor: theme.colors.$blackAlpha200 })}>
@@ -63,7 +65,11 @@ export const DropdownItemContainer = (props: React.PropsWithChildren<any>) => {
   return (
     <Flex
       direction='col'
-      sx={theme => ({ overflowY: 'scroll', minHeight: '10rem', maxHeight: '15vh', paddingBottom: theme.space.$2 })}
+      sx={theme => ({
+        overflowY: 'scroll',
+        maxHeight: '15vh',
+        paddingBottom: theme.space.$2,
+      })}
       {...props}
     />
   );

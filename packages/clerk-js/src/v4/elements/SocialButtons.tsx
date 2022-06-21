@@ -108,7 +108,7 @@ const SocialButtonIcon = (props: SocialButtonProps): JSX.Element => {
       elementId={descriptors.socialButtonsButtonIcon.setId(id)}
       variant='icon'
       colorScheme='neutral'
-      sx={{ padding: 0, height: '100%', width: '100%' }}
+      sx={theme => ({ padding: 0, height: '100%', width: '100%', borderColor: theme.colors.$blackAlpha200 })}
       {...rest}
     >
       {icon}
