@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useCoreUser, useUserButtonContext, withCoreUserGuard } from '../../ui/contexts';
 import { descriptors, Flex, Flow, Text } from '../customizables';
+import { withCardStateProvider } from '../elements';
 import { usePopover } from '../hooks';
 import { getFullName } from '../utils';
 import { getIdentifier } from './getIdentifier';
@@ -49,4 +50,4 @@ const UserButtonTopLevelIdentifier = () => {
   return showName ? <Text variant='secondaryHeading'>{getFullName(user) || getIdentifier(user)}</Text> : null;
 };
 
-export const UserButton = withCoreUserGuard(_UserButton);
+export const UserButton = withCoreUserGuard(withCardStateProvider(_UserButton));

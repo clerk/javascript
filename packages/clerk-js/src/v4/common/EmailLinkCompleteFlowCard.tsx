@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { EmailLinkVerify, EmailLinkVerifyProps } from '../common';
+import { withCardStateProvider } from '../elements';
 
 const signInTexts = {
   verified: {
@@ -41,20 +42,20 @@ const signUpTexts = {
   },
 };
 
-export const SignInEmailLinkFlowComplete = (props: Omit<EmailLinkVerifyProps, 'texts'>) => {
+export const SignInEmailLinkFlowComplete = withCardStateProvider((props: Omit<EmailLinkVerifyProps, 'texts'>) => {
   return (
     <EmailLinkVerify
       {...props}
       texts={signInTexts}
     />
   );
-};
+});
 
-export const SignUpEmailLinkFlowComplete = (props: Omit<EmailLinkVerifyProps, 'texts'>) => {
+export const SignUpEmailLinkFlowComplete = withCardStateProvider((props: Omit<EmailLinkVerifyProps, 'texts'>) => {
   return (
     <EmailLinkVerify
       {...props}
       texts={signUpTexts}
     />
   );
-};
+});

@@ -2,9 +2,10 @@ import React from 'react';
 
 import { useCoreSignUp, useEnvironment } from '../../ui/contexts';
 import { Flow } from '../customizables';
+import { withCardStateProvider } from '../elements';
 import { SignUpVerificationCodeForm } from './SignUpVerificationCodeForm';
 
-export const SignUpPhoneCodeCard = () => {
+export const SignUpPhoneCodeCard = withCardStateProvider(() => {
   const { displayConfig } = useEnvironment();
   const signUp = useCoreSignUp();
 
@@ -37,4 +38,4 @@ export const SignUpPhoneCodeCard = () => {
       />
     </Flow.Part>
   );
-};
+});

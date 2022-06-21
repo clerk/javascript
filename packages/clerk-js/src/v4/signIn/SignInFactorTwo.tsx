@@ -4,7 +4,7 @@ import { withRedirectToHome } from '../../ui/common/withRedirectToHome';
 import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../ui/contexts';
 import { useRouter } from '../../ui/router';
 import { Flow } from '../customizables';
-import { VerificationCodeCard, VerificationCodeCardProps } from '../elements';
+import { VerificationCodeCard, VerificationCodeCardProps, withCardStateProvider } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { handleError } from '../utils';
 
@@ -24,7 +24,7 @@ export function _SignInFactorTwo(): JSX.Element {
   return <SignInFactorTwoPhoneCodeCard />;
 }
 
-export const SignInFactorTwo = withRedirectToHome(_SignInFactorTwo);
+export const SignInFactorTwo = withRedirectToHome(withCardStateProvider(_SignInFactorTwo));
 
 const SignInFactorTwoPhoneCodeCard = () => {
   const signIn = useCoreSignIn();

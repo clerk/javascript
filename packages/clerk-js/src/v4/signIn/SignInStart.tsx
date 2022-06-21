@@ -8,7 +8,7 @@ import { useNavigate } from '../../ui/hooks';
 import { useSupportEmail } from '../../ui/hooks/useSupportEmail';
 import { getClerkQueryParam } from '../../utils/getClerkQueryParam';
 import { descriptors, Flex, Flow } from '../customizables';
-import { Card, CardAlert, Footer, Form, Header, LoadingCard } from '../elements';
+import { Card, CardAlert, Footer, Form, Header, LoadingCard, withCardStateProvider } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { useLoadingStatus } from '../hooks';
 import { buildRequest, FormControlState, handleError, isMobileDevice, useFormControl } from '../utils';
@@ -223,4 +223,4 @@ const InstantPasswordControl = ({ field }: { field?: FormControlState<'password'
   );
 };
 
-export const SignInStart = withRedirectToHome(_SignInStart);
+export const SignInStart = withRedirectToHome(withCardStateProvider(_SignInStart));
