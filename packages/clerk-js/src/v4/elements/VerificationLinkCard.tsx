@@ -69,7 +69,7 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
               startDisabled
               isDisabled={status.isLoading || card.isLoading}
               throttleTimeInSec={60}
-              sx={theme => ({ marginTop: theme.space.$8 })}
+              sx={theme => ({ marginTop: theme.space.$4 })}
             >
               Resend link
             </TimerButton>
