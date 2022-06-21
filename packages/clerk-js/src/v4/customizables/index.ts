@@ -5,7 +5,6 @@ export const Box = makeCustomizable(Primitives.Box);
 export const Flex = makeCustomizable(Primitives.Flex);
 export const Grid = makeCustomizable(Primitives.Grid);
 export const Button = makeCustomizable(Primitives.Button);
-export const BlockButtonIcon = makeCustomizable(Primitives.BlockButtonIcon);
 export const Heading = makeCustomizable(Primitives.Heading);
 export const Link = makeCustomizable(Primitives.Link);
 export const Text = makeCustomizable(Primitives.Text);

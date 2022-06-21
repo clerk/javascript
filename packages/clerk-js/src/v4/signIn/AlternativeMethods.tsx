@@ -4,7 +4,7 @@ import React from 'react';
 import { useCoreSignIn } from '../../ui/contexts/';
 import { factorHasLocalStrategy } from '../../ui/signIn/utils';
 import { descriptors, Flex, Flow } from '../customizables';
-import { BackLink, BlockButtonWithArrow, Card, CardAlert, Footer, Header } from '../elements';
+import { ArrowBlockButton, BackLink, Card, CardAlert, Footer, Header } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { allStrategiesButtonsComparator, formatIdentifier } from '../utils';
 import { HavingTrouble } from './HavingTrouble';
@@ -61,13 +61,13 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
             gap={2}
           >
             {validFactors.map((factor, i) => (
-              <BlockButtonWithArrow
+              <ArrowBlockButton
                 key={i}
                 isDisabled={card.isLoading}
                 onClick={() => onFactorSelected(factor)}
               >
                 {getButtonLabel(factor)}
-              </BlockButtonWithArrow>
+              </ArrowBlockButton>
             ))}
           </Flex>
         </Flex>

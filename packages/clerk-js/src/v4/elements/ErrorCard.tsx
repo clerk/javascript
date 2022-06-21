@@ -2,11 +2,10 @@ import React from 'react';
 
 import { useSupportEmail } from '../../ui/hooks/useSupportEmail';
 import { descriptors, Flex, Flow, Icon, Text } from '../customizables';
-import { Card } from '../elements';
+import { ArrowBlockButton, Card } from '../elements';
 import { Email } from '../icons';
 import { CardAlert } from './Alert';
 import { BackLink } from './BackLink';
-import { BlockButtonWithArrow } from './BlockButtonWithArrow';
 import { useCardState } from './contexts';
 import { Footer } from './Footer';
 import { Header } from './Header';
@@ -58,7 +57,7 @@ export const ErrorCard = (props: ErrorCardProps) => {
             If you’re experiencing difficulty signing into your account, email us and we will work with you to restore
             access as soon as possible.
           </Text>
-          <BlockButtonWithArrow
+          <ArrowBlockButton
             onClick={handleEmailSupport}
             icon={
               <Icon
@@ -68,7 +67,7 @@ export const ErrorCard = (props: ErrorCardProps) => {
             }
           >
             Email support
-          </BlockButtonWithArrow>
+          </ArrowBlockButton>
         </Flex>
         <Footer.Root>
           <Footer.Action />

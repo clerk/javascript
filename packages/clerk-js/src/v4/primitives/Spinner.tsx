@@ -61,6 +61,8 @@ export const Spinner = (props: SpinnerProps) => {
     <div
       {...filterProps(props)}
       css={applyVariants(props)}
+      aria-busy
+      aria-live='polite'
     />
   );
 };
