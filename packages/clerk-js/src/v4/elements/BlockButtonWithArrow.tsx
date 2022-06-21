@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { BlockButtonIcon, Flex, Icon } from '../customizables';
+import { BlockButtonIcon, Icon, Text } from '../customizables';
 import { ArrowRightIcon } from '../icons';
 import { PropsOfComponent } from '../styledSystem';
 
@@ -23,14 +23,16 @@ export const BlockButtonWithArrow = (props: BlockButtonWithArrowProps) => {
         />
       }
     >
-      <Flex
+      <Text
         // elementDescriptor={descriptors.socialButtonsButtonBlockText}
         // elementId={descriptors.socialButtonsButtonBlockText.setId(id)}
         as='span'
-        sx={{ width: '100%' }}
+        sx={{ width: '100%', textAlign: 'left' }}
+        truncate
+        variant='link'
       >
         {children}
-      </Flex>
+      </Text>
     </BlockButtonIcon>
   );
 };
