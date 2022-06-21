@@ -2,7 +2,7 @@ import { AuthStatus, Base, createGetToken, createSignedOutState } from '@clerk/b
 import { ClerkJWTClaims } from '@clerk/types';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 
-import { ClerkAPI } from './ClerkApi';
+import { ClerkAPI } from './ClerkAPI';
 import {
   AuthData,
   NextMiddlewareResult,
@@ -69,7 +69,7 @@ const users = ClerkAPI.users;
 export { allowlistIdentifiers, clients, emails, invitations, organizations, sessions, smsMessages, users };
 
 async function fetchInterstitial() {
-  return ClerkAPI.fetchInterstitial<string>();
+  return ClerkAPI.fetchInterstitial();
 }
 
 export function withEdgeMiddlewareAuth<
