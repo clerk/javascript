@@ -12,3 +12,4 @@ export * from './sleep';
 export * from './isMobileDevice';
 export * from './getFullName';
 export * from './phoneUtils';
+export * from './formatIdentifier';
