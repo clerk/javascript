@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { useSafeState } from '../../hooks';
 import { createContextAndHook } from '../../utils';
 
 type Status = 'idle' | 'loading' | 'error';
@@ -13,7 +14,7 @@ type CardStateCtxValue = {
 const [CardStateCtx, _useCardState] = createContextAndHook<CardStateCtxValue>('CardState');
 
 const CardStateProvider = (props: React.PropsWithChildren<any>) => {
-  const [state, setState] = React.useState<State>({
+  const [state, setState] = useSafeState<State>({
     status: 'idle',
     metadata: undefined,
     error: undefined,

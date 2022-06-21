@@ -36,7 +36,7 @@ export function _SignInStart(): JSX.Element {
     type: 'password',
     label: 'Password',
   });
-  const identifierField = useFormControl('identifier', 'nikos+1@clerk.dev', {
+  const identifierField = useFormControl('identifier', '', {
     type: identifierInputDisplayValues.fieldType,
     label: identifierInputDisplayValues.label,
   });
