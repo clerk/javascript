@@ -2,10 +2,11 @@ import React from 'react';
 
 import { useSupportEmail } from '../../ui/hooks/useSupportEmail';
 import { descriptors, Flex, Flow, Icon, Text } from '../customizables';
-import { ArrowBlockButton, Card } from '../elements';
 import { Email } from '../icons';
 import { CardAlert } from './Alert';
+import { ArrowBlockButton } from './ArrowBlockButton';
 import { BackLink } from './BackLink';
+import { Card } from './Card';
 import { useCardState } from './contexts';
 import { Footer } from './Footer';
 import { Header } from './Header';
