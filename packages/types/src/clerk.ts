@@ -294,6 +294,8 @@ export interface ClerkOptions {
   polling?: boolean;
   selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;
   theme?: ClerkThemeOptions;
+  /** Optional support email for display in authentication screens */
+  supportEmail?: string;
 }
 
 export interface Resources {

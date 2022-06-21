@@ -53,6 +53,7 @@ jest.mock('ui/contexts', () => {
     useCoreClerk: jest.fn(() => ({
       setActive: mockSetActive,
     })),
+    useOptions: jest.fn(() => ({ supportEmail: undefined })),
   };
 });
 

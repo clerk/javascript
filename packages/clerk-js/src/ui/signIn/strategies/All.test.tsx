@@ -3,6 +3,8 @@ import { SignInFactor } from '@clerk/types';
 import { Session } from 'core/resources';
 import React from 'react';
 
+const mockUseOptions = jest.fn(() => ({}));
+
 import { All } from './All';
 
 jest.mock('ui/contexts', () => {
@@ -13,6 +15,7 @@ jest.mock('ui/contexts', () => {
         frontendAPI: 'clerk.clerk.dev',
       },
     })),
+    useOptions: mockUseOptions,
     useEnvironment: jest.fn(() => ({
       displayConfig: {
         theme: {
@@ -65,7 +68,7 @@ describe('<All/>', () => {
     },
   ];
 
-  it('renders the All sign in methods', async () => {
+  it('renders the All sign in methods', () => {
     const tree = renderJSON(
       <All
         factors={factors}
@@ -75,7 +78,18 @@ describe('<All/>', () => {
     expect(tree).toMatchSnapshot();
   });
 
-  it('triggers selectStrategy callback on click', async () => {
+  it('renders the All sign in methods with custom support email', () => {
+    mockUseOptions.mockImplementationOnce(() => ({ supportEmail: 'test@test.com' }));
+    const tree = renderJSON(
+      <All
+        factors={factors}
+        selectFactor={jest.fn()}
+      />,
+    );
+    expect(tree).toMatchSnapshot();
+  });
+
+  it('triggers selectStrategy callback on click', () => {
     const mockSelectStrategy = jest.fn();
     render(
       <All
