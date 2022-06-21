@@ -17,7 +17,7 @@ export const IdentityPreview = (props: IdentityPreviewProps) => {
   const refs = React.useRef({ avatarUrl, identifier: formatIdentifier(identifier) });
 
   return (
-    <Flex sx={theme => ({ marginTop: `-${theme.space.$4}`, marginBottom: theme.space.$8 })}>
+    <Flex sx={theme => ({ marginBottom: theme.space.$8 })}>
       <Flex
         align='center'
         gap={2}
