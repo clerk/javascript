@@ -5,7 +5,8 @@ import { ClerkAPIResponseError } from '../api/errors';
 
 const defaultAPIKey = process.env.CLERK_API_KEY || '';
 const defaultAPIVersion = process.env.CLERK_API_VERSION || 'v1';
-const defaultServerAPIUrl = process.env.CLERK_API_URL || 'https://API.clerk.dev';
+
+export const defaultServerAPIUrl = process.env.CLERK_API_URL || 'https://API.clerk.dev';
 
 export const TestClerkAPI = new ClerkBackendAPI({
   apiKey: defaultAPIKey,

@@ -2,7 +2,7 @@ import nock from 'nock';
 import snakecaseKeys from 'snakecase-keys';
 
 import { Email } from '../../api/resources';
-import { TestClerkAPI } from '../TestClerkApi';
+import { defaultServerAPIUrl, TestClerkAPI } from '../TestClerkApi';
 
 afterEach(() => {
   nock.cleanAll();
@@ -14,7 +14,7 @@ test('createEmail() sends an email', async () => {
   const subject = 'Your account is in good standing!';
   const body = 'Click <a href="https://www.knowyourmeme.com/">here</a> to see your most recent transactions.';
 
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .post(
       '/v1/emails',
       snakecaseKeys({

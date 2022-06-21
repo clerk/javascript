@@ -1,14 +1,14 @@
 import nock from 'nock';
 
 import { Invitation, InvitationJSON, ObjectType } from '../../api/resources';
-import { TestClerkAPI } from '../TestClerkApi';
+import { defaultServerAPIUrl, TestClerkAPI } from '../TestClerkApi';
 
 afterEach(() => {
   nock.cleanAll();
 });
 
 test('getInvitationList() returns a list of invitations', async () => {
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .get('/v1/invitations')
     .replyWithFile(200, __dirname + '/responses/getInvitationList.json', {});
 
@@ -29,7 +29,7 @@ test('createInvitation() creates an invitation', async () => {
     public_metadata: null,
   };
 
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .post('/v1/invitations', {
       email_address: emailAddress,
     })
@@ -53,7 +53,7 @@ test('createInvitation() accepts a redirectUrl', async () => {
   };
   const redirectUrl = 'http://redirect.org';
 
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .post('/v1/invitations', {
       email_address: emailAddress,
       redirect_url: redirectUrl,
@@ -81,7 +81,7 @@ test('createInvitation() accepts publicMetadata', async () => {
     updated_at: 1611948436,
   };
 
-  nock('https://API.clerk.dev')
+  nock(defaultServerAPIUrl)
     .post('/v1/invitations', {
       email_address: emailAddress,
       public_metadata: JSON.stringify(publicMetadata),
@@ -108,7 +108,7 @@ test('revokeInvitation() revokes an invitation', async () => {
     updated_at: 1611948436,
   };
 
-  nock('https://API.clerk.dev').post(`/v1/invitations/${id}/revoke`).reply(200, resJSON);
+  nock(defaultServerAPIUrl).post(`/v1/invitations/${id}/revoke`).reply(200, resJSON);
 
   const invitation = await TestClerkAPI.invitations.revokeInvitation(id);
   expect(invitation).toEqual(new Invitation(id, resJSON.email_address, null, resJSON.created_at, resJSON.updated_at));
