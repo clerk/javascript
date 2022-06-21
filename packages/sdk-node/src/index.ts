@@ -1,4 +1,4 @@
-import { OptionsOfUnknownResponseBody } from 'got';
+import type { RequestInit } from 'node-fetch';
 
 import Clerk from './instance';
 
@@ -29,7 +29,6 @@ export {
 
 // Export resources
 export {
-  Nullable,
   AllowlistIdentifier,
   Client,
   Email,
@@ -62,16 +61,6 @@ export { ClerkExpressWithAuth, ClerkExpressRequireAuth, withAuth, requireAuth };
 // Export wrapper types for Next.js requests
 export { WithAuthProp, RequireAuthProp } from './Clerk';
 
-// Export Errors
-export {
-  HttpError,
-  ClerkServerError,
-  ClerkServerErrorJSON,
-} from './utils/Errors';
-
-// Export Logger
-export { default as Logger } from './utils/Logger';
-
 // Export setters for the default singleton instance
 // Useful if you only have access to a sub-api instance
 
@@ -80,13 +69,13 @@ export function setClerkApiKey(value: string) {
 }
 
 export function setClerkServerApiUrl(value: string) {
-  Clerk.getInstance().serverApiUrl = value;
+  Clerk.getInstance().apiUrl = value;
 }
 
 export function setClerkApiVersion(value: string) {
   Clerk.getInstance().apiVersion = value;
 }
 
-export function setClerkHttpOptions(value: OptionsOfUnknownResponseBody) {
+export function setClerkHttpOptions(value: RequestInit) {
   Clerk.getInstance().httpOptions = value;
 }
