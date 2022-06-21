@@ -3,7 +3,7 @@ import {
   formatPhoneNumber,
   getCountryIsoFromFormattedNumber,
   getFlagEmojiFromCountryIso,
-} from './utils';
+} from './phoneUtils';
 
 describe('phoneUtils', () => {
   describe('countryIsoToFlagEmoji(iso)', () => {

@@ -67,6 +67,7 @@ export const Avatar = (props: AvatarProps) => {
       elementDescriptor={descriptors.avatar}
       sx={[
         theme => ({
+          flexShrink: 0,
           borderRadius: theme.radii.$circle,
           overflow: 'hidden',
           width: size(theme),
