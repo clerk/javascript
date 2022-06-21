@@ -10,11 +10,11 @@
 } from '@clerk/backend-core';
 import { ClerkJWTClaims, ServerGetToken } from '@clerk/types';
 import Cookies from 'cookies';
-import deepMerge from 'deepmerge';
+import deepmerge from 'deepmerge';
 import type { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import jwks, { JwksClient } from 'jwks-rsa';
-import fetch from 'node-fetch';
+import fetch, { RequestInit } from 'node-fetch';
 
 import { SupportMessages } from './constants/SupportMessages';
 import { LIB_NAME, LIB_VERSION } from './info';
@@ -60,6 +60,7 @@ export type MiddlewareOptions = {
   onError?: (error: ClerkAPIResponseError) => unknown;
   authorizedParties?: string[];
   jwtKey?: string;
+  strict?: boolean;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -116,14 +117,17 @@ export default class Clerk extends ClerkBackendAPI {
             }
           }
 
-          const response = await fetch(finalUrl.href, {
-            method,
-            headers: headerParams as Record<string, string>,
-            ...(bodyParams &&
-              Object.keys(bodyParams).length > 0 && {
-                body: JSON.stringify(bodyParams),
-              }),
-          });
+          const response = await fetch(
+            finalUrl.href,
+            deepmerge(httpOptions, {
+              method,
+              headers: headerParams as Record<string, string>,
+              ...(bodyParams &&
+                Object.keys(bodyParams).length > 0 && {
+                  body: JSON.stringify(bodyParams),
+                }),
+            })
+          );
 
           // Parse JSON or Text response.
           const isJSONResponse =
@@ -226,38 +230,23 @@ export default class Clerk extends ClerkBackendAPI {
     return this._instance;
   }
 
-  // Middlewares
+  private logError(error: ClerkAPIResponseError | Error, strict = false) {
+    const logLevel = strict ? 'error' : 'warn';
+    Logger[logLevel](error.message);
 
-  // defaultOnError swallows the error
-  protected defaultOnError = (error: ClerkAPIResponseError) => {
-    Logger.warn(error.message);
+    if (error instanceof ClerkAPIResponseError) {
+      (error.errors || []).forEach(({ message, longMessage }) =>
+        Logger[logLevel](longMessage || message)
+      );
+    }
+  }
 
-    (error.errors || []).forEach(({ message, longMessage }) =>
-      Logger.warn(longMessage || message)
-    );
-  };
-
-  // strictOnError returns the error so that Express will halt the request chain
-  protected strictOnError = (error: ClerkAPIResponseError) => {
-    Logger.error(error.message);
-
-    (error.errors || []).forEach(({ message, longMessage }) =>
-      Logger.error(longMessage || message)
-    );
-
-    return error;
-  };
-
-  // Middlewares
-
-  expressWithAuth(options?: MiddlewareOptions): Middleware {
+  private nodeAuthenticate(options: MiddlewareOptions): Middleware {
     function signedOut() {
       throw new Error('Unauthenticated');
     }
 
-    options = deepMerge(options || {}, { onError: this.defaultOnError });
-
-    const { onError, authorizedParties, jwtKey } = options;
+    const { onError, authorizedParties, jwtKey, strict } = options;
 
     async function authenticate(
       this: Clerk,
@@ -322,14 +311,11 @@ export default class Clerk extends ClerkBackendAPI {
           claims: null,
         };
 
-        // Call onError if provided
-        if (!onError) {
-          return next();
-        }
+        this.logError(error as any, strict);
+        const err = onError ? await onError(error as any) : error;
 
-        const err = await onError(error as any);
-
-        if (err) {
+        // If strict, err will be returned to the Express-like `next` callback to signify an error should halt the request chain
+        if (strict) {
           next(err);
         } else {
           next();
@@ -338,12 +324,6 @@ export default class Clerk extends ClerkBackendAPI {
     }
 
     return authenticate.bind(this);
-  }
-
-  expressRequireAuth(options?: MiddlewareOptions) {
-    return this.expressWithAuth(
-      deepMerge(options || {}, { onError: this.strictOnError })
-    );
   }
 
   // Credits to https://nextjs.org/docs/api-routes/api-middlewares
@@ -361,6 +341,16 @@ export default class Clerk extends ClerkBackendAPI {
         return resolve(result);
       });
     });
+  }
+
+  // Middlewares
+
+  expressWithAuth(options: MiddlewareOptions = {}) {
+    return this.nodeAuthenticate({ strict: false, ...options });
+  }
+
+  expressRequireAuth(options?: MiddlewareOptions) {
+    return this.nodeAuthenticate({ strict: true, ...options });
   }
 
   // Set the session on the request and then call provided handler
@@ -390,9 +380,6 @@ export default class Clerk extends ClerkBackendAPI {
 
   // Stricter version, short-circuits if session can't be determined
   requireAuth(handler: Middleware, options?: MiddlewareOptions) {
-    return this.withAuth(
-      handler,
-      deepMerge(options || {}, { onError: this.strictOnError })
-    );
+    return this.withAuth(handler, { strict: true, ...options });
   }
 }
