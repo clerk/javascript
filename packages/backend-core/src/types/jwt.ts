@@ -36,9 +36,19 @@ export interface JWTPayload {
   azp?: string;
 
   /**
-   *
+   * List of organization memberships the user belongs to.
    */
   orgs?: Record<string, MembershipRole>;
+
+  /**
+   * Active organization id.
+   */
+  org_id?: string;
+
+  /**
+   * Active organization role
+   */
+  org_role?: MembershipRole;
 
   /**
    * Any other JWT Claim Set member.

@@ -11,6 +11,15 @@ export interface JWTClaims {
   nbf?: number;
   name?: string;
   orgs?: OrganizationsJWTClaim;
+  /**
+   * Active organization id.
+   */
+  org_id?: string;
+
+  /**
+   * Active organization role
+   */
+  org_role?: MembershipRole;
   [key: string]: unknown;
 }
 
