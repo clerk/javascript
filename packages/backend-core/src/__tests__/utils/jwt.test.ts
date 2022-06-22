@@ -1,9 +1,10 @@
-import { JWTPayload } from '../../types';
+import { ClerkJWTClaims } from '@clerk/types';
+
 import { TokenVerificationError } from '../../util/errors';
 import { checkClaims } from '../../util/jwt';
 
 test('check jwt claims with no issuer', () => {
-  const dummyClaims: JWTPayload = {
+  const dummyClaims: ClerkJWTClaims = {
     sub: 'subject',
     exp: 1643374283,
     iss: 'https://fake.issuer',
@@ -16,7 +17,7 @@ test('check jwt claims with no issuer', () => {
 });
 
 test('check jwt claims with invalid issuer', () => {
-  const dummyClaims: JWTPayload = {
+  const dummyClaims: ClerkJWTClaims = {
     sub: 'subject',
     exp: 1643374283,
     iss: 'invalid-issuer',
@@ -29,7 +30,7 @@ test('check jwt claims with invalid issuer', () => {
 });
 
 test('check jwt claims with valid issuer', () => {
-  const dummyClaims: JWTPayload = {
+  const dummyClaims: ClerkJWTClaims = {
     sub: 'subject',
     exp: 1643374283,
     iss: 'https://clerk.happy.path',
@@ -42,7 +43,7 @@ test('check jwt claims with valid issuer', () => {
 });
 
 test('check jwt claims with invalid azp', () => {
-  const dummyClaims: JWTPayload = {
+  const dummyClaims: ClerkJWTClaims = {
     sub: 'subject',
     exp: 1643374283,
     iss: 'https://clerk.happy.path',
@@ -57,7 +58,7 @@ test('check jwt claims with invalid azp', () => {
 });
 
 test('check jwt claims with no azp and no authorized parties', () => {
-  const dummyClaims: JWTPayload = {
+  const dummyClaims: ClerkJWTClaims = {
     sub: 'subject',
     exp: 1643374283,
     iss: 'https://clerk.happy.path',
@@ -70,7 +71,7 @@ test('check jwt claims with no azp and no authorized parties', () => {
 });
 
 test('check jwt claims with no azp and provided authorized parties', () => {
-  const dummyClaims: JWTPayload = {
+  const dummyClaims: ClerkJWTClaims = {
     sub: 'subject',
     exp: 1643374283,
     iss: 'https://clerk.happy.path',
@@ -84,7 +85,7 @@ test('check jwt claims with no azp and provided authorized parties', () => {
 });
 
 test('check jwt claims with azp and no authorized parties', () => {
-  const dummyClaims: JWTPayload = {
+  const dummyClaims: ClerkJWTClaims = {
     sub: 'subject',
     exp: 1643374283,
     iss: 'https://clerk.happy.path',
@@ -98,7 +99,7 @@ test('check jwt claims with azp and no authorized parties', () => {
 });
 
 test('check jwt claims with no azp and provided authorized parties', () => {
-  const dummyClaims: JWTPayload = {
+  const dummyClaims: ClerkJWTClaims = {
     sub: 'subject',
     exp: 1643374283,
     iss: 'https://clerk.happy.path',

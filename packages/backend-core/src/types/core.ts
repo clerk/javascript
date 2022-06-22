@@ -1,5 +1,6 @@
+import { ClerkJWTClaims } from '@clerk/types';
+
 import { AuthErrorReason } from './errors';
-import { JWTPayload } from './jwt';
 
 export enum AuthStatus {
   SignedIn = 'Signed in',
@@ -30,7 +31,7 @@ export type AuthState = {
   status: AuthStatus;
   session?: Session;
   interstitial?: string;
-  sessionClaims?: JWTPayload;
+  sessionClaims?: ClerkJWTClaims;
   /* Error reason for signed-out and interstitial states. Would probably be set on the `Auth-Result` response header. */
   errorReason?: AuthErrorReason;
 };
