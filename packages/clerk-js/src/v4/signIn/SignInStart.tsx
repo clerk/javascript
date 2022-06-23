@@ -8,7 +8,17 @@ import { useNavigate } from '../../ui/hooks';
 import { useSupportEmail } from '../../ui/hooks/useSupportEmail';
 import { getClerkQueryParam } from '../../utils/getClerkQueryParam';
 import { descriptors, Flex, Flow } from '../customizables';
-import { Card, CardAlert, Footer, Form, Header, LoadingCard, withCardStateProvider } from '../elements';
+import {
+  Card,
+  CardAlert,
+  Divider,
+  Footer,
+  Form,
+  Header,
+  LoadingCard,
+  SocialButtonsReversibleContainer,
+  withCardStateProvider,
+} from '../elements';
 import { useCardState } from '../elements/contexts';
 import { useLoadingStatus } from '../hooks';
 import { buildRequest, FormControlState, handleError, isMobileDevice, useFormControl } from '../utils';
@@ -181,21 +191,24 @@ export function _SignInStart(): JSX.Element {
           elementDescriptor={descriptors.main}
           gap={8}
         >
-          <SignInSocialButtons />
-          {standardFormAttributes.length && (
-            <Form.Root onSubmit={handleFirstPartySubmit}>
-              <Form.ControlRow>
-                <Form.Control
-                  {...identifierField.props}
-                  autoFocus={shouldAutofocus}
-                />
-              </Form.ControlRow>
-              <Form.ControlRow>
-                <InstantPasswordControl field={passwordBasedInstance ? instantPasswordField : undefined} />
-              </Form.ControlRow>
-              <Form.SubmitButton>Continue</Form.SubmitButton>
-            </Form.Root>
-          )}
+          <SocialButtonsReversibleContainer>
+            <SignInSocialButtons />
+            <Divider />
+            {standardFormAttributes.length && (
+              <Form.Root onSubmit={handleFirstPartySubmit}>
+                <Form.ControlRow>
+                  <Form.Control
+                    {...identifierField.props}
+                    autoFocus={shouldAutofocus}
+                  />
+                </Form.ControlRow>
+                <Form.ControlRow>
+                  <InstantPasswordControl field={passwordBasedInstance ? instantPasswordField : undefined} />
+                </Form.ControlRow>
+                <Form.SubmitButton>Continue</Form.SubmitButton>
+              </Form.Root>
+            )}
+          </SocialButtonsReversibleContainer>
         </Flex>
         <Footer.Root>
           <Footer.Action>

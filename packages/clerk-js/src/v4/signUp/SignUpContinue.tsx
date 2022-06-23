@@ -13,7 +13,16 @@ import {
 } from '../../ui/signUp/signUpFormHelpers';
 import { completeSignUpFlow } from '../../ui/signUp/util';
 import { descriptors, Flex, Flow } from '../customizables';
-import { Card, CardAlert, Footer, Header, LoadingCard, withCardStateProvider } from '../elements';
+import {
+  Card,
+  CardAlert,
+  Divider,
+  Footer,
+  Header,
+  LoadingCard,
+  SocialButtonsReversibleContainer,
+  withCardStateProvider,
+} from '../elements';
 import { useCardState } from '../elements/contexts';
 import { buildRequest, FormControlStateLike, handleError, useFormControl } from '../utils';
 import { SignUpForm } from './SignUpForm';
@@ -114,16 +123,19 @@ function _SignUpContinue() {
           elementDescriptor={descriptors.main}
           gap={8}
         >
-          {showOauthProviders && <SignUpSocialButtons />}
-          {showFormFields(userSettings) && (
-            <SignUpForm
-              handleSubmit={handleSubmit}
-              fields={fields}
-              formState={formState}
-              canToggleEmailPhone={canToggleEmailPhone}
-              handleEmailPhoneToggle={handleChangeActive}
-            />
-          )}
+          <SocialButtonsReversibleContainer>
+            {showOauthProviders && <SignUpSocialButtons />}
+            {showOauthProviders && <Divider />}
+            {showFormFields(userSettings) && (
+              <SignUpForm
+                handleSubmit={handleSubmit}
+                fields={fields}
+                formState={formState}
+                canToggleEmailPhone={canToggleEmailPhone}
+                handleEmailPhoneToggle={handleChangeActive}
+              />
+            )}
+          </SocialButtonsReversibleContainer>
         </Flex>
         <Footer.Root>
           <Footer.Action>

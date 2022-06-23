@@ -19,8 +19,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
 
   'logo',
   'logo-image',
-  // 'outerLogo',
-  // 'outerLogo-image',
 
   'header',
   'header-title',
@@ -41,6 +39,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'socialButtons-buttonBlockText',
   'socialButtons-buttonBlockArrow',
   'socialButtons-logo',
+
+  'divider',
 
   'form',
   'form-fieldRow',
