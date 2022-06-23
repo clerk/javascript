@@ -1,4 +1,5 @@
 const space = Object.freeze({
+  none: '0',
   xxs: '0.5px',
   px: '1px',
   '0x5': '0.125rem',

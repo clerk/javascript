@@ -13,6 +13,7 @@ type UsePopoverProps = {
   defaultOpen?: boolean;
   placement?: UseFloatingProps['placement'];
   offset?: Parameters<typeof offset>[0];
+  autoUpdate?: boolean;
 };
 
 export const usePopover = (props: UsePopoverProps = {}) => {
@@ -20,7 +21,7 @@ export const usePopover = (props: UsePopoverProps = {}) => {
   const { reference, floating, strategy, x, y, context } = useFloating({
     open,
     onOpenChange: setOpen,
-    whileElementsMounted: autoUpdate,
+    whileElementsMounted: props.autoUpdate === false ? undefined : autoUpdate,
     placement: props.placement || 'bottom-start',
     middleware: [offset(props.offset || 6), flip(), shift()],
   });

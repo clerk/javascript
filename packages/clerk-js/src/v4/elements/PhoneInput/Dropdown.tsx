@@ -54,7 +54,7 @@ export const DropdownSearchbar = (props: PropsOfComponent<typeof InputWithIcon>)
             icon={MagnifyingGlass}
           />
         }
-        sx={{ border: 'none' }}
+        sx={{ border: 'none', borderRadius: '0' }}
         {...props}
       />
     </Flex>

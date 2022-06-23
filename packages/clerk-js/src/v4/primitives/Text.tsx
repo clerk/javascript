@@ -6,7 +6,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
   return {
     base: {
       boxSizing: 'border-box',
-      // TODO: this should probably be inherit
+      // TODO: this should probably be inherited
       // and handled through cards
       color: theme.colors.$text500,
       margin: 0,

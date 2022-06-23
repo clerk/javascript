@@ -36,15 +36,16 @@ export const PoweredByClerkTag = React.memo(
 
     const topLeft = (theme: InternalTheme) => ({
       top: 0,
-      borderBottom: 0,
       transform: `rotate(-90deg) translateX(-10rem)`,
       borderRadius: `${theme.radii.$md} ${theme.radii.$md} 0 0`,
+      borderBottomColor: 'transparent',
     });
 
     const bottomLeft = (theme: InternalTheme) => ({
       bottom: 0,
       transform: `translateX(2rem) translateY(100%)`,
       borderRadius: `0 0 ${theme.radii.$md} ${theme.radii.$md}`,
+      borderTopColor: 'transparent',
     });
 
     return branded ? (
@@ -53,12 +54,13 @@ export const PoweredByClerkTag = React.memo(
         align='center'
         sx={theme => ({
           border: theme.borders.$normal,
-          borderColor: theme.colors.$whiteAlpha300,
+          borderColor: theme.colors.$whiteAlpha200,
           color: theme.colors.$white,
           backgroundColor: theme.colors.$primary500,
           padding: `${theme.space.$1x5} ${theme.space.$4}`,
           position: 'absolute',
           transformOrigin: 'left bottom',
+          backgroundClip: 'padding-box',
           left: 0,
           ...(placement === 'top-left' ? topLeft(theme) : bottomLeft(theme)),
         })}
@@ -67,7 +69,7 @@ export const PoweredByClerkTag = React.memo(
       >
         <Text
           variant='textExtraSmallRegular'
-          sx={{ color: 'inherit' }}
+          sx={theme => ({ color: 'inherit', letterSpacing: theme.space.$none })}
         >
           Secured by
         </Text>

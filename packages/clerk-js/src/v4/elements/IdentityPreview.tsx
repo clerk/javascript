@@ -23,7 +23,7 @@ export const IdentityPreview = (props: IdentityPreviewProps) => {
         gap={2}
         sx={theme => ({
           maxWidth: '100%',
-          backgroundColor: theme.colors.$blackAlpha50,
+          backgroundColor: theme.colors.$blackAlpha20,
           padding: `${theme.space.$1x5} ${theme.space.$4}`,
           borderRadius: theme.radii.$3xl,
           border: `${theme.borders.$normal} ${theme.colors.$blackAlpha200}`,

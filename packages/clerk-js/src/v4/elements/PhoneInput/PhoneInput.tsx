@@ -26,7 +26,7 @@ export const PhoneInput = (props: PhoneInputProps) => {
   const phoneInputRef = React.useRef<HTMLInputElement>(null);
   const selectedItemRef = React.useRef<HTMLDivElement>(null);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
-  const { floating, reference, styles, toggle: togglePopover, isOpen } = usePopover();
+  const { floating, reference, styles, toggle: togglePopover, isOpen } = usePopover({ autoUpdate: false });
   const { selectedIso, setPhoneNumber, cleanPhoneNumber, formattedPhoneNumber, setSelectedIso } =
     useFormattedPhoneNumber({ defaultPhone: value as string });
   const { filteredItems, searchInputProps } = useSearchInput({
