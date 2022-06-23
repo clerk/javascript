@@ -125,6 +125,7 @@ export const PhoneInput = (props: PhoneInputProps) => {
               innerRef={i === selectedIndex ? selectedItemRef : undefined}
             />
           ))}
+          {filteredItems.length === 0 && <NoResults />}
         </DropdownItemContainer>
       </DropdownBox>
     </Flex>
@@ -176,6 +177,18 @@ type CountryCodeListItem = React.PropsWithChildren<{
   isSelected: boolean;
   innerRef: any;
 }>;
+
+const NoResults = () => {
+  return (
+    <Text
+      as='div'
+      variant='hint'
+      sx={theme => ({ width: '100%', padding: `${theme.space.$2} 0 0 ${theme.space.$4}` })}
+    >
+      No countries found
+    </Text>
+  );
+};
 
 const CountryCodeListItem = React.memo((props: CountryCodeListItem) => {
   const { country, selectIso, isSelected, innerRef, ...rest } = props;
