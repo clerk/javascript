@@ -703,7 +703,7 @@ describe('<SignUpStart/> Progressive Sign Up', () => {
     expect(screen.getByText('Phone number')).toBeInTheDocument();
   });
 
-  it('renders optional email/phone input if email OR phone', () => {
+  it('renders optional email/phone input if email OR phone', async () => {
     mockUserSettings = new UserSettings({
       ...mockUserSettingsProgressive,
       attributes: {
@@ -724,7 +724,7 @@ describe('<SignUpStart/> Progressive Sign Up', () => {
     render(<SignUpStart />);
 
     expect(screen.getByText('Email address')).toBeInTheDocument();
-    userEvent.click(screen.getByText('Use phone instead'));
+    await userEvent.click(screen.getByText('Use phone instead'));
     expect(screen.getByText('Phone number')).toBeInTheDocument();
   });
   it('renders required phone & optional email inputs', () => {
