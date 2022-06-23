@@ -1,3 +1,4 @@
+import type { ClerkJWTClaims } from '@clerk/types';
 import type { CryptoKey as PeculiarCryptoKey } from '@peculiar/webcrypto';
 
 import {
@@ -7,7 +8,6 @@ import {
   AuthStatus,
   BuildAuthenticatedStateOptions,
   JWT,
-  JWTPayload,
   TokenVerificationErrorReason,
   VerifySessionTokenOptions,
 } from './types';
@@ -57,13 +57,13 @@ export class Base {
    *
    * @param {string} token
    * @param {VerifySessionTokenOptions} verifySessionTokenOptions
-   * @return {Promise<JWTPayload>} claims
+   * @return {Promise<ClerkJWTClaims>} claims
    * @throws {TokenVerificationError|Error}
    */
   verifySessionToken = async (
     token: string,
     { authorizedParties, jwtKey }: VerifySessionTokenOptions = {},
-  ): Promise<JWTPayload> => {
+  ): Promise<ClerkJWTClaims> => {
     /**
      * Priority of JWT key search
      * 1. Use supplied key
@@ -159,7 +159,7 @@ export class Base {
     }
   };
 
-  verifyJwt = async (key: CryptoKey, token: string): Promise<JWTPayload> => {
+  verifyJwt = async (key: CryptoKey, token: string): Promise<ClerkJWTClaims> => {
     const { payload } = this.decodeJwt(token);
 
     await this.verifyJwtSignature(key, token);

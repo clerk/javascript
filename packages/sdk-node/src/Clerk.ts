@@ -5,9 +5,8 @@
   ClerkFetcher,
   createGetToken,
   createSignedOutState,
-  JWTPayload,
 } from '@clerk/backend-core';
-import { ServerGetToken } from '@clerk/types';
+import { ClerkJWTClaims, ServerGetToken } from '@clerk/types';
 import { Crypto, CryptoKey } from '@peculiar/webcrypto';
 import Cookies from 'cookies';
 import deepmerge from 'deepmerge';
@@ -180,7 +179,7 @@ export default class Clerk extends ClerkBackendAPI {
   async verifyToken(
     token: string,
     authorizedParties?: string[]
-  ): Promise<JWTPayload> {
+  ): Promise<ClerkJWTClaims> {
     const decoded = jwt.decode(token, { complete: true });
     if (!decoded) {
       throw new Error(`Failed to verify token: ${token}`);
@@ -189,7 +188,7 @@ export default class Clerk extends ClerkBackendAPI {
     const key = await this._jwksClient.getSigningKey(decoded.header.kid);
     const verified = jwt.verify(token, key.getPublicKey(), {
       algorithms: ['RS256'],
-    }) as JWTPayload;
+    }) as ClerkJWTClaims;
 
     if (typeof verified === 'string') {
       throw new Error('Malformed token');

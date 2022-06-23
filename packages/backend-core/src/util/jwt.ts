@@ -1,4 +1,6 @@
-import { JWTPayload, TokenVerificationErrorReason } from '../types';
+import { ClerkJWTClaims } from '@clerk/types';
+
+import { TokenVerificationErrorReason } from '../types';
 import { TokenVerificationError } from './errors';
 const DEFAULT_ADDITIONAL_CLOCK_SKEW = 0;
 
@@ -6,11 +8,11 @@ const DEFAULT_ADDITIONAL_CLOCK_SKEW = 0;
  *
  *
  * @export
- * @param {JWTPayload} payload
+ * @param {ClerkJWTClaims} payload
  * @param {*} [additionalClockSkew=DEFAULT_ADDITIONAL_CLOCK_SKEW]
  * @throws {TokenVerificationError}
  */
-export function isExpired(payload: JWTPayload, additionalClockSkew = DEFAULT_ADDITIONAL_CLOCK_SKEW) {
+export function isExpired(payload: ClerkJWTClaims, additionalClockSkew = DEFAULT_ADDITIONAL_CLOCK_SKEW) {
   // verify exp+nbf claims
   const now = Date.now() / 1000;
 
@@ -23,7 +25,7 @@ export function isExpired(payload: JWTPayload, additionalClockSkew = DEFAULT_ADD
   }
 }
 
-export function checkClaims(claims: JWTPayload, authorizedParties?: string[]) {
+export function checkClaims(claims: ClerkJWTClaims, authorizedParties?: string[]) {
   if (!claims.iss || !claims.iss.startsWith('https://clerk')) {
     throw new TokenVerificationError(TokenVerificationErrorReason.InvalidIssuer);
   }
