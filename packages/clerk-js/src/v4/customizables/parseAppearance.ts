@@ -1,6 +1,6 @@
 import { Appearance, DeepPartial, Elements, Options, Theme } from '@clerk/types';
 
-import { createInternalTheme, defaultInternalTheme } from '../foundations';
+import { blackAlpha, createInternalTheme, defaultInternalTheme, whiteAlpha } from '../foundations';
 import { InternalTheme } from '../styledSystem';
 import { fastDeepMergeAndReplace } from '../utils';
 import { colorOptionTo500Scale, colorOptionToHslaScale } from './colorOptionToHslaScale';
@@ -58,18 +58,36 @@ const createInternalThemeFromVariables = (theme: Theme | undefined): DeepPartial
   if (!theme) {
     return {};
   }
-  return createInternalTheme({ colors: createColorScales(theme) } as any);
+  return createInternalTheme({
+    colors: {
+      ...createColorScales(theme),
+      ...reverseAlphaScalesIfNeeded(theme),
+    },
+  } as any);
 };
 
 const createColorScales = (theme: Theme) => {
   return {
-    ...colorOptionToHslaScale(theme?.variables?.colorPrimary, 'primary'),
-    ...colorOptionToHslaScale(theme?.variables?.colorDanger, 'danger'),
-    ...colorOptionToHslaScale(theme?.variables?.colorSuccess, 'success'),
-    ...colorOptionToHslaScale(theme?.variables?.colorWarning, 'warning'),
-    ...colorOptionToHslaScale(theme?.variables?.colorText, 'text'),
-    ...colorOptionTo500Scale(theme?.variables?.colorInputText, 'inputText'),
-    ...colorOptionTo500Scale(theme?.variables?.colorBackground, 'background'),
-    ...colorOptionTo500Scale(theme?.variables?.colorInputBackground, 'inputBackground'),
+    ...colorOptionToHslaScale(theme.variables?.colorPrimary, 'primary'),
+    ...colorOptionToHslaScale(theme.variables?.colorDanger, 'danger'),
+    ...colorOptionToHslaScale(theme.variables?.colorSuccess, 'success'),
+    ...colorOptionToHslaScale(theme.variables?.colorWarning, 'warning'),
+    ...colorOptionToHslaScale(theme.variables?.colorText, 'text'),
+    //TODO
+    ...colorOptionTo500Scale(theme.variables?.colorInputText, 'inputText'),
+    ...colorOptionTo500Scale(theme.variables?.colorBackground, 'background'),
+    ...colorOptionTo500Scale(theme.variables?.colorInputBackground, 'inputBackground'),
   };
+};
+
+const reverseAlphaScalesIfNeeded = (theme: Theme) => {
+  const { alphaShadesMode = 'dark' } = theme.variables || {};
+  if (alphaShadesMode === 'dark') {
+    return;
+  }
+
+  return Object.fromEntries([
+    ...Object.entries(whiteAlpha).map(([k, v]) => [k.replace('white', 'black'), v]),
+    ...Object.entries(blackAlpha).map(([k, v]) => [k.replace('black', 'white'), v]),
+  ]);
 };

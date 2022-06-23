@@ -1,16 +1,4 @@
-export const colors = Object.freeze({
-  background500: 'white',
-  inputBackground500: 'white',
-  text50: '#DBDBDB',
-  text100: '#C4C4C4',
-  text200: '#ADADAD',
-  text300: '#969696',
-  text400: '#646464',
-  text500: '#000000',
-  inputText500: '#000000',
-  transparent: 'transparent',
-  white: 'white',
-  black: 'black',
+export const whiteAlpha = Object.freeze({
   whiteAlpha20: 'rgba(255, 255, 255, 0.02)',
   whiteAlpha50: 'rgba(255, 255, 255, 0.04)',
   whiteAlpha100: 'rgba(255, 255, 255, 0.06)',
@@ -22,6 +10,9 @@ export const colors = Object.freeze({
   whiteAlpha700: 'rgba(255, 255, 255, 0.64)',
   whiteAlpha800: 'rgba(255, 255, 255, 0.80)',
   whiteAlpha900: 'rgba(255, 255, 255, 0.92)',
+} as const);
+
+export const blackAlpha = Object.freeze({
   blackAlpha20: 'rgba(0, 0, 0, 0.02)',
   blackAlpha50: 'rgba(0, 0, 0, 0.04)',
   blackAlpha100: 'rgba(0, 0, 0, 0.06)',
@@ -33,6 +24,18 @@ export const colors = Object.freeze({
   blackAlpha700: 'rgba(0, 0, 0, 0.64)',
   blackAlpha800: 'rgba(0, 0, 0, 0.80)',
   blackAlpha900: 'rgba(0, 0, 0, 0.92)',
+} as const);
+
+export const colors = Object.freeze({
+  ...blackAlpha,
+  ...whiteAlpha,
+  background500: 'white',
+  inputBackground500: 'white',
+  text500: '#000000',
+  inputText500: '#000000',
+  transparent: 'transparent',
+  white: 'white',
+  black: 'black',
   gray50: '#f5f5f5',
   gray100: '#e3e3e3',
   gray200: '#C4C4C4',
