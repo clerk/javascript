@@ -89,7 +89,7 @@ describe('<All/>', () => {
     expect(tree).toMatchSnapshot();
   });
 
-  it('triggers selectStrategy callback on click', () => {
+  it('triggers selectStrategy callback on click', async () => {
     const mockSelectStrategy = jest.fn();
     render(
       <All
