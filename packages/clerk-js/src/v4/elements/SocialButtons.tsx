@@ -1,13 +1,13 @@
 import { OAuthProvider, OAuthStrategy, Web3Provider, Web3Strategy } from '@clerk/types';
 import React from 'react';
 
-import { Button, descriptors, Grid, Image } from '../customizables';
+import { Button, descriptors, Grid, Image, useAppearance } from '../customizables';
 import { useEnabledThirdPartyProviders } from '../hooks';
 import { PropsOfComponent } from '../styledSystem';
 import { ArrowBlockButton } from './ArrowBlockButton';
 import { useCardState } from './contexts';
 
-export type SocialButtonsProps = React.PropsWithChildren<{ buttonVariant?: 'icon' | 'block' }>;
+export type SocialButtonsProps = React.PropsWithChildren<{}>;
 
 type SocialButtonsRootProps = SocialButtonsProps & {
   oauthCallback: (strategy: OAuthStrategy) => Promise<unknown>;
@@ -19,11 +19,19 @@ const isWeb3Strategy = (val: string): val is Web3Strategy => {
 };
 
 export const SocialButtons = React.memo((props: SocialButtonsRootProps): JSX.Element => {
-  const { oauthCallback, web3Callback, buttonVariant } = props;
+  const { oauthCallback, web3Callback } = props;
   const { strategies, displayData } = useEnabledThirdPartyProviders();
   const card = useCardState();
+  const {
+    parsedOptions: { socialButtonsVariant },
+  } = useAppearance();
 
-  const preferBlockButtons = buttonVariant ? buttonVariant === 'block' : strategies.length <= 3;
+  const preferBlockButtons =
+    socialButtonsVariant === 'blockButton'
+      ? true
+      : socialButtonsVariant === 'iconButton'
+      ? false
+      : strategies.length <= 3;
 
   const startOauth = (strategy: OAuthStrategy | Web3Strategy) => async () => {
     card.setLoading(strategy);
