@@ -27,10 +27,6 @@ const defaultInternalThemeFoundations = Object.freeze({
   zIndices,
 } as const);
 
-const defaultFoundationsCopy = (): InternalThemeFoundations => {
-  return { ...defaultInternalThemeFoundations };
-};
-
 type InternalThemeFoundations = typeof defaultInternalThemeFoundations;
 
 type PrefixWith<K extends string, T> = `${K}${Extract<T, boolean | number | string>}`;
@@ -40,5 +36,5 @@ type InternalTheme<F = InternalThemeFoundations> = {
   };
 };
 
-export { defaultInternalThemeFoundations, defaultFoundationsCopy };
+export { defaultInternalThemeFoundations };
 export type { InternalTheme, InternalThemeFoundations };

@@ -180,6 +180,7 @@ export type Variables = {
   /**
    * The default text color. The 500 shade is used as the text base. Less important
    * text (eg: a subtitle) will use lighter shades.
+   * @default black
    */
   colorText?: LightColorOption;
   /**
@@ -199,13 +200,21 @@ export type Variables = {
    */
   fontFamily?: FontFamily;
   /**
-   * The size that will be used as the base to calculate the `small` and `large` font sizes
+   * The size that will be used as the base to calculate the `small` and `large` font sizes\
+   * @default 16px
    */
   fontSize?: FontSize;
   /**
    * The size that will be used as the base to calculate the `small` and `large` border sizes
    */
   borderRadius?: BorderRadius;
+  /**
+   * The shade that will be used for all `alpha` black and white colors. To achieve sufficient contract,
+   * light themes should use `dark` shades, while dark themes should use `light` shades. This option applies to borders,
+   * backgrounds for hovered elements, hovered dropdown options etc.
+   * @default 'dark'
+   */
+  alphaShadesMode?: 'light' | 'dark';
 };
 
 export type Theme = {
