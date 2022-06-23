@@ -184,11 +184,15 @@ export function _SignInStart(): JSX.Element {
           <SignInSocialButtons />
           {standardFormAttributes.length && (
             <Form.Root onSubmit={handleFirstPartySubmit}>
-              <Form.Control
-                {...identifierField.props}
-                autoFocus={shouldAutofocus}
-              />
-              <InstantPasswordControl field={passwordBasedInstance ? instantPasswordField : undefined} />
+              <Form.ControlRow>
+                <Form.Control
+                  {...identifierField.props}
+                  autoFocus={shouldAutofocus}
+                />
+              </Form.ControlRow>
+              <Form.ControlRow>
+                <InstantPasswordControl field={passwordBasedInstance ? instantPasswordField : undefined} />
+              </Form.ControlRow>
               <Form.SubmitButton>Continue</Form.SubmitButton>
             </Form.Root>
           )}

@@ -22,22 +22,34 @@ export const SignUpForm = (props: SignUpFormProps) => {
           {fields.lastName && <Form.Control {...formState.lastName.props} />}
         </Form.ControlRow>
       )}
-      {fields.username && <Form.Control {...formState.username.props} />}
+      {fields.username && (
+        <Form.ControlRow>
+          <Form.Control {...formState.username.props} />
+        </Form.ControlRow>
+      )}
       {fields.emailAddress && (
-        <Form.Control
-          {...formState.emailAddress.props}
-          actionLabel={canToggleEmailPhone ? 'Use phone instead' : undefined}
-          onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('phoneNumber') : undefined}
-        />
+        <Form.ControlRow>
+          <Form.Control
+            {...formState.emailAddress.props}
+            actionLabel={canToggleEmailPhone ? 'Use phone instead' : undefined}
+            onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('phoneNumber') : undefined}
+          />
+        </Form.ControlRow>
       )}
       {fields.phoneNumber && (
-        <Form.Control
-          {...formState.phoneNumber.props}
-          actionLabel={canToggleEmailPhone ? 'Use email instead' : undefined}
-          onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('emailAddress') : undefined}
-        />
+        <Form.ControlRow>
+          <Form.Control
+            {...formState.phoneNumber.props}
+            actionLabel={canToggleEmailPhone ? 'Use email instead' : undefined}
+            onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('emailAddress') : undefined}
+          />
+        </Form.ControlRow>
       )}
-      {fields.password && <Form.Control {...formState.password.props} />}
+      {fields.password && (
+        <Form.ControlRow>
+          <Form.Control {...formState.password.props} />
+        </Form.ControlRow>
+      )}
       <Form.SubmitButton>Continue</Form.SubmitButton>
     </Form.Root>
   );

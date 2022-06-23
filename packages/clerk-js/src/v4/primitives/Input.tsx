@@ -11,6 +11,7 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
     padding: `${theme.sizes.$2x5} ${theme.sizes.$4}`,
     backgroundColor: theme.colors.$inputBackground500,
     color: theme.colors.$inputText500,
+    width: '100%',
     ...common.textVariants(theme).input,
     ...common.borderVariants(theme, props).normal,
     ...(props.focusRing === false ? {} : common.focusRingInput(theme)),

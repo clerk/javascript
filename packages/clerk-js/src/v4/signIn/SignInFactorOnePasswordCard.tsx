@@ -67,12 +67,14 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
           gap={8}
         >
           <Form.Root onSubmit={handlePasswordSubmit}>
-            <Form.Control
-              {...passwordControl.props}
-              autoFocus
-              actionLabel='Forgot password'
-              onActionClicked={onShowAlternativeMethodsClick}
-            />
+            <Form.ControlRow>
+              <Form.Control
+                {...passwordControl.props}
+                autoFocus
+                actionLabel='Forgot password'
+                onActionClicked={onShowAlternativeMethodsClick}
+              />
+            </Form.ControlRow>
             <Form.SubmitButton>Continue</Form.SubmitButton>
           </Form.Root>
         </Flex>
