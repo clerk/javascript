@@ -4,8 +4,8 @@ import React from 'react';
 import { Separator } from 'ui/common';
 import { useSupportEmail } from 'ui/hooks/useSupportEmail';
 import { allStrategiesButtonsComparator } from 'ui/signIn/strategies/factorSortingUtils';
-import { factorHasLocalStrategy } from '../utils';
 
+import { factorHasLocalStrategy } from '../utils';
 import { OAuth } from './OAuth';
 
 export function getButtonLabel(factor: SignInFactor): string {

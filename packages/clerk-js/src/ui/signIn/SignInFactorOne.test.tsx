@@ -17,6 +17,7 @@ jest.mock('ui/contexts', () => {
     useSignInContext: jest.fn(),
     useCoreClerk: jest.fn(),
     useCoreSignIn: jest.fn(),
+    useOptions: jest.fn(() => ({ supportEmail: undefined })),
   };
 });
 
