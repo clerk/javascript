@@ -1,6 +1,6 @@
 import { AuthStatus, createGetToken, createSignedOutState, Session, User } from '@clerk/backend-core';
 import Clerk, { sessions, users } from '@clerk/clerk-sdk-node';
-import { ServerGetToken } from '@clerk/types';
+import { ClerkJWTClaims, ServerGetToken } from '@clerk/types';
 
 import { RootAuthLoaderOptions } from './types';
 import { parseCookies } from './utils';
@@ -11,7 +11,7 @@ export type AuthData = {
   userId: string | null;
   user: User | undefined | null;
   getToken: ServerGetToken;
-  claims: Record<string, unknown> | null;
+  claims: ClerkJWTClaims | null;
 };
 
 /**

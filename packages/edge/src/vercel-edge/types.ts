@@ -1,5 +1,5 @@
 import type { Session, User } from '@clerk/backend-core';
-import { ServerGetToken } from '@clerk/types';
+import { ClerkJWTClaims, ServerGetToken } from '@clerk/types';
 import type { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 
 export type WithEdgeMiddlewareAuthOptions = {
@@ -37,7 +37,7 @@ export type EdgeMiddlewareAuth = {
   sessionId: string | null;
   userId: string | null;
   getToken: ServerGetToken;
-  claims: Record<string, unknown> | null;
+  claims: ClerkJWTClaims | null;
 };
 
 export type AuthData = {
@@ -46,5 +46,5 @@ export type AuthData = {
   userId: string | null;
   user: User | undefined | null;
   getToken: ServerGetToken;
-  claims: Record<string, unknown> | null;
+  claims: ClerkJWTClaims | null;
 };

@@ -1,5 +1,5 @@
 import type { Session, User } from '@clerk/clerk-sdk-node';
-import { ServerSideAuth } from '@clerk/types';
+import { ClerkJWTClaims, ServerSideAuth } from '@clerk/types';
 import { GetServerSidePropsContext } from 'next';
 
 // TODO: Remove when we're using TS >=4.5
@@ -24,7 +24,7 @@ export type AuthData = {
   userId: string | null;
   user: User | undefined | null;
   getToken: (...args: any) => Promise<string | null>;
-  claims: Record<string, unknown> | null;
+  claims: ClerkJWTClaims | null;
 };
 
 export type ContextWithAuth<Options extends WithServerSideAuthOptions = any> = GetServerSidePropsContext & {
