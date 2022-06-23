@@ -42,7 +42,7 @@ export type WithAuthProp<T> = T & {
     sessionId: string | null;
     userId: string | null;
     getToken: ServerGetToken;
-    claims: Record<string, unknown> | null;
+    claims: ClerkJWTClaims | null;
   };
 };
 
@@ -51,7 +51,7 @@ export type RequireAuthProp<T> = T & {
     sessionId: string;
     userId: string;
     getToken: ServerGetToken;
-    claims: Record<string, unknown>;
+    claims: ClerkJWTClaims;
   };
 };
 

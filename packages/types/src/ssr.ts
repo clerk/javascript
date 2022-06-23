@@ -1,4 +1,5 @@
 import { SessionJSON, UserJSON } from './json';
+import { ClerkJWTClaims } from './jwt';
 import { SessionResource } from './session';
 import { UserResource } from './user';
 
@@ -9,7 +10,7 @@ export type ServerSideAuth = {
   sessionId: string | null;
   userId: string | null;
   getToken: ServerGetToken;
-  claims: Record<string, unknown> | null;
+  claims: ClerkJWTClaims | null;
 };
 
 type SsrSessionState<SessionType> =
