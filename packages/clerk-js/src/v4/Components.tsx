@@ -9,7 +9,8 @@ import { EnvironmentProvider, OptionsProvider } from '../ui/contexts';
 import { CoreClerkContextWrapper } from '../ui/contexts/CoreClerkContextWrapper';
 import Portal from '../ui/portal';
 import { VirtualRouter } from '../ui/router';
-import type { AvailableComponentCtx, AvailableComponentProps } from '../ui/types';
+import type { AvailableComponentProps } from '../ui/types';
+import { AvailableComponentCtx } from '../ui/types';
 import { AppearanceProvider } from './customizables';
 import { SignIn, SignInModal } from './signIn';
 import { SignUp, SignUpModal } from './signUp';
@@ -23,13 +24,13 @@ export type MountComponentRenderer = (
 
 export type ComponentControls = {
   mountComponent: (params: {
+    appearanceKey: Uncapitalize<AvailableComponentNames>;
     name: AvailableComponentNames;
     node: HTMLDivElement;
-    nodeClassName: string;
     props?: AvailableComponentProps;
   }) => void;
   unmountComponent: (params: { node: HTMLDivElement }) => void;
-  updateAppearanceProp: (appearance: Appearance | undefined) => void;
+  updateProps: (params: { appearance?: Appearance | undefined; node?: HTMLDivElement; props?: unknown }) => void;
   openModal: <T extends 'signIn' | 'signUp'>(modal: T, props: T extends 'signIn' ? SignInProps : SignUpProps) => void;
   closeModal: (modal: 'signIn' | 'signUp') => void;
 };
@@ -50,6 +51,7 @@ type AvailableComponentNames = keyof typeof AvailableComponents;
 interface HtmlNodeOptions {
   key: string;
   name: AvailableComponentNames;
+  appearanceKey: Uncapitalize<AvailableComponentNames>;
   props?: AvailableComponentProps;
 }
 
@@ -105,14 +107,13 @@ const Components = (props: ComponentsProps) => {
     nodes: new Map(),
   });
   const { signInModal, signUpModal, nodes } = state;
-  const mountedNodes: JSX.Element[] = [];
 
   React.useEffect(() => {
     componentsControls.mountComponent = params => {
-      const { node, name, props } = params;
+      const { node, name, props, appearanceKey } = params;
       assertDOMElement(node);
       setState(s => {
-        s.nodes.set(node, { key: `p${++portalCt}`, name, props });
+        s.nodes.set(node, { key: `p${++portalCt}`, name, props, appearanceKey });
         return { ...s, nodes };
       });
     };
@@ -125,7 +126,15 @@ const Components = (props: ComponentsProps) => {
       });
     };
 
-    componentsControls.updateAppearanceProp = appearance => {
+    componentsControls.updateProps = ({ appearance, node, props }) => {
+      if (node && props && typeof props === 'object') {
+        const nodeOptions = state.nodes.get(node);
+        if (nodeOptions) {
+          nodeOptions.props = { ...props };
+          setState(s => ({ ...s }));
+          return;
+        }
+      }
       setState(s => ({ ...s, appearance }));
     };
 
@@ -145,19 +154,6 @@ const Components = (props: ComponentsProps) => {
       }
     };
   }, []);
-
-  nodes.forEach(({ key, name, props }, node) => {
-    mountedNodes.push(
-      <Portal<AvailableComponentCtx>
-        componentName={name}
-        key={key}
-        component={AvailableComponents[name]}
-        props={props || {}}
-        node={node}
-        preservedParams={PRESERVED_QUERYSTRING_PARAMS}
-      />,
-    );
-  });
 
   const mountedSignInModal = (
     <Modal
@@ -204,16 +200,32 @@ const Components = (props: ComponentsProps) => {
   );
 
   return (
-    <AppearanceProvider appearance={state.appearance}>
-      <CoreClerkContextWrapper clerk={props.clerk}>
-        <EnvironmentProvider value={props.environment}>
-          <OptionsProvider value={props.options}>
-            {mountedNodes}
-            {signInModal && mountedSignInModal}
-            {signUpModal && mountedSignUpModal}
-          </OptionsProvider>
-        </EnvironmentProvider>
-      </CoreClerkContextWrapper>
-    </AppearanceProvider>
+    <CoreClerkContextWrapper clerk={props.clerk}>
+      <EnvironmentProvider value={props.environment}>
+        <OptionsProvider value={props.options}>
+          {[...nodes].map(([node, component]) => {
+            return (
+              <AppearanceProvider
+                key={component.key}
+                globalAppearance={state.appearance}
+                appearanceKey={component.appearanceKey}
+                appearance={component.props?.appearance}
+              >
+                <Portal<AvailableComponentCtx>
+                  componentName={component.name}
+                  key={component.key}
+                  component={AvailableComponents[component.name]}
+                  props={component.props || {}}
+                  node={node}
+                  preservedParams={PRESERVED_QUERYSTRING_PARAMS}
+                />
+              </AppearanceProvider>
+            );
+          })}
+          {signInModal && mountedSignInModal}
+          {signUpModal && mountedSignUpModal}
+        </OptionsProvider>
+      </EnvironmentProvider>
+    </CoreClerkContextWrapper>
   );
 };

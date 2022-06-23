@@ -16,14 +16,14 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => 
 
   return (
     <>
-      {appearance.options.logoPlacement === 'outside' && <ApplicationLogo />}
+      {appearance.parsedOptions.logoPlacement === 'outside' && <ApplicationLogo />}
       <BaseCard
         elementDescriptor={descriptors.card}
         className={generateFlowPartClassname(flowMetadata)}
         {...props}
         ref={ref}
       >
-        {appearance.options.logoPlacement === 'inside' && <ApplicationLogo />}
+        {appearance.parsedOptions.logoPlacement === 'inside' && <ApplicationLogo />}
         {props.children}
         {logoMarkTag && <PoweredByClerkTag />}
       </BaseCard>
