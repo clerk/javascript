@@ -5,7 +5,6 @@ import { CacheProvider, ThemeProvider } from '@emotion/react';
 import React from 'react';
 
 import { useAppearance } from '../customizables';
-import { useFlowMetadata } from '../elements';
 import { InternalTheme } from '../styledSystem';
 
 const cache = createCache({
@@ -19,10 +18,9 @@ type InternalThemeProviderProps = React.PropsWithChildren<{
 
 export const InternalThemeProvider = (props: InternalThemeProviderProps) => {
   const { parsedInternalTheme } = useAppearance();
-  const { flow } = useFlowMetadata();
   return (
     <CacheProvider value={cache}>
-      <ThemeProvider theme={parsedInternalTheme[flow]}>{props.children}</ThemeProvider>
+      <ThemeProvider theme={parsedInternalTheme}>{props.children}</ThemeProvider>
     </CacheProvider>
   );
 };

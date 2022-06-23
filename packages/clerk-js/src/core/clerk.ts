@@ -196,8 +196,8 @@ export default class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#componentControls);
     this.#componentControls.mountComponent({
       name: 'SignIn',
+      appearanceKey: 'signIn',
       node,
-      nodeClassName: 'cl-sign-in',
       props,
     });
   };
@@ -213,8 +213,8 @@ export default class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#componentControls);
     this.#componentControls.mountComponent({
       name: 'SignUp',
+      appearanceKey: 'signUp',
       node,
-      nodeClassName: 'cl-sign-up',
       props,
     });
   };
@@ -230,8 +230,8 @@ export default class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#componentControls);
     this.#componentControls.mountComponent({
       name: 'UserProfile',
+      appearanceKey: 'userProfile',
       node,
-      nodeClassName: 'cl-user-profile',
       props,
     });
   };
@@ -247,8 +247,8 @@ export default class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#componentControls);
     this.#componentControls.mountComponent({
       name: 'UserButton',
+      appearanceKey: 'userButton',
       node,
-      nodeClassName: 'cl-user-button',
       props,
     });
   };
@@ -752,19 +752,19 @@ export default class Clerk implements ClerkInterface {
     return this.#environment;
   }
 
-  __unstable__onBeforeRequest(callback: FapiRequestCallback<any>): void {
+  __unstable__onBeforeRequest = (callback: FapiRequestCallback<any>): void => {
     this.#fapiClient.onBeforeRequest(callback);
-  }
+  };
 
-  __unstable__onAfterResponse(callback: FapiRequestCallback<any>): void {
+  __unstable__onAfterResponse = (callback: FapiRequestCallback<any>): void => {
     this.#fapiClient.onAfterResponse(callback);
-  }
+  };
 
-  __unstable__updateProps({ appearance }: any): void {
+  __unstable__updateProps = (props: any): void => {
     // The expect-error directive below is safe since `updateAppearanceProp` is only used
     // in the v4 build. This will be removed when v4 becomes the main stable version
-    this.#componentControls?.updateAppearanceProp(appearance);
-  }
+    this.#componentControls?.updateProps(props);
+  };
 
   #loadInBrowser = async (): Promise<void> => {
     this.#authService = new AuthenticationService(this);

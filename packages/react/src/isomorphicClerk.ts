@@ -247,14 +247,13 @@ export default class IsomorphicClerk {
     }
   }
 
-  __unstable__updateProps(props: any): any {
+  __unstable__updateProps = (props: any): any => {
     if (this.clerkjs) {
       (this.clerkjs as any).__unstable__updateProps(props);
     } else {
       return undefined;
     }
-  }
-
+  };
 
   /**
    * `setActive` can be used to set the active session and/or organization.

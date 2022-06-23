@@ -122,6 +122,8 @@ export type ElementsConfig = {
   'socialButtons-buttonBlockArrow': WithOptions<OAuthProvider | Web3Provider, never, never>;
   'socialButtons-logo': WithOptions<OAuthProvider | Web3Provider, LoadingState | DisabledState, never>;
 
+  divider: WithOptions<never, never, never>;
+
   form: WithOptions<never, ErrorState, never>;
   'form-fieldRow': WithOptions<never, never, never>;
   'form-field': WithOptions<FieldId, ErrorState | DisabledState, never>;

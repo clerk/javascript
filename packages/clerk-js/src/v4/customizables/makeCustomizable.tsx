@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { useFlowMetadata } from '../elements/contexts';
 import { ThemableCssProp } from '../styledSystem';
 import { useAppearance } from './AppearanceContext';
 import { appendEmojiSeparator, generateClassName } from './classGeneration';
@@ -18,7 +17,6 @@ type CustomizablePrimitive<T> = React.FunctionComponent<Customizable<T>>;
 export const makeCustomizable = <P,>(Component: React.FunctionComponent<P>): CustomizablePrimitive<P> => {
   const customizableComponent = React.forwardRef((props: Customizable<any>, ref) => {
     const { elementDescriptor, elementId, sx, className, ...restProps } = props;
-    const flowMetadata = useFlowMetadata();
     const { parsedElements } = useAppearance();
 
     if (!elementDescriptor) {
@@ -32,7 +30,7 @@ export const makeCustomizable = <P,>(Component: React.FunctionComponent<P>): Cus
       );
     }
 
-    const generatedStyles = generateClassName(parsedElements, elementDescriptor, elementId, props, flowMetadata);
+    const generatedStyles = generateClassName(parsedElements, elementDescriptor, elementId, props);
     const generatedClassname = appendEmojiSeparator(generatedStyles.className, className);
     generatedStyles.css.unshift(sx);
 

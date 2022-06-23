@@ -18,7 +18,6 @@ export const generateClassName = (
   elemDescriptor: ElementDescriptor,
   elemId: ElementId | undefined,
   props: PropsWithState | undefined,
-  flowMetadata: FlowMetadata,
 ) => {
   const state = getElementState(props);
   let className = '';
@@ -28,8 +27,8 @@ export const generateClassName = (
   className = addClerkTargettableIdClassname(className, elemDescriptor, elemId);
   className = addClerkTargettableStateClass(className, state);
 
-  className = addUserProvidedClassnames(className, parsedElements, elemDescriptor, elemId, state, flowMetadata);
-  addUserProvidedStyleRules(css, parsedElements, elemDescriptor, elemId, state, flowMetadata);
+  className = addUserProvidedClassnames(className, parsedElements, elemDescriptor, elemId, state);
+  addUserProvidedStyleRules(css, parsedElements, elemDescriptor, elemId, state);
   return { className, css };
 };
 
@@ -59,10 +58,10 @@ const addUserProvidedStyleRules = (
   elemDescriptor: ElementDescriptor,
   elemId: ElementId | undefined,
   state: ElementState | undefined,
-  flowMetadata: FlowMetadata,
 ) => {
-  addRulesFromElements(css, parsedElements.base, elemDescriptor, elemId, state);
-  addRulesFromElements(css, parsedElements[flowMetadata.flow], elemDescriptor, elemId, state);
+  parsedElements.forEach(elements => {
+    addRulesFromElements(css, elements, elemDescriptor, elemId, state);
+  });
 };
 
 const addUserProvidedClassnames = (
@@ -71,10 +70,10 @@ const addUserProvidedClassnames = (
   elemDescriptor: ElementDescriptor,
   elemId: ElementId | undefined,
   state: ElementState | undefined,
-  flowMetadata: FlowMetadata,
 ) => {
-  cn = addClassnamesFromElements(cn, parsedElements.base, elemDescriptor, elemId, state);
-  cn = addClassnamesFromElements(cn, parsedElements[flowMetadata.flow], elemDescriptor, elemId, state);
+  parsedElements.forEach(elements => {
+    cn = addClassnamesFromElements(cn, elements, elemDescriptor, elemId, state);
+  });
   return cn;
 };
 

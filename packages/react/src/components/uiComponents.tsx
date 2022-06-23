@@ -35,6 +35,12 @@ import { withClerk } from './withClerk';
 class Portal extends React.PureComponent<MountProps, {}> {
   private portalRef = React.createRef<HTMLDivElement>();
 
+  componentDidUpdate(prevProps: Readonly<MountProps>) {
+    if (prevProps.props.appearance !== this.props.props.appearance) {
+      this.props.updateProps({ node: this.portalRef.current, props: this.props.props });
+    }
+  }
+
   componentDidMount() {
     if (this.portalRef.current) {
       this.props.mount(this.portalRef.current, this.props.props);
@@ -57,6 +63,7 @@ export const SignIn = withClerk(({ clerk, ...props }: WithClerkProp<SignInProps>
     <Portal
       mount={clerk.mountSignIn}
       unmount={clerk.unmountSignIn}
+      updateProps={(clerk as any).__unstable__updateProps}
       props={props}
     />
   );
@@ -67,6 +74,7 @@ export const SignUp = withClerk(({ clerk, ...props }: WithClerkProp<SignUpProps>
     <Portal
       mount={clerk.mountSignUp}
       unmount={clerk.unmountSignUp}
+      updateProps={(clerk as any).__unstable__updateProps}
       props={props}
     />
   );
@@ -77,6 +85,7 @@ export const UserProfile = withClerk(({ clerk, ...props }: WithClerkProp<UserPro
     <Portal
       mount={clerk.mountUserProfile}
       unmount={clerk.unmountUserProfile}
+      updateProps={(clerk as any).__unstable__updateProps}
       props={props}
     />
   );
@@ -87,6 +96,7 @@ export const UserButton = withClerk(({ clerk, ...props }: WithClerkProp<UserButt
     <Portal
       mount={clerk.mountUserButton}
       unmount={clerk.unmountUserButton}
+      updateProps={(clerk as any).__unstable__updateProps}
       props={props}
     />
   );
