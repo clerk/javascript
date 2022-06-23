@@ -1,4 +1,5 @@
 import { AuthStatus, Base, createGetToken, createSignedOutState } from '@clerk/backend-core';
+import { ClerkJWTClaims } from '@clerk/types';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 
 import { ClerkAPI } from './ClerkAPI';
@@ -129,7 +130,7 @@ export function withEdgeMiddlewareAuth(
       sessionId,
       userId,
       getToken,
-      claims: sessionClaims as Record<string, unknown>,
+      claims: sessionClaims as ClerkJWTClaims,
     });
     return handler(authRequest, event);
   };
