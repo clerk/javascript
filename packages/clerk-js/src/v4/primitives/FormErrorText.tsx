@@ -24,7 +24,7 @@ export const FormErrorText = (props: FormErrorTextProps) => {
 
   return (
     <Text
-      variant='error'
+      variant='textSmallRegular'
       colorScheme='danger'
       aria-live='polite'
       id={errorMessageId}

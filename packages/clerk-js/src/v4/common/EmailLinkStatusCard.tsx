@@ -67,7 +67,7 @@ const StatusRow = (props: { status: VerificationStatus }) => {
         <>
           <StatusIcon status={props.status} />
           <Text
-            variant='subheading'
+            variant='textRegularRegular'
             colorScheme='neutral'
           >
             You may close this tab

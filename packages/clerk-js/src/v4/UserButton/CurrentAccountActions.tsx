@@ -71,7 +71,7 @@ export const Action = (props: ActionProps) => {
       </Flex>
       <Text
         as='span'
-        variant='hint'
+        variant='textSmallRegular'
         colorScheme='neutral'
       >
         {label}

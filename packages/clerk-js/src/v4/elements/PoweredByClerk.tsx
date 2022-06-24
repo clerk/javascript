@@ -15,7 +15,7 @@ export const PoweredByClerkText = React.memo(() => {
       sx={theme => ({ color: theme.colors.$blackAlpha300 })}
     >
       <Text
-        variant='label'
+        variant='textSmallMedium'
         sx={{ color: 'inherit' }}
       >
         Secured by

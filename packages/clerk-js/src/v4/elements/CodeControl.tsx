@@ -206,7 +206,7 @@ const SingleCharInput = React.forwardRef<
       maxLength={1}
       sx={theme => ({
         textAlign: 'center',
-        ...common.textVariants(theme).largeInput,
+        ...common.textVariants(theme).textXLargeMedium,
         padding: `${theme.space.$0x5} 0`,
         maxWidth: theme.sizes.$7,
         borderRadius: theme.radii.$none,

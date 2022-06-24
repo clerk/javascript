@@ -33,7 +33,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   },
   defaultVariants: {
     colorScheme: 'primary',
-    variant: 'link',
+    variant: 'textSmallRegular',
   },
 }));
 

@@ -67,7 +67,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
         elementDescriptor={textElementDescriptor}
         elementId={textElementId}
         as='span'
-        variant='link'
+        variant='textSmallRegular'
       >
         {children}
       </Text>

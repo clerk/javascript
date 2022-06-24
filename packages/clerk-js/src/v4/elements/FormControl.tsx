@@ -67,7 +67,7 @@ export const FormControl = (props: FormControlProps) => {
             elementDescriptor={descriptors.formFieldAction}
             elementId={descriptors.formFieldLabel.setId(id)}
             isDisabled={isDisabled}
-            variant='link'
+            variant='textSmallRegular'
             colorScheme='primary'
             onClick={e => {
               e.preventDefault();

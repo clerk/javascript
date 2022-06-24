@@ -37,14 +37,14 @@ export const UserPreview = (props: UserPreviewProps) => {
         sx={{ textAlign: 'left' }}
       >
         <Text
-          variant={size === 'md' ? 'secondaryHeading' : 'label'}
+          variant={size === 'md' ? 'textRegularMedium' : 'textSmallMedium'}
           truncate
         >
           {name || identifier}
         </Text>
         {name && identifier && (
           <Text
-            variant='secondarySubheading'
+            variant='textSmallRegular'
             colorScheme='neutral'
             truncate
           >
