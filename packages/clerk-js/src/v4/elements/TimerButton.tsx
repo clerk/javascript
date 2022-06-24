@@ -47,7 +47,7 @@ export const TimerButton = (props: TimerButtonProps) => {
 
   return (
     <Button
-      variant='link'
+      variant='textSmallRegular'
       {...rest}
       isDisabled={remainingSeconds > 0 || props.isDisabled}
       onClick={handleOnClick}

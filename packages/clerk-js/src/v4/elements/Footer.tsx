@@ -31,7 +31,7 @@ const FooterActionText = (props: React.PropsWithChildren<any>): JSX.Element => {
       elementDescriptor={descriptors.footerActionText}
       {...props}
       as='span'
-      variant='link'
+      variant='textSmallRegular'
       colorScheme='neutral'
     />
   );

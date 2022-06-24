@@ -47,7 +47,7 @@ const _UserButton = () => {
 const UserButtonTopLevelIdentifier = () => {
   const user = useCoreUser();
   const { showName } = useUserButtonContext();
-  return showName ? <Text variant='secondaryHeading'>{getFullName(user) || getIdentifier(user)}</Text> : null;
+  return showName ? <Text variant='textRegularMedium'>{getFullName(user) || getIdentifier(user)}</Text> : null;
 };
 
 export const UserButton = withCoreUserGuard(withCardStateProvider(_UserButton));

@@ -35,7 +35,7 @@ export const IdentityPreview = (props: IdentityPreviewProps) => {
           size={theme => theme.sizes.$5}
         />
         <Text
-          variant='hint'
+          variant='textSmallRegular'
           colorScheme='neutral'
           truncate
         >

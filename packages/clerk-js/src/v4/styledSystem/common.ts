@@ -56,16 +56,12 @@ const textVariants = (theme: InternalTheme) => {
   } as const;
 
   return {
-    label: textSmallMedium,
-    error: textSmallRegular,
-    link: textSmallRegular,
-    hint: textSmallRegular,
-    input: textSmallRegular,
-    buttonLabel: textButtonSmall,
-    subheading: textRegularRegular,
-    largeInput: textXLargeMedium,
-    secondaryHeading: textRegularMedium,
-    secondarySubheading: textSmallRegular,
+    textSmallRegular,
+    textSmallMedium,
+    textButtonSmall,
+    textRegularRegular,
+    textXLargeMedium,
+    textRegularMedium,
     textExtraSmallMedium,
     textExtraSmallRegular,
   } as const;
