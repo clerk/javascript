@@ -195,27 +195,28 @@ export type Variables = {
   /**
    * The background color for the card container.
    */
-  colorBackground?: string;
+  colorBackground?: CssColor;
   /**
    * The default text color inside input elements. To customise the input background color instead, use {@link Variables.colorInputBackground}.
    * @default The value of {@link Variables.colorText}
    */
   colorInputText?: CssColor;
   /**
-   * The background color for all the input elements.
+   * The background color for all input elements.
    */
-  colorInputBackground?: string;
+  colorInputBackground?: CssColor;
   /**
    * The default font that will be used in all components.
    */
   fontFamily?: FontFamily;
   /**
-   * The size that will be used as the base to calculate the `small` and `large` font sizes
-   * @default 16px
+   * The value will be used as the base `md` to calculate all the other scale values (`2xs`, `xs`, `sm`, `lg` and `xl`).
+   * By default, this value is relative to the root fontSize of the html element.
+   * @default 1rem;
    */
   fontSize?: CssLengthUnit;
   /**
-   * The size that will be used as the `md` borderRadius value. This is used as the base to calculate the `lg`, `xl`, `2xl`
+   * The size that will be used as the `md` base borderRadius value. This is used as the base to calculate the `lg`, `xl`, `2xl`
    * our components use. As a general rule, the bigger an element is, the larger its borderRadius is going to be.
    * eg: the Card element uses '2xl'
    * @default 0.375rem

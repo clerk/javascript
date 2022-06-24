@@ -3,7 +3,13 @@ import { Appearance, DeepPartial, Elements, Options, Theme } from '@clerk/types'
 import { createInternalTheme, defaultInternalTheme } from '../foundations';
 import { InternalTheme } from '../styledSystem';
 import { fastDeepMergeAndReplace } from '../utils';
-import { createColorScales, createRadiiUnits, createSpaceScale, reverseAlphaScalesIfNeeded } from './parseVariables';
+import {
+  createColorScales,
+  createFontSizeScale,
+  createRadiiUnits,
+  createSpaceScale,
+  reverseAlphaScalesIfNeeded,
+} from './parseVariables';
 
 export type ParsedElements = Elements[];
 export type ParsedInternalTheme = InternalTheme;
@@ -61,5 +67,6 @@ const createInternalThemeFromVariables = (theme: Theme | undefined): DeepPartial
   const colors = { ...createColorScales(theme), ...reverseAlphaScalesIfNeeded(theme) };
   const radii = { ...createRadiiUnits(theme) };
   const space = { ...createSpaceScale(theme) };
-  return createInternalTheme({ colors, radii, space } as any);
+  const fontSizes = { ...createFontSizeScale(theme) };
+  return createInternalTheme({ colors, radii, space, fontSizes } as any);
 };
