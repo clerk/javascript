@@ -25,7 +25,7 @@ export const IdentityPreview = (props: IdentityPreviewProps) => {
           maxWidth: '100%',
           backgroundColor: theme.colors.$blackAlpha20,
           padding: `${theme.space.$1x5} ${theme.space.$4}`,
-          borderRadius: theme.radii.$3xl,
+          borderRadius: theme.radii.$2xl,
           border: `${theme.borders.$normal} ${theme.colors.$blackAlpha200}`,
         })}
         {...rest}

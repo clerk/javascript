@@ -16,11 +16,12 @@ export type ColorScale<T = string> = Record<Shade, T>;
 
 export type ColorScaleWithRequiredBase<T = string> = Partial<ColorScale<T>> & { '500': T };
 
-export type ColorOrScale = string | ColorScaleWithRequiredBase;
-type Color = string | TransparentColor | BuiltInColors;
+export type CssColorOrScale = string | ColorScaleWithRequiredBase;
+type CssColor = string | TransparentColor | BuiltInColors;
+type CssLengthUnit = string;
 
-export type FontSize = string | { small?: string; base: string; large?: string };
-export type BorderRadius = string | { small?: string; base: string; large?: string };
+// export type FontSize = string | { small?: string; base: string; large?: string };
+// export type BorderRadius = string | { small?: string; base: string; large?: string };
 
 type LoadingState = 'loading';
 type DisabledState = 'disabled';
@@ -162,35 +163,35 @@ export type Variables = {
   /**
    * The primary color used throughout the components. Set this to your brand color.
    */
-  colorPrimary?: ColorOrScale;
+  colorPrimary?: CssColorOrScale;
   /**
    * The color used to indicate errors or destructive actions. Set this to your brand's danger color.
    */
-  colorDanger?: ColorOrScale;
+  colorDanger?: CssColorOrScale;
   /**
    * The color used to indicate an action that completed successfully or a positive result.
    */
-  colorSuccess?: ColorOrScale;
+  colorSuccess?: CssColorOrScale;
   /**
    * The color used for potentially destructive actions or when the user's attention is required.
    */
-  colorWarning?: ColorOrScale;
+  colorWarning?: CssColorOrScale;
   /**
    * The default text color.
    * @default black
    */
-  colorText?: Color;
+  colorText?: CssColor;
   /**
    * The color of text appearing on top of an element that with a background color of {@link Variables.colorPrimary},
    * eg: solid primary buttons.
    * @default white
    */
-  colorTextOnPrimaryBackground?: Color;
+  colorTextOnPrimaryBackground?: CssColor;
   /**
    * The text color for elements of lower importance, eg: a subtitle text.
    * @default A lighter shade of {@link Variables.colorText}
    */
-  colorTextSecondary?: Color;
+  colorTextSecondary?: CssColor;
   /**
    * The background color for the card container.
    */
@@ -199,7 +200,7 @@ export type Variables = {
    * The default text color inside input elements. To customise the input background color instead, use {@link Variables.colorInputBackground}.
    * @default The value of {@link Variables.colorText}
    */
-  colorInputText?: Color;
+  colorInputText?: CssColor;
   /**
    * The background color for all the input elements.
    */
@@ -212,11 +213,14 @@ export type Variables = {
    * The size that will be used as the base to calculate the `small` and `large` font sizes
    * @default 16px
    */
-  fontSize?: FontSize;
+  fontSize?: CssLengthUnit;
   /**
-   * The size that will be used as the base to calculate the `small` and `large` border sizes
+   * The size that will be used as the `md` borderRadius value. This is used as the base to calculate the `lg`, `xl`, `2xl`
+   * our components use. As a general rule, the bigger an element is, the larger its borderRadius is going to be.
+   * eg: the Card element uses '2xl'
+   * @default 0.375rem
    */
-  borderRadius?: BorderRadius;
+  borderRadius?: CssLengthUnit;
   /**
    * The shade that will be used for all `alpha` black and white colors. To achieve sufficient contract,
    * light themes should use `dark` shades, while dark themes should use `light` shades. This option applies to borders,
