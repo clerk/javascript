@@ -2,6 +2,7 @@ import { Theme } from '@clerk/types';
 
 import { blackAlpha, whiteAlpha } from '../foundations';
 import { spaceScaleKeys } from '../foundations/sizes';
+import { fontSizes } from '../foundations/typography';
 import { colors, removeUndefinedProps } from '../utils';
 import { colorOptionToHslaScale } from './colorOptionToHslaScale';
 
@@ -44,7 +45,7 @@ export const createRadiiUnits = (theme: Theme) => {
   }
 
   const md = borderRadius === 'none' ? '0' : borderRadius;
-  const { numericValue, unit } = splitCssUnit(md);
+  const { numericValue, unit = 'rem' } = splitCssUnit(md);
   return {
     md,
     lg: percentage(numericValue, 0.35).toString() + unit,
@@ -68,9 +69,25 @@ export const createSpaceScale = (theme: Theme) => {
   );
 };
 
+export const createFontSizeScale = (theme: Theme): Record<keyof typeof fontSizes, string> | undefined => {
+  const { fontSize } = theme.variables || {};
+  if (fontSize === undefined) {
+    return;
+  }
+  const { numericValue, unit = 'rem' } = splitCssUnit(fontSize);
+  return {
+    '2xs': (numericValue * 0.625).toString() + unit,
+    xs: (numericValue * 0.75).toString() + unit,
+    sm: (numericValue * 0.875).toString() + unit,
+    md: fontSize,
+    lg: (numericValue * 1.125).toString() + unit,
+    xl: (numericValue * 1.25).toString() + unit,
+  };
+};
+
 const splitCssUnit = (str: string) => {
   const numericValue = Number.parseFloat(str);
-  const unit = str.replace(numericValue.toString(), '');
+  const unit = str.replace(numericValue.toString(), '') || undefined;
   return { numericValue, unit };
 };
 

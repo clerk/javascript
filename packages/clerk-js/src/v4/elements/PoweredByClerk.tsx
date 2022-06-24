@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useEnvironment } from '../../ui/contexts';
-import { Flex, Icon, Text } from '../customizables';
+import { Flex, Icon, Link, Text } from '../customizables';
 import { LogoMark } from '../icons';
 import { InternalTheme } from '../styledSystem';
 
@@ -68,7 +68,7 @@ export const PoweredByClerkTag = React.memo(
       >
         <Text
           variant='textExtraSmallRegular'
-          sx={theme => ({ color: 'inherit', letterSpacing: theme.space.$none })}
+          sx={theme => ({ color: 'inherit', letterSpacing: theme.space.$none, fontSize: '0.625rem' })}
         >
           Secured by
         </Text>
@@ -80,10 +80,11 @@ export const PoweredByClerkTag = React.memo(
 
 const LogoMarkIconLink = () => {
   return (
-    <a
+    <Link
       href='https://www.clerk.dev?utm_source=clerk&utm_medium=components'
-      target='_blank'
-      rel='noopener'
+      colorScheme='neutral'
+      sx={{ color: 'inherit' }}
+      isExternal
     >
       <Icon
         icon={LogoMark}
@@ -93,6 +94,6 @@ const LogoMarkIconLink = () => {
           transform: 'translateY(1px)',
         })}
       />
-    </a>
+    </Link>
   );
 };

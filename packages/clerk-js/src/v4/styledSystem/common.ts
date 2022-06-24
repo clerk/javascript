@@ -19,7 +19,7 @@ const textVariants = (theme: InternalTheme) => {
   const textExtraSmallRegular = {
     fontWeight: theme.fontWeights.$normal,
     fontStyle: theme.fontStyles.$normal,
-    fontSize: theme.fontSizes.$xxs,
+    fontSize: theme.fontSizes.$2xs,
     letterSpacing: theme.letterSpacings.$normal,
     lineHeight: theme.lineHeights.$base,
   } as const;
@@ -69,7 +69,7 @@ const textVariants = (theme: InternalTheme) => {
 
 const fontSizeVariants = (theme: InternalTheme) => {
   return {
-    xss: { fontSize: theme.fontSizes.$xxs },
+    xss: { fontSize: theme.fontSizes.$2xs },
     xs: { fontSize: theme.fontSizes.$xs },
     sm: { fontSize: theme.fontSizes.$sm },
   } as const;
