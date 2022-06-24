@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.17.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.16.0...@clerk/types@2.17.0) (2022-06-24)
+
+### Features
+
+- **clerk-js:** Add supportEmail property option ([71eff74](https://github.com/clerkinc/javascript/commit/71eff74383bcd1c3044cfd42ceae70de5b246e68))
+- **types,backend-core:** Add org_role, org_id claims ([03da4cf](https://github.com/clerkinc/javascript/commit/03da4cffee2e5c493d0219d417842a13e066ffe6))
+- **types,backend-core:** Consolidate Clerk issued JWT claims under ClerkJWTClaims ([e6bc9fb](https://github.com/clerkinc/javascript/commit/e6bc9fb380d38d7f89cc2059e0211b0ad55bd1a5))
+
+### Bug Fixes
+
+- **edge,nextjs,remix,clerk-sdk-node,types:** Correct SSR claims typing ([09c147c](https://github.com/clerkinc/javascript/commit/09c147c196c08e64794423f9eae791bfe453b858))
+
 ## [2.16.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.16.0-staging.0...@clerk/types@2.16.0) (2022-06-16)
 
 **Note:** Version bump only for package @clerk/types

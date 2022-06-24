@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.6.8](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@3.6.7...@clerk/nextjs@3.6.8) (2022-06-24)
+
+### Bug Fixes
+
+- **edge,nextjs,remix,clerk-sdk-node,types:** Correct SSR claims typing ([09c147c](https://github.com/clerkinc/javascript/commit/09c147c196c08e64794423f9eae791bfe453b858))
+
 ### [3.6.7](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@3.6.7-staging.0...@clerk/nextjs@3.6.7) (2022-06-16)
 
 **Note:** Version bump only for package @clerk/nextjs

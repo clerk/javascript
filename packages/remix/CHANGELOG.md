@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.5.3](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.5.2...@clerk/remix@0.5.3) (2022-06-24)
+
+### Bug Fixes
+
+- **edge,nextjs,remix,clerk-sdk-node,types:** Correct SSR claims typing ([09c147c](https://github.com/clerkinc/javascript/commit/09c147c196c08e64794423f9eae791bfe453b858))
+
 ### [0.5.2](https://github.com/clerkinc/javascript/compare/@clerk/remix@0.5.2-staging.0...@clerk/remix@0.5.2) (2022-06-16)
 
 **Note:** Version bump only for package @clerk/remix

@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.9.2...@clerk/backend-core@1.10.0) (2022-06-24)
+
+### Features
+
+- **types,backend-core:** Add org_role, org_id claims ([03da4cf](https://github.com/clerkinc/javascript/commit/03da4cffee2e5c493d0219d417842a13e066ffe6))
+- **types,backend-core:** Consolidate Clerk issued JWT claims under ClerkJWTClaims ([e6bc9fb](https://github.com/clerkinc/javascript/commit/e6bc9fb380d38d7f89cc2059e0211b0ad55bd1a5))
+
 ### [1.9.2](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.9.2-staging.0...@clerk/backend-core@1.9.2) (2022-06-16)
 
 **Note:** Version bump only for package @clerk/backend-core

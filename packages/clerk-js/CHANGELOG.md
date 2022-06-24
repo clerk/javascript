@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.15.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.14.0...@clerk/clerk-js@3.15.0) (2022-06-24)
+
+### Features
+
+- **clerk-js:** Add supportEmail property option ([71eff74](https://github.com/clerkinc/javascript/commit/71eff74383bcd1c3044cfd42ceae70de5b246e68))
+
 ## [3.14.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@3.14.0-staging.1...@clerk/clerk-js@3.14.0) (2022-06-16)
 
 **Note:** Version bump only for package @clerk/clerk-js
