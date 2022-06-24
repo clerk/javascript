@@ -281,16 +281,46 @@ const toHslaColor = (str: string): HslaColor => {
   }
 };
 
-const toHslaString = (hsla: HslaColor): HslaColorString => {
-  return hslaColorToHslaString(hsla);
+const toHslaString = (hsla: HslaColor | string): HslaColorString => {
+  return typeof hsla === 'string' ? hslaColorToHslaString(toHslaColor(hsla)) : hslaColorToHslaString(hsla);
 };
 
 const changeHslaLightness = (color: HslaColor, num: number): HslaColor => {
   return { ...color, l: color.l + num };
 };
 
+const changeHslaAlpha = (color: HslaColor, num: number): HslaColor => {
+  return { ...color, a: color.a ? color.a - num : undefined };
+};
+
+const lighten = (color: string | undefined, percentage = 0): string | undefined => {
+  if (!color) {
+    return undefined;
+  }
+  const hsla = toHslaColor(color);
+  return toHslaString(changeHslaLightness(hsla, hsla.l * percentage));
+};
+
+const makeSolid = (color: string | undefined): string | undefined => {
+  if (!color) {
+    return undefined;
+  }
+  return toHslaString({ ...toHslaColor(color), a: 1 });
+};
+
+const makeTransparent = (color: string | undefined, percentage = 0): string | undefined => {
+  if (!color) {
+    return undefined;
+  }
+  const hsla = toHslaColor(color);
+  return toHslaString(changeHslaAlpha(hsla, (hsla.a ?? 1) * percentage));
+};
+
 export const colors = {
   toHslaColor,
   toHslaString,
   changeHslaLightness,
+  lighten,
+  makeTransparent,
+  makeSolid,
 };

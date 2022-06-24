@@ -16,3 +16,5 @@ export * from './PoweredByClerk';
 export * from './ApplicationLogo';
 export * from './Card';
 export * from './ArrowBlockButton';
+export * from './ReversibleContainer';
+export * from './Divider';

@@ -43,7 +43,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
       sx={theme => ({
         position: 'relative',
         justifyContent: 'flex-start',
-        color: theme.colors.$text500,
+        color: theme.colors.$colorText,
         borderColor: theme.colors.$blackAlpha200,
         '--arrow-opacity': '0',
         '--arrow-transform': `translateX(-${theme.space.$2});`,
@@ -78,7 +78,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
         sx={theme => ({
           position: 'absolute',
           right: '1rem',
-          color: theme.colors.$gray500,
+          color: theme.colors.$blackAlpha500,
           transition: 'all 100ms ease',
           opacity: `var(--arrow-opacity)`,
           transform: `var(--arrow-transform)`,

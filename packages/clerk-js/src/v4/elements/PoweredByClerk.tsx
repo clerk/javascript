@@ -55,12 +55,11 @@ export const PoweredByClerkTag = React.memo(
         sx={theme => ({
           border: theme.borders.$normal,
           borderColor: theme.colors.$whiteAlpha200,
-          color: theme.colors.$white,
+          color: theme.colors.$colorTextOnPrimaryBackground,
           backgroundColor: theme.colors.$primary500,
           padding: `${theme.space.$1x5} ${theme.space.$4}`,
           position: 'absolute',
           transformOrigin: 'left bottom',
-          backgroundClip: 'padding-box',
           left: 0,
           ...(placement === 'top-left' ? topLeft(theme) : bottomLeft(theme)),
         })}
