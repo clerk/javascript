@@ -52,7 +52,7 @@ export const FormControl = (props: FormControlProps) => {
         align='center'
         elementDescriptor={descriptors.formFieldLabelRow}
         elementId={descriptors.formFieldLabelRow.setId(id)}
-        sx={theme => ({ marginBottom: theme.space.$1x5 })}
+        sx={theme => ({ marginBottom: theme.space.$1 })}
       >
         <FormLabel
           elementDescriptor={descriptors.formFieldLabel}

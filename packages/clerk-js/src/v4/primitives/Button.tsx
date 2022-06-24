@@ -27,9 +27,9 @@ const { applyVariants, filterProps } = createVariants(theme => {
     variants: {
       textVariant: common.textVariants(theme),
       size: {
-        iconLg: { height: theme.sizes.$14, width: theme.sizes.$14 },
-        xs: { height: theme.sizes.$1x5, padding: `${theme.space.$1x5} ${theme.space.$1x5}` },
-        md: { height: theme.sizes.$9, padding: `${theme.space.$2x5} ${theme.space.$4}` },
+        iconLg: { minHeight: theme.sizes.$14, width: theme.sizes.$14 },
+        xs: { minHeight: theme.sizes.$1x5, padding: `${theme.space.$1x5} ${theme.space.$1x5}` },
+        md: { minHeight: theme.sizes.$9, padding: `${theme.space.$2x5} ${theme.space.$4}` },
       },
       colorScheme: {
         primary: {
@@ -83,7 +83,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
         },
         ghostIcon: {
           color: vars.accent,
-          height: theme.sizes.$6,
+          minHeight: theme.sizes.$6,
           width: theme.sizes.$6,
           padding: `${theme.space.$1} ${theme.space.$1}`,
           '&:hover': { color: vars.accentDark },
@@ -91,6 +91,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
         },
         link: {
           ...common.textVariants(theme).link,
+          minHeight: 'fit-content',
           height: 'fit-content',
           width: 'fit-content',
           textTransform: 'none',

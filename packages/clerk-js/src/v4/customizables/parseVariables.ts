@@ -1,6 +1,7 @@
 import { Theme } from '@clerk/types';
 
 import { blackAlpha, whiteAlpha } from '../foundations';
+import { spaceScaleKeys } from '../foundations/sizes';
 import { colors, removeUndefinedProps } from '../utils';
 import { colorOptionToHslaScale } from './colorOptionToHslaScale';
 
@@ -43,14 +44,34 @@ export const createRadiiUnits = (theme: Theme) => {
   }
 
   const md = borderRadius === 'none' ? '0' : borderRadius;
-  const mdNum = Number.parseFloat(md);
-  const mdUnit = md.replace(mdNum.toString(), '');
+  const { numericValue, unit } = splitCssUnit(md);
   return {
     md,
-    lg: percentage(mdNum, 0.35).toString() + mdUnit,
-    xl: percentage(mdNum, 1.7).toString() + mdUnit,
-    '2xl': percentage(mdNum, 2.35).toString() + mdUnit,
+    lg: percentage(numericValue, 0.35).toString() + unit,
+    xl: percentage(numericValue, 1.7).toString() + unit,
+    '2xl': percentage(numericValue, 2.35).toString() + unit,
   };
+};
+
+export const createSpaceScale = (theme: Theme) => {
+  const { spacingUnit } = theme.variables || {};
+  if (spacingUnit === undefined) {
+    return;
+  }
+  const { numericValue, unit } = splitCssUnit(spacingUnit);
+  return Object.fromEntries(
+    spaceScaleKeys.map(k => {
+      const num = Number.parseFloat(k.replace('x', '.'));
+      const percentage = (num / 0.5) * 0.125;
+      return [k, (numericValue * percentage).toString() + unit];
+    }),
+  );
+};
+
+const splitCssUnit = (str: string) => {
+  const numericValue = Number.parseFloat(str);
+  const unit = str.replace(numericValue.toString(), '');
+  return { numericValue, unit };
 };
 
 const percentage = (base: number, perc: number) => {

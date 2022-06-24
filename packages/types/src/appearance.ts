@@ -228,6 +228,11 @@ export type Variables = {
    * @default 'dark'
    */
   alphaShadesMode?: 'light' | 'dark';
+  /**
+   * The base spacing unit that all margins, paddings and gaps between the elements are derived from.
+   * @default 1rem
+   */
+  spacingUnit?: CssLengthUnit;
 };
 
 export type Theme = {

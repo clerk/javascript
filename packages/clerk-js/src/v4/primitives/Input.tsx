@@ -8,7 +8,7 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
   base: {
     margin: 0,
     outline: 0,
-    padding: `${theme.sizes.$2x5} ${theme.sizes.$4}`,
+    padding: `${theme.space.$2x5} ${theme.space.$4}`,
     backgroundColor: theme.colors.$colorInputBackground,
     color: theme.colors.$colorInputText,
     width: '100%',

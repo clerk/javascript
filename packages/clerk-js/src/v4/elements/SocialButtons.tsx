@@ -81,7 +81,7 @@ const ButtonGrid = (props: React.PropsWithChildren<any>) => {
       sx={theme => ({
         '--cl-socialButtonSize': theme.sizes.$12,
         '--cl-socialButtonsPerLine': 'auto-fill',
-        gridTemplateColumns: 'repeat(var(--cl-socialButtonsPerLine), minmax(var(--cl-socialButtonSize), 1fr))',
+        gridTemplateColumns: 'repeat(var(--cl-socialButtonsPerLine), var(--cl-socialButtonSize))',
         gridAutoRows: 'var(--cl-socialButtonSize)',
       })}
     >
