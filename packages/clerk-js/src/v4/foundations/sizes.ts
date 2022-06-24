@@ -47,17 +47,12 @@ const sizes = Object.freeze({
 } as const);
 
 const radii = Object.freeze({
-  card: '1rem',
-  none: '0', // 0px
-  sm: '0.125rem', // 2px
-  base: '0.25rem', // 4px
-  md: '0.375rem', // 6px
-  lg: '0.5rem', // 8px
-  xl: '0.75rem', // 12px
-  '2xl': '1rem', // 16px
-  '3xl': '1.25rem', // 24.px
-  full: '9999px',
+  none: '0px',
   circle: '50%',
+  md: '0.375rem',
+  lg: '0.5rem',
+  xl: '1rem',
+  '2xl': '1.25rem',
 } as const);
 
 export { sizes, space, radii };

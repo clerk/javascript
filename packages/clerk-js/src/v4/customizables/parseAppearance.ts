@@ -1,9 +1,9 @@
 import { Appearance, DeepPartial, Elements, Options, Theme } from '@clerk/types';
 
-import { blackAlpha, createInternalTheme, defaultInternalTheme, whiteAlpha } from '../foundations';
+import { createInternalTheme, defaultInternalTheme } from '../foundations';
 import { InternalTheme } from '../styledSystem';
-import { colors, fastDeepMergeAndReplace, removeUndefinedProps } from '../utils';
-import { colorOptionToHslaScale } from './colorOptionToHslaScale';
+import { fastDeepMergeAndReplace } from '../utils';
+import { createColorScales, createRadiiUnits, reverseAlphaScalesIfNeeded } from './parseVariables';
 
 export type ParsedElements = Elements[];
 export type ParsedInternalTheme = InternalTheme;
@@ -63,37 +63,6 @@ const createInternalThemeFromVariables = (theme: Theme | undefined): DeepPartial
       ...createColorScales(theme),
       ...reverseAlphaScalesIfNeeded(theme),
     },
+    radii: { ...createRadiiUnits(theme) },
   } as any);
-};
-
-const createColorScales = (theme: Theme) => {
-  const variables = theme.variables || {};
-  return removeUndefinedProps({
-    ...colorOptionToHslaScale(variables.colorPrimary, 'primary'),
-    ...colorOptionToHslaScale(variables.colorDanger, 'danger'),
-    ...colorOptionToHslaScale(variables.colorSuccess, 'success'),
-    ...colorOptionToHslaScale(variables.colorWarning, 'warning'),
-    colorText: toHSLA(variables.colorText),
-    colorTextOnPrimaryBackground: toHSLA(variables.colorTextOnPrimaryBackground),
-    colorTextSecondary: toHSLA(variables.colorTextSecondary) || colors.makeTransparent(variables.colorText, 0.35),
-    colorInputText: toHSLA(variables.colorInputText),
-    colorBackground: toHSLA(variables.colorBackground),
-    colorInputBackground: toHSLA(variables.colorInputBackground),
-  });
-};
-
-const reverseAlphaScalesIfNeeded = (theme: Theme) => {
-  const { alphaShadesMode = 'dark' } = theme.variables || {};
-  if (alphaShadesMode === 'dark') {
-    return;
-  }
-
-  return Object.fromEntries([
-    ...Object.entries(whiteAlpha).map(([k, v]) => [k.replace('white', 'black'), v]),
-    ...Object.entries(blackAlpha).map(([k, v]) => [k.replace('black', 'white'), v]),
-  ]);
-};
-
-const toHSLA = (str: string | undefined) => {
-  return str ? colors.toHslaString(str) : undefined;
 };

@@ -56,7 +56,7 @@ const BaseCard = React.forwardRef<HTMLDivElement, BaseCardProps>((props, ref) =>
           minWidth: theme.space.$100,
           maxWidth: theme.space.$100,
           padding: `${theme.space.$9x5} ${theme.space.$8} ${theme.space.$12} ${theme.space.$8}`,
-          borderRadius: theme.radii.$2xl,
+          borderRadius: theme.radii.$xl,
           backgroundColor: theme.colors.$colorBackground,
           transitionProperty: theme.transitionProperty.$common,
           transitionDuration: '200ms',

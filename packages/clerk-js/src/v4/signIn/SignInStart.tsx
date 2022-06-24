@@ -202,9 +202,7 @@ export function _SignInStart(): JSX.Element {
                     autoFocus={shouldAutofocus}
                   />
                 </Form.ControlRow>
-                <Form.ControlRow>
-                  <InstantPasswordControl field={passwordBasedInstance ? instantPasswordField : undefined} />
-                </Form.ControlRow>
+                <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
                 <Form.SubmitButton>Continue</Form.SubmitButton>
               </Form.Root>
             )}
@@ -227,16 +225,19 @@ export function _SignInStart(): JSX.Element {
   );
 }
 
-const InstantPasswordControl = ({ field }: { field?: FormControlState<'password'> }) => {
+const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> }) => {
   if (!field) {
     return null;
   }
   return (
-    <Form.Control
-      {...field.props}
-      tabIndex={!field.value ? -1 : undefined}
+    <Form.ControlRow
       sx={!field.value ? { opacity: 0, height: 0, pointerEvents: 'none', marginTop: '-1rem' } : undefined}
-    />
+    >
+      <Form.Control
+        {...field.props}
+        tabIndex={!field.value ? -1 : undefined}
+      />
+    </Form.ControlRow>
   );
 };
 
