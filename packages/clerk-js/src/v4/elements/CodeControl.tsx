@@ -208,7 +208,7 @@ const SingleCharInput = React.forwardRef<
         textAlign: 'center',
         ...common.textVariants(theme).largeInput,
         padding: `${theme.space.$0x5} 0`,
-        maxWidth: theme.space.$7,
+        maxWidth: theme.sizes.$7,
         borderRadius: theme.radii.$none,
         border: 'none',
         borderBottom: theme.borders.$heavy,

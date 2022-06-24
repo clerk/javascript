@@ -21,7 +21,7 @@ export const UserButtonTrigger = React.forwardRef<HTMLButtonElement, UserButtonT
       <Avatar
         {...user}
         optimize
-        size={theme => theme.space.$8}
+        size={theme => theme.sizes.$8}
       />
     </Button>
   );

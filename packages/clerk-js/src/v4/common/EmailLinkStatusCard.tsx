@@ -86,8 +86,8 @@ const StatusIcon = (props: { status: Exclude<VerificationStatus, 'loading'> }) =
       justify='center'
       align='center'
       sx={theme => ({
-        width: theme.space.$24,
-        height: theme.space.$24,
+        width: theme.sizes.$24,
+        height: theme.sizes.$24,
         borderRadius: theme.radii.$circle,
         backgroundColor: theme.colors.$blackAlpha100,
         color: statusToColor(theme, status),

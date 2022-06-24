@@ -20,6 +20,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
       center: { justifyContent: 'center' },
       end: { justifyContent: 'flex-end' },
       between: { justifyContent: 'space-between' },
+      around: { justifyContent: 'space-around' },
       stretch: { justifyContent: 'stretch' },
     },
     columns: {

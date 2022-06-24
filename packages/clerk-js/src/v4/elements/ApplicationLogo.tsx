@@ -42,7 +42,7 @@ export const ApplicationLogo = (props: ApplicationLogoProps) => {
       sx={[
         theme => ({
           marginBottom: theme.space.$8,
-          height: getContainerHeightForImageRatio(imageRef, theme.space.$6),
+          height: getContainerHeightForImageRatio(imageRef, theme.sizes.$6),
           objectFit: 'cover',
         }),
         props.sx,
