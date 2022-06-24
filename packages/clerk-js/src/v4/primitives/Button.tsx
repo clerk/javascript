@@ -50,7 +50,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
           [vars.border]: theme.colors.$blackAlpha200,
           [vars.accentLightest]: theme.colors.$blackAlpha50,
           [vars.accentLighter]: theme.colors.$blackAlpha300,
-          [vars.accent]: theme.colors.$text500,
+          [vars.accent]: theme.colors.$colorText,
           [vars.accentDark]: theme.colors.$blackAlpha600,
           [vars.accentDarker]: theme.colors.$blackAlpha700,
         },
@@ -58,7 +58,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
       variant: {
         solid: {
           backgroundColor: vars.accent,
-          color: theme.colors.$white,
+          color: theme.colors.$colorTextOnPrimaryBackground,
           '&:hover': { backgroundColor: vars.accentDark },
           '&:active': { backgroundColor: vars.accentDarker },
         },

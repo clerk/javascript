@@ -2,8 +2,8 @@ import { Appearance, DeepPartial, Elements, Options, Theme } from '@clerk/types'
 
 import { blackAlpha, createInternalTheme, defaultInternalTheme, whiteAlpha } from '../foundations';
 import { InternalTheme } from '../styledSystem';
-import { fastDeepMergeAndReplace } from '../utils';
-import { colorOptionTo500Scale, colorOptionToHslaScale } from './colorOptionToHslaScale';
+import { colors, fastDeepMergeAndReplace, removeUndefinedProps } from '../utils';
+import { colorOptionToHslaScale } from './colorOptionToHslaScale';
 
 export type ParsedElements = Elements[];
 export type ParsedInternalTheme = InternalTheme;
@@ -67,17 +67,19 @@ const createInternalThemeFromVariables = (theme: Theme | undefined): DeepPartial
 };
 
 const createColorScales = (theme: Theme) => {
-  return {
-    ...colorOptionToHslaScale(theme.variables?.colorPrimary, 'primary'),
-    ...colorOptionToHslaScale(theme.variables?.colorDanger, 'danger'),
-    ...colorOptionToHslaScale(theme.variables?.colorSuccess, 'success'),
-    ...colorOptionToHslaScale(theme.variables?.colorWarning, 'warning'),
-    ...colorOptionToHslaScale(theme.variables?.colorText, 'text'),
-    //TODO
-    ...colorOptionTo500Scale(theme.variables?.colorInputText, 'inputText'),
-    ...colorOptionTo500Scale(theme.variables?.colorBackground, 'background'),
-    ...colorOptionTo500Scale(theme.variables?.colorInputBackground, 'inputBackground'),
-  };
+  const variables = theme.variables || {};
+  return removeUndefinedProps({
+    ...colorOptionToHslaScale(variables.colorPrimary, 'primary'),
+    ...colorOptionToHslaScale(variables.colorDanger, 'danger'),
+    ...colorOptionToHslaScale(variables.colorSuccess, 'success'),
+    ...colorOptionToHslaScale(variables.colorWarning, 'warning'),
+    colorText: toHSLA(variables.colorText),
+    colorTextOnPrimaryBackground: toHSLA(variables.colorTextOnPrimaryBackground),
+    colorTextSecondary: toHSLA(variables.colorTextSecondary) || colors.makeTransparent(variables.colorText, 0.35),
+    colorInputText: toHSLA(variables.colorInputText),
+    colorBackground: toHSLA(variables.colorBackground),
+    colorInputBackground: toHSLA(variables.colorInputBackground),
+  });
 };
 
 const reverseAlphaScalesIfNeeded = (theme: Theme) => {
@@ -90,4 +92,8 @@ const reverseAlphaScalesIfNeeded = (theme: Theme) => {
     ...Object.entries(whiteAlpha).map(([k, v]) => [k.replace('white', 'black'), v]),
     ...Object.entries(blackAlpha).map(([k, v]) => [k.replace('black', 'white'), v]),
   ]);
+};
+
+const toHSLA = (str: string | undefined) => {
+  return str ? colors.toHslaString(str) : undefined;
 };

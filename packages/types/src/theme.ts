@@ -7,6 +7,7 @@ export type FontWeight = string;
 export type BoxShadow = string;
 
 export type TransparentColor = 'transparent';
+export type BuiltInColors = 'black' | 'blue' | 'red' | 'green' | 'grey' | 'white' | 'yellow';
 
 export type HexColor = `#${string}`;
 

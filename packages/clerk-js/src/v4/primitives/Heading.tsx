@@ -5,8 +5,7 @@ import { createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
 const { applyVariants } = createVariants(theme => ({
   base: {
     boxSizing: 'border-box',
-    // TODO: Should this be $text?
-    color: `${theme.colors.$text500}`,
+    color: `${theme.colors.$colorText}`,
     margin: 0,
   },
   variants: {

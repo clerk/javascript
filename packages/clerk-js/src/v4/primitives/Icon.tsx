@@ -10,7 +10,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     colorScheme: {
       danger: { color: theme.colors.$danger500 },
       warning: { color: theme.colors.$warning500 },
-      gray: { color: theme.colors.$gray300 },
+      neutral: { color: theme.colors.$blackAlpha400 },
     },
   },
   defaultVariants: {

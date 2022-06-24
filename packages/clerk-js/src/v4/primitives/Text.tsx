@@ -8,22 +8,17 @@ const { applyVariants, filterProps } = createVariants(theme => {
       boxSizing: 'border-box',
       // TODO: this should probably be inherited
       // and handled through cards
-      color: theme.colors.$text500,
+      color: theme.colors.$colorText,
       margin: 0,
     },
     variants: {
       variant: common.textVariants(theme),
       size: common.fontSizeVariants(theme),
       colorScheme: {
-        primary: {
-          color: theme.colors.$text500,
-        },
-        danger: {
-          color: theme.colors.$danger500,
-        },
-        neutral: {
-          color: theme.colors.$text400,
-        },
+        primary: { color: theme.colors.$colorText },
+        onPrimaryBg: { color: theme.colors.$colorTextOnPrimaryBackground },
+        danger: { color: theme.colors.$danger500 },
+        neutral: { color: theme.colors.$colorTextSecondary },
       },
       truncate: {
         true: {

@@ -1,4 +1,4 @@
-import { ColorOption, ColorScale, HslaColor, HslaColorString } from '@clerk/types';
+import { ColorOrScale, ColorScale, HslaColor, HslaColorString } from '@clerk/types';
 
 import { colors } from '../utils';
 
@@ -28,7 +28,7 @@ type WithPrefix<T extends Record<string, string>, Prefix extends string> = {
 };
 
 export const colorOptionToHslaScale = <Prefix extends string>(
-  colorOption: ColorOption | undefined,
+  colorOption: ColorOrScale | undefined,
   prefix: Prefix,
 ): WithPrefix<ColorScale<HslaColorString>, Prefix> | undefined => {
   if (!colorOption) {
@@ -43,18 +43,6 @@ export const colorOptionToHslaScale = <Prefix extends string>(
   const filledHslaColorScale = generateFilledScaleFromBaseHslaColor(userDefinedHslaColorScale['500']);
   const merged = mergeFilledIntoUserDefinedScale(filledHslaColorScale, userDefinedHslaColorScale);
   return prefixAndStringifyHslaScale(merged, prefix);
-};
-
-export const colorOptionTo500Scale = <Prefix extends string>(
-  colorOption: ColorOption | undefined,
-  prefix: Prefix,
-): WithPrefix<ColorScale<HslaColorString>, Prefix> | undefined => {
-  if (!colorOption || typeof colorOption !== 'string') {
-    return undefined;
-  }
-  const scale = createEmptyColorScale<HslaColor>();
-  scale['500'] = colors.toHslaColor(colorOption);
-  return prefixAndStringifyHslaScale(scale, prefix);
 };
 
 const mergeFilledIntoUserDefinedScale = (
@@ -79,8 +67,7 @@ const prefixAndStringifyHslaScale = (
   }
   return res;
 };
-
-const userDefinedColorToHslaColorScale = (colorOption: ColorOption): ColorScale<HslaColor> => {
+const userDefinedColorToHslaColorScale = (colorOption: ColorOrScale): ColorScale<HslaColor> => {
   const baseScale = typeof colorOption === 'string' ? { '500': colorOption } : colorOption;
   const hslaScale = createEmptyColorScale();
   // @ts-expect-error
@@ -99,14 +86,14 @@ const generateFilledScaleFromBaseHslaColor = (base: HslaColor): ColorScale<HslaC
   type Key = keyof typeof newScale;
   newScale['500'] = base;
 
-  const lightPerc = (TARGET_L_50_SHADE - base.l) / LIGHT_SHADES.length;
-  const darkPerc = (base.l - TARGET_L_900_SHADE) / DARK_SHADES.length;
+  const lightPercentage = (TARGET_L_50_SHADE - base.l) / LIGHT_SHADES.length;
+  const darkPercentage = (base.l - TARGET_L_900_SHADE) / DARK_SHADES.length;
 
   LIGHT_SHADES.forEach(
-    (shade, i) => (newScale[shade as any as Key] = colors.changeHslaLightness(base, (i + 1) * lightPerc)),
+    (shade, i) => (newScale[shade as any as Key] = colors.changeHslaLightness(base, (i + 1) * lightPercentage)),
   );
   DARK_SHADES.map(
-    (shade, i) => (newScale[shade as any as Key] = colors.changeHslaLightness(base, (i + 1) * darkPerc * -1)),
+    (shade, i) => (newScale[shade as any as Key] = colors.changeHslaLightness(base, (i + 1) * darkPercentage * -1)),
   );
   return newScale as ColorScale<HslaColor>;
 };

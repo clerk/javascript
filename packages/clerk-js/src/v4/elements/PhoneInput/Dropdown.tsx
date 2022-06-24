@@ -3,6 +3,7 @@ import React from 'react';
 import { Flex, Icon } from '../../customizables';
 import { MagnifyingGlass } from '../../icons';
 import { animations, PropsOfComponent } from '../../styledSystem';
+import { colors } from '../../utils';
 import { InputWithIcon } from '../InputWithIcon';
 
 type DropdownBoxProps = PropsOfComponent<typeof Flex> & { isOpen: boolean };
@@ -19,7 +20,7 @@ export const DropdownBox = React.forwardRef<HTMLDivElement, DropdownBoxProps>((p
       direction='col'
       justify='start'
       sx={theme => ({
-        backgroundColor: theme.colors.$background500,
+        backgroundColor: colors.makeSolid(theme.colors.$colorBackground),
         border: theme.borders.$normal,
         borderRadius: theme.radii.$lg,
         borderColor: theme.colors.$whiteAlpha200,
@@ -50,7 +51,7 @@ export const DropdownSearchbar = (props: PropsOfComponent<typeof InputWithIcon>)
         autoFocus
         leftIcon={
           <Icon
-            colorScheme='gray'
+            colorScheme='neutral'
             icon={MagnifyingGlass}
           />
         }

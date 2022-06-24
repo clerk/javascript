@@ -75,7 +75,7 @@ export const Avatar = (props: AvatarProps) => {
           border: theme.borders.$normal,
           borderColor: theme.colors.$blackAlpha200,
           backgroundColor: theme.colors.$blackAlpha500,
-          color: theme.colors.$text500,
+          color: theme.colors.$colorText,
           objectFit: 'cover',
           backgroundClip: 'padding-box',
         }),

@@ -1,7 +1,7 @@
 import * as CSS from 'csstype';
 
 import { OAuthProvider } from './oauth';
-import { FontFamily } from './theme';
+import { BuiltInColors, FontFamily, TransparentColor } from './theme';
 import { Web3Provider } from './web3';
 
 type CSSProperties = CSS.PropertiesFallback<number | string>;
@@ -13,13 +13,11 @@ type UserDefinedStyle = string | CSSObject;
 
 type Shade = '50' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900';
 export type ColorScale<T = string> = Record<Shade, T>;
-export type LightScale<T = string> = Pick<ColorScale<T>, '50' | '100' | '200' | '300' | '400' | '500'>;
 
 export type ColorScaleWithRequiredBase<T = string> = Partial<ColorScale<T>> & { '500': T };
-export type LightScaleWithRequiredBase<T = string> = Partial<LightScale<T>> & { '500': T };
 
-export type ColorOption = string | ColorScaleWithRequiredBase;
-export type LightColorOption = string | LightScaleWithRequiredBase;
+export type ColorOrScale = string | ColorScaleWithRequiredBase;
+type Color = string | TransparentColor | BuiltInColors;
 
 export type FontSize = string | { small?: string; base: string; large?: string };
 export type BorderRadius = string | { small?: string; base: string; large?: string };
@@ -164,33 +162,44 @@ export type Variables = {
   /**
    * The primary color used throughout the components. Set this to your brand color.
    */
-  colorPrimary?: ColorOption;
+  colorPrimary?: ColorOrScale;
   /**
    * The color used to indicate errors or destructive actions. Set this to your brand's danger color.
    */
-  colorDanger?: ColorOption;
+  colorDanger?: ColorOrScale;
   /**
    * The color used to indicate an action that completed successfully or a positive result.
    */
-  colorSuccess?: ColorOption;
+  colorSuccess?: ColorOrScale;
   /**
    * The color used for potentially destructive actions or when the user's attention is required.
    */
-  colorWarning?: ColorOption;
+  colorWarning?: ColorOrScale;
   /**
-   * The default text color. The 500 shade is used as the text base. Less important
-   * text (eg: a subtitle) will use lighter shades.
+   * The default text color.
    * @default black
    */
-  colorText?: LightColorOption;
+  colorText?: Color;
   /**
-   * The default text color inside input elements. To customise the input background color, use`colorInputBackground`.
+   * The color of text appearing on top of an element that with a background color of {@link Variables.colorPrimary},
+   * eg: solid primary buttons.
+   * @default white
    */
-  colorInputText?: LightColorOption;
+  colorTextOnPrimaryBackground?: Color;
+  /**
+   * The text color for elements of lower importance, eg: a subtitle text.
+   * @default A lighter shade of {@link Variables.colorText}
+   */
+  colorTextSecondary?: Color;
   /**
    * The background color for the card container.
    */
   colorBackground?: string;
+  /**
+   * The default text color inside input elements. To customise the input background color instead, use {@link Variables.colorInputBackground}.
+   * @default The value of {@link Variables.colorText}
+   */
+  colorInputText?: Color;
   /**
    * The background color for all the input elements.
    */
@@ -200,7 +209,7 @@ export type Variables = {
    */
   fontFamily?: FontFamily;
   /**
-   * The size that will be used as the base to calculate the `small` and `large` font sizes\
+   * The size that will be used as the base to calculate the `small` and `large` font sizes
    * @default 16px
    */
   fontSize?: FontSize;

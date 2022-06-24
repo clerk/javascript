@@ -27,9 +27,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
         '&:active': { color: theme.colors.$danger600 },
       },
       neutral: {
-        color: theme.colors.$gray500,
-        '&:hover': { color: theme.colors.$gray400 },
-        '&:active': { color: theme.colors.$gray600 },
+        color: theme.colors.$colorTextSecondary,
       },
     },
   },
