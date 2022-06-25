@@ -2,11 +2,11 @@ import React from 'react';
 
 import { useRouter } from '../../ui/router';
 import { descriptors, Flex, Flow, Text } from '../customizables';
-import { Card } from '../elements';
-import { useCardState } from '../elements/contexts';
 import { useLoadingStatus } from '../hooks';
 import { CardAlert } from './Alert';
 import { BackLink } from './BackLink';
+import { Card } from './Card';
+import { useCardState } from './contexts';
 import { Footer } from './Footer';
 import { Header } from './Header';
 import { IdentityPreview } from './IdentityPreview';

@@ -143,6 +143,7 @@ const DropdownTrigger = React.forwardRef<
       colorScheme='neutral'
       variant='ghost'
       textVariant='textSmallMedium'
+      focusRing={false}
       sx={theme => ({
         paddingLeft: theme.space.$3x5,
         paddingRight: theme.space.$3x5,

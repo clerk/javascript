@@ -9,18 +9,16 @@ const { applyVariants, filterProps } = createVariants(theme => {
   return {
     base: {
       display: 'inline-block',
-      color: 'currentColor',
       borderRadius: '99999px',
-      borderTop: `${thickness} solid currentcolor`,
-      borderRight: `${thickness} solid currentcolor`,
+      borderTop: `${thickness} solid currentColor`,
+      borderRight: `${thickness} solid currentColor`,
       borderBottomWidth: thickness,
       borderLeftWidth: thickness,
       borderBottomStyle: 'solid',
       borderLeftStyle: 'solid',
       borderBottomColor: theme.colors.$transparent,
       borderLeftColor: theme.colors.$transparent,
-      borderTopColor: theme.colors.$blackAlpha700,
-      borderRightColor: theme.colors.$blackAlpha700,
+      opacity: 1,
       animation: `${animations.spinning} ${speed} linear 0s infinite normal none running`,
       width: [size],
       height: [size],
@@ -29,8 +27,12 @@ const { applyVariants, filterProps } = createVariants(theme => {
     },
     variants: {
       colorScheme: {
-        primary: { borderTopColor: theme.colors.$primary500, borderRightColor: theme.colors.$primary500 },
-        neutral: { borderTopColor: theme.colors.$blackAlpha500, borderRightColor: theme.colors.$blackAlpha500 },
+        primary: { borderTopColor: theme.colors.$primary500, borderRightColor: theme.colors.$primary500, opacity: 1 },
+        neutral: {
+          borderTopColor: theme.colors.$blackAlpha700,
+          borderRightColor: theme.colors.$blackAlpha700,
+          opacity: 1,
+        },
       },
       thickness: {
         sm: { [thickness]: theme.sizes.$0x5 },
@@ -58,7 +60,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
 type SpinnerProps = PrimitiveProps<'div'> & StyleVariants<typeof applyVariants>;
 export const Spinner = (props: SpinnerProps) => {
   return (
-    <div
+    <span
       {...filterProps(props)}
       css={applyVariants(props)}
       aria-busy

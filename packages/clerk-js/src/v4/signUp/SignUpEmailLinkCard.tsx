@@ -75,7 +75,7 @@ export const SignUpEmailLinkCard = () => {
         cardTitle='Verify your email'
         cardSubtitle={`to continue to ${displayConfig.applicationName}`}
         formTitle='Verification link'
-        formSubtitle='Click on the verification link sent to your email'
+        formSubtitle='Use the verification link sent your email'
         onResendCodeClicked={restartVerification}
         safeIdentifier={signUp.emailAddress || ''}
       />

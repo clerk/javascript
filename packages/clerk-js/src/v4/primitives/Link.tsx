@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { common, createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
+import { applyDataStateProps } from './applyDataStateProps';
 
 const { applyVariants, filterProps } = createVariants(theme => ({
   base: {
@@ -10,6 +11,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     margin: 0,
     cursor: 'pointer',
     ...common.focusRing(theme),
+    ...common.disabled(theme),
     '&:hover': { textDecoration: 'underline' },
   },
   variants: {
@@ -37,16 +39,28 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   },
 }));
 
-type OwnProps = { isExternal?: boolean };
+type OwnProps = { isExternal?: boolean; isDisabled?: boolean };
 export type LinkProps = PrimitiveProps<'a'> & OwnProps & StyleVariants<typeof applyVariants>;
 
 export const Link = (props: LinkProps): JSX.Element => {
-  const { isExternal, children, ...rest } = props;
+  const { isExternal, children, href, onClick, ...rest } = props;
+
+  const onClickHandler = onClick
+    ? (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+        if (!href) {
+          e.preventDefault();
+        }
+        onClick(e);
+      }
+    : undefined;
+
   return (
     <a
-      {...filterProps(rest)}
-      target={isExternal ? '_blank' : undefined}
-      rel={isExternal ? 'noopener' : undefined}
+      {...applyDataStateProps(filterProps(rest))}
+      onClick={onClickHandler}
+      href={href || ''}
+      target={href && isExternal ? '_blank' : undefined}
+      rel={href && isExternal ? 'noopener' : undefined}
       css={applyVariants(props)}
     >
       {children}

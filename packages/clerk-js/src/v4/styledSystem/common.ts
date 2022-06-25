@@ -21,7 +21,7 @@ const textVariants = (theme: InternalTheme) => {
     fontStyle: theme.fontStyles.$normal,
     fontSize: theme.fontSizes.$2xs,
     letterSpacing: theme.letterSpacings.$normal,
-    lineHeight: theme.lineHeights.$base,
+    lineHeight: theme.lineHeights.$none,
   } as const;
 
   const textButtonSmall = {
