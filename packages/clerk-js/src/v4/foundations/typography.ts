@@ -12,7 +12,7 @@ const fontWeights = Object.freeze({
 
 const lineHeights = Object.freeze({
   normal: 'normal',
-  none: '1rem',
+  none: '1',
   shorter: 1.25,
   short: 1.375,
   base: 1.5,

@@ -34,7 +34,7 @@ export const TimerButton = (props: TimerButtonProps) => {
         }
         return seconds - 1;
       });
-    }, 10);
+    }, 1000);
   };
 
   const handleOnClick: React.MouseEventHandler<HTMLButtonElement> = e => {
@@ -47,7 +47,7 @@ export const TimerButton = (props: TimerButtonProps) => {
 
   return (
     <Button
-      variant='textSmallRegular'
+      variant='link'
       {...rest}
       isDisabled={remainingSeconds > 0 || props.isDisabled}
       onClick={handleOnClick}

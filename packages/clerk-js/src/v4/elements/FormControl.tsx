@@ -2,13 +2,13 @@ import { FieldId } from '@clerk/types';
 import React from 'react';
 
 import {
-  Button,
   descriptors,
   Flex,
   FormControl as FormControlPrim,
   FormErrorText,
   FormLabel,
   Input,
+  Link,
 } from '../customizables';
 import { PropsOfComponent } from '../styledSystem';
 import { useCardState } from './contexts';
@@ -63,11 +63,10 @@ export const FormControl = (props: FormControlProps) => {
           {label}
         </FormLabel>
         {actionLabel && (
-          <Button
+          <Link
             elementDescriptor={descriptors.formFieldAction}
             elementId={descriptors.formFieldLabel.setId(id)}
             isDisabled={isDisabled}
-            variant='textSmallRegular'
             colorScheme='primary'
             onClick={e => {
               e.preventDefault();
@@ -75,7 +74,7 @@ export const FormControl = (props: FormControlProps) => {
             }}
           >
             {actionLabel}
-          </Button>
+          </Link>
         )}
       </Flex>
       <InputElement

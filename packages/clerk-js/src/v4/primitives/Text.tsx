@@ -10,6 +10,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
       // and handled through cards
       color: theme.colors.$colorText,
       margin: 0,
+      fontSize: 'inherit',
     },
     variants: {
       variant: common.textVariants(theme),

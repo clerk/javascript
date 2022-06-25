@@ -75,6 +75,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
           '&:active': { backgroundColor: vars.accentLighter },
         },
         icon: {
+          color: vars.accent,
           border: theme.borders.$normal,
           borderRadius: theme.radii.$lg,
           borderColor: vars.border,
@@ -139,6 +140,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
     >
       {isLoading && (
         <Flex
+          as='span'
           gap={2}
           center
         >

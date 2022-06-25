@@ -31,7 +31,10 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
 
   const leftIcon = icon
     ? React.cloneElement(icon, {
-        sx: [icon.props.sx, theme => ({ width: theme.sizes.$4, marginRight: theme.space.$4 })],
+        sx: [
+          icon.props.sx,
+          theme => ({ width: theme.sizes.$4, margin: `-${theme.space.$px} ${theme.space.$4} -${theme.space.$px} 0` }),
+        ],
       })
     : null;
 
@@ -39,6 +42,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
     <Button
       variant='outline'
       colorScheme='neutral'
+      textVariant='textSmallRegular'
       block
       sx={theme => ({
         position: 'relative',
@@ -67,7 +71,6 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
         elementDescriptor={textElementDescriptor}
         elementId={textElementId}
         as='span'
-        variant='textSmallRegular'
       >
         {children}
       </Text>
@@ -80,6 +83,10 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
           right: '1rem',
           color: theme.colors.$blackAlpha500,
           transition: 'all 100ms ease',
+          minWidth: theme.sizes.$4,
+          minHeight: theme.sizes.$4,
+          width: '1em',
+          height: '1em',
           opacity: `var(--arrow-opacity)`,
           transform: `var(--arrow-transform)`,
         })}
