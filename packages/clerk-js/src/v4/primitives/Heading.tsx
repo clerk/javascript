@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
+import { common, createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
 
 const { applyVariants } = createVariants(theme => ({
   base: {
@@ -11,9 +11,7 @@ const { applyVariants } = createVariants(theme => ({
   variants: {
     as: {
       h1: {
-        fontStyle: theme.fontStyles.$normal,
-        fontWeight: theme.fontWeights.$semibold,
-        fontSize: theme.fontSizes.$xl,
+        ...common.textVariants(theme).textXLargeMedium,
         lineHeight: theme.lineHeights.$base,
       },
     },

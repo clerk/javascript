@@ -85,6 +85,14 @@ export const createFontSizeScale = (theme: Theme): Record<keyof typeof fontSizes
   };
 };
 
+export const createFonts = (theme: Theme) => {
+  const { fontFamily, fontFamilyButtons } = theme.variables || {};
+  if (fontFamily === undefined) {
+    return;
+  }
+  return { main: fontFamily, buttons: fontFamilyButtons || fontFamily };
+};
+
 const splitCssUnit = (str: string) => {
   const numericValue = Number.parseFloat(str);
   const unit = str.replace(numericValue.toString(), '') || undefined;
