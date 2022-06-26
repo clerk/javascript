@@ -1,7 +1,7 @@
 import * as CSS from 'csstype';
 
 import { OAuthProvider } from './oauth';
-import { BuiltInColors, FontFamily, TransparentColor } from './theme';
+import { BuiltInColors, TransparentColor } from './theme';
 import { Web3Provider } from './web3';
 
 type CSSProperties = CSS.PropertiesFallback<number | string>;
@@ -20,8 +20,19 @@ export type CssColorOrScale = string | ColorScaleWithRequiredBase;
 type CssColor = string | TransparentColor | BuiltInColors;
 type CssLengthUnit = string;
 
-// export type FontSize = string | { small?: string; base: string; large?: string };
-// export type BorderRadius = string | { small?: string; base: string; large?: string };
+type WebSafeFont =
+  | 'Arial'
+  | 'Brush Script MT'
+  | 'Courier New'
+  | 'Garamond'
+  | 'Georgia'
+  | 'Helvetica'
+  | 'Tahoma'
+  | 'Times New Roman'
+  | 'Trebuchet MS'
+  | 'Verdana';
+
+export type FontFamily = string | WebSafeFont;
 
 type LoadingState = 'loading';
 type DisabledState = 'disabled';
@@ -207,8 +218,22 @@ export type Variables = {
   colorInputBackground?: CssColor;
   /**
    * The default font that will be used in all components.
+   * This can be the name of any Google font (https://fonts.google.com/), the name of a web-safe font ((@link WebSafeFont})
+   * or the name of a custom font loaded by your code.
+   * If a Google font is used, the components will automatically preconnect, preload, load and inject the font.
+   * @default Inter
+   * @example Using a Google font
+   * { fontFamily: 'Montserrat' }
+   * @example Using a web-safe font
+   * { fontFamily: 'Times New Roman' }
    */
   fontFamily?: FontFamily;
+  /**
+   * The default font that will be used in all buttons. See {@link Variables.fontFamily} for details.
+   * If not provided, {@link Variables.fontFamily} will be used instead.
+   * @default Inter
+   */
+  fontFamilyButtons?: FontFamily;
   /**
    * The value will be used as the base `md` to calculate all the other scale values (`2xs`, `xs`, `sm`, `lg` and `xl`).
    * By default, this value is relative to the root fontSize of the html element.
@@ -251,6 +276,14 @@ export type Theme = {
   elements?: Elements;
 };
 
+export type Options = {
+  logoPlacement?: 'inside' | 'outside' | 'none';
+  socialButtonsVariant?: 'auto' | 'iconButton' | 'blockButton';
+  socialButtonsPlacement?: 'top' | 'bottom';
+  darkMode?: boolean;
+  // floatingLabels: boolean;
+};
+
 export type Appearance = Theme & {
   /**
    * Theme overrides that apply only
@@ -272,9 +305,17 @@ export type Appearance = Theme & {
    * to the `<UserProfile/>` component
    */
   userProfile?: Theme;
+
+  options?: Options;
 };
 
 // TODO: Discuss if we want to release a `prefersColorScheme` based theme switcher
 // type AppearanceFunctionParams = { prefersColorScheme: 'dark' | 'light' };
 // export type AppearanceFactory = (params: AppearanceFunctionParams) => Appearance;
 // export type AppearanceProp = Appearance | AppearanceFactory;
+
+const appearance: Appearance = {
+  variables: {
+    colorText: '',
+  },
+};

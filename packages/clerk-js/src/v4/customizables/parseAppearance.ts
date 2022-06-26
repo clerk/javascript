@@ -3,8 +3,10 @@ import { Appearance, DeepPartial, Elements, Options, Theme } from '@clerk/types'
 import { createInternalTheme, defaultInternalTheme } from '../foundations';
 import { InternalTheme } from '../styledSystem';
 import { fastDeepMergeAndReplace } from '../utils';
+import { loadFont } from './loadFont';
 import {
   createColorScales,
+  createFonts,
   createFontSizeScale,
   createRadiiUnits,
   createSpaceScale,
@@ -52,11 +54,13 @@ const parseOptions = (appearanceList: Appearance[]) => {
 };
 
 const parseVariables = (appearances: Appearance[]) => {
-  const res = {};
+  const res = {} as DeepPartial<InternalTheme>;
   fastDeepMergeAndReplace({ ...defaultInternalTheme }, res);
   appearances.forEach(appearance => {
     fastDeepMergeAndReplace(createInternalThemeFromVariables(appearance), res);
   });
+  loadFont(res?.fonts?.$main);
+  loadFont(res?.fonts?.$buttons);
   return res as ParsedInternalTheme;
 };
 
@@ -68,5 +72,6 @@ const createInternalThemeFromVariables = (theme: Theme | undefined): DeepPartial
   const radii = { ...createRadiiUnits(theme) };
   const space = { ...createSpaceScale(theme) };
   const fontSizes = { ...createFontSizeScale(theme) };
-  return createInternalTheme({ colors, radii, space, fontSizes } as any);
+  const fonts = { ...createFonts(theme) };
+  return createInternalTheme({ colors, radii, space, fontSizes, fonts } as any);
 };

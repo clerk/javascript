@@ -1,13 +1,7 @@
 const fontWeights = Object.freeze({
-  hairline: 100,
-  thin: 200,
-  light: 300,
   normal: 400,
   medium: 500,
   semibold: 600,
-  bold: 700,
-  extrabold: 800,
-  black: 900,
 } as const);
 
 const lineHeights = Object.freeze({
@@ -42,6 +36,9 @@ const fontStyles = Object.freeze({
   normal: 'normal',
 } as const);
 
-const fonts = Object.freeze({} as const);
+const fonts = Object.freeze({
+  main: 'Inter',
+  buttons: 'Inter',
+} as const);
 
 export { fontSizes, fontWeights, letterSpacings, lineHeights, fonts, fontStyles };

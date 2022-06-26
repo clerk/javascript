@@ -6,7 +6,7 @@ const textVariants = (theme: InternalTheme) => {
     fontWeight: theme.fontWeights.$normal,
     fontSize: theme.fontSizes.$xs,
     lineHeight: theme.lineHeights.$none,
-    textTransform: 'none',
+    fontFamily: theme.fonts.$main,
   } as const;
 
   const textSmallMedium = {
@@ -14,6 +14,7 @@ const textVariants = (theme: InternalTheme) => {
     fontWeight: theme.fontWeights.$medium,
     fontSize: theme.fontSizes.$xs,
     lineHeight: theme.lineHeights.$base,
+    fontFamily: theme.fonts.$main,
   } as const;
 
   const textExtraSmallRegular = {
@@ -22,16 +23,19 @@ const textVariants = (theme: InternalTheme) => {
     fontSize: theme.fontSizes.$2xs,
     letterSpacing: theme.letterSpacings.$normal,
     lineHeight: theme.lineHeights.$none,
+    fontFamily: theme.fonts.$main,
   } as const;
 
   const textButtonSmall = {
     ...textExtraSmallRegular,
     fontWeight: theme.fontWeights.$semibold,
     textTransform: 'uppercase',
+    fontFamily: theme.fonts.$buttons,
   } as const;
 
   const textExtraSmallMedium = {
     ...textButtonSmall,
+    fontFamily: theme.fonts.$main,
   } as const;
 
   const textRegularRegular = {
@@ -39,6 +43,7 @@ const textVariants = (theme: InternalTheme) => {
     fontWeight: theme.fontWeights.$normal,
     fontSize: theme.fontSizes.$sm,
     lineHeight: theme.lineHeights.$shorter,
+    fontFamily: theme.fonts.$main,
   } as const;
 
   const textRegularMedium = {
@@ -46,6 +51,7 @@ const textVariants = (theme: InternalTheme) => {
     fontWeight: theme.fontWeights.$medium,
     fontSize: theme.fontSizes.$sm,
     lineHeight: theme.lineHeights.$shorter,
+    fontFamily: theme.fonts.$main,
   } as const;
 
   const textXLargeMedium = {
@@ -53,6 +59,7 @@ const textVariants = (theme: InternalTheme) => {
     fontWeight: theme.fontWeights.$semibold,
     fontSize: theme.fontSizes.$xl,
     lineHeight: theme.lineHeights.$taller,
+    fontFamily: theme.fonts.$main,
   } as const;
 
   return {

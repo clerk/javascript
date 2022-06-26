@@ -1,7 +1,5 @@
 export type EmUnit = string;
 
-export type FontFamily = string;
-
 export type FontWeight = string;
 
 export type BoxShadow = string;
