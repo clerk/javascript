@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { useOptions } from '../../ui/contexts';
 import { descriptors, Flex, Link, Text } from '../customizables';
 import { PropsOfComponent } from '../styledSystem';
 
@@ -58,33 +59,40 @@ const FooterLink = (props: PropsOfComponent<typeof Link>): JSX.Element => {
 };
 
 const FooterLinks = React.memo((): JSX.Element => {
+  const paths = useOptions().paths || {};
   return (
     <Flex
       elementDescriptor={descriptors.footerPages}
       justify='between'
       gap={4}
     >
-      <FooterLink
-        elementId={descriptors.footerPagesLink.setId('help')}
-        isExternal
-        href='https://www.google.com'
-      >
-        Help
-      </FooterLink>
-      <FooterLink
-        elementId={descriptors.footerPagesLink.setId('privacy')}
-        isExternal
-        href='https://www.google.com'
-      >
-        Privacy
-      </FooterLink>
-      <FooterLink
-        elementId={descriptors.footerPagesLink.setId('terms')}
-        isExternal
-        href='https://www.google.com'
-      >
-        Terms
-      </FooterLink>
+      {paths.helpPageUrl && (
+        <FooterLink
+          elementId={descriptors.footerPagesLink.setId('help')}
+          isExternal
+          href={paths.helpPageUrl}
+        >
+          Help
+        </FooterLink>
+      )}
+      {paths.privacyPageUrl && (
+        <FooterLink
+          elementId={descriptors.footerPagesLink.setId('privacy')}
+          isExternal
+          href={paths.privacyPageUrl}
+        >
+          Privacy
+        </FooterLink>
+      )}
+      {paths.termsPageUrl && (
+        <FooterLink
+          elementId={descriptors.footerPagesLink.setId('terms')}
+          isExternal
+          href={paths.termsPageUrl}
+        >
+          Terms
+        </FooterLink>
+      )}
     </Flex>
   );
 });
