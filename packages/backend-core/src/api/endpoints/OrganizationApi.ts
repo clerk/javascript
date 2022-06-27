@@ -21,11 +21,6 @@ type CreateParams = {
   createdBy: string;
 } & OrganizationMetadataParams;
 
-type OrganizationMetadataRequestBody = {
-  publicMetadata?: string;
-  privateMetadata?: string;
-};
-
 type GetOrganizationParams = { organizationId: string } | { slug: string };
 
 type UpdateParams = {
@@ -83,17 +78,10 @@ export class OrganizationAPI extends AbstractAPI {
   }
 
   public async createOrganization(params: CreateParams) {
-    const { publicMetadata, privateMetadata } = params;
     return this.APIClient.request<Organization>({
       method: 'POST',
       path: basePath,
-      bodyParams: {
-        ...params,
-        ...stringifyMetadataParams({
-          publicMetadata,
-          privateMetadata,
-        }),
-      },
+      bodyParams: params,
     });
   }
 
@@ -122,7 +110,7 @@ export class OrganizationAPI extends AbstractAPI {
     return this.APIClient.request<Organization>({
       method: 'PATCH',
       path: joinPaths(basePath, organizationId, 'metadata'),
-      bodyParams: stringifyMetadataParams(params),
+      bodyParams: params,
     });
   }
 
@@ -215,20 +203,4 @@ export class OrganizationAPI extends AbstractAPI {
       },
     });
   }
-}
-
-function stringifyMetadataParams(
-  params: OrganizationMetadataParams & {
-    [key: string]: Record<string, unknown> | undefined;
-  },
-): OrganizationMetadataRequestBody {
-  return ['publicMetadata', 'privateMetadata'].reduce(
-    (res: Record<string, string>, key: string): Record<string, string> => {
-      if (params[key]) {
-        res[key] = JSON.stringify(params[key]);
-      }
-      return res;
-    },
-    {},
-  );
 }
