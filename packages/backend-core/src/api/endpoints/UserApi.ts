@@ -19,8 +19,6 @@ type UserListParams = UserCountParams & {
   orderBy?: 'created_at' | 'updated_at' | '+created_at' | '+updated_at' | '-created_at' | '-updated_at';
 };
 
-const userMetadataKeys = ['publicMetadata', 'privateMetadata', 'unsafeMetadata'];
-
 type UserMetadataParams = {
   publicMetadata?: Record<string, unknown>;
   privateMetadata?: Record<string, unknown>;
@@ -48,12 +46,6 @@ interface UpdateUserParams extends UserMetadataParams {
   primaryPhoneNumberID?: string;
 }
 
-type UserMetadataRequestBody = {
-  publicMetadata?: string;
-  privateMetadata?: string;
-  unsafeMetadata?: string;
-};
-
 export class UserAPI extends AbstractAPI {
   public async getUserList(params: UserListParams = {}) {
     return this.APIClient.request<Array<User>>({
@@ -72,36 +64,20 @@ export class UserAPI extends AbstractAPI {
   }
 
   public async createUser(params: CreateUserParams): Promise<User> {
-    const { publicMetadata, privateMetadata, unsafeMetadata } = params;
     return this.APIClient.request({
       method: 'POST',
       path: basePath,
-      bodyParams: {
-        ...params,
-        ...stringifyMetadataParams({
-          publicMetadata,
-          privateMetadata,
-          unsafeMetadata,
-        }),
-      },
+      bodyParams: params,
     });
   }
 
   public async updateUser(userId: string, params: UpdateUserParams = {}) {
     this.requireId(userId);
-    const { publicMetadata, privateMetadata, unsafeMetadata } = params;
 
     return this.APIClient.request<User>({
       method: 'PATCH',
       path: joinPaths(basePath, userId),
-      bodyParams: {
-        ...params,
-        ...stringifyMetadataParams({
-          publicMetadata,
-          privateMetadata,
-          unsafeMetadata,
-        }),
-      },
+      bodyParams: params,
     });
   }
 
@@ -111,7 +87,7 @@ export class UserAPI extends AbstractAPI {
     return this.APIClient.request<User>({
       method: 'PATCH',
       path: joinPaths(basePath, userId, 'metadata'),
-      bodyParams: stringifyMetadataParams(params),
+      bodyParams: params,
     });
   }
 
@@ -138,17 +114,4 @@ export class UserAPI extends AbstractAPI {
       path: joinPaths(basePath, userId, 'oauth_access_tokens', provider),
     });
   }
-}
-
-function stringifyMetadataParams(
-  params: UserMetadataParams & {
-    [key: string]: Record<string, unknown> | undefined;
-  },
-): UserMetadataRequestBody {
-  return userMetadataKeys.reduce((res: Record<string, string>, key: string): Record<string, string> => {
-    if (params[key]) {
-      res[key] = JSON.stringify(params[key]);
-    }
-    return res;
-  }, {});
 }
