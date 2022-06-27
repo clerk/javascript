@@ -137,7 +137,7 @@ const disabled = (theme: InternalTheme) => {
   } as const;
 };
 
-const centeredFlex = (display: 'flex' | 'inline-flex') => ({
+const centeredFlex = (display: 'flex' | 'inline-flex' = 'flex') => ({
   display: display,
   justifyContent: 'center',
   alignItems: 'center',

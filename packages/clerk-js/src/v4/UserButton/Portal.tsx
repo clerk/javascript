@@ -1,24 +1,21 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 
-import { useSafeLayoutEffect } from '../hooks';
-
 type PortalProps = React.PropsWithChildren<{}>;
 
 export const Portal = (props: PortalProps) => {
-  const elRef = React.useRef<HTMLDivElement>();
+  const el = React.useMemo<HTMLDivElement>(() => {
+    const div = document.createElement('div');
+    div.classList.add('cl-portal-root');
+    document.body.appendChild(div);
+    return div;
+  }, []);
 
-  useSafeLayoutEffect(() => {
-    elRef.current = document.createElement('div');
-    elRef.current.classList.add('cl-portal-root');
-    document.body.appendChild(elRef.current);
+  React.useEffect(() => {
     return () => {
-      if (elRef.current) {
-        document.body.removeChild(elRef.current);
-        elRef.current = undefined;
-      }
+      document.body.removeChild(el);
     };
   }, []);
 
-  return elRef.current ? createPortal(props.children, elRef.current) : null;
+  return createPortal(props.children, el);
 };

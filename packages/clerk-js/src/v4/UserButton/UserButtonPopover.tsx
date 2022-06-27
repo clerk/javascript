@@ -143,7 +143,7 @@ const UserButtonCard = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof 
           padding: `${theme.space.$6} 0`,
           minWidth: theme.sizes.$94,
           zIndex: theme.zIndices.$modal,
-          animation: `${animations.dropdownFadeInAndScale} 140ms `,
+          animation: `${animations.dropdownSlideInScaleAndFade} 140ms `,
         })}
       >
         {props.children}

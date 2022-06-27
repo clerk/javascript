@@ -13,8 +13,10 @@ import type { AvailableComponentProps } from '../ui/types';
 import { AvailableComponentCtx } from '../ui/types';
 import { AppearanceProvider } from './customizables';
 import { preconnectToGoogleFontsCdn } from './customizables/loadFont';
+import { FlowMetadataProvider, Modal } from './elements';
 import { SignIn, SignInModal } from './signIn';
 import { SignUp, SignUpModal } from './signUp';
+import { InternalThemeProvider } from './styledSystem';
 import { UserButton } from './UserButton';
 
 export type MountComponentRenderer = (
@@ -34,10 +36,6 @@ export type ComponentControls = {
   updateProps: (params: { appearance?: Appearance | undefined; node?: HTMLDivElement; props?: unknown }) => void;
   openModal: <T extends 'signIn' | 'signUp'>(modal: T, props: T extends 'signIn' ? SignInProps : SignUpProps) => void;
   closeModal: (modal: 'signIn' | 'signUp') => void;
-};
-
-const Modal = (props: any) => {
-  return <div {...props}>modal {props.children}</div>;
 };
 
 const AvailableComponents = {
@@ -160,47 +158,57 @@ const Components = (props: ComponentsProps) => {
   }, []);
 
   const mountedSignInModal = (
-    <Modal
-      active
-      handleClose={() => componentsControls.closeModal('signIn')}
-      className='cl-modal-backdrop'
-      modalClassname='cl-modal-container'
+    <AppearanceProvider
+      globalAppearance={state.appearance}
+      appearanceKey='signIn'
+      appearance={signInModal?.appearance}
     >
-      <VirtualRouter
-        preservedParams={PRESERVED_QUERYSTRING_PARAMS}
-        onExternalNavigate={() => componentsControls.closeModal('signIn')}
-        startPath='/sign-in'
-      >
-        <SignInModal {...signInModal} />
-        <SignUpModal
-          afterSignInUrl={signInModal?.afterSignInUrl}
-          afterSignUpUrl={signInModal?.afterSignUpUrl}
-          redirectUrl={signInModal?.redirectUrl}
-        />
-      </VirtualRouter>
-    </Modal>
+      <FlowMetadataProvider flow={'signIn'}>
+        <InternalThemeProvider>
+          <Modal handleClose={() => componentsControls.closeModal('signIn')}>
+            <VirtualRouter
+              preservedParams={PRESERVED_QUERYSTRING_PARAMS}
+              onExternalNavigate={() => componentsControls.closeModal('signIn')}
+              startPath='/sign-in'
+            >
+              <SignInModal {...signInModal} />
+              <SignUpModal
+                afterSignInUrl={signInModal?.afterSignInUrl}
+                afterSignUpUrl={signInModal?.afterSignUpUrl}
+                redirectUrl={signInModal?.redirectUrl}
+              />
+            </VirtualRouter>
+          </Modal>
+        </InternalThemeProvider>
+      </FlowMetadataProvider>
+    </AppearanceProvider>
   );
 
   const mountedSignUpModal = (
-    <Modal
-      active
-      handleClose={() => componentsControls.closeModal('signUp')}
-      className='cl-modal-backdrop'
-      modalClassname='cl-modal-container'
+    <AppearanceProvider
+      globalAppearance={state.appearance}
+      appearanceKey='signUp'
+      appearance={signUpModal?.appearance}
     >
-      <VirtualRouter
-        preservedParams={PRESERVED_QUERYSTRING_PARAMS}
-        onExternalNavigate={() => componentsControls.closeModal('signUp')}
-        startPath='/sign-up'
-      >
-        <SignInModal
-          afterSignInUrl={signUpModal?.afterSignInUrl}
-          afterSignUpUrl={signUpModal?.afterSignUpUrl}
-          redirectUrl={signUpModal?.redirectUrl}
-        />
-        <SignUpModal {...signUpModal} />
-      </VirtualRouter>
-    </Modal>
+      <FlowMetadataProvider flow={'signUp'}>
+        <InternalThemeProvider>
+          <Modal handleClose={() => componentsControls.closeModal('signUp')}>
+            <VirtualRouter
+              preservedParams={PRESERVED_QUERYSTRING_PARAMS}
+              onExternalNavigate={() => componentsControls.closeModal('signUp')}
+              startPath='/sign-up'
+            >
+              <SignInModal
+                afterSignInUrl={signUpModal?.afterSignInUrl}
+                afterSignUpUrl={signUpModal?.afterSignUpUrl}
+                redirectUrl={signUpModal?.redirectUrl}
+              />
+              <SignUpModal {...signUpModal} />
+            </VirtualRouter>
+          </Modal>
+        </InternalThemeProvider>
+      </FlowMetadataProvider>
+    </AppearanceProvider>
   );
 
   return (

@@ -1,14 +1,10 @@
 import { keyframes } from '@emotion/react';
 
 const spinning = keyframes`
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }`;
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }`;
 
-const dropdownFadeInAndScale = keyframes`
+const dropdownSlideInScaleAndFade = keyframes`
   0% {
     opacity: 0;
     transform: scaleY(1) translateY(-6px);
@@ -16,8 +12,29 @@ const dropdownFadeInAndScale = keyframes`
 
   100% {
     opacity: 1;
-    transform: scaleY(1)  translateY(0px);;
+    transform: scaleY(1)  translateY(0px);
   }
+`;
+
+const modalScaleOutAndFade = keyframes`
+  0% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  90% {
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+`;
+
+const fadeIn = keyframes`
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 `;
 
 const textInSmall = keyframes`
@@ -32,7 +49,9 @@ const textInBig = keyframes`
 
 export const animations = {
   spinning,
-  dropdownFadeInAndScale,
+  dropdownSlideInScaleAndFade,
+  modalScaleOutAndFade,
+  fadeIn,
   textInSmall,
   textInBig,
 };

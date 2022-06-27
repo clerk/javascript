@@ -27,6 +27,7 @@ export const blackAlpha = Object.freeze({
 } as const);
 
 export const colors = Object.freeze({
+  modalBackdrop: blackAlpha.blackAlpha700,
   ...blackAlpha,
   ...whiteAlpha,
   colorBackground: 'white',
