@@ -1,0 +1,223 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`module exports should not change unless explicitly set 1`] = `
+Object {
+  "AllowlistIdentifier": [Function],
+  "ClerkExpressRequireAuth": [Function],
+  "ClerkExpressWithAuth": [Function],
+  "ClerkServerError": [Function],
+  "Client": [Function],
+  "Email": [Function],
+  "EmailAddress": [Function],
+  "ExternalAccount": [Function],
+  "HttpError": [Function],
+  "IdentificationLink": [Function],
+  "Invitation": [Function],
+  "Logger": [Function],
+  "Organization": [Function],
+  "OrganizationInvitation": [Function],
+  "OrganizationMembership": [Function],
+  "OrganizationMembershipPublicUserData": [Function],
+  "PhoneNumber": [Function],
+  "SMSMessage": [Function],
+  "User": [Function],
+  "Verification": [Function],
+  "allowlistIdentifiers": AllowlistIdentifierApi {
+    "_restClient": RestClient {
+      "apiKey": "TEST_API_KEY",
+      "apiVersion": "v1",
+      "fetcher": [Function],
+      "serverApiUrl": "https://api.clerk.dev",
+      "userAgent": "@clerk/clerk-sdk-node/3.7.0 (https://github.com/clerkinc/clerk-sdk-node)",
+    },
+  },
+  "clients": ClientApi {
+    "_restClient": RestClient {
+      "apiKey": "TEST_API_KEY",
+      "apiVersion": "v1",
+      "fetcher": [Function],
+      "serverApiUrl": "https://api.clerk.dev",
+      "userAgent": "@clerk/clerk-sdk-node/3.7.0 (https://github.com/clerkinc/clerk-sdk-node)",
+    },
+  },
+  "default": Clerk {
+    "_allowlistIdentifierApi": AllowlistIdentifierApi {
+      "_restClient": RestClient {
+        "apiKey": "TEST_API_KEY",
+        "apiVersion": "v1",
+        "fetcher": [Function],
+        "serverApiUrl": "https://api.clerk.dev",
+        "userAgent": "@clerk/clerk-sdk-node/3.7.0 (https://github.com/clerkinc/clerk-sdk-node)",
+      },
+    },
+    "_clientApi": ClientApi {
+      "_restClient": RestClient {
+        "apiKey": "TEST_API_KEY",
+        "apiVersion": "v1",
+        "fetcher": [Function],
+        "serverApiUrl": "https://api.clerk.dev",
+        "userAgent": "@clerk/clerk-sdk-node/3.7.0 (https://github.com/clerkinc/clerk-sdk-node)",
+      },
+    },
+    "_emailApi": EmailApi {
+      "_restClient": RestClient {
+        "apiKey": "TEST_API_KEY",
+        "apiVersion": "v1",
+        "fetcher": [Function],
+        "serverApiUrl": "https://api.clerk.dev",
+        "userAgent": "@clerk/clerk-sdk-node/3.7.0 (https://github.com/clerkinc/clerk-sdk-node)",
+      },
+    },
+    "_invitationApi": InvitationApi {
+      "_restClient": RestClient {
+        "apiKey": "TEST_API_KEY",
+        "apiVersion": "v1",
+        "fetcher": [Function],
+        "serverApiUrl": "https://api.clerk.dev",
+        "userAgent": "@clerk/clerk-sdk-node/3.7.0 (https://github.com/clerkinc/clerk-sdk-node)",
+      },
+    },
+    "_jwksClient": JwksClient {
+      "getSigningKey": [Function],
+      "options": Object {
+        "cache": true,
+        "cacheMaxAge": 3600000,
+        "jwksUri": "https://api.clerk.dev/v1/jwks",
+        "rateLimit": false,
+        "requestHeaders": Object {
+          "Authorization": "Bearer TEST_API_KEY",
+        },
+        "timeout": 5000,
+      },
+    },
+    "_organizationApi": OrganizationApi {
+      "_restClient": RestClient {
+        "apiKey": "TEST_API_KEY",
+        "apiVersion": "v1",
+        "fetcher": [Function],
+        "serverApiUrl": "https://api.clerk.dev",
+        "userAgent": "@clerk/clerk-sdk-node/3.7.0 (https://github.com/clerkinc/clerk-sdk-node)",
+      },
+    },
+    "_restClient": RestClient {
+      "apiKey": "TEST_API_KEY",
+      "apiVersion": "v1",
+      "fetcher": [Function],
+      "serverApiUrl": "https://api.clerk.dev",
+      "userAgent": "@clerk/clerk-sdk-node/3.7.0 (https://github.com/clerkinc/clerk-sdk-node)",
+    },
+    "_sessionApi": SessionApi {
+      "_restClient": RestClient {
+        "apiKey": "TEST_API_KEY",
+        "apiVersion": "v1",
+        "fetcher": [Function],
+        "serverApiUrl": "https://api.clerk.dev",
+        "userAgent": "@clerk/clerk-sdk-node/3.7.0 (https://github.com/clerkinc/clerk-sdk-node)",
+      },
+      "getSession": [Function],
+      "getSessionList": [Function],
+      "getToken": [Function],
+      "revokeSession": [Function],
+      "verifySession": [Function],
+    },
+    "_smsMessageApi": SMSMessageApi {
+      "_restClient": RestClient {
+        "apiKey": "TEST_API_KEY",
+        "apiVersion": "v1",
+        "fetcher": [Function],
+        "serverApiUrl": "https://api.clerk.dev",
+        "userAgent": "@clerk/clerk-sdk-node/3.7.0 (https://github.com/clerkinc/clerk-sdk-node)",
+      },
+    },
+    "_userApi": UserApi {
+      "_restClient": RestClient {
+        "apiKey": "TEST_API_KEY",
+        "apiVersion": "v1",
+        "fetcher": [Function],
+        "serverApiUrl": "https://api.clerk.dev",
+        "userAgent": "@clerk/clerk-sdk-node/3.7.0 (https://github.com/clerkinc/clerk-sdk-node)",
+      },
+    },
+    "base": Base {
+      "buildAuthenticatedState": [Function],
+      "decodeBase64Function": [Function],
+      "decodeJwt": [Function],
+      "getAuthState": [Function],
+      "importKeyFunction": [Function],
+      "loadCryptoKey": [Function],
+      "loadCryptoKeyFunction": [Function],
+      "verifyJwt": [Function],
+      "verifyJwtSignature": [Function],
+      "verifySessionToken": [Function],
+      "verifySignatureFunction": [Function],
+    },
+    "httpOptions": Object {},
+    "jwtKey": undefined,
+  },
+  "emails": EmailApi {
+    "_restClient": RestClient {
+      "apiKey": "TEST_API_KEY",
+      "apiVersion": "v1",
+      "fetcher": [Function],
+      "serverApiUrl": "https://api.clerk.dev",
+      "userAgent": "@clerk/clerk-sdk-node/3.7.0 (https://github.com/clerkinc/clerk-sdk-node)",
+    },
+  },
+  "invitations": InvitationApi {
+    "_restClient": RestClient {
+      "apiKey": "TEST_API_KEY",
+      "apiVersion": "v1",
+      "fetcher": [Function],
+      "serverApiUrl": "https://api.clerk.dev",
+      "userAgent": "@clerk/clerk-sdk-node/3.7.0 (https://github.com/clerkinc/clerk-sdk-node)",
+    },
+  },
+  "organizations": OrganizationApi {
+    "_restClient": RestClient {
+      "apiKey": "TEST_API_KEY",
+      "apiVersion": "v1",
+      "fetcher": [Function],
+      "serverApiUrl": "https://api.clerk.dev",
+      "userAgent": "@clerk/clerk-sdk-node/3.7.0 (https://github.com/clerkinc/clerk-sdk-node)",
+    },
+  },
+  "requireAuth": [Function],
+  "sessions": SessionApi {
+    "_restClient": RestClient {
+      "apiKey": "TEST_API_KEY",
+      "apiVersion": "v1",
+      "fetcher": [Function],
+      "serverApiUrl": "https://api.clerk.dev",
+      "userAgent": "@clerk/clerk-sdk-node/3.7.0 (https://github.com/clerkinc/clerk-sdk-node)",
+    },
+    "getSession": [Function],
+    "getSessionList": [Function],
+    "getToken": [Function],
+    "revokeSession": [Function],
+    "verifySession": [Function],
+  },
+  "setClerkApiKey": [Function],
+  "setClerkApiVersion": [Function],
+  "setClerkHttpOptions": [Function],
+  "setClerkServerApiUrl": [Function],
+  "smsMessages": SMSMessageApi {
+    "_restClient": RestClient {
+      "apiKey": "TEST_API_KEY",
+      "apiVersion": "v1",
+      "fetcher": [Function],
+      "serverApiUrl": "https://api.clerk.dev",
+      "userAgent": "@clerk/clerk-sdk-node/3.7.0 (https://github.com/clerkinc/clerk-sdk-node)",
+    },
+  },
+  "users": UserApi {
+    "_restClient": RestClient {
+      "apiKey": "TEST_API_KEY",
+      "apiVersion": "v1",
+      "fetcher": [Function],
+      "serverApiUrl": "https://api.clerk.dev",
+      "userAgent": "@clerk/clerk-sdk-node/3.7.0 (https://github.com/clerkinc/clerk-sdk-node)",
+    },
+  },
+  "withAuth": [Function],
+}
+`;
