@@ -73,12 +73,7 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
         </Flex>
         <Footer.Root>
           <Footer.Action>
-            <Footer.ActionLink
-              isExternal
-              onClick={onHavingTroubleClick}
-            >
-              I'm having trouble
-            </Footer.ActionLink>
+            <Footer.ActionLink onClick={onHavingTroubleClick}>I'm having trouble</Footer.ActionLink>
           </Footer.Action>
           <Footer.Links />
         </Footer.Root>

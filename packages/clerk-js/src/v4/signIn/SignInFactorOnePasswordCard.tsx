@@ -80,12 +80,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
         </Flex>
         <Footer.Root>
           <Footer.Action>
-            <Footer.ActionLink
-              isExternal
-              onClick={onShowAlternativeMethodsClick}
-            >
-              Try another method
-            </Footer.ActionLink>
+            <Footer.ActionLink onClick={onShowAlternativeMethodsClick}>Try another method</Footer.ActionLink>
           </Footer.Action>
           <Footer.Links />
         </Footer.Root>

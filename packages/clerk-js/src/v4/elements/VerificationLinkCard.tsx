@@ -78,12 +78,7 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
         <Footer.Root>
           <Footer.Action>
             {props.onShowAlternativeMethodsClicked && (
-              <Footer.ActionLink
-                isExternal
-                onClick={props.onShowAlternativeMethodsClicked}
-              >
-                Try another method
-              </Footer.ActionLink>
+              <Footer.ActionLink onClick={props.onShowAlternativeMethodsClicked}>Try another method</Footer.ActionLink>
             )}
           </Footer.Action>
           <Footer.Links />

@@ -34,7 +34,7 @@ function _SignUpContinue() {
   const { displayConfig, userSettings } = useEnvironment();
   const { attributes } = userSettings;
   const { setActive } = useCoreClerk();
-  const { navigateAfterSignUp } = useSignUpContext();
+  const { navigateAfterSignUp, signInUrl } = useSignUpContext();
   const signUp = useCoreSignUp();
   const isProgressiveSignUp = userSettings.signUp.progressive;
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
@@ -140,12 +140,7 @@ function _SignUpContinue() {
         <Footer.Root>
           <Footer.Action>
             <Footer.ActionText>Have an account?</Footer.ActionText>
-            <Footer.ActionLink
-              isExternal
-              href={displayConfig.signInUrl}
-            >
-              Sign in
-            </Footer.ActionLink>
+            <Footer.ActionLink to={signInUrl}>Sign in</Footer.ActionLink>
           </Footer.Action>
           <Footer.Links />
         </Footer.Root>
