@@ -211,12 +211,7 @@ export function _SignInStart(): JSX.Element {
         <Footer.Root>
           <Footer.Action>
             <Footer.ActionText>No account?</Footer.ActionText>
-            <Footer.ActionLink
-              isExternal
-              href={signUpUrl}
-            >
-              Sign up
-            </Footer.ActionLink>
+            <Footer.ActionLink to={signUpUrl}>Sign up</Footer.ActionLink>
           </Footer.Action>
           <Footer.Links />
         </Footer.Root>

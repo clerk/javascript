@@ -3,6 +3,7 @@ import React from 'react';
 import { useOptions } from '../../ui/contexts';
 import { descriptors, Flex, Link, Text } from '../customizables';
 import { PropsOfComponent } from '../styledSystem';
+import { RouterLink } from './RouterLink';
 
 const FooterRoot = (props: React.PropsWithChildren<any>): JSX.Element => {
   return (
@@ -38,9 +39,9 @@ const FooterActionText = (props: React.PropsWithChildren<any>): JSX.Element => {
   );
 };
 
-const FooterActionLink = (props: PropsOfComponent<typeof Link>): JSX.Element => {
+const FooterActionLink = (props: PropsOfComponent<typeof RouterLink>): JSX.Element => {
   return (
-    <Link
+    <RouterLink
       elementDescriptor={descriptors.footerActionLink}
       {...props}
       colorScheme='primary'

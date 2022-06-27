@@ -38,7 +38,7 @@ function _SignUpStart(): JSX.Element {
   const { navigate } = useNavigate();
   const { attributes } = userSettings;
   const { setSession } = useCoreClerk();
-  const { navigateAfterSignUp } = useSignUpContext();
+  const { navigateAfterSignUp, signInUrl } = useSignUpContext();
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
@@ -211,12 +211,7 @@ function _SignUpStart(): JSX.Element {
         <Footer.Root>
           <Footer.Action>
             <Footer.ActionText>Have an account?</Footer.ActionText>
-            <Footer.ActionLink
-              isExternal
-              href={displayConfig.signInUrl}
-            >
-              Sign in
-            </Footer.ActionLink>
+            <Footer.ActionLink to={signInUrl}>Sign in</Footer.ActionLink>
           </Footer.Action>
           <Footer.Links />
         </Footer.Root>
