@@ -164,6 +164,9 @@ export type ElementsConfig = {
 
   loader: WithOptions<never, never, never>;
   'loader-icon': WithOptions<never, ErrorState, never>;
+
+  'modal-backdrop': WithOptions<never, never, never>;
+  'modal-content': WithOptions<never, never, never>;
 };
 
 export type Elements = {

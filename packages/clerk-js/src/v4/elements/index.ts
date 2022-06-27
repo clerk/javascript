@@ -18,3 +18,4 @@ export * from './Card';
 export * from './ArrowBlockButton';
 export * from './ReversibleContainer';
 export * from './Divider';
+export * from './Modal';

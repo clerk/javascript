@@ -7,7 +7,6 @@ type RouterLinkProps = PropsOfComponent<typeof Link> & {
 };
 
 export const RouterLink = (props: RouterLinkProps) => {
-  console.log(props);
   const { to, onClick: onClickProp, ...rest } = props;
   const router = useRouter();
 

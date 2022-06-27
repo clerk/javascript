@@ -27,7 +27,7 @@ export const DropdownBox = React.forwardRef<HTMLDivElement, DropdownBoxProps>((p
         overflow: 'hidden',
         width: '100%',
         top: `calc(100% + ${theme.space.$2})`,
-        animation: `${animations.dropdownFadeInAndScale} 250ms`,
+        animation: `${animations.dropdownSlideInScaleAndFade} 250ms`,
         animationTimingFunction: theme.transitionTiming.$slowBezier,
         transformOrigin: 'top center',
         boxShadow: theme.shadows.$cardDropShadow,

@@ -1,7 +1,6 @@
 import * as Primitives from '../primitives';
 import { makeCustomizable } from './makeCustomizable';
 
-export const Box = makeCustomizable(Primitives.Box);
 export const Flex = makeCustomizable(Primitives.Flex);
 export const Grid = makeCustomizable(Primitives.Grid);
 export const Button = makeCustomizable(Primitives.Button);

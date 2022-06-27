@@ -65,7 +65,7 @@ const FooterLinks = React.memo((): JSX.Element => {
     <Flex
       elementDescriptor={descriptors.footerPages}
       justify='between'
-      gap={4}
+      gap={3}
     >
       {paths.helpPageUrl && (
         <FooterLink

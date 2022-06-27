@@ -54,7 +54,7 @@ const BaseCard = React.forwardRef<HTMLDivElement, BaseCardProps>((props, ref) =>
         theme => ({
           willChange: 'transform, opacity, height',
           minWidth: theme.sizes.$100,
-          // maxWidth: theme.sizes.$100,
+          maxWidth: theme.sizes.$100,
           padding: `${theme.space.$9x5} ${theme.space.$8} ${theme.space.$12} ${theme.space.$8}`,
           borderRadius: theme.radii.$xl,
           backgroundColor: theme.colors.$colorBackground,
