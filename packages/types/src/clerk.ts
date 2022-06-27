@@ -1,4 +1,4 @@
-import { Appearance } from './appearance';
+import { Appearance, SignInTheme, SignUpTheme, UserButtonTheme, UserProfileTheme } from './appearance';
 import { ClientResource } from './client';
 import { DisplayThemeJSON } from './json';
 import { OrganizationResource } from './organization';
@@ -379,17 +379,21 @@ export type SignInProps = {
    * Page routing strategy
    */
   routing?: RoutingStrategy;
-
   /*
    * Root URL where the component is mounted on, eg: '/sign in'
    */
   path?: string;
-
   /**
    * Full URL or path to for the sign up process.
    * Used to fill the "Sign up" link in the SignUp component.
    */
   signUpUrl?: string;
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvided (if one is provided)
+   */
+  appearance?: SignInTheme;
 } & RedirectOptions;
 
 export type SignUpProps = {
@@ -397,17 +401,21 @@ export type SignUpProps = {
    * Page routing strategy
    */
   routing?: RoutingStrategy;
-
   /*
    * Root URL where the component is mounted on, eg: '/sign up'
    */
   path?: string;
-
   /**
    * Full URL or path to for the sign in process.
    * Used to fill the "Sign in" link in the SignUp component.
    */
   signInUrl?: string;
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvided (if one is provided)
+   */
+  appearance?: SignUpTheme;
 } & RedirectOptions;
 
 export type UserProfileProps = {
@@ -415,57 +423,61 @@ export type UserProfileProps = {
    * Page routing strategy
    */
   routing?: RoutingStrategy;
-
   /*
    * Root URL where the component is mounted on, eg: '/user'
    */
   path?: string;
-
   /*
    * Hides the default navigation bar
    */
   hideNavigation?: boolean;
-
   /*
    * Renders only a specific view of the component eg: 'security'
    */
   only?: 'account' | 'security';
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvided (if one is provided)
+   */
+  appearance?: UserProfileTheme;
 };
 
 export type UserButtonProps = {
   /**
-   * Controls if the user name is displayed next to the trigger button
+   * Controls if the username is displayed next to the trigger button
    */
   showName?: boolean;
-
   /**
    * Full URL or path to navigate after sign out is complete
    */
   afterSignOutUrl?: string;
-
   /**
    * Full URL or path to navigate after signing out the current user is complete.
    * This option applies to multi-session applications.
    */
   afterMultiSessionSingleSignOutUrl?: string;
-
-  /*
-   * Full URL or path leading to the
+  /**
+   *  Full URL or path leading to the
    * account management interface.
    */
   userProfileUrl?: string;
-
   /**
    * Full URL or path to navigate on "Add another account" action.
    * Multi-session mode only.
    */
   signInUrl?: string;
-
   /**
    * Full URL or path to navigate after successful account change.
    * Multi-session mode only.
    */
   afterSwitchSessionUrl?: string;
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvided (if one is provided)
+   */
+  appearance?: UserButtonTheme;
 };
 
 export interface HandleMagicLinkVerificationParams {

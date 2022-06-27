@@ -263,6 +263,10 @@ export type Variables = {
 
 export type Theme = {
   /**
+   * TODO:
+   */
+  options?: Options;
+  /**
    * General theme overrides. This styles will be merged with our base theme.
    * Can override global styles like colors, fonts etc.
    * Eg: `colorPrimary: 'blue'`
@@ -280,42 +284,38 @@ export type Options = {
   logoPlacement?: 'inside' | 'outside' | 'none';
   socialButtonsVariant?: 'auto' | 'iconButton' | 'blockButton';
   socialButtonsPlacement?: 'top' | 'bottom';
-  darkMode?: boolean;
   // floatingLabels: boolean;
 };
+
+export type SignInTheme = Theme;
+export type SignUpTheme = Theme;
+export type UserButtonTheme = Theme;
+export type UserProfileTheme = Theme;
 
 export type Appearance = Theme & {
   /**
    * Theme overrides that apply only
    * to the `<SignIn/>` component
    */
-  signIn?: Theme;
+  signIn?: SignInTheme;
   /**
    * Theme overrides that apply only
    * to the `<SignUp/>` component
    */
-  signUp?: Theme;
+  signUp?: SignUpTheme;
   /**
    * Theme overrides that apply only
    * to the `<UserButton/>` component
    */
-  userButton?: Theme;
+  userButton?: UserButtonTheme;
   /**
    * Theme overrides that apply only
    * to the `<UserProfile/>` component
    */
-  userProfile?: Theme;
-
-  options?: Options;
+  userProfile?: UserProfileTheme;
 };
 
 // TODO: Discuss if we want to release a `prefersColorScheme` based theme switcher
 // type AppearanceFunctionParams = { prefersColorScheme: 'dark' | 'light' };
 // export type AppearanceFactory = (params: AppearanceFunctionParams) => Appearance;
 // export type AppearanceProp = Appearance | AppearanceFactory;
-
-const appearance: Appearance = {
-  variables: {
-    colorText: '',
-  },
-};
