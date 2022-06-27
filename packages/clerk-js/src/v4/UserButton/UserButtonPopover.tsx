@@ -1,7 +1,7 @@
 import { ActiveSessionResource } from '@clerk/types';
 import React from 'react';
 
-import { useCoreSession, useCoreUser, useEnvironment, useUserButtonContext } from '../../ui/contexts';
+import { useCoreSession, useCoreUser, useEnvironment, useOptions, useUserButtonContext } from '../../ui/contexts';
 import { Flex, Flow, Link } from '../customizables';
 import { EmptyCard, PoweredByClerkText } from '../elements';
 import { CogFilled, Plus, SignOut, SignOutDouble } from '../icons';
@@ -113,10 +113,11 @@ const Footer = () => {
 };
 
 const Links = () => {
+  const paths = useOptions().paths || {};
   return (
     <Flex gap={4}>
-      <UserButtonLink href='https://www.google.com'>Terms</UserButtonLink>
-      <UserButtonLink href='https://www.google.com'>Privacy</UserButtonLink>
+      {paths.termsPageUrl && <UserButtonLink href={paths.termsPageUrl}>Terms</UserButtonLink>}
+      {paths.privacyPageUrl && <UserButtonLink href={paths.privacyPageUrl}>Privacy</UserButtonLink>}
     </Flex>
   );
 };

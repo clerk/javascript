@@ -14,7 +14,6 @@ export const RouterLink = (props: RouterLinkProps) => {
   const toUrl = router.resolve(to || router.indexPath);
 
   const onClick: React.MouseEventHandler<HTMLAnchorElement> = e => {
-    console.log(e);
     e.preventDefault();
     if (onClickProp && !to) {
       return onClickProp(e);
