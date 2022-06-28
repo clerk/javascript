@@ -62,8 +62,8 @@ test('createOrganization() creates an organization', async () => {
     .post('/v1/organizations', {
       name,
       slug,
-      public_metadata: JSON.stringify(publicMetadata),
-      private_metadata: JSON.stringify(privateMetadata),
+      public_metadata: publicMetadata,
+      private_metadata: privateMetadata,
       created_by: createdBy,
     })
     .reply(200, resJSON);
@@ -143,8 +143,8 @@ test('updateOrganizationMetadata() updates organization metadata', async () => {
 
   nock(defaultServerAPIUrl)
     .patch(`/v1/organizations/${id}/metadata`, {
-      public_metadata: JSON.stringify(publicMetadata),
-      private_metadata: JSON.stringify(privateMetadata),
+      public_metadata: publicMetadata,
+      private_metadata: privateMetadata,
     })
     .reply(200, resJSON);
 
