@@ -38,8 +38,7 @@ export const Modal = (props: ModalProps) => {
         aria-hidden
         elementDescriptor={descriptors.modalBackdrop}
         sx={theme => ({
-          animation: `${animations.fadeIn} 150ms`,
-          animationTimingFunction: theme.transitionTiming.$common,
+          animation: `${animations.fadeIn} 150ms ${theme.transitionTiming.$common}`,
           zIndex: theme.zIndices.$modal,
           backgroundColor: theme.colors.$modalBackdrop,
           ...common.centeredFlex(),
@@ -51,12 +50,12 @@ export const Modal = (props: ModalProps) => {
         })}
       >
         <Flex
+          elementDescriptor={descriptors.modalContent}
           ref={floating}
           aria-modal='true'
           role='dialog'
           sx={theme => ({
-            animation: `${animations.modalScaleOutAndFade} 180ms`,
-            animationTimingFunction: theme.transitionTiming.$common,
+            animation: `${animations.modalSlideAndFade} 180ms ${theme.transitionTiming.$easeOut}`,
           })}
         >
           {props.children}

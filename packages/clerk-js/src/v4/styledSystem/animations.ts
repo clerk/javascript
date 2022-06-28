@@ -16,19 +16,14 @@ const dropdownSlideInScaleAndFade = keyframes`
   }
 `;
 
-const modalScaleOutAndFade = keyframes`
+const modalSlideAndFade = keyframes`
   0% {
     opacity: 0;
-    transform: scale(0.96);
+    transform: translateY(0.5rem);
   }
-
-  90% {
-    transform: scale(1);
-  }
-
   100% {
     opacity: 1;
-    transform: scale(1);
+    transform: translateY(0);
   }
 `;
 
@@ -50,7 +45,7 @@ const textInBig = keyframes`
 export const animations = {
   spinning,
   dropdownSlideInScaleAndFade,
-  modalScaleOutAndFade,
+  modalSlideAndFade,
   fadeIn,
   textInSmall,
   textInBig,

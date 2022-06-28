@@ -6,7 +6,6 @@ type PortalProps = React.PropsWithChildren<{}>;
 export const Portal = (props: PortalProps) => {
   const el = React.useMemo<HTMLDivElement>(() => {
     const div = document.createElement('div');
-    div.classList.add('cl-portal-root');
     document.body.appendChild(div);
     return div;
   }, []);

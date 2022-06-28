@@ -11,6 +11,7 @@ const transitionProperty = Object.freeze({
 
 const transitionTiming = Object.freeze({
   common: 'ease',
+  easeOut: 'ease-out',
   slowBezier: 'cubic-bezier(0.16, 1, 0.3, 1)',
 } as const);
 
