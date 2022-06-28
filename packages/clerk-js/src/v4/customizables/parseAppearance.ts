@@ -24,7 +24,6 @@ export type ParsedAppearance = {
 };
 
 const defaultOptions: ParsedOptions = {
-  darkMode: false,
   logoPlacement: 'inside',
   socialButtonsPlacement: 'top',
   socialButtonsVariant: 'auto',
@@ -42,6 +41,7 @@ export const parseAppearance = (appearanceObjects: Array<Appearance | undefined>
   const parsedInternalTheme = parseVariables(appearanceList);
   const parsedElements = parseElements(appearanceList);
   const parsedOptions = parseOptions(appearanceList);
+  loadDefaultFont(parsedInternalTheme);
   return { parsedElements, parsedInternalTheme, parsedOptions };
 };
 
@@ -59,8 +59,6 @@ const parseVariables = (appearances: Appearance[]) => {
   appearances.forEach(appearance => {
     fastDeepMergeAndReplace(createInternalThemeFromVariables(appearance), res);
   });
-  loadFont(res?.fonts?.$main);
-  loadFont(res?.fonts?.$buttons);
   return res as ParsedInternalTheme;
 };
 
@@ -74,4 +72,13 @@ const createInternalThemeFromVariables = (theme: Theme | undefined): DeepPartial
   const fontSizes = { ...createFontSizeScale(theme) };
   const fonts = { ...createFonts(theme) };
   return createInternalTheme({ colors, radii, space, fontSizes, fonts } as any);
+};
+
+const loadDefaultFont = (theme: ParsedInternalTheme) => {
+  if (theme.fonts.$buttons === defaultInternalTheme.fonts.$buttons) {
+    loadFont(defaultInternalTheme.fonts.$buttons);
+  }
+  if (theme.fonts.$main === defaultInternalTheme.fonts.$main) {
+    loadFont(defaultInternalTheme.fonts.$buttons);
+  }
 };

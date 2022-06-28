@@ -221,14 +221,11 @@ export type Variables = {
   colorInputBackground?: CssColor;
   /**
    * The default font that will be used in all components.
-   * This can be the name of any Google font (https://fonts.google.com/), the name of a web-safe font ((@link WebSafeFont})
-   * or the name of a custom font loaded by your code.
-   * If a Google font is used, the components will automatically preconnect, preload, load and inject the font.
+   * This can be the name of a custom font loaded by your code or the name of a web-safe font ((@link WebSafeFont})
+   * If a specific fontFamily is not provided, the components will automatically preconnect, preload, load and inject the "Inter" Google font.
    * @default Inter
-   * @example Using a Google font
+   * @example
    * { fontFamily: 'Montserrat' }
-   * @example Using a web-safe font
-   * { fontFamily: 'Times New Roman' }
    */
   fontFamily?: FontFamily;
   /**
@@ -287,7 +284,6 @@ export type Options = {
   logoPlacement?: 'inside' | 'outside' | 'none';
   socialButtonsVariant?: 'auto' | 'iconButton' | 'blockButton';
   socialButtonsPlacement?: 'top' | 'bottom';
-  // floatingLabels: boolean;
 };
 
 export type SignInTheme = Theme;
