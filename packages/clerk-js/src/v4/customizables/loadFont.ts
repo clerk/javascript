@@ -3,29 +3,8 @@ import { FontFamily } from '@clerk/types';
 const GOOGLE_FONTS_API_URL = 'https://fonts.googleapis.com';
 const GOOGLE_FONTS_CDN_URL = 'https://fonts.gstatic.com';
 
-/**
- * Fonts that can be safely used without loading
- */
-const WEB_SAFE_FONTS = Object.freeze([
-  'Arial',
-  'Brush Script MT',
-  'Courier New',
-  'Garamond',
-  'Georgia',
-  'Helvetica',
-  'Tahoma',
-  'Times New Roman',
-  'Trebuchet MS',
-  'Verdana',
-] as const);
-
 export const loadFont = (font: FontFamily | undefined) => {
-  if (
-    !font ||
-    WEB_SAFE_FONTS.includes(font as any) ||
-    localFontIsAlreadyLoaded(font) ||
-    localFontIsAlreadyRegistered(font)
-  ) {
+  if (!font || localFontIsAlreadyLoaded(font) || localFontIsAlreadyRegistered(font)) {
     return;
   }
   loadGoogleFont(font);
