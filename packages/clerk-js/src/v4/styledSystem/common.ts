@@ -10,11 +10,9 @@ const textVariants = (theme: InternalTheme) => {
   } as const;
 
   const textSmallMedium = {
-    fontStyle: theme.fontStyles.$normal,
+    ...textSmallRegular,
     fontWeight: theme.fontWeights.$medium,
-    fontSize: theme.fontSizes.$xs,
     lineHeight: theme.lineHeights.$base,
-    fontFamily: theme.fonts.$main,
   } as const;
 
   const textExtraSmallRegular = {
@@ -47,17 +45,14 @@ const textVariants = (theme: InternalTheme) => {
   } as const;
 
   const textRegularMedium = {
-    fontStyle: theme.fontStyles.$normal,
+    ...textRegularRegular,
     fontWeight: theme.fontWeights.$medium,
-    fontSize: theme.fontSizes.$sm,
-    lineHeight: theme.lineHeights.$shorter,
-    fontFamily: theme.fonts.$main,
   } as const;
 
-  const textXLargeMedium = {
+  const textLargeSemibold = {
     fontStyle: theme.fontStyles.$normal,
     fontWeight: theme.fontWeights.$semibold,
-    fontSize: theme.fontSizes.$xl,
+    fontSize: theme.fontSizes.$md,
     lineHeight: theme.lineHeights.$taller,
     fontFamily: theme.fonts.$main,
   } as const;
@@ -67,10 +62,12 @@ const textVariants = (theme: InternalTheme) => {
     textSmallMedium,
     textButtonSmall,
     textRegularRegular,
+    textLargeSemibold,
     textXLargeMedium,
     textRegularMedium,
     textExtraSmallMedium,
     textExtraSmallRegular,
+    textLargeMedium,
   } as const;
 };
 
