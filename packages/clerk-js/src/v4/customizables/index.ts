@@ -2,6 +2,7 @@ import * as Primitives from '../primitives';
 import { makeCustomizable } from './makeCustomizable';
 
 export const Flex = makeCustomizable(Primitives.Flex);
+export const Col = makeCustomizable(Primitives.Col);
 export const Grid = makeCustomizable(Primitives.Grid);
 export const Button = makeCustomizable(Primitives.Button);
 export const Heading = makeCustomizable(Primitives.Heading);

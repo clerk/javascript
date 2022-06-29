@@ -66,3 +66,13 @@ export const Flex = React.forwardRef<HTMLDivElement, FlexProps>((props, ref) => 
     />
   );
 });
+
+export const Col = React.forwardRef<HTMLDivElement, FlexProps>((props, ref) => {
+  return (
+    <Flex
+      {...props}
+      direction='col'
+      ref={ref}
+    />
+  );
+});

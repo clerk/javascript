@@ -309,7 +309,7 @@ const makeSolid = (color: string | undefined): string | undefined => {
 };
 
 const makeTransparent = (color: string | undefined, percentage = 0): string | undefined => {
-  if (!color) {
+  if (!color || color.toString() === '') {
     return undefined;
   }
   const hsla = toHslaColor(color);
