@@ -73,6 +73,8 @@ export interface UserResource extends ClerkResource {
   }) => Promise<ExternalAccountResource>;
   get verifiedExternalAccounts(): ExternalAccountResource[];
   get unverifiedExternalAccounts(): ExternalAccountResource[];
+  get hasVerifiedEmailAddress(): boolean;
+  get hasVerifiedPhoneNumber(): boolean;
 }
 
 export type CreateEmailAddressParams = { email: string };
