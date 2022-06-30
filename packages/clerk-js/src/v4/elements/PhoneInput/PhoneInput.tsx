@@ -142,7 +142,7 @@ const DropdownTrigger = React.forwardRef<
       onClick={props.onClick}
       colorScheme='neutral'
       variant='ghost'
-      textVariant='textSmallMedium'
+      textVariant='smallMedium'
       focusRing={false}
       sx={theme => ({
         paddingLeft: theme.space.$3x5,
@@ -183,7 +183,7 @@ const NoResults = () => {
   return (
     <Text
       as='div'
-      variant='textSmallRegular'
+      variant='smallRegular'
       sx={theme => ({ width: '100%', padding: `${theme.space.$2} 0 0 ${theme.space.$4}` })}
     >
       No countries found
@@ -212,14 +212,14 @@ const CountryCodeListItem = React.memo((props: CountryCodeListItem) => {
       <Flag iso={country.iso} />
       <Text
         as='div'
-        variant='textSmallRegular'
+        variant='smallRegular'
         {...rest}
         sx={{ width: '100%' }}
       >
         {country.name}
       </Text>
       <Text
-        variant='textSmallRegular'
+        variant='smallRegular'
         colorScheme='neutral'
       >
         +{country.code}

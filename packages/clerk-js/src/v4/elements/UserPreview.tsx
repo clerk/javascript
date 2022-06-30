@@ -43,14 +43,14 @@ export const UserPreview = (props: UserPreviewProps) => {
         sx={{ textAlign: 'left' }}
       >
         <Text
-          variant={size === 'md' ? 'textRegularMedium' : 'textSmallMedium'}
+          variant={size === 'md' ? 'regularMedium' : 'smallMedium'}
           truncate
         >
           {name || identifier}
         </Text>
         {name && identifier && (
           <Text
-            variant='textSmallRegular'
+            variant='smallRegular'
             colorScheme='neutral'
             truncate
           >

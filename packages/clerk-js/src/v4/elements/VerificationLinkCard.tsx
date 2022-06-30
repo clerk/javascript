@@ -55,9 +55,9 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
             gap={1}
           >
             <Flex direction='col'>
-              <Text variant='textSmallMedium'>{props.formTitle}</Text>
+              <Text variant='smallMedium'>{props.formTitle}</Text>
               <Text
-                variant='textSmallRegular'
+                variant='smallRegular'
                 colorScheme='neutral'
               >
                 {props.formSubtitle}

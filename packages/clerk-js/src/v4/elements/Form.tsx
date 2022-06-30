@@ -57,7 +57,7 @@ const FormSubmit = (props: PropsOfComponent<typeof Button>) => {
         elementDescriptor={descriptors.formButtonPrimary}
         block
         colorScheme='primary'
-        textVariant='textButtonSmall'
+        textVariant='buttonSmall'
         type='submit'
         isLoading={isLoading}
         isDisabled={isDisabled}

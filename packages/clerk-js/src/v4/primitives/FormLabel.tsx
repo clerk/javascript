@@ -7,7 +7,7 @@ import { useFormControl } from './hooks';
 const { applyVariants } = createVariants(theme => ({
   base: {
     color: theme.colors.$colorText,
-    ...common.textVariants(theme).textSmallMedium,
+    ...common.textVariants(theme).smallMedium,
     ...common.disabled(theme),
   },
   variants: {},

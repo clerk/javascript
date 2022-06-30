@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Button, Flex, Icon, Spinner, Text } from '../customizables';
+import { Button, Col, Flex, Icon, Spinner, Text } from '../customizables';
 import { useCardState } from '../elements/contexts';
 import { useLoadingStatus } from '../hooks';
 import { PropsOfComponent } from '../styledSystem';
@@ -71,7 +71,7 @@ export const Action = (props: ActionProps) => {
       </Flex>
       <Text
         as='span'
-        variant='textSmallRegular'
+        variant='smallRegular'
         colorScheme='neutral'
       >
         {label}

@@ -43,7 +43,7 @@ export const ErrorCard = (props: ErrorCardProps) => {
         >
           {props.message && (
             <Text
-              variant='textSmallRegular'
+              variant='smallRegular'
               colorScheme='neutral'
             >
               {props.message}
@@ -51,7 +51,7 @@ export const ErrorCard = (props: ErrorCardProps) => {
           )}
           {/*TODO: extract  */}
           <Text
-            variant='textSmallRegular'
+            variant='smallRegular'
             colorScheme='neutral'
           >
             If you’re experiencing difficulty signing into your account, email us and we will work with you to restore

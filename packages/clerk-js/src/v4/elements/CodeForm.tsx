@@ -22,9 +22,9 @@ export const CodeForm = (props: CodeFormProps) => {
       gap={2}
     >
       <Flex direction='col'>
-        <Text variant='textSmallMedium'>{title}</Text>
+        <Text variant='smallMedium'>{title}</Text>
         <Text
-          variant='textSmallRegular'
+          variant='smallRegular'
           colorScheme='neutral'
         >
           {subtitle}
