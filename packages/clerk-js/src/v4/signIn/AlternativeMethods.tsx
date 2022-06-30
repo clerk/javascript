@@ -4,7 +4,7 @@ import React from 'react';
 import { useCoreSignIn } from '../../ui/contexts/';
 import { factorHasLocalStrategy } from '../../ui/signIn/utils';
 import { descriptors, Flex, Flow } from '../customizables';
-import { ArrowBlockButton, BackLink, Card, CardAlert, Footer, Header } from '../elements';
+import { ArrowBlockButton, Card, CardAlert, Footer, Header } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { allStrategiesButtonsComparator, formatIdentifier } from '../utils';
 import { HavingTrouble } from './HavingTrouble';
@@ -45,8 +45,8 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
     <Flow.Part part='alternativeMethods'>
       <Card>
         <CardAlert>{card.error}</CardAlert>
-        {onBackLinkClick && <BackLink onClick={onBackLinkClick} />}
         <Header.Root>
+          {onBackLinkClick && <Header.BackLink onClick={onBackLinkClick} />}
           <Header.Title>Try another method</Header.Title>
         </Header.Root>
         {/*TODO: extract main in its own component */}

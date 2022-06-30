@@ -5,7 +5,6 @@ import { descriptors, Flex, Flow, Icon, Text } from '../customizables';
 import { Email } from '../icons';
 import { CardAlert } from './Alert';
 import { ArrowBlockButton } from './ArrowBlockButton';
-import { BackLink } from './BackLink';
 import { Card } from './Card';
 import { useCardState } from './contexts';
 import { Footer } from './Footer';
@@ -31,8 +30,8 @@ export const ErrorCard = (props: ErrorCardProps) => {
     <Flow.Part part='havingTrouble'>
       <Card>
         <CardAlert>{card.error}</CardAlert>
-        {onBackLinkClick && <BackLink onClick={onBackLinkClick} />}
         <Header.Root>
+          {onBackLinkClick && <Header.BackLink onClick={onBackLinkClick} />}
           <Header.Title>{props.cardTitle || 'Error'}</Header.Title>
           {props.cardSubtitle && <Header.Subtitle>{props.cardSubtitle}</Header.Subtitle>}
         </Header.Root>

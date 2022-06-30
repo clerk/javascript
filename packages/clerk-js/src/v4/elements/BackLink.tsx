@@ -9,7 +9,7 @@ type BackLinkProps = PropsOfComponent<typeof RouterLink>;
 
 export const BackLink = (props: BackLinkProps) => {
   return (
-    <Flex sx={theme => ({ marginBottom: theme.space.$4 })}>
+    <Flex sx={theme => ({ marginBottom: theme.space.$2x5 })}>
       <RouterLink {...props}>
         <Icon icon={ArrowLeftIcon} />
         Back

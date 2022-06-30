@@ -5,7 +5,6 @@ import { descriptors, Flex } from '../customizables';
 import { useLoadingStatus } from '../hooks';
 import { handleError, sleep, useFormControl } from '../utils';
 import { CardAlert } from './Alert';
-import { BackLink } from './BackLink';
 import { Card } from './Card';
 import { useCodeControl } from './CodeControl';
 import { CodeForm } from './CodeForm';
@@ -68,8 +67,8 @@ export const VerificationCodeCard = (props: VerificationCodeCardProps) => {
   return (
     <Card>
       <CardAlert>{card.error}</CardAlert>
-      <BackLink onClick={goBack} />
       <Header.Root>
+        <Header.BackLink onClick={goBack} />
         <Header.Title>{props.cardTitle}</Header.Title>
         <Header.Subtitle>{props.cardSubtitle}</Header.Subtitle>
       </Header.Root>

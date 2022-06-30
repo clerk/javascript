@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { VerificationStatus } from '../../utils/getClerkQueryParam';
-import { descriptors, Flex, Flow, Icon, Spinner, Text } from '../customizables';
+import { Col, descriptors, Flex, Flow, Icon, Spinner, Text } from '../customizables';
 import { Card, CardAlert, Header } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { ExclamationTriangle, SwitchArrows, TickShield } from '../icons';
@@ -38,12 +38,9 @@ export const EmailLinkStatusCard = (props: EmailLinkStatusCardProps) => {
           <Header.Title>{props.title}</Header.Title>
           <Header.Subtitle>{props.subtitle}</Header.Subtitle>
         </Header.Root>
-        <Flex
-          direction='col'
-          elementDescriptor={descriptors.main}
-        >
+        <Col elementDescriptor={descriptors.main}>
           <StatusRow status={props.status} />
-        </Flex>
+        </Col>
       </Card>
     </Flow.Part>
   );

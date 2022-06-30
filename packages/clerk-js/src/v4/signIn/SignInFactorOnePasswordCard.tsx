@@ -4,7 +4,7 @@ import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '.
 import { useSupportEmail } from '../../ui/hooks/useSupportEmail';
 import { useRouter } from '../../ui/router/RouteContext';
 import { descriptors, Flex, Flow } from '../customizables';
-import { BackLink, Card, CardAlert, Footer, Form, Header, IdentityPreview } from '../elements';
+import { Card, CardAlert, Footer, Form, Header, IdentityPreview } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { handleError, useFormControl } from '../utils';
 
@@ -50,8 +50,8 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
     <Flow.Part part='password'>
       <Card>
         <CardAlert>{card.error}</CardAlert>
-        <BackLink onClick={goBack} />
         <Header.Root>
+          <Header.BackLink onClick={goBack} />
           <Header.Title>Enter password</Header.Title>
           <Header.Subtitle>to continue to {displayConfig.applicationName}</Header.Subtitle>
         </Header.Root>

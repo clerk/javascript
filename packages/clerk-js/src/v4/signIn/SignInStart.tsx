@@ -7,7 +7,7 @@ import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '.
 import { useNavigate } from '../../ui/hooks';
 import { useSupportEmail } from '../../ui/hooks/useSupportEmail';
 import { getClerkQueryParam } from '../../utils/getClerkQueryParam';
-import { descriptors, Flex, Flow } from '../customizables';
+import { Col, descriptors, Flow } from '../customizables';
 import {
   Card,
   CardAlert,
@@ -186,8 +186,7 @@ export function _SignInStart(): JSX.Element {
           <Header.Subtitle>to continue to {displayConfig.applicationName}</Header.Subtitle>
         </Header.Root>
         {/*TODO: extract main in its own component */}
-        <Flex
-          direction='col'
+        <Col
           elementDescriptor={descriptors.main}
           gap={8}
         >
@@ -207,7 +206,7 @@ export function _SignInStart(): JSX.Element {
               </Form.Root>
             )}
           </SocialButtonsReversibleContainer>
-        </Flex>
+        </Col>
         <Footer.Root>
           <Footer.Action>
             <Footer.ActionText>No account?</Footer.ActionText>

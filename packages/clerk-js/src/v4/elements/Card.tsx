@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { useEnvironment } from '../../ui/contexts';
 import { descriptors, Flex, useAppearance } from '../customizables';
 import { generateFlowPartClassname } from '../customizables/classGeneration';
 import { PropsOfComponent } from '../styledSystem';
@@ -16,11 +17,14 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => 
 
   return (
     <>
-      {appearance.parsedOptions.logoPlacement === 'outside' && <ApplicationLogo />}
+      {appearance.parsedOptions.logoPlacement === 'outside' && (
+        <ApplicationLogo sx={theme => ({ marginBottom: theme.space.$8 })} />
+      )}
       <BaseCard
         elementDescriptor={descriptors.card}
         className={generateFlowPartClassname(flowMetadata)}
         {...props}
+        gap={8}
         ref={ref}
       >
         {appearance.parsedOptions.logoPlacement === 'inside' && <ApplicationLogo />}
