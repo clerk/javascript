@@ -3,13 +3,12 @@ import React from 'react';
 
 import { useCoreSession, useCoreUser, useEnvironment, useOptions, useUserButtonContext } from '../../ui/contexts';
 import { Flex, Flow, Link } from '../customizables';
-import { EmptyCard, PoweredByClerkText } from '../elements';
+import { EmptyCard, PoweredByClerkText, UserPreview } from '../elements';
 import { CogFilled, Plus, SignOut, SignOutDouble } from '../icons';
 import { animations, PropsOfComponent } from '../styledSystem';
 import { Action, Actions } from './CurrentAccountActions';
 import { SessionActions, UserPreviewButton } from './OtherSessionActions';
 import { useMultisessionActions } from './useMultisessionActions';
-import { UserPreview } from './UserPreview';
 
 type UserButtonPopoverProps = { isOpen: boolean; close: () => void } & PropsOfComponent<typeof UserButtonCard>;
 

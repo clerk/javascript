@@ -2,15 +2,19 @@ import { UserResource } from '@clerk/types';
 import React from 'react';
 
 import { Flex, Text } from '../customizables';
-import { Avatar } from '../elements';
 import { PropsOfComponent } from '../styledSystem';
-import { getFullName } from '../utils';
-import { getIdentifier } from './getIdentifier';
+import { getFullName, getIdentifier } from '../utils';
+import { Avatar } from './Avatar';
 
-export type UserPreviewProps = PropsOfComponent<typeof Flex> & { user: UserResource; size?: 'md' | 'sm' };
+export type UserPreviewProps = PropsOfComponent<typeof Flex> & {
+  user: UserResource;
+  size?: 'lg' | 'md' | 'sm';
+  icon?: React.ReactNode;
+  profileImageUrl?: string;
+};
 
 export const UserPreview = (props: UserPreviewProps) => {
-  const { user, size = 'md', ...rest } = props;
+  const { user, size = 'md', icon, profileImageUrl, ...rest } = props;
   const name = getFullName(user);
   const identifier = getIdentifier(user);
 
@@ -22,14 +26,16 @@ export const UserPreview = (props: UserPreviewProps) => {
     >
       <Flex
         justify='center'
-        sx={theme => ({ flex: `0 0 ${theme.sizes.$11}` })}
+        sx={theme => ({ position: 'relative', flex: `0 0 ${theme.sizes.$11}` })}
       >
         <Avatar
           {...user}
+          profileImageUrl={profileImageUrl}
           // TODO: This should be coming from the theme
-          size={theme => (size === 'md' ? theme.sizes.$11 : theme.sizes.$8)}
+          size={theme => ({ sm: theme.sizes.$8, md: theme.sizes.$11, lg: theme.sizes.$12x5 }[size])}
           optimize
         />
+        {icon && <Flex sx={{ position: 'absolute', left: 0, bottom: 0 }}>{icon}</Flex>}
       </Flex>
       <Flex
         direction='col'

@@ -4,13 +4,12 @@ import { withRedirectToHome } from '../../ui/common/withRedirectToHome';
 import { useEnvironment, useSignInContext } from '../../ui/contexts';
 import { useNavigate } from '../../ui/hooks';
 import { Button, descriptors, Flex, Flow, Icon } from '../customizables';
-import { Card, CardAlert, Header, withCardStateProvider } from '../elements';
+import { Card, CardAlert, Header, UserPreview, UserPreviewProps, withCardStateProvider } from '../elements';
 import { ArrowBlockButton } from '../elements/ArrowBlockButton';
 import { useCardState } from '../elements/contexts';
 import { SignOutDouble } from '../icons';
 import { PropsOfComponent } from '../styledSystem';
 import { useMultisessionActions } from '../UserButton/useMultisessionActions';
-import { UserPreview, UserPreviewProps } from '../UserButton/UserPreview';
 
 const _SignInAccountSwitcher = () => {
   const card = useCardState();
