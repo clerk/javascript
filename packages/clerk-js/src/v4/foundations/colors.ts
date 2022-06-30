@@ -27,7 +27,11 @@ export const blackAlpha = Object.freeze({
 } as const);
 
 export const colors = Object.freeze({
+  // Colors that are not affected by `alphaShadesMode`
+  avatarBorder: blackAlpha.blackAlpha200,
+  avatarBackground: blackAlpha.blackAlpha500,
   modalBackdrop: blackAlpha.blackAlpha700,
+  // Themable colors
   ...blackAlpha,
   ...whiteAlpha,
   colorBackground: 'white',
