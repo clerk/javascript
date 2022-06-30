@@ -1,10 +1,10 @@
 import React from 'react';
 
 import { Button, Flex, Text } from '../customizables';
+import { UserPreview, UserPreviewProps } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { PropsOfComponent } from '../styledSystem';
 import { Actions } from './CurrentAccountActions';
-import { UserPreview, UserPreviewProps } from './UserPreview';
 
 export const SessionActions = (props: PropsOfComponent<typeof Flex>) => {
   return (

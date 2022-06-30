@@ -4,8 +4,7 @@ import { useCoreUser, useUserButtonContext, withCoreUserGuard } from '../../ui/c
 import { descriptors, Flex, Flow, Text } from '../customizables';
 import { withCardStateProvider } from '../elements';
 import { usePopover } from '../hooks';
-import { getFullName } from '../utils';
-import { getIdentifier } from './getIdentifier';
+import { getFullName, getIdentifier } from '../utils';
 import { Portal } from './Portal';
 import { UserButtonPopover } from './UserButtonPopover';
 import { UserButtonTrigger } from './UserButtonTrigger';

@@ -14,3 +14,4 @@ export * from './getFullName';
 export * from './phoneUtils';
 export * from './formatIdentifier';
 export * from './removeUndefinedProps';
+export * from './getIdentifier';
