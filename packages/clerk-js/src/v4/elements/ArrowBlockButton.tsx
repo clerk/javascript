@@ -3,7 +3,7 @@ import React from 'react';
 import { Button, Icon, Spinner, Text } from '../customizables';
 import { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { ArrowRightIcon } from '../icons';
-import { PropsOfComponent } from '../styledSystem';
+import { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 
 type ArrowBlockButtonProps = PropsOfComponent<typeof Button> & {
   icon?: React.ReactElement;
@@ -71,6 +71,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
         elementDescriptor={textElementDescriptor}
         elementId={textElementId}
         as='span'
+        truncate
       >
         {children}
       </Text>
