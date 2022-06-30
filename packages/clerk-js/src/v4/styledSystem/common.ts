@@ -1,7 +1,7 @@
 import { InternalTheme } from './types';
 
 const textVariants = (theme: InternalTheme) => {
-  const textSmallRegular = {
+  const smallRegular = {
     fontStyle: theme.fontStyles.$normal,
     fontWeight: theme.fontWeights.$normal,
     fontSize: theme.fontSizes.$xs,
@@ -9,13 +9,13 @@ const textVariants = (theme: InternalTheme) => {
     fontFamily: theme.fonts.$main,
   } as const;
 
-  const textSmallMedium = {
-    ...textSmallRegular,
+  const smallMedium = {
+    ...smallRegular,
     fontWeight: theme.fontWeights.$medium,
     lineHeight: theme.lineHeights.$base,
   } as const;
 
-  const textExtraSmallRegular = {
+  const extraSmallRegular = {
     fontWeight: theme.fontWeights.$normal,
     fontStyle: theme.fontStyles.$normal,
     fontSize: theme.fontSizes.$2xs,
@@ -24,19 +24,19 @@ const textVariants = (theme: InternalTheme) => {
     fontFamily: theme.fonts.$main,
   } as const;
 
-  const textButtonSmall = {
-    ...textExtraSmallRegular,
+  const buttonSmall = {
+    ...extraSmallRegular,
     fontWeight: theme.fontWeights.$semibold,
     textTransform: 'uppercase',
     fontFamily: theme.fonts.$buttons,
   } as const;
 
-  const textExtraSmallMedium = {
-    ...textButtonSmall,
+  const extraSmallMedium = {
+    ...buttonSmall,
     fontFamily: theme.fonts.$main,
   } as const;
 
-  const textRegularRegular = {
+  const regularRegular = {
     fontStyle: theme.fontStyles.$normal,
     fontWeight: theme.fontWeights.$normal,
     fontSize: theme.fontSizes.$sm,
@@ -44,12 +44,12 @@ const textVariants = (theme: InternalTheme) => {
     fontFamily: theme.fonts.$main,
   } as const;
 
-  const textRegularMedium = {
-    ...textRegularRegular,
+  const regularMedium = {
+    ...regularRegular,
     fontWeight: theme.fontWeights.$medium,
   } as const;
 
-  const textLargeSemibold = {
+  const largeSemibold = {
     fontStyle: theme.fontStyles.$normal,
     fontWeight: theme.fontWeights.$semibold,
     fontSize: theme.fontSizes.$md,
@@ -58,16 +58,17 @@ const textVariants = (theme: InternalTheme) => {
   } as const;
 
   return {
-    textSmallRegular,
-    textSmallMedium,
-    textButtonSmall,
-    textRegularRegular,
-    textLargeSemibold,
-    textXLargeMedium,
-    textRegularMedium,
-    textExtraSmallMedium,
-    textExtraSmallRegular,
-    textLargeMedium,
+    smallRegular,
+    smallMedium,
+    buttonSmall,
+    regularRegular,
+    largeSemibold,
+    xlargeMedium,
+    regularMedium,
+    extraSmallMedium,
+    extraSmallRegular,
+    largeMedium,
+    xxlargeMedium,
   } as const;
 };
 

@@ -47,7 +47,7 @@ export const UserPreviewButton = (props: UserPreviewButtonProps) => {
         size='sm'
       />
       <Text
-        variant='textSmallRegular'
+        variant='smallRegular'
         sx={theme => ({ color: theme.colors.$blackAlpha500 })}
       >
         Switch account

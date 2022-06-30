@@ -33,7 +33,7 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
         elementId={descriptors.alert.setId(variant)}
         colorScheme='neutral'
         // TODO: should these variants also include a size?
-        variant='textSmallRegular'
+        variant='smallRegular'
       >
         {children}
       </Text>

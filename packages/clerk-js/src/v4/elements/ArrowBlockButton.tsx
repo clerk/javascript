@@ -42,7 +42,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
     <Button
       variant='outline'
       colorScheme='neutral'
-      textVariant='textSmallRegular'
+      textVariant='smallRegular'
       block
       sx={theme => ({
         position: 'relative',

@@ -15,7 +15,7 @@ export const PoweredByClerkText = React.memo(() => {
       sx={theme => ({ color: theme.colors.$blackAlpha300 })}
     >
       <Text
-        variant='textSmallMedium'
+        variant='smallMedium'
         sx={{ color: 'inherit' }}
       >
         Secured by
@@ -67,7 +67,7 @@ export const PoweredByClerkTag = React.memo(
         ref={ref}
       >
         <Text
-          variant='textExtraSmallRegular'
+          variant='extraSmallRegular'
           sx={theme => ({ color: 'inherit', letterSpacing: theme.space.$none, fontSize: '0.625rem' })}
         >
           Secured by

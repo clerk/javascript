@@ -91,7 +91,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
           '&:active': { color: vars.accentDarker },
         },
         link: {
-          ...common.textVariants(theme).textSmallRegular,
+          ...common.textVariants(theme).smallRegular,
           minHeight: 'fit-content',
           height: 'fit-content',
           width: 'fit-content',
