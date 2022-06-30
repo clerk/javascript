@@ -85,11 +85,11 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
 export function getButtonLabel(factor: SignInFactor): string {
   switch (factor.strategy) {
     case 'email_link':
-      return `Send verification link to ${formatIdentifier(factor.safeIdentifier)}`;
+      return `Send link to ${formatIdentifier(factor.safeIdentifier)}`;
     case 'email_code':
-      return `Send verification code to ${formatIdentifier(factor.safeIdentifier)}`;
+      return `Send code to ${formatIdentifier(factor.safeIdentifier)}`;
     case 'phone_code':
-      return `Send verification code to ${formatIdentifier(factor.safeIdentifier)}`;
+      return `Send code to ${formatIdentifier(factor.safeIdentifier)}`;
     case 'password':
       return 'Sign in with your password';
     default:

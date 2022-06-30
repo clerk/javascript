@@ -11,12 +11,11 @@ const Root = React.memo((props: React.PropsWithChildren<any>): JSX.Element => {
       {...props}
       direction='col'
       gap={1}
-      sx={theme => ({ marginBottom: theme.space.$8 })}
     />
   );
 });
 
-const Title = React.memo((props: React.PropsWithChildren<any>): JSX.Element => {
+const Title = React.memo((props: PropsOfComponent<typeof Heading>): JSX.Element => {
   return (
     <Heading
       elementDescriptor={descriptors.headerTitle}
