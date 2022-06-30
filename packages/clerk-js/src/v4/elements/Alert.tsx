@@ -45,7 +45,6 @@ export const CardAlert = React.memo((props: AlertProps) => {
   return (
     <Alert
       variant='danger'
-      sx={theme => ({ marginBottom: theme.space.$8 })}
       {...props}
     />
   );

@@ -12,7 +12,6 @@ const FooterRoot = (props: React.PropsWithChildren<any>): JSX.Element => {
       {...props}
       justify='between'
       align='center'
-      sx={theme => ({ marginTop: theme.space.$8 })}
     />
   );
 };

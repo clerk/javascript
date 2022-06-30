@@ -4,7 +4,6 @@ import { useRouter } from '../../ui/router';
 import { descriptors, Flex, Flow, Text } from '../customizables';
 import { useLoadingStatus } from '../hooks';
 import { CardAlert } from './Alert';
-import { BackLink } from './BackLink';
 import { Card } from './Card';
 import { useCardState } from './contexts';
 import { Footer } from './Footer';
@@ -36,8 +35,8 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
     <Flow.Part part='emailLinkVerify'>
       <Card>
         <CardAlert>{card.error}</CardAlert>
-        <BackLink onClick={goBack} />
         <Header.Root>
+          <Header.BackLink onClick={goBack} />
           <Header.Title>{props.cardTitle}</Header.Title>
           <Header.Subtitle>{props.cardSubtitle}</Header.Subtitle>
         </Header.Root>

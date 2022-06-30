@@ -1,6 +1,8 @@
 import React from 'react';
 
 import { descriptors, Flex, Heading, Text } from '../customizables';
+import { PropsOfComponent } from '../styledSystem';
+import { BackLink as BackLinkEl } from './BackLink';
 
 const Root = React.memo((props: React.PropsWithChildren<any>): JSX.Element => {
   return (
@@ -34,8 +36,13 @@ const Subtitle = React.memo((props: React.PropsWithChildren<any>): JSX.Element =
   );
 });
 
+const BackLink = (props: PropsOfComponent<typeof BackLinkEl>) => {
+  return <BackLinkEl {...props} />;
+};
+
 export const Header = {
   Root,
   Title,
   Subtitle,
+  BackLink,
 };
