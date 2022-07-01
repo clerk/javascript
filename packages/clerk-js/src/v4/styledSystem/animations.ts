@@ -42,6 +42,12 @@ const textInBig = keyframes`
   100% {opacity: 1;max-height: 3rem;}
 `;
 
+const blockBigIn = keyframes`
+  0% {opacity: 0;max-height: 0;}
+  99% {opacity: 1;max-height: 10rem;}
+  100% {opacity: 1;max-height: unset;}
+`;
+
 export const animations = {
   spinning,
   dropdownSlideInScaleAndFade,
@@ -49,4 +55,5 @@ export const animations = {
   fadeIn,
   textInSmall,
   textInBig,
+  blockBigIn,
 };
