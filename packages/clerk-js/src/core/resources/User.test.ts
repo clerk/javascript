@@ -1,5 +1,5 @@
-import { ExternalAccountJSON, UserJSON, VerificationJSON, Web3WalletJSON } from '@clerk/types';
-import { BaseResource, ExternalAccount } from 'core/resources/internal';
+import { UserJSON } from '@clerk/types';
+import { BaseResource } from 'core/resources/internal';
 
 import { User } from './User';
 
@@ -63,5 +63,71 @@ describe('User', () => {
         web3_wallet: targetWeb3Wallet,
       },
     });
+  });
+
+  it('denotes if has a verified email address', () => {
+    const userWithUnverifiedEmail = new User({
+      email_addresses: [
+        {
+          emailAddress: 'unverified@clerk.dev',
+          verification: null,
+        },
+      ],
+      phone_numbers: [],
+      web3_wallets: [],
+      external_accounts: [],
+    } as unknown as UserJSON);
+
+    expect(userWithUnverifiedEmail.hasVerifiedEmailAddress).toEqual(false);
+
+    const userWithVerifiedEmail = new User({
+      email_addresses: [
+        {
+          emailAddress: 'unverified@clerk.dev',
+          verification: {
+            status: 'verified',
+          },
+        },
+      ],
+      phone_numbers: [],
+      web3_wallets: [],
+      external_accounts: [],
+    } as unknown as UserJSON);
+
+    expect(userWithVerifiedEmail.hasVerifiedEmailAddress).toEqual(true);
+  });
+
+  it('denotes if has a verified phone number', () => {
+    const userWithUnverifiedPhone = new User({
+      email_addresses: [],
+      phone_numbers: [
+        {
+          phoneNumber: '+306900000000',
+          verification: {
+            status: 'unverified',
+          },
+        },
+      ],
+      web3_wallets: [],
+      external_accounts: [],
+    } as unknown as UserJSON);
+
+    expect(userWithUnverifiedPhone.hasVerifiedPhoneNumber).toEqual(false);
+
+    const userWithVerifiedPhone = new User({
+      email_addresses: [],
+      phone_numbers: [
+        {
+          phoneNumber: '+306900000000',
+          verification: {
+            status: 'verified',
+          },
+        },
+      ],
+      web3_wallets: [],
+      external_accounts: [],
+    } as unknown as UserJSON);
+
+    expect(userWithVerifiedPhone.hasVerifiedPhoneNumber).toEqual(true);
   });
 });

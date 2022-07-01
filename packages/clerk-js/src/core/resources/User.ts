@@ -182,6 +182,14 @@ export class User extends BaseResource implements UserResource {
     return this.externalAccounts.filter(externalAccount => externalAccount.verification?.status != 'verified');
   }
 
+  get hasVerifiedEmailAddress() {
+    return this.emailAddresses.filter(email => email.verification.status === 'verified').length > 0;
+  }
+
+  get hasVerifiedPhoneNumber() {
+    return this.phoneNumbers.filter(phone => phone.verification.status === 'verified').length > 0;
+  }
+
   protected fromJSON(data: UserJSON): this {
     this.id = data.id;
     this.externalId = data.external_id;
