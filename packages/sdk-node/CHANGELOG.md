@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.8.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.7.0...@clerk/clerk-sdk-node@3.8.0) (2022-07-01)
+
+### Features
+
+- **clerk-sdk-node:** Add module exports testing ([ad01d27](https://github.com/clerkinc/javascript/commit/ad01d27f6259c1938d4d27df01c9af0a01a34ebf))
+
 ## [3.7.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@3.6.2...@clerk/clerk-sdk-node@3.7.0) (2022-06-24)
 
 ### Features

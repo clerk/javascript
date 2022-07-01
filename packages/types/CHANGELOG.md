@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.18.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.17.0...@clerk/types@2.18.0) (2022-07-01)
+
+### Features
+
+- **types,clerk-js:** Introduce user hasVerifiedEmailAddress & hasVerifiedPhoneNumber attributes ([ea68447](https://github.com/clerkinc/javascript/commit/ea684473697c33b7b5d8930fe24b7667f6edeaad))
+
 ## [2.17.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.16.0...@clerk/types@2.17.0) (2022-06-24)
 
 ### Features

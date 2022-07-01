@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.11.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.10.0...@clerk/backend-core@1.11.0) (2022-07-01)
+
+### Features
+
+- **backend-core:** Add backend-core exports testing ([2a2112d](https://github.com/clerkinc/javascript/commit/2a2112d5b458cbc4e577bd68f10d422dcf5af055))
+
 ## [1.10.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.9.2...@clerk/backend-core@1.10.0) (2022-06-24)
 
 ### Features
