@@ -76,12 +76,12 @@ export function withEdgeMiddlewareAuth(
 ): any {
   return async function clerkAuth(req: NextRequest, event: NextFetchEvent) {
     const { loadUser, loadSession, jwtKey, authorizedParties } = options;
-    const cookieToken = req.cookies['__session'];
+    const cookieToken = req.cookies.get('__session');
     const headerToken = req.headers.get('authorization');
     const { status, interstitial, sessionClaims, errorReason } = await vercelEdgeBase.getAuthState({
       cookieToken,
       headerToken,
-      clientUat: req.cookies['__client_uat'],
+      clientUat: req.cookies.get('__client_uat'),
       origin: req.headers.get('origin'),
       host: req.headers.get('host') as string,
       userAgent: req.headers.get('user-agent'),
