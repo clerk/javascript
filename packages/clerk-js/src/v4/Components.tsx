@@ -42,7 +42,7 @@ const AvailableComponents = {
   SignIn,
   SignUp,
   UserButton,
-  // UserProfile,
+  UserProfile,
 };
 
 type AvailableComponentNames = keyof typeof AvailableComponents;
