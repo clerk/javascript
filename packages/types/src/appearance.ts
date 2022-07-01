@@ -49,6 +49,15 @@ export type FieldId =
   | 'password'
   | 'identifier'
   | 'username';
+export type ProfileSectionId =
+  | 'profile'
+  | 'username'
+  | 'emailAddresses'
+  | 'phoneNumbers'
+  | 'connectedAccounts'
+  | 'password'
+  | 'mfa'
+  | 'activeDevices';
 
 /**
  * A type that describes the states and the ids that we will combine
@@ -167,6 +176,11 @@ export type ElementsConfig = {
 
   'modal-backdrop': WithOptions<never, never, never>;
   'modal-content': WithOptions<never, never, never>;
+
+  profileSection: WithOptions<ProfileSectionId, never, never>;
+  'profileSection-title': WithOptions<ProfileSectionId, never, never>;
+  'profileSection-titleText': WithOptions<ProfileSectionId, never, never>;
+  'profileSection-content': WithOptions<ProfileSectionId, never, never>;
 };
 
 export type Elements = {
