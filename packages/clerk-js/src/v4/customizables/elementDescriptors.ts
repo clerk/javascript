@@ -75,6 +75,11 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
 
   'modal-backdrop',
   'modal-content',
+
+  'profileSection',
+  'profileSection-title',
+  'profileSection-titleText',
+  'profileSection-content',
 ] as const);
 
 type TargettableClassname<K extends keyof ElementsConfig> = `${typeof CLASS_PREFIX}${K}`;
