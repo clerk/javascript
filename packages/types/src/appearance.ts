@@ -181,6 +181,10 @@ export type ElementsConfig = {
   'profileSection-title': WithOptions<ProfileSectionId, never, never>;
   'profileSection-titleText': WithOptions<ProfileSectionId, never, never>;
   'profileSection-content': WithOptions<ProfileSectionId, never, never>;
+
+  formattedPhoneNumber: WithOptions<never, never, never>;
+  'formattedPhoneNumber-flag': WithOptions<never, never, never>;
+  'formattedPhoneNumber-text': WithOptions<never, never, never>;
 };
 
 export type Elements = {
