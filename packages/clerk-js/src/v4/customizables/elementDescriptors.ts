@@ -80,6 +80,10 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'profileSection-title',
   'profileSection-titleText',
   'profileSection-content',
+
+  'formattedPhoneNumber',
+  'formattedPhoneNumber-flag',
+  'formattedPhoneNumber-text',
 ] as const);
 
 type TargettableClassname<K extends keyof ElementsConfig> = `${typeof CLASS_PREFIX}${K}`;

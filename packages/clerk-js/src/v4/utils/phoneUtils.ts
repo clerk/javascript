@@ -103,7 +103,7 @@ function maxE164CompliantLength(countryCode?: string) {
   return MAX_PHONE_NUMBER_LENGTH - codeWithPrefix.length;
 }
 
-function parsePhoneString(str: string) {
+export function parsePhoneString(str: string) {
   const iso = getCountryIsoFromFormattedNumber(str) as CountryIso;
   const pattern = IsoToCountryMap.get(iso)?.pattern || '';
   const code = IsoToCountryMap.get(iso)?.code || '';

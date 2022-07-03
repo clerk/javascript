@@ -21,3 +21,4 @@ export * from './Divider';
 export * from './Modal';
 export * from './UserPreview';
 export * from './Accordion';
+export * from './FormattedPhoneNumber';
