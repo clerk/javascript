@@ -6,8 +6,8 @@ export default function handleError(error: any): never {
   const body = error?.response?.body;
   let data;
 
-  if (body) {
-    data = JSON.parse(body).errors.map((errorJSON: ClerkServerErrorJSON) => {
+  if (body && Array.isArray(body.errors)) {
+    data = body.errors.map((errorJSON: ClerkServerErrorJSON) => {
       return ClerkServerError.fromJSON(errorJSON);
     });
   } else {
