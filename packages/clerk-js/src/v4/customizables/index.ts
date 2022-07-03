@@ -18,6 +18,7 @@ export const FormErrorText = makeCustomizable(Primitives.FormErrorText);
 export const Form = makeCustomizable(Primitives.Form);
 export const Icon = makeCustomizable(Primitives.Icon);
 export const Spinner = makeCustomizable(Primitives.Spinner);
+export const Label = makeCustomizable(Primitives.Label);
 
 export * from './Flow';
 export { AppearanceProvider, useAppearance } from './AppearanceContext';
