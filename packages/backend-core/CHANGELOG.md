@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [1.11.1](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.11.0...@clerk/backend-core@1.11.1) (2022-07-04)
+
+### Bug Fixes
+
+- **backend-core,clerk-sdk-node:** Fix parsing issue and defensively check for errors body ([f2f6fe9](https://github.com/clerkinc/javascript/commit/f2f6fe9b093ff3a34ca31c4ff3179841a44355cf))
+
 ## [1.11.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@1.10.0...@clerk/backend-core@1.11.0) (2022-07-01)
 
 ### Features
