@@ -10,10 +10,10 @@ export function titleize(str: string | undefined | null): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-export function snakeToCamel(str: string): string {
-  return str.replace(/([-_][a-z])/g, match => match.toUpperCase().replace(/-|_/, ''));
+export function snakeToCamel(str: string | undefined): string {
+  return str ? str.replace(/([-_][a-z])/g, match => match.toUpperCase().replace(/-|_/, '')) : '';
 }
 
-export function camelToSnake(str: string): string {
-  return str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+export function camelToSnake(str: string | undefined): string {
+  return str ? str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`) : '';
 }
