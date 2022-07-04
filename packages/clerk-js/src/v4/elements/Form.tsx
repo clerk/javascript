@@ -9,9 +9,7 @@ import { FormControl } from './FormControl';
 
 const [FormState, useFormState] = createContextAndHook<{ isLoading: boolean; isDisabled: boolean }>('FormState');
 
-type FormProps = React.PropsWithChildren<{
-  onSubmit?: React.FormEventHandler;
-}>;
+type FormProps = PropsOfComponent<typeof FormPrim>;
 
 const FormRoot = (props: FormProps): JSX.Element => {
   const card = useCardState();
@@ -56,11 +54,27 @@ const FormSubmit = (props: PropsOfComponent<typeof Button>) => {
       <Button
         elementDescriptor={descriptors.formButtonPrimary}
         block
-        colorScheme='primary'
         textVariant='buttonSmall'
         type='submit'
         isLoading={isLoading}
         isDisabled={isDisabled}
+        {...props}
+      />
+    </>
+  );
+};
+
+const FormReset = (props: PropsOfComponent<typeof Button>) => {
+  const { isLoading, isDisabled } = useFormState();
+  return (
+    <>
+      <Button
+        elementDescriptor={descriptors.formButtonReset}
+        block
+        variant='ghost'
+        textVariant='buttonSmall'
+        type='reset'
+        isDisabled={isLoading || isDisabled}
         {...props}
       />
     </>
@@ -83,4 +97,5 @@ export const Form = {
   ControlRow: FormControlRow,
   Control: FormControl,
   SubmitButton: FormSubmit,
+  ResetButton: FormReset,
 };
