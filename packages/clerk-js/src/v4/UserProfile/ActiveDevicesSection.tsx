@@ -30,7 +30,7 @@ export const ActiveDevicesSection = () => {
           size='lg'
         />
       )}
-      {sessionsWithActivities.length &&
+      {!!sessionsWithActivities.length &&
         sessionsWithActivities.sort(currentSessionFirst(session?.id)).map(sa => (
           <DeviceAccordion
             key={sa.id}
@@ -43,6 +43,12 @@ export const ActiveDevicesSection = () => {
 
 const DeviceAccordion = (props: { session: SessionWithActivitiesResource }) => {
   const isCurrent = useCoreSession()?.id === props.session.id;
+  const revoke = async () => {
+    if (isCurrent || !props.session) {
+      return;
+    }
+    return props.session.revoke();
+  };
 
   return (
     <AccordionItem title={<DeviceInfo session={props.session} />}>
@@ -60,6 +66,7 @@ const DeviceAccordion = (props: { session: SessionWithActivitiesResource }) => {
             subtitle='Sign out from your account on this device'
             actionLabel='Sign out of device'
             colorScheme='danger'
+            onClick={revoke}
           />
         )}
       </Col>
@@ -79,8 +86,7 @@ const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
       align='center'
     >
       <Flex
-        justify='center'
-        align='center'
+        center
         sx={theme => ({
           backgroundColor: theme.colors.$activeDeviceBackground,
           padding: `0 ${theme.space.$3}`,

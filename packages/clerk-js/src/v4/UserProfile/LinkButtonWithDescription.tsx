@@ -1,4 +1,5 @@
 import { Button, Col, Flex, Text } from '../customizables';
+import { useLoadingStatus } from '../hooks';
 import { PropsOfComponent } from '../styledSystem';
 
 type LinkButtonWithTextDescriptionProps = PropsOfComponent<typeof Button> & {
@@ -6,10 +7,22 @@ type LinkButtonWithTextDescriptionProps = PropsOfComponent<typeof Button> & {
   titleLabel?: React.ReactNode;
   subtitle: string;
   actionLabel?: string;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => Promise<any>;
 };
 
 export const LinkButtonWithDescription = (props: LinkButtonWithTextDescriptionProps) => {
-  const { title, subtitle, actionLabel, titleLabel, ...rest } = props;
+  const { title, subtitle, actionLabel, titleLabel, onClick: onClickProp, ...rest } = props;
+  const status = useLoadingStatus();
+  console.log(status);
+
+  const onClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    status.setLoading();
+    if (onClickProp) {
+      console.log(onClickProp);
+      (onClickProp?.(e) as any).finally(() => status.setIdle());
+    }
+  };
+
   return (
     <Col gap={2}>
       <Col gap={1}>
@@ -32,6 +45,9 @@ export const LinkButtonWithDescription = (props: LinkButtonWithTextDescriptionPr
           colorScheme='primary'
           variant='link'
           {...rest}
+          isLoading={status.isLoading}
+          loadingText={actionLabel}
+          onClick={onClick}
         >
           {actionLabel}
         </Button>
