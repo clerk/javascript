@@ -1,5 +1,6 @@
 // import { Modal } from '@clerk/shared/components/modal';
 import type { Appearance, Clerk, ClerkOptions, EnvironmentResource, SignInProps, SignUpProps } from '@clerk/types';
+import { UserProfileProps } from '@clerk/types/src';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -18,6 +19,7 @@ import { SignIn, SignInModal } from './signIn';
 import { SignUp, SignUpModal } from './signUp';
 import { InternalThemeProvider } from './styledSystem';
 import { UserButton } from './UserButton';
+import { UserProfile, UserProfileModal } from './UserProfile';
 
 export type MountComponentRenderer = (
   clerk: Clerk,
@@ -34,8 +36,11 @@ export type ComponentControls = {
   }) => void;
   unmountComponent: (params: { node: HTMLDivElement }) => void;
   updateProps: (params: { appearance?: Appearance | undefined; node?: HTMLDivElement; props?: unknown }) => void;
-  openModal: <T extends 'signIn' | 'signUp'>(modal: T, props: T extends 'signIn' ? SignInProps : SignUpProps) => void;
-  closeModal: (modal: 'signIn' | 'signUp') => void;
+  openModal: <T extends 'signIn' | 'signUp' | 'userProfile'>(
+    modal: T,
+    props: T extends 'signIn' ? SignInProps : T extends 'signUp' ? SignUpProps : UserProfileProps,
+  ) => void;
+  closeModal: (modal: 'signIn' | 'signUp' | 'userProfile') => void;
 };
 
 const AvailableComponents = {
@@ -64,6 +69,7 @@ interface ComponentsState {
   appearance: Appearance | undefined;
   signInModal: null | SignInProps;
   signUpModal: null | SignUpProps;
+  userProfileModal: null | UserProfileProps;
   nodes: Map<HTMLDivElement, HtmlNodeOptions>;
 }
 
@@ -106,9 +112,10 @@ const Components = (props: ComponentsProps) => {
     appearance: props.options.appearance,
     signInModal: null,
     signUpModal: null,
+    userProfileModal: null,
     nodes: new Map(),
   });
-  const { signInModal, signUpModal, nodes } = state;
+  const { signInModal, signUpModal, userProfileModal, nodes } = state;
 
   React.useEffect(() => {
     componentsControls.mountComponent = params => {
@@ -140,20 +147,13 @@ const Components = (props: ComponentsProps) => {
       setState(s => ({ ...s, appearance }));
     };
 
-    componentsControls.closeModal = modal => {
-      if (modal === 'signIn') {
-        setState(s => ({ ...s, signInModal: null }));
-      } else {
-        setState(s => ({ ...s, signUpModal: null }));
-      }
+    componentsControls.closeModal = name => {
+      setState(s => ({ ...s, [name + 'Modal']: null }));
     };
 
-    componentsControls.openModal = (modal, props) => {
-      if (modal === 'signIn') {
-        setState(s => ({ ...s, signInModal: props }));
-      } else {
-        setState(s => ({ ...s, signUpModal: props }));
-      }
+    componentsControls.openModal = (name, props) => {
+      console.log('componentsControls.openModal', name);
+      setState(s => ({ ...s, [name + 'Modal']: props }));
     };
   }, []);
 
@@ -211,6 +211,31 @@ const Components = (props: ComponentsProps) => {
     </AppearanceProvider>
   );
 
+  const mountedUserProfileModal = (
+    <AppearanceProvider
+      globalAppearance={state.appearance}
+      appearanceKey='userProfile'
+      appearance={userProfileModal?.appearance}
+    >
+      <FlowMetadataProvider flow='userProfile'>
+        <InternalThemeProvider>
+          <Modal
+            handleClose={() => componentsControls.closeModal('userProfile')}
+            contentSx={{ maxHeight: '60vh' }}
+          >
+            <VirtualRouter
+              preservedParams={PRESERVED_QUERYSTRING_PARAMS}
+              onExternalNavigate={() => componentsControls.closeModal('userProfile')}
+              startPath='/user'
+            >
+              <UserProfileModal />
+            </VirtualRouter>
+          </Modal>
+        </InternalThemeProvider>
+      </FlowMetadataProvider>
+    </AppearanceProvider>
+  );
+
   return (
     <CoreClerkContextWrapper clerk={props.clerk}>
       <EnvironmentProvider value={props.environment}>
@@ -236,6 +261,7 @@ const Components = (props: ComponentsProps) => {
           })}
           {signInModal && mountedSignInModal}
           {signUpModal && mountedSignUpModal}
+          {userProfileModal && mountedUserProfileModal}
         </OptionsProvider>
       </EnvironmentProvider>
     </CoreClerkContextWrapper>
