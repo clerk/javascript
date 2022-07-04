@@ -76,12 +76,15 @@ export function withEdgeMiddlewareAuth(
 ): any {
   return async function clerkAuth(req: NextRequest, event: NextFetchEvent) {
     const { loadUser, loadSession, jwtKey, authorizedParties } = options;
-    const cookieToken = req.cookies.get('__session');
+
+    const cookieToken = getCookie(req.cookies, '__session');
+    const clientUat = getCookie(req.cookies, '__client_uat');
+
     const headerToken = req.headers.get('authorization');
     const { status, interstitial, sessionClaims, errorReason } = await vercelEdgeBase.getAuthState({
       cookieToken,
       headerToken,
-      clientUat: req.cookies.get('__client_uat'),
+      clientUat,
       origin: req.headers.get('origin'),
       host: req.headers.get('host') as string,
       userAgent: req.headers.get('user-agent'),
@@ -134,4 +137,14 @@ export function withEdgeMiddlewareAuth(
     });
     return handler(authRequest, event);
   };
+}
+
+/* As of Next.js 12.2, the req.cookies API is accessed using .get, on previous releases, it used plain object access. To support both without breaking previous versions, we can use this simple check. */
+function getCookie(cookies: NextRequest['cookies'], name: string) {
+  if (typeof cookies.get === 'function') {
+    return cookies.get(name);
+  } else {
+    // @ts-expect-error
+    return cookies[name];
+  }
 }
