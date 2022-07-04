@@ -27,8 +27,10 @@ const dynamicSpaceUnits = Object.freeze({
   '16': '4rem',
   '20': '5rem',
   '24': '6rem',
+  '60': '15rem',
   '94': '23.5rem',
   '100': '25rem',
+  '160': '40rem',
   '220': '55rem',
 } as const);
 
@@ -46,6 +48,7 @@ const sizes = Object.freeze({ ...space } as const);
 const radii = Object.freeze({
   none: '0px',
   circle: '50%',
+  sm: '0.25rem',
   md: '0.375rem',
   lg: '0.5rem',
   xl: '1rem',

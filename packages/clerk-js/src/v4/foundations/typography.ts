@@ -30,6 +30,7 @@ const fontSizes = Object.freeze({
   md: '1rem',
   lg: '1.125rem',
   xl: '1.25rem',
+  '2xl': '2rem',
 } as const);
 
 const fontStyles = Object.freeze({
