@@ -39,7 +39,7 @@ const textInSmall = keyframes`
 
 const textInBig = keyframes`
   0% {opacity: 0;max-height: 0;}
-  100% {opacity: 1;max-height: 3rem;}
+  100% {opacity: 1;max-height: 8rem;}
 `;
 
 const blockBigIn = keyframes`

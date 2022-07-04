@@ -13,6 +13,8 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     colorScheme: {
       danger: { color: theme.colors.$danger500 },
       warning: { color: theme.colors.$warning500 },
+      success: { color: theme.colors.$success500 },
+      primary: { color: theme.colors.$primary500 },
     },
   },
 }));
