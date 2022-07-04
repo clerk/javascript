@@ -300,6 +300,18 @@ export default class IsomorphicClerk {
     }
   };
 
+  openUserButton = (): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.openUserButton();
+    }
+  };
+
+  closeUserButton = (): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.closeUserButton();
+    }
+  };
+
   mountSignIn = (node: HTMLDivElement, props: SignInProps): void => {
     if (this.clerkjs && this.#loaded) {
       this.clerkjs.mountSignIn(node, props);

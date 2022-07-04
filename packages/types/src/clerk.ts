@@ -73,6 +73,12 @@ export interface Clerk {
   /** Closes the Clerk sign in modal. */
   closeSignIn: () => void;
 
+  /** Open Clerk UserButton component */
+  openUserButton: () => void;
+
+  /** Close Clerk UserButton component */
+  closeUserButton: () => void;
+
   /**
    * Opens the Clerk sign up modal.
    *

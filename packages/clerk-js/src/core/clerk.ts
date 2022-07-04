@@ -192,6 +192,14 @@ export default class Clerk implements ClerkInterface {
     this.#components.closeSignUp();
   };
 
+  public openUserButton = () => {
+    return;
+  };
+
+  public closeUserButton = () => {
+    return;
+  };
+
   public mountSignIn = (node: HTMLDivElement, props?: SignInProps): void => {
     this.assertComponentsReady(this.#components);
     this.#components.mountComponent({

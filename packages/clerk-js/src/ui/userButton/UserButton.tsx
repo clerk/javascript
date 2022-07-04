@@ -1,6 +1,5 @@
 import { Avatar } from '@clerk/shared/components/avatar';
 import { Portal } from '@clerk/shared/components/portal';
-import { useDetectClickOutside } from '@clerk/shared/hooks';
 import type { UserButtonProps } from '@clerk/types';
 import cn from 'classnames';
 import React from 'react';
@@ -9,6 +8,7 @@ import { useCoreUser, withCoreUserGuard } from 'ui/contexts';
 
 import { PopupVisibilityContext } from './contexts/PopupVisibilityContext';
 import { UserButtonPopup } from './UserButtonPopup';
+import { useUserButtonVisibility } from './useUserButtonVisibility';
 import { determineIdentifier } from './utils';
 
 const userButtonPopperOptions = {
@@ -30,7 +30,8 @@ export const UserButton = withCoreUserGuard(({ showName }: UserButtonProps) => {
 
   const userButtonRef = React.useRef<HTMLButtonElement>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
-  const { isActive, setIsActive } = useDetectClickOutside(containerRef, false);
+  const { isActive, setIsActive } = useUserButtonVisibility(containerRef);
+
   const { styles, attributes, update } = usePopper(
     userButtonRef.current,
     containerRef.current,
