@@ -47,6 +47,7 @@ export const createRadiiUnits = (theme: Theme) => {
   const md = borderRadius === 'none' ? '0' : borderRadius;
   const { numericValue, unit = 'rem' } = splitCssUnit(md);
   return {
+    sm: percentage(numericValue, 0.23).toString() + unit,
     md,
     lg: percentage(numericValue, 0.35).toString() + unit,
     xl: percentage(numericValue, 1.7).toString() + unit,
@@ -82,6 +83,7 @@ export const createFontSizeScale = (theme: Theme): Record<keyof typeof fontSizes
     md: fontSize,
     lg: (numericValue * 1.125).toString() + unit,
     xl: (numericValue * 1.25).toString() + unit,
+    '2xl': (numericValue * 2).toString() + unit,
   };
 };
 
