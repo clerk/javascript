@@ -8,6 +8,7 @@ import {
   createColorScales,
   createFonts,
   createFontSizeScale,
+  createOptions,
   createRadiiUnits,
   createSpaceScale,
   reverseAlphaScalesIfNeeded,
@@ -71,7 +72,8 @@ const createInternalThemeFromVariables = (theme: Theme | undefined): DeepPartial
   const space = { ...createSpaceScale(theme) };
   const fontSizes = { ...createFontSizeScale(theme) };
   const fonts = { ...createFonts(theme) };
-  return createInternalTheme({ colors, radii, space, fontSizes, fonts } as any);
+  const options = { ...createOptions(theme) };
+  return createInternalTheme({ colors, radii, space, fontSizes, fonts, options } as any);
 };
 
 const loadDefaultFont = (theme: ParsedInternalTheme) => {

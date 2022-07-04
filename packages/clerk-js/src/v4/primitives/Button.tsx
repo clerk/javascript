@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { common, createCssVariables, createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
+import { colors } from '../utils';
 import { applyDataStateProps } from './applyDataStateProps';
 import { Flex } from './Flex';
 import { Spinner } from './Spinner';
@@ -33,8 +34,12 @@ const { applyVariants, filterProps } = createVariants(theme => {
       },
       colorScheme: {
         primary: {
-          [vars.accentLightest]: theme.colors.$primary50,
-          [vars.accentLighter]: theme.colors.$primary100,
+          [vars.accentLightest]: theme.options.$darkMode
+            ? colors.makeTransparent(theme.colors.$primary400, 0.8)
+            : theme.colors.$primary50,
+          [vars.accentLighter]: theme.options.$darkMode
+            ? colors.makeTransparent(theme.colors.$primary800, 0.5)
+            : theme.colors.$primary100,
           [vars.accent]: theme.colors.$primary500,
           [vars.accentDark]: theme.colors.$primary600,
           [vars.accentDarker]: theme.colors.$primary700,
@@ -144,8 +149,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
           gap={2}
           center
         >
-          <Spinner aria-label={loadingText || 'Loading'} />
-          {loadingText || undefined}
+          <Spinner
+            css={{ position: 'absolute' }}
+            aria-label={loadingText || 'Loading'}
+          />
+          {loadingText || <span style={{ opacity: 0 }}>{children}</span>}
         </Flex>
       )}
       {!isLoading && children}
