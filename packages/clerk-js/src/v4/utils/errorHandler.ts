@@ -1,7 +1,8 @@
 import { ClerkAPIError } from '@clerk/types';
 
 import { isClerkAPIResponseError } from '../../core/resources/internal';
-import type { FormControlState } from './useField';
+import { snakeToCamel } from '../shared';
+import { FormControlState } from './useFormControl';
 
 interface ParserErrors {
   fieldErrors: ClerkAPIError[];
@@ -14,7 +15,10 @@ function setFieldErrors(fieldStates: Array<FormControlState<string>>, errors: Cl
   }
 
   fieldStates.forEach(field => {
-    const error = errors.find(err => err.meta!.paramName === field.id);
+    const error = errors.find(err => {
+      console.log(err.meta!.paramName, snakeToCamel(err.meta!.paramName), field.id);
+      return err.meta!.paramName === field.id || snakeToCamel(err.meta!.paramName) === field.id;
+    });
     field.setError(error?.message || undefined);
   });
 }
