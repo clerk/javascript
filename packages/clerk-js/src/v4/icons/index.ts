@@ -21,3 +21,7 @@ export { default as SignOut } from './signout.svg';
 export { default as SignOutDouble } from './signout-double.svg';
 export { default as Plus } from './plus.svg';
 export { default as CogFilled } from './cog-filled.svg';
+export { default as User } from './user.svg';
+export { default as DeviceMobile } from './mobile.svg';
+export { default as DeviceDesktop } from './desktop.svg';
+export { default as Mobile } from './mobile-small.svg';

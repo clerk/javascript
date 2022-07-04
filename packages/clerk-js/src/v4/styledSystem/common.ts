@@ -15,6 +15,11 @@ const textVariants = (theme: InternalTheme) => {
     lineHeight: theme.lineHeights.$base,
   } as const;
 
+  const smallSemibold = {
+    ...smallMedium,
+    fontWeight: theme.fontWeights.$semibold,
+  } as const;
+
   const extraSmallRegular = {
     fontWeight: theme.fontWeights.$normal,
     fontStyle: theme.fontStyles.$normal,
@@ -34,6 +39,7 @@ const textVariants = (theme: InternalTheme) => {
   const extraSmallMedium = {
     ...buttonSmall,
     fontFamily: theme.fonts.$main,
+    textTransform: 'none',
   } as const;
 
   const regularRegular = {
@@ -57,17 +63,33 @@ const textVariants = (theme: InternalTheme) => {
     fontFamily: theme.fonts.$main,
   } as const;
 
+  const largeMedium = {
+    ...largeSemibold,
+    fontWeight: theme.fontWeights.$medium,
+  };
+
+  const xlargeMedium = {
+    ...largeSemibold,
+    fontSize: theme.fontSizes.$xl,
+  } as const;
+
+  const xxlargeMedium = {
+    ...xlargeMedium,
+    fontSize: theme.fontSizes.$2xl,
+  } as const;
+
   return {
+    buttonSmall,
+    extraSmallRegular,
+    extraSmallMedium,
     smallRegular,
     smallMedium,
-    buttonSmall,
+    smallSemibold,
     regularRegular,
+    regularMedium,
+    largeMedium,
     largeSemibold,
     xlargeMedium,
-    regularMedium,
-    extraSmallMedium,
-    extraSmallRegular,
-    largeMedium,
     xxlargeMedium,
   } as const;
 };
@@ -141,6 +163,23 @@ const centeredFlex = (display: 'flex' | 'inline-flex' = 'flex') => ({
   alignItems: 'center',
 });
 
+const maxHeightScroller = theme =>
+  ({
+    height: '100%',
+    overflowY: 'auto',
+    '::-webkit-scrollbar': {
+      background: 'transparent',
+      width: '8px',
+      height: '8px',
+    },
+    '::-webkit-scrollbar-thumb': {
+      background: theme.colors.$blackAlpha500,
+    },
+    '::-webkit-scrollbar-track': {
+      background: 'transparent',
+    },
+  } as const);
+
 export const common = {
   textVariants,
   fontSizeVariants,
@@ -150,4 +189,5 @@ export const common = {
   disabled,
   borderColor,
   centeredFlex,
+  maxHeightScroller,
 };
