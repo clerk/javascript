@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { descriptors, Flex, Text } from '../customizables';
+import { PropsOfComponent } from '../styledSystem';
 import { getFlagEmojiFromCountryIso, parsePhoneString, stringToFormattedPhoneString } from '../utils';
 
 type FormattedPhoneProps = {
@@ -29,5 +30,19 @@ export const FormattedPhoneNumber = (props: FormattedPhoneProps) => {
         {formattedPhone}
       </Text>
     </Flex>
+  );
+};
+
+export const FormattedPhoneNumberText = (props: FormattedPhoneProps & PropsOfComponent<typeof Text>) => {
+  const formattedPhone = stringToFormattedPhoneString(props.value);
+
+  return (
+    <Text
+      as='span'
+      elementDescriptor={descriptors.formattedPhoneNumberText}
+      variant='smallRegular'
+    >
+      {formattedPhone}
+    </Text>
   );
 };
