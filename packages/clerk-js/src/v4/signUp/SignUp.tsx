@@ -73,20 +73,18 @@ export const SignUpModal = (props: SignUpProps): JSX.Element => {
 
   return (
     <Route path='sign-up'>
-      <div className='cl-component cl-sign-up'>
-        <ComponentContext.Provider
-          value={{
-            componentName: 'SignUp',
-            ...signUpProps,
-            routing: 'virtual',
-          }}
-        >
-          <SignUp
-            {...signUpProps}
-            routing='virtual'
-          />
-        </ComponentContext.Provider>
-      </div>
+      <ComponentContext.Provider
+        value={{
+          componentName: 'SignUp',
+          ...signUpProps,
+          routing: 'virtual',
+        }}
+      >
+        <SignUp
+          {...signUpProps}
+          routing='virtual'
+        />
+      </ComponentContext.Provider>
     </Route>
   );
 };

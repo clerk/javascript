@@ -65,28 +65,40 @@ export interface Clerk {
   signOut: SignOut;
 
   /**
-   * Opens the Clerk sign in modal.
-   *
-   * @param signInProps Optional sign in configuration parameters.
+   * Opens the Clerk SignIn component in a modal.
+   * @param props Optional sign in configuration parameters.
    */
-  openSignIn: (signInProps?: SignInProps) => void;
+  openSignIn: (props?: SignInProps) => void;
 
-  /** Closes the Clerk sign in modal. */
+  /**
+   * Closes the Clerk SignIn modal.
+   */
   closeSignIn: () => void;
 
   /**
-   * Opens the Clerk sign up modal.
-   *
-   * @param signUpProps Optional sign up configuration parameters.
+   * Opens the Clerk SignUp component in a modal.
+   * @param props Optional props that will be passed to the SignUp component.
    */
-  openSignUp: (signUpProps?: SignUpProps) => void;
+  openSignUp: (props?: SignUpProps) => void;
 
-  /** Closes the Clerk sign up modal. */
+  /**
+   * Closes the Clerk SignUp modal.
+   */
   closeSignUp: () => void;
 
   /**
+   * Opens the Clerk UserProfile modal.
+   * @param props Optional props that will be passed to the UserProfile component.
+   */
+  openUserProfile: (props?: UserProfileProps) => void;
+
+  /**
+   * Closes the Clerk UserProfile modal.
+   */
+  closeUserProfile: () => void;
+
+  /**
    * Mounts a sign in flow component at the target element.
-   *
    * @param targetNode Target node to mount the SignIn component.
    * @param signInProps sign in configuration parameters.
    */

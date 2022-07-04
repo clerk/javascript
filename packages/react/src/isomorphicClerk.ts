@@ -49,6 +49,7 @@ export default class IsomorphicClerk {
   private clerkjs: BrowserClerk | null = null;
   private preopenSignIn?: null | SignInProps = null;
   private preopenSignUp?: null | SignUpProps = null;
+  private preopenUserProfile?: null | UserProfileProps = null;
   private premountSignInNodes = new Map<HTMLDivElement, SignInProps>();
   private premountSignUpNodes = new Map<HTMLDivElement, SignUpProps>();
   private premountUserProfileNodes = new Map<HTMLDivElement, UserProfileProps>();
@@ -178,6 +179,10 @@ export default class IsomorphicClerk {
       clerkjs.openSignUp(this.preopenSignUp);
     }
 
+    if (this.preopenUserProfile !== null) {
+      clerkjs.openUserProfile(this.preopenUserProfile);
+    }
+
     this.premountSignInNodes.forEach((props: SignInProps, node: HTMLDivElement) => {
       clerkjs.mountSignIn(node, props);
     });
@@ -289,6 +294,22 @@ export default class IsomorphicClerk {
       this.clerkjs.closeSignIn();
     } else {
       this.preopenSignIn = null;
+    }
+  };
+
+  openUserProfile = (props?: UserProfileProps): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.openUserProfile(props);
+    } else {
+      this.preopenUserProfile = props;
+    }
+  };
+
+  closeUserProfile = (): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.closeUserProfile();
+    } else {
+      this.preopenUserProfile = null;
     }
   };
 
