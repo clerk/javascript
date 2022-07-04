@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Alert as AlertCust, AlertIcon, descriptors, Text } from '../customizables';
-import { PropsOfComponent } from '../styledSystem';
+import { animations, PropsOfComponent } from '../styledSystem';
 
 type AlertProps = React.PropsWithChildren<{
   variant?: 'danger' | 'warning';
@@ -45,6 +45,10 @@ export const CardAlert = React.memo((props: AlertProps) => {
   return (
     <Alert
       variant='danger'
+      sx={theme => ({
+        willChange: 'transform, opacity, height',
+        animation: `${animations.textInBig} ${theme.transitionDuration.$slow}`,
+      })}
       {...props}
     />
   );
