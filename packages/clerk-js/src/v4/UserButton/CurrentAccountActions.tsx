@@ -6,12 +6,7 @@ import { useLoadingStatus } from '../hooks';
 import { PropsOfComponent } from '../styledSystem';
 
 export const Actions = (props: PropsOfComponent<typeof Flex>) => {
-  return (
-    <Flex
-      direction='col'
-      {...props}
-    />
-  );
+  return <Col {...props} />;
 };
 
 type ActionProps = PropsOfComponent<typeof Button> & {

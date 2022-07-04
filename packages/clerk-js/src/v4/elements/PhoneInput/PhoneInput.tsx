@@ -197,8 +197,7 @@ const CountryCodeListItem = React.memo((props: CountryCodeListItem) => {
     <Flex
       ref={innerRef}
       onClick={() => selectIso(country.iso)}
-      justify='center'
-      align='center'
+      center
       sx={theme => ({
         userSelect: 'none',
         gap: theme.space.$2,

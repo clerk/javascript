@@ -9,8 +9,7 @@ export const InputWithIcon = React.forwardRef<HTMLInputElement, InputWithIcon>((
   const { leftIcon, ...rest } = props;
   return (
     <Flex
-      justify='center'
-      align='center'
+      center
       sx={theme => ({
         width: '100%',
         position: 'relative',

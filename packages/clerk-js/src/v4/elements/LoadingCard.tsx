@@ -13,8 +13,7 @@ export const LoadingCard = () => {
       <CardAlert>{card.error}</CardAlert>
       <Flex
         direction='col'
-        justify='center'
-        align='center'
+        center
         elementDescriptor={descriptors.main}
         gap={8}
         sx={theme => ({

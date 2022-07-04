@@ -45,8 +45,7 @@ export const Label = (props: LabelProps) => {
   return (
     <Flex
       {...filterProps(props)}
-      justify='center'
-      align='center'
+      center
       css={applyVariants(props)}
     />
   );

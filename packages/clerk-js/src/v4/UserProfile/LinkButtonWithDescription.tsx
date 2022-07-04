@@ -13,13 +13,11 @@ type LinkButtonWithTextDescriptionProps = PropsOfComponent<typeof Button> & {
 export const LinkButtonWithDescription = (props: LinkButtonWithTextDescriptionProps) => {
   const { title, subtitle, actionLabel, titleLabel, onClick: onClickProp, ...rest } = props;
   const status = useLoadingStatus();
-  console.log(status);
 
   const onClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     status.setLoading();
     if (onClickProp) {
-      console.log(onClickProp);
-      (onClickProp?.(e) as any).finally(() => status.setIdle());
+      (onClickProp?.(e) as any)?.finally(() => status.setIdle());
     }
   };
 
