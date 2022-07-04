@@ -150,7 +150,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
           center
         >
           <Spinner
-            css={{ position: 'absolute' }}
+            css={{ position: loadingText ? undefined : 'absolute' }}
             aria-label={loadingText || 'Loading'}
           />
           {loadingText || <span style={{ opacity: 0 }}>{children}</span>}
