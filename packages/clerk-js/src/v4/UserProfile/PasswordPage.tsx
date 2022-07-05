@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { useCoreUser } from '../../ui/contexts';
-import { useNavigate } from '../../ui/hooks/useNavigate';
 import { useWizard, Wizard } from '../common';
 import { Form, useCardState, withCardStateProvider } from '../elements';
 import { handleError, useFormControl } from '../utils';
@@ -13,7 +12,6 @@ export const PasswordPage = withCardStateProvider(() => {
   const user = useCoreUser();
   const card = useCardState();
   const wizard = useWizard();
-  const { navigate } = useNavigate();
   const passwordField = useFormControl('password', '', { type: 'password', label: 'New password' });
   const confirmField = useFormControl('confirmPassword', '', { type: 'password', label: 'Confirm password' });
 
@@ -56,12 +54,7 @@ export const PasswordPage = withCardStateProvider(() => {
           <Form.ControlRow>
             <Form.Control {...confirmField.props} />
           </Form.ControlRow>
-          <ContentPage.Toolbar>
-            <FormButtons
-              isDisabled={!canSubmit}
-              onCancel={() => navigate('../')}
-            />
-          </ContentPage.Toolbar>
+          <FormButtons isDisabled={!canSubmit} />
         </Form.Root>
       </ContentPage.Root>
 

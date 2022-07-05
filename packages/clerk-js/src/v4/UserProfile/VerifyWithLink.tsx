@@ -7,8 +7,8 @@ import { useMagicLink } from '../../ui/hooks';
 import { EmailLinkStatusCard } from '../common';
 import { useCardState, VerificationLink } from '../elements';
 import { handleError } from '../utils';
+import { FormButtonContainer } from './FormButtons';
 import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
-import { ContentPage } from './Page';
 
 type VerifyWithLinkProps = {
   email: EmailAddressResource;
@@ -39,9 +39,9 @@ export const VerifyWithLink = (props: VerifyWithLinkProps) => {
         formSubtitle={`Click on the verification link in the email sent to ${email.emailAddress}`}
         onResendCodeClicked={startVerification}
       />
-      <ContentPage.Toolbar>
+      <FormButtonContainer>
         <NavigateToFlowStartButton>Cancel</NavigateToFlowStartButton>
-      </ContentPage.Toolbar>
+      </FormButtonContainer>
     </>
   );
 };

@@ -2,7 +2,6 @@ import { EmailAddressResource } from '@clerk/types';
 import React from 'react';
 
 import { useCoreUser, useEnvironment } from '../../ui/contexts';
-import { useNavigate } from '../../ui/hooks/useNavigate';
 import { useRouter } from '../../ui/router';
 import { useWizard, Wizard } from '../common';
 import { Text } from '../customizables';
@@ -13,12 +12,12 @@ import { ContentPage } from './Page';
 import { SuccessPage } from './SuccessPage';
 import { magicLinksEnabledForInstance } from './utils';
 import { VerifyWithCode } from './VerifyWithCode';
+import { VerifyWithLink } from './VerifyWithLink';
 
 export const EmailPage = withCardStateProvider(() => {
   const title = 'Add email address';
   const card = useCardState();
   const user = useCoreUser();
-  const { navigate } = useNavigate();
   const environment = useEnvironment();
   const preferMagicLinks = magicLinksEnabledForInstance(environment);
 
@@ -62,22 +61,24 @@ export const EmailPage = withCardStateProvider(() => {
               ? 'An email containing a verification link will be sent to this email address.'
               : 'An email containing a verification code will be sent to this email address.'}
           </Text>
-          <ContentPage.Toolbar>
-            <FormButtons
-              isDisabled={!canSubmit}
-              onCancel={() => navigate('../')}
-            />
-          </ContentPage.Toolbar>
+          <FormButtons isDisabled={!canSubmit} />
         </Form.Root>
       </ContentPage.Root>
 
       <ContentPage.Root headerTitle={title}>
-        <VerifyWithCode
-          nextStep={wizard.nextStep}
-          identification={emailAddressRef.current}
-          identifier={emailAddressRef.current?.emailAddress}
-          prepareVerification={() => emailAddressRef.current?.prepareVerification({ strategy: 'email_code' })}
-        />
+        {preferMagicLinks ? (
+          <VerifyWithLink
+            nextStep={wizard.nextStep}
+            email={emailAddressRef.current as any}
+          />
+        ) : (
+          <VerifyWithCode
+            nextStep={wizard.nextStep}
+            identification={emailAddressRef.current}
+            identifier={emailAddressRef.current?.emailAddress}
+            prepareVerification={() => emailAddressRef.current?.prepareVerification({ strategy: 'email_code' })}
+          />
+        )}
       </ContentPage.Root>
 
       <SuccessPage
