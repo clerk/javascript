@@ -69,7 +69,7 @@ export const colors = Object.freeze({
   warning200: '#FAE28F',
   warning300: '#F8D763',
   warning400: '#F6CC37',
-  warning500: '#F4C10B',
+  warning500: '#dca900',
   warning600: '#C49A08',
   warning700: '#937406',
   warning800: '#624D04',

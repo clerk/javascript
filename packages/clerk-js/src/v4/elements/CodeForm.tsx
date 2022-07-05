@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Flex, Text } from '../customizables';
+import { Col, Text } from '../customizables';
 import { CodeControl, useCodeControl } from './CodeControl';
 import { TimerButton } from './TimerButton';
 
@@ -17,11 +17,8 @@ export const CodeForm = (props: CodeFormProps) => {
   const { subtitle, title, isLoading, success, codeControl, onResendCodeClicked } = props;
 
   return (
-    <Flex
-      direction='col'
-      gap={2}
-    >
-      <Flex direction='col'>
+    <Col gap={2}>
+      <Col gap={1}>
         <Text variant='smallMedium'>{title}</Text>
         <Text
           variant='smallRegular'
@@ -29,7 +26,7 @@ export const CodeForm = (props: CodeFormProps) => {
         >
           {subtitle}
         </Text>
-      </Flex>
+      </Col>
       <CodeControl
         {...codeControl.otpInputProps}
         isLoading={isLoading}
@@ -44,6 +41,6 @@ export const CodeForm = (props: CodeFormProps) => {
       >
         Resend code
       </TimerButton>
-    </Flex>
+    </Col>
   );
 };

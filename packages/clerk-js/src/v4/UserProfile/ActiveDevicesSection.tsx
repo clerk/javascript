@@ -3,7 +3,7 @@ import { SessionWithActivitiesResource } from '@clerk/types';
 import React from 'react';
 
 import { useCoreSession, useCoreUser } from '../../ui/contexts';
-import { Col, Flex, Icon, Label, Spinner, Text } from '../customizables';
+import { Badge, Col, Flex, Icon, Spinner, Text } from '../customizables';
 import { AccordionItem } from '../elements';
 import { DeviceDesktop, DeviceMobile } from '../icons';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
@@ -56,7 +56,7 @@ const DeviceAccordion = (props: { session: SessionWithActivitiesResource }) => {
         {isCurrent && (
           <LinkButtonWithDescription
             title='Current device'
-            titleLabel={<Label>This device</Label>}
+            titleLabel={<Badge>This device</Badge>}
             subtitle='This is the device you are currently using'
           />
         )}
