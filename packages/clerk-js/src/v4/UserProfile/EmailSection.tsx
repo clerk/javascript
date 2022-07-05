@@ -3,7 +3,7 @@ import React from 'react';
 
 import { useCoreUser } from '../../ui/contexts';
 import { useNavigate } from '../../ui/hooks/useNavigate';
-import { Col, Label } from '../customizables';
+import { Badge, Col } from '../customizables';
 import { AccordionItem, useCardState } from '../elements';
 import { handleError } from '../utils';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
@@ -49,7 +49,7 @@ const EmailAccordion = ({ email }: { email: EmailAddressResource }) => {
         {isPrimary && (
           <LinkButtonWithDescription
             title='Primary email address'
-            titleLabel={<Label>Primary</Label>}
+            titleLabel={<Badge>Primary</Badge>}
             subtitle='This email address is the primary email address'
           />
         )}
@@ -64,7 +64,7 @@ const EmailAccordion = ({ email }: { email: EmailAddressResource }) => {
         {!isPrimary && !isVerified && (
           <LinkButtonWithDescription
             title='Unverified email address'
-            titleLabel={<Label colorScheme='warning'>Unverified</Label>}
+            titleLabel={<Badge colorScheme='warning'>Unverified</Badge>}
             subtitle='This email address has not been verified and may be limited in functionality'
             actionLabel='Complete verification'
             onClick={() => navigate(`email-address/${email.id}`)}

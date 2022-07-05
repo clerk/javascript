@@ -16,4 +16,4 @@ export * from './FormErrorText';
 export * from './FormLabel';
 export * from './Form';
 export * from './Icon';
-export * from './Label';
+export * from './Badge';

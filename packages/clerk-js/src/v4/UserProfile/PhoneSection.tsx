@@ -3,7 +3,7 @@ import React from 'react';
 
 import { useCoreUser } from '../../ui/contexts';
 import { useNavigate } from '../../ui/hooks';
-import { Col, Label } from '../customizables';
+import { Badge, Col } from '../customizables';
 import { AccordionItem, FormattedPhoneNumber, useCardState } from '../elements';
 import { handleError } from '../utils';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
@@ -49,7 +49,7 @@ const PhoneAccordion = ({ phone }: { phone: PhoneNumberResource }) => {
         {isPrimary && (
           <LinkButtonWithDescription
             title='Primary phone number'
-            titleLabel={<Label>Primary</Label>}
+            titleLabel={<Badge>Primary</Badge>}
             subtitle='This phone number is the primary phone number'
           />
         )}
@@ -64,7 +64,7 @@ const PhoneAccordion = ({ phone }: { phone: PhoneNumberResource }) => {
         {!isPrimary && !isVerified && (
           <LinkButtonWithDescription
             title='Unverified phone number'
-            titleLabel={<Label colorScheme='warning'>Unverified</Label>}
+            titleLabel={<Badge colorScheme='warning'>Unverified</Badge>}
             subtitle='This phone number has not been verified and may be limited in functionality'
             actionLabel='Complete verification'
             onClick={() => navigate(`phone-number/${phone.id}`)}

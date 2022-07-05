@@ -12,7 +12,7 @@ const textVariants = (theme: InternalTheme) => {
   const smallMedium = {
     ...smallRegular,
     fontWeight: theme.fontWeights.$medium,
-    lineHeight: theme.lineHeights.$base,
+    lineHeight: theme.lineHeights.$short,
   } as const;
 
   const smallSemibold = {
