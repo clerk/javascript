@@ -1,3 +1,5 @@
+import { EnvironmentResource } from '@clerk/types';
+
 type IDable = { id: string };
 
 export const primaryIdentificationFirst = (primaryId: string | null) => (val1: IDable, val2: IDable) => {
@@ -5,3 +7,9 @@ export const primaryIdentificationFirst = (primaryId: string | null) => (val1: I
 };
 
 export const currentSessionFirst = (id: string) => (a: IDable) => a.id === id ? -1 : 1;
+
+export function magicLinksEnabledForInstance(env: EnvironmentResource): boolean {
+  const { userSettings } = env;
+  const { email_address } = userSettings.attributes;
+  return email_address.enabled && email_address.verifications.includes('email_link');
+}
