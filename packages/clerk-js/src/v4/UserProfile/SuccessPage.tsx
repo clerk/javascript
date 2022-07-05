@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useNavigate } from '../../ui/hooks';
+import { useRouter } from '../../ui/router';
 import { Button, Text } from '../customizables';
 import { ContentPage } from './Page';
 
@@ -11,7 +11,10 @@ type SuccessPageProps = {
 
 export const SuccessPage = (props: SuccessPageProps) => {
   const { text, title } = props;
-  const { navigate } = useNavigate();
+  const router = useRouter();
+  const navigateToUserProfile = () => {
+    return router.navigate('/' + router.basePath + router.startPath);
+  };
 
   return (
     <ContentPage.Root headerTitle={title}>
@@ -20,7 +23,7 @@ export const SuccessPage = (props: SuccessPageProps) => {
         <Button
           autoFocus
           textVariant='buttonSmall'
-          onClick={() => navigate('../')}
+          onClick={navigateToUserProfile}
         >
           Finish
         </Button>
