@@ -11,6 +11,7 @@ import { RouteContext } from './RouteContext';
 
 interface BaseRouterProps {
   basePath: string;
+  startPath: string;
   getPath: () => string;
   getQueryString: () => string;
   internalNavigate: (toURL: URL) => Promise<any> | any;
@@ -22,6 +23,7 @@ interface BaseRouterProps {
 
 export const BaseRouter = ({
   basePath,
+  startPath,
   getPath,
   getQueryString,
   internalNavigate,
@@ -105,6 +107,8 @@ export const BaseRouter = ({
   return (
     <RouteContext.Provider
       value={{
+        basePath: basePath,
+        startPath: startPath,
         fullPath: '',
         indexPath: '',
         currentPath: currentPath,
