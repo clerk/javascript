@@ -5,8 +5,8 @@ import { useCardState, useCodeControl } from '../elements';
 import { CodeForm } from '../elements/CodeForm';
 import { useLoadingStatus } from '../hooks';
 import { handleError, sleep, useFormControl } from '../utils';
+import { FormButtonContainer } from './FormButtons';
 import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
-import { ContentPage } from './Page';
 
 type VerifyWithCodeProps = {
   nextStep: () => void;
@@ -63,9 +63,9 @@ export const VerifyWithCode = (props: VerifyWithCodeProps) => {
         success={success}
         onResendCodeClicked={prepare}
       />
-      <ContentPage.Toolbar>
+      <FormButtonContainer>
         <NavigateToFlowStartButton>Cancel</NavigateToFlowStartButton>
-      </ContentPage.Toolbar>
+      </FormButtonContainer>
     </>
   );
 };

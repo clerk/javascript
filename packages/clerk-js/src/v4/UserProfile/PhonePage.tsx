@@ -2,7 +2,6 @@ import { PhoneNumberResource } from '@clerk/types';
 import React from 'react';
 
 import { useCoreUser } from '../../ui/contexts';
-import { useNavigate } from '../../ui/hooks/useNavigate';
 import { useRouter } from '../../ui/router';
 import { useWizard, Wizard } from '../common';
 import { Text } from '../customizables';
@@ -17,7 +16,6 @@ export const PhonePage = withCardStateProvider(() => {
   const title = 'Add phone number';
   const card = useCardState();
   const user = useCoreUser();
-  const { navigate } = useNavigate();
 
   const { params } = useRouter();
   const { id } = params || {};
@@ -63,12 +61,7 @@ export const PhonePage = withCardStateProvider(() => {
           >
             Message and data rates may apply.
           </Text>
-          <ContentPage.Toolbar>
-            <FormButtons
-              isDisabled={!canSubmit}
-              onCancel={() => navigate('../')}
-            />
-          </ContentPage.Toolbar>
+          <FormButtons isDisabled={!canSubmit} />
         </Form.Root>
       </ContentPage.Root>
 

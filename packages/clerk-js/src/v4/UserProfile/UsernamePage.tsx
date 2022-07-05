@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { useCoreUser } from '../../ui/contexts';
-import { useNavigate } from '../../ui/hooks/useNavigate';
 import { useWizard, Wizard } from '../common';
 import { Form, useCardState, withCardStateProvider } from '../elements';
 import { handleError, useFormControl } from '../utils';
@@ -13,7 +12,6 @@ export const UsernamePage = withCardStateProvider(() => {
   const user = useCoreUser();
   const card = useCardState();
   const wizard = useWizard();
-  const { navigate } = useNavigate();
   const usernameField = useFormControl('username', user.username || '', { type: 'text', label: 'Username' });
 
   const canSubmit = usernameField.value.length > 1 && user.username !== usernameField.value;
@@ -38,12 +36,7 @@ export const UsernamePage = withCardStateProvider(() => {
               autoFocus
             />
           </Form.ControlRow>
-          <ContentPage.Toolbar>
-            <FormButtons
-              isDisabled={!canSubmit}
-              onCancel={() => navigate('../')}
-            />
-          </ContentPage.Toolbar>
+          <FormButtons isDisabled={!canSubmit} />
         </Form.Root>
       </ContentPage.Root>
       <SuccessPage

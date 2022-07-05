@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Text } from '../customizables';
+import { FormButtonContainer } from './FormButtons';
 import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
 import { ContentPage } from './Page';
 
@@ -15,14 +16,14 @@ export const SuccessPage = (props: SuccessPageProps) => {
   return (
     <ContentPage.Root headerTitle={title}>
       <Text variant='regularRegular'>{text}</Text>
-      <ContentPage.Toolbar>
+      <FormButtonContainer>
         <NavigateToFlowStartButton
           variant='solid'
           autoFocus
         >
           Finish
         </NavigateToFlowStartButton>
-      </ContentPage.Toolbar>
+      </FormButtonContainer>
     </ContentPage.Root>
   );
 };
