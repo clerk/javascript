@@ -1,6 +1,6 @@
 import { AuthStatus, Base, createGetToken, createSignedOutState } from '@clerk/backend-core';
 import { ClerkJWTClaims } from '@clerk/types';
-import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
+import { NextFetchEvent, NextRequest } from 'next/server';
 
 import { ClerkAPI } from './ClerkAPI';
 import {
@@ -10,6 +10,7 @@ import {
   WithEdgeMiddlewareAuthOptions,
 } from './types';
 import { injectAuthIntoRequest } from './utils';
+import { interstitialResponse, signedOutResponse } from './utils/responses';
 
 /**
  *
@@ -72,6 +73,27 @@ export function withEdgeMiddlewareAuth(
   options: any = {
     loadSession: false,
     loadUser: false,
+    strict: false,
+  },
+): any {
+  return vercelMiddlewareAuth(handler, { strict: false, ...options });
+}
+
+export function requireEdgeMiddlewareAuth(
+  handler: any,
+  options: any = {
+    loadSession: false,
+    loadUser: false,
+  },
+): any {
+  return vercelMiddlewareAuth(handler, { strict: true, ...options });
+}
+
+function vercelMiddlewareAuth(
+  handler: any,
+  options: any = {
+    loadSession: false,
+    loadUser: false,
   },
 ): any {
   return async function clerkAuth(req: NextRequest, event: NextFetchEvent) {
@@ -97,13 +119,14 @@ export function withEdgeMiddlewareAuth(
     });
 
     if (status === AuthStatus.Interstitial) {
-      return new NextResponse(interstitial, {
-        headers: { 'Content-Type': 'text/html', 'Auth-Result': errorReason || '' },
-        status: 401,
-      });
+      return interstitialResponse(interstitial as string, errorReason);
     }
 
     if (status === AuthStatus.SignedOut) {
+      if (options.strict) {
+        return signedOutResponse();
+      }
+
       const response = (await handler(
         injectAuthIntoRequest(req, createSignedOutState()),
         event,
