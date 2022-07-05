@@ -2,6 +2,8 @@ import type { ParsedQs } from 'qs';
 import React from 'react';
 
 export interface RouteContextValue {
+  basePath: string;
+  startPath: string;
   fullPath: string;
   indexPath: string;
   currentPath: string;
