@@ -1,8 +1,7 @@
 import React from 'react';
 
 import { useRouter } from '../../ui/router';
-import { descriptors, Flex, Flow, Text } from '../customizables';
-import { useLoadingStatus } from '../hooks';
+import { Col, descriptors, Flow, Text } from '../customizables';
 import { CardAlert } from './Alert';
 import { Card } from './Card';
 import { useCardState } from './contexts';
@@ -23,7 +22,6 @@ type VerificationLinkCardProps = {
 };
 
 export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
-  const status = useLoadingStatus();
   const { navigate } = useRouter();
   const card = useCardState();
 
@@ -45,35 +43,16 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
           avatarUrl={props.profileImageUrl}
           onClick={goBack}
         />
-        <Flex
-          direction='col'
+        <Col
           elementDescriptor={descriptors.main}
           gap={8}
         >
-          <Flex
-            direction='col'
-            gap={1}
-          >
-            <Flex direction='col'>
-              <Text variant='smallMedium'>{props.formTitle}</Text>
-              <Text
-                variant='smallRegular'
-                colorScheme='neutral'
-              >
-                {props.formSubtitle}
-              </Text>
-            </Flex>
-            <TimerButton
-              onClick={props.onResendCodeClicked}
-              startDisabled
-              isDisabled={status.isLoading || card.isLoading}
-              throttleTimeInSec={60}
-              sx={theme => ({ marginTop: theme.space.$4 })}
-            >
-              Resend link
-            </TimerButton>
-          </Flex>
-        </Flex>
+          <VerificationLink
+            formTitle={props.formTitle}
+            formSubtitle={props.formSubtitle}
+            onResendCodeClicked={props.onResendCodeClicked}
+          />
+        </Col>
         <Footer.Root>
           <Footer.Action>
             {props.onShowAlternativeMethodsClicked && (
@@ -84,5 +63,37 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
         </Footer.Root>
       </Card>
     </Flow.Part>
+  );
+};
+
+type VerificationLinkProps = {
+  formTitle: string;
+  formSubtitle: string;
+  onResendCodeClicked: React.MouseEventHandler;
+};
+
+export const VerificationLink = (props: VerificationLinkProps) => {
+  const card = useCardState();
+  return (
+    <Col gap={1}>
+      <Col gap={1}>
+        <Text variant='smallMedium'>{props.formTitle}</Text>
+        <Text
+          variant='smallRegular'
+          colorScheme='neutral'
+        >
+          {props.formSubtitle}
+        </Text>
+      </Col>
+      <TimerButton
+        onClick={props.onResendCodeClicked}
+        startDisabled
+        isDisabled={card.isLoading}
+        throttleTimeInSec={60}
+        sx={theme => ({ marginTop: theme.space.$4 })}
+      >
+        Resend link
+      </TimerButton>
+    </Col>
   );
 };

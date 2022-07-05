@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { useRouter } from '../../ui/router';
-import { Button, Text } from '../customizables';
+import { Text } from '../customizables';
+import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
 import { ContentPage } from './Page';
 
 type SuccessPageProps = {
@@ -11,22 +11,17 @@ type SuccessPageProps = {
 
 export const SuccessPage = (props: SuccessPageProps) => {
   const { text, title } = props;
-  const router = useRouter();
-  const navigateToUserProfile = () => {
-    return router.navigate('/' + router.basePath + router.startPath);
-  };
 
   return (
     <ContentPage.Root headerTitle={title}>
       <Text variant='regularRegular'>{text}</Text>
       <ContentPage.Toolbar>
-        <Button
+        <NavigateToFlowStartButton
+          variant='solid'
           autoFocus
-          textVariant='buttonSmall'
-          onClick={navigateToUserProfile}
         >
           Finish
-        </Button>
+        </NavigateToFlowStartButton>
       </ContentPage.Toolbar>
     </ContentPage.Root>
   );

@@ -1,22 +1,60 @@
+import { UserProfileProps } from '@clerk/types/src';
 import React from 'react';
 
-import { withCoreUserGuard } from '../../ui/contexts';
+import { ComponentContext, withCoreUserGuard } from '../../ui/contexts';
+import { Route, Switch } from '../../ui/router';
 import { Flow } from '../customizables';
 import { UserProfileCard, withCardStateProvider } from '../elements';
 import { Content } from './Content';
 import { NavBar } from './Navbar';
+import { VerificationSuccessPage } from './VerifyWithLink';
 
-const _UserProfile = () => {
+const _UserProfile = (props: UserProfileProps) => {
   return (
     <Flow.Root flow='userProfile'>
       <Flow.Part>
-        <UserProfileCard gap={8}>
-          <NavBar />
-          <Content />
-        </UserProfileCard>
+        <Switch>
+          {/* PublicRoutes */}
+          <Route path={'verify'}>
+            <VerificationSuccessPage />
+          </Route>
+          <Route>
+            <AuthenticatedRoutes />
+          </Route>
+        </Switch>
       </Flow.Part>
     </Flow.Root>
   );
 };
 
-export const UserProfile = withCoreUserGuard(withCardStateProvider(_UserProfile));
+const AuthenticatedRoutes = withCoreUserGuard(() => {
+  const contentRef = React.useRef<HTMLDivElement>(null);
+  return (
+    <UserProfileCard sx={{ height: '100%' }}>
+      <NavBar contentRef={contentRef} />
+      <Content ref={contentRef} />
+    </UserProfileCard>
+  );
+});
+
+export const UserProfile = withCardStateProvider(_UserProfile);
+
+export const UserProfileModal = (props: UserProfileProps): JSX.Element => {
+  const userProfileProps: UserProfileProps = {
+    ...props,
+    routing: 'virtual',
+  };
+
+  return (
+    <Route path='user'>
+      <ComponentContext.Provider
+        value={{
+          componentName: 'UserProfile',
+          ...userProfileProps,
+        }}
+      >
+        <UserProfile {...userProfileProps} />
+      </ComponentContext.Provider>
+    </Route>
+  );
+};

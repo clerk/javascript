@@ -49,8 +49,7 @@ export const EmailLinkStatusCard = (props: EmailLinkStatusCardProps) => {
 const StatusRow = (props: { status: VerificationStatus }) => {
   return (
     <Flex
-      justify='center'
-      align='center'
+      center
       direction='col'
       gap={8}
     >
@@ -80,8 +79,7 @@ const StatusIcon = (props: { status: Exclude<VerificationStatus, 'loading'> }) =
 
   return (
     <Flex
-      justify='center'
-      align='center'
+      center
       sx={theme => ({
         width: theme.sizes.$24,
         height: theme.sizes.$24,
