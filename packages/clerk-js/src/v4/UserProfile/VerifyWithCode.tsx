@@ -1,12 +1,11 @@
 import { EmailAddressResource, PhoneNumberResource } from '@clerk/types';
 import React from 'react';
 
-import { useNavigate } from '../../ui/hooks/useNavigate';
-import { Button } from '../customizables';
 import { useCardState, useCodeControl } from '../elements';
 import { CodeForm } from '../elements/CodeForm';
 import { useLoadingStatus } from '../hooks';
 import { handleError, sleep, useFormControl } from '../utils';
+import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
 import { ContentPage } from './Page';
 
 type VerifyWithCodeProps = {
@@ -19,7 +18,6 @@ type VerifyWithCodeProps = {
 export const VerifyWithCode = (props: VerifyWithCodeProps) => {
   const card = useCardState();
   const { nextStep, identification, identifier, prepareVerification } = props;
-  const { navigate } = useNavigate();
   const [success, setSuccess] = React.useState(false);
   const status = useLoadingStatus();
   const codeControlState = useFormControl('code', '');
@@ -66,13 +64,7 @@ export const VerifyWithCode = (props: VerifyWithCodeProps) => {
         onResendCodeClicked={prepare}
       />
       <ContentPage.Toolbar>
-        <Button
-          textVariant='buttonSmall'
-          variant={'ghost'}
-          onClick={() => navigate('../')}
-        >
-          Cancel
-        </Button>
+        <NavigateToFlowStartButton>Cancel</NavigateToFlowStartButton>
       </ContentPage.Toolbar>
     </>
   );

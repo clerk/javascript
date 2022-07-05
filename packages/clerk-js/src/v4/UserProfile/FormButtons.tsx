@@ -1,14 +1,15 @@
 import React from 'react';
 
 import { Form } from '../elements';
+import { useNavigateToFlowStart } from './NavigateToFlowStartButton';
 
 type FormButtonsProps = {
   isDisabled?: boolean;
-  onCancel?: React.MouseEventHandler<HTMLButtonElement>;
 };
 
 export const FormButtons = (props: FormButtonsProps) => {
-  const { isDisabled, onCancel } = props;
+  const { navigateToFlowStart } = useNavigateToFlowStart();
+  const { isDisabled } = props;
   return (
     <>
       <Form.SubmitButton
@@ -19,7 +20,7 @@ export const FormButtons = (props: FormButtonsProps) => {
       </Form.SubmitButton>
       <Form.ResetButton
         block={false}
-        onClick={onCancel}
+        onClick={navigateToFlowStart}
       >
         Cancel
       </Form.ResetButton>
