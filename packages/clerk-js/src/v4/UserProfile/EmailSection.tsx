@@ -38,7 +38,6 @@ const EmailAccordion = ({ email }: { email: EmailAddressResource }) => {
   const { navigate } = useNavigate();
   const isPrimary = user.primaryEmailAddressId === email.id;
   const isVerified = email.verification.status === 'verified';
-  const remove = () => email.destroy();
   const setPrimary = () => {
     return user.update({ primaryEmailAddressId: email.id }).catch(e => handleError(e, [], card.setError));
   };
@@ -75,7 +74,7 @@ const EmailAccordion = ({ email }: { email: EmailAddressResource }) => {
           subtitle='Delete this email address and remove it from your account'
           actionLabel='Remove email address'
           colorScheme='danger'
-          onClick={remove}
+          onClick={() => navigate(`email-address/${email.id}/remove`)}
         />
       </Col>
     </AccordionItem>

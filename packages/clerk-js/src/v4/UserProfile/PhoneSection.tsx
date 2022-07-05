@@ -38,7 +38,6 @@ const PhoneAccordion = ({ phone }: { phone: PhoneNumberResource }) => {
   const { navigate } = useNavigate();
   const isPrimary = user.primaryPhoneNumberId === phone.id;
   const isVerified = phone.verification.status === 'verified';
-  const remove = () => phone.destroy();
   const setPrimary = () => {
     return user.update({ primaryPhoneNumberId: phone.id }).catch(e => handleError(e, [], card.setError));
   };
@@ -75,7 +74,7 @@ const PhoneAccordion = ({ phone }: { phone: PhoneNumberResource }) => {
           subtitle='Delete this phone number and remove it from your account'
           actionLabel='Remove phone number'
           colorScheme='danger'
-          onClick={remove}
+          onClick={() => navigate(`phone-number/${phone.id}/remove`)}
         />
       </Col>
     </AccordionItem>
