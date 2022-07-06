@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.19.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.18.0...@clerk/types@2.19.0) (2022-07-06)
+
+### Features
+
+- **types:** Introduce Line OAuth ([e9d429d](https://github.com/clerkinc/javascript/commit/e9d429d63fcfacd3d393fa9e104e8a1b46f41a67))
+
 ## [2.18.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.17.0...@clerk/types@2.18.0) (2022-07-01)
 
 ### Features
