@@ -22,6 +22,7 @@ export type BitbucketOauthProvider = 'bitbucket';
 export type MicrosoftOauthProvider = 'microsoft';
 export type NotionOauthProvider = 'notion';
 export type AppleOauthProvider = 'apple';
+export type LineOauthProvider = 'line';
 
 export type OAuthProvider =
   | FacebookOauthProvider
@@ -38,7 +39,8 @@ export type OAuthProvider =
   | BitbucketOauthProvider
   | MicrosoftOauthProvider
   | NotionOauthProvider
-  | AppleOauthProvider;
+  | AppleOauthProvider
+  | LineOauthProvider;
 
 export const OAUTH_PROVIDERS: OAuthProviderData[] = [
   {
@@ -130,6 +132,12 @@ export const OAUTH_PROVIDERS: OAuthProviderData[] = [
     strategy: 'oauth_apple',
     name: 'Apple',
     docsUrl: 'https://docs.clerk.dev/reference/social-login-reference/apple',
+  },
+  {
+    provider: 'line',
+    strategy: 'oauth_line',
+    name: 'Line',
+    docsUrl: 'https://docs.clerk.dev/reference/social-login-reference/line',
   },
 ];
 
