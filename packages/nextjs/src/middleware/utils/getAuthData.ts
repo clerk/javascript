@@ -1,5 +1,5 @@
 import { AuthStatus, createGetToken, createSignedOutState } from '@clerk/backend-core';
-import Clerk, { sessions, users } from '@clerk/clerk-sdk-node';
+import Clerk, { organizations, sessions, users } from '@clerk/clerk-sdk-node';
 import { GetServerSidePropsContext } from 'next';
 
 import { AuthData, WithServerSideAuthOptions } from '../types';
@@ -12,7 +12,7 @@ export async function getAuthData(
   opts: WithServerSideAuthOptions = {},
 ): Promise<AuthData | null> {
   const { headers, cookies } = ctx.req;
-  const { loadSession, loadUser, jwtKey, authorizedParties } = opts;
+  const { loadSession, loadUser, loadOrg, jwtKey, authorizedParties } = opts;
 
   try {
     const cookieToken = cookies['__session'];
@@ -46,6 +46,7 @@ export async function getAuthData(
 
     const sessionId = sessionClaims.sid;
     const userId = sessionClaims.sub;
+    const organizationId = sessionClaims.org_id;
 
     const getToken = createGetToken({
       sessionId,
@@ -54,12 +55,13 @@ export async function getAuthData(
       fetcher: (...args) => sessions.getToken(...args),
     });
 
-    const [user, session] = await Promise.all([
+    const [user, session, organization] = await Promise.all([
       loadUser ? users.getUser(userId) : Promise.resolve(undefined),
       loadSession ? sessions.getSession(sessionId) : Promise.resolve(undefined),
+      loadOrg && organizationId ? organizations.getOrganization({ organizationId }) : Promise.resolve(undefined),
     ]);
 
-    return { sessionId, userId, user, session, getToken, claims: sessionClaims };
+    return { sessionId, userId, user, session, organization, getToken, claims: sessionClaims };
   } catch (err) {
     return createSignedOutState();
   }

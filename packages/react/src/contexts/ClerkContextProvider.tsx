@@ -120,8 +120,7 @@ function deriveState(
     // TODO: Instantiate an actual session resource
     const session = initialState.session as any as ActiveSessionResource;
 
-    // TODO: Fix post-SSR decision
-    const organization = undefined;
+    const organization = initialState.organization as any as OrganizationResource;
     return {
       sessionId,
       session,

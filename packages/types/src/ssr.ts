@@ -1,4 +1,4 @@
-import { SessionJSON, UserJSON } from './json';
+import { OrganizationJSON, SessionJSON, UserJSON } from './json';
 import { ClerkJWTClaims } from './jwt';
 import { SessionResource } from './session';
 import { UserResource } from './user';
@@ -23,6 +23,8 @@ type SsrSessionState<SessionType> =
       session: SessionType | undefined;
     };
 
+type SsrOrganizationState<OrganizationType> = { organization: null } | { organization: OrganizationType | undefined };
+
 type SsrUserState<UserType> =
   | {
       userId: null;
@@ -41,5 +43,6 @@ export type InitialState =
       userId: undefined;
       session: undefined;
       sessionId: undefined;
+      organization: undefined;
     }
-  | (SsrSessionState<SessionJSON> & SsrUserState<UserJSON>);
+  | (SsrSessionState<SessionJSON> & SsrUserState<UserJSON> & SsrOrganizationState<OrganizationJSON>);

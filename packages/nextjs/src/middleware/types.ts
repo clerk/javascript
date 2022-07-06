@@ -1,4 +1,4 @@
-import type { Session, User } from '@clerk/clerk-sdk-node';
+import type { Organization, Session, User } from '@clerk/clerk-sdk-node';
 import { ClerkJWTClaims, ServerSideAuth } from '@clerk/types';
 import { GetServerSidePropsContext } from 'next';
 
@@ -8,6 +8,7 @@ export type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
 export type WithServerSideAuthOptions = {
   loadUser?: boolean;
   loadSession?: boolean;
+  loadOrg?: boolean;
   jwtKey?: string;
   authorizedParties?: string[];
 };
@@ -23,6 +24,7 @@ export type AuthData = {
   session: Session | undefined | null;
   userId: string | null;
   user: User | undefined | null;
+  organization: Organization | undefined | null;
   getToken: (...args: any) => Promise<string | null>;
   claims: ClerkJWTClaims | null;
 };
@@ -34,4 +36,5 @@ export type ContextWithAuth<Options extends WithServerSideAuthOptions = any> = G
 export type RequestWithAuth<Options extends WithServerSideAuthOptions = any> = GetServerSidePropsContext['req'] & {
   auth: ServerSideAuth;
 } & (Options extends { loadSession: true } ? { session: Session | null } : {}) &
-  (Options extends { loadUser: true } ? { user: User | null } : {});
+  (Options extends { loadUser: true } ? { user: User | null } : {}) &
+  (Options extends { loadOrg: true } ? { organization: Organization | null } : {});
