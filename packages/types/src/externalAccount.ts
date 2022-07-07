@@ -18,4 +18,5 @@ export interface ExternalAccountResource {
   destroy: () => Promise<void>;
   providerSlug: () => OAuthProvider;
   providerTitle: () => string;
+  accountIdentifier: () => string;
 }

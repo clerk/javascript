@@ -1,71 +1,69 @@
 import { ExternalAccountResource } from '@clerk/types/src';
 
-import { svgUrl } from '../../ui/common/constants';
 import { useCoreUser } from '../../ui/contexts';
-import { Col, Flex, Image } from '../customizables';
+import { useNavigate } from '../../ui/hooks/useNavigate';
+import { Col, Image } from '../customizables';
 import { AccordionItem, UserPreview } from '../elements';
+import { useEnabledThirdPartyProviders } from '../hooks';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
 import { ProfileSection } from './Section';
 import { AddBlockButton } from './UserProfileBlockButtons';
 
 export const ConnectedAccountsSection = () => {
   const user = useCoreUser();
-  const accounts = [...user.verifiedExternalAccounts];
+  const { navigate } = useNavigate();
 
   return (
     <ProfileSection
       title='Connected accounts'
       id='connectedAccounts'
     >
-      {accounts.map(account => (
+      {user.verifiedExternalAccounts.map(account => (
         <ConnectedAccountAccordion
           key={account.id}
           account={account}
         />
       ))}
-      <AddBlockButton>Connect account</AddBlockButton>
+      <AddBlockButton onClick={() => navigate(`connected-account`)}>Connect account</AddBlockButton>
     </ProfileSection>
   );
 };
 
-const ConnectedAccountAccordion = (props: { account: ExternalAccountResource }) => {
+const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResource }) => {
   const user = useCoreUser();
-  const { account } = props;
+  const { navigate } = useNavigate();
+  const { providerToDisplayData } = useEnabledThirdPartyProviders();
+
   return (
     <AccordionItem
-      title={
-        <Flex
-          align={'center'}
-          gap={4}
-        >
-          <Image
-            alt={account.providerTitle()}
-            src={svgUrl(account.providerSlug())}
-            sx={theme => ({ width: theme.sizes.$4 })}
-          />
-          {account.username || account.emailAddress}
-          {account.label && ` (${account.label})`}
-        </Flex>
+      icon={
+        <Image
+          alt={providerToDisplayData[account.provider].name}
+          src={providerToDisplayData[account.provider].iconUrl}
+          sx={theme => ({ width: theme.sizes.$4 })}
+        />
       }
+      title={`${providerToDisplayData[account.provider].name} (${account.username || account.emailAddress})`}
     >
       <Col gap={4}>
         <UserPreview
           user={user}
-          size={'lg'}
+          size='lg'
           profileImageUrl={account.avatarUrl}
           icon={
             <Image
-              alt={account.providerTitle()}
-              src={svgUrl(account.providerSlug())}
+              alt={providerToDisplayData[account.provider].name}
+              src={providerToDisplayData[account.provider].iconUrl}
               sx={theme => ({ width: theme.sizes.$4 })}
             />
           }
         />
         <LinkButtonWithDescription
-          title='Unlink'
+          title='Remove'
           subtitle='Remove this connected account from your account'
-          label='Unlink connected account'
+          actionLabel='Remove connected account'
           colorScheme='danger'
+          onClick={() => navigate(`connected-account/${account.id}/remove`)}
         />
       </Col>
     </AccordionItem>
