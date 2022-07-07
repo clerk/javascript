@@ -1,4 +1,4 @@
-import { EnvironmentResource } from '@clerk/types';
+import { EnvironmentResource, PhoneNumberResource } from '@clerk/types';
 
 type IDable = { id: string };
 
@@ -7,6 +7,8 @@ export const primaryIdentificationFirst = (primaryId: string | null) => (val1: I
 };
 
 export const currentSessionFirst = (id: string) => (a: IDable) => a.id === id ? -1 : 1;
+
+export const defaultFirst = (a: PhoneNumberResource) => (a.defaultSecondFactor ? -1 : 1);
 
 export function magicLinksEnabledForInstance(env: EnvironmentResource): boolean {
   const { userSettings } = env;
