@@ -6,6 +6,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   variants: {
     size: {
       md: { width: theme.sizes.$4, height: theme.sizes.$4 },
+      lg: { width: theme.sizes.$5, height: theme.sizes.$5 },
     },
     colorScheme: {
       danger: { color: theme.colors.$danger500 },
