@@ -2,18 +2,23 @@ import { PhoneNumberResource } from '@clerk/types/src';
 import React from 'react';
 
 import { useCoreUser } from '../../ui/contexts';
-import { Col, Flex, Icon, Text } from '../customizables';
-import { AccordionItem, FormattedPhoneNumberText } from '../elements';
+import { useNavigate } from '../../ui/hooks';
+import { Col, Flex, Icon } from '../customizables';
+import { AccordionItem, FormattedPhoneNumberText, useCardState } from '../elements';
 import { Mobile } from '../icons';
+import { handleError } from '../utils';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
 import { ProfileSection } from './Section';
 import { AddBlockButton } from './UserProfileBlockButtons';
+import { defaultFirst } from './utils';
 
 export const MfaSection = () => {
+  const { navigate } = useNavigate();
   const user = useCoreUser();
   const mfaPhones = user.phoneNumbers
     .filter(ph => ph.verification.status === 'verified')
-    .filter(ph => ph.reservedForSecondFactor);
+    .filter(ph => ph.reservedForSecondFactor)
+    .sort(defaultFirst);
 
   return (
     <ProfileSection
@@ -26,14 +31,16 @@ export const MfaSection = () => {
           phone={phone}
         />
       ))}
-      <AddBlockButton>Add multi-factor</AddBlockButton>
+      <AddBlockButton onClick={() => navigate('multi-factor')}>Add multi-factor</AddBlockButton>
     </ProfileSection>
   );
 };
 
 const MfaAccordion = (props: { phone: PhoneNumberResource }) => {
   const { phone } = props;
-  const isPrimary = false;
+  const { navigate } = useNavigate();
+  const card = useCardState();
+  const isDefault = phone.defaultSecondFactor;
 
   return (
     <AccordionItem
@@ -46,26 +53,28 @@ const MfaAccordion = (props: { phone: PhoneNumberResource }) => {
             icon={Mobile}
             sx={theme => ({ color: theme.colors.$blackAlpha700 })}
           />
-          <Text>SMS Code</Text>
+          SMS Code
           <FormattedPhoneNumberText value={phone.phoneNumber} />
         </Flex>
       }
     >
       <Col gap={4}>
         <LinkButtonWithDescription
-          title='Primary phone number'
+          title={isDefault ? 'Default factor' : 'Set as default factor'}
           subtitle={
-            isPrimary
-              ? 'This phone number is the primary phone number'
-              : 'Set this phone number as the primary to receive communications regarding your account.'
+            isDefault
+              ? 'This factor will be used as the default multi-factor authentication method when signing in.'
+              : 'Set this factor as the default factor to use it as the default multi-factor authentication method when signing in.'
           }
-          actionLabel={!isPrimary ? 'Set as primary' : undefined}
+          actionLabel={!isDefault ? 'Set as default' : undefined}
+          onClick={() => phone.makeDefaultSecondFactor().catch(err => handleError(err, [], card.setError))}
         />
         <LinkButtonWithDescription
           title='Remove'
-          subtitle='Delete this phone number and remove it from your account'
+          subtitle='Remove this phone number from the multi-factor authentication methods'
           actionLabel='Remove phone number'
           colorScheme='danger'
+          onClick={() => navigate(`multi-factor/${phone.id}/remove`)}
         />
       </Col>
     </AccordionItem>

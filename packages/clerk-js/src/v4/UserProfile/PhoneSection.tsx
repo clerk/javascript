@@ -3,9 +3,9 @@ import React from 'react';
 
 import { useCoreUser } from '../../ui/contexts';
 import { useNavigate } from '../../ui/hooks';
-import { Badge, Col } from '../customizables';
-import { AccordionItem, FormattedPhoneNumber, useCardState } from '../elements';
-import { handleError } from '../utils';
+import { Badge, Col, Text } from '../customizables';
+import { AccordionItem, useCardState } from '../elements';
+import { getFlagEmojiFromCountryIso, handleError, parsePhoneString, stringToFormattedPhoneString } from '../utils';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
 import { ProfileSection } from './Section';
 import { AddBlockButton } from './UserProfileBlockButtons';
@@ -42,8 +42,22 @@ const PhoneAccordion = ({ phone }: { phone: PhoneNumberResource }) => {
     return user.update({ primaryPhoneNumberId: phone.id }).catch(e => handleError(e, [], card.setError));
   };
 
+  const formattedPhone = stringToFormattedPhoneString(phone.phoneNumber);
+  const flag = getFlagEmojiFromCountryIso(parsePhoneString(phone.phoneNumber).iso);
+
   return (
-    <AccordionItem title={<FormattedPhoneNumber value={phone.phoneNumber} />}>
+    // <AccordionItem title={<FormattedPhoneNumber value={phone.phoneNumber} />}>
+    <AccordionItem
+      icon={
+        <Text
+          as='span'
+          sx={theme => ({ fontSize: theme.fontSizes.$sm })}
+        >
+          {flag}
+        </Text>
+      }
+      title={formattedPhone}
+    >
       <Col gap={4}>
         {isPrimary && (
           <LinkButtonWithDescription
@@ -54,7 +68,7 @@ const PhoneAccordion = ({ phone }: { phone: PhoneNumberResource }) => {
         )}
         {!isPrimary && isVerified && (
           <LinkButtonWithDescription
-            title='Primary phone number'
+            title='Set as primary phone number'
             subtitle='Set this phone number as the primary to receive communications regarding your account.'
             actionLabel='Set as primary'
             onClick={setPrimary}

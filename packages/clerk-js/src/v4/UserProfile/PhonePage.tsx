@@ -14,7 +14,6 @@ import { VerifyWithCode } from './VerifyWithCode';
 
 export const PhonePage = withCardStateProvider(() => {
   const title = 'Add phone number';
-  const card = useCardState();
   const user = useCoreUser();
 
   const { params } = useRouter();
@@ -22,6 +21,37 @@ export const PhonePage = withCardStateProvider(() => {
 
   const phoneNumberRef = React.useRef<PhoneNumberResource | undefined>(user.phoneNumbers.find(a => a.id === id));
   const wizard = useWizard({ defaultStep: phoneNumberRef.current ? 1 : 0 });
+
+  return (
+    <Wizard {...wizard.props}>
+      <AddPhone
+        resourceRef={phoneNumberRef}
+        title={title}
+        onSuccess={wizard.nextStep}
+      />
+      <VerifyPhone
+        resourceRef={phoneNumberRef}
+        title={title}
+        onSuccess={wizard.nextStep}
+      />
+      <SuccessPage
+        title={title}
+        text={`${phoneNumberRef.current?.phoneNumber || ''} has been added to your account.`}
+      />
+    </Wizard>
+  );
+});
+
+type AddPhoneProps = {
+  title: string;
+  resourceRef: React.MutableRefObject<PhoneNumberResource | undefined>;
+  onSuccess: () => void;
+};
+
+export const AddPhone = (props: AddPhoneProps) => {
+  const { title, onSuccess, resourceRef } = props;
+  const card = useCardState();
+  const user = useCoreUser();
 
   const phoneField = useFormControl('phoneNumber', `6981593069`, {
     type: 'tel',
@@ -35,49 +65,48 @@ export const PhonePage = withCardStateProvider(() => {
     return user
       .createPhoneNumber({ phoneNumber: phoneField.value })
       .then(res => {
-        phoneNumberRef.current = res;
-        wizard.nextStep();
+        resourceRef.current = res;
+        onSuccess();
       })
       .catch(e => handleError(e, [phoneField], card.setError));
   };
 
   return (
-    <Wizard {...wizard.props}>
-      <ContentPage.Root headerTitle={title}>
-        <Form.Root onSubmit={addPhone}>
-          <Form.ControlRow>
-            <Form.Control
-              {...phoneField.props}
-              required
-              autoFocus
-            />
-          </Form.ControlRow>
-          <Text variant='regularRegular'>
-            A text message containing a verification link will be sent to this phone number.
-          </Text>
-          <Text
-            variant='smallRegular'
-            colorScheme='neutral'
-          >
-            Message and data rates may apply.
-          </Text>
-          <FormButtons isDisabled={!canSubmit} />
-        </Form.Root>
-      </ContentPage.Root>
-
-      <ContentPage.Root headerTitle={title}>
-        <VerifyWithCode
-          nextStep={wizard.nextStep}
-          identification={phoneNumberRef.current}
-          identifier={phoneNumberRef.current?.phoneNumber}
-          prepareVerification={phoneNumberRef.current?.prepareVerification}
-        />
-      </ContentPage.Root>
-
-      <SuccessPage
-        title={title}
-        text={`${phoneNumberRef.current?.phoneNumber || ''} has been added to your account.`}
-      />
-    </Wizard>
+    <ContentPage.Root headerTitle={title}>
+      <Form.Root onSubmit={addPhone}>
+        <Form.ControlRow>
+          <Form.Control
+            {...phoneField.props}
+            required
+            autoFocus
+          />
+        </Form.ControlRow>
+        <Text variant='regularRegular'>
+          A text message containing a verification link will be sent to this phone number.
+        </Text>
+        <Text
+          variant='smallRegular'
+          colorScheme='neutral'
+        >
+          Message and data rates may apply.
+        </Text>
+        <FormButtons isDisabled={!canSubmit} />
+      </Form.Root>
+    </ContentPage.Root>
   );
-});
+};
+
+export const VerifyPhone = (props: AddPhoneProps) => {
+  const { title, onSuccess, resourceRef } = props;
+
+  return (
+    <ContentPage.Root headerTitle={title}>
+      <VerifyWithCode
+        nextStep={onSuccess}
+        identification={resourceRef.current}
+        identifier={resourceRef.current?.phoneNumber}
+        prepareVerification={resourceRef.current?.prepareVerification}
+      />
+    </ContentPage.Root>
+  );
+};
