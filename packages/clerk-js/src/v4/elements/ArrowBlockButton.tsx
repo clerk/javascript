@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Button, Icon, Spinner, Text } from '../customizables';
+import { Button, Flex, Icon, Spinner, Text } from '../customizables';
 import { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { ArrowRightIcon } from '../icons';
 import { PropsOfComponent, ThemableCssProp } from '../styledSystem';
@@ -42,7 +42,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
           icon.props.sx,
           (theme: any) => ({
             width: theme.sizes.$4,
-            margin: `-${theme.space.$px} ${theme.space.$4} -${theme.space.$px} 0`,
+            position: 'absolute',
           }),
         ],
       })
@@ -57,6 +57,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
       {...rest}
       sx={theme => [
         {
+          gap: theme.space.$4,
           position: 'relative',
           justifyContent: 'flex-start',
           // color: theme.colors.$colorText,
@@ -71,14 +72,22 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
         props.sx,
       ]}
     >
-      {isLoading ? (
-        <Spinner
-          elementDescriptor={spinnerElementDescriptor}
-          elementId={spinnerElementId}
-          sx={theme => ({ marginRight: theme.space.$4 })}
-        />
-      ) : (
-        leftIcon
+      {(leftIcon || isLoading) && (
+        <Flex
+          as='span'
+          center
+          sx={theme => ({ flex: `0 0 ${theme.space.$4}` })}
+        >
+          {isLoading ? (
+            <Spinner
+              elementDescriptor={spinnerElementDescriptor}
+              elementId={spinnerElementId}
+              sx={{ position: 'absolute' }}
+            />
+          ) : (
+            leftIcon
+          )}
+        </Flex>
       )}
       <Text
         elementDescriptor={textElementDescriptor}
@@ -86,6 +95,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
         as='span'
         truncate
         colorScheme='inherit'
+        variant={'smallRegular'}
       >
         {children}
       </Text>

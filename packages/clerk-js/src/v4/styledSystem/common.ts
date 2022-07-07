@@ -5,7 +5,7 @@ const textVariants = (theme: InternalTheme) => {
     fontStyle: theme.fontStyles.$normal,
     fontWeight: theme.fontWeights.$normal,
     fontSize: theme.fontSizes.$xs,
-    lineHeight: theme.lineHeights.$none,
+    lineHeight: theme.lineHeights.$shorter,
     fontFamily: theme.fonts.$main,
   } as const;
 

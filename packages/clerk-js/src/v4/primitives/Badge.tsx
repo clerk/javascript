@@ -12,6 +12,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     backgroundColor: vars.bg,
     borderRadius: theme.radii.$sm,
     padding: `${theme.space.$0x5} ${theme.space.$1x5}`,
+    display: 'inline-flex',
   },
   variants: {
     textVariant: { ...common.textVariants(theme) },
@@ -55,6 +56,7 @@ export const Badge = (props: BadgeProps) => {
     <Flex
       {...filterProps(props)}
       center
+      as='span'
       css={applyVariants(props)}
     />
   );

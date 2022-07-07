@@ -103,7 +103,7 @@ const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
       </Flex>
       <Col
         align='start'
-        sx={theme => ({ gap: theme.space.$1x5 })}
+        gap={1}
       >
         <Text variant='smallMedium'>{title}</Text>
         <Text
