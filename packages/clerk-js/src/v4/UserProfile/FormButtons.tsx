@@ -2,22 +2,25 @@ import React from 'react';
 
 import { Flex } from '../customizables';
 import { Form } from '../elements';
+import { PropsOfComponent } from '../styledSystem';
 import { useNavigateToFlowStart } from './NavigateToFlowStartButton';
 
-type FormButtonsProps = {
+type FormButtonsProps = PropsOfComponent<typeof Form.SubmitButton> & {
   isDisabled?: boolean;
+  submitLabel?: string;
 };
 
 export const FormButtons = (props: FormButtonsProps) => {
   const { navigateToFlowStart } = useNavigateToFlowStart();
-  const { isDisabled } = props;
+  const { isDisabled, submitLabel, ...rest } = props;
   return (
     <FormButtonContainer>
       <Form.SubmitButton
         block={false}
         isDisabled={isDisabled}
+        {...rest}
       >
-        Continue
+        {submitLabel || 'Continue'}
       </Form.SubmitButton>
       <Form.ResetButton
         block={false}
@@ -29,12 +32,13 @@ export const FormButtons = (props: FormButtonsProps) => {
   );
 };
 
-export const FormButtonContainer = (props: React.PropsWithChildren<{}>) => {
+export const FormButtonContainer = (props: PropsOfComponent<typeof Flex>) => {
   return (
     <Flex
-      sx={theme => ({ marginTop: theme.space.$8 })}
       direction={'rowReverse'}
-      gap={4}
+      gap={2}
+      {...props}
+      sx={[theme => ({ marginTop: theme.space.$4 }), props.sx]}
     >
       {props.children}
     </Flex>

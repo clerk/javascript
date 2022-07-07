@@ -54,7 +54,7 @@ const EmailAccordion = ({ email }: { email: EmailAddressResource }) => {
         )}
         {!isPrimary && isVerified && (
           <LinkButtonWithDescription
-            title='Primary email address'
+            title='Set as primary email address'
             subtitle='Set this email address as the primary to receive communications regarding your account.'
             actionLabel='Set as primary'
             onClick={setPrimary}

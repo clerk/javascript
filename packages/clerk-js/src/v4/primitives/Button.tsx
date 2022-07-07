@@ -36,7 +36,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
         primary: {
           [vars.accentLightest]: theme.options.$darkMode
             ? colors.makeTransparent(theme.colors.$primary400, 0.8)
-            : theme.colors.$primary50,
+            : colors.makeTransparent(theme.colors.$primary300, 0.8),
           [vars.accentLighter]: theme.options.$darkMode
             ? colors.makeTransparent(theme.colors.$primary800, 0.5)
             : theme.colors.$primary100,

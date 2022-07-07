@@ -103,6 +103,6 @@ function InitialsAvatarFallback(props: AvatarProps) {
 const CLERK_IMAGE_URL_REGEX = /https:\/\/images\.(lcl)?clerk/i;
 const GRAVATAR_DEFAULT_AVATAR = 'https://www.gravatar.com/avatar?d=mp';
 
-function hasAvatar(profileImageUrl: string | undefined | null): boolean {
+export function hasAvatar(profileImageUrl: string | undefined | null): boolean {
   return CLERK_IMAGE_URL_REGEX.test(profileImageUrl!);
 }

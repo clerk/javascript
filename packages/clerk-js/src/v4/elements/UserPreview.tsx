@@ -10,11 +10,12 @@ export type UserPreviewProps = PropsOfComponent<typeof Flex> & {
   user: UserResource;
   size?: 'lg' | 'md' | 'sm';
   icon?: React.ReactNode;
+  badge?: React.ReactNode;
   profileImageUrl?: string;
 };
 
 export const UserPreview = (props: UserPreviewProps) => {
-  const { user, size = 'md', icon, profileImageUrl, ...rest } = props;
+  const { user, size = 'md', icon, profileImageUrl, badge, ...rest } = props;
   const name = getFullName(user);
   const identifier = getIdentifier(user);
 
@@ -30,8 +31,7 @@ export const UserPreview = (props: UserPreviewProps) => {
       >
         <Avatar
           {...user}
-          profileImageUrl={profileImageUrl}
-          // TODO: This should be coming from the theme
+          profileImageUrl={profileImageUrl || user.profileImageUrl}
           size={theme => ({ sm: theme.sizes.$8, md: theme.sizes.$11, lg: theme.sizes.$12x5 }[size])}
           optimize
         />
@@ -46,7 +46,7 @@ export const UserPreview = (props: UserPreviewProps) => {
           variant={size === 'md' ? 'regularMedium' : 'smallMedium'}
           truncate
         >
-          {name || identifier}
+          {name || identifier} {badge}
         </Text>
         {name && identifier && (
           <Text
