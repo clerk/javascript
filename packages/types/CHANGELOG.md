@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [2.19.1](https://github.com/clerkinc/javascript/compare/@clerk/types@2.19.0...@clerk/types@2.19.1) (2022-07-07)
+
+### Bug Fixes
+
+- **types:** Proper documentation url for OAuth providers ([4398cb2](https://github.com/clerkinc/javascript/commit/4398cb2ce0914ecd4850b1e3ccbbe64d3d25b031))
+
 ## [2.19.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.18.0...@clerk/types@2.19.0) (2022-07-06)
 
 ### Features
