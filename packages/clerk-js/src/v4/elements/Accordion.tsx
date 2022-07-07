@@ -7,12 +7,13 @@ import { ArrowBlockButton } from './ArrowBlockButton';
 
 type AccordionItemProps = React.PropsWithChildren<{
   title: React.ReactNode;
+  icon?: React.ReactElement;
   defaultOpen?: boolean;
   toggleable?: boolean;
 }>;
 
 export const AccordionItem = (props: AccordionItemProps) => {
-  const { children, title, defaultOpen = false, toggleable = true } = props;
+  const { children, title, icon, defaultOpen = false, toggleable = true } = props;
   const [isOpen, setIsOpen] = React.useState(defaultOpen);
 
   const toggle = () => {
@@ -27,6 +28,7 @@ export const AccordionItem = (props: AccordionItemProps) => {
         variant='ghost'
         colorScheme='neutral'
         textVariant='smallRegular'
+        icon={icon}
         rightIcon={Caret}
         rightIconSx={theme => ({
           transitionProperty: theme.transitionProperty.$common,
@@ -37,6 +39,7 @@ export const AccordionItem = (props: AccordionItemProps) => {
         sx={theme => ({
           backgroundColor: isOpen ? theme.colors.$blackAlpha50 : undefined,
           padding: `${theme.space.$3} ${theme.space.$4}`,
+          minHeight: theme.sizes.$10,
         })}
         onClick={toggle}
         isDisabled={!toggleable}

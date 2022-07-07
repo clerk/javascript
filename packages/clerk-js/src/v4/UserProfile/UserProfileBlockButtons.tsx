@@ -19,16 +19,17 @@ export const AddBlockButton = (props: BlockButtonProps) => {
     <BlockButton
       colorScheme='primary'
       {...props}
-      sx={{ justifyContent: 'flex-start' }}
+      sx={theme => ({ justifyContent: 'flex-start', gap: theme.space.$2 })}
+      icon={
+        <Icon
+          icon={Plus}
+          sx={theme => ({
+            width: theme.sizes.$2x5,
+            height: theme.sizes.$2x5,
+          })}
+        />
+      }
     >
-      <Icon
-        icon={Plus}
-        sx={theme => ({
-          width: theme.sizes.$2x5,
-          height: theme.sizes.$2x5,
-          marginRight: theme.space.$3,
-        })}
-      />
       {props.children}
     </BlockButton>
   );

@@ -30,6 +30,9 @@ const { applyVariants, filterProps } = createVariants(theme => {
         },
       },
     },
+    defaultVariants: {
+      variant: 'regularRegular',
+    },
   };
 });
 
