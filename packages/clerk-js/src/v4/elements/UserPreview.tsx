@@ -11,7 +11,7 @@ export type UserPreviewProps = PropsOfComponent<typeof Flex> & {
   size?: 'lg' | 'md' | 'sm';
   icon?: React.ReactNode;
   badge?: React.ReactNode;
-  profileImageUrl?: string;
+  profileImageUrl?: string | null;
 };
 
 export const UserPreview = (props: UserPreviewProps) => {
@@ -31,7 +31,7 @@ export const UserPreview = (props: UserPreviewProps) => {
       >
         <Avatar
           {...user}
-          profileImageUrl={profileImageUrl || user.profileImageUrl}
+          {...(profileImageUrl !== undefined && { profileImageUrl })}
           size={theme => ({ sm: theme.sizes.$8, md: theme.sizes.$11, lg: theme.sizes.$12x5 }[size])}
           optimize
         />
