@@ -4,6 +4,7 @@ import React from 'react';
 import { Button, descriptors, Grid, Image, useAppearance } from '../customizables';
 import { useEnabledThirdPartyProviders } from '../hooks';
 import { PropsOfComponent } from '../styledSystem';
+import { sleep } from '../utils';
 import { ArrowBlockButton } from './ArrowBlockButton';
 import { useCardState } from './contexts';
 
@@ -20,7 +21,7 @@ const isWeb3Strategy = (val: string): val is Web3Strategy => {
 
 export const SocialButtons = React.memo((props: SocialButtonsRootProps): JSX.Element => {
   const { oauthCallback, web3Callback } = props;
-  const { strategies, displayData } = useEnabledThirdPartyProviders();
+  const { strategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
   const card = useCardState();
   const {
     parsedOptions: { socialButtonsVariant },
@@ -51,19 +52,19 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps): JSX.Ele
       {strategies.map(strategy => (
         <ButtonElement
           key={strategy}
-          id={displayData[strategy].id}
+          id={strategyToDisplayData[strategy].id}
           onClick={startOauth(strategy)}
           isLoading={card.loadingMetadata === strategy}
           isDisabled={card.isLoading}
-          label={`Continue with ${displayData[strategy].name}`}
+          label={`Continue with ${strategyToDisplayData[strategy].name}`}
           icon={
             <Image
               elementDescriptor={descriptors.socialButtonsLogo}
-              elementId={descriptors.socialButtonsLogo.setId(displayData[strategy].id)}
+              elementId={descriptors.socialButtonsLogo.setId(strategyToDisplayData[strategy].id)}
               isLoading={card.loadingMetadata === strategy}
               isDisabled={card.isLoading}
-              src={displayData[strategy].iconUrl}
-              alt={`Sign in with ${displayData[strategy].name}`}
+              src={strategyToDisplayData[strategy].iconUrl}
+              alt={`Sign in with ${strategyToDisplayData[strategy].name}`}
               sx={theme => ({ width: theme.sizes.$5 })}
             />
           }
