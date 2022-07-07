@@ -5,6 +5,7 @@ import { createVariants, StyleVariants } from '../styledSystem';
 const { applyVariants, filterProps } = createVariants(theme => ({
   variants: {
     size: {
+      sm: { width: theme.sizes.$3, height: theme.sizes.$3 },
       md: { width: theme.sizes.$4, height: theme.sizes.$4 },
       lg: { width: theme.sizes.$5, height: theme.sizes.$5 },
     },
