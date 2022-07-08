@@ -1,6 +1,6 @@
 import { AuthStatus, Base, createGetToken, createSignedOutState } from '@clerk/backend-core';
 import { ClerkJWTClaims } from '@clerk/types';
-import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
+import { NextFetchEvent, NextRequest } from 'next/server';
 
 import { ClerkAPI } from './ClerkAPI';
 import {
@@ -10,6 +10,7 @@ import {
   WithEdgeMiddlewareAuthOptions,
 } from './types';
 import { injectAuthIntoRequest } from './utils';
+import { interstitialResponse, signedOutResponse } from './utils/responses';
 
 /**
  *
@@ -72,16 +73,40 @@ export function withEdgeMiddlewareAuth(
   options: any = {
     loadSession: false,
     loadUser: false,
+    strict: false,
+  },
+): any {
+  return vercelMiddlewareAuth(handler, { strict: false, ...options });
+}
+
+export function requireEdgeMiddlewareAuth(
+  handler: any,
+  options: any = {
+    loadSession: false,
+    loadUser: false,
+  },
+): any {
+  return vercelMiddlewareAuth(handler, { strict: true, ...options });
+}
+
+function vercelMiddlewareAuth(
+  handler: any,
+  options: any = {
+    loadSession: false,
+    loadUser: false,
   },
 ): any {
   return async function clerkAuth(req: NextRequest, event: NextFetchEvent) {
     const { loadUser, loadSession, jwtKey, authorizedParties } = options;
-    const cookieToken = req.cookies['__session'];
+
+    const cookieToken = getCookie(req.cookies, '__session');
+    const clientUat = getCookie(req.cookies, '__client_uat');
+
     const headerToken = req.headers.get('authorization');
     const { status, interstitial, sessionClaims, errorReason } = await vercelEdgeBase.getAuthState({
       cookieToken,
       headerToken,
-      clientUat: req.cookies['__client_uat'],
+      clientUat,
       origin: req.headers.get('origin'),
       host: req.headers.get('host') as string,
       userAgent: req.headers.get('user-agent'),
@@ -94,13 +119,14 @@ export function withEdgeMiddlewareAuth(
     });
 
     if (status === AuthStatus.Interstitial) {
-      return new NextResponse(interstitial, {
-        headers: { 'Content-Type': 'text/html', 'Auth-Result': errorReason || '' },
-        status: 401,
-      });
+      return interstitialResponse(interstitial as string, errorReason);
     }
 
     if (status === AuthStatus.SignedOut) {
+      if (options.strict) {
+        return signedOutResponse(errorReason);
+      }
+
       const response = (await handler(
         injectAuthIntoRequest(req, createSignedOutState()),
         event,
@@ -134,4 +160,14 @@ export function withEdgeMiddlewareAuth(
     });
     return handler(authRequest, event);
   };
+}
+
+/* As of Next.js 12.2, the req.cookies API is accessed using .get, on previous releases, it used plain object access. To support both without breaking previous versions, we can use this simple check. */
+function getCookie(cookies: NextRequest['cookies'], name: string) {
+  if (typeof cookies.get === 'function') {
+    return cookies.get(name);
+  } else {
+    // @ts-expect-error
+    return cookies[name];
+  }
 }
