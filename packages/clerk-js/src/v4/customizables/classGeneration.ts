@@ -9,9 +9,11 @@ const STATE_PROP_TO_CLASSNAME = Object.freeze({
   loading: ` ${CLASS_PREFIX}loading`,
   error: ` ${CLASS_PREFIX}error`,
   open: ` ${CLASS_PREFIX}open`,
+  active: ` ${CLASS_PREFIX}active`,
 } as const);
 
-type PropsWithState = Partial<Record<'isLoading' | 'isDisabled' | 'hasError' | 'isOpen', any>> & Record<string, any>;
+type PropsWithState = Partial<Record<'isLoading' | 'isDisabled' | 'hasError' | 'isOpen' | 'isActive', any>> &
+  Record<string, any>;
 
 export const generateClassName = (
   parsedElements: ParsedElements,
@@ -92,6 +94,9 @@ const getElementState = (props: PropsWithState | undefined): ElementState | unde
   }
   if (props.isOpen) {
     return 'open';
+  }
+  if (props.isActive) {
+    return 'active';
   }
   return undefined;
 };
