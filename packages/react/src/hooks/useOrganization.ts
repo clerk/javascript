@@ -43,33 +43,28 @@ export const useOrganization: UseOrganization = ({
   const session = useSessionContext();
 
   const isomorphicClerk = useIsomorphicClerkContext();
+  const clerk = isomorphicClerk as unknown as LoadedClerk;
+  const shouldFetch = isomorphicClerk.loaded && session && organization;
 
   // Some gymnastics to adhere to the rules of hooks
   // We need to make sure useSWR is called on every render
-  let pendingInvitations = () => {};
-  let currentOrganizationMemberships = () => {};
-  
-  if(isomorphicClerk.loaded){
-    const clerk = isomorphicClerk as unknown as LoadedClerk;
+  const pendingInvitations = !isomorphicClerk.loaded
+    ? () => [] as OrganizationInvitationResource[]
+    : () => clerk.organization?.getPendingInvitations(invitationListParams);
 
-    pendingInvitations = async () => {
-      return await clerk.organization?.getPendingInvitations(invitationListParams);
-    };
-
-    currentOrganizationMemberships = async () => {
-      return await clerk.organization?.getMemberships(membershipListParams);
-    };
-  }
+  const currentOrganizationMemberships = !isomorphicClerk.loaded
+    ? () => [] as OrganizationMembershipResource[]
+    : () => clerk.organization?.getMemberships(membershipListParams);
 
   const { data: invitationList, isValidating: isInvitationsLoading } = useSWR(
-    (isomorphicClerk.loaded && invitationListParams && session && organization)
+    shouldFetch && invitationListParams
       ? composeOrganizationResourcesUpdateKey(organization, lastOrganizationInvitation, 'invitations')
       : null,
     pendingInvitations,
   );
 
   const { data: membershipList, isValidating: isMembershipsLoading } = useSWR(
-    (isomorphicClerk.loaded && membershipListParams && session && organization)
+    shouldFetch && membershipListParams
       ? composeOrganizationResourcesUpdateKey(organization, lastOrganizationMember, 'memberships')
       : null,
     currentOrganizationMemberships,
@@ -84,8 +79,8 @@ export const useOrganization: UseOrganization = ({
       membershipList: undefined,
       membership: undefined,
     };
-  }  
-  
+  }
+
   return {
     isLoaded: !isMembershipsLoading && !isInvitationsLoading,
     organization,
