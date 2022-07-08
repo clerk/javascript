@@ -44,6 +44,37 @@ export const useOrganization: UseOrganization = ({
 
   const isomorphicClerk = useIsomorphicClerkContext();
 
+  // Some gymnastics to adhere to the rules of hooks
+  // We need to make sure useSWR is called on every render
+  let pendingInvitations = () => {};
+  let currentOrganizationMemberships = () => {};
+  
+  if(isomorphicClerk.loaded){
+    const clerk = isomorphicClerk as unknown as LoadedClerk;
+
+    pendingInvitations = async () => {
+      return await clerk.organization?.getPendingInvitations(invitationListParams);
+    };
+
+    currentOrganizationMemberships = async () => {
+      return await clerk.organization?.getMemberships(membershipListParams);
+    };
+  }
+
+  const { data: invitationList, isValidating: isInvitationsLoading } = useSWR(
+    (isomorphicClerk.loaded && invitationListParams)
+      ? composeOrganizationResourcesUpdateKey(organization, lastOrganizationInvitation, 'invitations')
+      : null,
+    pendingInvitations,
+  );
+
+  const { data: membershipList, isValidating: isMembershipsLoading } = useSWR(
+    (isomorphicClerk.loaded && membershipListParams)
+      ? composeOrganizationResourcesUpdateKey(organization, lastOrganizationMember, 'memberships')
+      : null,
+    currentOrganizationMemberships,
+  );
+
   // TODO re-iterate on SSR based on value of `organization`
   if (!isomorphicClerk.loaded || !session || !organization) {
     return {
@@ -53,32 +84,8 @@ export const useOrganization: UseOrganization = ({
       membershipList: undefined,
       membership: undefined,
     };
-  }
-
-  const clerk = isomorphicClerk as unknown as LoadedClerk;
-
-  const pendingInvitations = async () => {
-    return await clerk.organization?.getPendingInvitations(invitationListParams);
-  };
-
-  const currentOrganizationMemberships = async () => {
-    return await clerk.organization?.getMemberships(membershipListParams);
-  };
-
-  const { data: invitationList, isValidating: isInvitationsLoading } = useSWR(
-    invitationListParams
-      ? composeOrganizationResourcesUpdateKey(organization, lastOrganizationInvitation, 'invitations')
-      : null,
-    pendingInvitations,
-  );
-
-  const { data: membershipList, isValidating: isMembershipsLoading } = useSWR(
-    membershipListParams
-      ? composeOrganizationResourcesUpdateKey(organization, lastOrganizationMember, 'memberships')
-      : null,
-    currentOrganizationMemberships,
-  );
-
+  }  
+  
   return {
     isLoaded: !isMembershipsLoading && !isInvitationsLoading,
     organization,
