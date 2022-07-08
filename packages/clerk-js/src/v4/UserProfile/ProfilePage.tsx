@@ -23,15 +23,19 @@ export const ProfilePage = withCardStateProvider(() => {
   const firstNameField = useFormControl('firstName', user.firstName || '', { type: 'text', label: 'First name' });
   const lastNameField = useFormControl('lastName', user.lastName || '', { type: 'text', label: 'Last name' });
 
-  const canSubmit =
+  const userInfoChanged =
     (showFirstName && firstNameField.value && firstNameField.value !== user.firstName) ||
-    (showLastName && lastNameField.value && lastNameField.value !== user.lastName) ||
-    avatarChanged;
+    (showLastName && lastNameField.value && lastNameField.value !== user.lastName);
+  const canSubmit = userInfoChanged || avatarChanged;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    return user
-      .update({ firstName: firstNameField.value, lastName: lastNameField.value })
+
+    return (
+      userInfoChanged
+        ? user.update({ firstName: firstNameField.value, lastName: lastNameField.value })
+        : Promise.resolve()
+    )
       .then(() => {
         wizard.nextStep();
       })
@@ -116,24 +120,16 @@ const AvatarUploader = (props: AvatarUploaderProps) => {
         <Col gap={1}>
           <Text variant='regularMedium'>Profile image</Text>
           <Flex gap={4}>
-            {!showUpload && (
-              <Button
-                isDisabled={card.isLoading}
-                variant='link'
-                onClick={toggle}
-              >
-                Upload image
-              </Button>
-            )}
-            {showUpload && (
-              <Button
-                isDisabled={card.isLoading}
-                variant='link'
-                onClick={toggle}
-              >
-                Cancel
-              </Button>
-            )}
+            <Button
+              isDisabled={card.isLoading}
+              variant='link'
+              onClick={e => {
+                e.target.blur();
+                toggle();
+              }}
+            >
+              {!showUpload ? 'Upload image' : 'Cancel'}
+            </Button>
             {/* TODO */}
             {/*<Button*/}
             {/*  isDisabled={card.isLoading}*/}
