@@ -62,14 +62,14 @@ export const useOrganization: UseOrganization = ({
   }
 
   const { data: invitationList, isValidating: isInvitationsLoading } = useSWR(
-    (isomorphicClerk.loaded && invitationListParams)
+    (isomorphicClerk.loaded && invitationListParams && session && organization)
       ? composeOrganizationResourcesUpdateKey(organization, lastOrganizationInvitation, 'invitations')
       : null,
     pendingInvitations,
   );
 
   const { data: membershipList, isValidating: isMembershipsLoading } = useSWR(
-    (isomorphicClerk.loaded && membershipListParams)
+    (isomorphicClerk.loaded && membershipListParams && session && organization)
       ? composeOrganizationResourcesUpdateKey(organization, lastOrganizationMember, 'memberships')
       : null,
     currentOrganizationMemberships,
