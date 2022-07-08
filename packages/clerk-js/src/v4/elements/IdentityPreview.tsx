@@ -12,9 +12,14 @@ type IdentityPreviewProps = {
   onClick: React.MouseEventHandler;
 } & PropsOfComponent<typeof Flex>;
 
+const isSafeIdentifier = (str: string | undefined) => str && str.includes('**');
+
 export const IdentityPreview = (props: IdentityPreviewProps) => {
   const { avatarUrl, identifier, onClick, ...rest } = props;
-  const refs = React.useRef({ avatarUrl, identifier: formatIdentifier(identifier) });
+  const refs = React.useRef({
+    avatarUrl,
+    identifier: isSafeIdentifier(identifier) ? identifier : formatIdentifier(identifier),
+  });
 
   return (
     <Flex>
