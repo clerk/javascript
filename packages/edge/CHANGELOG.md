@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.0](https://github.com/clerkinc/javascript/compare/@clerk/edge@1.5.8...@clerk/edge@1.6.0) (2022-07-08)
+
+### Features
+
+- **backend-core,edge:** Add requireEdgeMiddlewareAuth ([9ce6a4e](https://github.com/clerkinc/javascript/commit/9ce6a4e3f763f5e75a59439f9e36dc1a2ec368c4))
+- **edge,nextjs:** Compatibility with API middleware experimental edge-runtime ([107d70e](https://github.com/clerkinc/javascript/commit/107d70e2fb0522a89763c4b99f0968aea4e01c2c))
+
+### Bug Fixes
+
+- **edge:** Add error reason on strict signed out response ([991b102](https://github.com/clerkinc/javascript/commit/991b102cf0514d3598185b1ac2ceb9bf21efbde1))
+- **edge:** Compatibility handler for old edge cookies handler ([4e42a11](https://github.com/clerkinc/javascript/commit/4e42a1150021b63a7e4b30690fe5f5ef12b5c1f6))
+
 ### [1.5.8](https://github.com/clerkinc/javascript/compare/@clerk/edge@1.5.7...@clerk/edge@1.5.8) (2022-07-07)
 
 **Note:** Version bump only for package @clerk/edge
