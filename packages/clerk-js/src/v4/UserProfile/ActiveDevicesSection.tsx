@@ -5,7 +5,7 @@ import React from 'react';
 import { useCoreSession, useCoreUser } from '../../ui/contexts';
 import { Badge, Col, Flex, Icon, Spinner, Text } from '../customizables';
 import { AccordionItem } from '../elements';
-import { DeviceDesktop, DeviceMobile } from '../icons';
+import { DeviceLaptop, DeviceMobile } from '../icons';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
 import { ProfileSection } from './Section';
 import { currentSessionFirst } from './utils';
@@ -88,14 +88,26 @@ const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
       <Flex
         center
         sx={theme => ({
-          backgroundColor: theme.colors.$activeDeviceBackground,
           padding: `0 ${theme.space.$3}`,
           borderRadius: theme.radii.$md,
         })}
       >
         <Icon
-          icon={isMobile ? DeviceMobile : DeviceDesktop}
+          icon={isMobile ? DeviceMobile : DeviceLaptop}
           sx={theme => ({
+            ...(theme.options.$darkMode
+              ? {
+                  '--cl-chassis-bottom': '#d2d2d2',
+                  '--cl-chassis-back': '#e6e6e6',
+                  '--cl-chassis-screen': '#e6e6e6',
+                  '--cl-screen': '#111111',
+                }
+              : {
+                  '--cl-chassis-bottom': '#444444',
+                  '--cl-chassis-back': '#343434',
+                  '--cl-chassis-screen': '#575757',
+                  '--cl-screen': '#000000',
+                }),
             width: theme.space.$20,
             height: theme.space.$20,
           })}

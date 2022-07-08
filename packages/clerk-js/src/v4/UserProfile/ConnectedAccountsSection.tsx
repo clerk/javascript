@@ -49,7 +49,7 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
         <UserPreview
           user={user}
           size='lg'
-          profileImageUrl={account.avatarUrl}
+          profileImageUrl={account.avatarUrl || null}
           icon={
             <Image
               alt={providerToDisplayData[account.provider].name}
