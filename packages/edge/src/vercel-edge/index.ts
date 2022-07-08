@@ -124,7 +124,7 @@ function vercelMiddlewareAuth(
 
     if (status === AuthStatus.SignedOut) {
       if (options.strict) {
-        return signedOutResponse();
+        return signedOutResponse(errorReason);
       }
 
       const response = (await handler(
