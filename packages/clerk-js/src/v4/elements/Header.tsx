@@ -1,16 +1,15 @@
 import React from 'react';
 
-import { descriptors, Flex, Heading, Text } from '../customizables';
+import { Col, descriptors, Heading, Text } from '../customizables';
 import { PropsOfComponent } from '../styledSystem';
 import { BackLink as BackLinkEl } from './BackLink';
 
-const Root = React.memo((props: React.PropsWithChildren<any>): JSX.Element => {
+const Root = React.memo((props: PropsOfComponent<typeof Col>): JSX.Element => {
   return (
-    <Flex
+    <Col
       elementDescriptor={descriptors.header}
-      {...props}
-      direction='col'
       gap={1}
+      {...props}
     />
   );
 });

@@ -38,7 +38,8 @@ type LoadingState = 'loading';
 type DisabledState = 'disabled';
 type ErrorState = 'error';
 type OpenState = 'open';
-export type ElementState = LoadingState | DisabledState | ErrorState | OpenState;
+type ActiveState = 'active';
+export type ElementState = LoadingState | DisabledState | ErrorState | OpenState | ActiveState;
 
 export type AlertId = 'danger' | 'warning';
 export type FieldId =
@@ -47,6 +48,7 @@ export type FieldId =
   | 'emailAddress'
   | 'phoneNumber'
   | 'password'
+  | 'confirmPassword'
   | 'identifier'
   | 'username';
 export type ProfileSectionId =
@@ -55,9 +57,11 @@ export type ProfileSectionId =
   | 'emailAddresses'
   | 'phoneNumbers'
   | 'connectedAccounts'
+  | 'web3Wallets'
   | 'password'
   | 'mfa'
   | 'activeDevices';
+type NavbarItemId = 'account' | 'security';
 
 /**
  * A type that describes the states and the ids that we will combine
@@ -152,6 +156,7 @@ export type ElementsConfig = {
   'form-fieldInput': WithOptions<FieldId, ErrorState | DisabledState, never>;
   'form-fieldErrorText': WithOptions<FieldId, ErrorState | DisabledState, never>;
   'form-buttonPrimary': WithOptions<never, ErrorState | LoadingState, never>;
+  'form-buttonReset': WithOptions<never, ErrorState | LoadingState, never>;
   'form-fieldInputShowPassword': WithOptions<never, never, never>;
   'form-fieldInputShowPasswordIcon': WithOptions<never, never, never>;
 
@@ -182,9 +187,27 @@ export type ElementsConfig = {
   'profileSection-titleText': WithOptions<ProfileSectionId, never, never>;
   'profileSection-content': WithOptions<ProfileSectionId, never, never>;
 
+  // TODO: review
   formattedPhoneNumber: WithOptions<never, never, never>;
   'formattedPhoneNumber-flag': WithOptions<never, never, never>;
   'formattedPhoneNumber-text': WithOptions<never, never, never>;
+
+  breadcrumbs: WithOptions<never, never, never>;
+  'breadcrumbs-itemContainer': WithOptions<never, never, never>;
+  'breadcrumbs-icon': WithOptions<never, never, never>;
+  'breadcrumbs-item': WithOptions<'currentPage', never, never>;
+  'breadcrumbs-divider': WithOptions<never, never, never>;
+
+  scroller: WithOptions<never, never, never>;
+
+  navbarSection: WithOptions<never, never, never>;
+  navbar: WithOptions<never, ActiveState, never>;
+  'navbar-item': WithOptions<NavbarItemId, ActiveState, never>;
+  'navbar-icon': WithOptions<NavbarItemId, ActiveState, never>;
+
+  pageSection: WithOptions<never, never, never>;
+  page: WithOptions<never, never, never>;
+  pageHeader: WithOptions<never, never, never>;
 };
 
 export type Elements = {

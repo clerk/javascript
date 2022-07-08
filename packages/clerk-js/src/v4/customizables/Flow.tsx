@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { descriptors, Flex } from '../customizables';
+import { Col, descriptors } from '../customizables';
 import { FlowMetadata, FlowMetadataProvider, useFlowMetadata } from '../elements';
 import { InternalThemeProvider } from '../styledSystem';
 import { generateFlowClassname } from './classGeneration';
@@ -11,10 +11,9 @@ const Root = (props: FlowRootProps) => {
   return (
     <FlowMetadataProvider flow={props.flow}>
       <InternalThemeProvider>
-        <Flex
+        <Col
           elementDescriptor={descriptors.root}
           className={generateFlowClassname(props)}
-          direction='col'
           {...props}
         />
       </InternalThemeProvider>
