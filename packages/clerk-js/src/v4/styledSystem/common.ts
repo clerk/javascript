@@ -163,17 +163,17 @@ const centeredFlex = (display: 'flex' | 'inline-flex' = 'flex') => ({
   alignItems: 'center',
 });
 
-const maxHeightScroller = theme =>
+const maxHeightScroller = t =>
   ({
     height: '100%',
-    overflowY: 'auto',
+    overflowY: 'scroll',
     '::-webkit-scrollbar': {
       background: 'transparent',
       width: '8px',
       height: '8px',
     },
     '::-webkit-scrollbar-thumb': {
-      background: theme.colors.$blackAlpha500,
+      background: t.colors.$blackAlpha500,
     },
     '::-webkit-scrollbar-track': {
       background: 'transparent',
