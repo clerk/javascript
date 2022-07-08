@@ -51,6 +51,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'form-fieldInput',
   'form-fieldErrorText',
   'form-buttonPrimary',
+  'form-buttonReset',
   'form-fieldInputShowPassword',
   'form-fieldInputShowPasswordIcon',
 
@@ -84,6 +85,23 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'formattedPhoneNumber',
   'formattedPhoneNumber-flag',
   'formattedPhoneNumber-text',
+
+  'breadcrumbs',
+  'breadcrumbs-itemContainer',
+  'breadcrumbs-icon',
+  'breadcrumbs-item',
+  'breadcrumbs-divider',
+
+  'scroller',
+
+  'navbarSection',
+  'navbar',
+  'navbar-item',
+  'navbar-icon',
+
+  'pageSection',
+  'page',
+  'pageHeader',
 ] as const);
 
 type TargettableClassname<K extends keyof ElementsConfig> = `${typeof CLASS_PREFIX}${K}`;

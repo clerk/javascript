@@ -1,8 +1,9 @@
 import React from 'react';
 
-import { Col, Flex } from '../customizables';
+import { Col, descriptors, Flex } from '../customizables';
 import { CardAlert, Header, useCardState } from '../elements';
 import { PropsOfComponent } from '../styledSystem';
+import { Breadcrumbs } from './Navbar';
 
 type PageProps = PropsOfComponent<typeof Col> & {
   headerTitle: string;
@@ -14,12 +15,13 @@ const Page = (props: PageProps) => {
 
   return (
     <Col
+      elementDescriptor={descriptors.page}
       gap={8}
-      sx={theme => ({ minHeight: theme.space.$140 })}
       {...rest}
     >
       <CardAlert>{card.error}</CardAlert>
-      <Header.Root>
+      <Header.Root gap={5}>
+        <Breadcrumbs title={headerTitle} />
         <Header.Title textVariant='xlargeMedium'>{headerTitle}</Header.Title>
       </Header.Root>
       <Col gap={8}>{children}</Col>
