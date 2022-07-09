@@ -8,7 +8,7 @@ import { useWizard, Wizard } from '../common';
 import { Col, descriptors, Image, Text } from '../customizables';
 import { ArrowBlockButton, useCardState, withCardStateProvider } from '../elements';
 import { useEnabledThirdPartyProviders } from '../hooks';
-import { handleError, sleep, stateParam } from '../utils';
+import { handleError, sleep } from '../utils';
 import { FormButtonContainer } from './FormButtons';
 import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
 import { ContentPage } from './Page';
@@ -54,15 +54,15 @@ const AddConnectedAccount = () => {
     // TODO: Decide if we should keep using this strategy
     // If yes, refactor and cleanup:
     card.setLoading(strategy);
-    const redirectUrl = stateParam.add(window.location.href, {
-      c: 'userProfile',
-      la: 'createExternalAccount',
-      lam: { strategy },
-    });
+    // const redirectUrl = stateParam.add(window.location.href, {
+    //   c: 'userProfile',
+    //   la: 'createExternalAccount',
+    //   lam: { strategy },
+    // });
     user
-      .createExternalAccount({ strategy: strategy, redirect_url: redirectUrl.toString() })
+      // .createExternalAccount({ strategy: strategy, redirect_url: redirectUrl.toString() })
+      .createExternalAccount({ strategy: strategy, redirect_url: window.location.href })
       .then(res => {
-        console.log(JSON.stringify(res));
         return navigate(res.verification!.externalVerificationRedirectURL);
       })
       .catch(err => handleError(err, [], card.setError))

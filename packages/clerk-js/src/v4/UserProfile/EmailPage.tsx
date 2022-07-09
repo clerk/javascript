@@ -27,7 +27,7 @@ export const EmailPage = withCardStateProvider(() => {
   const emailAddressRef = React.useRef<EmailAddressResource | undefined>(user.emailAddresses.find(a => a.id === id));
   const wizard = useWizard({ defaultStep: emailAddressRef.current ? 1 : 0 });
 
-  const emailField = useFormControl('emailAddress', `nikos+${Date.now()}@clerk.dev`, {
+  const emailField = useFormControl('emailAddress', '', {
     type: 'text',
     label: 'Email address',
   });
