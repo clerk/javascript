@@ -152,9 +152,13 @@ const Components = (props: ComponentsProps) => {
     };
 
     componentsControls.openModal = (name, props) => {
-      console.log('componentsControls.openModal', name);
       setState(s => ({ ...s, [name + 'Modal']: props }));
     };
+
+    // const stateFromParams = stateParam.readAndClear();
+    // if (stateFromParams.la && stateFromParams.c) {
+    //   componentsControls.openModal(stateFromParams.c, { ...stateFromParams });
+    // }
   }, []);
 
   const mountedSignInModal = (
@@ -221,7 +225,10 @@ const Components = (props: ComponentsProps) => {
         <InternalThemeProvider>
           <Modal
             handleClose={() => componentsControls.closeModal('userProfile')}
-            contentSx={{ maxHeight: '60vh' }}
+            contentSx={t => ({
+              height: t.sizes.$176,
+              maxHeight: `min(${t.sizes.$176}, calc(100vh - ${t.sizes.$20}))`,
+            })}
           >
             <VirtualRouter
               preservedParams={PRESERVED_QUERYSTRING_PARAMS}

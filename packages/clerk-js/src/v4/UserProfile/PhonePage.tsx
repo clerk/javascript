@@ -53,7 +53,7 @@ export const AddPhone = (props: AddPhoneProps) => {
   const card = useCardState();
   const user = useCoreUser();
 
-  const phoneField = useFormControl('phoneNumber', `6981593069`, {
+  const phoneField = useFormControl('phoneNumber', '', {
     type: 'tel',
     label: 'Phone number',
   });

@@ -32,6 +32,7 @@ const dynamicSpaceUnits = Object.freeze({
   '100': '25rem',
   '140': '35rem',
   '160': '40rem',
+  '176': '44rem',
   '220': '55rem',
 } as const);
 
