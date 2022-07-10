@@ -3,7 +3,7 @@ import React from 'react';
 import { Button, Flex, Text } from '../customizables';
 import { UserPreview, UserPreviewProps } from '../elements';
 import { useCardState } from '../elements/contexts';
-import { PropsOfComponent } from '../styledSystem';
+import { mqu, PropsOfComponent } from '../styledSystem';
 import { Actions } from './CurrentAccountActions';
 
 export const SessionActions = (props: PropsOfComponent<typeof Flex>) => {
@@ -48,7 +48,12 @@ export const UserPreviewButton = (props: UserPreviewButtonProps) => {
       />
       <Text
         variant='smallRegular'
-        sx={theme => ({ color: theme.colors.$blackAlpha500 })}
+        sx={t => ({
+          [mqu.xs]: {
+            display: 'none',
+          },
+          color: t.colors.$blackAlpha500,
+        })}
       >
         Switch account
       </Text>

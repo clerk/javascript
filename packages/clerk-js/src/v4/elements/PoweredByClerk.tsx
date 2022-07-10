@@ -3,7 +3,7 @@ import React from 'react';
 import { useEnvironment } from '../../ui/contexts';
 import { Flex, Icon, Link, Text } from '../customizables';
 import { LogoMark } from '../icons';
-import { InternalTheme } from '../styledSystem';
+import { InternalTheme, mqu, PropsOfComponent } from '../styledSystem';
 
 export const PoweredByClerkText = React.memo(() => {
   const { branded } = useEnvironment().displayConfig;
@@ -25,23 +25,20 @@ export const PoweredByClerkText = React.memo(() => {
   ) : null;
 });
 
-type PoweredByClerkTagProps = {
-  placement?: `${'bottom' | 'top'}-left`;
-};
-
 export const PoweredByClerkTag = React.memo(
-  React.forwardRef<HTMLDivElement, PoweredByClerkTagProps>((props, ref) => {
-    const { placement = 'top-left' } = props;
+  React.forwardRef<HTMLDivElement, PropsOfComponent<typeof Flex>>((props, ref) => {
     const { branded } = useEnvironment().displayConfig;
 
     const topLeft = (theme: InternalTheme) => ({
       top: theme.radii.$lg,
+      bottom: 'unset',
       transform: `rotate(-90deg) translateX(-10rem)`,
       borderRadius: `${theme.radii.$md} ${theme.radii.$md} 0 0`,
-      borderBottomColor: 'transparent',
+      borderTopColor: theme.colors.$whiteAlpha200,
     });
 
     const bottomLeft = (theme: InternalTheme) => ({
+      top: ' unset',
       bottom: 0,
       transform: `translateX(2rem) translateY(100%)`,
       borderRadius: `0 0 ${theme.radii.$md} ${theme.radii.$md}`,
@@ -61,7 +58,10 @@ export const PoweredByClerkTag = React.memo(
           position: 'absolute',
           transformOrigin: 'left bottom',
           left: 0,
-          ...(placement === 'top-left' ? topLeft(theme) : bottomLeft(theme)),
+          ...topLeft(theme),
+          [mqu.sm]: {
+            ...bottomLeft(theme),
+          },
         })}
         {...props}
         ref={ref}

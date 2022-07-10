@@ -3,7 +3,7 @@ import React from 'react';
 
 import { useCoreSession, useCoreUser, useEnvironment, useOptions, useUserButtonContext } from '../../ui/contexts';
 import { Flex, Flow, Link } from '../customizables';
-import { EmptyCard, PoweredByClerkText, UserPreview } from '../elements';
+import { BaseCard, PoweredByClerkText, UserPreview } from '../elements';
 import { CogFilled, Plus, SignOut, SignOutDouble } from '../icons';
 import { animations, PropsOfComponent } from '../styledSystem';
 import { Action, Actions } from './CurrentAccountActions';
@@ -132,21 +132,22 @@ const UserButtonLink = (props: PropsOfComponent<typeof Link>) => {
   );
 };
 
-const UserButtonCard = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof EmptyCard>>((props, ref) => {
+const UserButtonCard = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof BaseCard>>((props, ref) => {
   return (
     <Flow.Part part='popover'>
-      <EmptyCard
+      <BaseCard
         {...props}
         ref={ref}
-        sx={theme => ({
-          padding: `${theme.space.$6} 0`,
-          minWidth: theme.sizes.$94,
-          zIndex: theme.zIndices.$modal,
+        sx={t => ({
+          padding: `${t.space.$6} 0`,
+          width: t.sizes.$94,
+          maxWidth: `calc(100vw - ${t.sizes.$6})`,
+          zIndex: t.zIndices.$modal,
           animation: `${animations.dropdownSlideInScaleAndFade} 140ms `,
         })}
       >
         {props.children}
-      </EmptyCard>
+      </BaseCard>
     </Flow.Part>
   );
 });

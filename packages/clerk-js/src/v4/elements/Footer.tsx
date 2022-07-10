@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useOptions } from '../../ui/contexts';
 import { descriptors, Flex, Link, Text } from '../customizables';
-import { PropsOfComponent } from '../styledSystem';
+import { mqu, PropsOfComponent } from '../styledSystem';
 import { RouterLink } from './RouterLink';
 
 const FooterRoot = (props: React.PropsWithChildren<any>): JSX.Element => {
@@ -64,7 +64,12 @@ const FooterLinks = React.memo((): JSX.Element => {
     <Flex
       elementDescriptor={descriptors.footerPages}
       justify='between'
-      gap={3}
+      sx={t => ({
+        gap: t.space.$3,
+        [mqu.xs]: {
+          gap: t.space.$2,
+        },
+      })}
     >
       {paths.helpPageUrl && (
         <FooterLink
