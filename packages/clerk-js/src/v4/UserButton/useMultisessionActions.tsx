@@ -17,7 +17,7 @@ type UseMultisessionActionsParams = {
 };
 
 export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
-  const { setActive, signOut } = useCoreClerk();
+  const { setActive, signOut, openUserProfile } = useCoreClerk();
   const card = useCardState();
   const sessions = useCoreSessionList();
   const { navigate } = useNavigate();
@@ -35,6 +35,9 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   };
 
   const handleManageAccountClicked: React.MouseEventHandler<HTMLButtonElement> = () => {
+    openUserProfile();
+    return opts.actionCompleteCallback?.();
+
     return navigate(opts.userProfileUrl).finally(async () => {
       await sleep(1000);
       opts.actionCompleteCallback?.();
