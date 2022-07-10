@@ -41,7 +41,8 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps): JSX.Ele
     } else {
       await oauthCallback(strategy);
     }
-    setTimeout(() => card.setIdle(), 2000);
+    await sleep(2000);
+    card.setIdle();
   };
 
   const ButtonElement = preferBlockButtons ? SocialButtonBlock : SocialButtonIcon;
