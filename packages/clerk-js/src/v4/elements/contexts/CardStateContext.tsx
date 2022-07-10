@@ -29,10 +29,10 @@ const useCardState = () => {
 
   return {
     setIdle: (metadata?: Metadata) => setState(s => ({ ...s, status: 'idle', metadata })),
-    setError: (metadata: Metadata) => setState(s => ({ ...s, status: 'error', metadata })),
+    setError: (metadata: Metadata) => setState(s => ({ ...s, error: metadata })),
     setLoading: (metadata?: Metadata) => setState(s => ({ ...s, status: 'loading', metadata })),
     loadingMetadata: state.status === 'loading' ? state.metadata : undefined,
-    error: state.status === 'error' ? state.metadata : undefined,
+    error: state.error ? state.error : undefined,
     isLoading: state.status === 'loading',
     isIdle: state.status === 'idle',
   };

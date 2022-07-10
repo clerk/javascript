@@ -67,7 +67,7 @@ export const DropdownItemContainer = (props: React.PropsWithChildren<any>) => {
       direction='col'
       sx={theme => ({
         overflowY: 'scroll',
-        maxHeight: '15vh',
+        maxHeight: '18vh',
         paddingBottom: theme.space.$2,
       })}
       {...props}
