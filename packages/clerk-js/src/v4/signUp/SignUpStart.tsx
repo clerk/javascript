@@ -26,7 +26,7 @@ import {
 } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { useLoadingStatus } from '../hooks';
-import { buildRequest, FormControlStateLike, handleError, useFormControl } from '../utils';
+import { buildRequest, FormControlState, handleError, useFormControl } from '../utils';
 import { SignUpForm } from './SignUpForm';
 import { SignUpSocialButtons } from './SignUpSocialButtons';
 
@@ -150,12 +150,12 @@ function _SignUpStart(): JSX.Element {
     type FormStateKey = keyof typeof formState;
     const fieldsToSubmit = Object.entries(fields).reduce(
       (acc, [k, v]) => [...acc, ...(v && formState[k as FormStateKey] ? [formState[k as FormStateKey]] : [])],
-      [] as Array<FormControlStateLike>,
+      [] as Array<FormControlState>,
     );
 
     if (fields.ticket) {
       // fieldsToSubmit: Constructing a fake fields object for strategy.
-      fieldsToSubmit.push({ id: 'strategy', value: 'ticket' });
+      fieldsToSubmit.push({ id: 'strategy', value: 'ticket' } as any);
     }
 
     card.setLoading();
