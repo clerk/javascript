@@ -80,6 +80,7 @@ const ButtonGrid = (props: React.PropsWithChildren<any>) => {
       elementDescriptor={descriptors.socialButtons}
       gap={2}
       sx={theme => ({
+        justifyContent: 'center',
         '--cl-socialButtonSize': theme.sizes.$12,
         '--cl-socialButtonsPerLine': 'auto-fill',
         gridTemplateColumns: 'repeat(var(--cl-socialButtonsPerLine), var(--cl-socialButtonSize))',

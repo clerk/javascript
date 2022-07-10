@@ -3,7 +3,7 @@ import React from 'react';
 import { useEnvironment } from '../../ui/contexts';
 import { descriptors, Flex, useAppearance } from '../customizables';
 import { generateFlowPartClassname } from '../customizables/classGeneration';
-import { PropsOfComponent } from '../styledSystem';
+import { mqu, PropsOfComponent } from '../styledSystem';
 import { ApplicationLogo } from './ApplicationLogo';
 import { useFlowMetadata } from './contexts';
 import { PoweredByClerkTag } from './PoweredByClerk';
@@ -13,7 +13,7 @@ type CardProps = PropsOfComponent<typeof BaseCard> & React.PropsWithChildren<{}>
 export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => {
   const appearance = useAppearance();
   const flowMetadata = useFlowMetadata();
-  const logoMarkTag = true;
+  const { branded } = useEnvironment().displayConfig;
 
   return (
     <>
@@ -23,48 +23,76 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => 
       <BaseCard
         elementDescriptor={descriptors.card}
         className={generateFlowPartClassname(flowMetadata)}
-        {...props}
         gap={8}
+        {...props}
+        sx={[
+          t => ({
+            width: t.sizes.$100,
+            maxWidth: `calc(100vw - ${t.sizes.$20})`,
+            [mqu.sm]: {
+              maxWidth: `calc(100vw - ${t.sizes.$3})`,
+            },
+            padding: `${t.space.$9x5} ${t.space.$8} ${t.space.$12} ${t.space.$8}`,
+            [mqu.xs]: {
+              padding: `${t.space.$8} ${t.space.$5} ${t.space.$10} ${t.space.$5}`,
+            },
+          }),
+          props.sx,
+        ]}
         ref={ref}
       >
         {appearance.parsedOptions.logoPlacement === 'inside' && <ApplicationLogo />}
         {props.children}
-        {logoMarkTag && <PoweredByClerkTag />}
+        {branded && <PoweredByClerkTag />}
       </BaseCard>
     </>
   );
 });
 
-export const EmptyCard = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => {
-  const flowMetadata = useFlowMetadata();
+export const UserProfileCard = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => {
+  const { branded } = useEnvironment().displayConfig;
+
   return (
     <BaseCard
-      elementDescriptor={descriptors.card}
-      className={generateFlowPartClassname(flowMetadata)}
+      direction='row'
       {...props}
+      sx={[
+        t => ({
+          padding: 0,
+          width: t.sizes.$220,
+          maxWidth: `calc(100vw - ${t.sizes.$20})`,
+          [mqu.sm]: {
+            maxWidth: `calc(100vw - ${t.sizes.$3})`,
+          },
+        }),
+        props.sx,
+      ]}
       ref={ref}
-    />
+    >
+      {props.children}
+      {branded && <PoweredByClerkTag />}
+    </BaseCard>
   );
 });
 
 type BaseCardProps = PropsOfComponent<typeof Flex>;
 
-const BaseCard = React.forwardRef<HTMLDivElement, BaseCardProps>((props, ref) => {
+export const BaseCard = React.forwardRef<HTMLDivElement, BaseCardProps>((props, ref) => {
+  const flowMetadata = useFlowMetadata();
   return (
     <Flex
       direction='col'
+      elementDescriptor={descriptors.card}
+      className={generateFlowPartClassname(flowMetadata)}
       {...props}
       sx={[
-        theme => ({
+        t => ({
           willChange: 'transform, opacity, height',
-          minWidth: theme.sizes.$100,
-          maxWidth: theme.sizes.$100,
-          padding: `${theme.space.$9x5} ${theme.space.$8} ${theme.space.$12} ${theme.space.$8}`,
-          borderRadius: theme.radii.$xl,
-          backgroundColor: theme.colors.$colorBackground,
-          transitionProperty: theme.transitionProperty.$common,
+          borderRadius: t.radii.$xl,
+          backgroundColor: t.colors.$colorBackground,
+          transitionProperty: t.transitionProperty.$common,
           transitionDuration: '200ms',
-          boxShadow: theme.shadows.$cardDropShadow,
+          boxShadow: t.shadows.$cardDropShadow,
         }),
         props.sx,
       ]}
