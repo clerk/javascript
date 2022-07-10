@@ -33,7 +33,7 @@ type ElementProps = {
  * component has a specific state. We then remove the props
  * before rendering the element to the DOM
  */
-type StateProps = Partial<Record<'isDisabled' | 'hasError' | 'isLoading' | 'isOpen', any>>;
+type StateProps = Partial<Record<'isDisabled' | 'hasError' | 'isLoading' | 'isOpen' | 'isActive', any>>;
 
 type PrimitiveProps<HtmlT extends keyof ElementProps> = ElementProps[HtmlT] & CssProp;
 type PickSiblingProps<C extends React.FunctionComponent, T extends keyof Parameters<C>[0]> = Pick<Parameters<C>[0], T>;

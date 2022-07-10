@@ -128,6 +128,7 @@ type OwnProps = PrimitiveProps<'button'> & {
   isLoading?: boolean;
   loadingText?: string;
   isDisabled?: boolean;
+  isActive?: boolean;
 };
 type ButtonProps = OwnProps & StyleVariants<typeof applyVariants>;
 
