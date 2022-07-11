@@ -15,6 +15,7 @@ import { AvailableComponentCtx } from '../ui/types';
 import { AppearanceProvider } from './customizables';
 import { preconnectToGoogleFontsCdn } from './customizables/loadFont';
 import { FlowMetadataProvider, Modal } from './elements';
+import { useSafeLayoutEffect } from './hooks';
 import { SignIn, SignInModal } from './signIn';
 import { SignUp, SignUpModal } from './signUp';
 import { InternalThemeProvider } from './styledSystem';
@@ -117,7 +118,7 @@ const Components = (props: ComponentsProps) => {
   });
   const { signInModal, signUpModal, userProfileModal, nodes } = state;
 
-  React.useEffect(() => {
+  useSafeLayoutEffect(() => {
     componentsControls.mountComponent = params => {
       const { node, name, props, appearanceKey } = params;
       assertDOMElement(node);
