@@ -3,7 +3,8 @@ import React from 'react';
 import { Col, descriptors, Flex } from '../customizables';
 import { CardAlert, Header, useCardState } from '../elements';
 import { PropsOfComponent } from '../styledSystem';
-import { Breadcrumbs } from './Navbar';
+import { Breadcrumbs } from './Breadcrumbs';
+import { NavbarMenuButtonRow } from './Navbar';
 
 type PageProps = PropsOfComponent<typeof Col> & {
   headerTitle: string;
@@ -18,7 +19,12 @@ const Page = (props: PageProps) => {
       elementDescriptor={descriptors.page}
       gap={8}
       {...rest}
+      sx={t => ({
+        height: t.sizes.$176,
+        // maxHeight: `min(${t.sizes.$176}, calc(100vh - ${t.sizes.$20}))`,
+      })}
     >
+      <NavbarMenuButtonRow />
       <CardAlert>{card.error}</CardAlert>
       <Header.Root gap={5}>
         <Breadcrumbs title={headerTitle} />

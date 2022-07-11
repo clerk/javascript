@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Route, Switch } from '../../ui/router';
 import { Col, descriptors } from '../customizables';
-import { common } from '../styledSystem';
+import { common, mqu } from '../styledSystem';
 import { ConnectedAccountsPage } from './ConnectedAccountsPage';
 import { EmailPage } from './EmailPage';
 import { MfaPage } from './MfaPage';
@@ -20,7 +20,9 @@ import { RootPage } from './RootPage';
 import { UsernamePage } from './UsernamePage';
 import { Web3Page } from './Web3Page';
 
-export const Content = React.forwardRef((_, ref) => {
+type ContentProps = {};
+
+export const Content = React.forwardRef<any, ContentProps>((props, ref) => {
   return (
     <Scroller>
       <Col
@@ -28,17 +30,19 @@ export const Content = React.forwardRef((_, ref) => {
         sx={theme => ({
           flex: `1`,
           padding: `${theme.space.$9x5} ${theme.space.$8}`,
+          [mqu.xs]: {
+            padding: `${theme.space.$8} ${theme.space.$5}`,
+          },
           ...common.maxHeightScroller(theme),
         })}
+        ref={ref}
       >
         <Route index>
           <RootPage />
         </Route>
-
         <Route path='profile'>
           <ProfilePage />
         </Route>
-
         <Route path='email-address'>
           <Switch>
             <Route path=':id/remove'>
@@ -52,7 +56,6 @@ export const Content = React.forwardRef((_, ref) => {
             </Route>
           </Switch>
         </Route>
-
         <Route path='phone-number'>
           <Switch>
             <Route path=':id/remove'>
@@ -66,7 +69,6 @@ export const Content = React.forwardRef((_, ref) => {
             </Route>
           </Switch>
         </Route>
-
         <Route path='multi-factor'>
           <Switch>
             <Route path=':id/remove'>
@@ -80,7 +82,6 @@ export const Content = React.forwardRef((_, ref) => {
             </Route>
           </Switch>
         </Route>
-
         <Route path='connected-account'>
           <Switch>
             <Route path=':id/remove'>
@@ -91,7 +92,6 @@ export const Content = React.forwardRef((_, ref) => {
             </Route>
           </Switch>
         </Route>
-
         <Route path='web3-wallet'>
           <Switch>
             <Route path=':id/remove'>
@@ -102,11 +102,9 @@ export const Content = React.forwardRef((_, ref) => {
             </Route>
           </Switch>
         </Route>
-
         <Route path='username'>
           <UsernamePage />
         </Route>
-
         {/*<Route path='security'>*/}
         <Route path='password'>
           <PasswordPage />

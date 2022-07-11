@@ -1,4 +1,5 @@
 const transitionDuration = Object.freeze({
+  slower: '280ms',
   slow: '200ms',
   fast: '120ms',
   focusRing: '200ms',
