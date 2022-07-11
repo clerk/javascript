@@ -25,3 +25,4 @@ export { default as Mobile } from './mobile-small.svg';
 export { default as Folder } from './folder.svg';
 export { default as DeviceMobile } from './device-mobile.svg';
 export { default as DeviceLaptop } from './device-laptop.svg';
+export { default as Menu } from './menu.svg';

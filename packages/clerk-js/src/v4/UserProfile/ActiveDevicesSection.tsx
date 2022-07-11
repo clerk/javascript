@@ -6,6 +6,7 @@ import { useCoreSession, useCoreUser } from '../../ui/contexts';
 import { Badge, Col, Flex, Icon, Spinner, Text } from '../customizables';
 import { AccordionItem } from '../elements';
 import { DeviceLaptop, DeviceMobile } from '../icons';
+import { mqu } from '../styledSystem';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
 import { ProfileSection } from './Section';
 import { currentSessionFirst } from './utils';
@@ -82,13 +83,17 @@ const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
 
   return (
     <Flex
-      gap={8}
       align='center'
+      sx={t => ({
+        gap: t.space.$8,
+        [mqu.xs]: { gap: t.space.$2 },
+      })}
     >
       <Flex
         center
         sx={theme => ({
           padding: `0 ${theme.space.$3}`,
+          [mqu.sm]: { padding: `0` },
           borderRadius: theme.radii.$md,
         })}
       >
@@ -110,6 +115,10 @@ const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
                 }),
             width: theme.space.$20,
             height: theme.space.$20,
+            [mqu.sm]: {
+              width: theme.space.$10,
+              height: theme.space.$10,
+            },
           })}
         />
       </Flex>
