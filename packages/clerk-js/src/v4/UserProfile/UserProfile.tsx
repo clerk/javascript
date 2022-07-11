@@ -9,7 +9,7 @@ import { Content } from './Content';
 import { NavBar, NavbarContextProvider } from './Navbar';
 import { VerificationSuccessPage } from './VerifyWithLink';
 
-const _UserProfile = (props: UserProfileProps) => {
+const _UserProfile = (_: UserProfileProps) => {
   return (
     <Flow.Root flow='userProfile'>
       <Flow.Part>
