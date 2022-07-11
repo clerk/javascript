@@ -6,7 +6,7 @@ import { Route, Switch } from '../../ui/router';
 import { Flow } from '../customizables';
 import { UserProfileCard, withCardStateProvider } from '../elements';
 import { Content } from './Content';
-import { NavBar } from './Navbar';
+import { NavBar, NavbarContextProvider } from './Navbar';
 import { VerificationSuccessPage } from './VerifyWithLink';
 
 const _UserProfile = (props: UserProfileProps) => {
@@ -31,8 +31,10 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
   const contentRef = React.useRef<HTMLDivElement>(null);
   return (
     <UserProfileCard sx={{ height: '100%' }}>
-      <NavBar contentRef={contentRef} />
-      <Content ref={contentRef} />
+      <NavbarContextProvider>
+        <NavBar contentRef={contentRef} />
+        <Content ref={contentRef} />
+      </NavbarContextProvider>
     </UserProfileCard>
   );
 });

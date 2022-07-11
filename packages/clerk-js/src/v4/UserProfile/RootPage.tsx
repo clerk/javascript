@@ -7,6 +7,7 @@ import { ActiveDevicesSection } from './ActiveDevicesSection';
 import { ConnectedAccountsSection } from './ConnectedAccountsSection';
 import { EmailsSection } from './EmailSection';
 import { MfaSection } from './MfaSection';
+import { NavbarMenuButtonRow } from './Navbar';
 import { PasswordSection } from './PasswordSection';
 import { PhoneSection } from './PhoneSection';
 import { UsernameSection } from './UsernameSection';
@@ -29,6 +30,7 @@ export const RootPage = () => {
       elementDescriptor={descriptors.page}
       gap={8}
     >
+      <NavbarMenuButtonRow />
       <Header.Root id='cl-userProfile-section-account'>
         <Header.Title textVariant='xxlargeMedium'>Account</Header.Title>
         <Header.Subtitle>Description goes here</Header.Subtitle>
