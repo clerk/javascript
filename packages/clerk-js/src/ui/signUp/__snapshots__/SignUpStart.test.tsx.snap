@@ -65,6 +65,7 @@ Array [
     />
     <form
       className="form"
+      id="cl-sign-up-form"
       onReset={[Function]}
       onSubmit={[Function]}
     >

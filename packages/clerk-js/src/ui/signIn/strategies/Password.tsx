@@ -12,6 +12,7 @@ export type PasswordProps = {
 export const Password: React.FC<PasswordProps> = ({ handleSubmit, password }) => {
   return (
     <Form
+      id='cl-sign-in-form'
       handleSubmit={handleSubmit}
       submitButtonClassName='cl-sign-in-button'
       submitButtonLabel='Sign in'

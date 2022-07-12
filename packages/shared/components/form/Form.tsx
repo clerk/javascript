@@ -7,6 +7,7 @@ import { Button, ButtonWithSpinner } from '../button';
 import styles from './Form.module.scss';
 
 export type FormProps = {
+  id?: string;
   ref?: React.Ref<HTMLFormElement>;
   className?: string;
   submitButtonLabel?: string;
@@ -26,6 +27,7 @@ export type FormProps = {
 export const Form: React.FC<FormProps> = React.forwardRef(
   (
     {
+      id,
       className,
       submitButtonLabel = 'Submit',
       resetButtonLabel = 'Reset',
@@ -109,6 +111,7 @@ export const Form: React.FC<FormProps> = React.forwardRef(
 
     return (
       <form
+        id={id}
         ref={forwardRef}
         className={cn(styles.form, className)}
         onReset={handleFormReset}
