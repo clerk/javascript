@@ -1,11 +1,12 @@
 import React from 'react';
 
-import { Button, Col, descriptors, Icon } from '../customizables';
+import { Button, Col, descriptors, Flex, Icon } from '../customizables';
 import { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
-import { usePopover } from '../hooks';
+import { usePopover, useSafeLayoutEffect } from '../hooks';
 import { Menu, TickShield, User } from '../icons';
 import { animations, mqu, PropsOfComponent } from '../styledSystem';
 import { colors, createContextAndHook } from '../utils';
+import { useNavigateToFlowStart } from './NavigateToFlowStartButton';
 
 type NavbarContextValue = { isOpen: boolean; open: () => void; close: () => void };
 export const [NavbarContext, useNavbarContext] = createContextAndHook<NavbarContextValue>('NavbarContext');
@@ -18,76 +19,119 @@ export const NavbarContextProvider = (props: React.PropsWithChildren<{}>) => {
 };
 
 export const BaseRoutes = [
-  // Order matters, will match first
-  { name: 'Security', icon: TickShield, path: '/security' },
-  { name: 'Account', icon: User, path: '/' },
-];
+  { name: 'Account', id: 'account', icon: User, path: '/' } as const,
+  { name: 'Security', id: 'security', icon: TickShield, path: '/security' } as const,
+] as const;
+type BaseRouteId = typeof BaseRoutes[number]['id'];
 
 type NavBarProps = {
   contentRef: React.RefObject<HTMLDivElement>;
 };
 
+const getSectionId = (id: BaseRouteId) => `#cl-userProfile-section-${id}`;
+
 export const NavBar = (props: NavBarProps) => {
   const { contentRef } = props;
+  const [activeId, setActiveId] = React.useState<BaseRouteId>('account');
+  const { close } = useNavbarContext();
+  const { navigateToFlowStart } = useNavigateToFlowStart();
 
-  const scroll = (id: string) => {
+  const navigateAndScroll = async (id: BaseRouteId) => {
     if (contentRef.current) {
-      const el = contentRef.current.querySelector('#' + id);
+      setActiveId(id);
+      close();
+      await navigateToFlowStart();
+      const el = contentRef.current.querySelector(getSectionId(id));
       el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
+  useSafeLayoutEffect(() => {
+    const mountObservers = () => {
+      const ids = BaseRoutes.map(r => r.id);
+      const sectionElements = ids
+        .map(getSectionId)
+        .map(id => contentRef.current?.querySelector(id))
+        .filter(s => s);
+
+      if (sectionElements.length === 0) {
+        return false;
+      }
+
+      sectionElements.forEach((section, i) => {
+        const callback: IntersectionObserverCallback = entries => {
+          if (entries[0] && entries[0].isIntersecting) {
+            setActiveId(ids[i]);
+          }
+        };
+        const observer = new IntersectionObserver(callback, { root: contentRef.current, threshold: 0 });
+        section && observer.observe(section);
+      });
+
+      return true;
+    };
+
+    const intervalId = setInterval(() => {
+      if (mountObservers()) {
+        clearInterval(intervalId);
+      }
+    }, 50);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  const items = (
+    <Col
+      elementDescriptor={descriptors.navbar}
+      gap={2}
+    >
+      {BaseRoutes.map(r => (
+        <NavButton
+          elementDescriptor={descriptors.navbarItem}
+          elementId={descriptors.navbarItem.setId(r.id)}
+          iconElementDescriptor={descriptors.navbarIcon}
+          iconElementId={descriptors.navbarIcon.setId('account')}
+          onClick={() => navigateAndScroll(r.id)}
+          icon={r.icon}
+          isActive={activeId === r.id}
+        >
+          {r.name}
+        </NavButton>
+      ))}
+    </Col>
+  );
+
   return (
     <>
-      <Col
-        elementDescriptor={descriptors.navbarSection}
-        sx={theme => ({
-          flex: `0 0 ${theme.space.$60}`,
-          borderRight: `${theme.borders.$normal} ${theme.colors.$blackAlpha300}`,
-          padding: `${theme.space.$9x5} ${theme.space.$6}`,
-          [mqu.md]: {
-            display: 'none',
-          },
-        })}
-      >
-        <Col
-          elementDescriptor={descriptors.navbar}
-          gap={2}
-        >
-          <NavButton
-            elementDescriptor={descriptors.navbarItem}
-            elementId={descriptors.navbarItem.setId('account')}
-            iconElementDescriptor={descriptors.navbarIcon}
-            iconElementId={descriptors.navbarIcon.setId('account')}
-            onClick={() => scroll('cl-userProfile-section-account')}
-            icon={User}
-            isActive
-          >
-            Account
-          </NavButton>
-          <NavButton
-            elementDescriptor={descriptors.navbarItem}
-            elementId={descriptors.navbarItem.setId('security')}
-            iconElementDescriptor={descriptors.navbarIcon}
-            iconElementId={descriptors.navbarIcon.setId('security')}
-            icon={TickShield}
-            onClick={() => scroll('cl-userProfile-section-security')}
-          >
-            Security
-          </NavButton>
-        </Col>
-      </Col>
-      <MobileNavbar />
+      <NavbarContainer>{items}</NavbarContainer>
+      <MobileNavbarContainer>{items}</MobileNavbarContainer>
     </>
   );
 };
 
-const MobileNavbar = () => {
+const NavbarContainer = (props: React.PropsWithChildren<{}>) => {
+  return (
+    <Col
+      elementDescriptor={descriptors.navbarSection}
+      sx={theme => ({
+        flex: `0 0 ${theme.space.$60}`,
+        borderRight: `${theme.borders.$normal} ${theme.colors.$blackAlpha300}`,
+        padding: `${theme.space.$9x5} ${theme.space.$6}`,
+        [mqu.md]: {
+          display: 'none',
+        },
+      })}
+    >
+      {props.children}
+    </Col>
+  );
+};
+
+const MobileNavbarContainer = (props: React.PropsWithChildren<{}>) => {
   const navbarContext = useNavbarContext();
   const { floating, isOpen, open, close } = usePopover({ defaultOpen: false, autoUpdate: false });
 
   React.useEffect(() => {
-    console.log(isOpen);
     if (navbarContext.isOpen) {
       open();
     } else {
@@ -134,30 +178,7 @@ const MobileNavbar = () => {
           boxShadow: t.shadows.$cardDropShadow,
         })}
       >
-        <Col
-          elementDescriptor={descriptors.navbar}
-          gap={2}
-        >
-          <NavButton
-            elementDescriptor={descriptors.navbarItem}
-            elementId={descriptors.navbarItem.setId('account')}
-            iconElementDescriptor={descriptors.navbarIcon}
-            iconElementId={descriptors.navbarIcon.setId('account')}
-            icon={User}
-            isActive
-          >
-            Account
-          </NavButton>
-          <NavButton
-            elementDescriptor={descriptors.navbarItem}
-            elementId={descriptors.navbarItem.setId('security')}
-            iconElementDescriptor={descriptors.navbarIcon}
-            iconElementId={descriptors.navbarIcon.setId('security')}
-            icon={TickShield}
-          >
-            Security
-          </NavButton>
-        </Col>
+        {props.children}
       </Col>
     </Col>
   );
@@ -200,7 +221,7 @@ const NavButton = (props: NavButtonProps) => {
 export const NavbarMenuButtonRow = (props: PropsOfComponent<typeof Button>) => {
   const { open } = useNavbarContext();
   return (
-    <Col
+    <Flex
       sx={{
         display: 'none',
         [mqu.md]: {
@@ -227,6 +248,6 @@ export const NavbarMenuButtonRow = (props: PropsOfComponent<typeof Button>) => {
         />
         Menu
       </Button>
-    </Col>
+    </Flex>
   );
 };
