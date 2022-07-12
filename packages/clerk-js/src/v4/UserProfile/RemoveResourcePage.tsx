@@ -101,10 +101,10 @@ export const RemoveMfaPage = () => {
 
   return (
     <RemoveResourcePage
-      title='Remove multi-factor authentication'
+      title='Remove multifactor authentication'
       messageLine1={`${ref.current.phoneNumber} will be no longer receive verification codes when signing in.`}
       messageLine2={`Your account may not be as secure. Are you sure you want to continue?`}
-      successMessage={`SMS code multi-factor authentication has been removed for ${ref.current.phoneNumber}.`}
+      successMessage={`SMS code multifactor authentication has been removed for ${ref.current.phoneNumber}.`}
       deleteResource={() => Promise.resolve(ref.current?.setReservedForSecondFactor({ reserved: false }))}
     />
   );
