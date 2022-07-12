@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Button, Col, Flex, Icon, Text } from '../customizables';
 import { Folder } from '../icons';
-import { animations } from '../styledSystem';
+import { animations, mqu } from '../styledSystem';
 import { colors } from '../utils';
 
 const MAX_SIZE_BYTES = 10 * 1000 * 1000;
@@ -67,29 +67,26 @@ export const FileDropArea = (props: FileDropAreaProps) => {
       <Col
         center
         gap={4}
-        sx={theme => ({
-          height: theme.space.$60,
+        sx={t => ({
+          height: t.space.$60,
+          [mqu.sm]: { height: '10rem' },
           backgroundColor: {
-            idle: theme.options.$darkMode ? theme.colors.$blackAlpha100 : theme.colors.$blackAlpha50,
-            loading: theme.options.$darkMode ? theme.colors.$blackAlpha100 : theme.colors.$blackAlpha50,
-            valid: theme.options.$darkMode
-              ? colors.makeTransparent(theme.colors.$primary300, 0.8)
-              : theme.colors.$primary50,
-            invalid: theme.options.$darkMode
-              ? colors.makeTransparent(theme.colors.$danger300, 0.8)
-              : theme.colors.$danger50,
+            idle: t.options.$darkMode ? t.colors.$blackAlpha100 : t.colors.$blackAlpha50,
+            loading: t.options.$darkMode ? t.colors.$blackAlpha100 : t.colors.$blackAlpha50,
+            valid: t.options.$darkMode ? colors.makeTransparent(t.colors.$primary300, 0.8) : t.colors.$primary50,
+            invalid: t.options.$darkMode ? colors.makeTransparent(t.colors.$danger300, 0.8) : t.colors.$danger50,
           }[status],
-          borderRadius: theme.radii.$xl,
-          animation: `${animations.expandIn(theme.space.$60)} ${theme.transitionDuration.$fast} ease`,
+          borderRadius: t.radii.$xl,
+          animation: `${animations.expandIn(t.space.$60)} ${t.transitionDuration.$fast} ease`,
         })}
       >
         <Flex
           center
-          sx={theme => ({
-            backgroundColor: theme.colors.$blackAlpha50,
-            width: theme.sizes.$16,
-            height: theme.sizes.$16,
-            borderRadius: theme.radii.$circle,
+          sx={t => ({
+            backgroundColor: t.colors.$blackAlpha50,
+            width: t.sizes.$16,
+            height: t.sizes.$16,
+            borderRadius: t.radii.$circle,
           })}
         >
           <Icon
@@ -102,12 +99,17 @@ export const FileDropArea = (props: FileDropAreaProps) => {
           <Text colorScheme='neutral'>Uploading...</Text>
         ) : (
           <>
-            <Text colorScheme='neutral'>Drag file here</Text>
+            <Text
+              sx={{ [mqu.sm]: { display: 'none' } }}
+              colorScheme='neutral'
+            >
+              Drag file here, or...
+            </Text>
             <Button
               variant='ghost'
               onClick={openDialog}
             >
-              Or select file
+              Select file
             </Button>
           </>
         )}
