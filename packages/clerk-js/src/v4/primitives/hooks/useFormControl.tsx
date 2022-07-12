@@ -21,7 +21,7 @@ export const [FormControlContext, useFormControl] = createContextAndHook<FormCon
 );
 
 export const FormControlContextProvider = (props: React.PropsWithChildren<FormControlProps>) => {
-  const { id: propsId, isRequired = false, hasError = false } = props;
+  const { id: propsId, isRequired = false, hasError = false, isDisabled = false } = props;
   // TODO: This shouldnt be targettable
   const id = `${propsId}-field`;
   /**
@@ -30,8 +30,8 @@ export const FormControlContextProvider = (props: React.PropsWithChildren<FormCo
    */
   const errorMessageId = hasError ? `error-${propsId}` : '';
   const value = React.useMemo(
-    () => ({ value: { isRequired, hasError, id, errorMessageId } }),
-    [isRequired, hasError, id, errorMessageId],
+    () => ({ value: { isRequired, hasError, id, errorMessageId, isDisabled } }),
+    [isRequired, hasError, id, errorMessageId, isDisabled],
   );
   return <FormControlContext.Provider value={value}>{props.children}</FormControlContext.Provider>;
 };

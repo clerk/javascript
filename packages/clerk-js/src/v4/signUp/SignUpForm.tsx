@@ -14,23 +14,28 @@ type SignUpFormProps = {
 
 export const SignUpForm = (props: SignUpFormProps) => {
   const { handleSubmit, fields, formState, canToggleEmailPhone, handleEmailPhoneToggle } = props;
+
   return (
     <Form.Root onSubmit={handleSubmit}>
       {(fields.firstName || fields.lastName) && (
         <Form.ControlRow>
-          {fields.firstName && <Form.Control {...formState.firstName.props} />}
-          {fields.lastName && <Form.Control {...formState.lastName.props} />}
+          {fields.firstName && (
+            <Form.Control {...{ ...formState.firstName.props, isRequired: fields.firstName.required }} />
+          )}
+          {fields.lastName && (
+            <Form.Control {...{ ...formState.lastName.props, isRequired: fields.lastName.required }} />
+          )}
         </Form.ControlRow>
       )}
       {fields.username && (
         <Form.ControlRow>
-          <Form.Control {...formState.username.props} />
+          <Form.Control {...{ ...formState.username.props, isRequired: fields.username.required }} />
         </Form.ControlRow>
       )}
       {fields.emailAddress && (
         <Form.ControlRow>
           <Form.Control
-            {...formState.emailAddress.props}
+            {...{ ...formState.emailAddress.props, isRequired: fields.emailAddress.required }}
             actionLabel={canToggleEmailPhone ? 'Use phone instead' : undefined}
             onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('phoneNumber') : undefined}
           />
@@ -39,7 +44,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
       {fields.phoneNumber && (
         <Form.ControlRow>
           <Form.Control
-            {...formState.phoneNumber.props}
+            {...{ ...formState.phoneNumber.props, isRequired: fields.phoneNumber.required }}
             actionLabel={canToggleEmailPhone ? 'Use email instead' : undefined}
             onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('emailAddress') : undefined}
           />
@@ -47,7 +52,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
       )}
       {fields.password && (
         <Form.ControlRow>
-          <Form.Control {...formState.password.props} />
+          <Form.Control {...{ ...formState.password.props, isRequired: fields.password.required }} />
         </Form.ControlRow>
       )}
       <Form.SubmitButton>Continue</Form.SubmitButton>

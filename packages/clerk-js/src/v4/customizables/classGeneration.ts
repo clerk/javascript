@@ -28,6 +28,7 @@ export const generateClassName = (
   className = addClerkTargettableClassname(className, elemDescriptor);
   className = addClerkTargettableIdClassname(className, elemDescriptor, elemId);
   className = addClerkTargettableStateClass(className, state);
+  className = addClerkTargettableRequiredAttribute(className, props as any);
 
   className = addUserProvidedClassnames(className, parsedElements, elemDescriptor, elemId, state);
   addUserProvidedStyleRules(css, parsedElements, elemDescriptor, elemId, state);
@@ -48,6 +49,10 @@ const addClerkTargettableIdClassname = (
 
 const addClerkTargettableStateClass = (cn: string, state: ElementState | undefined) => {
   return state ? cn + STATE_PROP_TO_CLASSNAME[state] : cn;
+};
+
+const addClerkTargettableRequiredAttribute = (cn: string, props: { isRequired?: boolean } | undefined) => {
+  return props && props.isRequired ? cn + ` ${CLASS_PREFIX}required` : cn;
 };
 
 export const appendEmojiSeparator = (generatedCn: string, otherCn?: string) => {

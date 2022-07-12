@@ -34,6 +34,12 @@ type ElementProps = {
  * before rendering the element to the DOM
  */
 type StateProps = Partial<Record<'isDisabled' | 'hasError' | 'isLoading' | 'isOpen' | 'isActive', any>>;
+/**
+ * The form control elements can also accept a isRequired prop on top of the StateProps
+ * We're handling it differently since this is a prop that cannot change - a required field
+ * will remain required throughout the lifecycle of the component
+ */
+type RequiredProp = Partial<Record<'isRequired', boolean>>;
 
 type PrimitiveProps<HtmlT extends keyof ElementProps> = ElementProps[HtmlT] & CssProp;
 type PickSiblingProps<C extends React.FunctionComponent, T extends keyof Parameters<C>[0]> = Pick<Parameters<C>[0], T>;
@@ -47,4 +53,5 @@ export type {
   StyleRule,
   ThemableCssProp,
   StateProps,
+  RequiredProp,
 };
