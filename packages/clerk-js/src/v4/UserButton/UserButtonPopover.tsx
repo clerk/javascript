@@ -141,7 +141,7 @@ const UserButtonCard = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof 
         sx={t => ({
           padding: `${t.space.$6} 0`,
           width: t.sizes.$94,
-          maxWidth: `calc(100vw - ${t.sizes.$6})`,
+          maxWidth: `calc(100vw - ${t.sizes.$8})`,
           zIndex: t.zIndices.$modal,
           animation: `${animations.dropdownSlideInScaleAndFade} 140ms `,
         })}

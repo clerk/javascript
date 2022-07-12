@@ -63,8 +63,8 @@ export const CodeControl = React.forwardRef<{ reset: any }, CodeControlProps>((p
     },
   }));
 
-  React.useEffect(() => {
-    focusInputAt(0);
+  React.useLayoutEffect(() => {
+    setTimeout(() => focusInputAt(0), 0);
   }, []);
 
   React.useEffect(() => {

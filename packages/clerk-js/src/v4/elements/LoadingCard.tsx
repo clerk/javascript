@@ -4,9 +4,9 @@ import { descriptors, Flex } from '../customizables';
 import { Spinner } from '../primitives';
 import { CardAlert } from './Alert';
 import { Card } from './Card';
-import { useCardState } from './contexts';
+import { useCardState, withCardStateProvider } from './contexts';
 
-export const LoadingCard = () => {
+export const LoadingCard = withCardStateProvider(() => {
   const card = useCardState();
   return (
     <Card>
@@ -28,4 +28,4 @@ export const LoadingCard = () => {
       </Flex>
     </Card>
   );
-};
+});

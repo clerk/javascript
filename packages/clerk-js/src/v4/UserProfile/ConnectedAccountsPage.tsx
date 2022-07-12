@@ -28,7 +28,6 @@ export const ConnectedAccountsPage = withCardStateProvider(() => {
   return (
     <Wizard {...wizard.props}>
       <AddConnectedAccount />
-      <ContentPage.Root headerTitle={title}></ContentPage.Root>
       <SuccessPage
         title={title}
         text={`has been added to your account.`}

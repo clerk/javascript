@@ -20,9 +20,7 @@ import { RootPage } from './RootPage';
 import { UsernamePage } from './UsernamePage';
 import { Web3Page } from './Web3Page';
 
-type ContentProps = {};
-
-export const Content = React.forwardRef<any, ContentProps>((props, ref) => {
+export const Content = React.forwardRef<HTMLDivElement>((_, ref) => {
   return (
     <Scroller>
       <Col
@@ -119,7 +117,7 @@ const Scroller = (props: React.PropsWithChildren<{}>) => {
   return (
     <Col
       elementDescriptor={descriptors.scroller}
-      sx={t => ({ borderRadius: t.radii.$xl, width: '100%', overflow: 'hidden' })}
+      sx={t => ({ position: 'relative', borderRadius: t.radii.$xl, width: '100%', overflow: 'hidden' })}
       {...props}
     />
   );

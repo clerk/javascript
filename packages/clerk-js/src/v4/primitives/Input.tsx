@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { common, createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
+import { common, createVariants, mqu, PrimitiveProps, StyleVariants } from '../styledSystem';
 import { useFormControl } from './hooks';
 import { useInput } from './hooks/useInput';
 
@@ -16,6 +16,9 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
     ...common.borderVariants(theme, props).normal,
     ...(props.focusRing === false ? {} : common.focusRingInput(theme)),
     ...common.disabled(theme),
+    [mqu.ios]: {
+      fontSize: theme.fontSizes.$md,
+    },
   },
   variants: {},
 }));
