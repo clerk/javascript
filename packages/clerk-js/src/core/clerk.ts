@@ -628,12 +628,12 @@ export default class Clerk implements ClerkInterface {
       }
     }
 
-    if (su.externalAccountStatus === 'verified' && su.status == 'missing_requirements') {
-      return navigateToContinueSignUp();
-    }
-
     if (hasExternalAccountSignUpError(signUp)) {
       return navigateToSignUp();
+    }
+
+    if (su.externalAccountStatus === 'verified' && su.status === 'missing_requirements') {
+      return navigateToContinueSignUp();
     }
 
     return navigateToSignIn();
