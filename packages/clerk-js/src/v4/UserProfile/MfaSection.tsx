@@ -22,7 +22,7 @@ export const MfaSection = () => {
 
   return (
     <ProfileSection
-      title='Multi-factor authentication'
+      title='Multifactor authentication'
       id='mfa'
     >
       {mfaPhones.map(phone => (
@@ -31,7 +31,7 @@ export const MfaSection = () => {
           phone={phone}
         />
       ))}
-      <AddBlockButton onClick={() => navigate('multi-factor')}>Add multi-factor</AddBlockButton>
+      <AddBlockButton onClick={() => navigate('multi-factor')}>Add multifactor</AddBlockButton>
     </ProfileSection>
   );
 };
@@ -63,15 +63,15 @@ const MfaAccordion = (props: { phone: PhoneNumberResource }) => {
           title={isDefault ? 'Default factor' : 'Set as default factor'}
           subtitle={
             isDefault
-              ? 'This factor will be used as the default multi-factor authentication method when signing in.'
-              : 'Set this factor as the default factor to use it as the default multi-factor authentication method when signing in.'
+              ? 'This factor will be used as the default multifactor authentication method when signing in.'
+              : 'Set this factor as the default factor to use it as the default multifactor authentication method when signing in.'
           }
           actionLabel={!isDefault ? 'Set as default' : undefined}
           onClick={() => phone.makeDefaultSecondFactor().catch(err => handleError(err, [], card.setError))}
         />
         <LinkButtonWithDescription
           title='Remove'
-          subtitle='Remove this phone number from the multi-factor authentication methods'
+          subtitle='Remove this phone number from the multifactor authentication methods'
           actionLabel='Remove phone number'
           colorScheme='danger'
           onClick={() => navigate(`multi-factor/${phone.id}/remove`)}

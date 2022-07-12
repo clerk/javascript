@@ -14,7 +14,7 @@ import { SuccessPage } from './SuccessPage';
 import { AddBlockButton } from './UserProfileBlockButtons';
 
 export const MfaPage = withCardStateProvider(() => {
-  const title = 'Add multi-factor authentication';
+  const title = 'Add multifactor authentication';
 
   const ref = React.useRef<PhoneNumberResource | undefined>();
   const wizard = useWizard({ defaultStep: 2 });
@@ -42,7 +42,7 @@ export const MfaPage = withCardStateProvider(() => {
       />
       <SuccessPage
         title={title}
-        text={`SMS code multi-factor authentication is now enabled for this phone number. When signing in, you will need to enter a verification code sent to this phone number as an additional step.`}
+        text={`SMS code multifactor authentication is now enabled for this phone number. When signing in, you will need to enter a verification code sent to this phone number as an additional step.`}
       />
     </Wizard>
   );
@@ -80,7 +80,7 @@ const AddMfa = (props: AddMfaProps) => {
     <ContentPage.Root headerTitle={title}>
       <Text>
         {availableMethods.length
-          ? 'Select a phone number to register for SMS code multi-factor authentication.'
+          ? 'Select a phone number to register for SMS code multifactor authentication.'
           : 'There are no available methods.'}
       </Text>
       <Col gap={2}>
