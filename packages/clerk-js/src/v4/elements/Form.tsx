@@ -15,7 +15,7 @@ const FormRoot = (props: FormProps): JSX.Element => {
   const card = useCardState();
   const status = useLoadingStatus();
 
-  const onSubmit: React.FormEventHandler = async (e: any) => {
+  const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
     e.preventDefault();
     e.stopPropagation();
     if (!props.onSubmit) {

@@ -87,10 +87,11 @@ export const NavBar = (props: NavBarProps) => {
     >
       {BaseRoutes.map(r => (
         <NavButton
+          key={r.id}
           elementDescriptor={descriptors.navbarItem}
           elementId={descriptors.navbarItem.setId(r.id)}
           iconElementDescriptor={descriptors.navbarIcon}
-          iconElementId={descriptors.navbarIcon.setId('account')}
+          iconElementId={descriptors.navbarIcon.setId(r.id)}
           onClick={() => navigateAndScroll(r.id)}
           icon={r.icon}
           isActive={activeId === r.id}

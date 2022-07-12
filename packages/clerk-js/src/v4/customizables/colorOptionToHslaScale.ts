@@ -1,4 +1,4 @@
-import { ColorOrScale, ColorScale, HslaColor, HslaColorString } from '@clerk/types';
+import { ColorScale, CssColorOrScale, HslaColor, HslaColorString } from '@clerk/types';
 
 import { colors } from '../utils';
 
@@ -28,7 +28,7 @@ type WithPrefix<T extends Record<string, string>, Prefix extends string> = {
 };
 
 export const colorOptionToHslaScale = <Prefix extends string>(
-  colorOption: ColorOrScale | undefined,
+  colorOption: CssColorOrScale | undefined,
   prefix: Prefix,
 ): WithPrefix<ColorScale<HslaColorString>, Prefix> | undefined => {
   if (!colorOption) {
@@ -67,7 +67,8 @@ const prefixAndStringifyHslaScale = (
   }
   return res;
 };
-const userDefinedColorToHslaColorScale = (colorOption: ColorOrScale): ColorScale<HslaColor> => {
+
+const userDefinedColorToHslaColorScale = (colorOption: CssColorOrScale): ColorScale<HslaColor> => {
   const baseScale = typeof colorOption === 'string' ? { '500': colorOption } : colorOption;
   const hslaScale = createEmptyColorScale();
   // @ts-expect-error

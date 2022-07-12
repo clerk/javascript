@@ -8,7 +8,7 @@ function assertProviderExists(contextVal: unknown, msg: string): asserts context
 
 type Options = {
   skipCheck?: boolean;
-  assertCtxFn?: (v: unknown, msg: string) => asserts v;
+  assertCtxFn?: (v: unknown, msg: string) => void;
 };
 
 export function createContextAndHook<CtxValue>(
@@ -16,7 +16,6 @@ export function createContextAndHook<CtxValue>(
   options: Options = {},
 ): [React.Context<{ value: CtxValue } | undefined>, () => CtxValue] {
   const skipCheck = options.skipCheck || false;
-  const assertCtxFn = options.assertCtxFn || assertProviderExists;
   const Ctx = React.createContext<{ value: CtxValue } | undefined>(undefined);
   Ctx.displayName = displayName;
   const useCtx = (): CtxValue => {
@@ -24,7 +23,12 @@ export function createContextAndHook<CtxValue>(
     if (skipCheck) {
       return ctx ? ctx.value : (undefined as any);
     }
-    assertCtxFn(ctx, `${displayName} not found`);
+    if (!options.assertCtxFn) {
+      assertProviderExists(ctx, `${displayName} not found`);
+    } else {
+      options.assertCtxFn(ctx, `${displayName} not found`);
+    }
+    // @ts-expect-error
     return ctx.value;
   };
   return [Ctx, useCtx];

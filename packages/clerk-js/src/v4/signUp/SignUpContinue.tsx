@@ -24,7 +24,7 @@ import {
   withCardStateProvider,
 } from '../elements';
 import { useCardState } from '../elements/contexts';
-import { buildRequest, FormControlStateLike, handleError, useFormControl } from '../utils';
+import { buildRequest, FormControlState, handleError, useFormControl } from '../utils';
 import { SignUpForm } from './SignUpForm';
 import { SignUpSocialButtons } from './SignUpSocialButtons';
 
@@ -85,7 +85,7 @@ function _SignUpContinue() {
     type FormStateKey = keyof typeof formState;
     const fieldsToSubmit = Object.entries(fields).reduce(
       (acc, [k, v]) => [...acc, ...(v && formState[k as FormStateKey] ? [formState[k as FormStateKey]] : [])],
-      [] as Array<FormControlStateLike>,
+      [] as Array<FormControlState>,
     );
 
     card.setLoading();
@@ -106,8 +106,8 @@ function _SignUpContinue() {
   };
 
   const canToggleEmailPhone = emailOrPhone(attributes, isProgressiveSignUp);
-  const showOauthProviders = !hasVerifiedExternalAccount && oauthOptions.length > 0;
-  const showWeb3Providers = !hasVerifiedWeb3 && web3Options.length > 0;
+  const showSocialButtons =
+    (!hasVerifiedExternalAccount && oauthOptions.length > 0) || (!hasVerifiedWeb3 && web3Options.length > 0);
 
   return (
     <Flow.Part part='complete'>
@@ -124,8 +124,8 @@ function _SignUpContinue() {
           gap={8}
         >
           <SocialButtonsReversibleContainer>
-            {showOauthProviders && <SignUpSocialButtons />}
-            {showOauthProviders && <Divider />}
+            {showSocialButtons && <SignUpSocialButtons />}
+            {showSocialButtons && <Divider />}
             {showFormFields(userSettings) && (
               <SignUpForm
                 handleSubmit={handleSubmit}
