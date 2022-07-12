@@ -59,8 +59,10 @@ export const FormControl = (props: FormControlProps) => {
           elementId={descriptors.formFieldLabel.setId(id)}
           hasError={hasError}
           isDisabled={isDisabled}
+          isRequired={isRequired}
         >
           {label}
+          {isRequired ? ' (*)' : ''}
         </FormLabel>
         {actionLabel && (
           <Link
@@ -82,6 +84,7 @@ export const FormControl = (props: FormControlProps) => {
         elementId={descriptors.formFieldInput.setId(id)}
         hasError={hasError}
         isDisabled={isDisabled}
+        isRequired={isRequired}
         {...rest}
       />
       <FormErrorText

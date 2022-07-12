@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { common, createVariants, PrimitiveProps, StateProps, StyleVariants } from '../styledSystem';
+import { common, createVariants, PrimitiveProps, RequiredProp, StateProps, StyleVariants } from '../styledSystem';
 import { applyDataStateProps } from './applyDataStateProps';
 import { useFormControl } from './hooks';
 
@@ -15,13 +15,14 @@ const { applyVariants } = createVariants(theme => ({
 
 type OwnProps = React.PropsWithChildren<StateProps>;
 
-type FormLabelProps = PrimitiveProps<'label'> & StyleVariants<typeof applyVariants> & OwnProps;
+type FormLabelProps = PrimitiveProps<'label'> & StyleVariants<typeof applyVariants> & OwnProps & RequiredProp;
 
 export const FormLabel = (props: FormLabelProps) => {
   const { id } = useFormControl();
+  const { isRequired, ...rest } = props;
   return (
     <label
-      {...applyDataStateProps(props)}
+      {...applyDataStateProps(rest)}
       htmlFor={id}
       css={applyVariants(props)}
     >

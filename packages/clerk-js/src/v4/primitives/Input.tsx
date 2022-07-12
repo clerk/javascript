@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { common, createVariants, mqu, PrimitiveProps, StyleVariants } from '../styledSystem';
+import { common, createVariants, mqu, PrimitiveProps, RequiredProp, StyleVariants } from '../styledSystem';
 import { useFormControl } from './hooks';
 import { useInput } from './hooks/useInput';
 
@@ -29,19 +29,21 @@ type OwnProps = {
   focusRing?: boolean;
 };
 
-export type InputProps = PrimitiveProps<'input'> & StyleVariants<typeof applyVariants> & OwnProps;
+export type InputProps = PrimitiveProps<'input'> & StyleVariants<typeof applyVariants> & OwnProps & RequiredProp;
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
   const formControlProps = useFormControl() || {};
   const propsWithoutVariants = filterProps({ ...props, hasError: props.hasError || formControlProps.hasError });
   const { onChange } = useInput(propsWithoutVariants.onChange);
-  const { isDisabled, hasError, focusRing, ...rest } = propsWithoutVariants;
+  const { isDisabled, hasError, focusRing, isRequired, ...rest } = propsWithoutVariants;
+
   return (
     <input
       {...rest}
       ref={ref}
       onChange={onChange}
       disabled={isDisabled}
+      required={isRequired || formControlProps.isRequired}
       id={props.id || formControlProps.id}
       aria-invalid={hasError || formControlProps.hasError}
       aria-describedby={formControlProps.errorMessageId}
