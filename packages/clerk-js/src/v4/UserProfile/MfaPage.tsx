@@ -15,10 +15,8 @@ import { AddBlockButton } from './UserProfileBlockButtons';
 
 export const MfaPage = withCardStateProvider(() => {
   const title = 'Add multi-factor authentication';
-  const user = useCoreUser();
 
   const ref = React.useRef<PhoneNumberResource | undefined>();
-  const hasVerifiedPhoneNumbers = user.phoneNumbers.filter(p => p.verification.status === 'verified').length > 0;
   const wizard = useWizard({ defaultStep: 2 });
 
   return (
@@ -36,6 +34,10 @@ export const MfaPage = withCardStateProvider(() => {
       <AddMfa
         onSuccess={wizard.nextStep}
         onAddPhoneClick={() => wizard.goToStep(0)}
+        onUnverifiedPhoneClick={phone => {
+          ref.current = phone;
+          wizard.goToStep(1);
+        }}
         title={title}
       />
       <SuccessPage
@@ -48,17 +50,22 @@ export const MfaPage = withCardStateProvider(() => {
 
 type AddMfaProps = {
   onAddPhoneClick: React.MouseEventHandler;
+  onUnverifiedPhoneClick: (phone: PhoneNumberResource) => void;
   onSuccess: () => void;
   title: string;
 };
 
 const AddMfa = (props: AddMfaProps) => {
-  const { onSuccess, title, onAddPhoneClick } = props;
+  const { onSuccess, title, onAddPhoneClick, onUnverifiedPhoneClick } = props;
   const card = useCardState();
   const user = useCoreUser();
   const availableMethods = user.phoneNumbers.filter(p => !p.reservedForSecondFactor);
 
   const enableMfa = (phone: PhoneNumberResource) => {
+    if (phone.verification.status !== 'verified') {
+      return onUnverifiedPhoneClick(phone);
+    }
+
     card.setLoading(phone.id);
     phone
       .setReservedForSecondFactor({ reserved: true })
