@@ -2,6 +2,7 @@
  * Currently representing API DTOs in their JSON form.
  */
 
+import { FontFamily } from './appearance';
 import { DisplayConfigJSON } from './displayConfig';
 import { OAuthProvider } from './oauth';
 import { OrganizationInvitationStatus } from './organizationInvitation';
@@ -10,7 +11,7 @@ import { SessionStatus } from './session';
 import { SignInFirstFactor, SignInJSON, SignInSecondFactor } from './signIn';
 import { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUp';
 import { OAuthStrategy } from './strategies';
-import { BoxShadow, Color, EmUnit, FontFamily, FontWeight, HexColor } from './theme';
+import { BoxShadow, Color, EmUnit, FontWeight, HexColor } from './theme';
 import { UserSettingsJSON } from './userSettings';
 import { CamelToSnake } from './utils';
 import { VerificationStatus } from './verification';

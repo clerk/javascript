@@ -21,7 +21,7 @@ export const InputWithIcon = React.forwardRef<HTMLInputElement, InputWithIcon>((
         },
       })}
     >
-      {React.cloneElement(leftIcon, { className: 'cl-internal-icon' })}
+      {leftIcon && React.cloneElement(leftIcon, { className: 'cl-internal-icon' })}
       <Input
         {...rest}
         sx={[

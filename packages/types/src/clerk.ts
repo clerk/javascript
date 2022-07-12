@@ -324,9 +324,8 @@ export interface ClerkOptions {
   navigate?: (to: string) => Promise<unknown> | unknown;
   polling?: boolean;
   selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;
-  theme?: ClerkThemeOptions;
   paths?: PathOptions;
-  __unstable_appearance?: Appearance;
+  appearance?: Appearance;
   /** Optional support email for display in authentication screens */
   supportEmail?: string;
 }

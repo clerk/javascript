@@ -38,7 +38,7 @@ export const useFormControl = <Id extends string>(
   return { props, ...props, setError, setValue };
 };
 
-export type FormControlStateLike = Pick<FormControlState, 'id' | 'value'>;
+type FormControlStateLike = Pick<FormControlState, 'id' | 'value'>;
 
 export const buildRequest = (fieldStates: Array<FormControlStateLike>): Record<string, any> => {
   const request: { [x: string]: any } = {};

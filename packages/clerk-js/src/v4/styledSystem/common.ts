@@ -163,7 +163,7 @@ const centeredFlex = (display: 'flex' | 'inline-flex' = 'flex') => ({
   alignItems: 'center',
 });
 
-const maxHeightScroller = t =>
+const maxHeightScroller = (t: InternalTheme) =>
   ({
     height: '100%',
     overflowY: 'scroll',
