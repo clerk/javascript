@@ -7,10 +7,15 @@ const breakpoints = Object.freeze({
   '2xl': '96em', // 1536px
 } as const);
 
+const deviceQueries = {
+  ios: '@supports (-webkit-touch-callout: none)',
+} as const;
+
 // export const mq = Object.fromEntries(
 //   Object.entries(breakpoints).map(([k, v]) => [k, `@media (min-width: ${v})`]),
 // ) as Record<keyof typeof breakpoints, string>;
 
-export const mqu = Object.fromEntries(
-  Object.entries(breakpoints).map(([k, v]) => [k, `@media (max-width: ${v})`]),
-) as Record<keyof typeof breakpoints, string>;
+export const mqu = {
+  ...deviceQueries,
+  ...Object.fromEntries(Object.entries(breakpoints).map(([k, v]) => [k, `@media (max-width: ${v})`])),
+} as Record<keyof typeof breakpoints | keyof typeof deviceQueries, string>;

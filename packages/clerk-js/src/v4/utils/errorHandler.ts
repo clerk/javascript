@@ -16,7 +16,6 @@ function setFieldErrors(fieldStates: Array<FormControlState<string>>, errors: Cl
 
   fieldStates.forEach(field => {
     const error = errors.find(err => {
-      console.log(err.meta!.paramName, snakeToCamel(err.meta!.paramName), field.id);
       return err.meta!.paramName === field.id || snakeToCamel(err.meta!.paramName) === field.id;
     });
     field.setError(error?.message || undefined);

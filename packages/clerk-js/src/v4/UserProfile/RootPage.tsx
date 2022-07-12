@@ -33,7 +33,7 @@ export const RootPage = () => {
       <NavbarMenuButtonRow />
       <Header.Root id='cl-userProfile-section-account'>
         <Header.Title textVariant='xxlargeMedium'>Account</Header.Title>
-        <Header.Subtitle>Description goes here</Header.Subtitle>
+        <Header.Subtitle>Manage your account information</Header.Subtitle>
       </Header.Root>
       <UserProfileSection />
       {showUsername && <UsernameSection />}
@@ -44,7 +44,7 @@ export const RootPage = () => {
 
       <Header.Root id='cl-userProfile-section-security'>
         <Header.Title textVariant='xxlargeMedium'>Security</Header.Title>
-        <Header.Subtitle>Description goes here</Header.Subtitle>
+        <Header.Subtitle>Manage your security preferences</Header.Subtitle>
       </Header.Root>
       {showPassword && <PasswordSection />}
       {showMfa && <MfaSection />}

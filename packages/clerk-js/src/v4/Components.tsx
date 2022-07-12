@@ -227,8 +227,10 @@ const Components = (props: ComponentsProps) => {
           <Modal
             handleClose={() => componentsControls.closeModal('userProfile')}
             contentSx={t => ({
-              height: t.sizes.$176,
-              maxHeight: `min(${t.sizes.$176}, calc(100vh - ${t.sizes.$20}))`,
+              height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$20}))`,
+              // margin: 0,
+              // height: t.sizes.$176,
+              // maxHeight: `min(${t.sizes.$176}, calc(100vh - ${t.sizes.$20}))`,
             })}
           >
             <VirtualRouter

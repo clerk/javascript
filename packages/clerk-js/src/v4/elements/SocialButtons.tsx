@@ -1,9 +1,9 @@
 import { OAuthProvider, OAuthStrategy, Web3Provider, Web3Strategy } from '@clerk/types';
 import React from 'react';
 
-import { Button, descriptors, Grid, Image, useAppearance } from '../customizables';
+import { Button, descriptors, Flex, Grid, Image, useAppearance } from '../customizables';
 import { useEnabledThirdPartyProviders } from '../hooks';
-import { PropsOfComponent } from '../styledSystem';
+import { mqu, PropsOfComponent } from '../styledSystem';
 import { sleep } from '../utils';
 import { ArrowBlockButton } from './ArrowBlockButton';
 import { useCardState } from './contexts';
@@ -41,7 +41,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps): JSX.Ele
     } else {
       await oauthCallback(strategy);
     }
-    await sleep(2000);
+    await sleep(5000);
     card.setIdle();
   };
 
@@ -77,19 +77,13 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps): JSX.Ele
 
 const ButtonGrid = (props: React.PropsWithChildren<any>) => {
   return (
-    <Grid
+    <Flex
       elementDescriptor={descriptors.socialButtons}
       gap={2}
-      sx={theme => ({
-        justifyContent: 'center',
-        '--cl-socialButtonSize': theme.sizes.$12,
-        '--cl-socialButtonsPerLine': 'auto-fill',
-        gridTemplateColumns: 'repeat(var(--cl-socialButtonsPerLine), var(--cl-socialButtonSize))',
-        gridAutoRows: 'var(--cl-socialButtonSize)',
-      })}
+      wrap='wrap'
     >
       {props.children}
-    </Grid>
+    </Flex>
   );
 };
 
@@ -119,7 +113,16 @@ const SocialButtonIcon = (props: SocialButtonProps): JSX.Element => {
       elementId={descriptors.socialButtonsButtonIcon.setId(id)}
       variant='icon'
       colorScheme='neutral'
-      sx={theme => ({ padding: 0, height: '100%', width: '100%', borderColor: theme.colors.$blackAlpha200 })}
+      sx={t => ({
+        padding: 0,
+        borderColor: t.colors.$blackAlpha200,
+        height: t.sizes.$12,
+        width: t.sizes.$12,
+        [mqu.sm]: {
+          height: t.sizes.$11,
+          width: t.sizes.$11,
+        },
+      })}
       {...rest}
     >
       {icon}

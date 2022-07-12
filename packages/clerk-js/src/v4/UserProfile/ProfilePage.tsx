@@ -54,7 +54,6 @@ export const ProfilePage = withCardStateProvider(() => {
               <Form.Control
                 {...firstNameField.props}
                 required
-                autoFocus
               />
             </Form.ControlRow>
           )}
@@ -63,7 +62,6 @@ export const ProfilePage = withCardStateProvider(() => {
               <Form.Control
                 {...lastNameField.props}
                 required
-                autoFocus
               />
             </Form.ControlRow>
           )}
@@ -123,8 +121,8 @@ const AvatarUploader = (props: AvatarUploaderProps) => {
             <Button
               isDisabled={card.isLoading}
               variant='link'
-              onClick={e => {
-                e.target.blur();
+              onClick={(e: any) => {
+                e.target?.blur();
                 toggle();
               }}
             >
