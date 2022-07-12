@@ -23,6 +23,7 @@ export function SignUpForm({
 }: SignUpFormProps): JSX.Element {
   return (
     <Form
+      id='cl-sign-up-form'
       handleSubmit={handleSubmit}
       submitButtonClassName='cl-sign-up-button'
       submitButtonLabel='Sign up'

@@ -197,6 +197,7 @@ export function _SignInStart(): JSX.Element {
           <>
             {hasSocialOrWeb3Buttons && <Separator />}
             <Form
+              id='cl-sign-in-form'
               handleSubmit={handleFirstPartySubmit}
               submitButtonClassName='cl-sign-in-button'
               submitButtonLabel='Continue'
