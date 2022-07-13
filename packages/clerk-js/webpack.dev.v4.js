@@ -103,9 +103,8 @@ const defineConstants = ({ mode, packageJSON }) => [
 
 const devServerOutput = {
   output: {
-    // publicPath: 'https://js.lclclerk.com/npm/',
-    publicPath: 'https://192.168.1.102/',
-    // https://192.168.1.102:4000/clerk.browser.js
+    publicPath: 'https://js.lclclerk.com/npm/',
+    // publicPath: 'https://192.168.1.102/',
     crossOriginLoading: 'anonymous',
     filename: 'clerk.browser.js',
     libraryTarget: 'umd',
@@ -119,7 +118,7 @@ const devServerOutput = {
     hot: true,
     liveReload: false,
     client: {
-      // webSocketURL: 'auto://js.lclclerk.com/ws',
+      webSocketURL: 'auto://js.lclclerk.com/ws',
       // webSocketURL: 'auto://192.168.1.102/ws',
     },
   },
