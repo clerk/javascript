@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.8.0](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@3.7.1...@clerk/nextjs@3.8.0) (2022-07-13)
+
+### Features
+
+- **nextjs:** Add req.organization access on gssp ([d064448](https://github.com/clerkinc/javascript/commit/d0644489a71e06df0e751c615b0d03d77967aab2))
+- **types,clerk-react,nextjs:** Add loadOrg option for Next.js withServerSideAuth middleware ([0889bde](https://github.com/clerkinc/javascript/commit/0889bde9bc7f9e1a5d4c1e706c49212e1f7b36f4))
+
 ### [3.7.1](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@3.7.1-staging.0...@clerk/nextjs@3.7.1) (2022-07-11)
 
 **Note:** Version bump only for package @clerk/nextjs

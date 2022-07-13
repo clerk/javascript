@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.20.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.19.1...@clerk/types@2.20.0) (2022-07-13)
+
+### Features
+
+- **types,clerk-react,nextjs:** Add loadOrg option for Next.js withServerSideAuth middleware ([0889bde](https://github.com/clerkinc/javascript/commit/0889bde9bc7f9e1a5d4c1e706c49212e1f7b36f4))
+
+### Bug Fixes
+
+- **types:** Typo rename Line to LINE ([79b3dd5](https://github.com/clerkinc/javascript/commit/79b3dd581e9750ac943d9a7a1091a37a48647538))
+
 ### [2.19.1](https://github.com/clerkinc/javascript/compare/@clerk/types@2.19.0...@clerk/types@2.19.1) (2022-07-07)
 
 ### Bug Fixes
