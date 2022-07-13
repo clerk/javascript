@@ -91,9 +91,7 @@ const useLoadedIsomorphicClerk = (options: NewIsomorphicClerkParams) => {
   const isomorphicClerk = React.useMemo(() => IsomorphicClerk.getOrCreateInstance(options), []);
 
   React.useEffect(() => {
-    // @ts-expect-error
     isomorphicClerk.__unstable__updateProps({ appearance: options.options.appearance });
-    // @ts-expect-error
   }, [options.options.appearance]);
 
   React.useEffect(() => {

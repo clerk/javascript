@@ -1,7 +1,6 @@
 import React from 'react';
 
-import { Flex, FormErrorText, Input } from '../customizables';
-import { Spinner } from '../primitives';
+import { Flex, FormErrorText, Input, Spinner } from '../customizables';
 import { common, PropsOfComponent } from '../styledSystem';
 import { FormControlState } from '../utils';
 
@@ -180,7 +179,7 @@ export const CodeControl = React.forwardRef<{ reset: any }, CodeControlProps>((p
         {isLoading && (
           <Spinner
             colorScheme='neutral'
-            css={theme => ({ marginLeft: theme.space.$2 })}
+            sx={theme => ({ marginLeft: theme.space.$2 })}
           />
         )}
       </Flex>
