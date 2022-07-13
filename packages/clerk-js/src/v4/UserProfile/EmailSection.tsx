@@ -4,10 +4,11 @@ import React from 'react';
 import { useCoreUser } from '../../ui/contexts';
 import { useNavigate } from '../../ui/hooks/useNavigate';
 import { Badge, Col } from '../customizables';
-import { AccordionItem, useCardState } from '../elements';
+import { useCardState } from '../elements';
 import { handleError } from '../utils';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
 import { ProfileSection } from './Section';
+import { UserProfileAccordion } from './UserProfileAccordion';
 import { AddBlockButton } from './UserProfileBlockButtons';
 import { primaryIdentificationFirst } from './utils';
 
@@ -43,7 +44,7 @@ const EmailAccordion = ({ email }: { email: EmailAddressResource }) => {
   };
 
   return (
-    <AccordionItem title={email.emailAddress}>
+    <UserProfileAccordion title={email.emailAddress}>
       <Col gap={4}>
         {isPrimary && (
           <LinkButtonWithDescription
@@ -77,6 +78,6 @@ const EmailAccordion = ({ email }: { email: EmailAddressResource }) => {
           onClick={() => navigate(`email-address/${email.id}/remove`)}
         />
       </Col>
-    </AccordionItem>
+    </UserProfileAccordion>
   );
 };

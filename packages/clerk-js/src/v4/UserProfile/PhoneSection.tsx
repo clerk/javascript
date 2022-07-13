@@ -4,10 +4,11 @@ import React from 'react';
 import { useCoreUser } from '../../ui/contexts';
 import { useNavigate } from '../../ui/hooks';
 import { Badge, Col, Text } from '../customizables';
-import { AccordionItem, useCardState } from '../elements';
+import { useCardState } from '../elements';
 import { getFlagEmojiFromCountryIso, handleError, parsePhoneString, stringToFormattedPhoneString } from '../utils';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
 import { ProfileSection } from './Section';
+import { UserProfileAccordion } from './UserProfileAccordion';
 import { AddBlockButton } from './UserProfileBlockButtons';
 import { primaryIdentificationFirst } from './utils';
 
@@ -46,8 +47,7 @@ const PhoneAccordion = ({ phone }: { phone: PhoneNumberResource }) => {
   const flag = getFlagEmojiFromCountryIso(parsePhoneString(phone.phoneNumber).iso);
 
   return (
-    // <AccordionItem title={<FormattedPhoneNumber value={phone.phoneNumber} />}>
-    <AccordionItem
+    <UserProfileAccordion
       icon={
         <Text
           as='span'
@@ -91,6 +91,6 @@ const PhoneAccordion = ({ phone }: { phone: PhoneNumberResource }) => {
           onClick={() => navigate(`phone-number/${phone.id}/remove`)}
         />
       </Col>
-    </AccordionItem>
+    </UserProfileAccordion>
   );
 };

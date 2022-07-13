@@ -4,11 +4,12 @@ import { ExternalAccountResource } from '@clerk/types/src';
 import { useCoreUser } from '../../ui/contexts';
 import { useNavigate } from '../../ui/hooks/useNavigate';
 import { Badge, Col, Flex, Image } from '../customizables';
-import { AccordionItem, useCardState, UserPreview } from '../elements';
+import { useCardState, UserPreview } from '../elements';
 import { useEnabledThirdPartyProviders } from '../hooks';
 import { handleError } from '../utils';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
 import { ProfileSection } from './Section';
+import { UserProfileAccordion } from './UserProfileAccordion';
 import { AddBlockButton } from './UserProfileBlockButtons';
 
 export const ConnectedAccountsSection = () => {
@@ -44,7 +45,7 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
   const label = account.username || account.emailAddress;
 
   return (
-    <AccordionItem
+    <UserProfileAccordion
       icon={
         <Image
           alt={providerToDisplayData[account.provider].name}
@@ -101,6 +102,6 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
           onClick={() => navigate(`connected-account/${account.id}/remove`)}
         />
       </Col>
-    </AccordionItem>
+    </UserProfileAccordion>
   );
 };

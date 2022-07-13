@@ -4,11 +4,12 @@ import React from 'react';
 import { useCoreUser } from '../../ui/contexts';
 import { useNavigate } from '../../ui/hooks';
 import { Col, Flex, Icon } from '../customizables';
-import { AccordionItem, FormattedPhoneNumberText, useCardState } from '../elements';
+import { FormattedPhoneNumberText, useCardState } from '../elements';
 import { Mobile } from '../icons';
 import { handleError } from '../utils';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
 import { ProfileSection } from './Section';
+import { UserProfileAccordion } from './UserProfileAccordion';
 import { AddBlockButton } from './UserProfileBlockButtons';
 import { defaultFirst } from './utils';
 
@@ -43,7 +44,7 @@ const MfaAccordion = (props: { phone: PhoneNumberResource }) => {
   const isDefault = phone.defaultSecondFactor;
 
   return (
-    <AccordionItem
+    <UserProfileAccordion
       title={
         <Flex
           gap={2}
@@ -77,6 +78,6 @@ const MfaAccordion = (props: { phone: PhoneNumberResource }) => {
           onClick={() => navigate(`multi-factor/${phone.id}/remove`)}
         />
       </Col>
-    </AccordionItem>
+    </UserProfileAccordion>
   );
 };

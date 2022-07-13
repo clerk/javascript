@@ -155,11 +155,6 @@ const Components = (props: ComponentsProps) => {
     componentsControls.openModal = (name, props) => {
       setState(s => ({ ...s, [name + 'Modal']: props }));
     };
-
-    // const stateFromParams = stateParam.readAndClear();
-    // if (stateFromParams.la && stateFromParams.c) {
-    //   componentsControls.openModal(stateFromParams.c, { ...stateFromParams });
-    // }
   }, []);
 
   const mountedSignInModal = (

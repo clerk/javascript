@@ -6,20 +6,11 @@ import { useEnvironment } from '../contexts';
 import { useNavigate } from '../hooks';
 import type { ParsedQs } from '../router';
 import { useRouter } from '../router';
-import type {
-  AvailableComponentCtx,
-  SignInCtx,
-  SignInProps,
-  SignUpCtx,
-  SignUpProps,
-  UserButtonCtx,
-  UserProfileCtx,
-  UserProfileProps,
-} from '../types';
+import type { AvailableComponentCtx, SignInCtx, SignUpCtx, UserButtonCtx, UserProfileCtx } from '../types';
 
 export const ComponentContext = React.createContext<AvailableComponentCtx | null>(null);
 
-export type SignUpContextType = SignUpProps & {
+export type SignUpContextType = SignUpCtx & {
   navigateAfterSignUp: () => any;
   queryParams: ParsedQs;
   signInUrl: string;
@@ -73,6 +64,7 @@ export const useSignUpContext = (): SignUpContextType => {
 
   return {
     ...ctx,
+    componentName,
     signInUrl,
     secondFactorUrl,
     afterSignUpUrl,
@@ -83,7 +75,7 @@ export const useSignUpContext = (): SignUpContextType => {
   };
 };
 
-export type SignInContextType = SignInProps & {
+export type SignInContextType = SignInCtx & {
   navigateAfterSignIn: () => any;
   queryParams: ParsedQs;
   signUpUrl: string;
@@ -135,6 +127,7 @@ export const useSignInContext = (): SignInContextType => {
 
   return {
     ...ctx,
+    componentName,
     signUpUrl,
     afterSignInUrl,
     afterSignUpUrl,
@@ -145,7 +138,7 @@ export const useSignInContext = (): SignInContextType => {
   };
 };
 
-export type UserProfileContextType = UserProfileProps & {
+export type UserProfileContextType = UserProfileCtx & {
   queryParams: ParsedQs;
   authQueryString: string | null;
 };
@@ -163,6 +156,7 @@ export const useUserProfileContext = (): UserProfileContextType => {
 
   return {
     ...ctx,
+    componentName,
     queryParams,
     authQueryString: '',
   };
@@ -191,6 +185,7 @@ export const useUserButtonContext = () => {
 
   return {
     ...ctx,
+    componentName,
     navigateAfterMultiSessionSingleSignOut,
     navigateAfterSignOut,
     navigateAfterSwitchSession,

@@ -3,10 +3,10 @@ import { Web3WalletResource } from '@clerk/types';
 import { useCoreUser } from '../../ui/contexts';
 import { useNavigate } from '../../ui/hooks/useNavigate';
 import { Col, Flex, Image } from '../customizables';
-import { AccordionItem } from '../elements';
 import { useEnabledThirdPartyProviders } from '../hooks';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
 import { ProfileSection } from './Section';
+import { UserProfileAccordion } from './UserProfileAccordion';
 import { AddBlockButton } from './UserProfileBlockButtons';
 
 export const Web3Section = () => {
@@ -35,7 +35,7 @@ const Web3WalletAccordion = ({ wallet }: { wallet: Web3WalletResource }) => {
   const strategy = wallet.verification.strategy as keyof typeof strategyToDisplayData;
 
   return (
-    <AccordionItem
+    <UserProfileAccordion
       title={
         <Flex
           align='center'
@@ -59,6 +59,6 @@ const Web3WalletAccordion = ({ wallet }: { wallet: Web3WalletResource }) => {
           onClick={() => navigate(`web3-wallet/${wallet.id}/remove`)}
         />
       </Col>
-    </AccordionItem>
+    </UserProfileAccordion>
   );
 };

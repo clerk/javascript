@@ -10,10 +10,11 @@ type AccordionItemProps = React.PropsWithChildren<{
   icon?: React.ReactElement;
   defaultOpen?: boolean;
   toggleable?: boolean;
+  scrollOnOpen?: boolean;
 }>;
 
 export const AccordionItem = (props: AccordionItemProps) => {
-  const { children, title, icon, defaultOpen = false, toggleable = true } = props;
+  const { children, title, icon, defaultOpen = false, toggleable = true, scrollOnOpen = false } = props;
   const [isOpen, setIsOpen] = React.useState(defaultOpen);
   const contentRef = React.useRef<HTMLDivElement>(null);
 
@@ -24,7 +25,7 @@ export const AccordionItem = (props: AccordionItemProps) => {
   };
 
   React.useLayoutEffect(() => {
-    if (isOpen && contentRef.current) {
+    if (scrollOnOpen && isOpen && contentRef.current) {
       contentRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }, [isOpen]);

@@ -1,5 +1,6 @@
 import { UserProfileProps } from '@clerk/types/src';
 import React from 'react';
+import { UserProfileCtx } from 'ui/types';
 
 import { ComponentContext, withCoreUserGuard } from '../../ui/contexts';
 import { Route, Switch } from '../../ui/router';
@@ -42,19 +43,16 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
 export const UserProfile = withCardStateProvider(_UserProfile);
 
 export const UserProfileModal = (props: UserProfileProps): JSX.Element => {
-  const userProfileProps: UserProfileProps = {
+  const userProfileProps: UserProfileCtx = {
     ...props,
     routing: 'virtual',
+    componentName: 'UserProfile',
+    mode: 'modal',
   };
 
   return (
     <Route path='user'>
-      <ComponentContext.Provider
-        value={{
-          componentName: 'UserProfile',
-          ...userProfileProps,
-        }}
-      >
+      <ComponentContext.Provider value={userProfileProps}>
         <UserProfile {...userProfileProps} />
       </ComponentContext.Provider>
     </Route>

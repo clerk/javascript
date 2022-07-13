@@ -264,7 +264,13 @@ const parse = (str: string): ParsedResult => {
     res = { model: 'rgb', value: parseRgb(str) };
   }
   if (!res || !res.value) {
-    throw new Error('An invalid string was passed as a color: ' + str);
+    throw new Error(`Clerk: "${str}" is not a valid color. You can pass one of:
+- any valid hsl or hsla color
+- any valid rgb or rgba color
+- any valid hex color
+- any valid hwb color
+- ${Object.keys(keywords).join(', ')}
+`);
   }
   return res as ParsedResult;
 };

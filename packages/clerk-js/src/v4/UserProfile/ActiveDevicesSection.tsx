@@ -4,11 +4,11 @@ import React from 'react';
 
 import { useCoreSession, useCoreUser } from '../../ui/contexts';
 import { Badge, Col, Flex, Icon, Spinner, Text } from '../customizables';
-import { AccordionItem } from '../elements';
 import { DeviceLaptop, DeviceMobile } from '../icons';
 import { mqu } from '../styledSystem';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
 import { ProfileSection } from './Section';
+import { UserProfileAccordion } from './UserProfileAccordion';
 import { currentSessionFirst } from './utils';
 
 export const ActiveDevicesSection = () => {
@@ -52,7 +52,7 @@ const DeviceAccordion = (props: { session: SessionWithActivitiesResource }) => {
   };
 
   return (
-    <AccordionItem title={<DeviceInfo session={props.session} />}>
+    <UserProfileAccordion title={<DeviceInfo session={props.session} />}>
       <Col gap={4}>
         {isCurrent && (
           <LinkButtonWithDescription
@@ -71,7 +71,7 @@ const DeviceAccordion = (props: { session: SessionWithActivitiesResource }) => {
           />
         )}
       </Col>
-    </AccordionItem>
+    </UserProfileAccordion>
   );
 };
 
