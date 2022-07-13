@@ -2,7 +2,7 @@ import { InternalTheme } from './types';
 
 const textVariants = (theme: InternalTheme) => {
   const base = {
-    WebkitFontSmoothing: 'auto !important',
+    WebkitFontSmoothing: theme.options.$fontSmoothing,
     fontFamily: theme.fonts.$main,
   };
 

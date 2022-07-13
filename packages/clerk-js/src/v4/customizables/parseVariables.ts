@@ -35,8 +35,8 @@ export const reverseAlphaScalesIfNeeded = (theme: Theme) => {
 };
 
 export const createOptions = (theme: Theme) => {
-  const { alphaShadesMode = 'dark' } = theme.variables || {};
-  return { darkMode: alphaShadesMode === 'light' };
+  const { alphaShadesMode = 'dark', fontSmoothing = 'auto !important' } = theme.variables || {};
+  return { darkMode: alphaShadesMode === 'light', fontSmoothing };
 };
 
 export const toHSLA = (str: string | undefined) => {

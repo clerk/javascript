@@ -19,6 +19,7 @@ export type ColorScaleWithRequiredBase<T = string> = Partial<ColorScale<T>> & { 
 export type CssColorOrScale = string | ColorScaleWithRequiredBase;
 type CssColor = string | TransparentColor | BuiltInColors;
 type CssLengthUnit = string;
+type FontSmoothing = 'auto' | 'antialiased' | 'never';
 
 type WebSafeFont =
   | 'Arial'
@@ -282,6 +283,11 @@ export type Variables = {
    */
   fontSize?: CssLengthUnit;
   /**
+   * What text anti-aliasing strategy the components will use by default. You can set it to `auto`, `antialiased` or `never`
+   * @default auto;
+   */
+  fontSmoothing?: FontSmoothing;
+  /**
    * The size that will be used as the `md` base borderRadius value. This is used as the base to calculate the `lg`, `xl`, `2xl`
    * our components use. As a general rule, the bigger an element is, the larger its borderRadius is going to be.
    * eg: the Card element uses '2xl'
@@ -377,4 +383,14 @@ export type Appearance = Theme & {
    * Theme overrides that only apply to the `<UserProfile/>` component
    */
   userProfile?: UserProfileTheme;
+};
+
+const app: Appearance = {
+  options: {
+    socialButtonsVariant: 'iconButton',
+  },
+  variables: {},
+  elements: {
+    divider: {},
+  },
 };

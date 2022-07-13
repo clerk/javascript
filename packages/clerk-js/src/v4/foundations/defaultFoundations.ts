@@ -9,6 +9,7 @@ import { zIndices } from './zIndices';
 
 const options = {
   darkMode: false,
+  fontSmoothing: 'auto !important',
 };
 
 const defaultInternalThemeFoundations = Object.freeze({
