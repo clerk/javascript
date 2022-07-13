@@ -15,7 +15,7 @@ const BreadcrumbItem = (props: PropsOfComponent<typeof Text>) => {
       as='li'
       colorScheme='neutral'
       variant='smallRegular'
-      sx={{ listStyle: 'none' }}
+      sx={{ display: 'inline-flex', listStyle: 'none' }}
       {...props}
     />
   );

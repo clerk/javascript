@@ -58,16 +58,17 @@ export const NavBar = (props: NavBarProps) => {
         return false;
       }
 
-      sectionElements.forEach((section, i) => {
-        const callback: IntersectionObserverCallback = entries => {
-          if (entries[0] && entries[0].isIntersecting) {
-            setActiveId(ids[i]);
+      const callback: IntersectionObserverCallback = entries => {
+        for (const entry of entries) {
+          const id = entry.target?.id?.split('section-')[1];
+          if (entry.isIntersecting && id) {
+            return setActiveId(id as any);
           }
-        };
-        const observer = new IntersectionObserver(callback, { root: contentRef.current, threshold: 0 });
-        section && observer.observe(section);
-      });
+        }
+      };
 
+      const observer = new IntersectionObserver(callback, { root: contentRef.current, threshold: 1 });
+      sectionElements.forEach(section => section && observer.observe(section));
       return true;
     };
 
