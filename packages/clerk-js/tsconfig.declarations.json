@@ -1,5 +1,5 @@
 {
-  "extends": "./tsconfig.stable.json",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
     "skipLibCheck": true,
     "noEmit": false,
@@ -10,5 +10,6 @@
     "outDir": "./dist",
     "declarationDir": "./dist/types"
   },
-  "exclude": ["node_modules", "**/*.test.ts", "**/*.test.tsx", "src/v4", "src/index.browser.v4.ts"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "**/*.test.ts", "**/*.test.tsx"]
 }
