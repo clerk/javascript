@@ -116,6 +116,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
       },
     },
     defaultVariants: {
+      textVariant: 'buttonRegularRegular',
       colorScheme: 'primary',
       variant: 'solid',
       size: 'md',

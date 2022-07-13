@@ -34,6 +34,7 @@ export const Action = (props: ActionProps) => {
     <Button
       variant='ghost'
       colorScheme='neutral'
+      textVariant='smallRegular'
       focusRing={false}
       // TODO: colors should be colorTextSecondary
       sx={theme => ({

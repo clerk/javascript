@@ -1,12 +1,17 @@
 import { InternalTheme } from './types';
 
 const textVariants = (theme: InternalTheme) => {
+  const base = {
+    WebkitFontSmoothing: 'auto !important',
+    fontFamily: theme.fonts.$main,
+  };
+
   const smallRegular = {
+    ...base,
     fontStyle: theme.fontStyles.$normal,
     fontWeight: theme.fontWeights.$normal,
     fontSize: theme.fontSizes.$xs,
     lineHeight: theme.lineHeights.$shorter,
-    fontFamily: theme.fonts.$main,
   } as const;
 
   const smallMedium = {
@@ -21,12 +26,12 @@ const textVariants = (theme: InternalTheme) => {
   } as const;
 
   const extraSmallRegular = {
+    ...base,
     fontWeight: theme.fontWeights.$normal,
     fontStyle: theme.fontStyles.$normal,
     fontSize: theme.fontSizes.$2xs,
     letterSpacing: theme.letterSpacings.$normal,
     lineHeight: theme.lineHeights.$none,
-    fontFamily: theme.fonts.$main,
   } as const;
 
   const buttonSmall = {
@@ -38,17 +43,21 @@ const textVariants = (theme: InternalTheme) => {
 
   const extraSmallMedium = {
     ...buttonSmall,
-    fontFamily: theme.fonts.$main,
     textTransform: 'none',
   } as const;
 
   const regularRegular = {
+    ...base,
     fontStyle: theme.fontStyles.$normal,
     fontWeight: theme.fontWeights.$normal,
     fontSize: theme.fontSizes.$sm,
     lineHeight: theme.lineHeights.$shorter,
-    fontFamily: theme.fonts.$main,
   } as const;
+
+  const buttonRegularRegular = {
+    ...regularRegular,
+    lineHeight: theme.lineHeights.$none,
+  };
 
   const regularMedium = {
     ...regularRegular,
@@ -56,11 +65,11 @@ const textVariants = (theme: InternalTheme) => {
   } as const;
 
   const largeSemibold = {
+    ...base,
     fontStyle: theme.fontStyles.$normal,
     fontWeight: theme.fontWeights.$semibold,
     fontSize: theme.fontSizes.$md,
     lineHeight: theme.lineHeights.$taller,
-    fontFamily: theme.fonts.$main,
   } as const;
 
   const largeMedium = {
@@ -80,6 +89,7 @@ const textVariants = (theme: InternalTheme) => {
 
   return {
     buttonSmall,
+    buttonRegularRegular,
     extraSmallRegular,
     extraSmallMedium,
     smallRegular,
