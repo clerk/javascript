@@ -78,9 +78,7 @@ export const useOrganization: UseOrganization = ({
     currentOrganizationMemberships,
   );
 
-  // TODO re-iterate on SSR based on value of `organization`
   if (organization === undefined) {
-    console.log('in undefined');
     return {
       isLoaded: false,
       organization: undefined,
@@ -91,7 +89,6 @@ export const useOrganization: UseOrganization = ({
   }
 
   if (organization === null) {
-    console.log('in null');
     return {
       isLoaded: true,
       organization: null,
@@ -103,7 +100,6 @@ export const useOrganization: UseOrganization = ({
 
   /** In SSR context we include only the organization object when loadOrg is set to true. */
   if (!isomorphicClerk.loaded && organization) {
-    console.log('ssr?');
     return {
       isLoaded: true,
       organization,
