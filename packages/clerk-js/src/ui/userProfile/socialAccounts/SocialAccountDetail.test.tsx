@@ -30,6 +30,7 @@ jest.mock('ui/contexts/CoreUserContext', () => {
             destroy: mockFacebookDestroy,
             providerSlug: () => 'facebook',
             providerTitle: () => 'Facebook',
+            accountIdentifier: () => 'peter@gmail.com',
           } as ExternalAccountResource,
           {
             id: 'gac_swag',
@@ -47,6 +48,7 @@ jest.mock('ui/contexts/CoreUserContext', () => {
             destroy: mockGoogleDestroy,
             providerSlug: () => 'google',
             providerTitle: () => 'Google',
+            accountIdentifier: () => 'peter@gmail.com',
           } as ExternalAccountResource,
         ],
       };
