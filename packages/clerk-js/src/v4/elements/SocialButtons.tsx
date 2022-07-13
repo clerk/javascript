@@ -23,9 +23,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps): JSX.Ele
   const { oauthCallback, web3Callback } = props;
   const { strategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
   const card = useCardState();
-  const {
-    parsedOptions: { socialButtonsVariant },
-  } = useAppearance();
+  const { socialButtonsVariant } = useAppearance().parsedLayout;
 
   const preferBlockButtons =
     socialButtonsVariant === 'blockButton'

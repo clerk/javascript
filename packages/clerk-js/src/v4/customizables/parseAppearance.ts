@@ -1,4 +1,4 @@
-import { Appearance, DeepPartial, Elements, Options, Theme } from '@clerk/types';
+import { Appearance, DeepPartial, Elements, Layout, Theme } from '@clerk/types';
 
 import { createInternalTheme, defaultInternalTheme } from '../foundations';
 import { InternalTheme } from '../styledSystem';
@@ -8,23 +8,23 @@ import {
   createColorScales,
   createFonts,
   createFontSizeScale,
-  createOptions,
   createRadiiUnits,
   createSpaceScale,
+  createThemeOptions,
   reverseAlphaScalesIfNeeded,
 } from './parseVariables';
 
 export type ParsedElements = Elements[];
 export type ParsedInternalTheme = InternalTheme;
-export type ParsedOptions = Required<Options>;
+export type ParsedLayout = Required<Layout>;
 
 export type ParsedAppearance = {
   parsedElements: ParsedElements;
   parsedInternalTheme: ParsedInternalTheme;
-  parsedOptions: ParsedOptions;
+  parsedLayout: ParsedLayout;
 };
 
-const defaultOptions: ParsedOptions = {
+const defaultLayout: ParsedLayout = {
   logoPlacement: 'inside',
   socialButtonsPlacement: 'top',
   socialButtonsVariant: 'auto',
@@ -42,17 +42,17 @@ export const parseAppearance = (appearanceObjects: Array<Appearance | undefined>
   const appearanceList = appearanceObjects.filter(s => !!s) as Appearance[];
   const parsedInternalTheme = parseVariables(appearanceList);
   const parsedElements = parseElements(appearanceList);
-  const parsedOptions = parseOptions(appearanceList);
+  const parsedLayout = parseLayout(appearanceList);
   loadDefaultFont(parsedInternalTheme);
-  return { parsedElements, parsedInternalTheme, parsedOptions };
+  return { parsedElements, parsedInternalTheme, parsedLayout };
 };
 
 const parseElements = (appearances: Appearance[]) => {
   return appearances.map(appearance => ({ ...appearance?.elements }));
 };
 
-const parseOptions = (appearanceList: Appearance[]) => {
-  return { ...defaultOptions, ...appearanceList.reduce((acc, appearance) => ({ ...acc, ...appearance.options }), {}) };
+const parseLayout = (appearanceList: Appearance[]) => {
+  return { ...defaultLayout, ...appearanceList.reduce((acc, appearance) => ({ ...acc, ...appearance.layout }), {}) };
 };
 
 const parseVariables = (appearances: Appearance[]) => {
@@ -73,7 +73,7 @@ const createInternalThemeFromVariables = (theme: Theme | undefined): DeepPartial
   const space = { ...createSpaceScale(theme) };
   const fontSizes = { ...createFontSizeScale(theme) };
   const fonts = { ...createFonts(theme) };
-  const options = { ...createOptions(theme) };
+  const options = { ...createThemeOptions(theme) };
   return createInternalTheme({ colors, radii, space, fontSizes, fonts, options } as any);
 };
 

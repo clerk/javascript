@@ -17,7 +17,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => 
 
   return (
     <>
-      {appearance.parsedOptions.logoPlacement === 'outside' && (
+      {appearance.parsedLayout.logoPlacement === 'outside' && (
         <ApplicationLogo sx={theme => ({ marginBottom: theme.space.$8 })} />
       )}
       <BaseCard
@@ -41,7 +41,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => 
         ]}
         ref={ref}
       >
-        {appearance.parsedOptions.logoPlacement === 'inside' && <ApplicationLogo />}
+        {appearance.parsedLayout.logoPlacement === 'inside' && <ApplicationLogo />}
         {props.children}
         {branded && <PoweredByClerkTag />}
       </BaseCard>

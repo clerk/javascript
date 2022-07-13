@@ -314,7 +314,7 @@ export type Theme = {
    * customizations that hard to implement with CSS.
    * Eg: placing the logo outside the card element
    */
-  options?: Options;
+  layout?: Layout;
   /**
    * General theme overrides. This styles will be merged with our base theme.
    * Can override global styles like colors, fonts etc.
@@ -329,7 +329,7 @@ export type Theme = {
   elements?: Elements;
 };
 
-export type Options = {
+export type Layout = {
   /**
    * Controls whether the logo will be rendered inside or outside the component card.
    * To customise the logo further, you can use {@link Appearance.elements}
@@ -386,7 +386,7 @@ export type Appearance = Theme & {
 };
 
 const app: Appearance = {
-  options: {
+  layout: {
     socialButtonsVariant: 'iconButton',
   },
   variables: {},

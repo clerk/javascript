@@ -7,7 +7,7 @@ export const SocialButtonsReversibleContainer = (props: React.PropsWithChildren<
   return (
     <ReversibleContainer
       {...props}
-      reverse={appearance.parsedOptions.socialButtonsPlacement === 'bottom'}
+      reverse={appearance.parsedLayout.socialButtonsPlacement === 'bottom'}
     />
   );
 };
