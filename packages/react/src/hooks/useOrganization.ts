@@ -26,11 +26,18 @@ type UseOrganizationReturn =
       membership: undefined;
     }
   | {
+      isLoaded: true;
+      organization: OrganizationResource;
+      invitationList: undefined;
+      membershipList: undefined;
+      membership: undefined;
+    }
+  | {
       isLoaded: boolean;
-      organization: OrganizationResource | null | undefined;
+      organization: OrganizationResource | null;
       invitationList: OrganizationInvitationResource[] | null | undefined;
       membershipList: OrganizationMembershipResource[] | null | undefined;
-      membership: OrganizationMembershipResource | undefined;
+      membership: OrganizationMembershipResource | null | undefined;
     };
 
 type UseOrganization = (params?: UseOrganizationParams) => UseOrganizationReturn;
@@ -43,6 +50,7 @@ export const useOrganization: UseOrganization = ({
   const session = useSessionContext();
 
   const isomorphicClerk = useIsomorphicClerkContext();
+
   const clerk = isomorphicClerk as unknown as LoadedClerk;
   const shouldFetch = isomorphicClerk.loaded && session && organization;
 
@@ -70,11 +78,31 @@ export const useOrganization: UseOrganization = ({
     currentOrganizationMemberships,
   );
 
-  // TODO re-iterate on SSR based on value of `organization`
-  if (!isomorphicClerk.loaded || !session || !organization) {
+  if (organization === undefined) {
     return {
       isLoaded: false,
       organization: undefined,
+      invitationList: undefined,
+      membershipList: undefined,
+      membership: undefined,
+    };
+  }
+
+  if (organization === null) {
+    return {
+      isLoaded: true,
+      organization: null,
+      invitationList: null,
+      membershipList: null,
+      membership: null,
+    };
+  }
+
+  /** In SSR context we include only the organization object when loadOrg is set to true. */
+  if (!isomorphicClerk.loaded && organization) {
+    return {
+      isLoaded: true,
+      organization,
       invitationList: undefined,
       membershipList: undefined,
       membership: undefined,
@@ -85,7 +113,7 @@ export const useOrganization: UseOrganization = ({
     isLoaded: !isMembershipsLoading && !isInvitationsLoading,
     organization,
     membershipList,
-    membership: getCurrentOrganizationMembership(session.user.organizationMemberships, organization.id), // your membership in the current org
+    membership: getCurrentOrganizationMembership(session!.user.organizationMemberships, organization.id), // your membership in the current org
     invitationList,
   };
 };
