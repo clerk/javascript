@@ -11,7 +11,7 @@ const FAILED_TO_LOAD_ERROR = 'Clerk: Failed to load Clerk';
 const MISSING_PROVIDER_ERROR = 'Clerk: Missing provider';
 const MISSING_BODY_ERROR = 'Clerk: Missing <body> element.';
 
-const UNSTABLE_RELEASE_TAGS = ['staging'];
+const UNSTABLE_RELEASE_TAGS = ['staging', 'next'];
 
 const extractNonStableTag = (packageVersion: string) => {
   const tag = packageVersion.match(/-(.*)\./)?.[1];
@@ -39,12 +39,12 @@ function getScriptSrc({ frontendApi, scriptUrl, scriptVariant = '' }: LoadScript
   const getUrlForTag = (target: string) => {
     return `https://${frontendApi}/npm/@clerk/clerk-js@${target}/dist/clerk.${variant}browser.js`;
   };
+  const nonStableTag = extractNonStableTag(LIB_VERSION);
 
   if (forceStagingReleaseForClerkFapi(frontendApi)) {
-    return getUrlForTag('staging');
+    return nonStableTag ? getUrlForTag(nonStableTag) : getUrlForTag('staging');
   }
 
-  const nonStableTag = extractNonStableTag(LIB_VERSION);
   if (nonStableTag) {
     return getUrlForTag(nonStableTag);
   }
