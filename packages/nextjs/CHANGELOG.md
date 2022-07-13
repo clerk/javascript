@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.7.1](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@3.7.1-staging.0...@clerk/nextjs@3.7.1) (2022-07-11)
+
+**Note:** Version bump only for package @clerk/nextjs
+
+## [3.7.0](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@3.6.13...@clerk/nextjs@3.7.0) (2022-07-08)
+
+### Features
+
+- **backend-core,edge:** Add requireEdgeMiddlewareAuth ([9ce6a4e](https://github.com/clerkinc/javascript/commit/9ce6a4e3f763f5e75a59439f9e36dc1a2ec368c4))
+- **edge,nextjs:** Compatibility with API middleware experimental edge-runtime ([107d70e](https://github.com/clerkinc/javascript/commit/107d70e2fb0522a89763c4b99f0968aea4e01c2c))
+
+### [3.6.13](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@3.6.12...@clerk/nextjs@3.6.13) (2022-07-07)
+
+**Note:** Version bump only for package @clerk/nextjs
+
+### [3.6.12](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@3.6.11...@clerk/nextjs@3.6.12) (2022-07-06)
+
+**Note:** Version bump only for package @clerk/nextjs
+
 ### [3.6.11](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@3.6.10...@clerk/nextjs@3.6.11) (2022-07-04)
 
 **Note:** Version bump only for package @clerk/nextjs
