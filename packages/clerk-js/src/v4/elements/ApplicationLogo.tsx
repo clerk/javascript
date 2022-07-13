@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useEnvironment } from '../../ui/contexts';
-import { descriptors, Flex, Image } from '../customizables';
+import { descriptors, Flex, Image, useAppearance } from '../customizables';
 import { PropsOfComponent } from '../styledSystem';
 
 type WidthInRem = `${string}rem`;
@@ -29,7 +29,9 @@ export const ApplicationLogo = (props: ApplicationLogoProps) => {
   const imageRef = React.useRef<HTMLImageElement>(null);
   const [loaded, setLoaded] = React.useState(false);
   const { logoImage, applicationName } = useEnvironment().displayConfig;
-  const imageSrc = logoImage?.public_url;
+  const { parsedOptions } = useAppearance();
+  // TODO: Should we throw an error if logoImageUrl is not a valid url?
+  const imageSrc = parsedOptions.logoImageUrl || logoImage?.public_url;
 
   if (!imageSrc) {
     return null;
@@ -51,7 +53,7 @@ export const ApplicationLogo = (props: ApplicationLogoProps) => {
         ref={imageRef}
         elementDescriptor={descriptors.logoImage}
         alt={applicationName}
-        src={logoImage.public_url}
+        src={imageSrc}
         onLoad={() => setLoaded(true)}
         sx={{
           display: loaded ? 'inline-block' : 'none',

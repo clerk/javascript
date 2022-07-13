@@ -15,9 +15,6 @@ export interface ClerkProviderProps extends IsomorphicClerkOptions {
 
 function ClerkProviderBase(props: ClerkProviderProps): JSX.Element {
   const { initialState, children, Clerk, frontendApi, ...options } = props;
-  // @ts-expect-error
-  options.appearance = options.__unstable_appearance;
-
   return (
     <StructureContext.Provider value={StructureContextStates.noGuarantees}>
       <ClerkContextProvider
