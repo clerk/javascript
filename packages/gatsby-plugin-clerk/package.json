@@ -31,9 +31,9 @@
     "dev": "tsc -p tsconfig.build.json --watch"
   },
   "dependencies": {
-    "@clerk/clerk-react": "^3.2.7-alpha.0",
-    "@clerk/clerk-sdk-node": "^3.3.5-alpha.0",
-    "@clerk/types": "^2.6.1-alpha.0",
+    "@clerk/clerk-react": "^4.0.0-next.0",
+    "@clerk/clerk-sdk-node": "3.8.6",
+    "@clerk/types": "^3.0.0-next.0",
     "cookie": "^0.5.0",
     "tslib": "^2.3.1"
   },
