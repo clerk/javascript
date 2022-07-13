@@ -1,8 +1,10 @@
 {
-  "extends": "./tsconfig.stable.json",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "jsx": "react",
-    "noImplicitReturns": false,
-    "strict": false
-  }
+    "jsx": "react-jsx",
+    "noImplicitReturns": false
+    //    "strict": false
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }

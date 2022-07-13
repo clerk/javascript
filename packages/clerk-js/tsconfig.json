@@ -1,3 +1,38 @@
 {
-  "extends": "./tsconfig.stable.json"
+  "compilerOptions": {
+    "allowJs": false,
+    "baseUrl": "src",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "module": "esnext",
+    "moduleResolution": "Node",
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": true,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "strict": true,
+    "target": "ES2019",
+    "useUnknownInCatchVariables": false,
+    "declaration": false,
+    "jsx": "react-jsx",
+    "jsxImportSource": "@emotion/react",
+    "paths": {
+      "ui/*": ["ui/*"],
+      "core/*": ["core/*"],
+      "utils/*": ["utils/*"],
+      "types/*": ["types/*"]
+    }
+  },
+  "include": [
+    "src/index.ts",
+    "src/index.browser.ts",
+    "src/index.headless.ts",
+    "src/index.headless.browser.ts",
+    "**/*.d.ts"
+  ],
+  "exclude": ["node_modules", "**/*.test.ts", "**/*.test.tsx"]
 }
