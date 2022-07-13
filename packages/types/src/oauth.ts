@@ -136,7 +136,7 @@ export const OAUTH_PROVIDERS: OAuthProviderData[] = [
   {
     provider: 'line',
     strategy: 'oauth_line',
-    name: 'Line',
+    name: 'LINE',
     docsUrl: 'https://clerk.dev/docs/authentication/social-login-with-line',
   },
 ];
