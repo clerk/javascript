@@ -304,7 +304,9 @@ export type Variables = {
 
 export type Theme = {
   /**
-   * TODO:
+   * Configuration options that affect the layout of the components, allowing
+   * customizations that hard to implement with CSS.
+   * Eg: placing the logo outside the card element
    */
   options?: Options;
   /**
@@ -322,8 +324,34 @@ export type Theme = {
 };
 
 export type Options = {
+  /**
+   * Controls whether the logo will be rendered inside or outside the component card.
+   * To customise the logo further, you can use {@link Appearance.elements}
+   * @default inside
+   */
   logoPlacement?: 'inside' | 'outside' | 'none';
+  /**
+   * The URL of your custom logo the components will display.
+   * By default, the components will use the logo you've set in the Clerk Dashboard.
+   * This option is helpful when you need to display different logos for different themes,
+   * eg: white logo on dark themes, black logo on light themes
+   * To customise the logo further, you can use {@link Appearance.elements}
+   * @default undefined
+   */
+  logoImageUrl?: string;
+  /**
+   * Controls the variant that will be used for the social buttons.
+   * By default, the components will use block buttons if you have less than
+   * 4 social providers enabled, otherwise icon buttons will be used.
+   * To customise the social buttons further, you can use {@link Appearance.elements}
+   * @default auto
+   */
   socialButtonsVariant?: 'auto' | 'iconButton' | 'blockButton';
+  /**
+   * Controls whether the logo will be rendered inside or outside the component card.
+   * To customise the logo further, you can use {@link Appearance.elements}
+   * @default inside
+   */
   socialButtonsPlacement?: 'top' | 'bottom';
 };
 
@@ -334,28 +362,19 @@ export type UserProfileTheme = Theme;
 
 export type Appearance = Theme & {
   /**
-   * Theme overrides that apply only
-   * to the `<SignIn/>` component
+   * Theme overrides that only apply to the `<SignIn/>` component
    */
   signIn?: SignInTheme;
   /**
-   * Theme overrides that apply only
-   * to the `<SignUp/>` component
+   * Theme overrides that only apply to the `<SignUp/>` component
    */
   signUp?: SignUpTheme;
   /**
-   * Theme overrides that apply only
-   * to the `<UserButton/>` component
+   * Theme overrides that only apply to the `<UserButton/>` component
    */
   userButton?: UserButtonTheme;
   /**
-   * Theme overrides that apply only
-   * to the `<UserProfile/>` component
+   * Theme overrides that only apply to the `<UserProfile/>` component
    */
   userProfile?: UserProfileTheme;
 };
-
-// TODO: Discuss if we want to release a `prefersColorScheme` based theme switcher
-// type AppearanceFunctionParams = { prefersColorScheme: 'dark' | 'light' };
-// export type AppearanceFactory = (params: AppearanceFunctionParams) => Appearance;
-// export type AppearanceProp = Appearance | AppearanceFactory;

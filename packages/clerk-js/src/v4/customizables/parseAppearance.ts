@@ -28,6 +28,7 @@ const defaultOptions: ParsedOptions = {
   logoPlacement: 'inside',
   socialButtonsPlacement: 'top',
   socialButtonsVariant: 'auto',
+  logoImageUrl: '',
 };
 
 /**
