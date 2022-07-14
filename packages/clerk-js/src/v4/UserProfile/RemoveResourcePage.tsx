@@ -5,6 +5,7 @@ import { useRouter } from '../../ui/router';
 import { useWizard, Wizard } from '../common';
 import { Text } from '../customizables';
 import { Form } from '../elements';
+import { useEnabledThirdPartyProviders } from '../hooks';
 import { FormButtons } from './FormButtons';
 import { ContentPage } from './Page';
 import { SuccessPage } from './SuccessPage';
@@ -53,6 +54,7 @@ export const RemoveConnectedAccountPage = () => {
   const user = useCoreUser();
   const { id } = useRouter().params;
   const ref = React.useRef(user.externalAccounts.find(e => e.id === id));
+  const { providerToDisplayData } = useEnabledThirdPartyProviders();
 
   if (!ref.current) {
     return null;
@@ -61,9 +63,9 @@ export const RemoveConnectedAccountPage = () => {
   return (
     <RemoveResourcePage
       title='Remove connected account'
-      messageLine1={`${ref.current.accountIdentifier()} will be removed from this account.`}
+      messageLine1={`${providerToDisplayData[ref.current.provider].name} will be removed from this account.`}
       messageLine2={`You will no longer be able to sign in using this connected account.`}
-      successMessage={`${ref.current.accountIdentifier()} has been removed from your account.`}
+      successMessage={`${providerToDisplayData[ref.current.provider].name} has been removed from your account.`}
       deleteResource={() => Promise.resolve(ref.current?.destroy())}
     />
   );
