@@ -221,9 +221,12 @@ const Components = (props: ComponentsProps) => {
         <InternalThemeProvider>
           <Modal
             handleClose={() => componentsControls.closeModal('userProfile')}
+            containerSx={{
+              alignItems: 'center',
+            }}
             contentSx={t => ({
               height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$20}))`,
-              // margin: 0,
+              margin: 0,
               // height: t.sizes.$176,
               // maxHeight: `min(${t.sizes.$176}, calc(100vh - ${t.sizes.$20}))`,
             })}
