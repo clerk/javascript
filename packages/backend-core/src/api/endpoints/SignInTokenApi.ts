@@ -3,8 +3,8 @@ import { SignInToken } from '../resources/SignInTokens';
 import { AbstractAPI } from './AbstractApi';
 
 type CreateSignInTokensParams = {
-  user_id: string;
-  expires_in_seconds: number;
+  userId: string;
+  expiresInSeconds: number;
 };
 
 const basePath = '/sign_in_tokens';

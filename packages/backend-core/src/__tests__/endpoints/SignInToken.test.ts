@@ -22,8 +22,8 @@ test('createSignInToken() creates a new sign in token', async () => {
   nock(defaultServerAPIUrl).post('/v1/sign_in_tokens').reply(200, resJSON);
 
   const signInToken = await TestClerkAPI.signInTokens.createSignInToken({
-    user_id: resJSON.user_id,
-    expires_in_seconds: 60,
+    userId: resJSON.user_id,
+    expiresInSeconds: 60,
   });
   expect(signInToken).toBeInstanceOf(SignInToken);
   expect(signInToken.userId).toBe(resJSON.user_id);
