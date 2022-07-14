@@ -30,6 +30,7 @@ export const EmailPage = withCardStateProvider(() => {
   const emailField = useFormControl('emailAddress', '', {
     type: 'text',
     label: 'Email address',
+    isRequired: true,
   });
 
   const canSubmit = emailField.value.length > 1 && user.username !== emailField.value;

@@ -20,22 +20,44 @@ export const SignUpForm = (props: SignUpFormProps) => {
       {(fields.firstName || fields.lastName) && (
         <Form.ControlRow>
           {fields.firstName && (
-            <Form.Control {...{ ...formState.firstName.props, isRequired: fields.firstName.required }} />
+            <Form.Control
+              {...{
+                ...formState.firstName.props,
+                isRequired: fields.firstName.required,
+                isOptional: !fields.firstName.required,
+              }}
+            />
           )}
           {fields.lastName && (
-            <Form.Control {...{ ...formState.lastName.props, isRequired: fields.lastName.required }} />
+            <Form.Control
+              {...{
+                ...formState.lastName.props,
+                isRequired: fields.lastName.required,
+                isOptional: !fields.lastName.required,
+              }}
+            />
           )}
         </Form.ControlRow>
       )}
       {fields.username && (
         <Form.ControlRow>
-          <Form.Control {...{ ...formState.username.props, isRequired: fields.username.required }} />
+          <Form.Control
+            {...{
+              ...formState.username.props,
+              isRequired: fields.username.required,
+              isOptional: !fields.username.required,
+            }}
+          />
         </Form.ControlRow>
       )}
       {fields.emailAddress && (
         <Form.ControlRow>
           <Form.Control
-            {...{ ...formState.emailAddress.props, isRequired: fields.emailAddress.required }}
+            {...{
+              ...formState.emailAddress.props,
+              isRequired: fields.emailAddress.required,
+              isOptional: !fields.emailAddress.required,
+            }}
             actionLabel={canToggleEmailPhone ? 'Use phone instead' : undefined}
             onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('phoneNumber') : undefined}
           />
@@ -44,7 +66,11 @@ export const SignUpForm = (props: SignUpFormProps) => {
       {fields.phoneNumber && (
         <Form.ControlRow>
           <Form.Control
-            {...{ ...formState.phoneNumber.props, isRequired: fields.phoneNumber.required }}
+            {...{
+              ...formState.phoneNumber.props,
+              isRequired: fields.phoneNumber.required,
+              isOptional: !fields.phoneNumber.required,
+            }}
             actionLabel={canToggleEmailPhone ? 'Use email instead' : undefined}
             onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('emailAddress') : undefined}
           />
@@ -52,7 +78,13 @@ export const SignUpForm = (props: SignUpFormProps) => {
       )}
       {fields.password && (
         <Form.ControlRow>
-          <Form.Control {...{ ...formState.password.props, isRequired: fields.password.required }} />
+          <Form.Control
+            {...{
+              ...formState.password.props,
+              isRequired: fields.password.required,
+              isOptional: !fields.password.required,
+            }}
+          />
         </Form.ControlRow>
       )}
       <Form.SubmitButton>Continue</Form.SubmitButton>

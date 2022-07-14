@@ -20,6 +20,7 @@ type FormControlProps = {
   id: FieldId;
   label: string;
   isRequired?: boolean;
+  isOptional?: boolean;
   errorText?: string;
   actionLabel?: string;
   onActionClicked?: React.MouseEventHandler;
@@ -32,7 +33,7 @@ const getInputElementForType = (type: FormControlProps['type']) => {
 
 export const FormControl = (props: FormControlProps) => {
   const card = useCardState();
-  const { id, errorText, isRequired, label, actionLabel, onActionClicked, sx, ...rest } = props;
+  const { id, errorText, isRequired, isOptional, label, actionLabel, onActionClicked, sx, ...rest } = props;
   const hasError = !!errorText;
   const isDisabled = props.isDisabled || card.isLoading;
 
@@ -64,7 +65,7 @@ export const FormControl = (props: FormControlProps) => {
           sx={{ display: 'inline-flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}
         >
           {label}
-          {!isRequired && (
+          {isOptional && (
             <Text
               elementDescriptor={descriptors.formFieldHintText}
               elementId={descriptors.formFieldHintText.setId(id)}

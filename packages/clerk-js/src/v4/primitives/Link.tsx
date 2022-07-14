@@ -12,6 +12,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     cursor: 'pointer',
     ...common.focusRing(theme),
     ...common.disabled(theme),
+    textDecoration: 'none',
     '&:hover': { textDecoration: 'underline' },
   },
   variants: {

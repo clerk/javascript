@@ -56,6 +56,7 @@ export const AddPhone = (props: AddPhoneProps) => {
   const phoneField = useFormControl('phoneNumber', '', {
     type: 'tel',
     label: 'Phone number',
+    isRequired: true,
   });
 
   const canSubmit = phoneField.value.length > 1 && user.username !== phoneField.value;

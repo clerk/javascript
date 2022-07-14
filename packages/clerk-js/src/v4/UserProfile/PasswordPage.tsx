@@ -12,8 +12,12 @@ export const PasswordPage = withCardStateProvider(() => {
   const user = useCoreUser();
   const card = useCardState();
   const wizard = useWizard();
-  const passwordField = useFormControl('password', '', { type: 'password', label: 'New password' });
-  const confirmField = useFormControl('confirmPassword', '', { type: 'password', label: 'Confirm password' });
+  const passwordField = useFormControl('password', '', { type: 'password', label: 'New password', isRequired: true });
+  const confirmField = useFormControl('confirmPassword', '', {
+    type: 'password',
+    label: 'Confirm password',
+    isRequired: true,
+  });
 
   const canSubmit = passwordField.value && passwordField.value === confirmField.value && passwordField.value.length > 7;
 
