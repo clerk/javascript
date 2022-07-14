@@ -494,7 +494,7 @@ export type UserButtonProps = {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvided (if one is provided)
    */
-  appearance?: UserButtonTheme;
+  appearance?: UserButtonTheme & { userProfile?: UserProfileTheme };
 };
 
 export interface HandleMagicLinkVerificationParams {
