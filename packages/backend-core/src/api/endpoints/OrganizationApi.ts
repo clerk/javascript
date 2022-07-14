@@ -18,6 +18,7 @@ type GetOrganizationListParams = {
 type CreateParams = {
   name: string;
   slug?: string;
+  /* The User id for the user creating the organization. The user will become an administrator for the organization. */
   createdBy: string;
 } & OrganizationMetadataParams;
 
