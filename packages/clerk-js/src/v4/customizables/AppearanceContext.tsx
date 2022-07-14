@@ -16,8 +16,17 @@ type AppearanceProviderProps = React.PropsWithChildren<{
 
 const AppearanceProvider = (props: AppearanceProviderProps) => {
   const ctxValue = useDeepEqualMemo(() => {
-    const { appearance, globalAppearance, appearanceKey } = props;
-    return { value: parseAppearance([globalAppearance, globalAppearance?.[appearanceKey], appearance]) };
+    const { appearance: componentAppearance, globalAppearance, appearanceKey } = props;
+
+    const appearanceObjectCascade = [
+      globalAppearance?.baseTheme as unknown as Appearance,
+      globalAppearance,
+      globalAppearance?.[appearanceKey],
+      componentAppearance?.baseTheme as unknown as Appearance,
+      componentAppearance,
+    ];
+
+    return { value: parseAppearance(appearanceObjectCascade) };
   }, [props.appearance, props.globalAppearance]);
 
   return <AppearanceContext.Provider value={ctxValue}>{props.children}</AppearanceContext.Provider>;

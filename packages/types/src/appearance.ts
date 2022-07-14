@@ -310,7 +310,14 @@ export type Variables = {
   spacingUnit?: CssLengthUnit;
 };
 
+export type BaseThemeTaggedType = { __type: 'prebuilt_appearance' };
+export type BaseTheme = BaseThemeTaggedType;
+
 export type Theme = {
+  /**
+   * Hello there how are you
+   */
+  baseTheme: BaseTheme;
   /**
    * Configuration options that affect the layout of the components, allowing
    * customizations that hard to implement with CSS.
@@ -386,3 +393,33 @@ export type Appearance = Theme & {
    */
   userProfile?: UserProfileTheme;
 };
+
+// TODO: Remove before GA
+export const createClerkTheme = (appearance: Omit<Appearance, 'baseTheme'>): BaseTheme => {
+  // Placeholder method that might hande more transformations in the future
+  return { ...appearance, __type: 'prebuilt_appearance' };
+};
+
+// TODO: Remove before GA
+export const darkGlass = createClerkTheme({
+  variables: {
+    alphaShadesMode: 'light',
+    colorText: 'white',
+    colorBackground: 'rgba(43,43,56,0.95)',
+    colorInputText: 'white',
+    colorInputBackground: 'rgba(255,255,255,0.1)',
+    colorPrimary: 'rgb(0,172,255)',
+    colorDanger: 'rgb(255,125,142)',
+    colorSuccess: 'rgb(19,255,128)',
+    fontSmoothing: 'auto',
+  },
+  elements: {
+    card: {
+      boxShadow: '0 4px 30px rgba(0, 0, 0, 0.5)',
+      backdropFilter: 'blur(15px)',
+      border: '1px solid rgba(255, 255, 255, 0.1)',
+    },
+    socialButtonsLogo__apple: { filter: 'invert(1)' },
+    socialButtonsLogo__github: { filter: 'invert(1)' },
+  },
+});
