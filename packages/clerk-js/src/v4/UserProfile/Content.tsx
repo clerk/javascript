@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Route, Switch } from '../../ui/router';
+import { Route, Switch, useRouter } from '../../ui/router';
 import { Col, descriptors } from '../customizables';
 import { common, mqu } from '../styledSystem';
 import { ConnectedAccountsPage } from './ConnectedAccountsPage';
@@ -21,8 +21,29 @@ import { UsernamePage } from './UsernamePage';
 import { Web3Page } from './Web3Page';
 
 export const Content = React.forwardRef<HTMLDivElement>((_, ref) => {
+  const router = useRouter();
+  const containerRef = ref as React.MutableRefObject<HTMLDivElement>;
+  const scrollPosRef = React.useRef(0);
+
+  React.useEffect(() => {
+    const handleScroll = (e: Event) => {
+      const target = e.target as HTMLDivElement;
+      if (target.scrollTop) {
+        scrollPosRef.current = target.scrollTop;
+      }
+    };
+    containerRef.current?.addEventListener('scroll', handleScroll);
+    return () => containerRef.current?.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  React.useLayoutEffect(() => {
+    if (scrollPosRef.current && containerRef.current) {
+      containerRef.current.scrollTop = scrollPosRef.current;
+    }
+  }, [router.currentPath]);
+
   return (
-    <Scroller>
+    <ScrollerContainer>
       <Col
         elementDescriptor={descriptors.pageSection}
         sx={theme => ({
@@ -109,11 +130,11 @@ export const Content = React.forwardRef<HTMLDivElement>((_, ref) => {
         </Route>
         {/*</Route>*/}
       </Col>
-    </Scroller>
+    </ScrollerContainer>
   );
 });
 
-const Scroller = (props: React.PropsWithChildren<{}>) => {
+const ScrollerContainer = (props: React.PropsWithChildren<{}>) => {
   return (
     <Col
       elementDescriptor={descriptors.scroller}
