@@ -317,7 +317,7 @@ export type Theme = {
   /**
    * Hello there how are you
    */
-  baseTheme: BaseTheme;
+  baseTheme?: BaseTheme;
   /**
    * Configuration options that affect the layout of the components, allowing
    * customizations that hard to implement with CSS.
