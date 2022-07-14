@@ -103,6 +103,9 @@ const Footer = () => {
         padding: `${theme.space.$6}`,
         paddingBottom: 0,
         borderTop: `${theme.borders.$normal} ${theme.colors.$blackAlpha200}`,
+        '&:empty': {
+          padding: '0',
+        },
       })}
     >
       <PoweredByClerkText />
@@ -113,6 +116,10 @@ const Footer = () => {
 
 const Links = () => {
   const paths = useOptions().paths || {};
+  if (!paths.termsPageUrl && !paths.privacyPageUrl) {
+    return null;
+  }
+
   return (
     <Flex gap={4}>
       {paths.termsPageUrl && <UserButtonLink href={paths.termsPageUrl}>Terms</UserButtonLink>}
