@@ -83,7 +83,10 @@ const LogoMarkIconLink = () => {
     <Link
       href='https://www.clerk.dev?utm_source=clerk&utm_medium=components'
       colorScheme='neutral'
-      sx={{ color: 'inherit' }}
+      sx={{
+        color: 'inherit',
+        '&:hover': { color: 'inherit' },
+      }}
       isExternal
     >
       <Icon
