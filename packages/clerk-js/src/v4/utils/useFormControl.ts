@@ -3,7 +3,7 @@ import React, { HTMLInputTypeAttribute } from 'react';
 type Options = {
   label: string;
   type: HTMLInputTypeAttribute;
-  required?: boolean;
+  isRequired?: boolean;
 };
 
 type FieldStateProps<Id> = {
@@ -25,7 +25,7 @@ export const useFormControl = <Id extends string>(
   initialState: string,
   opts?: Options,
 ): FormControlState<Id> => {
-  opts = opts || { type: 'text', label: '', required: false };
+  opts = opts || { type: 'text', label: '', isRequired: false };
   const [value, setValueInternal] = React.useState(initialState);
   const [errorText, setErrorText] = React.useState<string | undefined>(undefined);
 

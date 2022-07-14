@@ -45,11 +45,11 @@ function _SignUpStart(): JSX.Element {
   const [missingRequirementsWithTicket, setMissingRequirementsWithTicket] = React.useState(false);
 
   const formState = {
-    firstName: useFormControl('first_name', '', { type: 'text', label: 'First name' }),
-    lastName: useFormControl('last_name', '', { type: 'text', label: 'Last name' }),
-    emailAddress: useFormControl('email_address', '', { type: 'email', label: 'Email address' }),
+    firstName: useFormControl('firstName', '', { type: 'text', label: 'First name' }),
+    lastName: useFormControl('lastName', '', { type: 'text', label: 'Last name' }),
+    emailAddress: useFormControl('emailAddress', '', { type: 'email', label: 'Email address' }),
     username: useFormControl('username', '', { type: 'text', label: 'Username' }),
-    phoneNumber: useFormControl('phone_number', '', { type: 'tel', label: 'Phone number' }),
+    phoneNumber: useFormControl('phoneNumber', '', { type: 'tel', label: 'Phone number' }),
     password: useFormControl('password', '', { type: 'password', label: 'Password' }),
   } as const;
   const ticket = useFormControl(

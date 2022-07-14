@@ -49,6 +49,7 @@ export function _SignInStart(): JSX.Element {
   const identifierField = useFormControl('identifier', '', {
     type: identifierInputDisplayValues.fieldType,
     label: identifierInputDisplayValues.label,
+    isRequired: true,
   });
 
   React.useEffect(() => {

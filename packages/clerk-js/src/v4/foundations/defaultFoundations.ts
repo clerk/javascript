@@ -10,7 +10,7 @@ import { zIndices } from './zIndices';
 const options = {
   darkMode: false,
   fontSmoothing: 'auto !important',
-};
+} as const;
 
 const defaultInternalThemeFoundations = Object.freeze({
   colors,

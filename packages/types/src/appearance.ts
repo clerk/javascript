@@ -41,6 +41,7 @@ type ErrorState = 'error';
 type OpenState = 'open';
 type ActiveState = 'active';
 export type ElementState = LoadingState | DisabledState | ErrorState | OpenState | ActiveState;
+type ControlState = ErrorState | DisabledState;
 
 export type AlertId = 'danger' | 'warning';
 export type FieldId =
@@ -150,14 +151,15 @@ export type ElementsConfig = {
 
   form: WithOptions<never, ErrorState, never>;
   'form-fieldRow': WithOptions<never, never, never>;
-  'form-field': WithOptions<FieldId, ErrorState | DisabledState, never>;
-  'form-fieldLabelRow': WithOptions<FieldId, ErrorState | DisabledState, never>;
-  'form-fieldLabel': WithOptions<FieldId, ErrorState | DisabledState, never>;
-  'form-fieldAction': WithOptions<FieldId, ErrorState | DisabledState, never>;
-  'form-fieldInput': WithOptions<FieldId, ErrorState | DisabledState, never>;
-  'form-fieldErrorText': WithOptions<FieldId, ErrorState | DisabledState, never>;
-  'form-buttonPrimary': WithOptions<never, ErrorState | LoadingState, never>;
-  'form-buttonReset': WithOptions<never, ErrorState | LoadingState, never>;
+  'form-field': WithOptions<FieldId, ControlState, never>;
+  'form-fieldLabelRow': WithOptions<FieldId, ControlState, never>;
+  'form-fieldLabel': WithOptions<FieldId, ControlState, never>;
+  'form-fieldAction': WithOptions<FieldId, ControlState, never>;
+  'form-fieldInput': WithOptions<FieldId, ControlState, never>;
+  'form-fieldErrorText': WithOptions<FieldId, ControlState, never>;
+  'form-fieldHintText': WithOptions<FieldId, ControlState, never>;
+  'form-buttonPrimary': WithOptions<never, ControlState | LoadingState, never>;
+  'form-buttonReset': WithOptions<never, ControlState | LoadingState, never>;
   'form-fieldInputShowPassword': WithOptions<never, never, never>;
   'form-fieldInputShowPasswordIcon': WithOptions<never, never, never>;
 

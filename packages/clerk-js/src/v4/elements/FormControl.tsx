@@ -9,6 +9,7 @@ import {
   FormLabel,
   Input,
   Link,
+  Text,
 } from '../customizables';
 import { PropsOfComponent } from '../styledSystem';
 import { useCardState } from './contexts';
@@ -60,9 +61,20 @@ export const FormControl = (props: FormControlProps) => {
           hasError={hasError}
           isDisabled={isDisabled}
           isRequired={isRequired}
+          sx={{ display: 'inline-flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}
         >
           {label}
-          {isRequired ? ' (*)' : ''}
+          {!isRequired && (
+            <Text
+              elementDescriptor={descriptors.formFieldHintText}
+              elementId={descriptors.formFieldHintText.setId(id)}
+              as='span'
+              colorScheme='neutral'
+              variant='smallRegular'
+            >
+              Optional
+            </Text>
+          )}
         </FormLabel>
         {actionLabel && (
           <Link

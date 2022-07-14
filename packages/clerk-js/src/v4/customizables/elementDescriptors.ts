@@ -50,6 +50,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'form-fieldAction',
   'form-fieldInput',
   'form-fieldErrorText',
+  'form-fieldHintText',
   'form-buttonPrimary',
   'form-buttonReset',
   'form-fieldInputShowPassword',
