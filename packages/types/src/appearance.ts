@@ -386,13 +386,3 @@ export type Appearance = Theme & {
    */
   userProfile?: UserProfileTheme;
 };
-
-const app: Appearance = {
-  layout: {
-    socialButtonsVariant: 'iconButton',
-  },
-  variables: {},
-  elements: {
-    divider: {},
-  },
-};
