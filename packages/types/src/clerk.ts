@@ -484,6 +484,12 @@ export type UserButtonProps = {
    */
   afterSwitchSessionUrl?: string;
   /**
+   * Controls whether clicking the "Manage your account" button will cause
+   * the UserProfile component to open as a modal, or if the browser will navigate
+   * to the `userProfileUrl` where UserProfile is mounted as a page.
+   */
+  userProfileMode?: 'modal' | 'navigation';
+  /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvided (if one is provided)

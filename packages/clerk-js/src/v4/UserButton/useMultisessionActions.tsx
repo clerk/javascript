@@ -1,4 +1,4 @@
-import { ActiveSessionResource } from '@clerk/types';
+import { ActiveSessionResource, UserButtonProps } from '@clerk/types';
 import React from 'react';
 
 import { useCoreClerk, useCoreSessionList, useCoreUser } from '../../ui/contexts';
@@ -14,7 +14,7 @@ type UseMultisessionActionsParams = {
   navigateAfterSwitchSession?: () => any;
   userProfileUrl?: string;
   signInUrl?: string;
-};
+} & Pick<UserButtonProps, 'userProfileMode'>;
 
 export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   const { setActive, signOut, openUserProfile } = useCoreClerk();
@@ -35,13 +35,15 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   };
 
   const handleManageAccountClicked: React.MouseEventHandler<HTMLButtonElement> = () => {
+    if (opts.userProfileMode === 'navigation') {
+      return navigate(opts.userProfileUrl).finally(async () => {
+        await sleep(1000);
+        opts.actionCompleteCallback?.();
+      });
+    }
+
     openUserProfile();
     return opts.actionCompleteCallback?.();
-
-    return navigate(opts.userProfileUrl).finally(async () => {
-      await sleep(1000);
-      opts.actionCompleteCallback?.();
-    });
   };
 
   const handleSignOutAllClicked = () => {
