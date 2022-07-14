@@ -15,6 +15,7 @@ const Root = (props: FlowRootProps) => {
           elementDescriptor={descriptors.root}
           className={generateFlowClassname(props)}
           {...props}
+          sx={{ width: 'fit-content' }}
         />
       </InternalThemeProvider>
     </FlowMetadataProvider>

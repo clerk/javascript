@@ -30,6 +30,7 @@ export const PoweredByClerkTag = React.memo(
     const { branded } = useEnvironment().displayConfig;
 
     const topLeft = (theme: InternalTheme) => ({
+      left: '-1px',
       top: theme.radii.$lg,
       bottom: 'unset',
       transform: `rotate(-90deg) translateX(-10rem)`,
@@ -38,8 +39,9 @@ export const PoweredByClerkTag = React.memo(
     });
 
     const bottomLeft = (theme: InternalTheme) => ({
+      left: 0,
       top: ' unset',
-      bottom: 0,
+      bottom: '-1px',
       transform: `translateX(2rem) translateY(100%)`,
       borderRadius: `0 0 ${theme.radii.$md} ${theme.radii.$md}`,
       borderTopColor: 'transparent',
@@ -57,7 +59,6 @@ export const PoweredByClerkTag = React.memo(
           padding: `${theme.space.$1x5} ${theme.space.$4}`,
           position: 'absolute',
           transformOrigin: 'left bottom',
-          left: 0,
           ...topLeft(theme),
           [mqu.sm]: {
             ...bottomLeft(theme),
