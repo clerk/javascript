@@ -63,9 +63,9 @@ export const RemoveConnectedAccountPage = () => {
   return (
     <RemoveResourcePage
       title='Remove connected account'
-      messageLine1={`${providerToDisplayData[ref.current.provider].name} will be removed from this account.`}
+      messageLine1={`${providerToDisplayData[ref.current.provider]?.name} will be removed from this account.`}
       messageLine2={`You will no longer be able to sign in using this connected account.`}
-      successMessage={`${providerToDisplayData[ref.current.provider].name} has been removed from your account.`}
+      successMessage={`${providerToDisplayData[ref.current.provider]?.name} has been removed from your account.`}
       deleteResource={() => Promise.resolve(ref.current?.destroy())}
     />
   );
