@@ -57,7 +57,7 @@ const localFontIsAlreadyRegistered = (str: string) => {
   if (!isBrowser()) {
     return;
   }
-  return !![...document.fonts.values()].find(v => v.family === str);
+  return !![...document.fonts].find(v => v.family === str);
 };
 
 const localFontIsAlreadyLoaded = (str: string) => {
