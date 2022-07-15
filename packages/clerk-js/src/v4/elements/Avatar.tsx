@@ -32,7 +32,6 @@ export const Avatar = (props: AvatarProps) => {
   const initials = getInitials({ firstName, lastName, name });
   const fullName = getFullName({ firstName, lastName, name });
   const avatarExists = hasAvatar(profileImageUrl);
-
   let src;
 
   if (!avatarExists) {
@@ -103,6 +102,7 @@ function InitialsAvatarFallback(props: AvatarProps) {
 const CLERK_IMAGE_URL_REGEX = /https:\/\/images\.(lcl)?clerk/i;
 const GRAVATAR_DEFAULT_AVATAR = 'https://www.gravatar.com/avatar?d=mp';
 
+// TODO: How do we want to handle this?
 export function hasAvatar(profileImageUrl: string | undefined | null): boolean {
-  return CLERK_IMAGE_URL_REGEX.test(profileImageUrl!);
+  return CLERK_IMAGE_URL_REGEX.test(profileImageUrl!) || !!profileImageUrl;
 }
