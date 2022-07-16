@@ -39,5 +39,8 @@
   "bugs": {
     "url": "https://github.com/clerkinc/javascript/issues"
   },
-  "homepage": "https://clerk.dev/"
+  "homepage": "https://clerk.dev/",
+  "engines": {
+    "node": ">=14"
+  }
 }
