@@ -7,9 +7,12 @@ import React from 'react';
 import { useAppearance } from '../customizables';
 import { InternalTheme } from '../styledSystem';
 
+const el = document.querySelector('style#cl-style-insertion-point');
+
 const cache = createCache({
   key: 'cl-internal',
-  prepend: true,
+  prepend: !el,
+  insertionPoint: el ? (el as HTMLElement) : undefined,
 });
 
 type InternalThemeProviderProps = React.PropsWithChildren<{
