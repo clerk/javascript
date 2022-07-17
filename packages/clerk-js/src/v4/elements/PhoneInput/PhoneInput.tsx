@@ -95,6 +95,7 @@ export const PhoneInput = (props: PhoneInputProps) => {
         ref={reference}
         isOpen={isOpen}
         onClick={togglePopover}
+        isDisabled={rest.isDisabled}
       />
       <Input
         value={formattedPhoneNumber}
@@ -144,6 +145,7 @@ const DropdownTrigger = React.forwardRef<
       variant='ghost'
       textVariant='smallMedium'
       focusRing={false}
+      isDisabled={props.isDisabled}
       sx={theme => ({
         paddingLeft: theme.space.$3x5,
         paddingRight: theme.space.$3x5,

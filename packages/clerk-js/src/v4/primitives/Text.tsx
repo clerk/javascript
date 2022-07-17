@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { common, createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
+import { applyDataStateProps } from './applyDataStateProps';
 
 const { applyVariants, filterProps } = createVariants(theme => {
   return {
@@ -11,6 +12,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
       color: theme.colors.$colorText,
       margin: 0,
       fontSize: 'inherit',
+      ...common.disabled(theme),
     },
     variants: {
       variant: common.textVariants(theme),
@@ -36,8 +38,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
   };
 });
 
-export type TextProps = PrimitiveProps<'p'> &
-  StyleVariants<typeof applyVariants> & {
+export type TextProps = PrimitiveProps<'p'> & { isDisabled?: boolean } & StyleVariants<typeof applyVariants> & {
     as?: 'p' | 'div' | 'label' | 'code' | 'span' | 'li';
   };
 
@@ -46,7 +47,7 @@ export const Text = (props: TextProps): JSX.Element => {
   return (
     // @ts-ignore
     <As
-      {...filterProps(rest)}
+      {...applyDataStateProps(filterProps(rest))}
       css={applyVariants(props)}
     />
   );

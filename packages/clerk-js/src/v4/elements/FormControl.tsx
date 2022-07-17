@@ -27,6 +27,7 @@ type FormControlProps = {
   isDisabled?: boolean;
 } & PropsOfComponent<typeof Input>;
 
+// TODO: Convert this into a Component?
 const getInputElementForType = (type: FormControlProps['type']) => {
   return type === 'password' ? PasswordInput : type === 'tel' ? PhoneInput : Input;
 };
@@ -73,6 +74,7 @@ export const FormControl = (props: FormControlProps) => {
             as='span'
             colorScheme='neutral'
             variant='smallRegular'
+            isDisabled={isDisabled}
           >
             Optional
           </Text>
