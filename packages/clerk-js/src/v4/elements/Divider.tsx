@@ -1,14 +1,31 @@
-import { descriptors, Flex } from '../customizables';
+import { descriptors, Flex, Text } from '../customizables';
 
 export const Divider = () => {
   return (
     <Flex
-      elementDescriptor={descriptors.divider}
-      sx={theme => ({
-        width: '100%',
+      center
+      elementDescriptor={descriptors.dividerBox}
+    >
+      <DividerLine />
+      <Text
+        elementDescriptor={descriptors.dividerText}
+        variant='smallMedium'
+        colorScheme='neutral'
+        sx={t => ({ margin: `0 ${t.space.$4}`, '&:after': { content: '"or"' } })}
+      />
+      <DividerLine />
+    </Flex>
+  );
+};
+
+const DividerLine = () => {
+  return (
+    <Flex
+      elementDescriptor={descriptors.dividerLine}
+      sx={t => ({
+        flex: '1',
         height: '1px',
-        backgroundColor: theme.colors.$blackAlpha300,
-        display: 'none',
+        backgroundColor: t.colors.$blackAlpha300,
       })}
     />
   );

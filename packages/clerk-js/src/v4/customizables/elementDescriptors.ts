@@ -40,7 +40,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'socialButtons-buttonBlockArrow',
   'socialButtons-logo',
 
-  'divider',
+  'dividerBox',
+  'dividerText',
+  'dividerLine',
 
   'form',
   'form-fieldRow',
