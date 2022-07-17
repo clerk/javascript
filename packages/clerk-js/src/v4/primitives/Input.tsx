@@ -6,6 +6,7 @@ import { useInput } from './hooks/useInput';
 
 const { applyVariants, filterProps } = createVariants((theme, props) => ({
   base: {
+    boxSizing: 'inherit',
     margin: 0,
     outline: 0,
     padding: `${theme.space.$2x5} ${theme.space.$4}`,

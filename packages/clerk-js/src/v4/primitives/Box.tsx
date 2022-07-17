@@ -5,7 +5,7 @@ import { applyDataStateProps } from './applyDataStateProps';
 
 const { applyVariants } = createVariants(() => ({
   base: {
-    boxSizing: 'border-box',
+    boxSizing: 'inherit',
   },
   variants: {},
 }));

@@ -266,8 +266,8 @@ export type Variables = {
   /**
    * The default font that will be used in all components.
    * This can be the name of a custom font loaded by your code or the name of a web-safe font ((@link WebSafeFont})
-   * If a specific fontFamily is not provided, the components will automatically preconnect, preload, load and inject the "Inter" Google font.
-   * @default Inter
+   * If a specific fontFamily is not provided, the components will inherit the font of the parent element.
+   * @default inherit
    * @example
    * { fontFamily: 'Montserrat' }
    */
@@ -275,7 +275,7 @@ export type Variables = {
   /**
    * The default font that will be used in all buttons. See {@link Variables.fontFamily} for details.
    * If not provided, {@link Variables.fontFamily} will be used instead.
-   * @default Inter
+   * @default inherit
    */
   fontFamilyButtons?: FontFamily;
   /**
@@ -412,6 +412,12 @@ export const darkGlass = createClerkTheme({
     colorDanger: 'rgb(255,125,142)',
     colorSuccess: 'rgb(19,255,128)',
     fontSmoothing: 'auto',
+    fontFamily: 'Times New Roman',
+    // fontWeight: {
+    //   normal: '',
+    //   medium: '',
+    //   bold: '',
+    // },
   },
   elements: {
     card: {
@@ -423,3 +429,29 @@ export const darkGlass = createClerkTheme({
     socialButtonsLogo__github: { filter: 'invert(1)' },
   },
 });
+
+const appearance: Appearance = {
+  variables: {
+    alphaShadesMode: 'light',
+    colorDanger: 'red',
+    colorPrimary: {
+      '50': '#f0f3ff',
+      '100': '#d1dcff',
+      '200': '#91A7F7',
+      '300': '#6684F5',
+      '400': '#3B62F2',
+      '500': '#103FEF',
+      '600': '#0D33BF',
+      '700': '#0A268F',
+      '800': '#07195F',
+      '900': '#030D30',
+    },
+    colorSuccess: {
+      '500': 'green',
+    },
+  },
+
+  elements: {
+    divider: { backgroundColor: 'red' },
+  },
+};
