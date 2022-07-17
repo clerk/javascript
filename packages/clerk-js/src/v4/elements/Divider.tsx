@@ -11,8 +11,10 @@ export const Divider = () => {
         elementDescriptor={descriptors.dividerText}
         variant='smallMedium'
         colorScheme='neutral'
-        sx={t => ({ margin: `0 ${t.space.$4}`, '&:after': { content: '"or"' } })}
-      />
+        sx={t => ({ margin: `0 ${t.space.$4}` })}
+      >
+        or
+      </Text>
       <DividerLine />
     </Flex>
   );
