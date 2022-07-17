@@ -1,8 +1,7 @@
 import React from 'react';
 
 import { useEnvironment } from '../../ui/contexts';
-import { descriptors, Flex, useAppearance } from '../customizables';
-import { generateFlowPartClassname } from '../customizables/classGeneration';
+import { descriptors, Flex, generateFlowPartClassname, useAppearance } from '../customizables';
 import { mqu, PropsOfComponent } from '../styledSystem';
 import { ApplicationLogo } from './ApplicationLogo';
 import { useFlowMetadata } from './contexts';

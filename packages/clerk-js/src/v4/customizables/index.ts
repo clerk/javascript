@@ -23,3 +23,4 @@ export const Badge = makeCustomizable(Primitives.Badge);
 export * from './Flow';
 export { AppearanceProvider, useAppearance } from './AppearanceContext';
 export { descriptors } from './elementDescriptors';
+export { generateFlowPartClassname } from './classGeneration';

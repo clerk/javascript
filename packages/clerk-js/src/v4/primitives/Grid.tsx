@@ -5,6 +5,7 @@ import { Box, BoxProps } from './Box';
 
 const { applyVariants, filterProps } = createVariants(theme => ({
   base: {
+    boxSizing: 'border-box',
     display: 'grid',
   },
   variants: {
