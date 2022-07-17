@@ -94,10 +94,10 @@ export const createFontSizeScale = (theme: Theme): Record<keyof typeof fontSizes
 
 export const createFonts = (theme: Theme) => {
   const { fontFamily, fontFamilyButtons } = theme.variables || {};
-  if (fontFamily === undefined) {
-    return;
-  }
-  return { main: fontFamily, buttons: fontFamilyButtons || fontFamily };
+  return {
+    ...(fontFamily && { main: fontFamily }),
+    ...(fontFamilyButtons && { buttons: fontFamilyButtons || fontFamily }),
+  };
 };
 
 const splitCssUnit = (str: string) => {

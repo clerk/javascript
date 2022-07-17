@@ -1,44 +1,41 @@
 import { InternalTheme } from './types';
 
-const textVariants = (theme: InternalTheme) => {
+const textVariants = (t: InternalTheme) => {
   const base = {
-    WebkitFontSmoothing: theme.options.$fontSmoothing,
-    fontFamily: theme.fonts.$main,
+    WebkitFontSmoothing: t.options.$fontSmoothing,
   };
 
   const smallRegular = {
     ...base,
-    fontStyle: theme.fontStyles.$normal,
-    fontWeight: theme.fontWeights.$normal,
-    fontSize: theme.fontSizes.$xs,
-    lineHeight: theme.lineHeights.$shorter,
+    fontWeight: t.fontWeights.$normal,
+    fontSize: t.fontSizes.$xs,
+    lineHeight: t.lineHeights.$shorter,
   } as const;
 
   const smallMedium = {
     ...smallRegular,
-    fontWeight: theme.fontWeights.$medium,
-    lineHeight: theme.lineHeights.$short,
+    fontWeight: t.fontWeights.$medium,
+    lineHeight: t.lineHeights.$short,
   } as const;
 
   const smallSemibold = {
     ...smallMedium,
-    fontWeight: theme.fontWeights.$semibold,
+    fontWeight: t.fontWeights.$semibold,
   } as const;
 
   const extraSmallRegular = {
     ...base,
-    fontWeight: theme.fontWeights.$normal,
-    fontStyle: theme.fontStyles.$normal,
-    fontSize: theme.fontSizes.$2xs,
-    letterSpacing: theme.letterSpacings.$normal,
-    lineHeight: theme.lineHeights.$none,
+    fontWeight: t.fontWeights.$normal,
+    fontSize: t.fontSizes.$2xs,
+    letterSpacing: t.letterSpacings.$normal,
+    lineHeight: t.lineHeights.$none,
   } as const;
 
   const buttonSmall = {
     ...extraSmallRegular,
-    fontWeight: theme.fontWeights.$semibold,
+    fontWeight: t.fontWeights.$semibold,
     textTransform: 'uppercase',
-    fontFamily: theme.fonts.$buttons,
+    fontFamily: t.fonts.$buttons,
   } as const;
 
   const extraSmallMedium = {
@@ -48,43 +45,41 @@ const textVariants = (theme: InternalTheme) => {
 
   const regularRegular = {
     ...base,
-    fontStyle: theme.fontStyles.$normal,
-    fontWeight: theme.fontWeights.$normal,
-    fontSize: theme.fontSizes.$sm,
-    lineHeight: theme.lineHeights.$shorter,
+    fontWeight: t.fontWeights.$normal,
+    fontSize: t.fontSizes.$sm,
+    lineHeight: t.lineHeights.$shorter,
   } as const;
 
   const buttonRegularRegular = {
     ...regularRegular,
-    lineHeight: theme.lineHeights.$none,
+    lineHeight: t.lineHeights.$none,
   };
 
   const regularMedium = {
     ...regularRegular,
-    fontWeight: theme.fontWeights.$medium,
+    fontWeight: t.fontWeights.$medium,
   } as const;
 
   const largeSemibold = {
     ...base,
-    fontStyle: theme.fontStyles.$normal,
-    fontWeight: theme.fontWeights.$semibold,
-    fontSize: theme.fontSizes.$md,
-    lineHeight: theme.lineHeights.$taller,
+    fontWeight: t.fontWeights.$semibold,
+    fontSize: t.fontSizes.$md,
+    lineHeight: t.lineHeights.$taller,
   } as const;
 
   const largeMedium = {
     ...largeSemibold,
-    fontWeight: theme.fontWeights.$medium,
+    fontWeight: t.fontWeights.$medium,
   };
 
   const xlargeMedium = {
     ...largeSemibold,
-    fontSize: theme.fontSizes.$xl,
+    fontSize: t.fontSizes.$xl,
   } as const;
 
   const xxlargeMedium = {
     ...xlargeMedium,
-    fontSize: theme.fontSizes.$2xl,
+    fontSize: t.fontSizes.$2xl,
   } as const;
 
   return {
@@ -104,65 +99,65 @@ const textVariants = (theme: InternalTheme) => {
   } as const;
 };
 
-const fontSizeVariants = (theme: InternalTheme) => {
+const fontSizeVariants = (t: InternalTheme) => {
   return {
-    xss: { fontSize: theme.fontSizes.$2xs },
-    xs: { fontSize: theme.fontSizes.$xs },
-    sm: { fontSize: theme.fontSizes.$sm },
+    xss: { fontSize: t.fontSizes.$2xs },
+    xs: { fontSize: t.fontSizes.$xs },
+    sm: { fontSize: t.fontSizes.$sm },
   } as const;
 };
 
-const borderVariants = (theme: InternalTheme, props?: any) => {
+const borderVariants = (t: InternalTheme, props?: any) => {
   return {
     normal: {
-      borderRadius: theme.radii.$md,
-      border: theme.borders.$normal,
-      ...borderColor(theme, props),
+      borderRadius: t.radii.$md,
+      border: t.borders.$normal,
+      ...borderColor(t, props),
     },
   } as const;
 };
 
-const borderColor = (theme: InternalTheme, props?: any) => {
+const borderColor = (t: InternalTheme, props?: any) => {
   return {
-    borderColor: props?.hasError ? theme.colors.$danger500 : theme.colors.$blackAlpha300,
+    borderColor: props?.hasError ? t.colors.$danger500 : t.colors.$blackAlpha300,
   } as const;
 };
 
-const focusRing = (theme: InternalTheme) => {
+const focusRing = (t: InternalTheme) => {
   return {
     '&:focus': {
       '&::-moz-focus-inner': { border: '0' },
       WebkitTapHighlightColor: 'transparent',
       outline: 'none',
       outlineOffset: '0',
-      boxShadow: theme.shadows.$focusRing.replace('{{color}}', theme.colors.$primary200),
-      transitionProperty: theme.transitionProperty.$common,
-      transitionTimingFunction: theme.transitionTiming.$common,
-      transitionDuration: theme.transitionDuration.$focusRing,
+      boxShadow: t.shadows.$focusRing.replace('{{color}}', t.colors.$primary200),
+      transitionProperty: t.transitionProperty.$common,
+      transitionTimingFunction: t.transitionTiming.$common,
+      transitionDuration: t.transitionDuration.$focusRing,
     },
   } as const;
 };
 
-const focusRingInput = (theme: InternalTheme) => {
+const focusRingInput = (t: InternalTheme) => {
   return {
     '&:focus': {
       WebkitTapHighlightColor: 'transparent',
       outlineOffset: '2',
-      boxShadow: theme.shadows.$focusRingInput.replace('{{color}}', theme.colors.$primary200),
-      transitionProperty: theme.transitionProperty.$common,
-      transitionTimingFunction: theme.transitionTiming.$common,
-      transitionDuration: theme.transitionDuration.$focusRing,
-      borderColor: theme.colors.$primary200,
+      boxShadow: t.shadows.$focusRingInput.replace('{{color}}', t.colors.$primary200),
+      transitionProperty: t.transitionProperty.$common,
+      transitionTimingFunction: t.transitionTiming.$common,
+      transitionDuration: t.transitionDuration.$focusRing,
+      borderColor: t.colors.$primary200,
     },
   } as const;
 };
 
-const disabled = (theme: InternalTheme) => {
+const disabled = (t: InternalTheme) => {
   return {
     '&:disabled,&[data-disabled]': {
       cursor: 'not-allowed',
       pointerEvents: 'none',
-      opacity: theme.opacity.$disabled,
+      opacity: t.opacity.$disabled,
     },
   } as const;
 };

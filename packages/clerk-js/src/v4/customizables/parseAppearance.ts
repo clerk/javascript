@@ -3,7 +3,6 @@ import { Appearance, DeepPartial, Elements, Layout, Theme } from '@clerk/types';
 import { createInternalTheme, defaultInternalTheme } from '../foundations';
 import { InternalTheme } from '../styledSystem';
 import { fastDeepMergeAndReplace } from '../utils';
-import { loadFont } from './loadFont';
 import {
   createColorScales,
   createFonts,
@@ -43,7 +42,6 @@ export const parseAppearance = (appearanceObjects: Array<Appearance | undefined>
   const parsedInternalTheme = parseVariables(appearanceList);
   const parsedElements = parseElements(appearanceList);
   const parsedLayout = parseLayout(appearanceList);
-  loadDefaultFont(parsedInternalTheme);
   return { parsedElements, parsedInternalTheme, parsedLayout };
 };
 
@@ -75,13 +73,4 @@ const createInternalThemeFromVariables = (theme: Theme | undefined): DeepPartial
   const fonts = { ...createFonts(theme) };
   const options = { ...createThemeOptions(theme) };
   return createInternalTheme({ colors, radii, space, fontSizes, fonts, options } as any);
-};
-
-const loadDefaultFont = (theme: ParsedInternalTheme) => {
-  if (theme.fonts.$buttons === defaultInternalTheme.fonts.$buttons) {
-    loadFont(defaultInternalTheme.fonts.$buttons);
-  }
-  if (theme.fonts.$main === defaultInternalTheme.fonts.$main) {
-    loadFont(defaultInternalTheme.fonts.$buttons);
-  }
 };

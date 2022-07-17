@@ -38,8 +38,8 @@ const fontStyles = Object.freeze({
 } as const);
 
 const fonts = Object.freeze({
-  main: 'Inter',
-  buttons: 'Inter',
+  main: 'inherit',
+  buttons: 'inherit',
 } as const);
 
 export { fontSizes, fontWeights, letterSpacings, lineHeights, fonts, fontStyles };

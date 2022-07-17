@@ -13,7 +13,6 @@ import { VirtualRouter } from '../ui/router';
 import type { AvailableComponentProps } from '../ui/types';
 import { AvailableComponentCtx } from '../ui/types';
 import { AppearanceProvider } from './customizables';
-import { preconnectToGoogleFontsCdn } from './customizables/loadFont';
 import { FlowMetadataProvider, Modal } from './elements';
 import { useSafeLayoutEffect } from './hooks';
 import { SignIn, SignInModal } from './SignIn';
@@ -89,7 +88,6 @@ export const mountComponentRenderer = (
 ): ComponentControls => {
   // TODO: Init of components should start
   // before /env and /client requests
-  preconnectToGoogleFontsCdn();
   const clerkRoot = document.createElement('div');
   clerkRoot.setAttribute('id', 'clerk-components');
   document.body.appendChild(clerkRoot);
