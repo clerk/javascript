@@ -140,7 +140,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
   return (
     <button
       {...applyDataStateProps(rest)}
-      type={rest.type || 'button'}
+      type={rest.type}
       disabled={isDisabled}
       css={applyVariants(parsedProps)}
       ref={ref}

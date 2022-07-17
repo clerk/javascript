@@ -1,7 +1,8 @@
 import React from 'react';
 
-import { Col, descriptors } from '../customizables';
+import { descriptors } from '../customizables';
 import { FlowMetadata, FlowMetadataProvider, useFlowMetadata } from '../elements';
+import { RootBox } from '../elements/RootBox';
 import { InternalThemeProvider } from '../styledSystem';
 import { generateFlowClassname } from './classGeneration';
 
@@ -11,11 +12,10 @@ const Root = (props: FlowRootProps) => {
   return (
     <FlowMetadataProvider flow={props.flow}>
       <InternalThemeProvider>
-        <Col
+        <RootBox
           elementDescriptor={descriptors.root}
           className={generateFlowClassname(props)}
           {...props}
-          sx={{ width: 'fit-content' }}
         />
       </InternalThemeProvider>
     </FlowMetadataProvider>
