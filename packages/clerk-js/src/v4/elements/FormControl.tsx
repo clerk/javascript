@@ -62,21 +62,21 @@ export const FormControl = (props: FormControlProps) => {
           hasError={hasError}
           isDisabled={isDisabled}
           isRequired={isRequired}
-          sx={{ display: 'inline-flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}
+          sx={{ marginRight: 'auto' }}
         >
           {label}
-          {isOptional && (
-            <Text
-              elementDescriptor={descriptors.formFieldHintText}
-              elementId={descriptors.formFieldHintText.setId(id)}
-              as='span'
-              colorScheme='neutral'
-              variant='smallRegular'
-            >
-              Optional
-            </Text>
-          )}
         </FormLabel>
+        {isOptional && !actionLabel && (
+          <Text
+            elementDescriptor={descriptors.formFieldHintText}
+            elementId={descriptors.formFieldHintText.setId(id)}
+            as='span'
+            colorScheme='neutral'
+            variant='smallRegular'
+          >
+            Optional
+          </Text>
+        )}
         {actionLabel && (
           <Link
             elementDescriptor={descriptors.formFieldAction}
