@@ -6,7 +6,7 @@ import { factorHasLocalStrategy } from '../../ui/signIn/utils';
 import { descriptors, Flex, Flow } from '../customizables';
 import { ArrowBlockButton, Card, CardAlert, Footer, Header } from '../elements';
 import { useCardState } from '../elements/contexts';
-import { allStrategiesButtonsComparator, formatIdentifier } from '../utils';
+import { allStrategiesButtonsComparator, formatSafeIdentifier } from '../utils';
 import { HavingTrouble } from './HavingTrouble';
 import { SignInSocialButtons } from './SignInSocialButtons';
 
@@ -85,11 +85,11 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
 export function getButtonLabel(factor: SignInFactor): string {
   switch (factor.strategy) {
     case 'email_link':
-      return `Send link to ${formatIdentifier(factor.safeIdentifier)}`;
+      return `Send link to ${formatSafeIdentifier(factor.safeIdentifier)}`;
     case 'email_code':
-      return `Send code to ${formatIdentifier(factor.safeIdentifier)}`;
+      return `Send code to ${formatSafeIdentifier(factor.safeIdentifier)}`;
     case 'phone_code':
-      return `Send code to ${formatIdentifier(factor.safeIdentifier)}`;
+      return `Send code to ${formatSafeIdentifier(factor.safeIdentifier)}`;
     case 'password':
       return 'Sign in with your password';
     default:

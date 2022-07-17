@@ -12,6 +12,6 @@ export * from './sleep';
 export * from './isMobileDevice';
 export * from './getFullName';
 export * from './phoneUtils';
-export * from './formatIdentifier';
+export * from './formatSafeIdentifier';
 export * from './removeUndefinedProps';
 export * from './getIdentifier';
