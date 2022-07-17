@@ -2,7 +2,7 @@ import { Theme } from '@clerk/types';
 
 import { blackAlpha, whiteAlpha } from '../foundations';
 import { spaceScaleKeys } from '../foundations/sizes';
-import { fontSizes } from '../foundations/typography';
+import { fontSizes, fontWeights } from '../foundations/typography';
 import { colors, removeUndefinedProps } from '../utils';
 import { colorOptionToHslaScale } from './colorOptionToHslaScale';
 
@@ -90,6 +90,11 @@ export const createFontSizeScale = (theme: Theme): Record<keyof typeof fontSizes
     xl: (numericValue * 1.25).toString() + unit,
     '2xl': (numericValue * 2).toString() + unit,
   };
+};
+
+export const createFontWeightScale = (theme: Theme): Record<keyof typeof fontWeights, any> => {
+  const { fontWeight } = theme.variables || {};
+  return { ...fontWeights, ...fontWeight };
 };
 
 export const createFonts = (theme: Theme) => {

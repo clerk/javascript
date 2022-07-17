@@ -20,6 +20,8 @@ export type CssColorOrScale = string | ColorScaleWithRequiredBase;
 type CssColor = string | TransparentColor | BuiltInColors;
 type CssLengthUnit = string;
 type FontSmoothing = 'auto' | 'antialiased' | 'never';
+type FontWeight = 400 | 500 | 600;
+type FontWeightScale = { normal?: FontWeight; medium?: FontWeight; bold?: FontWeight };
 
 type WebSafeFont =
   | 'Arial'
@@ -289,6 +291,12 @@ export type Variables = {
    * @default auto;
    */
   fontSmoothing?: FontSmoothing;
+  /**
+   * The font weight the components will use. By default, the components will use the 400, 500 and 600 weights for normal, medium and bold
+   * text respectively. You can override the default weights by passing a {@FontWeightScale} object
+   * @default { normal: 400, medium: 500, bold: 600 };
+   */
+  fontWeight?: FontWeightScale;
   /**
    * The size that will be used as the `md` base borderRadius value. This is used as the base to calculate the `lg`, `xl`, `2xl`
    * our components use. As a general rule, the bigger an element is, the larger its borderRadius is going to be.

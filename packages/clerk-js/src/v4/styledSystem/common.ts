@@ -18,9 +18,9 @@ const textVariants = (t: InternalTheme) => {
     lineHeight: t.lineHeights.$short,
   } as const;
 
-  const smallSemibold = {
+  const smallBold = {
     ...smallMedium,
-    fontWeight: t.fontWeights.$semibold,
+    fontWeight: t.fontWeights.$bold,
   } as const;
 
   const extraSmallRegular = {
@@ -33,7 +33,7 @@ const textVariants = (t: InternalTheme) => {
 
   const buttonSmall = {
     ...extraSmallRegular,
-    fontWeight: t.fontWeights.$semibold,
+    fontWeight: t.fontWeights.$bold,
     textTransform: 'uppercase',
     fontFamily: t.fonts.$buttons,
   } as const;
@@ -60,20 +60,20 @@ const textVariants = (t: InternalTheme) => {
     fontWeight: t.fontWeights.$medium,
   } as const;
 
-  const largeSemibold = {
+  const largeBold = {
     ...base,
-    fontWeight: t.fontWeights.$semibold,
+    fontWeight: t.fontWeights.$bold,
     fontSize: t.fontSizes.$md,
     lineHeight: t.lineHeights.$taller,
   } as const;
 
   const largeMedium = {
-    ...largeSemibold,
+    ...largeBold,
     fontWeight: t.fontWeights.$medium,
   };
 
   const xlargeMedium = {
-    ...largeSemibold,
+    ...largeBold,
     fontSize: t.fontSizes.$xl,
   } as const;
 
@@ -89,11 +89,11 @@ const textVariants = (t: InternalTheme) => {
     extraSmallMedium,
     smallRegular,
     smallMedium,
-    smallSemibold,
+    smallBold,
     regularRegular,
     regularMedium,
     largeMedium,
-    largeSemibold,
+    largeBold,
     xlargeMedium,
     xxlargeMedium,
   } as const;

@@ -1,7 +1,7 @@
 const fontWeights = Object.freeze({
   normal: 400,
   medium: 500,
-  semibold: 600,
+  bold: 600,
 } as const);
 
 const lineHeights = Object.freeze({
