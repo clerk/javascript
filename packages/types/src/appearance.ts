@@ -363,9 +363,9 @@ export type Layout = {
    */
   socialButtonsVariant?: 'auto' | 'iconButton' | 'blockButton';
   /**
-   * Controls whether the logo will be rendered inside or outside the component card.
-   * To customise the logo further, you can use {@link Appearance.elements}
-   * @default inside
+   * Controls whether the social buttons will be rendered above or below the card form.
+   * To customise the social button container further, you can use {@link Appearance.elements}
+   * @default 'top'
    */
   socialButtonsPlacement?: 'top' | 'bottom';
 };
