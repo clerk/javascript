@@ -59,7 +59,7 @@ const FooterLink = (props: PropsOfComponent<typeof Link>): JSX.Element => {
 };
 
 const FooterLinks = React.memo((): JSX.Element => {
-  const paths = useOptions().paths || {};
+  const links = useOptions().links || {};
   return (
     <Flex
       elementDescriptor={descriptors.footerPages}
@@ -71,29 +71,29 @@ const FooterLinks = React.memo((): JSX.Element => {
         },
       })}
     >
-      {paths.helpPageUrl && (
+      {links.helpPageUrl && (
         <FooterLink
           elementId={descriptors.footerPagesLink.setId('help')}
           isExternal
-          href={paths.helpPageUrl}
+          href={links.helpPageUrl}
         >
           Help
         </FooterLink>
       )}
-      {paths.privacyPageUrl && (
+      {links.privacyPageUrl && (
         <FooterLink
           elementId={descriptors.footerPagesLink.setId('privacy')}
           isExternal
-          href={paths.privacyPageUrl}
+          href={links.privacyPageUrl}
         >
           Privacy
         </FooterLink>
       )}
-      {paths.termsPageUrl && (
+      {links.termsPageUrl && (
         <FooterLink
           elementId={descriptors.footerPagesLink.setId('terms')}
           isExternal
-          href={paths.termsPageUrl}
+          href={links.termsPageUrl}
         >
           Terms
         </FooterLink>

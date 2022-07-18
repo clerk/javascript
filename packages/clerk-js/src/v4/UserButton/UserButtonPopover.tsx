@@ -115,15 +115,15 @@ const Footer = () => {
 };
 
 const Links = () => {
-  const paths = useOptions().paths || {};
-  if (!paths.termsPageUrl && !paths.privacyPageUrl) {
+  const links = useOptions().links || {};
+  if (!links.termsPageUrl && !links.privacyPageUrl) {
     return null;
   }
 
   return (
     <Flex gap={4}>
-      {paths.termsPageUrl && <UserButtonLink href={paths.termsPageUrl}>Terms</UserButtonLink>}
-      {paths.privacyPageUrl && <UserButtonLink href={paths.privacyPageUrl}>Privacy</UserButtonLink>}
+      {links.termsPageUrl && <UserButtonLink href={links.termsPageUrl}>Terms</UserButtonLink>}
+      {links.privacyPageUrl && <UserButtonLink href={links.privacyPageUrl}>Privacy</UserButtonLink>}
     </Flex>
   );
 };

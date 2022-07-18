@@ -302,7 +302,7 @@ export type CustomNavigation = (to: string) => Promise<unknown> | void;
 
 export type ClerkThemeOptions = DeepSnakeToCamel<DeepPartial<DisplayThemeJSON>>;
 
-type PathOptions = {
+type LinkOptions = {
   /**
    * This options enables the "Terms" link which is, by default, displayed on the bottom-right corner of the
    * prebuilt components. Clicking the link will open the passed URL in a new tab
@@ -324,7 +324,7 @@ export interface ClerkOptions {
   navigate?: (to: string) => Promise<unknown> | unknown;
   polling?: boolean;
   selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;
-  paths?: PathOptions;
+  links?: LinkOptions;
   appearance?: Appearance;
   /** Optional support email for display in authentication screens */
   supportEmail?: string;
