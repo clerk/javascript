@@ -199,7 +199,7 @@ const NavButton = (props: NavButtonProps) => {
     <Button
       variant='ghost'
       colorScheme='neutral'
-      textVariant='regularMedium'
+      textVariant='buttonRegularMedium'
       isActive={isActive}
       {...rest}
       sx={theme => ({

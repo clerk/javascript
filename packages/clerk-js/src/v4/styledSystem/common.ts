@@ -3,6 +3,7 @@ import { InternalTheme } from './types';
 const textVariants = (t: InternalTheme) => {
   const base = {
     WebkitFontSmoothing: t.options.$fontSmoothing,
+    fontFamily: 'inherit',
   };
 
   const smallRegular = {
@@ -84,10 +85,17 @@ const textVariants = (t: InternalTheme) => {
     lineHeight: t.lineHeights.$none,
   };
 
+  const buttonRegularMedium = {
+    ...regularMedium,
+    fontFamily: t.fonts.$buttons,
+    lineHeight: t.lineHeights.$none,
+  };
+
   return {
     buttonExtraSmallBold,
     buttonSmallRegular,
     buttonRegularRegular,
+    buttonRegularMedium,
     extraSmallRegular,
     smallRegular,
     smallMedium,
