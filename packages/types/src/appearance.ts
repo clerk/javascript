@@ -422,7 +422,6 @@ export const darkGlass = createClerkTheme({
     colorDanger: 'rgb(255,125,142)',
     colorSuccess: 'rgb(19,255,128)',
     fontSmoothing: 'auto',
-    fontFamily: 'Times New Roman',
     // fontWeight: {
     //   normal: '',
     //   medium: '',
@@ -439,29 +438,3 @@ export const darkGlass = createClerkTheme({
     socialButtonsLogo__github: { filter: 'invert(1)' },
   },
 });
-
-const appearance: Appearance = {
-  variables: {
-    alphaShadesMode: 'light',
-    colorDanger: 'red',
-    colorPrimary: {
-      '50': '#f0f3ff',
-      '100': '#d1dcff',
-      '200': '#91A7F7',
-      '300': '#6684F5',
-      '400': '#3B62F2',
-      '500': '#103FEF',
-      '600': '#0D33BF',
-      '700': '#0A268F',
-      '800': '#07195F',
-      '900': '#030D30',
-    },
-    colorSuccess: {
-      '500': 'green',
-    },
-  },
-
-  elements: {
-    divider: { backgroundColor: 'red' },
-  },
-};
