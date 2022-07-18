@@ -193,7 +193,7 @@ export function _SignInStart(): JSX.Element {
         >
           <SocialButtonsReversibleContainer>
             <SignInSocialButtons />
-            <Divider />
+            {hasSocialOrWeb3Buttons && <Divider />}
             {standardFormAttributes.length && (
               <Form.Root onSubmit={handleFirstPartySubmit}>
                 <Form.ControlRow>

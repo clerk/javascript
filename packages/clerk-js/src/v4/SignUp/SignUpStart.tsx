@@ -180,6 +180,8 @@ function _SignUpStart(): JSX.Element {
   }
 
   const canToggleEmailPhone = emailOrPhone(attributes, isProgressiveSignUp);
+  const hasSocialOrWeb3Buttons =
+    !!userSettings.socialProviderStrategies.length || !!userSettings.web3FirstFactors.length;
 
   return (
     <Flow.Part part='start'>
@@ -196,7 +198,7 @@ function _SignUpStart(): JSX.Element {
         >
           <SocialButtonsReversibleContainer>
             {(!hasTicket || missingRequirementsWithTicket) && <SignUpSocialButtons />}
-            <Divider />
+            {hasSocialOrWeb3Buttons && <Divider />}
             {showFormFields(userSettings) && (
               <SignUpForm
                 handleSubmit={handleSubmit}

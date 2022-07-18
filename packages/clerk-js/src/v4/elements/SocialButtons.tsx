@@ -19,11 +19,15 @@ const isWeb3Strategy = (val: string): val is Web3Strategy => {
   return val.startsWith('web3_');
 };
 
-export const SocialButtons = React.memo((props: SocialButtonsRootProps): JSX.Element => {
+export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   const { oauthCallback, web3Callback } = props;
   const { strategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
   const card = useCardState();
   const { socialButtonsVariant } = useAppearance().parsedLayout;
+
+  if (!strategies.length) {
+    return null;
+  }
 
   const preferBlockButtons =
     socialButtonsVariant === 'blockButton'
