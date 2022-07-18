@@ -57,6 +57,8 @@ const FormSubmit = (props: PropsOfComponent<typeof Button>) => {
         textVariant='buttonExtraSmallBold'
         isLoading={isLoading}
         isDisabled={isDisabled}
+        // Explicitly remove type=submit or type=button
+        type={undefined}
         {...props}
       />
     </>
