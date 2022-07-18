@@ -8,10 +8,12 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
   base: {
     boxSizing: 'inherit',
     margin: 0,
-    outline: 0,
     padding: `${theme.space.$2x5} ${theme.space.$4}`,
     backgroundColor: theme.colors.$colorInputBackground,
     color: theme.colors.$colorInputText,
+    // outline support for Windows contrast themes
+    outline: 'transparent solid 2px',
+    outlineOffset: '2px',
     width: '100%',
     ...common.textVariants(theme).smallRegular,
     ...common.borderVariants(theme, props).normal,

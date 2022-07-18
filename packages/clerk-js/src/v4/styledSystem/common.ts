@@ -128,8 +128,6 @@ const focusRing = (t: InternalTheme) => {
     '&:focus': {
       '&::-moz-focus-inner': { border: '0' },
       WebkitTapHighlightColor: 'transparent',
-      outline: 'none',
-      outlineOffset: '0',
       boxShadow: t.shadows.$focusRing.replace('{{color}}', t.colors.$primary200),
       transitionProperty: t.transitionProperty.$common,
       transitionTimingFunction: t.transitionTiming.$common,
@@ -142,7 +140,6 @@ const focusRingInput = (t: InternalTheme) => {
   return {
     '&:focus': {
       WebkitTapHighlightColor: 'transparent',
-      outlineOffset: '2',
       boxShadow: t.shadows.$focusRingInput.replace('{{color}}', t.colors.$primary200),
       transitionProperty: t.transitionProperty.$common,
       transitionTimingFunction: t.transitionTiming.$common,
