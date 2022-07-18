@@ -31,29 +31,12 @@ const textVariants = (t: InternalTheme) => {
     lineHeight: t.lineHeights.$none,
   } as const;
 
-  const buttonSmall = {
-    ...extraSmallRegular,
-    fontWeight: t.fontWeights.$bold,
-    textTransform: 'uppercase',
-    fontFamily: t.fonts.$buttons,
-  } as const;
-
-  const extraSmallMedium = {
-    ...buttonSmall,
-    textTransform: 'none',
-  } as const;
-
   const regularRegular = {
     ...base,
     fontWeight: t.fontWeights.$normal,
     fontSize: t.fontSizes.$sm,
     lineHeight: t.lineHeights.$shorter,
   } as const;
-
-  const buttonRegularRegular = {
-    ...regularRegular,
-    lineHeight: t.lineHeights.$none,
-  };
 
   const regularMedium = {
     ...regularRegular,
@@ -82,11 +65,30 @@ const textVariants = (t: InternalTheme) => {
     fontSize: t.fontSizes.$2xl,
   } as const;
 
+  const buttonExtraSmallBold = {
+    ...extraSmallRegular,
+    fontWeight: t.fontWeights.$bold,
+    textTransform: 'uppercase',
+    fontFamily: t.fonts.$buttons,
+  } as const;
+
+  const buttonSmallRegular = {
+    ...smallRegular,
+    fontFamily: t.fonts.$buttons,
+    lineHeight: t.lineHeights.$none,
+  };
+
+  const buttonRegularRegular = {
+    ...regularRegular,
+    fontFamily: t.fonts.$buttons,
+    lineHeight: t.lineHeights.$none,
+  };
+
   return {
-    buttonSmall,
+    buttonExtraSmallBold,
+    buttonSmallRegular,
     buttonRegularRegular,
     extraSmallRegular,
-    extraSmallMedium,
     smallRegular,
     smallMedium,
     smallBold,

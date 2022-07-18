@@ -54,7 +54,7 @@ const FormSubmit = (props: PropsOfComponent<typeof Button>) => {
       <Button
         elementDescriptor={descriptors.formButtonPrimary}
         block
-        textVariant='buttonSmall'
+        textVariant='buttonExtraSmallBold'
         isLoading={isLoading}
         isDisabled={isDisabled}
         {...props}
@@ -71,7 +71,7 @@ const FormReset = (props: PropsOfComponent<typeof Button>) => {
         elementDescriptor={descriptors.formButtonReset}
         block
         variant='ghost'
-        textVariant='buttonSmall'
+        textVariant='buttonExtraSmallBold'
         type='reset'
         isDisabled={isLoading || isDisabled}
         {...props}

@@ -52,7 +52,6 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
     <Button
       variant='outline'
       colorScheme='neutral'
-      textVariant='smallRegular'
       block
       {...rest}
       sx={theme => [
@@ -83,6 +82,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
               elementDescriptor={spinnerElementDescriptor}
               elementId={spinnerElementId}
               sx={{ position: 'absolute' }}
+              size={'sm'}
             />
           ) : (
             leftIcon
@@ -95,7 +95,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
         as='span'
         truncate
         colorScheme='inherit'
-        variant={'smallRegular'}
+        variant='buttonSmallRegular'
       >
         {children}
       </Text>
