@@ -1,10 +1,19 @@
-import { ClerkAPIResponseError, ClerkBackendAPI } from '@clerk/backend-core';
+import fetch from 'node-fetch';
 
-import { LIB_NAME, LIB_VERSION } from '../info';
+import { ClerkBackendAPI } from '../api/ClerkBackendApi';
+import { ClerkAPIResponseError } from '../api/errors';
 
-export const ClerkAPI = new ClerkBackendAPI({
-  libName: LIB_NAME,
-  libVersion: LIB_VERSION,
+const defaultAPIKey = process.env.CLERK_API_KEY || '';
+const defaultAPIVersion = process.env.CLERK_API_VERSION || 'v1';
+
+export const defaultServerAPIUrl = process.env.CLERK_API_URL || 'https://api.clerk.dev';
+
+export const TestClerkAPI = new ClerkBackendAPI({
+  apiKey: defaultAPIKey,
+  apiVersion: defaultAPIVersion,
+  apiUrl: defaultServerAPIUrl,
+  libName: 'test',
+  libVersion: '0.0.1',
   apiClient: {
     async request({ url, method, queryParams, headerParams, bodyParams }) {
       // Build final URL with search parameters
@@ -21,10 +30,7 @@ export const ClerkAPI = new ClerkBackendAPI({
 
       const response = await fetch(finalUrl.href, {
         method,
-        headers: {
-          ...(headerParams as Record<string, string>),
-          'X-Clerk-SDK': `vercel-edge/${LIB_VERSION}`,
-        },
+        headers: headerParams as Record<string, string>,
         ...(bodyParams && Object.keys(bodyParams).length > 0 && { body: JSON.stringify(bodyParams) }),
       });
 

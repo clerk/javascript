@@ -1,10 +1,10 @@
+import { AuthStatus } from '@clerk/backend-core';
 import type { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
-import Clerk from '../Clerk';
-import { AuthStatus } from '@clerk/backend-core';
+import Clerk, { WithAuthProp } from '../Clerk';
 
-const mockGetToken = () => {};
+const mockGetToken = jest.fn();
 
 jest.mock('@clerk/backend-core', () => {
   return {
@@ -50,29 +50,27 @@ afterEach(() => {
 
 test('expressWithAuth with no session token', async () => {
   // @ts-ignore
-  const req = {} as Request;
+  const req = {} as WithAuthProp<Request>;
   const res = {} as Response;
 
   const clerk = Clerk.getInstance();
 
-  await clerk.expressWithAuth()(req, res, mockNext as NextFunction);
+  const clerkMiddleware = clerk.expressWithAuth();
+  await clerkMiddleware(req, res, mockNext as NextFunction);
 
-  // @ts-ignore
   expect(req.auth).toEqual(mockAuthSignedOutProp);
-
-  expect(mockNext).toHaveBeenCalledWith(); // 0 args
+  expect(mockNext).toHaveBeenCalledWith();
 });
 
 test('expressRequireAuth with no session token', async () => {
-  // @ts-ignore
-  const req = {} as Request;
+  const req = {} as WithAuthProp<Request>;
   const res = {} as Response;
 
   const clerk = Clerk.getInstance();
 
-  await clerk.expressRequireAuth()(req, res, mockNext as NextFunction);
+  const clerkRequireAuthMiddleware = clerk.expressRequireAuth();
+  await clerkRequireAuthMiddleware(req, res, mockNext as NextFunction);
 
-  // @ts-ignore
   expect(req.auth).toEqual(mockAuthSignedOutProp);
 
   expect(mockNext).toHaveBeenCalled();
@@ -80,8 +78,9 @@ test('expressRequireAuth with no session token', async () => {
 });
 
 test('expressWithAuth with Authorization header', async () => {
-  // @ts-ignore
-  const req = { headers: { authorization: mockToken } } as Request;
+  const req = {
+    headers: { authorization: mockToken },
+  } as WithAuthProp<Request>;
   const res = {} as Response;
 
   const clerk = Clerk.getInstance();
@@ -89,16 +88,17 @@ test('expressWithAuth with Authorization header', async () => {
     .fn()
     .mockReturnValueOnce(mockGetAuthStateResult);
 
-  await clerk.expressWithAuth()(req, res, mockNext as NextFunction);
+  const clerkWithAuthMiddleware = clerk.expressWithAuth();
+  await clerkWithAuthMiddleware(req, res, mockNext as NextFunction);
 
-  // @ts-ignore
   expect(req.auth).toEqual(mockAuthProp);
   expect(mockNext).toHaveBeenCalledWith();
 });
 
 test('expressWithAuth with Authorization header in Bearer format', async () => {
-  // @ts-ignore
-  const req = { headers: { authorization: `Bearer ${mockToken}` } } as Request;
+  const req = {
+    headers: { authorization: `Bearer ${mockToken}` },
+  } as WithAuthProp<Request>;
   const res = {} as Response;
 
   const clerk = Clerk.getInstance();
@@ -106,36 +106,38 @@ test('expressWithAuth with Authorization header in Bearer format', async () => {
     .fn()
     .mockReturnValueOnce(mockGetAuthStateResult);
 
-  await clerk.expressWithAuth()(req, res, mockNext as NextFunction);
+  const clerkWithAuthMiddleware = clerk.expressWithAuth();
+  await clerkWithAuthMiddleware(req, res, mockNext as NextFunction);
 
-  // @ts-ignore
   expect(req.auth).toEqual(mockAuthProp);
-
-  expect(mockNext).toHaveBeenCalledWith(); // 0 args
+  expect(mockNext).toHaveBeenCalledWith();
 });
 
 test('expressWithAuth non-browser request (curl)', async () => {
   // @ts-ignore
-  const req = { headers: { 'User-Agent': 'curl/7.64.1' } } as Request;
+  const req = {
+    headers: { 'User-Agent': 'curl/7.64.1' },
+  } as WithAuthProp<Request>;
   const res = {} as Response;
 
   const clerk = Clerk.getInstance();
-  await clerk.expressWithAuth()(req, res, mockNext as NextFunction);
 
-  // @ts-ignore
+  const clerkWithAuthMiddleware = clerk.expressWithAuth();
+  await clerkWithAuthMiddleware(req, res, mockNext as NextFunction);
+
   expect(req.auth).toEqual(mockAuthSignedOutProp);
-  expect(mockNext).toHaveBeenCalledWith(); // 0 args
+  expect(mockNext).toHaveBeenCalledWith();
 });
 
 test('expressWithAuth with empty Authorization header', async () => {
-  // @ts-ignore
-  const req = { headers: { authorization: '' } } as Request;
+  const req = { headers: { authorization: '' } } as WithAuthProp<Request>;
   const res = {} as Response;
 
   const clerk = Clerk.getInstance();
-  await clerk.expressWithAuth()(req, res, mockNext as NextFunction);
 
-  //@ts-ignore
+  const clerkWithAuthMiddleware = clerk.expressWithAuth();
+  await clerkWithAuthMiddleware(req, res, mockNext as NextFunction);
+
   expect(req.auth).toEqual(mockAuthSignedOutProp);
-  expect(mockNext).toHaveBeenCalledWith(); // 0 args
+  expect(mockNext).toHaveBeenCalledWith();
 });

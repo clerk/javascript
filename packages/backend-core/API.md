@@ -32,11 +32,19 @@ Reference of the methods supported in the Clerk Backend API wrapper. [API refere
   - [createOrganizationMembership(params)](#createorganizationmembershipparams)
   - [updateOrganizationMembership(params)](#updateorganizationmembershipparams)
   - [deleteOrganizationMembership(params)](#deleteorganizationmembershipparams)
+- [Redirect URLs](#redirect_urls)
+  - [createRedirectUrl](#create-redirect-url)
+  - [getRedirectUrlList](#get-redirect-url-list)
+  - [getRedirectUrl](#get-redirect-url)
+  - [deleteRedirectUrl](#delete-redirect-url)
 - [Session operations](#session-operations)
   - [getSessionList({ clientId, userId })](#getsessionlist-clientid-userid-)
   - [getSession(sessionId)](#getsessionsessionid)
   - [revokeSession(sessionId)](#revokesessionsessionid)
   - [verifySession(sessionId, sessionToken)](#verifysessionsessionid-sessiontoken)
+- [Sign in tokens](#sign-in-tokens)
+  - [createSignInToken({ user_id, expires_in_seconds })](#create-sign-in-token)
+  - [revokeSignInToken(tokenId)](#revoke-sign-in-token)
 - [User operations](#user-operations)
   - [getUserList()](#getuserlist)
   - [getUser(userId)](#getuseruserid)
@@ -382,6 +390,44 @@ const membership = await clerkAPI.organizations.deleteOrganizationMembership({
 });
 ```
 
+## Redirect URLs operations
+
+Redirect URLs endpoints are used to whitelist URLs for native application authentication flows such as OAuth sign-ins and sign-ups in [React Native](https://clerk.dev/docs/reference/clerk-expo) and [Expo](https://clerk.dev/docs/reference/clerk-expo).
+
+Redirect URL operations are exposed by the `redirectUrls` sub-api (`clerkAPI.redirectUrls`).
+
+#### createRedirectUrl({ url })
+
+Creates a new redirect URL:
+
+```ts
+const redirectUrl = await clerkAPI.redirectUrls.createRedirectUrl({ url });
+```
+
+#### getRedirectUrlList()
+
+Get the list of all redirect URLs:
+
+```ts
+const redirectUrlList = await clerkAPI.redirectUrls.getRedirectUrlList();
+```
+
+#### getRedirectUrl(redirectUrlId)
+
+Retrieve a redirect URL:
+
+```ts
+const redirectUrl = await clerkAPI.redirectUrls.getRedirectUrl('redirect_url_test');
+```
+
+#### deleteRedirectUrl(redirectUrlId)
+
+Delete a redirect URL:
+
+```ts
+await clerkAPI.redirectUrls.deleteRedirectUrl('redirect_url_test');
+```
+
 ## Session operations
 
 Session operations are exposed by the `sessions` sub-api (`clerkAPI.sessions`).
@@ -432,6 +478,28 @@ Verifies whether a session with a given id corresponds to the provided session t
 const sessionId = 'my-session-id';
 const sessionToken = 'my-session-token';
 const session = await clerkAPI.sessions.verifySession(sessionId, sessionToken);
+```
+
+## Sign in token operations
+
+Generate a token for an existing user to sign in without him needing to apply any first-factor type authentication.
+
+_Second-factor type inputs would still need to be filled._
+
+#### createSignInToken(params)
+
+Creates a sign in token:
+
+```ts
+const signInToken = await clerkAPI.signInTokens.createSignInToken({ userId: 'user_test_id', expiresInSeconds: 60 });
+```
+
+#### revokeSignInToken(signInTokenId)
+
+Revokes an issued sign in token.
+
+```ts
+await clerkAPI.signInTokens.revokeSignInToken('token_test_id');
 ```
 
 ## User operations
