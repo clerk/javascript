@@ -92,6 +92,7 @@ export const BaseCard = React.forwardRef<HTMLDivElement, BaseCardProps>((props, 
           transitionProperty: t.transitionProperty.$common,
           transitionDuration: '200ms',
           boxShadow: t.shadows.$cardDropShadow,
+          border: '1px solid transparent',
         }),
         props.sx,
       ]}
