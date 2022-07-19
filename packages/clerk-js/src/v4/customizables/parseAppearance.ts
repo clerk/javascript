@@ -11,7 +11,6 @@ import {
   createRadiiUnits,
   createSpaceScale,
   createThemeOptions,
-  reverseAlphaScalesIfNeeded,
 } from './parseVariables';
 
 export type ParsedElements = Elements[];
@@ -67,7 +66,7 @@ const createInternalThemeFromVariables = (theme: Theme | undefined): DeepPartial
   if (!theme) {
     return {};
   }
-  const colors = { ...createColorScales(theme), ...reverseAlphaScalesIfNeeded(theme) };
+  const colors = { ...createColorScales(theme) };
   const radii = { ...createRadiiUnits(theme) };
   const space = { ...createSpaceScale(theme) };
   const fontSizes = { ...createFontSizeScale(theme) };

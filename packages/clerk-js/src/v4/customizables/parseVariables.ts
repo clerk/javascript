@@ -1,18 +1,18 @@
 import { Theme } from '@clerk/types';
 
-import { blackAlpha, whiteAlpha } from '../foundations';
 import { spaceScaleKeys } from '../foundations/sizes';
 import { fontSizes, fontWeights } from '../foundations/typography';
 import { colors, removeUndefinedProps } from '../utils';
-import { colorOptionToHslaScale } from './colorOptionToHslaScale';
+import { colorOptionToHslaAlphaScale, colorOptionToHslaLightnessScale } from './colorOptionToHslaScale';
 
 export const createColorScales = (theme: Theme) => {
   const variables = theme.variables || {};
   return removeUndefinedProps({
-    ...colorOptionToHslaScale(variables.colorPrimary, 'primary'),
-    ...colorOptionToHslaScale(variables.colorDanger, 'danger'),
-    ...colorOptionToHslaScale(variables.colorSuccess, 'success'),
-    ...colorOptionToHslaScale(variables.colorWarning, 'warning'),
+    ...colorOptionToHslaLightnessScale(variables.colorPrimary, 'primary'),
+    ...colorOptionToHslaLightnessScale(variables.colorDanger, 'danger'),
+    ...colorOptionToHslaLightnessScale(variables.colorSuccess, 'success'),
+    ...colorOptionToHslaLightnessScale(variables.colorWarning, 'warning'),
+    ...colorOptionToHslaAlphaScale(variables.colorAlphaShade, 'blackAlpha'),
     colorText: toHSLA(variables.colorText),
     colorTextOnPrimaryBackground: toHSLA(variables.colorTextOnPrimaryBackground),
     colorTextSecondary: toHSLA(variables.colorTextSecondary) || colors.makeTransparent(variables.colorText, 0.35),
@@ -22,21 +22,10 @@ export const createColorScales = (theme: Theme) => {
   });
 };
 
-export const reverseAlphaScalesIfNeeded = (theme: Theme) => {
-  const { alphaShadesMode = 'dark' } = theme.variables || {};
-  if (alphaShadesMode === 'dark') {
-    return;
-  }
-
-  return Object.fromEntries([
-    ...Object.entries(whiteAlpha).map(([k, v]) => [k.replace('white', 'black'), v]),
-    ...Object.entries(blackAlpha).map(([k, v]) => [k.replace('black', 'white'), v]),
-  ]);
-};
-
+// TODO:
 export const createThemeOptions = (theme: Theme) => {
-  const { alphaShadesMode = 'dark', fontSmoothing = 'auto !important' } = theme.variables || {};
-  return { darkMode: alphaShadesMode === 'light', fontSmoothing };
+  const { fontSmoothing = 'auto !important' } = theme.variables || {};
+  return { fontSmoothing };
 };
 
 export const toHSLA = (str: string | undefined) => {
@@ -99,10 +88,7 @@ export const createFontWeightScale = (theme: Theme): Record<keyof typeof fontWei
 
 export const createFonts = (theme: Theme) => {
   const { fontFamily, fontFamilyButtons } = theme.variables || {};
-  return {
-    ...(fontFamily && { main: fontFamily }),
-    ...(fontFamilyButtons && { buttons: fontFamilyButtons || fontFamily }),
-  };
+  return removeUndefinedProps({ main: fontFamily, buttons: fontFamilyButtons || fontFamily });
 };
 
 const splitCssUnit = (str: string) => {

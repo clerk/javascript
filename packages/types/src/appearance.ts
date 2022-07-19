@@ -13,10 +13,12 @@ type UserDefinedStyle = string | CSSObject;
 
 type Shade = '50' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900';
 export type ColorScale<T = string> = Record<Shade, T>;
+export type AlphaColorScale<T = string> = Record<'20' | Shade, T>;
 
 export type ColorScaleWithRequiredBase<T = string> = Partial<ColorScale<T>> & { '500': T };
 
 export type CssColorOrScale = string | ColorScaleWithRequiredBase;
+export type CssColorOrAlphaScale = string | AlphaColorScale;
 type CssColor = string | TransparentColor | BuiltInColors;
 type CssLengthUnit = string;
 type FontSmoothing = 'auto' | 'antialiased' | 'never';
@@ -38,12 +40,11 @@ type WebSafeFont =
 export type FontFamily = string | WebSafeFont;
 
 type LoadingState = 'loading';
-type DisabledState = 'disabled';
 type ErrorState = 'error';
 type OpenState = 'open';
 type ActiveState = 'active';
-export type ElementState = LoadingState | DisabledState | ErrorState | OpenState | ActiveState;
-type ControlState = ErrorState | DisabledState;
+export type ElementState = LoadingState | ErrorState | OpenState | ActiveState;
+type ControlState = ErrorState;
 
 export type AlertId = 'danger' | 'warning';
 export type FieldId =
@@ -143,11 +144,11 @@ export type ElementsConfig = {
   // socialButtonsGrid: WithOptions<never, never, never>;
   // socialButtonsRows: WithOptions<never, never, never>;
   socialButtons: WithOptions<never, never, never>;
-  'socialButtons-buttonIcon': WithOptions<OAuthProvider | Web3Provider, LoadingState | DisabledState, never>;
-  'socialButtons-buttonBlock': WithOptions<OAuthProvider | Web3Provider, LoadingState | DisabledState, never>;
+  'socialButtons-buttonIcon': WithOptions<OAuthProvider | Web3Provider, LoadingState, never>;
+  'socialButtons-buttonBlock': WithOptions<OAuthProvider | Web3Provider, LoadingState, never>;
   'socialButtons-buttonBlockText': WithOptions<OAuthProvider | Web3Provider, never, never>;
   'socialButtons-buttonBlockArrow': WithOptions<OAuthProvider | Web3Provider, never, never>;
-  'socialButtons-logo': WithOptions<OAuthProvider | Web3Provider, LoadingState | DisabledState, never>;
+  'socialButtons-logo': WithOptions<OAuthProvider | Web3Provider, LoadingState, never>;
 
   dividerBox: WithOptions<never, never, never>;
   dividerText: WithOptions<never, never, never>;
@@ -239,6 +240,13 @@ export type Variables = {
    */
   colorWarning?: CssColorOrScale;
   /**
+   * The color that will be used for all to generate the alpha shades the components use. To achieve sufficient contrast,
+   * light themes should be using dark shades (`black`), while dark themes should be using light (`white`) shades. This option applies to borders,
+   * backgrounds for hovered elements, hovered dropdown options etc.
+   * @default 'black'
+   */
+  colorAlphaShade?: CssColorOrAlphaScale;
+  /**
    * The default text color.
    * @default black
    */
@@ -306,13 +314,6 @@ export type Variables = {
    * @default 0.375rem
    */
   borderRadius?: CssLengthUnit;
-  /**
-   * The shade that will be used for all `alpha` black and white colors. To achieve sufficient contract,
-   * light themes should use `dark` shades, while dark themes should use `light` shades. This option applies to borders,
-   * backgrounds for hovered elements, hovered dropdown options etc.
-   * @default 'dark'
-   */
-  alphaShadesMode?: 'light' | 'dark';
   /**
    * The base spacing unit that all margins, paddings and gaps between the elements are derived from.
    * @default 1rem
@@ -413,7 +414,7 @@ export const createClerkTheme = (appearance: Omit<Appearance, 'baseTheme'>): Bas
 // TODO: Remove before GA
 export const darkGlass = createClerkTheme({
   variables: {
-    alphaShadesMode: 'light',
+    colorAlphaShade: 'white',
     colorText: 'white',
     colorBackground: 'rgba(43,43,56,0.95)',
     colorInputText: 'white',
@@ -422,6 +423,7 @@ export const darkGlass = createClerkTheme({
     colorDanger: 'rgb(255,125,142)',
     colorSuccess: 'rgb(19,255,128)',
     fontSmoothing: 'auto',
+    // fontSize: '1.1rem',
     // fontWeight: {
     //   normal: '',
     //   medium: '',

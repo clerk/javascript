@@ -23,7 +23,7 @@ export const DropdownBox = React.forwardRef<HTMLDivElement, DropdownBoxProps>((p
         backgroundColor: colors.makeSolid(theme.colors.$colorBackground),
         border: theme.borders.$normal,
         borderRadius: theme.radii.$lg,
-        borderColor: theme.colors.$whiteAlpha200,
+        borderColor: theme.colors.$blackAlpha200,
         overflow: 'hidden',
         width: '100%',
         top: `calc(100% + ${theme.space.$2})`,

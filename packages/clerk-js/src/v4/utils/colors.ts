@@ -295,6 +295,10 @@ const changeHslaLightness = (color: HslaColor, num: number): HslaColor => {
   return { ...color, l: color.l + num };
 };
 
+const setHslaAlpha = (color: HslaColor, num: number): HslaColor => {
+  return { ...color, a: num };
+};
+
 const changeHslaAlpha = (color: HslaColor, num: number): HslaColor => {
   return { ...color, a: color.a ? color.a - num : undefined };
 };
@@ -326,6 +330,7 @@ export const colors = {
   toHslaColor,
   toHslaString,
   changeHslaLightness,
+  setHslaAlpha,
   lighten,
   makeTransparent,
   makeSolid,
