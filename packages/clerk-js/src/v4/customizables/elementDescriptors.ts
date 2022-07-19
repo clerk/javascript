@@ -105,6 +105,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'pageSection',
   'page',
   'pageHeader',
+
+  'activeDeviceIcon',
 ] as const);
 
 type TargettableClassname<K extends keyof ElementsConfig> = `${typeof CLASS_PREFIX}${K}`;

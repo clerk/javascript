@@ -216,6 +216,8 @@ export type ElementsConfig = {
   pageSection: WithOptions<never, never, never>;
   page: WithOptions<never, never, never>;
   pageHeader: WithOptions<never, never, never>;
+
+  activeDeviceIcon: WithOptions<'mobile' | 'desktop', never, never>;
 };
 
 export type Elements = {
@@ -423,12 +425,6 @@ export const darkGlass = createClerkTheme({
     colorDanger: 'rgb(255,125,142)',
     colorSuccess: 'rgb(19,255,128)',
     fontSmoothing: 'auto',
-    // fontSize: '1.1rem',
-    // fontWeight: {
-    //   normal: '',
-    //   medium: '',
-    //   bold: '',
-    // },
   },
   elements: {
     card: {
@@ -438,5 +434,35 @@ export const darkGlass = createClerkTheme({
     },
     socialButtonsLogo__apple: { filter: 'invert(1)' },
     socialButtonsLogo__github: { filter: 'invert(1)' },
+    activeDeviceIcon: {
+      '--cl-chassis-bottom': '#d2d2d2',
+      '--cl-chassis-back': '#e6e6e6',
+      '--cl-chassis-screen': '#e6e6e6',
+      '--cl-screen': '#111111',
+    },
+  },
+});
+
+export const dark = createClerkTheme({
+  variables: {
+    colorAlphaShade: 'white',
+    colorText: 'white',
+    colorBackground: 'rgba(43,43,56)',
+    colorInputText: 'white',
+    colorInputBackground: 'rgba(255,255,255,0.1)',
+  },
+  elements: {
+    card: {
+      boxShadow: '0 4px 30px rgba(0, 0, 0, 0.5)',
+      border: '1px solid rgba(255, 255, 255, 0.1)',
+    },
+    socialButtonsLogo__apple: { filter: 'invert(1)' },
+    socialButtonsLogo__github: { filter: 'invert(1)' },
+    activeDeviceIcon: {
+      '--cl-chassis-bottom': '#d2d2d2',
+      '--cl-chassis-back': '#e6e6e6',
+      '--cl-chassis-screen': '#e6e6e6',
+      '--cl-screen': '#111111',
+    },
   },
 });
