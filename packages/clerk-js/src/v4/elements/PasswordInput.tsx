@@ -1,19 +1,13 @@
 import React from 'react';
 
-import { Button, Col, descriptors, Flex, Icon, Input } from '../customizables';
+import { Button, descriptors, Flex, Icon, Input } from '../customizables';
 import { EyeSlash } from '../icons';
 import { PropsOfComponent } from '../styledSystem';
-import { PasswordStrengthBar } from './PasswordStrengthBar';
 
-type PasswordInputProps = PropsOfComponent<typeof Input> & {
-  strengthMeter?: boolean;
-};
-
-export const PasswordInput = (props: PasswordInputProps) => {
+export const PasswordInput = (props: PropsOfComponent<typeof Input>) => {
   const [hidden, setHidden] = React.useState(true);
-  const { id, strengthMeter, ...rest } = props;
-
-  const input = (
+  const { id, ...rest } = props;
+  return (
     <Flex
       direction='col'
       justify='center'
@@ -25,7 +19,7 @@ export const PasswordInput = (props: PasswordInputProps) => {
         sx={theme => ({ paddingRight: theme.space.$8 })}
       />
       <Button
-        elementDescriptor={descriptors.formFieldInputShowPasswordButton}
+        elementDescriptor={descriptors.formFieldInputShowPassword}
         variant='ghostIcon'
         tabIndex={-1}
         colorScheme={hidden ? 'neutral' : 'primary'}
@@ -44,15 +38,4 @@ export const PasswordInput = (props: PasswordInputProps) => {
       </Button>
     </Flex>
   );
-
-  if (strengthMeter) {
-    return (
-      <Col gap={2}>
-        {input}
-        <PasswordStrengthBar password={(props.value || '').toString()} />
-      </Col>
-    );
-  }
-
-  return input;
 };
