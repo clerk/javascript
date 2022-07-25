@@ -58,6 +58,12 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'form-fieldInputShowPassword',
   'form-fieldInputShowPasswordIcon',
 
+  'strengthMeter-box',
+  'strengthMeter-barRow',
+  'strengthMeter-bar',
+  'strengthMeter-labelRow',
+  'strengthMeter-label',
+
   'avatar',
   'avatar-image',
 

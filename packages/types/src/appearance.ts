@@ -168,6 +168,12 @@ export type ElementsConfig = {
   'form-fieldInputShowPassword': WithOptions<never, never, never>;
   'form-fieldInputShowPasswordIcon': WithOptions<never, never, never>;
 
+  'strengthMeter-box': WithOptions<never, never, never>;
+  'strengthMeter-barRow': WithOptions<never, never, never>;
+  'strengthMeter-bar': WithOptions<never, never, never>;
+  'strengthMeter-labelRow': WithOptions<never, never, never>;
+  'strengthMeter-label': WithOptions<never, never, never>;
+
   avatar: WithOptions<never, never, never>;
   'avatar-image': WithOptions<never, never, never>;
 

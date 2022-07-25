@@ -53,6 +53,8 @@ export const PasswordPage = withCardStateProvider(() => {
               minLength={6}
               required
               autoFocus
+              // @ts-ignore
+              strengthMeter
             />
           </Form.ControlRow>
           <Form.ControlRow>

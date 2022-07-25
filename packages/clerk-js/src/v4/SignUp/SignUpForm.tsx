@@ -83,6 +83,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
               ...formState.password.props,
               isRequired: fields.password.required,
               isOptional: !fields.password.required,
+              strengthMeter: true,
             }}
           />
         </Form.ControlRow>
