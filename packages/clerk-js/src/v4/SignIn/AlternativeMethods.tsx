@@ -47,7 +47,7 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
         <CardAlert>{card.error}</CardAlert>
         <Header.Root>
           {onBackLinkClick && <Header.BackLink onClick={onBackLinkClick} />}
-          <Header.Title>Try another method</Header.Title>
+          <Header.Title>Sign in options</Header.Title>
         </Header.Root>
         {/*TODO: extract main in its own component */}
         <Flex

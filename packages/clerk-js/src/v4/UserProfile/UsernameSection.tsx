@@ -23,7 +23,9 @@ export const UsernameSection = () => {
           {user.username}
         </Text>
       )}
-      <AddBlockButton onClick={() => navigate('username')}>Set username</AddBlockButton>
+      <AddBlockButton onClick={() => navigate('username')}>
+        {user.username ? 'Change username' : 'Set username'}
+      </AddBlockButton>
     </ProfileSection>
   );
 };

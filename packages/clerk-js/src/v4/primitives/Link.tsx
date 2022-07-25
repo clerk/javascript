@@ -32,6 +32,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
       neutral: {
         color: theme.colors.$colorTextSecondary,
       },
+      inherit: { color: 'inherit' },
     },
   },
   defaultVariants: {

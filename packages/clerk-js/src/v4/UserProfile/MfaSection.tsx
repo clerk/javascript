@@ -3,7 +3,7 @@ import React from 'react';
 
 import { useCoreUser } from '../../ui/contexts';
 import { useNavigate } from '../../ui/hooks';
-import { Col, Flex, Icon } from '../customizables';
+import { Badge, Col, Icon } from '../customizables';
 import { FormattedPhoneNumberText, useCardState } from '../elements';
 import { Mobile } from '../icons';
 import { handleError } from '../utils';
@@ -23,7 +23,7 @@ export const MfaSection = () => {
 
   return (
     <ProfileSection
-      title='Multifactor authentication'
+      title='Two-step authentication'
       id='mfa'
     >
       {mfaPhones.map(phone => (
@@ -32,7 +32,7 @@ export const MfaSection = () => {
           phone={phone}
         />
       ))}
-      <AddBlockButton onClick={() => navigate('multi-factor')}>Add multifactor</AddBlockButton>
+      <AddBlockButton onClick={() => navigate('multi-factor')}>Add authentication step</AddBlockButton>
     </ProfileSection>
   );
 };
@@ -45,29 +45,28 @@ const MfaAccordion = (props: { phone: PhoneNumberResource }) => {
 
   return (
     <UserProfileAccordion
-      title={
-        <Flex
-          gap={2}
-          align='center'
-        >
-          <Icon
-            icon={Mobile}
-            sx={theme => ({ color: theme.colors.$blackAlpha700 })}
-          />
-          SMS Code
-          <FormattedPhoneNumberText value={phone.phoneNumber} />
-        </Flex>
+      icon={
+        <Icon
+          icon={Mobile}
+          sx={theme => ({ color: theme.colors.$blackAlpha700 })}
+        />
       }
+      title={
+        <>
+          SMS Code <FormattedPhoneNumberText value={phone.phoneNumber} />
+        </>
+      }
+      badge={isDefault ? <Badge>Default</Badge> : undefined}
     >
       <Col gap={4}>
         <LinkButtonWithDescription
-          title={isDefault ? 'Default factor' : 'Set as default factor'}
+          title={isDefault ? 'Default factor' : 'Set as Default factor'}
           subtitle={
             isDefault
               ? 'This factor will be used as the default multifactor authentication method when signing in.'
               : 'Set this factor as the default factor to use it as the default multifactor authentication method when signing in.'
           }
-          actionLabel={!isDefault ? 'Set as default' : undefined}
+          actionLabel={!isDefault ? 'Set as primary' : undefined}
           onClick={() => phone.makeDefaultSecondFactor().catch(err => handleError(err, [], card.setError))}
         />
         <LinkButtonWithDescription

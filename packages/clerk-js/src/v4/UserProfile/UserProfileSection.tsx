@@ -1,3 +1,4 @@
+import { UserResource } from '@clerk/types';
 import React from 'react';
 
 import { useCoreUser } from '../../ui/contexts';
@@ -8,7 +9,7 @@ import { BlockButton } from './UserProfileBlockButtons';
 
 export const UserProfileSection = () => {
   const { navigate } = useNavigate();
-  const user = useCoreUser();
+  const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = useCoreUser();
 
   return (
     <ProfileSection
@@ -17,7 +18,7 @@ export const UserProfileSection = () => {
     >
       <BlockButton onClick={() => navigate('profile')}>
         <UserPreview
-          user={user}
+          user={userWithoutIdentifiers as UserResource}
           size='lg'
         />
       </BlockButton>

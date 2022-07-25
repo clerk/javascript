@@ -24,7 +24,7 @@ export const PasswordPage = withCardStateProvider(() => {
   const validateForm = () => {
     if (passwordField.value && confirmField.value && passwordField.value !== confirmField.value) {
       passwordField.setError("Passwords don't match.");
-    } else if (passwordField.value.length < 8) {
+    } else if (passwordField.value.length > 0 && passwordField.value.length < 8) {
       passwordField.setError('Passwords must be 8 characters or more.');
     } else {
       passwordField.setError(undefined);

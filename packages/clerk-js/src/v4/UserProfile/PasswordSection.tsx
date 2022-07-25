@@ -25,7 +25,7 @@ export const PasswordSection = () => {
           ••••••••••
         </Text>
       )}
-      <AddBlockButton onClick={navigateToPage}>Set password</AddBlockButton>
+      <AddBlockButton onClick={navigateToPage}>{passwordEnabled ? 'Change password' : 'Set password'}</AddBlockButton>
     </ProfileSection>
   );
 };

@@ -44,12 +44,14 @@ const EmailAccordion = ({ email }: { email: EmailAddressResource }) => {
   };
 
   return (
-    <UserProfileAccordion title={email.emailAddress}>
+    <UserProfileAccordion
+      title={email.emailAddress}
+      badge={isPrimary ? <Badge>Primary</Badge> : undefined}
+    >
       <Col gap={4}>
         {isPrimary && (
           <LinkButtonWithDescription
             title='Primary email address'
-            titleLabel={<Badge>Primary</Badge>}
             subtitle='This email address is the primary email address'
           />
         )}

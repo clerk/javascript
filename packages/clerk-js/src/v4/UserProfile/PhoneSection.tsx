@@ -57,12 +57,12 @@ const PhoneAccordion = ({ phone }: { phone: PhoneNumberResource }) => {
         </Text>
       }
       title={formattedPhone}
+      badge={isPrimary ? <Badge>Primary</Badge> : undefined}
     >
       <Col gap={4}>
         {isPrimary && (
           <LinkButtonWithDescription
             title='Primary phone number'
-            titleLabel={<Badge>Primary</Badge>}
             subtitle='This phone number is the primary phone number'
           />
         )}

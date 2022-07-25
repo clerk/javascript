@@ -68,8 +68,8 @@ const SignInFactorTwoPhoneCodeCard = () => {
   return (
     <Flow.Part part='phoneCode2Fa'>
       <VerificationCodeCard
-        cardTitle='Sign in'
-        cardSubtitle={`To continue to ${applicationName}`}
+        cardTitle='Two-step authentication'
+        cardSubtitle={''}
         formTitle='Verification code'
         formSubtitle='Enter the verification code sent to your phone number'
         onCodeEntryFinishedAction={action}

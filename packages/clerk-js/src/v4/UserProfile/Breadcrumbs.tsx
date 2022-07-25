@@ -1,33 +1,57 @@
 import React from 'react';
 
 import { useRouter } from '../../ui/router';
-import { descriptors, Flex, Icon, Text } from '../customizables';
+import { descriptors, Flex, Icon, Link, Text } from '../customizables';
 import { mqu, PropsOfComponent } from '../styledSystem';
 import { BaseRoutes } from './Navbar';
+import { useNavigateToFlowStart } from './NavigateToFlowStartButton';
 
 type BreadcrumbsProps = {
   title: string;
 };
 
-const BreadcrumbItem = (props: PropsOfComponent<typeof Text>) => {
+const BreadcrumbItem = (props: PropsOfComponent<typeof Text> & { href?: string }) => {
+  const El = (props.onClick || props.href ? Link : Text) as unknown as any;
   return (
-    <Text
-      as='li'
-      colorScheme='neutral'
-      variant='smallRegular'
-      sx={{ display: 'inline-flex', listStyle: 'none' }}
-      {...props}
-    />
+    <Flex as='li'>
+      <El
+        colorScheme='neutral'
+        variant='smallRegular'
+        sx={{ display: 'inline-flex', listStyle: 'none' }}
+        {...props}
+      />
+    </Flex>
   );
+};
+
+const PAGE_TO_ROOT = {
+  profile: BaseRoutes.find(r => r.id === 'account'),
+  'email-address': BaseRoutes.find(r => r.id === 'account'),
+  'phone-number': BaseRoutes.find(r => r.id === 'account'),
+  'connected-account': BaseRoutes.find(r => r.id === 'account'),
+  'web3-wallet': BaseRoutes.find(r => r.id === 'account'),
+  username: BaseRoutes.find(r => r.id === 'account'),
+  'multi-factor': BaseRoutes.find(r => r.id === 'security'),
+  password: BaseRoutes.find(r => r.id === 'security'),
 };
 
 export const Breadcrumbs = (props: BreadcrumbsProps) => {
   const router = useRouter();
+  const { navigateToFlowStart } = useNavigateToFlowStart();
+  const currentPage = (router.currentPath || '').split('/').pop();
+
   const { title } = props;
   if (!title) {
     return null;
   }
-  const root = BaseRoutes.find(r => router.currentPath.includes(r.path));
+
+  // @ts-expect-error
+  const root = currentPage ? PAGE_TO_ROOT[currentPage] : undefined;
+  const handleRootClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    return navigateToFlowStart();
+  };
+
   return (
     <Flex
       as='nav'
@@ -45,7 +69,11 @@ export const Breadcrumbs = (props: BreadcrumbsProps) => {
       >
         {root && (
           <>
-            <BreadcrumbItem elementDescriptor={descriptors.breadcrumbsItem}>
+            <BreadcrumbItem
+              elementDescriptor={descriptors.breadcrumbsItem}
+              href=''
+              onClick={handleRootClick}
+            >
               <Icon
                 elementDescriptor={descriptors.breadcrumbsIcon}
                 icon={root.icon}

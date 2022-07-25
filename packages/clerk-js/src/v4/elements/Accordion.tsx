@@ -2,19 +2,20 @@ import React from 'react';
 
 import { Col } from '../customizables';
 import { Caret } from '../icons';
-import { animations } from '../styledSystem';
+import { animations, InternalTheme } from '../styledSystem';
 import { ArrowBlockButton } from './ArrowBlockButton';
 
 type AccordionItemProps = React.PropsWithChildren<{
   title: React.ReactNode;
   icon?: React.ReactElement;
+  badge?: React.ReactElement;
   defaultOpen?: boolean;
   toggleable?: boolean;
   scrollOnOpen?: boolean;
 }>;
 
 export const AccordionItem = (props: AccordionItemProps) => {
-  const { children, title, icon, defaultOpen = false, toggleable = true, scrollOnOpen = false } = props;
+  const { children, title, icon, defaultOpen = false, toggleable = true, scrollOnOpen = false, badge } = props;
   const [isOpen, setIsOpen] = React.useState(defaultOpen);
   const contentRef = React.useRef<HTMLDivElement>(null);
 
@@ -29,6 +30,17 @@ export const AccordionItem = (props: AccordionItemProps) => {
       contentRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }, [isOpen]);
+
+  const badgeSx = badge
+    ? React.cloneElement(badge, {
+        sx: [
+          badge.props.sx,
+          (t: InternalTheme) => ({
+            marginLeft: t.space.$2,
+          }),
+        ],
+      })
+    : null;
 
   return (
     <Col>
@@ -53,6 +65,7 @@ export const AccordionItem = (props: AccordionItemProps) => {
         isDisabled={!toggleable}
       >
         {title}
+        {badgeSx}
       </ArrowBlockButton>
       {isOpen && (
         <Col

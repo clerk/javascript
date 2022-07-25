@@ -39,7 +39,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
 });
 
 export type TextProps = PrimitiveProps<'p'> & { isDisabled?: boolean } & StyleVariants<typeof applyVariants> & {
-    as?: 'p' | 'div' | 'label' | 'code' | 'span' | 'li';
+    as?: 'p' | 'div' | 'label' | 'code' | 'span' | 'li' | 'a';
   };
 
 export const Text = (props: TextProps): JSX.Element => {
