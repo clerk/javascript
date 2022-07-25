@@ -88,7 +88,7 @@ export const createFontWeightScale = (theme: Theme): Record<keyof typeof fontWei
 
 export const createFonts = (theme: Theme) => {
   const { fontFamily, fontFamilyButtons } = theme.variables || {};
-  return removeUndefinedProps({ main: fontFamily, buttons: fontFamilyButtons || fontFamily });
+  return removeUndefinedProps({ main: fontFamily, buttons: fontFamilyButtons });
 };
 
 const splitCssUnit = (str: string) => {
