@@ -26,10 +26,24 @@ const AppearanceProvider = (props: AppearanceProviderProps) => {
       componentAppearance,
     ];
 
-    return { value: parseAppearance(appearanceObjectCascade) };
+    const value = parseAppearance(appearanceObjectCascade);
+    injectIntoWindowDebug(appearanceKey, appearanceObjectCascade, value);
+
+    return { value };
   }, [props.appearance, props.globalAppearance]);
 
   return <AppearanceContext.Provider value={ctxValue}>{props.children}</AppearanceContext.Provider>;
+};
+
+const injectIntoWindowDebug = (key: any, cascade: any, parsedAppearance: any) => {
+  if (typeof window !== 'undefined') {
+    (window as any).__clerk_debug = {
+      [`__${key}`]: {
+        __appearanceCascade: cascade,
+        __parsedAppearance: parsedAppearance,
+      },
+    };
+  }
 };
 
 export { AppearanceProvider, useAppearance };
