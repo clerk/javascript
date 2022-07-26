@@ -144,7 +144,6 @@ const DropdownTrigger = React.forwardRef<
       colorScheme='neutral'
       variant='ghost'
       textVariant='smallMedium'
-      focusRing={false}
       isDisabled={props.isDisabled}
       sx={theme => ({
         paddingLeft: theme.space.$3x5,
