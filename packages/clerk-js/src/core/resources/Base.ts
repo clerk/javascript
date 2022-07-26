@@ -1,4 +1,4 @@
-import type { ClerkAPIErrorJSON, ClerkResourceJSON, ClerkResourceReloadParams } from '@clerk/types';
+import type { ClerkAPIErrorJSON, ClerkResourceJSON, ClerkResourceReloadParams, DeletedObjectJSON } from '@clerk/types';
 import type { FapiClient, FapiRequestInit, FapiResponseJSON, HTTPMethod } from 'core/fapiClient';
 
 import { clerkMissingFapiClientInResources } from '../errors';
@@ -23,7 +23,7 @@ export abstract class BaseResource {
     return BaseResource.clerk.getFapiClient();
   }
 
-  protected static async _fetch<J extends ClerkResourceJSON | null>(
+  protected static async _fetch<J extends ClerkResourceJSON | DeletedObjectJSON | null>(
     requestInit: FapiRequestInit,
     opts: BaseFetchOptions = {},
   ): Promise<FapiResponseJSON<J> | null> {

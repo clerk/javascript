@@ -1,14 +1,16 @@
+import { DeletedObjectResource } from './deletedObject';
 import { EmailAddressResource } from './emailAddress';
 import { ExternalAccountResource } from './externalAccount';
 import { ImageResource } from './image';
 import { UserJSON } from './json';
+import { OrganizationMembershipResource } from './organizationMembership';
 import { PhoneNumberResource } from './phoneNumber';
 import { ClerkResource } from './resource';
 import { SessionWithActivitiesResource } from './session';
 import { OAuthStrategy } from './strategies';
+import { TOTPResource } from './totp';
 import { SnakeToCamel } from './utils';
 import { Web3WalletResource } from './web3Wallet';
-import { OrganizationMembershipResource } from './organizationMembership';
 
 declare global {
   /**
@@ -50,6 +52,8 @@ export interface UserResource extends ClerkResource {
   externalAccounts: ExternalAccountResource[];
   organizationMemberships: OrganizationMembershipResource[];
   passwordEnabled: boolean;
+  totpEnabled: boolean;
+  twoFactorEnabled: boolean;
   publicMetadata: UserPublicMetadata;
   unsafeMetadata: UserUnsafeMetadata;
   lastSignInAt: Date | null;
@@ -60,7 +64,6 @@ export interface UserResource extends ClerkResource {
   createEmailAddress: (params: CreateEmailAddressParams) => Promise<EmailAddressResource>;
   createPhoneNumber: (params: CreatePhoneNumberParams) => Promise<PhoneNumberResource>;
   createWeb3Wallet: (params: CreateWeb3WalletParams) => Promise<Web3WalletResource>;
-  twoFactorEnabled: () => boolean;
   isPrimaryIdentification: (ident: EmailAddressResource | PhoneNumberResource | Web3WalletResource) => boolean;
   getSessions: () => Promise<SessionWithActivitiesResource[]>;
   setProfileImage: (params: SetProfileImageParams) => Promise<ImageResource>;
@@ -71,6 +74,9 @@ export interface UserResource extends ClerkResource {
     strategy: OAuthStrategy;
     redirect_url?: string;
   }) => Promise<ExternalAccountResource>;
+  createTOTP: () => Promise<TOTPResource>;
+  verifyTOTP: (params: VerifyTOTPParams) => Promise<TOTPResource>;
+  disableTOTP: () => Promise<DeletedObjectResource>;
   get verifiedExternalAccounts(): ExternalAccountResource[];
   get unverifiedExternalAccounts(): ExternalAccountResource[];
   get hasVerifiedEmailAddress(): boolean;
@@ -81,6 +87,7 @@ export type CreateEmailAddressParams = { email: string };
 export type CreatePhoneNumberParams = { phoneNumber: string };
 export type CreateWeb3WalletParams = { web3Wallet: string };
 export type SetProfileImageParams = { file: Blob | File };
+export type VerifyTOTPParams = { code: string };
 
 type UpdateUserJSON = Pick<
   UserJSON,
