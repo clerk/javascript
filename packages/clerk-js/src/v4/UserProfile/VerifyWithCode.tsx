@@ -57,7 +57,7 @@ export const VerifyWithCode = (props: VerifyWithCodeProps) => {
     <>
       <CodeForm
         title={'Verification code'}
-        subtitle={`Enter verification code sent to ${identifier}`}
+        subtitle={`Enter the verification code sent to ${identifier}`}
         codeControl={codeControl}
         isLoading={status.isLoading}
         success={success}

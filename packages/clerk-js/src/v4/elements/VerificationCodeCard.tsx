@@ -68,7 +68,7 @@ export const VerificationCodeCard = (props: VerificationCodeCardProps) => {
     <Card>
       <CardAlert>{card.error}</CardAlert>
       <Header.Root>
-        <Header.BackLink onClick={goBack} />
+        {/*<Header.BackLink onClick={goBack} />*/}
         <Header.Title>{props.cardTitle}</Header.Title>
         <Header.Subtitle>{props.cardSubtitle}</Header.Subtitle>
       </Header.Root>
@@ -95,7 +95,7 @@ export const VerificationCodeCard = (props: VerificationCodeCardProps) => {
       <Footer.Root>
         <Footer.Action>
           {props.onShowAlternativeMethodsClicked && (
-            <Footer.ActionLink onClick={props.onShowAlternativeMethodsClicked}>Sign in another way</Footer.ActionLink>
+            <Footer.ActionLink onClick={props.onShowAlternativeMethodsClicked}>Use another method</Footer.ActionLink>
           )}
         </Footer.Action>
         <Footer.Links />

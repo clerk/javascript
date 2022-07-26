@@ -14,7 +14,7 @@ export const SignInFactorOneEmailCodeCard = (props: SignInFactorOneEmailCodeCard
     <Flow.Part part='emailCode'>
       <SignInFactorOneCodeForm
         {...props}
-        cardTitle='Enter verification code'
+        cardTitle='Check your email'
         cardSubtitle={`To continue to ${applicationName}`}
         formTitle='Verification code'
         formSubtitle='Enter the verification code sent to your email address'

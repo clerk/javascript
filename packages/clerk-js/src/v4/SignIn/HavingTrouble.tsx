@@ -8,7 +8,7 @@ export const HavingTrouble = (props: PropsOfComponent<typeof ErrorCard>) => {
 
   return (
     <ErrorCard
-      cardTitle="I'm having trouble"
+      cardTitle='Get help'
       onBackLinkClick={onBackLinkClick}
     />
   );

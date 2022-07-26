@@ -51,7 +51,6 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
       <Card>
         <CardAlert>{card.error}</CardAlert>
         <Header.Root>
-          <Header.BackLink onClick={goBack} />
           <Header.Title>Enter your password</Header.Title>
           <Header.Subtitle>to continue to {displayConfig.applicationName}</Header.Subtitle>
         </Header.Root>
@@ -80,7 +79,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
         </Flex>
         <Footer.Root>
           <Footer.Action>
-            <Footer.ActionLink onClick={onShowAlternativeMethodsClick}>Sign in another way</Footer.ActionLink>
+            <Footer.ActionLink onClick={onShowAlternativeMethodsClick}>Use another method</Footer.ActionLink>
           </Footer.Action>
           <Footer.Links />
         </Footer.Root>

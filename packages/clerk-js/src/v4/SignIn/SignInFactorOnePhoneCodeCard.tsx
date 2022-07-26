@@ -14,10 +14,10 @@ export const SignInFactorOnePhoneCodeCard = (props: SignInFactorOnePhoneCodeCard
     <Flow.Part part='phoneCode'>
       <SignInFactorOneCodeForm
         {...props}
-        cardTitle='Enter verification code'
+        cardTitle='Check your phone'
         cardSubtitle={`To continue to ${applicationName}`}
         formTitle='Verification code'
-        formSubtitle='Enter the verification code sent to your email address'
+        formSubtitle='Enter the verification code sent to your phone number'
       />
     </Flow.Part>
   );
