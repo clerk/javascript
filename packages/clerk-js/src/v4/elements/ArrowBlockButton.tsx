@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Button, Flex, Icon, Spinner, Text } from '../customizables';
+import { SimpleButton } from '../customizables';
 import { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { ArrowRightIcon } from '../icons';
 import { PropsOfComponent, ThemableCssProp } from '../styledSystem';
@@ -49,10 +50,11 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
     : null;
 
   return (
-    <Button
+    <SimpleButton
       variant='outline'
       colorScheme='neutral'
       block
+      isLoading={isLoading}
       {...rest}
       sx={theme => [
         {
@@ -107,7 +109,6 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
           theme => ({
             position: 'absolute',
             right: '1rem',
-            // color: theme.colors.$blackAlpha500,
             transition: 'all 100ms ease',
             minWidth: theme.sizes.$4,
             minHeight: theme.sizes.$4,
@@ -119,7 +120,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
           rightIconSx,
         ]}
       />
-    </Button>
+    </SimpleButton>
   );
 };
 

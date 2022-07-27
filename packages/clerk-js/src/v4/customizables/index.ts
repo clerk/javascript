@@ -5,6 +5,7 @@ export const Flex = makeCustomizable(Primitives.Flex);
 export const Col = makeCustomizable(Primitives.Col);
 export const Grid = makeCustomizable(Primitives.Grid);
 export const Button = makeCustomizable(Primitives.Button);
+export const SimpleButton = makeCustomizable(Primitives.SimpleButton);
 export const Heading = makeCustomizable(Primitives.Heading);
 export const Link = makeCustomizable(Primitives.Link);
 export const Text = makeCustomizable(Primitives.Text);

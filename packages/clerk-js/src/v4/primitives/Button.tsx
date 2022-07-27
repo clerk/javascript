@@ -136,7 +136,6 @@ type ButtonProps = OwnProps & StyleVariants<typeof applyVariants>;
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
   const parsedProps: ButtonProps = { ...props, isDisabled: props.isDisabled || props.isLoading };
   const { isLoading, isDisabled, loadingText, children, ...rest } = filterProps(parsedProps);
-
   return (
     <button
       type={rest.type || 'button'}
@@ -163,4 +162,21 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
   );
 });
 
-export { Button };
+const SimpleButton = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
+  const parsedProps: ButtonProps = { ...props, isDisabled: props.isDisabled || props.isLoading };
+  const { loadingText, isDisabled, children, ...rest } = filterProps(parsedProps);
+
+  return (
+    <button
+      type={rest.type || 'button'}
+      {...applyDataStateProps(rest)}
+      css={applyVariants(parsedProps)}
+      disabled={isDisabled}
+      ref={ref}
+    >
+      {children}
+    </button>
+  );
+});
+
+export { Button, SimpleButton };
