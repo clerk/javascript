@@ -5,7 +5,7 @@ import { CLASS_PREFIX, ElementDescriptor, ElementId } from './elementDescriptors
 import { ParsedElements } from './parseAppearance';
 
 const STATE_PROP_TO_CLASSNAME = Object.freeze({
-  disabled: ` ${CLASS_PREFIX}disabled`,
+  // disabled: ` ${CLASS_PREFIX}disabled`,
   loading: ` ${CLASS_PREFIX}loading`,
   error: ` ${CLASS_PREFIX}error`,
   open: ` ${CLASS_PREFIX}open`,
@@ -94,9 +94,9 @@ const getElementState = (props: PropsWithState | undefined): ElementState | unde
   if (props.hasError) {
     return 'error';
   }
-  if (props.isDisabled) {
-    return 'disabled';
-  }
+  // if (props.isDisabled) {
+  //   return 'disabled';
+  // }
   if (props.isOpen) {
     return 'open';
   }

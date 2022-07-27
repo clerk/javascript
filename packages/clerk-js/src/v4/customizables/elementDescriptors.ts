@@ -53,9 +53,10 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'form-fieldInput',
   'form-fieldErrorText',
   'form-fieldHintText',
+  'form-buttonRow',
   'form-buttonPrimary',
   'form-buttonReset',
-  'form-fieldInputShowPassword',
+  'form-fieldInputShowPasswordButton',
   'form-fieldInputShowPasswordIcon',
 
   'avatar',
@@ -136,8 +137,9 @@ type ElementDescriptors = { [k in keyof ElementsConfig as ElementObjectKey<k>]: 
  * Turns a key from the ElementsConfig object to a targettable classname
  * socialButtons-buttonIcon ->  cl-socialButtons-buttonIcon
  */
+const camelize = (s: string) => s.replace(/-./g, x => x[1].toUpperCase());
 const toTargettableClassname = <K extends keyof ElementsConfig>(key: K): TargettableClassname<K> => {
-  return (CLASS_PREFIX + key) as TargettableClassname<K>;
+  return (CLASS_PREFIX + camelize(key)) as TargettableClassname<K>;
 };
 
 /**

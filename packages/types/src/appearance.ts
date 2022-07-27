@@ -461,3 +461,33 @@ export const dark = createClerkTheme({
     },
   },
 });
+
+export const socialButtonsRounded = createClerkTheme({
+  layout: {
+    socialButtonsVariant: 'iconButton',
+  },
+  elements: ({ theme }) => ({
+    socialButtonsButtonIcon: {
+      borderColor: theme.colors.$primary500,
+      borderRadius: '999px',
+    },
+  }),
+});
+
+export const socialButtonsAutofit = (opts?: { perRow: number }) => {
+  const { perRow } = opts || {};
+  return createClerkTheme({
+    layout: {
+      socialButtonsVariant: 'iconButton',
+    },
+    elements: {
+      socialButtonsButtonIcon: {
+        width: 'auto',
+      },
+      socialButtons: {
+        display: 'grid',
+        gridTemplateColumns: perRow ? `repeat(${perRow}, 1fr )` : 'repeat( auto-fit, minmax(3rem, 1fr) )',
+      },
+    },
+  });
+};
