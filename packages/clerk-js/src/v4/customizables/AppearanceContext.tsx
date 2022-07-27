@@ -1,33 +1,18 @@
-import { Appearance } from '@clerk/types';
 import React from 'react';
 
 import { createContextAndHook, useDeepEqualMemo } from '../utils';
-import { parseAppearance, ParsedAppearance } from './parseAppearance';
+import { AppearanceCascade, parseAppearance, ParsedAppearance } from './parseAppearance';
 
 type AppearanceContextValue = ParsedAppearance;
 
 const [AppearanceContext, useAppearance] = createContextAndHook<AppearanceContextValue>('AppearanceContext');
 
-type AppearanceProviderProps = React.PropsWithChildren<{
-  appearance?: Appearance;
-  globalAppearance?: Appearance;
-  appearanceKey: keyof Pick<Appearance, 'signIn' | 'signUp' | 'userProfile' | 'userButton'>;
-}>;
+type AppearanceProviderProps = React.PropsWithChildren<AppearanceCascade>;
 
 const AppearanceProvider = (props: AppearanceProviderProps) => {
   const ctxValue = useDeepEqualMemo(() => {
-    const { appearance: componentAppearance, globalAppearance, appearanceKey } = props;
-
-    const appearanceObjectCascade = [
-      globalAppearance?.baseTheme as unknown as Appearance,
-      globalAppearance,
-      globalAppearance?.[appearanceKey],
-      componentAppearance?.baseTheme as unknown as Appearance,
-      componentAppearance,
-    ];
-
-    const value = parseAppearance(appearanceObjectCascade);
-    injectIntoWindowDebug(appearanceKey, appearanceObjectCascade, value);
+    const value = parseAppearance(props);
+    injectIntoWindowDebug(props.appearanceKey, props, value);
 
     return { value };
   }, [props.appearance, props.globalAppearance]);

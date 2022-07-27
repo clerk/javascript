@@ -1,3 +1,6 @@
+// Temp way to import the type. We will clean this up when we extract
+// theming into its own package
+import type { InternalTheme } from '@clerk/clerk-js/src/v4/foundations';
 import * as CSS from 'csstype';
 
 import { OAuthProvider } from './oauth';
@@ -163,9 +166,10 @@ export type ElementsConfig = {
   'form-fieldInput': WithOptions<FieldId, ControlState, never>;
   'form-fieldErrorText': WithOptions<FieldId, ControlState, never>;
   'form-fieldHintText': WithOptions<FieldId, ControlState, never>;
+  'form-buttonRow': WithOptions<never, ControlState | LoadingState, never>;
   'form-buttonPrimary': WithOptions<never, ControlState | LoadingState, never>;
   'form-buttonReset': WithOptions<never, ControlState | LoadingState, never>;
-  'form-fieldInputShowPassword': WithOptions<never, never, never>;
+  'form-fieldInputShowPasswordButton': WithOptions<never, never, never>;
   'form-fieldInputShowPasswordIcon': WithOptions<never, never, never>;
 
   avatar: WithOptions<never, never, never>;
@@ -330,7 +334,7 @@ export type Theme = {
   /**
    * Hello there how are you
    */
-  baseTheme?: BaseTheme;
+  baseTheme?: BaseTheme | BaseTheme[];
   /**
    * Configuration options that affect the layout of the components, allowing
    * customizations that hard to implement with CSS.
@@ -349,6 +353,27 @@ export type Theme = {
    * Eg: `formButtonPrimary__loading: { backgroundColor: 'gray' }`
    */
   elements?: Elements;
+};
+
+export type CreateClerkThemeParams = {
+  /**
+   * Configuration options that affect the layout of the components, allowing
+   * customizations that hard to implement with CSS.
+   * Eg: placing the logo outside the card element
+   */
+  layout?: Layout;
+  /**
+   * General theme overrides. This styles will be merged with our base theme.
+   * Can override global styles like colors, fonts etc.
+   * Eg: `colorPrimary: 'blue'`
+   */
+  variables?: Variables;
+  /**
+   * Fine-grained theme overrides. Useful when you want to style
+   * specific elements or elements that under a specific state.
+   * Eg: `formButtonPrimary__loading: { backgroundColor: 'gray' }`
+   */
+  elements?: Elements | ((params: { theme: InternalTheme }) => Elements);
 };
 
 export type Layout = {
@@ -388,60 +413,30 @@ export type SignUpTheme = Theme;
 export type UserButtonTheme = Theme;
 export type UserProfileTheme = Theme;
 
-export type Appearance = Theme & {
+export type Appearance<T = Theme> = T & {
   /**
    * Theme overrides that only apply to the `<SignIn/>` component
    */
-  signIn?: SignInTheme;
+  signIn?: T;
   /**
    * Theme overrides that only apply to the `<SignUp/>` component
    */
-  signUp?: SignUpTheme;
+  signUp?: T;
   /**
    * Theme overrides that only apply to the `<UserButton/>` component
    */
-  userButton?: UserButtonTheme;
+  userButton?: T;
   /**
    * Theme overrides that only apply to the `<UserProfile/>` component
    */
-  userProfile?: UserProfileTheme;
+  userProfile?: T;
 };
 
 // TODO: Remove before GA
-export const createClerkTheme = (appearance: Omit<Appearance, 'baseTheme'>): BaseTheme => {
+export const createClerkTheme = (appearance: Appearance<CreateClerkThemeParams>): BaseTheme => {
   // Placeholder method that might hande more transformations in the future
   return { ...appearance, __type: 'prebuilt_appearance' };
 };
-
-// TODO: Remove before GA
-export const darkGlass = createClerkTheme({
-  variables: {
-    colorAlphaShade: 'white',
-    colorText: 'white',
-    colorBackground: 'rgba(43,43,56,0.95)',
-    colorInputText: 'white',
-    colorInputBackground: 'rgba(255,255,255,0.1)',
-    colorPrimary: 'rgb(0,172,255)',
-    colorDanger: 'rgb(255,125,142)',
-    colorSuccess: 'rgb(19,255,128)',
-    fontSmoothing: 'auto',
-  },
-  elements: {
-    card: {
-      boxShadow: '0 4px 30px rgba(0, 0, 0, 0.5)',
-      backdropFilter: 'blur(15px)',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
-    },
-    socialButtonsLogo__apple: { filter: 'invert(1)' },
-    socialButtonsLogo__github: { filter: 'invert(1)' },
-    activeDeviceIcon: {
-      '--cl-chassis-bottom': '#d2d2d2',
-      '--cl-chassis-back': '#e6e6e6',
-      '--cl-chassis-screen': '#e6e6e6',
-      '--cl-screen': '#111111',
-    },
-  },
-});
 
 export const dark = createClerkTheme({
   variables: {
