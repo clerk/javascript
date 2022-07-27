@@ -7,7 +7,7 @@ export const ID_CLASS_PREFIX = 'cl-id-';
 export const OBJ_KEY_DELIMITER = '__';
 
 const containsAllElementsConfigKeys = containsAllOfType<keyof ElementsConfig>();
-
+const camelize = (s: string) => s.replace(/-./g, x => x[1].toUpperCase());
 /**
  * This object is strictly typed using the ElementsConfig type
  * and is used as the single source of truth to generate the
@@ -108,7 +108,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'pageHeader',
 
   'activeDeviceIcon',
-] as const);
+  // Decide if we want to keep the keys as camel cased in HTML as well,
+  // if yes, refactor and remove the .map(camelize) method
+] as const).map(camelize) as (keyof ElementsConfig)[];
 
 type TargettableClassname<K extends keyof ElementsConfig> = `${typeof CLASS_PREFIX}${K}`;
 type AllowedIds<T extends keyof ElementsConfig> = ElementsConfig[T]['ids'];
@@ -137,9 +139,8 @@ type ElementDescriptors = { [k in keyof ElementsConfig as ElementObjectKey<k>]: 
  * Turns a key from the ElementsConfig object to a targettable classname
  * socialButtons-buttonIcon ->  cl-socialButtons-buttonIcon
  */
-const camelize = (s: string) => s.replace(/-./g, x => x[1].toUpperCase());
 const toTargettableClassname = <K extends keyof ElementsConfig>(key: K): TargettableClassname<K> => {
-  return (CLASS_PREFIX + camelize(key)) as TargettableClassname<K>;
+  return (CLASS_PREFIX + key) as TargettableClassname<K>;
 };
 
 /**
