@@ -57,7 +57,6 @@ const DeviceAccordion = (props: { session: SessionWithActivitiesResource }) => {
         {isCurrent && (
           <LinkButtonWithDescription
             title='Current device'
-            titleLabel={<Badge>This device</Badge>}
             subtitle='This is the device you are currently using'
           />
         )}
@@ -76,6 +75,7 @@ const DeviceAccordion = (props: { session: SessionWithActivitiesResource }) => {
 };
 
 const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
+  const isCurrent = useCoreSession()?.id === props.session.id;
   const { city, country, browserName, browserVersion, deviceType, ipAddress, isMobile } = props.session.latestActivity;
   const title = deviceType ? deviceType : isMobile ? 'Mobile device' : 'Desktop device';
   const browser = `${browserName || ''} ${browserVersion || ''}`.trim() || 'Web browser';
@@ -119,7 +119,13 @@ const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
         align='start'
         gap={1}
       >
-        <Text variant='smallMedium'>{title}</Text>
+        <Flex
+          center
+          gap={2}
+        >
+          <Text variant='smallMedium'>{title}</Text>
+          {isCurrent && <Badge>This device</Badge>}
+        </Flex>
         <Text
           variant='smallRegular'
           colorScheme='neutral'
