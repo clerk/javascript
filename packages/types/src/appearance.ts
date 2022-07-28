@@ -456,7 +456,7 @@ export const dark = createClerkTheme({
     colorText: 'white',
     colorInputText: 'white',
   },
-  elements: ({ theme }) => {
+  elements: () => {
     return {
       socialButtonsLogo__apple: { filter: 'invert(1)' },
       socialButtonsLogo__github: { filter: 'invert(1)' },
