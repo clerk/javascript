@@ -222,6 +222,16 @@ export type ElementsConfig = {
   pageHeader: WithOptions<never, never, never>;
 
   activeDeviceIcon: WithOptions<'mobile' | 'desktop', never, never>;
+
+  fileDropAreaOuterBox: WithOptions<never, never, never>;
+  fileDropAreaBox: WithOptions<never, never, never>;
+  fileDropAreaIconBox: WithOptions<never, never, never>;
+  fileDropAreaIcon: WithOptions<never, never, never>;
+  fileDropAreaHint: WithOptions<never, never, never>;
+  fileDropAreaButtonPrimary: WithOptions<never, never, never>;
+  fileDropAreaFooterHint: WithOptions<never, never, never>;
+
+  badgePrimary: WithOptions<never, never, never>;
 };
 
 export type Elements = {
@@ -440,25 +450,23 @@ export const createClerkTheme = (appearance: Appearance<CreateClerkThemeParams>)
 
 export const dark = createClerkTheme({
   variables: {
+    colorBackground: 'rgba(43,43,56)',
+    colorInputBackground: 'rgba(255,255,255,0.1)',
     colorAlphaShade: 'white',
     colorText: 'white',
-    colorBackground: 'rgba(43,43,56)',
     colorInputText: 'white',
-    colorInputBackground: 'rgba(255,255,255,0.1)',
   },
-  elements: {
-    card: {
-      boxShadow: '0 4px 30px rgba(0, 0, 0, 0.5)',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
-    },
-    socialButtonsLogo__apple: { filter: 'invert(1)' },
-    socialButtonsLogo__github: { filter: 'invert(1)' },
-    activeDeviceIcon: {
-      '--cl-chassis-bottom': '#d2d2d2',
-      '--cl-chassis-back': '#e6e6e6',
-      '--cl-chassis-screen': '#e6e6e6',
-      '--cl-screen': '#111111',
-    },
+  elements: ({ theme }) => {
+    return {
+      socialButtonsLogo__apple: { filter: 'invert(1)' },
+      socialButtonsLogo__github: { filter: 'invert(1)' },
+      activeDeviceIcon: {
+        '--cl-chassis-bottom': '#d2d2d2',
+        '--cl-chassis-back': '#e6e6e6',
+        '--cl-chassis-screen': '#e6e6e6',
+        '--cl-screen': '#111111',
+      },
+    };
   },
 });
 
@@ -491,3 +499,11 @@ export const socialButtonsAutofit = (opts?: { perRow: number }) => {
     },
   });
 };
+
+export const shadesOfPurple = createClerkTheme({
+  variables: {
+    colorBackground: '#38375f',
+    colorPrimary: '#f8d80d',
+    colorTextOnPrimaryBackground: '#38375f',
+  },
+});

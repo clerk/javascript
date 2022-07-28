@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Button, Col, Flex, Icon, Text } from '../customizables';
+import { Button, Col, descriptors, Flex, Icon, Text } from '../customizables';
 import { Folder } from '../icons';
 import { animations, mqu } from '../styledSystem';
 import { colors } from '../utils';
@@ -54,6 +54,7 @@ export const FileDropArea = (props: FileDropAreaProps) => {
 
   return (
     <Col
+      elementDescriptor={descriptors.fileDropAreaOuterBox}
       gap={2}
       {...events}
     >
@@ -65,22 +66,24 @@ export const FileDropArea = (props: FileDropAreaProps) => {
         onChange={e => upload(e.currentTarget.files?.[0])}
       />
       <Col
+        elementDescriptor={descriptors.fileDropAreaBox}
         center
         gap={4}
         sx={t => ({
           height: t.space.$60,
-          [mqu.sm]: { height: '10rem' },
+          [mqu.sm]: { height: '10 rem' },
           backgroundColor: {
-            idle: t.options.$darkMode ? t.colors.$blackAlpha100 : t.colors.$blackAlpha50,
-            loading: t.options.$darkMode ? t.colors.$blackAlpha100 : t.colors.$blackAlpha50,
-            valid: t.options.$darkMode ? colors.makeTransparent(t.colors.$primary300, 0.8) : t.colors.$primary50,
-            invalid: t.options.$darkMode ? colors.makeTransparent(t.colors.$danger300, 0.8) : t.colors.$danger50,
+            idle: t.colors.$blackAlpha50,
+            loading: t.colors.$blackAlpha50,
+            valid: colors.setAlpha(t.colors.$success500, 0.2),
+            invalid: colors.setAlpha(t.colors.$danger500, 0.2),
           }[status],
           borderRadius: t.radii.$xl,
           animation: `${animations.expandIn(t.space.$60)} ${t.transitionDuration.$fast} ease`,
         })}
       >
         <Flex
+          elementDescriptor={descriptors.fileDropAreaIconBox}
           center
           sx={t => ({
             backgroundColor: t.colors.$blackAlpha50,
@@ -90,6 +93,7 @@ export const FileDropArea = (props: FileDropAreaProps) => {
           })}
         >
           <Icon
+            elementDescriptor={descriptors.fileDropAreaIcon}
             icon={Folder}
             size='lg'
             sx={theme => ({ color: theme.colors.$blackAlpha600 })}
@@ -100,12 +104,14 @@ export const FileDropArea = (props: FileDropAreaProps) => {
         ) : (
           <>
             <Text
+              elementDescriptor={descriptors.fileDropAreaHint}
               sx={{ [mqu.sm]: { display: 'none' } }}
               colorScheme='neutral'
             >
               Drag file here, or...
             </Text>
             <Button
+              elementDescriptor={descriptors.fileDropAreaButtonPrimary}
               variant='ghost'
               onClick={openDialog}
             >
@@ -115,6 +121,7 @@ export const FileDropArea = (props: FileDropAreaProps) => {
         )}
       </Col>
       <Text
+        elementDescriptor={descriptors.fileDropAreaFooterHint}
         variant='smallRegular'
         colorScheme='neutral'
       >
