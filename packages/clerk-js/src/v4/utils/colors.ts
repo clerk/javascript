@@ -326,6 +326,13 @@ const makeTransparent = (color: string | undefined, percentage = 0): string | un
   return toHslaString(changeHslaAlpha(hsla, (hsla.a ?? 1) * percentage));
 };
 
+const setAlpha = (color: string, alpha: number) => {
+  if (!color.toString()) {
+    return color;
+  }
+  return toHslaString(setHslaAlpha(toHslaColor(color), alpha));
+};
+
 export const colors = {
   toHslaColor,
   toHslaString,
@@ -334,4 +341,5 @@ export const colors = {
   lighten,
   makeTransparent,
   makeSolid,
+  setAlpha,
 };

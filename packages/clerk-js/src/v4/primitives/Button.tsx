@@ -34,19 +34,15 @@ const { applyVariants, filterProps } = createVariants(theme => {
       },
       colorScheme: {
         primary: {
-          [vars.accentLightest]: theme.options.$darkMode
-            ? colors.makeTransparent(theme.colors.$primary400, 0.8)
-            : colors.makeTransparent(theme.colors.$primary300, 0.8),
-          [vars.accentLighter]: theme.options.$darkMode
-            ? colors.makeTransparent(theme.colors.$primary800, 0.5)
-            : theme.colors.$primary100,
+          [vars.accentLightest]: colors.setAlpha(theme.colors.$primary400, 0.3),
+          [vars.accentLighter]: colors.setAlpha(theme.colors.$primary500, 0.3),
           [vars.accent]: theme.colors.$primary500,
           [vars.accentDark]: theme.colors.$primary600,
           [vars.accentDarker]: theme.colors.$primary700,
         },
         danger: {
-          [vars.accentLightest]: theme.colors.$danger50,
-          [vars.accentLighter]: theme.colors.$danger100,
+          [vars.accentLightest]: colors.setAlpha(theme.colors.$danger400, 0.3),
+          [vars.accentLighter]: colors.setAlpha(theme.colors.$danger500, 0.3),
           [vars.accent]: theme.colors.$danger500,
           [vars.accentDark]: theme.colors.$danger600,
           [vars.accentDarker]: theme.colors.$danger700,

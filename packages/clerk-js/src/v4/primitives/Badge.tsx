@@ -19,27 +19,19 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     colorScheme: {
       primary: {
         [vars.accent]: theme.colors.$primary500,
-        [vars.bg]: theme.options.$darkMode
-          ? colors.makeTransparent(theme.colors.$primary300, 0.8)
-          : theme.colors.$primary50,
+        [vars.bg]: colors.setAlpha(theme.colors.$primary400, 0.2),
       },
       danger: {
         [vars.accent]: theme.colors.$danger500,
-        [vars.bg]: theme.options.$darkMode
-          ? colors.makeTransparent(theme.colors.$danger300, 0.8)
-          : theme.colors.$danger50,
+        [vars.bg]: colors.setAlpha(theme.colors.$danger50, 0.2),
       },
       success: {
         [vars.accent]: theme.colors.$success500,
-        [vars.bg]: theme.options.$darkMode
-          ? colors.makeTransparent(theme.colors.$success300, 0.8)
-          : theme.colors.$success50,
+        [vars.bg]: colors.setAlpha(theme.colors.$success50, 0.2),
       },
       warning: {
         [vars.accent]: theme.colors.$warning500,
-        [vars.bg]: theme.options.$darkMode
-          ? colors.makeTransparent(theme.colors.$warning300, 0.8)
-          : theme.colors.$warning50,
+        [vars.bg]: colors.setAlpha(theme.colors.$warning50, 0.2),
       },
     },
   },

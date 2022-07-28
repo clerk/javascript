@@ -8,7 +8,6 @@ import { fonts, fontSizes, fontStyles, fontWeights, letterSpacings, lineHeights 
 import { zIndices } from './zIndices';
 
 const options = {
-  darkMode: false,
   fontSmoothing: 'auto !important',
 } as const;
 
