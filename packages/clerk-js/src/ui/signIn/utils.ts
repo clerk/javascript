@@ -110,3 +110,16 @@ export function factorHasLocalStrategy(factor: SignInFactor | undefined | null):
   }
   return localStrategies.includes(factor.strategy);
 }
+
+export function determineStartingSignInSecondFactor(secondFactors: SignInFactor[]): SignInFactor | null {
+  if (!secondFactors || secondFactors.length === 0) {
+    return null;
+  }
+
+  const totpFactor = secondFactors.find(f => f.strategy === 'totp');
+  if (totpFactor) {
+    return totpFactor;
+  }
+
+  return secondFactors[0];
+}

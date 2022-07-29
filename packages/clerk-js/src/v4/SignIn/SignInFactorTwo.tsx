@@ -1,16 +1,39 @@
+import { SignInFactor } from '@clerk/types';
 import React from 'react';
 
 import { withRedirectToHome } from '../../ui/common/withRedirectToHome';
-import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../ui/contexts';
+import { useCoreSignIn } from '../../ui/contexts';
 import { useRouter } from '../../ui/router';
-import { Flow } from '../customizables';
-import { VerificationCodeCard, VerificationCodeCardProps, withCardStateProvider } from '../elements';
-import { useCardState } from '../elements/contexts';
-import { handleError } from '../utils';
+import { determineStartingSignInSecondFactor } from '../../ui/signIn/utils';
+import { LoadingCard, withCardStateProvider } from '../elements';
+import { SignInFactorTwoPhoneCodeCard } from './SignInFactorTwoPhoneCodeCard';
+import { SignInFactorTwoTOTPCard } from './SignInFactorTwoTOTPCard';
+
+const factorKey = (factor: SignInFactor | null | undefined) => {
+  if (!factor) {
+    return '';
+  }
+  let key = factor.strategy;
+  if ('phoneNumberId' in factor) {
+    key += factor.phoneNumberId;
+  }
+  return key;
+};
 
 export function _SignInFactorTwo(): JSX.Element {
   const signIn = useCoreSignIn();
+  const availableFactors = signIn.supportedSecondFactors;
   const router = useRouter();
+
+  const lastPreparedFactorKeyRef = React.useRef('');
+  const [currentFactor, setCurrentFactor] = React.useState<SignInFactor | null>(() =>
+    determineStartingSignInSecondFactor(availableFactors),
+  );
+
+  // TODO
+  const handleFactorPrepare = () => {
+    lastPreparedFactorKeyRef.current = factorKey(currentFactor);
+  };
 
   React.useEffect(() => {
     // Handle the case where a user lands on alternative methods screen,
@@ -21,63 +44,32 @@ export function _SignInFactorTwo(): JSX.Element {
     }
   }, []);
 
-  return <SignInFactorTwoPhoneCodeCard />;
+  if (!currentFactor) {
+    return <LoadingCard />;
+  }
+
+  switch (currentFactor?.strategy) {
+    case 'phone_code':
+      return (
+        <SignInFactorTwoPhoneCodeCard
+          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+          onFactorPrepare={handleFactorPrepare}
+          factor={currentFactor}
+          onShowAlternativeMethodsClicked={undefined}
+        />
+      );
+    case 'totp':
+      return (
+        <SignInFactorTwoTOTPCard
+          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+          onFactorPrepare={handleFactorPrepare}
+          factor={currentFactor}
+          onShowAlternativeMethodsClicked={undefined}
+        />
+      );
+    default:
+      return <LoadingCard />;
+  }
 }
 
 export const SignInFactorTwo = withRedirectToHome(withCardStateProvider(_SignInFactorTwo));
-
-const SignInFactorTwoPhoneCodeCard = () => {
-  const signIn = useCoreSignIn();
-  const card = useCardState();
-  const { applicationName } = useEnvironment().displayConfig;
-  const { navigateAfterSignIn } = useSignInContext();
-  const { setActive } = useCoreClerk();
-  const defaultFactor = React.useMemo(() => {
-    const secondFactors = signIn.supportedSecondFactors.filter(factor => factor.strategy === 'phone_code');
-    const defaultIdentifier = secondFactors.find(factor => factor.default);
-    return defaultIdentifier ? defaultIdentifier : secondFactors[0];
-  }, []);
-
-  React.useEffect(() => {
-    // TODO: Make sure this id idempotent
-    prepare();
-  }, []);
-
-  const prepare = () => {
-    if (!signIn || signIn.secondFactorVerification.status === 'verified' || !defaultFactor) {
-      return;
-    }
-    void signIn
-      .prepareSecondFactor({ strategy: 'phone_code', phoneNumberId: defaultFactor.phoneNumberId })
-      .catch(err => handleError(err, [], card.setError));
-  };
-
-  const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
-    return signIn
-      .attemptSecondFactor({ strategy: 'phone_code', code })
-      .then(async res => {
-        await resolve();
-        switch (res.status) {
-          case 'complete':
-            return setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignIn });
-        }
-      })
-      .catch(err => reject(err));
-  };
-
-  return (
-    <Flow.Part part='phoneCode2Fa'>
-      <VerificationCodeCard
-        cardTitle='Two-step authentication'
-        cardSubtitle={''}
-        formTitle='Verification code'
-        formSubtitle='Enter the verification code sent to your phone number'
-        onCodeEntryFinishedAction={action}
-        onResendCodeClicked={prepare}
-        safeIdentifier={defaultFactor.safeIdentifier}
-        profileImageUrl={signIn.userData.profileImageUrl}
-        onShowAlternativeMethodsClicked={undefined}
-      />
-    </Flow.Part>
-  );
-};

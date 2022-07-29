@@ -4,6 +4,7 @@ import {
   OAuthStrategy,
   PasswordStrategy,
   PhoneCodeStrategy,
+  TOTPStrategy,
   Web3Strategy,
 } from './strategies';
 
@@ -37,6 +38,10 @@ export type PasswordFactor = {
 
 export type OauthFactor = {
   strategy: OAuthStrategy;
+};
+
+export type TOTPFactor = {
+  strategy: TOTPStrategy;
 };
 
 export type EmailCodeConfig = Omit<EmailCodeFactor, 'safeIdentifier'>;
@@ -73,4 +78,9 @@ export type PasswordAttempt = {
 export type Web3Attempt = {
   strategy: Web3Strategy;
   signature: string;
+};
+
+export type TOTPAttempt = {
+  strategy: TOTPStrategy;
+  code: string;
 };
