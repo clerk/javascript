@@ -131,11 +131,23 @@ type ButtonProps = OwnProps & StyleVariants<typeof applyVariants>;
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
   const parsedProps: ButtonProps = { ...props, isDisabled: props.isDisabled || props.isLoading };
-  const { isLoading, isDisabled, loadingText, children, ...rest } = filterProps(parsedProps);
+  const { isLoading, isDisabled, loadingText, children, onClick: onClickProp, ...rest } = filterProps(parsedProps);
+
+  const onClick: React.MouseEventHandler<HTMLButtonElement> = e => {
+    if (rest.type !== 'submit') {
+      e.preventDefault();
+    }
+    return onClickProp?.(e);
+  };
+
   return (
     <button
-      type={rest.type || 'button'}
       {...applyDataStateProps(rest)}
+      // Explicitly remove type=submit or type=button
+      // to prevent global css resets (eg tailwind) from affecting
+      // the default styles of our components
+      type={undefined}
+      onClick={onClick}
       disabled={isDisabled}
       css={applyVariants(parsedProps)}
       ref={ref}
@@ -160,12 +172,23 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
 
 const SimpleButton = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
   const parsedProps: ButtonProps = { ...props, isDisabled: props.isDisabled || props.isLoading };
-  const { loadingText, isDisabled, children, ...rest } = filterProps(parsedProps);
+  const { loadingText, isDisabled, children, onClick: onClickProp, ...rest } = filterProps(parsedProps);
+
+  const onClick: React.MouseEventHandler<HTMLButtonElement> = e => {
+    if (rest.type !== 'submit') {
+      e.preventDefault();
+    }
+    return onClickProp?.(e);
+  };
 
   return (
     <button
-      type={rest.type || 'button'}
       {...applyDataStateProps(rest)}
+      // Explicitly remove type=submit or type=button
+      // to prevent global css resets (eg tailwind) from affecting
+      // the default styles of our components
+      type={undefined}
+      onClick={onClick}
       css={applyVariants(parsedProps)}
       disabled={isDisabled}
       ref={ref}
