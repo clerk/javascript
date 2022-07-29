@@ -12,6 +12,8 @@ import {
   PhoneCodeConfig,
   PhoneCodeFactor,
   PhoneCodeSecondFactorConfig,
+  TOTPAttempt,
+  TOTPFactor,
   Web3Attempt,
   Web3SignatureConfig,
   Web3SignatureFactor,
@@ -33,6 +35,7 @@ import {
   PasswordStrategy,
   PhoneCodeStrategy,
   TicketStrategy,
+  TOTPStrategy,
   Web3Strategy,
 } from './strategies';
 import { CreateMagicLinkFlowReturn, StartMagicLinkFlowParams, VerificationResource } from './verification';
@@ -84,7 +87,7 @@ export type SignInFirstFactor =
   | Web3SignatureFactor
   | OauthFactor;
 
-export type SignInSecondFactor = PhoneCodeFactor;
+export type SignInSecondFactor = PhoneCodeFactor | TOTPFactor;
 
 export interface UserData {
   firstName?: string;
@@ -105,7 +108,7 @@ export type AttemptFirstFactorParams = EmailCodeAttempt | PhoneCodeAttempt | Pas
 
 export type PrepareSecondFactorParams = PhoneCodeSecondFactorConfig;
 
-export type AttemptSecondFactorParams = PhoneCodeAttempt;
+export type AttemptSecondFactorParams = PhoneCodeAttempt | TOTPAttempt;
 
 export type SignInCreateParams = (
   | {
@@ -148,6 +151,7 @@ export type SignInStrategy =
   | EmailLinkStrategy
   | TicketStrategy
   | Web3Strategy
+  | TOTPStrategy
   | OAuthStrategy;
 
 export interface SignInJSON extends ClerkResourceJSON {
