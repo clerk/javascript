@@ -171,6 +171,8 @@ export interface UserJSON extends ClerkResourceJSON {
   profile_image_id: string;
   first_name: string;
   last_name: string;
+  totp_enabled: boolean;
+  two_factor_enabled: boolean;
   public_metadata: Record<string, unknown>;
   unsafe_metadata: Record<string, unknown>;
   last_sign_in_at: number | null;
@@ -280,6 +282,23 @@ export interface UserDataJSON {
   first_name?: string;
   last_name?: string;
   profile_image_url?: string;
+}
+
+export interface TOTPJSON extends ClerkResourceJSON {
+  object: 'totp';
+  id: string;
+  secret?: string;
+  uri?: string;
+  verified: boolean;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface DeletedObjectJSON {
+  object: string;
+  id?: string;
+  slug?: string;
+  deleted: boolean;
 }
 
 export type SignInFirstFactorJSON = CamelToSnake<SignInFirstFactor>;

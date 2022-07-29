@@ -24,7 +24,7 @@ export function ActiveMethodsCard(): JSX.Element | null {
     .filter(ph => ph.verification.status === 'verified')
     .filter(ph => ph.reservedForSecondFactor);
 
-  const subtitleMessage = user.twoFactorEnabled()
+  const subtitleMessage = user.twoFactorEnabled
     ? '2-step verification is currently enabled using these methods.'
     : '2-step verification is not enabled.';
 

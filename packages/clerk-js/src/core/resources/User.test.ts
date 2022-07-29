@@ -130,4 +130,16 @@ describe('User', () => {
 
     expect(userWithVerifiedPhone.hasVerifiedPhoneNumber).toEqual(true);
   });
+
+  it.skip('creates a new TOTP secret for the user', () => {
+    // TODO
+  });
+
+  it.skip('verifies a TOTP secret', () => {
+    // TODO
+  });
+
+  it.skip('disables TOTP for a user', () => {
+    // TODO
+  });
 });
