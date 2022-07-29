@@ -25,7 +25,7 @@ export type VerificationCodeCardProps = {
     resolve: () => Promise<void>,
     reject: (err: unknown) => Promise<void>,
   ) => void;
-  onResendCodeClicked: React.MouseEventHandler;
+  onResendCodeClicked?: React.MouseEventHandler;
   onShowAlternativeMethodsClicked?: React.MouseEventHandler;
 };
 
@@ -59,10 +59,12 @@ export const VerificationCodeCard = (props: VerificationCodeCardProps) => {
     props.onCodeEntryFinishedAction(code, resolve, reject);
   });
 
-  const handleResend: React.MouseEventHandler = e => {
-    codeControl.reset();
-    props.onResendCodeClicked(e);
-  };
+  const handleResend = props.onResendCodeClicked
+    ? (e: React.MouseEvent) => {
+        codeControl.reset();
+        props.onResendCodeClicked?.(e);
+      }
+    : undefined;
 
   return (
     <Card>

@@ -9,7 +9,7 @@ type CodeFormProps = {
   subtitle: string;
   isLoading: boolean;
   success: boolean;
-  onResendCodeClicked: React.MouseEventHandler<HTMLButtonElement>;
+  onResendCodeClicked?: React.MouseEventHandler<HTMLButtonElement>;
   codeControl: ReturnType<typeof useCodeControl>;
 };
 
@@ -32,15 +32,17 @@ export const CodeForm = (props: CodeFormProps) => {
         isLoading={isLoading}
         isSuccessfullyFilled={success}
       />
-      <TimerButton
-        onClick={onResendCodeClicked}
-        startDisabled
-        isDisabled={success || isLoading}
-        showCounter={!success}
-        sx={theme => ({ marginTop: theme.space.$6 })}
-      >
-        Resend code
-      </TimerButton>
+      {onResendCodeClicked && (
+        <TimerButton
+          onClick={onResendCodeClicked}
+          startDisabled
+          isDisabled={success || isLoading}
+          showCounter={!success}
+          sx={theme => ({ marginTop: theme.space.$6 })}
+        >
+          Resend code
+        </TimerButton>
+      )}
     </Col>
   );
 };
