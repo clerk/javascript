@@ -16,6 +16,7 @@ const FormRoot = (props: FormProps): JSX.Element => {
   const status = useLoadingStatus();
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
+    console.log('onSubmit');
     e.preventDefault();
     e.stopPropagation();
     if (!props.onSubmit) {
@@ -42,7 +43,20 @@ const FormRoot = (props: FormProps): JSX.Element => {
         gap={4}
         {...props}
         onSubmit={onSubmit}
-      />
+      >
+        {/*
+        We add a submit button as the first element of the form as a workaround to support
+        submitting the form via hitting enter on a field, without explicitly adding type=submit
+        to the other buttons, to avoid conflicts with css resets like tailwind's.
+        This button needs to always be the first element of the form.
+        */}
+        <button
+          type='submit'
+          aria-hidden
+          style={{ display: 'none' }}
+        />
+        {props.children}
+      </FormPrim>
     </FormState.Provider>
   );
 };
