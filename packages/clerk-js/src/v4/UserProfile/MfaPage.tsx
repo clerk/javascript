@@ -1,129 +1,85 @@
-import { PhoneNumberResource } from '@clerk/types';
+import { VerificationStrategy } from '@clerk/types';
 import React from 'react';
 
-import { useCoreUser } from '../../ui/contexts';
-import { useWizard, Wizard } from '../common';
-import { Col, Text } from '../customizables';
-import { ArrowBlockButton, useCardState, withCardStateProvider } from '../elements';
-import { getFlagEmojiFromCountryIso, handleError, parsePhoneString, stringToFormattedPhoneString } from '../utils';
+import { useCoreUser, useEnvironment } from '../../ui/contexts';
+import { Col, Grid, Text } from '../customizables';
+import { useCardState, withCardStateProvider } from '../elements';
+import { AuthenticatorApp, Mobile } from '../icons';
 import { FormButtonContainer } from './FormButtons';
+import { MfaPhoneCodePage } from './MfaPhoneCodePage';
+import { MfaTOTPPage } from './MfaTOTPPage';
 import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
 import { ContentPage } from './Page';
-import { AddPhone, VerifyPhone } from './PhonePage';
-import { SuccessPage } from './SuccessPage';
-import { AddBlockButton } from './UserProfileBlockButtons';
+import { TileButton } from './TileButton';
+import { getSecondFactors } from './utils';
 
 export const MfaPage = withCardStateProvider(() => {
-  const title = 'Add authentication step';
-
-  const ref = React.useRef<PhoneNumberResource | undefined>();
-  const wizard = useWizard({ defaultStep: 2 });
-
-  return (
-    <Wizard {...wizard.props}>
-      <AddPhone
-        title={title}
-        resourceRef={ref}
-        onSuccess={wizard.nextStep}
-      />
-      <VerifyPhone
-        title={title}
-        resourceRef={ref}
-        onSuccess={wizard.nextStep}
-      />
-      <AddMfa
-        onSuccess={wizard.nextStep}
-        onAddPhoneClick={() => wizard.goToStep(0)}
-        onUnverifiedPhoneClick={phone => {
-          ref.current = phone;
-          wizard.goToStep(1);
-        }}
-        title={title}
-      />
-      <SuccessPage
-        title={title}
-        text={`SMS code multifactor authentication is now enabled for this phone number. When signing in, you will need to enter a verification code sent to this phone number as an additional step.`}
-      />
-    </Wizard>
-  );
-});
-
-type AddMfaProps = {
-  onAddPhoneClick: React.MouseEventHandler;
-  onUnverifiedPhoneClick: (phone: PhoneNumberResource) => void;
-  onSuccess: () => void;
-  title: string;
-};
-
-const AddMfa = (props: AddMfaProps) => {
-  const { onSuccess, title, onAddPhoneClick, onUnverifiedPhoneClick } = props;
   const card = useCardState();
+  const { attributes } = useEnvironment().userSettings;
   const user = useCoreUser();
-  const availableMethods = user.phoneNumbers.filter(p => !p.reservedForSecondFactor);
+  const title = 'Add multifactor authentication';
+  const [selectedMethod, setSelectedMethod] = React.useState<VerificationStrategy | undefined>(undefined);
 
-  const enableMfa = (phone: PhoneNumberResource) => {
-    if (phone.verification.status !== 'verified') {
-      return onUnverifiedPhoneClick(phone);
+  // Calculate second factors on first use only
+  const secondFactors = React.useMemo<string[]>(() => {
+    let sfs = getSecondFactors(attributes);
+
+    // If user.totp_enabled, skip totp from the list of choices
+    if (user.totpEnabled) {
+      sfs = sfs.filter(f => f !== 'totp');
     }
 
-    card.setLoading(phone.id);
-    phone
-      .setReservedForSecondFactor({ reserved: true })
-      .then(() => {
-        card.setIdle();
-        onSuccess();
-      })
-      .catch(err => handleError(err, [], card.setError));
-  };
+    return sfs;
+  }, []);
+
+  if (secondFactors.length == 0) {
+    card.setError('There are no enabled second factors');
+
+    return <ContentPage.Root headerTitle={title} />;
+  }
+
+  // If only phone_code is available, just render that
+  // Otherwise check if selected
+  if ((secondFactors.length == 1 && secondFactors[0] == 'phone_code') || selectedMethod === 'phone_code') {
+    return <MfaPhoneCodePage />;
+  }
+
+  // If only totp is available, just render that
+  // Otherwise check if selected
+  if ((secondFactors.length == 1 && secondFactors[0] == 'totp') || selectedMethod === 'totp') {
+    return <MfaTOTPPage />;
+  }
 
   return (
     <ContentPage.Root headerTitle={title}>
-      <Text>
-        {availableMethods.length
-          ? 'Select a phone number to register for SMS code two-step authentication.'
-          : 'There are no available methods.'}
-      </Text>
-      <Col gap={2}>
-        {availableMethods.map(phone => {
-          const formattedPhone = stringToFormattedPhoneString(phone.phoneNumber);
-          const flag = getFlagEmojiFromCountryIso(parsePhoneString(phone.phoneNumber).iso);
+      <Col gap={4}>
+        <Text>Select a method to add.</Text>
 
-          return (
-            <ArrowBlockButton
-              // elementDescriptor={descriptors.socialButtonsButtonBlock}
-              // elementId={descriptors.socialButtonsButtonBlock.setId(strategy)}
-              // textElementDescriptor={descriptors.socialButtonsButtonBlockText}
-              // textElementId={descriptors.socialButtonsButtonBlockText.setId(strategy)}
-              // arrowElementDescriptor={descriptors.socialButtonsButtonBlockArrow}
-              // arrowElementId={descriptors.socialButtonsButtonBlockArrow.setId(strategy)}
-              key={phone.id}
-              // id={strategyToDisplayData[strategy].id}
-              onClick={() => enableMfa(phone)}
-              isLoading={card.loadingMetadata === phone.id}
-              isDisabled={card.isLoading}
-              icon={
-                <Text
-                  as='span'
-                  sx={theme => ({ fontSize: theme.fontSizes.$sm })}
-                >
-                  {flag}
-                </Text>
-              }
-            >
-              {formattedPhone}
-            </ArrowBlockButton>
-          );
-        })}
-        <AddBlockButton
-          block={false}
-          onClick={onAddPhoneClick}
+        <Grid
+          columns={3}
+          gap={2}
         >
-          Add a phone number
-        </AddBlockButton>
+          <TileButton
+            icon={AuthenticatorApp}
+            onClick={() => setSelectedMethod('totp')}
+            sx={{ height: '96px' }}
+          >
+            Authenticator application
+          </TileButton>
+
+          <TileButton
+            icon={Mobile}
+            onClick={() => setSelectedMethod('phone_code')}
+            sx={{ height: '96px' }}
+          >
+            SMS code
+          </TileButton>
+        </Grid>
       </Col>
+
       <FormButtonContainer sx={{ marginTop: 0 }}>
         <NavigateToFlowStartButton>Cancel</NavigateToFlowStartButton>
       </FormButtonContainer>
     </ContentPage.Root>
   );
-};
+});

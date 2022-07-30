@@ -1,4 +1,4 @@
-import { EnvironmentResource, PhoneNumberResource } from '@clerk/types';
+import { Attributes, EnvironmentResource, PhoneNumberResource } from '@clerk/types';
 
 type IDable = { id: string };
 
@@ -14,4 +14,11 @@ export function magicLinksEnabledForInstance(env: EnvironmentResource): boolean 
   const { userSettings } = env;
   const { email_address } = userSettings.attributes;
   return email_address.enabled && email_address.verifications.includes('email_link');
+}
+
+export function getSecondFactors(attributes: Attributes): string[] {
+  return [
+    ...(attributes.phone_number.used_for_second_factor ? attributes.phone_number.second_factors : []),
+    ...(attributes.authenticator_app.used_for_second_factor ? attributes.authenticator_app.second_factors : []),
+  ];
 }

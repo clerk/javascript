@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useReducer } from 'react';
 
 import { useCoreUser } from '../../ui/contexts';
 import { useRouter } from '../../ui/router';
@@ -91,7 +91,7 @@ export const RemoveWeb3WalletPage = () => {
   );
 };
 
-export const RemoveMfaPage = () => {
+export const RemoveMfaPhoneCodePage = () => {
   const user = useCoreUser();
   const { id } = useRouter().params;
   // TODO: This logic will need to change when we add more 2fa methods
@@ -108,6 +108,20 @@ export const RemoveMfaPage = () => {
       messageLine2={`Your account may not be as secure. Are you sure you want to continue?`}
       successMessage={`SMS code multifactor authentication has been removed for ${ref.current.phoneNumber}.`}
       deleteResource={() => Promise.resolve(ref.current?.setReservedForSecondFactor({ reserved: false }))}
+    />
+  );
+};
+
+export const RemoveMfaTOTPPage = () => {
+  const user = useCoreUser();
+
+  return (
+    <RemoveResourcePage
+      title='Remove multifactor authentication'
+      messageLine1='Verification codes from this authenticator will no longer be required when signing in.'
+      messageLine2='Your account may not be as secure. Are you sure you want to continue?'
+      successMessage='Multifactor authentication via authenticator application has been removed.'
+      deleteResource={() => Promise.resolve(user.disableTOTP())}
     />
   );
 };

@@ -26,6 +26,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     columns: {
       1: { gridTemplateColumns: '1fr' },
       2: { gridTemplateColumns: 'repeat(2, 1fr)' },
+      3: { gridTemplateColumns: 'repeat(3, 1fr)' },
       4: { gridTemplateColumns: 'repeat(4, 1fr)' },
       6: { gridTemplateColumns: 'repeat(6, 1fr)' },
     },

@@ -6,6 +6,7 @@
  */
 export { default as ArrowLeftIcon } from './arrow-left.svg';
 export { default as ArrowRightIcon } from './arrow-right.svg';
+export { default as AuthenticatorApp } from './authenticator-app.svg';
 export { default as ExclamationTriangle } from './exclamation-triangle.svg';
 export { default as ExclamationCircle } from './exclamation-circle.svg';
 export { default as EyeSlash } from './eye-slash.svg';

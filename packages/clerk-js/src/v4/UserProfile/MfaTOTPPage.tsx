@@ -1,0 +1,190 @@
+import { TOTPResource } from '@clerk/types';
+import { QRCodeSVG } from 'qrcode.react';
+import React from 'react';
+
+import { useCoreUser } from '../../ui/contexts';
+import { useWizard, Wizard } from '../common';
+import { Button, Col, Spinner, Text } from '../customizables';
+import { useCardState, useCodeControl, withCardStateProvider } from '../elements';
+import { CodeForm } from '../elements/CodeForm';
+import { useLoadingStatus } from '../hooks';
+import { handleError, sleep, useFormControl } from '../utils';
+import { FormButtonContainer } from './FormButtons';
+import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
+import { ContentPage } from './Page';
+import { SuccessPage } from './SuccessPage';
+
+export const MfaTOTPPage = withCardStateProvider(() => {
+  const title = 'Add authenticator app';
+  const wizard = useWizard({});
+
+  return (
+    <Wizard {...wizard.props}>
+      <AddAuthenticatorApp
+        title={title}
+        onContinue={wizard.nextStep}
+      />
+
+      <VerifyTOTP
+        title={title}
+        onVerified={wizard.nextStep}
+      />
+
+      <SuccessPage
+        title={title}
+        text={`Multifactor authentication is now enabled. When signing in, you will need to enter a verification code from this authenticator as an additional step.`}
+      />
+    </Wizard>
+  );
+});
+
+type AddAuthenticatorAppProps = {
+  title: string;
+  onContinue: () => void;
+};
+
+type DisplayFormat = 'qr' | 'uri';
+
+const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
+  const { title, onContinue } = props;
+  const user = useCoreUser();
+  const card = useCardState();
+  const [totp, setTOTP] = React.useState<TOTPResource | undefined>(undefined);
+  const [displayFormat, setDisplayFormat] = React.useState<DisplayFormat>('qr');
+
+  React.useEffect(() => {
+    void user
+      .createTOTP()
+      .then((totp: TOTPResource) => setTOTP(totp))
+      .catch(err => handleError(err, [], card.setError));
+  }, [user]);
+
+  if (!totp && !card.error) {
+    return (
+      <Spinner
+        colorScheme='primary'
+        size='lg'
+      />
+    );
+  }
+
+  if (card.error) {
+    return <ContentPage.Root headerTitle={title} />;
+  }
+
+  return (
+    <ContentPage.Root headerTitle={title}>
+      {totp && (
+        <>
+          <Col gap={4}>
+            {displayFormat == 'qr' && (
+              <>
+                <Text>
+                  Set up a new sign-in method in your authenticator app and scan the following QR code to link it to
+                  your account.
+                </Text>
+
+                <QRCodeSVG
+                  size={200}
+                  value={totp.uri || ''}
+                />
+
+                <Button
+                  variant='link'
+                  onClick={() => setDisplayFormat('uri')}
+                >
+                  Can’t scan QR code?
+                </Button>
+              </>
+            )}
+
+            {displayFormat == 'uri' && (
+              <>
+                <Text>Set up a new sign-in method in your authenticator and enter the Key provided below.</Text>
+
+                <Text>Make sure Time-based or One-time passwords is enabled, then finish linking your account.</Text>
+
+                <Text>Key: {totp.secret}</Text>
+
+                <Text>URI: {totp.uri}</Text>
+
+                <Button
+                  variant='link'
+                  onClick={() => setDisplayFormat('qr')}
+                >
+                  Scan QR code instead
+                </Button>
+              </>
+            )}
+          </Col>
+
+          <FormButtonContainer sx={{ marginTop: 0 }}>
+            <Button
+              textVariant='buttonExtraSmallBold'
+              onClick={onContinue}
+            >
+              Continue
+            </Button>
+
+            <NavigateToFlowStartButton>Cancel</NavigateToFlowStartButton>
+          </FormButtonContainer>
+        </>
+      )}
+    </ContentPage.Root>
+  );
+};
+
+type VerifyTOTPProps = {
+  title: string;
+  onVerified: () => void;
+};
+
+const VerifyTOTP = (props: VerifyTOTPProps) => {
+  const { title, onVerified } = props;
+  const card = useCardState();
+  const user = useCoreUser();
+  const status = useLoadingStatus();
+  const [success, setSuccess] = React.useState(false);
+  const codeControlState = useFormControl('code', '');
+  const codeControl = useCodeControl(codeControlState);
+
+  const resolve = async () => {
+    setSuccess(true);
+    await sleep(750);
+    onVerified();
+  };
+
+  const reject = async (err: any) => {
+    handleError(err, [codeControlState], card.setError);
+    status.setIdle();
+    await sleep(750);
+    codeControl.reset();
+  };
+
+  codeControl.onCodeEntryFinished(code => {
+    status.setLoading();
+    codeControlState.setError(undefined);
+    return user
+      .verifyTOTP({ code })
+      .then(() => resolve())
+      .catch(reject);
+  });
+
+  return (
+    <ContentPage.Root headerTitle={title}>
+      <Col>
+        <CodeForm
+          title={'Verification code'}
+          subtitle={'Enter verification code generated by your authenticator'}
+          isLoading={status.isLoading}
+          success={success}
+          codeControl={codeControl}
+        />
+      </Col>
+
+      <FormButtonContainer sx={{ marginTop: 0 }}>
+        <NavigateToFlowStartButton>Cancel</NavigateToFlowStartButton>
+      </FormButtonContainer>
+    </ContentPage.Root>
+  );
+};
