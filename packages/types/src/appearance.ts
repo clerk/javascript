@@ -365,19 +365,7 @@ export type Theme = {
   elements?: Elements;
 };
 
-export type CreateClerkThemeParams = {
-  /**
-   * Configuration options that affect the layout of the components, allowing
-   * customizations that hard to implement with CSS.
-   * Eg: placing the logo outside the card element
-   */
-  layout?: Layout;
-  /**
-   * General theme overrides. This styles will be merged with our base theme.
-   * Can override global styles like colors, fonts etc.
-   * Eg: `colorPrimary: 'blue'`
-   */
-  variables?: Variables;
+export type CreateClerkThemeParams = Theme & {
   /**
    * Fine-grained theme overrides. Useful when you want to style
    * specific elements or elements that under a specific state.
@@ -501,9 +489,11 @@ export const socialButtonsAutofit = (opts?: { perRow: number }) => {
 };
 
 export const shadesOfPurple = createClerkTheme({
+  baseTheme: [dark],
   variables: {
     colorBackground: '#38375f',
     colorPrimary: '#f8d80d',
     colorTextOnPrimaryBackground: '#38375f',
+    colorInputText: '#a1fdfe',
   },
 });

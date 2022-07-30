@@ -1,5 +1,5 @@
 import { Appearance, DeepPartial, Elements, Layout, Theme } from '@clerk/types';
-import { BaseTheme } from '@clerk/types/src';
+import { BaseTheme, BaseThemeTaggedType } from '@clerk/types/src';
 
 import { createInternalTheme, defaultInternalTheme } from '../foundations';
 import { InternalTheme } from '../styledSystem';
@@ -46,22 +46,10 @@ const defaultLayout: ParsedLayout = {
  */
 export const parseAppearance = (cascade: AppearanceCascade): ParsedAppearance => {
   const { globalAppearance, appearance: componentAppearance, appearanceKey } = cascade;
-  const baseThemes = Array.isArray(globalAppearance?.baseTheme)
-    ? (globalAppearance?.baseTheme as BaseTheme[])
-    : [globalAppearance?.baseTheme];
-  const componentBaseThemes = Array.isArray(componentAppearance?.baseTheme)
-    ? (componentAppearance?.baseTheme as BaseTheme[])
-    : [componentAppearance?.baseTheme];
 
-  const orderedCascade = [
-    ...baseThemes,
-    globalAppearance,
-    globalAppearance?.[appearanceKey],
-    ...componentBaseThemes,
-    componentAppearance,
-  ];
+  const appearanceList: Appearance[] = [];
+  [globalAppearance, globalAppearance?.[appearanceKey], componentAppearance].forEach(a => expand(a, appearanceList));
 
-  const appearanceList = orderedCascade.filter(s => !!s) as Appearance[];
   const parsedInternalTheme = parseVariables(appearanceList);
   const parsedLayout = parseLayout(appearanceList);
   const parsedElements = parseElements(
@@ -75,6 +63,16 @@ export const parseAppearance = (cascade: AppearanceCascade): ParsedAppearance =>
     }),
   );
   return { parsedElements, parsedInternalTheme, parsedLayout };
+};
+
+const expand = (theme: Theme | undefined, cascade: any[]) => {
+  if (!theme) {
+    return;
+  }
+  (Array.isArray(theme.baseTheme) ? theme.baseTheme : [theme.baseTheme]).forEach(baseTheme =>
+    expand(baseTheme as Theme, cascade),
+  );
+  cascade.push(theme);
 };
 
 const parseElements = (appearances: Appearance[]) => {
