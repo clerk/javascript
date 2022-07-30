@@ -1,53 +1,119 @@
 import React from 'react';
 
 import { Button, Flex, Icon, Text } from '../customizables';
-import { PencilEdit } from '../icons';
+import { AuthApp, PencilEdit } from '../icons';
 import { PropsOfComponent } from '../styledSystem';
-import { formatSafeIdentifier } from '../utils';
+import { formatSafeIdentifier, getFlagEmojiFromCountryIso, isMaskedIdentifier, parsePhoneString } from '../utils';
 import { Avatar } from './Avatar';
 
 type IdentityPreviewProps = {
   avatarUrl: string | null | undefined;
   identifier: string | null | undefined;
-  onClick: React.MouseEventHandler;
+  onClick?: React.MouseEventHandler;
 } & PropsOfComponent<typeof Flex>;
 
 export const IdentityPreview = (props: IdentityPreviewProps) => {
   const { avatarUrl, identifier, onClick, ...rest } = props;
   const refs = React.useRef({ avatarUrl, identifier: formatSafeIdentifier(identifier) });
 
+  const edit = onClick && (
+    <Button
+      variant='ghostIcon'
+      onClick={onClick}
+    >
+      <Icon icon={PencilEdit} />
+    </Button>
+  );
+
+  if (!refs.current.identifier) {
+    return (
+      <Container {...rest}>
+        <Authenticator />
+        {edit}
+      </Container>
+    );
+  }
+
+  if (isMaskedIdentifier(refs.current.identifier) || !refs.current.identifier.startsWith('+')) {
+    return (
+      <Container {...rest}>
+        <UsernameOrEmailIdentifier {...refs.current} />
+        {edit}
+      </Container>
+    );
+  }
+
+  const parsedPhone = parsePhoneString(refs.current.identifier || '');
+  const flag = getFlagEmojiFromCountryIso(parsedPhone.iso);
   return (
-    <Flex>
-      <Flex
-        align='center'
-        gap={2}
-        sx={theme => ({
-          maxWidth: '100%',
-          backgroundColor: theme.colors.$blackAlpha20,
-          padding: `${theme.space.$1x5} ${theme.space.$4}`,
-          borderRadius: theme.radii.$2xl,
-          border: `${theme.borders.$normal} ${theme.colors.$blackAlpha200}`,
-        })}
-        {...rest}
-      >
-        <Avatar
-          profileImageUrl={refs.current.avatarUrl}
-          size={theme => theme.sizes.$5}
-        />
-        <Text
-          variant='smallRegular'
-          colorScheme='neutral'
-          truncate
-        >
-          {refs.current.identifier}
-        </Text>
-        <Button
-          variant='ghostIcon'
-          onClick={onClick}
-        >
-          <Icon icon={PencilEdit} />
-        </Button>
-      </Flex>
-    </Flex>
+    <Container {...rest}>
+      <PhoneIdentifier
+        identifier={refs.current.identifier}
+        flag={flag}
+      />
+      {edit}
+    </Container>
+  );
+};
+
+const IdentifierContainer = (props: React.PropsWithChildren<{}>) => {
+  return (
+    <Text
+      variant='smallRegular'
+      colorScheme='neutral'
+      truncate
+      {...props}
+    />
+  );
+};
+
+const UsernameOrEmailIdentifier = (props: any) => {
+  return (
+    <>
+      <Avatar
+        profileImageUrl={props.avatarUrl}
+        size={t => t.sizes.$5}
+      />
+      <IdentifierContainer>{props.identifier}</IdentifierContainer>
+    </>
+  );
+};
+
+const PhoneIdentifier = (props: { identifier: string; flag?: string }) => {
+  return (
+    <>
+      <Text sx={t => ({ fontSize: t.fontSizes.$sm })}>{props.flag}</Text>
+      <IdentifierContainer>{props.identifier}</IdentifierContainer>
+    </>
+  );
+};
+
+const Authenticator = () => {
+  return (
+    <>
+      <Icon
+        icon={AuthApp}
+        sx={t => ({ color: t.colors.$blackAlpha700 })}
+      />
+      <IdentifierContainer>Authenticator app</IdentifierContainer>
+    </>
+  );
+};
+
+const Container = (props: React.PropsWithChildren<{}>) => {
+  return (
+    <Flex
+      align='center'
+      gap={2}
+      sx={t => ({
+        minHeight: t.space.$9x5,
+        width: 'fit-content',
+        backgroundColor: t.colors.$blackAlpha20,
+        padding: `${t.space.$1x5} ${t.space.$4}`,
+        borderRadius: t.radii.$2xl,
+        border: `${t.borders.$normal} ${t.colors.$blackAlpha200}`,
+      })}
+      {...props}
+    ></Flex>
   );
 };
