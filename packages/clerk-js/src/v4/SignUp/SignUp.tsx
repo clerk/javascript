@@ -80,10 +80,13 @@ export const SignUpModal = (props: SignUpProps): JSX.Element => {
           routing: 'virtual',
         }}
       >
-        <SignUp
-          {...signUpProps}
-          routing='virtual'
-        />
+        {/*TODO: Used by InvisibleRootBox, can we simplify? */}
+        <div>
+          <SignUp
+            {...signUpProps}
+            routing='virtual'
+          />
+        </div>
       </ComponentContext.Provider>
     </Route>
   );

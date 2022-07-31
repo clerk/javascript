@@ -14,7 +14,15 @@ type Customizable<T = {}> = T & {
 
 type CustomizablePrimitive<T> = React.FunctionComponent<Customizable<T>>;
 
-export const makeCustomizable = <P,>(Component: React.FunctionComponent<P>): CustomizablePrimitive<P> => {
+type MakeCustomizableOptions = {
+  defaultStyles: ThemableCssProp;
+};
+
+export const makeCustomizable = <P,>(
+  Component: React.FunctionComponent<P>,
+  options?: MakeCustomizableOptions,
+): CustomizablePrimitive<P> => {
+  const { defaultStyles } = options || {};
   const customizableComponent = React.forwardRef((props: Customizable<any>, ref) => {
     const { elementDescriptor, elementId, sx, className, ...restProps } = props;
     const { parsedElements } = useAppearance();
@@ -32,7 +40,7 @@ export const makeCustomizable = <P,>(Component: React.FunctionComponent<P>): Cus
 
     const generatedStyles = generateClassName(parsedElements, elementDescriptor, elementId, props);
     const generatedClassname = appendEmojiSeparator(generatedStyles.className, className);
-    generatedStyles.css.unshift(sx);
+    generatedStyles.css.unshift(defaultStyles, sx);
 
     return (
       <Component

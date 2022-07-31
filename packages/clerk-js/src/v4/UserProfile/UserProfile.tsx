@@ -53,7 +53,10 @@ export const UserProfileModal = (props: UserProfileProps): JSX.Element => {
   return (
     <Route path='user'>
       <ComponentContext.Provider value={userProfileProps}>
-        <UserProfile {...userProfileProps} />
+        {/*TODO: Used by InvisibleRootBox, can we simplify? */}
+        <div>
+          <UserProfile {...userProfileProps} />
+        </div>
       </ComponentContext.Provider>
     </Route>
   );

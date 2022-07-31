@@ -23,3 +23,4 @@ export * from './UserPreview';
 export * from './Accordion';
 export * from './FormattedPhoneNumber';
 export * from './FileDropArea';
+export * from './RootBox';
