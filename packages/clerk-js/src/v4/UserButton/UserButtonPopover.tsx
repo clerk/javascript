@@ -2,8 +2,9 @@ import { ActiveSessionResource } from '@clerk/types';
 import React from 'react';
 
 import { useCoreSession, useCoreUser, useEnvironment, useOptions, useUserButtonContext } from '../../ui/contexts';
-import { Flex, Flow, Link } from '../customizables';
+import { descriptors, Flex, Flow, Link } from '../customizables';
 import { BaseCard, PoweredByClerkText, UserPreview } from '../elements';
+import { RootBox } from '../elements/RootBox';
 import { CogFilled, Plus, SignOut, SignOutDouble } from '../icons';
 import { animations, PropsOfComponent } from '../styledSystem';
 import { Action, Actions } from './CurrentAccountActions';
@@ -63,31 +64,33 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
   );
 
   return (
-    <UserButtonCard
-      ref={ref}
-      {...rest}
-    >
-      <Main>
-        <UserPreview
-          user={user}
-          sx={theme => ({ padding: `0 ${theme.space.$6}`, marginBottom: theme.space.$2 })}
-        />
-        <Actions>
-          <Action
-            icon={CogFilled}
-            label='Manage account'
-            onClick={handleManageAccountClicked}
+    <RootBox elementDescriptor={descriptors.userButtonPopoverRoot}>
+      <UserButtonCard
+        ref={ref}
+        {...rest}
+      >
+        <Main>
+          <UserPreview
+            user={user}
+            sx={theme => ({ padding: `0 ${theme.space.$6}`, marginBottom: theme.space.$2 })}
           />
-          <Action
-            icon={SignOut}
-            label='Sign out'
-            onClick={handleSignOutSessionClicked(session)}
-          />
-        </Actions>
-        {sessionActions}
-      </Main>
-      <Footer />
-    </UserButtonCard>
+          <Actions>
+            <Action
+              icon={CogFilled}
+              label='Manage account'
+              onClick={handleManageAccountClicked}
+            />
+            <Action
+              icon={SignOut}
+              label='Sign out'
+              onClick={handleSignOutSessionClicked(session)}
+            />
+          </Actions>
+          {sessionActions}
+        </Main>
+        <Footer />
+      </UserButtonCard>
+    </RootBox>
   );
 });
 

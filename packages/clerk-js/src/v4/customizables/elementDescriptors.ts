@@ -64,6 +64,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
 
   'userButton',
   'userButton-trigger',
+  'userButton-popoverRoot',
   'userButton-popover',
 
   'identityPreview',

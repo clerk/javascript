@@ -177,6 +177,7 @@ export type ElementsConfig = {
 
   userButton: WithOptions<never, 'open', never>;
   'userButton-trigger': WithOptions<never, 'open', never>;
+  'userButton-popoverRoot': WithOptions<never, never, never>;
   'userButton-popover': WithOptions<never, never, never>;
 
   identityPreview: WithOptions<never, never, never>;
