@@ -69,8 +69,10 @@ export const UserProfileCard = React.forwardRef<HTMLDivElement, CardProps>((prop
           padding: 0,
           width: t.sizes.$220,
           maxWidth: `calc(100vw - ${t.sizes.$20})`,
+          margin: branded ? `0 ${t.space.$7}` : undefined,
           [mqu.sm]: {
             maxWidth: `calc(100vw - ${t.sizes.$3})`,
+            margin: branded ? `0 0 ${t.space.$7} 0` : '0',
           },
         }),
         props.sx,
