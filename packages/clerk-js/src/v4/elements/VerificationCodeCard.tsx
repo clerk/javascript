@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { useRouter } from '../../ui/router';
 import { descriptors, Flex } from '../customizables';
 import { useLoadingStatus } from '../hooks';
 import { handleError, sleep, useFormControl } from '../utils';
@@ -14,11 +13,11 @@ import { Header } from './Header';
 import { IdentityPreview } from './IdentityPreview';
 
 export type VerificationCodeCardProps = {
-  safeIdentifier: string;
   cardTitle: string;
   cardSubtitle: string;
   formTitle: string;
   formSubtitle: string;
+  safeIdentifier?: string;
   profileImageUrl?: string;
   onCodeEntryFinishedAction: (
     code: string,
@@ -27,6 +26,7 @@ export type VerificationCodeCardProps = {
   ) => void;
   onResendCodeClicked?: React.MouseEventHandler;
   onShowAlternativeMethodsClicked?: React.MouseEventHandler;
+  onIdentityPreviewEditClicked?: React.MouseEventHandler;
 };
 
 export const VerificationCodeCard = (props: VerificationCodeCardProps) => {
@@ -34,12 +34,7 @@ export const VerificationCodeCard = (props: VerificationCodeCardProps) => {
   const status = useLoadingStatus();
   const codeControlState = useFormControl('code', '');
   const codeControl = useCodeControl(codeControlState);
-  const { navigate } = useRouter();
   const card = useCardState();
-
-  const goBack = () => {
-    return navigate('../');
-  };
 
   const resolve = async () => {
     setSuccess(true);
@@ -77,7 +72,7 @@ export const VerificationCodeCard = (props: VerificationCodeCardProps) => {
       <IdentityPreview
         identifier={props.safeIdentifier}
         avatarUrl={props.profileImageUrl}
-        onClick={goBack}
+        onClick={props.onIdentityPreviewEditClicked}
       />
       {/*TODO: extract main in its own component */}
       <Flex

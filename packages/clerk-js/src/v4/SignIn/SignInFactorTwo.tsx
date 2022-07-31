@@ -3,9 +3,9 @@ import React from 'react';
 
 import { withRedirectToHome } from '../../ui/common/withRedirectToHome';
 import { useCoreSignIn } from '../../ui/contexts';
-import { useRouter } from '../../ui/router';
 import { determineStartingSignInSecondFactor } from '../../ui/signIn/utils';
 import { LoadingCard, withCardStateProvider } from '../elements';
+import { SignInFactorTwoAlternativeMethods } from './SignInFactorTwoAlternativeMethods';
 import { SignInFactorTwoPhoneCodeCard } from './SignInFactorTwoPhoneCodeCard';
 import { SignInFactorTwoTOTPCard } from './SignInFactorTwoTOTPCard';
 
@@ -23,29 +23,35 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
 export function _SignInFactorTwo(): JSX.Element {
   const signIn = useCoreSignIn();
   const availableFactors = signIn.supportedSecondFactors;
-  const router = useRouter();
 
   const lastPreparedFactorKeyRef = React.useRef('');
   const [currentFactor, setCurrentFactor] = React.useState<SignInFactor | null>(() =>
     determineStartingSignInSecondFactor(availableFactors),
   );
+  const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(!currentFactor);
+  const toggleAllStrategies = () => setShowAllStrategies(s => !s);
 
   // TODO
   const handleFactorPrepare = () => {
     lastPreparedFactorKeyRef.current = factorKey(currentFactor);
   };
 
-  React.useEffect(() => {
-    // Handle the case where a user lands on alternative methods screen,
-    // clicks a social button but then navigates back to signin.
-    // SignIn status resets to 'needs_identifier'
-    if (signIn.status === 'needs_identifier' || signIn.status === null) {
-      void router.navigate('../');
-    }
-  }, []);
+  const selectFactor = (factor: SignInFactor) => {
+    setCurrentFactor(factor);
+    toggleAllStrategies();
+  };
 
   if (!currentFactor) {
     return <LoadingCard />;
+  }
+
+  if (showAllStrategies) {
+    return (
+      <SignInFactorTwoAlternativeMethods
+        onBackLinkClick={toggleAllStrategies}
+        onFactorSelected={selectFactor}
+      />
+    );
   }
 
   switch (currentFactor?.strategy) {
@@ -55,7 +61,7 @@ export function _SignInFactorTwo(): JSX.Element {
           factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
-          onShowAlternativeMethodsClicked={undefined}
+          onShowAlternativeMethodsClicked={toggleAllStrategies}
         />
       );
     case 'totp':
@@ -64,7 +70,7 @@ export function _SignInFactorTwo(): JSX.Element {
           factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
-          onShowAlternativeMethodsClicked={undefined}
+          onShowAlternativeMethodsClicked={toggleAllStrategies}
         />
       );
     default:

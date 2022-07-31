@@ -21,6 +21,10 @@ export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) 
   const { setActive } = useCoreClerk();
   const { navigate } = useNavigate();
 
+  const goBack = () => {
+    return navigate('../');
+  };
+
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
     return props
       .attempt(code)
@@ -49,6 +53,7 @@ export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) 
       onCodeEntryFinishedAction={action}
       onResendCodeClicked={props.prepare}
       safeIdentifier={props.safeIdentifier || ''}
+      onIdentityPreviewEditClicked={goBack}
     />
   );
 };

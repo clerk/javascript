@@ -11,7 +11,10 @@ export const SignInFactorTwoPhoneCodeCard = (props: SignInFactorTwoPhoneCodeCard
   const signIn = useCoreSignIn();
 
   const prepare = () => {
-    return signIn.prepareSecondFactor(props.factor);
+    // TODO: Why does the BE throw an error if I simply pass
+    // the whole factor?
+    const { phoneNumberId, strategy } = props.factor;
+    return signIn.prepareSecondFactor({ phoneNumberId, strategy });
   };
 
   return (

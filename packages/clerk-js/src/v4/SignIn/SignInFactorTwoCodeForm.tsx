@@ -3,8 +3,7 @@ import React from 'react';
 
 import { useCoreClerk, useCoreSignIn, useSignInContext } from '../../ui/contexts';
 import { useSupportEmail } from '../../ui/hooks/useSupportEmail';
-import { VerificationCodeCard, VerificationCodeCardProps } from '../elements';
-import { useCardState } from '../elements';
+import { useCardState, VerificationCodeCard, VerificationCodeCardProps } from '../elements';
 import { handleError } from '../utils';
 
 export type SignInFactorTwoCodeCard = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
@@ -38,13 +37,10 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
 
   const prepare = props.prepare
     ? () => {
-        return (
-          props
-            .prepare?.()
-            // TODO
-            // .then(() => props.onFactorPrepare())
-            .catch(err => handleError(err, [], card.setError))
-        );
+        return props
+          .prepare?.()
+          .then(() => props.onFactorPrepare())
+          .catch(err => handleError(err, [], card.setError));
       }
     : undefined;
 
@@ -73,9 +69,7 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
       formSubtitle={props.formSubtitle}
       onCodeEntryFinishedAction={action}
       onResendCodeClicked={prepare}
-      // TODO
-      // @ts-expect-error
-      safeIdentifier={props.factor.safeIdentifier}
+      safeIdentifier={'safeIdentifier' in props.factor ? props.factor.safeIdentifier : undefined}
       profileImageUrl={signIn.userData.profileImageUrl}
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
     />

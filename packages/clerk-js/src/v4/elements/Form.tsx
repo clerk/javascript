@@ -16,7 +16,6 @@ const FormRoot = (props: FormProps): JSX.Element => {
   const status = useLoadingStatus();
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
-    console.log('onSubmit');
     e.preventDefault();
     e.stopPropagation();
     if (!props.onSubmit) {

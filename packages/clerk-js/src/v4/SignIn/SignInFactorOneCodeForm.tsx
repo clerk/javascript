@@ -29,6 +29,10 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   const { setActive } = useCoreClerk();
   const supportEmail = useSupportEmail();
 
+  const goBack = () => {
+    return navigate('../');
+  };
+
   React.useEffect(() => {
     if (signIn.firstFactorVerification.status === null && !props.factorAlreadyPrepared) {
       prepare();
@@ -72,6 +76,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
       safeIdentifier={props.factor.safeIdentifier}
       profileImageUrl={signIn.userData.profileImageUrl}
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
+      onIdentityPreviewEditClicked={goBack}
     />
   );
 };
