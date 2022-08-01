@@ -1,9 +1,9 @@
 import { OAuthProvider, OAuthStrategy, Web3Provider, Web3Strategy } from '@clerk/types';
 import React from 'react';
 
-import { Button, descriptors, Flex, Grid, Image, useAppearance } from '../customizables';
+import { Button, descriptors, Grid, Image, useAppearance } from '../customizables';
 import { useEnabledThirdPartyProviders } from '../hooks';
-import { mqu, PropsOfComponent } from '../styledSystem';
+import { PropsOfComponent } from '../styledSystem';
 import { sleep } from '../utils';
 import { ArrowBlockButton } from './ArrowBlockButton';
 import { useCardState } from './contexts';
@@ -79,13 +79,16 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
 
 const ButtonGrid = (props: React.PropsWithChildren<any>) => {
   return (
-    <Flex
+    <Grid
       elementDescriptor={descriptors.socialButtons}
       gap={2}
-      wrap='wrap'
+      sx={t => ({
+        gridTemplateColumns: `repeat(auto-fit, minmax(${t.sizes.$12}, 1fr))`,
+        gridAutoRows: t.sizes.$12,
+      })}
     >
       {props.children}
-    </Flex>
+    </Grid>
   );
 };
 
@@ -118,12 +121,6 @@ const SocialButtonIcon = (props: SocialButtonProps): JSX.Element => {
       sx={t => ({
         padding: 0,
         borderColor: t.colors.$blackAlpha200,
-        height: t.sizes.$12,
-        width: t.sizes.$12,
-        [mqu.sm]: {
-          height: t.sizes.$11,
-          width: t.sizes.$11,
-        },
       })}
       {...rest}
     >
