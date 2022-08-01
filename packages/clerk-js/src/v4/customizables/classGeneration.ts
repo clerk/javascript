@@ -5,7 +5,6 @@ import { CLASS_PREFIX, ElementDescriptor, ElementId } from './elementDescriptors
 import { ParsedElements } from './parseAppearance';
 
 const STATE_PROP_TO_CLASSNAME = Object.freeze({
-  // disabled: ` ${CLASS_PREFIX}disabled`,
   loading: ` ${CLASS_PREFIX}loading`,
   error: ` ${CLASS_PREFIX}error`,
   open: ` ${CLASS_PREFIX}open`,
@@ -17,7 +16,7 @@ type PropsWithState = Partial<Record<'isLoading' | 'isDisabled' | 'hasError' | '
 
 export const generateClassName = (
   parsedElements: ParsedElements,
-  elemDescriptor: ElementDescriptor,
+  elemDescriptors: ElementDescriptor[],
   elemId: ElementId | undefined,
   props: PropsWithState | undefined,
 ) => {
@@ -25,18 +24,22 @@ export const generateClassName = (
   let className = '';
   const css: unknown[] = [];
 
-  className = addClerkTargettableClassname(className, elemDescriptor);
-  className = addClerkTargettableIdClassname(className, elemDescriptor, elemId);
+  className = addClerkTargettableClassname(className, elemDescriptors);
+  className = addClerkTargettableIdClassname(className, elemDescriptors[0], elemId);
   className = addClerkTargettableStateClass(className, state);
   className = addClerkTargettableRequiredAttribute(className, props as any);
 
-  className = addUserProvidedClassnames(className, parsedElements, elemDescriptor, elemId, state);
-  addUserProvidedStyleRules(css, parsedElements, elemDescriptor, elemId, state);
+  className = addUserProvidedClassnames(className, parsedElements, elemDescriptors, elemId, state);
+  addUserProvidedStyleRules(css, parsedElements, elemDescriptors, elemId, state);
   return { className, css };
 };
 
-const addClerkTargettableClassname = (cn: string, elemDescriptor: ElementDescriptor) => {
-  return cn + elemDescriptor.targettableClassname;
+const addClerkTargettableClassname = (cn: string, elemDescriptors: ElementDescriptor[]) => {
+  // We want the most specific classname to be displayed first, so we reverse the order
+  for (let i = elemDescriptors.length - 1; i >= 0; i--) {
+    cn += elemDescriptors[i].targettableClassname + ' ';
+  }
+  return cn.trimEnd();
 };
 
 const addClerkTargettableIdClassname = (
@@ -44,6 +47,7 @@ const addClerkTargettableIdClassname = (
   elemDescriptor: ElementDescriptor,
   elemId: ElementId | undefined,
 ) => {
+  // TODO: All descriptors return the same id, extract into stand-alone function?
   return elemId ? cn + ' ' + elemDescriptor.getTargettableIdClassname(elemId) : cn;
 };
 
@@ -62,26 +66,30 @@ export const appendEmojiSeparator = (generatedCn: string, otherCn?: string) => {
 const addUserProvidedStyleRules = (
   css: unknown[],
   parsedElements: ParsedElements,
-  elemDescriptor: ElementDescriptor,
+  elemDescriptors: ElementDescriptor[],
   elemId: ElementId | undefined,
   state: ElementState | undefined,
 ) => {
-  parsedElements.forEach(elements => {
-    addRulesFromElements(css, elements, elemDescriptor, elemId, state);
-  });
+  for (let j = 0; j < elemDescriptors.length; j++) {
+    for (let i = 0; i < parsedElements.length; i++) {
+      addRulesFromElements(css, parsedElements[i], elemDescriptors[j], elemId, state);
+    }
+  }
 };
 
 const addUserProvidedClassnames = (
   cn: string,
   parsedElements: ParsedElements,
-  elemDescriptor: ElementDescriptor,
+  elemDescriptors: ElementDescriptor[],
   elemId: ElementId | undefined,
   state: ElementState | undefined,
 ) => {
-  parsedElements.forEach(elements => {
-    cn = addClassnamesFromElements(cn, elements, elemDescriptor, elemId, state);
-  });
-  return cn;
+  for (let j = 0; j < elemDescriptors.length; j++) {
+    for (let i = 0; i < parsedElements.length; i++) {
+      cn = addClassnamesFromElements(cn, parsedElements[i], elemDescriptors[j], elemId, state);
+    }
+  }
+  return cn; //.trimEnd();
 };
 
 const getElementState = (props: PropsWithState | undefined): ElementState | undefined => {
@@ -94,9 +102,6 @@ const getElementState = (props: PropsWithState | undefined): ElementState | unde
   if (props.hasError) {
     return 'error';
   }
-  // if (props.isDisabled) {
-  //   return 'disabled';
-  // }
   if (props.isOpen) {
     return 'open';
   }

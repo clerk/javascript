@@ -233,6 +233,10 @@ export type ElementsConfig = {
   fileDropAreaFooterHint: WithOptions<never, never, never>;
 
   badgePrimary: WithOptions<never, never, never>;
+
+  // default descriptors
+  badge: WithOptions<never, never, never>;
+  button: WithOptions<never, LoadingState, never>;
 };
 
 export type Elements = {

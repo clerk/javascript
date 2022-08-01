@@ -6,7 +6,7 @@ import { appendEmojiSeparator, generateClassName } from './classGeneration';
 import { ElementDescriptor, ElementId } from './elementDescriptors';
 
 type Customizable<T = {}> = T & {
-  elementDescriptor?: ElementDescriptor;
+  elementDescriptor?: ElementDescriptor | ElementDescriptor[];
   elementId?: ElementId;
   css?: never;
   sx?: ThemableCssProp;
@@ -15,19 +15,25 @@ type Customizable<T = {}> = T & {
 type CustomizablePrimitive<T> = React.FunctionComponent<Customizable<T>>;
 
 type MakeCustomizableOptions = {
-  defaultStyles: ThemableCssProp;
+  defaultStyles?: ThemableCssProp;
+  defaultDescriptor?: ElementDescriptor;
 };
 
 export const makeCustomizable = <P,>(
   Component: React.FunctionComponent<P>,
   options?: MakeCustomizableOptions,
 ): CustomizablePrimitive<P> => {
-  const { defaultStyles } = options || {};
+  const { defaultStyles, defaultDescriptor } = options || {};
+
   const customizableComponent = React.forwardRef((props: Customizable<any>, ref) => {
     const { elementDescriptor, elementId, sx, className, ...restProps } = props;
     const { parsedElements } = useAppearance();
+    const descriptors = [
+      defaultDescriptor,
+      ...(Array.isArray(elementDescriptor) ? elementDescriptor : [elementDescriptor]),
+    ].filter(s => s);
 
-    if (!elementDescriptor) {
+    if (!descriptors.length) {
       return (
         <Component
           css={sx}
@@ -38,7 +44,7 @@ export const makeCustomizable = <P,>(
       );
     }
 
-    const generatedStyles = generateClassName(parsedElements, elementDescriptor, elementId, props);
+    const generatedStyles = generateClassName(parsedElements, descriptors, elementId, props);
     const generatedClassname = appendEmojiSeparator(generatedStyles.className, className);
     generatedStyles.css.unshift(defaultStyles, sx);
 
