@@ -253,7 +253,8 @@ export default class IsomorphicClerk {
   }
 
   __unstable__updateProps = (props: any): any => {
-    if (this.clerkjs) {
+    // Handle case where accounts has clerk-react@4 installed, but clerk-js@3 is manually loaded
+    if (this.clerkjs && '__unstable__updateProps' in this.clerkjs) {
       (this.clerkjs as any).__unstable__updateProps(props);
     } else {
       return undefined;
