@@ -1,17 +1,24 @@
 {
-  "name": "next",
-  "version": "0.2.0",
+  "name": "my-app",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
-    "@clerk/clerk-sdk-node": "file:../../dist",
-    "lodash": "^4.17.21",
-    "next": "11.0.1",
-    "react": "^16",
-    "react-dom": "^16"
+    "next": "12.2.3",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "18.6.3",
+    "@types/react": "18.0.15",
+    "@types/react-dom": "18.0.6",
+    "eslint": "8.21.0",
+    "eslint-config-next": "12.2.3",
+    "typescript": "4.7.4"
   }
 }
