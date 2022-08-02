@@ -68,12 +68,14 @@ export default function createFapiClient(clerkInstance: Clerk): FapiClient {
   }
 
   async function runBeforeRequestCallbacks(requestInit: FapiRequestInit) {
+    typeof window !== 'undefined' && (await (window as any).__unstable__onBeforeRequest?.(requestInit));
     for await (const callback of onBeforeRequestCallbacks) {
       await callback(requestInit);
     }
   }
 
   async function runAfterResponseCallbacks(requestInit: FapiRequestInit, response: FapiResponse<unknown>) {
+    typeof window !== 'undefined' && (await (window as any).__unstable__onAfterResponse?.(requestInit, response));
     for await (const callback of onAfterResponseCallbacks) {
       await callback(requestInit, response);
     }
@@ -167,19 +169,23 @@ export default function createFapiClient(clerkInstance: Clerk): FapiClient {
         ...requestInit,
         credentials: 'include',
         method: overwrittenRequestMethod,
+      }).catch(e => {
+        // Support for mocked components on the marketing site
+        if (e.name === 'AbortError') {
+          console.log(e);
+          return { status: 200, ok: true, json: () => Promise.resolve(undefined) } as any;
+        }
+        throw e;
       });
     } catch (e) {
       clerkNetworkError(urlStr, e);
     }
-
     const json: FapiResponseJSON<T> = await response.json();
-
     const fapiResponse: FapiResponse<T> = Object.assign(response, {
       payload: json,
     });
 
     await runAfterResponseCallbacks(requestInit, fapiResponse);
-
     return fapiResponse;
   }
 

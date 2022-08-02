@@ -62,7 +62,9 @@ const AddConnectedAccount = () => {
       // .createExternalAccount({ strategy: strategy, redirect_url: redirectUrl.toString() })
       .createExternalAccount({ strategy: strategy, redirect_url: window.location.href })
       .then(res => {
-        return navigate(res.verification!.externalVerificationRedirectURL);
+        if (res.verification?.externalVerificationRedirectURL) {
+          return navigate(res.verification.externalVerificationRedirectURL);
+        }
       })
       .catch(err => handleError(err, [], card.setError))
       .finally(() => {
