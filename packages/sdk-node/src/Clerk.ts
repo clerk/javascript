@@ -50,21 +50,38 @@ export type RequireAuthProp<T> = T & {
   };
 };
 
-export type Middleware = (
+type MiddlewareWithAuthProp = (
   req: WithAuthProp<Request>,
   res: Response,
   next: NextFunction
 ) => Promise<void>;
 
-export type MiddlewareOptions = {
+type MiddlewareRequireAuthProp = (
+  req: RequireAuthProp<Request>,
+  res: Response,
+  next: NextFunction
+) => Promise<void>;
+
+export type Middleware = MiddlewareWithAuthProp | MiddlewareRequireAuthProp;
+
+export type MiddlewareOptionsInLooseMode = {
   onError?: (error: ClerkAPIResponseError) => unknown;
   authorizedParties?: string[];
   jwtKey?: string;
   strict?: boolean;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const noop: NextFunction = () => {};
+export type MiddlewareOptionsInStrictMode = MiddlewareOptionsInLooseMode & {
+  strict: true;
+};
+
+export type MiddlewareOptions =
+  | MiddlewareOptionsInLooseMode
+  | MiddlewareOptionsInStrictMode;
+
+type MiddlewareReturnType<T> = T extends MiddlewareOptionsInStrictMode
+  ? MiddlewareRequireAuthProp
+  : MiddlewareWithAuthProp;
 
 export default class Clerk extends ClerkBackendAPI {
   base: Base;
@@ -241,19 +258,17 @@ export default class Clerk extends ClerkBackendAPI {
     }
   }
 
-  private nodeAuthenticate(options: MiddlewareOptions): Middleware {
-    function signedOut() {
-      throw new Error('Unauthenticated');
-    }
-
+  private authenticate<T extends MiddlewareOptions>(
+    options: T
+  ): MiddlewareReturnType<T> {
     const { onError, authorizedParties, jwtKey, strict } = options;
 
-    async function authenticate(
+    async function doAuthenticate(
       this: Clerk,
       req: Request,
       res: Response,
       next: NextFunction
-    ): Promise<any> {
+    ): Promise<void> {
       try {
         const cookies = new Cookies(req, res);
         const cookieToken = cookies.get('__session') as string;
@@ -278,7 +293,7 @@ export default class Clerk extends ClerkBackendAPI {
         errorReason && res.setHeader('Auth-Result', errorReason);
 
         if (status === AuthStatus.SignedOut) {
-          return signedOut();
+          throw new Error('Unauthenticated');
         }
 
         if (status === AuthStatus.SignedIn) {
@@ -293,7 +308,7 @@ export default class Clerk extends ClerkBackendAPI {
               fetcher: (...args) => this.sessions.getToken(...args),
             }),
             claims: sessionClaims,
-          };
+          } as RequireAuthProp<Request>;
 
           return next();
         }
@@ -309,7 +324,7 @@ export default class Clerk extends ClerkBackendAPI {
           sessionId: null,
           getToken: createSignedOutState().getToken,
           claims: null,
-        };
+        } as WithAuthProp<Request>;
 
         this.logError(error as any, strict);
         const err = onError ? await onError(error as any) : error;
@@ -323,63 +338,16 @@ export default class Clerk extends ClerkBackendAPI {
       }
     }
 
-    return authenticate.bind(this);
+    return doAuthenticate.bind(this);
   }
 
-  // Credits to https://nextjs.org/docs/api-routes/api-middlewares
-  // Helper method to wait for a middleware to execute before continuing
-  // And to throw an error when an error happens in a middleware
-  // @ts-ignore
-  private _runMiddleware(req, res, fn) {
-    return new Promise((resolve, reject) => {
-      // @ts-ignore
-      fn(req, res, (result) => {
-        if (result instanceof Error) {
-          return reject(result);
-        }
+  // Connect/Express middlewares
 
-        return resolve(result);
-      });
-    });
+  expressWithAuth(options = {}) {
+    return this.authenticate({ strict: false, ...options });
   }
 
-  // Middlewares
-
-  expressWithAuth(options: MiddlewareOptions = {}) {
-    return this.nodeAuthenticate({ strict: false, ...options });
-  }
-
-  expressRequireAuth(options?: MiddlewareOptions) {
-    return this.nodeAuthenticate({ strict: true, ...options });
-  }
-
-  // Set the session on the request and then call provided handler
-  withAuth(handler: Middleware, options?: MiddlewareOptions) {
-    return async (
-      req: WithAuthProp<Request>,
-      res: Response,
-      next?: NextFunction
-    ) => {
-      try {
-        await this._runMiddleware(req, res, this.expressWithAuth(options));
-        return handler(req, res, next || noop);
-      } catch (error) {
-        // @ts-ignore
-        const errorData = error.data || { error: error.message };
-        // @ts-ignore
-        res.statusCode = error.statusCode || 401;
-        /**
-         * Res.json is available in express-like environments.
-         * Res.send is available in express-like but also Fastify.
-         */
-        res.json ? res.json(errorData) : res.send(errorData);
-        res.end();
-      }
-    };
-  }
-
-  // Stricter version, short-circuits if session can't be determined
-  requireAuth(handler: Middleware, options?: MiddlewareOptions) {
-    return this.withAuth(handler, { strict: true, ...options });
+  expressRequireAuth(options = {}) {
+    return this.authenticate({ strict: true, ...options });
   }
 }

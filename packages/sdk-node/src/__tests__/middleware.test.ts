@@ -2,7 +2,7 @@ import { AuthStatus } from '@clerk/backend-core';
 import type { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
-import Clerk, { WithAuthProp } from '../Clerk';
+import Clerk, { RequireAuthProp, WithAuthProp } from '../Clerk';
 
 const mockGetToken = jest.fn();
 
@@ -63,7 +63,7 @@ test('expressWithAuth with no session token', async () => {
 });
 
 test('expressRequireAuth with no session token', async () => {
-  const req = {} as WithAuthProp<Request>;
+  const req = {} as RequireAuthProp<Request>;
   const res = {} as Response;
 
   const clerk = Clerk.getInstance();
