@@ -57,7 +57,12 @@ const ClerkExpressRequireAuth =
 export { ClerkExpressWithAuth, ClerkExpressRequireAuth };
 
 // Export wrapper types for Next.js requests
-export { WithAuthProp, RequireAuthProp } from './Clerk';
+export {
+  WithAuthProp,
+  RequireAuthProp,
+  Middleware as ClerkMiddleware,
+  MiddlewareOptions as ClerkMiddlewareOptions,
+} from './Clerk';
 
 // Export setters for the default singleton instance
 // Useful if you only have access to a sub-api instance

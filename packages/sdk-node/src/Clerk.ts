@@ -64,14 +64,14 @@ type MiddlewareRequireAuthProp = (
 
 export type Middleware = MiddlewareWithAuthProp | MiddlewareRequireAuthProp;
 
-export type MiddlewareOptionsInLooseMode = {
+type MiddlewareOptionsInLooseMode = {
   onError?: (error: ClerkAPIResponseError) => unknown;
   authorizedParties?: string[];
   jwtKey?: string;
   strict?: boolean;
 };
 
-export type MiddlewareOptionsInStrictMode = MiddlewareOptionsInLooseMode & {
+type MiddlewareOptionsInStrictMode = MiddlewareOptionsInLooseMode & {
   strict: true;
 };
 
