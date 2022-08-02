@@ -1,4 +1,4 @@
-import { withAuth, WithAuthProp } from '@clerk/clerk-sdk-node';
+import { withAuth, WithAuthProp } from '@clerk/nextjs/api';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 function handler(req: WithAuthProp<NextApiRequest>, res: NextApiResponse) {
