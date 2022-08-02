@@ -15,7 +15,9 @@ import { defaultFirst, getSecondFactors } from './utils';
 
 export const MfaSection = () => {
   const { navigate } = useNavigate();
-  const { attributes } = useEnvironment().userSettings;
+  const {
+    userSettings: { attributes },
+  } = useEnvironment();
   const user = useCoreUser();
 
   const secondFactors = getSecondFactors(attributes);

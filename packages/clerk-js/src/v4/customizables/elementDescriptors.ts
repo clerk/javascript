@@ -58,6 +58,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'form-buttonReset',
   'form-fieldInputShowPasswordButton',
   'form-fieldInputShowPasswordIcon',
+  'form-fieldInputCopyToClipboardButton',
+  'form-fieldInputCopyToClipboardIcon',
 
   'avatar',
   'avatar-image',

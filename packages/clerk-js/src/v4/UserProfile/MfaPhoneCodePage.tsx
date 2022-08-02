@@ -16,7 +16,7 @@ import { AddBlockButton } from './UserProfileBlockButtons';
 export const MfaPhoneCodePage = withCardStateProvider(() => {
   const title = 'Add multifactor authentication';
 
-  const ref = React.useRef<PhoneNumberResource | undefined>();
+  const ref = React.useRef<PhoneNumberResource>();
   const wizard = useWizard({ defaultStep: 2 });
 
   return (

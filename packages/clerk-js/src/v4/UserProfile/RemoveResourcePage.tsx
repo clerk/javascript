@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React from 'react';
 
 import { useCoreUser } from '../../ui/contexts';
 import { useRouter } from '../../ui/router';
@@ -121,7 +121,7 @@ export const RemoveMfaTOTPPage = () => {
       messageLine1='Verification codes from this authenticator will no longer be required when signing in.'
       messageLine2='Your account may not be as secure. Are you sure you want to continue?'
       successMessage='Multifactor authentication via authenticator application has been removed.'
-      deleteResource={() => Promise.resolve(user.disableTOTP())}
+      deleteResource={user.disableTOTP}
     />
   );
 };

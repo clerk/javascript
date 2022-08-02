@@ -52,8 +52,5 @@
     "lerna": "lerna",
     "nuke": "rm -r node_modules; for d in packages/*/node_modules; do echo $d; rm -r $d; done",
     "yalc:all": " for d in packages/*/; do echo $d; cd $d; yalc push --replace; cd '../../'; done"
-  },
-  "dependencies": {
-    "qrcode.react": "^3.1.0"
   }
 }

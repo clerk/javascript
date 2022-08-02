@@ -15,13 +15,15 @@ import { getSecondFactors } from './utils';
 
 export const MfaPage = withCardStateProvider(() => {
   const card = useCardState();
-  const { attributes } = useEnvironment().userSettings;
+  const {
+    userSettings: { attributes },
+  } = useEnvironment();
   const user = useCoreUser();
   const title = 'Add multifactor authentication';
-  const [selectedMethod, setSelectedMethod] = React.useState<VerificationStrategy | undefined>(undefined);
+  const [selectedMethod, setSelectedMethod] = React.useState<VerificationStrategy>();
 
   // Calculate second factors on first use only
-  const secondFactors = React.useMemo<string[]>(() => {
+  const secondFactors = React.useMemo(() => {
     let sfs = getSecondFactors(attributes);
 
     // If user.totp_enabled, skip totp from the list of choices
@@ -32,7 +34,7 @@ export const MfaPage = withCardStateProvider(() => {
     return sfs;
   }, []);
 
-  if (secondFactors.length == 0) {
+  if (secondFactors.length === 0) {
     card.setError('There are no enabled second factors');
 
     return <ContentPage.Root headerTitle={title} />;
@@ -40,13 +42,13 @@ export const MfaPage = withCardStateProvider(() => {
 
   // If only phone_code is available, just render that
   // Otherwise check if selected
-  if ((secondFactors.length == 1 && secondFactors[0] == 'phone_code') || selectedMethod === 'phone_code') {
+  if ((secondFactors.length === 1 && secondFactors[0] === 'phone_code') || selectedMethod === 'phone_code') {
     return <MfaPhoneCodePage />;
   }
 
   // If only totp is available, just render that
   // Otherwise check if selected
-  if ((secondFactors.length == 1 && secondFactors[0] == 'totp') || selectedMethod === 'totp') {
+  if ((secondFactors.length === 1 && secondFactors[0] === 'totp') || selectedMethod === 'totp') {
     return <MfaTOTPPage />;
   }
 
