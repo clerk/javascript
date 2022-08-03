@@ -25,8 +25,15 @@ export type CssColorOrAlphaScale = string | AlphaColorScale;
 type CssColor = string | TransparentColor | BuiltInColors;
 type CssLengthUnit = string;
 type FontSmoothing = 'auto' | 'antialiased' | 'never';
-type FontWeight = 400 | 500 | 600;
-type FontWeightScale = { normal?: FontWeight; medium?: FontWeight; bold?: FontWeight };
+
+type FontWeightNamedValue = CSS.Properties['fontWeight'];
+type FontWeightNumericValue = 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
+
+type FontWeightScale = {
+  normal?: FontWeightNamedValue | FontWeightNumericValue;
+  medium?: FontWeightNamedValue | FontWeightNumericValue;
+  bold?: FontWeightNamedValue | FontWeightNumericValue;
+};
 
 type WebSafeFont =
   | 'Arial'
@@ -463,11 +470,14 @@ export const dark = createClerkTheme({
   },
 });
 
-export const socialButtonsRounded = createClerkTheme({
+export const socialButtonsRoundedPills = createClerkTheme({
   layout: {
     socialButtonsVariant: 'iconButton',
   },
   elements: ({ theme }) => ({
+    socialButtons: {
+      gridTemplateColumns: `repeat(auto-fit, ${theme.space.$12})`,
+    },
     socialButtonsButtonIcon: {
       borderColor: theme.colors.$primary500,
       borderRadius: '999px',
@@ -475,28 +485,10 @@ export const socialButtonsRounded = createClerkTheme({
   }),
 });
 
-export const socialButtonsAutofit = (opts?: { perRow: number }) => {
-  const { perRow } = opts || {};
-  return createClerkTheme({
-    layout: {
-      socialButtonsVariant: 'iconButton',
-    },
-    elements: {
-      socialButtonsButtonIcon: {
-        width: 'auto',
-      },
-      socialButtons: {
-        display: 'grid',
-        gridTemplateColumns: perRow ? `repeat(${perRow}, 1fr )` : 'repeat( auto-fit, minmax(3rem, 1fr) )',
-      },
-    },
-  });
-};
-
 export const shadesOfPurple = createClerkTheme({
   baseTheme: [dark],
   variables: {
-    colorBackground: '#38375f',
+    colorBackground: '#3f3c77',
     colorPrimary: '#f8d80d',
     colorTextOnPrimaryBackground: '#38375f',
     colorInputText: '#a1fdfe',

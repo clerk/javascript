@@ -1,5 +1,4 @@
 import { Appearance, DeepPartial, Elements, Layout, Theme } from '@clerk/types';
-import { BaseTheme, BaseThemeTaggedType } from '@clerk/types/src';
 
 import { createInternalTheme, defaultInternalTheme } from '../foundations';
 import { InternalTheme } from '../styledSystem';
@@ -53,12 +52,12 @@ export const parseAppearance = (cascade: AppearanceCascade): ParsedAppearance =>
   const parsedInternalTheme = parseVariables(appearanceList);
   const parsedLayout = parseLayout(appearanceList);
   const parsedElements = parseElements(
-    appearanceList.map(a => {
-      if (!a.elements || typeof a.elements !== 'function') {
-        return a;
+    appearanceList.map(appearance => {
+      if (!appearance.elements || typeof appearance.elements !== 'function') {
+        return appearance;
       }
-      const res = { ...a };
-      res.elements = a.elements({ theme: parsedInternalTheme });
+      const res = { ...appearance };
+      res.elements = appearance.elements({ theme: parsedInternalTheme });
       return res;
     }),
   );

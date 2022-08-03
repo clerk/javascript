@@ -83,7 +83,7 @@ export const createFontSizeScale = (theme: Theme): Record<keyof typeof fontSizes
 
 export const createFontWeightScale = (theme: Theme): Record<keyof typeof fontWeights, any> => {
   const { fontWeight } = theme.variables || {};
-  return { ...fontWeights, ...fontWeight };
+  return removeUndefinedProps({ ...fontWeight });
 };
 
 export const createFonts = (theme: Theme) => {
