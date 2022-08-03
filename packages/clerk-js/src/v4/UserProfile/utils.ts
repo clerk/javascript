@@ -1,4 +1,4 @@
-import { Attributes, EnvironmentResource, PhoneNumberResource } from '@clerk/types';
+import { Attributes, EnvironmentResource, PhoneNumberResource, UserResource } from '@clerk/types';
 
 type IDable = { id: string };
 
@@ -21,4 +21,15 @@ export function getSecondFactors(attributes: Attributes): string[] {
     ...(attributes.phone_number.used_for_second_factor ? attributes.phone_number.second_factors : []),
     ...(attributes.authenticator_app.used_for_second_factor ? attributes.authenticator_app.second_factors : []),
   ];
+}
+
+export function getSecondFactorsAvailableToAdd(attributes: Attributes, user: UserResource): string[] {
+  let sfs = getSecondFactors(attributes);
+
+  // If user.totp_enabled, skip totp from the list of choices
+  if (user.totpEnabled) {
+    sfs = sfs.filter(f => f !== 'totp');
+  }
+
+  return sfs;
 }

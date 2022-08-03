@@ -11,7 +11,7 @@ import { MfaTOTPPage } from './MfaTOTPPage';
 import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
 import { ContentPage } from './Page';
 import { TileButton } from './TileButton';
-import { getSecondFactors } from './utils';
+import { getSecondFactorsAvailableToAdd } from './utils';
 
 export const MfaPage = withCardStateProvider(() => {
   const card = useCardState();
@@ -22,33 +22,34 @@ export const MfaPage = withCardStateProvider(() => {
   const title = 'Add multifactor authentication';
   const [selectedMethod, setSelectedMethod] = React.useState<VerificationStrategy>();
 
-  // Calculate second factors on first use only
-  const secondFactors = React.useMemo(() => {
-    let sfs = getSecondFactors(attributes);
+  // Calculate second factors available to add on first use only
+  const secondFactorsAvailableToAdd = React.useMemo(() => getSecondFactorsAvailableToAdd(attributes, user), []);
 
-    // If user.totp_enabled, skip totp from the list of choices
-    if (user.totpEnabled) {
-      sfs = sfs.filter(f => f !== 'totp');
+  React.useEffect(() => {
+    if (secondFactorsAvailableToAdd.length === 0) {
+      card.setError('There are no second factors available to add');
     }
-
-    return sfs;
   }, []);
 
-  if (secondFactors.length === 0) {
-    card.setError('There are no enabled second factors');
-
+  if (card.error) {
     return <ContentPage.Root headerTitle={title} />;
   }
 
   // If only phone_code is available, just render that
   // Otherwise check if selected
-  if ((secondFactors.length === 1 && secondFactors[0] === 'phone_code') || selectedMethod === 'phone_code') {
+  if (
+    (secondFactorsAvailableToAdd.length === 1 && secondFactorsAvailableToAdd[0] === 'phone_code') ||
+    selectedMethod === 'phone_code'
+  ) {
     return <MfaPhoneCodePage />;
   }
 
   // If only totp is available, just render that
   // Otherwise check if selected
-  if ((secondFactors.length === 1 && secondFactors[0] === 'totp') || selectedMethod === 'totp') {
+  if (
+    (secondFactorsAvailableToAdd.length === 1 && secondFactorsAvailableToAdd[0] === 'totp') ||
+    selectedMethod === 'totp'
+  ) {
     return <MfaTOTPPage />;
   }
 

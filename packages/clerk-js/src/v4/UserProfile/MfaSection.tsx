@@ -11,7 +11,7 @@ import { LinkButtonWithDescription } from './LinkButtonWithDescription';
 import { ProfileSection } from './Section';
 import { UserProfileAccordion } from './UserProfileAccordion';
 import { AddBlockButton } from './UserProfileBlockButtons';
-import { defaultFirst, getSecondFactors } from './utils';
+import { defaultFirst, getSecondFactors, getSecondFactorsAvailableToAdd } from './utils';
 
 export const MfaSection = () => {
   const { navigate } = useNavigate();
@@ -21,6 +21,7 @@ export const MfaSection = () => {
   const user = useCoreUser();
 
   const secondFactors = getSecondFactors(attributes);
+  const secondFactorsAvailableToAdd = getSecondFactorsAvailableToAdd(attributes, user);
 
   const mfaPhones = user.phoneNumbers
     .filter(ph => ph.verification.status === 'verified')
@@ -41,7 +42,10 @@ export const MfaSection = () => {
             phone={phone}
           />
         ))}
-      <AddBlockButton onClick={() => navigate('multi-factor')}>Add multifactor method</AddBlockButton>
+
+      {secondFactorsAvailableToAdd.length > 0 && (
+        <AddBlockButton onClick={() => navigate('multi-factor')}>Add multifactor method</AddBlockButton>
+      )}
     </ProfileSection>
   );
 };
