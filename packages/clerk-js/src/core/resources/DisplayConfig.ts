@@ -10,24 +10,25 @@ import { BaseResource } from './internal';
 
 export class DisplayConfig extends BaseResource implements DisplayConfigResource {
   id!: string;
-  instanceEnvironmentType!: string;
+  afterSignInUrl!: string;
+  afterSignOutAllUrl!: string;
+  afterSignOutOneUrl!: string;
+  afterSignOutUrl!: string;
+  afterSignUpUrl!: string;
+  afterSwitchSessionUrl!: string;
   applicationName!: string;
-  theme!: DisplayThemeJSON;
-  preferredSignInStrategy!: PreferredSignInStrategy;
-  logoImage!: ImageJSON;
-  faviconImage!: ImageJSON;
   backendHost!: string;
+  branded!: boolean;
+  faviconImage!: ImageJSON;
   homeUrl!: string;
+  instanceEnvironmentType!: string;
+  logoImage!: ImageJSON;
+  preferredSignInStrategy!: PreferredSignInStrategy;
   signInUrl!: string;
   signUpUrl!: string;
+  supportEmail!: string;
+  theme!: DisplayThemeJSON;
   userProfileUrl!: string;
-  afterSignInUrl!: string;
-  afterSignUpUrl!: string;
-  afterSignOutUrl!: string;
-  afterSignOutOneUrl!: string;
-  afterSignOutAllUrl!: string;
-  afterSwitchSessionUrl!: string;
-  branded!: boolean;
 
   public constructor(data: DisplayConfigJSON) {
     super();
@@ -54,6 +55,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     this.afterSignOutAllUrl = data.after_sign_out_all_url;
     this.afterSwitchSessionUrl = data.after_switch_session_url;
     this.branded = data.branded;
+    this.supportEmail = data.support_email || '';
     return this;
   }
 }
