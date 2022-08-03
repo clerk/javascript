@@ -8,6 +8,8 @@ import { sleep } from '../utils';
 import { ArrowBlockButton } from './ArrowBlockButton';
 import { useCardState } from './contexts';
 
+const SOCIAL_BUTTON_BLOCK_THRESHOLD = 2;
+
 export type SocialButtonsProps = React.PropsWithChildren<{}>;
 
 type SocialButtonsRootProps = SocialButtonsProps & {
@@ -34,7 +36,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
       ? true
       : socialButtonsVariant === 'iconButton'
       ? false
-      : strategies.length <= 3;
+      : strategies.length <= SOCIAL_BUTTON_BLOCK_THRESHOLD;
 
   const startOauth = (strategy: OAuthStrategy | Web3Strategy) => async () => {
     card.setLoading(strategy);
