@@ -13,6 +13,7 @@ import { PhoneSection } from './PhoneSection';
 import { UsernameSection } from './UsernameSection';
 import { UserProfileSection } from './UserProfileSection';
 import { Web3Section } from './Web3Section';
+import { getSecondFactors } from './utils';
 
 export const RootPage = () => {
   const { attributes, social } = useEnvironment().userSettings;
@@ -22,8 +23,7 @@ export const RootPage = () => {
   const showConnectedAccounts = social && Object.values(social).filter(p => p.enabled).length > 0;
   const showWeb3 = attributes.web3_wallet.enabled;
   const showPassword = attributes.password.enabled && attributes.password.required;
-  const showMfa =
-    attributes.phone_number.used_for_second_factor && attributes.phone_number.second_factors.includes('phone_code');
+  const showMfa = getSecondFactors(attributes).length > 0;
 
   return (
     <Col

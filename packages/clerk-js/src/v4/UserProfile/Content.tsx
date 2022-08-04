@@ -12,7 +12,8 @@ import { ProfilePage } from './ProfilePage';
 import {
   RemoveConnectedAccountPage,
   RemoveEmailPage,
-  RemoveMfaPage,
+  RemoveMfaPhoneCodePage,
+  RemoveMfaTOTPPage,
   RemovePhonePage,
   RemoveWeb3WalletPage,
 } from './RemoveResourcePage';
@@ -90,8 +91,11 @@ export const Content = React.forwardRef<HTMLDivElement>((_, ref) => {
         </Route>
         <Route path='multi-factor'>
           <Switch>
+            <Route path='totp/remove'>
+              <RemoveMfaTOTPPage />
+            </Route>
             <Route path=':id/remove'>
-              <RemoveMfaPage />
+              <RemoveMfaPhoneCodePage />
             </Route>
             <Route path=':id'>
               <MfaPage />

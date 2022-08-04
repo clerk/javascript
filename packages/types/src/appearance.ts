@@ -178,6 +178,8 @@ export type ElementsConfig = {
   'form-buttonReset': WithOptions<never, ControlState | LoadingState, never>;
   'form-fieldInputShowPasswordButton': WithOptions<never, never, never>;
   'form-fieldInputShowPasswordIcon': WithOptions<never, never, never>;
+  'form-fieldInputCopyToClipboardButton': WithOptions<never, never, never>;
+  'form-fieldInputCopyToClipboardIcon': WithOptions<never, never, never>;
 
   avatar: WithOptions<never, never, never>;
   'avatar-image': WithOptions<never, never, never>;

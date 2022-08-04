@@ -131,15 +131,88 @@ describe('User', () => {
     expect(userWithVerifiedPhone.hasVerifiedPhoneNumber).toEqual(true);
   });
 
-  it.skip('creates a new TOTP secret for the user', () => {
-    // TODO
+  it('creates a new TOTP secret for the user', async () => {
+    const totpJSON = {
+      id: 'totp_foo',
+      object: 'totp',
+      secret: 'BANANA',
+      uri: 'otpauth://totp/Cyberdyne%20%28development%29:vin@diesel.family?algorithm=SHA1&digits=6&issuer=Cyberdyne+%28development%29&period=30&secret=BANANA',
+      verified: false,
+      createdAt: 1659607590792,
+      updatedAt: 1659607590792,
+    };
+
+    // @ts-ignore
+    BaseResource._fetch = jest.fn().mockReturnValue(Promise.resolve({ response: totpJSON }));
+
+    const user = new User({
+      email_addresses: [],
+      phone_numbers: [],
+      web3_wallets: [],
+      external_accounts: [],
+    } as unknown as UserJSON);
+
+    await user.createTOTP();
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({
+      method: 'POST',
+      path: '/me/totp',
+    });
   });
 
-  it.skip('verifies a TOTP secret', () => {
-    // TODO
+  it('verifies a TOTP secret', async () => {
+    const totpJSON = {
+      id: 'totp_foo',
+      object: 'totp',
+      verified: true,
+      createdAt: 1659607590792,
+      updatedAt: 1659607590792,
+    };
+
+    // @ts-ignore
+    BaseResource._fetch = jest.fn().mockReturnValue(Promise.resolve({ response: totpJSON }));
+
+    const user = new User({
+      email_addresses: [],
+      phone_numbers: [],
+      web3_wallets: [],
+      external_accounts: [],
+    } as unknown as UserJSON);
+
+    await user.verifyTOTP({ code: '123456' });
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({
+      method: 'POST',
+      path: '/me/totp/attempt_verification',
+      body: { code: '123456' },
+    });
   });
 
-  it.skip('disables TOTP for a user', () => {
-    // TODO
+  it('disables TOTP for a user', async () => {
+    const deletedObjectJSON = {
+      object: 'externaltotp_account',
+      id: 'totp_foo',
+      deleted: true,
+    };
+
+    // @ts-ignore
+    BaseResource._fetch = jest.fn().mockReturnValue(Promise.resolve({ response: deletedObjectJSON }));
+
+    const user = new User({
+      email_addresses: [],
+      phone_numbers: [],
+      web3_wallets: [],
+      external_accounts: [],
+    } as unknown as UserJSON);
+
+    await user.disableTOTP();
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({
+      method: 'DELETE',
+      path: '/me/totp',
+    });
   });
 });
