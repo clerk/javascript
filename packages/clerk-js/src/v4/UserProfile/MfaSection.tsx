@@ -27,7 +27,7 @@ export const MfaSection = () => {
 
   return (
     <ProfileSection
-      title='Multifactor authentication'
+      title='Two-step verification'
       id='mfa'
     >
       {showTOTP && <MfaTOTPAccordion />}
@@ -42,7 +42,7 @@ export const MfaSection = () => {
         ))}
 
       {secondFactorsAvailableToAdd.length > 0 && (
-        <AddBlockButton onClick={() => navigate('multi-factor')}>Add multifactor method</AddBlockButton>
+        <AddBlockButton onClick={() => navigate('multi-factor')}>Add two-step verification</AddBlockButton>
       )}
     </ProfileSection>
   );

@@ -25,12 +25,12 @@ export const MfaTOTPAccordion = () => {
       <Col gap={4}>
         <LinkButtonWithDescription
           title={'Default factor'}
-          subtitle='This factor will be used as the default multifactor authentication method when signing in.'
+          subtitle='This factor will be used as the default two-step verification method when signing in.'
         />
 
         <LinkButtonWithDescription
           title='Remove'
-          subtitle='Remove authenticator application from the multifactor authentication methods'
+          subtitle='Remove authenticator application from the two-step verification methods'
           actionLabel='Remove authenticator application'
           colorScheme='danger'
           onClick={() => navigate(`multi-factor/totp/remove`)}

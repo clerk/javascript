@@ -44,8 +44,8 @@ export const MfaPhoneCodeAccordion = ({ phone, showTOTP }: MfaPhoneCodeAccordion
             title={isDefault ? 'Default factor' : 'Set as Default factor'}
             subtitle={
               isDefault
-                ? 'This factor will be used as the default multifactor authentication method when signing in.'
-                : 'Set this factor as the default factor to use it as the default multifactor authentication method when signing in.'
+                ? 'This factor will be used as the default two-step verification method when signing in.'
+                : 'Set this factor as the default factor to use it as the default two-step verification method when signing in.'
             }
             actionLabel={!isDefault ? 'Set as default' : undefined}
             onClick={() => phone.makeDefaultSecondFactor().catch(err => handleError(err, [], card.setError))}
@@ -54,7 +54,7 @@ export const MfaPhoneCodeAccordion = ({ phone, showTOTP }: MfaPhoneCodeAccordion
 
         <LinkButtonWithDescription
           title='Remove'
-          subtitle='Remove this phone number from the multifactor authentication methods'
+          subtitle='Remove this phone number from the two-step verification methods'
           actionLabel='Remove phone number'
           colorScheme='danger'
           onClick={() => navigate(`multi-factor/${phone.id}/remove`)}

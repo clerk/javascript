@@ -19,7 +19,7 @@ export const MfaPage = withCardStateProvider(() => {
     userSettings: { attributes },
   } = useEnvironment();
   const user = useCoreUser();
-  const title = 'Add multifactor authentication';
+  const title = 'Add two-step verification';
   const [selectedMethod, setSelectedMethod] = React.useState<VerificationStrategy>();
 
   // Calculate second factors available to add on first use only

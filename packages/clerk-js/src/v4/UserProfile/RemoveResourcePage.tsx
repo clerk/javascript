@@ -103,10 +103,10 @@ export const RemoveMfaPhoneCodePage = () => {
 
   return (
     <RemoveResourcePage
-      title='Remove multifactor authentication'
+      title='Remove two-step verification'
       messageLine1={`${ref.current.phoneNumber} will be no longer receive verification codes when signing in.`}
       messageLine2={`Your account may not be as secure. Are you sure you want to continue?`}
-      successMessage={`SMS code multifactor authentication has been removed for ${ref.current.phoneNumber}.`}
+      successMessage={`SMS code two-step verification has been removed for ${ref.current.phoneNumber}.`}
       deleteResource={() => Promise.resolve(ref.current?.setReservedForSecondFactor({ reserved: false }))}
     />
   );
@@ -117,10 +117,10 @@ export const RemoveMfaTOTPPage = () => {
 
   return (
     <RemoveResourcePage
-      title='Remove multifactor authentication'
+      title='Remove two-step verification'
       messageLine1='Verification codes from this authenticator will no longer be required when signing in.'
       messageLine2='Your account may not be as secure. Are you sure you want to continue?'
-      successMessage='Multifactor authentication via authenticator application has been removed.'
+      successMessage='two-step verification via authenticator application has been removed.'
       deleteResource={user.disableTOTP}
     />
   );

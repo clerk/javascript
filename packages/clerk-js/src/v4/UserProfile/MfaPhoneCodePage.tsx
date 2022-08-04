@@ -14,7 +14,7 @@ import { SuccessPage } from './SuccessPage';
 import { AddBlockButton } from './UserProfileBlockButtons';
 
 export const MfaPhoneCodePage = withCardStateProvider(() => {
-  const title = 'Add multifactor authentication';
+  const title = 'Add two-step verification';
 
   const ref = React.useRef<PhoneNumberResource>();
   const wizard = useWizard({ defaultStep: 2 });
@@ -42,7 +42,7 @@ export const MfaPhoneCodePage = withCardStateProvider(() => {
       />
       <SuccessPage
         title={title}
-        text={`SMS code multifactor authentication is now enabled for this phone number. When signing in, you will need to enter a verification code sent to this phone number as an additional step.`}
+        text={`SMS code two-step verification is now enabled for this phone number. When signing in, you will need to enter a verification code sent to this phone number as an additional step.`}
       />
     </Wizard>
   );

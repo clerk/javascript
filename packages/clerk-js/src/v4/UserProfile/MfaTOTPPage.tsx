@@ -24,7 +24,7 @@ export const MfaTOTPPage = withCardStateProvider(() => {
 
       <SuccessPage
         title={title}
-        text={`Multifactor authentication is now enabled. When signing in, you will need to enter a verification code from this authenticator as an additional step.`}
+        text={`Two-step verification is now enabled. When signing in, you will need to enter a verification code from this authenticator as an additional step.`}
       />
     </Wizard>
   );
