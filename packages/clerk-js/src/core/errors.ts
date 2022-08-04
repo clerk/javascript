@@ -16,7 +16,7 @@ export function clerkErrorDevInitFailed(msg?: string): never {
 
 export function clerkErrorPathRouterMissingPath(componentName: string): never {
   throw new Error(
-    `ClerkJS: Missing "path" option.  The ${componentName} component was mounted with "path" routing but no "path" attribute was passed.`,
+    `ClerkJS: Missing path option. The ${componentName} component was mounted with path routing so you need to specify the path where the component is mounted on e.g. path="/sign-in".`,
   );
 }
 

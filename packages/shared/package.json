@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "0.3.7-next.13",
+  "version": "0.3.7",
   "private": true,
   "main": "index.js",
   "module": "index.js",

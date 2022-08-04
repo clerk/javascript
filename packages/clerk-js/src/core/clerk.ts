@@ -78,7 +78,7 @@ declare global {
   }
 }
 
-const defaultOptions: ClerkOptions & { polling: boolean } = { polling: true };
+const defaultOptions: ClerkOptions = { polling: true, touchSession: true };
 
 export default class Clerk implements ClerkInterface {
   public static mountComponentRenderer?: MountComponentRenderer;
@@ -873,7 +873,7 @@ export default class Clerk implements ClerkInterface {
 
   // TODO: Be more conservative about touches. Throttle, don't touch when only one user, etc
   #touchLastActiveSession = (session: ActiveSessionResource | null): Promise<unknown> => {
-    if (!session) {
+    if (!session || !this.#options.touchSession) {
       return Promise.resolve();
     }
     return session.touch().catch(noop);

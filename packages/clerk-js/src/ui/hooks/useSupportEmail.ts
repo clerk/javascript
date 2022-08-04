@@ -1,20 +1,23 @@
 import React from 'react';
 
 import { buildEmailAddress } from '../../utils';
-import { useCoreClerk, useOptions } from '../contexts';
+import { useCoreClerk, useEnvironment, useOptions } from '../contexts';
 
 export function useSupportEmail(): string {
   const Clerk = useCoreClerk();
-  const { supportEmail } = useOptions();
+  const { supportEmail: supportEmailFromOptions } = useOptions();
+  const { displayConfig } = useEnvironment();
+  const { supportEmail: supportEmailFromEnvironment } = displayConfig;
 
   const supportDomain = React.useMemo(
     () =>
-      supportEmail ||
+      supportEmailFromOptions ||
+      supportEmailFromEnvironment ||
       buildEmailAddress({
         localPart: 'support',
         frontendApi: Clerk.frontendApi,
       }),
-    [Clerk.frontendApi, supportEmail],
+    [Clerk.frontendApi, supportEmailFromOptions, supportEmailFromEnvironment],
   );
 
   return supportDomain;

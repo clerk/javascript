@@ -323,6 +323,7 @@ type LinkOptions = {
 export interface ClerkOptions {
   navigate?: (to: string) => Promise<unknown> | unknown;
   polling?: boolean;
+  touchSession?: boolean;
   selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;
   links?: LinkOptions;
   appearance?: Appearance;

@@ -34,8 +34,8 @@
   "dependencies": {
     "@clerk/clerk-react": "^4.0.0-next.14",
     "@clerk/clerk-sdk-node": "^4.0.0-next.7",
-    "@clerk/edge": "^1.7.0-next.6",
     "@clerk/types": "^3.0.0-next.13",
+    "@clerk/edge": "1.7.0-next.6",
     "tslib": "^2.3.1"
   },
   "devDependencies": {
