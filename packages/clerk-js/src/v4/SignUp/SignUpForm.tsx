@@ -1,6 +1,7 @@
 import React from 'react';
 import { ActiveIdentifier, Fields } from 'ui/signUp/signUpFormHelpers';
 
+import { useAppearance } from '../customizables';
 import { Form } from '../elements';
 import { FormControlState } from '../utils';
 
@@ -14,75 +15,80 @@ type SignUpFormProps = {
 
 export const SignUpForm = (props: SignUpFormProps) => {
   const { handleSubmit, fields, formState, canToggleEmailPhone, handleEmailPhoneToggle } = props;
+  const { showOptionalFields } = useAppearance().parsedLayout;
+
+  const shouldShow = (name: keyof typeof fields) => {
+    return !!fields[name] && (showOptionalFields || fields[name]?.required);
+  };
 
   return (
     <Form.Root onSubmit={handleSubmit}>
-      {(fields.firstName || fields.lastName) && (
+      {(shouldShow('firstName') || shouldShow('lastName')) && (
         <Form.ControlRow>
-          {fields.firstName && (
+          {shouldShow('firstName') && (
             <Form.Control
               {...{
                 ...formState.firstName.props,
-                isRequired: fields.firstName.required,
-                isOptional: !fields.firstName.required,
+                isRequired: fields.firstName!.required,
+                isOptional: !fields.firstName!.required,
               }}
             />
           )}
-          {fields.lastName && (
+          {shouldShow('lastName') && (
             <Form.Control
               {...{
                 ...formState.lastName.props,
-                isRequired: fields.lastName.required,
-                isOptional: !fields.lastName.required,
+                isRequired: fields.lastName!.required,
+                isOptional: !fields.lastName!.required,
               }}
             />
           )}
         </Form.ControlRow>
       )}
-      {fields.username && (
+      {shouldShow('username') && (
         <Form.ControlRow>
           <Form.Control
             {...{
               ...formState.username.props,
-              isRequired: fields.username.required,
-              isOptional: !fields.username.required,
+              isRequired: fields.username!.required,
+              isOptional: !fields.username!.required,
             }}
           />
         </Form.ControlRow>
       )}
-      {fields.emailAddress && (
+      {shouldShow('emailAddress') && (
         <Form.ControlRow>
           <Form.Control
             {...{
               ...formState.emailAddress.props,
-              isRequired: fields.emailAddress.required,
-              isOptional: !fields.emailAddress.required,
+              isRequired: fields.emailAddress!.required,
+              isOptional: !fields.emailAddress!.required,
             }}
             actionLabel={canToggleEmailPhone ? 'Use phone instead' : undefined}
             onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('phoneNumber') : undefined}
           />
         </Form.ControlRow>
       )}
-      {fields.phoneNumber && (
+      {shouldShow('phoneNumber') && (
         <Form.ControlRow>
           <Form.Control
             {...{
               ...formState.phoneNumber.props,
-              isRequired: fields.phoneNumber.required,
-              isOptional: !fields.phoneNumber.required,
+              isRequired: fields.phoneNumber!.required,
+              isOptional: !fields.phoneNumber!.required,
             }}
             actionLabel={canToggleEmailPhone ? 'Use email instead' : undefined}
             onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('emailAddress') : undefined}
           />
         </Form.ControlRow>
       )}
-      {fields.password && (
+      {shouldShow('password') && (
         <Form.ControlRow>
           <Form.Control
             {...{
               ...formState.password.props,
-              isRequired: fields.password.required,
-              isOptional: !fields.password.required,
+              isRequired: fields.password!.required,
+              isOptional: !fields.password!.required,
             }}
           />
         </Form.ControlRow>

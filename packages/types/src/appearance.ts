@@ -416,6 +416,12 @@ export type Layout = {
    * @default 'top'
    */
   socialButtonsPlacement?: 'top' | 'bottom';
+  /**
+   * Controls whether the SignIn or SignUp forms will include optional fields.
+   * You can make a field required or optional through the {@link https://dashboard.clerk.dev|Clerk dashboard}.
+   * @default false
+   */
+  showOptionalFields?: boolean;
 };
 
 export type SignInTheme = Theme;
