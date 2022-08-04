@@ -292,6 +292,7 @@ export type ClerkThemeOptions = DeepSnakeToCamel<DeepPartial<DisplayThemeJSON>>;
 export interface ClerkOptions {
   navigate?: (to: string) => Promise<unknown> | unknown;
   polling?: boolean;
+  touchSession?: boolean;
   selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;
   theme?: ClerkThemeOptions;
   /** Optional support email for display in authentication screens */

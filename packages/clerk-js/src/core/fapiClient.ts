@@ -26,7 +26,10 @@ export type FapiResponse<T> = Response & {
   payload: FapiResponseJSON<T> | null;
 };
 
-export type FapiRequestCallback<T> = (request: FapiRequestInit, response?: FapiResponse<T>) => Promise<void> | void;
+export type FapiRequestCallback<T> = (
+  request: FapiRequestInit,
+  response?: FapiResponse<T>,
+) => Promise<unknown | false> | unknown | false;
 
 const camelToSnakeEncoder: qs.IStringifyOptions['encoder'] = (str, defaultEncoder, _, type) => {
   return type === 'key' ? camelToSnake(str) : defaultEncoder(str);
@@ -68,15 +71,23 @@ export default function createFapiClient(clerkInstance: Clerk): FapiClient {
   }
 
   async function runBeforeRequestCallbacks(requestInit: FapiRequestInit) {
-    for await (const callback of onBeforeRequestCallbacks) {
-      await callback(requestInit);
+    const windowCallback = typeof window !== 'undefined' && (window as any).__unstable__onBeforeRequest;
+    for await (const callback of [windowCallback, ...onBeforeRequestCallbacks].filter(s => s)) {
+      if ((await callback(requestInit)) === false) {
+        return false;
+      }
     }
+    return true;
   }
 
   async function runAfterResponseCallbacks(requestInit: FapiRequestInit, response: FapiResponse<unknown>) {
-    for await (const callback of onAfterResponseCallbacks) {
-      await callback(requestInit, response);
+    const windowCallback = typeof window !== 'undefined' && (window as any).__unstable__onAfterResponse;
+    for await (const callback of [windowCallback, ...onAfterResponseCallbacks].filter(s => s)) {
+      if ((await callback(requestInit, response)) === false) {
+        return false;
+      }
     }
+    return true;
   }
 
   function buildQueryString({ method, path, sessionId, search, rotatingTokenNonce }: FapiRequestInit) {
@@ -151,35 +162,29 @@ export default function createFapiClient(clerkInstance: Clerk): FapiClient {
       requestInit.headers.set('Content-Type', 'application/x-www-form-urlencoded');
     }
 
-    await runBeforeRequestCallbacks(requestInit);
-
+    const beforeRequestCallbacksResult = await runBeforeRequestCallbacks(requestInit);
     // Due to a known Safari bug regarding CORS requests, we are forced to always use GET or POST method.
     // The original HTTP method is used as a query string parameter instead of as an actual method to
     // avoid triggering a CORS OPTION request as it currently breaks cookie dropping in Safari.
     const overwrittenRequestMethod = method === 'GET' ? 'GET' : 'POST';
-
     let response: Response;
-
     const urlStr = requestInit.url.toString();
 
     try {
-      response = await fetch(urlStr, {
-        ...requestInit,
-        credentials: 'include',
-        method: overwrittenRequestMethod,
-      });
+      response = beforeRequestCallbacksResult
+        ? await fetch(urlStr, {
+            ...requestInit,
+            credentials: 'include',
+            method: overwrittenRequestMethod,
+          })
+        : // Mock an empty json response
+          new Response('{}', requestInit);
     } catch (e) {
       clerkNetworkError(urlStr, e);
     }
-
     const json: FapiResponseJSON<T> = await response.json();
-
-    const fapiResponse: FapiResponse<T> = Object.assign(response, {
-      payload: json,
-    });
-
+    const fapiResponse: FapiResponse<T> = Object.assign(response, { payload: json });
     await runAfterResponseCallbacks(requestInit, fapiResponse);
-
     return fapiResponse;
   }
 

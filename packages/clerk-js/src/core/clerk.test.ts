@@ -1,4 +1,4 @@
-import { SignInJSON, SignUpJSON } from '@clerk/types';
+import { ActiveSessionResource, SignInJSON, SignUpJSON } from '@clerk/types';
 import { waitFor } from '@testing-library/dom';
 import Clerk from 'core/clerk';
 import { Client, DisplayConfig, Environment, MagicLinkErrorCode, SignIn, SignUp } from 'core/resources/internal';
@@ -39,6 +39,7 @@ describe('Clerk singleton', () => {
   } as DisplayConfig;
 
   let mockWindowLocation;
+  let mockWindowDocument;
   let mockHref: jest.Mock;
 
   beforeEach(() => {
@@ -55,9 +56,8 @@ describe('Clerk singleton', () => {
       },
     } as any;
 
-    Object.defineProperty(global.window, 'location', {
-      value: mockWindowLocation,
-    });
+    Object.defineProperty(global.window, 'location', { value: mockWindowLocation });
+    Object.defineProperty(global.window.document, 'hasFocus', { value: () => true, configurable: true });
 
     // sut = new Clerk(frontendApi);
   });
@@ -124,6 +124,45 @@ describe('Clerk singleton', () => {
     it('redirects to userProfileUrl', () => {
       sut.redirectToUserProfile();
       expect(mockNavigate).toHaveBeenCalledWith('/user-profile');
+    });
+  });
+
+  describe('.setActive', () => {
+    const mockSession = {
+      id: '1',
+      remove: jest.fn(),
+      status: 'active',
+      user: {},
+      touch: jest.fn(),
+    };
+
+    beforeEach(() => {
+      mockSession.remove.mockReset();
+      mockSession.touch.mockReset();
+    });
+
+    it('calls session.touch by default', async () => {
+      mockSession.touch.mockReturnValueOnce(Promise.resolve());
+      mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
+
+      const sut = new Clerk(frontendApi);
+      await sut.load();
+      await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+      await waitFor(() => {
+        expect(mockSession.touch).toHaveBeenCalled();
+      });
+    });
+
+    it('does not call session.touch if Clerk was initialised with touchSession set to false', async () => {
+      mockSession.touch.mockReturnValueOnce(Promise.resolve());
+      mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
+
+      const sut = new Clerk(frontendApi);
+      await sut.load({ touchSession: false });
+      await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+      await waitFor(() => {
+        expect(mockSession.touch).not.toHaveBeenCalled();
+      });
     });
   });
 
