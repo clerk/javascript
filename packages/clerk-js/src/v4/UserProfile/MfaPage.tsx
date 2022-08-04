@@ -3,14 +3,14 @@ import React from 'react';
 
 import { useCoreUser, useEnvironment } from '../../ui/contexts';
 import { Col, Grid, Text } from '../customizables';
-import { useCardState, withCardStateProvider } from '../elements';
+import { TileButton, useCardState, withCardStateProvider } from '../elements';
 import { AuthApp, Mobile } from '../icons';
+import { mqu } from '../styledSystem';
 import { FormButtonContainer } from './FormButtons';
 import { MfaPhoneCodePage } from './MfaPhoneCodePage';
 import { MfaTOTPPage } from './MfaTOTPPage';
 import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
 import { ContentPage } from './Page';
-import { TileButton } from './TileButton';
 import { getSecondFactorsAvailableToAdd } from './utils';
 
 export const MfaPage = withCardStateProvider(() => {
@@ -57,10 +57,15 @@ export const MfaPage = withCardStateProvider(() => {
     <ContentPage.Root headerTitle={title}>
       <Col gap={4}>
         <Text>Select a method to add.</Text>
-
         <Grid
-          columns={3}
           gap={2}
+          sx={t => ({
+            gridTemplateColumns: `repeat(3, minmax(${t.sizes.$24}, 1fr))`,
+            gridAutoRows: t.sizes.$24,
+            [mqu.sm]: {
+              gridTemplateColumns: `repeat(2, minmax(${t.sizes.$24}, 1fr))`,
+            },
+          })}
         >
           <TileButton
             icon={AuthApp}

@@ -1,7 +1,6 @@
 import React from 'react';
 
-import { Button, Flex, Icon, Spinner, Text } from '../customizables';
-import { SimpleButton } from '../customizables';
+import { Button, Flex, Icon, SimpleButton, Spinner, Text } from '../customizables';
 import { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { ArrowRightIcon } from '../icons';
 import { PropsOfComponent, ThemableCssProp } from '../styledSystem';
@@ -61,7 +60,6 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
           gap: theme.space.$4,
           position: 'relative',
           justifyContent: 'flex-start',
-          // color: theme.colors.$colorText,
           borderColor: theme.colors.$blackAlpha200,
           '--arrow-opacity': '0',
           '--arrow-transform': `translateX(-${theme.space.$2});`,

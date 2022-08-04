@@ -26,3 +26,4 @@ export * from './FileDropArea';
 export * from './RootBox';
 export * from './InvisibleRootBox';
 export * from './ClipboardInput';
+export * from './TileButton';
