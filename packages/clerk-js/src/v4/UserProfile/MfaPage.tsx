@@ -4,7 +4,7 @@ import React from 'react';
 import { useCoreUser, useEnvironment } from '../../ui/contexts';
 import { Col, Grid, Text } from '../customizables';
 import { useCardState, withCardStateProvider } from '../elements';
-import { AuthenticatorApp, Mobile } from '../icons';
+import { AuthApp, Mobile } from '../icons';
 import { FormButtonContainer } from './FormButtons';
 import { MfaPhoneCodePage } from './MfaPhoneCodePage';
 import { MfaTOTPPage } from './MfaTOTPPage';
@@ -63,9 +63,8 @@ export const MfaPage = withCardStateProvider(() => {
           gap={2}
         >
           <TileButton
-            icon={AuthenticatorApp}
+            icon={AuthApp}
             onClick={() => setSelectedMethod('totp')}
-            sx={{ height: '96px' }}
           >
             Authenticator application
           </TileButton>
@@ -73,7 +72,6 @@ export const MfaPage = withCardStateProvider(() => {
           <TileButton
             icon={Mobile}
             onClick={() => setSelectedMethod('phone_code')}
-            sx={{ height: '96px' }}
           >
             SMS code
           </TileButton>

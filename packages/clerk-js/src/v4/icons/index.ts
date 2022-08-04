@@ -6,7 +6,7 @@
  */
 export { default as ArrowLeftIcon } from './arrow-left.svg';
 export { default as ArrowRightIcon } from './arrow-right.svg';
-export { default as AuthenticatorApp } from './authenticator-app.svg';
+export { default as AuthApp } from './auth-app.svg';
 export { default as Clipboard } from './clipboard.svg';
 export { default as ExclamationTriangle } from './exclamation-triangle.svg';
 export { default as ExclamationCircle } from './exclamation-circle.svg';
@@ -28,4 +28,3 @@ export { default as Folder } from './folder.svg';
 export { default as DeviceMobile } from './device-mobile.svg';
 export { default as DeviceLaptop } from './device-laptop.svg';
 export { default as Menu } from './menu.svg';
-export { default as AuthApp } from './auth-app.svg';

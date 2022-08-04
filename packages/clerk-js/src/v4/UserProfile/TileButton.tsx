@@ -10,6 +10,7 @@ export const TileButton = (props: PropsOfComponent<typeof Button> & { icon: Reac
     <Button
       colorScheme={'neutral'}
       variant={'ghost'}
+      sx={[t => ({ height: t.sizes.$24 }), props.sx]}
       {...rest}
     >
       <Col

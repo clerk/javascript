@@ -24,6 +24,8 @@ export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
   const [totp, setTOTP] = React.useState<TOTPResource | undefined>(undefined);
   const [displayFormat, setDisplayFormat] = React.useState<DisplayFormat>('qr');
 
+  // TODO: React18
+  // Non-idempotent useEffect
   React.useEffect(() => {
     void user
       .createTOTP()
@@ -31,21 +33,19 @@ export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
       .catch(err => handleError(err, [], card.setError));
   }, [user]);
 
-  if (!totp && !card.error) {
-    return (
-      <Spinner
-        colorScheme='primary'
-        size='lg'
-      />
-    );
-  }
-
   if (card.error) {
     return <ContentPage.Root headerTitle={title} />;
   }
 
   return (
     <ContentPage.Root headerTitle={title}>
+      {!totp && (
+        <Spinner
+          colorScheme='primary'
+          size='lg'
+        />
+      )}
+
       {totp && (
         <>
           <Col gap={4}>

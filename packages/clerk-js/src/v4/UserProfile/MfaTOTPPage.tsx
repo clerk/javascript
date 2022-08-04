@@ -8,7 +8,7 @@ import { VerifyTOTP } from './VerifyTOTP';
 
 export const MfaTOTPPage = withCardStateProvider(() => {
   const title = 'Add authenticator app';
-  const wizard = useWizard({});
+  const wizard = useWizard();
 
   return (
     <Wizard {...wizard.props}>
