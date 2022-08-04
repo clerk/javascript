@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "4.0.0-next.17",
+  "version": "4.0.0-next.18",
   "license": "MIT",
   "description": "Clerk.dev JS library",
   "keywords": [
@@ -37,7 +37,7 @@
     "test:coverage": "jest --collectCoverage"
   },
   "dependencies": {
-    "@clerk/types": "^3.0.0-next.12",
+    "@clerk/types": "^3.0.0-next.13",
     "@emotion/cache": "^11.7.1",
     "@emotion/react": "^11.9.0",
     "@floating-ui/react-dom-interactions": "^0.6.3",
@@ -63,7 +63,7 @@
     "@babel/preset-env": "^7.12.1",
     "@babel/preset-react": "^7.12.5",
     "@babel/preset-typescript": "^7.12.1",
-    "@clerk/shared": "^0.3.7-next.12",
+    "@clerk/shared": "^0.3.7-next.13",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.7",
     "@svgr/webpack": "^6.2.1",
     "@testing-library/dom": "^7.28.1",
@@ -118,7 +118,7 @@
     "files": [
       {
         "path": "./dist/clerk.browser.js",
-        "maxSize": "140kB"
+        "maxSize": "148kB"
       },
       {
         "path": "./dist/clerk.headless.js",
