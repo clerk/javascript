@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.21.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.20.0...@clerk/types@2.21.0) (2022-08-04)
+
+### Features
+
+- **clerk-js:** Get support email from FAPI /v1/environment if exists ([c9bb8d7](https://github.com/clerkinc/javascript/commit/c9bb8d7aaf3958207d4799bdd30e3b15b2890a5d))
+
 ## [2.20.0](https://github.com/clerkinc/javascript/compare/@clerk/types@2.19.1...@clerk/types@2.20.0) (2022-07-13)
 
 ### Features
