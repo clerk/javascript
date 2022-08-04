@@ -120,7 +120,7 @@ export const RemoveMfaTOTPPage = () => {
       title='Remove two-step verification'
       messageLine1='Verification codes from this authenticator will no longer be required when signing in.'
       messageLine2='Your account may not be as secure. Are you sure you want to continue?'
-      successMessage='two-step verification via authenticator application has been removed.'
+      successMessage='Two-step verification via authenticator application has been removed.'
       deleteResource={user.disableTOTP}
     />
   );

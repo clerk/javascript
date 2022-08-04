@@ -356,12 +356,19 @@ export type BaseTheme = BaseThemeTaggedType;
 
 export type Theme = {
   /**
-   * Hello there how are you
+   * One or more themes or theme utilities that will be merged and used as the base theme for the components.
+   * For further customisation, you can use the {@link Theme.layout}, {@link Theme.variables} and {@link Theme.elements} props.
+   * @example
+   * import { dark } from "@clerk/themes";
+   * appearance={{ baseTheme: dark }}
+   * @example
+   * import { dark, roundedSocialButtons } from "@clerk/themes";
+   * appearance={{ baseTheme: [dark, roundedSocialButtons] }}
    */
   baseTheme?: BaseTheme | BaseTheme[];
   /**
    * Configuration options that affect the layout of the components, allowing
-   * customizations that hard to implement with CSS.
+   * customizations that hard to implement with just CSS.
    * Eg: placing the logo outside the card element
    */
   layout?: Layout;
