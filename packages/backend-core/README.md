@@ -64,14 +64,14 @@ This package is used as the base building block for Clerk JavaScript SDKs and en
   <br />
 </p>
 
-In essence, the client should supply these key functions in the Clerk [Base](./src/Base.ts#47) and [ClerkBackendAPI](./src/api/ClerkBackendAPI.ts) classes:
+In essence, the client should supply these key functions in the Clerk [Base](./src/Base.ts#47) and [ClerkBackendApi](./src/api/ClerkBackendApi.ts) classes:
 
 1. Public key import `importKeyFunction`.
 2. JWT signature verification `verifySignatureFunction`.
 3. Base64 decoding `decodeBase64Function`.
 4. HTTP fetching utility for the API resource management `ClerkFetcher`.
 
-After supplying those in the `Base` and `ClerkBackendAPI` classes, you can use all the Clerk utilities required for the SDK business logic.
+After supplying those in the `Base` and `ClerkBackendApi` classes, you can use all the Clerk utilities required for the SDK business logic.
 
 ## Usage
 
@@ -116,9 +116,9 @@ examplePlatformBase.verifySessionToken(token > { authorizedParties });
 
 ### Clerk API Resources
 
-API resource management is also provided by this package through the [ClerkBackendAPI](./src/api/ClerkBackendAPI.ts) class. For more information on the API resources you can checkout the [resource documentation page](https://reference.clerk.dev/reference/backend-api-reference).
+API resource management is also provided by this package through the [ClerkBackendApi](./src/api/ClerkBackendApi.ts) class. For more information on the API resources you can checkout the [resource documentation page](https://reference.clerk.dev/reference/backend-api-reference).
 
-To use the Clerk Backend API wrapper in any JavaScript platform, you would need to provide some specific SDK information and an HTTP fetching utility. See more at the [ClerkBackendAPIProps](./src/api/ClerkBackendAPI.ts#17) implementation.
+To use the Clerk Backend API wrapper in any JavaScript platform, you would need to provide some specific SDK information and an HTTP fetching utility. See more at the [ClerkBackendAPIProps](./src/api/ClerkBackendApi.ts#17) implementation.
 
 ## Support
 
