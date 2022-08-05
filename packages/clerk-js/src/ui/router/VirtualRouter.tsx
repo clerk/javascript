@@ -21,7 +21,10 @@ export const VirtualRouter = ({
     new URL('/' + VIRTUAL_ROUTER_BASE_PATH + startPath, window.location.origin),
   );
 
-  const internalNavigate = (toURL: URL) => {
+  const internalNavigate = (toURL: URL | undefined) => {
+    if (!toURL) {
+      return;
+    }
     setCurrentURL(toURL);
   };
 

@@ -80,7 +80,11 @@ export const BaseRouter = ({
   useWindowEventListener(refreshEvents, refresh);
 
   // TODO: Look into the real possible types of globalNavigate
-  const baseNavigate = async (toURL: URL): Promise<unknown> => {
+  const baseNavigate = async (toURL: URL | undefined): Promise<unknown> => {
+    if (!toURL) {
+      return;
+    }
+
     if (toURL.origin !== window.location.origin || !toURL.pathname.startsWith('/' + basePath)) {
       if (onExternalNavigate) {
         onExternalNavigate();

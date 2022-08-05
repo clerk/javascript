@@ -11,7 +11,10 @@ interface HashRouterProps {
 }
 
 export const HashRouter = ({ preservedParams, children }: HashRouterProps): JSX.Element => {
-  const internalNavigate = (toURL: URL): Promise<void> => {
+  const internalNavigate = async (toURL: URL): Promise<void> => {
+    if (!toURL) {
+      return;
+    }
     window.location.hash = stripOrigin(toURL).substring(1 + hashRouterBase.length);
     return Promise.resolve();
   };

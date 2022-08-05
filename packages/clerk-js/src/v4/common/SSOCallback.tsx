@@ -11,7 +11,9 @@ export const SSOCallback = (props: HandleOAuthCallbackParams) => {
   const { navigate } = useNavigate();
 
   React.useEffect(() => {
-    void handleRedirectCallback({ ...props }, navigate);
+    handleRedirectCallback({ ...props }, navigate).catch(e => {
+      console.log(e);
+    });
   }, []);
 
   return (
