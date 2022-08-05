@@ -57,11 +57,15 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
         >
           <SignInSocialButtons />
           <Flex
+            elementDescriptor={descriptors.alternativeMethods}
             direction='col'
             gap={2}
           >
             {validFactors.map((factor, i) => (
               <ArrowBlockButton
+                elementDescriptor={descriptors.alternativeMethodsBlockButton}
+                textElementDescriptor={descriptors.alternativeMethodsBlockButtonText}
+                arrowElementDescriptor={descriptors.alternativeMethodsBlockButtonArrow}
                 key={i}
                 isDisabled={card.isLoading}
                 onClick={() => onFactorSelected(factor)}

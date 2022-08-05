@@ -24,7 +24,12 @@ export const Web3Section = () => {
           wallet={wallet}
         />
       ))}
-      <AddBlockButton onClick={() => navigate(`web3-wallet`)}>Add web3 wallet</AddBlockButton>
+      <AddBlockButton
+        id='password'
+        onClick={() => navigate(`web3-wallet`)}
+      >
+        Add web3 wallet
+      </AddBlockButton>
     </ProfileSection>
   );
 };

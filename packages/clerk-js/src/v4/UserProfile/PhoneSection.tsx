@@ -28,7 +28,12 @@ export const PhoneSection = () => {
         />
       ))}
 
-      <AddBlockButton onClick={() => navigate('phone-number')}>Add a phone number</AddBlockButton>
+      <AddBlockButton
+        id='password'
+        onClick={() => navigate('phone-number')}
+      >
+        Add a phone number
+      </AddBlockButton>
     </ProfileSection>
   );
 };

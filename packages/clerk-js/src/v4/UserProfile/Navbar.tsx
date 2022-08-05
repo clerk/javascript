@@ -83,16 +83,16 @@ export const NavBar = (props: NavBarProps) => {
 
   const items = (
     <Col
-      elementDescriptor={descriptors.navbar}
+      elementDescriptor={descriptors.navbarButtons}
       gap={2}
     >
       {BaseRoutes.map(r => (
         <NavButton
           key={r.id}
-          elementDescriptor={descriptors.navbarItem}
-          elementId={descriptors.navbarItem.setId(r.id)}
-          iconElementDescriptor={descriptors.navbarIcon}
-          iconElementId={descriptors.navbarIcon.setId(r.id)}
+          elementDescriptor={descriptors.navbarButton}
+          elementId={descriptors.navbarButton.setId(r.id)}
+          iconElementDescriptor={descriptors.navbarButtonIcon}
+          iconElementId={descriptors.navbarButtonIcon.setId(r.id)}
           onClick={() => navigateAndScroll(r.id)}
           icon={r.icon}
           isActive={activeId === r.id}
@@ -224,6 +224,7 @@ export const NavbarMenuButtonRow = (props: PropsOfComponent<typeof Button>) => {
   const { open } = useNavbarContext();
   return (
     <Flex
+      elementDescriptor={descriptors.navbarMobileMenuRow}
       sx={{
         display: 'none',
         [mqu.md]: {
@@ -232,6 +233,7 @@ export const NavbarMenuButtonRow = (props: PropsOfComponent<typeof Button>) => {
       }}
     >
       <Button
+        elementDescriptor={descriptors.navbarMobileMenuButton}
         {...props}
         onClick={open}
         size='xs'
@@ -245,6 +247,7 @@ export const NavbarMenuButtonRow = (props: PropsOfComponent<typeof Button>) => {
         })}
       >
         <Icon
+          elementDescriptor={descriptors.navbarMobileMenuButtonIcon}
           icon={Menu}
           size='sm'
         />

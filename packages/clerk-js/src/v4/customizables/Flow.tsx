@@ -12,7 +12,7 @@ const Root = (props: FlowRootProps) => {
     <FlowMetadataProvider flow={props.flow}>
       <InternalThemeProvider>
         <InvisibleRootBox
-          elementDescriptor={descriptors.root}
+          elementDescriptor={descriptors.rootBox}
           className={generateFlowClassname(props)}
           {...props}
         />

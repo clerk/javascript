@@ -42,7 +42,12 @@ export const MfaSection = () => {
         ))}
 
       {secondFactorsAvailableToAdd.length > 0 && (
-        <AddBlockButton onClick={() => navigate('multi-factor')}>Add two-step verification</AddBlockButton>
+        <AddBlockButton
+          id='mfa'
+          onClick={() => navigate('multi-factor')}
+        >
+          Add two-step verification
+        </AddBlockButton>
       )}
     </ProfileSection>
   );

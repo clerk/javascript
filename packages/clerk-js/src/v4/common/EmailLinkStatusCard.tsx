@@ -49,6 +49,7 @@ export const EmailLinkStatusCard = (props: EmailLinkStatusCardProps) => {
 const StatusRow = (props: { status: VerificationStatus }) => {
   return (
     <Flex
+      elementDescriptor={descriptors.verificationLinkStatusBox}
       center
       direction='col'
       gap={8}
@@ -63,6 +64,7 @@ const StatusRow = (props: { status: VerificationStatus }) => {
         <>
           <StatusIcon status={props.status} />
           <Text
+            elementDescriptor={descriptors.verificationLinkStatusText}
             variant='regularRegular'
             colorScheme='neutral'
           >
@@ -79,6 +81,7 @@ const StatusIcon = (props: { status: Exclude<VerificationStatus, 'loading'> }) =
 
   return (
     <Flex
+      elementDescriptor={descriptors.verificationLinkStatusIconBox}
       center
       sx={theme => ({
         width: theme.sizes.$24,
@@ -90,6 +93,7 @@ const StatusIcon = (props: { status: Exclude<VerificationStatus, 'loading'> }) =
       })}
     >
       <Icon
+        elementDescriptor={descriptors.verificationLinkStatusIcon}
         icon={StatusToIcon[status]}
         sx={theme => ({ height: theme.sizes.$6, width: theme.sizes.$5 })}
       />

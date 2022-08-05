@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Col, Text } from '../customizables';
+import { Col, descriptors, Text } from '../customizables';
 import { CodeControl, useCodeControl } from './CodeControl';
 import { TimerButton } from './TimerButton';
 
@@ -17,10 +17,22 @@ export const CodeForm = (props: CodeFormProps) => {
   const { subtitle, title, isLoading, success, codeControl, onResendCodeClicked } = props;
 
   return (
-    <Col gap={2}>
-      <Col gap={1}>
-        <Text variant='smallMedium'>{title}</Text>
+    <Col
+      elementDescriptor={descriptors.form}
+      gap={2}
+    >
+      <Col
+        elementDescriptor={descriptors.formHeader}
+        gap={1}
+      >
         <Text
+          elementDescriptor={descriptors.formHeaderTitle}
+          variant='smallMedium'
+        >
+          {title}
+        </Text>
+        <Text
+          elementDescriptor={descriptors.formHeaderSubtitle}
           variant='smallRegular'
           colorScheme='neutral'
         >
@@ -34,6 +46,7 @@ export const CodeForm = (props: CodeFormProps) => {
       />
       {onResendCodeClicked && (
         <TimerButton
+          elementDescriptor={descriptors.formResendCodeLink}
           onClick={onResendCodeClicked}
           startDisabled
           isDisabled={success || isLoading}

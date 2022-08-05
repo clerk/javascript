@@ -74,10 +74,22 @@ type VerificationLinkProps = {
 export const VerificationLink = (props: VerificationLinkProps) => {
   const card = useCardState();
   return (
-    <Col gap={1}>
-      <Col gap={1}>
-        <Text variant='smallMedium'>{props.formTitle}</Text>
+    <Col
+      elementDescriptor={descriptors.form}
+      gap={1}
+    >
+      <Col
+        elementDescriptor={descriptors.formHeader}
+        gap={1}
+      >
         <Text
+          elementDescriptor={descriptors.formHeaderTitle}
+          variant='smallMedium'
+        >
+          {props.formTitle}
+        </Text>
+        <Text
+          elementDescriptor={descriptors.formHeaderSubtitle}
           variant='smallRegular'
           colorScheme='neutral'
         >
@@ -85,6 +97,7 @@ export const VerificationLink = (props: VerificationLinkProps) => {
         </Text>
       </Col>
       <TimerButton
+        elementDescriptor={descriptors.formResendCodeLink}
         onClick={props.onResendCodeClicked}
         startDisabled
         isDisabled={card.isLoading}

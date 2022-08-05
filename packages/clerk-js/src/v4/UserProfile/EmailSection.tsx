@@ -28,7 +28,12 @@ export const EmailsSection = () => {
         />
       ))}
 
-      <AddBlockButton onClick={() => navigate('email-address')}>Add an email address</AddBlockButton>
+      <AddBlockButton
+        id='emailAddresses'
+        onClick={() => navigate('email-address')}
+      >
+        Add an email address
+      </AddBlockButton>
     </ProfileSection>
   );
 };

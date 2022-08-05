@@ -5,7 +5,7 @@ import { useCoreUser } from '../../ui/contexts';
 import { useNavigate } from '../../ui/hooks';
 import { useRouter } from '../../ui/router';
 import { useWizard, Wizard } from '../common';
-import { Col, descriptors, Image, Text } from '../customizables';
+import { Col, Image, Text } from '../customizables';
 import { ArrowBlockButton, useCardState, withCardStateProvider } from '../elements';
 import { useEnabledThirdPartyProviders } from '../hooks';
 import { handleError, sleep } from '../utils';
@@ -95,8 +95,8 @@ const AddConnectedAccount = () => {
             isDisabled={card.isLoading}
             icon={
               <Image
-                elementDescriptor={descriptors.socialButtonsLogo}
-                elementId={descriptors.socialButtonsLogo.setId(strategyToDisplayData[strategy].id)}
+                // elementDescriptor={descriptors.socialButtonsLogo}
+                // elementId={descriptors.socialButtonsLogo.setId(strategyToDisplayData[strategy].id)}
                 isLoading={card.loadingMetadata === strategy}
                 isDisabled={card.isLoading}
                 src={strategyToDisplayData[strategy].iconUrl}

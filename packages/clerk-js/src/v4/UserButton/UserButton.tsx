@@ -19,7 +19,7 @@ const _UserButton = () => {
   return (
     <Flow.Root flow='userButton'>
       <Flex
-        elementDescriptor={descriptors.userButton}
+        elementDescriptor={descriptors.userButtonBox}
         isOpen={isOpen}
         align='center'
         gap={2}

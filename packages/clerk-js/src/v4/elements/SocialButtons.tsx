@@ -64,8 +64,8 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
           label={`Continue with ${strategyToDisplayData[strategy].name}`}
           icon={
             <Image
-              elementDescriptor={descriptors.socialButtonsLogo}
-              elementId={descriptors.socialButtonsLogo.setId(strategyToDisplayData[strategy].id)}
+              elementDescriptor={[descriptors.providerIcon, descriptors.socialButtonsProviderIcon]}
+              elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id)}
               isLoading={card.loadingMetadata === strategy}
               isDisabled={card.isLoading}
               src={strategyToDisplayData[strategy].iconUrl}
@@ -116,8 +116,8 @@ const SocialButtonIcon = (props: SocialButtonProps): JSX.Element => {
   const { icon, label, id, ...rest } = props;
   return (
     <Button
-      elementDescriptor={descriptors.socialButtonsButtonIcon}
-      elementId={descriptors.socialButtonsButtonIcon.setId(id)}
+      elementDescriptor={descriptors.socialButtonsIconButton}
+      elementId={descriptors.socialButtonsIconButton.setId(id)}
       variant='icon'
       colorScheme='neutral'
       sx={t => ({
@@ -136,12 +136,12 @@ const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
 
   return (
     <ArrowBlockButton
-      elementDescriptor={descriptors.socialButtonsButtonBlock}
-      elementId={descriptors.socialButtonsButtonBlock.setId(id)}
-      textElementDescriptor={descriptors.socialButtonsButtonBlockText}
-      textElementId={descriptors.socialButtonsButtonBlockText.setId(id)}
-      arrowElementDescriptor={descriptors.socialButtonsButtonBlockArrow}
-      arrowElementId={descriptors.socialButtonsButtonBlockArrow.setId(id)}
+      elementDescriptor={descriptors.socialButtonsBlockButton}
+      elementId={descriptors.socialButtonsBlockButton.setId(id)}
+      textElementDescriptor={descriptors.socialButtonsBlockButtonText}
+      textElementId={descriptors.socialButtonsBlockButtonText.setId(id)}
+      arrowElementDescriptor={descriptors.socialButtonsBlockButtonArrow}
+      arrowElementId={descriptors.socialButtonsBlockButtonArrow.setId(id)}
       {...rest}
     >
       {label}

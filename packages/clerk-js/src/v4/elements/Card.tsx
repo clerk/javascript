@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useEnvironment } from '../../ui/contexts';
 import { descriptors, Flex, generateFlowPartClassname, useAppearance } from '../customizables';
+import { ElementDescriptor } from '../customizables/elementDescriptors';
 import { mqu, PropsOfComponent } from '../styledSystem';
 import { ApplicationLogo } from './ApplicationLogo';
 import { useFlowMetadata } from './contexts';
@@ -92,9 +93,9 @@ export const BaseCard = React.forwardRef<HTMLDivElement, BaseCardProps>((props, 
   return (
     <Flex
       direction='col'
-      elementDescriptor={descriptors.card}
       className={generateFlowPartClassname(flowMetadata)}
       {...props}
+      elementDescriptor={[descriptors.card, props.elementDescriptor as ElementDescriptor]}
       sx={[
         t => ({
           willChange: 'transform, opacity, height',

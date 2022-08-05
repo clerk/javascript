@@ -76,6 +76,8 @@ export type ProfileSectionId =
   | 'password'
   | 'mfa'
   | 'activeDevices';
+export type ProfilePageId = 'account' | 'security';
+
 type NavbarItemId = 'account' | 'security';
 
 /**
@@ -129,103 +131,160 @@ export type ElementObjectKey<K extends string> = K extends `${infer Parent}-${in
  * Kebab-case is used to differentiate between the container and child elements
  */
 export type ElementsConfig = {
-  root: WithOptions<never, never, never>;
+  rootBox: WithOptions<never, never, never>;
   card: WithOptions<never, never, never>;
 
-  logo: WithOptions<never, never, never>;
-  'logo-image': WithOptions<never, never, never>;
+  logoBox: WithOptions<never, never, never>;
+  logoImage: WithOptions<never, never, never>;
   // outerLogo: WithOptions<never, never, never>;
   // 'outerLogo-image': WithOptions<never, never, never>;
 
   header: WithOptions<never, never, never>;
-  'header-title': WithOptions<never, never, never>;
-  'header-subtitle': WithOptions<never, never, never>;
+  headerTitle: WithOptions<never, never, never>;
+  headerSubtitle: WithOptions<never, never, never>;
+  headerBackBox: WithOptions<never, never, never>;
+  headerBackLink: WithOptions<never, never, never>;
+  headerBackIcon: WithOptions<never, never, never>;
 
   main: WithOptions<never, never, never>;
 
   footer: WithOptions<never, never, never>;
-  'footer-action': WithOptions<never, never, never>;
-  'footer-actionText': WithOptions<never, never, never>;
-  'footer-actionLink': WithOptions<never, never, never>;
-  'footer-pages': WithOptions<never, never, never>;
-  'footer-pagesLink': WithOptions<'help' | 'terms' | 'privacy', never, never>;
+  footerAction: WithOptions<never, never, never>;
+  footerActionText: WithOptions<never, never, never>;
+  footerActionLink: WithOptions<never, never, never>;
+  footerPages: WithOptions<never, never, never>;
+  footerPagesLink: WithOptions<'help' | 'terms' | 'privacy', never, never>;
 
-  // TODO: grid + rows or just socialButtons?
-  // socialButtonsGrid: WithOptions<never, never, never>;
-  // socialButtonsRows: WithOptions<never, never, never>;
   socialButtons: WithOptions<never, never, never>;
-  'socialButtons-buttonIcon': WithOptions<OAuthProvider | Web3Provider, LoadingState, never>;
-  'socialButtons-buttonBlock': WithOptions<OAuthProvider | Web3Provider, LoadingState, never>;
-  'socialButtons-buttonBlockText': WithOptions<OAuthProvider | Web3Provider, never, never>;
-  'socialButtons-buttonBlockArrow': WithOptions<OAuthProvider | Web3Provider, never, never>;
-  'socialButtons-logo': WithOptions<OAuthProvider | Web3Provider, LoadingState, never>;
+  socialButtonsIconButton: WithOptions<OAuthProvider | Web3Provider, LoadingState, never>;
+  socialButtonsBlockButton: WithOptions<OAuthProvider | Web3Provider, LoadingState, never>;
+  socialButtonsBlockButtonText: WithOptions<OAuthProvider | Web3Provider, never, never>;
+  socialButtonsBlockButtonArrow: WithOptions<OAuthProvider | Web3Provider, never, never>;
+  socialButtonsProviderIcon: WithOptions<OAuthProvider | Web3Provider, LoadingState, never>;
 
-  dividerBox: WithOptions<never, never, never>;
+  alternativeMethods: WithOptions<never, never, never>;
+  alternativeMethodsBlockButton: WithOptions<OAuthProvider | Web3Provider, LoadingState, never>;
+  alternativeMethodsBlockButtonText: WithOptions<OAuthProvider | Web3Provider, never, never>;
+  alternativeMethodsBlockButtonArrow: WithOptions<OAuthProvider | Web3Provider, never, never>;
+
+  otpCodeBox: WithOptions<never, never, never>;
+  otpCodeHeader: WithOptions<never, never, never>;
+  otpCodeHeaderTitle: WithOptions<never, never, never>;
+  otpCodeHeaderSubtitle: WithOptions<never, never, never>;
+  otpCodeField: WithOptions<never, never, never>;
+  otpCodeFieldInputs: WithOptions<never, never, never>;
+  otpCodeFieldInput: WithOptions<never, never, never>;
+  otpCodeFieldErrorText: WithOptions<never, never, never>;
+
+  dividerRow: WithOptions<never, never, never>;
   dividerText: WithOptions<never, never, never>;
   dividerLine: WithOptions<never, never, never>;
 
+  formHeader: WithOptions<never, ErrorState, never>;
+  formHeaderTitle: WithOptions<never, ErrorState, never>;
+  formHeaderSubtitle: WithOptions<never, ErrorState, never>;
+  formResendCodeLink: WithOptions<never, never, never>;
+
+  verificationLinkStatusBox: WithOptions<never, never, never>;
+  verificationLinkStatusIconBox: WithOptions<never, never, never>;
+  verificationLinkStatusIcon: WithOptions<never, never, never>;
+  verificationLinkStatusText: WithOptions<never, never, never>;
+
   form: WithOptions<never, ErrorState, never>;
-  'form-fieldRow': WithOptions<never, never, never>;
-  'form-field': WithOptions<FieldId, ControlState, never>;
-  'form-fieldLabelRow': WithOptions<FieldId, ControlState, never>;
-  'form-fieldLabel': WithOptions<FieldId, ControlState, never>;
-  'form-fieldAction': WithOptions<FieldId, ControlState, never>;
-  'form-fieldInput': WithOptions<FieldId, ControlState, never>;
-  'form-fieldErrorText': WithOptions<FieldId, ControlState, never>;
-  'form-fieldHintText': WithOptions<FieldId, ControlState, never>;
-  'form-buttonRow': WithOptions<never, ControlState | LoadingState, never>;
-  'form-buttonPrimary': WithOptions<never, ControlState | LoadingState, never>;
-  'form-buttonReset': WithOptions<never, ControlState | LoadingState, never>;
-  'form-fieldInputShowPasswordButton': WithOptions<never, never, never>;
-  'form-fieldInputShowPasswordIcon': WithOptions<never, never, never>;
-  'form-fieldInputCopyToClipboardButton': WithOptions<never, never, never>;
-  'form-fieldInputCopyToClipboardIcon': WithOptions<never, never, never>;
+  formFieldRow: WithOptions<never, never, never>;
+  formField: WithOptions<FieldId, ControlState, never>;
+  formFieldLabelRow: WithOptions<FieldId, ControlState, never>;
+  formFieldLabel: WithOptions<FieldId, ControlState, never>;
+  formFieldAction: WithOptions<FieldId, ControlState, never>;
+  formFieldInput: WithOptions<FieldId, ControlState, never>;
+  formFieldErrorText: WithOptions<FieldId, ControlState, never>;
+  formFieldHintText: WithOptions<FieldId, ControlState, never>;
+  formButtonRow: WithOptions<never, ControlState | LoadingState, never>;
+  formButtonPrimary: WithOptions<never, ControlState | LoadingState, never>;
+  formButtonReset: WithOptions<never, ControlState | LoadingState, never>;
+  formFieldInputGroup: WithOptions<never, never, never>;
+  formFieldInputShowPasswordButton: WithOptions<never, never, never>;
+  formFieldInputShowPasswordIcon: WithOptions<never, never, never>;
+  formFieldInputCopyToClipboardButton: WithOptions<never, never, never>;
+  formFieldInputCopyToClipboardIcon: WithOptions<never, never, never>;
 
   avatar: WithOptions<never, never, never>;
-  'avatar-image': WithOptions<never, never, never>;
+  avatarImage: WithOptions<never, never, never>;
 
-  userButton: WithOptions<never, 'open', never>;
-  'userButton-trigger': WithOptions<never, 'open', never>;
-  'userButton-popoverRoot': WithOptions<never, never, never>;
-  'userButton-popover': WithOptions<never, never, never>;
+  // TODO: We can remove "Popover" from these:
+  userButtonBox: WithOptions<never, 'open', never>;
+  userButtonOuterIdentifier: WithOptions<never, 'open', never>;
+  userButtonTrigger: WithOptions<never, 'open', never>;
+  userButtonAvatarBox: WithOptions<never, 'open', never>;
+  userButtonAvatarImage: WithOptions<never, 'open', never>;
+  userButtonPopoverRootBox: WithOptions<never, never, never>;
+  userButtonPopoverCard: WithOptions<never, never, never>;
+  userButtonPopoverMainBox: WithOptions<never, never, never>;
+  userButtonPopoverUserPreviewBox: WithOptions<never, never, never>;
+  userButtonPopoverActionsBox: WithOptions<never, never, never>;
+  userButtonPopoverActionButton: WithOptions<'manageAccount' | 'signOut', never, never>;
+  userButtonPopoverActionButtonIconBox: WithOptions<'manageAccount' | 'signOut', never, never>;
+  userButtonPopoverActionButtonIcon: WithOptions<'manageAccount' | 'signOut', never, never>;
+  userButtonPopoverActionButtonText: WithOptions<'manageAccount' | 'signOut', never, never>;
+  userButtonPopoverFooterBox: WithOptions<never, never, never>;
+  userButtonPopoverFooterPagesBox: WithOptions<never, never, never>;
+  userButtonPopoverFooterPagesLink: WithOptions<'terms' | 'privacy', never, never>;
 
-  identityPreview: WithOptions<never, never, never>;
-  'identityPreview-avatar': WithOptions<never, never, never>;
-  'identityPreview-text': WithOptions<never, never, never>;
-  'identityPreview-icon': WithOptions<never, never, never>;
+  // TODO: Test this idea. Instead of userButtonUserPreview, have a userPreview__userButton instead
+  // Same for other repeated selectors, eg avatar
+  userPreviewBox: WithOptions<'userButton', never, never>;
+  userPreviewAvatarContainer: WithOptions<'userButton', never, never>;
+  userPreviewAvatarBox: WithOptions<'userButton', never, never>;
+  userPreviewAvatarImage: WithOptions<'userButton', never, never>;
+  userPreviewTextContainer: WithOptions<'userButton', never, never>;
+  userPreviewMainIdentifier: WithOptions<'userButton', never, never>;
+  userPreviewSecondaryIdentifier: WithOptions<'userButton', never, never>;
+
+  identityPreviewBox: WithOptions<never, never, never>;
+  identityPreviewAvatarBox: WithOptions<never, never, never>;
+  identityPreviewAvatarImage: WithOptions<never, never, never>;
+  identityPreviewText: WithOptions<never, never, never>;
+  identityPreviewEditButton: WithOptions<never, never, never>;
+  identityPreviewEditButtonIcon: WithOptions<never, never, never>;
 
   alert: WithOptions<AlertId, never, never>;
-  'alert-icon': WithOptions<AlertId, never, never>;
-  'alert-text': WithOptions<AlertId, never, never>;
+  alertIcon: WithOptions<AlertId, never, never>;
+  alertText: WithOptions<AlertId, never, never>;
 
   loader: WithOptions<never, never, never>;
-  'loader-icon': WithOptions<never, ErrorState, never>;
+  loaderIcon: WithOptions<never, ErrorState, never>;
 
-  'modal-backdrop': WithOptions<never, never, never>;
-  'modal-content': WithOptions<never, never, never>;
+  modalBackdrop: WithOptions<never, never, never>;
+  modalContent: WithOptions<never, never, never>;
 
   profileSection: WithOptions<ProfileSectionId, never, never>;
-  'profileSection-title': WithOptions<ProfileSectionId, never, never>;
-  'profileSection-titleText': WithOptions<ProfileSectionId, never, never>;
-  'profileSection-content': WithOptions<ProfileSectionId, never, never>;
+  profileSectionTitle: WithOptions<ProfileSectionId, never, never>;
+  profileSectionTitleText: WithOptions<ProfileSectionId, never, never>;
+  profileSectionContent: WithOptions<ProfileSectionId, never, never>;
+  profileSectionPrimaryButton: WithOptions<ProfileSectionId, never, never>;
+  profilePage: WithOptions<ProfilePageId, never, never>;
 
   // TODO: review
   formattedPhoneNumber: WithOptions<never, never, never>;
-  'formattedPhoneNumber-flag': WithOptions<never, never, never>;
-  'formattedPhoneNumber-text': WithOptions<never, never, never>;
+  formattedPhoneNumberFlag: WithOptions<never, never, never>;
+  formattedPhoneNumberText: WithOptions<never, never, never>;
 
   breadcrumbs: WithOptions<never, never, never>;
-  'breadcrumbs-itemContainer': WithOptions<never, never, never>;
-  'breadcrumbs-icon': WithOptions<never, never, never>;
-  'breadcrumbs-item': WithOptions<'currentPage', never, never>;
-  'breadcrumbs-divider': WithOptions<never, never, never>;
+  breadcrumbsItems: WithOptions<never, never, never>;
+  breadcrumbsItemBox: WithOptions<'currentPage', never, never>;
+  breadcrumbsItem: WithOptions<'currentPage', never, never>;
+  breadcrumbsItemIcon: WithOptions<'currentPage', never, never>;
+  breadcrumbsItemDivider: WithOptions<never, never, never>;
 
   scroller: WithOptions<never, never, never>;
 
   navbarSection: WithOptions<never, never, never>;
-  navbar: WithOptions<never, ActiveState, never>;
-  'navbar-item': WithOptions<NavbarItemId, ActiveState, never>;
-  'navbar-icon': WithOptions<NavbarItemId, ActiveState, never>;
+  navbarButtons: WithOptions<never, ActiveState, never>;
+  navbarButton: WithOptions<NavbarItemId, ActiveState, never>;
+  navbarButtonIcon: WithOptions<NavbarItemId, ActiveState, never>;
+  navbarMobileMenuRow: WithOptions<never, never, never>;
+  navbarMobileMenuButton: WithOptions<never, never, never>;
+  navbarMobileMenuButtonIcon: WithOptions<never, never, never>;
 
   pageSection: WithOptions<never, never, never>;
   page: WithOptions<never, never, never>;
@@ -241,11 +300,13 @@ export type ElementsConfig = {
   fileDropAreaButtonPrimary: WithOptions<never, never, never>;
   fileDropAreaFooterHint: WithOptions<never, never, never>;
 
-  badgePrimary: WithOptions<never, never, never>;
+  accordionTriggerButton: WithOptions<never, never, never>;
+  accordionContent: WithOptions<never, never, never>;
 
   // default descriptors
-  badge: WithOptions<never, never, never>;
+  badge: WithOptions<'primary' | 'actionRequired', never, never>;
   button: WithOptions<never, LoadingState, never>;
+  providerIcon: WithOptions<OAuthProvider | Web3Provider, never, never>;
 };
 
 export type Elements = {

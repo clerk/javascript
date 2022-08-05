@@ -23,7 +23,10 @@ export const UsernameSection = () => {
           {user.username}
         </Text>
       )}
-      <AddBlockButton onClick={() => navigate('username')}>
+      <AddBlockButton
+        id='username'
+        onClick={() => navigate('username')}
+      >
         {user.username ? 'Change username' : 'Set username'}
       </AddBlockButton>
     </ProfileSection>

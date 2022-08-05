@@ -19,6 +19,8 @@ export const UserButtonTrigger = React.forwardRef<HTMLButtonElement, UserButtonT
       ref={ref}
     >
       <Avatar
+        boxElementDescriptor={descriptors.userButtonAvatarBox}
+        imageElementDescriptor={descriptors.userButtonAvatarImage}
         {...user}
         optimize
         size={theme => theme.sizes.$8}

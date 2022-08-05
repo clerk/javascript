@@ -2,6 +2,7 @@ import { isRetinaDisplay } from '@clerk/shared/utils/isRetinaDisplay';
 import React from 'react';
 
 import { descriptors, Flex, Image, Text } from '../customizables';
+import { ElementDescriptor } from '../customizables/elementDescriptors';
 import { InternalTheme } from '../foundations';
 import { common, ThemableCssProp } from '../styledSystem';
 import { getFullName, getInitials } from '../utils';
@@ -15,6 +16,8 @@ type AvatarProps = {
   profileImageFetchSize?: number;
   optimize?: boolean;
   sx?: ThemableCssProp;
+  boxElementDescriptor?: ElementDescriptor;
+  imageElementDescriptor?: ElementDescriptor;
 };
 
 export const Avatar = (props: AvatarProps) => {
@@ -27,6 +30,8 @@ export const Avatar = (props: AvatarProps) => {
     optimize,
     profileImageFetchSize = 64,
     sx,
+    boxElementDescriptor,
+    imageElementDescriptor,
   } = props;
   const [error, setError] = React.useState(false);
   const initials = getInitials({ firstName, lastName, name });
@@ -50,7 +55,7 @@ export const Avatar = (props: AvatarProps) => {
       <InitialsAvatarFallback {...props} />
     ) : (
       <Image
-        elementDescriptor={descriptors.avatarImage}
+        elementDescriptor={imageElementDescriptor || descriptors.avatarImage}
         alt={fullName}
         title={fullName}
         src={src || GRAVATAR_DEFAULT_AVATAR}
@@ -63,7 +68,7 @@ export const Avatar = (props: AvatarProps) => {
   // TODO: Revise size handling. Do we need to be this dynamic or should we use the theme instead?
   return (
     <Flex
-      elementDescriptor={descriptors.avatar}
+      elementDescriptor={boxElementDescriptor || descriptors.avatar}
       sx={[
         theme => ({
           flexShrink: 0,

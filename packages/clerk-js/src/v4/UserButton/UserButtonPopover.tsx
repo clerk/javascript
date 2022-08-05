@@ -64,23 +64,40 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
   );
 
   return (
-    <RootBox elementDescriptor={descriptors.userButtonPopoverRoot}>
+    <RootBox elementDescriptor={descriptors.userButtonPopoverRootBox}>
       <UserButtonCard
         ref={ref}
         {...rest}
       >
         <Main>
           <UserPreview
+            elementId={'userButton' as any}
             user={user}
             sx={theme => ({ padding: `0 ${theme.space.$6}`, marginBottom: theme.space.$2 })}
           />
-          <Actions>
+          <Actions elementDescriptor={descriptors.userButtonPopoverActionsBox}>
             <Action
+              elementDescriptor={descriptors.userButtonPopoverActionButton}
+              elementId={descriptors.userButtonPopoverActionButton.setId('manageAccount')}
+              iconBoxElementDescriptor={descriptors.userButtonPopoverActionButtonIconBox}
+              iconBoxElementId={descriptors.userButtonPopoverActionButtonIconBox.setId('manageAccount')}
+              iconElementDescriptor={descriptors.userButtonPopoverActionButtonIcon}
+              iconElementId={descriptors.userButtonPopoverActionButtonIcon.setId('manageAccount')}
+              textElementDescriptor={descriptors.userButtonPopoverActionButtonText}
+              textElementId={descriptors.userButtonPopoverActionButtonText.setId('manageAccount')}
               icon={CogFilled}
               label='Manage account'
               onClick={handleManageAccountClicked}
             />
             <Action
+              elementDescriptor={descriptors.userButtonPopoverActionButton}
+              elementId={descriptors.userButtonPopoverActionButton.setId('signOut')}
+              iconBoxElementDescriptor={descriptors.userButtonPopoverActionButtonIconBox}
+              iconBoxElementId={descriptors.userButtonPopoverActionButtonIconBox.setId('signOut')}
+              iconElementDescriptor={descriptors.userButtonPopoverActionButtonIcon}
+              iconElementId={descriptors.userButtonPopoverActionButtonIcon.setId('signOut')}
+              textElementDescriptor={descriptors.userButtonPopoverActionButtonText}
+              textElementId={descriptors.userButtonPopoverActionButtonText.setId('signOut')}
               icon={SignOut}
               label='Sign out'
               onClick={handleSignOutSessionClicked(session)}
@@ -95,12 +112,20 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
 });
 
 const Main = (props: React.PropsWithChildren<{}>) => {
-  return <Flex direction='col'>{props.children}</Flex>;
+  return (
+    <Flex
+      elementDescriptor={descriptors.userButtonPopoverMainBox}
+      direction='col'
+    >
+      {props.children}
+    </Flex>
+  );
 };
 
 const Footer = () => {
   return (
     <Flex
+      elementDescriptor={descriptors.userButtonPopoverFooterBox}
       justify='between'
       sx={theme => ({
         padding: `${theme.space.$6}`,
@@ -125,9 +150,28 @@ const Links = () => {
   }
 
   return (
-    <Flex gap={4}>
-      {links.termsPageUrl && <UserButtonLink href={links.termsPageUrl}>Terms</UserButtonLink>}
-      {links.privacyPageUrl && <UserButtonLink href={links.privacyPageUrl}>Privacy</UserButtonLink>}
+    <Flex
+      elementDescriptor={descriptors.userButtonPopoverFooterPagesBox}
+      gap={4}
+    >
+      {termsPageUrl && (
+        <UserButtonLink
+          elementDescriptor={descriptors.userButtonPopoverFooterPagesLink}
+          elementId={descriptors.userButtonPopoverFooterPagesLink.setId('terms')}
+          href={termsPageUrl}
+        >
+          Terms
+        </UserButtonLink>
+      )}
+      {privacyPageUrl && (
+        <UserButtonLink
+          elementDescriptor={descriptors.userButtonPopoverFooterPagesLink}
+          elementId={descriptors.userButtonPopoverFooterPagesLink.setId('privacy')}
+          href={privacyPageUrl}
+        >
+          Privacy
+        </UserButtonLink>
+      )}
     </Flex>
   );
 };
@@ -147,6 +191,7 @@ const UserButtonCard = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof 
   return (
     <Flow.Part part='popover'>
       <BaseCard
+        elementDescriptor={descriptors.userButtonPopoverCard}
         {...props}
         ref={ref}
         sx={t => ({

@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Button, Col, Flex, Icon, Spinner, Text } from '../customizables';
+import { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { useCardState } from '../elements/contexts';
 import { useLoadingStatus } from '../hooks';
 import { PropsOfComponent } from '../styledSystem';
@@ -12,12 +13,29 @@ export const Actions = (props: PropsOfComponent<typeof Flex>) => {
 type ActionProps = PropsOfComponent<typeof Button> & {
   icon: React.ComponentType;
   label: string;
+  iconBoxElementDescriptor?: ElementDescriptor;
+  iconBoxElementId?: ElementId;
+  iconElementDescriptor?: ElementDescriptor;
+  iconElementId?: ElementId;
+  textElementDescriptor?: ElementDescriptor;
+  textElementId?: ElementId;
 };
 
 export const Action = (props: ActionProps) => {
   const card = useCardState();
   const status = useLoadingStatus();
-  const { icon, label, onClick: onClickProp, ...rest } = props;
+  const {
+    icon,
+    label,
+    onClick: onClickProp,
+    iconElementDescriptor,
+    iconElementId,
+    textElementDescriptor,
+    textElementId,
+    iconBoxElementDescriptor,
+    iconBoxElementId,
+    ...rest
+  } = props;
 
   const onClick: React.MouseEventHandler<HTMLButtonElement> = async e => {
     card.setLoading();
@@ -49,6 +67,8 @@ export const Action = (props: ActionProps) => {
       {...rest}
     >
       <Flex
+        elementDescriptor={iconBoxElementDescriptor}
+        elementId={iconBoxElementId}
         justify='center'
         sx={theme => ({ flex: `0 0 ${theme.sizes.$11}` })}
       >
@@ -56,6 +76,8 @@ export const Action = (props: ActionProps) => {
           <Spinner size='sm' />
         ) : (
           <Icon
+            elementDescriptor={iconElementDescriptor}
+            elementId={iconElementId}
             icon={icon}
             sx={theme => ({
               color: theme.colors.$blackAlpha400,
@@ -66,6 +88,8 @@ export const Action = (props: ActionProps) => {
         )}
       </Flex>
       <Text
+        elementDescriptor={textElementDescriptor}
+        elementId={textElementId}
         as='span'
         variant='smallRegular'
         colorScheme='neutral'

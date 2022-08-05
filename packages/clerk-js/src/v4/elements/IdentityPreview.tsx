@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Button, Flex, Icon, Text } from '../customizables';
+import { Button, descriptors, Flex, Icon, Text } from '../customizables';
 import { AuthApp, PencilEdit } from '../icons';
 import { PropsOfComponent } from '../styledSystem';
 import { formatSafeIdentifier, getFlagEmojiFromCountryIso, isMaskedIdentifier, parsePhoneString } from '../utils';
@@ -18,10 +18,14 @@ export const IdentityPreview = (props: IdentityPreviewProps) => {
 
   const edit = onClick && (
     <Button
+      elementDescriptor={descriptors.identityPreviewEditButton}
       variant='ghostIcon'
       onClick={onClick}
     >
-      <Icon icon={PencilEdit} />
+      <Icon
+        elementDescriptor={descriptors.identityPreviewEditButtonIcon}
+        icon={PencilEdit}
+      />
     </Button>
   );
 
@@ -59,6 +63,7 @@ export const IdentityPreview = (props: IdentityPreviewProps) => {
 const IdentifierContainer = (props: React.PropsWithChildren<{}>) => {
   return (
     <Text
+      elementDescriptor={descriptors.identityPreviewText}
       variant='smallRegular'
       colorScheme='neutral'
       truncate
@@ -71,6 +76,8 @@ const UsernameOrEmailIdentifier = (props: any) => {
   return (
     <>
       <Avatar
+        boxElementDescriptor={descriptors.identityPreviewAvatarBox}
+        imageElementDescriptor={descriptors.identityPreviewAvatarImage}
         profileImageUrl={props.avatarUrl}
         size={t => t.sizes.$5}
       />
@@ -103,6 +110,7 @@ const Authenticator = () => {
 const Container = (props: React.PropsWithChildren<{}>) => {
   return (
     <Flex
+      elementDescriptor={descriptors.identityPreviewBox}
       align='center'
       gap={2}
       sx={t => ({

@@ -9,6 +9,7 @@ export const PasswordInput = (props: PropsOfComponent<typeof Input>) => {
   const { id, ...rest } = props;
   return (
     <Flex
+      elementDescriptor={descriptors.formFieldInputGroup}
       direction='col'
       justify='center'
       sx={{ position: 'relative' }}

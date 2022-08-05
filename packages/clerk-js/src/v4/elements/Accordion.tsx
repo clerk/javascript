@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Col } from '../customizables';
+import { Col, descriptors } from '../customizables';
 import { Caret } from '../icons';
 import { animations, InternalTheme } from '../styledSystem';
 import { ArrowBlockButton } from './ArrowBlockButton';
@@ -45,6 +45,7 @@ export const AccordionItem = (props: AccordionItemProps) => {
   return (
     <Col>
       <ArrowBlockButton
+        elementDescriptor={descriptors.accordionTriggerButton}
         variant='ghost'
         colorScheme='neutral'
         textVariant='smallRegular'
@@ -69,6 +70,7 @@ export const AccordionItem = (props: AccordionItemProps) => {
       </ArrowBlockButton>
       {isOpen && (
         <Col
+          elementDescriptor={descriptors.accordionContent}
           ref={contentRef}
           sx={t => ({
             animation: `${animations.blockBigIn} ${t.transitionDuration.$slow} ease`,

@@ -1,4 +1,4 @@
-import { Icon } from '../customizables';
+import { descriptors, Icon } from '../customizables';
 import { ArrowBlockButton } from '../elements';
 import { Plus } from '../icons';
 import { PropsOfComponent } from '../styledSystem';
@@ -15,10 +15,13 @@ export const BlockButton = (props: BlockButtonProps) => {
 };
 
 export const AddBlockButton = (props: BlockButtonProps) => {
+  const { id, ...rest } = props;
   return (
     <BlockButton
+      elementDescriptor={descriptors.profileSectionPrimaryButton}
+      elementId={descriptors.profileSectionPrimaryButton?.setId(id as any)}
       colorScheme='primary'
-      {...props}
+      {...rest}
       sx={theme => ({ justifyContent: 'flex-start', gap: theme.space.$2 })}
       icon={
         <Icon

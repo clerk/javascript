@@ -13,8 +13,12 @@ type BreadcrumbsProps = {
 const BreadcrumbItem = (props: PropsOfComponent<typeof Text> & { href?: string }) => {
   const El = (props.onClick || props.href ? Link : Text) as unknown as any;
   return (
-    <Flex as='li'>
+    <Flex
+      elementDescriptor={descriptors.breadcrumbsItemBox}
+      as='li'
+    >
       <El
+        elementDescriptor={descriptors.breadcrumbsItem}
         colorScheme='neutral'
         variant='smallRegular'
         sx={{ display: 'inline-flex', listStyle: 'none' }}
@@ -58,7 +62,7 @@ export const Breadcrumbs = (props: BreadcrumbsProps) => {
       elementDescriptor={descriptors.breadcrumbs}
     >
       <Flex
-        elementDescriptor={descriptors.breadcrumbsItemContainer}
+        elementDescriptor={descriptors.breadcrumbsItems}
         as='ol'
         sx={t => ({
           gap: t.space.$3,
@@ -70,12 +74,11 @@ export const Breadcrumbs = (props: BreadcrumbsProps) => {
         {root && (
           <>
             <BreadcrumbItem
-              elementDescriptor={descriptors.breadcrumbsItem}
               href=''
               onClick={handleRootClick}
             >
               <Icon
-                elementDescriptor={descriptors.breadcrumbsIcon}
+                elementDescriptor={descriptors.breadcrumbsItemIcon}
                 icon={root.icon}
                 size={'sm'}
                 sx={t => ({
@@ -87,7 +90,7 @@ export const Breadcrumbs = (props: BreadcrumbsProps) => {
               {root.name}
             </BreadcrumbItem>
             <BreadcrumbItem
-              elementDescriptor={descriptors.breadcrumbsDivider}
+              elementDescriptor={descriptors.breadcrumbsItemDivider}
               aria-hidden
             >
               /

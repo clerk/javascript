@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Flex, FormErrorText, Input, Spinner } from '../customizables';
+import { descriptors, Flex, FormErrorText, Input, Spinner } from '../customizables';
 import { common, PropsOfComponent } from '../styledSystem';
 import { FormControlState } from '../utils';
 
@@ -150,13 +150,22 @@ export const CodeControl = React.forwardRef<{ reset: any }, CodeControlProps>((p
   };
 
   return (
-    <Flex direction='col'>
+    <Flex
+      elementDescriptor={descriptors.otpCodeField}
+      isLoading={isLoading}
+      hasError={!!errorText}
+      direction='col'
+    >
       <Flex
+        isLoading={isLoading}
+        hasError={!!errorText}
+        elementDescriptor={descriptors.otpCodeFieldInputs}
         gap={2}
         align='center'
       >
         {values.map((value, index) => (
           <SingleCharInput
+            elementDescriptor={descriptors.otpCodeFieldInput}
             key={index}
             value={value}
             onClick={handleOnClick(index)}
@@ -183,12 +192,7 @@ export const CodeControl = React.forwardRef<{ reset: any }, CodeControlProps>((p
           />
         )}
       </Flex>
-      <FormErrorText
-      // elementDescriptor={descriptors.formFieldErrorText}
-      // elementId={descriptors.formFieldErrorText.setId(id)}
-      >
-        {errorText}
-      </FormErrorText>
+      <FormErrorText elementDescriptor={descriptors.otpCodeFieldErrorText}>{errorText}</FormErrorText>
     </Flex>
   );
 });

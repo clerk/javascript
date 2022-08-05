@@ -31,7 +31,12 @@ export const ConnectedAccountsSection = () => {
           account={account}
         />
       ))}
-      <AddBlockButton onClick={() => navigate(`connected-account`)}>Connect account</AddBlockButton>
+      <AddBlockButton
+        id='connectedAccounts'
+        onClick={() => navigate(`connected-account`)}
+      >
+        Connect account
+      </AddBlockButton>
     </ProfileSection>
   );
 };

@@ -35,7 +35,14 @@ const Subtitle = React.memo((props: React.PropsWithChildren<any>): JSX.Element =
 });
 
 const BackLink = (props: PropsOfComponent<typeof BackLinkEl>) => {
-  return <BackLinkEl {...props} />;
+  return (
+    <BackLinkEl
+      boxElementDescriptor={descriptors.headerBackBox}
+      linkElementDescriptor={descriptors.headerBackLink}
+      iconElementDescriptor={descriptors.headerBackIcon}
+      {...props}
+    />
+  );
 };
 
 export const Header = {

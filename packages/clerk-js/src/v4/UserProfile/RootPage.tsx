@@ -12,8 +12,8 @@ import { PasswordSection } from './PasswordSection';
 import { PhoneSection } from './PhoneSection';
 import { UsernameSection } from './UsernameSection';
 import { UserProfileSection } from './UserProfileSection';
-import { Web3Section } from './Web3Section';
 import { getSecondFactors } from './utils';
+import { Web3Section } from './Web3Section';
 
 export const RootPage = () => {
   const { attributes, social } = useEnvironment().userSettings;
@@ -31,24 +31,35 @@ export const RootPage = () => {
       gap={8}
     >
       <NavbarMenuButtonRow />
-      <Header.Root id='cl-userProfile-section-account'>
-        <Header.Title textVariant='xxlargeMedium'>Account</Header.Title>
-        <Header.Subtitle>Manage your account information</Header.Subtitle>
-      </Header.Root>
-      <UserProfileSection />
-      {showUsername && <UsernameSection />}
-      {showEmail && <EmailsSection />}
-      {showPhone && <PhoneSection />}
-      {showConnectedAccounts && <ConnectedAccountsSection />}
-      {showWeb3 && <Web3Section />}
-
-      <Header.Root id='cl-userProfile-section-security'>
-        <Header.Title textVariant='xxlargeMedium'>Security</Header.Title>
-        <Header.Subtitle>Manage your security preferences</Header.Subtitle>
-      </Header.Root>
-      {showPassword && <PasswordSection />}
-      {showMfa && <MfaSection />}
-      <ActiveDevicesSection />
+      <Col
+        elementDescriptor={descriptors.profilePage}
+        elementId={descriptors.profilePage.setId('account')}
+        gap={8}
+      >
+        <Header.Root id='cl-userProfile-section-account'>
+          <Header.Title textVariant='xxlargeMedium'>Account</Header.Title>
+          <Header.Subtitle>Manage your account information</Header.Subtitle>
+        </Header.Root>
+        <UserProfileSection />
+        {showUsername && <UsernameSection />}
+        {showEmail && <EmailsSection />}
+        {showPhone && <PhoneSection />}
+        {showConnectedAccounts && <ConnectedAccountsSection />}
+        {showWeb3 && <Web3Section />}
+      </Col>
+      <Col
+        elementDescriptor={descriptors.profilePage}
+        elementId={descriptors.profilePage.setId('security')}
+        gap={8}
+      >
+        <Header.Root id='cl-userProfile-section-security'>
+          <Header.Title textVariant='xxlargeMedium'>Security</Header.Title>
+          <Header.Subtitle>Manage your security preferences</Header.Subtitle>
+        </Header.Root>
+        {showPassword && <PasswordSection />}
+        {showMfa && <MfaSection />}
+        <ActiveDevicesSection />
+      </Col>
     </Col>
   );
 };

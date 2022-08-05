@@ -39,7 +39,7 @@ export const ApplicationLogo = (props: ApplicationLogoProps) => {
 
   return (
     <Flex
-      elementDescriptor={descriptors.logo}
+      elementDescriptor={descriptors.logoBox}
       {...props}
       sx={[
         theme => ({

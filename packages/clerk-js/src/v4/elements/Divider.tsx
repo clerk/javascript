@@ -4,7 +4,7 @@ export const Divider = () => {
   return (
     <Flex
       center
-      elementDescriptor={descriptors.dividerBox}
+      elementDescriptor={descriptors.dividerRow}
     >
       <DividerLine />
       <Text

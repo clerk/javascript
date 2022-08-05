@@ -6,7 +6,7 @@ import { appendEmojiSeparator, generateClassName } from './classGeneration';
 import { ElementDescriptor, ElementId } from './elementDescriptors';
 
 type Customizable<T = {}> = T & {
-  elementDescriptor?: ElementDescriptor | ElementDescriptor[];
+  elementDescriptor?: ElementDescriptor | Array<ElementDescriptor | undefined>;
   elementId?: ElementId;
   css?: never;
   sx?: ThemableCssProp;
