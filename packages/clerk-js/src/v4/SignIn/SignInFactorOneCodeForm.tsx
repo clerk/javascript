@@ -34,7 +34,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   };
 
   React.useEffect(() => {
-    if (signIn.firstFactorVerification.status === null && !props.factorAlreadyPrepared) {
+    if (!props.factorAlreadyPrepared) {
       prepare();
     }
   }, []);
