@@ -11,6 +11,13 @@ const STATE_PROP_TO_CLASSNAME = Object.freeze({
   active: ` ${CLASS_PREFIX}active`,
 } as const);
 
+const STATE_PROP_TO_SPECIFICITY = Object.freeze({
+  loading: 2,
+  error: 2,
+  open: 2,
+  active: 2,
+} as const);
+
 type PropsWithState = Partial<Record<'isLoading' | 'isDisabled' | 'hasError' | 'isOpen' | 'isActive', any>> &
   Record<string, any>;
 
@@ -113,9 +120,12 @@ const getElementState = (props: PropsWithState | undefined): ElementState | unde
 
 const addStringClassname = (cn: string, val?: unknown) => (typeof val === 'string' ? cn + ' ' + val : cn);
 
-const addStyleRuleObject = (css: unknown[], val?: unknown) => {
-  val && typeof val === 'object' && css.push(val);
-  // val && typeof val === 'object' && css.push({ '&&': val });
+const addStyleRuleObject = (css: unknown[], val: unknown, specificity = 0) => {
+  if (specificity) {
+    val && typeof val === 'object' && css.push({ ['&'.repeat(specificity)]: val });
+  } else {
+    val && typeof val === 'object' && css.push(val);
+  }
 };
 
 export const generateFlowClassname = (props: Pick<FlowMetadata, 'flow'>) => {
@@ -171,9 +181,17 @@ const addRulesFromElements = (
     addStyleRuleObject(css, elements[elemDescriptor.getObjectKeyWithId(elemId) as Key]);
   }
   if (state) {
-    addStyleRuleObject(css, elements[elemDescriptor.getObjectKeyWithState(state) as Key]);
+    addStyleRuleObject(
+      css,
+      elements[elemDescriptor.getObjectKeyWithState(state) as Key],
+      STATE_PROP_TO_SPECIFICITY[state],
+    );
   }
   if (elemId && state) {
-    addStyleRuleObject(css, elements[elemDescriptor.getObjectKeyWithIdAndState(elemId, state) as Key]);
+    addStyleRuleObject(
+      css,
+      elements[elemDescriptor.getObjectKeyWithIdAndState(elemId, state) as Key],
+      STATE_PROP_TO_SPECIFICITY[state],
+    );
   }
 };
