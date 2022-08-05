@@ -28,7 +28,7 @@ export const EmailLinkVerify = (props: EmailLinkVerifyProps) => {
       // Avoid loading flickering
       await sleep(750);
       await handleMagicLinkVerification({ redirectUrlComplete, redirectUrl }, navigate);
-      setVerificationStatus('verified');
+      setVerificationStatus('verified_switch_tab');
       await sleep(750);
       return completeSignUpFlow({
         signUp,
