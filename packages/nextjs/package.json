@@ -34,7 +34,7 @@
   "dependencies": {
     "@clerk/clerk-react": "^4.0.0-next.15",
     "@clerk/clerk-sdk-node": "^4.0.0-next.8",
-    "@clerk/edge": "^1.7.0-next.7",
+    "@clerk/edge": "^1.7.2",
     "@clerk/types": "^3.0.0-next.14",
     "tslib": "^2.3.1"
   },
@@ -59,12 +59,12 @@
   "publishConfig": {
     "access": "public"
   },
-  "bugs": {
-    "url": "https://github.com/clerkinc/javascript/issues"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/clerkinc/javascript.git"
+  },
+  "bugs": {
+    "url": "https://github.com/clerkinc/javascript/issues"
   },
   "homepage": "https://clerk.dev/"
 }

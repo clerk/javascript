@@ -1,6 +1,6 @@
 {
   "name": "@clerk/remix",
-  "version": "0.5.14-next.0",
+  "version": "0.5.14",
   "license": "MIT",
   "description": "Clerk.dev SDK for Remix",
   "keywords": [
