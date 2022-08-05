@@ -32,7 +32,7 @@ const defaultServerApiUrl =
   process.env.CLERK_API_URL || 'https://api.clerk.dev';
 const JWKS_MAX_AGE = 3600000; // 1 hour
 
-export type WithAuthProp<T> = T & {
+export type LooseAuthProp = {
   auth: {
     sessionId: string | null;
     userId: string | null;
@@ -41,7 +41,9 @@ export type WithAuthProp<T> = T & {
   };
 };
 
-export type RequireAuthProp<T> = T & {
+export type WithAuthProp<T> = T & LooseAuthProp;
+
+export type StrictAuthProp = {
   auth: {
     sessionId: string;
     userId: string;
@@ -49,6 +51,8 @@ export type RequireAuthProp<T> = T & {
     claims: ClerkJWTClaims;
   };
 };
+
+export type RequireAuthProp<T> = T & StrictAuthProp;
 
 type MiddlewareWithAuthProp = (
   req: WithAuthProp<Request>,
