@@ -32,7 +32,7 @@ export const generateClassName = (
   const css: unknown[] = [];
 
   className = addClerkTargettableClassname(className, elemDescriptors);
-  className = addClerkTargettableIdClassname(className, elemDescriptors[0], elemId);
+  className = addClerkTargettableIdClassname(className, elemDescriptors[elemDescriptors.length - 1], elemId);
   className = addClerkTargettableStateClass(className, state);
   className = addClerkTargettableRequiredAttribute(className, props as any);
 
