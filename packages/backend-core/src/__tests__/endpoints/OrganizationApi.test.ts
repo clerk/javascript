@@ -127,8 +127,8 @@ test('updateOrganization() updates organization', async () => {
 test('updateOrganizationMetadata() updates organization metadata', async () => {
   const id = 'org_randomid';
   const slug = 'acme-inc';
-  const publicMetadata = { hello: 'world' };
-  const privateMetadata = { goodbye: 'world' };
+  const publicMetadata = { helloWorld: 42 };
+  const privateMetadata = { goodbyeWorld: 42 };
   const resJSON: OrganizationJSON = {
     object: ObjectType.Organization,
     id,

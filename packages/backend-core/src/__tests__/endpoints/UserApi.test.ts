@@ -160,15 +160,25 @@ test('createUser() creates a user', async () => {
 test('updateUser() updates a user', async () => {
   const params = {
     emailAddress: ['boss@clerk.dev'],
-    phoneNumber: ['+15555555555'],
-    username: 'clerk_boss',
-    password: '123456',
     firstName: 'Boss',
-    lastName: 'Clerk',
+    publicMetadata: {
+      topKey: {
+        nestedKey: 42,
+      },
+    },
   };
 
   nock(defaultServerAPIUrl)
-    .patch('/v1/users/user_1oBNj55jOjSK9rOYrT5QHqj7eaK', snakecaseKeys(params))
+    .patch('/v1/users/user_1oBNj55jOjSK9rOYrT5QHqj7eaK', {
+      email_address: ['boss@clerk.dev'],
+      first_name: 'Boss',
+      // The SDK converts only top level keys to snakecase. Nested objects such as metadata are kept with their original key & values.
+      public_metadata: {
+        topKey: {
+          nestedKey: 42,
+        },
+      },
+    })
     .replyWithFile(200, __dirname + '/responses/updateUser.json', {
       'Content-Type': '',
     });
