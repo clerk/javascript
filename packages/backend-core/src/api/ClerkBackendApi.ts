@@ -100,10 +100,13 @@ export class ClerkBackendAPI {
       ...requestOptions.headerParams,
     };
 
-    newRequestOptions.bodyParams = snakecaseKeys({
-      ...this.getDefaultBodyParams(),
-      ...requestOptions.bodyParams,
-    });
+    newRequestOptions.bodyParams = snakecaseKeys(
+      {
+        ...this.getDefaultBodyParams(),
+        ...requestOptions.bodyParams,
+      },
+      { deep: false },
+    );
 
     const data = await this.apiClient.request<T>(newRequestOptions);
 

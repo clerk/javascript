@@ -70,7 +70,7 @@ test('createInvitation() accepts a redirectUrl', async () => {
 test('createInvitation() accepts publicMetadata', async () => {
   const emailAddress = 'test@example.com';
   const publicMetadata = {
-    hello: 'world',
+    helloWorld: 42,
   };
   const resJSON = {
     object: 'invitation',
