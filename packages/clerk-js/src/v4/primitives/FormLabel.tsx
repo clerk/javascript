@@ -1,34 +1,28 @@
 import React from 'react';
 
-import { createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
-import { useFormControlContext } from './hooks';
+import { common, createVariants, PrimitiveProps, RequiredProp, StateProps, StyleVariants } from '../styledSystem';
+import { applyDataStateProps } from './applyDataStateProps';
+import { useFormControl } from './hooks';
 
-// TODO: Connect with CSS variables
-
-const { applyVariants, filterProps } = createVariants(theme => ({
+const { applyVariants } = createVariants(theme => ({
   base: {
-    color: theme.colors.$black,
-    fontStyle: theme.fontStyles.$normal,
-    fontWeight: theme.fontWeights.$medium,
-    lineHeight: theme.lineHeights.$none,
-    marginBottom: theme.sizes.$1,
+    color: theme.colors.$colorText,
+    ...common.textVariants(theme).smallMedium,
+    ...common.disabled(theme),
   },
   variants: {},
 }));
 
-type FormLabelProps = PrimitiveProps<'label'> &
-  StyleVariants<typeof applyVariants> & {
-    hasError?: boolean;
-    children: React.ReactNode;
-  };
+type OwnProps = React.PropsWithChildren<StateProps>;
 
-const FormLabel = (props: FormLabelProps) => {
-  const propsWithoutVariants = filterProps(props);
-  const { id } = useFormControlContext();
+type FormLabelProps = PrimitiveProps<'label'> & StyleVariants<typeof applyVariants> & OwnProps & RequiredProp;
 
+export const FormLabel = (props: FormLabelProps) => {
+  const { id } = useFormControl();
+  const { isRequired, ...rest } = props;
   return (
     <label
-      {...propsWithoutVariants}
+      {...applyDataStateProps(rest)}
       htmlFor={id}
       css={applyVariants(props)}
     >
@@ -36,5 +30,3 @@ const FormLabel = (props: FormLabelProps) => {
     </label>
   );
 };
-
-export { FormLabel };

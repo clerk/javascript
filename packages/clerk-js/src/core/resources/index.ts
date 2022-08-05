@@ -1,6 +1,7 @@
 export * from './AuthConfig';
 export * from './Client';
 export * from './DisplayConfig';
+export * from './DeletedObject';
 export * from './EmailAddress';
 export * from './Environment';
 export * from './ExternalAccount';

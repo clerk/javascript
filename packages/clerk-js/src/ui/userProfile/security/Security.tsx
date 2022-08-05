@@ -34,7 +34,7 @@ export function Security(): JSX.Element {
   );
 
   const buildSecondFactorRow = () => {
-    const twoFacOn = user.twoFactorEnabled();
+    const twoFacOn = user.twoFactorEnabled;
     return (
       <List.Item
         className='cl-list-item'

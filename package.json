@@ -37,7 +37,7 @@
     "dev": "lerna run dev --parallel --ignore @clerk/{expo}",
     "lint-fix": "eslint . --ext .ts",
     "bump": "lerna version",
-    "bump:next": "lerna version --conventional-prerelease",
+    "bump:next": "lerna version --conventional-prerelease --preid next  --no-changelog",
     "bump:staging": "lerna version --conventional-prerelease --preid staging --no-changelog",
     "graduate": "lerna version --conventional-graduate",
     "release:staging": "lerna publish from-package --dist-tag staging",
@@ -50,6 +50,7 @@
     "prepare": "husky install",
     "version": "./scripts/version-info.sh",
     "lerna": "lerna",
-    "nuke": "rm -r node_modules; for d in packages/*/node_modules; do echo $d; rm -r $d; done"
+    "nuke": "rm -r node_modules; for d in packages/*/node_modules; do echo $d; rm -r $d; done",
+    "yalc:all": " for d in packages/*/; do echo $d; cd $d; yalc push --replace; cd '../../'; done"
   }
 }

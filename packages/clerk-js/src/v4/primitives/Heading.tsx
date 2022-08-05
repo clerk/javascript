@@ -1,26 +1,24 @@
 import React from 'react';
 
-import { createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
+import { common, createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
 
-const { applyVariants } = createVariants(theme => ({
+const { applyVariants, filterProps } = createVariants(theme => ({
   base: {
     boxSizing: 'border-box',
-    // TODO: Should this be $text?
-    color: `${theme.colors.$black}`,
+    color: `${theme.colors.$colorText}`,
     margin: 0,
   },
   variants: {
+    textVariant: { ...common.textVariants(theme) },
     as: {
       h1: {
-        fontStyle: theme.fontStyles.$normal,
-        fontWeight: theme.fontWeights.$semibold,
-        fontSize: theme.fontSizes.$xl,
         lineHeight: theme.lineHeights.$base,
       },
     },
   },
   defaultVariants: {
     as: 'h1',
+    textVariant: 'xlargeMedium',
   },
 }));
 
@@ -30,7 +28,7 @@ export const Heading = (props: HeadingProps) => {
   const { as: As = 'h1', ...rest } = props;
   return (
     <As
-      {...rest}
+      {...filterProps(rest)}
       css={applyVariants(props)}
     />
   );

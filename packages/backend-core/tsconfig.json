@@ -15,7 +15,7 @@
     "resolveJsonModule": true,
     "sourceMap": false,
     "strict": true,
-    "target": "ES2019"
+    "target": "ES2020"
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist", "src/**/*.spec.ts", "src/**/*.test.ts", "src/__tests__"]

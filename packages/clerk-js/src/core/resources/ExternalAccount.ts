@@ -57,4 +57,8 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
   providerTitle(): string {
     return [titleize(this.providerSlug()), 'Account'].join(' ');
   }
+
+  accountIdentifier(): string {
+    return this.username || this.emailAddress || this.label;
+  }
 }

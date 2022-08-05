@@ -1,21 +1,17 @@
 import React from 'react';
 
 import { Flex } from './Flex';
-import { FormControlContext, FormControlOptions, useFormControlProvider } from './hooks';
+import { FormControlContextProvider, FormControlProps } from './hooks';
 
-// TODO: Connect with CSS variables
-
-type FormControlProps = {
-  children: React.ReactNode;
-} & FormControlOptions;
-
-const FormControl = (props: FormControlProps) => {
-  const ctx = useFormControlProvider(props);
+export const FormControl = (props: React.PropsWithChildren<FormControlProps>) => {
+  const { hasError, id, isRequired, ...rest } = props;
   return (
-    <FormControlContext.Provider value={ctx}>
-      <Flex direction='col'>{props.children}</Flex>
-    </FormControlContext.Provider>
+    <Flex
+      direction='col'
+      {...rest}
+      css={{ position: 'relative', flex: '1 1 auto' }}
+    >
+      <FormControlContextProvider {...{ hasError, id, isRequired }}>{props.children}</FormControlContextProvider>
+    </Flex>
   );
 };
-
-export { FormControl };

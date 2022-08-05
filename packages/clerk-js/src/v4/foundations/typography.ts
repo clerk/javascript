@@ -1,18 +1,12 @@
 const fontWeights = Object.freeze({
-  hairline: 100,
-  thin: 200,
-  light: 300,
   normal: 400,
   medium: 500,
-  semibold: 600,
-  bold: 700,
-  extrabold: 800,
-  black: 900,
+  bold: 600,
 } as const);
 
 const lineHeights = Object.freeze({
   normal: 'normal',
-  none: 1,
+  none: '1',
   shorter: 1.25,
   short: 1.375,
   base: 1.5,
@@ -30,18 +24,22 @@ const letterSpacings = Object.freeze({
 } as const);
 
 const fontSizes = Object.freeze({
-  xxs: '0.625rem',
+  '2xs': '0.625rem',
   xs: '0.75rem',
   sm: '0.875rem',
   md: '1rem',
   lg: '1.125rem',
   xl: '1.25rem',
+  '2xl': '2rem',
 } as const);
 
 const fontStyles = Object.freeze({
   normal: 'normal',
 } as const);
 
-const fonts = Object.freeze({} as const);
+const fonts = Object.freeze({
+  main: 'inherit',
+  buttons: 'inherit',
+} as const);
 
 export { fontSizes, fontWeights, letterSpacings, lineHeights, fonts, fontStyles };

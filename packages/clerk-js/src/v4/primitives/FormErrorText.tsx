@@ -1,40 +1,35 @@
 import React from 'react';
 
-import { createVariants, StyleVariants } from '../styledSystem';
-import { useFormControlContext } from './hooks';
+import { animations, createVariants, StyleVariants } from '../styledSystem';
+import { useFormControl } from './hooks';
 import { Text } from './Text';
-
-// TODO: Connect with CSS variables
 
 const { applyVariants } = createVariants(theme => ({
   base: {
-    color: theme.colors.$danger500,
+    willChange: 'transform, opacity, height',
     marginTop: theme.sizes.$2,
+    animation: `${animations.textInSmall} ${theme.transitionDuration.$fast}`,
   },
   variants: {},
 }));
 
-type FormErrorTextProps = StyleVariants<typeof applyVariants> & {
-  children: React.ReactNode;
-};
+type FormErrorTextProps = React.PropsWithChildren<StyleVariants<typeof applyVariants>>;
 
-const FormErrorText = (props: FormErrorTextProps) => {
-  const { hasError, errorMessageId } = useFormControlContext();
+export const FormErrorText = (props: FormErrorTextProps) => {
+  const { hasError, errorMessageId } = useFormControl() || {};
 
-  if (!hasError) {
+  if (!hasError && !props.children) {
     return null;
   }
 
   return (
     <Text
-      css={applyVariants(props)}
-      variant='error'
+      variant='smallRegular'
+      colorScheme='danger'
       aria-live='polite'
       id={errorMessageId}
-    >
-      {props.children}
-    </Text>
+      {...props}
+      css={applyVariants(props)}
+    />
   );
 };
-
-export { FormErrorText };

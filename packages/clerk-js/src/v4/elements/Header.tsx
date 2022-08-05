@@ -1,34 +1,53 @@
 import React from 'react';
 
-import { Flex, Heading, Text } from '../primitives';
+import { Col, descriptors, Heading, Text } from '../customizables';
+import { PropsOfComponent } from '../styledSystem';
+import { BackLink as BackLinkEl } from './BackLink';
 
-// const keys = createAppearanceKeys("header", ["title", "subtitle"] as const);
-
-const HeaderRoot = (props: React.PropsWithChildren<any>): JSX.Element => {
+const Root = React.memo((props: PropsOfComponent<typeof Col>): JSX.Element => {
   return (
-    <Flex
-      {...props}
-      direction='col'
+    <Col
+      elementDescriptor={descriptors.header}
       gap={1}
+      {...props}
     />
   );
-};
+});
 
-const HeaderTitle = (props: React.PropsWithChildren<any>): JSX.Element => {
-  return <Heading {...props} />;
-};
+const Title = React.memo((props: PropsOfComponent<typeof Heading>): JSX.Element => {
+  return (
+    <Heading
+      elementDescriptor={descriptors.headerTitle}
+      {...props}
+    />
+  );
+});
 
-const HeaderSubtitle = (props: React.PropsWithChildren<any>): JSX.Element => {
+const Subtitle = React.memo((props: React.PropsWithChildren<any>): JSX.Element => {
   return (
     <Text
+      elementDescriptor={descriptors.headerSubtitle}
       {...props}
-      variant='subheading'
+      variant='regularRegular'
+      colorScheme='neutral'
+    />
+  );
+});
+
+const BackLink = (props: PropsOfComponent<typeof BackLinkEl>) => {
+  return (
+    <BackLinkEl
+      boxElementDescriptor={descriptors.headerBackBox}
+      linkElementDescriptor={descriptors.headerBackLink}
+      iconElementDescriptor={descriptors.headerBackIcon}
+      {...props}
     />
   );
 };
 
 export const Header = {
-  Root: HeaderRoot,
-  Title: HeaderTitle,
-  Subtitle: HeaderSubtitle,
+  Root,
+  Title,
+  Subtitle,
+  BackLink,
 };

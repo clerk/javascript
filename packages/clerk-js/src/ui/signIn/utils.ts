@@ -1,7 +1,8 @@
-import { titleize } from '@clerk/shared/utils/string';
 import { PreferredSignInStrategy, SignInFactor, SignInResource, SignInStrategy } from '@clerk/types';
-import { PREFERRED_SIGN_IN_STRATEGIES } from 'ui/common';
-import { otpPrefFactorComparator, passwordPrefFactorComparator } from 'ui/signIn/strategies/factorSortingUtils';
+
+import { PREFERRED_SIGN_IN_STRATEGIES } from '../../ui/common/constants';
+import { otpPrefFactorComparator, passwordPrefFactorComparator } from '../../ui/signIn/strategies/factorSortingUtils';
+import { titleize } from '../../v4/shared';
 
 const FONT_SIZE_STEP = 2;
 
@@ -103,9 +104,22 @@ export function determineSalutation(signIn: Partial<SignInResource>): string {
 }
 
 const localStrategies: SignInStrategy[] = ['email_code', 'password', 'phone_code', 'email_link'];
-export function factorHasLocalStrategy(factor: SignInFactor): boolean {
+export function factorHasLocalStrategy(factor: SignInFactor | undefined | null): boolean {
   if (!factor) {
     return false;
   }
   return localStrategies.includes(factor.strategy);
+}
+
+export function determineStartingSignInSecondFactor(secondFactors: SignInFactor[]): SignInFactor | null {
+  if (!secondFactors || secondFactors.length === 0) {
+    return null;
+  }
+
+  const totpFactor = secondFactors.find(f => f.strategy === 'totp');
+  if (totpFactor) {
+    return totpFactor;
+  }
+
+  return secondFactors[0];
 }

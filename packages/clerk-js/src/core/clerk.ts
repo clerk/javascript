@@ -32,7 +32,6 @@ import type {
 import { SetActiveParams, SignOutOptions } from '@clerk/types/src';
 
 import packageJSON from '../../package.json';
-import type Components from '../ui';
 import {
   appendAsQueryParams,
   buildURL,
@@ -50,6 +49,7 @@ import {
   windowNavigate,
 } from '../utils';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
+import type { ComponentControls, MountComponentRenderer } from '../v4';
 import { ERROR_CODES } from './constants';
 import createDevBrowserHandler, { DevBrowserHandler } from './devBrowserHandler';
 import {
@@ -81,7 +81,7 @@ declare global {
 const defaultOptions: ClerkOptions = { polling: true, touchSession: true };
 
 export default class Clerk implements ClerkInterface {
-  public static Components?: typeof Components;
+  public static mountComponentRenderer?: MountComponentRenderer;
   public static version: string = packageJSON.version;
   public client?: ClientResource;
   public session?: ActiveSessionResource | null;
@@ -90,7 +90,7 @@ export default class Clerk implements ClerkInterface {
   public frontendApi: string;
 
   #environment?: EnvironmentResource | null;
-  #components?: Components | null;
+  #componentControls?: ComponentControls | null;
   #listeners: Array<(emission: Resources) => void> = [];
   #options: ClerkOptions = {};
   #isReady = false;
@@ -173,89 +173,99 @@ export default class Clerk implements ClerkInterface {
   };
 
   public openSignIn = (props?: SignInProps): void => {
-    this.assertComponentsReady(this.#components);
-    this.#components.openSignIn(props || {});
+    this.assertComponentsReady(this.#componentControls);
+    this.#componentControls?.openModal('signIn', props || {});
   };
 
   public closeSignIn = (): void => {
-    this.assertComponentsReady(this.#components);
-    this.#components.closeSignIn();
+    this.assertComponentsReady(this.#componentControls);
+    this.#componentControls?.closeModal('signIn');
   };
 
   public openSignUp = (props?: SignInProps): void => {
-    this.assertComponentsReady(this.#components);
-    this.#components.openSignUp(props || {});
+    this.assertComponentsReady(this.#componentControls);
+    this.#componentControls?.openModal('signUp', props || {});
   };
 
   public closeSignUp = (): void => {
-    this.assertComponentsReady(this.#components);
-    this.#components.closeSignUp();
+    this.assertComponentsReady(this.#componentControls);
+    this.#componentControls?.closeModal('signUp');
+  };
+
+  public openUserProfile = (props?: UserProfileProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    this.#componentControls?.openModal('userProfile', props || {});
+  };
+
+  public closeUserProfile = (): void => {
+    this.assertComponentsReady(this.#componentControls);
+    this.#componentControls?.closeModal('userProfile');
   };
 
   public mountSignIn = (node: HTMLDivElement, props?: SignInProps): void => {
-    this.assertComponentsReady(this.#components);
-    this.#components.mountComponent({
+    this.assertComponentsReady(this.#componentControls);
+    this.#componentControls.mountComponent({
       name: 'SignIn',
+      appearanceKey: 'signIn',
       node,
-      nodeClassName: 'cl-sign-in',
       props,
     });
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
-    this.assertComponentsReady(this.#components);
-    this.#components.unmountComponent({
+    this.assertComponentsReady(this.#componentControls);
+    this.#componentControls.unmountComponent({
       node,
     });
   };
 
   public mountSignUp = (node: HTMLDivElement, props?: SignUpProps): void => {
-    this.assertComponentsReady(this.#components);
-    this.#components.mountComponent({
+    this.assertComponentsReady(this.#componentControls);
+    this.#componentControls.mountComponent({
       name: 'SignUp',
+      appearanceKey: 'signUp',
       node,
-      nodeClassName: 'cl-sign-up',
       props,
     });
   };
 
   public unmountSignUp = (node: HTMLDivElement): void => {
-    this.assertComponentsReady(this.#components);
-    this.#components.unmountComponent({
+    this.assertComponentsReady(this.#componentControls);
+    this.#componentControls.unmountComponent({
       node,
     });
   };
 
   public mountUserProfile = (node: HTMLDivElement, props?: UserProfileProps): void => {
-    this.assertComponentsReady(this.#components);
-    this.#components.mountComponent({
+    this.assertComponentsReady(this.#componentControls);
+    this.#componentControls.mountComponent({
       name: 'UserProfile',
+      appearanceKey: 'userProfile',
       node,
-      nodeClassName: 'cl-user-profile',
       props,
     });
   };
 
   public unmountUserProfile = (node: HTMLDivElement): void => {
-    this.assertComponentsReady(this.#components);
-    this.#components.unmountComponent({
+    this.assertComponentsReady(this.#componentControls);
+    this.#componentControls.unmountComponent({
       node,
     });
   };
 
   public mountUserButton = (node: HTMLDivElement, props?: UserButtonProps): void => {
-    this.assertComponentsReady(this.#components);
-    this.#components.mountComponent({
+    this.assertComponentsReady(this.#componentControls);
+    this.#componentControls.mountComponent({
       name: 'UserButton',
+      appearanceKey: 'userButton',
       node,
-      nodeClassName: 'cl-user-button',
       props,
     });
   };
 
   public unmountUserButton = (node: HTMLDivElement): void => {
-    this.assertComponentsReady(this.#components);
-    this.#components.unmountComponent({
+    this.assertComponentsReady(this.#componentControls);
+    this.#componentControls.unmountComponent({
       node,
     });
   };
@@ -752,13 +762,19 @@ export default class Clerk implements ClerkInterface {
     return this.#environment;
   }
 
-  __unstable__onBeforeRequest(callback: FapiRequestCallback<any>): void {
+  __unstable__onBeforeRequest = (callback: FapiRequestCallback<any>): void => {
     this.#fapiClient.onBeforeRequest(callback);
-  }
+  };
 
-  __unstable__onAfterResponse(callback: FapiRequestCallback<any>): void {
+  __unstable__onAfterResponse = (callback: FapiRequestCallback<any>): void => {
     this.#fapiClient.onAfterResponse(callback);
-  }
+  };
+
+  __unstable__updateProps = (props: any): void => {
+    // The expect-error directive below is safe since `updateAppearanceProp` is only used
+    // in the v4 build. This will be removed when v4 becomes the main stable version
+    this.#componentControls?.updateProps(props);
+  };
 
   #loadInBrowser = async (): Promise<void> => {
     this.#authService = new AuthenticationService(this);
@@ -797,8 +813,8 @@ export default class Clerk implements ClerkInterface {
           environment: this.#environment,
         });
 
-        if (Clerk.Components) {
-          this.#components = Clerk.Components.render(this, this.#environment, this.#options);
+        if (Clerk.mountComponentRenderer) {
+          this.#componentControls = Clerk.mountComponentRenderer(this, this.#environment, this.#options);
         }
 
         break;
@@ -883,14 +899,14 @@ export default class Clerk implements ClerkInterface {
   };
 
   #resetComponentsState = () => {
-    if (Clerk.Components) {
+    if (Clerk.mountComponentRenderer) {
       this.closeSignUp();
       this.closeSignIn();
     }
   };
 
-  assertComponentsReady(components: Components | null | undefined): asserts components is Components {
-    if (!Clerk.Components) {
+  assertComponentsReady(components: ComponentControls | null | undefined): asserts components is ComponentControls {
+    if (!Clerk.mountComponentRenderer) {
       throw new Error('ClerkJS was loaded without UI components.');
     }
     if (!components) {

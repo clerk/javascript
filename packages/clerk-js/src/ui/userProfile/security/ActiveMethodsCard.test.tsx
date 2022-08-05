@@ -8,7 +8,7 @@ jest.mock('ui/contexts/CoreUserContext', () => {
   return {
     useCoreUser: (): Partial<UserResource> => {
       return {
-        twoFactorEnabled: () => true,
+        twoFactorEnabled: true,
         phoneNumbers: [
           {
             id: '1',

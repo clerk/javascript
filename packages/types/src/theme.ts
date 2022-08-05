@@ -1,27 +1,31 @@
 export type EmUnit = string;
 
-export type FontFamily = string;
-
 export type FontWeight = string;
 
 export type BoxShadow = string;
 
+export type TransparentColor = 'transparent';
+export type BuiltInColors = 'black' | 'blue' | 'red' | 'green' | 'grey' | 'white' | 'yellow';
+
 export type HexColor = `#${string}`;
 
-export type TransparentColor = 'transparent';
-
-export interface HslaColor {
-  a?: number;
+export type HslaColor = {
   h: number;
-  l: number;
   s: number;
-}
-
-export interface RgbaColor {
+  l: number;
   a?: number;
-  b: number;
-  g: number;
+};
+
+export type RgbaColor = {
   r: number;
-}
+  g: number;
+  b: number;
+  a?: number;
+};
+
+export type HexColorString = HexColor;
+export type HslaColorString = `hsl(${string})` | `hsla(${string})`;
+export type RgbaColorString = `rgb(${string})` | `rgba(${string})`;
 
 export type Color = string | HexColor | HslaColor | RgbaColor | TransparentColor;
+export type ColorString = HexColorString | HslaColorString | RgbaColorString;

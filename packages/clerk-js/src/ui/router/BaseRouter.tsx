@@ -11,6 +11,7 @@ import { RouteContext } from './RouteContext';
 
 interface BaseRouterProps {
   basePath: string;
+  startPath: string;
   getPath: () => string;
   getQueryString: () => string;
   internalNavigate: (toURL: URL) => Promise<any> | any;
@@ -22,6 +23,7 @@ interface BaseRouterProps {
 
 export const BaseRouter = ({
   basePath,
+  startPath,
   getPath,
   getQueryString,
   internalNavigate,
@@ -78,7 +80,11 @@ export const BaseRouter = ({
   useWindowEventListener(refreshEvents, refresh);
 
   // TODO: Look into the real possible types of globalNavigate
-  const baseNavigate = async (toURL: URL): Promise<unknown> => {
+  const baseNavigate = async (toURL: URL | undefined): Promise<unknown> => {
+    if (!toURL) {
+      return;
+    }
+
     if (toURL.origin !== window.location.origin || !toURL.pathname.startsWith('/' + basePath)) {
       if (onExternalNavigate) {
         onExternalNavigate();
@@ -105,6 +111,8 @@ export const BaseRouter = ({
   return (
     <RouteContext.Provider
       value={{
+        basePath: basePath,
+        startPath: startPath,
         fullPath: '',
         indexPath: '',
         currentPath: currentPath,

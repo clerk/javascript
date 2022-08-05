@@ -8,8 +8,9 @@ import {
 } from '@clerk/types';
 import * as React from 'react';
 import { PartialDeep } from 'type-fest';
-import { useEnvironment } from 'ui/contexts';
-import { Security } from 'ui/userProfile/security/Security';
+
+import { useEnvironment } from '../../contexts';
+import { Security } from './Security';
 
 const sessionWithActivities: Partial<SessionWithActivitiesResource> = {
   id: 'sess_id',
@@ -35,7 +36,7 @@ jest.mock('ui/contexts', () => {
     },
     useCoreUser: () => {
       return {
-        twoFactorEnabled: () => true,
+        twoFactorEnabled: true,
         passwordEnabled: true,
         getSessions: () => {
           return Promise.resolve([sessionWithActivities]);
@@ -50,7 +51,7 @@ describe('<Security/>', () => {
     jest.clearAllMocks();
   });
 
-  it('renders the Security page with 2nd factor enabled', async () => {
+  it('renders the Security page with 2nd factor enabled', () => {
     mocked(useEnvironment as jest.Mock<PartialDeep<EnvironmentResource>>, true).mockImplementation(
       () =>
         ({

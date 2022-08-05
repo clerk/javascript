@@ -53,13 +53,18 @@ const ClerkExpressWithAuth =
   singletonInstance.expressWithAuth.bind(singletonInstance);
 const ClerkExpressRequireAuth =
   singletonInstance.expressRequireAuth.bind(singletonInstance);
-const withAuth = singletonInstance.withAuth.bind(singletonInstance);
-const requireAuth = singletonInstance.requireAuth.bind(singletonInstance);
 
-export { ClerkExpressWithAuth, ClerkExpressRequireAuth, withAuth, requireAuth };
+export { ClerkExpressWithAuth, ClerkExpressRequireAuth };
 
 // Export wrapper types for Next.js requests
-export { WithAuthProp, RequireAuthProp } from './Clerk';
+export {
+  LooseAuthProp,
+  StrictAuthProp,
+  WithAuthProp,
+  RequireAuthProp,
+  Middleware as ClerkMiddleware,
+  MiddlewareOptions as ClerkMiddlewareOptions,
+} from './Clerk';
 
 // Export setters for the default singleton instance
 // Useful if you only have access to a sub-api instance

@@ -3,9 +3,8 @@
   "compilerOptions": {
     "declaration": false,
     "jsx": "react-jsx",
-    "jsxImportSource": "@emotion/react",
-    "jsxFactory": "jsx"
+    "jsxImportSource": "@emotion/react"
   },
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "**/*.test.ts", "**/*.test.tsx", "**/*.v3.tsx", "**/*.v3.ts"],
   "include": ["src/**/*"]
 }

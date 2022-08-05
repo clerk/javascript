@@ -2,6 +2,8 @@ import type {
   CreateEmailAddressParams,
   CreatePhoneNumberParams,
   CreateWeb3WalletParams,
+  DeletedObjectJSON,
+  DeletedObjectResource,
   EmailAddressResource,
   ExternalAccountJSON,
   ExternalAccountResource,
@@ -10,9 +12,12 @@ import type {
   OrganizationMembershipResource,
   PhoneNumberResource,
   SetProfileImageParams,
+  TOTPJSON,
+  TOTPResource,
   UpdateUserParams,
   UserJSON,
   UserResource,
+  VerifyTOTPParams,
   Web3WalletResource,
 } from '@clerk/types';
 
@@ -20,6 +25,7 @@ import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import {
   BaseResource,
+  DeletedObject,
   EmailAddress,
   ExternalAccount,
   Image,
@@ -27,6 +33,7 @@ import {
   PhoneNumber,
   RetrieveMembershipsParams,
   SessionWithActivities,
+  TOTP,
   Web3Wallet,
 } from './internal';
 
@@ -52,6 +59,8 @@ export class User extends BaseResource implements UserResource {
   primaryWeb3WalletId: string | null = null;
   primaryWeb3Wallet: Web3WalletResource | null = null;
   profileImageUrl = '';
+  twoFactorEnabled = false;
+  totpEnabled = false;
   publicMetadata: Record<string, unknown> = {};
   unsafeMetadata: Record<string, unknown> = {};
   lastSignInAt: Date | null = null;
@@ -84,18 +93,6 @@ export class User extends BaseResource implements UserResource {
       default:
         return false;
     }
-  };
-
-  twoFactorEnabled = (): boolean => {
-    let enabled = false;
-    for (const ph of this.phoneNumbers) {
-      if (ph.reservedForSecondFactor) {
-        enabled = true;
-        break;
-      }
-    }
-
-    return enabled;
   };
 
   createEmailAddress = (params: CreateEmailAddressParams): Promise<EmailAddressResource> => {
@@ -144,6 +141,40 @@ export class User extends BaseResource implements UserResource {
     )?.response as unknown as ExternalAccountJSON;
 
     return new ExternalAccount(json, this.path() + '/external_accounts');
+  };
+
+  createTOTP = async (): Promise<TOTPResource> => {
+    const json = (
+      await BaseResource._fetch<TOTPJSON>({
+        path: '/me/totp',
+        method: 'POST',
+      })
+    )?.response as unknown as TOTPJSON;
+
+    return new TOTP(json);
+  };
+
+  verifyTOTP = async ({ code }: VerifyTOTPParams): Promise<TOTPResource> => {
+    const json = (
+      await BaseResource._fetch<ExternalAccountJSON>({
+        path: '/me/totp/attempt_verification',
+        method: 'POST',
+        body: { code } as any,
+      })
+    )?.response as unknown as TOTPJSON;
+
+    return new TOTP(json);
+  };
+
+  disableTOTP = async (): Promise<DeletedObjectResource> => {
+    const json = (
+      await BaseResource._fetch<DeletedObjectJSON>({
+        path: '/me/totp',
+        method: 'DELETE',
+      })
+    )?.response as unknown as DeletedObjectJSON;
+
+    return new DeletedObject(json);
   };
 
   update = (params: UpdateUserParams): Promise<UserResource> => {
@@ -225,6 +256,9 @@ export class User extends BaseResource implements UserResource {
 
     this.publicMetadata = data.public_metadata;
     this.unsafeMetadata = data.unsafe_metadata;
+
+    this.totpEnabled = data.totp_enabled;
+    this.twoFactorEnabled = data.two_factor_enabled;
 
     if (data.last_sign_in_at) {
       this.lastSignInAt = unixEpochToDate(data.last_sign_in_at);

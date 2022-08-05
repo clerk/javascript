@@ -27,6 +27,7 @@ export function withRedirectToHome<P extends SignInProps | SignUpProps | { conti
       return null;
     }
 
+    // @ts-ignore
     return <Component {...props} />;
   };
 

@@ -87,6 +87,8 @@ export function Route(props: RouteProps): JSX.Element | null {
   return (
     <RouteContext.Provider
       value={{
+        basePath: router.basePath,
+        startPath: router.startPath,
         indexPath: indexPath,
         fullPath: fullPath,
         currentPath: router.currentPath,

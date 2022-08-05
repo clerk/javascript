@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { createVariants, StyleVariants } from '../styledSystem';
+import { createVariants, StateProps, StyleVariants } from '../styledSystem';
 import { Box, BoxProps } from './Box';
 
 const { applyVariants, filterProps } = createVariants(theme => ({
@@ -43,6 +43,9 @@ const { applyVariants, filterProps } = createVariants(theme => ({
       8: { gap: theme.space.$8 },
       9: { gap: theme.space.$9 },
     },
+    center: {
+      true: { justifyContent: 'center', alignItems: 'center' },
+    },
   },
   defaultVariants: {
     direction: 'row',
@@ -52,13 +55,23 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   },
 }));
 
-export type FlexProps = BoxProps & StyleVariants<typeof applyVariants>;
+export type FlexProps = StateProps & BoxProps & StyleVariants<typeof applyVariants>;
 
 export const Flex = React.forwardRef<HTMLDivElement, FlexProps>((props, ref) => {
   return (
     <Box
       {...filterProps(props)}
       css={applyVariants(props)}
+      ref={ref}
+    />
+  );
+});
+
+export const Col = React.forwardRef<HTMLDivElement, FlexProps>((props, ref) => {
+  return (
+    <Flex
+      {...props}
+      direction='col'
       ref={ref}
     />
   );

@@ -18,6 +18,7 @@ export type WithUserProp<T> = T & { user: UserResource };
 export interface MountProps {
   mount: (node: HTMLDivElement, props: any) => void;
   unmount: (node: HTMLDivElement) => void;
+  updateProps: (props: any) => void;
   props?: any;
 }
 

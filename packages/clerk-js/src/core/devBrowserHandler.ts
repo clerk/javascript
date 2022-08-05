@@ -112,7 +112,7 @@ export default function createDevBrowserHandler({
       });
 
       fapiClient.onAfterResponse((_, response) => {
-        const newDevBrowserJWT = response?.headers.get(DEV_BROWSER_SSO_JWT_HTTP_HEADER);
+        const newDevBrowserJWT = response?.headers?.get(DEV_BROWSER_SSO_JWT_HTTP_HEADER);
         if (newDevBrowserJWT) {
           setDevBrowserJWT(newDevBrowserJWT);
         }

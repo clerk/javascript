@@ -1,11 +1,11 @@
 import 'regenerator-runtime/runtime';
 
 import Clerk from './core/clerk';
-import Components from './ui';
+import { mountComponentRenderer } from './v4';
 
 export { MagicLinkError, MagicLinkErrorCode, isMagicLinkError } from './core/resources';
 
-Clerk.Components = Components;
+Clerk.mountComponentRenderer = mountComponentRenderer;
 export default Clerk;
 
 if (module.hot) {

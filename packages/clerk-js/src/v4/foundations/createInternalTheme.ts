@@ -1,20 +1,13 @@
-type PrefixWith<K extends string, T> = `${K}${Extract<T, boolean | number | string>}`;
+import { InternalTheme, InternalThemeFoundations } from './defaultFoundations';
 
-type ThemeWithPrefix<Theme> = {
-  [scale in keyof Theme]: {
-    [token in keyof Theme[scale] as PrefixWith<'$', token>]: Theme[scale][token];
-  };
+export const createInternalTheme = (foundations: InternalThemeFoundations): InternalTheme => {
+  const res = {} as any;
+  const base = foundations as any;
+  for (const scale in base) {
+    res[scale] = {};
+    for (const shade in base[scale]) {
+      res[scale]['$' + shade] = base[scale][shade];
+    }
+  }
+  return Object.freeze(res);
 };
-
-const createInternalTheme = <T>(theme: T): ThemeWithPrefix<Readonly<T>> => {
-  return Object.freeze(
-    Object.fromEntries(
-      Object.entries(theme).map(([scale, values]) => [
-        scale,
-        Object.fromEntries(Object.entries(values).map(([name, value]) => [`$${name}`, value])),
-      ]),
-    ) as any,
-  );
-};
-
-export { createInternalTheme };

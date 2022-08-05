@@ -1,10 +1,13 @@
 import React from 'react';
 
-import { Flex, Text } from '../primitives';
+import { descriptors, Flex, Link, Text, useAppearance } from '../customizables';
+import { mqu, PropsOfComponent } from '../styledSystem';
+import { RouterLink } from './RouterLink';
 
 const FooterRoot = (props: React.PropsWithChildren<any>): JSX.Element => {
   return (
     <Flex
+      elementDescriptor={descriptors.footer}
       {...props}
       justify='between'
       align='center'
@@ -13,47 +16,91 @@ const FooterRoot = (props: React.PropsWithChildren<any>): JSX.Element => {
 };
 
 const FooterAction = (props: React.PropsWithChildren<any>): JSX.Element => {
-  return <Flex {...props} />;
+  return (
+    <Flex
+      elementDescriptor={descriptors.footerAction}
+      {...props}
+      gap={1}
+    />
+  );
 };
 
 const FooterActionText = (props: React.PropsWithChildren<any>): JSX.Element => {
   return (
     <Text
+      elementDescriptor={descriptors.footerActionText}
       {...props}
       as='span'
-      variant='link'
+      variant='smallRegular'
+      colorScheme='neutral'
     />
   );
 };
 
-const FooterActionLink = (props: React.PropsWithChildren<any>): JSX.Element => {
+const FooterActionLink = (props: PropsOfComponent<typeof RouterLink>): JSX.Element => {
   return (
-    <Text
+    <RouterLink
+      elementDescriptor={descriptors.footerActionLink}
       {...props}
-      as='span'
-      variant='link'
+      colorScheme='primary'
     />
   );
 };
 
-const FooterLinks = (props: React.PropsWithChildren<any>): JSX.Element => {
+const FooterLink = (props: PropsOfComponent<typeof Link>): JSX.Element => {
+  return (
+    <Link
+      elementDescriptor={descriptors.footerPagesLink}
+      {...props}
+      colorScheme='neutral'
+    />
+  );
+};
+
+const FooterLinks = React.memo((): JSX.Element => {
+  const { helpPageUrl, privacyPageUrl, termsPageUrl } = useAppearance().parsedLayout;
+
   return (
     <Flex
-      {...props}
+      elementDescriptor={descriptors.footerPages}
       justify='between'
-    />
+      sx={t => ({
+        gap: t.space.$3,
+        [mqu.xs]: {
+          gap: t.space.$2,
+        },
+      })}
+    >
+      {helpPageUrl && (
+        <FooterLink
+          elementId={descriptors.footerPagesLink.setId('help')}
+          isExternal
+          href={helpPageUrl}
+        >
+          Help
+        </FooterLink>
+      )}
+      {privacyPageUrl && (
+        <FooterLink
+          elementId={descriptors.footerPagesLink.setId('privacy')}
+          isExternal
+          href={privacyPageUrl}
+        >
+          Privacy
+        </FooterLink>
+      )}
+      {termsPageUrl && (
+        <FooterLink
+          elementId={descriptors.footerPagesLink.setId('terms')}
+          isExternal
+          href={termsPageUrl}
+        >
+          Terms
+        </FooterLink>
+      )}
+    </Flex>
   );
-};
-
-const FooterLink = (props: React.PropsWithChildren<any>): JSX.Element => {
-  return (
-    <Text
-      {...props}
-      as='span'
-      variant='link'
-    />
-  );
-};
+});
 
 export const Footer = {
   Root: FooterRoot,

@@ -3,42 +3,83 @@ const webpack = require('webpack');
 const packageJSON = require('./package.json');
 const path = require('path');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const ReactRefreshTypeScript = require('react-refresh-typescript');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = env => {
-  const mode = env.prod ? 'production' : 'development';
+  const mode = env.production ? 'production' : 'development';
   const isProduction = mode === 'production';
+  console.log(`--- Building for ${mode} ---`);
 
   return {
     mode,
-    plugins: [
-      new ReactRefreshWebpackPlugin({ overlay: { sockHost: 'js.lclclerk.com' } }),
-      ...defineConstants({ mode, packageJSON }),
-      new webpack.ProvidePlugin({
-        jsx: ['@emotion/react', 'jsx'],
-      }),
-    ],
-    devtool: isProduction ? undefined : 'eval-cheap-source-map',
-    entry: './src/index.browser.v4.ts',
     resolve: {
       extensions: ['.ts', '.tsx', '.js', '.jsx'],
     },
+    ...(isProduction ? getProductionConfig(mode) : getDevelopmentConfig(mode, env)),
+  };
+};
+
+const getProductionConfig = (mode = 'production') => {
+  return {
+    plugins: [...defineConstants({ mode, packageJSON })],
+    devtool: undefined,
+    entry: {
+      clerk: './src/index.ts',
+      'clerk.browser': './src/index.browser.ts',
+      'clerk.headless': './src/index.headless.ts',
+      'clerk.headless.browser': './src/index.headless.browser.ts',
+    },
     module: {
-      rules: [loadSvgs, loadTypescriptWithESBuild],
+      rules: [loadSvgs, tsLoaderProd],
+    },
+    output: {
+      path: path.resolve(__dirname, 'dist'),
+      filename: '[name].js',
+      libraryTarget: 'umd',
+    },
+  };
+};
+
+const getDevelopmentConfig = (mode = 'development', env) => {
+  const serveAnalyzer = env.serveAnalyzer;
+  return {
+    plugins: [
+      new ReactRefreshWebpackPlugin({ overlay: { sockHost: 'js.lclclerk.com' } }),
+      ...defineConstants({ mode, packageJSON }),
+      ...(serveAnalyzer ? [new BundleAnalyzerPlugin()] : []),
+    ],
+    devtool: 'eval-cheap-source-map',
+    entry: './src/index.browser.ts',
+    module: {
+      rules: [loadSvgs, tsLoaderDev],
     },
     ...devServerOutput,
   };
 };
 
-const loadTypescriptWithESBuild = {
+const tsLoaderProd = {
   test: /\.(ts|js)x?$/,
   exclude: /node_modules/,
   use: [
     {
-      loader: 'esbuild-loader',
+      loader: 'ts-loader',
+      options: { transpileOnly: true },
+    },
+  ],
+};
+
+const tsLoaderDev = {
+  test: /\.(ts|js)x?$/,
+  exclude: /node_modules/,
+  use: [
+    {
+      loader: 'ts-loader',
       options: {
-        loader: 'tsx',
-        target: 'ES2019',
-        tsconfigRaw: require('./tsconfig.v4.json'),
+        transpileOnly: true,
+        getCustomTransformers: () => ({
+          before: [ReactRefreshTypeScript()],
+        }),
       },
     },
   ],
@@ -56,17 +97,20 @@ const defineConstants = ({ mode, packageJSON }) => [
   }),
   new webpack.EnvironmentPlugin({
     CLERK_ENV: mode,
+    NODE_ENV: mode,
   }),
 ];
 
 const devServerOutput = {
   output: {
     publicPath: 'https://js.lclclerk.com/npm/',
+    // publicPath: 'https://192.168.1.102/',
     crossOriginLoading: 'anonymous',
     filename: 'clerk.browser.js',
     libraryTarget: 'umd',
   },
   devServer: {
+    // https: true,
     allowedHosts: ['all'],
     headers: { 'Access-Control-Allow-Origin': '*' },
     host: '0.0.0.0',
@@ -75,13 +119,7 @@ const devServerOutput = {
     liveReload: false,
     client: {
       webSocketURL: 'auto://js.lclclerk.com/ws',
+      // webSocketURL: 'auto://192.168.1.102/ws',
     },
-  },
-};
-
-const bundleOutput = {
-  output: {
-    filename: 'index.browser.v4.js',
-    path: path.resolve(__dirname, 'dist'),
   },
 };

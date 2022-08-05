@@ -17,7 +17,10 @@ export const PathRouter = ({ basePath, preservedParams, children }: PathRouterPr
     throw new Error('Clerk: Missing navigate option.');
   }
 
-  const internalNavigate = (toURL: URL) => {
+  const internalNavigate = (toURL: URL | undefined) => {
+    if (!toURL) {
+      return;
+    }
     // Only send the path
     return navigate(stripOrigin(toURL));
   };
@@ -49,6 +52,7 @@ export const PathRouter = ({ basePath, preservedParams, children }: PathRouterPr
   return (
     <BaseRouter
       basePath={basePath.substring(1)}
+      startPath={''}
       getPath={getPath}
       getQueryString={getQueryString}
       internalNavigate={internalNavigate}
