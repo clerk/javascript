@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nextjs",
-  "version": "3.8.2",
+  "version": "3.8.3",
   "license": "MIT",
   "description": "Clerk.dev SDK for NextJS",
   "keywords": [
@@ -33,8 +33,8 @@
   },
   "dependencies": {
     "@clerk/clerk-react": "^3.5.1",
-    "@clerk/clerk-sdk-node": "^3.9.1",
-    "@clerk/edge": "^1.7.1",
+    "@clerk/clerk-sdk-node": "^3.9.2",
+    "@clerk/edge": "^1.7.2",
     "@clerk/types": "^2.21.0",
     "tslib": "^2.3.1"
   },
