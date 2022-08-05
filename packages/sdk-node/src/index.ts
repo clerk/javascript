@@ -58,6 +58,8 @@ export { ClerkExpressWithAuth, ClerkExpressRequireAuth };
 
 // Export wrapper types for Next.js requests
 export {
+  LooseAuthProp,
+  StrictAuthProp,
   WithAuthProp,
   RequireAuthProp,
   Middleware as ClerkMiddleware,
