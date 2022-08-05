@@ -3,7 +3,7 @@
 Reference of the methods supported in the Clerk Backend API wrapper. [API reference](https://docs.clerk.dev/reference/backend-api-reference/)
 
 ```diff
-! All methods should be called from a [ClerkBackendAPI](./src/api/ClerkBackendAPI.ts) instance.
+! All methods should be called from a [ClerkBackendApi](./src/api/ClerkBackendApi.ts) instance.
 ```
 
 - [Allowlist operations](#allowlist-operations)
