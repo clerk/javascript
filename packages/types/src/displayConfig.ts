@@ -25,6 +25,7 @@ export interface DisplayConfigJSON {
   support_email: string;
   theme: DisplayThemeJSON;
   user_profile_url: string;
+  clerk_js_version?: string;
 }
 
 export interface DisplayConfigResource extends ClerkResource {
@@ -48,4 +49,5 @@ export interface DisplayConfigResource extends ClerkResource {
   supportEmail: string;
   theme: DisplayThemeJSON;
   userProfileUrl: string;
+  clerkJSVersion?: string;
 }

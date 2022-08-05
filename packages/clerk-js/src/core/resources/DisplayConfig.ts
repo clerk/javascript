@@ -29,6 +29,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
   supportEmail!: string;
   theme!: DisplayThemeJSON;
   userProfileUrl!: string;
+  clerkJSVersion?: string;
 
   public constructor(data: DisplayConfigJSON) {
     super();
@@ -56,6 +57,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     this.afterSwitchSessionUrl = data.after_switch_session_url;
     this.branded = data.branded;
     this.supportEmail = data.support_email || '';
+    this.clerkJSVersion = data.clerk_js_version;
     return this;
   }
 }
