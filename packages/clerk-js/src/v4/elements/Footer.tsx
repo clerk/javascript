@@ -1,7 +1,6 @@
 import React from 'react';
 
-import { useOptions } from '../../ui/contexts';
-import { descriptors, Flex, Link, Text } from '../customizables';
+import { descriptors, Flex, Link, Text, useAppearance } from '../customizables';
 import { mqu, PropsOfComponent } from '../styledSystem';
 import { RouterLink } from './RouterLink';
 
@@ -59,7 +58,8 @@ const FooterLink = (props: PropsOfComponent<typeof Link>): JSX.Element => {
 };
 
 const FooterLinks = React.memo((): JSX.Element => {
-  const links = useOptions().links || {};
+  const { helpPageUrl, privacyPageUrl, termsPageUrl } = useAppearance().parsedLayout;
+
   return (
     <Flex
       elementDescriptor={descriptors.footerPages}
@@ -71,29 +71,29 @@ const FooterLinks = React.memo((): JSX.Element => {
         },
       })}
     >
-      {links.helpPageUrl && (
+      {helpPageUrl && (
         <FooterLink
           elementId={descriptors.footerPagesLink.setId('help')}
           isExternal
-          href={links.helpPageUrl}
+          href={helpPageUrl}
         >
           Help
         </FooterLink>
       )}
-      {links.privacyPageUrl && (
+      {privacyPageUrl && (
         <FooterLink
           elementId={descriptors.footerPagesLink.setId('privacy')}
           isExternal
-          href={links.privacyPageUrl}
+          href={privacyPageUrl}
         >
           Privacy
         </FooterLink>
       )}
-      {links.termsPageUrl && (
+      {termsPageUrl && (
         <FooterLink
           elementId={descriptors.footerPagesLink.setId('terms')}
           isExternal
-          href={links.termsPageUrl}
+          href={termsPageUrl}
         >
           Terms
         </FooterLink>

@@ -414,7 +414,7 @@ export type Layout = {
   /**
    * Controls the variant that will be used for the social buttons.
    * By default, the components will use block buttons if you have less than
-   * 4 social providers enabled, otherwise icon buttons will be used.
+   * 3 social providers enabled, otherwise icon buttons will be used.
    * To customise the social buttons further, you can use {@link Appearance.elements}
    * @default auto
    */
@@ -431,6 +431,21 @@ export type Layout = {
    * @default false
    */
   showOptionalFields?: boolean;
+  /**
+   * This options enables the "Terms" link which is, by default, displayed on the bottom-right corner of the
+   * prebuilt components. Clicking the link will open the passed URL in a new tab
+   */
+  termsPageUrl?: string;
+  /**
+   * This options enables the "Help" link which is, by default, displayed on the bottom-right corner of the
+   * prebuilt components. Clicking the link will open the passed URL in a new tab
+   */
+  helpPageUrl?: string;
+  /**
+   * This options enables the "Privacy" link which is, by default, displayed on the bottom-right corner of the
+   * prebuilt components. Clicking the link will open the passed URL in a new tab
+   */
+  privacyPageUrl?: string;
 };
 
 export type SignInTheme = Theme;

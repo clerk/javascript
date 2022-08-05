@@ -1,8 +1,8 @@
 import { ActiveSessionResource } from '@clerk/types';
 import React from 'react';
 
-import { useCoreSession, useCoreUser, useEnvironment, useOptions, useUserButtonContext } from '../../ui/contexts';
-import { descriptors, Flex, Flow, Link } from '../customizables';
+import { useCoreSession, useCoreUser, useEnvironment, useUserButtonContext } from '../../ui/contexts';
+import { descriptors, Flex, Flow, Link, useAppearance } from '../customizables';
 import { BaseCard, PoweredByClerkText, UserPreview } from '../elements';
 import { RootBox } from '../elements/RootBox';
 import { CogFilled, Plus, SignOut, SignOutDouble } from '../icons';
@@ -118,8 +118,9 @@ const Footer = () => {
 };
 
 const Links = () => {
-  const links = useOptions().links || {};
-  if (!links.termsPageUrl && !links.privacyPageUrl) {
+  const { privacyPageUrl, termsPageUrl } = useAppearance().parsedLayout;
+
+  if (!termsPageUrl && !privacyPageUrl) {
     return null;
   }
 
