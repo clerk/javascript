@@ -3,11 +3,11 @@ import React from 'react';
 import { withRedirectToHome } from '../../ui/common/withRedirectToHome';
 import { useEnvironment, useSignInContext } from '../../ui/contexts';
 import { useNavigate } from '../../ui/hooks';
-import { Button, descriptors, Flex, Flow, Icon } from '../customizables';
+import { Button, Col, descriptors, Flow, Icon } from '../customizables';
 import { Card, CardAlert, Header, UserPreview, UserPreviewProps, withCardStateProvider } from '../elements';
 import { ArrowBlockButton } from '../elements/ArrowBlockButton';
 import { useCardState } from '../elements/contexts';
-import { SignOutDouble } from '../icons';
+import { Plus, SignOutDouble } from '../icons';
 import { PropsOfComponent } from '../styledSystem';
 import { useMultisessionActions } from '../UserButton/useMultisessionActions';
 
@@ -16,12 +16,13 @@ const _SignInAccountSwitcher = () => {
   const { navigate } = useNavigate();
   const { applicationName, userProfileUrl, signInUrl, afterSignOutAllUrl } = useEnvironment().displayConfig;
   const { navigateAfterSignIn } = useSignInContext();
-  const { handleSignOutAllClicked, handleSessionClicked, activeSessions } = useMultisessionActions({
-    navigateAfterSignOut: () => navigate(afterSignOutAllUrl),
-    navigateAfterSwitchSession: navigateAfterSignIn,
-    userProfileUrl,
-    signInUrl,
-  });
+  const { handleSignOutAllClicked, handleSessionClicked, activeSessions, handleAddAccountClicked } =
+    useMultisessionActions({
+      navigateAfterSignOut: () => navigate(afterSignOutAllUrl),
+      navigateAfterSwitchSession: navigateAfterSignIn,
+      userProfileUrl,
+      signInUrl,
+    });
 
   return (
     <Flow.Part part='accountSwitcher'>
@@ -32,12 +33,11 @@ const _SignInAccountSwitcher = () => {
           <Header.Subtitle>Select account to continue to {applicationName}</Header.Subtitle>
         </Header.Root>
         {/*TODO: extract main in its own component */}
-        <Flex
-          direction='col'
+        <Col
           elementDescriptor={descriptors.main}
           gap={8}
         >
-          <Flex direction='col'>
+          <Col>
             {activeSessions.map(s => (
               <UserPreviewButton
                 key={s.id}
@@ -45,20 +45,35 @@ const _SignInAccountSwitcher = () => {
                 onClick={handleSessionClicked(s)}
               />
             ))}
-          </Flex>
-          <ArrowBlockButton
-            isDisabled={card.isLoading}
-            icon={
-              <Icon
-                icon={SignOutDouble}
-                sx={theme => ({ color: theme.colors.$blackAlpha500 })}
-              />
-            }
-            onClick={handleSignOutAllClicked}
-          >
-            Sign out of all accounts
-          </ArrowBlockButton>
-        </Flex>
+          </Col>
+          <Col gap={2}>
+            <ArrowBlockButton
+              isDisabled={card.isLoading}
+              icon={
+                <Icon
+                  size={'sm'}
+                  icon={Plus}
+                  sx={theme => ({ color: theme.colors.$blackAlpha500 })}
+                />
+              }
+              onClick={handleAddAccountClicked}
+            >
+              Add account
+            </ArrowBlockButton>
+            <ArrowBlockButton
+              isDisabled={card.isLoading}
+              icon={
+                <Icon
+                  icon={SignOutDouble}
+                  sx={theme => ({ color: theme.colors.$blackAlpha500 })}
+                />
+              }
+              onClick={handleSignOutAllClicked}
+            >
+              Sign out of all accounts
+            </ArrowBlockButton>
+          </Col>
+        </Col>
       </Card>
     </Flow.Part>
   );
