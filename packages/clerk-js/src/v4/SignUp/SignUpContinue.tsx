@@ -125,7 +125,7 @@ function _SignUpContinue() {
         >
           <SocialButtonsReversibleContainer>
             {showSocialButtons && <SignUpSocialButtons />}
-            {showSocialButtons && <Divider />}
+            {showSocialButtons && showFormFields(userSettings) && <Divider />}
             {showFormFields(userSettings) && (
               <SignUpForm
                 handleSubmit={handleSubmit}
