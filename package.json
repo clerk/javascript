@@ -42,15 +42,14 @@
     "graduate": "lerna version --conventional-graduate",
     "release:staging": "lerna publish from-package --dist-tag staging",
     "release": "lerna publish from-package",
-    "prerelease": "turbo run build test --concurrency=${TURBO_CONCURRENCY:-2}",
+    "prerelease": "npx rimraf packages/*/dist && turbo run build test --concurrency=${TURBO_CONCURRENCY:-2}",
     "release:next": "lerna publish from-package --dist-tag next",
-    "prerelease:next": "turbo run build --concurrency=${TURBO_CONCURRENCY:-2}",
     "build": "turbo run build --concurrency=${TURBO_CONCURRENCY:-2}",
     "test": "turbo run test --concurrency=${TURBO_CONCURRENCY:-2}",
     "prepare": "husky install",
     "version": "./scripts/version-info.sh",
     "lerna": "lerna",
     "nuke": "rm -r node_modules; for d in packages/*/node_modules; do echo $d; rm -r $d; done",
-    "yalc:all": " for d in packages/*/; do echo $d; cd $d; yalc push --replace; cd '../../'; done"
+    "yalc:all": "for d in packages/*/; do echo $d; cd $d; yalc push --replace; cd '../../'; done"
   }
 }

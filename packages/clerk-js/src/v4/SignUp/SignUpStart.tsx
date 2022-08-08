@@ -198,7 +198,7 @@ function _SignUpStart(): JSX.Element {
         >
           <SocialButtonsReversibleContainer>
             {(!hasTicket || missingRequirementsWithTicket) && <SignUpSocialButtons />}
-            {hasSocialOrWeb3Buttons && <Divider />}
+            {hasSocialOrWeb3Buttons && showFormFields(userSettings) && <Divider />}
             {showFormFields(userSettings) && (
               <SignUpForm
                 handleSubmit={handleSubmit}

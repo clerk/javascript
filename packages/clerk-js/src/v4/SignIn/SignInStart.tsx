@@ -193,8 +193,8 @@ export function _SignInStart(): JSX.Element {
         >
           <SocialButtonsReversibleContainer>
             <SignInSocialButtons />
-            {hasSocialOrWeb3Buttons && <Divider />}
-            {standardFormAttributes.length && (
+            {hasSocialOrWeb3Buttons && standardFormAttributes.length ? <Divider /> : null}
+            {standardFormAttributes.length ? (
               <Form.Root onSubmit={handleFirstPartySubmit}>
                 <Form.ControlRow>
                   <Form.Control
@@ -205,7 +205,7 @@ export function _SignInStart(): JSX.Element {
                 <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
                 <Form.SubmitButton>Continue</Form.SubmitButton>
               </Form.Root>
-            )}
+            ) : null}
           </SocialButtonsReversibleContainer>
         </Col>
         <Footer.Root>
