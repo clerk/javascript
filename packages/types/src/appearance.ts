@@ -1,6 +1,3 @@
-// Temp way to import the type. We will clean this up when we extract
-// theming into its own package
-import type { InternalTheme } from '@clerk/clerk-js/src/v4/foundations';
 import * as CSS from 'csstype';
 
 import { OAuthProvider } from './oauth';
@@ -445,15 +442,6 @@ export type Theme = {
    * Eg: `formButtonPrimary__loading: { backgroundColor: 'gray' }`
    */
   elements?: Elements;
-};
-
-export type CreateClerkThemeParams = Theme & {
-  /**
-   * Fine-grained theme overrides. Useful when you want to style
-   * specific elements or elements that under a specific state.
-   * Eg: `formButtonPrimary__loading: { backgroundColor: 'gray' }`
-   */
-  elements?: Elements | ((params: { theme: InternalTheme }) => Elements);
 };
 
 export type Layout = {
