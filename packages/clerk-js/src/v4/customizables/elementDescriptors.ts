@@ -23,7 +23,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'header',
   'headerTitle',
   'headerSubtitle',
-  'headerBackBox',
+  'headerBackRow',
   'headerBackLink',
   'headerBackIcon',
 
@@ -99,18 +99,18 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'userButtonAvatarImage',
   'userButtonPopoverRootBox',
   'userButtonPopoverCard',
-  'userButtonPopoverMainBox',
-  'userButtonPopoverUserPreviewBox',
-  'userButtonPopoverActionsBox',
+  'userButtonPopoverMain',
+  'userButtonPopoverUserPreview',
+  'userButtonPopoverActions',
   'userButtonPopoverActionButton',
   'userButtonPopoverActionButtonIconBox',
   'userButtonPopoverActionButtonIcon',
   'userButtonPopoverActionButtonText',
-  'userButtonPopoverFooterBox',
-  'userButtonPopoverFooterPagesBox',
+  'userButtonPopoverFooter',
+  'userButtonPopoverFooterPages',
   'userButtonPopoverFooterPagesLink',
 
-  'userPreviewBox',
+  'userPreview',
   'userPreviewAvatarContainer',
   'userPreviewAvatarBox',
   'userPreviewAvatarImage',
@@ -118,7 +118,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'userPreviewMainIdentifier',
   'userPreviewSecondaryIdentifier',
 
-  'identityPreviewBox',
+  'identityPreview',
   'identityPreviewAvatarBox',
   'identityPreviewAvatarImage',
   'identityPreviewText',
@@ -153,9 +153,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'breadcrumbsItemIcon',
   'breadcrumbsItemDivider',
 
-  'scroller',
+  'scrollBox',
 
-  'navbarSection',
+  'navbar',
   'navbarButtons',
   'navbarButton',
   'navbarButtonIcon',
@@ -163,7 +163,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'navbarMobileMenuButton',
   'navbarMobileMenuButtonIcon',
 
-  'pageSection',
+  'pageScrollBox',
   'page',
   'pageHeader',
 

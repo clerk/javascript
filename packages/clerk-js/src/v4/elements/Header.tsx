@@ -37,7 +37,7 @@ const Subtitle = React.memo((props: React.PropsWithChildren<any>): JSX.Element =
 const BackLink = (props: PropsOfComponent<typeof BackLinkEl>) => {
   return (
     <BackLinkEl
-      boxElementDescriptor={descriptors.headerBackBox}
+      boxElementDescriptor={descriptors.headerBackRow}
       linkElementDescriptor={descriptors.headerBackLink}
       iconElementDescriptor={descriptors.headerBackIcon}
       {...props}

@@ -46,7 +46,7 @@ export const Content = React.forwardRef<HTMLDivElement>((_, ref) => {
   return (
     <ScrollerContainer>
       <Col
-        elementDescriptor={descriptors.pageSection}
+        elementDescriptor={descriptors.pageScrollBox}
         sx={theme => ({
           flex: `1`,
           padding: `${theme.space.$9x5} ${theme.space.$8}`,
@@ -141,7 +141,7 @@ export const Content = React.forwardRef<HTMLDivElement>((_, ref) => {
 const ScrollerContainer = (props: React.PropsWithChildren<{}>) => {
   return (
     <Col
-      elementDescriptor={descriptors.scroller}
+      elementDescriptor={descriptors.scrollBox}
       sx={t => ({ position: 'relative', borderRadius: t.radii.$xl, width: '100%', overflow: 'hidden' })}
       {...props}
     />

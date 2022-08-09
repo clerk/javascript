@@ -114,7 +114,7 @@ export const NavBar = (props: NavBarProps) => {
 const NavbarContainer = (props: React.PropsWithChildren<{}>) => {
   return (
     <Col
-      elementDescriptor={descriptors.navbarSection}
+      elementDescriptor={descriptors.navbar}
       sx={theme => ({
         flex: `0 0 ${theme.space.$60}`,
         borderRight: `${theme.borders.$normal} ${theme.colors.$blackAlpha300}`,
@@ -165,7 +165,7 @@ const MobileNavbarContainer = (props: React.PropsWithChildren<{}>) => {
     >
       <Col
         ref={floating}
-        elementDescriptor={descriptors.navbarSection}
+        elementDescriptor={descriptors.navbar}
         sx={t => ({
           position: 'absolute',
           top: 0,

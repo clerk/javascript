@@ -110,7 +110,7 @@ const Authenticator = () => {
 const Container = (props: React.PropsWithChildren<{}>) => {
   return (
     <Flex
-      elementDescriptor={descriptors.identityPreviewBox}
+      elementDescriptor={descriptors.identityPreview}
       align='center'
       gap={2}
       sx={t => ({

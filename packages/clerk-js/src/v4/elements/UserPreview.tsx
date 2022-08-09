@@ -22,8 +22,8 @@ export const UserPreview = (props: UserPreviewProps) => {
 
   return (
     <Flex
-      elementDescriptor={descriptors.userPreviewBox}
-      elementId={descriptors.userPreviewBox.setId(elementId)}
+      elementDescriptor={descriptors.userPreview}
+      elementId={descriptors.userPreview.setId(elementId)}
       gap={4}
       align='center'
       {...rest}

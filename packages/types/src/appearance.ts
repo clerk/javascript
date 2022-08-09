@@ -139,7 +139,7 @@ export type ElementsConfig = {
   header: WithOptions<never, never, never>;
   headerTitle: WithOptions<never, never, never>;
   headerSubtitle: WithOptions<never, never, never>;
-  headerBackBox: WithOptions<never, never, never>;
+  headerBackRow: WithOptions<never, never, never>;
   headerBackLink: WithOptions<never, never, never>;
   headerBackIcon: WithOptions<never, never, never>;
 
@@ -216,20 +216,20 @@ export type ElementsConfig = {
   userButtonAvatarImage: WithOptions<never, 'open', never>;
   userButtonPopoverRootBox: WithOptions<never, never, never>;
   userButtonPopoverCard: WithOptions<never, never, never>;
-  userButtonPopoverMainBox: WithOptions<never, never, never>;
-  userButtonPopoverUserPreviewBox: WithOptions<never, never, never>;
-  userButtonPopoverActionsBox: WithOptions<never, never, never>;
+  userButtonPopoverMain: WithOptions<never, never, never>;
+  userButtonPopoverUserPreview: WithOptions<never, never, never>;
+  userButtonPopoverActions: WithOptions<never, never, never>;
   userButtonPopoverActionButton: WithOptions<'manageAccount' | 'signOut', never, never>;
   userButtonPopoverActionButtonIconBox: WithOptions<'manageAccount' | 'signOut', never, never>;
   userButtonPopoverActionButtonIcon: WithOptions<'manageAccount' | 'signOut', never, never>;
   userButtonPopoverActionButtonText: WithOptions<'manageAccount' | 'signOut', never, never>;
-  userButtonPopoverFooterBox: WithOptions<never, never, never>;
-  userButtonPopoverFooterPagesBox: WithOptions<never, never, never>;
+  userButtonPopoverFooter: WithOptions<never, never, never>;
+  userButtonPopoverFooterPages: WithOptions<never, never, never>;
   userButtonPopoverFooterPagesLink: WithOptions<'terms' | 'privacy', never, never>;
 
   // TODO: Test this idea. Instead of userButtonUserPreview, have a userPreview__userButton instead
   // Same for other repeated selectors, eg avatar
-  userPreviewBox: WithOptions<'userButton', never, never>;
+  userPreview: WithOptions<'userButton', never, never>;
   userPreviewAvatarContainer: WithOptions<'userButton', never, never>;
   userPreviewAvatarBox: WithOptions<'userButton', never, never>;
   userPreviewAvatarImage: WithOptions<'userButton', never, never>;
@@ -237,7 +237,7 @@ export type ElementsConfig = {
   userPreviewMainIdentifier: WithOptions<'userButton', never, never>;
   userPreviewSecondaryIdentifier: WithOptions<'userButton', never, never>;
 
-  identityPreviewBox: WithOptions<never, never, never>;
+  identityPreview: WithOptions<never, never, never>;
   identityPreviewAvatarBox: WithOptions<never, never, never>;
   identityPreviewAvatarImage: WithOptions<never, never, never>;
   identityPreviewText: WithOptions<never, never, never>;
@@ -273,9 +273,9 @@ export type ElementsConfig = {
   breadcrumbsItemIcon: WithOptions<'currentPage', never, never>;
   breadcrumbsItemDivider: WithOptions<never, never, never>;
 
-  scroller: WithOptions<never, never, never>;
+  scrollBox: WithOptions<never, never, never>;
 
-  navbarSection: WithOptions<never, never, never>;
+  navbar: WithOptions<never, never, never>;
   navbarButtons: WithOptions<never, ActiveState, never>;
   navbarButton: WithOptions<NavbarItemId, ActiveState, never>;
   navbarButtonIcon: WithOptions<NavbarItemId, ActiveState, never>;
@@ -283,7 +283,7 @@ export type ElementsConfig = {
   navbarMobileMenuButton: WithOptions<never, never, never>;
   navbarMobileMenuButtonIcon: WithOptions<never, never, never>;
 
-  pageSection: WithOptions<never, never, never>;
+  pageScrollBox: WithOptions<never, never, never>;
   page: WithOptions<never, never, never>;
   pageHeader: WithOptions<never, never, never>;
 

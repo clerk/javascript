@@ -75,7 +75,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
             user={user}
             sx={theme => ({ padding: `0 ${theme.space.$6}`, marginBottom: theme.space.$2 })}
           />
-          <Actions elementDescriptor={descriptors.userButtonPopoverActionsBox}>
+          <Actions elementDescriptor={descriptors.userButtonPopoverActions}>
             <Action
               elementDescriptor={descriptors.userButtonPopoverActionButton}
               elementId={descriptors.userButtonPopoverActionButton.setId('manageAccount')}
@@ -114,7 +114,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
 const Main = (props: React.PropsWithChildren<{}>) => {
   return (
     <Flex
-      elementDescriptor={descriptors.userButtonPopoverMainBox}
+      elementDescriptor={descriptors.userButtonPopoverMain}
       direction='col'
     >
       {props.children}
@@ -125,7 +125,7 @@ const Main = (props: React.PropsWithChildren<{}>) => {
 const Footer = () => {
   return (
     <Flex
-      elementDescriptor={descriptors.userButtonPopoverFooterBox}
+      elementDescriptor={descriptors.userButtonPopoverFooter}
       justify='between'
       sx={theme => ({
         padding: `${theme.space.$6}`,
@@ -151,7 +151,7 @@ const Links = () => {
 
   return (
     <Flex
-      elementDescriptor={descriptors.userButtonPopoverFooterPagesBox}
+      elementDescriptor={descriptors.userButtonPopoverFooterPages}
       gap={4}
     >
       {termsPageUrl && (
