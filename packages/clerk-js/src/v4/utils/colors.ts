@@ -28,6 +28,7 @@ const keywords = {
   red: [255, 0, 0, 1],
   green: [0, 128, 0, 1],
   grey: [128, 128, 128, 1],
+  gray: [128, 128, 128, 1],
   white: [255, 255, 255, 1],
   yellow: [255, 255, 0, 1],
   transparent: [0, 0, 0, 0],
@@ -264,7 +265,7 @@ const parse = (str: string): ParsedResult => {
     res = { model: 'rgb', value: parseRgb(str) };
   }
   if (!res || !res.value) {
-    throw new Error(`Clerk: "${str}" is not a valid color. You can pass one of:
+    throw new Error(`Clerk: "${str}" cannot be used as a color within 'variables'. You can pass one of:
 - any valid hsl or hsla color
 - any valid rgb or rgba color
 - any valid hex color
