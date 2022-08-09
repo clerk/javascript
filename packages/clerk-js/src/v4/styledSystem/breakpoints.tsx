@@ -1,3 +1,5 @@
+import { fromEntries } from '../utils';
+
 const breakpoints = Object.freeze({
   xs: '21em', // 336px
   sm: '30em', // 480px
@@ -17,5 +19,5 @@ const deviceQueries = {
 
 export const mqu = {
   ...deviceQueries,
-  ...Object.fromEntries(Object.entries(breakpoints).map(([k, v]) => [k, `@media (max-width: ${v})`])),
+  ...fromEntries(Object.entries(breakpoints).map(([k, v]) => [k, `@media (max-width: ${v})`])),
 } as Record<keyof typeof breakpoints | keyof typeof deviceQueries, string>;

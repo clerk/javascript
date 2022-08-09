@@ -2,7 +2,7 @@ import { Theme } from '@clerk/types';
 
 import { spaceScaleKeys } from '../foundations/sizes';
 import { fontSizes, fontWeights } from '../foundations/typography';
-import { colors, removeUndefinedProps } from '../utils';
+import { colors, fromEntries, removeUndefinedProps } from '../utils';
 import { colorOptionToHslaAlphaScale, colorOptionToHslaLightnessScale } from './colorOptionToHslaScale';
 
 export const createColorScales = (theme: Theme) => {
@@ -55,7 +55,7 @@ export const createSpaceScale = (theme: Theme) => {
     return;
   }
   const { numericValue, unit } = splitCssUnit(spacingUnit);
-  return Object.fromEntries(
+  return fromEntries(
     spaceScaleKeys.map(k => {
       const num = Number.parseFloat(k.replace('x', '.'));
       const percentage = (num / 0.5) * 0.125;

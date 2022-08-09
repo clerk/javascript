@@ -1,6 +1,6 @@
 import { ElementObjectKey, ElementsConfig, IdSelectors, StateSelectors } from '@clerk/types';
 
-import { containsAllOfType } from '../utils';
+import { containsAllOfType, fromEntries } from '../utils';
 
 export const CLASS_PREFIX = 'cl-';
 export const ID_CLASS_PREFIX = 'cl-id-';
@@ -245,7 +245,7 @@ const createDescriptorMap = <K extends keyof ElementsConfig>(keys = APPEARANCE_K
   const entries = keys.map(key => [toObjectKey(key), createElementDescriptor(key)]) as unknown as Array<
     [K, ElementDescriptor<K>]
   >;
-  return Object.fromEntries(entries) as unknown as ElementDescriptors;
+  return fromEntries(entries) as unknown as ElementDescriptors;
 };
 
 export const descriptors = createDescriptorMap();

@@ -4,6 +4,7 @@ import { OAUTH_PROVIDERS, WEB3_PROVIDERS } from '@clerk/types/src';
 
 import { svgUrl } from '../../ui/common/constants';
 import { useEnvironment } from '../../ui/contexts/EnvironmentContext';
+import { fromEntries } from '../utils';
 
 type ThirdPartyStrategyToDataMap = {
   [k in Web3Strategy | OAuthStrategy]: { id: Web3Provider | OAuthProvider; iconUrl: string; name: string };
@@ -13,13 +14,13 @@ type ThirdPartyProviderToDataMap = {
   [k in Web3Provider | OAuthProvider]: { strategy: Web3Strategy | OAuthStrategy; iconUrl: string; name: string };
 };
 
-const providerToDisplayData: ThirdPartyProviderToDataMap = Object.fromEntries(
+const providerToDisplayData: ThirdPartyProviderToDataMap = fromEntries(
   [...OAUTH_PROVIDERS, ...WEB3_PROVIDERS].map(p => {
     return [p.provider, { strategy: p.strategy, name: p.name, iconUrl: svgUrl(p.provider) }];
   }),
 ) as ThirdPartyProviderToDataMap;
 
-const strategyToDisplayData: ThirdPartyStrategyToDataMap = Object.fromEntries(
+const strategyToDisplayData: ThirdPartyStrategyToDataMap = fromEntries(
   [...OAUTH_PROVIDERS, ...WEB3_PROVIDERS].map(p => {
     return [p.strategy, { id: p.provider, name: p.name, iconUrl: svgUrl(p.provider) }];
   }),

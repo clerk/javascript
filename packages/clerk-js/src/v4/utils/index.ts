@@ -15,3 +15,4 @@ export * from './phoneUtils';
 export * from './formatSafeIdentifier';
 export * from './removeUndefinedProps';
 export * from './getIdentifier';
+export * from './fromEntries';
