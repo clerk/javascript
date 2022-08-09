@@ -3,7 +3,7 @@ import { ExternalAccountResource } from '@clerk/types/src';
 
 import { useCoreUser } from '../../ui/contexts';
 import { useNavigate } from '../../ui/hooks/useNavigate';
-import { Badge, Col, Flex, Image } from '../customizables';
+import { Badge, Col, descriptors, Flex, Image } from '../customizables';
 import { useCardState, UserPreview } from '../elements';
 import { useEnabledThirdPartyProviders } from '../hooks';
 import { handleError } from '../utils';
@@ -53,6 +53,8 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
     <UserProfileAccordion
       icon={
         <Image
+          elementDescriptor={[descriptors.providerIcon]}
+          elementId={descriptors.socialButtonsProviderIcon.setId(account.provider)}
           alt={providerToDisplayData[account.provider].name}
           src={providerToDisplayData[account.provider].iconUrl}
           sx={theme => ({ width: theme.sizes.$4 })}

@@ -10,8 +10,8 @@ export const dark = unstable_createTheme({
   },
   elements: () => {
     return {
-      socialButtonsLogo__apple: { filter: 'invert(1)' },
-      socialButtonsLogo__github: { filter: 'invert(1)' },
+      providerIcon__apple: { filter: 'invert(1)' },
+      providerIcon__github: { filter: 'invert(1)' },
       activeDeviceIcon: {
         '--cl-chassis-bottom': '#d2d2d2',
         '--cl-chassis-back': '#e6e6e6',
