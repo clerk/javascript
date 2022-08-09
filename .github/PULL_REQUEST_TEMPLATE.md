@@ -13,6 +13,7 @@
 - [ ] `@clerk/nextjs`
 - [ ] `@clerk/remix`
 - [ ] `@clerk/types`
+- [ ] `@clerk/themes`
 - [ ] `@clerk/clerk-expo`
 - [ ] `@clerk/backend-core`
 - [ ] `@clerk/clerk-sdk-node`
