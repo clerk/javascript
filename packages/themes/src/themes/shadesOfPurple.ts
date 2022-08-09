@@ -2,7 +2,7 @@ import { unstable_createTheme } from '../createTheme';
 import { dark } from './dark';
 
 export const shadesOfPurple = unstable_createTheme({
-  baseTheme: [dark],
+  baseTheme: dark,
   variables: {
     colorBackground: '#3f3c77',
     colorPrimary: '#f8d80d',

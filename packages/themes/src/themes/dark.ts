@@ -2,8 +2,8 @@ import { unstable_createTheme } from '../createTheme';
 
 export const dark = unstable_createTheme({
   variables: {
-    colorBackground: 'rgba(43,43,56)',
-    colorInputBackground: 'rgba(255,255,255,0.1)',
+    colorBackground: '#19191A',
+    colorInputBackground: '#19191A',
     colorAlphaShade: 'white',
     colorText: 'white',
     colorInputText: 'white',
