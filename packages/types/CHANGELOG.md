@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.1.0](https://github.com/clerkinc/javascript/compare/@clerk/types@3.1.0-staging.0...@clerk/types@3.1.0) (2022-08-09)
+
+### Bug Fixes
+
+- **clerk-js:** Introduce more selectors ([bf4c3b3](https://github.com/clerkinc/javascript/commit/bf4c3b372c7e74b1b42ce53cb7254e54b67c7815))
+
 ### [3.0.1](https://github.com/clerkinc/javascript/compare/@clerk/types@3.0.0...@clerk/types@3.0.1) (2022-08-07)
 
 **Note:** Version bump only for package @clerk/types
