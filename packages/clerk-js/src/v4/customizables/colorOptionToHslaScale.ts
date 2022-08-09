@@ -1,6 +1,6 @@
 import { ColorScale, CssColorOrScale, HslaColor, HslaColorString } from '@clerk/types';
 
-import { colors } from '../utils';
+import { colors, fromEntries } from '../utils';
 
 type InternalColorScale<T> = ColorScale<T> & Partial<Record<20, T>>;
 
@@ -67,7 +67,7 @@ const mergeFilledIntoUserDefinedScale = (
   userDefined: InternalColorScale<HslaColor>,
 ): InternalColorScale<HslaColor> => {
   // @ts-expect-error
-  return Object.fromEntries(Object.entries(userDefined).map(([k, v]) => [k, v || generated[k]]));
+  return fromEntries(Object.entries(userDefined).map(([k, v]) => [k, v || generated[k]]));
 };
 
 const prefixAndStringifyHslaScale = (
@@ -90,7 +90,7 @@ const userDefinedColorToHslaColorScale = (colorOption: CssColorOrScale): Interna
   const hslaScale = createEmptyColorScale();
   // @ts-expect-error
   const entries = Object.keys(hslaScale).map(k => [k, baseScale[k] ? colors.toHslaColor(baseScale[k]) : undefined]);
-  return Object.fromEntries(entries) as InternalColorScale<HslaColor>;
+  return fromEntries(entries) as InternalColorScale<HslaColor>;
 };
 
 /**
