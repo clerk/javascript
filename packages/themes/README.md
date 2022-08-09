@@ -5,7 +5,7 @@
   <br />
 </p>
 
-# @clerk/themes (experimental)
+# @clerk/themes
 
 <div align="center">
 
