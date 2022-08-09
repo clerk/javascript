@@ -32,7 +32,7 @@ export const generateClassName = (
   const css: unknown[] = [];
 
   className = addClerkTargettableClassname(className, elemDescriptors);
-  className = addClerkTargettableIdClassname(className, elemDescriptors[elemDescriptors.length - 1], elemId);
+  className = addClerkTargettableIdClassname(className, elemDescriptors, elemId);
   className = addClerkTargettableStateClass(className, state);
   className = addClerkTargettableRequiredAttribute(className, props as any);
 
@@ -51,11 +51,17 @@ const addClerkTargettableClassname = (cn: string, elemDescriptors: ElementDescri
 
 const addClerkTargettableIdClassname = (
   cn: string,
-  elemDescriptor: ElementDescriptor,
+  elemDescriptors: ElementDescriptor[],
   elemId: ElementId | undefined,
 ) => {
-  // TODO: All descriptors return the same id, extract into stand-alone function?
-  return elemId ? cn + ' ' + elemDescriptor.getTargettableIdClassname(elemId) : cn;
+  if (!elemId) {
+    return cn;
+  }
+  // We want the most specific classname to be displayed first, so we reverse the order
+  for (let i = elemDescriptors.length - 1; i >= 0; i--) {
+    cn = cn + ' ' + elemDescriptors[i].getTargettableIdClassname(elemId);
+  }
+  return cn;
 };
 
 const addClerkTargettableStateClass = (cn: string, state: ElementState | undefined) => {
