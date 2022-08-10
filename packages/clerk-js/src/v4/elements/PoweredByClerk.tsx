@@ -8,21 +8,25 @@ import { InternalTheme, mqu, PropsOfComponent } from '../styledSystem';
 export const PoweredByClerkText = React.memo(() => {
   const { branded } = useEnvironment().displayConfig;
 
-  return branded ? (
+  return (
     <Flex
       gap={1}
       justify='center'
       sx={theme => ({ color: theme.colors.$blackAlpha300 })}
     >
-      <Text
-        variant='smallMedium'
-        sx={{ color: 'inherit' }}
-      >
-        Secured by
-      </Text>
-      <LogoMarkIconLink />
+      {branded ? (
+        <>
+          <Text
+            variant='smallMedium'
+            sx={{ color: 'inherit' }}
+          >
+            Secured by
+          </Text>
+          <LogoMarkIconLink />
+        </>
+      ) : null}
     </Flex>
-  ) : null;
+  );
 });
 
 export const PoweredByClerkTag = React.memo(
