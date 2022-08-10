@@ -1,7 +1,7 @@
 import 'regenerator-runtime/runtime';
 
 import Clerk from './core/clerk';
-import { mountComponentRenderer } from './v4';
+import { mountComponentRenderer } from './ui';
 
 Clerk.mountComponentRenderer = mountComponentRenderer;
 
