@@ -32,6 +32,7 @@ import type {
 import { SetActiveParams, SignOutOptions } from '@clerk/types/src';
 
 import packageJSON from '../../package.json';
+import type { ComponentControls, MountComponentRenderer } from '../ui';
 import {
   appendAsQueryParams,
   buildURL,
@@ -49,7 +50,6 @@ import {
   windowNavigate,
 } from '../utils';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
-import type { ComponentControls, MountComponentRenderer } from '../v4';
 import { ERROR_CODES } from './constants';
 import createDevBrowserHandler, { DevBrowserHandler } from './devBrowserHandler';
 import {
