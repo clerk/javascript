@@ -1,5 +1,6 @@
 import { UserSettingsJSON } from '@clerk/types';
-import { UserSettings } from 'core/resources/internal';
+
+import { UserSettings } from './internal';
 
 describe('UserSettings', () => {
   it('returns enabled web3 first factors', function () {

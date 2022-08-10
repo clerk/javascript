@@ -1,8 +1,7 @@
-import { ClerkAPIResponseError } from 'core/resources/Error';
-
+import { ClerkAPIResponseError } from '../../core/resources/Error';
 import { isVerificationExpiredError, VerificationErrorMessage, verificationErrorMessage } from './verification';
 
-describe('ui/common/verification', () => {
+describe('verification utils', () => {
   describe('verificationErrorMessage', () => {
     it('returns expired error message', () => {
       expect(

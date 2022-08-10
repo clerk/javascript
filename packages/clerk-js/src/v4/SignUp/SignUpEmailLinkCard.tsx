@@ -5,12 +5,12 @@ import { buildMagicLinkRedirectUrl } from '../../ui/common/redirects';
 import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from '../../ui/contexts';
 import { useNavigate } from '../../ui/hooks';
 import { useMagicLink } from '../../ui/hooks/useMagicLink';
-import { completeSignUpFlow } from '../../ui/signUp/util';
 import { EmailLinkStatusCard } from '../common';
 import { Flow } from '../customizables';
 import { VerificationLinkCard } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { handleError } from '../utils';
+import { completeSignUpFlow } from './util';
 
 export const SignUpEmailLinkCard = () => {
   const signUp = useCoreSignUp();

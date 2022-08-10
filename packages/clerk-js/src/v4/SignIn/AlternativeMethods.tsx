@@ -2,13 +2,13 @@ import { SignInFactor } from '@clerk/types';
 import React from 'react';
 
 import { useCoreSignIn } from '../../ui/contexts/';
-import { factorHasLocalStrategy } from '../../ui/signIn/utils';
 import { descriptors, Flex, Flow } from '../customizables';
 import { ArrowBlockButton, Card, CardAlert, Footer, Header } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { allStrategiesButtonsComparator, formatSafeIdentifier } from '../utils';
 import { HavingTrouble } from './HavingTrouble';
 import { SignInSocialButtons } from './SignInSocialButtons';
+import { factorHasLocalStrategy } from './utils';
 
 export type AlternativeMethodsProps = {
   onBackLinkClick: React.MouseEventHandler | undefined;

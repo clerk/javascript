@@ -1,8 +1,8 @@
 import { PreferredSignInStrategy, SignInFactor, SignInResource, SignInStrategy } from '@clerk/types';
 
 import { PREFERRED_SIGN_IN_STRATEGIES } from '../../ui/common/constants';
-import { otpPrefFactorComparator, passwordPrefFactorComparator } from '../../ui/signIn/strategies/factorSortingUtils';
-import { titleize } from '../../v4/shared';
+import { titleize } from '../shared';
+import { otpPrefFactorComparator, passwordPrefFactorComparator } from './strategies/factorSortingUtils';
 
 const FONT_SIZE_STEP = 2;
 

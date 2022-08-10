@@ -1,4 +1,4 @@
-import { OrganizationMembership } from 'core/resources/internal';
+import { OrganizationMembership } from './internal';
 
 describe('OrganizationMembership', () => {
   it('has the same initial properties', () => {

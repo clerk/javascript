@@ -4,13 +4,13 @@ import React from 'react';
 import { withRedirectToHome } from '../../ui/common/withRedirectToHome';
 import { useCoreSignIn, useEnvironment } from '../../ui/contexts';
 import { useRouter } from '../../ui/router';
-import { determineStartingSignInFactor, factorHasLocalStrategy } from '../../ui/signIn/utils';
 import { ErrorCard, LoadingCard, withCardStateProvider } from '../elements';
 import { AlternativeMethods } from './AlternativeMethods';
 import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
 import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
 import { SignInFactorOnePasswordCard } from './SignInFactorOnePasswordCard';
 import { SignInFactorOnePhoneCodeCard } from './SignInFactorOnePhoneCodeCard';
+import { determineStartingSignInFactor, factorHasLocalStrategy } from './utils';
 
 const factorKey = (factor: SignInFactor | null | undefined) => {
   if (!factor) {

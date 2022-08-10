@@ -1,9 +1,9 @@
 import { render, screen } from '@clerk/shared/testUtils';
 import { EnvironmentResource } from '@clerk/types';
-import { AuthConfig, DisplayConfig } from 'core/resources';
 import React from 'react';
-import { useCoreSession, useEnvironment } from 'ui/contexts';
 
+import { AuthConfig, DisplayConfig } from '../../core/resources';
+import { useCoreSession, useEnvironment } from '../../ui/contexts';
 import { withRedirectToHome } from './withRedirectToHome';
 
 const mockNavigate = jest.fn();

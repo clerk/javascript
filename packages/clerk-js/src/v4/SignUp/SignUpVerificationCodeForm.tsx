@@ -3,8 +3,8 @@ import React from 'react';
 
 import { useCoreClerk, useSignUpContext } from '../../ui/contexts';
 import { useNavigate } from '../../ui/hooks/useNavigate';
-import { completeSignUpFlow } from '../../ui/signUp/util';
 import { VerificationCodeCard, VerificationCodeCardProps } from '../elements';
+import { completeSignUpFlow } from './util';
 
 type SignInFactorOneCodeFormProps = {
   cardTitle: string;

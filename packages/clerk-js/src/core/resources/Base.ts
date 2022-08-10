@@ -1,7 +1,7 @@
 import type { ClerkAPIErrorJSON, ClerkResourceJSON, ClerkResourceReloadParams, DeletedObjectJSON } from '@clerk/types';
-import type { FapiClient, FapiRequestInit, FapiResponseJSON, HTTPMethod } from 'core/fapiClient';
 
 import { clerkMissingFapiClientInResources } from '../errors';
+import type { FapiClient, FapiRequestInit, FapiResponseJSON, HTTPMethod } from '../fapiClient';
 import type { Clerk } from './internal';
 import { ClerkAPIResponseError, Client } from './internal';
 

@@ -3,11 +3,11 @@ import React from 'react';
 
 import { withRedirectToHome } from '../../ui/common/withRedirectToHome';
 import { useCoreSignIn } from '../../ui/contexts';
-import { determineStartingSignInSecondFactor } from '../../ui/signIn/utils';
 import { LoadingCard, withCardStateProvider } from '../elements';
 import { SignInFactorTwoAlternativeMethods } from './SignInFactorTwoAlternativeMethods';
 import { SignInFactorTwoPhoneCodeCard } from './SignInFactorTwoPhoneCodeCard';
 import { SignInFactorTwoTOTPCard } from './SignInFactorTwoTOTPCard';
+import { determineStartingSignInSecondFactor } from './utils';
 
 const factorKey = (factor: SignInFactor | null | undefined) => {
   if (!factor) {

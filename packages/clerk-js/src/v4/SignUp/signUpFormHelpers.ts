@@ -1,7 +1,8 @@
 import { camelToSnake } from '@clerk/shared/utils';
 import type { Attributes, SignUpResource } from '@clerk/types';
 import { UserSettingsResource } from '@clerk/types';
-import { FieldState } from 'ui/common';
+
+import { FieldState } from '../../ui/common';
 
 /**
  * ActiveIdentifier denotes which one of the email address or phone number takes priority when enabled

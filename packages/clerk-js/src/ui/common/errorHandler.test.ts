@@ -1,5 +1,4 @@
-import { ClerkAPIResponseError } from 'core/resources/Error';
-
+import { ClerkAPIResponseError } from '../../core/resources/Error';
 import { getFieldError, getGlobalError, handleError } from './errorHandler';
 import type { FieldState } from './forms';
 

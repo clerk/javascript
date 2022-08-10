@@ -1,9 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`<Footer/> renders the footer component 1`] = `
-<div
-  className="cl-auth-form-footer"
->
-  Foo
-</div>
-`;
