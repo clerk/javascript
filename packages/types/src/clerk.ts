@@ -303,13 +303,15 @@ export type CustomNavigation = (to: string) => Promise<unknown> | void;
 export type ClerkThemeOptions = DeepSnakeToCamel<DeepPartial<DisplayThemeJSON>>;
 
 export interface ClerkOptions {
+  appearance?: Appearance;
   navigate?: (to: string) => Promise<unknown> | unknown;
   polling?: boolean;
-  touchSession?: boolean;
   selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;
-  appearance?: Appearance;
+  /** Controls if ClerkJS will load with the standard browser setup using Clerk cookies */
+  standardBrowser?: boolean;
   /** Optional support email for display in authentication screens */
   supportEmail?: string;
+  touchSession?: boolean;
 }
 
 export interface Resources {
