@@ -20,6 +20,6 @@
     "target": "ES2019",
     "useUnknownInCatchVariables": false
   },
-  "exclude": ["node_modules", "src/v4", "src/index.browser.v4.ts"],
+  "exclude": ["node_modules"],
   "include": ["src/**/*"]
 }
