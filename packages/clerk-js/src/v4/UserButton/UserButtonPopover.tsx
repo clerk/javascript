@@ -123,6 +123,14 @@ const Main = (props: React.PropsWithChildren<{}>) => {
 };
 
 const Footer = () => {
+  const { branded } = useEnvironment().displayConfig;
+  const { privacyPageUrl, termsPageUrl } = useAppearance().parsedLayout;
+  const shouldShow = branded || privacyPageUrl || termsPageUrl;
+
+  if (!shouldShow) {
+    return null;
+  }
+
   return (
     <Flex
       elementDescriptor={descriptors.userButtonPopoverFooter}
