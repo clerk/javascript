@@ -1,7 +1,8 @@
 // Temp way to import the type. We will clean this up when we extract
 // theming into its own package
-import type { InternalTheme } from '@clerk/clerk-js/src/v4/foundations';
 import type { Appearance, BaseTheme, Elements, Theme } from '@clerk/types';
+
+import type { InternalTheme } from '../../clerk-js/src/ui/foundations';
 
 type CreateClerkThemeParams = Theme & {
   /**
