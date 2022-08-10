@@ -43,7 +43,6 @@ import {
   isAccountsHostedPages,
   isDevOrStagingUrl,
   isError,
-  isReactNative,
   stripOrigin,
   validateFrontendApi,
   windowNavigate,
@@ -78,7 +77,11 @@ declare global {
   }
 }
 
-const defaultOptions: ClerkOptions = { polling: true, touchSession: true };
+const defaultOptions: ClerkOptions = {
+  polling: true,
+  standardBrowser: true,
+  touchSession: true,
+};
 
 export default class Clerk implements ClerkInterface {
   public static mountComponentRenderer?: MountComponentRenderer;
@@ -137,10 +140,10 @@ export default class Clerk implements ClerkInterface {
       ...options,
     };
 
-    if (isReactNative()) {
-      await this.#loadInReactNative();
+    if (this.#options.standardBrowser) {
+      await this.#loadInStandardBrowser();
     } else {
-      await this.#loadInBrowser();
+      await this.#loadInNonStandardBrowser();
     }
 
     this.#isReady = true;
@@ -776,7 +779,7 @@ export default class Clerk implements ClerkInterface {
     this.#componentControls?.updateProps(props);
   };
 
-  #loadInBrowser = async (): Promise<void> => {
+  #loadInStandardBrowser = async (): Promise<void> => {
     this.#authService = new AuthenticationService(this);
 
     this.#devBrowserHandler = createDevBrowserHandler({
@@ -832,7 +835,7 @@ export default class Clerk implements ClerkInterface {
     }
   };
 
-  #loadInReactNative = async (): Promise<void> => {
+  #loadInNonStandardBrowser = async (): Promise<void> => {
     const [environment, client] = await Promise.all([
       Environment.getInstance().fetch({ touch: false }),
       Client.getInstance().fetch(),
@@ -840,6 +843,12 @@ export default class Clerk implements ClerkInterface {
 
     this.#environment = environment;
     this.updateClient(client);
+
+    // TODO: Add an auth service also for non standard browsers that will poll for the __session JWT but won't use cookies
+
+    if (Clerk.mountComponentRenderer) {
+      this.#componentControls = Clerk.mountComponentRenderer(this, this.#environment, this.#options);
+    }
   };
 
   #defaultSession = (client: ClientResource): ActiveSessionResource | null => {

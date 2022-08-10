@@ -15,7 +15,6 @@ export * from './jwt';
 export * from './pageLifecycle';
 export * from './path';
 export * from './querystring';
-export * from './runtime';
 export * from './runWithExponentialBackOff';
 export * from './safeLock';
 export * from './script';
