@@ -4,6 +4,7 @@ import { ClerkProvider as ClerkReactProvider, ClerkProviderProps as ClerkReactPr
 import React from 'react';
 
 import type { TokenCache } from './cache';
+import { isReactNative } from './runtime';
 import { buildClerk } from './singleton';
 
 export type ClerkProviderProps = ClerkReactProviderProps & {
@@ -32,6 +33,7 @@ export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
     <ClerkReactProvider
       {...rest}
       Clerk={getClerk()}
+      standardBrowser={!isReactNative()}
     >
       {children}
     </ClerkReactProvider>
