@@ -5,6 +5,6 @@
     "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react"
   },
-  "exclude": ["node_modules", "**/*.test.ts", "**/*.test.tsx", "**/*.v3.tsx", "**/*.v3.ts"],
+  "exclude": ["node_modules", "**/*.test.ts", "**/*.test.tsx"],
   "include": ["src/**/*"]
 }
