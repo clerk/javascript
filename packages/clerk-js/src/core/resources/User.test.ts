@@ -1,6 +1,6 @@
 import { UserJSON } from '@clerk/types';
-import { BaseResource } from 'core/resources/internal';
 
+import { BaseResource } from './internal';
 import { User } from './User';
 
 describe('User', () => {

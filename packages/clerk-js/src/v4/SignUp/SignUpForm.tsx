@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActiveIdentifier, Fields } from 'ui/signUp/signUpFormHelpers';
+import { ActiveIdentifier, Fields } from 'v4/SignUp/signUpFormHelpers';
 
 import { useAppearance } from '../customizables';
 import { Form } from '../elements';

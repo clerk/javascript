@@ -3,8 +3,8 @@ import React from 'react';
 import { isMagicLinkError, MagicLinkErrorCode } from '../../core/resources/Error';
 import { useCoreClerk, useCoreSignUp } from '../../ui/contexts';
 import { useNavigate } from '../../ui/hooks/useNavigate';
-import { completeSignUpFlow } from '../../ui/signUp/util';
 import { VerificationStatus } from '../../utils/getClerkQueryParam';
+import { completeSignUpFlow } from '../SignUp/util';
 import { sleep } from '../utils';
 import { EmailLinkStatusCard } from './EmailLinkStatusCard';
 

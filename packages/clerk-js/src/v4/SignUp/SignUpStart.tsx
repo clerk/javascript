@@ -4,14 +4,6 @@ import { ERROR_CODES } from '../../ui/common/constants';
 import { withRedirectToHome } from '../../ui/common/withRedirectToHome';
 import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from '../../ui/contexts';
 import { useNavigate } from '../../ui/hooks';
-import {
-  ActiveIdentifier,
-  determineActiveFields,
-  emailOrPhone,
-  getInitialActiveIdentifier,
-  showFormFields,
-} from '../../ui/signUp/signUpFormHelpers';
-import { completeSignUpFlow } from '../../ui/signUp/util';
 import { getClerkQueryParam } from '../../utils/getClerkQueryParam';
 import { descriptors, Flex, Flow } from '../customizables';
 import {
@@ -28,7 +20,15 @@ import { useCardState } from '../elements/contexts';
 import { useLoadingStatus } from '../hooks';
 import { buildRequest, FormControlState, handleError, useFormControl } from '../utils';
 import { SignUpForm } from './SignUpForm';
+import {
+  ActiveIdentifier,
+  determineActiveFields,
+  emailOrPhone,
+  getInitialActiveIdentifier,
+  showFormFields,
+} from './signUpFormHelpers';
 import { SignUpSocialButtons } from './SignUpSocialButtons';
+import { completeSignUpFlow } from './util';
 
 function _SignUpStart(): JSX.Element {
   const card = useCardState();

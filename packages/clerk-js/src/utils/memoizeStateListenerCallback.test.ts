@@ -6,9 +6,7 @@ describe('memoizeStateListenerCallback', () => {
   it('runs', () => {});
 });
 
-// import { User } from 'core/resources';
 // import { Resources, UserJSON } from '@clerk/types';
-// import { memoizeListenerCallback } from 'utils/memoizeStateListenerCallback';
 //
 // const frontEndApi = '';
 // const path = '';

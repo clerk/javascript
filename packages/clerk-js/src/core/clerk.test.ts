@@ -1,13 +1,14 @@
 import { ActiveSessionResource, SignInJSON, SignUpJSON } from '@clerk/types';
 import { waitFor } from '@testing-library/dom';
-import Clerk from 'core/clerk';
-import { Client, DisplayConfig, Environment, MagicLinkErrorCode, SignIn, SignUp } from 'core/resources/internal';
+
+import Clerk from './clerk';
+import { Client, DisplayConfig, Environment, MagicLinkErrorCode, SignIn, SignUp } from './resources/internal';
 
 const mockClientFetch = jest.fn();
 const mockEnvironmentFetch = jest.fn();
 
-jest.mock('core/resources/Client');
-jest.mock('core/resources/Environment');
+jest.mock('./resources/Client');
+jest.mock('./resources/Environment');
 
 Client.getInstance = jest.fn().mockImplementation(() => {
   return { fetch: mockClientFetch };

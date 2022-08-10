@@ -3,15 +3,6 @@ import React from 'react';
 import { withRedirectToHome } from '../../ui/common/withRedirectToHome';
 import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from '../../ui/contexts';
 import { useNavigate } from '../../ui/hooks';
-import {
-  ActiveIdentifier,
-  determineActiveFields,
-  emailOrPhone,
-  getInitialActiveIdentifier,
-  minimizeFieldsForExistingSignup,
-  showFormFields,
-} from '../../ui/signUp/signUpFormHelpers';
-import { completeSignUpFlow } from '../../ui/signUp/util';
 import { descriptors, Flex, Flow } from '../customizables';
 import {
   Card,
@@ -26,7 +17,16 @@ import {
 import { useCardState } from '../elements/contexts';
 import { buildRequest, FormControlState, handleError, useFormControl } from '../utils';
 import { SignUpForm } from './SignUpForm';
+import {
+  ActiveIdentifier,
+  determineActiveFields,
+  emailOrPhone,
+  getInitialActiveIdentifier,
+  minimizeFieldsForExistingSignup,
+  showFormFields,
+} from './signUpFormHelpers';
 import { SignUpSocialButtons } from './SignUpSocialButtons';
+import { completeSignUpFlow } from './util';
 
 function _SignUpContinue() {
   const card = useCardState();

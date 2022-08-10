@@ -1,9 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`<Body/> renders the body component 1`] = `
-<div
-  className="cl-auth-form-body"
->
-  Foo
-</div>
-`;

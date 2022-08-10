@@ -1,4 +1,4 @@
-import { BaseResource, ExternalAccount } from 'core/resources/internal';
+import { BaseResource, ExternalAccount } from './internal';
 
 describe('External account', () => {
   it('destroy', async () => {

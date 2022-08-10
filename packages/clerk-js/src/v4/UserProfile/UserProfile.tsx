@@ -1,9 +1,9 @@
 import { UserProfileProps } from '@clerk/types/src';
 import React from 'react';
-import { UserProfileCtx } from 'ui/types';
 
 import { ComponentContext, withCoreUserGuard } from '../../ui/contexts';
 import { Route, Switch } from '../../ui/router';
+import { UserProfileCtx } from '../../ui/types';
 import { Flow } from '../customizables';
 import { UserProfileCard, withCardStateProvider } from '../elements';
 import { Content } from './Content';

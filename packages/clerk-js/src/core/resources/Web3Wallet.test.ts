@@ -1,5 +1,6 @@
 import { Web3WalletJSON } from '@clerk/types';
-import { BaseResource, Web3Wallet } from 'core/resources/internal';
+
+import { BaseResource, Web3Wallet } from './internal';
 
 describe('Web3 wallet', () => {
   it('create', async () => {

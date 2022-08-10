@@ -14,12 +14,6 @@
     "noImplicitReturns": true,
     "noUnusedLocals": false,
     "noUnusedParameters": true,
-    "paths": {
-      "ui/*": ["ui/*"],
-      "core/*": ["core/*"],
-      "utils/*": ["utils/*"],
-      "types/*": ["types/*"]
-    },
     "resolveJsonModule": true,
     "sourceMap": true,
     "strict": true,
