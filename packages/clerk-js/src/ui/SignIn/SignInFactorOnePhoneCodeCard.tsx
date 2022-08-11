@@ -15,7 +15,7 @@ export const SignInFactorOnePhoneCodeCard = (props: SignInFactorOnePhoneCodeCard
       <SignInFactorOneCodeForm
         {...props}
         cardTitle='Check your phone'
-        cardSubtitle={`To continue to ${applicationName}`}
+        cardSubtitle={`to continue to ${applicationName}`}
         formTitle='Verification code'
         formSubtitle='Enter the verification code sent to your phone number'
       />
