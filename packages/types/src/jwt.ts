@@ -65,7 +65,7 @@ export interface ClerkJWTClaims {
   azp?: string;
 
   /**
-   *
+   * @deprecated - Add orgs to your session token using the "user.organizations" shortcode in JWT Templates instead
    */
   orgs?: Record<string, MembershipRole>;
 
@@ -73,6 +73,11 @@ export interface ClerkJWTClaims {
    * Active organization id.
    */
   org_id?: string;
+
+  /**
+   * Active organization slug.
+   */
+  org_slug?: string;
 
   /**
    * Active organization role
