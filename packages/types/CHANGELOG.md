@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.1.1](https://github.com/clerkinc/javascript/compare/@clerk/types@3.1.0...@clerk/types@3.1.1) (2022-08-16)
+
+### Bug Fixes
+
+- **types:** Deprecate orgs session token claim, add org_slug for active organization ([4175040](https://github.com/clerkinc/javascript/commit/4175040ca2257265cc0b8c12389056933765040b))
+
 ## [3.1.0](https://github.com/clerkinc/javascript/compare/@clerk/types@3.1.0-staging.0...@clerk/types@3.1.0) (2022-08-09)
 
 ### Bug Fixes
