@@ -4,10 +4,20 @@ type WizardProps = React.PropsWithChildren<{
   step: number;
 }>;
 
-export const useWizard = (params: { defaultStep?: number } = {}) => {
-  const { defaultStep = 0 } = params;
+type UseWizardProps = {
+  defaultStep?: number;
+  onNextStep?: () => void;
+};
+
+export const useWizard = (params: UseWizardProps = {}) => {
+  const { defaultStep = 0, onNextStep } = params;
   const [step, setStep] = React.useState(defaultStep);
-  const nextStep = React.useCallback(() => setStep(s => s + 1), []);
+
+  const nextStep = React.useCallback(() => {
+    onNextStep?.();
+    setStep(s => s + 1);
+  }, []);
+
   const prevStep = React.useCallback(() => setStep(s => s - 1), []);
   const goToStep = React.useCallback((i: number) => setStep(i), []);
   return { nextStep, prevStep, goToStep, props: { step } };
