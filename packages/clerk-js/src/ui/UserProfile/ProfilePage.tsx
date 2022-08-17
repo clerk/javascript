@@ -18,7 +18,7 @@ export const ProfilePage = withCardStateProvider(() => {
   const showFirstName = first_name.enabled;
   const showLastName = last_name.enabled;
 
-  const wizard = useWizard();
+  const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
 
   const firstNameField = useFormControl('firstName', user.firstName || '', { type: 'text', label: 'First name' });
   const lastNameField = useFormControl('lastName', user.lastName || '', { type: 'text', label: 'Last name' });
