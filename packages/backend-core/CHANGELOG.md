@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@2.0.5...@clerk/backend-core@2.1.0) (2022-08-18)
+
+### Bug Fixes
+
+- **clerk-sdk-node:** Snakecase only top level keys for BAPI calls ([a9b3591](https://github.com/clerkinc/javascript/commit/a9b35918b931f4050d73a57659844caccda0184c))
+
 ### [2.0.5](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@2.0.4...@clerk/backend-core@2.0.5) (2022-08-18)
 
 **Note:** Version bump only for package @clerk/backend-core
