@@ -46,10 +46,7 @@ const AddWeb3Wallet = (props: { nextStep: () => void }) => {
   // const connectedStrategies = user.web3Wallets.map(w => w.web3Wallet) as OAuthStrategy[];
   const unconnectedStrategies: Web3Strategy[] =
     user.web3Wallets.filter(w => w.verification?.status === 'verified').length === 0 ? ['web3_metamask_signature'] : [];
-  console.log(card);
   const connect = async (strategy: Web3Strategy) => {
-    // card.setError('hey');
-    // return;
     try {
       card.setLoading(strategy);
       const identifier = await getMetamaskIdentifier();
@@ -65,10 +62,8 @@ const AddWeb3Wallet = (props: { nextStep: () => void }) => {
       console.log(err);
       const fieldError = getFieldError(err);
       if (fieldError) {
-        console.log('fieldError', fieldError);
         card.setError(fieldError.longMessage);
       } else {
-        console.log('handleError');
         handleError(err, [], card.setError);
       }
     }
