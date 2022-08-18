@@ -23,6 +23,7 @@ export type MicrosoftOauthProvider = 'microsoft';
 export type NotionOauthProvider = 'notion';
 export type AppleOauthProvider = 'apple';
 export type LineOauthProvider = 'line';
+export type InstagramOauthProvider = 'instagram';
 
 export type OAuthProvider =
   | FacebookOauthProvider
@@ -40,7 +41,8 @@ export type OAuthProvider =
   | MicrosoftOauthProvider
   | NotionOauthProvider
   | AppleOauthProvider
-  | LineOauthProvider;
+  | LineOauthProvider
+  | InstagramOauthProvider;
 
 export const OAUTH_PROVIDERS: OAuthProviderData[] = [
   {
@@ -138,6 +140,12 @@ export const OAUTH_PROVIDERS: OAuthProviderData[] = [
     strategy: 'oauth_line',
     name: 'LINE',
     docsUrl: 'https://clerk.dev/docs/authentication/social-login-with-line',
+  },
+  {
+    provider: 'instagram',
+    strategy: 'oauth_instagram',
+    name: 'Instagram',
+    docsUrl: 'https://clerk.dev/docs/authentication/social-login-with-instagram',
   },
 ];
 
