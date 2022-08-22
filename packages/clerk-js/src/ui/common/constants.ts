@@ -75,4 +75,5 @@ export const ERROR_CODES = {
   INVALID_STRATEGY_FOR_USER: 'strategy_for_user_invalid',
   NOT_ALLOWED_TO_SIGN_UP: 'not_allowed_to_sign_up',
   OAUTH_ACCESS_DENIED: 'oauth_access_denied',
+  NOT_ALLOWED_ACCESS: 'not_allowed_access',
 };

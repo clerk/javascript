@@ -96,6 +96,7 @@ export function _SignInStart(): JSX.Element {
         switch (error.code) {
           case ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP:
           case ERROR_CODES.OAUTH_ACCESS_DENIED:
+          case ERROR_CODES.NOT_ALLOWED_ACCESS:
             card.setError(error.longMessage);
             break;
           default:
@@ -108,7 +109,7 @@ export function _SignInStart(): JSX.Element {
       }
     }
     void handleOauthError();
-  });
+  }, []);
 
   const buildSignInParams = (fields: Array<FormControlState<string>>): SignInCreateParams => {
     const hasPassword = fields.some(f => f.name === 'password' && !!f.value);
