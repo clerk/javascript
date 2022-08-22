@@ -120,6 +120,7 @@ function _SignUpStart(): JSX.Element {
         switch (error.code) {
           case ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP:
           case ERROR_CODES.OAUTH_ACCESS_DENIED:
+          case ERROR_CODES.NOT_ALLOWED_ACCESS:
             card.setError(error.longMessage);
             break;
           default:
@@ -135,7 +136,7 @@ function _SignUpStart(): JSX.Element {
     }
 
     void handleOauthError();
-  });
+  }, []);
 
   const handleChangeActive = (type: ActiveIdentifier) => {
     if (!emailOrPhone(attributes, isProgressiveSignUp)) {
