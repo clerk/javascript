@@ -1,4 +1,4 @@
-import { DisplayThemeJSON, ImageJSON } from './json';
+import { DisplayThemeJSON } from './json';
 import { ClerkResource } from './resource';
 
 export type PreferredSignInStrategy = 'password' | 'otp';
@@ -15,10 +15,10 @@ export interface DisplayConfigJSON {
   application_name: string;
   backend_host: string;
   branded: boolean;
-  favicon_image: ImageJSON;
   home_url: string;
   instance_environment_type: string;
-  logo_image: ImageJSON;
+  logo_url: string;
+  favicon_url: string;
   preferred_sign_in_strategy: PreferredSignInStrategy;
   sign_in_url: string;
   sign_up_url: string;
@@ -39,10 +39,10 @@ export interface DisplayConfigResource extends ClerkResource {
   applicationName: string;
   backendHost: string;
   branded: boolean;
-  faviconImage: ImageJSON;
   homeUrl: string;
   instanceEnvironmentType: string;
-  logoImage: ImageJSON;
+  logoUrl: string;
+  faviconUrl: string;
   preferredSignInStrategy: PreferredSignInStrategy;
   signInUrl: string;
   signUpUrl: string;

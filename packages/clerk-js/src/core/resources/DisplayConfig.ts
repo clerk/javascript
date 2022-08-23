@@ -1,10 +1,4 @@
-import type {
-  DisplayConfigJSON,
-  DisplayConfigResource,
-  DisplayThemeJSON,
-  ImageJSON,
-  PreferredSignInStrategy,
-} from '@clerk/types';
+import type { DisplayConfigJSON, DisplayConfigResource, DisplayThemeJSON, PreferredSignInStrategy } from '@clerk/types';
 
 import { BaseResource } from './internal';
 
@@ -19,10 +13,10 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
   applicationName!: string;
   backendHost!: string;
   branded!: boolean;
-  faviconImage!: ImageJSON;
   homeUrl!: string;
   instanceEnvironmentType!: string;
-  logoImage!: ImageJSON;
+  logoUrl!: string;
+  faviconUrl!: string;
   preferredSignInStrategy!: PreferredSignInStrategy;
   signInUrl!: string;
   signUpUrl!: string;
@@ -42,8 +36,8 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     this.applicationName = data.application_name;
     this.theme = data.theme;
     this.preferredSignInStrategy = data.preferred_sign_in_strategy;
-    this.logoImage = data.logo_image;
-    this.faviconImage = data.favicon_image;
+    this.logoUrl = data.logo_url;
+    this.faviconUrl = data.favicon_url;
     this.backendHost = data.backend_host;
     this.homeUrl = data.home_url;
     this.signInUrl = data.sign_in_url;
