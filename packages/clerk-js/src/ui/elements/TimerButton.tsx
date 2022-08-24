@@ -27,7 +27,7 @@ export const TimerButton = (props: TimerButtonProps) => {
 
   const disable = () => {
     setRemainingSeconds(throttleTimeInSec);
-    intervalIdRef.current = setInterval(() => {
+    intervalIdRef.current = window.setInterval(() => {
       setRemainingSeconds(seconds => {
         if (seconds === 1) {
           clearInterval(intervalIdRef.current);
