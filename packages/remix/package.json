@@ -41,7 +41,7 @@
   "devDependencies": {
     "@types/cookie": "^0.5.0",
     "@types/jest": "^27.4.0",
-    "@types/node": "^16.11.9",
+    "@types/node": "^16.11.55",
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.11",
     "jest": "^27.4.7",
