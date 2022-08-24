@@ -3,9 +3,10 @@ import React from 'react';
 import { useWizard, Wizard } from '../common';
 import { useCoreUser } from '../contexts';
 import { Text } from '../customizables';
-import { Form } from '../elements';
+import { Form, useCardState, withCardStateProvider } from '../elements';
 import { useEnabledThirdPartyProviders } from '../hooks';
 import { useRouter } from '../router';
+import { handleError } from '../utils';
 import { FormButtons } from './FormButtons';
 import { ContentPage } from './Page';
 import { SuccessPage } from './SuccessPage';
@@ -134,13 +135,23 @@ type RemovePageProps = {
   deleteResource: () => Promise<any>;
 };
 
-const RemoveResourcePage = (props: RemovePageProps) => {
+const RemoveResourcePage = withCardStateProvider((props: RemovePageProps) => {
   const { title, messageLine1, messageLine2, successMessage, deleteResource } = props;
   const wizard = useWizard();
+  const card = useCardState();
+
+  const handleSubmit = async () => {
+    try {
+      await deleteResource().then(() => wizard.nextStep());
+    } catch (e) {
+      handleError(e, [], card.setError);
+    }
+  };
+
   return (
     <Wizard {...wizard.props}>
       <ContentPage.Root headerTitle={title}>
-        <Form.Root onSubmit={() => deleteResource().then(() => wizard.nextStep())}>
+        <Form.Root onSubmit={handleSubmit}>
           <Text variant='regularRegular'>{messageLine1}</Text>
           <Text variant='regularRegular'>{messageLine2}</Text>
           <FormButtons colorScheme={'danger'} />
@@ -153,4 +164,4 @@ const RemoveResourcePage = (props: RemovePageProps) => {
       />
     </Wizard>
   );
-};
+});
