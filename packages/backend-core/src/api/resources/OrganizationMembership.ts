@@ -6,6 +6,8 @@ export class OrganizationMembership {
   constructor(
     readonly id: string,
     readonly role: OrganizationMembershipRole,
+    readonly publicMetadata: Record<string, unknown> = {},
+    readonly privateMetadata: Record<string, unknown> = {},
     readonly createdAt: number,
     readonly updatedAt: number,
     readonly organization: Organization,
@@ -16,6 +18,8 @@ export class OrganizationMembership {
     return new OrganizationMembership(
       data.id,
       data.role,
+      data.public_metadata,
+      data.private_metadata,
       data.created_at,
       data.updated_at,
       Organization.fromJSON(data.organization),
