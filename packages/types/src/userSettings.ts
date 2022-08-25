@@ -63,7 +63,7 @@ export interface UserSettingsJSON extends ClerkResourceJSON {
 }
 
 export interface UserSettingsResource extends ClerkResource {
-  id: undefined;
+  id?: undefined;
   social: OAuthProviders;
   attributes: Attributes;
   signIn: SignInData;

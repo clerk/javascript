@@ -31,15 +31,15 @@
     "dev": "tsc -p tsconfig.build.json --watch"
   },
   "dependencies": {
-    "@clerk/clerk-react": "^4.0.0-next.14",
-    "@clerk/clerk-sdk-node": "^4.0.0-next.7",
+    "@clerk/clerk-react": "^4.0.6",
+    "@clerk/clerk-sdk-node": "^4.1.1",
     "@clerk/types": "^3.0.0-next.13",
     "cookie": "^0.5.0",
     "tslib": "^2.3.1"
   },
   "devDependencies": {
     "@types/cookie": "^0.5.0",
-    "@types/node": "^16.11.9",
+    "@types/node": "^16.11.55",
     "typescript": "^4.6.4"
   },
   "peerDependencies": {

@@ -3,7 +3,7 @@ export type ClerkResourceReloadParams = {
 };
 
 export interface ClerkResource {
-  readonly id?: string;
+  readonly id?: string | undefined;
   pathRoot: string;
   reload(p?: ClerkResourceReloadParams): Promise<this>;
 }

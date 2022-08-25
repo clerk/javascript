@@ -40,7 +40,7 @@
     "@types/classnames": "^2",
     "@types/jest": "^27.4.0",
     "@types/js-cookie": "^2",
-    "@types/node": "^16.11.9",
+    "@types/node": "^16.11.55",
     "@types/react": "^17.0.39",
     "@types/react-color": "^3.0.4",
     "@types/react-dom": "^17.0.11",
