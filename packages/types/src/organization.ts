@@ -7,7 +7,7 @@ declare global {
   /**
    * If you want to provide custom types for the organization.publicMetadata object,
    * simply redeclare this rule in the global namespace.
-   * Every user object will use the provided type.
+   * Every organization object will use the provided type.
    */
   interface OrganizationPublicMetadata {
     [k: string]: unknown;

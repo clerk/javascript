@@ -10,6 +10,7 @@ import { BaseResource, Organization } from './internal';
 
 export class OrganizationMembership extends BaseResource implements OrganizationMembershipResource {
   id!: string;
+  publicMetadata: Record<string, unknown> = {};
   publicUserData!: PublicUserData;
   organization!: Organization;
   role!: MembershipRole;
@@ -55,6 +56,7 @@ export class OrganizationMembership extends BaseResource implements Organization
   protected fromJSON(data: OrganizationMembershipJSON): this {
     this.id = data.id;
     this.organization = new Organization(data.organization);
+    this.publicMetadata = data.public_metadata;
     if (data.public_user_data) {
       this.publicUserData = {
         firstName: data.public_user_data.first_name,

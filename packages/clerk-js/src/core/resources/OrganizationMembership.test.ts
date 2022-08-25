@@ -18,6 +18,9 @@ describe('OrganizationMembership', () => {
         created_at: 12345,
         updated_at: 67890,
       },
+      public_metadata: {
+        foo: 'bar',
+      },
       public_user_data: {
         object: 'public_user_data',
         first_name: 'test_first_name',
