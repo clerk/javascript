@@ -5,7 +5,7 @@ import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/organizations';
 
-type OrganizationMetadataParams = {
+type MetadataParams = {
   publicMetadata?: Record<string, unknown>;
   privateMetadata?: Record<string, unknown>;
 };
@@ -20,7 +20,7 @@ type CreateParams = {
   slug?: string;
   /* The User id for the user creating the organization. The user will become an administrator for the organization. */
   createdBy: string;
-} & OrganizationMetadataParams;
+} & MetadataParams;
 
 type GetOrganizationParams = { organizationId: string } | { slug: string };
 
@@ -28,7 +28,7 @@ type UpdateParams = {
   name?: string;
 };
 
-type UpdateMetadataParams = OrganizationMetadataParams;
+type UpdateMetadataParams = MetadataParams;
 
 type GetOrganizationMembershipListParams = {
   organizationId: string;
@@ -43,6 +43,11 @@ type CreateOrganizationMembershipParams = {
 };
 
 type UpdateOrganizationMembershipParams = CreateOrganizationMembershipParams;
+
+type UpdateOrganizationMembershipMetadataParams = {
+  organizationId: string;
+  userId: string;
+} & MetadataParams;
 
 type DeleteOrganizationMembershipParams = {
   organizationId: string;
@@ -156,6 +161,19 @@ export class OrganizationAPI extends AbstractAPI {
       path: joinPaths(basePath, organizationId, 'memberships', userId),
       bodyParams: {
         role,
+      },
+    });
+  }
+
+  public async updateOrganizationMembershipMetadata(params: UpdateOrganizationMembershipMetadataParams) {
+    const { organizationId, userId, publicMetadata, privateMetadata } = params;
+
+    return this.APIClient.request<OrganizationMembership>({
+      method: 'PATCH',
+      path: joinPaths(basePath, organizationId, 'memberships', userId, 'metadata'),
+      bodyParams: {
+        publicMetadata,
+        privateMetadata,
       },
     });
   }

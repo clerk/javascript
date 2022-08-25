@@ -209,6 +209,8 @@ test('createOrganizationMembership() creates a membership for an organization', 
   const resJSON: OrganizationMembershipJSON = {
     object: ObjectType.OrganizationMembership,
     id: 'orgmem_randomid',
+    public_metadata: {},
+    private_metadata: {},
     role,
     organization: {
       object: ObjectType.Organization,
@@ -261,6 +263,8 @@ test('updateOrganizationMembership() updates an organization membership', async 
       created_at: 1612378465,
       updated_at: 1612378465,
     },
+    public_metadata: {},
+    private_metadata: {},
     public_user_data: {
       first_name: 'John',
       last_name: 'Doe',
@@ -278,6 +282,55 @@ test('updateOrganizationMembership() updates an organization membership', async 
     organizationId,
     userId,
     role,
+  });
+  expect(orgMembership).toEqual(OrganizationMembership.fromJSON(resJSON));
+});
+
+test('updateOrganizationMembershipMetadata() updates organization metadata', async () => {
+  const organizationId = 'org_randomid';
+  const userId = 'user_randomid';
+  const publicMetadata = { helloWorld: 42 };
+  const privateMetadata = { goodbyeWorld: 42 };
+  const resJSON: OrganizationMembershipJSON = {
+    object: ObjectType.OrganizationMembership,
+    id: 'orgmem_randomid',
+    role: 'basic_member',
+    organization: {
+      object: ObjectType.Organization,
+      id: organizationId,
+      logo_url: null,
+      name: 'Acme Inc',
+      slug: 'acme-inc',
+      public_metadata: {},
+      private_metadata: {},
+      created_at: 1612378465,
+      updated_at: 1612378465,
+    },
+    public_metadata: publicMetadata,
+    private_metadata: privateMetadata,
+    public_user_data: {
+      first_name: 'John',
+      last_name: 'Doe',
+      profile_image_url: 'https://url-to-image.png',
+      identifier: 'johndoe@example.com',
+      user_id: userId,
+    },
+    created_at: 1612378465,
+    updated_at: 1612378465,
+  };
+
+  nock(defaultServerAPIUrl)
+    .patch(`/v1/organizations/${organizationId}/memberships/${userId}/metadata`, {
+      public_metadata: publicMetadata,
+      private_metadata: privateMetadata,
+    })
+    .reply(200, resJSON);
+
+  const orgMembership = await TestClerkAPI.organizations.updateOrganizationMembershipMetadata({
+    organizationId,
+    userId,
+    publicMetadata,
+    privateMetadata,
   });
   expect(orgMembership).toEqual(OrganizationMembership.fromJSON(resJSON));
 });

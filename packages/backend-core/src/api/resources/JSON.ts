@@ -134,6 +134,8 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
 export interface OrganizationMembershipJSON extends ClerkResourceJSON {
   object: ObjectType.OrganizationMembership;
   organization: OrganizationJSON;
+  public_metadata: Record<string, unknown>;
+  private_metadata?: Record<string, unknown>;
   public_user_data: OrganizationMembershipPublicUserDataJSON;
   role: OrganizationMembershipRole;
   created_at: number;
