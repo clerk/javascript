@@ -84,7 +84,7 @@ test('createInvitation() accepts publicMetadata', async () => {
   nock(defaultServerAPIUrl)
     .post('/v1/invitations', {
       email_address: emailAddress,
-      public_metadata: JSON.stringify(publicMetadata),
+      public_metadata: publicMetadata,
     })
     .reply(200, resJSON);
 
