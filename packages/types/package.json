@@ -25,6 +25,9 @@
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsc -p tsconfig.build.json --watch"
   },
+  "dependencies": {
+    "csstype": "^3.1.0"
+  },
   "devDependencies": {
     "@types/jest": "^27.4.0",
     "jest": "^27.4.7",
