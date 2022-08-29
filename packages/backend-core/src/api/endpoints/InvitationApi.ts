@@ -22,10 +22,7 @@ export class InvitationAPI extends AbstractAPI {
     return this.APIClient.request<Invitation>({
       method: 'POST',
       path: basePath,
-      bodyParams: {
-        ...params,
-        publicMetadata: JSON.stringify(params.publicMetadata),
-      },
+      bodyParams: params,
     });
   }
 
