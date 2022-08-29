@@ -145,6 +145,7 @@ test('createUser() creates a user', async () => {
     password: '123456',
     firstName: 'Boss',
     lastName: 'Clerk',
+    totpSecret: 'AICJ3HCXKO4KOY6NDH6RII4E3ZYL5ZBH',
   };
 
   nock(defaultServerAPIUrl)
