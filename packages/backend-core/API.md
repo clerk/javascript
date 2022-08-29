@@ -557,6 +557,7 @@ Available parameters are:
 - _password_ The plaintext password to give the user.
 - _firstName_ User's first name.
 - _lastName_ User's last name.
+- _totpSecret_ User's secret for TOTP. Useful while migrating users with enabled 2FA Authenticator Apps.
 - _publicMetadata_ Metadata saved on the user, that is visible to both your Frontend and Backend APIs.
 - _privateMetadata_ Metadata saved on the user, that is only visible to your Backend API.
 - _unsafeMetadata_ Metadata saved on the user, that can be updated from both the Frontend and Backend APIs. Note: Since this data can be modified from the frontend, it is not guaranteed to be safe.

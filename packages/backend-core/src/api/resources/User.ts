@@ -8,6 +8,7 @@ export class User {
   constructor(
     readonly id: string,
     readonly passwordEnabled: boolean,
+    readonly totpEnabled: boolean,
     readonly twoFactorEnabled: boolean,
     readonly createdAt: number,
     readonly updatedAt: number,
@@ -35,6 +36,7 @@ export class User {
     return new User(
       data.id,
       data.password_enabled,
+      data.totp_enabled,
       data.two_factor_enabled,
       data.created_at,
       data.updated_at,

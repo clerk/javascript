@@ -35,6 +35,7 @@ type CreateUserParams = {
   lastName?: string;
   skipPasswordChecks?: boolean;
   skipPasswordRequirement?: boolean;
+  totpSecret?: string;
 } & UserMetadataParams;
 
 interface UpdateUserParams extends UserMetadataParams {
