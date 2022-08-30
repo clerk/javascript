@@ -1,8 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`<TextArea/> renders the controlled textarea with error 1`] = `
-<textarea
-  className="textArea error"
-  onChange={[Function]}
-/>
-`;

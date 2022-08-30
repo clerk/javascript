@@ -1,7 +1,5 @@
 export * from './beforeUnloadTracker';
 export * from './cookies';
-export * from './customCss';
-export * from './customFont';
 export * from './email';
 export * from './encoders';
 export * from './errors';

@@ -1,9 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`<Wizard/> renders the selected child 1`] = `
-<div
-  title="Bar"
->
-  Bar tab
-</div>
-`;
