@@ -68,6 +68,7 @@ import {
   OrganizationMembership,
 } from './resources/internal';
 import { AuthenticationService } from './services';
+import { SessionTokenCache } from './tokenCache';
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 
@@ -310,6 +311,8 @@ export default class Clerk implements ClerkInterface {
       } else {
         session.lastActiveOrganizationId = organization.id;
       }
+
+      SessionTokenCache.clear();
     }
 
     this.#authService?.setAuthCookiesFromSession(session);
