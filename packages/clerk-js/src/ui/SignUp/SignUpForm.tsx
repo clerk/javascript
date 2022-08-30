@@ -18,6 +18,12 @@ export const SignUpForm = (props: SignUpFormProps) => {
   const { showOptionalFields } = useAppearance().parsedLayout;
 
   const shouldShow = (name: keyof typeof fields) => {
+    // In case both email & phone are optional, then don't take into account the
+    // Layout showOptionalFields prop and the required field.
+    if ((name === 'emailAddress' || name === 'phoneNumber') && canToggleEmailPhone) {
+      return !!fields[name];
+    }
+
     return !!fields[name] && (showOptionalFields || fields[name]?.required);
   };
 
