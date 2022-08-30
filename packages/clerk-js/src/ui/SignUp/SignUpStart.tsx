@@ -159,6 +159,16 @@ function _SignUpStart(): JSX.Element {
       fieldsToSubmit.push({ id: 'strategy', value: 'ticket' } as any);
     }
 
+    // In case of emailOrPhone (both email & phone are optional) and neither of them is provided,
+    // add both to the submitted fields to trigger and render an error for both respective inputs
+    const emailAddressProvided = !!(fieldsToSubmit.find(f => f.id === 'emailAddress')?.value || '');
+    const phoneNumberProvided = !!(fieldsToSubmit.find(f => f.id === 'phoneNumber')?.value || '');
+
+    if (!emailAddressProvided && !phoneNumberProvided && emailOrPhone(attributes, isProgressiveSignUp)) {
+      fieldsToSubmit.push(formState['emailAddress']);
+      fieldsToSubmit.push(formState['phoneNumber']);
+    }
+
     card.setLoading();
     card.setError(undefined);
     return signUp
