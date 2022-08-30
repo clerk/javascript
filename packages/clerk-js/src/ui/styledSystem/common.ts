@@ -91,7 +91,13 @@ const textVariants = (t: InternalTheme) => {
     lineHeight: t.lineHeights.$none,
   };
 
+  const headingRegularRegular = {
+    ...regularRegular,
+    fontSize: t.fontSizes.$md,
+  } as const;
+
   return {
+    headingRegularRegular,
     buttonExtraSmallBold,
     buttonSmallRegular,
     buttonRegularRegular,
