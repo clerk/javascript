@@ -6,12 +6,13 @@ const fontWeights = Object.freeze({
 
 const lineHeights = Object.freeze({
   normal: 'normal',
-  none: '1',
+  none: 1,
+  shortest: 1.1,
   shorter: 1.25,
   short: 1.375,
   base: 1.5,
   tall: 1.625,
-  taller: '2',
+  taller: 2,
 } as const);
 
 const letterSpacings = Object.freeze({
