@@ -37,7 +37,7 @@ function _SignUpStart(): JSX.Element {
   const { userSettings, displayConfig } = useEnvironment();
   const { navigate } = useNavigate();
   const { attributes } = userSettings;
-  const { setSession } = useCoreClerk();
+  const { setActive } = useCoreClerk();
   const { navigateAfterSignUp, signInUrl } = useSignUpContext();
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
@@ -89,7 +89,7 @@ function _SignUpStart(): JSX.Element {
           signUp,
           verifyEmailPath: 'verify-email-address',
           verifyPhonePath: 'verify-phone-number',
-          handleComplete: () => setSession(signUp.createdSessionId, navigateAfterSignUp),
+          handleComplete: () => setActive({ session: signUp.createdSessionId, beforeEmit: navigateAfterSignUp }),
           navigate,
         });
       })
@@ -168,7 +168,7 @@ function _SignUpStart(): JSX.Element {
           signUp: res,
           verifyEmailPath: 'verify-email-address',
           verifyPhonePath: 'verify-phone-number',
-          handleComplete: () => setSession(res.createdSessionId, navigateAfterSignUp),
+          handleComplete: () => setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignUp }),
           navigate,
         }),
       )
