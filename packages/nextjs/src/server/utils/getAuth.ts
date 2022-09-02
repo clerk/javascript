@@ -1,4 +1,4 @@
-import { createSignedOutState } from '@clerk/backend-core';
+import { signedOutGetToken } from '@clerk/backend-core';
 
 import type { RequestLike } from '../types';
 import { AuthData, AuthResult, SESSION_COOKIE_NAME, SessionsApi } from '../types';
@@ -14,11 +14,11 @@ export function createGetAuth(sessions: SessionsApi) {
     const authResult = getAuthResultFromRequest(req);
 
     if (!authResult) {
-      throw 'You need to use "withClerkMiddleware" in your Next.js middleware.js file. See https://nextjs.org/docs/advanced-features/middleware.';
+      throw 'You need to use "withClerkMiddleware" in your Next.js middleware.js file. See https://clerk.dev/docs/quickstarts/get-started-with-nextjs.';
     }
 
     // Signed in case
-    if (authResult === AuthResult.StandardIn) {
+    if (authResult === AuthResult.StandardSignedIn) {
       // Get the token from header or cookie
 
       const headerToken = getHeader(req, 'authorization')?.replace('Bearer ', '');
@@ -37,6 +37,12 @@ export function createGetAuth(sessions: SessionsApi) {
     }
 
     // Signed out case assumed
-    return createSignedOutState();
+    return {
+      sessionId: null,
+      userId: null,
+      orgId: null,
+      getToken: signedOutGetToken,
+      claims: null,
+    };
   };
 }

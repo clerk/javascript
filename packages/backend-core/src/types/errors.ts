@@ -13,7 +13,7 @@ export enum AuthErrorReason {
   UATMissing = 'uat-missing',
   CrossOriginReferrer = 'cross-origin-referrer',
   CookieAndUATMissing = 'cookie-and-uat-missing',
-  StandardOut = 'standard-out',
+  StandardSignedOut = 'standard-signed-out',
   CookieMissing = 'cookie-missing',
   CookieExpired = 'cookie-expired',
   CookieEarly = 'cookie-early',
