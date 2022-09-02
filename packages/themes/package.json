@@ -16,8 +16,8 @@
   ],
   "author": "Clerk",
   "source": "src/index.js",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "main": "dist/themes/src/index.js",
+  "typings": "dist/themes/src/index.d.ts",
   "files": [
     "dist"
   ],
