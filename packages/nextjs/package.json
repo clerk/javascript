@@ -22,6 +22,8 @@
     "api.js",
     "edge-middleware.js",
     "edge-middleware.d.ts",
+    "server.d.ts",
+    "server.js",
     "ssr.d.ts",
     "ssr.js"
   ],

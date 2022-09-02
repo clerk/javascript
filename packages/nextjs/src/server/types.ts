@@ -1,0 +1,40 @@
+import { AuthErrorReason, ClerkBackendAPI, Organization, Session, User } from '@clerk/backend-core';
+import { ClerkJWTClaims, ServerGetToken } from '@clerk/types';
+import { IncomingMessage } from 'http';
+import { NextApiRequest } from 'next';
+import { NextApiRequestCookies } from 'next/dist/server/api-utils';
+import { NextRequest } from 'next/server';
+
+// Request contained in GetServerSidePropsContext, has cookies but not query
+type GsspRequest = IncomingMessage & {
+  cookies: NextApiRequestCookies;
+};
+
+export type RequestLike = NextRequest | NextApiRequest | GsspRequest;
+
+export const SESSION_COOKIE_NAME = '__session';
+export const AUTH_RESULT = 'Auth-Result';
+export const NEXT_REWRITE_HEADER = 'x-middleware-rewrite';
+export const NEXT_RESUME_HEADER = 'x-middleware-next';
+export const NEXT_REDIRECT_HEADER = 'Location';
+
+// TODO consolidate AuthData declarations across repo
+export type AuthData = {
+  sessionId: string | null;
+  session: Session | undefined | null;
+  userId: string | null;
+  user: User | undefined | null;
+  orgId: string | null | undefined;
+  organization: Organization | undefined | null;
+  getToken: ServerGetToken;
+  claims: ClerkJWTClaims | null;
+};
+
+enum AuthResultExt {
+  StandardIn = 'standard-in',
+}
+
+export const AuthResult = { ...AuthResultExt, ...AuthErrorReason };
+export type AuthResult = typeof AuthResult;
+
+export type SessionsApi = InstanceType<typeof ClerkBackendAPI>['sessions'];

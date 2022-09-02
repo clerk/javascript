@@ -43,6 +43,7 @@ export const createSignedOutState = () => {
     sessionId: null,
     session: null,
     userId: null,
+    orgId: null,
     user: null,
     getToken: signedOutGetToken,
     claims: null,
