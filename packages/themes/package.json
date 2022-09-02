@@ -1,6 +1,6 @@
 {
   "name": "@clerk/themes",
-  "version": "1.2.7-staging.0",
+  "version": "1.2.7",
   "license": "MIT",
   "description": "Themes for the Clerk auth components",
   "keywords": [
