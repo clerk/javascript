@@ -50,14 +50,17 @@ function _SignUpStart(): JSX.Element {
     emailAddress: useFormControl('emailAddress', '', { type: 'email', label: 'Email address' }),
     username: useFormControl('username', '', { type: 'text', label: 'Username' }),
     phoneNumber: useFormControl('phoneNumber', '', { type: 'tel', label: 'Phone number' }),
-    password: useFormControl('password', '', { type: 'password', label: 'Password' }),
+    password: useFormControl('password', '', {
+      type: 'password',
+      label: 'Password',
+    }),
+    ticket: useFormControl(
+      'ticket',
+      getClerkQueryParam('__clerk_ticket') || getClerkQueryParam('__clerk_invitation_token') || '',
+    ),
   } as const;
-  const ticket = useFormControl(
-    'ticket',
-    getClerkQueryParam('__clerk_ticket') || getClerkQueryParam('__clerk_invitation_token') || '',
-  );
 
-  const hasTicket = !!ticket.value;
+  const hasTicket = !!formState.ticket.value;
   const hasEmail = !!formState.emailAddress.value;
   const isProgressiveSignUp = userSettings.signUp.progressive;
 
@@ -70,13 +73,13 @@ function _SignUpStart(): JSX.Element {
   });
 
   const handleTokenFlow = () => {
-    if (!ticket.value) {
+    if (!formState.ticket.value) {
       return;
     }
     status.setLoading();
     card.setLoading();
     signUp
-      .create({ strategy: 'ticket', ticket: ticket.value })
+      .create({ strategy: 'ticket', ticket: formState.ticket.value })
       .then(signUp => {
         formState.emailAddress.setValue(signUp.emailAddress || '');
         // In case we are in a Ticket flow and the sign up is not complete yet, update the state
@@ -95,7 +98,7 @@ function _SignUpStart(): JSX.Element {
       })
       .catch(err => {
         /* Clear ticket values when an error occurs in the initial sign up attempt */
-        ticket.setValue('');
+        formState.ticket.setValue('');
         handleError(err, [], card.setError);
       })
       .finally(() => {
@@ -155,8 +158,11 @@ function _SignUpStart(): JSX.Element {
     );
 
     if (fields.ticket) {
+      const noop = () => {
+        //
+      };
       // fieldsToSubmit: Constructing a fake fields object for strategy.
-      fieldsToSubmit.push({ id: 'strategy', value: 'ticket' } as any);
+      fieldsToSubmit.push({ id: 'strategy', value: 'ticket', setValue: noop, onChange: noop, setError: noop } as any);
     }
 
     // In case of emailOrPhone (both email & phone are optional) and neither of them is provided,
