@@ -34,7 +34,7 @@ the <a href="https://clerk.dev/docs/reference/node/getting-started?utm_source=gi
 
 ### Prerequisites
 
-- Node.js v12+
+- Node.js v14+
 
 ## Installation
 
