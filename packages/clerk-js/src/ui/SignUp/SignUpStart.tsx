@@ -5,7 +5,7 @@ import { withRedirectToHome } from '../../ui/common/withRedirectToHome';
 import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from '../../ui/contexts';
 import { useNavigate } from '../../ui/hooks';
 import { getClerkQueryParam } from '../../utils/getClerkQueryParam';
-import { descriptors, Flex, Flow } from '../customizables';
+import { descriptors, Flex, Flow, useAppearance } from '../customizables';
 import {
   Card,
   CardAlert,
@@ -34,6 +34,7 @@ function _SignUpStart(): JSX.Element {
   const card = useCardState();
   const status = useLoadingStatus();
   const signUp = useCoreSignUp();
+  const { showOptionalFields } = useAppearance().parsedLayout;
   const { userSettings, displayConfig } = useEnvironment();
   const { navigate } = useNavigate();
   const { attributes } = userSettings;
@@ -200,6 +201,9 @@ function _SignUpStart(): JSX.Element {
   const hasSocialOrWeb3Buttons =
     !!userSettings.socialProviderStrategies.length || !!userSettings.web3FirstFactors.length;
 
+  const visibleFields = Object.entries(fields).filter(([_, opts]) => showOptionalFields || opts?.required);
+  const shouldShowForm = showFormFields(userSettings) && visibleFields.length > 0;
+
   return (
     <Flow.Part part='start'>
       <Card>
@@ -215,8 +219,8 @@ function _SignUpStart(): JSX.Element {
         >
           <SocialButtonsReversibleContainer>
             {(!hasTicket || missingRequirementsWithTicket) && <SignUpSocialButtons />}
-            {hasSocialOrWeb3Buttons && showFormFields(userSettings) && <Divider />}
-            {showFormFields(userSettings) && (
+            {hasSocialOrWeb3Buttons && shouldShowForm && <Divider />}
+            {shouldShowForm && (
               <SignUpForm
                 handleSubmit={handleSubmit}
                 fields={fields}
