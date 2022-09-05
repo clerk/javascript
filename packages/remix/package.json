@@ -18,7 +18,6 @@
   "typings": "dist/index.d.ts",
   "files": [
     "dist",
-    "src",
     "api.server.d.ts",
     "api.server.js",
     "edge.js",

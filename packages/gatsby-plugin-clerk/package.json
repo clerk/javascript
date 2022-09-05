@@ -18,7 +18,6 @@
   "typings": "dist/index.d.ts",
   "files": [
     "dist",
-    "src",
     "gatsby-browser.js",
     "gatsby-ssr.js",
     "gatsby-node.js",

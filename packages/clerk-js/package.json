@@ -17,8 +17,7 @@
   "module": "dist/clerk.js",
   "typings": "dist/types/src/index.d.ts",
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "publishConfig": {
     "access": "public"
