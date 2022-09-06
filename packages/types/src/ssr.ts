@@ -9,6 +9,7 @@ export type ServerGetToken = (options?: ServerGetTokenOptions) => Promise<string
 export type ServerSideAuth = {
   sessionId: string | null;
   userId: string | null;
+  actorId: string | null;
   getToken: ServerGetToken;
   claims: ClerkJWTClaims | null;
 };
