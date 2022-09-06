@@ -9,6 +9,7 @@ export interface SessionResource extends ClerkResource {
   abandonAt: Date;
   lastActiveToken: TokenResource | null;
   lastActiveOrganizationId: string | null;
+  actorId: string | null;
   user: UserResource | null;
   publicUserData: PublicUserData;
   end: () => Promise<SessionResource>;
