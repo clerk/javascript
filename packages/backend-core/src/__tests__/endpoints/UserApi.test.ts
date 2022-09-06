@@ -205,3 +205,15 @@ test('getCount() returns a valid number response', async () => {
   const userCount = await TestClerkAPI.users.getCount();
   expect(userCount).toEqual(1);
 });
+
+test('disableUserMFA() throws an error without user ID', async () => {
+  await expect(TestClerkAPI.users.disableUserMFA('')).rejects.toThrow('A valid resource ID is required.');
+});
+
+test('disableUserMFA() disables all MFA methods of a user', async () => {
+  const id = 'user_1oBNj55jOjSK9rOYrT5QHqj7eaK';
+
+  nock(defaultServerAPIUrl).delete(`/v1/users/${id}/mfa`).reply(200, { user_id: 'user_1oBNj55jOjSK9rOYrT5QHqj7eaK' });
+
+  await TestClerkAPI.users.disableUserMFA(id);
+});

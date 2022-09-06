@@ -51,6 +51,7 @@ Reference of the methods supported in the Clerk Backend API wrapper. [API refere
   - [createUser(params)](#createuserparams)
   - [updateUser(userId, params)](#updateuseruserid-params)
   - [deleteUser(userId)](#deleteuseruserid)
+  - [disableUserMFA(userId)](#disableusermfauserid)
 - [Email operations](#email-operations)
   - [createEmail({ fromEmailName, subject, body, emailAddressId })](#createemail-fromemailname-subject-body-emailaddressid-)
 - [SMS Message operations](#sms-message-operations)
@@ -593,6 +594,15 @@ Deletes a user given their id, if the id is valid. Throws an error otherwise.
 ```ts
 const userId = 'my-user-id';
 const user = await clerkAPI.users.deleteUser(userId);
+```
+
+#### disableUserMFA(userId)
+
+Disables all MFA methods of a user given their id. Throws an error otherwise.
+
+```ts
+const userId = 'my-user-id';
+await clerkAPI.users.disableUserMFA(userId);
 ```
 
 ## Email operations

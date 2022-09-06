@@ -115,4 +115,12 @@ export class UserAPI extends AbstractAPI {
       path: joinPaths(basePath, userId, 'oauth_access_tokens', provider),
     });
   }
+
+  public async disableUserMFA(userId: string) {
+    this.requireId(userId);
+    return this.APIClient.request<User>({
+      method: 'DELETE',
+      path: joinPaths(basePath, userId, 'mfa'),
+    });
+  }
 }
