@@ -34,7 +34,7 @@ const defaultLayout: ParsedLayout = {
   socialButtonsPlacement: 'top',
   socialButtonsVariant: 'auto',
   logoImageUrl: '',
-  showOptionalFields: false,
+  showOptionalFields: true,
   helpPageUrl: '',
   privacyPageUrl: '',
   termsPageUrl: '',
