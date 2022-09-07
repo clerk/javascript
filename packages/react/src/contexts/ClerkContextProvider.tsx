@@ -47,19 +47,26 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
   const clerkCtx = React.useMemo(() => ({ value: clerk }), [clerkLoaded]);
   const clientCtx = React.useMemo(() => ({ value: state.client }), [state.client]);
 
+  const { sessionId, session, userId, user } = derivedState;
+  const actorId = session?.actorId || null;
+
   const authCtx = React.useMemo(() => {
     return {
-      value: { sessionId: derivedState.sessionId, userId: derivedState.userId },
+      value: {
+        sessionId,
+        userId,
+        actorId,
+      },
     };
-  }, [derivedState.sessionId, derivedState.userId]);
+  }, [sessionId, userId, actorId]);
 
   const userCtx = React.useMemo(() => {
-    return { value: derivedState.user };
-  }, [derivedState.userId, derivedState.user]);
+    return { value: user };
+  }, [userId, user]);
 
   const sessionCtx = React.useMemo(() => {
-    return { value: derivedState.session };
-  }, [derivedState.sessionId, derivedState.session]);
+    return { value: session };
+  }, [sessionId, session]);
 
   const organizationCtx = React.useMemo(() => {
     return {

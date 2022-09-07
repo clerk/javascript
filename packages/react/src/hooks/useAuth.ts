@@ -11,6 +11,7 @@ type UseAuthReturn =
       isSignedIn: undefined;
       userId: undefined;
       sessionId: undefined;
+      actorId: null;
       signOut: SignOut;
       getToken: GetToken;
     }
@@ -19,6 +20,7 @@ type UseAuthReturn =
       isSignedIn: false;
       userId: null;
       sessionId: null;
+      actorId: null;
       signOut: SignOut;
       getToken: GetToken;
     }
@@ -27,6 +29,7 @@ type UseAuthReturn =
       isSignedIn: true;
       userId: string;
       sessionId: string;
+      actorId: string | null;
       signOut: SignOut;
       getToken: GetToken;
     };
@@ -73,7 +76,7 @@ type UseAuth = () => UseAuthReturn;
  * }
  */
 export const useAuth: UseAuth = () => {
-  const { sessionId, userId } = useAuthContext();
+  const { sessionId, userId, actorId } = useAuthContext();
   const isomorphicClerk = useIsomorphicClerkContext();
 
   const getToken: GetToken = createGetToken(isomorphicClerk);
@@ -85,6 +88,7 @@ export const useAuth: UseAuth = () => {
       isSignedIn: undefined,
       sessionId,
       userId,
+      actorId: null,
       signOut,
       getToken,
     };
@@ -96,6 +100,7 @@ export const useAuth: UseAuth = () => {
       isSignedIn: false,
       sessionId,
       userId,
+      actorId: null,
       signOut,
       getToken,
     };
@@ -107,6 +112,7 @@ export const useAuth: UseAuth = () => {
       isSignedIn: true,
       sessionId,
       userId,
+      actorId,
       signOut,
       getToken,
     };
