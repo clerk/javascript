@@ -24,6 +24,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
   theme!: DisplayThemeJSON;
   userProfileUrl!: string;
   clerkJSVersion?: string;
+  experimental__forceOauthFirst?: boolean;
 
   public constructor(data: DisplayConfigJSON) {
     super();
@@ -52,6 +53,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     this.branded = data.branded;
     this.supportEmail = data.support_email || '';
     this.clerkJSVersion = data.clerk_js_version;
+    this.experimental__forceOauthFirst = data.experimental_force_oauth_first || false;
     return this;
   }
 }

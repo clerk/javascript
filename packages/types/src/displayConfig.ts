@@ -26,6 +26,7 @@ export interface DisplayConfigJSON {
   theme: DisplayThemeJSON;
   user_profile_url: string;
   clerk_js_version?: string;
+  experimental_force_oauth_first?: boolean;
 }
 
 export interface DisplayConfigResource extends ClerkResource {
@@ -50,4 +51,5 @@ export interface DisplayConfigResource extends ClerkResource {
   theme: DisplayThemeJSON;
   userProfileUrl: string;
   clerkJSVersion?: string;
+  experimental__forceOauthFirst?: boolean;
 }
