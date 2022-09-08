@@ -1,3 +1,4 @@
+import { ActJWTClaim, ServerSideAuth } from '@clerk/types';
 import cookie from 'cookie';
 import type { GetServerDataProps } from 'gatsby';
 
@@ -8,10 +9,17 @@ import { GetServerDataPropsWithAuth } from './types';
  * @internal
  */
 export function injectAuthIntoContext(context: GetServerDataProps, authData: AuthData): GetServerDataPropsWithAuth {
-  const { user, session, ...auth } = authData || {};
-  // FIXME: Add auth.claims addition
-  // @ts-ignore
-  return { ...context, auth, user, session };
+  const { user, session, claims, ...auth } = authData || {};
+  return {
+    ...context,
+    auth: {
+      ...auth,
+      claims,
+      actorId: (claims?.act as ActJWTClaim)?.sub || null,
+    } as ServerSideAuth,
+    user: user || null,
+    session: session || null,
+  };
 }
 
 /**

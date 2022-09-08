@@ -65,6 +65,11 @@ export interface ClerkJWTClaims {
   azp?: string;
 
   /**
+   * JWT Actor - [RFC8693](https://www.rfc-editor.org/rfc/rfc8693.html#name-act-actor-claim).
+   */
+  act?: ActJWTClaim;
+
+  /**
    * @deprecated - Add orgs to your session token using the "user.organizations" shortcode in JWT Templates instead
    */
   orgs?: Record<string, MembershipRole>;
@@ -88,6 +93,10 @@ export interface ClerkJWTClaims {
    * Any other JWT Claim Set member.
    */
   [propName: string]: unknown;
+}
+
+export interface ActJWTClaim {
+  sub: string;
 }
 
 export type OrganizationsJWTClaim = Record<string, MembershipRole>;

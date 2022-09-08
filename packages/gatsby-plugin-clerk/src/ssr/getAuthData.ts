@@ -1,7 +1,7 @@
 import { AuthStatus, createGetToken, createSignedOutState, Session, User } from '@clerk/backend-core';
 import { isDevelopmentOrStaging } from '@clerk/backend-core/src/util/clerkApiKey';
 import Clerk, { sessions, users } from '@clerk/clerk-sdk-node';
-import { ServerGetToken } from '@clerk/types';
+import { ClerkJWTClaims, ServerGetToken } from '@clerk/types';
 import { GetServerDataProps } from 'gatsby';
 
 import { WithServerAuthOptions } from './types';
@@ -13,6 +13,7 @@ export type AuthData = {
   userId: string | null;
   user: User | undefined | null;
   getToken: ServerGetToken;
+  claims: ClerkJWTClaims | null;
 };
 
 type GetAuthDataReturn =
@@ -71,7 +72,7 @@ export async function getAuthData(
       headerToken,
       fetcher: (...args) => sessions.getToken(...args),
     });
-    return { authData: { sessionId, userId, user, session, getToken } };
+    return { authData: { sessionId, userId, user, session, getToken, claims: sessionClaims } };
   } catch (e) {
     return { authData: createSignedOutState() };
   }
