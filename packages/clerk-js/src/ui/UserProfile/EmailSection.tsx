@@ -54,10 +54,19 @@ const EmailAccordion = ({ email }: { email: EmailAddressResource }) => {
       badge={isPrimary ? <Badge>Primary</Badge> : undefined}
     >
       <Col gap={4}>
-        {isPrimary && (
+        {isPrimary && isVerified && (
           <LinkButtonWithDescription
             title='Primary email address'
             subtitle='This email address is the primary email address'
+          />
+        )}
+        {isPrimary && !isVerified && (
+          <LinkButtonWithDescription
+            title='Primary email address'
+            titleLabel={<Badge colorScheme='warning'>Unverified</Badge>}
+            subtitle='This email address is the primary email address'
+            actionLabel='Complete verification'
+            onClick={() => navigate(`email-address/${email.id}`)}
           />
         )}
         {!isPrimary && isVerified && (
