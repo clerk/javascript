@@ -9,6 +9,7 @@ export function injectAuthIntoRequest(req: NextRequest, authData: AuthData): Req
     sessionId,
     getToken,
     claims,
+    actorId: claims?.act?.sub || null,
   };
 
   /* Object.assign is used here as NextRequest properties also include Symbols */

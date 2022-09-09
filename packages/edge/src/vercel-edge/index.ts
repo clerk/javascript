@@ -126,10 +126,7 @@ function vercelMiddlewareAuth(
         return signedOutResponse(errorReason);
       }
 
-      const response = (await handler(
-        injectAuthIntoRequest(req, createSignedOutState()),
-        event,
-      )) as NextMiddlewareResult;
+      const response = await handler(injectAuthIntoRequest(req, createSignedOutState()), event);
       response?.headers.set('Auth-Result', errorReason || '');
       return response;
     }
