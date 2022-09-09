@@ -23,6 +23,15 @@ const mockGetAuthStateClaims = {
   sid: 'session_id',
 };
 
+const mockActClaim = {
+  sub: 'actor_id',
+};
+
+const mockGetAuthStateClaimsWithAct = {
+  ...mockGetAuthStateClaims,
+  act: mockActClaim,
+};
+
 const mockGetAuthStateResult = {
   sessionClaims: mockGetAuthStateClaims,
   status: AuthStatus.SignedIn,
@@ -32,6 +41,7 @@ const mockAuthProp = {
   getToken: mockGetToken,
   userId: 'user_id',
   sessionId: 'session_id',
+  actorId: null,
   claims: mockGetAuthStateClaims,
 };
 
@@ -39,10 +49,15 @@ const mockAuthSignedOutProp = {
   getToken: mockGetToken,
   userId: null,
   sessionId: null,
+  actorId: null,
   claims: null,
 };
 
 const mockToken = jwt.sign(mockGetAuthStateClaims, 'mock-secret');
+const mockTokenWithActClaim = jwt.sign(
+  mockGetAuthStateClaimsWithAct,
+  'mock-secret'
+);
 
 afterEach(() => {
   mockNext.mockReset();
@@ -95,6 +110,29 @@ test('expressWithAuth with Authorization header', async () => {
   expect(mockNext).toHaveBeenCalledWith();
 });
 
+test('expressWithAuth with Authorization header containing act claim', async () => {
+  const req = {
+    headers: { authorization: mockTokenWithActClaim },
+  } as WithAuthProp<Request>;
+  const res = {} as Response;
+
+  const clerk = Clerk.getInstance();
+  clerk.base.getAuthState = jest.fn().mockReturnValueOnce({
+    ...mockGetAuthStateResult,
+    sessionClaims: mockGetAuthStateClaimsWithAct,
+  });
+
+  const clerkWithAuthMiddleware = clerk.expressWithAuth();
+  await clerkWithAuthMiddleware(req, res, mockNext as NextFunction);
+
+  expect(req.auth).toEqual({
+    ...mockAuthProp,
+    claims: mockGetAuthStateClaimsWithAct,
+    actorId: mockActClaim.sub,
+  });
+  expect(mockNext).toHaveBeenCalledWith();
+});
+
 test('expressWithAuth with Authorization header in Bearer format', async () => {
   const req = {
     headers: { authorization: `Bearer ${mockToken}` },
@@ -110,6 +148,29 @@ test('expressWithAuth with Authorization header in Bearer format', async () => {
   await clerkWithAuthMiddleware(req, res, mockNext as NextFunction);
 
   expect(req.auth).toEqual(mockAuthProp);
+  expect(mockNext).toHaveBeenCalledWith();
+});
+
+test('expressWithAuth with Authorization header in Bearer format and act claim', async () => {
+  const req = {
+    headers: { authorization: `Bearer ${mockToken}` },
+  } as WithAuthProp<Request>;
+  const res = {} as Response;
+
+  const clerk = Clerk.getInstance();
+  clerk.base.getAuthState = jest.fn().mockReturnValueOnce({
+    ...mockGetAuthStateResult,
+    sessionClaims: mockGetAuthStateClaimsWithAct,
+  });
+
+  const clerkWithAuthMiddleware = clerk.expressWithAuth();
+  await clerkWithAuthMiddleware(req, res, mockNext as NextFunction);
+
+  expect(req.auth).toEqual({
+    ...mockAuthProp,
+    claims: mockGetAuthStateClaimsWithAct,
+    actorId: mockActClaim.sub,
+  });
   expect(mockNext).toHaveBeenCalledWith();
 });
 

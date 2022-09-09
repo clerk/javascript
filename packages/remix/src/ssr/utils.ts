@@ -9,8 +9,13 @@ import { LoaderFunctionArgs, LoaderFunctionArgsWithAuth } from './types';
  * @internal
  */
 export function injectAuthIntoRequest(args: LoaderFunctionArgs, authData: AuthData): LoaderFunctionArgsWithAuth {
-  const { user, session, userId, sessionId, getToken } = authData;
-  (args.request as any).auth = { userId, sessionId, getToken };
+  const { user, session, userId, sessionId, getToken, claims } = authData;
+  (args.request as any).auth = {
+    userId,
+    sessionId,
+    getToken,
+    actorId: claims?.act?.sub || null,
+  };
   (args.request as any).user = user;
   (args.request as any).session = session;
   return args as LoaderFunctionArgsWithAuth;

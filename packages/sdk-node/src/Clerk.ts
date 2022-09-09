@@ -36,6 +36,7 @@ export type LooseAuthProp = {
   auth: {
     sessionId: string | null;
     userId: string | null;
+    actorId: string | null;
     getToken: ServerGetToken;
     claims: ClerkJWTClaims | null;
   };
@@ -47,6 +48,7 @@ export type StrictAuthProp = {
   auth: {
     sessionId: string;
     userId: string;
+    actorId: string | null;
     getToken: ServerGetToken;
     claims: ClerkJWTClaims;
   };
@@ -305,6 +307,7 @@ export default class Clerk extends ClerkBackendAPI {
           req.auth = {
             sessionId: sessionClaims?.sid,
             userId: sessionClaims?.sub,
+            actorId: sessionClaims?.act?.sub || null,
             getToken: createGetToken({
               headerToken,
               cookieToken,
@@ -326,6 +329,7 @@ export default class Clerk extends ClerkBackendAPI {
         req.auth = {
           userId: null,
           sessionId: null,
+          actorId: null,
           getToken: createSignedOutState().getToken,
           claims: null,
         } as WithAuthProp<Request>;

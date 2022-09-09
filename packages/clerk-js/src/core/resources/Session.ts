@@ -14,6 +14,7 @@ export class Session extends BaseResource implements SessionResource {
   lastActiveAt!: Date;
   lastActiveToken!: Token | null;
   lastActiveOrganizationId!: string | null;
+  actorId!: string | null;
   user!: UserResource | null;
   publicUserData!: PublicUserData;
   expireAt!: Date;
@@ -87,6 +88,10 @@ export class Session extends BaseResource implements SessionResource {
     return tokenResolver.then(res => res.getRawString());
   };
 
+  isImpersonated = (): boolean => {
+    return !!this.actorId;
+  };
+
   #hydrateCache = (token: Token | null) => {
     if (token && SessionTokenCache.size() === 0) {
       SessionTokenCache.set({
@@ -130,6 +135,7 @@ export class Session extends BaseResource implements SessionResource {
     this.abandonAt = unixEpochToDate(data.abandon_at);
     this.lastActiveAt = unixEpochToDate(data.last_active_at);
     this.lastActiveOrganizationId = data.last_active_organization_id;
+    this.actorId = data.actor_id;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     this.user = new User(data.user);
