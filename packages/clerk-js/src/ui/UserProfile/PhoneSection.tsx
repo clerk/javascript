@@ -65,10 +65,19 @@ const PhoneAccordion = ({ phone }: { phone: PhoneNumberResource }) => {
       badge={isPrimary ? <Badge>Primary</Badge> : undefined}
     >
       <Col gap={4}>
-        {isPrimary && (
+        {isPrimary && isVerified && (
           <LinkButtonWithDescription
             title='Primary phone number'
             subtitle='This phone number is the primary phone number'
+          />
+        )}
+        {isPrimary && !isVerified && (
+          <LinkButtonWithDescription
+            title='Primary phone number'
+            titleLabel={<Badge colorScheme='warning'>Unverified</Badge>}
+            subtitle='This phone number is the primary phone number'
+            actionLabel='Complete verification'
+            onClick={() => navigate(`phone-number/${phone.id}`)}
           />
         )}
         {!isPrimary && isVerified && (
