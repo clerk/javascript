@@ -37,13 +37,9 @@ function getScriptSrc({ publishableKey, frontendApi, scriptUrl, scriptVariant = 
 
   let scriptHost: string;
   if (publishableKey) {
-    const pkParts = publishableKey.split('.');
-    if (pkParts.length <= 1) {
-      // TODO: Make this smart per environment
-      return 'https://js.lclclerk.com/npm/clerk.browser.js';
-    } else {
-      scriptHost = atob(pkParts[1]).trim();
-    }
+    const pkParts = publishableKey.split('_');
+    console.log('pkparts', pkParts);
+    scriptHost = atob(pkParts[2]).trim();
   } else if (frontendApi) {
     scriptHost = frontendApi;
   } else {

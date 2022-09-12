@@ -15,7 +15,6 @@ export type CreateDevBrowserHandlerOptions = {
   syncMode: 'cookies' | 'urlDecoration';
   frontendApi: string;
   fapiClient: FapiClient;
-  instanceKey?: string;
 };
 
 // export type DevBrowserHandler = ReturnType<typeof createDevBrowserHandler>;
@@ -23,12 +22,11 @@ export default function createDevBrowserHandler({
   frontendApi,
   fapiClient,
   syncMode,
-  instanceKey,
 }: CreateDevBrowserHandlerOptions): DevBrowserHandler {
   const cookieHandler = createCookieHandler();
 
   const localStorageKey =
-    syncMode === 'urlDecoration' ? `${DEV_BROWSER_SSO_JWT_KEY}_${instanceKey}` : DEV_BROWSER_SSO_JWT_KEY;
+    syncMode === 'urlDecoration' ? `${DEV_BROWSER_SSO_JWT_KEY}_${frontendApi}` : DEV_BROWSER_SSO_JWT_KEY;
 
   function getDevBrowserJWT() {
     return localStorage.getItem(localStorageKey);

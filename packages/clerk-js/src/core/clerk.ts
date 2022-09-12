@@ -97,7 +97,6 @@ export default class Clerk implements ClerkInterface {
   public user?: UserResource | null;
   public frontendApi: string;
   public publishableKey?: string;
-  public instanceKey?: string;
   public instanceType?: 'test' | 'live';
   public syncMode: 'cookies' | 'urlDecoration';
 
@@ -145,10 +144,7 @@ export default class Clerk implements ClerkInterface {
       }
       this.syncMode = 'urlDecoration';
       this.instanceType = pkParts[1];
-      this.frontendApi = atob(pkParts[2]);
-      if (this.instanceType === 'test') {
-        this.instanceKey = pkParts[3];
-      }
+      this.frontendApi = atob(pkParts[2]).trim();
     }
     this.#fapiClient = createFapiClient(this);
     BaseResource.clerk = this;
@@ -937,7 +933,6 @@ export default class Clerk implements ClerkInterface {
       frontendApi: this.frontendApi,
       fapiClient: this.#fapiClient,
       syncMode: this.syncMode,
-      instanceKey: this.instanceKey,
     });
 
     if (this.instanceType === 'live') {
