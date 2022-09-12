@@ -100,6 +100,10 @@ export default function createFapiClient(clerkInstance: Clerk): FapiClient {
       searchParams.append('rotating_token_nonce', rotatingTokenNonce);
     }
 
+    if (clerkInstance.instanceKey) {
+      searchParams.append('_clerk_pk', clerkInstance.instanceKey);
+    }
+
     // Due to a known Safari bug regarding CORS requests, we are forced to always use GET or POST method.
     // The original HTTP method is used as a query string parameter instead of as an actual method to
     // avoid triggering a CORS OPTION request as it currently breaks cookie dropping in Safari.

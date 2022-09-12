@@ -96,6 +96,10 @@ export default class Clerk implements ClerkInterface {
   public organization?: OrganizationResource | null;
   public user?: UserResource | null;
   public frontendApi: string;
+  public publishableKey?: string;
+  public instanceKey?: string;
+  public instanceType?: 'test' | 'live';
+  public syncMode: 'cookies' | 'urlDecoration';
 
   #environment?: EnvironmentResource | null;
   #componentControls?: ComponentControls | null;
@@ -118,17 +122,35 @@ export default class Clerk implements ClerkInterface {
     return this.#isReady;
   }
 
-  public constructor(frontendApi: string) {
-    if (!frontendApi) {
+  public constructor(publishableKeyOrFrontendApi: string) {
+    if (!publishableKeyOrFrontendApi) {
+      // TODO: Refactor the error
       clerkErrorNoFrontendApi();
     }
-    if (!validateFrontendApi(frontendApi)) {
-      clerkErrorInvalidFrontendApi();
+
+    if (publishableKeyOrFrontendApi.startsWith('clerk.')) {
+      const frontendApi = publishableKeyOrFrontendApi;
+      if (!validateFrontendApi(frontendApi)) {
+        clerkErrorInvalidFrontendApi();
+      }
+      this.syncMode = 'cookies';
+      this.frontendApi = frontendApi;
+      this.instanceType = isDevOrStagingUrl(frontendApi) ? 'test' : 'live';
+    } else {
+      this.publishableKey = publishableKeyOrFrontendApi;
+      const pkParts = this.publishableKey.split('_');
+      if (pkParts[1] !== 'test' && pkParts[1] !== 'live') {
+        // TODO: Write a better error.
+        throw new Error('foo');
+      }
+      this.syncMode = 'urlDecoration';
+      this.instanceType = pkParts[1];
+      this.frontendApi = atob(pkParts[2]);
+      if (this.instanceType === 'test') {
+        this.instanceKey = pkParts[3];
+      }
     }
-
-    this.frontendApi = frontendApi;
     this.#fapiClient = createFapiClient(this);
-
     BaseResource.clerk = this;
   }
 
@@ -542,7 +564,7 @@ export default class Clerk implements ClerkInterface {
     }
     const { signInUrl } = this.#environment.displayConfig;
     const url = appendAsQueryParams(signInUrl, opts);
-    return this.navigate(url);
+    return this.redirectWithAuth(url);
   };
 
   public redirectToSignUp = async (options?: RedirectOptions): Promise<unknown> => {
@@ -555,14 +577,27 @@ export default class Clerk implements ClerkInterface {
     }
     const { signUpUrl } = this.#environment.displayConfig;
     const url = appendAsQueryParams(signUpUrl, opts);
-    return this.navigate(url);
+    return this.redirectWithAuth(url);
   };
 
   public redirectToUserProfile = async (): Promise<unknown> => {
     if (!this.#environment || !this.#environment.displayConfig) {
       return;
     }
-    return this.navigate(this.#environment.displayConfig.userProfileUrl);
+    return this.redirectWithAuth(this.#environment.displayConfig.userProfileUrl);
+  };
+
+  public redirectWithAuth = async (to: string): Promise<unknown> => {
+    if (this.instanceType === 'live') {
+      return this.navigate(to);
+    }
+
+    const toURL = new URL(to, window.location.href);
+    if (toURL.origin !== window.location.origin) {
+      toURL.hash = `${toURL.hash}&_clerk_test_jwt=${this.#devBrowserHandler?.getDevBrowserJWT()}`;
+    }
+
+    return this.navigate(this.#temporaryPostProcessAccounts(toURL.href));
   };
 
   public redirectToOrganizationProfile = async (): Promise<unknown> => {
@@ -880,20 +915,36 @@ export default class Clerk implements ClerkInterface {
     this.#componentControls?.updateProps(props);
   };
 
+  // TODO: Move this to FAPI based on whether PK is passed
+  #temporaryPostProcessAccounts = (to: string) => {
+    if (this.instanceType === 'test' && this.syncMode === 'urlDecoration' && this.publishableKey) {
+      const toURL = new URL(to, window.location.href);
+      if (!toURL.host.startsWith('accounts.')) {
+        return to;
+      }
+      const hostTransform = toURL.host.replace('accounts.', 'clerk.').replaceAll('-', '-x-').replaceAll('.', '-');
+      toURL.host = `${hostTransform}.shared.lclclerk.com`;
+      return toURL.href;
+    }
+    return to;
+  };
+
   #loadInStandardBrowser = async (): Promise<void> => {
     this.#authService = new AuthenticationService(this);
+    this.#pageLifecycle = createPageLifecycle();
 
     this.#devBrowserHandler = createDevBrowserHandler({
       frontendApi: this.frontendApi,
       fapiClient: this.#fapiClient,
+      syncMode: this.syncMode,
+      instanceKey: this.instanceKey,
     });
 
-    this.#pageLifecycle = createPageLifecycle();
-
-    const isFapiDevOrStaging = isDevOrStagingUrl(this.frontendApi);
-    const isInAccountsHostedPages = isAccountsHostedPages(window?.location.hostname);
-
-    await this.#devBrowserHandler.setup({ purge: !isFapiDevOrStaging });
+    if (this.instanceType === 'live') {
+      await this.#devBrowserHandler.clear();
+    } else {
+      await this.#devBrowserHandler.setup();
+    }
 
     this.#setupListeners();
 
@@ -902,7 +953,8 @@ export default class Clerk implements ClerkInterface {
       retries++;
 
       try {
-        const shouldTouchEnv = isFapiDevOrStaging && !isInAccountsHostedPages;
+        const isInAccountsHostedPages = isAccountsHostedPages(window?.location.hostname);
+        const shouldTouchEnv = this.instanceType === 'test' && !isInAccountsHostedPages;
 
         const [environment, client] = await Promise.all([
           Environment.getInstance().fetch({ touch: shouldTouchEnv }),
@@ -923,8 +975,10 @@ export default class Clerk implements ClerkInterface {
 
         break;
       } catch (err) {
-        if (isError(err, 'dev_browser_unauthenticated')) {
-          await this.#devBrowserHandler.setup({ purge: true });
+        if (isError(err, 'dev_browser_unauthenticated') && this.#devBrowserHandler) {
+          // Purge and try setup again
+          await this.#devBrowserHandler.clear();
+          await this.#devBrowserHandler.setup();
         } else {
           throw err;
         }

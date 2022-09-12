@@ -9,17 +9,29 @@ import { StructureContext, StructureContextStates } from './StructureContext';
 
 export interface ClerkProviderProps extends IsomorphicClerkOptions {
   children: React.ReactNode;
-  frontendApi?: string;
   initialState?: InitialState;
+  publishableKey?: string;
+  frontendApi?: string;
 }
 
 function ClerkProviderBase(props: ClerkProviderProps): JSX.Element {
-  const { initialState, children, Clerk, frontendApi, ...options } = props;
+  const { initialState, children, Clerk, frontendApi, publishableKey, ...options } = props;
+
+  // TODO: There should be a better way to type this
+  let keyOptions;
+  if (typeof frontendApi === 'string' && typeof publishableKey === 'undefined') {
+    keyOptions = { frontendApi: frontendApi, publishableKey: publishableKey };
+  } else if (typeof frontendApi === 'undefined' && typeof publishableKey === 'string') {
+    keyOptions = { frontendApi: frontendApi, publishableKey: publishableKey };
+  } else {
+    throw new Error('One of frontendApi or publishableKey must be set.');
+  }
+
   return (
     <StructureContext.Provider value={StructureContextStates.noGuarantees}>
       <ClerkContextProvider
         initialState={initialState}
-        isomorphicClerkOptions={{ frontendApi: frontendApi || '', Clerk, options }}
+        isomorphicClerkOptions={{ ...keyOptions, Clerk, options }}
       >
         {children}
       </ClerkContextProvider>

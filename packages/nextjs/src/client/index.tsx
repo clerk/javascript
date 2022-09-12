@@ -8,26 +8,42 @@ export * from '@clerk/clerk-react';
 const NO_FRONTEND_API_ERR =
   'The NEXT_PUBLIC_CLERK_FRONTEND_API environment variable must be set to use the ClerkProvider component.';
 
-type NextClerkProviderProps = {
-  children: React.ReactNode;
-  frontendApi?: string;
-} & IsomorphicClerkOptions;
+type NextClerkProviderProps =
+  | ({
+      children: React.ReactNode;
+      publishableKey?: string;
+      frontendApi: undefined;
+    } & IsomorphicClerkOptions)
+  | ({
+      children: React.ReactNode;
+      publishableKey: undefined;
+      frontendApi?: string;
+    } & IsomorphicClerkOptions);
 
 export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JSX.Element {
   // @ts-expect-error
   // Allow for overrides without making the type public
-  const { frontendApi, __clerk_ssr_state, authServerSideProps, clerkJSUrl, ...restProps } = rest;
+  const { frontendApi, publishableKey, authServerSideProps, __clerk_ssr_state, clerkJSUrl, ...restProps } = rest;
   const { push } = useRouter();
-
-  if (frontendApi == undefined && !process.env.NEXT_PUBLIC_CLERK_FRONTEND_API) {
-    throw Error(NO_FRONTEND_API_ERR);
-  }
 
   ReactClerkProvider.displayName = 'ReactClerkProvider';
 
+  const parsedFrontendApi = frontendApi || process.env.NEXT_PUBLIC_CLERK_FRONTEND_API;
+  const parsedPublishableKey = publishableKey || process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
+  // TODO: Improve error
+  let keyOptions;
+  if (typeof parsedFrontendApi === 'string' && typeof parsedPublishableKey === 'undefined') {
+    keyOptions = { frontendApi: parsedFrontendApi, publishableKey: parsedPublishableKey };
+  } else if (typeof parsedFrontendApi === 'undefined' && typeof parsedPublishableKey === 'string') {
+    keyOptions = { frontendApi: parsedFrontendApi, publishableKey: parsedPublishableKey };
+  } else {
+    throw new Error('One of frontendApi or publishableKey must be set.');
+  }
+
   return (
     <ReactClerkProvider
-      frontendApi={frontendApi || process.env.NEXT_PUBLIC_CLERK_FRONTEND_API}
+      {...keyOptions}
       clerkJSUrl={clerkJSUrl || process.env.NEXT_PUBLIC_CLERK_JS}
       navigate={to => push(to)}
       // withServerSideAuth automatically injects __clerk_ssr_state

@@ -56,6 +56,18 @@ export interface Clerk {
   /** Clerk Frontend API string. */
   frontendApi: string;
 
+  /** Clerk Publishable Key string. */
+  publishableKey?: string;
+
+  /** Clerk Instance Type string. */
+  instanceType?: 'test' | 'live';
+
+  /** Clerk Sync Mode string. */
+  syncMode?: 'cookies' | 'urlDecoration';
+
+  /** Clerk Instance Key string. */
+  instanceKey?: string;
+
   /** Client handling most Clerk operations. */
   client?: ClientResource;
 

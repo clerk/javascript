@@ -5,33 +5,105 @@ import { FapiClient } from './fapiClient';
 
 export interface DevBrowserHandler {
   clear(): Promise<void>;
-  setup({ purge }: { purge: boolean }): Promise<void>;
+  setup(): Promise<void>;
   getDevBrowserJWT(): string | null;
   setDevBrowserJWT(jwt: string): void;
   removeDevBrowserJWT(): void;
 }
 
 export type CreateDevBrowserHandlerOptions = {
+  syncMode: 'cookies' | 'urlDecoration';
   frontendApi: string;
   fapiClient: FapiClient;
+  instanceKey?: string;
 };
 
 // export type DevBrowserHandler = ReturnType<typeof createDevBrowserHandler>;
 export default function createDevBrowserHandler({
   frontendApi,
   fapiClient,
+  syncMode,
+  instanceKey,
 }: CreateDevBrowserHandlerOptions): DevBrowserHandler {
   const cookieHandler = createCookieHandler();
+
+  const localStorageKey =
+    syncMode === 'urlDecoration' ? `${DEV_BROWSER_SSO_JWT_KEY}_${instanceKey}` : DEV_BROWSER_SSO_JWT_KEY;
+
   function getDevBrowserJWT() {
-    return localStorage.getItem(DEV_BROWSER_SSO_JWT_KEY);
+    return localStorage.getItem(localStorageKey);
   }
 
   function setDevBrowserJWT(jwt: string) {
-    localStorage.setItem(DEV_BROWSER_SSO_JWT_KEY, jwt);
+    localStorage.setItem(localStorageKey, jwt);
   }
 
   function removeDevBrowserJWT() {
-    localStorage.removeItem(DEV_BROWSER_SSO_JWT_KEY);
+    localStorage.removeItem(localStorageKey);
+  }
+
+  async function clear() {
+    removeDevBrowserJWT();
+    await cookieHandler.removeAllDevBrowserCookies();
+  }
+
+  async function setup(): Promise<void> {
+    fapiClient.onBeforeRequest(request => {
+      const devBrowserJWT = getDevBrowserJWT();
+      if (devBrowserJWT) {
+        request.url?.searchParams.set(DEV_BROWSER_SSO_JWT_PARAMETER, devBrowserJWT);
+      }
+    });
+
+    fapiClient.onAfterResponse((_, response) => {
+      const newDevBrowserJWT = response?.headers?.get(DEV_BROWSER_SSO_JWT_HTTP_HEADER);
+      if (newDevBrowserJWT) {
+        setDevBrowserJWT(newDevBrowserJWT);
+      }
+    });
+
+    if (syncMode === 'cookies') {
+      await setupCookiesMode();
+    } else if (syncMode === 'urlDecoration') {
+      await setupUrlDecorationMode();
+    }
+  }
+
+  async function setupUrlDecorationMode(): Promise<void> {
+    console.log('Url decoration mode onload', window.location.hash);
+    const flag = '&_clerk_test_jwt=';
+    const hashParts = window.location.hash.split(flag);
+    console.log('Url decoration mode onload', hashParts);
+    if (hashParts.length === 2) {
+      setDevBrowserJWT(hashParts[1]);
+      const newURL = new URL(window.location.href);
+      newURL.hash = hashParts[0];
+      window.history.replaceState(window.history.state, '', newURL);
+    } else if (hashParts.length === 1 && window.location.hash.startsWith(flag)) {
+      setDevBrowserJWT(hashParts[0]);
+      const newURL = new URL(window.location.href);
+      newURL.hash = '';
+      window.history.replaceState(window.history.state, '', newURL);
+    }
+
+    if (getDevBrowserJWT() !== null) {
+      return;
+    }
+
+    const createDevBrowserUrl = fapiClient.buildUrl({
+      method: 'POST',
+      path: '/dev_browser',
+    });
+
+    const options: RequestInit = {
+      method: 'POST',
+    };
+
+    const resp = await fetch(createDevBrowserUrl.toString(), options);
+
+    const data = await resp.json();
+    const token = data.token;
+    setDevBrowserJWT(token);
   }
 
   // location.host == *.lcl.dev
@@ -87,43 +159,15 @@ export default function createDevBrowserHandler({
     }
   }
 
-  async function clear() {
-    removeDevBrowserJWT();
-    await cookieHandler.removeAllDevBrowserCookies();
-  }
-
-  async function setup({ purge }: { purge: boolean }): Promise<void> {
+  async function setupCookiesMode(): Promise<void> {
     const devOrStgApi = isDevOrStagingUrl(frontendApi);
     const devOrStgHost = isDevOrStagingUrl(window.location.host);
-
-    if (purge) {
-      // Note 1: When setup runs for production instances, clear will work only in staging and production Clerk environments
-      // as lclclerk.com is not in the PSL yet.  As a result we can't delete the .(prod|dev).lclclerk.com cookie
-      // that is set from auth V1 applications in local environment
-      await clear();
-    }
-
-    if (devOrStgApi) {
-      fapiClient.onBeforeRequest(request => {
-        const devBrowserJWT = getDevBrowserJWT();
-        if (devBrowserJWT) {
-          request.url?.searchParams.set(DEV_BROWSER_SSO_JWT_PARAMETER, devBrowserJWT);
-        }
-      });
-
-      fapiClient.onAfterResponse((_, response) => {
-        const newDevBrowserJWT = response?.headers?.get(DEV_BROWSER_SSO_JWT_HTTP_HEADER);
-        if (newDevBrowserJWT) {
-          setDevBrowserJWT(newDevBrowserJWT);
-        }
-      });
-    }
 
     if (devOrStgHost && !cookieHandler.getDevBrowserInittedCookie()) {
       return setFirstPartyCookieForDevBrowser();
     }
 
-    if (!devOrStgHost && devOrStgApi && !getDevBrowserJWT()) {
+    if (!devOrStgHost && !getDevBrowserJWT()) {
       return setThirdPartyCookieForDevBrowser();
     }
   }
