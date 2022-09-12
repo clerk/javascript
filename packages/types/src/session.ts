@@ -15,6 +15,7 @@ export interface SessionResource extends ClerkResource {
   end: () => Promise<SessionResource>;
   remove: () => Promise<SessionResource>;
   touch: () => Promise<SessionResource>;
+  isImpersonated: () => boolean;
   getToken: GetToken;
   createdAt: Date;
   updatedAt: Date;
