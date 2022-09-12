@@ -36,6 +36,7 @@ export const PathRouter = ({ basePath, preservedParams, children }: PathRouterPr
   React.useEffect(() => {
     const effect = async () => {
       if (window.location.hash.startsWith('#/')) {
+        console.log('pathrouter killing hash.');
         const hashToPath = new URL(window.location.pathname + window.location.hash.substr(1), window.location.href);
         hashToPath.pathname = trimTrailingSlash(hashToPath.pathname);
         await navigate(stripOrigin(hashToPath));

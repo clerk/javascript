@@ -94,6 +94,27 @@ const defaultOptions: ClerkOptions = {
   __experimental__devSessionSyncMode: 'cookie',
 };
 
+// TODO: Undup
+function parsePublishableKey(key: string, pkg: string) {
+  try {
+    if (!key.startsWith('pk_test_') && !key.startsWith('pk_live_')) {
+      throw 'error';
+    }
+    const keyParts = key.split('_');
+    const instanceType = keyParts[1] as 'test' | 'live';
+    let frontendApi = atob(keyParts[2]);
+    if (!frontendApi.endsWith('$')) {
+      throw 'error';
+    }
+    frontendApi = frontendApi.slice(0, -1);
+    return { instanceType, frontendApi };
+  } catch (e) {
+    throw new Error(
+      `Clerk Error: The publishableKey passed to Clerk is malformed. Your publishable key can be retrieved from https://dashboard.clerk.dev/last-active?path=api-keys (package=${pkg};passed=${key})`,
+    );
+  }
+}
+
 export default class Clerk implements ClerkInterface {
   public static mountComponentRenderer?: MountComponentRenderer;
   public static version: string = packageJSON.version;
@@ -102,6 +123,9 @@ export default class Clerk implements ClerkInterface {
   public organization?: OrganizationResource | null;
   public user?: UserResource | null;
   public frontendApi: string;
+  public publishableKey?: string;
+  public instanceType?: 'test' | 'live';
+  public syncMode: 'cookies' | 'urlDecoration';
 
   #authService: AuthenticationService | null = null;
   #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
@@ -125,19 +149,31 @@ export default class Clerk implements ClerkInterface {
     return this.#isReady;
   }
 
-  public constructor(frontendApi: string) {
-    if (!frontendApi) {
+  public constructor(publishableKeyOrFrontendApi: string) {
+    if (!publishableKeyOrFrontendApi) {
+      // TODO: Refactor the error
       clerkErrorNoFrontendApi();
     }
-    if (!validateFrontendApi(frontendApi)) {
-      clerkErrorInvalidFrontendApi();
+
+    if (publishableKeyOrFrontendApi.startsWith('clerk.')) {
+      this.frontendApi = publishableKeyOrFrontendApi;
+      this.syncMode = 'cookies';
+      if (!validateFrontendApi(this.frontendApi)) {
+        clerkErrorInvalidFrontendApi();
+      }
+      this.instanceType = isDevOrStagingUrl(this.frontendApi) ? 'test' : 'live';
+    } else {
+      this.publishableKey = publishableKeyOrFrontendApi.trim();
+      this.syncMode = 'urlDecoration';
+      const { frontendApi, instanceType } = parsePublishableKey(this.publishableKey, '@clerk/clerk-js');
+      this.frontendApi = frontendApi;
+      this.instanceType = instanceType;
     }
 
     this.frontendApi = frontendApi;
 
     this.#instanceType = isDevOrStagingUrl(this.frontendApi) ? 'development' : 'production';
     this.#fapiClient = createFapiClient(this);
-
     BaseResource.clerk = this;
   }
 
@@ -957,6 +993,21 @@ export default class Clerk implements ClerkInterface {
     // The expect-error directive below is safe since `updateAppearanceProp` is only used
     // in the v4 build. This will be removed when v4 becomes the main stable version
     this.#componentControls?.updateProps(props);
+  };
+
+  // TODO: Move this to FAPI based on whether PK is passed
+  #temporaryPostProcessAccounts = (to: string) => {
+    if (this.instanceType === 'test' && this.syncMode === 'urlDecoration' && this.publishableKey) {
+      const toURL = new URL(to, window.location.href);
+      if (!toURL.host.startsWith('accounts.')) {
+        return to;
+      }
+      toURL.host = this.frontendApi.replace('.clerk', '');
+      // const hostTransform = toURL.host.replace('accounts.', 'clerk.').replaceAll('-', '-x-').replaceAll('.', '-');
+      // toURL.host = `${hostTransform}.shared.lclclerk.com`;
+      return toURL.href;
+    }
+    return to;
   };
 
   #loadInStandardBrowser = async (): Promise<void> => {

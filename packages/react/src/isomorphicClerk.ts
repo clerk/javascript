@@ -45,14 +45,16 @@ type MethodName<T> = {
 type MethodCallback = () => void;
 
 export type NewIsomorphicClerkParams = {
-  frontendApi: string;
+  publishableKey?: string;
+  frontendApi?: string;
   options: IsomorphicClerkOptions;
   Clerk: ClerkProp | null;
 };
 
 export default class IsomorphicClerk {
   private mode: 'browser' | 'server';
-  private frontendApi: string;
+  private frontendApi?: string;
+  private publishableKey?: string;
   private options: IsomorphicClerkOptions;
   private Clerk: ClerkProp;
   private clerkjs: BrowserClerk | HeadlessBrowserClerk | null = null;
@@ -89,8 +91,9 @@ export default class IsomorphicClerk {
   }
 
   constructor(params: NewIsomorphicClerkParams) {
-    const { Clerk = null, frontendApi, options = {} } = params || {};
+    const { Clerk = null, frontendApi, publishableKey, options = {} } = params || {};
     this.frontendApi = frontendApi;
+    this.publishableKey = publishableKey;
     this.options = options;
     this.Clerk = Clerk;
     this.mode = inClientSide() ? 'browser' : 'server';
@@ -102,7 +105,8 @@ export default class IsomorphicClerk {
       return;
     }
 
-    if (!this.frontendApi) {
+    if (typeof this.publishableKey === 'undefined' && typeof this.frontendApi === 'undefined') {
+      // TODO: Rewrite error
       this.throwError(noFrontendApiError);
     }
 
@@ -125,7 +129,7 @@ export default class IsomorphicClerk {
 
         if (isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstrutor>(this.Clerk)) {
           // Construct a new Clerk object if a constructor is passed
-          c = new this.Clerk(this.frontendApi);
+          c = new this.Clerk(this.publishableKey || this.frontendApi);
           await c.load(this.options);
         } else {
           // Otherwise use the instantiated Clerk object
@@ -141,6 +145,7 @@ export default class IsomorphicClerk {
         // Hot-load latest ClerkJS from Clerk CDN
         await loadScript({
           frontendApi: this.frontendApi,
+          publishableKey: this.publishableKey,
           scriptUrl: this.options.clerkJSUrl,
           scriptVariant: this.options.clerkJSVariant,
         });

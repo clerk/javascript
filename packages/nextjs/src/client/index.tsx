@@ -5,29 +5,64 @@ import React from 'react';
 
 export * from '@clerk/clerk-react';
 
-const NO_FRONTEND_API_ERR =
-  'The NEXT_PUBLIC_CLERK_FRONTEND_API environment variable must be set to use the ClerkProvider component.';
+//const NO_FRONTEND_API_ERR = 'The NEXT_PUBLIC_CLERK_FRONTEND_API environment variable must be set to use the ClerkProvider component.';
 
-type NextClerkProviderProps = {
-  children: React.ReactNode;
-  frontendApi?: string;
-} & IsomorphicClerkOptions;
+type NextClerkProviderProps =
+  | ({
+      children: React.ReactNode;
+      publishableKey?: string;
+      frontendApi: undefined;
+    } & IsomorphicClerkOptions)
+  | ({
+      children: React.ReactNode;
+      publishableKey: undefined;
+      frontendApi?: string;
+    } & IsomorphicClerkOptions);
+
+// TODO: Undup
+function parsePublishableKey(key: string, pkg: string) {
+  try {
+    if (!key.startsWith('pk_test_') && !key.startsWith('pk_live_')) {
+      throw 'error';
+    }
+    const keyParts = key.split('_');
+    const instanceType = keyParts[1] as 'test' | 'live';
+    let frontendApi = atob(keyParts[2]);
+    if (!frontendApi.endsWith('$')) {
+      throw 'error';
+    }
+    frontendApi = frontendApi.slice(0, -1);
+    return { instanceType, frontendApi };
+  } catch (e) {
+    throw new Error(
+      `Clerk Error: The publishableKey passed to Clerk is malformed. Your publishable key can be retrieved from https://dashboard.clerk.dev/last-active?path=api-keys (package=${pkg};passed=${key})`,
+    );
+  }
+}
 
 export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JSX.Element {
   // @ts-expect-error
   // Allow for overrides without making the type public
-  const { frontendApi, __clerk_ssr_state, authServerSideProps, clerkJSUrl, ...restProps } = rest;
+  const { frontendApi, publishableKey, authServerSideProps, __clerk_ssr_state, clerkJSUrl, ...restProps } = rest;
   const { push } = useRouter();
-
-  if (frontendApi == undefined && !process.env.NEXT_PUBLIC_CLERK_FRONTEND_API) {
-    throw Error(NO_FRONTEND_API_ERR);
-  }
 
   ReactClerkProvider.displayName = 'ReactClerkProvider';
 
+  const parsedFrontendApi = frontendApi || process.env.NEXT_PUBLIC_CLERK_FRONTEND_API;
+  const parsedPublishableKey = publishableKey || process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
+  // TODO: Improve error
+  let keyOptions;
+  if (typeof parsedFrontendApi === 'string' && typeof parsedPublishableKey === 'undefined') {
+    keyOptions = { frontendApi: parsedFrontendApi };
+  } else if (typeof parsedFrontendApi === 'undefined' && typeof parsedPublishableKey === 'string') {
+    keyOptions = { publishableKey: parsedPublishableKey };
+    parsePublishableKey(parsedPublishableKey, '@clerk/nextjs');
+  }
+
   return (
     <ReactClerkProvider
-      frontendApi={frontendApi || process.env.NEXT_PUBLIC_CLERK_FRONTEND_API}
+      {...keyOptions}
       clerkJSUrl={clerkJSUrl || process.env.NEXT_PUBLIC_CLERK_JS}
       navigate={to => push(to)}
       // withServerSideAuth automatically injects __clerk_ssr_state
