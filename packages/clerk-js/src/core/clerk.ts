@@ -584,7 +584,7 @@ export default class Clerk implements ClerkInterface {
   };
 
   public redirectWithAuth = async (to: string): Promise<unknown> => {
-    if (this.instanceType === 'live') {
+    if (this.instanceType === 'live' || this.syncMode === 'cookies') {
       return this.navigate(to);
     }
 
@@ -918,8 +918,9 @@ export default class Clerk implements ClerkInterface {
       if (!toURL.host.startsWith('accounts.')) {
         return to;
       }
-      const hostTransform = toURL.host.replace('accounts.', 'clerk.').replaceAll('-', '-x-').replaceAll('.', '-');
-      toURL.host = `${hostTransform}.shared.lclclerk.com`;
+      toURL.host = this.frontendApi.replace('.clerk', '');
+      // const hostTransform = toURL.host.replace('accounts.', 'clerk.').replaceAll('-', '-x-').replaceAll('.', '-');
+      // toURL.host = `${hostTransform}.shared.lclclerk.com`;
       return toURL.href;
     }
     return to;
