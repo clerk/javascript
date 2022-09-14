@@ -50,6 +50,8 @@ export const makeCustomizable = <P,>(
 
     return (
       <Component
+        // Propagate elementId so subsequent HOCs can use it
+        elementId={elementId}
         css={generatedStyles.css}
         // always first for better readability in the DOM
         className={generatedClassname}

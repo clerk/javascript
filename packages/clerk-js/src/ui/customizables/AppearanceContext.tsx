@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { createContextAndHook, useDeepEqualMemo } from '../utils';
+import { useDeepEqualMemo } from '../hooks';
+import { createContextAndHook } from '../utils';
 import { AppearanceCascade, parseAppearance, ParsedAppearance } from './parseAppearance';
 
 type AppearanceContextValue = ParsedAppearance;

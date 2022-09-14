@@ -1,6 +1,7 @@
 import { Appearance, SignInTheme, SignUpTheme, UserButtonTheme, UserProfileTheme } from './appearance';
 import { ClientResource } from './client';
 import { DisplayThemeJSON } from './json';
+import { LocalizationResource } from './localization';
 import { OrganizationResource } from './organization';
 import { OrganizationInvitationResource } from './organizationInvitation';
 import { MembershipRole, OrganizationMembershipResource } from './organizationMembership';
@@ -304,6 +305,7 @@ export type ClerkThemeOptions = DeepSnakeToCamel<DeepPartial<DisplayThemeJSON>>;
 
 export interface ClerkOptions {
   appearance?: Appearance;
+  localization?: DeepPartial<LocalizationResource>;
   navigate?: (to: string) => Promise<unknown> | unknown;
   polling?: boolean;
   selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;

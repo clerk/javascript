@@ -1,39 +1,49 @@
 import type { Web3Provider } from '@clerk/types';
 
+import { LocalizationKey, localizationKeys } from '../localization/localizationKeys';
+
 const FirstFactorConfigs = Object.freeze({
   email_address: {
-    label: 'Email address',
-    fieldType: 'email',
+    label: localizationKeys('formFieldLabel__emailAddress'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress'),
+    type: 'email',
   },
   phone_number: {
-    label: 'Phone number',
-    fieldType: 'tel',
+    label: localizationKeys('formFieldLabel__phoneNumber'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__phoneNumber'),
+    type: 'tel',
   },
   username: {
-    label: 'Username',
-    fieldType: 'text',
+    label: localizationKeys('formFieldLabel__username'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__username'),
+    type: 'text',
   },
   email_address_phone_number: {
-    label: 'Email or phone',
-    fieldType: 'text',
+    label: localizationKeys('formFieldLabel__emailAddress_phoneNumber'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress_phoneNumber'),
+    type: 'text',
   },
   email_address_username: {
-    label: 'Email or username',
-    fieldType: 'text',
+    label: localizationKeys('formFieldLabel__emailAddress_username'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress_username'),
+    type: 'text',
   },
   phone_number_username: {
-    label: 'Phone number or username',
-    fieldType: 'text',
+    label: localizationKeys('formFieldLabel__phoneNumber_username'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__phoneNumber_username'),
+    type: 'text',
   },
   email_address_phone_number_username: {
-    label: 'Email, phone, or username',
-    fieldType: 'text',
+    label: localizationKeys('formFieldLabel__emailAddress_phoneNumber_username'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress_phoneNumber_username'),
+    type: 'text',
   },
   default: {
     label: '',
-    fieldType: 'text',
+    placeholder: '',
+    type: 'text',
   },
-} as Record<string, { label: string; fieldType: string }>);
+} as Record<string, { label: string | LocalizationKey; type: string; placeholder: string | LocalizationKey }>);
 
 export const getIdentifierControlDisplayValues = (attributes: string[]) => {
   const indexKey = attributes.length == 0 ? null : [...attributes].sort().join('_');
