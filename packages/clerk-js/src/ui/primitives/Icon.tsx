@@ -20,6 +20,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   },
 }));
 
+// @ts-ignore
 export type IconProps = StyleVariants<typeof applyVariants> & {
   icon: React.ComponentType;
 };

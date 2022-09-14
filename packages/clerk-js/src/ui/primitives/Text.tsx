@@ -38,6 +38,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
   };
 });
 
+// @ts-ignore
 export type TextProps = PrimitiveProps<'p'> & { isDisabled?: boolean } & StyleVariants<typeof applyVariants> & {
     as?: 'p' | 'div' | 'label' | 'code' | 'span' | 'li' | 'a';
   };

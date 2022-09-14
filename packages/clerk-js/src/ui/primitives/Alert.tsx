@@ -12,6 +12,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   variants: {},
 }));
 
+// @ts-ignore
 export type AlertProps = React.PropsWithChildren<StyleVariants<typeof applyVariants>>;
 
 export const Alert = (props: AlertProps): JSX.Element => {
