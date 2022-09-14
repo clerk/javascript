@@ -1,5 +1,5 @@
 import { OrganizationJSON, SessionJSON, UserJSON } from './json';
-import { ClerkJWTClaims } from './jwt';
+import type { ActJWTClaim, ClerkJWTClaims } from './jwt';
 import { SessionResource } from './session';
 import { UserResource } from './user';
 
@@ -9,7 +9,7 @@ export type ServerGetToken = (options?: ServerGetTokenOptions) => Promise<string
 export type ServerSideAuth = {
   sessionId: string | null;
   userId: string | null;
-  actorId: string | null;
+  actor: ActJWTClaim | null;
   getToken: ServerGetToken;
   claims: ClerkJWTClaims | null;
 };

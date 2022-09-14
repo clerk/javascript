@@ -4,6 +4,7 @@
 
 import { FontFamily } from './appearance';
 import { DisplayConfigJSON } from './displayConfig';
+import type { ActJWTClaim } from './jwt';
 import { OAuthProvider } from './oauth';
 import { OrganizationInvitationStatus } from './organizationInvitation';
 import { MembershipRole } from './organizationMembership';
@@ -101,7 +102,7 @@ export interface SessionJSON extends ClerkResourceJSON {
   last_active_at: number;
   last_active_token: TokenJSON;
   last_active_organization_id: string | null;
-  actor_id: string | null;
+  actor: ActJWTClaim | null;
   user: UserJSON;
   public_user_data: PublicUserDataJSON;
   created_at: number;

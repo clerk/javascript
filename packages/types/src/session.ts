@@ -1,3 +1,4 @@
+import { ActJWTClaim } from './jwt';
 import { ClerkResource } from './resource';
 import { TokenResource } from './token';
 import { UserResource } from './user';
@@ -9,13 +10,12 @@ export interface SessionResource extends ClerkResource {
   abandonAt: Date;
   lastActiveToken: TokenResource | null;
   lastActiveOrganizationId: string | null;
-  actorId: string | null;
+  actor: ActJWTClaim | null;
   user: UserResource | null;
   publicUserData: PublicUserData;
   end: () => Promise<SessionResource>;
   remove: () => Promise<SessionResource>;
   touch: () => Promise<SessionResource>;
-  isImpersonated: () => boolean;
   getToken: GetToken;
   createdAt: Date;
   updatedAt: Date;

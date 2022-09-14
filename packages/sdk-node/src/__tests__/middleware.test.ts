@@ -25,6 +25,7 @@ const mockGetAuthStateClaims = {
 
 const mockActClaim = {
   sub: 'actor_id',
+  iss: 'issuer',
 };
 
 const mockGetAuthStateClaimsWithAct = {
@@ -41,7 +42,7 @@ const mockAuthProp = {
   getToken: mockGetToken,
   userId: 'user_id',
   sessionId: 'session_id',
-  actorId: null,
+  actor: null,
   claims: mockGetAuthStateClaims,
 };
 
@@ -49,7 +50,7 @@ const mockAuthSignedOutProp = {
   getToken: mockGetToken,
   userId: null,
   sessionId: null,
-  actorId: null,
+  actor: null,
   claims: null,
 };
 
@@ -128,7 +129,7 @@ test('expressWithAuth with Authorization header containing act claim', async () 
   expect(req.auth).toEqual({
     ...mockAuthProp,
     claims: mockGetAuthStateClaimsWithAct,
-    actorId: mockActClaim.sub,
+    actor: mockActClaim,
   });
   expect(mockNext).toHaveBeenCalledWith();
 });
@@ -169,7 +170,7 @@ test('expressWithAuth with Authorization header in Bearer format and act claim',
   expect(req.auth).toEqual({
     ...mockAuthProp,
     claims: mockGetAuthStateClaimsWithAct,
-    actorId: mockActClaim.sub,
+    actor: mockActClaim,
   });
   expect(mockNext).toHaveBeenCalledWith();
 });

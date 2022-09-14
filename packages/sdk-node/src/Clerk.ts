@@ -8,7 +8,7 @@
   createSignedOutState,
   Logger,
 } from '@clerk/backend-core';
-import { ClerkJWTClaims, ServerGetToken } from '@clerk/types';
+import type { ActJWTClaim, ClerkJWTClaims, ServerGetToken } from '@clerk/types';
 import Cookies from 'cookies';
 import deepmerge from 'deepmerge';
 import type { NextFunction, Request, Response } from 'express';
@@ -36,7 +36,7 @@ export type LooseAuthProp = {
   auth: {
     sessionId: string | null;
     userId: string | null;
-    actorId: string | null;
+    actor: ActJWTClaim | null;
     getToken: ServerGetToken;
     claims: ClerkJWTClaims | null;
   };
@@ -48,7 +48,7 @@ export type StrictAuthProp = {
   auth: {
     sessionId: string;
     userId: string;
-    actorId: string | null;
+    actor: ActJWTClaim | null;
     getToken: ServerGetToken;
     claims: ClerkJWTClaims;
   };
@@ -307,7 +307,7 @@ export default class Clerk extends ClerkBackendAPI {
           req.auth = {
             sessionId: sessionClaims?.sid,
             userId: sessionClaims?.sub,
-            actorId: sessionClaims?.act?.sub || null,
+            actor: sessionClaims?.act || null,
             getToken: createGetToken({
               headerToken,
               cookieToken,
@@ -329,7 +329,7 @@ export default class Clerk extends ClerkBackendAPI {
         req.auth = {
           userId: null,
           sessionId: null,
-          actorId: null,
+          actor: null,
           getToken: createSignedOutState().getToken,
           claims: null,
         } as WithAuthProp<Request>;
