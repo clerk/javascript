@@ -593,7 +593,7 @@ export default class Clerk implements ClerkInterface {
       toURL.hash = `${toURL.hash}&_clerk_test_jwt=${this.#devBrowserHandler?.getDevBrowserJWT()}`;
     }
 
-    return this.navigate(this.#temporaryPostProcessAccounts(toURL.href));
+    return this.navigate(toURL.href);
   };
 
   public redirectToOrganizationProfile = async (): Promise<unknown> => {
