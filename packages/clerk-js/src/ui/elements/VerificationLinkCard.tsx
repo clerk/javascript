@@ -1,7 +1,7 @@
 import React from 'react';
 
+import { Col, descriptors, Flow, LocalizationKey, localizationKeys, Text } from '../customizables';
 import { useRouter } from '../router';
-import { Col, descriptors, Flow, Text } from '../customizables';
 import { CardAlert } from './Alert';
 import { Card } from './Card';
 import { useCardState } from './contexts';
@@ -12,10 +12,11 @@ import { TimerButton } from './TimerButton';
 
 type VerificationLinkCardProps = {
   safeIdentifier: string;
-  cardTitle: string;
-  cardSubtitle: string;
-  formTitle: string;
-  formSubtitle: string;
+  cardTitle: LocalizationKey;
+  cardSubtitle: LocalizationKey;
+  formTitle: LocalizationKey;
+  formSubtitle: LocalizationKey;
+  resendButton: LocalizationKey;
   profileImageUrl?: string;
   onResendCodeClicked: React.MouseEventHandler;
   onShowAlternativeMethodsClicked?: React.MouseEventHandler;
@@ -34,8 +35,8 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
       <Card>
         <CardAlert>{card.error}</CardAlert>
         <Header.Root>
-          <Header.Title>{props.cardTitle}</Header.Title>
-          <Header.Subtitle>{props.cardSubtitle}</Header.Subtitle>
+          <Header.Title localizationKey={props.cardTitle} />
+          <Header.Subtitle localizationKey={props.cardSubtitle} />
         </Header.Root>
         <IdentityPreview
           identifier={props.safeIdentifier}
@@ -49,13 +50,17 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
           <VerificationLink
             formTitle={props.formTitle}
             formSubtitle={props.formSubtitle}
+            resendButton={props.resendButton}
             onResendCodeClicked={props.onResendCodeClicked}
           />
         </Col>
         <Footer.Root>
           <Footer.Action>
             {props.onShowAlternativeMethodsClicked && (
-              <Footer.ActionLink onClick={props.onShowAlternativeMethodsClicked}>Use another method</Footer.ActionLink>
+              <Footer.ActionLink
+                localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
+                onClick={props.onShowAlternativeMethodsClicked}
+              />
             )}
           </Footer.Action>
           <Footer.Links />
@@ -66,8 +71,9 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
 };
 
 type VerificationLinkProps = {
-  formTitle: string;
-  formSubtitle: string;
+  formTitle: LocalizationKey;
+  formSubtitle: LocalizationKey;
+  resendButton: LocalizationKey;
   onResendCodeClicked: React.MouseEventHandler;
 };
 
@@ -83,29 +89,26 @@ export const VerificationLink = (props: VerificationLinkProps) => {
         gap={1}
       >
         <Text
+          localizationKey={props.formTitle}
           elementDescriptor={descriptors.formHeaderTitle}
           variant='smallMedium'
-        >
-          {props.formTitle}
-        </Text>
+        />
         <Text
+          localizationKey={props.formSubtitle}
           elementDescriptor={descriptors.formHeaderSubtitle}
           variant='smallRegular'
           colorScheme='neutral'
-        >
-          {props.formSubtitle}
-        </Text>
+        />
       </Col>
       <TimerButton
+        localizationKey={props.resendButton}
         elementDescriptor={descriptors.formResendCodeLink}
         onClick={props.onResendCodeClicked}
         startDisabled
         isDisabled={card.isLoading}
         throttleTimeInSec={60}
         sx={theme => ({ marginTop: theme.space.$4 })}
-      >
-        Resend link
-      </TimerButton>
+      />
     </Col>
   );
 };

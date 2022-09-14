@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { useCoreUser, useEnvironment } from '../contexts';
+import { localizationKeys } from '../customizables';
 import { useNavigate } from '../hooks';
 import { MfaPhoneCodeAccordion } from './MfaPhoneCodeAccordion';
 import { MfaTOTPAccordion } from './MfaTOTPAccordion';
@@ -27,7 +28,7 @@ export const MfaSection = () => {
 
   return (
     <ProfileSection
-      title='Two-step verification'
+      title={localizationKeys('userProfile.sectionTitle__mfa')}
       id='mfa'
     >
       {showTOTP && <MfaTOTPAccordion />}
@@ -43,11 +44,10 @@ export const MfaSection = () => {
 
       {secondFactorsAvailableToAdd.length > 0 && (
         <AddBlockButton
+          textLocalizationKey={localizationKeys('userProfile.sectionPrimaryButton__mfa')}
           id='mfa'
           onClick={() => navigate('multi-factor')}
-        >
-          Add two-step verification
-        </AddBlockButton>
+        />
       )}
     </ProfileSection>
   );

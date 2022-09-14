@@ -1,8 +1,8 @@
 import React from 'react';
 
 import { useCoreUser } from '../contexts';
+import { localizationKeys, Text } from '../customizables';
 import { useNavigate } from '../hooks/useNavigate';
-import { Text } from '../customizables';
 import { ProfileSection } from './Section';
 import { AddBlockButton } from './UserProfileBlockButtons';
 
@@ -12,7 +12,7 @@ export const UsernameSection = () => {
 
   return (
     <ProfileSection
-      title='Username'
+      title={localizationKeys('userProfile.sectionTitle__username')}
       id='username'
     >
       {user.username && (
@@ -26,9 +26,12 @@ export const UsernameSection = () => {
       <AddBlockButton
         id='username'
         onClick={() => navigate('username')}
-      >
-        {user.username ? 'Change username' : 'Set username'}
-      </AddBlockButton>
+        textLocalizationKey={
+          user.username
+            ? localizationKeys('userProfile.sectionPrimaryButton__changeUsername')
+            : localizationKeys('userProfile.sectionPrimaryButton__setUsername')
+        }
+      />
     </ProfileSection>
   );
 };

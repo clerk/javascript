@@ -2,7 +2,7 @@ import { OAuthStrategy } from '@clerk/types';
 import { ExternalAccountResource } from '@clerk/types/src';
 
 import { useCoreUser } from '../contexts';
-import { Badge, Col, descriptors, Flex, Image } from '../customizables';
+import { Badge, Col, descriptors, Flex, Image, localizationKeys } from '../customizables';
 import { useCardState, UserPreview } from '../elements';
 import { useEnabledThirdPartyProviders } from '../hooks';
 import { useNavigate } from '../hooks/useNavigate';
@@ -22,7 +22,7 @@ export const ConnectedAccountsSection = () => {
 
   return (
     <ProfileSection
-      title='Connected accounts'
+      title={localizationKeys('userProfile.sectionTitle__connectedAccounts')}
       id='connectedAccounts'
     >
       {accounts.map(account => (
@@ -32,11 +32,10 @@ export const ConnectedAccountsSection = () => {
         />
       ))}
       <AddBlockButton
+        textLocalizationKey={localizationKeys('userProfile.sectionPrimaryButton__connectedAccounts')}
         id='connectedAccounts'
         onClick={() => navigate(`connected-account`)}
-      >
-        Connect account
-      </AddBlockButton>
+      />
     </ProfileSection>
   );
 };

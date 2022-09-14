@@ -1,13 +1,13 @@
 import React from 'react';
 
-import { Col, descriptors } from '../customizables';
+import { Col, descriptors, LocalizationKey } from '../customizables';
 import { CardAlert, Header, useCardState } from '../elements';
 import { PropsOfComponent } from '../styledSystem';
 import { Breadcrumbs } from './Breadcrumbs';
 import { NavbarMenuButtonRow } from './Navbar';
 
 type PageProps = PropsOfComponent<typeof Col> & {
-  headerTitle: string;
+  headerTitle: LocalizationKey;
 };
 
 const Page = (props: PageProps) => {
@@ -19,18 +19,16 @@ const Page = (props: PageProps) => {
       elementDescriptor={descriptors.page}
       gap={8}
       {...rest}
-      sx={t => ({
-        // This needs to be less than the modal's max height
-        minHeight: t.sizes.$120,
-        // paddingBottom: '80px',
-        // maxHeight: `min(${t.sizes.$176}, calc(100vh - ${t.sizes.$20}))`,
-      })}
+      sx={t => ({ minHeight: t.sizes.$120 })}
     >
       <NavbarMenuButtonRow />
       <CardAlert>{card.error}</CardAlert>
       <Header.Root gap={5}>
         <Breadcrumbs title={headerTitle} />
-        <Header.Title textVariant='xlargeMedium'>{headerTitle}</Header.Title>
+        <Header.Title
+          localizationKey={headerTitle}
+          textVariant='xlargeMedium'
+        />
       </Header.Root>
       <Col gap={8}>{children}</Col>
     </Col>

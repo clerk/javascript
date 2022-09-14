@@ -1,4 +1,4 @@
-import { descriptors, Flex, Text } from '../customizables';
+import { descriptors, Flex, localizationKeys, Text } from '../customizables';
 
 export const Divider = () => {
   return (
@@ -8,13 +8,12 @@ export const Divider = () => {
     >
       <DividerLine />
       <Text
+        localizationKey={localizationKeys('dividerText')}
         elementDescriptor={descriptors.dividerText}
         variant='smallMedium'
         colorScheme='neutral'
         sx={t => ({ margin: `0 ${t.space.$4}` })}
-      >
-        or
-      </Text>
+      />
       <DividerLine />
     </Flex>
   );

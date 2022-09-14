@@ -3,6 +3,7 @@ import React from 'react';
 
 import { useCoreClerk, useCoreSignIn, useSignInContext } from '../../ui/contexts';
 import { useSupportEmail } from '../../ui/hooks/useSupportEmail';
+import { LocalizationKey } from '../customizables';
 import { useCardState, VerificationCodeCard, VerificationCodeCardProps } from '../elements';
 import { handleError } from '../utils';
 
@@ -14,10 +15,11 @@ export type SignInFactorTwoCodeCard = Pick<VerificationCodeCardProps, 'onShowAlt
 };
 
 type SignInFactorTwoCodeFormProps = SignInFactorTwoCodeCard & {
-  cardTitle: string;
-  cardSubtitle: string;
-  formTitle: string;
-  formSubtitle: string;
+  cardTitle: LocalizationKey;
+  cardSubtitle: LocalizationKey;
+  formTitle: LocalizationKey;
+  formSubtitle: LocalizationKey;
+  resendButton: LocalizationKey;
 };
 
 export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
@@ -67,6 +69,7 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
       cardSubtitle={props.cardSubtitle}
       formTitle={props.formTitle}
       formSubtitle={props.formSubtitle}
+      resendButton={props.resendButton}
       onCodeEntryFinishedAction={action}
       onResendCodeClicked={prepare}
       safeIdentifier={'safeIdentifier' in props.factor ? props.factor.safeIdentifier : undefined}

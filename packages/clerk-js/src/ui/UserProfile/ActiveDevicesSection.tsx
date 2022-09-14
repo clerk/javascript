@@ -3,7 +3,7 @@ import { SessionWithActivitiesResource } from '@clerk/types';
 import React from 'react';
 
 import { useCoreSession, useCoreUser } from '../contexts';
-import { Badge, Col, descriptors, Flex, Icon, Spinner, Text } from '../customizables';
+import { Badge, Col, descriptors, Flex, Icon, localizationKeys, Spinner, Text } from '../customizables';
 import { DeviceLaptop, DeviceMobile } from '../icons';
 import { mqu } from '../styledSystem';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
@@ -22,7 +22,7 @@ export const ActiveDevicesSection = () => {
 
   return (
     <ProfileSection
-      title='Active Devices'
+      title={localizationKeys('userProfile.activeDevices.sectionTitle')}
       id='activeDevices'
     >
       {!sessionsWithActivities.length && (
@@ -56,15 +56,15 @@ const DeviceAccordion = (props: { session: SessionWithActivitiesResource }) => {
       <Col gap={4}>
         {isCurrent && (
           <LinkButtonWithDescription
-            title='Current device'
-            subtitle='This is the device you are currently using'
+            title={localizationKeys('userProfile.activeDevices.detailsTitle')}
+            subtitle={localizationKeys('userProfile.activeDevices.detailsSubtitle')}
           />
         )}
         {!isCurrent && (
           <LinkButtonWithDescription
-            title='Sign out'
-            subtitle='Sign out from your account on this device'
-            actionLabel='Sign out of device'
+            title={localizationKeys('userProfile.activeDevices.destructiveActionTitle')}
+            subtitle={localizationKeys('userProfile.activeDevices.destructiveActionSubtitle')}
+            actionLabel={localizationKeys('userProfile.activeDevices.destructiveAction')}
             colorScheme='danger'
             onClick={revoke}
           />
@@ -124,7 +124,7 @@ const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
           gap={2}
         >
           <Text variant='smallMedium'>{title}</Text>
-          {isCurrent && <Badge>This device</Badge>}
+          {isCurrent && <Badge localizationKey={localizationKeys('badge__thisDevice')} />}
         </Flex>
         <Text
           variant='smallRegular'

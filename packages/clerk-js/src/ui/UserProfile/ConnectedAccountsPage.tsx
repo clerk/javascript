@@ -3,7 +3,7 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../common';
 import { useCoreUser } from '../contexts';
-import { Col, Image, Text } from '../customizables';
+import { Col, Image, localizationKeys, Text } from '../customizables';
 import { ArrowBlockButton, useCardState, withCardStateProvider } from '../elements';
 import { useEnabledThirdPartyProviders, useNavigate } from '../hooks';
 import { useRouter } from '../router';
@@ -14,7 +14,7 @@ import { ContentPage } from './Page';
 import { SuccessPage } from './SuccessPage';
 
 export const ConnectedAccountsPage = withCardStateProvider(() => {
-  const title = 'Add connected account';
+  const title = localizationKeys('userProfile.connectedAccountPage.title');
   const user = useCoreUser();
 
   const { params } = useRouter();
@@ -29,7 +29,7 @@ export const ConnectedAccountsPage = withCardStateProvider(() => {
       <AddConnectedAccount />
       <SuccessPage
         title={title}
-        text={`has been added to your account.`}
+        text={localizationKeys('userProfile.connectedAccountPage.successMessage')}
       />
     </Wizard>
   );
@@ -52,13 +52,7 @@ const AddConnectedAccount = () => {
     // TODO: Decide if we should keep using this strategy
     // If yes, refactor and cleanup:
     card.setLoading(strategy);
-    // const redirectUrl = stateParam.add(window.location.href, {
-    //   c: 'userProfile',
-    //   la: 'createExternalAccount',
-    //   lam: { strategy },
-    // });
     user
-      // .createExternalAccount({ strategy: strategy, redirect_url: redirectUrl.toString() })
       .createExternalAccount({ strategy: strategy, redirect_url: window.location.href })
       .then(res => {
         if (res.verification?.externalVerificationRedirectURL) {
@@ -73,20 +67,16 @@ const AddConnectedAccount = () => {
 
   return (
     <ContentPage.Root headerTitle={'Add connected account'}>
-      <Text>
-        {unconnectedStrategies.length
-          ? 'Select a provider to connect your account.'
-          : 'There are no available external account providers.'}
-      </Text>
+      <Text
+        localizationKey={
+          unconnectedStrategies.length
+            ? localizationKeys('userProfile.connectedAccountPage.formHint')
+            : localizationKeys('userProfile.connectedAccountPage.formHint__noAccounts')
+        }
+      />
       <Col gap={2}>
         {unconnectedStrategies.map(strategy => (
           <ArrowBlockButton
-            // elementDescriptor={descriptors.socialButtonsButtonBlock}
-            // elementId={descriptors.socialButtonsButtonBlock.setId(strategy)}
-            // textElementDescriptor={descriptors.socialButtonsButtonBlockText}
-            // textElementId={descriptors.socialButtonsButtonBlockText.setId(strategy)}
-            // arrowElementDescriptor={descriptors.socialButtonsButtonBlockArrow}
-            // arrowElementId={descriptors.socialButtonsButtonBlockArrow.setId(strategy)}
             key={strategy}
             id={strategyToDisplayData[strategy].id}
             onClick={() => connect(strategy)}
@@ -94,8 +84,6 @@ const AddConnectedAccount = () => {
             isDisabled={card.isLoading}
             icon={
               <Image
-                // elementDescriptor={descriptors.socialButtonsLogo}
-                // elementId={descriptors.socialButtonsLogo.setId(strategyToDisplayData[strategy].id)}
                 isLoading={card.loadingMetadata === strategy}
                 isDisabled={card.isLoading}
                 src={strategyToDisplayData[strategy].iconUrl}
@@ -103,13 +91,14 @@ const AddConnectedAccount = () => {
                 sx={theme => ({ width: theme.sizes.$5 })}
               />
             }
-          >
-            {`Connect ${strategyToDisplayData[strategy].name} account`}
-          </ArrowBlockButton>
+            textLocalizationKey={localizationKeys('userProfile.connectedAccountPage.socialButtonsBlockButton', {
+              provider: strategyToDisplayData[strategy].name,
+            })}
+          />
         ))}
       </Col>
       <FormButtonContainer sx={{ marginTop: 0 }}>
-        <NavigateToFlowStartButton>Cancel</NavigateToFlowStartButton>
+        <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
       </FormButtonContainer>
     </ContentPage.Root>
   );

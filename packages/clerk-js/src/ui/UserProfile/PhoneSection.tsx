@@ -2,7 +2,7 @@ import { PhoneNumberResource } from '@clerk/types';
 import React from 'react';
 
 import { useCoreUser } from '../contexts';
-import { Badge, Col, Text } from '../customizables';
+import { Badge, Col, localizationKeys, Text } from '../customizables';
 import { useCardState } from '../elements';
 import { useNavigate } from '../hooks';
 import { getFlagEmojiFromCountryIso, handleError, parsePhoneString, stringToFormattedPhoneString } from '../utils';
@@ -18,7 +18,7 @@ export const PhoneSection = () => {
 
   return (
     <ProfileSection
-      title='Phone numbers'
+      title={localizationKeys('userProfile.sectionTitle__phoneNumbers')}
       id='phoneNumbers'
     >
       {user.phoneNumbers.sort(primaryIdentificationFirst(user.primaryPhoneNumberId)).map(phone => (
@@ -29,11 +29,10 @@ export const PhoneSection = () => {
       ))}
 
       <AddBlockButton
+        textLocalizationKey={localizationKeys('userProfile.sectionPrimaryButton__phoneNumbers')}
         id='password'
         onClick={() => navigate('phone-number')}
-      >
-        Add a phone number
-      </AddBlockButton>
+      />
     </ProfileSection>
   );
 };
@@ -62,7 +61,7 @@ const PhoneAccordion = ({ phone }: { phone: PhoneNumberResource }) => {
         </Text>
       }
       title={formattedPhone}
-      badge={isPrimary ? <Badge>Primary</Badge> : undefined}
+      badge={isPrimary ? <Badge localizationKey={localizationKeys('badge__primary')} /> : undefined}
     >
       <Col gap={4}>
         {isPrimary && isVerified && (
@@ -91,7 +90,12 @@ const PhoneAccordion = ({ phone }: { phone: PhoneNumberResource }) => {
         {!isPrimary && !isVerified && (
           <LinkButtonWithDescription
             title='Unverified phone number'
-            titleLabel={<Badge colorScheme='warning'>Unverified</Badge>}
+            titleLabel={
+              <Badge
+                localizationKey={localizationKeys('badge__unverified')}
+                colorScheme='warning'
+              />
+            }
             subtitle='This phone number has not been verified and may be limited in functionality'
             actionLabel='Complete verification'
             onClick={() => navigate(`phone-number/${phone.id}`)}

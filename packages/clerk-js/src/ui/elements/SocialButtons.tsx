@@ -1,7 +1,7 @@
 import { OAuthProvider, OAuthStrategy, Web3Provider, Web3Strategy } from '@clerk/types';
 import React from 'react';
 
-import { Button, descriptors, Grid, Image, useAppearance } from '../customizables';
+import { Button, descriptors, Grid, Image, localizationKeys, useAppearance } from '../customizables';
 import { useEnabledThirdPartyProviders } from '../hooks';
 import { PropsOfComponent } from '../styledSystem';
 import { sleep } from '../utils';
@@ -140,6 +140,7 @@ const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
       elementId={descriptors.socialButtonsBlockButton.setId(id)}
       textElementDescriptor={descriptors.socialButtonsBlockButtonText}
       textElementId={descriptors.socialButtonsBlockButtonText.setId(id)}
+      textLocalizationKey={localizationKeys('socialButtonsBlockButton', { provider: id })}
       arrowElementDescriptor={descriptors.socialButtonsBlockButtonArrow}
       arrowElementId={descriptors.socialButtonsBlockButtonArrow.setId(id)}
       {...rest}

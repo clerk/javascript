@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../common';
 import { useCoreUser, useEnvironment } from '../contexts';
-import { Button, Col, Flex, Text } from '../customizables';
+import { Button, Col, Flex, localizationKeys, Text } from '../customizables';
 import { Avatar, FileDropArea, Form, useCardState, withCardStateProvider } from '../elements';
 import { handleError, useFormControl } from '../utils';
 import { FormButtons } from './FormButtons';
@@ -10,7 +10,7 @@ import { ContentPage } from './Page';
 import { SuccessPage } from './SuccessPage';
 
 export const ProfilePage = withCardStateProvider(() => {
-  const title = 'Update profile';
+  const title = localizationKeys('userProfile.profilePage.title');
   const card = useCardState();
   const user = useCoreUser();
   const [avatarChanged, setAvatarChanged] = React.useState(false);
@@ -20,8 +20,16 @@ export const ProfilePage = withCardStateProvider(() => {
 
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
 
-  const firstNameField = useFormControl('firstName', user.firstName || '', { type: 'text', label: 'First name' });
-  const lastNameField = useFormControl('lastName', user.lastName || '', { type: 'text', label: 'Last name' });
+  const firstNameField = useFormControl('firstName', user.firstName || '', {
+    type: 'text',
+    label: localizationKeys('formFieldLabel__firstName'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__firstName'),
+  });
+  const lastNameField = useFormControl('lastName', user.lastName || '', {
+    type: 'text',
+    label: localizationKeys('formFieldLabel__lastName'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__lastName'),
+  });
 
   const userInfoChanged =
     (showFirstName && firstNameField.value && firstNameField.value !== user.firstName) ||
@@ -70,7 +78,7 @@ export const ProfilePage = withCardStateProvider(() => {
       </ContentPage.Root>
       <SuccessPage
         title={title}
-        text={'Your profile has been updated.'}
+        text={localizationKeys('userProfile.profilePage.successMessage')}
       />
     </Wizard>
   );
@@ -116,26 +124,24 @@ const AvatarUploader = (props: AvatarUploaderProps) => {
           optimize
         />
         <Col gap={1}>
-          <Text variant='regularMedium'>Profile image</Text>
+          <Text
+            localizationKey={localizationKeys('userProfile.profilePage.imageFormTitle')}
+            variant='regularMedium'
+          />
           <Flex gap={4}>
             <Button
+              localizationKey={
+                !showUpload
+                  ? localizationKeys('userProfile.profilePage.imageFormSubtitle')
+                  : localizationKeys('userProfile.formButtonReset')
+              }
               isDisabled={card.isLoading}
               variant='link'
               onClick={(e: any) => {
                 e.target?.blur();
                 toggle();
               }}
-            >
-              {!showUpload ? 'Upload image' : 'Cancel'}
-            </Button>
-            {/* TODO */}
-            {/*<Button*/}
-            {/*  isDisabled={card.isLoading}*/}
-            {/*  variant='link'*/}
-            {/*  colorScheme='danger'*/}
-            {/*>*/}
-            {/*  Remove image*/}
-            {/*</Button>*/}
+            />
           </Flex>
         </Col>
       </Flex>

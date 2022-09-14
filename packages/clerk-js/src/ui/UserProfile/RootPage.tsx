@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useEnvironment } from '../contexts';
-import { Col, descriptors } from '../customizables';
+import { Col, descriptors, localizationKeys } from '../customizables';
 import { Header } from '../elements';
 import { ActiveDevicesSection } from './ActiveDevicesSection';
 import { ConnectedAccountsSection } from './ConnectedAccountsSection';
@@ -37,8 +37,11 @@ export const RootPage = () => {
         gap={8}
       >
         <Header.Root id='cl-userProfile-section-account'>
-          <Header.Title textVariant='xxlargeMedium'>Account</Header.Title>
-          <Header.Subtitle>Manage your account information</Header.Subtitle>
+          <Header.Title
+            localizationKey={localizationKeys('userProfile.headerTitle__account')}
+            textVariant='xxlargeMedium'
+          />
+          <Header.Subtitle localizationKey={localizationKeys('userProfile.headerSubtitle__account')} />
         </Header.Root>
         <UserProfileSection />
         {showUsername && <UsernameSection />}
@@ -53,8 +56,11 @@ export const RootPage = () => {
         gap={8}
       >
         <Header.Root id='cl-userProfile-section-security'>
-          <Header.Title textVariant='xxlargeMedium'>Security</Header.Title>
-          <Header.Subtitle>Manage your security preferences</Header.Subtitle>
+          <Header.Title
+            localizationKey={localizationKeys('userProfile.headerTitle__security')}
+            textVariant='xxlargeMedium'
+          />
+          <Header.Subtitle localizationKey={localizationKeys('userProfile.headerSubtitle__security')} />
         </Header.Root>
         {showPassword && <PasswordSection />}
         {showMfa && <MfaSection />}

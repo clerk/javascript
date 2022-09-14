@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useCoreSignUp, useEnvironment } from '../../ui/contexts';
-import { Flow } from '../customizables';
+import { Flow, localizationKeys } from '../customizables';
 import { SignUpVerificationCodeForm } from './SignUpVerificationCodeForm';
 
 export const SignUpEmailCodeCard = () => {
@@ -27,10 +27,11 @@ export const SignUpEmailCodeCard = () => {
   return (
     <Flow.Part part='emailCode'>
       <SignUpVerificationCodeForm
-        cardTitle='Verify your email'
-        cardSubtitle={`to continue to ${displayConfig.applicationName}`}
-        formTitle='Verification code'
-        formSubtitle='Enter the verification code sent to your email address'
+        cardTitle={localizationKeys('signUp.emailCode.title')}
+        cardSubtitle={localizationKeys('signUp.emailCode.subtitle', { applicationName: displayConfig.applicationName })}
+        formTitle={localizationKeys('signUp.emailCode.formTitle')}
+        formSubtitle={localizationKeys('signUp.emailCode.formSubtitle')}
+        resendButton={localizationKeys('signUp.emailCode.resendButton')}
         prepare={prepare}
         attempt={attempt}
         safeIdentifier={signUp.emailAddress}

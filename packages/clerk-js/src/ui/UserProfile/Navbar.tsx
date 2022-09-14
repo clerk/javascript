@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Button, Col, descriptors, Flex, Icon } from '../customizables';
+import { Button, Col, descriptors, Flex, Icon, localizationKeys, useLocalizations } from '../customizables';
 import { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { usePopover, useSafeLayoutEffect } from '../hooks';
 import { Menu, TickShield, User } from '../icons';
@@ -19,9 +19,15 @@ export const NavbarContextProvider = (props: React.PropsWithChildren<{}>) => {
 };
 
 export const BaseRoutes = [
-  { name: 'Account', id: 'account', icon: User, path: '/' } as const,
-  { name: 'Security', id: 'security', icon: TickShield, path: '/security' } as const,
+  { name: localizationKeys('userProfile.headerTitle__account'), id: 'account', icon: User, path: '/' } as const,
+  {
+    name: localizationKeys('userProfile.headerTitle__security'),
+    id: 'security',
+    icon: TickShield,
+    path: '/security',
+  } as const,
 ] as const;
+
 type BaseRouteId = typeof BaseRoutes[number]['id'];
 
 type NavBarProps = {
@@ -35,6 +41,7 @@ export const NavBar = (props: NavBarProps) => {
   const [activeId, setActiveId] = React.useState<BaseRouteId>('account');
   const { close } = useNavbarContext();
   const { navigateToFlowStart } = useNavigateToFlowStart();
+  const { t } = useLocalizations();
 
   const navigateAndScroll = async (id: BaseRouteId) => {
     if (contentRef.current) {
@@ -62,7 +69,7 @@ export const NavBar = (props: NavBarProps) => {
         for (const entry of entries) {
           const id = entry.target?.id?.split('section-')[1];
           if (entry.isIntersecting && id) {
-            return setActiveId(id as any);
+            return setActiveId(id as unknown as any);
           }
         }
       };
@@ -97,7 +104,7 @@ export const NavBar = (props: NavBarProps) => {
           icon={r.icon}
           isActive={activeId === r.id}
         >
-          {r.name}
+          {t(r.name)}
         </NavButton>
       ))}
     </Col>
@@ -222,6 +229,7 @@ const NavButton = (props: NavButtonProps) => {
 
 export const NavbarMenuButtonRow = (props: PropsOfComponent<typeof Button>) => {
   const { open } = useNavbarContext();
+  const { t } = useLocalizations();
   return (
     <Flex
       elementDescriptor={descriptors.navbarMobileMenuRow}
@@ -251,7 +259,7 @@ export const NavbarMenuButtonRow = (props: PropsOfComponent<typeof Button>) => {
           icon={Menu}
           size='sm'
         />
-        Menu
+        {t(localizationKeys('userProfile.mobileButton__menu'))}
       </Button>
     </Flex>
   );

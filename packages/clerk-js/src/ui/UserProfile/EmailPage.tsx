@@ -3,7 +3,7 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../common';
 import { useCoreUser, useEnvironment } from '../contexts';
-import { Text } from '../customizables';
+import { localizationKeys, Text } from '../customizables';
 import { Form, useCardState, withCardStateProvider } from '../elements';
 import { useRouter } from '../router';
 import { handleError, useFormControl } from '../utils';
@@ -15,7 +15,7 @@ import { VerifyWithCode } from './VerifyWithCode';
 import { VerifyWithLink } from './VerifyWithLink';
 
 export const EmailPage = withCardStateProvider(() => {
-  const title = 'Add email address';
+  const title = localizationKeys('userProfile.emailAddressPage.title');
   const card = useCardState();
   const user = useCoreUser();
   const environment = useEnvironment();
@@ -32,7 +32,8 @@ export const EmailPage = withCardStateProvider(() => {
 
   const emailField = useFormControl('emailAddress', '', {
     type: 'text',
-    label: 'Email address',
+    label: localizationKeys('formFieldLabel__emailAddress'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress'),
     isRequired: true,
   });
 
@@ -60,11 +61,14 @@ export const EmailPage = withCardStateProvider(() => {
               autoFocus
             />
           </Form.ControlRow>
-          <Text variant='regularRegular'>
-            {preferMagicLinks
-              ? 'An email containing a verification link will be sent to this email address.'
-              : 'An email containing a verification code will be sent to this email address.'}
-          </Text>
+          <Text
+            localizationKey={
+              preferMagicLinks
+                ? localizationKeys('userProfile.emailAddressPage.emailLink.formHint')
+                : localizationKeys('userProfile.emailAddressPage.emailCode.formHint')
+            }
+            variant='regularRegular'
+          />
           <FormButtons isDisabled={!canSubmit} />
         </Form.Root>
       </ContentPage.Root>
@@ -87,7 +91,15 @@ export const EmailPage = withCardStateProvider(() => {
 
       <SuccessPage
         title={title}
-        text={`The email ${emailAddressRef.current?.emailAddress || ''} has been added to your account.`}
+        text={
+          preferMagicLinks
+            ? localizationKeys('userProfile.emailAddressPage.emailLink.successMessage', {
+                identifier: emailAddressRef.current?.emailAddress || '',
+              })
+            : localizationKeys('userProfile.emailAddressPage.emailCode.successMessage', {
+                identifier: emailAddressRef.current?.emailAddress || '',
+              })
+        }
       />
     </Wizard>
   );

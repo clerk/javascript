@@ -6,7 +6,7 @@ import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '.
 import { useMagicLink } from '../../ui/hooks/useMagicLink';
 import { useRouter } from '../../ui/router/RouteContext';
 import { EmailLinkStatusCard } from '../common';
-import { Flow } from '../customizables';
+import { Flow, localizationKeys } from '../customizables';
 import { VerificationCodeCardProps, VerificationLinkCard } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { handleError } from '../utils';
@@ -83,10 +83,11 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
   return (
     <Flow.Part part='emailLink'>
       <VerificationLinkCard
-        cardTitle='Check your email'
-        cardSubtitle={`to continue to ${displayConfig.applicationName}`}
-        formTitle='Verification link'
-        formSubtitle='Use the verification link sent your email'
+        cardTitle={localizationKeys('signIn.emailLink.title')}
+        cardSubtitle={localizationKeys('signIn.emailLink.subtitle', { applicationName: displayConfig.applicationName })}
+        formTitle={localizationKeys('signIn.emailLink.formTitle')}
+        formSubtitle={localizationKeys('signIn.emailLink.formSubtitle')}
+        resendButton={localizationKeys('signIn.emailLink.resendButton')}
         onResendCodeClicked={restartVerification}
         safeIdentifier={props.factor.safeIdentifier}
         profileImageUrl={signIn.userData.profileImageUrl}

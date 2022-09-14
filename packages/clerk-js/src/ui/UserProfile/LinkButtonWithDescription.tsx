@@ -1,18 +1,19 @@
-import { Button, Col, Flex, Text } from '../customizables';
+import { Button, Col, Flex, LocalizationKey, Text, useLocalizations } from '../customizables';
 import { useLoadingStatus } from '../hooks';
 import { PropsOfComponent } from '../styledSystem';
 
-type LinkButtonWithTextDescriptionProps = PropsOfComponent<typeof Button> & {
-  title: string;
+type LinkButtonWithTextDescriptionProps = Omit<PropsOfComponent<typeof Button>, 'title'> & {
+  title: LocalizationKey;
   titleLabel?: React.ReactNode;
-  subtitle: string;
-  actionLabel?: string;
+  subtitle: LocalizationKey;
+  actionLabel?: LocalizationKey;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => Promise<any>;
 };
 
 export const LinkButtonWithDescription = (props: LinkButtonWithTextDescriptionProps) => {
   const { title, subtitle, actionLabel, titleLabel, onClick: onClickProp, ...rest } = props;
   const status = useLoadingStatus();
+  const { t } = useLocalizations();
 
   const onClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     status.setLoading();
@@ -28,27 +29,28 @@ export const LinkButtonWithDescription = (props: LinkButtonWithTextDescriptionPr
           gap={2}
           align='center'
         >
-          <Text variant='regularMedium'>{title}</Text>
+          <Text
+            localizationKey={title}
+            variant='regularMedium'
+          />
           {titleLabel}
         </Flex>
         <Text
+          localizationKey={subtitle}
           variant='smallRegular'
           colorScheme='neutral'
-        >
-          {subtitle}
-        </Text>
+        />
       </Col>
       {actionLabel && (
         <Button
+          localizationKey={actionLabel}
+          loadingText={t(actionLabel)}
           colorScheme='primary'
           variant='link'
           {...rest}
           isLoading={status.isLoading}
-          loadingText={actionLabel}
           onClick={onClick}
-        >
-          {actionLabel}
-        </Button>
+        />
       )}
     </Col>
   );

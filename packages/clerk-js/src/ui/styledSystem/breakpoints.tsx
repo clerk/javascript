@@ -1,4 +1,4 @@
-import { fromEntries } from '../utils';
+import { fromEntries } from '../utils/fromEntries';
 
 const breakpoints = Object.freeze({
   xs: '21em', // 336px

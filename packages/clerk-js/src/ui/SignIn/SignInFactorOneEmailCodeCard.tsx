@@ -2,7 +2,7 @@ import { EmailCodeFactor } from '@clerk/types';
 import React from 'react';
 
 import { useEnvironment } from '../../ui/contexts';
-import { Flow } from '../customizables';
+import { Flow, localizationKeys } from '../customizables';
 import { SignInFactorOneCodeCard, SignInFactorOneCodeForm } from './SignInFactorOneCodeForm';
 
 type SignInFactorOneEmailCodeCardProps = SignInFactorOneCodeCard & { factor: EmailCodeFactor };
@@ -14,10 +14,11 @@ export const SignInFactorOneEmailCodeCard = (props: SignInFactorOneEmailCodeCard
     <Flow.Part part='emailCode'>
       <SignInFactorOneCodeForm
         {...props}
-        cardTitle='Check your email'
-        cardSubtitle={`to continue to ${applicationName}`}
-        formTitle='Verification code'
-        formSubtitle='Enter the verification code sent to your email address'
+        cardTitle={localizationKeys('signIn.emailCode.title')}
+        cardSubtitle={localizationKeys('signIn.emailCode.subtitle', { applicationName })}
+        formTitle={localizationKeys('signIn.emailCode.formTitle')}
+        formSubtitle={localizationKeys('signIn.emailCode.formSubtitle')}
+        resendButton={localizationKeys('signIn.emailCode.resendButton')}
       />
     </Flow.Part>
   );

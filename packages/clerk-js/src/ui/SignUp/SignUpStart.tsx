@@ -5,7 +5,7 @@ import { withRedirectToHome } from '../../ui/common/withRedirectToHome';
 import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from '../../ui/contexts';
 import { useNavigate } from '../../ui/hooks';
 import { getClerkQueryParam } from '../../utils/getClerkQueryParam';
-import { descriptors, Flex, Flow, useAppearance } from '../customizables';
+import { descriptors, Flex, Flow, localizationKeys, useAppearance } from '../customizables';
 import {
   Card,
   CardAlert,
@@ -46,14 +46,35 @@ function _SignUpStart(): JSX.Element {
   const [missingRequirementsWithTicket, setMissingRequirementsWithTicket] = React.useState(false);
 
   const formState = {
-    firstName: useFormControl('firstName', '', { type: 'text', label: 'First name' }),
-    lastName: useFormControl('lastName', '', { type: 'text', label: 'Last name' }),
-    emailAddress: useFormControl('emailAddress', '', { type: 'email', label: 'Email address' }),
-    username: useFormControl('username', '', { type: 'text', label: 'Username' }),
-    phoneNumber: useFormControl('phoneNumber', '', { type: 'tel', label: 'Phone number' }),
+    firstName: useFormControl('firstName', '', {
+      type: 'text',
+      label: localizationKeys('formFieldLabel__firstName'),
+      placeholder: localizationKeys('formFieldInputPlaceholder__firstName'),
+    }),
+    lastName: useFormControl('lastName', '', {
+      type: 'text',
+      label: localizationKeys('formFieldLabel__lastName'),
+      placeholder: localizationKeys('formFieldInputPlaceholder__lastName'),
+    }),
+    emailAddress: useFormControl('emailAddress', '', {
+      type: 'email',
+      label: localizationKeys('formFieldLabel__emailAddress'),
+      placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress'),
+    }),
+    username: useFormControl('username', '', {
+      type: 'text',
+      label: localizationKeys('formFieldLabel__username'),
+      placeholder: localizationKeys('formFieldInputPlaceholder__username'),
+    }),
+    phoneNumber: useFormControl('phoneNumber', '', {
+      type: 'tel',
+      label: localizationKeys('formFieldLabel__phoneNumber'),
+      placeholder: localizationKeys('formFieldInputPlaceholder__phoneNumber'),
+    }),
     password: useFormControl('password', '', {
       type: 'password',
-      label: 'Password',
+      label: localizationKeys('formFieldLabel__password'),
+      placeholder: localizationKeys('formFieldInputPlaceholder__password'),
     }),
     ticket: useFormControl(
       'ticket',
@@ -209,8 +230,14 @@ function _SignUpStart(): JSX.Element {
       <Card>
         <CardAlert>{card.error}</CardAlert>
         <Header.Root>
-          <Header.Title>Create your account</Header.Title>
-          <Header.Subtitle>to continue to {displayConfig.applicationName}</Header.Subtitle>
+          <Header.Title localizationKey={localizationKeys('signUp.start.title')}>Create your account</Header.Title>
+          <Header.Subtitle
+            localizationKey={localizationKeys('signUp.start.subtitle', {
+              applicationName: displayConfig.applicationName,
+            })}
+          >
+            to continue to {displayConfig.applicationName}
+          </Header.Subtitle>
         </Header.Root>
         <Flex
           direction='col'
@@ -233,8 +260,15 @@ function _SignUpStart(): JSX.Element {
         </Flex>
         <Footer.Root>
           <Footer.Action>
-            <Footer.ActionText>Have an account?</Footer.ActionText>
-            <Footer.ActionLink to={signInUrl}>Sign in</Footer.ActionLink>
+            <Footer.ActionText localizationKey={localizationKeys('signUp.start.actionText')}>
+              Have an account?
+            </Footer.ActionText>
+            <Footer.ActionLink
+              localizationKey={localizationKeys('signUp.start.actionLink')}
+              to={signInUrl}
+            >
+              Sign in
+            </Footer.ActionLink>
           </Footer.Action>
           <Footer.Links />
         </Footer.Root>
