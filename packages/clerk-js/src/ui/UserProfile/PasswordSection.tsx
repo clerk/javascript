@@ -14,7 +14,7 @@ export const PasswordSection = () => {
 
   return (
     <ProfileSection
-      title={localizationKeys('userProfile.sectionTitle__password')}
+      title={localizationKeys('userProfile.start.passwordSection.title')}
       id='password'
     >
       {passwordEnabled && (
@@ -30,8 +30,8 @@ export const PasswordSection = () => {
         onClick={navigateToPage}
         textLocalizationKey={
           passwordEnabled
-            ? localizationKeys('userProfile.sectionPrimaryButton__changePassword')
-            : localizationKeys('userProfile.sectionPrimaryButton__setPassword')
+            ? localizationKeys('userProfile.start.passwordSection.primaryButton__changePassword')
+            : localizationKeys('userProfile.start.passwordSection.primaryButton__setPassword')
         }
       />
     </ProfileSection>

@@ -18,7 +18,7 @@ export const PhoneSection = () => {
 
   return (
     <ProfileSection
-      title={localizationKeys('userProfile.sectionTitle__phoneNumbers')}
+      title={localizationKeys('userProfile.start.phoneNumbersSection.title')}
       id='phoneNumbers'
     >
       {user.phoneNumbers.sort(primaryIdentificationFirst(user.primaryPhoneNumberId)).map(phone => (
@@ -29,7 +29,7 @@ export const PhoneSection = () => {
       ))}
 
       <AddBlockButton
-        textLocalizationKey={localizationKeys('userProfile.sectionPrimaryButton__phoneNumbers')}
+        textLocalizationKey={localizationKeys('userProfile.start.phoneNumbersSection.primaryButton')}
         id='password'
         onClick={() => navigate('phone-number')}
       />

@@ -28,7 +28,7 @@ export const MfaSection = () => {
 
   return (
     <ProfileSection
-      title={localizationKeys('userProfile.sectionTitle__mfa')}
+      title={localizationKeys('userProfile.start.mfaSection.title')}
       id='mfa'
     >
       {showTOTP && <MfaTOTPAccordion />}
@@ -44,7 +44,7 @@ export const MfaSection = () => {
 
       {secondFactorsAvailableToAdd.length > 0 && (
         <AddBlockButton
-          textLocalizationKey={localizationKeys('userProfile.sectionPrimaryButton__mfa')}
+          textLocalizationKey={localizationKeys('userProfile.start.mfaSection.primaryButton')}
           id='mfa'
           onClick={() => navigate('multi-factor')}
         />

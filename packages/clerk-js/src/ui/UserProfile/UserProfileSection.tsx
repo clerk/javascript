@@ -14,7 +14,7 @@ export const UserProfileSection = () => {
 
   return (
     <ProfileSection
-      title={localizationKeys('userProfile.sectionTitle__profile')}
+      title={localizationKeys('userProfile.start.profileSection.title')}
       id='profile'
     >
       <BlockButton onClick={() => navigate('profile')}>

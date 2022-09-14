@@ -1,3 +1,5 @@
+import { DeepPartial } from './utils';
+
 export type LocalizationValue = string;
 
 /**
@@ -8,7 +10,9 @@ export type LocalizationValue = string;
  * the default english resource object from {@link https://github.com/clerkinc/javascript our open source repo}
  * as a starting point.
  */
-export type LocalizationResource = {
+export type LocalizationResource = DeepPartial<_LocalizationResource>;
+
+type _LocalizationResource = {
   socialButtonsBlockButton: LocalizationValue;
   dividerText: LocalizationValue;
   formFieldLabel__emailAddress: LocalizationValue;
@@ -119,6 +123,13 @@ export type LocalizationResource = {
       formSubtitle: LocalizationValue;
       resendButton: LocalizationValue;
     };
+    totp2Fa: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      formTitle: LocalizationValue;
+      formSubtitle: LocalizationValue;
+      resendButton: LocalizationValue;
+    };
     alternativeMethods: {
       title: LocalizationValue;
       actionLink: LocalizationValue;
@@ -134,33 +145,58 @@ export type LocalizationResource = {
     };
   };
   userProfile: {
-    headerTitle__account: LocalizationValue;
-    headerTitle__security: LocalizationValue;
-    headerSubtitle__account: LocalizationValue;
-    headerSubtitle__security: LocalizationValue;
-    sectionTitle__profile: LocalizationValue;
-    sectionTitle__username: LocalizationValue;
-    sectionTitle__emailAddresses: LocalizationValue;
-    sectionTitle__phoneNumbers: LocalizationValue;
-    sectionTitle__connectedAccounts: LocalizationValue;
-    sectionTitle__password: LocalizationValue;
-    sectionTitle__mfa: LocalizationValue;
-    sectionTitle__activeDevices: LocalizationValue;
-    sectionTitle__web3Wallets: LocalizationValue;
-    sectionPrimaryButton__changeUsername: LocalizationValue;
-    sectionPrimaryButton__setUsername: LocalizationValue;
-    sectionPrimaryButton__emailAddresses: LocalizationValue;
-    sectionPrimaryButton__phoneNumbers: LocalizationValue;
-    sectionPrimaryButton__connectedAccounts: LocalizationValue;
-    sectionPrimaryButton__changePassword: LocalizationValue;
-    sectionPrimaryButton__setPassword: LocalizationValue;
-    sectionPrimaryButton__mfa: LocalizationValue;
-    sectionPrimaryButton__activeDevices: LocalizationValue;
-    sectionPrimaryButton__web3Wallets: LocalizationValue;
     mobileButton__menu: LocalizationValue;
     formButtonPrimary__continue: LocalizationValue;
     formButtonPrimary__finish: LocalizationValue;
     formButtonReset: LocalizationValue;
+    start: {
+      headerTitle__account: LocalizationValue;
+      headerTitle__security: LocalizationValue;
+      headerSubtitle__account: LocalizationValue;
+      headerSubtitle__security: LocalizationValue;
+      profileSection: {
+        title: LocalizationValue;
+      };
+      usernameSection: {
+        title: LocalizationValue;
+        primaryButton__changeUsername: LocalizationValue;
+        primaryButton__setUsername: LocalizationValue;
+      };
+      emailAddressesSection: {
+        title: LocalizationValue;
+        primaryButton: LocalizationValue;
+      };
+      phoneNumbersSection: {
+        title: LocalizationValue;
+        primaryButton: LocalizationValue;
+      };
+      connectedAccountsSection: {
+        title: LocalizationValue;
+        primaryButton: LocalizationValue;
+      };
+      passwordSection: {
+        title: LocalizationValue;
+        primaryButton__changePassword: LocalizationValue;
+        primaryButton__setPassword: LocalizationValue;
+      };
+      mfaSection: {
+        title: LocalizationValue;
+        primaryButton: LocalizationValue;
+      };
+      activeDevicesSection: {
+        title: LocalizationValue;
+        primaryButton: LocalizationValue;
+        detailsTitle: LocalizationValue;
+        detailsSubtitle: LocalizationValue;
+        destructiveActionTitle: LocalizationValue;
+        destructiveActionSubtitle: LocalizationValue;
+        destructiveAction: LocalizationValue;
+      };
+      web3WalletsSection: {
+        title: LocalizationValue;
+        primaryButton: LocalizationValue;
+      };
+    };
     profilePage: {
       title: LocalizationValue;
       imageFormTitle: LocalizationValue;
@@ -176,13 +212,19 @@ export type LocalizationResource = {
     };
     emailAddressPage: {
       title: LocalizationValue;
-      formHint__emailCode: LocalizationValue;
-      successMessage: LocalizationValue;
+      emailCode: {
+        formHint: LocalizationValue;
+        formTitle: LocalizationValue;
+        formSubtitle: LocalizationValue;
+        resendButton: LocalizationValue;
+        successMessage: LocalizationValue;
+      };
       emailLink: {
         formHint: LocalizationValue;
         formTitle: LocalizationValue;
         formSubtitle: LocalizationValue;
         resendButton: LocalizationValue;
+        successMessage: LocalizationValue;
       };
     };
     connectedAccountPage: {
@@ -200,14 +242,6 @@ export type LocalizationResource = {
       title: LocalizationValue;
       formHint: LocalizationValue;
       successMessage: LocalizationValue;
-    };
-    activeDevices: {
-      sectionTitle: LocalizationValue;
-      detailsTitle: LocalizationValue;
-      detailsSubtitle: LocalizationValue;
-      destructiveActionTitle: LocalizationValue;
-      destructiveActionSubtitle: LocalizationValue;
-      destructiveAction: LocalizationValue;
     };
   };
   userButton: {
