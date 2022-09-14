@@ -32,6 +32,7 @@ type OwnProps = {
   focusRing?: boolean;
 };
 
+// @ts-ignore
 export type InputProps = PrimitiveProps<'input'> & StyleVariants<typeof applyVariants> & OwnProps & RequiredProp;
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {

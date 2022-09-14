@@ -42,6 +42,8 @@ const { applyVariants, filterProps } = createVariants(theme => ({
 }));
 
 type OwnProps = { isExternal?: boolean; isDisabled?: boolean };
+
+// @ts-ignore
 export type LinkProps = PrimitiveProps<'a'> & OwnProps & StyleVariants<typeof applyVariants>;
 
 export const Link = (props: LinkProps): JSX.Element => {

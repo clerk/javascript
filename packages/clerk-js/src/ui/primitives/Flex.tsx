@@ -55,6 +55,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   },
 }));
 
+// @ts-ignore
 export type FlexProps = StateProps & BoxProps & StyleVariants<typeof applyVariants>;
 
 export const Flex = React.forwardRef<HTMLDivElement, FlexProps>((props, ref) => {

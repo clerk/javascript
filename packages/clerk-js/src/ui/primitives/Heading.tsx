@@ -22,6 +22,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   },
 }));
 
+// @ts-ignore
 export type HeadingProps = PrimitiveProps<'div'> & StyleVariants<typeof applyVariants> & { as?: 'h1' };
 
 export const Heading = (props: HeadingProps) => {
