@@ -5,8 +5,7 @@ import React from 'react';
 
 export * from '@clerk/clerk-react';
 
-const NO_FRONTEND_API_ERR =
-  'The NEXT_PUBLIC_CLERK_FRONTEND_API environment variable must be set to use the ClerkProvider component.';
+//const NO_FRONTEND_API_ERR = 'The NEXT_PUBLIC_CLERK_FRONTEND_API environment variable must be set to use the ClerkProvider component.';
 
 type NextClerkProviderProps =
   | ({
