@@ -3,7 +3,7 @@ import React from 'react';
 
 import { EmailLinkStatusCard } from '../common';
 import { buildMagicLinkRedirectUrl } from '../common/redirects';
-import { useUserProfileContext } from '../contexts';
+import { useEnvironment, useUserProfileContext } from '../contexts';
 import { localizationKeys } from '../customizables';
 import { useCardState, VerificationLink } from '../elements';
 import { useMagicLink } from '../hooks';
@@ -21,13 +21,24 @@ export const VerifyWithLink = (props: VerifyWithLinkProps) => {
   const card = useCardState();
   const profileContext = useUserProfileContext();
   const { startMagicLinkFlow } = useMagicLink(email);
+  const { displayConfig } = useEnvironment();
 
   React.useEffect(() => {
     startVerification();
   }, []);
 
   function startVerification() {
-    const redirectUrl = buildMagicLinkRedirectUrl(profileContext);
+    /**
+     * The following workaround is used in order to make magic links work when the
+     * <UserProfile/> is used as a modal. In modals, the routing is virtual. For
+     * magic links the flow needs to end by invoking the /verify path of the <UserProfile/>
+     * that renders the <VerificationSuccessPage/>. So, we use the userProfileUrl that
+     * defaults to Clerk Hosted Pages /user as a fallback.
+     */
+    const { routing } = profileContext;
+    const baseUrl = routing === 'virtual' ? displayConfig.userProfileUrl : '';
+
+    const redirectUrl = buildMagicLinkRedirectUrl(profileContext, baseUrl);
     startMagicLinkFlow({ redirectUrl })
       .then(() => nextStep())
       .catch(err => handleError(err, [], card.setError));

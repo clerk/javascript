@@ -16,7 +16,7 @@ const _UserProfile = (_: UserProfileProps) => {
       <Flow.Part>
         <Switch>
           {/* PublicRoutes */}
-          <Route path={'verify'}>
+          <Route path='verify'>
             <VerificationSuccessPage />
           </Route>
           <Route>
