@@ -30,6 +30,9 @@ export type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
 };
 
+/**
+ * Internal type used by RecordToPath
+ */
 type PathImpl<T, Key extends keyof T> = Key extends string
   ? T[Key] extends Record<string, any>
     ?
@@ -38,10 +41,25 @@ type PathImpl<T, Key extends keyof T> = Key extends string
     : never
   : never;
 
+/**
+ * Internal type used by RecordToPath
+ */
 type PathImpl2<T> = PathImpl<T, keyof T> | keyof T;
 
+/**
+ * Used to construct a type union containing all the keys (even if nested) of an object defined as const
+ * const obj =  { a: { b: '' }, c: '' }  as const;
+ * type Paths = RecordToPath<typeof obj>
+ * Paths contains: 'a' | 'a.b' | 'c'
+ */
 export type RecordToPath<T> = PathImpl2<T> extends string | keyof T ? PathImpl2<T> : keyof T;
 
+/**
+ * Used to read the value of a string path inside an object defined as const
+ * const obj =  { a: { b: 'hello' }}  as const;
+ * type Value = PathValue<typeof obj, 'a.b'>
+ * Value is now a union set containing a single type: 'hello'
+ */
 export type PathValue<T, P extends RecordToPath<T>> = P extends `${infer Key}.${infer Rest}`
   ? Key extends keyof T
     ? Rest extends RecordToPath<T[Key]>
