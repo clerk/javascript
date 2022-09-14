@@ -18,7 +18,7 @@ export type SignUpContextType = SignUpCtx & {
   authQueryString: string | null;
 };
 export const useSignUpContext = (): SignUpContextType => {
-  const { componentName, ...ctx } = React.useContext(ComponentContext) as SignUpCtx;
+  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as SignUpCtx;
   const { navigate } = useNavigate();
   const { displayConfig } = useEnvironment();
   const { queryParams } = useRouter();
@@ -84,7 +84,7 @@ export type SignInContextType = SignInCtx & {
 };
 
 export const useSignInContext = (): SignInContextType => {
-  const { componentName, ...ctx } = React.useContext(ComponentContext) as SignInCtx;
+  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as SignInCtx;
   const { navigate } = useNavigate();
   const { displayConfig } = useEnvironment();
   const { queryParams } = useRouter();
@@ -147,7 +147,7 @@ export type UserProfileContextType = UserProfileCtx & {
 // `routing` and `path`
 // TODO: remove if not needed during the components v2 overhaul
 export const useUserProfileContext = (): UserProfileContextType => {
-  const { componentName, ...ctx } = React.useContext(ComponentContext) as UserProfileCtx;
+  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as UserProfileCtx;
   const { queryParams } = useRouter();
 
   if (componentName !== 'UserProfile') {
@@ -163,7 +163,7 @@ export const useUserProfileContext = (): UserProfileContextType => {
 };
 
 export const useUserButtonContext = () => {
-  const { componentName, ...ctx } = React.useContext(ComponentContext) as UserButtonCtx;
+  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as UserButtonCtx;
   const { navigate } = useNavigate();
   const { displayConfig } = useEnvironment();
 
