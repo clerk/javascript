@@ -1,9 +1,13 @@
+import { ClerkAPIError } from '@clerk/types';
 import React, { HTMLInputTypeAttribute } from 'react';
 
+import { LocalizationKey, useLocalizations } from '../localization';
+
 type Options = {
-  label: string;
   type: HTMLInputTypeAttribute;
   isRequired?: boolean;
+  label: string | LocalizationKey;
+  placeholder?: string | LocalizationKey;
 };
 
 type FieldStateProps<Id> = {
@@ -15,7 +19,7 @@ type FieldStateProps<Id> = {
 } & Options;
 
 export type FormControlState<Id = string> = FieldStateProps<Id> & {
-  setError: (error: string | undefined) => void;
+  setError: (error: string | ClerkAPIError | undefined) => void;
   setValue: (val: string | undefined) => void;
   props: FieldStateProps<Id>;
 };
@@ -25,13 +29,14 @@ export const useFormControl = <Id extends string>(
   initialState: string,
   opts?: Options,
 ): FormControlState<Id> => {
-  opts = opts || { type: 'text', label: '', isRequired: false };
+  opts = opts || { type: 'text', label: '', isRequired: false, placeholder: '' };
+  const { translateError } = useLocalizations();
   const [value, setValueInternal] = React.useState(initialState);
   const [errorText, setErrorText] = React.useState<string | undefined>(undefined);
 
   const onChange: FormControlState['onChange'] = event => setValueInternal(event.target.value || '');
   const setValue: FormControlState['setValue'] = val => setValueInternal(val || '');
-  const setError: FormControlState['setError'] = error => setErrorText(error || undefined);
+  const setError: FormControlState['setError'] = error => setErrorText(translateError(error || undefined));
 
   const props = { id, name: id, value, errorText, onChange, ...opts };
 
