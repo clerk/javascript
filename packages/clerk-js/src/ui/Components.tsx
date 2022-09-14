@@ -35,7 +35,12 @@ export type ComponentControls = {
     props?: AvailableComponentProps;
   }) => void;
   unmountComponent: (params: { node: HTMLDivElement }) => void;
-  updateProps: (params: { appearance?: Appearance | undefined; node?: HTMLDivElement; props?: unknown }) => void;
+  updateProps: (params: {
+    appearance?: Appearance | undefined;
+    options?: ClerkOptions | undefined;
+    node?: HTMLDivElement;
+    props?: unknown;
+  }) => void;
   openModal: <T extends 'signIn' | 'signUp' | 'userProfile'>(
     modal: T,
     props: T extends 'signIn' ? SignInProps : T extends 'signUp' ? SignUpProps : UserProfileProps,
@@ -67,6 +72,7 @@ interface ComponentsProps {
 
 interface ComponentsState {
   appearance: Appearance | undefined;
+  options: ClerkOptions | undefined;
   signInModal: null | SignInProps;
   signUpModal: null | SignUpProps;
   userProfileModal: null | UserProfileProps;
@@ -109,6 +115,7 @@ const componentsControls = {} as ComponentControls;
 const Components = (props: ComponentsProps) => {
   const [state, setState] = React.useState<ComponentsState>({
     appearance: props.options.appearance,
+    options: props.options,
     signInModal: null,
     signUpModal: null,
     userProfileModal: null,
@@ -134,7 +141,7 @@ const Components = (props: ComponentsProps) => {
       });
     };
 
-    componentsControls.updateProps = ({ appearance, node, props }) => {
+    componentsControls.updateProps = ({ node, props, ...restProps }) => {
       if (node && props && typeof props === 'object') {
         const nodeOptions = state.nodes.get(node);
         if (nodeOptions) {
@@ -143,7 +150,7 @@ const Components = (props: ComponentsProps) => {
           return;
         }
       }
-      setState(s => ({ ...s, appearance }));
+      setState(s => ({ ...s, ...restProps }));
     };
 
     componentsControls.closeModal = name => {
@@ -245,7 +252,7 @@ const Components = (props: ComponentsProps) => {
   return (
     <CoreClerkContextWrapper clerk={props.clerk}>
       <EnvironmentProvider value={props.environment}>
-        <OptionsProvider value={props.options}>
+        <OptionsProvider value={state.options}>
           {[...nodes].map(([node, component]) => {
             return (
               <AppearanceProvider
