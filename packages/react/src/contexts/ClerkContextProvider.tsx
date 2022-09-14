@@ -102,6 +102,10 @@ const useLoadedIsomorphicClerk = (options: NewIsomorphicClerkParams) => {
   }, [options.options.appearance]);
 
   React.useEffect(() => {
+    isomorphicClerk.__unstable__updateProps({ options: options.options });
+  }, [options.options.localization]);
+
+  React.useEffect(() => {
     isomorphicClerk.addOnLoaded(() => setLoaded(true));
   }, []);
 
