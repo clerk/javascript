@@ -3,7 +3,7 @@ import React from 'react';
 import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../ui/contexts';
 import { useSupportEmail } from '../../ui/hooks/useSupportEmail';
 import { useRouter } from '../../ui/router/RouteContext';
-import { descriptors, Flex, Flow } from '../customizables';
+import { descriptors, Flex, Flow, localizationKeys } from '../customizables';
 import { Card, CardAlert, Footer, Form, Header, IdentityPreview } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { handleError, useFormControl } from '../utils';
@@ -20,7 +20,10 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
   const signIn = useCoreSignIn();
   const { navigateAfterSignIn } = useSignInContext();
   const supportEmail = useSupportEmail();
-  const passwordControl = useFormControl('password', '', { type: 'password', label: 'Password' });
+  const passwordControl = useFormControl('password', '', {
+    type: 'password',
+    label: localizationKeys('formFieldLabel__password'),
+  });
   const { navigate } = useRouter();
 
   const goBack = () => {
@@ -51,8 +54,12 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
       <Card>
         <CardAlert>{card.error}</CardAlert>
         <Header.Root>
-          <Header.Title>Enter your password</Header.Title>
-          <Header.Subtitle>to continue to {displayConfig.applicationName}</Header.Subtitle>
+          <Header.Title localizationKey={localizationKeys('signIn.password.title')} />
+          <Header.Subtitle
+            localizationKey={localizationKeys('signIn.password.subtitle', {
+              applicationName: displayConfig.applicationName,
+            })}
+          />
         </Header.Root>
         <IdentityPreview
           identifier={signIn.identifier}
@@ -70,16 +77,19 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
               <Form.Control
                 {...passwordControl.props}
                 autoFocus
-                actionLabel='Forgot password'
+                actionLabel={localizationKeys('formFieldAction__forgotPassword')}
                 onActionClicked={onShowAlternativeMethodsClick}
               />
             </Form.ControlRow>
-            <Form.SubmitButton>Continue</Form.SubmitButton>
+            <Form.SubmitButton />
           </Form.Root>
         </Flex>
         <Footer.Root>
           <Footer.Action>
-            <Footer.ActionLink onClick={onShowAlternativeMethodsClick}>Use another method</Footer.ActionLink>
+            <Footer.ActionLink
+              localizationKey={localizationKeys('signIn.password.actionLink')}
+              onClick={onShowAlternativeMethodsClick}
+            />
           </Footer.Action>
           <Footer.Links />
         </Footer.Root>

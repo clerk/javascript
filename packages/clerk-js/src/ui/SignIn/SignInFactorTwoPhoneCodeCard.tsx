@@ -2,7 +2,7 @@ import { PhoneCodeFactor } from '@clerk/types';
 import React from 'react';
 
 import { useCoreSignIn } from '../../ui/contexts';
-import { Flow } from '../customizables';
+import { Flow, localizationKeys } from '../customizables';
 import { SignInFactorTwoCodeCard, SignInFactorTwoCodeForm } from './SignInFactorTwoCodeForm';
 
 type SignInFactorTwoPhoneCodeCardProps = SignInFactorTwoCodeCard & { factor: PhoneCodeFactor };
@@ -21,10 +21,11 @@ export const SignInFactorTwoPhoneCodeCard = (props: SignInFactorTwoPhoneCodeCard
     <Flow.Part part='phoneCode2Fa'>
       <SignInFactorTwoCodeForm
         {...props}
-        cardTitle='Two-step authentication'
-        cardSubtitle={''}
-        formTitle='Verification code'
-        formSubtitle='Enter the verification code sent to your phone number'
+        cardTitle={localizationKeys('signIn.phoneCode2Fa.title')}
+        cardSubtitle={localizationKeys('signIn.phoneCode2Fa.subtitle')}
+        formTitle={localizationKeys('signIn.phoneCode2Fa.formTitle')}
+        formSubtitle={localizationKeys('signIn.phoneCode2Fa.formSubtitle')}
+        resendButton={localizationKeys('signIn.phoneCode2Fa.resendButton')}
         prepare={prepare}
       />
     </Flow.Part>

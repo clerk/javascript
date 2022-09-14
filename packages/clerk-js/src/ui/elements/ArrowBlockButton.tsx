@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Button, Flex, Icon, SimpleButton, Spinner, Text } from '../customizables';
+import { Button, Flex, Icon, LocalizationKey, SimpleButton, Spinner, Text } from '../customizables';
 import { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { ArrowRightIcon } from '../icons';
 import { PropsOfComponent, ThemableCssProp } from '../styledSystem';
@@ -15,6 +15,7 @@ type ArrowBlockButtonProps = PropsOfComponent<typeof Button> & {
   arrowElementId?: ElementId;
   spinnerElementDescriptor?: ElementDescriptor;
   spinnerElementId?: ElementId;
+  textLocalizationKey?: LocalizationKey;
 };
 
 export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
@@ -30,6 +31,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
     spinnerElementId,
     arrowElementDescriptor,
     arrowElementId,
+    textLocalizationKey,
     ...rest
   } = props;
 
@@ -96,6 +98,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
         truncate
         colorScheme='inherit'
         variant='buttonSmallRegular'
+        localizationKey={textLocalizationKey}
       >
         {children}
       </Text>

@@ -1,10 +1,13 @@
 import { ProfileSectionId } from '@clerk/types';
 
-import { Col, descriptors, Flex, Text } from '../customizables';
+import { Col, descriptors, Flex, LocalizationKey, Text } from '../customizables';
 import { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { PropsOfComponent } from '../styledSystem';
 
-type ProfileSectionProps = PropsOfComponent<typeof Flex> & { title: string; id: ProfileSectionId };
+type ProfileSectionProps = Omit<PropsOfComponent<typeof Flex>, 'title'> & {
+  title: LocalizationKey;
+  id: ProfileSectionId;
+};
 
 export const ProfileSection = (props: ProfileSectionProps) => {
   const { title, children, id, ...rest } = props;
@@ -16,13 +19,12 @@ export const ProfileSection = (props: ProfileSectionProps) => {
       gap={2}
     >
       <SectionHeader
+        localizationKey={title}
         elementDescriptor={descriptors.profileSectionTitle}
         elementId={descriptors.profileSectionTitle.setId(id)}
         textElementDescriptor={descriptors.profileSectionTitleText}
         textElementId={descriptors.profileSectionTitleText.setId(id)}
-      >
-        {title}
-      </SectionHeader>
+      />
       <Col
         elementDescriptor={descriptors.profileSectionContent}
         elementId={descriptors.profileSectionContent.setId(id)}
@@ -35,24 +37,24 @@ export const ProfileSection = (props: ProfileSectionProps) => {
 };
 
 type SectionHeaderProps = PropsOfComponent<typeof Flex> & {
+  localizationKey: LocalizationKey;
   textElementDescriptor?: ElementDescriptor;
   textElementId?: ElementId;
 };
 
 export const SectionHeader = (props: SectionHeaderProps) => {
-  const { textElementDescriptor, textElementId, children, ...rest } = props;
+  const { textElementDescriptor, textElementId, localizationKey, ...rest } = props;
   return (
     <Flex
       {...rest}
       sx={theme => ({ borderBottom: `${theme.borders.$normal} ${theme.colors.$blackAlpha100}` })}
     >
       <Text
+        localizationKey={localizationKey}
         variant='largeMedium'
         elementDescriptor={textElementDescriptor}
         elementId={textElementId}
-      >
-        {children}
-      </Text>
+      />
     </Flex>
   );
 };

@@ -3,14 +3,16 @@ import React from 'react';
 
 import { useCoreClerk, useSignUpContext } from '../../ui/contexts';
 import { useNavigate } from '../../ui/hooks/useNavigate';
+import { LocalizationKey } from '../customizables';
 import { VerificationCodeCard, VerificationCodeCardProps } from '../elements';
 import { completeSignUpFlow } from './util';
 
 type SignInFactorOneCodeFormProps = {
-  cardTitle: string;
-  cardSubtitle: string;
-  formTitle: string;
-  formSubtitle: string;
+  cardTitle: LocalizationKey;
+  cardSubtitle: LocalizationKey;
+  formTitle: LocalizationKey;
+  formSubtitle: LocalizationKey;
+  resendButton: LocalizationKey;
   prepare: () => Promise<SignUpResource> | undefined;
   attempt: (code: string) => Promise<SignUpResource>;
   safeIdentifier: string | undefined | null;
@@ -50,6 +52,7 @@ export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) 
       cardSubtitle={props.cardSubtitle}
       formTitle={props.formTitle}
       formSubtitle={props.formSubtitle}
+      resendButton={props.resendButton}
       onCodeEntryFinishedAction={action}
       onResendCodeClicked={props.prepare}
       safeIdentifier={props.safeIdentifier || ''}

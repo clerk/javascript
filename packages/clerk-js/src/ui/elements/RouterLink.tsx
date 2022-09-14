@@ -1,5 +1,5 @@
-import { useRouter } from '../router';
 import { Link } from '../customizables';
+import { useRouter } from '../router';
 import { PropsOfComponent } from '../styledSystem';
 
 type RouterLinkProps = PropsOfComponent<typeof Link> & {

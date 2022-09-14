@@ -1,13 +1,13 @@
 import React from 'react';
 
-import { Text } from '../customizables';
+import { LocalizationKey, localizationKeys, Text } from '../customizables';
 import { FormButtonContainer } from './FormButtons';
 import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
 import { ContentPage } from './Page';
 
 type SuccessPageProps = {
-  title: string;
-  text: string;
+  title: LocalizationKey;
+  text: LocalizationKey;
 };
 
 export const SuccessPage = (props: SuccessPageProps) => {
@@ -15,14 +15,16 @@ export const SuccessPage = (props: SuccessPageProps) => {
 
   return (
     <ContentPage.Root headerTitle={title}>
-      <Text variant='regularRegular'>{text}</Text>
+      <Text
+        localizationKey={text}
+        variant='regularRegular'
+      />
       <FormButtonContainer>
         <NavigateToFlowStartButton
           variant='solid'
           autoFocus
-        >
-          Finish
-        </NavigateToFlowStartButton>
+          localizationKey={localizationKeys('userProfile.formButtonPrimary__finish')}
+        />
       </FormButtonContainer>
     </ContentPage.Root>
   );

@@ -2,7 +2,7 @@ import { ActiveSessionResource } from '@clerk/types';
 import React from 'react';
 
 import { useCoreSession, useCoreUser, useEnvironment, useUserButtonContext } from '../contexts';
-import { descriptors, Flex, Flow, Link, useAppearance } from '../customizables';
+import { descriptors, Flex, Flow, Link, localizationKeys, useAppearance } from '../customizables';
 import { BaseCard, PoweredByClerkText, UserPreview } from '../elements';
 import { RootBox } from '../elements/RootBox';
 import { CogFilled, Plus, SignOut, SignOutDouble } from '../icons';
@@ -34,7 +34,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
   const addAccountButton = (
     <Action
       icon={Plus}
-      label='Add account'
+      label={localizationKeys('userButton.action__addAccount')}
       onClick={handleAddAccountClicked}
     />
   );
@@ -54,7 +54,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
       <Actions>
         <Action
           icon={SignOutDouble}
-          label='Sign out of all accounts'
+          label={localizationKeys('userButton.action__signOutAll')}
           onClick={handleSignOutAllClicked}
         />
       </Actions>
@@ -86,7 +86,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
               textElementDescriptor={descriptors.userButtonPopoverActionButtonText}
               textElementId={descriptors.userButtonPopoverActionButtonText.setId('manageAccount')}
               icon={CogFilled}
-              label='Manage account'
+              label={localizationKeys('userButton.action__manageAccount')}
               onClick={handleManageAccountClicked}
             />
             <Action
@@ -99,7 +99,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
               textElementDescriptor={descriptors.userButtonPopoverActionButtonText}
               textElementId={descriptors.userButtonPopoverActionButtonText.setId('signOut')}
               icon={SignOut}
-              label='Sign out'
+              label={localizationKeys('userButton.action__signOut')}
               onClick={handleSignOutSessionClicked(session)}
             />
           </Actions>

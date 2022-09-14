@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Flex, Icon } from '../customizables';
+import { Flex, Icon, localizationKeys, Text } from '../customizables';
 import { ElementDescriptor } from '../customizables/elementDescriptors';
 import { ArrowLeftIcon } from '../icons';
 import { PropsOfComponent } from '../styledSystem';
@@ -19,15 +19,16 @@ export const BackLink = (props: BackLinkProps) => {
       elementDescriptor={boxElementDescriptor}
       sx={theme => ({ marginBottom: theme.space.$2x5 })}
     >
-      <RouterLink
-        elementDescriptor={linkElementDescriptor}
-        {...rest}
-      >
+      <RouterLink {...rest}>
         <Icon
           elementDescriptor={iconElementDescriptor}
           icon={ArrowLeftIcon}
         />
-        Back
+        <Text
+          localizationKey={localizationKeys('backButton')}
+          elementDescriptor={linkElementDescriptor}
+          colorScheme='inherit'
+        />
       </RouterLink>
     </Flex>
   );

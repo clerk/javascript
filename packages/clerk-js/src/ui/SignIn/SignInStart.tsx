@@ -7,7 +7,7 @@ import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '.
 import { useNavigate } from '../../ui/hooks';
 import { useSupportEmail } from '../../ui/hooks/useSupportEmail';
 import { getClerkQueryParam } from '../../utils/getClerkQueryParam';
-import { Col, descriptors, Flow } from '../customizables';
+import { Col, descriptors, Flow, localizationKeys } from '../customizables';
 import {
   Card,
   CardAlert,
@@ -44,11 +44,12 @@ export function _SignInStart(): JSX.Element {
 
   const instantPasswordField = useFormControl('password', '', {
     type: 'password',
-    label: 'Password',
+    label: localizationKeys('formFieldLabel__password'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__password') as any,
   });
+
   const identifierField = useFormControl('identifier', '', {
-    type: identifierInputDisplayValues.fieldType,
-    label: identifierInputDisplayValues.label,
+    ...identifierInputDisplayValues,
     isRequired: true,
   });
 
@@ -56,6 +57,7 @@ export function _SignInStart(): JSX.Element {
     if (!organizationTicket) {
       return;
     }
+
     status.setLoading();
     card.setLoading();
     signIn
@@ -184,8 +186,12 @@ export function _SignInStart(): JSX.Element {
       <Card>
         <CardAlert>{card.error}</CardAlert>
         <Header.Root>
-          <Header.Title>Sign in</Header.Title>
-          <Header.Subtitle>to continue to {displayConfig.applicationName}</Header.Subtitle>
+          <Header.Title localizationKey={localizationKeys('signIn.start.title')} />
+          <Header.Subtitle
+            localizationKey={localizationKeys('signIn.start.subtitle', {
+              applicationName: displayConfig.applicationName,
+            })}
+          />
         </Header.Root>
         {/*TODO: extract main in its own component */}
         <Col
@@ -211,8 +217,15 @@ export function _SignInStart(): JSX.Element {
         </Col>
         <Footer.Root>
           <Footer.Action>
-            <Footer.ActionText>No account?</Footer.ActionText>
-            <Footer.ActionLink to={signUpUrl}>Sign up</Footer.ActionLink>
+            <Footer.ActionText localizationKey={localizationKeys('signIn.start.actionText')}>
+              No account?
+            </Footer.ActionText>
+            <Footer.ActionLink
+              localizationKey={localizationKeys('signIn.start.actionLink')}
+              to={signUpUrl}
+            >
+              Sign up
+            </Footer.ActionLink>
           </Footer.Action>
           <Footer.Links />
         </Footer.Root>

@@ -2,7 +2,7 @@ import { EmailAddressResource } from '@clerk/types';
 import React from 'react';
 
 import { useCoreUser } from '../contexts';
-import { Badge, Col } from '../customizables';
+import { Badge, Col, localizationKeys } from '../customizables';
 import { useCardState } from '../elements';
 import { useNavigate } from '../hooks/useNavigate';
 import { handleError } from '../utils';
@@ -18,7 +18,7 @@ export const EmailsSection = () => {
 
   return (
     <ProfileSection
-      title='Email addresses'
+      title={localizationKeys('userProfile.sectionTitle__emailAddresses')}
       id='emailAddresses'
     >
       {user.emailAddresses.sort(primaryIdentificationFirst(user.primaryEmailAddressId)).map(email => (
@@ -29,11 +29,10 @@ export const EmailsSection = () => {
       ))}
 
       <AddBlockButton
+        textLocalizationKey={localizationKeys('userProfile.sectionPrimaryButton__emailAddresses')}
         id='emailAddresses'
         onClick={() => navigate('email-address')}
-      >
-        Add an email address
-      </AddBlockButton>
+      />
     </ProfileSection>
   );
 };
@@ -51,7 +50,7 @@ const EmailAccordion = ({ email }: { email: EmailAddressResource }) => {
   return (
     <UserProfileAccordion
       title={email.emailAddress}
-      badge={isPrimary ? <Badge>Primary</Badge> : undefined}
+      badge={isPrimary ? <Badge localizationKey={localizationKeys('badge__primary')} /> : undefined}
     >
       <Col gap={4}>
         {isPrimary && isVerified && (
@@ -80,7 +79,12 @@ const EmailAccordion = ({ email }: { email: EmailAddressResource }) => {
         {!isPrimary && !isVerified && (
           <LinkButtonWithDescription
             title='Unverified email address'
-            titleLabel={<Badge colorScheme='warning'>Unverified</Badge>}
+            titleLabel={
+              <Badge
+                localizationKey={localizationKeys('badge__unverified')}
+                colorScheme='warning'
+              />
+            }
             subtitle='This email address has not been verified and may be limited in functionality'
             actionLabel='Complete verification'
             onClick={() => navigate(`email-address/${email.id}`)}

@@ -1,8 +1,8 @@
 import { PhoneCodeFactor } from '@clerk/types';
 import React from 'react';
 
-import { useEnvironment } from '../../ui/contexts';
-import { Flow } from '../customizables';
+import { useEnvironment } from '../contexts';
+import { Flow, localizationKeys } from '../customizables';
 import { SignInFactorOneCodeCard, SignInFactorOneCodeForm } from './SignInFactorOneCodeForm';
 
 type SignInFactorOnePhoneCodeCardProps = SignInFactorOneCodeCard & { factor: PhoneCodeFactor };
@@ -14,10 +14,11 @@ export const SignInFactorOnePhoneCodeCard = (props: SignInFactorOnePhoneCodeCard
     <Flow.Part part='phoneCode'>
       <SignInFactorOneCodeForm
         {...props}
-        cardTitle='Check your phone'
-        cardSubtitle={`to continue to ${applicationName}`}
-        formTitle='Verification code'
-        formSubtitle='Enter the verification code sent to your phone number'
+        cardTitle={localizationKeys('signIn.phoneCode.title')}
+        cardSubtitle={localizationKeys('signIn.phoneCode.subtitle', { applicationName })}
+        formTitle={localizationKeys('signIn.phoneCode.formTitle')}
+        formSubtitle={localizationKeys('signIn.phoneCode.formSubtitle')}
+        resendButton={localizationKeys('signIn.phoneCode.resendButton')}
       />
     </Flow.Part>
   );

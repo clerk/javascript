@@ -1,7 +1,7 @@
 import { Web3WalletResource } from '@clerk/types';
 
 import { useCoreUser } from '../contexts';
-import { Col, Flex, Image } from '../customizables';
+import { Col, Flex, Image, localizationKeys } from '../customizables';
 import { useEnabledThirdPartyProviders } from '../hooks';
 import { useNavigate } from '../hooks/useNavigate';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
@@ -15,7 +15,7 @@ export const Web3Section = () => {
 
   return (
     <ProfileSection
-      title='Web3 wallets'
+      title={localizationKeys('userProfile.sectionTitle__web3Wallets')}
       id='web3Wallets'
     >
       {user.web3Wallets.map(wallet => (
@@ -27,9 +27,8 @@ export const Web3Section = () => {
       <AddBlockButton
         id='password'
         onClick={() => navigate(`web3-wallet`)}
-      >
-        Add web3 wallet
-      </AddBlockButton>
+        textLocalizationKey={localizationKeys('userProfile.sectionPrimaryButton__web3Wallets')}
+      ></AddBlockButton>
     </ProfileSection>
   );
 };

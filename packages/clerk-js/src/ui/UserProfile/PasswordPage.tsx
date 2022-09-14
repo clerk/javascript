@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../common';
 import { useCoreUser } from '../contexts';
+import { localizationKeys } from '../customizables';
 import { Form, useCardState, withCardStateProvider } from '../elements';
 import { handleError, useFormControl } from '../utils';
 import { FormButtons } from './FormButtons';
@@ -9,13 +10,18 @@ import { ContentPage } from './Page';
 import { SuccessPage } from './SuccessPage';
 
 export const PasswordPage = withCardStateProvider(() => {
+  const title = localizationKeys('userProfile.passwordPage.title');
   const user = useCoreUser();
   const card = useCardState();
   const wizard = useWizard();
-  const passwordField = useFormControl('password', '', { type: 'password', label: 'New password', isRequired: true });
+  const passwordField = useFormControl('password', '', {
+    type: 'password',
+    label: localizationKeys('formFieldLabel__newPassword'),
+    isRequired: true,
+  });
   const confirmField = useFormControl('confirmPassword', '', {
     type: 'password',
-    label: 'Confirm password',
+    label: localizationKeys('formFieldLabel__confirmPassword'),
     isRequired: true,
   });
 
@@ -42,7 +48,7 @@ export const PasswordPage = withCardStateProvider(() => {
 
   return (
     <Wizard {...wizard.props}>
-      <ContentPage.Root headerTitle='Set password'>
+      <ContentPage.Root headerTitle={title}>
         <Form.Root
           onSubmit={updatePassword}
           onBlur={validateForm}
@@ -63,8 +69,8 @@ export const PasswordPage = withCardStateProvider(() => {
       </ContentPage.Root>
 
       <SuccessPage
-        title={'Set password'}
-        text={'Your password has been set.'}
+        title={title}
+        text={localizationKeys('userProfile.passwordPage.successMessage')}
       />
     </Wizard>
   );

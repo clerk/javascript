@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Button, descriptors, Flex, Form as FormPrim } from '../customizables';
+import { Button, descriptors, Flex, Form as FormPrim, localizationKeys } from '../customizables';
 import { useLoadingStatus } from '../hooks';
 import { PropsOfComponent } from '../styledSystem';
 import { createContextAndHook } from '../utils';
@@ -72,6 +72,7 @@ const FormSubmit = (props: PropsOfComponent<typeof Button>) => {
         isDisabled={isDisabled}
         type='submit'
         {...props}
+        localizationKey={props.localizationKey || localizationKeys('formButtonPrimary')}
       />
     </>
   );

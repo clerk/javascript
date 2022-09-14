@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Button, Col, Flex, Icon, Spinner, Text } from '../customizables';
+import { Button, Col, Flex, Icon, LocalizationKey, Spinner, Text } from '../customizables';
 import { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { useCardState } from '../elements/contexts';
 import { useLoadingStatus } from '../hooks';
@@ -10,9 +10,9 @@ export const Actions = (props: PropsOfComponent<typeof Flex>) => {
   return <Col {...props} />;
 };
 
-type ActionProps = PropsOfComponent<typeof Button> & {
+type ActionProps = Omit<PropsOfComponent<typeof Button>, 'label'> & {
   icon: React.ComponentType;
-  label: string;
+  label: LocalizationKey;
   iconBoxElementDescriptor?: ElementDescriptor;
   iconBoxElementId?: ElementId;
   iconElementDescriptor?: ElementDescriptor;
@@ -88,14 +88,13 @@ export const Action = (props: ActionProps) => {
         )}
       </Flex>
       <Text
+        localizationKey={label}
         elementDescriptor={textElementDescriptor}
         elementId={textElementId}
         as='span'
         variant='smallRegular'
         colorScheme='neutral'
-      >
-        {label}
-      </Text>
+      />
     </Button>
   );
 };

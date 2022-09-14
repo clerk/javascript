@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { useLocalizations } from '../../customizables';
 import { useSafeState } from '../../hooks';
 import { createContextAndHook } from '../../utils';
 
@@ -26,10 +27,14 @@ const CardStateProvider = (props: React.PropsWithChildren<any>) => {
 
 const useCardState = () => {
   const { state, setState } = _useCardState();
+  const { translateError } = useLocalizations();
 
   return {
     setIdle: (metadata?: Metadata) => setState(s => ({ ...s, status: 'idle', metadata })),
-    setError: (metadata: Metadata) => setState(s => ({ ...s, error: metadata })),
+    setError: (metadata: Metadata) =>
+      setState(s => {
+        return { ...s, error: translateError(metadata) };
+      }),
     setLoading: (metadata?: Metadata) => setState(s => ({ ...s, status: 'loading', metadata })),
     loadingMetadata: state.status === 'loading' ? state.metadata : undefined,
     error: state.error ? state.error : undefined,

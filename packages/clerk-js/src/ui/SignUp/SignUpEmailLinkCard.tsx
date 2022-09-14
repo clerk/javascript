@@ -6,7 +6,7 @@ import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from '.
 import { useNavigate } from '../../ui/hooks';
 import { useMagicLink } from '../../ui/hooks/useMagicLink';
 import { EmailLinkStatusCard } from '../common';
-import { Flow } from '../customizables';
+import { Flow, localizationKeys } from '../customizables';
 import { VerificationLinkCard } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { handleError } from '../utils';
@@ -72,10 +72,11 @@ export const SignUpEmailLinkCard = () => {
   return (
     <Flow.Part part='emailLink'>
       <VerificationLinkCard
-        cardTitle='Verify your email'
-        cardSubtitle={`to continue to ${displayConfig.applicationName}`}
-        formTitle='Verification link'
-        formSubtitle='Use the verification link sent your email'
+        cardTitle={localizationKeys('signUp.emailLink.title')}
+        cardSubtitle={localizationKeys('signUp.emailLink.subtitle')}
+        formTitle={localizationKeys('signUp.emailLink.formTitle')}
+        formSubtitle={localizationKeys('signUp.emailLink.formSubtitle')}
+        resendButton={localizationKeys('signUp.emailLink.resendButton')}
         onResendCodeClicked={restartVerification}
         safeIdentifier={signUp.emailAddress || ''}
       />

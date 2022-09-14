@@ -1,7 +1,7 @@
 import React from 'react';
 
+import { descriptors, Flex, Flow, Icon, LocalizationKey, localizationKeys, Text } from '../customizables';
 import { useSupportEmail } from '../hooks/useSupportEmail';
-import { descriptors, Flex, Flow, Icon, Text } from '../customizables';
 import { Email } from '../icons';
 import { CardAlert } from './Alert';
 import { ArrowBlockButton } from './ArrowBlockButton';
@@ -11,8 +11,8 @@ import { Footer } from './Footer';
 import { Header } from './Header';
 
 type ErrorCardProps = {
-  cardTitle?: string;
-  cardSubtitle?: string;
+  cardTitle?: string | LocalizationKey;
+  cardSubtitle?: string | LocalizationKey;
   message?: string;
   onBackLinkClick?: React.MouseEventHandler | undefined;
 };
@@ -32,8 +32,8 @@ export const ErrorCard = (props: ErrorCardProps) => {
         <CardAlert>{card.error}</CardAlert>
         <Header.Root>
           {onBackLinkClick && <Header.BackLink onClick={onBackLinkClick} />}
-          <Header.Title>{props.cardTitle || 'Error'}</Header.Title>
-          {props.cardSubtitle && <Header.Subtitle>{props.cardSubtitle}</Header.Subtitle>}
+          <Header.Title localizationKey={props.cardTitle || 'Error'}></Header.Title>
+          {props.cardSubtitle && <Header.Subtitle localizationKey={props.cardSubtitle} />}
         </Header.Root>
         {/*TODO: extract main in its own component */}
         <Flex
@@ -53,11 +53,10 @@ export const ErrorCard = (props: ErrorCardProps) => {
           <Text
             variant='smallRegular'
             colorScheme='neutral'
-          >
-            If you’re experiencing difficulty signing into your account, email us and we will work with you to restore
-            access as soon as possible.
-          </Text>
+            localizationKey={localizationKeys('signIn.alternativeMethods.getHelp.content')}
+          />
           <ArrowBlockButton
+            textLocalizationKey={localizationKeys('signIn.alternativeMethods.getHelp.blockButton__emailSupport')}
             onClick={handleEmailSupport}
             icon={
               <Icon
@@ -65,9 +64,7 @@ export const ErrorCard = (props: ErrorCardProps) => {
                 sx={theme => ({ color: theme.colors.$blackAlpha500 })}
               />
             }
-          >
-            Email support
-          </ArrowBlockButton>
+          />
         </Flex>
         <Footer.Root>
           <Footer.Action />

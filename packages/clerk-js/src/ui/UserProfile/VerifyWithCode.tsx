@@ -1,6 +1,7 @@
 import { EmailAddressResource, PhoneNumberResource } from '@clerk/types';
 import React from 'react';
 
+import { localizationKeys } from '../customizables';
 import { useCardState, useCodeControl } from '../elements';
 import { CodeForm } from '../elements/CodeForm';
 import { useLoadingStatus } from '../hooks';
@@ -56,8 +57,9 @@ export const VerifyWithCode = (props: VerifyWithCodeProps) => {
   return (
     <>
       <CodeForm
-        title={'Verification code'}
-        subtitle={`Enter the verification code sent to ${identifier}`}
+        title={localizationKeys('userProfile.emailAddressPage.emailCode.formTitle')}
+        subtitle={localizationKeys('userProfile.emailAddressPage.emailCode.formSubtitle', { identifier })}
+        resendButton={localizationKeys('userProfile.emailAddressPage.emailCode.resendButton')}
         codeControl={codeControl}
         isLoading={status.isLoading}
         success={success}

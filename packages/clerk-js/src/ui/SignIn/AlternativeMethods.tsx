@@ -2,7 +2,7 @@ import { SignInFactor } from '@clerk/types';
 import React from 'react';
 
 import { useCoreSignIn } from '../../ui/contexts/';
-import { descriptors, Flex, Flow } from '../customizables';
+import { descriptors, Flex, Flow, LocalizationKey, localizationKeys } from '../customizables';
 import { ArrowBlockButton, Card, CardAlert, Footer, Header } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { allStrategiesButtonsComparator, formatSafeIdentifier } from '../utils';
@@ -47,7 +47,7 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
         <CardAlert>{card.error}</CardAlert>
         <Header.Root>
           {onBackLinkClick && <Header.BackLink onClick={onBackLinkClick} />}
-          <Header.Title>Use another method</Header.Title>
+          <Header.Title localizationKey={localizationKeys('signIn.alternativeMethods.title')} />
         </Header.Root>
         {/*TODO: extract main in its own component */}
         <Flex
@@ -63,21 +63,23 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
           >
             {validFactors.map((factor, i) => (
               <ArrowBlockButton
+                textLocalizationKey={getButtonLabel(factor)}
                 elementDescriptor={descriptors.alternativeMethodsBlockButton}
                 textElementDescriptor={descriptors.alternativeMethodsBlockButtonText}
                 arrowElementDescriptor={descriptors.alternativeMethodsBlockButtonArrow}
                 key={i}
                 isDisabled={card.isLoading}
                 onClick={() => onFactorSelected(factor)}
-              >
-                {getButtonLabel(factor)}
-              </ArrowBlockButton>
+              />
             ))}
           </Flex>
         </Flex>
         <Footer.Root>
           <Footer.Action>
-            <Footer.ActionLink onClick={onHavingTroubleClick}>Get help</Footer.ActionLink>
+            <Footer.ActionLink
+              localizationKey={localizationKeys('signIn.alternativeMethods.actionLink')}
+              onClick={onHavingTroubleClick}
+            />
           </Footer.Action>
           <Footer.Links />
         </Footer.Root>
@@ -86,16 +88,22 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
   );
 };
 
-export function getButtonLabel(factor: SignInFactor): string {
+export function getButtonLabel(factor: SignInFactor): LocalizationKey {
   switch (factor.strategy) {
     case 'email_link':
-      return `Send link to ${formatSafeIdentifier(factor.safeIdentifier)}`;
+      return localizationKeys('signIn.alternativeMethods.blockButton__emailLink', {
+        identifier: formatSafeIdentifier(factor.safeIdentifier) || '',
+      });
     case 'email_code':
-      return `Send code to ${formatSafeIdentifier(factor.safeIdentifier)}`;
+      return localizationKeys('signIn.alternativeMethods.blockButton__emailCode', {
+        identifier: formatSafeIdentifier(factor.safeIdentifier) || '',
+      });
     case 'phone_code':
-      return `Send code to ${formatSafeIdentifier(factor.safeIdentifier)}`;
+      return localizationKeys('signIn.alternativeMethods.blockButton__phoneCode', {
+        identifier: formatSafeIdentifier(factor.safeIdentifier) || '',
+      });
     case 'password':
-      return 'Sign in with your password';
+      return localizationKeys('signIn.alternativeMethods.blockButton__password');
     default:
       throw `Invalid sign in strategy: "${factor.strategy}"`;
   }

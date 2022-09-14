@@ -9,23 +9,27 @@ import {
   FormLabel,
   Input,
   Link,
+  LocalizationKey,
+  localizationKeys,
   Text,
+  useLocalizations,
 } from '../customizables';
 import { PropsOfComponent } from '../styledSystem';
 import { useCardState } from './contexts';
 import { PasswordInput } from './PasswordInput';
 import { PhoneInput } from './PhoneInput';
 
-type FormControlProps = {
+type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placeholder'> & {
   id: FieldId;
-  label: string;
   isRequired?: boolean;
   isOptional?: boolean;
   errorText?: string;
-  actionLabel?: string;
   onActionClicked?: React.MouseEventHandler;
   isDisabled?: boolean;
-} & PropsOfComponent<typeof Input>;
+  label: string | LocalizationKey;
+  placeholder?: string | LocalizationKey;
+  actionLabel?: string | LocalizationKey;
+};
 
 // TODO: Convert this into a Component?
 const getInputElementForType = (type: FormControlProps['type']) => {
@@ -33,8 +37,10 @@ const getInputElementForType = (type: FormControlProps['type']) => {
 };
 
 export const FormControl = (props: FormControlProps) => {
+  const { t } = useLocalizations();
   const card = useCardState();
-  const { id, errorText, isRequired, isOptional, label, actionLabel, onActionClicked, sx, ...rest } = props;
+  const { id, errorText, isRequired, isOptional, label, actionLabel, onActionClicked, sx, placeholder, ...rest } =
+    props;
   const hasError = !!errorText;
   const isDisabled = props.isDisabled || card.isLoading;
 
@@ -58,6 +64,7 @@ export const FormControl = (props: FormControlProps) => {
         sx={theme => ({ marginBottom: theme.space.$1 })}
       >
         <FormLabel
+          localizationKey={typeof label === 'object' ? label : undefined}
           elementDescriptor={descriptors.formFieldLabel}
           elementId={descriptors.formFieldLabel.setId(id)}
           hasError={hasError}
@@ -65,22 +72,22 @@ export const FormControl = (props: FormControlProps) => {
           isRequired={isRequired}
           sx={{ marginRight: 'auto' }}
         >
-          {label}
+          {typeof label === 'string' ? label : undefined}
         </FormLabel>
         {isOptional && !actionLabel && (
           <Text
+            localizationKey={localizationKeys('formFieldHintText__optional')}
             elementDescriptor={descriptors.formFieldHintText}
             elementId={descriptors.formFieldHintText.setId(id)}
             as='span'
             colorScheme='neutral'
             variant='smallRegular'
             isDisabled={isDisabled}
-          >
-            Optional
-          </Text>
+          />
         )}
         {actionLabel && (
           <Link
+            localizationKey={actionLabel}
             elementDescriptor={descriptors.formFieldAction}
             elementId={descriptors.formFieldLabel.setId(id)}
             isDisabled={isDisabled}
@@ -90,7 +97,7 @@ export const FormControl = (props: FormControlProps) => {
               onActionClicked?.(e);
             }}
           >
-            {actionLabel}
+            {typeof actionLabel === 'string' ? actionLabel : undefined}
           </Link>
         )}
       </Flex>
@@ -101,6 +108,7 @@ export const FormControl = (props: FormControlProps) => {
         isDisabled={isDisabled}
         isRequired={isRequired}
         {...rest}
+        placeholder={t(placeholder)}
       />
       <FormErrorText
         elementDescriptor={descriptors.formFieldErrorText}

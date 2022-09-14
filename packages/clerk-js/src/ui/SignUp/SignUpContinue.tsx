@@ -3,7 +3,7 @@ import React from 'react';
 import { withRedirectToHome } from '../../ui/common/withRedirectToHome';
 import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from '../../ui/contexts';
 import { useNavigate } from '../../ui/hooks';
-import { descriptors, Flex, Flow } from '../customizables';
+import { descriptors, Flex, Flow, localizationKeys } from '../customizables';
 import {
   Card,
   CardAlert,
@@ -47,13 +47,38 @@ function _SignUpContinue() {
     return <LoadingCard />;
   }
 
+  // TODO: This form should be shared between SignUpStart and SignUpContinue
   const formState = {
-    firstName: useFormControl('first_name', '', { type: 'text', label: 'First name' }),
-    lastName: useFormControl('last_name', '', { type: 'text', label: 'Last name' }),
-    emailAddress: useFormControl('email_address', '', { type: 'email', label: 'Email address' }),
-    username: useFormControl('username', '', { type: 'text', label: 'Username' }),
-    phoneNumber: useFormControl('phone_number', '', { type: 'tel', label: 'Phone number' }),
-    password: useFormControl('password', '', { type: 'password', label: 'Password' }),
+    firstName: useFormControl('firstName', '', {
+      type: 'text',
+      label: localizationKeys('formFieldLabel__firstName'),
+      placeholder: localizationKeys('formFieldInputPlaceholder__firstName'),
+    }),
+    lastName: useFormControl('lastName', '', {
+      type: 'text',
+      label: localizationKeys('formFieldLabel__lastName'),
+      placeholder: localizationKeys('formFieldInputPlaceholder__lastName'),
+    }),
+    emailAddress: useFormControl('emailAddress', '', {
+      type: 'email',
+      label: localizationKeys('formFieldLabel__emailAddress'),
+      placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress'),
+    }),
+    username: useFormControl('username', '', {
+      type: 'text',
+      label: localizationKeys('formFieldLabel__username'),
+      placeholder: localizationKeys('formFieldInputPlaceholder__username'),
+    }),
+    phoneNumber: useFormControl('phoneNumber', '', {
+      type: 'tel',
+      label: localizationKeys('formFieldLabel__phoneNumber'),
+      placeholder: localizationKeys('formFieldInputPlaceholder__phoneNumber'),
+    }),
+    password: useFormControl('password', '', {
+      type: 'password',
+      label: localizationKeys('formFieldLabel__password'),
+      placeholder: localizationKeys('formFieldInputPlaceholder__password'),
+    }),
   } as const;
 
   const hasEmail = !!formState.emailAddress.value;
@@ -124,9 +149,8 @@ function _SignUpContinue() {
       <Card>
         <CardAlert>{card.error}</CardAlert>
         <Header.Root>
-          {/* TODO: copy? */}
-          <Header.Title>Fill in missing fields</Header.Title>
-          <Header.Subtitle>to continue to {displayConfig.applicationName}</Header.Subtitle>
+          <Header.Title localizationKey={localizationKeys('signUp.continue.title')} />
+          <Header.Subtitle localizationKey={localizationKeys('signUp.continue.subtitle')} />
         </Header.Root>
         <Flex
           direction='col'
@@ -149,8 +173,11 @@ function _SignUpContinue() {
         </Flex>
         <Footer.Root>
           <Footer.Action>
-            <Footer.ActionText>Have an account?</Footer.ActionText>
-            <Footer.ActionLink to={signInUrl}>Sign in</Footer.ActionLink>
+            <Footer.ActionText localizationKey={localizationKeys('signUp.continue.actionText')} />
+            <Footer.ActionLink
+              localizationKey={localizationKeys('signUp.continue.actionLink')}
+              to={signInUrl}
+            />
           </Footer.Action>
           <Footer.Links />
         </Footer.Root>

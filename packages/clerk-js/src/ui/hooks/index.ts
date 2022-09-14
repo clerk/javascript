@@ -10,3 +10,4 @@ export * from './useLocalStorage';
 export * from './useSearchInput';
 export * from './useSafeState';
 export * from './useScrollLock';
+export * from './useDeepEqualMemo';

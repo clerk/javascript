@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../common';
 import { useCoreUser } from '../contexts';
+import { localizationKeys } from '../customizables';
 import { Form, useCardState, withCardStateProvider } from '../elements';
 import { handleError, useFormControl } from '../utils';
 import { FormButtons } from './FormButtons';
@@ -12,7 +13,11 @@ export const UsernamePage = withCardStateProvider(() => {
   const user = useCoreUser();
   const card = useCardState();
   const wizard = useWizard();
-  const usernameField = useFormControl('username', user.username || '', { type: 'text', label: 'Username' });
+  const usernameField = useFormControl('username', user.username || '', {
+    type: 'text',
+    label: localizationKeys('formFieldLabel__username'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__username'),
+  });
 
   const canSubmit = usernameField.value.length > 1 && user.username !== usernameField.value;
 
@@ -27,7 +32,7 @@ export const UsernamePage = withCardStateProvider(() => {
 
   return (
     <Wizard {...wizard.props}>
-      <ContentPage.Root headerTitle='Update username'>
+      <ContentPage.Root headerTitle={localizationKeys('userProfile.usernamePage.title')}>
         <Form.Root onSubmit={updatePassword}>
           <Form.ControlRow>
             <Form.Control
@@ -40,8 +45,8 @@ export const UsernamePage = withCardStateProvider(() => {
         </Form.Root>
       </ContentPage.Root>
       <SuccessPage
-        title={'Update username'}
-        text={'Your username has been updated.'}
+        title={localizationKeys('userProfile.usernamePage.title')}
+        text={localizationKeys('userProfile.usernamePage.successMessage')}
       />
     </Wizard>
   );

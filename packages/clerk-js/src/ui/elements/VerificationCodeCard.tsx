@@ -1,7 +1,6 @@
 import React from 'react';
 
-import { descriptors, Flex } from '../customizables';
-// import { useLoadingStatus } from '../hooks';
+import { Col, descriptors, LocalizationKey, localizationKeys } from '../customizables';
 import { useLoadingStatus } from '../hooks';
 import { handleError, sleep, useFormControl } from '../utils';
 import { CardAlert } from './Alert';
@@ -14,10 +13,11 @@ import { Header } from './Header';
 import { IdentityPreview } from './IdentityPreview';
 
 export type VerificationCodeCardProps = {
-  cardTitle: string;
-  cardSubtitle: string;
-  formTitle: string;
-  formSubtitle: string;
+  cardTitle: LocalizationKey;
+  cardSubtitle: LocalizationKey;
+  formTitle: LocalizationKey;
+  formSubtitle: LocalizationKey;
+  resendButton: LocalizationKey;
   safeIdentifier?: string;
   profileImageUrl?: string;
   onCodeEntryFinishedAction: (
@@ -66,34 +66,35 @@ export const VerificationCodeCard = (props: VerificationCodeCardProps) => {
     <Card>
       <CardAlert>{card.error}</CardAlert>
       <Header.Root>
-        {/*<Header.BackLink onClick={goBack} />*/}
-        <Header.Title>{props.cardTitle}</Header.Title>
-        <Header.Subtitle>{props.cardSubtitle}</Header.Subtitle>
+        <Header.Title localizationKey={props.cardTitle} />
+        <Header.Subtitle localizationKey={props.cardSubtitle} />
       </Header.Root>
       <IdentityPreview
         identifier={props.safeIdentifier}
         avatarUrl={props.profileImageUrl}
         onClick={props.onIdentityPreviewEditClicked}
       />
-      {/*TODO: extract main in its own component */}
-      <Flex
-        direction='col'
+      <Col
         elementDescriptor={descriptors.main}
         gap={8}
       >
         <CodeForm
           title={props.formTitle}
           subtitle={props.formSubtitle}
+          resendButton={props.resendButton}
           isLoading={status.isLoading}
           success={success}
           codeControl={codeControl}
           onResendCodeClicked={handleResend}
         />
-      </Flex>
+      </Col>
       <Footer.Root>
         <Footer.Action>
           {props.onShowAlternativeMethodsClicked && (
-            <Footer.ActionLink onClick={props.onShowAlternativeMethodsClicked}>Use another method</Footer.ActionLink>
+            <Footer.ActionLink
+              localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
+              onClick={props.onShowAlternativeMethodsClicked}
+            />
           )}
         </Footer.Action>
         <Footer.Links />

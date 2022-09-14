@@ -23,7 +23,7 @@ const Title = React.memo((props: PropsOfComponent<typeof Heading>): JSX.Element 
   );
 });
 
-const Subtitle = React.memo((props: React.PropsWithChildren<any>): JSX.Element => {
+const Subtitle = React.memo((props: PropsOfComponent<typeof Text>): JSX.Element => {
   return (
     <Text
       elementDescriptor={descriptors.headerSubtitle}

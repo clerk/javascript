@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Flex } from '../customizables';
+import { Flex, localizationKeys } from '../customizables';
 import { Form } from '../elements';
 import { PropsOfComponent } from '../styledSystem';
 import { useNavigateToFlowStart } from './NavigateToFlowStartButton';
@@ -23,11 +23,10 @@ export const FormButtons = (props: FormButtonsProps) => {
         {submitLabel || 'Continue'}
       </Form.SubmitButton>
       <Form.ResetButton
+        localizationKey={localizationKeys('userProfile.formButtonReset')}
         block={false}
         onClick={navigateToFlowStart}
-      >
-        Cancel
-      </Form.ResetButton>
+      />
     </FormButtonContainer>
   );
 };

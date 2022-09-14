@@ -2,7 +2,7 @@ import { VerificationStrategy } from '@clerk/types';
 import React from 'react';
 
 import { useCoreUser, useEnvironment } from '../contexts';
-import { Col, Grid, Text } from '../customizables';
+import { Col, Grid, localizationKeys, Text } from '../customizables';
 import { TileButton, useCardState, withCardStateProvider } from '../elements';
 import { AuthApp, Mobile } from '../icons';
 import { mqu } from '../styledSystem';
@@ -19,7 +19,7 @@ export const MfaPage = withCardStateProvider(() => {
     userSettings: { attributes },
   } = useEnvironment();
   const user = useCoreUser();
-  const title = 'Add two-step verification';
+  const title = localizationKeys('userProfile.mfaPage.title');
   const [selectedMethod, setSelectedMethod] = React.useState<VerificationStrategy>();
 
   // Calculate second factors available to add on first use only

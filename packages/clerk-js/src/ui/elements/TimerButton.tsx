@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import { Button } from '../customizables';
+import { Button, useLocalizations } from '../customizables';
 import { useSafeLayoutEffect } from '../hooks';
 import { PropsOfComponent } from '../styledSystem';
 
@@ -11,7 +11,16 @@ type TimerButtonProps = PropsOfComponent<typeof Button> & {
 };
 
 export const TimerButton = (props: TimerButtonProps) => {
-  const { onClick: onClickProp, throttleTimeInSec = 30, startDisabled, children, showCounter = true, ...rest } = props;
+  const { t } = useLocalizations();
+  const {
+    onClick: onClickProp,
+    throttleTimeInSec = 30,
+    startDisabled,
+    children,
+    localizationKey,
+    showCounter = true,
+    ...rest
+  } = props;
   const [remainingSeconds, setRemainingSeconds] = React.useState(0);
   const intervalIdRef = React.useRef<number | undefined>(undefined);
 
@@ -52,7 +61,7 @@ export const TimerButton = (props: TimerButtonProps) => {
       isDisabled={remainingSeconds > 0 || props.isDisabled}
       onClick={handleOnClick}
     >
-      {children}
+      {t(localizationKey) || children}
       {remainingSeconds && showCounter ? ` (${remainingSeconds})` : ''}
     </Button>
   );

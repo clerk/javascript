@@ -1,6 +1,6 @@
 import { useCoreUser } from '../contexts';
+import { localizationKeys, Text } from '../customizables';
 import { useNavigate } from '../hooks/useNavigate';
-import { Text } from '../customizables';
 import { ProfileSection } from './Section';
 import { AddBlockButton } from './UserProfileBlockButtons';
 
@@ -14,7 +14,7 @@ export const PasswordSection = () => {
 
   return (
     <ProfileSection
-      title='Password'
+      title={localizationKeys('userProfile.sectionTitle__password')}
       id='password'
     >
       {passwordEnabled && (
@@ -28,9 +28,12 @@ export const PasswordSection = () => {
       <AddBlockButton
         id='password'
         onClick={navigateToPage}
-      >
-        {passwordEnabled ? 'Change password' : 'Set password'}
-      </AddBlockButton>
+        textLocalizationKey={
+          passwordEnabled
+            ? localizationKeys('userProfile.sectionPrimaryButton__changePassword')
+            : localizationKeys('userProfile.sectionPrimaryButton__setPassword')
+        }
+      />
     </ProfileSection>
   );
 };

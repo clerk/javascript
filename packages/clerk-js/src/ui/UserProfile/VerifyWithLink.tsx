@@ -4,6 +4,7 @@ import React from 'react';
 import { EmailLinkStatusCard } from '../common';
 import { buildMagicLinkRedirectUrl } from '../common/redirects';
 import { useUserProfileContext } from '../contexts';
+import { localizationKeys } from '../customizables';
 import { useCardState, VerificationLink } from '../elements';
 import { useMagicLink } from '../hooks';
 import { handleError } from '../utils';
@@ -35,8 +36,11 @@ export const VerifyWithLink = (props: VerifyWithLinkProps) => {
   return (
     <>
       <VerificationLink
-        formTitle={'Verification link'}
-        formSubtitle={`Click on the verification link in the email sent to ${email.emailAddress}`}
+        formTitle={localizationKeys('userProfile.emailAddressPage.emailLink.formTitle')}
+        formSubtitle={localizationKeys('userProfile.emailAddressPage.emailLink.formSubtitle', {
+          identifier: email.emailAddress,
+        })}
+        resendButton={localizationKeys('userProfile.emailAddressPage.emailLink.resendButton')}
         onResendCodeClicked={startVerification}
       />
       <FormButtonContainer>

@@ -1,13 +1,13 @@
 import React from 'react';
 
+import { descriptors, Flex, Icon, Link, LocalizationKey, Text, useLocalizations } from '../customizables';
 import { useRouter } from '../router';
-import { descriptors, Flex, Icon, Link, Text } from '../customizables';
 import { mqu, PropsOfComponent } from '../styledSystem';
 import { BaseRoutes } from './Navbar';
 import { useNavigateToFlowStart } from './NavigateToFlowStartButton';
 
 type BreadcrumbsProps = {
-  title: string;
+  title: LocalizationKey;
 };
 
 const BreadcrumbItem = (props: PropsOfComponent<typeof Text> & { href?: string }) => {
@@ -42,6 +42,7 @@ const PAGE_TO_ROOT = {
 export const Breadcrumbs = (props: BreadcrumbsProps) => {
   const router = useRouter();
   const { navigateToFlowStart } = useNavigateToFlowStart();
+  const { t } = useLocalizations();
   const currentPage = (router.currentPath || '').split('/').pop();
 
   const { title } = props;
@@ -87,7 +88,7 @@ export const Breadcrumbs = (props: BreadcrumbsProps) => {
                   marginRight: t.space.$2,
                 })}
               />
-              {root.name}
+              {t(root.name)}
             </BreadcrumbItem>
             <BreadcrumbItem
               elementDescriptor={descriptors.breadcrumbsItemDivider}
@@ -98,12 +99,11 @@ export const Breadcrumbs = (props: BreadcrumbsProps) => {
           </>
         )}
         <BreadcrumbItem
+          localizationKey={title}
           elementDescriptor={descriptors.breadcrumbsItem}
           elementId={descriptors.breadcrumbsItem.setId('currentPage')}
           colorScheme='primary'
-        >
-          {title}
-        </BreadcrumbItem>
+        />
       </Flex>
     </Flex>
   );

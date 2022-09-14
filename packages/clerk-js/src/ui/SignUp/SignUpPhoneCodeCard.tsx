@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useCoreSignUp, useEnvironment } from '../../ui/contexts';
-import { Flow } from '../customizables';
+import { Flow, localizationKeys } from '../customizables';
 import { withCardStateProvider } from '../elements';
 import { SignUpVerificationCodeForm } from './SignUpVerificationCodeForm';
 
@@ -28,10 +28,11 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
   return (
     <Flow.Part part='phoneCode'>
       <SignUpVerificationCodeForm
-        cardTitle='Verify your phone number'
-        cardSubtitle={`to continue to ${displayConfig.applicationName}`}
-        formTitle='Verification code'
-        formSubtitle='Enter the verification code sent to your phone number'
+        cardTitle={localizationKeys('signUp.phoneCode.title')}
+        cardSubtitle={localizationKeys('signUp.phoneCode.subtitle', { applicationName: displayConfig.applicationName })}
+        formTitle={localizationKeys('signUp.phoneCode.formTitle')}
+        formSubtitle={localizationKeys('signUp.phoneCode.formSubtitle')}
+        resendButton={localizationKeys('signUp.phoneCode.resendButton')}
         prepare={prepare}
         attempt={attempt}
         safeIdentifier={signUp.phoneNumber}

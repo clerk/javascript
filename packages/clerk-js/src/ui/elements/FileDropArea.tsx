@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Button, Col, descriptors, Flex, Icon, Text } from '../customizables';
+import { Button, Col, descriptors, Flex, Icon, localizationKeys, Text } from '../customizables';
 import { Folder } from '../icons';
 import { animations, mqu } from '../styledSystem';
 import { colors } from '../utils';
@@ -104,29 +104,26 @@ export const FileDropArea = (props: FileDropAreaProps) => {
         ) : (
           <>
             <Text
+              localizationKey={localizationKeys('userProfile.profilePage.fileDropAreaTitle')}
               elementDescriptor={descriptors.fileDropAreaHint}
               sx={{ [mqu.sm]: { display: 'none' } }}
               colorScheme='neutral'
-            >
-              Drag file here, or...
-            </Text>
+            />
             <Button
+              localizationKey={localizationKeys('userProfile.profilePage.fileDropAreaAction')}
               elementDescriptor={descriptors.fileDropAreaButtonPrimary}
               variant='ghost'
               onClick={openDialog}
-            >
-              Select file
-            </Button>
+            />
           </>
         )}
       </Col>
       <Text
+        localizationKey={localizationKeys('userProfile.profilePage.fileDropAreaHint')}
         elementDescriptor={descriptors.fileDropAreaFooterHint}
         variant='smallRegular'
         colorScheme='neutral'
-      >
-        Upload a JPG, PNG, GIF, or WEBP image smaller than 10 MB
-      </Text>
+      />
     </Col>
   );
 };
