@@ -19,9 +19,9 @@ export const NavbarContextProvider = (props: React.PropsWithChildren<{}>) => {
 };
 
 export const BaseRoutes = [
-  { name: localizationKeys('userProfile.headerTitle__account'), id: 'account', icon: User, path: '/' } as const,
+  { name: localizationKeys('userProfile.start.headerTitle__account'), id: 'account', icon: User, path: '/' } as const,
   {
-    name: localizationKeys('userProfile.headerTitle__security'),
+    name: localizationKeys('userProfile.start.headerTitle__security'),
     id: 'security',
     icon: TickShield,
     path: '/security',

@@ -12,7 +12,7 @@ export const UsernameSection = () => {
 
   return (
     <ProfileSection
-      title={localizationKeys('userProfile.sectionTitle__username')}
+      title={localizationKeys('userProfile.start.usernameSection.title')}
       id='username'
     >
       {user.username && (
@@ -28,8 +28,8 @@ export const UsernameSection = () => {
         onClick={() => navigate('username')}
         textLocalizationKey={
           user.username
-            ? localizationKeys('userProfile.sectionPrimaryButton__changeUsername')
-            : localizationKeys('userProfile.sectionPrimaryButton__setUsername')
+            ? localizationKeys('userProfile.start.usernameSection.primaryButton__changeUsername')
+            : localizationKeys('userProfile.start.usernameSection.primaryButton__setUsername')
         }
       />
     </ProfileSection>

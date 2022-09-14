@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { Route, Switch, useRouter } from '../router';
 import { Col, descriptors } from '../customizables';
+import { Route, Switch, useRouter } from '../router';
 import { common, mqu } from '../styledSystem';
 import { ConnectedAccountsPage } from './ConnectedAccountsPage';
 import { EmailPage } from './EmailPage';

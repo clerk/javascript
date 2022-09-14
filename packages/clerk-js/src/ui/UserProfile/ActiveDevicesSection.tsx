@@ -22,7 +22,7 @@ export const ActiveDevicesSection = () => {
 
   return (
     <ProfileSection
-      title={localizationKeys('userProfile.activeDevices.sectionTitle')}
+      title={localizationKeys('userProfile.start.activeDevicesSection.title')}
       id='activeDevices'
     >
       {!sessionsWithActivities.length && (
@@ -56,15 +56,15 @@ const DeviceAccordion = (props: { session: SessionWithActivitiesResource }) => {
       <Col gap={4}>
         {isCurrent && (
           <LinkButtonWithDescription
-            title={localizationKeys('userProfile.activeDevices.detailsTitle')}
-            subtitle={localizationKeys('userProfile.activeDevices.detailsSubtitle')}
+            title={localizationKeys('userProfile.start.activeDevicesSection.detailsTitle')}
+            subtitle={localizationKeys('userProfile.start.activeDevicesSection.detailsSubtitle')}
           />
         )}
         {!isCurrent && (
           <LinkButtonWithDescription
-            title={localizationKeys('userProfile.activeDevices.destructiveActionTitle')}
-            subtitle={localizationKeys('userProfile.activeDevices.destructiveActionSubtitle')}
-            actionLabel={localizationKeys('userProfile.activeDevices.destructiveAction')}
+            title={localizationKeys('userProfile.start.activeDevicesSection.destructiveActionTitle')}
+            subtitle={localizationKeys('userProfile.start.activeDevicesSection.destructiveActionSubtitle')}
+            actionLabel={localizationKeys('userProfile.start.activeDevicesSection.destructiveAction')}
             colorScheme='danger'
             onClick={revoke}
           />

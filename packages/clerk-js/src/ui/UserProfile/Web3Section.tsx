@@ -15,7 +15,7 @@ export const Web3Section = () => {
 
   return (
     <ProfileSection
-      title={localizationKeys('userProfile.sectionTitle__web3Wallets')}
+      title={localizationKeys('userProfile.start.web3WalletsSection.title')}
       id='web3Wallets'
     >
       {user.web3Wallets.map(wallet => (
@@ -27,7 +27,7 @@ export const Web3Section = () => {
       <AddBlockButton
         id='password'
         onClick={() => navigate(`web3-wallet`)}
-        textLocalizationKey={localizationKeys('userProfile.sectionPrimaryButton__web3Wallets')}
+        textLocalizationKey={localizationKeys('userProfile.start.web3WalletsSection.primaryButton')}
       ></AddBlockButton>
     </ProfileSection>
   );

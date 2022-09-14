@@ -22,7 +22,7 @@ export const ConnectedAccountsSection = () => {
 
   return (
     <ProfileSection
-      title={localizationKeys('userProfile.sectionTitle__connectedAccounts')}
+      title={localizationKeys('userProfile.start.connectedAccountsSection.title')}
       id='connectedAccounts'
     >
       {accounts.map(account => (
@@ -32,7 +32,7 @@ export const ConnectedAccountsSection = () => {
         />
       ))}
       <AddBlockButton
-        textLocalizationKey={localizationKeys('userProfile.sectionPrimaryButton__connectedAccounts')}
+        textLocalizationKey={localizationKeys('userProfile.start.connectedAccountsSection.primaryButton')}
         id='connectedAccounts'
         onClick={() => navigate(`connected-account`)}
       />

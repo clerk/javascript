@@ -1,3 +1,5 @@
+import { LocalizationResource } from '@clerk/types';
+
 const commonTexts = {
   signIn: {
     phoneCode: {
@@ -10,7 +12,7 @@ const commonTexts = {
   },
 } as const;
 
-export const defaultResource = {
+export const defaultResource: LocalizationResource = {
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
   dividerText: 'or',
   formFieldLabel__emailAddress: 'Email address',
@@ -131,33 +133,58 @@ export const defaultResource = {
     },
   },
   userProfile: {
-    headerTitle__account: 'Account',
-    headerTitle__security: 'Security',
-    headerSubtitle__account: 'Manage your account information',
-    headerSubtitle__security: 'Manage your security preferences',
-    sectionTitle__profile: 'Profile',
-    sectionTitle__username: 'Username',
-    sectionTitle__emailAddresses: 'Email addresses',
-    sectionTitle__phoneNumbers: 'Phone numbers',
-    sectionTitle__connectedAccounts: 'Connected accounts',
-    sectionTitle__password: 'Password',
-    sectionTitle__mfa: 'Two-step verification',
-    sectionTitle__activeDevices: 'Active devices',
-    sectionTitle__web3Wallets: 'Web3 wallets',
-    sectionPrimaryButton__changeUsername: 'Change username',
-    sectionPrimaryButton__setUsername: 'Set username',
-    sectionPrimaryButton__emailAddresses: 'Add an email address',
-    sectionPrimaryButton__phoneNumbers: 'Add a phone number',
-    sectionPrimaryButton__connectedAccounts: 'Connect account',
-    sectionPrimaryButton__changePassword: 'Change password',
-    sectionPrimaryButton__setPassword: 'Set password',
-    sectionPrimaryButton__mfa: 'Add two-step verification',
-    sectionPrimaryButton__activeDevices: 'Active devices',
-    sectionPrimaryButton__web3Wallets: 'Web3 wallets',
     mobileButton__menu: 'Menu',
     formButtonPrimary__continue: 'Continue',
     formButtonPrimary__finish: 'Finish',
     formButtonReset: 'Cancel',
+    start: {
+      headerTitle__account: 'Account',
+      headerTitle__security: 'Security',
+      headerSubtitle__account: 'Manage your account information',
+      headerSubtitle__security: 'Manage your security preferences',
+      profileSection: {
+        title: 'Profile',
+      },
+      usernameSection: {
+        title: 'Username',
+        primaryButton__changeUsername: 'Change username',
+        primaryButton__setUsername: 'Set username',
+      },
+      emailAddressesSection: {
+        title: 'Email addresses',
+        primaryButton: 'Add an email address',
+      },
+      phoneNumbersSection: {
+        title: 'Phone numbers',
+        primaryButton: 'Add a phone number',
+      },
+      connectedAccountsSection: {
+        title: 'Connected accounts',
+        primaryButton: 'Connect account',
+      },
+      passwordSection: {
+        title: 'Password',
+        primaryButton__changePassword: 'Change password',
+        primaryButton__setPassword: 'Set password',
+      },
+      mfaSection: {
+        title: 'Two-step verification',
+        primaryButton: 'Add two-step verification',
+      },
+      activeDevicesSection: {
+        title: 'Active devices',
+        primaryButton: 'Active devices',
+        detailsTitle: 'Current device',
+        detailsSubtitle: 'This is the device you are currently using',
+        destructiveActionTitle: 'Sign out',
+        destructiveActionSubtitle: 'Sign out from your account on this device',
+        destructiveAction: 'Sign out of device',
+      },
+      web3WalletsSection: {
+        title: 'Web3 wallets',
+        primaryButton: 'Web3 wallets',
+      },
+    },
     profilePage: {
       title: 'Update profile',
       imageFormTitle: 'Profile image',
@@ -204,14 +231,6 @@ export const defaultResource = {
       formHint: 'Select a method to add.',
       successMessage: 'Your password has been set.',
     },
-    activeDevices: {
-      sectionTitle: 'Active devices',
-      detailsTitle: 'Current device',
-      detailsSubtitle: 'This is the device you are currently using',
-      destructiveActionTitle: 'Sign out',
-      destructiveActionSubtitle: 'Sign out from your account on this device',
-      destructiveAction: 'Sign out of device',
-    },
   },
   userButton: {
     action__manageAccount: 'Manage account',
@@ -226,5 +245,6 @@ export const defaultResource = {
     form_param_format_invalid: '',
     form_password_length_too_short: '',
     form_param_nil: '',
+    form_code_incorrect: '',
   },
 } as const;

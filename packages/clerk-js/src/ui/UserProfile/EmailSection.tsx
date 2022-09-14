@@ -18,7 +18,7 @@ export const EmailsSection = () => {
 
   return (
     <ProfileSection
-      title={localizationKeys('userProfile.sectionTitle__emailAddresses')}
+      title={localizationKeys('userProfile.start.emailAddressesSection.title')}
       id='emailAddresses'
     >
       {user.emailAddresses.sort(primaryIdentificationFirst(user.primaryEmailAddressId)).map(email => (
@@ -29,7 +29,7 @@ export const EmailsSection = () => {
       ))}
 
       <AddBlockButton
-        textLocalizationKey={localizationKeys('userProfile.sectionPrimaryButton__emailAddresses')}
+        textLocalizationKey={localizationKeys('userProfile.start.emailAddressesSection.primaryButton')}
         id='emailAddresses'
         onClick={() => navigate('email-address')}
       />

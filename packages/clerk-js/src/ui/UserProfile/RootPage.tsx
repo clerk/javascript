@@ -38,10 +38,10 @@ export const RootPage = () => {
       >
         <Header.Root id='cl-userProfile-section-account'>
           <Header.Title
-            localizationKey={localizationKeys('userProfile.headerTitle__account')}
+            localizationKey={localizationKeys('userProfile.start.headerTitle__account')}
             textVariant='xxlargeMedium'
           />
-          <Header.Subtitle localizationKey={localizationKeys('userProfile.headerSubtitle__account')} />
+          <Header.Subtitle localizationKey={localizationKeys('userProfile.start.headerSubtitle__account')} />
         </Header.Root>
         <UserProfileSection />
         {showUsername && <UsernameSection />}
@@ -57,10 +57,10 @@ export const RootPage = () => {
       >
         <Header.Root id='cl-userProfile-section-security'>
           <Header.Title
-            localizationKey={localizationKeys('userProfile.headerTitle__security')}
+            localizationKey={localizationKeys('userProfile.start.headerTitle__security')}
             textVariant='xxlargeMedium'
           />
-          <Header.Subtitle localizationKey={localizationKeys('userProfile.headerSubtitle__security')} />
+          <Header.Subtitle localizationKey={localizationKeys('userProfile.start.headerSubtitle__security')} />
         </Header.Root>
         {showPassword && <PasswordSection />}
         {showMfa && <MfaSection />}
