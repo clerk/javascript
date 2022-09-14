@@ -18,7 +18,10 @@ function setFieldErrors(fieldStates: Array<FormControlState<string>>, errors: Cl
     const error = errors.find(err => {
       return err.meta!.paramName === field.id || snakeToCamel(err.meta!.paramName) === field.id;
     });
-    field.setError(error?.message || undefined);
+    if (!error) {
+      return;
+    }
+    field.setError(error || undefined);
   });
 }
 
@@ -60,6 +63,7 @@ export function handleError(
   // Show field errors if applicable
   setFieldErrors(fieldStates, fieldErrors);
 
+  // TODO: Make global errors localizable
   // Show only the first global error until we have snack bar stacks if applicable
   if (typeof setGlobalError === 'function' && globalErrors[0]) {
     setGlobalError(globalErrors[0].longMessage || globalErrors[0].message);
