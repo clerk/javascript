@@ -31,7 +31,7 @@ export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
       .createTOTP()
       .then((totp: TOTPResource) => setTOTP(totp))
       .catch(err => handleError(err, [], card.setError));
-  }, [user]);
+  }, []);
 
   if (card.error) {
     return <ContentPage.Root headerTitle={title} />;
