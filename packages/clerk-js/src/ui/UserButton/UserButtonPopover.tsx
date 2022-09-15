@@ -164,21 +164,19 @@ const Links = () => {
     >
       {termsPageUrl && (
         <UserButtonLink
+          localizationKey={localizationKeys('footerPageLink__terms')}
           elementDescriptor={descriptors.userButtonPopoverFooterPagesLink}
           elementId={descriptors.userButtonPopoverFooterPagesLink.setId('terms')}
           href={termsPageUrl}
-        >
-          Terms
-        </UserButtonLink>
+        />
       )}
       {privacyPageUrl && (
         <UserButtonLink
+          localizationKey={localizationKeys('footerPageLink__privacy')}
           elementDescriptor={descriptors.userButtonPopoverFooterPagesLink}
           elementId={descriptors.userButtonPopoverFooterPagesLink.setId('privacy')}
           href={privacyPageUrl}
-        >
-          Privacy
-        </UserButtonLink>
+        />
       )}
     </Flex>
   );

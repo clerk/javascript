@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { descriptors, Flex, Link, Text, useAppearance } from '../customizables';
+import { descriptors, Flex, Link, localizationKeys, Text, useAppearance } from '../customizables';
 import { mqu, PropsOfComponent } from '../styledSystem';
 import { RouterLink } from './RouterLink';
 
@@ -75,30 +75,27 @@ const FooterLinks = React.memo((): JSX.Element => {
     >
       {helpPageUrl && (
         <FooterLink
+          localizationKey={localizationKeys('footerPageLink__help')}
           elementId={descriptors.footerPagesLink.setId('help')}
           isExternal
           href={helpPageUrl}
-        >
-          Help
-        </FooterLink>
+        />
       )}
       {privacyPageUrl && (
         <FooterLink
+          localizationKey={localizationKeys('footerPageLink__privacy')}
           elementId={descriptors.footerPagesLink.setId('privacy')}
           isExternal
           href={privacyPageUrl}
-        >
-          Privacy
-        </FooterLink>
+        />
       )}
       {termsPageUrl && (
         <FooterLink
+          localizationKey={localizationKeys('footerPageLink__terms')}
           elementId={descriptors.footerPagesLink.setId('terms')}
           isExternal
           href={termsPageUrl}
-        >
-          Terms
-        </FooterLink>
+        />
       )}
     </Flex>
   );
