@@ -7,7 +7,7 @@ import { TimerButton } from './TimerButton';
 type CodeFormProps = {
   title: LocalizationKey;
   subtitle: LocalizationKey;
-  resendButton: LocalizationKey;
+  resendButton?: LocalizationKey;
   isLoading: boolean;
   success: boolean;
   onResendCodeClicked?: React.MouseEventHandler<HTMLButtonElement>;

@@ -15,7 +15,6 @@ export const SignInFactorTwoTOTPCard = (props: SignInFactorTwoTOTPCardProps) => 
         cardSubtitle={localizationKeys('signIn.totp2Fa.subtitle')}
         formTitle={localizationKeys('signIn.totp2Fa.formTitle')}
         formSubtitle={localizationKeys('signIn.totp2Fa.formSubtitle')}
-        resendButton={localizationKeys('signIn.totp2Fa.resendButton')}
       />
     </Flow.Part>
   );
