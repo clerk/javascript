@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.3.6](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.3.5...@clerk/clerk-js@4.3.6) (2022-09-15)
+
+### Bug Fixes
+
+- **clerk-js:** Stop infinite TOTP re-renders by removing user from the dep array ([6e7c061](https://github.com/clerkinc/javascript/commit/6e7c061c89d582620e18735bac21f6edd4ff80dd))
+
 ### [4.3.5](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.3.5-staging.0...@clerk/clerk-js@4.3.5) (2022-09-07)
 
 **Note:** Version bump only for package @clerk/clerk-js
