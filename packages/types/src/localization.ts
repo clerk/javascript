@@ -48,6 +48,9 @@ type _LocalizationResource = {
   badge__default: LocalizationValue;
   badge__unverified: LocalizationValue;
   badge__requiresAction: LocalizationValue;
+  footerPageLink__help: LocalizationValue;
+  footerPageLink__privacy: LocalizationValue;
+  footerPageLink__terms: LocalizationValue;
   signUp: {
     start: {
       title: LocalizationValue;
