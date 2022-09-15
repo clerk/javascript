@@ -17,7 +17,7 @@ export type VerificationCodeCardProps = {
   cardSubtitle: LocalizationKey;
   formTitle: LocalizationKey;
   formSubtitle: LocalizationKey;
-  resendButton: LocalizationKey;
+  resendButton?: LocalizationKey;
   safeIdentifier?: string;
   profileImageUrl?: string;
   onCodeEntryFinishedAction: (

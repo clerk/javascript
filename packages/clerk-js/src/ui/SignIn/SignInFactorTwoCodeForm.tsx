@@ -19,7 +19,7 @@ type SignInFactorTwoCodeFormProps = SignInFactorTwoCodeCard & {
   cardSubtitle: LocalizationKey;
   formTitle: LocalizationKey;
   formSubtitle: LocalizationKey;
-  resendButton: LocalizationKey;
+  resendButton?: LocalizationKey;
 };
 
 export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
