@@ -131,7 +131,6 @@ type _LocalizationResource = {
       subtitle: LocalizationValue;
       formTitle: LocalizationValue;
       formSubtitle: LocalizationValue;
-      resendButton: LocalizationValue;
     };
     alternativeMethods: {
       title: LocalizationValue;
