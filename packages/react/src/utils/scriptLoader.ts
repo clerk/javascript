@@ -30,6 +30,27 @@ const forceStagingReleaseForClerkFapi = (frontendApi: string): boolean => {
   );
 };
 
+// TODO: Undup
+function parsePublishableKey(key: string, pkg: string) {
+  try {
+    if (!key.startsWith('pk_test_') && !key.startsWith('pk_live_')) {
+      throw 'error';
+    }
+    const keyParts = key.split('_');
+    const instanceType = keyParts[1] as 'test' | 'live';
+    let frontendApi = atob(keyParts[2]);
+    if (!frontendApi.endsWith('$')) {
+      throw 'error';
+    }
+    frontendApi = frontendApi.slice(0, -1);
+    return { instanceType, frontendApi };
+  } catch (e) {
+    throw new Error(
+      `Clerk Error: The publishableKey passed to Clerk is malformed. Your publishable key can be retrieved from https://dashboard.clerk.dev/last-active?path=api-keys (package=${pkg};passed=${key})`,
+    );
+  }
+}
+
 function getScriptSrc({ publishableKey, frontendApi, scriptUrl, scriptVariant = '' }: LoadScriptParams): string {
   if (scriptUrl) {
     return scriptUrl;
@@ -37,14 +58,14 @@ function getScriptSrc({ publishableKey, frontendApi, scriptUrl, scriptVariant = 
 
   let scriptHost: string;
   if (publishableKey) {
-    const pkParts = publishableKey.split('_');
-    console.log('pkparts', pkParts);
-    scriptHost = atob(pkParts[2]).trim();
+    const { frontendApi: derivedFrontendApi } = parsePublishableKey(publishableKey, '@clerk/clerk-react');
+    scriptHost = derivedFrontendApi;
   } else if (frontendApi) {
     scriptHost = frontendApi;
   } else {
-    // TODO: Better error
-    throw new Error('Neither frontendApi nor publishableKey passed');
+    throw new Error(
+      'Internal Clerk Error: Neither frontendApi nor publishableKey passed to getScriptSrc. Please report to support@clerk.dev if you are seeing this while developing an application with Clerk. (package=@clerk/clerk-react)',
+    );
   }
 
   const variant = scriptVariant ? `${scriptVariant.replace(/\.+$/, '')}.` : '';

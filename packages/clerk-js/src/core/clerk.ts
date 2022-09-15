@@ -88,6 +88,27 @@ const defaultOptions: ClerkOptions = {
   touchSession: true,
 };
 
+// TODO: Undup
+function parsePublishableKey(key: string, pkg: string) {
+  try {
+    if (!key.startsWith('pk_test_') && !key.startsWith('pk_live_')) {
+      throw 'error';
+    }
+    const keyParts = key.split('_');
+    const instanceType = keyParts[1] as 'test' | 'live';
+    let frontendApi = atob(keyParts[2]);
+    if (!frontendApi.endsWith('$')) {
+      throw 'error';
+    }
+    frontendApi = frontendApi.slice(0, -1);
+    return { instanceType, frontendApi };
+  } catch (e) {
+    throw new Error(
+      `Clerk Error: The publishableKey passed to Clerk is malformed. Your publishable key can be retrieved from https://dashboard.clerk.dev/last-active?path=api-keys (package=${pkg};passed=${key})`,
+    );
+  }
+}
+
 export default class Clerk implements ClerkInterface {
   public static mountComponentRenderer?: MountComponentRenderer;
   public static version: string = packageJSON.version;
@@ -128,23 +149,18 @@ export default class Clerk implements ClerkInterface {
     }
 
     if (publishableKeyOrFrontendApi.startsWith('clerk.')) {
-      const frontendApi = publishableKeyOrFrontendApi;
-      if (!validateFrontendApi(frontendApi)) {
+      this.frontendApi = publishableKeyOrFrontendApi;
+      this.syncMode = 'cookies';
+      if (!validateFrontendApi(this.frontendApi)) {
         clerkErrorInvalidFrontendApi();
       }
-      this.syncMode = 'cookies';
-      this.frontendApi = frontendApi;
-      this.instanceType = isDevOrStagingUrl(frontendApi) ? 'test' : 'live';
+      this.instanceType = isDevOrStagingUrl(this.frontendApi) ? 'test' : 'live';
     } else {
-      this.publishableKey = publishableKeyOrFrontendApi;
-      const pkParts = this.publishableKey.split('_');
-      if (pkParts[1] !== 'test' && pkParts[1] !== 'live') {
-        // TODO: Write a better error.
-        throw new Error('foo');
-      }
+      this.publishableKey = publishableKeyOrFrontendApi.trim();
       this.syncMode = 'urlDecoration';
-      this.instanceType = pkParts[1];
-      this.frontendApi = atob(pkParts[2]).trim();
+      const { frontendApi, instanceType } = parsePublishableKey(this.publishableKey, '@clerk/clerk-js');
+      this.frontendApi = frontendApi;
+      this.instanceType = instanceType;
     }
     this.#fapiClient = createFapiClient(this);
     BaseResource.clerk = this;

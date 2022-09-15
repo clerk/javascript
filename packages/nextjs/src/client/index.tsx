@@ -19,6 +19,27 @@ type NextClerkProviderProps =
       frontendApi?: string;
     } & IsomorphicClerkOptions);
 
+// TODO: Undup
+function parsePublishableKey(key: string, pkg: string) {
+  try {
+    if (!key.startsWith('pk_test_') && !key.startsWith('pk_live_')) {
+      throw 'error';
+    }
+    const keyParts = key.split('_');
+    const instanceType = keyParts[1] as 'test' | 'live';
+    let frontendApi = atob(keyParts[2]);
+    if (!frontendApi.endsWith('$')) {
+      throw 'error';
+    }
+    frontendApi = frontendApi.slice(0, -1);
+    return { instanceType, frontendApi };
+  } catch (e) {
+    throw new Error(
+      `Clerk Error: The publishableKey passed to Clerk is malformed. Your publishable key can be retrieved from https://dashboard.clerk.dev/last-active?path=api-keys (package=${pkg};passed=${key})`,
+    );
+  }
+}
+
 export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JSX.Element {
   // @ts-expect-error
   // Allow for overrides without making the type public
@@ -33,11 +54,14 @@ export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JS
   // TODO: Improve error
   let keyOptions;
   if (typeof parsedFrontendApi === 'string' && typeof parsedPublishableKey === 'undefined') {
-    keyOptions = { frontendApi: parsedFrontendApi, publishableKey: parsedPublishableKey };
+    keyOptions = { frontendApi: parsedFrontendApi };
   } else if (typeof parsedFrontendApi === 'undefined' && typeof parsedPublishableKey === 'string') {
-    keyOptions = { frontendApi: parsedFrontendApi, publishableKey: parsedPublishableKey };
+    keyOptions = { publishableKey: parsedPublishableKey };
+    parsePublishableKey(parsedPublishableKey, '@clerk/nextjs');
   } else {
-    throw new Error('One of frontendApi or publishableKey must be set.');
+    throw new Error(
+      'Clerk Error: The publishableKey is not set. Either set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` as an environment variable, or explicitly pass a `publishableKey` prop to the ClerkProvider component. Your publishable key can be retrieved from https://dashboard.clerk.dev/last-active?path=api-keys (package=@clerk/nextjs)',
+    );
   }
 
   return (
