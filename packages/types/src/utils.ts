@@ -30,6 +30,10 @@ export type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
 };
 
+export type DeepRequired<T> = Required<{
+  [P in keyof T]: T[P] extends object | undefined ? DeepRequired<Required<T[P]>> : T[P];
+}>;
+
 /**
  * Internal type used by RecordToPath
  */

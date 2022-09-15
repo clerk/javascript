@@ -1,4 +1,4 @@
-import { LocalizationResource } from '@clerk/types';
+import { DeepRequired, LocalizationResource } from '@clerk/types';
 
 const commonTexts = {
   signIn: {
@@ -12,7 +12,7 @@ const commonTexts = {
   },
 } as const;
 
-export const defaultResource: LocalizationResource = {
+export const defaultResource: DeepRequired<LocalizationResource> = {
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
   dividerText: 'or',
   formFieldLabel__emailAddress: 'Email address',
