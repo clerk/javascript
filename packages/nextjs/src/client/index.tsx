@@ -58,10 +58,6 @@ export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JS
   } else if (typeof parsedFrontendApi === 'undefined' && typeof parsedPublishableKey === 'string') {
     keyOptions = { publishableKey: parsedPublishableKey };
     parsePublishableKey(parsedPublishableKey, '@clerk/nextjs');
-  } else {
-    throw new Error(
-      'Clerk Error: The publishableKey is not set. Either set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` as an environment variable, or explicitly pass a `publishableKey` prop to the ClerkProvider component. Your publishable key can be retrieved from https://dashboard.clerk.dev/last-active?path=api-keys (package=@clerk/nextjs)',
-    );
   }
 
   return (

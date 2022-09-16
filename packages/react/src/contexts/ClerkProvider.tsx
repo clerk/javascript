@@ -46,10 +46,6 @@ function ClerkProviderBase(props: ClerkProviderProps): JSX.Element {
   } else if (typeof frontendApi === 'undefined' && typeof publishableKey === 'string') {
     keyOptions = { frontendApi: frontendApi, publishableKey: publishableKey };
     parsePublishableKey(publishableKey, '@clerk/clerk-react');
-  } else {
-    throw new Error(
-      'Clerk Error: publishableKey must be passed to the ClerkProvider component. (package=@clerk/clerk-react)',
-    );
   }
 
   return (

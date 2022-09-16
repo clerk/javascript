@@ -94,7 +94,21 @@ export interface LoadScriptParams {
   scriptVariant?: ScriptVariant;
 }
 
-export function loadScript(params: LoadScriptParams): Promise<HTMLScriptElement | null> {
+export async function loadScript(params: LoadScriptParams): Promise<HTMLScriptElement | null> {
+  // @ts-ignore
+  if (!params.publishableKey && !params.frontendApi && window.__clerkDemoInstance) {
+    const ephemeralKeyCookie = document.cookie.split('; ').find(x => x.startsWith('clerk_ephemeral_pk='));
+    if (ephemeralKeyCookie) {
+      params.publishableKey = ephemeralKeyCookie.replace('clerk_ephemeral_pk=', '');
+    } else {
+      // @ts-ignore
+      const apiOrigin = window.__clerkApiOrigin || 'https://api.clerk.dev';
+      const instanceCreate = await fetch(`${apiOrigin}/v1/public/demo_instance`, { method: 'POST' });
+      const details = await instanceCreate.json();
+      params.publishableKey = details['frontend_api_key'];
+      document.cookie = `clerk_ephemeral_pk=${params.publishableKey}`;
+    }
+  }
   return new Promise((resolve, reject) => {
     const { frontendApi, publishableKey } = params;
 
@@ -103,15 +117,15 @@ export function loadScript(params: LoadScriptParams): Promise<HTMLScriptElement 
     }
 
     const script = document.createElement('script');
-    const src = getScriptSrc(params);
 
     if (publishableKey) {
       script.setAttribute('data-clerk-publishable-key', publishableKey);
     } else if (frontendApi) {
       script.setAttribute('data-clerk-frontend-api', frontendApi);
     } else {
-      // TODO: Rewrite error
-      reject(MISSING_PROVIDER_ERROR);
+      throw new Error(
+        'Clerk Error: publishableKey not found. Please pass a publishableKey to the ClerkProvider component, or set the appropriate environment variable for your framework.',
+      );
     }
 
     script.setAttribute('crossorigin', 'anonymous');
@@ -124,7 +138,7 @@ export function loadScript(params: LoadScriptParams): Promise<HTMLScriptElement 
     script.addEventListener('load', () => resolve(script));
     script.addEventListener('error', () => reject(FAILED_TO_LOAD_ERROR));
 
-    script.src = src;
+    script.src = getScriptSrc(params);
     document.body.appendChild(script);
   });
 }

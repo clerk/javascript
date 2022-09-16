@@ -37,19 +37,12 @@ type MethodName<T> = {
 }[keyof T];
 type MethodCallback = () => void;
 
-export type NewIsomorphicClerkParams =
-  | {
-      publishableKey: undefined;
-      frontendApi: string;
-      options: IsomorphicClerkOptions;
-      Clerk: ClerkProp | null;
-    }
-  | {
-      publishableKey: string;
-      frontendApi: undefined;
-      options: IsomorphicClerkOptions;
-      Clerk: ClerkProp | null;
-    };
+export type NewIsomorphicClerkParams = {
+  publishableKey?: string;
+  frontendApi?: string;
+  options: IsomorphicClerkOptions;
+  Clerk: ClerkProp | null;
+};
 
 export default class IsomorphicClerk {
   private mode: 'browser' | 'server';
