@@ -42,7 +42,7 @@ export const RemovePhonePage = () => {
 
   return (
     <RemoveResourcePage
-      title='Remove email address'
+      title='Remove phone number'
       messageLine1={`${ref.current.phoneNumber} will be removed from this account.`}
       messageLine2={`You will no longer be able to sign in using this phone number.`}
       successMessage={`${ref.current.phoneNumber} has been removed from your account.`}
