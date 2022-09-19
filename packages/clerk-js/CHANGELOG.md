@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.4.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.4.0-staging.4...@clerk/clerk-js@4.4.1) (2022-09-19)
+
+### Bug Fixes
+
+- **clerk-js:** Add missing applicationName param to `signUp.continue.subtitle` ([1a41709](https://github.com/clerkinc/javascript/commit/1a41709965d58925ea43f26593c9cbf13405b694))
+- **clerk-js:** Add missing applicationName param to `signUp.emailLink.subtitle` ([bd5c8f2](https://github.com/clerkinc/javascript/commit/bd5c8f2b9b7eb6eae7d3a2a47be40c86b046ef38))
+- **clerk-js:** Stop infinite TOTP re-renders by removing user from the dep array ([dc935bb](https://github.com/clerkinc/javascript/commit/dc935bba64561a485a7670f0f4994150c7938b07))
+- **clerk-js:** Typo on remove phone number page ([5fa86a4](https://github.com/clerkinc/javascript/commit/5fa86a43edb391b8649c431b8dac8d5ca4f6edca))
+
 ## [4.4.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.4.0-staging.4...@clerk/clerk-js@4.4.0) (2022-09-16)
 
 ### Bug Fixes

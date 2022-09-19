@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.5.1](https://github.com/clerkinc/javascript/compare/@clerk/types@3.5.0-staging.4...@clerk/types@3.5.1) (2022-09-19)
+
+### Bug Fixes
+
+- **types:** Completely remove totp2Fa.resendButton key ([434fae5](https://github.com/clerkinc/javascript/commit/434fae5803122c825ce6da8ca2dccad13889605b))
+
 ## [3.5.0](https://github.com/clerkinc/javascript/compare/@clerk/types@3.5.0-staging.4...@clerk/types@3.5.0) (2022-09-16)
 
 ### Bug Fixes
