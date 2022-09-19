@@ -73,7 +73,7 @@ export const SignUpEmailLinkCard = () => {
     <Flow.Part part='emailLink'>
       <VerificationLinkCard
         cardTitle={localizationKeys('signUp.emailLink.title')}
-        cardSubtitle={localizationKeys('signUp.emailLink.subtitle')}
+        cardSubtitle={localizationKeys('signUp.emailLink.subtitle', { applicationName: displayConfig.applicationName })}
         formTitle={localizationKeys('signUp.emailLink.formTitle')}
         formSubtitle={localizationKeys('signUp.emailLink.formSubtitle')}
         resendButton={localizationKeys('signUp.emailLink.resendButton')}
