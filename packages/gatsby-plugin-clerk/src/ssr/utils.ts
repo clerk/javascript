@@ -1,4 +1,4 @@
-import { ActJWTClaim, ServerSideAuth } from '@clerk/types';
+import type { ServerSideAuth } from '@clerk/types';
 import cookie from 'cookie';
 import type { GetServerDataProps } from 'gatsby';
 
@@ -15,7 +15,7 @@ export function injectAuthIntoContext(context: GetServerDataProps, authData: Aut
     auth: {
       ...auth,
       claims,
-      actorId: (claims?.act as ActJWTClaim)?.sub || null,
+      actor: claims?.act || null,
     } as ServerSideAuth,
     user: user || null,
     session: session || null,

@@ -13,7 +13,7 @@ export function injectAuthIntoRequest(ctx: GetServerSidePropsContext, authData: 
     sessionId,
     getToken,
     claims,
-    actorId: claims?.act?.sub || null,
+    actor: claims?.act || null,
   };
   (ctx.req as any).user = user;
   (ctx.req as any).session = session;
