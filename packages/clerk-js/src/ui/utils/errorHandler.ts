@@ -1,6 +1,6 @@
 import { ClerkAPIError } from '@clerk/types';
 
-import { isClerkAPIResponseError } from '../../core/resources/internal';
+import { isClerkAPIResponseError, isKnownError, isMetamaskError } from '../../core/resources/internal';
 import { snakeToCamel } from '../shared';
 import { FormControlState } from './useFormControl';
 
@@ -48,25 +48,24 @@ export function handleError(
   setGlobalError?: React.Dispatch<React.SetStateAction<string | undefined>> | ((error: string | undefined) => void),
 ): void {
   // Throw unknown errors
-  if (!isClerkAPIResponseError(err)) {
+  if (!isKnownError(err)) {
     throw err;
   }
 
-  // Clear global and field errors
-  if (typeof setGlobalError === 'function') {
-    setGlobalError(undefined);
+  if (isMetamaskError(err)) {
+    setGlobalError?.(err.message);
   }
 
-  // Group errors to field and global
-  const { fieldErrors, globalErrors } = parseErrors(err.errors);
-
-  // Show field errors if applicable
-  setFieldErrors(fieldStates, fieldErrors);
-
-  // TODO: Make global errors localizable
-  // Show only the first global error until we have snack bar stacks if applicable
-  if (typeof setGlobalError === 'function' && globalErrors[0]) {
-    setGlobalError(globalErrors[0].longMessage || globalErrors[0].message);
+  if (isClerkAPIResponseError(err)) {
+    // Clear global and field errors
+    setGlobalError?.(undefined);
+    // Group errors to field and global
+    const { fieldErrors, globalErrors } = parseErrors(err.errors);
+    // Show field errors if applicable
+    setFieldErrors(fieldStates, fieldErrors);
+    // TODO: Make global errors localizable
+    // Show only the first global error until we have snack bar stacks if applicable
+    setGlobalError?.(globalErrors[0].longMessage || globalErrors[0].message || undefined);
   }
 }
 
