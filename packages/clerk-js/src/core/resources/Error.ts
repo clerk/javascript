@@ -5,8 +5,24 @@ interface ClerkAPIResponseOptions {
   status: number;
 }
 
-export function isClerkAPIResponseError(object: any): object is ClerkAPIResponseError {
-  return 'clerkError' in object;
+// For a comprehensive Metamask error list, please see
+// https://docs.metamask.io/guide/ethereum-provider.html#errors
+interface MetamaskError extends Error {
+  code: 4001 | 32602 | 32603;
+  message: string;
+  data?: unknown;
+}
+
+export function isKnownError(error: any) {
+  return isClerkAPIResponseError(error) || isMetamaskError(error);
+}
+
+export function isClerkAPIResponseError(err: any): err is ClerkAPIResponseError {
+  return 'clerkError' in err;
+}
+
+export function isMetamaskError(err: any): err is MetamaskError {
+  return 'code' in err && [4001, 32602, 32603].includes(err.code) && 'message' in err;
 }
 
 export function parseErrors(data: ClerkAPIErrorJSON[] = []): ClerkAPIError[] {
@@ -54,8 +70,8 @@ export class MagicLinkError extends Error {
     Object.setPrototypeOf(this, MagicLinkError.prototype);
   }
 }
-
 // Check if the error is a MagicLinkError.
+
 export function isMagicLinkError(err: Error): err is MagicLinkError {
   return err instanceof MagicLinkError;
 }
