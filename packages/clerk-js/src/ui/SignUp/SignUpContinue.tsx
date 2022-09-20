@@ -7,11 +7,10 @@ import { descriptors, Flex, Flow, localizationKeys } from '../customizables';
 import {
   Card,
   CardAlert,
-  Divider,
   Footer,
   Header,
   LoadingCard,
-  SocialButtonsReversibleContainer,
+  SocialButtonsReversibleContainerWithDivider,
   withCardStateProvider,
 } from '../elements';
 import { useCardState } from '../elements/contexts';
@@ -161,9 +160,8 @@ function _SignUpContinue() {
           elementDescriptor={descriptors.main}
           gap={8}
         >
-          <SocialButtonsReversibleContainer>
+          <SocialButtonsReversibleContainerWithDivider>
             {showSocialButtons && <SignUpSocialButtons />}
-            {showSocialButtons && showFormFields(userSettings) && <Divider />}
             {showFormFields(userSettings) && (
               <SignUpForm
                 handleSubmit={handleSubmit}
@@ -173,7 +171,7 @@ function _SignUpContinue() {
                 handleEmailPhoneToggle={handleChangeActive}
               />
             )}
-          </SocialButtonsReversibleContainer>
+          </SocialButtonsReversibleContainerWithDivider>
         </Flex>
         <Footer.Root>
           <Footer.Action>

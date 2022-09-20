@@ -11,12 +11,11 @@ import { Col, descriptors, Flow, localizationKeys } from '../customizables';
 import {
   Card,
   CardAlert,
-  Divider,
   Footer,
   Form,
   Header,
   LoadingCard,
-  SocialButtonsReversibleContainer,
+  SocialButtonsReversibleContainerWithDivider,
   withCardStateProvider,
 } from '../elements';
 import { useCardState } from '../elements/contexts';
@@ -198,9 +197,8 @@ export function _SignInStart(): JSX.Element {
           elementDescriptor={descriptors.main}
           gap={8}
         >
-          <SocialButtonsReversibleContainer>
+          <SocialButtonsReversibleContainerWithDivider>
             <SignInSocialButtons />
-            {hasSocialOrWeb3Buttons && standardFormAttributes.length ? <Divider /> : null}
             {standardFormAttributes.length ? (
               <Form.Root onSubmit={handleFirstPartySubmit}>
                 <Form.ControlRow>
@@ -213,7 +211,7 @@ export function _SignInStart(): JSX.Element {
                 <Form.SubmitButton>Continue</Form.SubmitButton>
               </Form.Root>
             ) : null}
-          </SocialButtonsReversibleContainer>
+          </SocialButtonsReversibleContainerWithDivider>
         </Col>
         <Footer.Root>
           <Footer.Action>
