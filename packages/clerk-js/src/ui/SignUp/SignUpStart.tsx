@@ -9,11 +9,10 @@ import { descriptors, Flex, Flow, localizationKeys, useAppearance } from '../cus
 import {
   Card,
   CardAlert,
-  Divider,
   Footer,
   Header,
   LoadingCard,
-  SocialButtonsReversibleContainer,
+  SocialButtonsReversibleContainerWithDivider,
   withCardStateProvider,
 } from '../elements';
 import { useCardState } from '../elements/contexts';
@@ -244,9 +243,8 @@ function _SignUpStart(): JSX.Element {
           elementDescriptor={descriptors.main}
           gap={8}
         >
-          <SocialButtonsReversibleContainer>
+          <SocialButtonsReversibleContainerWithDivider>
             {(!hasTicket || missingRequirementsWithTicket) && <SignUpSocialButtons />}
-            {hasSocialOrWeb3Buttons && shouldShowForm && <Divider />}
             {shouldShowForm && (
               <SignUpForm
                 handleSubmit={handleSubmit}
@@ -256,7 +254,7 @@ function _SignUpStart(): JSX.Element {
                 handleEmailPhoneToggle={handleChangeActive}
               />
             )}
-          </SocialButtonsReversibleContainer>
+          </SocialButtonsReversibleContainerWithDivider>
         </Flex>
         <Footer.Root>
           <Footer.Action>
