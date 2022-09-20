@@ -140,8 +140,8 @@ function _SignUpContinue() {
   };
 
   const canToggleEmailPhone = emailOrPhone(attributes, isProgressiveSignUp);
-  const showSocialButtons =
-    (!hasVerifiedExternalAccount && oauthOptions.length > 0) || (!hasVerifiedWeb3 && web3Options.length > 0);
+  const showOauthProviders = !hasVerifiedExternalAccount && oauthOptions.length > 0;
+  const showWeb3Providers = !hasVerifiedWeb3 && web3Options.length > 0;
 
   return (
     <Flow.Part part='complete'>
@@ -161,7 +161,12 @@ function _SignUpContinue() {
           gap={8}
         >
           <SocialButtonsReversibleContainerWithDivider>
-            {showSocialButtons && <SignUpSocialButtons />}
+            {(showOauthProviders || showWeb3Providers) && (
+              <SignUpSocialButtons
+                enableOAuthProviders={showOauthProviders}
+                enableWeb3Providers={showWeb3Providers}
+              />
+            )}
             {showFormFields(userSettings) && (
               <SignUpForm
                 handleSubmit={handleSubmit}

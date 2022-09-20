@@ -198,7 +198,12 @@ export function _SignInStart(): JSX.Element {
           gap={8}
         >
           <SocialButtonsReversibleContainerWithDivider>
-            <SignInSocialButtons />
+            {hasSocialOrWeb3Buttons && (
+              <SignInSocialButtons
+                enableWeb3Providers
+                enableOAuthProviders
+              />
+            )}
             {standardFormAttributes.length ? (
               <Form.Root onSubmit={handleFirstPartySubmit}>
                 <Form.ControlRow>

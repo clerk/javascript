@@ -218,11 +218,12 @@ function _SignUpStart(): JSX.Element {
   }
 
   const canToggleEmailPhone = emailOrPhone(attributes, isProgressiveSignUp);
-  const hasSocialOrWeb3Buttons =
-    !!userSettings.socialProviderStrategies.length || !!userSettings.web3FirstFactors.length;
-
   const visibleFields = Object.entries(fields).filter(([_, opts]) => showOptionalFields || opts?.required);
   const shouldShowForm = showFormFields(userSettings) && visibleFields.length > 0;
+
+  const showOauthProviders =
+    (!hasTicket || missingRequirementsWithTicket) && userSettings.socialProviderStrategies.length > 0;
+  const showWeb3Providers = !hasTicket && userSettings.web3FirstFactors.length > 0;
 
   return (
     <Flow.Part part='start'>
@@ -244,7 +245,12 @@ function _SignUpStart(): JSX.Element {
           gap={8}
         >
           <SocialButtonsReversibleContainerWithDivider>
-            {(!hasTicket || missingRequirementsWithTicket) && <SignUpSocialButtons />}
+            {(showOauthProviders || showWeb3Providers) && (
+              <SignUpSocialButtons
+                enableOAuthProviders={showOauthProviders}
+                enableWeb3Providers={showWeb3Providers}
+              />
+            )}
             {shouldShowForm && (
               <SignUpForm
                 handleSubmit={handleSubmit}
