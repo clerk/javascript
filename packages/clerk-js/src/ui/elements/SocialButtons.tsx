@@ -10,7 +10,10 @@ import { useCardState } from './contexts';
 
 const SOCIAL_BUTTON_BLOCK_THRESHOLD = 2;
 
-export type SocialButtonsProps = React.PropsWithChildren<{}>;
+export type SocialButtonsProps = React.PropsWithChildren<{
+  enableOAuthProviders: boolean;
+  enableWeb3Providers: boolean;
+}>;
 
 type SocialButtonsRootProps = SocialButtonsProps & {
   oauthCallback: (strategy: OAuthStrategy) => Promise<unknown>;
@@ -22,10 +25,12 @@ const isWeb3Strategy = (val: string): val is Web3Strategy => {
 };
 
 export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
-  const { oauthCallback, web3Callback } = props;
-  const { strategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
+  const { oauthCallback, web3Callback, enableOAuthProviders = true, enableWeb3Providers = true } = props;
+  const { web3Strategies, oauthStrategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
   const card = useCardState();
   const { socialButtonsVariant } = useAppearance().parsedLayout;
+
+  const strategies = [...(enableOAuthProviders ? oauthStrategies : []), ...(enableWeb3Providers ? web3Strategies : [])];
 
   if (!strategies.length) {
     return null;

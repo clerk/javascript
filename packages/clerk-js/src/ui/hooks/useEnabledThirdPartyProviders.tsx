@@ -30,6 +30,8 @@ export const useEnabledThirdPartyProviders = () => {
   const { socialProviderStrategies, web3FirstFactors } = useEnvironment().userSettings;
   return {
     strategies: [...socialProviderStrategies, ...web3FirstFactors],
+    web3Strategies: [...web3FirstFactors],
+    oauthStrategies: [...socialProviderStrategies],
     strategyToDisplayData,
     providerToDisplayData,
   };
