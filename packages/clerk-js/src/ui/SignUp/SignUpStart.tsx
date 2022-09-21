@@ -270,9 +270,7 @@ function _SignUpStart(): JSX.Element {
             <Footer.ActionLink
               localizationKey={localizationKeys('signUp.start.actionLink')}
               to={signInUrl}
-            >
-              Sign in
-            </Footer.ActionLink>
+            />
           </Footer.Action>
           <Footer.Links />
         </Footer.Root>

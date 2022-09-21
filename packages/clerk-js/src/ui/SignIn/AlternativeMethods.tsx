@@ -55,7 +55,10 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
           elementDescriptor={descriptors.main}
           gap={8}
         >
-          <SignInSocialButtons />
+          <SignInSocialButtons
+            enableWeb3Providers
+            enableOAuthProviders
+          />
           <Flex
             elementDescriptor={descriptors.alternativeMethods}
             direction='col'

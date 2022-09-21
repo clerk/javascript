@@ -28,7 +28,6 @@ const FooterAction = (props: React.PropsWithChildren<any>): JSX.Element => {
 const FooterActionText = (props: React.PropsWithChildren<any>): JSX.Element => {
   return (
     <Text
-      localizationKey={descriptors.footerActionText.objectKey}
       elementDescriptor={descriptors.footerActionText}
       {...props}
       as='span'
@@ -41,7 +40,6 @@ const FooterActionText = (props: React.PropsWithChildren<any>): JSX.Element => {
 const FooterActionLink = (props: PropsOfComponent<typeof RouterLink>): JSX.Element => {
   return (
     <RouterLink
-      localizationKey={descriptors.footerActionLink.objectKey}
       elementDescriptor={descriptors.footerActionLink}
       {...props}
       colorScheme='primary'

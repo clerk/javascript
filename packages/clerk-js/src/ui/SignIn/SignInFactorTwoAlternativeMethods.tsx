@@ -2,7 +2,7 @@ import { SignInFactor } from '@clerk/types';
 import React from 'react';
 
 import { useCoreSignIn } from '../../ui/contexts/';
-import { descriptors, Flex, Flow } from '../customizables';
+import { Col, descriptors, Flow, localizationKeys } from '../customizables';
 import { ArrowBlockButton, Card, CardAlert, Footer, Header } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { formatSafeIdentifier } from '../utils';
@@ -41,18 +41,14 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
         <CardAlert>{card.error}</CardAlert>
         <Header.Root>
           {onBackLinkClick && <Header.BackLink onClick={onBackLinkClick} />}
-          <Header.Title>Use another method</Header.Title>
+          <Header.Title localizationKey={localizationKeys('signIn.alternativeMethods.title')} />
         </Header.Root>
         {/*TODO: extract main in its own component */}
-        <Flex
-          direction='col'
+        <Col
           elementDescriptor={descriptors.main}
           gap={8}
         >
-          <Flex
-            direction='col'
-            gap={2}
-          >
+          <Col gap={2}>
             {supportedSecondFactors.map((factor, i) => (
               <ArrowBlockButton
                 key={i}
@@ -62,11 +58,14 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
                 {getButtonLabel(factor)}
               </ArrowBlockButton>
             ))}
-          </Flex>
-        </Flex>
+          </Col>
+        </Col>
         <Footer.Root>
           <Footer.Action>
-            <Footer.ActionLink onClick={onHavingTroubleClick}>Get help</Footer.ActionLink>
+            <Footer.ActionLink
+              localizationKey={localizationKeys('signIn.alternativeMethods.actionLink')}
+              onClick={onHavingTroubleClick}
+            />
           </Footer.Action>
           <Footer.Links />
         </Footer.Root>
