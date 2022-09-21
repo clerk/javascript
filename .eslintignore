@@ -4,6 +4,7 @@ dist
 build
 coverage
 playground
+packages/*/examples
 .github
 .idea
 .vscode
