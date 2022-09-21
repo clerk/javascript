@@ -22,6 +22,7 @@ const _SignInAccountSwitcher = () => {
       navigateAfterSwitchSession: navigateAfterSignIn,
       userProfileUrl,
       signInUrl,
+      user: undefined,
     });
 
   return (
@@ -32,7 +33,6 @@ const _SignInAccountSwitcher = () => {
           <Header.Title>Signed out</Header.Title>
           <Header.Subtitle>Select account to continue to {applicationName}</Header.Subtitle>
         </Header.Root>
-        {/*TODO: extract main in its own component */}
         <Col
           elementDescriptor={descriptors.main}
           gap={8}
@@ -51,7 +51,7 @@ const _SignInAccountSwitcher = () => {
               isDisabled={card.isLoading}
               icon={
                 <Icon
-                  size={'sm'}
+                  size='sm'
                   icon={Plus}
                   sx={theme => ({ color: theme.colors.$blackAlpha500 })}
                 />

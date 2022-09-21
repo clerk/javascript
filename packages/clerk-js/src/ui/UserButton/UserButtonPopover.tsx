@@ -15,9 +15,9 @@ type UserButtonPopoverProps = { isOpen: boolean; close: () => void } & PropsOfCo
 
 export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopoverProps>((props, ref) => {
   const { isOpen, close, ...rest } = props;
-  const user = useCoreUser();
   const session = useCoreSession() as ActiveSessionResource;
   const { authConfig } = useEnvironment();
+  const user = useCoreUser();
   const {
     handleAddAccountClicked,
     handleManageAccountClicked,
@@ -25,7 +25,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
     handleSignOutAllClicked,
     handleSignOutSessionClicked,
     otherSessions,
-  } = useMultisessionActions({ ...useUserButtonContext(), actionCompleteCallback: close });
+  } = useMultisessionActions({ ...useUserButtonContext(), actionCompleteCallback: close, user });
 
   if (!isOpen) {
     return null;
