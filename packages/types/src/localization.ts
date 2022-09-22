@@ -27,6 +27,7 @@ type _LocalizationResource = {
   formFieldLabel__confirmPassword: LocalizationValue;
   formFieldLabel__firstName: LocalizationValue;
   formFieldLabel__lastName: LocalizationValue;
+  formFieldLabel__backupCode: LocalizationValue;
   formFieldInputPlaceholder__emailAddress: LocalizationValue;
   formFieldInputPlaceholder__phoneNumber: LocalizationValue;
   formFieldInputPlaceholder__username: LocalizationValue;
@@ -127,6 +128,12 @@ type _LocalizationResource = {
       resendButton: LocalizationValue;
     };
     totp2Fa: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      formTitle: LocalizationValue;
+      formSubtitle: LocalizationValue;
+    };
+    backupCode2Fa: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       formTitle: LocalizationValue;

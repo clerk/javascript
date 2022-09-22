@@ -80,6 +80,8 @@ export function getButtonLabel(factor: SignInFactor): string {
       return `Send code to ${formatSafeIdentifier(factor.safeIdentifier)}`;
     case 'totp':
       return 'Use your authenticator app';
+    case 'backup_code':
+      return 'Sign in with backup code';
     default:
       throw `Invalid sign in strategy: "${factor.strategy}"`;
   }

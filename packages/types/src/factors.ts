@@ -1,4 +1,5 @@
 import {
+  BackupCodeStrategy,
   EmailCodeStrategy,
   EmailLinkStrategy,
   OAuthStrategy,
@@ -44,6 +45,10 @@ export type TOTPFactor = {
   strategy: TOTPStrategy;
 };
 
+export type BackupCodeFactor = {
+  strategy: BackupCodeStrategy;
+};
+
 export type EmailCodeConfig = Omit<EmailCodeFactor, 'safeIdentifier'>;
 export type EmailLinkConfig = Omit<EmailLinkFactor, 'safeIdentifier'> & {
   redirectUrl: string;
@@ -82,5 +87,10 @@ export type Web3Attempt = {
 
 export type TOTPAttempt = {
   strategy: TOTPStrategy;
+  code: string;
+};
+
+export type BackupCodeAttempt = {
+  strategy: BackupCodeStrategy;
   code: string;
 };

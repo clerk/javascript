@@ -10,6 +10,7 @@ type FlowMetadata = {
     | 'phoneCode'
     | 'phoneCode2Fa'
     | 'totp2Fa'
+    | 'backupCode2Fa'
     | 'password'
     | 'emailLink'
     | 'emailLinkVerify'

@@ -1,4 +1,6 @@
 import {
+  BackupCodeAttempt,
+  BackupCodeFactor,
   EmailCodeAttempt,
   EmailCodeConfig,
   EmailCodeFactor,
@@ -29,6 +31,7 @@ import {
 import { AuthenticateWithRedirectParams } from './oauth';
 import { ClerkResource } from './resource';
 import {
+  BackupCodeStrategy,
   EmailCodeStrategy,
   EmailLinkStrategy,
   OAuthStrategy,
@@ -87,7 +90,7 @@ export type SignInFirstFactor =
   | Web3SignatureFactor
   | OauthFactor;
 
-export type SignInSecondFactor = PhoneCodeFactor | TOTPFactor;
+export type SignInSecondFactor = PhoneCodeFactor | TOTPFactor | BackupCodeFactor;
 
 export interface UserData {
   firstName?: string;
@@ -108,7 +111,7 @@ export type AttemptFirstFactorParams = EmailCodeAttempt | PhoneCodeAttempt | Pas
 
 export type PrepareSecondFactorParams = PhoneCodeSecondFactorConfig;
 
-export type AttemptSecondFactorParams = PhoneCodeAttempt | TOTPAttempt;
+export type AttemptSecondFactorParams = PhoneCodeAttempt | TOTPAttempt | BackupCodeAttempt;
 
 export type SignInCreateParams = (
   | {
@@ -152,6 +155,7 @@ export type SignInStrategy =
   | TicketStrategy
   | Web3Strategy
   | TOTPStrategy
+  | BackupCodeStrategy
   | OAuthStrategy;
 
 export interface SignInJSON extends ClerkResourceJSON {

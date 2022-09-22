@@ -5,6 +5,7 @@ import { withRedirectToHome } from '../../ui/common/withRedirectToHome';
 import { useCoreSignIn } from '../../ui/contexts';
 import { LoadingCard, withCardStateProvider } from '../elements';
 import { SignInFactorTwoAlternativeMethods } from './SignInFactorTwoAlternativeMethods';
+import { SignInFactorTwoBackupCodeCard } from './SignInFactorTwoBackupCodeCard';
 import { SignInFactorTwoPhoneCodeCard } from './SignInFactorTwoPhoneCodeCard';
 import { SignInFactorTwoTOTPCard } from './SignInFactorTwoTOTPCard';
 import { determineStartingSignInSecondFactor } from './utils';
@@ -73,6 +74,8 @@ export function _SignInFactorTwo(): JSX.Element {
           onShowAlternativeMethodsClicked={toggleAllStrategies}
         />
       );
+    case 'backup_code':
+      return <SignInFactorTwoBackupCodeCard onShowAlternativeMethodsClicked={toggleAllStrategies} />;
     default:
       return <LoadingCard />;
   }
