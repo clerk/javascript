@@ -1,5 +1,6 @@
 export * from './api';
 export * from './authConfig';
+export * from './backupCode';
 export * from './clerk';
 export * from './client';
 export * from './deletedObject';

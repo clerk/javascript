@@ -1,3 +1,4 @@
+import { BackupCodeResource } from './backupCode';
 import { DeletedObjectResource } from './deletedObject';
 import { EmailAddressResource } from './emailAddress';
 import { ExternalAccountResource } from './externalAccount';
@@ -77,6 +78,7 @@ export interface UserResource extends ClerkResource {
   createTOTP: () => Promise<TOTPResource>;
   verifyTOTP: (params: VerifyTOTPParams) => Promise<TOTPResource>;
   disableTOTP: () => Promise<DeletedObjectResource>;
+  createBackupCode: () => Promise<BackupCodeResource>;
   get verifiedExternalAccounts(): ExternalAccountResource[];
   get unverifiedExternalAccounts(): ExternalAccountResource[];
   get hasVerifiedEmailAddress(): boolean;

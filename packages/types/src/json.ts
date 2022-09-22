@@ -297,6 +297,14 @@ export interface TOTPJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
+export interface BackupCodeJSON extends ClerkResourceJSON {
+  object: 'backup_code';
+  id: string;
+  codes: string[];
+  created_at: number;
+  updated_at: number;
+}
+
 export interface DeletedObjectJSON {
   object: string;
   id?: string;

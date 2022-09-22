@@ -1,4 +1,6 @@
 import type {
+  BackupCodeJSON,
+  BackupCodeResource,
   CreateEmailAddressParams,
   CreatePhoneNumberParams,
   CreateWeb3WalletParams,
@@ -23,6 +25,7 @@ import type {
 
 import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
+import { BackupCode } from './BackupCode';
 import {
   BaseResource,
   DeletedObject,
@@ -175,6 +178,17 @@ export class User extends BaseResource implements UserResource {
     )?.response as unknown as DeletedObjectJSON;
 
     return new DeletedObject(json);
+  };
+
+  createBackupCode = async (): Promise<BackupCodeResource> => {
+    const json = (
+      await BaseResource._fetch<BackupCodeJSON>({
+        path: this.path() + '/backup_codes/',
+        method: 'POST',
+      })
+    )?.response as unknown as BackupCodeJSON;
+
+    return new BackupCode(json);
   };
 
   update = (params: UpdateUserParams): Promise<UserResource> => {
