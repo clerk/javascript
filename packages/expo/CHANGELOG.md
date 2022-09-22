@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.9.56](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.9.56-staging.2...@clerk/clerk-expo@0.9.56) (2022-09-22)
+
+### Bug Fixes
+
+- **clerk-expo:** Add org hooks to expo ([93ac733](https://github.com/clerkinc/javascript/commit/93ac73329d6c36ffdf269b5ae6f26ec18e0246c0))
+
 ### [0.9.55](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.9.53-staging.4...@clerk/clerk-expo@0.9.55) (2022-09-19)
 
 **Note:** Version bump only for package @clerk/clerk-expo
