@@ -38,6 +38,7 @@ type _LocalizationResource = {
   formFieldInputPlaceholder__password: LocalizationValue;
   formFieldInputPlaceholder__firstName: LocalizationValue;
   formFieldInputPlaceholder__lastName: LocalizationValue;
+  formFieldInputPlaceholder__backupCode: LocalizationValue;
   formFieldAction__forgotPassword: LocalizationValue;
   formFieldHintText__optional: LocalizationValue;
   formButtonPrimary: LocalizationValue;
@@ -146,9 +147,11 @@ type _LocalizationResource = {
       blockButton__emailCode: LocalizationValue;
       blockButton__phoneCode: LocalizationValue;
       blockButton__password: LocalizationValue;
+      blockButton__totp: LocalizationValue;
+      blockButton__backupCode: LocalizationValue;
       getHelp: {
         title: LocalizationValue;
-        content: `If you’re experiencing difficulty signing into your account, email us and we will work with you to restore access as soon as possible.`;
+        content: LocalizationValue;
         blockButton__emailSupport: LocalizationValue;
       };
     };

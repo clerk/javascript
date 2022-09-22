@@ -2,7 +2,7 @@ import { SignInFactor } from '@clerk/types';
 import React from 'react';
 
 import { useCoreSignIn } from '../../ui/contexts/';
-import { Col, descriptors, Flow, localizationKeys } from '../customizables';
+import { Col, descriptors, Flow, LocalizationKey, localizationKeys } from '../customizables';
 import { ArrowBlockButton, Card, CardAlert, Footer, Header } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { formatSafeIdentifier } from '../utils';
@@ -51,12 +51,14 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
           <Col gap={2}>
             {supportedSecondFactors.map((factor, i) => (
               <ArrowBlockButton
+                textLocalizationKey={getButtonLabel(factor)}
+                elementDescriptor={descriptors.alternativeMethodsBlockButton}
+                textElementDescriptor={descriptors.alternativeMethodsBlockButtonText}
+                arrowElementDescriptor={descriptors.alternativeMethodsBlockButtonArrow}
                 key={i}
                 isDisabled={card.isLoading}
                 onClick={() => onFactorSelected(factor)}
-              >
-                {getButtonLabel(factor)}
-              </ArrowBlockButton>
+              />
             ))}
           </Col>
         </Col>
@@ -74,14 +76,16 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
   );
 };
 
-export function getButtonLabel(factor: SignInFactor): string {
+export function getButtonLabel(factor: SignInFactor): LocalizationKey {
   switch (factor.strategy) {
     case 'phone_code':
-      return `Send code to ${formatSafeIdentifier(factor.safeIdentifier)}`;
+      return localizationKeys('signIn.alternativeMethods.blockButton__emailCode', {
+        identifier: formatSafeIdentifier(factor.safeIdentifier) || '',
+      });
     case 'totp':
-      return 'Use your authenticator app';
+      return localizationKeys('signIn.alternativeMethods.blockButton__totp');
     case 'backup_code':
-      return 'Sign in with backup code';
+      return localizationKeys('signIn.alternativeMethods.blockButton__backupCode');
     default:
       throw `Invalid sign in strategy: "${factor.strategy}"`;
   }

@@ -38,6 +38,7 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
+  formFieldInputPlaceholder__backupCode: '',
   formFieldAction__forgotPassword: 'Forgot password',
   formFieldHintText__optional: 'Optional',
   formButtonPrimary: 'Continue',
@@ -134,6 +135,8 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
       blockButton__emailCode: 'Send code to {{identifier}}',
       blockButton__phoneCode: 'Send code to {{identifier}}',
       blockButton__password: 'Sign in with your password',
+      blockButton__totp: 'Use your authenticator app',
+      blockButton__backupCode: 'Sign in with backup code',
       getHelp: {
         title: 'Get help',
         content: `If you’re experiencing difficulty signing into your account, email us and we will work with you to restore access as soon as possible.`,
