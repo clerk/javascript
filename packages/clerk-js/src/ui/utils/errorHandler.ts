@@ -42,32 +42,24 @@ function parseErrors(errors: ClerkAPIError[]): ParserErrors {
   );
 }
 
-export function handleError(
-  err: Error,
-  fieldStates: Array<FormControlState<string>>,
-  setGlobalError?: React.Dispatch<React.SetStateAction<string | undefined>> | ((error: string | undefined) => void),
-): void {
+type HandleError = {
+  (err: Error, fieldStates: Array<FormControlState<string>>, setGlobalError?: (err: string | undefined) => void): void;
+};
+
+export const handleError: HandleError = (err, fieldStates, setGlobalError) => {
   // Throw unknown errors
   if (!isKnownError(err)) {
     throw err;
   }
 
   if (isMetamaskError(err)) {
-    setGlobalError?.(err.message);
+    return handleMetamaskError(err, fieldStates, setGlobalError);
   }
 
   if (isClerkAPIResponseError(err)) {
-    // Clear global and field errors
-    setGlobalError?.(undefined);
-    // Group errors to field and global
-    const { fieldErrors, globalErrors } = parseErrors(err.errors);
-    // Show field errors if applicable
-    setFieldErrors(fieldStates, fieldErrors);
-    // TODO: Make global errors localizable
-    // Show only the first global error until we have snack bar stacks if applicable
-    setGlobalError?.(globalErrors[0].longMessage || globalErrors[0].message || undefined);
+    return handleClerkApiError(err, fieldStates, setGlobalError);
   }
-}
+};
 
 // Returns the first global API error or undefined if none exists.
 export function getGlobalError(err: Error): ClerkAPIError | undefined {
@@ -96,3 +88,26 @@ export function getFieldError(err: Error): ClerkAPIError | undefined {
 export function getClerkAPIErrorMessage(err: ClerkAPIError): string {
   return err.longMessage || err.message;
 }
+
+const handleMetamaskError: HandleError = (err, _, setGlobalError) => {
+  return setGlobalError?.(err.message);
+};
+
+const handleClerkApiError: HandleError = (err, fieldStates, setGlobalError) => {
+  if (!isClerkAPIResponseError(err)) {
+    return;
+  }
+
+  const { fieldErrors, globalErrors } = parseErrors(err.errors);
+  setFieldErrors(fieldStates, fieldErrors);
+
+  if (setGlobalError) {
+    setGlobalError(undefined);
+    // Show only the first global error until we have snack bar stacks if applicable
+    // TODO: Make global errors localizable
+    const firstGlobalError = globalErrors[0];
+    if (firstGlobalError) {
+      setGlobalError(firstGlobalError.longMessage || firstGlobalError.message || undefined);
+    }
+  }
+};
