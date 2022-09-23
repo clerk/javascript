@@ -52,6 +52,7 @@ Reference of the methods supported in the Clerk Backend API wrapper. [API refere
   - [updateUser(userId, params)](#updateuseruserid-params)
   - [deleteUser(userId)](#deleteuseruserid)
   - [disableUserMFA(userId)](#disableusermfauserid)
+  - [getOrganizationMembershipList(params)](#getorganizationmembershiplistparams)
 - [Email operations](#email-operations)
   - [createEmail({ fromEmailName, subject, body, emailAddressId })](#createemail-fromemailname-subject-body-emailaddressid-)
 - [SMS Message operations](#sms-message-operations)
@@ -603,6 +604,22 @@ Disables all MFA methods of a user given their id. Throws an error otherwise.
 ```ts
 const userId = 'my-user-id';
 await clerkAPI.users.disableUserMFA(userId);
+```
+
+#### getOrganizationMembershipList(params)
+
+Get a list of organization memberships for the user with the provided `userId`.
+
+The method supports pagination via optional `limit` and `offset` parameters. The method parameters are:
+
+- _userId_ The unique ID of the user to retrieve organization memberships for
+- _limit_ Optionally put a limit on the number of results returned
+- _offset_ Optionally skip some results
+
+```ts
+const memberships = await clerkAPI.users.getOrganizationMemberships({
+  userId: 'user_1o4q123qMeCkKKIXcA9h8',
+});
 ```
 
 ## Email operations

@@ -1,7 +1,7 @@
 import nock from 'nock';
 import snakecaseKeys from 'snakecase-keys';
 
-import { User } from '../../api/resources';
+import { Organization, OrganizationMembership, OrganizationMembershipPublicUserData, User } from '../../api/resources';
 import { defaultServerAPIUrl, TestClerkAPI } from '../TestClerkApi';
 
 afterEach(() => {
@@ -216,4 +216,45 @@ test('disableUserMFA() disables all MFA methods of a user', async () => {
   nock(defaultServerAPIUrl).delete(`/v1/users/${id}/mfa`).reply(200, { user_id: 'user_1oBNj55jOjSK9rOYrT5QHqj7eaK' });
 
   await TestClerkAPI.users.disableUserMFA(id);
+});
+
+test('getOrganizationMembershipList() returns a list of organization memberships', async () => {
+  const userId = 'user_randomid';
+  const resJSON = [
+    {
+      object: 'organization_membership',
+      id: 'orgmem_randomid',
+      role: 'basic_member',
+      organization: {
+        object: 'organization',
+        id: 'org_randomid',
+        name: 'Acme Inc',
+        slug: 'acme-inc',
+        created_at: 1612378465,
+        updated_at: 1612378465,
+      },
+      public_user_data: {
+        first_name: 'John',
+        last_name: 'Doe',
+        profile_image_url: 'https://url-to-image.png',
+        identifier: 'johndoe@example.com',
+        user_id: userId,
+      },
+      created_at: 1612378465,
+      updated_at: 1612378465,
+    },
+  ];
+
+  nock(defaultServerAPIUrl)
+    .get(new RegExp(`/v1/users/${userId}/organization_memberships`))
+    .reply(200, resJSON);
+
+  const organizationMembershipList = await TestClerkAPI.users.getOrganizationMembershipList({
+    userId,
+  });
+  expect(organizationMembershipList).toBeInstanceOf(Array);
+  expect(organizationMembershipList.length).toEqual(1);
+  expect(organizationMembershipList[0]).toBeInstanceOf(OrganizationMembership);
+  expect(organizationMembershipList[0].organization).toBeInstanceOf(Organization);
+  expect(organizationMembershipList[0].publicUserData).toBeInstanceOf(OrganizationMembershipPublicUserData);
 });
