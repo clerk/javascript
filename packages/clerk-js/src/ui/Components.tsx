@@ -11,6 +11,7 @@ import { CoreClerkContextWrapper } from './contexts/CoreClerkContextWrapper';
 import { AppearanceProvider } from './customizables';
 import { FlowMetadataProvider, Modal } from './elements';
 import { useSafeLayoutEffect } from './hooks';
+import { ImpersonationFab } from './ImpersonationFab';
 import Portal from './portal';
 import { VirtualRouter } from './router';
 import { SignIn, SignInModal } from './SignIn';
@@ -249,6 +250,17 @@ const Components = (props: ComponentsProps) => {
     </AppearanceProvider>
   );
 
+  const mountedImpersonationFab = (
+    <AppearanceProvider
+      globalAppearance={state.appearance}
+      appearanceKey='impersonationFab'
+    >
+      <InternalThemeProvider>
+        <ImpersonationFab />
+      </InternalThemeProvider>
+    </AppearanceProvider>
+  );
+
   return (
     <CoreClerkContextWrapper clerk={props.clerk}>
       <EnvironmentProvider value={props.environment}>
@@ -275,6 +287,7 @@ const Components = (props: ComponentsProps) => {
           {signInModal && mountedSignInModal}
           {signUpModal && mountedSignUpModal}
           {userProfileModal && mountedUserProfileModal}
+          {mountedImpersonationFab}
         </OptionsProvider>
       </EnvironmentProvider>
     </CoreClerkContextWrapper>
