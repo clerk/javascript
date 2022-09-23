@@ -215,4 +215,30 @@ describe('User', () => {
       path: '/me/totp',
     });
   });
+
+  it('creates backup codes', async () => {
+    const backupCodeJSON = {
+      object: 'backup_code',
+      id: 'bcode_1234',
+      codes: ['1234', '5678'],
+    };
+
+    // @ts-ignore
+    BaseResource._fetch = jest.fn().mockReturnValue(Promise.resolve({ response: backupCodeJSON }));
+
+    const user = new User({
+      email_addresses: [],
+      phone_numbers: [],
+      web3_wallets: [],
+      external_accounts: [],
+    } as unknown as UserJSON);
+
+    await user.createBackupCode();
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({
+      method: 'POST',
+      path: '/me/backup_codes/',
+    });
+  });
 });
