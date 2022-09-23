@@ -1,5 +1,5 @@
 import { joinPaths } from '../../util/path';
-import { User } from '../resources/User';
+import { OrganizationMembership, User } from '../resources';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/users';
@@ -46,6 +46,12 @@ interface UpdateUserParams extends UserMetadataParams {
   primaryEmailAddressID?: string;
   primaryPhoneNumberID?: string;
 }
+
+type GetOrganizationMembershipListParams = {
+  userId: string;
+  limit?: number;
+  offset?: number;
+};
 
 export class UserAPI extends AbstractAPI {
   public async getUserList(params: UserListParams = {}) {
@@ -121,6 +127,17 @@ export class UserAPI extends AbstractAPI {
     return this.APIClient.request<User>({
       method: 'DELETE',
       path: joinPaths(basePath, userId, 'mfa'),
+    });
+  }
+
+  public async getOrganizationMembershipList(params: GetOrganizationMembershipListParams) {
+    const { userId, limit, offset } = params;
+    this.requireId(userId);
+
+    return this.APIClient.request<OrganizationMembership[]>({
+      method: 'GET',
+      path: joinPaths(basePath, userId, 'organization_memberships'),
+      queryParams: { limit, offset },
     });
   }
 }
