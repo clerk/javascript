@@ -1,6 +1,6 @@
 {
   "name": "@clerk/backend-core",
-  "version": "2.5.0-staging.1",
+  "version": "2.5.0",
   "license": "MIT",
   "description": "Clerk Backend API core resources and authentication utilities for JavaScript environments.",
   "scripts": {
@@ -12,7 +12,7 @@
   "main": "dist/cjs/index.js",
   "module": "dist/mjs/index.js",
   "dependencies": {
-    "@clerk/types": "^3.7.0-staging.1",
+    "@clerk/types": "^3.7.0",
     "@peculiar/webcrypto": "^1.4.0",
     "@types/node": "^16.11.55",
     "@types/node-fetch": "^2",
