@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": "./",
     "declaration": true,
-    "declarationMap": true,
+    "declarationMap": false,
     "esModuleInterop": true,
     "importHelpers": true,
     "jsx": "react",
@@ -16,6 +16,7 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "sourceMap": true,
+    "sourceRoot": "https://github.com/clerkinc/javascript/tree/%40clerk%2Fclerk-react%404.2.0/packages/react/src",
     "strict": true,
     "target": "ES2017"
   },

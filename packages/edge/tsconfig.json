@@ -3,7 +3,7 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "declaration": true,
-    "declarationMap": true,
+    "declarationMap": false,
     "forceConsistentCasingInFileNames": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
