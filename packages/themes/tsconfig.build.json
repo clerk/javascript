@@ -7,7 +7,7 @@
     "moduleResolution": "node",
     "importHelpers": true,
     "declaration": true,
-    "declarationMap": true,
+    "declarationMap": false,
     "noImplicitReturns": true,
     "noUnusedLocals": false,
     "noUnusedParameters": true,

@@ -4,7 +4,7 @@
   "compilerOptions": {
     "strict": true,
     "declaration": true,
-    "declarationMap": true,
+    "declarationMap": false,
     "downlevelIteration": true,
     "inlineSources": true,
     "sourceMap": true,
