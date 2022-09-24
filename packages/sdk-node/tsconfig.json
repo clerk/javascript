@@ -7,7 +7,7 @@
     "declarationMap": false,
     "downlevelIteration": true,
     "inlineSources": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "importHelpers": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,

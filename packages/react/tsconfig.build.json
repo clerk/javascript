@@ -15,8 +15,7 @@
     "outDir": "dist",
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "sourceMap": true,
-    "sourceRoot": "https://github.com/clerkinc/javascript/tree/%40clerk%2Fclerk-react%404.2.0/packages/react/src",
+    "sourceMap": false,
     "strict": true,
     "target": "ES2017"
   },
