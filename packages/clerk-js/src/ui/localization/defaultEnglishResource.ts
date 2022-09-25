@@ -185,6 +185,9 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
       web3WalletsSection: {
         title: 'Web3 wallets',
         primaryButton: 'Web3 wallets',
+        destructiveActionTitle: 'Remove',
+        destructiveActionSubtitle: 'Remove this web3 wallet from your account',
+        destructiveAction: 'Remove wallet',
       },
     },
     profilePage: {

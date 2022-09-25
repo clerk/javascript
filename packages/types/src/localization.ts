@@ -197,6 +197,9 @@ type _LocalizationResource = {
       web3WalletsSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
+        destructiveActionTitle: LocalizationValue;
+        destructiveActionSubtitle: LocalizationValue;
+        destructiveAction: LocalizationValue;
       };
     };
     profilePage: {
