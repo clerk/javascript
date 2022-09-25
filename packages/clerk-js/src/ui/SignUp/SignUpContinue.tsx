@@ -149,11 +149,7 @@ function _SignUpContinue() {
         <CardAlert>{card.error}</CardAlert>
         <Header.Root>
           <Header.Title localizationKey={localizationKeys('signUp.continue.title')} />
-          <Header.Subtitle
-            localizationKey={localizationKeys('signUp.continue.subtitle', {
-              applicationName: displayConfig.applicationName,
-            })}
-          />
+          <Header.Subtitle localizationKey={localizationKeys('signUp.continue.subtitle')} />
         </Header.Root>
         <Flex
           direction='col'

@@ -186,11 +186,7 @@ export function _SignInStart(): JSX.Element {
         <CardAlert>{card.error}</CardAlert>
         <Header.Root>
           <Header.Title localizationKey={localizationKeys('signIn.start.title')} />
-          <Header.Subtitle
-            localizationKey={localizationKeys('signIn.start.subtitle', {
-              applicationName: displayConfig.applicationName,
-            })}
-          />
+          <Header.Subtitle localizationKey={localizationKeys('signIn.start.subtitle')} />
         </Header.Root>
         {/*TODO: extract main in its own component */}
         <Col

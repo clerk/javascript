@@ -55,11 +55,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
         <CardAlert>{card.error}</CardAlert>
         <Header.Root>
           <Header.Title localizationKey={localizationKeys('signIn.password.title')} />
-          <Header.Subtitle
-            localizationKey={localizationKeys('signIn.password.subtitle', {
-              applicationName: displayConfig.applicationName,
-            })}
-          />
+          <Header.Subtitle localizationKey={localizationKeys('signIn.password.subtitle')} />
         </Header.Root>
         <IdentityPreview
           identifier={signIn.identifier}

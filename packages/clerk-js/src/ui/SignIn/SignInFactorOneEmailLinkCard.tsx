@@ -84,7 +84,7 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
     <Flow.Part part='emailLink'>
       <VerificationLinkCard
         cardTitle={localizationKeys('signIn.emailLink.title')}
-        cardSubtitle={localizationKeys('signIn.emailLink.subtitle', { applicationName: displayConfig.applicationName })}
+        cardSubtitle={localizationKeys('signIn.emailLink.subtitle')}
         formTitle={localizationKeys('signIn.emailLink.formTitle')}
         formSubtitle={localizationKeys('signIn.emailLink.formSubtitle')}
         resendButton={localizationKeys('signIn.emailLink.resendButton')}
