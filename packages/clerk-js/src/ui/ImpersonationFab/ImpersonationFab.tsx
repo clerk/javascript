@@ -43,16 +43,19 @@ const FabContent = ({ userId }: FabContentProps) => {
   return (
     <Col
       sx={t => ({
-        whiteSpace: 'nowrap',
         paddingLeft: t.sizes.$4,
         paddingRight: t.sizes.$6,
-        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
         overflow: 'hidden',
       })}
     >
       <Text
         colorScheme='neutral'
         variant='regularMedium'
+        sx={{
+          textOverflow: 'ellipsis',
+          overflow: 'hidden',
+        }}
       >
         Signed in as {userId}
       </Text>
@@ -67,11 +70,9 @@ const FabContent = ({ userId }: FabContentProps) => {
         })}
         onClick={async () => {
           await signOut();
-          window.close();
-          //TODO: add timeout with redirect here
         }}
       >
-        Sign out and close tab
+        Sign out
       </Link>
     </Col>
   );
@@ -108,7 +109,7 @@ export const ImpersonationFab = () => {
           backgroundColor: t.colors.$white,
           fontFamily: t.fonts.$main,
           ':hover #cl-impersonationText': {
-            maxWidth: `calc(min(100vw, 45ch) - ${eyeWidth} - ${right})`,
+            maxWidth: `calc(min(100vw, 50ch) - ${eyeWidth} - 2 * ${right})`,
           },
           ':hover #cl-impersonationEye': {
             transform: 'rotate(-180deg)',
