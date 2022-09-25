@@ -2,9 +2,9 @@ import { ClerkAPIError, LocalizationResource } from '@clerk/types';
 import React from 'react';
 
 import { readObjectPath } from '../utils';
+import { applyTokensToString, GlobalTokens, useGlobalTokens } from './applyTokensToString';
 import { LocalizationKey, localizationKeys } from './localizationKeys';
 import { useParsedLocalizationResource } from './parseLocalization';
-import { applyTokensToString, GlobalTokens, useGlobalTokens } from './parseTokens';
 
 type Localizable<T> = T & {
   localizationKey?: LocalizationKey | string;

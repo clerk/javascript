@@ -47,14 +47,6 @@ export const useGlobalTokens = (): GlobalTokens => {
   };
 };
 
-const applyTokenExpressions = (s: string, expressions: TokenExpression[], tokens: Tokens) => {
-  expressions.forEach(({ token, modifiers }) => {
-    const value = modifiers.reduce((acc, mod) => MODIFIERS[mod](acc), tokens[token]);
-    s = s.replace(`_{{${token}}_`, value);
-  });
-  return s;
-};
-
 const parseTokensFromLocalizedString = (
   s: string,
   tokens: Tokens,
@@ -70,9 +62,19 @@ const parseTokensFromLocalizedString = (
 
   let normalisedString = s;
   expressions.forEach(({ token }) => {
-    normalisedString = normalisedString.replace(/{{.+?}}/, `_{{${token}}_`);
+    // Marking the position of each token with _++token++_ so we can easily
+    // replace it with its localized value in the next step
+    normalisedString = normalisedString.replace(/{{.+?}}/, `_++${token}++_`);
   });
   return { expressions, normalisedString };
+};
+
+const applyTokenExpressions = (s: string, expressions: TokenExpression[], tokens: Tokens) => {
+  expressions.forEach(({ token, modifiers }) => {
+    const value = modifiers.reduce((acc, mod) => MODIFIERS[mod](acc), tokens[token]);
+    s = s.replace(`_++${token}++_`, value);
+  });
+  return s;
 };
 
 const assertKnownModifier = (s: any): s is Modifier => Object.prototype.hasOwnProperty.call(MODIFIERS, s);
