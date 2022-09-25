@@ -183,6 +183,18 @@ type _LocalizationResource = {
       phoneNumbersSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
+        detailsTitle__primary: LocalizationValue;
+        detailsSubtitle__primary: LocalizationValue;
+        detailsAction__primary: LocalizationValue;
+        detailsTitle__nonPrimary: LocalizationValue;
+        detailsSubtitle__nonPrimary: LocalizationValue;
+        detailsAction__nonPrimary: LocalizationValue;
+        detailsTitle__unverified: LocalizationValue;
+        detailsSubtitle__unverified: LocalizationValue;
+        detailsAction__unverified: LocalizationValue;
+        destructiveActionTitle: LocalizationValue;
+        destructiveActionSubtitle: LocalizationValue;
+        destructiveAction: LocalizationValue;
       };
       connectedAccountsSection: {
         title: LocalizationValue;

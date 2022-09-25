@@ -172,6 +172,19 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
       phoneNumbersSection: {
         title: 'Phone numbers',
         primaryButton: 'Add a phone number',
+        detailsTitle__primary: 'Primary phone number',
+        detailsSubtitle__primary: 'This phone number is the primary phone number',
+        detailsAction__primary: 'Complete verification',
+        detailsTitle__nonPrimary: 'Set as primary phone number',
+        detailsSubtitle__nonPrimary:
+          'Set this phone number as the primary to receive communications regarding your account.',
+        detailsAction__nonPrimary: 'Set as primary',
+        detailsTitle__unverified: 'Unverified phone number',
+        detailsSubtitle__unverified: 'This phone number has not been verified and may be limited in functionality',
+        detailsAction__unverified: 'Complete verification',
+        destructiveActionTitle: 'Remove',
+        destructiveActionSubtitle: 'Delete this phone number and remove it from your account',
+        destructiveAction: 'Remove phone number',
       },
       connectedAccountsSection: {
         title: 'Connected accounts',
