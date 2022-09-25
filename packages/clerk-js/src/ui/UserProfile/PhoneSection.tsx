@@ -66,45 +66,50 @@ const PhoneAccordion = ({ phone }: { phone: PhoneNumberResource }) => {
       <Col gap={4}>
         {isPrimary && isVerified && (
           <LinkButtonWithDescription
-            title='Primary phone number'
-            subtitle='This phone number is the primary phone number'
+            title={localizationKeys('userProfile.start.phoneNumbersSection.detailsTitle__primary')}
+            subtitle={localizationKeys('userProfile.start.phoneNumbersSection.detailsSubtitle__primary')}
           />
         )}
         {isPrimary && !isVerified && (
           <LinkButtonWithDescription
-            title='Primary phone number'
-            titleLabel={<Badge colorScheme='warning'>Unverified</Badge>}
-            subtitle='This phone number is the primary phone number'
-            actionLabel='Complete verification'
-            onClick={() => navigate(`phone-number/${phone.id}`)}
-          />
-        )}
-        {!isPrimary && isVerified && (
-          <LinkButtonWithDescription
-            title='Set as primary phone number'
-            subtitle='Set this phone number as the primary to receive communications regarding your account.'
-            actionLabel='Set as primary'
-            onClick={setPrimary}
-          />
-        )}
-        {!isPrimary && !isVerified && (
-          <LinkButtonWithDescription
-            title='Unverified phone number'
             titleLabel={
               <Badge
                 localizationKey={localizationKeys('badge__unverified')}
                 colorScheme='warning'
               />
             }
-            subtitle='This phone number has not been verified and may be limited in functionality'
-            actionLabel='Complete verification'
+            title={localizationKeys('userProfile.start.phoneNumbersSection.detailsTitle__primary')}
+            subtitle={localizationKeys('userProfile.start.phoneNumbersSection.detailsSubtitle__primary')}
+            actionLabel={localizationKeys('userProfile.start.phoneNumbersSection.detailsAction__primary')}
+            onClick={() => navigate(`phone-number/${phone.id}`)}
+          />
+        )}
+        {!isPrimary && isVerified && (
+          <LinkButtonWithDescription
+            title={localizationKeys('userProfile.start.phoneNumbersSection.detailsTitle__nonPrimary')}
+            subtitle={localizationKeys('userProfile.start.phoneNumbersSection.detailsSubtitle__nonPrimary')}
+            actionLabel={localizationKeys('userProfile.start.phoneNumbersSection.detailsAction__nonPrimary')}
+            onClick={setPrimary}
+          />
+        )}
+        {!isPrimary && !isVerified && (
+          <LinkButtonWithDescription
+            titleLabel={
+              <Badge
+                localizationKey={localizationKeys('badge__unverified')}
+                colorScheme='warning'
+              />
+            }
+            title={localizationKeys('userProfile.start.phoneNumbersSection.detailsTitle__unverified')}
+            subtitle={localizationKeys('userProfile.start.phoneNumbersSection.detailsSubtitle__unverified')}
+            actionLabel={localizationKeys('userProfile.start.phoneNumbersSection.detailsAction__unverified')}
             onClick={() => navigate(`phone-number/${phone.id}`)}
           />
         )}
         <LinkButtonWithDescription
-          title='Remove'
-          subtitle='Delete this phone number and remove it from your account'
-          actionLabel='Remove phone number'
+          title={localizationKeys('userProfile.start.phoneNumbersSection.destructiveActionTitle')}
+          subtitle={localizationKeys('userProfile.start.phoneNumbersSection.destructiveActionSubtitle')}
+          actionLabel={localizationKeys('userProfile.start.phoneNumbersSection.destructiveAction')}
           colorScheme='danger'
           onClick={() => navigate(`phone-number/${phone.id}/remove`)}
         />
