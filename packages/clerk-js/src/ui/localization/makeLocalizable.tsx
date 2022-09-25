@@ -1,12 +1,12 @@
 import { ClerkAPIError, LocalizationResource } from '@clerk/types';
 import React from 'react';
 
-import { titleize } from '../shared';
 import { readObjectPath } from '../utils';
 import { LocalizationKey, localizationKeys } from './localizationKeys';
 import { useParsedLocalizationResource } from './parseLocalization';
+import { applyTokensToString, GlobalTokens, useGlobalTokens } from './parseTokens';
 
-type Localizable<T = {}> = T & {
+type Localizable<T> = T & {
   localizationKey?: LocalizationKey | string;
 };
 
@@ -16,6 +16,7 @@ export const makeLocalizable = <P,>(Component: React.FunctionComponent<P>): Loca
   const localizableComponent = React.forwardRef((props: Localizable<any>, ref) => {
     const parsedResource = useParsedLocalizationResource();
     const { localizationKey, ...restProps } = props;
+    const globalTokens = useGlobalTokens();
 
     if (!localizationKey) {
       return (
@@ -43,7 +44,7 @@ export const makeLocalizable = <P,>(Component: React.FunctionComponent<P>): Loca
         ref={ref}
         data-localization-key={localizationKeyAttribute(localizationKey)}
       >
-        {localizedStringFromKey(localizationKey, parsedResource) || restProps.children}
+        {localizedStringFromKey(localizationKey, parsedResource, globalTokens) || restProps.children}
       </Component>
     );
   });
@@ -55,12 +56,13 @@ export const makeLocalizable = <P,>(Component: React.FunctionComponent<P>): Loca
 
 export const useLocalizations = () => {
   const parsedResource = useParsedLocalizationResource();
+  const globalTokens = useGlobalTokens();
 
   const t = (localizationKey: LocalizationKey | string | undefined) => {
     if (!localizationKey || typeof localizationKey === 'string') {
       return localizationKey || '';
     }
-    return localizedStringFromKey(localizationKey, parsedResource);
+    return localizedStringFromKey(localizationKey, parsedResource, globalTokens);
   };
 
   const translateError = (error: string | ClerkAPIError | undefined) => {
@@ -81,17 +83,14 @@ const localizationKeyAttribute = (localizationKey: LocalizationKey) => {
   return localizationKey.key;
 };
 
-const localizedStringFromKey = (localizationKey: LocalizationKey, resource: LocalizationResource): string => {
+const localizedStringFromKey = (
+  localizationKey: LocalizationKey,
+  resource: LocalizationResource,
+  globalTokens: GlobalTokens,
+): string => {
   const key = localizationKey.key;
+  const base = readObjectPath(resource, key) as string;
   const params = localizationKey.params;
-  const base = readObjectPath(resource, key);
-  let localizedStr = (base || '') as string;
-  if (localizedStr) {
-    for (const paramKey in params) {
-      // TODO: Localizations v2: smarter pipe operator (|) for utils
-      localizedStr = localizedStr.replace(`{{${paramKey}|titleize}}`, titleize(params[paramKey]));
-      localizedStr = localizedStr.replace(`{{${paramKey}}}`, params[paramKey]);
-    }
-  }
-  return localizedStr || '';
+  const tokens = { ...globalTokens, ...params };
+  return applyTokensToString(base || '', tokens);
 };
