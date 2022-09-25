@@ -165,6 +165,19 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
       emailAddressesSection: {
         title: 'Email addresses',
         primaryButton: 'Add an email address',
+        detailsTitle__primary: 'Primary email address',
+        detailsSubtitle__primary: 'This email address is the primary email address',
+        detailsAction__primary: 'Complete verification',
+        detailsTitle__nonPrimary: 'Set as primary email address',
+        detailsSubtitle__nonPrimary:
+          'Set this email address as the primary to receive communications regarding your account.',
+        detailsAction__nonPrimary: 'Set as primary',
+        detailsTitle__unverified: 'Unverified email address',
+        detailsSubtitle__unverified: 'This email address has not been verified and may be limited in functionality',
+        detailsAction__unverified: 'Complete verification',
+        destructiveActionTitle: 'Remove',
+        destructiveActionSubtitle: 'Delete this email address and remove it from your account',
+        destructiveAction: 'Remove email address',
       },
       phoneNumbersSection: {
         title: 'Phone numbers',

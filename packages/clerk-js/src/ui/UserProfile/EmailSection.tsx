@@ -55,45 +55,50 @@ const EmailAccordion = ({ email }: { email: EmailAddressResource }) => {
       <Col gap={4}>
         {isPrimary && isVerified && (
           <LinkButtonWithDescription
-            title='Primary email address'
-            subtitle='This email address is the primary email address'
+            title={localizationKeys('userProfile.start.emailAddressesSection.detailsTitle__primary')}
+            subtitle={localizationKeys('userProfile.start.emailAddressesSection.detailsSubtitle__primary')}
           />
         )}
         {isPrimary && !isVerified && (
           <LinkButtonWithDescription
-            title='Primary email address'
-            titleLabel={<Badge colorScheme='warning'>Unverified</Badge>}
-            subtitle='This email address is the primary email address'
-            actionLabel='Complete verification'
-            onClick={() => navigate(`email-address/${email.id}`)}
-          />
-        )}
-        {!isPrimary && isVerified && (
-          <LinkButtonWithDescription
-            title='Set as primary email address'
-            subtitle='Set this email address as the primary to receive communications regarding your account.'
-            actionLabel='Set as primary'
-            onClick={setPrimary}
-          />
-        )}
-        {!isPrimary && !isVerified && (
-          <LinkButtonWithDescription
-            title='Unverified email address'
             titleLabel={
               <Badge
                 localizationKey={localizationKeys('badge__unverified')}
                 colorScheme='warning'
               />
             }
-            subtitle='This email address has not been verified and may be limited in functionality'
-            actionLabel='Complete verification'
+            title={localizationKeys('userProfile.start.emailAddressesSection.detailsTitle__primary')}
+            subtitle={localizationKeys('userProfile.start.emailAddressesSection.detailsSubtitle__primary')}
+            actionLabel={localizationKeys('userProfile.start.emailAddressesSection.detailsAction__primary')}
+            onClick={() => navigate(`email-address/${email.id}`)}
+          />
+        )}
+        {!isPrimary && isVerified && (
+          <LinkButtonWithDescription
+            title={localizationKeys('userProfile.start.emailAddressesSection.detailsTitle__nonPrimary')}
+            subtitle={localizationKeys('userProfile.start.emailAddressesSection.detailsSubtitle__nonPrimary')}
+            actionLabel={localizationKeys('userProfile.start.emailAddressesSection.detailsAction__nonPrimary')}
+            onClick={setPrimary}
+          />
+        )}
+        {!isPrimary && !isVerified && (
+          <LinkButtonWithDescription
+            titleLabel={
+              <Badge
+                localizationKey={localizationKeys('badge__unverified')}
+                colorScheme='warning'
+              />
+            }
+            title={localizationKeys('userProfile.start.emailAddressesSection.detailsTitle__unverified')}
+            subtitle={localizationKeys('userProfile.start.emailAddressesSection.detailsSubtitle__unverified')}
+            actionLabel={localizationKeys('userProfile.start.emailAddressesSection.detailsAction__unverified')}
             onClick={() => navigate(`email-address/${email.id}`)}
           />
         )}
         <LinkButtonWithDescription
-          title='Remove'
-          subtitle='Delete this email address and remove it from your account'
-          actionLabel='Remove email address'
+          title={localizationKeys('userProfile.start.emailAddressesSection.destructiveActionTitle')}
+          subtitle={localizationKeys('userProfile.start.emailAddressesSection.destructiveActionSubtitle')}
+          actionLabel={localizationKeys('userProfile.start.emailAddressesSection.destructiveAction')}
           colorScheme='danger'
           onClick={() => navigate(`email-address/${email.id}/remove`)}
         />
