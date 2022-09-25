@@ -231,11 +231,7 @@ function _SignUpStart(): JSX.Element {
         <CardAlert>{card.error}</CardAlert>
         <Header.Root>
           <Header.Title localizationKey={localizationKeys('signUp.start.title')}>Create your account</Header.Title>
-          <Header.Subtitle
-            localizationKey={localizationKeys('signUp.start.subtitle', {
-              applicationName: displayConfig.applicationName,
-            })}
-          >
+          <Header.Subtitle localizationKey={localizationKeys('signUp.start.subtitle')}>
             to continue to {displayConfig.applicationName}
           </Header.Subtitle>
         </Header.Root>

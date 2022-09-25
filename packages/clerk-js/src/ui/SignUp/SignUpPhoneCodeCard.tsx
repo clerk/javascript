@@ -29,7 +29,7 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
     <Flow.Part part='phoneCode'>
       <SignUpVerificationCodeForm
         cardTitle={localizationKeys('signUp.phoneCode.title')}
-        cardSubtitle={localizationKeys('signUp.phoneCode.subtitle', { applicationName: displayConfig.applicationName })}
+        cardSubtitle={localizationKeys('signUp.phoneCode.subtitle')}
         formTitle={localizationKeys('signUp.phoneCode.formTitle')}
         formSubtitle={localizationKeys('signUp.phoneCode.formSubtitle')}
         resendButton={localizationKeys('signUp.phoneCode.resendButton')}
