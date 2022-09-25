@@ -56,9 +56,9 @@ const Web3WalletAccordion = ({ wallet }: { wallet: Web3WalletResource }) => {
     >
       <Col gap={4}>
         <LinkButtonWithDescription
-          title='Remove'
-          subtitle='Remove this web3 wallet from your account'
-          actionLabel='Remove connected account'
+          title={localizationKeys('userProfile.start.web3WalletsSection.destructiveActionTitle')}
+          subtitle={localizationKeys('userProfile.start.web3WalletsSection.destructiveActionSubtitle')}
+          actionLabel={localizationKeys('userProfile.start.web3WalletsSection.destructiveAction')}
           colorScheme='danger'
           onClick={() => navigate(`web3-wallet/${wallet.id}/remove`)}
         />
