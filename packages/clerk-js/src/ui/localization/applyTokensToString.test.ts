@@ -1,10 +1,10 @@
-import { applyTokensToString } from './parseTokens';
+import { applyTokensToString } from './applyTokensToString';
 
 describe('applyTokensToString', function () {
   const tokens = {
     applicationName: 'myApp',
-    'user.fistName': 'nikos',
-    identifier: 'nikos@clerk.dev',
+    'user.firstName': 'nikos',
+    identifier: 'nikos@hello.dev',
     provider: 'google',
   };
 
@@ -17,6 +17,10 @@ describe('applyTokensToString', function () {
     ['This is an {{unknown}} token', 'This is an {{unknown}} token'],
     ['This is an {{applicationName|unknown}} modifier', 'This is an myApp modifier'],
     ['This includes no token', 'This includes no token'],
+    [
+      'This supports multiple tokens {{user.firstName }} - {{ identifier |titleize}}',
+      'This supports multiple tokens nikos - Nikos@hello.dev',
+    ],
     ['', ''],
     [undefined, ''],
   ];
