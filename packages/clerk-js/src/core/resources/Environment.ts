@@ -24,7 +24,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
     return Environment.instance;
   }
 
-  private constructor(data: EnvironmentJSON | null = null) {
+  constructor(data: EnvironmentJSON | null = null) {
     super();
     this.fromJSON(data);
   }

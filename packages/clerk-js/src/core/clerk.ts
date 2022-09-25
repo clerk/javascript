@@ -9,6 +9,7 @@ import type {
   ClerkOptions,
   ClientResource,
   CreateOrganizationParams,
+  EnvironmentJSON,
   EnvironmentResource,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
@@ -767,6 +768,14 @@ export default class Clerk implements ClerkInterface {
   get __unstable__environment(): EnvironmentResource | null | undefined {
     return this.#environment;
   }
+
+  __unstable__setEnvironment = (env: EnvironmentJSON): void => {
+    this.#environment = new Environment(env);
+
+    if (Clerk.mountComponentRenderer) {
+      this.#componentControls = Clerk.mountComponentRenderer(this, this.#environment, this.#options);
+    }
+  };
 
   __unstable__onBeforeRequest = (callback: FapiRequestCallback<any>): void => {
     this.#fapiClient.onBeforeRequest(callback);

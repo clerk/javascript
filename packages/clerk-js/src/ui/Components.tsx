@@ -21,6 +21,8 @@ import { AvailableComponentCtx } from './types';
 import { UserButton } from './UserButton';
 import { UserProfile, UserProfileModal } from './UserProfile';
 
+const ROOT_ELEMENT_ID = 'clerk-components';
+
 export type MountComponentRenderer = (
   clerk: Clerk,
   environment: EnvironmentResource,
@@ -94,9 +96,13 @@ export const mountComponentRenderer = (
 ): ComponentControls => {
   // TODO: Init of components should start
   // before /env and /client requests
-  const clerkRoot = document.createElement('div');
-  clerkRoot.setAttribute('id', 'clerk-components');
-  document.body.appendChild(clerkRoot);
+  let clerkRoot = document.getElementById(ROOT_ELEMENT_ID);
+
+  if (!clerkRoot) {
+    clerkRoot = document.createElement('div');
+    clerkRoot.setAttribute('id', 'clerk-components');
+    document.body.appendChild(clerkRoot);
+  }
 
   ReactDOM.render<ComponentsProps>(
     <Components
