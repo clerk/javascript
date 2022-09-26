@@ -1,10 +1,10 @@
 import React from 'react';
 
+import { clerkInvalidFAPIResponse } from '../../core/errors';
 import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../ui/contexts';
 import { useSupportEmail } from '../../ui/hooks/useSupportEmail';
 import { useRouter } from '../../ui/router/RouteContext';
-import { descriptors, Flex, Flow, localizationKeys } from '../customizables';
-import { Card, CardAlert, Footer, Form, Header, IdentityPreview } from '../elements';
+import { descriptors, localizationKeys } from '../customizables';
 import { useCardState } from '../elements/contexts';
 import { handleError, useFormControl } from '../utils';
 
@@ -41,9 +41,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
           case 'needs_second_factor':
             return navigate('../factor-two');
           default:
-            return alert(
-              `Response: ${res.status} not supported yet.\nFor more information contact us at ${supportEmail}`,
-            );
+            return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
         }
       })
       .catch(err => handleError(err, [passwordControl], card.setError));

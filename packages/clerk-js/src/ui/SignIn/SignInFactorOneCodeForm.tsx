@@ -1,6 +1,7 @@
 import { EmailCodeFactor, PhoneCodeFactor } from '@clerk/types';
 import React from 'react';
 
+import { clerkInvalidFAPIResponse } from '../../core/errors';
 import { useCoreClerk, useCoreSignIn, useSignInContext } from '../../ui/contexts';
 import { useSupportEmail } from '../../ui/hooks/useSupportEmail';
 import { useRouter } from '../../ui/router';
@@ -49,19 +50,18 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   };
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
-    return signIn
+    signIn
       .attemptFirstFactor({ strategy: props.factor.strategy, code })
       .then(async res => {
         await resolve();
+
         switch (res.status) {
           case 'complete':
             return setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignIn });
           case 'needs_second_factor':
             return navigate('../factor-two');
           default:
-            return alert(
-              `Response: ${res.status} not supported yet.\nFor more information contact us at ${supportEmail}`,
-            );
+            return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
         }
       })
       .catch(err => reject(err));
