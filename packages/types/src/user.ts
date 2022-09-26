@@ -54,6 +54,7 @@ export interface UserResource extends ClerkResource {
   organizationMemberships: OrganizationMembershipResource[];
   passwordEnabled: boolean;
   totpEnabled: boolean;
+  backupCodeEnabled: boolean;
   twoFactorEnabled: boolean;
   publicMetadata: UserPublicMetadata;
   unsafeMetadata: UserUnsafeMetadata;

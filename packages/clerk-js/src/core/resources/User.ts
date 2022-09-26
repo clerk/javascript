@@ -64,6 +64,7 @@ export class User extends BaseResource implements UserResource {
   profileImageUrl = '';
   twoFactorEnabled = false;
   totpEnabled = false;
+  backupCodeEnabled = false;
   publicMetadata: Record<string, unknown> = {};
   unsafeMetadata: Record<string, unknown> = {};
   lastSignInAt: Date | null = null;
@@ -272,6 +273,7 @@ export class User extends BaseResource implements UserResource {
     this.unsafeMetadata = data.unsafe_metadata;
 
     this.totpEnabled = data.totp_enabled;
+    this.backupCodeEnabled = data.backup_code_enabled;
     this.twoFactorEnabled = data.two_factor_enabled;
 
     if (data.last_sign_in_at) {

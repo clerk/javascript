@@ -17,10 +17,13 @@ export function magicLinksEnabledForInstance(env: EnvironmentResource): boolean 
 }
 
 export function getSecondFactors(attributes: Attributes): string[] {
-  return [
-    ...(attributes.phone_number.used_for_second_factor ? attributes.phone_number.second_factors : []),
-    ...(attributes.authenticator_app.used_for_second_factor ? attributes.authenticator_app.second_factors : []),
-  ];
+  const secondFactors: string[] = [];
+
+  Object.entries(attributes).forEach(([, attr]) => {
+    attr.used_for_second_factor ? secondFactors.push(...attr.second_factors) : null;
+  });
+
+  return secondFactors;
 }
 
 export function getSecondFactorsAvailableToAdd(attributes: Attributes, user: UserResource): string[] {
@@ -29,6 +32,11 @@ export function getSecondFactorsAvailableToAdd(attributes: Attributes, user: Use
   // If user.totp_enabled, skip totp from the list of choices
   if (user.totpEnabled) {
     sfs = sfs.filter(f => f !== 'totp');
+  }
+
+  // Remove backup codes if already enabled or user doesn't have another MFA method added
+  if (user.backupCodeEnabled || !user.twoFactorEnabled) {
+    sfs = sfs.filter(f => f !== 'backup_code');
   }
 
   return sfs;

@@ -4,9 +4,10 @@ import React from 'react';
 import { useCoreUser, useEnvironment } from '../contexts';
 import { Col, Grid, localizationKeys, Text } from '../customizables';
 import { TileButton, useCardState, withCardStateProvider } from '../elements';
-import { AuthApp, Mobile } from '../icons';
+import { AuthApp, DotCircle, Mobile } from '../icons';
 import { mqu } from '../styledSystem';
 import { FormButtonContainer } from './FormButtons';
+import { MfaBackupCodePage } from './MfaBackupCodePage';
 import { MfaPhoneCodePage } from './MfaPhoneCodePage';
 import { MfaTOTPPage } from './MfaTOTPPage';
 import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
@@ -53,6 +54,14 @@ export const MfaPage = withCardStateProvider(() => {
     return <MfaTOTPPage />;
   }
 
+  // If only backup_code is available, just render that. Otherwise, check if selected
+  if (
+    (secondFactorsAvailableToAdd.length === 1 && secondFactorsAvailableToAdd[0] === 'backup_code') ||
+    selectedMethod === 'backup_code'
+  ) {
+    return <MfaBackupCodePage />;
+  }
+
   return (
     <ContentPage.Root headerTitle={title}>
       <Col gap={4}>
@@ -67,19 +76,32 @@ export const MfaPage = withCardStateProvider(() => {
             },
           })}
         >
-          <TileButton
-            icon={AuthApp}
-            onClick={() => setSelectedMethod('totp')}
-          >
-            Authenticator application
-          </TileButton>
+          {secondFactorsAvailableToAdd.includes('totp') && (
+            <TileButton
+              icon={AuthApp}
+              onClick={() => setSelectedMethod('totp')}
+            >
+              Authenticator application
+            </TileButton>
+          )}
 
-          <TileButton
-            icon={Mobile}
-            onClick={() => setSelectedMethod('phone_code')}
-          >
-            SMS code
-          </TileButton>
+          {secondFactorsAvailableToAdd.includes('phone_code') && (
+            <TileButton
+              icon={Mobile}
+              onClick={() => setSelectedMethod('phone_code')}
+            >
+              SMS code
+            </TileButton>
+          )}
+
+          {secondFactorsAvailableToAdd.includes('backup_code') && (
+            <TileButton
+              icon={DotCircle}
+              onClick={() => setSelectedMethod('backup_code')}
+            >
+              Backup code
+            </TileButton>
+          )}
         </Grid>
       </Col>
 
