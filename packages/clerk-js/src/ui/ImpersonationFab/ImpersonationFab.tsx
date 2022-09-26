@@ -3,7 +3,17 @@ import React from 'react';
 import { mqu } from '../../ui/styledSystem';
 import { getFullName, getIdentifier } from '../../ui/utils';
 import { useCoreClerk, useCoreSession } from '../contexts';
-import { Col, Flex, Icon, Link, LocalizationKey, localizationKeys, Text, useAppearance } from '../customizables';
+import {
+  Col,
+  descriptors,
+  Flex,
+  Icon,
+  Link,
+  LocalizationKey,
+  localizationKeys,
+  Text,
+  useAppearance,
+} from '../customizables';
 import { Portal } from '../elements/Portal';
 import { Eye } from '../icons';
 
@@ -16,6 +26,7 @@ const EyeCircle = ({ width, height }: EyeCircleProps) => {
   return (
     <Col
       id='cl-impersonationEye'
+      elementDescriptor={descriptors.impersonationFabIconContainer}
       justify='center'
       sx={t => ({
         width,
@@ -26,6 +37,7 @@ const EyeCircle = ({ width, height }: EyeCircleProps) => {
       })}
     >
       <Icon
+        elementDescriptor={descriptors.impersonationFabIcon}
         sx={{
           margin: 'auto',
         }}
@@ -52,6 +64,7 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
     >
       <Text
         colorScheme='neutral'
+        elementDescriptor={descriptors.impersonationFabTitle}
         variant='regularMedium'
         sx={{
           textOverflow: 'ellipsis',
@@ -61,6 +74,7 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
       />
       <Link
         variant='regularMedium'
+        elementDescriptor={descriptors.impersonationFabActionLink}
         sx={t => ({
           alignSelf: 'flex-start',
           color: t.colors.$primary500,
@@ -96,6 +110,7 @@ export const ImpersonationFab = () => {
   return (
     <Portal>
       <Flex
+        elementDescriptor={descriptors.impersonationFab}
         align='center'
         sx={t => ({
           position: 'fixed',
