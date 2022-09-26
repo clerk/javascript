@@ -63,6 +63,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
         <ButtonElement
           key={strategy}
           id={strategyToDisplayData[strategy].id}
+          providerName={strategyToDisplayData[strategy].name}
           onClick={startOauth(strategy)}
           isLoading={card.loadingMetadata === strategy}
           isDisabled={card.isLoading}
@@ -114,6 +115,7 @@ const ButtonRows = (props: React.PropsWithChildren<any>) => {
 type SocialButtonProps = PropsOfComponent<typeof Button> & {
   icon: React.ReactElement;
   id: OAuthProvider | Web3Provider;
+  providerName: string;
   label?: string;
 };
 
@@ -137,7 +139,7 @@ const SocialButtonIcon = (props: SocialButtonProps): JSX.Element => {
 };
 
 const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
-  const { label, id, ...rest } = props;
+  const { label, id, providerName, ...rest } = props;
 
   return (
     <ArrowBlockButton
@@ -145,7 +147,7 @@ const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
       elementId={descriptors.socialButtonsBlockButton.setId(id)}
       textElementDescriptor={descriptors.socialButtonsBlockButtonText}
       textElementId={descriptors.socialButtonsBlockButtonText.setId(id)}
-      textLocalizationKey={localizationKeys('socialButtonsBlockButton', { provider: id })}
+      textLocalizationKey={localizationKeys('socialButtonsBlockButton', { provider: providerName })}
       arrowElementDescriptor={descriptors.socialButtonsBlockButtonArrow}
       arrowElementId={descriptors.socialButtonsBlockButtonArrow.setId(id)}
       {...rest}
