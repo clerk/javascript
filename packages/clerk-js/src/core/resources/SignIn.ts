@@ -27,6 +27,7 @@ import { AuthenticateWithWeb3Params } from '@clerk/types/src';
 
 import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from '../../utils';
 import {
+  clerkInvalidFAPIResponse,
   clerkInvalidStrategy,
   clerkMissingOptionError,
   clerkVerifyEmailAddressCalledBeforeCreate,
@@ -159,9 +160,7 @@ export class SignIn extends BaseResource implements SignInResource {
     if (status === 'unverified' && externalVerificationRedirectURL) {
       windowNavigate(externalVerificationRedirectURL);
     } else {
-      const email = SignIn.fapiClient.buildEmailAddress('support');
-      const message = `Response: ${status} not supported yet.\nFor more information contact us at ${email}`;
-      alert(message);
+      console.error(clerkInvalidFAPIResponse(status, SignIn.fapiClient.buildEmailAddress('support')));
     }
   };
 

@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { clerkInvalidFAPIResponse } from '../../core/errors';
 import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../contexts';
 import { Col, descriptors, localizationKeys } from '../customizables';
 import { Card, CardAlert, Footer, Form, Header, useCardState } from '../elements';
@@ -33,9 +34,7 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
           case 'complete':
             return setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignIn });
           default:
-            return alert(
-              `Response: ${res.status} not supported yet.\nFor more information contact us at ${supportEmail}`,
-            );
+            return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
         }
       })
       .catch(err => handleError(err, [codeControl], card.setError));
