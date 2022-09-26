@@ -1,8 +1,9 @@
 import React from 'react';
 
+import { mqu } from '../../ui/styledSystem';
 import { getFullName, getIdentifier } from '../../ui/utils';
 import { useCoreClerk, useCoreSession } from '../contexts';
-import { Col, Flex, Icon, Link, Text, useAppearance } from '../customizables';
+import { Col, Flex, Icon, Link, LocalizationKey, localizationKeys, Text, useAppearance } from '../customizables';
 import { Portal } from '../elements/Portal';
 import { Eye } from '../icons';
 
@@ -19,7 +20,7 @@ const EyeCircle = ({ width, height }: EyeCircleProps) => {
       sx={t => ({
         width,
         height,
-        transition: `transform ${t.transitionDuration.$slowest}`,
+        transition: `transform ${t.transitionDuration.$slowest} ease`,
         backgroundColor: t.colors.$danger500,
         borderRadius: t.radii.$circle,
       })}
@@ -35,9 +36,9 @@ const EyeCircle = ({ width, height }: EyeCircleProps) => {
   );
 };
 
-type FabContentProps = { userId: string };
+type FabContentProps = { title: LocalizationKey; signOutText: LocalizationKey };
 
-const FabContent = ({ userId }: FabContentProps) => {
+const FabContent = ({ title, signOutText }: FabContentProps) => {
   const { signOut } = useCoreClerk();
 
   return (
@@ -56,9 +57,8 @@ const FabContent = ({ userId }: FabContentProps) => {
           textOverflow: 'ellipsis',
           overflow: 'hidden',
         }}
-      >
-        Signed in as {userId}
-      </Text>
+        localizationKey={title}
+      />
       <Link
         variant='regularMedium'
         sx={t => ({
@@ -68,12 +68,11 @@ const FabContent = ({ userId }: FabContentProps) => {
             cursor: 'pointer',
           },
         })}
+        localizationKey={signOutText}
         onClick={async () => {
           await signOut();
         }}
-      >
-        Sign out
-      </Link>
+      />
     </Col>
   );
 };
@@ -109,7 +108,10 @@ export const ImpersonationFab = () => {
           backgroundColor: t.colors.$white,
           fontFamily: t.fonts.$main,
           ':hover #cl-impersonationText': {
-            maxWidth: `calc(min(100vw, 50ch) - ${eyeWidth} - 2 * ${right})`,
+            maxWidth: `calc(50vw - ${eyeWidth} - 2 * ${right})`,
+            [mqu.md]: {
+              maxWidth: `calc(100vw - ${eyeWidth} - 2 * ${right})`,
+            },
           },
           ':hover #cl-impersonationEye': {
             transform: 'rotate(-180deg)',
@@ -125,10 +127,15 @@ export const ImpersonationFab = () => {
           id='cl-impersonationText'
           sx={t => ({
             maxWidth: '0px',
-            transition: `max-width ${t.transitionDuration.$slowest}`,
+            transition: `max-width ${t.transitionDuration.$slowest} ease`,
           })}
         >
-          <FabContent userId={getFullName(session.user) || getIdentifier(session.user)} />
+          <FabContent
+            title={localizationKeys('impersonationFab.title', {
+              userEmailOrId: getFullName(session.user) || getIdentifier(session.user),
+            })}
+            signOutText={localizationKeys('impersonationFab.action__signOut')}
+          />
         </Flex>
       </Flex>
     </Portal>

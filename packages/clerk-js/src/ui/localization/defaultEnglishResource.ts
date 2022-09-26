@@ -240,6 +240,10 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
     action__signOutAll: 'Sign out of all accounts',
     action__addAccount: 'Add account',
   },
+  impersonationFab: {
+    title: 'Signed in as {{userEmailOrId}}',
+    action__signOut: 'Sign out',
+  },
   unstable__errors: {
     form_identifier_not_found: '',
     form_password_pwned: '',
