@@ -10,8 +10,9 @@ import { UserButtonPopover } from './UserButtonPopover';
 import { UserButtonTrigger } from './UserButtonTrigger';
 
 const _UserButton = () => {
+  const { isOpen: isButtonOpenFromOutside } = useUserButtonContext();
   const { floating, reference, styles, toggle, isOpen } = usePopover({
-    defaultOpen: false,
+    defaultOpen: isButtonOpenFromOutside,
     placement: 'bottom-end',
     offset: 8,
   });
@@ -20,7 +21,7 @@ const _UserButton = () => {
     <Flow.Root flow='userButton'>
       <Flex
         elementDescriptor={descriptors.userButtonBox}
-        isOpen={isOpen}
+        isOpen={isButtonOpenFromOutside || isOpen}
         align='center'
         gap={2}
       >
@@ -28,11 +29,11 @@ const _UserButton = () => {
         <UserButtonTrigger
           ref={reference}
           onClick={toggle}
-          isOpen={isOpen}
+          isOpen={isButtonOpenFromOutside || isOpen}
         />
         <Portal>
           <UserButtonPopover
-            isOpen={isOpen}
+            isOpen={isButtonOpenFromOutside || isOpen}
             close={toggle}
             ref={floating}
             style={{ ...styles }}

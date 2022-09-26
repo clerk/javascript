@@ -446,6 +446,10 @@ export type UserButtonProps = {
    */
   showName?: boolean;
   /**
+    Controls programmatically if the UserButton component is open or not
+   */
+  isOpen?: boolean;
+  /**
    * Full URL or path to navigate after sign out is complete
    */
   afterSignOutUrl?: string;
