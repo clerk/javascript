@@ -242,11 +242,18 @@ export default class IsomorphicClerk {
     }
   }
 
-  // TODO: Remove temp use of __unstable__environment
   get __unstable__environment(): any {
     if (this.clerkjs) {
       return (this.clerkjs as any).__unstable__environment;
       // TODO: add ssr condition
+    } else {
+      return undefined;
+    }
+  }
+
+  __unstable__setEnvironment(...args: any): void {
+    if (this.clerkjs && '__unstable__setEnvironment' in this.clerkjs) {
+      (this.clerkjs as any).__unstable__setEnvironment(args);
     } else {
       return undefined;
     }
