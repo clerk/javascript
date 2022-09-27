@@ -16,7 +16,7 @@ export type UserPreviewProps = PropsOfComponent<typeof Flex> & {
 };
 
 export const UserPreview = (props: UserPreviewProps) => {
-  const { user, size = 'md', icon, profileImageUrl, badge, elementId, ...rest } = props;
+  const { user, size = 'md', icon, profileImageUrl, badge, elementId, sx, ...rest } = props;
   const name = getFullName(user);
   const identifier = getIdentifier(user);
 
@@ -26,6 +26,13 @@ export const UserPreview = (props: UserPreviewProps) => {
       elementId={descriptors.userPreview.setId(elementId)}
       gap={4}
       align='center'
+      sx={[
+        {
+          minWidth: '0px',
+          width: '100%',
+        },
+        sx,
+      ]}
       {...rest}
     >
       <Flex
@@ -49,7 +56,7 @@ export const UserPreview = (props: UserPreviewProps) => {
         elementId={descriptors.userPreviewTextContainer.setId(elementId)}
         direction='col'
         justify='center'
-        sx={{ textAlign: 'left' }}
+        sx={{ minWidth: '0px', textAlign: 'left' }}
       >
         <Text
           elementDescriptor={descriptors.userPreviewMainIdentifier}
