@@ -9,6 +9,7 @@ type ArrowBlockButtonProps = PropsOfComponent<typeof Button> & {
   icon?: React.ReactElement;
   rightIcon?: React.ComponentType;
   rightIconSx?: ThemableCssProp;
+  badge?: React.ReactElement;
   textElementDescriptor?: ElementDescriptor;
   textElementId?: ElementId;
   arrowElementDescriptor?: ElementDescriptor;
@@ -32,6 +33,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
     arrowElementDescriptor,
     arrowElementId,
     textLocalizationKey,
+    badge,
     ...rest
   } = props;
 
@@ -91,17 +93,26 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
           )}
         </Flex>
       )}
-      <Text
-        elementDescriptor={textElementDescriptor}
-        elementId={textElementId}
-        as='span'
-        truncate
-        colorScheme='inherit'
-        variant='buttonSmallRegular'
-        localizationKey={textLocalizationKey}
+      <Flex
+        center
+        gap={2}
+        sx={{
+          overflow: 'hidden',
+        }}
       >
-        {children}
-      </Text>
+        <Text
+          elementDescriptor={textElementDescriptor}
+          elementId={textElementId}
+          as='span'
+          truncate
+          colorScheme='inherit'
+          variant='buttonSmallRegular'
+          localizationKey={textLocalizationKey}
+        >
+          {children}
+        </Text>
+        {badge}
+      </Flex>
       <Icon
         elementDescriptor={arrowElementDescriptor}
         elementId={arrowElementId}

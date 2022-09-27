@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Col, descriptors } from '../customizables';
 import { Caret } from '../icons';
-import { animations, InternalTheme } from '../styledSystem';
+import { animations } from '../styledSystem';
 import { ArrowBlockButton } from './ArrowBlockButton';
 
 type AccordionItemProps = React.PropsWithChildren<{
@@ -31,17 +31,6 @@ export const AccordionItem = (props: AccordionItemProps) => {
     }
   }, [isOpen]);
 
-  const badgeSx = badge
-    ? React.cloneElement(badge, {
-        sx: [
-          badge.props.sx,
-          (t: InternalTheme) => ({
-            marginLeft: t.space.$2,
-          }),
-        ],
-      })
-    : null;
-
   return (
     <Col>
       <ArrowBlockButton
@@ -57,6 +46,7 @@ export const AccordionItem = (props: AccordionItemProps) => {
           transform: `rotate(${isOpen ? '180' : '0'}deg)`,
           opacity: 0.4,
         })}
+        badge={badge}
         sx={t => ({
           backgroundColor: isOpen ? t.colors.$blackAlpha50 : undefined,
           padding: `${t.space.$3} ${t.space.$4}`,
@@ -66,7 +56,6 @@ export const AccordionItem = (props: AccordionItemProps) => {
         isDisabled={!toggleable}
       >
         {title}
-        {badgeSx}
       </ArrowBlockButton>
       {isOpen && (
         <Col
