@@ -269,7 +269,7 @@ export class Base {
     // }
 
     if (clientUat === '0') {
-      return { status: AuthStatus.SignedOut, errorReason: AuthErrorReason.StandardOut };
+      return { status: AuthStatus.SignedOut, errorReason: AuthErrorReason.StandardSignedOut };
     }
 
     if (isProductionKey && clientUat && !cookieToken) {

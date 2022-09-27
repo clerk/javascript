@@ -21,7 +21,7 @@ export type VerifySessionTokenOptions = {
 export type BuildAuthenticatedStateOptions = {
   jwtKey?: string;
   authorizedParties?: string[];
-  fetchInterstitial: () => Promise<string>;
+  fetchInterstitial: () => Promise<string> | null;
   tokenType: TokenType;
 };
 
@@ -30,7 +30,8 @@ export type TokenType = 'cookie' | 'header';
 export type AuthState = {
   status: AuthStatus;
   session?: Session;
-  interstitial?: string;
+  /* Interstitial is returned as null when the interstitial endpoint will be rewritten to instead of being rendered directly */
+  interstitial?: string | null;
   sessionClaims?: ClerkJWTClaims;
   /* Error reason for signed-out and interstitial states. Would probably be set on the `Auth-Result` response header. */
   errorReason?: AuthErrorReason;
@@ -59,8 +60,11 @@ export type AuthStateParams = {
   userAgent?: string | null;
   /* A list of authorized parties to validate against the session token azp claim */
   authorizedParties?: string[];
-  /* HTTP utility for fetching a text/html string */
-  fetchInterstitial: () => Promise<string>;
+  /*
+   * HTTP utility for fetching a text/html string.
+   * If explicitly `null` it will only return the status for the client to handle as it may
+   */
+  fetchInterstitial: () => Promise<string> | null;
   /* Value corresponding to the JWT verification key */
   jwtKey?: string;
 };

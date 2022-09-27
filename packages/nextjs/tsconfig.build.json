@@ -18,7 +18,8 @@
     "types": [],
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "allowJs": true
+    "allowJs": true,
+    "target": "ES2020"
   },
   "include": ["src"]
 }

@@ -27,7 +27,7 @@ Object {
     "InlineKeyMissing": "inline-key-missing",
     "InternalError": "internal-error",
     "PublicKeyFetchError": "pk-fetch-error",
-    "StandardOut": "standard-out",
+    "StandardSignedOut": "standard-signed-out",
     "UATMissing": "uat-missing",
     "Unknown": "unknown",
   },
@@ -85,5 +85,6 @@ Object {
   "createGetToken": [Function],
   "createSignedOutState": [Function],
   "deserialize": [Function],
+  "signedOutGetToken": [Function],
 }
 `;

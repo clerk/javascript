@@ -35,7 +35,7 @@ const decodeBase64 = (base64: string) => atob(base64);
 
 /** Base initialization */
 
-const vercelEdgeBase = new Base(importKey, verifySignature, decodeBase64);
+export const vercelEdgeBase = new Base(importKey, verifySignature, decodeBase64);
 
 /** Export standalone verifySessionToken */
 
@@ -51,11 +51,12 @@ const organizations = ClerkAPI.organizations;
 const sessions = ClerkAPI.sessions;
 const smsMessages = ClerkAPI.smsMessages;
 const users = ClerkAPI.users;
+const clerkApi = ClerkAPI;
 
 // Export sub-api objects
-export { allowlistIdentifiers, clients, emails, invitations, organizations, sessions, smsMessages, users };
+export { allowlistIdentifiers, clients, emails, invitations, organizations, sessions, smsMessages, users, clerkApi };
 
-async function fetchInterstitial() {
+export function fetchInterstitial() {
   return ClerkAPI.fetchInterstitial();
 }
 
@@ -131,8 +132,12 @@ function vercelMiddlewareAuth(
       return response;
     }
 
-    const sessionId = sessionClaims!.sid;
-    const userId = sessionClaims!.sub;
+    if (!sessionClaims) {
+      throw new Error('An unexpected error occurred');
+    }
+
+    const sessionId = sessionClaims.sid;
+    const userId = sessionClaims.sub;
 
     const [user, session] = await Promise.all([
       loadUser ? ClerkAPI.users.getUser(userId) : Promise.resolve(undefined),
