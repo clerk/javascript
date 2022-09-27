@@ -31,7 +31,7 @@ export const createGetToken: CreateGetToken = params => {
   };
 };
 
-const signedOutGetToken = createGetToken({
+export const signedOutGetToken = createGetToken({
   sessionId: undefined,
   cookieToken: undefined,
   headerToken: undefined,

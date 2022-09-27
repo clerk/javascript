@@ -1,6 +1,7 @@
 import { Base } from '../Base';
 import { AuthErrorReason, AuthStateParams, AuthStatus } from '../types';
 import { TokenVerificationError } from '../util/errors';
+
 const mockCrossOrigin = jest.fn();
 const mockFetchInterstitial = jest.fn();
 const mockIsDevelopmentOrStaging = jest.fn();
@@ -188,7 +189,7 @@ describe('Base getAuthState', () => {
     const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
     mockIsProduction.mockImplementationOnce(() => true);
     const authStateResult = await testBase.getAuthState({ ...defaultAuthState, clientUat: '0' });
-    expect(authStateResult).toEqual({ status: AuthStatus.SignedOut, errorReason: AuthErrorReason.StandardOut });
+    expect(authStateResult).toEqual({ status: AuthStatus.SignedOut, errorReason: AuthErrorReason.StandardSignedOut });
   });
 
   it('returns interstitial when on production and have a valid clientUat value without cookieToken', async () => {

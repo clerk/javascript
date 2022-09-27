@@ -30,7 +30,7 @@ export type TokenType = 'cookie' | 'header';
 export type AuthState = {
   status: AuthStatus;
   session?: Session;
-  /* Interstitial is returned as null when the client will handle the interstitial logic */
+  /* Interstitial is returned as null when the interstitial endpoint will be rewritten to instead of being rendered directly */
   interstitial?: string | null;
   sessionClaims?: ClerkJWTClaims;
   /* Error reason for signed-out and interstitial states. Would probably be set on the `Auth-Result` response header. */

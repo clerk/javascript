@@ -18,11 +18,8 @@ export function getAuthDataFromClaims({
 }: GetAuthDataFromClaimsOpts): AuthData {
   return {
     sessionId: sessionClaims.sid,
-    session: undefined, // currently not loaded here
     userId: sessionClaims.sub,
-    user: undefined, // currently not loaded here
     orgId: sessionClaims.org_id,
-    organization: undefined, // currently not loaded here
     getToken: createGetToken({
       headerToken: headerToken,
       cookieToken: cookieToken,

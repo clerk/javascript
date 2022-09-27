@@ -17,26 +17,30 @@ const DEFAULT_API_URL = process.env.CLERK_API_URL || 'https://api.clerk.dev';
 const DEFAULT_API_VERSION = process.env.CLERK_API_VERSION || 'v1';
 
 // Using public interstitial endpoint for time being
-const INTERSTITIAL_URL = `${DEFAULT_API_URL}/${DEFAULT_API_VERSION}/public/interstitial?frontendApi=${process.env.NEXT_PUBLIC_FRONTEND_API}`;
+const INTERSTITIAL_URL = `${DEFAULT_API_URL}/${DEFAULT_API_VERSION}/public/interstitial?frontendApi=${process.env.NEXT_PUBLIC_CLERK_FRONTEND_API}`;
 
 type WithAuthOptions = {
   jwtKey?: string;
   authorizedParties?: string[];
+  ignoredPaths?: string[];
 };
 
 export function withClerkMiddleware(handler: NextMiddleware, opts: WithAuthOptions = {}): NextMiddleware {
   return async (req: NextRequest, event: NextFetchEvent) => {
     const { headers, cookies } = req;
-    const { jwtKey, authorizedParties } = opts;
+    const { jwtKey, authorizedParties, ignoredPaths } = opts;
+    const pathname = req.nextUrl.pathname;
 
-    // Skip if this is an internal next request
-    if (req.nextUrl.pathname.startsWith('/_next/')) {
+    // Skip if:
+    // - it is an internal next request
+    // - it is an ignored path
+    if (pathname.startsWith('/_next/') || (ignoredPaths || []).find(p => new RegExp(p).test(pathname))) {
       return NextResponse.next();
     }
 
     // throw an error if the request already includes an auth result, because that means it has been spoofed
     if (getAuthResultFromRequest(req)) {
-      throw 'Auth violation detected';
+      throw 'withClerkMiddleware: Auth violation detected';
     }
 
     // get auth state, check if we need to return an interstitial
@@ -68,10 +72,10 @@ export function withClerkMiddleware(handler: NextMiddleware, opts: WithAuthOptio
 
     // Signed in / out case
 
-    const authResult = status === AuthStatus.SignedIn ? AuthResult.StandardIn : errorReason;
+    const authResult = status === AuthStatus.SignedIn ? AuthResult.StandardSignedIn : errorReason;
 
     if (!authResult) {
-      throw 'Auth result could not be determined';
+      throw 'withClerkMiddleware: Auth result could not be determined';
     }
 
     setAuthResultOnRequest({ req, authResult });

@@ -24,15 +24,21 @@ function getQueryParam(req: RequestLike, name: string): string | null | undefine
 
   // Check if the request contains a parsed query object
   // NextApiRequest does, but the IncomingMessage in the GetServerSidePropsContext case does not
+
+  let queryParam: string | null | undefined;
+
   if ('query' in req) {
-    return req.query[name] as string | undefined;
+    queryParam = req.query[name] as string | undefined;
   }
 
   // Fall back to query string
-  const qs = (req.url || '').split('?')[1];
-  const searchParams = new URLSearchParams(qs);
+  if (!queryParam) {
+    const qs = (req.url || '').split('?')[1];
+    const searchParams = new URLSearchParams(qs);
+    queryParam = searchParams.get(name);
+  }
 
-  return searchParams.get(name);
+  return queryParam;
 }
 
 export function getHeader(req: RequestLike, name: string): string | null | undefined {
