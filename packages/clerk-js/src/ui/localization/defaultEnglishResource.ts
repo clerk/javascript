@@ -241,7 +241,7 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
     action__addAccount: 'Add account',
   },
   impersonationFab: {
-    title: 'Signed in as {{userEmailOrId}}',
+    title: 'Signed in as {{identifier}}',
     action__signOut: 'Sign out',
   },
   unstable__errors: {

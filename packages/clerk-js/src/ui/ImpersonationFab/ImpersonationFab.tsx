@@ -27,7 +27,7 @@ const EyeCircle = ({ width, height }: EyeCircleProps) => {
     <Col
       id='cl-impersonationEye'
       elementDescriptor={descriptors.impersonationFabIconContainer}
-      justify='center'
+      center
       sx={t => ({
         width,
         height,
@@ -38,9 +38,6 @@ const EyeCircle = ({ width, height }: EyeCircleProps) => {
     >
       <Icon
         elementDescriptor={descriptors.impersonationFabIcon}
-        sx={{
-          margin: 'auto',
-        }}
         icon={Eye}
         size={undefined}
       />
@@ -56,20 +53,17 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
   return (
     <Col
       sx={t => ({
+        width: '100%',
         paddingLeft: t.sizes.$4,
         paddingRight: t.sizes.$6,
         whiteSpace: 'nowrap',
-        overflow: 'hidden',
       })}
     >
       <Text
         colorScheme='neutral'
         elementDescriptor={descriptors.impersonationFabTitle}
         variant='regularMedium'
-        sx={{
-          textOverflow: 'ellipsis',
-          overflow: 'hidden',
-        }}
+        truncate
         localizationKey={title}
       />
       <Link
@@ -147,7 +141,7 @@ export const ImpersonationFab = () => {
         >
           <FabContent
             title={localizationKeys('impersonationFab.title', {
-              userEmailOrId: getFullName(session.user) || getIdentifier(session.user),
+              identifier: getFullName(session.user) || getIdentifier(session.user),
             })}
             signOutText={localizationKeys('impersonationFab.action__signOut')}
           />
