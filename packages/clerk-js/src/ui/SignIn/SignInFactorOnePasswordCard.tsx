@@ -1,11 +1,11 @@
 import React from 'react';
 
-import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../ui/contexts';
+import { clerkInvalidFAPIResponse } from '../../core/errors';
+import { useCoreClerk, useCoreSignIn, useSignInContext } from '../../ui/contexts';
 import { useSupportEmail } from '../../ui/hooks/useSupportEmail';
 import { useRouter } from '../../ui/router/RouteContext';
 import { descriptors, Flex, Flow, localizationKeys } from '../customizables';
-import { Card, CardAlert, Footer, Form, Header, IdentityPreview } from '../elements';
-import { useCardState } from '../elements/contexts';
+import { Card, CardAlert, Footer, Form, Header, IdentityPreview, useCardState } from '../elements';
 import { handleError, useFormControl } from '../utils';
 
 type SignInFactorOnePasswordProps = {
@@ -15,7 +15,6 @@ type SignInFactorOnePasswordProps = {
 export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps) => {
   const { onShowAlternativeMethodsClick } = props;
   const card = useCardState();
-  const { displayConfig } = useEnvironment();
   const { setActive } = useCoreClerk();
   const signIn = useCoreSignIn();
   const { navigateAfterSignIn } = useSignInContext();
@@ -41,9 +40,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
           case 'needs_second_factor':
             return navigate('../factor-two');
           default:
-            return alert(
-              `Response: ${res.status} not supported yet.\nFor more information contact us at ${supportEmail}`,
-            );
+            return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
         }
       })
       .catch(err => handleError(err, [passwordControl], card.setError));

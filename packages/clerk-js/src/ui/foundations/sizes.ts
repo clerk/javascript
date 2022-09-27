@@ -57,6 +57,7 @@ const radii = Object.freeze({
   lg: '0.5rem',
   xl: '1rem',
   '2xl': '1.25rem',
+  halfHeight: '99999px',
 } as const);
 
 /**

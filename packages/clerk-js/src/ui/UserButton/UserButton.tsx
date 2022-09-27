@@ -3,9 +3,9 @@ import React from 'react';
 import { useCoreUser, useUserButtonContext, withCoreUserGuard } from '../contexts';
 import { descriptors, Flex, Flow, Text } from '../customizables';
 import { withCardStateProvider } from '../elements';
+import { Portal } from '../elements/Portal';
 import { usePopover } from '../hooks';
 import { getFullName, getIdentifier } from '../utils';
-import { Portal } from './Portal';
 import { UserButtonPopover } from './UserButtonPopover';
 import { UserButtonTrigger } from './UserButtonTrigger';
 

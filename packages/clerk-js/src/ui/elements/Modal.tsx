@@ -3,7 +3,7 @@ import React from 'react';
 import { descriptors, Flex } from '../customizables';
 import { usePopover, useSafeLayoutEffect, useScrollLock } from '../hooks';
 import { animations, mqu, ThemableCssProp } from '../styledSystem';
-import { Portal } from '../UserButton/Portal';
+import { Portal } from './Portal';
 
 type ModalProps = React.PropsWithChildren<{
   handleOpen?: () => void;

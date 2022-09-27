@@ -290,6 +290,12 @@ export type ElementsConfig = {
 
   activeDeviceIcon: WithOptions<'mobile' | 'desktop', never, never>;
 
+  impersonationFab: WithOptions<never, never, never>;
+  impersonationFabIcon: WithOptions<never, never, never>;
+  impersonationFabIconContainer: WithOptions<never, never, never>;
+  impersonationFabTitle: WithOptions<never, never, never>;
+  impersonationFabActionLink: WithOptions<never, never, never>;
+
   fileDropAreaOuterBox: WithOptions<never, never, never>;
   fileDropAreaBox: WithOptions<never, never, never>;
   fileDropAreaIconBox: WithOptions<never, never, never>;

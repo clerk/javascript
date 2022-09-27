@@ -1,6 +1,7 @@
 import { ClerkAPIError, SignInCreateParams } from '@clerk/types';
 import React from 'react';
 
+import { clerkInvalidFAPIResponse } from '../../core/errors';
 import { ERROR_CODES, getIdentifierControlDisplayValues } from '../../ui/common/constants';
 import { withRedirectToHome } from '../../ui/common/withRedirectToHome';
 import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../ui/contexts';
@@ -76,8 +77,8 @@ export function _SignInStart(): JSX.Element {
               beforeEmit: navigateAfterSignIn,
             });
           default: {
-            const msg = `Response: ${res.status} not supported yet.\nFor more information contact us at ${supportEmail}`;
-            alert(msg);
+            console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
+            return;
           }
         }
       })
@@ -137,8 +138,8 @@ export function _SignInStart(): JSX.Element {
             beforeEmit: navigateAfterSignIn,
           });
         default: {
-          const msg = `Response: ${res.status} not supported yet.\nFor more information contact us at ${supportEmail}`;
-          alert(msg);
+          console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
+          return;
         }
       }
     } catch (e) {

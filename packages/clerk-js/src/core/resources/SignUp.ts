@@ -23,6 +23,7 @@ import type {
 import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from '../../utils';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import {
+  clerkInvalidFAPIResponse,
   clerkMissingOptionError,
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
@@ -192,10 +193,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     if (status === 'unverified' && !!externalVerificationRedirectURL) {
       windowNavigate(externalVerificationRedirectURL);
     } else {
-      // TODO:
-      const email = SignUp.fapiClient.buildEmailAddress('support');
-      const message = `Response: ${status} not supported yet.\nFor more information contact us at ${email}`;
-      alert(message);
+      console.error(clerkInvalidFAPIResponse(status, SignUp.fapiClient.buildEmailAddress('support')));
     }
   };
 

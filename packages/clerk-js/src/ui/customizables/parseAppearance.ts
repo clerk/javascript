@@ -17,10 +17,12 @@ export type ParsedElements = Elements[];
 export type ParsedInternalTheme = InternalTheme;
 export type ParsedLayout = Required<Layout>;
 
+type PublicAppearanceTopLevelKey = keyof Pick<Appearance, 'signIn' | 'signUp' | 'userProfile' | 'userButton'>;
+
 export type AppearanceCascade = {
   globalAppearance?: Appearance;
   appearance?: Appearance;
-  appearanceKey: keyof Pick<Appearance, 'signIn' | 'signUp' | 'userProfile' | 'userButton'>;
+  appearanceKey: PublicAppearanceTopLevelKey | 'impersonationFab';
 };
 
 export type ParsedAppearance = {
@@ -51,7 +53,9 @@ export const parseAppearance = (cascade: AppearanceCascade): ParsedAppearance =>
   const { globalAppearance, appearance: componentAppearance, appearanceKey } = cascade;
 
   const appearanceList: Appearance[] = [];
-  [globalAppearance, globalAppearance?.[appearanceKey], componentAppearance].forEach(a => expand(a, appearanceList));
+  [globalAppearance, globalAppearance?.[appearanceKey as PublicAppearanceTopLevelKey], componentAppearance].forEach(a =>
+    expand(a, appearanceList),
+  );
 
   const parsedInternalTheme = parseVariables(appearanceList);
   const parsedLayout = parseLayout(appearanceList);
