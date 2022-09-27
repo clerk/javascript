@@ -108,8 +108,6 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
         icon={rightIcon}
         sx={[
           theme => ({
-            position: 'absolute',
-            right: '1rem',
             transition: 'all 100ms ease',
             minWidth: theme.sizes.$4,
             minHeight: theme.sizes.$4,
