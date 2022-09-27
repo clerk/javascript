@@ -289,6 +289,10 @@ type _LocalizationResource = {
     action__signOutAll: LocalizationValue;
     action__addAccount: LocalizationValue;
   };
+  impersonationFab: {
+    title: LocalizationValue;
+    action__signOut: LocalizationValue;
+  };
   unstable__errors: {
     form_identifier_not_found: LocalizationValue;
     form_password_pwned: LocalizationValue;

@@ -169,6 +169,12 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
 
   'activeDeviceIcon',
 
+  'impersonationFab',
+  'impersonationFabIcon',
+  'impersonationFabIconContainer',
+  'impersonationFabTitle',
+  'impersonationFabActionLink',
+
   'fileDropAreaOuterBox',
   'fileDropAreaBox',
   'fileDropAreaIconBox',
