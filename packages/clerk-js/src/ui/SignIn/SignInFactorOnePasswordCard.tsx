@@ -1,11 +1,11 @@
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../core/errors';
-import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../ui/contexts';
+import { useCoreClerk, useCoreSignIn, useSignInContext } from '../../ui/contexts';
 import { useSupportEmail } from '../../ui/hooks/useSupportEmail';
 import { useRouter } from '../../ui/router/RouteContext';
-import { descriptors, localizationKeys } from '../customizables';
-import { useCardState } from '../elements/contexts';
+import { descriptors, Flex, Flow, localizationKeys } from '../customizables';
+import { Card, CardAlert, Footer, Form, Header, IdentityPreview, useCardState } from '../elements';
 import { handleError, useFormControl } from '../utils';
 
 type SignInFactorOnePasswordProps = {
@@ -15,7 +15,6 @@ type SignInFactorOnePasswordProps = {
 export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps) => {
   const { onShowAlternativeMethodsClick } = props;
   const card = useCardState();
-  const { displayConfig } = useEnvironment();
   const { setActive } = useCoreClerk();
   const signIn = useCoreSignIn();
   const { navigateAfterSignIn } = useSignInContext();
