@@ -1,5 +1,4 @@
 import { AuthStatus, Base, createGetToken, createSignedOutState } from '@clerk/backend-core';
-import { ClerkJWTClaims } from '@clerk/types';
 import { NextFetchEvent, NextRequest } from 'next/server';
 
 import { ClerkAPI } from './ClerkAPI';
@@ -42,7 +41,6 @@ export const vercelEdgeBase = new Base(importKey, verifySignature, decodeBase64)
 export const verifySessionToken = vercelEdgeBase.verifySessionToken;
 
 /** Export ClerkBackendAPI API client */
-
 const allowlistIdentifiers = ClerkAPI.allowlistIdentifiers;
 const clients = ClerkAPI.clients;
 const emails = ClerkAPI.emails;
@@ -157,7 +155,7 @@ function vercelMiddlewareAuth(
       sessionId,
       userId,
       getToken,
-      claims: sessionClaims as ClerkJWTClaims,
+      claims: sessionClaims,
     });
     return handler(authRequest, event);
   };
@@ -171,4 +169,14 @@ function getCookie(cookies: NextRequest['cookies'], name: string) {
     // @ts-expect-error
     return cookies[name];
   }
+}
+
+export function setClerkApiKey(value: string) {
+  ClerkAPI.apiKey = value;
+}
+
+export function setClerkJwtKey() {
+  // noop
+  // This method exists for parity between edge and sdk-node
+  // The JWT can only be passed as an option to withEdgeMiddlewareAuth/requireEdgeMiddlewareAuth
 }

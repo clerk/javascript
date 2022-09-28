@@ -73,6 +73,10 @@ export function setClerkApiKey(value: string) {
   Clerk.getInstance().apiKey = value;
 }
 
+export function setClerkJwtKey(value: string) {
+  Clerk.getInstance().jwtKey = value;
+}
+
 export function setClerkServerApiUrl(value: string) {
   Clerk.getInstance().apiUrl = value;
 }
