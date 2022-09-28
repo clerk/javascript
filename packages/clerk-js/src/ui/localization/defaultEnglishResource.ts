@@ -47,6 +47,7 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
   footerActionLink__useAnotherMethod: 'Use another method',
   badge__primary: 'Primary',
   badge__thisDevice: 'This device',
+  badge__impersonationDevice: 'Impersonator',
   badge__default: 'Default',
   badge__unverified: 'Unverified',
   badge__requiresAction: 'Requires action',

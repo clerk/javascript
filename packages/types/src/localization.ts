@@ -47,6 +47,7 @@ type _LocalizationResource = {
   footerActionLink__useAnotherMethod: LocalizationValue;
   badge__primary: LocalizationValue;
   badge__thisDevice: LocalizationValue;
+  badge__impersonationDevice: LocalizationValue;
   badge__default: LocalizationValue;
   badge__unverified: LocalizationValue;
   badge__requiresAction: LocalizationValue;
