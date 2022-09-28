@@ -21,7 +21,7 @@ export const NEXT_REDIRECT_HEADER = 'Location';
 export type AuthData = {
   sessionId: string | null;
   userId: string | null;
-  orgId: string | null | undefined;
+  orgId: string | null;
   getToken: ServerGetToken;
   claims: ClerkJWTClaims | null;
 };

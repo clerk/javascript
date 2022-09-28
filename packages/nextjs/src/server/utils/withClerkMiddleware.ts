@@ -11,7 +11,7 @@ import {
   NEXT_REWRITE_HEADER,
   SESSION_COOKIE_NAME,
 } from '../types';
-import { getAuthResultFromRequest, setAuthResultOnRequest } from './requestResponseUtils';
+import { getAuthResultFromRequest, setPrivateAuthResultOnRequest } from './requestResponseUtils';
 
 const DEFAULT_API_URL = process.env.CLERK_API_URL || 'https://api.clerk.dev';
 const DEFAULT_API_VERSION = process.env.CLERK_API_VERSION || 'v1';
@@ -22,21 +22,12 @@ const INTERSTITIAL_URL = `${DEFAULT_API_URL}/${DEFAULT_API_VERSION}/public/inter
 type WithAuthOptions = {
   jwtKey?: string;
   authorizedParties?: string[];
-  ignoredPaths?: string[];
 };
 
 export function withClerkMiddleware(handler: NextMiddleware, opts: WithAuthOptions = {}): NextMiddleware {
   return async (req: NextRequest, event: NextFetchEvent) => {
     const { headers, cookies } = req;
-    const { jwtKey, authorizedParties, ignoredPaths } = opts;
-    const pathname = req.nextUrl.pathname;
-
-    // Skip if:
-    // - it is an internal next request
-    // - it is an ignored path
-    if (pathname.startsWith('/_next/') || (ignoredPaths || []).find(p => new RegExp(p).test(pathname))) {
-      return NextResponse.next();
-    }
+    const { jwtKey, authorizedParties } = opts;
 
     // throw an error if the request already includes an auth result, because that means it has been spoofed
     if (getAuthResultFromRequest(req)) {
@@ -67,7 +58,8 @@ export function withClerkMiddleware(handler: NextMiddleware, opts: WithAuthOptio
     // Therefore we have to resort to a public interstitial endpoint
 
     if (status === AuthStatus.Interstitial) {
-      return NextResponse.rewrite(INTERSTITIAL_URL);
+      const response = NextResponse.rewrite(INTERSTITIAL_URL);
+      response.headers.set(AUTH_RESULT, errorReason as string);
     }
 
     // Signed in / out case
@@ -78,7 +70,8 @@ export function withClerkMiddleware(handler: NextMiddleware, opts: WithAuthOptio
       throw 'withClerkMiddleware: Auth result could not be determined';
     }
 
-    setAuthResultOnRequest({ req, authResult });
+    // Set auth result on request in a private property so that middleware can read it too
+    setPrivateAuthResultOnRequest({ req, authResult });
 
     // get result from provided handler
     const res = await handler(req, event);
