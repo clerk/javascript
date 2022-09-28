@@ -1,6 +1,6 @@
-import { GetServerSidePropsResult } from 'next';
+import type { GetServerSidePropsResult } from 'next';
 
-import { AuthData } from '../types';
+import type { AuthData } from '../types';
 
 /**
  *
@@ -11,12 +11,16 @@ import { AuthData } from '../types';
  * @param authData
  */
 export function injectSSRStateIntoProps(callbackResult: any, authData: AuthData): GetServerSidePropsResult<any> {
+  return {
+    ...callbackResult,
+    props: injectSSRStateIntoObject(callbackResult.props, authData),
+  };
+}
+
+export const injectSSRStateIntoObject = (obj: any, authData: AuthData) => {
   // Serializing the state on dev env is a temp workaround for the following issue:
   // https://github.com/vercel/next.js/discussions/11209|Next.js
   const __clerk_ssr_state =
     process.env.NODE_ENV !== 'production' ? JSON.parse(JSON.stringify({ ...authData })) : { ...authData };
-  return {
-    ...callbackResult,
-    props: { ...callbackResult.props, __clerk_ssr_state },
-  };
-}
+  return { ...obj, __clerk_ssr_state };
+};
