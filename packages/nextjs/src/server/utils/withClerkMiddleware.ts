@@ -24,7 +24,15 @@ type WithAuthOptions = {
   authorizedParties?: string[];
 };
 
-export function withClerkMiddleware(handler: NextMiddleware, opts: WithAuthOptions = {}): NextMiddleware {
+interface WithClerkMiddleware {
+  (handler: NextMiddleware, opts?: WithAuthOptions): NextMiddleware;
+  (): NextMiddleware;
+}
+
+export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => {
+  const noop = () => undefined;
+  const [handler = noop, opts = {}] = args as [NextMiddleware, WithAuthOptions] | [];
+
   return async (req: NextRequest, event: NextFetchEvent) => {
     const { headers, cookies } = req;
     const { jwtKey, authorizedParties } = opts;
@@ -78,7 +86,7 @@ export function withClerkMiddleware(handler: NextMiddleware, opts: WithAuthOptio
 
     return handleMiddlewareResult({ req, res, authResult });
   };
-}
+};
 
 type HandleMiddlewareResultProps = {
   req: NextRequest;
