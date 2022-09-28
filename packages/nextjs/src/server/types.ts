@@ -34,3 +34,5 @@ export const AuthResult = { ...AuthResultExt, ...AuthErrorReason };
 export type AuthResult = typeof AuthResult;
 
 export type SessionsApi = InstanceType<typeof ClerkBackendAPI>['sessions'];
+export type OrganizationsApi = InstanceType<typeof ClerkBackendAPI>['organizations'];
+export type UsersApi = InstanceType<typeof ClerkBackendAPI>['users'];

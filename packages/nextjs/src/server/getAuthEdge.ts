@@ -1,4 +1,4 @@
-import { sessions } from '../edge-middleware';
+import { organizations, sessions, users } from '../edge-middleware';
 import { createGetAuth } from './utils/getAuth';
 
-export const getAuthEdge = createGetAuth(sessions);
+export const getAuthEdge = createGetAuth({ sessions, users, organizations });
