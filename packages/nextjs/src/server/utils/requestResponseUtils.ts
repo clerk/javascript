@@ -7,14 +7,17 @@ type RequestProps = {
   authResult: string;
 };
 
-export function setAuthResultOnRequest({ req, authResult }: RequestProps): void {
-  req.headers.set(AUTH_RESULT, authResult);
-  req.nextUrl.searchParams.set(AUTH_RESULT, authResult);
+export function setPrivateAuthResultOnRequest({ req, authResult }: RequestProps): void {
+  Object.assign(req, { _authResult: authResult });
 }
 
 // Tries to extract auth result from the request using several strategies
 export function getAuthResultFromRequest(req: RequestLike): string | null | undefined {
-  return getQueryParam(req, AUTH_RESULT) || getHeader(req, AUTH_RESULT);
+  return getPrivateAuthResult(req) || getQueryParam(req, AUTH_RESULT) || getHeader(req, AUTH_RESULT);
+}
+
+function getPrivateAuthResult(req: RequestLike): string | null | undefined {
+  return '_authResult' in req ? req['_authResult'] : undefined;
 }
 
 function getQueryParam(req: RequestLike, name: string): string | null | undefined {

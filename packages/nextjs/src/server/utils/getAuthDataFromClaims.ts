@@ -19,7 +19,7 @@ export function getAuthDataFromClaims({
   return {
     sessionId: sessionClaims.sid,
     userId: sessionClaims.sub,
-    orgId: sessionClaims.org_id,
+    orgId: sessionClaims.org_id || null,
     getToken: createGetToken({
       headerToken: headerToken,
       cookieToken: cookieToken,
