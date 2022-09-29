@@ -13,6 +13,7 @@ if (process.env.NEXT_RUNTIME === 'edge') {
   exportLib.getAuth = require('./dist/server/getAuthNode').getAuthNode;
 }
 
+exportLib.buildClerkProps = require('./dist/server/utils/getAuth').buildClerkProps;
 exportLib.withClerkMiddleware = require('./dist/server/utils/withClerkMiddleware').withClerkMiddleware;
 
 module.exports = exportLib;

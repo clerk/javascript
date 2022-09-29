@@ -85,6 +85,7 @@ Object {
   "createGetToken": [Function],
   "createSignedOutState": [Function],
   "deserialize": [Function],
+  "extractClerkApiFromInstance": [Function],
   "signedOutGetToken": [Function],
 }
 `;
