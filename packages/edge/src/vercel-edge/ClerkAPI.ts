@@ -1,8 +1,13 @@
-import { ClerkAPIResponseError, ClerkBackendAPI } from '@clerk/backend-core';
+import {
+  ClerkAPIResponseError,
+  ClerkBackendAPI,
+  CreateClerkClient,
+  extractClerkApiFromInstance,
+} from '@clerk/backend-core';
 
 import { LIB_NAME, LIB_VERSION } from '../info';
 
-export const ClerkAPI = new ClerkBackendAPI({
+const defaultParams = {
   libName: LIB_NAME,
   libVersion: LIB_VERSION,
   apiClient: {
@@ -43,4 +48,12 @@ export const ClerkAPI = new ClerkBackendAPI({
       return data;
     },
   },
-});
+} as ConstructorParameters<typeof ClerkBackendAPI>[0];
+
+export const ClerkAPI = new ClerkBackendAPI(defaultParams);
+
+export const createClerkClient: CreateClerkClient = params => {
+  const { apiKey, ...rest } = params || {};
+  const instance = new ClerkBackendAPI({ apiKey: apiKey || process.env.CLERK_API_KEY, ...defaultParams, ...rest });
+  return extractClerkApiFromInstance(instance);
+};

@@ -1,7 +1,7 @@
-import { AuthStatus, Base, createGetToken, createSignedOutState } from '@clerk/backend-core';
+import { AuthStatus, Base, ClerkClient, createGetToken, createSignedOutState } from '@clerk/backend-core';
 import { NextFetchEvent, NextRequest } from 'next/server';
 
-import { ClerkAPI } from './ClerkAPI';
+import { ClerkAPI, createClerkClient } from './ClerkAPI';
 import {
   NextMiddlewareResult,
   WithEdgeMiddlewareAuthCallback,
@@ -10,8 +10,6 @@ import {
 } from './types';
 import { injectAuthIntoRequest } from './utils/injectAuthIntoRequest';
 import { interstitialResponse, signedOutResponse } from './utils/responses';
-
-let JWT_KEY = process.env.CLERK_JWT_KEY;
 
 /**
  *
@@ -36,18 +34,8 @@ const decodeBase64 = (base64: string) => atob(base64);
 
 /** Base initialization */
 export const vercelEdgeBase = new Base(importKey, verifySignature, decodeBase64);
-/**
- *  Temporarily allow setting the JWT key by calling setClerkJwtKey,
- *  as is also supported be clerk-sdk-node
- */
-export const vercelEdgeBaseGetAuthState = (params: Parameters<typeof vercelEdgeBase.getAuthState>[0]) =>
-  vercelEdgeBase.getAuthState({
-    ...params,
-    jwtKey: params.jwtKey || JWT_KEY,
-  });
 
 /** Export standalone verifySessionToken */
-
 export const verifySessionToken = vercelEdgeBase.verifySessionToken;
 
 /** Export ClerkBackendAPI API client */
@@ -111,7 +99,7 @@ function vercelMiddlewareAuth(
     const clientUat = getCookie(req.cookies, '__client_uat');
 
     const headerToken = req.headers.get('authorization');
-    const { status, interstitial, sessionClaims, errorReason } = await vercelEdgeBaseGetAuthState({
+    const { status, interstitial, sessionClaims, errorReason } = await vercelEdgeBase.getAuthState({
       cookieToken,
       headerToken,
       clientUat,
@@ -185,6 +173,5 @@ export function setClerkApiKey(value: string) {
   ClerkAPI.apiKey = value;
 }
 
-export function setClerkJwtKey(value: string) {
-  JWT_KEY = value;
-}
+export const clerkClient: ClerkClient = createClerkClient();
+export { createClerkClient };
