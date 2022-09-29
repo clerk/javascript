@@ -1,8 +1,8 @@
 import { AuthStatus } from '@clerk/backend-core';
+import { vercelEdgeBaseGetAuthState } from '@clerk/edge/src';
 import { NextMiddleware, NextMiddlewareResult } from 'next/dist/server/web/types';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 
-import { vercelEdgeBase } from '../../edge-middleware';
 import {
   AUTH_RESULT,
   AuthResult,
@@ -46,7 +46,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
     const cookieToken = cookies.get(SESSION_COOKIE_NAME);
     const headerToken = headers.get('authorization')?.replace('Bearer ', '');
 
-    const { status, errorReason } = await vercelEdgeBase.getAuthState({
+    const { status, errorReason } = await vercelEdgeBaseGetAuthState({
       cookieToken,
       headerToken,
       clientUat: cookies.get('__client_uat'),

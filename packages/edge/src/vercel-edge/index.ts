@@ -11,6 +11,8 @@ import {
 import { injectAuthIntoRequest } from './utils/injectAuthIntoRequest';
 import { interstitialResponse, signedOutResponse } from './utils/responses';
 
+let JWT_KEY = process.env.CLERK_JWT_KEY;
+
 /**
  *
  * Required implementations for the runtime:
@@ -33,8 +35,16 @@ const verifySignature = async (algorithm: Algorithm, key: CryptoKey, signature: 
 const decodeBase64 = (base64: string) => atob(base64);
 
 /** Base initialization */
-
 export const vercelEdgeBase = new Base(importKey, verifySignature, decodeBase64);
+/**
+ *  Temporarily allow setting the JWT key by calling setClerkJwtKey,
+ *  as is also supported be clerk-sdk-node
+ */
+export const vercelEdgeBaseGetAuthState = (params: Parameters<typeof vercelEdgeBase.getAuthState>[0]) =>
+  vercelEdgeBase.getAuthState({
+    ...params,
+    jwtKey: params.jwtKey || JWT_KEY,
+  });
 
 /** Export standalone verifySessionToken */
 
@@ -101,7 +111,7 @@ function vercelMiddlewareAuth(
     const clientUat = getCookie(req.cookies, '__client_uat');
 
     const headerToken = req.headers.get('authorization');
-    const { status, interstitial, sessionClaims, errorReason } = await vercelEdgeBase.getAuthState({
+    const { status, interstitial, sessionClaims, errorReason } = await vercelEdgeBaseGetAuthState({
       cookieToken,
       headerToken,
       clientUat,
@@ -175,8 +185,6 @@ export function setClerkApiKey(value: string) {
   ClerkAPI.apiKey = value;
 }
 
-export function setClerkJwtKey() {
-  // noop
-  // This method exists for parity between edge and sdk-node
-  // The JWT can only be passed as an option to withEdgeMiddlewareAuth/requireEdgeMiddlewareAuth
+export function setClerkJwtKey(value: string) {
+  JWT_KEY = value;
 }

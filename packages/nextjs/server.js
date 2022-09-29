@@ -1,4 +1,3 @@
-const { setClerkApiKey, setClerkJwtKey } = require('@clerk/clerk-sdk-node/src');
 let exportLib = {};
 
 if (process.env.NEXT_RUNTIME === 'edge') {
