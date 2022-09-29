@@ -75,7 +75,10 @@ const DeviceAccordion = (props: { session: SessionWithActivitiesResource }) => {
 };
 
 const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
-  const isCurrent = useCoreSession()?.id === props.session.id;
+  const coreSession = useCoreSession();
+  const isCurrent = coreSession?.id === props.session.id;
+  const isCurrentlyImpersonating = !!coreSession.actor;
+  const isImpersonationSession = !!props.session.actor;
   const { city, country, browserName, browserVersion, deviceType, ipAddress, isMobile } = props.session.latestActivity;
   const title = deviceType ? deviceType : isMobile ? 'Mobile device' : 'Desktop device';
   const browser = `${browserName || ''} ${browserVersion || ''}`.trim() || 'Web browser';
@@ -124,7 +127,21 @@ const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
           gap={2}
         >
           <Text variant='smallMedium'>{title}</Text>
-          {isCurrent && <Badge localizationKey={localizationKeys('badge__thisDevice')} />}
+          {isCurrent && (
+            <Badge
+              localizationKey={localizationKeys('badge__thisDevice')}
+              colorScheme={isCurrentlyImpersonating ? 'danger' : 'primary'}
+            />
+          )}
+          {isCurrentlyImpersonating && !isImpersonationSession && (
+            <Badge localizationKey={localizationKeys('badge__userDevice')} />
+          )}
+          {!isCurrent && isImpersonationSession && (
+            <Badge
+              localizationKey={localizationKeys('badge__otherImpersonatorDevice')}
+              colorScheme='danger'
+            />
+          )}
         </Flex>
         <Text
           variant='smallRegular'

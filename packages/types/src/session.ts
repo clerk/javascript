@@ -33,6 +33,8 @@ export interface SessionWithActivitiesResource extends ClerkResource {
   abandonAt: Date;
   lastActiveAt: Date;
   latestActivity: SessionActivity;
+  actor: ActJWTClaim | null;
+
   revoke: () => Promise<SessionWithActivitiesResource>;
 }
 
