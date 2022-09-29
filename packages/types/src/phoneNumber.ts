@@ -24,6 +24,7 @@ export interface PhoneNumberResource extends ClerkResource {
   reservedForSecondFactor: boolean;
   defaultSecondFactor: boolean;
   linkedTo: IdentificationLinkResource[];
+  backupCodes?: string[];
   toString: () => string;
   prepareVerification: () => Promise<PhoneNumberResource>;
   attemptVerification: (params: AttemptPhoneNumberVerificationParams) => Promise<PhoneNumberResource>;

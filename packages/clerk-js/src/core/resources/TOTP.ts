@@ -10,6 +10,7 @@ export class TOTP extends BaseResource implements TOTPResource {
   secret?: string;
   uri?: string;
   verified = false;
+  backupCodes?: string[];
   updatedAt: Date | null = null;
   createdAt: Date | null = null;
 
@@ -23,6 +24,7 @@ export class TOTP extends BaseResource implements TOTPResource {
     this.secret = data.secret;
     this.uri = data.uri;
     this.verified = data.verified;
+    this.backupCodes = data.backup_codes;
     this.updatedAt = unixEpochToDate(data.updated_at);
     this.createdAt = unixEpochToDate(data.created_at);
 

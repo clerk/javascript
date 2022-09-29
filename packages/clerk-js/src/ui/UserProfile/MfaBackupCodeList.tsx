@@ -2,18 +2,19 @@ import React from 'react';
 
 import { PrintableComponent, usePrintable } from '../common';
 import { useCoreUser, useEnvironment } from '../contexts';
-import { Button, Col, Flex, Grid, Heading, Text } from '../customizables';
+import { Button, Col, Flex, Grid, Heading, LocalizationKey, Text } from '../customizables';
 import { useClipboard } from '../hooks';
 import { mqu } from '../styledSystem';
 import { getIdentifier } from '../utils';
 import { MfaBackupCodeTile } from './MfaBackupCodeTile';
 
 type MfaBackupCodeListProps = {
+  subtitle: LocalizationKey;
   backupCodes?: string[];
 };
 
 export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
-  const { backupCodes } = props;
+  const { subtitle, backupCodes } = props;
   const { applicationName } = useEnvironment().displayConfig;
   const user = useCoreUser();
   const { print, printableProps } = usePrintable();
@@ -43,7 +44,7 @@ export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
           variant='regularMedium'
         />
         <Text
-          localizationKey={'Store them securely and keep them secret.'}
+          localizationKey={subtitle}
           variant='smallRegular'
           colorScheme='neutral'
         />
