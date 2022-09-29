@@ -7,18 +7,19 @@ import {
   useFloating,
   UseFloatingProps,
 } from '@floating-ui/react-dom-interactions';
-import React, { useEffect } from 'react';
+import React, { useLayoutEffect } from 'react';
 
 type UsePopoverProps = {
   defaultOpen?: boolean;
   placement?: UseFloatingProps['placement'];
   offset?: Parameters<typeof offset>[0];
   autoUpdate?: boolean;
+  isOpenProp?: boolean;
 };
 
 export const usePopover = (props: UsePopoverProps = {}) => {
   const [isOpen, setIsOpen] = React.useState(props.defaultOpen || false);
-  const { update, reference, floating, strategy, x, y, context } = useFloating({
+  const { reference, floating, strategy, x, y, context } = useFloating({
     open: isOpen,
     onOpenChange: setIsOpen,
     whileElementsMounted: props.autoUpdate === false ? undefined : autoUpdate,
@@ -26,13 +27,11 @@ export const usePopover = (props: UsePopoverProps = {}) => {
     middleware: [offset(props.offset || 6), flip(), shift()],
   });
 
-  useEffect(() => {
-    setIsOpen(props.defaultOpen || false);
-  }, [props.defaultOpen]);
-
-  useEffect(() => {
-    update();
-  }, []); // this is due to a positioning bug on render
+  useLayoutEffect(() => {
+    if (props.isOpenProp) {
+      toggle();
+    }
+  }, []);
 
   useDismiss(context);
 

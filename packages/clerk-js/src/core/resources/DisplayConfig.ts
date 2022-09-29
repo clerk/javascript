@@ -10,7 +10,6 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
   afterSignOutUrl!: string;
   afterSignUpUrl!: string;
   afterSwitchSessionUrl!: string;
-  isOpen!: boolean;
   applicationName!: string;
   backendHost!: string;
   branded!: boolean;
@@ -48,7 +47,6 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     this.afterSignInUrl = data.after_sign_in_url;
     this.afterSignUpUrl = data.after_sign_up_url;
     this.afterSignOutUrl = data.after_sign_out_url;
-    this.isOpen = data.is_open;
     this.afterSignOutOneUrl = data.after_sign_out_one_url;
     this.afterSignOutAllUrl = data.after_sign_out_all_url;
     this.afterSwitchSessionUrl = data.after_switch_session_url;

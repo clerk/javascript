@@ -10,7 +10,6 @@ export interface DisplayConfigJSON {
   after_sign_out_all_url: string;
   after_sign_out_one_url: string;
   after_sign_out_url: string;
-  is_open: boolean;
   after_sign_up_url: string;
   after_switch_session_url: string;
   application_name: string;
@@ -38,7 +37,6 @@ export interface DisplayConfigResource extends ClerkResource {
   afterSignOutUrl: string;
   afterSignUpUrl: string;
   afterSwitchSessionUrl: string;
-  isOpen?: boolean;
   applicationName: string;
   backendHost: string;
   branded: boolean;
