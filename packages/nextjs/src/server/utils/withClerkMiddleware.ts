@@ -1,8 +1,8 @@
 import { AuthStatus } from '@clerk/backend-core';
+import { vercelEdgeBase } from '@clerk/edge';
 import { NextMiddleware, NextMiddlewareResult } from 'next/dist/server/web/types';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 
-import { vercelEdgeBase } from '../../edge-middleware';
 import {
   AUTH_RESULT,
   AuthResult,

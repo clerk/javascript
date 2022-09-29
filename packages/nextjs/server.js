@@ -1,14 +1,19 @@
 let exportLib = {};
 
 if (process.env.NEXT_RUNTIME === 'edge') {
-  exportLib = require('./dist/edge-middleware');
+  const sdk = require('./dist/edge-middleware');
+  exportLib.clerkClient = sdk.clerkClient;
+  exportLib.createClerkClient = sdk.createClerkClient;
   exportLib.getAuth = require('./dist/server/getAuthEdge').getAuthEdge;
 } else {
   // nodejs runtime assumed
-  exportLib = require('./dist/api');
+  const sdk = require('./dist/api');
+  exportLib.clerkClient = sdk.clerkClient;
+  exportLib.createClerkClient = sdk.createClerkClient;
   exportLib.getAuth = require('./dist/server/getAuthNode').getAuthNode;
 }
 
+exportLib.buildClerkProps = require('./dist/server/utils/getAuth').buildClerkProps;
 exportLib.withClerkMiddleware = require('./dist/server/utils/withClerkMiddleware').withClerkMiddleware;
 
 module.exports = exportLib;

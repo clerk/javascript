@@ -1,3 +1,4 @@
+import { ClerkClient, CreateClerkClient, extractClerkApiFromInstance } from '@clerk/backend-core';
 import type { RequestInit } from 'node-fetch';
 
 import Clerk from './instance';
@@ -12,20 +13,12 @@ const sessions = singletonInstance.sessions;
 const smsMessages = singletonInstance.smsMessages;
 const users = singletonInstance.users;
 
+// Export sub-api objects
+// "Old" /api export structure
+export { allowlistIdentifiers, clients, emails, invitations, organizations, sessions, smsMessages, users };
+
 // Export a default singleton instance that should suffice for most use cases
 export default singletonInstance;
-
-// Export sub-api objects
-export {
-  allowlistIdentifiers,
-  clients,
-  emails,
-  invitations,
-  organizations,
-  sessions,
-  smsMessages,
-  users,
-};
 
 // Export resources
 export {
@@ -49,10 +42,8 @@ export {
 
 // Export middleware functions
 
-const ClerkExpressWithAuth =
-  singletonInstance.expressWithAuth.bind(singletonInstance);
-const ClerkExpressRequireAuth =
-  singletonInstance.expressRequireAuth.bind(singletonInstance);
+const ClerkExpressWithAuth = singletonInstance.expressWithAuth.bind(singletonInstance);
+const ClerkExpressRequireAuth = singletonInstance.expressRequireAuth.bind(singletonInstance);
 
 export { ClerkExpressWithAuth, ClerkExpressRequireAuth };
 
@@ -84,3 +75,11 @@ export function setClerkApiVersion(value: string) {
 export function setClerkHttpOptions(value: RequestInit) {
   Clerk.getInstance().httpOptions = value;
 }
+
+export const createClerkClient: CreateClerkClient = params => {
+  const { apiKey, ...rest } = params || {};
+  const instance = new Clerk({ apiKey: apiKey || process.env.CLERK_API_KEY, ...rest });
+  return extractClerkApiFromInstance(instance);
+};
+
+export const clerkClient: ClerkClient = createClerkClient();

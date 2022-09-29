@@ -1,8 +1,7 @@
-import { AuthStatus, Base, createGetToken, createSignedOutState } from '@clerk/backend-core';
-import { ClerkJWTClaims } from '@clerk/types';
+import { AuthStatus, Base, ClerkClient, createGetToken, createSignedOutState } from '@clerk/backend-core';
 import { NextFetchEvent, NextRequest } from 'next/server';
 
-import { ClerkAPI } from './ClerkAPI';
+import { ClerkAPI, createClerkClient } from './ClerkAPI';
 import {
   NextMiddlewareResult,
   WithEdgeMiddlewareAuthCallback,
@@ -34,15 +33,12 @@ const verifySignature = async (algorithm: Algorithm, key: CryptoKey, signature: 
 const decodeBase64 = (base64: string) => atob(base64);
 
 /** Base initialization */
-
 export const vercelEdgeBase = new Base(importKey, verifySignature, decodeBase64);
 
 /** Export standalone verifySessionToken */
-
 export const verifySessionToken = vercelEdgeBase.verifySessionToken;
 
 /** Export ClerkBackendAPI API client */
-
 const allowlistIdentifiers = ClerkAPI.allowlistIdentifiers;
 const clients = ClerkAPI.clients;
 const emails = ClerkAPI.emails;
@@ -157,7 +153,7 @@ function vercelMiddlewareAuth(
       sessionId,
       userId,
       getToken,
-      claims: sessionClaims as ClerkJWTClaims,
+      claims: sessionClaims,
     });
     return handler(authRequest, event);
   };
@@ -172,3 +168,10 @@ function getCookie(cookies: NextRequest['cookies'], name: string) {
     return cookies[name];
   }
 }
+
+export function setClerkApiKey(value: string) {
+  ClerkAPI.apiKey = value;
+}
+
+export const clerkClient: ClerkClient = createClerkClient();
+export { createClerkClient };
