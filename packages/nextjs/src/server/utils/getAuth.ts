@@ -22,7 +22,7 @@ export const createGetAuth = ({ sessions }: CreateGetAuthParams): GetAuth => {
     const authResult = getAuthResultFromRequest(req);
 
     if (!authResult) {
-      throw 'You need to use "withClerkMiddleware" in your Next.js middleware.js file. See https://clerk.dev/docs/quickstarts/get-started-with-nextjs.';
+      throw 'You need to use "withClerkMiddleware" in your Next.js middleware file. See https://clerk.dev/docs/quickstarts/get-started-with-nextjs';
     }
 
     if (authResult !== AuthResult.StandardSignedIn) {
