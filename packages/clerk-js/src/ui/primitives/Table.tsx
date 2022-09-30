@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { createVariants, PrimitiveProps } from '../styledSystem';
+import { createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
 import { Box, BoxProps } from './Box';
 
 const { applyVariants, filterProps } = createVariants(theme => {
@@ -16,12 +16,13 @@ const { applyVariants, filterProps } = createVariants(theme => {
       'tr:not(:last-child)>td': {
         paddingBottom: theme.sizes.$2,
       },
+      width: '100%',
     },
     variants: {},
   };
 });
 
-export type TableProps = PrimitiveProps<'table'> & Omit<BoxProps, 'as'>;
+export type TableProps = PrimitiveProps<'table'> & Omit<BoxProps, 'as'> & StyleVariants<typeof applyVariants>;
 
 export const Table = React.forwardRef<HTMLTableCellElement, TableProps>((props, ref) => {
   return (
