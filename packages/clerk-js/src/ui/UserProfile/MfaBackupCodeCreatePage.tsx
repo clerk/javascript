@@ -49,7 +49,11 @@ export const MfaBackupCodeCreatePage = () => {
         localizationKey={text}
         variant='regularRegular'
       />
-      <MfaBackupCodeList backupCodes={backupCode.codes} />
+
+      <MfaBackupCodeList
+        subtitle={'Store them securely and keep them secret.'}
+        backupCodes={backupCode.codes}
+      />
 
       <FormButtonContainer>
         <NavigateToFlowStartButton

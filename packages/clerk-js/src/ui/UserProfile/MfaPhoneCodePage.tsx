@@ -39,10 +39,12 @@ export const MfaPhoneCodePage = withCardStateProvider(() => {
           wizard.goToStep(1);
         }}
         title={title}
+        resourceRef={ref}
       />
       <SuccessPage
         title={title}
         text={`SMS code two-step verification is now enabled for this phone number. When signing in, you will need to enter a verification code sent to this phone number as an additional step.`}
+        backupCodes={ref.current?.backupCodes}
       />
     </Wizard>
   );
@@ -53,10 +55,11 @@ type AddMfaProps = {
   onUnverifiedPhoneClick: (phone: PhoneNumberResource) => void;
   onSuccess: () => void;
   title: string;
+  resourceRef: React.MutableRefObject<PhoneNumberResource | undefined>;
 };
 
 const AddMfa = (props: AddMfaProps) => {
-  const { onSuccess, title, onAddPhoneClick, onUnverifiedPhoneClick } = props;
+  const { onSuccess, title, onAddPhoneClick, onUnverifiedPhoneClick, resourceRef } = props;
   const card = useCardState();
   const user = useCoreUser();
   const availableMethods = user.phoneNumbers.filter(p => !p.reservedForSecondFactor);
@@ -74,6 +77,8 @@ const AddMfa = (props: AddMfaProps) => {
         onSuccess();
       })
       .catch(err => handleError(err, [], card.setError));
+
+    resourceRef.current = phone;
   };
 
   return (

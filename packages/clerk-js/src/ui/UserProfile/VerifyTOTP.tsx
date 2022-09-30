@@ -1,3 +1,4 @@
+import { TOTPResource } from '@clerk/types';
 import React from 'react';
 
 import { useCoreUser } from '../contexts';
@@ -13,10 +14,11 @@ import { ContentPage } from './Page';
 type VerifyTOTPProps = {
   title: string;
   onVerified: () => void;
+  resourceRef: React.MutableRefObject<TOTPResource | undefined>;
 };
 
 export const VerifyTOTP = (props: VerifyTOTPProps) => {
-  const { title, onVerified } = props;
+  const { title, onVerified, resourceRef } = props;
   const card = useCardState();
   const user = useCoreUser();
   const status = useLoadingStatus();
@@ -24,8 +26,9 @@ export const VerifyTOTP = (props: VerifyTOTPProps) => {
   const codeControlState = useFormControl('code', '');
   const codeControl = useCodeControl(codeControlState);
 
-  const resolve = async () => {
+  const resolve = async (totp: TOTPResource) => {
     setSuccess(true);
+    resourceRef.current = totp;
     await sleep(750);
     onVerified();
   };
@@ -42,7 +45,7 @@ export const VerifyTOTP = (props: VerifyTOTPProps) => {
     codeControlState.setError(undefined);
     return user
       .verifyTOTP({ code })
-      .then(() => resolve())
+      .then((totp: TOTPResource) => resolve(totp))
       .catch(reject);
   });
 

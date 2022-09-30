@@ -129,6 +129,7 @@ export interface PhoneNumberJSON extends ClerkResourceJSON {
   default_second_factor: boolean;
   linked_to: IdentificationLinkJSON[];
   verification: VerificationJSON | null;
+  backup_codes?: string[];
 }
 
 export interface Web3WalletJSON extends ClerkResourceJSON {
@@ -294,6 +295,7 @@ export interface TOTPJSON extends ClerkResourceJSON {
   secret?: string;
   uri?: string;
   verified: boolean;
+  backup_codes?: string[];
   created_at: number;
   updated_at: number;
 }
