@@ -1,4 +1,6 @@
 // eslint-disable-next-line no-restricted-imports
+// eslint-disable-next-line no-restricted-imports
+// eslint-disable-next-line no-restricted-imports
 import { Interpolation as _Interpolation } from '@emotion/react';
 import React from 'react';
 
@@ -25,6 +27,10 @@ type ElementProps = {
   label: JSX.IntrinsicElements['label'];
   img: JSX.IntrinsicElements['img'];
   form: JSX.IntrinsicElements['form'];
+  table: JSX.IntrinsicElements['table'];
+  th: JSX.IntrinsicElements['th'];
+  tr: JSX.IntrinsicElements['tr'];
+  td: JSX.IntrinsicElements['td'];
 };
 
 /**

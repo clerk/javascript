@@ -11,6 +11,7 @@ export { localizationKeys, useLocalizations } from '../localization';
 export type { LocalizationKey } from '../localization';
 export { generateFlowPartClassname } from './classGeneration';
 
+export const Box = makeCustomizable(sanitizeDomProps(Primitives.Box));
 export const Flex = makeCustomizable(sanitizeDomProps(Primitives.Flex));
 export const Col = makeCustomizable(sanitizeDomProps(Primitives.Col));
 export const Grid = makeCustomizable(sanitizeDomProps(Primitives.Grid));
@@ -36,3 +37,9 @@ export const Spinner = makeCustomizable(sanitizeDomProps(Primitives.Spinner));
 export const Badge = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.Badge)), {
   defaultDescriptor: descriptors.badge,
 });
+
+export const TableContainer = makeCustomizable(sanitizeDomProps(Primitives.TableContainer));
+export const Table = makeCustomizable(sanitizeDomProps(Primitives.Table));
+export const Tr = makeCustomizable(sanitizeDomProps(Primitives.Tr));
+export const Th = makeCustomizable(sanitizeDomProps(Primitives.Th));
+export const Td = makeCustomizable(sanitizeDomProps(Primitives.Td));

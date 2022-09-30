@@ -1,0 +1,22 @@
+import React from 'react';
+
+import { createVariants, PrimitiveProps } from '../styledSystem';
+import { Box, BoxProps } from './Box';
+
+const { applyVariants, filterProps } = createVariants(theme => ({
+  base: {},
+  variants: {},
+}));
+
+export type TdProps = PrimitiveProps<'td'> & Omit<BoxProps, 'as'>;
+
+export const Td = React.forwardRef<HTMLTableCellElement, TdProps>((props, ref) => {
+  return (
+    <Box
+      as='td'
+      {...filterProps(props)}
+      css={applyVariants(props)}
+      ref={ref}
+    />
+  );
+});
