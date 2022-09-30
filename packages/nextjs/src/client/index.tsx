@@ -19,8 +19,6 @@ export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JS
   const { frontendApi, __clerk_ssr_state, authServerSideProps, clerkJSUrl, ...restProps } = rest;
   const { push } = useRouter();
 
-  console.log('clerkprovider', __clerk_ssr_state, authServerSideProps);
-
   if (frontendApi == undefined && !process.env.NEXT_PUBLIC_CLERK_FRONTEND_API) {
     throw Error(NO_FRONTEND_API_ERR);
   }

@@ -69,6 +69,7 @@ export function withEdgeMiddlewareAuth(
   options: any = {
     loadSession: false,
     loadUser: false,
+    loadOrg: false,
     strict: false,
   },
 ): any {
@@ -90,10 +91,11 @@ function vercelMiddlewareAuth(
   options: any = {
     loadSession: false,
     loadUser: false,
+    loadOrg: false,
   },
 ): any {
   return async function clerkAuth(req: NextRequest, event: NextFetchEvent) {
-    const { loadUser, loadSession, jwtKey, authorizedParties } = options;
+    const { loadUser, loadSession, loadOrg, jwtKey, authorizedParties } = options;
 
     const cookieToken = getCookie(req.cookies, '__session');
     const clientUat = getCookie(req.cookies, '__client_uat');
@@ -134,10 +136,14 @@ function vercelMiddlewareAuth(
 
     const sessionId = sessionClaims.sid;
     const userId = sessionClaims.sub;
+    const organizationId = sessionClaims.org_id;
 
-    const [user, session] = await Promise.all([
+    const [user, session, organization] = await Promise.all([
       loadUser ? ClerkAPI.users.getUser(userId) : Promise.resolve(undefined),
       loadSession ? ClerkAPI.sessions.getSession(sessionId) : Promise.resolve(undefined),
+      loadOrg && organizationId
+        ? ClerkAPI.organizations.getOrganization({ organizationId })
+        : Promise.resolve(undefined),
     ]);
 
     const getToken = createGetToken({
@@ -152,6 +158,7 @@ function vercelMiddlewareAuth(
       session,
       sessionId,
       userId,
+      organization,
       getToken,
       claims: sessionClaims,
     });
