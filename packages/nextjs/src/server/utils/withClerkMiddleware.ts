@@ -26,6 +26,7 @@ type WithAuthOptions = {
 
 interface WithClerkMiddleware {
   (handler: NextMiddleware, opts?: WithAuthOptions): NextMiddleware;
+
   (): NextMiddleware;
 }
 
@@ -68,6 +69,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
     if (status === AuthStatus.Interstitial) {
       const response = NextResponse.rewrite(INTERSTITIAL_URL);
       response.headers.set(AUTH_RESULT, errorReason as string);
+      return response;
     }
 
     // Signed in / out case
