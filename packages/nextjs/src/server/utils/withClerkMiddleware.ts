@@ -40,7 +40,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
 
     // throw an error if the request already includes an auth result, because that means it has been spoofed
     if (getAuthResultFromRequest(req)) {
-      throw 'withClerkMiddleware: Auth violation detected';
+      throw new Error('withClerkMiddleware: Auth violation detected');
     }
 
     // get auth state, check if we need to return an interstitial
@@ -77,7 +77,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
     const authResult = status === AuthStatus.SignedIn ? AuthResult.StandardSignedIn : errorReason;
 
     if (!authResult) {
-      throw 'withClerkMiddleware: Auth result could not be determined';
+      throw new Error('withClerkMiddleware: Auth result could not be determined');
     }
 
     // Set auth result on request in a private property so that middleware can read it too
