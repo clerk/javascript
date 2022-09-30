@@ -1,6 +1,4 @@
 // eslint-disable-next-line no-restricted-imports
-// eslint-disable-next-line no-restricted-imports
-// eslint-disable-next-line no-restricted-imports
 import { Interpolation as _Interpolation } from '@emotion/react';
 import React from 'react';
 

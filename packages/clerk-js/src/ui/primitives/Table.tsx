@@ -13,7 +13,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
       'th:not(:first-child)': {
         paddingLeft: theme.sizes.$2,
       },
-      'tr>td:not(:last-child)': {
+      'tr:not(:last-child)>td': {
         paddingBottom: theme.sizes.$2,
       },
     },
