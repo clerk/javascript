@@ -94,9 +94,11 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
         </Flex>
       )}
       <Flex
-        center
+        justify='start'
+        align='center'
         gap={2}
         sx={{
+          width: '100%',
           overflow: 'hidden',
         }}
       >
