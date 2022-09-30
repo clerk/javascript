@@ -10,9 +10,10 @@ type Attribute =
   | 'last_name'
   | 'password'
   | 'web3_wallet'
-  | 'authenticator_app';
+  | 'authenticator_app'
+  | 'backup_code';
 
-export type VerificationStrategy = 'email_link' | 'email_code' | 'phone_code' | 'totp';
+export type VerificationStrategy = 'email_link' | 'email_code' | 'phone_code' | 'totp' | 'backup_code';
 
 export type OAuthProviderSettings = {
   enabled: boolean;

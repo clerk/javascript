@@ -29,3 +29,4 @@ export { default as DeviceMobile } from './device-mobile.svg';
 export { default as DeviceLaptop } from './device-laptop.svg';
 export { default as Menu } from './menu.svg';
 export { default as Eye } from './eye.svg';
+export { default as DotCircle } from './dot-circle-horizontal.svg';

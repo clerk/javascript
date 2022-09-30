@@ -174,6 +174,7 @@ export interface UserJSON extends ClerkResourceJSON {
   first_name: string;
   last_name: string;
   totp_enabled: boolean;
+  backup_code_enabled: boolean;
   two_factor_enabled: boolean;
   public_metadata: Record<string, unknown>;
   unsafe_metadata: Record<string, unknown>;

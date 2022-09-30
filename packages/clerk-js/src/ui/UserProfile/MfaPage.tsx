@@ -4,9 +4,10 @@ import React from 'react';
 import { useCoreUser, useEnvironment } from '../contexts';
 import { Col, Grid, localizationKeys, Text } from '../customizables';
 import { TileButton, useCardState, withCardStateProvider } from '../elements';
-import { AuthApp, Mobile } from '../icons';
+import { AuthApp, DotCircle, Mobile } from '../icons';
 import { mqu } from '../styledSystem';
 import { FormButtonContainer } from './FormButtons';
+import { MfaBackupCodePage } from './MfaBackupCodePage';
 import { MfaPhoneCodePage } from './MfaPhoneCodePage';
 import { MfaTOTPPage } from './MfaTOTPPage';
 import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
@@ -35,22 +36,9 @@ export const MfaPage = withCardStateProvider(() => {
     return <ContentPage.Root headerTitle={title} />;
   }
 
-  // If only phone_code is available, just render that
-  // Otherwise check if selected
-  if (
-    (secondFactorsAvailableToAdd.length === 1 && secondFactorsAvailableToAdd[0] === 'phone_code') ||
-    selectedMethod === 'phone_code'
-  ) {
-    return <MfaPhoneCodePage />;
-  }
-
-  // If only totp is available, just render that
-  // Otherwise check if selected
-  if (
-    (secondFactorsAvailableToAdd.length === 1 && secondFactorsAvailableToAdd[0] === 'totp') ||
-    selectedMethod === 'totp'
-  ) {
-    return <MfaTOTPPage />;
+  // If there is only an available method or one has been selected, render the dedicated page instead
+  if (secondFactorsAvailableToAdd.length === 1 || selectedMethod) {
+    return <MfaPageIfSingleOrCurrent method={selectedMethod || secondFactorsAvailableToAdd[0]} />;
   }
 
   return (
@@ -67,19 +55,13 @@ export const MfaPage = withCardStateProvider(() => {
             },
           })}
         >
-          <TileButton
-            icon={AuthApp}
-            onClick={() => setSelectedMethod('totp')}
-          >
-            Authenticator application
-          </TileButton>
-
-          <TileButton
-            icon={Mobile}
-            onClick={() => setSelectedMethod('phone_code')}
-          >
-            SMS code
-          </TileButton>
+          {secondFactorsAvailableToAdd.map((method, i) => (
+            <MfaAvailableMethodToAdd
+              method={method}
+              setSelectedMethod={setSelectedMethod}
+              key={i}
+            />
+          ))}
         </Grid>
       </Col>
 
@@ -89,3 +71,55 @@ export const MfaPage = withCardStateProvider(() => {
     </ContentPage.Root>
   );
 });
+
+type MfaPageIfSingleOrCurrentProps = {
+  method: string;
+};
+
+const MfaPageIfSingleOrCurrent = (props: MfaPageIfSingleOrCurrentProps) => {
+  const { method } = props;
+
+  switch (method) {
+    case 'phone_code':
+      return <MfaPhoneCodePage />;
+    case 'totp':
+      return <MfaTOTPPage />;
+    case 'backup_code':
+      return <MfaBackupCodePage />;
+    default:
+      return null;
+  }
+};
+
+type MfaAvailableMethodToAddProps = {
+  method: string;
+  setSelectedMethod: (method: VerificationStrategy | undefined) => void;
+};
+
+const MfaAvailableMethodToAdd = (props: MfaAvailableMethodToAddProps) => {
+  const { method, setSelectedMethod } = props;
+
+  let icon: React.ComponentType;
+  let text: string;
+  if (method === 'phone_code') {
+    icon = Mobile;
+    text = 'SMS code';
+  } else if (method === 'totp') {
+    icon = AuthApp;
+    text = 'Authenticator application';
+  } else if (method === 'backup_code') {
+    icon = DotCircle;
+    text = 'Backup code';
+  } else {
+    return null;
+  }
+
+  return (
+    <TileButton
+      icon={icon}
+      onClick={() => setSelectedMethod(method)}
+    >
+      {text}
+    </TileButton>
+  );
+};

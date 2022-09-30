@@ -5,6 +5,7 @@ import { Route, Switch, useRouter } from '../router';
 import { common, mqu } from '../styledSystem';
 import { ConnectedAccountsPage } from './ConnectedAccountsPage';
 import { EmailPage } from './EmailPage';
+import { MfaBackupCodeCreatePage } from './MfaBackupCodeCreatePage';
 import { MfaPage } from './MfaPage';
 import { PasswordPage } from './PasswordPage';
 import { PhonePage } from './PhonePage';
@@ -93,6 +94,9 @@ export const Content = React.forwardRef<HTMLDivElement>((_, ref) => {
           <Switch>
             <Route path='totp/remove'>
               <RemoveMfaTOTPPage />
+            </Route>
+            <Route path='backup_code/add'>
+              <MfaBackupCodeCreatePage />
             </Route>
             <Route path=':id/remove'>
               <RemoveMfaPhoneCodePage />

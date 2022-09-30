@@ -3,6 +3,7 @@ import React from 'react';
 import { useCoreUser, useEnvironment } from '../contexts';
 import { localizationKeys } from '../customizables';
 import { useNavigate } from '../hooks';
+import { MfaBackupCodeAccordion } from './MfaBackupCodeAccordion';
 import { MfaPhoneCodeAccordion } from './MfaPhoneCodeAccordion';
 import { MfaTOTPAccordion } from './MfaTOTPAccordion';
 import { ProfileSection } from './Section';
@@ -20,6 +21,7 @@ export const MfaSection = () => {
   const secondFactorsAvailableToAdd = getSecondFactorsAvailableToAdd(attributes, user);
 
   const showTOTP = secondFactors.includes('totp') && user.totpEnabled;
+  const showBackupCode = secondFactors.includes('backup_code') && user.backupCodeEnabled;
 
   const mfaPhones = user.phoneNumbers
     .filter(ph => ph.verification.status === 'verified')
@@ -41,6 +43,8 @@ export const MfaSection = () => {
             showTOTP={showTOTP}
           />
         ))}
+
+      {showBackupCode && <MfaBackupCodeAccordion />}
 
       {secondFactorsAvailableToAdd.length > 0 && (
         <AddBlockButton
