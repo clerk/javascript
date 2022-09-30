@@ -1,4 +1,4 @@
-import type { Session, User } from '@clerk/backend-core';
+import type { Organization, Session, User } from '@clerk/backend-core';
 import { ClerkJWTClaims, ServerGetToken } from '@clerk/types';
 import type { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 
@@ -24,7 +24,8 @@ export type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
 export type RequestWithAuth<Options extends WithEdgeMiddlewareAuthOptions = any> = NextRequest & {
   auth: EdgeMiddlewareAuth;
 } & (Options extends { loadSession: true } ? { session: Session | null } : {}) &
-  (Options extends { loadUser: true } ? { user: User | null } : {});
+  (Options extends { loadUser: true } ? { user: User | null } : {}) &
+  (Options extends { loadOrg: true } ? { organization: Organization | null } : {});
 
 type NextMiddlewareReturnOptions = NextResponse | Response | null | undefined;
 export type NextMiddlewareResult = NextMiddlewareReturnOptions;
@@ -48,4 +49,5 @@ export type AuthData = {
   user: User | undefined | null;
   getToken: ServerGetToken;
   claims: ClerkJWTClaims | null;
+  organization: Organization | undefined | null;
 };
