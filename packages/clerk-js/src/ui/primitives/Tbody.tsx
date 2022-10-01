@@ -8,9 +8,9 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   variants: {},
 }));
 
-export type TBodyProps = PrimitiveProps<'tbody'> & Omit<BoxProps, 'as'> & StyleVariants<typeof applyVariants>;
+export type TbodyProps = PrimitiveProps<'tbody'> & Omit<BoxProps, 'as'> & StyleVariants<typeof applyVariants>;
 
-export const TBody = React.forwardRef<HTMLTableCellElement, TBodyProps>((props, ref) => {
+export const Tbody = React.forwardRef<HTMLTableCellElement, TbodyProps>((props, ref) => {
   return (
     <Box
       as='tbody'

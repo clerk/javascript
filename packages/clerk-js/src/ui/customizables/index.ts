@@ -40,8 +40,8 @@ export const Badge = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitive
 
 export const TableContainer = makeCustomizable(sanitizeDomProps(Primitives.TableContainer));
 export const Table = makeCustomizable(sanitizeDomProps(Primitives.Table));
-export const THead = makeCustomizable(sanitizeDomProps(Primitives.THead));
-export const TBody = makeCustomizable(sanitizeDomProps(Primitives.TBody));
+export const Thead = makeCustomizable(sanitizeDomProps(Primitives.Thead));
+export const Tbody = makeCustomizable(sanitizeDomProps(Primitives.Tbody));
 export const Tr = makeCustomizable(sanitizeDomProps(Primitives.Tr));
 export const Th = makeCustomizable(sanitizeDomProps(Primitives.Th));
 export const Td = makeCustomizable(sanitizeDomProps(Primitives.Td));

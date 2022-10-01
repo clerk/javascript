@@ -8,9 +8,9 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   variants: {},
 }));
 
-export type THeadProps = PrimitiveProps<'thead'> & Omit<BoxProps, 'as'> & StyleVariants<typeof applyVariants>;
+export type TheadProps = PrimitiveProps<'thead'> & Omit<BoxProps, 'as'> & StyleVariants<typeof applyVariants>;
 
-export const THead = React.forwardRef<HTMLTableCellElement, THeadProps>((props, ref) => {
+export const Thead = React.forwardRef<HTMLTableCellElement, TheadProps>((props, ref) => {
   return (
     <Box
       as='thead'
