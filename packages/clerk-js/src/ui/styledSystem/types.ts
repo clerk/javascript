@@ -26,6 +26,8 @@ type ElementProps = {
   img: JSX.IntrinsicElements['img'];
   form: JSX.IntrinsicElements['form'];
   table: JSX.IntrinsicElements['table'];
+  thead: JSX.IntrinsicElements['thead'];
+  tbody: JSX.IntrinsicElements['tbody'];
   th: JSX.IntrinsicElements['th'];
   tr: JSX.IntrinsicElements['tr'];
   td: JSX.IntrinsicElements['td'];

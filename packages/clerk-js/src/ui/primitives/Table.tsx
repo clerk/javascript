@@ -7,13 +7,13 @@ const { applyVariants, filterProps } = createVariants(theme => {
   return {
     base: {
       borderCollapse: 'collapse',
-      'td:not(:first-child)': {
+      'td:not(:first-of-type)': {
         paddingLeft: theme.sizes.$2,
       },
-      'th:not(:first-child)': {
+      'th:not(:first-of-type)': {
         paddingLeft: theme.sizes.$2,
       },
-      'tr:not(:last-child)>td': {
+      'tr:not(:last-of-type)>td': {
         paddingBottom: theme.sizes.$2,
       },
       width: '100%',

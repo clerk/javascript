@@ -75,6 +75,7 @@ export const Pagination = (props: PaginationProps) => {
           if (Math.abs(page - p) < siblingCount || p === count || p === 1) {
             return (
               <PageButton
+                key={p}
                 sx={t => ({ color: page === p ? t.colors.$black : t.colors.$blackAlpha700 })}
                 onClick={() => {
                   onChange?.(p);
@@ -87,7 +88,10 @@ export const Pagination = (props: PaginationProps) => {
 
           if (Math.abs(page - p) === siblingCount) {
             return (
-              <Flex center>
+              <Flex
+                center
+                key={p}
+              >
                 <Text
                   sx={t => ({
                     color: t.colors.$blackAlpha500,
