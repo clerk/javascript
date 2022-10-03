@@ -55,6 +55,10 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
   footerPageLink__help: 'Help',
   footerPageLink__privacy: 'Privacy',
   footerPageLink__terms: 'Terms',
+  paginationButton__previous: 'Previous',
+  paginationButton__next: 'Next',
+  paginationRowInfo__displaying: 'Displaying',
+  paginationRowInfo__of: 'of',
   signUp: {
     start: {
       title: 'Create your account',
