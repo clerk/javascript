@@ -13,6 +13,7 @@ import {
   localizationKeys,
   Text,
   useAppearance,
+  useLocalizations,
 } from '../customizables';
 import { Portal } from '../elements/Portal';
 import { Eye } from '../icons';
@@ -87,6 +88,7 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
 
 export const ImpersonationFab = () => {
   const session = useCoreSession();
+  const { t } = useLocalizations();
   const { parsedInternalTheme } = useAppearance();
   const actor = session?.actor;
   const isImpersonating = !!actor;
@@ -100,6 +102,11 @@ export const ImpersonationFab = () => {
   if (!isImpersonating || !session.user) {
     return null;
   }
+
+  const title = localizationKeys('impersonationFab.title', {
+    identifier: getFullName(session.user) || getIdentifier(session.user),
+  });
+  const titleLength = t(title).length;
 
   return (
     <Portal>
@@ -117,9 +124,9 @@ export const ImpersonationFab = () => {
           backgroundColor: t.colors.$white,
           fontFamily: t.fonts.$main,
           ':hover #cl-impersonationText': {
-            maxWidth: `calc(50vw - ${eyeWidth} - 2 * ${right})`,
+            maxWidth: `min(calc(50vw - ${eyeWidth} - 2 * ${right}), ${titleLength}ch)`,
             [mqu.md]: {
-              maxWidth: `calc(100vw - ${eyeWidth} - 2 * ${right})`,
+              maxWidth: `min(calc(100vw - ${eyeWidth} - 2 * ${right}), ${titleLength}ch)`,
             },
           },
           ':hover #cl-impersonationEye': {
@@ -140,9 +147,7 @@ export const ImpersonationFab = () => {
           })}
         >
           <FabContent
-            title={localizationKeys('impersonationFab.title', {
-              identifier: getFullName(session.user) || getIdentifier(session.user),
-            })}
+            title={title}
             signOutText={localizationKeys('impersonationFab.action__signOut')}
           />
         </Flex>
