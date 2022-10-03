@@ -88,6 +88,7 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
 
 export const ImpersonationFab = () => {
   const session = useCoreSession();
+  const { t } = useLocalizations();
   const { parsedInternalTheme } = useAppearance();
   const actor = session?.actor;
   const isImpersonating = !!actor;
@@ -98,8 +99,6 @@ export const ImpersonationFab = () => {
   const eyeWidth = parsedInternalTheme.sizes.$16;
   const eyeHeight = eyeWidth;
 
-  const localizations = useLocalizations();
-
   if (!isImpersonating || !session.user) {
     return null;
   }
@@ -107,7 +106,7 @@ export const ImpersonationFab = () => {
   const title = localizationKeys('impersonationFab.title', {
     identifier: getFullName(session.user) || getIdentifier(session.user),
   });
-  const titleLength = localizations.t(title).length;
+  const titleLength = t(title).length;
 
   return (
     <Portal>
