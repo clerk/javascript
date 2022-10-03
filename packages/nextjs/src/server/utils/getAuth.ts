@@ -66,6 +66,10 @@ type BuildClerkPropsInitState = { user?: User | null; session?: Session | null; 
 type BuildClerkProps = (req: RequestLike, authState?: BuildClerkPropsInitState) => Record<string, unknown>;
 
 export const buildClerkProps: BuildClerkProps = (req, initState = {}) => {
+  const authResult = getAuthResultFromRequest(req);
+  if (!authResult || authResult !== AuthResult.StandardSignedIn) {
+    return {};
+  }
   const { sessionClaims } = parseRequest(req);
   const authData = getAuthDataFromClaims({ sessionClaims });
   return injectSSRStateIntoObject({}, sanitizeAuthData({ ...authData, ...initState } as any));
