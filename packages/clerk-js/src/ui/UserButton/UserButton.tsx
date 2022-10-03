@@ -10,8 +10,9 @@ import { UserButtonPopover } from './UserButtonPopover';
 import { UserButtonTrigger } from './UserButtonTrigger';
 
 const _UserButton = () => {
+  const { defaultOpen } = useUserButtonContext();
   const { floating, reference, styles, toggle, isOpen } = usePopover({
-    defaultOpen: false,
+    defaultOpen,
     placement: 'bottom-end',
     offset: 8,
   });

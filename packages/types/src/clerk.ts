@@ -446,6 +446,10 @@ export type UserButtonProps = {
    */
   showName?: boolean;
   /**
+    Controls the default state of the UserButton
+   */
+  defaultOpen?: boolean;
+  /**
    * Full URL or path to navigate after sign out is complete
    */
   afterSignOutUrl?: string;
