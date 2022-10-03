@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.8.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.8.0-staging.3...@clerk/clerk-js@4.8.0) (2022-10-03)
+
+### Features
+
+- **clerk-js:** Add open prop in user button ([6ae7f42](https://github.com/clerkinc/javascript/commit/6ae7f4226f4db5760e04ee812a494beb66ab2502))
+
+### Bug Fixes
+
+- **clerk-js:** Refactor defaultOpen prop ([1d7b0a9](https://github.com/clerkinc/javascript/commit/1d7b0a997a86686644d28ac58d0bd7143af9023f))
+- **clerk-js:** Refactor isOpen prop ([044860f](https://github.com/clerkinc/javascript/commit/044860f7204988876b258141108d0e1741204bc1))
+
 ## [4.7.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.7.0-staging.4...@clerk/clerk-js@4.7.0) (2022-09-29)
 
 **Note:** Version bump only for package @clerk/clerk-js

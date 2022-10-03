@@ -1,6 +1,6 @@
 {
   "name": "@clerk/themes",
-  "version": "1.2.15-staging.3",
+  "version": "1.2.15",
   "license": "MIT",
   "description": "Themes for the Clerk auth components",
   "keywords": [
@@ -26,7 +26,7 @@
     "dev": "tsc -p tsconfig.build.json --watch"
   },
   "devDependencies": {
-    "@clerk/types": "^3.9.0-staging.2",
+    "@clerk/types": "^3.9.0",
     "typescript": "^4.6.4"
   },
   "peerDependencies": {
