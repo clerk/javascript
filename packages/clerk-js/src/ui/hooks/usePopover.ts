@@ -7,19 +7,18 @@ import {
   useFloating,
   UseFloatingProps,
 } from '@floating-ui/react-dom-interactions';
-import React, { useLayoutEffect } from 'react';
+import React, { useEffect } from 'react';
 
 type UsePopoverProps = {
   defaultOpen?: boolean;
   placement?: UseFloatingProps['placement'];
   offset?: Parameters<typeof offset>[0];
   autoUpdate?: boolean;
-  isOpenProp?: boolean;
 };
 
 export const usePopover = (props: UsePopoverProps = {}) => {
   const [isOpen, setIsOpen] = React.useState(props.defaultOpen || false);
-  const { reference, floating, strategy, x, y, context } = useFloating({
+  const { update, reference, floating, strategy, x, y, context } = useFloating({
     open: isOpen,
     onOpenChange: setIsOpen,
     whileElementsMounted: props.autoUpdate === false ? undefined : autoUpdate,
@@ -27,9 +26,9 @@ export const usePopover = (props: UsePopoverProps = {}) => {
     middleware: [offset(props.offset || 6), flip(), shift()],
   });
 
-  useLayoutEffect(() => {
-    if (props.isOpenProp) {
-      toggle();
+  useEffect(() => {
+    if (props.defaultOpen) {
+      update();
     }
   }, []);
 
