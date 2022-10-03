@@ -9,6 +9,7 @@ type ArrowBlockButtonProps = PropsOfComponent<typeof Button> & {
   icon?: React.ReactElement;
   rightIcon?: React.ComponentType;
   rightIconSx?: ThemableCssProp;
+  badge?: React.ReactElement;
   textElementDescriptor?: ElementDescriptor;
   textElementId?: ElementId;
   arrowElementDescriptor?: ElementDescriptor;
@@ -32,6 +33,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
     arrowElementDescriptor,
     arrowElementId,
     textLocalizationKey,
+    badge,
     ...rest
   } = props;
 
@@ -91,25 +93,34 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
           )}
         </Flex>
       )}
-      <Text
-        elementDescriptor={textElementDescriptor}
-        elementId={textElementId}
-        as='span'
-        truncate
-        colorScheme='inherit'
-        variant='buttonSmallRegular'
-        localizationKey={textLocalizationKey}
+      <Flex
+        justify='start'
+        align='center'
+        gap={2}
+        sx={{
+          width: '100%',
+          overflow: 'hidden',
+        }}
       >
-        {children}
-      </Text>
+        <Text
+          elementDescriptor={textElementDescriptor}
+          elementId={textElementId}
+          as='span'
+          truncate
+          colorScheme='inherit'
+          variant='buttonSmallRegular'
+          localizationKey={textLocalizationKey}
+        >
+          {children}
+        </Text>
+        {badge}
+      </Flex>
       <Icon
         elementDescriptor={arrowElementDescriptor}
         elementId={arrowElementId}
         icon={rightIcon}
         sx={[
           theme => ({
-            position: 'absolute',
-            right: '1rem',
             transition: 'all 100ms ease',
             minWidth: theme.sizes.$4,
             minHeight: theme.sizes.$4,
