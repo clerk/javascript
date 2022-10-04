@@ -17,7 +17,7 @@ export const MfaBackupCodeAccordion = () => {
           sx={theme => ({ color: theme.colors.$blackAlpha700 })}
         />
       }
-      title='Backup code'
+      title='Backup codes'
     >
       <Col gap={4}>
         <LinkButtonWithDescription
