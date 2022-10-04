@@ -1,4 +1,12 @@
-import { Appearance, SignInTheme, SignUpTheme, UserButtonTheme, UserProfileTheme } from './appearance';
+import {
+  Appearance,
+  OrganizationProfileTheme,
+  OrganizationSwitcherTheme,
+  SignInTheme,
+  SignUpTheme,
+  UserButtonTheme,
+  UserProfileTheme,
+} from './appearance';
 import { ClientResource } from './client';
 import { DisplayThemeJSON } from './json';
 import { LocalizationResource } from './localization';
@@ -99,6 +107,17 @@ export interface Clerk {
   closeUserProfile: () => void;
 
   /**
+   * Opens the Clerk OrganizationProfile modal.
+   * @param props Optional props that will be passed to the OrganizationProfile component.
+   */
+  openOrganizationProfile: (props?: OrganizationProfileProps) => void;
+
+  /**
+   * Closes the Clerk OrganizationProfile modal.
+   */
+  closeOrganizationProfile: () => void;
+
+  /**
    * Mounts a sign in flow component at the target element.
    * @param targetNode Target node to mount the SignIn component.
    * @param signInProps sign in configuration parameters.
@@ -160,6 +179,32 @@ export interface Clerk {
    * @param targetNode Target node to unmount the UserProfile component from.
    */
   unmountUserProfile: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * Mount an organization profile component at the target element.
+   * @param targetNode Target to mount the UserProfile component.
+   * @param props Configuration parameters.
+   */
+  mountOrganizationProfile: (targetNode: HTMLDivElement, props?: OrganizationProfileProps) => void;
+
+  /**
+   * Unmount the organization profile component from the target node.
+   * @param targetNode Target node to unmount the UserProfile component from.
+   */
+  unmountOrganizationProfile: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * Mount an organization switcher component at the target element.
+   * @param targetNode Target to mount the UserProfile component.
+   * @param props Configuration parameters.
+   */
+  mountOrganizationSwitcher: (targetNode: HTMLDivElement, props?: OrganizationSwitcherProps) => void;
+
+  /**
+   * Unmount the organization profile component from the target node.*
+   * @param targetNode Target node to unmount the UserProfile component from.
+   */
+  unmountOrganizationSwitcher: (targetNode: HTMLDivElement) => void;
 
   /**
    * Register a listener that triggers a callback each time important Clerk resources are changed.
@@ -436,6 +481,31 @@ export type UserProfileProps = {
   appearance?: UserProfileTheme;
 };
 
+export type OrganizationProfileProps = {
+  /*
+   * Page routing strategy
+   */
+  routing?: RoutingStrategy;
+  /*
+   * Root URL where the component is mounted on, eg: '/user'
+   */
+  path?: string;
+  /*
+   * Hides the default navigation bar
+   */
+  hideNavigation?: boolean;
+  /*
+   * Renders only a specific view of the component eg: 'security'
+   */
+  only?: 'account' | 'security';
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvided (if one is provided)
+   */
+  appearance?: OrganizationProfileTheme;
+};
+
 export type UserButtonProps = {
   /**
    * Controls if the username is displayed next to the trigger button
@@ -481,6 +551,24 @@ export type UserButtonProps = {
    * prop of ClerkProvided (if one is provided)
    */
   appearance?: UserButtonTheme & { userProfile?: UserProfileTheme };
+};
+
+export type OrganizationSwitcherProps = {
+  /**
+   Controls the default state of the OrganizationSwitcher
+   */
+  defaultOpen?: boolean;
+  /**
+   * Full URL or path to navigate after successful account change.
+   * Multi-session mode only.
+   */
+  afterSwitchSessionUrl?: string;
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvided (if one is provided)
+   */
+  appearance?: OrganizationSwitcherTheme;
 };
 
 export interface HandleMagicLinkVerificationParams {

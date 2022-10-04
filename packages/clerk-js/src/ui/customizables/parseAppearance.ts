@@ -17,7 +17,7 @@ export type ParsedElements = Elements[];
 export type ParsedInternalTheme = InternalTheme;
 export type ParsedLayout = Required<Layout>;
 
-type PublicAppearanceTopLevelKey = keyof Pick<Appearance, 'signIn' | 'signUp' | 'userProfile' | 'userButton'>;
+type PublicAppearanceTopLevelKey = keyof Omit<Appearance, 'baseTheme' | 'elements' | 'layout' | 'variables'>;
 
 export type AppearanceCascade = {
   globalAppearance?: Appearance;

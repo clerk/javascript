@@ -505,6 +505,8 @@ export type SignInTheme = Theme;
 export type SignUpTheme = Theme;
 export type UserButtonTheme = Theme;
 export type UserProfileTheme = Theme;
+export type OrganizationSwitcherTheme = Theme;
+export type OrganizationProfileTheme = Theme;
 
 export type Appearance<T = Theme> = T & {
   /**
@@ -523,4 +525,12 @@ export type Appearance<T = Theme> = T & {
    * Theme overrides that only apply to the `<UserProfile/>` component
    */
   userProfile?: T;
+  /**
+   * Theme overrides that only apply to the `<OrganizationSwitcher/>` component
+   */
+  organizationSwitcher?: T;
+  /**
+   * Theme overrides that only apply to the `<OrganizationProfile/>` component
+   */
+  organizationProfile?: T;
 };

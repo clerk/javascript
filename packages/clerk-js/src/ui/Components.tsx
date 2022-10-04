@@ -1,4 +1,5 @@
 import type { Appearance, Clerk, ClerkOptions, EnvironmentResource, SignInProps, SignUpProps } from '@clerk/types';
+import { OrganizationProfileProps } from '@clerk/types';
 import { UserProfileProps } from '@clerk/types/src';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -43,11 +44,11 @@ export type ComponentControls = {
     node?: HTMLDivElement;
     props?: unknown;
   }) => void;
-  openModal: <T extends 'signIn' | 'signUp' | 'userProfile'>(
+  openModal: <T extends 'signIn' | 'signUp' | 'userProfile' | 'organizationProfile'>(
     modal: T,
     props: T extends 'signIn' ? SignInProps : T extends 'signUp' ? SignUpProps : UserProfileProps,
   ) => void;
-  closeModal: (modal: 'signIn' | 'signUp' | 'userProfile') => void;
+  closeModal: (modal: 'signIn' | 'signUp' | 'userProfile' | 'organizationProfile') => void;
 };
 
 const AvailableComponents = {
@@ -55,6 +56,8 @@ const AvailableComponents = {
   SignUp,
   UserButton,
   UserProfile,
+  OrganizationProfile: () => <div>hello from org profile</div>,
+  OrganizationSwitcher: () => <div>hello from org switcher</div>,
 };
 
 type AvailableComponentNames = keyof typeof AvailableComponents;
@@ -78,6 +81,7 @@ interface ComponentsState {
   signInModal: null | SignInProps;
   signUpModal: null | SignUpProps;
   userProfileModal: null | UserProfileProps;
+  organizationProfileModal: null | OrganizationProfileProps;
   nodes: Map<HTMLDivElement, HtmlNodeOptions>;
 }
 
@@ -125,9 +129,10 @@ const Components = (props: ComponentsProps) => {
     signInModal: null,
     signUpModal: null,
     userProfileModal: null,
+    organizationProfileModal: null,
     nodes: new Map(),
   });
-  const { signInModal, signUpModal, userProfileModal, nodes } = state;
+  const { signInModal, signUpModal, userProfileModal, organizationProfileModal, nodes } = state;
 
   useSafeLayoutEffect(() => {
     componentsControls.mountComponent = params => {
@@ -255,6 +260,35 @@ const Components = (props: ComponentsProps) => {
     </AppearanceProvider>
   );
 
+  const mountedOrganizationProfileModal = (
+    <AppearanceProvider
+      globalAppearance={state.appearance}
+      appearanceKey='organizationProfile'
+      appearance={organizationProfileModal?.appearance}
+    >
+      <FlowMetadataProvider flow='organizationProfile'>
+        <InternalThemeProvider>
+          <Modal
+            handleClose={() => componentsControls.closeModal('organizationProfile')}
+            containerSx={{ alignItems: 'center' }}
+            contentSx={t => ({
+              height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`,
+              margin: 0,
+            })}
+          >
+            <VirtualRouter
+              preservedParams={PRESERVED_QUERYSTRING_PARAMS}
+              onExternalNavigate={() => componentsControls.closeModal('organizationProfile')}
+              startPath='/user'
+            >
+              hello from org profil
+            </VirtualRouter>
+          </Modal>
+        </InternalThemeProvider>
+      </FlowMetadataProvider>
+    </AppearanceProvider>
+  );
+
   const mountedImpersonationFab = (
     <AppearanceProvider
       globalAppearance={state.appearance}
@@ -292,6 +326,7 @@ const Components = (props: ComponentsProps) => {
           {signInModal && mountedSignInModal}
           {signUpModal && mountedSignUpModal}
           {userProfileModal && mountedUserProfileModal}
+          {organizationProfileModal && mountedOrganizationProfileModal}
           {mountedImpersonationFab}
         </OptionsProvider>
       </EnvironmentProvider>
