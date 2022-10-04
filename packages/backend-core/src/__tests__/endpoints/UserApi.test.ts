@@ -112,6 +112,8 @@ test('getUser() returns a single user', async () => {
 
   expect(user).toBeInstanceOf(User);
 
+  expect(user.banned).toBe(false);
+
   expect(user.externalAccounts.length).toEqual(2);
   expect(user.externalAccounts[0].provider).toEqual('google');
   expect(user.externalAccounts[0].username).toEqual('tester');
