@@ -24,6 +24,8 @@ export type NotionOauthProvider = 'notion';
 export type AppleOauthProvider = 'apple';
 export type LineOauthProvider = 'line';
 export type InstagramOauthProvider = 'instagram';
+export type CoinbaseOauthProvider = 'coinbase';
+export type SpotifyOauthProvider = 'spotify';
 
 export type OAuthProvider =
   | FacebookOauthProvider
@@ -42,7 +44,9 @@ export type OAuthProvider =
   | NotionOauthProvider
   | AppleOauthProvider
   | LineOauthProvider
-  | InstagramOauthProvider;
+  | InstagramOauthProvider
+  | CoinbaseOauthProvider
+  | SpotifyOauthProvider;
 
 export const OAUTH_PROVIDERS: OAuthProviderData[] = [
   {
@@ -146,6 +150,18 @@ export const OAUTH_PROVIDERS: OAuthProviderData[] = [
     strategy: 'oauth_instagram',
     name: 'Instagram',
     docsUrl: 'https://clerk.dev/docs/authentication/social-login-with-instagram',
+  },
+  {
+    provider: 'coinbase',
+    strategy: 'oauth_coinbase',
+    name: 'Coinbase',
+    docsUrl: 'https://clerk.dev/docs/authentication/social-login-with-coinbase',
+  },
+  {
+    provider: 'spotify',
+    strategy: 'oauth_spotify',
+    name: 'Spotify',
+    docsUrl: 'https://clerk.dev/docs/authentication/social-login-with-spotify',
   },
 ];
 
