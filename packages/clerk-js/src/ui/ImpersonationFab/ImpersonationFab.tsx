@@ -49,6 +49,7 @@ const EyeCircle = ({ width, height }: EyeCircleProps) => {
 type FabContentProps = { title: LocalizationKey; signOutText: LocalizationKey };
 
 const FabContent = ({ title, signOutText }: FabContentProps) => {
+  const session = useCoreSession();
   const { signOut } = useCoreClerk();
 
   return (
@@ -79,7 +80,7 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
         })}
         localizationKey={signOutText}
         onClick={async () => {
-          await signOut();
+          await signOut({ sessionId: session.id });
         }}
       />
     </Col>
