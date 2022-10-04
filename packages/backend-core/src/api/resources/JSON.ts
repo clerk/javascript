@@ -243,6 +243,7 @@ export interface UserJSON extends ClerkResourceJSON {
   totp_enabled: boolean;
   backup_code_enabled: boolean;
   two_factor_enabled: boolean;
+  banned: boolean;
   email_addresses: EmailAddressJSON[];
   phone_numbers: PhoneNumberJSON[];
   web3_wallets: Web3WalletJSON[];

@@ -12,6 +12,7 @@
     "primary_phone_number_id": "idn_omega",
     "password_enabled": false,
     "two_factor_enabled": true,
+    "banned": false,
     "email_addresses": [
       {
         "id": "idn_clark",

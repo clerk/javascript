@@ -9,6 +9,7 @@
   "primary_phone_number_id": null,
   "password_enabled": true,
   "two_factor_enabled": false,
+  "banned": false,
   "email_addresses": [
     {
       "id": "idn_1oBNgISXFbSf5m0uP2Wl0qWtNGX",
