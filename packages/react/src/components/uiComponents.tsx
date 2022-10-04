@@ -1,4 +1,11 @@
-import { SignInProps, SignUpProps, UserButtonProps, UserProfileProps } from '@clerk/types';
+import {
+  OrganizationProfileProps,
+  OrganizationSwitcherProps,
+  SignInProps,
+  SignUpProps,
+  UserButtonProps,
+  UserProfileProps,
+} from '@clerk/types';
 import React from 'react';
 
 import { MountProps, WithClerkProp } from '../types';
@@ -101,3 +108,25 @@ export const UserButton = withClerk(({ clerk, ...props }: WithClerkProp<UserButt
     />
   );
 }, 'UserButton');
+
+export const OrganizationProfile = withClerk(({ clerk, ...props }: WithClerkProp<OrganizationProfileProps>) => {
+  return (
+    <Portal
+      mount={clerk.mountOrganizationProfile}
+      unmount={clerk.unmountOrganizationProfile}
+      updateProps={(clerk as any).__unstable__updateProps}
+      props={props}
+    />
+  );
+}, 'OrganizationProfile');
+
+export const OrganizationSwitcher = withClerk(({ clerk, ...props }: WithClerkProp<OrganizationSwitcherProps>) => {
+  return (
+    <Portal
+      mount={clerk.mountOrganizationSwitcher}
+      unmount={clerk.unmountOrganizationSwitcher}
+      updateProps={(clerk as any).__unstable__updateProps}
+      props={props}
+    />
+  );
+}, 'OrganizationSwitcher');

@@ -14,13 +14,17 @@ import type {
   ListenerCallback,
   OrganizationInvitationResource,
   OrganizationMembershipResource,
+  OrganizationProfileProps,
   OrganizationResource,
+  OrganizationSwitcherProps,
   RedirectOptions,
   Resources,
+  SetActiveParams,
   SignInProps,
   SignInResource,
   SignOut,
   SignOutCallback,
+  SignOutOptions,
   SignUpProps,
   SignUpResource,
   UnsubscribeCallback,
@@ -28,7 +32,6 @@ import type {
   UserProfileProps,
   UserResource,
 } from '@clerk/types';
-import { SetActiveParams, SignOutOptions } from '@clerk/types/src';
 
 import packageJSON from '../../package.json';
 import type { ComponentControls, MountComponentRenderer } from '../ui';
@@ -205,6 +208,16 @@ export default class Clerk implements ClerkInterface {
     this.#componentControls?.closeModal('userProfile');
   };
 
+  public openOrganizationProfile = (props?: OrganizationProfileProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    this.#componentControls?.openModal('organizationProfile', props || {});
+  };
+
+  public closeOrganizationProfile = (): void => {
+    this.assertComponentsReady(this.#componentControls);
+    this.#componentControls?.closeModal('organizationProfile');
+  };
+
   public mountSignIn = (node: HTMLDivElement, props?: SignInProps): void => {
     this.assertComponentsReady(this.#componentControls);
     this.#componentControls.mountComponent({
@@ -250,6 +263,40 @@ export default class Clerk implements ClerkInterface {
   };
 
   public unmountUserProfile = (node: HTMLDivElement): void => {
+    this.assertComponentsReady(this.#componentControls);
+    this.#componentControls.unmountComponent({
+      node,
+    });
+  };
+
+  public mountOrganizationProfile = (node: HTMLDivElement, props?: OrganizationProfileProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    this.#componentControls.mountComponent({
+      name: 'OrganizationProfile',
+      appearanceKey: 'userProfile',
+      node,
+      props,
+    });
+  };
+
+  public unmountOrganizationProfile = (node: HTMLDivElement): void => {
+    this.assertComponentsReady(this.#componentControls);
+    this.#componentControls.unmountComponent({
+      node,
+    });
+  };
+
+  public mountOrganizationSwitcher = (node: HTMLDivElement, props?: OrganizationSwitcherProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    this.#componentControls.mountComponent({
+      name: 'OrganizationSwitcher',
+      appearanceKey: 'userProfile',
+      node,
+      props,
+    });
+  };
+
+  public unmountOrganizationSwitcher = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
     this.#componentControls.unmountComponent({
       node,

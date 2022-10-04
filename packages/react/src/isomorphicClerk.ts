@@ -19,6 +19,7 @@ import type {
   UserProfileProps,
   UserResource,
 } from '@clerk/types';
+import { OrganizationProfileProps, OrganizationSwitcherProps } from '@clerk/types/src';
 
 import { noFrontendApiError } from './errors';
 import type { BrowserClerk, BrowserClerkConstructor, ClerkProp, IsomorphicClerkOptions } from './types';
@@ -50,10 +51,13 @@ export default class IsomorphicClerk {
   private preopenSignIn?: null | SignInProps = null;
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
+  private preopenOrganizationProfile?: null | OrganizationProfileProps = null;
   private premountSignInNodes = new Map<HTMLDivElement, SignInProps>();
   private premountSignUpNodes = new Map<HTMLDivElement, SignUpProps>();
   private premountUserProfileNodes = new Map<HTMLDivElement, UserProfileProps>();
   private premountUserButtonNodes = new Map<HTMLDivElement, UserButtonProps>();
+  private premountOrganizationProfileNodes = new Map<HTMLDivElement, OrganizationProfileProps>();
+  private premountOrganizationSwitcherNodes = new Map<HTMLDivElement, OrganizationSwitcherProps>();
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
   private loadedListeners: Array<() => void> = [];
 
@@ -321,6 +325,22 @@ export default class IsomorphicClerk {
     }
   };
 
+  openOrganizationProfile = (props?: OrganizationProfileProps): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.openOrganizationProfile(props);
+    } else {
+      this.preopenOrganizationProfile = props;
+    }
+  };
+
+  closeOrganizationProfile = (): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.closeOrganizationProfile();
+    } else {
+      this.preopenOrganizationProfile = null;
+    }
+  };
+
   openSignUp = (props?: SignUpProps): void => {
     if (this.clerkjs && this.#loaded) {
       this.clerkjs.openSignUp(props);
@@ -382,6 +402,38 @@ export default class IsomorphicClerk {
       this.clerkjs.unmountUserProfile(node);
     } else {
       this.premountUserProfileNodes.delete(node);
+    }
+  };
+
+  mountOrganizationProfile = (node: HTMLDivElement, props: OrganizationProfileProps): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.mountOrganizationProfile(node, props);
+    } else {
+      this.premountOrganizationProfileNodes.set(node, props);
+    }
+  };
+
+  unmountOrganizationProfile = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.unmountOrganizationProfile(node);
+    } else {
+      this.premountOrganizationProfileNodes.delete(node);
+    }
+  };
+
+  mountOrganizationSwitcher = (node: HTMLDivElement, props: OrganizationSwitcherProps): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.mountOrganizationSwitcher(node, props);
+    } else {
+      this.premountOrganizationSwitcherNodes.set(node, props);
+    }
+  };
+
+  unmountOrganizationSwitcher = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.unmountOrganizationSwitcher(node);
+    } else {
+      this.premountOrganizationSwitcherNodes.delete(node);
     }
   };
 

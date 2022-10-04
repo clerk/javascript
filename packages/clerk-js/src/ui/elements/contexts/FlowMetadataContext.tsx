@@ -3,7 +3,7 @@ import React from 'react';
 import { createContextAndHook } from '../../utils';
 
 type FlowMetadata = {
-  flow: 'signIn' | 'signUp' | 'userButton' | 'userProfile';
+  flow: 'signIn' | 'signUp' | 'userButton' | 'userProfile' | 'organizationProfile' | 'organizationSwitcher';
   part?:
     | 'start'
     | 'emailCode'
