@@ -43,6 +43,7 @@ export const MenuTrigger = (props: MenuTriggerProps) => {
   }
 
   return cloneElement(children, {
+    // @ts-expect-error
     ref: reference,
     onClick: (e: React.MouseEvent) => {
       children.props?.onClick?.(e);
