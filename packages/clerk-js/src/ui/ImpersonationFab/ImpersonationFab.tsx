@@ -1,4 +1,4 @@
-import React, { MouseEventHandler, useEffect, useRef } from 'react';
+import React, { PointerEventHandler, useEffect, useRef } from 'react';
 
 import { mqu, PropsOfComponent } from '../../ui/styledSystem';
 import { getFullName, getIdentifier } from '../../ui/utils';
@@ -95,7 +95,7 @@ export const ImpersonationFab = () => {
   const session = useCoreSession();
   const { t } = useLocalizations();
   const { parsedInternalTheme } = useAppearance();
-  const ref = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const actor = session?.actor;
   const isImpersonating = !!actor;
 
@@ -108,50 +108,57 @@ export const ImpersonationFab = () => {
   const defaultRight = 23;
 
   const handleResize = () => {
-    const { current } = ref;
+    const current = containerRef.current;
     if (!current) {
       return;
     }
 
-    if (current.offsetLeft < 0 || current.offsetLeft > window.innerWidth) {
+    const outsideViewport =
+      current.offsetLeft < 0 ||
+      current.offsetLeft > window.innerWidth ||
+      current.offsetTop < 0 ||
+      current.offsetTop > window.innerHeight;
+
+    if (outsideViewport) {
       document.documentElement.style.setProperty(rightProperty, `${defaultRight}px`);
+      document.documentElement.style.setProperty(topProperty, `${defaultTop}px`);
     }
   };
 
-  const onMouseDown: MouseEventHandler = () => {
-    window.addEventListener('mousemove', onMouseMove);
+  const onPointerDown: PointerEventHandler = () => {
+    window.addEventListener('pointermove', onPointerMove);
     window.addEventListener(
-      'mouseup',
+      'pointerup',
       () => {
-        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('pointermove', onPointerMove);
         handleResize();
       },
       { once: true },
     );
   };
 
-  const onMouseMove = React.useCallback((e: MouseEvent) => {
+  const onPointerMove = React.useCallback((e: PointerEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    const { current } = ref;
+    const current = containerRef.current;
     if (!current) {
       return;
     }
-    document.documentElement.style.setProperty(
-      rightProperty,
-      `${window.innerWidth - current.offsetLeft - current.offsetWidth - e.movementX}px`,
-    );
+    const rightOffestBasedOnViewportAndContent = `${
+      window.innerWidth - current.offsetLeft - current.offsetWidth - e.movementX
+    }px`;
+    document.documentElement.style.setProperty(rightProperty, rightOffestBasedOnViewportAndContent);
     document.documentElement.style.setProperty(topProperty, `${current.offsetTop + e.movementY}px`);
   }, []);
 
-  //reposition the fab if needed when the window resizes
-  useEffect(() => {
+  const repositionFabOnResize = () => {
     window.addEventListener('resize', handleResize);
-
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  });
+  };
+
+  useEffect(repositionFabOnResize, []);
 
   if (!isImpersonating || !session.user) {
     return null;
@@ -165,7 +172,7 @@ export const ImpersonationFab = () => {
   return (
     <Portal>
       <Flex
-        ref={ref}
+        ref={containerRef}
         elementDescriptor={descriptors.impersonationFab}
         align='center'
         sx={t => ({
@@ -190,7 +197,7 @@ export const ImpersonationFab = () => {
         })}
       >
         <EyeCircle
-          onMouseDown={onMouseDown}
+          onPointerDown={onPointerDown}
           sx={{
             ':hover': {
               cursor: 'grab',
