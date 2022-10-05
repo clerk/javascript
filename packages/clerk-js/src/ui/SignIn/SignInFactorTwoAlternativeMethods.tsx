@@ -5,7 +5,7 @@ import { useCoreSignIn } from '../../ui/contexts/';
 import { Col, descriptors, Flow, LocalizationKey, localizationKeys } from '../customizables';
 import { ArrowBlockButton, Card, CardAlert, Footer, Header } from '../elements';
 import { useCardState } from '../elements/contexts';
-import { formatSafeIdentifier } from '../utils';
+import { backupCodePrefFactorComparator, formatSafeIdentifier } from '../utils';
 import { HavingTrouble } from './HavingTrouble';
 
 export type AlternativeMethodsProps = {
@@ -49,7 +49,7 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
           gap={8}
         >
           <Col gap={2}>
-            {supportedSecondFactors.map((factor, i) => (
+            {supportedSecondFactors.sort(backupCodePrefFactorComparator).map((factor, i) => (
               <ArrowBlockButton
                 textLocalizationKey={getButtonLabel(factor)}
                 elementDescriptor={descriptors.alternativeMethodsBlockButton}
