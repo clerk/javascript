@@ -27,6 +27,12 @@ const STRATEGY_SORT_ORDER_ALL_STRATEGIES_BUTTONS = makeSortingOrderMap([
   'password',
 ] as SignInStrategy[]);
 
+const STRATEGY_SORT_ORDER_BACKUP_CODE_PREF = makeSortingOrderMap([
+  'totp',
+  'phone_code',
+  'backup_code',
+] as SignInStrategy[]);
+
 const makeSortingFunction =
   (sortingMap: Record<SignInStrategy, number>) =>
   (a: SignInFactor, b: SignInFactor): number => {
@@ -40,4 +46,5 @@ const makeSortingFunction =
 
 export const passwordPrefFactorComparator = makeSortingFunction(STRATEGY_SORT_ORDER_PASSWORD_PREF);
 export const otpPrefFactorComparator = makeSortingFunction(STRATEGY_SORT_ORDER_OTP_PREF);
+export const backupCodePrefFactorComparator = makeSortingFunction(STRATEGY_SORT_ORDER_BACKUP_CODE_PREF);
 export const allStrategiesButtonsComparator = makeSortingFunction(STRATEGY_SORT_ORDER_ALL_STRATEGIES_BUTTONS);
