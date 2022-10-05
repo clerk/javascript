@@ -303,5 +303,6 @@ type _LocalizationResource = {
     form_password_length_too_short: LocalizationValue;
     form_param_nil: LocalizationValue;
     form_code_incorrect: LocalizationValue;
+    form_password_incorrect: LocalizationValue;
   };
 };
