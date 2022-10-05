@@ -17,8 +17,6 @@ type UseUserReturn =
  * For projects using NextJs or Remix, you can make this state available during SSR
  * simply by using the `withServerSideAuth` helper and setting the `loadUser` flag to `true`.
  *
- * If you want to disable strict type checking, pass the generic `guaranteed` type flag
- * as shown in the last example below.
  *
  * @example
  * A simple example:
@@ -49,13 +47,6 @@ type UseUserReturn =
  *   return <div>Hello, {user.firstName}</div>
  * }
  *
- * @example
- * Disable strict type checking:
- *
- * function Hello() {
- *   const { user } = useUser<guaranteed>();
- *   return <div>Hello, {user.firstName}</div>
- * }
  */
 export function useUser(): UseUserReturn {
   const user = useUserContext();
