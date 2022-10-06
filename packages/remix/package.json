@@ -28,7 +28,8 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "build": "tsc -p tsconfig.build.json",
-    "dev": "tsc -p tsconfig.build.json --watch"
+    "dev": "tsc -p tsconfig.build.json --watch",
+    "clean": "rimraf ./dist"
   },
   "dependencies": {
     "@clerk/clerk-react": "^4.2.6",

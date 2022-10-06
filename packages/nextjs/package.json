@@ -30,6 +30,7 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "build": "tsc -p tsconfig.build.json",
+    "clean": "rimraf ./dist",
     "dev": "tsc -p tsconfig.build.json --watch"
   },
   "dependencies": {

@@ -22,7 +22,8 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "dev": "tsc -p tsconfig.build.json --watch"
+    "dev": "tsc -p tsconfig.build.json --watch",
+    "clean": "rimraf ./dist"
   },
   "dependencies": {
     "@clerk/clerk-js": "^4.9.0",

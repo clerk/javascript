@@ -33,7 +33,8 @@
     }
   },
   "scripts": {
-    "build": "node ./scripts/info.cjs && tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && ./moduleTypeFix"
+    "build": "node ./scripts/info.cjs && tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && ./moduleTypeFix",
+    "clean": "rimraf ./dist"
   },
   "dependencies": {
     "@clerk/backend-core": "^2.8.1",
