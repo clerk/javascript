@@ -5,6 +5,7 @@
   "description": "Clerk Backend API core resources and authentication utilities for JavaScript environments.",
   "scripts": {
     "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && ./moduleTypeFix",
+    "clean": "rimraf ./dist",
     "dev": "tsc -p tsconfig.esm.json --watch",
     "test": "jest"
   },

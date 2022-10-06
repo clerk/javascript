@@ -17,6 +17,7 @@
     "build:es5": "node ./scripts/info.js && tsc -p tsconfig.build.json",
     "build:esm": "node ./scripts/info.js && tsc -p tsconfig.esm.json",
     "build": "run-p build:es5 build:esm",
+    "clean": "rimraf ./dist",
     "test": "jest",
     "lint": "eslint ./src --ext .ts",
     "pack": "npm pack"

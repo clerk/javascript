@@ -29,6 +29,7 @@
     "build:bundle": "webpack --config webpack.dev.js --env production",
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "dev": "webpack serve --config webpack.dev.js",
+    "clean": "rimraf ./dist",
     "prepublishOnly": "npm run build",
     "postpublish": "node ./scripts/purge-cache.mjs",
     "start": "echo \"Noop\"",
@@ -37,6 +38,7 @@
   },
   "dependencies": {
     "@clerk/types": "^3.10.1",
+    "@clerk/common": "^0.0.1",
     "@emotion/cache": "^11.7.1",
     "@emotion/react": "^11.9.0",
     "@floating-ui/react-dom-interactions": "^0.6.3",
