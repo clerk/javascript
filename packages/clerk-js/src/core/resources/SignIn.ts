@@ -160,7 +160,7 @@ export class SignIn extends BaseResource implements SignInResource {
     if (status === 'unverified' && externalVerificationRedirectURL) {
       windowNavigate(externalVerificationRedirectURL);
     } else {
-      console.error(clerkInvalidFAPIResponse(status, SignIn.fapiClient.buildEmailAddress('support')));
+      clerkInvalidFAPIResponse(status, SignIn.fapiClient.buildEmailAddress('support'));
     }
   };
 

@@ -45,10 +45,15 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
 
   const startOauth = (strategy: OAuthStrategy | Web3Strategy) => async () => {
     card.setLoading(strategy);
-    if (isWeb3Strategy(strategy)) {
-      await web3Callback(strategy);
-    } else {
-      await oauthCallback(strategy);
+    try {
+      if (isWeb3Strategy(strategy)) {
+        await web3Callback(strategy);
+      } else {
+        await oauthCallback(strategy);
+      }
+    } catch {
+      await sleep(1000);
+      card.setIdle();
     }
     await sleep(5000);
     card.setIdle();
