@@ -22,7 +22,6 @@
     "pretty": true,
     "sourceMap": false,
     "strict": true,
-    //    "types": ["node"],
     "target": "ES2019",
     "noErrorTruncation": true
   },
