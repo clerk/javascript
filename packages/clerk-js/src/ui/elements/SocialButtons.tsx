@@ -139,7 +139,7 @@ const SocialButtonIcon = (props: SocialButtonProps): JSX.Element => {
 };
 
 const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
-  const { label, id, providerName, ...rest } = props;
+  const { label, id, providerName, sx, ...rest } = props;
 
   return (
     <ArrowBlockButton
@@ -150,6 +150,13 @@ const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
       textLocalizationKey={localizationKeys('socialButtonsBlockButton', { provider: providerName })}
       arrowElementDescriptor={descriptors.socialButtonsBlockButtonArrow}
       arrowElementId={descriptors.socialButtonsBlockButtonArrow.setId(id)}
+      sx={[
+        {
+          textOverflow: 'ellipsis',
+          overflow: 'hidden',
+        },
+        sx,
+      ]}
       {...rest}
     >
       {label}
