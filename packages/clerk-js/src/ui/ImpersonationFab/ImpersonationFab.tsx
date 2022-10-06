@@ -114,11 +114,10 @@ export const ImpersonationFab = () => {
       return;
     }
 
-    const outsideViewport =
-      current.offsetLeft < 0 ||
-      current.offsetLeft > window.innerWidth ||
-      current.offsetTop < 0 ||
-      current.offsetTop > window.innerHeight;
+    const offsetRight = window.innerWidth - current.offsetLeft - current.offsetWidth;
+    const offsetBottom = window.innerHeight - current.offsetTop - current.offsetHeight;
+
+    const outsideViewport = [current.offsetLeft, offsetRight, current.offsetTop, offsetBottom].some(o => o < 0);
 
     if (outsideViewport) {
       document.documentElement.style.setProperty(rightProperty, `${defaultRight}px`);
