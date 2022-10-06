@@ -193,7 +193,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     if (status === 'unverified' && !!externalVerificationRedirectURL) {
       windowNavigate(externalVerificationRedirectURL);
     } else {
-      console.error(clerkInvalidFAPIResponse(status, SignUp.fapiClient.buildEmailAddress('support')));
+      clerkInvalidFAPIResponse(status, SignUp.fapiClient.buildEmailAddress('support'));
     }
   };
 
