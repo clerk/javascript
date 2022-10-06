@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && ./moduleTypeFix",
     "clean": "rimraf ./dist",
+    "lint": "eslint .",
     "dev": "tsc -p tsconfig.esm.json --watch",
     "test": "jest"
   },

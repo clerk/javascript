@@ -23,7 +23,8 @@
     "prepublishOnly": "npm run build",
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsc -p tsconfig.build.json --watch",
-    "clean": "rimraf ./dist"
+    "clean": "rimraf ./dist",
+    "lint": "eslint ."
   },
   "dependencies": {
     "csstype": "^3.1.0"

@@ -20,7 +20,7 @@
     "conventional-changelog-conventionalcommits": "^4.6.3",
     "eslint": "^8.24.0",
     "eslint-config-custom": "*",
-    "husky": "^7.0.4",
+    "husky": "^8.0.1",
     "lerna": "^4.0.0",
     "prettier": "^2.6.0",
     "pretty-quick": "^3.1.3",
@@ -33,6 +33,7 @@
     "build": "turbo build --concurrency=${TURBO_CONCURRENCY:-2}",
     "test": "turbo test --concurrency=${TURBO_CONCURRENCY:-2}",
     "clean": "turbo clean",
+    "lint": "turbo lint",
     "lint-fix": "eslint . --ext .ts",
     "bump": "lerna version",
     "bump:next": "lerna version --conventional-prerelease --preid next  --no-changelog",
@@ -42,10 +43,10 @@
     "release": "lerna publish from-package",
     "prerelease": "npx rimraf packages/*/dist && turbo run build test --concurrency=${TURBO_CONCURRENCY:-2}",
     "release:next": "lerna publish from-package --dist-tag next",
-    "prepare": "husky install",
     "version": "./scripts/version-info.sh",
     "lerna": "lerna",
     "nuke": "rm -r node_modules; for d in packages/*/node_modules; do echo $d; rm -r $d; done",
-    "yalc:all": "for d in packages/*/; do echo $d; cd $d; yalc push --replace; cd '../../'; done"
+    "yalc:all": "for d in packages/*/; do echo $d; cd $d; yalc push --replace; cd '../../'; done",
+    "prepare": "husky install"
   }
 }
