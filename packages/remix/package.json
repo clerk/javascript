@@ -29,7 +29,8 @@
     "prepublishOnly": "npm run build",
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsc -p tsconfig.build.json --watch",
-    "clean": "rimraf ./dist"
+    "clean": "rimraf ./dist",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@clerk/clerk-react": "^4.2.6",

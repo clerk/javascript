@@ -34,7 +34,8 @@
   },
   "scripts": {
     "build": "node ./scripts/info.cjs && tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && ./moduleTypeFix",
-    "clean": "rimraf ./dist"
+    "clean": "rimraf ./dist",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@clerk/backend-core": "^2.8.1",

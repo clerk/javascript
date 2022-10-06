@@ -30,6 +30,7 @@
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "dev": "webpack serve --config webpack.dev.js",
     "clean": "rimraf ./dist",
+    "lint": "eslint .",
     "prepublishOnly": "npm run build",
     "postpublish": "node ./scripts/purge-cache.mjs",
     "start": "echo \"Noop\"",
