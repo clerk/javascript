@@ -57,15 +57,17 @@ export const TabsList = (props: TabsListProps) => {
   );
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    const tabCount = Object.keys(childrenWithProps).length;
+    const tabs = childrenWithProps.filter(child => !child.props?.isDisabled).map(child => child.props.tabIndex);
+    const tabsLenth = tabs.length;
+    const current = tabs.indexOf(selectedIndex);
 
     if (e.key === 'ArrowLeft') {
-      const prev = selectedIndex === 0 ? tabCount - 1 : selectedIndex - 1;
+      const prev = current === 0 ? tabs[tabsLenth - 1] : tabs[current - 1];
       setFocusedIndex(prev);
       return setSelectedIndex(prev);
     }
     if (e.key === 'ArrowRight') {
-      const next = tabCount - 1 === selectedIndex ? 0 : selectedIndex + 1;
+      const next = tabsLenth - 1 === current ? tabs[0] : tabs[current + 1];
       setFocusedIndex(next);
       return setSelectedIndex(next);
     }
@@ -88,7 +90,7 @@ export const TabsList = (props: TabsListProps) => {
 type TabProps = React.PropsWithChildren<any>;
 type TabPropsWithTabIndex = TabProps & { tabIndex?: number };
 export const Tab = (props: TabProps) => {
-  const { children, tabIndex } = props as TabPropsWithTabIndex;
+  const { children, tabIndex, isDisabled } = props as TabPropsWithTabIndex;
 
   if (tabIndex === undefined) {
     throw new Error('Tab component must be a direct child of TabList.');
@@ -105,6 +107,12 @@ export const Tab = (props: TabProps) => {
   };
 
   React.useEffect(() => {
+    if (isDisabled && tabIndex === 0) {
+      setSelectedIndex((tabIndex as number) + 1);
+    }
+  }, []);
+
+  React.useEffect(() => {
     if (ref && isFocused) {
       ref.current.focus();
     }
@@ -118,6 +126,7 @@ export const Tab = (props: TabProps) => {
       <Button
         onClick={onClick}
         focusRing={isFocused}
+        isDisabled={isDisabled}
         variant='ghost'
         aria-selected={isActive}
         id={`tab-${tabIndex}`}
