@@ -2,8 +2,8 @@ import { BackupCodeResource } from '@clerk/types';
 import React from 'react';
 
 import { useCoreUser } from '../contexts';
-import { localizationKeys, Spinner, Text } from '../customizables';
-import { useCardState } from '../elements';
+import { localizationKeys, Text } from '../customizables';
+import { FullHeightLoader, useCardState } from '../elements';
 import { handleError } from '../utils';
 import { FormButtonContainer } from './FormButtons';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
@@ -34,34 +34,31 @@ export const MfaBackupCodeCreatePage = () => {
     return <ContentPage.Root headerTitle={title} />;
   }
 
-  if (!backupCode) {
-    return (
-      <Spinner
-        colorScheme='primary'
-        size='lg'
-      />
-    );
-  }
-
   return (
     <ContentPage.Root headerTitle={title}>
-      <Text
-        localizationKey={text}
-        variant='regularRegular'
-      />
+      {!backupCode ? (
+        <FullHeightLoader />
+      ) : (
+        <>
+          <Text
+            localizationKey={text}
+            variant='regularRegular'
+          />
 
-      <MfaBackupCodeList
-        subtitle={'Store them securely and keep them secret.'}
-        backupCodes={backupCode.codes}
-      />
+          <MfaBackupCodeList
+            subtitle={'Store them securely and keep them secret.'}
+            backupCodes={backupCode.codes}
+          />
 
-      <FormButtonContainer>
-        <NavigateToFlowStartButton
-          variant='solid'
-          autoFocus
-          localizationKey={localizationKeys('userProfile.formButtonPrimary__finish')}
-        />
-      </FormButtonContainer>
+          <FormButtonContainer>
+            <NavigateToFlowStartButton
+              variant='solid'
+              autoFocus
+              localizationKey={localizationKeys('userProfile.formButtonPrimary__finish')}
+            />
+          </FormButtonContainer>
+        </>
+      )}
     </ContentPage.Root>
   );
 };

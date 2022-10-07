@@ -3,8 +3,8 @@ import { QRCodeSVG } from 'qrcode.react';
 import React from 'react';
 
 import { useCoreUser } from '../contexts';
-import { Button, Col, Spinner, Text } from '../customizables';
-import { ClipboardInput, useCardState } from '../elements';
+import { Button, Col, Text } from '../customizables';
+import { ClipboardInput, FullHeightLoader, useCardState } from '../elements';
 import { handleError } from '../utils';
 import { FormButtonContainer } from './FormButtons';
 import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
@@ -39,12 +39,7 @@ export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
 
   return (
     <ContentPage.Root headerTitle={title}>
-      {!totp && (
-        <Spinner
-          colorScheme='primary'
-          size='lg'
-        />
-      )}
+      {!totp && <FullHeightLoader />}
 
       {totp && (
         <>
