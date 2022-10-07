@@ -8,7 +8,7 @@ import { SuccessPage } from './SuccessPage';
 import { VerifyTOTP } from './VerifyTOTP';
 
 export const MfaTOTPPage = withCardStateProvider(() => {
-  const title = 'Add authenticator app';
+  const title = 'Add authenticator application';
   const wizard = useWizard();
   const ref = React.useRef<TOTPResource>();
 

@@ -14,7 +14,7 @@ import { SuccessPage } from './SuccessPage';
 import { AddBlockButton } from './UserProfileBlockButtons';
 
 export const MfaPhoneCodePage = withCardStateProvider(() => {
-  const title = 'Add two-step verification';
+  const title = 'Add SMS code verification';
 
   const ref = React.useRef<PhoneNumberResource>();
   const wizard = useWizard({ defaultStep: 2 });
@@ -85,8 +85,8 @@ const AddMfa = (props: AddMfaProps) => {
     <ContentPage.Root headerTitle={title}>
       <Text>
         {availableMethods.length
-          ? 'Select a phone number to register for SMS code two-step authentication.'
-          : 'There are no available phone numbers to register for SMS code two-step authentication.'}
+          ? 'Select a phone number to register for SMS code two-step verification.'
+          : 'There are no available phone numbers to register for SMS code two-step verification.'}
       </Text>
       <Col gap={2}>
         {availableMethods.map(phone => {

@@ -14,7 +14,7 @@ export const MfaBackupCodePage = withCardStateProvider(() => {
   return (
     <Wizard {...wizard.props}>
       <AddBackupCode
-        title={'Add multi-factor authentication'}
+        title='Add backup code verification'
         onContinue={wizard.nextStep}
       />
 
