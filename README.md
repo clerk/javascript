@@ -1,6 +1,9 @@
 <p align="center">
   <a href="https://clerk.dev/" target="_blank" align="center">
-    <img src="./docs/clerk-logo.png" height="64">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="./docs/clerk-logo-dark.png">
+      <img src="./docs/clerk-logo-light.png" height="64">
+    </picture>
   </a>
   <br />
 </p>
@@ -17,7 +20,7 @@ This repository contains all the Clerk JavaScript SDKs under the `@clerk/` names
 
 **Clerk is Hiring!**
 
-Would you like to work on Open Source software and help maintain this repository? Apply today https://apply.workable.com/clerk-dev/.
+Would you like to work on Open Source software and help maintain this repository? [Apply today!](https://apply.workable.com/clerk-dev/).
 
 ---
 
