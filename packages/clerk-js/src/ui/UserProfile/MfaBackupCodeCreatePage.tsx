@@ -15,7 +15,7 @@ export const MfaBackupCodeCreatePage = () => {
   const card = useCardState();
   const [backupCode, setBackupCode] = React.useState<BackupCodeResource | undefined>(undefined);
 
-  const title = 'Add multi-factor authentication';
+  const title = 'Add backup code verification';
   const text =
     'Backup codes are now enabled. You can use one of these to sign in to your account, if you lose access to your authentication device. Each code can only be used once.';
 
