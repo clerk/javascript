@@ -1,7 +1,7 @@
 import { isRetinaDisplay } from '@clerk/shared/utils/isRetinaDisplay';
 import React from 'react';
 
-import { default as BoringAvatar } from '../common/BoringAvatar';
+import { BoringAvatar } from '../common/BoringAvatar';
 import { descriptors, Flex, Image, Text, useAppearance } from '../customizables';
 import { ElementDescriptor } from '../customizables/elementDescriptors';
 import { InternalTheme } from '../foundations';
@@ -89,6 +89,8 @@ export const Avatar = (props: AvatarProps) => {
   );
 };
 
+const avatarColors = ['#6C47FF', '#5BC5EF', '#FBD486', '#BEF972', '#FF8F8F'];
+
 function InitialsAvatarFallback(props: AvatarProps) {
   const initials = getInitials(props);
   const { parsedInternalTheme } = useAppearance();
@@ -102,7 +104,7 @@ function InitialsAvatarFallback(props: AvatarProps) {
       <BoringAvatar
         size={Number(props.size?.(parsedInternalTheme))}
         name={`${props.firstName} ${props.lastName}`}
-        colors={['#CEEBD1', '#B6DEB9', '#B1CCB4', '#AEBFAF', '#A6ADA7']}
+        colors={avatarColors}
       />
       {initials && (
         <Text

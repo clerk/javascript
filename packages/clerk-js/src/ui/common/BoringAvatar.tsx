@@ -128,7 +128,7 @@ const AvatarMarble = props => {
   );
 };
 
-const Avatar = ({
+export const BoringAvatar = ({
   colors = ['#92A1C6', '#146A7C', '#F0AB3D', '#C271B4', '#C20D90'],
   name = 'Clara Barton',
   square = false,
@@ -140,5 +140,3 @@ const Avatar = ({
 
   return <AvatarMarble {...avatarProps} />;
 };
-
-export default Avatar;
