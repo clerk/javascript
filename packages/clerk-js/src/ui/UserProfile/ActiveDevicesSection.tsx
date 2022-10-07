@@ -3,7 +3,8 @@ import { SessionWithActivitiesResource } from '@clerk/types';
 import React from 'react';
 
 import { useCoreSession, useCoreUser } from '../contexts';
-import { Badge, Col, descriptors, Flex, Icon, localizationKeys, Spinner, Text } from '../customizables';
+import { Badge, Col, descriptors, Flex, Icon, localizationKeys, Text } from '../customizables';
+import { FullHeightLoader } from '../elements';
 import { DeviceLaptop, DeviceMobile } from '../icons';
 import { mqu } from '../styledSystem';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
@@ -25,12 +26,7 @@ export const ActiveDevicesSection = () => {
       title={localizationKeys('userProfile.start.activeDevicesSection.title')}
       id='activeDevices'
     >
-      {!sessionsWithActivities.length && (
-        <Spinner
-          colorScheme='primary'
-          size='lg'
-        />
-      )}
+      {!sessionsWithActivities.length && <FullHeightLoader />}
       {!!sessionsWithActivities.length &&
         sessionsWithActivities.sort(currentSessionFirst(session?.id)).map(sa => (
           <DeviceAccordion
