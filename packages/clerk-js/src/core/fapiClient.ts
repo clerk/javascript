@@ -1,4 +1,4 @@
-import { camelToSnake } from '@clerk/common';
+import { camelToSnake } from '@clerk/shared';
 import type { Clerk, ClerkAPIErrorJSON, ClientJSON } from '@clerk/types';
 import qs from 'qs';
 

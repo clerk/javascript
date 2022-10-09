@@ -1,14 +1,19 @@
 {
   "compilerOptions": {
-    "baseUrl": "./",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "importHelpers": true,
-    "jsx": "react",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "module": "es2020",
+    "isolatedModules": true,
     "moduleResolution": "node",
+    "preserveWatchOutput": true,
+    "skipLibCheck": true,
     "strict": true,
-    "target": "ES2017"
-  }
+    "emitDeclarationOnly": true,
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "dist",
+    "resolveJsonModule": true,
+    "declarationDir": "dist/types"
+  },
+  "exclude": ["node_modules"],
+  "include": ["src/index.ts", "src/testUtils/index.ts", "global.d.ts"]
 }

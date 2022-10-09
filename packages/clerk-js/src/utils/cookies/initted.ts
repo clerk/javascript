@@ -1,4 +1,4 @@
-import { createCookieHandler } from '@clerk/common';
+import { createCookieHandler } from '@clerk/shared';
 
 const INITTED_COOKIE_NAME = '__initted';
 

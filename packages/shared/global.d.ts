@@ -1,5 +1,6 @@
-declare namespace NodeJS {
-  interface Process {
-    browser: boolean;
-  }
+export {};
+
+declare global {
+  const PACKAGE_VERSION: string;
+  const __DEV__: boolean;
 }

@@ -1,4 +1,4 @@
-import { formatRelative } from '@clerk/common';
+import { formatRelative } from '@clerk/shared';
 import { SessionWithActivitiesResource } from '@clerk/types';
 import React from 'react';
 

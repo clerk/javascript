@@ -1,4 +1,4 @@
-import { camelToSnake } from '@clerk/common';
+import { camelToSnake } from '@clerk/shared';
 import type { DisplayConfigResource } from '@clerk/types';
 import type { ParsedQs } from 'qs';
 import qs from 'qs';

@@ -1,4 +1,4 @@
-import { deepSnakeToCamel } from '@clerk/common';
+import { deepSnakeToCamel } from '@clerk/shared';
 import type { ActJWTClaim, PublicUserData, SessionJSON, SessionResource, SessionStatus } from '@clerk/types';
 import { GetToken, GetTokenOptions, UserResource } from '@clerk/types/src';
 

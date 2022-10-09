@@ -1,4 +1,4 @@
-import { render, screen } from '@clerk/common/testUtils';
+import { render, screen } from '@clerk/shared/testUtils';
 import { EnvironmentResource } from '@clerk/types';
 import React from 'react';
 

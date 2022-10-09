@@ -1,4 +1,4 @@
-import { isRetinaDisplay } from '@clerk/common';
+import { isRetinaDisplay } from '@clerk/shared';
 import React from 'react';
 
 import { BoringAvatar } from '../common/BoringAvatar';

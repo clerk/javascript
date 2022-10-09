@@ -1,5 +1,5 @@
-import { deepSnakeToCamel } from '@clerk/common';
-import { Poller } from '@clerk/common';
+import { deepSnakeToCamel } from '@clerk/shared';
+import { Poller } from '@clerk/shared';
 import type {
   AttemptFirstFactorParams,
   AttemptSecondFactorParams,

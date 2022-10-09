@@ -1,4 +1,4 @@
-import { Poller } from '@clerk/common';
+import { Poller } from '@clerk/shared';
 import type {
   AttemptEmailAddressVerificationParams,
   CreateMagicLinkFlowReturn,

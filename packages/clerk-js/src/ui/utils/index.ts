@@ -3,7 +3,6 @@ export * from './containsAllOf';
 export * from './createContextAndHook';
 export * from './createInfiniteAccessProxy';
 export * from './fastDeepMerge';
-export * from './colorTransformations';
 export * from './colors';
 export * from './factorSorting';
 export * from './sleep';
