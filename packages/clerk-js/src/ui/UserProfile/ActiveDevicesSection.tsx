@@ -1,4 +1,4 @@
-import { formatRelative } from '@clerk/shared/utils/date';
+import { formatRelative } from '@clerk/common';
 import { SessionWithActivitiesResource } from '@clerk/types';
 import React from 'react';
 

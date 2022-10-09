@@ -1,4 +1,4 @@
-import { inClientSide } from '@clerk/shared/utils/ssr';
+import { inClientSide } from '@clerk/common';
 
 const noop = () => {
   //

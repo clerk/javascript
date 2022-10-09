@@ -1,4 +1,4 @@
-import { noop } from '@clerk/shared/utils';
+import { noop } from '@clerk/common';
 
 export const useRouter = () => ({
   resolve: jest.fn(() => ({

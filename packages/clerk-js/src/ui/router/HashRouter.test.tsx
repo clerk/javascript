@@ -1,4 +1,4 @@
-import { act, render, screen, userEvent } from '@clerk/shared/testUtils';
+import { act, render, screen, userEvent } from '@clerk/common/testUtils';
 import React from 'react';
 
 import Clerk from '../../core/clerk';

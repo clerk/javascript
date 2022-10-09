@@ -1,4 +1,4 @@
-import { camelToSnake, isIPV4Address } from '@clerk/shared/utils/string';
+import { camelToSnake, isIPV4Address } from '@clerk/common';
 import { SignUpResource } from '@clerk/types';
 
 import { loadScript } from '../utils';

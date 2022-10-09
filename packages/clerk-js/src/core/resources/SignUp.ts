@@ -1,4 +1,4 @@
-import { Poller } from '@clerk/shared/utils/poller';
+import { Poller } from '@clerk/common';
 import type {
   AttemptEmailAddressVerificationParams,
   AttemptPhoneNumberVerificationParams,

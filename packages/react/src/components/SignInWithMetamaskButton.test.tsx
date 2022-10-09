@@ -1,6 +1,6 @@
 /* eslint-disable react/display-name */
 
-import { render, screen, userEvent, waitFor } from '@clerk/shared/utils/testUtils';
+import { render, screen, userEvent, waitFor } from '@clerk/common/testUtils';
 import React from 'react';
 
 import { SignInWithMetamaskButton } from './SignInWithMetamaskButton';

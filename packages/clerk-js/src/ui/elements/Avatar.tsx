@@ -1,4 +1,4 @@
-import { isRetinaDisplay } from '@clerk/shared/utils/isRetinaDisplay';
+import { isRetinaDisplay } from '@clerk/common';
 import React from 'react';
 
 import { descriptors, Flex, Image, Text } from '../customizables';

@@ -1,4 +1,4 @@
-import { createCookieHandler } from '@clerk/shared/utils';
+import { createCookieHandler } from '@clerk/common';
 
 const SESSION_COOKIE_NAME = '__session';
 

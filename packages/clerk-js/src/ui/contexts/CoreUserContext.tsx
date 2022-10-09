@@ -1,5 +1,5 @@
 import { UserResource } from '@clerk/types';
-import * as React from 'react';
+import React from 'react';
 
 import { clerkCoreErrorUserIsNotDefined } from '../../core/errors';
 import { assertContextExists } from './utils';

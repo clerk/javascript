@@ -1,4 +1,4 @@
-import { render, screen } from '@clerk/shared/testUtils';
+import { render, screen } from '@clerk/common/testUtils';
 import React from 'react';
 import { HashRouter, Route, Switch } from 'ui/router';
 
