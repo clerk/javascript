@@ -12,7 +12,7 @@ export type RootAuthLoaderOptions = {
   authorizedParties?: [];
 };
 
-export type RootAuthLoaderCallback<Options> = (
+export type RootAuthLoaderCallback<Options extends RootAuthLoaderOptions> = (
   args: LoaderFunctionArgsWithAuth<Options>,
 ) => RootAuthLoaderCallbackReturn;
 

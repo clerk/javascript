@@ -24,7 +24,7 @@ export function withMaxAllowedInstancesGuard<P>(
   const displayName = WrappedComponent.displayName || WrappedComponent.name || name || 'Component';
   const Hoc = (props: P) => {
     useMaxAllowedInstancesGuard(name, error);
-    return <WrappedComponent {...props} />;
+    return <WrappedComponent {...(props as any)} />;
   };
   Hoc.displayName = `withMaxAllowedInstancesGuard(${displayName})`;
   return Hoc;

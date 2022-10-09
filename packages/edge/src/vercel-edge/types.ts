@@ -10,12 +10,12 @@ export type WithEdgeMiddlewareAuthOptions = {
   strict?: boolean;
 };
 
-export type WithEdgeMiddlewareAuthCallback<Return, Options> = (
+export type WithEdgeMiddlewareAuthCallback<Return, Options extends WithEdgeMiddlewareAuthOptions> = (
   req: RequestWithAuth<Options>,
   event: NextFetchEvent,
 ) => Return;
 
-export type WithEdgeMiddlewareAuthMiddlewareResult<CallbackReturn, Options> = (
+export type WithEdgeMiddlewareAuthMiddlewareResult<CallbackReturn, Options extends WithEdgeMiddlewareAuthOptions> = (
   req: RequestWithAuth<Options>,
   event: NextFetchEvent,
 ) => Promise<Awaited<CallbackReturn>>;
@@ -30,7 +30,7 @@ export type RequestWithAuth<Options extends WithEdgeMiddlewareAuthOptions = any>
 type NextMiddlewareReturnOptions = NextResponse | Response | null | undefined;
 export type NextMiddlewareResult = NextMiddlewareReturnOptions;
 
-export type WithAuthNextMiddlewareHandler<Options> = (
+export type WithAuthNextMiddlewareHandler<Options extends WithEdgeMiddlewareAuthOptions> = (
   req: RequestWithAuth<Options>,
   event: NextFetchEvent,
 ) => NextMiddlewareResult | Promise<NextMiddlewareResult>;

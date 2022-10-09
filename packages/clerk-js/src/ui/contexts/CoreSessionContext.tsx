@@ -31,7 +31,7 @@ export function withCoreSessionSwitchGuard<P>(Component: React.ComponentType<P>)
     if (context.value === undefined) {
       return null;
     }
-    return <Component {...props} />;
+    return <Component {...(props as any)} />;
   };
 
   const displayName = Component.displayName || Component.name || 'Component';

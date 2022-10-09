@@ -25,7 +25,7 @@ export function withCoreUserGuard<P>(Component: React.ComponentType<P>): React.C
     if (!user) {
       return null;
     }
-    return <Component {...props} />;
+    return <Component {...(props as any)} />;
   };
 
   const displayName = Component.displayName || Component.name || 'Component';

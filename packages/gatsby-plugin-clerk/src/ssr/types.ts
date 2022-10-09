@@ -9,7 +9,9 @@ export type GetServerDataPropsWithAuth<Options extends WithServerAuthOptions = a
 } & (Options extends { loadSession: true } ? { session: Session | null } : {}) &
   (Options extends { loadUser: true } ? { user: User | null } : {});
 
-export type WithServerAuthCallback<Return, Options> = (props: GetServerDataPropsWithAuth<Options>) => Return;
+export type WithServerAuthCallback<Return, Options extends WithServerAuthOptions> = (
+  props: GetServerDataPropsWithAuth<Options>,
+) => Return;
 
 export type WithServerAuthOptions = {
   loadUser?: boolean;
