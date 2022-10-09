@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@clerk/types": "^3.10.1",
-    "typescript": "^4.6.4"
+    "typescript": "*"
   },
   "peerDependencies": {
     "react": ">=16"

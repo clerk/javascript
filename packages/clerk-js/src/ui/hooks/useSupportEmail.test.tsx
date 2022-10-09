@@ -1,4 +1,4 @@
-import { renderHook } from '@clerk/common/testUtils';
+import { renderHook } from '@clerk/shared/testUtils';
 
 import { useSupportEmail } from './useSupportEmail';
 

@@ -13,7 +13,9 @@ export type WithServerSideAuthOptions = {
   authorizedParties?: string[];
 };
 
-export type WithServerSideAuthCallback<Return, Options> = (context: ContextWithAuth<Options>) => Return;
+export type WithServerSideAuthCallback<Return, Options extends WithServerSideAuthOptions> = (
+  context: ContextWithAuth<Options>,
+) => Return;
 
 export type WithServerSideAuthResult<CallbackReturn> = (
   context: GetServerSidePropsContext,
