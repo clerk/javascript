@@ -1,4 +1,4 @@
-import { render, screen, userEvent, waitFor } from '@clerk/common/testUtils';
+import { render, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
 import React from 'react';
 
 import { SignInButton } from './SignInButton';

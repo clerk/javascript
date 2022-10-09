@@ -1,4 +1,4 @@
-import { inClientSide, LocalStorageBroadcastChannel, noop } from '@clerk/common';
+import { inClientSide, LocalStorageBroadcastChannel, noop } from '@clerk/shared';
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,

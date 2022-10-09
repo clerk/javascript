@@ -1,4 +1,4 @@
-import { createCookieHandler } from '@clerk/common';
+import { createCookieHandler } from '@clerk/shared';
 
 const CLIENT_UAT_COOKIE_NAME = '__client_uat';
 

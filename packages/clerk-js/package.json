@@ -39,7 +39,7 @@
   },
   "dependencies": {
     "@clerk/types": "^3.10.1",
-    "@clerk/common": "^0.0.1",
+    "@clerk/shared": "^0.0.1",
     "@emotion/cache": "^11.7.1",
     "@emotion/react": "^11.9.0",
     "@floating-ui/react-dom-interactions": "^0.6.3",

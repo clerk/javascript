@@ -1,4 +1,4 @@
-import { camelToSnake } from '@clerk/common';
+import { camelToSnake } from '@clerk/shared';
 import type { Attributes, SignUpResource } from '@clerk/types';
 import { UserSettingsResource } from '@clerk/types';
 

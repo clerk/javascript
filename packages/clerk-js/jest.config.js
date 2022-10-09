@@ -28,7 +28,6 @@ module.exports = {
   // using ts-jest
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
-    '^.+\\.svg$': '<rootDir>../shared/utils/svgTransform.js',
   },
 
   // For mocking fetch
