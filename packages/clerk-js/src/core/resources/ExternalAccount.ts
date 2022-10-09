@@ -1,4 +1,4 @@
-import { titleize } from '@clerk/shared/utils/string';
+import { titleize } from '@clerk/common';
 import type { ExternalAccountJSON, ExternalAccountResource, OAuthProvider, VerificationResource } from '@clerk/types';
 
 import { BaseResource } from './Base';

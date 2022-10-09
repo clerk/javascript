@@ -1,4 +1,4 @@
-import { noop } from '@clerk/shared/testUtils';
+import { noop } from '@clerk/common/testUtils';
 
 import { ignoreEventValue } from './ignoreEventValue';
 

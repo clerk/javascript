@@ -1,4 +1,4 @@
-import { render } from '@clerk/shared/testUtils';
+import { render } from '@clerk/common/testUtils';
 import React from 'react';
 
 import { useMaxAllowedInstancesGuard, withMaxAllowedInstancesGuard } from './useMaxAllowedInstancesGuard';

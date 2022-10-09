@@ -1,4 +1,4 @@
-import { addYears } from '@clerk/shared/utils/date';
+import { addYears } from '@clerk/common';
 import type { ClientResource } from '@clerk/types';
 
 import { buildURL, getAllETLDs } from '../url';

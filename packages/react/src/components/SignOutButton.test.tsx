@@ -1,4 +1,4 @@
-import { render, screen, userEvent, waitFor } from '@clerk/shared/utils/testUtils';
+import { render, screen, userEvent, waitFor } from '@clerk/common/testUtils';
 import React from 'react';
 
 import { SignOutButton } from './SignOutButton';

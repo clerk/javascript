@@ -1,4 +1,3 @@
-// import { Modal } from '@clerk/shared/components/modal';
 import type { Appearance, Clerk, ClerkOptions, EnvironmentResource, SignInProps, SignUpProps } from '@clerk/types';
 import { UserProfileProps } from '@clerk/types/src';
 import React from 'react';
