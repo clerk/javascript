@@ -1,19 +1,19 @@
-import { renderHook } from '@clerk/shared/testUtils';
+import { renderHook } from '@clerk/common/testUtils';
+
+import { useSupportEmail } from './useSupportEmail';
 
 const mockUseOptions = jest.fn();
 const mockUseEnvironment = jest.fn();
 
-import { useSupportEmail } from './useSupportEmail';
-
-jest.mock('ui/contexts', () => {
+jest.mock('../contexts', () => {
   return {
     useCoreClerk: () => {
       return {
         frontendApi: 'clerk.clerk.dev',
       };
     },
-    useEnvironment: mockUseEnvironment,
-    useOptions: mockUseOptions,
+    useEnvironment: () => mockUseEnvironment(),
+    useOptions: () => mockUseOptions(),
   };
 });
 
