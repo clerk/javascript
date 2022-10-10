@@ -9,7 +9,8 @@ type UsePaginationProps = {
 };
 
 export const usePagination = (props?: UsePaginationProps) => {
-  const [page, setPage] = useState(props?.defaultPage || 1);
+  const { defaultPage = 1 } = props || {};
+  const [page, setPage] = useState(defaultPage);
 
   return { page, changePage: setPage };
 };
@@ -79,18 +80,6 @@ const RowInformation = (props: RowInfoProps) => {
   );
 };
 
-type PaginationProps = {
-  page: number;
-  count: number;
-  rowInfo?: {
-    startingRow: number;
-    endingRow: number;
-    allRowsCount: number;
-  };
-  siblingCount?: number;
-  onChange?: (page: number) => void;
-};
-
 const shouldShowPageButton = (currentPage: number, pageToShow: number, siblingCount: number, pageCount: number) => {
   if (Math.abs(currentPage - pageToShow) < siblingCount || pageToShow === pageCount || pageToShow === 1) {
     return true;
@@ -116,6 +105,18 @@ const ThreeDots = () => (
     </Text>
   </Flex>
 );
+
+type PaginationProps = {
+  page: number;
+  count: number;
+  rowInfo?: {
+    startingRow: number;
+    endingRow: number;
+    allRowsCount: number;
+  };
+  siblingCount?: number;
+  onChange?: (page: number) => void;
+};
 
 export const Pagination = (props: PaginationProps) => {
   const { page, count, rowInfo, siblingCount = 2, onChange } = props;
