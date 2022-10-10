@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useEnvironment } from '../contexts';
 import { Col, descriptors, localizationKeys } from '../customizables';
-import { Header } from '../elements';
+import { Header, Tab, TabPanel, TabPanels, Tabs, TabsList } from '../elements';
 import { ActiveDevicesSection } from './ActiveDevicesSection';
 import { ConnectedAccountsSection } from './ConnectedAccountsSection';
 import { EmailsSection } from './EmailSection';
@@ -44,6 +44,20 @@ export const RootPage = () => {
           <Header.Subtitle localizationKey={localizationKeys('userProfile.start.headerSubtitle__account')} />
         </Header.Root>
         <UserProfileSection />
+
+        <Tabs>
+          <TabsList>
+            <Tab>Active</Tab>
+            <Tab>Invited</Tab>
+            <Tab>Danger</Tab>
+          </TabsList>
+          <TabPanels>
+            <TabPanel>section 1</TabPanel>
+            <TabPanel>section 2</TabPanel>
+            <TabPanel>section 3</TabPanel>
+          </TabPanels>
+        </Tabs>
+
         {showUsername && <UsernameSection />}
         {showEmail && <EmailsSection />}
         {showPhone && <PhoneSection />}

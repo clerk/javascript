@@ -1,10 +1,7 @@
 import React from 'react';
 
-import * as Primitives from '../../ui/primitives';
-import { Button, Flex } from '../customizables';
+import { Button, Col, Flex } from '../customizables';
 import { createContextAndHook, getValidChildren } from '../utils';
-
-const { Box } = Primitives;
 
 type TabsContextValue = {
   selectedIndex: number;
@@ -26,17 +23,17 @@ export const TabsContextProvider = (props: React.PropsWithChildren<{ value: Tabs
  */
 type TabsProps = {
   children: React.ReactNode;
-  defaultIndex?: number | null;
+  defaultIndex?: number;
 };
 
 export const Tabs = ({ children, ...props }: TabsProps) => {
-  const { defaultIndex = null } = props;
-  const [selectedIndex, setSelectedIndex] = React.useState(defaultIndex ?? 0);
-  const [focusedIndex, setFocusedIndex] = React.useState(defaultIndex ?? 0);
+  const { defaultIndex = 0 } = props;
+  const [selectedIndex, setSelectedIndex] = React.useState(defaultIndex);
+  const [focusedIndex, setFocusedIndex] = React.useState(defaultIndex);
 
   return (
     <TabsContextProvider value={{ selectedIndex, setSelectedIndex, focusedIndex, setFocusedIndex }}>
-      <Box>{children}</Box>
+      <Col>{children}</Col>
     </TabsContextProvider>
   );
 };
@@ -49,9 +46,8 @@ export const TabsList = (props: TabsListProps) => {
   const { children } = props;
   const { setSelectedIndex, selectedIndex, setFocusedIndex } = useTabsContext();
 
-  const validChildren = getValidChildren(children);
-  const childrenWithProps = validChildren.map((child, index) =>
-    React.cloneElement(child as React.ReactElement<React.PropsWithChildren<any>>, {
+  const childrenWithProps = getValidChildren(children).map((child, index) =>
+    React.cloneElement(child, {
       tabIndex: index,
     }),
   );
@@ -76,7 +72,6 @@ export const TabsList = (props: TabsListProps) => {
   return (
     <Flex
       onKeyDown={onKeyDown}
-      direction='row'
       sx={theme => ({ borderBottom: theme.borders.$normal, borderColor: theme.colors.$blackAlpha300 })}
     >
       {childrenWithProps}
@@ -97,7 +92,7 @@ export const Tab = (props: TabProps) => {
   }
 
   const { setSelectedIndex, selectedIndex, focusedIndex, setFocusedIndex } = useTabsContext();
-  const ref = React.useRef<HTMLButtonElement | any>(null);
+  const buttonRef = React.useRef<HTMLButtonElement | any>(null);
   const isActive = tabIndex === selectedIndex;
   const isFocused = tabIndex === focusedIndex;
 
@@ -113,26 +108,23 @@ export const Tab = (props: TabProps) => {
   }, []);
 
   React.useEffect(() => {
-    if (ref && isFocused) {
-      ref.current.focus();
+    if (buttonRef.current && isFocused) {
+      buttonRef.current.focus();
     }
-  }, [ref, isFocused]);
+  }, [isFocused]);
 
   return (
-    <Flex
-      direction='row'
-      sx={{ position: 'relative' }}
-    >
+    <Flex sx={{ position: 'relative' }}>
       <Button
         onClick={onClick}
         focusRing={isFocused}
         isDisabled={isDisabled}
         variant='ghost'
         aria-selected={isActive}
-        id={`tab-${tabIndex}`}
-        aria-controls={`tabpanel-${tabIndex}`}
+        id={`cl-tab-${tabIndex}`}
+        aria-controls={`cl-tabpanel-${tabIndex}`}
         role='tab'
-        ref={ref}
+        ref={buttonRef}
         sx={t => ({
           background: t.colors.$transparent,
           color: isActive ? t.colors.$blackAlpha900 : t.colors.$blackAlpha700,
@@ -158,9 +150,8 @@ type TabPanelsProps = React.PropsWithChildren<any>;
 export const TabPanels = (props: TabPanelsProps) => {
   const { children } = props;
 
-  const validChildren = getValidChildren(children);
-  const childrenWithProps = validChildren.map((child, index) =>
-    React.cloneElement(child as React.ReactElement<React.PropsWithChildren<any>>, {
+  const childrenWithProps = getValidChildren(children).map((child, index) =>
+    React.cloneElement(child, {
       tabIndex: index,
     }),
   );
@@ -189,10 +180,10 @@ export const TabPanel = (props: TabPanelProps) => {
 
   return (
     <Flex
-      id={`tabpanel-${tabIndex}`}
+      id={`cl-tabpanel-${tabIndex}`}
       role='tabpanel'
       tabIndex={0}
-      aria-labelledby={`tab-${tabIndex}`}
+      aria-labelledby={`cl-tab-${tabIndex}`}
     >
       {children}
     </Flex>
