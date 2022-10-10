@@ -6,6 +6,10 @@ import ReactDOM from 'react-dom';
 
 import { PRESERVED_QUERYSTRING_PARAMS } from '../core/constants';
 import { clerkUIErrorDOMElementNotFound } from '../core/errors';
+import { SignIn, SignInModal } from './components/SignIn';
+import { SignUp, SignUpModal } from './components/SignUp';
+import { UserButton } from './components/UserButton';
+import { UserProfile, UserProfileModal } from './components/UserProfile';
 import { EnvironmentProvider, OptionsProvider } from './contexts';
 import { CoreClerkContextWrapper } from './contexts/CoreClerkContextWrapper';
 import { AppearanceProvider } from './customizables';
@@ -14,13 +18,9 @@ import { useSafeLayoutEffect } from './hooks';
 import { ImpersonationFab } from './ImpersonationFab';
 import Portal from './portal';
 import { VirtualRouter } from './router';
-import { SignIn, SignInModal } from './SignIn';
-import { SignUp, SignUpModal } from './SignUp';
 import { InternalThemeProvider } from './styledSystem';
 import type { AvailableComponentProps } from './types';
 import { AvailableComponentCtx } from './types';
-import { UserButton } from './UserButton';
-import { UserProfile, UserProfileModal } from './UserProfile';
 
 const ROOT_ELEMENT_ID = 'clerk-components';
 
