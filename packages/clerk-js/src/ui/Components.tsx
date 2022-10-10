@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom';
 
 import { PRESERVED_QUERYSTRING_PARAMS } from '../core/constants';
 import { clerkUIErrorDOMElementNotFound } from '../core/errors';
+import { OrganizationSwitcher } from './components/OrganizationSwitcher';
 import { SignIn, SignInModal } from './components/SignIn';
 import { SignUp, SignUpModal } from './components/SignUp';
 import { UserButton } from './components/UserButton';
@@ -56,8 +57,8 @@ const AvailableComponents = {
   SignUp,
   UserButton,
   UserProfile,
+  OrganizationSwitcher,
   OrganizationProfile: () => <div>hello from org profile</div>,
-  OrganizationSwitcher: () => <div>hello from org switcher</div>,
 };
 
 type AvailableComponentNames = keyof typeof AvailableComponents;
