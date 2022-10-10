@@ -425,10 +425,6 @@ export type UserProfileProps = {
    */
   path?: string;
   /*
-   * Hides the default navigation bar
-   */
-  hideNavigation?: boolean;
-  /*
    * Renders only a specific view of the component eg: 'security'
    */
   only?: 'account' | 'security';
