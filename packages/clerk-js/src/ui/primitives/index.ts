@@ -17,7 +17,6 @@ export * from './FormLabel';
 export * from './Form';
 export * from './Icon';
 export * from './Badge';
-export * from './TableContainer';
 export * from './Table';
 export * from './Thead';
 export * from './Tbody';

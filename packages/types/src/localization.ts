@@ -57,8 +57,8 @@ type _LocalizationResource = {
   footerPageLink__terms: LocalizationValue;
   paginationButton__previous: LocalizationValue;
   paginationButton__next: LocalizationValue;
-  paginationRowInfo__displaying: LocalizationValue;
-  paginationRowInfo__of: LocalizationValue;
+  paginationRowText__displaying: LocalizationValue;
+  paginationRowText__of: LocalizationValue;
   signUp: {
     start: {
       title: LocalizationValue;

@@ -1,11 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Button, Flex, localizationKeys, Text } from '../customizables';
 import { PropsOfComponent } from '../styledSystem';
 import { range } from '../utils';
 
-const PageButton = (props: PropsOfComponent<typeof Button>) => {
-  const { sx, ...rest } = props;
+type UsePaginationProps = {
+  defaultPage?: number;
+};
+
+export const usePagination = (props?: UsePaginationProps) => {
+  const [page, setPage] = useState(props?.defaultPage || 1);
+
+  return { page, changePage: setPage };
+};
+
+const PageButton = (props: PropsOfComponent<typeof Button> & { isActive?: boolean }) => {
+  const { sx, isActive, ...rest } = props;
 
   return (
     <Button
@@ -14,7 +24,7 @@ const PageButton = (props: PropsOfComponent<typeof Button>) => {
       colorScheme='neutral'
       sx={t => [
         {
-          color: t.colors.$blackAlpha700,
+          color: isActive ? t.colors.$black : t.colors.$blackAlpha700,
         },
         sx,
       ]}
@@ -45,7 +55,7 @@ const RowInformation = (props: RowInfoProps) => {
         sx={t => ({
           color: t.colors.$blackAlpha700,
         })}
-        localizationKey={localizationKeys('paginationRowInfo__displaying')}
+        localizationKey={localizationKeys('paginationRowText__displaying')}
       />{' '}
       <Text as='span'>
         {startingRow} - {endingRow}
@@ -55,7 +65,7 @@ const RowInformation = (props: RowInfoProps) => {
         sx={t => ({
           color: t.colors.$blackAlpha700,
         })}
-        localizationKey={localizationKeys('paginationRowInfo__of')}
+        localizationKey={localizationKeys('paginationRowText__of')}
       />{' '}
       <Text
         as='span'
@@ -80,6 +90,32 @@ type PaginationProps = {
   siblingCount?: number;
   onChange?: (page: number) => void;
 };
+
+const shouldShowPageButton = (currentPage: number, pageToShow: number, siblingCount: number, pageCount: number) => {
+  if (Math.abs(currentPage - pageToShow) < siblingCount || pageToShow === pageCount || pageToShow === 1) {
+    return true;
+  }
+  return false;
+};
+
+const shouldShowDots = (currentPage: number, pageToShow: number, siblingCount: number) => {
+  if (Math.abs(currentPage - pageToShow) === siblingCount) {
+    return true;
+  }
+  return false;
+};
+
+const ThreeDots = () => (
+  <Flex center>
+    <Text
+      sx={t => ({
+        color: t.colors.$blackAlpha500,
+      })}
+    >
+      ...
+    </Text>
+  </Flex>
+);
 
 export const Pagination = (props: PaginationProps) => {
   const { page, count, rowInfo, siblingCount = 2, onChange } = props;
@@ -106,11 +142,11 @@ export const Pagination = (props: PaginationProps) => {
           }}
         />
         {range(1, count).map(p => {
-          if (Math.abs(page - p) < siblingCount || p === count || p === 1) {
+          if (shouldShowPageButton(page, p, siblingCount, count)) {
             return (
               <PageButton
                 key={p}
-                sx={t => ({ color: page === p ? t.colors.$black : undefined })}
+                isActive={p === page}
                 onClick={() => {
                   onChange?.(p);
                 }}
@@ -120,21 +156,8 @@ export const Pagination = (props: PaginationProps) => {
             );
           }
 
-          if (Math.abs(page - p) === siblingCount) {
-            return (
-              <Flex
-                center
-                key={p}
-              >
-                <Text
-                  sx={t => ({
-                    color: t.colors.$blackAlpha500,
-                  })}
-                >
-                  ...
-                </Text>
-              </Flex>
-            );
+          if (shouldShowDots(page, p, siblingCount)) {
+            return <ThreeDots key={p} />;
           }
 
           return null;
