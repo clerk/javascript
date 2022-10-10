@@ -361,6 +361,12 @@ export type Variables = {
    * The background color for the card container.
    */
   colorBackground?: CssColor;
+
+  /*
+   * An array of colors to create the avatar gradient.
+   * This will take place when a user doesn't provide an avatar image.
+   */
+  colorAvatarGradient?: CssColor[];
   /**
    * The default text color inside input elements. To customise the input background color instead, use {@link Variables.colorInputBackground}.
    * @default The value of {@link Variables.colorText}

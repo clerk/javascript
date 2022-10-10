@@ -89,11 +89,13 @@ export const Avatar = (props: AvatarProps) => {
   );
 };
 
-const avatarColors = ['#6C47FF', '#5BC5EF', '#FBD486', '#BEF972', '#FF8F8F'];
+const defaultAvatarColors = ['#6C47FF', '#5BC5EF', '#FBD486', '#BEF972', '#FF8F8F'];
 
 function InitialsAvatarFallback(props: AvatarProps) {
   const initials = getInitials(props);
   const { parsedInternalTheme } = useAppearance();
+  const themeAvatarBackground = parsedInternalTheme.colors.$colorAvatarGradient;
+  const avatarColors = themeAvatarBackground.length ? themeAvatarBackground : defaultAvatarColors;
 
   return (
     <Flex
@@ -104,7 +106,7 @@ function InitialsAvatarFallback(props: AvatarProps) {
       <BoringAvatar
         size={Number(props.size?.(parsedInternalTheme))}
         name={`${props.firstName} ${props.lastName}`}
-        colors={avatarColors}
+        colors={avatarColors as string[]}
       />
       {initials && (
         <Text

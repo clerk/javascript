@@ -7,6 +7,7 @@ import { colorOptionToHslaAlphaScale, colorOptionToHslaLightnessScale } from './
 
 export const createColorScales = (theme: Theme) => {
   const variables = theme.variables || {};
+
   return removeUndefinedProps({
     ...colorOptionToHslaLightnessScale(variables.colorPrimary, 'primary'),
     ...colorOptionToHslaLightnessScale(variables.colorDanger, 'danger'),
@@ -19,6 +20,7 @@ export const createColorScales = (theme: Theme) => {
     colorInputText: toHSLA(variables.colorInputText),
     colorBackground: toHSLA(variables.colorBackground),
     colorInputBackground: toHSLA(variables.colorInputBackground),
+    colorAvatarGradient: (variables.colorAvatarGradient as string[])?.map(color => toHSLA(color)),
   });
 };
 
