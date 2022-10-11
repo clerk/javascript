@@ -66,8 +66,8 @@ const AvatarMarble = (props: AvatarProps) => {
       fill='none'
       role='img'
       xmlns='http://www.w3.org/2000/svg'
-      width={props.size}
-      height={props.size}
+      width={`${props.size}`}
+      height={`${props.size}`}
     >
       {props.title && <title>{props.name}</title>}
       <mask
@@ -138,7 +138,7 @@ const AvatarMarble = (props: AvatarProps) => {
 
 export const BoringAvatar = ({
   colors = ['#92A1C6', '#146A7C', '#F0AB3D', '#C271B4', '#C20D90'],
-  name = 'Clara Barton',
+  name = '',
   square = false,
   title = false,
   size = 40,

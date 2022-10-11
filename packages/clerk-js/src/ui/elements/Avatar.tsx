@@ -101,7 +101,6 @@ function InitialsAvatarFallback(props: AvatarProps) {
     >
       <BoringAvatar
         size={Number(props.size?.(parsedInternalTheme))}
-        name={`${props.firstName} ${props.lastName}`}
         colors={parsedInternalTheme.colors.$colorAvatarGradient}
       />
       {initials && (
