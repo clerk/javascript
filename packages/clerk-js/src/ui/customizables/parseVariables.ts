@@ -20,7 +20,7 @@ export const createColorScales = (theme: Theme) => {
     colorInputText: toHSLA(variables.colorInputText),
     colorBackground: toHSLA(variables.colorBackground),
     colorInputBackground: toHSLA(variables.colorInputBackground),
-    colorAvatarGradient: (variables.colorAvatarGradient as string[])?.map(color => toHSLA(color)),
+    colorAvatarGradient: variables.colorAvatarGradient?.length ? variables.colorAvatarGradient.map(toHSLA) : undefined,
   });
 };
 

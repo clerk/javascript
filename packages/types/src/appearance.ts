@@ -363,8 +363,9 @@ export type Variables = {
   colorBackground?: CssColor;
 
   /*
-   * An array of colors to create the avatar gradient.
-   * This will take place when a user doesn't provide an avatar image.
+   * If a user hasn't provided an avatar image, a colorful gradient avatar will be shown as fallback.
+   * To customise the gradient,pass an array of CSS colors.
+   * @default ['#6C47FF', '#5BC5EF', '#FBD486', '#BEF972', '#FF8F8F'];
    */
   colorAvatarGradient?: CssColor[];
   /**
