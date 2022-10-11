@@ -54,7 +54,7 @@ type AvatarProps = {
   name: string;
   square: boolean;
   title: boolean;
-  size: number;
+  size: number | string;
 };
 
 const AvatarMarble = (props: AvatarProps) => {
@@ -141,7 +141,7 @@ export const BoringAvatar = ({
   name = '',
   square = false,
   title = false,
-  size = 40,
+  size = '40px',
   ...props
 }) => {
   const avatarProps = { colors, name, title, size, square, ...props };
