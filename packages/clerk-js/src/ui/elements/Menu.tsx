@@ -2,12 +2,10 @@ import React, { PropsWithChildren, useEffect, useRef } from 'react';
 
 import { createContextAndHook } from '../../ui/utils';
 import { Button, Col } from '../customizables';
-import { usePopover } from '../hooks';
+import { usePopover, UsePopoverReturn } from '../hooks';
 import { animations, PropsOfComponent } from '../styledSystem';
 import { colors } from '../utils/colors';
 import { Portal } from './Portal';
-
-type UsePopoverReturn = ReturnType<typeof usePopover>;
 
 type MenuState = {
   popoverCtx: UsePopoverReturn;
@@ -23,9 +21,11 @@ export const Menu = (props: MenuProps) => {
     offset: 8,
   });
 
+  const value = React.useMemo(() => ({ value: { popoverCtx } }), [{ ...popoverCtx }]);
+
   return (
     <MenuStateCtx.Provider
-      value={{ value: { popoverCtx } }}
+      value={value}
       {...props}
     />
   );
@@ -49,7 +49,7 @@ export const MenuButton = (props: MenuButtonProps) => {
 const findMenuItem = (el: Element, siblingType: 'prev' | 'next', options?: { countSelf?: boolean }) => {
   let tagName = options?.countSelf ? el.tagName : '';
   let sibling: Element | null = el;
-  while (sibling && tagName !== 'BUTTON') {
+  while (sibling && tagName.toUpperCase() !== 'BUTTON') {
     sibling = sibling[siblingType === 'prev' ? 'previousElementSibling' : 'nextElementSibling'];
     tagName = sibling?.tagName ?? '';
   }
@@ -71,6 +71,7 @@ export const MenuList = (props: MenuListProps) => {
   }, [isOpen]);
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    e.preventDefault();
     const current = containerRef.current;
     if (!current) {
       return;
@@ -130,20 +131,19 @@ export const MenuItem = (props: MenuItemProps) => {
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     const current = buttonRef.current;
     if (!current) {
       return;
     }
 
-    const keyMap: Record<string, 'prev' | 'next'> = {
-      ArrowUp: 'prev',
-      ArrowDown: 'next',
-    };
-
-    if (e.key in keyMap) {
-      const sibling = findMenuItem(current, keyMap[e.key]);
-      (sibling as HTMLElement)?.focus();
+    const key = e.key;
+    if (key !== 'ArrowUp' && key !== 'ArrowDown') {
+      return;
     }
+
+    const sibling = findMenuItem(current, key === 'ArrowUp' ? 'prev' : 'next');
+    (sibling as HTMLElement)?.focus();
   };
 
   return (
@@ -160,6 +160,7 @@ export const MenuItem = (props: MenuItemProps) => {
       }}
       sx={[
         theme => ({
+          justifyContent: 'start',
           borderRadius: theme.radii.$none,
           paddingLeft: theme.space.$4,
           paddingRight: theme.space.$4,
