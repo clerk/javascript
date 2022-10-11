@@ -28,3 +28,4 @@ export * from './InvisibleRootBox';
 export * from './ClipboardInput';
 export * from './TileButton';
 export * from './FullHeightLoader';
+export * from './Tabs';

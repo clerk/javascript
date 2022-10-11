@@ -44,6 +44,7 @@ export const RootPage = () => {
           <Header.Subtitle localizationKey={localizationKeys('userProfile.start.headerSubtitle__account')} />
         </Header.Root>
         <UserProfileSection />
+
         {showUsername && <UsernameSection />}
         {showEmail && <EmailsSection />}
         {showPhone && <PhoneSection />}
