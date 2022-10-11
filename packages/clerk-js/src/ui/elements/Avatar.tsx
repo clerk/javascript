@@ -100,7 +100,7 @@ function InitialsAvatarFallback(props: AvatarProps) {
       align='center'
     >
       <BoringAvatar
-        size={Number(props.size?.(parsedInternalTheme))}
+        size={`${props.size?.(parsedInternalTheme)}`}
         colors={[...parsedInternalTheme.colors.$colorAvatarGradient]}
       />
       {initials && (

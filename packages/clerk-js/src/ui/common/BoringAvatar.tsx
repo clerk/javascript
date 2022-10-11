@@ -54,7 +54,7 @@ type AvatarProps = {
   name: string;
   square: boolean;
   title: boolean;
-  size: number | string;
+  size: string;
 };
 
 const AvatarMarble = (props: AvatarProps) => {
@@ -66,8 +66,8 @@ const AvatarMarble = (props: AvatarProps) => {
       fill='none'
       role='img'
       xmlns='http://www.w3.org/2000/svg'
-      width={`${props.size}`}
-      height={`${props.size}`}
+      width={props.size}
+      height={props.size}
     >
       {props.title && <title>{props.name}</title>}
       <mask
