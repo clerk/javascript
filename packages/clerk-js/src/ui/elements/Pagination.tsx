@@ -81,17 +81,11 @@ const RowInformation = (props: RowInfoProps) => {
 };
 
 const shouldShowPageButton = (currentPage: number, pageToShow: number, siblingCount: number, pageCount: number) => {
-  if (Math.abs(currentPage - pageToShow) < siblingCount || pageToShow === pageCount || pageToShow === 1) {
-    return true;
-  }
-  return false;
+  return Math.abs(currentPage - pageToShow) <= siblingCount || pageToShow === pageCount || pageToShow === 1;
 };
 
 const shouldShowDots = (currentPage: number, pageToShow: number, siblingCount: number) => {
-  if (Math.abs(currentPage - pageToShow) === siblingCount) {
-    return true;
-  }
-  return false;
+  return Math.abs(currentPage - pageToShow) === siblingCount + 1;
 };
 
 const ThreeDots = () => (
@@ -119,7 +113,7 @@ type PaginationProps = {
 };
 
 export const Pagination = (props: PaginationProps) => {
-  const { page, count, rowInfo, siblingCount = 2, onChange } = props;
+  const { page, count, rowInfo, siblingCount = 1, onChange } = props;
 
   return (
     <Flex
