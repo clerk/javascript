@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useEffect, useRef } from 'react';
+import React, { cloneElement, isValidElement, PropsWithChildren, useEffect, useRef } from 'react';
 
 import { createContextAndHook } from '../../ui/utils';
 import { Button, Col } from '../customizables';
@@ -31,19 +31,21 @@ export const Menu = (props: MenuProps) => {
   );
 };
 
-type MenuButtonProps = PropsOfComponent<typeof Button>;
+type MenuTriggerProps = React.PropsWithChildren<Record<never, never>>;
 
-export const MenuButton = (props: MenuButtonProps) => {
+export const MenuTrigger = (props: MenuTriggerProps) => {
+  const { children } = props;
   const { popoverCtx } = useMenuState();
   const { reference, toggle } = popoverCtx;
 
-  return (
-    <Button
-      ref={reference}
-      onClick={toggle}
-      {...props}
-    />
-  );
+  if (!isValidElement(children)) {
+    return null;
+  }
+
+  return cloneElement(children, {
+    ref: reference,
+    onClick: toggle,
+  });
 };
 
 const findMenuItem = (el: Element, siblingType: 'prev' | 'next', options?: { countSelf?: boolean }) => {
@@ -71,7 +73,6 @@ export const MenuList = (props: MenuListProps) => {
   }, [isOpen]);
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    e.preventDefault();
     const current = containerRef.current;
     if (!current) {
       return;
@@ -82,6 +83,7 @@ export const MenuList = (props: MenuListProps) => {
     }
 
     if (e.key === 'ArrowDown') {
+      e.preventDefault();
       return (findMenuItem(current.children[0], 'next', { countSelf: true }) as HTMLElement)?.focus();
     }
   };
@@ -131,7 +133,6 @@ export const MenuItem = (props: MenuItemProps) => {
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
-    e.preventDefault();
     const current = buttonRef.current;
     if (!current) {
       return;
@@ -142,6 +143,7 @@ export const MenuItem = (props: MenuItemProps) => {
       return;
     }
 
+    e.preventDefault();
     const sibling = findMenuItem(current, key === 'ArrowUp' ? 'prev' : 'next');
     (sibling as HTMLElement)?.focus();
   };
