@@ -1,9 +1,10 @@
 import React from 'react';
 
-import { Button, Flex, Text } from '../../customizables';
+import { Button, Flex, Icon } from '../../customizables';
 import { UserPreview, UserPreviewProps } from '../../elements';
 import { useCardState } from '../../elements/contexts';
-import { mqu, PropsOfComponent } from '../../styledSystem';
+import { SwitchArrows } from '../../icons';
+import { PropsOfComponent } from '../../styledSystem';
 import { Actions } from './CurrentAccountActions';
 
 export const SessionActions = (props: PropsOfComponent<typeof Flex>) => {
@@ -38,6 +39,9 @@ export const UserPreviewButton = (props: UserPreviewButtonProps) => {
           borderRadius: 0,
           justifyContent: 'space-between',
           padding: `${theme.space.$3} ${theme.space.$6}`,
+          ':hover > svg': {
+            visibility: 'initial',
+          },
         }),
         rest.sx,
       ]}
@@ -46,17 +50,11 @@ export const UserPreviewButton = (props: UserPreviewButtonProps) => {
         user={user}
         size='sm'
       />
-      <Text
-        variant='smallRegular'
-        sx={t => ({
-          [mqu.xs]: {
-            display: 'none',
-          },
-          color: t.colors.$blackAlpha500,
-        })}
-      >
-        Switch account
-      </Text>
+
+      <Icon
+        icon={SwitchArrows}
+        sx={t => ({ color: t.colors.$blackAlpha500, marginLeft: t.space.$2, visibility: 'hidden' })}
+      />
     </Button>
   );
 };
