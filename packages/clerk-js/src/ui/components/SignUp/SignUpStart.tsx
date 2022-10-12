@@ -15,8 +15,7 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useCardState } from '../../elements/contexts';
-import { useNavigate } from '../../hooks';
-import { useLoadingStatus } from '../../hooks';
+import { useLoadingStatus, useNavigate } from '../../hooks';
 import { buildRequest, FormControlState, handleError, useFormControl } from '../../utils';
 import { SignUpForm } from './SignUpForm';
 import {
@@ -222,7 +221,7 @@ function _SignUpStart(): JSX.Element {
   const shouldShowForm = showFormFields(userSettings) && visibleFields.length > 0;
 
   const showOauthProviders =
-    (!hasTicket || missingRequirementsWithTicket) && userSettings.socialProviderStrategies.length > 0;
+    (!hasTicket || missingRequirementsWithTicket) && userSettings.authenticatableSocialStrategies.length > 0;
   const showWeb3Providers = !hasTicket && userSettings.web3FirstFactors.length > 0;
 
   return (

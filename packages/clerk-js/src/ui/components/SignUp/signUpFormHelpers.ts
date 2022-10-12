@@ -109,9 +109,9 @@ export const getInitialActiveIdentifier = (attributes: Attributes, isProgressive
 };
 
 export function showFormFields(userSettings: UserSettingsResource): boolean {
-  const { socialProviderStrategies, web3FirstFactors } = userSettings;
+  const { authenticatableSocialStrategies, web3FirstFactors } = userSettings;
 
-  return userSettings.hasValidAuthFactor || (!socialProviderStrategies.length && !web3FirstFactors.length);
+  return userSettings.hasValidAuthFactor || (!authenticatableSocialStrategies.length && !web3FirstFactors.length);
 }
 
 export function emailOrPhone(attributes: Attributes, isProgressiveSignUp: boolean) {

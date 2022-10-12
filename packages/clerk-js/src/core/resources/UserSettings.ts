@@ -22,6 +22,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
   signUp!: SignUpData;
 
   socialProviderStrategies: OAuthStrategy[] = [];
+  authenticatableSocialStrategies: OAuthStrategy[] = [];
   web3FirstFactors: Web3Strategy[] = [];
   enabledFirstFactorIdentifiers: Array<keyof UserSettingsResource['attributes']> = [];
 
@@ -48,6 +49,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     this.signIn = data.sign_in;
     this.signUp = data.sign_up;
     this.socialProviderStrategies = this.getSocialProviderStrategies(data.social);
+    this.authenticatableSocialStrategies = this.getAuthenticatableSocialStrategies(data.social);
     this.web3FirstFactors = this.getWeb3FirstFactors(data.attributes);
     this.enabledFirstFactorIdentifiers = this.getEnabledFirstFactorIdentifiers(data.attributes);
     return this;
@@ -81,6 +83,17 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
 
     return Object.entries(social)
       .filter(([, desc]) => desc.enabled)
+      .map(([, desc]) => desc.strategy)
+      .sort();
+  }
+
+  private getAuthenticatableSocialStrategies(social: OAuthProviders): OAuthStrategy[] {
+    if (!social) {
+      return [];
+    }
+
+    return Object.entries(social)
+      .filter(([, desc]) => desc.enabled && desc.authenticatable)
       .map(([, desc]) => desc.strategy)
       .sort();
   }

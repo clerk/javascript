@@ -26,11 +26,14 @@ const isWeb3Strategy = (val: string): val is Web3Strategy => {
 
 export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   const { oauthCallback, web3Callback, enableOAuthProviders = true, enableWeb3Providers = true } = props;
-  const { web3Strategies, oauthStrategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
+  const { web3Strategies, authenticatableOauthStrategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
   const card = useCardState();
   const { socialButtonsVariant } = useAppearance().parsedLayout;
 
-  const strategies = [...(enableOAuthProviders ? oauthStrategies : []), ...(enableWeb3Providers ? web3Strategies : [])];
+  const strategies = [
+    ...(enableOAuthProviders ? authenticatableOauthStrategies : []),
+    ...(enableWeb3Providers ? web3Strategies : []),
+  ];
 
   if (!strategies.length) {
     return null;

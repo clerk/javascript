@@ -93,7 +93,7 @@ function _SignUpContinue() {
   });
   minimizeFieldsForExistingSignup(fields, signUp);
 
-  const oauthOptions = userSettings.socialProviderStrategies;
+  const oauthOptions = userSettings.authenticatableSocialStrategies;
   const web3Options = userSettings.web3FirstFactors;
 
   const handleChangeActive = (type: ActiveIdentifier) => {
