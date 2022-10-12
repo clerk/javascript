@@ -27,6 +27,7 @@ export * from './RootBox';
 export * from './InvisibleRootBox';
 export * from './ClipboardInput';
 export * from './TileButton';
+export * from './Menu';
 export * from './Pagination';
 export * from './FullHeightLoader';
 export * from './Tabs';

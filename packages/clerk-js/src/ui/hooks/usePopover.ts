@@ -16,6 +16,8 @@ type UsePopoverProps = {
   autoUpdate?: boolean;
 };
 
+export type UsePopoverReturn = ReturnType<typeof usePopover>;
+
 export const usePopover = (props: UsePopoverProps = {}) => {
   const [isOpen, setIsOpen] = React.useState(props.defaultOpen || false);
   const { update, reference, floating, strategy, x, y, context } = useFloating({
