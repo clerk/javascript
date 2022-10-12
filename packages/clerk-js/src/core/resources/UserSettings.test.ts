@@ -199,7 +199,7 @@ describe('UserSettings', () => {
         oauth_google: {
           enabled: true,
           required: false,
-          authenticatable: true,
+          authenticatable: false,
           strategy: 'oauth_google',
         },
         oauth_gitlab: {
@@ -227,8 +227,8 @@ describe('UserSettings', () => {
       },
     } as any as UserSettingsJSON);
 
-    const res = sut.socialProviderStrategies;
-    expect(res).toEqual(['oauth_facebook', 'oauth_google']);
+    expect(sut.socialProviderStrategies).toEqual(['oauth_facebook', 'oauth_google']);
+    expect(sut.authenticatableSocialStrategies).toEqual(['oauth_facebook']);
   });
 
   it('returns enabled standard form attributes', function () {

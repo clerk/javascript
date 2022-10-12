@@ -27,11 +27,11 @@ const strategyToDisplayData: ThirdPartyStrategyToDataMap = fromEntries(
 ) as ThirdPartyStrategyToDataMap;
 
 export const useEnabledThirdPartyProviders = () => {
-  const { socialProviderStrategies, web3FirstFactors } = useEnvironment().userSettings;
+  const { socialProviderStrategies, web3FirstFactors, authenticatableSocialStrategies } = useEnvironment().userSettings;
   return {
     strategies: [...socialProviderStrategies, ...web3FirstFactors],
     web3Strategies: [...web3FirstFactors],
-    oauthStrategies: [...socialProviderStrategies],
+    authenticatableOauthStrategies: [...authenticatableSocialStrategies],
     strategyToDisplayData,
     providerToDisplayData,
   };

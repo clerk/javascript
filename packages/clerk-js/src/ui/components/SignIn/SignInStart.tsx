@@ -18,8 +18,7 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useCardState } from '../../elements/contexts';
-import { useNavigate } from '../../hooks';
-import { useLoadingStatus } from '../../hooks';
+import { useLoadingStatus, useNavigate } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { buildRequest, FormControlState, handleError, isMobileDevice, useFormControl } from '../../utils';
 import { SignInSocialButtons } from './SignInSocialButtons';
@@ -38,7 +37,7 @@ export function _SignInStart(): JSX.Element {
 
   const standardFormAttributes = userSettings.enabledFirstFactorIdentifiers;
   const web3FirstFactors = userSettings.web3FirstFactors;
-  const socialProviderStrategies = userSettings.socialProviderStrategies;
+  const authenticatableSocialStrategies = userSettings.authenticatableSocialStrategies;
   const passwordBasedInstance = userSettings.instanceIsPasswordBased;
   const identifierInputDisplayValues = getIdentifierControlDisplayValues(standardFormAttributes);
 
@@ -178,7 +177,7 @@ export function _SignInStart(): JSX.Element {
     return <LoadingCard />;
   }
 
-  const hasSocialOrWeb3Buttons = !!socialProviderStrategies.length || !!web3FirstFactors.length;
+  const hasSocialOrWeb3Buttons = !!authenticatableSocialStrategies.length || !!web3FirstFactors.length;
   const shouldAutofocus = !isMobileDevice() && hasSocialOrWeb3Buttons;
 
   return (

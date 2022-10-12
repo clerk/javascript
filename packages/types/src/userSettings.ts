@@ -70,6 +70,7 @@ export interface UserSettingsResource extends ClerkResource {
   signIn: SignInData;
   signUp: SignUpData;
   socialProviderStrategies: OAuthStrategy[];
+  authenticatableSocialStrategies: OAuthStrategy[];
   web3FirstFactors: Web3Strategy[];
   enabledFirstFactorIdentifiers: Attribute[];
   instanceIsPasswordBased: boolean;
