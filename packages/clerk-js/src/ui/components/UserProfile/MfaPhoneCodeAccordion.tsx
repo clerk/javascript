@@ -1,7 +1,7 @@
 import { PhoneNumberResource } from '@clerk/types';
 import React from 'react';
 
-import { Badge, Col, Icon } from '../../customizables';
+import { Badge, Col, Icon, localizationKeys } from '../../customizables';
 import { FormattedPhoneNumberText, useCardState } from '../../elements';
 import { useNavigate } from '../../hooks';
 import { Mobile } from '../../icons';
@@ -41,21 +41,25 @@ export const MfaPhoneCodeAccordion = ({ phone, showTOTP }: MfaPhoneCodeAccordion
       <Col gap={4}>
         {!showTOTP && (
           <LinkButtonWithDescription
-            title={isDefault ? 'Default factor' : 'Set as Default factor'}
-            subtitle={
-              isDefault
-                ? 'This factor will be used as the default two-step verification method when signing in.'
-                : 'Set this factor as the default factor to use it as the default two-step verification method when signing in.'
+            title={localizationKeys(
+              `userProfile.start.phoneNumbersSection.defaultFactorTitle__${isDefault ? 'default' : 'setDefault'}`,
+            )}
+            subtitle={localizationKeys(
+              `userProfile.start.phoneNumbersSection.defaultFactorSubtitle__${isDefault ? 'default' : 'setDefault'}`,
+            )}
+            actionLabel={
+              !isDefault
+                ? localizationKeys('userProfile.start.phoneNumbersSection.defaultFactorActionLabel__setDefault')
+                : undefined
             }
-            actionLabel={!isDefault ? 'Set as default' : undefined}
             onClick={() => phone.makeDefaultSecondFactor().catch(err => handleError(err, [], card.setError))}
           />
         )}
 
         <LinkButtonWithDescription
-          title='Remove'
-          subtitle='Remove this phone number from the two-step verification methods'
-          actionLabel='Remove phone number'
+          title={localizationKeys('userProfile.start.phoneNumbersSection.destructiveActionTitle')}
+          subtitle={localizationKeys('userProfile.start.phoneNumbersSection.destructiveActionAccordionSubtitle')}
+          actionLabel={localizationKeys('userProfile.start.phoneNumbersSection.destructiveAction')}
           colorScheme='danger'
           onClick={() => navigate(`multi-factor/${phone.id}/remove`)}
         />

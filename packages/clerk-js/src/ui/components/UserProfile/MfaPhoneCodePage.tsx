@@ -3,7 +3,7 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser } from '../../contexts';
-import { Col, Text } from '../../customizables';
+import { Col, LocalizationKey, localizationKeys, Text } from '../../customizables';
 import { ArrowBlockButton, useCardState, withCardStateProvider } from '../../elements';
 import { getFlagEmojiFromCountryIso, handleError, parsePhoneString, stringToFormattedPhoneString } from '../../utils';
 import { FormButtonContainer } from './FormButtons';
@@ -14,20 +14,18 @@ import { SuccessPage } from './SuccessPage';
 import { AddBlockButton } from './UserProfileBlockButtons';
 
 export const MfaPhoneCodePage = withCardStateProvider(() => {
-  const title = 'Add SMS code verification';
-
   const ref = React.useRef<PhoneNumberResource>();
   const wizard = useWizard({ defaultStep: 2 });
 
   return (
     <Wizard {...wizard.props}>
       <AddPhone
-        title={title}
+        title={localizationKeys('userProfile.mfaPhoneCodePage.title')}
         resourceRef={ref}
         onSuccess={wizard.nextStep}
       />
       <VerifyPhone
-        title={title}
+        title={localizationKeys('userProfile.mfaPhoneCodePage.title')}
         resourceRef={ref}
         onSuccess={wizard.nextStep}
       />
@@ -38,12 +36,12 @@ export const MfaPhoneCodePage = withCardStateProvider(() => {
           ref.current = phone;
           wizard.goToStep(1);
         }}
-        title={title}
+        title={localizationKeys('userProfile.mfaPhoneCodePage.title')}
         resourceRef={ref}
       />
       <SuccessPage
-        title={title}
-        text={`SMS code two-step verification is now enabled for this phone number. When signing in, you will need to enter a verification code sent to this phone number as an additional step.`}
+        title={localizationKeys('userProfile.mfaPhoneCodePage.title')}
+        text={localizationKeys('userProfile.mfaPhoneCodePage.successMessage')}
         backupCodes={ref.current?.backupCodes}
       />
     </Wizard>
@@ -54,7 +52,7 @@ type AddMfaProps = {
   onAddPhoneClick: React.MouseEventHandler;
   onUnverifiedPhoneClick: (phone: PhoneNumberResource) => void;
   onSuccess: () => void;
-  title: string;
+  title: LocalizationKey;
   resourceRef: React.MutableRefObject<PhoneNumberResource | undefined>;
 };
 

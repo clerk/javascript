@@ -210,11 +210,26 @@ type _LocalizationResource = {
         detailsAction__unverified: LocalizationValue;
         destructiveActionTitle: LocalizationValue;
         destructiveActionSubtitle: LocalizationValue;
+        destructiveActionAccordionSubtitle: LocalizationValue;
         destructiveAction: LocalizationValue;
+        defaultFactorTitle__default: LocalizationValue;
+        defaultFactorTitle__setDefault: LocalizationValue;
+        defaultFactorSubtitle__default: LocalizationValue;
+        defaultFactorSubtitle__setDefault: LocalizationValue;
+        defaultFactorActionLabel__setDefault: LocalizationValue;
       };
       connectedAccountsSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
+        failedConnection: {
+          title: LocalizationValue;
+          actionLabel: LocalizationValue;
+        };
+        remove: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+          actionLabel: LocalizationValue;
+        };
       };
       passwordSection: {
         title: LocalizationValue;
@@ -240,6 +255,8 @@ type _LocalizationResource = {
         destructiveActionTitle: LocalizationValue;
         destructiveActionSubtitle: LocalizationValue;
         destructiveAction: LocalizationValue;
+        additiveAction: LocalizationValue;
+        successMessage: LocalizationValue;
       };
     };
     profilePage: {
@@ -271,6 +288,18 @@ type _LocalizationResource = {
         resendButton: LocalizationValue;
         successMessage: LocalizationValue;
       };
+      removeResource: {
+        title: LocalizationValue;
+        successMessage: LocalizationValue;
+      };
+    };
+    phoneNumberPage: {
+      title: LocalizationValue;
+      successMessage: LocalizationValue;
+      removeResource: {
+        title: LocalizationValue;
+        successMessage: LocalizationValue;
+      };
     };
     connectedAccountPage: {
       title: LocalizationValue;
@@ -278,6 +307,16 @@ type _LocalizationResource = {
       formHint__noAccounts: LocalizationValue;
       socialButtonsBlockButton: LocalizationValue;
       successMessage: LocalizationValue;
+      removeResource: {
+        title: LocalizationValue;
+        successMessage: LocalizationValue;
+      };
+    };
+    web3WalletPage: {
+      removeResource: {
+        title: LocalizationValue;
+        successMessage: LocalizationValue;
+      };
     };
     passwordPage: {
       title: LocalizationValue;
@@ -287,6 +326,42 @@ type _LocalizationResource = {
       title: LocalizationValue;
       formHint: LocalizationValue;
       successMessage: LocalizationValue;
+    };
+    mfaTOTPPage: {
+      title: LocalizationValue;
+      verifyTitle: LocalizationValue;
+      verifySubtitle: LocalizationValue;
+      successMessage: LocalizationValue;
+      defaultFactorTitle: LocalizationValue;
+      defaultFactorSubtitle: LocalizationValue;
+      removeFactorTitle: LocalizationValue;
+      removeFactorSubtitle: LocalizationValue;
+      removeFactorActionLabel: LocalizationValue;
+      removeResource: {
+        title: LocalizationValue;
+        successMessage: LocalizationValue;
+      };
+    };
+    mfaPhoneCodePage: {
+      title: LocalizationValue;
+      successMessage: LocalizationValue;
+      removeResource: {
+        title: LocalizationValue;
+        successMessage: LocalizationValue;
+      };
+    };
+    backupCodePage: {
+      title: LocalizationValue;
+      regenerateTitle: LocalizationValue;
+      regenerateSubtitle: LocalizationValue;
+      regenerateActionLabel: LocalizationValue;
+      successBackupCodeSubtitle: LocalizationValue;
+    };
+    backupCodeCreatePage: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      successSubtitle: LocalizationValue;
+      infoText: LocalizationValue;
     };
   };
   userButton: {

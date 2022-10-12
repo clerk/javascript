@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
-import { Button, Text } from '../../customizables';
+import { Button, localizationKeys, Text } from '../../customizables';
 import { withCardStateProvider } from '../../elements';
 import { FormButtonContainer } from './FormButtons';
 import { MfaBackupCodeCreatePage } from './MfaBackupCodeCreatePage';
@@ -13,10 +13,7 @@ export const MfaBackupCodePage = withCardStateProvider(() => {
 
   return (
     <Wizard {...wizard.props}>
-      <AddBackupCode
-        title='Add backup code verification'
-        onContinue={wizard.nextStep}
-      />
+      <AddBackupCode onContinue={wizard.nextStep} />
 
       <MfaBackupCodeCreatePage />
     </Wizard>
@@ -24,15 +21,14 @@ export const MfaBackupCodePage = withCardStateProvider(() => {
 });
 
 type AddBackupCodeProps = {
-  title: string;
   onContinue: () => void;
 };
 
 const AddBackupCode = (props: AddBackupCodeProps) => {
-  const { title, onContinue } = props;
+  const { onContinue } = props;
 
   return (
-    <ContentPage.Root headerTitle={title}>
+    <ContentPage.Root headerTitle={localizationKeys('userProfile.backupCodePage.title')}>
       <Text>Backup codes will be enabled for this account.</Text>
       <Text>
         Keep the backup codes secret and store them securely. You may regenerate backup codes if you suspect they have

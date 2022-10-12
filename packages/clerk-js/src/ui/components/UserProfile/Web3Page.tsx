@@ -4,7 +4,7 @@ import React from 'react';
 import { generateSignatureWithMetamask, getMetamaskIdentifier } from '../../../utils/web3';
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser } from '../../contexts';
-import { Col, descriptors, Image, Text } from '../../customizables';
+import { Col, descriptors, Image,  localizationKeys, Text } from '../../customizables';
 import { ArrowBlockButton, useCardState, withCardStateProvider } from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
@@ -15,7 +15,6 @@ import { ContentPage } from './Page';
 import { SuccessPage } from './SuccessPage';
 
 export const Web3Page = withCardStateProvider(() => {
-  const title = 'Add web3 wallet';
   const user = useCoreUser();
 
   const { params } = useRouter();
@@ -28,8 +27,8 @@ export const Web3Page = withCardStateProvider(() => {
     <Wizard {...wizard.props}>
       <AddWeb3Wallet nextStep={wizard.nextStep} />
       <SuccessPage
-        title={title}
-        text={`The wallet has been added to your account.`}
+        title={localizationKeys('userProfile.start.web3WalletsSection.additiveAction')}
+        text={localizationKeys('userProfile.start.web3WalletsSection.successMessage')}
       />
     </Wizard>
   );
@@ -70,7 +69,7 @@ const AddWeb3Wallet = (props: { nextStep: () => void }) => {
   };
 
   return (
-    <ContentPage.Root headerTitle={'Add web3 wallet'}>
+    <ContentPage.Root headerTitle={localizationKeys('userProfile.start.web3WalletsSection.additiveAction')}>
       <Text>
         {unconnectedStrategies.length
           ? 'Select a web3 wallet to connect to your account.'

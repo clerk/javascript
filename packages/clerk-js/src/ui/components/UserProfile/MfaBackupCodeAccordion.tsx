@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Col, Icon } from '../../customizables';
+import { Col, Icon, localizationKeys } from '../../customizables';
 import { useNavigate } from '../../hooks';
 import { DotCircle } from '../../icons';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
@@ -21,9 +21,9 @@ export const MfaBackupCodeAccordion = () => {
     >
       <Col gap={4}>
         <LinkButtonWithDescription
-          title='Regenerate backup codes'
-          subtitle='Get a fresh set of secure backup codes. Prior backup codes will be deleted and cannot be used.'
-          actionLabel='Regenerate codes'
+          title={localizationKeys('userProfile.backupCodePage.regenerateTitle')}
+          subtitle={localizationKeys('userProfile.backupCodePage.regenerateSubtitle')}
+          actionLabel={localizationKeys('userProfile.backupCodePage.regenerateActionLabel')}
           onClick={() => navigate('multi-factor/backup_code/add')}
         />
       </Col>

@@ -15,10 +15,6 @@ export const MfaBackupCodeCreatePage = () => {
   const card = useCardState();
   const [backupCode, setBackupCode] = React.useState<BackupCodeResource | undefined>(undefined);
 
-  const title = 'Add backup code verification';
-  const text =
-    'Backup codes are now enabled. You can use one of these to sign in to your account, if you lose access to your authentication device. Each code can only be used once.';
-
   React.useEffect(() => {
     if (backupCode) {
       return;
@@ -31,22 +27,22 @@ export const MfaBackupCodeCreatePage = () => {
   }, []);
 
   if (card.error) {
-    return <ContentPage.Root headerTitle={title} />;
+    return <ContentPage.Root headerTitle={localizationKeys('userProfile.backupCodeCreatePage.title')} />;
   }
 
   return (
-    <ContentPage.Root headerTitle={title}>
+    <ContentPage.Root headerTitle={localizationKeys('userProfile.backupCodeCreatePage.title')}>
       {!backupCode ? (
         <FullHeightLoader />
       ) : (
         <>
           <Text
-            localizationKey={text}
+            localizationKey={localizationKeys('userProfile.backupCodeCreatePage.infoText')}
             variant='regularRegular'
           />
 
           <MfaBackupCodeList
-            subtitle={'Store them securely and keep them secret.'}
+            subtitle={localizationKeys('userProfile.backupCodeCreatePage.subtitle')}
             backupCodes={backupCode.codes}
           />
 

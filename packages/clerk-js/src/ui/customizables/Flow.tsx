@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { descriptors } from './index';
 import { FlowMetadata, FlowMetadataProvider, InvisibleRootBox, useFlowMetadata } from '../elements';
 import { InternalThemeProvider } from '../styledSystem';
 import { generateFlowClassname } from './classGeneration';
+import { descriptors } from './index';
 
 type FlowRootProps = React.PropsWithChildren<{}> & FlowMetadata;
 

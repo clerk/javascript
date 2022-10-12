@@ -3,7 +3,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import React from 'react';
 
 import { useCoreUser } from '../../contexts';
-import { Button, Col, Text } from '../../customizables';
+import { Button, Col, LocalizationKey, Text } from '../../customizables';
 import { ClipboardInput, FullHeightLoader, useCardState } from '../../elements';
 import { handleError } from '../../utils';
 import { FormButtonContainer } from './FormButtons';
@@ -11,7 +11,7 @@ import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
 import { ContentPage } from './Page';
 
 type AddAuthenticatorAppProps = {
-  title: string;
+  title: LocalizationKey;
   onContinue: () => void;
 };
 

@@ -86,9 +86,9 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
         )}
         {error && (
           <LinkButtonWithDescription
-            title='Retry failed connection'
-            subtitle={error}
-            actionLabel='Try again'
+            title={localizationKeys('userProfile.start.connectedAccountsSection.failedConnection.title')}
+            subtitle={error as any}
+            actionLabel={localizationKeys('userProfile.start.connectedAccountsSection.failedConnection.actionLabel')}
             onClick={() => {
               return user
                 .createExternalAccount({
@@ -101,9 +101,9 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
           />
         )}
         <LinkButtonWithDescription
-          title='Remove'
-          subtitle='Remove this connected account from your account'
-          actionLabel='Remove connected account'
+          title={localizationKeys('userProfile.start.connectedAccountsSection.remove.title')}
+          subtitle={localizationKeys('userProfile.start.connectedAccountsSection.remove.subtitle')}
+          actionLabel={localizationKeys('userProfile.start.connectedAccountsSection.remove.actionLabel')}
           colorScheme='danger'
           onClick={() => navigate(`connected-account/${account.id}/remove`)}
         />

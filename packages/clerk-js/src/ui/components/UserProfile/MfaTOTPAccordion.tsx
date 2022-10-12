@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Badge, Col, Icon } from '../../customizables';
+import { Badge, Col, Icon, localizationKeys } from '../../customizables';
 import { useNavigate } from '../../hooks';
 import { AuthApp } from '../../icons';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
@@ -24,14 +24,14 @@ export const MfaTOTPAccordion = () => {
     >
       <Col gap={4}>
         <LinkButtonWithDescription
-          title={'Default factor'}
-          subtitle='This factor will be used as the default two-step verification method when signing in.'
+          title={localizationKeys('userProfile.mfaTOTPPage.defaultFactorTitle')}
+          subtitle={localizationKeys('userProfile.mfaTOTPPage.defaultFactorSubtitle')}
         />
 
         <LinkButtonWithDescription
-          title='Remove'
-          subtitle='Remove authenticator application from the two-step verification methods'
-          actionLabel='Remove authenticator application'
+          title={localizationKeys('userProfile.mfaTOTPPage.removeFactorTitle')}
+          subtitle={localizationKeys('userProfile.mfaTOTPPage.removeFactorSubtitle')}
+          actionLabel={localizationKeys('userProfile.mfaTOTPPage.removeFactorActionLabel')}
           colorScheme='danger'
           onClick={() => navigate(`multi-factor/totp/remove`)}
         />
