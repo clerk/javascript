@@ -44,7 +44,10 @@ export const MenuTrigger = (props: MenuTriggerProps) => {
 
   return cloneElement(children, {
     ref: reference,
-    onClick: toggle,
+    onClick: (e: React.MouseEvent) => {
+      children.props?.onClick?.(e);
+      toggle();
+    },
   });
 };
 
