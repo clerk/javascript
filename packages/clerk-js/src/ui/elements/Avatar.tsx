@@ -95,6 +95,7 @@ function InitialsAvatarFallback(props: AvatarProps) {
 
   return (
     <Flex
+      elementDescriptor={descriptors.avatar}
       sx={{ position: 'relative' }}
       justify='center'
       align='center'
@@ -106,7 +107,12 @@ function InitialsAvatarFallback(props: AvatarProps) {
       {initials && (
         <Text
           as='span'
-          sx={{ ...common.centeredFlex('inline-flex'), width: '100%', position: 'absolute' }}
+          colorScheme='inherit'
+          sx={{
+            ...common.centeredFlex('inline-flex'),
+            width: '100%',
+            position: 'absolute',
+          }}
         >
           {initials}
         </Text>
