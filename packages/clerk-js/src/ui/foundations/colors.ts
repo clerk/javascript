@@ -37,6 +37,7 @@ export const colors = Object.freeze({
   ...whiteAlpha,
   colorBackground: 'white',
   colorInputBackground: 'white',
+  colorAvatarGradient: ['#6C47FF', '#5BC5EF', '#FBD486', '#BEF972', '#FF8F8F'],
   colorText: 'black',
   colorTextOnPrimaryBackground: 'white',
   colorTextSecondary: 'rgba(0,0,0,0.65)',

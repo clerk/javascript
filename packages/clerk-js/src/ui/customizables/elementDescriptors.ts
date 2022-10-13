@@ -89,7 +89,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'formFieldInputCopyToClipboardButton',
   'formFieldInputCopyToClipboardIcon',
 
-  'avatar',
+  'avatarBox',
   'avatarImage',
 
   'userButtonBox',
