@@ -308,5 +308,6 @@ type _LocalizationResource = {
     form_param_nil: LocalizationValue;
     form_code_incorrect: LocalizationValue;
     form_password_incorrect: LocalizationValue;
+    not_allowed_access: LocalizationValue;
   };
 };
