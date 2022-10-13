@@ -65,7 +65,7 @@ export const useLocalizations = () => {
     return localizedStringFromKey(localizationKey, parsedResource, globalTokens);
   };
 
-  const translateError = (error: string | ClerkAPIError | undefined) => {
+  const translateError = (error: ClerkAPIError | string | undefined) => {
     if (!error || typeof error === 'string') {
       return t(error);
     }

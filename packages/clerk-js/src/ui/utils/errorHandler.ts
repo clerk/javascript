@@ -43,7 +43,11 @@ function parseErrors(errors: ClerkAPIError[]): ParserErrors {
 }
 
 type HandleError = {
-  (err: Error, fieldStates: Array<FormControlState<string>>, setGlobalError?: (err: string | undefined) => void): void;
+  (
+    err: Error,
+    fieldStates: Array<FormControlState<string>>,
+    setGlobalError?: (err: ClerkAPIError | string | undefined) => void,
+  ): void;
 };
 
 export const handleError: HandleError = (err, fieldStates, setGlobalError) => {
@@ -107,7 +111,7 @@ const handleClerkApiError: HandleError = (err, fieldStates, setGlobalError) => {
     // TODO: Make global errors localizable
     const firstGlobalError = globalErrors[0];
     if (firstGlobalError) {
-      setGlobalError(firstGlobalError.longMessage || firstGlobalError.message || undefined);
+      setGlobalError(firstGlobalError);
     }
   }
 };
