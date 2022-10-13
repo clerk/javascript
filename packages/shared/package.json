@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "0.0.1",
+  "version": "0.0.2-staging.0",
   "description": "Internal package utils used by the Clerk SDKs",
   "types": "./dist/types/index.d.ts",
   "main": "./dist/index.js",
@@ -18,9 +18,9 @@
     "test:watch": "vitest"
   },
   "devDependencies": {
-    "js-cookie": "^3.0.1",
-    "@clerk/types": "^3.10.1",
+    "@clerk/types": "^3.11.0-staging.0",
     "@types/js-cookie": "^3.0.2",
+    "js-cookie": "^3.0.1",
     "tsup": "^6.2.3",
     "typescript": "*",
     "vitest": "^0.23.4"
