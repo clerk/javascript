@@ -175,6 +175,7 @@ export const ImpersonationFab = () => {
         onPointerDown={onPointerDown}
         align='center'
         sx={t => ({
+          touchAction: 'none', //for drag to work on mobile consistently
           position: 'fixed',
           overflow: 'hidden',
           top: `var(${topProperty}, ${defaultTop}px)`,
