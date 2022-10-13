@@ -1,4 +1,4 @@
-import React, { PointerEventHandler, useEffect, useRef } from 'react';
+import React, { PointerEventHandler, TransitionEventHandler, useEffect, useRef, useState } from 'react';
 
 import { mqu, PropsOfComponent } from '../../ui/styledSystem';
 import { getFullName, getIdentifier } from '../../ui/utils';
@@ -174,6 +174,7 @@ export const ImpersonationFab = () => {
       <Flex
         ref={containerRef}
         elementDescriptor={descriptors.impersonationFab}
+        onPointerDown={onPointerDown}
         align='center'
         sx={t => ({
           position: 'fixed',
@@ -185,6 +186,9 @@ export const ImpersonationFab = () => {
           borderRadius: t.radii.$halfHeight, //to match the circular eye perfectly
           backgroundColor: t.colors.$white,
           fontFamily: t.fonts.$main,
+          ':hover': {
+            cursor: 'grab',
+          },
           ':hover #cl-impersonationText': {
             maxWidth: `min(calc(50vw - ${eyeWidth} - 2 * ${defaultRight}px), ${titleLength}ch)`,
             [mqu.md]: {
@@ -197,12 +201,6 @@ export const ImpersonationFab = () => {
         })}
       >
         <EyeCircle
-          onPointerDown={onPointerDown}
-          sx={{
-            ':hover': {
-              cursor: 'grab',
-            },
-          }}
           width={eyeWidth}
           height={eyeHeight}
         />
