@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.9.0-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@2.8.1...@clerk/backend-core@2.9.0-staging.0) (2022-10-13)
+
+### Features
+
+- **backend-core:** Add support for updating user's totp secret and backup codes ([250a47d](https://github.com/clerkinc/javascript/commit/250a47daf561928e7d09b48873b19be4de28a581))
+
 ### [2.8.1](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@2.8.1-staging.0...@clerk/backend-core@2.8.1) (2022-10-07)
 
 **Note:** Version bump only for package @clerk/backend-core

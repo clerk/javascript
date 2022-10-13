@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.11.0-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/types@3.10.1...@clerk/types@3.11.0-staging.1) (2022-10-13)
+
+### Features
+
+- **clerk-js,clerk-react,types:** Wire up `OrganizationSwitcher` and `OrganizationProfile` ([1e34e69](https://github.com/clerkinc/javascript/commit/1e34e6986ee49aeb9ca9f72cdc5d799d6611b53f))
+- **clerk-js:** Add table and pagination elements ([cb56f5c](https://github.com/clerkinc/javascript/commit/cb56f5c0313ba6f1fce50eae6fc3e3d596cf1b16))
+
+### Bug Fixes
+
+- **clerk-js:** Add appearance customization support for avatar gradient ([96cde45](https://github.com/clerkinc/javascript/commit/96cde45b4f1db5ff074289b57ff58c40bf80f6e1))
+- **clerk-js:** Add global not_allowed_access error to localization prop ([0313fe5](https://github.com/clerkinc/javascript/commit/0313fe5ce4e0afca20865ad1b6d0503502ea6e4d))
+- **types:** Remove unused hideNavigation prop from UserProfile ([21cafcb](https://github.com/clerkinc/javascript/commit/21cafcb488d66f90a3b0a13a2079d9b0473ecf7e))
+
 ### [3.10.1](https://github.com/clerkinc/javascript/compare/@clerk/types@3.10.1-staging.0...@clerk/types@3.10.1) (2022-10-07)
 
 **Note:** Version bump only for package @clerk/types

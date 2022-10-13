@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.0-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@4.2.6...@clerk/clerk-react@4.3.0-staging.1) (2022-10-13)
+
+### Features
+
+- **clerk-js,clerk-react,types:** Wire up `OrganizationSwitcher` and `OrganizationProfile` ([1e34e69](https://github.com/clerkinc/javascript/commit/1e34e6986ee49aeb9ca9f72cdc5d799d6611b53f))
+
 ### [4.2.6](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@4.2.6-staging.0...@clerk/clerk-react@4.2.6) (2022-10-07)
 
 **Note:** Version bump only for package @clerk/clerk-react

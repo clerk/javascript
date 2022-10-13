@@ -3,6 +3,35 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.10.0-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.9.0...@clerk/clerk-js@4.10.0-staging.1) (2022-10-13)
+
+### Features
+
+- **clerk-js,clerk-react,types:** Wire up `OrganizationSwitcher` and `OrganizationProfile` ([1e34e69](https://github.com/clerkinc/javascript/commit/1e34e6986ee49aeb9ca9f72cdc5d799d6611b53f))
+- **clerk-js:** Add table and pagination elements ([cb56f5c](https://github.com/clerkinc/javascript/commit/cb56f5c0313ba6f1fce50eae6fc3e3d596cf1b16))
+- **clerk-js:** Fade in text for ImpersonationFab ([25c24b2](https://github.com/clerkinc/javascript/commit/25c24b29564ea14e933ca6bfeb108b5fbeee0405))
+- **clerk-js:** Introduce Menu element ([f4b4586](https://github.com/clerkinc/javascript/commit/f4b4586816734a97a06bc7a9ee1c12f728973daa))
+- **clerk-js:** Introduce Select element and use it in PhoneInput ([9619bfe](https://github.com/clerkinc/javascript/commit/9619bfe6da4fb876f2ba6279f2c08d6a8c2d263c))
+- **clerk-js:** Make the whole ImpersonationFab draggable ([85d65f8](https://github.com/clerkinc/javascript/commit/85d65f8ae962cb16b14ddf9b77b4bf42cb1423da))
+- **clerk-js:** Replace Switch Account text with icon ([1262f1b](https://github.com/clerkinc/javascript/commit/1262f1bfacd10df0a292fe0250b8843729aa1162))
+
+### Bug Fixes
+
+- **clerk-js:** Add appearance customization support for avatar gradient ([96cde45](https://github.com/clerkinc/javascript/commit/96cde45b4f1db5ff074289b57ff58c40bf80f6e1))
+- **clerk-js:** Add default colors for avatar ([703fbd9](https://github.com/clerkinc/javascript/commit/703fbd9922c25b4e34fc8b443020e77d54a11afe))
+- **clerk-js:** Add global not_allowed_access error to localization prop ([0313fe5](https://github.com/clerkinc/javascript/commit/0313fe5ce4e0afca20865ad1b6d0503502ea6e4d))
+- **clerk-js:** Consistent ImpersonationFab drag behaviour in mobile ([b53d0a8](https://github.com/clerkinc/javascript/commit/b53d0a88b898e9aa8161906b671e0cd70c5ba2e9))
+- **clerk-js:** Extract BoringAvatar library module ([ca5420b](https://github.com/clerkinc/javascript/commit/ca5420b4dd6a6ddb26086c1f1641e9b2b44ea7b2))
+- **clerk-js:** Fix useSupportEmail.test.tsx ([52bb1cb](https://github.com/clerkinc/javascript/commit/52bb1cb950edc88b53c8ea05c88b3cfd6b1d377e))
+- **clerk-js:** Implement tabs components ([d9428cd](https://github.com/clerkinc/javascript/commit/d9428cdf21889318a181310f32ea77fe1f627e7e))
+- **clerk-js:** Improve keyboard nav and handle disabled tabs order of focus ([ae87f00](https://github.com/clerkinc/javascript/commit/ae87f0025b457ac64a60bd5176406bb46b1d532f))
+- **clerk-js:** Introduce FullHeightLoader element and replace Spinner in UserProfile ([121d697](https://github.com/clerkinc/javascript/commit/121d6972889fe8ecc3d534e12e40273766b2ba41))
+- **clerk-js:** Make global errors localizable ([e674272](https://github.com/clerkinc/javascript/commit/e674272bfe61d8eae24db3c10436f92eaf98a5da))
+- **clerk-js:** Make translateError fallback to longMessage first ([78627ca](https://github.com/clerkinc/javascript/commit/78627ca84f96627c3b5ccd77e4fbbcb52f5df784))
+- **clerk-js:** Minor refactor in naming and types ([8e1d32b](https://github.com/clerkinc/javascript/commit/8e1d32b660e33c2131642de0e9d0435e40544362))
+- **clerk-js:** Remove redundant code ([49c97e2](https://github.com/clerkinc/javascript/commit/49c97e2165eb54a430c22a74e86649e298205644))
+- **clerk-js:** Replace gravatar with Boring avatar ([7f2e2b6](https://github.com/clerkinc/javascript/commit/7f2e2b600fb746cc36c8464629d63ca3aa1a430b))
+
 ## [4.9.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.9.0-staging.1...@clerk/clerk-js@4.9.0) (2022-10-07)
 
 **Note:** Version bump only for package @clerk/clerk-js
