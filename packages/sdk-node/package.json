@@ -70,5 +70,6 @@
   "homepage": "https://clerk.dev/",
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "gitHead": "1b19a43b61f712756ab4d8c9ccbee6e8bddbe4ce"
 }

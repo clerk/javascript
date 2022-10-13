@@ -68,5 +68,6 @@
   "homepage": "https://clerk.dev/",
   "bugs": {
     "url": "https://github.com/clerkinc/javascript/issues"
-  }
+  },
+  "gitHead": "1b19a43b61f712756ab4d8c9ccbee6e8bddbe4ce"
 }
