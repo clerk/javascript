@@ -53,7 +53,7 @@ export const Avatar = (props: AvatarProps) => {
       <InitialsAvatarFallback {...props} />
     ) : (
       <Image
-        elementDescriptor={imageElementDescriptor || descriptors.avatarImage}
+        elementDescriptor={[imageElementDescriptor, descriptors.avatarImage]}
         alt={fullName}
         title={fullName}
         src={src || ''}
@@ -66,7 +66,7 @@ export const Avatar = (props: AvatarProps) => {
   // TODO: Revise size handling. Do we need to be this dynamic or should we use the theme instead?
   return (
     <Flex
-      elementDescriptor={boxElementDescriptor || descriptors.avatar}
+      elementDescriptor={[boxElementDescriptor, descriptors.avatarBox]}
       sx={[
         theme => ({
           flexShrink: 0,
@@ -95,7 +95,6 @@ function InitialsAvatarFallback(props: AvatarProps) {
 
   return (
     <Flex
-      elementDescriptor={descriptors.avatar}
       sx={{ position: 'relative' }}
       justify='center'
       align='center'
