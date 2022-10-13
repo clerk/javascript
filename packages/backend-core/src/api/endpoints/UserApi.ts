@@ -36,6 +36,7 @@ type CreateUserParams = {
   skipPasswordChecks?: boolean;
   skipPasswordRequirement?: boolean;
   totpSecret?: string;
+  backupCodes?: string[];
 } & UserMetadataParams;
 
 interface UpdateUserParams extends UserMetadataParams {
@@ -45,6 +46,8 @@ interface UpdateUserParams extends UserMetadataParams {
   password?: string;
   primaryEmailAddressID?: string;
   primaryPhoneNumberID?: string;
+  totpSecret?: string;
+  backupCodes?: string[];
 }
 
 type GetOrganizationMembershipListParams = {
