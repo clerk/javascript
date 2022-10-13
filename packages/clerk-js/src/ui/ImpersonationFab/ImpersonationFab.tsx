@@ -27,14 +27,12 @@ const EyeCircle = ({ width, height, ...props }: EyeCircleProps) => {
   const { sx, ...rest } = props;
   return (
     <Col
-      id='cl-impersonationEye'
       elementDescriptor={descriptors.impersonationFabIconContainer}
       center
       sx={[
         t => ({
           width,
           height,
-          transition: `transform ${t.transitionDuration.$slowest} ease`,
           backgroundColor: t.colors.$danger500,
           borderRadius: t.radii.$circle,
         }),
@@ -203,8 +201,12 @@ export const ImpersonationFab = () => {
         })}
       >
         <EyeCircle
+          id='cl-impersonationEye'
           width={eyeWidth}
           height={eyeHeight}
+          sx={t => ({
+            transition: `transform ${t.transitionDuration.$slowest} ease`,
+          })}
         />
 
         <Flex
