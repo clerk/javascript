@@ -1,4 +1,4 @@
-import React, { PointerEventHandler, TransitionEventHandler, useEffect, useRef, useState } from 'react';
+import React, { PointerEventHandler, useEffect, useRef } from 'react';
 
 import { mqu, PropsOfComponent } from '../../ui/styledSystem';
 import { getFullName, getIdentifier } from '../../ui/utils';
@@ -190,10 +190,12 @@ export const ImpersonationFab = () => {
             cursor: 'grab',
           },
           ':hover #cl-impersonationText': {
+            transition: `max-width ${t.transitionDuration.$slowest} ease, opacity ${t.transitionDuration.$slower} ease ${t.transitionDuration.$slowest}`,
             maxWidth: `min(calc(50vw - ${eyeWidth} - 2 * ${defaultRight}px), ${titleLength}ch)`,
             [mqu.md]: {
               maxWidth: `min(calc(100vw - ${eyeWidth} - 2 * ${defaultRight}px), ${titleLength}ch)`,
             },
+            opacity: 1,
           },
           ':hover #cl-impersonationEye': {
             transform: 'rotate(-180deg)',
@@ -208,8 +210,9 @@ export const ImpersonationFab = () => {
         <Flex
           id='cl-impersonationText'
           sx={t => ({
+            transition: `max-width ${t.transitionDuration.$slowest} ease, opacity ${t.transitionDuration.$fast} ease`,
             maxWidth: '0px',
-            transition: `max-width ${t.transitionDuration.$slowest} ease`,
+            opacity: 0,
           })}
         >
           <FabContent
