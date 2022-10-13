@@ -1,3 +1,4 @@
+import { ClerkAPIError } from '@clerk/types';
 import React from 'react';
 
 import { useLocalizations } from '../../customizables';
@@ -31,7 +32,7 @@ const useCardState = () => {
 
   return {
     setIdle: (metadata?: Metadata) => setState(s => ({ ...s, status: 'idle', metadata })),
-    setError: (metadata: Metadata) =>
+    setError: (metadata: ClerkAPIError | Metadata) =>
       setState(s => {
         return { ...s, error: translateError(metadata) };
       }),
