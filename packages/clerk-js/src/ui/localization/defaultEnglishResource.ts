@@ -298,5 +298,6 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
     form_param_nil: '',
     form_code_incorrect: '',
     form_password_incorrect: '',
+    not_allowed_access: '',
   },
 } as const;
