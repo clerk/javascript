@@ -69,11 +69,11 @@ export const useLocalizations = () => {
     if (!error || typeof error === 'string') {
       return t(error);
     }
-    const { code, message } = error || {};
+    const { code, message, longMessage } = error || {};
     if (!code) {
       return '';
     }
-    return t(localizationKeys(`unstable__errors.${code}` as any)) || message;
+    return t(localizationKeys(`unstable__errors.${code}` as any)) || longMessage || message;
   };
 
   return { t, translateError };
