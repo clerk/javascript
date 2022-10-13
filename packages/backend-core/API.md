@@ -560,6 +560,7 @@ Available parameters are:
 - _firstName_ User's first name.
 - _lastName_ User's last name.
 - _totpSecret_ User's secret for TOTP. Useful while migrating users with enabled 2FA Authenticator Apps.
+- _backupCodes_ User's backup codes. Useful while migrating users with already existed 2FA backup codes.
 - _publicMetadata_ Metadata saved on the user, that is visible to both your Frontend and Backend APIs.
 - _privateMetadata_ Metadata saved on the user, that is only visible to your Backend API.
 - _unsafeMetadata_ Metadata saved on the user, that can be updated from both the Frontend and Backend APIs. Note: Since this data can be modified from the frontend, it is not guaranteed to be safe.
@@ -587,6 +588,8 @@ Supported user attributes for update are:
 | primaryPhoneNumberID  |         string          |
 |    publicMetadata     | Record<string, unknown> |
 |    privateMetadata    | Record<string, unknown> |
+|      totpSecret       |         string          |
+|      backupCodes      |        string[]         |
 
 #### deleteUser(userId)
 

@@ -148,6 +148,7 @@ test('createUser() creates a user', async () => {
     firstName: 'Boss',
     lastName: 'Clerk',
     totpSecret: 'AICJ3HCXKO4KOY6NDH6RII4E3ZYL5ZBH',
+    backupCodes: ['1234', 'abcd'],
   };
 
   nock(defaultServerAPIUrl)
@@ -169,6 +170,8 @@ test('updateUser() updates a user', async () => {
         nestedKey: 42,
       },
     },
+    totpSecret: 'AICJ3HCXKO4KOY6NDH6RII4E3ZYL5ZBH',
+    backupCodes: ['1234', 'abcd'],
   };
 
   nock(defaultServerAPIUrl)
@@ -181,6 +184,8 @@ test('updateUser() updates a user', async () => {
           nestedKey: 42,
         },
       },
+      totp_secret: 'AICJ3HCXKO4KOY6NDH6RII4E3ZYL5ZBH',
+      backup_codes: ['1234', 'abcd'],
     })
     .replyWithFile(200, __dirname + '/responses/updateUser.json', {
       'Content-Type': '',
