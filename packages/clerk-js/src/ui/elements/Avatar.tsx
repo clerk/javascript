@@ -53,7 +53,7 @@ export const Avatar = (props: AvatarProps) => {
       <InitialsAvatarFallback {...props} />
     ) : (
       <Image
-        elementDescriptor={[imageElementDescriptor, descriptors.avatarImage]}
+        elementDescriptor={imageElementDescriptor || descriptors.avatarImage}
         alt={fullName}
         title={fullName}
         src={src || ''}
@@ -66,7 +66,7 @@ export const Avatar = (props: AvatarProps) => {
   // TODO: Revise size handling. Do we need to be this dynamic or should we use the theme instead?
   return (
     <Flex
-      elementDescriptor={[boxElementDescriptor, descriptors.avatarBox]}
+      elementDescriptor={boxElementDescriptor || descriptors.avatar}
       sx={[
         theme => ({
           flexShrink: 0,
@@ -89,6 +89,8 @@ export const Avatar = (props: AvatarProps) => {
   );
 };
 
+const avatarColors = ['#6C47FF', '#5BC5EF', '#FBD486', '#BEF972', '#FF8F8F'];
+
 function InitialsAvatarFallback(props: AvatarProps) {
   const initials = getInitials(props);
   const { parsedInternalTheme } = useAppearance();
@@ -100,18 +102,14 @@ function InitialsAvatarFallback(props: AvatarProps) {
       align='center'
     >
       <BoringAvatar
-        size={`${props.size?.(parsedInternalTheme)}`}
-        colors={[...parsedInternalTheme.colors.$colorAvatarGradient]}
+        size={Number(props.size?.(parsedInternalTheme))}
+        name={`${props.firstName} ${props.lastName}`}
+        colors={avatarColors}
       />
       {initials && (
         <Text
           as='span'
-          colorScheme='inherit'
-          sx={{
-            ...common.centeredFlex('inline-flex'),
-            width: '100%',
-            position: 'absolute',
-          }}
+          sx={{ ...common.centeredFlex('inline-flex'), width: '100%', position: 'absolute' }}
         >
           {initials}
         </Text>

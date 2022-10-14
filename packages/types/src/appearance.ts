@@ -206,7 +206,7 @@ export type ElementsConfig = {
   formFieldInputCopyToClipboardButton: WithOptions<never, never, never>;
   formFieldInputCopyToClipboardIcon: WithOptions<never, never, never>;
 
-  avatarBox: WithOptions<never, never, never>;
+  avatar: WithOptions<never, never, never>;
   avatarImage: WithOptions<never, never, never>;
 
   // TODO: We can remove "Popover" from these:
@@ -361,13 +361,6 @@ export type Variables = {
    * The background color for the card container.
    */
   colorBackground?: CssColor;
-
-  /*
-   * If a user hasn't provided an avatar image, a colorful gradient avatar will be shown as fallback.
-   * To customise the gradient,pass an array of CSS colors.
-   * @default ['#6C47FF', '#5BC5EF', '#FBD486', '#BEF972', '#FF8F8F'];
-   */
-  colorAvatarGradient?: CssColor[];
   /**
    * The default text color inside input elements. To customise the input background color instead, use {@link Variables.colorInputBackground}.
    * @default The value of {@link Variables.colorText}
