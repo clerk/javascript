@@ -38,7 +38,7 @@
     "test:coverage": "jest --collectCoverage"
   },
   "dependencies": {
-    "@clerk/shared": "^0.0.2",
+    "@clerk/shared": "^0.0.3",
     "@clerk/types": "^3.11.0",
     "@emotion/cache": "^11.7.1",
     "@emotion/react": "^11.9.0",
