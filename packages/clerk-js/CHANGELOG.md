@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.11.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.10.1...@clerk/clerk-js@4.11.0) (2022-10-14)
+
+### Features
+
+- **types,clerk-js:** List only authenticatable OAuth providers in Sign in/up components ([4b3f1e6](https://github.com/clerkinc/javascript/commit/4b3f1e67d655dfb3e818ce9015b68b369d7a1bd4))
+
+### Bug Fixes
+
+- **clerk-js:** Replace `avatar` descriptor with `avatarBox` ([65cab1f](https://github.com/clerkinc/javascript/commit/65cab1f4581ea40244c139a59e27f2dac7407d97))
+
 ### [4.10.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.10.0...@clerk/clerk-js@4.10.1) (2022-10-14)
 
 ### Bug Fixes

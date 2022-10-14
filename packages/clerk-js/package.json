@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "4.10.1",
+  "version": "4.11.0",
   "license": "MIT",
   "description": "Clerk.dev JS library",
   "keywords": [
@@ -38,8 +38,8 @@
     "test:coverage": "jest --collectCoverage"
   },
   "dependencies": {
-    "@clerk/shared": "^0.0.4",
-    "@clerk/types": "^3.11.0",
+    "@clerk/shared": "^0.0.5",
+    "@clerk/types": "^3.12.0",
     "@emotion/cache": "^11.7.1",
     "@emotion/react": "^11.9.0",
     "@floating-ui/react-dom-interactions": "^0.6.3",

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.12.0](https://github.com/clerkinc/javascript/compare/@clerk/types@3.11.0...@clerk/types@3.12.0) (2022-10-14)
+
+### Features
+
+- **types,clerk-js:** List only authenticatable OAuth providers in Sign in/up components ([4b3f1e6](https://github.com/clerkinc/javascript/commit/4b3f1e67d655dfb3e818ce9015b68b369d7a1bd4))
+
 ## [3.11.0](https://github.com/clerkinc/javascript/compare/@clerk/types@3.11.0-staging.2...@clerk/types@3.11.0) (2022-10-14)
 
 **Note:** Version bump only for package @clerk/types
