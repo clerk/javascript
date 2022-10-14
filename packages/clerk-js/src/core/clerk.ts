@@ -172,7 +172,7 @@ export default class Clerk implements ClerkInterface {
     await session?.remove();
     if (shouldSignOutCurrent) {
       return this.setActive({
-        session: null,
+        session: this.client.activeSessions.length > 0 ? this.client.activeSessions[0] : null,
         beforeEmit: ignoreEventValue(cb),
       });
     }
