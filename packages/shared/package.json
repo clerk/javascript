@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Internal package utils used by the Clerk SDKs",
   "types": "./dist/types/index.d.ts",
   "main": "./dist/index.js",
