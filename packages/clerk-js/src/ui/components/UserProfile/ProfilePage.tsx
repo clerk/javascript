@@ -35,11 +35,11 @@ export const ProfilePage = withCardStateProvider(() => {
 
   const userInfoChanged =
     (showFirstName && firstNameField.value !== userFirstName) || (showLastName && lastNameField.value !== userLastName);
-  const canSubmitOptionalFields = userInfoChanged || avatarChanged;
+  const optionalFieldsChanged = userInfoChanged || avatarChanged;
 
   const hasRequiredFields = (showFirstName && first_name.required) || (showLastName && last_name.required);
-  const canSubmitRequiredFields =
-    hasRequiredFields && !!lastNameField.value && !!firstNameField.value && canSubmitOptionalFields;
+  const requiredFieldsFilled =
+    hasRequiredFields && !!lastNameField.value && !!firstNameField.value && optionalFieldsChanged;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,7 +78,7 @@ export const ProfilePage = withCardStateProvider(() => {
               />
             </Form.ControlRow>
           )}
-          <FormButtons isDisabled={hasRequiredFields ? !canSubmitRequiredFields : !canSubmitOptionalFields} />
+          <FormButtons isDisabled={hasRequiredFields ? !requiredFieldsFilled : !optionalFieldsChanged} />
         </Form.Root>
       </ContentPage.Root>
       <SuccessPage
