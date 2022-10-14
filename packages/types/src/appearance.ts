@@ -206,7 +206,7 @@ export type ElementsConfig = {
   formFieldInputCopyToClipboardButton: WithOptions<never, never, never>;
   formFieldInputCopyToClipboardIcon: WithOptions<never, never, never>;
 
-  avatar: WithOptions<never, never, never>;
+  avatarBox: WithOptions<never, never, never>;
   avatarImage: WithOptions<never, never, never>;
 
   // TODO: We can remove "Popover" from these:
