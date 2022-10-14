@@ -213,15 +213,11 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
       connectedAccountsSection: {
         title: 'Connected accounts',
         primaryButton: 'Connect account',
-        failedConnection: {
-          title: 'Retry failed connection',
-          actionLabel: 'Try again',
-        },
-        remove: {
-          title: 'Remove',
-          subtitle: 'Remove this connected account from your account',
-          actionLabel: 'Remove connected account',
-        },
+        title__conectionFailed: 'Retry failed connection',
+        actionLabel__conectionFailed: 'Try again',
+        destructiveActionTitle: 'Remove',
+        destructiveActionSubtitle: 'Remove this connected account from your account',
+        destructiveActionAccordionSubtitle: 'Remove connected account',
       },
       passwordSection: {
         title: 'Password',
@@ -231,6 +227,12 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
       mfaSection: {
         title: 'Two-step verification',
         primaryButton: 'Add two-step verification',
+      },
+      backupCode2FaSection: {
+        regenerateTitle: 'Regenerate backup codes',
+        regenerateSubtitle:
+          'Get a fresh set of secure backup codes. Prior backup codes will be deleted and cannot be used.',
+        regenerateActionLabel: 'Regenerate codes',
       },
       activeDevicesSection: {
         title: 'Active devices',
@@ -247,8 +249,6 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
         destructiveActionTitle: 'Remove',
         destructiveActionSubtitle: 'Remove this web3 wallet from your account',
         destructiveAction: 'Remove wallet',
-        additiveAction: 'Add web3 wallet',
-        successMessage: 'The wallet has been added to your account.',
       },
     },
     profilePage: {
@@ -282,6 +282,8 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
       },
       removeResource: {
         title: 'Remove email address',
+        messageLine1: '{{identifier}} will be removed from this account.',
+        messageLine2: 'You will no longer be able to sign in using this email address.',
         successMessage: '{{emailAddress}} has been removed from your account.',
       },
     },
@@ -290,6 +292,8 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
       successMessage: '{{identifier}} has been added to your account.',
       removeResource: {
         title: 'Remove phone number',
+        messageLine1: '{{identifier}} will be removed from this account.',
+        messageLine2: 'You will no longer be able to sign in using this phone number.',
         successMessage: '{{phoneNumber}} has been removed from your account.',
       },
     },
@@ -301,12 +305,18 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
       successMessage: 'The provider has been added to your account',
       removeResource: {
         title: 'Remove connected account',
+        messageLine1: '{{identifier}} will be removed from this account.',
+        messageLine2: 'You will no longer be able to sign in using this connected account.',
         successMessage: '{{connectedAccount}} has been removed from your account.',
       },
     },
     web3WalletPage: {
+      title: 'Add web3 wallet',
+      successMessage: 'The wallet has been added to your account.',
       removeResource: {
         title: 'Remove web3 wallet',
+        messageLine1: '{{identifier}} will be removed from this account.',
+        messageLine2: 'You will no longer be able to sign in using this web3 wallet.',
         successMessage: '{{web3Wallet}} has been removed from your account.',
       },
     },
@@ -332,6 +342,8 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
       removeFactorActionLabel: 'Remove authenticator application',
       removeResource: {
         title: 'Remove two-step verification',
+        messageLine1: 'Verification codes from this authenticator will no longer be required when signing in.',
+        messageLine2: 'Your account may not be as secure. Are you sure you want to continue?',
         successMessage: 'Two-step verification via authenticator application has been removed.',
       },
     },
@@ -341,15 +353,13 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
         'SMS code two-step verification is now enabled for this phone number. When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
       removeResource: {
         title: 'Remove two-step verification',
+        messageLine1: '{{identifier}} will be no longer receiving verification codes when signing in.',
+        messageLine2: 'Your account may not be as secure. Are you sure you want to continue?',
         successMessage: 'SMS code two-step verification has been removed for {{mfaPhoneCode}}',
       },
     },
     backupCodePage: {
       title: 'Add backup code verification',
-      regenerateTitle: 'Regenerate backup codes',
-      regenerateSubtitle:
-        'Get a fresh set of secure backup codes. Prior backup codes will be deleted and cannot be used.',
-      regenerateActionLabel: 'Regenerate codes',
       successBackupCodeSubtitle:
         'You can use one of these to sign in to your account, if you lose access to your authentication device.',
     },

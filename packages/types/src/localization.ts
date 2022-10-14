@@ -221,15 +221,11 @@ type _LocalizationResource = {
       connectedAccountsSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
-        failedConnection: {
-          title: LocalizationValue;
-          actionLabel: LocalizationValue;
-        };
-        remove: {
-          title: LocalizationValue;
-          subtitle: LocalizationValue;
-          actionLabel: LocalizationValue;
-        };
+        title__conectionFailed: LocalizationValue;
+        actionLabel__conectionFailed: LocalizationValue;
+        destructiveActionTitle: LocalizationValue;
+        destructiveActionSubtitle: LocalizationValue;
+        destructiveActionAccordionSubtitle: LocalizationValue;
       };
       passwordSection: {
         title: LocalizationValue;
@@ -239,6 +235,11 @@ type _LocalizationResource = {
       mfaSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
+      };
+      backupCode2FaSection: {
+        regenerateTitle: LocalizationValue;
+        regenerateSubtitle: LocalizationValue;
+        regenerateActionLabel: LocalizationValue;
       };
       activeDevicesSection: {
         title: LocalizationValue;
@@ -255,8 +256,6 @@ type _LocalizationResource = {
         destructiveActionTitle: LocalizationValue;
         destructiveActionSubtitle: LocalizationValue;
         destructiveAction: LocalizationValue;
-        additiveAction: LocalizationValue;
-        successMessage: LocalizationValue;
       };
     };
     profilePage: {
@@ -290,6 +289,8 @@ type _LocalizationResource = {
       };
       removeResource: {
         title: LocalizationValue;
+        messageLine1: LocalizationValue;
+        messageLine2: LocalizationValue;
         successMessage: LocalizationValue;
       };
     };
@@ -298,6 +299,8 @@ type _LocalizationResource = {
       successMessage: LocalizationValue;
       removeResource: {
         title: LocalizationValue;
+        messageLine1: LocalizationValue;
+        messageLine2: LocalizationValue;
         successMessage: LocalizationValue;
       };
     };
@@ -309,12 +312,18 @@ type _LocalizationResource = {
       successMessage: LocalizationValue;
       removeResource: {
         title: LocalizationValue;
+        messageLine1: LocalizationValue;
+        messageLine2: LocalizationValue;
         successMessage: LocalizationValue;
       };
     };
     web3WalletPage: {
+      title: LocalizationValue;
+      successMessage: LocalizationValue;
       removeResource: {
         title: LocalizationValue;
+        messageLine1: LocalizationValue;
+        messageLine2: LocalizationValue;
         successMessage: LocalizationValue;
       };
     };
@@ -339,6 +348,8 @@ type _LocalizationResource = {
       removeFactorActionLabel: LocalizationValue;
       removeResource: {
         title: LocalizationValue;
+        messageLine1: LocalizationValue;
+        messageLine2: LocalizationValue;
         successMessage: LocalizationValue;
       };
     };
@@ -347,14 +358,13 @@ type _LocalizationResource = {
       successMessage: LocalizationValue;
       removeResource: {
         title: LocalizationValue;
+        messageLine1: LocalizationValue;
+        messageLine2: LocalizationValue;
         successMessage: LocalizationValue;
       };
     };
     backupCodePage: {
       title: LocalizationValue;
-      regenerateTitle: LocalizationValue;
-      regenerateSubtitle: LocalizationValue;
-      regenerateActionLabel: LocalizationValue;
       successBackupCodeSubtitle: LocalizationValue;
     };
     backupCodeCreatePage: {

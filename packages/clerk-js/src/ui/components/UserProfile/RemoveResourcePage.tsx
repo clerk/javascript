@@ -23,8 +23,10 @@ export const RemoveEmailPage = () => {
   return (
     <RemoveResourcePage
       title={localizationKeys('userProfile.emailAddressPage.removeResource.title')}
-      messageLine1={`${ref.current.emailAddress} will be removed from this account.`}
-      messageLine2={'You will no longer be able to sign in using this email address.'}
+      messageLine1={localizationKeys('userProfile.emailAddressPage.removeResource.messageLine1', {
+        identifier: ref.current.emailAddress,
+      })}
+      messageLine2={localizationKeys('userProfile.emailAddressPage.removeResource.messageLine2')}
       successMessage={localizationKeys('userProfile.emailAddressPage.removeResource.successMessage', {
         emailAddress: ref.current.emailAddress,
       })}
@@ -45,8 +47,10 @@ export const RemovePhonePage = () => {
   return (
     <RemoveResourcePage
       title={localizationKeys('userProfile.phoneNumberPage.removeResource.title')}
-      messageLine1={`${ref.current.phoneNumber} will be removed from this account.`}
-      messageLine2={`You will no longer be able to sign in using this phone number.`}
+      messageLine1={localizationKeys('userProfile.phoneNumberPage.removeResource.messageLine1', {
+        identifier: ref.current.phoneNumber,
+      })}
+      messageLine2={localizationKeys('userProfile.phoneNumberPage.removeResource.messageLine2')}
       successMessage={localizationKeys('userProfile.phoneNumberPage.removeResource.successMessage', {
         phoneNumber: ref.current.phoneNumber,
       })}
@@ -68,8 +72,10 @@ export const RemoveConnectedAccountPage = () => {
   return (
     <RemoveResourcePage
       title={localizationKeys('userProfile.connectedAccountPage.removeResource.title')}
-      messageLine1={`${providerToDisplayData[ref.current.provider]?.name} will be removed from this account.`}
-      messageLine2={`You will no longer be able to sign in using this connected account.`}
+      messageLine1={localizationKeys('userProfile.connectedAccountPage.removeResource.messageLine1', {
+        identifier: providerToDisplayData[ref.current.provider]?.name,
+      })}
+      messageLine2={localizationKeys('userProfile.connectedAccountPage.removeResource.messageLine2')}
       successMessage={localizationKeys('userProfile.connectedAccountPage.removeResource.successMessage', {
         connectedAccount: providerToDisplayData[ref.current.provider]?.name,
       })}
@@ -90,8 +96,10 @@ export const RemoveWeb3WalletPage = () => {
   return (
     <RemoveResourcePage
       title={localizationKeys('userProfile.web3WalletPage.removeResource.title')}
-      messageLine1={`${ref.current.web3Wallet} will be removed from this account.`}
-      messageLine2={`You will no longer be able to sign in using this web3 wallet.`}
+      messageLine1={localizationKeys('userProfile.web3WalletPage.removeResource.messageLine1', {
+        identifier: ref.current.web3Wallet,
+      })}
+      messageLine2={localizationKeys('userProfile.web3WalletPage.removeResource.messageLine2')}
       successMessage={localizationKeys('userProfile.web3WalletPage.removeResource.successMessage', {
         web3Wallet: ref.current.web3Wallet,
       })}
@@ -113,8 +121,10 @@ export const RemoveMfaPhoneCodePage = () => {
   return (
     <RemoveResourcePage
       title={localizationKeys('userProfile.mfaPhoneCodePage.removeResource.title')}
-      messageLine1={`${ref.current.phoneNumber} will be no longer receive verification codes when signing in.`}
-      messageLine2={`Your account may not be as secure. Are you sure you want to continue?`}
+      messageLine1={localizationKeys('userProfile.mfaPhoneCodePage.removeResource.messageLine1', {
+        identifier: ref.current.phoneNumber,
+      })}
+      messageLine2={localizationKeys('userProfile.mfaPhoneCodePage.removeResource.messageLine2')}
       successMessage={localizationKeys('userProfile.mfaPhoneCodePage.removeResource.successMessage', {
         mfaPhoneCode: ref.current.phoneNumber,
       })}
@@ -129,8 +139,8 @@ export const RemoveMfaTOTPPage = () => {
   return (
     <RemoveResourcePage
       title={localizationKeys('userProfile.mfaTOTPPage.removeResource.title')}
-      messageLine1='Verification codes from this authenticator will no longer be required when signing in.'
-      messageLine2='Your account may not be as secure. Are you sure you want to continue?'
+      messageLine1={localizationKeys('userProfile.mfaTOTPPage.removeResource.messageLine1')}
+      messageLine2={localizationKeys('userProfile.mfaTOTPPage.removeResource.messageLine2')}
       successMessage={localizationKeys('userProfile.mfaTOTPPage.removeResource.successMessage')}
       deleteResource={user.disableTOTP}
     />
@@ -139,8 +149,8 @@ export const RemoveMfaTOTPPage = () => {
 
 type RemovePageProps = {
   title: LocalizationKey;
-  messageLine1: string;
-  messageLine2: string;
+  messageLine1: LocalizationKey;
+  messageLine2: LocalizationKey;
   successMessage: LocalizationKey;
   deleteResource: () => Promise<any>;
 };

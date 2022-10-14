@@ -86,9 +86,9 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
         )}
         {error && (
           <LinkButtonWithDescription
-            title={localizationKeys('userProfile.start.connectedAccountsSection.failedConnection.title')}
+            title={localizationKeys('userProfile.start.connectedAccountsSection.title__conectionFailed')}
             subtitle={error as any}
-            actionLabel={localizationKeys('userProfile.start.connectedAccountsSection.failedConnection.actionLabel')}
+            actionLabel={localizationKeys('userProfile.start.connectedAccountsSection.actionLabel__conectionFailed')}
             onClick={() => {
               return user
                 .createExternalAccount({
@@ -100,10 +100,13 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
             }}
           />
         )}
+
         <LinkButtonWithDescription
-          title={localizationKeys('userProfile.start.connectedAccountsSection.remove.title')}
-          subtitle={localizationKeys('userProfile.start.connectedAccountsSection.remove.subtitle')}
-          actionLabel={localizationKeys('userProfile.start.connectedAccountsSection.remove.actionLabel')}
+          title={localizationKeys('userProfile.start.connectedAccountsSection.destructiveActionTitle')}
+          subtitle={localizationKeys('userProfile.start.connectedAccountsSection.destructiveActionSubtitle')}
+          actionLabel={localizationKeys(
+            'userProfile.start.connectedAccountsSection.destructiveActionAccordionSubtitle',
+          )}
           colorScheme='danger'
           onClick={() => navigate(`connected-account/${account.id}/remove`)}
         />
