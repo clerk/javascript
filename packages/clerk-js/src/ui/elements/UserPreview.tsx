@@ -45,6 +45,7 @@ export const UserPreview = (props: UserPreviewProps) => {
           boxElementDescriptor={descriptors.userPreviewAvatarBox}
           imageElementDescriptor={descriptors.userPreviewAvatarImage}
           {...user}
+          profileImageUrl={profileImageUrl || user.profileImageUrl}
           size={theme => ({ sm: theme.sizes.$8, md: theme.sizes.$11, lg: theme.sizes.$12x5 }[size])}
           optimize
         />
