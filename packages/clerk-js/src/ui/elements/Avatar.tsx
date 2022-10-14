@@ -1,7 +1,7 @@
 import { isRetinaDisplay } from '@clerk/shared';
 import React from 'react';
 
-import { descriptors, Flex, Image, Text, useAppearance } from '../customizables';
+import { descriptors, Flex, Image, Text } from '../customizables';
 import { ElementDescriptor } from '../customizables/elementDescriptors';
 import { InternalTheme } from '../foundations';
 import { common, ThemableCssProp } from '../styledSystem';
@@ -34,11 +34,14 @@ export const Avatar = (props: AvatarProps) => {
     imageElementDescriptor,
   } = props;
   const [error, setError] = React.useState(false);
+  const initials = getInitials({ firstName, lastName, name });
   const fullName = getFullName({ firstName, lastName, name });
   const avatarExists = hasAvatar(profileImageUrl);
   let src;
 
-  if (avatarExists && !optimize && profileImageUrl) {
+  if (!avatarExists) {
+    src = GRAVATAR_DEFAULT_AVATAR;
+  } else if (!optimize && profileImageUrl) {
     const optimizedHeight = Math.max(profileImageFetchSize) * (isRetinaDisplay() ? 2 : 1);
     const srcUrl = new URL(profileImageUrl);
     srcUrl.searchParams.append('height', optimizedHeight.toString());
@@ -48,14 +51,14 @@ export const Avatar = (props: AvatarProps) => {
   }
 
   const ImgOrFallback =
-    !avatarExists || error ? (
+    initials && (!avatarExists || error) ? (
       <InitialsAvatarFallback {...props} />
     ) : (
       <Image
         elementDescriptor={imageElementDescriptor || descriptors.avatarImage}
         alt={fullName}
         title={fullName}
-        src={src || (profileImageUrl as string)}
+        src={src || GRAVATAR_DEFAULT_AVATAR}
         width='100%'
         height='100%'
         onError={() => setError(true)}
@@ -90,37 +93,21 @@ export const Avatar = (props: AvatarProps) => {
 
 function InitialsAvatarFallback(props: AvatarProps) {
   const initials = getInitials(props);
-  const { parsedInternalTheme } = useAppearance();
 
   return (
-    <Flex
-      sx={{ position: 'relative' }}
-      justify='center'
-      align='center'
+    <Text
+      as='span'
+      sx={{ ...common.centeredFlex('inline-flex'), width: '100%' }}
     >
-      <BoringAvatar
-        size={props.size?.(parsedInternalTheme)}
-        name={`${props.firstName} ${props.lastName}`}
-        colors={['#CEEBD1', '#B6DEB9', '#B1CCB4', '#AEBFAF', '#A6ADA7']}
-      />
-      {initials && (
-        <Text
-          as='span'
-          sx={{ ...common.centeredFlex('inline-flex'), width: '100%', position: 'absolute' }}
-        >
-          {initials}
-        </Text>
-      )}
-    </Flex>
+      {initials}
+    </Text>
   );
 }
 
 const CLERK_IMAGE_URL_REGEX = /https:\/\/images\.(lcl)?clerk/i;
-const GRAVATAR_URL_REGEX = /gravatar/i;
+const GRAVATAR_DEFAULT_AVATAR = 'https://www.gravatar.com/avatar?d=mp';
+
 // TODO: How do we want to handle this?
 export function hasAvatar(profileImageUrl: string | undefined | null): boolean {
-  return (
-    (CLERK_IMAGE_URL_REGEX.test(profileImageUrl!) || !!profileImageUrl) &&
-    !GRAVATAR_URL_REGEX.test(profileImageUrl as string)
-  );
+  return CLERK_IMAGE_URL_REGEX.test(profileImageUrl!) || !!profileImageUrl;
 }
