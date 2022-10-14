@@ -5,6 +5,7 @@ import { AuthApp, PencilEdit } from '../icons';
 import { PropsOfComponent } from '../styledSystem';
 import { formatSafeIdentifier, getFlagEmojiFromCountryIso, isMaskedIdentifier, parsePhoneString } from '../utils';
 import { Avatar } from './Avatar';
+import { UserAvatar } from './UserAvatar';
 
 type IdentityPreviewProps = {
   avatarUrl: string | null | undefined;
@@ -75,7 +76,7 @@ const IdentifierContainer = (props: React.PropsWithChildren<{}>) => {
 const UsernameOrEmailIdentifier = (props: any) => {
   return (
     <>
-      <Avatar
+      <UserAvatar
         boxElementDescriptor={descriptors.identityPreviewAvatarBox}
         imageElementDescriptor={descriptors.identityPreviewAvatarImage}
         profileImageUrl={props.avatarUrl}

@@ -33,6 +33,7 @@ export * from './Pagination';
 export * from './FullHeightLoader';
 export * from './Tabs';
 export * from './InputWithIcon';
+export * from './UserAvatar';
 export * from './Navbar';
 export * from './Breadcrumbs';
 export * from './ContentPage';
