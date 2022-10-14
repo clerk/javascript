@@ -3,9 +3,9 @@ import React from 'react';
 import { useCoreUser } from '../contexts';
 import { Button, Col, Flex, localizationKeys, Text } from '../customizables';
 import { handleError } from '../utils';
-import { Avatar } from './Avatar';
 import { useCardState } from './contexts';
 import { FileDropArea } from './FileDropArea';
+import { UserAvatar } from './UserAvatar';
 
 type AvatarUploaderProps = {
   onAvatarChange: (file: File) => Promise<unknown>;
@@ -39,7 +39,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
         align='center'
         {...rest}
       >
-        <Avatar
+        <UserAvatar
           {...user}
           size={theme => theme.sizes.$11}
           optimize

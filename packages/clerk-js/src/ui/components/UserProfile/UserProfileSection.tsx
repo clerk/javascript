@@ -19,7 +19,7 @@ export const UserProfileSection = () => {
     >
       <BlockButton onClick={() => navigate('profile')}>
         <UserPreview
-          user={userWithoutIdentifiers as UserResource}
+          user={userWithoutIdentifiers}
           size='lg'
         />
       </BlockButton>
