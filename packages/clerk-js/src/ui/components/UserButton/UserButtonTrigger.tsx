@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useCoreUser } from '../../contexts';
 import { Button, descriptors } from '../../customizables';
-import { Avatar } from '../../elements';
+import { UserAvatar } from '../../elements';
 import { PropsOfComponent } from '../../styledSystem';
 
 type UserButtonTriggerProps = PropsOfComponent<typeof Button> & { isOpen: boolean };
@@ -18,7 +18,7 @@ export const UserButtonTrigger = React.forwardRef<HTMLButtonElement, UserButtonT
       {...props}
       ref={ref}
     >
-      <Avatar
+      <UserAvatar
         boxElementDescriptor={descriptors.userButtonAvatarBox}
         imageElementDescriptor={descriptors.userButtonAvatarImage}
         {...user}

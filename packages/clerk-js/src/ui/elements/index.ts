@@ -33,3 +33,4 @@ export * from './Pagination';
 export * from './FullHeightLoader';
 export * from './Tabs';
 export * from './InputWithIcon';
+export * from './UserAvatar';

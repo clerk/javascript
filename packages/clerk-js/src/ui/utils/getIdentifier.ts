@@ -1,6 +1,6 @@
 import { UserResource } from '@clerk/types';
 
-export const getIdentifier = (user: UserResource): string => {
+export const getIdentifier = (user: Partial<UserResource>): string => {
   if (user.username) {
     return user.username;
   }

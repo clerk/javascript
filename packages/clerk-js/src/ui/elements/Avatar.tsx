@@ -4,18 +4,16 @@ import React from 'react';
 import { descriptors, Flex, Image, Text } from '../customizables';
 import { ElementDescriptor } from '../customizables/elementDescriptors';
 import { InternalTheme } from '../foundations';
-import { common, ThemableCssProp } from '../styledSystem';
-import { getFullName, getInitials } from '../utils';
+import { common, PropsOfComponent } from '../styledSystem';
 
-type AvatarProps = {
+type AvatarProps = PropsOfComponent<typeof Flex> & {
   size?: (theme: InternalTheme) => string | number;
-  firstName?: string | null;
-  lastName?: string | null;
-  name?: string | null;
-  profileImageUrl?: string | null;
-  profileImageFetchSize?: number;
+  title?: string;
+  initials?: string;
+  imageUrl?: string | null;
+  imageFetchSize?: number;
   optimize?: boolean;
-  sx?: ThemableCssProp;
+  rounded?: boolean;
   boxElementDescriptor?: ElementDescriptor;
   imageElementDescriptor?: ElementDescriptor;
 };
@@ -23,42 +21,38 @@ type AvatarProps = {
 export const Avatar = (props: AvatarProps) => {
   const {
     size = () => 26,
-    firstName,
-    lastName,
-    name,
-    profileImageUrl,
+    title,
+    initials,
+    imageUrl,
     optimize,
-    profileImageFetchSize = 64,
+    rounded = true,
+    imageFetchSize = 64,
     sx,
     boxElementDescriptor,
     imageElementDescriptor,
   } = props;
   const [error, setError] = React.useState(false);
-  const initials = getInitials({ firstName, lastName, name });
-  const fullName = getFullName({ firstName, lastName, name });
-  const avatarExists = hasAvatar(profileImageUrl);
+  const avatarExists = hasAvatar(imageUrl);
   let src;
 
-  if (!avatarExists) {
-    src = GRAVATAR_DEFAULT_AVATAR;
-  } else if (!optimize && profileImageUrl) {
-    const optimizedHeight = Math.max(profileImageFetchSize) * (isRetinaDisplay() ? 2 : 1);
-    const srcUrl = new URL(profileImageUrl);
+  if (avatarExists && !optimize && imageUrl) {
+    const optimizedHeight = Math.max(imageFetchSize) * (isRetinaDisplay() ? 2 : 1);
+    const srcUrl = new URL(imageUrl);
     srcUrl.searchParams.append('height', optimizedHeight.toString());
     src = srcUrl.toString();
   } else {
-    src = profileImageUrl;
+    src = imageUrl;
   }
 
   const ImgOrFallback =
     initials && (!avatarExists || error) ? (
-      <InitialsAvatarFallback {...props} />
+      <InitialsAvatarFallback initials={initials} />
     ) : (
       <Image
-        elementDescriptor={[imageElementDescriptor || descriptors.avatarImage]}
-        alt={fullName}
-        title={fullName}
-        src={src || GRAVATAR_DEFAULT_AVATAR}
+        elementDescriptor={[imageElementDescriptor, descriptors.avatarImage]}
+        title={title}
+        alt={title}
+        src={src || ''}
         width='100%'
         height='100%'
         onError={() => setError(true)}
@@ -72,7 +66,7 @@ export const Avatar = (props: AvatarProps) => {
       sx={[
         theme => ({
           flexShrink: 0,
-          borderRadius: theme.radii.$circle,
+          borderRadius: rounded ? theme.radii.$circle : theme.radii.$md,
           overflow: 'hidden',
           width: size(theme),
           height: size(theme),
@@ -91,8 +85,8 @@ export const Avatar = (props: AvatarProps) => {
   );
 };
 
-function InitialsAvatarFallback(props: AvatarProps) {
-  const initials = getInitials(props);
+const InitialsAvatarFallback = (props: { initials: string }) => {
+  const initials = props.initials;
 
   return (
     <Text
@@ -102,12 +96,11 @@ function InitialsAvatarFallback(props: AvatarProps) {
       {initials}
     </Text>
   );
-}
+};
 
 const CLERK_IMAGE_URL_REGEX = /https:\/\/images\.(lcl)?clerk/i;
-const GRAVATAR_DEFAULT_AVATAR = 'https://www.gravatar.com/avatar?d=mp';
 
 // TODO: How do we want to handle this?
-export function hasAvatar(profileImageUrl: string | undefined | null): boolean {
-  return CLERK_IMAGE_URL_REGEX.test(profileImageUrl!) || !!profileImageUrl;
+export function hasAvatar(imageUrl: string | undefined | null): boolean {
+  return CLERK_IMAGE_URL_REGEX.test(imageUrl!) || !!imageUrl;
 }

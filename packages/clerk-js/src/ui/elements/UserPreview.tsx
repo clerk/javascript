@@ -4,10 +4,10 @@ import React from 'react';
 import { descriptors, Flex, Text } from '../customizables';
 import { PropsOfComponent } from '../styledSystem';
 import { getFullName, getIdentifier } from '../utils';
-import { Avatar } from './Avatar';
+import { UserAvatar } from './UserAvatar';
 
 export type UserPreviewProps = PropsOfComponent<typeof Flex> & {
-  user: UserResource;
+  user: Partial<UserResource>;
   size?: 'lg' | 'md' | 'sm';
   icon?: React.ReactNode;
   badge?: React.ReactNode;
@@ -41,11 +41,10 @@ export const UserPreview = (props: UserPreviewProps) => {
         justify='center'
         sx={theme => ({ position: 'relative', flex: `0 0 ${theme.sizes.$11}` })}
       >
-        <Avatar
+        <UserAvatar
           boxElementDescriptor={descriptors.userPreviewAvatarBox}
           imageElementDescriptor={descriptors.userPreviewAvatarImage}
           {...user}
-          {...(profileImageUrl !== undefined && { profileImageUrl })}
           size={theme => ({ sm: theme.sizes.$8, md: theme.sizes.$11, lg: theme.sizes.$12x5 }[size])}
           optimize
         />

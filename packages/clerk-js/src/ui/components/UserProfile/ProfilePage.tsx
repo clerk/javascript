@@ -3,7 +3,7 @@ import React from 'react';
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser, useEnvironment } from '../../contexts';
 import { Button, Col, Flex, localizationKeys, Text } from '../../customizables';
-import { Avatar, FileDropArea, Form, useCardState, withCardStateProvider } from '../../elements';
+import { FileDropArea, Form, useCardState, UserAvatar, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 import { FormButtons } from './FormButtons';
 import { ContentPage } from './Page';
@@ -118,7 +118,7 @@ const AvatarUploader = (props: AvatarUploaderProps) => {
         align='center'
         {...rest}
       >
-        <Avatar
+        <UserAvatar
           {...user}
           size={theme => theme.sizes.$11}
           optimize
