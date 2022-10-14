@@ -28,13 +28,6 @@ describe('fastDeepMergeReplace', () => {
     fastDeepMergeAndReplace(source, target);
     expect(target).toEqual({ a: '1', b: '2', c: '3', obj: { a: '1', b: '2' } });
   });
-
-  it('does not deep-merge arrays', () => {
-    const source = { obj: { a: 1 }, arr: [1, 2, 3] };
-    const target = { obj: { b: 2 }, arr: [1, 2, 3, 4, 5, 6] };
-    fastDeepMergeAndReplace(source, target);
-    expect(target).toEqual({ obj: { a: 1, b: 2 }, arr: [1, 2, 3] });
-  });
 });
 
 describe('fastDeepMergeKeep', () => {
@@ -64,12 +57,5 @@ describe('fastDeepMergeKeep', () => {
     const target = { a: '10', obj: { a: '10', b: '20' } };
     fastDeepMergeAndKeep(source, target);
     expect(target).toEqual({ a: '10', b: '2', c: '3', obj: { a: '10', b: '20' } });
-  });
-
-  it('does not deep-merge arrays', () => {
-    const source = { obj: { a: 1 }, arr: [1, 2, 3] };
-    const target = { obj: { b: 2 }, arr: [1, 2, 3, 4, 5, 6] };
-    fastDeepMergeAndKeep(source, target);
-    expect(target).toEqual({ obj: { a: 1, b: 2 }, arr: [1, 2, 3, 4, 5, 6] });
   });
 });

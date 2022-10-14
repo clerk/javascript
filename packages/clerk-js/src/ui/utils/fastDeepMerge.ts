@@ -12,8 +12,7 @@ export const fastDeepMergeAndReplace = (
   }
 
   for (const key in source) {
-    // Deep merge objects but shallow-copy arrays
-    if (source[key] !== null && typeof source[key] === `object` && !Array.isArray(source[key])) {
+    if (source[key] !== null && typeof source[key] === `object`) {
       if (target[key] === undefined) {
         target[key] = new (Object.getPrototypeOf(source[key]).constructor)();
       }
@@ -33,8 +32,7 @@ export const fastDeepMergeAndKeep = (
   }
 
   for (const key in source) {
-    // Deep merge objects but shallow-copy arrays
-    if (source[key] !== null && typeof source[key] === `object` && !Array.isArray(source[key])) {
+    if (source[key] !== null && typeof source[key] === `object`) {
       if (target[key] === undefined) {
         target[key] = new (Object.getPrototypeOf(source[key]).constructor)();
       }

@@ -49,15 +49,7 @@ function generateColors(name: string, colors: string[]) {
   return elementsProperties;
 }
 
-type AvatarProps = {
-  colors: string[];
-  name: string;
-  square: boolean;
-  title: boolean;
-  size: string;
-};
-
-const AvatarMarble = (props: AvatarProps) => {
+const AvatarMarble = props => {
   const properties = generateColors(props.name, props.colors);
 
   return (
@@ -138,10 +130,10 @@ const AvatarMarble = (props: AvatarProps) => {
 
 export const BoringAvatar = ({
   colors = ['#92A1C6', '#146A7C', '#F0AB3D', '#C271B4', '#C20D90'],
-  name = '',
+  name = 'Clara Barton',
   square = false,
   title = false,
-  size = '40px',
+  size = 40,
   ...props
 }) => {
   const avatarProps = { colors, name, title, size, square, ...props };
