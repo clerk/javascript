@@ -17,6 +17,8 @@ export const ProfilePage = withCardStateProvider(() => {
   const { first_name, last_name } = useEnvironment().userSettings.attributes;
   const showFirstName = first_name.enabled;
   const showLastName = last_name.enabled;
+  const userFirstName = user.firstName || '';
+  const userLastName = user.lastName || '';
 
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
 
@@ -32,9 +34,12 @@ export const ProfilePage = withCardStateProvider(() => {
   });
 
   const userInfoChanged =
-    (showFirstName && firstNameField.value && firstNameField.value !== user.firstName) ||
-    (showLastName && lastNameField.value && lastNameField.value !== user.lastName);
-  const canSubmit = userInfoChanged || avatarChanged;
+    (showFirstName && firstNameField.value !== userFirstName) || (showLastName && lastNameField.value !== userLastName);
+  const canSubmitOptionalFields = userInfoChanged || avatarChanged;
+
+  const hasRequiredFields = (showFirstName && first_name.required) || (showLastName && last_name.required);
+  const canSubmitRequiredFields =
+    hasRequiredFields && !!lastNameField.value && !!firstNameField.value && canSubmitOptionalFields;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,7 +66,7 @@ export const ProfilePage = withCardStateProvider(() => {
             <Form.ControlRow>
               <Form.Control
                 {...firstNameField.props}
-                required
+                required={first_name.required}
               />
             </Form.ControlRow>
           )}
@@ -69,11 +74,11 @@ export const ProfilePage = withCardStateProvider(() => {
             <Form.ControlRow>
               <Form.Control
                 {...lastNameField.props}
-                required
+                required={last_name.required}
               />
             </Form.ControlRow>
           )}
-          <FormButtons isDisabled={!canSubmit} />
+          <FormButtons isDisabled={hasRequiredFields ? !canSubmitRequiredFields : !canSubmitOptionalFields} />
         </Form.Root>
       </ContentPage.Root>
       <SuccessPage
