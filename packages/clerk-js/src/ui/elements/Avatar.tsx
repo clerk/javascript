@@ -10,7 +10,7 @@ type AvatarProps = PropsOfComponent<typeof Flex> & {
   size?: (theme: InternalTheme) => string | number;
   title?: string;
   initials?: string;
-  imageUrl?: string | null;
+  imageUrl?: string;
   imageFetchSize?: number;
   optimize?: boolean;
   rounded?: boolean;
