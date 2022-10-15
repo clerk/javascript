@@ -26,6 +26,7 @@ const AppBar = () => {
         alignItems: 'center',
         padding: '1rem',
         borderBottom: '1px solid black',
+        marginBottom: '2rem',
       }}
     >
       <Link href={'/'}>
