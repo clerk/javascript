@@ -399,6 +399,13 @@ type _LocalizationResource = {
     action__signOutAll: LocalizationValue;
     action__addAccount: LocalizationValue;
   };
+  organizationSwitcher: {
+    title: LocalizationValue;
+    personalWorkspace: LocalizationValue;
+    notSelected: LocalizationValue;
+    action__createOrganization: LocalizationValue;
+    action__manageOrganization: LocalizationValue;
+  };
   impersonationFab: {
     title: LocalizationValue;
     action__signOut: LocalizationValue;

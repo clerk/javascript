@@ -1,11 +1,10 @@
 import React from 'react';
 
 import { Button, descriptors, Flex, Icon, Text } from '../customizables';
+import { UserAvatar } from '../elements';
 import { AuthApp, PencilEdit } from '../icons';
 import { PropsOfComponent } from '../styledSystem';
 import { formatSafeIdentifier, getFlagEmojiFromCountryIso, isMaskedIdentifier, parsePhoneString } from '../utils';
-import { Avatar } from './Avatar';
-import { UserAvatar } from './UserAvatar';
 
 type IdentityPreviewProps = {
   avatarUrl: string | null | undefined;

@@ -17,11 +17,13 @@ export type OrganizationPreviewProps = PropsOfComponent<typeof Flex> & {
 export const OrganizationPreview = (props: OrganizationPreviewProps) => {
   const { organization, size = 'md', icon, rounded = false, badge, sx, ...rest } = props;
   const name = organization.name;
+  //Mocks
+  const role = 'Member';
 
   return (
     <Flex
-      // elementDescriptor={descriptors.userPreview}
-      // elementId={descriptors.userPreview.setId(elementId)}
+      // elementDescriptor={descriptors.organizationPreview}
+      // elementId={descriptors.organizationPreview.setId(elementId)}
       gap={4}
       align='center'
       sx={[
@@ -34,14 +36,14 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
       {...rest}
     >
       <Flex
-        // elementDescriptor={descriptors.userPreviewAvatarContainer}
+        // elementDescriptor={descriptors.organizationPreviewAvatarContainer}
         // elementId={descriptors.userPreviewAvatarContainer.setId(elementId)}
         justify='center'
         sx={theme => ({ position: 'relative', flex: `0 0 ${theme.sizes.$11}` })}
       >
         <OrganizationAvatar
-          // boxElementDescriptor={descriptors.userPreviewAvatarBox}
-          // imageElementDescriptor={descriptors.userPreviewAvatarImage}
+          // boxElementDescriptor={descriptors.organizationPreviewAvatarBox}
+          // imageElementDescriptor={descriptors.organizationPreviewAvatarImage}
           {...organization}
           size={theme => ({ sm: theme.sizes.$8, md: theme.sizes.$11, lg: theme.sizes.$12x5 }[size])}
           optimize
@@ -50,15 +52,15 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
         {icon && <Flex sx={{ position: 'absolute', left: 0, bottom: 0 }}>{icon}</Flex>}
       </Flex>
       <Flex
-        // elementDescriptor={descriptors.userPreviewTextContainer}
-        // elementId={descriptors.userPreviewTextContainer.setId(elementId)}
+        // elementDescriptor={descriptors.organizationPreviewTextContainer}
+        // elementId={descriptors.organizationPreviewTextContainer.setId(elementId)}
         direction='col'
         justify='center'
         sx={{ minWidth: '0px', textAlign: 'left' }}
       >
         <Text
-          // elementDescriptor={descriptors.userPreviewMainIdentifier}
-          // elementId={descriptors.userPreviewMainIdentifier.setId(elementId)}
+          // elementDescriptor={descriptors.organizationPreviewMainIdentifier}
+          // elementId={descriptors.organizationPreviewMainIdentifier.setId(elementId)}
           variant={size === 'md' ? 'regularMedium' : 'smallMedium'}
           truncate
         >
@@ -66,14 +68,13 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
         </Text>
         {name && (
           <Text
-            // elementDescriptor={descriptors.userPreviewSecondaryIdentifier}
-            //   elementId={descriptors.userPreviewSecondaryIdentifier.setId(elementId)}
+            // elementDescriptor={descriptors.organizationPreviewSecondaryIdentifier}
+            //   elementId={descriptors.organizationPreviewSecondaryIdentifier.setId(elementId)}
             variant='smallRegular'
             colorScheme='neutral'
             truncate
           >
-            {/* TODO: Add org role for user */}
-            Member
+            {role}
           </Text>
         )}
       </Flex>
