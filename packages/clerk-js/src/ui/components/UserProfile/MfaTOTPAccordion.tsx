@@ -24,14 +24,14 @@ export const MfaTOTPAccordion = () => {
     >
       <Col gap={4}>
         <LinkButtonWithDescription
-          title={localizationKeys('userProfile.mfaTOTPPage.defaultFactorTitle')}
-          subtitle={localizationKeys('userProfile.mfaTOTPPage.defaultFactorSubtitle')}
+          title={localizationKeys('userProfile.start.mfaSection.totp.title')}
+          subtitle={localizationKeys('userProfile.start.mfaSection.totp.subtitle')}
         />
 
         <LinkButtonWithDescription
-          title={localizationKeys('userProfile.mfaTOTPPage.removeFactorTitle')}
-          subtitle={localizationKeys('userProfile.mfaTOTPPage.removeFactorSubtitle')}
-          actionLabel={localizationKeys('userProfile.mfaTOTPPage.removeFactorActionLabel')}
+          title={localizationKeys('userProfile.start.mfaSection.totp.destructiveActionTitle')}
+          subtitle={localizationKeys('userProfile.start.mfaSection.totp.destructiveActionSubtitle')}
+          actionLabel={localizationKeys('userProfile.start.mfaSection.totp.destructiveActionLabel')}
           colorScheme='danger'
           onClick={() => navigate(`multi-factor/totp/remove`)}
         />

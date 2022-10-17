@@ -210,13 +210,7 @@ type _LocalizationResource = {
         detailsAction__unverified: LocalizationValue;
         destructiveActionTitle: LocalizationValue;
         destructiveActionSubtitle: LocalizationValue;
-        destructiveActionAccordionSubtitle: LocalizationValue;
         destructiveAction: LocalizationValue;
-        defaultFactorTitle__default: LocalizationValue;
-        defaultFactorTitle__setDefault: LocalizationValue;
-        defaultFactorSubtitle__default: LocalizationValue;
-        defaultFactorSubtitle__setDefault: LocalizationValue;
-        defaultFactorActionLabel__setDefault: LocalizationValue;
       };
       connectedAccountsSection: {
         title: LocalizationValue;
@@ -235,11 +229,28 @@ type _LocalizationResource = {
       mfaSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
-      };
-      backupCode2FaSection: {
-        regenerateTitle: LocalizationValue;
-        regenerateSubtitle: LocalizationValue;
-        regenerateActionLabel: LocalizationValue;
+        phoneCode: {
+          destructiveActionTitle: LocalizationValue;
+          destructiveActionSubtitle: LocalizationValue;
+          destructiveActionLabel: LocalizationValue;
+          title__default: LocalizationValue;
+          title__setDefault: LocalizationValue;
+          subtitle__default: LocalizationValue;
+          subtitle__setDefault: LocalizationValue;
+          actionLabel__setDefault: LocalizationValue;
+        };
+        backupCodes: {
+          title__regenerate: LocalizationValue;
+          subtitle__regenerate: LocalizationValue;
+          actionLabel__regenerate: LocalizationValue;
+        };
+        totp: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+          destructiveActionTitle: LocalizationValue;
+          destructiveActionSubtitle: LocalizationValue;
+          destructiveActionLabel: LocalizationValue;
+        };
       };
       activeDevicesSection: {
         title: LocalizationValue;
@@ -341,11 +352,6 @@ type _LocalizationResource = {
       verifyTitle: LocalizationValue;
       verifySubtitle: LocalizationValue;
       successMessage: LocalizationValue;
-      defaultFactorTitle: LocalizationValue;
-      defaultFactorSubtitle: LocalizationValue;
-      removeFactorTitle: LocalizationValue;
-      removeFactorSubtitle: LocalizationValue;
-      removeFactorActionLabel: LocalizationValue;
       removeResource: {
         title: LocalizationValue;
         messageLine1: LocalizationValue;

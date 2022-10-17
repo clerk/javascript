@@ -21,9 +21,9 @@ export const MfaBackupCodeAccordion = () => {
     >
       <Col gap={4}>
         <LinkButtonWithDescription
-          title={localizationKeys('userProfile.start.backupCode2FaSection.regenerateTitle')}
-          subtitle={localizationKeys('userProfile.start.backupCode2FaSection.regenerateSubtitle')}
-          actionLabel={localizationKeys('userProfile.start.backupCode2FaSection.regenerateActionLabel')}
+          title={localizationKeys('userProfile.start.mfaSection.backupCodes.title__regenerate')}
+          subtitle={localizationKeys('userProfile.start.mfaSection.backupCodes.subtitle__regenerate')}
+          actionLabel={localizationKeys('userProfile.start.mfaSection.backupCodes.actionLabel__regenerate')}
           onClick={() => navigate('multi-factor/backup_code/add')}
         />
       </Col>

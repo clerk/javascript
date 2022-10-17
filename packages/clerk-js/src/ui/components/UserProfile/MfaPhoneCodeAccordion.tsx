@@ -42,14 +42,18 @@ export const MfaPhoneCodeAccordion = ({ phone, showTOTP }: MfaPhoneCodeAccordion
         {!showTOTP && (
           <LinkButtonWithDescription
             title={localizationKeys(
-              `userProfile.start.phoneNumbersSection.defaultFactorTitle__${isDefault ? 'default' : 'setDefault'}`,
+              isDefault
+                ? 'userProfile.start.mfaSection.phoneCode.title__default'
+                : 'userProfile.start.mfaSection.phoneCode.title__setDefault',
             )}
             subtitle={localizationKeys(
-              `userProfile.start.phoneNumbersSection.defaultFactorSubtitle__${isDefault ? 'default' : 'setDefault'}`,
+              isDefault
+                ? 'userProfile.start.mfaSection.phoneCode.subtitle__default'
+                : 'userProfile.start.mfaSection.phoneCode.subtitle__setDefault',
             )}
             actionLabel={
               !isDefault
-                ? localizationKeys('userProfile.start.phoneNumbersSection.defaultFactorActionLabel__setDefault')
+                ? localizationKeys('userProfile.start.mfaSection.phoneCode.actionLabel__setDefault')
                 : undefined
             }
             onClick={() => phone.makeDefaultSecondFactor().catch(err => handleError(err, [], card.setError))}
@@ -57,9 +61,9 @@ export const MfaPhoneCodeAccordion = ({ phone, showTOTP }: MfaPhoneCodeAccordion
         )}
 
         <LinkButtonWithDescription
-          title={localizationKeys('userProfile.start.phoneNumbersSection.destructiveActionTitle')}
-          subtitle={localizationKeys('userProfile.start.phoneNumbersSection.destructiveActionAccordionSubtitle')}
-          actionLabel={localizationKeys('userProfile.start.phoneNumbersSection.destructiveAction')}
+          title={localizationKeys('userProfile.start.mfaSection.phoneCode.destructiveActionTitle')}
+          subtitle={localizationKeys('userProfile.start.mfaSection.phoneCode.destructiveActionSubtitle')}
+          actionLabel={localizationKeys('userProfile.start.mfaSection.phoneCode.destructiveActionLabel')}
           colorScheme='danger'
           onClick={() => navigate(`multi-factor/${phone.id}/remove`)}
         />
