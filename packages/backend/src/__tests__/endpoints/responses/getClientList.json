@@ -1,0 +1,52 @@
+[
+  {
+    "object": "client",
+    "id": "client_isalwaysright",
+    "session_ids": ["sess_swag"],
+    "sessions": [
+      {
+        "id": "sess_swag",
+        "client_id": "client_isalwaysright",
+        "user_id": "user_player1",
+        "status": "active",
+        "last_active_at": 1630846634,
+        "expire_at": 1630846634,
+        "abandon_at": 1630846634,
+        "created_at": 1630846634,
+        "updated_at": 1630846634
+      }
+    ],
+    "sign_in_attempt_id": null,
+    "sign_up_attempt_id": null,
+    "sign_up_id": null,
+    "sign_in_id": null,
+    "last_active_session_id": "sess_swag",
+    "created_at": 1630846634,
+    "updated_at": 1630846634
+  },
+  {
+    "object": "client",
+    "id": "client_keysersoze",
+    "session_ids": ["sess_mood"],
+    "sessions": [
+      {
+        "id": "sess_mood",
+        "client_id": "client_keysersoze",
+        "user_id": "user_player2",
+        "status": "active",
+        "last_active_at": 1630846634,
+        "expire_at": 1630846634,
+        "abandon_at": 1630846634,
+        "created_at": 1630846634,
+        "updated_at": 1630846634
+      }
+    ],
+    "sign_in_attempt_id": "sia_qwerty",
+    "sign_up_attempt_id": null,
+    "last_active_session_id": null,
+    "sign_up_id": null,
+    "sign_in_id": null,
+    "created_at": 1630846634,
+    "updated_at": 1630846634
+  }
+]

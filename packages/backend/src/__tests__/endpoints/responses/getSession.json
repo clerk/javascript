@@ -1,0 +1,12 @@
+{
+  "object": "session",
+  "id": "sess_oops",
+  "client_id": "client_isalwayswrong",
+  "user_id": "user_player1",
+  "status": "active",
+  "last_active_at": 1613593533,
+  "expire_at": 1613593533,
+  "abandon_at": 1613593533,
+  "created_at": 1613593533,
+  "updated_at": 1613593533
+}

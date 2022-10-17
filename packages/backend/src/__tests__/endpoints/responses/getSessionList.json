@@ -1,0 +1,26 @@
+[
+  {
+    "object": "session",
+    "id": "sess_foobar",
+    "client_id": "client_yolo",
+    "user_id": "user_babyyoda",
+    "status": "expired",
+    "last_active_at": 1613593533,
+    "expire_at": 1613593533,
+    "abandon_at": 1613593533,
+    "created_at": 1613593533,
+    "updated_at": 1613593533
+  },
+  {
+    "object": "session",
+    "id": "sess_snafu",
+    "client_id": "client_fomo",
+    "user_id": "user_mandalorian",
+    "status": "abandoned",
+    "last_active_at": 1613593533,
+    "expire_at": 1613593533,
+    "abandon_at": 1613593533,
+    "created_at": 1613593533,
+    "updated_at": 1613593533
+  }
+]

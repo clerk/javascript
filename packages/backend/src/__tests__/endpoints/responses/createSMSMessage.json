@@ -1,0 +1,9 @@
+{
+  "object": "sms_message",
+  "id": "test_sms_message_id",
+  "from_phone_number": "+19516231001",
+  "to_phone_number": "+306957178227",
+  "phone_number_id": "idn_random",
+  "message": "Press F to pay pespects",
+  "status": "queued"
+}

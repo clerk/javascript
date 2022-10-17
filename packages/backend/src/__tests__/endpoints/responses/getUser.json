@@ -1,0 +1,129 @@
+{
+  "object": "user",
+  "id": "user_deadbeef",
+  "username": null,
+  "first_name": "Kyle",
+  "last_name": "Reese",
+  "gender": "",
+  "birthday": "",
+  "profile_image_url": "https://lh3.googleusercontent.com/-MvTefx9nU6o/BBBBBBBBBBI/BBBBBBBBBBB/ereRAMWiew8hQ5IaSVdTZWm1Y1G1z0T_P7Q/s96-c/photo.jpg",
+  "primary_email_address_id": "idn_alpha",
+  "primary_phone_number_id": "idn_omega",
+  "password_enabled": false,
+  "two_factor_enabled": true,
+  "banned": false,
+  "email_addresses": [
+    {
+      "id": "idn_clark",
+      "email_address": "kyle@tech.com",
+      "verification": {
+        "status": "verified",
+        "strategy": "from_oauth_google",
+        "external_verification_redirect_url": null
+      },
+      "linked_to": [
+        {
+          "type": "oauth_google",
+          "id": "idn_t800"
+        }
+      ]
+    },
+    {
+      "id": "idn_invision",
+      "email_address": "john@tech.com",
+      "verification": {
+        "status": "verified",
+        "strategy": "email_code",
+        "external_verification_redirect_url": null,
+        "attempts": 1,
+        "expire_at": 1613830889
+      },
+      "linked_to": []
+    }
+  ],
+  "phone_numbers": [
+    {
+      "id": "idn_callme",
+      "phone_number": "+19515551001",
+      "reserved_for_second_factor": true,
+      "verification": {
+        "status": "verified",
+        "strategy": "phone_code",
+        "external_verification_redirect_url": null,
+        "attempts": 1,
+        "expireAt": 1613831075
+      },
+      "linked_to": []
+    },
+    {
+      "id": "idn_maybe",
+      "phone_number": "+19515551002",
+      "reserved_for_second_factor": false,
+      "verification": {
+        "status": "verified",
+        "strategy": "phone_code",
+        "external_verification_redirect_url": null,
+        "attempts": 1,
+        "expireAt": 1613831855
+      },
+      "linked_to": []
+    }
+  ],
+  "web3_wallets": [
+    {
+      "id": "idn_240KZI4L5vZEXO3KWDz2kJlV4Vw",
+      "object": "web3_wallet",
+      "web3_wallet": "0x0000000000000000000000000000000000000000",
+      "verification": {
+        "status": "verified",
+        "strategy": "web3_metamask_signature",
+        "attempts": 1,
+        "expire_at": 1642762718086,
+        "nonce": "l6i2keszfr0yftb0aghwxye8xdxmec2x4m86elc5"
+      }
+    }
+  ],
+  "external_accounts": [
+    {
+      "object": "external_account",
+      "provider": "google",
+      "id": "gac_googlyeyes",
+      "identification_id": "1234567890",
+      "provider_user_id": "1234567890",
+      "approved_scopes": "email https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid profile",
+      "email_address": "kyle@tech.com",
+      "first_name": "Kyle",
+      "last_name": "Reese",
+      "avatar_url": "https://lh3.googleusercontent.com/-MvTefx9nU6o/BBBBBBBBBBI/BBBBBBBBBBB/ereRAMWiew8hQ5IaSVdTZWm1Y1G1z0T_P7Q/s96-c/photo.jpg",
+      "username": "tester",
+      "public_metadata": {},
+      "label": null,
+      "verification": null
+    },
+    {
+      "object": "external_account",
+      "provider": "facebook",
+      "id": "fbac_xavier",
+      "identification_id": "9876543210",
+      "provider_user_id": "9876543210",
+      "approved_scopes": "email",
+      "email_address": "kyle@tech.com",
+      "first_name": "Kyle",
+      "last_name": "Reese",
+      "avatar_url": "https://platform-lookaside.fbsbx.com/platform/profilepic/?asid=16357923188267094&height=50&width=50&ext=2319847405&hash=AeQyoXRpxMMso8vNHSw",
+      "username": null,
+      "public_metadata": {
+        "extra": "more info"
+      },
+      "label": "clerk",
+      "verification": null
+    }
+  ],
+  "public_metadata": {
+    "zodiac_sign": "leo",
+    "ascendant": "scorpio"
+  },
+  "private_metadata": {},
+  "created_at": 1611948436,
+  "updated_at": 1611948436
+}
