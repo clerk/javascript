@@ -3,11 +3,10 @@ import React from 'react';
 
 import { useCoreSession, useCoreUser, useEnvironment, useUserButtonContext } from '../../contexts';
 import { descriptors, Flex, Flow, Link, localizationKeys, useAppearance } from '../../customizables';
-import { BaseCard, PoweredByClerkText, UserPreview } from '../../elements';
+import { Action, Actions, BaseCard, PoweredByClerkText, UserPreview } from '../../elements';
 import { RootBox } from '../../elements/RootBox';
 import { CogFilled, Plus, SignOut, SignOutDouble } from '../../icons';
 import { animations, PropsOfComponent } from '../../styledSystem';
-import { Action, Actions } from './CurrentAccountActions';
 import { SessionActions, UserPreviewButton } from './OtherSessionActions';
 import { useMultisessionActions } from './useMultisessionActions';
 
@@ -111,7 +110,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
   );
 });
 
-const Main = (props: React.PropsWithChildren<{}>) => {
+const Main = (props: React.PropsWithChildren<Record<never, never>>) => {
   return (
     <Flex
       elementDescriptor={descriptors.userButtonPopoverMain}

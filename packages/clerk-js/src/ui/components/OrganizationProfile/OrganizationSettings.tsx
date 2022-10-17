@@ -52,7 +52,7 @@ const OrganizationProfileSection = () => {
       <BlockButton onClick={() => navigate('profile')}>
         {/*// TODO*/}
         <UserPreview
-          user={userWithoutIdentifiers as any}
+          user={userWithoutIdentifiers}
           size='lg'
         />
       </BlockButton>

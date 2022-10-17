@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { Button, Col, Flex, Icon, LocalizationKey, Spinner, Text } from '../../customizables';
-import { ElementDescriptor, ElementId } from '../../customizables/elementDescriptors';
-import { useCardState } from '../../elements/contexts';
-import { useLoadingStatus } from '../../hooks';
-import { PropsOfComponent } from '../../styledSystem';
+import { Button, Col, Flex, Icon, LocalizationKey, Spinner, Text } from '../customizables';
+import { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
+import { useCardState } from '../elements/contexts';
+import { useLoadingStatus } from '../hooks';
+import { PropsOfComponent } from '../styledSystem';
 
 export const Actions = (props: PropsOfComponent<typeof Flex>) => {
   return <Col {...props} />;
@@ -29,6 +29,7 @@ export const Action = (props: ActionProps) => {
     label,
     onClick: onClickProp,
     iconElementDescriptor,
+    sx,
     iconElementId,
     textElementDescriptor,
     textElementId,
@@ -55,13 +56,16 @@ export const Action = (props: ActionProps) => {
       textVariant='buttonSmallRegular'
       focusRing={false}
       // TODO: colors should be colorTextSecondary
-      sx={theme => ({
-        flex: '1',
-        borderRadius: 0,
-        gap: theme.space.$4,
-        padding: `${theme.space.$3x5} ${theme.space.$6}`,
-        justifyContent: 'flex-start',
-      })}
+      sx={[
+        theme => ({
+          flex: '1',
+          borderRadius: 0,
+          gap: theme.space.$4,
+          padding: `${theme.space.$3x5} ${theme.space.$6}`,
+          justifyContent: 'flex-start',
+        }),
+        sx,
+      ]}
       isDisabled={card.isLoading}
       onClick={onClick}
       {...rest}

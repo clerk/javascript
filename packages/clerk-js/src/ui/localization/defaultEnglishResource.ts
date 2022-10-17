@@ -400,6 +400,13 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
     action__signOutAll: 'Sign out of all accounts',
     action__addAccount: 'Add account',
   },
+  organizationSwitcher: {
+    title: 'Organizations',
+    personalWorkspace: 'Personal Workspace',
+    notSelected: 'No organization selected',
+    action__createOrganization: 'Create Organization',
+    action__manageOrganization: 'Manage Organization',
+  },
   impersonationFab: {
     title: 'Signed in as {{identifier}}',
     action__signOut: 'Sign out',
