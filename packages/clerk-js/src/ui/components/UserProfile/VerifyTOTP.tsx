@@ -61,7 +61,7 @@ export const VerifyTOTP = (props: VerifyTOTPProps) => {
       </Col>
 
       <FormButtonContainer sx={{ marginTop: 0 }}>
-        <NavigateToFlowStartButton>Cancel</NavigateToFlowStartButton>
+        <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
       </FormButtonContainer>
     </ContentPage.Root>
   );

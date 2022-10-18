@@ -19,8 +19,8 @@ export const MfaTOTPAccordion = () => {
           sx={theme => ({ color: theme.colors.$blackAlpha700 })}
         />
       }
-      title='Authenticator application'
-      badge={<Badge>Default</Badge>}
+      title={localizationKeys('userProfile.start.mfaSection.totp.headerTitle')}
+      badge={<Badge>{localizationKeys('userProfile.start.mfaSection.totp.badge__default')}</Badge>}
     >
       <Col gap={4}>
         <LinkButtonWithDescription

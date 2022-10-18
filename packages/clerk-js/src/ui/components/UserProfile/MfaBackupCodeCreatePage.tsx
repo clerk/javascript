@@ -27,22 +27,22 @@ export const MfaBackupCodeCreatePage = () => {
   }, []);
 
   if (card.error) {
-    return <ContentPage.Root headerTitle={localizationKeys('userProfile.backupCodeCreatePage.title')} />;
+    return <ContentPage.Root headerTitle={localizationKeys('userProfile.backupCodePage.title')} />;
   }
 
   return (
-    <ContentPage.Root headerTitle={localizationKeys('userProfile.backupCodeCreatePage.title')}>
+    <ContentPage.Root headerTitle={localizationKeys('userProfile.backupCodePage.title')}>
       {!backupCode ? (
         <FullHeightLoader />
       ) : (
         <>
           <Text
-            localizationKey={localizationKeys('userProfile.backupCodeCreatePage.infoText')}
+            localizationKey={localizationKeys('userProfile.backupCodePage.successMessage')}
             variant='regularRegular'
           />
 
           <MfaBackupCodeList
-            subtitle={localizationKeys('userProfile.backupCodeCreatePage.subtitle')}
+            subtitle={localizationKeys('userProfile.backupCodePage.subtitle__codelist')}
             backupCodes={backupCode.codes}
           />
 

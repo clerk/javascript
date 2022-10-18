@@ -127,20 +127,20 @@ type _LocalizationResource = {
       formSubtitle: LocalizationValue;
       resendButton: LocalizationValue;
     };
-    phoneCode2Fa: {
+    phoneCodeMfa: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       formTitle: LocalizationValue;
       formSubtitle: LocalizationValue;
       resendButton: LocalizationValue;
     };
-    totp2Fa: {
+    totpMfa: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       formTitle: LocalizationValue;
       formSubtitle: LocalizationValue;
     };
-    backupCode2Fa: {
+    backupCodeMfa: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       formTitle: LocalizationValue;
@@ -245,11 +245,13 @@ type _LocalizationResource = {
           actionLabel__regenerate: LocalizationValue;
         };
         totp: {
+          headerTitle: LocalizationValue;
           title: LocalizationValue;
           subtitle: LocalizationValue;
           destructiveActionTitle: LocalizationValue;
           destructiveActionSubtitle: LocalizationValue;
           destructiveActionLabel: LocalizationValue;
+          badge__default: LocalizationValue;
         };
       };
       activeDevicesSection: {
@@ -345,7 +347,6 @@ type _LocalizationResource = {
     mfaPage: {
       title: LocalizationValue;
       formHint: LocalizationValue;
-      successMessage: LocalizationValue;
     };
     mfaTOTPPage: {
       title: LocalizationValue;
@@ -371,13 +372,11 @@ type _LocalizationResource = {
     };
     backupCodePage: {
       title: LocalizationValue;
-      successBackupCodeSubtitle: LocalizationValue;
-    };
-    backupCodeCreatePage: {
-      title: LocalizationValue;
-      subtitle: LocalizationValue;
+      subtitle__codelist: LocalizationValue;
+      infoText1: LocalizationValue;
+      infoText2: LocalizationValue;
       successSubtitle: LocalizationValue;
-      infoText: LocalizationValue;
+      successMessage: LocalizationValue;
     };
   };
   userButton: {

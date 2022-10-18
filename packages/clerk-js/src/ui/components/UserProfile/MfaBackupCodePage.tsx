@@ -29,20 +29,17 @@ const AddBackupCode = (props: AddBackupCodeProps) => {
 
   return (
     <ContentPage.Root headerTitle={localizationKeys('userProfile.backupCodePage.title')}>
-      <Text>Backup codes will be enabled for this account.</Text>
-      <Text>
-        Keep the backup codes secret and store them securely. You may regenerate backup codes if you suspect they have
-        been compromised.
-      </Text>
+      <Text localizationKey={localizationKeys('userProfile.backupCodePage.infoText1')} />
+      <Text localizationKey={localizationKeys('userProfile.backupCodePage.infoText2')} />
+
       <FormButtonContainer sx={{ marginTop: 0 }}>
         <Button
           textVariant='buttonExtraSmallBold'
           onClick={onContinue}
-        >
-          Continue
-        </Button>
+          localizationKey={localizationKeys('userProfile.formButtonPrimary__finish')}
+        />
 
-        <NavigateToFlowStartButton>Cancel</NavigateToFlowStartButton>
+        <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
       </FormButtonContainer>
     </ContentPage.Root>
   );

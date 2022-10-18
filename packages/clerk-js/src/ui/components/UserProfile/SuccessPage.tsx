@@ -24,7 +24,7 @@ export const SuccessPage = (props: SuccessPageProps) => {
 
       {backupCodes && (
         <MfaBackupCodeList
-          subtitle={localizationKeys('userProfile.backupCodeCreatePage.successSubtitle')}
+          subtitle={localizationKeys('userProfile.backupCodePage.successSubtitle')}
           backupCodes={backupCodes}
         />
       )}

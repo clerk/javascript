@@ -44,7 +44,7 @@ export const MfaPage = withCardStateProvider(() => {
   return (
     <ContentPage.Root headerTitle={title}>
       <Col gap={4}>
-        <Text>Select a method to add.</Text>
+        <Text localizationKey={localizationKeys('userProfile.mfaPage.formHint')} />
         <Grid
           gap={2}
           sx={t => ({
@@ -66,7 +66,7 @@ export const MfaPage = withCardStateProvider(() => {
       </Col>
 
       <FormButtonContainer sx={{ marginTop: 0 }}>
-        <NavigateToFlowStartButton>Cancel</NavigateToFlowStartButton>
+        <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
       </FormButtonContainer>
     </ContentPage.Root>
   );
