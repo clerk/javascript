@@ -24,9 +24,7 @@ export const SuccessPage = (props: SuccessPageProps) => {
 
       {backupCodes && (
         <MfaBackupCodeList
-          subtitle={
-            'You can use one of these to sign in to your account, if you lose access to your authentication device.'
-          }
+          subtitle={localizationKeys('userProfile.backupCodePage.successSubtitle')}
           backupCodes={backupCodes}
         />
       )}

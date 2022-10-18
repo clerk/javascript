@@ -4,7 +4,7 @@ import React from 'react';
 import { generateSignatureWithMetamask, getMetamaskIdentifier } from '../../../utils/web3';
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser } from '../../contexts';
-import { Col, descriptors, Image, Text } from '../../customizables';
+import { Col, descriptors, Image, localizationKeys, Text } from '../../customizables';
 import { ArrowBlockButton, useCardState, withCardStateProvider } from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
@@ -15,7 +15,6 @@ import { ContentPage } from './Page';
 import { SuccessPage } from './SuccessPage';
 
 export const Web3Page = withCardStateProvider(() => {
-  const title = 'Add web3 wallet';
   const user = useCoreUser();
 
   const { params } = useRouter();
@@ -28,8 +27,8 @@ export const Web3Page = withCardStateProvider(() => {
     <Wizard {...wizard.props}>
       <AddWeb3Wallet nextStep={wizard.nextStep} />
       <SuccessPage
-        title={title}
-        text={`The wallet has been added to your account.`}
+        title={localizationKeys('userProfile.web3WalletPage.title')}
+        text={localizationKeys('userProfile.web3WalletPage.successMessage')}
       />
     </Wizard>
   );
@@ -70,12 +69,14 @@ const AddWeb3Wallet = (props: { nextStep: () => void }) => {
   };
 
   return (
-    <ContentPage.Root headerTitle={'Add web3 wallet'}>
-      <Text>
-        {unconnectedStrategies.length
-          ? 'Select a web3 wallet to connect to your account.'
-          : 'There are no available web3 wallets.'}
-      </Text>
+    <ContentPage.Root headerTitle={localizationKeys('userProfile.web3WalletPage.title')}>
+      <Text
+        localizationKey={localizationKeys(
+          unconnectedStrategies.length
+            ? 'userProfile.web3WalletPage.subtitle__availableWallets'
+            : 'userProfile.web3WalletPage.subtitle__unavailableWallets',
+        )}
+      />
       <Col gap={2}>
         {unconnectedStrategies.map(strategy => (
           <ArrowBlockButton
@@ -107,7 +108,7 @@ const AddWeb3Wallet = (props: { nextStep: () => void }) => {
         ))}
       </Col>
       <FormButtonContainer sx={{ marginTop: 0 }}>
-        <NavigateToFlowStartButton>Cancel</NavigateToFlowStartButton>
+        <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
       </FormButtonContainer>
     </ContentPage.Root>
   );

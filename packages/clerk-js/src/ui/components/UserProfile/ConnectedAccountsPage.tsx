@@ -66,7 +66,7 @@ const AddConnectedAccount = () => {
   };
 
   return (
-    <ContentPage.Root headerTitle={'Add connected account'}>
+    <ContentPage.Root headerTitle={localizationKeys('userProfile.connectedAccountPage.title')}>
       <Text
         localizationKey={
           unconnectedStrategies.length

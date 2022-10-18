@@ -1,7 +1,7 @@
 import { PhoneNumberResource } from '@clerk/types';
 import React from 'react';
 
-import { Badge, Col, Icon } from '../../customizables';
+import { Badge, Col, Icon, localizationKeys } from '../../customizables';
 import { FormattedPhoneNumberText, useCardState } from '../../elements';
 import { useNavigate } from '../../hooks';
 import { Mobile } from '../../icons';
@@ -36,26 +36,34 @@ export const MfaPhoneCodeAccordion = ({ phone, showTOTP }: MfaPhoneCodeAccordion
           SMS Code <FormattedPhoneNumberText value={phone.phoneNumber} />
         </>
       }
-      badge={isDefault ? <Badge>Default</Badge> : undefined}
+      badge={isDefault ? <Badge localizationKey={localizationKeys('badge__default')} /> : undefined}
     >
       <Col gap={4}>
         {!showTOTP && (
           <LinkButtonWithDescription
-            title={isDefault ? 'Default factor' : 'Set as Default factor'}
-            subtitle={
+            title={localizationKeys(
               isDefault
-                ? 'This factor will be used as the default two-step verification method when signing in.'
-                : 'Set this factor as the default factor to use it as the default two-step verification method when signing in.'
+                ? 'userProfile.start.mfaSection.phoneCode.title__default'
+                : 'userProfile.start.mfaSection.phoneCode.title__setDefault',
+            )}
+            subtitle={localizationKeys(
+              isDefault
+                ? 'userProfile.start.mfaSection.phoneCode.subtitle__default'
+                : 'userProfile.start.mfaSection.phoneCode.subtitle__setDefault',
+            )}
+            actionLabel={
+              !isDefault
+                ? localizationKeys('userProfile.start.mfaSection.phoneCode.actionLabel__setDefault')
+                : undefined
             }
-            actionLabel={!isDefault ? 'Set as default' : undefined}
             onClick={() => phone.makeDefaultSecondFactor().catch(err => handleError(err, [], card.setError))}
           />
         )}
 
         <LinkButtonWithDescription
-          title='Remove'
-          subtitle='Remove this phone number from the two-step verification methods'
-          actionLabel='Remove phone number'
+          title={localizationKeys('userProfile.start.mfaSection.phoneCode.destructiveActionTitle')}
+          subtitle={localizationKeys('userProfile.start.mfaSection.phoneCode.destructiveActionSubtitle')}
+          actionLabel={localizationKeys('userProfile.start.mfaSection.phoneCode.destructiveActionLabel')}
           colorScheme='danger'
           onClick={() => navigate(`multi-factor/${phone.id}/remove`)}
         />

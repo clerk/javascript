@@ -21,11 +21,11 @@ export const SignInFactorTwoPhoneCodeCard = (props: SignInFactorTwoPhoneCodeCard
     <Flow.Part part='phoneCode2Fa'>
       <SignInFactorTwoCodeForm
         {...props}
-        cardTitle={localizationKeys('signIn.phoneCode2Fa.title')}
-        cardSubtitle={localizationKeys('signIn.phoneCode2Fa.subtitle')}
-        formTitle={localizationKeys('signIn.phoneCode2Fa.formTitle')}
-        formSubtitle={localizationKeys('signIn.phoneCode2Fa.formSubtitle')}
-        resendButton={localizationKeys('signIn.phoneCode2Fa.resendButton')}
+        cardTitle={localizationKeys('signIn.phoneCodeMfa.title')}
+        cardSubtitle={localizationKeys('signIn.phoneCodeMfa.subtitle')}
+        formTitle={localizationKeys('signIn.phoneCodeMfa.formTitle')}
+        formSubtitle={localizationKeys('signIn.phoneCodeMfa.formSubtitle')}
+        resendButton={localizationKeys('signIn.phoneCodeMfa.resendButton')}
         prepare={prepare}
       />
     </Flow.Part>

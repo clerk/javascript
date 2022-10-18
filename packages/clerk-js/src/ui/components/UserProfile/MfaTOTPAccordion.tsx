@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Badge, Col, Icon } from '../../customizables';
+import { Badge, Col, Icon, localizationKeys } from '../../customizables';
 import { useNavigate } from '../../hooks';
 import { AuthApp } from '../../icons';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
@@ -19,19 +19,19 @@ export const MfaTOTPAccordion = () => {
           sx={theme => ({ color: theme.colors.$blackAlpha700 })}
         />
       }
-      title='Authenticator application'
-      badge={<Badge>Default</Badge>}
+      title={localizationKeys('userProfile.start.mfaSection.totp.headerTitle')}
+      badge={<Badge localizationKey={localizationKeys('badge__default')} />}
     >
       <Col gap={4}>
         <LinkButtonWithDescription
-          title={'Default factor'}
-          subtitle='This factor will be used as the default two-step verification method when signing in.'
+          title={localizationKeys('userProfile.start.mfaSection.totp.title')}
+          subtitle={localizationKeys('userProfile.start.mfaSection.totp.subtitle')}
         />
 
         <LinkButtonWithDescription
-          title='Remove'
-          subtitle='Remove authenticator application from the two-step verification methods'
-          actionLabel='Remove authenticator application'
+          title={localizationKeys('userProfile.start.mfaSection.totp.destructiveActionTitle')}
+          subtitle={localizationKeys('userProfile.start.mfaSection.totp.destructiveActionSubtitle')}
+          actionLabel={localizationKeys('userProfile.start.mfaSection.totp.destructiveActionLabel')}
           colorScheme='danger'
           onClick={() => navigate(`multi-factor/totp/remove`)}
         />

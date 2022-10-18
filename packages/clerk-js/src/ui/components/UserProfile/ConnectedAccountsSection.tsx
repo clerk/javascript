@@ -65,7 +65,12 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
           center
         >
           {`${providerToDisplayData[account.provider].name} ${label ? `(${label})` : ''}`}
-          {error && <Badge colorScheme='danger'>Requires action</Badge>}
+          {error && (
+            <Badge
+              colorScheme='danger'
+              localizationKey={localizationKeys('badge__requiresAction')}
+            />
+          )}
         </Flex>
       }
     >
@@ -86,9 +91,9 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
         )}
         {error && (
           <LinkButtonWithDescription
-            title='Retry failed connection'
-            subtitle={error}
-            actionLabel='Try again'
+            title={localizationKeys('userProfile.start.connectedAccountsSection.title__conectionFailed')}
+            subtitle={error as any}
+            actionLabel={localizationKeys('userProfile.start.connectedAccountsSection.actionLabel__conectionFailed')}
             onClick={() => {
               return user
                 .createExternalAccount({
@@ -100,10 +105,13 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
             }}
           />
         )}
+
         <LinkButtonWithDescription
-          title='Remove'
-          subtitle='Remove this connected account from your account'
-          actionLabel='Remove connected account'
+          title={localizationKeys('userProfile.start.connectedAccountsSection.destructiveActionTitle')}
+          subtitle={localizationKeys('userProfile.start.connectedAccountsSection.destructiveActionSubtitle')}
+          actionLabel={localizationKeys(
+            'userProfile.start.connectedAccountsSection.destructiveActionAccordionSubtitle',
+          )}
           colorScheme='danger'
           onClick={() => navigate(`connected-account/${account.id}/remove`)}
         />

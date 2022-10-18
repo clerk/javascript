@@ -127,20 +127,20 @@ type _LocalizationResource = {
       formSubtitle: LocalizationValue;
       resendButton: LocalizationValue;
     };
-    phoneCode2Fa: {
+    phoneCodeMfa: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       formTitle: LocalizationValue;
       formSubtitle: LocalizationValue;
       resendButton: LocalizationValue;
     };
-    totp2Fa: {
+    totpMfa: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       formTitle: LocalizationValue;
       formSubtitle: LocalizationValue;
     };
-    backupCode2Fa: {
+    backupCodeMfa: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       formTitle: LocalizationValue;
@@ -215,6 +215,11 @@ type _LocalizationResource = {
       connectedAccountsSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
+        title__conectionFailed: LocalizationValue;
+        actionLabel__conectionFailed: LocalizationValue;
+        destructiveActionTitle: LocalizationValue;
+        destructiveActionSubtitle: LocalizationValue;
+        destructiveActionAccordionSubtitle: LocalizationValue;
       };
       passwordSection: {
         title: LocalizationValue;
@@ -224,6 +229,29 @@ type _LocalizationResource = {
       mfaSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
+        phoneCode: {
+          destructiveActionTitle: LocalizationValue;
+          destructiveActionSubtitle: LocalizationValue;
+          destructiveActionLabel: LocalizationValue;
+          title__default: LocalizationValue;
+          title__setDefault: LocalizationValue;
+          subtitle__default: LocalizationValue;
+          subtitle__setDefault: LocalizationValue;
+          actionLabel__setDefault: LocalizationValue;
+        };
+        backupCodes: {
+          title__regenerate: LocalizationValue;
+          subtitle__regenerate: LocalizationValue;
+          actionLabel__regenerate: LocalizationValue;
+        };
+        totp: {
+          headerTitle: LocalizationValue;
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+          destructiveActionTitle: LocalizationValue;
+          destructiveActionSubtitle: LocalizationValue;
+          destructiveActionLabel: LocalizationValue;
+        };
       };
       activeDevicesSection: {
         title: LocalizationValue;
@@ -271,6 +299,24 @@ type _LocalizationResource = {
         resendButton: LocalizationValue;
         successMessage: LocalizationValue;
       };
+      removeResource: {
+        title: LocalizationValue;
+        messageLine1: LocalizationValue;
+        messageLine2: LocalizationValue;
+        successMessage: LocalizationValue;
+      };
+    };
+    phoneNumberPage: {
+      title: LocalizationValue;
+      successMessage: LocalizationValue;
+      infoText: LocalizationValue;
+      infoText__secondary: LocalizationValue;
+      removeResource: {
+        title: LocalizationValue;
+        messageLine1: LocalizationValue;
+        messageLine2: LocalizationValue;
+        successMessage: LocalizationValue;
+      };
     };
     connectedAccountPage: {
       title: LocalizationValue;
@@ -278,6 +324,24 @@ type _LocalizationResource = {
       formHint__noAccounts: LocalizationValue;
       socialButtonsBlockButton: LocalizationValue;
       successMessage: LocalizationValue;
+      removeResource: {
+        title: LocalizationValue;
+        messageLine1: LocalizationValue;
+        messageLine2: LocalizationValue;
+        successMessage: LocalizationValue;
+      };
+    };
+    web3WalletPage: {
+      title: LocalizationValue;
+      subtitle__availableWallets: LocalizationValue;
+      subtitle__unavailableWallets: LocalizationValue;
+      successMessage: LocalizationValue;
+      removeResource: {
+        title: LocalizationValue;
+        messageLine1: LocalizationValue;
+        messageLine2: LocalizationValue;
+        successMessage: LocalizationValue;
+      };
     };
     passwordPage: {
       title: LocalizationValue;
@@ -286,6 +350,46 @@ type _LocalizationResource = {
     mfaPage: {
       title: LocalizationValue;
       formHint: LocalizationValue;
+    };
+    mfaTOTPPage: {
+      title: LocalizationValue;
+      verifyTitle: LocalizationValue;
+      verifySubtitle: LocalizationValue;
+      successMessage: LocalizationValue;
+      authenticatorApp: {
+        infoText__ableToScan: LocalizationValue;
+        infoText__unableToScan: LocalizationValue;
+        inputLabel__unableToScan1: LocalizationValue;
+        inputLabel__unableToScan2: LocalizationValue;
+        buttonAbleToScan__nonPrimary: LocalizationValue;
+        buttonUnableToScan__nonPrimary: LocalizationValue;
+      };
+      removeResource: {
+        title: LocalizationValue;
+        messageLine1: LocalizationValue;
+        messageLine2: LocalizationValue;
+        successMessage: LocalizationValue;
+      };
+    };
+    mfaPhoneCodePage: {
+      title: LocalizationValue;
+      primaryButton__addPhoneNumber: LocalizationValue;
+      subtitle__availablePhoneNumbers: LocalizationValue;
+      subtitle__unavailablePhoneNumbers: LocalizationValue;
+      successMessage: LocalizationValue;
+      removeResource: {
+        title: LocalizationValue;
+        messageLine1: LocalizationValue;
+        messageLine2: LocalizationValue;
+        successMessage: LocalizationValue;
+      };
+    };
+    backupCodePage: {
+      title: LocalizationValue;
+      subtitle__codelist: LocalizationValue;
+      infoText1: LocalizationValue;
+      infoText2: LocalizationValue;
+      successSubtitle: LocalizationValue;
       successMessage: LocalizationValue;
     };
   };

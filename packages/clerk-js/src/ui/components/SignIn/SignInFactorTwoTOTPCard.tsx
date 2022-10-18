@@ -11,10 +11,10 @@ export const SignInFactorTwoTOTPCard = (props: SignInFactorTwoTOTPCardProps) => 
     <Flow.Part part='totp2Fa'>
       <SignInFactorTwoCodeForm
         {...props}
-        cardTitle={localizationKeys('signIn.totp2Fa.title')}
-        cardSubtitle={localizationKeys('signIn.totp2Fa.subtitle')}
-        formTitle={localizationKeys('signIn.totp2Fa.formTitle')}
-        formSubtitle={localizationKeys('signIn.totp2Fa.formSubtitle')}
+        cardTitle={localizationKeys('signIn.totpMfa.title')}
+        cardSubtitle={localizationKeys('signIn.totpMfa.subtitle')}
+        formTitle={localizationKeys('signIn.totpMfa.formTitle')}
+        formSubtitle={localizationKeys('signIn.totpMfa.formSubtitle')}
       />
     </Flow.Part>
   );
