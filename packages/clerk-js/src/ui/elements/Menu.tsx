@@ -128,10 +128,12 @@ export const MenuList = (props: MenuListProps) => {
   );
 };
 
-type MenuItemProps = PropsOfComponent<typeof Button>;
+type MenuItemProps = PropsOfComponent<typeof Button> & {
+  destructive?: boolean;
+};
 
 export const MenuItem = (props: MenuItemProps) => {
-  const { sx, onClick, ...rest } = props;
+  const { sx, onClick, destructive, ...rest } = props;
   const { popoverCtx } = useMenuState();
   const { toggle } = popoverCtx;
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -157,7 +159,7 @@ export const MenuItem = (props: MenuItemProps) => {
       ref={buttonRef}
       focusRing={false}
       variant='ghost'
-      colorScheme='neutral'
+      colorScheme={destructive ? 'danger' : 'neutral'}
       role='menuitem'
       onKeyDown={onKeyDown}
       onClick={e => {

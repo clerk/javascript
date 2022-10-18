@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Button, Col, Flex } from '../customizables';
+import { PropsOfComponent } from '../styledSystem';
 import { createContextAndHook, getValidChildren } from '../utils';
 
 type TabsContextValue = {
@@ -9,8 +10,9 @@ type TabsContextValue = {
   focusedIndex: number;
   setFocusedIndex: (item: number) => void;
 };
-export const [TabsContext, useTabsContext] = createContextAndHook<TabsContextValue>('TabsContext');
-export const TabsContextProvider = (props: React.PropsWithChildren<{ value: TabsContextValue }>) => {
+
+const [TabsContext, useTabsContext] = createContextAndHook<TabsContextValue>('TabsContext');
+const TabsContextProvider = (props: React.PropsWithChildren<{ value: TabsContextValue }>) => {
   const ctxValue = React.useMemo(
     () => ({ value: props.value }),
     [props.value.selectedIndex, props.value.setFocusedIndex],
@@ -18,32 +20,30 @@ export const TabsContextProvider = (props: React.PropsWithChildren<{ value: Tabs
   return <TabsContext.Provider value={ctxValue}>{props.children}</TabsContext.Provider>;
 };
 
-/**
- * TabsProps
- */
-type TabsProps = {
-  children: React.ReactNode;
+type TabsProps = PropsOfComponent<typeof Col> & {
   defaultIndex?: number;
 };
 
-export const Tabs = ({ children, ...props }: TabsProps) => {
-  const { defaultIndex = 0 } = props;
+export const Tabs = (props: TabsProps) => {
+  const { defaultIndex = 0, children, sx, ...rest } = props;
   const [selectedIndex, setSelectedIndex] = React.useState(defaultIndex);
   const [focusedIndex, setFocusedIndex] = React.useState(defaultIndex);
 
   return (
     <TabsContextProvider value={{ selectedIndex, setSelectedIndex, focusedIndex, setFocusedIndex }}>
-      <Col>{children}</Col>
+      <Col
+        sx={sx}
+        {...rest}
+      >
+        {children}
+      </Col>
     </TabsContextProvider>
   );
 };
 
-/**
- * TabsList
- */
-type TabsListProps = React.PropsWithChildren<any>;
+type TabsListProps = PropsOfComponent<typeof Flex>;
 export const TabsList = (props: TabsListProps) => {
-  const { children } = props;
+  const { children, sx, ...rest } = props;
   const { setSelectedIndex, selectedIndex, setFocusedIndex } = useTabsContext();
 
   const childrenWithProps = getValidChildren(children).map((child, index) =>
@@ -72,20 +72,18 @@ export const TabsList = (props: TabsListProps) => {
   return (
     <Flex
       onKeyDown={onKeyDown}
-      sx={theme => ({ borderBottom: theme.borders.$normal, borderColor: theme.colors.$blackAlpha300 })}
+      sx={[theme => ({ borderBottom: theme.borders.$normal, borderColor: theme.colors.$blackAlpha300 }), sx]}
+      {...rest}
     >
       {childrenWithProps}
     </Flex>
   );
 };
 
-/**
- * Tab
- */
-type TabProps = React.PropsWithChildren<any>;
+type TabProps = PropsOfComponent<typeof Flex>;
 type TabPropsWithTabIndex = TabProps & { tabIndex?: number };
 export const Tab = (props: TabProps) => {
-  const { children, tabIndex, isDisabled } = props as TabPropsWithTabIndex;
+  const { children, sx, tabIndex, isDisabled, ...rest } = props as TabPropsWithTabIndex;
 
   if (tabIndex === undefined) {
     throw new Error('Tab component must be a direct child of TabList.');
@@ -108,13 +106,16 @@ export const Tab = (props: TabProps) => {
   }, []);
 
   React.useEffect(() => {
-    if (buttonRef.current && isFocused) {
-      buttonRef.current.focus();
-    }
+    // if (buttonRef.current && isFocused) {
+    //   buttonRef.current.focus();
+    // }
   }, [isFocused]);
 
   return (
-    <Flex sx={{ position: 'relative' }}>
+    <Flex
+      sx={[{ position: 'relative' }, sx]}
+      {...rest}
+    >
       <Button
         onClick={onClick}
         focusRing={isFocused}
@@ -143,12 +144,9 @@ export const Tab = (props: TabProps) => {
   );
 };
 
-/**
- * TabPanels
- */
-type TabPanelsProps = React.PropsWithChildren<any>;
+type TabPanelsProps = PropsOfComponent<typeof Flex>;
 export const TabPanels = (props: TabPanelsProps) => {
-  const { children } = props;
+  const { sx, children, ...rest } = props;
 
   const childrenWithProps = getValidChildren(children).map((child, index) =>
     React.cloneElement(child, {
@@ -156,16 +154,20 @@ export const TabPanels = (props: TabPanelsProps) => {
     }),
   );
 
-  return <Flex>{childrenWithProps}</Flex>;
+  return (
+    <Flex
+      sx={sx}
+      {...rest}
+    >
+      {childrenWithProps}
+    </Flex>
+  );
 };
 
-/**
- * TabPanel
- */
-type TabPanelProps = React.PropsWithChildren<any>;
+type TabPanelProps = PropsOfComponent<typeof Flex>;
 type TabPanelPropsWithTabIndex = TabPanelProps & { tabIndex?: number };
 export const TabPanel = (props: TabPanelProps) => {
-  const { tabIndex, children } = props as TabPanelPropsWithTabIndex;
+  const { tabIndex, sx, children, ...rest } = props as TabPanelPropsWithTabIndex;
 
   if (tabIndex === undefined) {
     throw new Error('TabPanel component must be a direct child of TabPanels.');
@@ -184,6 +186,8 @@ export const TabPanel = (props: TabPanelProps) => {
       role='tabpanel'
       tabIndex={0}
       aria-labelledby={`cl-tab-${tabIndex}`}
+      sx={sx}
+      {...rest}
     >
       {children}
     </Flex>

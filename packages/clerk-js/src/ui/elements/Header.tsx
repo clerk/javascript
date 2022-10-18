@@ -27,9 +27,9 @@ const Subtitle = React.memo((props: PropsOfComponent<typeof Text>): JSX.Element 
   return (
     <Text
       elementDescriptor={descriptors.headerSubtitle}
-      {...props}
       variant='headingRegularRegular'
       colorScheme='neutral'
+      {...props}
     />
   );
 });

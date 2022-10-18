@@ -4,7 +4,7 @@ import { LocalizationKey, localizationKeys, Text } from '../../customizables';
 import { FormButtonContainer } from './FormButtons';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
 import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
-import { ContentPage } from './Page';
+import { ContentPage } from './UserProfileContentPage';
 
 type SuccessPageProps = {
   title: LocalizationKey;
@@ -16,7 +16,7 @@ export const SuccessPage = (props: SuccessPageProps) => {
   const { text, title, backupCodes } = props;
 
   return (
-    <ContentPage.Root headerTitle={title}>
+    <ContentPage headerTitle={title}>
       <Text
         localizationKey={text}
         variant='regularRegular'
@@ -36,6 +36,6 @@ export const SuccessPage = (props: SuccessPageProps) => {
           localizationKey={localizationKeys('userProfile.formButtonPrimary__finish')}
         />
       </FormButtonContainer>
-    </ContentPage.Root>
+    </ContentPage>
   );
 };

@@ -8,7 +8,7 @@ import { ClipboardInput, FullHeightLoader, useCardState } from '../../elements';
 import { handleError } from '../../utils';
 import { FormButtonContainer } from './FormButtons';
 import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
-import { ContentPage } from './Page';
+import { ContentPage } from './UserProfileContentPage';
 
 type AddAuthenticatorAppProps = {
   title: LocalizationKey;
@@ -34,11 +34,11 @@ export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
   }, []);
 
   if (card.error) {
-    return <ContentPage.Root headerTitle={title} />;
+    return <ContentPage headerTitle={title} />;
   }
 
   return (
-    <ContentPage.Root headerTitle={title}>
+    <ContentPage headerTitle={title}>
       {!totp && <FullHeightLoader />}
 
       {totp && (
@@ -109,6 +109,6 @@ export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
           </FormButtonContainer>
         </>
       )}
-    </ContentPage.Root>
+    </ContentPage>
   );
 };

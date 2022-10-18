@@ -6,7 +6,7 @@ import { withCardStateProvider } from '../../elements';
 import { FormButtonContainer } from './FormButtons';
 import { MfaBackupCodeCreatePage } from './MfaBackupCodeCreatePage';
 import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
-import { ContentPage } from './Page';
+import { ContentPage } from './UserProfileContentPage';
 
 export const MfaBackupCodePage = withCardStateProvider(() => {
   const wizard = useWizard();
@@ -28,7 +28,7 @@ const AddBackupCode = (props: AddBackupCodeProps) => {
   const { onContinue } = props;
 
   return (
-    <ContentPage.Root headerTitle={localizationKeys('userProfile.backupCodePage.title')}>
+    <ContentPage headerTitle={localizationKeys('userProfile.backupCodePage.title')}>
       <Text localizationKey={localizationKeys('userProfile.backupCodePage.infoText1')} />
       <Text localizationKey={localizationKeys('userProfile.backupCodePage.infoText2')} />
 
@@ -41,6 +41,6 @@ const AddBackupCode = (props: AddBackupCodeProps) => {
 
         <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
       </FormButtonContainer>
-    </ContentPage.Root>
+    </ContentPage>
   );
 };

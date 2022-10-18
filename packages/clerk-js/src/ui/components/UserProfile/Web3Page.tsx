@@ -11,8 +11,8 @@ import { useRouter } from '../../router';
 import { getFieldError, handleError } from '../../utils';
 import { FormButtonContainer } from './FormButtons';
 import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
-import { ContentPage } from './Page';
 import { SuccessPage } from './SuccessPage';
+import { ContentPage } from './UserProfileContentPage';
 
 export const Web3Page = withCardStateProvider(() => {
   const user = useCoreUser();
@@ -69,7 +69,7 @@ const AddWeb3Wallet = (props: { nextStep: () => void }) => {
   };
 
   return (
-    <ContentPage.Root headerTitle={localizationKeys('userProfile.web3WalletPage.title')}>
+    <ContentPage headerTitle={localizationKeys('userProfile.web3WalletPage.title')}>
       <Text
         localizationKey={localizationKeys(
           unconnectedStrategies.length
@@ -110,6 +110,6 @@ const AddWeb3Wallet = (props: { nextStep: () => void }) => {
       <FormButtonContainer sx={{ marginTop: 0 }}>
         <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
       </FormButtonContainer>
-    </ContentPage.Root>
+    </ContentPage>
   );
 };

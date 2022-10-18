@@ -8,7 +8,7 @@ import { handleError } from '../../utils';
 import { FormButtonContainer } from './FormButtons';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
 import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
-import { ContentPage } from './Page';
+import { ContentPage } from './UserProfileContentPage';
 
 export const MfaBackupCodeCreatePage = () => {
   const user = useCoreUser();
@@ -27,11 +27,11 @@ export const MfaBackupCodeCreatePage = () => {
   }, []);
 
   if (card.error) {
-    return <ContentPage.Root headerTitle={localizationKeys('userProfile.backupCodePage.title')} />;
+    return <ContentPage headerTitle={localizationKeys('userProfile.backupCodePage.title')} />;
   }
 
   return (
-    <ContentPage.Root headerTitle={localizationKeys('userProfile.backupCodePage.title')}>
+    <ContentPage headerTitle={localizationKeys('userProfile.backupCodePage.title')}>
       {!backupCode ? (
         <FullHeightLoader />
       ) : (
@@ -55,6 +55,6 @@ export const MfaBackupCodeCreatePage = () => {
           </FormButtonContainer>
         </>
       )}
-    </ContentPage.Root>
+    </ContentPage>
   );
 };

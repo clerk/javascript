@@ -58,7 +58,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => 
   );
 });
 
-export const UserProfileCard = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => {
+export const ProfileCard = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => {
   const { branded } = useEnvironment().displayConfig;
 
   return (

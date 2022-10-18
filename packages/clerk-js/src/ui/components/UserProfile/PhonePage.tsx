@@ -8,8 +8,8 @@ import { Form, useCardState, withCardStateProvider } from '../../elements';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
 import { FormButtons } from './FormButtons';
-import { ContentPage } from './Page';
 import { SuccessPage } from './SuccessPage';
+import { ContentPage } from './UserProfileContentPage';
 import { VerifyWithCode } from './VerifyWithCode';
 
 export const PhonePage = withCardStateProvider(() => {
@@ -74,7 +74,7 @@ export const AddPhone = (props: AddPhoneProps) => {
   };
 
   return (
-    <ContentPage.Root headerTitle={title}>
+    <ContentPage headerTitle={title}>
       <Form.Root onSubmit={addPhone}>
         <Form.ControlRow>
           <Form.Control
@@ -94,7 +94,7 @@ export const AddPhone = (props: AddPhoneProps) => {
         />
         <FormButtons isDisabled={!canSubmit} />
       </Form.Root>
-    </ContentPage.Root>
+    </ContentPage>
   );
 };
 
@@ -102,13 +102,13 @@ export const VerifyPhone = (props: AddPhoneProps) => {
   const { title, onSuccess, resourceRef } = props;
 
   return (
-    <ContentPage.Root headerTitle={title}>
+    <ContentPage headerTitle={title}>
       <VerifyWithCode
         nextStep={onSuccess}
         identification={resourceRef.current}
         identifier={resourceRef.current?.phoneNumber}
         prepareVerification={resourceRef.current?.prepareVerification}
       />
-    </ContentPage.Root>
+    </ContentPage>
   );
 };

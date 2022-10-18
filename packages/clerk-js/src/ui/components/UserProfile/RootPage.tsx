@@ -3,11 +3,11 @@ import React from 'react';
 import { useEnvironment } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { Header } from '../../elements';
+import { NavbarMenuButtonRow } from '../../elements/Navbar';
 import { ActiveDevicesSection } from './ActiveDevicesSection';
 import { ConnectedAccountsSection } from './ConnectedAccountsSection';
 import { EmailsSection } from './EmailSection';
 import { MfaSection } from './MfaSection';
-import { NavbarMenuButtonRow } from './Navbar';
 import { PasswordSection } from './PasswordSection';
 import { PhoneSection } from './PhoneSection';
 import { UsernameSection } from './UsernameSection';
@@ -36,15 +36,15 @@ export const RootPage = () => {
         elementId={descriptors.profilePage.setId('account')}
         gap={8}
       >
-        <Header.Root id='cl-userProfile-section-account'>
+        <Header.Root id='cl-section-account'>
           <Header.Title
             localizationKey={localizationKeys('userProfile.start.headerTitle__account')}
             textVariant='xxlargeMedium'
           />
           <Header.Subtitle localizationKey={localizationKeys('userProfile.start.headerSubtitle__account')} />
         </Header.Root>
-        <UserProfileSection />
 
+        <UserProfileSection />
         {showUsername && <UsernameSection />}
         {showEmail && <EmailsSection />}
         {showPhone && <PhoneSection />}
@@ -56,7 +56,7 @@ export const RootPage = () => {
         elementId={descriptors.profilePage.setId('security')}
         gap={8}
       >
-        <Header.Root id='cl-userProfile-section-security'>
+        <Header.Root id='cl-section-security'>
           <Header.Title
             localizationKey={localizationKeys('userProfile.start.headerTitle__security')}
             textVariant='xxlargeMedium'

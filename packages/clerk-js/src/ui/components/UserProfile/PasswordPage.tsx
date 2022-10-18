@@ -6,8 +6,8 @@ import { localizationKeys } from '../../customizables';
 import { Form, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 import { FormButtons } from './FormButtons';
-import { ContentPage } from './Page';
 import { SuccessPage } from './SuccessPage';
+import { ContentPage } from './UserProfileContentPage';
 
 export const PasswordPage = withCardStateProvider(() => {
   const title = localizationKeys('userProfile.passwordPage.title');
@@ -48,7 +48,7 @@ export const PasswordPage = withCardStateProvider(() => {
 
   return (
     <Wizard {...wizard.props}>
-      <ContentPage.Root headerTitle={title}>
+      <ContentPage headerTitle={title}>
         <Form.Root
           onSubmit={updatePassword}
           onBlur={validateForm}
@@ -66,7 +66,7 @@ export const PasswordPage = withCardStateProvider(() => {
           </Form.ControlRow>
           <FormButtons isDisabled={!canSubmit} />
         </Form.Root>
-      </ContentPage.Root>
+      </ContentPage>
 
       <SuccessPage
         title={title}
