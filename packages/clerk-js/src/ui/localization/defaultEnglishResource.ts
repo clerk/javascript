@@ -404,6 +404,12 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
     title: 'Signed in as {{identifier}}',
     action__signOut: 'Sign out',
   },
+  organizationProfile: {
+    start: {
+      headerTitle__members: 'Members',
+      headerTitle__settings: 'Settings',
+    },
+  },
   unstable__errors: {
     form_identifier_not_found: '',
     form_password_pwned: '',
