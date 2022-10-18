@@ -30,3 +30,7 @@ export { default as DeviceLaptop } from './device-laptop.svg';
 export { default as Menu } from './menu.svg';
 export { default as Eye } from './eye.svg';
 export { default as DotCircle } from './dot-circle-horizontal.svg';
+export { default as Times } from './times.svg';
+export { default as Trash } from './trash.svg';
+export { default as UserAdd } from './userAdd.svg';
+export { default as ThreeDots } from './threeDots.svg';

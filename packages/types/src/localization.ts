@@ -403,6 +403,12 @@ type _LocalizationResource = {
     title: LocalizationValue;
     action__signOut: LocalizationValue;
   };
+  organizationProfile: {
+    start: {
+      headerTitle__members: LocalizationValue;
+      headerTitle__settings: LocalizationValue;
+    };
+  };
   unstable__errors: {
     form_identifier_not_found: LocalizationValue;
     form_password_pwned: LocalizationValue;

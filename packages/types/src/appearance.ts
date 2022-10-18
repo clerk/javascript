@@ -63,7 +63,8 @@ export type FieldId =
   | 'confirmPassword'
   | 'identifier'
   | 'username'
-  | 'code';
+  | 'code'
+  | 'name';
 export type ProfileSectionId =
   | 'profile'
   | 'username'
