@@ -75,7 +75,14 @@ export const PhoneInput = (props: PhoneInputProps) => {
             marginLeft: '1px',
           }}
         >
-          <SelectButton>
+          <SelectButton
+            sx={theme => ({
+              backgroundColor: theme.colors.$blackAlpha50,
+              border: 'none',
+              borderBottomRightRadius: '0',
+              borderTopRightRadius: '0',
+            })}
+          >
             <Flag iso={selectedIso} />
           </SelectButton>
         </Flex>
