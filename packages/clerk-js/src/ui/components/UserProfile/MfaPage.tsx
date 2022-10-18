@@ -11,7 +11,7 @@ import { MfaBackupCodePage } from './MfaBackupCodePage';
 import { MfaPhoneCodePage } from './MfaPhoneCodePage';
 import { MfaTOTPPage } from './MfaTOTPPage';
 import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
-import { ContentPage } from './Page';
+import { ContentPage } from './UserProfileContentPage';
 import { getSecondFactorsAvailableToAdd } from './utils';
 
 export const MfaPage = withCardStateProvider(() => {
@@ -33,7 +33,7 @@ export const MfaPage = withCardStateProvider(() => {
   }, []);
 
   if (card.error) {
-    return <ContentPage.Root headerTitle={title} />;
+    return <ContentPage headerTitle={title} />;
   }
 
   // If there is only an available method or one has been selected, render the dedicated page instead
@@ -42,7 +42,7 @@ export const MfaPage = withCardStateProvider(() => {
   }
 
   return (
-    <ContentPage.Root headerTitle={title}>
+    <ContentPage headerTitle={title}>
       <Col gap={4}>
         <Text localizationKey={localizationKeys('userProfile.mfaPage.formHint')} />
         <Grid
@@ -68,7 +68,7 @@ export const MfaPage = withCardStateProvider(() => {
       <FormButtonContainer sx={{ marginTop: 0 }}>
         <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
       </FormButtonContainer>
-    </ContentPage.Root>
+    </ContentPage>
   );
 });
 

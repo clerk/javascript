@@ -3,15 +3,15 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser } from '../../contexts';
-import { Col, LocalizationKey, localizationKeys, Text } from '../../customizables';
+import { Col, Text } from '../../customizables';
 import { ArrowBlockButton, useCardState, withCardStateProvider } from '../../elements';
 import { getFlagEmojiFromCountryIso, handleError, parsePhoneString, stringToFormattedPhoneString } from '../../utils';
 import { FormButtonContainer } from './FormButtons';
 import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
-import { ContentPage } from './Page';
 import { AddPhone, VerifyPhone } from './PhonePage';
 import { SuccessPage } from './SuccessPage';
 import { AddBlockButton } from './UserProfileBlockButtons';
+import { ContentPage } from './UserProfileContentPage';
 
 export const MfaPhoneCodePage = withCardStateProvider(() => {
   const ref = React.useRef<PhoneNumberResource>();
@@ -80,7 +80,7 @@ const AddMfa = (props: AddMfaProps) => {
   };
 
   return (
-    <ContentPage.Root headerTitle={title}>
+    <ContentPage headerTitle={title}>
       <Text
         localizationKey={localizationKeys(
           availableMethods.length
@@ -128,6 +128,6 @@ const AddMfa = (props: AddMfaProps) => {
       <FormButtonContainer sx={{ marginTop: 0 }}>
         <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
       </FormButtonContainer>
-    </ContentPage.Root>
+    </ContentPage>
   );
 };

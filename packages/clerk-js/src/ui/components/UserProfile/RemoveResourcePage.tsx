@@ -8,8 +8,8 @@ import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
 import { handleError } from '../../utils';
 import { FormButtons } from './FormButtons';
-import { ContentPage } from './Page';
 import { SuccessPage } from './SuccessPage';
+import { ContentPage } from './UserProfileContentPage';
 
 export const RemoveEmailPage = () => {
   const user = useCoreUser();
@@ -170,13 +170,13 @@ const RemoveResourcePage = withCardStateProvider((props: RemovePageProps) => {
 
   return (
     <Wizard {...wizard.props}>
-      <ContentPage.Root headerTitle={title}>
+      <ContentPage headerTitle={title}>
         <Form.Root onSubmit={handleSubmit}>
           <Text variant='regularRegular'>{messageLine1}</Text>
           <Text variant='regularRegular'>{messageLine2}</Text>
           <FormButtons colorScheme={'danger'} />
         </Form.Root>
-      </ContentPage.Root>
+      </ContentPage>
 
       <SuccessPage
         title={title}

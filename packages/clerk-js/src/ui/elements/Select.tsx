@@ -316,10 +316,9 @@ export const SelectButton = (props: PropsOfComponent<typeof Button>) => {
         theme => ({
           paddingLeft: theme.space.$3x5,
           paddingRight: theme.space.$3x5,
-          backgroundColor: theme.colors.$blackAlpha50,
+          border: theme.borders.$normal,
+          borderColor: theme.colors.$blackAlpha300,
           borderRadius: theme.radii.$md,
-          borderBottomRightRadius: '0',
-          borderTopRightRadius: '0',
           '> *': { pointerEvents: 'none' },
         }),
         sx,

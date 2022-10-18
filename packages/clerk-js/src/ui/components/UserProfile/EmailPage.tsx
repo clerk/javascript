@@ -8,8 +8,8 @@ import { Form, useCardState, withCardStateProvider } from '../../elements';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
 import { FormButtons } from './FormButtons';
-import { ContentPage } from './Page';
 import { SuccessPage } from './SuccessPage';
+import { ContentPage } from './UserProfileContentPage';
 import { magicLinksEnabledForInstance } from './utils';
 import { VerifyWithCode } from './VerifyWithCode';
 import { VerifyWithLink } from './VerifyWithLink';
@@ -52,7 +52,7 @@ export const EmailPage = withCardStateProvider(() => {
 
   return (
     <Wizard {...wizard.props}>
-      <ContentPage.Root headerTitle={title}>
+      <ContentPage headerTitle={title}>
         <Form.Root onSubmit={addEmail}>
           <Form.ControlRow>
             <Form.Control
@@ -71,9 +71,9 @@ export const EmailPage = withCardStateProvider(() => {
           />
           <FormButtons isDisabled={!canSubmit} />
         </Form.Root>
-      </ContentPage.Root>
+      </ContentPage>
 
-      <ContentPage.Root headerTitle={title}>
+      <ContentPage headerTitle={title}>
         {preferMagicLinks ? (
           <VerifyWithLink
             nextStep={wizard.nextStep}
@@ -87,7 +87,7 @@ export const EmailPage = withCardStateProvider(() => {
             prepareVerification={() => emailAddressRef.current?.prepareVerification({ strategy: 'email_code' })}
           />
         )}
-      </ContentPage.Root>
+      </ContentPage>
 
       <SuccessPage
         title={title}

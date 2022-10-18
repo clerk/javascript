@@ -10,8 +10,8 @@ import { useRouter } from '../../router';
 import { handleError, sleep } from '../../utils';
 import { FormButtonContainer } from './FormButtons';
 import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
-import { ContentPage } from './Page';
 import { SuccessPage } from './SuccessPage';
+import { ContentPage } from './UserProfileContentPage';
 
 export const ConnectedAccountsPage = withCardStateProvider(() => {
   const title = localizationKeys('userProfile.connectedAccountPage.title');
@@ -66,7 +66,7 @@ const AddConnectedAccount = () => {
   };
 
   return (
-    <ContentPage.Root headerTitle={localizationKeys('userProfile.connectedAccountPage.title')}>
+    <ContentPage headerTitle={localizationKeys('userProfile.connectedAccountPage.title')}>
       <Text
         localizationKey={
           unconnectedStrategies.length
@@ -100,6 +100,6 @@ const AddConnectedAccount = () => {
       <FormButtonContainer sx={{ marginTop: 0 }}>
         <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
       </FormButtonContainer>
-    </ContentPage.Root>
+    </ContentPage>
   );
 };

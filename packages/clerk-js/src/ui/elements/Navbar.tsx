@@ -1,12 +1,21 @@
 import React from 'react';
 
-import { Button, Col, descriptors, Flex, Icon, localizationKeys, useLocalizations } from '../../customizables';
-import { ElementDescriptor, ElementId } from '../../customizables/elementDescriptors';
-import { usePopover, useSafeLayoutEffect } from '../../hooks';
-import { Menu, TickShield, User } from '../../icons';
-import { animations, mqu, PropsOfComponent } from '../../styledSystem';
-import { colors, createContextAndHook } from '../../utils';
-import { useNavigateToFlowStart } from './NavigateToFlowStartButton';
+import { useNavigateToFlowStart } from '../components/UserProfile/NavigateToFlowStartButton';
+import {
+  Button,
+  Col,
+  descriptors,
+  Flex,
+  Icon,
+  LocalizationKey,
+  localizationKeys,
+  useLocalizations,
+} from '../customizables';
+import { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
+import { useNavigate, usePopover, useSafeLayoutEffect } from '../hooks';
+import { Menu } from '../icons';
+import { animations, mqu, PropsOfComponent } from '../styledSystem';
+import { colors, createContextAndHook } from '../utils';
 
 type NavbarContextValue = { isOpen: boolean; open: () => void; close: () => void };
 export const [NavbarContext, useNavbarContext] = createContextAndHook<NavbarContextValue>('NavbarContext');
@@ -18,44 +27,42 @@ export const NavbarContextProvider = (props: React.PropsWithChildren<{}>) => {
   return <NavbarContext.Provider value={value}>{props.children}</NavbarContext.Provider>;
 };
 
-export const BaseRoutes = [
-  { name: localizationKeys('userProfile.start.headerTitle__account'), id: 'account', icon: User, path: '/' } as const,
-  {
-    name: localizationKeys('userProfile.start.headerTitle__security'),
-    id: 'security',
-    icon: TickShield,
-    path: '/security',
-  } as const,
-] as const;
-
-type BaseRouteId = typeof BaseRoutes[number]['id'];
-
+export type NavbarRoute = { name: LocalizationKey; id: string; icon: React.ComponentType; path: string };
+type RouteId = NavbarRoute['id'];
 type NavBarProps = {
   contentRef: React.RefObject<HTMLDivElement>;
+  routes: NavbarRoute[];
 };
 
-const getSectionId = (id: BaseRouteId) => `#cl-userProfile-section-${id}`;
+const getSectionId = (id: RouteId) => `#cl-section-${id}`;
 
 export const NavBar = (props: NavBarProps) => {
-  const { contentRef } = props;
-  const [activeId, setActiveId] = React.useState<BaseRouteId>('account');
+  const { contentRef, routes } = props;
+  const [activeId, setActiveId] = React.useState<RouteId>(routes[0]['id']);
   const { close } = useNavbarContext();
+  const { navigate } = useNavigate();
   const { navigateToFlowStart } = useNavigateToFlowStart();
   const { t } = useLocalizations();
 
-  const navigateAndScroll = async (id: BaseRouteId) => {
+  const navigateAndScroll = async (route: NavbarRoute) => {
     if (contentRef.current) {
-      setActiveId(id);
+      setActiveId(route.id);
       close();
-      await navigateToFlowStart();
-      const el = contentRef.current.querySelector(getSectionId(id));
+      if (route.path === '/') {
+        // TODO: this is needed to correctly handle navigations
+        // when the component is opened as a modal
+        await navigateToFlowStart();
+      } else {
+        await navigate(route.path);
+      }
+      const el = contentRef.current?.querySelector(getSectionId(route.id));
       el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
   useSafeLayoutEffect(() => {
     const mountObservers = () => {
-      const ids = BaseRoutes.map(r => r.id);
+      const ids = routes.map(r => r.id);
       const sectionElements = ids
         .map(getSectionId)
         .map(id => contentRef.current?.querySelector(id))
@@ -93,14 +100,14 @@ export const NavBar = (props: NavBarProps) => {
       elementDescriptor={descriptors.navbarButtons}
       gap={2}
     >
-      {BaseRoutes.map(r => (
+      {routes.map(r => (
         <NavButton
           key={r.id}
           elementDescriptor={descriptors.navbarButton}
-          elementId={descriptors.navbarButton.setId(r.id)}
+          elementId={descriptors.navbarButton.setId(r.id as any)}
           iconElementDescriptor={descriptors.navbarButtonIcon}
-          iconElementId={descriptors.navbarButtonIcon.setId(r.id)}
-          onClick={() => navigateAndScroll(r.id)}
+          iconElementId={descriptors.navbarButtonIcon.setId(r.id as any)}
+          onClick={() => navigateAndScroll(r)}
           icon={r.icon}
           isActive={activeId === r.id}
         >
@@ -201,7 +208,7 @@ type NavButtonProps = PropsOfComponent<typeof Button> & {
 };
 
 const NavButton = (props: NavButtonProps) => {
-  const { icon, children, isActive, contentEditable, iconElementDescriptor, iconElementId, ...rest } = props;
+  const { icon, children, isActive, iconElementDescriptor, iconElementId, ...rest } = props;
   return (
     <Button
       variant='ghost'

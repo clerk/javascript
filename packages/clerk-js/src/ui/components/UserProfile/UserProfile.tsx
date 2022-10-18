@@ -1,13 +1,13 @@
-import { UserProfileProps } from '@clerk/types/src';
+import { UserProfileProps } from '@clerk/types';
 import React from 'react';
 
 import { ComponentContext, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
-import { UserProfileCard, withCardStateProvider } from '../../elements';
+import { ProfileCard, withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
 import { UserProfileCtx } from '../../types';
-import { Content } from './Content';
-import { NavBar, NavbarContextProvider } from './Navbar';
+import { UserProfileNavbar } from './UserProfileNavbar';
+import { UserProfileRoutes } from './UserProfileRoutes';
 import { VerificationSuccessPage } from './VerifyWithLink';
 
 const _UserProfile = (_: UserProfileProps) => {
@@ -31,12 +31,11 @@ const _UserProfile = (_: UserProfileProps) => {
 const AuthenticatedRoutes = withCoreUserGuard(() => {
   const contentRef = React.useRef<HTMLDivElement>(null);
   return (
-    <UserProfileCard sx={{ height: '100%' }}>
-      <NavbarContextProvider>
-        <NavBar contentRef={contentRef} />
-        <Content ref={contentRef} />
-      </NavbarContextProvider>
-    </UserProfileCard>
+    <ProfileCard sx={{ height: '100%' }}>
+      <UserProfileNavbar contentRef={contentRef}>
+        <UserProfileRoutes contentRef={contentRef} />
+      </UserProfileNavbar>
+    </ProfileCard>
   );
 });
 

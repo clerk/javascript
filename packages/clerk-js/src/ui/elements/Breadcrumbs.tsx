@@ -1,13 +1,14 @@
 import React from 'react';
 
-import { descriptors, Flex, Icon, Link, LocalizationKey, Text, useLocalizations } from '../../customizables';
-import { useRouter } from '../../router';
-import { mqu, PropsOfComponent } from '../../styledSystem';
-import { BaseRoutes } from './Navbar';
-import { useNavigateToFlowStart } from './NavigateToFlowStartButton';
+import { useNavigateToFlowStart } from '../components/UserProfile/NavigateToFlowStartButton';
+import { descriptors, Flex, Icon, Link, LocalizationKey, Text, useLocalizations } from '../customizables';
+import { useRouter } from '../router';
+import { mqu, PropsOfComponent } from '../styledSystem';
+import { NavbarRoute } from './Navbar';
 
 type BreadcrumbsProps = {
   title: LocalizationKey;
+  pageToRootNavbarRoute: Record<string, NavbarRoute | undefined>;
 };
 
 const BreadcrumbItem = (props: PropsOfComponent<typeof Text> & { href?: string }) => {
@@ -28,30 +29,18 @@ const BreadcrumbItem = (props: PropsOfComponent<typeof Text> & { href?: string }
   );
 };
 
-const PAGE_TO_ROOT = {
-  profile: BaseRoutes.find(r => r.id === 'account'),
-  'email-address': BaseRoutes.find(r => r.id === 'account'),
-  'phone-number': BaseRoutes.find(r => r.id === 'account'),
-  'connected-account': BaseRoutes.find(r => r.id === 'account'),
-  'web3-wallet': BaseRoutes.find(r => r.id === 'account'),
-  username: BaseRoutes.find(r => r.id === 'account'),
-  'multi-factor': BaseRoutes.find(r => r.id === 'security'),
-  password: BaseRoutes.find(r => r.id === 'security'),
-};
-
 export const Breadcrumbs = (props: BreadcrumbsProps) => {
   const router = useRouter();
   const { navigateToFlowStart } = useNavigateToFlowStart();
   const { t } = useLocalizations();
   const currentPage = (router.currentPath || '').split('/').pop();
 
-  const { title } = props;
+  const { title, pageToRootNavbarRoute, ...rest } = props;
   if (!title) {
     return null;
   }
 
-  // @ts-expect-error
-  const root = currentPage ? PAGE_TO_ROOT[currentPage] : undefined;
+  const root = currentPage ? pageToRootNavbarRoute[currentPage] : undefined;
   const handleRootClick = (e: React.MouseEvent) => {
     e.preventDefault();
     return navigateToFlowStart();
@@ -61,6 +50,7 @@ export const Breadcrumbs = (props: BreadcrumbsProps) => {
     <Flex
       as='nav'
       elementDescriptor={descriptors.breadcrumbs}
+      {...rest}
     >
       <Flex
         elementDescriptor={descriptors.breadcrumbsItems}
