@@ -66,7 +66,7 @@ export const VerifyWithCode = (props: VerifyWithCodeProps) => {
         onResendCodeClicked={prepare}
       />
       <FormButtonContainer>
-        <NavigateToFlowStartButton>Cancel</NavigateToFlowStartButton>
+        <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
       </FormButtonContainer>
     </>
   );

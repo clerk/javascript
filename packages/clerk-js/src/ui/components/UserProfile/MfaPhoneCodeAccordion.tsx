@@ -36,7 +36,7 @@ export const MfaPhoneCodeAccordion = ({ phone, showTOTP }: MfaPhoneCodeAccordion
           SMS Code <FormattedPhoneNumberText value={phone.phoneNumber} />
         </>
       }
-      badge={isDefault ? <Badge>Default</Badge> : undefined}
+      badge={isDefault ? <Badge localizationKey={localizationKeys('badge__default')} /> : undefined}
     >
       <Col gap={4}>
         {!showTOTP && (

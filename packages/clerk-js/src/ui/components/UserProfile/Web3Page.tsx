@@ -70,11 +70,13 @@ const AddWeb3Wallet = (props: { nextStep: () => void }) => {
 
   return (
     <ContentPage.Root headerTitle={localizationKeys('userProfile.web3WalletPage.title')}>
-      <Text>
-        {unconnectedStrategies.length
-          ? 'Select a web3 wallet to connect to your account.'
-          : 'There are no available web3 wallets.'}
-      </Text>
+      <Text
+        localizationKey={localizationKeys(
+          unconnectedStrategies.length
+            ? 'userProfile.web3WalletPage.subtitle__availableWallets'
+            : 'userProfile.web3WalletPage.subtitle__unavailableWallets',
+        )}
+      />
       <Col gap={2}>
         {unconnectedStrategies.map(strategy => (
           <ArrowBlockButton
@@ -106,7 +108,7 @@ const AddWeb3Wallet = (props: { nextStep: () => void }) => {
         ))}
       </Col>
       <FormButtonContainer sx={{ marginTop: 0 }}>
-        <NavigateToFlowStartButton>Cancel</NavigateToFlowStartButton>
+        <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
       </FormButtonContainer>
     </ContentPage.Root>
   );

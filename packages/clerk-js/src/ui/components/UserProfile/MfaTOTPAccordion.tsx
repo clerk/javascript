@@ -20,7 +20,7 @@ export const MfaTOTPAccordion = () => {
         />
       }
       title={localizationKeys('userProfile.start.mfaSection.totp.headerTitle')}
-      badge={<Badge>{localizationKeys('userProfile.start.mfaSection.totp.badge__default')}</Badge>}
+      badge={<Badge localizationKey={localizationKeys('badge__default')} />}
     >
       <Col gap={4}>
         <LinkButtonWithDescription

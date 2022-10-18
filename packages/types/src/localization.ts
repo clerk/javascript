@@ -251,7 +251,6 @@ type _LocalizationResource = {
           destructiveActionTitle: LocalizationValue;
           destructiveActionSubtitle: LocalizationValue;
           destructiveActionLabel: LocalizationValue;
-          badge__default: LocalizationValue;
         };
       };
       activeDevicesSection: {
@@ -310,6 +309,8 @@ type _LocalizationResource = {
     phoneNumberPage: {
       title: LocalizationValue;
       successMessage: LocalizationValue;
+      infoText: LocalizationValue;
+      infoText__secondary: LocalizationValue;
       removeResource: {
         title: LocalizationValue;
         messageLine1: LocalizationValue;
@@ -332,6 +333,8 @@ type _LocalizationResource = {
     };
     web3WalletPage: {
       title: LocalizationValue;
+      subtitle__availableWallets: LocalizationValue;
+      subtitle__unavailableWallets: LocalizationValue;
       successMessage: LocalizationValue;
       removeResource: {
         title: LocalizationValue;
@@ -353,6 +356,14 @@ type _LocalizationResource = {
       verifyTitle: LocalizationValue;
       verifySubtitle: LocalizationValue;
       successMessage: LocalizationValue;
+      authenticatorApp: {
+        infoText__ableToScan: LocalizationValue;
+        infoText__unableToScan: LocalizationValue;
+        inputLabel__unableToScan1: LocalizationValue;
+        inputLabel__unableToScan2: LocalizationValue;
+        buttonAbleToScan__nonPrimary: LocalizationValue;
+        buttonUnableToScan__nonPrimary: LocalizationValue;
+      };
       removeResource: {
         title: LocalizationValue;
         messageLine1: LocalizationValue;
@@ -362,6 +373,9 @@ type _LocalizationResource = {
     };
     mfaPhoneCodePage: {
       title: LocalizationValue;
+      primaryButton__addPhoneNumber: LocalizationValue;
+      subtitle__availablePhoneNumbers: LocalizationValue;
+      subtitle__unavailablePhoneNumbers: LocalizationValue;
       successMessage: LocalizationValue;
       removeResource: {
         title: LocalizationValue;

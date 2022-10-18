@@ -3,7 +3,7 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser } from '../../contexts';
-import {  LocalizationKey, localizationKeys, Text } from '../../customizables';
+import { LocalizationKey, localizationKeys, Text } from '../../customizables';
 import { Form, useCardState, withCardStateProvider } from '../../elements';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
@@ -56,7 +56,7 @@ export const AddPhone = (props: AddPhoneProps) => {
 
   const phoneField = useFormControl('phoneNumber', '', {
     type: 'tel',
-    label: 'Phone number',
+    label: localizationKeys('formFieldLabel__phoneNumber'),
     isRequired: true,
   });
 
@@ -83,15 +83,15 @@ export const AddPhone = (props: AddPhoneProps) => {
             autoFocus
           />
         </Form.ControlRow>
-        <Text variant='regularRegular'>
-          A text message containing a verification link will be sent to this phone number.
-        </Text>
+        <Text
+          variant='regularRegular'
+          localizationKey={localizationKeys('userProfile.phoneNumberPage.infoText')}
+        />
         <Text
           variant='smallRegular'
           colorScheme='neutral'
-        >
-          Message and data rates may apply.
-        </Text>
+          localizationKey={localizationKeys('userProfile.phoneNumberPage.infoText__secondary')}
+        />
         <FormButtons isDisabled={!canSubmit} />
       </Form.Root>
     </ContentPage.Root>

@@ -28,7 +28,7 @@ export const Web3Section = () => {
         id='password'
         onClick={() => navigate(`web3-wallet`)}
         textLocalizationKey={localizationKeys('userProfile.start.web3WalletsSection.primaryButton')}
-      ></AddBlockButton>
+      />
     </ProfileSection>
   );
 };

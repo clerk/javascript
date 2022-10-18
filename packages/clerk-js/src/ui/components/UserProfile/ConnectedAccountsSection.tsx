@@ -65,7 +65,12 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
           center
         >
           {`${providerToDisplayData[account.provider].name} ${label ? `(${label})` : ''}`}
-          {error && <Badge colorScheme='danger'>Requires action</Badge>}
+          {error && (
+            <Badge
+              colorScheme='danger'
+              localizationKey={localizationKeys('badge__requiresAction')}
+            />
+          )}
         </Flex>
       }
     >

@@ -3,7 +3,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import React from 'react';
 
 import { useCoreUser } from '../../contexts';
-import { Button, Col, LocalizationKey, Text } from '../../customizables';
+import { Button, Col, LocalizationKey, localizationKeys, Text } from '../../customizables';
 import { ClipboardInput, FullHeightLoader, useCardState } from '../../elements';
 import { handleError } from '../../utils';
 import { FormButtonContainer } from './FormButtons';
@@ -46,10 +46,9 @@ export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
           <Col gap={4}>
             {displayFormat == 'qr' && (
               <>
-                <Text>
-                  Set up a new sign-in method in your authenticator app and scan the following QR code to link it to
-                  your account.
-                </Text>
+                <Text
+                  localizationKey={localizationKeys('userProfile.mfaTOTPPage.authenticatorApp.infoText__ableToScan')}
+                />
 
                 <QRCodeSVG
                   size={200}
@@ -59,30 +58,42 @@ export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
                 <Button
                   variant='link'
                   onClick={() => setDisplayFormat('uri')}
-                >
-                  Can’t scan QR code?
-                </Button>
+                  localizationKey={localizationKeys(
+                    'userProfile.mfaTOTPPage.authenticatorApp.buttonUnableToScan__nonPrimary',
+                  )}
+                />
               </>
             )}
 
             {displayFormat == 'uri' && (
               <>
-                <Text>Set up a new sign-in method in your authenticator and enter the Key provided below.</Text>
+                <Text
+                  localizationKey={localizationKeys('userProfile.mfaTOTPPage.authenticatorApp.infoText__unableToScan')}
+                />
 
-                <Text>Make sure Time-based or One-time passwords is enabled, then finish linking your account.</Text>
+                <Text
+                  localizationKey={localizationKeys(
+                    'userProfile.mfaTOTPPage.authenticatorApp.inputLabel__unableToScan1',
+                  )}
+                />
 
                 <ClipboardInput value={totp.secret} />
 
-                <Text>Alternatively, if your authenticator supports TOTP URIs, you can also copy the full URI.</Text>
+                <Text
+                  localizationKey={localizationKeys(
+                    'userProfile.mfaTOTPPage.authenticatorApp.inputLabel__unableToScan2',
+                  )}
+                />
 
                 <ClipboardInput value={totp.uri} />
 
                 <Button
                   variant='link'
                   onClick={() => setDisplayFormat('qr')}
-                >
-                  Scan QR code instead
-                </Button>
+                  localizationKey={localizationKeys(
+                    'userProfile.mfaTOTPPage.authenticatorApp.buttonAbleToScan__nonPrimary',
+                  )}
+                />
               </>
             )}
           </Col>
@@ -91,11 +102,10 @@ export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
             <Button
               textVariant='buttonExtraSmallBold'
               onClick={onContinue}
-            >
-              Continue
-            </Button>
+              localizationKey={localizationKeys('userProfile.formButtonPrimary__finish')}
+            />
 
-            <NavigateToFlowStartButton>Cancel</NavigateToFlowStartButton>
+            <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
           </FormButtonContainer>
         </>
       )}

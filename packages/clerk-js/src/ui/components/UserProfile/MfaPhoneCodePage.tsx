@@ -81,11 +81,13 @@ const AddMfa = (props: AddMfaProps) => {
 
   return (
     <ContentPage.Root headerTitle={title}>
-      <Text>
-        {availableMethods.length
-          ? 'Select a phone number to register for SMS code two-step verification.'
-          : 'There are no available phone numbers to register for SMS code two-step verification.'}
-      </Text>
+      <Text
+        localizationKey={localizationKeys(
+          availableMethods.length
+            ? 'userProfile.mfaPhoneCodePage.subtitle__availablePhoneNumbers'
+            : 'userProfile.mfaPhoneCodePage.subtitle__unavailablePhoneNumbers',
+        )}
+      />
       <Col gap={2}>
         {availableMethods.map(phone => {
           const formattedPhone = stringToFormattedPhoneString(phone.phoneNumber);
@@ -120,12 +122,11 @@ const AddMfa = (props: AddMfaProps) => {
         <AddBlockButton
           block={false}
           onClick={onAddPhoneClick}
-        >
-          Add a phone number
-        </AddBlockButton>
+          textLocalizationKey={localizationKeys('userProfile.mfaPhoneCodePage.primaryButton__addPhoneNumber')}
+        />
       </Col>
       <FormButtonContainer sx={{ marginTop: 0 }}>
-        <NavigateToFlowStartButton>Cancel</NavigateToFlowStartButton>
+        <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
       </FormButtonContainer>
     </ContentPage.Root>
   );

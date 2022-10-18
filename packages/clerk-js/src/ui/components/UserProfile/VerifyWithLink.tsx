@@ -55,7 +55,7 @@ export const VerifyWithLink = (props: VerifyWithLinkProps) => {
         onResendCodeClicked={startVerification}
       />
       <FormButtonContainer>
-        <NavigateToFlowStartButton>Cancel</NavigateToFlowStartButton>
+        <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
       </FormButtonContainer>
     </>
   );
@@ -65,7 +65,7 @@ export const VerificationSuccessPage = () => {
   return (
     <EmailLinkStatusCard
       title='Successfully verified email'
-      subtitle='Return to previous tab continue'
+      subtitle='Return to previous tab to continue'
       status='verified'
     />
   );
