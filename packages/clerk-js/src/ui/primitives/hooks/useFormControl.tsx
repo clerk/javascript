@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { createContextAndHook } from '../../utils';
+import { createContextAndHook } from '@clerk/shared';
 
 export type FormControlProps = {
   /**
