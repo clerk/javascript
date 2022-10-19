@@ -60,7 +60,7 @@ export const NavBar = (props: NavBarProps) => {
     }
   };
 
-  useSafeLayoutEffect(() => {
+  useSafeLayoutEffect(function selectNavItemBasedOnVisibleSection() {
     const mountObservers = () => {
       const ids = routes.map(r => r.id);
       const sectionElements = ids

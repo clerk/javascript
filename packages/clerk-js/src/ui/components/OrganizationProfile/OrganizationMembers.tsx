@@ -26,7 +26,7 @@ export const OrganizationMembers = () => {
           justify={'between'}
           align={'center'}
         >
-          <Header.Root id='cl-section-settings'>
+          <Header.Root id='cl-section-members'>
             <Header.Title
               localizationKey={localizationKeys('organizationProfile.start.headerTitle__members')}
               textVariant='xxlargeMedium'
