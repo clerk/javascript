@@ -319,7 +319,8 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
       removeResource: {
         title: 'Remove connected account',
         messageLine1: '{{identifier}} will be removed from this account.',
-        messageLine2: 'You will no longer be able to sign in using this connected account.',
+        messageLine2:
+          'You will no longer be able to use this connected account and any dependent features will no longer work.',
         successMessage: '{{connectedAccount}} has been removed from your account.',
       },
     },
