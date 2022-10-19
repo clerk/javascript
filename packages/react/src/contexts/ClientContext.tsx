@@ -1,9 +1,9 @@
+import { createContextAndHook } from '@clerk/shared';
 import { ClientResource } from '@clerk/types';
-import React from 'react';
-
-import { makeContextAndHook } from '../utils/makeContextAndHook';
 
 /**
  * @internal
  */
-export const [ClientContext, useClientContext] = makeContextAndHook<ClientResource | undefined | null>('ClientContext');
+export const [ClientContext, useClientContext] = createContextAndHook<ClientResource | undefined | null>(
+  'ClientContext',
+);

@@ -1,7 +1,7 @@
+import { createContextAndHook } from '@clerk/shared';
 import React from 'react';
 
 import { useDeepEqualMemo } from '../hooks';
-import { createContextAndHook } from '../utils';
 import { AppearanceCascade, parseAppearance, ParsedAppearance } from './parseAppearance';
 
 type AppearanceContextValue = ParsedAppearance;

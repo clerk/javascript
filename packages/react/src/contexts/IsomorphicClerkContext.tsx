@@ -1,8 +1,9 @@
+import { createContextAndHook } from '@clerk/shared';
+
 import IsomorphicClerk from '../isomorphicClerk';
-import { makeContextAndHook } from '../utils/makeContextAndHook';
 
 /**
  * @internal
  */
 export const [IsomorphicClerkContext, useIsomorphicClerkContext] =
-  makeContextAndHook<IsomorphicClerk>('IsomorphicClerkContext');
+  createContextAndHook<IsomorphicClerk>('IsomorphicClerkContext');

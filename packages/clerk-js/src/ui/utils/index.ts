@@ -1,6 +1,5 @@
 export * from './fromEntries';
 export * from './containsAllOf';
-export * from './createContextAndHook';
 export * from './createInfiniteAccessProxy';
 export * from './fastDeepMerge';
 export * from './colors';

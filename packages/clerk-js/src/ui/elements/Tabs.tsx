@@ -1,8 +1,9 @@
+import { createContextAndHook } from '@clerk/shared';
 import React from 'react';
 
 import { Button, Col, Flex } from '../customizables';
 import { PropsOfComponent } from '../styledSystem';
-import { createContextAndHook, getValidChildren } from '../utils';
+import { getValidChildren } from '../utils';
 
 type TabsContextValue = {
   selectedIndex: number;
