@@ -303,7 +303,7 @@ export const SelectButton = (props: PropsOfComponent<typeof Button>) => {
   const { isOpen, reference } = popoverCtx;
 
   let show: React.ReactNode = children;
-  if (!isValidElement(children)) {
+  if (!children) {
     show = optionBuilder(selectedOption);
   }
 

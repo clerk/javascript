@@ -1,7 +1,7 @@
 import { UserResource } from '@clerk/types';
 import React from 'react';
 
-import { Button, Col, Flex, Icon, Table, Tbody, Td, Th, Thead, Tr } from '../../customizables';
+import { Box, Button, Col, Flex, Icon, Table, Tbody, Td, Th, Thead, Tr } from '../../customizables';
 import {
   InputWithIcon,
   Menu,
@@ -9,6 +9,9 @@ import {
   MenuList,
   MenuTrigger,
   Pagination,
+  Select,
+  SelectButton,
+  SelectOptionList,
   usePagination,
   UserPreview,
 } from '../../elements';
@@ -55,8 +58,11 @@ export const MembersListTable = (props: MembersListProps) => {
   }, [filteredItems]);
 
   return (
-    <Col sx={t => ({ width: '100%', padding: `${t.space.$8} 0` })}>
-      <Flex sx={{ width: 'min(30ch, 100%)' }}>
+    <Col
+      gap={4}
+      sx={t => ({ width: '100%', padding: `${t.space.$8} 0` })}
+    >
+      <Box sx={{ width: 'min(30ch, 100%)' }}>
         <InputWithIcon
           {...searchInputProps}
           placeholder={'Search'}
@@ -68,7 +74,7 @@ export const MembersListTable = (props: MembersListProps) => {
             />
           }
         />
-      </Flex>
+      </Box>
       <Flex sx={{ overflowX: 'auto' }}>
         <Table sx={{ width: '100%' }}>
           <Thead>
@@ -122,16 +128,48 @@ const EmptyRow = () => {
 
 const UserRow = (props: { user: Partial<UserResource>; actions: UserAction[] }) => {
   const { user, actions } = props;
+  //Mock
+  const roles = ['basic_member', 'admin'];
+
   return (
     <Tr sx={t => ({ ':hover': { backgroundColor: t.colors.$blackAlpha50 } })}>
-      <Td sx={{ width: '65%' }}>
+      <Td sx={{ width: '100%' }}>
         <UserPreview user={user} />
       </Td>
-      <Td sx={{ width: '25%' }}>{user.role}</Td>
-      <Td sx={{ width: '10%' }}>
+      <Td>
+        <Select
+          options={roles}
+          value={user.role}
+          onChange={() => {}}
+        >
+          <SelectButton
+            sx={t => ({
+              border: 'none',
+              // opacity also affects the background. Can we only reduce color opacity?
+              // we also need the caret to be affected so we can't use a <Text/> for the role.
+              opacity: t.opacity.$inactive,
+              backgroundColor: 'transparent',
+            })}
+          >
+            {user.role}
+          </SelectButton>
+          <SelectOptionList />
+        </Select>
+      </Td>
+      <Td>
         <Menu>
           <MenuTrigger>
-            <Button variant='ghostIcon'>
+            <Button
+              size='xs'
+              sx={t => ({
+                opacity: t.opacity.$inactive,
+                ':hover': {
+                  opacity: 1,
+                },
+              })}
+              colorScheme='neutral'
+              variant='ghost'
+            >
               <Icon icon={ThreeDots} />
             </Button>
           </MenuTrigger>

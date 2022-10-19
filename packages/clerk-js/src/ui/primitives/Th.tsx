@@ -6,9 +6,13 @@ import { Box, BoxProps } from './Box';
 const { applyVariants, filterProps } = createVariants(theme => ({
   base: {
     textAlign: 'left',
-    fontWeight: theme.fontWeights.$medium,
+    fontSize: theme.fontSizes.$xs,
+    fontWeight: theme.fontWeights.$normal,
+    color: theme.colors.$colorText,
+    opacity: theme.opacity.$inactive,
     borderBottom: theme.borders.$normal,
     borderColor: theme.colors.$blackAlpha300,
+    paddingBottom: theme.space.$2,
   },
   variants: {},
 }));
