@@ -1,7 +1,7 @@
 import { UserResource } from '@clerk/types';
 import React from 'react';
 
-import { Box, Button, Col, Icon, Table, Tbody, Td, Th, Thead, Tr } from '../../customizables';
+import { Button, Col, Flex, Icon, Table, Tbody, Td, Th, Thead, Tr } from '../../customizables';
 import {
   InputWithIcon,
   Menu,
@@ -56,7 +56,7 @@ export const MembersListTable = (props: MembersListProps) => {
 
   return (
     <Col sx={t => ({ width: '100%', padding: `${t.space.$8} 0` })}>
-      <Box sx={{ width: 'min(30ch, 100%)' }}>
+      <Flex sx={{ width: 'min(30ch, 100%)' }}>
         <InputWithIcon
           {...searchInputProps}
           placeholder={'Search'}
@@ -68,8 +68,8 @@ export const MembersListTable = (props: MembersListProps) => {
             />
           }
         />
-      </Box>
-      <Box sx={{ overflowX: 'auto' }}>
+      </Flex>
+      <Flex sx={{ overflowX: 'auto' }}>
         <Table sx={{ width: '100%' }}>
           <Thead>
             <Tr>
@@ -79,6 +79,7 @@ export const MembersListTable = (props: MembersListProps) => {
             </Tr>
           </Thead>
           <Tbody>
+            {!filteredItems.length && <EmptyRow />}
             {filteredItems.slice(startRowIndex, endRowIndex).map(user => (
               <UserRow
                 key={user.id}
@@ -88,8 +89,8 @@ export const MembersListTable = (props: MembersListProps) => {
             ))}
           </Tbody>
         </Table>
-      </Box>
-      {!!pageCount && (
+      </Flex>
+      {
         <Pagination
           count={pageCount}
           page={page}
@@ -97,12 +98,25 @@ export const MembersListTable = (props: MembersListProps) => {
           siblingCount={1}
           rowInfo={{
             allRowsCount: filteredItems.length,
-            startingRow: startRowIndex + 1,
+            startingRow: filteredItems.length ? startRowIndex + 1 : startRowIndex,
             endingRow: endRowIndex,
           }}
         />
-      )}
+      }
     </Col>
+  );
+};
+
+const EmptyRow = () => {
+  return (
+    <Tr>
+      <Td
+        sx={{ width: '25%' }}
+        colSpan={4}
+      >
+        No members to display
+      </Td>
+    </Tr>
   );
 };
 
@@ -110,11 +124,11 @@ const UserRow = (props: { user: Partial<UserResource>; actions: UserAction[] }) 
   const { user, actions } = props;
   return (
     <Tr sx={t => ({ ':hover': { backgroundColor: t.colors.$blackAlpha50 } })}>
-      <Td sx={{ width: '70%' }}>
+      <Td sx={{ width: '65%' }}>
         <UserPreview user={user} />
       </Td>
-      <Td>{user.role}</Td>
-      <Td>
+      <Td sx={{ width: '25%' }}>{user.role}</Td>
+      <Td sx={{ width: '10%' }}>
         <Menu>
           <MenuTrigger>
             <Button variant='ghostIcon'>
