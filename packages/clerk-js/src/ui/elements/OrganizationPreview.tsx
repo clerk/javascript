@@ -1,4 +1,4 @@
-import { OrganizationResource } from '@clerk/types';
+import { OrganizationResource, UserResource } from '@clerk/types';
 import React from 'react';
 
 import { Flex, Text } from '../customizables';
@@ -7,6 +7,7 @@ import { OrganizationAvatar } from './OrganizationAvatar';
 
 export type OrganizationPreviewProps = PropsOfComponent<typeof Flex> & {
   organization: OrganizationResource;
+  user?: UserResource;
   size?: 'lg' | 'md' | 'sm';
   icon?: React.ReactNode;
   badge?: React.ReactNode;
@@ -15,37 +16,28 @@ export type OrganizationPreviewProps = PropsOfComponent<typeof Flex> & {
 };
 
 export const OrganizationPreview = (props: OrganizationPreviewProps) => {
-  const { organization, size = 'md', icon, rounded = false, badge, sx, ...rest } = props;
-  const name = organization.name;
-  //Mocks
-  const role = 'Member';
+  const { organization, size = 'md', icon, rounded = false, badge, sx, user, ...rest } = props;
 
   return (
     <Flex
       // elementDescriptor={descriptors.organizationPreview}
       // elementId={descriptors.organizationPreview.setId(elementId)}
-      gap={4}
+      gap={3}
       align='center'
-      sx={[
-        {
-          minWidth: '0px',
-          width: '100%',
-        },
-        sx,
-      ]}
+      sx={[{ minWidth: '0px', width: '100%' }, sx]}
       {...rest}
     >
       <Flex
         // elementDescriptor={descriptors.organizationPreviewAvatarContainer}
         // elementId={descriptors.userPreviewAvatarContainer.setId(elementId)}
         justify='center'
-        sx={theme => ({ position: 'relative', flex: `0 0 ${theme.sizes.$11}` })}
+        sx={{ position: 'relative' }}
       >
         <OrganizationAvatar
           // boxElementDescriptor={descriptors.organizationPreviewAvatarBox}
           // imageElementDescriptor={descriptors.organizationPreviewAvatarImage}
           {...organization}
-          size={theme => ({ sm: theme.sizes.$8, md: theme.sizes.$11, lg: theme.sizes.$12x5 }[size])}
+          size={t => ({ sm: t.sizes.$8, md: t.sizes.$11, lg: t.sizes.$12x5 }[size])}
           optimize
           rounded={rounded}
         />
@@ -64,9 +56,9 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
           variant={size === 'md' ? 'regularMedium' : 'smallMedium'}
           truncate
         >
-          {name} {badge}
+          {organization.name} {badge}
         </Text>
-        {name && (
+        {organization.name && (
           <Text
             // elementDescriptor={descriptors.organizationPreviewSecondaryIdentifier}
             //   elementId={descriptors.organizationPreviewSecondaryIdentifier.setId(elementId)}
@@ -74,7 +66,8 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
             colorScheme='neutral'
             truncate
           >
-            {role}
+            {/*{role}*/}
+            {user && 'Member'}
           </Text>
         )}
       </Flex>

@@ -40,14 +40,14 @@ export const UserPreview = (props: UserPreviewProps) => {
         elementDescriptor={descriptors.userPreviewAvatarContainer}
         elementId={descriptors.userPreviewAvatarContainer.setId(elementId)}
         justify='center'
-        sx={theme => ({ position: 'relative', flex: `0 0 ${theme.sizes.$11}` })}
+        sx={t => ({ position: 'relative', flex: `0 0 ${t.sizes.$11}` })}
       >
         <UserAvatar
           boxElementDescriptor={descriptors.userPreviewAvatarBox}
           imageElementDescriptor={descriptors.userPreviewAvatarImage}
           {...user}
           imageUrl={imageUrl || user.profileImageUrl}
-          size={theme => ({ sm: theme.sizes.$8, md: theme.sizes.$11, lg: theme.sizes.$12x5 }[size])}
+          size={t => ({ sm: t.sizes.$8, md: t.sizes.$11, lg: t.sizes.$12x5 }[size])}
           optimize
           rounded={rounded}
         />

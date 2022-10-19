@@ -32,12 +32,13 @@ type RouteId = NavbarRoute['id'];
 type NavBarProps = {
   contentRef: React.RefObject<HTMLDivElement>;
   routes: NavbarRoute[];
+  header?: React.ReactNode;
 };
 
 const getSectionId = (id: RouteId) => `#cl-section-${id}`;
 
 export const NavBar = (props: NavBarProps) => {
-  const { contentRef, routes } = props;
+  const { contentRef, routes, header } = props;
   const [activeId, setActiveId] = React.useState<RouteId>(routes[0]['id']);
   const { close } = useNavbarContext();
   const { navigate } = useNavigate();
@@ -119,8 +120,14 @@ export const NavBar = (props: NavBarProps) => {
 
   return (
     <>
-      <NavbarContainer>{items}</NavbarContainer>
-      <MobileNavbarContainer>{items}</MobileNavbarContainer>
+      <NavbarContainer>
+        {header}
+        {items}
+      </NavbarContainer>
+      <MobileNavbarContainer>
+        {header}
+        {items}
+      </MobileNavbarContainer>
     </>
   );
 };

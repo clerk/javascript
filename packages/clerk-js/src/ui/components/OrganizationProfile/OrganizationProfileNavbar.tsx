@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Breadcrumbs, NavBar, NavbarContextProvider, NavbarRoute } from '../../elements';
+import { Breadcrumbs, NavBar, NavbarContextProvider, NavbarRoute, OrganizationPreview } from '../../elements';
 import { CogFilled, User } from '../../icons';
 import { localizationKeys } from '../../localization';
 import { PropsOfComponent } from '../../styledSystem';
@@ -26,6 +26,16 @@ export const OrganizationProfileNavbar = (
   return (
     <NavbarContextProvider>
       <NavBar
+        header={
+          <OrganizationPreview
+            size='sm'
+            organization={{
+              name: 'Drivepoint',
+              logoUrl: 'https://images.lclclerk.com/uploaded/img_2GE5fixIVWTNMdRjcH7ivtelSxT.png',
+            }}
+            sx={t => ({ margin: `0 0 ${t.space.$2x5} ${t.space.$2}` })}
+          />
+        }
         routes={organizationProfileRoutes}
         contentRef={props.contentRef}
       />
