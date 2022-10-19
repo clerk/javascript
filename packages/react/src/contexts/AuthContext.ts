@@ -1,8 +1,7 @@
+import { createContextAndHook } from '@clerk/shared';
 import type { ActJWTClaim } from '@clerk/types';
 
-import { makeContextAndHook } from '../utils/makeContextAndHook';
-
-export const [AuthContext, useAuthContext] = makeContextAndHook<{
+export const [AuthContext, useAuthContext] = createContextAndHook<{
   userId: string | null | undefined;
   sessionId: string | null | undefined;
   actor: ActJWTClaim | null;

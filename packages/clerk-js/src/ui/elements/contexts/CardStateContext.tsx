@@ -1,9 +1,9 @@
+import { createContextAndHook } from '@clerk/shared';
 import { ClerkAPIError } from '@clerk/types';
 import React from 'react';
 
 import { useLocalizations } from '../../customizables';
 import { useSafeState } from '../../hooks';
-import { createContextAndHook } from '../../utils';
 
 type Status = 'idle' | 'loading' | 'error';
 type Metadata = string | undefined;

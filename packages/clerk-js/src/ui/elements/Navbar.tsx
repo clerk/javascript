@@ -1,3 +1,4 @@
+import { createContextAndHook } from '@clerk/shared';
 import React from 'react';
 
 import { useNavigateToFlowStart } from '../components/UserProfile/NavigateToFlowStartButton';
@@ -15,7 +16,7 @@ import { ElementDescriptor, ElementId } from '../customizables/elementDescriptor
 import { useNavigate, usePopover, useSafeLayoutEffect } from '../hooks';
 import { Menu } from '../icons';
 import { animations, mqu, PropsOfComponent } from '../styledSystem';
-import { colors, createContextAndHook } from '../utils';
+import { colors } from '../utils';
 
 type NavbarContextValue = { isOpen: boolean; open: () => void; close: () => void };
 export const [NavbarContext, useNavbarContext] = createContextAndHook<NavbarContextValue>('NavbarContext');

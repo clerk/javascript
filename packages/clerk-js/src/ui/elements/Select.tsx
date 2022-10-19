@@ -1,10 +1,11 @@
-import React, { isValidElement, PropsWithChildren, useState } from 'react';
+import { createContextAndHook } from '@clerk/shared';
+import React, {  PropsWithChildren, useState } from 'react';
 
 import { usePopover, useSearchInput } from '../../ui/hooks';
 import { Button, Flex, Icon, Text } from '../customizables';
 import { Caret, MagnifyingGlass } from '../icons';
 import { animations, common, PropsOfComponent, ThemableCssProp } from '../styledSystem';
-import { colors, createContextAndHook } from '../utils';
+import { colors } from '../utils';
 import { InputWithIcon } from './InputWithIcon';
 
 type UsePopoverReturn = ReturnType<typeof usePopover>;
