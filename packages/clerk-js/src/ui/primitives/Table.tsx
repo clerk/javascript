@@ -8,13 +8,38 @@ const { applyVariants, filterProps } = createVariants(theme => {
     base: {
       borderCollapse: 'collapse',
       'td:not(:first-of-type)': {
-        paddingLeft: theme.sizes.$2,
+        paddingLeft: theme.space.$2,
       },
       'th:not(:first-of-type)': {
-        paddingLeft: theme.sizes.$2,
+        paddingLeft: theme.space.$2,
       },
-      'tr:not(:last-of-type)>td': {
-        paddingBottom: theme.sizes.$2,
+      'tr > td': {
+        paddingBottom: theme.space.$2,
+        paddingTop: theme.space.$2,
+        paddingLeft: theme.space.$4,
+        paddingRight: theme.space.$4,
+      },
+      'tr > th:first-of-type': {
+        paddingLeft: theme.space.$5,
+      },
+      'thead::after': {
+        content: '""',
+        display: 'block',
+        paddingBottom: theme.space.$2,
+      },
+      'tbody::after': {
+        content: '""',
+        display: 'block',
+        paddingBottom: theme.space.$2,
+      },
+      // border-radius for hover
+      'tr > td:first-of-type': {
+        borderTopLeftRadius: theme.radii.$md,
+        borderBottomLeftRadius: theme.radii.$md,
+      },
+      'tr > td:last-of-type': {
+        borderTopRightRadius: theme.radii.$md,
+        borderBottomRightRadius: theme.radii.$md,
       },
       width: '100%',
     },

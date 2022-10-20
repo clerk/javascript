@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { Button, Flex, localizationKeys, Text } from '../customizables';
-import { PropsOfComponent } from '../styledSystem';
+import { mqu, PropsOfComponent } from '../styledSystem';
 import { range } from '../utils';
 
 type UsePaginationProps = {
@@ -25,7 +25,8 @@ const PageButton = (props: PropsOfComponent<typeof Button> & { isActive?: boolea
       colorScheme='neutral'
       sx={t => [
         {
-          color: isActive ? t.colors.$black : t.colors.$blackAlpha700,
+          color: t.colors.$colorText,
+          opacity: isActive ? 1 : t.opacity.$inactive,
         },
         sx,
       ]}
@@ -118,13 +119,17 @@ export const Pagination = (props: PaginationProps) => {
         '*': {
           fontSize: 'inherit',
         },
+        [mqu.md]: {
+          flexDirection: 'column',
+          gap: t.space.$2,
+        },
       })}
     >
       {rowInfo && <RowInformation rowInfo={rowInfo} />}
 
       <Flex gap={2}>
         <PageButton
-          isDisabled={page === 1}
+          isDisabled={page <= 1}
           localizationKey={localizationKeys('paginationButton__previous')}
           onClick={() => {
             onChange?.(page - 1);
@@ -152,7 +157,7 @@ export const Pagination = (props: PaginationProps) => {
           return null;
         })}
         <PageButton
-          isDisabled={page === count}
+          isDisabled={page >= count || page < 1}
           localizationKey={localizationKeys('paginationButton__next')}
           onClick={() => {
             onChange?.(page + 1);
