@@ -135,7 +135,6 @@ export const RemoveMfaPhoneCodePage = () => {
 
 export const RemoveMfaTOTPPage = () => {
   const user = useCoreUser();
-
   return (
     <RemoveResourcePage
       title={localizationKeys('userProfile.mfaTOTPPage.removeResource.title')}
@@ -172,12 +171,17 @@ const RemoveResourcePage = withCardStateProvider((props: RemovePageProps) => {
     <Wizard {...wizard.props}>
       <ContentPage headerTitle={title}>
         <Form.Root onSubmit={handleSubmit}>
-          <Text variant='regularRegular'>{messageLine1}</Text>
-          <Text variant='regularRegular'>{messageLine2}</Text>
+          <Text
+            localizationKey={messageLine1}
+            variant='regularRegular'
+          />
+          <Text
+            localizationKey={messageLine2}
+            variant='regularRegular'
+          />
           <FormButtons colorScheme={'danger'} />
         </Form.Root>
       </ContentPage>
-
       <SuccessPage
         title={title}
         text={successMessage}
