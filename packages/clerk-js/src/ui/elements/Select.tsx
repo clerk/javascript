@@ -3,7 +3,7 @@ import React, { isValidElement, PropsWithChildren, useState } from 'react';
 import { usePopover, useSearchInput } from '../../ui/hooks';
 import { Button, Flex, Icon, Text } from '../customizables';
 import { Caret, MagnifyingGlass } from '../icons';
-import { animations, PropsOfComponent } from '../styledSystem';
+import { animations, common, PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { colors, createContextAndHook } from '../utils';
 import { InputWithIcon } from './InputWithIcon';
 
@@ -43,15 +43,16 @@ const defaultOptionBuilder = <O,>(option: O, _index?: number, isSelected?: boole
     <Flex
       sx={theme => ({
         width: '100%',
-        paddingLeft: theme.space.$2,
-        paddingRight: theme.space.$2,
+        padding: `${theme.space.$2} ${theme.space.$4}`,
+        margin: `0 ${theme.space.$1}`,
+        borderRadius: theme.radii.$md,
         ...(isSelected && { backgroundColor: theme.colors.$blackAlpha200 }),
         '&:hover': {
           backgroundColor: theme.colors.$blackAlpha200,
         },
       })}
     >
-      <Text>{option}</Text>
+      <Text truncate>{option}</Text>
     </Flex>
   );
 };
@@ -168,10 +169,12 @@ export const SelectNoResults = (props: PropsOfComponent<typeof Text>) => {
   );
 };
 
-type SelectOptionListProps = PropsOfComponent<typeof Flex>;
+type SelectOptionListProps = PropsOfComponent<typeof Flex> & {
+  containerSx?: ThemableCssProp;
+};
 
 export const SelectOptionList = (props: SelectOptionListProps) => {
-  const { sx, ...rest } = props;
+  const { containerSx, sx, ...rest } = props;
   const {
     popoverCtx,
     searchInputCtx,
@@ -243,7 +246,6 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
           borderRadius: theme.radii.$lg,
           borderColor: theme.colors.$blackAlpha200,
           overflow: 'hidden',
-          width: '100%',
           animation: `${animations.dropdownSlideInScaleAndFade} ${theme.transitionDuration.$slower} ${theme.transitionTiming.$slowBezier}`,
           transformOrigin: 'top center',
           boxShadow: theme.shadows.$cardDropShadow,
@@ -252,7 +254,6 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
         sx,
       ]}
       style={{ ...styles, left: styles.left - 1 }}
-      {...rest}
     >
       {comparator && (
         <SelectSearchbar
@@ -266,12 +267,13 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
         tabIndex={comparator ? undefined : 0}
         sx={[
           theme => ({
+            gap: theme.space.$1,
             outline: 'none',
             overflowY: 'scroll',
             maxHeight: '18vh',
-            paddingBottom: theme.space.$2,
+            padding: `${theme.space.$2} 0`,
           }),
-          sx,
+          containerSx,
         ]}
         {...rest}
       >
@@ -314,11 +316,11 @@ export const SelectButton = (props: PropsOfComponent<typeof Button>) => {
       onClick={onTriggerClick}
       sx={[
         theme => ({
+          color: theme.colors.$colorInputText,
+          backgroundColor: theme.colors.$colorInputBackground,
+          ...common.borderVariants(theme).normal,
           paddingLeft: theme.space.$3x5,
           paddingRight: theme.space.$3x5,
-          border: theme.borders.$normal,
-          borderColor: theme.colors.$blackAlpha300,
-          borderRadius: theme.radii.$md,
           '> *': { pointerEvents: 'none' },
         }),
         sx,

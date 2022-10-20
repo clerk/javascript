@@ -44,7 +44,7 @@ export const PhoneInput = (props: PhoneInputProps) => {
     <Flex
       direction='col'
       justify='center'
-      sx={theme => ({ position: 'relative', borderRadius: theme.radii.$md })}
+      sx={theme => ({ position: 'relative', borderRadius: theme.radii.$md, zIndex: 1 })}
     >
       <Select
         value={selectedCountryOption}
@@ -73,6 +73,7 @@ export const PhoneInput = (props: PhoneInputProps) => {
             position: 'absolute',
             height: `calc(100% - 2px)`,
             marginLeft: '1px',
+            zIndex: 2,
           }}
         >
           <SelectButton
@@ -86,7 +87,10 @@ export const PhoneInput = (props: PhoneInputProps) => {
             <Flag iso={selectedIso} />
           </SelectButton>
         </Flex>
-        <SelectOptionList />
+        <SelectOptionList
+          sx={{ width: '100%', padding: '0 0' }}
+          containerSx={{ gap: 0 }}
+        />
       </Select>
       <Input
         value={formattedPhoneNumber}
