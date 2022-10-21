@@ -1,8 +1,8 @@
 import React from 'react';
 
-function assertProviderExists(contextVal: unknown, msg: string): asserts contextVal {
+export function assertContextExists(contextVal: unknown, msgOrCtx: string | React.Context<any>): asserts contextVal {
   if (!contextVal) {
-    throw new Error(msg);
+    throw typeof msgOrCtx === 'string' ? new Error(msgOrCtx) : new Error(`${msgOrCtx.displayName} not found`);
   }
 }
 
@@ -18,18 +18,20 @@ export function createContextAndHook<CtxValue>(
   const skipCheck = options.skipCheck || false;
   const Ctx = React.createContext<{ value: CtxValue } | undefined>(undefined);
   Ctx.displayName = displayName;
+
   const useCtx = (): CtxValue => {
     const ctx = React.useContext(Ctx);
     if (skipCheck) {
       return ctx ? ctx.value : (undefined as any);
     }
     if (!options.assertCtxFn) {
-      assertProviderExists(ctx, `${displayName} not found`);
+      assertContextExists(ctx, `${displayName} not found`);
     } else {
       options.assertCtxFn(ctx, `${displayName} not found`);
     }
     // @ts-expect-error
     return ctx.value;
   };
+
   return [Ctx, useCtx];
 }

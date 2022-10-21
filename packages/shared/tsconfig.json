@@ -12,7 +12,8 @@
     "declarationMap": true,
     "outDir": "dist",
     "resolveJsonModule": true,
-    "declarationDir": "dist/types"
+    "declarationDir": "dist/types",
+    "jsx": "react"
   },
   "exclude": ["node_modules"],
   "include": ["src/index.ts", "src/testUtils/index.ts", "global.d.ts"]
