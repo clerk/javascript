@@ -3,7 +3,7 @@ import { EnvironmentResource } from '@clerk/types';
 import React from 'react';
 
 import { AuthConfig, DisplayConfig } from '../../core/resources';
-import { useCoreSession, useEnvironment } from '../../ui/contexts';
+import { CoreSessionContext, useEnvironment } from '../../ui/contexts';
 import { withRedirectToHome } from './withRedirectToHome';
 
 const mockNavigate = jest.fn();
@@ -12,7 +12,7 @@ jest.mock('ui/hooks', () => ({
 }));
 
 jest.mock('ui/contexts', () => ({
-  useCoreSession: jest.fn(),
+  ...jest.requireActual('ui/contexts'),
   useEnvironment: jest.fn(),
 }));
 
@@ -26,10 +26,6 @@ describe('withRedirectToHome(Component)', () => {
   describe('when there is a session', () => {
     describe('and the instance is in single session mode', () => {
       beforeEach(() => {
-        (useCoreSession as jest.Mock).mockImplementation(() => ({
-          id: 'sess_id',
-        }));
-
         (useEnvironment as jest.Mock).mockImplementation(
           () =>
             ({
@@ -45,7 +41,11 @@ describe('withRedirectToHome(Component)', () => {
 
       it('navigates to home_url', () => {
         const Component = withRedirectToHome(Tester);
-        render(<Component />);
+        render(
+          <CoreSessionContext.Provider value={{ value: { id: 'sess_id' } as any }}>
+            <Component />
+          </CoreSessionContext.Provider>,
+        );
         expect(mockNavigate).toHaveBeenNthCalledWith(1, 'http://my-home.com');
         expect(screen.queryByText('Tester')).not.toBeInTheDocument();
       });
@@ -53,10 +53,6 @@ describe('withRedirectToHome(Component)', () => {
 
     describe('and the instance is not in single session mode', () => {
       beforeEach(() => {
-        (useCoreSession as jest.Mock).mockImplementation(() => ({
-          id: 'sess_id',
-        }));
-
         (useEnvironment as jest.Mock).mockImplementation(
           () =>
             ({
@@ -72,7 +68,11 @@ describe('withRedirectToHome(Component)', () => {
 
       it('renders the wrapped component', () => {
         const Component = withRedirectToHome(Tester);
-        render(<Component />);
+        render(
+          <CoreSessionContext.Provider value={{ value: { id: 'sess_id' } as any }}>
+            <Component />
+          </CoreSessionContext.Provider>,
+        );
         expect(mockNavigate).not.toHaveBeenCalled();
         expect(screen.queryByText('Tester')).toBeInTheDocument();
       });
@@ -81,8 +81,6 @@ describe('withRedirectToHome(Component)', () => {
 
   describe('when there is no session', () => {
     beforeEach(() => {
-      (useCoreSession as jest.Mock).mockImplementation(() => undefined);
-
       (useEnvironment as jest.Mock).mockImplementation(
         () =>
           ({
@@ -98,7 +96,11 @@ describe('withRedirectToHome(Component)', () => {
 
     it('renders the wrapped component', () => {
       const Component = withRedirectToHome(Tester);
-      render(<Component />);
+      render(
+        <CoreSessionContext.Provider value={{ value: undefined }}>
+          <Component />
+        </CoreSessionContext.Provider>,
+      );
       expect(mockNavigate).not.toHaveBeenCalled();
       expect(screen.queryByText('Tester')).toBeInTheDocument();
     });

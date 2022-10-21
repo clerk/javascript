@@ -3,6 +3,7 @@ import type { ActJWTClaim, GetToken, SignOut } from '@clerk/types';
 import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { invalidStateError } from '../errors';
+import IsomorphicClerk from '../isomorphicClerk';
 import { createGetToken, createSignOut } from './utils';
 
 type UseAuthReturn =
@@ -77,7 +78,7 @@ type UseAuth = () => UseAuthReturn;
  */
 export const useAuth: UseAuth = () => {
   const { sessionId, userId, actor } = useAuthContext();
-  const isomorphicClerk = useIsomorphicClerkContext();
+  const isomorphicClerk = useIsomorphicClerkContext() as unknown as IsomorphicClerk;
 
   const getToken: GetToken = createGetToken(isomorphicClerk);
   const signOut: SignOut = createSignOut(isomorphicClerk);
