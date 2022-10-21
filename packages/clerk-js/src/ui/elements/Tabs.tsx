@@ -27,7 +27,7 @@ type TabsProps = PropsOfComponent<typeof Col> & {
 export const Tabs = (props: TabsProps) => {
   const { defaultIndex = 0, children, sx, ...rest } = props;
   const [selectedIndex, setSelectedIndex] = React.useState(defaultIndex);
-  const [focusedIndex, setFocusedIndex] = React.useState(defaultIndex);
+  const [focusedIndex, setFocusedIndex] = React.useState(-1);
 
   return (
     <TabsContextProvider value={{ selectedIndex, setSelectedIndex, focusedIndex, setFocusedIndex }}>
@@ -90,7 +90,7 @@ export const Tab = (props: TabProps) => {
   }
 
   const { setSelectedIndex, selectedIndex, focusedIndex, setFocusedIndex } = useTabsContext();
-  const buttonRef = React.useRef<HTMLButtonElement | any>(null);
+  const buttonRef = React.useRef<HTMLButtonElement>(null);
   const isActive = tabIndex === selectedIndex;
   const isFocused = tabIndex === focusedIndex;
 
@@ -106,9 +106,9 @@ export const Tab = (props: TabProps) => {
   }, []);
 
   React.useEffect(() => {
-    // if (buttonRef.current && isFocused) {
-    //   buttonRef.current.focus();
-    // }
+    if (buttonRef.current && isFocused) {
+      buttonRef.current.focus();
+    }
   }, [isFocused]);
 
   return (
@@ -118,8 +118,9 @@ export const Tab = (props: TabProps) => {
     >
       <Button
         onClick={onClick}
-        focusRing={isFocused}
+        focusRing={isActive}
         isDisabled={isDisabled}
+        tabIndex={isActive ? 0 : -1}
         variant='ghost'
         aria-selected={isActive}
         id={`cl-tab-${tabIndex}`}
@@ -184,7 +185,6 @@ export const TabPanel = (props: TabPanelProps) => {
     <Flex
       id={`cl-tabpanel-${tabIndex}`}
       role='tabpanel'
-      tabIndex={0}
       aria-labelledby={`cl-tab-${tabIndex}`}
       sx={sx}
       {...rest}
