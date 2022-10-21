@@ -1,26 +1,23 @@
-import { ClientResource, SessionResource, SignInResource, SignUpResource } from '@clerk/types';
+import { assertContextExists, ClientContext, useClientContext } from '@clerk/shared';
+import { SessionResource, SignInResource, SignUpResource } from '@clerk/types';
 import React from 'react';
 
-import { assertContextExists } from './utils';
-
-type CoreClientContextValue = { value: ClientResource };
-export const CoreClientContext = React.createContext<CoreClientContextValue | undefined>(undefined);
-CoreClientContext.displayName = 'CoreClientContext';
+export const CoreClientContext = ClientContext;
 
 export function useCoreSignIn(): SignInResource {
-  const context = React.useContext(CoreClientContext);
-  assertContextExists(context, 'CoreClientContextProvider');
-  return context.value.signIn;
+  const ctx = useClientContext();
+  assertContextExists(ctx, CoreClientContext);
+  return ctx.signIn;
 }
 
 export function useCoreSignUp(): SignUpResource {
-  const context = React.useContext(CoreClientContext);
-  assertContextExists(context, 'CoreClientContextProvider');
-  return context.value.signUp;
+  const ctx = useClientContext();
+  assertContextExists(ctx, CoreClientContext);
+  return ctx.signUp;
 }
 
 export function useCoreSessionList(): SessionResource[] {
-  const context = React.useContext(CoreClientContext);
-  assertContextExists(context, 'CoreClientContextProvider');
-  return context.value.sessions;
+  const ctx = useClientContext();
+  assertContextExists(ctx, CoreClientContext);
+  return ctx.sessions;
 }
