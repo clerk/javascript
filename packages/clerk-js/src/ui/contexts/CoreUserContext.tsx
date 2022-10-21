@@ -1,28 +1,23 @@
-import { UserResource } from '@clerk/types';
-import React from 'react';
+import { assertContextExists, UserContext, useUserContext } from '@clerk/shared';
+import React, { useContext } from 'react';
 
 import { clerkCoreErrorUserIsNotDefined } from '../../core/errors';
-import { assertContextExists } from './utils';
 
-type CoreUserContextValue = { value: UserResource | undefined | null };
-export const CoreUserContext = React.createContext<CoreUserContextValue | undefined>(undefined);
-CoreUserContext.displayName = 'CoreUserContext';
+export const CoreUserContext = UserContext;
 
-export function useCoreUser(): UserResource {
-  const context = React.useContext(CoreUserContext);
-  assertContextExists(context, 'CoreUserContextProvider');
-  if (!context.value) {
+export const useCoreUser = () => {
+  const user = useUserContext();
+  if (!user) {
     clerkCoreErrorUserIsNotDefined();
   }
-  return context.value;
-}
+  return user;
+};
 
 export function withCoreUserGuard<P>(Component: React.ComponentType<P>): React.ComponentType<P> {
   const Hoc = (props: P) => {
-    const context = React.useContext(CoreUserContext);
-    assertContextExists(context, 'CoreUserContextProvider');
-    const user = context.value;
-    if (!user) {
+    const ctx = useContext(CoreUserContext);
+    assertContextExists(ctx, CoreUserContext);
+    if (!ctx.value) {
       return null;
     }
     return <Component {...(props as any)} />;

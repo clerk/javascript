@@ -1,7 +1,8 @@
 import { SignInProps, SignUpProps } from '@clerk/types';
-import React from 'react';
+import React, { useContext } from 'react';
 
-import { useCoreSession, useEnvironment } from '../contexts';
+import { useEnvironment } from '../contexts';
+import { CoreSessionContext } from '../contexts/CoreSessionContext';
 import { useNavigate } from '../hooks';
 
 export function withRedirectToHome<P extends SignInProps | SignUpProps | { continueExisting?: boolean }>(
@@ -15,7 +16,8 @@ export function withRedirectToHome<P extends SignInProps | SignUpProps | { conti
     const { navigate } = useNavigate();
     const { authConfig, displayConfig } = useEnvironment();
     const { singleSessionMode } = authConfig;
-    const session = useCoreSession({ avoidUndefinedCheck: true });
+    const ctx = useContext(CoreSessionContext);
+    const session = ctx?.value;
 
     React.useEffect(() => {
       if (singleSessionMode && !!session) {
