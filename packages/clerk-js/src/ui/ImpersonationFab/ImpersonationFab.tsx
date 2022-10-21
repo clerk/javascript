@@ -2,7 +2,7 @@ import React, { PointerEventHandler, useEffect, useRef } from 'react';
 
 import { mqu, PropsOfComponent } from '../../ui/styledSystem';
 import { getFullName, getIdentifier } from '../../ui/utils';
-import { useCoreClerk, useCoreSession } from '../contexts';
+import { useCoreClerk, useCoreSession, withCoreSessionSwitchGuard } from '../contexts';
 import {
   Col,
   descriptors,
@@ -90,7 +90,7 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
   );
 };
 
-export const ImpersonationFab = () => {
+const _ImpersonationFab = () => {
   const session = useCoreSession();
   const { t } = useLocalizations();
   const { parsedInternalTheme } = useAppearance();
@@ -227,3 +227,5 @@ export const ImpersonationFab = () => {
     </Portal>
   );
 };
+
+export const ImpersonationFab = withCoreSessionSwitchGuard(_ImpersonationFab);
