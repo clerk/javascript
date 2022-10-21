@@ -50,6 +50,8 @@ export interface Clerk {
    */
   version?: string;
 
+  loaded: boolean;
+
   /** Clerk Frontend API string. */
   frontendApi: string;
 
