@@ -1,18 +1,6 @@
-import { OrganizationResource } from '@clerk/types';
-import React from 'react';
+import { OrganizationContext, useOrganization, useOrganizationList, useOrganizations } from '@clerk/shared';
 
-import { clerkCoreErrorOrganizationIsNotDefined } from '../../core/errors';
-import { assertContextExists } from './utils';
-
-type CoreOrganizationContextValue = { value: OrganizationResource | null | undefined };
-export const CoreOrganizationContext = React.createContext<CoreOrganizationContextValue | undefined>(undefined);
-CoreOrganizationContext.displayName = 'CoreOrganizationContext';
-
-export function useCoreOrganization(): OrganizationResource {
-  const context = React.useContext(CoreOrganizationContext);
-  assertContextExists(context, 'CoreOrganizationContextProvider');
-  if (!context.value) {
-    clerkCoreErrorOrganizationIsNotDefined();
-  }
-  return context.value;
-}
+export const CoreOrganizationContext = OrganizationContext;
+export const useCoreOrganization = useOrganization;
+export const useCoreOrganizationList = useOrganizationList;
+export const useCoreOrganizations = useOrganizations;

@@ -32,13 +32,23 @@ export function CoreClerkContextWrapper(props: CoreClerkContextWrapperProps): JS
   }, []);
 
   const { client, session, user, organization } = state;
+  const clerkCtx = React.useMemo(() => ({ value: clerk }), []);
   const clientCtx = React.useMemo(() => ({ value: client }), [client]);
   const sessionCtx = React.useMemo(() => ({ value: session }), [session]);
   const userCtx = React.useMemo(() => ({ value: user }), [user]);
-  const organizationCtx = React.useMemo(() => ({ value: organization }), [organization]);
+  const organizationCtx = React.useMemo(
+    () => ({
+      value: {
+        organization: organization,
+        lastOrganizationInvitation: undefined,
+        lastOrganizationMember: undefined,
+      },
+    }),
+    [organization],
+  );
 
   return (
-    <CoreClerkContext.Provider value={clerk}>
+    <CoreClerkContext.Provider value={clerkCtx}>
       <CoreClientContext.Provider value={clientCtx}>
         <CoreSessionContext.Provider value={sessionCtx}>
           <CoreOrganizationContext.Provider value={organizationCtx}>
