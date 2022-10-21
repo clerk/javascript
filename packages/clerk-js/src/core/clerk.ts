@@ -108,11 +108,12 @@ export default class Clerk implements ClerkInterface {
   #lastOrganizationInvitation: OrganizationInvitationResource | null = null;
   #lastOrganizationMember: OrganizationMembershipResource | null = null;
 
-  /**
-   * @inheritDoc {ClerkInterface.version}
-   */
   get version(): string {
     return Clerk.version;
+  }
+
+  get loaded(): boolean {
+    return this.#isReady;
   }
 
   public constructor(frontendApi: string) {
