@@ -50,24 +50,9 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
   const { sessionId, session, userId, user } = derivedState;
   const actor = session?.actor || null;
 
-  const authCtx = React.useMemo(() => {
-    return {
-      value: {
-        sessionId,
-        userId,
-        actor,
-      },
-    };
-  }, [sessionId, userId, actor]);
-
-  const userCtx = React.useMemo(() => {
-    return { value: user };
-  }, [userId, user]);
-
-  const sessionCtx = React.useMemo(() => {
-    return { value: session };
-  }, [sessionId, session]);
-
+  const authCtx = React.useMemo(() => ({ value: { sessionId, userId, actor } }), [sessionId, userId, actor]);
+  const userCtx = React.useMemo(() => ({ value: user }), [userId, user]);
+  const sessionCtx = React.useMemo(() => ({ value: session }), [sessionId, session]);
   const organizationCtx = React.useMemo(() => {
     return {
       value: {
@@ -79,6 +64,7 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
   }, [derivedState.organization, derivedState.lastOrganizationInvitation, derivedState.lastOrganizationMember]);
 
   return (
+    // @ts-expect-error
     <IsomorphicClerkContext.Provider value={clerkCtx}>
       <ClientContext.Provider value={clientCtx}>
         <SessionContext.Provider value={sessionCtx}>
