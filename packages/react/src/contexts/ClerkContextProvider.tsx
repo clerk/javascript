@@ -146,9 +146,9 @@ function deriveState(
       lastOrganizationMember: null,
     };
   }
-  const userId: string | null | undefined = state.user ? state.user.id : state.user;
+  const userId: string | null | undefined = state.user ? state.user.id : (state.user as null | undefined);
   const user = state.user;
-  const sessionId: string | null | undefined = state.session ? state.session.id : state.session;
+  const sessionId: string | null | undefined = state.session ? state.session.id : (state.session as null | undefined);
   const session = state.session;
   const organization = state.organization;
   const lastOrganizationInvitation = state.lastOrganizationInvitation;

@@ -1,38 +1,20 @@
 import type { ActJWTClaim, GetToken, SignOut } from '@clerk/types';
+import { useMemo } from 'react';
 
 import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { invalidStateError } from '../errors';
 import { createGetToken, createSignOut } from './utils';
 
-type UseAuthReturn =
-  | {
-      isLoaded: false;
-      isSignedIn: undefined;
-      userId: undefined;
-      sessionId: undefined;
-      actor: null;
-      signOut: SignOut;
-      getToken: GetToken;
-    }
-  | {
-      isLoaded: true;
-      isSignedIn: false;
-      userId: null;
-      sessionId: null;
-      actor: null;
-      signOut: SignOut;
-      getToken: GetToken;
-    }
-  | {
-      isLoaded: true;
-      isSignedIn: true;
-      userId: string;
-      sessionId: string;
-      actor: ActJWTClaim | null;
-      signOut: SignOut;
-      getToken: GetToken;
-    };
+type UseAuthReturn = {
+  isLoaded: boolean;
+  isSignedIn: boolean | undefined;
+  userId: string | null | undefined;
+  sessionId: string | null | undefined;
+  actor: ActJWTClaim | null;
+  signOut: SignOut;
+  getToken: GetToken;
+};
 
 type UseAuth = () => UseAuthReturn;
 
@@ -79,44 +61,56 @@ export const useAuth: UseAuth = () => {
   const { sessionId, userId, actor } = useAuthContext();
   const isomorphicClerk = useIsomorphicClerkContext();
 
-  const getToken: GetToken = createGetToken(isomorphicClerk);
-  const signOut: SignOut = createSignOut(isomorphicClerk);
+  const getToken: GetToken = useMemo(() => {
+    return createGetToken(isomorphicClerk);
+  }, [isomorphicClerk]);
+  const signOut: SignOut = useMemo(() => {
+    return createSignOut(isomorphicClerk);
+  }, [isomorphicClerk]);
 
+  // Make this stable as well!
+  const auth: UseAuthReturn = {
+    // These come from somewhere else; considered stable here
+    sessionId,
+    userId,
+    signOut,
+    getToken,
+
+    // These 3 vary depending on the conditions
+    isLoaded: false,
+    isSignedIn: false,
+    actor: null,
+  };
+
+  let isValidState = false;
   if (sessionId === undefined && userId === undefined) {
-    return {
-      isLoaded: false,
-      isSignedIn: undefined,
-      sessionId,
-      userId,
-      actor: null,
-      signOut,
-      getToken,
-    };
+    isValidState = true;
+    auth.isLoaded = false;
+    auth.isSignedIn = undefined;
+    auth.actor = null;
   }
 
   if (sessionId === null && userId === null) {
-    return {
-      isLoaded: true,
-      isSignedIn: false,
-      sessionId,
-      userId,
-      actor: null,
-      signOut,
-      getToken,
-    };
+    isValidState = true;
+    auth.isLoaded = true;
+    auth.isSignedIn = undefined;
+    auth.actor = actor;
   }
 
   if (!!sessionId && !!userId) {
-    return {
-      isLoaded: true,
-      isSignedIn: true,
-      sessionId,
-      userId,
-      actor,
-      signOut,
-      getToken,
-    };
+    isValidState = true;
+    auth.isLoaded = true;
+    auth.isSignedIn = true;
+    auth.actor = actor;
   }
 
-  throw new Error(invalidStateError);
+  // When any of the values of auth changes, create a new auth; but if
+  // none of them change, keep auth also stable!
+  const StableAuth = useMemo(() => auth, Object.values(auth));
+
+  if (!isValidState) {
+    throw new Error(invalidStateError);
+  }
+
+  return StableAuth;
 };
