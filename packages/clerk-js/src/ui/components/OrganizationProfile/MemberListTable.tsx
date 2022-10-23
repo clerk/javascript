@@ -49,7 +49,7 @@ export const MembersListTable = (props: MembersListProps) => {
     comparator: (term, _, itemTerm) => (itemTerm || '').includes(term.toLowerCase()),
     searchTermForItem: searchTermForUser,
   });
-  const pageCount = Math.ceil(filteredItems.length / MAX_ROWS_PER_PAGE);
+  const pageCount = Math.ceil(filteredItems.length / MAX_ROWS_PER_PAGE) || 1;
   const startRowIndex = (page - 1) * MAX_ROWS_PER_PAGE;
   const endRowIndex = Math.min(page * MAX_ROWS_PER_PAGE, filteredItems.length);
 
@@ -116,12 +116,7 @@ export const MembersListTable = (props: MembersListProps) => {
 const EmptyRow = () => {
   return (
     <Tr>
-      <Td
-        sx={{ width: '25%' }}
-        colSpan={4}
-      >
-        No members to display
-      </Td>
+      <Td colSpan={3}>No members to display</Td>
     </Tr>
   );
 };
