@@ -1,7 +1,7 @@
 import { UserResource } from '@clerk/types';
 import React from 'react';
 
-import { descriptors, Flex, Text } from '../customizables';
+import { descriptors, Flex, LocalizationKey, Text } from '../customizables';
 import { PropsOfComponent } from '../styledSystem';
 import { getFullName, getIdentifier } from '../utils';
 import { UserAvatar } from './UserAvatar';
@@ -14,10 +14,11 @@ export type UserPreviewProps = PropsOfComponent<typeof Flex> & {
   imageUrl?: string | null;
   rounded?: boolean;
   elementId?: any;
+  subtitle?: LocalizationKey;
 };
 
 export const UserPreview = (props: UserPreviewProps) => {
-  const { user, size = 'md', icon, rounded = true, imageUrl, badge, elementId, sx, ...rest } = props;
+  const { user, size = 'md', icon, rounded = true, imageUrl, badge, elementId, sx, subtitle, ...rest } = props;
   const name = getFullName(user);
   const identifier = getIdentifier(user);
 
@@ -27,13 +28,7 @@ export const UserPreview = (props: UserPreviewProps) => {
       elementId={descriptors.userPreview.setId(elementId)}
       gap={4}
       align='center'
-      sx={[
-        {
-          minWidth: '0px',
-          width: '100%',
-        },
-        sx,
-      ]}
+      sx={[{ minWidth: '0px', width: '100%' }, sx]}
       {...rest}
     >
       <Flex
@@ -68,16 +63,15 @@ export const UserPreview = (props: UserPreviewProps) => {
         >
           {name || identifier} {badge}
         </Text>
-        {name && identifier && (
+        {(subtitle || (name && identifier)) && (
           <Text
             elementDescriptor={descriptors.userPreviewSecondaryIdentifier}
             elementId={descriptors.userPreviewSecondaryIdentifier.setId(elementId)}
             variant='smallRegular'
             colorScheme='neutral'
             truncate
-          >
-            {identifier}
-          </Text>
+            localizationKey={subtitle || identifier}
+          />
         )}
       </Flex>
     </Flex>
