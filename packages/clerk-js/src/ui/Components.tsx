@@ -6,7 +6,7 @@ import ReactDOM from 'react-dom';
 
 import { PRESERVED_QUERYSTRING_PARAMS } from '../core/constants';
 import { clerkUIErrorDOMElementNotFound } from '../core/errors';
-import { OrganizationProfile } from './components/OrganizationProfile';
+import { OrganizationProfile, OrganizationProfileModal } from './components/OrganizationProfile';
 import { OrganizationSwitcher } from './components/OrganizationSwitcher';
 import { SignIn, SignInModal } from './components/SignIn';
 import { SignUp, SignUpModal } from './components/SignUp';
@@ -239,15 +239,8 @@ const Components = (props: ComponentsProps) => {
         <InternalThemeProvider>
           <Modal
             handleClose={() => componentsControls.closeModal('userProfile')}
-            containerSx={{
-              alignItems: 'center',
-            }}
-            contentSx={t => ({
-              height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`,
-              margin: 0,
-              // height: t.sizes.$176,
-              // maxHeight: `min(${t.sizes.$176}, calc(100vh - ${t.sizes.$20}))`,
-            })}
+            containerSx={{ alignItems: 'center' }}
+            contentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
           >
             <VirtualRouter
               preservedParams={PRESERVED_QUERYSTRING_PARAMS}
@@ -273,17 +266,14 @@ const Components = (props: ComponentsProps) => {
           <Modal
             handleClose={() => componentsControls.closeModal('organizationProfile')}
             containerSx={{ alignItems: 'center' }}
-            contentSx={t => ({
-              height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`,
-              margin: 0,
-            })}
+            contentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
           >
             <VirtualRouter
               preservedParams={PRESERVED_QUERYSTRING_PARAMS}
               onExternalNavigate={() => componentsControls.closeModal('organizationProfile')}
-              startPath='/user'
+              startPath='/organizationProfile'
             >
-              hello from org profil
+              <OrganizationProfileModal />
             </VirtualRouter>
           </Modal>
         </InternalThemeProvider>

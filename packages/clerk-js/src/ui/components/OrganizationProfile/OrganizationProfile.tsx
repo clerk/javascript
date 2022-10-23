@@ -37,22 +37,21 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
 
 export const OrganizationProfile = withCardStateProvider(_OrganizationProfile);
 
-// @ts-ignore
 export const OrganizationProfileModal = (props: OrganizationProfileProps): JSX.Element => {
-  // const userProfileProps: OrganizationProfileCtx = {
-  //   ...props,
-  //   routing: 'virtual',
-  //   componentName: 'OrganizationProfile',
-  //   mode: 'modal',
-  // };
+  type OrganizationProfileCtx = any;
+  const userProfileProps: OrganizationProfileCtx = {
+    ...props,
+    routing: 'virtual',
+    componentName: 'OrganizationProfile',
+    mode: 'modal',
+  };
 
   return (
-    <Route path='user'>
+    <Route path='organizationProfile'>
       {/*<ComponentContext.Provider value={userProfileProps}>*/}
       {/*TODO: Used by InvisibleRootBox, can we simplify? */}
       <div>
-        {/*<OrganizationProfile {...userProfileProps} />*/}
-        <OrganizationProfile />
+        <OrganizationProfile {...userProfileProps} />
       </div>
       {/*</ComponentContext.Provider>*/}
     </Route>
