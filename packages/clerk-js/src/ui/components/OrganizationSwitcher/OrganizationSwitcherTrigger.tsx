@@ -1,7 +1,6 @@
-import { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
-import { useCoreUser } from '../../contexts';
+import { useCoreOrganization, useCoreUser } from '../../contexts';
 import { Button, Flex, Icon, localizationKeys, Text } from '../../customizables';
 import { OrganizationPreview, PersonalWorkspacePreview } from '../../elements';
 import { Selector } from '../../icons';
@@ -11,25 +10,18 @@ type OrganizationSwitcherTriggerProps = PropsOfComponent<typeof Button> & { isOp
 
 export const OrganizationSwitcherTrigger = React.forwardRef<HTMLButtonElement, OrganizationSwitcherTriggerProps>(
   (props, ref) => {
-    // const organization = useCoreOrganization();
     const user = useCoreUser();
+    const { organization, isLoaded } = useCoreOrganization();
 
-    //Mocks
-    const hidePersonal = false;
-    const organization = { name: 'Test Org', logoUrl: user.profileImageUrl } as OrganizationResource;
+    // TODO: if org is undfined, isloaded returns false always
+    // if (!isLoaded) {
+    //   return null;
+    // }
 
-    const personalWorkspace = hidePersonal ? (
-      <Text localizationKey={localizationKeys('organizationSwitcher.notSelected')} />
-    ) : (
-      <PersonalWorkspacePreview
-        user={user}
-        rounded={false}
-      />
-    );
+    const showPersonalAccount = true;
 
     return (
       <Button
-        // elementDescriptor={descriptors.organizationSwitcherTrigger}
         variant='ghost'
         colorScheme='neutral'
         sx={theme => ({
@@ -39,16 +31,27 @@ export const OrganizationSwitcherTrigger = React.forwardRef<HTMLButtonElement, O
         ref={ref}
       >
         <Flex
-          // elementDescriptor={descriptors.organizationSwitcherTriggerBox}
           gap={4}
           center
         >
-          {organization ? <OrganizationPreview organization={organization} /> : personalWorkspace}
-
-          <Icon
-            // do we need a descriptor here?
-            icon={Selector}
-          />
+          {organization && (
+            <OrganizationPreview
+              size={'sm'}
+              organization={organization}
+              user={user}
+            />
+          )}
+          {!organization && !showPersonalAccount && (
+            <Text localizationKey={localizationKeys('organizationSwitcher.notSelected')} />
+          )}
+          {!organization && showPersonalAccount && (
+            <PersonalWorkspacePreview
+              user={user}
+              rounded={false}
+              size={'sm'}
+            />
+          )}
+          <Icon icon={Selector} />
         </Flex>
       </Button>
     );

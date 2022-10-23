@@ -181,21 +181,25 @@ const centeredFlex = (display: 'flex' | 'inline-flex' = 'flex') => ({
   alignItems: 'center',
 });
 
+const unstyledScrollbar = (t: InternalTheme) => ({
+  '::-webkit-scrollbar': {
+    background: 'transparent',
+    width: '8px',
+    height: '8px',
+  },
+  '::-webkit-scrollbar-thumb': {
+    background: t.colors.$blackAlpha500,
+  },
+  '::-webkit-scrollbar-track': {
+    background: 'transparent',
+  },
+});
+
 const maxHeightScroller = (t: InternalTheme) =>
   ({
     height: '100%',
     overflowY: 'scroll',
-    '::-webkit-scrollbar': {
-      background: 'transparent',
-      width: '8px',
-      height: '8px',
-    },
-    '::-webkit-scrollbar-thumb': {
-      background: t.colors.$blackAlpha500,
-    },
-    '::-webkit-scrollbar-track': {
-      background: 'transparent',
-    },
+    ...unstyledScrollbar(t),
   } as const);
 
 export const common = {
@@ -208,4 +212,5 @@ export const common = {
   borderColor,
   centeredFlex,
   maxHeightScroller,
+  unstyledScrollbar,
 };
