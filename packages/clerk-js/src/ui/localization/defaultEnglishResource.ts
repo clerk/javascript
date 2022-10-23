@@ -59,6 +59,9 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
   paginationButton__next: 'Next',
   paginationRowText__displaying: 'Displaying',
   paginationRowText__of: 'of',
+  membershipRole__admin: 'Admin',
+  membershipRole__basicMember: 'Member',
+  membershipRole__guestMember: 'Guest',
   signUp: {
     start: {
       title: 'Create your account',
@@ -402,7 +405,7 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
     action__addAccount: 'Add account',
   },
   organizationSwitcher: {
-    title: 'Organizations',
+    listTitle: 'Organizations',
     personalWorkspace: 'Personal Workspace',
     notSelected: 'No organization selected',
     action__createOrganization: 'Create Organization',

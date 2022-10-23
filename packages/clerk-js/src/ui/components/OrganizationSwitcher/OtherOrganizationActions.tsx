@@ -1,51 +1,112 @@
+import { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
-import { SwitchArrows } from '../../../ui/icons';
-import { Button, Flex, Icon } from '../../customizables';
+import { Plus, SwitchArrows } from '../../../ui/icons';
+import { useCoreOrganization, useCoreOrganizationList, useCoreUser } from '../../contexts';
+import { Box, Button, Icon, localizationKeys, Text } from '../../customizables';
 import {
+  Action,
   Actions,
   OrganizationPreview,
   OrganizationPreviewProps,
   PersonalWorkspacePreview,
-  PersonalWorkspacePreviewProps,
 } from '../../elements';
 import { useCardState } from '../../elements/contexts';
-import { PropsOfComponent } from '../../styledSystem';
+import { common, PropsOfComponent } from '../../styledSystem';
 
-export const OrganizationActions = (props: PropsOfComponent<typeof Flex>) => {
+type OrganizationActionListProps = {
+  onCreateOrganizationClick: React.MouseEventHandler;
+  onPersonalWorkspaceClick: React.MouseEventHandler;
+  onOrganizationClick: (org: OrganizationResource) => unknown;
+};
+
+export const OrganizationActionList = (props: OrganizationActionListProps) => {
+  const { onCreateOrganizationClick, onPersonalWorkspaceClick, onOrganizationClick } = props;
+  const { organizationList } = useCoreOrganizationList();
+  const { organization: currentOrg } = useCoreOrganization();
+  const user = useCoreUser();
+  const showPersonalAccount = true;
+
+  const otherOrgs = (organizationList || []).map(e => e.organization).filter(o => o.id !== currentOrg?.id);
+  console.log({ currentOrg, otherOrgs });
+
+  const createOrganizationButton = (
+    <Action
+      icon={Plus}
+      label={localizationKeys('organizationSwitcher.action__createOrganization')}
+      onClick={onCreateOrganizationClick}
+    />
+  );
+
   return (
     <Actions
-      sx={theme => ({
-        backgroundColor: theme.colors.$blackAlpha20,
-        border: `${theme.borders.$normal} ${theme.colors.$blackAlpha200}`,
+      sx={t => ({
+        backgroundColor: t.colors.$blackAlpha20,
+        border: `${t.borders.$normal} ${t.colors.$blackAlpha200}`,
         borderRight: 0,
         borderLeft: 0,
-        paddingTop: theme.space.$3,
-        paddingBottom: theme.space.$3,
+        paddingTop: t.space.$3,
+        paddingBottom: t.space.$3,
       })}
-      {...props}
-    />
+    >
+      {currentOrg && showPersonalAccount && (
+        <PersonalWorkspacePreviewButton
+          user={user}
+          sx={t => ({ marginBottom: t.space.$4 })}
+          onClick={onPersonalWorkspaceClick}
+        />
+      )}
+      {!!otherOrgs.length && (
+        <Text
+          size='xss'
+          colorScheme='neutral'
+          sx={t => ({
+            paddingLeft: t.space.$6,
+            marginBottom: t.space.$1,
+            textTransform: 'uppercase',
+          })}
+          localizationKey={localizationKeys('organizationSwitcher.listTitle')}
+        />
+      )}
+      <Box
+        sx={t => ({
+          maxHeight: `calc(3 * ${t.sizes.$14})`,
+          overflowY: 'scroll',
+          ...common.unstyledScrollbar(t),
+        })}
+      >
+        {otherOrgs.map(organization => (
+          <OrganizationPreviewButton
+            key={organization.id}
+            organization={organization}
+            user={user}
+            onClick={() => onOrganizationClick(organization)}
+          />
+        ))}
+      </Box>
+      {createOrganizationButton}
+    </Actions>
   );
 };
 
-type OrganizationPreviewButtonProps = PropsOfComponent<typeof Button> & OrganizationPreviewProps;
-
-export const OrganizationPreviewButton = (props: OrganizationPreviewButtonProps) => {
+export const OrganizationPreviewButton = (props: PropsOfComponent<typeof Button> & OrganizationPreviewProps) => {
   const card = useCardState();
-  const { organization, ...rest } = props;
+  const { organization, user, ...rest } = props;
+
   return (
     <Button
       variant='ghost'
       colorScheme='neutral'
       focusRing={false}
       isDisabled={card.isLoading}
+      block
       {...rest}
       sx={[
-        theme => ({
-          height: theme.sizes.$14,
+        t => ({
+          height: t.sizes.$14,
           borderRadius: 0,
           justifyContent: 'space-between',
-          padding: `${theme.space.$3} ${theme.space.$6}`,
+          padding: `${t.space.$3} ${t.space.$6}`,
           ':hover > svg': {
             visibility: 'initial',
           },
@@ -55,9 +116,9 @@ export const OrganizationPreviewButton = (props: OrganizationPreviewButtonProps)
     >
       <OrganizationPreview
         organization={organization}
+        user={user}
         size='sm'
       />
-
       <Icon
         icon={SwitchArrows}
         sx={t => ({ color: t.colors.$blackAlpha500, marginLeft: t.space.$2, visibility: 'hidden' })}
@@ -66,9 +127,9 @@ export const OrganizationPreviewButton = (props: OrganizationPreviewButtonProps)
   );
 };
 
-type PersonalWorkspacePreviewButtonProps = PropsOfComponent<typeof Button> & PersonalWorkspacePreviewProps;
-
-export const PersonalWorkspacePreviewButton = (props: PersonalWorkspacePreviewButtonProps) => {
+export const PersonalWorkspacePreviewButton = (
+  props: PropsOfComponent<typeof Button> & PropsOfComponent<typeof PersonalWorkspacePreview>,
+) => {
   const card = useCardState();
   const { user, ...rest } = props;
   return (
@@ -79,11 +140,11 @@ export const PersonalWorkspacePreviewButton = (props: PersonalWorkspacePreviewBu
       isDisabled={card.isLoading}
       {...rest}
       sx={[
-        theme => ({
-          height: theme.sizes.$14,
+        t => ({
+          height: t.sizes.$14,
           borderRadius: 0,
           justifyContent: 'space-between',
-          padding: `${theme.space.$3} ${theme.space.$6}`,
+          padding: `${t.space.$3} ${t.space.$6}`,
           ':hover > svg': {
             visibility: 'initial',
           },
@@ -95,7 +156,6 @@ export const PersonalWorkspacePreviewButton = (props: PersonalWorkspacePreviewBu
         user={user}
         size='sm'
       />
-
       <Icon
         icon={SwitchArrows}
         sx={t => ({ color: t.colors.$blackAlpha500, marginLeft: t.space.$2, visibility: 'hidden' })}

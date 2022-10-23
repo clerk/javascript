@@ -39,7 +39,7 @@ export const OrganizationProfile = withCardStateProvider(_OrganizationProfile);
 
 export const OrganizationProfileModal = (props: OrganizationProfileProps): JSX.Element => {
   type OrganizationProfileCtx = any;
-  const userProfileProps: OrganizationProfileCtx = {
+  const organizationProfileProps: OrganizationProfileCtx = {
     ...props,
     routing: 'virtual',
     componentName: 'OrganizationProfile',
@@ -48,10 +48,10 @@ export const OrganizationProfileModal = (props: OrganizationProfileProps): JSX.E
 
   return (
     <Route path='organizationProfile'>
-      {/*<ComponentContext.Provider value={userProfileProps}>*/}
+      {/*<ComponentContext.Provider value={organizationProfileProps}>*/}
       {/*TODO: Used by InvisibleRootBox, can we simplify? */}
       <div>
-        <OrganizationProfile {...userProfileProps} />
+        <OrganizationProfile {...organizationProfileProps} />
       </div>
       {/*</ComponentContext.Provider>*/}
     </Route>

@@ -59,6 +59,9 @@ type _LocalizationResource = {
   paginationButton__next: LocalizationValue;
   paginationRowText__displaying: LocalizationValue;
   paginationRowText__of: LocalizationValue;
+  membershipRole__admin: LocalizationValue;
+  membershipRole__basicMember: LocalizationValue;
+  membershipRole__guestMember: LocalizationValue;
   signUp: {
     start: {
       title: LocalizationValue;
@@ -400,7 +403,7 @@ type _LocalizationResource = {
     action__addAccount: LocalizationValue;
   };
   organizationSwitcher: {
-    title: LocalizationValue;
+    listTitle: LocalizationValue;
     personalWorkspace: LocalizationValue;
     notSelected: LocalizationValue;
     action__createOrganization: LocalizationValue;
