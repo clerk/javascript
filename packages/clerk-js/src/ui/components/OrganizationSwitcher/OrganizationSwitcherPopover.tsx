@@ -1,17 +1,26 @@
 import { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
-import { useCoreUser, useEnvironment } from '../../contexts';
-import { Flex, Flow, Link, localizationKeys, Text, useAppearance } from '../../customizables';
-import { Action, BaseCard, OrganizationPreview, PersonalWorkspacePreview, PoweredByClerkText } from '../../elements';
-import { RootBox } from '../../elements/RootBox';
-import { CogFilled, Plus } from '../../icons';
-import { animations, PropsOfComponent } from '../../styledSystem';
 import {
-  OrganizationActions,
-  OrganizationPreviewButton,
-  PersonalWorkspacePreviewButton,
-} from './OtherOrganizationActions';
+  useCoreClerk,
+  useCoreOrganization,
+  useCoreOrganizationList,
+  useCoreUser,
+  useEnvironment,
+} from '../../contexts';
+import { Flex, Flow, Link, localizationKeys, useAppearance } from '../../customizables';
+import {
+  Action,
+  BaseCard,
+  OrganizationPreview,
+  PersonalWorkspacePreview,
+  PoweredByClerkText,
+  useCardState,
+} from '../../elements';
+import { RootBox } from '../../elements/RootBox';
+import { CogFilled } from '../../icons';
+import { animations, PropsOfComponent } from '../../styledSystem';
+import { OrganizationActionList } from './OtherOrganizationActions';
 
 type OrganizationSwitcherPopoverProps = { isOpen: boolean; close: () => void } & PropsOfComponent<
   typeof OrganizationSwitcherCard
@@ -20,28 +29,32 @@ type OrganizationSwitcherPopoverProps = { isOpen: boolean; close: () => void } &
 export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, OrganizationSwitcherPopoverProps>(
   (props, ref) => {
     const { isOpen, close, ...rest } = props;
-    const { authConfig } = useEnvironment();
-    // const organization = useCoreOrganization();
+    const card = useCardState();
+    const { openOrganizationProfile } = useCoreClerk();
+    const { organization: currentOrg } = useCoreOrganization();
+    const { createOrganization, isLoaded, setActive } = useCoreOrganizationList();
     const user = useCoreUser();
 
-    /* Mocks */
-    const organization = { name: 'Test Org', logoUrl: user.profileImageUrl } as OrganizationResource;
-    const hidePersonal = false;
-    const otherOrganizations = [
-      { name: 'Test Org2', logoUrl: user.profileImageUrl },
-      { name: 'Test Org3', logoUrl: user.profileImageUrl },
-      { name: 'Test Org4', logoUrl: user.profileImageUrl },
-    ] as OrganizationResource[];
-    const handleOrganizationClicked = (_organization: OrganizationResource) => () => {
-      close();
+    if (!isLoaded) {
+      return null;
+    }
+
+    const showPersonalAccount = true;
+
+    const handleOrganizationClicked = (organization: OrganizationResource) => {
+      return card.runAsync(() => setActive({ organization })).then(close);
     };
-    const handleCreateOrganizationClicked = () => {
-      close();
-    };
-    const handleManageOrganizationClicked = () => {
-      close();
-    };
+
     const handlePersonalWorkspaceClicked = () => {
+      return card.runAsync(() => setActive({ organization: null })).then(close);
+    };
+
+    const handleCreateOrganizationClicked = () => {
+      return card.runAsync(() => createOrganization({ name: `Org${Date.now()}` })).then(close);
+    };
+
+    const handleManageOrganizationClicked = () => {
+      openOrganizationProfile();
       close();
     };
 
@@ -51,14 +64,6 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
 
     const manageOrganizationButton = (
       <Action
-        // elementDescriptor={descriptors.organizationSwitcherPopoverActionButton}
-        // elementId={descriptors.organizationSwitcherPopoverActionButton.setId('manageOrganization')}
-        // iconBoxElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonIconBox}
-        // iconBoxElementId={descriptors.organizationSwitcherPopoverActionButtonIconBox.setId('manageOrganization')}
-        // iconElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonIcon}
-        // iconElementId={descriptors.organizationSwitcherPopoverActionButtonIcon.setId('manageOrganization')}
-        // textElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonText}
-        // textElementId={descriptors.organizationSwitcherPopoverActionButtonText.setId('manageOrganization')}
         icon={CogFilled}
         label={localizationKeys('organizationSwitcher.action__manageOrganization')}
         onClick={handleManageOrganizationClicked}
@@ -66,89 +71,35 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       />
     );
 
-    const createOrganizationButton = (
-      <Action
-        // elementDescriptor={descriptors.organizationSwitcherPopoverActionButton}
-        //   elementId={descriptors.organizationSwitcherPopoverActionButton.setId('createOrganization')}
-        //   iconBoxElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonIconBox}
-        //   iconBoxElementId={descriptors.organizationSwitcherPopoverActionButtonIconBox.setId('createOrganization')}
-        //   iconElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonIcon}
-        //   iconElementId={descriptors.organizationSwitcherPopoverActionButtonIcon.setId('createOrganization')}
-        //   textElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonText}
-        //   textElementId={descriptors.organizationSwitcherPopoverActionButtonText.setId('createOrganization')}
-        icon={Plus}
-        label={localizationKeys('organizationSwitcher.action__createOrganization')}
-        onClick={handleCreateOrganizationClicked}
-      />
-    );
-
-    const organizationActions = authConfig.singleSessionMode ? null : otherOrganizations.length > 0 ? (
-      <>
-        <OrganizationActions>
-          {organization && !hidePersonal && (
-            <PersonalWorkspacePreviewButton
-              // elementDescriptor={descriptors.organizationSwitcherPersonalWorkspace}
-              // elementId={'organizationSwitcher' as any}
-              user={user}
-              sx={t => ({
-                marginBottom: t.space.$4,
-              })}
-              onClick={handlePersonalWorkspaceClicked}
-            />
-          )}
-          <Text
-            // elementDescriptor={descriptors.organizationSwitcherTitle}
-            size='xss'
-            colorScheme='neutral'
-            sx={t => ({
-              paddingLeft: t.space.$6,
-              marginBottom: t.space.$1,
-              textTransform: 'uppercase',
-            })}
-            localizationKey={localizationKeys('organizationSwitcher.title')}
-          />
-          {otherOrganizations.map(organization => (
-            <OrganizationPreviewButton
-              key={organization.id}
-              organization={organization}
-              onClick={handleOrganizationClicked(organization)}
-            />
-          ))}
-          {createOrganizationButton}
-        </OrganizationActions>
-      </>
-    ) : (
-      <OrganizationActions>{createOrganizationButton}</OrganizationActions>
-    );
-
     return (
-      <RootBox
-      // elementDescriptor={descriptors.organizationSwitcherPopoverRootBox}
-      >
+      <RootBox>
         <OrganizationSwitcherCard
           ref={ref}
           {...rest}
         >
           <Main>
-            {organization ? (
+            {currentOrg ? (
               <>
                 <OrganizationPreview
-                  //   elementId={'organizationSwitcher' as any}
-                  organization={organization}
+                  organization={currentOrg}
+                  user={user}
                   sx={theme => ({ padding: `0 ${theme.space.$6}` })}
                 />
                 {manageOrganizationButton}
               </>
             ) : (
-              !hidePersonal && (
+              showPersonalAccount && (
                 <PersonalWorkspacePreview
-                  //   elementId={'organizationSwitcher' as any}
                   user={user}
                   sx={theme => ({ padding: `0 ${theme.space.$6}`, marginBottom: theme.space.$6 })}
                 />
               )
             )}
-            {organizationActions}
+            <OrganizationActionList
+              onCreateOrganizationClick={handleCreateOrganizationClicked}
+              onPersonalWorkspaceClick={handlePersonalWorkspaceClicked}
+              onOrganizationClick={handleOrganizationClicked}
+            />
           </Main>
           <Footer />
         </OrganizationSwitcherCard>
@@ -243,7 +194,6 @@ const OrganizationSwitcherCard = React.forwardRef<HTMLDivElement, PropsOfCompone
   return (
     <Flow.Part part='popover'>
       <BaseCard
-        // elementDescriptor={descriptors.organizationSwitcherPopoverCard}
         {...props}
         ref={ref}
         sx={t => ({
