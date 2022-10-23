@@ -30,13 +30,22 @@ const useCardState = () => {
   const { state, setState } = _useCardState();
   const { translateError } = useLocalizations();
 
+  const setIdle = (metadata?: Metadata) => setState(s => ({ ...s, status: 'idle', metadata }));
+  const setError = (metadata: ClerkAPIError | Metadata) => setState(s => ({ ...s, error: translateError(metadata) }));
+  const setLoading = (metadata?: Metadata) => setState(s => ({ ...s, status: 'loading', metadata }));
+  const runAsync = async (cb: () => Promise<unknown>) => {
+    setLoading();
+    return cb().then(res => {
+      setIdle();
+      return res;
+    });
+  };
+
   return {
-    setIdle: (metadata?: Metadata) => setState(s => ({ ...s, status: 'idle', metadata })),
-    setError: (metadata: ClerkAPIError | Metadata) =>
-      setState(s => {
-        return { ...s, error: translateError(metadata) };
-      }),
-    setLoading: (metadata?: Metadata) => setState(s => ({ ...s, status: 'loading', metadata })),
+    setIdle,
+    setError,
+    setLoading,
+    runAsync,
     loadingMetadata: state.status === 'loading' ? state.metadata : undefined,
     error: state.error ? state.error : undefined,
     isLoading: state.status === 'loading',
