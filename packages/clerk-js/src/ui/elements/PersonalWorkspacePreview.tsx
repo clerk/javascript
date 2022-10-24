@@ -1,11 +1,9 @@
-import { localizationKeys } from '../localization';
 import { UserPreview, UserPreviewProps } from './UserPreview';
 
-export const PersonalWorkspacePreview = (props: Omit<UserPreviewProps, 'subtitle'>) => {
+export const PersonalWorkspacePreview = (props: UserPreviewProps) => {
   return (
     <UserPreview
       rounded={false}
-      subtitle={localizationKeys('organizationSwitcher.personalWorkspace')}
       {...props}
     />
   );
