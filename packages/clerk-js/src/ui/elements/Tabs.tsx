@@ -185,8 +185,14 @@ export const TabPanel = (props: TabPanelProps) => {
     <Flex
       id={`cl-tabpanel-${tabIndex}`}
       role='tabpanel'
+      tabIndex={0}
       aria-labelledby={`cl-tab-${tabIndex}`}
-      sx={sx}
+      sx={[
+        {
+          outline: 0,
+        },
+        sx,
+      ]}
       {...rest}
     >
       {children}
