@@ -1,29 +1,16 @@
 import { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
-import {
-  useCoreClerk,
-  useCoreOrganization,
-  useCoreOrganizationList,
-  useCoreUser,
-  useEnvironment,
-} from '../../contexts';
-import { Flex, Flow, Link, localizationKeys, useAppearance } from '../../customizables';
-import {
-  Action,
-  BaseCard,
-  OrganizationPreview,
-  PersonalWorkspacePreview,
-  PoweredByClerkText,
-  useCardState,
-} from '../../elements';
+import { useCoreClerk, useCoreOrganization, useCoreOrganizationList, useCoreUser } from '../../contexts';
+import { localizationKeys } from '../../customizables';
+import { Action, OrganizationPreview, PersonalWorkspacePreview, PopoverCard, useCardState } from '../../elements';
 import { RootBox } from '../../elements/RootBox';
 import { CogFilled } from '../../icons';
-import { animations, PropsOfComponent } from '../../styledSystem';
+import { PropsOfComponent } from '../../styledSystem';
 import { OrganizationActionList } from './OtherOrganizationActions';
 
 type OrganizationSwitcherPopoverProps = { isOpen: boolean; close: () => void } & PropsOfComponent<
-  typeof OrganizationSwitcherCard
+  typeof PopoverCard.Root
 >;
 
 export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, OrganizationSwitcherPopoverProps>(
@@ -73,11 +60,11 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
 
     return (
       <RootBox>
-        <OrganizationSwitcherCard
+        <PopoverCard.Root
           ref={ref}
           {...rest}
         >
-          <Main>
+          <PopoverCard.Main>
             {currentOrg ? (
               <>
                 <OrganizationPreview
@@ -100,112 +87,10 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
               onPersonalWorkspaceClick={handlePersonalWorkspaceClicked}
               onOrganizationClick={handleOrganizationClicked}
             />
-          </Main>
-          <Footer />
-        </OrganizationSwitcherCard>
+          </PopoverCard.Main>
+          <PopoverCard.Footer />
+        </PopoverCard.Root>
       </RootBox>
     );
   },
 );
-
-const Main = (props: React.PropsWithChildren<Record<never, never>>) => {
-  return (
-    <Flex
-      //   elementDescriptor={descriptors.organizationSwitcherPopoverMain}
-      direction='col'
-    >
-      {props.children}
-    </Flex>
-  );
-};
-
-const Footer = () => {
-  const { branded } = useEnvironment().displayConfig;
-  const { privacyPageUrl, termsPageUrl } = useAppearance().parsedLayout;
-  const shouldShow = branded || privacyPageUrl || termsPageUrl;
-
-  if (!shouldShow) {
-    return null;
-  }
-
-  return (
-    <Flex
-      //   elementDescriptor={descriptors.organizationSwitcherPopoverFooter}
-      justify='between'
-      sx={theme => ({
-        padding: `${theme.space.$6}`,
-        paddingBottom: 0,
-        borderTop: `${theme.borders.$normal} ${theme.colors.$blackAlpha200}`,
-        '&:empty': {
-          padding: '0',
-        },
-      })}
-    >
-      <PoweredByClerkText />
-      <Links />
-    </Flex>
-  );
-};
-
-const Links = () => {
-  const { privacyPageUrl, termsPageUrl } = useAppearance().parsedLayout;
-
-  if (!termsPageUrl && !privacyPageUrl) {
-    return null;
-  }
-
-  return (
-    <Flex
-      //   elementDescriptor={descriptors.organizationSwitcherPopoverFooterPages}
-      gap={4}
-    >
-      {termsPageUrl && (
-        <OrganizationSwitcherLink
-          localizationKey={localizationKeys('footerPageLink__terms')}
-          //   elementDescriptor={descriptors.organizationSwitcherPopoverFooterPagesLink}
-          //   elementId={descriptors.organizationSwitcherPopoverFooterPagesLink.setId('terms')}
-          href={termsPageUrl}
-        />
-      )}
-      {privacyPageUrl && (
-        <OrganizationSwitcherLink
-          localizationKey={localizationKeys('footerPageLink__privacy')}
-          //   elementDescriptor={descriptors.organizationSwitcherPopoverFooterPagesLink}
-          //   elementId={descriptors.organizationSwitcherPopoverFooterPagesLink.setId('privacy')}
-          href={privacyPageUrl}
-        />
-      )}
-    </Flex>
-  );
-};
-
-const OrganizationSwitcherLink = (props: PropsOfComponent<typeof Link>) => {
-  return (
-    <Link
-      colorScheme='neutral'
-      isExternal
-      size='xss'
-      {...props}
-    />
-  );
-};
-
-const OrganizationSwitcherCard = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof BaseCard>>((props, ref) => {
-  return (
-    <Flow.Part part='popover'>
-      <BaseCard
-        {...props}
-        ref={ref}
-        sx={t => ({
-          padding: `${t.space.$6} 0`,
-          width: t.sizes.$94,
-          maxWidth: `calc(100vw - ${t.sizes.$8})`,
-          zIndex: t.zIndices.$modal,
-          animation: `${animations.dropdownSlideInScaleAndFade} 140ms `,
-        })}
-      >
-        {props.children}
-      </BaseCard>
-    </Flow.Part>
-  );
-});
