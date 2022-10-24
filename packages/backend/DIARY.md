@@ -16,3 +16,7 @@
 - [] Export CJS and ESM without [dual package hazard](https://github.com/nodejs/modules/issues/409)
 - [] Add integration tests across different runtimes (Node, CF Workers, Vercel Edge middleware, etc...)
 - [] Add easier debugging
+- [] Custom claim validation
+- [] [Key sizes](https://clerkinc.slack.com/archives/C04372Z64V6/p1666428277862049?thread_ts=1666214091.100049&cid=C04372Z64V6)
+- [] Add tribute to https://github.com/cfworker/cfworker/tree/main/packages/jwt
+- [] Replace mock with a fetcher using dependency injection

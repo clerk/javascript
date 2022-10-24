@@ -6,7 +6,7 @@ const MAX_NUMBER_OF_RETRIES = 5;
 
 export async function callWithRetry<T>(
   fn: (...args: unknown[]) => Promise<T>,
-  attempt = 0,
+  attempt = 1,
   maxAttempts = MAX_NUMBER_OF_RETRIES,
 ): Promise<T> {
   try {

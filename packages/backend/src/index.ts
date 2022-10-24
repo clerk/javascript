@@ -1,5 +1,5 @@
 import { createBackendApiClient } from './api';
-import { createSessionVerifier } from './sessionVerifier';
+import { createSessionVerifier } from './tokens';
 
 export const apiClient = createBackendApiClient();
 
@@ -8,7 +8,7 @@ export const sessionVerifier = createSessionVerifier({
 });
 
 export * from './api';
-export * from './sessionVerifier';
+export * from './tokens';
 
 // TODO: Revise the following
 export { createGetToken, signedOutGetToken, createSignedOutState } from './util/createGetToken';

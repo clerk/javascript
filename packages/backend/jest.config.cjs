@@ -4,6 +4,11 @@ module.exports = {
   transform: {
     '^.+\\.ts$': 'ts-jest',
   },
-  setupFiles: ['<rootDir>/jest/setupEnvVars.js'],
+  globals: {
+    'ts-jest': {
+      tsconfig: 'tsconfig.test.json',
+    },
+  },
+  setupFiles: ['<rootDir>/jest/setupEnvVars.ts'],
   collectCoverage: true,
 };

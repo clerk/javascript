@@ -1,9 +1,10 @@
 import type { ClerkJWTClaims } from '@clerk/types';
+import { verify } from 'node:crypto';
 
 import { isDevelopmentFromApiKey, isProductionFromApiKey } from '../util/instance';
 import { checkCrossOrigin } from '../util/request';
 import { AuthErrorReason } from './errors';
-import { type VerifySessionTokenOptions, verifySessionToken } from './verify';
+import { type VerifyTokenOptions, verifyToken } from './verify';
 
 export type GetAuthStateOptions = {
   /* Clerk Backend API key value */
@@ -34,7 +35,7 @@ export type GetAuthStateOptions = {
   key?: string;
   /* A function that returns the HTML of the interstitial */
   interstitial: () => Promise<string>;
-} & VerifySessionTokenOptions;
+} & VerifyTokenOptions;
 
 export enum AuthStatus {
   SignedIn = 'Signed in',
@@ -72,16 +73,17 @@ export async function getAuthState({
   headerToken,
   host,
   interstitial,
-  jwksTTL,
+  jwksTtlInMs,
   origin,
   referrer,
   userAgent,
 }: GetAuthStateOptions): Promise<AuthState> {
   if (headerToken) {
-    const sessionClaims = await verifySessionToken(headerToken, {
+    const sessionClaims = await verifyToken(headerToken, {
       authorizedParties,
       clockSkewInSeconds,
-      jwksTTL,
+      jwksTtlInMs,
+      issuer: iss => iss.startsWith('https://clerk.'),
     });
 
     return {
@@ -165,10 +167,11 @@ export async function getAuthState({
     };
   }
 
-  const sessionClaims = await verifySessionToken(cookieToken!, {
+  const sessionClaims = await verifyToken(cookieToken!, {
     authorizedParties,
     clockSkewInSeconds,
-    jwksTTL,
+    jwksTtlInMs,
+    issuer: iss => iss.startsWith('https://clerk.'),
   });
 
   if (sessionClaims && sessionClaims.iat >= Number(clientUat)) {

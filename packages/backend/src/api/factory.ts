@@ -1,7 +1,7 @@
 // TODO: Remove import and use an isomorphic helper
 import snakecaseKeys from 'snakecase-keys';
 
-import { DEFAULT_API_KEY, DEFAULT_API_URL, DEFAULT_API_VERSION, DEFAULT_USER_AGENT } from '../constants';
+import { API_KEY, API_URL, API_VERSION, USER_AGENT } from '../constants';
 import { joinPaths } from '../util/path';
 import {
   AllowlistIdentifierAPI,
@@ -38,11 +38,11 @@ export type ClerkBackendAPIOptions = {
 
 export function createBackendApiClient(options?: ClerkBackendAPIOptions) {
   const {
-    apiKey = DEFAULT_API_KEY,
-    apiUrl = DEFAULT_API_URL,
-    apiVersion = DEFAULT_API_VERSION,
+    apiKey = API_KEY,
+    apiUrl = API_URL,
+    apiVersion = API_VERSION,
     httpTransport = httpRequest,
-    userAgent = DEFAULT_USER_AGENT,
+    userAgent = USER_AGENT,
   } = options || {};
 
   const request = async <T>(requestOptions: HTTPTransportRequestOptions): Promise<T> | never => {
