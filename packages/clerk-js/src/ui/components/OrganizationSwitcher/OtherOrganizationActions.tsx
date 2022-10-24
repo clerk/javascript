@@ -4,13 +4,7 @@ import React from 'react';
 import { Plus, SwitchArrows } from '../../../ui/icons';
 import { useCoreOrganization, useCoreOrganizationList, useCoreUser } from '../../contexts';
 import { Box, Button, Icon, localizationKeys, Text } from '../../customizables';
-import {
-  Action,
-  Actions,
-  OrganizationPreview,
-  OrganizationPreviewProps,
-  PersonalWorkspacePreview,
-} from '../../elements';
+import { Action, Actions, OrganizationPreview, PersonalWorkspacePreview } from '../../elements';
 import { useCardState } from '../../elements/contexts';
 import { common, PropsOfComponent } from '../../styledSystem';
 
@@ -50,11 +44,12 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
       })}
     >
       {currentOrg && showPersonalAccount && (
-        <PersonalWorkspacePreviewButton
-          user={user}
+        <PreviewButton
           sx={t => ({ marginBottom: t.space.$4 })}
           onClick={onPersonalWorkspaceClick}
-        />
+        >
+          <PersonalWorkspacePreview user={user} />
+        </PreviewButton>
       )}
       {!!otherOrgs.length && (
         <Text
@@ -76,12 +71,17 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
         })}
       >
         {otherOrgs.map(organization => (
-          <OrganizationPreviewButton
+          <PreviewButton
+            block
             key={organization.id}
-            organization={organization}
-            user={user}
             onClick={() => onOrganizationClick(organization)}
-          />
+          >
+            <OrganizationPreview
+              organization={organization}
+              user={user}
+              size='sm'
+            />
+          </PreviewButton>
         ))}
       </Box>
       {createOrganizationButton}
@@ -89,49 +89,10 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
   );
 };
 
-export const OrganizationPreviewButton = (props: PropsOfComponent<typeof Button> & OrganizationPreviewProps) => {
+const PreviewButton = (props: PropsOfComponent<typeof Button>) => {
+  const { sx, children, ...rest } = props;
   const card = useCardState();
-  const { organization, user, ...rest } = props;
 
-  return (
-    <Button
-      variant='ghost'
-      colorScheme='neutral'
-      focusRing={false}
-      isDisabled={card.isLoading}
-      block
-      {...rest}
-      sx={[
-        t => ({
-          height: t.sizes.$14,
-          borderRadius: 0,
-          justifyContent: 'space-between',
-          padding: `${t.space.$3} ${t.space.$6}`,
-          ':hover > svg': {
-            visibility: 'initial',
-          },
-        }),
-        rest.sx,
-      ]}
-    >
-      <OrganizationPreview
-        organization={organization}
-        user={user}
-        size='sm'
-      />
-      <Icon
-        icon={SwitchArrows}
-        sx={t => ({ color: t.colors.$blackAlpha500, marginLeft: t.space.$2, visibility: 'hidden' })}
-      />
-    </Button>
-  );
-};
-
-export const PersonalWorkspacePreviewButton = (
-  props: PropsOfComponent<typeof Button> & PropsOfComponent<typeof PersonalWorkspacePreview>,
-) => {
-  const card = useCardState();
-  const { user, ...rest } = props;
   return (
     <Button
       variant='ghost'
@@ -149,13 +110,10 @@ export const PersonalWorkspacePreviewButton = (
             visibility: 'initial',
           },
         }),
-        rest.sx,
+        sx,
       ]}
     >
-      <PersonalWorkspacePreview
-        user={user}
-        size='sm'
-      />
+      {children}
       <Icon
         icon={SwitchArrows}
         sx={t => ({ color: t.colors.$blackAlpha500, marginLeft: t.space.$2, visibility: 'hidden' })}
