@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useCoreOrganization, useCoreUser } from '../../contexts';
-import { Button, Flex, Icon, localizationKeys, Text } from '../../customizables';
+import { Button, Flex, Icon, localizationKeys } from '../../customizables';
 import { OrganizationPreview, PersonalWorkspacePreview } from '../../elements';
 import { Selector } from '../../icons';
 import { PropsOfComponent } from '../../styledSystem';
@@ -41,14 +41,14 @@ export const OrganizationSwitcherTrigger = React.forwardRef<HTMLButtonElement, O
               user={user}
             />
           )}
-          {!organization && !showPersonalAccount && (
-            <Text localizationKey={localizationKeys('organizationSwitcher.notSelected')} />
-          )}
-          {!organization && showPersonalAccount && (
+          {!organization && (
             <PersonalWorkspacePreview
               user={user}
               rounded={false}
               size={'sm'}
+              subtitle={localizationKeys(
+                showPersonalAccount ? 'organizationSwitcher.personalWorkspace' : 'organizationSwitcher.notSelected',
+              )}
             />
           )}
           <Icon icon={Selector} />
