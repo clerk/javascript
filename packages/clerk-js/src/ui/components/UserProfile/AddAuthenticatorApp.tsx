@@ -102,7 +102,7 @@ export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
             <Button
               textVariant='buttonExtraSmallBold'
               onClick={onContinue}
-              localizationKey={localizationKeys('userProfile.formButtonPrimary__finish')}
+              localizationKey={localizationKeys('userProfile.formButtonPrimary__continue')}
             />
 
             <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
