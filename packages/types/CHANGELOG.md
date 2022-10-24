@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.13.0](https://github.com/clerkinc/javascript/compare/@clerk/types@3.13.0-staging.0...@clerk/types@3.13.0) (2022-10-24)
+
+**Note:** Version bump only for package @clerk/types
+
 ## [3.12.0](https://github.com/clerkinc/javascript/compare/@clerk/types@3.11.0...@clerk/types@3.12.0) (2022-10-14)
 
 ### Features
