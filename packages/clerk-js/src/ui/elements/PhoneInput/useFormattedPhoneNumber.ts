@@ -31,8 +31,8 @@ export const useFormattedPhoneNumber = (props: UseFormattedPhoneNumberProps = {}
   }, [selectedIso, phoneNum]);
 
   const setPhoneNumber = React.useCallback(
-    (str: string) => {
-      setPhoneNum(format(str, selectedIso));
+    (str: string, countryCode?: CountryIso) => {
+      setPhoneNum(format(str, countryCode || selectedIso));
     },
     [selectedIso, phoneNum],
   );

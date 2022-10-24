@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { SyntheticEvent } from 'react';
 
 import { Flex, Input, Text } from '../../customizables';
 import { Select, SelectButton, SelectOptionList } from '../../elements';
@@ -20,9 +20,14 @@ const countryOptions = [...IsoToCountryMap.values()].map(createSelectOption);
 
 type PhoneInputProps = PropsOfComponent<typeof Input>;
 
+interface ClipboardEvent<T = Element> extends SyntheticEvent<T> {
+  clipboardData: DataTransfer;
+}
+
 export const PhoneInput = (props: PhoneInputProps) => {
   const { onChange: onChangeProp, value, ...rest } = props;
   const phoneInputRef = React.useRef<HTMLInputElement>(null);
+  const [hasBeenPasted, setHasBeenPasted] = React.useState(false);
   const { setPhoneNumber, cleanPhoneNumber, formattedPhoneNumber, selectedIso, setSelectedIso } =
     useFormattedPhoneNumber({
       defaultPhone: value as string,
@@ -38,8 +43,47 @@ export const PhoneInput = (props: PhoneInputProps) => {
   const selectedCountryOption = React.useMemo(() => {
     return countryOptions.find(o => o.country.iso === selectedIso) || countryOptions[0];
   }, [selectedIso]);
+  const dynamicPadding = selectedCountryOption.country.code.length * 5; // this to calculate the padding of the input field depending the length of country code
 
   React.useEffect(callOnChangeProp, [cleanPhoneNumber]);
+
+  const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
+    const inputValue = e.clipboardData.getData('text');
+    const testPattern = /\+/g;
+
+    if (testPattern.test(inputValue)) {
+      setHasBeenPasted(true);
+
+      let result = '';
+      let selectedCountry = null;
+      for (let i = 5; i > 1; i--) {
+        const code = inputValue.slice(1, i);
+
+        result = inputValue.slice(i, inputValue.length);
+        selectedCountry = countryOptions.find(o => o.country.code === code);
+
+        if (selectedCountry) {
+          break;
+        }
+      }
+
+      if (selectedCountry) {
+        setSelectedIso(selectedCountry?.country.iso);
+        setPhoneNumber(result, selectedCountry?.country.iso);
+        return;
+      }
+    }
+    setSelectedIso(selectedIso);
+    setPhoneNumber(inputValue);
+  };
+
+  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!hasBeenPasted) {
+      setPhoneNumber(e.target.value);
+    }
+
+    setHasBeenPasted(false);
+  };
 
   return (
     <Flex
@@ -86,6 +130,7 @@ export const PhoneInput = (props: PhoneInputProps) => {
             })}
           >
             <Flag iso={selectedIso} />
+            <Text sx={{ paddingLeft: '4px' }}>+{selectedCountryOption.country.code}</Text>
           </SelectButton>
         </Flex>
         <SelectOptionList
@@ -95,10 +140,11 @@ export const PhoneInput = (props: PhoneInputProps) => {
       </Select>
       <Input
         value={formattedPhoneNumber}
-        onChange={el => setPhoneNumber(el.target.value)}
+        onPaste={handlePaste}
+        onChange={handlePhoneNumberChange}
         maxLength={25}
         type='tel'
-        sx={theme => ({ paddingLeft: theme.space.$20 })}
+        sx={theme => ({ paddingLeft: `calc(${theme.space.$20} + ${dynamicPadding}px)` })}
         ref={phoneInputRef}
         {...rest}
       />
