@@ -12,6 +12,7 @@ export * from './identificationLink';
 export * from './image';
 export * from './json';
 export * from './jwt';
+export * from './jwtv2';
 export * from './oauth';
 export * from './organization';
 export * from './organizationInvitation';
