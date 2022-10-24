@@ -44,3 +44,4 @@ export * from './ProfileCardContent';
 export * from './IconButton';
 export * from './AvatarUploader';
 export * from './Actions';
+export * from './PopoverCard';
