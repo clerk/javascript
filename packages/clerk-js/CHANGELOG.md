@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.12.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.12.0...@clerk/clerk-js@4.12.1) (2022-10-24)
+
+### Bug Fixes
+
+- **clerk-js:** Add missing localizationKey import ([fb17eca](https://github.com/clerkinc/javascript/commit/fb17ecac5a054027078ce1a7d8700cb497c526fa))
+
 ## [4.12.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.12.0-staging.1...@clerk/clerk-js@4.12.0) (2022-10-24)
 
 **Note:** Version bump only for package @clerk/clerk-js
