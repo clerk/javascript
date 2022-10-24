@@ -3,7 +3,7 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser } from '../../contexts';
-import { Col, Text } from '../../customizables';
+import { Col, LocalizationKey, localizationKeys, Text } from '../../customizables';
 import { ArrowBlockButton, useCardState, withCardStateProvider } from '../../elements';
 import { getFlagEmojiFromCountryIso, handleError, parsePhoneString, stringToFormattedPhoneString } from '../../utils';
 import { FormButtonContainer } from './FormButtons';

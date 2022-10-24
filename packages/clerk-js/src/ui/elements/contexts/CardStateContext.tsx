@@ -50,6 +50,7 @@ export const withCardStateProvider = <T,>(Component: React.ComponentType<T>) => 
   return (props: T) => {
     return (
       <CardStateProvider>
+        {/* @ts-ignore */}
         <Component {...props} />
       </CardStateProvider>
     );
