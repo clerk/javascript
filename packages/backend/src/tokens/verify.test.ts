@@ -20,7 +20,7 @@ describe('verifySessionToken(token, options)', () => {
     // jest.setSystemTime(new Date(...));
     //
     // we just mock Date.now().
-    global.Date.now = jest.fn(() => new Date(1666099945000).getTime());
+    global.Date.now = jest.fn(() => new Date(mockJwtPayload.iat * 1000).getTime());
 
     nock('https://api.clerk.test').get('/v1/jwks').once().reply(200, mockJwks);
   });
@@ -32,8 +32,8 @@ describe('verifySessionToken(token, options)', () => {
   it('verifies the provided session JWT', async () => {
     const payload = await verifyToken(mockJwt, {
       apiUrl: 'https://api.clerk.test',
-      authorizedParties: ['https://accounts.regular.sloth-91.lcl.dev'],
-      issuer: 'https://clerk.regular.sloth-91.lcl.dev',
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+      issuer: 'https://clerk.inspired.puma-74.lcl.dev',
     });
 
     expect(payload).toEqual(mockJwtPayload);
@@ -47,6 +47,6 @@ describe('verifySessionToken(token, options)', () => {
         apiUrl: 'https://api.clerk.test',
         issuer: 'whatever',
       }),
-    ).rejects.toThrow('Invalid JWT issuer claim (iss) "https://clerk.regular.sloth-91.lcl.dev". Expected "whatever".');
+    ).rejects.toThrow('Invalid JWT issuer claim (iss) "https://clerk.inspired.puma-74.lcl.dev". Expected "whatever".');
   });
 });

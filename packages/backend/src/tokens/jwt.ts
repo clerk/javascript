@@ -2,6 +2,7 @@ import { Jwt, JwtPayload } from '@clerk/types';
 import { base64url } from 'rfc4648';
 
 import crypto from '../runtime/crypto';
+import { TokenVerificationError, TokenVerificationErrorReason } from './errors';
 
 type IssuerResolver = string | ((iss: string) => boolean);
 
@@ -52,7 +53,10 @@ export async function hasValidSignature(jwt: Jwt, jwk: JsonWebKey) {
 export function decodeJwt(token: string): Jwt {
   const tokenParts = (token || '').toString().split('.');
   if (tokenParts.length !== 3) {
-    throw new Error(`Invalid JWT form. A JWT consists of three parts separated by dots.`);
+    throw new TokenVerificationError({
+      reason: TokenVerificationErrorReason.TokenInvalid,
+      message: `Invalid JWT form. A JWT consists of three parts separated by dots.`,
+    });
   }
 
   const [rawHeader, rawPayload, rawSignature] = tokenParts;
@@ -98,18 +102,19 @@ export type VerifyJwtOptions = {
   key: JsonWebKey;
 };
 
+// TODO: Revise the return types. Maybe it's better to throw an error instead of return an object with a reason
 export async function verifyJwt(
   token: string,
   { audience, authorizedParties, clockSkewInSeconds = DEFAULT_CLOCK_SKEW_IN_SECONDS, issuer, key }: VerifyJwtOptions,
 ): Promise<{ valid: true; payload: JwtPayload } | { valid: false; reason: string }> {
   let decoded: Jwt;
 
-  // Decode JWT
+  // Decode JWT and shallow known error to respect the return type of the verifyJWT function
   try {
     decoded = decodeJwt(token);
   } catch (err) {
-    if (err instanceof Error) {
-      return { valid: false, reason: `Unable to decode JWT. ${err.message || err}` };
+    if (err instanceof TokenVerificationError) {
+      return { valid: false, reason: err.reason };
     }
     throw err;
   }
@@ -207,7 +212,7 @@ export async function verifyJwt(
   if (expired) {
     return {
       valid: false,
-      reason: `JWT is expired. Expiry date: ${expiryDate}; Current date: ${currentDate};`,
+      reason: `JWT is expired. Expiry date: ${expiryDate}, Current date: ${currentDate}.`,
     };
   }
 

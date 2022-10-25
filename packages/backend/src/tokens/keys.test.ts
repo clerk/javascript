@@ -42,10 +42,10 @@ describe('loadClerkJWKFromRemote(options)', () => {
   });
 
   it('loads JWKS from Frontend API when issuer is provided', async () => {
-    nock('https://accounts.regular.sloth-91.lcl.dev').get('/.well-known/jwks.json').once().reply(200, mockJwks);
+    nock('https://accounts.inspired.puma-74.lcl.dev').get('/.well-known/jwks.json').once().reply(200, mockJwks);
 
     const jwk = await loadClerkJWKFromRemote({
-      issuer: 'https://accounts.regular.sloth-91.lcl.dev',
+      issuer: 'https://accounts.inspired.puma-74.lcl.dev',
       kid: mockRsaJwkKid,
     });
 
@@ -110,6 +110,6 @@ describe('loadClerkJWKFromRemote(options)', () => {
         apiKey: 'deadbeef',
         kid: 'ins_whatever',
       }),
-    ).rejects.toThrow("Unable to find a signing key that matches kid='ins_whatever'");
+    ).rejects.toThrow("Unable to find a signing key in JWKS that matches kid='ins_whatever'");
   });
 });

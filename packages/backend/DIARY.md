@@ -20,3 +20,4 @@
 - [] [Key sizes](https://clerkinc.slack.com/archives/C04372Z64V6/p1666428277862049?thread_ts=1666214091.100049&cid=C04372Z64V6)
 - [] Add tribute to https://github.com/cfworker/cfworker/tree/main/packages/jwt
 - [] Replace mock with a fetcher using dependency injection
+- [] Move interstitial fetching into @clerk/backend. Fetch from BAPI/inline or FAPI

@@ -1,6 +1,7 @@
 import type { JwtPayload } from '@clerk/types';
 
 import { API_KEY, API_URL, JWT_KEY } from '../constants';
+import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from './errors';
 import { type VerifyJwtOptions, decodeJwt, verifyJwt } from './jwt';
 import { loadClerkJWKFromLocal, loadClerkJWKFromRemote, LoadClerkJWKFromRemoteOptions } from './keys';
 
@@ -36,7 +37,11 @@ export async function verifyToken(token: string, options: VerifyTokenOptions): P
       jwksTtlInMs,
     });
   } else {
-    throw new Error('Failed to resolve JWK during verification');
+    throw new TokenVerificationError({
+      action: TokenVerificationErrorAction.SetClerkJWTKey,
+      message: 'Failed to resolve JWK during verification.',
+      reason: TokenVerificationErrorReason.JWKFailedToResolve,
+    });
   }
 
   const result = await verifyJwt(token, {
@@ -47,7 +52,11 @@ export async function verifyToken(token: string, options: VerifyTokenOptions): P
   });
 
   if (!result.valid) {
-    throw new Error(result.reason);
+    throw new TokenVerificationError({
+      // Not to be confused with TokenVerificationErrorReason. This text says why JWT verification failed.
+      message: result.reason,
+      reason: TokenVerificationErrorReason.TokenVerificationFailed,
+    });
   }
 
   return result.payload;

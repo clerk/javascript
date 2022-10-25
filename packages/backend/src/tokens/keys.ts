@@ -1,6 +1,7 @@
 import fetch from '../runtime/fetch';
 import { callWithRetry } from '../util/callWithRetry';
 import { joinPaths } from '../util/path';
+import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from './errors';
 
 type JsonWebKeyWithKid = JsonWebKey & { kid: string };
 
@@ -42,7 +43,11 @@ const LocalJwkKid = 'local';
 export function loadClerkJWKFromLocal(localKey?: string): JsonWebKey {
   if (!getFromCache(LocalJwkKid)) {
     if (!localKey) {
-      throw new Error('Missing local JWK');
+      throw new TokenVerificationError({
+        action: TokenVerificationErrorAction.SetClerkJWTKey,
+        message: 'Missing local JWK.',
+        reason: TokenVerificationErrorReason.LocalJWKMissing,
+      });
     }
 
     // Notice:
@@ -110,13 +115,21 @@ export async function loadClerkJWKFromRemote({
     } else if (issuer) {
       fetcher = () => fetchJWKSFromFAPI(issuer);
     } else {
-      throw new Error('Failed to load JWKS from Clerk Backend or Frontend API');
+      throw new TokenVerificationError({
+        action: TokenVerificationErrorAction.ContactSupport,
+        message: 'Failed to load JWKS from Clerk Backend or Frontend API.',
+        reason: TokenVerificationErrorReason.RemoteJWKFailedToLoad,
+      });
     }
 
     const { keys }: { keys: JsonWebKeyWithKid[] } = await callWithRetry(fetcher);
 
     if (!keys || !keys.length) {
-      throw new Error('The JWKS endpoint did not contain any signing keys');
+      throw new TokenVerificationError({
+        action: TokenVerificationErrorAction.ContactSupport,
+        message: 'The JWKS endpoint did not contain any signing keys. Contact support@clerk.dev.',
+        reason: TokenVerificationErrorReason.RemoteJWKFailedToLoad,
+      });
     }
 
     keys.forEach(key => setInCache(key, jwksTtlInMs));
@@ -125,7 +138,11 @@ export async function loadClerkJWKFromRemote({
   const jwk = getFromCache(kid);
 
   if (!jwk) {
-    throw new Error(`Unable to find a signing key that matches kid='${kid}'`);
+    throw new TokenVerificationError({
+      action: TokenVerificationErrorAction.ContactSupport,
+      message: `Unable to find a signing key in JWKS that matches kid='${kid}'.`,
+      reason: TokenVerificationErrorReason.RemoteJWKMissing,
+    });
   }
 
   return jwk;
@@ -138,7 +155,11 @@ async function fetchJWKSFromFAPI(issuer: string) {
   const response = await fetch(url);
 
   if (!response.ok) {
-    throw new Error(`Error loading Clerk JWKS from ${url.href} with code=${response.status}`);
+    throw new TokenVerificationError({
+      action: TokenVerificationErrorAction.ContactSupport,
+      message: `Error loading Clerk JWKS from ${url.href} with code=${response.status}`,
+      reason: TokenVerificationErrorReason.RemoteJWKFailedToLoad,
+    });
   }
 
   return response.json();
@@ -156,7 +177,11 @@ async function fetchJWKSFromBAPI(apiUrl: string, apiKey: string) {
   });
 
   if (!response.ok) {
-    throw new Error(`Error loading Clerk JWKS from ${url.href} with code=${response.status}`);
+    throw new TokenVerificationError({
+      action: TokenVerificationErrorAction.ContactSupport,
+      message: `Error loading Clerk JWKS from ${url.href} with code=${response.status}`,
+      reason: TokenVerificationErrorReason.RemoteJWKFailedToLoad,
+    });
   }
 
   return response.json();
