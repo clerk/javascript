@@ -1,5 +1,5 @@
 import { createContextAndHook } from '@clerk/shared';
-import React, {  PropsWithChildren, useState } from 'react';
+import React, { PropsWithChildren, useState } from 'react';
 
 import { usePopover, useSearchInput } from '../../ui/hooks';
 import { Button, Flex, Icon, Text } from '../customizables';

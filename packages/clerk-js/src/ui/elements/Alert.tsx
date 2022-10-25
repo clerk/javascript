@@ -3,10 +3,7 @@ import React from 'react';
 import { Alert as AlertCust, AlertIcon, descriptors, Text } from '../customizables';
 import { animations, PropsOfComponent } from '../styledSystem';
 
-type AlertProps = React.PropsWithChildren<{
-  variant?: 'danger' | 'warning';
-}> &
-  PropsOfComponent<typeof AlertCust>;
+type AlertProps = { variant?: 'danger' | 'warning' } & PropsOfComponent<typeof AlertCust>;
 
 export const Alert = (props: AlertProps): JSX.Element | null => {
   const { children, variant = 'warning', ...rest } = props;

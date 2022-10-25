@@ -45,3 +45,4 @@ export * from './IconButton';
 export * from './AvatarUploader';
 export * from './Actions';
 export * from './PopoverCard';
+export * from './TagInput';
