@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { useCoreOrganization } from '../../contexts';
 import { Breadcrumbs, NavBar, NavbarContextProvider, NavbarRoute, OrganizationPreview } from '../../elements';
 import { CogFilled, User } from '../../icons';
 import { localizationKeys } from '../../localization';
@@ -23,17 +24,20 @@ const organizationProfileRoutes: NavbarRoute[] = [
 export const OrganizationProfileNavbar = (
   props: React.PropsWithChildren<Pick<PropsOfComponent<typeof NavBar>, 'contentRef'>>,
 ) => {
+  const { organization } = useCoreOrganization();
+
+  if (!organization) {
+    return null;
+  }
+
   return (
     <NavbarContextProvider>
       <NavBar
         header={
           <OrganizationPreview
             size='sm'
-            organization={{
-              name: 'Drivepoint',
-              logoUrl: 'https://images.lclclerk.com/uploaded/img_2GE5fixIVWTNMdRjcH7ivtelSxT.png',
-            }}
-            sx={t => ({ margin: `0 0 ${t.space.$2x5} ${t.space.$2}` })}
+            organization={organization}
+            sx={t => ({ margin: `0 0 ${t.space.$4} ${t.space.$2}` })}
           />
         }
         routes={organizationProfileRoutes}
