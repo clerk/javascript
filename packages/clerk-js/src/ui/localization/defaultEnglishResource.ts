@@ -28,6 +28,7 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
   formFieldLabel__firstName: 'First name',
   formFieldLabel__lastName: 'Last name',
   formFieldLabel__backupCode: 'Backup code',
+  formFieldLabel__organizationName: 'Organization name',
   formFieldInputPlaceholder__emailAddress: '',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
@@ -39,6 +40,7 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
   formFieldInputPlaceholder__backupCode: '',
+  formFieldInputPlaceholder__organizationName: '',
   formFieldAction__forgotPassword: 'Forgot password',
   formFieldHintText__optional: 'Optional',
   formButtonPrimary: 'Continue',
@@ -419,6 +421,9 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
     start: {
       headerTitle__members: 'Members',
       headerTitle__settings: 'Settings',
+    },
+    profilePage: {
+      successMessage: 'The organization has been updated.',
     },
   },
   unstable__errors: {
