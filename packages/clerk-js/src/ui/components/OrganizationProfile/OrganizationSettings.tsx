@@ -1,16 +1,14 @@
 import React from 'react';
 
-import { useCoreUser, useEnvironment } from '../../contexts';
+import { useCoreOrganization, useCoreUser } from '../../contexts';
 import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
-import { Header, IconButton, NavbarMenuButtonRow, UserPreview } from '../../elements';
+import { Header, IconButton, NavbarMenuButtonRow, OrganizationPreview } from '../../elements';
 import { useNavigate } from '../../hooks';
-import { Times, Trash } from '../../icons';
+import { Times } from '../../icons';
 import { ProfileSection } from '../UserProfile/Section';
 import { BlockButton } from '../UserProfile/UserProfileBlockButtons';
 
 export const OrganizationSettings = () => {
-  const { attributes } = useEnvironment().userSettings;
-
   return (
     <Col
       elementDescriptor={descriptors.page}
@@ -40,8 +38,13 @@ export const OrganizationSettings = () => {
 };
 
 const OrganizationProfileSection = () => {
+  const { organization } = useCoreOrganization();
   const { navigate } = useNavigate();
   const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = useCoreUser();
+
+  if (!organization) {
+    return null;
+  }
 
   return (
     <ProfileSection
@@ -50,9 +53,8 @@ const OrganizationProfileSection = () => {
       // id='organization-profile'
     >
       <BlockButton onClick={() => navigate('profile')}>
-        {/*// TODO*/}
-        <UserPreview
-          user={userWithoutIdentifiers}
+        <OrganizationPreview
+          organization={organization}
           size='lg'
         />
       </BlockButton>
@@ -61,7 +63,16 @@ const OrganizationProfileSection = () => {
 };
 
 const OrganizationDangerSection = () => {
-  const { navigate } = useNavigate();
+  const { organization, membership } = useCoreOrganization();
+  const user = useCoreUser();
+
+  if (!organization || !membership) {
+    return null;
+  }
+
+  const leave = () => {
+    return organization.removeMember(user.id);
+  };
 
   return (
     <ProfileSection
@@ -76,16 +87,10 @@ const OrganizationDangerSection = () => {
           variant='outline'
           colorScheme='danger'
           textVariant='buttonExtraSmallBold'
+          onClick={leave}
+          isDisabled={membership.role === 'admin'}
         >
           Leave organization
-        </IconButton>
-        <IconButton
-          icon={Trash}
-          variant='outline'
-          colorScheme='danger'
-          textVariant='buttonExtraSmallBold'
-        >
-          Delete organization
         </IconButton>
       </Flex>
     </ProfileSection>
