@@ -28,6 +28,7 @@ type _LocalizationResource = {
   formFieldLabel__firstName: LocalizationValue;
   formFieldLabel__lastName: LocalizationValue;
   formFieldLabel__backupCode: LocalizationValue;
+  formFieldLabel__organizationName: LocalizationValue;
   formFieldInputPlaceholder__emailAddress: LocalizationValue;
   formFieldInputPlaceholder__phoneNumber: LocalizationValue;
   formFieldInputPlaceholder__username: LocalizationValue;
@@ -39,6 +40,7 @@ type _LocalizationResource = {
   formFieldInputPlaceholder__firstName: LocalizationValue;
   formFieldInputPlaceholder__lastName: LocalizationValue;
   formFieldInputPlaceholder__backupCode: LocalizationValue;
+  formFieldInputPlaceholder__organizationName: LocalizationValue;
   formFieldAction__forgotPassword: LocalizationValue;
   formFieldHintText__optional: LocalizationValue;
   formButtonPrimary: LocalizationValue;
@@ -417,6 +419,9 @@ type _LocalizationResource = {
     start: {
       headerTitle__members: LocalizationValue;
       headerTitle__settings: LocalizationValue;
+    };
+    profilePage: {
+      successMessage: LocalizationValue;
     };
   };
   unstable__errors: {
