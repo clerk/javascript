@@ -2,7 +2,7 @@ import React, { PointerEventHandler, useEffect, useRef } from 'react';
 
 import { mqu, PropsOfComponent } from '../../ui/styledSystem';
 import { getFullName, getIdentifier } from '../../ui/utils';
-import { useCoreClerk, useCoreSession, withCoreSessionSwitchGuard } from '../contexts';
+import { useCoreClerk, useCoreSession, withCoreUserGuard } from '../contexts';
 import {
   Col,
   descriptors,
@@ -228,4 +228,4 @@ const _ImpersonationFab = () => {
   );
 };
 
-export const ImpersonationFab = withCoreSessionSwitchGuard(_ImpersonationFab);
+export const ImpersonationFab = withCoreUserGuard(_ImpersonationFab);
