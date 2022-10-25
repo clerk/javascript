@@ -286,6 +286,7 @@ export type ElementsConfig = {
   alert: WithOptions<AlertId, never, never>;
   alertIcon: WithOptions<AlertId, never, never>;
   alertText: WithOptions<AlertId, never, never>;
+  alertTextContainer: WithOptions<AlertId, never, never>;
 
   loader: WithOptions<never, never, never>;
   loaderIcon: WithOptions<never, ErrorState, never>;

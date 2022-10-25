@@ -165,6 +165,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'alert',
   'alertIcon',
   'alertText',
+  'alertTextContainer',
 
   'loader',
   'loaderIcon',

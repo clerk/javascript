@@ -14,7 +14,7 @@ export type UserPreviewProps = PropsOfComponent<typeof Flex> & {
   imageUrl?: string | null;
   rounded?: boolean;
   elementId?: any;
-  subtitle?: LocalizationKey;
+  subtitle?: LocalizationKey | string;
 };
 
 export const UserPreview = (props: UserPreviewProps) => {
