@@ -119,7 +119,7 @@ export const Pagination = (props: PaginationProps) => {
         '*': {
           fontSize: 'inherit',
         },
-        [mqu.md]: {
+        [mqu.sm]: {
           flexDirection: 'column',
           gap: t.space.$2,
         },

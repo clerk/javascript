@@ -1,14 +1,18 @@
 import React from 'react';
 
-import { Alert as AlertCust, AlertIcon, descriptors, Text } from '../customizables';
+import { Alert as AlertCust, AlertIcon, Col, descriptors, LocalizationKey, Text } from '../customizables';
 import { animations, PropsOfComponent } from '../styledSystem';
 
-type AlertProps = { variant?: 'danger' | 'warning' } & PropsOfComponent<typeof AlertCust>;
+type AlertProps = {
+  variant?: 'danger' | 'warning';
+  title?: LocalizationKey | string;
+  subtitle?: LocalizationKey | string;
+} & PropsOfComponent<typeof AlertCust>;
 
 export const Alert = (props: AlertProps): JSX.Element | null => {
-  const { children, variant = 'warning', ...rest } = props;
+  const { children, title, subtitle, variant = 'warning', ...rest } = props;
 
-  if (!children) {
+  if (!children && (!title || !subtitle)) {
     return null;
   }
 
@@ -25,15 +29,30 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
         colorScheme={variant}
         sx={{ flexShrink: '0' }}
       />
-      <Text
-        elementDescriptor={descriptors.alertText}
-        elementId={descriptors.alert.setId(variant)}
-        colorScheme='neutral'
-        // TODO: should these variants also include a size?
-        variant='smallRegular'
+      <Col
+        elementDescriptor={descriptors.alertTextContainer}
+        elementId={descriptors.alertTextContainer.setId(variant)}
+        gap={1}
       >
-        {children}
-      </Text>
+        <Text
+          elementDescriptor={descriptors.alertText}
+          elementId={descriptors.alert.setId(variant)}
+          colorScheme='neutral'
+          variant='smallRegular'
+        >
+          {title || children}
+        </Text>
+        {subtitle && (
+          <Text
+            elementDescriptor={descriptors.alertText}
+            elementId={descriptors.alert.setId(variant)}
+            colorScheme='neutral'
+            variant='smallRegular'
+          >
+            {subtitle}
+          </Text>
+        )}
+      </Col>
     </AlertCust>
   );
 };
