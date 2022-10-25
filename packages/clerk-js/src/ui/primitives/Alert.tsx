@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { common, createVariants, StyleVariants } from '../styledSystem';
-import { Flex } from './Flex';
+import { Flex, FlexProps } from './Flex';
 
 const { applyVariants, filterProps } = createVariants(theme => ({
   base: {
@@ -12,8 +12,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   variants: {},
 }));
 
-// @ts-ignore
-export type AlertProps = React.PropsWithChildren<StyleVariants<typeof applyVariants>>;
+export type AlertProps = FlexProps & StyleVariants<typeof applyVariants>;
 
 export const Alert = (props: AlertProps): JSX.Element => {
   return (

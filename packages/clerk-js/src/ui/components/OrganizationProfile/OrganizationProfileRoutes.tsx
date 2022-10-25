@@ -1,7 +1,7 @@
 import { ProfileCardContent } from '../../elements';
 import { Route, Switch } from '../../router';
 import { PropsOfComponent } from '../../styledSystem';
-import { InviteMemberPage } from './InviteMemberPage';
+import { InviteMembersPage } from './InviteMembersPage';
 import { OrganizationMembers } from './OrganizationMembers';
 import { OrganizationSettings } from './OrganizationSettings';
 import { ProfileSettingsPage } from './ProfileSettingsPage';
@@ -22,7 +22,7 @@ export const OrganizationProfileRoutes = (props: PropsOfComponent<typeof Profile
       <Route>
         <Switch>
           <Route path='invite-members'>
-            <InviteMemberPage />
+            <InviteMembersPage />
           </Route>
           <Route index>
             <OrganizationMembers />
