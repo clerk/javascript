@@ -1,7 +1,6 @@
 import { ClerkPaginationParams } from './api';
 import { OrganizationInvitationResource } from './organizationInvitation';
-import { OrganizationMembershipResource } from './organizationMembership';
-import { MembershipRole } from './organizationMembership';
+import { MembershipRole, OrganizationMembershipResource } from './organizationMembership';
 
 declare global {
   /**
@@ -27,6 +26,7 @@ export interface OrganizationResource {
   getPendingInvitations: (params?: GetPendingInvitationsParams) => Promise<OrganizationInvitationResource[]>;
   addMember: (params: AddMemberParams) => Promise<OrganizationMembershipResource>;
   inviteMember: (params: InviteMemberParams) => Promise<OrganizationInvitationResource>;
+  inviteMembers: (params: InviteMembersParams) => Promise<OrganizationInvitationResource[]>;
   updateMember: (params: UpdateMembershipParams) => Promise<OrganizationMembershipResource>;
   removeMember: (userId: string) => Promise<OrganizationMembershipResource>;
   destroy: () => Promise<void>;
@@ -44,6 +44,12 @@ export interface AddMemberParams {
 
 export interface InviteMemberParams {
   emailAddress: string;
+  role: MembershipRole;
+  redirectUrl?: string;
+}
+
+export interface InviteMembersParams {
+  emailAddresses: string[];
   role: MembershipRole;
   redirectUrl?: string;
 }
