@@ -4,7 +4,8 @@ import { Button, Icon } from '../customizables';
 import { ThreeDots } from '../icons';
 import { Menu, MenuItem, MenuList, MenuTrigger } from './Menu';
 
-type Action = { label: string; isDestructive?: boolean; onClick: () => unknown };
+type Action = { label: string; isDestructive?: boolean; onClick: () => unknown; isDisabled?: boolean };
+
 type ThreeDotsMenuProps = {
   actions: Action[];
 };
@@ -34,6 +35,7 @@ export const ThreeDotsMenu = (props: ThreeDotsMenuProps) => {
             key={a.label}
             destructive={a.isDestructive}
             onClick={a.onClick}
+            isDisabled={a.isDisabled}
           >
             {a.label}
           </MenuItem>

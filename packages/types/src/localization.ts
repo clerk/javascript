@@ -54,6 +54,7 @@ type _LocalizationResource = {
   badge__default: LocalizationValue;
   badge__unverified: LocalizationValue;
   badge__requiresAction: LocalizationValue;
+  badge__you: LocalizationValue;
   footerPageLink__help: LocalizationValue;
   footerPageLink__privacy: LocalizationValue;
   footerPageLink__terms: LocalizationValue;
