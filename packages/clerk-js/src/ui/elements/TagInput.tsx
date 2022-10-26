@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Flex, Icon, Input, Text } from '../customizables';
 import { Plus } from '../icons';
-import { common } from '../styledSystem';
+import { common, PropsOfComponent } from '../styledSystem';
 
 type Tag = string;
 
@@ -19,8 +19,10 @@ const useTags = (val: Tag[] = []) => {
   return { values, add, removeLast, remove, has };
 };
 
-export const TagInput = () => {
-  const tags = useTags(['nikos@clerk.dev', 'maria@clerk.dev']);
+type TagInputProps = PropsOfComponent<typeof Flex>;
+export const TagInput = (props: TagInputProps) => {
+  const { sx, ...rest } = props;
+  const tags = useTags([]);
   const keyReleasedRef = React.useRef(true);
   const [input, setInput] = React.useState('');
   const addTag = (tag: Tag) => {
@@ -64,13 +66,17 @@ export const TagInput = () => {
     <Flex
       gap={2}
       wrap='wrap'
-      sx={t => ({
-        maxWidth: '100%',
-        padding: `${t.space.$2x5} ${t.space.$4}`,
-        backgroundColor: t.colors.$colorInputBackground,
-        color: t.colors.$colorInputText,
-        ...common.borderVariants(t).normal,
-      })}
+      sx={[
+        t => ({
+          maxWidth: '100%',
+          padding: `${t.space.$2x5} ${t.space.$4}`,
+          backgroundColor: t.colors.$colorInputBackground,
+          color: t.colors.$colorInputText,
+          ...common.borderVariants(t).normal,
+        }),
+        sx,
+      ]}
+      {...rest}
     >
       {tags.values.map(tag => (
         <TagPill
@@ -90,6 +96,7 @@ export const TagInput = () => {
         onPaste={handlePaste}
         focusRing={false}
         sx={{
+          flexGrow: 1,
           border: 'none',
           width: 'initial',
           padding: 0,

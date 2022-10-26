@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useCoreOrganization } from '../../contexts';
+import { Flex, Text } from '../../customizables';
 import {
   Alert,
   Form,
@@ -19,7 +20,7 @@ import { ContentPage } from './OrganizationContentPage';
 
 export const InviteMembersPage = withCardStateProvider(() => {
   // const title = localizationKeys('userProfile.profilePage.title');
-  const title = 'Invite member';
+  const title = 'Invite members';
   const subtitle = 'Invite new members to this organization';
   const card = useCardState();
   const { organization } = useCoreOrganization();
@@ -75,27 +76,35 @@ export const InviteMembersPage = withCardStateProvider(() => {
           align='start'
           title={'The invitations could not be send. Fix the following and try again:'}
           subtitle={'nikos@clerk.dev, nikos@clerk.dev, nikos@clerk.dev, nikos@clerk.dev'}
+          sx={{ border: 0 }}
         />
 
         <Form.Root onSubmit={onSubmit}>
           <Form.ControlRow>
-            {/* <Form.Control
-              sx={{ flexBasis: '80%' }}
-              {...emailAddress.props}
-              required
-            /> */}
-            <TagInput />
+            <Flex
+              direction='col'
+              gap={2}
+              sx={{ width: '100%' }}
+            >
+              <Text>Email addresses</Text>
+              <TagInput sx={{ width: '100%' }} />
+            </Flex>
           </Form.ControlRow>
           <Form.ControlRow>
-            <Select
-              options={['admin', 'basic_member']}
-              value={'admin'}
-              onChange={() => {}}
+            <Flex
+              direction='col'
+              gap={2}
             >
-              {/* Pass value as child so that the defaultOptionBuilder is not used */}
-              <SelectButton>admin</SelectButton>
-              <SelectOptionList />
-            </Select>
+              <Text>Role</Text>
+              <Select
+                options={['admin', 'basic_member']}
+                value={'admin'}
+                onChange={() => {}}
+              >
+                <SelectButton />
+                <SelectOptionList />
+              </Select>
+            </Flex>
           </Form.ControlRow>
           <FormButtons isDisabled={!canSubmit} />
         </Form.Root>
