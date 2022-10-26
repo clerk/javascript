@@ -54,6 +54,7 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
   badge__default: 'Default',
   badge__unverified: 'Unverified',
   badge__requiresAction: 'Requires action',
+  badge__you: 'You',
   footerPageLink__help: 'Help',
   footerPageLink__privacy: 'Privacy',
   footerPageLink__terms: 'Terms',
