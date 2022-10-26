@@ -46,3 +46,4 @@ export * from './AvatarUploader';
 export * from './Actions';
 export * from './PopoverCard';
 export * from './TagInput';
+export * from './ThreeDotsMenu';
