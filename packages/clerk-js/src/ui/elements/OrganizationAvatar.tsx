@@ -13,7 +13,7 @@ export const OrganizationAvatar = (props: OrganizationAvatarProps) => {
   return (
     <Avatar
       title={name}
-      initials={name[0]}
+      initials={(name || ' ')[0]}
       imageUrl={logoUrl}
       rounded={false}
       {...rest}
