@@ -49,10 +49,10 @@ export const PhoneInput = (props: PhoneInputProps) => {
       <Select
         value={selectedCountryOption}
         options={countryOptions}
-        optionBuilder={(option, _index, isSelected) => (
+        optionBuilder={(option, _index, isFocused) => (
           <CountryCodeListItem
             sx={theme => ({
-              ...(isSelected && { backgroundColor: theme.colors.$blackAlpha200 }),
+              ...(isFocused && { backgroundColor: theme.colors.$blackAlpha200 }),
               '&:hover': {
                 backgroundColor: theme.colors.$blackAlpha200,
               },
