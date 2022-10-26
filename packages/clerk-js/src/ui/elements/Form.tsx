@@ -1,9 +1,9 @@
+import { createContextAndHook } from '@clerk/shared';
 import React from 'react';
 
 import { Button, descriptors, Flex, Form as FormPrim, localizationKeys } from '../customizables';
 import { useLoadingStatus } from '../hooks';
 import { PropsOfComponent } from '../styledSystem';
-import { createContextAndHook } from '@clerk/shared';
 import { useCardState } from './contexts';
 import { FormControl } from './FormControl';
 
