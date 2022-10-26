@@ -1,21 +1,33 @@
 import React from 'react';
 
-import { useEnvironment } from '../../contexts';
 import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
-import { Header, IconButton, NavbarMenuButtonRow, Tab, TabPanel, TabPanels, Tabs, TabsList } from '../../elements';
+import {
+  CardAlert,
+  Header,
+  IconButton,
+  NavbarMenuButtonRow,
+  Tab,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  TabsList,
+  useCardState,
+} from '../../elements';
 import { useNavigate } from '../../hooks';
 import { UserAdd } from '../../icons';
-import { MembersListTable } from './MemberListTable';
+import { ActiveMembersList } from './ActiveMembersList';
+import { InvitedMembersList } from './InvitationMemberList';
 
 export const OrganizationMembers = () => {
   const { navigate } = useNavigate();
-  const { attributes } = useEnvironment().userSettings;
+  const card = useCardState();
 
   return (
     <Col
       elementDescriptor={descriptors.page}
       gap={8}
     >
+      <CardAlert>{card.error}</CardAlert>
       <NavbarMenuButtonRow />
       <Col
         // elementDescriptor={descriptors.profilePage}
@@ -60,36 +72,5 @@ export const OrganizationMembers = () => {
         </Tabs>
       </Col>
     </Col>
-  );
-};
-
-const mockUsers = Array.from({ length: 34 }, (_, i) => ({
-  id: i.toString(),
-  firstName: `Corey${i}`,
-  lastName: `Doken${i}`,
-  primaryEmailAddress: {
-    emailAddress: `hello${i}@gmail.com`,
-  },
-  role: i % 2 ? 'admin' : 'basic_member',
-}));
-
-const ActiveMembersList = () => {
-  return (
-    <MembersListTable
-      users={mockUsers}
-      actions={[{ label: 'Remove member', destructive: true, onClick: () => {} }]}
-    />
-  );
-};
-
-const InvitedMembersList = () => {
-  return (
-    <MembersListTable
-      users={mockUsers.slice(0, 7)}
-      actions={[
-        { label: 'Resend invitation', onClick: () => {} },
-        { label: 'Revoke invitation', destructive: true, onClick: () => {} },
-      ]}
-    />
   );
 };

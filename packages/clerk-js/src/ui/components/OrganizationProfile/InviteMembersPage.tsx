@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
-import { Text } from '../../customizables';
 import {
   Alert,
   Form,
@@ -12,7 +11,6 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
-import { PropsOfComponent } from '../../styledSystem';
 import { useFormControl } from '../../utils';
 import { FormButtons } from '../UserProfile/FormButtons';
 import { SuccessPage } from '../UserProfile/SuccessPage';
@@ -68,9 +66,11 @@ export const InviteMembersPage = withCardStateProvider(() => {
         headerTitle={title}
         headerSubtitle={subtitle}
       >
-        <InviteAlert
+        <Alert
+          variant='danger'
+          align='start'
           title={'The invitations could not be send. Fix the following and try again:'}
-          subtitle={'invite3@example, invite4example.com'}
+          subtitle={'nikos@clerk.dev, nikos@clerk.dev, nikos@clerk.dev, nikos@clerk.dev'}
         />
 
         <Form.Root onSubmit={onSubmit}>
@@ -104,18 +104,3 @@ export const InviteMembersPage = withCardStateProvider(() => {
     </Wizard>
   );
 });
-
-type InviteAlertProps = PropsOfComponent<typeof Alert> & { title?: string; subtitle?: string };
-const InviteAlert = (props: InviteAlertProps) => {
-  const { title, subtitle } = props;
-  return (
-    <Alert
-      variant='danger'
-      align='start'
-      sx={{ border: 0 }}
-    >
-      <Text>{title}</Text>
-      <Text sx={t => ({ opacity: t.opacity.$inactive })}>{subtitle}</Text>
-    </Alert>
-  );
-};
