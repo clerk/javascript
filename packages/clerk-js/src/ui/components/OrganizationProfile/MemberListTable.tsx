@@ -100,8 +100,8 @@ export const RowContainer = (props: PropsOfComponent<typeof Tr>) => {
   );
 };
 
-export const RoleSelect = (props: { value: MembershipRole; onChange: any }) => {
-  const { value, onChange } = props;
+export const RoleSelect = (props: { value: MembershipRole; onChange: any; isDisabled?: boolean }) => {
+  const { value, onChange, isDisabled } = props;
   const { t } = useLocalizations();
 
   const roles: Array<{ label: string; value: MembershipRole }> = [
@@ -122,6 +122,7 @@ export const RoleSelect = (props: { value: MembershipRole; onChange: any }) => {
           color: t.colors.$colorTextSecondary,
           backgroundColor: 'transparent',
         })}
+        isDisabled={isDisabled}
       >
         {roles.find(r => r.value === value)!.label}
       </SelectButton>
