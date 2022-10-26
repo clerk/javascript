@@ -195,7 +195,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
 
   const scrollToItemOnSelectedIndexChange = () => {
     if (!isOpen) {
-      setFocusedIndex(0);
+      setFocusedIndex(-1);
       return;
     }
     focusedItemRef.current?.scrollIntoView({ block: 'nearest' });
