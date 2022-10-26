@@ -25,6 +25,7 @@ export const TagInput = (props: TagInputProps) => {
   const tags = useTags([]);
   const keyReleasedRef = React.useRef(true);
   const [input, setInput] = React.useState('');
+  const inputRef = React.useRef<HTMLInputElement>(null);
   const addTag = (tag: Tag) => {
     tags.add(tag);
     setInput('');
@@ -66,6 +67,9 @@ export const TagInput = (props: TagInputProps) => {
     <Flex
       gap={2}
       wrap='wrap'
+      onClick={() => {
+        inputRef.current?.focus();
+      }}
       sx={[
         t => ({
           maxWidth: '100%',
@@ -87,6 +91,7 @@ export const TagInput = (props: TagInputProps) => {
         </TagPill>
       ))}
       <Input
+        ref={inputRef}
         value={input}
         type='email'
         placeholder={placeholder}
@@ -95,12 +100,13 @@ export const TagInput = (props: TagInputProps) => {
         onChange={handleChange}
         onPaste={handlePaste}
         focusRing={false}
-        sx={{
+        sx={t => ({
           flexGrow: 1,
           border: 'none',
           width: 'initial',
           padding: 0,
-        }}
+          paddingLeft: t.space.$1,
+        })}
       />
     </Flex>
   );
