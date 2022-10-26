@@ -35,7 +35,9 @@ export const Avatar = (props: AvatarProps) => {
   const avatarExists = hasAvatar(imageUrl);
   let src;
 
-  if (avatarExists && !optimize && imageUrl) {
+  if (!avatarExists) {
+    src = GRAVATAR_DEFAULT_AVATAR;
+  } else if (!optimize && imageUrl) {
     const optimizedHeight = Math.max(imageFetchSize) * (isRetinaDisplay() ? 2 : 1);
     const srcUrl = new URL(imageUrl);
     srcUrl.searchParams.append('height', optimizedHeight.toString());
@@ -98,6 +100,7 @@ const InitialsAvatarFallback = (props: { initials: string }) => {
   );
 };
 
+const GRAVATAR_DEFAULT_AVATAR = 'https://www.gravatar.com/avatar?d=mp';
 const CLERK_IMAGE_URL_REGEX = /https:\/\/images\.(lcl)?clerk/i;
 
 // TODO: How do we want to handle this?
