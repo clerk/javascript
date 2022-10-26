@@ -114,24 +114,24 @@ type SelectOptionBuilderProps<O = unknown> = {
   isSelected: boolean;
 };
 
-const _SelectOptionBuilder = (props: SelectOptionBuilderProps, ref?: React.ForwardedRef<HTMLDivElement>) => {
-  const { option, optionBuilder, index, handleSelect, isSelected } = props;
-  return (
-    <Flex
-      ref={ref}
-      sx={{
-        userSelect: 'none',
-      }}
-      onClick={() => {
-        handleSelect(option);
-      }}
-    >
-      {optionBuilder(option, index, isSelected)}
-    </Flex>
-  );
-};
-
-const SelectOptionBuilder = React.memo(React.forwardRef(_SelectOptionBuilder));
+const SelectOptionBuilder = React.memo(
+  React.forwardRef((props: SelectOptionBuilderProps, ref?: React.ForwardedRef<HTMLDivElement>) => {
+    const { option, optionBuilder, index, handleSelect, isSelected } = props;
+    return (
+      <Flex
+        ref={ref}
+        sx={{
+          userSelect: 'none',
+        }}
+        onClick={() => {
+          handleSelect(option);
+        }}
+      >
+        {optionBuilder(option, index, isSelected)}
+      </Flex>
+    );
+  }),
+);
 
 const SelectSearchbar = (props: PropsOfComponent<typeof InputWithIcon>) => {
   const { sx, ...rest } = props;

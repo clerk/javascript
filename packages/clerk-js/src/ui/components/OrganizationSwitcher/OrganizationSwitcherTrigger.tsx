@@ -11,12 +11,7 @@ type OrganizationSwitcherTriggerProps = PropsOfComponent<typeof Button> & { isOp
 export const OrganizationSwitcherTrigger = React.forwardRef<HTMLButtonElement, OrganizationSwitcherTriggerProps>(
   (props, ref) => {
     const user = useCoreUser();
-    const { organization, isLoaded } = useCoreOrganization();
-
-    // TODO: if org is undfined, isloaded returns false always
-    // if (!isLoaded) {
-    //   return null;
-    // }
+    const { organization } = useCoreOrganization();
 
     const showPersonalAccount = true;
 
@@ -46,9 +41,11 @@ export const OrganizationSwitcherTrigger = React.forwardRef<HTMLButtonElement, O
               user={user}
               rounded={false}
               size={'sm'}
-              subtitle={localizationKeys(
-                showPersonalAccount ? 'organizationSwitcher.personalWorkspace' : 'organizationSwitcher.notSelected',
-              )}
+              subtitle={
+                showPersonalAccount
+                  ? localizationKeys('organizationSwitcher.personalWorkspace')
+                  : localizationKeys('organizationSwitcher.notSelected')
+              }
             />
           )}
           <Icon icon={Selector} />
