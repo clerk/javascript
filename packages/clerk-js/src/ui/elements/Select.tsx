@@ -123,6 +123,7 @@ const SelectOptionBuilder = React.memo(
         ref={ref}
         sx={{
           userSelect: 'none',
+          cursor: 'pointer',
         }}
         onClick={() => {
           handleSelect(option);
