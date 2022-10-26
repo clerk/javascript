@@ -33,7 +33,7 @@ export const OrganizationProfileNavbar = (
               name: 'Drivepoint',
               logoUrl: 'https://images.lclclerk.com/uploaded/img_2GE5fixIVWTNMdRjcH7ivtelSxT.png',
             }}
-            sx={t => ({ margin: `0 0 ${t.space.$2x5} ${t.space.$2}` })}
+            sx={t => ({ margin: `0 0 ${t.space.$2x5} ${t.space.$2}`, maxWidth: t.space.$60 })}
           />
         }
         routes={organizationProfileRoutes}
