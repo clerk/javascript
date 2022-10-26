@@ -19,15 +19,27 @@ const useTags = (val: Tag[] = []) => {
   return { values, add, removeLast, remove, has };
 };
 
-type TagInputProps = PropsOfComponent<typeof Flex> & { placeholder?: string };
+type TagInputProps = PropsOfComponent<typeof Flex> & {
+  validate?: (tag: Tag) => boolean;
+  placeholder?: string;
+};
+
 export const TagInput = (props: TagInputProps) => {
-  const { sx, placeholder = 'Enter a tag', ...rest } = props;
+  const { sx, placeholder, validate = () => true, ...rest } = props;
   const tags = useTags([]);
   const keyReleasedRef = React.useRef(true);
+  const inputRef = React.useRef<HTMLInputElement>(null);
   const [input, setInput] = React.useState('');
+
   const addTag = (tag: Tag) => {
-    tags.add(tag);
-    setInput('');
+    if (tag.length && validate(tag)) {
+      tags.add(tag);
+      setInput('');
+    }
+  };
+
+  const focusInput = () => {
+    inputRef.current?.focus();
   };
 
   const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = e => {
@@ -40,6 +52,11 @@ export const TagInput = (props: TagInputProps) => {
       tags.removeLast();
     }
     keyReleasedRef.current = false;
+  };
+
+  const handleOnBlur: React.FocusEventHandler = e => {
+    e.preventDefault();
+    addTag(input);
   };
 
   const handleKeyUp: React.KeyboardEventHandler<HTMLInputElement> = () => {
@@ -64,14 +81,19 @@ export const TagInput = (props: TagInputProps) => {
 
   return (
     <Flex
+      align={'start'}
       gap={2}
       wrap='wrap'
+      onClick={focusInput}
+      onFocus={focusInput}
+      onBlur={handleOnBlur}
       sx={[
         t => ({
           maxWidth: '100%',
           padding: `${t.space.$2x5} ${t.space.$4}`,
           backgroundColor: t.colors.$colorInputBackground,
           color: t.colors.$colorInputText,
+          minHeight: t.sizes.$20,
           ...common.borderVariants(t).normal,
         }),
         sx,
@@ -87,9 +109,10 @@ export const TagInput = (props: TagInputProps) => {
         </TagPill>
       ))}
       <Input
+        ref={inputRef}
         value={input}
         type='email'
-        placeholder={placeholder}
+        placeholder={!tags.values.length ? placeholder : undefined}
         onKeyDown={handleKeyDown}
         onKeyUp={handleKeyUp}
         onChange={handleChange}
