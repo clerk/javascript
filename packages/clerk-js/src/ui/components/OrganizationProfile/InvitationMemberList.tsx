@@ -34,10 +34,17 @@ const InvitationRow = (props: { invitation: OrganizationInvitationResource }) =>
 
   return (
     <RowContainer>
-      <Td sx={{ width: '100%' }}>
+      <Td
+        sx={{
+          width: '100%',
+          p: {
+            maxWidth: '20ch',
+          },
+        }}
+      >
         <UserPreview user={{ primaryEmailAddress: { emailAddress: invitation.emailAddress } } as any} />
       </Td>
-      <Td sx={{ width: '10%' }}>{invitation.createdAt.toLocaleDateString()}</Td>
+      <Td>{invitation.createdAt.toLocaleDateString()}</Td>
       <Td>
         <Text
           colorScheme={'neutral'}
