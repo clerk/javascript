@@ -51,13 +51,20 @@ const MemberRow = (props: { membership: OrganizationMembershipResource }) => {
 
   return (
     <RowContainer>
-      <Td sx={{ width: '50%' }}>
+      <Td
+        sx={{
+          width: '100%',
+          p: {
+            maxWidth: '20ch',
+          },
+        }}
+      >
         <UserPreview
           user={membership.publicUserData}
           subtitle={membership.publicUserData.identifier}
         />
       </Td>
-      <Td sx={{ width: '10%' }}>{membership.createdAt.toLocaleDateString()}</Td>
+      <Td>{membership.createdAt.toLocaleDateString()}</Td>
       <Td>
         <RoleSelect
           isDisabled={!isAdmin || card.isLoading}
