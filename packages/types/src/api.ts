@@ -8,6 +8,7 @@ export interface ClerkAPIError {
   meta?: {
     paramName?: string;
     sessionId?: string;
+    emailAddresses?: string[];
   };
 }
 
