@@ -7,12 +7,13 @@ import { FileDropArea } from './FileDropArea';
 
 export type AvatarUploaderProps = {
   title: LocalizationKey;
-  avatarPreview: React.ReactNode;
+  avatarPreview: React.ReactElement;
   onAvatarChange: (file: File) => Promise<unknown>;
 };
 
 export const AvatarUploader = (props: AvatarUploaderProps) => {
   const [showUpload, setShowUpload] = React.useState(false);
+  const [objectUrl, setObjectUrl] = React.useState<string>();
   const card = useCardState();
   const { onAvatarChange, title, avatarPreview, ...rest } = props;
 
@@ -21,6 +22,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
   };
 
   const handleFileDrop = (file: File) => {
+    setObjectUrl(URL.createObjectURL(file));
     card.setLoading();
     return onAvatarChange(file)
       .then(() => {
@@ -30,6 +32,10 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
       .catch(err => handleError(err, [], card.setError));
   };
 
+  React.useEffect(() => () => {
+    objectUrl && URL.revokeObjectURL(objectUrl);
+  });
+
   return (
     <Col gap={4}>
       <Flex
@@ -37,7 +43,9 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
         align='center'
         {...rest}
       >
-        {avatarPreview}
+        {objectUrl
+          ? React.cloneElement(avatarPreview, { logoUrl: objectUrl, profileImageUrl: objectUrl })
+          : avatarPreview}
         <Col gap={1}>
           <Text
             localizationKey={title}
