@@ -87,7 +87,10 @@ export const InviteMembersPage = withCardStateProvider(() => {
               sx={{ width: '100%' }}
             >
               <Text>Email addresses</Text>
-              <TagInput sx={{ width: '100%' }} />
+              <TagInput
+                placeholder='Enter one or more email addresses, separated by spaces or commas'
+                sx={{ width: '100%' }}
+              />
             </Flex>
           </Form.ControlRow>
           <Form.ControlRow>

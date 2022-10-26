@@ -19,9 +19,9 @@ const useTags = (val: Tag[] = []) => {
   return { values, add, removeLast, remove, has };
 };
 
-type TagInputProps = PropsOfComponent<typeof Flex>;
+type TagInputProps = PropsOfComponent<typeof Flex> & { placeholder?: string };
 export const TagInput = (props: TagInputProps) => {
-  const { sx, ...rest } = props;
+  const { sx, placeholder = 'Enter a tag', ...rest } = props;
   const tags = useTags([]);
   const keyReleasedRef = React.useRef(true);
   const [input, setInput] = React.useState('');
@@ -89,7 +89,7 @@ export const TagInput = (props: TagInputProps) => {
       <Input
         value={input}
         type='email'
-        placeholder='Enter a tag'
+        placeholder={placeholder}
         onKeyDown={handleKeyDown}
         onKeyUp={handleKeyUp}
         onChange={handleChange}
