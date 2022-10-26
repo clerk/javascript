@@ -34,10 +34,32 @@ export class OrganizationInvitation extends BaseResource implements Organization
         } as any,
       })
     )?.response as unknown as OrganizationInvitationJSON;
-
     const newInvitation = new OrganizationInvitation(json);
     this.clerk.__unstable__invitationUpdate(newInvitation);
     return newInvitation;
+  }
+
+  static async createMany(
+    organizationId: string,
+    params: CreateManyOrganizationInvitationParams,
+  ): Promise<OrganizationInvitationResource[]> {
+    const { emailAddresses, redirectUrl, role, publicMetadata} = params;
+    const json = (
+      await BaseResource._fetch<OrganizationInvitationJSON>({
+        path: `/organizations/${organizationId}/invitations/bulk`,
+        method: 'POST',
+        body: {
+          email_address: emailAddresses,
+          role,
+          redirect_url: redirectUrl,
+          public_metadata: JSON.stringify(publicMetadata),
+        } as any,
+      })
+    )?.response as unknown as OrganizationInvitationJSON[];
+    // const newInvitation = new OrganizationInvitation(json);
+    // TODO: Figure out what this is...
+    // this.clerk.__unstable__invitationUpdate(newInvitation);
+    return json.map(invitationJson => new OrganizationInvitation(invitationJson));
   }
 
   constructor(data: OrganizationInvitationJSON) {
@@ -70,5 +92,4 @@ export type CreateOrganizationInvitationParams = {
   emailAddress: string;
   role: MembershipRole;
   redirectUrl?: string;
-  publicMetadata?: Record<string, unknown>;
 };
