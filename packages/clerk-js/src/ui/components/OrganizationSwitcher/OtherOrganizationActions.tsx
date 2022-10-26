@@ -66,7 +66,7 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
       <Box
         sx={t => ({
           maxHeight: `calc(3 * ${t.sizes.$14})`,
-          overflowY: 'scroll',
+          overflowY: 'auto',
           ...common.unstyledScrollbar(t),
         })}
       >
