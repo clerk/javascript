@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Flex, Icon, Input, Text } from '../customizables';
+import { Flex, Icon, Input, LocalizationKey, Text, useLocalizations } from '../customizables';
 import { Plus } from '../icons';
 import { common, PropsOfComponent } from '../styledSystem';
 
@@ -9,24 +9,27 @@ type Tag = string;
 const useTags = (val: Tag[] = []) => {
   const [, _update] = React.useState({});
   const update = React.useCallback(() => _update({}), []);
-  const set = React.useRef(new Set<Tag>(val)).current;
   const sanitize = (val: string) => val.trim();
+  const set = React.useRef(new Set<Tag>(val.map(sanitize).filter(Boolean))).current;
   const add = (tag: Tag) => set.add(sanitize(tag)) && update();
   const removeLast = () => set.delete([...set.values()].pop() || '') && update();
   const remove = (tag: Tag) => set.delete(tag) && update();
   const has = (tag: Tag) => set.has(tag);
-  const values = [...set.values()];
+  const values = () => [...set.values()];
   return { values, add, removeLast, remove, has };
 };
 
-type TagInputProps = PropsOfComponent<typeof Flex> & {
+type TagInputProps = Pick<PropsOfComponent<typeof Flex>, 'sx'> & {
+  value: string;
+  onChange: React.ChangeEventHandler<HTMLInputElement>;
   validate?: (tag: Tag) => boolean;
-  placeholder?: string;
+  placeholder?: LocalizationKey | string;
 };
 
 export const TagInput = (props: TagInputProps) => {
-  const { sx, placeholder, validate = () => true, ...rest } = props;
-  const tags = useTags([]);
+  const { t } = useLocalizations();
+  const { sx, placeholder, validate = () => true, value: valueProp, onChange: onChangeProp, ...rest } = props;
+  const tags = useTags(valueProp.split(','));
   const keyReleasedRef = React.useRef(true);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [input, setInput] = React.useState('');
@@ -35,6 +38,8 @@ export const TagInput = (props: TagInputProps) => {
     if (tag.length && validate(tag)) {
       tags.add(tag);
       setInput('');
+      onChangeProp({ target: { value: tags.values().join(',') } } as any);
+      focusInput();
     }
   };
 
@@ -47,7 +52,7 @@ export const TagInput = (props: TagInputProps) => {
     if ((key === ',' || key === ' ' || key === 'Enter') && !!input.length) {
       e.preventDefault();
       addTag(input);
-    } else if (key === 'Backspace' && !input.length && !!tags.values.length && keyReleasedRef.current) {
+    } else if (key === 'Backspace' && !input.length && !!tags.values().length && keyReleasedRef.current) {
       e.preventDefault();
       tags.removeLast();
     }
@@ -100,7 +105,7 @@ export const TagInput = (props: TagInputProps) => {
       ]}
       {...rest}
     >
-      {tags.values.map(tag => (
+      {tags.values().map(tag => (
         <TagPill
           key={tag}
           onRemoveClick={() => tags.remove(tag)}
@@ -112,18 +117,19 @@ export const TagInput = (props: TagInputProps) => {
         ref={inputRef}
         value={input}
         type='email'
-        placeholder={!tags.values.length ? placeholder : undefined}
+        placeholder={!tags.values().length ? t(placeholder) : undefined}
         onKeyDown={handleKeyDown}
         onKeyUp={handleKeyUp}
         onChange={handleChange}
         onPaste={handlePaste}
         focusRing={false}
-        sx={{
+        sx={t => ({
           flexGrow: 1,
           border: 'none',
           width: 'initial',
           padding: 0,
-        }}
+          paddingLeft: t.space.$1,
+        })}
       />
     </Flex>
   );
