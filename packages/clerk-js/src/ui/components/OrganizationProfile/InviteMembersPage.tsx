@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
+import { useCoreOrganization } from '../../contexts';
 import {
   Alert,
   Form,
@@ -21,10 +22,11 @@ export const InviteMembersPage = withCardStateProvider(() => {
   const title = 'Invite member';
   const subtitle = 'Invite new members to this organization';
   const card = useCardState();
+  const { organization } = useCoreOrganization();
 
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
 
-  const organizationName = useFormControl('emailAddress', '', {
+  const emailAddressField = useFormControl('emailAddress', `nikos+${Date.now()}@clerk.dev`, {
     type: 'text',
     // label: localizationKeys('formFieldLabel__firstName'),
     // placeholder: localizationKeys('formFieldInputPlaceholder__firstName'),
@@ -32,7 +34,7 @@ export const InviteMembersPage = withCardStateProvider(() => {
     placeholder: '',
   });
 
-  const role = useFormControl('role', '', {
+  const roleField = useFormControl('role', 'basic_member', {
     type: 'text',
     // label: localizationKeys('formFieldLabel__firstName'),
     // placeholder: localizationKeys('formFieldInputPlaceholder__firstName'),
@@ -40,23 +42,25 @@ export const InviteMembersPage = withCardStateProvider(() => {
     placeholder: '',
   });
 
-  const dataChanged = 'placeholder' !== organizationName.value;
+  const dataChanged = 'placeholder' !== emailAddressField.value;
   const canSubmit = dataChanged;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    wizard.nextStep();
+    return organization
+      .inviteMember({ emailAddress: emailAddressField.value, role: roleField.value })
+      .then(wizard.nextStep);
 
     // return (
     // dataChanged
-    //   ? user.update({ firstName: organizationName.value, lastName: lastNameField.value })
+    //   ? user.update({ firstName: emailAddress.value, lastName: lastNameField.value })
     // : Promise.resolve()
     // )
     //   .then(() => {
     //     wizard.nextStep();
     //   })
     // .catch(err => {
-    //   handleError(err, [organizationName, lastNameField], card.setError);
+    //   handleError(err, [emailAddress, lastNameField], card.setError);
     // });
   };
 
@@ -77,7 +81,7 @@ export const InviteMembersPage = withCardStateProvider(() => {
           <Form.ControlRow>
             {/* <Form.Control
               sx={{ flexBasis: '80%' }}
-              {...organizationName.props}
+              {...emailAddress.props}
               required
             /> */}
             <TagInput />
