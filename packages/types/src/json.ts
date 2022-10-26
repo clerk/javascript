@@ -231,6 +231,7 @@ export interface ClerkAPIErrorJSON {
   meta?: {
     param_name?: string;
     session_id?: string;
+    email_addresses?: string[];
   };
 }
 
