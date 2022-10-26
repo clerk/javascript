@@ -19,7 +19,9 @@ import { animations, mqu, PropsOfComponent } from '../styledSystem';
 import { colors } from '../utils';
 
 type NavbarContextValue = { isOpen: boolean; open: () => void; close: () => void };
-export const [NavbarContext, useNavbarContext] = createContextAndHook<NavbarContextValue>('NavbarContext');
+export const [NavbarContext, useNavbarContext, useUnsafeNavbarContext] =
+  createContextAndHook<NavbarContextValue>('NavbarContext');
+
 export const NavbarContextProvider = (props: React.PropsWithChildren<{}>) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const open = React.useCallback(() => setIsOpen(true), []);
@@ -243,8 +245,14 @@ const NavButton = (props: NavButtonProps) => {
 };
 
 export const NavbarMenuButtonRow = (props: PropsOfComponent<typeof Button>) => {
-  const { open } = useNavbarContext();
+  const { open } = useUnsafeNavbarContext();
   const { t } = useLocalizations();
+
+  const navbarContextExistsInTree = !!open;
+  if (!navbarContextExistsInTree) {
+    return null;
+  }
+
   return (
     <Flex
       elementDescriptor={descriptors.navbarMobileMenuRow}

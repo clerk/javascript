@@ -1,6 +1,5 @@
-import React from 'react';
-
 import { createContextAndHook } from '@clerk/shared';
+import React from 'react';
 
 export type FormControlProps = {
   /**
@@ -15,10 +14,8 @@ export type FormControlProps = {
 
 type FormControlContextValue = Required<FormControlProps> & { errorMessageId: string };
 
-export const [FormControlContext, useFormControl] = createContextAndHook<FormControlContextValue>(
-  'FormControlContext',
-  { skipCheck: true },
-);
+export const [FormControlContext, , useFormControl] =
+  createContextAndHook<FormControlContextValue>('FormControlContext');
 
 export const FormControlContextProvider = (props: React.PropsWithChildren<FormControlProps>) => {
   const { id: propsId, isRequired = false, hasError = false, isDisabled = false } = props;
