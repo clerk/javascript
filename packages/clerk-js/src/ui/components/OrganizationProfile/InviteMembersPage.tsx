@@ -18,6 +18,8 @@ import { FormButtons } from '../UserProfile/FormButtons';
 import { SuccessPage } from '../UserProfile/SuccessPage';
 import { ContentPage } from './OrganizationContentPage';
 
+const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);
+
 export const InviteMembersPage = withCardStateProvider(() => {
   // const title = localizationKeys('userProfile.profilePage.title');
   const title = 'Invite members';
@@ -51,18 +53,6 @@ export const InviteMembersPage = withCardStateProvider(() => {
     return organization
       .inviteMember({ emailAddress: emailAddressField.value, role: roleField.value })
       .then(wizard.nextStep);
-
-    // return (
-    // dataChanged
-    //   ? user.update({ firstName: emailAddress.value, lastName: lastNameField.value })
-    // : Promise.resolve()
-    // )
-    //   .then(() => {
-    //     wizard.nextStep();
-    //   })
-    // .catch(err => {
-    //   handleError(err, [emailAddress, lastNameField], card.setError);
-    // });
   };
 
   return (
@@ -88,6 +78,7 @@ export const InviteMembersPage = withCardStateProvider(() => {
             >
               <Text>Email addresses</Text>
               <TagInput
+                validate={isEmail}
                 placeholder='Enter one or more email addresses, separated by spaces or commas'
                 sx={{ width: '100%' }}
               />
