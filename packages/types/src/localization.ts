@@ -16,6 +16,7 @@ type _LocalizationResource = {
   socialButtonsBlockButton: LocalizationValue;
   dividerText: LocalizationValue;
   formFieldLabel__emailAddress: LocalizationValue;
+  formFieldLabel__emailAddresses: LocalizationValue;
   formFieldLabel__phoneNumber: LocalizationValue;
   formFieldLabel__username: LocalizationValue;
   formFieldLabel__emailAddress_phoneNumber: LocalizationValue;
@@ -30,6 +31,7 @@ type _LocalizationResource = {
   formFieldLabel__backupCode: LocalizationValue;
   formFieldLabel__organizationName: LocalizationValue;
   formFieldInputPlaceholder__emailAddress: LocalizationValue;
+  formFieldInputPlaceholder__emailAddresses: LocalizationValue;
   formFieldInputPlaceholder__phoneNumber: LocalizationValue;
   formFieldInputPlaceholder__username: LocalizationValue;
   formFieldInputPlaceholder__emailAddress_phoneNumber: LocalizationValue;

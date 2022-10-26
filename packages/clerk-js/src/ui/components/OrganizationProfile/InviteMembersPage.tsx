@@ -1,8 +1,10 @@
+import { MembershipRole } from '@clerk/types';
 import React from 'react';
 
+import { ClerkAPIResponseError } from '../../../core/resources/Error';
 import { useWizard, Wizard } from '../../common';
 import { useCoreOrganization } from '../../contexts';
-import { Flex, Text } from '../../customizables';
+import { Flex, localizationKeys, Text } from '../../customizables';
 import {
   Alert,
   Form,
@@ -13,7 +15,7 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
-import { useFormControl } from '../../utils';
+import { handleError, useFormControl } from '../../utils';
 import { FormButtons } from '../UserProfile/FormButtons';
 import { SuccessPage } from '../UserProfile/SuccessPage';
 import { ContentPage } from './OrganizationContentPage';
@@ -26,15 +28,18 @@ export const InviteMembersPage = withCardStateProvider(() => {
   const subtitle = 'Invite new members to this organization';
   const card = useCardState();
   const { organization } = useCoreOrganization();
+  const [invalidEmails, setInvalidEmails] = React.useState<string[]>([]);
+
+  if (!organization) {
+    return null;
+  }
 
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
 
-  const emailAddressField = useFormControl('emailAddress', `nikos+${Date.now()}@clerk.dev`, {
+  const emailAddressField = useFormControl('emailAddress', '', {
     type: 'text',
-    // label: localizationKeys('formFieldLabel__firstName'),
-    // placeholder: localizationKeys('formFieldInputPlaceholder__firstName'),
-    label: 'Email addresses',
-    placeholder: '',
+    label: localizationKeys('formFieldLabel__emailAddresses'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__emailAddresses'),
   });
 
   const roleField = useFormControl('role', 'basic_member', {
@@ -45,14 +50,33 @@ export const InviteMembersPage = withCardStateProvider(() => {
     placeholder: '',
   });
 
-  const dataChanged = 'placeholder' !== emailAddressField.value;
-  const canSubmit = dataChanged;
+  React.useEffect(() => {
+    // Remove invalid emails from the tag input
+    if (invalidEmails.length) {
+      const invalids = new Set(invalidEmails);
+      const emails = emailAddressField.value.split(',');
+      console.log(invalids, emails);
+      emailAddressField.setValue(emails.filter(e => !invalids.has(e)).join(','));
+    }
+  }, [invalidEmails]);
+
+  const canSubmit = !!emailAddressField.value.length;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     return organization
-      .inviteMember({ emailAddress: emailAddressField.value, role: roleField.value })
-      .then(wizard.nextStep);
+      .inviteMembers({ emailAddresses: emailAddressField.value.split(','), role: roleField.value as MembershipRole })
+      .then(wizard.nextStep)
+      .catch(err => {
+        if (err instanceof ClerkAPIResponseError) {
+          const invalids = err.errors[0].meta?.emailAddresses || [];
+          if (invalids.length) {
+            setInvalidEmails(invalids);
+          } else {
+            handleError(err, [], card.setError);
+          }
+        }
+      });
   };
 
   return (
@@ -61,13 +85,15 @@ export const InviteMembersPage = withCardStateProvider(() => {
         headerTitle={title}
         headerSubtitle={subtitle}
       >
-        <Alert
-          variant='danger'
-          align='start'
-          title={'The invitations could not be send. Fix the following and try again:'}
-          subtitle={'nikos@clerk.dev, nikos@clerk.dev, nikos@clerk.dev, nikos@clerk.dev'}
-          sx={{ border: 0 }}
-        />
+        {!!invalidEmails.length && (
+          <Alert
+            variant='danger'
+            align='start'
+            title={'The invitations could not be send. Fix the following and try again:'}
+            subtitle={invalidEmails.join(', ')}
+            sx={{ border: 0 }}
+          />
+        )}
 
         <Form.Root onSubmit={onSubmit}>
           <Form.ControlRow>
@@ -78,8 +104,8 @@ export const InviteMembersPage = withCardStateProvider(() => {
             >
               <Text>Email addresses</Text>
               <TagInput
+                {...emailAddressField.props}
                 validate={isEmail}
-                placeholder='Enter one or more email addresses, separated by spaces or commas'
                 sx={{ width: '100%' }}
               />
             </Flex>
@@ -93,7 +119,7 @@ export const InviteMembersPage = withCardStateProvider(() => {
               <Select
                 options={['admin', 'basic_member']}
                 value={'admin'}
-                onChange={() => {}}
+                onChange={option => {}}
               >
                 <SelectButton />
                 <SelectOptionList />
