@@ -73,6 +73,7 @@ export const InviteMembersPage = withCardStateProvider(() => {
           if (invalids.length) {
             setInvalidEmails(invalids);
           } else {
+            setInvalidEmails([]);
             handleError(err, [], card.setError);
           }
         }
