@@ -1,5 +1,5 @@
 import {
-  CreateManyOrganizationInvitationParams,
+  CreateBulkOrganizationInvitationParams,
   CreateOrganizationInvitationParams,
   MembershipRole,
   OrganizationInvitationJSON,
@@ -35,9 +35,9 @@ export class OrganizationInvitation extends BaseResource implements Organization
     return newInvitation;
   }
 
-  static async createMany(
+  static async createBulk(
     organizationId: string,
-    params: CreateManyOrganizationInvitationParams,
+    params: CreateBulkOrganizationInvitationParams,
   ): Promise<OrganizationInvitationResource[]> {
     const { emailAddresses, redirectUrl, role } = params;
     const json = (
