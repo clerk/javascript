@@ -9,6 +9,7 @@ Organization {
   "getPendingInvitations": [Function],
   "id": "test_id",
   "inviteMember": [Function],
+  "inviteMembers": [Function],
   "logoUrl": "https://url-for-logo.png",
   "name": "test_name",
   "pathRoot": "/organizations",
