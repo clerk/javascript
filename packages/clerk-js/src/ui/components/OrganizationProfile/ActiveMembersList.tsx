@@ -8,11 +8,12 @@ import { handleError } from '../../utils';
 import { MembersListTable, RoleSelect, RowContainer } from './MemberListTable';
 
 const MOCK_ITEM_COUNT = 28;
+const ITEMS_PER_PAGE = 10;
+
 export const ActiveMembersList = () => {
-  const itemsPerPage = 10;
   const { page, changePage } = usePagination({ defaultPage: 1 });
   const { membershipList } = useCoreOrganization({
-    membershipList: { offset: (page - 1) * itemsPerPage, limit: itemsPerPage },
+    membershipList: { offset: (page - 1) * ITEMS_PER_PAGE, limit: ITEMS_PER_PAGE },
   });
 
   return (
@@ -61,15 +62,9 @@ const MemberRow = (props: { membership: OrganizationMembershipResource }) => {
 
   return (
     <RowContainer>
-      <Td
-        sx={{
-          width: '100%',
-          p: {
-            maxWidth: '20ch',
-          },
-        }}
-      >
+      <Td>
         <UserPreview
+          sx={{ maxWidth: '30ch' }}
           user={membership.publicUserData}
           subtitle={membership.publicUserData.identifier}
           badge={isCurrentUser && <Badge localizationKey={localizationKeys('badge__you')} />}
