@@ -1,5 +1,5 @@
 {
-  "version": "4.4.5",
+  "version": "4.4.6-staging.0",
   "license": "MIT",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -38,8 +38,8 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@clerk/backend-core": "^2.9.2",
-    "@clerk/types": "^3.13.0",
+    "@clerk/backend-core": "^2.9.3-staging.0",
+    "@clerk/types": "^3.14.0-staging.0",
     "@peculiar/webcrypto": "^1.4.0",
     "@types/cookies": "^0.7.7",
     "@types/express": "^4.17.11",
