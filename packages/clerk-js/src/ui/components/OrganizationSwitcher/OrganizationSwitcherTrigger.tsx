@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useCoreOrganization, useCoreUser } from '../../contexts';
+import { useCoreOrganization, useCoreUser, useOrganizationSwitcherContext } from '../../contexts';
 import { Button, Flex, Icon, localizationKeys } from '../../customizables';
 import { OrganizationPreview, PersonalWorkspacePreview } from '../../elements';
 import { Selector } from '../../icons';
@@ -12,8 +12,7 @@ export const OrganizationSwitcherTrigger = React.forwardRef<HTMLButtonElement, O
   (props, ref) => {
     const user = useCoreUser();
     const { organization } = useCoreOrganization();
-
-    const showPersonalAccount = true;
+    const { showPersonalAccount } = useOrganizationSwitcherContext();
 
     return (
       <Button

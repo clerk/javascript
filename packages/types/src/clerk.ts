@@ -493,13 +493,10 @@ export type OrganizationProfileProps = {
    */
   path?: string;
   /*
-   * Hides the default navigation bar
+   * If set to true, the OrganizationProfile will display the Create Organization flow
+   * @default false
    */
-  hideNavigation?: boolean;
-  /*
-   * Renders only a specific view of the component eg: 'security'
-   */
-  only?: 'account' | 'security';
+  createOrganization?: boolean;
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
@@ -561,10 +558,17 @@ export type OrganizationSwitcherProps = {
    */
   defaultOpen?: boolean;
   /**
-   * Full URL or path to navigate after successful account change.
-   * Multi-session mode only.
+   * Full URL or path to navigate after a successful organization switch.
    */
-  afterSwitchSessionUrl?: string;
+  afterOrganizationSwitchUrl?: string;
+  /**
+   * By default, users can switch between organization and their personal account.
+   * This option controls whether OrganizationSwitcher will include the user's personal account
+   * in the organization list. Setting this to `false` will hide the personal account entry,
+   * and users will only be able to switch between organizations.
+   * @default true
+   */
+  showPersonalAccount?: boolean;
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`

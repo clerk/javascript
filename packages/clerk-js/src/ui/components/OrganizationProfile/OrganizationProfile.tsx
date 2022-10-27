@@ -1,10 +1,11 @@
 import { OrganizationProfileProps } from '@clerk/types/src';
 import React from 'react';
 
-import { withCoreUserGuard } from '../../contexts';
+import { ComponentContext, useOrganizationProfileContext, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { ProfileCard, withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
+import { OrganizationProfileCtx } from '../../types';
 import { OrganizationProfileNavbar } from './OrganizationProfileNavbar';
 import { OrganizationProfileRoutes } from './OrganizationProfileRoutes';
 
@@ -38,7 +39,6 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
 export const OrganizationProfile = withCardStateProvider(_OrganizationProfile);
 
 export const OrganizationProfileModal = (props: OrganizationProfileProps): JSX.Element => {
-  type OrganizationProfileCtx = any;
   const organizationProfileProps: OrganizationProfileCtx = {
     ...props,
     routing: 'virtual',
@@ -48,12 +48,12 @@ export const OrganizationProfileModal = (props: OrganizationProfileProps): JSX.E
 
   return (
     <Route path='organizationProfile'>
-      {/*<ComponentContext.Provider value={organizationProfileProps}>*/}
-      {/*TODO: Used by InvisibleRootBox, can we simplify? */}
-      <div>
-        <OrganizationProfile {...organizationProfileProps} />
-      </div>
-      {/*</ComponentContext.Provider>*/}
+      <ComponentContext.Provider value={organizationProfileProps}>
+        {/*TODO: Used by InvisibleRootBox, can we simplify? */}
+        <div>
+          <OrganizationProfile {...organizationProfileProps} />
+        </div>
+      </ComponentContext.Provider>
     </Route>
   );
 };
