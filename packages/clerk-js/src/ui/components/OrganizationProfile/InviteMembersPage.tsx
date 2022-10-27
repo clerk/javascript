@@ -55,7 +55,6 @@ export const InviteMembersPage = withCardStateProvider(() => {
     if (invalidEmails.length) {
       const invalids = new Set(invalidEmails);
       const emails = emailAddressField.value.split(',');
-      console.log(invalids, emails);
       emailAddressField.setValue(emails.filter(e => !invalids.has(e)).join(','));
     }
   }, [invalidEmails]);
