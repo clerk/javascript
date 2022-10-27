@@ -35,7 +35,7 @@ export const UserPreview = (props: UserPreviewProps) => {
         elementDescriptor={descriptors.userPreviewAvatarContainer}
         elementId={descriptors.userPreviewAvatarContainer.setId(elementId)}
         justify='center'
-        sx={t => ({ position: 'relative', flex: `0 0 ${t.sizes.$11}` })}
+        sx={{ position: 'relative' }}
       >
         <UserAvatar
           boxElementDescriptor={descriptors.userPreviewAvatarBox}
