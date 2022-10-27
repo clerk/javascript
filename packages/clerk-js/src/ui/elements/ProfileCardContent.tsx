@@ -4,7 +4,7 @@ import { Col, descriptors } from '../customizables';
 import { useRouter } from '../router';
 import { common, mqu } from '../styledSystem';
 
-type ProfileCardContentProps = React.PropsWithChildren<{ contentRef: React.RefObject<HTMLDivElement> }>;
+type ProfileCardContentProps = React.PropsWithChildren<{ contentRef?: React.RefObject<HTMLDivElement> }>;
 
 export const ProfileCardContent = (props: ProfileCardContentProps) => {
   const { contentRef, children } = props;
@@ -18,12 +18,12 @@ export const ProfileCardContent = (props: ProfileCardContentProps) => {
         scrollPosRef.current = target.scrollTop;
       }
     };
-    contentRef.current?.addEventListener('scroll', handleScroll);
-    return () => contentRef.current?.removeEventListener('scroll', handleScroll);
+    contentRef?.current?.addEventListener('scroll', handleScroll);
+    return () => contentRef?.current?.removeEventListener('scroll', handleScroll);
   }, []);
 
   React.useLayoutEffect(() => {
-    if (scrollPosRef.current && contentRef.current) {
+    if (scrollPosRef.current && contentRef?.current) {
       contentRef.current.scrollTop = scrollPosRef.current;
     }
   }, [router.currentPath]);

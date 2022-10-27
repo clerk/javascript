@@ -7,7 +7,7 @@ import { ProfileCard, withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
 import { OrganizationProfileCtx } from '../../types';
 import { OrganizationProfileNavbar } from './OrganizationProfileNavbar';
-import { OrganizationProfileRoutes } from './OrganizationProfileRoutes';
+import { CreateOrganizationRoutes, OrganizationProfileRoutes } from './OrganizationProfileRoutes';
 
 const _OrganizationProfile = (_: OrganizationProfileProps) => {
   return (
@@ -27,6 +27,16 @@ const _OrganizationProfile = (_: OrganizationProfileProps) => {
 
 const AuthenticatedRoutes = withCoreUserGuard(() => {
   const contentRef = React.useRef<HTMLDivElement>(null);
+  const { createOrganization } = useOrganizationProfileContext();
+
+  if (createOrganization) {
+    return (
+      <ProfileCard sx={{ height: '100%' }}>
+        <CreateOrganizationRoutes />
+      </ProfileCard>
+    );
+  }
+
   return (
     <ProfileCard sx={{ height: '100%' }}>
       <OrganizationProfileNavbar contentRef={contentRef}>
