@@ -28,6 +28,7 @@ export const OrganizationSwitcherTrigger = React.forwardRef<HTMLButtonElement, O
         <Flex
           gap={4}
           center
+          align='start'
         >
           {organization && (
             <OrganizationPreview
@@ -48,7 +49,13 @@ export const OrganizationSwitcherTrigger = React.forwardRef<HTMLButtonElement, O
               }
             />
           )}
-          <Icon icon={Selector} />
+          <Icon
+            icon={Selector}
+            sx={t => ({
+              color: t.colors.$colorText,
+              opacity: 0.3,
+            })}
+          />
         </Flex>
       </Button>
     );
