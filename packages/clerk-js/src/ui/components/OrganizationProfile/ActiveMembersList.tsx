@@ -8,11 +8,12 @@ import { handleError } from '../../utils';
 import { MembersListTable, RoleSelect, RowContainer } from './MemberListTable';
 
 const MOCK_ITEM_COUNT = 28;
+const ITEMS_PER_PAGE = 10;
+
 export const ActiveMembersList = () => {
-  const itemsPerPage = 10;
   const { page, changePage } = usePagination({ defaultPage: 1 });
   const { membershipList } = useCoreOrganization({
-    membershipList: { offset: (page - 1) * itemsPerPage, limit: itemsPerPage },
+    membershipList: { offset: (page - 1) * ITEMS_PER_PAGE, limit: ITEMS_PER_PAGE },
   });
 
   return (
