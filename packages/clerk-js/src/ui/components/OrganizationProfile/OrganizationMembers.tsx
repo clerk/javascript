@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { useCoreOrganization } from '../../contexts';
 import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import {
   CardAlert,
@@ -21,6 +22,8 @@ import { InvitedMembersList } from './InvitationMemberList';
 export const OrganizationMembers = () => {
   const { navigate } = useNavigate();
   const card = useCardState();
+  const { membership } = useCoreOrganization();
+  const isAdmin = membership?.role === 'admin';
 
   return (
     <Col
@@ -48,26 +51,30 @@ export const OrganizationMembers = () => {
               localizationKey={'View and manage organization members'}
             />
           </Header.Root>
-          <IconButton
-            onClick={() => navigate('invite-members')}
-            icon={UserAdd}
-            textVariant='buttonExtraSmallBold'
-          >
-            Invite
-          </IconButton>
+          {isAdmin && (
+            <IconButton
+              onClick={() => navigate('invite-members')}
+              icon={UserAdd}
+              textVariant='buttonExtraSmallBold'
+            >
+              Invite
+            </IconButton>
+          )}
         </Flex>
         <Tabs>
           <TabsList>
             <Tab>Active</Tab>
-            <Tab>Invited</Tab>
+            {isAdmin && <Tab>Invited</Tab>}
           </TabsList>
           <TabPanels>
             <TabPanel sx={{ width: '100%' }}>
               <ActiveMembersList />
             </TabPanel>
-            <TabPanel sx={{ width: '100%' }}>
-              <InvitedMembersList />
-            </TabPanel>
+            {isAdmin && (
+              <TabPanel sx={{ width: '100%' }}>
+                <InvitedMembersList />
+              </TabPanel>
+            )}
           </TabPanels>
         </Tabs>
       </Col>

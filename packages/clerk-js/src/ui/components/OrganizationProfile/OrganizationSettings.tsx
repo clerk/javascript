@@ -38,13 +38,20 @@ export const OrganizationSettings = () => {
 };
 
 const OrganizationProfileSection = () => {
-  const { organization } = useCoreOrganization();
+  const { organization, membership } = useCoreOrganization();
   const { navigate } = useNavigate();
-  const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = useCoreUser();
+  const isAdmin = membership?.role === 'admin';
 
   if (!organization) {
     return null;
   }
+
+  const profile = (
+    <OrganizationPreview
+      organization={organization}
+      size='lg'
+    />
+  );
 
   return (
     <ProfileSection
@@ -52,12 +59,7 @@ const OrganizationProfileSection = () => {
       title={'Organization profile'}
       // id='organization-profile'
     >
-      <BlockButton onClick={() => navigate('profile')}>
-        <OrganizationPreview
-          organization={organization}
-          size='lg'
-        />
-      </BlockButton>
+      {isAdmin ? <BlockButton onClick={() => navigate('profile')}>{profile}</BlockButton> : profile}
     </ProfileSection>
   );
 };
