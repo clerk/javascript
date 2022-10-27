@@ -157,7 +157,7 @@ export default function createFapiClient(clerkInstance: Clerk): FapiClient {
     // In case FormData is provided, we don't want to mess with the headers,
     // because for file uploads the header is properly set by the browser.
     if (method !== 'GET' && !(body instanceof FormData)) {
-      requestInit.body = qs.stringify(body, { encoder: camelToSnakeEncoder });
+      requestInit.body = qs.stringify(body, { encoder: camelToSnakeEncoder, indices: false });
       // @ts-ignore
       requestInit.headers.set('Content-Type', 'application/x-www-form-urlencoded');
     }
