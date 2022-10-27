@@ -38,8 +38,8 @@ const MemberRow = (props: { membership: OrganizationMembershipResource }) => {
     if (!isAdmin) {
       return;
     }
-    return membership
-      .update({ role: newRole })
+    return card
+      .runAsync(membership.update({ role: newRole }))
       .then(() => setRole(newRole))
       .catch(err => handleError(err, [], card.setError));
   };
@@ -48,7 +48,7 @@ const MemberRow = (props: { membership: OrganizationMembershipResource }) => {
     if (!isAdmin) {
       return;
     }
-    return membership.destroy().catch(err => handleError(err, [], card.setError));
+    return card.runAsync(membership.destroy()).catch(err => handleError(err, [], card.setError));
   };
 
   return (
@@ -76,9 +76,13 @@ const MemberRow = (props: { membership: OrganizationMembershipResource }) => {
         />
       </Td>
       <Td>
-        <ThreeDotsMenu
-          actions={[{ label: 'Remove member', isDestructive: true, onClick: handleRemove, isDisabled: isCurrentUser }]}
-        />
+        {isAdmin && (
+          <ThreeDotsMenu
+            actions={[
+              { label: 'Remove member', isDestructive: true, onClick: handleRemove, isDisabled: isCurrentUser },
+            ]}
+          />
+        )}
       </Td>
     </RowContainer>
   );
