@@ -19,9 +19,7 @@ export const OrganizationSwitcherTrigger = React.forwardRef<HTMLButtonElement, O
       <Button
         variant='ghost'
         colorScheme='neutral'
-        sx={theme => ({
-          borderRadius: theme.radii.$lg,
-        })}
+        sx={t => ({ borderRadius: t.radii.$lg })}
         {...props}
         ref={ref}
       >
@@ -35,6 +33,7 @@ export const OrganizationSwitcherTrigger = React.forwardRef<HTMLButtonElement, O
               size={'sm'}
               organization={organization}
               user={user}
+              sx={{ maxWidth: '30ch' }}
             />
           )}
           {!organization && (
@@ -51,10 +50,7 @@ export const OrganizationSwitcherTrigger = React.forwardRef<HTMLButtonElement, O
           )}
           <Icon
             icon={Selector}
-            sx={t => ({
-              color: t.colors.$colorText,
-              opacity: 0.3,
-            })}
+            sx={t => ({ color: t.colors.$blackAlpha400 })}
           />
         </Flex>
       </Button>
