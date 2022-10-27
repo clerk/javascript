@@ -61,15 +61,9 @@ const MemberRow = (props: { membership: OrganizationMembershipResource }) => {
 
   return (
     <RowContainer>
-      <Td
-        sx={{
-          width: '100%',
-          p: {
-            maxWidth: '20ch',
-          },
-        }}
-      >
+      <Td>
         <UserPreview
+          sx={{ maxWidth: '30ch' }}
           user={membership.publicUserData}
           subtitle={membership.publicUserData.identifier}
           badge={isCurrentUser && <Badge localizationKey={localizationKeys('badge__you')} />}

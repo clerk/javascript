@@ -42,16 +42,10 @@ const InvitationRow = (props: { invitation: OrganizationInvitationResource }) =>
 
   return (
     <RowContainer>
-      <Td
-        sx={{
-          width: '100%',
-          p: {
-            maxWidth: '20ch',
-          },
-        }}
-      >
+      <Td>
         <UserPreview
-          hideAvatar
+          sx={{ maxWidth: '30ch' }}
+          showAvatar={false}
           user={{ primaryEmailAddress: { emailAddress: invitation.emailAddress } } as any}
         />
       </Td>
