@@ -1,4 +1,5 @@
 import {
+  ClerkPaginationParams,
   GetMembershipsParams,
   GetPendingInvitationsParams,
   OrganizationInvitationResource,
@@ -39,10 +40,8 @@ type UseOrganizationReturn =
 
 type UseOrganization = (params?: UseOrganizationParams) => UseOrganizationReturn;
 
-export const useOrganization: UseOrganization = ({
-  invitationList: invitationListParams,
-  membershipList: membershipListParams,
-} = {}) => {
+export const useOrganization: UseOrganization = params => {
+  const { invitationList: invitationListParams, membershipList: membershipListParams } = params || {};
   const { organization, lastOrganizationMember, lastOrganizationInvitation } = useOrganizationContext();
   const session = useSessionContext();
 
@@ -61,14 +60,14 @@ export const useOrganization: UseOrganization = ({
 
   const { data: invitationList, isValidating: isInvitationsLoading } = useSWR(
     shouldFetch && invitationListParams
-      ? composeOrganizationResourcesUpdateKey(organization, lastOrganizationInvitation, 'invitations')
+      ? cacheKey('invites', organization, lastOrganizationInvitation, invitationListParams)
       : null,
     pendingInvitations,
   );
 
   const { data: membershipList, isValidating: isMembershipsLoading } = useSWR(
     shouldFetch && membershipListParams
-      ? composeOrganizationResourcesUpdateKey(organization, lastOrganizationMember, 'memberships')
+      ? cacheKey('memberships', organization, lastOrganizationMember, membershipListParams)
       : null,
     currentOrganizationMemberships,
   );
@@ -122,10 +121,13 @@ function getCurrentOrganizationMembership(
   );
 }
 
-function composeOrganizationResourcesUpdateKey(
+function cacheKey(
+  type: 'memberships' | 'invites',
   organization: OrganizationResource,
-  resource: OrganizationInvitationResource | OrganizationMembershipResource | null = null,
-  resourceType: string,
+  resource: OrganizationInvitationResource | OrganizationMembershipResource | null | undefined,
+  pagination: ClerkPaginationParams,
 ) {
-  return `${organization.id}${resource?.id}${resource?.updatedAt}${resourceType}`;
+  return [type, organization.id, resource?.id, resource?.updatedAt, pagination.offset, pagination.limit]
+    .filter(Boolean)
+    .join('-');
 }
