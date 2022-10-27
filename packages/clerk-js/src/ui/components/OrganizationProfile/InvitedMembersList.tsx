@@ -3,15 +3,23 @@ import React from 'react';
 
 import { useCoreOrganization } from '../../contexts';
 import { Td, Text } from '../../customizables';
-import { ThreeDotsMenu, useCardState, UserPreview } from '../../elements';
+import { ThreeDotsMenu, useCardState, usePagination, UserPreview } from '../../elements';
 import { handleError } from '../../utils';
 import { MembersListTable, RowContainer } from './MemberListTable';
 
+const MOCK_ITEM_COUNT = 28;
 export const InvitedMembersList = () => {
-  const { invitationList } = useCoreOrganization({ invitationList: { offset: 0, limit: 10 } });
+  const itemsPerPage = 10;
+  const { page, changePage } = usePagination();
+  const { invitationList } = useCoreOrganization({
+    invitationList: { offset: (page - 1) * itemsPerPage, limit: itemsPerPage },
+  });
 
   return (
     <MembersListTable
+      page={page}
+      onPageChange={changePage}
+      itemCount={MOCK_ITEM_COUNT}
       isLoading={!invitationList}
       headers={['User', 'Invited', 'Role', '']}
       rows={(invitationList || []).map(i => (
