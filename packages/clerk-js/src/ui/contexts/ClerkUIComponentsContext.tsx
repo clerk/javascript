@@ -6,7 +6,15 @@ import { useEnvironment } from '../contexts';
 import { useNavigate } from '../hooks';
 import type { ParsedQs } from '../router';
 import { useRouter } from '../router';
-import type { AvailableComponentCtx, SignInCtx, SignUpCtx, UserButtonCtx, UserProfileCtx } from '../types';
+import type {
+  AvailableComponentCtx,
+  OrganizationProfileCtx,
+  OrganizationSwitcherCtx,
+  SignInCtx,
+  SignUpCtx,
+  UserButtonCtx,
+  UserProfileCtx,
+} from '../types';
 
 export const ComponentContext = React.createContext<AvailableComponentCtx | null>(null);
 
@@ -17,6 +25,7 @@ export type SignUpContextType = SignUpCtx & {
   secondFactorUrl: string;
   authQueryString: string | null;
 };
+
 export const useSignUpContext = (): SignUpContextType => {
   const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as SignUpCtx;
   const { navigate } = useNavigate();
@@ -194,5 +203,43 @@ export const useUserButtonContext = () => {
     afterMultiSessionSingleSignOutUrl,
     afterSignOutUrl,
     afterSwitchSessionUrl,
+  };
+};
+
+export const useOrganizationSwitcherContext = () => {
+  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as OrganizationSwitcherCtx;
+  const { navigate } = useNavigate();
+  const { displayConfig } = useEnvironment();
+
+  if (componentName !== 'OrganizationSwitcher') {
+    throw new Error('Clerk: useUserButtonContext called outside OrganizationSwitcher.');
+  }
+
+  const navigateAfterOrganizationSwitchUrl = () => navigate(ctx.afterOrganizationSwitchUrl);
+
+  return {
+    ...ctx,
+    showPersonalAccount: ctx.showPersonalAccount ?? true,
+    navigateAfterOrganizationSwitchUrl,
+    componentName,
+  };
+};
+
+export const useOrganizationProfileContext = () => {
+  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as OrganizationProfileCtx;
+  const { navigate } = useNavigate();
+  const { displayConfig } = useEnvironment();
+
+  if (componentName !== 'OrganizationProfile') {
+    throw new Error('Clerk: useOrganizationProfileContext called outside OrganizationProfile.');
+  }
+
+  const navigateAfterOrganizationSwitchUrl = () => navigate(ctx.createOrganization);
+
+  return {
+    ...ctx,
+    createOrganization: ctx.createOrganization || false,
+    navigateAfterOrganizationSwitchUrl,
+    componentName,
   };
 };

@@ -2,7 +2,12 @@ import { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
 import { Plus, SwitchArrows } from '../../../ui/icons';
-import { useCoreOrganization, useCoreOrganizationList, useCoreUser } from '../../contexts';
+import {
+  useCoreOrganization,
+  useCoreOrganizationList,
+  useCoreUser,
+  useOrganizationSwitcherContext,
+} from '../../contexts';
 import { Box, Button, Icon, localizationKeys, Text } from '../../customizables';
 import { Action, Actions, OrganizationPreview, PersonalWorkspacePreview } from '../../elements';
 import { useCardState } from '../../elements/contexts';
@@ -19,10 +24,9 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
   const { organizationList } = useCoreOrganizationList();
   const { organization: currentOrg } = useCoreOrganization();
   const user = useCoreUser();
-  const showPersonalAccount = true;
+  const { showPersonalAccount } = useOrganizationSwitcherContext();
 
   const otherOrgs = (organizationList || []).map(e => e.organization).filter(o => o.id !== currentOrg?.id);
-  console.log({ currentOrg, otherOrgs });
 
   const createOrganizationButton = (
     <Action

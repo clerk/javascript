@@ -175,6 +175,8 @@ const Components = (props: ComponentsProps) => {
     };
   }, []);
 
+  console.log('components state', state);
+
   const mountedSignInModal = (
     <AppearanceProvider
       globalAppearance={state.appearance}
@@ -273,7 +275,7 @@ const Components = (props: ComponentsProps) => {
               onExternalNavigate={() => componentsControls.closeModal('organizationProfile')}
               startPath='/organizationProfile'
             >
-              <OrganizationProfileModal />
+              <OrganizationProfileModal {...organizationProfileModal} />
             </VirtualRouter>
           </Modal>
         </InternalThemeProvider>
@@ -315,6 +317,7 @@ const Components = (props: ComponentsProps) => {
               </AppearanceProvider>
             );
           })}
+
           {signInModal && mountedSignInModal}
           {signUpModal && mountedSignUpModal}
           {userProfileModal && mountedUserProfileModal}

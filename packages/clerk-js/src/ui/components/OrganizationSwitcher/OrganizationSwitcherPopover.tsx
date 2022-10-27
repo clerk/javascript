@@ -1,7 +1,13 @@
 import { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
-import { useCoreClerk, useCoreOrganization, useCoreOrganizationList, useCoreUser } from '../../contexts';
+import {
+  useCoreClerk,
+  useCoreOrganization,
+  useCoreOrganizationList,
+  useCoreUser,
+  useOrganizationSwitcherContext,
+} from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { Action, OrganizationPreview, PersonalWorkspacePreview, PopoverCard, useCardState } from '../../elements';
 import { RootBox } from '../../elements/RootBox';
@@ -20,13 +26,13 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
     const { openOrganizationProfile } = useCoreClerk();
     const { organization: currentOrg } = useCoreOrganization();
     const { createOrganization, isLoaded, setActive } = useCoreOrganizationList();
+    const { showPersonalAccount } = useOrganizationSwitcherContext();
+
     const user = useCoreUser();
 
     if (!isLoaded) {
       return null;
     }
-
-    const showPersonalAccount = true;
 
     const handleOrganizationClicked = (organization: OrganizationResource) => {
       return card.runAsync(() => setActive({ organization })).then(close);
