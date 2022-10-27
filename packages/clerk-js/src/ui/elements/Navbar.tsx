@@ -139,10 +139,11 @@ const NavbarContainer = (props: React.PropsWithChildren<{}>) => {
   return (
     <Col
       elementDescriptor={descriptors.navbar}
-      sx={theme => ({
-        flex: `0 0 ${theme.space.$60}`,
-        borderRight: `${theme.borders.$normal} ${theme.colors.$blackAlpha300}`,
-        padding: `${theme.space.$9x5} ${theme.space.$6}`,
+      sx={t => ({
+        flex: `0 0 ${t.space.$60}`,
+        maxWidth: t.space.$60,
+        borderRight: `${t.borders.$normal} ${t.colors.$blackAlpha300}`,
+        padding: `${t.space.$9x5} ${t.space.$6}`,
         [mqu.md]: {
           display: 'none',
         },
@@ -226,10 +227,10 @@ const NavButton = (props: NavButtonProps) => {
       textVariant='buttonRegularMedium'
       isActive={isActive}
       {...rest}
-      sx={theme => ({
-        gap: theme.space.$4,
+      sx={t => ({
+        gap: t.space.$4,
         justifyContent: 'flex-start',
-        backgroundColor: isActive ? theme.colors.$blackAlpha50 : undefined,
+        backgroundColor: isActive ? t.colors.$blackAlpha50 : undefined,
         opacity: isActive ? 1 : 0.6,
       })}
     >
