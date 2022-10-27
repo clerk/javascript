@@ -8,11 +8,13 @@ import { handleError } from '../../utils';
 import { MembersListTable, RowContainer } from './MemberListTable';
 
 const MOCK_ITEM_COUNT = 28;
+const ITEMS_PER_PAGE = 10;
+
 export const InvitedMembersList = () => {
-  const itemsPerPage = 10;
   const { page, changePage } = usePagination();
+
   const { invitationList } = useCoreOrganization({
-    invitationList: { offset: (page - 1) * itemsPerPage, limit: itemsPerPage },
+    invitationList: { offset: (page - 1) * ITEMS_PER_PAGE, limit: ITEMS_PER_PAGE },
   });
 
   return (
@@ -42,16 +44,10 @@ const InvitationRow = (props: { invitation: OrganizationInvitationResource }) =>
 
   return (
     <RowContainer>
-      <Td
-        sx={{
-          width: '100%',
-          p: {
-            maxWidth: '20ch',
-          },
-        }}
-      >
+      <Td>
         <UserPreview
-          hideAvatar
+          sx={{ maxWidth: '30ch' }}
+          showAvatar={false}
           user={{ primaryEmailAddress: { emailAddress: invitation.emailAddress } } as any}
         />
       </Td>

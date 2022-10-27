@@ -175,8 +175,6 @@ const Components = (props: ComponentsProps) => {
     };
   }, []);
 
-  console.log('components state', state);
-
   const mountedSignInModal = (
     <AppearanceProvider
       globalAppearance={state.appearance}

@@ -15,14 +15,14 @@ export type UserPreviewProps = PropsOfComponent<typeof Flex> & {
   rounded?: boolean;
   elementId?: any;
   subtitle?: LocalizationKey | string;
-  hideAvatar?: boolean;
+  showAvatar?: boolean;
 };
 
 export const UserPreview = (props: UserPreviewProps) => {
   const {
     user,
     size = 'md',
-    hideAvatar = false,
+    showAvatar = true,
     icon,
     rounded = true,
     imageUrl,
@@ -44,23 +44,25 @@ export const UserPreview = (props: UserPreviewProps) => {
       sx={[{ minWidth: '0px', width: '100%' }, sx]}
       {...rest}
     >
-      <Flex
-        elementDescriptor={descriptors.userPreviewAvatarContainer}
-        elementId={descriptors.userPreviewAvatarContainer.setId(elementId)}
-        justify='center'
-        sx={{ position: 'relative', display: hideAvatar ? 'none' : 'initial' }}
-      >
-        <UserAvatar
-          boxElementDescriptor={descriptors.userPreviewAvatarBox}
-          imageElementDescriptor={descriptors.userPreviewAvatarImage}
-          {...user}
-          imageUrl={imageUrl || user.profileImageUrl}
-          size={t => ({ sm: t.sizes.$8, md: t.sizes.$11, lg: t.sizes.$12x5 }[size])}
-          optimize
-          rounded={rounded}
-        />
-        {icon && <Flex sx={{ position: 'absolute', left: 0, bottom: 0 }}>{icon}</Flex>}
-      </Flex>
+      {showAvatar && (
+        <Flex
+          elementDescriptor={descriptors.userPreviewAvatarContainer}
+          elementId={descriptors.userPreviewAvatarContainer.setId(elementId)}
+          justify='center'
+          sx={{ position: 'relative' }}
+        >
+          <UserAvatar
+            boxElementDescriptor={descriptors.userPreviewAvatarBox}
+            imageElementDescriptor={descriptors.userPreviewAvatarImage}
+            {...user}
+            imageUrl={imageUrl || user.profileImageUrl}
+            size={t => ({ sm: t.sizes.$8, md: t.sizes.$11, lg: t.sizes.$12x5 }[size])}
+            optimize
+            rounded={rounded}
+          />
+          {icon && <Flex sx={{ position: 'absolute', left: 0, bottom: 0 }}>{icon}</Flex>}
+        </Flex>
+      )}
       <Flex
         elementDescriptor={descriptors.userPreviewTextContainer}
         elementId={descriptors.userPreviewTextContainer.setId(elementId)}
