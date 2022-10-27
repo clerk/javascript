@@ -108,7 +108,7 @@ export class Organization extends BaseResource implements OrganizationResource {
   };
 
   inviteMembers = async (params: InviteMembersParams) => {
-    return OrganizationInvitation.createMany(this.id, params);
+    return OrganizationInvitation.createBulk(this.id, params);
   };
 
   updateMember = async ({ userId, role }: UpdateMembershipParams): Promise<OrganizationMembership> => {

@@ -597,7 +597,7 @@ export type CreateOrganizationInvitationParams = {
   redirectUrl?: string;
 };
 
-export type CreateManyOrganizationInvitationParams = {
+export type CreateBulkOrganizationInvitationParams = {
   emailAddresses: string[];
   role: MembershipRole;
   redirectUrl?: string;
