@@ -42,7 +42,10 @@ const InvitationRow = (props: { invitation: OrganizationInvitationResource }) =>
           },
         }}
       >
-        <UserPreview user={{ primaryEmailAddress: { emailAddress: invitation.emailAddress } } as any} />
+        <UserPreview
+          hideAvatar
+          user={{ primaryEmailAddress: { emailAddress: invitation.emailAddress } } as any}
+        />
       </Td>
       <Td>{invitation.createdAt.toLocaleDateString()}</Td>
       <Td>
