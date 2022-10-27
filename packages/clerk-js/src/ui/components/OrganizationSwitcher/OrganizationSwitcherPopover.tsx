@@ -43,7 +43,8 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
     };
 
     const handleCreateOrganizationClicked = () => {
-      return card.runAsync(() => createOrganization({ name: `Org${Date.now()}` })).then(close);
+      openOrganizationProfile({ createOrganization: true });
+      close();
     };
 
     const handleManageOrganizationClicked = () => {
