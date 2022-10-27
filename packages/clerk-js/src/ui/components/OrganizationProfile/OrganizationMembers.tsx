@@ -17,7 +17,7 @@ import {
 import { useNavigate } from '../../hooks';
 import { UserAdd } from '../../icons';
 import { ActiveMembersList } from './ActiveMembersList';
-import { InvitedMembersList } from './InvitationMemberList';
+import { InvitedMembersList } from './InvitedMembersList';
 
 export const OrganizationMembers = () => {
   const { navigate } = useNavigate();

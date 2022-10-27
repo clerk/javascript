@@ -15,10 +15,23 @@ export type UserPreviewProps = PropsOfComponent<typeof Flex> & {
   rounded?: boolean;
   elementId?: any;
   subtitle?: LocalizationKey | string;
+  hideAvatar?: boolean;
 };
 
 export const UserPreview = (props: UserPreviewProps) => {
-  const { user, size = 'md', icon, rounded = true, imageUrl, badge, elementId, sx, subtitle, ...rest } = props;
+  const {
+    user,
+    size = 'md',
+    hideAvatar = false,
+    icon,
+    rounded = true,
+    imageUrl,
+    badge,
+    elementId,
+    sx,
+    subtitle,
+    ...rest
+  } = props;
   const name = getFullName(user);
   const identifier = getIdentifier(user);
 
@@ -35,7 +48,7 @@ export const UserPreview = (props: UserPreviewProps) => {
         elementDescriptor={descriptors.userPreviewAvatarContainer}
         elementId={descriptors.userPreviewAvatarContainer.setId(elementId)}
         justify='center'
-        sx={{ position: 'relative' }}
+        sx={{ position: 'relative', display: hideAvatar ? 'none' : 'initial' }}
       >
         <UserAvatar
           boxElementDescriptor={descriptors.userPreviewAvatarBox}

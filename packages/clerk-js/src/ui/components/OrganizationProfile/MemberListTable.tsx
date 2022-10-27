@@ -14,28 +14,24 @@ import {
   Tr,
   useLocalizations,
 } from '../../customizables';
-import { Pagination, Select, SelectButton, SelectOptionList, usePagination } from '../../elements';
+import { Pagination, Select, SelectButton, SelectOptionList } from '../../elements';
 import { PropsOfComponent } from '../../styledSystem';
-
-const MAX_ROWS_PER_PAGE = 10;
 
 type MembersListTableProps = {
   headers: string[];
   rows: React.ReactNode[];
   isLoading?: boolean;
+  page: number;
+  onPageChange: (page: number) => void;
+  itemCount: number;
 };
 
 export const MembersListTable = (props: MembersListTableProps) => {
-  const { headers, rows, isLoading } = props;
-  const { page, changePage } = usePagination();
+  const { headers, page, onPageChange, itemCount, rows, isLoading } = props;
 
-  const pageCount = Math.ceil(rows.length / MAX_ROWS_PER_PAGE) || 1;
-  const startRowIndex = (page - 1) * MAX_ROWS_PER_PAGE;
-  const endRowIndex = Math.min(page * MAX_ROWS_PER_PAGE, rows.length);
-
-  React.useEffect(() => {
-    changePage(1);
-  }, []);
+  const pageCount = rows.length !== 0 ? Math.ceil(itemCount / rows.length) : 1;
+  const startRowIndex = (page - 1) * rows.length;
+  const endRowIndex = Math.min(page * rows.length);
 
   return (
     <Col
@@ -54,8 +50,8 @@ export const MembersListTable = (props: MembersListTableProps) => {
           <Tbody>
             {isLoading ? (
               <Tr>
-                <Td>
-                  <Spinner />
+                <Td colSpan={4}>
+                  <Spinner sx={{ margin: 'auto', display: 'block' }} />
                 </Td>
               </Tr>
             ) : !rows.length ? (
@@ -70,10 +66,10 @@ export const MembersListTable = (props: MembersListTableProps) => {
         <Pagination
           count={pageCount}
           page={page}
-          onChange={changePage}
+          onChange={onPageChange}
           siblingCount={1}
           rowInfo={{
-            allRowsCount: rows.length,
+            allRowsCount: itemCount,
             startingRow: rows.length ? startRowIndex + 1 : startRowIndex,
             endingRow: endRowIndex,
           }}

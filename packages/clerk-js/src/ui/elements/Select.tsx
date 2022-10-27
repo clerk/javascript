@@ -272,7 +272,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
           theme => ({
             gap: theme.space.$1,
             outline: 'none',
-            overflowY: 'scroll',
+            overflowY: 'auto',
             maxHeight: '18vh',
             padding: `${theme.space.$2} 0`,
           }),

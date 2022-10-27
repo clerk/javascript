@@ -3,15 +3,23 @@ import React, { useState } from 'react';
 
 import { useCoreOrganization, useCoreUser } from '../../contexts';
 import { Badge, localizationKeys, Td } from '../../customizables';
-import { ThreeDotsMenu, useCardState, UserPreview } from '../../elements';
+import { ThreeDotsMenu, useCardState, usePagination, UserPreview } from '../../elements';
 import { handleError } from '../../utils';
 import { MembersListTable, RoleSelect, RowContainer } from './MemberListTable';
 
+const MOCK_ITEM_COUNT = 28;
 export const ActiveMembersList = () => {
-  const { membershipList } = useCoreOrganization({ membershipList: { offset: 0, limit: 10 } });
+  const itemsPerPage = 10;
+  const { page, changePage } = usePagination({ defaultPage: 1 });
+  const { membershipList } = useCoreOrganization({
+    membershipList: { offset: (page - 1) * itemsPerPage, limit: itemsPerPage },
+  });
 
   return (
     <MembersListTable
+      page={page}
+      onPageChange={changePage}
+      itemCount={MOCK_ITEM_COUNT}
       isLoading={!membershipList}
       headers={['User', 'Joined', 'Role', '']}
       rows={(membershipList || []).map(m => (
