@@ -54,8 +54,8 @@ export const MembersListTable = (props: MembersListTableProps) => {
           <Tbody>
             {isLoading ? (
               <Tr>
-                <Td>
-                  <Spinner />
+                <Td colSpan={4}>
+                  <Spinner sx={{ margin: 'auto', display: 'block' }} />
                 </Td>
               </Tr>
             ) : !rows.length ? (
