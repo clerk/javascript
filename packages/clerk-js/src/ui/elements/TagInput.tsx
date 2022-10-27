@@ -140,6 +140,7 @@ export const TagInput = (props: TagInputProps) => {
           border: 'none',
           width: 'initial',
           padding: 0,
+          lineHeight: t.space.$6,
           paddingLeft: t.space.$1,
         })}
       />
