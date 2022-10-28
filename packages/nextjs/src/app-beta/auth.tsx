@@ -1,7 +1,8 @@
 import { cookies } from 'next/headers';
 import { NextRequest } from 'next/server';
 
-import { buildClerkProps, getAuth } from '../../server';
+import { getAuthEdge } from '../server/getAuthEdge';
+import { buildClerkProps } from '../server/utils/getAuth';
 
 // Warning: This is insecure unless withClerkMiddleware has run
 
@@ -31,7 +32,7 @@ function buildReqLike() {
 }
 
 export function auth() {
-  return getAuth(buildReqLike());
+  return getAuthEdge(buildReqLike());
 }
 
 export function initialState() {
