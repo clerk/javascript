@@ -1,7 +1,9 @@
-import { auth, SignedIn, SignedOut, SignIn, UserButton } from '@clerk/nextjs/app-beta';
+import { auth, currentUser, clerkClient, SignedIn, SignedOut, SignIn, UserButton } from '@clerk/nextjs/app-beta';
 
-export default function Page() {
+export default async function Page() {
   const { userId } = auth();
+  const user = await clerkClient.users.getUser(userId);
+  const currentUser_ = await currentUser();
   return (
     <div>
       <h1>Hello, Next.js!</h1>
@@ -11,6 +13,8 @@ export default function Page() {
           userProfileMode='navigation'
           userProfileUrl='/appdir/user'
         />
+        <div>{JSON.stringify(user)}</div>
+        <div>{JSON.stringify(currentUser_)}</div>
       </SignedIn>
       <SignedOut>
         <SignIn />

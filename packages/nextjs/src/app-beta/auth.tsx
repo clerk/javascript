@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { NextRequest } from 'next/server';
 
-import { getAuth, buildClerkProps } from '../../server';
+import { buildClerkProps, getAuth } from '../../server';
 
 // Warning: This is insecure unless withClerkMiddleware has run
 
