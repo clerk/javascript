@@ -21,9 +21,9 @@ function getPrivateAuthResult(req: RequestLike): string | null | undefined {
 }
 
 function getQueryParam(req: RequestLike, name: string): string | null | undefined {
-  if (req instanceof NextRequest) {
-    return req.nextUrl.searchParams.get(name);
-  }
+  try {
+    return (req as NextRequest).nextUrl.searchParams.get(name);
+  } catch (e) {}
 
   // Check if the request contains a parsed query object
   // NextApiRequest does, but the IncomingMessage in the GetServerSidePropsContext case does not
@@ -45,9 +45,9 @@ function getQueryParam(req: RequestLike, name: string): string | null | undefine
 }
 
 export function getHeader(req: RequestLike, name: string): string | null | undefined {
-  if (req instanceof NextRequest) {
-    return req.headers.get(name);
-  }
+  try {
+    return (req as NextRequest).headers.get(name);
+  } catch (e) {}
 
   let header = req.headers[name] as string | undefined;
 
@@ -61,9 +61,9 @@ export function getHeader(req: RequestLike, name: string): string | null | undef
 }
 
 export function getCookie(req: RequestLike, name: string): string | undefined {
-  if (req instanceof NextRequest) {
-    return req.cookies.get(name);
-  }
+  try {
+    return (req as NextRequest).cookies.get(name);
+  } catch (e) {}
 
   return req.cookies[name];
 }
