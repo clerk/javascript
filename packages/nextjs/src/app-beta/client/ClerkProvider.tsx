@@ -41,7 +41,8 @@ export const useAwaitableNavigate = () => {
   }, []);
 };
 
-export function ClerkProvider({ children, initialState }) {
+export function ClerkProvider(props: React.PropsWithChildren<{ initialState: any }>) {
+  const { children, initialState } = props;
   const navigate = useAwaitableNavigate();
   return (
     <ReactClerkProvider

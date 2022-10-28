@@ -2,12 +2,14 @@ import React from 'react';
 
 import { auth } from './auth';
 
-export function SignedIn({ children }) {
+export function SignedIn(props: React.PropsWithChildren<{}>) {
+  const { children } = props;
   const { userId } = auth();
   return userId ? <>{children}</> : null;
 }
 
-export function SignedOut({ children }) {
+export function SignedOut(props: React.PropsWithChildren<{}>) {
+  const { children } = props;
   const { userId } = auth();
   return userId ? null : <>{children}</>;
 }
