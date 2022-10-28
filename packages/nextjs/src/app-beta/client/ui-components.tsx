@@ -1,5 +1,5 @@
 'use client';
-import { SignIn as OgSignIn, SignUp as OgSignUp, UserButton as OgUserButton, UserProfile } from '@clerk/nextjs';
+import { SignIn as OgSignIn, SignUp as OgSignUp, UserButton as OgUserButton, UserProfile } from '@clerk/clerk-react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import React from 'react';
 

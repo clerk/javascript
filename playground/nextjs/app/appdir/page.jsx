@@ -2,7 +2,7 @@ import { auth, currentUser, clerkClient, SignedIn, SignedOut, SignIn, UserButton
 
 export default async function Page() {
   const { userId } = auth();
-  const user = await clerkClient.users.getUser(userId);
+  const user = userId ? await clerkClient.users.getUser(userId) : null;
   const currentUser_ = await currentUser();
   return (
     <div>
