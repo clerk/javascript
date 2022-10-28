@@ -13,8 +13,8 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ClerkProvider
       appearance={{ baseTheme: themes[selectedTheme] }}
-      frontendApi={'clerk.touching.camel-78.dev.lclclerk.com'}
-      clerkJSUrl={'https://js.lclclerk.com/npm/clerk.browser.js'}
+      // frontendApi={'clerk.touching.camel-78.dev.lclclerk.com'}
+      // clerkJSUrl={'https://js.lclclerk.com/npm/clerk.browser.js'}
       {...pageProps}
     >
       <AppBar
@@ -40,9 +40,7 @@ const AppBar = (props: { onChangeTheme: React.ChangeEventHandler<HTMLSelectEleme
       }}
     >
       <Link href={'/'}>
-        <a>
-          <h2>Nextjs Playground</h2>
-        </a>
+        <h2>Nextjs Playground</h2>
       </Link>
       <select
         name='theme'

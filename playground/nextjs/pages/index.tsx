@@ -23,19 +23,13 @@ const Home: NextPage = () => {
         <p className={styles.description}>Get started by editing visiting one of the pages below</p>
         <ul>
           <li>
-            <Link href={'/sign-in'}>
-              <a>Sign in page</a>
-            </Link>
+            <Link href={'/sign-in'}>Sign in page</Link>
           </li>
           <li>
-            <Link href={'/sign-up'}>
-              <a>Sign up page</a>
-            </Link>
+            <Link href={'/sign-up'}>Sign up page</Link>
           </li>
           <li>
-            <Link href={'/user'}>
-              <a>User profile page</a>
-            </Link>
+            <Link href={'/user'}>User profile page</Link>
           </li>
         </ul>
       </main>
