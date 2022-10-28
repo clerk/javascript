@@ -49,6 +49,7 @@ export function getHeader(req: RequestLike, name: string): string | null | undef
     return (req as NextRequest).headers.get(name);
   } catch (e) {}
 
+  // @ts-ignore
   let header = req.headers[name] as string | undefined;
 
   // If no header has been determined for IncomingMessage case, check if available within private headers
@@ -65,5 +66,6 @@ export function getCookie(req: RequestLike, name: string): string | undefined {
     return (req as NextRequest).cookies.get(name);
   } catch (e) {}
 
+  // @ts-ignore
   return req.cookies[name];
 }
