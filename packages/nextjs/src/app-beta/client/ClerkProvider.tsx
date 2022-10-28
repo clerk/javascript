@@ -2,7 +2,14 @@
 // !!! Note the import from react
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import { usePathname, useRouter } from 'next/navigation';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect } from 'react';
+
+declare global {
+  export interface Window {
+    __clerk_nav_await: Array<(value: void) => void>;
+    __clerk_nav: (to: string) => Promise<void>;
+  }
+}
 
 export const useAwaitableNavigate = () => {
   const { push, refresh } = useRouter();
