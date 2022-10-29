@@ -80,7 +80,7 @@ type UseAuth = () => InitReturn | LoadedReturn | UserReturn;
  */
 export const useAuth: UseAuth = () => {
   const { sessionId, userId, actor } = useAuthContext();
-  const isomorphicClerk = useIsomorphicClerkContext() as unknown as IsomorphicClerk;
+  const isomorphicClerk = useIsomorphicClerkContext();
 
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
   const signOut: SignOut = useCallback(createSignOut(isomorphicClerk), [isomorphicClerk]);
