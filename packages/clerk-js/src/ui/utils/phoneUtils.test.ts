@@ -3,6 +3,7 @@ import {
   formatPhoneNumber,
   getCountryIsoFromFormattedNumber,
   getFlagEmojiFromCountryIso,
+  getLongestValidCountryCode,
 } from './phoneUtils';
 
 describe('phoneUtils', () => {
@@ -196,6 +197,28 @@ describe('phoneUtils', () => {
     it('handles a non-US phone without a format pattern', () => {
       const res = getCountryIsoFromFormattedNumber('+1758 123123');
       expect(res).toBe('lc');
+    });
+  });
+
+  describe('getLongestValidCountryCode(value)', () => {
+    it('finds valid country and returns phone number value without country code', () => {
+      const res = getLongestValidCountryCode('+12064563059');
+      expect(res.phoneNumberValue).toBe('2064563059');
+      expect(res.selectedCountry).not.toBe(undefined);
+      expect(res.selectedCountry?.code).toBe('1');
+    });
+
+    it('finds valid country by applying priority', () => {
+      const res = getLongestValidCountryCode('+1242123123');
+      expect(res.phoneNumberValue).toBe('242123123');
+      expect(res.selectedCountry).not.toBe(undefined);
+      expect(res.selectedCountry?.code).toBe('1');
+    });
+
+    it('does not find valid country code and returns phone number value as is', () => {
+      const res = getLongestValidCountryCode('+699090909090');
+      expect(res.phoneNumberValue).toBe('699090909090');
+      expect(res.selectedCountry).toBe(undefined);
     });
   });
 });
