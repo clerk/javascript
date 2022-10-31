@@ -1,21 +1,10 @@
 import { MembershipRole } from '@clerk/types';
 import React from 'react';
 
-import {
-  Col,
-  Flex,
-  localizationKeys,
-  Spinner,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-  useLocalizations,
-} from '../../customizables';
+import { Col, Flex, Spinner, Table, Tbody, Td, Th, Thead, Tr, useLocalizations } from '../../customizables';
 import { Pagination, Select, SelectButton, SelectOptionList } from '../../elements';
 import { PropsOfComponent } from '../../styledSystem';
+import { roleLocalizationKey } from '../../utils';
 
 type MembersListTableProps = {
   headers: string[];
@@ -101,9 +90,9 @@ export const RoleSelect = (props: { value: MembershipRole; onChange: any; isDisa
   const { t } = useLocalizations();
 
   const roles: Array<{ label: string; value: MembershipRole }> = [
-    { label: t(localizationKeys('membershipRole__admin')), value: 'admin' },
-    { label: t(localizationKeys('membershipRole__basicMember')), value: 'basic_member' },
-    { label: t(localizationKeys('membershipRole__guestMember')), value: 'guest_member' },
+    { label: t(roleLocalizationKey('admin')), value: 'admin' },
+    { label: t(roleLocalizationKey('basic_member')), value: 'basic_member' },
+    { label: t(roleLocalizationKey('guest_member')), value: 'guest_member' },
   ];
 
   return (

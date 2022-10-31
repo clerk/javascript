@@ -16,3 +16,4 @@ export * from './useFormControl';
 export * from './errorHandler';
 export * from './range';
 export * from './getValidReactChildren';
+export * from './roleLocalizationKey';

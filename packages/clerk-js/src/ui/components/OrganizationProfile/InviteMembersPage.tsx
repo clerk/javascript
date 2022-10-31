@@ -4,7 +4,7 @@ import React from 'react';
 import { ClerkAPIResponseError } from '../../../core/resources/Error';
 import { useWizard, Wizard } from '../../common';
 import { useCoreOrganization } from '../../contexts';
-import { Flex, localizationKeys, Text } from '../../customizables';
+import { Flex, localizationKeys, Text, useLocalizations } from '../../customizables';
 import {
   Alert,
   Form,
@@ -15,7 +15,7 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
-import { handleError, useFormControl } from '../../utils';
+import { handleError, roleLocalizationKey, useFormControl } from '../../utils';
 import { FormButtons } from '../UserProfile/FormButtons';
 import { SuccessPage } from '../UserProfile/SuccessPage';
 import { ContentPage } from './OrganizationContentPage';
@@ -27,6 +27,7 @@ export const InviteMembersPage = withCardStateProvider(() => {
   const title = 'Invite members';
   const subtitle = 'Invite new members to this organization';
   const card = useCardState();
+  const { t } = useLocalizations();
   const { organization } = useCoreOrganization();
   const [invalidEmails, setInvalidEmails] = React.useState<string[]>([]);
 
@@ -79,6 +80,12 @@ export const InviteMembersPage = withCardStateProvider(() => {
       });
   };
 
+  const roles: Array<{ label: string; value: MembershipRole }> = [
+    { label: t(roleLocalizationKey('admin')), value: 'admin' },
+    { label: t(roleLocalizationKey('basic_member')), value: 'basic_member' },
+    { label: t(roleLocalizationKey('guest_member')), value: 'guest_member' },
+  ];
+
   return (
     <Wizard {...wizard.props}>
       <ContentPage
@@ -117,11 +124,11 @@ export const InviteMembersPage = withCardStateProvider(() => {
             >
               <Text>Role</Text>
               <Select
-                options={['admin', 'basic_member']}
-                value={'admin'}
-                onChange={option => {}}
+                options={roles.map(r => r.label)}
+                value={roleField.value}
+                onChange={val => roleField.setValue(roles.find(r => r.label === val)!.value)}
               >
-                <SelectButton />
+                <SelectButton>{roles.find(r => r.value === roleField.value)!.label}</SelectButton>
                 <SelectOptionList />
               </Select>
             </Flex>

@@ -4,7 +4,7 @@ import React from 'react';
 import { useCoreOrganization } from '../../contexts';
 import { Td, Text } from '../../customizables';
 import { ThreeDotsMenu, useCardState, usePagination, UserPreview } from '../../elements';
-import { handleError } from '../../utils';
+import { handleError, roleLocalizationKey } from '../../utils';
 import { MembersListTable, RowContainer } from './MemberListTable';
 
 const MOCK_ITEM_COUNT = 28;
@@ -55,7 +55,7 @@ const InvitationRow = (props: { invitation: OrganizationInvitationResource }) =>
       <Td>
         <Text
           colorScheme={'neutral'}
-          localizationKey={invitation.role}
+          localizationKey={roleLocalizationKey(invitation.role)}
         />
       </Td>
       <Td>
