@@ -1,7 +1,12 @@
 import { OrganizationProfileProps } from '@clerk/types/src';
 import React from 'react';
 
-import { ComponentContext, useOrganizationProfileContext, withCoreUserGuard } from '../../contexts';
+import {
+  ComponentContext,
+  useCoreOrganization,
+  useOrganizationProfileContext,
+  withCoreUserGuard,
+} from '../../contexts';
 import { Flow } from '../../customizables';
 import { ProfileCard, withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
@@ -10,6 +15,12 @@ import { OrganizationProfileNavbar } from './OrganizationProfileNavbar';
 import { CreateOrganizationRoutes, OrganizationProfileRoutes } from './OrganizationProfileRoutes';
 
 const _OrganizationProfile = (_: OrganizationProfileProps) => {
+  // TODO: Should this be a guard HOC?
+  const { organization } = useCoreOrganization();
+  if (!organization) {
+    return null;
+  }
+
   return (
     <Flow.Root flow='organizationProfile'>
       <Flow.Part>
