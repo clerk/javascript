@@ -1,8 +1,6 @@
 import React, { PointerEventHandler, useEffect, useRef } from 'react';
 
-import { mqu, PropsOfComponent } from '../../ui/styledSystem';
-import { getFullName, getIdentifier } from '../../ui/utils';
-import { useCoreClerk, useCoreSession, withCoreUserGuard } from '../contexts';
+import { useCoreClerk, useCoreSession, withCoreUserGuard } from '../../contexts';
 import {
   Col,
   descriptors,
@@ -14,9 +12,11 @@ import {
   Text,
   useAppearance,
   useLocalizations,
-} from '../customizables';
-import { Portal } from '../elements/Portal';
-import { Eye } from '../icons';
+} from '../../customizables';
+import { Portal } from '../../elements/Portal';
+import { Eye } from '../../icons';
+import { mqu, PropsOfComponent } from '../../styledSystem';
+import { getFullName, getIdentifier } from '../../utils';
 
 type EyeCircleProps = PropsOfComponent<typeof Col> & {
   width: string;
