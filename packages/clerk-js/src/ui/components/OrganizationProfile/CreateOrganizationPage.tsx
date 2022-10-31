@@ -1,12 +1,13 @@
 import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
-import { useCoreClerk, useCoreOrganizations, useOrganizationProfileContext } from '../../contexts';
+import { useCoreClerk, useCoreOrganization, useCoreOrganizations, useOrganizationProfileContext } from '../../contexts';
+import { Button, Text } from '../../customizables';
 import { Form, useCardState, withCardStateProvider } from '../../elements';
 import { localizationKeys } from '../../localization';
 import { handleError, useFormControl } from '../../utils';
 import { FormButtonContainer } from '../UserProfile/FormButtons';
-import { InviteMembersPage } from './InviteMembersPage';
+import { InviteMembersForm } from './InviteMembersForm';
 import { ContentPage } from './OrganizationContentPage';
 import { OrganizationProfileAvatarUploader } from './OrganizationProfileAvatarUploader';
 
@@ -17,9 +18,9 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
   const card = useCardState();
   const [file, setFile] = React.useState<File>();
   const { createOrganization } = useCoreOrganizations();
-  const { setActive } = useCoreClerk();
-  const { closeOrganizationProfile } = useCoreClerk();
-  const { mode } = useOrganizationProfileContext();
+  const { setActive, closeOrganizationProfile } = useCoreClerk();
+  const { mode, navigateAfterOrganizationCreationUrl } = useOrganizationProfileContext();
+  const { organization } = useCoreOrganization();
 
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
 
@@ -43,6 +44,13 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
       .then(org => setActive({ organization: org }))
       .then(wizard.nextStep)
       .catch(err => handleError(err, [nameField], card.setError));
+  };
+
+  const completeFlow = () => {
+    navigateAfterOrganizationCreationUrl();
+    if (mode === 'modal') {
+      closeOrganizationProfile();
+    }
   };
 
   return (
@@ -80,7 +88,40 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
           </FormButtonContainer>
         </Form.Root>
       </ContentPage>
-      <InviteMembersPage />
+      <ContentPage
+        Breadcrumbs={null}
+        headerTitle={title}
+        headerSubtitle={subtitle}
+      >
+        <InviteMembersForm
+          organization={organization!}
+          resetButtonLabel={'Skip'}
+          onSuccess={wizard.nextStep}
+          onReset={completeFlow}
+        />
+      </ContentPage>
+      {/*<SuccessPage*/}
+      {/*  title={title}*/}
+      {/*  text={'Invitations successfully sent'}*/}
+      {/*/>*/}
+      <ContentPage
+        Breadcrumbs={null}
+        headerTitle={title}
+      >
+        <Text
+          localizationKey={'Invitations successfully sent'}
+          variant='regularRegular'
+        />
+        <FormButtonContainer>
+          <Button
+            textVariant='buttonExtraSmallBold'
+            block={false}
+            autoFocus
+            localizationKey={localizationKeys('userProfile.formButtonPrimary__finish')}
+            onClick={completeFlow}
+          />
+        </FormButtonContainer>
+      </ContentPage>
     </Wizard>
   );
 });
