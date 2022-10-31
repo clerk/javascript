@@ -494,9 +494,9 @@ export type OrganizationProfileProps = {
   path?: string;
   /*
    * If set to true, the OrganizationProfile will display the Create Organization flow
-   * @default false
+   * @default undefined
    */
-  createOrganization?: boolean;
+  new?: boolean;
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`

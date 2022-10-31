@@ -234,11 +234,11 @@ export const useOrganizationProfileContext = () => {
     throw new Error('Clerk: useOrganizationProfileContext called outside OrganizationProfile.');
   }
 
-  const navigateAfterOrganizationSwitchUrl = () => navigate(ctx.createOrganization);
+  const navigateAfterOrganizationSwitchUrl = () => navigate(ctx.new);
 
   return {
     ...ctx,
-    createOrganization: ctx.createOrganization || false,
+    new: ctx.new || false,
     navigateAfterOrganizationSwitchUrl,
     componentName,
   };

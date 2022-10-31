@@ -43,7 +43,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
     };
 
     const handleCreateOrganizationClicked = () => {
-      openOrganizationProfile({ createOrganization: true });
+      openOrganizationProfile({ new: true });
       close();
     };
 

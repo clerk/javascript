@@ -27,9 +27,9 @@ const _OrganizationProfile = (_: OrganizationProfileProps) => {
 
 const AuthenticatedRoutes = withCoreUserGuard(() => {
   const contentRef = React.useRef<HTMLDivElement>(null);
-  const { createOrganization } = useOrganizationProfileContext();
+  const { new: showCreateOrganization } = useOrganizationProfileContext();
 
-  if (createOrganization) {
+  if (showCreateOrganization) {
     return (
       <ProfileCard sx={{ height: '100%' }}>
         <CreateOrganizationRoutes />
