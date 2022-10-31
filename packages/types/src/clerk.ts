@@ -498,6 +498,17 @@ export type OrganizationProfileProps = {
    */
   new?: boolean;
   /**
+   * Full URL or path to navigate after creating a new organization.
+   * @default undefined
+   */
+  afterOrganizationCreationUrl?: string;
+  /**
+   * Full URL or path to navigate after a user accepts an invitation
+   * and successfully joins the corresponding organization.
+   * TODO: confirm the naming
+   */
+  invitationRedirectUrl?: string;
+  /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvided (if one is provided)
@@ -558,10 +569,6 @@ export type OrganizationSwitcherProps = {
    */
   defaultOpen?: boolean;
   /**
-   * Full URL or path to navigate after a successful organization switch.
-   */
-  afterOrganizationSwitchUrl?: string;
-  /**
    * By default, users can switch between organization and their personal account.
    * This option controls whether OrganizationSwitcher will include the user's personal account
    * in the organization list. Setting this to `false` will hide the personal account entry,
@@ -569,6 +576,27 @@ export type OrganizationSwitcherProps = {
    * @default true
    */
   showPersonalAccount?: boolean;
+  /**
+   * Full URL or path to navigate after a successful organization switch.
+   */
+  afterOrganizationSwitchUrl?: string;
+  /**
+   * Full URL or path to navigate after creating a new organization.
+   * @default undefined
+   */
+  afterOrganizationCreationUrl?: string;
+  /**
+   * Props to pass through to the OrganizationProfile component, if opened as a modal.
+   * By default, clicking the "Manage organization" button inside the OrganizationSwitcher
+   * will open a OrganizationProfile modal.
+   */
+  organizationProfileProps?: OrganizationProfileProps;
+  /**
+   * Controls whether clicking the "Manage organization" button will cause
+   * the OrganizationProfile component to open as a modal, or if the browser will navigate
+   * to the `organizationProfileUrl` where OrganizationProfile is mounted as a page.
+   */
+  organizationProfileMode?: 'modal' | 'navigation';
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`

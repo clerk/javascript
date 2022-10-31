@@ -25,8 +25,8 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
     const card = useCardState();
     const { openOrganizationProfile } = useCoreClerk();
     const { organization: currentOrg } = useCoreOrganization();
-    const { createOrganization, isLoaded, setActive } = useCoreOrganizationList();
-    const { showPersonalAccount } = useOrganizationSwitcherContext();
+    const { isLoaded, setActive } = useCoreOrganizationList();
+    const { showPersonalAccount, afterOrganizationCreationUrl } = useOrganizationSwitcherContext();
 
     const user = useCoreUser();
 
@@ -43,7 +43,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
     };
 
     const handleCreateOrganizationClicked = () => {
-      openOrganizationProfile({ new: true });
+      openOrganizationProfile({ new: true, afterOrganizationCreationUrl });
       close();
     };
 
