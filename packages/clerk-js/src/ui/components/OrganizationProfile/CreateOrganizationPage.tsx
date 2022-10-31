@@ -1,11 +1,11 @@
 import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
-import { useCoreClerk, useCoreOrganizations } from '../../contexts';
+import { useCoreClerk, useCoreOrganizations, useOrganizationProfileContext } from '../../contexts';
 import { Form, useCardState, withCardStateProvider } from '../../elements';
 import { localizationKeys } from '../../localization';
 import { handleError, useFormControl } from '../../utils';
-import { FormButtons } from '../UserProfile/FormButtons';
+import { FormButtonContainer } from '../UserProfile/FormButtons';
 import { InviteMembersPage } from './InviteMembersPage';
 import { ContentPage } from './OrganizationContentPage';
 import { OrganizationProfileAvatarUploader } from './OrganizationProfileAvatarUploader';
@@ -18,6 +18,8 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
   const [file, setFile] = React.useState<File>();
   const { createOrganization } = useCoreOrganizations();
   const { setActive } = useCoreClerk();
+  const { closeOrganizationProfile } = useCoreClerk();
+  const { mode } = useOrganizationProfileContext();
 
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
 
@@ -62,11 +64,20 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
               required
             />
           </Form.ControlRow>
-          <FormButtons
-            // localizationKey={localizationKeys('createOrganization')}
-            isDisabled={!canSubmit}
-            submitLabel={'Create organization'}
-          />
+          <FormButtonContainer>
+            <Form.SubmitButton
+              block={false}
+              isDisabled={!canSubmit}
+              localizationKey={'Create organization'}
+            />
+            {mode === 'modal' && (
+              <Form.ResetButton
+                localizationKey={localizationKeys('userProfile.formButtonReset')}
+                block={false}
+                onClick={closeOrganizationProfile}
+              />
+            )}
+          </FormButtonContainer>
         </Form.Root>
       </ContentPage>
       <InviteMembersPage />
