@@ -11,7 +11,7 @@ module.exports = {
     },
   },
 
-  setupFilesAfterEnv: ['<rootDir>../../setupJest.afterEnv.js'],
+  setupFilesAfterEnv: ['<rootDir>../../setupJest.afterEnv.ts'],
 
   // Coverage
   collectCoverageFrom: ['**/*.{js,jsx,ts,tsx}'],

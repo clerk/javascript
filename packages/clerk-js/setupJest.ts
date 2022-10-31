@@ -1,3 +1,5 @@
+import { jest } from '@jest/globals';
+
 window.ResizeObserver =
   window.ResizeObserver ||
   jest.fn().mockImplementation(() => ({
