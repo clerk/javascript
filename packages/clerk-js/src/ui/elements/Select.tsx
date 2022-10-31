@@ -331,16 +331,18 @@ export const SelectButton = (props: PropsOfComponent<typeof Button>) => {
       {...rest}
     >
       {show}
-      <Icon
-        icon={Caret}
-        sx={theme => ({
-          width: theme.sizes.$3x5,
-          marginLeft: theme.space.$1,
-          transitionProperty: theme.transitionProperty.$common,
-          transitionDuration: theme.transitionDuration.$controls,
-          transform: `rotate(${isOpen ? '180' : '0'}deg)`,
-        })}
-      />
+      {!rest.isDisabled && (
+        <Icon
+          icon={Caret}
+          sx={theme => ({
+            width: theme.sizes.$3x5,
+            marginLeft: theme.space.$1,
+            transitionProperty: theme.transitionProperty.$common,
+            transitionDuration: theme.transitionDuration.$controls,
+            transform: `rotate(${isOpen ? '180' : '0'}deg)`,
+          })}
+        />
+      )}
     </Button>
   );
 };
