@@ -216,11 +216,13 @@ export const useOrganizationSwitcherContext = () => {
   }
 
   const navigateAfterOrganizationSwitchUrl = () => navigate(ctx.afterOrganizationSwitchUrl);
+  const navigateAfterOrganizationCreationUrl = () => navigate(ctx.afterOrganizationCreationUrl);
 
   return {
     ...ctx,
     showPersonalAccount: ctx.showPersonalAccount ?? true,
     navigateAfterOrganizationSwitchUrl,
+    navigateAfterOrganizationCreationUrl,
     componentName,
   };
 };
@@ -234,12 +236,12 @@ export const useOrganizationProfileContext = () => {
     throw new Error('Clerk: useOrganizationProfileContext called outside OrganizationProfile.');
   }
 
-  const navigateAfterOrganizationSwitchUrl = () => navigate(ctx.new);
+  const navigateAfterOrganizationCreationUrl = () => navigate(ctx.afterOrganizationCreationUrl);
 
   return {
     ...ctx,
     new: ctx.new || false,
-    navigateAfterOrganizationSwitchUrl,
+    navigateAfterOrganizationCreationUrl,
     componentName,
   };
 };
