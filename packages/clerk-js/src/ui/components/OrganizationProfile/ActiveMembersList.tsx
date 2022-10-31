@@ -2,9 +2,9 @@ import { MembershipRole, OrganizationMembershipResource } from '@clerk/types';
 import React, { useState } from 'react';
 
 import { useCoreOrganization, useCoreUser } from '../../contexts';
-import { Badge, localizationKeys, Td } from '../../customizables';
+import { Badge, localizationKeys, Td, Text } from '../../customizables';
 import { ThreeDotsMenu, useCardState, usePagination, UserPreview } from '../../elements';
-import { handleError } from '../../utils';
+import { handleError, roleLocalizationKey } from '../../utils';
 import { MembersListTable, RoleSelect, RowContainer } from './MemberListTable';
 
 const MOCK_ITEM_COUNT = 28;
@@ -72,11 +72,18 @@ const MemberRow = (props: { membership: OrganizationMembershipResource }) => {
       </Td>
       <Td>{membership.createdAt.toLocaleDateString()}</Td>
       <Td>
-        <RoleSelect
-          isDisabled={!isAdmin || card.isLoading}
-          value={role}
-          onChange={handleRoleChange}
-        />
+        {isAdmin ? (
+          <RoleSelect
+            isDisabled={card.isLoading}
+            value={role}
+            onChange={handleRoleChange}
+          />
+        ) : (
+          <Text
+            sx={t => ({ opacity: t.opacity.$inactive })}
+            localizationKey={roleLocalizationKey(role)}
+          />
+        )}
       </Td>
       <Td>
         {isAdmin && (
