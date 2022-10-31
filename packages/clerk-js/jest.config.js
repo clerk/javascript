@@ -34,7 +34,7 @@ module.exports = {
   automock: false,
   setupFiles: ['./setupJest.ts'],
   setupFilesAfterEnv: ['<rootDir>../../setupJest.afterEnv.ts'],
-  injectGlobals: false,
+  injectGlobals: true,
 
   // Test spec file resolution pattern
   // Matches parent folder `__tests__` and filename
