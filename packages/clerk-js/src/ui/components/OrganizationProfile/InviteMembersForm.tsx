@@ -31,7 +31,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
     return null;
   }
 
-  const emailAddressField = useFormControl('emailAddress', `nikos+${Date.now()}@clerk.dev`, {
+  const emailAddressField = useFormControl('emailAddress', '', {
     type: 'text',
     label: localizationKeys('formFieldLabel__emailAddresses'),
     placeholder: localizationKeys('formFieldInputPlaceholder__emailAddresses'),
