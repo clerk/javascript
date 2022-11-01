@@ -45,6 +45,7 @@ export interface AddMemberParams {
 export interface InviteMemberParams {
   emailAddress: string;
   role: MembershipRole;
+  publicMetadata?: Record<string, unknown>;
   redirectUrl?: string;
 }
 

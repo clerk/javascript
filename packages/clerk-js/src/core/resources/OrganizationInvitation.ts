@@ -12,6 +12,7 @@ export class OrganizationInvitation extends BaseResource implements Organization
   id!: string;
   emailAddress!: string;
   organizationId!: string;
+  publicMetadata: Record<string, unknown> = {};
   status!: OrganizationInvitationStatus;
   role!: MembershipRole;
   createdAt!: Date;
@@ -19,7 +20,7 @@ export class OrganizationInvitation extends BaseResource implements Organization
 
   static async create(
     organizationId: string,
-    { emailAddress, role, redirectUrl }: CreateOrganizationInvitationParams,
+    { emailAddress, role, redirectUrl, publicMetadata }: CreateOrganizationInvitationParams,
   ): Promise<OrganizationInvitationResource> {
     const json = (
       await BaseResource._fetch<OrganizationInvitationJSON>({
@@ -29,6 +30,7 @@ export class OrganizationInvitation extends BaseResource implements Organization
           email_address: emailAddress,
           role,
           redirect_url: redirectUrl,
+          public_metadata: JSON.stringify(publicMetadata),
         } as any,
       })
     )?.response as unknown as OrganizationInvitationJSON;
@@ -55,6 +57,7 @@ export class OrganizationInvitation extends BaseResource implements Organization
     this.id = data.id;
     this.emailAddress = data.email_address;
     this.organizationId = data.organization_id;
+    this.publicMetadata = data.public_metadata;
     this.role = data.role;
     this.status = data.status;
     this.createdAt = unixEpochToDate(data.created_at);
@@ -67,4 +70,5 @@ export type CreateOrganizationInvitationParams = {
   emailAddress: string;
   role: MembershipRole;
   redirectUrl?: string;
+  publicMetadata?: Record<string, unknown>;
 };
