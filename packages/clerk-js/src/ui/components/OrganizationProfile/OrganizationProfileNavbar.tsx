@@ -51,6 +51,7 @@ export const OrganizationProfileNavbar = (
 const pageToRootNavbarRouteMap = {
   'invite-members': organizationProfileRoutes.find(r => r.id === 'members'),
   profile: organizationProfileRoutes.find(r => r.id === 'settings'),
+  leave: organizationProfileRoutes.find(r => r.id === 'settings'),
 };
 
 export const OrganizationProfileBreadcrumbs = (props: Pick<PropsOfComponent<typeof Breadcrumbs>, 'title'>) => {
