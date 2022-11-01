@@ -31,6 +31,12 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
     return null;
   }
 
+  const roles: Array<{ label: string; value: MembershipRole }> = [
+    { label: t(roleLocalizationKey('admin')), value: 'admin' },
+    { label: t(roleLocalizationKey('basic_member')), value: 'basic_member' },
+    { label: t(roleLocalizationKey('guest_member')), value: 'guest_member' },
+  ];
+
   const emailAddressField = useFormControl('emailAddress', '', {
     type: 'text',
     label: localizationKeys('formFieldLabel__emailAddresses'),
@@ -38,7 +44,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
   });
 
   const roleField = useFormControl('role', 'basic_member', {
-    type: 'text',
+    options: roles,
     // label: localizationKeys('formFieldLabel__firstName'),
     // placeholder: localizationKeys('formFieldInputPlaceholder__firstName'),
     label: 'Role',
@@ -74,12 +80,6 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
       });
   };
 
-  const roles: Array<{ label: string; value: MembershipRole }> = [
-    { label: t(roleLocalizationKey('admin')), value: 'admin' },
-    { label: t(roleLocalizationKey('basic_member')), value: 'basic_member' },
-    { label: t(roleLocalizationKey('guest_member')), value: 'guest_member' },
-  ];
-
   return (
     <>
       {!!invalidEmails.length && (
@@ -113,10 +113,10 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
             gap={2}
           >
             <Text>Role</Text>
+            {/*// @ts-expect-error */}
             <Select
-              options={roles}
-              value={roleField.value}
-              onChange={role => roleField.setValue(role.value)}
+              {...roleField.props}
+              onChange={option => roleField.setValue(option.value)}
             />
           </Flex>
         </Form.ControlRow>

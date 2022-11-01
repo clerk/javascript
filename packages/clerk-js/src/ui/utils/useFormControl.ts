@@ -3,12 +3,22 @@ import React, { HTMLInputTypeAttribute } from 'react';
 
 import { LocalizationKey, useLocalizations } from '../localization';
 
+type SelectOption = { value: string; label?: string };
+
 type Options = {
-  type: HTMLInputTypeAttribute;
   isRequired?: boolean;
   label: string | LocalizationKey;
   placeholder?: string | LocalizationKey;
-};
+} & (
+  | {
+      type: HTMLInputTypeAttribute;
+      options?: never;
+    }
+  | {
+      type?: never;
+      options: SelectOption[];
+    }
+);
 
 type FieldStateProps<Id> = {
   id: Id;
@@ -24,12 +34,12 @@ export type FormControlState<Id = string> = FieldStateProps<Id> & {
   props: FieldStateProps<Id>;
 };
 
-export const useFormControl = <Id extends string>(
+export const useFormControl = <Id extends string, Opts extends Options>(
   id: Id,
   initialState: string,
-  opts?: Options,
+  opts: Opts,
 ): FormControlState<Id> => {
-  opts = opts || { type: 'text', label: '', isRequired: false, placeholder: '' };
+  opts = opts || { type: 'text', label: '', isRequired: false, placeholder: '', options: [] };
   const { translateError } = useLocalizations();
   const [value, setValueInternal] = React.useState(initialState);
   const [errorText, setErrorText] = React.useState<string | undefined>(undefined);
