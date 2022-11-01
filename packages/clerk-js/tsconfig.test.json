@@ -1,9 +1,9 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "jsx": "react-jsx",
-    "noImplicitReturns": false,
-    "lib": ["es2019", "es6", "dom"]
+    "noImplicitReturns": false
+    //    "lib": ["es2019", "es6", "dom"],
+    //    "noImplicitAny": false
     //    "strict": false
   },
   "include": ["src/**/*"],

@@ -1,14 +1,12 @@
-import { AttributeData, Clerk, EnvironmentResource } from '@clerk/types';
-import { Attributes, OAuthProviders, SignInData } from '@clerk/types/src';
+import { AttributeData, Attributes, Clerk, EnvironmentResource, OAuthProviders, SignInData } from '@clerk/types';
 import React from 'react';
-import { RouteContext } from 'ui/router';
 
-import { EnvironmentProvider } from '../contexts';
+import { ComponentContext, EnvironmentProvider } from '../contexts';
 import { CoreClerkContextWrapper } from '../contexts/CoreClerkContextWrapper';
 import { AppearanceProvider } from '../customizables';
 import { FlowMetadataProvider } from '../elements';
+import { RouteContext } from '../router';
 import { InternalThemeProvider } from '../styledSystem';
-import { ComponentContext } from '../contexts';
 
 const initialConfig = {
   frontendApi: '',
@@ -291,16 +289,16 @@ const initialEnvironmentResource = {
     preferredSignInStrategy: 'password',
     logoUrl: 'https://images.clerk.services/clerk/logo.svg',
     faviconUrl: null,
-    backendHost: window.location.host,
-    homeUrl: 'https://dashboard.prod.lclclerk.com',
-    signInUrl: 'https://accounts.prod.lclclerk.com/sign-in',
-    signUpUrl: 'https://accounts.prod.lclclerk.com/sign-up',
-    userProfileUrl: 'https://accounts.prod.lclclerk.com/user',
-    afterSignInUrl: 'https://dashboard.prod.lclclerk.com',
-    afterSignUpUrl: 'https://dashboard.prod.lclclerk.com',
-    afterSignOutOneUrl: 'https://accounts.prod.lclclerk.com/sign-in/choose',
-    afterSignOutAllUrl: 'https://accounts.prod.lclclerk.com/sign-in',
-    afterSwitchSessionUrl: 'https://dashboard.prod.lclclerk.com',
+    backendHost: '',
+    homeUrl: '',
+    signInUrl: '',
+    signUpUrl: '',
+    userProfileUrl: '',
+    afterSignInUrl: '',
+    afterSignUpUrl: '',
+    afterSignOutOneUrl: '',
+    afterSignOutAllUrl: '',
+    afterSwitchSessionUrl: '',
     branded: true,
     supportEmail: '',
     clerkJSVersion: null,

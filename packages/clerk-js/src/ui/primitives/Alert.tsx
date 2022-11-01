@@ -16,8 +16,11 @@ export type AlertProps = FlexProps & StyleVariants<typeof applyVariants>;
 
 export const Alert = (props: AlertProps): JSX.Element => {
   return (
+    // @ts-ignore
     <Flex
+      // @ts-ignore
       align='center'
+      // @ts-ignore
       justify='start'
       {...filterProps(props)}
       css={applyVariants(props)}

@@ -12,37 +12,30 @@ module.exports = {
   },
 
   // Coverage
-  collectCoverageFrom: [
-    '**/*.{js,jsx,ts,tsx}',
-    '!**/*.d.ts',
-    '!**/index.ts',
-    '!**/index.browser.ts',
-    '!**/index.headless.ts',
-    '!**/index.headless.browser.ts',
-    '!**/coverage/**',
-    '!**/dist/**',
-    '!**/node_modules/**',
-  ],
+  // collectCoverageFrom: [
+  //   '**/*.{js,jsx,ts,tsx}',
+  //   '!**/*.d.ts',
+  //   '!**/index.ts',
+  //   '!**/index.browser.ts',
+  //   '!**/index.headless.ts',
+  //   '!**/index.headless.browser.ts',
+  //   '!**/coverage/**',
+  //   '!**/dist/**',
+  //   '!**/node_modules/**',
+  // ],
 
   // Jest transformations -- this adds support for TypeScript
   // using ts-jest
   transform: {
-    '^.+\\.tsx?$': [
-      'ts-jest',
-      {
-        babelConfig: {
-          presets: ['@emotion/babel-preset-css-prop'],
-        },
-      },
-    ],
+    '^.+\\.tsx?$': ['ts-jest'],
     '^.+\\.svg$': '<rootDir>/svgTransform.js',
   },
 
   // For mocking fetch
   automock: false,
   setupFiles: ['./setupJest.ts'],
-  setupFilesAfterEnv: ['<rootDir>../../setupJest.afterEnv.ts'],
-  snapshotSerializers: ['@emotion/jest/serializer'],
+  // setupFilesAfterEnv: ['<rootDir>../../setupJest.afterEnv.ts'],
+  // snapshotSerializers: ['@emotion/jest/serializer'],
   injectGlobals: true,
 
   // Test spec file resolution pattern
@@ -51,15 +44,15 @@ module.exports = {
   testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$',
 
   // Module file extensions for importings
-  transformIgnorePatterns: ['^.+\\.module\\.(css|sass|scss)$'],
+  // transformIgnorePatterns: ['^.+\\.module\\.(css|sass|scss)$'],
 
-  moduleNameMapper: {
-    '^ui/(.*)': '<rootDir>/src/ui/$1',
-    '^core/(.*)': '<rootDir>/src/core/$1',
-    '^utils/(.*)$': '<rootDir>/src/utils/$1',
-    '^utils': '<rootDir>/src/utils',
-    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-  },
+  // moduleNameMapper: {
+  //   '^ui/(.*)': '<rootDir>/src/ui/$1',
+  //   '^core/(.*)': '<rootDir>/src/core/$1',
+  //   '^utils/(.*)$': '<rootDir>/src/utils/$1',
+  //   '^utils': '<rootDir>/src/utils',
+  //   '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+  // },
 
   testPathIgnorePatterns: ['/node_modules/'],
 };
