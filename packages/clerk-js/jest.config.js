@@ -27,13 +27,22 @@ module.exports = {
   // Jest transformations -- this adds support for TypeScript
   // using ts-jest
   transform: {
-    '^.+\\.tsx?$': 'ts-jest',
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        babelConfig: {
+          presets: ['@emotion/babel-preset-css-prop'],
+        },
+      },
+    ],
+    '^.+\\.svg$': '<rootDir>/svgTransform.js',
   },
 
   // For mocking fetch
   automock: false,
   setupFiles: ['./setupJest.ts'],
   setupFilesAfterEnv: ['<rootDir>../../setupJest.afterEnv.ts'],
+  snapshotSerializers: ['@emotion/jest/serializer'],
   injectGlobals: true,
 
   // Test spec file resolution pattern

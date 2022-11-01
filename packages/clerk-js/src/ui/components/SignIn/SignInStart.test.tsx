@@ -1,8 +1,9 @@
-import { render } from '@clerk/shared/testUtils';
 import { expect, it } from '@jest/globals';
+import React from 'react';
 import { createFixture } from 'ui/utils/testUtils';
 
 import { SignInStart } from './SignInStart';
+import { render, screen } from '@clerk/shared/testUtils';
 
 it('navigates to home_url', () => {
   // const Component = withRedirectToHome(Tester);
@@ -12,10 +13,14 @@ it('navigates to home_url', () => {
   });
 
   render(
-    <MockClerkProvider>
+    <MockClerkProvider data-testid='sign-in-start'>
       <SignInStart />
     </MockClerkProvider>,
   );
+
+  const component = screen.getByTestId('sign-in-start');
+
+  // expect(component).toBeDefined();
 
   // expect(...).toHaveBeenNthCalledWith(...);
 

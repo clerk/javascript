@@ -1,11 +1,135 @@
 import { AttributeData, Clerk, EnvironmentResource } from '@clerk/types';
 import { Attributes, OAuthProviders, SignInData } from '@clerk/types/src';
+import React from 'react';
+import { RouteContext } from 'ui/router';
 
 import { EnvironmentProvider } from '../contexts';
 import { CoreClerkContextWrapper } from '../contexts/CoreClerkContextWrapper';
 import { AppearanceProvider } from '../customizables';
+import { FlowMetadataProvider } from '../elements';
+import { InternalThemeProvider } from '../styledSystem';
+import { ComponentContext } from '../contexts';
 
-const initialEnvResource = {
+const initialConfig = {
+  frontendApi: '',
+  organization: undefined,
+  user: null,
+  session: null,
+  addListener: jest.fn(),
+  client: {
+    pathRoot: '/client',
+    sessions: [],
+    signUp: {
+      pathRoot: '/client/sign_ups',
+      status: null,
+      requiredFields: [],
+      optionalFields: [],
+      missingFields: [],
+      unverifiedFields: [],
+      verifications: {
+        emailAddress: {
+          pathRoot: '',
+          status: null,
+          strategy: null,
+          nonce: null,
+          externalVerificationRedirectURL: null,
+          attempts: null,
+          expireAt: null,
+          error: null,
+          verifiedAtClient: null,
+          nextAction: '',
+          supportedStrategies: [],
+        },
+        phoneNumber: {
+          pathRoot: '',
+          status: null,
+          strategy: null,
+          nonce: null,
+          externalVerificationRedirectURL: null,
+          attempts: null,
+          expireAt: null,
+          error: null,
+          verifiedAtClient: null,
+          nextAction: '',
+          supportedStrategies: [],
+        },
+        web3Wallet: {
+          pathRoot: '',
+          status: null,
+          strategy: null,
+          nonce: null,
+          externalVerificationRedirectURL: null,
+          attempts: null,
+          expireAt: null,
+          error: null,
+          verifiedAtClient: null,
+          nextAction: '',
+          supportedStrategies: [],
+        },
+        externalAccount: {
+          pathRoot: '',
+          status: null,
+          strategy: null,
+          nonce: null,
+          externalVerificationRedirectURL: null,
+          attempts: null,
+          expireAt: null,
+          error: null,
+          verifiedAtClient: null,
+        },
+      },
+      username: null,
+      firstName: null,
+      lastName: null,
+      emailAddress: null,
+      phoneNumber: null,
+      web3wallet: null,
+      hasPassword: false,
+      unsafeMetadata: {},
+      createdSessionId: null,
+      createdUserId: null,
+      abandonAt: null,
+    },
+    signIn: {
+      pathRoot: '/client/sign_ins',
+      status: null,
+      supportedIdentifiers: [],
+      supportedFirstFactors: [],
+      supportedSecondFactors: [],
+      firstFactorVerification: {
+        pathRoot: '',
+        status: null,
+        strategy: null,
+        nonce: null,
+        externalVerificationRedirectURL: null,
+        attempts: null,
+        expireAt: null,
+        error: null,
+        verifiedAtClient: null,
+      },
+      secondFactorVerification: {
+        pathRoot: '',
+        status: null,
+        strategy: null,
+        nonce: null,
+        externalVerificationRedirectURL: null,
+        attempts: null,
+        expireAt: null,
+        error: null,
+        verifiedAtClient: null,
+      },
+      identifier: null,
+      createdSessionId: null,
+      userData: {},
+    },
+    lastActiveSessionId: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    id: 'client_2GLpcZTwM08TAm7RCDFrfekjbCO',
+  },
+} as any; // initialize config
+
+const initialEnvironmentResource = {
   userSettings: {
     id: undefined,
     social: {
@@ -142,7 +266,7 @@ const initialEnvResource = {
   displayConfig: {
     pathRoot: '',
     id: 'display_config_2GLnHgZkgHLIp5F3ciLxw1jdRrX',
-    instanceEnvironmentType: 'dev',
+    instanceEnvironmentType: 'production',
     applicationName: 'ClerkProd-(local)',
     theme: {
       buttons: {
@@ -167,7 +291,7 @@ const initialEnvResource = {
     preferredSignInStrategy: 'password',
     logoUrl: 'https://images.clerk.services/clerk/logo.svg',
     faviconUrl: null,
-    backendHost: 'dapi.prod.lclclerk.com',
+    backendHost: window.location.host,
     homeUrl: 'https://dashboard.prod.lclclerk.com',
     signInUrl: 'https://accounts.prod.lclclerk.com/sign-in',
     signUpUrl: 'https://accounts.prod.lclclerk.com/sign-up',
@@ -183,8 +307,8 @@ const initialEnvResource = {
     experimental__forceOauthFirst: false,
   },
   isSingleSession: () => false,
-  isProduction: () => false,
-  onWindowLocationHost: () => false,
+  isProduction: () => true,
+  onWindowLocationHost: () => true,
 } as any as EnvironmentResource;
 
 const createClerkFixture = () => {
@@ -219,129 +343,13 @@ type FParam = {
 type ConfigFn = (f: FParam) => void;
 
 export const createFixture = (configFn: ConfigFn) => {
-  const config = {
-    frontendApi: 'clerk.prod.lclclerk.com',
-    organization: undefined,
-    user: null,
-    session: null,
-    client: {
-      pathRoot: '/client',
-      sessions: [],
-      signUp: {
-        pathRoot: '/client/sign_ups',
-        status: null,
-        requiredFields: [],
-        optionalFields: [],
-        missingFields: [],
-        unverifiedFields: [],
-        verifications: {
-          emailAddress: {
-            pathRoot: '',
-            status: null,
-            strategy: null,
-            nonce: null,
-            externalVerificationRedirectURL: null,
-            attempts: null,
-            expireAt: null,
-            error: null,
-            verifiedAtClient: null,
-            nextAction: '',
-            supportedStrategies: [],
-          },
-          phoneNumber: {
-            pathRoot: '',
-            status: null,
-            strategy: null,
-            nonce: null,
-            externalVerificationRedirectURL: null,
-            attempts: null,
-            expireAt: null,
-            error: null,
-            verifiedAtClient: null,
-            nextAction: '',
-            supportedStrategies: [],
-          },
-          web3Wallet: {
-            pathRoot: '',
-            status: null,
-            strategy: null,
-            nonce: null,
-            externalVerificationRedirectURL: null,
-            attempts: null,
-            expireAt: null,
-            error: null,
-            verifiedAtClient: null,
-            nextAction: '',
-            supportedStrategies: [],
-          },
-          externalAccount: {
-            pathRoot: '',
-            status: null,
-            strategy: null,
-            nonce: null,
-            externalVerificationRedirectURL: null,
-            attempts: null,
-            expireAt: null,
-            error: null,
-            verifiedAtClient: null,
-          },
-        },
-        username: null,
-        firstName: null,
-        lastName: null,
-        emailAddress: null,
-        phoneNumber: null,
-        web3wallet: null,
-        hasPassword: false,
-        unsafeMetadata: {},
-        createdSessionId: null,
-        createdUserId: null,
-        abandonAt: null,
-      },
-      signIn: {
-        pathRoot: '/client/sign_ins',
-        status: null,
-        supportedIdentifiers: [],
-        supportedFirstFactors: [],
-        supportedSecondFactors: [],
-        firstFactorVerification: {
-          pathRoot: '',
-          status: null,
-          strategy: null,
-          nonce: null,
-          externalVerificationRedirectURL: null,
-          attempts: null,
-          expireAt: null,
-          error: null,
-          verifiedAtClient: null,
-        },
-        secondFactorVerification: {
-          pathRoot: '',
-          status: null,
-          strategy: null,
-          nonce: null,
-          externalVerificationRedirectURL: null,
-          attempts: null,
-          expireAt: null,
-          error: null,
-          verifiedAtClient: null,
-        },
-        identifier: null,
-        createdSessionId: null,
-        userData: {},
-      },
-      lastActiveSessionId: null,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      id: 'client_2GLpcZTwM08TAm7RCDFrfekjbCO',
-    },
-  } as any; // initialize config
+  const config = initialConfig;
   const f = {
     withUsername: () => {
-      config.user_settings.username = {
-        enabled: true,
-        required: true,
-      };
+      // config.user_settings.username = {
+      //   enabled: true,
+      //   required: true,
+      // };
     },
     withGoogleOauth: () => {
       config.user_settings.social.google_oauth = {
@@ -360,8 +368,33 @@ export const createFixture = (configFn: ConfigFn) => {
     const { children } = props;
     return (
       <CoreClerkContextWrapper clerk={config}>
-        <EnvironmentProvider value={initialEnvResource}>
-          <AppearanceProvider appearanceKey={'signIn'}>{children}</AppearanceProvider>
+        <EnvironmentProvider value={initialEnvironmentResource}>
+          <RouteContext.Provider
+            value={{
+              basePath: '',
+              startPath: '',
+              fullPath: '',
+              indexPath: '',
+              currentPath: '',
+              queryString: '',
+              queryParams: {},
+              getMatchData: jest.fn(),
+              matches: jest.fn(),
+              baseNavigate: jest.fn(),
+              navigate: jest.fn(),
+              resolve: jest.fn(),
+              refresh: jest.fn(),
+              params: {},
+            }}
+          >
+            <AppearanceProvider appearanceKey={'signIn'}>
+              <FlowMetadataProvider flow={'signIn'}>
+                <InternalThemeProvider>
+                  <ComponentContext.Provider value={{ componentName: 'SignIn' }}>{children}</ComponentContext.Provider>
+                </InternalThemeProvider>
+              </FlowMetadataProvider>
+            </AppearanceProvider>
+          </RouteContext.Provider>
         </EnvironmentProvider>
       </CoreClerkContextWrapper>
     );
