@@ -31,7 +31,8 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
   formFieldLabel__backupCode: 'Backup code',
   formFieldLabel__organizationName: 'Organization name',
   formFieldInputPlaceholder__emailAddress: '',
-  formFieldInputPlaceholder__emailAddresses: 'Enter one or more email addresses, separated by spaces or commas',
+  formFieldInputPlaceholder__emailAddresses:
+    'Enter or paste one or more email addresses, separated by spaces or commas',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
   formFieldInputPlaceholder__emailAddress_phoneNumber: '',
