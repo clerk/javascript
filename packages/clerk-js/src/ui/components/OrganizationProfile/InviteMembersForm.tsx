@@ -114,11 +114,11 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
           >
             <Text>Role</Text>
             <Select
-              options={roles.map(r => r.label)}
+              options={roles}
               value={roleField.value}
-              onChange={val => roleField.setValue(roles.find(r => r.label === val)!.value)}
+              onChange={role => roleField.setValue(role.value)}
             >
-              <SelectButton>{roles.find(r => r.value === roleField.value)!.label}</SelectButton>
+              <SelectButton />
               <SelectOptionList />
             </Select>
           </Flex>

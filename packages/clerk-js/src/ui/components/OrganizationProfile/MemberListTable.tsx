@@ -97,9 +97,9 @@ export const RoleSelect = (props: { value: MembershipRole; onChange: any; isDisa
 
   return (
     <Select
-      options={roles.map(r => r.label)}
+      options={roles}
       value={value}
-      onChange={val => onChange(roles.find(r => r.label === val)!.value)}
+      onChange={role => onChange(role.value)}
     >
       <SelectButton
         sx={t => ({
@@ -108,9 +108,7 @@ export const RoleSelect = (props: { value: MembershipRole; onChange: any; isDisa
           backgroundColor: 'transparent',
         })}
         isDisabled={isDisabled}
-      >
-        {roles.find(r => r.value === value)!.label}
-      </SelectButton>
+      />
       <SelectOptionList />
     </Select>
   );
