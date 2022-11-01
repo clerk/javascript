@@ -37,8 +37,8 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
 
   get hasValidAuthFactor() {
     return (
-      this.attributes.email_address.used_for_first_factor ||
-      this.attributes.phone_number.used_for_first_factor ||
+      this.attributes.email_address.enabled ||
+      this.attributes.phone_number.enabled ||
       (this.attributes.password.required && this.attributes.username.required)
     );
   }
