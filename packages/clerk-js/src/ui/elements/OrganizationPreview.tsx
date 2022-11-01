@@ -1,8 +1,9 @@
 import { OrganizationResource, UserResource } from '@clerk/types';
 import React from 'react';
 
-import { Flex, localizationKeys, Text } from '../customizables';
+import { Flex, Text } from '../customizables';
 import { PropsOfComponent } from '../styledSystem';
+import { roleLocalizationKey } from '../utils';
 import { OrganizationAvatar } from './OrganizationAvatar';
 
 export type OrganizationPreviewProps = PropsOfComponent<typeof Flex> & {
@@ -51,14 +52,7 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
         </Text>
         {organization.name && (
           <Text
-            localizationKey={
-              role &&
-              {
-                admin: localizationKeys('membershipRole__admin'),
-                basic_member: localizationKeys('membershipRole__basicMember'),
-                guest_member: localizationKeys('membershipRole__guestMember'),
-              }[role]
-            }
+            localizationKey={role && roleLocalizationKey(role)}
             variant='smallRegular'
             colorScheme='neutral'
             truncate

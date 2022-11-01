@@ -5,8 +5,8 @@ import { ClerkAPIResponseError } from '../../../core/resources/Error';
 import { Flex, Text } from '../../customizables';
 import { Alert, Form, Select, SelectButton, SelectOptionList, TagInput, useCardState } from '../../elements';
 import { useNavigate } from '../../hooks';
-import { LocalizationKey, localizationKeys } from '../../localization';
-import { handleError, useFormControl } from '../../utils';
+import { LocalizationKey, localizationKeys, useLocalizations } from '../../localization';
+import { handleError, roleLocalizationKey, useFormControl } from '../../utils';
 import { FormButtonContainer } from '../UserProfile/FormButtons';
 
 const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);
@@ -23,6 +23,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
   const { navigate } = useNavigate();
   const { onSuccess, onReset = () => navigate('..'), resetButtonLabel, organization } = props;
   const card = useCardState();
+  const { t } = useLocalizations();
 
   const [invalidEmails, setInvalidEmails] = React.useState<string[]>([]);
 
@@ -73,6 +74,12 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
       });
   };
 
+  const roles: Array<{ label: string; value: MembershipRole }> = [
+    { label: t(roleLocalizationKey('admin')), value: 'admin' },
+    { label: t(roleLocalizationKey('basic_member')), value: 'basic_member' },
+    { label: t(roleLocalizationKey('guest_member')), value: 'guest_member' },
+  ];
+
   return (
     <>
       {!!invalidEmails.length && (
@@ -107,11 +114,11 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
           >
             <Text>Role</Text>
             <Select
-              options={['admin', 'basic_member']}
-              value={'admin'}
-              onChange={option => {}}
+              options={roles.map(r => r.label)}
+              value={roleField.value}
+              onChange={val => roleField.setValue(roles.find(r => r.label === val)!.value)}
             >
-              <SelectButton />
+              <SelectButton>{roles.find(r => r.value === roleField.value)!.label}</SelectButton>
               <SelectOptionList />
             </Select>
           </Flex>
