@@ -7,6 +7,9 @@ OrganizationInvitation {
   "id": "test_id",
   "organizationId": "test_organization_id",
   "pathRoot": "",
+  "publicMetadata": Object {
+    "public": "metadata",
+  },
   "revoke": [Function],
   "role": "basic_member",
   "status": "pending",
