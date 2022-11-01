@@ -17,7 +17,8 @@ import { CreateOrganizationRoutes, OrganizationProfileRoutes } from './Organizat
 const _OrganizationProfile = (_: OrganizationProfileProps) => {
   // TODO: Should this be a guard HOC?
   const { organization } = useCoreOrganization();
-  if (!organization) {
+  const { new: isCreating } = useOrganizationProfileContext();
+  if (!organization && !isCreating) {
     return null;
   }
 
