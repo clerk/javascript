@@ -1,33 +1,51 @@
 import '../styles/globals.css';
 import type { AppProps } from 'next/app';
 
-import { ClerkProvider, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
+import { ClerkProvider, SignInButton, UnstableOrganizationSwitcher, UserButton } from '@clerk/nextjs';
 import { dark, neobrutalism, shadesOfPurple } from '@clerk/themes';
 import Link from 'next/link';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { useColorScheme } from './hooks/useColorScheme';
 
 const themes = { default: undefined, dark, neobrutalism, shadesOfPurple };
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [selectedTheme, setSelectedTheme] = useState<keyof typeof themes>('default');
+  const { scheme } = useColorScheme();
+
+  const onToggleDark = () => {
+    if (window.document.body.classList.contains('dark-mode')) {
+      setSelectedTheme('default');
+      window.document.body.classList.remove('dark-mode');
+    } else {
+      setSelectedTheme('dark');
+      window.document.body.classList.add('dark-mode');
+    }
+  };
+
   return (
     <ClerkProvider
-      appearance={{ baseTheme: themes[selectedTheme] }}
-      frontendApi={'clerk.touching.camel-78.dev.lclclerk.com'}
-      clerkJSUrl={'https://js.lclclerk.com/npm/clerk.browser.js'}
+      appearance={{
+        baseTheme: scheme === 'dark' ? themes.dark : themes[selectedTheme],
+        variables: { colorPrimary: '#f85656' },
+      }}
       {...pageProps}
     >
       <AppBar
-        onChangeTheme={e => {
-          setSelectedTheme(e.target.value as any);
-        }}
+        onChangeTheme={e => setSelectedTheme(e.target.value as any)}
+        onToggleDark={onToggleDark}
       />
       <Component {...pageProps} />
     </ClerkProvider>
   );
 }
 
-const AppBar = (props: { onChangeTheme: React.ChangeEventHandler<HTMLSelectElement> }) => {
+type AppBarProps = {
+  onChangeTheme: React.ChangeEventHandler<HTMLSelectElement>;
+  onToggleDark: React.MouseEventHandler<HTMLButtonElement>;
+};
+
+const AppBar = (props: AppBarProps) => {
   return (
     <div
       style={{
@@ -39,6 +57,8 @@ const AppBar = (props: { onChangeTheme: React.ChangeEventHandler<HTMLSelectEleme
         marginBottom: '2rem',
       }}
     >
+      <UnstableOrganizationSwitcher afterOrganizationCreationUrl={'https://www.google.com'} />
+      <UnstableOrganizationSwitcher showPersonalAccount={false} />
       <Link href={'/'}>
         <a>
           <h2>Nextjs Playground</h2>
@@ -54,10 +74,9 @@ const AppBar = (props: { onChangeTheme: React.ChangeEventHandler<HTMLSelectEleme
         <option value='neobrutalism'>neobrutalism</option>
         <option value='shadesOfPurple'>shadesOfPurple</option>
       </select>
+      <button onClick={props.onToggleDark}>toggle dark mode</button>
       <UserButton />
-      <SignedOut>
-        <SignInButton mode={'modal'} />
-      </SignedOut>
+      <SignInButton mode={'modal'} />
     </div>
   );
 };
