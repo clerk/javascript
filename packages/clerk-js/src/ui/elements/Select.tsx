@@ -75,6 +75,7 @@ export const Select = <O extends Option>(props: PropsWithChildren<SelectProps<O>
     comparator,
     placeholder = 'Select an option',
     searchPlaceholder,
+    children,
     ...rest
   } = props;
   const popoverCtx = usePopover({ autoUpdate: false });
@@ -91,6 +92,13 @@ export const Select = <O extends Option>(props: PropsWithChildren<SelectProps<O>
       togglePopover();
     },
     [togglePopover, onChange],
+  );
+
+  const defaultChildren = (
+    <>
+      <SelectOptionList />
+      <SelectButton />
+    </>
   );
 
   return (
@@ -112,7 +120,9 @@ export const Select = <O extends Option>(props: PropsWithChildren<SelectProps<O>
         },
       }}
       {...rest}
-    />
+    >
+      {React.Children.count(children) ? children : defaultChildren}
+    </SelectStateCtx.Provider>
   );
 };
 
