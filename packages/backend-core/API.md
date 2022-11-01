@@ -291,6 +291,8 @@ Create an invitation to join an organization and send an email to the email addr
 
 You must pass the ID of the user that invites the new member as `inviterUserId`. The inviter user must be an administrator in the organization.
 
+You can optionally pass metadata for the organization invitation with the `publicMetadata` field. These metadata will be accessible from both the Frontend and the Backend. Once the invitation is accepted, the metadata will be transferred to the newly created organization membership.
+
 Available parameters:
 
 - _organizationId_ The unique ID of the organization the invitation is about.
@@ -298,6 +300,7 @@ Available parameters:
 - _role_ The new member's role in the organization.
 - _inviterUserId_ The ID of the organization administrator that invites the new member.
 - _redirectUrl_ An optional URL to redirect to after the invited member clicks the link from the invitation email.
+- _publicMetadata_ Optionally pass metadata for the organization invitation which will be visible to both your Frontend and Backend.
 
 ```js
 const invitation = await clerkAPI.organizations.createOrganizationInvitation({

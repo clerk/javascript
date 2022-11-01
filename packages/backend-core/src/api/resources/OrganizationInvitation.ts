@@ -9,6 +9,7 @@ export class OrganizationInvitation {
     readonly organizationId: string,
     readonly createdAt: number,
     readonly updatedAt: number,
+    readonly publicMetadata: Record<string, unknown> = {},
     readonly status?: OrganizationInvitationStatus,
   ) {}
 
@@ -20,6 +21,7 @@ export class OrganizationInvitation {
       data.organization_id,
       data.created_at,
       data.updated_at,
+      data.public_metadata,
       data.status,
     );
   }

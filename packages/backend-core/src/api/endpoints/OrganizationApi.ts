@@ -59,6 +59,7 @@ type CreateOrganizationInvitationParams = {
   inviterUserId: string;
   emailAddress: string;
   role: OrganizationMembershipRole;
+  publicMetadata?: Record<string, unknown>;
   redirectUrl?: string;
 };
 
