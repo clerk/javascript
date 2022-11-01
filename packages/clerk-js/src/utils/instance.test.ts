@@ -16,7 +16,12 @@ describe('validateFrontendApi(str)', () => {
     ['clerk.abcef.12345.dev.lclclerk.com', true],
     ['clerk.abcef.12345.stg.lclclerk.com', true],
     ['clerk.abcef.12345.prod.lclclerk.com', true],
-    ['clerk.abc.123.prod.lclclerk.com', true],
+    ['clerk.prod.lclclerk.com', true],
+    ['clerk.dev.lclclerk.com', true],
+    ['clerk.api.example1-do_main.com', true],
+    ['clerk.example1-do_main.com', true],
+    ['clerk.com', false],
+    ['whatever.com', false],
   ])('validates the frontendApi format', (str, expected) => {
     expect(validateFrontendApi(str)).toBe(expected);
   });

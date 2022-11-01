@@ -1,8 +1,8 @@
 import { isDevOrStagingUrl } from './url';
 
-const FRONTEND_API_DEV_OR_STG_REGEX = /^clerk\.\w+\.[\w-]+\.(\w+.){1,2}(dev|com)$/i;
+const FRONTEND_API_DEV_OR_STG_REGEX = /^clerk\.(\w+\.){2,4}(dev|com)$/i;
 
-const FRONTEND_API_PROD_REGEX = /^clerk(\.[-a-zA-Z0-9@:%_+~#=]{1,256}){2,}$/i;
+const FRONTEND_API_PROD_REGEX = /^clerk(\.[A-Z0-9_-]{1,256}){2,}$/i;
 
 export function validateFrontendApi(frontendApi: string | null | undefined): boolean {
   if (!frontendApi) {
