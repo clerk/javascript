@@ -348,11 +348,13 @@ test('createOrganizationInvitation() creates an invitation for an organization',
   const status: OrganizationInvitationStatus = 'pending';
   const emailAddress = 'invitation@example.com';
   const redirectUrl = 'https://example.com';
+  const publicMetadata = { foo: 'bar' };
   const resJSON: OrganizationInvitationJSON = {
     object: ObjectType.OrganizationInvitation,
     id: 'orginv_randomid',
     role,
     status,
+    public_metadata: publicMetadata,
     email_address: emailAddress,
     organization_id: organizationId,
     created_at: 1612378465,
@@ -366,6 +368,7 @@ test('createOrganizationInvitation() creates an invitation for an organization',
     emailAddress,
     role,
     redirectUrl,
+    publicMetadata,
     inviterUserId: 'user_randomid',
   });
   expect(orgInvitation).toEqual(OrganizationInvitation.fromJSON(resJSON));
@@ -381,6 +384,7 @@ test('getPendingOrganizationInvitationList() returns a list of organization memb
       email_address: 'invited@example.org',
       organization_id: organizationId,
       status: 'pending',
+      public_metadata: {},
       created_at: 1612378465,
       updated_at: 1612378465,
     },
@@ -408,6 +412,7 @@ test('revokeOrganizationInvitation() revokes an organization invitation', async 
     email_address: 'invited@example.org',
     organization_id: organizationId,
     status: 'revoked',
+    public_metadata: {},
     created_at: 1612378465,
     updated_at: 1612378465,
   };
