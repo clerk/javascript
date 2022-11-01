@@ -1,7 +1,7 @@
 import { Jwt, JwtPayload } from '@clerk/types';
 import { base64url } from 'rfc4648';
 
-import crypto from '../runtime/crypto';
+import runtime from '../runtime';
 import { TokenVerificationError, TokenVerificationErrorReason } from './errors';
 
 type IssuerResolver = string | ((iss: string) => boolean);
@@ -36,7 +36,7 @@ export async function hasValidSignature(jwt: Jwt, jwk: JsonWebKey) {
   const encoder = new TextEncoder();
   const data = encoder.encode([raw.header, raw.payload].join('.'));
 
-  const cryptoKey = await crypto.subtle.importKey(
+  const cryptoKey = await runtime.crypto.subtle.importKey(
     'jwk',
     jwk,
     {
@@ -47,7 +47,7 @@ export async function hasValidSignature(jwt: Jwt, jwk: JsonWebKey) {
     ['verify'],
   );
 
-  return crypto.subtle.verify('RSASSA-PKCS1-v1_5', cryptoKey, signature, data);
+  return runtime.crypto.subtle.verify('RSASSA-PKCS1-v1_5', cryptoKey, signature, data);
 }
 
 export function decodeJwt(token: string): Jwt {

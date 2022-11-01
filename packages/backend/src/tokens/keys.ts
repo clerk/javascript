@@ -1,4 +1,4 @@
-import fetch from '../runtime/fetch';
+import runtime from '../runtime';
 import { callWithRetry } from '../util/callWithRetry';
 import { joinPaths } from '../util/path';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from './errors';
@@ -169,7 +169,7 @@ async function fetchJWKSFromBAPI(apiUrl: string, apiKey: string) {
   const url = new URL(apiUrl);
   url.pathname = joinPaths(url.pathname, 'v1/jwks');
 
-  const response = await fetch(url, {
+  const response = await runtime.fetch(url, {
     headers: {
       Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json',

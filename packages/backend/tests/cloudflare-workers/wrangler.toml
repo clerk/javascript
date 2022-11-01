@@ -1,0 +1,14 @@
+# Top-level configuration
+
+name = "my-worker"
+
+main = "./testHarness.js"
+
+compatibility_date = "2022-07-12"
+
+workers_dev = true
+
+[miniflare]
+global_async_io = true
+global_timers = true
+glboal_random = true

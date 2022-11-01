@@ -1,4 +1,4 @@
-import fetch from '../runtime/fetch';
+import runtime from '../runtime';
 
 export type HTTPTransportRequestOptions = {
   method: 'GET' | 'POST' | 'PATCH' | 'DELETE' | 'PUT';
@@ -38,7 +38,7 @@ export const request: HTTPTransport = async ({ url, method, queryParams, headerP
     }
   }
 
-  const response = await fetch(finalUrl.href, {
+  const response = await runtime.fetch(finalUrl.href, {
     method,
     headers: headerParams,
     ...(bodyParams && Object.keys(bodyParams).length > 0 && { body: JSON.stringify(bodyParams) }),

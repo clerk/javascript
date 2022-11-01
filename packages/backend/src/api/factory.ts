@@ -71,6 +71,7 @@ export function createBackendApiClient(options?: ClerkBackendAPIOptions) {
 
     if (hasError) {
       throw new ClerkAPIResponseError(statusText, {
+        // @ts-expect-errors
         data: data?.errors || data,
         status,
       });
