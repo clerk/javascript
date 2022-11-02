@@ -14,8 +14,14 @@ type ModalProps = React.PropsWithChildren<{
 
 export const Modal = (props: ModalProps) => {
   const { handleClose, handleOpen, contentSx, containerSx } = props;
-  const { floating, isOpen } = usePopover({ defaultOpen: true, autoUpdate: false });
+  const { floating, isOpen } = usePopover({ defaultOpen: true, autoUpdate: false, bubbles: false });
   const { disableScroll, enableScroll } = useScrollLock(document.body);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    floating(containerRef.current);
+    containerRef.current?.focus();
+  }, []);
 
   React.useEffect(() => {
     if (!isOpen) {
@@ -59,11 +65,13 @@ export const Modal = (props: ModalProps) => {
       >
         <Flex
           elementDescriptor={descriptors.modalContent}
-          ref={floating}
+          ref={containerRef}
           aria-modal='true'
+          tabIndex={0}
           role='dialog'
           sx={[
             t => ({
+              outline: 0,
               animation: `${animations.modalSlideAndFade} 180ms ${t.transitionTiming.$easeOut}`,
               margin: `${t.space.$16} 0`,
               [mqu.sm]: {
