@@ -237,6 +237,7 @@ export const useOrganizationProfileContext = () => {
 
   return {
     ...ctx,
+    // @ts-expect-error
     new: ctx.new || false,
     componentName,
   };

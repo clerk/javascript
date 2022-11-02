@@ -1,6 +1,6 @@
+import { createContextAndHook } from '@clerk/shared';
 import React, { cloneElement, isValidElement, PropsWithChildren, useEffect, useRef } from 'react';
 
-import { createContextAndHook } from '@clerk/shared';
 import { Button, Col } from '../customizables';
 import { usePopover, UsePopoverReturn } from '../hooks';
 import { animations, PropsOfComponent } from '../styledSystem';
