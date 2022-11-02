@@ -77,6 +77,7 @@ export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 declare global {
   interface Window {
     Clerk?: Clerk;
+    __clerk_frontend_api?: string;
   }
 }
 
