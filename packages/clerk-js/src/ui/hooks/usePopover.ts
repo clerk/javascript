@@ -7,18 +7,20 @@ import {
   useFloating,
   UseFloatingProps,
 } from '@floating-ui/react-dom-interactions';
-import React, { useEffect } from 'react';
+import React, { RefObject, useEffect } from 'react';
 
 type UsePopoverProps = {
   defaultOpen?: boolean;
   placement?: UseFloatingProps['placement'];
   offset?: Parameters<typeof offset>[0];
   autoUpdate?: boolean;
+  bubbles?: boolean;
 };
 
 export type UsePopoverReturn = ReturnType<typeof usePopover>;
 
 export const usePopover = (props: UsePopoverProps = {}) => {
+  const { bubbles = true } = props;
   const [isOpen, setIsOpen] = React.useState(props.defaultOpen || false);
   const { update, reference, floating, strategy, x, y, context } = useFloating({
     open: isOpen,
@@ -34,7 +36,7 @@ export const usePopover = (props: UsePopoverProps = {}) => {
     }
   }, []);
 
-  useDismiss(context);
+  useDismiss(context, { bubbles });
 
   const toggle = React.useCallback(() => setIsOpen(o => !o), [setIsOpen]);
   const open = React.useCallback(() => setIsOpen(true), [setIsOpen]);
