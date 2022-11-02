@@ -627,14 +627,12 @@ export type CreateOrganizationInvitationParams = {
   emailAddress: string;
   role: MembershipRole;
   redirectUrl?: string;
-  publicMetadata?: Record<string, unknown>;
 };
 
 export type CreateBulkOrganizationInvitationParams = {
   emailAddresses: string[];
   role: MembershipRole;
   redirectUrl?: string;
-  publicMetadata?: Record<string, unknown>;
 };
 
 export interface CreateOrganizationParams {
