@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.13.0-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.12.1...@clerk/clerk-js@4.13.0-staging.1) (2022-11-02)
+
+### Features
+
+- **clerk-js,types:** Organization invitation metadata ([87764b8](https://github.com/clerkinc/javascript/commit/87764b839cc65455347e1c19b15f4a17603201b8))
+- **clerk-js:** Add `loaded` to core Clerk instance ([7c08a91](https://github.com/clerkinc/javascript/commit/7c08a914d674f05608503898542b907886465b7e))
+- **clerk-js:** Set up the InviteMembersPage for OrganizationProfile ([882727f](https://github.com/clerkinc/javascript/commit/882727f72accecb4c084656d9233b9c265278a45))
+
+### Bug Fixes
+
+- **clerk-js:** Add TabPanel tabIndex and remove outline ([262499e](https://github.com/clerkinc/javascript/commit/262499eb17afe3838f1d4fd7a68e688ebe9aea36))
+- **clerk-js:** Correctly truncate the name in the OrganizationProfile Navbar ([fc06ec7](https://github.com/clerkinc/javascript/commit/fc06ec79339d9a9ad8d8d5a650c7c24097808c30))
+- **clerk-js:** Fallback to Default Gravatar when not provided an imageUrl ([580a423](https://github.com/clerkinc/javascript/commit/580a4232817e7a35cfb8f197dfbfda9a16776cce))
+- **clerk-js:** Fix globalObject for UMD packaging ([7499207](https://github.com/clerkinc/javascript/commit/749920780ca1f82c6f1548e7aaa4244c7516bc6f))
+- **clerk-js:** Prioritize focus of tabs when keyboard navigating ([3f90c38](https://github.com/clerkinc/javascript/commit/3f90c38b079d81662a763b276fb5dda326106cc7))
+- **clerk-js:** Take into account enabled attributes and not first factors for Sign Up form ([d3fdb1d](https://github.com/clerkinc/javascript/commit/d3fdb1d9804025084a15006c925a3a3a1f2d36df))
+- **clerk-js:** Update the OrgSwitcher trigger when hidePersonal is true ([8a0d8cd](https://github.com/clerkinc/javascript/commit/8a0d8cdc94d26d5f415ca5db60867b15a7c3ec2f))
+- **clerk-js:** Wrap ImpersonationFab with `withCoreSessionSwitchGuard` ([1d7cea9](https://github.com/clerkinc/javascript/commit/1d7cea9f4bc7325f61b789601b62441240681c60))
+- **clerk-js:** Wrap ImpersonationFab with withCoreUserGuard ([7405f34](https://github.com/clerkinc/javascript/commit/7405f34fd722b2f111e7d3842a05460697e6dddb))
+- **clerk-react:** Add frontendAPI on window as a fallback ([06f8b37](https://github.com/clerkinc/javascript/commit/06f8b3755cda83455e301591badaf16e1d59dd33))
+
 ### [4.12.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.12.0...@clerk/clerk-js@4.12.1) (2022-10-24)
 
 ### Bug Fixes

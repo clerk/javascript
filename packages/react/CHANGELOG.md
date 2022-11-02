@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.3.3-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@4.3.2...@clerk/clerk-react@4.3.3-staging.1) (2022-11-02)
+
+### Bug Fixes
+
+- **clerk-react:** Add frontendAPI on window as a fallback ([06f8b37](https://github.com/clerkinc/javascript/commit/06f8b3755cda83455e301591badaf16e1d59dd33))
+
 ### [4.3.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@4.3.2-staging.0...@clerk/clerk-react@4.3.2) (2022-10-24)
 
 **Note:** Version bump only for package @clerk/clerk-react
