@@ -215,33 +215,29 @@ export const useOrganizationSwitcherContext = () => {
     throw new Error('Clerk: useUserButtonContext called outside OrganizationSwitcher.');
   }
 
-  const navigateAfterOrganizationSwitchUrl = () => navigate(ctx.afterOrganizationSwitchUrl);
-  const navigateAfterOrganizationCreationUrl = () => navigate(ctx.afterOrganizationCreationUrl);
+  const navigateAfterSwitchOrganizationUrl = () => navigate(ctx.afterSwitchOrganizationUrl);
+  const navigateAfterCreateOrganizationUrl = () => navigate(ctx.afterCreateOrganizationUrl);
 
   return {
     ...ctx,
-    showPersonalAccount: ctx.showPersonalAccount ?? true,
-    navigateAfterOrganizationSwitchUrl,
-    navigateAfterOrganizationCreationUrl,
+    hidePersonal: ctx.hidePersonal || false,
+    navigateAfterSwitchOrganizationUrl,
+    navigateAfterCreateOrganizationUrl,
     componentName,
   };
 };
 
 export const useOrganizationProfileContext = () => {
   const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as OrganizationProfileCtx;
-  const { navigate } = useNavigate();
   const { displayConfig } = useEnvironment();
 
   if (componentName !== 'OrganizationProfile') {
     throw new Error('Clerk: useOrganizationProfileContext called outside OrganizationProfile.');
   }
 
-  const navigateAfterOrganizationCreationUrl = () => navigate(ctx.afterOrganizationCreationUrl);
-
   return {
     ...ctx,
     new: ctx.new || false,
-    navigateAfterOrganizationCreationUrl,
     componentName,
   };
 };

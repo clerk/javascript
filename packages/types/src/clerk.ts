@@ -492,22 +492,11 @@ export type OrganizationProfileProps = {
    * Root URL where the component is mounted on, eg: '/user'
    */
   path?: string;
-  /*
-   * If set to true, the OrganizationProfile will display the Create Organization flow
+  /**
+   * Full URL or path to navigate to after the user leaves the currently active organization.
    * @default undefined
    */
-  new?: boolean;
-  /**
-   * Full URL or path to navigate after creating a new organization.
-   * @default undefined
-   */
-  afterOrganizationCreationUrl?: string;
-  /**
-   * Full URL or path to navigate after a user accepts an invitation
-   * and successfully joins the corresponding organization.
-   * TODO: confirm the naming
-   */
-  invitationRedirectUrl?: string;
+  afterLeaveOrganizationUrl?: string;
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
@@ -575,28 +564,39 @@ export type OrganizationSwitcherProps = {
    * and users will only be able to switch between organizations.
    * @default true
    */
-  showPersonalAccount?: boolean;
+  hidePersonal?: boolean;
   /**
    * Full URL or path to navigate after a successful organization switch.
+   * @default undefined
    */
-  afterOrganizationSwitchUrl?: string;
+  afterSwitchOrganizationUrl?: string;
   /**
    * Full URL or path to navigate after creating a new organization.
    * @default undefined
    */
-  afterOrganizationCreationUrl?: string;
+  afterCreateOrganizationUrl?: string;
   /**
-   * Props to pass through to the OrganizationProfile component, if opened as a modal.
-   * By default, clicking the "Manage organization" button inside the OrganizationSwitcher
-   * will open a OrganizationProfile modal.
+   * Full URL or path to navigate to after the user leaves the currently active organization.
+   * @default undefined
    */
-  organizationProfileProps?: OrganizationProfileProps;
+  afterLeaveOrganizationUrl?: string;
   /**
    * Controls whether clicking the "Manage organization" button will cause
    * the OrganizationProfile component to open as a modal, or if the browser will navigate
    * to the `organizationProfileUrl` where OrganizationProfile is mounted as a page.
+   * @default modal
    */
   organizationProfileMode?: 'modal' | 'navigation';
+  /**
+   * Full URL or path where the <OrganizationProfile /> component is mounted.
+   * @default undefined
+   */
+  organizationProfileUrl?: string;
+  /**
+   * Full URL or path where the <CreateOrganization /> component is mounted.
+   * @default undefined
+   */
+  createOrganizationUrl?: string;
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`

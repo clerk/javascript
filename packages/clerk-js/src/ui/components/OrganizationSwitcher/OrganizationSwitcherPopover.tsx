@@ -26,7 +26,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
     const { openOrganizationProfile } = useCoreClerk();
     const { organization: currentOrg } = useCoreOrganization();
     const { isLoaded, setActive } = useCoreOrganizationList();
-    const { showPersonalAccount, afterOrganizationCreationUrl } = useOrganizationSwitcherContext();
+    const { hidePersonal, afterCreateOrganizationUrl } = useOrganizationSwitcherContext();
 
     const user = useCoreUser();
 
@@ -43,7 +43,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
     };
 
     const handleCreateOrganizationClicked = () => {
-      openOrganizationProfile({ new: true, afterOrganizationCreationUrl });
+      openOrganizationProfile({ new: true, afterCreateOrganizationUrl });
       close();
     };
 
@@ -82,7 +82,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
                 {manageOrganizationButton}
               </>
             ) : (
-              showPersonalAccount && (
+              !hidePersonal && (
                 <PersonalWorkspacePreview
                   user={user}
                   sx={theme => ({ padding: `0 ${theme.space.$6}`, marginBottom: theme.space.$6 })}

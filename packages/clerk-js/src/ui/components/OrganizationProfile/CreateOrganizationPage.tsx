@@ -19,7 +19,7 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
   const [file, setFile] = React.useState<File>();
   const { createOrganization } = useCoreOrganizations();
   const { setActive, closeOrganizationProfile } = useCoreClerk();
-  const { mode, navigateAfterOrganizationCreationUrl } = useOrganizationProfileContext();
+  const { mode } = useOrganizationProfileContext();
   const { organization } = useCoreOrganization();
 
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
@@ -47,7 +47,7 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
   };
 
   const completeFlow = () => {
-    navigateAfterOrganizationCreationUrl();
+    // navigateAfterCreateOrganizationUrl();
     if (mode === 'modal') {
       closeOrganizationProfile();
     }
