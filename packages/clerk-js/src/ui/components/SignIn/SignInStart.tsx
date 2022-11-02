@@ -2,16 +2,25 @@ import { ClerkAPIError, SignInCreateParams } from '@clerk/types';
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
-import { getClerkQueryParam } from '../../../utils/getClerkQueryParam';
-import { ERROR_CODES, getIdentifierControlDisplayValues } from '../../common/constants';
-import { withRedirectToHome } from '../../common/withRedirectToHome';
+import { getClerkQueryParam } from '../../../utils';
+import { ERROR_CODES, getIdentifierControlDisplayValues, withRedirectToHome } from '../../common';
 import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
-import { localizationKeys } from '../../customizables';
-import { Form, withCardStateProvider } from '../../elements';
-import { useCardState } from '../../elements/contexts';
+import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
+import {
+  Card,
+  CardAlert,
+  Footer,
+  Form,
+  Header,
+  LoadingCard,
+  SocialButtonsReversibleContainerWithDivider,
+  useCardState,
+  withCardStateProvider,
+} from '../../elements';
 import { useLoadingStatus, useNavigate } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { buildRequest, FormControlState, handleError, isMobileDevice, useFormControl } from '../../utils';
+import { SignInSocialButtons } from './SignInSocialButtons';
 
 export function _SignInStart(): JSX.Element {
   const card = useCardState();
@@ -164,13 +173,63 @@ export function _SignInStart(): JSX.Element {
   };
 
   if (status.isLoading) {
-    return <div>loading</div>;
+    return <LoadingCard />;
   }
 
   const hasSocialOrWeb3Buttons = !!authenticatableSocialStrategies.length || !!web3FirstFactors.length;
   const shouldAutofocus = !isMobileDevice() && hasSocialOrWeb3Buttons;
 
-  return <div>SignInComponent</div>;
+  return (
+    <Flow.Part part='start'>
+      <Card>
+        <CardAlert>{card.error}</CardAlert>
+        <Header.Root>
+          <Header.Title localizationKey={localizationKeys('signIn.start.title')} />
+          <Header.Subtitle localizationKey={localizationKeys('signIn.start.subtitle')} />
+        </Header.Root>
+        {/*TODO: extract main in its own component */}
+        <Col
+          elementDescriptor={descriptors.main}
+          gap={8}
+        >
+          <SocialButtonsReversibleContainerWithDivider>
+            {hasSocialOrWeb3Buttons && (
+              <SignInSocialButtons
+                enableWeb3Providers
+                enableOAuthProviders
+              />
+            )}
+            {standardFormAttributes.length ? (
+              <Form.Root onSubmit={handleFirstPartySubmit}>
+                <Form.ControlRow>
+                  <Form.Control
+                    {...identifierField.props}
+                    autoFocus={shouldAutofocus}
+                  />
+                </Form.ControlRow>
+                <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
+                <Form.SubmitButton>Continue</Form.SubmitButton>
+              </Form.Root>
+            ) : null}
+          </SocialButtonsReversibleContainerWithDivider>
+        </Col>
+        <Footer.Root>
+          <Footer.Action>
+            <Footer.ActionText localizationKey={localizationKeys('signIn.start.actionText')}>
+              No account?
+            </Footer.ActionText>
+            <Footer.ActionLink
+              localizationKey={localizationKeys('signIn.start.actionLink')}
+              to={signUpUrl}
+            >
+              Sign up
+            </Footer.ActionLink>
+          </Footer.Action>
+          <Footer.Links />
+        </Footer.Root>
+      </Card>
+    </Flow.Part>
+  );
 }
 
 const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> }) => {

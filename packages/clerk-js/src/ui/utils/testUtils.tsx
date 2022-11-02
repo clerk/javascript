@@ -1,4 +1,5 @@
 import { AttributeData, Attributes, Clerk, EnvironmentResource, OAuthProviders, SignInData } from '@clerk/types';
+import { jest } from '@jest/globals';
 import React from 'react';
 
 import { ComponentContext, EnvironmentProvider } from '../contexts';
@@ -380,7 +381,7 @@ export const createFixture = (configFn: ConfigFn) => {
               matches: jest.fn(),
               baseNavigate: jest.fn(),
               navigate: jest.fn(),
-              resolve: jest.fn(),
+              resolve: jest.fn(() => ({ href: 'test.host' } as any)),
               refresh: jest.fn(),
               params: {},
             }}
