@@ -1,5 +1,11 @@
 import type { Clerk, ClerkOptions, ClientResource, LoadedClerk, RedirectOptions, UserResource } from '@clerk/types';
 
+declare global {
+  interface Window {
+    __clerk_frontend_api?: string;
+  }
+}
+
 export interface IsomorphicClerkOptions extends ClerkOptions {
   Clerk?: ClerkProp;
   clerkJSUrl?: string;
