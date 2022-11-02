@@ -3,13 +3,15 @@ import { expect, it } from '@jest/globals';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 
-import { createFixture } from '../../utils/testUtils';
+import { createFixture } from '../../utils/test/createFixture';
 import { SignInStart } from './SignInStart';
 
 it('navigates to home_url', () => {
   // const Component = withRedirectToHome(Tester);
-  const { MockClerkProvider, updateMock } = createFixture(f => {
+  const { MockClerkProvider, updateClerkMock } = createFixture(f => {
     f.withUsername();
+    f.withGoogleOAuth();
+    f.withDiscordOAuth();
     // f.withEmailAddress({ required: true });
   });
 
@@ -22,10 +24,12 @@ it('navigates to home_url', () => {
   // render(<SignInStart />);
 
   const component = screen.getByText('Sign in');
-  const component2 = screen.getByText('Secured by');
+  const googleOauth = screen.getByText('Continue with Google');
+  const discordOauth = screen.getByText('Continue with Discord');
 
   expect(component).toBeDefined();
-  expect(component2).toBeDefined();
+  expect(googleOauth).toBeDefined();
+  expect(discordOauth).toBeDefined();
 
   // expect(...).toHaveBeenNthCalledWith(...);
 

@@ -1,15 +1,9 @@
 import { AttributeData, Attributes, Clerk, EnvironmentResource, OAuthProviders, SignInData } from '@clerk/types';
 import { jest } from '@jest/globals';
-import React from 'react';
 
-import { ComponentContext, EnvironmentProvider } from '../contexts';
-import { CoreClerkContextWrapper } from '../contexts/CoreClerkContextWrapper';
-import { AppearanceProvider } from '../customizables';
-import { FlowMetadataProvider } from '../elements';
-import { RouteContext } from '../router';
-import { InternalThemeProvider } from '../styledSystem';
+import { RouteContextValue } from '../../router';
 
-const initialConfig = {
+export const initialMockClerkConfig: Clerk = {
   frontendApi: '',
   organization: undefined,
   user: null,
@@ -126,9 +120,9 @@ const initialConfig = {
     updatedAt: new Date().toISOString(),
     id: 'client_2GLpcZTwM08TAm7RCDFrfekjbCO',
   },
-} as any; // initialize config
+} as any as Clerk;
 
-const initialEnvironmentResource = {
+export const initialMockEnvironmentResource: EnvironmentResource = {
   userSettings: {
     id: undefined,
     social: {
@@ -250,8 +244,8 @@ const initialEnvironmentResource = {
       disable_hibp: false,
       progressive: true,
     },
-    socialProviderStrategies: ['oauth_google'],
-    authenticatableSocialStrategies: ['oauth_google'],
+    socialProviderStrategies: [],
+    authenticatableSocialStrategies: [],
     web3FirstFactors: [],
     enabledFirstFactorIdentifiers: ['email_address'],
     instanceIsPasswordBased: true,
@@ -305,99 +299,119 @@ const initialEnvironmentResource = {
     clerkJSVersion: null,
     experimental__forceOauthFirst: false,
   },
-  isSingleSession: () => false,
-  isProduction: () => true,
-  onWindowLocationHost: () => true,
+  isSingleSession: jest.fn(),
+  isProduction: jest.fn(),
+  onWindowLocationHost: jest.fn(),
 } as any as EnvironmentResource;
 
-const createClerkFixture = () => {
-  const listeners: any[] = [];
-
-  const client = {};
-  const session = {};
-  const user = {};
-  const organization = {};
-  const resources = { client, session, user, organization };
-  const addListener = (listener: any) => {
-    listeners.push(listener);
-    listener(resources);
-  };
-  const updateMock = () => {
-    // how do we create new state?
-    const newState = { ...resources };
-    listeners.forEach(listener => listener(newState));
-  };
-
-  return { mockedClerk: { ...resources, addListener } as Clerk, updateMock };
+export const initialRouteContextValue: RouteContextValue = {
+  basePath: '',
+  startPath: '',
+  fullPath: '',
+  indexPath: '',
+  currentPath: '',
+  queryString: '',
+  queryParams: {},
+  getMatchData: jest.fn(),
+  matches: jest.fn(),
+  baseNavigate: jest.fn(),
+  navigate: jest.fn(),
+  resolve: jest.fn(() => ({ href: 'test.host' } as any)),
+  refresh: jest.fn(),
+  params: {},
 };
 
-type FParam = {
-  withUsername: () => void;
-  withEmailAddress: () => void;
-  withGoogleOAuth: () => void;
-  withAllOAuth: () => void;
-  withPhoneCode: () => void;
-};
-
-type ConfigFn = (f: FParam) => void;
-
-export const createFixture = (configFn: ConfigFn) => {
-  const config = initialConfig;
-  const f = {
-    withUsername: () => {
-      // config.user_settings.username = {
+export const initialFixtureConfig = {
+  environment: {
+    username: {
+      enabled: true,
+      required: true,
+    },
+    social: [
+      // {
+      //   oauthProvider: 'oauth_google',
       //   enabled: true,
       //   required: true,
-      // };
-    },
-    withGoogleOauth: () => {
-      config.user_settings.social.google_oauth = {
-        enabled: true,
-        required: true,
-      };
-    },
-  } as any as FParam;
-  if (configFn) {
-    configFn(f);
-  }
-
-  const { mockedClerk, updateMock } = createClerkFixture();
-
-  const MockClerkProvider = (props: any) => {
-    const { children } = props;
-    return (
-      <CoreClerkContextWrapper clerk={config}>
-        <EnvironmentProvider value={initialEnvironmentResource}>
-          <RouteContext.Provider
-            value={{
-              basePath: '',
-              startPath: '',
-              fullPath: '',
-              indexPath: '',
-              currentPath: '',
-              queryString: '',
-              queryParams: {},
-              getMatchData: jest.fn(),
-              matches: jest.fn(),
-              baseNavigate: jest.fn(),
-              navigate: jest.fn(),
-              resolve: jest.fn(() => ({ href: 'test.host' } as any)),
-              refresh: jest.fn(),
-              params: {},
-            }}
-          >
-            <AppearanceProvider appearanceKey={'signIn'}>
-              <FlowMetadataProvider flow={'signIn'}>
-                <InternalThemeProvider>
-                  <ComponentContext.Provider value={{ componentName: 'SignIn' }}>{children}</ComponentContext.Provider>
-                </InternalThemeProvider>
-              </FlowMetadataProvider>
-            </AppearanceProvider>
-          </RouteContext.Provider>
-        </EnvironmentProvider>
-      </CoreClerkContextWrapper>
-    );
-  };
-
-  return { MockClerkProvider, updateMock };
+      // },
+    ],
+    // oauth_google: {
+    //   enabled: true,
+    //   required: true,
+    // },
+    // oauth_discord: {
+    //   enabled: false,
+    //   required: false,
+    // },
+    // oauth_facebook: {
+    //   enabled: false,
+    //   required: false,
+    // },
+    // oauth_twitch: {
+    //   enabled: false,
+    //   required: false,
+    // },
+    // oauth_twitter: {
+    //   enabled: false,
+    //   required: false,
+    // },
+    // oauth_microsoft: {
+    //   enabled: false,
+    //   required: false,
+    // },
+    // oauth_tiktok: {
+    //   enabled: false,
+    //   required: false,
+    // },
+    // oauth_linkedin: {
+    //   enabled: false,
+    //   required: false,
+    // },
+    // oauth_github: {
+    //   enabled: false,
+    //   required: false,
+    // },
+    // oauth_gitlab: {
+    //   enabled: false,
+    //   required: false,
+    // },
+    // oauth_dropbox: {
+    //   enabled: false,
+    //   required: false,
+    // },
+    // oauth_bitbucket: {
+    //   enabled: false,
+    //   required: false,
+    // },
+    // oauth_hubspot: {
+    //   enabled: false,
+    //   required: false,
+    // },
+    // oauth_notion: {
+    //   enabled: false,
+    //   required: false,
+    // },
+    // oauth_apple: {
+    //   enabled: false,
+    //   required: false,
+    // },
+    // oauth_line: {
+    //   enabled: false,
+    //   required: false,
+    // },
+    // oauth_instagram: {
+    //   enabled: false,
+    //   required: false,
+    // },
+    // oauth_coinbase: {
+    //   enabled: false,
+    //   required: false,
+    // },
+    // oauth_spotify: {
+    //   enabled: false,
+    //   required: false,
+    // },
+    // },
+  },
+  user: {},
+  client: {},
 };
