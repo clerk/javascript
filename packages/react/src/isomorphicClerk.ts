@@ -96,6 +96,19 @@ export default class IsomorphicClerk {
     if (!this.frontendApi) {
       this.throwError(noFrontendApiError);
     }
+
+    // Store frontendAPI value on window as a fallback. This value can be used as a
+    // fallback during ClerkJS hot loading in case ClerkJS fails to find the
+    // "data-clerk-frontend-api" attribute on its script tag.
+
+    // This can happen when the DOM is altered completely during client rehydration.
+    // For example, in Remix with React 18 the document changes completely via `hydrateRoot(document)`.
+
+    // For more information refer to:
+    // - https://github.com/remix-run/remix/issues/2947
+    // - https://github.com/facebook/react/issues/24430
+    window.__clerk_frontend_api = this.frontendApi;
+
     try {
       if (this.Clerk) {
         // Set a fixed Clerk version

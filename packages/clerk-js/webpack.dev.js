@@ -37,6 +37,7 @@ const getProductionConfig = (mode = 'production') => {
       path: path.resolve(__dirname, 'dist'),
       filename: '[name].js',
       libraryTarget: 'umd',
+      globalObject: 'globalThis',
     },
   };
 };

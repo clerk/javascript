@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.14.0-staging.4](https://github.com/clerkinc/javascript/compare/@clerk/types@3.14.0-staging.3...@clerk/types@3.14.0-staging.4) (2022-11-02)
+
+**Note:** Version bump only for package @clerk/types
+
+## [3.14.0-staging.3](https://github.com/clerkinc/javascript/compare/@clerk/types@3.14.0-staging.1...@clerk/types@3.14.0-staging.3) (2022-11-02)
+
+**Note:** Version bump only for package @clerk/types
+
+## [3.14.0-staging.2](https://github.com/clerkinc/javascript/compare/@clerk/types@3.14.0-staging.1...@clerk/types@3.14.0-staging.2) (2022-11-02)
+
+**Note:** Version bump only for package @clerk/types
+
+## [3.14.0-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/types@3.13.0...@clerk/types@3.14.0-staging.1) (2022-11-02)
+
+### Features
+
+- **clerk-js,types:** Organization invitation metadata ([87764b8](https://github.com/clerkinc/javascript/commit/87764b839cc65455347e1c19b15f4a17603201b8))
+- **clerk-js:** Add `loaded` to core Clerk instance ([7c08a91](https://github.com/clerkinc/javascript/commit/7c08a914d674f05608503898542b907886465b7e))
+
 ## [3.13.0](https://github.com/clerkinc/javascript/compare/@clerk/types@3.13.0-staging.0...@clerk/types@3.13.0) (2022-10-24)
 
 **Note:** Version bump only for package @clerk/types
