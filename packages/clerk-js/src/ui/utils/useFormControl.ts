@@ -9,16 +9,9 @@ type Options = {
   isRequired?: boolean;
   label: string | LocalizationKey;
   placeholder?: string | LocalizationKey;
-} & (
-  | {
-      type: HTMLInputTypeAttribute;
-      options?: never;
-    }
-  | {
-      type?: never;
-      options: SelectOption[];
-    }
-);
+  type?: HTMLInputTypeAttribute;
+  options?: SelectOption[];
+};
 
 type FieldStateProps<Id> = {
   id: Id;
@@ -34,10 +27,10 @@ export type FormControlState<Id = string> = FieldStateProps<Id> & {
   props: FieldStateProps<Id>;
 };
 
-export const useFormControl = <Id extends string, Opts extends Options>(
+export const useFormControl = <Id extends string>(
   id: Id,
   initialState: string,
-  opts: Opts,
+  opts?: Options,
 ): FormControlState<Id> => {
   opts = opts || { type: 'text', label: '', isRequired: false, placeholder: '', options: [] };
   const { translateError } = useLocalizations();
