@@ -3,10 +3,11 @@ import React from 'react';
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser, useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
-import { AvatarUploader, Form, useCardState, withCardStateProvider } from '../../elements';
+import { Form, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 import { FormButtons } from './FormButtons';
 import { SuccessPage } from './SuccessPage';
+import { UserProfileAvatarUploader } from './UserProfileAvatarUploader';
 import { ContentPage } from './UserProfileContentPage';
 
 export const ProfilePage = withCardStateProvider(() => {
@@ -67,7 +68,10 @@ export const ProfilePage = withCardStateProvider(() => {
     <Wizard {...wizard.props}>
       <ContentPage headerTitle={title}>
         <Form.Root onSubmit={onSubmit}>
-          <AvatarUploader onAvatarChange={uploadAvatar} />
+          <UserProfileAvatarUploader
+            user={user}
+            onAvatarChange={uploadAvatar}
+          />
           {showFirstName && (
             <Form.ControlRow>
               <Form.Control

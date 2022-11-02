@@ -33,12 +33,13 @@ const useCardState = () => {
   const setIdle = (metadata?: Metadata) => setState(s => ({ ...s, status: 'idle', metadata }));
   const setError = (metadata: ClerkAPIError | Metadata) => setState(s => ({ ...s, error: translateError(metadata) }));
   const setLoading = (metadata?: Metadata) => setState(s => ({ ...s, status: 'loading', metadata }));
-  const runAsync = async (cb: () => Promise<unknown>) => {
+  const runAsync = async (cb: Promise<unknown> | (() => Promise<unknown>)) => {
     setLoading();
-    return cb().then(res => {
-      setIdle();
-      return res;
-    });
+    return (typeof cb === 'function' ? cb() : cb)
+      .then(res => {
+        return res;
+      })
+      .finally(() => setIdle());
   };
 
   return {

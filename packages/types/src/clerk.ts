@@ -493,13 +493,21 @@ export type OrganizationProfileProps = {
    */
   path?: string;
   /*
-   * Hides the default navigation bar
+   * If set to true, the OrganizationProfile will display the Create Organization flow
+   * @default undefined
    */
-  hideNavigation?: boolean;
-  /*
-   * Renders only a specific view of the component eg: 'security'
+  new?: boolean;
+  /**
+   * Full URL or path to navigate after creating a new organization.
+   * @default undefined
    */
-  only?: 'account' | 'security';
+  afterOrganizationCreationUrl?: string;
+  /**
+   * Full URL or path to navigate after a user accepts an invitation
+   * and successfully joins the corresponding organization.
+   * TODO: confirm the naming
+   */
+  invitationRedirectUrl?: string;
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
@@ -561,10 +569,34 @@ export type OrganizationSwitcherProps = {
    */
   defaultOpen?: boolean;
   /**
-   * Full URL or path to navigate after successful account change.
-   * Multi-session mode only.
+   * By default, users can switch between organization and their personal account.
+   * This option controls whether OrganizationSwitcher will include the user's personal account
+   * in the organization list. Setting this to `false` will hide the personal account entry,
+   * and users will only be able to switch between organizations.
+   * @default true
    */
-  afterSwitchSessionUrl?: string;
+  showPersonalAccount?: boolean;
+  /**
+   * Full URL or path to navigate after a successful organization switch.
+   */
+  afterOrganizationSwitchUrl?: string;
+  /**
+   * Full URL or path to navigate after creating a new organization.
+   * @default undefined
+   */
+  afterOrganizationCreationUrl?: string;
+  /**
+   * Props to pass through to the OrganizationProfile component, if opened as a modal.
+   * By default, clicking the "Manage organization" button inside the OrganizationSwitcher
+   * will open a OrganizationProfile modal.
+   */
+  organizationProfileProps?: OrganizationProfileProps;
+  /**
+   * Controls whether clicking the "Manage organization" button will cause
+   * the OrganizationProfile component to open as a modal, or if the browser will navigate
+   * to the `organizationProfileUrl` where OrganizationProfile is mounted as a page.
+   */
+  organizationProfileMode?: 'modal' | 'navigation';
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
@@ -593,6 +625,12 @@ export interface HandleMagicLinkVerificationParams {
 
 export type CreateOrganizationInvitationParams = {
   emailAddress: string;
+  role: MembershipRole;
+  redirectUrl?: string;
+};
+
+export type CreateBulkOrganizationInvitationParams = {
+  emailAddresses: string[];
   role: MembershipRole;
   redirectUrl?: string;
 };

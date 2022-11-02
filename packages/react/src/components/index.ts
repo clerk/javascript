@@ -1,4 +1,11 @@
-export { SignUp, SignIn, UserProfile, UserButton } from './uiComponents';
+export {
+  SignUp,
+  SignIn,
+  UserProfile,
+  UserButton,
+  OrganizationProfile as UnstableOrganizationProfile,
+  OrganizationSwitcher as UnstableOrganizationSwitcher,
+} from './uiComponents';
 
 export {
   ClerkLoaded,

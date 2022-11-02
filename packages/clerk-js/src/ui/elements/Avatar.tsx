@@ -58,6 +58,7 @@ export const Avatar = (props: AvatarProps) => {
         width='100%'
         height='100%'
         onError={() => setError(true)}
+        sx={{ objectFit: 'contain' }}
       />
     );
 

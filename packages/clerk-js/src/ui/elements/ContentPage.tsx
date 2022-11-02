@@ -6,7 +6,7 @@ import { CardAlert, Header, NavbarMenuButtonRow, useCardState } from './index';
 
 type PageProps = PropsOfComponent<typeof Col> & {
   headerTitle: LocalizationKey;
-  Breadcrumbs: React.ComponentType<any>;
+  Breadcrumbs: React.ComponentType<any> | null;
   headerSubtitle?: LocalizationKey;
 };
 
@@ -24,10 +24,12 @@ export const ContentPage = (props: PageProps) => {
       <NavbarMenuButtonRow />
       <CardAlert>{card.error}</CardAlert>
       <Header.Root>
-        <Breadcrumbs
-          title={headerTitle}
-          sx={(t: any) => ({ marginBottom: t.space.$5 })}
-        />
+        {Breadcrumbs && (
+          <Breadcrumbs
+            title={headerTitle}
+            sx={(t: any) => ({ marginBottom: t.space.$5 })}
+          />
+        )}
         <Header.Title
           // TODO: Align them between user profile and org profile
           localizationKey={headerTitle}

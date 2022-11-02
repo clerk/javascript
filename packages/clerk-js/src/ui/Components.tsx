@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom';
 
 import { PRESERVED_QUERYSTRING_PARAMS } from '../core/constants';
 import { clerkUIErrorDOMElementNotFound } from '../core/errors';
+import { ImpersonationFab } from './components/ImpersonationFab';
 import { OrganizationProfile, OrganizationProfileModal } from './components/OrganizationProfile';
 import { OrganizationSwitcher } from './components/OrganizationSwitcher';
 import { SignIn, SignInModal } from './components/SignIn';
@@ -17,7 +18,6 @@ import { CoreClerkContextWrapper } from './contexts/CoreClerkContextWrapper';
 import { AppearanceProvider } from './customizables';
 import { FlowMetadataProvider, Modal } from './elements';
 import { useSafeLayoutEffect } from './hooks';
-import { ImpersonationFab } from './ImpersonationFab';
 import Portal from './portal';
 import { VirtualRouter } from './router';
 import { InternalThemeProvider } from './styledSystem';
@@ -273,7 +273,7 @@ const Components = (props: ComponentsProps) => {
               onExternalNavigate={() => componentsControls.closeModal('organizationProfile')}
               startPath='/organizationProfile'
             >
-              <OrganizationProfileModal />
+              <OrganizationProfileModal {...organizationProfileModal} />
             </VirtualRouter>
           </Modal>
         </InternalThemeProvider>
@@ -315,6 +315,7 @@ const Components = (props: ComponentsProps) => {
               </AppearanceProvider>
             );
           })}
+
           {signInModal && mountedSignInModal}
           {signUpModal && mountedSignUpModal}
           {userProfileModal && mountedUserProfileModal}

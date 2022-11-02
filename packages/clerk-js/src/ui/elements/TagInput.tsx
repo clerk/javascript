@@ -1,31 +1,59 @@
 import React from 'react';
 
-import { Flex, Icon, Input, Text } from '../customizables';
+import { Flex, Icon, Input, LocalizationKey, Text, useLocalizations } from '../customizables';
 import { Plus } from '../icons';
-import { common } from '../styledSystem';
+import { common, PropsOfComponent } from '../styledSystem';
 
 type Tag = string;
 
-const useTags = (val: Tag[] = []) => {
-  const [, _update] = React.useState({});
-  const update = React.useCallback(() => _update({}), []);
-  const set = React.useRef(new Set<Tag>(val)).current;
-  const sanitize = (val: string) => val.trim();
-  const add = (tag: Tag) => set.add(sanitize(tag)) && update();
-  const removeLast = () => set.delete([...set.values()].pop() || '') && update();
-  const remove = (tag: Tag) => set.delete(tag) && update();
-  const has = (tag: Tag) => set.has(tag);
-  const values = [...set.values()];
-  return { values, add, removeLast, remove, has };
+const sanitize = (val: string) => val.trim();
+
+type TagInputProps = Pick<PropsOfComponent<typeof Flex>, 'sx'> & {
+  value: string;
+  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  validate?: (tag: Tag) => boolean;
+  placeholder?: LocalizationKey | string;
 };
 
-export const TagInput = () => {
-  const tags = useTags(['nikos@clerk.dev', 'maria@clerk.dev']);
+export const TagInput = (props: TagInputProps) => {
+  const { t } = useLocalizations();
+  const { sx, placeholder, validate = () => true, value: valueProp, onChange: onChangeProp, ...rest } = props;
+  const tags = valueProp.split(',').map(sanitize).filter(Boolean);
+  const tagsSet = new Set(tags);
   const keyReleasedRef = React.useRef(true);
+  const inputRef = React.useRef<HTMLInputElement>(null);
   const [input, setInput] = React.useState('');
-  const addTag = (tag: Tag) => {
-    tags.add(tag);
-    setInput('');
+
+  const emit = (newTags: Tag[]) => {
+    onChangeProp({ target: { value: newTags.join(',') } } as any);
+    focusInput();
+  };
+
+  const remove = (tag: Tag) => {
+    emit(tags.filter(t => t !== tag));
+  };
+
+  const removeLast = () => {
+    emit(tags.slice(0, -1));
+  };
+
+  const addTag = (tag: Tag | Tag[]) => {
+    // asdfa@asd.com
+    const newTags = (Array.isArray(tag) ? [...tag] : [tag])
+      .map(sanitize)
+      .filter(Boolean)
+      .filter(validate)
+      .filter(t => !tagsSet.has(t));
+
+    if (newTags.length) {
+      emit([...tags, ...newTags]);
+      setInput('');
+      focusInput();
+    }
+  };
+
+  const focusInput = () => {
+    inputRef.current?.focus();
   };
 
   const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = e => {
@@ -33,11 +61,16 @@ export const TagInput = () => {
     if ((key === ',' || key === ' ' || key === 'Enter') && !!input.length) {
       e.preventDefault();
       addTag(input);
-    } else if (key === 'Backspace' && !input.length && !!tags.values.length && keyReleasedRef.current) {
+    } else if (key === 'Backspace' && !input.length && !!tags.length && keyReleasedRef.current) {
       e.preventDefault();
-      tags.removeLast();
+      removeLast();
     }
     keyReleasedRef.current = false;
+  };
+
+  const handleOnBlur: React.FocusEventHandler = e => {
+    e.preventDefault();
+    addTag(input);
   };
 
   const handleKeyUp: React.KeyboardEventHandler<HTMLInputElement> = () => {
@@ -53,47 +86,63 @@ export const TagInput = () => {
 
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
-    (e.clipboardData.getData('text') || '')
-      .split(/,| |\n|\t/)
-      .filter(Boolean)
-      .map(tag => tag.trim())
-      .forEach(tag => addTag(tag));
+    addTag(
+      (e.clipboardData.getData('text') || '')
+        .split(/,| |\n|\t/)
+        .filter(Boolean)
+        .map(tag => tag.trim()),
+    );
   };
 
   return (
     <Flex
+      align={'start'}
       gap={2}
       wrap='wrap'
-      sx={t => ({
-        maxWidth: '100%',
-        padding: `${t.space.$2x5} ${t.space.$4}`,
-        backgroundColor: t.colors.$colorInputBackground,
-        color: t.colors.$colorInputText,
-        ...common.borderVariants(t).normal,
-      })}
+      onClick={focusInput}
+      onFocus={focusInput}
+      onBlur={handleOnBlur}
+      sx={[
+        t => ({
+          maxWidth: '100%',
+          padding: `${t.space.$2x5} ${t.space.$4}`,
+          backgroundColor: t.colors.$colorInputBackground,
+          color: t.colors.$colorInputText,
+          minHeight: t.sizes.$20,
+          maxHeight: t.sizes.$60,
+          overflowY: 'auto',
+          ...common.borderVariants(t).normal,
+        }),
+        sx,
+      ]}
+      {...rest}
     >
-      {tags.values.map(tag => (
+      {tags.map(tag => (
         <TagPill
           key={tag}
-          onRemoveClick={() => tags.remove(tag)}
+          onRemoveClick={() => remove(tag)}
         >
           {tag}
         </TagPill>
       ))}
       <Input
+        ref={inputRef}
         value={input}
         type='email'
-        placeholder='Enter a tag'
+        placeholder={!tags.length ? t(placeholder) : undefined}
         onKeyDown={handleKeyDown}
         onKeyUp={handleKeyUp}
         onChange={handleChange}
         onPaste={handlePaste}
         focusRing={false}
-        sx={{
+        sx={t => ({
+          flexGrow: 1,
           border: 'none',
           width: 'initial',
           padding: 0,
-        }}
+          lineHeight: t.space.$6,
+          paddingLeft: t.space.$1,
+        })}
       />
     </Flex>
   );

@@ -16,6 +16,7 @@ type _LocalizationResource = {
   socialButtonsBlockButton: LocalizationValue;
   dividerText: LocalizationValue;
   formFieldLabel__emailAddress: LocalizationValue;
+  formFieldLabel__emailAddresses: LocalizationValue;
   formFieldLabel__phoneNumber: LocalizationValue;
   formFieldLabel__username: LocalizationValue;
   formFieldLabel__emailAddress_phoneNumber: LocalizationValue;
@@ -28,7 +29,9 @@ type _LocalizationResource = {
   formFieldLabel__firstName: LocalizationValue;
   formFieldLabel__lastName: LocalizationValue;
   formFieldLabel__backupCode: LocalizationValue;
+  formFieldLabel__organizationName: LocalizationValue;
   formFieldInputPlaceholder__emailAddress: LocalizationValue;
+  formFieldInputPlaceholder__emailAddresses: LocalizationValue;
   formFieldInputPlaceholder__phoneNumber: LocalizationValue;
   formFieldInputPlaceholder__username: LocalizationValue;
   formFieldInputPlaceholder__emailAddress_phoneNumber: LocalizationValue;
@@ -39,6 +42,7 @@ type _LocalizationResource = {
   formFieldInputPlaceholder__firstName: LocalizationValue;
   formFieldInputPlaceholder__lastName: LocalizationValue;
   formFieldInputPlaceholder__backupCode: LocalizationValue;
+  formFieldInputPlaceholder__organizationName: LocalizationValue;
   formFieldAction__forgotPassword: LocalizationValue;
   formFieldHintText__optional: LocalizationValue;
   formButtonPrimary: LocalizationValue;
@@ -52,6 +56,7 @@ type _LocalizationResource = {
   badge__default: LocalizationValue;
   badge__unverified: LocalizationValue;
   badge__requiresAction: LocalizationValue;
+  badge__you: LocalizationValue;
   footerPageLink__help: LocalizationValue;
   footerPageLink__privacy: LocalizationValue;
   footerPageLink__terms: LocalizationValue;
@@ -417,6 +422,9 @@ type _LocalizationResource = {
     start: {
       headerTitle__members: LocalizationValue;
       headerTitle__settings: LocalizationValue;
+    };
+    profilePage: {
+      successMessage: LocalizationValue;
     };
   };
   unstable__errors: {

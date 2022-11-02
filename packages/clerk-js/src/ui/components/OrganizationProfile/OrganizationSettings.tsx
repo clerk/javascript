@@ -1,16 +1,14 @@
 import React from 'react';
 
-import { useCoreUser, useEnvironment } from '../../contexts';
+import { useCoreOrganization, useCoreUser } from '../../contexts';
 import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
-import { Header, IconButton, NavbarMenuButtonRow, UserPreview } from '../../elements';
+import { Header, IconButton, NavbarMenuButtonRow, OrganizationPreview } from '../../elements';
 import { useNavigate } from '../../hooks';
-import { Times, Trash } from '../../icons';
+import { Times } from '../../icons';
 import { ProfileSection } from '../UserProfile/Section';
 import { BlockButton } from '../UserProfile/UserProfileBlockButtons';
 
 export const OrganizationSettings = () => {
-  const { attributes } = useEnvironment().userSettings;
-
   return (
     <Col
       elementDescriptor={descriptors.page}
@@ -40,8 +38,20 @@ export const OrganizationSettings = () => {
 };
 
 const OrganizationProfileSection = () => {
+  const { organization, membership } = useCoreOrganization();
   const { navigate } = useNavigate();
-  const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = useCoreUser();
+  const isAdmin = membership?.role === 'admin';
+
+  if (!organization) {
+    return null;
+  }
+
+  const profile = (
+    <OrganizationPreview
+      organization={organization}
+      size='lg'
+    />
+  );
 
   return (
     <ProfileSection
@@ -49,19 +59,22 @@ const OrganizationProfileSection = () => {
       title={'Organization profile'}
       // id='organization-profile'
     >
-      <BlockButton onClick={() => navigate('profile')}>
-        {/*// TODO*/}
-        <UserPreview
-          user={userWithoutIdentifiers}
-          size='lg'
-        />
-      </BlockButton>
+      {isAdmin ? <BlockButton onClick={() => navigate('profile')}>{profile}</BlockButton> : profile}
     </ProfileSection>
   );
 };
 
 const OrganizationDangerSection = () => {
-  const { navigate } = useNavigate();
+  const { organization, membership } = useCoreOrganization();
+  const user = useCoreUser();
+
+  if (!organization || !membership) {
+    return null;
+  }
+
+  const leave = () => {
+    return organization.removeMember(user.id);
+  };
 
   return (
     <ProfileSection
@@ -76,16 +89,10 @@ const OrganizationDangerSection = () => {
           variant='outline'
           colorScheme='danger'
           textVariant='buttonExtraSmallBold'
+          onClick={leave}
+          isDisabled={membership.role === 'admin'}
         >
           Leave organization
-        </IconButton>
-        <IconButton
-          icon={Trash}
-          variant='outline'
-          colorScheme='danger'
-          textVariant='buttonExtraSmallBold'
-        >
-          Delete organization
         </IconButton>
       </Flex>
     </ProfileSection>

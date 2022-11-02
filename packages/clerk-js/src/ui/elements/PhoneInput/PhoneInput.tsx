@@ -10,6 +10,7 @@ import { useFormattedPhoneNumber } from './useFormattedPhoneNumber';
 const createSelectOption = (country: CountryEntry) => {
   return {
     searchTerm: `${country.iso} ${country.name} ${country.code}`,
+    value: `${country.iso} ${country.name} ${country.code}`,
     country,
     // nativeOption: createNativeSelectOption(country),
   };
@@ -47,12 +48,12 @@ export const PhoneInput = (props: PhoneInputProps) => {
       sx={theme => ({ position: 'relative', borderRadius: theme.radii.$md, zIndex: 1 })}
     >
       <Select
-        value={selectedCountryOption}
+        value={selectedCountryOption.value}
         options={countryOptions}
-        optionBuilder={(option, _index, isSelected) => (
+        optionBuilder={(option, _index, isFocused) => (
           <CountryCodeListItem
             sx={theme => ({
-              ...(isSelected && { backgroundColor: theme.colors.$blackAlpha200 }),
+              ...(isFocused && { backgroundColor: theme.colors.$blackAlpha200 }),
               '&:hover': {
                 backgroundColor: theme.colors.$blackAlpha200,
               },
@@ -65,7 +66,7 @@ export const PhoneInput = (props: PhoneInputProps) => {
           phoneInputRef.current?.focus();
         }}
         noResultsMessage='No countries found'
-        placeholder='Search country or code'
+        searchPlaceholder='Search country or code'
         comparator={(term, option) => option.searchTerm.toLowerCase().includes(term.toLowerCase())}
       >
         <Flex

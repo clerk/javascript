@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useCoreOrganization, useCoreUser } from '../../contexts';
+import { useCoreOrganization, useCoreUser, useOrganizationSwitcherContext } from '../../contexts';
 import { Button, Flex, Icon, localizationKeys } from '../../customizables';
 import { OrganizationPreview, PersonalWorkspacePreview } from '../../elements';
 import { Selector } from '../../icons';
@@ -11,34 +11,28 @@ type OrganizationSwitcherTriggerProps = PropsOfComponent<typeof Button> & { isOp
 export const OrganizationSwitcherTrigger = React.forwardRef<HTMLButtonElement, OrganizationSwitcherTriggerProps>(
   (props, ref) => {
     const user = useCoreUser();
-    const { organization, isLoaded } = useCoreOrganization();
-
-    // TODO: if org is undfined, isloaded returns false always
-    // if (!isLoaded) {
-    //   return null;
-    // }
-
-    const showPersonalAccount = true;
+    const { organization } = useCoreOrganization();
+    const { showPersonalAccount } = useOrganizationSwitcherContext();
 
     return (
       <Button
         variant='ghost'
         colorScheme='neutral'
-        sx={theme => ({
-          borderRadius: theme.radii.$lg,
-        })}
+        sx={t => ({ borderRadius: t.radii.$lg })}
         {...props}
         ref={ref}
       >
         <Flex
           gap={4}
           center
+          align='start'
         >
           {organization && (
             <OrganizationPreview
               size={'sm'}
               organization={organization}
               user={user}
+              sx={{ maxWidth: '30ch' }}
             />
           )}
           {!organization && (
@@ -46,12 +40,17 @@ export const OrganizationSwitcherTrigger = React.forwardRef<HTMLButtonElement, O
               user={user}
               rounded={false}
               size={'sm'}
-              subtitle={localizationKeys(
-                showPersonalAccount ? 'organizationSwitcher.personalWorkspace' : 'organizationSwitcher.notSelected',
-              )}
+              subtitle={
+                showPersonalAccount
+                  ? localizationKeys('organizationSwitcher.personalWorkspace')
+                  : localizationKeys('organizationSwitcher.notSelected')
+              }
             />
           )}
-          <Icon icon={Selector} />
+          <Icon
+            icon={Selector}
+            sx={t => ({ color: t.colors.$blackAlpha400 })}
+          />
         </Flex>
       </Button>
     );

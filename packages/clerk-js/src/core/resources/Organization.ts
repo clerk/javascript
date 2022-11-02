@@ -1,13 +1,16 @@
 import type {
+  AddMemberParams,
   CreateOrganizationParams,
   GetMembershipsParams,
   GetPendingInvitationsParams,
-  MembershipRole,
+  InviteMemberParams,
+  InviteMembersParams,
   OrganizationInvitationJSON,
   OrganizationJSON,
   OrganizationMembershipJSON,
   OrganizationResource,
   SetOrganizationLogoParams,
+  UpdateMembershipParams,
   UpdateOrganizationParams,
 } from '@clerk/types';
 
@@ -100,8 +103,12 @@ export class Organization extends BaseResource implements OrganizationResource {
     return newMember;
   };
 
-  inviteMember = async (inviteMemberParams: InviteMemberParams) => {
-    return await OrganizationInvitation.create(this.id, inviteMemberParams);
+  inviteMember = async (params: InviteMemberParams) => {
+    return OrganizationInvitation.create(this.id, params);
+  };
+
+  inviteMembers = async (params: InviteMembersParams) => {
+    return OrganizationInvitation.createBulk(this.id, params);
   };
 
   updateMember = async ({ userId, role }: UpdateMembershipParams): Promise<OrganizationMembership> => {
@@ -149,24 +156,3 @@ export class Organization extends BaseResource implements OrganizationResource {
     return this;
   }
 }
-
-export type GetOrganizationParams = {
-  limit?: number;
-  offset?: number;
-};
-
-export type AddMemberParams = {
-  userId: string;
-  role: MembershipRole;
-};
-
-export type InviteMemberParams = {
-  emailAddress: string;
-  role: MembershipRole;
-  redirectUrl?: string;
-};
-
-export type UpdateMembershipParams = {
-  userId: string;
-  role: MembershipRole;
-};

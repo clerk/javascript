@@ -18,10 +18,9 @@ export const FormButtons = (props: FormButtonsProps) => {
       <Form.SubmitButton
         block={false}
         isDisabled={isDisabled}
+        localizationKey={submitLabel || localizationKeys('userProfile.formButtonPrimary__continue')}
         {...rest}
-      >
-        {submitLabel || 'Continue'}
-      </Form.SubmitButton>
+      />
       <Form.ResetButton
         localizationKey={localizationKeys('userProfile.formButtonReset')}
         block={false}

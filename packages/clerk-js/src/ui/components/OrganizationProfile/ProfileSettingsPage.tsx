@@ -1,12 +1,14 @@
 import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
+import { useCoreOrganization } from '../../contexts';
 import { localizationKeys } from '../../customizables';
-import { AvatarUploader, Form, useCardState, withCardStateProvider } from '../../elements';
-import { useFormControl } from '../../utils';
+import { Form, useCardState, withCardStateProvider } from '../../elements';
+import { handleError, useFormControl } from '../../utils';
 import { FormButtons } from '../UserProfile/FormButtons';
 import { SuccessPage } from '../UserProfile/SuccessPage';
 import { ContentPage } from './OrganizationContentPage';
+import { OrganizationProfileAvatarUploader } from './OrganizationProfileAvatarUploader';
 
 export const ProfileSettingsPage = withCardStateProvider(() => {
   // const title = localizationKeys('userProfile.profilePage.title');
@@ -14,40 +16,36 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
   const subtitle = 'Manage organization profile';
   const card = useCardState();
   const [avatarChanged, setAvatarChanged] = React.useState(false);
+  const { organization } = useCoreOrganization();
 
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
 
-  const organizationName = useFormControl('name', 'placeholder' || '', {
+  const nameField = useFormControl('name', organization?.name || '', {
     type: 'text',
-    // label: localizationKeys('formFieldLabel__firstName'),
-    // placeholder: localizationKeys('formFieldInputPlaceholder__firstName'),
-    label: 'Organization name',
-    placeholder: '',
+    label: localizationKeys('formFieldLabel__organizationName'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__organizationName'),
   });
 
-  const dataChanged = 'placeholder' !== organizationName.value;
+  if (!organization) {
+    return null;
+  }
+
+  const dataChanged = organization.name !== nameField.value;
   const canSubmit = dataChanged || avatarChanged;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    wizard.nextStep();
-
-    // return (
-    // dataChanged
-    //   ? user.update({ firstName: organizationName.value, lastName: lastNameField.value })
-    // : Promise.resolve()
-    // )
-    //   .then(() => {
-    //     wizard.nextStep();
-    //   })
-    // .catch(err => {
-    //   handleError(err, [organizationName, lastNameField], card.setError);
-    // });
+    return (dataChanged ? organization.update({ name: nameField.value }) : Promise.resolve())
+      .then(wizard.nextStep)
+      .catch(err => {
+        handleError(err, [nameField], card.setError);
+      });
   };
 
   const uploadAvatar = (file: File) => {
-    console.log(file);
-    return Promise.resolve();
+    return organization.setLogo({ file }).then(() => {
+      setAvatarChanged(true);
+    });
   };
 
   return (
@@ -57,10 +55,13 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
         headerSubtitle={subtitle}
       >
         <Form.Root onSubmit={onSubmit}>
-          <AvatarUploader onAvatarChange={uploadAvatar} />
+          <OrganizationProfileAvatarUploader
+            organization={organization}
+            onAvatarChange={uploadAvatar}
+          />
           <Form.ControlRow>
             <Form.Control
-              {...organizationName.props}
+              {...nameField.props}
               required
             />
           </Form.ControlRow>
@@ -69,7 +70,7 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
       </ContentPage>
       <SuccessPage
         title={title}
-        text={localizationKeys('userProfile.profilePage.successMessage')}
+        text={localizationKeys('organizationProfile.profilePage.successMessage')}
       />
     </Wizard>
   );

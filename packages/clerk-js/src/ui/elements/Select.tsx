@@ -11,35 +11,38 @@ import { InputWithIcon } from './InputWithIcon';
 type UsePopoverReturn = ReturnType<typeof usePopover>;
 type UseSearchInputReturn = ReturnType<typeof useSearchInput>;
 
-type OptionBuilder<O> = (option: O, index?: number, isSelected?: boolean) => JSX.Element;
+type Option = { value: string | null; label?: string };
 
-type SelectProps<O> = {
+type OptionBuilder<O extends Option> = (option: O, index?: number, isFocused?: boolean) => JSX.Element;
+
+type SelectProps<O extends Option> = {
   options: O[];
-  value: O;
+  value: string | null;
   onChange: (option: O) => void;
+  searchPlaceholder?: string;
   placeholder?: string;
   comparator?: (term: string, option: O) => boolean;
   noResultsMessage?: string;
   optionBuilder?: OptionBuilder<O>;
 };
 
-type SelectState<O = any> = Pick<SelectProps<O>, 'placeholder' | 'comparator' | 'noResultsMessage'> & {
+type SelectState<O extends Option> = Pick<
+  SelectProps<O>,
+  'placeholder' | 'searchPlaceholder' | 'comparator' | 'noResultsMessage'
+> & {
   popoverCtx: UsePopoverReturn;
   searchInputCtx: UseSearchInputReturn;
   optionBuilder: OptionBuilder<O>;
-  selectedOption: O;
-  select: (option: O) => void;
-  selectedItemRef: React.RefObject<HTMLDivElement>;
+  buttonOptionBuilder: OptionBuilder<O>;
+  selectedOption: Option | null;
+  select: (option: Option) => void;
+  focusedItemRef: React.RefObject<HTMLDivElement>;
   onTriggerClick: () => void;
 };
 
-const [SelectStateCtx, useSelectState] = createContextAndHook<SelectState>('SelectState');
+const [SelectStateCtx, useSelectState] = createContextAndHook<SelectState<any>>('SelectState');
 
-const defaultOptionBuilder = <O,>(option: O, _index?: number, isSelected?: boolean) => {
-  if (typeof option !== 'string' && typeof option !== 'number') {
-    throw new Error('Provide an optionBuilder function');
-  }
-
+const defaultOptionBuilder = <O extends Option>(option: O, _index?: number, isFocused?: boolean) => {
   return (
     <Flex
       sx={theme => ({
@@ -47,31 +50,37 @@ const defaultOptionBuilder = <O,>(option: O, _index?: number, isSelected?: boole
         padding: `${theme.space.$2} ${theme.space.$4}`,
         margin: `0 ${theme.space.$1}`,
         borderRadius: theme.radii.$md,
-        ...(isSelected && { backgroundColor: theme.colors.$blackAlpha200 }),
+        ...(isFocused && { backgroundColor: theme.colors.$blackAlpha200 }),
         '&:hover': {
           backgroundColor: theme.colors.$blackAlpha200,
         },
       })}
     >
-      <Text truncate>{option}</Text>
+      <Text truncate>{option.label || option.value}</Text>
     </Flex>
   );
 };
 
-export const Select = <O,>(props: PropsWithChildren<SelectProps<O>>) => {
+const defaultButtonOptionBuilder = <O extends Option>(option: O) => {
+  return <>{option.label || option.value}</>;
+};
+
+export const Select = <O extends Option>(props: PropsWithChildren<SelectProps<O>>) => {
   const {
     value,
     options,
     onChange,
-    optionBuilder = defaultOptionBuilder,
+    optionBuilder,
     noResultsMessage,
     comparator,
-    placeholder,
+    placeholder = 'Select an option',
+    searchPlaceholder,
+    children,
     ...rest
   } = props;
   const popoverCtx = usePopover({ autoUpdate: false });
   const togglePopover = popoverCtx.toggle;
-  const selectedItemRef = React.useRef<HTMLDivElement>(null);
+  const focusedItemRef = React.useRef<HTMLDivElement>(null);
   const searchInputCtx = useSearchInput({
     items: options,
     comparator: comparator || (() => true),
@@ -85,53 +94,65 @@ export const Select = <O,>(props: PropsWithChildren<SelectProps<O>>) => {
     [togglePopover, onChange],
   );
 
+  const defaultChildren = (
+    <>
+      <SelectOptionList />
+      <SelectButton />
+    </>
+  );
+
   return (
     <SelectStateCtx.Provider
       value={{
         value: {
           popoverCtx,
           searchInputCtx,
-          selectedOption: value,
+          selectedOption: options.find(o => o.value === value) || null,
           noResultsMessage,
-          selectedItemRef,
-          optionBuilder,
+          focusedItemRef,
+          optionBuilder: optionBuilder || defaultOptionBuilder,
+          buttonOptionBuilder: optionBuilder || defaultButtonOptionBuilder,
           placeholder,
+          searchPlaceholder,
           comparator,
           select,
           onTriggerClick: togglePopover,
         },
       }}
       {...rest}
-    />
+    >
+      {React.Children.count(children) ? children : defaultChildren}
+    </SelectStateCtx.Provider>
   );
 };
 
-type SelectOptionBuilderProps<O = unknown> = {
-  option: O;
+type SelectOptionBuilderProps<O extends Option> = {
+  option: Option;
   index: number;
   optionBuilder: OptionBuilder<O>;
-  handleSelect: (option: O) => void;
-  isSelected: boolean;
+  handleSelect: (option: Option) => void;
+  isFocused: boolean;
 };
 
-const _SelectOptionBuilder = (props: SelectOptionBuilderProps, ref?: React.ForwardedRef<HTMLDivElement>) => {
-  const { option, optionBuilder, index, handleSelect, isSelected } = props;
-  return (
-    <Flex
-      ref={ref}
-      sx={{
-        userSelect: 'none',
-      }}
-      onClick={() => {
-        handleSelect(option);
-      }}
-    >
-      {optionBuilder(option, index, isSelected)}
-    </Flex>
-  );
-};
-
-const SelectOptionBuilder = React.memo(React.forwardRef(_SelectOptionBuilder));
+const SelectOptionBuilder = React.memo(
+  React.forwardRef((props: SelectOptionBuilderProps<any>, ref?: React.ForwardedRef<HTMLDivElement>) => {
+    const { option, optionBuilder, index, handleSelect, isFocused } = props;
+    return (
+      <Flex
+        ref={ref}
+        sx={{
+          userSelect: 'none',
+          cursor: 'pointer',
+        }}
+        onClick={() => {
+          handleSelect(option);
+        }}
+      >
+        {optionBuilder(option, index, isFocused)}
+      </Flex>
+    );
+  }),
+);
 
 const SelectSearchbar = (props: PropsOfComponent<typeof InputWithIcon>) => {
   const { sx, ...rest } = props;
@@ -181,26 +202,27 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
     searchInputCtx,
     optionBuilder,
     placeholder,
+    searchPlaceholder,
     comparator,
-    selectedItemRef,
+    focusedItemRef,
     noResultsMessage,
     select,
     onTriggerClick,
   } = useSelectState();
   const { filteredItems: options, searchInputProps } = searchInputCtx;
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [focusedIndex, setFocusedIndex] = useState(0);
   const { isOpen, floating, styles } = popoverCtx;
   const containerRef = React.useRef<HTMLDivElement>(null);
 
   const scrollToItemOnSelectedIndexChange = () => {
     if (!isOpen) {
-      setSelectedIndex(0);
+      setFocusedIndex(-1);
       return;
     }
-    selectedItemRef.current?.scrollIntoView({ block: 'nearest' });
+    focusedItemRef.current?.scrollIntoView({ block: 'nearest' });
   };
 
-  React.useEffect(scrollToItemOnSelectedIndexChange, [selectedIndex, isOpen]);
+  React.useEffect(scrollToItemOnSelectedIndexChange, [focusedIndex, isOpen]);
   React.useEffect(() => {
     if (!comparator) {
       containerRef?.current?.focus();
@@ -211,7 +233,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
     if (e.key === 'ArrowUp') {
       e.preventDefault();
       if (isOpen) {
-        return setSelectedIndex((i = 0) => Math.max(i - 1, 0));
+        return setFocusedIndex((i = 0) => Math.max(i - 1, 0));
       }
       return onTriggerClick();
     }
@@ -219,14 +241,14 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       if (isOpen) {
-        return setSelectedIndex((i = 0) => Math.min(i + 1, options.length - 1));
+        return setFocusedIndex((i = 0) => Math.min(i + 1, options.length - 1));
       }
       return onTriggerClick();
     }
 
     if (e.key === 'Enter') {
       e.preventDefault();
-      return select(options[selectedIndex]);
+      return select(options[focusedIndex]);
     }
   };
 
@@ -258,7 +280,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
     >
       {comparator && (
         <SelectSearchbar
-          placeholder={placeholder}
+          placeholder={searchPlaceholder}
           {...searchInputProps}
         />
       )}
@@ -270,7 +292,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
           theme => ({
             gap: theme.space.$1,
             outline: 'none',
-            overflowY: 'scroll',
+            overflowY: 'auto',
             maxHeight: '18vh',
             padding: `${theme.space.$2} 0`,
           }),
@@ -279,15 +301,15 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
         {...rest}
       >
         {options.map((option, index) => {
-          const isSelected = index === selectedIndex;
+          const isFocused = index === focusedIndex;
           return (
             <SelectOptionBuilder
               key={index}
               index={index}
-              ref={isSelected ? selectedItemRef : undefined}
+              ref={isFocused ? focusedItemRef : undefined}
               option={option}
               optionBuilder={optionBuilder}
-              isSelected={isSelected}
+              isFocused={isFocused}
               handleSelect={select}
             />
           );
@@ -300,12 +322,16 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
 
 export const SelectButton = (props: PropsOfComponent<typeof Button>) => {
   const { sx, children, ...rest } = props;
-  const { popoverCtx, onTriggerClick, optionBuilder, selectedOption } = useSelectState();
+  const { popoverCtx, onTriggerClick, buttonOptionBuilder, selectedOption, placeholder } = useSelectState();
   const { isOpen, reference } = popoverCtx;
 
   let show: React.ReactNode = children;
   if (!children) {
-    show = optionBuilder(selectedOption);
+    show = selectedOption ? (
+      buttonOptionBuilder(selectedOption)
+    ) : (
+      <Text sx={t => ({ opacity: t.opacity.$inactive })}>{placeholder}</Text>
+    );
   }
 
   return (

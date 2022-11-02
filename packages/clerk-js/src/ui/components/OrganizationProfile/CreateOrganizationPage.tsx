@@ -1,90 +1,127 @@
 import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
-import {
-  AvatarUploader,
-  Form,
-  Select,
-  SelectButton,
-  SelectOptionList,
-  useCardState,
-  withCardStateProvider,
-} from '../../elements';
+import { useCoreClerk, useCoreOrganization, useCoreOrganizations, useOrganizationProfileContext } from '../../contexts';
+import { Button, Text } from '../../customizables';
+import { Form, useCardState, withCardStateProvider } from '../../elements';
 import { localizationKeys } from '../../localization';
-import { useFormControl } from '../../utils';
-import { FormButtons } from '../UserProfile/FormButtons';
-import { SuccessPage } from '../UserProfile/SuccessPage';
+import { handleError, useFormControl } from '../../utils';
+import { FormButtonContainer } from '../UserProfile/FormButtons';
+import { InviteMembersForm } from './InviteMembersForm';
 import { ContentPage } from './OrganizationContentPage';
+import { OrganizationProfileAvatarUploader } from './OrganizationProfileAvatarUploader';
 
 export const CreateOrganizationPage = withCardStateProvider(() => {
   // const title = localizationKeys('userProfile.profilePage.title');
   const title = 'Create Organization';
   const subtitle = 'Set the organization profile';
   const card = useCardState();
-  const [avatarChanged, setAvatarChanged] = React.useState(false);
+  const [file, setFile] = React.useState<File>();
+  const { createOrganization } = useCoreOrganizations();
+  const { setActive, closeOrganizationProfile } = useCoreClerk();
+  const { mode, navigateAfterOrganizationCreationUrl } = useOrganizationProfileContext();
+  const { organization } = useCoreOrganization();
 
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
 
-  const organizationName = useFormControl('name', '', {
+  const nameField = useFormControl('name', '', {
     type: 'text',
-    // label: localizationKeys('formFieldLabel__firstName'),
-    // placeholder: localizationKeys('formFieldInputPlaceholder__firstName'),
-    label: 'Organization Name',
-    placeholder: '',
+    label: localizationKeys('formFieldLabel__organizationName'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__organizationName'),
   });
 
-  const dataChanged = 'placeholder' !== organizationName.value;
-  const canSubmit = dataChanged || avatarChanged;
+  const dataChanged = !!nameField.value;
+  const canSubmit = dataChanged || !!file;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    wizard.nextStep();
+    if (!canSubmit) {
+      return;
+    }
 
-    // return (
-    // dataChanged
-    //   ? user.update({ firstName: organizationName.value, lastName: lastNameField.value })
-    // : Promise.resolve()
-    // )
-    //   .then(() => {
-    //     wizard.nextStep();
-    //   })
-    // .catch(err => {
-    //   handleError(err, [organizationName, lastNameField], card.setError);
-    // });
+    return createOrganization?.({ name: nameField.value })
+      .then(org => (file ? org.setLogo({ file }) : org))
+      .then(org => setActive({ organization: org }))
+      .then(wizard.nextStep)
+      .catch(err => handleError(err, [nameField], card.setError));
   };
 
-  const uploadAvatar = (file: File) => {
-    // return user.setProfileImage({ file }).then(() => {
-    //   setAvatarChanged(true);
-    // });
+  const completeFlow = () => {
+    navigateAfterOrganizationCreationUrl();
+    if (mode === 'modal') {
+      closeOrganizationProfile();
+    }
   };
 
   return (
     <Wizard {...wizard.props}>
       <ContentPage
+        Breadcrumbs={null}
         headerTitle={title}
         headerSubtitle={subtitle}
       >
         <Form.Root onSubmit={onSubmit}>
-          <AvatarUploader onAvatarChange={uploadAvatar} />
+          <OrganizationProfileAvatarUploader
+            organization={{ name: nameField.value }}
+            onAvatarChange={async file => await setFile(file)}
+          />
           <Form.ControlRow>
             <Form.Control
               sx={{ flexBasis: '80%' }}
-              {...organizationName.props}
+              {...nameField.props}
               required
             />
           </Form.ControlRow>
-          <FormButtons
-            // localizationKey={localizationKeys('createOrganization')}
-            isDisabled={!canSubmit}
-          />
+          <FormButtonContainer>
+            <Form.SubmitButton
+              block={false}
+              isDisabled={!canSubmit}
+              localizationKey={'Create organization'}
+            />
+            {mode === 'modal' && (
+              <Form.ResetButton
+                localizationKey={localizationKeys('userProfile.formButtonReset')}
+                block={false}
+                onClick={closeOrganizationProfile}
+              />
+            )}
+          </FormButtonContainer>
         </Form.Root>
       </ContentPage>
-      <SuccessPage
-        title={title}
-        // text={localizationKeys('userProfile.profilePage.successMessage')}
-        text={'Organization created successfully'}
-      />
+      <ContentPage
+        Breadcrumbs={null}
+        headerTitle={title}
+        headerSubtitle={subtitle}
+      >
+        <InviteMembersForm
+          organization={organization!}
+          resetButtonLabel={'Skip'}
+          onSuccess={wizard.nextStep}
+          onReset={completeFlow}
+        />
+      </ContentPage>
+      {/*<SuccessPage*/}
+      {/*  title={title}*/}
+      {/*  text={'Invitations successfully sent'}*/}
+      {/*/>*/}
+      <ContentPage
+        Breadcrumbs={null}
+        headerTitle={title}
+      >
+        <Text
+          localizationKey={'Invitations successfully sent'}
+          variant='regularRegular'
+        />
+        <FormButtonContainer>
+          <Button
+            textVariant='buttonExtraSmallBold'
+            block={false}
+            autoFocus
+            localizationKey={localizationKeys('userProfile.formButtonPrimary__finish')}
+            onClick={completeFlow}
+          />
+        </FormButtonContainer>
+      </ContentPage>
     </Wizard>
   );
 });

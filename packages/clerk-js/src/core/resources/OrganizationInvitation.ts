@@ -1,4 +1,6 @@
 import {
+  CreateBulkOrganizationInvitationParams,
+  CreateOrganizationInvitationParams,
   MembershipRole,
   OrganizationInvitationJSON,
   OrganizationInvitationResource,
@@ -26,17 +28,30 @@ export class OrganizationInvitation extends BaseResource implements Organization
       await BaseResource._fetch<OrganizationInvitationJSON>({
         path: `/organizations/${organizationId}/invitations`,
         method: 'POST',
-        body: {
-          email_address: emailAddress,
-          role,
-          redirect_url: redirectUrl,
-        } as any,
+        body: { email_address: emailAddress, role, redirect_url: redirectUrl } as any,
       })
     )?.response as unknown as OrganizationInvitationJSON;
-
     const newInvitation = new OrganizationInvitation(json);
     this.clerk.__unstable__invitationUpdate(newInvitation);
     return newInvitation;
+  }
+
+  static async createBulk(
+    organizationId: string,
+    params: CreateBulkOrganizationInvitationParams,
+  ): Promise<OrganizationInvitationResource[]> {
+    const { emailAddresses, redirectUrl, role } = params;
+    const json = (
+      await BaseResource._fetch<OrganizationInvitationJSON>({
+        path: `/organizations/${organizationId}/invitations/bulk`,
+        method: 'POST',
+        body: { email_address: emailAddresses, role, redirect_url: redirectUrl } as any,
+      })
+    )?.response as unknown as OrganizationInvitationJSON[];
+    // const newInvitation = new OrganizationInvitation(json);
+    // TODO: Figure out what this is...
+    // this.clerk.__unstable__invitationUpdate(newInvitation);
+    return json.map(invitationJson => new OrganizationInvitation(invitationJson));
   }
 
   constructor(data: OrganizationInvitationJSON) {
@@ -64,9 +79,3 @@ export class OrganizationInvitation extends BaseResource implements Organization
     return this;
   }
 }
-
-export type CreateOrganizationInvitationParams = {
-  emailAddress: string;
-  role: MembershipRole;
-  redirectUrl?: string;
-};

@@ -1,14 +1,27 @@
 import { OrganizationProfileProps } from '@clerk/types/src';
 import React from 'react';
 
-import { withCoreUserGuard } from '../../contexts';
+import {
+  ComponentContext,
+  useCoreOrganization,
+  useOrganizationProfileContext,
+  withCoreUserGuard,
+} from '../../contexts';
 import { Flow } from '../../customizables';
 import { ProfileCard, withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
+import { OrganizationProfileCtx } from '../../types';
 import { OrganizationProfileNavbar } from './OrganizationProfileNavbar';
-import { OrganizationProfileRoutes } from './OrganizationProfileRoutes';
+import { CreateOrganizationRoutes, OrganizationProfileRoutes } from './OrganizationProfileRoutes';
 
 const _OrganizationProfile = (_: OrganizationProfileProps) => {
+  // TODO: Should this be a guard HOC?
+  const { organization } = useCoreOrganization();
+  const { new: isCreating } = useOrganizationProfileContext();
+  if (!organization && !isCreating) {
+    return null;
+  }
+
   return (
     <Flow.Root flow='organizationProfile'>
       <Flow.Part>
@@ -26,6 +39,16 @@ const _OrganizationProfile = (_: OrganizationProfileProps) => {
 
 const AuthenticatedRoutes = withCoreUserGuard(() => {
   const contentRef = React.useRef<HTMLDivElement>(null);
+  const { new: showCreateOrganization } = useOrganizationProfileContext();
+
+  if (showCreateOrganization) {
+    return (
+      <ProfileCard sx={{ height: '100%' }}>
+        <CreateOrganizationRoutes />
+      </ProfileCard>
+    );
+  }
+
   return (
     <ProfileCard sx={{ height: '100%' }}>
       <OrganizationProfileNavbar contentRef={contentRef}>
@@ -38,7 +61,6 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
 export const OrganizationProfile = withCardStateProvider(_OrganizationProfile);
 
 export const OrganizationProfileModal = (props: OrganizationProfileProps): JSX.Element => {
-  type OrganizationProfileCtx = any;
   const organizationProfileProps: OrganizationProfileCtx = {
     ...props,
     routing: 'virtual',
@@ -48,12 +70,12 @@ export const OrganizationProfileModal = (props: OrganizationProfileProps): JSX.E
 
   return (
     <Route path='organizationProfile'>
-      {/*<ComponentContext.Provider value={organizationProfileProps}>*/}
-      {/*TODO: Used by InvisibleRootBox, can we simplify? */}
-      <div>
-        <OrganizationProfile {...organizationProfileProps} />
-      </div>
-      {/*</ComponentContext.Provider>*/}
+      <ComponentContext.Provider value={organizationProfileProps}>
+        {/*TODO: Used by InvisibleRootBox, can we simplify? */}
+        <div>
+          <OrganizationProfile {...organizationProfileProps} />
+        </div>
+      </ComponentContext.Provider>
     </Route>
   );
 };

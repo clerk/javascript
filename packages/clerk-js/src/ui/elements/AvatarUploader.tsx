@@ -1,28 +1,28 @@
 import React from 'react';
 
-import { useCoreUser } from '../contexts';
-import { Button, Col, Flex, localizationKeys, Text } from '../customizables';
+import { Button, Col, Flex, LocalizationKey, localizationKeys, Text } from '../customizables';
 import { handleError } from '../utils';
 import { useCardState } from './contexts';
 import { FileDropArea } from './FileDropArea';
-import { UserAvatar } from './UserAvatar';
 
-type AvatarUploaderProps = {
+export type AvatarUploaderProps = {
+  title: LocalizationKey;
+  avatarPreview: React.ReactElement;
   onAvatarChange: (file: File) => Promise<unknown>;
 };
 
 export const AvatarUploader = (props: AvatarUploaderProps) => {
   const [showUpload, setShowUpload] = React.useState(false);
+  const [objectUrl, setObjectUrl] = React.useState<string>();
   const card = useCardState();
-  // TODO
-  const user = useCoreUser();
-  const { onAvatarChange, ...rest } = props;
+  const { onAvatarChange, title, avatarPreview, ...rest } = props;
 
   const toggle = () => {
     setShowUpload(!showUpload);
   };
 
   const handleFileDrop = (file: File) => {
+    setObjectUrl(URL.createObjectURL(file));
     card.setLoading();
     return onAvatarChange(file)
       .then(() => {
@@ -32,6 +32,10 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
       .catch(err => handleError(err, [], card.setError));
   };
 
+  React.useEffect(() => () => {
+    objectUrl && URL.revokeObjectURL(objectUrl);
+  });
+
   return (
     <Col gap={4}>
       <Flex
@@ -39,14 +43,12 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
         align='center'
         {...rest}
       >
-        <UserAvatar
-          {...user}
-          size={theme => theme.sizes.$11}
-          optimize
-        />
+        {objectUrl
+          ? React.cloneElement(avatarPreview, { logoUrl: objectUrl, profileImageUrl: objectUrl })
+          : avatarPreview}
         <Col gap={1}>
           <Text
-            localizationKey={localizationKeys('userProfile.profilePage.imageFormTitle')}
+            localizationKey={title}
             variant='regularMedium'
           />
           <Flex gap={4}>
