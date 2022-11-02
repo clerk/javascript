@@ -12,7 +12,7 @@ export const OrganizationSwitcherTrigger = React.forwardRef<HTMLButtonElement, O
   (props, ref) => {
     const user = useCoreUser();
     const { organization } = useCoreOrganization();
-    const { showPersonalAccount } = useOrganizationSwitcherContext();
+    const { hidePersonal } = useOrganizationSwitcherContext();
 
     return (
       <Button
@@ -41,9 +41,9 @@ export const OrganizationSwitcherTrigger = React.forwardRef<HTMLButtonElement, O
               rounded={false}
               size={'sm'}
               subtitle={
-                showPersonalAccount
-                  ? localizationKeys('organizationSwitcher.personalWorkspace')
-                  : localizationKeys('organizationSwitcher.notSelected')
+                hidePersonal
+                  ? localizationKeys('organizationSwitcher.notSelected')
+                  : localizationKeys('organizationSwitcher.personalWorkspace')
               }
             />
           )}

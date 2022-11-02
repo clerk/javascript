@@ -24,7 +24,7 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
   const { organizationList } = useCoreOrganizationList();
   const { organization: currentOrg } = useCoreOrganization();
   const user = useCoreUser();
-  const { showPersonalAccount } = useOrganizationSwitcherContext();
+  const { hidePersonal } = useOrganizationSwitcherContext();
 
   const otherOrgs = (organizationList || []).map(e => e.organization).filter(o => o.id !== currentOrg?.id);
 
@@ -47,7 +47,7 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
         paddingBottom: t.space.$3,
       })}
     >
-      {currentOrg && showPersonalAccount && (
+      {currentOrg && !hidePersonal && (
         <PreviewButton
           sx={t => ({ marginBottom: t.space.$4 })}
           onClick={onPersonalWorkspaceClick}
