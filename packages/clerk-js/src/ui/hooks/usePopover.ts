@@ -5,6 +5,7 @@ import {
   shift,
   useDismiss,
   useFloating,
+  useFloatingNodeId,
   UseFloatingProps,
 } from '@floating-ui/react-dom-interactions';
 import React, { useEffect } from 'react';
@@ -22,25 +23,21 @@ export type UsePopoverReturn = ReturnType<typeof usePopover>;
 export const usePopover = (props: UsePopoverProps = {}) => {
   const { bubbles = true } = props;
   const [isOpen, setIsOpen] = React.useState(props.defaultOpen || false);
+  const nodeId = useFloatingNodeId();
   const { update, reference, floating, strategy, x, y, context, refs } = useFloating({
     open: isOpen,
     onOpenChange: setIsOpen,
+    nodeId,
     whileElementsMounted: props.autoUpdate === false ? undefined : autoUpdate,
     placement: props.placement || 'bottom-start',
     middleware: [offset(props.offset || 6), flip(), shift()],
   });
 
-  useEffect(() => {
-    if (props.defaultOpen) {
-      update();
-    }
-  }, []);
-
   useDismiss(context, { bubbles });
 
   useEffect(() => {
     const handleFocus = (e: FocusEvent) => {
-      if (e.relatedTarget === null) {
+      if (!e.relatedTarget) {
         (refs.floating.current as HTMLElement | null)?.focus();
       }
     };
@@ -56,6 +53,12 @@ export const usePopover = (props: UsePopoverProps = {}) => {
     };
   }, [bubbles]);
 
+  useEffect(() => {
+    if (props.defaultOpen) {
+      update();
+    }
+  }, []);
+
   const toggle = React.useCallback(() => setIsOpen(o => !o), [setIsOpen]);
   const open = React.useCallback(() => setIsOpen(true), [setIsOpen]);
   const close = React.useCallback(() => setIsOpen(false), [setIsOpen]);
@@ -65,6 +68,7 @@ export const usePopover = (props: UsePopoverProps = {}) => {
     floating,
     toggle,
     open,
+    nodeId,
     close,
     isOpen,
     styles: { position: strategy, top: y ?? 0, left: x ?? 0 },

@@ -60,7 +60,7 @@ export const withCardStateProvider = <T,>(Component: React.ComponentType<T>) => 
   return (props: T) => {
     return (
       <CardStateProvider>
-        {/* @ts-ignore */}
+        {/* @ts-expect-error */}
         <Component {...props} />
       </CardStateProvider>
     );

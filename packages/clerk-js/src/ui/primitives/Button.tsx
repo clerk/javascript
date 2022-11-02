@@ -60,19 +60,19 @@ const { applyVariants, filterProps } = createVariants(theme => {
         solid: {
           backgroundColor: vars.accent,
           color: theme.colors.$colorTextOnPrimaryBackground,
-          '&:hover': { backgroundColor: vars.accentDark },
+          '&:hover, :focus': { backgroundColor: vars.accentDark },
           '&:active': { backgroundColor: vars.accentDarker },
         },
         outline: {
           border: theme.borders.$normal,
           borderColor: vars.accentLighter,
           color: vars.accent,
-          '&:hover': { backgroundColor: vars.accentLightest },
+          '&:hover, :focus': { backgroundColor: vars.accentLightest },
           '&:active': { backgroundColor: vars.accentLighter },
         },
         ghost: {
           color: vars.accent,
-          '&:hover': { backgroundColor: vars.accentLightest },
+          '&:hover, :focus': { backgroundColor: vars.accentLightest },
           '&:active': { backgroundColor: vars.accentLighter },
         },
         icon: {
@@ -80,7 +80,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
           border: theme.borders.$normal,
           borderRadius: theme.radii.$lg,
           borderColor: vars.border,
-          '&:hover': { backgroundColor: vars.accentLightest },
+          '&:hover, :focus': { backgroundColor: vars.accentLightest },
           '&:active': { backgroundColor: vars.accentLighter },
         },
         ghostIcon: {
@@ -88,7 +88,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
           minHeight: theme.sizes.$6,
           width: theme.sizes.$6,
           padding: `${theme.space.$1} ${theme.space.$1}`,
-          '&:hover': { color: vars.accentDark },
+          '&:hover, :focus': { color: vars.accentDark },
           '&:active': { color: vars.accentDarker },
         },
         link: {
@@ -99,7 +99,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
           textTransform: 'none',
           padding: 0,
           color: vars.accent,
-          '&:hover': { textDecoration: 'underline' },
+          '&:hover, :focus': { textDecoration: 'underline' },
           '&:active': { color: vars.accentDark },
         },
         roundWrapper: { padding: 0, margin: 0, height: 'unset', width: 'unset', minHeight: 'unset' },

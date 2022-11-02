@@ -15,13 +15,11 @@ import { CogFilled } from '../../icons';
 import { PropsOfComponent } from '../../styledSystem';
 import { OrganizationActionList } from './OtherOrganizationActions';
 
-type OrganizationSwitcherPopoverProps = { isOpen: boolean; close: () => void } & PropsOfComponent<
-  typeof PopoverCard.Root
->;
+type OrganizationSwitcherPopoverProps = { close: () => void } & PropsOfComponent<typeof PopoverCard.Root>;
 
 export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, OrganizationSwitcherPopoverProps>(
   (props, ref) => {
-    const { isOpen, close, ...rest } = props;
+    const { close, ...rest } = props;
     const card = useCardState();
     const { openOrganizationProfile, openCreateOrganization } = useCoreClerk();
     const { organization: currentOrg } = useCoreOrganization();
@@ -68,10 +66,6 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       }
       openOrganizationProfile({ afterLeaveOrganizationUrl });
     };
-
-    if (!isOpen) {
-      return null;
-    }
 
     const manageOrganizationButton = (
       <Action
