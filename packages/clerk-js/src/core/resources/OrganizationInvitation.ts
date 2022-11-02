@@ -22,18 +22,13 @@ export class OrganizationInvitation extends BaseResource implements Organization
 
   static async create(
     organizationId: string,
-    { emailAddress, role, redirectUrl, publicMetadata }: CreateOrganizationInvitationParams,
+    { emailAddress, role, redirectUrl }: CreateOrganizationInvitationParams,
   ): Promise<OrganizationInvitationResource> {
     const json = (
       await BaseResource._fetch<OrganizationInvitationJSON>({
         path: `/organizations/${organizationId}/invitations`,
         method: 'POST',
-        body: {
-          email_address: emailAddress,
-          role,
-          redirect_url: redirectUrl,
-          public_metadata: JSON.stringify(publicMetadata),
-        } as any,
+        body: { email_address: emailAddress, role, redirect_url: redirectUrl } as any,
       })
     )?.response as unknown as OrganizationInvitationJSON;
     const newInvitation = new OrganizationInvitation(json);
@@ -45,17 +40,12 @@ export class OrganizationInvitation extends BaseResource implements Organization
     organizationId: string,
     params: CreateBulkOrganizationInvitationParams,
   ): Promise<OrganizationInvitationResource[]> {
-    const { emailAddresses, redirectUrl, role, publicMetadata} = params;
+    const { emailAddresses, redirectUrl, role } = params;
     const json = (
       await BaseResource._fetch<OrganizationInvitationJSON>({
         path: `/organizations/${organizationId}/invitations/bulk`,
         method: 'POST',
-        body: {
-          email_address: emailAddresses,
-          role,
-          redirect_url: redirectUrl,
-          public_metadata: JSON.stringify(publicMetadata),
-        } as any,
+        body: { email_address: emailAddresses, role, redirect_url: redirectUrl } as any,
       })
     )?.response as unknown as OrganizationInvitationJSON[];
     // const newInvitation = new OrganizationInvitation(json);
