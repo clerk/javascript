@@ -1,12 +1,13 @@
-import { OrganizationMembershipRole } from '../../../../backend-core/src/api/resources';
-import { LocalizationKey, localizationKeys } from '../localization/localizationKeys';
+import { MembershipRole } from '@clerk/types';
 
-const roleToLocalizationKey: Record<OrganizationMembershipRole, LocalizationKey> = {
+import { LocalizationKey, localizationKeys } from '../localization';
+
+const roleToLocalizationKey: Record<MembershipRole, LocalizationKey> = {
   basic_member: localizationKeys('membershipRole__basicMember'),
   guest_member: localizationKeys('membershipRole__guestMember'),
   admin: localizationKeys('membershipRole__admin'),
 };
 
-export const roleLocalizationKey = (role: OrganizationMembershipRole): LocalizationKey => {
+export const roleLocalizationKey = (role: MembershipRole): LocalizationKey => {
   return roleToLocalizationKey[role];
 };
