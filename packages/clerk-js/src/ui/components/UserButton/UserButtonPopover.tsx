@@ -10,10 +10,10 @@ import { PropsOfComponent } from '../../styledSystem';
 import { SessionActions, UserPreviewButton } from './OtherSessionActions';
 import { useMultisessionActions } from './useMultisessionActions';
 
-type UserButtonPopoverProps = { isOpen: boolean; close: () => void } & PropsOfComponent<typeof PopoverCard.Root>;
+type UserButtonPopoverProps = { close: () => void } & PropsOfComponent<typeof PopoverCard.Root>;
 
 export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopoverProps>((props, ref) => {
-  const { isOpen, close, ...rest } = props;
+  const { close, ...rest } = props;
   const session = useCoreSession() as ActiveSessionResource;
   const { authConfig } = useEnvironment();
   const user = useCoreUser();
@@ -25,10 +25,6 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
     handleSignOutSessionClicked,
     otherSessions,
   } = useMultisessionActions({ ...useUserButtonContext(), actionCompleteCallback: close, user });
-
-  if (!isOpen) {
-    return null;
-  }
 
   const addAccountButton = (
     <Action

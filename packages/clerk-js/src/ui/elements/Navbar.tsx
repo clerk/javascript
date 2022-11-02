@@ -17,7 +17,9 @@ import { Menu } from '../icons';
 import { useRouter } from '../router';
 import { animations, mqu, PropsOfComponent } from '../styledSystem';
 import { colors } from '../utils';
+import { withFloatingTree } from './contexts';
 import { useNavigateToFlowStart } from './NavigateToFlowStartButton';
+import { Popover } from './Popover';
 
 type NavbarContextValue = { isOpen: boolean; open: () => void; close: () => void };
 export const [NavbarContext, useNavbarContext, useUnsafeNavbarContext] =
@@ -177,9 +179,9 @@ const NavbarContainer = (props: React.PropsWithChildren<Record<never, never>>) =
   );
 };
 
-const MobileNavbarContainer = (props: React.PropsWithChildren<Record<never, never>>) => {
+const MobileNavbarContainer = withFloatingTree((props: React.PropsWithChildren<Record<never, never>>) => {
   const navbarContext = useNavbarContext();
-  const { floating, isOpen, open, close } = usePopover({ defaultOpen: false, autoUpdate: false });
+  const { floating, isOpen, open, close, nodeId, context } = usePopover({ defaultOpen: false, autoUpdate: false });
 
   React.useEffect(() => {
     if (navbarContext.isOpen) {
@@ -195,44 +197,50 @@ const MobileNavbarContainer = (props: React.PropsWithChildren<Record<never, neve
     }
   }, [isOpen]);
 
-  if (!isOpen) {
-    return null;
-  }
-
   return (
-    <Col
-      sx={t => ({
-        position: 'absolute',
-        top: 0,
-        bottom: 0,
-        width: '100%',
-        zIndex: t.zIndices.$navbar,
-        borderRadius: t.radii.$xl,
-        overflow: 'hidden',
-      })}
+    <Popover
+      nodeId={nodeId}
+      context={context}
+      isOpen={isOpen}
+      order={['floating', 'content']}
+      portal={false}
     >
       <Col
-        ref={floating}
-        elementDescriptor={descriptors.navbar}
         sx={t => ({
           position: 'absolute',
           top: 0,
           bottom: 0,
-          width: t.space.$60,
-          backgroundColor: colors.makeSolid(t.colors.$colorBackground),
-          borderTopRightRadius: t.radii.$lg,
-          borderBottomRightRadius: t.radii.$lg,
-          borderRight: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
-          padding: `${t.space.$9x5} ${t.space.$6}`,
-          animation: `${animations.navbarSlideIn} ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
-          boxShadow: t.shadows.$cardDropShadow,
+          width: '100%',
+          zIndex: t.zIndices.$navbar,
+          borderRadius: t.radii.$xl,
+          overflow: 'hidden',
         })}
       >
-        {props.children}
+        <Col
+          ref={floating}
+          elementDescriptor={descriptors.navbar}
+          tabIndex={0}
+          sx={t => ({
+            outline: 0,
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            width: t.space.$60,
+            backgroundColor: colors.makeSolid(t.colors.$colorBackground),
+            borderTopRightRadius: t.radii.$lg,
+            borderBottomRightRadius: t.radii.$lg,
+            borderRight: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
+            padding: `${t.space.$9x5} ${t.space.$6}`,
+            animation: `${animations.navbarSlideIn} ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
+            boxShadow: t.shadows.$cardDropShadow,
+          })}
+        >
+          {props.children}
+        </Col>
       </Col>
-    </Col>
+    </Popover>
   );
-};
+});
 
 type NavButtonProps = PropsOfComponent<typeof Button> & {
   icon: React.ComponentType;

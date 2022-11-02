@@ -6,7 +6,9 @@ import { Button, Flex, Icon, Text } from '../customizables';
 import { Caret, MagnifyingGlass } from '../icons';
 import { animations, common, PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { colors } from '../utils';
+import { withFloatingTree } from './contexts';
 import { InputWithIcon } from './InputWithIcon';
+import { Popover } from './Popover';
 
 type UsePopoverReturn = ReturnType<typeof usePopover>;
 type UseSearchInputReturn = ReturnType<typeof useSearchInput>;
@@ -65,7 +67,7 @@ const defaultButtonOptionBuilder = <O extends Option>(option: O) => {
   return <>{option.label || option.value}</>;
 };
 
-export const Select = <O extends Option>(props: PropsWithChildren<SelectProps<O>>) => {
+export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildren<SelectProps<O>>) => {
   const {
     value,
     options,
@@ -124,7 +126,7 @@ export const Select = <O extends Option>(props: PropsWithChildren<SelectProps<O>
       {React.Children.count(children) ? children : defaultChildren}
     </SelectStateCtx.Provider>
   );
-};
+});
 
 type SelectOptionBuilderProps<O extends Option> = {
   option: Option;
@@ -165,7 +167,6 @@ const SelectSearchbar = (props: PropsOfComponent<typeof InputWithIcon>) => {
     <Flex sx={theme => ({ borderBottom: theme.borders.$normal, borderColor: theme.colors.$blackAlpha200 })}>
       <InputWithIcon
         focusRing={false}
-        autoFocus
         leftIcon={
           <Icon
             colorScheme='neutral'
@@ -201,7 +202,6 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
     popoverCtx,
     searchInputCtx,
     optionBuilder,
-    placeholder,
     searchPlaceholder,
     comparator,
     focusedItemRef,
@@ -211,7 +211,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
   } = useSelectState();
   const { filteredItems: options, searchInputProps } = searchInputCtx;
   const [focusedIndex, setFocusedIndex] = useState(0);
-  const { isOpen, floating, styles } = popoverCtx;
+  const { isOpen, floating, styles, nodeId, context } = popoverCtx;
   const containerRef = React.useRef<HTMLDivElement>(null);
 
   const scrollToItemOnSelectedIndexChange = () => {
@@ -252,71 +252,75 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
     }
   };
 
-  if (!isOpen) {
-    return null;
-  }
-
   return (
-    <Flex
-      ref={floating}
-      onKeyDown={onKeyDown}
-      direction='col'
-      justify='start'
-      sx={[
-        theme => ({
-          backgroundColor: colors.makeSolid(theme.colors.$colorBackground),
-          border: theme.borders.$normal,
-          borderRadius: theme.radii.$lg,
-          borderColor: theme.colors.$blackAlpha200,
-          overflow: 'hidden',
-          animation: `${animations.dropdownSlideInScaleAndFade} ${theme.transitionDuration.$slower} ${theme.transitionTiming.$slowBezier}`,
-          transformOrigin: 'top center',
-          boxShadow: theme.shadows.$cardDropShadow,
-          zIndex: theme.zIndices.$dropdown,
-        }),
-        sx,
-      ]}
-      style={{ ...styles, left: styles.left - 1 }}
+    <Popover
+      nodeId={nodeId}
+      context={context}
+      isOpen={isOpen}
+      portal={false}
+      order={['content']}
     >
-      {comparator && (
-        <SelectSearchbar
-          placeholder={searchPlaceholder}
-          {...searchInputProps}
-        />
-      )}
       <Flex
-        ref={containerRef}
+        ref={floating}
+        onKeyDown={onKeyDown}
         direction='col'
-        tabIndex={comparator ? undefined : 0}
+        justify='start'
         sx={[
           theme => ({
-            gap: theme.space.$1,
-            outline: 'none',
-            overflowY: 'auto',
-            maxHeight: '18vh',
-            padding: `${theme.space.$2} 0`,
+            backgroundColor: colors.makeSolid(theme.colors.$colorBackground),
+            border: theme.borders.$normal,
+            borderRadius: theme.radii.$lg,
+            borderColor: theme.colors.$blackAlpha200,
+            overflow: 'hidden',
+            animation: `${animations.dropdownSlideInScaleAndFade} ${theme.transitionDuration.$slower} ${theme.transitionTiming.$slowBezier}`,
+            transformOrigin: 'top center',
+            boxShadow: theme.shadows.$cardDropShadow,
+            zIndex: theme.zIndices.$dropdown,
           }),
-          containerSx,
+          sx,
         ]}
-        {...rest}
+        style={{ ...styles, left: styles.left - 1 }}
       >
-        {options.map((option, index) => {
-          const isFocused = index === focusedIndex;
-          return (
-            <SelectOptionBuilder
-              key={index}
-              index={index}
-              ref={isFocused ? focusedItemRef : undefined}
-              option={option}
-              optionBuilder={optionBuilder}
-              isFocused={isFocused}
-              handleSelect={select}
-            />
-          );
-        })}
-        {noResultsMessage && options.length === 0 && <SelectNoResults>{noResultsMessage}</SelectNoResults>}
+        {comparator && (
+          <SelectSearchbar
+            placeholder={searchPlaceholder}
+            {...searchInputProps}
+          />
+        )}
+        <Flex
+          ref={containerRef}
+          direction='col'
+          tabIndex={comparator ? undefined : 0}
+          sx={[
+            theme => ({
+              gap: theme.space.$1,
+              outline: 'none',
+              overflowY: 'auto',
+              maxHeight: '18vh',
+              padding: `${theme.space.$2} 0`,
+            }),
+            containerSx,
+          ]}
+          {...rest}
+        >
+          {options.map((option, index) => {
+            const isFocused = index === focusedIndex;
+            return (
+              <SelectOptionBuilder
+                key={index}
+                index={index}
+                ref={isFocused ? focusedItemRef : undefined}
+                option={option}
+                optionBuilder={optionBuilder}
+                isFocused={isFocused}
+                handleSelect={select}
+              />
+            );
+          })}
+          {noResultsMessage && options.length === 0 && <SelectNoResults>{noResultsMessage}</SelectNoResults>}
+        </Flex>
       </Flex>
-    </Flex>
+    </Popover>
   );
 };
 

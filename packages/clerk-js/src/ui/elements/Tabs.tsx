@@ -137,7 +137,7 @@ export const Tab = (props: TabProps) => {
           borderColor: isActive ? t.colors.$blackAlpha700 : t.colors.$transparent,
           borderRadius: 0,
           width: 'fit-content',
-          '&:hover': { backgroundColor: t.colors.$transparent },
+          '&:hover, :focus': { backgroundColor: t.colors.$transparent },
         })}
       >
         {children}

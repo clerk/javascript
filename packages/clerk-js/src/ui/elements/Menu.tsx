@@ -1,11 +1,12 @@
 import { createContextAndHook } from '@clerk/shared';
-import React, { cloneElement, isValidElement, PropsWithChildren, useEffect, useRef } from 'react';
+import React, { cloneElement, isValidElement, PropsWithChildren, useLayoutEffect, useRef } from 'react';
 
 import { Button, Col } from '../customizables';
 import { usePopover, UsePopoverReturn } from '../hooks';
 import { animations, PropsOfComponent } from '../styledSystem';
 import { colors } from '../utils/colors';
-import { Portal } from './Portal';
+import { withFloatingTree } from './contexts';
+import { Popover } from './Popover';
 
 type MenuState = {
   popoverCtx: UsePopoverReturn;
@@ -15,7 +16,7 @@ const [MenuStateCtx, useMenuState] = createContextAndHook<MenuState>('MenuState'
 
 type MenuProps = PropsWithChildren<Record<never, never>>;
 
-export const Menu = (props: MenuProps) => {
+export const Menu = withFloatingTree((props: MenuProps) => {
   const popoverCtx = usePopover({
     placement: 'right-start',
     offset: 8,
@@ -29,7 +30,7 @@ export const Menu = (props: MenuProps) => {
       {...props}
     />
   );
-};
+});
 
 type MenuTriggerProps = React.PropsWithChildren<Record<never, never>>;
 
@@ -67,13 +68,12 @@ type MenuListProps = PropsOfComponent<typeof Col>;
 export const MenuList = (props: MenuListProps) => {
   const { sx, ...rest } = props;
   const { popoverCtx } = useMenuState();
-  const { floating, styles, isOpen } = popoverCtx;
-  const containerRef = useRef<HTMLDivElement>(null);
+  const { floating, styles, isOpen, context, nodeId } = popoverCtx;
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const current = containerRef.current;
     floating(current);
-    current?.focus();
   }, [isOpen]);
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -92,12 +92,13 @@ export const MenuList = (props: MenuListProps) => {
     }
   };
 
-  if (!isOpen) {
-    return null;
-  }
-
   return (
-    <Portal>
+    <Popover
+      context={context}
+      nodeId={nodeId}
+      isOpen={isOpen}
+      order={['floating', 'content']}
+    >
       <Col
         ref={containerRef}
         role='menu'
@@ -124,7 +125,7 @@ export const MenuList = (props: MenuListProps) => {
         style={styles}
         {...rest}
       />
-    </Portal>
+    </Popover>
   );
 };
 
