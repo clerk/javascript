@@ -27,6 +27,8 @@ export class Organization extends BaseResource implements OrganizationResource {
   publicMetadata: Record<string, unknown> = {};
   createdAt!: Date;
   updatedAt!: Date;
+  membersCount = 0;
+  pendingInvitationsCount = 0;
 
   constructor(data: OrganizationJSON) {
     super();
@@ -151,6 +153,8 @@ export class Organization extends BaseResource implements OrganizationResource {
     this.slug = data.slug;
     this.logoUrl = data.logo_url;
     this.publicMetadata = data.public_metadata;
+    this.membersCount = data.members_count;
+    this.pendingInvitationsCount = data.pending_invitations_count;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     return this;
