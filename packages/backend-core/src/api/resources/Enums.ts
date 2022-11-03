@@ -10,6 +10,7 @@ export type OAuthProvider =
   | 'twitch'
   | 'linkedin'
   | 'dropbox'
+  | 'atlassian'
   | 'bitbucket'
   | 'microsoft'
   | 'notion'
