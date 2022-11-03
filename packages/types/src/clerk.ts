@@ -542,6 +542,7 @@ export type UserButtonProps = {
    * Controls whether clicking the "Manage your account" button will cause
    * the UserProfile component to open as a modal, or if the browser will navigate
    * to the `userProfileUrl` where UserProfile is mounted as a page.
+   * @default 'modal'
    */
   userProfileMode?: 'modal' | 'navigation';
   /**
