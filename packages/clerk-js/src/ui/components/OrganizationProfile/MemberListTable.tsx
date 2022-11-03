@@ -13,12 +13,13 @@ type MembersListTableProps = {
   page: number;
   onPageChange: (page: number) => void;
   itemCount: number;
+  itemsPerPage: number;
 };
 
 export const MembersListTable = (props: MembersListTableProps) => {
-  const { headers, page, onPageChange, itemCount, rows, isLoading } = props;
+  const { headers, page, onPageChange, rows, isLoading, itemCount, itemsPerPage } = props;
 
-  const pageCount = rows.length !== 0 ? Math.ceil(itemCount / rows.length) : 1;
+  const pageCount = rows.length !== 0 ? Math.ceil(itemCount / itemsPerPage) : 1;
   const startRowIndex = (page - 1) * rows.length;
   const endRowIndex = Math.min(page * rows.length);
 
