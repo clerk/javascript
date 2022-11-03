@@ -15,11 +15,13 @@ import { buildClerkProps } from '../server/utils/getAuth';
 
 function buildReqLike() {
   const session = cookies().get('__session');
+  const sessionString = typeof session === 'string' ? session : session?.value;
+
   if (session) {
     return new NextRequest('https://example.com', {
       headers: new Headers({
         'auth-result': 'standard-signed-in',
-        authorization: `Bearer ${session}`,
+        authorization: `Bearer ${sessionString}`,
       }),
     });
   }

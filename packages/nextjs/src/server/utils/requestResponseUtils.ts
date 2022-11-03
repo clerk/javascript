@@ -63,7 +63,11 @@ export function getHeader(req: RequestLike, name: string): string | null | undef
 
 export function getCookie(req: RequestLike, name: string): string | undefined {
   try {
-    return (req as NextRequest).cookies.get(name);
+    const cookie13 = (req as NextRequest).cookies.get(name);
+    if (typeof cookie13 === 'string') {
+      return cookie13;
+    }
+    return cookie13?.value;
   } catch (e) {}
 
   // @ts-ignore
