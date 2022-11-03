@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.4.6](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@4.4.6-staging.7...@clerk/clerk-sdk-node@4.4.6) (2022-11-03)
+
+**Note:** Version bump only for package @clerk/clerk-sdk-node
+
 ### [4.4.6-staging.4](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@4.4.6-staging.3...@clerk/clerk-sdk-node@4.4.6-staging.4) (2022-11-02)
 
 **Note:** Version bump only for package @clerk/clerk-sdk-node
