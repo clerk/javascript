@@ -25,6 +25,10 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
   userProfileUrl!: string;
   clerkJSVersion?: string;
   experimental__forceOauthFirst?: boolean;
+  organizationProfileUrl!: string;
+  createOrganizationUrl!: string;
+  afterLeaveOrganizationUrl!: string;
+  afterCreateOrganizationUrl!: string;
 
   public constructor(data: DisplayConfigJSON) {
     super();
@@ -54,6 +58,10 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     this.supportEmail = data.support_email || '';
     this.clerkJSVersion = data.clerk_js_version;
     this.experimental__forceOauthFirst = data.experimental_force_oauth_first || false;
+    this.organizationProfileUrl = data.organization_profile_url;
+    this.createOrganizationUrl = data.create_organization_url;
+    this.afterLeaveOrganizationUrl = data.after_leave_organization_url;
+    this.afterCreateOrganizationUrl = data.after_create_organization_url;
     return this;
   }
 }
