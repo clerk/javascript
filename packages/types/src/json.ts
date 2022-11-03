@@ -260,6 +260,8 @@ export interface OrganizationJSON extends ClerkResourceJSON {
   public_metadata: Record<string, unknown>;
   created_at: number;
   updated_at: number;
+  members_count: number;
+  pending_invitations_count: number;
 }
 
 export interface OrganizationMembershipJSON extends ClerkResourceJSON {

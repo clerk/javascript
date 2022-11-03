@@ -18,6 +18,8 @@ export interface OrganizationResource {
   name: string;
   slug: string;
   logoUrl: string;
+  membersCount: number;
+  pendingInvitationsCount: number;
   publicMetadata: OrganizationPublicMetadata;
   createdAt: Date;
   updatedAt: Date;
