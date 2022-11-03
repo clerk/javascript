@@ -546,6 +546,7 @@ export type UserButtonTheme = Theme;
 export type UserProfileTheme = Theme;
 export type OrganizationSwitcherTheme = Theme;
 export type OrganizationProfileTheme = Theme;
+export type CreateOrganizationTheme = Theme;
 
 export type Appearance<T = Theme> = T & {
   /**
@@ -572,4 +573,8 @@ export type Appearance<T = Theme> = T & {
    * Theme overrides that only apply to the `<OrganizationProfile/>` component
    */
   organizationProfile?: T;
+  /**
+   * Theme overrides that only apply to the `<CreateOrganization />` component
+   */
+  createOrganization?: T;
 };

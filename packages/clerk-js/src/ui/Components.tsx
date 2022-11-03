@@ -1,4 +1,12 @@
-import type { Appearance, Clerk, ClerkOptions, EnvironmentResource, SignInProps, SignUpProps } from '@clerk/types';
+import type {
+  Appearance,
+  Clerk,
+  ClerkOptions,
+  CreateOrganizationProps,
+  EnvironmentResource,
+  SignInProps,
+  SignUpProps,
+} from '@clerk/types';
 import { OrganizationProfileProps } from '@clerk/types';
 import { UserProfileProps } from '@clerk/types/src';
 import React from 'react';
@@ -6,6 +14,7 @@ import ReactDOM from 'react-dom';
 
 import { PRESERVED_QUERYSTRING_PARAMS } from '../core/constants';
 import { clerkUIErrorDOMElementNotFound } from '../core/errors';
+import { CreateOrganization, CreateOrganizationModal } from './components/CreateOrganization';
 import { ImpersonationFab } from './components/ImpersonationFab';
 import { OrganizationProfile, OrganizationProfileModal } from './components/OrganizationProfile';
 import { OrganizationSwitcher } from './components/OrganizationSwitcher';
@@ -46,11 +55,11 @@ export type ComponentControls = {
     node?: HTMLDivElement;
     props?: unknown;
   }) => void;
-  openModal: <T extends 'signIn' | 'signUp' | 'userProfile' | 'organizationProfile'>(
+  openModal: <T extends 'signIn' | 'signUp' | 'userProfile' | 'organizationProfile' | 'createOrganization'>(
     modal: T,
     props: T extends 'signIn' ? SignInProps : T extends 'signUp' ? SignUpProps : UserProfileProps,
   ) => void;
-  closeModal: (modal: 'signIn' | 'signUp' | 'userProfile' | 'organizationProfile') => void;
+  closeModal: (modal: 'signIn' | 'signUp' | 'userProfile' | 'organizationProfile' | 'createOrganization') => void;
 };
 
 const AvailableComponents = {
@@ -60,6 +69,7 @@ const AvailableComponents = {
   UserProfile,
   OrganizationSwitcher,
   OrganizationProfile,
+  CreateOrganization,
 };
 
 type AvailableComponentNames = keyof typeof AvailableComponents;
@@ -84,6 +94,7 @@ interface ComponentsState {
   signUpModal: null | SignUpProps;
   userProfileModal: null | UserProfileProps;
   organizationProfileModal: null | OrganizationProfileProps;
+  createOrganizationModal: null | CreateOrganizationProps;
   nodes: Map<HTMLDivElement, HtmlNodeOptions>;
 }
 
@@ -132,9 +143,11 @@ const Components = (props: ComponentsProps) => {
     signUpModal: null,
     userProfileModal: null,
     organizationProfileModal: null,
+    createOrganizationModal: null,
     nodes: new Map(),
   });
-  const { signInModal, signUpModal, userProfileModal, organizationProfileModal, nodes } = state;
+  const { signInModal, signUpModal, userProfileModal, organizationProfileModal, createOrganizationModal, nodes } =
+    state;
 
   useSafeLayoutEffect(() => {
     componentsControls.mountComponent = params => {
@@ -281,6 +294,32 @@ const Components = (props: ComponentsProps) => {
     </AppearanceProvider>
   );
 
+  const mountedCreateOrganizationModal = (
+    <AppearanceProvider
+      globalAppearance={state.appearance}
+      appearanceKey='createOrganization'
+      appearance={createOrganizationModal?.appearance}
+    >
+      <FlowMetadataProvider flow='createOrganization'>
+        <InternalThemeProvider>
+          <Modal
+            handleClose={() => componentsControls.closeModal('createOrganization')}
+            containerSx={{ alignItems: 'center' }}
+            contentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
+          >
+            <VirtualRouter
+              preservedParams={PRESERVED_QUERYSTRING_PARAMS}
+              onExternalNavigate={() => componentsControls.closeModal('createOrganization')}
+              startPath='/createOrganization'
+            >
+              <CreateOrganizationModal {...createOrganizationModal} />
+            </VirtualRouter>
+          </Modal>
+        </InternalThemeProvider>
+      </FlowMetadataProvider>
+    </AppearanceProvider>
+  );
+
   const mountedImpersonationFab = (
     <AppearanceProvider
       globalAppearance={state.appearance}
@@ -320,6 +359,7 @@ const Components = (props: ComponentsProps) => {
           {signUpModal && mountedSignUpModal}
           {userProfileModal && mountedUserProfileModal}
           {organizationProfileModal && mountedOrganizationProfileModal}
+          {createOrganizationModal && mountedCreateOrganizationModal}
           {mountedImpersonationFab}
         </OptionsProvider>
       </EnvironmentProvider>

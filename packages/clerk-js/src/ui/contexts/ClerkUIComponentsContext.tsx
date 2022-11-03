@@ -8,6 +8,7 @@ import type { ParsedQs } from '../router';
 import { useRouter } from '../router';
 import type {
   AvailableComponentCtx,
+  CreateOrganizationCtx,
   OrganizationProfileCtx,
   OrganizationSwitcherCtx,
   SignInCtx,
@@ -251,9 +252,26 @@ export const useOrganizationProfileContext = () => {
 
   return {
     ...ctx,
-    // @ts-expect-error
-    new: ctx.new || false,
     navigateAfterLeaveOrganization,
+    componentName,
+  };
+};
+
+export const useCreateOrganizationContext = () => {
+  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as CreateOrganizationCtx;
+  const { navigate } = useNavigate();
+  const { displayConfig } = useEnvironment();
+
+  if (componentName !== 'CreateOrganization') {
+    throw new Error('Clerk: useCreateOrganizationContext called outside CreateOrganization.');
+  }
+
+  const navigateAfterCreateOrganization = () =>
+    navigate(ctx.afterCreateOrganizationUrl || displayConfig.afterCreateOrganizationUrl);
+
+  return {
+    ...ctx,
+    navigateAfterCreateOrganization,
     componentName,
   };
 };

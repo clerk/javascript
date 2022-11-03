@@ -1,5 +1,6 @@
 import {
   Appearance,
+  CreateOrganizationTheme,
   OrganizationProfileTheme,
   OrganizationSwitcherTheme,
   SignInTheme,
@@ -120,6 +121,17 @@ export interface Clerk {
   closeOrganizationProfile: () => void;
 
   /**
+   * Opens the Clerk CreateOrganization modal.
+   * @param props Optional props that will be passed to the CreateOrganization component.
+   */
+  openCreateOrganization: (props?: CreateOrganizationProps) => void;
+
+  /**
+   * Closes the Clerk CreateOrganization modal.
+   */
+  closeCreateOrganization: () => void;
+
+  /**
    * Mounts a sign in flow component at the target element.
    * @param targetNode Target node to mount the SignIn component.
    * @param signInProps sign in configuration parameters.
@@ -194,6 +206,19 @@ export interface Clerk {
    * @param targetNode Target node to unmount the UserProfile component from.
    */
   unmountOrganizationProfile: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * Mount a CreateOrganization component at the target element.
+   * @param targetNode Target to mount the CreateOrganization component.
+   * @param props Configuration parameters.
+   */
+  mountCreateOrganization: (targetNode: HTMLDivElement, props?: CreateOrganizationProps) => void;
+
+  /**
+   * Unmount the CreateOrganization component from the target node.
+   * @param targetNode Target node to unmount the CreateOrganization component from.
+   */
+  unmountCreateOrganization: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mount an organization switcher component at the target element.
@@ -503,6 +528,28 @@ export type OrganizationProfileProps = {
    * prop of ClerkProvided (if one is provided)
    */
   appearance?: OrganizationProfileTheme;
+};
+
+export type CreateOrganizationProps = {
+  /*
+   * Page routing strategy
+   */
+  routing?: RoutingStrategy;
+  /*
+   * Root URL where the component is mounted on, eg: '/user'
+   */
+  path?: string;
+  /**
+   * Full URL or path to navigate after creating a new organization.
+   * @default undefined
+   */
+  afterCreateOrganizationUrl?: string;
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvided (if one is provided)
+   */
+  appearance?: CreateOrganizationTheme;
 };
 
 export type UserButtonProps = {

@@ -3,6 +3,7 @@ import type {
   AuthenticateWithMetamaskParams,
   ClientResource,
   CreateOrganizationParams,
+  CreateOrganizationProps,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
   OrganizationMembershipResource,
@@ -57,6 +58,7 @@ export default class IsomorphicClerk {
   private premountUserProfileNodes = new Map<HTMLDivElement, UserProfileProps>();
   private premountUserButtonNodes = new Map<HTMLDivElement, UserButtonProps>();
   private premountOrganizationProfileNodes = new Map<HTMLDivElement, OrganizationProfileProps>();
+  private premountCreateOrganizationNodes = new Map<HTMLDivElement, CreateOrganizationProps>();
   private premountOrganizationSwitcherNodes = new Map<HTMLDivElement, OrganizationSwitcherProps>();
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
   private loadedListeners: Array<() => void> = [];
@@ -431,6 +433,22 @@ export default class IsomorphicClerk {
       this.clerkjs.unmountOrganizationProfile(node);
     } else {
       this.premountOrganizationProfileNodes.delete(node);
+    }
+  };
+
+  mountCreateOrganization = (node: HTMLDivElement, props: CreateOrganizationProps): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.mountCreateOrganization(node, props);
+    } else {
+      this.premountCreateOrganizationNodes.set(node, props);
+    }
+  };
+
+  unmountCreateOrganization = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.unmountCreateOrganization(node);
+    } else {
+      this.premountCreateOrganizationNodes.delete(node);
     }
   };
 

@@ -3,8 +3,9 @@ export {
   SignIn,
   UserProfile,
   UserButton,
-  OrganizationProfile as UnstableOrganizationProfile,
   OrganizationSwitcher as UnstableOrganizationSwitcher,
+  OrganizationProfile as UnstableOrganizationProfile,
+  CreateOrganization as UnstableCreateOrganization,
 } from './uiComponents';
 
 export {

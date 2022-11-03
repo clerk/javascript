@@ -1,9 +1,15 @@
+import { createContextAndHook } from '@clerk/shared';
 import React from 'react';
 
-import { createContextAndHook } from '@clerk/shared';
-
 type FlowMetadata = {
-  flow: 'signIn' | 'signUp' | 'userButton' | 'userProfile' | 'organizationProfile' | 'organizationSwitcher';
+  flow:
+    | 'signIn'
+    | 'signUp'
+    | 'userButton'
+    | 'userProfile'
+    | 'organizationProfile'
+    | 'createOrganization'
+    | 'organizationSwitcher';
   part?:
     | 'start'
     | 'emailCode'
