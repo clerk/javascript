@@ -1,4 +1,10 @@
-import type { SignInProps, SignUpProps, UserButtonProps, UserProfileProps } from '@clerk/types';
+import type {
+  CreateOrganizationProps,
+  SignInProps,
+  SignUpProps,
+  UserButtonProps,
+  UserProfileProps,
+} from '@clerk/types';
 import { OrganizationProfileProps, OrganizationSwitcherProps } from '@clerk/types';
 
 export type { SignInProps, SignUpProps, UserButtonProps, UserProfileProps };
@@ -32,6 +38,11 @@ export type OrganizationProfileCtx = OrganizationProfileProps & {
   mode?: ComponentMode;
 };
 
+export type CreateOrganizationCtx = CreateOrganizationProps & {
+  componentName: 'CreateOrganization';
+  mode?: ComponentMode;
+};
+
 export type OrganizationSwitcherCtx = OrganizationSwitcherProps & {
   componentName: 'OrganizationSwitcher';
   mode?: ComponentMode;
@@ -43,4 +54,5 @@ export type AvailableComponentCtx =
   | UserButtonCtx
   | UserProfileCtx
   | OrganizationProfileCtx
+  | CreateOrganizationProps
   | OrganizationSwitcherCtx;

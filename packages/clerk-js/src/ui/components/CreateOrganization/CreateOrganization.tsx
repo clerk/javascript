@@ -1,0 +1,49 @@
+import { CreateOrganizationProps } from '@clerk/types';
+import React from 'react';
+
+import { ComponentContext, useCoreOrganization, withCoreUserGuard } from '../../contexts';
+import { Flow } from '../../customizables';
+import { ProfileCard, withCardStateProvider } from '../../elements';
+import { Route, Switch } from '../../router';
+import { CreateOrganizationCtx } from '../../types';
+
+const _CreateOrganization = (_: CreateOrganizationProps) => {
+  const { organization } = useCoreOrganization();
+
+  return (
+    <Flow.Root flow='createOrganization'>
+      <Flow.Part>
+        <Switch>
+          <Route>
+            <AuthenticatedRoutes />
+          </Route>
+        </Switch>
+      </Flow.Part>
+    </Flow.Root>
+  );
+};
+
+const AuthenticatedRoutes = withCoreUserGuard(() => {
+  return <ProfileCard sx={{ height: '100%' }}>yooooooooo create</ProfileCard>;
+});
+
+export const CreateOrganization = withCardStateProvider(_CreateOrganization);
+
+export const CreateOrganizationModal = (props: CreateOrganizationProps): JSX.Element => {
+  const createOrganizationProps: CreateOrganizationCtx = {
+    ...props,
+    routing: 'virtual',
+    componentName: 'CreateOrganization',
+    mode: 'modal',
+  };
+
+  return (
+    <Route path='createOrganization'>
+      <ComponentContext.Provider value={createOrganizationProps}>
+        <div>
+          <CreateOrganization {...createOrganizationProps} />
+        </div>
+      </ComponentContext.Provider>
+    </Route>
+  );
+};

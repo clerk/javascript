@@ -1,4 +1,4 @@
-import { OrganizationProfileProps } from '@clerk/types/src';
+import { OrganizationProfileProps } from '@clerk/types';
 import React from 'react';
 
 import {
@@ -26,8 +26,6 @@ const _OrganizationProfile = (_: OrganizationProfileProps) => {
     <Flow.Root flow='organizationProfile'>
       <Flow.Part>
         <Switch>
-          {/* PublicRoutes */}
-          <Route path='verify'>{/*<VerificationSuccessPage />*/}</Route>
           <Route>
             <AuthenticatedRoutes />
           </Route>
