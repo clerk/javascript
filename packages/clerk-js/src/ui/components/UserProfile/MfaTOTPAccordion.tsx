@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Badge, Col, Icon, localizationKeys } from '../../customizables';
+import { Badge, Col, Icon, localizationKeys, useLocalizations } from '../../customizables';
 import { useNavigate } from '../../hooks';
 import { AuthApp } from '../../icons';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
@@ -10,6 +10,7 @@ import { UserProfileAccordion } from './UserProfileAccordion';
 
 export const MfaTOTPAccordion = () => {
   const { navigate } = useNavigate();
+  const { t } = useLocalizations();
 
   return (
     <UserProfileAccordion
@@ -19,7 +20,7 @@ export const MfaTOTPAccordion = () => {
           sx={theme => ({ color: theme.colors.$blackAlpha700 })}
         />
       }
-      title={localizationKeys('userProfile.start.mfaSection.totp.headerTitle')}
+      title={t(localizationKeys('userProfile.start.mfaSection.totp.headerTitle'))}
       badge={<Badge localizationKey={localizationKeys('badge__default')} />}
     >
       <Col gap={4}>

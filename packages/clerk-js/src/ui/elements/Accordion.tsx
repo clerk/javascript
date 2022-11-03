@@ -6,7 +6,7 @@ import { animations } from '../styledSystem';
 import { ArrowBlockButton } from './ArrowBlockButton';
 
 type AccordionItemProps = React.PropsWithChildren<{
-  title: React.ReactNode;
+  title: React.ReactElement | string;
   icon?: React.ReactElement;
   badge?: React.ReactElement;
   defaultOpen?: boolean;
