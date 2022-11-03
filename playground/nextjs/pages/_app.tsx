@@ -57,8 +57,8 @@ const AppBar = (props: AppBarProps) => {
         marginBottom: '2rem',
       }}
     >
-      <UnstableOrganizationSwitcher afterOrganizationCreationUrl={'https://www.google.com'} />
-      <UnstableOrganizationSwitcher showPersonalAccount={false} />
+      <UnstableOrganizationSwitcher afterCreateOrganizationUrl={'https://www.google.com'} />
+      <UnstableOrganizationSwitcher hidePersonal />
       <Link href={'/'}>
         <a>
           <h2>Nextjs Playground</h2>
