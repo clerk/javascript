@@ -22,7 +22,7 @@ type NavbarContextValue = { isOpen: boolean; open: () => void; close: () => void
 export const [NavbarContext, useNavbarContext, useUnsafeNavbarContext] =
   createContextAndHook<NavbarContextValue>('NavbarContext');
 
-export const NavbarContextProvider = (props: React.PropsWithChildren<{}>) => {
+export const NavbarContextProvider = (props: React.PropsWithChildren<Record<never, never>>) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const open = React.useCallback(() => setIsOpen(true), []);
   const close = React.useCallback(() => setIsOpen(false), []);
@@ -30,7 +30,12 @@ export const NavbarContextProvider = (props: React.PropsWithChildren<{}>) => {
   return <NavbarContext.Provider value={value}>{props.children}</NavbarContext.Provider>;
 };
 
-export type NavbarRoute = { name: LocalizationKey; id: string; icon: React.ComponentType; path: string };
+export type NavbarRoute = {
+  name: LocalizationKey;
+  id: string;
+  icon: React.ComponentType;
+  path: string;
+};
 type RouteId = NavbarRoute['id'];
 type NavBarProps = {
   contentRef: React.RefObject<HTMLDivElement>;
@@ -135,7 +140,7 @@ export const NavBar = (props: NavBarProps) => {
   );
 };
 
-const NavbarContainer = (props: React.PropsWithChildren<{}>) => {
+const NavbarContainer = (props: React.PropsWithChildren<Record<never, never>>) => {
   return (
     <Col
       elementDescriptor={descriptors.navbar}
@@ -154,7 +159,7 @@ const NavbarContainer = (props: React.PropsWithChildren<{}>) => {
   );
 };
 
-const MobileNavbarContainer = (props: React.PropsWithChildren<{}>) => {
+const MobileNavbarContainer = (props: React.PropsWithChildren<Record<never, never>>) => {
   const navbarContext = useNavbarContext();
   const { floating, isOpen, open, close } = usePopover({ defaultOpen: false, autoUpdate: false });
 
