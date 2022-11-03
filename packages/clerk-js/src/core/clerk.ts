@@ -7,6 +7,7 @@ import type {
   ClerkOptions,
   ClientResource,
   CreateOrganizationParams,
+  CreateOrganizationProps,
   EnvironmentJSON,
   EnvironmentResource,
   HandleMagicLinkVerificationParams,
@@ -220,6 +221,16 @@ export default class Clerk implements ClerkInterface {
     this.#componentControls?.closeModal('organizationProfile');
   };
 
+  public openCreateOrganization = (props?: CreateOrganizationProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    this.#componentControls?.openModal('createOrganization', props || {});
+  };
+
+  public closeCreateOrganization = (): void => {
+    this.assertComponentsReady(this.#componentControls);
+    this.#componentControls?.closeModal('createOrganization');
+  };
+
   public mountSignIn = (node: HTMLDivElement, props?: SignInProps): void => {
     this.assertComponentsReady(this.#componentControls);
     this.#componentControls.mountComponent({
@@ -288,11 +299,28 @@ export default class Clerk implements ClerkInterface {
     });
   };
 
+  public mountCreateOrganization = (node: HTMLDivElement, props?: CreateOrganizationProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    this.#componentControls.mountComponent({
+      name: 'CreateOrganization',
+      appearanceKey: 'createOrganization',
+      node,
+      props,
+    });
+  };
+
+  public unmountCreateOrganization = (node: HTMLDivElement): void => {
+    this.assertComponentsReady(this.#componentControls);
+    this.#componentControls.unmountComponent({
+      node,
+    });
+  };
+
   public mountOrganizationSwitcher = (node: HTMLDivElement, props?: OrganizationSwitcherProps): void => {
     this.assertComponentsReady(this.#componentControls);
     this.#componentControls.mountComponent({
       name: 'OrganizationSwitcher',
-      appearanceKey: 'userProfile',
+      appearanceKey: 'organizationSwitcher',
       node,
       props,
     });

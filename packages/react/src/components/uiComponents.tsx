@@ -1,4 +1,5 @@
 import {
+  CreateOrganizationProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
   SignInProps,
@@ -119,6 +120,17 @@ export const OrganizationProfile = withClerk(({ clerk, ...props }: WithClerkProp
     />
   );
 }, 'OrganizationProfile');
+
+export const CreateOrganization = withClerk(({ clerk, ...props }: WithClerkProp<CreateOrganizationProps>) => {
+  return (
+    <Portal
+      mount={clerk.mountCreateOrganization}
+      unmount={clerk.unmountCreateOrganization}
+      updateProps={(clerk as any).__unstable__updateProps}
+      props={props}
+    />
+  );
+}, 'CreateOrganization');
 
 export const OrganizationSwitcher = withClerk(({ clerk, ...props }: WithClerkProp<OrganizationSwitcherProps>) => {
   return (
