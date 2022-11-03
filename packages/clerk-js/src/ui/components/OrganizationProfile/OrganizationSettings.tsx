@@ -20,7 +20,7 @@ export const OrganizationSettings = () => {
         // elementId={descriptors.profilePage.setId('account')}
         gap={8}
       >
-        <Header.Root id='cl-section-settings'>
+        <Header.Root>
           <Header.Title
             localizationKey={localizationKeys('organizationProfile.start.headerTitle__settings')}
             textVariant='xxlargeMedium'
