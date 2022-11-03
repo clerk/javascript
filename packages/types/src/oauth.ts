@@ -18,6 +18,7 @@ export type TwitterOauthProvider = 'twitter';
 export type TwitchOauthProvider = 'twitch';
 export type LinkedinOauthProvider = 'linkedin';
 export type DropboxOauthProvider = 'dropbox';
+export type AtlassianOauthProvider = 'atlassian';
 export type BitbucketOauthProvider = 'bitbucket';
 export type MicrosoftOauthProvider = 'microsoft';
 export type NotionOauthProvider = 'notion';
@@ -39,6 +40,7 @@ export type OAuthProvider =
   | TwitchOauthProvider
   | LinkedinOauthProvider
   | DropboxOauthProvider
+  | AtlassianOauthProvider
   | BitbucketOauthProvider
   | MicrosoftOauthProvider
   | NotionOauthProvider
@@ -114,6 +116,12 @@ export const OAUTH_PROVIDERS: OAuthProviderData[] = [
     strategy: 'oauth_dropbox',
     name: 'Dropbox',
     docsUrl: 'https://clerk.dev/docs/authentication/social-connection-with-dropbox',
+  },
+  {
+    provider: 'atlassian',
+    strategy: 'oauth_atlassian',
+    name: 'Atlassian',
+    docsUrl: 'https://clerk.dev/docs/authentication/social-connection-with-atlassian',
   },
   {
     provider: 'bitbucket',
