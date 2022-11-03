@@ -1,5 +1,5 @@
 import { MembershipRole, OrganizationMembershipResource } from '@clerk/types';
-import React, { useState } from 'react';
+import React from 'react';
 
 import { useCoreOrganization, useCoreUser } from '../../contexts';
 import { Badge, localizationKeys, Td, Text } from '../../customizables';
@@ -7,58 +7,70 @@ import { ThreeDotsMenu, useCardState, usePagination, UserPreview } from '../../e
 import { handleError, roleLocalizationKey } from '../../utils';
 import { MembersListTable, RoleSelect, RowContainer } from './MemberListTable';
 
-const MOCK_ITEM_COUNT = 28;
 const ITEMS_PER_PAGE = 10;
 
 export const ActiveMembersList = () => {
+  const card = useCardState();
   const { page, changePage } = usePagination({ defaultPage: 1 });
-  const { membershipList } = useCoreOrganization({
+  const {
+    organization,
+    membershipList,
+    membership: currentUserMembership,
+  } = useCoreOrganization({
     membershipList: { offset: (page - 1) * ITEMS_PER_PAGE, limit: ITEMS_PER_PAGE },
   });
+  const isAdmin = currentUserMembership?.role === 'admin';
+
+  if (!organization) {
+    return null;
+  }
+
+  const handleRoleChange = (membership: OrganizationMembershipResource) => (newRole: MembershipRole) => {
+    if (!isAdmin) {
+      return;
+    }
+    return card.runAsync(membership.update({ role: newRole })).catch(err => handleError(err, [], card.setError));
+  };
+
+  const handleRemove = (membership: OrganizationMembershipResource) => () => {
+    if (!isAdmin) {
+      return;
+    }
+    return card.runAsync(membership.destroy()).catch(err => handleError(err, [], card.setError));
+  };
 
   return (
     <MembersListTable
       page={page}
       onPageChange={changePage}
-      itemCount={MOCK_ITEM_COUNT}
+      itemCount={organization.membersCount}
+      itemsPerPage={ITEMS_PER_PAGE}
       isLoading={!membershipList}
       headers={['User', 'Joined', 'Role', '']}
       rows={(membershipList || []).map(m => (
         <MemberRow
           key={m.id}
           membership={m}
+          onRoleChange={handleRoleChange(m)}
+          onRemove={handleRemove(m)}
         />
       ))}
     />
   );
 };
 
-const MemberRow = (props: { membership: OrganizationMembershipResource }) => {
-  const { membership } = props;
+const MemberRow = (props: {
+  membership: OrganizationMembershipResource;
+  onRemove: () => unknown;
+  onRoleChange: (role: MembershipRole) => unknown;
+}) => {
+  const { membership, onRemove, onRoleChange } = props;
   const card = useCardState();
   const { membership: currentUserMembership } = useCoreOrganization();
   const user = useCoreUser();
-  const [role, setRole] = useState<MembershipRole>(membership.role);
 
   const isAdmin = currentUserMembership?.role === 'admin';
   const isCurrentUser = user.id === membership.publicUserData.userId;
-
-  const handleRoleChange = (newRole: MembershipRole) => {
-    if (!isAdmin) {
-      return;
-    }
-    return card
-      .runAsync(membership.update({ role: newRole }))
-      .then(() => setRole(newRole))
-      .catch(err => handleError(err, [], card.setError));
-  };
-
-  const handleRemove = () => {
-    if (!isAdmin) {
-      return;
-    }
-    return card.runAsync(membership.destroy()).catch(err => handleError(err, [], card.setError));
-  };
 
   return (
     <RowContainer>
@@ -75,22 +87,20 @@ const MemberRow = (props: { membership: OrganizationMembershipResource }) => {
         {isAdmin ? (
           <RoleSelect
             isDisabled={card.isLoading}
-            value={role}
-            onChange={handleRoleChange}
+            value={membership.role}
+            onChange={onRoleChange}
           />
         ) : (
           <Text
             sx={t => ({ opacity: t.opacity.$inactive })}
-            localizationKey={roleLocalizationKey(role)}
+            localizationKey={roleLocalizationKey(membership.role)}
           />
         )}
       </Td>
       <Td>
         {isAdmin && (
           <ThreeDotsMenu
-            actions={[
-              { label: 'Remove member', isDestructive: true, onClick: handleRemove, isDisabled: isCurrentUser },
-            ]}
+            actions={[{ label: 'Remove member', isDestructive: true, onClick: onRemove, isDisabled: isCurrentUser }]}
           />
         )}
       </Td>
