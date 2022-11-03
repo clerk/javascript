@@ -215,14 +215,24 @@ export const useOrganizationSwitcherContext = () => {
     throw new Error('Clerk: useUserButtonContext called outside OrganizationSwitcher.');
   }
 
-  const navigateAfterSwitchOrganizationUrl = () => navigate(ctx.afterSwitchOrganizationUrl);
-  const navigateAfterCreateOrganizationUrl = () => navigate(ctx.afterCreateOrganizationUrl);
+  const afterCreateOrganizationUrl = ctx.afterCreateOrganizationUrl || displayConfig.afterCreateOrganizationUrl;
+  const afterLeaveOrganizationUrl = ctx.afterLeaveOrganizationUrl || displayConfig.afterLeaveOrganizationUrl;
+
+  const navigateCreateOrganization = () => navigate(ctx.createOrganizationUrl || displayConfig.createOrganizationUrl);
+  const navigateOrganizationProfile = () =>
+    navigate(ctx.organizationProfileUrl || displayConfig.organizationProfileUrl);
+  const navigateAfterSwitchOrganization = () =>
+    ctx.afterSwitchOrganizationUrl ? navigate(ctx.afterSwitchOrganizationUrl) : Promise.resolve();
 
   return {
     ...ctx,
     hidePersonal: ctx.hidePersonal || false,
-    navigateAfterSwitchOrganizationUrl,
-    navigateAfterCreateOrganizationUrl,
+    organizationProfileMode: ctx.organizationProfileMode || 'modal',
+    afterCreateOrganizationUrl,
+    afterLeaveOrganizationUrl,
+    navigateOrganizationProfile,
+    navigateCreateOrganization,
+    navigateAfterSwitchOrganization,
     componentName,
   };
 };

@@ -26,7 +26,14 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
     const { openOrganizationProfile } = useCoreClerk();
     const { organization: currentOrg } = useCoreOrganization();
     const { isLoaded, setActive } = useCoreOrganizationList();
-    const { hidePersonal, afterCreateOrganizationUrl } = useOrganizationSwitcherContext();
+    const {
+      hidePersonal,
+      organizationProfileMode,
+      afterLeaveOrganizationUrl,
+      navigateCreateOrganization,
+      navigateOrganizationProfile,
+      navigateAfterSwitchOrganization,
+    } = useOrganizationSwitcherContext();
 
     const user = useCoreUser();
 
@@ -35,21 +42,30 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
     }
 
     const handleOrganizationClicked = (organization: OrganizationResource) => {
-      return card.runAsync(() => setActive({ organization })).then(close);
+      return card.runAsync(() => setActive({ organization, beforeEmit: navigateAfterSwitchOrganization })).then(close);
     };
 
     const handlePersonalWorkspaceClicked = () => {
-      return card.runAsync(() => setActive({ organization: null })).then(close);
+      return card
+        .runAsync(() => setActive({ organization: null, beforeEmit: navigateAfterSwitchOrganization }))
+        .then(close);
     };
 
     const handleCreateOrganizationClicked = () => {
-      openOrganizationProfile({ new: true, afterCreateOrganizationUrl });
       close();
+      if (organizationProfileMode === 'navigation') {
+        return navigateCreateOrganization();
+      }
+      // @ts-ignore
+      openOrganizationProfile({ new: true });
     };
 
     const handleManageOrganizationClicked = () => {
-      openOrganizationProfile();
       close();
+      if (organizationProfileMode === 'navigation') {
+        return navigateOrganizationProfile();
+      }
+      openOrganizationProfile({ afterLeaveOrganizationUrl });
     };
 
     if (!isOpen) {
