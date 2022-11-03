@@ -7,41 +7,47 @@ import { ThreeDotsMenu, useCardState, usePagination, UserPreview } from '../../e
 import { handleError, roleLocalizationKey } from '../../utils';
 import { MembersListTable, RowContainer } from './MemberListTable';
 
-const MOCK_ITEM_COUNT = 28;
 const ITEMS_PER_PAGE = 10;
 
 export const InvitedMembersList = () => {
+  const card = useCardState();
   const { page, changePage } = usePagination();
-
-  const { invitationList } = useCoreOrganization({
+  const { organization, invitationList } = useCoreOrganization({
     invitationList: { offset: (page - 1) * ITEMS_PER_PAGE, limit: ITEMS_PER_PAGE },
   });
+
+  if (!organization) {
+    return null;
+  }
+
+  const revoke = (invitation: OrganizationInvitationResource) => () => {
+    return card
+      .runAsync(invitation.revoke)
+      .then(() => changePage(1))
+      .catch(err => handleError(err, [], card.setError));
+  };
 
   return (
     <MembersListTable
       page={page}
       onPageChange={changePage}
-      itemCount={MOCK_ITEM_COUNT}
+      itemCount={organization.pendingInvitationsCount}
+      itemsPerPage={ITEMS_PER_PAGE}
       isLoading={!invitationList}
       headers={['User', 'Invited', 'Role', '']}
       rows={(invitationList || []).map(i => (
         <InvitationRow
           key={i.id}
           invitation={i}
+          onRevoke={revoke(i)}
         />
       ))}
     />
   );
 };
 
-const InvitationRow = (props: { invitation: OrganizationInvitationResource }) => {
-  const { invitation } = props;
-  const card = useCardState();
-
-  const revoke = () => {
-    return invitation.revoke().catch(err => handleError(err, [], card.setError));
-  };
-
+const InvitationRow = (props: { invitation: OrganizationInvitationResource; onRevoke: () => unknown }) => {
+  const { invitation, onRevoke } = props;
   return (
     <RowContainer>
       <Td>
@@ -64,7 +70,7 @@ const InvitationRow = (props: { invitation: OrganizationInvitationResource }) =>
             {
               label: 'Revoke invitation',
               isDestructive: true,
-              onClick: revoke,
+              onClick: onRevoke,
             },
           ]}
         />
