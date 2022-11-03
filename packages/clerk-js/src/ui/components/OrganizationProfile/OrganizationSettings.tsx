@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useCoreOrganization, useCoreUser } from '../../contexts';
+import { useCoreOrganization, useCoreUser, useOrganizationProfileContext } from '../../contexts';
 import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import { Header, IconButton, NavbarMenuButtonRow, OrganizationPreview } from '../../elements';
 import { useNavigate } from '../../hooks';
@@ -66,6 +66,7 @@ const OrganizationProfileSection = () => {
 
 const OrganizationDangerSection = () => {
   const { organization, membership } = useCoreOrganization();
+  const { navigateAfterLeaveOrganization } = useOrganizationProfileContext();
   const user = useCoreUser();
 
   if (!organization || !membership) {
@@ -73,7 +74,7 @@ const OrganizationDangerSection = () => {
   }
 
   const leave = () => {
-    return organization.removeMember(user.id);
+    return organization.removeMember(user.id).finally(navigateAfterLeaveOrganization);
   };
 
   return (
