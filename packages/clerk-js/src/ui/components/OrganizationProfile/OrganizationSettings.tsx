@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useCoreOrganization, useCoreUser } from '../../contexts';
+import { useCoreOrganization } from '../../contexts';
 import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import { Header, IconButton, NavbarMenuButtonRow, OrganizationPreview } from '../../elements';
 import { useNavigate } from '../../hooks';

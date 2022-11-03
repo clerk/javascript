@@ -239,16 +239,21 @@ export const useOrganizationSwitcherContext = () => {
 
 export const useOrganizationProfileContext = () => {
   const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as OrganizationProfileCtx;
+  const { navigate } = useNavigate();
   const { displayConfig } = useEnvironment();
 
   if (componentName !== 'OrganizationProfile') {
     throw new Error('Clerk: useOrganizationProfileContext called outside OrganizationProfile.');
   }
 
+  const navigateAfterLeaveOrganization = () =>
+    navigate(ctx.afterLeaveOrganizationUrl || displayConfig.afterLeaveOrganizationUrl);
+
   return {
     ...ctx,
     // @ts-expect-error
     new: ctx.new || false,
+    navigateAfterLeaveOrganization,
     componentName,
   };
 };
