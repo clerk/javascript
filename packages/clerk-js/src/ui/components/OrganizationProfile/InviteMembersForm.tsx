@@ -34,7 +34,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
   const roles: Array<{ label: string; value: MembershipRole }> = [
     { label: t(roleLocalizationKey('admin')), value: 'admin' },
     { label: t(roleLocalizationKey('basic_member')), value: 'basic_member' },
-    { label: t(roleLocalizationKey('guest_member')), value: 'guest_member' },
+    // { label: t(roleLocalizationKey('guest_member')), value: 'guest_member' },
   ];
 
   const emailAddressField = useFormControl('emailAddress', '', {
