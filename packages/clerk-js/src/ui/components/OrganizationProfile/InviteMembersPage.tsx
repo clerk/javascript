@@ -1,8 +1,8 @@
-import React from 'react';
-
 import { useWizard, Wizard } from '../../common';
 import { useCoreOrganization } from '../../contexts';
+import { Flex, Icon, Text } from '../../customizables';
 import { ContentPage, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
+import { Email } from '../../icons';
 import { InviteMembersForm } from './InviteMembersForm';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
@@ -32,9 +32,35 @@ export const InviteMembersPage = withCardStateProvider(() => {
       </ContentPage>
       <SuccessPage
         title={title}
-        // text={localizationKeys('userProfile.profilePage.successMessage')}
-        text={'Invitations successfully sent'}
+        content={<InvitationsSentMessage />}
+        Breadcrumbs={OrganizationProfileBreadcrumbs}
       />
     </Wizard>
   );
 });
+
+export const InvitationsSentMessage = () => {
+  return (
+    <Flex
+      direction='col'
+      center
+      gap={4}
+    >
+      <Flex
+        center
+        sx={t => ({
+          width: t.space.$14,
+          height: t.space.$14,
+          borderRadius: t.radii.$circle,
+          background: t.colors.$blackAlpha200,
+        })}
+      >
+        <Icon
+          icon={Email}
+          size='md'
+        />
+      </Flex>
+      <Text>Invitations successfully sent</Text>
+    </Flex>
+  );
+};
