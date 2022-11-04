@@ -17,6 +17,8 @@ describe('OrganizationMembership', () => {
         object: 'organization',
         created_at: 12345,
         updated_at: 67890,
+        members_count: 1,
+        pending_invitations_count: 10,
       },
       public_metadata: {
         foo: 'bar',
