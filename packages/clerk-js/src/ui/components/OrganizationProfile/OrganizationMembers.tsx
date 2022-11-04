@@ -13,13 +13,14 @@ import {
   Tabs,
   TabsList,
   useCardState,
+  withCardStateProvider,
 } from '../../elements';
 import { useNavigate } from '../../hooks';
 import { UserAdd } from '../../icons';
 import { ActiveMembersList } from './ActiveMembersList';
 import { InvitedMembersList } from './InvitedMembersList';
 
-export const OrganizationMembers = () => {
+export const OrganizationMembers = withCardStateProvider(() => {
   const { navigate } = useNavigate();
   const card = useCardState();
   const { membership } = useCoreOrganization();
@@ -80,4 +81,4 @@ export const OrganizationMembers = () => {
       </Col>
     </Col>
   );
-};
+});
