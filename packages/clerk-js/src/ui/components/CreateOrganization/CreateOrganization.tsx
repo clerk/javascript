@@ -1,6 +1,7 @@
 import { CreateOrganizationProps } from '@clerk/types';
 import React from 'react';
 
+import { withOrganizationsEnabledGuard } from '../../common';
 import { ComponentContext, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { ProfileCard, ProfileCardContent, withCardStateProvider } from '../../elements';
@@ -32,7 +33,11 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
   );
 });
 
-export const CreateOrganization = withCardStateProvider(_CreateOrganization);
+export const CreateOrganization = withOrganizationsEnabledGuard(
+  withCardStateProvider(_CreateOrganization),
+  'CreateOrganization',
+  { mode: 'redirect' },
+);
 
 export const CreateOrganizationModal = (props: CreateOrganizationProps): JSX.Element => {
   const createOrganizationProps: CreateOrganizationCtx = {
