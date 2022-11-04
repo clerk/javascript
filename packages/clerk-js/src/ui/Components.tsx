@@ -305,7 +305,7 @@ const Components = (props: ComponentsProps) => {
           <Modal
             handleClose={() => componentsControls.closeModal('createOrganization')}
             containerSx={{ alignItems: 'center' }}
-            contentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
+            contentSx={t => ({ height: `min(${t.sizes.$120}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
           >
             <VirtualRouter
               preservedParams={PRESERVED_QUERYSTRING_PARAMS}

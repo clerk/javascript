@@ -2,7 +2,6 @@ import { ProfileCardContent } from '../../elements';
 import { Route, Switch } from '../../router';
 import { PropsOfComponent } from '../../styledSystem';
 import { LeaveOrganizationPage } from './ActionConfirmationPage';
-import { CreateOrganizationPage } from './CreateOrganizationPage';
 import { InviteMembersPage } from './InviteMembersPage';
 import { OrganizationMembers } from './OrganizationMembers';
 import { OrganizationSettings } from './OrganizationSettings';
@@ -31,20 +30,6 @@ export const OrganizationProfileRoutes = (props: PropsOfComponent<typeof Profile
           </Route>
           <Route index>
             <OrganizationMembers />
-          </Route>
-        </Switch>
-      </Route>
-    </ProfileCardContent>
-  );
-};
-
-export const CreateOrganizationRoutes = () => {
-  return (
-    <ProfileCardContent>
-      <Route>
-        <Switch>
-          <Route index>
-            <CreateOrganizationPage />
           </Route>
         </Switch>
       </Route>

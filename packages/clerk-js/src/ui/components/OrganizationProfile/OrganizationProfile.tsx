@@ -1,24 +1,19 @@
 import { OrganizationProfileProps } from '@clerk/types';
 import React from 'react';
 
-import {
-  ComponentContext,
-  useCoreOrganization,
-  useOrganizationProfileContext,
-  withCoreUserGuard,
-} from '../../contexts';
+import { ComponentContext, useCoreOrganization, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { ProfileCard, withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
 import { OrganizationProfileCtx } from '../../types';
 import { OrganizationProfileNavbar } from './OrganizationProfileNavbar';
-import { CreateOrganizationRoutes, OrganizationProfileRoutes } from './OrganizationProfileRoutes';
+import { OrganizationProfileRoutes } from './OrganizationProfileRoutes';
 
 const _OrganizationProfile = (_: OrganizationProfileProps) => {
   // TODO: Should this be a guard HOC?
   const { organization } = useCoreOrganization();
-  const { new: isCreating } = useOrganizationProfileContext();
-  if (!organization && !isCreating) {
+
+  if (!organization) {
     return null;
   }
 
@@ -37,16 +32,6 @@ const _OrganizationProfile = (_: OrganizationProfileProps) => {
 
 const AuthenticatedRoutes = withCoreUserGuard(() => {
   const contentRef = React.useRef<HTMLDivElement>(null);
-  const { new: showCreateOrganization } = useOrganizationProfileContext();
-
-  if (showCreateOrganization) {
-    return (
-      <ProfileCard sx={{ height: '100%' }}>
-        <CreateOrganizationRoutes />
-      </ProfileCard>
-    );
-  }
-
   return (
     <ProfileCard sx={{ height: '100%' }}>
       <OrganizationProfileNavbar contentRef={contentRef}>
