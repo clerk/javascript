@@ -108,29 +108,11 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
           onReset={completeFlow}
         />
       </ContentPage>
-      {/* <SuccessPage
+      <SuccessPage
         title={title}
         content={<InvitationsSentMessage />}
-        Breadcrumbs={OrganizationProfileBreadcrumbs}
-      /> */}
-      <ContentPage
-        Breadcrumbs={null}
-        headerTitle={title}
-      >
-        <Text
-          localizationKey={'Invitations successfully sent'}
-          variant='regularRegular'
-        />
-        <FormButtonContainer>
-          <Button
-            textVariant='buttonExtraSmallBold'
-            block={false}
-            autoFocus
-            localizationKey={localizationKeys('userProfile.formButtonPrimary__finish')}
-            onClick={completeFlow}
-          />
-        </FormButtonContainer>
-      </ContentPage>
+        onFinish={completeFlow}
+      />
     </Wizard>
   );
 });
