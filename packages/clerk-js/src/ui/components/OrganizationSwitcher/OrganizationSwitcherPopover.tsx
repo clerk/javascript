@@ -28,6 +28,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
     const { isLoaded, setActive } = useCoreOrganizationList();
     const {
       hidePersonal,
+      createOrganizationMode,
       organizationProfileMode,
       afterLeaveOrganizationUrl,
       afterCreateOrganizationUrl,
@@ -54,7 +55,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
 
     const handleCreateOrganizationClicked = () => {
       close();
-      if (organizationProfileMode === 'navigation') {
+      if (createOrganizationMode === 'navigation') {
         return navigateCreateOrganization();
       }
       openCreateOrganization({ afterCreateOrganizationUrl });
