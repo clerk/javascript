@@ -588,7 +588,7 @@ export default class IsomorphicClerk {
     if (this.clerkjs && this.#loaded) {
       return callback() as Promise<OrganizationMembershipResource[]>;
     } else {
-      this.premountMethodCalls.set('getOrganizationMemberships', redirectToUserProfilecallback);
+      this.premountMethodCalls.set('getOrganizationMemberships', callback);
     }
   };
 
