@@ -1,15 +1,15 @@
 import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
-import { useCoreClerk, useCoreOrganization, useCoreOrganizations, useOrganizationProfileContext } from '../../contexts';
+import { useCoreClerk, useCoreOrganization, useCoreOrganizations, useCreateOrganizationContext } from '../../contexts';
 import { Button, Text } from '../../customizables';
 import { Form, useCardState, withCardStateProvider } from '../../elements';
 import { localizationKeys } from '../../localization';
 import { handleError, useFormControl } from '../../utils';
+import { InviteMembersForm } from '../OrganizationProfile/InviteMembersForm';
+import { ContentPage } from '../OrganizationProfile/OrganizationContentPage';
+import { OrganizationProfileAvatarUploader } from '../OrganizationProfile/OrganizationProfileAvatarUploader';
 import { FormButtonContainer } from '../UserProfile/FormButtons';
-import { InviteMembersForm } from './InviteMembersForm';
-import { ContentPage } from './OrganizationContentPage';
-import { OrganizationProfileAvatarUploader } from './OrganizationProfileAvatarUploader';
 
 export const CreateOrganizationPage = withCardStateProvider(() => {
   // const title = localizationKeys('userProfile.profilePage.title');
@@ -18,8 +18,8 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
   const card = useCardState();
   const [file, setFile] = React.useState<File>();
   const { createOrganization } = useCoreOrganizations();
-  const { setActive, closeOrganizationProfile } = useCoreClerk();
-  const { mode } = useOrganizationProfileContext();
+  const { setActive, closeCreateOrganization } = useCoreClerk();
+  const { mode, navigateAfterCreateOrganization } = useCreateOrganizationContext();
   const { organization } = useCoreOrganization();
 
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
@@ -47,9 +47,9 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
   };
 
   const completeFlow = () => {
-    // navigateAfterCreateOrganizationUrl();
+    navigateAfterCreateOrganization();
     if (mode === 'modal') {
-      closeOrganizationProfile();
+      closeCreateOrganization();
     }
   };
 
@@ -59,6 +59,7 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
         Breadcrumbs={null}
         headerTitle={title}
         headerSubtitle={subtitle}
+        sx={t => ({ minHeight: t.sizes.$60 })}
       >
         <Form.Root onSubmit={onSubmit}>
           <OrganizationProfileAvatarUploader
@@ -82,7 +83,7 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
               <Form.ResetButton
                 localizationKey={localizationKeys('userProfile.formButtonReset')}
                 block={false}
-                onClick={closeOrganizationProfile}
+                onClick={closeCreateOrganization}
               />
             )}
           </FormButtonContainer>
