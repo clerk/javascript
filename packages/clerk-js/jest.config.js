@@ -44,15 +44,15 @@ module.exports = {
   testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$',
 
   // Module file extensions for importings
-  // transformIgnorePatterns: ['^.+\\.module\\.(css|sass|scss)$'],
+  transformIgnorePatterns: ['^.+\\.module\\.(css|sass|scss)$'],
 
-  // moduleNameMapper: {
-  //   '^ui/(.*)': '<rootDir>/src/ui/$1',
-  //   '^core/(.*)': '<rootDir>/src/core/$1',
-  //   '^utils/(.*)$': '<rootDir>/src/utils/$1',
-  //   '^utils': '<rootDir>/src/utils',
-  //   '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-  // },
+  moduleNameMapper: {
+    '^ui/(.*)': '<rootDir>/src/ui/$1',
+    '^core/(.*)': '<rootDir>/src/core/$1',
+    '^utils/(.*)$': '<rootDir>/src/utils/$1',
+    '^utils': '<rootDir>/src/utils',
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+  },
 
   testPathIgnorePatterns: ['/node_modules/'],
 };
