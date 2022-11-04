@@ -10,10 +10,11 @@ type SuccessPageProps = Omit<PropsOfComponent<typeof ContentPage>, 'headerTitle'
   text: LocalizationKey;
   finishLabel?: LocalizationKey;
   content?: React.ReactNode;
+  onFinish?: () => void;
 };
 
 export const SuccessPage = (props: SuccessPageProps) => {
-  const { text, title, finishLabel, content, ...rest } = props;
+  const { text, title, finishLabel, onFinish, content, ...rest } = props;
 
   return (
     <ContentPage
@@ -33,6 +34,7 @@ export const SuccessPage = (props: SuccessPageProps) => {
           autoFocus
           //Do we need a separate key here?
           localizationKey={finishLabel || localizationKeys('userProfile.formButtonPrimary__finish')}
+          {...(onFinish ? { onClick: onFinish } : {})}
         />
       </FormButtonContainer>
     </ContentPage>
