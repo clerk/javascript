@@ -1,10 +1,10 @@
-import { AttributeData, Attributes, Clerk, EnvironmentResource, OAuthProviders, SignInData } from '@clerk/types';
+import { Clerk, EnvironmentResource } from '@clerk/types';
 import { jest } from '@jest/globals';
 
 import { RouteContextValue } from '../../router';
 
-export const initialMockClerkConfig: Clerk = {
-  frontendApi: '',
+const initialMockClerkConfig: Clerk = {
+  frontendApi: 'test.host',
   organization: undefined,
   user: null,
   session: null,
@@ -21,7 +21,7 @@ export const initialMockClerkConfig: Clerk = {
       unverifiedFields: [],
       verifications: {
         emailAddress: {
-          pathRoot: '',
+          pathRoot: 'test.host',
           status: null,
           strategy: null,
           nonce: null,
@@ -30,11 +30,11 @@ export const initialMockClerkConfig: Clerk = {
           expireAt: null,
           error: null,
           verifiedAtClient: null,
-          nextAction: '',
+          nextAction: 'test.host',
           supportedStrategies: [],
         },
         phoneNumber: {
-          pathRoot: '',
+          pathRoot: 'test.host',
           status: null,
           strategy: null,
           nonce: null,
@@ -43,11 +43,11 @@ export const initialMockClerkConfig: Clerk = {
           expireAt: null,
           error: null,
           verifiedAtClient: null,
-          nextAction: '',
+          nextAction: 'test.host',
           supportedStrategies: [],
         },
         web3Wallet: {
-          pathRoot: '',
+          pathRoot: 'test.host',
           status: null,
           strategy: null,
           nonce: null,
@@ -56,11 +56,11 @@ export const initialMockClerkConfig: Clerk = {
           expireAt: null,
           error: null,
           verifiedAtClient: null,
-          nextAction: '',
+          nextAction: 'test.host',
           supportedStrategies: [],
         },
         externalAccount: {
-          pathRoot: '',
+          pathRoot: 'test.host',
           status: null,
           strategy: null,
           nonce: null,
@@ -90,7 +90,7 @@ export const initialMockClerkConfig: Clerk = {
       supportedFirstFactors: [],
       supportedSecondFactors: [],
       firstFactorVerification: {
-        pathRoot: '',
+        pathRoot: 'test.host',
         status: null,
         strategy: null,
         nonce: null,
@@ -101,7 +101,7 @@ export const initialMockClerkConfig: Clerk = {
         verifiedAtClient: null,
       },
       secondFactorVerification: {
-        pathRoot: '',
+        pathRoot: 'test.host',
         status: null,
         strategy: null,
         nonce: null,
@@ -122,7 +122,7 @@ export const initialMockClerkConfig: Clerk = {
   },
 } as any as Clerk;
 
-export const initialMockEnvironmentResource: EnvironmentResource = {
+const initialMockEnvironmentResource: EnvironmentResource = {
   userSettings: {
     id: undefined,
     social: {
@@ -132,30 +132,30 @@ export const initialMockEnvironmentResource: EnvironmentResource = {
         authenticatable: true,
         strategy: 'oauth_google',
       },
-    } as OAuthProviders,
+    },
     attributes: {
       email_address: {
-        enabled: true,
-        required: true,
+        enabled: false,
+        required: false,
         name: 'email_address',
         verifications: ['email_code'],
-        used_for_first_factor: true,
+        used_for_first_factor: false,
         first_factors: ['email_code'],
         used_for_second_factor: false,
         second_factors: [],
-        verify_at_sign_up: true,
-      } as AttributeData,
+        verify_at_sign_up: false,
+      },
       phone_number: {
-        enabled: true,
+        enabled: false,
         required: false,
         name: 'phone_number',
         verifications: ['phone_code'],
         used_for_first_factor: false,
         first_factors: [],
-        used_for_second_factor: true,
+        used_for_second_factor: false,
         second_factors: ['phone_code'],
-        verify_at_sign_up: true,
-      } as AttributeData,
+        verify_at_sign_up: false,
+      },
       username: {
         enabled: false,
         required: false,
@@ -166,7 +166,7 @@ export const initialMockEnvironmentResource: EnvironmentResource = {
         used_for_second_factor: false,
         second_factors: [],
         verify_at_sign_up: false,
-      } as AttributeData,
+      },
       first_name: {
         enabled: true,
         required: true,
@@ -177,7 +177,7 @@ export const initialMockEnvironmentResource: EnvironmentResource = {
         used_for_second_factor: false,
         second_factors: [],
         verify_at_sign_up: false,
-      } as AttributeData,
+      },
       last_name: {
         enabled: true,
         required: true,
@@ -188,7 +188,7 @@ export const initialMockEnvironmentResource: EnvironmentResource = {
         used_for_second_factor: false,
         second_factors: [],
         verify_at_sign_up: false,
-      } as AttributeData,
+      },
       password: {
         enabled: true,
         required: true,
@@ -199,7 +199,7 @@ export const initialMockEnvironmentResource: EnvironmentResource = {
         used_for_second_factor: false,
         second_factors: [],
         verify_at_sign_up: false,
-      } as AttributeData,
+      },
       web3_wallet: {
         enabled: false,
         required: false,
@@ -210,7 +210,7 @@ export const initialMockEnvironmentResource: EnvironmentResource = {
         used_for_second_factor: false,
         second_factors: [],
         verify_at_sign_up: false,
-      } as AttributeData,
+      },
       authenticator_app: {
         enabled: false,
         required: false,
@@ -221,7 +221,7 @@ export const initialMockEnvironmentResource: EnvironmentResource = {
         used_for_second_factor: false,
         second_factors: [],
         verify_at_sign_up: false,
-      } as AttributeData,
+      },
       backup_code: {
         enabled: false,
         required: false,
@@ -232,13 +232,13 @@ export const initialMockEnvironmentResource: EnvironmentResource = {
         used_for_second_factor: false,
         second_factors: [],
         verify_at_sign_up: false,
-      } as AttributeData,
-    } as Attributes,
+      },
+    },
     signIn: {
       second_factor: {
         required: false,
       },
-    } as SignInData,
+    },
     signUp: {
       custom_action_required: false,
       disable_hibp: false,
@@ -247,17 +247,17 @@ export const initialMockEnvironmentResource: EnvironmentResource = {
     socialProviderStrategies: [],
     authenticatableSocialStrategies: [],
     web3FirstFactors: [],
-    enabledFirstFactorIdentifiers: ['email_address'],
+    enabledFirstFactorIdentifiers: [],
     instanceIsPasswordBased: true,
     hasValidAuthFactor: true,
-    pathRoot: '',
+    pathRoot: 'test.host',
   },
   authConfig: {
-    pathRoot: '',
+    pathRoot: 'test.host',
     singleSessionMode: false,
   },
   displayConfig: {
-    pathRoot: '',
+    pathRoot: 'test.host',
     id: 'display_config_2GLnHgZkgHLIp5F3ciLxw1jdRrX',
     instanceEnvironmentType: 'production',
     applicationName: 'ClerkProd-(local)',
@@ -283,20 +283,20 @@ export const initialMockEnvironmentResource: EnvironmentResource = {
     },
     preferredSignInStrategy: 'password',
     logoUrl: 'https://images.clerk.services/clerk/logo.svg',
-    faviconUrl: null,
-    backendHost: '',
-    homeUrl: '',
-    signInUrl: '',
-    signUpUrl: '',
-    userProfileUrl: '',
-    afterSignInUrl: '',
-    afterSignUpUrl: '',
-    afterSignOutOneUrl: '',
-    afterSignOutAllUrl: '',
-    afterSwitchSessionUrl: '',
+    faviconUrl: 'test.host',
+    backendHost: 'test.host',
+    homeUrl: 'test.host',
+    signInUrl: 'test.host',
+    signUpUrl: 'test.host',
+    userProfileUrl: 'test.host',
+    afterSignInUrl: 'test.host',
+    afterSignUpUrl: 'test.host',
+    afterSignOutOneUrl: 'test.host',
+    afterSignOutAllUrl: 'test.host',
+    afterSwitchSessionUrl: 'test.host',
     branded: true,
-    supportEmail: '',
-    clerkJSVersion: null,
+    supportEmail: 'test@host',
+    clerkJSVersion: undefined,
     experimental__forceOauthFirst: false,
   },
   isSingleSession: jest.fn(),
@@ -305,12 +305,12 @@ export const initialMockEnvironmentResource: EnvironmentResource = {
 } as any as EnvironmentResource;
 
 export const initialRouteContextValue: RouteContextValue = {
-  basePath: '',
-  startPath: '',
-  fullPath: '',
-  indexPath: '',
-  currentPath: '',
-  queryString: '',
+  basePath: 'test.host',
+  startPath: 'test.host',
+  fullPath: 'test.host',
+  indexPath: 'test.host',
+  currentPath: 'test.host',
+  queryString: 'test.host',
   queryParams: {},
   getMatchData: jest.fn(),
   matches: jest.fn(),
@@ -321,97 +321,37 @@ export const initialRouteContextValue: RouteContextValue = {
   params: {},
 };
 
-export const initialFixtureConfig = {
+const initialFixtureConfig = {
   environment: {
-    username: {
-      enabled: true,
-      required: true,
-    },
-    social: [
-      // {
-      //   oauthProvider: 'oauth_google',
-      //   enabled: true,
-      //   required: true,
-      // },
-    ],
-    // oauth_google: {
-    //   enabled: true,
-    //   required: true,
-    // },
-    // oauth_discord: {
-    //   enabled: false,
-    //   required: false,
-    // },
-    // oauth_facebook: {
-    //   enabled: false,
-    //   required: false,
-    // },
-    // oauth_twitch: {
-    //   enabled: false,
-    //   required: false,
-    // },
-    // oauth_twitter: {
-    //   enabled: false,
-    //   required: false,
-    // },
-    // oauth_microsoft: {
-    //   enabled: false,
-    //   required: false,
-    // },
-    // oauth_tiktok: {
-    //   enabled: false,
-    //   required: false,
-    // },
-    // oauth_linkedin: {
-    //   enabled: false,
-    //   required: false,
-    // },
-    // oauth_github: {
-    //   enabled: false,
-    //   required: false,
-    // },
-    // oauth_gitlab: {
-    //   enabled: false,
-    //   required: false,
-    // },
-    // oauth_dropbox: {
-    //   enabled: false,
-    //   required: false,
-    // },
-    // oauth_bitbucket: {
-    //   enabled: false,
-    //   required: false,
-    // },
-    // oauth_hubspot: {
-    //   enabled: false,
-    //   required: false,
-    // },
-    // oauth_notion: {
-    //   enabled: false,
-    //   required: false,
-    // },
-    // oauth_apple: {
-    //   enabled: false,
-    //   required: false,
-    // },
-    // oauth_line: {
-    //   enabled: false,
-    //   required: false,
-    // },
-    // oauth_instagram: {
-    //   enabled: false,
-    //   required: false,
-    // },
-    // oauth_coinbase: {
-    //   enabled: false,
-    //   required: false,
-    // },
-    // oauth_spotify: {
-    //   enabled: false,
-    //   required: false,
-    // },
-    // },
+    enabledFirstFactorIdentifiers: [],
+    social: [],
   },
   user: {},
   client: {},
+};
+
+export const getInitialFixtureConfig = () => JSON.parse(JSON.stringify(initialFixtureConfig));
+export const getInitialMockClerkConfig = () => {
+  const config = JSON.parse(JSON.stringify(initialMockClerkConfig));
+  config.getMatchData = jest.fn();
+  config.matches = jest.fn();
+  config.baseNavigate = jest.fn();
+  config.navigate = jest.fn();
+  config.resolve = jest.fn(() => ({ href: 'test.host' } as any));
+  config.refresh = jest.fn();
+  return config;
+};
+export const getInitialRouteContextValue = () => {
+  const config = JSON.parse(JSON.stringify(initialMockClerkConfig));
+  config.addListener = jest.fn();
+  config.createdAt = new Date().toISOString();
+  config.updatedAt = new Date().toISOString();
+  return config;
+};
+export const getInitialEnvironmentResource = () => {
+  const config = JSON.parse(JSON.stringify(initialMockEnvironmentResource));
+  config.isSingleSession = jest.fn();
+  config.isProduction = jest.fn();
+  config.onWindowLocationHost = jest.fn();
+  return config;
 };

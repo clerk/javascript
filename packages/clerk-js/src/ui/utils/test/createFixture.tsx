@@ -7,27 +7,45 @@ import { FlowMetadataProvider } from '../../elements';
 import { RouteContext } from '../../router';
 import { InternalThemeProvider } from '../../styledSystem';
 import { createClerkFixture } from './createClerkFeature';
-import { initialFixtureConfig, initialRouteContextValue } from './mockConfigs';
+import { getInitialFixtureConfig, initialRouteContextValue } from './mockConfigs';
 
 type FParam = {
   withUsername: () => void;
   withEmailAddress: () => void;
+  withPhoneNumber: () => void;
   withGoogleOAuth: () => void;
   withDiscordOAuth: () => void;
+  withInstagramOAuth: () => void;
   withAllOAuth: () => void;
   withPhoneCode: () => void;
 };
 
 type ConfigFn = (f: FParam) => void;
 
-export const createFixture = (configFn: ConfigFn) => {
-  const config = initialFixtureConfig;
+export const createFixture = (configFn?: ConfigFn) => {
+  const routeContextValue = initialRouteContextValue;
+  const config = getInitialFixtureConfig();
   const f = {
     withUsername: () => {
-      config.environment.username = {
+      config.environment.enabledFirstFactorIdentifiers.push({
+        identifier: 'username',
         enabled: true,
         required: true,
-      };
+      });
+    },
+    withEmailAddress: () => {
+      config.environment.enabledFirstFactorIdentifiers.push({
+        identifier: 'email_address',
+        enabled: true,
+        required: true,
+      });
+    },
+    withPhoneNumber: () => {
+      config.environment.enabledFirstFactorIdentifiers.push({
+        identifier: 'phone_number',
+        enabled: true,
+        required: true,
+      });
     },
     withGoogleOAuth: () => {
       // @ts-ignore
@@ -41,6 +59,14 @@ export const createFixture = (configFn: ConfigFn) => {
       // @ts-ignore
       config.environment.social.push({
         oauthProvider: 'oauth_discord',
+        enabled: true,
+        required: true,
+      });
+    },
+    withInstagramOAuth: () => {
+      // @ts-ignore
+      config.environment.social.push({
+        oauthProvider: 'oauth_instagram',
         enabled: true,
         required: true,
       });
@@ -59,7 +85,7 @@ export const createFixture = (configFn: ConfigFn) => {
         <EnvironmentProvider value={mockedEnvironment}>
           <RouteContext.Provider value={initialRouteContextValue}>
             <AppearanceProvider appearanceKey={'signIn'}>
-              <FlowMetadataProvider flow={'signIn'}>
+              <FlowMetadataProvider flow={'test' as any}>
                 <InternalThemeProvider>
                   <ComponentContext.Provider value={{ componentName: 'SignIn' }}>{children}</ComponentContext.Provider>
                 </InternalThemeProvider>

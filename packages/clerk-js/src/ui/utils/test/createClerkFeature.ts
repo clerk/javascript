@@ -1,15 +1,17 @@
 import { Clerk } from '@clerk/types';
 
-import { initialMockClerkConfig, initialMockEnvironmentResource } from './mockConfigs';
+import { getInitialEnvironmentResource, getInitialMockClerkConfig } from './mockConfigs';
 
 const applyOptionsToInitialMockConfig = (fixtureConfig: any) => {
-  const mockClerkConfig = initialMockClerkConfig;
-  const mockEnvironmentResource = initialMockEnvironmentResource;
+  const mockClerkConfig = getInitialMockClerkConfig();
+  const mockEnvironmentResource = getInitialEnvironmentResource();
 
   fixtureConfig.environment.social.forEach((s: any) => {
     mockEnvironmentResource.userSettings.authenticatableSocialStrategies.push(s.oauthProvider);
     mockEnvironmentResource.userSettings.socialProviderStrategies.push(s.oauthProvider);
-    // mockEnvironmentResource.userSettings.social = {...mockEnvironmentResource.userSettings.social, }
+  });
+  fixtureConfig.environment.enabledFirstFactorIdentifiers.forEach((identifier: any) => {
+    mockEnvironmentResource.userSettings.enabledFirstFactorIdentifiers.push(identifier.identifier);
   });
 
   return { mockClerkConfig, mockEnvironmentResource };
