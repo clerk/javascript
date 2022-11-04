@@ -92,8 +92,13 @@ export const RoleSelect = (props: { value: MembershipRole; onChange: any; isDisa
   const roles: Array<{ label: string; value: MembershipRole }> = [
     { label: t(roleLocalizationKey('admin')), value: 'admin' },
     { label: t(roleLocalizationKey('basic_member')), value: 'basic_member' },
+  ];
+
+  const excludedRoles: Array<{ label: string; value: MembershipRole }> = [
     { label: t(roleLocalizationKey('guest_member')), value: 'guest_member' },
   ];
+
+  const selectedRole = [...roles, ...excludedRoles].find(r => r.value === value);
 
   return (
     <Select
@@ -108,7 +113,9 @@ export const RoleSelect = (props: { value: MembershipRole; onChange: any; isDisa
           backgroundColor: 'transparent',
         })}
         isDisabled={isDisabled}
-      />
+      >
+        {selectedRole?.label}
+      </SelectButton>
       <SelectOptionList />
     </Select>
   );
