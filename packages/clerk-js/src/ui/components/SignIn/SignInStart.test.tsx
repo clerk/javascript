@@ -1,5 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
-import { render, screen } from '@testing-library/react';
+import { waitFor } from '@testing-library/dom';
+import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 
 import { createFixture } from '../../utils/test/createFixture';
@@ -143,6 +144,71 @@ describe('SignInStart', () => {
 
       const socialOAuth = screen.getByText('Continue with Instagram');
       expect(socialOAuth).toBeDefined();
+    });
+
+    it('shows the social buttons when 3 or more social login methods are enabled', () => {
+      const { MockClerkProvider } = createFixture(f => {
+        f.withDiscordOAuth();
+        f.withInstagramOAuth();
+        f.withGoogleOAuth();
+      });
+
+      const { container } = render(
+        <MockClerkProvider>
+          <SignInStart />
+        </MockClerkProvider>,
+      );
+
+      // target the css classname as this is public API
+      const googleIcon = container.getElementsByClassName('cl-socialButtonsIconButton__google');
+      const instagramIcon = container.getElementsByClassName('cl-socialButtonsIconButton__instagram');
+      const discordIcon = container.getElementsByClassName('cl-socialButtonsIconButton__discord');
+      expect(googleIcon).toBeDefined();
+      expect(instagramIcon).toBeDefined();
+      expect(discordIcon).toBeDefined();
+    });
+  });
+
+  describe('navigation', () => {
+    it('calls create on clicking Continue button', async () => {
+      let mockCreateFn: any;
+      const { MockClerkProvider } = createFixture(f => {
+        f.withEmailAddress();
+        mockCreateFn = f.mockSignInCreate();
+      });
+
+      render(
+        <MockClerkProvider>
+          <SignInStart />
+        </MockClerkProvider>,
+      );
+
+      fireEvent.click(screen.getByText('Continue'));
+      await waitFor(() => {
+        expect(mockCreateFn).toHaveBeenCalled();
+      });
+    });
+
+    it('nav', async () => {
+      let mockCreateFn: any;
+      let mockRouteNavigateFn: any;
+      const { MockClerkProvider } = createFixture(f => {
+        f.withEmailAddress();
+        mockCreateFn = f.mockSignInCreate({ responseStatus: 'needs_first_factor' });
+        mockRouteNavigateFn = f.mockRouteNavigate();
+      });
+
+      render(
+        <MockClerkProvider>
+          <SignInStart />
+        </MockClerkProvider>,
+      );
+
+      fireEvent.click(screen.getByText('Continue'));
+      await waitFor(() => {
+        expect(mockCreateFn).toHaveBeenCalled();
+        expect(mockRouteNavigateFn).toHaveBeenCalledWith('factor-one');
+      });
     });
   });
 });

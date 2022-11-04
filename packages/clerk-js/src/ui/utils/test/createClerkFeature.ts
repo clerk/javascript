@@ -1,10 +1,11 @@
 import { Clerk } from '@clerk/types';
 
-import { getInitialEnvironmentResource, getInitialMockClerkConfig } from './mockConfigs';
+import { getInitialEnvironmentResource, getInitialMockClerkConfig, getInitialRouteContextValue } from './mockConfigs';
 
 const applyOptionsToInitialMockConfig = (fixtureConfig: any) => {
   const mockClerkConfig = getInitialMockClerkConfig();
   const mockEnvironmentResource = getInitialEnvironmentResource();
+  const mockRouteContextValue = getInitialRouteContextValue();
 
   fixtureConfig.environment.social.forEach((s: any) => {
     mockEnvironmentResource.userSettings.authenticatableSocialStrategies.push(s.oauthProvider);
@@ -13,12 +14,15 @@ const applyOptionsToInitialMockConfig = (fixtureConfig: any) => {
   fixtureConfig.environment.enabledFirstFactorIdentifiers.forEach((identifier: any) => {
     mockEnvironmentResource.userSettings.enabledFirstFactorIdentifiers.push(identifier.identifier);
   });
+  mockClerkConfig.client.signIn.create = fixtureConfig.client.signIn.create;
+  mockRouteContextValue.navigate = fixtureConfig.routeContext.navigate;
 
-  return { mockClerkConfig, mockEnvironmentResource };
+  return { mockClerkConfig, mockEnvironmentResource, mockRouteContextValue };
 };
 
 export const createClerkFixture = (fixtureConfig: any) => {
-  const { mockClerkConfig, mockEnvironmentResource } = applyOptionsToInitialMockConfig(fixtureConfig);
+  const { mockClerkConfig, mockEnvironmentResource, mockRouteContextValue } =
+    applyOptionsToInitialMockConfig(fixtureConfig);
   const listeners: any[] = [];
 
   const client = mockClerkConfig.client;
@@ -38,6 +42,7 @@ export const createClerkFixture = (fixtureConfig: any) => {
 
   return {
     mockedEnvironment: mockEnvironmentResource,
+    mockedRouteContext: mockRouteContextValue,
     mockedClerk: { ...resources, addListener } as Clerk,
     updateClerkMock: updateMock,
   };

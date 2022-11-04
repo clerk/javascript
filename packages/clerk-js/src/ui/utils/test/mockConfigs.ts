@@ -114,6 +114,7 @@ const initialMockClerkConfig: Clerk = {
       identifier: null,
       createdSessionId: null,
       userData: {},
+      create: jest.fn(),
     },
     lastActiveSessionId: null,
     createdAt: new Date().toISOString(),
@@ -304,7 +305,7 @@ const initialMockEnvironmentResource: EnvironmentResource = {
   onWindowLocationHost: jest.fn(),
 } as any as EnvironmentResource;
 
-export const initialRouteContextValue: RouteContextValue = {
+const initialRouteContextValue: RouteContextValue = {
   basePath: 'test.host',
   startPath: 'test.host',
   fullPath: 'test.host',
@@ -326,26 +327,37 @@ const initialFixtureConfig = {
     enabledFirstFactorIdentifiers: [],
     social: [],
   },
-  user: {},
-  client: {},
+  client: {
+    signIn: {
+      create: jest.fn(),
+    },
+  },
+  routeContext: {
+    navigate: jest.fn(),
+  },
 };
 
-export const getInitialFixtureConfig = () => JSON.parse(JSON.stringify(initialFixtureConfig));
+export const getInitialFixtureConfig = () => {
+  const config = JSON.parse(JSON.stringify(initialFixtureConfig));
+  config.client.signIn.create = jest.fn();
+  config.routeContext.navigate = jest.fn();
+  return config;
+};
 export const getInitialMockClerkConfig = () => {
   const config = JSON.parse(JSON.stringify(initialMockClerkConfig));
+  config.addListener = jest.fn();
+  config.createdAt = new Date().toISOString();
+  config.updatedAt = new Date().toISOString();
+  return config;
+};
+export const getInitialRouteContextValue = () => {
+  const config = JSON.parse(JSON.stringify(initialRouteContextValue));
   config.getMatchData = jest.fn();
   config.matches = jest.fn();
   config.baseNavigate = jest.fn();
   config.navigate = jest.fn();
   config.resolve = jest.fn(() => ({ href: 'test.host' } as any));
   config.refresh = jest.fn();
-  return config;
-};
-export const getInitialRouteContextValue = () => {
-  const config = JSON.parse(JSON.stringify(initialMockClerkConfig));
-  config.addListener = jest.fn();
-  config.createdAt = new Date().toISOString();
-  config.updatedAt = new Date().toISOString();
   return config;
 };
 export const getInitialEnvironmentResource = () => {
