@@ -8,6 +8,7 @@ import type { ActJWTClaim } from './jwt';
 import { OAuthProvider } from './oauth';
 import { OrganizationInvitationStatus } from './organizationInvitation';
 import { MembershipRole } from './organizationMembership';
+import { OrganizationSettingsJSON } from './organizationSettings';
 import { SessionStatus } from './session';
 import { SignInFirstFactor, SignInJSON, SignInSecondFactor } from './signIn';
 import { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUp';
@@ -55,6 +56,7 @@ export interface EnvironmentJSON extends ClerkResourceJSON {
   auth_config: AuthConfigJSON;
   display_config: DisplayConfigJSON;
   user_settings: UserSettingsJSON;
+  organization_settings: OrganizationSettingsJSON;
 }
 
 export interface ClientJSON extends ClerkResourceJSON {

@@ -3,10 +3,12 @@ import type {
   DisplayConfigResource,
   EnvironmentJSON,
   EnvironmentResource,
+  OrganizationSettingsResource,
   UserSettingsResource,
 } from '@clerk/types';
 
 import { AuthConfig, BaseResource, DisplayConfig, UserSettings } from './internal';
+import { OrganizationSettings } from './OrganizationSettings';
 
 export class Environment extends BaseResource implements EnvironmentResource {
   private static instance: Environment;
@@ -15,6 +17,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
   authConfig!: AuthConfigResource;
   displayConfig!: DisplayConfigResource;
   userSettings!: UserSettingsResource;
+  organizationSettings!: OrganizationSettingsResource;
 
   public static getInstance(): Environment {
     if (!Environment.instance) {
@@ -53,6 +56,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
       this.authConfig = new AuthConfig(data.auth_config);
       this.displayConfig = new DisplayConfig(data.display_config);
       this.userSettings = new UserSettings(data.user_settings);
+      this.organizationSettings = new OrganizationSettings(data.organization_settings);
     }
     return this;
   }
