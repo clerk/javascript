@@ -20,7 +20,7 @@ const applyOptionsToInitialMockConfig = (fixtureConfig: any) => {
   return { mockClerkConfig, mockEnvironmentResource, mockRouteContextValue };
 };
 
-export const createClerkFixture = (fixtureConfig: any) => {
+export const createClerkMockContexts = (fixtureConfig: any) => {
   const { mockClerkConfig, mockEnvironmentResource, mockRouteContextValue } =
     applyOptionsToInitialMockConfig(fixtureConfig);
   const listeners: any[] = [];

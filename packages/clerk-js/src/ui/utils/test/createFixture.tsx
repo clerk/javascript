@@ -7,7 +7,7 @@ import { AppearanceProvider } from '../../customizables';
 import { FlowMetadataProvider } from '../../elements';
 import { RouteContext } from '../../router';
 import { InternalThemeProvider } from '../../styledSystem';
-import { createClerkFixture } from './createClerkFeature';
+import { createClerkMockContexts } from './createClerkMockContexts';
 import { getInitialFixtureConfig } from './mockConfigs';
 
 type FParam = {
@@ -50,7 +50,6 @@ export const createFixture = (configFn?: ConfigFn) => {
       });
     },
     withGoogleOAuth: () => {
-      // @ts-ignore
       config.environment.social.push({
         oauthProvider: 'oauth_google',
         enabled: true,
@@ -58,7 +57,6 @@ export const createFixture = (configFn?: ConfigFn) => {
       });
     },
     withDiscordOAuth: () => {
-      // @ts-ignore
       config.environment.social.push({
         oauthProvider: 'oauth_discord',
         enabled: true,
@@ -66,7 +64,6 @@ export const createFixture = (configFn?: ConfigFn) => {
       });
     },
     withInstagramOAuth: () => {
-      // @ts-ignore
       config.environment.social.push({
         oauthProvider: 'oauth_instagram',
         enabled: true,
@@ -74,13 +71,11 @@ export const createFixture = (configFn?: ConfigFn) => {
       });
     },
     mockSignInCreate: (opts?: { responseStatus: SignInStatus }) => {
-      // @ts-ignore
       const mockCreate = jest.fn(() => Promise.resolve({ status: opts?.responseStatus }));
       config.client.signIn.create = mockCreate;
       return mockCreate;
     },
     mockRouteNavigate: () => {
-      // @ts-ignore
       const mockNavigate = jest.fn();
       config.routeContext.navigate = mockNavigate;
       return mockNavigate;
@@ -90,7 +85,7 @@ export const createFixture = (configFn?: ConfigFn) => {
     configFn(f);
   }
 
-  const { mockedEnvironment, mockedClerk, mockedRouteContext, updateClerkMock } = createClerkFixture(config);
+  const { mockedEnvironment, mockedClerk, mockedRouteContext, updateClerkMock } = createClerkMockContexts(config);
 
   const MockClerkProvider = (props: any) => {
     const { children } = props;
