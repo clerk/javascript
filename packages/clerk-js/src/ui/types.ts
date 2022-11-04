@@ -54,5 +54,5 @@ export type AvailableComponentCtx =
   | UserButtonCtx
   | UserProfileCtx
   | OrganizationProfileCtx
-  | CreateOrganizationProps
+  | CreateOrganizationCtx
   | OrganizationSwitcherCtx;
