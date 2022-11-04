@@ -1,13 +1,9 @@
-import React from 'react';
-
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser } from '../../contexts';
 import { localizationKeys } from '../../customizables';
-import { Form, useCardState, withCardStateProvider } from '../../elements';
+import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
-import { FormButtons } from './FormButtons';
-import { SuccessPage } from './SuccessPage';
-import { ContentPage } from './UserProfileContentPage';
+import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 export const PasswordPage = withCardStateProvider(() => {
   const title = localizationKeys('userProfile.passwordPage.title');
@@ -48,7 +44,10 @@ export const PasswordPage = withCardStateProvider(() => {
 
   return (
     <Wizard {...wizard.props}>
-      <ContentPage headerTitle={title}>
+      <ContentPage
+        headerTitle={title}
+        Breadcrumbs={UserProfileBreadcrumbs}
+      >
         <Form.Root
           onSubmit={updatePassword}
           onBlur={validateForm}
@@ -71,6 +70,7 @@ export const PasswordPage = withCardStateProvider(() => {
       <SuccessPage
         title={title}
         text={localizationKeys('userProfile.passwordPage.successMessage')}
+        Breadcrumbs={UserProfileBreadcrumbs}
       />
     </Wizard>
   );

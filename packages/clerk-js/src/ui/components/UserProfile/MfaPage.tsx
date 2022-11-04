@@ -3,15 +3,20 @@ import React from 'react';
 
 import { useCoreUser, useEnvironment } from '../../contexts';
 import { Col, Grid, localizationKeys, Text } from '../../customizables';
-import { TileButton, useCardState, withCardStateProvider } from '../../elements';
+import {
+  ContentPage,
+  FormButtonContainer,
+  NavigateToFlowStartButton,
+  TileButton,
+  useCardState,
+  withCardStateProvider,
+} from '../../elements';
 import { AuthApp, DotCircle, Mobile } from '../../icons';
 import { mqu } from '../../styledSystem';
-import { FormButtonContainer } from './FormButtons';
 import { MfaBackupCodePage } from './MfaBackupCodePage';
 import { MfaPhoneCodePage } from './MfaPhoneCodePage';
 import { MfaTOTPPage } from './MfaTOTPPage';
-import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
-import { ContentPage } from './UserProfileContentPage';
+import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 import { getSecondFactorsAvailableToAdd } from './utils';
 
 export const MfaPage = withCardStateProvider(() => {
@@ -33,7 +38,12 @@ export const MfaPage = withCardStateProvider(() => {
   }, []);
 
   if (card.error) {
-    return <ContentPage headerTitle={title} />;
+    return (
+      <ContentPage
+        headerTitle={title}
+        Breadcrumbs={UserProfileBreadcrumbs}
+      />
+    );
   }
 
   // If there is only an available method or one has been selected, render the dedicated page instead
@@ -42,7 +52,10 @@ export const MfaPage = withCardStateProvider(() => {
   }
 
   return (
-    <ContentPage headerTitle={title}>
+    <ContentPage
+      headerTitle={title}
+      Breadcrumbs={UserProfileBreadcrumbs}
+    >
       <Col gap={4}>
         <Text localizationKey={localizationKeys('userProfile.mfaPage.formHint')} />
         <Grid

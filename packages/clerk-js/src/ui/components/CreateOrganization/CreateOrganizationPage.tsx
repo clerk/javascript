@@ -3,13 +3,11 @@ import React from 'react';
 import { useWizard, Wizard } from '../../common';
 import { useCoreClerk, useCoreOrganization, useCoreOrganizations, useCreateOrganizationContext } from '../../contexts';
 import { Button, Text } from '../../customizables';
-import { Form, useCardState, withCardStateProvider } from '../../elements';
+import { ContentPage, Form, FormButtonContainer, useCardState, withCardStateProvider } from '../../elements';
 import { localizationKeys } from '../../localization';
 import { handleError, useFormControl } from '../../utils';
 import { InviteMembersForm } from '../OrganizationProfile/InviteMembersForm';
-import { ContentPage } from '../OrganizationProfile/OrganizationContentPage';
 import { OrganizationProfileAvatarUploader } from '../OrganizationProfile/OrganizationProfileAvatarUploader';
-import { FormButtonContainer } from '../UserProfile/FormButtons';
 
 export const CreateOrganizationPage = withCardStateProvider(() => {
   // const title = localizationKeys('userProfile.profilePage.title');

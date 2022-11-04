@@ -4,12 +4,11 @@ import React from 'react';
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser, useEnvironment } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
-import { Form, useCardState, withCardStateProvider } from '../../elements';
+import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
-import { FormButtons } from './FormButtons';
-import { SuccessPage } from './SuccessPage';
-import { ContentPage } from './UserProfileContentPage';
+import { OrganizationProfileBreadcrumbs } from '../OrganizationProfile/OrganizationProfileNavbar';
+import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 import { magicLinksEnabledForInstance } from './utils';
 import { VerifyWithCode } from './VerifyWithCode';
 import { VerifyWithLink } from './VerifyWithLink';
@@ -100,6 +99,7 @@ export const EmailPage = withCardStateProvider(() => {
                 identifier: emailAddressRef.current?.emailAddress || '',
               })
         }
+        Breadcrumbs={UserProfileBreadcrumbs}
       />
     </Wizard>
   );

@@ -3,13 +3,17 @@ import React from 'react';
 
 import { useCoreUser } from '../../contexts';
 import { Col, localizationKeys } from '../../customizables';
-import { useCardState, useCodeControl } from '../../elements';
+import {
+  ContentPage,
+  FormButtonContainer,
+  NavigateToFlowStartButton,
+  useCardState,
+  useCodeControl,
+} from '../../elements';
 import { CodeForm } from '../../elements/CodeForm';
 import { useLoadingStatus } from '../../hooks';
 import { handleError, sleep, useFormControl } from '../../utils';
-import { FormButtonContainer } from './FormButtons';
-import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
-import { ContentPage } from './UserProfileContentPage';
+import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 type VerifyTOTPProps = {
   onVerified: () => void;
@@ -49,7 +53,10 @@ export const VerifyTOTP = (props: VerifyTOTPProps) => {
   });
 
   return (
-    <ContentPage headerTitle={localizationKeys('userProfile.mfaTOTPPage.title')}>
+    <ContentPage
+      headerTitle={localizationKeys('userProfile.mfaTOTPPage.title')}
+      Breadcrumbs={UserProfileBreadcrumbs}
+    >
       <Col>
         <CodeForm
           title={'Verification code'}

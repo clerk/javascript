@@ -4,14 +4,20 @@ import React from 'react';
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser } from '../../contexts';
 import { Col, LocalizationKey, localizationKeys, Text } from '../../customizables';
-import { ArrowBlockButton, useCardState, withCardStateProvider } from '../../elements';
+import {
+  ArrowBlockButton,
+  ContentPage,
+  FormButtonContainer,
+  NavigateToFlowStartButton,
+  SuccessPage,
+  useCardState,
+  withCardStateProvider,
+} from '../../elements';
 import { getFlagEmojiFromCountryIso, handleError, parsePhoneString, stringToFormattedPhoneString } from '../../utils';
-import { FormButtonContainer } from './FormButtons';
-import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
+import { MfaBackupCodeList } from './MfaBackupCodeList';
 import { AddPhone, VerifyPhone } from './PhonePage';
-import { SuccessPage } from './SuccessPage';
 import { AddBlockButton } from './UserProfileBlockButtons';
-import { ContentPage } from './UserProfileContentPage';
+import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 export const MfaPhoneCodePage = withCardStateProvider(() => {
   const ref = React.useRef<PhoneNumberResource>();
@@ -42,7 +48,13 @@ export const MfaPhoneCodePage = withCardStateProvider(() => {
       <SuccessPage
         title={localizationKeys('userProfile.mfaPhoneCodePage.title')}
         text={localizationKeys('userProfile.mfaPhoneCodePage.successMessage')}
-        backupCodes={ref.current?.backupCodes}
+        content={
+          <MfaBackupCodeList
+            subtitle={localizationKeys('userProfile.backupCodePage.successSubtitle')}
+            backupCodes={ref.current?.backupCodes}
+          />
+        }
+        Breadcrumbs={UserProfileBreadcrumbs}
       />
     </Wizard>
   );
@@ -80,7 +92,10 @@ const AddMfa = (props: AddMfaProps) => {
   };
 
   return (
-    <ContentPage headerTitle={title}>
+    <ContentPage
+      headerTitle={title}
+      Breadcrumbs={UserProfileBreadcrumbs}
+    >
       <Text
         localizationKey={localizationKeys(
           availableMethods.length

@@ -1,12 +1,8 @@
-import React from 'react';
-
 import { useWizard, Wizard } from '../../common';
 import { Button, localizationKeys, Text } from '../../customizables';
-import { withCardStateProvider } from '../../elements';
-import { FormButtonContainer } from './FormButtons';
+import { ContentPage, FormButtonContainer, NavigateToFlowStartButton, withCardStateProvider } from '../../elements';
 import { MfaBackupCodeCreatePage } from './MfaBackupCodeCreatePage';
-import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
-import { ContentPage } from './UserProfileContentPage';
+import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 export const MfaBackupCodePage = withCardStateProvider(() => {
   const wizard = useWizard();
@@ -28,7 +24,10 @@ const AddBackupCode = (props: AddBackupCodeProps) => {
   const { onContinue } = props;
 
   return (
-    <ContentPage headerTitle={localizationKeys('userProfile.backupCodePage.title')}>
+    <ContentPage
+      headerTitle={localizationKeys('userProfile.backupCodePage.title')}
+      Breadcrumbs={UserProfileBreadcrumbs}
+    >
       <Text localizationKey={localizationKeys('userProfile.backupCodePage.infoText1')} />
       <Text localizationKey={localizationKeys('userProfile.backupCodePage.infoText2')} />
 

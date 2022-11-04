@@ -2,12 +2,10 @@ import { EmailAddressResource, PhoneNumberResource } from '@clerk/types';
 import React from 'react';
 
 import { localizationKeys } from '../../customizables';
-import { useCardState, useCodeControl } from '../../elements';
+import { FormButtonContainer, NavigateToFlowStartButton, useCardState, useCodeControl } from '../../elements';
 import { CodeForm } from '../../elements/CodeForm';
 import { useLoadingStatus } from '../../hooks';
 import { handleError, sleep, useFormControl } from '../../utils';
-import { FormButtonContainer } from './FormButtons';
-import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
 
 type VerifyWithCodeProps = {
   nextStep: () => void;

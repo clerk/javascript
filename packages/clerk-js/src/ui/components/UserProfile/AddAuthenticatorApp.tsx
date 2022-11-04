@@ -4,11 +4,16 @@ import React from 'react';
 
 import { useCoreUser } from '../../contexts';
 import { Button, Col, LocalizationKey, localizationKeys, Text } from '../../customizables';
-import { ClipboardInput, FullHeightLoader, useCardState } from '../../elements';
+import {
+  ClipboardInput,
+  ContentPage,
+  FormButtonContainer,
+  FullHeightLoader,
+  NavigateToFlowStartButton,
+  useCardState,
+} from '../../elements';
 import { handleError } from '../../utils';
-import { FormButtonContainer } from './FormButtons';
-import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
-import { ContentPage } from './UserProfileContentPage';
+import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 type AddAuthenticatorAppProps = {
   title: LocalizationKey;
@@ -38,7 +43,10 @@ export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
   }
 
   return (
-    <ContentPage headerTitle={title}>
+    <ContentPage
+      headerTitle={title}
+      Breadcrumbs={UserProfileBreadcrumbs}
+    >
       {!totp && <FullHeightLoader />}
 
       {totp && (

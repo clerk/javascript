@@ -3,9 +3,10 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { localizationKeys } from '../../customizables';
-import { withCardStateProvider } from '../../elements';
+import { SuccessPage, withCardStateProvider } from '../../elements';
 import { AddAuthenticatorApp } from './AddAuthenticatorApp';
-import { SuccessPage } from './SuccessPage';
+import { MfaBackupCodeList } from './MfaBackupCodeList';
+import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 import { VerifyTOTP } from './VerifyTOTP';
 
 export const MfaTOTPPage = withCardStateProvider(() => {
@@ -27,7 +28,13 @@ export const MfaTOTPPage = withCardStateProvider(() => {
       <SuccessPage
         title={localizationKeys('userProfile.mfaTOTPPage.title')}
         text={localizationKeys('userProfile.mfaTOTPPage.successMessage')}
-        backupCodes={ref.current?.backupCodes}
+        content={
+          <MfaBackupCodeList
+            subtitle={localizationKeys('userProfile.backupCodePage.successSubtitle')}
+            backupCodes={ref.current?.backupCodes}
+          />
+        }
+        Breadcrumbs={UserProfileBreadcrumbs}
       />
     </Wizard>
   );
