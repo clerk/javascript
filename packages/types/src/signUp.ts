@@ -94,6 +94,11 @@ export type PrepareVerificationParams =
     }
   | {
       strategy: Web3Strategy;
+    }
+  | {
+      strategy: OAuthStrategy;
+      redirectUrl?: string;
+      actionCompleteRedirectUrl?: string;
     };
 
 export type AttemptVerificationParams =
