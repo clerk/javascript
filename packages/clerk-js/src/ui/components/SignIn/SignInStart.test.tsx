@@ -17,14 +17,8 @@ describe('SignInStart', () => {
     );
 
     const component = screen.getByText('Sign in');
-    // const googleOauth = screen.getByText('Continue with Google');
-    // const discordOauth = screen.getByText('Continue with Discord');
-    // const instagramOauth = container.getElementsByClassName('cl-socialButtonsIconButton__instagram');
 
     expect(component).toBeDefined();
-    // expect(googleOauth).toBeDefined();
-    // expect(discordOauth).toBeDefined();
-    // expect(instagramOauth).toBeDefined();
 
     // updateMock(mocks => {
     //   // TBD, use as a sample only
@@ -189,7 +183,7 @@ describe('SignInStart', () => {
       });
     });
 
-    it('nav', async () => {
+    it('navigates to /factor-one page when user clicks on Continue button and create needs a first factor', async () => {
       let mockCreateFn: any;
       let mockRouteNavigateFn: any;
       const { MockClerkProvider } = createFixture(f => {
@@ -208,6 +202,28 @@ describe('SignInStart', () => {
       await waitFor(() => {
         expect(mockCreateFn).toHaveBeenCalled();
         expect(mockRouteNavigateFn).toHaveBeenCalledWith('factor-one');
+      });
+    });
+
+    it('navigates to /factor-two page when user clicks on Continue button and create needs a second factor', async () => {
+      let mockCreateFn: any;
+      let mockRouteNavigateFn: any;
+      const { MockClerkProvider } = createFixture(f => {
+        f.withEmailAddress();
+        mockCreateFn = f.mockSignInCreate({ responseStatus: 'needs_second_factor' });
+        mockRouteNavigateFn = f.mockRouteNavigate();
+      });
+
+      render(
+        <MockClerkProvider>
+          <SignInStart />
+        </MockClerkProvider>,
+      );
+
+      fireEvent.click(screen.getByText('Continue'));
+      await waitFor(() => {
+        expect(mockCreateFn).toHaveBeenCalled();
+        expect(mockRouteNavigateFn).toHaveBeenCalledWith('factor-two');
       });
     });
   });
