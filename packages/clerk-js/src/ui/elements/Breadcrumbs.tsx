@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { useNavigateToFlowStart } from '../components/UserProfile/NavigateToFlowStartButton';
 import { descriptors, Flex, Icon, Link, LocalizationKey, Text, useLocalizations } from '../customizables';
+import { useNavigateToFlowStart } from '../elements';
 import { useRouter } from '../router';
 import { mqu, PropsOfComponent } from '../styledSystem';
 import { NavbarRoute } from './Navbar';

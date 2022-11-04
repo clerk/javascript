@@ -3,13 +3,11 @@ import React from 'react';
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser } from '../../contexts';
 import { LocalizationKey, localizationKeys, Text } from '../../customizables';
-import { Form, useCardState, withCardStateProvider } from '../../elements';
+import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
 import { handleError } from '../../utils';
-import { FormButtons } from './FormButtons';
-import { SuccessPage } from './SuccessPage';
-import { ContentPage } from './UserProfileContentPage';
+import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 export const RemoveEmailPage = () => {
   const user = useCoreUser();
@@ -169,7 +167,10 @@ const RemoveResourcePage = withCardStateProvider((props: RemovePageProps) => {
 
   return (
     <Wizard {...wizard.props}>
-      <ContentPage headerTitle={title}>
+      <ContentPage
+        headerTitle={title}
+        Breadcrumbs={UserProfileBreadcrumbs}
+      >
         <Form.Root onSubmit={handleSubmit}>
           <Text
             localizationKey={messageLine1}
@@ -185,6 +186,7 @@ const RemoveResourcePage = withCardStateProvider((props: RemovePageProps) => {
       <SuccessPage
         title={title}
         text={successMessage}
+        Breadcrumbs={UserProfileBreadcrumbs}
       />
     </Wizard>
   );

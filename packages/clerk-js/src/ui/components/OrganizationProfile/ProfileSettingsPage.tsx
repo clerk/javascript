@@ -3,12 +3,11 @@ import React from 'react';
 import { useWizard, Wizard } from '../../common';
 import { useCoreOrganization } from '../../contexts';
 import { localizationKeys } from '../../customizables';
-import { Form, useCardState, withCardStateProvider } from '../../elements';
+import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
-import { FormButtons } from '../UserProfile/FormButtons';
-import { SuccessPage } from '../UserProfile/SuccessPage';
-import { ContentPage } from './OrganizationContentPage';
+import { UserProfileBreadcrumbs } from '../UserProfile/UserProfileNavbar';
 import { OrganizationProfileAvatarUploader } from './OrganizationProfileAvatarUploader';
+import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
 export const ProfileSettingsPage = withCardStateProvider(() => {
   // const title = localizationKeys('userProfile.profilePage.title');
@@ -53,6 +52,7 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
       <ContentPage
         headerTitle={title}
         headerSubtitle={subtitle}
+        Breadcrumbs={OrganizationProfileBreadcrumbs}
       >
         <Form.Root onSubmit={onSubmit}>
           <OrganizationProfileAvatarUploader
@@ -71,6 +71,7 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
       <SuccessPage
         title={title}
         text={localizationKeys('organizationProfile.profilePage.successMessage')}
+        Breadcrumbs={UserProfileBreadcrumbs}
       />
     </Wizard>
   );

@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { Button } from '../../customizables';
-import { useRouter } from '../../router';
-import { PropsOfComponent } from '../../styledSystem';
+import { Button } from '../customizables';
+import { useRouter } from '../router';
+import { PropsOfComponent } from '../styledSystem';
 
 type NavigateToFlowStartButtonProps = PropsOfComponent<typeof Button>;
 

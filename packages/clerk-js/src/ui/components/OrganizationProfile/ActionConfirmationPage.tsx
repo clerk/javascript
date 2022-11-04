@@ -1,14 +1,17 @@
-import React from 'react';
-
 import { useWizard, Wizard } from '../../common';
 import { useCoreOrganization, useCoreUser, useOrganizationProfileContext } from '../../contexts';
 import { LocalizationKey, localizationKeys, Text } from '../../customizables';
-import { Form, useCardState, withCardStateProvider } from '../../elements';
+import {
+  ContentPage,
+  Form,
+  FormButtonContainer,
+  SuccessPage,
+  useCardState,
+  withCardStateProvider,
+} from '../../elements';
 import { useNavigate } from '../../hooks';
 import { handleError } from '../../utils';
-import { FormButtonContainer } from '../UserProfile/FormButtons';
-import { SuccessPage } from '../UserProfile/SuccessPage';
-import { ContentPage } from './OrganizationContentPage';
+import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
 export const LeaveOrganizationPage = () => {
   const card = useCardState();
@@ -60,7 +63,10 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
 
   return (
     <Wizard {...wizard.props}>
-      <ContentPage headerTitle={title}>
+      <ContentPage
+        headerTitle={title}
+        Breadcrumbs={OrganizationProfileBreadcrumbs}
+      >
         <Form.Root onSubmit={handleSubmit}>
           <Text
             localizationKey={messageLine1}

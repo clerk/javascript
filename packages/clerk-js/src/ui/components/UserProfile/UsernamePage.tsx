@@ -1,13 +1,9 @@
-import React from 'react';
-
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser } from '../../contexts';
 import { localizationKeys } from '../../customizables';
-import { Form, useCardState, withCardStateProvider } from '../../elements';
+import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
-import { FormButtons } from './FormButtons';
-import { SuccessPage } from './SuccessPage';
-import { ContentPage } from './UserProfileContentPage';
+import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 export const UsernamePage = withCardStateProvider(() => {
   const user = useCoreUser();
@@ -32,7 +28,10 @@ export const UsernamePage = withCardStateProvider(() => {
 
   return (
     <Wizard {...wizard.props}>
-      <ContentPage headerTitle={localizationKeys('userProfile.usernamePage.title')}>
+      <ContentPage
+        headerTitle={localizationKeys('userProfile.usernamePage.title')}
+        Breadcrumbs={UserProfileBreadcrumbs}
+      >
         <Form.Root onSubmit={updatePassword}>
           <Form.ControlRow>
             <Form.Control
@@ -47,6 +46,7 @@ export const UsernamePage = withCardStateProvider(() => {
       <SuccessPage
         title={localizationKeys('userProfile.usernamePage.title')}
         text={localizationKeys('userProfile.usernamePage.successMessage')}
+        Breadcrumbs={UserProfileBreadcrumbs}
       />
     </Wizard>
   );

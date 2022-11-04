@@ -5,14 +5,19 @@ import { generateSignatureWithMetamask, getMetamaskIdentifier } from '../../../u
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser } from '../../contexts';
 import { Col, descriptors, Image, localizationKeys, Text } from '../../customizables';
-import { ArrowBlockButton, useCardState, withCardStateProvider } from '../../elements';
+import {
+  ArrowBlockButton,
+  ContentPage,
+  FormButtonContainer,
+  NavigateToFlowStartButton,
+  SuccessPage,
+  useCardState,
+  withCardStateProvider,
+} from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
 import { getFieldError, handleError } from '../../utils';
-import { FormButtonContainer } from './FormButtons';
-import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
-import { SuccessPage } from './SuccessPage';
-import { ContentPage } from './UserProfileContentPage';
+import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 export const Web3Page = withCardStateProvider(() => {
   const user = useCoreUser();
@@ -29,6 +34,7 @@ export const Web3Page = withCardStateProvider(() => {
       <SuccessPage
         title={localizationKeys('userProfile.web3WalletPage.title')}
         text={localizationKeys('userProfile.web3WalletPage.successMessage')}
+        Breadcrumbs={UserProfileBreadcrumbs}
       />
     </Wizard>
   );
@@ -69,7 +75,10 @@ const AddWeb3Wallet = (props: { nextStep: () => void }) => {
   };
 
   return (
-    <ContentPage headerTitle={localizationKeys('userProfile.web3WalletPage.title')}>
+    <ContentPage
+      headerTitle={localizationKeys('userProfile.web3WalletPage.title')}
+      Breadcrumbs={UserProfileBreadcrumbs}
+    >
       <Text
         localizationKey={localizationKeys(
           unconnectedStrategies.length

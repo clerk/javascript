@@ -3,11 +3,10 @@ import React from 'react';
 
 import { ClerkAPIResponseError } from '../../../core/resources/Error';
 import { Flex, Text } from '../../customizables';
-import { Alert, Form, Select, TagInput, useCardState } from '../../elements';
+import { Alert, Form, FormButtonContainer, Select, TagInput, useCardState } from '../../elements';
 import { useNavigate } from '../../hooks';
 import { LocalizationKey, localizationKeys, useLocalizations } from '../../localization';
 import { handleError, roleLocalizationKey, useFormControl } from '../../utils';
-import { FormButtonContainer } from '../UserProfile/FormButtons';
 
 const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);
 

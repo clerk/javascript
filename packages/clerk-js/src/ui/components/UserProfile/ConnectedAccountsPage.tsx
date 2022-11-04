@@ -4,14 +4,20 @@ import React from 'react';
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser } from '../../contexts';
 import { Col, Image, localizationKeys, Text } from '../../customizables';
-import { ArrowBlockButton, useCardState, withCardStateProvider } from '../../elements';
+import {
+  ArrowBlockButton,
+  ContentPage,
+  FormButtonContainer,
+  NavigateToFlowStartButton,
+  SuccessPage,
+  useCardState,
+  withCardStateProvider,
+} from '../../elements';
 import { useEnabledThirdPartyProviders, useNavigate } from '../../hooks';
 import { useRouter } from '../../router';
 import { handleError, sleep } from '../../utils';
-import { FormButtonContainer } from './FormButtons';
-import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
-import { SuccessPage } from './SuccessPage';
-import { ContentPage } from './UserProfileContentPage';
+import { OrganizationProfileBreadcrumbs } from '../OrganizationProfile/OrganizationProfileNavbar';
+import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 export const ConnectedAccountsPage = withCardStateProvider(() => {
   const title = localizationKeys('userProfile.connectedAccountPage.title');
@@ -30,6 +36,7 @@ export const ConnectedAccountsPage = withCardStateProvider(() => {
       <SuccessPage
         title={title}
         text={localizationKeys('userProfile.connectedAccountPage.successMessage')}
+        Breadcrumbs={UserProfileBreadcrumbs}
       />
     </Wizard>
   );

@@ -6,7 +6,7 @@ import { CardAlert, Header, NavbarMenuButtonRow, useCardState } from './index';
 
 type PageProps = PropsOfComponent<typeof Col> & {
   headerTitle: LocalizationKey;
-  Breadcrumbs: React.ComponentType<any> | null;
+  Breadcrumbs?: React.ComponentType<any> | null;
   headerSubtitle?: LocalizationKey;
 };
 

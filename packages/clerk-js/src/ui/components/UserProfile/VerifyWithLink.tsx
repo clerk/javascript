@@ -5,11 +5,9 @@ import { EmailLinkStatusCard } from '../../common';
 import { buildMagicLinkRedirectUrl } from '../../common/redirects';
 import { useEnvironment, useUserProfileContext } from '../../contexts';
 import { localizationKeys } from '../../customizables';
-import { useCardState, VerificationLink } from '../../elements';
+import { FormButtonContainer, NavigateToFlowStartButton, useCardState, VerificationLink } from '../../elements';
 import { useMagicLink } from '../../hooks';
 import { handleError } from '../../utils';
-import { FormButtonContainer } from './FormButtons';
-import { NavigateToFlowStartButton } from './NavigateToFlowStartButton';
 
 type VerifyWithLinkProps = {
   email: EmailAddressResource;
