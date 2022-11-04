@@ -1,15 +1,14 @@
 import { CreateOrganizationProps } from '@clerk/types';
 import React from 'react';
 
-import { ComponentContext, useCoreOrganization, withCoreUserGuard } from '../../contexts';
+import { ComponentContext, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
-import { ProfileCard, withCardStateProvider } from '../../elements';
+import { ProfileCard, ProfileCardContent, withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
 import { CreateOrganizationCtx } from '../../types';
+import { CreateOrganizationPage } from './CreateOrganizationPage';
 
 const _CreateOrganization = (_: CreateOrganizationProps) => {
-  const { organization } = useCoreOrganization();
-
   return (
     <Flow.Root flow='createOrganization'>
       <Flow.Part>
@@ -24,7 +23,13 @@ const _CreateOrganization = (_: CreateOrganizationProps) => {
 };
 
 const AuthenticatedRoutes = withCoreUserGuard(() => {
-  return <ProfileCard sx={{ height: '100%' }}>yooooooooo create</ProfileCard>;
+  return (
+    <ProfileCard>
+      <ProfileCardContent>
+        <CreateOrganizationPage />
+      </ProfileCardContent>
+    </ProfileCard>
+  );
 });
 
 export const CreateOrganization = withCardStateProvider(_CreateOrganization);

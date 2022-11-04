@@ -11,7 +11,7 @@ type PageProps = PropsOfComponent<typeof Col> & {
 };
 
 export const ContentPage = (props: PageProps) => {
-  const { headerTitle, headerSubtitle, children, Breadcrumbs, ...rest } = props;
+  const { headerTitle, headerSubtitle, children, Breadcrumbs, sx, ...rest } = props;
   const card = useCardState();
 
   return (
@@ -19,7 +19,7 @@ export const ContentPage = (props: PageProps) => {
       elementDescriptor={descriptors.page}
       gap={8}
       {...rest}
-      sx={t => ({ minHeight: t.sizes.$120 })}
+      sx={[t => ({ minHeight: t.sizes.$120 }), sx]}
     >
       <NavbarMenuButtonRow />
       <CardAlert>{card.error}</CardAlert>
