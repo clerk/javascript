@@ -1,7 +1,7 @@
 import '../styles/globals.css';
 import type { AppProps } from 'next/app';
 
-import { ClerkProvider, SignInButton, UnstableOrganizationSwitcher, UserButton } from '@clerk/nextjs';
+import { ClerkProvider, OrganizationSwitcher, SignInButton, UserButton } from '@clerk/nextjs';
 import { dark, neobrutalism, shadesOfPurple } from '@clerk/themes';
 import Link from 'next/link';
 import React, { useState } from 'react';
@@ -57,12 +57,12 @@ const AppBar = (props: AppBarProps) => {
         marginBottom: '2rem',
       }}
     >
-      <UnstableOrganizationSwitcher afterCreateOrganizationUrl={'https://www.google.com'} />
-      <UnstableOrganizationSwitcher
+      <OrganizationSwitcher afterCreateOrganizationUrl={'https://www.google.com'} />
+      <OrganizationSwitcher
         hidePersonal
         afterLeaveOrganizationUrl={'https://www.google.com'}
       />
-      <UnstableOrganizationSwitcher organizationProfileMode={'navigation'} />
+      <OrganizationSwitcher organizationProfileMode={'navigation'} />
       <Link href={'/'}>
         <a>
           <h2>Nextjs Playground</h2>
