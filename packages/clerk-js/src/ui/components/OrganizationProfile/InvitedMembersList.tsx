@@ -12,9 +12,16 @@ const ITEMS_PER_PAGE = 10;
 export const InvitedMembersList = () => {
   const card = useCardState();
   const { page, changePage } = usePagination();
-  const { organization, invitationList } = useCoreOrganization({
+  const { organization, invitationList, ...rest } = useCoreOrganization({
     invitationList: { offset: (page - 1) * ITEMS_PER_PAGE, limit: ITEMS_PER_PAGE },
   });
+
+  const mutateSwrState = () => {
+    const unstable__mutate = (rest as any).unstable__mutate;
+    if (unstable__mutate && typeof unstable__mutate === 'function') {
+      unstable__mutate();
+    }
+  };
 
   if (!organization) {
     return null;
@@ -23,6 +30,7 @@ export const InvitedMembersList = () => {
   const revoke = (invitation: OrganizationInvitationResource) => () => {
     return card
       .runAsync(invitation.revoke)
+      .then(mutateSwrState)
       .then(() => changePage(1))
       .catch(err => handleError(err, [], card.setError));
   };

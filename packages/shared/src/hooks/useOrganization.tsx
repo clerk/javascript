@@ -58,14 +58,22 @@ export const useOrganization: UseOrganization = params => {
     ? () => [] as OrganizationMembershipResource[]
     : () => clerk.organization?.getMemberships(membershipListParams);
 
-  const { data: invitationList, isValidating: isInvitationsLoading } = useSWR(
+  const {
+    data: invitationList,
+    isValidating: isInvitationsLoading,
+    mutate: mutateInvitationList,
+  } = useSWR(
     shouldFetch && invitationListParams
       ? cacheKey('invites', organization, lastOrganizationInvitation, invitationListParams)
       : null,
     pendingInvitations,
   );
 
-  const { data: membershipList, isValidating: isMembershipsLoading } = useSWR(
+  const {
+    data: membershipList,
+    isValidating: isMembershipsLoading,
+    mutate: mutateMembershipList,
+  } = useSWR(
     shouldFetch && membershipListParams
       ? cacheKey('memberships', organization, lastOrganizationMember, membershipListParams)
       : null,
@@ -109,6 +117,10 @@ export const useOrganization: UseOrganization = params => {
     membershipList,
     membership: getCurrentOrganizationMembership(session!.user.organizationMemberships, organization.id), // your membership in the current org
     invitationList,
+    unstable__mutate: () => {
+      void mutateMembershipList();
+      void mutateInvitationList();
+    },
   };
 };
 
