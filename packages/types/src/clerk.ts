@@ -646,6 +646,13 @@ export type OrganizationSwitcherProps = {
    */
   organizationProfileMode?: 'modal' | 'navigation';
   /**
+   * Controls whether clicking the "Create organization" button will cause
+   * the CreateOrganization component to open as a modal, or if the browser will navigate
+   * to the `createOrganizationUrl` where CreateOrganization is mounted as a page.
+   * @default modal
+   */
+  createOrganizationMode?: 'modal' | 'navigation';
+  /**
    * Full URL or path where the <OrganizationProfile /> component is mounted.
    * @default undefined
    */
