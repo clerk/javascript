@@ -11,6 +11,8 @@ describe('Organization', () => {
       logo_url: 'https://url-for-logo.png',
       created_at: 12345,
       updated_at: 5678,
+      members_count: 1,
+      pending_invitations_count: 10,
     });
 
     expect(organization).toMatchSnapshot();
