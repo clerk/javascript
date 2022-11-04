@@ -128,7 +128,7 @@ type SocialButtonProps = PropsOfComponent<typeof Button> & {
 };
 
 const SocialButtonIcon = (props: SocialButtonProps): JSX.Element => {
-  const { icon, label, id, ...rest } = props;
+  const { icon, label, id, providerName, ...rest } = props;
   return (
     <Button
       elementDescriptor={descriptors.socialButtonsIconButton}
