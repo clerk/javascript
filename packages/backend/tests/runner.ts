@@ -1,14 +1,20 @@
-import { suite, exec } from 'uvu';
+import type QUnit from 'qunit';
+import suites from './suites';
 
-import verifyTestSuite from '../src/tokens/verify-uvu.test';
+export default async function runTests(QUnit: QUnit): Promise<QUnit.DoneDetails> {
+  QUnit.config.autostart = false;
+  // @ts-expect-error
+  QUnit.reporters.tap.init(QUnit);
 
-// All all other suites here
-const suites = [verifyTestSuite];
-
-export default async function runTests() {
-  suite('hack').run();
-  for (const s of suites) {
-    s.run();
+  for (const suite of suites) {
+    await suite(QUnit);
   }
-  return exec(true);
+
+  QUnit.start();
+
+  return new Promise(resolve => {
+    QUnit.done((details: QUnit.DoneDetails) => {
+      resolve(details);
+    });
+  });
 }

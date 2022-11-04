@@ -1,5 +1,13 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["jest/**/*", "src/**/*"],
-  "exclude": ["node_modules"]
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "module": "ES2022",
+    "moduleResolution": "Node",
+    "noImplicitAny": false,
+    "outDir": "./tests/dist",
+    "target": "ES2020"
+  },
+  "include": ["src/tokens/**/*.test.ts"],
+  "exclude": ["node_modules", "dist", "src/__tests__"]
 }

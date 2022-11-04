@@ -7,7 +7,7 @@ import { type VerifyTokenOptions, verifyToken } from './verify';
 
 type RequiredVerifyTokenOptions = Required<Pick<VerifyTokenOptions, 'apiKey' | 'apiUrl'>>;
 type OptionalVerifyTokenOptions = Partial<
-  Pick<VerifyTokenOptions, 'authorizedParties' | 'clockSkewInSeconds' | 'jwksTtlInMs'>
+  Pick<VerifyTokenOptions, 'authorizedParties' | 'clockSkewInSeconds' | 'jwksCacheTtlInMs' | 'skipJwksCache'>
 >;
 
 export type TokenCarrier = 'header' | 'cookie';

@@ -15,18 +15,18 @@ function getFromCache(kid: string) {
 
 function setInCache(
   jwk: JsonWebKeyWithKid,
-  jwksTtlInMs: number = 1000 * 60 * 60, // 1 hour
+  jwksCacheTtlInMs: number = 1000 * 60 * 60, // 1 hour
 ) {
   cache[jwk.kid] = jwk;
 
-  if (jwksTtlInMs >= 0) {
+  if (jwksCacheTtlInMs >= 0) {
     setTimeout(() => {
       if (jwk) {
         delete cache[jwk.kid];
       } else {
         cache = {};
       }
-    }, jwksTtlInMs);
+    }, jwksCacheTtlInMs);
   }
 }
 
@@ -74,7 +74,11 @@ export function loadClerkJWKFromLocal(localKey?: string): JsonWebKey {
   return getFromCache(LocalJwkKid);
 }
 
-export type LoadClerkJWKFromRemoteOptions = { kid: string; jwksTtlInMs?: number } & (
+export type LoadClerkJWKFromRemoteOptions = {
+  kid: string;
+  jwksCacheTtlInMs?: number;
+  skipJwksCache?: boolean;
+} & (
   | {
       apiKey: string;
       apiUrl: string;
@@ -97,7 +101,7 @@ export type LoadClerkJWKFromRemoteOptions = { kid: string; jwksTtlInMs?: number 
  * @param {string} options.issuer - The issuer origin of the JWT
  * @param {string} options.kid - The id of the key that the JWT was signed with
  * @param {string} options.alg - The algorithm of the JWT
- * @param {number} options.jwksTtlInMs - The TTL of the jwks cache (defaults to 1 hour)
+ * @param {number} options.jwksCacheTtlInMs - The TTL of the jwks cache (defaults to 1 hour)
  * @returns {JsonWebKey} key
  */
 export async function loadClerkJWKFromRemote({
@@ -105,9 +109,10 @@ export async function loadClerkJWKFromRemote({
   apiUrl,
   issuer,
   kid,
-  jwksTtlInMs = 1000 * 60 * 60, // 1 hour,
+  jwksCacheTtlInMs = 1000 * 60 * 60, // 1 hour,
+  skipJwksCache,
 }: LoadClerkJWKFromRemoteOptions): Promise<JsonWebKey> {
-  if (!getFromCache(kid)) {
+  if (skipJwksCache || !getFromCache(kid)) {
     let fetcher;
 
     if (apiUrl && apiKey) {
@@ -132,7 +137,7 @@ export async function loadClerkJWKFromRemote({
       });
     }
 
-    keys.forEach(key => setInCache(key, jwksTtlInMs));
+    keys.forEach(key => setInCache(key, jwksCacheTtlInMs));
   }
 
   const jwk = getFromCache(kid);

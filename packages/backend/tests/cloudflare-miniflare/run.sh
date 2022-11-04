@@ -1,8 +1,9 @@
 #!/bin/bash
+
 current_folder=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
 
-in_file="$current_folder/bundle.ts"
-out_file="$current_folder/bundle.js"
+in_file="$current_folder/worker.ts"
+out_file="$current_folder/worker.js"
 
 npx esbuild \
   --bundle \
@@ -13,5 +14,4 @@ npx esbuild \
   --target=esnext \
   $in_file
 
-node "$current_folder/run.mjs"
-
+node --experimental-vm-modules "$current_folder/run.mjs"

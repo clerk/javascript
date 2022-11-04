@@ -7,3 +7,5 @@ dist
 .tgz
 .env
 .env.local
+bundle.js
+worker.js

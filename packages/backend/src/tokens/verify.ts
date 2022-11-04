@@ -12,10 +12,18 @@ export type VerifyTokenOptions = Pick<
   VerifyJwtOptions,
   'authorizedParties' | 'audience' | 'issuer' | 'clockSkewInSeconds'
 > &
-  Pick<LoadClerkJWKFromRemoteOptions, 'apiKey' | 'apiUrl' | 'jwksTtlInMs'>;
+  Pick<LoadClerkJWKFromRemoteOptions, 'apiKey' | 'apiUrl' | 'jwksCacheTtlInMs' | 'skipJwksCache'>;
 
 export async function verifyToken(token: string, options: VerifyTokenOptions): Promise<JwtPayload> {
-  const { apiKey = API_KEY, apiUrl = API_URL, authorizedParties, clockSkewInSeconds, issuer, jwksTtlInMs } = options;
+  const {
+    apiKey = API_KEY,
+    apiUrl = API_URL,
+    authorizedParties,
+    clockSkewInSeconds,
+    issuer,
+    jwksCacheTtlInMs,
+    skipJwksCache,
+  } = options;
 
   const { header } = decodeJwt(token);
   const { kid } = header;
@@ -34,7 +42,8 @@ export async function verifyToken(token: string, options: VerifyTokenOptions): P
       apiUrl,
       apiKey,
       kid,
-      jwksTtlInMs,
+      jwksCacheTtlInMs,
+      skipJwksCache,
     });
   } else {
     throw new TokenVerificationError({

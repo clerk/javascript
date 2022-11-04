@@ -38,6 +38,5289 @@ var __toESM = (mod, isNodeMode, target) => (
   )
 );
 
+// ../../node_modules/qunit/qunit/qunit.js
+var require_qunit = __commonJS({
+  '../../node_modules/qunit/qunit/qunit.js'(exports, module) {
+    (function () {
+      'use strict';
+      function _typeof(obj) {
+        return (
+          (_typeof =
+            typeof Symbol == 'function' && typeof Symbol.iterator == 'symbol'
+              ? function (obj2) {
+                  return typeof obj2;
+                }
+              : function (obj2) {
+                  return obj2 && typeof Symbol == 'function' && obj2.constructor === Symbol && obj2 !== Symbol.prototype
+                    ? 'symbol'
+                    : typeof obj2;
+                }),
+          _typeof(obj)
+        );
+      }
+      function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) throw new TypeError('Cannot call a class as a function');
+      }
+      function _defineProperties(target, props) {
+        for (var i = 0; i < props.length; i++) {
+          var descriptor = props[i];
+          (descriptor.enumerable = descriptor.enumerable || !1),
+            (descriptor.configurable = !0),
+            'value' in descriptor && (descriptor.writable = !0),
+            Object.defineProperty(target, descriptor.key, descriptor);
+        }
+      }
+      function _createClass(Constructor, protoProps, staticProps) {
+        return (
+          protoProps && _defineProperties(Constructor.prototype, protoProps),
+          staticProps && _defineProperties(Constructor, staticProps),
+          Object.defineProperty(Constructor, 'prototype', {
+            writable: !1,
+          }),
+          Constructor
+        );
+      }
+      function _slicedToArray(arr, i) {
+        return (
+          _arrayWithHoles(arr) ||
+          _iterableToArrayLimit(arr, i) ||
+          _unsupportedIterableToArray(arr, i) ||
+          _nonIterableRest()
+        );
+      }
+      function _toConsumableArray(arr) {
+        return (
+          _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread()
+        );
+      }
+      function _arrayWithoutHoles(arr) {
+        if (Array.isArray(arr)) return _arrayLikeToArray(arr);
+      }
+      function _arrayWithHoles(arr) {
+        if (Array.isArray(arr)) return arr;
+      }
+      function _iterableToArray(iter) {
+        if ((typeof Symbol < 'u' && iter[Symbol.iterator] != null) || iter['@@iterator'] != null)
+          return Array.from(iter);
+      }
+      function _iterableToArrayLimit(arr, i) {
+        var _i = arr == null ? null : (typeof Symbol < 'u' && arr[Symbol.iterator]) || arr['@@iterator'];
+        if (_i != null) {
+          var _arr = [],
+            _n = !0,
+            _d = !1,
+            _s,
+            _e;
+          try {
+            for (
+              _i = _i.call(arr);
+              !(_n = (_s = _i.next()).done) && (_arr.push(_s.value), !(i && _arr.length === i));
+              _n = !0
+            );
+          } catch (err) {
+            (_d = !0), (_e = err);
+          } finally {
+            try {
+              !_n && _i.return != null && _i.return();
+            } finally {
+              if (_d) throw _e;
+            }
+          }
+          return _arr;
+        }
+      }
+      function _unsupportedIterableToArray(o, minLen) {
+        if (!!o) {
+          if (typeof o == 'string') return _arrayLikeToArray(o, minLen);
+          var n = Object.prototype.toString.call(o).slice(8, -1);
+          if ((n === 'Object' && o.constructor && (n = o.constructor.name), n === 'Map' || n === 'Set'))
+            return Array.from(o);
+          if (n === 'Arguments' || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))
+            return _arrayLikeToArray(o, minLen);
+        }
+      }
+      function _arrayLikeToArray(arr, len) {
+        (len == null || len > arr.length) && (len = arr.length);
+        for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
+        return arr2;
+      }
+      function _nonIterableSpread() {
+        throw new TypeError(`Invalid attempt to spread non-iterable instance.
+In order to be iterable, non-array objects must have a [Symbol.iterator]() method.`);
+      }
+      function _nonIterableRest() {
+        throw new TypeError(`Invalid attempt to destructure non-iterable instance.
+In order to be iterable, non-array objects must have a [Symbol.iterator]() method.`);
+      }
+      function _createForOfIteratorHelper(o, allowArrayLike) {
+        var it = (typeof Symbol < 'u' && o[Symbol.iterator]) || o['@@iterator'];
+        if (!it) {
+          if (
+            Array.isArray(o) ||
+            (it = _unsupportedIterableToArray(o)) ||
+            (allowArrayLike && o && typeof o.length == 'number')
+          ) {
+            it && (o = it);
+            var i = 0,
+              F = function () {};
+            return {
+              s: F,
+              n: function () {
+                return i >= o.length
+                  ? {
+                      done: !0,
+                    }
+                  : {
+                      done: !1,
+                      value: o[i++],
+                    };
+              },
+              e: function (e) {
+                throw e;
+              },
+              f: F,
+            };
+          }
+          throw new TypeError(`Invalid attempt to iterate non-iterable instance.
+In order to be iterable, non-array objects must have a [Symbol.iterator]() method.`);
+        }
+        var normalCompletion = !0,
+          didErr = !1,
+          err;
+        return {
+          s: function () {
+            it = it.call(o);
+          },
+          n: function () {
+            var step = it.next();
+            return (normalCompletion = step.done), step;
+          },
+          e: function (e) {
+            (didErr = !0), (err = e);
+          },
+          f: function () {
+            try {
+              !normalCompletion && it.return != null && it.return();
+            } finally {
+              if (didErr) throw err;
+            }
+          },
+        };
+      }
+      function getGlobalThis() {
+        if (typeof globalThis < 'u') return globalThis;
+        if (typeof self < 'u') return self;
+        if (typeof window$1 < 'u') return window$1;
+        if (typeof global < 'u') return global;
+        throw new Error('Unable to locate global object');
+      }
+      var g = getGlobalThis(),
+        window$1 = g.window,
+        console$1 = g.console,
+        setTimeout$1 = g.setTimeout,
+        clearTimeout2 = g.clearTimeout,
+        document2 = window$1 && window$1.document,
+        navigator = window$1 && window$1.navigator,
+        localSessionStorage = (function () {
+          var x = 'qunit-test-string';
+          try {
+            return g.sessionStorage.setItem(x, x), g.sessionStorage.removeItem(x), g.sessionStorage;
+          } catch {
+            return;
+          }
+        })(),
+        StringMap =
+          typeof g.Map == 'function' &&
+          typeof g.Map.prototype.keys == 'function' &&
+          typeof g.Symbol == 'function' &&
+          _typeof(g.Symbol.iterator) === 'symbol'
+            ? g.Map
+            : function (input) {
+                var _this = this,
+                  store = /* @__PURE__ */ Object.create(null),
+                  hasOwn2 = Object.prototype.hasOwnProperty;
+                (this.has = function (strKey) {
+                  return hasOwn2.call(store, strKey);
+                }),
+                  (this.get = function (strKey) {
+                    return store[strKey];
+                  }),
+                  (this.set = function (strKey, val) {
+                    return hasOwn2.call(store, strKey) || this.size++, (store[strKey] = val), this;
+                  }),
+                  (this.delete = function (strKey) {
+                    hasOwn2.call(store, strKey) && (delete store[strKey], this.size--);
+                  }),
+                  (this.forEach = function (callback) {
+                    for (var strKey in store) callback(store[strKey], strKey);
+                  }),
+                  (this.keys = function () {
+                    return Object.keys(store);
+                  }),
+                  (this.clear = function () {
+                    (store = /* @__PURE__ */ Object.create(null)), (this.size = 0);
+                  }),
+                  (this.size = 0),
+                  input &&
+                    input.forEach(function (val, strKey) {
+                      _this.set(strKey, val);
+                    });
+              },
+        StringSet =
+          typeof g.Set == 'function' && typeof g.Set.prototype.values == 'function'
+            ? g.Set
+            : function (input) {
+                var set = /* @__PURE__ */ Object.create(null);
+                return (
+                  Array.isArray(input) &&
+                    input.forEach(function (item) {
+                      set[item] = !0;
+                    }),
+                  {
+                    add: function (value) {
+                      set[value] = !0;
+                    },
+                    has: function (value) {
+                      return value in set;
+                    },
+                    get size() {
+                      return Object.keys(set).length;
+                    },
+                  }
+                );
+              },
+        Logger = {
+          warn: console$1 ? Function.prototype.bind.call(console$1.warn || console$1.log, console$1) : function () {},
+        },
+        toString = Object.prototype.toString,
+        hasOwn$1 = Object.prototype.hasOwnProperty,
+        nativePerf = getNativePerf();
+      function getNativePerf() {
+        if (
+          window$1 &&
+          typeof window$1.performance < 'u' &&
+          typeof window$1.performance.mark == 'function' &&
+          typeof window$1.performance.measure == 'function'
+        )
+          return window$1.performance;
+      }
+      var performance = {
+        now: nativePerf ? nativePerf.now.bind(nativePerf) : Date.now,
+        measure: nativePerf
+          ? function (comment, startMark, endMark) {
+              try {
+                nativePerf.measure(comment, startMark, endMark);
+              } catch (ex) {
+                Logger.warn('performance.measure could not be executed because of ', ex.message);
+              }
+            }
+          : function () {},
+        mark: nativePerf ? nativePerf.mark.bind(nativePerf) : function () {},
+      };
+      function diff(a, b) {
+        return a.filter(function (a2) {
+          return b.indexOf(a2) === -1;
+        });
+      }
+      function inArray(elem, array) {
+        return array.indexOf(elem) !== -1;
+      }
+      function objectValues(obj) {
+        var allowArray = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : !0,
+          vals = allowArray && is('array', obj) ? [] : {};
+        for (var key in obj)
+          if (hasOwn$1.call(obj, key)) {
+            var val = obj[key];
+            vals[key] = val === Object(val) ? objectValues(val, allowArray) : val;
+          }
+        return vals;
+      }
+      function objectValuesSubset(obj, model) {
+        if (obj !== Object(obj)) return obj;
+        var subset = {};
+        for (var key in model)
+          hasOwn$1.call(model, key) &&
+            hasOwn$1.call(obj, key) &&
+            (subset[key] = objectValuesSubset(obj[key], model[key]));
+        return subset;
+      }
+      function extend(a, b, undefOnly) {
+        for (var prop in b)
+          hasOwn$1.call(b, prop) &&
+            (b[prop] === void 0 ? delete a[prop] : (undefOnly && typeof a[prop] < 'u') || (a[prop] = b[prop]));
+        return a;
+      }
+      function objectType(obj) {
+        if (typeof obj > 'u') return 'undefined';
+        if (obj === null) return 'null';
+        var match = toString.call(obj).match(/^\[object\s(.*)\]$/),
+          type = match && match[1];
+        switch (type) {
+          case 'Number':
+            return isNaN(obj) ? 'nan' : 'number';
+          case 'String':
+          case 'Boolean':
+          case 'Array':
+          case 'Set':
+          case 'Map':
+          case 'Date':
+          case 'RegExp':
+          case 'Function':
+          case 'Symbol':
+            return type.toLowerCase();
+          default:
+            return _typeof(obj);
+        }
+      }
+      function is(type, obj) {
+        return objectType(obj) === type;
+      }
+      function generateHash(module2, testName) {
+        for (var str = module2 + '' + testName, hash = 0, i = 0; i < str.length; i++)
+          (hash = (hash << 5) - hash + str.charCodeAt(i)), (hash |= 0);
+        var hex = (4294967296 + hash).toString(16);
+        return hex.length < 8 && (hex = '0000000' + hex), hex.slice(-8);
+      }
+      function errorString(error) {
+        var resultErrorString = String(error);
+        return resultErrorString.slice(0, 7) === '[object'
+          ? (error.name || 'Error') + (error.message ? ': '.concat(error.message) : '')
+          : resultErrorString;
+      }
+      var BOXABLE_TYPES = new StringSet(['boolean', 'number', 'string']),
+        memory = [];
+      function useStrictEquality(a, b) {
+        return a === b;
+      }
+      function useObjectValueEquality(a, b) {
+        return a === b || a.valueOf() === b.valueOf();
+      }
+      function compareConstructors(a, b) {
+        return getConstructor(a) === getConstructor(b);
+      }
+      function getConstructor(obj) {
+        var proto = Object.getPrototypeOf(obj);
+        return !proto || proto.constructor === null ? Object : obj.constructor;
+      }
+      function getRegExpFlags(regexp) {
+        return 'flags' in regexp ? regexp.flags : regexp.toString().match(/[gimuy]*$/)[0];
+      }
+      var objTypeCallbacks = {
+          undefined: useStrictEquality,
+          null: useStrictEquality,
+          boolean: useObjectValueEquality,
+          number: function (a, b) {
+            return a === b || a.valueOf() === b.valueOf() || (isNaN(a.valueOf()) && isNaN(b.valueOf()));
+          },
+          string: useObjectValueEquality,
+          symbol: useStrictEquality,
+          date: useObjectValueEquality,
+          nan: function () {
+            return !0;
+          },
+          regexp: function (a, b) {
+            return a.source === b.source && getRegExpFlags(a) === getRegExpFlags(b);
+          },
+          function: useStrictEquality,
+          array: function (a, b) {
+            if (a.length !== b.length) return !1;
+            for (var i = 0; i < a.length; i++) if (!typeEquiv(a[i], b[i])) return !1;
+            return !0;
+          },
+          set: function (a, b) {
+            if (a.size !== b.size) return !1;
+            var outerEq = !0;
+            return (
+              a.forEach(function (aVal) {
+                if (!!outerEq) {
+                  var innerEq = !1;
+                  b.forEach(function (bVal) {
+                    if (!innerEq) {
+                      var originalMemory = memory;
+                      (memory = []), typeEquiv(bVal, aVal) && (innerEq = !0), (memory = originalMemory);
+                    }
+                  }),
+                    innerEq || (outerEq = !1);
+                }
+              }),
+              outerEq
+            );
+          },
+          map: function (a, b) {
+            if (a.size !== b.size) return !1;
+            var outerEq = !0;
+            return (
+              a.forEach(function (aVal, aKey) {
+                if (!!outerEq) {
+                  var innerEq = !1;
+                  b.forEach(function (bVal, bKey) {
+                    if (!innerEq) {
+                      var originalMemory = memory;
+                      (memory = []),
+                        objTypeCallbacks.array([bVal, bKey], [aVal, aKey]) && (innerEq = !0),
+                        (memory = originalMemory);
+                    }
+                  }),
+                    innerEq || (outerEq = !1);
+                }
+              }),
+              outerEq
+            );
+          },
+        },
+        entryTypeCallbacks = {
+          undefined: useStrictEquality,
+          null: useStrictEquality,
+          boolean: useStrictEquality,
+          number: function (a, b) {
+            return a === b || (isNaN(a) && isNaN(b));
+          },
+          string: useStrictEquality,
+          symbol: useStrictEquality,
+          function: useStrictEquality,
+          object: function (a, b) {
+            if (
+              memory.some(function (pair) {
+                return pair.a === a && pair.b === b;
+              })
+            )
+              return !0;
+            memory.push({
+              a,
+              b,
+            });
+            var aObjType = objectType(a),
+              bObjType = objectType(b);
+            if (aObjType !== 'object' || bObjType !== 'object')
+              return aObjType === bObjType && objTypeCallbacks[aObjType](a, b);
+            if (compareConstructors(a, b) === !1) return !1;
+            var aProperties = [],
+              bProperties = [];
+            for (var i in a)
+              if (
+                (aProperties.push(i),
+                !(
+                  a.constructor !== Object &&
+                  typeof a.constructor < 'u' &&
+                  typeof a[i] == 'function' &&
+                  typeof b[i] == 'function' &&
+                  a[i].toString() === b[i].toString()
+                ) && !typeEquiv(a[i], b[i]))
+              )
+                return !1;
+            for (var _i in b) bProperties.push(_i);
+            return objTypeCallbacks.array(aProperties.sort(), bProperties.sort());
+          },
+        };
+      function typeEquiv(a, b) {
+        if (a === b) return !0;
+        var aType = _typeof(a),
+          bType = _typeof(b);
+        return aType !== bType
+          ? (aType === 'object' && BOXABLE_TYPES.has(objectType(a)) ? a.valueOf() : a) ===
+              (bType === 'object' && BOXABLE_TYPES.has(objectType(b)) ? b.valueOf() : b)
+          : entryTypeCallbacks[aType](a, b);
+      }
+      function innerEquiv(a, b) {
+        var res = typeEquiv(a, b);
+        return (memory = []), res;
+      }
+      function equiv(a, b) {
+        if (arguments.length === 2) return a === b || innerEquiv(a, b);
+        for (var i = arguments.length - 1; i > 0; ) {
+          if (!innerEquiv(arguments[i - 1], arguments[i])) return !1;
+          i--;
+        }
+        return !0;
+      }
+      var config = {
+          altertitle: !0,
+          collapse: !0,
+          failOnZeroTests: !0,
+          filter: void 0,
+          maxDepth: 5,
+          module: void 0,
+          moduleId: void 0,
+          reorder: !0,
+          requireExpects: !1,
+          scrolltop: !0,
+          storage: localSessionStorage,
+          testId: void 0,
+          urlConfig: [],
+          currentModule: {
+            name: '',
+            tests: [],
+            childModules: [],
+            testsRun: 0,
+            testsIgnored: 0,
+            hooks: {
+              before: [],
+              beforeEach: [],
+              afterEach: [],
+              after: [],
+            },
+          },
+          globalHooks: {},
+          blocking: !0,
+          callbacks: {},
+          modules: [],
+          queue: [],
+          stats: {
+            all: 0,
+            bad: 0,
+            testCount: 0,
+          },
+        },
+        preConfig = g && g.QUnit && !g.QUnit.version && g.QUnit.config;
+      preConfig && extend(config, preConfig), config.modules.push(config.currentModule);
+      var dump = (function () {
+          function quote(str) {
+            return '"' + str.toString().replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"';
+          }
+          function literal(o) {
+            return o + '';
+          }
+          function join(pre, arr, post) {
+            var s = dump2.separator(),
+              inner = dump2.indent(1);
+            if ((arr.join && (arr = arr.join(',' + s + inner)), !arr)) return pre + post;
+            var base = dump2.indent();
+            return [pre, inner + arr, base + post].join(s);
+          }
+          function array(arr, stack) {
+            if (dump2.maxDepth && dump2.depth > dump2.maxDepth) return '[object Array]';
+            this.up();
+            for (var i = arr.length, ret = new Array(i); i--; ) ret[i] = this.parse(arr[i], void 0, stack);
+            return this.down(), join('[', ret, ']');
+          }
+          function isArray(obj) {
+            return (
+              toString.call(obj) === '[object Array]' ||
+              (typeof obj.length == 'number' &&
+                obj.item !== void 0 &&
+                (obj.length ? obj.item(0) === obj[0] : obj.item(0) === null && obj[0] === void 0))
+            );
+          }
+          var reName = /^function (\w+)/,
+            dump2 = {
+              parse: function (obj, objType, stack) {
+                stack = stack || [];
+                var objIndex = stack.indexOf(obj);
+                if (objIndex !== -1) return 'recursion('.concat(objIndex - stack.length, ')');
+                objType = objType || this.typeOf(obj);
+                var parser = this.parsers[objType],
+                  parserType = _typeof(parser);
+                if (parserType === 'function') {
+                  stack.push(obj);
+                  var res = parser.call(this, obj, stack);
+                  return stack.pop(), res;
+                }
+                return parserType === 'string'
+                  ? parser
+                  : '[ERROR: Missing QUnit.dump formatter for type ' + objType + ']';
+              },
+              typeOf: function (obj) {
+                var type;
+                return (
+                  obj === null
+                    ? (type = 'null')
+                    : typeof obj > 'u'
+                    ? (type = 'undefined')
+                    : is('regexp', obj)
+                    ? (type = 'regexp')
+                    : is('date', obj)
+                    ? (type = 'date')
+                    : is('function', obj)
+                    ? (type = 'function')
+                    : obj.setInterval !== void 0 && obj.document !== void 0 && obj.nodeType === void 0
+                    ? (type = 'window')
+                    : obj.nodeType === 9
+                    ? (type = 'document')
+                    : obj.nodeType
+                    ? (type = 'node')
+                    : isArray(obj)
+                    ? (type = 'array')
+                    : obj.constructor === Error.prototype.constructor
+                    ? (type = 'error')
+                    : (type = _typeof(obj)),
+                  type
+                );
+              },
+              separator: function () {
+                return this.multiline
+                  ? this.HTML
+                    ? '<br />'
+                    : `
+`
+                  : this.HTML
+                  ? '&#160;'
+                  : ' ';
+              },
+              indent: function (extra) {
+                if (!this.multiline) return '';
+                var chr = this.indentChar;
+                return (
+                  this.HTML && (chr = chr.replace(/\t/g, '   ').replace(/ /g, '&#160;')),
+                  new Array(this.depth + (extra || 0)).join(chr)
+                );
+              },
+              up: function (a) {
+                this.depth += a || 1;
+              },
+              down: function (a) {
+                this.depth -= a || 1;
+              },
+              setParser: function (name, parser) {
+                this.parsers[name] = parser;
+              },
+              quote,
+              literal,
+              join,
+              depth: 1,
+              maxDepth: config.maxDepth,
+              parsers: {
+                window: '[Window]',
+                document: '[Document]',
+                error: function (_error) {
+                  return 'Error("' + _error.message + '")';
+                },
+                unknown: '[Unknown]',
+                null: 'null',
+                undefined: 'undefined',
+                function: function (fn) {
+                  var ret = 'function',
+                    name = 'name' in fn ? fn.name : (reName.exec(fn) || [])[1];
+                  return (
+                    name && (ret += ' ' + name),
+                    (ret += '('),
+                    (ret = [ret, dump2.parse(fn, 'functionArgs'), '){'].join('')),
+                    join(ret, dump2.parse(fn, 'functionCode'), '}')
+                  );
+                },
+                array,
+                nodelist: array,
+                arguments: array,
+                object: function (map, stack) {
+                  var ret = [];
+                  if (dump2.maxDepth && dump2.depth > dump2.maxDepth) return '[object Object]';
+                  dump2.up();
+                  var keys = [];
+                  for (var key in map) keys.push(key);
+                  var nonEnumerableProperties = ['message', 'name'];
+                  for (var i in nonEnumerableProperties) {
+                    var _key = nonEnumerableProperties[i];
+                    _key in map && !inArray(_key, keys) && keys.push(_key);
+                  }
+                  keys.sort();
+                  for (var _i = 0; _i < keys.length; _i++) {
+                    var _key2 = keys[_i],
+                      val = map[_key2];
+                    ret.push(dump2.parse(_key2, 'key') + ': ' + dump2.parse(val, void 0, stack));
+                  }
+                  return dump2.down(), join('{', ret, '}');
+                },
+                node: function (_node) {
+                  var open = dump2.HTML ? '&lt;' : '<',
+                    close = dump2.HTML ? '&gt;' : '>',
+                    tag = _node.nodeName.toLowerCase(),
+                    ret = open + tag,
+                    attrs = _node.attributes;
+                  if (attrs)
+                    for (var i = 0; i < attrs.length; i++) {
+                      var val = attrs[i].nodeValue;
+                      val &&
+                        val !== 'inherit' &&
+                        (ret += ' ' + attrs[i].nodeName + '=' + dump2.parse(val, 'attribute'));
+                    }
+                  return (
+                    (ret += close),
+                    (_node.nodeType === 3 || _node.nodeType === 4) && (ret += _node.nodeValue),
+                    ret + open + '/' + tag + close
+                  );
+                },
+                functionArgs: function (fn) {
+                  var l = fn.length;
+                  if (!l) return '';
+                  for (var args = new Array(l); l--; ) args[l] = String.fromCharCode(97 + l);
+                  return ' ' + args.join(', ') + ' ';
+                },
+                key: quote,
+                functionCode: '[code]',
+                attribute: quote,
+                string: quote,
+                date: quote,
+                regexp: literal,
+                number: literal,
+                boolean: literal,
+                symbol: function (sym) {
+                  return sym.toString();
+                },
+              },
+              HTML: !1,
+              indentChar: '  ',
+              multiline: !0,
+            };
+          return dump2;
+        })(),
+        SuiteReport = /* @__PURE__ */ (function () {
+          function SuiteReport2(name, parentSuite) {
+            _classCallCheck(this, SuiteReport2),
+              (this.name = name),
+              (this.fullName = parentSuite ? parentSuite.fullName.concat(name) : []),
+              (this.globalFailureCount = 0),
+              (this.tests = []),
+              (this.childSuites = []),
+              parentSuite && parentSuite.pushChildSuite(this);
+          }
+          return (
+            _createClass(SuiteReport2, [
+              {
+                key: 'start',
+                value: function (recordTime) {
+                  if (recordTime) {
+                    this._startTime = performance.now();
+                    var suiteLevel = this.fullName.length;
+                    performance.mark('qunit_suite_'.concat(suiteLevel, '_start'));
+                  }
+                  return {
+                    name: this.name,
+                    fullName: this.fullName.slice(),
+                    tests: this.tests.map(function (test2) {
+                      return test2.start();
+                    }),
+                    childSuites: this.childSuites.map(function (suite) {
+                      return suite.start();
+                    }),
+                    testCounts: {
+                      total: this.getTestCounts().total,
+                    },
+                  };
+                },
+              },
+              {
+                key: 'end',
+                value: function (recordTime) {
+                  if (recordTime) {
+                    this._endTime = performance.now();
+                    var suiteLevel = this.fullName.length,
+                      suiteName = this.fullName.join(' \u2013 ');
+                    performance.mark('qunit_suite_'.concat(suiteLevel, '_end')),
+                      performance.measure(
+                        suiteLevel === 0 ? 'QUnit Test Run' : 'QUnit Test Suite: '.concat(suiteName),
+                        'qunit_suite_'.concat(suiteLevel, '_start'),
+                        'qunit_suite_'.concat(suiteLevel, '_end'),
+                      );
+                  }
+                  return {
+                    name: this.name,
+                    fullName: this.fullName.slice(),
+                    tests: this.tests.map(function (test2) {
+                      return test2.end();
+                    }),
+                    childSuites: this.childSuites.map(function (suite) {
+                      return suite.end();
+                    }),
+                    testCounts: this.getTestCounts(),
+                    runtime: this.getRuntime(),
+                    status: this.getStatus(),
+                  };
+                },
+              },
+              {
+                key: 'pushChildSuite',
+                value: function (suite) {
+                  this.childSuites.push(suite);
+                },
+              },
+              {
+                key: 'pushTest',
+                value: function (test2) {
+                  this.tests.push(test2);
+                },
+              },
+              {
+                key: 'getRuntime',
+                value: function () {
+                  return Math.round(this._endTime - this._startTime);
+                },
+              },
+              {
+                key: 'getTestCounts',
+                value: function () {
+                  var counts =
+                    arguments.length > 0 && arguments[0] !== void 0
+                      ? arguments[0]
+                      : {
+                          passed: 0,
+                          failed: 0,
+                          skipped: 0,
+                          todo: 0,
+                          total: 0,
+                        };
+                  return (
+                    (counts.failed += this.globalFailureCount),
+                    (counts.total += this.globalFailureCount),
+                    (counts = this.tests.reduce(function (counts2, test2) {
+                      return test2.valid && (counts2[test2.getStatus()]++, counts2.total++), counts2;
+                    }, counts)),
+                    this.childSuites.reduce(function (counts2, suite) {
+                      return suite.getTestCounts(counts2);
+                    }, counts)
+                  );
+                },
+              },
+              {
+                key: 'getStatus',
+                value: function () {
+                  var _this$getTestCounts = this.getTestCounts(),
+                    total = _this$getTestCounts.total,
+                    failed = _this$getTestCounts.failed,
+                    skipped = _this$getTestCounts.skipped,
+                    todo = _this$getTestCounts.todo;
+                  return failed ? 'failed' : skipped === total ? 'skipped' : todo === total ? 'todo' : 'passed';
+                },
+              },
+            ]),
+            SuiteReport2
+          );
+        })(),
+        moduleStack = [],
+        runSuite = new SuiteReport();
+      function isParentModuleInQueue() {
+        var modulesInQueue = config.modules
+          .filter(function (module2) {
+            return !module2.ignored;
+          })
+          .map(function (module2) {
+            return module2.moduleId;
+          });
+        return moduleStack.some(function (module2) {
+          return modulesInQueue.includes(module2.moduleId);
+        });
+      }
+      function createModule(name, testEnvironment, modifiers) {
+        var parentModule = moduleStack.length ? moduleStack.slice(-1)[0] : null,
+          moduleName = parentModule !== null ? [parentModule.name, name].join(' > ') : name,
+          parentSuite = parentModule ? parentModule.suiteReport : runSuite,
+          skip = (parentModule !== null && parentModule.skip) || modifiers.skip,
+          todo = (parentModule !== null && parentModule.todo) || modifiers.todo,
+          env = {};
+        parentModule && extend(env, parentModule.testEnvironment), extend(env, testEnvironment);
+        var module2 = {
+          name: moduleName,
+          parentModule,
+          hooks: {
+            before: [],
+            beforeEach: [],
+            afterEach: [],
+            after: [],
+          },
+          testEnvironment: env,
+          tests: [],
+          moduleId: generateHash(moduleName),
+          testsRun: 0,
+          testsIgnored: 0,
+          childModules: [],
+          suiteReport: new SuiteReport(name, parentSuite),
+          stats: null,
+          skip,
+          todo: skip ? !1 : todo,
+          ignored: modifiers.ignored || !1,
+        };
+        return parentModule && parentModule.childModules.push(module2), config.modules.push(module2), module2;
+      }
+      function setHookFromEnvironment(hooks2, environment, name) {
+        var potentialHook = environment[name];
+        typeof potentialHook == 'function' && hooks2[name].push(potentialHook), delete environment[name];
+      }
+      function makeSetHook(module2, hookName) {
+        return function (callback) {
+          config.currentModule !== module2 &&
+            Logger.warn(
+              'The `' +
+                hookName +
+                '` hook was called inside the wrong module (`' +
+                config.currentModule.name +
+                '`). Instead, use hooks provided by the callback to the containing module (`' +
+                module2.name +
+                '`). This will become an error in QUnit 3.0.',
+            ),
+            module2.hooks[hookName].push(callback);
+        };
+      }
+      function processModule(name, options, executeNow) {
+        var modifiers = arguments.length > 3 && arguments[3] !== void 0 ? arguments[3] : {};
+        typeof options == 'function' && ((executeNow = options), (options = void 0));
+        var module2 = createModule(name, options, modifiers),
+          testEnvironment = module2.testEnvironment,
+          hooks2 = module2.hooks;
+        setHookFromEnvironment(hooks2, testEnvironment, 'before'),
+          setHookFromEnvironment(hooks2, testEnvironment, 'beforeEach'),
+          setHookFromEnvironment(hooks2, testEnvironment, 'afterEach'),
+          setHookFromEnvironment(hooks2, testEnvironment, 'after');
+        var moduleFns = {
+            before: makeSetHook(module2, 'before'),
+            beforeEach: makeSetHook(module2, 'beforeEach'),
+            afterEach: makeSetHook(module2, 'afterEach'),
+            after: makeSetHook(module2, 'after'),
+          },
+          prevModule = config.currentModule;
+        if (((config.currentModule = module2), typeof executeNow == 'function')) {
+          moduleStack.push(module2);
+          try {
+            var cbReturnValue = executeNow.call(module2.testEnvironment, moduleFns);
+            cbReturnValue &&
+              typeof cbReturnValue.then == 'function' &&
+              Logger.warn(
+                'Returning a promise from a module callback is not supported. Instead, use hooks for async behavior. This will become an error in QUnit 3.0.',
+              );
+          } finally {
+            moduleStack.pop(), (config.currentModule = module2.parentModule || prevModule);
+          }
+        }
+      }
+      var focused$1 = !1;
+      function module$1(name, options, executeNow) {
+        var ignored = focused$1 && !isParentModuleInQueue();
+        processModule(name, options, executeNow, {
+          ignored,
+        });
+      }
+      (module$1.only = function () {
+        focused$1 || ((config.modules.length = 0), (config.queue.length = 0), (config.currentModule.ignored = !0)),
+          (focused$1 = !0),
+          processModule.apply(void 0, arguments);
+      }),
+        (module$1.skip = function (name, options, executeNow) {
+          focused$1 ||
+            processModule(name, options, executeNow, {
+              skip: !0,
+            });
+        }),
+        (module$1.todo = function (name, options, executeNow) {
+          focused$1 ||
+            processModule(name, options, executeNow, {
+              todo: !0,
+            });
+        });
+      var fileName = (sourceFromStacktrace(0) || '').replace(/(:\d+)+\)?/, '').replace(/.+[/\\]/, '');
+      function extractStacktrace(e, offset) {
+        if (((offset = offset === void 0 ? 4 : offset), e && e.stack)) {
+          var stack = e.stack.split(`
+`);
+          if ((/^error$/i.test(stack[0]) && stack.shift(), fileName)) {
+            for (var include = [], i = offset; i < stack.length && stack[i].indexOf(fileName) === -1; i++)
+              include.push(stack[i]);
+            if (include.length)
+              return include.join(`
+`);
+          }
+          return stack[offset];
+        }
+      }
+      function sourceFromStacktrace(offset) {
+        var error = new Error();
+        if (!error.stack)
+          try {
+            throw error;
+          } catch (err) {
+            error = err;
+          }
+        return extractStacktrace(error, offset);
+      }
+      var Assert = /* @__PURE__ */ (function () {
+        function Assert2(testContext) {
+          _classCallCheck(this, Assert2), (this.test = testContext);
+        }
+        return (
+          _createClass(Assert2, [
+            {
+              key: 'timeout',
+              value: function (duration) {
+                if (typeof duration != 'number')
+                  throw new Error('You must pass a number as the duration to assert.timeout');
+                (this.test.timeout = duration),
+                  config.timeout &&
+                    (clearTimeout2(config.timeout),
+                    (config.timeout = null),
+                    config.timeoutHandler &&
+                      this.test.timeout > 0 &&
+                      this.test.internalResetTimeout(this.test.timeout));
+              },
+            },
+            {
+              key: 'step',
+              value: function (message) {
+                var assertionMessage = message,
+                  result = !!message;
+                this.test.steps.push(message),
+                  typeof message > 'u' || message === ''
+                    ? (assertionMessage = 'You must provide a message to assert.step')
+                    : typeof message != 'string' &&
+                      ((assertionMessage = 'You must provide a string value to assert.step'), (result = !1)),
+                  this.pushResult({
+                    result,
+                    message: assertionMessage,
+                  });
+              },
+            },
+            {
+              key: 'verifySteps',
+              value: function (steps, message) {
+                var actualStepsClone = this.test.steps.slice();
+                this.deepEqual(actualStepsClone, steps, message), (this.test.steps.length = 0);
+              },
+            },
+            {
+              key: 'expect',
+              value: function (asserts) {
+                if (arguments.length === 1) this.test.expected = asserts;
+                else return this.test.expected;
+              },
+            },
+            {
+              key: 'async',
+              value: function (count) {
+                var requiredCalls = count === void 0 ? 1 : count;
+                return this.test.internalStop(requiredCalls);
+              },
+            },
+            {
+              key: 'push',
+              value: function (result, actual, expected, message, negative) {
+                Logger.warn(
+                  'assert.push is deprecated and will be removed in QUnit 3.0. Please use assert.pushResult instead (https://api.qunitjs.com/assert/pushResult).',
+                );
+                var currentAssert = this instanceof Assert2 ? this : config.current.assert;
+                return currentAssert.pushResult({
+                  result,
+                  actual,
+                  expected,
+                  message,
+                  negative,
+                });
+              },
+            },
+            {
+              key: 'pushResult',
+              value: function (resultInfo) {
+                var assert = this,
+                  currentTest = (assert instanceof Assert2 && assert.test) || config.current;
+                if (!currentTest) throw new Error('assertion outside test context, in ' + sourceFromStacktrace(2));
+                return assert instanceof Assert2 || (assert = currentTest.assert), assert.test.pushResult(resultInfo);
+              },
+            },
+            {
+              key: 'ok',
+              value: function (result, message) {
+                message ||
+                  (message = result
+                    ? 'okay'
+                    : 'failed, expected argument to be truthy, was: '.concat(dump.parse(result))),
+                  this.pushResult({
+                    result: !!result,
+                    actual: result,
+                    expected: !0,
+                    message,
+                  });
+              },
+            },
+            {
+              key: 'notOk',
+              value: function (result, message) {
+                message ||
+                  (message = result
+                    ? 'failed, expected argument to be falsy, was: '.concat(dump.parse(result))
+                    : 'okay'),
+                  this.pushResult({
+                    result: !result,
+                    actual: result,
+                    expected: !1,
+                    message,
+                  });
+              },
+            },
+            {
+              key: 'true',
+              value: function (result, message) {
+                this.pushResult({
+                  result: result === !0,
+                  actual: result,
+                  expected: !0,
+                  message,
+                });
+              },
+            },
+            {
+              key: 'false',
+              value: function (result, message) {
+                this.pushResult({
+                  result: result === !1,
+                  actual: result,
+                  expected: !1,
+                  message,
+                });
+              },
+            },
+            {
+              key: 'equal',
+              value: function (actual, expected, message) {
+                this.pushResult({
+                  result: expected == actual,
+                  actual,
+                  expected,
+                  message,
+                });
+              },
+            },
+            {
+              key: 'notEqual',
+              value: function (actual, expected, message) {
+                this.pushResult({
+                  result: expected != actual,
+                  actual,
+                  expected,
+                  message,
+                  negative: !0,
+                });
+              },
+            },
+            {
+              key: 'propEqual',
+              value: function (actual, expected, message) {
+                (actual = objectValues(actual)),
+                  (expected = objectValues(expected)),
+                  this.pushResult({
+                    result: equiv(actual, expected),
+                    actual,
+                    expected,
+                    message,
+                  });
+              },
+            },
+            {
+              key: 'notPropEqual',
+              value: function (actual, expected, message) {
+                (actual = objectValues(actual)),
+                  (expected = objectValues(expected)),
+                  this.pushResult({
+                    result: !equiv(actual, expected),
+                    actual,
+                    expected,
+                    message,
+                    negative: !0,
+                  });
+              },
+            },
+            {
+              key: 'propContains',
+              value: function (actual, expected, message) {
+                (actual = objectValuesSubset(actual, expected)),
+                  (expected = objectValues(expected, !1)),
+                  this.pushResult({
+                    result: equiv(actual, expected),
+                    actual,
+                    expected,
+                    message,
+                  });
+              },
+            },
+            {
+              key: 'notPropContains',
+              value: function (actual, expected, message) {
+                (actual = objectValuesSubset(actual, expected)),
+                  (expected = objectValues(expected)),
+                  this.pushResult({
+                    result: !equiv(actual, expected),
+                    actual,
+                    expected,
+                    message,
+                    negative: !0,
+                  });
+              },
+            },
+            {
+              key: 'deepEqual',
+              value: function (actual, expected, message) {
+                this.pushResult({
+                  result: equiv(actual, expected),
+                  actual,
+                  expected,
+                  message,
+                });
+              },
+            },
+            {
+              key: 'notDeepEqual',
+              value: function (actual, expected, message) {
+                this.pushResult({
+                  result: !equiv(actual, expected),
+                  actual,
+                  expected,
+                  message,
+                  negative: !0,
+                });
+              },
+            },
+            {
+              key: 'strictEqual',
+              value: function (actual, expected, message) {
+                this.pushResult({
+                  result: expected === actual,
+                  actual,
+                  expected,
+                  message,
+                });
+              },
+            },
+            {
+              key: 'notStrictEqual',
+              value: function (actual, expected, message) {
+                this.pushResult({
+                  result: expected !== actual,
+                  actual,
+                  expected,
+                  message,
+                  negative: !0,
+                });
+              },
+            },
+            {
+              key: 'throws',
+              value: function (block, expected, message) {
+                var _validateExpectedExce = validateExpectedExceptionArgs(expected, message, 'throws'),
+                  _validateExpectedExce2 = _slicedToArray(_validateExpectedExce, 2);
+                (expected = _validateExpectedExce2[0]), (message = _validateExpectedExce2[1]);
+                var currentTest = (this instanceof Assert2 && this.test) || config.current;
+                if (typeof block != 'function') {
+                  currentTest.assert.pushResult({
+                    result: !1,
+                    actual: block,
+                    message:
+                      'The value provided to `assert.throws` in "' + currentTest.testName + '" was not a function.',
+                  });
+                  return;
+                }
+                var actual,
+                  result = !1;
+                currentTest.ignoreGlobalErrors = !0;
+                try {
+                  block.call(currentTest.testEnvironment);
+                } catch (e) {
+                  actual = e;
+                }
+                if (((currentTest.ignoreGlobalErrors = !1), actual)) {
+                  var _validateException = validateException(actual, expected, message),
+                    _validateException2 = _slicedToArray(_validateException, 3);
+                  (result = _validateException2[0]),
+                    (expected = _validateException2[1]),
+                    (message = _validateException2[2]);
+                }
+                currentTest.assert.pushResult({
+                  result,
+                  actual: actual && errorString(actual),
+                  expected,
+                  message,
+                });
+              },
+            },
+            {
+              key: 'rejects',
+              value: function (promise, expected, message) {
+                var _validateExpectedExce3 = validateExpectedExceptionArgs(expected, message, 'rejects'),
+                  _validateExpectedExce4 = _slicedToArray(_validateExpectedExce3, 2);
+                (expected = _validateExpectedExce4[0]), (message = _validateExpectedExce4[1]);
+                var currentTest = (this instanceof Assert2 && this.test) || config.current,
+                  then = promise && promise.then;
+                if (typeof then != 'function') {
+                  currentTest.assert.pushResult({
+                    result: !1,
+                    message:
+                      'The value provided to `assert.rejects` in "' + currentTest.testName + '" was not a promise.',
+                    actual: promise,
+                  });
+                  return;
+                }
+                var done2 = this.async();
+                return then.call(
+                  promise,
+                  function () {
+                    currentTest.assert.pushResult({
+                      result: !1,
+                      message:
+                        'The promise returned by the `assert.rejects` callback in "' +
+                        currentTest.testName +
+                        '" did not reject.',
+                      actual: promise,
+                    }),
+                      done2();
+                  },
+                  function (actual) {
+                    var result,
+                      _validateException3 = validateException(actual, expected, message),
+                      _validateException4 = _slicedToArray(_validateException3, 3);
+                    (result = _validateException4[0]),
+                      (expected = _validateException4[1]),
+                      (message = _validateException4[2]),
+                      currentTest.assert.pushResult({
+                        result,
+                        actual: actual && errorString(actual),
+                        expected,
+                        message,
+                      }),
+                      done2();
+                  },
+                );
+              },
+            },
+          ]),
+          Assert2
+        );
+      })();
+      function validateExpectedExceptionArgs(expected, message, assertionMethod) {
+        var expectedType = objectType(expected);
+        if (expectedType === 'string') {
+          if (message === void 0) return (message = expected), (expected = void 0), [expected, message];
+          throw new Error(
+            'assert.' +
+              assertionMethod +
+              ` does not accept a string value for the expected argument.
+Use a non-string object value (e.g. RegExp or validator function) instead if necessary.`,
+          );
+        }
+        var valid = !expected || expectedType === 'regexp' || expectedType === 'function' || expectedType === 'object';
+        if (!valid)
+          throw new Error(
+            'Invalid expected value type (' + expectedType + ') provided to assert.' + assertionMethod + '.',
+          );
+        return [expected, message];
+      }
+      function validateException(actual, expected, message) {
+        var result = !1,
+          expectedType = objectType(expected);
+        if (!expected) result = !0;
+        else if (expectedType === 'regexp')
+          (result = expected.test(errorString(actual))), (expected = String(expected));
+        else if (expectedType === 'function' && expected.prototype !== void 0 && actual instanceof expected)
+          result = !0;
+        else if (expectedType === 'object')
+          (result =
+            actual instanceof expected.constructor &&
+            actual.name === expected.name &&
+            actual.message === expected.message),
+            (expected = errorString(expected));
+        else if (expectedType === 'function')
+          try {
+            (result = expected.call({}, actual) === !0), (expected = null);
+          } catch (e) {
+            expected = errorString(e);
+          }
+        return [result, expected, message];
+      }
+      Assert.prototype.raises = Assert.prototype.throws;
+      var LISTENERS = /* @__PURE__ */ Object.create(null),
+        SUPPORTED_EVENTS = [
+          'error',
+          'runStart',
+          'suiteStart',
+          'testStart',
+          'assertion',
+          'testEnd',
+          'suiteEnd',
+          'runEnd',
+        ];
+      function emit(eventName, data) {
+        if (typeof eventName != 'string') throw new TypeError('eventName must be a string when emitting an event');
+        for (
+          var originalCallbacks = LISTENERS[eventName],
+            callbacks = originalCallbacks ? _toConsumableArray(originalCallbacks) : [],
+            i = 0;
+          i < callbacks.length;
+          i++
+        )
+          callbacks[i](data);
+      }
+      function on(eventName, callback) {
+        if (typeof eventName != 'string') throw new TypeError('eventName must be a string when registering a listener');
+        if (inArray(eventName, SUPPORTED_EVENTS)) {
+          if (typeof callback != 'function')
+            throw new TypeError('callback must be a function when registering a listener');
+        } else {
+          var events = SUPPORTED_EVENTS.join(', ');
+          throw new Error('"'.concat(eventName, '" is not a valid event; must be one of: ').concat(events, '.'));
+        }
+        LISTENERS[eventName] || (LISTENERS[eventName] = []),
+          inArray(callback, LISTENERS[eventName]) || LISTENERS[eventName].push(callback);
+      }
+      var commonjsGlobal =
+        typeof globalThis < 'u'
+          ? globalThis
+          : typeof window < 'u'
+          ? window
+          : typeof global < 'u'
+          ? global
+          : typeof self < 'u'
+          ? self
+          : {};
+      function commonjsRequire(path) {
+        throw new Error(
+          'Could not dynamically require "' +
+            path +
+            '". Please configure the dynamicRequireTargets or/and ignoreDynamicRequires option of @rollup/plugin-commonjs appropriately for this require call to work.',
+        );
+      }
+      var promisePolyfill = { exports: {} };
+      (function () {
+        var globalNS = (function () {
+          if (typeof globalThis < 'u') return globalThis;
+          if (typeof self < 'u') return self;
+          if (typeof window < 'u') return window;
+          if (typeof commonjsGlobal < 'u') return commonjsGlobal;
+          throw new Error('unable to locate global object');
+        })();
+        if (typeof globalNS.Promise == 'function') {
+          promisePolyfill.exports = globalNS.Promise;
+          return;
+        }
+        function finallyConstructor(callback) {
+          var constructor = this.constructor;
+          return this.then(
+            function (value) {
+              return constructor.resolve(callback()).then(function () {
+                return value;
+              });
+            },
+            function (reason) {
+              return constructor.resolve(callback()).then(function () {
+                return constructor.reject(reason);
+              });
+            },
+          );
+        }
+        function allSettled(arr) {
+          var P = this;
+          return new P(function (resolve2, reject2) {
+            if (!(arr && typeof arr.length < 'u'))
+              return reject2(
+                new TypeError(
+                  _typeof(arr) + ' ' + arr + ' is not iterable(cannot read property Symbol(Symbol.iterator))',
+                ),
+              );
+            var args = Array.prototype.slice.call(arr);
+            if (args.length === 0) return resolve2([]);
+            var remaining = args.length;
+            function res(i2, val) {
+              if (val && (_typeof(val) === 'object' || typeof val == 'function')) {
+                var then = val.then;
+                if (typeof then == 'function') {
+                  then.call(
+                    val,
+                    function (val2) {
+                      res(i2, val2);
+                    },
+                    function (e) {
+                      (args[i2] = {
+                        status: 'rejected',
+                        reason: e,
+                      }),
+                        --remaining === 0 && resolve2(args);
+                    },
+                  );
+                  return;
+                }
+              }
+              (args[i2] = {
+                status: 'fulfilled',
+                value: val,
+              }),
+                --remaining === 0 && resolve2(args);
+            }
+            for (var i = 0; i < args.length; i++) res(i, args[i]);
+          });
+        }
+        var setTimeoutFunc = setTimeout;
+        function isArray(x) {
+          return Boolean(x && typeof x.length < 'u');
+        }
+        function noop() {}
+        function bind(fn, thisArg) {
+          return function () {
+            fn.apply(thisArg, arguments);
+          };
+        }
+        function Promise2(fn) {
+          if (!(this instanceof Promise2)) throw new TypeError('Promises must be constructed via new');
+          if (typeof fn != 'function') throw new TypeError('not a function');
+          (this._state = 0), (this._handled = !1), (this._value = void 0), (this._deferreds = []), doResolve(fn, this);
+        }
+        function handle(self2, deferred) {
+          for (; self2._state === 3; ) self2 = self2._value;
+          if (self2._state === 0) {
+            self2._deferreds.push(deferred);
+            return;
+          }
+          (self2._handled = !0),
+            Promise2._immediateFn(function () {
+              var cb = self2._state === 1 ? deferred.onFulfilled : deferred.onRejected;
+              if (cb === null) {
+                (self2._state === 1 ? resolve : reject)(deferred.promise, self2._value);
+                return;
+              }
+              var ret;
+              try {
+                ret = cb(self2._value);
+              } catch (e) {
+                reject(deferred.promise, e);
+                return;
+              }
+              resolve(deferred.promise, ret);
+            });
+        }
+        function resolve(self2, newValue) {
+          try {
+            if (newValue === self2) throw new TypeError('A promise cannot be resolved with itself.');
+            if (newValue && (_typeof(newValue) === 'object' || typeof newValue == 'function')) {
+              var then = newValue.then;
+              if (newValue instanceof Promise2) {
+                (self2._state = 3), (self2._value = newValue), finale(self2);
+                return;
+              } else if (typeof then == 'function') {
+                doResolve(bind(then, newValue), self2);
+                return;
+              }
+            }
+            (self2._state = 1), (self2._value = newValue), finale(self2);
+          } catch (e) {
+            reject(self2, e);
+          }
+        }
+        function reject(self2, newValue) {
+          (self2._state = 2), (self2._value = newValue), finale(self2);
+        }
+        function finale(self2) {
+          self2._state === 2 &&
+            self2._deferreds.length === 0 &&
+            Promise2._immediateFn(function () {
+              self2._handled || Promise2._unhandledRejectionFn(self2._value);
+            });
+          for (var i = 0, len = self2._deferreds.length; i < len; i++) handle(self2, self2._deferreds[i]);
+          self2._deferreds = null;
+        }
+        function Handler(onFulfilled, onRejected, promise) {
+          (this.onFulfilled = typeof onFulfilled == 'function' ? onFulfilled : null),
+            (this.onRejected = typeof onRejected == 'function' ? onRejected : null),
+            (this.promise = promise);
+        }
+        function doResolve(fn, self2) {
+          var done2 = !1;
+          try {
+            fn(
+              function (value) {
+                done2 || ((done2 = !0), resolve(self2, value));
+              },
+              function (reason) {
+                done2 || ((done2 = !0), reject(self2, reason));
+              },
+            );
+          } catch (ex) {
+            if (done2) return;
+            (done2 = !0), reject(self2, ex);
+          }
+        }
+        (Promise2.prototype.catch = function (onRejected) {
+          return this.then(null, onRejected);
+        }),
+          (Promise2.prototype.then = function (onFulfilled, onRejected) {
+            var prom = new this.constructor(noop);
+            return handle(this, new Handler(onFulfilled, onRejected, prom)), prom;
+          }),
+          (Promise2.prototype.finally = finallyConstructor),
+          (Promise2.all = function (arr) {
+            return new Promise2(function (resolve2, reject2) {
+              if (!isArray(arr)) return reject2(new TypeError('Promise.all accepts an array'));
+              var args = Array.prototype.slice.call(arr);
+              if (args.length === 0) return resolve2([]);
+              var remaining = args.length;
+              function res(i2, val) {
+                try {
+                  if (val && (_typeof(val) === 'object' || typeof val == 'function')) {
+                    var then = val.then;
+                    if (typeof then == 'function') {
+                      then.call(
+                        val,
+                        function (val2) {
+                          res(i2, val2);
+                        },
+                        reject2,
+                      );
+                      return;
+                    }
+                  }
+                  (args[i2] = val), --remaining === 0 && resolve2(args);
+                } catch (ex) {
+                  reject2(ex);
+                }
+              }
+              for (var i = 0; i < args.length; i++) res(i, args[i]);
+            });
+          }),
+          (Promise2.allSettled = allSettled),
+          (Promise2.resolve = function (value) {
+            return value && _typeof(value) === 'object' && value.constructor === Promise2
+              ? value
+              : new Promise2(function (resolve2) {
+                  resolve2(value);
+                });
+          }),
+          (Promise2.reject = function (value) {
+            return new Promise2(function (resolve2, reject2) {
+              reject2(value);
+            });
+          }),
+          (Promise2.race = function (arr) {
+            return new Promise2(function (resolve2, reject2) {
+              if (!isArray(arr)) return reject2(new TypeError('Promise.race accepts an array'));
+              for (var i = 0, len = arr.length; i < len; i++) Promise2.resolve(arr[i]).then(resolve2, reject2);
+            });
+          }),
+          (Promise2._immediateFn =
+            (typeof setImmediate == 'function' &&
+              function (fn) {
+                setImmediate(fn);
+              }) ||
+            function (fn) {
+              setTimeoutFunc(fn, 0);
+            }),
+          (Promise2._unhandledRejectionFn = function (err) {
+            typeof console < 'u' && console && console.warn('Possible Unhandled Promise Rejection:', err);
+          }),
+          (promisePolyfill.exports = Promise2);
+      })();
+      var _Promise = promisePolyfill.exports;
+      function registerLoggingCallbacks(obj) {
+        var callbackNames = ['begin', 'done', 'log', 'testStart', 'testDone', 'moduleStart', 'moduleDone'];
+        function registerLoggingCallback(key2) {
+          return function (callback) {
+            if (typeof callback != 'function') throw new Error('Callback parameter must be a function');
+            config.callbacks[key2].push(callback);
+          };
+        }
+        for (var i = 0; i < callbackNames.length; i++) {
+          var key = callbackNames[i];
+          typeof config.callbacks[key] > 'u' && (config.callbacks[key] = []), (obj[key] = registerLoggingCallback(key));
+        }
+      }
+      function runLoggingCallbacks(key, args) {
+        var callbacks = config.callbacks[key];
+        if (key === 'log') {
+          callbacks.map(function (callback) {
+            return callback(args);
+          });
+          return;
+        }
+        var promiseChain = _Promise.resolve();
+        return (
+          callbacks.forEach(function (callback) {
+            promiseChain = promiseChain.then(function () {
+              return _Promise.resolve(callback(args));
+            });
+          }),
+          promiseChain
+        );
+      }
+      var priorityCount = 0,
+        unitSampler,
+        taskQueue = [];
+      function advance() {
+        advanceTaskQueue(), !taskQueue.length && !config.blocking && !config.current && advanceTestQueue();
+      }
+      function advanceTaskQueue() {
+        var start = performance.now();
+        (config.depth = (config.depth || 0) + 1), processTaskQueue(start), config.depth--;
+      }
+      function processTaskQueue(start) {
+        if (taskQueue.length && !config.blocking) {
+          var elapsedTime = performance.now() - start;
+          if (!setTimeout$1 || config.updateRate <= 0 || elapsedTime < config.updateRate) {
+            var task = taskQueue.shift();
+            _Promise.resolve(task()).then(function () {
+              taskQueue.length ? processTaskQueue(start) : advance();
+            });
+          } else setTimeout$1(advance);
+        }
+      }
+      function advanceTestQueue() {
+        if (!config.blocking && !config.queue.length && config.depth === 0) {
+          done();
+          return;
+        }
+        var testTasks = config.queue.shift();
+        addToTaskQueue(testTasks()), priorityCount > 0 && priorityCount--, advance();
+      }
+      function addToTaskQueue(tasksArray) {
+        taskQueue.push.apply(taskQueue, _toConsumableArray(tasksArray));
+      }
+      function taskQueueLength() {
+        return taskQueue.length;
+      }
+      function addToTestQueue(testTasksFunc, prioritize, seed) {
+        if (prioritize) config.queue.splice(priorityCount++, 0, testTasksFunc);
+        else if (seed) {
+          unitSampler || (unitSampler = unitSamplerGenerator(seed));
+          var index = Math.floor(unitSampler() * (config.queue.length - priorityCount + 1));
+          config.queue.splice(priorityCount + index, 0, testTasksFunc);
+        } else config.queue.push(testTasksFunc);
+      }
+      function unitSamplerGenerator(seed) {
+        var sample = parseInt(generateHash(seed), 16) || -1;
+        return function () {
+          return (
+            (sample ^= sample << 13),
+            (sample ^= sample >>> 17),
+            (sample ^= sample << 5),
+            sample < 0 && (sample += 4294967296),
+            sample / 4294967296
+          );
+        };
+      }
+      function done() {
+        if (config.stats.testCount === 0 && config.failOnZeroTests === !0) {
+          var error;
+          config.filter && config.filter.length
+            ? (error = new Error('No tests matched the filter "'.concat(config.filter, '".')))
+            : config.module && config.module.length
+            ? (error = new Error('No tests matched the module "'.concat(config.module, '".')))
+            : config.moduleId && config.moduleId.length
+            ? (error = new Error('No tests matched the moduleId "'.concat(config.moduleId, '".')))
+            : config.testId && config.testId.length
+            ? (error = new Error('No tests matched the testId "'.concat(config.testId, '".')))
+            : (error = new Error('No tests were run.')),
+            test(
+              'global failure',
+              extend(
+                function (assert) {
+                  assert.pushResult({
+                    result: !1,
+                    message: error.message,
+                    source: error.stack,
+                  });
+                },
+                {
+                  validTest: !0,
+                },
+              ),
+            ),
+            advance();
+          return;
+        }
+        var storage = config.storage,
+          runtime2 = Math.round(performance.now() - config.started),
+          passed = config.stats.all - config.stats.bad;
+        (ProcessingQueue.finished = !0),
+          emit('runEnd', runSuite.end(!0)),
+          runLoggingCallbacks('done', {
+            passed,
+            failed: config.stats.bad,
+            total: config.stats.all,
+            runtime: runtime2,
+          }).then(function () {
+            if (storage && config.stats.bad === 0)
+              for (var i = storage.length - 1; i >= 0; i--) {
+                var key = storage.key(i);
+                key.indexOf('qunit-test-') === 0 && storage.removeItem(key);
+              }
+          });
+      }
+      var ProcessingQueue = {
+          finished: !1,
+          add: addToTestQueue,
+          advance,
+          taskCount: taskQueueLength,
+        },
+        TestReport = /* @__PURE__ */ (function () {
+          function TestReport2(name, suite, options) {
+            _classCallCheck(this, TestReport2),
+              (this.name = name),
+              (this.suiteName = suite.name),
+              (this.fullName = suite.fullName.concat(name)),
+              (this.runtime = 0),
+              (this.assertions = []),
+              (this.skipped = !!options.skip),
+              (this.todo = !!options.todo),
+              (this.valid = options.valid),
+              (this._startTime = 0),
+              (this._endTime = 0),
+              suite.pushTest(this);
+          }
+          return (
+            _createClass(TestReport2, [
+              {
+                key: 'start',
+                value: function (recordTime) {
+                  return (
+                    recordTime && ((this._startTime = performance.now()), performance.mark('qunit_test_start')),
+                    {
+                      name: this.name,
+                      suiteName: this.suiteName,
+                      fullName: this.fullName.slice(),
+                    }
+                  );
+                },
+              },
+              {
+                key: 'end',
+                value: function (recordTime) {
+                  if (recordTime && ((this._endTime = performance.now()), performance)) {
+                    performance.mark('qunit_test_end');
+                    var testName = this.fullName.join(' \u2013 ');
+                    performance.measure('QUnit Test: '.concat(testName), 'qunit_test_start', 'qunit_test_end');
+                  }
+                  return extend(this.start(), {
+                    runtime: this.getRuntime(),
+                    status: this.getStatus(),
+                    errors: this.getFailedAssertions(),
+                    assertions: this.getAssertions(),
+                  });
+                },
+              },
+              {
+                key: 'pushAssertion',
+                value: function (assertion) {
+                  this.assertions.push(assertion);
+                },
+              },
+              {
+                key: 'getRuntime',
+                value: function () {
+                  return Math.round(this._endTime - this._startTime);
+                },
+              },
+              {
+                key: 'getStatus',
+                value: function () {
+                  if (this.skipped) return 'skipped';
+                  var testPassed = this.getFailedAssertions().length > 0 ? this.todo : !this.todo;
+                  return testPassed ? (this.todo ? 'todo' : 'passed') : 'failed';
+                },
+              },
+              {
+                key: 'getFailedAssertions',
+                value: function () {
+                  return this.assertions.filter(function (assertion) {
+                    return !assertion.passed;
+                  });
+                },
+              },
+              {
+                key: 'getAssertions',
+                value: function () {
+                  return this.assertions.slice();
+                },
+              },
+              {
+                key: 'slimAssertions',
+                value: function () {
+                  this.assertions = this.assertions.map(function (assertion) {
+                    return delete assertion.actual, delete assertion.expected, assertion;
+                  });
+                },
+              },
+            ]),
+            TestReport2
+          );
+        })();
+      function Test(settings) {
+        if (
+          ((this.expected = null),
+          (this.assertions = []),
+          (this.module = config.currentModule),
+          (this.steps = []),
+          (this.timeout = void 0),
+          (this.data = void 0),
+          (this.withData = !1),
+          (this.pauses = new StringMap()),
+          (this.nextPauseId = 1),
+          (this.stackOffset = 3),
+          extend(this, settings),
+          this.module.skip ? ((this.skip = !0), (this.todo = !1)) : this.module.todo && !this.skip && (this.todo = !0),
+          ProcessingQueue.finished)
+        ) {
+          Logger.warn('Unexpected test after runEnd. This is unstable and will fail in QUnit 3.0.');
+          return;
+        }
+        if (!this.skip && typeof this.callback != 'function') {
+          var method = this.todo ? 'QUnit.todo' : 'QUnit.test';
+          throw new TypeError('You must provide a callback to '.concat(method, '("').concat(this.testName, '")'));
+        }
+        for (var i = 0, l = this.module.tests; i < l.length; i++)
+          this.module.tests[i].name === this.testName && (this.testName += ' ');
+        (this.testId = generateHash(this.module.name, this.testName)),
+          ++Test.count,
+          (this.errorForStack = new Error()),
+          this.callback && this.callback.validTest && (this.errorForStack.stack = void 0),
+          (this.testReport = new TestReport(this.testName, this.module.suiteReport, {
+            todo: this.todo,
+            skip: this.skip,
+            valid: this.valid(),
+          })),
+          this.module.tests.push({
+            name: this.testName,
+            testId: this.testId,
+            skip: !!this.skip,
+          }),
+          this.skip
+            ? ((this.callback = function () {}), (this.async = !1), (this.expected = 0))
+            : (this.assert = new Assert(this));
+      }
+      Test.count = 0;
+      function getNotStartedModules(startModule) {
+        for (var module2 = startModule, modules = []; module2 && module2.testsRun === 0; )
+          modules.push(module2), (module2 = module2.parentModule);
+        return modules.reverse();
+      }
+      Test.prototype = {
+        get stack() {
+          return extractStacktrace(this.errorForStack, this.stackOffset);
+        },
+        before: function () {
+          var _this = this,
+            module2 = this.module,
+            notStartedModules = getNotStartedModules(module2),
+            moduleStartChain = _Promise.resolve();
+          return (
+            notStartedModules.forEach(function (startModule) {
+              moduleStartChain = moduleStartChain.then(function () {
+                return (
+                  (startModule.stats = {
+                    all: 0,
+                    bad: 0,
+                    started: performance.now(),
+                  }),
+                  emit('suiteStart', startModule.suiteReport.start(!0)),
+                  runLoggingCallbacks('moduleStart', {
+                    name: startModule.name,
+                    tests: startModule.tests,
+                  })
+                );
+              });
+            }),
+            moduleStartChain.then(function () {
+              return (
+                (config.current = _this),
+                (_this.testEnvironment = extend({}, module2.testEnvironment)),
+                (_this.started = performance.now()),
+                emit('testStart', _this.testReport.start(!0)),
+                runLoggingCallbacks('testStart', {
+                  name: _this.testName,
+                  module: module2.name,
+                  testId: _this.testId,
+                  previousFailure: _this.previousFailure,
+                }).then(function () {
+                  config.pollution || saveGlobal();
+                })
+              );
+            })
+          );
+        },
+        run: function () {
+          if (((config.current = this), config.notrycatch)) {
+            runTest(this);
+            return;
+          }
+          try {
+            runTest(this);
+          } catch (e) {
+            this.pushFailure(
+              'Died on test #' +
+                (this.assertions.length + 1) +
+                ': ' +
+                (e.message || e) +
+                `
+` +
+                this.stack,
+              extractStacktrace(e, 0),
+            ),
+              saveGlobal(),
+              config.blocking && internalRecover(this);
+          }
+          function runTest(test2) {
+            var promise;
+            test2.withData
+              ? (promise = test2.callback.call(test2.testEnvironment, test2.assert, test2.data))
+              : (promise = test2.callback.call(test2.testEnvironment, test2.assert)),
+              test2.resolvePromise(promise),
+              test2.timeout === 0 &&
+                test2.pauses.size > 0 &&
+                pushFailure(
+                  'Test did not finish synchronously even though assert.timeout( 0 ) was used.',
+                  sourceFromStacktrace(2),
+                );
+          }
+        },
+        after: function () {
+          checkPollution();
+        },
+        queueGlobalHook: function (hook, hookName) {
+          var _this2 = this,
+            runHook = function () {
+              config.current = _this2;
+              var promise;
+              if (config.notrycatch) promise = hook.call(_this2.testEnvironment, _this2.assert);
+              else
+                try {
+                  promise = hook.call(_this2.testEnvironment, _this2.assert);
+                } catch (error) {
+                  _this2.pushFailure(
+                    'Global ' + hookName + ' failed on ' + _this2.testName + ': ' + errorString(error),
+                    extractStacktrace(error, 0),
+                  );
+                  return;
+                }
+              _this2.resolvePromise(promise, hookName);
+            };
+          return runHook;
+        },
+        queueHook: function (hook, hookName, hookOwner) {
+          var _this3 = this,
+            callHook = function () {
+              var promise = hook.call(_this3.testEnvironment, _this3.assert);
+              _this3.resolvePromise(promise, hookName);
+            },
+            runHook = function () {
+              if (hookName === 'before') {
+                if (hookOwner.testsRun !== 0) return;
+                _this3.preserveEnvironment = !0;
+              }
+              if (
+                !(
+                  hookName === 'after' &&
+                  !lastTestWithinModuleExecuted(hookOwner) &&
+                  (config.queue.length > 0 || ProcessingQueue.taskCount() > 2)
+                )
+              ) {
+                if (((config.current = _this3), config.notrycatch)) {
+                  callHook();
+                  return;
+                }
+                try {
+                  callHook();
+                } catch (error) {
+                  _this3.pushFailure(
+                    hookName + ' failed on ' + _this3.testName + ': ' + (error.message || error),
+                    extractStacktrace(error, 0),
+                  );
+                }
+              }
+            };
+          return runHook;
+        },
+        hooks: function (handler) {
+          var hooks3 = [];
+          function processGlobalhooks(test2) {
+            if ((handler === 'beforeEach' || handler === 'afterEach') && config.globalHooks[handler])
+              for (var i = 0; i < config.globalHooks[handler].length; i++)
+                hooks3.push(test2.queueGlobalHook(config.globalHooks[handler][i], handler));
+          }
+          function processHooks(test2, module2) {
+            if ((module2.parentModule && processHooks(test2, module2.parentModule), module2.hooks[handler].length))
+              for (var i = 0; i < module2.hooks[handler].length; i++)
+                hooks3.push(test2.queueHook(module2.hooks[handler][i], handler, module2));
+          }
+          return this.skip || (processGlobalhooks(this), processHooks(this, this.module)), hooks3;
+        },
+        finish: function () {
+          if (((config.current = this), (this.callback = void 0), this.steps.length)) {
+            var stepsList = this.steps.join(', ');
+            this.pushFailure(
+              'Expected assert.verifySteps() to be called before end of test ' +
+                'after using assert.step(). Unverified steps: '.concat(stepsList),
+              this.stack,
+            );
+          }
+          config.requireExpects && this.expected === null
+            ? this.pushFailure('Expected number of assertions to be defined, but expect() was not called.', this.stack)
+            : this.expected !== null && this.expected !== this.assertions.length
+            ? this.pushFailure(
+                'Expected ' + this.expected + ' assertions, but ' + this.assertions.length + ' were run',
+                this.stack,
+              )
+            : this.expected === null &&
+              !this.assertions.length &&
+              this.pushFailure(
+                'Expected at least one assertion, but none were run - call expect(0) to accept zero assertions.',
+                this.stack,
+              );
+          var module2 = this.module,
+            moduleName = module2.name,
+            testName = this.testName,
+            skipped = !!this.skip,
+            todo = !!this.todo,
+            bad = 0,
+            storage = config.storage;
+          (this.runtime = Math.round(performance.now() - this.started)),
+            (config.stats.all += this.assertions.length),
+            (config.stats.testCount += 1),
+            (module2.stats.all += this.assertions.length);
+          for (var i = 0; i < this.assertions.length; i++)
+            this.assertions[i].result || (bad++, config.stats.bad++, module2.stats.bad++);
+          skipped ? incrementTestsIgnored(module2) : incrementTestsRun(module2),
+            storage &&
+              (bad
+                ? storage.setItem('qunit-test-' + moduleName + '-' + testName, bad)
+                : storage.removeItem('qunit-test-' + moduleName + '-' + testName)),
+            emit('testEnd', this.testReport.end(!0)),
+            this.testReport.slimAssertions();
+          var test2 = this;
+          return runLoggingCallbacks('testDone', {
+            name: testName,
+            module: moduleName,
+            skipped,
+            todo,
+            failed: bad,
+            passed: this.assertions.length - bad,
+            total: this.assertions.length,
+            runtime: skipped ? 0 : this.runtime,
+            assertions: this.assertions,
+            testId: this.testId,
+            get source() {
+              return test2.stack;
+            },
+          })
+            .then(function () {
+              if (allTestsExecuted(module2)) {
+                for (
+                  var completedModules = [module2], parent = module2.parentModule;
+                  parent && allTestsExecuted(parent);
+
+                )
+                  completedModules.push(parent), (parent = parent.parentModule);
+                var moduleDoneChain = _Promise.resolve();
+                return (
+                  completedModules.forEach(function (completedModule) {
+                    moduleDoneChain = moduleDoneChain.then(function () {
+                      return logSuiteEnd(completedModule);
+                    });
+                  }),
+                  moduleDoneChain
+                );
+              }
+            })
+            .then(function () {
+              config.current = void 0;
+            });
+          function logSuiteEnd(module3) {
+            for (var modules = [module3]; modules.length; ) {
+              var nextModule = modules.shift();
+              (nextModule.hooks = {}), modules.push.apply(modules, _toConsumableArray(nextModule.childModules));
+            }
+            return (
+              emit('suiteEnd', module3.suiteReport.end(!0)),
+              runLoggingCallbacks('moduleDone', {
+                name: module3.name,
+                tests: module3.tests,
+                failed: module3.stats.bad,
+                passed: module3.stats.all - module3.stats.bad,
+                total: module3.stats.all,
+                runtime: Math.round(performance.now() - module3.stats.started),
+              })
+            );
+          }
+        },
+        preserveTestEnvironment: function () {
+          this.preserveEnvironment &&
+            ((this.module.testEnvironment = this.testEnvironment),
+            (this.testEnvironment = extend({}, this.module.testEnvironment)));
+        },
+        queue: function () {
+          var test2 = this;
+          if (!this.valid()) {
+            incrementTestsIgnored(this.module);
+            return;
+          }
+          function runTest() {
+            return [
+              function () {
+                return test2.before();
+              },
+            ].concat(
+              _toConsumableArray(test2.hooks('before')),
+              [
+                function () {
+                  test2.preserveTestEnvironment();
+                },
+              ],
+              _toConsumableArray(test2.hooks('beforeEach')),
+              [
+                function () {
+                  test2.run();
+                },
+              ],
+              _toConsumableArray(test2.hooks('afterEach').reverse()),
+              _toConsumableArray(test2.hooks('after').reverse()),
+              [
+                function () {
+                  test2.after();
+                },
+                function () {
+                  return test2.finish();
+                },
+              ],
+            );
+          }
+          var previousFailCount =
+              config.storage && +config.storage.getItem('qunit-test-' + this.module.name + '-' + this.testName),
+            prioritize = config.reorder && !!previousFailCount;
+          (this.previousFailure = !!previousFailCount), ProcessingQueue.add(runTest, prioritize, config.seed);
+        },
+        pushResult: function (resultInfo) {
+          if (this !== config.current) {
+            var message = (resultInfo && resultInfo.message) || '',
+              testName = (this && this.testName) || '',
+              error =
+                `Assertion occurred after test finished.
+> Test: ` +
+                testName +
+                `
+> Message: ` +
+                message +
+                `
+`;
+            throw new Error(error);
+          }
+          var details = {
+            module: this.module.name,
+            name: this.testName,
+            result: resultInfo.result,
+            message: resultInfo.message,
+            actual: resultInfo.actual,
+            testId: this.testId,
+            negative: resultInfo.negative || !1,
+            runtime: Math.round(performance.now() - this.started),
+            todo: !!this.todo,
+          };
+          if ((hasOwn$1.call(resultInfo, 'expected') && (details.expected = resultInfo.expected), !resultInfo.result)) {
+            var source = resultInfo.source || sourceFromStacktrace();
+            source && (details.source = source);
+          }
+          this.logAssertion(details),
+            this.assertions.push({
+              result: !!resultInfo.result,
+              message: resultInfo.message,
+            });
+        },
+        pushFailure: function (message, source, actual) {
+          if (!(this instanceof Test))
+            throw new Error('pushFailure() assertion outside test context, was ' + sourceFromStacktrace(2));
+          this.pushResult({
+            result: !1,
+            message: message || 'error',
+            actual: actual || null,
+            source,
+          });
+        },
+        logAssertion: function (details) {
+          runLoggingCallbacks('log', details);
+          var assertion = {
+            passed: details.result,
+            actual: details.actual,
+            expected: details.expected,
+            message: details.message,
+            stack: details.source,
+            todo: details.todo,
+          };
+          this.testReport.pushAssertion(assertion), emit('assertion', assertion);
+        },
+        internalResetTimeout: function (timeoutDuration) {
+          clearTimeout2(config.timeout),
+            (config.timeout = setTimeout$1(config.timeoutHandler(timeoutDuration), timeoutDuration));
+        },
+        internalStop: function () {
+          var requiredCalls = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : 1;
+          config.blocking = !0;
+          var test2 = this,
+            pauseId = this.nextPauseId++,
+            pause = {
+              cancelled: !1,
+              remaining: requiredCalls,
+            };
+          test2.pauses.set(pauseId, pause);
+          function release() {
+            if (!pause.cancelled) {
+              if (config.current === void 0)
+                throw new Error(
+                  `Unexpected release of async pause after tests finished.
+` + '> Test: '.concat(test2.testName, ' [async #').concat(pauseId, ']'),
+                );
+              if (config.current !== test2)
+                throw new Error(
+                  `Unexpected release of async pause during a different test.
+` + '> Test: '.concat(test2.testName, ' [async #').concat(pauseId, ']'),
+                );
+              if (pause.remaining <= 0)
+                throw new Error(
+                  `Tried to release async pause that was already released.
+` + '> Test: '.concat(test2.testName, ' [async #').concat(pauseId, ']'),
+                );
+              pause.remaining--, pause.remaining === 0 && test2.pauses.delete(pauseId), internalStart(test2);
+            }
+          }
+          if (setTimeout$1) {
+            var timeoutDuration;
+            typeof test2.timeout == 'number'
+              ? (timeoutDuration = test2.timeout)
+              : typeof config.testTimeout == 'number' && (timeoutDuration = config.testTimeout),
+              typeof timeoutDuration == 'number' &&
+                timeoutDuration > 0 &&
+                ((config.timeoutHandler = function (timeout) {
+                  return function () {
+                    (config.timeout = null),
+                      (pause.cancelled = !0),
+                      test2.pauses.delete(pauseId),
+                      test2.pushFailure(
+                        'Test took longer than '.concat(timeout, 'ms; test timed out.'),
+                        sourceFromStacktrace(2),
+                      ),
+                      internalStart(test2);
+                  };
+                }),
+                clearTimeout2(config.timeout),
+                (config.timeout = setTimeout$1(config.timeoutHandler(timeoutDuration), timeoutDuration)));
+          }
+          return release;
+        },
+        resolvePromise: function (promise, phase) {
+          if (promise != null) {
+            var _test = this,
+              then = promise.then;
+            if (typeof then == 'function') {
+              var resume = _test.internalStop(),
+                resolve = function () {
+                  resume();
+                };
+              if (config.notrycatch) then.call(promise, resolve);
+              else {
+                var reject = function (error) {
+                  var message =
+                    'Promise rejected ' +
+                    (phase ? phase.replace(/Each$/, '') : 'during') +
+                    ' "' +
+                    _test.testName +
+                    '": ' +
+                    ((error && error.message) || error);
+                  _test.pushFailure(message, extractStacktrace(error, 0)), saveGlobal(), internalRecover(_test);
+                };
+                then.call(promise, resolve, reject);
+              }
+            }
+          }
+        },
+        valid: function () {
+          if (this.callback && this.callback.validTest) return !0;
+          function moduleChainIdMatch(testModule, selectedId) {
+            return (
+              !selectedId ||
+              !selectedId.length ||
+              inArray(testModule.moduleId, selectedId) ||
+              (testModule.parentModule && moduleChainIdMatch(testModule.parentModule, selectedId))
+            );
+          }
+          if (
+            !moduleChainIdMatch(this.module, config.moduleId) ||
+            (config.testId && config.testId.length && !inArray(this.testId, config.testId))
+          )
+            return !1;
+          function moduleChainNameMatch(testModule, selectedModule2) {
+            if (!selectedModule2) return !0;
+            var testModuleName = testModule.name ? testModule.name.toLowerCase() : null;
+            return testModuleName === selectedModule2
+              ? !0
+              : testModule.parentModule
+              ? moduleChainNameMatch(testModule.parentModule, selectedModule2)
+              : !1;
+          }
+          var selectedModule = config.module && config.module.toLowerCase();
+          if (!moduleChainNameMatch(this.module, selectedModule)) return !1;
+          var filter = config.filter;
+          if (!filter) return !0;
+          var regexFilter = /^(!?)\/([\w\W]*)\/(i?$)/.exec(filter),
+            fullName = this.module.name + ': ' + this.testName;
+          return regexFilter
+            ? this.regexFilter(!!regexFilter[1], regexFilter[2], regexFilter[3], fullName)
+            : this.stringFilter(filter, fullName);
+        },
+        regexFilter: function (exclude, pattern, flags, fullName) {
+          var regex = new RegExp(pattern, flags),
+            match = regex.test(fullName);
+          return match !== exclude;
+        },
+        stringFilter: function (filter, fullName) {
+          (filter = filter.toLowerCase()), (fullName = fullName.toLowerCase());
+          var include = filter.charAt(0) !== '!';
+          return include || (filter = filter.slice(1)), fullName.indexOf(filter) !== -1 ? include : !include;
+        },
+      };
+      function pushFailure() {
+        if (!config.current)
+          throw new Error('pushFailure() assertion outside test context, in ' + sourceFromStacktrace(2));
+        var currentTest = config.current;
+        return currentTest.pushFailure.apply(currentTest, arguments);
+      }
+      function saveGlobal() {
+        if (((config.pollution = []), config.noglobals)) {
+          for (var key in g)
+            if (hasOwn$1.call(g, key)) {
+              if (/^qunit-test-output/.test(key)) continue;
+              config.pollution.push(key);
+            }
+        }
+      }
+      function checkPollution() {
+        var old = config.pollution;
+        saveGlobal();
+        var newGlobals = diff(config.pollution, old);
+        newGlobals.length > 0 && pushFailure('Introduced global variable(s): ' + newGlobals.join(', '));
+        var deletedGlobals = diff(old, config.pollution);
+        deletedGlobals.length > 0 && pushFailure('Deleted global variable(s): ' + deletedGlobals.join(', '));
+      }
+      var focused = !1;
+      function addTest(settings) {
+        if (!(focused || config.currentModule.ignored)) {
+          var newTest = new Test(settings);
+          newTest.queue();
+        }
+      }
+      function addOnlyTest(settings) {
+        if (!config.currentModule.ignored) {
+          focused || ((config.queue.length = 0), (focused = !0));
+          var newTest = new Test(settings);
+          newTest.queue();
+        }
+      }
+      function test(testName, callback) {
+        addTest({
+          testName,
+          callback,
+        });
+      }
+      function makeEachTestName(testName, argument) {
+        return ''.concat(testName, ' [').concat(argument, ']');
+      }
+      function runEach(data, eachFn) {
+        if (Array.isArray(data)) for (var i = 0; i < data.length; i++) eachFn(data[i], i);
+        else if (_typeof(data) === 'object' && data !== null) for (var key in data) eachFn(data[key], key);
+        else
+          throw new Error(
+            `test.each() expects an array or object as input, but
+found `.concat(_typeof(data), ' instead.'),
+          );
+      }
+      extend(test, {
+        todo: function (testName, callback) {
+          addTest({
+            testName,
+            callback,
+            todo: !0,
+          });
+        },
+        skip: function (testName) {
+          addTest({
+            testName,
+            skip: !0,
+          });
+        },
+        only: function (testName, callback) {
+          addOnlyTest({
+            testName,
+            callback,
+          });
+        },
+        each: function (testName, dataset, callback) {
+          runEach(dataset, function (data, testKey) {
+            addTest({
+              testName: makeEachTestName(testName, testKey),
+              callback,
+              withData: !0,
+              stackOffset: 5,
+              data,
+            });
+          });
+        },
+      }),
+        (test.todo.each = function (testName, dataset, callback) {
+          runEach(dataset, function (data, testKey) {
+            addTest({
+              testName: makeEachTestName(testName, testKey),
+              callback,
+              todo: !0,
+              withData: !0,
+              stackOffset: 5,
+              data,
+            });
+          });
+        }),
+        (test.skip.each = function (testName, dataset) {
+          runEach(dataset, function (_, testKey) {
+            addTest({
+              testName: makeEachTestName(testName, testKey),
+              stackOffset: 5,
+              skip: !0,
+            });
+          });
+        }),
+        (test.only.each = function (testName, dataset, callback) {
+          runEach(dataset, function (data, testKey) {
+            addOnlyTest({
+              testName: makeEachTestName(testName, testKey),
+              callback,
+              withData: !0,
+              stackOffset: 5,
+              data,
+            });
+          });
+        });
+      function internalRecover(test2) {
+        test2.pauses.forEach(function (pause) {
+          pause.cancelled = !0;
+        }),
+          test2.pauses.clear(),
+          internalStart(test2);
+      }
+      function internalStart(test2) {
+        test2.pauses.size > 0 ||
+          (setTimeout$1
+            ? (clearTimeout2(config.timeout),
+              (config.timeout = setTimeout$1(function () {
+                test2.pauses.size > 0 ||
+                  (clearTimeout2(config.timeout),
+                  (config.timeout = null),
+                  (config.blocking = !1),
+                  ProcessingQueue.advance());
+              })))
+            : ((config.blocking = !1), ProcessingQueue.advance()));
+      }
+      function collectTests(module2) {
+        for (
+          var tests = [].concat(module2.tests), modules = _toConsumableArray(module2.childModules);
+          modules.length;
+
+        ) {
+          var nextModule = modules.shift();
+          tests.push.apply(tests, nextModule.tests),
+            modules.push.apply(modules, _toConsumableArray(nextModule.childModules));
+        }
+        return tests;
+      }
+      function allTestsExecuted(module2) {
+        return module2.testsRun + module2.testsIgnored === collectTests(module2).length;
+      }
+      function lastTestWithinModuleExecuted(module2) {
+        return (
+          module2.testsRun ===
+          collectTests(module2).filter(function (test2) {
+            return !test2.skip;
+          }).length -
+            1
+        );
+      }
+      function incrementTestsRun(module2) {
+        for (module2.testsRun++; (module2 = module2.parentModule); ) module2.testsRun++;
+      }
+      function incrementTestsIgnored(module2) {
+        for (module2.testsIgnored++; (module2 = module2.parentModule); ) module2.testsIgnored++;
+      }
+      function exportQUnit(QUnit3) {
+        var exportedModule = !1;
+        if (window$1 && document2) {
+          if (window$1.QUnit && window$1.QUnit.version) throw new Error('QUnit has already been defined.');
+          (window$1.QUnit = QUnit3), (exportedModule = !0);
+        }
+        typeof module < 'u' &&
+          module &&
+          module.exports &&
+          ((module.exports = QUnit3), (module.exports.QUnit = QUnit3), (exportedModule = !0)),
+          typeof exports < 'u' && exports && ((exports.QUnit = QUnit3), (exportedModule = !0)),
+          typeof define == 'function' &&
+            define.amd &&
+            (define(function () {
+              return QUnit3;
+            }),
+            (QUnit3.config.autostart = !1),
+            (exportedModule = !0)),
+          exportedModule || (g.QUnit = QUnit3);
+      }
+      var ConsoleReporter = /* @__PURE__ */ (function () {
+          function ConsoleReporter2(runner) {
+            var options = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
+            _classCallCheck(this, ConsoleReporter2),
+              (this.log = options.log || Function.prototype.bind.call(console$1.log, console$1)),
+              runner.on('error', this.onError.bind(this)),
+              runner.on('runStart', this.onRunStart.bind(this)),
+              runner.on('testStart', this.onTestStart.bind(this)),
+              runner.on('testEnd', this.onTestEnd.bind(this)),
+              runner.on('runEnd', this.onRunEnd.bind(this));
+          }
+          return (
+            _createClass(
+              ConsoleReporter2,
+              [
+                {
+                  key: 'onError',
+                  value: function (error) {
+                    this.log('error', error);
+                  },
+                },
+                {
+                  key: 'onRunStart',
+                  value: function (runStart) {
+                    this.log('runStart', runStart);
+                  },
+                },
+                {
+                  key: 'onTestStart',
+                  value: function (test2) {
+                    this.log('testStart', test2);
+                  },
+                },
+                {
+                  key: 'onTestEnd',
+                  value: function (test2) {
+                    this.log('testEnd', test2);
+                  },
+                },
+                {
+                  key: 'onRunEnd',
+                  value: function (runEnd) {
+                    this.log('runEnd', runEnd);
+                  },
+                },
+              ],
+              [
+                {
+                  key: 'init',
+                  value: function (runner, options) {
+                    return new ConsoleReporter2(runner, options);
+                  },
+                },
+              ],
+            ),
+            ConsoleReporter2
+          );
+        })(),
+        FORCE_COLOR,
+        NODE_DISABLE_COLORS,
+        NO_COLOR,
+        TERM,
+        isTTY = !0;
+      if (typeof process < 'u') {
+        var _ref = process.env || {};
+        (FORCE_COLOR = _ref.FORCE_COLOR),
+          (NODE_DISABLE_COLORS = _ref.NODE_DISABLE_COLORS),
+          (NO_COLOR = _ref.NO_COLOR),
+          (TERM = _ref.TERM),
+          (isTTY = process.stdout && process.stdout.isTTY);
+      }
+      var $ = {
+        enabled:
+          !NODE_DISABLE_COLORS &&
+          NO_COLOR == null &&
+          TERM !== 'dumb' &&
+          ((FORCE_COLOR != null && FORCE_COLOR !== '0') || isTTY),
+        reset: init(0, 0),
+        bold: init(1, 22),
+        dim: init(2, 22),
+        italic: init(3, 23),
+        underline: init(4, 24),
+        inverse: init(7, 27),
+        hidden: init(8, 28),
+        strikethrough: init(9, 29),
+        black: init(30, 39),
+        red: init(31, 39),
+        green: init(32, 39),
+        yellow: init(33, 39),
+        blue: init(34, 39),
+        magenta: init(35, 39),
+        cyan: init(36, 39),
+        white: init(37, 39),
+        gray: init(90, 39),
+        grey: init(90, 39),
+        bgBlack: init(40, 49),
+        bgRed: init(41, 49),
+        bgGreen: init(42, 49),
+        bgYellow: init(43, 49),
+        bgBlue: init(44, 49),
+        bgMagenta: init(45, 49),
+        bgCyan: init(46, 49),
+        bgWhite: init(47, 49),
+      };
+      function run(arr, str) {
+        for (var i = 0, tmp, beg = '', end = ''; i < arr.length; i++)
+          (tmp = arr[i]),
+            (beg += tmp.open),
+            (end += tmp.close),
+            ~str.indexOf(tmp.close) && (str = str.replace(tmp.rgx, tmp.close + tmp.open));
+        return beg + str + end;
+      }
+      function chain(has, keys) {
+        var ctx = {
+          has,
+          keys,
+        };
+        return (
+          (ctx.reset = $.reset.bind(ctx)),
+          (ctx.bold = $.bold.bind(ctx)),
+          (ctx.dim = $.dim.bind(ctx)),
+          (ctx.italic = $.italic.bind(ctx)),
+          (ctx.underline = $.underline.bind(ctx)),
+          (ctx.inverse = $.inverse.bind(ctx)),
+          (ctx.hidden = $.hidden.bind(ctx)),
+          (ctx.strikethrough = $.strikethrough.bind(ctx)),
+          (ctx.black = $.black.bind(ctx)),
+          (ctx.red = $.red.bind(ctx)),
+          (ctx.green = $.green.bind(ctx)),
+          (ctx.yellow = $.yellow.bind(ctx)),
+          (ctx.blue = $.blue.bind(ctx)),
+          (ctx.magenta = $.magenta.bind(ctx)),
+          (ctx.cyan = $.cyan.bind(ctx)),
+          (ctx.white = $.white.bind(ctx)),
+          (ctx.gray = $.gray.bind(ctx)),
+          (ctx.grey = $.grey.bind(ctx)),
+          (ctx.bgBlack = $.bgBlack.bind(ctx)),
+          (ctx.bgRed = $.bgRed.bind(ctx)),
+          (ctx.bgGreen = $.bgGreen.bind(ctx)),
+          (ctx.bgYellow = $.bgYellow.bind(ctx)),
+          (ctx.bgBlue = $.bgBlue.bind(ctx)),
+          (ctx.bgMagenta = $.bgMagenta.bind(ctx)),
+          (ctx.bgCyan = $.bgCyan.bind(ctx)),
+          (ctx.bgWhite = $.bgWhite.bind(ctx)),
+          ctx
+        );
+      }
+      function init(open, close) {
+        var blk = {
+          open: '\x1B['.concat(open, 'm'),
+          close: '\x1B['.concat(close, 'm'),
+          rgx: new RegExp('\\x1b\\['.concat(close, 'm'), 'g'),
+        };
+        return function (txt) {
+          return this !== void 0 && this.has !== void 0
+            ? (~this.has.indexOf(open) || (this.has.push(open), this.keys.push(blk)),
+              txt === void 0 ? this : $.enabled ? run(this.keys, txt + '') : txt + '')
+            : txt === void 0
+            ? chain([open], [blk])
+            : $.enabled
+            ? run([blk], txt + '')
+            : txt + '';
+        };
+      }
+      var hasOwn = Object.prototype.hasOwnProperty;
+      function prettyYamlValue(value) {
+        var indent = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : 4;
+        if (
+          (value === void 0 && (value = String(value)),
+          typeof value == 'number' && !isFinite(value) && (value = String(value)),
+          typeof value == 'number')
+        )
+          return JSON.stringify(value);
+        if (typeof value == 'string') {
+          var rSpecialJson = /['"\\/[{}\]\r\n]/,
+            rSpecialYaml = /[-?:,[\]{}#&*!|=>'"%@`]/,
+            rUntrimmed = /(^\s|\s$)/,
+            rNumerical = /^[\d._-]+$/,
+            rBool = /^(true|false|y|n|yes|no|on|off)$/i;
+          if (
+            value === '' ||
+            rSpecialJson.test(value) ||
+            rSpecialYaml.test(value[0]) ||
+            rUntrimmed.test(value) ||
+            rNumerical.test(value) ||
+            rBool.test(value)
+          ) {
+            if (!/\n/.test(value)) return JSON.stringify(value);
+            var prefix = new Array(indent + 1).join(' '),
+              trailingLinebreakMatch = value.match(/\n+$/),
+              trailingLinebreaks = trailingLinebreakMatch ? trailingLinebreakMatch[0].length : 0;
+            if (trailingLinebreaks === 1) {
+              var lines = value
+                .replace(/\n$/, '')
+                .split(
+                  `
+`,
+                )
+                .map(function (line) {
+                  return prefix + line;
+                });
+              return (
+                `|
+` +
+                lines.join(`
+`)
+              );
+            } else {
+              var _lines = value
+                .split(
+                  `
+`,
+                )
+                .map(function (line) {
+                  return prefix + line;
+                });
+              return (
+                `|+
+` +
+                _lines.join(`
+`)
+              );
+            }
+          } else return value;
+        }
+        return JSON.stringify(decycledShallowClone(value), null, 2);
+      }
+      function decycledShallowClone(object) {
+        var ancestors = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : [];
+        if (ancestors.indexOf(object) !== -1) return '[Circular]';
+        var type = Object.prototype.toString
+            .call(object)
+            .replace(/^\[.+\s(.+?)]$/, '$1')
+            .toLowerCase(),
+          clone;
+        switch (type) {
+          case 'array':
+            ancestors.push(object),
+              (clone = object.map(function (element) {
+                return decycledShallowClone(element, ancestors);
+              })),
+              ancestors.pop();
+            break;
+          case 'object':
+            ancestors.push(object),
+              (clone = {}),
+              Object.keys(object).forEach(function (key) {
+                clone[key] = decycledShallowClone(object[key], ancestors);
+              }),
+              ancestors.pop();
+            break;
+          default:
+            clone = object;
+        }
+        return clone;
+      }
+      var TapReporter = /* @__PURE__ */ (function () {
+          function TapReporter2(runner) {
+            var options = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
+            _classCallCheck(this, TapReporter2),
+              (this.log = options.log || Function.prototype.bind.call(console$1.log, console$1)),
+              (this.testCount = 0),
+              (this.ended = !1),
+              (this.bailed = !1),
+              runner.on('error', this.onError.bind(this)),
+              runner.on('runStart', this.onRunStart.bind(this)),
+              runner.on('testEnd', this.onTestEnd.bind(this)),
+              runner.on('runEnd', this.onRunEnd.bind(this));
+          }
+          return (
+            _createClass(
+              TapReporter2,
+              [
+                {
+                  key: 'onRunStart',
+                  value: function (_runSuite) {
+                    this.log('TAP version 13');
+                  },
+                },
+                {
+                  key: 'onError',
+                  value: function (error) {
+                    this.bailed ||
+                      ((this.bailed = !0),
+                      this.ended ||
+                        ((this.testCount = this.testCount + 1),
+                        this.log($.red('not ok '.concat(this.testCount, ' global failure'))),
+                        this.logError(error)),
+                      this.log(
+                        'Bail out! ' +
+                          errorString(error).split(`
+`)[0],
+                      ),
+                      this.ended && this.logError(error));
+                  },
+                },
+                {
+                  key: 'onTestEnd',
+                  value: function (test2) {
+                    var _this = this;
+                    (this.testCount = this.testCount + 1),
+                      test2.status === 'passed'
+                        ? this.log('ok '.concat(this.testCount, ' ').concat(test2.fullName.join(' > ')))
+                        : test2.status === 'skipped'
+                        ? this.log(
+                            $.yellow('ok '.concat(this.testCount, ' # SKIP ').concat(test2.fullName.join(' > '))),
+                          )
+                        : test2.status === 'todo'
+                        ? (this.log(
+                            $.cyan('not ok '.concat(this.testCount, ' # TODO ').concat(test2.fullName.join(' > '))),
+                          ),
+                          test2.errors.forEach(function (error) {
+                            return _this.logAssertion(error, 'todo');
+                          }))
+                        : (this.log($.red('not ok '.concat(this.testCount, ' ').concat(test2.fullName.join(' > ')))),
+                          test2.errors.forEach(function (error) {
+                            return _this.logAssertion(error);
+                          }));
+                  },
+                },
+                {
+                  key: 'onRunEnd',
+                  value: function (runSuite2) {
+                    (this.ended = !0),
+                      this.log('1..'.concat(runSuite2.testCounts.total)),
+                      this.log('# pass '.concat(runSuite2.testCounts.passed)),
+                      this.log($.yellow('# skip '.concat(runSuite2.testCounts.skipped))),
+                      this.log($.cyan('# todo '.concat(runSuite2.testCounts.todo))),
+                      this.log($.red('# fail '.concat(runSuite2.testCounts.failed)));
+                  },
+                },
+                {
+                  key: 'logAssertion',
+                  value: function (error, severity) {
+                    var out = '  ---';
+                    (out += `
+  message: `.concat(prettyYamlValue(error.message || 'failed'))),
+                      (out += `
+  severity: `.concat(prettyYamlValue(severity || 'failed'))),
+                      hasOwn.call(error, 'actual') &&
+                        (out += `
+  actual  : `.concat(prettyYamlValue(error.actual))),
+                      hasOwn.call(error, 'expected') &&
+                        (out += `
+  expected: `.concat(prettyYamlValue(error.expected))),
+                      error.stack &&
+                        (out += `
+  stack: `.concat(
+                          prettyYamlValue(
+                            error.stack +
+                              `
+`,
+                          ),
+                        )),
+                      (out += `
+  ...`),
+                      this.log(out);
+                  },
+                },
+                {
+                  key: 'logError',
+                  value: function (error) {
+                    var out = '  ---';
+                    (out += `
+  message: `.concat(prettyYamlValue(errorString(error)))),
+                      (out += `
+  severity: `.concat(prettyYamlValue('failed'))),
+                      error &&
+                        error.stack &&
+                        (out += `
+  stack: `.concat(
+                          prettyYamlValue(
+                            error.stack +
+                              `
+`,
+                          ),
+                        )),
+                      (out += `
+  ...`),
+                      this.log(out);
+                  },
+                },
+              ],
+              [
+                {
+                  key: 'init',
+                  value: function (runner, options) {
+                    return new TapReporter2(runner, options);
+                  },
+                },
+              ],
+            ),
+            TapReporter2
+          );
+        })(),
+        reporters = {
+          console: ConsoleReporter,
+          tap: TapReporter,
+        };
+      function makeAddGlobalHook(hookName) {
+        return function (callback) {
+          config.globalHooks[hookName] || (config.globalHooks[hookName] = []),
+            config.globalHooks[hookName].push(callback);
+        };
+      }
+      var hooks = {
+        beforeEach: makeAddGlobalHook('beforeEach'),
+        afterEach: makeAddGlobalHook('afterEach'),
+      };
+      function onUncaughtException(error) {
+        config.current
+          ? config.current.assert.pushResult({
+              result: !1,
+              message: 'global failure: '.concat(errorString(error)),
+              source: (error && error.stack) || sourceFromStacktrace(2),
+            })
+          : (runSuite.globalFailureCount++, config.stats.bad++, config.stats.all++, emit('error', error));
+      }
+      function onWindowError(details) {
+        if (
+          (Logger.warn(
+            'QUnit.onError is deprecated and will be removed in QUnit 3.0. Please use QUnit.onUncaughtException instead.',
+          ),
+          config.current && config.current.ignoreGlobalErrors)
+        )
+          return !0;
+        var err = new Error(details.message);
+        return (
+          (err.stack = details.stacktrace || details.fileName + ':' + details.lineNumber), onUncaughtException(err), !1
+        );
+      }
+      var QUnit2 = {};
+      config.currentModule.suiteReport = runSuite;
+      var globalStartCalled = !1,
+        runStarted = !1;
+      (QUnit2.isLocal = window$1 && window$1.location && window$1.location.protocol === 'file:'),
+        (QUnit2.version = '2.19.3'),
+        extend(QUnit2, {
+          config,
+          dump,
+          equiv,
+          reporters,
+          hooks,
+          is,
+          objectType,
+          on,
+          onError: onWindowError,
+          onUncaughtException,
+          pushFailure,
+          assert: Assert.prototype,
+          module: module$1,
+          test,
+          todo: test.todo,
+          skip: test.skip,
+          only: test.only,
+          start: function (count) {
+            if (config.current) throw new Error('QUnit.start cannot be called inside a test context.');
+            var globalStartAlreadyCalled = globalStartCalled;
+            if (((globalStartCalled = !0), runStarted))
+              throw new Error('Called start() while test already started running');
+            if (globalStartAlreadyCalled || count > 1)
+              throw new Error('Called start() outside of a test context too many times');
+            if (config.autostart)
+              throw new Error('Called start() outside of a test context when QUnit.config.autostart was true');
+            if (!config.pageLoaded) {
+              (config.autostart = !0), document2 || QUnit2.load();
+              return;
+            }
+            scheduleBegin();
+          },
+          onUnhandledRejection: function (reason) {
+            Logger.warn(
+              'QUnit.onUnhandledRejection is deprecated and will be removed in QUnit 3.0. Please use QUnit.onUncaughtException instead.',
+            ),
+              onUncaughtException(reason);
+          },
+          extend: function () {
+            Logger.warn(
+              'QUnit.extend is deprecated and will be removed in QUnit 3.0. Please use Object.assign instead.',
+            );
+            for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++)
+              args[_key] = arguments[_key];
+            return extend.apply(this, args);
+          },
+          load: function () {
+            (config.pageLoaded = !0),
+              extend(
+                config,
+                {
+                  started: 0,
+                  updateRate: 1e3,
+                  autostart: !0,
+                  filter: '',
+                },
+                !0,
+              ),
+              runStarted || ((config.blocking = !1), config.autostart && scheduleBegin());
+          },
+          stack: function (offset) {
+            return (offset = (offset || 0) + 2), sourceFromStacktrace(offset);
+          },
+        }),
+        registerLoggingCallbacks(QUnit2);
+      function scheduleBegin() {
+        (runStarted = !0),
+          setTimeout$1
+            ? setTimeout$1(function () {
+                begin();
+              })
+            : begin();
+      }
+      function unblockAndAdvanceQueue() {
+        (config.blocking = !1), ProcessingQueue.advance();
+      }
+      function begin() {
+        if (config.started) {
+          unblockAndAdvanceQueue();
+          return;
+        }
+        (config.started = performance.now()),
+          config.modules[0].name === '' && config.modules[0].tests.length === 0 && config.modules.shift();
+        for (var modulesLog = [], i = 0; i < config.modules.length; i++)
+          config.modules[i].name !== '' &&
+            modulesLog.push({
+              name: config.modules[i].name,
+              moduleId: config.modules[i].moduleId,
+              tests: config.modules[i].tests,
+            });
+        emit('runStart', runSuite.start(!0)),
+          runLoggingCallbacks('begin', {
+            totalTests: Test.count,
+            modules: modulesLog,
+          }).then(unblockAndAdvanceQueue);
+      }
+      exportQUnit(QUnit2),
+        (function () {
+          if (!window$1 || !document2) return;
+          var config2 = QUnit2.config,
+            hasOwn2 = Object.prototype.hasOwnProperty;
+          function storeFixture() {
+            if (!hasOwn2.call(config2, 'fixture')) {
+              var fixture = document2.getElementById('qunit-fixture');
+              fixture && (config2.fixture = fixture.cloneNode(!0));
+            }
+          }
+          QUnit2.begin(storeFixture);
+          function resetFixture() {
+            if (config2.fixture != null) {
+              var fixture = document2.getElementById('qunit-fixture'),
+                resetFixtureType = _typeof(config2.fixture);
+              if (resetFixtureType === 'string') {
+                var newFixture = document2.createElement('div');
+                newFixture.setAttribute('id', 'qunit-fixture'),
+                  (newFixture.innerHTML = config2.fixture),
+                  fixture.parentNode.replaceChild(newFixture, fixture);
+              } else {
+                var clonedFixture = config2.fixture.cloneNode(!0);
+                fixture.parentNode.replaceChild(clonedFixture, fixture);
+              }
+            }
+          }
+          QUnit2.testStart(resetFixture);
+        })(),
+        (function () {
+          var location = typeof window$1 < 'u' && window$1.location;
+          if (!location) return;
+          var urlParams = getUrlParams();
+          (QUnit2.urlParams = urlParams),
+            (QUnit2.config.filter = urlParams.filter),
+            (QUnit2.config.module = urlParams.module),
+            (QUnit2.config.moduleId = [].concat(urlParams.moduleId || [])),
+            (QUnit2.config.testId = [].concat(urlParams.testId || [])),
+            urlParams.seed === !0
+              ? (QUnit2.config.seed = Math.random().toString(36).slice(2))
+              : urlParams.seed && (QUnit2.config.seed = urlParams.seed),
+            QUnit2.config.urlConfig.push(
+              {
+                id: 'hidepassed',
+                label: 'Hide passed tests',
+                tooltip: 'Only show tests and assertions that fail. Stored as query-strings.',
+              },
+              {
+                id: 'noglobals',
+                label: 'Check for Globals',
+                tooltip:
+                  'Enabling this will test if any test introduces new properties on the global object (`window` in Browsers). Stored as query-strings.',
+              },
+              {
+                id: 'notrycatch',
+                label: 'No try-catch',
+                tooltip:
+                  'Enabling this will run tests outside of a try-catch block. Makes debugging exceptions in IE reasonable. Stored as query-strings.',
+              },
+            ),
+            QUnit2.begin(function () {
+              for (var urlConfig = QUnit2.config.urlConfig, i = 0; i < urlConfig.length; i++) {
+                var option = QUnit2.config.urlConfig[i];
+                typeof option != 'string' && (option = option.id),
+                  QUnit2.config[option] === void 0 && (QUnit2.config[option] = urlParams[option]);
+              }
+            });
+          function getUrlParams() {
+            for (
+              var urlParams2 = /* @__PURE__ */ Object.create(null),
+                params = location.search.slice(1).split('&'),
+                length = params.length,
+                i = 0;
+              i < length;
+              i++
+            )
+              if (params[i]) {
+                var param = params[i].split('='),
+                  name = decodeQueryParam(param[0]),
+                  value = param.length === 1 || decodeQueryParam(param.slice(1).join('='));
+                name in urlParams2
+                  ? (urlParams2[name] = [].concat(urlParams2[name], value))
+                  : (urlParams2[name] = value);
+              }
+            return urlParams2;
+          }
+          function decodeQueryParam(param) {
+            return decodeURIComponent(param.replace(/\+/g, '%20'));
+          }
+        })();
+      var fuzzysort$1 = { exports: {} };
+      (function (module2) {
+        (function (root, UMD) {
+          module2.exports ? (module2.exports = UMD()) : (root.fuzzysort = UMD());
+        })(commonjsGlobal, function () {
+          function fuzzysortNew(instanceOptions) {
+            var fuzzysort2 = {
+              single: function (search, target, options) {
+                if (search == 'farzher')
+                  return {
+                    target: 'farzher was here (^-^*)/',
+                    score: 0,
+                    indexes: [0, 1, 2, 3, 4, 5, 6],
+                  };
+                if (!search || (isObj(search) || (search = fuzzysort2.getPreparedSearch(search)), !target)) return null;
+                isObj(target) || (target = fuzzysort2.getPrepared(target));
+                var allowTypo =
+                    options && options.allowTypo !== void 0
+                      ? options.allowTypo
+                      : instanceOptions && instanceOptions.allowTypo !== void 0
+                      ? instanceOptions.allowTypo
+                      : !0,
+                  algorithm = allowTypo ? fuzzysort2.algorithm : fuzzysort2.algorithmNoTypo;
+                return algorithm(search, target, search[0]);
+              },
+              go: function (search, targets, options) {
+                if (search == 'farzher')
+                  return [
+                    {
+                      target: 'farzher was here (^-^*)/',
+                      score: 0,
+                      indexes: [0, 1, 2, 3, 4, 5, 6],
+                      obj: targets ? targets[0] : null,
+                    },
+                  ];
+                if (!search) return noResults;
+                search = fuzzysort2.prepareSearch(search);
+                var searchLowerCode = search[0],
+                  threshold =
+                    (options && options.threshold) ||
+                    (instanceOptions && instanceOptions.threshold) ||
+                    -9007199254740991,
+                  limit = (options && options.limit) || (instanceOptions && instanceOptions.limit) || 9007199254740991,
+                  allowTypo =
+                    options && options.allowTypo !== void 0
+                      ? options.allowTypo
+                      : instanceOptions && instanceOptions.allowTypo !== void 0
+                      ? instanceOptions.allowTypo
+                      : !0,
+                  algorithm = allowTypo ? fuzzysort2.algorithm : fuzzysort2.algorithmNoTypo,
+                  resultsLen = 0,
+                  limitedCount = 0,
+                  targetsLen = targets.length;
+                if (options && options.keys)
+                  for (
+                    var scoreFn = options.scoreFn || defaultScoreFn,
+                      keys = options.keys,
+                      keysLen = keys.length,
+                      i = targetsLen - 1;
+                    i >= 0;
+                    --i
+                  ) {
+                    for (var obj = targets[i], objResults = new Array(keysLen), keyI = keysLen - 1; keyI >= 0; --keyI) {
+                      var key = keys[keyI],
+                        target = getValue(obj, key);
+                      if (!target) {
+                        objResults[keyI] = null;
+                        continue;
+                      }
+                      isObj(target) || (target = fuzzysort2.getPrepared(target)),
+                        (objResults[keyI] = algorithm(search, target, searchLowerCode));
+                    }
+                    objResults.obj = obj;
+                    var score = scoreFn(objResults);
+                    score !== null &&
+                      (score < threshold ||
+                        ((objResults.score = score),
+                        resultsLen < limit
+                          ? (q.add(objResults), ++resultsLen)
+                          : (++limitedCount, score > q.peek().score && q.replaceTop(objResults))));
+                  }
+                else if (options && options.key)
+                  for (var key = options.key, i = targetsLen - 1; i >= 0; --i) {
+                    var obj = targets[i],
+                      target = getValue(obj, key);
+                    if (!!target) {
+                      isObj(target) || (target = fuzzysort2.getPrepared(target));
+                      var result = algorithm(search, target, searchLowerCode);
+                      result !== null &&
+                        (result.score < threshold ||
+                          ((result = {
+                            target: result.target,
+                            _targetLowerCodes: null,
+                            _nextBeginningIndexes: null,
+                            score: result.score,
+                            indexes: result.indexes,
+                            obj,
+                          }),
+                          resultsLen < limit
+                            ? (q.add(result), ++resultsLen)
+                            : (++limitedCount, result.score > q.peek().score && q.replaceTop(result))));
+                    }
+                  }
+                else
+                  for (var i = targetsLen - 1; i >= 0; --i) {
+                    var target = targets[i];
+                    if (!!target) {
+                      isObj(target) || (target = fuzzysort2.getPrepared(target));
+                      var result = algorithm(search, target, searchLowerCode);
+                      result !== null &&
+                        (result.score < threshold ||
+                          (resultsLen < limit
+                            ? (q.add(result), ++resultsLen)
+                            : (++limitedCount, result.score > q.peek().score && q.replaceTop(result))));
+                    }
+                  }
+                if (resultsLen === 0) return noResults;
+                for (var results = new Array(resultsLen), i = resultsLen - 1; i >= 0; --i) results[i] = q.poll();
+                return (results.total = resultsLen + limitedCount), results;
+              },
+              goAsync: function (search, targets, options) {
+                var canceled = !1,
+                  p = new Promise(function (resolve, reject) {
+                    if (search == 'farzher')
+                      return resolve([
+                        {
+                          target: 'farzher was here (^-^*)/',
+                          score: 0,
+                          indexes: [0, 1, 2, 3, 4, 5, 6],
+                          obj: targets ? targets[0] : null,
+                        },
+                      ]);
+                    if (!search) return resolve(noResults);
+                    search = fuzzysort2.prepareSearch(search);
+                    var searchLowerCode = search[0],
+                      q2 = fastpriorityqueue(),
+                      iCurrent = targets.length - 1,
+                      threshold =
+                        (options && options.threshold) ||
+                        (instanceOptions && instanceOptions.threshold) ||
+                        -9007199254740991,
+                      limit =
+                        (options && options.limit) || (instanceOptions && instanceOptions.limit) || 9007199254740991,
+                      allowTypo =
+                        options && options.allowTypo !== void 0
+                          ? options.allowTypo
+                          : instanceOptions && instanceOptions.allowTypo !== void 0
+                          ? instanceOptions.allowTypo
+                          : !0,
+                      algorithm = allowTypo ? fuzzysort2.algorithm : fuzzysort2.algorithmNoTypo,
+                      resultsLen = 0,
+                      limitedCount = 0;
+                    function step() {
+                      if (canceled) return reject('canceled');
+                      var startMs = Date.now();
+                      if (options && options.keys)
+                        for (
+                          var scoreFn = options.scoreFn || defaultScoreFn, keys = options.keys, keysLen = keys.length;
+                          iCurrent >= 0;
+                          --iCurrent
+                        ) {
+                          if (iCurrent % 1e3 === 0 && Date.now() - startMs >= 10) {
+                            isNode ? setImmediate(step) : setTimeout(step);
+                            return;
+                          }
+                          for (
+                            var obj = targets[iCurrent], objResults = new Array(keysLen), keyI = keysLen - 1;
+                            keyI >= 0;
+                            --keyI
+                          ) {
+                            var key = keys[keyI],
+                              target = getValue(obj, key);
+                            if (!target) {
+                              objResults[keyI] = null;
+                              continue;
+                            }
+                            isObj(target) || (target = fuzzysort2.getPrepared(target)),
+                              (objResults[keyI] = algorithm(search, target, searchLowerCode));
+                          }
+                          objResults.obj = obj;
+                          var score = scoreFn(objResults);
+                          score !== null &&
+                            (score < threshold ||
+                              ((objResults.score = score),
+                              resultsLen < limit
+                                ? (q2.add(objResults), ++resultsLen)
+                                : (++limitedCount, score > q2.peek().score && q2.replaceTop(objResults))));
+                        }
+                      else if (options && options.key)
+                        for (var key = options.key; iCurrent >= 0; --iCurrent) {
+                          if (iCurrent % 1e3 === 0 && Date.now() - startMs >= 10) {
+                            isNode ? setImmediate(step) : setTimeout(step);
+                            return;
+                          }
+                          var obj = targets[iCurrent],
+                            target = getValue(obj, key);
+                          if (!!target) {
+                            isObj(target) || (target = fuzzysort2.getPrepared(target));
+                            var result = algorithm(search, target, searchLowerCode);
+                            result !== null &&
+                              (result.score < threshold ||
+                                ((result = {
+                                  target: result.target,
+                                  _targetLowerCodes: null,
+                                  _nextBeginningIndexes: null,
+                                  score: result.score,
+                                  indexes: result.indexes,
+                                  obj,
+                                }),
+                                resultsLen < limit
+                                  ? (q2.add(result), ++resultsLen)
+                                  : (++limitedCount, result.score > q2.peek().score && q2.replaceTop(result))));
+                          }
+                        }
+                      else
+                        for (; iCurrent >= 0; --iCurrent) {
+                          if (iCurrent % 1e3 === 0 && Date.now() - startMs >= 10) {
+                            isNode ? setImmediate(step) : setTimeout(step);
+                            return;
+                          }
+                          var target = targets[iCurrent];
+                          if (!!target) {
+                            isObj(target) || (target = fuzzysort2.getPrepared(target));
+                            var result = algorithm(search, target, searchLowerCode);
+                            result !== null &&
+                              (result.score < threshold ||
+                                (resultsLen < limit
+                                  ? (q2.add(result), ++resultsLen)
+                                  : (++limitedCount, result.score > q2.peek().score && q2.replaceTop(result))));
+                          }
+                        }
+                      if (resultsLen === 0) return resolve(noResults);
+                      for (var results = new Array(resultsLen), i = resultsLen - 1; i >= 0; --i) results[i] = q2.poll();
+                      (results.total = resultsLen + limitedCount), resolve(results);
+                    }
+                    isNode ? setImmediate(step) : step();
+                  });
+                return (
+                  (p.cancel = function () {
+                    canceled = !0;
+                  }),
+                  p
+                );
+              },
+              highlight: function (result, hOpen, hClose) {
+                if (typeof hOpen == 'function') return fuzzysort2.highlightCallback(result, hOpen);
+                if (result === null) return null;
+                hOpen === void 0 && (hOpen = '<b>'), hClose === void 0 && (hClose = '</b>');
+                for (
+                  var highlighted = '',
+                    matchesIndex = 0,
+                    opened = !1,
+                    target = result.target,
+                    targetLen = target.length,
+                    matchesBest = result.indexes,
+                    i = 0;
+                  i < targetLen;
+                  ++i
+                ) {
+                  var char = target[i];
+                  if (matchesBest[matchesIndex] === i) {
+                    if (
+                      (++matchesIndex,
+                      opened || ((opened = !0), (highlighted += hOpen)),
+                      matchesIndex === matchesBest.length)
+                    ) {
+                      highlighted += char + hClose + target.substr(i + 1);
+                      break;
+                    }
+                  } else opened && ((opened = !1), (highlighted += hClose));
+                  highlighted += char;
+                }
+                return highlighted;
+              },
+              highlightCallback: function (result, cb) {
+                if (result === null) return null;
+                for (
+                  var target = result.target,
+                    targetLen = target.length,
+                    indexes = result.indexes,
+                    highlighted = '',
+                    matchI = 0,
+                    indexesI = 0,
+                    opened = !1,
+                    result = [],
+                    i = 0;
+                  i < targetLen;
+                  ++i
+                ) {
+                  var char = target[i];
+                  if (indexes[indexesI] === i) {
+                    if (
+                      (++indexesI,
+                      opened || ((opened = !0), result.push(highlighted), (highlighted = '')),
+                      indexesI === indexes.length)
+                    ) {
+                      (highlighted += char),
+                        result.push(cb(highlighted, matchI++)),
+                        (highlighted = ''),
+                        result.push(target.substr(i + 1));
+                      break;
+                    }
+                  } else opened && ((opened = !1), result.push(cb(highlighted, matchI++)), (highlighted = ''));
+                  highlighted += char;
+                }
+                return result;
+              },
+              prepare: function (target) {
+                return target
+                  ? {
+                      target,
+                      _targetLowerCodes: fuzzysort2.prepareLowerCodes(target),
+                      _nextBeginningIndexes: null,
+                      score: null,
+                      indexes: null,
+                      obj: null,
+                    }
+                  : {
+                      target: '',
+                      _targetLowerCodes: [0],
+                      _nextBeginningIndexes: null,
+                      score: null,
+                      indexes: null,
+                      obj: null,
+                    };
+              },
+              prepareSlow: function (target) {
+                return target
+                  ? {
+                      target,
+                      _targetLowerCodes: fuzzysort2.prepareLowerCodes(target),
+                      _nextBeginningIndexes: fuzzysort2.prepareNextBeginningIndexes(target),
+                      score: null,
+                      indexes: null,
+                      obj: null,
+                    }
+                  : {
+                      target: '',
+                      _targetLowerCodes: [0],
+                      _nextBeginningIndexes: null,
+                      score: null,
+                      indexes: null,
+                      obj: null,
+                    };
+              },
+              prepareSearch: function (search) {
+                return search || (search = ''), fuzzysort2.prepareLowerCodes(search);
+              },
+              getPrepared: function (target) {
+                if (target.length > 999) return fuzzysort2.prepare(target);
+                var targetPrepared = preparedCache.get(target);
+                return (
+                  targetPrepared !== void 0 ||
+                    ((targetPrepared = fuzzysort2.prepare(target)), preparedCache.set(target, targetPrepared)),
+                  targetPrepared
+                );
+              },
+              getPreparedSearch: function (search) {
+                if (search.length > 999) return fuzzysort2.prepareSearch(search);
+                var searchPrepared = preparedSearchCache.get(search);
+                return (
+                  searchPrepared !== void 0 ||
+                    ((searchPrepared = fuzzysort2.prepareSearch(search)),
+                    preparedSearchCache.set(search, searchPrepared)),
+                  searchPrepared
+                );
+              },
+              algorithm: function (searchLowerCodes, prepared, searchLowerCode) {
+                for (
+                  var targetLowerCodes = prepared._targetLowerCodes,
+                    searchLen = searchLowerCodes.length,
+                    targetLen = targetLowerCodes.length,
+                    searchI = 0,
+                    targetI = 0,
+                    typoSimpleI = 0,
+                    matchesSimpleLen = 0;
+                  ;
+
+                ) {
+                  var isMatch = searchLowerCode === targetLowerCodes[targetI];
+                  if (isMatch) {
+                    if (((matchesSimple[matchesSimpleLen++] = targetI), ++searchI, searchI === searchLen)) break;
+                    searchLowerCode =
+                      searchLowerCodes[
+                        typoSimpleI === 0
+                          ? searchI
+                          : typoSimpleI === searchI
+                          ? searchI + 1
+                          : typoSimpleI === searchI - 1
+                          ? searchI - 1
+                          : searchI
+                      ];
+                  }
+                  if ((++targetI, targetI >= targetLen))
+                    for (;;) {
+                      if (searchI <= 1) return null;
+                      if (typoSimpleI === 0) {
+                        --searchI;
+                        var searchLowerCodeNew = searchLowerCodes[searchI];
+                        if (searchLowerCode === searchLowerCodeNew) continue;
+                        typoSimpleI = searchI;
+                      } else {
+                        if (typoSimpleI === 1) return null;
+                        --typoSimpleI, (searchI = typoSimpleI), (searchLowerCode = searchLowerCodes[searchI + 1]);
+                        var searchLowerCodeNew = searchLowerCodes[searchI];
+                        if (searchLowerCode === searchLowerCodeNew) continue;
+                      }
+                      (matchesSimpleLen = searchI), (targetI = matchesSimple[matchesSimpleLen - 1] + 1);
+                      break;
+                    }
+                }
+                var searchI = 0,
+                  typoStrictI = 0,
+                  successStrict = !1,
+                  matchesStrictLen = 0,
+                  nextBeginningIndexes = prepared._nextBeginningIndexes;
+                nextBeginningIndexes === null &&
+                  (nextBeginningIndexes = prepared._nextBeginningIndexes =
+                    fuzzysort2.prepareNextBeginningIndexes(prepared.target));
+                var firstPossibleI = (targetI =
+                  matchesSimple[0] === 0 ? 0 : nextBeginningIndexes[matchesSimple[0] - 1]);
+                if (targetI !== targetLen)
+                  for (;;)
+                    if (targetI >= targetLen) {
+                      if (searchI <= 0) {
+                        if ((++typoStrictI, typoStrictI > searchLen - 2)) break;
+                        if (searchLowerCodes[typoStrictI] === searchLowerCodes[typoStrictI + 1]) continue;
+                        targetI = firstPossibleI;
+                        continue;
+                      }
+                      --searchI;
+                      var lastMatch = matchesStrict[--matchesStrictLen];
+                      targetI = nextBeginningIndexes[lastMatch];
+                    } else {
+                      var isMatch =
+                        searchLowerCodes[
+                          typoStrictI === 0
+                            ? searchI
+                            : typoStrictI === searchI
+                            ? searchI + 1
+                            : typoStrictI === searchI - 1
+                            ? searchI - 1
+                            : searchI
+                        ] === targetLowerCodes[targetI];
+                      if (isMatch) {
+                        if (((matchesStrict[matchesStrictLen++] = targetI), ++searchI, searchI === searchLen)) {
+                          successStrict = !0;
+                          break;
+                        }
+                        ++targetI;
+                      } else targetI = nextBeginningIndexes[targetI];
+                    }
+                {
+                  if (successStrict)
+                    var matchesBest = matchesStrict,
+                      matchesBestLen = matchesStrictLen;
+                  else
+                    var matchesBest = matchesSimple,
+                      matchesBestLen = matchesSimpleLen;
+                  for (var score = 0, lastTargetI = -1, i = 0; i < searchLen; ++i) {
+                    var targetI = matchesBest[i];
+                    lastTargetI !== targetI - 1 && (score -= targetI), (lastTargetI = targetI);
+                  }
+                  successStrict
+                    ? typoStrictI !== 0 && (score += -20)
+                    : ((score *= 1e3), typoSimpleI !== 0 && (score += -20)),
+                    (score -= targetLen - searchLen),
+                    (prepared.score = score),
+                    (prepared.indexes = new Array(matchesBestLen));
+                  for (var i = matchesBestLen - 1; i >= 0; --i) prepared.indexes[i] = matchesBest[i];
+                  return prepared;
+                }
+              },
+              algorithmNoTypo: function (searchLowerCodes, prepared, searchLowerCode) {
+                for (
+                  var targetLowerCodes = prepared._targetLowerCodes,
+                    searchLen = searchLowerCodes.length,
+                    targetLen = targetLowerCodes.length,
+                    searchI = 0,
+                    targetI = 0,
+                    matchesSimpleLen = 0;
+                  ;
+
+                ) {
+                  var isMatch = searchLowerCode === targetLowerCodes[targetI];
+                  if (isMatch) {
+                    if (((matchesSimple[matchesSimpleLen++] = targetI), ++searchI, searchI === searchLen)) break;
+                    searchLowerCode = searchLowerCodes[searchI];
+                  }
+                  if ((++targetI, targetI >= targetLen)) return null;
+                }
+                var searchI = 0,
+                  successStrict = !1,
+                  matchesStrictLen = 0,
+                  nextBeginningIndexes = prepared._nextBeginningIndexes;
+                if (
+                  (nextBeginningIndexes === null &&
+                    (nextBeginningIndexes = prepared._nextBeginningIndexes =
+                      fuzzysort2.prepareNextBeginningIndexes(prepared.target)),
+                  (targetI = matchesSimple[0] === 0 ? 0 : nextBeginningIndexes[matchesSimple[0] - 1]),
+                  targetI !== targetLen)
+                )
+                  for (;;)
+                    if (targetI >= targetLen) {
+                      if (searchI <= 0) break;
+                      --searchI;
+                      var lastMatch = matchesStrict[--matchesStrictLen];
+                      targetI = nextBeginningIndexes[lastMatch];
+                    } else {
+                      var isMatch = searchLowerCodes[searchI] === targetLowerCodes[targetI];
+                      if (isMatch) {
+                        if (((matchesStrict[matchesStrictLen++] = targetI), ++searchI, searchI === searchLen)) {
+                          successStrict = !0;
+                          break;
+                        }
+                        ++targetI;
+                      } else targetI = nextBeginningIndexes[targetI];
+                    }
+                {
+                  if (successStrict)
+                    var matchesBest = matchesStrict,
+                      matchesBestLen = matchesStrictLen;
+                  else
+                    var matchesBest = matchesSimple,
+                      matchesBestLen = matchesSimpleLen;
+                  for (var score = 0, lastTargetI = -1, i = 0; i < searchLen; ++i) {
+                    var targetI = matchesBest[i];
+                    lastTargetI !== targetI - 1 && (score -= targetI), (lastTargetI = targetI);
+                  }
+                  successStrict || (score *= 1e3),
+                    (score -= targetLen - searchLen),
+                    (prepared.score = score),
+                    (prepared.indexes = new Array(matchesBestLen));
+                  for (var i = matchesBestLen - 1; i >= 0; --i) prepared.indexes[i] = matchesBest[i];
+                  return prepared;
+                }
+              },
+              prepareLowerCodes: function (str) {
+                for (var strLen = str.length, lowerCodes = [], lower = str.toLowerCase(), i = 0; i < strLen; ++i)
+                  lowerCodes[i] = lower.charCodeAt(i);
+                return lowerCodes;
+              },
+              prepareBeginningIndexes: function (target) {
+                for (
+                  var targetLen = target.length,
+                    beginningIndexes = [],
+                    beginningIndexesLen = 0,
+                    wasUpper = !1,
+                    wasAlphanum = !1,
+                    i = 0;
+                  i < targetLen;
+                  ++i
+                ) {
+                  var targetCode = target.charCodeAt(i),
+                    isUpper = targetCode >= 65 && targetCode <= 90,
+                    isAlphanum =
+                      isUpper || (targetCode >= 97 && targetCode <= 122) || (targetCode >= 48 && targetCode <= 57),
+                    isBeginning = (isUpper && !wasUpper) || !wasAlphanum || !isAlphanum;
+                  (wasUpper = isUpper),
+                    (wasAlphanum = isAlphanum),
+                    isBeginning && (beginningIndexes[beginningIndexesLen++] = i);
+                }
+                return beginningIndexes;
+              },
+              prepareNextBeginningIndexes: function (target) {
+                for (
+                  var targetLen = target.length,
+                    beginningIndexes = fuzzysort2.prepareBeginningIndexes(target),
+                    nextBeginningIndexes = [],
+                    lastIsBeginning = beginningIndexes[0],
+                    lastIsBeginningI = 0,
+                    i = 0;
+                  i < targetLen;
+                  ++i
+                )
+                  lastIsBeginning > i
+                    ? (nextBeginningIndexes[i] = lastIsBeginning)
+                    : ((lastIsBeginning = beginningIndexes[++lastIsBeginningI]),
+                      (nextBeginningIndexes[i] = lastIsBeginning === void 0 ? targetLen : lastIsBeginning));
+                return nextBeginningIndexes;
+              },
+              cleanup,
+              new: fuzzysortNew,
+            };
+            return fuzzysort2;
+          }
+          var isNode = typeof commonjsRequire < 'u' && typeof window > 'u',
+            MyMap =
+              typeof Map == 'function'
+                ? Map
+                : function () {
+                    var s = /* @__PURE__ */ Object.create(null);
+                    (this.get = function (k) {
+                      return s[k];
+                    }),
+                      (this.set = function (k, val) {
+                        return (s[k] = val), this;
+                      }),
+                      (this.clear = function () {
+                        s = /* @__PURE__ */ Object.create(null);
+                      });
+                  },
+            preparedCache = new MyMap(),
+            preparedSearchCache = new MyMap(),
+            noResults = [];
+          noResults.total = 0;
+          var matchesSimple = [],
+            matchesStrict = [];
+          function cleanup() {
+            preparedCache.clear(), preparedSearchCache.clear(), (matchesSimple = []), (matchesStrict = []);
+          }
+          function defaultScoreFn(a) {
+            for (var max = -9007199254740991, i = a.length - 1; i >= 0; --i) {
+              var result = a[i];
+              if (result !== null) {
+                var score = result.score;
+                score > max && (max = score);
+              }
+            }
+            return max === -9007199254740991 ? null : max;
+          }
+          function getValue(obj, prop) {
+            var tmp = obj[prop];
+            if (tmp !== void 0) return tmp;
+            var segs = prop;
+            Array.isArray(prop) || (segs = prop.split('.'));
+            for (var len = segs.length, i = -1; obj && ++i < len; ) obj = obj[segs[i]];
+            return obj;
+          }
+          function isObj(x) {
+            return _typeof(x) === 'object';
+          }
+          var fastpriorityqueue = function () {
+              var r = [],
+                o = 0,
+                e = {};
+              function n() {
+                for (var e2 = 0, n2 = r[e2], c = 1; c < o; ) {
+                  var f = c + 1;
+                  (e2 = c),
+                    f < o && r[f].score < r[c].score && (e2 = f),
+                    (r[(e2 - 1) >> 1] = r[e2]),
+                    (c = 1 + (e2 << 1));
+                }
+                for (var a = (e2 - 1) >> 1; e2 > 0 && n2.score < r[a].score; a = ((e2 = a) - 1) >> 1) r[e2] = r[a];
+                r[e2] = n2;
+              }
+              return (
+                (e.add = function (e2) {
+                  var n2 = o;
+                  r[o++] = e2;
+                  for (var c = (n2 - 1) >> 1; n2 > 0 && e2.score < r[c].score; c = ((n2 = c) - 1) >> 1) r[n2] = r[c];
+                  r[n2] = e2;
+                }),
+                (e.poll = function () {
+                  if (o !== 0) {
+                    var e2 = r[0];
+                    return (r[0] = r[--o]), n(), e2;
+                  }
+                }),
+                (e.peek = function (e2) {
+                  if (o !== 0) return r[0];
+                }),
+                (e.replaceTop = function (o2) {
+                  (r[0] = o2), n();
+                }),
+                e
+              );
+            },
+            q = fastpriorityqueue();
+          return fuzzysortNew();
+        });
+      })(fuzzysort$1);
+      var fuzzysort = fuzzysort$1.exports,
+        stats = {
+          failedTests: [],
+          defined: 0,
+          completed: 0,
+        };
+      function escapeText(str) {
+        return str
+          ? ('' + str).replace(/['"<>&]/g, function (s) {
+              switch (s) {
+                case "'":
+                  return '&#039;';
+                case '"':
+                  return '&quot;';
+                case '<':
+                  return '&lt;';
+                case '>':
+                  return '&gt;';
+                case '&':
+                  return '&amp;';
+              }
+            })
+          : '';
+      }
+      (function () {
+        if (!window$1 || !document2) return;
+        var config2 = QUnit2.config,
+          hiddenTests = [],
+          collapseNext = !1,
+          hasOwn2 = Object.prototype.hasOwnProperty,
+          unfilteredUrl = setUrl({
+            filter: void 0,
+            module: void 0,
+            moduleId: void 0,
+            testId: void 0,
+          }),
+          dropdownData = null;
+        function trim(string) {
+          return typeof string.trim == 'function' ? string.trim() : string.replace(/^\s+|\s+$/g, '');
+        }
+        function addEvent(elem, type, fn) {
+          elem.addEventListener(type, fn, !1);
+        }
+        function removeEvent(elem, type, fn) {
+          elem.removeEventListener(type, fn, !1);
+        }
+        function addEvents(elems, type, fn) {
+          for (var i = elems.length; i--; ) addEvent(elems[i], type, fn);
+        }
+        function hasClass(elem, name) {
+          return (' ' + elem.className + ' ').indexOf(' ' + name + ' ') >= 0;
+        }
+        function addClass(elem, name) {
+          hasClass(elem, name) || (elem.className += (elem.className ? ' ' : '') + name);
+        }
+        function toggleClass(elem, name, force) {
+          force || (typeof force > 'u' && !hasClass(elem, name)) ? addClass(elem, name) : removeClass(elem, name);
+        }
+        function removeClass(elem, name) {
+          for (var set = ' ' + elem.className + ' '; set.indexOf(' ' + name + ' ') >= 0; )
+            set = set.replace(' ' + name + ' ', ' ');
+          elem.className = trim(set);
+        }
+        function id(name) {
+          return document2.getElementById && document2.getElementById(name);
+        }
+        function abortTests() {
+          var abortButton = id('qunit-abort-tests-button');
+          return (
+            abortButton && ((abortButton.disabled = !0), (abortButton.innerHTML = 'Aborting...')),
+            (QUnit2.config.queue.length = 0),
+            !1
+          );
+        }
+        function interceptNavigation(ev) {
+          var filterInputElem = id('qunit-filter-input');
+          return (
+            (filterInputElem.value = trim(filterInputElem.value)),
+            applyUrlParams(),
+            ev && ev.preventDefault && ev.preventDefault(),
+            !1
+          );
+        }
+        function getUrlConfigHtml() {
+          for (
+            var selection = !1, urlConfig = config2.urlConfig, urlConfigHtml = '', i = 0;
+            i < urlConfig.length;
+            i++
+          ) {
+            var val = config2.urlConfig[i];
+            typeof val == 'string' &&
+              (val = {
+                id: val,
+                label: val,
+              });
+            var escaped = escapeText(val.id),
+              escapedTooltip = escapeText(val.tooltip);
+            if (!val.value || typeof val.value == 'string')
+              urlConfigHtml +=
+                "<label for='qunit-urlconfig-" +
+                escaped +
+                "' title='" +
+                escapedTooltip +
+                "'><input id='qunit-urlconfig-" +
+                escaped +
+                "' name='" +
+                escaped +
+                "' type='checkbox'" +
+                (val.value ? " value='" + escapeText(val.value) + "'" : '') +
+                (config2[val.id] ? " checked='checked'" : '') +
+                " title='" +
+                escapedTooltip +
+                "' />" +
+                escapeText(val.label) +
+                '</label>';
+            else {
+              if (
+                ((urlConfigHtml +=
+                  "<label for='qunit-urlconfig-" +
+                  escaped +
+                  "' title='" +
+                  escapedTooltip +
+                  "'>" +
+                  val.label +
+                  ": </label><select id='qunit-urlconfig-" +
+                  escaped +
+                  "' name='" +
+                  escaped +
+                  "' title='" +
+                  escapedTooltip +
+                  "'><option></option>"),
+                Array.isArray(val.value))
+              )
+                for (var j = 0; j < val.value.length; j++)
+                  (escaped = escapeText(val.value[j])),
+                    (urlConfigHtml +=
+                      "<option value='" +
+                      escaped +
+                      "'" +
+                      (config2[val.id] === val.value[j] ? (selection = !0) && " selected='selected'" : '') +
+                      '>' +
+                      escaped +
+                      '</option>');
+              else
+                for (var _j in val.value)
+                  hasOwn2.call(val.value, _j) &&
+                    (urlConfigHtml +=
+                      "<option value='" +
+                      escapeText(_j) +
+                      "'" +
+                      (config2[val.id] === _j ? (selection = !0) && " selected='selected'" : '') +
+                      '>' +
+                      escapeText(val.value[_j]) +
+                      '</option>');
+              config2[val.id] &&
+                !selection &&
+                ((escaped = escapeText(config2[val.id])),
+                (urlConfigHtml +=
+                  "<option value='" + escaped + "' selected='selected' disabled='disabled'>" + escaped + '</option>')),
+                (urlConfigHtml += '</select>');
+            }
+          }
+          return urlConfigHtml;
+        }
+        function toolbarChanged() {
+          var field = this,
+            params = {},
+            value;
+          'selectedIndex' in field
+            ? (value = field.options[field.selectedIndex].value || void 0)
+            : (value = field.checked ? field.defaultValue || !0 : void 0),
+            (params[field.name] = value);
+          var updatedUrl = setUrl(params);
+          if (field.name === 'hidepassed' && 'replaceState' in window$1.history) {
+            (QUnit2.urlParams[field.name] = value), (config2[field.name] = value || !1);
+            var tests = id('qunit-tests');
+            if (tests) {
+              var length = tests.children.length,
+                children = tests.children;
+              if (field.checked) {
+                for (var i = 0; i < length; i++) {
+                  var test2 = children[i],
+                    className = test2 ? test2.className : '',
+                    classNameHasPass = className.indexOf('pass') > -1,
+                    classNameHasSkipped = className.indexOf('skipped') > -1;
+                  (classNameHasPass || classNameHasSkipped) && hiddenTests.push(test2);
+                }
+                var _iterator = _createForOfIteratorHelper(hiddenTests),
+                  _step;
+                try {
+                  for (_iterator.s(); !(_step = _iterator.n()).done; ) {
+                    var hiddenTest = _step.value;
+                    tests.removeChild(hiddenTest);
+                  }
+                } catch (err) {
+                  _iterator.e(err);
+                } finally {
+                  _iterator.f();
+                }
+              } else for (var _test; (_test = hiddenTests.pop()) != null; ) tests.appendChild(_test);
+            }
+            window$1.history.replaceState(null, '', updatedUrl);
+          } else window$1.location = updatedUrl;
+        }
+        function setUrl(params) {
+          var querystring = '?',
+            location = window$1.location;
+          params = extend(extend({}, QUnit2.urlParams), params);
+          for (var key in params)
+            if (hasOwn2.call(params, key) && params[key] !== void 0)
+              for (var arrValue = [].concat(params[key]), i = 0; i < arrValue.length; i++)
+                (querystring += encodeURIComponent(key)),
+                  arrValue[i] !== !0 && (querystring += '=' + encodeURIComponent(arrValue[i])),
+                  (querystring += '&');
+          return location.protocol + '//' + location.host + location.pathname + querystring.slice(0, -1);
+        }
+        function applyUrlParams() {
+          var filter = id('qunit-filter-input').value;
+          window$1.location = setUrl({
+            filter: filter === '' ? void 0 : filter,
+            moduleId: _toConsumableArray(dropdownData.selectedMap.keys()),
+            module: void 0,
+            testId: void 0,
+          });
+        }
+        function toolbarUrlConfigContainer() {
+          var urlConfigContainer = document2.createElement('span');
+          return (
+            (urlConfigContainer.innerHTML = getUrlConfigHtml()),
+            addClass(urlConfigContainer, 'qunit-url-config'),
+            addEvents(urlConfigContainer.getElementsByTagName('input'), 'change', toolbarChanged),
+            addEvents(urlConfigContainer.getElementsByTagName('select'), 'change', toolbarChanged),
+            urlConfigContainer
+          );
+        }
+        function abortTestsButton() {
+          var button = document2.createElement('button');
+          return (
+            (button.id = 'qunit-abort-tests-button'),
+            (button.innerHTML = 'Abort'),
+            addEvent(button, 'click', abortTests),
+            button
+          );
+        }
+        function toolbarLooseFilter() {
+          var filter = document2.createElement('form'),
+            label = document2.createElement('label'),
+            input = document2.createElement('input'),
+            button = document2.createElement('button');
+          return (
+            addClass(filter, 'qunit-filter'),
+            (label.innerHTML = 'Filter: '),
+            (input.type = 'text'),
+            (input.value = config2.filter || ''),
+            (input.name = 'filter'),
+            (input.id = 'qunit-filter-input'),
+            (button.innerHTML = 'Go'),
+            label.appendChild(input),
+            filter.appendChild(label),
+            filter.appendChild(document2.createTextNode(' ')),
+            filter.appendChild(button),
+            addEvent(filter, 'submit', interceptNavigation),
+            filter
+          );
+        }
+        function createModuleListItem(moduleId, name, checked) {
+          return (
+            '<li><label class="clickable' +
+            (checked ? ' checked' : '') +
+            '"><input type="checkbox" value="' +
+            escapeText(moduleId) +
+            '"' +
+            (checked ? ' checked="checked"' : '') +
+            ' />' +
+            escapeText(name) +
+            '</label></li>'
+          );
+        }
+        function moduleListHtml(results) {
+          var html = '';
+          dropdownData.selectedMap.forEach(function (name, moduleId) {
+            html += createModuleListItem(moduleId, name, !0);
+          });
+          for (var i = 0; i < results.length; i++) {
+            var mod = results[i].obj;
+            dropdownData.selectedMap.has(mod.moduleId) || (html += createModuleListItem(mod.moduleId, mod.name, !1));
+          }
+          return html;
+        }
+        function toolbarModuleFilter(beginDetails) {
+          var initialSelected = null;
+          if (
+            ((dropdownData = {
+              options: beginDetails.modules.slice(),
+              selectedMap: new StringMap(),
+              isDirty: function () {
+                return (
+                  _toConsumableArray(dropdownData.selectedMap.keys()).sort().join(',') !==
+                  _toConsumableArray(initialSelected.keys()).sort().join(',')
+                );
+              },
+            }),
+            config2.moduleId.length)
+          )
+            for (var i = 0; i < beginDetails.modules.length; i++) {
+              var mod = beginDetails.modules[i];
+              config2.moduleId.indexOf(mod.moduleId) !== -1 && dropdownData.selectedMap.set(mod.moduleId, mod.name);
+            }
+          initialSelected = new StringMap(dropdownData.selectedMap);
+          var moduleSearch = document2.createElement('input');
+          (moduleSearch.id = 'qunit-modulefilter-search'),
+            (moduleSearch.autocomplete = 'off'),
+            addEvent(moduleSearch, 'input', searchInput),
+            addEvent(moduleSearch, 'input', searchFocus),
+            addEvent(moduleSearch, 'focus', searchFocus),
+            addEvent(moduleSearch, 'click', searchFocus);
+          var label = document2.createElement('label');
+          (label.htmlFor = 'qunit-modulefilter-search'), (label.textContent = 'Module:');
+          var searchContainer = document2.createElement('span');
+          (searchContainer.id = 'qunit-modulefilter-search-container'), searchContainer.appendChild(moduleSearch);
+          var applyButton = document2.createElement('button');
+          (applyButton.textContent = 'Apply'),
+            (applyButton.title = 'Re-run the selected test modules'),
+            addEvent(applyButton, 'click', applyUrlParams);
+          var resetButton = document2.createElement('button');
+          (resetButton.textContent = 'Reset'),
+            (resetButton.type = 'reset'),
+            (resetButton.title = 'Restore the previous module selection');
+          var clearButton = document2.createElement('button');
+          (clearButton.textContent = 'Select none'),
+            (clearButton.type = 'button'),
+            (clearButton.title = 'Clear the current module selection'),
+            addEvent(clearButton, 'click', function () {
+              dropdownData.selectedMap.clear(), selectionChange(), searchInput();
+            });
+          var actions = document2.createElement('span');
+          (actions.id = 'qunit-modulefilter-actions'),
+            actions.appendChild(applyButton),
+            actions.appendChild(resetButton),
+            initialSelected.size && actions.appendChild(clearButton);
+          var dropDownList = document2.createElement('ul');
+          dropDownList.id = 'qunit-modulefilter-dropdown-list';
+          var dropDown = document2.createElement('div');
+          (dropDown.id = 'qunit-modulefilter-dropdown'),
+            (dropDown.style.display = 'none'),
+            dropDown.appendChild(actions),
+            dropDown.appendChild(dropDownList),
+            addEvent(dropDown, 'change', selectionChange),
+            searchContainer.appendChild(dropDown),
+            selectionChange();
+          var moduleFilter = document2.createElement('form');
+          (moduleFilter.id = 'qunit-modulefilter'),
+            moduleFilter.appendChild(label),
+            moduleFilter.appendChild(document2.createTextNode(' ')),
+            moduleFilter.appendChild(searchContainer),
+            addEvent(moduleFilter, 'submit', interceptNavigation),
+            addEvent(moduleFilter, 'reset', function () {
+              (dropdownData.selectedMap = new StringMap(initialSelected)), selectionChange(), searchInput();
+            });
+          function searchFocus() {
+            if (dropDown.style.display !== 'none') return;
+            searchInput(),
+              (dropDown.style.display = 'block'),
+              addEvent(document2, 'click', hideHandler),
+              addEvent(document2, 'keydown', hideHandler);
+            function hideHandler(e) {
+              var inContainer = moduleFilter.contains(e.target);
+              (e.keyCode === 27 || !inContainer) &&
+                (e.keyCode === 27 && inContainer && moduleSearch.focus(),
+                (dropDown.style.display = 'none'),
+                removeEvent(document2, 'click', hideHandler),
+                removeEvent(document2, 'keydown', hideHandler),
+                (moduleSearch.value = ''),
+                searchInput());
+            }
+          }
+          function filterModules(searchText) {
+            var results;
+            return (
+              searchText === ''
+                ? (results = dropdownData.options.slice(0, 20).map(function (obj) {
+                    return {
+                      obj,
+                    };
+                  }))
+                : (results = fuzzysort.go(searchText, dropdownData.options, {
+                    limit: 20,
+                    key: 'name',
+                    allowTypo: !0,
+                  })),
+              moduleListHtml(results)
+            );
+          }
+          var searchInputTimeout;
+          function searchInput() {
+            window$1.clearTimeout(searchInputTimeout),
+              (searchInputTimeout = window$1.setTimeout(function () {
+                dropDownList.innerHTML = filterModules(moduleSearch.value);
+              }));
+          }
+          function selectionChange(evt) {
+            var checkbox = (evt && evt.target) || null;
+            checkbox &&
+              (checkbox.checked
+                ? dropdownData.selectedMap.set(checkbox.value, checkbox.parentNode.textContent)
+                : dropdownData.selectedMap.delete(checkbox.value),
+              toggleClass(checkbox.parentNode, 'checked', checkbox.checked));
+            var textForm = dropdownData.selectedMap.size
+              ? dropdownData.selectedMap.size + ' ' + (dropdownData.selectedMap.size === 1 ? 'module' : 'modules')
+              : 'All modules';
+            (moduleSearch.placeholder = textForm),
+              (moduleSearch.title = 'Type to search through and reduce the list.'),
+              (resetButton.disabled = !dropdownData.isDirty()),
+              (clearButton.style.display = dropdownData.selectedMap.size ? '' : 'none');
+          }
+          return moduleFilter;
+        }
+        function appendToolbar(beginDetails) {
+          var toolbar = id('qunit-testrunner-toolbar');
+          if (toolbar) {
+            toolbar.appendChild(toolbarUrlConfigContainer());
+            var toolbarFilters = document2.createElement('span');
+            (toolbarFilters.id = 'qunit-toolbar-filters'),
+              toolbarFilters.appendChild(toolbarLooseFilter()),
+              toolbarFilters.appendChild(toolbarModuleFilter(beginDetails));
+            var clearfix = document2.createElement('div');
+            (clearfix.className = 'clearfix'), toolbar.appendChild(toolbarFilters), toolbar.appendChild(clearfix);
+          }
+        }
+        function appendHeader() {
+          var header = id('qunit-header');
+          header && (header.innerHTML = "<a href='" + escapeText(unfilteredUrl) + "'>" + header.innerHTML + '</a> ');
+        }
+        function appendBanner() {
+          var banner = id('qunit-banner');
+          banner && (banner.className = '');
+        }
+        function appendTestResults() {
+          var tests = id('qunit-tests'),
+            result = id('qunit-testresult'),
+            controls;
+          result && result.parentNode.removeChild(result),
+            tests &&
+              ((tests.innerHTML = ''),
+              (result = document2.createElement('p')),
+              (result.id = 'qunit-testresult'),
+              (result.className = 'result'),
+              tests.parentNode.insertBefore(result, tests),
+              (result.innerHTML =
+                '<div id="qunit-testresult-display">Running...<br />&#160;</div><div id="qunit-testresult-controls"></div><div class="clearfix"></div>'),
+              (controls = id('qunit-testresult-controls'))),
+            controls && controls.appendChild(abortTestsButton());
+        }
+        function appendFilteredTest() {
+          var testId = QUnit2.config.testId;
+          return !testId || testId.length <= 0
+            ? ''
+            : "<div id='qunit-filteredTest'>Rerunning selected tests: " +
+                escapeText(testId.join(', ')) +
+                " <a id='qunit-clearFilter' href='" +
+                escapeText(unfilteredUrl) +
+                "'>Run all tests</a></div>";
+        }
+        function appendUserAgent() {
+          var userAgent = id('qunit-userAgent');
+          userAgent &&
+            ((userAgent.innerHTML = ''),
+            userAgent.appendChild(document2.createTextNode('QUnit ' + QUnit2.version + '; ' + navigator.userAgent)));
+        }
+        function appendInterface(beginDetails) {
+          var qunit = id('qunit');
+          qunit &&
+            (qunit.setAttribute('role', 'main'),
+            (qunit.innerHTML =
+              "<h1 id='qunit-header'>" +
+              escapeText(document2.title) +
+              "</h1><h2 id='qunit-banner'></h2><div id='qunit-testrunner-toolbar' role='navigation'></div>" +
+              appendFilteredTest() +
+              "<h2 id='qunit-userAgent'></h2><ol id='qunit-tests'></ol>")),
+            appendHeader(),
+            appendBanner(),
+            appendTestResults(),
+            appendUserAgent(),
+            appendToolbar(beginDetails);
+        }
+        function appendTest(name, testId, moduleName) {
+          var tests = id('qunit-tests');
+          if (!!tests) {
+            var title = document2.createElement('strong');
+            title.innerHTML = getNameHtml(name, moduleName);
+            var testBlock = document2.createElement('li');
+            if ((testBlock.appendChild(title), testId !== void 0)) {
+              var rerunTrigger = document2.createElement('a');
+              (rerunTrigger.innerHTML = 'Rerun'),
+                (rerunTrigger.href = setUrl({
+                  testId,
+                })),
+                (testBlock.id = 'qunit-test-output-' + testId),
+                testBlock.appendChild(rerunTrigger);
+            }
+            var assertList = document2.createElement('ol');
+            return (
+              (assertList.className = 'qunit-assert-list'),
+              testBlock.appendChild(assertList),
+              tests.appendChild(testBlock),
+              testBlock
+            );
+          }
+        }
+        QUnit2.on('runStart', function (runStart) {
+          stats.defined = runStart.testCounts.total;
+        }),
+          QUnit2.begin(function (beginDetails) {
+            appendInterface(beginDetails);
+          });
+        function getRerunFailedHtml(failedTests) {
+          if (failedTests.length === 0) return '';
+          var href = setUrl({
+            testId: failedTests,
+          });
+          return [
+            "<br /><a href='" + escapeText(href) + "'>",
+            failedTests.length === 1 ? 'Rerun 1 failed test' : 'Rerun ' + failedTests.length + ' failed tests',
+            '</a>',
+          ].join('');
+        }
+        QUnit2.on('runEnd', function (runEnd) {
+          var banner = id('qunit-banner'),
+            tests = id('qunit-tests'),
+            abortButton = id('qunit-abort-tests-button'),
+            assertPassed = config2.stats.all - config2.stats.bad,
+            html = [
+              runEnd.testCounts.total,
+              ' tests completed in ',
+              runEnd.runtime,
+              ' milliseconds, with ',
+              runEnd.testCounts.failed,
+              ' failed, ',
+              runEnd.testCounts.skipped,
+              ' skipped, and ',
+              runEnd.testCounts.todo,
+              ' todo.<br />',
+              "<span class='passed'>",
+              assertPassed,
+              "</span> assertions of <span class='total'>",
+              config2.stats.all,
+              "</span> passed, <span class='failed'>",
+              config2.stats.bad,
+              '</span> failed.',
+              getRerunFailedHtml(stats.failedTests),
+            ].join(''),
+            test2,
+            assertLi,
+            assertList;
+          if (abortButton && abortButton.disabled) {
+            html = 'Tests aborted after ' + runEnd.runtime + ' milliseconds.';
+            for (var i = 0; i < tests.children.length; i++)
+              (test2 = tests.children[i]),
+                (test2.className === '' || test2.className === 'running') &&
+                  ((test2.className = 'aborted'),
+                  (assertList = test2.getElementsByTagName('ol')[0]),
+                  (assertLi = document2.createElement('li')),
+                  (assertLi.className = 'fail'),
+                  (assertLi.innerHTML = 'Test aborted.'),
+                  assertList.appendChild(assertLi));
+          }
+          banner &&
+            (!abortButton || abortButton.disabled === !1) &&
+            (banner.className = runEnd.status === 'failed' ? 'qunit-fail' : 'qunit-pass'),
+            abortButton && abortButton.parentNode.removeChild(abortButton),
+            tests && (id('qunit-testresult-display').innerHTML = html),
+            config2.altertitle &&
+              document2.title &&
+              (document2.title = [
+                runEnd.status === 'failed' ? '\u2716' : '\u2714',
+                document2.title.replace(/^[\u2714\u2716] /i, ''),
+              ].join(' ')),
+            config2.scrolltop && window$1.scrollTo && window$1.scrollTo(0, 0);
+        });
+        function getNameHtml(name, module2) {
+          var nameHtml = '';
+          return (
+            module2 && (nameHtml = "<span class='module-name'>" + escapeText(module2) + '</span>: '),
+            (nameHtml += "<span class='test-name'>" + escapeText(name) + '</span>'),
+            nameHtml
+          );
+        }
+        function getProgressHtml(stats2) {
+          return [stats2.completed, ' / ', stats2.defined, ' tests completed.<br />'].join('');
+        }
+        QUnit2.testStart(function (details) {
+          var running, bad;
+          appendTest(details.name, details.testId, details.module),
+            (running = id('qunit-testresult-display')),
+            running &&
+              (addClass(running, 'running'),
+              (bad = QUnit2.config.reorder && details.previousFailure),
+              (running.innerHTML = [
+                getProgressHtml(stats),
+                bad ? 'Rerunning previously failed test: <br />' : 'Running: ',
+                getNameHtml(details.name, details.module),
+                getRerunFailedHtml(stats.failedTests),
+              ].join('')));
+        });
+        function stripHtml(string) {
+          return string
+            .replace(/<\/?[^>]+(>|$)/g, '')
+            .replace(/&quot;/g, '')
+            .replace(/\s+/g, '');
+        }
+        QUnit2.log(function (details) {
+          var testItem = id('qunit-test-output-' + details.testId);
+          if (!!testItem) {
+            var message = escapeText(details.message) || (details.result ? 'okay' : 'failed');
+            (message = "<span class='test-message'>" + message + '</span>'),
+              (message += "<span class='runtime'>@ " + details.runtime + ' ms</span>');
+            var expected,
+              actual,
+              diff2,
+              showDiff = !1;
+            !details.result && hasOwn2.call(details, 'expected')
+              ? (details.negative
+                  ? (expected = 'NOT ' + QUnit2.dump.parse(details.expected))
+                  : (expected = QUnit2.dump.parse(details.expected)),
+                (actual = QUnit2.dump.parse(details.actual)),
+                (message +=
+                  "<table><tr class='test-expected'><th>Expected: </th><td><pre>" +
+                  escapeText(expected) +
+                  '</pre></td></tr>'),
+                actual !== expected
+                  ? ((message +=
+                      "<tr class='test-actual'><th>Result: </th><td><pre>" + escapeText(actual) + '</pre></td></tr>'),
+                    typeof details.actual == 'number' && typeof details.expected == 'number'
+                      ? !isNaN(details.actual) &&
+                        !isNaN(details.expected) &&
+                        ((showDiff = !0),
+                        (diff2 = details.actual - details.expected),
+                        (diff2 = (diff2 > 0 ? '+' : '') + diff2))
+                      : typeof details.actual != 'boolean' &&
+                        typeof details.expected != 'boolean' &&
+                        ((diff2 = QUnit2.diff(expected, actual)),
+                        (showDiff = stripHtml(diff2).length !== stripHtml(expected).length + stripHtml(actual).length)),
+                    showDiff &&
+                      (message += "<tr class='test-diff'><th>Diff: </th><td><pre>" + diff2 + '</pre></td></tr>'))
+                  : expected.indexOf('[object Array]') !== -1 || expected.indexOf('[object Object]') !== -1
+                  ? (message +=
+                      "<tr class='test-message'><th>Message: </th><td>Diff suppressed as the depth of object is more than current max depth (" +
+                      QUnit2.config.maxDepth +
+                      ").<p>Hint: Use <code>QUnit.dump.maxDepth</code> to  run with a higher max depth or <a href='" +
+                      escapeText(
+                        setUrl({
+                          maxDepth: -1,
+                        }),
+                      ) +
+                      "'>Rerun</a> without max depth.</p></td></tr>")
+                  : (message +=
+                      "<tr class='test-message'><th>Message: </th><td>Diff suppressed as the expected and actual results have an equivalent serialization</td></tr>"),
+                details.source &&
+                  (message +=
+                    "<tr class='test-source'><th>Source: </th><td><pre>" +
+                    escapeText(details.source) +
+                    '</pre></td></tr>'),
+                (message += '</table>'))
+              : !details.result &&
+                details.source &&
+                (message +=
+                  "<table><tr class='test-source'><th>Source: </th><td><pre>" +
+                  escapeText(details.source) +
+                  '</pre></td></tr></table>');
+            var assertList = testItem.getElementsByTagName('ol')[0],
+              assertLi = document2.createElement('li');
+            (assertLi.className = details.result ? 'pass' : 'fail'),
+              (assertLi.innerHTML = message),
+              assertList.appendChild(assertLi);
+          }
+        }),
+          QUnit2.testDone(function (details) {
+            var tests = id('qunit-tests'),
+              testItem = id('qunit-test-output-' + details.testId);
+            if (!(!tests || !testItem)) {
+              removeClass(testItem, 'running');
+              var status;
+              details.failed > 0
+                ? (status = 'failed')
+                : details.todo
+                ? (status = 'todo')
+                : (status = details.skipped ? 'skipped' : 'passed');
+              var assertList = testItem.getElementsByTagName('ol')[0],
+                good = details.passed,
+                bad = details.failed,
+                testPassed = details.failed > 0 ? details.todo : !details.todo;
+              testPassed
+                ? addClass(assertList, 'qunit-collapsed')
+                : (stats.failedTests.push(details.testId),
+                  config2.collapse && (collapseNext ? addClass(assertList, 'qunit-collapsed') : (collapseNext = !0)));
+              var testTitle = testItem.firstChild,
+                testCounts = bad ? "<b class='failed'>" + bad + "</b>, <b class='passed'>" + good + '</b>, ' : '';
+              if (
+                ((testTitle.innerHTML += " <b class='counts'>(" + testCounts + details.assertions.length + ')</b>'),
+                stats.completed++,
+                details.skipped)
+              ) {
+                testItem.className = 'skipped';
+                var skipped = document2.createElement('em');
+                (skipped.className = 'qunit-skipped-label'),
+                  (skipped.innerHTML = 'skipped'),
+                  testItem.insertBefore(skipped, testTitle);
+              } else {
+                if (
+                  (addEvent(testTitle, 'click', function () {
+                    toggleClass(assertList, 'qunit-collapsed');
+                  }),
+                  (testItem.className = testPassed ? 'pass' : 'fail'),
+                  details.todo)
+                ) {
+                  var todoLabel = document2.createElement('em');
+                  (todoLabel.className = 'qunit-todo-label'),
+                    (todoLabel.innerHTML = 'todo'),
+                    (testItem.className += ' todo'),
+                    testItem.insertBefore(todoLabel, testTitle);
+                }
+                var time = document2.createElement('span');
+                (time.className = 'runtime'),
+                  (time.innerHTML = details.runtime + ' ms'),
+                  testItem.insertBefore(time, assertList);
+              }
+              if (details.source) {
+                var sourceName = document2.createElement('p');
+                (sourceName.innerHTML = '<strong>Source: </strong>' + escapeText(details.source)),
+                  addClass(sourceName, 'qunit-source'),
+                  testPassed && addClass(sourceName, 'qunit-collapsed'),
+                  addEvent(testTitle, 'click', function () {
+                    toggleClass(sourceName, 'qunit-collapsed');
+                  }),
+                  testItem.appendChild(sourceName);
+              }
+              config2.hidepassed &&
+                (status === 'passed' || details.skipped) &&
+                (hiddenTests.push(testItem), tests.removeChild(testItem));
+            }
+          }),
+          QUnit2.on('error', function (error) {
+            var testItem = appendTest('global failure');
+            if (!!testItem) {
+              var message = escapeText(errorString(error));
+              (message = "<span class='test-message'>" + message + '</span>'),
+                error &&
+                  error.stack &&
+                  (message +=
+                    "<table><tr class='test-source'><th>Source: </th><td><pre>" +
+                    escapeText(error.stack) +
+                    '</pre></td></tr></table>');
+              var assertList = testItem.getElementsByTagName('ol')[0],
+                assertLi = document2.createElement('li');
+              (assertLi.className = 'fail'),
+                (assertLi.innerHTML = message),
+                assertList.appendChild(assertLi),
+                (testItem.className = 'fail');
+            }
+          });
+        var usingPhantom = (function (p) {
+          return p && p.version && p.version.major > 0;
+        })(window$1.phantom);
+        usingPhantom && console$1.warn('Support for PhantomJS is deprecated and will be removed in QUnit 3.0.'),
+          !usingPhantom && document2.readyState === 'complete'
+            ? QUnit2.load()
+            : addEvent(window$1, 'load', QUnit2.load);
+        var originalWindowOnError = window$1.onerror;
+        (window$1.onerror = function (message, fileName2, lineNumber, columnNumber, errorObj) {
+          var ret = !1;
+          if (originalWindowOnError) {
+            for (var _len = arguments.length, args = new Array(_len > 5 ? _len - 5 : 0), _key = 5; _key < _len; _key++)
+              args[_key - 5] = arguments[_key];
+            ret = originalWindowOnError.call.apply(
+              originalWindowOnError,
+              [this, message, fileName2, lineNumber, columnNumber, errorObj].concat(args),
+            );
+          }
+          if (ret !== !0) {
+            if (config2.current && config2.current.ignoreGlobalErrors) return !0;
+            var error = errorObj || new Error(message);
+            !error.stack && fileName2 && lineNumber && (error.stack = ''.concat(fileName2, ':').concat(lineNumber)),
+              QUnit2.onUncaughtException(error);
+          }
+          return ret;
+        }),
+          window$1.addEventListener('unhandledrejection', function (event) {
+            QUnit2.onUncaughtException(event.reason);
+          });
+      })(),
+        (QUnit2.diff = (function () {
+          function DiffMatchPatch() {}
+          var DIFF_DELETE = -1,
+            DIFF_INSERT = 1,
+            DIFF_EQUAL = 0,
+            hasOwn2 = Object.prototype.hasOwnProperty;
+          return (
+            (DiffMatchPatch.prototype.DiffMain = function (text1, text2, optChecklines) {
+              var deadline = Date.now() + 1e3;
+              if (text1 === null || text2 === null) throw new Error('Cannot diff null input.');
+              if (text1 === text2) return text1 ? [[DIFF_EQUAL, text1]] : [];
+              typeof optChecklines > 'u' && (optChecklines = !0);
+              var commonlength = this.diffCommonPrefix(text1, text2),
+                commonprefix = text1.substring(0, commonlength);
+              (text1 = text1.substring(commonlength)),
+                (text2 = text2.substring(commonlength)),
+                (commonlength = this.diffCommonSuffix(text1, text2));
+              var commonsuffix = text1.substring(text1.length - commonlength);
+              (text1 = text1.substring(0, text1.length - commonlength)),
+                (text2 = text2.substring(0, text2.length - commonlength));
+              var diffs = this.diffCompute(text1, text2, optChecklines, deadline);
+              return (
+                commonprefix && diffs.unshift([DIFF_EQUAL, commonprefix]),
+                commonsuffix && diffs.push([DIFF_EQUAL, commonsuffix]),
+                this.diffCleanupMerge(diffs),
+                diffs
+              );
+            }),
+            (DiffMatchPatch.prototype.diffCleanupEfficiency = function (diffs) {
+              var changes, equalities, equalitiesLength, lastequality, pointer, preIns, preDel, postIns, postDel;
+              for (
+                changes = !1,
+                  equalities = [],
+                  equalitiesLength = 0,
+                  lastequality = null,
+                  pointer = 0,
+                  preIns = !1,
+                  preDel = !1,
+                  postIns = !1,
+                  postDel = !1;
+                pointer < diffs.length;
+
+              )
+                diffs[pointer][0] === DIFF_EQUAL
+                  ? (diffs[pointer][1].length < 4 && (postIns || postDel)
+                      ? ((equalities[equalitiesLength++] = pointer),
+                        (preIns = postIns),
+                        (preDel = postDel),
+                        (lastequality = diffs[pointer][1]))
+                      : ((equalitiesLength = 0), (lastequality = null)),
+                    (postIns = postDel = !1))
+                  : (diffs[pointer][0] === DIFF_DELETE ? (postDel = !0) : (postIns = !0),
+                    lastequality &&
+                      ((preIns && preDel && postIns && postDel) ||
+                        (lastequality.length < 2 && preIns + preDel + postIns + postDel === 3)) &&
+                      (diffs.splice(equalities[equalitiesLength - 1], 0, [DIFF_DELETE, lastequality]),
+                      (diffs[equalities[equalitiesLength - 1] + 1][0] = DIFF_INSERT),
+                      equalitiesLength--,
+                      (lastequality = null),
+                      preIns && preDel
+                        ? ((postIns = postDel = !0), (equalitiesLength = 0))
+                        : (equalitiesLength--,
+                          (pointer = equalitiesLength > 0 ? equalities[equalitiesLength - 1] : -1),
+                          (postIns = postDel = !1)),
+                      (changes = !0))),
+                  pointer++;
+              changes && this.diffCleanupMerge(diffs);
+            }),
+            (DiffMatchPatch.prototype.diffPrettyHtml = function (diffs) {
+              for (var html = [], x = 0; x < diffs.length; x++) {
+                var op = diffs[x][0],
+                  data = diffs[x][1];
+                switch (op) {
+                  case DIFF_INSERT:
+                    html[x] = '<ins>' + escapeText(data) + '</ins>';
+                    break;
+                  case DIFF_DELETE:
+                    html[x] = '<del>' + escapeText(data) + '</del>';
+                    break;
+                  case DIFF_EQUAL:
+                    html[x] = '<span>' + escapeText(data) + '</span>';
+                    break;
+                }
+              }
+              return html.join('');
+            }),
+            (DiffMatchPatch.prototype.diffCommonPrefix = function (text1, text2) {
+              var pointermid, pointermax, pointermin, pointerstart;
+              if (!text1 || !text2 || text1.charAt(0) !== text2.charAt(0)) return 0;
+              for (
+                pointermin = 0,
+                  pointermax = Math.min(text1.length, text2.length),
+                  pointermid = pointermax,
+                  pointerstart = 0;
+                pointermin < pointermid;
+
+              )
+                text1.substring(pointerstart, pointermid) === text2.substring(pointerstart, pointermid)
+                  ? ((pointermin = pointermid), (pointerstart = pointermin))
+                  : (pointermax = pointermid),
+                  (pointermid = Math.floor((pointermax - pointermin) / 2 + pointermin));
+              return pointermid;
+            }),
+            (DiffMatchPatch.prototype.diffCommonSuffix = function (text1, text2) {
+              var pointermid, pointermax, pointermin, pointerend;
+              if (!text1 || !text2 || text1.charAt(text1.length - 1) !== text2.charAt(text2.length - 1)) return 0;
+              for (
+                pointermin = 0,
+                  pointermax = Math.min(text1.length, text2.length),
+                  pointermid = pointermax,
+                  pointerend = 0;
+                pointermin < pointermid;
+
+              )
+                text1.substring(text1.length - pointermid, text1.length - pointerend) ===
+                text2.substring(text2.length - pointermid, text2.length - pointerend)
+                  ? ((pointermin = pointermid), (pointerend = pointermin))
+                  : (pointermax = pointermid),
+                  (pointermid = Math.floor((pointermax - pointermin) / 2 + pointermin));
+              return pointermid;
+            }),
+            (DiffMatchPatch.prototype.diffCompute = function (text1, text2, checklines, deadline) {
+              var diffs, longtext, shorttext, i, hm, text1A, text2A, text1B, text2B, midCommon, diffsA, diffsB;
+              return text1
+                ? text2
+                  ? ((longtext = text1.length > text2.length ? text1 : text2),
+                    (shorttext = text1.length > text2.length ? text2 : text1),
+                    (i = longtext.indexOf(shorttext)),
+                    i !== -1
+                      ? ((diffs = [
+                          [DIFF_INSERT, longtext.substring(0, i)],
+                          [DIFF_EQUAL, shorttext],
+                          [DIFF_INSERT, longtext.substring(i + shorttext.length)],
+                        ]),
+                        text1.length > text2.length && (diffs[0][0] = diffs[2][0] = DIFF_DELETE),
+                        diffs)
+                      : shorttext.length === 1
+                      ? [
+                          [DIFF_DELETE, text1],
+                          [DIFF_INSERT, text2],
+                        ]
+                      : ((hm = this.diffHalfMatch(text1, text2)),
+                        hm
+                          ? ((text1A = hm[0]),
+                            (text1B = hm[1]),
+                            (text2A = hm[2]),
+                            (text2B = hm[3]),
+                            (midCommon = hm[4]),
+                            (diffsA = this.DiffMain(text1A, text2A, checklines, deadline)),
+                            (diffsB = this.DiffMain(text1B, text2B, checklines, deadline)),
+                            diffsA.concat([[DIFF_EQUAL, midCommon]], diffsB))
+                          : checklines && text1.length > 100 && text2.length > 100
+                          ? this.diffLineMode(text1, text2, deadline)
+                          : this.diffBisect(text1, text2, deadline)))
+                  : [[DIFF_DELETE, text1]]
+                : [[DIFF_INSERT, text2]];
+            }),
+            (DiffMatchPatch.prototype.diffHalfMatch = function (text1, text2) {
+              var longtext, shorttext, dmp, text1A, text2B, text2A, text1B, midCommon, hm1, hm2, hm;
+              if (
+                ((longtext = text1.length > text2.length ? text1 : text2),
+                (shorttext = text1.length > text2.length ? text2 : text1),
+                longtext.length < 4 || shorttext.length * 2 < longtext.length)
+              )
+                return null;
+              dmp = this;
+              function diffHalfMatchI(longtext2, shorttext2, i) {
+                var seed,
+                  j,
+                  bestCommon,
+                  prefixLength,
+                  suffixLength,
+                  bestLongtextA,
+                  bestLongtextB,
+                  bestShorttextA,
+                  bestShorttextB;
+                for (
+                  seed = longtext2.substring(i, i + Math.floor(longtext2.length / 4)), j = -1, bestCommon = '';
+                  (j = shorttext2.indexOf(seed, j + 1)) !== -1;
+
+                )
+                  (prefixLength = dmp.diffCommonPrefix(longtext2.substring(i), shorttext2.substring(j))),
+                    (suffixLength = dmp.diffCommonSuffix(longtext2.substring(0, i), shorttext2.substring(0, j))),
+                    bestCommon.length < suffixLength + prefixLength &&
+                      ((bestCommon =
+                        shorttext2.substring(j - suffixLength, j) + shorttext2.substring(j, j + prefixLength)),
+                      (bestLongtextA = longtext2.substring(0, i - suffixLength)),
+                      (bestLongtextB = longtext2.substring(i + prefixLength)),
+                      (bestShorttextA = shorttext2.substring(0, j - suffixLength)),
+                      (bestShorttextB = shorttext2.substring(j + prefixLength)));
+                return bestCommon.length * 2 >= longtext2.length
+                  ? [bestLongtextA, bestLongtextB, bestShorttextA, bestShorttextB, bestCommon]
+                  : null;
+              }
+              return (
+                (hm1 = diffHalfMatchI(longtext, shorttext, Math.ceil(longtext.length / 4))),
+                (hm2 = diffHalfMatchI(longtext, shorttext, Math.ceil(longtext.length / 2))),
+                !hm1 && !hm2
+                  ? null
+                  : (hm2 ? (hm1 ? (hm = hm1[4].length > hm2[4].length ? hm1 : hm2) : (hm = hm2)) : (hm = hm1),
+                    text1.length > text2.length
+                      ? ((text1A = hm[0]), (text1B = hm[1]), (text2A = hm[2]), (text2B = hm[3]))
+                      : ((text2A = hm[0]), (text2B = hm[1]), (text1A = hm[2]), (text1B = hm[3])),
+                    (midCommon = hm[4]),
+                    [text1A, text1B, text2A, text2B, midCommon])
+              );
+            }),
+            (DiffMatchPatch.prototype.diffLineMode = function (text1, text2, deadline) {
+              var a, diffs, linearray, pointer, countInsert, countDelete, textInsert, textDelete, j;
+              for (
+                a = this.diffLinesToChars(text1, text2),
+                  text1 = a.chars1,
+                  text2 = a.chars2,
+                  linearray = a.lineArray,
+                  diffs = this.DiffMain(text1, text2, !1, deadline),
+                  this.diffCharsToLines(diffs, linearray),
+                  this.diffCleanupSemantic(diffs),
+                  diffs.push([DIFF_EQUAL, '']),
+                  pointer = 0,
+                  countDelete = 0,
+                  countInsert = 0,
+                  textDelete = '',
+                  textInsert = '';
+                pointer < diffs.length;
+
+              ) {
+                switch (diffs[pointer][0]) {
+                  case DIFF_INSERT:
+                    countInsert++, (textInsert += diffs[pointer][1]);
+                    break;
+                  case DIFF_DELETE:
+                    countDelete++, (textDelete += diffs[pointer][1]);
+                    break;
+                  case DIFF_EQUAL:
+                    if (countDelete >= 1 && countInsert >= 1) {
+                      for (
+                        diffs.splice(pointer - countDelete - countInsert, countDelete + countInsert),
+                          pointer = pointer - countDelete - countInsert,
+                          a = this.DiffMain(textDelete, textInsert, !1, deadline),
+                          j = a.length - 1;
+                        j >= 0;
+                        j--
+                      )
+                        diffs.splice(pointer, 0, a[j]);
+                      pointer = pointer + a.length;
+                    }
+                    (countInsert = 0), (countDelete = 0), (textDelete = ''), (textInsert = '');
+                    break;
+                }
+                pointer++;
+              }
+              return diffs.pop(), diffs;
+            }),
+            (DiffMatchPatch.prototype.diffBisect = function (text1, text2, deadline) {
+              var text1Length,
+                text2Length,
+                maxD,
+                vOffset,
+                vLength,
+                v1,
+                v2,
+                x,
+                delta,
+                front,
+                k1start,
+                k1end,
+                k2start,
+                k2end,
+                k2Offset,
+                k1Offset,
+                x1,
+                x2,
+                y1,
+                y2,
+                d,
+                k1,
+                k2;
+              for (
+                text1Length = text1.length,
+                  text2Length = text2.length,
+                  maxD = Math.ceil((text1Length + text2Length) / 2),
+                  vOffset = maxD,
+                  vLength = 2 * maxD,
+                  v1 = new Array(vLength),
+                  v2 = new Array(vLength),
+                  x = 0;
+                x < vLength;
+                x++
+              )
+                (v1[x] = -1), (v2[x] = -1);
+              for (
+                v1[vOffset + 1] = 0,
+                  v2[vOffset + 1] = 0,
+                  delta = text1Length - text2Length,
+                  front = delta % 2 !== 0,
+                  k1start = 0,
+                  k1end = 0,
+                  k2start = 0,
+                  k2end = 0,
+                  d = 0;
+                d < maxD && !(Date.now() > deadline);
+                d++
+              ) {
+                for (k1 = -d + k1start; k1 <= d - k1end; k1 += 2) {
+                  for (
+                    k1Offset = vOffset + k1,
+                      k1 === -d || (k1 !== d && v1[k1Offset - 1] < v1[k1Offset + 1])
+                        ? (x1 = v1[k1Offset + 1])
+                        : (x1 = v1[k1Offset - 1] + 1),
+                      y1 = x1 - k1;
+                    x1 < text1Length && y1 < text2Length && text1.charAt(x1) === text2.charAt(y1);
+
+                  )
+                    x1++, y1++;
+                  if (((v1[k1Offset] = x1), x1 > text1Length)) k1end += 2;
+                  else if (y1 > text2Length) k1start += 2;
+                  else if (
+                    front &&
+                    ((k2Offset = vOffset + delta - k1),
+                    k2Offset >= 0 &&
+                      k2Offset < vLength &&
+                      v2[k2Offset] !== -1 &&
+                      ((x2 = text1Length - v2[k2Offset]), x1 >= x2))
+                  )
+                    return this.diffBisectSplit(text1, text2, x1, y1, deadline);
+                }
+                for (k2 = -d + k2start; k2 <= d - k2end; k2 += 2) {
+                  for (
+                    k2Offset = vOffset + k2,
+                      k2 === -d || (k2 !== d && v2[k2Offset - 1] < v2[k2Offset + 1])
+                        ? (x2 = v2[k2Offset + 1])
+                        : (x2 = v2[k2Offset - 1] + 1),
+                      y2 = x2 - k2;
+                    x2 < text1Length &&
+                    y2 < text2Length &&
+                    text1.charAt(text1Length - x2 - 1) === text2.charAt(text2Length - y2 - 1);
+
+                  )
+                    x2++, y2++;
+                  if (((v2[k2Offset] = x2), x2 > text1Length)) k2end += 2;
+                  else if (y2 > text2Length) k2start += 2;
+                  else if (
+                    !front &&
+                    ((k1Offset = vOffset + delta - k2),
+                    k1Offset >= 0 &&
+                      k1Offset < vLength &&
+                      v1[k1Offset] !== -1 &&
+                      ((x1 = v1[k1Offset]), (y1 = vOffset + x1 - k1Offset), (x2 = text1Length - x2), x1 >= x2))
+                  )
+                    return this.diffBisectSplit(text1, text2, x1, y1, deadline);
+                }
+              }
+              return [
+                [DIFF_DELETE, text1],
+                [DIFF_INSERT, text2],
+              ];
+            }),
+            (DiffMatchPatch.prototype.diffBisectSplit = function (text1, text2, x, y, deadline) {
+              var text1a, text1b, text2a, text2b, diffs, diffsb;
+              return (
+                (text1a = text1.substring(0, x)),
+                (text2a = text2.substring(0, y)),
+                (text1b = text1.substring(x)),
+                (text2b = text2.substring(y)),
+                (diffs = this.DiffMain(text1a, text2a, !1, deadline)),
+                (diffsb = this.DiffMain(text1b, text2b, !1, deadline)),
+                diffs.concat(diffsb)
+              );
+            }),
+            (DiffMatchPatch.prototype.diffCleanupSemantic = function (diffs) {
+              for (
+                var changes = !1,
+                  equalities = [],
+                  equalitiesLength = 0,
+                  lastequality = null,
+                  pointer = 0,
+                  lengthInsertions1 = 0,
+                  lengthDeletions1 = 0,
+                  lengthInsertions2 = 0,
+                  lengthDeletions2 = 0;
+                pointer < diffs.length;
+
+              )
+                diffs[pointer][0] === DIFF_EQUAL
+                  ? ((equalities[equalitiesLength++] = pointer),
+                    (lengthInsertions1 = lengthInsertions2),
+                    (lengthDeletions1 = lengthDeletions2),
+                    (lengthInsertions2 = 0),
+                    (lengthDeletions2 = 0),
+                    (lastequality = diffs[pointer][1]))
+                  : (diffs[pointer][0] === DIFF_INSERT
+                      ? (lengthInsertions2 += diffs[pointer][1].length)
+                      : (lengthDeletions2 += diffs[pointer][1].length),
+                    lastequality &&
+                      lastequality.length <= Math.max(lengthInsertions1, lengthDeletions1) &&
+                      lastequality.length <= Math.max(lengthInsertions2, lengthDeletions2) &&
+                      (diffs.splice(equalities[equalitiesLength - 1], 0, [DIFF_DELETE, lastequality]),
+                      (diffs[equalities[equalitiesLength - 1] + 1][0] = DIFF_INSERT),
+                      equalitiesLength--,
+                      equalitiesLength--,
+                      (pointer = equalitiesLength > 0 ? equalities[equalitiesLength - 1] : -1),
+                      (lengthInsertions1 = 0),
+                      (lengthDeletions1 = 0),
+                      (lengthInsertions2 = 0),
+                      (lengthDeletions2 = 0),
+                      (lastequality = null),
+                      (changes = !0))),
+                  pointer++;
+              changes && this.diffCleanupMerge(diffs);
+              var deletion, insertion, overlapLength1, overlapLength2;
+              for (pointer = 1; pointer < diffs.length; )
+                diffs[pointer - 1][0] === DIFF_DELETE &&
+                  diffs[pointer][0] === DIFF_INSERT &&
+                  ((deletion = diffs[pointer - 1][1]),
+                  (insertion = diffs[pointer][1]),
+                  (overlapLength1 = this.diffCommonOverlap(deletion, insertion)),
+                  (overlapLength2 = this.diffCommonOverlap(insertion, deletion)),
+                  overlapLength1 >= overlapLength2
+                    ? (overlapLength1 >= deletion.length / 2 || overlapLength1 >= insertion.length / 2) &&
+                      (diffs.splice(pointer, 0, [DIFF_EQUAL, insertion.substring(0, overlapLength1)]),
+                      (diffs[pointer - 1][1] = deletion.substring(0, deletion.length - overlapLength1)),
+                      (diffs[pointer + 1][1] = insertion.substring(overlapLength1)),
+                      pointer++)
+                    : (overlapLength2 >= deletion.length / 2 || overlapLength2 >= insertion.length / 2) &&
+                      (diffs.splice(pointer, 0, [DIFF_EQUAL, deletion.substring(0, overlapLength2)]),
+                      (diffs[pointer - 1][0] = DIFF_INSERT),
+                      (diffs[pointer - 1][1] = insertion.substring(0, insertion.length - overlapLength2)),
+                      (diffs[pointer + 1][0] = DIFF_DELETE),
+                      (diffs[pointer + 1][1] = deletion.substring(overlapLength2)),
+                      pointer++),
+                  pointer++),
+                  pointer++;
+            }),
+            (DiffMatchPatch.prototype.diffCommonOverlap = function (text1, text2) {
+              var text1Length = text1.length,
+                text2Length = text2.length;
+              if (text1Length === 0 || text2Length === 0) return 0;
+              text1Length > text2Length
+                ? (text1 = text1.substring(text1Length - text2Length))
+                : text1Length < text2Length && (text2 = text2.substring(0, text1Length));
+              var textLength = Math.min(text1Length, text2Length);
+              if (text1 === text2) return textLength;
+              for (var best = 0, length = 1; ; ) {
+                var pattern = text1.substring(textLength - length),
+                  found = text2.indexOf(pattern);
+                if (found === -1) return best;
+                (length += found),
+                  (found === 0 || text1.substring(textLength - length) === text2.substring(0, length)) &&
+                    ((best = length), length++);
+              }
+            }),
+            (DiffMatchPatch.prototype.diffLinesToChars = function (text1, text2) {
+              var lineArray = [],
+                lineHash = {};
+              lineArray[0] = '';
+              function diffLinesToCharsMunge(text) {
+                for (
+                  var chars = '', lineStart = 0, lineEnd = -1, lineArrayLength = lineArray.length;
+                  lineEnd < text.length - 1;
+
+                ) {
+                  (lineEnd = text.indexOf(
+                    `
+`,
+                    lineStart,
+                  )),
+                    lineEnd === -1 && (lineEnd = text.length - 1);
+                  var line = text.substring(lineStart, lineEnd + 1);
+                  (lineStart = lineEnd + 1),
+                    hasOwn2.call(lineHash, line)
+                      ? (chars += String.fromCharCode(lineHash[line]))
+                      : ((chars += String.fromCharCode(lineArrayLength)),
+                        (lineHash[line] = lineArrayLength),
+                        (lineArray[lineArrayLength++] = line));
+                }
+                return chars;
+              }
+              var chars1 = diffLinesToCharsMunge(text1),
+                chars2 = diffLinesToCharsMunge(text2);
+              return {
+                chars1,
+                chars2,
+                lineArray,
+              };
+            }),
+            (DiffMatchPatch.prototype.diffCharsToLines = function (diffs, lineArray) {
+              for (var x = 0; x < diffs.length; x++) {
+                for (var chars = diffs[x][1], text = [], y = 0; y < chars.length; y++)
+                  text[y] = lineArray[chars.charCodeAt(y)];
+                diffs[x][1] = text.join('');
+              }
+            }),
+            (DiffMatchPatch.prototype.diffCleanupMerge = function (diffs) {
+              diffs.push([DIFF_EQUAL, '']);
+              for (
+                var pointer = 0, countDelete = 0, countInsert = 0, textDelete = '', textInsert = '';
+                pointer < diffs.length;
+
+              )
+                switch (diffs[pointer][0]) {
+                  case DIFF_INSERT:
+                    countInsert++, (textInsert += diffs[pointer][1]), pointer++;
+                    break;
+                  case DIFF_DELETE:
+                    countDelete++, (textDelete += diffs[pointer][1]), pointer++;
+                    break;
+                  case DIFF_EQUAL:
+                    if (countDelete + countInsert > 1) {
+                      if (countDelete !== 0 && countInsert !== 0) {
+                        var commonlength = this.diffCommonPrefix(textInsert, textDelete);
+                        commonlength !== 0 &&
+                          (pointer - countDelete - countInsert > 0 &&
+                          diffs[pointer - countDelete - countInsert - 1][0] === DIFF_EQUAL
+                            ? (diffs[pointer - countDelete - countInsert - 1][1] += textInsert.substring(
+                                0,
+                                commonlength,
+                              ))
+                            : (diffs.splice(0, 0, [DIFF_EQUAL, textInsert.substring(0, commonlength)]), pointer++),
+                          (textInsert = textInsert.substring(commonlength)),
+                          (textDelete = textDelete.substring(commonlength))),
+                          (commonlength = this.diffCommonSuffix(textInsert, textDelete)),
+                          commonlength !== 0 &&
+                            ((diffs[pointer][1] =
+                              textInsert.substring(textInsert.length - commonlength) + diffs[pointer][1]),
+                            (textInsert = textInsert.substring(0, textInsert.length - commonlength)),
+                            (textDelete = textDelete.substring(0, textDelete.length - commonlength)));
+                      }
+                      countDelete === 0
+                        ? diffs.splice(pointer - countInsert, countDelete + countInsert, [DIFF_INSERT, textInsert])
+                        : countInsert === 0
+                        ? diffs.splice(pointer - countDelete, countDelete + countInsert, [DIFF_DELETE, textDelete])
+                        : diffs.splice(
+                            pointer - countDelete - countInsert,
+                            countDelete + countInsert,
+                            [DIFF_DELETE, textDelete],
+                            [DIFF_INSERT, textInsert],
+                          ),
+                        (pointer =
+                          pointer - countDelete - countInsert + (countDelete ? 1 : 0) + (countInsert ? 1 : 0) + 1);
+                    } else
+                      pointer !== 0 && diffs[pointer - 1][0] === DIFF_EQUAL
+                        ? ((diffs[pointer - 1][1] += diffs[pointer][1]), diffs.splice(pointer, 1))
+                        : pointer++;
+                    (countInsert = 0), (countDelete = 0), (textDelete = ''), (textInsert = '');
+                    break;
+                }
+              diffs[diffs.length - 1][1] === '' && diffs.pop();
+              var changes = !1;
+              for (pointer = 1; pointer < diffs.length - 1; ) {
+                if (diffs[pointer - 1][0] === DIFF_EQUAL && diffs[pointer + 1][0] === DIFF_EQUAL) {
+                  var diffPointer = diffs[pointer][1],
+                    position = diffPointer.substring(diffPointer.length - diffs[pointer - 1][1].length);
+                  position === diffs[pointer - 1][1]
+                    ? ((diffs[pointer][1] =
+                        diffs[pointer - 1][1] +
+                        diffs[pointer][1].substring(0, diffs[pointer][1].length - diffs[pointer - 1][1].length)),
+                      (diffs[pointer + 1][1] = diffs[pointer - 1][1] + diffs[pointer + 1][1]),
+                      diffs.splice(pointer - 1, 1),
+                      (changes = !0))
+                    : diffPointer.substring(0, diffs[pointer + 1][1].length) === diffs[pointer + 1][1] &&
+                      ((diffs[pointer - 1][1] += diffs[pointer + 1][1]),
+                      (diffs[pointer][1] =
+                        diffs[pointer][1].substring(diffs[pointer + 1][1].length) + diffs[pointer + 1][1]),
+                      diffs.splice(pointer + 1, 1),
+                      (changes = !0));
+                }
+                pointer++;
+              }
+              changes && this.diffCleanupMerge(diffs);
+            }),
+            function (o, n) {
+              var diff2, output, text;
+              return (
+                (diff2 = new DiffMatchPatch()),
+                (output = diff2.DiffMain(o, n)),
+                diff2.diffCleanupEfficiency(output),
+                (text = diff2.diffPrettyHtml(output)),
+                text
+              );
+            }
+          );
+        })());
+    })();
+  },
+});
+
 // ../../node_modules/rfc4648/lib/index.js
 var require_lib = __commonJS({
   '../../node_modules/rfc4648/lib/index.js'(exports) {
@@ -71,7 +5354,7 @@ var require_lib = __commonJS({
       if (bits >= encoding.bits || 255 & (buffer << (8 - bits))) throw new SyntaxError('Unexpected end of data');
       return out;
     }
-    function stringify2(data, encoding, opts) {
+    function stringify(data, encoding, opts) {
       opts === void 0 && (opts = {});
       for (
         var _opts = opts,
@@ -116,7 +5399,7 @@ var require_lib = __commonJS({
           return parse(string.toUpperCase(), base16Encoding, opts);
         },
         stringify: function (data, opts) {
-          return stringify2(data, base16Encoding, opts);
+          return stringify(data, base16Encoding, opts);
         },
       },
       base322 = {
@@ -131,7 +5414,7 @@ var require_lib = __commonJS({
           );
         },
         stringify: function (data, opts) {
-          return stringify2(data, base32Encoding, opts);
+          return stringify(data, base32Encoding, opts);
         },
       },
       base32hex2 = {
@@ -139,7 +5422,7 @@ var require_lib = __commonJS({
           return parse(string, base32HexEncoding, opts);
         },
         stringify: function (data, opts) {
-          return stringify2(data, base32HexEncoding, opts);
+          return stringify(data, base32HexEncoding, opts);
         },
       },
       base642 = {
@@ -147,7 +5430,7 @@ var require_lib = __commonJS({
           return parse(string, base64Encoding, opts);
         },
         stringify: function (data, opts) {
-          return stringify2(data, base64Encoding, opts);
+          return stringify(data, base64Encoding, opts);
         },
       },
       base64url2 = {
@@ -155,12 +5438,12 @@ var require_lib = __commonJS({
           return parse(string, base64UrlEncoding, opts);
         },
         stringify: function (data, opts) {
-          return stringify2(data, base64UrlEncoding, opts);
+          return stringify(data, base64UrlEncoding, opts);
         },
       },
       codec2 = {
         parse,
-        stringify: stringify2,
+        stringify,
       };
     exports.base16 = base162;
     exports.base32 = base322;
@@ -171,851 +5454,8 @@ var require_lib = __commonJS({
   },
 });
 
-// ../../node_modules/uvu/node_modules/kleur/index.mjs
-var FORCE_COLOR,
-  NODE_DISABLE_COLORS,
-  NO_COLOR,
-  TERM,
-  isTTY = !0;
-typeof process < 'u' &&
-  (({ FORCE_COLOR, NODE_DISABLE_COLORS, NO_COLOR, TERM } = process.env || {}),
-  (isTTY = process.stdout && process.stdout.isTTY));
-var $ = {
-  enabled:
-    !NODE_DISABLE_COLORS &&
-    NO_COLOR == null &&
-    TERM !== 'dumb' &&
-    ((FORCE_COLOR != null && FORCE_COLOR !== '0') || isTTY),
-  reset: init(0, 0),
-  bold: init(1, 22),
-  dim: init(2, 22),
-  italic: init(3, 23),
-  underline: init(4, 24),
-  inverse: init(7, 27),
-  hidden: init(8, 28),
-  strikethrough: init(9, 29),
-  black: init(30, 39),
-  red: init(31, 39),
-  green: init(32, 39),
-  yellow: init(33, 39),
-  blue: init(34, 39),
-  magenta: init(35, 39),
-  cyan: init(36, 39),
-  white: init(37, 39),
-  gray: init(90, 39),
-  grey: init(90, 39),
-  bgBlack: init(40, 49),
-  bgRed: init(41, 49),
-  bgGreen: init(42, 49),
-  bgYellow: init(43, 49),
-  bgBlue: init(44, 49),
-  bgMagenta: init(45, 49),
-  bgCyan: init(46, 49),
-  bgWhite: init(47, 49),
-};
-function run(arr, str) {
-  let i = 0,
-    tmp,
-    beg = '',
-    end = '';
-  for (; i < arr.length; i++)
-    (tmp = arr[i]),
-      (beg += tmp.open),
-      (end += tmp.close),
-      ~str.indexOf(tmp.close) && (str = str.replace(tmp.rgx, tmp.close + tmp.open));
-  return beg + str + end;
-}
-function chain(has2, keys) {
-  let ctx = { has: has2, keys };
-  return (
-    (ctx.reset = $.reset.bind(ctx)),
-    (ctx.bold = $.bold.bind(ctx)),
-    (ctx.dim = $.dim.bind(ctx)),
-    (ctx.italic = $.italic.bind(ctx)),
-    (ctx.underline = $.underline.bind(ctx)),
-    (ctx.inverse = $.inverse.bind(ctx)),
-    (ctx.hidden = $.hidden.bind(ctx)),
-    (ctx.strikethrough = $.strikethrough.bind(ctx)),
-    (ctx.black = $.black.bind(ctx)),
-    (ctx.red = $.red.bind(ctx)),
-    (ctx.green = $.green.bind(ctx)),
-    (ctx.yellow = $.yellow.bind(ctx)),
-    (ctx.blue = $.blue.bind(ctx)),
-    (ctx.magenta = $.magenta.bind(ctx)),
-    (ctx.cyan = $.cyan.bind(ctx)),
-    (ctx.white = $.white.bind(ctx)),
-    (ctx.gray = $.gray.bind(ctx)),
-    (ctx.grey = $.grey.bind(ctx)),
-    (ctx.bgBlack = $.bgBlack.bind(ctx)),
-    (ctx.bgRed = $.bgRed.bind(ctx)),
-    (ctx.bgGreen = $.bgGreen.bind(ctx)),
-    (ctx.bgYellow = $.bgYellow.bind(ctx)),
-    (ctx.bgBlue = $.bgBlue.bind(ctx)),
-    (ctx.bgMagenta = $.bgMagenta.bind(ctx)),
-    (ctx.bgCyan = $.bgCyan.bind(ctx)),
-    (ctx.bgWhite = $.bgWhite.bind(ctx)),
-    ctx
-  );
-}
-function init(open, close) {
-  let blk = {
-    open: `\x1B[${open}m`,
-    close: `\x1B[${close}m`,
-    rgx: new RegExp(`\\x1b\\[${close}m`, 'g'),
-  };
-  return function (txt) {
-    return this !== void 0 && this.has !== void 0
-      ? (~this.has.indexOf(open) || (this.has.push(open), this.keys.push(blk)),
-        txt === void 0 ? this : $.enabled ? run(this.keys, txt + '') : txt + '')
-      : txt === void 0
-      ? chain([open], [blk])
-      : $.enabled
-      ? run([blk], txt + '')
-      : txt + '';
-  };
-}
-var kleur_default = $;
-
-// ../../node_modules/uvu/node_modules/diff/lib/index.mjs
-function Diff() {}
-Diff.prototype = {
-  diff: function (oldString, newString) {
-    var options = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : {},
-      callback = options.callback;
-    typeof options == 'function' && ((callback = options), (options = {})), (this.options = options);
-    var self2 = this;
-    function done(value) {
-      return callback
-        ? (setTimeout(function () {
-            callback(void 0, value);
-          }, 0),
-          !0)
-        : value;
-    }
-    (oldString = this.castInput(oldString)),
-      (newString = this.castInput(newString)),
-      (oldString = this.removeEmpty(this.tokenize(oldString))),
-      (newString = this.removeEmpty(this.tokenize(newString)));
-    var newLen = newString.length,
-      oldLen = oldString.length,
-      editLength = 1,
-      maxEditLength = newLen + oldLen;
-    options.maxEditLength && (maxEditLength = Math.min(maxEditLength, options.maxEditLength));
-    var bestPath = [
-        {
-          newPos: -1,
-          components: [],
-        },
-      ],
-      oldPos = this.extractCommon(bestPath[0], newString, oldString, 0);
-    if (bestPath[0].newPos + 1 >= newLen && oldPos + 1 >= oldLen)
-      return done([
-        {
-          value: this.join(newString),
-          count: newString.length,
-        },
-      ]);
-    function execEditLength() {
-      for (var diagonalPath = -1 * editLength; diagonalPath <= editLength; diagonalPath += 2) {
-        var basePath = void 0,
-          addPath = bestPath[diagonalPath - 1],
-          removePath = bestPath[diagonalPath + 1],
-          _oldPos = (removePath ? removePath.newPos : 0) - diagonalPath;
-        addPath && (bestPath[diagonalPath - 1] = void 0);
-        var canAdd = addPath && addPath.newPos + 1 < newLen,
-          canRemove = removePath && 0 <= _oldPos && _oldPos < oldLen;
-        if (!canAdd && !canRemove) {
-          bestPath[diagonalPath] = void 0;
-          continue;
-        }
-        if (
-          (!canAdd || (canRemove && addPath.newPos < removePath.newPos)
-            ? ((basePath = clonePath(removePath)), self2.pushComponent(basePath.components, void 0, !0))
-            : ((basePath = addPath), basePath.newPos++, self2.pushComponent(basePath.components, !0, void 0)),
-          (_oldPos = self2.extractCommon(basePath, newString, oldString, diagonalPath)),
-          basePath.newPos + 1 >= newLen && _oldPos + 1 >= oldLen)
-        )
-          return done(buildValues(self2, basePath.components, newString, oldString, self2.useLongestToken));
-        bestPath[diagonalPath] = basePath;
-      }
-      editLength++;
-    }
-    if (callback)
-      (function exec2() {
-        setTimeout(function () {
-          if (editLength > maxEditLength) return callback();
-          execEditLength() || exec2();
-        }, 0);
-      })();
-    else
-      for (; editLength <= maxEditLength; ) {
-        var ret = execEditLength();
-        if (ret) return ret;
-      }
-  },
-  pushComponent: function (components, added, removed) {
-    var last = components[components.length - 1];
-    last && last.added === added && last.removed === removed
-      ? (components[components.length - 1] = {
-          count: last.count + 1,
-          added,
-          removed,
-        })
-      : components.push({
-          count: 1,
-          added,
-          removed,
-        });
-  },
-  extractCommon: function (basePath, newString, oldString, diagonalPath) {
-    for (
-      var newLen = newString.length,
-        oldLen = oldString.length,
-        newPos = basePath.newPos,
-        oldPos = newPos - diagonalPath,
-        commonCount = 0;
-      newPos + 1 < newLen && oldPos + 1 < oldLen && this.equals(newString[newPos + 1], oldString[oldPos + 1]);
-
-    )
-      newPos++, oldPos++, commonCount++;
-    return (
-      commonCount &&
-        basePath.components.push({
-          count: commonCount,
-        }),
-      (basePath.newPos = newPos),
-      oldPos
-    );
-  },
-  equals: function (left, right) {
-    return this.options.comparator
-      ? this.options.comparator(left, right)
-      : left === right || (this.options.ignoreCase && left.toLowerCase() === right.toLowerCase());
-  },
-  removeEmpty: function (array) {
-    for (var ret = [], i = 0; i < array.length; i++) array[i] && ret.push(array[i]);
-    return ret;
-  },
-  castInput: function (value) {
-    return value;
-  },
-  tokenize: function (value) {
-    return value.split('');
-  },
-  join: function (chars2) {
-    return chars2.join('');
-  },
-};
-function buildValues(diff2, components, newString, oldString, useLongestToken) {
-  for (
-    var componentPos = 0, componentLen = components.length, newPos = 0, oldPos = 0;
-    componentPos < componentLen;
-    componentPos++
-  ) {
-    var component = components[componentPos];
-    if (component.removed) {
-      if (
-        ((component.value = diff2.join(oldString.slice(oldPos, oldPos + component.count))),
-        (oldPos += component.count),
-        componentPos && components[componentPos - 1].added)
-      ) {
-        var tmp = components[componentPos - 1];
-        (components[componentPos - 1] = components[componentPos]), (components[componentPos] = tmp);
-      }
-    } else {
-      if (!component.added && useLongestToken) {
-        var value = newString.slice(newPos, newPos + component.count);
-        (value = value.map(function (value2, i) {
-          var oldValue = oldString[oldPos + i];
-          return oldValue.length > value2.length ? oldValue : value2;
-        })),
-          (component.value = diff2.join(value));
-      } else component.value = diff2.join(newString.slice(newPos, newPos + component.count));
-      (newPos += component.count), component.added || (oldPos += component.count);
-    }
-  }
-  var lastComponent = components[componentLen - 1];
-  return (
-    componentLen > 1 &&
-      typeof lastComponent.value == 'string' &&
-      (lastComponent.added || lastComponent.removed) &&
-      diff2.equals('', lastComponent.value) &&
-      ((components[componentLen - 2].value += lastComponent.value), components.pop()),
-    components
-  );
-}
-function clonePath(path) {
-  return {
-    newPos: path.newPos,
-    components: path.components.slice(0),
-  };
-}
-var characterDiff = new Diff();
-function diffChars(oldStr, newStr, options) {
-  return characterDiff.diff(oldStr, newStr, options);
-}
-var extendedWordChars = /^[A-Za-z\xC0-\u02C6\u02C8-\u02D7\u02DE-\u02FF\u1E00-\u1EFF]+$/,
-  reWhitespace = /\S/,
-  wordDiff = new Diff();
-wordDiff.equals = function (left, right) {
-  return (
-    this.options.ignoreCase && ((left = left.toLowerCase()), (right = right.toLowerCase())),
-    left === right || (this.options.ignoreWhitespace && !reWhitespace.test(left) && !reWhitespace.test(right))
-  );
-};
-wordDiff.tokenize = function (value) {
-  for (var tokens = value.split(/([^\S\r\n]+|[()[\]{}'"\r\n]|\b)/), i = 0; i < tokens.length - 1; i++)
-    !tokens[i + 1] &&
-      tokens[i + 2] &&
-      extendedWordChars.test(tokens[i]) &&
-      extendedWordChars.test(tokens[i + 2]) &&
-      ((tokens[i] += tokens[i + 2]), tokens.splice(i + 1, 2), i--);
-  return tokens;
-};
-var lineDiff = new Diff();
-lineDiff.tokenize = function (value) {
-  var retLines = [],
-    linesAndNewlines = value.split(/(\n|\r\n)/);
-  linesAndNewlines[linesAndNewlines.length - 1] || linesAndNewlines.pop();
-  for (var i = 0; i < linesAndNewlines.length; i++) {
-    var line2 = linesAndNewlines[i];
-    i % 2 && !this.options.newlineIsToken
-      ? (retLines[retLines.length - 1] += line2)
-      : (this.options.ignoreWhitespace && (line2 = line2.trim()), retLines.push(line2));
-  }
-  return retLines;
-};
-function diffLines(oldStr, newStr, callback) {
-  return lineDiff.diff(oldStr, newStr, callback);
-}
-var sentenceDiff = new Diff();
-sentenceDiff.tokenize = function (value) {
-  return value.split(/(\S.+?[.!?])(?=\s+|$)/);
-};
-var cssDiff = new Diff();
-cssDiff.tokenize = function (value) {
-  return value.split(/([{}:;,]|\s+)/);
-};
-function _typeof(obj) {
-  return (
-    typeof Symbol == 'function' && typeof Symbol.iterator == 'symbol'
-      ? (_typeof = function (obj2) {
-          return typeof obj2;
-        })
-      : (_typeof = function (obj2) {
-          return obj2 && typeof Symbol == 'function' && obj2.constructor === Symbol && obj2 !== Symbol.prototype
-            ? 'symbol'
-            : typeof obj2;
-        }),
-    _typeof(obj)
-  );
-}
-var objectPrototypeToString = Object.prototype.toString,
-  jsonDiff = new Diff();
-jsonDiff.useLongestToken = !0;
-jsonDiff.tokenize = lineDiff.tokenize;
-jsonDiff.castInput = function (value) {
-  var _this$options = this.options,
-    undefinedReplacement = _this$options.undefinedReplacement,
-    _this$options$stringi = _this$options.stringifyReplacer,
-    stringifyReplacer =
-      _this$options$stringi === void 0
-        ? function (k, v) {
-            return typeof v > 'u' ? undefinedReplacement : v;
-          }
-        : _this$options$stringi;
-  return typeof value == 'string'
-    ? value
-    : JSON.stringify(canonicalize(value, null, null, stringifyReplacer), stringifyReplacer, '  ');
-};
-jsonDiff.equals = function (left, right) {
-  return Diff.prototype.equals.call(jsonDiff, left.replace(/,([\r\n])/g, '$1'), right.replace(/,([\r\n])/g, '$1'));
-};
-function canonicalize(obj, stack2, replacementStack, replacer, key) {
-  (stack2 = stack2 || []), (replacementStack = replacementStack || []), replacer && (obj = replacer(key, obj));
-  var i;
-  for (i = 0; i < stack2.length; i += 1) if (stack2[i] === obj) return replacementStack[i];
-  var canonicalizedObj;
-  if (objectPrototypeToString.call(obj) === '[object Array]') {
-    for (
-      stack2.push(obj), canonicalizedObj = new Array(obj.length), replacementStack.push(canonicalizedObj), i = 0;
-      i < obj.length;
-      i += 1
-    )
-      canonicalizedObj[i] = canonicalize(obj[i], stack2, replacementStack, replacer, key);
-    return stack2.pop(), replacementStack.pop(), canonicalizedObj;
-  }
-  if ((obj && obj.toJSON && (obj = obj.toJSON()), _typeof(obj) === 'object' && obj !== null)) {
-    stack2.push(obj), (canonicalizedObj = {}), replacementStack.push(canonicalizedObj);
-    var sortedKeys = [],
-      _key;
-    for (_key in obj) obj.hasOwnProperty(_key) && sortedKeys.push(_key);
-    for (sortedKeys.sort(), i = 0; i < sortedKeys.length; i += 1)
-      (_key = sortedKeys[i]),
-        (canonicalizedObj[_key] = canonicalize(obj[_key], stack2, replacementStack, replacer, _key));
-    stack2.pop(), replacementStack.pop();
-  } else canonicalizedObj = obj;
-  return canonicalizedObj;
-}
-var arrayDiff = new Diff();
-arrayDiff.tokenize = function (value) {
-  return value.slice();
-};
-arrayDiff.join = arrayDiff.removeEmpty = function (value) {
-  return value;
-};
-function diffArrays(oldArr, newArr, callback) {
-  return arrayDiff.diff(oldArr, newArr, callback);
-}
-
-// ../../node_modules/uvu/diff/index.mjs
-var colors = {
-    '--': kleur_default.red,
-    '\xB7\xB7': kleur_default.grey,
-    '++': kleur_default.green,
-  },
-  TITLE = kleur_default.dim().italic,
-  TAB = kleur_default.dim('\u2192'),
-  SPACE = kleur_default.dim('\xB7'),
-  NL = kleur_default.dim('\u21B5'),
-  LOG = (sym, str) =>
-    colors[sym](sym + PRETTY(str)) +
-    `
-`,
-  LINE = (num, x) => kleur_default.dim('L' + String(num).padStart(x, '0') + ' '),
-  PRETTY = str =>
-    str
-      .replace(/[ ]/g, SPACE)
-      .replace(/\t/g, TAB)
-      .replace(/(\r?\n)/g, NL);
-function line(obj, prev, pad) {
-  let char = obj.removed ? '--' : obj.added ? '++' : '\xB7\xB7',
-    arr = obj.value.replace(/\r?\n$/, '').split(`
-`),
-    i = 0,
-    tmp,
-    out = '';
-  for (
-    obj.added
-      ? (out +=
-          colors[char]().underline(TITLE('Expected:')) +
-          `
-`)
-      : obj.removed &&
-        (out +=
-          colors[char]().underline(TITLE('Actual:')) +
-          `
-`);
-    i < arr.length;
-    i++
-  )
-    (tmp = arr[i]),
-      tmp != null &&
-        (prev && (out += LINE(prev + i, pad)),
-        (out += LOG(
-          char,
-          tmp ||
-            `
-`,
-        )));
-  return out;
-}
-function arrays(input, expect) {
-  let arr = diffArrays(input, expect),
-    i = 0,
-    j = 0,
-    k = 0,
-    tmp,
-    val,
-    char,
-    isObj,
-    str,
-    out = LOG('\xB7\xB7', '[');
-  for (; i < arr.length; i++)
-    for (
-      char = (tmp = arr[i]).removed ? '--' : tmp.added ? '++' : '\xB7\xB7',
-        tmp.added
-          ? (out +=
-              colors[char]().underline(TITLE('Expected:')) +
-              `
-`)
-          : tmp.removed &&
-            (out +=
-              colors[char]().underline(TITLE('Actual:')) +
-              `
-`),
-        j = 0;
-      j < tmp.value.length;
-      j++
-    )
-      for (
-        isObj = tmp.value[j] && typeof tmp.value[j] == 'object', val = stringify(tmp.value[j]).split(/\r?\n/g), k = 0;
-        k < val.length;
-
-      )
-        (str = '  ' + val[k++] + (isObj ? '' : ',')),
-          isObj && k === val.length && j + 1 < tmp.value.length && (str += ','),
-          (out += LOG(char, str));
-  return out + LOG('\xB7\xB7', ']');
-}
-function lines(input, expect, linenum = 0) {
-  let i = 0,
-    tmp,
-    output = '',
-    arr = diffLines(input, expect),
-    pad = String(expect.split(/\r?\n/g).length - linenum).length;
-  for (; i < arr.length; i++)
-    (output += line((tmp = arr[i]), linenum, pad)), linenum && !tmp.removed && (linenum += tmp.count);
-  return output;
-}
-function chars(input, expect) {
-  let arr = diffChars(input, expect),
-    i = 0,
-    output = '',
-    tmp,
-    l1 = input.length,
-    l2 = expect.length,
-    p1 = PRETTY(input),
-    p2 = PRETTY(expect);
-  if (((tmp = arr[i]), l1 !== l2)) {
-    if (tmp.removed && arr[i + 1]) {
-      let del = tmp.count - arr[i + 1].count;
-      del == 0 ||
-        (del > 0
-          ? ((expect = ' '.repeat(del) + expect), (p2 = ' '.repeat(del) + p2), (l2 += del))
-          : del < 0 && ((input = ' '.repeat(-del) + input), (p1 = ' '.repeat(-del) + p1), (l1 += -del)));
-    }
-  }
-  if (((output += direct(p1, p2, l1, l2)), l1 === l2))
-    for (tmp = '  '; i < l1; i++) tmp += input[i] === expect[i] ? ' ' : '^';
-  else
-    for (tmp = '  '; i < arr.length; i++)
-      (tmp += (arr[i].added || arr[i].removed ? '^' : ' ').repeat(Math.max(arr[i].count, 0))),
-        i + 1 < arr.length &&
-          ((arr[i].added && arr[i + 1].removed) || (arr[i].removed && arr[i + 1].added)) &&
-          (arr[i + 1].count -= arr[i].count);
-  return output + kleur_default.red(tmp);
-}
-function direct(input, expect, lenA = String(input).length, lenB = String(expect).length) {
-  let gutter = 4,
-    lenC = Math.max(lenA, lenB),
-    typeA = typeof input,
-    typeB = typeof expect;
-  if (typeA !== typeB) {
-    gutter = 2;
-    let delA = gutter + lenC - lenA,
-      delB = gutter + lenC - lenB;
-    (input += ' '.repeat(delA) + kleur_default.dim(`[${typeA}]`)),
-      (expect += ' '.repeat(delB) + kleur_default.dim(`[${typeB}]`)),
-      (lenA += delA + typeA.length + 2),
-      (lenB += delB + typeB.length + 2),
-      (lenC = Math.max(lenA, lenB));
-  }
-  return (
-    colors['++']('++' + expect + ' '.repeat(gutter + lenC - lenB) + TITLE('(Expected)')) +
-    `
-` +
-    colors['--']('--' + input + ' '.repeat(gutter + lenC - lenA) + TITLE('(Actual)')) +
-    `
-`
-  );
-}
-function sort(input, expect) {
-  var k,
-    i = 0,
-    tmp,
-    isArr = Array.isArray(input),
-    keys = [],
-    out = isArr ? Array(input.length) : {};
-  if (isArr)
-    for (i = 0; i < out.length; i++)
-      (tmp = input[i]), !tmp || typeof tmp != 'object' ? (out[i] = tmp) : (out[i] = sort(tmp, expect[i]));
-  else {
-    for (k in expect) keys.push(k);
-    for (; i < keys.length; i++)
-      Object.prototype.hasOwnProperty.call(input, (k = keys[i])) &&
-        (!(tmp = input[k]) || typeof tmp != 'object' ? (out[k] = tmp) : (out[k] = sort(tmp, expect[k])));
-    for (k in input) out.hasOwnProperty(k) || (out[k] = input[k]);
-  }
-  return out;
-}
-function circular() {
-  var cache2 = /* @__PURE__ */ new Set();
-  return function (key, val) {
-    return val === void 0
-      ? '[__VOID__]'
-      : typeof val == 'number' && val !== val
-      ? '[__NAN__]'
-      : typeof val == 'bigint'
-      ? val.toString()
-      : !val || typeof val != 'object'
-      ? val
-      : cache2.has(val)
-      ? '[Circular]'
-      : (cache2.add(val), val);
-  };
-}
-function stringify(input) {
-  return JSON.stringify(input, circular(), 2)
-    .replace(/"\[__NAN__\]"/g, 'NaN')
-    .replace(/"\[__VOID__\]"/g, 'undefined');
-}
-function compare(input, expect) {
-  if (Array.isArray(expect) && Array.isArray(input)) return arrays(input, expect);
-  if (expect instanceof RegExp) return chars('' + input, '' + expect);
-  let isA = input && typeof input == 'object',
-    isB = expect && typeof expect == 'object';
-  return (
-    isA && isB && (input = sort(input, expect)),
-    isB && (expect = stringify(expect)),
-    isA && (input = stringify(input)),
-    expect && typeof expect == 'object' && ((input = stringify(sort(input, expect))), (expect = stringify(expect))),
-    (isA = typeof input == 'string'),
-    (isB = typeof expect == 'string'),
-    isA && /\r?\n/.test(input)
-      ? lines(input, '' + expect)
-      : isB && /\r?\n/.test(expect)
-      ? lines('' + input, expect)
-      : isA && isB
-      ? chars(input, expect)
-      : direct(input, expect)
-  );
-}
-
-// ../../node_modules/uvu/dist/index.mjs
-var isCLI = !1,
-  isNode = !1,
-  hrtime =
-    (now = Date.now()) =>
-    () =>
-      (Date.now() - now).toFixed(2) + 'ms',
-  write = console.log,
-  into = (ctx, key) => (name, handler) => ctx[key].push({ name, handler }),
-  context = state => ({ tests: [], before: [], after: [], bEach: [], aEach: [], only: [], skips: 0, state }),
-  milli = arr => (arr[0] * 1e3 + arr[1] / 1e6).toFixed(2) + 'ms',
-  hook = (ctx, key) => handler => ctx[key].push(handler);
-if ((isNode = typeof process < 'u' && typeof process.stdout < 'u')) {
-  typeof globalThis != 'object' &&
-    Object.defineProperty(global, 'globalThis', {
-      get: function () {
-        return this;
-      },
-    });
-  let rgx = /(\.bin[\\+\/]uvu$|uvu[\\+\/]bin\.js)/i;
-  (isCLI = process.argv.some(x => rgx.test(x))),
-    (write = x => process.stdout.write(x)),
-    (hrtime =
-      (now = process.hrtime()) =>
-      () =>
-        milli(process.hrtime(now)));
-} else
-  typeof performance < 'u' &&
-    (hrtime =
-      (now = performance.now()) =>
-      () =>
-        (performance.now() - now).toFixed(2) + 'ms');
-globalThis.UVU_QUEUE = globalThis.UVU_QUEUE || [];
-isCLI = isCLI || !!globalThis.UVU_DEFER;
-isCLI || UVU_QUEUE.push([null]);
-var QUOTE = kleur_default.dim('"'),
-  GUTTER = `
-        `,
-  FAIL = kleur_default.red('\u2718 '),
-  PASS = kleur_default.gray('\u2022 '),
-  IGNORE = /^\s*at.*(?:\(|\s)(?:node|(internal\/[\w/]*))/,
-  FAILURE = kleur_default.bold().bgRed(' FAIL '),
-  FILE = kleur_default.bold().underline().white,
-  SUITE = kleur_default.bgWhite().bold;
-function stack(stack2, idx) {
-  let i = 0,
-    line2,
-    out = '',
-    arr = stack2.substring(idx).replace(/\\/g, '/').split(`
-`);
-  for (; i < arr.length; i++)
-    (line2 = arr[i].trim()),
-      line2.length &&
-        !IGNORE.test(line2) &&
-        (out +=
-          `
-    ` + line2);
-  return (
-    kleur_default.grey(out) +
-    `
-`
-  );
-}
-function format(name, err, suite2 = '') {
-  let { details, operator = '' } = err,
-    idx =
-      err.stack &&
-      err.stack.indexOf(`
-`);
-  err.name.startsWith('AssertionError') && !operator.includes('not') && (details = compare(err.actual, err.expected));
-  let str =
-    '  ' +
-    FAILURE +
-    (suite2 ? kleur_default.red(SUITE(` ${suite2} `)) : '') +
-    ' ' +
-    QUOTE +
-    kleur_default.red().bold(name) +
-    QUOTE;
-  return (
-    (str +=
-      `
-    ` +
-      err.message +
-      (operator ? kleur_default.italic().dim(`  (${operator})`) : '') +
-      `
-`),
-    details &&
-      (str +=
-        GUTTER +
-        details
-          .split(
-            `
-`,
-          )
-          .join(GUTTER)),
-    ~idx && (str += stack(err.stack, idx)),
-    str +
-      `
-`
-  );
-}
-async function runner(ctx, name) {
-  let { only, tests, before, after, bEach, aEach, state } = ctx,
-    hook2,
-    test2,
-    arr = only.length ? only : tests,
-    num = 0,
-    errors = '',
-    total = arr.length;
-  try {
-    name && write(SUITE(kleur_default.black(` ${name} `)) + ' ');
-    for (hook2 of before) await hook2(state);
-    for (test2 of arr) {
-      state.__test__ = test2.name;
-      try {
-        for (hook2 of bEach) await hook2(state);
-        await test2.handler(state);
-        for (hook2 of aEach) await hook2(state);
-        write(PASS), num++;
-      } catch (err) {
-        for (hook2 of aEach) await hook2(state);
-        errors.length &&
-          (errors += `
-`),
-          (errors += format(test2.name, err, name)),
-          write(FAIL);
-      }
-    }
-  } finally {
-    state.__test__ = '';
-    for (hook2 of after) await hook2(state);
-    let msg = `  (${num} / ${total})
-`,
-      skipped = (only.length ? tests.length : 0) + ctx.skips;
-    return (
-      write(errors.length ? kleur_default.red(msg) : kleur_default.green(msg)), [errors || !0, num, skipped, total]
-    );
-  }
-}
-var timer;
-function defer() {
-  clearTimeout(timer), (timer = setTimeout(exec));
-}
-function setup(ctx, name = '') {
-  (ctx.state.__test__ = ''), (ctx.state.__suite__ = name);
-  let test2 = into(ctx, 'tests');
-  return (
-    (test2.before = hook(ctx, 'before')),
-    (test2.before.each = hook(ctx, 'bEach')),
-    (test2.after = hook(ctx, 'after')),
-    (test2.after.each = hook(ctx, 'aEach')),
-    (test2.only = into(ctx, 'only')),
-    (test2.skip = () => {
-      ctx.skips++;
-    }),
-    (test2.run = () => {
-      let copy = { ...ctx },
-        run2 = runner.bind(0, copy, name);
-      Object.assign(ctx, context(copy.state)), UVU_QUEUE[globalThis.UVU_INDEX || 0].push(run2), isCLI || defer();
-    }),
-    test2
-  );
-}
-var suite = (name = '', state = {}) => setup(context(state), name),
-  test = suite(),
-  isRunning = !1;
-async function exec(bail) {
-  let timer2 = hrtime(),
-    done = 0,
-    total = 0,
-    skips = 0,
-    code = 0;
-  isRunning = !0;
-  for (let group of UVU_QUEUE) {
-    total &&
-      write(`
-`);
-    let name = group.shift();
-    name != null &&
-      write(
-        FILE(name) +
-          `
-`,
-      );
-    for (let test2 of group) {
-      let [errs, ran, skip, max] = await test2();
-      if (
-        ((total += max),
-        (done += ran),
-        (skips += skip),
-        errs.length &&
-          (write(
-            `
-` +
-              errs +
-              `
-`,
-          ),
-          (code = 1),
-          bail))
-      )
-        return isNode && process.exit(1);
-    }
-  }
-  (isRunning = !1),
-    write(
-      `
-  Total:     ` + total,
-    ),
-    write(
-      (code ? kleur_default.red : kleur_default.green)(
-        `
-  Passed:    ` + done,
-      ),
-    ),
-    write(
-      `
-  Skipped:   ` + (skips && kleur_default.yellow(skips)),
-    ),
-    write(
-      `
-  Duration:  ` +
-        timer2() +
-        `
-
-`,
-    ),
-    isNode && (process.exitCode = code);
-}
-isNode &&
-  process.on('exit', () => {
-    !isRunning ||
-      ((process.exitCode = process.exitCode || 1), console.error('Exiting early before testing is finished.'));
-  });
+// tests/edge-runtime/bundle.ts
+var import_qunit = __toESM(require_qunit());
 
 // ../../node_modules/sinon/pkg/sinon-esm.js
 var sinon;
@@ -1067,7 +5507,7 @@ var sinon;
           createSandbox = require2('./sinon/create-sandbox'),
           extend = require2('./sinon/util/core/extend'),
           fakeTimers = require2('./sinon/util/fake-timers'),
-          format2 = require2('./sinon/util/core/format'),
+          format = require2('./sinon/util/core/format'),
           nise = require2('nise'),
           Sandbox = require2('./sinon/sandbox'),
           stub = require2('./sinon/stub'),
@@ -1079,7 +5519,7 @@ var sinon;
             restoreObject: require2('./sinon/restore-object'),
             expectation: require2('./sinon/mock-expectation'),
             defaultConfig: require2('./sinon/util/core/default-config'),
-            setFormatter: format2.setFormatter,
+            setFormatter: format.setFormatter,
             timers: fakeTimers.timers,
             xhr: nise.fakeXhr.xhr,
             FakeXMLHttpRequest: nise.fakeXhr.FakeXMLHttpRequest,
@@ -1121,24 +5561,24 @@ var sinon;
           createMatcher = require2('@sinonjs/samsam').createMatcher,
           orderByFirstCall = require2('@sinonjs/commons').orderByFirstCall,
           timesInWords = require2('./util/core/times-in-words'),
-          format2 = require2('./util/core/format'),
+          format = require2('./util/core/format'),
           stringSlice = require2('@sinonjs/commons').prototypes.string.slice,
           globalObject = require2('@sinonjs/commons').global,
           arraySlice = arrayProto.slice,
           concat = arrayProto.concat,
           forEach = arrayProto.forEach,
-          join2 = arrayProto.join,
+          join = arrayProto.join,
           splice = arrayProto.splice;
         function createAssertObject() {
-          var assert2;
+          var assert;
           function verifyIsStub() {
             var args = arraySlice(arguments);
             forEach(args, function (method) {
-              method || assert2.fail('fake is not a spy'),
+              method || assert.fail('fake is not a spy'),
                 method.proxy && method.proxy.isSinonProxy
                   ? verifyIsStub(method.proxy)
-                  : (typeof method != 'function' && assert2.fail(`${method} is not a function`),
-                    typeof method.getCall != 'function' && assert2.fail(`${method} is not stubbed`));
+                  : (typeof method != 'function' && assert.fail(`${method} is not a function`),
+                    typeof method.getCall != 'function' && assert.fail(`${method} is not stubbed`));
             });
           }
           function verifyIsValidAssertion(assertionMethod, assertionArgs) {
@@ -1149,7 +5589,7 @@ var sinon;
               case 'calledTwice':
               case 'calledThrice':
                 assertionArgs.length !== 0 &&
-                  assert2.fail(
+                  assert.fail(
                     `${assertionMethod} takes 1 argument but was called with ${assertionArgs.length + 1} arguments`,
                   );
                 break;
@@ -1159,14 +5599,14 @@ var sinon;
           }
           function failAssertion(object, msg) {
             var obj = object || globalObject,
-              failMethod = obj.fail || assert2.fail;
+              failMethod = obj.fail || assert.fail;
             failMethod.call(obj, msg);
           }
           function mirrorPropAsAssertion(name, method, message) {
             var msg = message,
               meth = method;
             arguments.length === 2 && ((msg = method), (meth = name)),
-              (assert2[name] = function (fake) {
+              (assert[name] = function (fake) {
                 verifyIsStub(fake);
                 var args = arraySlice(arguments, 1),
                   failed = !1;
@@ -1176,7 +5616,7 @@ var sinon;
                     : (failed = typeof fake[meth] == 'function' ? !fake[meth].apply(fake, args) : !fake[meth]),
                   failed
                     ? failAssertion(this, (fake.printf || fake.proxy.printf).apply(fake, concat([msg], args)))
-                    : assert2.pass(name);
+                    : assert.pass(name);
               });
           }
           function exposedName(prefix, prop) {
@@ -1185,24 +5625,24 @@ var sinon;
               : prefix + stringSlice(prop, 0, 1).toUpperCase() + stringSlice(prop, 1);
           }
           return (
-            (assert2 = {
+            (assert = {
               failException: 'AssertError',
               fail: function (message) {
                 var error = new Error(message);
-                throw ((error.name = this.failException || assert2.failException), error);
+                throw ((error.name = this.failException || assert.failException), error);
               },
               pass: function () {},
               callOrder: function () {
                 verifyIsStub.apply(null, arguments);
                 var expected = '',
                   actual = '';
-                if (calledInOrder(arguments)) assert2.pass('callOrder');
+                if (calledInOrder(arguments)) assert.pass('callOrder');
                 else {
                   try {
-                    expected = join2(arguments, ', ');
+                    expected = join(arguments, ', ');
                     for (var calls = arraySlice(arguments), i = calls.length; i; )
                       calls[--i].called || splice(calls, i, 1);
-                    actual = join2(orderByFirstCall(calls), ', ');
+                    actual = join(orderByFirstCall(calls), ', ');
                   } catch {}
                   failAssertion(this, `expected ${expected} to be called in order but were called as ${actual}`);
                 }
@@ -1211,40 +5651,40 @@ var sinon;
                 verifyIsStub(method);
                 var msg;
                 typeof count != 'number'
-                  ? ((msg = `expected ${format2(count)} to be a number but was of type ${typeof count}`),
+                  ? ((msg = `expected ${format(count)} to be a number but was of type ${typeof count}`),
                     failAssertion(this, msg))
                   : method.callCount !== count
                   ? ((msg = `expected %n to be called ${timesInWords(count)} but was called %c%C`),
                     failAssertion(this, method.printf(msg)))
-                  : assert2.pass('callCount');
+                  : assert.pass('callCount');
               },
               expose: function (target, options) {
                 if (!target) throw new TypeError('target is null or undefined');
                 var o = options || {},
                   prefix = (typeof o.prefix > 'u' && 'assert') || o.prefix,
                   includeFail = typeof o.includeFail > 'u' || Boolean(o.includeFail),
-                  instance2 = this;
+                  instance = this;
                 return (
-                  forEach(Object.keys(instance2), function (method) {
+                  forEach(Object.keys(instance), function (method) {
                     method !== 'expose' &&
                       (includeFail || !/^(fail)/.test(method)) &&
-                      (target[exposedName(prefix, method)] = instance2[method]);
+                      (target[exposedName(prefix, method)] = instance[method]);
                   }),
                   target
                 );
               },
               match: function (actual, expectation) {
                 var matcher = createMatcher(expectation);
-                if (matcher.test(actual)) assert2.pass('match');
+                if (matcher.test(actual)) assert.pass('match');
                 else {
                   var formatted = [
                     'expected value to match',
-                    `    expected = ${format2(expectation)}`,
-                    `    actual = ${format2(actual)}`,
+                    `    expected = ${format(expectation)}`,
+                    `    actual = ${format(actual)}`,
                   ];
                   failAssertion(
                     this,
-                    join2(
+                    join(
                       formatted,
                       `
 `,
@@ -1283,7 +5723,7 @@ var sinon;
             mirrorPropAsAssertion('neverCalledWithMatch', 'expected %n to never be called with match %*%C'),
             mirrorPropAsAssertion('threw', '%n did not throw exception%C'),
             mirrorPropAsAssertion('alwaysThrew', '%n did not always throw exception%C'),
-            assert2
+            assert
           );
         }
         (module.exports = createAssertObject()), (module.exports.createAssertObject = createAssertObject);
@@ -1300,7 +5740,7 @@ var sinon;
           valueToString = require2('@sinonjs/commons').valueToString,
           exportAsyncBehaviors = require2('./util/core/export-async-behaviors'),
           concat = arrayProto.concat,
-          join2 = arrayProto.join,
+          join = arrayProto.join,
           reverse = arrayProto.reverse,
           slice = arrayProto.slice,
           useLeftMostCallback = -1,
@@ -1327,7 +5767,7 @@ var sinon;
                     behavior.callArgProp,
                   )}', but no object with such a property was passed.`)
                 : (msg = `${functionName(behavior.stub)} expected to yield, but no callback was passed.`),
-              args.length > 0 && (msg += ` Received [${join2(args, ', ')}]`),
+              args.length > 0 && (msg += ` Received [${join(args, ', ')}]`),
               msg
             );
           }
@@ -1379,26 +5819,26 @@ var sinon;
               this.returnValueDefined
             );
           },
-          invoke: function (context2, args) {
+          invoke: function (context, args) {
             var returnValue = callCallback(this, args);
             if (this.exception) throw this.exception;
             if (this.exceptionCreator)
               throw ((this.exception = this.exceptionCreator()), (this.exceptionCreator = void 0), this.exception);
             if (typeof this.returnArgAt == 'number')
               return ensureArgs('returnsArg', this, args), args[this.returnArgAt];
-            if (this.returnThis) return context2;
+            if (this.returnThis) return context;
             if (typeof this.throwArgAt == 'number') throw (ensureArgs('throwsArg', this, args), args[this.throwArgAt]);
-            if (this.fakeFn) return this.fakeFn.apply(context2, args);
+            if (this.fakeFn) return this.fakeFn.apply(context, args);
             if (typeof this.resolveArgAt == 'number')
               return (
                 ensureArgs('resolvesArg', this, args), (this.promiseLibrary || Promise).resolve(args[this.resolveArgAt])
               );
-            if (this.resolveThis) return (this.promiseLibrary || Promise).resolve(context2);
+            if (this.resolveThis) return (this.promiseLibrary || Promise).resolve(context);
             if (this.resolve) return (this.promiseLibrary || Promise).resolve(this.returnValue);
             if (this.reject) return (this.promiseLibrary || Promise).reject(this.returnValue);
             if (this.callsThrough) {
               var wrappedMethod = this.effectiveWrappedMethod();
-              return wrappedMethod.apply(context2, args);
+              return wrappedMethod.apply(context, args);
             } else if (this.callsThroughWithNew) {
               var WrappedClass = this.effectiveWrappedMethod(),
                 argsArray = slice(args),
@@ -1587,11 +6027,11 @@ var sinon;
                 (fake.callArgProp = void 0),
                 (fake.callbackAsync = !1);
             },
-            callsArgOn: function (fake, index, context2) {
+            callsArgOn: function (fake, index, context) {
               if (typeof index != 'number') throw new TypeError('argument index is not number');
               (fake.callArgAt = index),
                 (fake.callbackArguments = []),
-                (fake.callbackContext = context2),
+                (fake.callbackContext = context),
                 (fake.callArgProp = void 0),
                 (fake.callbackAsync = !1);
             },
@@ -1603,11 +6043,11 @@ var sinon;
                 (fake.callArgProp = void 0),
                 (fake.callbackAsync = !1);
             },
-            callsArgOnWith: function (fake, index, context2) {
+            callsArgOnWith: function (fake, index, context) {
               if (typeof index != 'number') throw new TypeError('argument index is not number');
               (fake.callArgAt = index),
                 (fake.callbackArguments = slice(arguments, 3)),
-                (fake.callbackContext = context2),
+                (fake.callbackContext = context),
                 (fake.callArgProp = void 0),
                 (fake.callbackAsync = !1);
             },
@@ -1630,10 +6070,10 @@ var sinon;
                 (fake.callbackAsync = !1),
                 (fake.fakeFn = void 0);
             },
-            yieldsOn: function (fake, context2) {
+            yieldsOn: function (fake, context) {
               (fake.callArgAt = useLeftMostCallback),
                 (fake.callbackArguments = slice(arguments, 2)),
-                (fake.callbackContext = context2),
+                (fake.callbackContext = context),
                 (fake.callArgProp = void 0),
                 (fake.callbackAsync = !1),
                 (fake.fakeFn = void 0);
@@ -1646,10 +6086,10 @@ var sinon;
                 (fake.callbackAsync = !1),
                 (fake.fakeFn = void 0);
             },
-            yieldsToOn: function (fake, prop, context2) {
+            yieldsToOn: function (fake, prop, context) {
               (fake.callArgAt = useLeftMostCallback),
                 (fake.callbackArguments = slice(arguments, 3)),
-                (fake.callbackContext = context2),
+                (fake.callbackContext = context),
                 (fake.callArgProp = prop),
                 (fake.callbackAsync = !1),
                 (fake.fakeFn = void 0);
@@ -1873,11 +6313,11 @@ var sinon;
           proxyCallToString = require2('./proxy-call').toString,
           timesInWords = require2('./util/core/times-in-words'),
           extend = require2('./util/core/extend'),
-          match2 = require2('@sinonjs/samsam').createMatcher,
+          match = require2('@sinonjs/samsam').createMatcher,
           stub = require2('./stub'),
-          assert2 = require2('./assert'),
+          assert = require2('./assert'),
           deepEqual = require2('@sinonjs/samsam').deepEqual,
-          format2 = require2('./util/core/format'),
+          format = require2('./util/core/format'),
           valueToString = require2('@sinonjs/commons').valueToString,
           every = arrayProto.every,
           forEach = arrayProto.forEach,
@@ -1903,7 +6343,7 @@ var sinon;
           return typeof expectation.maxCalls != 'number' ? !1 : expectation.callCount === expectation.maxCalls;
         }
         function verifyMatcher(possibleMatcher, arg) {
-          var isMatcher = match2.isMatcher(possibleMatcher);
+          var isMatcher = match.isMatcher(possibleMatcher);
           return (isMatcher && possibleMatcher.test(arg)) || !0;
         }
         var mockExpectation = {
@@ -1957,17 +6397,17 @@ var sinon;
                 ),
               'expectedArguments' in this &&
                 (args ||
-                  mockExpectation.fail(`${this.method} received no arguments, expected ${format2(expectedArguments)}`),
+                  mockExpectation.fail(`${this.method} received no arguments, expected ${format(expectedArguments)}`),
                 args.length < expectedArguments.length &&
                   mockExpectation.fail(
-                    `${this.method} received too few arguments (${format2(args)}), expected ${format2(
+                    `${this.method} received too few arguments (${format(args)}), expected ${format(
                       expectedArguments,
                     )}`,
                   ),
                 this.expectsExactArgCount &&
                   args.length !== expectedArguments.length &&
                   mockExpectation.fail(
-                    `${this.method} received too many arguments (${format2(args)}), expected ${format2(
+                    `${this.method} received too many arguments (${format(args)}), expected ${format(
                       expectedArguments,
                     )}`,
                   ),
@@ -1976,13 +6416,13 @@ var sinon;
                   function (expectedArgument, i) {
                     verifyMatcher(expectedArgument, args[i]) ||
                       mockExpectation.fail(
-                        `${this.method} received wrong arguments ${format2(args)}, didn't match ${String(
+                        `${this.method} received wrong arguments ${format(args)}, didn't match ${String(
                           expectedArguments,
                         )}`,
                       ),
                       deepEqual(args[i], expectedArgument) ||
                         mockExpectation.fail(
-                          `${this.method} received wrong arguments ${format2(args)}, expected ${format2(
+                          `${this.method} received wrong arguments ${format(args)}, expected ${format(
                             expectedArguments,
                           )}`,
                         );
@@ -2028,7 +6468,7 @@ var sinon;
             return this.met() ? mockExpectation.pass(String(this)) : mockExpectation.fail(String(this)), !0;
           },
           pass: function (message) {
-            assert2.pass(message);
+            assert.pass(message);
           },
           fail: function (message) {
             var exception = new Error(message);
@@ -2063,7 +6503,7 @@ var sinon;
           filter = arrayProto.filter,
           forEach = arrayProto.forEach,
           every = arrayProto.every,
-          join2 = arrayProto.join,
+          join = arrayProto.join,
           push = arrayProto.push,
           slice = arrayProto.slice,
           unshift = arrayProto.unshift;
@@ -2129,7 +6569,7 @@ var sinon;
               this.restore(),
               messages.length > 0
                 ? mockExpectation.fail(
-                    join2(
+                    join(
                       concat(messages, met),
                       `
 `,
@@ -2137,7 +6577,7 @@ var sinon;
                   )
                 : met.length > 0 &&
                   mockExpectation.pass(
-                    join2(
+                    join(
                       concat(messages, met),
                       `
 `,
@@ -2194,7 +6634,7 @@ var sinon;
               })}`,
             ),
               mockExpectation.fail(
-                join2(
+                join(
                   messages,
                   `
 `,
@@ -2304,24 +6744,24 @@ var sinon;
       function (require2, module, exports) {
         'use strict';
         var arrayProto = require2('@sinonjs/commons').prototypes.array,
-          match2 = require2('@sinonjs/samsam').createMatcher,
+          match = require2('@sinonjs/samsam').createMatcher,
           deepEqual = require2('@sinonjs/samsam').deepEqual,
           functionName = require2('@sinonjs/commons').functionName,
           sinonFormat = require2('./util/core/format'),
           valueToString = require2('@sinonjs/commons').valueToString,
           concat = arrayProto.concat,
           filter = arrayProto.filter,
-          join2 = arrayProto.join,
+          join = arrayProto.join,
           map = arrayProto.map,
           reduce = arrayProto.reduce,
           slice = arrayProto.slice;
         function throwYieldError(proxy, text, args) {
           var msg = functionName(proxy) + text;
-          throw (args.length && (msg += ` Received [${join2(slice(args), ', ')}]`), new Error(msg));
+          throw (args.length && (msg += ` Received [${join(slice(args), ', ')}]`), new Error(msg));
         }
         var callProto = {
           calledOn: function (thisValue) {
-            return match2.isMatcher(thisValue) ? thisValue.test(this.thisValue) : this.thisValue === thisValue;
+            return match.isMatcher(thisValue) ? thisValue.test(this.thisValue) : this.thisValue === thisValue;
           },
           calledWith: function () {
             var self2 = this,
@@ -2345,7 +6785,7 @@ var sinon;
                   calledWithMatchArgs,
                   function (prev, expectation, i) {
                     var actual = self2.args[i];
-                    return prev && match2(expectation).test(actual);
+                    return prev && match(expectation).test(actual);
                   },
                   !0,
                 );
@@ -2440,7 +6880,7 @@ var sinon;
               ? ((formattedArgs = map(this.args, function (arg) {
                   return sinonFormat(arg);
                 })),
-                (callStr = `${callStr + join2(formattedArgs, ', ')})`),
+                (callStr = `${callStr + join(formattedArgs, ', ')})`),
                 typeof this.returnValue < 'u' && (callStr += ` => ${sinonFormat(this.returnValue)}`),
                 this.exception &&
                   ((callStr += ` !${this.exception.name}`),
@@ -2626,11 +7066,11 @@ var sinon;
                 : this.callIds[this.callCount - 1] === proxy.callIds[proxy.callCount - 1] + 1;
             },
             formatters: require2('./spy-formatters'),
-            printf: function (format2) {
+            printf: function (format) {
               var spyInstance = this,
                 args = slice(arguments, 1),
                 formatter;
-              return (format2 || '').replace(/%(.)/g, function (match2, specifier) {
+              return (format || '').replace(/%(.)/g, function (match, specifier) {
                 return (
                   (formatter = proxyApi.formatters[specifier]),
                   typeof formatter == 'function'
@@ -2843,7 +7283,7 @@ var sinon;
           collectOwnMethods = require2('./collect-own-methods'),
           getPropertyDescriptor = require2('./util/core/get-property-descriptor'),
           isPropertyConfigurable = require2('./util/core/is-property-configurable'),
-          match2 = require2('@sinonjs/samsam').createMatcher,
+          match = require2('@sinonjs/samsam').createMatcher,
           sinonAssert = require2('./assert'),
           sinonClock = require2('./util/fake-timers'),
           sinonMock = require2('./mock'),
@@ -2929,7 +7369,7 @@ var sinon;
                 }),
                 sandbox.clock && (obj.clock = sandbox.clock),
                 sandbox.server && ((obj.server = sandbox.server), (obj.requests = sandbox.server.requests)),
-                (obj.match = match2),
+                (obj.match = match),
                 obj
               );
             }),
@@ -3106,7 +7546,7 @@ var sinon;
               return (promiseLib = promiseLibrary), (collection.promiseLibrary = promiseLibrary), sandbox;
             });
         }
-        (Sandbox.prototype.match = match2), (module.exports = Sandbox);
+        (Sandbox.prototype.match = match), (module.exports = Sandbox);
       },
       {
         './assert': 3,
@@ -3129,11 +7569,11 @@ var sinon;
         'use strict';
         var arrayProto = require2('@sinonjs/commons').prototypes.array,
           color = require2('./color'),
-          match2 = require2('@sinonjs/samsam').createMatcher,
+          match = require2('@sinonjs/samsam').createMatcher,
           timesInWords = require2('./util/core/times-in-words'),
           sinonFormat = require2('./util/core/format'),
           jsDiff = require2('diff'),
-          join2 = arrayProto.join,
+          join = arrayProto.join,
           map = arrayProto.map,
           push = arrayProto.push,
           slice = arrayProto.slice;
@@ -3146,16 +7586,16 @@ var sinon;
             `${calledArgumentMessage} ${matcher.message}`
           );
         }
-        function colorDiffText(diff2) {
-          var objects = map(diff2, function (part) {
+        function colorDiffText(diff) {
+          var objects = map(diff, function (part) {
             var text = part.value;
             return (
               part.added ? (text = color.green(text)) : part.removed && (text = color.red(text)),
-              diff2.length === 2 && (text += ' '),
+              diff.length === 2 && (text += ' '),
               text
             );
           });
-          return join2(objects, '');
+          return join(objects, '');
         }
         function quoteStringValue(value) {
           return typeof value == 'string' ? JSON.stringify(value) : value;
@@ -3184,12 +7624,12 @@ Call ${i + 1}:`);
                   (message += `
 `);
                 var calledArgMessage = j < calledArgs.length ? sinonFormat(calledArg) : '';
-                if (match2.isMatcher(expectedArg))
+                if (match.isMatcher(expectedArg))
                   message += colorSinonMatchText(expectedArg, calledArg, calledArgMessage);
                 else {
                   var expectedArgMessage = j < expectedArgs.length ? sinonFormat(expectedArg) : '',
-                    diff2 = jsDiff.diffJson(calledArgMessage, expectedArgMessage);
-                  message += colorDiffText(diff2);
+                    diff = jsDiff.diffJson(calledArgMessage, expectedArgMessage);
+                  message += colorDiffText(diff);
                 }
               }
             }
@@ -3205,7 +7645,7 @@ ${stringifiedCall}`),
             }
             return calls.length > 0
               ? `
-${join2(
+${join(
   calls,
   `
 `,
@@ -3215,10 +7655,10 @@ ${join2(
           t: function (spyInstance) {
             for (var objects = [], i = 0, l = spyInstance.callCount; i < l; ++i)
               push(objects, sinonFormat(spyInstance.thisValues[i]));
-            return join2(objects, ', ');
+            return join(objects, ', ');
           },
           '*': function (spyInstance, args) {
-            return join2(
+            return join(
               map(args, function (arg) {
                 return sinonFormat(arg);
               }),
@@ -3393,7 +7833,7 @@ ${join2(
           forEach = arrayProto.forEach,
           pop = arrayProto.pop,
           slice = arrayProto.slice,
-          sort2 = arrayProto.sort,
+          sort = arrayProto.sort,
           uuid = 0;
         function createStub(originalFunc) {
           var proxy;
@@ -3402,7 +7842,7 @@ ${join2(
               matchings = proxy.matchingFakes(args),
               fnStub =
                 pop(
-                  sort2(matchings, function (a, b) {
+                  sort(matchings, function (a, b) {
                     return a.matchingArguments.length - b.matchingArguments.length;
                   }),
                 ) || proxy;
@@ -3635,7 +8075,7 @@ ${join2(
         'use strict';
         var arrayProto = require2('@sinonjs/commons').prototypes.array,
           hasOwnProperty = require2('@sinonjs/commons').prototypes.object.hasOwnProperty,
-          join2 = arrayProto.join,
+          join = arrayProto.join,
           push = arrayProto.push,
           hasDontEnumBug = (function () {
             var obj = {
@@ -3672,7 +8112,7 @@ ${join2(
               },
               result = [];
             for (var prop in obj) hasOwnProperty(obj, prop) && push(result, obj[prop]());
-            return join2(result, '') !== '0123456789';
+            return join(result, '') !== '0123456789';
           })();
         function extendCommon(target, sources, doCopy) {
           var source, i, prop;
@@ -3721,15 +8161,15 @@ ${join2(
         'use strict';
         var inspect = require2('util').inspect,
           customFormatter;
-        function format2() {
+        function format() {
           return customFormatter ? customFormatter.apply(null, arguments) : inspect.apply(inspect, arguments);
         }
-        (format2.setFormatter = function (aCustomFormatter) {
+        (format.setFormatter = function (aCustomFormatter) {
           if (typeof aCustomFormatter != 'function')
             throw new Error('format.setFormatter must be called with a function');
           customFormatter = aCustomFormatter;
         }),
-          (module.exports = format2);
+          (module.exports = format);
       },
       { util: 92 },
     ],
@@ -3757,11 +8197,11 @@ ${join2(
         function nextTick(callback) {
           setTimeout(callback, 0);
         }
-        module.exports = function (process2, setImmediate) {
+        module.exports = function (process2, setImmediate2) {
           return typeof process2 == 'object' && typeof process2.nextTick == 'function'
             ? process2.nextTick
-            : typeof setImmediate == 'function'
-            ? setImmediate
+            : typeof setImmediate2 == 'function'
+            ? setImmediate2
             : nextTick;
         };
       },
@@ -3893,24 +8333,24 @@ ${join2(
       function (require2, module, exports) {
         'use strict';
         var forEach = require2('@sinonjs/commons').prototypes.array.forEach;
-        function walkInternal(obj, iterator, context2, originalObj, seen) {
+        function walkInternal(obj, iterator, context, originalObj, seen) {
           var proto, prop;
           if (typeof Object.getOwnPropertyNames != 'function') {
-            for (prop in obj) iterator.call(context2, obj[prop], prop, obj);
+            for (prop in obj) iterator.call(context, obj[prop], prop, obj);
             return;
           }
           forEach(Object.getOwnPropertyNames(obj), function (k) {
             if (seen[k] !== !0) {
               seen[k] = !0;
               var target = typeof Object.getOwnPropertyDescriptor(obj, k).get == 'function' ? originalObj : obj;
-              iterator.call(context2, k, target);
+              iterator.call(context, k, target);
             }
           }),
             (proto = Object.getPrototypeOf(obj)),
-            proto && walkInternal(proto, iterator, context2, originalObj, seen);
+            proto && walkInternal(proto, iterator, context, originalObj, seen);
         }
-        module.exports = function (obj, iterator, context2) {
-          return walkInternal(obj, iterator, context2, obj, {});
+        module.exports = function (obj, iterator, context) {
+          return walkInternal(obj, iterator, context, obj, {});
         };
       },
       { '@sinonjs/commons': 47 },
@@ -4248,7 +8688,7 @@ ${wrappedMethodDesc.stackTraceError.stack}`),
     48: [
       function (require2, module, exports) {
         'use strict';
-        var sort2 = require2('./prototypes/array').sort,
+        var sort = require2('./prototypes/array').sort,
           slice = require2('./prototypes/array').slice;
         function comparator(a, b) {
           var aCall = a.getCall(0),
@@ -4258,7 +8698,7 @@ ${wrappedMethodDesc.stackTraceError.stack}`),
           return aId < bId ? -1 : 1;
         }
         function orderByFirstCall(spies) {
-          return sort2(slice(spies), comparator);
+          return sort(slice(spies), comparator);
         }
         module.exports = orderByFirstCall;
       },
@@ -4445,8 +8885,8 @@ ${wrappedMethodDesc.stackTraceError.stack}`),
             if (typeof epoch == 'number') return epoch;
             throw new TypeError('now should be milliseconds since UNIX epoch');
           }
-          function inRange(from, to, timer2) {
-            return timer2 && timer2.callAt >= from && timer2.callAt <= to;
+          function inRange(from, to, timer) {
+            return timer && timer.callAt >= from && timer.callAt <= to;
           }
           function getInfiniteLoopError(clock, job) {
             let infiniteLoopError = new Error(
@@ -4463,14 +8903,14 @@ ${wrappedMethodDesc.stackTraceError.stack}`),
                 `
 `,
               )
-              .some(function (line2, i) {
-                return line2.match(computedTargetPattern)
+              .some(function (line, i) {
+                return line.match(computedTargetPattern)
                   ? ((matchedLineIndex = i), !0)
-                  : line2.match(clockMethodPattern)
+                  : line.match(clockMethodPattern)
                   ? ((matchedLineIndex = i), !1)
                   : matchedLineIndex >= 0;
               });
-            let stack2 = `${infiniteLoopError}
+            let stack = `${infiniteLoopError}
 ${job.type || 'Microtask'} - ${job.func.name || 'anonymous'}
 ${job.error.stack
   .split(
@@ -4481,7 +8921,7 @@ ${job.error.stack
 `)}`;
             try {
               Object.defineProperty(infiniteLoopError, 'stack', {
-                value: stack2,
+                value: stack,
               });
             } catch {}
             return infiniteLoopError;
@@ -4552,31 +8992,31 @@ ${job.error.stack
               resetIsNearInfiniteLimit(), (clock.jobs = []);
             }
           }
-          function addTimer(clock, timer2) {
-            if (timer2.func === void 0) throw new Error('Callback must be provided to timer calls');
-            if (addTimerReturnsObject && typeof timer2.func != 'function')
+          function addTimer(clock, timer) {
+            if (timer.func === void 0) throw new Error('Callback must be provided to timer calls');
+            if (addTimerReturnsObject && typeof timer.func != 'function')
               throw new TypeError(
                 `[ERR_INVALID_CALLBACK]: Callback must be a function. Received ${
-                  timer2.func
-                } of type ${typeof timer2.func}`,
+                  timer.func
+                } of type ${typeof timer.func}`,
               );
             if (
-              (isNearInfiniteLimit && (timer2.error = new Error()),
-              (timer2.type = timer2.immediate ? 'Immediate' : 'Timeout'),
-              timer2.hasOwnProperty('delay') &&
-                (typeof timer2.delay != 'number' && (timer2.delay = parseInt(timer2.delay, 10)),
-                isNumberFinite(timer2.delay) || (timer2.delay = 0),
-                (timer2.delay = timer2.delay > maxTimeout ? 1 : timer2.delay),
-                (timer2.delay = Math.max(0, timer2.delay))),
-              timer2.hasOwnProperty('interval') &&
-                ((timer2.type = 'Interval'), (timer2.interval = timer2.interval > maxTimeout ? 1 : timer2.interval)),
-              timer2.hasOwnProperty('animation') && ((timer2.type = 'AnimationFrame'), (timer2.animation = !0)),
-              timer2.hasOwnProperty('idleCallback') && ((timer2.type = 'IdleCallback'), (timer2.idleCallback = !0)),
+              (isNearInfiniteLimit && (timer.error = new Error()),
+              (timer.type = timer.immediate ? 'Immediate' : 'Timeout'),
+              timer.hasOwnProperty('delay') &&
+                (typeof timer.delay != 'number' && (timer.delay = parseInt(timer.delay, 10)),
+                isNumberFinite(timer.delay) || (timer.delay = 0),
+                (timer.delay = timer.delay > maxTimeout ? 1 : timer.delay),
+                (timer.delay = Math.max(0, timer.delay))),
+              timer.hasOwnProperty('interval') &&
+                ((timer.type = 'Interval'), (timer.interval = timer.interval > maxTimeout ? 1 : timer.interval)),
+              timer.hasOwnProperty('animation') && ((timer.type = 'AnimationFrame'), (timer.animation = !0)),
+              timer.hasOwnProperty('idleCallback') && ((timer.type = 'IdleCallback'), (timer.idleCallback = !0)),
               clock.timers || (clock.timers = {}),
-              (timer2.id = uniqueTimerId++),
-              (timer2.createdAt = clock.now),
-              (timer2.callAt = clock.now + (parseInt(timer2.delay) || (clock.duringTick ? 1 : 0))),
-              (clock.timers[timer2.id] = timer2),
+              (timer.id = uniqueTimerId++),
+              (timer.createdAt = clock.now),
+              (timer.callAt = clock.now + (parseInt(timer.delay) || (clock.duringTick ? 1 : 0))),
+              (clock.timers[timer.id] = timer),
               addTimerReturnsObject)
             ) {
               let res = {
@@ -4592,18 +9032,18 @@ ${job.error.stack
                 },
                 refresh: function () {
                   return (
-                    (timer2.callAt = clock.now + (parseInt(timer2.delay) || (clock.duringTick ? 1 : 0))),
-                    (clock.timers[timer2.id] = timer2),
+                    (timer.callAt = clock.now + (parseInt(timer.delay) || (clock.duringTick ? 1 : 0))),
+                    (clock.timers[timer.id] = timer),
                     res
                   );
                 },
                 [Symbol.toPrimitive]: function () {
-                  return timer2.id;
+                  return timer.id;
                 },
               };
               return res;
             }
-            return timer2.id;
+            return timer.id;
           }
           function compareTimers(a, b) {
             if (a.callAt < b.callAt) return -1;
@@ -4617,47 +9057,47 @@ ${job.error.stack
           }
           function firstTimerInRange(clock, from, to) {
             let timers2 = clock.timers,
-              timer2 = null,
+              timer = null,
               id,
               isInRange;
             for (id in timers2)
               timers2.hasOwnProperty(id) &&
                 ((isInRange = inRange(from, to, timers2[id])),
-                isInRange && (!timer2 || compareTimers(timer2, timers2[id]) === 1) && (timer2 = timers2[id]));
-            return timer2;
+                isInRange && (!timer || compareTimers(timer, timers2[id]) === 1) && (timer = timers2[id]));
+            return timer;
           }
           function firstTimer(clock) {
             let timers2 = clock.timers,
-              timer2 = null,
+              timer = null,
               id;
             for (id in timers2)
               timers2.hasOwnProperty(id) &&
-                (!timer2 || compareTimers(timer2, timers2[id]) === 1) &&
-                (timer2 = timers2[id]);
-            return timer2;
+                (!timer || compareTimers(timer, timers2[id]) === 1) &&
+                (timer = timers2[id]);
+            return timer;
           }
           function lastTimer(clock) {
             let timers2 = clock.timers,
-              timer2 = null,
+              timer = null,
               id;
             for (id in timers2)
               timers2.hasOwnProperty(id) &&
-                (!timer2 || compareTimers(timer2, timers2[id]) === -1) &&
-                (timer2 = timers2[id]);
-            return timer2;
+                (!timer || compareTimers(timer, timers2[id]) === -1) &&
+                (timer = timers2[id]);
+            return timer;
           }
-          function callTimer(clock, timer2) {
+          function callTimer(clock, timer) {
             if (
-              (typeof timer2.interval == 'number'
-                ? (clock.timers[timer2.id].callAt += timer2.interval)
-                : delete clock.timers[timer2.id],
-              typeof timer2.func == 'function')
+              (typeof timer.interval == 'number'
+                ? (clock.timers[timer.id].callAt += timer.interval)
+                : delete clock.timers[timer.id],
+              typeof timer.func == 'function')
             )
-              timer2.func.apply(null, timer2.args);
+              timer.func.apply(null, timer.args);
             else {
               let eval2 = eval;
               (function () {
-                eval2(timer2.func);
+                eval2(timer.func);
               })();
             }
           }
@@ -4690,16 +9130,16 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
               );
             }
             if (clock.timers.hasOwnProperty(id)) {
-              let timer2 = clock.timers[id];
+              let timer = clock.timers[id];
               if (
-                timer2.type === ttype ||
-                (timer2.type === 'Timeout' && ttype === 'Interval') ||
-                (timer2.type === 'Interval' && ttype === 'Timeout')
+                timer.type === ttype ||
+                (timer.type === 'Timeout' && ttype === 'Interval') ||
+                (timer.type === 'Interval' && ttype === 'Timeout')
               )
                 delete clock.timers[id];
               else {
                 let clear = getClearHandler(ttype),
-                  schedule = getScheduleHandler(timer2.type);
+                  schedule = getScheduleHandler(timer.type);
                 throw new Error(`Cannot clear timer: timer created with ${schedule}() but cleared with ${clear}()`);
               }
             }
@@ -4794,7 +9234,7 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
             function getTimeToNextFrame() {
               return 16 - ((clock.now - start) % 16);
             }
-            function hrtime2(prev) {
+            function hrtime(prev) {
               let millisSinceStart = clock.now - adjustedSystemTime[0] - start,
                 secsSinceStart = Math.floor(millisSinceStart / 1e3),
                 remainderInNanos = (millisSinceStart - secsSinceStart * 1e3) * 1e6 + nanos - adjustedSystemTime[1];
@@ -4808,8 +9248,8 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
               return [secsSinceStart, remainderInNanos];
             }
             hrtimeBigintPresent &&
-              (hrtime2.bigint = function () {
-                let parts = hrtime2();
+              (hrtime.bigint = function () {
+                let parts = hrtime();
                 return BigInt(parts[0]) * BigInt(1e9) + BigInt(parts[1]);
               }),
               (clock.requestIdleCallback = function (func, timeout) {
@@ -4921,7 +9361,7 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
               nanosTotal >= 1e6 && ((tickTo += 1), (nanosTotal -= 1e6)), (nanos = nanosTotal);
               let tickFrom = clock.now,
                 previous = clock.now,
-                timer2,
+                timer,
                 firstException,
                 oldNow,
                 nextPromiseTick,
@@ -4932,11 +9372,11 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
                 runJobs(clock),
                 oldNow !== clock.now && ((tickFrom += clock.now - oldNow), (tickTo += clock.now - oldNow));
               function doTickInner() {
-                for (timer2 = firstTimerInRange(clock, tickFrom, tickTo); timer2 && tickFrom <= tickTo; ) {
-                  if (clock.timers[timer2.id]) {
-                    (tickFrom = timer2.callAt), (clock.now = timer2.callAt), (oldNow = clock.now);
+                for (timer = firstTimerInRange(clock, tickFrom, tickTo); timer && tickFrom <= tickTo; ) {
+                  if (clock.timers[timer.id]) {
+                    (tickFrom = timer.callAt), (clock.now = timer.callAt), (oldNow = clock.now);
                     try {
-                      runJobs(clock), callTimer(clock, timer2);
+                      runJobs(clock), callTimer(clock, timer);
                     } catch (e) {
                       firstException = firstException || e;
                     }
@@ -4953,8 +9393,8 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
                   runJobs(clock),
                   oldNow !== clock.now && ((tickFrom += clock.now - oldNow), (tickTo += clock.now - oldNow)),
                   (clock.duringTick = !1),
-                  (timer2 = firstTimerInRange(clock, tickFrom, tickTo)),
-                  timer2)
+                  (timer = firstTimerInRange(clock, tickFrom, tickTo)),
+                  timer)
                 )
                   try {
                     clock.tick(tickTo - clock.now);
@@ -4983,7 +9423,7 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
                     (previous += clock.now - oldNow));
                 }),
                 (postTimerCall = function () {
-                  (timer2 = firstTimerInRange(clock, previous, tickTo)), (previous = tickFrom);
+                  (timer = firstTimerInRange(clock, previous, tickTo)), (previous = tickFrom);
                 }),
                 doTickInner()
               );
@@ -5006,11 +9446,11 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
                 }),
               (clock.next = function () {
                 runJobs(clock);
-                let timer2 = firstTimer(clock);
-                if (!timer2) return clock.now;
+                let timer = firstTimer(clock);
+                if (!timer) return clock.now;
                 clock.duringTick = !0;
                 try {
-                  return (clock.now = timer2.callAt), callTimer(clock, timer2), runJobs(clock), clock.now;
+                  return (clock.now = timer.callAt), callTimer(clock, timer), runJobs(clock), clock.now;
                 } finally {
                   clock.duringTick = !1;
                 }
@@ -5020,15 +9460,15 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
                   return new _global.Promise(function (resolve, reject) {
                     originalSetTimeout(function () {
                       try {
-                        let timer2 = firstTimer(clock);
-                        if (!timer2) {
+                        let timer = firstTimer(clock);
+                        if (!timer) {
                           resolve(clock.now);
                           return;
                         }
                         let err;
-                        (clock.duringTick = !0), (clock.now = timer2.callAt);
+                        (clock.duringTick = !0), (clock.now = timer.callAt);
                         try {
-                          callTimer(clock, timer2);
+                          callTimer(clock, timer);
                         } catch (e) {
                           err = e;
                         }
@@ -5086,16 +9526,16 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
                   });
                 }),
               (clock.runToLast = function () {
-                let timer2 = lastTimer(clock);
-                return timer2 ? clock.tick(timer2.callAt - clock.now) : (runJobs(clock), clock.now);
+                let timer = lastTimer(clock);
+                return timer ? clock.tick(timer.callAt - clock.now) : (runJobs(clock), clock.now);
               }),
               typeof _global.Promise < 'u' &&
                 (clock.runToLastAsync = function () {
                   return new _global.Promise(function (resolve, reject) {
                     originalSetTimeout(function () {
                       try {
-                        let timer2 = lastTimer(clock);
-                        timer2 || resolve(clock.now), resolve(clock.tickAsync(timer2.callAt));
+                        let timer = lastTimer(clock);
+                        timer || resolve(clock.now), resolve(clock.tickAsync(timer.callAt));
                       } catch (e) {
                         reject(e);
                       }
@@ -5109,22 +9549,22 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
                 let newNow = getEpoch(systemTime),
                   difference = newNow - clock.now,
                   id,
-                  timer2;
+                  timer;
                 (adjustedSystemTime[0] = adjustedSystemTime[0] + difference),
                   (adjustedSystemTime[1] = adjustedSystemTime[1] + nanos),
                   (clock.now = newNow),
                   (nanos = 0);
                 for (id in clock.timers)
                   clock.timers.hasOwnProperty(id) &&
-                    ((timer2 = clock.timers[id]), (timer2.createdAt += difference), (timer2.callAt += difference));
+                    ((timer = clock.timers[id]), (timer.createdAt += difference), (timer.callAt += difference));
               }),
               performancePresent &&
                 ((clock.performance = /* @__PURE__ */ Object.create(null)),
                 (clock.performance.now = function () {
-                  let hrt = hrtime2();
+                  let hrt = hrtime();
                   return hrt[0] * 1e3 + hrt[1] / 1e6;
                 })),
-              hrtimePresent && (clock.hrtime = hrtime2),
+              hrtimePresent && (clock.hrtime = hrtime),
               clock
             );
           }
@@ -5644,12 +10084,12 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
       function (require2, module, exports) {
         'use strict';
         var functionName = require2('@sinonjs/commons').functionName,
-          join2 = require2('@sinonjs/commons').prototypes.array.join,
+          join = require2('@sinonjs/commons').prototypes.array.join,
           map = require2('@sinonjs/commons').prototypes.array.map,
           stringIndexOf = require2('@sinonjs/commons').prototypes.string.indexOf,
           valueToString = require2('@sinonjs/commons').valueToString,
           matchObject = require2('./match-object'),
-          createTypeMap = function (match2) {
+          createTypeMap = function (match) {
             return {
               function: function (m, expectation, message) {
                 (m.test = expectation), (m.message = message || `match(${functionName(expectation)})`);
@@ -5671,9 +10111,9 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
                       return `${key}: ${valueToString(expectation[key])}`;
                     })),
                     (m.test = function (actual) {
-                      return matchObject(actual, expectation, match2);
+                      return matchObject(actual, expectation, match);
                     }),
-                    (m.message = `match(${join2(array, ', ')})`),
+                    (m.message = `match(${join(array, ', ')})`),
                     m);
               },
               regexp: function (m, expectation) {
@@ -5722,15 +10162,15 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
           indexOf = arrayProto.indexOf,
           keys = Object.keys,
           getOwnPropertySymbols = Object.getOwnPropertySymbols;
-        function deepEqualCyclic(actual, expectation, match2) {
+        function deepEqualCyclic(actual, expectation, match) {
           var actualObjects = [],
             expectationObjects = [],
             actualPaths = [],
             expectationPaths = [],
             compared = {};
           return (function deepEqual(actualObj, expectationObj, actualPath, expectationPath) {
-            if (match2 && match2.isMatcher(expectationObj))
-              return match2.isMatcher(actualObj) ? actualObj === expectationObj : expectationObj.test(actualObj);
+            if (match && match.isMatcher(expectationObj))
+              return match.isMatcher(actualObj) ? actualObj === expectationObj : expectationObj.test(actualObj);
             var actualType = typeof actualObj,
               expectationType = typeof expectationObj;
             if (
@@ -5835,9 +10275,9 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
             });
           })(actual, expectation, '$1', '$2');
         }
-        (deepEqualCyclic.use = function (match2) {
+        (deepEqualCyclic.use = function (match) {
           return function (a, b) {
-            return deepEqualCyclic(a, b, match2);
+            return deepEqualCyclic(a, b, match);
           };
         }),
           (module.exports = deepEqualCyclic);
@@ -6009,13 +10449,13 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
       function (require2, module, exports) {
         'use strict';
         var forEach = require2('@sinonjs/commons').prototypes.set.forEach;
-        function isSubset(s1, s2, compare2) {
+        function isSubset(s1, s2, compare) {
           var allContained = !0;
           return (
             forEach(s1, function (v1) {
               var includes = !1;
               forEach(s2, function (v2) {
-                compare2(v2, v1) && (includes = !0);
+                compare(v2, v1) && (includes = !0);
               }),
                 (allContained = allContained && includes);
             }),
@@ -6039,7 +10479,7 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
           var representation = '';
           return (
             map.forEach(function (value, key) {
-              representation += `[${stringify2(key)},${stringify2(value)}],`;
+              representation += `[${stringify(key)},${stringify(value)}],`;
             }),
             (representation = slice(representation, 0, -1)),
             representation
@@ -6049,13 +10489,13 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
           var representation = '';
           return (
             iterable.forEach(function (value) {
-              representation += `${stringify2(value)},`;
+              representation += `${stringify(value)},`;
             }),
             (representation = slice(representation, 0, -1)),
             representation
           );
         }
-        function stringify2(item) {
+        function stringify(item) {
           return typeof item == 'string' ? `'${item}'` : valueToString(item);
         }
         module.exports = iterableToString;
@@ -6070,22 +10510,21 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
           forEach = require2('@sinonjs/commons').prototypes.array.forEach,
           type = require2('type-detect'),
           engineCanCompareMaps = typeof Array.from == 'function',
-          deepEqual = require2('./deep-equal').use(match2),
+          deepEqual = require2('./deep-equal').use(match),
           isArrayType = require2('./is-array-type'),
           isSubset = require2('./is-subset'),
           createMatcher = require2('./create-matcher');
-        function arrayContains(array, subset, compare2) {
+        function arrayContains(array, subset, compare) {
           if (subset.length === 0) return !0;
           var i, l, j, k;
           for (i = 0, l = array.length; i < l; ++i)
-            if (compare2(array[i], subset[0])) {
-              for (j = 0, k = subset.length; j < k; ++j)
-                if (i + j >= l || !compare2(array[i + j], subset[j])) return !1;
+            if (compare(array[i], subset[0])) {
+              for (j = 0, k = subset.length; j < k; ++j) if (i + j >= l || !compare(array[i + j], subset[j])) return !1;
               return !0;
             }
           return !1;
         }
-        function match2(object, matcherOrValue) {
+        function match(object, matcherOrValue) {
           if (matcherOrValue && typeof matcherOrValue.test == 'function') return matcherOrValue.test(object);
           switch (type(matcherOrValue)) {
             case 'bigint':
@@ -6115,13 +10554,13 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
             case 'Uint32Array':
             case 'Float32Array':
             case 'Float64Array':
-              return isArrayType(matcherOrValue) && arrayContains(object, matcherOrValue, match2);
+              return isArrayType(matcherOrValue) && arrayContains(object, matcherOrValue, match);
             case 'Map':
               if (!engineCanCompareMaps)
                 throw new Error(
                   'The JavaScript engine does not support Array.from and cannot reliably do value comparison of Map instances',
                 );
-              return type(object) === 'Map' && arrayContains(Array.from(object), Array.from(matcherOrValue), match2);
+              return type(object) === 'Map' && arrayContains(Array.from(object), Array.from(matcherOrValue), match);
             default:
               break;
           }
@@ -6129,7 +10568,7 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
             case 'null':
               return !1;
             case 'Set':
-              return isSubset(matcherOrValue, object, match2);
+              return isSubset(matcherOrValue, object, match);
             default:
               break;
           }
@@ -6151,9 +10590,9 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
           throw new Error('Matcher was an unknown or unsupported type');
         }
         forEach(Object.keys(createMatcher), function (key) {
-          match2[key] = createMatcher[key];
+          match[key] = createMatcher[key];
         }),
-          (module.exports = match2);
+          (module.exports = match);
       },
       {
         './create-matcher': 61,
@@ -6173,8 +10612,8 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
           isNegZero = require2('./is-neg-zero'),
           isSet = require2('./is-set'),
           isMap = require2('./is-map'),
-          match2 = require2('./match'),
-          deepEqualCyclic = require2('./deep-equal').use(match2),
+          match = require2('./match'),
+          deepEqualCyclic = require2('./deep-equal').use(match),
           createMatcher = require2('./create-matcher');
         module.exports = {
           createMatcher,
@@ -6185,7 +10624,7 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
           isMap,
           isNegZero,
           isSet,
-          match: match2,
+          match,
         };
       },
       {
@@ -74657,8 +79096,8 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
                             `
 `,
                           )
-                          .map(function (line2) {
-                            return '  ' + line2;
+                          .map(function (line) {
+                            return '  ' + line;
                           })
                           .join(
                             `
@@ -74673,8 +79112,8 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
                               `
 `,
                             )
-                            .map(function (line2) {
-                              return '   ' + line2;
+                            .map(function (line) {
+                              return '   ' + line;
                             }).join(`
 `))))
                 : (str = ctx.stylize('[Circular]', 'special'))),
@@ -74816,8 +79255,8 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
             : ((global2 = global2 || self), factory((global2.Diff = {})));
         })(this, function (exports2) {
           'use strict';
-          function Diff2() {}
-          Diff2.prototype = {
+          function Diff() {}
+          Diff.prototype = {
             diff: function (oldString, newString) {
               var options = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : {},
                 callback = options.callback;
@@ -74869,21 +79308,21 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
                   }
                   if (
                     (!canAdd || (canRemove && addPath.newPos < removePath.newPos)
-                      ? ((basePath = clonePath2(removePath)), self2.pushComponent(basePath.components, void 0, !0))
+                      ? ((basePath = clonePath(removePath)), self2.pushComponent(basePath.components, void 0, !0))
                       : ((basePath = addPath), basePath.newPos++, self2.pushComponent(basePath.components, !0, void 0)),
                     (_oldPos = self2.extractCommon(basePath, newString, oldString, diagonalPath)),
                     basePath.newPos + 1 >= newLen && _oldPos + 1 >= oldLen)
                   )
-                    return done(buildValues2(self2, basePath.components, newString, oldString, self2.useLongestToken));
+                    return done(buildValues(self2, basePath.components, newString, oldString, self2.useLongestToken));
                   bestPath[diagonalPath] = basePath;
                 }
                 editLength++;
               }
               if (callback)
-                (function exec2() {
+                (function exec() {
                   setTimeout(function () {
                     if (editLength > maxEditLength) return callback();
-                    execEditLength() || exec2();
+                    execEditLength() || exec();
                   }, 0);
                 })();
               else
@@ -74941,11 +79380,11 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
             tokenize: function (value) {
               return value.split('');
             },
-            join: function (chars2) {
-              return chars2.join('');
+            join: function (chars) {
+              return chars.join('');
             },
           };
-          function buildValues2(diff2, components, newString, oldString, useLongestToken) {
+          function buildValues(diff, components, newString, oldString, useLongestToken) {
             for (
               var componentPos = 0, componentLen = components.length, newPos = 0, oldPos = 0;
               componentPos < componentLen;
@@ -74954,7 +79393,7 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
               var component = components[componentPos];
               if (component.removed) {
                 if (
-                  ((component.value = diff2.join(oldString.slice(oldPos, oldPos + component.count))),
+                  ((component.value = diff.join(oldString.slice(oldPos, oldPos + component.count))),
                   (oldPos += component.count),
                   componentPos && components[componentPos - 1].added)
                 ) {
@@ -74968,8 +79407,8 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
                     var oldValue = oldString[oldPos + i];
                     return oldValue.length > value2.length ? oldValue : value2;
                   })),
-                    (component.value = diff2.join(value));
-                } else component.value = diff2.join(newString.slice(newPos, newPos + component.count));
+                    (component.value = diff.join(value));
+                } else component.value = diff.join(newString.slice(newPos, newPos + component.count));
                 (newPos += component.count), component.added || (oldPos += component.count);
               }
             }
@@ -74978,20 +79417,20 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
               componentLen > 1 &&
                 typeof lastComponent.value == 'string' &&
                 (lastComponent.added || lastComponent.removed) &&
-                diff2.equals('', lastComponent.value) &&
+                diff.equals('', lastComponent.value) &&
                 ((components[componentLen - 2].value += lastComponent.value), components.pop()),
               components
             );
           }
-          function clonePath2(path) {
+          function clonePath(path) {
             return {
               newPos: path.newPos,
               components: path.components.slice(0),
             };
           }
-          var characterDiff2 = new Diff2();
-          function diffChars2(oldStr, newStr, options) {
-            return characterDiff2.diff(oldStr, newStr, options);
+          var characterDiff = new Diff();
+          function diffChars(oldStr, newStr, options) {
+            return characterDiff.diff(oldStr, newStr, options);
           }
           function generateOptions(options, defaults) {
             if (typeof options == 'function') defaults.callback = options;
@@ -74999,22 +79438,21 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
               for (var name in options) options.hasOwnProperty(name) && (defaults[name] = options[name]);
             return defaults;
           }
-          var extendedWordChars2 = /^[A-Za-z\xC0-\u02C6\u02C8-\u02D7\u02DE-\u02FF\u1E00-\u1EFF]+$/,
-            reWhitespace2 = /\S/,
-            wordDiff2 = new Diff2();
-          (wordDiff2.equals = function (left, right) {
+          var extendedWordChars = /^[A-Za-z\xC0-\u02C6\u02C8-\u02D7\u02DE-\u02FF\u1E00-\u1EFF]+$/,
+            reWhitespace = /\S/,
+            wordDiff = new Diff();
+          (wordDiff.equals = function (left, right) {
             return (
               this.options.ignoreCase && ((left = left.toLowerCase()), (right = right.toLowerCase())),
-              left === right ||
-                (this.options.ignoreWhitespace && !reWhitespace2.test(left) && !reWhitespace2.test(right))
+              left === right || (this.options.ignoreWhitespace && !reWhitespace.test(left) && !reWhitespace.test(right))
             );
           }),
-            (wordDiff2.tokenize = function (value) {
+            (wordDiff.tokenize = function (value) {
               for (var tokens = value.split(/([^\S\r\n]+|[()[\]{}'"\r\n]|\b)/), i = 0; i < tokens.length - 1; i++)
                 !tokens[i + 1] &&
                   tokens[i + 2] &&
-                  extendedWordChars2.test(tokens[i]) &&
-                  extendedWordChars2.test(tokens[i + 2]) &&
+                  extendedWordChars.test(tokens[i]) &&
+                  extendedWordChars.test(tokens[i + 2]) &&
                   ((tokens[i] += tokens[i + 2]), tokens.splice(i + 1, 2), i--);
               return tokens;
             });
@@ -75023,55 +79461,55 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
               (options = generateOptions(options, {
                 ignoreWhitespace: !0,
               })),
-              wordDiff2.diff(oldStr, newStr, options)
+              wordDiff.diff(oldStr, newStr, options)
             );
           }
           function diffWordsWithSpace(oldStr, newStr, options) {
-            return wordDiff2.diff(oldStr, newStr, options);
+            return wordDiff.diff(oldStr, newStr, options);
           }
-          var lineDiff2 = new Diff2();
-          lineDiff2.tokenize = function (value) {
+          var lineDiff = new Diff();
+          lineDiff.tokenize = function (value) {
             var retLines = [],
               linesAndNewlines = value.split(/(\n|\r\n)/);
             linesAndNewlines[linesAndNewlines.length - 1] || linesAndNewlines.pop();
             for (var i = 0; i < linesAndNewlines.length; i++) {
-              var line2 = linesAndNewlines[i];
+              var line = linesAndNewlines[i];
               i % 2 && !this.options.newlineIsToken
-                ? (retLines[retLines.length - 1] += line2)
-                : (this.options.ignoreWhitespace && (line2 = line2.trim()), retLines.push(line2));
+                ? (retLines[retLines.length - 1] += line)
+                : (this.options.ignoreWhitespace && (line = line.trim()), retLines.push(line));
             }
             return retLines;
           };
-          function diffLines2(oldStr, newStr, callback) {
-            return lineDiff2.diff(oldStr, newStr, callback);
+          function diffLines(oldStr, newStr, callback) {
+            return lineDiff.diff(oldStr, newStr, callback);
           }
           function diffTrimmedLines(oldStr, newStr, callback) {
             var options = generateOptions(callback, {
               ignoreWhitespace: !0,
             });
-            return lineDiff2.diff(oldStr, newStr, options);
+            return lineDiff.diff(oldStr, newStr, options);
           }
-          var sentenceDiff2 = new Diff2();
-          sentenceDiff2.tokenize = function (value) {
+          var sentenceDiff = new Diff();
+          sentenceDiff.tokenize = function (value) {
             return value.split(/(\S.+?[.!?])(?=\s+|$)/);
           };
           function diffSentences(oldStr, newStr, callback) {
-            return sentenceDiff2.diff(oldStr, newStr, callback);
+            return sentenceDiff.diff(oldStr, newStr, callback);
           }
-          var cssDiff2 = new Diff2();
-          cssDiff2.tokenize = function (value) {
+          var cssDiff = new Diff();
+          cssDiff.tokenize = function (value) {
             return value.split(/([{}:;,]|\s+)/);
           };
           function diffCss(oldStr, newStr, callback) {
-            return cssDiff2.diff(oldStr, newStr, callback);
+            return cssDiff.diff(oldStr, newStr, callback);
           }
-          function _typeof2(obj) {
+          function _typeof(obj) {
             return (
               typeof Symbol == 'function' && typeof Symbol.iterator == 'symbol'
-                ? (_typeof2 = function (obj2) {
+                ? (_typeof = function (obj2) {
                     return typeof obj2;
                   })
-                : (_typeof2 = function (obj2) {
+                : (_typeof = function (obj2) {
                     return obj2 &&
                       typeof Symbol == 'function' &&
                       obj2.constructor === Symbol &&
@@ -75079,7 +79517,7 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
                       ? 'symbol'
                       : typeof obj2;
                   }),
-              _typeof2(obj)
+              _typeof(obj)
             );
           }
           function _toConsumableArray(arr) {
@@ -75115,11 +79553,11 @@ To automatically clean-up native timers, use \`shouldClearNativeTimers\`.`,
             throw new TypeError(`Invalid attempt to spread non-iterable instance.
 In order to be iterable, non-array objects must have a [Symbol.iterator]() method.`);
           }
-          var objectPrototypeToString2 = Object.prototype.toString,
-            jsonDiff2 = new Diff2();
-          (jsonDiff2.useLongestToken = !0),
-            (jsonDiff2.tokenize = lineDiff2.tokenize),
-            (jsonDiff2.castInput = function (value) {
+          var objectPrototypeToString = Object.prototype.toString,
+            jsonDiff = new Diff();
+          (jsonDiff.useLongestToken = !0),
+            (jsonDiff.tokenize = lineDiff.tokenize),
+            (jsonDiff.castInput = function (value) {
               var _this$options = this.options,
                 undefinedReplacement = _this$options.undefinedReplacement,
                 _this$options$stringi = _this$options.stringifyReplacer,
@@ -75131,59 +79569,57 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                     : _this$options$stringi;
               return typeof value == 'string'
                 ? value
-                : JSON.stringify(canonicalize2(value, null, null, stringifyReplacer), stringifyReplacer, '  ');
+                : JSON.stringify(canonicalize(value, null, null, stringifyReplacer), stringifyReplacer, '  ');
             }),
-            (jsonDiff2.equals = function (left, right) {
-              return Diff2.prototype.equals.call(
-                jsonDiff2,
+            (jsonDiff.equals = function (left, right) {
+              return Diff.prototype.equals.call(
+                jsonDiff,
                 left.replace(/,([\r\n])/g, '$1'),
                 right.replace(/,([\r\n])/g, '$1'),
               );
             });
           function diffJson(oldObj, newObj, options) {
-            return jsonDiff2.diff(oldObj, newObj, options);
+            return jsonDiff.diff(oldObj, newObj, options);
           }
-          function canonicalize2(obj, stack2, replacementStack, replacer, key) {
-            (stack2 = stack2 || []),
-              (replacementStack = replacementStack || []),
-              replacer && (obj = replacer(key, obj));
+          function canonicalize(obj, stack, replacementStack, replacer, key) {
+            (stack = stack || []), (replacementStack = replacementStack || []), replacer && (obj = replacer(key, obj));
             var i;
-            for (i = 0; i < stack2.length; i += 1) if (stack2[i] === obj) return replacementStack[i];
+            for (i = 0; i < stack.length; i += 1) if (stack[i] === obj) return replacementStack[i];
             var canonicalizedObj;
-            if (objectPrototypeToString2.call(obj) === '[object Array]') {
+            if (objectPrototypeToString.call(obj) === '[object Array]') {
               for (
-                stack2.push(obj),
+                stack.push(obj),
                   canonicalizedObj = new Array(obj.length),
                   replacementStack.push(canonicalizedObj),
                   i = 0;
                 i < obj.length;
                 i += 1
               )
-                canonicalizedObj[i] = canonicalize2(obj[i], stack2, replacementStack, replacer, key);
-              return stack2.pop(), replacementStack.pop(), canonicalizedObj;
+                canonicalizedObj[i] = canonicalize(obj[i], stack, replacementStack, replacer, key);
+              return stack.pop(), replacementStack.pop(), canonicalizedObj;
             }
-            if ((obj && obj.toJSON && (obj = obj.toJSON()), _typeof2(obj) === 'object' && obj !== null)) {
-              stack2.push(obj), (canonicalizedObj = {}), replacementStack.push(canonicalizedObj);
+            if ((obj && obj.toJSON && (obj = obj.toJSON()), _typeof(obj) === 'object' && obj !== null)) {
+              stack.push(obj), (canonicalizedObj = {}), replacementStack.push(canonicalizedObj);
               var sortedKeys = [],
                 _key;
               for (_key in obj) obj.hasOwnProperty(_key) && sortedKeys.push(_key);
               for (sortedKeys.sort(), i = 0; i < sortedKeys.length; i += 1)
                 (_key = sortedKeys[i]),
-                  (canonicalizedObj[_key] = canonicalize2(obj[_key], stack2, replacementStack, replacer, _key));
-              stack2.pop(), replacementStack.pop();
+                  (canonicalizedObj[_key] = canonicalize(obj[_key], stack, replacementStack, replacer, _key));
+              stack.pop(), replacementStack.pop();
             } else canonicalizedObj = obj;
             return canonicalizedObj;
           }
-          var arrayDiff2 = new Diff2();
-          (arrayDiff2.tokenize = function (value) {
+          var arrayDiff = new Diff();
+          (arrayDiff.tokenize = function (value) {
             return value.slice();
           }),
-            (arrayDiff2.join = arrayDiff2.removeEmpty =
+            (arrayDiff.join = arrayDiff.removeEmpty =
               function (value) {
                 return value;
               });
-          function diffArrays2(oldArr, newArr, callback) {
-            return arrayDiff2.diff(oldArr, newArr, callback);
+          function diffArrays(oldArr, newArr, callback) {
+            return arrayDiff.diff(oldArr, newArr, callback);
           }
           function parsePatch(uniDiff) {
             var options = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {},
@@ -75194,9 +79630,9 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             function parseIndex() {
               var index = {};
               for (list.push(index); i < diffstr.length; ) {
-                var line2 = diffstr[i];
-                if (/^(\-\-\-|\+\+\+|@@)\s/.test(line2)) break;
-                var header = /^(?:Index:|diff(?: -r \w+)+)\s+(.+?)\s*$/.exec(line2);
+                var line = diffstr[i];
+                if (/^(\-\-\-|\+\+\+|@@)\s/.test(line)) break;
+                var header = /^(?:Index:|diff(?: -r \w+)+)\s+(.+?)\s*$/.exec(line);
                 header && (index.index = header[1]), i++;
               }
               for (parseFileHeader(index), parseFileHeader(index), index.hunks = []; i < diffstr.length; ) {
@@ -75299,13 +79735,13 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               if (uniDiff.length > 1) throw new Error('applyPatch only works with a single input.');
               uniDiff = uniDiff[0];
             }
-            var lines2 = source.split(/\r\n|[\n\v\f\r\x85]/),
+            var lines = source.split(/\r\n|[\n\v\f\r\x85]/),
               delimiters = source.match(/\r\n|[\n\v\f\r\x85]/g) || [],
               hunks = uniDiff.hunks,
               compareLine =
                 options.compareLine ||
-                function (lineNumber, line3, operation2, patchContent) {
-                  return line3 === patchContent;
+                function (lineNumber, line2, operation2, patchContent) {
+                  return line2 === patchContent;
                 },
               errorCount = 0,
               fuzzFactor = options.fuzzFactor || 0,
@@ -75315,12 +79751,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               addEOFNL;
             function hunkFits(hunk2, toPos2) {
               for (var j2 = 0; j2 < hunk2.lines.length; j2++) {
-                var line3 = hunk2.lines[j2],
-                  operation2 = line3.length > 0 ? line3[0] : ' ',
-                  content2 = line3.length > 0 ? line3.substr(1) : line3;
+                var line2 = hunk2.lines[j2],
+                  operation2 = line2.length > 0 ? line2[0] : ' ',
+                  content2 = line2.length > 0 ? line2.substr(1) : line2;
                 if (operation2 === ' ' || operation2 === '-') {
                   if (
-                    !compareLine(toPos2 + 1, lines2[toPos2], operation2, content2) &&
+                    !compareLine(toPos2 + 1, lines[toPos2], operation2, content2) &&
                     (errorCount++, errorCount > fuzzFactor)
                   )
                     return !1;
@@ -75332,7 +79768,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             for (var i = 0; i < hunks.length; i++) {
               for (
                 var hunk = hunks[i],
-                  maxLine = lines2.length - hunk.oldLines,
+                  maxLine = lines.length - hunk.oldLines,
                   localOffset = 0,
                   toPos = offset + hunk.oldStart - 1,
                   iterator = distanceIterator(toPos, minLine, maxLine);
@@ -75351,28 +79787,28 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 _toPos = _hunk.oldStart + _hunk.offset + diffOffset - 1;
               diffOffset += _hunk.newLines - _hunk.oldLines;
               for (var j = 0; j < _hunk.lines.length; j++) {
-                var line2 = _hunk.lines[j],
-                  operation = line2.length > 0 ? line2[0] : ' ',
-                  content = line2.length > 0 ? line2.substr(1) : line2,
+                var line = _hunk.lines[j],
+                  operation = line.length > 0 ? line[0] : ' ',
+                  content = line.length > 0 ? line.substr(1) : line,
                   delimiter = _hunk.linedelimiters[j];
                 if (operation === ' ') _toPos++;
-                else if (operation === '-') lines2.splice(_toPos, 1), delimiters.splice(_toPos, 1);
+                else if (operation === '-') lines.splice(_toPos, 1), delimiters.splice(_toPos, 1);
                 else if (operation === '+')
-                  lines2.splice(_toPos, 0, content), delimiters.splice(_toPos, 0, delimiter), _toPos++;
+                  lines.splice(_toPos, 0, content), delimiters.splice(_toPos, 0, delimiter), _toPos++;
                 else if (operation === '\\') {
                   var previousOperation = _hunk.lines[j - 1] ? _hunk.lines[j - 1][0] : null;
                   previousOperation === '+' ? (removeEOFNL = !0) : previousOperation === '-' && (addEOFNL = !0);
                 }
               }
             }
-            if (removeEOFNL) for (; !lines2[lines2.length - 1]; ) lines2.pop(), delimiters.pop();
+            if (removeEOFNL) for (; !lines[lines.length - 1]; ) lines.pop(), delimiters.pop();
             else
               addEOFNL &&
-                (lines2.push(''),
+                (lines.push(''),
                 delimiters.push(`
 `));
-            for (var _k = 0; _k < lines2.length - 1; _k++) lines2[_k] = lines2[_k] + delimiters[_k];
-            return lines2.join('');
+            for (var _k = 0; _k < lines.length - 1; _k++) lines[_k] = lines[_k] + delimiters[_k];
+            return lines.join('');
           }
           function applyPatches(uniDiff, options) {
             typeof uniDiff == 'string' && (uniDiff = parsePatch(uniDiff));
@@ -75393,14 +79829,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           }
           function structuredPatch(oldFileName, newFileName, oldStr, newStr, oldHeader, newHeader, options) {
             options || (options = {}), typeof options.context > 'u' && (options.context = 4);
-            var diff2 = diffLines2(oldStr, newStr, options);
-            if (!diff2) return;
-            diff2.push({
+            var diff = diffLines(oldStr, newStr, options);
+            if (!diff) return;
+            diff.push({
               value: '',
               lines: [],
             });
-            function contextLines(lines2) {
-              return lines2.map(function (entry) {
+            function contextLines(lines) {
+              return lines.map(function (entry) {
                 return ' ' + entry;
               });
             }
@@ -75412,15 +79848,15 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 oldLine = 1,
                 newLine = 1,
                 _loop = function (i2) {
-                  var current = diff2[i2],
-                    lines2 =
+                  var current = diff[i2],
+                    lines =
                       current.lines ||
                       current.value.replace(/\n$/, '').split(`
 `);
-                  if (((current.lines = lines2), current.added || current.removed)) {
+                  if (((current.lines = lines), current.added || current.removed)) {
                     var _curRange;
                     if (!oldRangeStart) {
-                      var prev = diff2[i2 - 1];
+                      var prev = diff[i2 - 1];
                       (oldRangeStart = oldLine),
                         (newRangeStart = newLine),
                         prev &&
@@ -75431,23 +79867,23 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                     (_curRange = curRange).push.apply(
                       _curRange,
                       _toConsumableArray(
-                        lines2.map(function (entry) {
+                        lines.map(function (entry) {
                           return (current.added ? '+' : '-') + entry;
                         }),
                       ),
                     ),
-                      current.added ? (newLine += lines2.length) : (oldLine += lines2.length);
+                      current.added ? (newLine += lines.length) : (oldLine += lines.length);
                   } else {
                     if (oldRangeStart)
-                      if (lines2.length <= options.context * 2 && i2 < diff2.length - 2) {
+                      if (lines.length <= options.context * 2 && i2 < diff.length - 2) {
                         var _curRange2;
-                        (_curRange2 = curRange).push.apply(_curRange2, _toConsumableArray(contextLines(lines2)));
+                        (_curRange2 = curRange).push.apply(_curRange2, _toConsumableArray(contextLines(lines)));
                       } else {
                         var _curRange3,
-                          contextSize = Math.min(lines2.length, options.context);
+                          contextSize = Math.min(lines.length, options.context);
                         (_curRange3 = curRange).push.apply(
                           _curRange3,
-                          _toConsumableArray(contextLines(lines2.slice(0, contextSize))),
+                          _toConsumableArray(contextLines(lines.slice(0, contextSize))),
                         );
                         var hunk = {
                           oldStart: oldRangeStart,
@@ -75456,10 +79892,10 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                           newLines: newLine - newRangeStart + contextSize,
                           lines: curRange,
                         };
-                        if (i2 >= diff2.length - 2 && lines2.length <= options.context) {
+                        if (i2 >= diff.length - 2 && lines.length <= options.context) {
                           var oldEOFNewline = /\n$/.test(oldStr),
                             newEOFNewline = /\n$/.test(newStr),
-                            noNlBeforeAdds = lines2.length == 0 && curRange.length > hunk.oldLines;
+                            noNlBeforeAdds = lines.length == 0 && curRange.length > hunk.oldLines;
                           !oldEOFNewline &&
                             noNlBeforeAdds &&
                             oldStr.length > 0 &&
@@ -75469,11 +79905,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                         }
                         hunks.push(hunk), (oldRangeStart = 0), (newRangeStart = 0), (curRange = []);
                       }
-                    (oldLine += lines2.length), (newLine += lines2.length);
+                    (oldLine += lines.length), (newLine += lines.length);
                   }
                 },
                 i = 0;
-              i < diff2.length;
+              i < diff.length;
               i++
             )
               _loop(i);
@@ -75485,14 +79921,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               hunks,
             };
           }
-          function formatPatch(diff2) {
+          function formatPatch(diff) {
             var ret = [];
-            diff2.oldFileName == diff2.newFileName && ret.push('Index: ' + diff2.oldFileName),
+            diff.oldFileName == diff.newFileName && ret.push('Index: ' + diff.oldFileName),
               ret.push('==================================================================='),
-              ret.push('--- ' + diff2.oldFileName + (typeof diff2.oldHeader > 'u' ? '' : '	' + diff2.oldHeader)),
-              ret.push('+++ ' + diff2.newFileName + (typeof diff2.newHeader > 'u' ? '' : '	' + diff2.newHeader));
-            for (var i = 0; i < diff2.hunks.length; i++) {
-              var hunk = diff2.hunks[i];
+              ret.push('--- ' + diff.oldFileName + (typeof diff.oldHeader > 'u' ? '' : '	' + diff.oldHeader)),
+              ret.push('+++ ' + diff.newFileName + (typeof diff.newHeader > 'u' ? '' : '	' + diff.newHeader));
+            for (var i = 0; i < diff.hunks.length; i++) {
+              var hunk = diff.hunks[i];
               hunk.oldLines === 0 && (hunk.oldStart -= 1),
                 hunk.newLines === 0 && (hunk.newStart -= 1),
                 ret.push(
@@ -75611,8 +80047,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                   theirs,
                 });
           }
-          function hunkBefore(test2, check) {
-            return test2.oldStart < check.oldStart && test2.oldStart + test2.oldLines < check.oldStart;
+          function hunkBefore(test, check) {
+            return test.oldStart < check.oldStart && test.oldStart + test.oldLines < check.oldStart;
           }
           function cloneHunk(hunk, offset) {
             return {
@@ -75707,21 +80143,21 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           }
           function insertLeading(hunk, insert, their) {
             for (; insert.offset < their.offset && insert.index < insert.lines.length; ) {
-              var line2 = insert.lines[insert.index++];
-              hunk.lines.push(line2), insert.offset++;
+              var line = insert.lines[insert.index++];
+              hunk.lines.push(line), insert.offset++;
             }
           }
           function insertTrailing(hunk, insert) {
             for (; insert.index < insert.lines.length; ) {
-              var line2 = insert.lines[insert.index++];
-              hunk.lines.push(line2);
+              var line = insert.lines[insert.index++];
+              hunk.lines.push(line);
             }
           }
           function collectChange(state) {
             for (var ret = [], operation = state.lines[state.index][0]; state.index < state.lines.length; ) {
-              var line2 = state.lines[state.index];
-              if ((operation === '-' && line2[0] === '+' && (operation = '+'), operation === line2[0]))
-                ret.push(line2), state.index++;
+              var line = state.lines[state.index];
+              if ((operation === '-' && line[0] === '+' && (operation = '+'), operation === line[0]))
+                ret.push(line), state.index++;
               else break;
             }
             return ret;
@@ -75733,16 +80169,16 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
 
             ) {
               var change = state.lines[state.index],
-                match2 = matchChanges[matchIndex];
-              if (match2[0] === '+') break;
+                match = matchChanges[matchIndex];
+              if (match[0] === '+') break;
               if (
                 ((contextChanges = contextChanges || change[0] !== ' '),
-                merged.push(match2),
+                merged.push(match),
                 matchIndex++,
                 change[0] === '+')
               )
                 for (conflicted = !0; change[0] === '+'; ) changes.push(change), (change = state.lines[++state.index]);
-              match2.substr(1) === change.substr(1) ? (changes.push(change), state.index++) : (conflicted = !0);
+              match.substr(1) === change.substr(1) ? (changes.push(change), state.index++) : (conflicted = !0);
             }
             if (((matchChanges[matchIndex] || '')[0] === '+' && contextChanges && (conflicted = !0), conflicted))
               return changes;
@@ -75764,19 +80200,19 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             }
             return (state.index += delta), !0;
           }
-          function calcOldNewLineCount(lines2) {
+          function calcOldNewLineCount(lines) {
             var oldLines = 0,
               newLines = 0;
             return (
-              lines2.forEach(function (line2) {
-                if (typeof line2 != 'string') {
-                  var myCount = calcOldNewLineCount(line2.mine),
-                    theirCount = calcOldNewLineCount(line2.theirs);
+              lines.forEach(function (line) {
+                if (typeof line != 'string') {
+                  var myCount = calcOldNewLineCount(line.mine),
+                    theirCount = calcOldNewLineCount(line.theirs);
                   oldLines !== void 0 &&
                     (myCount.oldLines === theirCount.oldLines ? (oldLines += myCount.oldLines) : (oldLines = void 0)),
                     newLines !== void 0 &&
                       (myCount.newLines === theirCount.newLines ? (newLines += myCount.newLines) : (newLines = void 0));
-                } else newLines !== void 0 && (line2[0] === '+' || line2[0] === ' ') && newLines++, oldLines !== void 0 && (line2[0] === '-' || line2[0] === ' ') && oldLines++;
+                } else newLines !== void 0 && (line[0] === '+' || line[0] === ' ') && newLines++, oldLines !== void 0 && (line[0] === '-' || line[0] === ' ') && oldLines++;
               }),
               {
                 oldLines,
@@ -75810,19 +80246,19 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               n
             );
           }
-          (exports2.Diff = Diff2),
+          (exports2.Diff = Diff),
             (exports2.applyPatch = applyPatch),
             (exports2.applyPatches = applyPatches),
-            (exports2.canonicalize = canonicalize2),
+            (exports2.canonicalize = canonicalize),
             (exports2.convertChangesToDMP = convertChangesToDMP),
             (exports2.convertChangesToXML = convertChangesToXML),
             (exports2.createPatch = createPatch),
             (exports2.createTwoFilesPatch = createTwoFilesPatch),
-            (exports2.diffArrays = diffArrays2),
-            (exports2.diffChars = diffChars2),
+            (exports2.diffArrays = diffArrays),
+            (exports2.diffChars = diffChars),
             (exports2.diffCss = diffCss),
             (exports2.diffJson = diffJson),
-            (exports2.diffLines = diffLines2),
+            (exports2.diffLines = diffLines),
             (exports2.diffSentences = diffSentences),
             (exports2.diffTrimmedLines = diffTrimmedLines),
             (exports2.diffWords = diffWords),
@@ -76083,8 +80519,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           var result = [];
           return (
             reLeadingDot.test(string) && result.push(''),
-            string.replace(rePropName, function (match2, number, quote, string2) {
-              result.push(quote ? string2.replace(reEscapeChar, '$1') : number || match2);
+            string.replace(rePropName, function (match, number, quote, string2) {
+              result.push(quote ? string2.replace(reEscapeChar, '$1') : number || match);
             }),
             result
           );
@@ -76207,7 +80643,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
                 passive: Boolean(options.passive),
               };
         }
-        function not2(fn) {
+        function not(fn) {
           return function () {
             return !fn.apply(this, arguments);
           };
@@ -76234,7 +80670,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             if (!(!this.eventListeners || !this.eventListeners[event])) {
               var options = flattenOptions(providedOptions);
               this.eventListeners[event] = this.eventListeners[event].filter(
-                not2(hasListenerFilter(listener, options.capture)),
+                not(hasListenerFilter(listener, options.capture)),
               );
             }
           },
@@ -76412,7 +80848,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               (typeof url == 'function' && url(reqUrl) === !0);
           return matchMethod && matchUrl;
         }
-        function match2(response, request) {
+        function match(response, request) {
           var wloc = getWindowLocation(),
             rCurrLoc = new RegExp(`^${wloc.protocol}//${wloc.host}/`),
             requestUrl = request.url;
@@ -76545,7 +80981,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
               var response = this.response || [404, {}, ''];
               if (this.responses) {
                 for (var l = this.responses.length, i = l - 1; i >= 0; i--)
-                  if (match2.call(this, this.responses[i], request)) {
+                  if (match.call(this, this.responses[i], request)) {
                     response = this.responses[i].response;
                     break;
                   }
@@ -77558,225 +81994,57 @@ var _createFakeServerWithClock = sinon.createFakeServerWithClock;
 var _addBehavior = sinon.addBehavior;
 var _promise = sinon.promise;
 
-// ../../node_modules/dequal/dist/index.mjs
-var has = Object.prototype.hasOwnProperty;
-function find(iter, tar, key) {
-  for (key of iter.keys()) if (dequal(key, tar)) return key;
-}
-function dequal(foo, bar) {
-  var ctor, len, tmp;
-  if (foo === bar) return !0;
-  if (foo && bar && (ctor = foo.constructor) === bar.constructor) {
-    if (ctor === Date) return foo.getTime() === bar.getTime();
-    if (ctor === RegExp) return foo.toString() === bar.toString();
-    if (ctor === Array) {
-      if ((len = foo.length) === bar.length) for (; len-- && dequal(foo[len], bar[len]); );
-      return len === -1;
-    }
-    if (ctor === Set) {
-      if (foo.size !== bar.size) return !1;
-      for (len of foo)
-        if (((tmp = len), (tmp && typeof tmp == 'object' && ((tmp = find(bar, tmp)), !tmp)) || !bar.has(tmp)))
-          return !1;
-      return !0;
-    }
-    if (ctor === Map) {
-      if (foo.size !== bar.size) return !1;
-      for (len of foo)
-        if (
-          ((tmp = len[0]),
-          (tmp && typeof tmp == 'object' && ((tmp = find(bar, tmp)), !tmp)) || !dequal(len[1], bar.get(tmp)))
-        )
-          return !1;
-      return !0;
-    }
-    if (ctor === ArrayBuffer) (foo = new Uint8Array(foo)), (bar = new Uint8Array(bar));
-    else if (ctor === DataView) {
-      if ((len = foo.byteLength) === bar.byteLength) for (; len-- && foo.getInt8(len) === bar.getInt8(len); );
-      return len === -1;
-    }
-    if (ArrayBuffer.isView(foo)) {
-      if ((len = foo.byteLength) === bar.byteLength) for (; len-- && foo[len] === bar[len]; );
-      return len === -1;
-    }
-    if (!ctor || typeof foo == 'object') {
-      len = 0;
-      for (ctor in foo)
-        if ((has.call(foo, ctor) && ++len && !has.call(bar, ctor)) || !(ctor in bar) || !dequal(foo[ctor], bar[ctor]))
-          return !1;
-      return Object.keys(bar).length === len;
-    }
-  }
-  return foo !== foo && bar !== bar;
-}
-
-// ../../node_modules/uvu/assert/index.mjs
-function dedent(str) {
-  str = str.replace(
-    /\r?\n/g,
-    `
-`,
-  );
-  let arr = str.match(/^[ \t]*(?=\S)/gm),
-    i = 0,
-    min = 1 / 0,
-    len = (arr || []).length;
-  for (; i < len; i++) min = Math.min(min, arr[i].length);
-  return len && min ? str.replace(new RegExp(`^[ \\t]{${min}}`, 'gm'), '') : str;
-}
-var Assertion = class extends Error {
-  constructor(opts = {}) {
-    super(opts.message),
-      (this.name = 'Assertion'),
-      (this.code = 'ERR_ASSERTION'),
-      Error.captureStackTrace && Error.captureStackTrace(this, this.constructor),
-      (this.details = opts.details || !1),
-      (this.generated = !!opts.generated),
-      (this.operator = opts.operator),
-      (this.expects = opts.expects),
-      (this.actual = opts.actual);
-  }
-};
-function assert(bool, actual, expects, operator, detailer, backup, msg) {
-  if (bool) return;
-  let message = msg || backup;
-  if (msg instanceof Error) throw msg;
-  let details = detailer && detailer(actual, expects);
-  throw new Assertion({ actual, expects, operator, message, details, generated: !msg });
-}
-function ok(val, msg) {
-  assert(!!val, !1, !0, 'ok', !1, 'Expected value to be truthy', msg);
-}
-function is(val, exp, msg) {
-  assert(val === exp, val, exp, 'is', compare, 'Expected values to be strictly equal:', msg);
-}
-function equal(val, exp, msg) {
-  assert(dequal(val, exp), val, exp, 'equal', compare, 'Expected values to be deeply equal:', msg);
-}
-function unreachable(msg) {
-  assert(!1, !0, !1, 'unreachable', !1, 'Expected not to be reached!', msg);
-}
-function instance(val, exp, msg) {
-  let name = '`' + (exp.name || exp.constructor.name) + '`';
-  assert(val instanceof exp, val, exp, 'instance', !1, `Expected value to be an instance of ${name}`, msg);
-}
-function match(val, exp, msg) {
-  typeof exp == 'string'
-    ? assert(val.includes(exp), val, exp, 'match', !1, `Expected value to include "${exp}" substring`, msg)
-    : assert(exp.test(val), val, exp, 'match', !1, `Expected value to match \`${String(exp)}\` pattern`, msg);
-}
-function not(val, msg) {
-  assert(!val, !0, !1, 'not', !1, 'Expected value to be falsey', msg);
-}
-not.ok = not;
-is.not = function (val, exp, msg) {
-  assert(val !== exp, val, exp, 'is.not', !1, 'Expected values not to be strictly equal', msg);
-};
-not.equal = function (val, exp, msg) {
-  assert(!dequal(val, exp), val, exp, 'not.equal', !1, 'Expected values not to be deeply equal', msg);
-};
-not.type = function (val, exp, msg) {
-  let tmp = typeof val;
-  assert(tmp !== exp, tmp, exp, 'not.type', !1, `Expected "${tmp}" not to be "${exp}"`, msg);
-};
-not.instance = function (val, exp, msg) {
-  let name = '`' + (exp.name || exp.constructor.name) + '`';
-  assert(!(val instanceof exp), val, exp, 'not.instance', !1, `Expected value not to be an instance of ${name}`, msg);
-};
-not.snapshot = function (val, exp, msg) {
-  (val = dedent(val)),
-    (exp = dedent(exp)),
-    assert(val !== exp, val, exp, 'not.snapshot', !1, 'Expected value not to match snapshot', msg);
-};
-not.fixture = function (val, exp, msg) {
-  (val = dedent(val)),
-    (exp = dedent(exp)),
-    assert(val !== exp, val, exp, 'not.fixture', !1, 'Expected value not to match fixture', msg);
-};
-not.match = function (val, exp, msg) {
-  typeof exp == 'string'
-    ? assert(!val.includes(exp), val, exp, 'not.match', !1, `Expected value not to include "${exp}" substring`, msg)
-    : assert(!exp.test(val), val, exp, 'not.match', !1, `Expected value not to match \`${String(exp)}\` pattern`, msg);
-};
-not.throws = function (blk, exp, msg) {
-  !msg && typeof exp == 'string' && ((msg = exp), (exp = null));
-  try {
-    blk();
-  } catch (err) {
-    typeof exp == 'function'
-      ? assert(!exp(err), !0, !1, 'not.throws', !1, 'Expected function not to throw matching exception', msg)
-      : exp instanceof RegExp
-      ? assert(
-          !exp.test(err.message),
-          !0,
-          !1,
-          'not.throws',
-          !1,
-          `Expected function not to throw exception matching \`${String(exp)}\` pattern`,
-          msg,
-        )
-      : exp || assert(!1, !0, !1, 'not.throws', !1, 'Expected function not to throw', msg);
-  }
-};
-
 // dist/runtime/browser/crypto.js
 var crypto_default = crypto;
 
 // dist/runtime/browser/fetch.js
 var fetch_default = fetch;
 
-// src/runtime/index.ts
+// tests/dist/runtime/index.js
 var runtime = { crypto: crypto_default, fetch: fetch_default },
   runtime_default = runtime;
 
-// src/tokens/fixtures.ts
-var mockJwt =
-  'eyJhbGciOiJSUzI1NiIsImtpZCI6Imluc18yR0lvUWhiVXB5MGhYN0IyY1ZrdVRNaW5Yb0QiLCJ0eXAiOiJKV1QifQ.eyJhenAiOiJodHRwczovL2FjY291bnRzLmluc3BpcmVkLnB1bWEtNzQubGNsLmRldiIsImV4cCI6MTY2NjY0ODMxMCwiaWF0IjoxNjY2NjQ4MjUwLCJpc3MiOiJodHRwczovL2NsZXJrLmluc3BpcmVkLnB1bWEtNzQubGNsLmRldiIsIm5iZiI6MTY2NjY0ODI0MCwic2lkIjoic2Vzc18yR2JEQjRlbk5kQ2E1dlMxenBDM1h6Zzl0SzkiLCJzdWIiOiJ1c2VyXzJHSXBYT0VwVnlKdzUxcmtabjlLbW5jNlN4ciJ9.n1Usc-DLDftqA0Xb-_2w8IGs4yjCmwc5RngwbSRvwevuZOIuRoeHmE2sgCdEvjfJEa7ewL6EVGVcM557TWPW--g_J1XQPwBy8tXfz7-S73CEuyRFiR97L2AHRdvRtvGtwR-o6l8aHaFxtlmfWbQXfg4kFJz2UGe9afmh3U9-f_4JOZ5fa3mI98UMy1-bo20vjXeWQ9aGrqaxHQxjnzzC-1Kpi5LdPvhQ16H0dPB8MHRTSM5TAuLKTpPV7wqixmbtcc2-0k6b9FKYZNqRVTaIyV-lifZloBvdzlfOF8nW1VVH_fx-iW5Q3hovHFcJIULHEC1kcAYTubbxzpgeVQepGg';
-var mockJwtPayload = {
-    azp: 'https://accounts.inspired.puma-74.lcl.dev',
-    exp: 1666648310,
-    iat: 1666648250,
-    iss: 'https://clerk.inspired.puma-74.lcl.dev',
-    nbf: 1666648240,
-    sid: 'sess_2GbDB4enNdCa5vS1zpC3Xzg9tK9',
-    sub: 'user_2GIpXOEpVyJw51rkZn9Kmnc6Sxr',
-  },
-  mockRsaJwkKid = 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD',
-  mockRsaJwk = {
-    use: 'sig',
-    kty: 'RSA',
-    kid: mockRsaJwkKid,
-    alg: 'RS256',
-    n: 'u0tNUitBZmcGYMWcqvaRBaJe0XmTQ738RHYoHjhYANyeOkysuu4L_Rqr-fmTXsbebrTp7_OewIqsJXImEWB_WQ3HN9lAkOMCCGDU1udsz_sl1Kwy5JZ7x8Nr4ghXJagQzEF0Ovsj7_TPsBJGkVJ-OiZsTXCe7EAmG5gNGGPBE5Gu14Rwb-eZ5r9RCAaPfhxR1yHYTAvCrku_6i2os7RLpT6UockKtX4QQSH2CMveNwqd6LdwhV8USZrczB2VYkAImngJC745-EWek1sVExYkqheGvC3J8O7D9H4JtaKD2zaq0rJzsIU0zb_wwax5-La-uRuPYvTXlO8B8IK4jjNMCQ',
-    e: 'AQAB',
-  },
-  mockJwks = {
-    keys: [mockRsaJwk],
-  };
-
-// src/tokens/mockFetch.ts
-function jsonOk(body) {
-  let mockResponse = {
-    ok: !0,
-    status: 200,
-    headers: {
-      'Content-type': 'application/json',
-    },
-    json() {
-      return Promise.resolve(body);
-    },
-  };
-  return Promise.resolve(mockResponse);
+// tests/dist/util/instance.js
+function isDevelopmentFromApiKey(apiKey) {
+  return apiKey.startsWith('test_');
+}
+function isProductionFromApiKey(apiKey) {
+  return apiKey.startsWith('live_');
 }
 
-// src/constants.ts
-var API_URL = 'https://api.clerk.dev';
+// tests/dist/util/request.js
+function checkCrossOrigin({ originURL, host, forwardedHost, forwardedPort, forwardedProto }) {
+  if (forwardedProto && forwardedProto !== originURL.protocol) return !0;
+  let finalURL = convertHostHeaderValueToURL(forwardedHost || host);
+  return (
+    (finalURL.port = forwardedPort || finalURL.port),
+    finalURL.port !== originURL.port || finalURL.hostname !== originURL.hostname
+  );
+}
+function convertHostHeaderValueToURL(host) {
+  return new URL(`https://${host}`);
+}
 
-// src/tokens/errors.ts
+// tests/dist/tokens/errors.js
+var TokenVerificationErrorReason;
+(function (TokenVerificationErrorReason2) {
+  (TokenVerificationErrorReason2.TokenInvalid = 'token-invalid'),
+    (TokenVerificationErrorReason2.TokenExpired = 'token-expired'),
+    (TokenVerificationErrorReason2.TokenNotActiveYet = 'token-not-active-yet'),
+    (TokenVerificationErrorReason2.TokenVerificationFailed = 'token-verification-failed'),
+    (TokenVerificationErrorReason2.LocalJWKMissing = 'jwk-local-missing'),
+    (TokenVerificationErrorReason2.RemoteJWKFailedToLoad = 'jwk-remote-failed-to-load'),
+    (TokenVerificationErrorReason2.RemoteJWKInvalid = 'jwk-remote-invalid'),
+    (TokenVerificationErrorReason2.RemoteJWKMissing = 'jwk-remote-missing'),
+    (TokenVerificationErrorReason2.JWKFailedToResolve = 'jwk-failed-to-resolve');
+})(TokenVerificationErrorReason || (TokenVerificationErrorReason = {}));
+var TokenVerificationErrorAction;
+(function (TokenVerificationErrorAction2) {
+  (TokenVerificationErrorAction2.ContactSupport = 'Contact support@clerk.dev'),
+    (TokenVerificationErrorAction2.SetClerkJWTKey = 'Set the CLERK_JWT_KEY environment variable.'),
+    (TokenVerificationErrorAction2.setClerkAPIKey = 'Set the CLERK_API_KEY environment variable.');
+})(TokenVerificationErrorAction || (TokenVerificationErrorAction = {}));
 var TokenVerificationError = class extends Error {
-  action;
-  reason;
-  tokenCarrier;
   constructor({ action, message, reason }) {
     super(message),
       Object.setPrototypeOf(this, TokenVerificationError.prototype),
@@ -77791,6 +82059,9 @@ var TokenVerificationError = class extends Error {
   }
 };
 
+// tests/dist/constants.js
+var API_URL = 'https://api.clerk.dev';
+
 // ../../node_modules/rfc4648/lib/index.mjs
 var import_index = __toESM(require_lib(), 1),
   base16 = import_index.default.base16,
@@ -77800,7 +82071,7 @@ var import_index = __toESM(require_lib(), 1),
   base64url = import_index.default.base64url,
   codec = import_index.default.codec;
 
-// src/tokens/jwt.ts
+// tests/dist/tokens/jwt.js
 var DEFAULT_CLOCK_SKEW_IN_SECONDS = 2 * 1e3,
   algToHash = {
     RS256: 'SHA-256',
@@ -77840,7 +82111,7 @@ function decodeJwt(token) {
   let tokenParts = (token || '').toString().split('.');
   if (tokenParts.length !== 3)
     throw new TokenVerificationError({
-      reason: 'token-invalid' /* TokenInvalid */,
+      reason: TokenVerificationErrorReason.TokenInvalid,
       message: 'Invalid JWT form. A JWT consists of three parts separated by dots.',
     });
   let [rawHeader, rawPayload, rawSignature] = tokenParts,
@@ -77966,7 +82237,7 @@ async function verifyJwt(
     : { valid: !1, reason: 'JWT signature is invalid.' };
 }
 
-// src/util/callWithRetry.ts
+// tests/dist/util/callWithRetry.js
 function wait(ms) {
   return new Promise(res => setTimeout(res, ms));
 }
@@ -77980,7 +82251,7 @@ async function callWithRetry(fn, attempt = 1, maxAttempts = MAX_NUMBER_OF_RETRIE
   }
 }
 
-// src/util/path.ts
+// tests/dist/util/path.js
 var SEPARATOR = '/',
   MULTIPLE_SEPARATOR_REGEX = new RegExp(SEPARATOR + '{1,}', 'g');
 function joinPaths(...args) {
@@ -77990,26 +82261,26 @@ function joinPaths(...args) {
     .replace(MULTIPLE_SEPARATOR_REGEX, SEPARATOR);
 }
 
-// src/tokens/keys.ts
+// tests/dist/tokens/keys.js
 var cache = {};
 function getFromCache(kid) {
   return cache[kid];
 }
-function setInCache(jwk, jwksTtlInMs = 1e3 * 60 * 60) {
+function setInCache(jwk, jwksCacheTtlInMs = 1e3 * 60 * 60) {
   (cache[jwk.kid] = jwk),
-    jwksTtlInMs >= 0 &&
+    jwksCacheTtlInMs >= 0 &&
       setTimeout(() => {
         jwk ? delete cache[jwk.kid] : (cache = {});
-      }, jwksTtlInMs);
+      }, jwksCacheTtlInMs);
 }
 var LocalJwkKid = 'local';
 function loadClerkJWKFromLocal(localKey) {
   if (!getFromCache(LocalJwkKid)) {
     if (!localKey)
       throw new TokenVerificationError({
-        action: 'Set the CLERK_JWT_KEY environment variable.' /* SetClerkJWTKey */,
+        action: TokenVerificationErrorAction.SetClerkJWTKey,
         message: 'Missing local JWK.',
-        reason: 'jwk-local-missing' /* LocalJWKMissing */,
+        reason: TokenVerificationErrorReason.LocalJWKMissing,
       });
     let RSA_PREFIX = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA',
       RSA_SUFFIX = 'IDAQAB';
@@ -78028,32 +82299,39 @@ function loadClerkJWKFromLocal(localKey) {
   }
   return getFromCache(LocalJwkKid);
 }
-async function loadClerkJWKFromRemote({ apiKey, apiUrl, issuer, kid, jwksTtlInMs = 1e3 * 60 * 60 }) {
-  if (!getFromCache(kid)) {
+async function loadClerkJWKFromRemote({
+  apiKey,
+  apiUrl,
+  issuer,
+  kid,
+  jwksCacheTtlInMs = 1e3 * 60 * 60,
+  skipJwksCache,
+}) {
+  if (skipJwksCache || !getFromCache(kid)) {
     let fetcher;
     if (apiUrl && apiKey) fetcher = () => fetchJWKSFromBAPI(apiUrl, apiKey);
     else if (issuer) fetcher = () => fetchJWKSFromFAPI(issuer);
     else
       throw new TokenVerificationError({
-        action: 'Contact support@clerk.dev' /* ContactSupport */,
+        action: TokenVerificationErrorAction.ContactSupport,
         message: 'Failed to load JWKS from Clerk Backend or Frontend API.',
-        reason: 'jwk-remote-failed-to-load' /* RemoteJWKFailedToLoad */,
+        reason: TokenVerificationErrorReason.RemoteJWKFailedToLoad,
       });
     let { keys } = await callWithRetry(fetcher);
     if (!keys || !keys.length)
       throw new TokenVerificationError({
-        action: 'Contact support@clerk.dev' /* ContactSupport */,
+        action: TokenVerificationErrorAction.ContactSupport,
         message: 'The JWKS endpoint did not contain any signing keys. Contact support@clerk.dev.',
-        reason: 'jwk-remote-failed-to-load' /* RemoteJWKFailedToLoad */,
+        reason: TokenVerificationErrorReason.RemoteJWKFailedToLoad,
       });
-    keys.forEach(key => setInCache(key, jwksTtlInMs));
+    keys.forEach(key => setInCache(key, jwksCacheTtlInMs));
   }
   let jwk = getFromCache(kid);
   if (!jwk)
     throw new TokenVerificationError({
-      action: 'Contact support@clerk.dev' /* ContactSupport */,
+      action: TokenVerificationErrorAction.ContactSupport,
       message: `Unable to find a signing key in JWKS that matches kid='${kid}'.`,
-      reason: 'jwk-remote-missing' /* RemoteJWKMissing */,
+      reason: TokenVerificationErrorReason.RemoteJWKMissing,
     });
   return jwk;
 }
@@ -78063,9 +82341,9 @@ async function fetchJWKSFromFAPI(issuer) {
   let response = await fetch(url);
   if (!response.ok)
     throw new TokenVerificationError({
-      action: 'Contact support@clerk.dev' /* ContactSupport */,
+      action: TokenVerificationErrorAction.ContactSupport,
       message: `Error loading Clerk JWKS from ${url.href} with code=${response.status}`,
-      reason: 'jwk-remote-failed-to-load' /* RemoteJWKFailedToLoad */,
+      reason: TokenVerificationErrorReason.RemoteJWKFailedToLoad,
     });
   return response.json();
 }
@@ -78080,16 +82358,24 @@ async function fetchJWKSFromBAPI(apiUrl, apiKey) {
   });
   if (!response.ok)
     throw new TokenVerificationError({
-      action: 'Contact support@clerk.dev' /* ContactSupport */,
+      action: TokenVerificationErrorAction.ContactSupport,
       message: `Error loading Clerk JWKS from ${url.href} with code=${response.status}`,
-      reason: 'jwk-remote-failed-to-load' /* RemoteJWKFailedToLoad */,
+      reason: TokenVerificationErrorReason.RemoteJWKFailedToLoad,
     });
   return response.json();
 }
 
-// src/tokens/verify.ts
+// tests/dist/tokens/verify.js
 async function verifyToken(token, options) {
-  let { apiKey = void 0, apiUrl = API_URL, authorizedParties, clockSkewInSeconds, issuer, jwksTtlInMs } = options,
+  let {
+      apiKey = void 0,
+      apiUrl = API_URL,
+      authorizedParties,
+      clockSkewInSeconds,
+      issuer,
+      jwksCacheTtlInMs,
+      skipJwksCache,
+    } = options,
     { header } = decodeJwt(token),
     { kid } = header,
     key;
@@ -78099,13 +82385,14 @@ async function verifyToken(token, options) {
       apiUrl,
       apiKey,
       kid,
-      jwksTtlInMs,
+      jwksCacheTtlInMs,
+      skipJwksCache,
     });
   else
     throw new TokenVerificationError({
-      action: 'Set the CLERK_JWT_KEY environment variable.' /* SetClerkJWTKey */,
+      action: TokenVerificationErrorAction.SetClerkJWTKey,
       message: 'Failed to resolve JWK during verification.',
-      reason: 'jwk-failed-to-resolve' /* JWKFailedToResolve */,
+      reason: TokenVerificationErrorReason.JWKFailedToResolve,
     });
   let result = await verifyJwt(token, {
     authorizedParties,
@@ -78116,57 +82403,347 @@ async function verifyToken(token, options) {
   if (!result.valid)
     throw new TokenVerificationError({
       message: result.reason,
-      reason: 'token-verification-failed' /* TokenVerificationFailed */,
+      reason: TokenVerificationErrorReason.TokenVerificationFailed,
     });
   return result.payload;
 }
 
-// src/tokens/verify-uvu.test.ts
-var fakeClock,
-  fakeFetch,
-  testSuite = suite('verifyToken(token, options)');
-testSuite.before.each(() => {
-  (fakeClock = sinon_esm_default.useFakeTimers(new Date(mockJwtPayload.iat * 1e3).getTime())),
-    (fakeFetch = sinon_esm_default.stub(runtime_default, 'fetch')),
-    fakeFetch.onCall(0).returns(jsonOk(mockJwks));
-});
-testSuite.after.each(() => {
-  fakeClock.restore(), fakeFetch.restore();
-});
-testSuite('verifies the provided session JWT', async () => {
-  let payload = await verifyToken(mockJwt, {
-    apiUrl: 'https://api.clerk.test',
-    apiKey: 'a-valid-key',
-    authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
-    issuer: 'https://clerk.inspired.puma-74.lcl.dev',
-  });
-  equal(payload, mockJwtPayload), ok(fakeFetch.calledOnce);
-});
-testSuite('throws an error when the verification fails', async () => {
+// tests/dist/tokens/authState.js
+var AuthStateReason;
+(function (AuthStateReason2) {
+  (AuthStateReason2.TokenVerificationError = 'token-verification-error'),
+    (AuthStateReason2.JWTKeyMissing = 'jwt-key-missing'),
+    (AuthStateReason2.InlineKeyMissing = 'inline-key-missing'),
+    (AuthStateReason2.InlineKeyInvalid = 'inline-key-invalid'),
+    (AuthStateReason2.HeaderExpired = 'header-expired'),
+    (AuthStateReason2.HeaderEarly = 'header-early'),
+    (AuthStateReason2.HeaderInvalid = 'header-invalid'),
+    (AuthStateReason2.HeaderInvalidIssuer = 'header-invalid-issuer'),
+    (AuthStateReason2.HeaderMissingNonBrowser = 'header-missing-non-browser'),
+    (AuthStateReason2.HeaderMissingCORS = 'header-missing-cors'),
+    (AuthStateReason2.HeaderUnauthorizedParty = 'header-unauthorized-party'),
+    (AuthStateReason2.HeaderVerificationFailed = 'header-verification-failed'),
+    (AuthStateReason2.UATMissing = 'uat-missing'),
+    (AuthStateReason2.CrossOriginReferrer = 'cross-origin-referrer'),
+    (AuthStateReason2.CookieAndUATMissing = 'cookie-and-uat-missing'),
+    (AuthStateReason2.StandardSignedOut = 'standard-signed-out'),
+    (AuthStateReason2.CookieMissing = 'cookie-missing'),
+    (AuthStateReason2.CookieExpired = 'cookie-expired'),
+    (AuthStateReason2.CookieEarly = 'cookie-early'),
+    (AuthStateReason2.CookieInvalid = 'cookie-invalid'),
+    (AuthStateReason2.CookieInvalidIssuer = 'cookie-invalid-issuer'),
+    (AuthStateReason2.CookieOutDated = 'cookie-outdated'),
+    (AuthStateReason2.CookieUnauthorizedParty = 'cookie-unauthorized-party'),
+    (AuthStateReason2.CookieVerificationFailed = 'cookie-verification-failed'),
+    (AuthStateReason2.UnexpectedError = 'unexpected-error'),
+    (AuthStateReason2.PublicKeyFetchError = 'pk-fetch-error'),
+    (AuthStateReason2.Unknown = 'unknown');
+})(AuthStateReason || (AuthStateReason = {}));
+var AuthStatus;
+(function (AuthStatus2) {
+  (AuthStatus2.SignedIn = 'signed-in'),
+    (AuthStatus2.SignedOut = 'signed-out'),
+    (AuthStatus2.Interstitial = 'interstitial');
+})(AuthStatus || (AuthStatus = {}));
+async function getAuthState(params) {
+  return params.headerToken ? handleRequestWithTokenInHeader(params) : handleRequestWithTokenInCookie(params);
+}
+async function handleRequestWithTokenInHeader({ headerToken, ...rest }) {
   try {
-    await verifyToken(mockJwt, {
-      apiUrl: 'https://api.clerk.test',
-      apiKey: 'a-valid-key',
-      issuer: 'whatever',
-    }),
-      unreachable('should have thrown');
+    return await buildAuthenticatedState(headerToken, rest);
   } catch (err) {
-    instance(err, Error),
-      match(err.message, 'Invalid JWT issuer claim (iss) "https://clerk.inspired.puma-74.lcl.dev".'),
-      ok(fakeFetch.notCalled);
+    return handleError(err, 'header');
   }
-});
-var verify_uvu_test_default = testSuite;
+}
+async function handleRequestWithTokenInCookie(params) {
+  let signedOutOrInterstitial = runInterstitialRules(params, [
+    nonBrowserRequestInDevRule,
+    crossOriginRequestWithoutHeader,
+    potentialFirstLoadInDevWhenUATMissing,
+    potentialRequestAfterSignInOrOurFromClerkHostedUiInDev,
+    potentialFirstRequestOnProductionEnvironment,
+    isNormalSignedOutState,
+    hasClientUatButCookieIsMissingInProd,
+  ]);
+  if (signedOutOrInterstitial) return signedOutOrInterstitial;
+  try {
+    let { cookieToken, ...rest } = params,
+      authenticatedState = await buildAuthenticatedState(cookieToken, rest);
+    return !params.clientUat || cookieTokenIsOutdated(authenticatedState.sessionClaims, params.clientUat)
+      ? interstitial(AuthStateReason.CookieOutDated)
+      : authenticatedState;
+  } catch (err) {
+    return handleError(err, 'cookie');
+  }
+}
+async function buildAuthenticatedState(token, params) {
+  let sessionClaims = await verifyToken(token, {
+    ...params,
+    issuer: iss => iss.startsWith('https://clerk.'),
+  });
+  return signedIn(sessionClaims);
+}
+function handleError(err, tokenCarrier) {
+  return err instanceof TokenVerificationError
+    ? ((err.tokenCarrier = tokenCarrier),
+      [TokenVerificationErrorReason.TokenExpired, TokenVerificationErrorReason.TokenNotActiveYet].includes(err.reason)
+        ? interstitial(AuthStateReason.TokenVerificationError)
+        : signedOut(AuthStateReason.TokenVerificationError, err.getFullMessage()))
+    : signedOut(AuthStateReason.UnexpectedError, err.message);
+}
+function cookieTokenIsOutdated(jwt, clientUat) {
+  return jwt.iat < Number.parseInt(clientUat);
+}
+function signedIn(sessionClaims) {
+  let session = {
+    id: sessionClaims.sid,
+    userId: sessionClaims.sub,
+    orgId: sessionClaims.org_id,
+    orgRole: sessionClaims.org_role,
+  };
+  return { status: AuthStatus.SignedIn, session, sessionClaims };
+}
+function signedOut(reason, message = '') {
+  return {
+    status: AuthStatus.SignedOut,
+    reason,
+    message,
+  };
+}
+function interstitial(reason) {
+  return {
+    status: AuthStatus.Interstitial,
+    reason,
+  };
+}
+var runInterstitialRules = (params, rules) => {
+    for (let rule of rules) {
+      let res = rule(params);
+      if (res) return res;
+    }
+  },
+  nonBrowserRequestInDevRule = ({ apiKey, userAgent }) => {
+    if (isDevelopmentFromApiKey(apiKey) && !userAgent?.startsWith('Mozilla/'))
+      return signedOut(AuthStateReason.HeaderMissingNonBrowser);
+  },
+  crossOriginRequestWithoutHeader = ({ origin, host, forwardedHost, forwardedPort, forwardedProto }) => {
+    if (
+      origin &&
+      checkCrossOrigin({
+        originURL: new URL(origin),
+        host,
+        forwardedHost,
+        forwardedPort,
+        forwardedProto,
+      })
+    )
+      return signedOut(AuthStateReason.HeaderMissingCORS);
+  },
+  potentialFirstLoadInDevWhenUATMissing = ({ apiKey, clientUat }) => {
+    if (isDevelopmentFromApiKey(apiKey) && !clientUat) return interstitial(AuthStateReason.UATMissing);
+  },
+  potentialRequestAfterSignInOrOurFromClerkHostedUiInDev = ({
+    apiKey,
+    referrer,
+    host,
+    forwardedHost,
+    forwardedPort,
+    forwardedProto,
+  }) => {
+    let crossOriginReferrer =
+      referrer &&
+      checkCrossOrigin({ originURL: new URL(referrer), host, forwardedHost, forwardedPort, forwardedProto });
+    if (isDevelopmentFromApiKey(apiKey) && crossOriginReferrer)
+      return interstitial(AuthStateReason.CrossOriginReferrer);
+  },
+  potentialFirstRequestOnProductionEnvironment = ({ apiKey, clientUat, cookieToken }) => {
+    if (isProductionFromApiKey(apiKey) && !clientUat && !cookieToken)
+      return signedOut(AuthStateReason.CookieAndUATMissing);
+  },
+  isNormalSignedOutState = ({ clientUat }) => {
+    if (clientUat === '0') return signedOut(AuthStateReason.StandardSignedOut);
+  },
+  hasClientUatButCookieIsMissingInProd = ({ apiKey, clientUat, cookieToken }) => {
+    if (isProductionFromApiKey(apiKey) && clientUat && !cookieToken) return interstitial(AuthStateReason.CookieMissing);
+  };
+
+// tests/dist/tokens/fixtures.js
+var mockJwt =
+  'eyJhbGciOiJSUzI1NiIsImtpZCI6Imluc18yR0lvUWhiVXB5MGhYN0IyY1ZrdVRNaW5Yb0QiLCJ0eXAiOiJKV1QifQ.eyJhenAiOiJodHRwczovL2FjY291bnRzLmluc3BpcmVkLnB1bWEtNzQubGNsLmRldiIsImV4cCI6MTY2NjY0ODMxMCwiaWF0IjoxNjY2NjQ4MjUwLCJpc3MiOiJodHRwczovL2NsZXJrLmluc3BpcmVkLnB1bWEtNzQubGNsLmRldiIsIm5iZiI6MTY2NjY0ODI0MCwic2lkIjoic2Vzc18yR2JEQjRlbk5kQ2E1dlMxenBDM1h6Zzl0SzkiLCJzdWIiOiJ1c2VyXzJHSXBYT0VwVnlKdzUxcmtabjlLbW5jNlN4ciJ9.n1Usc-DLDftqA0Xb-_2w8IGs4yjCmwc5RngwbSRvwevuZOIuRoeHmE2sgCdEvjfJEa7ewL6EVGVcM557TWPW--g_J1XQPwBy8tXfz7-S73CEuyRFiR97L2AHRdvRtvGtwR-o6l8aHaFxtlmfWbQXfg4kFJz2UGe9afmh3U9-f_4JOZ5fa3mI98UMy1-bo20vjXeWQ9aGrqaxHQxjnzzC-1Kpi5LdPvhQ16H0dPB8MHRTSM5TAuLKTpPV7wqixmbtcc2-0k6b9FKYZNqRVTaIyV-lifZloBvdzlfOF8nW1VVH_fx-iW5Q3hovHFcJIULHEC1kcAYTubbxzpgeVQepGg';
+var mockJwtPayload = {
+    azp: 'https://accounts.inspired.puma-74.lcl.dev',
+    exp: 1666648310,
+    iat: 1666648250,
+    iss: 'https://clerk.inspired.puma-74.lcl.dev',
+    nbf: 1666648240,
+    sid: 'sess_2GbDB4enNdCa5vS1zpC3Xzg9tK9',
+    sub: 'user_2GIpXOEpVyJw51rkZn9Kmnc6Sxr',
+  },
+  mockRsaJwkKid = 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD',
+  mockRsaJwk = {
+    use: 'sig',
+    kty: 'RSA',
+    kid: mockRsaJwkKid,
+    alg: 'RS256',
+    n: 'u0tNUitBZmcGYMWcqvaRBaJe0XmTQ738RHYoHjhYANyeOkysuu4L_Rqr-fmTXsbebrTp7_OewIqsJXImEWB_WQ3HN9lAkOMCCGDU1udsz_sl1Kwy5JZ7x8Nr4ghXJagQzEF0Ovsj7_TPsBJGkVJ-OiZsTXCe7EAmG5gNGGPBE5Gu14Rwb-eZ5r9RCAaPfhxR1yHYTAvCrku_6i2os7RLpT6UockKtX4QQSH2CMveNwqd6LdwhV8USZrczB2VYkAImngJC745-EWek1sVExYkqheGvC3J8O7D9H4JtaKD2zaq0rJzsIU0zb_wwax5-La-uRuPYvTXlO8B8IK4jjNMCQ',
+    e: 'AQAB',
+  },
+  mockJwks = {
+    keys: [mockRsaJwk],
+  };
+
+// tests/dist/tokens/mockFetch.js
+function jsonOk(body) {
+  let mockResponse = {
+    ok: !0,
+    status: 200,
+    headers: {
+      'Content-type': 'application/json',
+    },
+    json() {
+      return Promise.resolve(body);
+    },
+  };
+  return Promise.resolve(mockResponse);
+}
+
+// tests/dist/tokens/authState.test.js
+var authState_test_default = QUnit2 => {
+  let { module, test } = QUnit2,
+    defaultMockAuthState = {
+      apiKey: 'deadbeef',
+      apiUrl: 'https://api.clerk.test',
+      host: 'example.com',
+      userAgent: 'Mozilla/TestAgent',
+      skipJwksCache: !0,
+    };
+  module('getAuthState(options)', hooks => {
+    let fakeClock, fakeFetch;
+    hooks.beforeEach(() => {
+      (fakeClock = sinon_esm_default.useFakeTimers(new Date(mockJwtPayload.iat * 1e3).getTime())),
+        (fakeFetch = sinon_esm_default.stub(runtime_default, 'fetch')),
+        fakeFetch.onCall(0).returns(jsonOk(mockJwks));
+    }),
+      hooks.afterEach(() => {
+        fakeClock.restore(), fakeFetch.restore(), sinon_esm_default.restore();
+      }),
+      test('returns the signed in state when a valid token is in HTTP Authorization header', async assert => {
+        let authState = await getAuthState({
+          ...defaultMockAuthState,
+          headerToken: mockJwt,
+        });
+        assert.deepEqual(authState, {
+          session: {
+            id: mockJwtPayload.sid,
+            orgId: void 0,
+            orgRole: void 0,
+            userId: mockJwtPayload.sub,
+          },
+          sessionClaims: mockJwtPayload,
+          status: 'signed-in',
+        });
+      }),
+      test('returns the signed our state when a token with invalid authorizedParties is in HTTP Authorization header', async assert => {
+        let authState = await getAuthState({
+          ...defaultMockAuthState,
+          headerToken: mockJwt,
+          authorizedParties: ['whatever'],
+        });
+        assert.propEqual(authState, {
+          message:
+            'Invalid JWT Authorized party claim (azp) "https://accounts.inspired.puma-74.lcl.dev". Expected "whatever". (reason=token-verification-failed, carrier=header)',
+          reason: 'token-verification-error',
+          status: 'signed-out',
+        });
+      }),
+      test('returns the signed our state when an invalid token is in HTTP Authorization header', async assert => {
+        let authState = await getAuthState({
+          ...defaultMockAuthState,
+          headerToken: 'test_header_token',
+        });
+        assert.propEqual(authState, {
+          message:
+            'Invalid JWT form. A JWT consists of three parts separated by dots. (reason=token-invalid, carrier=header)',
+          reason: 'token-verification-error',
+          status: 'signed-out',
+        });
+      });
+  });
+};
+
+// tests/dist/util/path.test.js
+var path_test_default = QUnit2 => {
+  let { module, test } = QUnit2;
+  module('joinPaths(...args)'),
+    test('joins the provides paths safely', assert => {
+      assert.equal(joinPaths('foo', '/bar', '/qux//'), 'foo/bar/qux/');
+    });
+};
+
+// tests/dist/tokens/verify.test.js
+var verify_test_default = QUnit2 => {
+  let { module, test } = QUnit2;
+  module('verify(token, options)', hooks => {
+    let fakeClock, fakeFetch;
+    hooks.beforeEach(() => {
+      (fakeClock = sinon_esm_default.useFakeTimers(new Date(mockJwtPayload.iat * 1e3).getTime())),
+        (fakeFetch = sinon_esm_default.stub(runtime_default, 'fetch')),
+        fakeFetch.onCall(0).returns(jsonOk(mockJwks));
+    }),
+      hooks.afterEach(() => {
+        fakeClock.restore(), fakeFetch.restore(), sinon_esm_default.restore();
+      }),
+      test('verifies the provided session JWT', async assert => {
+        let payload = await verifyToken(mockJwt, {
+          apiUrl: 'https://api.clerk.test',
+          apiKey: 'a-valid-key',
+          authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+          issuer: 'https://clerk.inspired.puma-74.lcl.dev',
+          skipJwksCache: !0,
+        });
+        assert.propEqual(payload, mockJwtPayload), assert.ok(fakeFetch.calledOnce);
+      }),
+      test('throws an error when the verification fails', async assert => {
+        try {
+          await verifyToken(mockJwt, {
+            apiUrl: 'https://api.clerk.test',
+            apiKey: 'a-valid-key',
+            issuer: 'whatever',
+            skipJwksCache: !0,
+          }),
+            assert.false(!0);
+        } catch (err) {
+          err instanceof Error
+            ? assert.equal(
+                err.message,
+                'Invalid JWT issuer claim (iss) "https://clerk.inspired.puma-74.lcl.dev". Expected "whatever".',
+              )
+            : assert.false(!0);
+        }
+      });
+  });
+};
+
+// tests/suites.ts
+var suites = [authState_test_default, path_test_default, verify_test_default],
+  suites_default = suites;
 
 // tests/runner.ts
-var suites = [verify_uvu_test_default];
-async function runTests() {
-  for (let suite2 of suites) suite2.run();
-  return exec(!0);
+async function runTests(QUnit2) {
+  (QUnit2.config.autostart = !1), QUnit2.reporters.tap.init(QUnit2);
+  for (let suite of suites_default) await suite(QUnit2);
+  return (
+    QUnit2.start(),
+    new Promise(resolve => {
+      QUnit2.done(details => {
+        resolve(details);
+      });
+    })
+  );
 }
 
 // tests/edge-runtime/bundle.ts
-(async () => await runTests())();
+(async () => (globalThis.stats = await runTests(import_qunit.default)))();
 /* Sinon.JS 14.0.1, 2022-10-03, @license BSD-3 */
 /*!
 
@@ -78205,3 +82782,11 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISI
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 @license
 */
+/*!
+ * QUnit 2.19.3
+ * https://qunitjs.com/
+ *
+ * Copyright OpenJS Foundation and other contributors
+ * Released under the MIT license
+ * https://jquery.org/license
+ */

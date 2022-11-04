@@ -2,7 +2,7 @@ import { exit } from 'node:process';
 import { Miniflare, Log, LogLevel } from 'miniflare';
 
 const mf = new Miniflare({
-  scriptPath: './tests/cf-miniflare/worker.js',
+  scriptPath: './tests/cloudflare-miniflare/worker.js',
   modules: true, // Enable modules
   log: new Log(LogLevel.DEBUG), // Enable --debug messages
   globalAsyncIO: true, // Allow async I/O outside handlers
@@ -12,8 +12,8 @@ const mf = new Miniflare({
 
 const res = await mf.dispatchFetch('http://localhost:8787/');
 
-console.log(await res.text());
+const stats = await res.json();
 
-if (res.status !== 200) {
+if (stats.failed > 0) {
   exit(1);
 }

@@ -6,20 +6,20 @@
   "scripts": {
     "prebuild": "run-s clean build:runtime",
     "build": "tsc -p tsconfig.esm.json",
+    "build:tests": "tsc -p tsconfig.test.json",
     "build:runtime": "mkdir -p dist/runtime && cp -r src/runtime/* dist/runtime",
     "clean": "rimraf ./dist",
     "lint": "eslint .",
     "dev": "tsc -p tsconfig.esm.json --watch",
-    "test": "run-s build:runtime test:node test:edge-runtime",
+    "test": "run-s build:runtime build:tests test:node test:edge-runtime test:cloudflare-miniflare",
     "test:node": "./tests/node/run.sh",
     "test:edge-runtime": "./tests/edge-runtime/run.sh",
-    "test:cloudflare-workers": "tests/cloudflare-workers/run.sh",
-    "test:cloudflare-workers2": "tests/cloudflare-workers/run2.sh",
-    "test:cloudflare-workers3": "tests/cf-miniflare/run.sh"
+    "test:cloudflare-miniflare": "tests/cloudflare-miniflare/run.sh",
+    "test:cloudflare-workerd": "tests/cloudflare-workerd/run.sh"
   },
   "module": "dist/mjs/index.js",
   "dependencies": {
-    "@clerk/types": "^3.10.1",
+    "@clerk/types": "^3.14.0-staging.4",
     "@types/node": "^16.11.55",
     "node-fetch-native": "^0.1.7",
     "rfc4648": "^1.5.2",
@@ -28,19 +28,19 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^3.18.0",
-    "@types/jest": "^27.4.0",
+    "@types/chai": "^4.3.3",
+    "@types/qunit": "^2.19.3",
+    "@types/sinon": "^10.0.13",
+    "chai": "^4.3.6",
     "edge-runtime": "^2.0.0",
     "esbuild": "^0.15.12",
     "esbuild-register": "^3.3.3",
-    "jest": "^27.4.7",
     "miniflare": "^2.11.0",
     "npm-run-all": "^4.1.5",
+    "qunit": "^2.19.3",
     "sinon": "^14.0.1",
-    "ts-jest": "^27.1.3",
     "typescript": "*",
-    "uvu": "^0.5.6",
-    "workerd": "1.20220926.3",
-    "wrangler": "^2.1.13"
+    "workerd": "1.20220926.3"
   },
   "publishConfig": {
     "access": "public"

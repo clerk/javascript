@@ -1,5 +1,6 @@
+import QUnit from 'qunit';
 import runTests from '../runner';
 
 (async () => {
-  await runTests();
+  globalThis.stats = await runTests(QUnit);
 })();
