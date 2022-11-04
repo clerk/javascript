@@ -9,3 +9,4 @@ export * from './EmailLinkVerify';
 export * from './EmailLinkStatusCard';
 export * from './Wizard';
 export * from './PrintableComponent';
+export * from './withOrganizationsEnabledGuard';

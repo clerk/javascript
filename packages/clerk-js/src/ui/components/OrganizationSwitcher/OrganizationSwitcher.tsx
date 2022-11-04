@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { withOrganizationsEnabledGuard } from '../../common';
 import { withCoreUserGuard } from '../../contexts';
 import { Flex, Flow } from '../../customizables';
 import { withCardStateProvider } from '../../elements';
@@ -40,4 +41,8 @@ const _OrganizationSwitcher = () => {
   );
 };
 
-export const OrganizationSwitcher = withCoreUserGuard(withCardStateProvider(_OrganizationSwitcher));
+export const OrganizationSwitcher = withOrganizationsEnabledGuard(
+  withCoreUserGuard(withCardStateProvider(_OrganizationSwitcher)),
+  'OrganizationSwitcher',
+  { mode: 'hide' },
+);
