@@ -11,6 +11,15 @@ export type AvatarUploaderProps = {
   onAvatarChange: (file: File) => Promise<unknown>;
 };
 
+export const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = error => reject(error);
+  });
+};
+
 export const AvatarUploader = (props: AvatarUploaderProps) => {
   const [showUpload, setShowUpload] = React.useState(false);
   const [objectUrl, setObjectUrl] = React.useState<string>();
@@ -22,7 +31,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
   };
 
   const handleFileDrop = (file: File) => {
-    setObjectUrl(URL.createObjectURL(file));
+    void fileToBase64(file).then(setObjectUrl);
     card.setLoading();
     return onAvatarChange(file)
       .then(() => {
@@ -31,10 +40,6 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
       })
       .catch(err => handleError(err, [], card.setError));
   };
-
-  React.useEffect(() => () => {
-    objectUrl && URL.revokeObjectURL(objectUrl);
-  });
 
   return (
     <Col gap={4}>
