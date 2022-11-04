@@ -1,6 +1,7 @@
 import { ProfileCardContent } from '../../elements';
 import { Route, Switch } from '../../router';
 import { PropsOfComponent } from '../../styledSystem';
+import { LeaveOrganizationPage } from './ActionConfirmationPage';
 import { CreateOrganizationPage } from './CreateOrganizationPage';
 import { InviteMembersPage } from './InviteMembersPage';
 import { OrganizationMembers } from './OrganizationMembers';
@@ -14,6 +15,9 @@ export const OrganizationProfileRoutes = (props: PropsOfComponent<typeof Profile
         <Switch>
           <Route path='profile'>
             <ProfileSettingsPage />
+          </Route>
+          <Route path='leave'>
+            <LeaveOrganizationPage />
           </Route>
           <Route index>
             <OrganizationSettings />

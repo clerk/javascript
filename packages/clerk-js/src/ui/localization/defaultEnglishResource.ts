@@ -428,6 +428,13 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
     },
     profilePage: {
       successMessage: 'The organization has been updated.',
+      leave: {
+        title: 'Leave organization',
+        messageLine1:
+          'Are you sure you want to leave this organization? You will lose access to this organization and its applications.',
+        messageLine2: 'This action is permanent and irreversible.',
+        successMessage: 'You have left the organization.',
+      },
     },
   },
   unstable__errors: {

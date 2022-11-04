@@ -425,6 +425,12 @@ type _LocalizationResource = {
     };
     profilePage: {
       successMessage: LocalizationValue;
+      leave: {
+        title: LocalizationValue;
+        messageLine1: LocalizationValue;
+        messageLine2: LocalizationValue;
+        successMessage: LocalizationValue;
+      };
     };
   };
   unstable__errors: {

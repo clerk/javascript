@@ -66,15 +66,11 @@ const OrganizationProfileSection = () => {
 
 const OrganizationDangerSection = () => {
   const { organization, membership } = useCoreOrganization();
-  const user = useCoreUser();
+  const { navigate } = useNavigate();
 
   if (!organization || !membership) {
     return null;
   }
-
-  const leave = () => {
-    return organization.removeMember(user.id);
-  };
 
   return (
     <ProfileSection
@@ -89,7 +85,7 @@ const OrganizationDangerSection = () => {
           variant='outline'
           colorScheme='danger'
           textVariant='buttonExtraSmallBold'
-          onClick={leave}
+          onClick={() => navigate('leave')}
           isDisabled={membership.role === 'admin'}
         >
           Leave organization
