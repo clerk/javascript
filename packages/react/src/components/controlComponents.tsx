@@ -75,6 +75,22 @@ export const RedirectToUserProfile = withClerk(({ clerk }) => {
   return null;
 }, 'RedirectToUserProfile');
 
+export const RedirectToOrganizationProfile = withClerk(({ clerk }) => {
+  React.useEffect(() => {
+    clerk.redirectToOrganizationProfile();
+  }, []);
+
+  return null;
+}, 'RedirectToOrganizationProfile');
+
+export const RedirectToCreateOrganization = withClerk(({ clerk }) => {
+  React.useEffect(() => {
+    clerk.redirectToCreateOrganization();
+  }, []);
+
+  return null;
+}, 'RedirectToCreateOrganization');
+
 export const AuthenticateWithRedirectCallback = withClerk(
   ({ clerk, ...handleRedirectCallbackParams }: WithClerkProp<HandleOAuthCallbackParams>) => {
     React.useEffect(() => {

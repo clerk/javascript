@@ -565,6 +565,20 @@ export default class Clerk implements ClerkInterface {
     return this.navigate(this.#environment.displayConfig.userProfileUrl);
   };
 
+  public redirectToOrganizationProfile = async (): Promise<unknown> => {
+    if (!this.#environment || !this.#environment.displayConfig) {
+      return;
+    }
+    return this.navigate(this.#environment.displayConfig.organizationProfileUrl);
+  };
+
+  public redirectToCreateOrganization = async (): Promise<unknown> => {
+    if (!this.#environment || !this.#environment.displayConfig) {
+      return;
+    }
+    return this.navigate(this.#environment.displayConfig.createOrganizationUrl);
+  };
+
   public handleMagicLinkVerification = async (
     params: HandleMagicLinkVerificationParams,
     customNavigate?: (to: string) => Promise<unknown>,
