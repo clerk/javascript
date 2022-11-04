@@ -112,12 +112,22 @@ function _SignUpContinue() {
       [] as Array<FormControlState>,
     );
 
-    // In case of emailOrPhone (both email & phone are optional) and neither of them is provided,
-    // add both to the submitted fields to trigger and render an error for both respective inputs
+    // Add both email & phone to the submitted fields to trigger and render an error for both respective inputs in
+    // case all the below requirements are met:
+    // 1. Sign up contains both in the missing fields
+    // 2. The instance settings has both email & phone as optional (emailOrPhone)
+    // 3. Neither of them is provided
     const emailAddressProvided = !!(fieldsToSubmit.find(f => f.id === 'emailAddress')?.value || '');
     const phoneNumberProvided = !!(fieldsToSubmit.find(f => f.id === 'phoneNumber')?.value || '');
+    const emailOrPhoneMissing =
+      signUp.missingFields.includes('email_address') && signUp.missingFields.includes('phone_number');
 
-    if (!emailAddressProvided && !phoneNumberProvided && emailOrPhone(attributes, isProgressiveSignUp)) {
+    if (
+      emailOrPhoneMissing &&
+      !emailAddressProvided &&
+      !phoneNumberProvided &&
+      emailOrPhone(attributes, isProgressiveSignUp)
+    ) {
       fieldsToSubmit.push(formState['emailAddress']);
       fieldsToSubmit.push(formState['phoneNumber']);
     }
