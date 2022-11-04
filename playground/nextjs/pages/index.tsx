@@ -37,6 +37,16 @@ const Home: NextPage = () => {
               <a>User profile page</a>
             </Link>
           </li>
+          <li>
+            <Link href={'/organization'}>
+              <a>Organization profile</a>
+            </Link>
+          </li>
+          <li>
+            <Link href={'/create-organization'}>
+              <a>Create organization</a>
+            </Link>
+          </li>
         </ul>
       </main>
     </div>
