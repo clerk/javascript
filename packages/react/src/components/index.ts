@@ -18,6 +18,8 @@ export {
   RedirectToUserProfile,
   AuthenticateWithRedirectCallback,
   MultisessionAppSupport,
+  RedirectToCreateOrganization,
+  RedirectToOrganizationProfile,
 } from './controlComponents';
 
 export * from './withClerk';
