@@ -16,10 +16,18 @@ export const ActiveMembersList = () => {
     organization,
     membershipList,
     membership: currentUserMembership,
+    ...rest
   } = useCoreOrganization({
     membershipList: { offset: (page - 1) * ITEMS_PER_PAGE, limit: ITEMS_PER_PAGE },
   });
   const isAdmin = currentUserMembership?.role === 'admin';
+
+  const mutateSwrState = () => {
+    const unstable__mutate = (rest as any).unstable__mutate;
+    if (unstable__mutate && typeof unstable__mutate === 'function') {
+      unstable__mutate();
+    }
+  };
 
   if (!organization) {
     return null;
@@ -36,7 +44,10 @@ export const ActiveMembersList = () => {
     if (!isAdmin) {
       return;
     }
-    return card.runAsync(membership.destroy()).catch(err => handleError(err, [], card.setError));
+    return card
+      .runAsync(membership.destroy())
+      .then(mutateSwrState)
+      .catch(err => handleError(err, [], card.setError));
   };
 
   return (
