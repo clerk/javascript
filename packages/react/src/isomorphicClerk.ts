@@ -529,6 +529,24 @@ export default class IsomorphicClerk {
     }
   };
 
+  redirectToOrganizationProfile = (): void => {
+    const callback = () => this.clerkjs?.redirectToOrganizationProfile();
+    if (this.clerkjs && this.#loaded) {
+      callback();
+    } else {
+      this.premountMethodCalls.set('redirectToOrganizationProfile', callback);
+    }
+  };
+
+  redirectToCreateOrganization = (): void => {
+    const callback = () => this.clerkjs?.redirectToCreateOrganization();
+    if (this.clerkjs && this.#loaded) {
+      callback();
+    } else {
+      this.premountMethodCalls.set('redirectToCreateOrganization', callback);
+    }
+  };
+
   handleRedirectCallback = (params: HandleOAuthCallbackParams): void => {
     const callback = () => this.clerkjs?.handleRedirectCallback(params);
     if (this.clerkjs && this.#loaded) {
@@ -570,7 +588,7 @@ export default class IsomorphicClerk {
     if (this.clerkjs && this.#loaded) {
       return callback() as Promise<OrganizationMembershipResource[]>;
     } else {
-      this.premountMethodCalls.set('getOrganizationMemberships', callback);
+      this.premountMethodCalls.set('getOrganizationMemberships', redirectToUserProfilecallback);
     }
   };
 

@@ -291,6 +291,16 @@ export interface Clerk {
   redirectToUserProfile: () => void;
 
   /**
+   * Redirects to the configured URL where <OrganizationProfile /> is mounted. Retrieved from {@link environment}.
+   */
+  redirectToOrganizationProfile: () => void;
+
+  /**
+   * Redirects to the configured URL where <CreateOrganization /> is mounted. Retrieved from {@link environment}.
+   */
+  redirectToCreateOrganization: () => void;
+
+  /**
    * Completes an OAuth flow started by {@link Clerk.client.signIn.authenticateWithRedirect} or {@link Clerk.client.signUp.authenticateWithRedirect}
    */
   handleRedirectCallback: (
