@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
-import { useCoreOrganization, useCoreUser } from '../../contexts';
+import { useCoreOrganization, useCoreUser, useOrganizationProfileContext } from '../../contexts';
 import { LocalizationKey, localizationKeys, Text } from '../../customizables';
 import { Form, useCardState, withCardStateProvider } from '../../elements';
 import { useNavigate } from '../../hooks';
@@ -11,6 +11,8 @@ import { SuccessPage } from '../UserProfile/SuccessPage';
 import { ContentPage } from './OrganizationContentPage';
 
 export const LeaveOrganizationPage = () => {
+  const card = useCardState();
+  const { navigateAfterLeaveOrganization } = useOrganizationProfileContext();
   const { organization, membership } = useCoreOrganization();
   const user = useCoreUser();
 
@@ -19,7 +21,7 @@ export const LeaveOrganizationPage = () => {
   }
 
   const leave = () => {
-    return organization.removeMember(user.id);
+    return card.runAsync(organization.removeMember(user.id)).then(navigateAfterLeaveOrganization);
   };
 
   return (
