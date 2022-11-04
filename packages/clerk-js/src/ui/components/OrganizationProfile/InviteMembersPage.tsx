@@ -1,7 +1,7 @@
 import { useWizard, Wizard } from '../../common';
 import { useCoreOrganization } from '../../contexts';
 import { Flex, Icon, Text } from '../../customizables';
-import { ContentPage, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
+import { ContentPage, IconCircle, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { Email } from '../../icons';
 import { InviteMembersForm } from './InviteMembersForm';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
@@ -46,20 +46,7 @@ export const InvitationsSentMessage = () => {
       center
       gap={4}
     >
-      <Flex
-        center
-        sx={t => ({
-          width: t.space.$14,
-          height: t.space.$14,
-          borderRadius: t.radii.$circle,
-          background: t.colors.$blackAlpha200,
-        })}
-      >
-        <Icon
-          icon={Email}
-          size='md'
-        />
-      </Flex>
+      <IconCircle icon={Email} />
       <Text>Invitations successfully sent</Text>
     </Flex>
   );

@@ -4,6 +4,7 @@ import { Button, Col, descriptors, Flex, Icon, localizationKeys, Text } from '..
 import { Folder } from '../icons';
 import { animations, mqu } from '../styledSystem';
 import { colors } from '../utils';
+import { IconCircle } from './IconCircle';
 
 const MAX_SIZE_BYTES = 10 * 1000 * 1000;
 const SUPPORTED_MIME_TYPES = Object.freeze(['image/png', 'image/jpeg', 'image/gif', 'image/webp']);
@@ -82,23 +83,11 @@ export const FileDropArea = (props: FileDropAreaProps) => {
           animation: `${animations.expandIn(t.space.$60)} ${t.transitionDuration.$fast} ease`,
         })}
       >
-        <Flex
-          elementDescriptor={descriptors.fileDropAreaIconBox}
-          center
-          sx={t => ({
-            backgroundColor: t.colors.$blackAlpha50,
-            width: t.sizes.$16,
-            height: t.sizes.$16,
-            borderRadius: t.radii.$circle,
-          })}
-        >
-          <Icon
-            elementDescriptor={descriptors.fileDropAreaIcon}
-            icon={Folder}
-            size='lg'
-            sx={theme => ({ color: theme.colors.$blackAlpha600 })}
-          />
-        </Flex>
+        <IconCircle
+          icon={Folder}
+          boxElementDescriptor={descriptors.fileDropAreaIconBox}
+          iconElementDescriptor={descriptors.fileDropAreaIcon}
+        />
         {status === 'loading' ? (
           <Text colorScheme='neutral'>Uploading...</Text>
         ) : (
