@@ -1,3 +1,4 @@
+import { API_VERSION } from '../constants';
 import runtime from '../runtime';
 import { callWithRetry } from '../util/callWithRetry';
 import { isStaging } from '../util/instance';
@@ -70,7 +71,7 @@ export function loadInterstitialFromLocal({ frontendApi, pkgVersion, debugData }
 
 export async function loadInterstitialFromBAPI({ apiUrl, frontendApi, pkgVersion }: LoadInterstitialOptions) {
   const url = new URL(apiUrl);
-  url.pathname = joinPaths(url.pathname, 'v1/public/interstitial');
+  url.pathname = joinPaths(url.pathname, API_VERSION, '/public/interstitial');
   url.searchParams.append('clerk_js_version', getClerkJsMajorVersionOrTag(frontendApi, pkgVersion));
   url.searchParams.append('frontendApi', frontendApi);
 

@@ -1,3 +1,4 @@
+import { API_VERSION } from '../constants';
 import runtime from '../runtime';
 import { callWithRetry } from '../util/callWithRetry';
 import { joinPaths } from '../util/path';
@@ -172,7 +173,7 @@ async function fetchJWKSFromFAPI(issuer: string) {
 
 async function fetchJWKSFromBAPI(apiUrl: string, apiKey: string) {
   const url = new URL(apiUrl);
-  url.pathname = joinPaths(url.pathname, 'v1/jwks');
+  url.pathname = joinPaths(url.pathname, API_VERSION, '/jwks');
 
   const response = await runtime.fetch(url, {
     headers: {

@@ -40,6 +40,7 @@ export const request: HTTPTransport = async ({ url, method, queryParams, headerP
 
   const response = await runtime.fetch(finalUrl.href, {
     method,
+    // @ts-expect-error
     headers: headerParams,
     ...(bodyParams && Object.keys(bodyParams).length > 0 && { body: JSON.stringify(bodyParams) }),
   });
