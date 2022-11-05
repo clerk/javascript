@@ -157,7 +157,7 @@ async function fetchJWKSFromFAPI(issuer: string) {
   const url = new URL(issuer);
   url.pathname = joinPaths(url.pathname, '.well-known/jwks.json');
 
-  const response = await fetch(url);
+  const response = await runtime.fetch(url);
 
   if (!response.ok) {
     throw new TokenVerificationError({
