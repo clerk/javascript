@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.14.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.14.0-staging.1...@clerk/clerk-js@4.14.0) (2022-11-05)
+
+### Features
+
+- **clerk-js,shared:** Introduce private unstable\_\_mutate to force mutate swr state ([2a21dd8](https://github.com/clerkinc/javascript/commit/2a21dd8ea3935f3889044c063fe7af4bfc03cbfd))
+- **clerk-js:** Introduce withOrganizationsEnabledGuard ([00fc621](https://github.com/clerkinc/javascript/commit/00fc6212c4f9153a1a823198dfb70b7e3134befa))
+- **clerk-js:** Reset card error when navigating in OrganizationMembers ([6a1e873](https://github.com/clerkinc/javascript/commit/6a1e8730c7678ab89b9ea244fe022f7002e050d9))
+- **clerk-js:** Update avatar background color ([7874110](https://github.com/clerkinc/javascript/commit/7874110622cee6a83ce5d1d20544136c0d73447e))
+- **types,clerk-js:** Introduce OrganizationSettings resource ([455911f](https://github.com/clerkinc/javascript/commit/455911f4166e4bea00aa62b32a05bef297983c61))
+
 ## [4.13.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.13.0-staging.8...@clerk/clerk-js@4.13.0) (2022-11-03)
 
 **Note:** Version bump only for package @clerk/clerk-js

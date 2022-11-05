@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.15.0](https://github.com/clerkinc/javascript/compare/@clerk/types@3.15.0-staging.1...@clerk/types@3.15.0) (2022-11-05)
+
+### Features
+
+- **types,clerk-js:** Introduce OrganizationSettings resource ([455911f](https://github.com/clerkinc/javascript/commit/455911f4166e4bea00aa62b32a05bef297983c61))
+
 ## [3.14.0](https://github.com/clerkinc/javascript/compare/@clerk/types@3.14.0-staging.7...@clerk/types@3.14.0) (2022-11-03)
 
 **Note:** Version bump only for package @clerk/types
