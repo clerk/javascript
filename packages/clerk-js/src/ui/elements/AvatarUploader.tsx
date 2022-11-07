@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { useCoreUser } from '../contexts';
 import { Button, Col, Flex, LocalizationKey, localizationKeys, Text } from '../customizables';
 import { handleError } from '../utils';
 import { useCardState } from './contexts';
@@ -8,7 +9,7 @@ import { FileDropArea } from './FileDropArea';
 export type AvatarUploaderProps = {
   title: LocalizationKey;
   avatarPreview: React.ReactElement;
-  onAvatarChange: (file: File) => Promise<unknown>;
+  onAvatarChange: (file: File | null) => Promise<unknown>;
 };
 
 export const fileToBase64 = (file: File): Promise<string> => {
@@ -24,6 +25,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
   const [showUpload, setShowUpload] = React.useState(false);
   const [objectUrl, setObjectUrl] = React.useState<string>();
   const card = useCardState();
+  const user = useCoreUser();
   const { onAvatarChange, title, avatarPreview, ...rest } = props;
 
   const toggle = () => {
