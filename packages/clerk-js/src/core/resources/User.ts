@@ -209,6 +209,10 @@ export class User extends BaseResource implements UserResource {
 
   setProfileImage = (params: SetProfileImageParams): Promise<ImageResource> => {
     const { file } = params || {};
+
+    if (!file) {
+      return Image.delete(`${this.path()}/profile_image`);
+    }
     return Image.create(`${this.path()}/profile_image`, {
       file,
     });

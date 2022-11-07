@@ -26,6 +26,17 @@ export class Image extends BaseResource implements ImageResource {
     return new Image(json);
   }
 
+  static async delete(path: string): Promise<ImageResource> {
+    const json = (
+      await BaseResource._fetch<ImageJSON>({
+        path,
+        method: 'DELETE',
+      })
+    )?.response as unknown as ImageJSON;
+
+    return new Image(json);
+  }
+
   constructor(data: ImageJSON) {
     super();
     this.fromJSON(data);

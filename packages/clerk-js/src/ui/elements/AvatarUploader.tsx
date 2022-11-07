@@ -30,6 +30,8 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
     setShowUpload(!showUpload);
   };
 
+  const hasProfileImage = !new RegExp('gravatar').test(user.profileImageUrl);
+
   const handleFileDrop = (file: File) => {
     void fileToBase64(file).then(setObjectUrl);
     card.setLoading();
@@ -70,6 +72,18 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
                 toggle();
               }}
             />
+
+            {hasProfileImage && !showUpload && (
+              <Button
+                localizationKey={localizationKeys('userProfile.profilePage.destructiveActionSubtitle')}
+                isDisabled={card.isLoading}
+                sx={t => ({ color: t.colors.$danger500 })}
+                variant='link'
+                onClick={() => {
+                  void onAvatarChange(null);
+                }}
+              />
+            )}
           </Flex>
         </Col>
       </Flex>
