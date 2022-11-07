@@ -1,5 +1,5 @@
 import { createContextAndHook } from '@clerk/shared';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import {
   Button,
@@ -14,6 +14,7 @@ import {
 import { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { useNavigate, usePopover, useSafeLayoutEffect } from '../hooks';
 import { Menu } from '../icons';
+import { useRouter } from '../router';
 import { animations, mqu, PropsOfComponent } from '../styledSystem';
 import { colors } from '../utils';
 import { useNavigateToFlowStart } from './NavigateToFlowStartButton';
@@ -52,6 +53,7 @@ export const NavBar = (props: NavBarProps) => {
   const { navigate } = useNavigate();
   const { navigateToFlowStart } = useNavigateToFlowStart();
   const { t } = useLocalizations();
+  const router = useRouter();
 
   const navigateAndScroll = async (route: NavbarRoute) => {
     if (contentRef.current) {
@@ -103,6 +105,18 @@ export const NavBar = (props: NavBarProps) => {
 
     return () => clearInterval(intervalId);
   }, []);
+
+  useEffect(() => {
+    routes.every(route => {
+      const isRoot = router.currentPath === router.fullPath && route.path === '/';
+      const matchesPath = router.matches(route.path);
+      if (isRoot || matchesPath) {
+        setActiveId(route.id);
+        setActiveId(route.id);
+      }
+      return false;
+    });
+  }, [router]);
 
   const items = (
     <Col
