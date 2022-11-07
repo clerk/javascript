@@ -71,47 +71,51 @@ export const NavBar = (props: NavBarProps) => {
     }
   };
 
-  useSafeLayoutEffect(function selectNavItemBasedOnVisibleSection() {
-    const mountObservers = () => {
-      const ids = routes.map(r => r.id);
-      const sectionElements = ids
-        .map(getSectionId)
-        .map(id => contentRef.current?.querySelector(id))
-        .filter(s => s);
-
-      if (sectionElements.length === 0) {
-        return false;
-      }
-
+  useSafeLayoutEffect(
+    function selectNavItemBasedOnVisibleSection() {
       const callback: IntersectionObserverCallback = entries => {
         for (const entry of entries) {
           const id = entry.target?.id?.split('section-')[1];
           if (entry.isIntersecting && id) {
-            return setActiveId(id as unknown as any);
+            return setActiveId(id);
           }
         }
       };
-
       const observer = new IntersectionObserver(callback, { root: contentRef.current, threshold: 1 });
-      sectionElements.forEach(section => section && observer.observe(section));
-      return true;
-    };
 
-    const intervalId = setInterval(() => {
-      if (mountObservers()) {
-        clearInterval(intervalId);
-      }
-    }, 50);
+      const mountObservers = () => {
+        const ids = routes.map(r => r.id);
+        const sectionElements = ids
+          .map(getSectionId)
+          .map(id => contentRef.current?.querySelector(id))
+          .filter(s => s);
 
-    return () => clearInterval(intervalId);
-  }, []);
+        if (sectionElements.length === 0) {
+          return false;
+        }
+
+        sectionElements.forEach(section => section && observer.observe(section));
+        return true;
+      };
+
+      const intervalId = setInterval(() => {
+        if (mountObservers()) {
+          clearInterval(intervalId);
+        }
+      }, 50);
+
+      return () => {
+        observer.disconnect();
+      };
+    },
+    [router],
+  );
 
   useEffect(() => {
     routes.every(route => {
       const isRoot = router.currentPath === router.fullPath && route.path === '/';
       const matchesPath = router.matches(route.path);
       if (isRoot || matchesPath) {
-        setActiveId(route.id);
         setActiveId(route.id);
       }
       return false;
