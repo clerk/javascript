@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { useCoreUser } from '../contexts';
 import { Button, Col, Flex, LocalizationKey, localizationKeys, Text } from '../customizables';
 import { handleError } from '../utils';
 import { useCardState } from './contexts';
@@ -10,6 +9,7 @@ export type AvatarUploaderProps = {
   title: LocalizationKey;
   avatarPreview: React.ReactElement;
   onAvatarChange: (file: File | null) => Promise<unknown>;
+  hasImageUrl?: boolean;
 };
 
 export const fileToBase64 = (file: File): Promise<string> => {
@@ -25,14 +25,12 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
   const [showUpload, setShowUpload] = React.useState(false);
   const [objectUrl, setObjectUrl] = React.useState<string>();
   const card = useCardState();
-  const user = useCoreUser();
-  const { onAvatarChange, title, avatarPreview, ...rest } = props;
+
+  const { onAvatarChange, title, avatarPreview, hasImageUrl = false, ...rest } = props;
 
   const toggle = () => {
     setShowUpload(!showUpload);
   };
-
-  const hasProfileImage = !new RegExp('gravatar').test(user.profileImageUrl);
 
   const handleFileDrop = (file: File) => {
     void fileToBase64(file).then(setObjectUrl);
@@ -75,7 +73,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
               }}
             />
 
-            {hasProfileImage && !showUpload && (
+            {hasImageUrl && !showUpload && (
               <Button
                 localizationKey={localizationKeys('userProfile.profilePage.destructiveActionSubtitle')}
                 isDisabled={card.isLoading}

@@ -11,6 +11,7 @@ export const UserProfileAvatarUploader = (
     <AvatarUploader
       {...rest}
       title={localizationKeys('userProfile.profilePage.imageFormTitle')}
+      hasImageUrl={!new RegExp('gravatar').test(user.profileImageUrl || '')}
       avatarPreview={
         <UserAvatar
           size={theme => theme.sizes.$11}
