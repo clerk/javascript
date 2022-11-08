@@ -9,7 +9,7 @@ export type AvatarUploaderProps = {
   title: LocalizationKey;
   avatarPreview: React.ReactElement;
   onAvatarChange: (file: File | null) => Promise<unknown>;
-  hasImageUrl?: boolean;
+  hasDefaultImageUrl?: boolean;
 };
 
 export const fileToBase64 = (file: File): Promise<string> => {
@@ -26,7 +26,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
   const [objectUrl, setObjectUrl] = React.useState<string>();
   const card = useCardState();
 
-  const { onAvatarChange, title, avatarPreview, hasImageUrl = false, ...rest } = props;
+  const { onAvatarChange, title, avatarPreview, hasDefaultImageUrl = true, ...rest } = props;
 
   const toggle = () => {
     setShowUpload(!showUpload);
@@ -73,7 +73,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
               }}
             />
 
-            {hasImageUrl && !showUpload && (
+            {!hasDefaultImageUrl && !showUpload && (
               <Button
                 localizationKey={localizationKeys('userProfile.profilePage.imageFormDestructiveActionSubtitle')}
                 isDisabled={card.isLoading}
