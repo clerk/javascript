@@ -106,5 +106,5 @@ export const createFixture = (configFn?: ConfigFn) => {
     );
   };
 
-  return { MockClerkProvider, updateClerkMock };
+  return { wrapper: MockClerkProvider, MockClerkProvider, updateClerkMock };
 };

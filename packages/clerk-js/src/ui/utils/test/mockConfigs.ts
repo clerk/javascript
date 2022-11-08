@@ -320,7 +320,7 @@ const initialRouteContextValue: RouteContextValue = {
   resolve: jest.fn(() => ({ href: 'test.host' } as any)),
   refresh: jest.fn(),
   params: {},
-};
+} as any;
 
 const initialFixtureConfig = {
   environment: {
