@@ -437,6 +437,18 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
         successMessage: 'You have left the organization.',
       },
     },
+    invitePage: {
+      title: 'Invite members',
+      subtitle: 'Invite new members to this organization',
+      successMessage: 'Invitations successfully sent',
+    },
+  },
+  createOrganization: {
+    title: 'Create Organization',
+    subtitle: 'Set the organization profile',
+    invitePage: {
+      formButtonReset: 'Skip',
+    },
   },
   unstable__errors: {
     form_identifier_not_found: '',
