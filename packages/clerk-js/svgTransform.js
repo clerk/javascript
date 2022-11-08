@@ -12,7 +12,8 @@ module.exports = {
       .map(x => `${x.charAt(0).toUpperCase()}${x.slice(1)}`)
       .join('');
 
-    return `
+    return {
+      code: `
       const React = require('react');
       function ${name}(props) {
         return React.createElement(
@@ -21,6 +22,7 @@ module.exports = {
         )
       }
       module.exports = ${name}
-            `;
+            `,
+    };
   },
 };

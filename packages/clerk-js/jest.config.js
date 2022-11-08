@@ -1,17 +1,18 @@
-module.exports = {
-  // The root of your source code, typically /src
-  // `<rootDir>` is a token Jest substitutes
-  roots: ['<rootDir>/src'],
+/** @type {import('ts-jest').JestConfigWithTsJest} */
+const config = {
+  displayName: 'clerk-js',
+  injectGlobals: false,
+
   testEnvironment: 'jsdom',
+  roots: ['<rootDir>/src'],
+  setupFiles: ['./setupJest.ts'],
+  testRegex: 'SignInStart.test.tsx',
+  testPathIgnorePatterns: ['/node_modules/'],
 
-  // Global settings
-  globals: {
-    'ts-jest': {
-      tsconfig: 'tsconfig.test.json',
-    },
-  },
-
-  // Coverage
+  collectCoverage: false,
+  coverageProvider: 'v8',
+  coverageDirectory: 'coverage',
+  coveragePathIgnorePatterns: ['/node_modules/'],
   // collectCoverageFrom: [
   //   '**/*.{js,jsx,ts,tsx}',
   //   '!**/*.d.ts',
@@ -24,27 +25,11 @@ module.exports = {
   //   '!**/node_modules/**',
   // ],
 
-  // Jest transformations -- this adds support for TypeScript
-  // using ts-jest
   transform: {
-    '^.+\\.tsx?$': ['ts-jest'],
+    '^.+\\.m?tsx?$': ['ts-jest', { tsconfig: 'tsconfig.test.json', diagnostics: false }],
+    // '^.+\\.m?tsx?$': ['@swc/jest'],
     '^.+\\.svg$': '<rootDir>/svgTransform.js',
   },
-
-  // For mocking fetch
-  automock: false,
-  setupFiles: ['./setupJest.ts'],
-  // setupFilesAfterEnv: ['<rootDir>../../setupJest.afterEnv.ts'],
-  // snapshotSerializers: ['@emotion/jest/serializer'],
-  injectGlobals: true,
-
-  // Test spec file resolution pattern
-  // Matches parent folder `__tests__` and filename
-  // should contain `test` or `spec`.
-  testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$',
-
-  // Module file extensions for importings
-  transformIgnorePatterns: ['^.+\\.module\\.(css|sass|scss)$'],
 
   moduleNameMapper: {
     '^ui/(.*)': '<rootDir>/src/ui/$1',
@@ -53,6 +38,6 @@ module.exports = {
     '^utils': '<rootDir>/src/utils',
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
   },
-
-  testPathIgnorePatterns: ['/node_modules/'],
 };
+
+module.exports = config;
