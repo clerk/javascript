@@ -19,7 +19,7 @@ OrganizationMembership {
     "name": "test_name",
     "pathRoot": "/organizations",
     "pendingInvitationsCount": 10,
-    "publicMetadata": Object {
+    "publicMetadata": {
       "public": "metadata",
     },
     "removeMember": [Function],
@@ -30,10 +30,10 @@ OrganizationMembership {
     "updatedAt": 1970-01-01T00:01:07.890Z,
   },
   "pathRoot": "",
-  "publicMetadata": Object {
+  "publicMetadata": {
     "foo": "bar",
   },
-  "publicUserData": Object {
+  "publicUserData": {
     "firstName": "test_first_name",
     "identifier": "test@identifier.gr",
     "lastName": "test_last_name",
