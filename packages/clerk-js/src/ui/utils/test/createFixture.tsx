@@ -1,4 +1,5 @@
 import { SignInStatus } from '@clerk/types';
+import { getOAuthProviderData, OAuthProvider } from '@clerk/types/src';
 import React from 'react';
 
 import { ComponentContext, EnvironmentProvider } from '../../contexts';
@@ -21,6 +22,7 @@ type FParam = {
   withPhoneCode: () => void;
   mockSignInCreate: (opts?: { responseStatus: SignInStatus }) => typeof jest.fn;
   mockRouteNavigate: () => typeof jest.fn;
+  withSocialOAuth: (provider: OAuthProvider) => void;
 };
 
 type ConfigFn = (f: FParam) => void;
@@ -28,6 +30,9 @@ type ConfigFn = (f: FParam) => void;
 export const createFixture = (configFn?: ConfigFn) => {
   const config = getInitialFixtureConfig();
   const f = {
+    withSocialOAuth: (provider: OAuthProvider) => {
+      config.environment.social.push(getOAuthProviderData({ provider }));
+    },
     withUsername: () => {
       config.environment.enabledFirstFactorIdentifiers.push({
         identifier: 'username',
@@ -45,27 +50,6 @@ export const createFixture = (configFn?: ConfigFn) => {
     withPhoneNumber: () => {
       config.environment.enabledFirstFactorIdentifiers.push({
         identifier: 'phone_number',
-        enabled: true,
-        required: true,
-      });
-    },
-    withGoogleOAuth: () => {
-      config.environment.social.push({
-        oauthProvider: 'oauth_google',
-        enabled: true,
-        required: true,
-      });
-    },
-    withDiscordOAuth: () => {
-      config.environment.social.push({
-        oauthProvider: 'oauth_discord',
-        enabled: true,
-        required: true,
-      });
-    },
-    withInstagramOAuth: () => {
-      config.environment.social.push({
-        oauthProvider: 'oauth_instagram',
         enabled: true,
         required: true,
       });

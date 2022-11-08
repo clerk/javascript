@@ -8,8 +8,8 @@ const applyOptionsToInitialMockConfig = (fixtureConfig: any) => {
   const mockRouteContextValue = getInitialRouteContextValue();
 
   fixtureConfig.environment.social.forEach((s: any) => {
-    mockEnvironmentResource.userSettings.authenticatableSocialStrategies.push(s.oauthProvider);
-    mockEnvironmentResource.userSettings.socialProviderStrategies.push(s.oauthProvider);
+    mockEnvironmentResource.userSettings.authenticatableSocialStrategies.push(s.strategy);
+    mockEnvironmentResource.userSettings.socialProviderStrategies.push(s.strategy);
   });
   fixtureConfig.environment.enabledFirstFactorIdentifiers.forEach((identifier: any) => {
     mockEnvironmentResource.userSettings.enabledFirstFactorIdentifiers.push(identifier.identifier);

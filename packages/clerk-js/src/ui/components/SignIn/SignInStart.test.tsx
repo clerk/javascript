@@ -55,7 +55,7 @@ describe('SignInStart', () => {
   describe('Social OAuth', () => {
     it('shows the Continue with Google social OAuth button', () => {
       const { wrapper } = createFixture(f => {
-        f.withGoogleOAuth();
+        f.withSocialOAuth('google');
       });
 
       render(<SignInStart />, { wrapper });
@@ -66,31 +66,31 @@ describe('SignInStart', () => {
 
     it('shows the Continue with Discord social OAuth button', () => {
       const { wrapper } = createFixture(f => {
-        f.withDiscordOAuth();
+        f.withSocialOAuth('discord');
       });
 
       render(<SignInStart />, { wrapper });
 
-      const socialOAuth = screen.getByText('Continue with Discord');
+      const socialOAuth = screen.getByText(/continue with discord/i);
       expect(socialOAuth).toBeDefined();
     });
 
     it('shows the Continue with Instagram social OAuth button', () => {
       const { wrapper } = createFixture(f => {
-        f.withInstagramOAuth();
+        f.withSocialOAuth('instagram');
       });
 
       render(<SignInStart />, { wrapper });
 
-      const socialOAuth = screen.getByText('Continue with Instagram');
+      const socialOAuth = screen.getByText(/continue with instagram/i);
       expect(socialOAuth).toBeDefined();
     });
 
     it('shows the social buttons when 3 or more social login methods are enabled', () => {
       const { wrapper } = createFixture(f => {
-        f.withDiscordOAuth();
-        f.withInstagramOAuth();
-        f.withGoogleOAuth();
+        f.withSocialOAuth('google');
+        f.withSocialOAuth('instagram');
+        f.withSocialOAuth('discord');
       });
 
       const { container } = render(<SignInStart />, { wrapper });
