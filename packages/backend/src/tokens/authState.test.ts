@@ -2,9 +2,9 @@ import type QUnit from 'qunit';
 import sinon from 'sinon';
 
 import runtime from '../runtime';
+import { jsonOk } from '../util/mockFetch';
 import { type AuthStateParams, AuthState, getAuthState } from './authState';
 import { mockJwks, mockJwt, mockJwtPayload } from './fixtures';
-import { jsonOk } from './mockFetch';
 
 export default (QUnit: QUnit) => {
   const { module, test } = QUnit;
@@ -18,7 +18,7 @@ export default (QUnit: QUnit) => {
     skipJwksCache: true,
   };
 
-  module('getAuthState(options)', hooks => {
+  module('tokens.getAuthState(options)', hooks => {
     let fakeClock;
     let fakeFetch;
 

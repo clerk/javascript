@@ -8,6 +8,6 @@
     "outDir": "./tests/dist",
     "target": "ES2020"
   },
-  "include": ["src/tokens/**/*.test.ts"],
+  "include": ["src/**/*.test.ts"],
   "exclude": ["node_modules", "dist", "src/__tests__"]
 }

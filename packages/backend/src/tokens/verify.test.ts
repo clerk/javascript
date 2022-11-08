@@ -2,14 +2,14 @@ import type QUnit from 'qunit';
 import sinon from 'sinon';
 
 import runtime from '../runtime';
+import { jsonOk } from '../util/mockFetch';
 import { mockJwks, mockJwt, mockJwtPayload } from './fixtures';
-import { jsonOk } from './mockFetch';
 import { verifyToken } from './verify';
 
 export default (QUnit: QUnit) => {
   const { module, test } = QUnit;
 
-  module('verify(token, options)', hooks => {
+  module('tokens.verify(token, options)', hooks => {
     let fakeClock;
     let fakeFetch;
 
