@@ -1,3 +1,4 @@
+import { OAUTH_PROVIDERS } from '@clerk/types';
 import { describe, expect, it } from '@jest/globals';
 import { waitFor } from '@testing-library/dom';
 import { fireEvent, render, screen } from '@testing-library/react';
@@ -53,55 +54,31 @@ describe('SignInStart', () => {
   });
 
   describe('Social OAuth', () => {
-    it('shows the Continue with Google social OAuth button', () => {
+    it.each(OAUTH_PROVIDERS)('shows the "Continue with $name" social OAuth button', ({ provider, name }) => {
       const { wrapper } = createFixture(f => {
-        f.withSocialOAuth('google');
+        f.withSocialOAuth(provider);
       });
 
       render(<SignInStart />, { wrapper });
 
-      const socialOAuth = screen.getByText(/continue with google/i);
+      const socialOAuth = screen.getByText(`Continue with ${name}`);
       expect(socialOAuth).toBeDefined();
     });
 
-    it('shows the Continue with Discord social OAuth button', () => {
+    it('uses the "cl-socialButtonsIconButton__SOCIALOAUTHNAME" classname when rendering the social button icon only', () => {
       const { wrapper } = createFixture(f => {
-        f.withSocialOAuth('discord');
-      });
-
-      render(<SignInStart />, { wrapper });
-
-      const socialOAuth = screen.getByText(/continue with discord/i);
-      expect(socialOAuth).toBeDefined();
-    });
-
-    it('shows the Continue with Instagram social OAuth button', () => {
-      const { wrapper } = createFixture(f => {
-        f.withSocialOAuth('instagram');
-      });
-
-      render(<SignInStart />, { wrapper });
-
-      const socialOAuth = screen.getByText(/continue with instagram/i);
-      expect(socialOAuth).toBeDefined();
-    });
-
-    it('shows the social buttons when 3 or more social login methods are enabled', () => {
-      const { wrapper } = createFixture(f => {
-        f.withSocialOAuth('google');
-        f.withSocialOAuth('instagram');
-        f.withSocialOAuth('discord');
+        OAUTH_PROVIDERS.forEach(providerData => {
+          f.withSocialOAuth(providerData.provider);
+        });
       });
 
       const { container } = render(<SignInStart />, { wrapper });
 
       // target the css classname as this is public API
-      const googleIcon = container.getElementsByClassName('cl-socialButtonsIconButton__google');
-      const instagramIcon = container.getElementsByClassName('cl-socialButtonsIconButton__instagram');
-      const discordIcon = container.getElementsByClassName('cl-socialButtonsIconButton__discord');
-      expect(googleIcon).toBeDefined();
-      expect(instagramIcon).toBeDefined();
-      expect(discordIcon).toBeDefined();
+      OAUTH_PROVIDERS.forEach(providerData => {
+        const icon = container.getElementsByClassName(`cl-socialButtonsIconButton__${providerData.provider}`);
+        expect(icon.length).toEqual(1);
+      });
     });
   });
 
