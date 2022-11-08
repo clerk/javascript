@@ -42,7 +42,6 @@
     "tslib": "^2.3.1"
   },
   "devDependencies": {
-    "@types/jest": "^27.4.0",
     "@types/node": "^16.11.55",
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.11",
