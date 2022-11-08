@@ -433,6 +433,18 @@ type _LocalizationResource = {
         successMessage: LocalizationValue;
       };
     };
+    invitePage: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      successMessage: LocalizationValue;
+    };
+  };
+  createOrganization: {
+    title: LocalizationValue;
+    subtitle: LocalizationValue;
+    invitePage: {
+      formButtonReset: LocalizationValue;
+    };
   };
   unstable__errors: {
     form_identifier_not_found: LocalizationValue;
