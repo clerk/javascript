@@ -1,7 +1,7 @@
-import type { HTTPTransport } from '../HttpTransport';
+import type { RequestFunction } from '../request';
 
 export abstract class AbstractAPI {
-  constructor(protected request: HTTPTransport) {}
+  constructor(protected request: RequestFunction) {}
 
   protected requireId(id: string) {
     if (!id) {
