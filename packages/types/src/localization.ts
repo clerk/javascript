@@ -282,7 +282,7 @@ type _LocalizationResource = {
       title: LocalizationValue;
       imageFormTitle: LocalizationValue;
       imageFormSubtitle: LocalizationValue;
-      destructiveActionSubtitle: LocalizationValue;
+      imageFormDestructiveActionSubtitle: LocalizationValue;
       fileDropAreaTitle: LocalizationValue;
       fileDropAreaAction: LocalizationValue;
       fileDropAreaHint: LocalizationValue;

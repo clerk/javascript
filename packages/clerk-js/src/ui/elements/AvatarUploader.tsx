@@ -75,11 +75,12 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
 
             {hasImageUrl && !showUpload && (
               <Button
-                localizationKey={localizationKeys('userProfile.profilePage.destructiveActionSubtitle')}
+                localizationKey={localizationKeys('userProfile.profilePage.imageFormDestructiveActionSubtitle')}
                 isDisabled={card.isLoading}
                 sx={t => ({ color: t.colors.$danger500 })}
                 variant='link'
                 onClick={() => {
+                  card.setLoading();
                   void onAvatarChange(null);
                 }}
               />
