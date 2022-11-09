@@ -10,7 +10,7 @@ afterEach(() => {
 
 test('createSMSMessage() sends an SMS message', async () => {
   const phoneNumberId = 'idn_random';
-  const message = 'Press F to pay pespects';
+  const message = 'Press F to pay respects';
 
   nock(defaultServerAPIUrl)
     .post('/v1/sms_messages', snakecaseKeys({ phoneNumberId, message }))

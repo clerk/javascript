@@ -274,3 +274,10 @@ export interface Web3WalletJSON extends ClerkResourceJSON {
   web3_wallet: string;
   verification: VerificationJSON | null;
 }
+
+export interface DeletedObjectJSON {
+  object: string;
+  id?: string;
+  slug?: string;
+  deleted: boolean;
+}

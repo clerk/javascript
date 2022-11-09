@@ -1,0 +1,13 @@
+{
+  "id": "idn_banana",
+  "object": "email_address",
+  "email_address": "banana@cherry.com",
+  "reserved": true,
+  "verification": {
+    "status": "verified",
+    "strategy": "admin",
+    "attempts": null,
+    "expire_at": null
+  },
+  "linked_to": []
+}

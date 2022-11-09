@@ -40,6 +40,7 @@ Object {
   "ClerkAPIResponseError": [Function],
   "ClerkBackendAPI": [Function],
   "Client": [Function],
+  "DeletedObject": [Function],
   "Email": [Function],
   "EmailAddress": [Function],
   "ExternalAccount": [Function],

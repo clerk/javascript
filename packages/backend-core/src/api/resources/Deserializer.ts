@@ -2,11 +2,14 @@ import { Logger } from '../../util/Logger';
 import {
   AllowlistIdentifier,
   Client,
+  DeletedObject,
+  EmailAddress,
   Email,
   Invitation,
   Organization,
   OrganizationInvitation,
   OrganizationMembership,
+  PhoneNumber,
   RedirectUrl,
   Session,
   SignInToken,
@@ -41,11 +44,19 @@ function getCount(item: { total_count: number }) {
 
 // TODO: Revise response deserialization
 function jsonToObject(item: any): any {
+  // Special case: DeletedObject
+  // TODO: Improve this check
+  if ('object' in item && 'deleted' in item) {
+    return DeletedObject.fromJSON(item);
+  }
+
   switch (item.object) {
     case ObjectType.AllowlistIdentifier:
       return AllowlistIdentifier.fromJSON(item);
     case ObjectType.Client:
       return Client.fromJSON(item);
+    case ObjectType.EmailAddress:
+      return EmailAddress.fromJSON(item);
     case ObjectType.Email:
       return Email.fromJSON(item);
     case ObjectType.Invitation:
@@ -56,6 +67,8 @@ function jsonToObject(item: any): any {
       return OrganizationInvitation.fromJSON(item);
     case ObjectType.OrganizationMembership:
       return OrganizationMembership.fromJSON(item);
+    case ObjectType.PhoneNumber:
+      return PhoneNumber.fromJSON(item);
     case ObjectType.RedirectUrl:
       return RedirectUrl.fromJSON(item);
     case ObjectType.SignInToken:
