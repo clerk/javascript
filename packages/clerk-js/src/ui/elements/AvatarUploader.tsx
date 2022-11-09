@@ -8,7 +8,8 @@ import { FileDropArea } from './FileDropArea';
 export type AvatarUploaderProps = {
   title: LocalizationKey;
   avatarPreview: React.ReactElement;
-  onAvatarChange: (file: File) => Promise<unknown>;
+  onAvatarChange: (file: File | null) => Promise<unknown>;
+  hasDefaultImageUrl?: boolean;
 };
 
 export const fileToBase64 = (file: File): Promise<string> => {
@@ -24,7 +25,8 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
   const [showUpload, setShowUpload] = React.useState(false);
   const [objectUrl, setObjectUrl] = React.useState<string>();
   const card = useCardState();
-  const { onAvatarChange, title, avatarPreview, ...rest } = props;
+
+  const { onAvatarChange, title, avatarPreview, hasDefaultImageUrl = true, ...rest } = props;
 
   const toggle = () => {
     setShowUpload(!showUpload);
@@ -70,6 +72,19 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
                 toggle();
               }}
             />
+
+            {!hasDefaultImageUrl && !showUpload && (
+              <Button
+                localizationKey={localizationKeys('userProfile.profilePage.imageFormDestructiveActionSubtitle')}
+                isDisabled={card.isLoading}
+                sx={t => ({ color: t.colors.$danger500 })}
+                variant='link'
+                onClick={() => {
+                  card.setLoading();
+                  void onAvatarChange(null);
+                }}
+              />
+            )}
           </Flex>
         </Col>
       </Flex>

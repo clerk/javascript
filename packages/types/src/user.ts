@@ -89,7 +89,7 @@ export interface UserResource extends ClerkResource {
 export type CreateEmailAddressParams = { email: string };
 export type CreatePhoneNumberParams = { phoneNumber: string };
 export type CreateWeb3WalletParams = { web3Wallet: string };
-export type SetProfileImageParams = { file: Blob | File };
+export type SetProfileImageParams = { file: Blob | File | null };
 export type VerifyTOTPParams = { code: string };
 
 type UpdateUserJSON = Pick<
