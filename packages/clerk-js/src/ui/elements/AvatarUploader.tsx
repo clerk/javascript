@@ -9,6 +9,7 @@ export type AvatarUploaderProps = {
   title: LocalizationKey;
   avatarPreview: React.ReactElement;
   onAvatarChange: (file: File | null) => Promise<unknown>;
+  onAvatarRemove?: () => void;
   hasDefaultImageUrl?: boolean;
 };
 
@@ -26,13 +27,17 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
   const [objectUrl, setObjectUrl] = React.useState<string>();
   const card = useCardState();
 
-  const { onAvatarChange, title, avatarPreview, hasDefaultImageUrl = true, ...rest } = props;
+  const { onAvatarChange, onAvatarRemove, title, avatarPreview, hasDefaultImageUrl = true, ...rest } = props;
 
   const toggle = () => {
     setShowUpload(!showUpload);
   };
 
-  const handleFileDrop = (file: File) => {
+  const handleFileDrop = (file: File | null) => {
+    if (file === null) {
+      return setObjectUrl('');
+    }
+
     void fileToBase64(file).then(setObjectUrl);
     card.setLoading();
     return onAvatarChange(file)
@@ -41,6 +46,12 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
         card.setIdle();
       })
       .catch(err => handleError(err, [], card.setError));
+  };
+
+  const handleRemove = () => {
+    card.setLoading();
+    handleFileDrop(null);
+    return onAvatarRemove?.();
   };
 
   return (
@@ -79,10 +90,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
                 isDisabled={card.isLoading}
                 sx={t => ({ color: t.colors.$danger500 })}
                 variant='link'
-                onClick={() => {
-                  card.setLoading();
-                  void onAvatarChange(null);
-                }}
+                onClick={handleRemove}
               />
             )}
           </Flex>

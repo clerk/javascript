@@ -41,9 +41,17 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
       });
   };
 
-  const uploadAvatar = (file: File) => {
+  const uploadAvatar = (file: File | null) => {
     return organization.setLogo({ file }).then(() => {
       setAvatarChanged(true);
+      card.setIdle();
+    });
+  };
+
+  const onAvatarRemove = () => {
+    return organization.setLogo({ file: null }).then(() => {
+      setAvatarChanged(true);
+      card.setIdle();
     });
   };
 
@@ -58,6 +66,8 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
           <OrganizationProfileAvatarUploader
             organization={organization}
             onAvatarChange={uploadAvatar}
+            onAvatarRemove={onAvatarRemove}
+            hasDefaultImageUrl={!organization.logoUrl}
           />
           <Form.ControlRow>
             <Form.Control
