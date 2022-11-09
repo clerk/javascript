@@ -63,6 +63,13 @@ export const ProfilePage = withCardStateProvider(() => {
     });
   };
 
+  const onAvatarRemove = () => {
+    void user.setProfileImage({ file: null }).then(() => {
+      setAvatarChanged(true);
+      card.setIdle();
+    });
+  };
+
   return (
     <Wizard {...wizard.props}>
       <ContentPage
@@ -73,6 +80,8 @@ export const ProfilePage = withCardStateProvider(() => {
           <UserProfileAvatarUploader
             user={user}
             onAvatarChange={uploadAvatar}
+            onAvatarRemove={onAvatarRemove}
+            hasDefaultImage={(user.profileImageUrl || '').includes('gravatar')}
           />
           {showFirstName && (
             <Form.ControlRow>

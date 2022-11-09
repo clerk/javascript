@@ -49,7 +49,7 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
   };
 
   const onAvatarRemove = () => {
-    return organization.setLogo({ file: null }).then(() => {
+    void organization.setLogo({ file: null }).then(() => {
       setAvatarChanged(true);
       card.setIdle();
     });
@@ -67,7 +67,7 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
             organization={organization}
             onAvatarChange={uploadAvatar}
             onAvatarRemove={onAvatarRemove}
-            hasDefaultImageUrl={!organization.logoUrl}
+            hasDefaultImage={!organization.logoUrl}
           />
           <Form.ControlRow>
             <Form.Control

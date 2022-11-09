@@ -82,7 +82,7 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
             organization={{ name: nameField.value }}
             onAvatarChange={async file => await setFile(file)}
             onAvatarRemove={onAvatarRemove}
-            hasDefaultImageUrl={!file}
+            hasDefaultImage={!file}
           />
           <Form.ControlRow>
             <Form.Control
