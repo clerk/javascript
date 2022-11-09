@@ -41,7 +41,7 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
       });
   };
 
-  const uploadAvatar = (file: File | null) => {
+  const uploadAvatar = (file: File) => {
     return organization.setLogo({ file }).then(() => {
       setAvatarChanged(true);
       card.setIdle();

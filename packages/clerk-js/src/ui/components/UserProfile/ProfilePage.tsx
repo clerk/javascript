@@ -56,7 +56,7 @@ export const ProfilePage = withCardStateProvider(() => {
       });
   };
 
-  const uploadAvatar = (file: File | null) => {
+  const uploadAvatar = (file: File) => {
     return user.setProfileImage({ file }).then(() => {
       setAvatarChanged(true);
       card.setIdle();

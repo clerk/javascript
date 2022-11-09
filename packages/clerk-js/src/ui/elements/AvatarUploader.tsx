@@ -8,7 +8,7 @@ import { FileDropArea } from './FileDropArea';
 export type AvatarUploaderProps = {
   title: LocalizationKey;
   avatarPreview: React.ReactElement;
-  onAvatarChange: (file: File | null) => Promise<unknown>;
+  onAvatarChange: (file: File) => Promise<unknown>;
   onAvatarRemove?: () => void;
   hasDefaultImage?: boolean;
 };
