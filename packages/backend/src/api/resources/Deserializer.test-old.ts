@@ -17,7 +17,7 @@ import {
   SessionJSON,
   SMSMessage,
   SMSMessageJSON,
-} from '../../api/resources';
+} from '.';
 
 const allowlistIdentifierJSON: AllowlistIdentifierJSON = {
   object: ObjectType.AllowlistIdentifier,

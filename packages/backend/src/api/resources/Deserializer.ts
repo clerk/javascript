@@ -1,4 +1,3 @@
-import { Logger } from '../../util/Logger';
 import {
   AllowlistIdentifier,
   Client,
@@ -71,7 +70,6 @@ function jsonToObject(item: any): any {
     case ObjectType.User:
       return User.fromJSON(item);
     default:
-      Logger.error(`Unexpected object type: ${item.object}`);
       return item;
   }
 }

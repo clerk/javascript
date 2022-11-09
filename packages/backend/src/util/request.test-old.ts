@@ -1,4 +1,4 @@
-import { checkCrossOrigin } from '../../util/request';
+import { checkCrossOrigin } from './request';
 
 describe('check cross-origin-referrer request utility', () => {
   test('is not CO with IPv6', () => {
