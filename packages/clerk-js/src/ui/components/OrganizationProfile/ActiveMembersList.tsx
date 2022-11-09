@@ -1,5 +1,4 @@
 import { MembershipRole, OrganizationMembershipResource } from '@clerk/types';
-import React from 'react';
 
 import { useCoreOrganization, useCoreUser } from '../../contexts';
 import { Badge, localizationKeys, Td, Text } from '../../customizables';
@@ -57,7 +56,12 @@ export const ActiveMembersList = () => {
       itemCount={organization.membersCount}
       itemsPerPage={ITEMS_PER_PAGE}
       isLoading={!membershipList}
-      headers={['User', 'Joined', 'Role', '']}
+      headers={[
+        localizationKeys('organizationProfile.membersPage.activeMembersTab.headerTitle__user'),
+        localizationKeys('organizationProfile.membersPage.activeMembersTab.headerTitle__joined'),
+        localizationKeys('organizationProfile.membersPage.activeMembersTab.headerTitle__role'),
+        localizationKeys('organizationProfile.membersPage.activeMembersTab.headerTitle__actions'),
+      ]}
       rows={(membershipList || []).map(m => (
         <MemberRow
           key={m.id}
@@ -111,7 +115,14 @@ const MemberRow = (props: {
       <Td>
         {isAdmin && (
           <ThreeDotsMenu
-            actions={[{ label: 'Remove member', isDestructive: true, onClick: onRemove, isDisabled: isCurrentUser }]}
+            actions={[
+              {
+                label: localizationKeys('organizationProfile.membersPage.activeMembersTab.action__remove'),
+                isDestructive: true,
+                onClick: onRemove,
+                isDisabled: isCurrentUser,
+              },
+            ]}
           />
         )}
       </Td>

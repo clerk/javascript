@@ -85,7 +85,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
         <Alert
           variant='danger'
           align='start'
-          title={'The invitations could not be send. Fix the following and try again:'}
+          title={localizationKeys('organizationProfile.invitePage.detailsTitle__inviteFailed')}
           subtitle={invalidEmails.join(', ')}
           sx={{ border: 0 }}
         />
@@ -98,7 +98,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
             gap={2}
             sx={{ width: '100%' }}
           >
-            <Text>Email addresses</Text>
+            <Text localizationKey={localizationKeys('formFieldLabel__emailAddresses')} />
             <TagInput
               {...emailAddressField.props}
               validate={isEmail}
@@ -111,7 +111,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
             direction='col'
             gap={2}
           >
-            <Text>Role</Text>
+            <Text localizationKey={localizationKeys('formFieldLabel__role')} />
             {/*// @ts-expect-error */}
             <Select
               {...roleField.props}
