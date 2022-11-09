@@ -50,8 +50,7 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
   const handleVerificationResult = async (si: SignInResource) => {
     const ver = si.firstFactorVerification;
     if (ver.status === 'expired') {
-      card.setError('The verification link expired. A replacement link has just been sent to your email address.');
-      void startEmailLinkVerification();
+      card.setError('The verification link expired. Please resend it.');
     } else if (ver.verifiedFromTheSameClient()) {
       setShowVerifyModal(true);
     } else {
