@@ -18,7 +18,7 @@ export function useSafeState<S>(initialState?: S | (() => S)) {
     };
   }, []);
 
-  const setState = React.useCallback(currentState => {
+  const setState = React.useCallback((currentState: any) => {
     if (!isMountedRef.current) {
       return;
     }

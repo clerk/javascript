@@ -27,13 +27,13 @@
     "vitest": "^0.23.4"
   },
   "peerDependencies": {
-    "@testing-library/dom": "^7.28.1",
-    "@testing-library/jest-dom": "^5.11.6",
-    "@testing-library/react": "^11.2.1",
-    "@testing-library/react-hooks": "^3.4.2",
-    "@testing-library/user-event": "^12.2.2",
-    "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "@testing-library/dom": "^8.19.0",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^14.4.3",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-test-renderer": "^18.2.0"
   },
   "author": "",
   "license": "ISC",
