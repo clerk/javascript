@@ -16,6 +16,7 @@ export * from './identifiers';
 export * from './image';
 export * from './json';
 export * from './jwt';
+export * from './key';
 export * from './localization';
 export * from './oauth';
 export * from './organization';
