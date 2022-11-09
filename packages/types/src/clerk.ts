@@ -18,6 +18,9 @@ import { ActiveSessionResource } from './session';
 import { UserResource } from './user';
 import { DeepPartial, DeepSnakeToCamel } from './utils';
 
+export type InstanceType = 'test' | 'live';
+export type SessionSyncMode = 'cookies' | 'urlDecoration';
+
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
 export type BeforeEmitCallback = (session: ActiveSessionResource | null) => void | Promise<any>;
@@ -60,10 +63,10 @@ export interface Clerk {
   publishableKey?: string;
 
   /** Clerk Instance Type string. */
-  instanceType?: 'test' | 'live';
+  instanceType?: InstanceType;
 
   /** Clerk Sync Mode string. */
-  syncMode?: 'cookies' | 'urlDecoration';
+  syncMode?: SessionSyncMode;
 
   /** Clerk Instance Key string. */
   instanceKey?: string;
