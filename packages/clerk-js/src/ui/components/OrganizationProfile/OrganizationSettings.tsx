@@ -25,10 +25,7 @@ export const OrganizationSettings = () => {
             localizationKey={localizationKeys('organizationProfile.start.headerTitle__settings')}
             textVariant='xxlargeMedium'
           />
-          <Header.Subtitle
-            // localizationKey={localizationKeys('organizationProfile.start.headerSubtitle__account')}
-            localizationKey={'Manage organization settings'}
-          />
+          <Header.Subtitle localizationKey={localizationKeys('organizationProfile.start.headerSubtitle__settings')} />
         </Header.Root>
         <OrganizationProfileSection />
         <OrganizationDangerSection />
@@ -55,8 +52,7 @@ const OrganizationProfileSection = () => {
 
   return (
     <ProfileSection
-      // title={localizationKeys('userProfile.start.profileSection.title')}
-      title={'Organization profile'}
+      title={localizationKeys('organizationProfile.profilePage.title')}
       // id='organization-profile'
     >
       {isAdmin ? <BlockButton onClick={() => navigate('profile')}>{profile}</BlockButton> : profile}
@@ -74,9 +70,8 @@ const OrganizationDangerSection = () => {
 
   return (
     <ProfileSection
-      // title={localizationKeys('userProfile.start.profileSection.title')}
       // id='organization-danger'
-      title={'Danger'}
+      title={localizationKeys('organizationProfile.profilePage.dangerSection.title')}
       sx={t => ({ marginBottom: t.space.$4 })}
     >
       <Flex gap={4}>
@@ -87,9 +82,8 @@ const OrganizationDangerSection = () => {
           textVariant='buttonExtraSmallBold'
           onClick={() => navigate('leave')}
           isDisabled={membership.role === 'admin'}
-        >
-          Leave organization
-        </IconButton>
+          localizationKey={localizationKeys('organizationProfile.profilePage.dangerSection.leave.title')}
+        />
       </Flex>
     </ProfileSection>
   );

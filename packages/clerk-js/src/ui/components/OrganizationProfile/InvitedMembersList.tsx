@@ -1,8 +1,7 @@
 import { OrganizationInvitationResource } from '@clerk/types';
-import React from 'react';
 
 import { useCoreOrganization } from '../../contexts';
-import { Td, Text } from '../../customizables';
+import { localizationKeys, Td, Text } from '../../customizables';
 import { ThreeDotsMenu, useCardState, usePagination, UserPreview } from '../../elements';
 import { handleError, roleLocalizationKey } from '../../utils';
 import { MembersListTable, RowContainer } from './MemberListTable';
@@ -42,7 +41,12 @@ export const InvitedMembersList = () => {
       itemCount={organization.pendingInvitationsCount}
       itemsPerPage={ITEMS_PER_PAGE}
       isLoading={!invitationList}
-      headers={['User', 'Invited', 'Role', '']}
+      headers={[
+        localizationKeys('organizationProfile.membersPage.activeMembersTab.headerTitle__user'),
+        localizationKeys('organizationProfile.membersPage.invitedMembersTab.headerTitle__invited'),
+        localizationKeys('organizationProfile.membersPage.activeMembersTab.headerTitle__role'),
+        localizationKeys('organizationProfile.membersPage.activeMembersTab.headerTitle__actions'),
+      ]}
       rows={(invitationList || []).map(i => (
         <InvitationRow
           key={i.id}
@@ -76,7 +80,7 @@ const InvitationRow = (props: { invitation: OrganizationInvitationResource; onRe
         <ThreeDotsMenu
           actions={[
             {
-              label: 'Revoke invitation',
+              label: localizationKeys('organizationProfile.membersPage.invitedMembersTab.action__revoke'),
               isDestructive: true,
               onClick: onRevoke,
             },

@@ -30,6 +30,7 @@ type _LocalizationResource = {
   formFieldLabel__lastName: LocalizationValue;
   formFieldLabel__backupCode: LocalizationValue;
   formFieldLabel__organizationName: LocalizationValue;
+  formFieldLabel__role: LocalizationValue;
   formFieldInputPlaceholder__emailAddress: LocalizationValue;
   formFieldInputPlaceholder__emailAddresses: LocalizationValue;
   formFieldInputPlaceholder__phoneNumber: LocalizationValue;
@@ -423,20 +424,47 @@ type _LocalizationResource = {
     start: {
       headerTitle__members: LocalizationValue;
       headerTitle__settings: LocalizationValue;
+      headerSubtitle__members: LocalizationValue;
+      headerSubtitle__settings: LocalizationValue;
     };
     profilePage: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
       successMessage: LocalizationValue;
-      leave: {
+      dangerSection: {
         title: LocalizationValue;
-        messageLine1: LocalizationValue;
-        messageLine2: LocalizationValue;
-        successMessage: LocalizationValue;
+        leave: {
+          title: LocalizationValue;
+          messageLine1: LocalizationValue;
+          messageLine2: LocalizationValue;
+          successMessage: LocalizationValue;
+        };
       };
     };
     invitePage: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       successMessage: LocalizationValue;
+      detailsTitle__inviteFailed: LocalizationValue;
+    };
+    membersPage: {
+      detailsTitle__emptyRow: LocalizationValue;
+      action__invite: LocalizationValue;
+      start: {
+        headerTitle__active: LocalizationValue;
+        headerTitle__invited: LocalizationValue;
+      };
+      activeMembersTab: {
+        headerTitle__user: LocalizationValue;
+        headerTitle__joined: LocalizationValue;
+        headerTitle__role: LocalizationValue;
+        headerTitle__actions: LocalizationValue;
+        action__remove: LocalizationValue;
+      };
+      invitedMembersTab: {
+        headerTitle__invited: LocalizationValue;
+        action__revoke: LocalizationValue;
+      };
     };
   };
   createOrganization: {

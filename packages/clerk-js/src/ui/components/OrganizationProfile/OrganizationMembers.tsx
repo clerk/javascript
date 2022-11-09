@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useCoreOrganization } from '../../contexts';
-import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
+import { Col, descriptors, Flex, localizationKeys, Text } from '../../customizables';
 import {
   CardAlert,
   Header,
@@ -47,25 +47,29 @@ export const OrganizationMembers = withCardStateProvider(() => {
               localizationKey={localizationKeys('organizationProfile.start.headerTitle__members')}
               textVariant='xxlargeMedium'
             />
-            <Header.Subtitle
-              // localizationKey={localizationKeys('organizationProfile.start.headerSubtitle__account')}
-              localizationKey={'View and manage organization members'}
-            />
+            <Header.Subtitle localizationKey={localizationKeys('organizationProfile.start.headerSubtitle__members')} />
           </Header.Root>
           {isAdmin && (
             <IconButton
               onClick={() => navigate('invite-members')}
               icon={UserAdd}
               textVariant='buttonExtraSmallBold'
-            >
-              Invite
-            </IconButton>
+              localizationKey={localizationKeys('organizationProfile.membersPage.action__invite')}
+            />
           )}
         </Flex>
         <Tabs>
           <TabsList>
-            <Tab>Active</Tab>
-            {isAdmin && <Tab>Invited</Tab>}
+            <Tab>
+              <Text localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__active')} />
+            </Tab>
+            {isAdmin && (
+              <Tab>
+                <Text
+                  localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__invited')}
+                />
+              </Tab>
+            )}
           </TabsList>
           <TabPanels>
             <TabPanel sx={{ width: '100%' }}>

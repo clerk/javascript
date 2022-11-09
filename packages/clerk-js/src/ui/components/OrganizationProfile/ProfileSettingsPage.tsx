@@ -10,9 +10,8 @@ import { OrganizationProfileAvatarUploader } from './OrganizationProfileAvatarUp
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
 export const ProfileSettingsPage = withCardStateProvider(() => {
-  // const title = localizationKeys('userProfile.profilePage.title');
-  const title = 'Organization profile';
-  const subtitle = 'Manage organization profile';
+  const title = localizationKeys('organizationProfile.profilePage.title');
+  const subtitle = localizationKeys('organizationProfile.profilePage.subtitle');
   const card = useCardState();
   const [avatarChanged, setAvatarChanged] = React.useState(false);
   const { organization } = useCoreOrganization();

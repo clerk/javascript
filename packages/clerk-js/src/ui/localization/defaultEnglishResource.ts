@@ -30,6 +30,7 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
   formFieldLabel__lastName: 'Last name',
   formFieldLabel__backupCode: 'Backup code',
   formFieldLabel__organizationName: 'Organization name',
+  formFieldLabel__role: 'Role',
   formFieldInputPlaceholder__emailAddress: '',
   formFieldInputPlaceholder__emailAddresses:
     'Enter or paste one or more email addresses, separated by spaces or commas',
@@ -426,21 +427,48 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
     start: {
       headerTitle__members: 'Members',
       headerTitle__settings: 'Settings',
+      headerSubtitle__members: 'View and manage organization members',
+      headerSubtitle__settings: 'View and manage organization members',
     },
     profilePage: {
+      title: 'Organization Profile',
+      subtitle: 'Manage organization profile',
       successMessage: 'The organization has been updated.',
-      leave: {
-        title: 'Leave organization',
-        messageLine1:
-          'Are you sure you want to leave this organization? You will lose access to this organization and its applications.',
-        messageLine2: 'This action is permanent and irreversible.',
-        successMessage: 'You have left the organization.',
+      dangerSection: {
+        title: 'Danger',
+        leave: {
+          title: 'Leave organization',
+          messageLine1:
+            'Are you sure you want to leave this organization? You will lose access to this organization and its applications.',
+          messageLine2: 'This action is permanent and irreversible.',
+          successMessage: 'You have left the organization.',
+        },
       },
     },
     invitePage: {
       title: 'Invite members',
       subtitle: 'Invite new members to this organization',
       successMessage: 'Invitations successfully sent',
+      detailsTitle__inviteFailed: 'The invitations could not be sent. Fix the following and try again:',
+    },
+    membersPage: {
+      detailsTitle__emptyRow: 'No members to display',
+      action__invite: 'Invite',
+      start: {
+        headerTitle__active: 'Active',
+        headerTitle__invited: 'Invited',
+      },
+      activeMembersTab: {
+        headerTitle__user: 'User',
+        headerTitle__joined: 'Joined',
+        headerTitle__role: 'Role',
+        headerTitle__actions: '',
+        action__remove: 'Remove member',
+      },
+      invitedMembersTab: {
+        headerTitle__invited: 'Invited',
+        action__revoke: 'Revoke invitation',
+      },
     },
   },
   createOrganization: {
