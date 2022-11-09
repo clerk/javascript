@@ -81,8 +81,7 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
           <OrganizationProfileAvatarUploader
             organization={{ name: nameField.value }}
             onAvatarChange={async file => await setFile(file)}
-            onAvatarRemove={onAvatarRemove}
-            hasDefaultImage={!file}
+            onAvatarRemove={file ? onAvatarRemove : null}
           />
           <Form.ControlRow>
             <Form.Control

@@ -57,17 +57,23 @@ export const ProfilePage = withCardStateProvider(() => {
   };
 
   const uploadAvatar = (file: File) => {
-    return user.setProfileImage({ file }).then(() => {
-      setAvatarChanged(true);
-      card.setIdle();
-    });
+    return user
+      .setProfileImage({ file })
+      .then(() => {
+        setAvatarChanged(true);
+        card.setIdle();
+      })
+      .catch(err => handleError(err, [], card.setError));
   };
 
   const onAvatarRemove = () => {
-    void user.setProfileImage({ file: null }).then(() => {
-      setAvatarChanged(true);
-      card.setIdle();
-    });
+    void user
+      .setProfileImage({ file: null })
+      .then(() => {
+        setAvatarChanged(true);
+        card.setIdle();
+      })
+      .catch(err => handleError(err, [], card.setError));
   };
 
   return (
@@ -80,8 +86,7 @@ export const ProfilePage = withCardStateProvider(() => {
           <UserProfileAvatarUploader
             user={user}
             onAvatarChange={uploadAvatar}
-            onAvatarRemove={onAvatarRemove}
-            hasDefaultImage={(user.profileImageUrl || '').includes('gravatar')}
+            onAvatarRemove={!(user.profileImageUrl || '').includes('gravatar') ? onAvatarRemove : null}
           />
           {showFirstName && (
             <Form.ControlRow>

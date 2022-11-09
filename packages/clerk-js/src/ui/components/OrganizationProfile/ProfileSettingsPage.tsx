@@ -42,17 +42,23 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
   };
 
   const uploadAvatar = (file: File) => {
-    return organization.setLogo({ file }).then(() => {
-      setAvatarChanged(true);
-      card.setIdle();
-    });
+    return organization
+      .setLogo({ file })
+      .then(() => {
+        setAvatarChanged(true);
+        card.setIdle();
+      })
+      .catch(err => handleError(err, [], card.setError));
   };
 
   const onAvatarRemove = () => {
-    void organization.setLogo({ file: null }).then(() => {
-      setAvatarChanged(true);
-      card.setIdle();
-    });
+    void organization
+      .setLogo({ file: null })
+      .then(() => {
+        setAvatarChanged(true);
+        card.setIdle();
+      })
+      .catch(err => handleError(err, [], card.setError));
   };
 
   return (
@@ -66,8 +72,7 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
           <OrganizationProfileAvatarUploader
             organization={organization}
             onAvatarChange={uploadAvatar}
-            onAvatarRemove={onAvatarRemove}
-            hasDefaultImage={!organization.logoUrl}
+            onAvatarRemove={organization.logoUrl ? onAvatarRemove : null}
           />
           <Form.ControlRow>
             <Form.Control
