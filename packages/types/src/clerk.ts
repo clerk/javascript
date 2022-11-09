@@ -60,6 +60,7 @@ export interface Clerk {
   frontendApi: string;
 
   instanceType?: InstanceType;
+
   /** Clerk Publishable Key string. */
   publishableKey?: string;
 
