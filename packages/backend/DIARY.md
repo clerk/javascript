@@ -16,10 +16,11 @@
 
 ## Remaining tasks
 
-- [] Align Auth data interface and move getToken builder in one place.
+- [] Align Auth data interface and move getToken builder in one place by passing an API client to getAuthState
 - [] Build test coverage
 - [] Export CJS and ESM without [dual package hazard](https://github.com/nodejs/modules/issues/409)
 - [] Custom claim validation
 - [] Add tribute to https://github.com/cfworker/cfworker/tree/main/packages/jwt
 - [] Replace QUnit with Mocha in a browser-like setup using ESM.
 - [] Make test suite files load dynamically so that we don't need to manually update `suites.ts` every time we add a new test file.
+- [] Run suite in Deno runtime

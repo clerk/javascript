@@ -19,7 +19,7 @@
   },
   "module": "dist/mjs/index.js",
   "dependencies": {
-    "@clerk/types": "^3.14.0-staging.4",
+    "@clerk/types": "^3.15.1-staging.1",
     "@types/node": "^16.11.55",
     "node-fetch-native": "^0.1.7",
     "rfc4648": "^1.5.2",
