@@ -4,7 +4,7 @@ import { useWizard, Wizard } from '../../common';
 import { useCoreUser, useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
-import { handleError, useFormControl } from '../../utils';
+import { handleError, useFormControl, userHasDefaultImage } from '../../utils';
 import { UserProfileAvatarUploader } from './UserProfileAvatarUploader';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
@@ -86,7 +86,7 @@ export const ProfilePage = withCardStateProvider(() => {
           <UserProfileAvatarUploader
             user={user}
             onAvatarChange={uploadAvatar}
-            onAvatarRemove={!(user.profileImageUrl || '').includes('gravatar') ? onAvatarRemove : null}
+            onAvatarRemove={userHasDefaultImage(user.profileImageUrl) ? onAvatarRemove : null}
           />
           {showFirstName && (
             <Form.ControlRow>
