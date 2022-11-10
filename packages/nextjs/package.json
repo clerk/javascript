@@ -25,7 +25,8 @@
     "server.d.ts",
     "server.js",
     "ssr.d.ts",
-    "ssr.js"
+    "ssr.js",
+    "app-beta"
   ],
   "scripts": {
     "prepublishOnly": "npm run build",
