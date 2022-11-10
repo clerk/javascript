@@ -13,14 +13,16 @@
 - [x] Move interstitial fetching into @clerk/backend.
 - [x] Supports Node >= 16 due to native web crypto requirement.
 - [x] Do not use any process.env as it's not supported across all run-times.
+- [x] Export a generic verifyToken for all Clerk JWTs verification.
 
 ## Remaining tasks
 
 - [] Align Auth data interface and move getToken builder in one place by passing an API client to getAuthState
-- [] Build test coverage
 - [] Export CJS and ESM without [dual package hazard](https://github.com/nodejs/modules/issues/409)
-- [] Custom claim validation
-- [] Add tribute to https://github.com/cfworker/cfworker/tree/main/packages/jwt
+- [] Custom claim validation in verifyToken for JWT templates
+- [] Build test coverage
 - [] Replace QUnit with Mocha in a browser-like setup using ESM.
+- [] Replace Sinon with https://mswjs.io
+- [] Add tribute to https://github.com/cfworker/cfworker/tree/main/packages/jwt
 - [] Make test suite files load dynamically so that we don't need to manually update `suites.ts` every time we add a new test file.
 - [] Run suite in Deno runtime
