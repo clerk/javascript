@@ -15,6 +15,7 @@ import { createRoot } from 'react-dom/client';
 
 import { PRESERVED_QUERYSTRING_PARAMS } from '../core/constants';
 import { clerkUIErrorDOMElementNotFound } from '../core/errors';
+import { buildURL, getClerkQueryParam, windowNavigate } from '../utils';
 import { CreateOrganization, CreateOrganizationModal } from './components/CreateOrganization';
 import { ImpersonationFab } from './components/ImpersonationFab';
 import { OrganizationProfile, OrganizationProfileModal } from './components/OrganizationProfile';
@@ -148,7 +149,60 @@ const Components = (props: ComponentsProps) => {
   const { signInModal, signUpModal, userProfileModal, organizationProfileModal, createOrganizationModal, nodes } =
     state;
 
+  const urlClerkState = getClerkQueryParam('__clerk_state') ?? '';
+
+  // TODO: this will be greatly refactored and moved elsewhere
+  const getState = () => {
+    const fullPath = urlClerkState?.split('__')[0] || '';
+    const basePath = fullPath?.split('/')[1] || '';
+    const isModal = Boolean(urlClerkState?.split('__')[1]?.split('=')[1]);
+    const url = new URL(window.location.href);
+    const params = new URLSearchParams(url.search);
+
+    // // Delete the foo parameter.
+    // params.delete('__clerk_state');
+    // window.history.pushState({}, '', url);``
+    // const po = new URL(window.location.href).searchParams.delete('__clerk_state');
+
+    console.log(params, 'params');
+    console.log(props, 'props');
+
+    // props.options.navigate(window.location.href)
+
+    return { isModal, fullPath, basePath };
+  };
+
+  const urlState = {
+    user: 'userProfileModal',
+  };
+
+  // const po = getState();
+  // console.log(window.location.href);
+
+  // useEffect(() => {
+  // const url = new URL(window.location.href);
+  // const searchParams = new URL(window.location.href).search;
+  // const params = new URLSearchParams(url.search);
+
+  // // Delete the foo parameter.
+  // // params.delete('__clerk_state');
+  // console.log(params, 'paramsa')
+  // console.log(searchParams, 'searchParams')
+  // console.log(url, 'url')
+  // windowNavigate(url);
+  // buildURL({ base: url, params }, { stringify: true });
+  // }, []);
+
   useSafeLayoutEffect(() => {
+    const { isModal, basePath } = getState();
+
+    if (urlClerkState && isModal) {
+      setState(s => ({ ...s, [urlState[basePath]]: {} }));
+
+      // Delete the foo parameter.
+      // params.delete('__clerk_state');
+    }
+
     componentsControls.mountComponent = params => {
       const { node, name, props, appearanceKey } = params;
       assertDOMElement(node);
@@ -259,7 +313,8 @@ const Components = (props: ComponentsProps) => {
             <VirtualRouter
               preservedParams={PRESERVED_QUERYSTRING_PARAMS}
               onExternalNavigate={() => componentsControls.closeModal('userProfile')}
-              startPath='/user'
+              // startPath={'/user'}
+              startPath={getState()?.fullPath || '/user'}
             >
               <UserProfileModal />
             </VirtualRouter>

@@ -2,7 +2,7 @@ import type { ExternalAccountResource, OAuthStrategy } from '@clerk/types';
 import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
-import { useCoreUser } from '../../contexts';
+import { useCoreUser, useUserProfileContext } from '../../contexts';
 import { Col, Image, localizationKeys, Text } from '../../customizables';
 import {
   ArrowBlockButton,
@@ -46,6 +46,10 @@ const AddConnectedAccount = () => {
   const user = useCoreUser();
   const { navigate } = useNavigate();
   const { strategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
+  const { currentPath } = useRouter();
+  const isModal = useUserProfileContext().mode === 'modal';
+
+  const params = `${currentPath.replace('/CLERK-ROUTER/VIRTUAL', '')}__modal=${isModal}`;
 
   const enabledStrategies = strategies.filter(s => s.startsWith('oauth')) as OAuthStrategy[];
   const connectedStrategies = user.verifiedExternalAccounts.map(a => 'oauth_' + a.provider) as OAuthStrategy[];
@@ -59,7 +63,10 @@ const AddConnectedAccount = () => {
     // If yes, refactor and cleanup:
     card.setLoading(strategy);
     user
-      .createExternalAccount({ strategy: strategy, redirect_url: window.location.href })
+      .createExternalAccount({
+        strategy: strategy,
+        redirect_url: `${window.location.href}?__clerk_state=${params}`,
+      })
       .then(res => {
         if (res.verification?.externalVerificationRedirectURL) {
           return navigate(res.verification.externalVerificationRedirectURL);

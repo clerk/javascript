@@ -3,6 +3,7 @@ const ClerkQueryParams = [
   '__clerk_created_session',
   '__clerk_invitation_token',
   '__clerk_ticket',
+  '__clerk_state',
 ] as const;
 
 type ClerkQueryParam = typeof ClerkQueryParams[number];
@@ -12,6 +13,7 @@ type ClerkQueryParamsToValuesMap = {
   __clerk_created_session: string;
   __clerk_invitation_token: string;
   __clerk_ticket: string;
+  __clerk_state: string;
 };
 
 export type VerificationStatus = 'expired' | 'failed' | 'loading' | 'verified' | 'verified_switch_tab';
