@@ -14,6 +14,6 @@ export default defineConfig(overrideOptions => {
     sourcemap: true,
     format: ['cjs', 'esm'],
     define: { PACKAGE_VERSION: `"${version}"`, __DEV__: `${!isProd}` },
-    external: ['@testing-library', 'react', 'react-test-renderer'],
+    external: ['@testing-library', 'react', 'react-dom', 'react-test-renderer'],
   };
 });
