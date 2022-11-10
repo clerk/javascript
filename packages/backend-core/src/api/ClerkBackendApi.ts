@@ -5,9 +5,11 @@ import { APIClient, APIRequestOptions } from './endpoints';
 import {
   AllowlistIdentifierAPI,
   ClientAPI,
+  EmailAddressAPI,
   EmailAPI,
   InvitationAPI,
   OrganizationAPI,
+  PhoneNumberAPI,
   RedirectUrlAPI,
   SessionAPI,
   SignInTokenAPI,
@@ -43,9 +45,11 @@ type ClerkBackendAPIOptions = {
 export class ClerkBackendAPI {
   private _allowlistIdentifierAPI?: AllowlistIdentifierAPI;
   private _clientAPI?: ClientAPI;
+  private _emailAddressApi?: EmailAddressAPI;
   private _emailAPI?: EmailAPI;
   private _invitationAPI?: InvitationAPI;
   private _organizationAPI?: OrganizationAPI;
+  private _phoneNumberApi?: PhoneNumberAPI;
   private _redirectUrlAPI?: RedirectUrlAPI;
   private _sessionAPI?: SessionAPI;
   private _signInTokenAPI?: SignInTokenAPI;
@@ -142,6 +146,7 @@ export class ClerkBackendAPI {
   }
 
   // Lazy sub-API getters
+
   get allowlistIdentifiers(): AllowlistIdentifierAPI {
     if (!this._allowlistIdentifierAPI) {
       this._allowlistIdentifierAPI = new AllowlistIdentifierAPI(this);
@@ -155,6 +160,14 @@ export class ClerkBackendAPI {
     }
 
     return this._clientAPI;
+  }
+
+  get emailAddresses(): EmailAddressAPI {
+    if (!this._emailAddressApi) {
+      this._emailAddressApi = new EmailAddressAPI(this);
+    }
+
+    return this._emailAddressApi;
   }
 
   get emails(): EmailAPI {
@@ -177,6 +190,14 @@ export class ClerkBackendAPI {
       this._organizationAPI = new OrganizationAPI(this);
     }
     return this._organizationAPI;
+  }
+
+  get phoneNumbers(): PhoneNumberAPI {
+    if (!this._phoneNumberApi) {
+      this._phoneNumberApi = new PhoneNumberAPI(this);
+    }
+
+    return this._phoneNumberApi;
   }
 
   get redirectUrls(): RedirectUrlAPI {
