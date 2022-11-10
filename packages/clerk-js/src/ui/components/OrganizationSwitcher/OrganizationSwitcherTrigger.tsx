@@ -38,7 +38,6 @@ export const OrganizationSwitcherTrigger = React.forwardRef<HTMLButtonElement, O
           {!organization && (
             <PersonalWorkspacePreview
               user={user}
-              rounded={false}
               size={'sm'}
               subtitle={
                 hidePersonal
