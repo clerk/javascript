@@ -134,7 +134,33 @@ export function handleMiddlewareResult({ req, res, authResult }: HandleMiddlewar
     res.headers.set(AUTH_RESULT, authResult);
     rewriteURL.searchParams.set(AUTH_RESULT, authResult);
     res.headers.set(NEXT_REWRITE_HEADER, rewriteURL.href);
+    setRequestHeaderOnNextResponse(res, req, { [AUTH_RESULT]: authResult });
   }
 
   return res;
 }
+
+const OVERRIDE_HEADERS = 'x-middleware-override-headers';
+const MIDDLEWARE_HEADER_PREFIX = 'x-middleware-request' as string;
+
+const setRequestHeaderOnNextResponse = (
+  res: NextResponse | Response,
+  req: NextRequest,
+  newHeaders: Record<string, string>,
+) => {
+  if (!res.headers.get(OVERRIDE_HEADERS)) {
+    // Emulate a user setting overrides by explicitly adding the required nextjs headers
+    // https://github.com/vercel/next.js/pull/41380
+    // @ts-expect-error
+    res.headers.set(OVERRIDE_HEADERS, [...req.headers.keys()]);
+    req.headers.forEach((val, key) => {
+      res.headers.set(`${MIDDLEWARE_HEADER_PREFIX}-${key}`, val);
+    });
+  }
+
+  // Now that we have normalised res to include overrides, just append the new header
+  Object.entries(newHeaders).forEach(([key, val]) => {
+    res.headers.set(OVERRIDE_HEADERS, `${res.headers.get(OVERRIDE_HEADERS)},${key}`);
+    res.headers.set(`${MIDDLEWARE_HEADER_PREFIX}-${key}`, val);
+  });
+};
