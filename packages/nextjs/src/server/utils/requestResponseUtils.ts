@@ -35,7 +35,8 @@ function getQueryParam(req: RequestLike, name: string): string | null | undefine
 
   // Fall back to query string
   if (!queryParam) {
-    queryParam = new URL(req.url || '').searchParams.get(name);
+    const qs = (req.url || '').split('?')[1];
+    queryParam = new URLSearchParams(qs).get(name);
   }
   return queryParam;
 }
