@@ -1,3 +1,3 @@
-export const userHasDefaultImage = (url: string) => {
+export const isDefaultProfileImage = (url: string) => {
   return !(url || '').includes('gravatar');
 };
