@@ -52,7 +52,10 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
           sx={t => ({ marginBottom: t.space.$4 })}
           onClick={onPersonalWorkspaceClick}
         >
-          <PersonalWorkspacePreview user={user} />
+          <PersonalWorkspacePreview
+            user={user}
+            subtitle={localizationKeys('organizationSwitcher.personalWorkspace')}
+          />
         </PreviewButton>
       )}
       {!!otherOrgs.length && (
