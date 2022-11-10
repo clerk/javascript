@@ -2,7 +2,6 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useCoreClerk, useCoreOrganization, useCoreOrganizations, useCreateOrganizationContext } from '../../contexts';
-import { Button, Text } from '../../customizables';
 import {
   ContentPage,
   Form,
@@ -16,7 +15,6 @@ import { handleError, useFormControl } from '../../utils';
 import { InviteMembersForm } from '../OrganizationProfile/InviteMembersForm';
 import { InvitationsSentMessage } from '../OrganizationProfile/InviteMembersPage';
 import { OrganizationProfileAvatarUploader } from '../OrganizationProfile/OrganizationProfileAvatarUploader';
-import { OrganizationProfileBreadcrumbs } from '../OrganizationProfile/OrganizationProfileNavbar';
 
 export const CreateOrganizationPage = withCardStateProvider(() => {
   // const title = localizationKeys('userProfile.profilePage.title');
@@ -36,10 +34,6 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
     label: localizationKeys('formFieldLabel__organizationName'),
     placeholder: localizationKeys('formFieldInputPlaceholder__organizationName'),
   });
-
-  if (!organization) {
-    return null;
-  }
 
   const dataChanged = !!nameField.value;
   const canSubmit = dataChanged || !!file;
