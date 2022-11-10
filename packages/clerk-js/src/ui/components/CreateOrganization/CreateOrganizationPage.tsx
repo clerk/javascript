@@ -23,7 +23,7 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
   const title = 'Create Organization';
   const subtitle = 'Set the organization profile';
   const card = useCardState();
-  const [file, setFile] = React.useState<File>();
+  const [file, setFile] = React.useState<File | null>();
   const { createOrganization } = useCoreOrganizations();
   const { setActive, closeCreateOrganization } = useCoreClerk();
   const { mode, navigateAfterCreateOrganization } = useCreateOrganizationContext();
@@ -36,6 +36,10 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
     label: localizationKeys('formFieldLabel__organizationName'),
     placeholder: localizationKeys('formFieldInputPlaceholder__organizationName'),
   });
+
+  if (!organization) {
+    return null;
+  }
 
   const dataChanged = !!nameField.value;
   const canSubmit = dataChanged || !!file;
@@ -60,6 +64,11 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
     }
   };
 
+  const onAvatarRemove = () => {
+    card.setIdle();
+    return setFile(null);
+  };
+
   return (
     <Wizard {...wizard.props}>
       <ContentPage
@@ -72,6 +81,7 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
           <OrganizationProfileAvatarUploader
             organization={{ name: nameField.value }}
             onAvatarChange={async file => await setFile(file)}
+            onAvatarRemove={file ? onAvatarRemove : null}
           />
           <Form.ControlRow>
             <Form.Control
