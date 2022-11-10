@@ -1,42 +1,17 @@
-import { cookies } from 'next/headers';
+import { headers } from 'next/headers';
 import { NextRequest } from 'next/server';
 
 import { getAuthEdge } from '../server/getAuthEdge';
 import { buildClerkProps } from '../server/utils/getAuth';
 
-// Warning: This is insecure unless withClerkMiddleware has run
+const buildRequestLike = () => {
+  return new NextRequest('https://placeholder.com', { headers: headers() });
+};
 
-// We cannot currently detect if withClerkMiddleware has run for
-// the appDir, so we can't throw an error if they misconfigure
-// middleware, which would make this strategy quite insecure.
+export const auth = () => {
+  return getAuthEdge(buildRequestLike());
+};
 
-// Track resolution here - looks like it will be in 13.0.1:
-// https://github.com/vercel/next.js/pull/41380
-
-function buildReqLike() {
-  const session = cookies().get('__session');
-  const sessionString = typeof session === 'string' ? session : session?.value;
-
-  if (session) {
-    return new NextRequest('https://example.com', {
-      headers: new Headers({
-        'auth-result': 'standard-signed-in',
-        authorization: `Bearer ${sessionString}`,
-      }),
-    });
-  }
-
-  return new NextRequest('https://example.com', {
-    headers: new Headers({
-      'auth-result': 'standard-signed-out',
-    }),
-  });
-}
-
-export function auth() {
-  return getAuthEdge(buildReqLike());
-}
-
-export function initialState() {
-  return buildClerkProps(buildReqLike());
-}
+export const initialState = () => {
+  return buildClerkProps(buildRequestLike());
+};
