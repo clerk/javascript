@@ -35,9 +35,9 @@ export const ThreeDotsMenu = (props: ThreeDotsMenuProps) => {
         </Button>
       </MenuTrigger>
       <MenuList>
-        {actions.map(a => (
+        {actions.map((a, index) => (
           <MenuItem
-            key={`${a.label.key}${JSON.stringify(a.label.params)}`}
+            key={index}
             destructive={a.isDestructive}
             onClick={a.onClick}
             isDisabled={a.isDisabled}

@@ -45,9 +45,9 @@ export const MembersListTable = (props: MembersListTableProps) => {
         <Table sx={{ width: '100%' }}>
           <Thead>
             <Tr>
-              {headers.map(h => (
+              {headers.map((h, index) => (
                 <Th
-                  key={`${h.key}${JSON.stringify(h.params)}`}
+                  key={index}
                   localizationKey={h}
                 />
               ))}
