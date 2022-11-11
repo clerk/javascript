@@ -5,7 +5,7 @@
   <br />
 </p>
 
-# @clerk/backend-code
+# @clerk/backend-core
 
 <div align="center">
 
