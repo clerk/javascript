@@ -7,7 +7,7 @@ export * from './file';
 export * from './index';
 export * from './instance';
 export * from './isRetinaDisplay';
-export * from './key';
+export * from './keys';
 export * from './localStorageBroadcastChannel';
 export * from './mimeTypeExtensions';
 export * from './noop';
