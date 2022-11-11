@@ -1,9 +1,9 @@
-import { Clerk } from '@clerk/types';
+import { Clerk, SignInFirstFactor } from '@clerk/types';
 
 import { getInitialEnvironmentResource, getInitialMockClerkConfig, getInitialRouteContextValue } from './mockConfigs';
 
-const applyOptionsToInitialMockConfig = (fixtureConfig: any) => {
-  const mockClerkConfig = getInitialMockClerkConfig();
+const applyOptionsToInitialMockContext = (fixtureConfig: any) => {
+  const mockClerkContext = getInitialMockClerkConfig();
   const mockEnvironmentResource = getInitialEnvironmentResource();
   const mockRouteContextValue = getInitialRouteContextValue();
 
@@ -14,21 +14,24 @@ const applyOptionsToInitialMockConfig = (fixtureConfig: any) => {
   fixtureConfig.environment.enabledFirstFactorIdentifiers.forEach((identifier: any) => {
     mockEnvironmentResource.userSettings.enabledFirstFactorIdentifiers.push(identifier.identifier);
   });
-  mockClerkConfig.client.signIn.create = fixtureConfig.client.signIn.create;
+  fixtureConfig.client.signIn.supportedFirstFactors.forEach((factorStrategy: SignInFirstFactor) => {
+    mockClerkContext.client.signIn.supportedFirstFactors.push(factorStrategy);
+  });
+  mockClerkContext.client.signIn.create = fixtureConfig.client.signIn.create;
   mockRouteContextValue.navigate = fixtureConfig.routeContext.navigate;
 
-  return { mockClerkConfig, mockEnvironmentResource, mockRouteContextValue };
+  return { mockClerkContext, mockEnvironmentResource, mockRouteContextValue };
 };
 
 export const createClerkMockContexts = (fixtureConfig: any) => {
-  const { mockClerkConfig, mockEnvironmentResource, mockRouteContextValue } =
-    applyOptionsToInitialMockConfig(fixtureConfig);
+  const { mockClerkContext, mockEnvironmentResource, mockRouteContextValue } =
+    applyOptionsToInitialMockContext(fixtureConfig);
   const listeners: any[] = [];
 
-  const client = mockClerkConfig.client;
-  const session = mockClerkConfig.session;
-  const user = mockClerkConfig.user;
-  const organization = mockClerkConfig.organization;
+  const client = mockClerkContext.client;
+  const session = mockClerkContext.session;
+  const user = mockClerkContext.user;
+  const organization = mockClerkContext.organization;
   const resources = { client, session, user, organization };
   const addListener = (listener: any) => {
     listeners.push(listener);

@@ -1,5 +1,5 @@
-import { SignInStatus } from '@clerk/types';
-import { getOAuthProviderData, OAuthProvider } from '@clerk/types/src';
+import { SignInFactorStrategy } from '@clerk/backend-core/src';
+import { getOAuthProviderData, OAuthProvider, SignInStatus } from '@clerk/types';
 import React from 'react';
 
 import { ComponentContext, EnvironmentProvider } from '../../contexts';
@@ -15,14 +15,10 @@ type FParam = {
   withUsername: () => void;
   withEmailAddress: () => void;
   withPhoneNumber: () => void;
-  withGoogleOAuth: () => void;
-  withDiscordOAuth: () => void;
-  withInstagramOAuth: () => void;
-  withAllOAuth: () => void;
-  withPhoneCode: () => void;
   mockSignInCreate: (opts?: { responseStatus: SignInStatus }) => typeof jest.fn;
   mockRouteNavigate: () => typeof jest.fn;
   withSocialOAuth: (provider: OAuthProvider) => void;
+  withAuthFirstFactor: (firstFactorStrategy: SignInFactorStrategy) => void;
 };
 
 type ConfigFn = (f: FParam) => void;
@@ -32,6 +28,11 @@ export const createFixture = (configFn?: ConfigFn) => {
   const f = {
     withSocialOAuth: (provider: OAuthProvider) => {
       config.environment.social.push(getOAuthProviderData({ provider }));
+    },
+    withAuthFirstFactor: (firstFactorStrategy: SignInFactorStrategy) => {
+      config.client.signIn.supportedFirstFactors.push({
+        strategy: firstFactorStrategy,
+      });
     },
     withUsername: () => {
       config.environment.enabledFirstFactorIdentifiers.push({
