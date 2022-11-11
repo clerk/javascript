@@ -9,16 +9,16 @@ const KEY = '__clerk_client_jwt';
 export let clerk: HeadlessBrowserClerk;
 
 type BuildClerkOptions = {
-  frontendApi: string;
+  key: string;
   tokenCache?: TokenCache;
 };
 
-export function buildClerk({ frontendApi, tokenCache }: BuildClerkOptions): HeadlessBrowserClerk {
+export function buildClerk({ key, tokenCache }: BuildClerkOptions): HeadlessBrowserClerk {
   if (!clerk) {
     const getToken = (tokenCache && tokenCache.getToken) ?? getTokenFromMemory;
     const saveToken = (tokenCache && tokenCache.saveToken) ?? saveTokenInMemory;
 
-    clerk = new Clerk(frontendApi);
+    clerk = new Clerk(key);
 
     if (!tokenCache) {
       return clerk;
