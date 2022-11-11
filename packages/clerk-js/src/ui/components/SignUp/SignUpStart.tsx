@@ -128,10 +128,6 @@ function _SignUpStart(): JSX.Element {
   };
 
   React.useLayoutEffect(() => {
-    // Don't proceed with token flow if there are still optional fields to fill in
-    if (Object.values(fields).some(f => f && !f.required)) {
-      return;
-    }
     void handleTokenFlow();
   }, []);
 
