@@ -1,4 +1,4 @@
-import { createDeferredPromise } from '@clerk/shared';
+import { createDeferredPromise, snakeToCamel } from '@clerk/shared';
 import type {
   Appearance,
   Clerk,
@@ -15,7 +15,7 @@ import { createRoot } from 'react-dom/client';
 
 import { PRESERVED_QUERYSTRING_PARAMS } from '../core/constants';
 import { clerkUIErrorDOMElementNotFound } from '../core/errors';
-import { buildURL, getClerkQueryParam, windowNavigate } from '../utils';
+import { getClerkQueryParam, removeClerkQueryParam } from '../utils';
 import { CreateOrganization, CreateOrganizationModal } from './components/CreateOrganization';
 import { ImpersonationFab } from './components/ImpersonationFab';
 import { OrganizationProfile, OrganizationProfileModal } from './components/OrganizationProfile';
@@ -135,6 +135,15 @@ export type MountComponentRenderer = typeof mountComponentRenderer;
 
 const componentsControls = {} as ComponentControls;
 
+// TODO: move this elsewhere
+const componentNodes = Object.freeze({
+  signUp: 'signUpModal',
+  singIn: 'signInModal',
+  user: 'userProfileModal',
+  organization: 'organizationProfileModal',
+  createOrganization: 'createOrganizationModal',
+});
+
 const Components = (props: ComponentsProps) => {
   const [state, setState] = React.useState<ComponentsState>({
     appearance: props.options.appearance,
@@ -149,58 +158,19 @@ const Components = (props: ComponentsProps) => {
   const { signInModal, signUpModal, userProfileModal, organizationProfileModal, createOrganizationModal, nodes } =
     state;
 
+  // TODO: rename these
   const urlClerkState = getClerkQueryParam('__clerk_state') ?? '';
-
-  // TODO: this will be greatly refactored and moved elsewhere
-  const getState = () => {
-    const fullPath = urlClerkState?.split('__')[0] || '';
-    const basePath = fullPath?.split('/')[1] || '';
-    const isModal = Boolean(urlClerkState?.split('__')[1]?.split('=')[1]);
-    const url = new URL(window.location.href);
-    const params = new URLSearchParams(url.search);
-
-    // // Delete the foo parameter.
-    // params.delete('__clerk_state');
-    // window.history.pushState({}, '', url);``
-    // const po = new URL(window.location.href).searchParams.delete('__clerk_state');
-
-    console.log(params, 'params');
-    console.log(props, 'props');
-
-    // props.options.navigate(window.location.href)
-
-    return { isModal, fullPath, basePath };
-  };
-
-  const urlState = {
-    user: 'userProfileModal',
-  };
-
-  // const po = getState();
-  // console.log(window.location.href);
-
-  // useEffect(() => {
-  // const url = new URL(window.location.href);
-  // const searchParams = new URL(window.location.href).search;
-  // const params = new URLSearchParams(url.search);
-
-  // // Delete the foo parameter.
-  // // params.delete('__clerk_state');
-  // console.log(params, 'paramsa')
-  // console.log(searchParams, 'searchParams')
-  // console.log(url, 'url')
-  // windowNavigate(url);
-  // buildURL({ base: url, params }, { stringify: true });
-  // }, []);
+  const decodedRedirectParams = urlClerkState ? JSON.parse(atob(urlClerkState)) : null;
 
   useSafeLayoutEffect(() => {
-    const { isModal, basePath } = getState();
+    if (urlClerkState && decodedRedirectParams && decodedRedirectParams?.modal) {
+      setState(s => ({
+        ...s,
+        [componentNodes[snakeToCamel(decodedRedirectParams.basePath)]]: {},
+        options: { ...s.options, startPath: decodedRedirectParams.fullPath },
+      }));
 
-    if (urlClerkState && isModal) {
-      setState(s => ({ ...s, [urlState[basePath]]: {} }));
-
-      // Delete the foo parameter.
-      // params.delete('__clerk_state');
+      removeClerkQueryParam('__clerk_state');
     }
 
     componentsControls.mountComponent = params => {
@@ -233,7 +203,7 @@ const Components = (props: ComponentsProps) => {
     };
 
     componentsControls.closeModal = name => {
-      setState(s => ({ ...s, [name + 'Modal']: null }));
+      setState(s => ({ ...s, [name + 'Modal']: null, options: { ...s.options, startPath: null } }));
     };
 
     componentsControls.openModal = (name, props) => {
@@ -255,7 +225,7 @@ const Components = (props: ComponentsProps) => {
             <VirtualRouter
               preservedParams={PRESERVED_QUERYSTRING_PARAMS}
               onExternalNavigate={() => componentsControls.closeModal('signIn')}
-              startPath='/sign-in'
+              startPath={state.options?.startPath || '/sign-in'}
             >
               <SignInModal {...signInModal} />
               <SignUpModal
@@ -282,7 +252,7 @@ const Components = (props: ComponentsProps) => {
             <VirtualRouter
               preservedParams={PRESERVED_QUERYSTRING_PARAMS}
               onExternalNavigate={() => componentsControls.closeModal('signUp')}
-              startPath='/sign-up'
+              startPath={state.options?.startPath || '/sign-up'}
             >
               <SignInModal
                 afterSignInUrl={signUpModal?.afterSignInUrl}
@@ -313,8 +283,7 @@ const Components = (props: ComponentsProps) => {
             <VirtualRouter
               preservedParams={PRESERVED_QUERYSTRING_PARAMS}
               onExternalNavigate={() => componentsControls.closeModal('userProfile')}
-              // startPath={'/user'}
-              startPath={getState()?.fullPath || '/user'}
+              startPath={state.options?.startPath || '/user'}
             >
               <UserProfileModal />
             </VirtualRouter>
@@ -340,7 +309,7 @@ const Components = (props: ComponentsProps) => {
             <VirtualRouter
               preservedParams={PRESERVED_QUERYSTRING_PARAMS}
               onExternalNavigate={() => componentsControls.closeModal('organizationProfile')}
-              startPath='/organizationProfile'
+              startPath={state.options?.startPath || '/organization'}
             >
               <OrganizationProfileModal {...organizationProfileModal} />
             </VirtualRouter>
@@ -366,7 +335,7 @@ const Components = (props: ComponentsProps) => {
             <VirtualRouter
               preservedParams={PRESERVED_QUERYSTRING_PARAMS}
               onExternalNavigate={() => componentsControls.closeModal('createOrganization')}
-              startPath='/createOrganization'
+              startPath={state.options?.startPath || '/create-organization'}
             >
               <CreateOrganizationModal {...createOrganizationModal} />
             </VirtualRouter>

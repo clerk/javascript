@@ -47,7 +47,7 @@ export const CreateOrganizationModal = (props: CreateOrganizationProps): JSX.Ele
   };
 
   return (
-    <Route path='createOrganization'>
+    <Route path='create-organization'>
       <ComponentContext.Provider value={createOrganizationProps}>
         <div>
           <CreateOrganization />

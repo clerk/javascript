@@ -57,7 +57,7 @@ export const OrganizationProfileModal = (props: OrganizationProfileProps): JSX.E
   };
 
   return (
-    <Route path='organizationProfile'>
+    <Route path='organization'>
       <ComponentContext.Provider value={organizationProfileProps}>
         {/*TODO: Used by InvisibleRootBox, can we simplify? */}
         <div>

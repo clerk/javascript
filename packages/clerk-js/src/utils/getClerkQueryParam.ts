@@ -22,3 +22,10 @@ export function getClerkQueryParam<T extends ClerkQueryParam>(param: T): ClerkQu
   const val = new URL(window.location.href).searchParams.get(param);
   return val ? (val as ClerkQueryParamsToValuesMap[T]) : null;
 }
+
+export function removeClerkQueryParam<T extends ClerkQueryParam>(param: T) {
+  new URL(window.location.href).searchParams.delete(param);
+  const strippedUrl = new URL(`${window.location.origin}${window.location.pathname}`);
+  window.history.pushState({}, '', strippedUrl);
+  return;
+}

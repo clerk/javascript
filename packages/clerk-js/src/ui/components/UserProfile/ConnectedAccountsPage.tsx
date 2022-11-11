@@ -49,7 +49,12 @@ const AddConnectedAccount = () => {
   const { currentPath } = useRouter();
   const isModal = useUserProfileContext().mode === 'modal';
 
-  const params = `${currentPath.replace('/CLERK-ROUTER/VIRTUAL', '')}__modal=${isModal}`;
+  const redirectParams = {
+    basePath: currentPath.replace('/CLERK-ROUTER/VIRTUAL', '')?.split('/')[1] || '',
+    fullPath: currentPath.replace('/CLERK-ROUTER/VIRTUAL', ''),
+    modal: isModal,
+  };
+  const encodedRedirectParams = btoa(JSON.stringify(redirectParams));
 
   const enabledStrategies = strategies.filter(s => s.startsWith('oauth')) as OAuthStrategy[];
   const connectedStrategies = user.verifiedExternalAccounts.map(a => 'oauth_' + a.provider) as OAuthStrategy[];
@@ -65,7 +70,7 @@ const AddConnectedAccount = () => {
     user
       .createExternalAccount({
         strategy: strategy,
-        redirect_url: `${window.location.href}?__clerk_state=${params}`,
+        redirect_url: `${window.location.href}?__clerk_state=${encodedRedirectParams}`,
       })
       .then(res => {
         if (res.verification?.externalVerificationRedirectURL) {
