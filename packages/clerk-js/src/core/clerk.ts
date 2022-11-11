@@ -1,4 +1,10 @@
-import { inClientSide, LocalStorageBroadcastChannel, noop } from '@clerk/shared';
+import {
+  inClientSide,
+  isLegacyFrontendApiKey,
+  LocalStorageBroadcastChannel,
+  noop,
+  parsePublishableKey,
+} from '@clerk/shared';
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
@@ -19,6 +25,7 @@ import type {
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
+  PublishableKey,
   RedirectOptions,
   Resources,
   SetActiveParams,
@@ -42,6 +49,7 @@ import {
   buildURL,
   createBeforeUnloadTracker,
   createPageLifecycle,
+  errorThrower,
   getClerkQueryParam,
   hasExternalAccountSignUpError,
   ignoreEventValue,
@@ -60,8 +68,6 @@ import { DEV_BROWSER_SSO_JWT_PARAMETER, ERROR_CODES } from './constants';
 import createDevBrowserHandler, { DevBrowserHandler } from './devBrowserHandler';
 import {
   clerkErrorInitFailed,
-  clerkErrorInvalidFrontendApi,
-  clerkErrorNoFrontendApi,
   clerkMissingDevBrowserJwt,
   clerkOAuthCallbackDidNotCompleteSignInSIgnUp,
 } from './errors';
@@ -84,6 +90,7 @@ declare global {
   interface Window {
     Clerk?: Clerk;
     __clerk_frontend_api?: string;
+    __clerk_publishable_key?: string;
   }
 }
 
@@ -101,6 +108,7 @@ export default class Clerk implements ClerkInterface {
   public organization?: OrganizationResource | null;
   public user?: UserResource | null;
   public frontendApi: string;
+  public publishableKey?: string;
 
   #authService: AuthenticationService | null = null;
   #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
@@ -124,19 +132,29 @@ export default class Clerk implements ClerkInterface {
     return this.#isReady;
   }
 
-  public constructor(frontendApi: string) {
-    if (!frontendApi) {
-      clerkErrorNoFrontendApi();
-    }
-    if (!validateFrontendApi(frontendApi)) {
-      clerkErrorInvalidFrontendApi();
-    }
+  public constructor(key: string) {
+    key = (key || '').trim();
 
-    this.frontendApi = frontendApi;
+    if (isLegacyFrontendApiKey(key)) {
+      if (!validateFrontendApi(key)) {
+        errorThrower.throwInvalidFrontendApiError({ key });
+      }
 
-    this.#instanceType = isDevOrStagingUrl(this.frontendApi) ? 'development' : 'production';
+      this.frontendApi = key;
+      this.#instanceType = isDevOrStagingUrl(this.frontendApi) ? 'development' : 'production';
+    } else {
+      const publishableKey = parsePublishableKey(key);
+
+      if (!publishableKey) {
+        errorThrower.throwInvalidPublishableKeyError({ key });
+      }
+
+      const { frontendApi, instanceType } = publishableKey as PublishableKey;
+
+      this.frontendApi = frontendApi;
+      this.#instanceType = instanceType;
+    }
     this.#fapiClient = createFapiClient(this);
-
     BaseResource.clerk = this;
   }
 

@@ -3,6 +3,7 @@ export * from './cookies';
 export * from './email';
 export * from './encoders';
 export * from './errors';
+export * from './errorThrower';
 export * from './getClerkQueryParam';
 export * from './getClerkQueryParam';
 export * from './hex';

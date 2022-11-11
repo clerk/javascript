@@ -43,6 +43,10 @@ export class AuthenticationService {
   }
 
   private refreshTokenOnVisibilityChange() {
+    if (!inBrowser()) {
+      return;
+    }
+
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
         void this.refreshSessionToken();
