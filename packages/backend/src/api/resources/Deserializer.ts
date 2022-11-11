@@ -2,10 +2,12 @@ import {
   AllowlistIdentifier,
   Client,
   Email,
+  EmailAddress,
   Invitation,
   Organization,
   OrganizationInvitation,
   OrganizationMembership,
+  PhoneNumber,
   RedirectUrl,
   Session,
   SignInToken,
@@ -47,6 +49,8 @@ function jsonToObject(item: any): any {
       return Client.fromJSON(item);
     case ObjectType.Email:
       return Email.fromJSON(item);
+    case ObjectType.EmailAddress:
+      return EmailAddress.fromJSON(item);
     case ObjectType.Invitation:
       return Invitation.fromJSON(item);
     case ObjectType.Organization:
@@ -55,6 +59,8 @@ function jsonToObject(item: any): any {
       return OrganizationInvitation.fromJSON(item);
     case ObjectType.OrganizationMembership:
       return OrganizationMembership.fromJSON(item);
+    case ObjectType.PhoneNumber:
+      return PhoneNumber.fromJSON(item);
     case ObjectType.RedirectUrl:
       return RedirectUrl.fromJSON(item);
     case ObjectType.SignInToken:

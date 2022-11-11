@@ -2,10 +2,12 @@ import { API_KEY, API_URL, API_VERSION, USER_AGENT } from '../constants';
 import {
   AllowlistIdentifierAPI,
   ClientAPI,
+  EmailAddressAPI,
   EmailAPI,
   InterstitialAPI,
   InvitationAPI,
   OrganizationAPI,
+  PhoneNumberAPI,
   RedirectUrlAPI,
   SessionAPI,
   SignInTokenAPI,
@@ -33,14 +35,16 @@ export function createBackendApiClient(options?: ClerkBackendAPIOptions) {
   return {
     allowlistIdentifiers: new AllowlistIdentifierAPI(request),
     clients: new ClientAPI(request),
+    emailAddresses: new EmailAddressAPI(request),
     emails: new EmailAPI(request),
     interstitial: new InterstitialAPI(request),
     invitations: new InvitationAPI(request),
     organizations: new OrganizationAPI(request),
+    phoneNumbers: new PhoneNumberAPI(request),
     redirectUrls: new RedirectUrlAPI(request),
     sessions: new SessionAPI(request),
     signInTokens: new SignInTokenAPI(request),
-    smsMessage: new SMSMessageAPI(request),
+    smsMessages: new SMSMessageAPI(request),
     users: new UserAPI(request),
   };
 }
