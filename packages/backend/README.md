@@ -42,8 +42,48 @@ npm install @clerk/backend
 To build the package locally with the TypeScript compiler, run:
 
 ```sh
-npm run build
+npm run build -w @clerk/backend
 ```
+
+## API
+
+This package exports the following methods:
+
+### Clerk Backend API HTTP client
+
+**createBackendApiClient(options?: ClerkBackendAPIOptions)**
+
+Creates a Clerk Backend API to consume the RestFul API client
+
+### Token verification
+
+**function getAuthState(options: AuthStateOptions)**
+
+Compute the authState from the request parameters
+
+**loadInterstitialFromLocal()**
+
+Return the interstitial HTML as a string
+
+**loadInterstitialFromBAPI(options: LoadInterstitialOptions)**
+
+Return the interstitial HTML from Backend API
+
+**verifyToken(token: string, options: VerifyTokenOptions)**
+
+Verifies any Clerk generated JWT. The key resolution (via JWKS or local environment variables) is done automatically.
+
+**verifyJwt(token: string, options: VerifyJwtOptions)**
+
+Verified any Clerk generated JWT. The key needs to be provided.
+
+**decodeJwt(token: string)**
+
+Decodes any Clerk generaterd JWT
+
+**hasValidSignature(jwt: Jwt, jwk: JsonWebKey)**
+
+Verified that the JWT has a valid signature
 
 ## License
 
