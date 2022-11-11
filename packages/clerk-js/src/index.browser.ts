@@ -12,7 +12,7 @@ const publishableKey =
 
 const frontendApi =
   document.querySelector('script[data-clerk-frontend-api]')?.getAttribute('data-clerk-frontend-api') ||
-  window.__clerk_publishable_key ||
+  window.__clerk_frontend_api ||
   '';
 
 window.Clerk = new Clerk(publishableKey || frontendApi);

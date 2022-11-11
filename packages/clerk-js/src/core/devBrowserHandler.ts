@@ -170,7 +170,7 @@ export default function createDevBrowserHandler({
       return setFirstPartyCookieForDevBrowser();
     }
 
-    if (!devOrStgHost && !getDevBrowserJWT()) {
+    if (!devOrStgHost && devOrStgApi && !getDevBrowserJWT()) {
       return setThirdPartyCookieForDevBrowser();
     }
   }
