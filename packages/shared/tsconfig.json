@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "target": "es2020",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
