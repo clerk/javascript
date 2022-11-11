@@ -26,3 +26,4 @@
 - [] Add tribute to https://github.com/cfworker/cfworker/tree/main/packages/jwt
 - [] Make test suite files load dynamically so that we don't need to manually update `suites.ts` every time we add a new test file.
 - [] Run suite in Deno runtime
+- [] Dynamic resource parsing to remove the deserializer
