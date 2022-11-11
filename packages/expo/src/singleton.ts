@@ -10,16 +10,16 @@ const KEY = '__clerk_client_jwt';
 export let clerk: ClerkProp;
 
 type BuildClerkOptions = {
-  frontendApi: string;
+  publishableKey: string;
   tokenCache?: TokenCache;
 };
 
-export function buildClerk({ frontendApi, tokenCache }: BuildClerkOptions): ClerkProp {
+export function buildClerk({ publishableKey, tokenCache }: BuildClerkOptions): ClerkProp {
   const getToken = (tokenCache && tokenCache.getToken) ?? getTokenFromMemory;
   const saveToken = (tokenCache && tokenCache.saveToken) ?? saveTokenInMemory;
 
   if (!clerk) {
-    clerk = new Clerk(frontendApi);
+    clerk = new Clerk(publishableKey);
 
     if (!tokenCache) {
       return clerk;
