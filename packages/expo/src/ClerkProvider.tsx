@@ -1,26 +1,34 @@
 import './polyfills';
 
-import { ClerkProvider as ClerkReactProvider, ClerkProviderProps as ClerkReactProviderProps } from '@clerk/clerk-react';
+import {
+  __internal__setErrorThrowerOptions,
+  ClerkProvider as ClerkReactProvider,
+  ClerkProviderProps as ClerkReactProviderProps,
+} from '@clerk/clerk-react';
 import React from 'react';
 
 import type { TokenCache } from './cache';
 import { isReactNative } from './runtime';
 import { buildClerk } from './singleton';
 
+__internal__setErrorThrowerOptions({
+  packageName: '@clerk/expo',
+});
+
 export type ClerkProviderProps = ClerkReactProviderProps & {
   children: React.ReactNode;
   tokenCache?: TokenCache;
-  hotload?: boolean;
 };
 
 export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
   const { children, tokenCache, ...rest } = props;
-  const frontendApi = props.frontendApi || process.env.CLERK_FRONTEND_API || '';
+  const publishableKey =
+    props.publishableKey || process.env.CLERK_PUBLISHABLE_KEY || process.env.CLERK_FRONTEND_API || '';
 
   return (
     <ClerkReactProvider
       {...rest}
-      Clerk={buildClerk({ frontendApi, tokenCache })}
+      Clerk={buildClerk({ publishableKey, tokenCache })}
       standardBrowser={!isReactNative()}
     >
       {children}
