@@ -18,6 +18,7 @@
 
 ## Remaining tasks
 
+- [] Polish API key, url, and version injection
 - [] Export CJS and ESM without [dual package hazard](https://github.com/nodejs/modules/issues/409)
 - [] Build test coverage
 - [] Run suite in Deno runtime
