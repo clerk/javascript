@@ -22,17 +22,6 @@ export function clerkErrorPathRouterMissingPath(componentName: string): never {
   );
 }
 
-export function clerkErrorNoFrontendApi(): never {
-  throw new Error(`${errorPrefix} Missing frontendAPI option.`);
-}
-
-export function clerkErrorInvalidFrontendApi(): never {
-  throw new Error(
-    `${errorPrefix} Invalid frontendAPI option. Go to the instance home page at https://dashboard.clerk.dev and get your Frontend API value.
-    `,
-  );
-}
-
 export function clerkErrorInvalidColor(name: string): never {
   throw new Error(`${errorPrefix} You're using an invalid ${name} color. Change the ${name} color from the dashboard.`);
 }

@@ -68,10 +68,8 @@ export default function createDevBrowserHandler({
   }
 
   async function setupUrlDecorationMode(): Promise<void> {
-    console.log('Url decoration mode onload', window.location.hash);
-    const flag = '&_clerk_test_jwt=';
+    const flag = '&__clerk_test_jwt=';
     const hashParts = window.location.hash.split(flag);
-    console.log('Url decoration mode onload', hashParts);
     if (hashParts.length === 2) {
       setDevBrowserJWT(hashParts[1]);
       const newURL = new URL(window.location.href);
