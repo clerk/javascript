@@ -16,7 +16,7 @@ describe.concurrent('errorReporter', () => {
           InvalidPublishableKeyErrorMessage:
             'This is a custom error message for key={{key}} and {{unknown_replacement}}',
         })
-        .errorReporter.throwInvalidPublishableKeyError({ key: 'whatever' }),
+        .throwInvalidPublishableKeyError({ key: 'whatever' }),
     ).toThrow('@clerk/test-package: This is a custom error message for key=whatever and');
   });
 });
