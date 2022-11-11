@@ -3,16 +3,17 @@ import sinon from 'sinon';
 
 import runtime from '../runtime';
 import { jsonOk } from '../util/mockFetch';
-import { type AuthStateParams, AuthState, getAuthState } from './authState';
+import { type AuthStateOptions, AuthStatus, getAuthState } from './authState';
 import { mockJwks, mockJwt, mockJwtPayload } from './fixtures';
 
 export default (QUnit: QUnit) => {
-  const { module, test } = QUnit;
+  const { module, test, todo } = QUnit;
 
   /* An otherwise bare state on a request. */
-  const defaultMockAuthState: AuthStateParams = {
+  const defaultMockAuthState: AuthStateOptions = {
     apiKey: 'deadbeef',
     apiUrl: 'https://api.clerk.test',
+    apiVersion: 'v1',
     host: 'example.com',
     userAgent: 'Mozilla/TestAgent',
     skipJwksCache: true,
@@ -34,9 +35,13 @@ export default (QUnit: QUnit) => {
       sinon.restore();
     });
 
-    // module.todo('throws if jwk fails to load from local');
+    todo('throws if jwk fails to load from local', assert => {
+      assert.true(true);
+    });
 
-    // module.todo('throws if jwk fails to load from remote');
+    todo('throws if jwk fails to load from remote', assert => {
+      assert.true(true);
+    });
 
     test('returns the signed in state when a valid token is in HTTP Authorization header', async assert => {
       const authState = await getAuthState({
@@ -44,19 +49,28 @@ export default (QUnit: QUnit) => {
         headerToken: mockJwt,
       });
 
-      assert.deepEqual(authState, {
-        session: {
-          id: mockJwtPayload.sid,
-          orgId: undefined,
-          orgRole: undefined,
-          userId: mockJwtPayload.sub,
-        },
+      assert.propContains(authState, {
+        status: AuthStatus.SignedIn,
         sessionClaims: mockJwtPayload,
-        status: 'signed-in',
-      } as AuthState);
+        sessionId: mockJwtPayload.sid,
+        session: undefined,
+        userId: mockJwtPayload.sub,
+        user: undefined,
+        orgId: undefined,
+        orgRole: undefined,
+        organization: undefined,
+        getToken: {},
+      });
     });
 
-    test('returns the signed our state when a token with invalid authorizedParties is in HTTP Authorization header', async assert => {
+    todo(
+      'returns the full signed in state when a valid token is in HTTP Authorization header, the organizations are enabled and the resources are loaded',
+      assert => {
+        assert.true(true);
+      },
+    );
+
+    test('returns the signed out state when a token with invalid authorizedParties is in HTTP Authorization header', async assert => {
       const authState = await getAuthState({
         ...defaultMockAuthState,
         headerToken: mockJwt,
@@ -68,10 +82,18 @@ export default (QUnit: QUnit) => {
           'Invalid JWT Authorized party claim (azp) "https://accounts.inspired.puma-74.lcl.dev". Expected "whatever". (reason=token-verification-failed, carrier=header)',
         reason: 'token-verification-error',
         status: 'signed-out',
+        sessionId: null,
+        session: null,
+        userId: null,
+        user: null,
+        orgId: null,
+        orgRole: null,
+        organization: null,
+        getToken: {},
       });
     });
 
-    test('returns the signed our state when an invalid token is in HTTP Authorization header', async assert => {
+    test('returns the signed out state when an invalid token is in HTTP Authorization header', async assert => {
       const authState = await getAuthState({
         ...defaultMockAuthState,
         headerToken: 'test_header_token',
@@ -82,6 +104,14 @@ export default (QUnit: QUnit) => {
           'Invalid JWT form. A JWT consists of three parts separated by dots. (reason=token-invalid, carrier=header)',
         reason: 'token-verification-error',
         status: 'signed-out',
+        sessionId: null,
+        session: null,
+        userId: null,
+        user: null,
+        orgId: null,
+        orgRole: null,
+        organization: null,
+        getToken: {},
       });
     });
   });

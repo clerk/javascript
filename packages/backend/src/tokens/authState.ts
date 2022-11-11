@@ -1,19 +1,30 @@
-import type { JwtPayload } from '@clerk/types';
+import type { JwtPayload, ServerGetToken } from '@clerk/types';
 
+import { createBackendApiClient } from '../api';
+import { Organization, Session, User } from '../api/resources';
+import { API_URL, API_VERSION } from '../constants';
 import { isDevelopmentFromApiKey, isProductionFromApiKey } from '../util/instance';
 import { checkCrossOrigin } from '../util/request';
 import { TokenVerificationError, TokenVerificationErrorReason } from './errors';
+import { createGetToken } from './getToken';
 import { type VerifyTokenOptions, verifyToken } from './verify';
 
-type RequiredVerifyTokenOptions = Required<Pick<VerifyTokenOptions, 'apiKey' | 'apiUrl'>>;
+type RequiredVerifyTokenOptions = Required<Pick<VerifyTokenOptions, 'apiKey' | 'apiUrl' | 'apiVersion'>>;
 type OptionalVerifyTokenOptions = Partial<
   Pick<VerifyTokenOptions, 'authorizedParties' | 'clockSkewInSeconds' | 'jwksCacheTtlInMs' | 'skipJwksCache'>
 >;
 
 export type TokenCarrier = 'header' | 'cookie';
 
-export type AuthStateParams = RequiredVerifyTokenOptions &
-  OptionalVerifyTokenOptions & {
+type LoadResourcesOptions = {
+  loadSession?: boolean;
+  loadUser?: boolean;
+  loadOrganization?: boolean;
+};
+
+export type AuthStateOptions = RequiredVerifyTokenOptions &
+  OptionalVerifyTokenOptions &
+  LoadResourcesOptions & {
     /* Client token cookie value */
     cookieToken?: string;
     /* Client uat cookie value */
@@ -74,14 +85,29 @@ export enum AuthStatus {
 
 export type SignedInAuthState = {
   status: AuthStatus.SignedIn;
-  session: any; // TODO:
   sessionClaims: JwtPayload;
+  sessionId: string;
+  session?: Session;
+  userId: string;
+  user?: User;
+  orgId?: string;
+  orgRole?: string;
+  organization?: Organization;
+  getToken: ServerGetToken;
 };
 
 export type SignedOutAuthState = {
   status: AuthStatus.SignedOut;
   message: string;
   reason: AuthStateReason;
+  sessionId: null;
+  session: null;
+  userId: null;
+  user: null;
+  orgId: null;
+  orgRole: null;
+  organization: null;
+  getToken: ServerGetToken;
 };
 
 export type InterstitialAuthState = {
@@ -91,14 +117,17 @@ export type InterstitialAuthState = {
 
 export type AuthState = SignedInAuthState | SignedOutAuthState | InterstitialAuthState;
 
-export async function getAuthState(params: AuthStateParams): Promise<AuthState> {
-  if (params.headerToken) {
-    return handleRequestWithTokenInHeader(params);
+export async function getAuthState(options: AuthStateOptions): Promise<AuthState> {
+  options.apiUrl = options.apiUrl || API_URL;
+  options.apiVersion = options.apiVersion || API_VERSION;
+
+  if (options.headerToken) {
+    return handleRequestWithTokenInHeader(options);
   }
-  return handleRequestWithTokenInCookie(params);
+  return handleRequestWithTokenInCookie(options);
 }
 
-async function handleRequestWithTokenInHeader({ headerToken, ...rest }: AuthStateParams) {
+async function handleRequestWithTokenInHeader({ headerToken, ...rest }: AuthStateOptions) {
   try {
     return await buildAuthenticatedState(headerToken!, rest);
   } catch (err) {
@@ -106,8 +135,8 @@ async function handleRequestWithTokenInHeader({ headerToken, ...rest }: AuthStat
   }
 }
 
-async function handleRequestWithTokenInCookie(params: AuthStateParams) {
-  const signedOutOrInterstitial = runInterstitialRules(params, [
+async function handleRequestWithTokenInCookie(options: AuthStateOptions) {
+  const signedOutOrInterstitial = runInterstitialRules(options, [
     nonBrowserRequestInDevRule,
     crossOriginRequestWithoutHeader,
     potentialFirstLoadInDevWhenUATMissing,
@@ -122,10 +151,10 @@ async function handleRequestWithTokenInCookie(params: AuthStateParams) {
   }
 
   try {
-    const { cookieToken, ...rest } = params;
+    const { cookieToken, ...rest } = options;
     const authenticatedState = await buildAuthenticatedState(cookieToken!, rest);
 
-    if (!params.clientUat || cookieTokenIsOutdated(authenticatedState.sessionClaims, params.clientUat)) {
+    if (!options.clientUat || cookieTokenIsOutdated(authenticatedState.sessionClaims, options.clientUat)) {
       return interstitial(AuthStateReason.CookieOutDated);
     }
 
@@ -135,15 +164,15 @@ async function handleRequestWithTokenInCookie(params: AuthStateParams) {
   }
 }
 
-async function buildAuthenticatedState(token: string, params: Omit<AuthStateParams, 'headerToken' | 'cookieToken'>) {
+async function buildAuthenticatedState(token: string, options: Omit<AuthStateOptions, 'headerToken' | 'cookieToken'>) {
   const issuer = (iss: string) => iss.startsWith('https://clerk.');
 
   const sessionClaims = await verifyToken(token, {
-    ...params,
+    ...options,
     issuer,
   });
 
-  return signedIn(sessionClaims);
+  return signedIn(sessionClaims, options);
 }
 
 function handleError(err: unknown, tokenCarrier: TokenCarrier) {
@@ -167,16 +196,57 @@ function cookieTokenIsOutdated(jwt: JwtPayload, clientUat: string) {
   return jwt.iat < Number.parseInt(clientUat);
 }
 
-function signedIn(sessionClaims: JwtPayload): SignedInAuthState {
-  // TODO: Do we need this to be an API Session object?
-  const session = {
-    id: sessionClaims.sid,
-    userId: sessionClaims.sub,
-    orgId: sessionClaims.org_id,
-    orgRole: sessionClaims.org_role,
-  };
+async function signedIn(
+  sessionClaims: JwtPayload,
+  {
+    apiKey,
+    apiUrl,
+    apiVersion,
+    cookieToken,
+    headerToken,
+    loadSession,
+    loadUser,
+    loadOrganization,
+  }: LoadResourcesOptions & Pick<AuthStateOptions, 'apiKey' | 'apiUrl' | 'apiVersion' | 'cookieToken' | 'headerToken'>,
+): Promise<SignedInAuthState> {
+  const { sid: sessionId, org_id: orgId, org_role: orgRole, sub: userId } = sessionClaims;
 
-  return { status: AuthStatus.SignedIn, session, sessionClaims };
+  const { sessions, users, organizations } = createBackendApiClient({
+    apiKey,
+    apiUrl,
+    apiVersion,
+  });
+
+  const [sessionResp, userResp, organizationResp] = await Promise.all([
+    loadSession ? sessions.getSession(sessionId) : Promise.resolve(undefined),
+    loadUser ? users.getUser(userId) : Promise.resolve(undefined),
+    loadOrganization && orgId ? organizations.getOrganization({ organizationId: orgId }) : Promise.resolve(undefined),
+  ]);
+
+  // TODO: Returns errors that might occur when loading resources while building signed-in state.
+  const session = sessionResp && !sessionResp.errors ? sessionResp.data : undefined;
+  const user = userResp && !userResp.errors ? userResp.data : undefined;
+  const organization = organizationResp && !organizationResp.errors ? organizationResp.data : undefined;
+
+  const getToken = createGetToken({
+    sessionId,
+    cookieToken,
+    headerToken,
+    fetcher: (...args) => sessions.getToken(...args),
+  });
+
+  return {
+    status: AuthStatus.SignedIn,
+    sessionClaims,
+    sessionId,
+    session,
+    userId,
+    user,
+    orgId,
+    orgRole,
+    organization,
+    getToken,
+  };
 }
 
 function signedOut(reason: AuthStateReason, message = ''): SignedOutAuthState {
@@ -184,6 +254,14 @@ function signedOut(reason: AuthStateReason, message = ''): SignedOutAuthState {
     status: AuthStatus.SignedOut,
     reason,
     message,
+    sessionId: null,
+    session: null,
+    userId: null,
+    user: null,
+    orgId: null,
+    orgRole: null,
+    organization: null,
+    getToken: () => Promise.resolve(null),
   };
 }
 
@@ -194,12 +272,12 @@ function interstitial(reason: AuthStateReason): InterstitialAuthState {
   };
 }
 
-type InterstitialRule = (params: AuthStateParams) => AuthState | undefined;
-type RunRules = (params: AuthStateParams, rules: InterstitialRule[]) => AuthState | undefined;
+type InterstitialRule = (options: AuthStateOptions) => AuthState | undefined;
+type RunRules = (options: AuthStateOptions, rules: InterstitialRule[]) => AuthState | undefined;
 
-const runInterstitialRules: RunRules = (params, rules) => {
+const runInterstitialRules: RunRules = (options, rules) => {
   for (const rule of rules) {
-    const res = rule(params);
+    const res = rule(options);
     if (res) {
       return res;
     }
@@ -276,8 +354,8 @@ const potentialFirstRequestOnProductionEnvironment: InterstitialRule = ({ apiKey
 };
 
 // TBD: Can enable if we do not want the __session cookie to be inspected.
-// const signedOutOnDifferentSubdomainButCookieNotRemovedYet: AuthStateRule = (params, key) => {
-//   if (isProduction(key) && !params.clientUat && !params.cookieToken) {
+// const signedOutOnDifferentSubdomainButCookieNotRemovedYet: AuthStateRule = (options, key) => {
+//   if (isProduction(key) && !options.clientUat && !options.cookieToken) {
 //     return { status: AuthStatus.Interstitial, errorReason: '' as any };
 //   }
 // };

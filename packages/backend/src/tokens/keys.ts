@@ -1,4 +1,3 @@
-import { API_VERSION } from '../constants';
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
 import runtime from '../runtime';
@@ -85,11 +84,13 @@ export type LoadClerkJWKFromRemoteOptions = {
   | {
       apiKey: string;
       apiUrl: string;
+      apiVersion: string;
       issuer?: never;
     }
   | {
       apiKey?: never;
       apiUrl?: never;
+      apiVersion?: never;
       issuer: string;
     }
 );
@@ -110,6 +111,7 @@ export type LoadClerkJWKFromRemoteOptions = {
 export async function loadClerkJWKFromRemote({
   apiKey,
   apiUrl,
+  apiVersion,
   issuer,
   kid,
   jwksCacheTtlInMs = 1000 * 60 * 60, // 1 hour,
@@ -119,7 +121,7 @@ export async function loadClerkJWKFromRemote({
     let fetcher;
 
     if (apiUrl && apiKey) {
-      fetcher = () => fetchJWKSFromBAPI(apiUrl, apiKey);
+      fetcher = () => fetchJWKSFromBAPI(apiUrl, apiKey, apiVersion);
     } else if (issuer) {
       fetcher = () => fetchJWKSFromFAPI(issuer);
     } else {
@@ -173,9 +175,9 @@ async function fetchJWKSFromFAPI(issuer: string) {
   return response.json();
 }
 
-async function fetchJWKSFromBAPI(apiUrl: string, apiKey: string) {
+async function fetchJWKSFromBAPI(apiUrl: string, apiKey: string, apiVersion: string) {
   const url = new URL(apiUrl);
-  url.pathname = joinPaths(url.pathname, API_VERSION, '/jwks');
+  url.pathname = joinPaths(url.pathname, apiVersion, '/jwks');
 
   const response = await runtime.fetch(url, {
     headers: {

@@ -1,6 +1,6 @@
 import type { JwtPayload } from '@clerk/types';
 
-import { API_KEY, API_URL, JWT_KEY } from '../constants';
+import { API_KEY, API_URL, API_VERSION, JWT_KEY } from '../constants';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from './errors';
 import { type VerifyJwtOptions, decodeJwt, verifyJwt } from './jwt';
 import { loadClerkJWKFromLocal, loadClerkJWKFromRemote, LoadClerkJWKFromRemoteOptions } from './keys';
@@ -12,12 +12,13 @@ export type VerifyTokenOptions = Pick<
   VerifyJwtOptions,
   'authorizedParties' | 'audience' | 'issuer' | 'clockSkewInSeconds'
 > &
-  Pick<LoadClerkJWKFromRemoteOptions, 'apiKey' | 'apiUrl' | 'jwksCacheTtlInMs' | 'skipJwksCache'>;
+  Pick<LoadClerkJWKFromRemoteOptions, 'apiKey' | 'apiUrl' | 'apiVersion' | 'jwksCacheTtlInMs' | 'skipJwksCache'>;
 
 export async function verifyToken(token: string, options: VerifyTokenOptions): Promise<JwtPayload> {
   const {
     apiKey = API_KEY,
     apiUrl = API_URL,
+    apiVersion = API_VERSION,
     authorizedParties,
     clockSkewInSeconds,
     issuer,
@@ -41,6 +42,7 @@ export async function verifyToken(token: string, options: VerifyTokenOptions): P
     key = await loadClerkJWKFromRemote({
       apiUrl,
       apiKey,
+      apiVersion,
       kid,
       jwksCacheTtlInMs,
       skipJwksCache,
