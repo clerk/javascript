@@ -1,5 +1,4 @@
 import { MembershipRole, OrganizationMembershipResource } from '@clerk/types';
-import React from 'react';
 
 import { useCoreOrganization, useCoreUser } from '../../contexts';
 import { Badge, localizationKeys, Td, Text } from '../../customizables';
@@ -33,6 +32,9 @@ export const ActiveMembersList = () => {
     return null;
   }
 
+  //TODO: calculate if user is the only admin
+  const canChangeOwnAdminRole = isAdmin && organization?.membersCount === 1;
+
   const handleRoleChange = (membership: OrganizationMembershipResource) => (newRole: MembershipRole) => {
     if (!isAdmin) {
       return;
@@ -62,7 +64,7 @@ export const ActiveMembersList = () => {
         <MemberRow
           key={m.id}
           membership={m}
-          onRoleChange={handleRoleChange(m)}
+          onRoleChange={canChangeOwnAdminRole ? handleRoleChange(m) : undefined}
           onRemove={handleRemove(m)}
         />
       ))}
@@ -73,7 +75,7 @@ export const ActiveMembersList = () => {
 const MemberRow = (props: {
   membership: OrganizationMembershipResource;
   onRemove: () => unknown;
-  onRoleChange: (role: MembershipRole) => unknown;
+  onRoleChange?: (role: MembershipRole) => unknown;
 }) => {
   const { membership, onRemove, onRoleChange } = props;
   const card = useCardState();
@@ -97,7 +99,7 @@ const MemberRow = (props: {
       <Td>
         {isAdmin ? (
           <RoleSelect
-            isDisabled={card.isLoading}
+            isDisabled={card.isLoading || !onRoleChange}
             value={membership.role}
             onChange={onRoleChange}
           />
