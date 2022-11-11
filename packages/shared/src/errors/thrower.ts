@@ -7,12 +7,23 @@ type MessageKeys = keyof typeof DefaultMessages;
 
 type Messages = Record<MessageKeys, string>;
 
-export type BuildErrorReporterOptions = {
-  pkg: string;
-  customMessages?: Partial<Messages>;
+type CustomMessages = Partial<Messages>;
+
+export type ErrorThrowerOptions = {
+  packageName: string;
+  customMessages?: CustomMessages;
 };
 
-export function buildErrorReporter({ pkg, customMessages }: BuildErrorReporterOptions) {
+export interface ErrorThrower {
+  setPackageName(options: ErrorThrowerOptions): ErrorThrower;
+  setMessages(options: ErrorThrowerOptions): ErrorThrower;
+  throwInvalidPublishableKeyError(params: { key?: string }): never;
+  throwInvalidFrontendApiError(params: { key?: string }): never;
+}
+
+export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerOptions): ErrorThrower {
+  let pkg = packageName;
+
   const messages = {
     ...DefaultMessages,
     ...customMessages,
@@ -31,8 +42,15 @@ export function buildErrorReporter({ pkg, customMessages }: BuildErrorReporterOp
   }
 
   return {
-    setMessages(customMessages: Partial<Messages>) {
-      Object.assign(messages, customMessages);
+    setPackageName({ packageName }: ErrorThrowerOptions): ErrorThrower {
+      if (typeof packageName === 'string') {
+        pkg = packageName;
+      }
+      return this;
+    },
+
+    setMessages({ customMessages }: ErrorThrowerOptions): ErrorThrower {
+      Object.assign(messages, customMessages || {});
       return this;
     },
 

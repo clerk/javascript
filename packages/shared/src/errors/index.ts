@@ -1,1 +1,1 @@
-export * from './reporter';
+export * from './thrower';
