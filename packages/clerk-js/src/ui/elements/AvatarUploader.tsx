@@ -9,6 +9,7 @@ export type AvatarUploaderProps = {
   title: LocalizationKey;
   avatarPreview: React.ReactElement;
   onAvatarChange: (file: File) => Promise<unknown>;
+  onAvatarRemove?: (() => void) | null;
 };
 
 export const fileToBase64 = (file: File): Promise<string> => {
@@ -24,13 +25,18 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
   const [showUpload, setShowUpload] = React.useState(false);
   const [objectUrl, setObjectUrl] = React.useState<string>();
   const card = useCardState();
-  const { onAvatarChange, title, avatarPreview, ...rest } = props;
+
+  const { onAvatarChange, onAvatarRemove, title, avatarPreview, ...rest } = props;
 
   const toggle = () => {
     setShowUpload(!showUpload);
   };
 
-  const handleFileDrop = (file: File) => {
+  const handleFileDrop = (file: File | null) => {
+    if (file === null) {
+      return setObjectUrl('');
+    }
+
     void fileToBase64(file).then(setObjectUrl);
     card.setLoading();
     return onAvatarChange(file)
@@ -39,6 +45,12 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
         card.setIdle();
       })
       .catch(err => handleError(err, [], card.setError));
+  };
+
+  const handleRemove = () => {
+    card.setLoading();
+    handleFileDrop(null);
+    return onAvatarRemove?.();
   };
 
   return (
@@ -70,6 +82,16 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
                 toggle();
               }}
             />
+
+            {!!onAvatarRemove && !showUpload && (
+              <Button
+                localizationKey={localizationKeys('userProfile.profilePage.imageFormDestructiveActionSubtitle')}
+                isDisabled={card.isLoading}
+                sx={t => ({ color: t.colors.$danger500 })}
+                variant='link'
+                onClick={handleRemove}
+              />
+            )}
           </Flex>
         </Col>
       </Flex>

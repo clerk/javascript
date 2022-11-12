@@ -12,25 +12,24 @@ import type { ActJWTClaim, ClerkJWTClaims, ServerGetToken } from '@clerk/types';
 import Cookies from 'cookies';
 import deepmerge from 'deepmerge';
 import type { NextFunction, Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, { type VerifyOptions } from 'jsonwebtoken';
 import jwks, { JwksClient } from 'jwks-rsa';
 import fetch, { RequestInit } from 'node-fetch';
 
 import { SupportMessages } from './constants/SupportMessages';
 import { LIB_NAME, LIB_VERSION } from './info';
-import {
-  decodeBase64,
-  importJSONWebKey,
-  importPKIKey,
-  verifySignature,
-} from './utils';
+import { decodeBase64, importJSONWebKey, importPKIKey, verifySignature } from './utils';
 
 const defaultApiKey = process.env.CLERK_API_KEY || '';
 const defaultJWTKey = process.env.CLERK_JWT_KEY;
 const defaultApiVersion = process.env.CLERK_API_VERSION || 'v1';
-const defaultServerApiUrl =
-  process.env.CLERK_API_URL || 'https://api.clerk.dev';
+const defaultServerApiUrl = process.env.CLERK_API_URL || 'https://api.clerk.dev';
 const JWKS_MAX_AGE = 3600000; // 1 hour
+
+export type VerifyTokenOptions = { authorizedParties?: string[] } & Pick<
+  VerifyOptions,
+  'clockTimestamp' | 'clockTolerance' | 'ignoreExpiration' | 'ignoreNotBefore' | 'subject' | 'audience' | 'maxAge'
+>;
 
 export type LooseAuthProp = {
   auth: {
@@ -56,17 +55,9 @@ export type StrictAuthProp = {
 
 export type RequireAuthProp<T> = T & StrictAuthProp;
 
-type MiddlewareWithAuthProp = (
-  req: WithAuthProp<Request>,
-  res: Response,
-  next: NextFunction
-) => Promise<void>;
+type MiddlewareWithAuthProp = (req: WithAuthProp<Request>, res: Response, next: NextFunction) => Promise<void>;
 
-type MiddlewareRequireAuthProp = (
-  req: RequireAuthProp<Request>,
-  res: Response,
-  next: NextFunction
-) => Promise<void>;
+type MiddlewareRequireAuthProp = (req: RequireAuthProp<Request>, res: Response, next: NextFunction) => Promise<void>;
 
 export type Middleware = MiddlewareWithAuthProp | MiddlewareRequireAuthProp;
 
@@ -81,9 +72,7 @@ type MiddlewareOptionsInStrictMode = MiddlewareOptionsInLooseMode & {
   strict: true;
 };
 
-export type MiddlewareOptions =
-  | MiddlewareOptionsInLooseMode
-  | MiddlewareOptionsInStrictMode;
+export type MiddlewareOptions = MiddlewareOptionsInLooseMode | MiddlewareOptionsInStrictMode;
 
 type MiddlewareReturnType<T> = T extends MiddlewareOptionsInStrictMode
   ? MiddlewareRequireAuthProp
@@ -122,20 +111,15 @@ export default class Clerk extends ClerkBackendAPI {
       libVersion: LIB_VERSION,
       apiClient: {
         async request<T>(options: APIRequestOptions) {
-          const { url, method, queryParams, headerParams, bodyParams } =
-            options;
+          const { url, method, queryParams, headerParams, bodyParams } = options;
           // Build final URL with search parameters
           const finalUrl = new URL(url || '');
 
           if (queryParams) {
-            for (const [key, val] of Object.entries(
-              queryParams as Record<string, string | string[]>
-            )) {
+            for (const [key, val] of Object.entries(queryParams as Record<string, string | string[]>)) {
               // Support array values for queryParams such as { foo: [42, 43] }
               if (val) {
-                [val]
-                  .flat()
-                  .forEach((v) => finalUrl.searchParams.append(key, v));
+                [val].flat().forEach(v => finalUrl.searchParams.append(key, v));
               }
             }
           }
@@ -149,15 +133,12 @@ export default class Clerk extends ClerkBackendAPI {
                 Object.keys(bodyParams).length > 0 && {
                   body: JSON.stringify(bodyParams),
                 }),
-            })
+            }),
           );
 
           // Parse JSON or Text response.
-          const isJSONResponse =
-            headerParams && headerParams['Content-Type'] === 'application/json';
-          const data = (await (isJSONResponse
-            ? response.json()
-            : response.text())) as T;
+          const isJSONResponse = headerParams && headerParams['Content-Type'] === 'application/json';
+          const data = (await (isJSONResponse ? response.json() : response.text())) as T;
 
           // Check for errors
           if (!response.ok) {
@@ -195,9 +176,7 @@ export default class Clerk extends ClerkBackendAPI {
         throw new Error(`Failed to decode token: ${token}`);
       }
 
-      const signingKey = await this._jwksClient.getSigningKey(
-        decoded.header.kid
-      );
+      const signingKey = await this._jwksClient.getSigningKey(decoded.header.kid);
       const publicKey = signingKey.getPublicKey();
 
       return importPKIKey(publicKey);
@@ -205,18 +184,11 @@ export default class Clerk extends ClerkBackendAPI {
 
     /** Base initialization */
     // TODO: More comprehensive base initialization
-    this.base = new Base(
-      importJSONWebKey,
-      verifySignature,
-      decodeBase64,
-      loadCryptoKey
-    );
+    this.base = new Base(importJSONWebKey, verifySignature, decodeBase64, loadCryptoKey);
   }
 
-  async verifyToken(
-    token: string,
-    authorizedParties?: string[]
-  ): Promise<ClerkJWTClaims> {
+  async verifyToken(token: string, verifyOptions?: VerifyTokenOptions): Promise<ClerkJWTClaims> {
+    const { authorizedParties, ...rest } = verifyOptions || {};
     const decoded = jwt.decode(token, { complete: true });
     if (!decoded) {
       throw new Error(`Failed to verify token: ${token}`);
@@ -224,6 +196,7 @@ export default class Clerk extends ClerkBackendAPI {
 
     const key = await this._jwksClient.getSigningKey(decoded.header.kid);
     const verified = jwt.verify(token, key.getPublicKey(), {
+      ...rest,
       algorithms: ['RS256'],
     }) as ClerkJWTClaims;
 
@@ -258,43 +231,33 @@ export default class Clerk extends ClerkBackendAPI {
     Logger[logLevel](error.message);
 
     if (error instanceof ClerkAPIResponseError) {
-      (error.errors || []).forEach(({ message, longMessage }) =>
-        Logger[logLevel](longMessage || message)
-      );
+      (error.errors || []).forEach(({ message, longMessage }) => Logger[logLevel](longMessage || message));
     }
   }
 
-  private authenticate<T extends MiddlewareOptions>(
-    options: T
-  ): MiddlewareReturnType<T> {
+  private authenticate<T extends MiddlewareOptions>(options: T): MiddlewareReturnType<T> {
     const { onError, authorizedParties, jwtKey, strict } = options;
 
-    async function doAuthenticate(
-      this: Clerk,
-      req: Request,
-      res: Response,
-      next: NextFunction
-    ): Promise<void> {
+    async function doAuthenticate(this: Clerk, req: Request, res: Response, next: NextFunction): Promise<void> {
       try {
         const cookies = new Cookies(req, res);
         const cookieToken = cookies.get('__session') as string;
         const headerToken = req.headers.authorization?.replace('Bearer ', '');
 
-        const { status, interstitial, sessionClaims, errorReason } =
-          await this.base.getAuthState({
-            cookieToken,
-            headerToken,
-            clientUat: cookies.get('__client_uat') as string,
-            origin: req.headers.origin,
-            host: req.headers.host as string,
-            forwardedPort: req.headers['x-forwarded-port'] as string,
-            forwardedHost: req.headers['x-forwarded-host'] as string,
-            referrer: req.headers.referer,
-            userAgent: req.headers['user-agent'] as string,
-            authorizedParties,
-            jwtKey: jwtKey || this.jwtKey,
-            fetchInterstitial: () => this.fetchInterstitial(),
-          });
+        const { status, interstitial, sessionClaims, errorReason } = await this.base.getAuthState({
+          cookieToken,
+          headerToken,
+          clientUat: cookies.get('__client_uat') as string,
+          origin: req.headers.origin,
+          host: req.headers.host as string,
+          forwardedPort: req.headers['x-forwarded-port'] as string,
+          forwardedHost: req.headers['x-forwarded-host'] as string,
+          referrer: req.headers.referer,
+          userAgent: req.headers['user-agent'] as string,
+          authorizedParties,
+          jwtKey: jwtKey || this.jwtKey,
+          fetchInterstitial: () => this.fetchInterstitial(),
+        });
 
         errorReason && res.setHeader('Auth-Result', errorReason);
 

@@ -12,9 +12,7 @@ const customRender = (ui: React.ReactElement, options?: RenderOptions) => {
 
 // Re-export everything
 export * from '@testing-library/react';
-export { act as actHook, renderHook } from '@testing-library/react-hooks';
 export { default as userEvent } from '@testing-library/user-event';
-export { mocked } from 'jest-mock';
 
 // Override render method
 export { customRender as render, noop };

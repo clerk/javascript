@@ -10,7 +10,7 @@ type AvatarProps = PropsOfComponent<typeof Flex> & {
   size?: (theme: InternalTheme) => string | number;
   title?: string;
   initials?: string;
-  imageUrl?: string;
+  imageUrl?: string | null;
   imageFetchSize?: number;
   optimize?: boolean;
   rounded?: boolean;
@@ -58,7 +58,6 @@ export const Avatar = (props: AvatarProps) => {
         width='100%'
         height='100%'
         onError={() => setError(true)}
-        sx={{ objectFit: 'contain' }}
       />
     );
 

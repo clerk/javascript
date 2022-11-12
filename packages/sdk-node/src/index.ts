@@ -6,16 +6,29 @@ import Clerk from './instance';
 const singletonInstance = Clerk.getInstance();
 const allowlistIdentifiers = singletonInstance.allowlistIdentifiers;
 const clients = singletonInstance.clients;
+const emailAddresses = singletonInstance.emailAddresses;
 const emails = singletonInstance.emails;
 const invitations = singletonInstance.invitations;
 const organizations = singletonInstance.organizations;
+const phoneNumbers = singletonInstance.phoneNumbers;
 const sessions = singletonInstance.sessions;
 const smsMessages = singletonInstance.smsMessages;
 const users = singletonInstance.users;
 
 // Export sub-api objects
 // "Old" /api export structure
-export { allowlistIdentifiers, clients, emails, invitations, organizations, sessions, smsMessages, users };
+export {
+  allowlistIdentifiers,
+  clients,
+  emailAddresses,
+  emails,
+  invitations,
+  organizations,
+  phoneNumbers,
+  sessions,
+  smsMessages,
+  users,
+};
 
 // Export a default singleton instance that should suffice for most use cases
 export default singletonInstance;

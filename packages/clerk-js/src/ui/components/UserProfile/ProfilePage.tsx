@@ -4,7 +4,7 @@ import { useWizard, Wizard } from '../../common';
 import { useCoreUser, useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
-import { handleError, useFormControl } from '../../utils';
+import { handleError, useFormControl, isDefaultProfileImage } from '../../utils';
 import { UserProfileAvatarUploader } from './UserProfileAvatarUploader';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
@@ -57,9 +57,23 @@ export const ProfilePage = withCardStateProvider(() => {
   };
 
   const uploadAvatar = (file: File) => {
-    return user.setProfileImage({ file }).then(() => {
-      setAvatarChanged(true);
-    });
+    return user
+      .setProfileImage({ file })
+      .then(() => {
+        setAvatarChanged(true);
+        card.setIdle();
+      })
+      .catch(err => handleError(err, [], card.setError));
+  };
+
+  const onAvatarRemove = () => {
+    void user
+      .setProfileImage({ file: null })
+      .then(() => {
+        setAvatarChanged(true);
+        card.setIdle();
+      })
+      .catch(err => handleError(err, [], card.setError));
   };
 
   return (
@@ -72,6 +86,7 @@ export const ProfilePage = withCardStateProvider(() => {
           <UserProfileAvatarUploader
             user={user}
             onAvatarChange={uploadAvatar}
+            onAvatarRemove={isDefaultProfileImage(user.profileImageUrl) ? onAvatarRemove : null}
           />
           {showFirstName && (
             <Form.ControlRow>

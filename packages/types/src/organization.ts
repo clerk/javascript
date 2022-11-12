@@ -17,7 +17,7 @@ export interface OrganizationResource {
   id: string;
   name: string;
   slug: string;
-  logoUrl: string;
+  logoUrl: string | null;
   membersCount: number;
   pendingInvitationsCount: number;
   publicMetadata: OrganizationPublicMetadata;
@@ -66,5 +66,5 @@ export interface UpdateOrganizationParams {
 }
 
 export interface SetOrganizationLogoParams {
-  file: Blob | File;
+  file: Blob | File | null;
 }

@@ -7,6 +7,7 @@ export const OrganizationProfileAvatarUploader = (
   props: Omit<AvatarUploaderProps, 'avatarPreview' | 'title'> & { organization: Partial<OrganizationResource> },
 ) => {
   const { organization, ...rest } = props;
+
   return (
     <AvatarUploader
       {...rest}
