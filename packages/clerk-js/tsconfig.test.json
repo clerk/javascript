@@ -1,10 +1,11 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "noImplicitReturns": false
+    "noImplicitReturns": false,
     //    "lib": ["es2019", "es6", "dom"],
     //    "noImplicitAny": false
     //    "strict": false
+    "types": []
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]
