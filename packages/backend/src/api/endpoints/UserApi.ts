@@ -1,5 +1,5 @@
 import { joinPaths } from '../../util/path';
-import { OrganizationMembership, User } from '../resources';
+import { OauthAccessToken, OrganizationMembership, User } from '../resources';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/users';
@@ -36,6 +36,7 @@ type CreateUserParams = {
   skipPasswordChecks?: boolean;
   skipPasswordRequirement?: boolean;
   totpSecret?: string;
+  backupCodes?: string[];
 } & UserMetadataParams;
 
 interface UpdateUserParams extends UserMetadataParams {
@@ -45,6 +46,8 @@ interface UpdateUserParams extends UserMetadataParams {
   password?: string;
   primaryEmailAddressID?: string;
   primaryPhoneNumberID?: string;
+  totpSecret?: string;
+  backupCodes?: string[];
 }
 
 type GetOrganizationMembershipListParams = {
@@ -70,8 +73,8 @@ export class UserAPI extends AbstractAPI {
     });
   }
 
-  public async createUser(params: CreateUserParams) {
-    return this.request<User>({
+  public async createUser(params: CreateUserParams): Promise<User> {
+    return this.request({
       method: 'POST',
       path: basePath,
       bodyParams: params,
@@ -116,7 +119,7 @@ export class UserAPI extends AbstractAPI {
 
   public async getUserOauthAccessToken(userId: string, provider: `oauth_${string}`) {
     this.requireId(userId);
-    return this.request<User>({
+    return this.request<OauthAccessToken[]>({
       method: 'GET',
       path: joinPaths(basePath, userId, 'oauth_access_tokens', provider),
     });

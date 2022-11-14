@@ -1,9 +1,11 @@
 import {
   AllowlistIdentifier,
   Client,
+  DeletedObject,
   Email,
   EmailAddress,
   Invitation,
+  OauthAccessToken,
   Organization,
   OrganizationInvitation,
   OrganizationMembership,
@@ -42,17 +44,25 @@ function getCount(item: { total_count: number }) {
 
 // TODO: Revise response deserialization
 function jsonToObject(item: any): any {
+  // Special case: DeletedObject
+  // TODO: Improve this check
+  if ('object' in item && 'deleted' in item) {
+    return DeletedObject.fromJSON(item);
+  }
+
   switch (item.object) {
     case ObjectType.AllowlistIdentifier:
       return AllowlistIdentifier.fromJSON(item);
     case ObjectType.Client:
       return Client.fromJSON(item);
-    case ObjectType.Email:
-      return Email.fromJSON(item);
     case ObjectType.EmailAddress:
       return EmailAddress.fromJSON(item);
+    case ObjectType.Email:
+      return Email.fromJSON(item);
     case ObjectType.Invitation:
       return Invitation.fromJSON(item);
+    case ObjectType.OauthAccessToken:
+      return OauthAccessToken.fromJSON(item);
     case ObjectType.Organization:
       return Organization.fromJSON(item);
     case ObjectType.OrganizationInvitation:
