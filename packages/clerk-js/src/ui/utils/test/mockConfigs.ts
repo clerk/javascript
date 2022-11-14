@@ -115,6 +115,7 @@ const initialMockClerkConfig: Clerk = {
       createdSessionId: null,
       userData: {},
       create: jest.fn(),
+      createMagicLinkFlow: jest.fn(),
     },
     lastActiveSessionId: null,
     createdAt: new Date().toISOString(),
@@ -261,7 +262,7 @@ const initialMockEnvironmentResource: EnvironmentResource = {
     pathRoot: 'test.host',
     id: 'display_config_2GLnHgZkgHLIp5F3ciLxw1jdRrX',
     instanceEnvironmentType: 'production',
-    applicationName: 'ClerkProd-(local)',
+    applicationName: 'Clerk Test App',
     theme: {
       buttons: {
         font_color: '#ffffff',
@@ -283,7 +284,7 @@ const initialMockEnvironmentResource: EnvironmentResource = {
       },
     },
     preferredSignInStrategy: 'password',
-    logoUrl: 'https://images.clerk.services/clerk/logo.svg',
+    logoUrl: '',
     faviconUrl: 'test.host',
     backendHost: 'test.host',
     homeUrl: 'test.host',
@@ -329,7 +330,9 @@ const initialFixtureConfig = {
   },
   client: {
     signIn: {
+      supportedFirstFactors: [],
       create: jest.fn(),
+      createMagicLinkFlow: jest.fn(),
     },
   },
   routeContext: {
@@ -340,6 +343,7 @@ const initialFixtureConfig = {
 export const getInitialFixtureConfig = () => {
   const config = JSON.parse(JSON.stringify(initialFixtureConfig));
   config.client.signIn.create = jest.fn();
+  config.client.signIn.createMagicLinkFlow = jest.fn();
   config.routeContext.navigate = jest.fn();
   return config;
 };
@@ -349,6 +353,11 @@ export const getInitialMockClerkConfig = () => {
   config.addListener = jest.fn();
   config.createdAt = new Date().toISOString();
   config.updatedAt = new Date().toISOString();
+  config.client.signIn.createMagicLinkFlow = jest.fn(() => ({
+    startMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+    cancelMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+  }));
+  config.client.signIn.prepareFirstFactor = jest.fn(() => new Promise(() => {}));
   return config;
 };
 
