@@ -1,3 +1,4 @@
+import { API_URL, API_VERSION } from '../constants';
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
 import runtime from '../runtime';
@@ -83,8 +84,8 @@ export type LoadClerkJWKFromRemoteOptions = {
 } & (
   | {
       apiKey: string;
-      apiUrl: string;
-      apiVersion: string;
+      apiUrl?: string;
+      apiVersion?: string;
       issuer?: never;
     }
   | {
@@ -175,7 +176,7 @@ async function fetchJWKSFromFAPI(issuer: string) {
   return response.json();
 }
 
-async function fetchJWKSFromBAPI(apiUrl: string, apiKey: string, apiVersion: string) {
+async function fetchJWKSFromBAPI(apiUrl: string = API_URL, apiKey: string, apiVersion: string = API_VERSION) {
   const url = new URL(apiUrl);
   url.pathname = joinPaths(url.pathname, apiVersion, '/jwks');
 

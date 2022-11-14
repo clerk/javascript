@@ -11,7 +11,7 @@ import { type VerifyTokenOptions, verifyToken } from './verify';
 
 type RequiredVerifyTokenOptions = Required<Pick<VerifyTokenOptions, 'apiKey' | 'apiUrl' | 'apiVersion'>>;
 type OptionalVerifyTokenOptions = Partial<
-  Pick<VerifyTokenOptions, 'authorizedParties' | 'clockSkewInSeconds' | 'jwksCacheTtlInMs' | 'skipJwksCache'>
+  Pick<VerifyTokenOptions, 'authorizedParties' | 'clockSkewInSeconds' | 'jwksCacheTtlInMs' | 'skipJwksCache' | 'jwtKey'>
 >;
 
 export type TokenCarrier = 'header' | 'cookie';
@@ -120,7 +120,6 @@ export type AuthState = SignedInAuthState | SignedOutAuthState | InterstitialAut
 export async function getAuthState(options: AuthStateOptions): Promise<AuthState> {
   options.apiUrl = options.apiUrl || API_URL;
   options.apiVersion = options.apiVersion || API_VERSION;
-
   if (options.headerToken) {
     return handleRequestWithTokenInHeader(options);
   }

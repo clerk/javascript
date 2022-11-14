@@ -5,7 +5,7 @@ import snakecaseKeys from 'snakecase-keys';
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
 import runtime from '../runtime';
 import { joinPaths } from '../util/path';
-import type { ClerkBackendAPIOptions } from './factory';
+import type { CreateBackendApiOptions } from './factory';
 import { deserialize } from './resources/Deserializer';
 
 export type ClerkBackendApiRequestOptions = {
@@ -36,7 +36,7 @@ export type ClerkBackendApiResponse<T> =
 
 export type RequestFunction = ReturnType<typeof buildRequest>;
 
-export function buildRequest({ apiUrl, apiKey, apiVersion, userAgent }: ClerkBackendAPIOptions) {
+export function buildRequest({ apiUrl, apiKey, apiVersion, userAgent }: CreateBackendApiOptions) {
   return async function request<T>({
     path,
     method,

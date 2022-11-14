@@ -1,4 +1,4 @@
-import { API_KEY, API_URL, API_VERSION, USER_AGENT } from '../constants';
+import { API_URL, API_VERSION, USER_AGENT } from '../constants';
 import {
   AllowlistIdentifierAPI,
   ClientAPI,
@@ -16,9 +16,9 @@ import {
 } from './endpoints';
 import { buildRequest } from './request';
 
-export type ClerkBackendAPIOptions = {
+export type CreateBackendApiOptions = {
   /* Backend API key */
-  apiKey?: string;
+  apiKey: string;
   /* Backend API URL */
   apiUrl?: string;
   /* Backend API version */
@@ -27,8 +27,10 @@ export type ClerkBackendAPIOptions = {
   userAgent?: string;
 };
 
-export function createBackendApiClient(options?: ClerkBackendAPIOptions) {
-  const { apiKey = API_KEY, apiUrl = API_URL, apiVersion = API_VERSION, userAgent = USER_AGENT } = options || {};
+export type ApiClient = ReturnType<typeof createBackendApiClient>;
+
+export function createBackendApiClient(options: CreateBackendApiOptions) {
+  const { apiKey, apiUrl = API_URL, apiVersion = API_VERSION, userAgent = USER_AGENT } = options;
 
   const request = buildRequest({ apiKey, apiUrl, apiVersion, userAgent });
 
