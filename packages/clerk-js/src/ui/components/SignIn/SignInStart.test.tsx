@@ -46,7 +46,6 @@ describe('SignInStart', () => {
         f.withUsername();
         f.withEmailAddress();
       });
-
       render(<SignInStart />, { wrapper });
       screen.getByText(/email address, phone number or username/i);
     });
@@ -82,16 +81,16 @@ describe('SignInStart', () => {
   });
 
   describe('navigation', () => {
-    it('calls create on clicking Continue button', async () => {
-      const { wrapper, mocks } = createFixture(f => {
+    it.only('calls create on clicking Continue button', async () => {
+      const { wrapper, fixtures } = createFixture(f => {
         f.withEmailAddress();
+        f.mockSignInCreate({ responseStatus: 'needs_first_factor' });
       });
-      // TODO:
-      mocks.client.signIn.create.mockReturnValueOnce({ status: 'needs_first_factor' });
+
       const { user } = render(<SignInStart />, { wrapper });
       await user.type(screen.getByLabelText(/email address/i), 'hello@clerk.dev');
       await user.click(screen.getByText('Continue'));
-      expect(mocks.client.signIn.create).toHaveBeenCalled();
+      expect(fixtures.client.signIn.create).toHaveBeenCalled();
     });
 
     it('navigates to /factor-one page when user clicks on Continue button and create needs a first factor', async () => {

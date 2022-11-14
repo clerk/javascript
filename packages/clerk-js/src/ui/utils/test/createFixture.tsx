@@ -97,5 +97,5 @@ export const createFixture =
       );
     };
 
-    return { wrapper: MockClerkProvider, mocks: config };
+    return { wrapper: MockClerkProvider, fixtures: config };
   };
