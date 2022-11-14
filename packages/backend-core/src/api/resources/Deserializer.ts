@@ -3,9 +3,10 @@ import {
   AllowlistIdentifier,
   Client,
   DeletedObject,
-  EmailAddress,
   Email,
+  EmailAddress,
   Invitation,
+  OauthAccessToken,
   Organization,
   OrganizationInvitation,
   OrganizationMembership,
@@ -61,6 +62,8 @@ function jsonToObject(item: any): any {
       return Email.fromJSON(item);
     case ObjectType.Invitation:
       return Invitation.fromJSON(item);
+    case ObjectType.OauthAccessToken:
+      return OauthAccessToken.fromJSON(item);
     case ObjectType.Organization:
       return Organization.fromJSON(item);
     case ObjectType.OrganizationInvitation:

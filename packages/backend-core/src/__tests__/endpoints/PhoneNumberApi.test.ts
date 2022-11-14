@@ -17,8 +17,6 @@ test('getPhoneNumber() returns a single phone number', async () => {
 
   const phoneNumber = await TestClerkAPI.phoneNumbers.getPhoneNumber('idn_avocado');
 
-  console.log(phoneNumber);
-
   expect(phoneNumber).toBeInstanceOf(PhoneNumber);
   expect(phoneNumber.id).toEqual('idn_avocado');
   expect(phoneNumber.phoneNumber).toEqual('+15555555555');

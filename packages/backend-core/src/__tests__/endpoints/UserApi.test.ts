@@ -265,3 +265,28 @@ test('getOrganizationMembershipList() returns a list of organization memberships
   expect(organizationMembershipList[0].organization).toBeInstanceOf(Organization);
   expect(organizationMembershipList[0].publicUserData).toBeInstanceOf(OrganizationMembershipPublicUserData);
 });
+
+test('getUserOauthAccessToken() returns a valid access token', async () => {
+  const userId = 'user_randomid';
+  const provider = 'oauth_test';
+  const resJSON = [
+    {
+      object: 'oauth_access_token',
+      provider,
+      token: 'deadbeef',
+      public_metadata: {
+        foo_bar: 42,
+      },
+      label: 'clerk',
+      scopes: ['scope_1'],
+    },
+  ];
+
+  nock(defaultServerAPIUrl)
+    .get(new RegExp(`/v1/users/${userId}/oauth_access_tokens/${provider}`))
+    .reply(200, resJSON);
+
+  const [oauthAccessToken] = await TestClerkAPI.users.getUserOauthAccessToken(userId, provider);
+  expect(oauthAccessToken.provider).toBe(provider);
+  expect(oauthAccessToken.token).toBe('deadbeef');
+});

@@ -1,5 +1,5 @@
 import { joinPaths } from '../../util/path';
-import { OrganizationMembership, User } from '../resources';
+import { OauthAccessToken, OrganizationMembership, User } from '../resources';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/users';
@@ -119,7 +119,7 @@ export class UserAPI extends AbstractAPI {
 
   public async getUserOauthAccessToken(userId: string, provider: `oauth_${string}`) {
     this.requireId(userId);
-    return this.APIClient.request<User>({
+    return this.APIClient.request<OauthAccessToken[]>({
       method: 'GET',
       path: joinPaths(basePath, userId, 'oauth_access_tokens', provider),
     });
