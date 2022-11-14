@@ -18,6 +18,7 @@ export enum ObjectType {
   FacebookAccount = 'facebook_account',
   GoogleAccount = 'google_account',
   Invitation = 'invitation',
+  OauthAccessToken = 'oauth_access_token',
   Organization = 'organization',
   OrganizationInvitation = 'organization_invitation',
   OrganizationMembership = 'organization_membership',
@@ -109,6 +110,18 @@ export interface InvitationJSON extends ClerkResourceJSON {
   created_at: number;
   updated_at: number;
   revoked?: boolean;
+}
+
+export interface OauthAccessTokenJSON {
+  object: ObjectType.OauthAccessToken;
+  provider: string;
+  token: string;
+  public_metadata: Record<string, unknown>;
+  label: string;
+  // Only set in OAuth 2.0 tokens
+  scopes?: string[];
+  // Only set in OAuth 1.0 tokens
+  token_secret?: string;
 }
 
 export interface OrganizationJSON extends ClerkResourceJSON {
