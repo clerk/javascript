@@ -1,11 +1,10 @@
 import { OAUTH_PROVIDERS } from '@clerk/types';
-import { describe, expect, it } from '@jest/globals';
-import { waitFor } from '@testing-library/dom';
-import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 
-import { createFixture } from '../../utils/test/createFixture';
+import { createFixture as _createFixture, render, screen } from '../../../testUtils';
 import { SignInStart } from './SignInStart';
+
+const createFixture = _createFixture('SignIn');
 
 describe('SignInStart', () => {
   it('renders the component', () => {
@@ -82,20 +81,17 @@ describe('SignInStart', () => {
     });
   });
 
-  describe.skip('navigation', () => {
+  describe('navigation', () => {
     it('calls create on clicking Continue button', async () => {
-      let mockCreateFn: any;
-      const { wrapper } = createFixture(f => {
+      const { wrapper, mocks } = createFixture(f => {
         f.withEmailAddress();
-        mockCreateFn = f.mockSignInCreate();
       });
-
-      render(<SignInStart />, { wrapper });
-
-      fireEvent.click(screen.getByText('Continue'));
-      await waitFor(() => {
-        expect(mockCreateFn).toHaveBeenCalled();
-      });
+      // TODO:
+      mocks.client.signIn.create.mockReturnValueOnce({ status: 'needs_first_factor' });
+      const { user } = render(<SignInStart />, { wrapper });
+      await user.type(screen.getByLabelText(/email address/i), 'hello@clerk.dev');
+      await user.click(screen.getByText('Continue'));
+      expect(mocks.client.signIn.create).toHaveBeenCalled();
     });
 
     it('navigates to /factor-one page when user clicks on Continue button and create needs a first factor', async () => {
@@ -107,13 +103,11 @@ describe('SignInStart', () => {
         mockRouteNavigateFn = f.mockRouteNavigate();
       });
 
-      render(<SignInStart />, { wrapper });
-
-      fireEvent.click(screen.getByText('Continue'));
-      await waitFor(() => {
-        expect(mockCreateFn).toHaveBeenCalled();
-        expect(mockRouteNavigateFn).toHaveBeenCalledWith('factor-one');
-      });
+      const { user } = render(<SignInStart />, { wrapper });
+      await user.type(screen.getByLabelText(/email address/i), 'hello@clerk.dev');
+      await user.click(screen.getByText('Continue'));
+      expect(mockCreateFn).toHaveBeenCalled();
+      expect(mockRouteNavigateFn).toHaveBeenCalledWith('factor-one');
     });
 
     it('navigates to /factor-two page when user clicks on Continue button and create needs a second factor', async () => {
@@ -125,13 +119,12 @@ describe('SignInStart', () => {
         mockRouteNavigateFn = f.mockRouteNavigate();
       });
 
-      render(<SignInStart />, { wrapper });
-
-      fireEvent.click(screen.getByText('Continue'));
-      await waitFor(() => {
-        expect(mockCreateFn).toHaveBeenCalled();
-        expect(mockRouteNavigateFn).toHaveBeenCalledWith('factor-two');
-      });
+      const { user } = render(<SignInStart />, { wrapper });
+      expect(screen.getByText('Continue')).toBeInTheDocument();
+      await user.type(screen.getByLabelText(/email address/i), 'hello@clerk.dev');
+      await user.click(screen.getByText('Continue'));
+      expect(mockCreateFn).toHaveBeenCalled();
+      expect(mockRouteNavigateFn).toHaveBeenCalledWith('factor-two');
     });
   });
 });
