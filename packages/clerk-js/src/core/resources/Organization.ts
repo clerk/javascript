@@ -137,6 +137,13 @@ export class Organization extends BaseResource implements OrganizationResource {
   };
 
   setLogo = async ({ file }: SetOrganizationLogoParams): Promise<OrganizationResource> => {
+    if (file === null) {
+      return await BaseResource._fetch({
+        path: `/organizations/${this.id}/logo`,
+        method: 'DELETE',
+      }).then(res => new Organization(res?.response as OrganizationJSON));
+    }
+
     const body = new FormData();
     body.append('file', file);
 

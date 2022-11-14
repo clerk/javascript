@@ -343,6 +343,7 @@ export const getInitialFixtureConfig = () => {
   config.routeContext.navigate = jest.fn();
   return config;
 };
+
 export const getInitialMockClerkConfig = () => {
   const config = JSON.parse(JSON.stringify(initialMockClerkConfig));
   config.addListener = jest.fn();
@@ -350,6 +351,7 @@ export const getInitialMockClerkConfig = () => {
   config.updatedAt = new Date().toISOString();
   return config;
 };
+
 export const getInitialRouteContextValue = () => {
   const config = JSON.parse(JSON.stringify(initialRouteContextValue));
   config.getMatchData = jest.fn();
@@ -360,6 +362,7 @@ export const getInitialRouteContextValue = () => {
   config.refresh = jest.fn();
   return config;
 };
+
 export const getInitialEnvironmentResource = () => {
   const config = JSON.parse(JSON.stringify(initialMockEnvironmentResource));
   config.isSingleSession = jest.fn();

@@ -275,6 +275,7 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
       title: 'Update profile',
       imageFormTitle: 'Profile image',
       imageFormSubtitle: 'Upload image',
+      imageFormDestructiveActionSubtitle: 'Remove image',
       fileDropAreaTitle: 'Drag file here, or...',
       fileDropAreaAction: 'Select file',
       fileDropAreaHint: 'Upload a JPG, PNG, GIF, or WEBP image smaller than 10 MB',

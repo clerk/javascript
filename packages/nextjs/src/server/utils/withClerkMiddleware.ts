@@ -11,7 +11,7 @@ import {
   NEXT_REWRITE_HEADER,
   SESSION_COOKIE_NAME,
 } from '../types';
-import { getAuthResultFromRequest, setPrivateAuthResultOnRequest } from './requestResponseUtils';
+import { getAuthResultFromRequest, getCookie, setPrivateAuthResultOnRequest } from './requestResponseUtils';
 
 const DEFAULT_API_URL = process.env.CLERK_API_URL || 'https://api.clerk.dev';
 const DEFAULT_API_VERSION = process.env.CLERK_API_VERSION || 'v1';
@@ -35,7 +35,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
   const [handler = noop, opts = {}] = args as [NextMiddleware, WithAuthOptions] | [];
 
   return async (req: NextRequest, event: NextFetchEvent) => {
-    const { headers, cookies } = req;
+    const { headers } = req;
     const { jwtKey, authorizedParties } = opts;
 
     // throw an error if the request already includes an auth result, because that means it has been spoofed
@@ -44,13 +44,14 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
     }
 
     // get auth state, check if we need to return an interstitial
-    const cookieToken = cookies.get(SESSION_COOKIE_NAME);
+    const cookieToken = getCookie(req, SESSION_COOKIE_NAME);
+
     const headerToken = headers.get('authorization')?.replace('Bearer ', '');
 
     const { status, errorReason } = await vercelEdgeBase.getAuthState({
       cookieToken,
       headerToken,
-      clientUat: cookies.get('__client_uat'),
+      clientUat: getCookie(req, '__client_uat'),
       origin: headers.get('origin'),
       host: headers.get('host') as string,
       forwardedPort: headers.get('x-forwarded-port'),
@@ -133,7 +134,33 @@ export function handleMiddlewareResult({ req, res, authResult }: HandleMiddlewar
     res.headers.set(AUTH_RESULT, authResult);
     rewriteURL.searchParams.set(AUTH_RESULT, authResult);
     res.headers.set(NEXT_REWRITE_HEADER, rewriteURL.href);
+    setRequestHeaderOnNextResponse(res, req, { [AUTH_RESULT]: authResult });
   }
 
   return res;
 }
+
+const OVERRIDE_HEADERS = 'x-middleware-override-headers';
+const MIDDLEWARE_HEADER_PREFIX = 'x-middleware-request' as string;
+
+const setRequestHeaderOnNextResponse = (
+  res: NextResponse | Response,
+  req: NextRequest,
+  newHeaders: Record<string, string>,
+) => {
+  if (!res.headers.get(OVERRIDE_HEADERS)) {
+    // Emulate a user setting overrides by explicitly adding the required nextjs headers
+    // https://github.com/vercel/next.js/pull/41380
+    // @ts-expect-error
+    res.headers.set(OVERRIDE_HEADERS, [...req.headers.keys()]);
+    req.headers.forEach((val, key) => {
+      res.headers.set(`${MIDDLEWARE_HEADER_PREFIX}-${key}`, val);
+    });
+  }
+
+  // Now that we have normalised res to include overrides, just append the new header
+  Object.entries(newHeaders).forEach(([key, val]) => {
+    res.headers.set(OVERRIDE_HEADERS, `${res.headers.get(OVERRIDE_HEADERS)},${key}`);
+    res.headers.set(`${MIDDLEWARE_HEADER_PREFIX}-${key}`, val);
+  });
+};

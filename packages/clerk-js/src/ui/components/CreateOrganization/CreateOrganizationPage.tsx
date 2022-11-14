@@ -2,7 +2,6 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useCoreClerk, useCoreOrganization, useCoreOrganizations, useCreateOrganizationContext } from '../../contexts';
-import { Button, Text } from '../../customizables';
 import {
   ContentPage,
   Form,
@@ -16,14 +15,13 @@ import { handleError, useFormControl } from '../../utils';
 import { InviteMembersForm } from '../OrganizationProfile/InviteMembersForm';
 import { InvitationsSentMessage } from '../OrganizationProfile/InviteMembersPage';
 import { OrganizationProfileAvatarUploader } from '../OrganizationProfile/OrganizationProfileAvatarUploader';
-import { OrganizationProfileBreadcrumbs } from '../OrganizationProfile/OrganizationProfileNavbar';
 
 export const CreateOrganizationPage = withCardStateProvider(() => {
   // const title = localizationKeys('userProfile.profilePage.title');
   const title = 'Create Organization';
   const subtitle = 'Set the organization profile';
   const card = useCardState();
-  const [file, setFile] = React.useState<File>();
+  const [file, setFile] = React.useState<File | null>();
   const { createOrganization } = useCoreOrganizations();
   const { setActive, closeCreateOrganization } = useCoreClerk();
   const { mode, navigateAfterCreateOrganization } = useCreateOrganizationContext();
@@ -60,6 +58,11 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
     }
   };
 
+  const onAvatarRemove = () => {
+    card.setIdle();
+    return setFile(null);
+  };
+
   return (
     <Wizard {...wizard.props}>
       <ContentPage
@@ -72,6 +75,7 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
           <OrganizationProfileAvatarUploader
             organization={{ name: nameField.value }}
             onAvatarChange={async file => await setFile(file)}
+            onAvatarRemove={file ? onAvatarRemove : null}
           />
           <Form.ControlRow>
             <Form.Control

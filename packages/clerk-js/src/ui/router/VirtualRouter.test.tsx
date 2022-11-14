@@ -1,4 +1,4 @@
-import { act, render, screen, userEvent } from '@clerk/shared/testUtils';
+import { render, screen, userEvent } from '@clerk/shared/testUtils';
 import React from 'react';
 
 import { Route, useRouter, VirtualRouter } from './';
@@ -89,17 +89,12 @@ describe('VirtualRouter', () => {
 
     it('preserves the param for internal navigation', async () => {
       render(<Tester />);
-      await act(async () => {
-        const createButton = screen.getByRole('button', { name: /Create/i });
-        expect(createButton).toBeInTheDocument();
-        await userEvent.click(createButton);
-
-        const preserveButton = screen.getByRole('button', {
-          name: /Preserve/i,
-        });
-        expect(preserveButton).toBeInTheDocument();
-        await userEvent.click(preserveButton);
-      });
+      const createButton = screen.getByRole('button', { name: /Create/i });
+      expect(createButton).toBeInTheDocument();
+      await userEvent.click(createButton);
+      const preserveButton = screen.getByText(/Preserve/i);
+      expect(preserveButton).toBeInTheDocument();
+      await userEvent.click(preserveButton);
       expect(screen.queryByText('preserved=1')).toBeInTheDocument();
     });
   });

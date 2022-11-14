@@ -2,10 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "noImplicitReturns": false
-    //    "lib": ["es2019", "es6", "dom"],
-    //    "noImplicitAny": false
-    //    "strict": false
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "./setupJestAfterEnv.ts"],
   "exclude": ["node_modules"]
 }

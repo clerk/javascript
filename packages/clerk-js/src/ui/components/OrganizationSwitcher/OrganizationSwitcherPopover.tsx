@@ -103,6 +103,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
                 <PersonalWorkspacePreview
                   user={user}
                   sx={theme => ({ padding: `0 ${theme.space.$6}`, marginBottom: theme.space.$6 })}
+                  subtitle={localizationKeys('organizationSwitcher.personalWorkspace')}
                 />
               )
             )}

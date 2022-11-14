@@ -64,9 +64,7 @@ const AppBar = (props: AppBarProps) => {
       />
       <OrganizationSwitcher organizationProfileMode={'navigation'} />
       <Link href={'/'}>
-        <a>
-          <h2>Nextjs Playground</h2>
-        </a>
+        <h2>Nextjs Playground</h2>
       </Link>
       <select
         name='theme'

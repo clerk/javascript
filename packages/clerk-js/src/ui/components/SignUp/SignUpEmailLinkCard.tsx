@@ -44,8 +44,7 @@ export const SignUpEmailLinkCard = () => {
   const handleVerificationResult = async (su: SignUpResource) => {
     const ver = su.verifications.emailAddress;
     if (ver.status === 'expired') {
-      card.setError('The verification link expired. A replacement link has just been sent to your email address.');
-      void startEmailLinkVerification();
+      card.setError('The verification link expired. Please resend it.');
     } else if (ver.verifiedFromTheSameClient()) {
       setShowVerifyModal(true);
     } else {

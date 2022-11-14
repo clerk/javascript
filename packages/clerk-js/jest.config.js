@@ -1,12 +1,13 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 const config = {
   displayName: 'clerk-js',
-  injectGlobals: false,
+  injectGlobals: true,
 
   testEnvironment: 'jsdom',
   roots: ['<rootDir>/src'],
   setupFiles: ['./setupJest.ts'],
-  testRegex: 'SignInStart.test.tsx',
+  setupFilesAfterEnv: ['./setupJestAfterEnv.ts'],
+  testRegex: ['SignInStart.test.tsx', '/ui/.*/__tests__/.*.test.[jt]sx?$', '/(core|utils)/.*.test.[jt]sx?$'],
   testPathIgnorePatterns: ['/node_modules/'],
 
   collectCoverage: false,
@@ -25,19 +26,20 @@ const config = {
   //   '!**/node_modules/**',
   // ],
 
+  moduleDirectories: ['node_modules', '<rootDir>/src'],
   transform: {
     '^.+\\.m?tsx?$': ['ts-jest', { tsconfig: 'tsconfig.test.json', diagnostics: false }],
     // '^.+\\.m?tsx?$': ['@swc/jest'],
     '^.+\\.svg$': '<rootDir>/svgTransform.js',
   },
 
-  moduleNameMapper: {
-    '^ui/(.*)': '<rootDir>/src/ui/$1',
-    '^core/(.*)': '<rootDir>/src/core/$1',
-    '^utils/(.*)$': '<rootDir>/src/utils/$1',
-    '^utils': '<rootDir>/src/utils',
-    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-  },
+  // moduleNameMapper: {
+  //   '^ui/(.*)': '<rootDir>/src/ui/$1',
+  //   '^core/(.*)': '<rootDir>/src/core/$1',
+  //   '^utils/(.*)$': '<rootDir>/src/utils/$1',
+  //   '^utils': '<rootDir>/src/utils',
+  //   '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+  // },
 };
 
 module.exports = config;

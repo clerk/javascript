@@ -7,7 +7,6 @@ import { localizationKeys, Text } from '../../customizables';
 import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
-import { OrganizationProfileBreadcrumbs } from '../OrganizationProfile/OrganizationProfileNavbar';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 import { magicLinksEnabledForInstance } from './utils';
 import { VerifyWithCode } from './VerifyWithCode';

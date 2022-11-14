@@ -1,5 +1,5 @@
 import { createContextAndHook } from '@clerk/shared';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import {
   Button,
@@ -14,6 +14,7 @@ import {
 import { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { useNavigate, usePopover, useSafeLayoutEffect } from '../hooks';
 import { Menu } from '../icons';
+import { useRouter } from '../router';
 import { animations, mqu, PropsOfComponent } from '../styledSystem';
 import { colors } from '../utils';
 import { useNavigateToFlowStart } from './NavigateToFlowStartButton';
@@ -52,6 +53,7 @@ export const NavBar = (props: NavBarProps) => {
   const { navigate } = useNavigate();
   const { navigateToFlowStart } = useNavigateToFlowStart();
   const { t } = useLocalizations();
+  const router = useRouter();
 
   const navigateAndScroll = async (route: NavbarRoute) => {
     if (contentRef.current) {
@@ -69,40 +71,56 @@ export const NavBar = (props: NavBarProps) => {
     }
   };
 
-  useSafeLayoutEffect(function selectNavItemBasedOnVisibleSection() {
-    const mountObservers = () => {
-      const ids = routes.map(r => r.id);
-      const sectionElements = ids
-        .map(getSectionId)
-        .map(id => contentRef.current?.querySelector(id))
-        .filter(s => s);
-
-      if (sectionElements.length === 0) {
-        return false;
-      }
-
+  useSafeLayoutEffect(
+    function selectNavItemBasedOnVisibleSection() {
       const callback: IntersectionObserverCallback = entries => {
         for (const entry of entries) {
           const id = entry.target?.id?.split('section-')[1];
           if (entry.isIntersecting && id) {
-            return setActiveId(id as unknown as any);
+            return setActiveId(id);
           }
         }
       };
-
       const observer = new IntersectionObserver(callback, { root: contentRef.current, threshold: 1 });
-      sectionElements.forEach(section => section && observer.observe(section));
-      return true;
-    };
 
-    const intervalId = setInterval(() => {
-      if (mountObservers()) {
-        clearInterval(intervalId);
+      const mountObservers = () => {
+        const ids = routes.map(r => r.id);
+        const sectionElements = ids
+          .map(getSectionId)
+          .map(id => contentRef.current?.querySelector(id))
+          .filter(s => s);
+
+        if (sectionElements.length === 0) {
+          return false;
+        }
+
+        sectionElements.forEach(section => section && observer.observe(section));
+        return true;
+      };
+
+      const intervalId = setInterval(() => {
+        if (mountObservers()) {
+          clearInterval(intervalId);
+        }
+      }, 50);
+
+      return () => {
+        observer.disconnect();
+      };
+    },
+    [router],
+  );
+
+  useEffect(() => {
+    routes.every(route => {
+      const isRoot = router.currentPath === router.fullPath && route.path === '/';
+      const matchesPath = router.matches(route.path);
+      if (isRoot || matchesPath) {
+        setActiveId(route.id);
       }
-    }, 50);
-
-    return () => clearInterval(intervalId);
-  }, []);
+      return false;
+    });
+  }, [router]);
 
   const items = (
     <Col
