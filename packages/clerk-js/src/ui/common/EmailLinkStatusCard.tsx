@@ -1,15 +1,15 @@
 import React from 'react';
 
 import { VerificationStatus } from '../../utils/getClerkQueryParam';
-import { Col, descriptors, Flex, Flow, Icon, Spinner, Text } from '../customizables';
+import { Col, descriptors, Flex, Flow, Icon, LocalizationKey, localizationKeys, Spinner, Text } from '../customizables';
 import { Card, CardAlert, Header } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { ExclamationTriangle, SwitchArrows, TickShield } from '../icons';
 import { animations, InternalTheme } from '../styledSystem';
 
 type EmailLinkStatusCardProps = React.PropsWithChildren<{
-  title: string;
-  subtitle: string;
+  title: LocalizationKey;
+  subtitle: LocalizationKey;
   status: VerificationStatus;
 }>;
 
@@ -35,8 +35,8 @@ export const EmailLinkStatusCard = (props: EmailLinkStatusCardProps) => {
       <Card>
         <CardAlert>{card.error}</CardAlert>
         <Header.Root>
-          <Header.Title>{props.title}</Header.Title>
-          <Header.Subtitle>{props.subtitle}</Header.Subtitle>
+          <Header.Title localizationKey={props.title} />
+          <Header.Subtitle localizationKey={props.subtitle} />
         </Header.Root>
         <Col elementDescriptor={descriptors.main}>
           <StatusRow status={props.status} />
@@ -67,9 +67,8 @@ const StatusRow = (props: { status: VerificationStatus }) => {
             elementDescriptor={descriptors.verificationLinkStatusText}
             variant='regularRegular'
             colorScheme='neutral'
-          >
-            You may close this tab
-          </Text>
+            localizationKey={localizationKeys('signIn.emailLink.unusedTab.title')}
+          />
         </>
       )}
     </Flex>

@@ -5,6 +5,7 @@ import { VerificationStatus } from '../../utils/getClerkQueryParam';
 import { completeSignUpFlow } from '../components/SignUp/util';
 import { useCoreClerk, useCoreSignUp } from '../contexts';
 import { useNavigate } from '../hooks/useNavigate';
+import { LocalizationKey } from '../localization';
 import { sleep } from '../utils';
 import { EmailLinkStatusCard } from './EmailLinkStatusCard';
 
@@ -13,7 +14,7 @@ export type EmailLinkVerifyProps = {
   redirectUrl?: string;
   verifyEmailPath?: string;
   verifyPhonePath?: string;
-  texts: Record<VerificationStatus, { title: string; subtitle: string }>;
+  texts: Record<VerificationStatus, { title: LocalizationKey; subtitle: LocalizationKey }>;
 };
 
 export const EmailLinkVerify = (props: EmailLinkVerifyProps) => {

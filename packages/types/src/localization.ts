@@ -80,6 +80,12 @@ type _LocalizationResource = {
       formTitle: LocalizationValue;
       formSubtitle: LocalizationValue;
       resendButton: LocalizationValue;
+      verified: {
+        title: LocalizationValue;
+      };
+      loading: {
+        title: LocalizationValue;
+      };
     };
     emailCode: {
       title: LocalizationValue;
@@ -127,6 +133,28 @@ type _LocalizationResource = {
       formTitle: LocalizationValue;
       formSubtitle: LocalizationValue;
       resendButton: LocalizationValue;
+      unusedTab: {
+        title: LocalizationValue;
+      };
+      verified: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
+      verifiedSwitchTab: {
+        subtitle: LocalizationValue;
+      };
+      loading: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
+      failed: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
+      expired: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
     };
     phoneCode: {
       title: LocalizationValue;

@@ -1,44 +1,43 @@
-import React from 'react';
-
 import { withCardStateProvider } from '../elements';
+import { localizationKeys } from '../localization';
 import { EmailLinkVerify, EmailLinkVerifyProps } from './EmailLinkVerify';
 
-const signInTexts = {
+const signInLocalizationKeys = {
   verified: {
-    title: 'Successfully signed in',
-    subtitle: 'You will be redirected soon',
+    title: localizationKeys('signIn.emailLink.verified.title'),
+    subtitle: localizationKeys('signIn.emailLink.verified.subtitle'),
   },
   verified_switch_tab: {
-    title: 'Successfully signed in',
-    subtitle: 'Return to original tab to continue',
+    title: localizationKeys('signIn.emailLink.verified.title'),
+    subtitle: localizationKeys('signIn.emailLink.verifiedSwitchTab.subtitle'),
   },
   loading: {
-    title: 'Signing in...',
-    subtitle: 'You will be redirected soon',
+    title: localizationKeys('signIn.emailLink.loading.title'),
+    subtitle: localizationKeys('signIn.emailLink.loading.subtitle'),
   },
   failed: {
-    title: 'This verification link is invalid',
-    subtitle: 'Return to the original tab to continue.',
+    title: localizationKeys('signIn.emailLink.failed.title'),
+    subtitle: localizationKeys('signIn.emailLink.failed.subtitle'),
   },
   expired: {
-    title: 'This verification link has expired',
-    subtitle: 'Return to the original tab to continue.',
+    title: localizationKeys('signIn.emailLink.expired.title'),
+    subtitle: localizationKeys('signIn.emailLink.expired.subtitle'),
   },
 };
 
-const signUpTexts = {
-  ...signInTexts,
+const signUpLocalizationKeys = {
+  ...signInLocalizationKeys,
   verified: {
-    ...signInTexts.verified,
-    title: 'Successfully signed up',
+    ...signInLocalizationKeys.verified,
+    title: localizationKeys('signUp.emailLink.verified.title'),
   },
   verified_switch_tab: {
-    ...signInTexts.verified_switch_tab,
-    title: 'Successfully signed up',
+    ...signInLocalizationKeys.verified_switch_tab,
+    title: localizationKeys('signUp.emailLink.verified.title'),
   },
   loading: {
-    ...signInTexts.loading,
-    title: 'Signing up...',
+    ...signInLocalizationKeys.loading,
+    title: localizationKeys('signUp.emailLink.loading.title'),
   },
 };
 
@@ -46,7 +45,7 @@ export const SignInEmailLinkFlowComplete = withCardStateProvider((props: Omit<Em
   return (
     <EmailLinkVerify
       {...props}
-      texts={signInTexts}
+      texts={signInLocalizationKeys}
     />
   );
 });
@@ -55,7 +54,7 @@ export const SignUpEmailLinkFlowComplete = withCardStateProvider((props: Omit<Em
   return (
     <EmailLinkVerify
       {...props}
-      texts={signUpTexts}
+      texts={signUpLocalizationKeys}
     />
   );
 });

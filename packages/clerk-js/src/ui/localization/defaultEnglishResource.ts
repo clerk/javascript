@@ -81,6 +81,12 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
       formTitle: 'Verification link',
       formSubtitle: 'Use the verification link sent to your email address',
       resendButton: 'Resend link',
+      verified: {
+        title: 'Successfully signed up',
+      },
+      loading: {
+        title: 'Signing up...',
+      },
     },
     emailCode: {
       title: 'Verify your email',
@@ -128,6 +134,28 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
       formTitle: 'Verification link',
       formSubtitle: 'Use the verification link sent your email',
       resendButton: 'Resend link',
+      unusedTab: {
+        title: 'You may close this tab',
+      },
+      verified: {
+        title: 'Successfully signed in',
+        subtitle: 'You will be redirected soon',
+      },
+      verifiedSwitchTab: {
+        subtitle: 'Return to original tab to continue',
+      },
+      loading: {
+        title: 'Signing in...',
+        subtitle: 'You will be redirected soon',
+      },
+      failed: {
+        title: 'This verification link is invalid',
+        subtitle: 'Return to the original tab to continue.',
+      },
+      expired: {
+        title: 'This verification link has expired',
+        subtitle: 'Return to the original tab to continue.',
+      },
     },
     phoneCode: { ...commonTexts.signIn.phoneCode },
     phoneCodeMfa: { ...commonTexts.signIn.phoneCode, subtitle: '' },
