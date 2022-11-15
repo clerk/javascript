@@ -1,6 +1,6 @@
 import { Clerk, EnvironmentResource, SessionResource, TokenResource } from '@clerk/types';
 
-import { CookieHandler, createCookieHandler, runWithExponentialBackOff } from '../../../utils';
+import { CookieHandler, createCookieHandler, inBrowser, runWithExponentialBackOff } from '../../../utils';
 import { clerkCoreErrorTokenRefreshFailed } from '../../errors';
 import { AuthenticationPoller } from './AuthenticationPoller';
 
@@ -50,6 +50,10 @@ export class AuthenticationService {
   }
 
   private async refreshSessionToken(): Promise<void> {
+    if (!inBrowser()) {
+      return;
+    }
+
     if (!this.clerk.session) {
       return;
     }
