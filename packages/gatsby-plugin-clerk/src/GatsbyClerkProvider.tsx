@@ -1,26 +1,25 @@
-import { ClerkLoaded, ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
+import {
+  __internal__setErrorThrowerOptions,
+  ClerkLoaded,
+  ClerkProvider as ReactClerkProvider,
+} from '@clerk/clerk-react';
 import { IsomorphicClerkOptions } from '@clerk/clerk-react/dist/types';
 import { navigate } from 'gatsby';
 import React from 'react';
 
-import { assertFrontendApi } from './utils';
+__internal__setErrorThrowerOptions({ packageName: 'gatsby-plugin-clerk' });
 
 export type GatsbyClerkProviderProps = {
   children: React.ReactNode;
   clerkState: any;
-  frontendApi: string;
 } & IsomorphicClerkOptions;
 
 export function ClerkProvider({ children, ...rest }: GatsbyClerkProviderProps) {
-  const { clerkJSUrl, clerkState, frontendApi, ...restProps } = rest;
+  const { clerkState, ...restProps } = rest;
   const { __clerk_ssr_state, __clerk_ssr_interstitial } = clerkState?.__internal_clerk_state || {};
-
-  assertFrontendApi(frontendApi);
 
   return (
     <ReactClerkProvider
-      frontendApi={frontendApi}
-      clerkJSUrl={clerkJSUrl}
       navigate={to => navigate(to)}
       initialState={__clerk_ssr_state || {}}
       {...restProps}
