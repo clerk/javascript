@@ -33,7 +33,7 @@ export const ActiveMembersList = () => {
   }
 
   //TODO: calculate if user is the only admin
-  const canChangeOwnAdminRole = isAdmin && organization?.membersCount === 1;
+  const canChangeOwnAdminRole = isAdmin && organization?.membersCount > 1;
 
   const handleRoleChange = (membership: OrganizationMembershipResource) => (newRole: MembershipRole) => {
     if (!isAdmin) {
