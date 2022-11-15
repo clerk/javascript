@@ -1,11 +1,26 @@
-import { buildURL, createCookieHandler, isDevOrStagingUrl, runIframe } from '../utils';
-import { DEV_BROWSER_SSO_JWT_HTTP_HEADER, DEV_BROWSER_SSO_JWT_KEY, DEV_BROWSER_SSO_JWT_PARAMETER } from './constants';
+import { DevSessionSyncMode } from '@clerk/types';
+
+import {
+  buildURL,
+  createCookieHandler,
+  getSearchParameterFromHash,
+  isDevOrStagingUrl,
+  removeSearchParameterFromHash,
+  runIframe,
+} from '../utils';
+import {
+  DEV_BROWSER_SSO_JWT_HTTP_HEADER,
+  DEV_BROWSER_SSO_JWT_KEY,
+  DEV_BROWSER_SSO_JWT_PARAMETER,
+  TEST_SSO_JWT_KEY,
+  TEST_SSO_JWT_SEARCH_PARAM_NAME,
+} from './constants';
 import { clerkErrorDevInitFailed } from './errors';
 import { FapiClient } from './fapiClient';
 
 export interface DevBrowserHandler {
   clear(): Promise<void>;
-  setup({ purge }: { purge: boolean }): Promise<void>;
+  setup(): Promise<void>;
   getDevBrowserJWT(): string | null;
   setDevBrowserJWT(jwt: string): void;
   removeDevBrowserJWT(): void;
@@ -14,24 +29,29 @@ export interface DevBrowserHandler {
 export type CreateDevBrowserHandlerOptions = {
   frontendApi: string;
   fapiClient: FapiClient;
+  devSessionSyncMode: DevSessionSyncMode;
 };
 
 // export type DevBrowserHandler = ReturnType<typeof createDevBrowserHandler>;
 export default function createDevBrowserHandler({
   frontendApi,
   fapiClient,
+  devSessionSyncMode,
 }: CreateDevBrowserHandlerOptions): DevBrowserHandler {
   const cookieHandler = createCookieHandler();
+  const key = devSessionSyncMode === 'cookieless' ? TEST_SSO_JWT_KEY : DEV_BROWSER_SSO_JWT_KEY;
+
   function getDevBrowserJWT() {
-    return localStorage.getItem(DEV_BROWSER_SSO_JWT_KEY);
+    return localStorage.getItem(key);
   }
 
   function setDevBrowserJWT(jwt: string) {
-    localStorage.setItem(DEV_BROWSER_SSO_JWT_KEY, jwt);
+    localStorage.setItem(key, jwt);
   }
 
   function removeDevBrowserJWT() {
-    localStorage.removeItem(DEV_BROWSER_SSO_JWT_KEY);
+    // TODO: Maybe clear keys for both dev session sync modes to be on the safe side?
+    localStorage.removeItem(key);
   }
 
   // location.host == *.lcl.dev
@@ -87,21 +107,50 @@ export default function createDevBrowserHandler({
     }
   }
 
-  async function clear() {
-    removeDevBrowserJWT();
-    await cookieHandler.removeAllDevBrowserCookies();
+  async function setCookielessDevBrowser(): Promise<void> {
+    // 1. Get the JWT from hash search parameters when the redirection comes from Clerk Hosted Pages
+    const devBrowserToken = getSearchParameterFromHash({
+      hash: window.location.hash,
+      paramName: TEST_SSO_JWT_SEARCH_PARAM_NAME,
+    });
+
+    if (devBrowserToken) {
+      window.location.hash = removeSearchParameterFromHash({
+        hash: window.location.hash,
+        paramName: TEST_SSO_JWT_SEARCH_PARAM_NAME,
+      });
+
+      setDevBrowserJWT(devBrowserToken);
+      return;
+    }
+
+    // 2. If no JWT is found in the first step, check if a JWT is already available in the local cache
+    if (getDevBrowserJWT() !== null) {
+      return;
+    }
+
+    // 3. Otherwise, fetch a new DevBrowser JWT from FAPI and cache it
+    const createDevBrowserUrl = fapiClient.buildUrl({
+      path: '/dev_browser',
+    });
+
+    const resp = await fetch(createDevBrowserUrl.toString(), {
+      method: 'POST',
+    });
+
+    const data = await resp.json();
+    setDevBrowserJWT(data?.token);
   }
 
-  async function setup({ purge }: { purge: boolean }): Promise<void> {
+  async function clear() {
+    removeDevBrowserJWT();
+    cookieHandler.removeAllDevBrowserCookies();
+    return Promise.resolve();
+  }
+
+  async function setup(): Promise<void> {
     const devOrStgApi = isDevOrStagingUrl(frontendApi);
     const devOrStgHost = isDevOrStagingUrl(window.location.host);
-
-    if (purge) {
-      // Note 1: When setup runs for production instances, clear will work only in staging and production Clerk environments
-      // as lclclerk.com is not in the PSL yet.  As a result we can't delete the .(prod|dev).lclclerk.com cookie
-      // that is set from auth V1 applications in local environment
-      await clear();
-    }
 
     if (devOrStgApi) {
       fapiClient.onBeforeRequest(request => {
@@ -117,6 +166,10 @@ export default function createDevBrowserHandler({
           setDevBrowserJWT(newDevBrowserJWT);
         }
       });
+    }
+
+    if (devSessionSyncMode === 'cookieless') {
+      return setCookielessDevBrowser();
     }
 
     if (devOrStgHost && !cookieHandler.getDevBrowserInittedCookie()) {
