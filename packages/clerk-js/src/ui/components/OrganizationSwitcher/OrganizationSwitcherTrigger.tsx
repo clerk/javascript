@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useCoreOrganization, useCoreUser, useOrganizationSwitcherContext } from '../../contexts';
-import { Button, Flex, Icon, localizationKeys } from '../../customizables';
+import { Button, Icon, localizationKeys } from '../../customizables';
 import { OrganizationPreview, PersonalWorkspacePreview } from '../../elements';
 import { Selector } from '../../icons';
 import { PropsOfComponent } from '../../styledSystem';
@@ -18,39 +18,34 @@ export const OrganizationSwitcherTrigger = React.forwardRef<HTMLButtonElement, O
       <Button
         variant='ghost'
         colorScheme='neutral'
-        sx={t => ({ borderRadius: t.radii.$lg })}
+        sx={t => ({ minHeight: 0, padding: `0 ${t.space.$2} 0 0` })}
         {...props}
         ref={ref}
       >
-        <Flex
-          gap={4}
-          center
-          align='start'
-        >
-          {organization && (
-            <OrganizationPreview
-              size={'sm'}
-              organization={organization}
-              user={user}
-              sx={{ maxWidth: '30ch' }}
-            />
-          )}
-          {!organization && (
-            <PersonalWorkspacePreview
-              user={user}
-              size={'sm'}
-              subtitle={
-                hidePersonal
-                  ? localizationKeys('organizationSwitcher.notSelected')
-                  : localizationKeys('organizationSwitcher.personalWorkspace')
-              }
-            />
-          )}
-          <Icon
-            icon={Selector}
-            sx={t => ({ color: t.colors.$blackAlpha400 })}
+        {organization && (
+          <OrganizationPreview
+            gap={3}
+            size={'sm'}
+            organization={organization}
+            sx={{ maxWidth: '30ch' }}
           />
-        </Flex>
+        )}
+        {!organization && (
+          <PersonalWorkspacePreview
+            size={'sm'}
+            gap={3}
+            user={{ profileImageUrl: user.profileImageUrl }}
+            title={
+              hidePersonal
+                ? localizationKeys('organizationSwitcher.notSelected')
+                : localizationKeys('organizationSwitcher.personalWorkspace')
+            }
+          />
+        )}
+        <Icon
+          icon={Selector}
+          sx={t => ({ color: t.colors.$blackAlpha400, marginLeft: `${t.space.$2}` })}
+        />
       </Button>
     );
   },
