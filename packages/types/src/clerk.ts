@@ -296,6 +296,11 @@ export interface Clerk {
   redirectToUserProfile: () => void;
 
   /**
+   * Redirects to the configured home URL. Retrieved from {@link environment}.
+   */
+  redirectToHome: () => void;
+
+  /**
    * Redirects to the configured URL where <OrganizationProfile /> is mounted. Retrieved from {@link environment}.
    */
   redirectToOrganizationProfile: () => void;
