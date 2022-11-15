@@ -1,1 +1,1 @@
-export { ClerkProvider, ClerkProviderProps } from './ClerkProvider';
+export { ClerkProvider, ClerkProviderProps, __internal__setErrorThrowerOptions } from './ClerkProvider';

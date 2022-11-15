@@ -10,7 +10,8 @@ import {
 } from '@clerk/types';
 import React from 'react';
 
-import IsomorphicClerk, { NewIsomorphicClerkParams } from '../isomorphicClerk';
+import IsomorphicClerk from '../isomorphicClerk';
+import type { IsomorphicClerkOptions } from '../types';
 import { AuthContext } from './AuthContext';
 import { ClientContext } from './ClientContext';
 import { IsomorphicClerkContext } from './IsomorphicClerkContext';
@@ -19,7 +20,7 @@ import { SessionContext } from './SessionContext';
 import { UserContext } from './UserContext';
 
 type ClerkContextProvider = {
-  isomorphicClerkOptions: NewIsomorphicClerkParams;
+  isomorphicClerkOptions: IsomorphicClerkOptions;
   initialState: InitialState | undefined;
   children: React.ReactNode;
 };
@@ -95,17 +96,17 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
   );
 }
 
-const useLoadedIsomorphicClerk = (options: NewIsomorphicClerkParams) => {
+const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
   const [loaded, setLoaded] = React.useState(false);
   const isomorphicClerk = React.useMemo(() => IsomorphicClerk.getOrCreateInstance(options), []);
 
   React.useEffect(() => {
-    isomorphicClerk.__unstable__updateProps({ appearance: options.options.appearance });
-  }, [options.options.appearance]);
+    isomorphicClerk.__unstable__updateProps({ appearance: options.appearance });
+  }, [options.appearance]);
 
   React.useEffect(() => {
-    isomorphicClerk.__unstable__updateProps({ options: options.options });
-  }, [options.options.localization]);
+    isomorphicClerk.__unstable__updateProps({ options });
+  }, [options.localization]);
 
   React.useEffect(() => {
     isomorphicClerk.addOnLoaded(() => setLoaded(true));

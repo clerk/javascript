@@ -1,25 +1,35 @@
+import { isLegacyFrontendApiKey, isPublishableKey } from '@clerk/shared';
 import { InitialState } from '@clerk/types';
 import React from 'react';
 
 import { multipleClerkProvidersError } from '../errors';
 import type { IsomorphicClerkOptions } from '../types';
-import { withMaxAllowedInstancesGuard } from '../utils';
+import { __internal__setErrorThrowerOptions, errorThrower, withMaxAllowedInstancesGuard } from '../utils';
 import { ClerkContextProvider } from './ClerkContextProvider';
 import { StructureContext, StructureContextStates } from './StructureContext';
 
-export interface ClerkProviderProps extends IsomorphicClerkOptions {
+__internal__setErrorThrowerOptions({
+  packageName: '@clerk/clerk-react',
+});
+
+export type ClerkProviderProps = IsomorphicClerkOptions & {
   children: React.ReactNode;
-  frontendApi?: string;
   initialState?: InitialState;
-}
+};
 
 function ClerkProviderBase(props: ClerkProviderProps): JSX.Element {
-  const { initialState, children, Clerk, frontendApi, ...options } = props;
+  const { initialState, children, ...restIsomorphicClerkOptions } = props;
+  const { frontendApi = '', publishableKey = '' } = restIsomorphicClerkOptions;
+
+  if (!isPublishableKey(publishableKey) && !isLegacyFrontendApiKey(frontendApi)) {
+    errorThrower.throwInvalidPublishableKeyError({ key: publishableKey || frontendApi || '' });
+  }
+
   return (
     <StructureContext.Provider value={StructureContextStates.noGuarantees}>
       <ClerkContextProvider
         initialState={initialState}
-        isomorphicClerkOptions={{ frontendApi: frontendApi || '', Clerk, options }}
+        isomorphicClerkOptions={restIsomorphicClerkOptions}
       >
         {children}
       </ClerkContextProvider>
@@ -31,4 +41,4 @@ const ClerkProvider = withMaxAllowedInstancesGuard(ClerkProviderBase, 'ClerkProv
 
 ClerkProvider.displayName = 'ClerkProvider';
 
-export { ClerkProvider };
+export { ClerkProvider, __internal__setErrorThrowerOptions };
