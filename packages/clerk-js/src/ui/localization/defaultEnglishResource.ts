@@ -441,7 +441,6 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
     action__addAccount: 'Add account',
   },
   organizationSwitcher: {
-    listTitle: 'Organizations',
     personalWorkspace: 'Personal Workspace',
     notSelected: 'No organization selected',
     action__createOrganization: 'Create Organization',

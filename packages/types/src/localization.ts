@@ -438,7 +438,6 @@ type _LocalizationResource = {
     action__addAccount: LocalizationValue;
   };
   organizationSwitcher: {
-    listTitle: LocalizationValue;
     personalWorkspace: LocalizationValue;
     notSelected: LocalizationValue;
     action__createOrganization: LocalizationValue;
