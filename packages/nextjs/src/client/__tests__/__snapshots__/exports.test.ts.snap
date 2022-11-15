@@ -32,6 +32,7 @@ Object {
   "WithClerk": [Function],
   "WithSession": [Function],
   "WithUser": [Function],
+  "__internal__setErrorThrowerOptions": [Function],
   "isMagicLinkError": [Function],
   "useAuth": [Function],
   "useClerk": [Function],
