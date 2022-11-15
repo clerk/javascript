@@ -1,15 +1,9 @@
 import { ClerkState } from './client/types';
-import { invalidClerkStatePropError, noClerkStateError, noFrontendApiError } from './errors';
+import { invalidClerkStatePropError, noClerkStateError } from './errors';
 
 export function warnForSsr(val: ClerkState | undefined) {
   if (!val || !val.__internal_clerk_state) {
     console.warn(noClerkStateError);
-  }
-}
-
-export function assertFrontendApi(fapi: any): asserts fapi is string {
-  if (!fapi || typeof fapi !== 'string') {
-    throw new Error(noFrontendApiError);
   }
 }
 

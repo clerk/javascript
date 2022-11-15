@@ -77,6 +77,7 @@ export function assertObject(val: any, error?: string): asserts val is Record<st
  */
 export const interstitialJsonResponse = (opts: {
   frontendApi: string;
+  publishableKey: string;
   errorReason: string | undefined;
   loader: 'root' | 'nested';
 }) => {
@@ -84,6 +85,7 @@ export const interstitialJsonResponse = (opts: {
     wrapWithClerkState({
       __clerk_ssr_interstitial: true,
       __frontendApi: opts.frontendApi,
+      __publishableKey: opts.publishableKey,
       __lastAuthResult: opts.errorReason,
       __loader: opts.loader,
     }),
@@ -97,6 +99,7 @@ export const interstitialJsonResponse = (opts: {
 export const returnLoaderResultJsonResponse = (opts: {
   authData: AuthData | null;
   frontendApi: string;
+  publishableKey: string;
   errorReason: string | undefined;
   callbackResult?: any;
 }) => {
@@ -105,6 +108,7 @@ export const returnLoaderResultJsonResponse = (opts: {
     ...wrapWithClerkState({
       __clerk_ssr_state: opts.authData,
       __frontendApi: opts.frontendApi,
+      __publishableKey: opts.publishableKey,
       __lastAuthResult: opts.errorReason || '',
     }),
   });

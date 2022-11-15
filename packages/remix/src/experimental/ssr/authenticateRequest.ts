@@ -1,6 +1,6 @@
 import { type RequestState, Clerk } from '@clerk/backend';
 
-import { noApiKeyError, noFrontendApiError } from '../errors';
+import { noApiKeyError } from '../errors';
 import { assertEnvVar, getEnvVariable } from '../utils';
 import { LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
 import { parseCookies } from './utils';
@@ -21,8 +21,10 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
   assertEnvVar(apiKey, noApiKeyError);
 
   const frontendApi =
-    getEnvVariable('CLERK_FRONTEND_API') || (context?.CLERK_FRONTEND_API as string) || opts.frontendApi;
-  assertEnvVar(frontendApi, noFrontendApiError);
+    getEnvVariable('CLERK_FRONTEND_API') || (context?.CLERK_FRONTEND_API as string) || opts.frontendApi || '';
+
+  const publishableKey =
+    getEnvVariable('CLERK_PUBLISHABLE_KEY') || (context?.CLERK_PUBLISHABLE_KEY as string) || opts.publishableKey || '';
 
   const jwtKey = getEnvVariable('CLERK_JWT_KEY') || (context?.CLERK_JWT_KEY as string) || opts.jwtKey;
 
@@ -36,6 +38,7 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     apiKey,
     jwtKey,
     frontendApi,
+    publishableKey,
     loadUser,
     loadSession,
     loadOrganization,

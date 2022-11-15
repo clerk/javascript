@@ -12,7 +12,8 @@ export async function getAuth(argsOrReq: Request | LoaderFunctionArgs, opts?: an
 
   if (showInterstitial || !authData) {
     const frontendApi = process.env.CLERK_FRONTEND_API || opts.frontendApi;
-    throw interstitialJsonResponse({ frontendApi, errorReason, loader: 'nested' });
+    const publishableKey = process.env.CLERK_PUBLISHABLE_KEY || opts.publishableKey;
+    throw interstitialJsonResponse({ frontendApi, publishableKey, errorReason, loader: 'nested' });
   }
 
   return sanitizeAuthData(authData);
