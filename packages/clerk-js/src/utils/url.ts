@@ -231,3 +231,43 @@ export const hasExternalAccountSignUpError = (signUp: SignUpResource): boolean =
   const { externalAccount } = signUp.verifications;
   return !!externalAccount.error;
 };
+
+export function getSearchParameterFromHash({
+  hash = window.location.hash,
+  paramName,
+}: {
+  hash?: string;
+  paramName: string;
+}) {
+  const h = hash.startsWith('#') ? hash.substring(1) : hash;
+  const dummyUrlForHash = new URL(h, DUMMY_URL_BASE);
+  return dummyUrlForHash.searchParams.get(paramName);
+}
+
+export function setSearchParameterInHash({
+  hash = window.location.hash,
+  paramName,
+  paramValue,
+}: {
+  hash?: string;
+  paramName: string;
+  paramValue: string;
+}) {
+  const h = hash.startsWith('#') ? hash.substring(1) : hash;
+  const dummyUrlForHash = new URL(h, DUMMY_URL_BASE);
+  dummyUrlForHash.searchParams.set(paramName, paramValue);
+  return dummyUrlForHash.href.replace(DUMMY_URL_BASE, '').replace('/', '');
+}
+
+export function removeSearchParameterFromHash({
+  hash = window.location.hash,
+  paramName,
+}: {
+  hash?: string;
+  paramName: string;
+}) {
+  const h = hash.startsWith('#') ? hash.substring(1) : hash;
+  const dummyUrlForHash = new URL(h, DUMMY_URL_BASE);
+  dummyUrlForHash.searchParams.delete(paramName);
+  return dummyUrlForHash.href.replace(DUMMY_URL_BASE, '').replace('/', '');
+}
