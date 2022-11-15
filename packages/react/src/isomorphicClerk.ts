@@ -22,7 +22,6 @@ import type {
 } from '@clerk/types';
 import { OrganizationProfileProps, OrganizationSwitcherProps } from '@clerk/types/src';
 
-import { noFrontendApiError } from './errors';
 import type {
   BrowserClerk,
   BrowserClerkConstructor,
@@ -31,7 +30,7 @@ import type {
   HeadlessBrowserClerkConstrutor,
   IsomorphicClerkOptions,
 } from './types';
-import { inClientSide, isConstructor, loadScript } from './utils';
+import { errorThrower, inClientSide, isConstructor, loadScript } from './utils';
 
 export interface Global {
   Clerk?: HeadlessBrowserClerk | BrowserClerk;
@@ -42,17 +41,12 @@ declare const global: Global;
 type MethodName<T> = {
   [P in keyof T]: T[P] extends Function ? P : never;
 }[keyof T];
-type MethodCallback = () => void;
-
-export type NewIsomorphicClerkParams = {
-  frontendApi: string;
-  options: IsomorphicClerkOptions;
-  Clerk: ClerkProp | null;
-};
+type MethodCallback = () => Promise<unknown> | unknown;
 
 export default class IsomorphicClerk {
   private mode: 'browser' | 'server';
-  private frontendApi: string;
+  private frontendApi?: string;
+  private publishableKey?: string;
   private options: IsomorphicClerkOptions;
   private Clerk: ClerkProp;
   private clerkjs: BrowserClerk | HeadlessBrowserClerk | null = null;
@@ -78,19 +72,20 @@ export default class IsomorphicClerk {
 
   static #instance: IsomorphicClerk;
 
-  static getOrCreateInstance(params: NewIsomorphicClerkParams) {
+  static getOrCreateInstance(options: IsomorphicClerkOptions) {
     // During SSR: a new instance should be created for every request
     // During CSR: use the cached instance for the whole lifetime of the app
     // This method should be idempotent in both scenarios
     if (!inClientSide() || !this.#instance) {
-      this.#instance = new IsomorphicClerk(params);
+      this.#instance = new IsomorphicClerk(options);
     }
     return this.#instance;
   }
 
-  constructor(params: NewIsomorphicClerkParams) {
-    const { Clerk = null, frontendApi, options = {} } = params || {};
+  constructor(options: IsomorphicClerkOptions) {
+    const { Clerk = null, frontendApi, publishableKey, ...rest } = options || {};
     this.frontendApi = frontendApi;
+    this.publishableKey = publishableKey;
     this.options = options;
     this.Clerk = Clerk;
     this.mode = inClientSide() ? 'browser' : 'server';
@@ -102,8 +97,8 @@ export default class IsomorphicClerk {
       return;
     }
 
-    if (!this.frontendApi) {
-      this.throwError(noFrontendApiError);
+    if (typeof this.publishableKey === 'undefined' && typeof this.frontendApi === 'undefined') {
+      errorThrower.throwMissingFrontendApiPublishableKeyError();
     }
 
     // Store frontendAPI value on window as a fallback. This value can be used as a
@@ -117,6 +112,7 @@ export default class IsomorphicClerk {
     // - https://github.com/remix-run/remix/issues/2947
     // - https://github.com/facebook/react/issues/24430
     window.__clerk_frontend_api = this.frontendApi;
+    window.__clerk_publishable_key = this.publishableKey;
 
     try {
       if (this.Clerk) {
@@ -125,7 +121,7 @@ export default class IsomorphicClerk {
 
         if (isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstrutor>(this.Clerk)) {
           // Construct a new Clerk object if a constructor is passed
-          c = new this.Clerk(this.frontendApi);
+          c = new this.Clerk(this.publishableKey || this.frontendApi || '');
           await c.load(this.options);
         } else {
           // Otherwise use the instantiated Clerk object
@@ -141,6 +137,7 @@ export default class IsomorphicClerk {
         // Hot-load latest ClerkJS from Clerk CDN
         await loadScript({
           frontendApi: this.frontendApi,
+          publishableKey: this.publishableKey,
           scriptUrl: this.options.clerkJSUrl,
           scriptVariant: this.options.clerkJSVariant,
         });
@@ -189,7 +186,7 @@ export default class IsomorphicClerk {
     }
   }
 
-  private hydrateClerkJS = async (clerkjs: BrowserClerk | HeadlessBrowserClerk | undefined) => {
+  private hydrateClerkJS = (clerkjs: BrowserClerk | HeadlessBrowserClerk | undefined) => {
     if (!clerkjs) {
       throw new Error('Failed to hydrate latest Clerk JS');
     }

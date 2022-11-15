@@ -3,14 +3,24 @@ import type { Clerk, ClerkOptions, ClientResource, LoadedClerk, RedirectOptions,
 declare global {
   interface Window {
     __clerk_frontend_api?: string;
+    __clerk_publishable_key?: string;
   }
 }
 
-export interface IsomorphicClerkOptions extends ClerkOptions {
+export type IsomorphicClerkOptions = ClerkOptions & {
   Clerk?: ClerkProp;
   clerkJSUrl?: string;
   clerkJSVariant?: 'headless' | '';
-}
+} & (
+    | {
+        frontendApi?: never;
+        publishableKey: string;
+      }
+    | {
+        frontendApi: string;
+        publishableKey?: never;
+      }
+  );
 
 export interface BrowserClerkConstructor {
   new (frontendApi: string): BrowserClerk;
