@@ -1,8 +1,8 @@
 import { OAUTH_PROVIDERS } from '@clerk/types';
 import React from 'react';
 
-import { createFixture as _createFixture, render, screen } from '../../../testUtils';
-import { SignInStart } from './SignInStart';
+import { createFixture as _createFixture, render, screen } from '../../../../testUtils';
+import { SignInStart } from '../SignInStart';
 
 const createFixture = _createFixture('SignIn');
 
@@ -81,7 +81,7 @@ describe('SignInStart', () => {
   });
 
   describe('navigation', () => {
-    it.only('calls create on clicking Continue button', async () => {
+    it('calls create on clicking Continue button', async () => {
       const { wrapper, fixtures } = createFixture(f => {
         f.withEmailAddress();
         f.mockSignInCreate({ responseStatus: 'needs_first_factor' });
