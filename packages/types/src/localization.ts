@@ -461,7 +461,7 @@ type _LocalizationResource = {
       successMessage: LocalizationValue;
       dangerSection: {
         title: LocalizationValue;
-        leave: {
+        leaveOrganization: {
           title: LocalizationValue;
           messageLine1: LocalizationValue;
           messageLine2: LocalizationValue;
@@ -483,15 +483,15 @@ type _LocalizationResource = {
         headerTitle__invited: LocalizationValue;
       };
       activeMembersTab: {
-        headerTitle__user: LocalizationValue;
-        headerTitle__joined: LocalizationValue;
-        headerTitle__role: LocalizationValue;
-        headerTitle__actions: LocalizationValue;
-        action__remove: LocalizationValue;
+        tableHeader__user: LocalizationValue;
+        tableHeader__joined: LocalizationValue;
+        tableHeader__role: LocalizationValue;
+        tableHeader__actions: LocalizationValue;
+        menuAction__remove: LocalizationValue;
       };
       invitedMembersTab: {
-        headerTitle__invited: LocalizationValue;
-        action__revoke: LocalizationValue;
+        tableHeader__invited: LocalizationValue;
+        menuAction__revoke: LocalizationValue;
       };
     };
   };

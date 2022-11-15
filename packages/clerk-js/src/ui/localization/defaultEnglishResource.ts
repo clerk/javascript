@@ -464,7 +464,7 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
       successMessage: 'The organization has been updated.',
       dangerSection: {
         title: 'Danger',
-        leave: {
+        leaveOrganization: {
           title: 'Leave organization',
           messageLine1:
             'Are you sure you want to leave this organization? You will lose access to this organization and its applications.',
@@ -487,15 +487,15 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
         headerTitle__invited: 'Invited',
       },
       activeMembersTab: {
-        headerTitle__user: 'User',
-        headerTitle__joined: 'Joined',
-        headerTitle__role: 'Role',
-        headerTitle__actions: '',
-        action__remove: 'Remove member',
+        tableHeader__user: 'User',
+        tableHeader__joined: 'Joined',
+        tableHeader__role: 'Role',
+        tableHeader__actions: '',
+        menuAction__remove: 'Remove member',
       },
       invitedMembersTab: {
-        headerTitle__invited: 'Invited',
-        action__revoke: 'Revoke invitation',
+        tableHeader__invited: 'Invited',
+        menuAction__revoke: 'Revoke invitation',
       },
     },
   },

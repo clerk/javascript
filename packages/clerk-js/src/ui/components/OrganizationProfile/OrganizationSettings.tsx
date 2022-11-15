@@ -82,7 +82,7 @@ const OrganizationDangerSection = () => {
           textVariant='buttonExtraSmallBold'
           onClick={() => navigate('leave')}
           isDisabled={membership.role === 'admin'}
-          localizationKey={localizationKeys('organizationProfile.profilePage.dangerSection.leave.title')}
+          localizationKey={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.title')}
         />
       </Flex>
     </ProfileSection>

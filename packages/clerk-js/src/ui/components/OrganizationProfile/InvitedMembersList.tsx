@@ -42,10 +42,10 @@ export const InvitedMembersList = () => {
       itemsPerPage={ITEMS_PER_PAGE}
       isLoading={!invitationList}
       headers={[
-        localizationKeys('organizationProfile.membersPage.activeMembersTab.headerTitle__user'),
-        localizationKeys('organizationProfile.membersPage.invitedMembersTab.headerTitle__invited'),
-        localizationKeys('organizationProfile.membersPage.activeMembersTab.headerTitle__role'),
-        localizationKeys('organizationProfile.membersPage.activeMembersTab.headerTitle__actions'),
+        localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__user'),
+        localizationKeys('organizationProfile.membersPage.invitedMembersTab.tableHeader__invited'),
+        localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__role'),
+        localizationKeys('organizationProfile.membersPage.activeMembersTab.tableHeader__actions'),
       ]}
       rows={(invitationList || []).map(i => (
         <InvitationRow
@@ -80,7 +80,7 @@ const InvitationRow = (props: { invitation: OrganizationInvitationResource; onRe
         <ThreeDotsMenu
           actions={[
             {
-              label: localizationKeys('organizationProfile.membersPage.invitedMembersTab.action__revoke'),
+              label: localizationKeys('organizationProfile.membersPage.invitedMembersTab.menuAction__revoke'),
               isDestructive: true,
               onClick: onRevoke,
             },
