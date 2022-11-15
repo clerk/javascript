@@ -6,6 +6,7 @@ export type GetAuthReturn = Promise<ServerSideAuth>;
 
 export type RootAuthLoaderOptions = {
   frontendApi?: string;
+  publishableKey?: string;
   loadUser?: boolean;
   loadSession?: boolean;
   jwtKey?: string;

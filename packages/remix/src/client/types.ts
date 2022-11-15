@@ -6,6 +6,7 @@ export type ClerkState = {
     __clerk_ssr_interstitial: string;
     __clerk_ssr_state: InitialState;
     __frontendApi: string;
+    __publishableKey: string;
     __lastAuthResult: string;
   };
 };
