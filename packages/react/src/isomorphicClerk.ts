@@ -529,6 +529,15 @@ export default class IsomorphicClerk {
     }
   };
 
+  redirectToHome = (): void => {
+    const callback = () => this.clerkjs?.redirectToHome();
+    if (this.clerkjs && this.#loaded) {
+      callback();
+    } else {
+      this.premountMethodCalls.set('redirectToHome', callback);
+    }
+  };
+
   redirectToOrganizationProfile = (): void => {
     const callback = () => this.clerkjs?.redirectToOrganizationProfile();
     if (this.clerkjs && this.#loaded) {

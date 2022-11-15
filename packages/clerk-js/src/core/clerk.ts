@@ -576,6 +576,13 @@ export default class Clerk implements ClerkInterface {
     return this.redirectWithAuth(this.#environment.displayConfig.userProfileUrl);
   };
 
+  public redirectToHome = async (): Promise<unknown> => {
+    if (!this.#environment || !this.#environment.displayConfig) {
+      return;
+    }
+    return this.redirectWithAuth(this.#environment.displayConfig.homeUrl);
+  };
+
   public redirectWithAuth = async (to: string): Promise<unknown> => {
     if (!inBrowser()) {
       return;
