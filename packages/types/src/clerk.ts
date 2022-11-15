@@ -18,6 +18,8 @@ import { ActiveSessionResource } from './session';
 import { UserResource } from './user';
 import { DeepPartial, DeepSnakeToCamel } from './utils';
 
+export type DevSessionSyncMode = 'cookie' | 'cookieless';
+
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
 export type BeforeEmitCallback = (session: ActiveSessionResource | null) => void | Promise<any>;
@@ -55,6 +57,9 @@ export interface Clerk {
 
   /** Clerk Frontend API string. */
   frontendApi: string;
+
+  /** Clerk Dev Session Sync Mode string. */
+  syncMode?: DevSessionSyncMode;
 
   /** Client handling most Clerk operations. */
   client?: ClientResource;
