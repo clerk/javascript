@@ -1,3 +1,5 @@
+import { parsePublishableKey } from '@clerk/shared';
+
 import { LIB_VERSION } from '../info';
 import { BrowserClerk } from '../types';
 
@@ -8,7 +10,6 @@ export interface Global {
 declare const global: Global;
 
 const FAILED_TO_LOAD_ERROR = 'Clerk: Failed to load Clerk';
-const MISSING_PROVIDER_ERROR = 'Clerk: Missing provider';
 const MISSING_BODY_ERROR = 'Clerk: Missing <body> element.';
 
 const UNSTABLE_RELEASE_TAGS = ['staging', 'next'];
@@ -30,27 +31,6 @@ const forceStagingReleaseForClerkFapi = (frontendApi: string): boolean => {
   );
 };
 
-// TODO: Undup
-function parsePublishableKey(key: string, pkg: string) {
-  try {
-    if (!key.startsWith('pk_test_') && !key.startsWith('pk_live_')) {
-      throw 'error';
-    }
-    const keyParts = key.split('_');
-    const instanceType = keyParts[1] as 'test' | 'live';
-    let frontendApi = atob(keyParts[2]);
-    if (!frontendApi.endsWith('$')) {
-      throw 'error';
-    }
-    frontendApi = frontendApi.slice(0, -1);
-    return { instanceType, frontendApi };
-  } catch (e) {
-    throw new Error(
-      `Clerk Error: The publishableKey passed to Clerk is malformed. Your publishable key can be retrieved from https://dashboard.clerk.dev/last-active?path=api-keys (package=${pkg};passed=${key})`,
-    );
-  }
-}
-
 function getScriptSrc({ publishableKey, frontendApi, scriptUrl, scriptVariant = '' }: LoadScriptParams): string {
   if (scriptUrl) {
     return scriptUrl;
@@ -58,8 +38,8 @@ function getScriptSrc({ publishableKey, frontendApi, scriptUrl, scriptVariant = 
 
   let scriptHost: string;
   if (publishableKey) {
-    const { frontendApi: derivedFrontendApi } = parsePublishableKey(publishableKey, '@clerk/clerk-react');
-    scriptHost = derivedFrontendApi;
+    const { frontendApi } = parsePublishableKey(publishableKey)!;
+    scriptHost = frontendApi;
   } else if (frontendApi) {
     scriptHost = frontendApi;
   } else {
@@ -95,20 +75,6 @@ export interface LoadScriptParams {
 }
 
 export async function loadScript(params: LoadScriptParams): Promise<HTMLScriptElement | null> {
-  // @ts-ignore
-  if (!params.publishableKey && !params.frontendApi && window.__clerkDemoInstance) {
-    const ephemeralKeyCookie = document.cookie.split('; ').find(x => x.startsWith('clerk_ephemeral_pk='));
-    if (ephemeralKeyCookie) {
-      params.publishableKey = ephemeralKeyCookie.replace('clerk_ephemeral_pk=', '');
-    } else {
-      // @ts-ignore
-      const apiOrigin = window.__clerkApiOrigin || 'https://api.clerk.dev';
-      const instanceCreate = await fetch(`${apiOrigin}/v1/public/demo_instance`, { method: 'POST' });
-      const details = await instanceCreate.json();
-      params.publishableKey = details['frontend_api_key'];
-      document.cookie = `clerk_ephemeral_pk=${params.publishableKey}`;
-    }
-  }
   return new Promise((resolve, reject) => {
     const { frontendApi, publishableKey } = params;
 
@@ -117,17 +83,8 @@ export async function loadScript(params: LoadScriptParams): Promise<HTMLScriptEl
     }
 
     const script = document.createElement('script');
-
-    if (publishableKey) {
-      script.setAttribute('data-clerk-publishable-key', publishableKey);
-    } else if (frontendApi) {
-      script.setAttribute('data-clerk-frontend-api', frontendApi);
-    } else {
-      throw new Error(
-        'Clerk Error: publishableKey not found. Please pass a publishableKey to the ClerkProvider component, or set the appropriate environment variable for your framework.',
-      );
-    }
-
+    script.setAttribute('data-clerk-publishable-key', publishableKey!);
+    script.setAttribute('data-clerk-frontend-api', frontendApi!);
     script.setAttribute('crossorigin', 'anonymous');
     script.async = true;
 

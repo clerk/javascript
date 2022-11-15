@@ -42,14 +42,7 @@ declare const global: Global;
 type MethodName<T> = {
   [P in keyof T]: T[P] extends Function ? P : never;
 }[keyof T];
-type MethodCallback = () => void;
-
-export type NewIsomorphicClerkParams = {
-  publishableKey?: string;
-  frontendApi?: string;
-  options: IsomorphicClerkOptions;
-  Clerk: ClerkProp | null;
-};
+type MethodCallback = () => Promise<unknown> | unknown;
 
 export default class IsomorphicClerk {
   private mode: 'browser' | 'server';
@@ -80,18 +73,18 @@ export default class IsomorphicClerk {
 
   static #instance: IsomorphicClerk;
 
-  static getOrCreateInstance(params: NewIsomorphicClerkParams) {
+  static getOrCreateInstance(options: IsomorphicClerkOptions) {
     // During SSR: a new instance should be created for every request
     // During CSR: use the cached instance for the whole lifetime of the app
     // This method should be idempotent in both scenarios
     if (!inClientSide() || !this.#instance) {
-      this.#instance = new IsomorphicClerk(params);
+      this.#instance = new IsomorphicClerk(options);
     }
     return this.#instance;
   }
 
-  constructor(params: NewIsomorphicClerkParams) {
-    const { Clerk = null, frontendApi, publishableKey, options = {} } = params || {};
+  constructor(options: IsomorphicClerkOptions) {
+    const { Clerk = null, frontendApi, publishableKey, ...rest } = options || {};
     this.frontendApi = frontendApi;
     this.publishableKey = publishableKey;
     this.options = options;
@@ -121,6 +114,7 @@ export default class IsomorphicClerk {
     // - https://github.com/remix-run/remix/issues/2947
     // - https://github.com/facebook/react/issues/24430
     window.__clerk_frontend_api = this.frontendApi;
+    window.__clerk_publishable_key = this.publishableKey;
 
     try {
       if (this.Clerk) {
@@ -129,7 +123,7 @@ export default class IsomorphicClerk {
 
         if (isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstrutor>(this.Clerk)) {
           // Construct a new Clerk object if a constructor is passed
-          c = new this.Clerk(this.publishableKey || this.frontendApi);
+          c = new this.Clerk(this.publishableKey || this.frontendApi || '');
           await c.load(this.options);
         } else {
           // Otherwise use the instantiated Clerk object
@@ -193,7 +187,7 @@ export default class IsomorphicClerk {
     throw new Error(errorMsg);
   }
 
-  private hydrateClerkJS = async (clerkjs: BrowserClerk | HeadlessBrowserClerk | undefined) => {
+  private hydrateClerkJS = (clerkjs: BrowserClerk | HeadlessBrowserClerk | undefined) => {
     if (!clerkjs) {
       throw new Error('Failed to hydrate latest Clerk JS');
     }
