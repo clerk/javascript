@@ -137,11 +137,11 @@ const componentsControls = {} as ComponentControls;
 
 // TODO: move this elsewhere
 const componentNodes = Object.freeze({
-  signUp: 'signUpModal',
-  singIn: 'signInModal',
-  user: 'userProfileModal',
-  organization: 'organizationProfileModal',
-  createOrganization: 'createOrganizationModal',
+  SignUp: 'signUpModal',
+  SignIn: 'signInModal',
+  UserProfile: 'userProfileModal',
+  OrganizationProfile: 'organizationProfileModal',
+  CreateOrganization: 'createOrganizationModal',
 });
 
 const Components = (props: ComponentsProps) => {
@@ -158,19 +158,23 @@ const Components = (props: ComponentsProps) => {
   const { signInModal, signUpModal, userProfileModal, organizationProfileModal, createOrganizationModal, nodes } =
     state;
 
-  // TODO: rename these
-  const urlClerkState = getClerkQueryParam('__clerk_state') ?? '';
-  const decodedRedirectParams = urlClerkState ? JSON.parse(atob(urlClerkState)) : null;
+  const [urlState, setUrlState] = React.useState(null);
+
+  const readAndRemoveStateParam = () => {
+    const urlClerkState = getClerkQueryParam('__clerk_state') ?? '';
+    removeClerkQueryParam('__clerk_state');
+    return urlClerkState ? JSON.parse(atob(urlClerkState)) : null;
+  };
+
+  const decodedRedirectParams = readAndRemoveStateParam() ?? '';
 
   useSafeLayoutEffect(() => {
-    if (urlClerkState && decodedRedirectParams && decodedRedirectParams?.modal) {
+    if (decodedRedirectParams) {
+      setUrlState(decodedRedirectParams);
       setState(s => ({
         ...s,
-        [componentNodes[snakeToCamel(decodedRedirectParams.basePath)]]: {},
-        options: { ...s.options, startPath: decodedRedirectParams.fullPath },
+        [componentNodes[decodedRedirectParams.componentName]]: true,
       }));
-
-      removeClerkQueryParam('__clerk_state');
     }
 
     componentsControls.mountComponent = params => {
@@ -203,7 +207,8 @@ const Components = (props: ComponentsProps) => {
     };
 
     componentsControls.closeModal = name => {
-      setState(s => ({ ...s, [name + 'Modal']: null, options: { ...s.options, startPath: null } }));
+      setUrlState(null);
+      setState(s => ({ ...s, [name + 'Modal']: null }));
     };
 
     componentsControls.openModal = (name, props) => {
@@ -283,7 +288,8 @@ const Components = (props: ComponentsProps) => {
             <VirtualRouter
               preservedParams={PRESERVED_QUERYSTRING_PARAMS}
               onExternalNavigate={() => componentsControls.closeModal('userProfile')}
-              startPath={state.options?.startPath || '/user'}
+              // startPath={state.options?.startPath || '/user'}
+              startPath={`/user${urlState?.path || ''}`}
             >
               <UserProfileModal />
             </VirtualRouter>

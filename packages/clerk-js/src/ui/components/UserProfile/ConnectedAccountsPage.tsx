@@ -48,13 +48,22 @@ const AddConnectedAccount = () => {
   const { strategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
   const { currentPath } = useRouter();
   const isModal = useUserProfileContext().mode === 'modal';
+  const componentName = useUserProfileContext().componentName;
 
-  const redirectParams = {
-    basePath: currentPath.replace('/CLERK-ROUTER/VIRTUAL', '')?.split('/')[1] || '',
-    fullPath: currentPath.replace('/CLERK-ROUTER/VIRTUAL', ''),
-    modal: isModal,
+  const serializeAndAppendModalState = (url: string, isModal: boolean) => {
+    if (!isModal) {
+      return url;
+    }
+
+    const redirectParams = {
+      path: currentPath.replace('/CLERK-ROUTER/VIRTUAL/user', '') || '',
+      componentName,
+    };
+
+    const encodedRedirectParams = btoa(JSON.stringify(redirectParams));
+
+    return `${window.location.href}?__clerk_state=${encodedRedirectParams}`;
   };
-  const encodedRedirectParams = btoa(JSON.stringify(redirectParams));
 
   const enabledStrategies = strategies.filter(s => s.startsWith('oauth')) as OAuthStrategy[];
   const connectedStrategies = user.verifiedExternalAccounts.map(a => 'oauth_' + a.provider) as OAuthStrategy[];
@@ -70,7 +79,7 @@ const AddConnectedAccount = () => {
     user
       .createExternalAccount({
         strategy: strategy,
-        redirect_url: `${window.location.href}?__clerk_state=${encodedRedirectParams}`,
+        redirect_url: serializeAndAppendModalState(window.location.href, isModal),
       })
       .then(res => {
         if (res.verification?.externalVerificationRedirectURL) {

@@ -460,7 +460,6 @@ export interface ClerkOptions {
   /** Optional support email for display in authentication screens */
   supportEmail?: string;
   touchSession?: boolean;
-  startPath?: string | null;
 }
 
 export interface Resources {
