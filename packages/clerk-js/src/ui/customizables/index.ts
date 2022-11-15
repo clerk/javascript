@@ -42,5 +42,5 @@ export const Table = makeCustomizable(sanitizeDomProps(Primitives.Table));
 export const Thead = makeCustomizable(sanitizeDomProps(Primitives.Thead));
 export const Tbody = makeCustomizable(sanitizeDomProps(Primitives.Tbody));
 export const Tr = makeCustomizable(sanitizeDomProps(Primitives.Tr));
-export const Th = makeCustomizable(sanitizeDomProps(Primitives.Th));
-export const Td = makeCustomizable(sanitizeDomProps(Primitives.Td));
+export const Th = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.Th)));
+export const Td = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.Td)));

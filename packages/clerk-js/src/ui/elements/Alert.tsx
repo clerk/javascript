@@ -3,11 +3,13 @@ import React from 'react';
 import { Alert as AlertCust, AlertIcon, Col, descriptors, LocalizationKey, Text } from '../customizables';
 import { animations, PropsOfComponent } from '../styledSystem';
 
-type AlertProps = {
+type _AlertProps = {
   variant?: 'danger' | 'warning';
   title?: LocalizationKey | string;
   subtitle?: LocalizationKey | string;
-} & PropsOfComponent<typeof AlertCust>;
+};
+
+type AlertProps = Omit<PropsOfComponent<typeof AlertCust>, keyof _AlertProps> & _AlertProps;
 
 export const Alert = (props: AlertProps): JSX.Element | null => {
   const { children, title, subtitle, variant = 'warning', ...rest } = props;
@@ -39,8 +41,9 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
           elementId={descriptors.alert.setId(variant)}
           colorScheme='neutral'
           variant='smallRegular'
+          localizationKey={title}
         >
-          {title || children}
+          {children}
         </Text>
         {subtitle && (
           <Text
@@ -48,9 +51,8 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
             elementId={descriptors.alert.setId(variant)}
             colorScheme='neutral'
             variant='smallRegular'
-          >
-            {subtitle}
-          </Text>
+            localizationKey={subtitle}
+          />
         )}
       </Col>
     </AlertCust>

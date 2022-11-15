@@ -1,10 +1,15 @@
 import React from 'react';
 
-import { Button, Icon } from '../customizables';
+import { Button, Icon, LocalizationKey } from '../customizables';
 import { ThreeDots } from '../icons';
 import { Menu, MenuItem, MenuList, MenuTrigger } from './Menu';
 
-type Action = { label: string; isDestructive?: boolean; onClick: () => unknown; isDisabled?: boolean };
+type Action = {
+  label: LocalizationKey;
+  isDestructive?: boolean;
+  onClick: () => unknown;
+  isDisabled?: boolean;
+};
 
 type ThreeDotsMenuProps = {
   actions: Action[];
@@ -30,15 +35,14 @@ export const ThreeDotsMenu = (props: ThreeDotsMenuProps) => {
         </Button>
       </MenuTrigger>
       <MenuList>
-        {actions.map(a => (
+        {actions.map((a, index) => (
           <MenuItem
-            key={a.label}
+            key={index}
             destructive={a.isDestructive}
             onClick={a.onClick}
             isDisabled={a.isDisabled}
-          >
-            {a.label}
-          </MenuItem>
+            localizationKey={a.label}
+          />
         ))}
       </MenuList>
     </Menu>

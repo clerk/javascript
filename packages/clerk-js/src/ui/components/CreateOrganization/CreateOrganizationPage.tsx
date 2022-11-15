@@ -17,9 +17,8 @@ import { InvitationsSentMessage } from '../OrganizationProfile/InviteMembersPage
 import { OrganizationProfileAvatarUploader } from '../OrganizationProfile/OrganizationProfileAvatarUploader';
 
 export const CreateOrganizationPage = withCardStateProvider(() => {
-  // const title = localizationKeys('userProfile.profilePage.title');
-  const title = 'Create Organization';
-  const subtitle = 'Set the organization profile';
+  const title = localizationKeys('createOrganization.title');
+  const subtitle = localizationKeys('createOrganization.subtitle');
   const card = useCardState();
   const [file, setFile] = React.useState<File | null>();
   const { createOrganization } = useCoreOrganizations();
@@ -107,7 +106,7 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
       >
         <InviteMembersForm
           organization={organization!}
-          resetButtonLabel={'Skip'}
+          resetButtonLabel={localizationKeys('createOrganization.invitePage.formButtonReset')}
           onSuccess={wizard.nextStep}
           onReset={completeFlow}
         />

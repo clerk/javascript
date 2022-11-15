@@ -47,6 +47,7 @@ Object {
   "IdentificationLink": [Function],
   "Invitation": [Function],
   "Logger": [Function],
+  "OauthAccessToken": [Function],
   "ObjectType": Object {
     "AllowlistIdentifier": "allowlist_identifier",
     "Client": "client",
@@ -56,6 +57,7 @@ Object {
     "FacebookAccount": "facebook_account",
     "GoogleAccount": "google_account",
     "Invitation": "invitation",
+    "OauthAccessToken": "oauth_access_token",
     "Organization": "organization",
     "OrganizationInvitation": "organization_invitation",
     "OrganizationMembership": "organization_membership",

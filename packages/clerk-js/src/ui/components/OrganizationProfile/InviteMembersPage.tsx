@@ -1,15 +1,14 @@
 import { useWizard, Wizard } from '../../common';
 import { useCoreOrganization } from '../../contexts';
-import { Flex, Icon, Text } from '../../customizables';
+import { Flex, localizationKeys, Text } from '../../customizables';
 import { ContentPage, IconCircle, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { Email } from '../../icons';
 import { InviteMembersForm } from './InviteMembersForm';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
 export const InviteMembersPage = withCardStateProvider(() => {
-  // const title = localizationKeys('userProfile.profilePage.title');
-  const title = 'Invite members';
-  const subtitle = 'Invite new members to this organization';
+  const title = localizationKeys('organizationProfile.invitePage.title');
+  const subtitle = localizationKeys('organizationProfile.invitePage.subtitle');
   const card = useCardState();
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
   const { organization } = useCoreOrganization();
@@ -47,7 +46,7 @@ export const InvitationsSentMessage = () => {
       gap={4}
     >
       <IconCircle icon={Email} />
-      <Text>Invitations successfully sent</Text>
+      <Text localizationKey={localizationKeys('organizationProfile.invitePage.successMessage')} />
     </Flex>
   );
 };

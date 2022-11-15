@@ -1,13 +1,26 @@
 import { MembershipRole } from '@clerk/types';
 import React from 'react';
 
-import { Col, Flex, Spinner, Table, Tbody, Td, Th, Thead, Tr, useLocalizations } from '../../customizables';
+import {
+  Col,
+  Flex,
+  LocalizationKey,
+  localizationKeys,
+  Spinner,
+  Table,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+  useLocalizations,
+} from '../../customizables';
 import { Pagination, Select, SelectButton, SelectOptionList } from '../../elements';
 import { PropsOfComponent } from '../../styledSystem';
 import { roleLocalizationKey } from '../../utils';
 
 type MembersListTableProps = {
-  headers: string[];
+  headers: LocalizationKey[];
   rows: React.ReactNode[];
   isLoading?: boolean;
   page: number;
@@ -32,8 +45,11 @@ export const MembersListTable = (props: MembersListTableProps) => {
         <Table sx={{ width: '100%' }}>
           <Thead>
             <Tr>
-              {headers.map(h => (
-                <Th key={h}>{h}</Th>
+              {headers.map((h, index) => (
+                <Th
+                  key={index}
+                  localizationKey={h}
+                />
               ))}
             </Tr>
           </Thead>
@@ -72,7 +88,10 @@ export const MembersListTable = (props: MembersListTableProps) => {
 const EmptyRow = () => {
   return (
     <Tr>
-      <Td colSpan={3}>No members to display</Td>
+      <Td
+        colSpan={3}
+        localizationKey={localizationKeys('organizationProfile.membersPage.detailsTitle__emptyRow')}
+      />
     </Tr>
   );
 };

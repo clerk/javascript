@@ -7,7 +7,7 @@ import { PropsOfComponent } from '../styledSystem';
 
 type SuccessPageProps = Omit<PropsOfComponent<typeof ContentPage>, 'headerTitle' | 'title'> & {
   title: LocalizationKey;
-  text: LocalizationKey;
+  text?: LocalizationKey;
   finishLabel?: LocalizationKey;
   content?: React.ReactNode;
   onFinish?: () => void;

@@ -29,10 +29,13 @@ export const LeaveOrganizationPage = () => {
 
   return (
     <ActionConfirmationPage
-      title={localizationKeys('organizationProfile.profilePage.leave.title')}
-      messageLine1={localizationKeys('organizationProfile.profilePage.leave.messageLine1')}
-      messageLine2={localizationKeys('organizationProfile.profilePage.leave.messageLine2')}
-      successMessage={localizationKeys('organizationProfile.profilePage.leave.successMessage')}
+      title={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.title')}
+      messageLine1={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.messageLine1')}
+      messageLine2={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.messageLine2')}
+      submitLabel={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.title')}
+      successMessage={localizationKeys(
+        'organizationProfile.profilePage.dangerSection.leaveOrganization.successMessage',
+      )}
       onConfirmation={leave}
     />
   );
@@ -43,12 +46,21 @@ type ActionConfirmationPageProps = {
   messageLine1: LocalizationKey;
   messageLine2: LocalizationKey;
   successMessage: LocalizationKey;
+  submitLabel: LocalizationKey;
   onConfirmation: () => Promise<any>;
   colorScheme?: 'danger' | 'neutral' | 'primary';
 };
 
 const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationPageProps) => {
-  const { title, messageLine1, messageLine2, successMessage, onConfirmation, colorScheme = 'danger' } = props;
+  const {
+    title,
+    messageLine1,
+    messageLine2,
+    successMessage,
+    submitLabel,
+    onConfirmation,
+    colorScheme = 'danger',
+  } = props;
   const wizard = useWizard();
   const card = useCardState();
   const { navigate } = useNavigate();
@@ -80,7 +92,7 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
             <Form.SubmitButton
               block={false}
               colorScheme={colorScheme}
-              localizationKey={'Leave Organization'}
+              localizationKey={submitLabel}
             />
             <Form.ResetButton
               localizationKey={localizationKeys('userProfile.formButtonReset')}

@@ -30,6 +30,7 @@ type _LocalizationResource = {
   formFieldLabel__lastName: LocalizationValue;
   formFieldLabel__backupCode: LocalizationValue;
   formFieldLabel__organizationName: LocalizationValue;
+  formFieldLabel__role: LocalizationValue;
   formFieldInputPlaceholder__emailAddress: LocalizationValue;
   formFieldInputPlaceholder__emailAddresses: LocalizationValue;
   formFieldInputPlaceholder__phoneNumber: LocalizationValue;
@@ -80,6 +81,12 @@ type _LocalizationResource = {
       formTitle: LocalizationValue;
       formSubtitle: LocalizationValue;
       resendButton: LocalizationValue;
+      verified: {
+        title: LocalizationValue;
+      };
+      loading: {
+        title: LocalizationValue;
+      };
     };
     emailCode: {
       title: LocalizationValue;
@@ -127,6 +134,28 @@ type _LocalizationResource = {
       formTitle: LocalizationValue;
       formSubtitle: LocalizationValue;
       resendButton: LocalizationValue;
+      unusedTab: {
+        title: LocalizationValue;
+      };
+      verified: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
+      verifiedSwitchTab: {
+        subtitle: LocalizationValue;
+      };
+      loading: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
+      failed: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
+      expired: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
     };
     phoneCode: {
       title: LocalizationValue;
@@ -423,15 +452,54 @@ type _LocalizationResource = {
     start: {
       headerTitle__members: LocalizationValue;
       headerTitle__settings: LocalizationValue;
+      headerSubtitle__members: LocalizationValue;
+      headerSubtitle__settings: LocalizationValue;
     };
     profilePage: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
       successMessage: LocalizationValue;
-      leave: {
+      dangerSection: {
         title: LocalizationValue;
-        messageLine1: LocalizationValue;
-        messageLine2: LocalizationValue;
-        successMessage: LocalizationValue;
+        leaveOrganization: {
+          title: LocalizationValue;
+          messageLine1: LocalizationValue;
+          messageLine2: LocalizationValue;
+          successMessage: LocalizationValue;
+        };
       };
+    };
+    invitePage: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      successMessage: LocalizationValue;
+      detailsTitle__inviteFailed: LocalizationValue;
+    };
+    membersPage: {
+      detailsTitle__emptyRow: LocalizationValue;
+      action__invite: LocalizationValue;
+      start: {
+        headerTitle__active: LocalizationValue;
+        headerTitle__invited: LocalizationValue;
+      };
+      activeMembersTab: {
+        tableHeader__user: LocalizationValue;
+        tableHeader__joined: LocalizationValue;
+        tableHeader__role: LocalizationValue;
+        tableHeader__actions: LocalizationValue;
+        menuAction__remove: LocalizationValue;
+      };
+      invitedMembersTab: {
+        tableHeader__invited: LocalizationValue;
+        menuAction__revoke: LocalizationValue;
+      };
+    };
+  };
+  createOrganization: {
+    title: LocalizationValue;
+    subtitle: LocalizationValue;
+    invitePage: {
+      formButtonReset: LocalizationValue;
     };
   };
   unstable__errors: {
