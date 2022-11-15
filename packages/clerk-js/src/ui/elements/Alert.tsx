@@ -41,8 +41,9 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
           elementId={descriptors.alert.setId(variant)}
           colorScheme='neutral'
           variant='smallRegular'
+          localizationKey={title}
         >
-          {title || children}
+          {children}
         </Text>
         {subtitle && (
           <Text
@@ -50,9 +51,8 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
             elementId={descriptors.alert.setId(variant)}
             colorScheme='neutral'
             variant='smallRegular'
-          >
-            {subtitle}
-          </Text>
+            localizationKey={subtitle}
+          />
         )}
       </Col>
     </AlertCust>
