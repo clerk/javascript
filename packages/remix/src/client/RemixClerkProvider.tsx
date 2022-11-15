@@ -1,10 +1,12 @@
-import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
+import { __internal__setErrorThrowerOptions, ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import { IsomorphicClerkOptions } from '@clerk/clerk-react/dist/types';
 import React from 'react';
 
 import { assertFrontendApi, assertValidClerkState, warnForSsr } from '../utils';
 import { ClerkState } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
+
+__internal__setErrorThrowerOptions({ packageName: '@clerk/remix' });
 
 export * from '@clerk/clerk-react';
 
@@ -19,7 +21,8 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
   ReactClerkProvider.displayName = 'ReactClerkProvider';
 
   assertValidClerkState(clerkState);
-  const { __clerk_ssr_state, __frontendApi, __lastAuthResult } = clerkState?.__internal_clerk_state || {};
+  const { __clerk_ssr_state, __frontendApi, __publishableKey, __lastAuthResult } =
+    clerkState?.__internal_clerk_state || {};
 
   React.useEffect(() => {
     warnForSsr(clerkState);
@@ -32,8 +35,10 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
   assertFrontendApi(__frontendApi);
 
   return (
+    // @ts-expect-error
     <ReactClerkProvider
       frontendApi={__frontendApi}
+      publishableKey={__publishableKey}
       clerkJSUrl={clerkJSUrl}
       navigate={awaitableNavigate}
       initialState={__clerk_ssr_state}
