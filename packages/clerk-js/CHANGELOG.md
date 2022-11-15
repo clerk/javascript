@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.15.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.15.0...@clerk/clerk-js@4.15.1) (2022-11-15)
+
+### Bug Fixes
+
+- **clerk-js:** Correct role change check in ActiveMembersList ([3cf8b5e](https://github.com/clerkinc/javascript/commit/3cf8b5e14669ef78d99a4d4975b7be709a6f3c8f))
+
 ## [4.15.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.15.0-staging.1...@clerk/clerk-js@4.15.0) (2022-11-15)
 
 **Note:** Version bump only for package @clerk/clerk-js
