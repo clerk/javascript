@@ -1,11 +1,7 @@
-import { UserResource } from '@clerk/types';
-import React from 'react';
-
 import { useCoreUser } from '../../contexts';
 import { localizationKeys } from '../../customizables';
-import { UserPreview } from '../../elements';
+import { ProfileSection, UserPreview } from '../../elements';
 import { useNavigate } from '../../hooks';
-import { ProfileSection } from './Section';
 import { BlockButton } from './UserProfileBlockButtons';
 
 export const UserProfileSection = () => {

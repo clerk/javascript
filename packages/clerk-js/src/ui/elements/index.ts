@@ -51,3 +51,4 @@ export * from './FormButtons';
 export * from './NavigateToFlowStartButton';
 export * from './SuccessPage';
 export * from './IconCircle';
+export * from './Section';

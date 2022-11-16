@@ -3,12 +3,11 @@ import { ExternalAccountResource } from '@clerk/types/src';
 
 import { useCoreUser } from '../../contexts';
 import { Badge, Col, descriptors, Flex, Image, localizationKeys } from '../../customizables';
-import { useCardState, UserPreview } from '../../elements';
+import { ProfileSection, useCardState, UserPreview } from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useNavigate } from '../../hooks/useNavigate';
 import { handleError } from '../../utils';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
-import { ProfileSection } from './Section';
 import { UserProfileAccordion } from './UserProfileAccordion';
 import { AddBlockButton } from './UserProfileBlockButtons';
 

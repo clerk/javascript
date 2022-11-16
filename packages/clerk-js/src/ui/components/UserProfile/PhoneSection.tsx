@@ -1,13 +1,11 @@
 import { PhoneNumberResource } from '@clerk/types';
-import React from 'react';
 
 import { useCoreUser } from '../../contexts';
 import { Badge, Col, localizationKeys, Text } from '../../customizables';
-import { useCardState } from '../../elements';
+import { ProfileSection, useCardState } from '../../elements';
 import { useNavigate } from '../../hooks';
 import { getFlagEmojiFromCountryIso, handleError, parsePhoneString, stringToFormattedPhoneString } from '../../utils';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
-import { ProfileSection } from './Section';
 import { UserProfileAccordion } from './UserProfileAccordion';
 import { AddBlockButton } from './UserProfileBlockButtons';
 import { primaryIdentificationFirst } from './utils';

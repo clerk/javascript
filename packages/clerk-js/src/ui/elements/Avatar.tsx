@@ -105,5 +105,8 @@ const CLERK_IMAGE_URL_REGEX = /https:\/\/images\.(lcl)?clerk/i;
 
 // TODO: How do we want to handle this?
 export function hasAvatar(imageUrl: string | undefined | null): boolean {
-  return imageUrl ? CLERK_IMAGE_URL_REGEX.test(imageUrl) : false;
+  if (!imageUrl) {
+    return false;
+  }
+  return CLERK_IMAGE_URL_REGEX.test(imageUrl) || !!imageUrl;
 }

@@ -1,13 +1,11 @@
 import { EmailAddressResource } from '@clerk/types';
-import React from 'react';
 
 import { useCoreUser } from '../../contexts';
 import { Badge, Col, localizationKeys } from '../../customizables';
-import { useCardState } from '../../elements';
+import { ProfileSection, useCardState } from '../../elements';
 import { useNavigate } from '../../hooks/useNavigate';
 import { handleError } from '../../utils';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
-import { ProfileSection } from './Section';
 import { UserProfileAccordion } from './UserProfileAccordion';
 import { AddBlockButton } from './UserProfileBlockButtons';
 import { primaryIdentificationFirst } from './utils';

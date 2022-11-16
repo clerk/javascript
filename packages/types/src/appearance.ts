@@ -74,8 +74,10 @@ export type ProfileSectionId =
   | 'web3Wallets'
   | 'password'
   | 'mfa'
-  | 'activeDevices';
-export type ProfilePageId = 'account' | 'security';
+  | 'activeDevices'
+  | 'organization-profile'
+  | 'organization-danger';
+export type ProfilePageId = 'account' | 'security' | 'organization-settings';
 
 type NavbarItemId = 'account' | 'security';
 
@@ -275,6 +277,8 @@ export type ElementsConfig = {
   // organizationPreviewTextContainer: WithOptions<'organizationSwitcher', never, never>;
   // organizationPreviewMainIdentifier: WithOptions<'organizationSwitcher', never, never>;
   // organizationPreviewSecondaryIdentifier: WithOptions<'organizationSwitcher', never, never>;
+
+  organizationProfilePage: WithOptions<never, never, never>;
 
   identityPreview: WithOptions<never, never, never>;
   identityPreviewAvatarBox: WithOptions<never, never, never>;
