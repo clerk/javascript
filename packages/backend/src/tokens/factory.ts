@@ -2,6 +2,7 @@ import { type ApiClient } from '../api';
 import { API_URL, API_VERSION } from '../constants';
 import { type AuthStateOptions, getAuthState } from './authState';
 import { type LoadInterstitialOptions, loadInterstitialFromBAPI, loadInterstitialFromLocal } from './interstitial';
+import { sanitizeResource } from './sanitizer';
 
 export type CreateAuthStateOptions = Partial<Pick<AuthStateOptions, 'apiKey' | 'apiUrl' | 'apiVersion' | 'jwtKey'>> & {
   apiClient: ApiClient;
@@ -36,5 +37,6 @@ export function createAuthState(options: CreateAuthStateOptions) {
     localInterstitial,
     remotePublicInterstitial,
     remotePrivateInterstitial,
+    sanitizeResource,
   };
 }

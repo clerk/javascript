@@ -14,7 +14,11 @@ export type LoadInterstitialOptions = {
   debugData?: any;
 };
 
-export function loadInterstitialFromLocal({ frontendApi, pkgVersion, debugData }: LoadInterstitialOptions) {
+export function loadInterstitialFromLocal({
+  frontendApi,
+  pkgVersion,
+  debugData,
+}: Omit<LoadInterstitialOptions, 'apiUrl'>) {
   return `
     <head>
         <meta charset="UTF-8" />
@@ -71,6 +75,7 @@ export function loadInterstitialFromLocal({ frontendApi, pkgVersion, debugData }
 `;
 }
 
+// TODO: Add caching to Interstitial
 export async function loadInterstitialFromBAPI({ apiUrl, frontendApi, pkgVersion }: LoadInterstitialOptions) {
   const url = new URL(apiUrl);
   url.pathname = joinPaths(url.pathname, API_VERSION, '/public/interstitial');

@@ -3,6 +3,11 @@
   "version": "0.0.1",
   "license": "MIT",
   "description": "Clerk Backend SDK - REST Client for Backend API & JWT verification utilities",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "prebuild": "run-s clean build:runtime",
     "build": "tsc -p tsconfig.esm.json",
@@ -17,7 +22,6 @@
     "test:cloudflare-miniflare": "tests/cloudflare-miniflare/run.sh",
     "test:cloudflare-workerd": "tests/cloudflare-workerd/run.sh"
   },
-  "module": "dist/mjs/index.js",
   "dependencies": {
     "@clerk/types": "^3.15.2-staging.1",
     "@types/node": "^16.11.55",
