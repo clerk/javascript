@@ -1,31 +1,22 @@
 import { Clerk, SignInFirstFactor } from '@clerk/types';
 
-import { getInitialEnvironmentResource, getInitialMockClerkConfig, getInitialRouteContextValue } from './mockConfigs';
+import { getInitialMockClerkConfig, getInitialRouteContextValue } from './mockConfigs';
 
 const applyOptionsToInitialMockContext = (fixtureConfig: any) => {
   const mockClerkContext = getInitialMockClerkConfig();
-  const mockEnvironmentResource = getInitialEnvironmentResource();
   const mockRouteContextValue = getInitialRouteContextValue();
 
-  fixtureConfig.environment.social.forEach((s: any) => {
-    mockEnvironmentResource.userSettings.authenticatableSocialStrategies.push(s.strategy);
-    mockEnvironmentResource.userSettings.socialProviderStrategies.push(s.strategy);
-  });
-  fixtureConfig.environment.enabledFirstFactorIdentifiers.forEach((identifier: any) => {
-    mockEnvironmentResource.userSettings.enabledFirstFactorIdentifiers.push(identifier.identifier);
-  });
   fixtureConfig.client.signIn.supportedFirstFactors.forEach((factorStrategy: SignInFirstFactor) => {
     mockClerkContext.client.signIn.supportedFirstFactors.push(factorStrategy);
   });
   mockClerkContext.client.signIn.create = fixtureConfig.client.signIn.create;
   mockRouteContextValue.navigate = fixtureConfig.routeContext.navigate;
 
-  return { mockClerkContext, mockEnvironmentResource, mockRouteContextValue };
+  return { mockClerkContext, mockRouteContextValue };
 };
 
 export const createClerkMockContexts = (fixtureConfig: any) => {
-  const { mockClerkContext, mockEnvironmentResource, mockRouteContextValue } =
-    applyOptionsToInitialMockContext(fixtureConfig);
+  const { mockClerkContext, mockRouteContextValue } = applyOptionsToInitialMockContext(fixtureConfig);
   const listeners: any[] = [];
 
   const client = mockClerkContext.client;
@@ -44,7 +35,6 @@ export const createClerkMockContexts = (fixtureConfig: any) => {
   };
 
   return {
-    mockedEnvironment: mockEnvironmentResource,
     mockedRouteContext: mockRouteContextValue,
     mockedClerk: { ...resources, addListener } as Clerk,
     updateClerkMock: updateMock,

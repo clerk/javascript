@@ -8,8 +8,12 @@ const createFixture = _createFixture('SignIn');
 
 describe('SignInStart', () => {
   it('renders the component', () => {
-    const { wrapper } = createFixture();
-    render(<SignInStart />, { wrapper });
+    const { wrapper } = createFixture(f => {
+      f.withEmailAddress();
+      f.withSupportEmail();
+    });
+    const { debug } = render(<SignInStart />, { wrapper });
+    // debug();
     screen.getByText('Sign in');
   });
 
@@ -54,7 +58,7 @@ describe('SignInStart', () => {
   describe('Social OAuth', () => {
     it.each(OAUTH_PROVIDERS)('shows the "Continue with $name" social OAuth button', ({ provider, name }) => {
       const { wrapper } = createFixture(f => {
-        f.withSocialOAuth(provider);
+        f.withSocialProvider({ provider });
       });
 
       render(<SignInStart />, { wrapper });
@@ -65,8 +69,8 @@ describe('SignInStart', () => {
 
     it('uses the "cl-socialButtonsIconButton__SOCIALOAUTHNAME" classname when rendering the social button icon only', () => {
       const { wrapper } = createFixture(f => {
-        OAUTH_PROVIDERS.forEach(providerData => {
-          f.withSocialOAuth(providerData.provider);
+        OAUTH_PROVIDERS.forEach(({ provider }) => {
+          f.withSocialProvider({ provider });
         });
       });
 

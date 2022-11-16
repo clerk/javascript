@@ -1,8 +1,8 @@
-import { SignInFactorStrategy } from '@clerk/backend-core/src';
-import { getOAuthProviderData, OAuthProvider, SignInStatus } from '@clerk/types';
+import { EnvironmentJSON, SignInStatus } from '@clerk/types';
 import { jest } from '@jest/globals';
 import React from 'react';
 
+import { Environment } from '../../../core/resources';
 import { ComponentContext, EnvironmentProvider } from '../../contexts';
 import { CoreClerkContextWrapper } from '../../contexts/CoreClerkContextWrapper';
 import { AppearanceProvider } from '../../customizables';
@@ -10,79 +10,58 @@ import { FlowMetadataProvider } from '../../elements';
 import { RouteContext } from '../../router';
 import { InternalThemeProvider } from '../../styledSystem';
 import { createClerkMockContexts } from './createClerkMockContexts';
+import {
+  createAuthConfigFixtureHelpers,
+  createDisplayConfigFixtureHelpers,
+  createOrganizationSettingsFixtureHelpers,
+  createUserSettingsFixtureHelpers,
+} from './fixtureHelpers';
+import { createBaseEnvironmentJSON } from './fixtures';
 import { getInitialFixtureConfig } from './mockConfigs';
-
-type FParam = {
-  withUsername: () => void;
-  withEmailAddress: () => void;
-  withPhoneNumber: () => void;
-  mockSignInCreate: (opts?: { responseStatus: SignInStatus }) => typeof jest.fn;
-  mockRouteNavigate: () => typeof jest.fn;
-  withSocialOAuth: (provider: OAuthProvider) => void;
-  withAuthFirstFactor: (firstFactorStrategy: SignInFactorStrategy) => void;
-};
-
-type ConfigFn = (f: FParam) => void;
 
 type UnpackContext<T> = NonNullable<T extends React.Context<infer U> ? U : T>;
 
-export const createFixture =
-  (componentName: UnpackContext<typeof ComponentContext>['componentName']) => (configFn?: ConfigFn) => {
-    const config = getInitialFixtureConfig();
+const createConfigFParam = (config: any, baseEnvironment: EnvironmentJSON) => {
+  return {
+    ...createAuthConfigFixtureHelpers(baseEnvironment),
+    ...createDisplayConfigFixtureHelpers(baseEnvironment),
+    ...createOrganizationSettingsFixtureHelpers(baseEnvironment),
+    ...createUserSettingsFixtureHelpers(baseEnvironment),
+    ...createUserSettingsFixtureHelpers(baseEnvironment),
+    mockSignInCreate: (opts?: { responseStatus: SignInStatus }) => {
+      const mockCreate = jest.fn(() => Promise.resolve({ status: opts?.responseStatus }));
+      config.client.signIn.create = mockCreate;
+      return mockCreate;
+    },
+    mockRouteNavigate: () => {
+      const mockNavigate = jest.fn();
+      config.routeContext.navigate = mockNavigate;
+      return mockNavigate;
+    },
+  };
+};
 
-    const f = {
-      withSocialOAuth: (provider: OAuthProvider) => {
-        config.environment.social.push(getOAuthProviderData({ provider }));
-      },
-      withAuthFirstFactor: (firstFactorStrategy: SignInFactorStrategy) => {
-        config.client.signIn.supportedFirstFactors.push({
-          strategy: firstFactorStrategy,
-        });
-      },
-      withUsername: () => {
-        config.environment.enabledFirstFactorIdentifiers.push({
-          identifier: 'username',
-          enabled: true,
-          required: true,
-        });
-      },
-      withEmailAddress: () => {
-        config.environment.enabledFirstFactorIdentifiers.push({
-          identifier: 'email_address',
-          enabled: true,
-          required: true,
-        });
-      },
-      withPhoneNumber: () => {
-        config.environment.enabledFirstFactorIdentifiers.push({
-          identifier: 'phone_number',
-          enabled: true,
-          required: true,
-        });
-      },
-      mockSignInCreate: (opts?: { responseStatus: SignInStatus }) => {
-        const mockCreate = jest.fn(() => Promise.resolve({ status: opts?.responseStatus }));
-        config.client.signIn.create = mockCreate;
-        return mockCreate;
-      },
-      mockRouteNavigate: () => {
-        const mockNavigate = jest.fn();
-        config.routeContext.navigate = mockNavigate;
-        return mockNavigate;
-      },
-    } as any as FParam;
+type FParam = ReturnType<typeof createConfigFParam>;
+type ConfigFn = (f: FParam) => void;
+
+export const createFixture = (componentName: UnpackContext<typeof ComponentContext>['componentName']) => {
+  return (configFn?: ConfigFn) => {
+    const config = getInitialFixtureConfig();
+    const baseEnvironment = createBaseEnvironmentJSON();
 
     if (configFn) {
-      configFn(f);
+      configFn(createConfigFParam(config, baseEnvironment));
     }
 
-    const { mockedEnvironment, mockedClerk, mockedRouteContext, updateClerkMock } = createClerkMockContexts(config);
+    const environmentMock = new Environment(baseEnvironment);
+
+    const { mockedRouteContext, mockedClerk, updateClerkMock } = createClerkMockContexts(config);
 
     const MockClerkProvider = (props: any) => {
       const { children } = props;
       return (
         <CoreClerkContextWrapper clerk={mockedClerk}>
-          <EnvironmentProvider value={mockedEnvironment}>
+          <EnvironmentProvider value={environmentMock}>
             <RouteContext.Provider value={mockedRouteContext}>
               <AppearanceProvider appearanceKey={'signIn'}>
                 <FlowMetadataProvider flow={componentName as any}>
@@ -97,5 +76,6 @@ export const createFixture =
       );
     };
 
-    return { wrapper: MockClerkProvider, fixtures: config };
+    return { wrapper: MockClerkProvider, fixtures: config, mockedClerk };
   };
+};
