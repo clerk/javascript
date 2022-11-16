@@ -14,6 +14,7 @@
     "npm": ">=8.5.0"
   },
   "devDependencies": {
+    "@clerk/backend": "^0.0.1",
     "@commitlint/cli": "^16.0.2",
     "@commitlint/config-conventional": "^16.0.0",
     "@commitlint/config-lerna-scopes": "^16.0.0",
@@ -27,6 +28,7 @@
     "prettier": "^2.6.0",
     "pretty-quick": "^3.1.3",
     "rimraf": "^3.0.2",
+    "tsup": "^6.5.0",
     "turbo": "^1.5.5",
     "typescript": "4.8.4"
   },
