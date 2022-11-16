@@ -77,14 +77,11 @@ export enum AuthStateReason {
   Unknown = 'unknown',
 }
 
-export enum AuthStatus {
-  SignedIn = 'signed-in',
-  SignedOut = 'signed-out',
-  Interstitial = 'interstitial',
-}
-
 export type SignedInAuthState = {
-  status: AuthStatus.SignedIn;
+  isSignedIn: true;
+  isInterstitial: false;
+  reason: null;
+  message: null;
   sessionClaims: JwtPayload;
   sessionId: string;
   session?: Session;
@@ -97,9 +94,11 @@ export type SignedInAuthState = {
 };
 
 export type SignedOutAuthState = {
-  status: AuthStatus.SignedOut;
+  isSignedIn: false;
+  isInterstitial: false;
   message: string;
   reason: AuthStateReason;
+  sessionClaims: null;
   sessionId: null;
   session: null;
   userId: null;
@@ -110,9 +109,11 @@ export type SignedOutAuthState = {
   getToken: ServerGetToken;
 };
 
-export type InterstitialAuthState = {
-  status: AuthStatus.Interstitial;
+export type InterstitialAuthState = Omit<SignedOutAuthState, 'isInterstitial' | 'message'> & {
+  isSignedIn: false;
+  isInterstitial: true;
   reason: AuthStateReason;
+  message: null;
 };
 
 export type AuthState = SignedInAuthState | SignedOutAuthState | InterstitialAuthState;
@@ -235,7 +236,10 @@ async function signedIn(
   });
 
   return {
-    status: AuthStatus.SignedIn,
+    isSignedIn: true,
+    isInterstitial: false,
+    message: null,
+    reason: null,
     sessionClaims,
     sessionId,
     session,
@@ -250,9 +254,27 @@ async function signedIn(
 
 function signedOut(reason: AuthStateReason, message = ''): SignedOutAuthState {
   return {
-    status: AuthStatus.SignedOut,
+    isSignedIn: false,
+    isInterstitial: false,
     reason,
     message,
+    ..._signedOutState(),
+  };
+}
+
+function interstitial(reason: AuthStateReason): InterstitialAuthState {
+  return {
+    isSignedIn: false,
+    isInterstitial: true,
+    reason,
+    message: null,
+    ..._signedOutState(),
+  };
+}
+
+function _signedOutState() {
+  return {
+    sessionClaims: null,
     sessionId: null,
     session: null,
     userId: null,
@@ -261,13 +283,6 @@ function signedOut(reason: AuthStateReason, message = ''): SignedOutAuthState {
     orgRole: null,
     organization: null,
     getToken: () => Promise.resolve(null),
-  };
-}
-
-function interstitial(reason: AuthStateReason): InterstitialAuthState {
-  return {
-    status: AuthStatus.Interstitial,
-    reason,
   };
 }
 

@@ -3,7 +3,7 @@ import sinon from 'sinon';
 
 import runtime from '../runtime';
 import { jsonOk } from '../util/mockFetch';
-import { type AuthStateOptions, AuthStatus, getAuthState } from './authState';
+import { type AuthStateOptions, getAuthState } from './authState';
 import { mockJwks, mockJwt, mockJwtPayload } from './fixtures';
 
 export default (QUnit: QUnit) => {
@@ -50,7 +50,8 @@ export default (QUnit: QUnit) => {
       });
 
       assert.propContains(authState, {
-        status: AuthStatus.SignedIn,
+        isSignedIn: true,
+        isInterstitial: false,
         sessionClaims: mockJwtPayload,
         sessionId: mockJwtPayload.sid,
         session: undefined,
@@ -78,10 +79,12 @@ export default (QUnit: QUnit) => {
       });
 
       assert.propEqual(authState, {
+        isSignedIn: false,
+        isInterstitial: false,
+        reason: 'token-verification-error',
         message:
           'Invalid JWT Authorized party claim (azp) "https://accounts.inspired.puma-74.lcl.dev". Expected "whatever". (reason=token-verification-failed, carrier=header)',
-        reason: 'token-verification-error',
-        status: 'signed-out',
+        sessionClaims: null,
         sessionId: null,
         session: null,
         userId: null,
@@ -100,10 +103,12 @@ export default (QUnit: QUnit) => {
       });
 
       assert.propEqual(authState, {
+        isSignedIn: false,
+        isInterstitial: false,
         message:
           'Invalid JWT form. A JWT consists of three parts separated by dots. (reason=token-invalid, carrier=header)',
         reason: 'token-verification-error',
-        status: 'signed-out',
+        sessionClaims: null,
         sessionId: null,
         session: null,
         userId: null,
