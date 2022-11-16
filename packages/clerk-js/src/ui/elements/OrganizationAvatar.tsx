@@ -1,5 +1,4 @@
 import { OrganizationResource } from '@clerk/types';
-import React from 'react';
 
 import { Avatar } from '../elements';
 import { PropsOfComponent } from '../styledSystem';

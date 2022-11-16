@@ -288,6 +288,10 @@ export type ElementsConfig = {
   alertText: WithOptions<AlertId, never, never>;
   alertTextContainer: WithOptions<AlertId, never, never>;
 
+  tagInputContainer: WithOptions<never, never, never>;
+  tagPillIcon: WithOptions<never, never, never>;
+  tagPillContainer: WithOptions<never, never, never>;
+
   loader: WithOptions<never, never, never>;
   loaderIcon: WithOptions<never, ErrorState, never>;
 

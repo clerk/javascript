@@ -4,7 +4,7 @@ import { useWizard, Wizard } from '../../common';
 import { useCoreUser, useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
-import { handleError, useFormControl, isDefaultProfileImage } from '../../utils';
+import { handleError, isDefaultProfileImage, useFormControl } from '../../utils';
 import { UserProfileAvatarUploader } from './UserProfileAvatarUploader';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
