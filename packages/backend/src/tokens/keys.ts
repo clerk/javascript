@@ -163,7 +163,7 @@ async function fetchJWKSFromFAPI(issuer: string) {
   const url = new URL(issuer);
   url.pathname = joinPaths(url.pathname, '.well-known/jwks.json');
 
-  const response = await runtime.fetch(url);
+  const response = await runtime.fetch(url.href);
 
   if (!response.ok) {
     throw new TokenVerificationError({
@@ -180,7 +180,7 @@ async function fetchJWKSFromBAPI(apiUrl: string = API_URL, apiKey: string, apiVe
   const url = new URL(apiUrl);
   url.pathname = joinPaths(url.pathname, apiVersion, '/jwks');
 
-  const response = await runtime.fetch(url, {
+  const response = await runtime.fetch(url.href, {
     headers: {
       Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json',

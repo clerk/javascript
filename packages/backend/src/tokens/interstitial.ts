@@ -82,7 +82,7 @@ export async function loadInterstitialFromBAPI({ apiUrl, frontendApi, pkgVersion
   url.searchParams.append('clerk_js_version', getClerkJsMajorVersionOrTag(frontendApi, pkgVersion));
   url.searchParams.append('frontendApi', frontendApi);
 
-  const response = await callWithRetry(() => runtime.fetch(url));
+  const response = await callWithRetry(() => runtime.fetch(url.href));
 
   if (!response.ok) {
     throw new TokenVerificationError({

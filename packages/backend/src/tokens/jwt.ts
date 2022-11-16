@@ -257,13 +257,15 @@ export async function verifyJwt(
   }
 
   let signatureValid: boolean;
+
   try {
     signatureValid = await hasValidSignature(decoded, key);
-  } catch {
-    return { valid: false, reason: `Error verifying JWT signature.` };
+  } catch (err) {
+    return { valid: false, reason: `Error verifying JWT signature. ${err}` };
   }
+
   if (!signatureValid) {
-    return { valid: false, reason: `JWT signature is invalid.` };
+    return { valid: false, reason: 'JWT signature is invalid.' };
   }
 
   return {

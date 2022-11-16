@@ -1,4 +1,4 @@
-import type { JwtPayload, ServerGetToken } from '@clerk/types';
+import type { ActClaim, JwtPayload, ServerGetToken } from '@clerk/types';
 
 import { createBackendApiClient } from '../api';
 import { Organization, Session, User } from '../api/resources';
@@ -85,6 +85,7 @@ export type SignedInAuthState = {
   sessionClaims: JwtPayload;
   sessionId: string;
   session?: Session;
+  actor?: ActClaim;
   userId: string;
   user?: User;
   orgId?: string;
@@ -227,6 +228,7 @@ async function signedIn(
   const session = sessionResp && !sessionResp.errors ? sessionResp.data : undefined;
   const user = userResp && !userResp.errors ? userResp.data : undefined;
   const organization = organizationResp && !organizationResp.errors ? organizationResp.data : undefined;
+  const actor = sessionClaims.act;
 
   const getToken = createGetToken({
     sessionId,
@@ -240,6 +242,7 @@ async function signedIn(
     isInterstitial: false,
     message: null,
     reason: null,
+    actor,
     sessionClaims,
     sessionId,
     session,
@@ -279,6 +282,7 @@ function _signedOutState() {
     session: null,
     userId: null,
     user: null,
+    actor: null,
     orgId: null,
     orgRole: null,
     organization: null,

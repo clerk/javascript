@@ -1,6 +1,7 @@
 import { type CreateBackendApiOptions, createBackendApiClient } from './api';
 import { type CreateAuthStateOptions, createAuthState } from './tokens';
 
+export * from './api/resources';
 export { type AuthState } from './tokens';
 export * from './tokens/jwt';
 export * from './tokens/verify';

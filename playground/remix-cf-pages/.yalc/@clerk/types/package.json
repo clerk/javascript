@@ -1,0 +1,47 @@
+{
+  "name": "@clerk/types",
+  "version": "3.15.2-staging.1",
+  "license": "MIT",
+  "description": "Typings for Clerk libraries.",
+  "keywords": [
+    "clerk",
+    "react",
+    "auth",
+    "authentication",
+    "passwordless",
+    "session",
+    "jwt",
+    "types"
+  ],
+  "author": "Clerk",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "prepublishOnly": "npm run build",
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch",
+    "clean": "rimraf ./dist",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "csstype": "^3.1.0"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/clerkinc/javascript.git"
+  },
+  "homepage": "https://clerk.dev/",
+  "bugs": {
+    "url": "https://github.com/clerkinc/javascript/issues"
+  },
+  "yalcSig": "23c01e5da40bedb7178b5e957d3a72d2"
+}

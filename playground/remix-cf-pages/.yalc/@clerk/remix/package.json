@@ -1,0 +1,62 @@
+{
+  "name": "@clerk/remix",
+  "version": "1.3.13-staging.3",
+  "license": "MIT",
+  "description": "Clerk.dev SDK for Remix",
+  "keywords": [
+    "clerk",
+    "typescript",
+    "remix",
+    "auth",
+    "authentication",
+    "passwordless",
+    "session",
+    "jwt"
+  ],
+  "author": "Clerk",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "api.server.d.ts",
+    "api.server.js",
+    "edge.js",
+    "edge.d.ts",
+    "ssr.server.d.ts",
+    "ssr.server.js"
+  ],
+  "scripts": {
+    "prepublishOnly": "npm run build",
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch",
+    "clean": "rimraf ./dist",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@clerk/backend": "^0.0.1",
+    "@clerk/clerk-react": "^4.4.2-staging.2",
+    "@clerk/types": "^3.15.2-staging.1",
+    "cookie": "^0.5.0",
+    "tslib": "^2.3.1"
+  },
+  "peerDependencies": {
+    "@remix-run/react": "^1.2.1",
+    "@remix-run/server-runtime": "^1.2.1"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/clerkinc/javascript.git"
+  },
+  "bugs": {
+    "url": "https://github.com/clerkinc/javascript/issues"
+  },
+  "homepage": "https://clerk.dev/",
+  "gitHead": "1b19a43b61f712756ab4d8c9ccbee6e8bddbe4ce",
+  "yalcSig": "a83e851c87debfd75e2f2dc73e57b339"
+}

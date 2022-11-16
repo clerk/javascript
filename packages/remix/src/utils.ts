@@ -21,3 +21,19 @@ export function assertValidClerkState(val: any): asserts val is ClerkState | und
     throw new Error(invalidClerkStatePropError);
   }
 }
+
+/**
+ *
+ * Utility function to get env variables across Node and Edge runtimes.
+ *
+ * @param name
+ * @returns
+ */
+export const getEnvVariable = (name: string) => {
+  if (typeof process !== 'undefined') {
+    return process.env && process.env[name];
+  }
+  console.log('GLOBAL THIS', globalThis);
+  // @ts-expect-error
+  return globalThis[name];
+};
