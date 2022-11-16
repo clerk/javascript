@@ -29,7 +29,7 @@ describe('SignInFactorOne', () => {
     it.todo('sets an active session when user submits first factor successfully and second factor does not exist');
   });
 
-  describe('Default First Factor Method', () => {
+  describe('Selected First Factor Method', () => {
     describe('Password', () => {
       it('shows an input to fill with password', () => {
         const { wrapper } = createFixture(f => {
