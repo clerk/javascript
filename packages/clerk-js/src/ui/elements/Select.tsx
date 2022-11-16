@@ -2,7 +2,7 @@ import { createContextAndHook } from '@clerk/shared';
 import React, { PropsWithChildren, useState } from 'react';
 
 import { usePopover, useSearchInput } from '../../ui/hooks';
-import { Button, Flex, Icon, Text } from '../customizables';
+import { Button, descriptors, Flex, Icon, Text } from '../customizables';
 import { Caret, MagnifyingGlass } from '../icons';
 import { animations, common, PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { colors } from '../utils';
@@ -35,7 +35,7 @@ type SelectState<O extends Option> = Pick<
   optionBuilder: OptionBuilder<O>;
   buttonOptionBuilder: OptionBuilder<O>;
   selectedOption: Option | null;
-  select: (option: Option) => void;
+  select: (option: O) => void;
   focusedItemRef: React.RefObject<HTMLDivElement>;
   onTriggerClick: () => void;
 };
@@ -87,7 +87,7 @@ export const Select = <O extends Option>(props: PropsWithChildren<SelectProps<O>
   });
 
   const select = React.useCallback(
-    option => {
+    (option: O) => {
       onChange?.(option);
       togglePopover();
     },
@@ -201,7 +201,6 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
     popoverCtx,
     searchInputCtx,
     optionBuilder,
-    placeholder,
     searchPlaceholder,
     comparator,
     focusedItemRef,
@@ -258,6 +257,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
 
   return (
     <Flex
+      elementDescriptor={descriptors.selectOptionsContainer}
       ref={floating}
       onKeyDown={onKeyDown}
       direction='col'
@@ -336,6 +336,7 @@ export const SelectButton = (props: PropsOfComponent<typeof Button>) => {
 
   return (
     <Button
+      elementDescriptor={descriptors.selectButton}
       ref={reference}
       colorScheme='neutral'
       variant='ghost'
@@ -356,6 +357,7 @@ export const SelectButton = (props: PropsOfComponent<typeof Button>) => {
     >
       {show}
       <Icon
+        elementDescriptor={descriptors.selectButtonIcon}
         icon={Caret}
         sx={theme => ({
           width: theme.sizes.$3x5,

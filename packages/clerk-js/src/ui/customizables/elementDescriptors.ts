@@ -171,6 +171,10 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'tagPillIcon',
   'tagPillContainer',
 
+  'selectButton',
+  'selectButtonIcon',
+  'selectOptionsContainer',
+
   'loader',
   'loaderIcon',
 

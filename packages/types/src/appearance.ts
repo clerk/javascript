@@ -292,6 +292,10 @@ export type ElementsConfig = {
   tagPillIcon: WithOptions<never, never, never>;
   tagPillContainer: WithOptions<never, never, never>;
 
+  selectButton: WithOptions<never, never, never>;
+  selectButtonIcon: WithOptions<never, never, never>;
+  selectOptionsContainer: WithOptions<never, never, never>;
+
   loader: WithOptions<never, never, never>;
   loaderIcon: WithOptions<never, ErrorState, never>;
 
