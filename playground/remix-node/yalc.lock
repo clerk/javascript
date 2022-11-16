@@ -6,12 +6,12 @@
       "file": true
     },
     "@clerk/remix": {
-      "signature": "a83e851c87debfd75e2f2dc73e57b339",
+      "signature": "e4e66e97b383f32d76189194ca2cd9f9",
       "file": true,
       "replaced": "file:../../packages/remix/dist"
     },
     "@clerk/backend": {
-      "signature": "6cfd29620c12b97066e254e2de468451",
+      "signature": "3e36d7b32081afd15413ecc19eb6fef2",
       "file": true
     }
   }

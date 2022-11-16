@@ -1,13 +1,13 @@
-import { Session, User } from '@clerk/backend-core/src';
-import { ServerSideAuth } from '@clerk/types';
+import { AuthState, Organization, Session, User } from '@clerk/backend';
 import { DataFunctionArgs, LoaderFunction } from '@remix-run/server-runtime';
 
-export type GetAuthReturn = Promise<ServerSideAuth>;
+export type GetAuthReturn = Promise<AuthState>;
 
 export type RootAuthLoaderOptions = {
   frontendApi?: string;
   loadUser?: boolean;
   loadSession?: boolean;
+  loadOrganization?: boolean;
   jwtKey?: string;
   authorizedParties?: [];
 };
@@ -30,6 +30,7 @@ export type LoaderFunctionArgsWithAuth<Options extends RootAuthLoaderOptions = a
 };
 
 export type RequestWithAuth<Options extends RootAuthLoaderOptions = any> = LoaderFunctionArgs['request'] & {
-  auth: ServerSideAuth;
+  auth: Omit<AuthState, 'session' | 'user' | 'organization'>;
 } & (Options extends { loadSession: true } ? { session: Session | null } : {}) &
-  (Options extends { loadUser: true } ? { user: User | null } : {});
+  (Options extends { loadUser: true } ? { user: User | null } : {}) &
+  (Options extends { loadOrganization: true } ? { organization: Organization | null } : {});

@@ -1,6 +1,6 @@
 import { invalidRootLoaderCallbackResponseReturn, invalidRootLoaderCallbackReturn } from '../errors';
-import { assertFrontendApi } from '../utils';
-import { getAuthData } from './getAuthData';
+import { assertFrontendApi, getEnvVariable } from '../utils';
+import { getAuthState } from './getAuthState';
 import { LoaderFunctionArgs, LoaderFunctionReturn, RootAuthLoaderCallback, RootAuthLoaderOptions } from './types';
 import {
   assertObject,
@@ -33,20 +33,20 @@ export const rootAuthLoader: RootAuthLoader = async (
     ? cbOrOptions
     : {};
 
-  const frontendApi = process.env.CLERK_FRONTEND_API || opts.frontendApi;
+  const frontendApi = getEnvVariable('CLERK_FRONTEND_API') || opts.frontendApi;
   assertFrontendApi(frontendApi);
 
-  const { authData, showInterstitial, errorReason } = await getAuthData(args.request, opts);
+  const authState = await getAuthState(args.request, opts);
 
-  if (showInterstitial) {
-    throw throwInterstitialJsonResponse({ frontendApi, errorReason });
+  if (authState.isInterstitial) {
+    throw throwInterstitialJsonResponse({ frontendApi, errorReason: authState.reason });
   }
 
   if (!callback) {
-    return returnLoaderResultJsonResponse({ authData, frontendApi, errorReason });
+    return returnLoaderResultJsonResponse({ authState, frontendApi });
   }
 
-  const callbackResult = await callback(injectAuthIntoRequest(args, sanitizeAuthData(authData!)));
+  const callbackResult = await callback(injectAuthIntoRequest(args, sanitizeAuthData(authState)));
   assertObject(callbackResult, invalidRootLoaderCallbackReturn);
 
   // Pass through custom responses
@@ -57,5 +57,5 @@ export const rootAuthLoader: RootAuthLoader = async (
     throw new Error(invalidRootLoaderCallbackResponseReturn);
   }
 
-  return returnLoaderResultJsonResponse({ authData, frontendApi, errorReason, callbackResult });
+  return returnLoaderResultJsonResponse({ authState, frontendApi, callbackResult });
 };

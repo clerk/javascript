@@ -1,20 +1,21 @@
+import { LIB_VERSION } from '@clerk/clerk-react/dist/info';
 import { json } from '@remix-run/server-runtime';
 import cookie from 'cookie';
 
-import { AuthData } from './getAuthData';
+import { AuthState, clerk } from '../clerk';
 import { LoaderFunctionArgs, LoaderFunctionArgsWithAuth } from './types';
 
 /**
  * Inject `auth`, `user` and `session` properties into `request`
  * @internal
  */
-export function injectAuthIntoRequest(args: LoaderFunctionArgs, authData: AuthData): LoaderFunctionArgsWithAuth {
-  const { user, session, userId, sessionId, getToken, claims } = authData;
+export function injectAuthIntoRequest(args: LoaderFunctionArgs, authState: AuthState): LoaderFunctionArgsWithAuth {
+  const { user, session, userId, sessionId, getToken, sessionClaims } = authState;
   (args.request as any).auth = {
     userId,
     sessionId,
     getToken,
-    actor: claims?.act || null,
+    actor: sessionClaims?.act || null,
   };
   (args.request as any).user = user;
   (args.request as any).session = session;
@@ -27,13 +28,17 @@ export function injectAuthIntoRequest(args: LoaderFunctionArgs, authData: AuthDa
  *
  * @internal
  */
-export function sanitizeAuthData(authData: AuthData): any {
-  const user = authData.user ? { ...authData.user } : authData.user;
-  if (user) {
-    // @ts-expect-error;
-    delete user['privateMetadata'];
+export function sanitizeAuthData(authState: AuthState): any {
+  if (!authState.isSignedIn) {
+    return authState;
   }
-  return { ...authData, user };
+
+  const user = authState.user ? { ...authState.user } : authState.user;
+  const organization = authState.user ? { ...authState.user } : authState.user;
+  clerk.sanitizeResource(user);
+  clerk.sanitizeResource(user);
+
+  return { ...authState, user, organization };
 }
 
 /**
@@ -78,9 +83,11 @@ export function assertObject(val: any, error?: string): asserts val is Record<st
 export const throwInterstitialJsonResponse = (opts: { frontendApi: string; errorReason: string | undefined }) => {
   throw json(
     wrapWithClerkState({
-      __clerk_ssr_interstitial: true,
-      __frontendApi: opts.frontendApi,
-      __lastAuthResult: opts.errorReason,
+      __clerk_ssr_interstitial_html: clerk.localInterstitial({
+        debugData: opts.errorReason,
+        frontendApi: opts.frontendApi,
+        pkgVersion: LIB_VERSION,
+      }),
     }),
     { status: 401 },
   );
@@ -90,17 +97,16 @@ export const throwInterstitialJsonResponse = (opts: { frontendApi: string; error
  * @internal
  */
 export const returnLoaderResultJsonResponse = (opts: {
-  authData: AuthData | null;
+  authState: AuthState | null;
   frontendApi: string;
-  errorReason: string | undefined;
   callbackResult?: any;
 }) => {
   return json({
     ...(opts.callbackResult || {}),
     ...wrapWithClerkState({
-      __clerk_ssr_state: opts.authData,
+      __clerk_ssr_state: opts.authState,
       __frontendApi: opts.frontendApi,
-      __lastAuthResult: opts.errorReason || '',
+      __lastAuthResult: opts.authState?.reason || '',
     }),
   });
 };

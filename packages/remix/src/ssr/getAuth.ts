@@ -1,7 +1,7 @@
 import { json } from '@remix-run/server-runtime';
 
 import { getAuthInterstitialErrorRendered, noRequestPassedInGetAuth } from '../errors';
-import { getAuthData } from './getAuthData';
+import { getAuthState } from './getAuthState';
 import { GetAuthReturn, LoaderFunctionArgs } from './types';
 import { sanitizeAuthData } from './utils';
 
@@ -12,11 +12,11 @@ export async function getAuth(argsOrReq: Request | LoaderFunctionArgs): GetAuthR
     throw new Error(noRequestPassedInGetAuth);
   }
   const request = 'request' in argsOrReq ? argsOrReq.request : argsOrReq;
-  const { authData, showInterstitial } = await getAuthData(request);
+  const authState = await getAuthState(request);
 
-  if (showInterstitial || !authData) {
+  if (authState.isInterstitial || !authState) {
     throw json(EMPTY_INTERSTITIAL_RESPONSE, { status: 401 });
   }
 
-  return sanitizeAuthData(authData);
+  return sanitizeAuthData(authState);
 }
