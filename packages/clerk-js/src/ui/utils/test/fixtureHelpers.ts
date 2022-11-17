@@ -107,6 +107,10 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     };
   };
 
+  const withMagicLink = () => {
+    withEmailAddress({ first_factors: ['email_link'], verifications: ['email_link'] });
+  };
+
   const withPhoneNumber = (opts?: Partial<UserSettingsJSON['attributes']['phone_number']>) => {
     us.attributes.phone_number = {
       ...emptyAttribute,
@@ -179,6 +183,7 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
 
   return {
     withEmailAddress,
+    withMagicLink,
     withPhoneNumber,
     withUsername,
     withWeb3Wallet,
