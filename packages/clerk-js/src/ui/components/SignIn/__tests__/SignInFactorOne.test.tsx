@@ -1,4 +1,4 @@
-import { describe, it } from '@jest/globals';
+import { describe, it, jest } from '@jest/globals';
 import React from 'react';
 import { createFixture as _createFixture, render, screen } from 'testUtils';
 
@@ -41,10 +41,12 @@ describe('SignInFactorOne', () => {
 
   describe('Selected First Factor Method', () => {
     describe('Password', () => {
-      it('shows an input to fill with password', () => {
-        const { wrapper } = createFixture(f => {
+      it('shows an input to fill with password', async () => {
+        const { wrapper } = await createFixture(f => {
           f.withEmailAddress();
-          f.withAuthFirstFactor('password');
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'password' });
+          f.startSignInWithEmailAddress({ supportEmailCode: true, supportPassword: true });
         });
         render(<SignInFactorOne />, { wrapper });
         screen.getByText('Password');
@@ -56,11 +58,21 @@ describe('SignInFactorOne', () => {
     });
 
     describe('Verification link', () => {
-      it('shows message to use the magic link in their email', () => {
-        const { wrapper } = createFixture(f => {
+      it('shows message to use the magic link in their email', async () => {
+        const { wrapper, fixtures } = await createFixture(f => {
           f.withEmailAddress();
-          f.withAuthFirstFactor('email_link');
+          f.withMagicLink();
+          f.startSignInWithEmailAddress({ supportEmailLink: true, supportPassword: false });
         });
+
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
+        fixtures.signIn.createMagicLinkFlow.mockImplementation(
+          () =>
+            ({
+              startMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+              cancelMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+            } as any),
+        );
 
         render(<SignInFactorOne />, { wrapper });
         screen.getByText(/Use the verification link sent your email/i);
@@ -71,12 +83,14 @@ describe('SignInFactorOne', () => {
     });
 
     describe('Email Code', () => {
-      it('shows an input to add the code sent to email', () => {
-        const { wrapper } = createFixture(f => {
+      it('shows an input to add the code sent to email', async () => {
+        const { wrapper, fixtures } = await createFixture(f => {
           f.withEmailAddress();
-          f.withAuthFirstFactor('email_code');
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInWithEmailAddress({ supportEmailCode: true });
         });
-
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
         render(<SignInFactorOne />, { wrapper });
         screen.getByText(/Enter the verification code sent to your email address/i);
       });
@@ -87,15 +101,15 @@ describe('SignInFactorOne', () => {
     });
 
     describe('Phone Code', () => {
-      it('shows an input to add the code sent to phone', () => {
-        const { wrapper } = createFixture(f => {
-          f.withEmailAddress();
+      it('shows an input to add the code sent to phone', async () => {
+        const { wrapper, fixtures } = await createFixture(f => {
           f.withPhoneNumber();
-          f.withAuthFirstFactor('phone_code');
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInWithPhoneNumber({ supportPhoneCode: true, supportPassword: false });
         });
-
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
         render(<SignInFactorOne />, { wrapper });
-        screen.getByText('Verification code');
+        screen.getByText(/Enter the verification code sent to your phone number/i);
       });
 
       it.todo('enables the "Resend code" button after 30 seconds');
