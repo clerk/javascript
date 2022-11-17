@@ -39,6 +39,7 @@ testem.log
 .DS_Store
 Thumbs.db
 
+# Tooling
 .yarn/*
 !.yarn/cache
 !.yarn/patches
