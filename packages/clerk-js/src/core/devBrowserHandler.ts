@@ -18,23 +18,22 @@ export interface DevBrowserHandler {
   getDevBrowserJWT(): string | null;
   setDevBrowserJWT(jwt: string): void;
   removeDevBrowserJWT(): void;
-  isCookieless(): boolean;
 }
 
 export type CreateDevBrowserHandlerOptions = {
   frontendApi: string;
   fapiClient: FapiClient;
+  devSessionSyncMode: DevSessionSyncMode;
 };
 
 // export type DevBrowserHandler = ReturnType<typeof createDevBrowserHandler>;
 export default function createDevBrowserHandler({
   frontendApi,
   fapiClient,
+  devSessionSyncMode,
 }: CreateDevBrowserHandlerOptions): DevBrowserHandler {
   const cookieHandler = createCookieHandler();
   const key = DEV_BROWSER_SSO_JWT_KEY;
-
-  let devSessionSyncMode: DevSessionSyncMode = 'cookieless';
 
   function getDevBrowserJWT() {
     return localStorage.getItem(key);
@@ -134,10 +133,6 @@ export default function createDevBrowserHandler({
     });
 
     const data = await resp.json();
-
-    // TODO:
-    devSessionSyncMode = 'cookieless'; // or 'cookie' based on the resp
-
     setDevBrowserJWT(data?.token);
   }
 
@@ -167,14 +162,8 @@ export default function createDevBrowserHandler({
       });
     }
 
-    function isCookieless() {
-      return devSessionSyncMode === 'cookieless';
-    }
-
-    await setCookielessDevBrowser();
-
-    if (isCookieless()) {
-      return;
+    if (devSessionSyncMode === 'cookieless') {
+      return setCookielessDevBrowser();
     }
 
     if (devOrStgHost && !cookieHandler.getDevBrowserInittedCookie()) {
@@ -192,6 +181,5 @@ export default function createDevBrowserHandler({
     getDevBrowserJWT,
     setDevBrowserJWT,
     removeDevBrowserJWT,
-    isCookieless,
   };
 }

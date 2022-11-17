@@ -22,5 +22,7 @@ type Runtime = {
   fetch: typeof global.fetch;
 };
 
+// DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
 const runtime: Runtime = { crypto, fetch };
+export default runtime;
