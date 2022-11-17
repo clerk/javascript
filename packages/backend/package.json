@@ -1,0 +1,75 @@
+{
+  "name": "@clerk/backend",
+  "version": "0.0.1",
+  "license": "MIT",
+  "description": "Clerk Backend SDK - REST Client for Backend API & JWT verification utilities",
+  "types": "./dist/types/index.d.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/esm/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "tsup --watch",
+    "build": "run-s clean build:runtime build:lib",
+    "build:lib": "tsup --env.NODE_ENV production",
+    "build:tests": "tsc -p tsconfig.test.json",
+    "build:runtime": "mkdir -p dist/runtime && cp -r src/runtime/* dist/runtime",
+    "clean": "rimraf ./dist",
+    "lint": "eslint .",
+    "test": "run-s build:runtime build:tests test:node test:edge-runtime test:cloudflare-miniflare",
+    "test:node": "./tests/node/run.sh",
+    "test:edge-runtime": "./tests/edge-runtime/run.sh",
+    "test:cloudflare-miniflare": "tests/cloudflare-miniflare/run.sh",
+    "test:cloudflare-workerd": "tests/cloudflare-workerd/run.sh"
+  },
+  "dependencies": {
+    "@clerk/types": "^3.15.2-staging.1",
+    "@types/node": "^16.11.55",
+    "node-fetch-native": "^0.1.7",
+    "rfc4648": "^1.5.2",
+    "snakecase-keys": "^5.4.4",
+    "tslib": "^2.3.1"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^3.18.0",
+    "@types/chai": "^4.3.3",
+    "@types/qunit": "^2.19.3",
+    "@types/sinon": "^10.0.13",
+    "chai": "^4.3.6",
+    "edge-runtime": "^2.0.0",
+    "esbuild": "^0.15.12",
+    "esbuild-register": "^3.3.3",
+    "miniflare": "^2.11.0",
+    "npm-run-all": "^4.1.5",
+    "qunit": "^2.19.3",
+    "sinon": "^14.0.1",
+    "tsup": "*",
+    "typescript": "*",
+    "workerd": "1.20220926.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "imports": {
+    "#crypto": {
+      "node": "./dist/runtime/node/crypto.js",
+      "default": "./dist/runtime/browser/crypto.mjs"
+    },
+    "#fetch": {
+      "node": "./dist/runtime/node/fetch.js",
+      "default": "./dist/runtime/browser/fetch.mjs"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/clerkinc/javascript.git"
+  },
+  "bugs": {
+    "url": "https://github.com/clerkinc/javascript/issues"
+  },
+  "homepage": "https://clerk.dev/",
+  "engines": {
+    "node": ">=16"
+  }
+}
