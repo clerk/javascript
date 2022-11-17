@@ -269,7 +269,7 @@ const NavButton = (props: NavButtonProps) => {
 };
 
 export const NavbarMenuButtonRow = (props: PropsOfComponent<typeof Button>) => {
-  const { open } = useUnsafeNavbarContext();
+  const { open } = useNavbarContext();
   const { t } = useLocalizations();
 
   const navbarContextExistsInTree = !!open;
