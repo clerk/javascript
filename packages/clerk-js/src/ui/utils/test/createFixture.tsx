@@ -1,4 +1,4 @@
-import { EnvironmentJSON, LoadedClerk } from '@clerk/types';
+import { ClientJSON, EnvironmentJSON, LoadedClerk } from '@clerk/types';
 import { jest } from '@jest/globals';
 import React from 'react';
 
@@ -11,24 +11,16 @@ import { FlowMetadataProvider } from '../../elements';
 import { RouteContext } from '../../router';
 import { InternalThemeProvider } from '../../styledSystem';
 import { createClerkMockContexts } from './createClerkMockContexts';
-import {
-  createAuthConfigFixtureHelpers,
-  createDisplayConfigFixtureHelpers,
-  createOrganizationSettingsFixtureHelpers,
-  createUserSettingsFixtureHelpers,
-} from './fixtureHelpers';
-import { createBaseEnvironmentJSON } from './fixtures';
+import { createClientFixtureHelpers, createEnvironmentFixtureHelpers } from './fixtureHelpers';
+import { createBaseClientJSON, createBaseEnvironmentJSON } from './fixtures';
 import { getInitialFixtureConfig } from './mockConfigs';
 
 type UnpackContext<T> = NonNullable<T extends React.Context<infer U> ? U : T>;
 
-const createConfigFParam = (config: any, baseEnvironment: EnvironmentJSON) => {
+const createInitialStateConfigParam = (config: any, baseEnvironment: EnvironmentJSON, baseClient: ClientJSON) => {
   return {
-    ...createAuthConfigFixtureHelpers(baseEnvironment),
-    ...createDisplayConfigFixtureHelpers(baseEnvironment),
-    ...createOrganizationSettingsFixtureHelpers(baseEnvironment),
-    ...createUserSettingsFixtureHelpers(baseEnvironment),
-    ...createUserSettingsFixtureHelpers(baseEnvironment),
+    ...createEnvironmentFixtureHelpers(baseEnvironment),
+    ...createClientFixtureHelpers(baseClient),
     mockRouteNavigate: () => {
       const mockNavigate = jest.fn();
       config.routeContext.navigate = mockNavigate;
@@ -37,7 +29,7 @@ const createConfigFParam = (config: any, baseEnvironment: EnvironmentJSON) => {
   };
 };
 
-type FParam = ReturnType<typeof createConfigFParam>;
+type FParam = ReturnType<typeof createInitialStateConfigParam>;
 type ConfigFn = (f: FParam) => void;
 
 type DeepJestMocked<T> = T extends object
@@ -67,16 +59,17 @@ export const createFixture = (componentName: UnpackContext<typeof ComponentConte
   return async (configFn?: ConfigFn) => {
     const config = getInitialFixtureConfig();
     const baseEnvironment = createBaseEnvironmentJSON();
+    const baseClient = createBaseClientJSON();
 
     if (configFn) {
-      configFn(createConfigFParam(config, baseEnvironment));
+      configFn(createInitialStateConfigParam(config, baseEnvironment, baseClient));
     }
 
     const environmentMock = new Environment(baseEnvironment);
     Environment.getInstance().fetch = jest.fn(() => Promise.resolve(environmentMock));
 
     // @ts-expect-error
-    const clientMock = new Client(null);
+    const clientMock = new Client(baseClient);
     Client.getInstance().fetch = jest.fn(() => Promise.resolve(clientMock));
 
     // Use a FAPI value for local production instances to avoid triggering the devInit flow during testing

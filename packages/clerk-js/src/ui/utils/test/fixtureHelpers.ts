@@ -1,6 +1,53 @@
-import { DisplayConfigJSON, EnvironmentJSON, OAuthProvider, UserSettingsJSON } from '@clerk/types';
+import {
+  ClientJSON,
+  DisplayConfigJSON,
+  EnvironmentJSON,
+  OAuthProvider,
+  SignInJSON,
+  UserSettingsJSON,
+} from '@clerk/types';
 
-export const createAuthConfigFixtureHelpers = (environment: EnvironmentJSON) => {
+import { createUserFixture } from './fixtures';
+
+export const createEnvironmentFixtureHelpers = (baseEnvironment: EnvironmentJSON) => {
+  return {
+    ...createAuthConfigFixtureHelpers(baseEnvironment),
+    ...createDisplayConfigFixtureHelpers(baseEnvironment),
+    ...createOrganizationSettingsFixtureHelpers(baseEnvironment),
+    ...createUserSettingsFixtureHelpers(baseEnvironment),
+    ...createUserSettingsFixtureHelpers(baseEnvironment),
+  };
+};
+
+export const createClientFixtureHelpers = (baseClient: ClientJSON) => {
+  return { ...createSignInFixtureHelpers(baseClient) };
+};
+
+const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
+  type SignInWithEmailAddressParams = {
+    identifier?: string;
+    supportPassword?: boolean;
+    supportEmailCode?: boolean;
+  };
+
+  const startSignInWithEmailAddress = (params?: SignInWithEmailAddressParams) => {
+    const { identifier = 'hello@clerk.dev', supportPassword = true, supportEmailCode } = params || {};
+    baseClient.sign_in = {
+      status: 'needs_first_factor',
+      identifier,
+      supported_identifiers: ['email_address'],
+      supported_first_factors: [
+        ...(supportPassword ? [{ strategy: 'password' }] : []),
+        ...(supportEmailCode ? [{ strategy: 'email_code', safe_identifier: 'n*****@clerk.dev' }] : []),
+      ],
+      user_data: { ...(createUserFixture() as any) },
+    } as SignInJSON;
+  };
+
+  return { startSignInWithEmailAddress };
+};
+
+const createAuthConfigFixtureHelpers = (environment: EnvironmentJSON) => {
   const ac = environment.auth_config;
   const withMultiSessionMode = () => {
     // TODO:
@@ -9,7 +56,7 @@ export const createAuthConfigFixtureHelpers = (environment: EnvironmentJSON) => 
   return { withMultiSessionMode };
 };
 
-export const createDisplayConfigFixtureHelpers = (environment: EnvironmentJSON) => {
+const createDisplayConfigFixtureHelpers = (environment: EnvironmentJSON) => {
   const dc = environment.display_config;
   const withSupportEmail = (opts?: { email: string }) => {
     dc.support_email = opts?.email || 'support@clerk.dev';
@@ -23,7 +70,7 @@ export const createDisplayConfigFixtureHelpers = (environment: EnvironmentJSON) 
   return { withSupportEmail, withoutClerkBranding, withPreferredSignInStrategy };
 };
 
-export const createOrganizationSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
+const createOrganizationSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
   const os = environment.organization_settings;
   const withOrganizations = () => {
     os.enabled = true;
@@ -34,7 +81,7 @@ export const createOrganizationSettingsFixtureHelpers = (environment: Environmen
   return { withOrganizations, withMaxAllowedMemberships };
 };
 
-export const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
+const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
   const us = environment.user_settings;
   const emptyAttribute = {
     first_factors: [],

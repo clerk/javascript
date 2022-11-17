@@ -7,13 +7,16 @@ import { SignInFactorOne } from '../SignInFactorOne';
 const createFixture = _createFixture('SignIn');
 
 describe('SignInFactorOne', () => {
-  it('renders the component', () => {
-    const { wrapper } = createFixture(f => {
+  it('renders the component', async () => {
+    const { wrapper, fixtures } = await createFixture(f => {
       f.withEmailAddress();
-      f.withAuthFirstFactor('password');
+      f.withPassword();
+      f.withPreferredSignInStrategy({ strategy: 'otp' });
+      f.startSignInWithEmailAddress({ supportEmailCode: true });
     });
+    fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
     render(<SignInFactorOne />, { wrapper });
-    screen.getByText(/Clerk Test App/i);
+    screen.getByText(/Check your email/i);
   });
 
   it.todo('prefills the email if the identifier is an email');
@@ -21,7 +24,14 @@ describe('SignInFactorOne', () => {
 
   describe('Navigation', () => {
     it.todo('navigates to SignInStart component when user clicks the edit icon');
-    it.todo('navigates to SignInStart component if user lands on SignInFactorOne page but they should not');
+    it('navigates to SignInStart component if the user lands on SignInFactorOne directly without calling signIn.create', async () => {
+      let spy: any;
+      const { wrapper, fixtures } = await createFixture(f => {
+        spy = f.mockRouteNavigate();
+      });
+      render(<SignInFactorOne />, { wrapper });
+      expect(spy).toHaveBeenCalledWith('../');
+    });
   });
 
   describe('Submitting', () => {

@@ -1,8 +1,10 @@
 import {
   AuthConfigJSON,
+  ClientJSON,
   DisplayConfigJSON,
   EnvironmentJSON,
   OrganizationSettingsJSON,
+  UserJSON,
   UserSettingsJSON,
 } from '@clerk/types';
 
@@ -166,4 +168,17 @@ const createBaseUserSettings = (): UserSettingsJSON => {
       },
     },
   };
+};
+
+export const createBaseClientJSON = (): ClientJSON => {
+  return {} as ClientJSON;
+};
+
+// TODO:
+export const createUserFixture = (): UserJSON => {
+  return {
+    first_name: 'Firstname',
+    last_name: 'Lastname',
+    profile_image_url: 'https://lh3.googleusercontent.com/a/public-photo-kmmfZIb=s1000-c',
+  } as UserJSON;
 };
