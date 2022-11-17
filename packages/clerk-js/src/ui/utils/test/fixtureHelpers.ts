@@ -45,8 +45,8 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
       supported_identifiers: ['email_address'],
       supported_first_factors: [
         ...(supportPassword ? [{ strategy: 'password' }] : []),
-        ...(supportEmailCode ? [{ strategy: 'email_code', safe_identifier: 'n*****@clerk.dev' }] : []),
-        ...(supportEmailLink ? [{ strategy: 'email_link', safe_identifier: 'n*****@clerk.dev' }] : []),
+        ...(supportEmailCode ? [{ strategy: 'email_code', safe_identifier: identifier || 'n*****@clerk.dev' }] : []),
+        ...(supportEmailLink ? [{ strategy: 'email_link', safe_identifier: identifier || 'n*****@clerk.dev' }] : []),
       ],
       user_data: { ...(createUserFixture() as any) },
     } as SignInJSON;
