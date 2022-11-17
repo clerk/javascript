@@ -7,10 +7,9 @@ import { SignInAccountSwitcher } from '../SignInAccountSwitcher';
 const createFixture = _createFixture('SignIn');
 
 describe('SignInAccountSwitcher', () => {
-  it('renders the component', () => {
-    const { wrapper } = createFixture(f => {
+  it('renders the component', async () => {
+    const { wrapper } = await createFixture(f => {
       f.withEmailAddress();
-      // f.withAuthFirstFactor('password');
     });
     render(<SignInAccountSwitcher />, { wrapper });
   });

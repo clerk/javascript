@@ -6,8 +6,8 @@ import { SignUpStart } from '../SignUpStart';
 const createFixture = _createFixture('SignUp');
 
 describe('SignUpStart', () => {
-  it('renders the component', () => {
-    const { wrapper } = createFixture();
+  it('renders the component', async () => {
+    const { wrapper } = await createFixture();
     render(<SignUpStart />, { wrapper });
     screen.getByText(/create/i);
   });
