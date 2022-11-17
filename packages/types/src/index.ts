@@ -17,6 +17,7 @@ export * from './image';
 export * from './json';
 export * from './jwt';
 export * from './localization';
+export * from './jwtv2';
 export * from './oauth';
 export * from './organization';
 export * from './organizationInvitation';
