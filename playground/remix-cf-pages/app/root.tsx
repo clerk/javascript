@@ -1,4 +1,4 @@
-import type { LoaderFunction, MetaFunction } from '@remix-run/node';
+import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare';
 import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react';
 import { rootAuthLoader } from '@clerk/remix/ssr.server';
 import { ClerkApp, ClerkCatchBoundary } from '@clerk/remix';
@@ -8,10 +8,14 @@ export const loader: LoaderFunction = args => {
     args,
     ({ request }) => {
       const { user } = request;
+
       console.log('User:', user);
+
       return { user };
     },
-    { loadUser: true },
+    {
+      loadUser: true,
+    },
   );
 };
 

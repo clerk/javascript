@@ -1,3 +1,3 @@
-import fetch from 'node-fetch-native';
+const fetch = require('node-fetch-native');
 
-export default fetch;
+module.exports = fetch;

@@ -37,11 +37,11 @@
   "imports": {
     "#crypto": {
       "node": "./dist/runtime/node/crypto.js",
-      "default": "./dist/runtime/browser/crypto.js"
+      "default": "./dist/runtime/browser/crypto.mjs"
     },
     "#fetch": {
       "node": "./dist/runtime/node/fetch.js",
-      "default": "./dist/runtime/browser/fetch.js"
+      "default": "./dist/runtime/browser/fetch.mjs"
     }
   },
   "repository": {
@@ -55,5 +55,5 @@
   "engines": {
     "node": ">=16"
   },
-  "yalcSig": "3e36d7b32081afd15413ecc19eb6fef2"
+  "yalcSig": "5693563100523671870f049c1c42a9dc"
 }

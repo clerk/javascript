@@ -2,8 +2,8 @@ import type { LoaderFunction } from '@remix-run/cloudflare';
 import { getAuth } from '@clerk/remix/ssr.server';
 import { useUser, SignedIn, ClerkLoaded } from '@clerk/remix';
 
-export const loader: LoaderFunction = async ({ request }) => {
-  const authState = await getAuth(request);
+export const loader: LoaderFunction = async args => {
+  const authState = await getAuth(args);
   console.log('AuthState', authState);
   return authState;
 };

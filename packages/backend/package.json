@@ -54,11 +54,11 @@
   "imports": {
     "#crypto": {
       "node": "./dist/runtime/node/crypto.js",
-      "default": "./dist/runtime/browser/crypto.js"
+      "default": "./dist/runtime/browser/crypto.mjs"
     },
     "#fetch": {
       "node": "./dist/runtime/node/fetch.js",
-      "default": "./dist/runtime/browser/fetch.js"
+      "default": "./dist/runtime/browser/fetch.mjs"
     }
   },
   "repository": {

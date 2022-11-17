@@ -35,8 +35,8 @@ export function sanitizeAuthData(authState: AuthState): any {
 
   const user = authState.user ? { ...authState.user } : authState.user;
   const organization = authState.user ? { ...authState.user } : authState.user;
-  clerk.sanitizeResource(user);
-  clerk.sanitizeResource(user);
+  clerk.toSSRResource(user);
+  clerk.toSSRResource(organization);
 
   return { ...authState, user, organization };
 }
@@ -80,12 +80,12 @@ export function assertObject(val: any, error?: string): asserts val is Record<st
 /**
  * @internal
  */
-export const throwInterstitialJsonResponse = (opts: { frontendApi: string; errorReason: string | undefined }) => {
+export const throwInterstitialJsonResponse = (authState: AuthState) => {
   throw json(
     wrapWithClerkState({
       __clerk_ssr_interstitial_html: clerk.localInterstitial({
-        debugData: opts.errorReason,
-        frontendApi: opts.frontendApi,
+        debugData: clerk.debugAuthState(authState),
+        frontendApi: authState.frontendApi,
         pkgVersion: LIB_VERSION,
       }),
     }),
@@ -96,17 +96,14 @@ export const throwInterstitialJsonResponse = (opts: { frontendApi: string; error
 /**
  * @internal
  */
-export const returnLoaderResultJsonResponse = (opts: {
-  authState: AuthState | null;
-  frontendApi: string;
-  callbackResult?: any;
-}) => {
+export const returnLoaderResultJsonResponse = (opts: { authState: AuthState; callbackResult?: any }) => {
+  const { reason, message, isSignedIn, isInterstitial, ...rest } = opts.authState;
   return json({
     ...(opts.callbackResult || {}),
     ...wrapWithClerkState({
-      __clerk_ssr_state: opts.authState,
-      __frontendApi: opts.frontendApi,
-      __lastAuthResult: opts.authState?.reason || '',
+      __clerk_ssr_state: rest,
+      __frontendApi: opts.authState.frontendApi,
+      __clerk_debug: clerk.debugAuthState(opts.authState),
     }),
   });
 };

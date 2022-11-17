@@ -32,7 +32,12 @@ export type ApiClient = ReturnType<typeof createBackendApiClient>;
 export function createBackendApiClient(options: CreateBackendApiOptions) {
   const { apiKey, apiUrl = API_URL, apiVersion = API_VERSION, userAgent = USER_AGENT } = options;
 
-  const request = buildRequest({ apiKey, apiUrl, apiVersion, userAgent });
+  const request = buildRequest({
+    apiKey,
+    apiUrl,
+    apiVersion,
+    userAgent,
+  });
 
   return {
     allowlistIdentifiers: new AllowlistIdentifierAPI(request),

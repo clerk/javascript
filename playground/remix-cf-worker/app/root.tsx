@@ -21,6 +21,8 @@ export const meta: MetaFunction = () => ({
   viewport: 'width=device-width,initial-scale=1',
 });
 
+export const CatchBoundary = ClerkCatchBoundary();
+
 function App() {
   return (
     <html lang='en'>

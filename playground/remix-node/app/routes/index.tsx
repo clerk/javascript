@@ -1,13 +1,16 @@
 import type { LoaderFunction } from '@remix-run/node';
 import { getAuth } from '@clerk/remix/ssr.server';
+import { useUser, ClerkLoaded, SignedIn } from '@clerk/remix';
 
-export const loader: LoaderFunction = async ({ request }) => {
-  const authState = await getAuth(request);
-  console.log('AuthState', authState);
-  return authState;
+export const loader: LoaderFunction = async args => {
+  return getAuth(args);
 };
 
-import { useUser, ClerkLoaded, SignedIn } from '@clerk/remix';
+export function headers() {
+  return {
+    'Control-Sorkatis': 'whatever2',
+  };
+}
 
 export default function Index() {
   const user = useUser();

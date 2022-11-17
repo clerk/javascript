@@ -6,11 +6,11 @@
       "file": true
     },
     "@clerk/remix": {
-      "signature": "e4e66e97b383f32d76189194ca2cd9f9",
+      "signature": "dd63952651b96906fabc8d639b418ba6",
       "file": true
     },
     "@clerk/backend": {
-      "signature": "3e36d7b32081afd15413ecc19eb6fef2",
+      "signature": "5693563100523671870f049c1c42a9dc",
       "file": true
     }
   }

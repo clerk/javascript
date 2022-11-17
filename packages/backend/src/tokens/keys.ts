@@ -121,7 +121,7 @@ export async function loadClerkJWKFromRemote({
   if (skipJwksCache || !getFromCache(kid)) {
     let fetcher;
 
-    if (apiUrl && apiKey) {
+    if (apiUrl) {
       fetcher = () => fetchJWKSFromBAPI(apiUrl, apiKey, apiVersion);
     } else if (issuer) {
       fetcher = () => fetchJWKSFromFAPI(issuer);
@@ -177,6 +177,14 @@ async function fetchJWKSFromFAPI(issuer: string) {
 }
 
 async function fetchJWKSFromBAPI(apiUrl: string = API_URL, apiKey: string, apiVersion: string = API_VERSION) {
+  if (!apiKey) {
+    throw new TokenVerificationError({
+      action: TokenVerificationErrorAction.setClerkAPIKey,
+      message: 'Missing Clerk API Key. Go to https://dashboard.clerk.dev and get your Clerk API Key for your instance.',
+      reason: TokenVerificationErrorReason.RemoteJWKFailedToLoad,
+    });
+  }
+
   const url = new URL(apiUrl);
   url.pathname = joinPaths(url.pathname, apiVersion, '/jwks');
 

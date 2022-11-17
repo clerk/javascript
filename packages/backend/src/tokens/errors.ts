@@ -47,7 +47,7 @@ export class TokenVerificationError extends Error {
   }
 
   public getFullMessage() {
-    return `${[this.message, this.action].filter(m => m).join(' ')} (reason=${this.reason}, carrier=${
+    return `${[this.message, this.action].filter(m => m).join(' ')} (reason=${this.reason}, token-carrier=${
       this.tokenCarrier
     })`;
   }

@@ -14,6 +14,7 @@ export default (QUnit: QUnit) => {
     apiKey: 'deadbeef',
     apiUrl: 'https://api.clerk.test',
     apiVersion: 'v1',
+    frontendApi: 'cafe.babe.clerk.ts',
     host: 'example.com',
     userAgent: 'Mozilla/TestAgent',
     skipJwksCache: true,
@@ -50,6 +51,7 @@ export default (QUnit: QUnit) => {
       });
 
       assert.propContains(authState, {
+        frontendApi: 'cafe.babe.clerk.ts',
         isSignedIn: true,
         isInterstitial: false,
         sessionClaims: mockJwtPayload,
@@ -79,6 +81,7 @@ export default (QUnit: QUnit) => {
       });
 
       assert.propEqual(authState, {
+        frontendApi: 'cafe.babe.clerk.ts',
         isSignedIn: false,
         isInterstitial: false,
         reason: 'token-verification-error',
@@ -103,6 +106,7 @@ export default (QUnit: QUnit) => {
       });
 
       assert.propEqual(authState, {
+        frontendApi: 'cafe.babe.clerk.ts',
         isSignedIn: false,
         isInterstitial: false,
         message:

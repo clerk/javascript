@@ -1,42 +1,59 @@
 import { type ApiClient } from '../api';
 import { API_URL, API_VERSION } from '../constants';
-import { type AuthStateOptions, getAuthState } from './authState';
+import { type AuthStateOptions, AuthState, getAuthState } from './authState';
 import { type LoadInterstitialOptions, loadInterstitialFromBAPI, loadInterstitialFromLocal } from './interstitial';
-import { sanitizeResource } from './sanitizer';
+import { toSSRResource } from './utils';
 
-export type CreateAuthStateOptions = Partial<Pick<AuthStateOptions, 'apiKey' | 'apiUrl' | 'apiVersion' | 'jwtKey'>> & {
+export type CreateAuthStateOptions = Partial<
+  Pick<AuthStateOptions, 'apiKey' | 'apiUrl' | 'apiVersion' | 'frontendApi' | 'jwtKey'>
+> & {
   apiClient: ApiClient;
 };
 
 export function createAuthState(options: CreateAuthStateOptions) {
-  const { apiKey, apiUrl = API_URL, apiVersion = API_VERSION, apiClient } = options;
+  const {
+    apiKey: buildtimeApiKey = '',
+    apiUrl = API_URL,
+    apiVersion = API_VERSION,
+    apiClient,
+    frontendApi: buildtimeFrontendApi = '',
+  } = options;
 
-  if (!apiKey) {
-    throw Error(
-      'Missing Clerk API Key. Go to https://dashboard.clerk.dev and get your Clerk API Key for your instance.',
-    );
-  }
-
-  const authState = (options: Omit<AuthStateOptions, 'apiKey' | 'apiUrl' | 'apiVersion'>) =>
+  const authState = ({
+    apiKey: runtimeApiKey,
+    frontendApi: runtimeFrontendApi,
+    ...rest
+  }: Omit<AuthStateOptions, 'apiUrl' | 'apiVersion'>) =>
     getAuthState({
-      ...options,
-      apiKey,
+      ...rest,
+      apiKey: runtimeApiKey || buildtimeApiKey,
       apiUrl,
       apiVersion,
+      frontendApi: runtimeFrontendApi || buildtimeFrontendApi,
     });
 
   const localInterstitial = loadInterstitialFromLocal;
 
-  const remotePublicInterstitial = (options: LoadInterstitialOptions) =>
-    loadInterstitialFromBAPI({ ...options, apiUrl });
+  const remotePublicInterstitial = ({ frontendApi: runtimeFrontendApi, ...rest }: LoadInterstitialOptions) =>
+    loadInterstitialFromBAPI({ ...rest, apiUrl, frontendApi: runtimeFrontendApi || buildtimeFrontendApi });
 
+  // TODO: Replace this function with remotePublicInterstitial
   const remotePrivateInterstitial = () => apiClient.interstitial.getInterstitial();
+
+  const debugAuthState = ({ frontendApi, isSignedIn, isInterstitial, reason, message }: AuthState) => ({
+    frontendApi,
+    isSignedIn,
+    isInterstitial,
+    reason,
+    message,
+  });
 
   return {
     authState,
     localInterstitial,
     remotePublicInterstitial,
     remotePrivateInterstitial,
-    sanitizeResource,
+    toSSRResource,
+    debugAuthState,
   };
 }

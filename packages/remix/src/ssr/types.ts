@@ -5,10 +5,11 @@ export type GetAuthReturn = Promise<AuthState>;
 
 export type RootAuthLoaderOptions = {
   frontendApi?: string;
+  jwtKey?: string;
+  apiKey?: string;
   loadUser?: boolean;
   loadSession?: boolean;
   loadOrganization?: boolean;
-  jwtKey?: string;
   authorizedParties?: [];
 };
 

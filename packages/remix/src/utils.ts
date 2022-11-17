@@ -1,5 +1,5 @@
 import { ClerkState } from './client/types';
-import { invalidClerkStatePropError, noClerkStateError, noFrontendApiError } from './errors';
+import { invalidClerkStatePropError, noClerkStateError } from './errors';
 
 export function warnForSsr(val: ClerkState | undefined) {
   if (!val || !val.__internal_clerk_state) {
@@ -7,9 +7,9 @@ export function warnForSsr(val: ClerkState | undefined) {
   }
 }
 
-export function assertFrontendApi(fapi: any): asserts fapi is string {
-  if (!fapi || typeof fapi !== 'string') {
-    throw new Error(noFrontendApiError);
+export function assertEnvVar(name: any, errorMessage: string): asserts name is string {
+  if (!name || typeof name !== 'string') {
+    throw new Error(errorMessage);
   }
 }
 
@@ -29,11 +29,19 @@ export function assertValidClerkState(val: any): asserts val is ClerkState | und
  * @param name
  * @returns
  */
-export const getEnvVariable = (name: string) => {
+export const getEnvVariable = (name: string): string => {
+  // Node envs
   if (typeof process !== 'undefined') {
-    return process.env && process.env[name];
+    return (process.env && process.env[name]) || '';
   }
-  console.log('GLOBAL THIS', globalThis);
-  // @ts-expect-error
-  return globalThis[name];
+
+  // Cloudflare workers
+  try {
+    // @ts-expect-error
+    return globalThis[name];
+  } catch (_) {
+    // This will raise an error in Cloudflare Pages
+  }
+
+  return '';
 };
