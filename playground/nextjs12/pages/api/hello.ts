@@ -7,7 +7,7 @@ type Data = {
 };
 
 export default function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
-  const { userId } = getAuth(req);
-  console.log('/api/hello ', userId, req.query);
-  res.status(200).json({ userId });
+  const auth = getAuth(req);
+  console.log('/api/hello ', auth.userId, req.query);
+  res.status(200).json({ name: 'John Doe' });
 }
