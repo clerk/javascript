@@ -1,6 +1,5 @@
 import { defineConfig } from 'tsup';
 
-// @ts-expect-error
 import { version } from './package.json';
 
 export default defineConfig(overrideOptions => {
