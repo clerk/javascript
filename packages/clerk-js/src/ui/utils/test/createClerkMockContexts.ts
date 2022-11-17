@@ -1,4 +1,4 @@
-import { Clerk, SignInFirstFactor } from '@clerk/types';
+import { SignInFirstFactor } from '@clerk/types';
 
 import { getInitialMockClerkConfig, getInitialRouteContextValue } from './mockConfigs';
 
@@ -16,27 +16,9 @@ const applyOptionsToInitialMockContext = (fixtureConfig: any) => {
 };
 
 export const createClerkMockContexts = (fixtureConfig: any) => {
-  const { mockClerkContext, mockRouteContextValue } = applyOptionsToInitialMockContext(fixtureConfig);
-  const listeners: any[] = [];
-
-  const client = mockClerkContext.client;
-  const session = mockClerkContext.session;
-  const user = mockClerkContext.user;
-  const organization = mockClerkContext.organization;
-  const resources = { client, session, user, organization };
-  const addListener = (listener: any) => {
-    listeners.push(listener);
-    listener(resources);
-  };
-  const updateMock = () => {
-    // how do we create new state?
-    const newState = { ...resources };
-    listeners.forEach(listener => listener(newState));
-  };
+  const { mockRouteContextValue } = applyOptionsToInitialMockContext(fixtureConfig);
 
   return {
     mockedRouteContext: mockRouteContextValue,
-    mockedClerk: { ...resources, addListener } as Clerk,
-    updateClerkMock: updateMock,
   };
 };

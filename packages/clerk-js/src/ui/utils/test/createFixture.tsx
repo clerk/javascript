@@ -1,8 +1,9 @@
-import { EnvironmentJSON, SignInStatus } from '@clerk/types';
+import { EnvironmentJSON, LoadedClerk } from '@clerk/types';
 import { jest } from '@jest/globals';
 import React from 'react';
 
-import { Environment } from '../../../core/resources';
+import { default as ClerkCtor } from '../../../core/clerk';
+import { Client, Environment } from '../../../core/resources';
 import { ComponentContext, EnvironmentProvider } from '../../contexts';
 import { CoreClerkContextWrapper } from '../../contexts/CoreClerkContextWrapper';
 import { AppearanceProvider } from '../../customizables';
@@ -28,11 +29,6 @@ const createConfigFParam = (config: any, baseEnvironment: EnvironmentJSON) => {
     ...createOrganizationSettingsFixtureHelpers(baseEnvironment),
     ...createUserSettingsFixtureHelpers(baseEnvironment),
     ...createUserSettingsFixtureHelpers(baseEnvironment),
-    mockSignInCreate: (opts?: { responseStatus: SignInStatus }) => {
-      const mockCreate = jest.fn(() => Promise.resolve({ status: opts?.responseStatus }));
-      config.client.signIn.create = mockCreate;
-      return mockCreate;
-    },
     mockRouteNavigate: () => {
       const mockNavigate = jest.fn();
       config.routeContext.navigate = mockNavigate;
@@ -44,8 +40,31 @@ const createConfigFParam = (config: any, baseEnvironment: EnvironmentJSON) => {
 type FParam = ReturnType<typeof createConfigFParam>;
 type ConfigFn = (f: FParam) => void;
 
+type DeepJestMocked<T> = T extends object
+  ? {
+      [k in keyof T]: T[k] extends object ? jest.Mocked<T[k]> : T[k];
+    }
+  : T;
+
+const mockClerkMethods = (clerk: LoadedClerk): DeepJestMocked<LoadedClerk> => {
+  const mockProp = <T,>(obj: T, k: keyof T) => {
+    if (typeof obj[k] === 'function') {
+      // @ts-ignore
+      obj[k] = jest.fn();
+    }
+  };
+
+  const mockMethodsOf = (obj: any) => {
+    Object.keys(obj).forEach(k => mockProp(obj, k));
+  };
+  mockMethodsOf(clerk.client.signIn);
+  mockMethodsOf(clerk.client.signUp);
+  mockProp(clerk, 'navigate');
+  return clerk as any as DeepJestMocked<LoadedClerk>;
+};
+
 export const createFixture = (componentName: UnpackContext<typeof ComponentContext>['componentName']) => {
-  return (configFn?: ConfigFn) => {
+  return async (configFn?: ConfigFn) => {
     const config = getInitialFixtureConfig();
     const baseEnvironment = createBaseEnvironmentJSON();
 
@@ -54,13 +73,29 @@ export const createFixture = (componentName: UnpackContext<typeof ComponentConte
     }
 
     const environmentMock = new Environment(baseEnvironment);
+    Environment.getInstance().fetch = jest.fn(() => Promise.resolve(environmentMock));
 
-    const { mockedRouteContext, mockedClerk, updateClerkMock } = createClerkMockContexts(config);
+    // @ts-expect-error
+    const clientMock = new Client(null);
+    Client.getInstance().fetch = jest.fn(() => Promise.resolve(clientMock));
+
+    // Use a FAPI value for local production instances to avoid triggering the devInit flow during testing
+    const frontendApi = 'clerk.abcef.12345.prod.lclclerk.com';
+    const tempClerk = new ClerkCtor(frontendApi);
+    await tempClerk.load();
+    const clerkMock = mockClerkMethods(tempClerk as LoadedClerk);
+    const { mockedRouteContext } = createClerkMockContexts(config);
+
+    const fixtures = {
+      clerk: clerkMock,
+      signIn: clerkMock.client.signIn,
+      signUp: clerkMock.client.signUp,
+    };
 
     const MockClerkProvider = (props: any) => {
       const { children } = props;
       return (
-        <CoreClerkContextWrapper clerk={mockedClerk}>
+        <CoreClerkContextWrapper clerk={clerkMock}>
           <EnvironmentProvider value={environmentMock}>
             <RouteContext.Provider value={mockedRouteContext}>
               <AppearanceProvider appearanceKey={'signIn'}>
@@ -76,6 +111,6 @@ export const createFixture = (componentName: UnpackContext<typeof ComponentConte
       );
     };
 
-    return { wrapper: MockClerkProvider, fixtures: config, mockedClerk };
+    return { wrapper: MockClerkProvider, fixtures };
   };
 };
