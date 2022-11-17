@@ -11,7 +11,13 @@ import {
   NEXT_REWRITE_HEADER,
   SESSION_COOKIE_NAME,
 } from '../types';
-import { getAuthResultFromRequest, getCookie, setPrivateAuthResultOnRequest } from './requestResponseUtils';
+import {
+  getAuthResultFromRequest,
+  getCookie,
+  nextJsVersionCanOverrideRequestHeaders,
+  setPrivateAuthResultOnRequest,
+  setRequestHeadersOnNextResponse,
+} from './requestResponseUtils';
 
 const DEFAULT_API_URL = process.env.CLERK_API_URL || 'https://api.clerk.dev';
 const DEFAULT_API_VERSION = process.env.CLERK_API_VERSION || 'v1';
@@ -131,36 +137,17 @@ export function handleMiddlewareResult({ req, res, authResult }: HandleMiddlewar
   }
 
   if (rewriteURL) {
-    res.headers.set(AUTH_RESULT, authResult);
-    rewriteURL.searchParams.set(AUTH_RESULT, authResult);
+    if (nextJsVersionCanOverrideRequestHeaders()) {
+      // If we detect that the host app is using a nextjs installation that reliably sets the
+      // request headers, we don't need to fall back to the searchParams strategy.
+      // In this case, we won't set them at all in order to avoid having them visible in the req.url
+      setRequestHeadersOnNextResponse(res, req, { [AUTH_RESULT]: authResult });
+    } else {
+      res.headers.set(AUTH_RESULT, authResult);
+      rewriteURL.searchParams.set(AUTH_RESULT, authResult);
+    }
     res.headers.set(NEXT_REWRITE_HEADER, rewriteURL.href);
-    setRequestHeaderOnNextResponse(res, req, { [AUTH_RESULT]: authResult });
   }
 
   return res;
 }
-
-const OVERRIDE_HEADERS = 'x-middleware-override-headers';
-const MIDDLEWARE_HEADER_PREFIX = 'x-middleware-request' as string;
-
-const setRequestHeaderOnNextResponse = (
-  res: NextResponse | Response,
-  req: NextRequest,
-  newHeaders: Record<string, string>,
-) => {
-  if (!res.headers.get(OVERRIDE_HEADERS)) {
-    // Emulate a user setting overrides by explicitly adding the required nextjs headers
-    // https://github.com/vercel/next.js/pull/41380
-    // @ts-expect-error
-    res.headers.set(OVERRIDE_HEADERS, [...req.headers.keys()]);
-    req.headers.forEach((val, key) => {
-      res.headers.set(`${MIDDLEWARE_HEADER_PREFIX}-${key}`, val);
-    });
-  }
-
-  // Now that we have normalised res to include overrides, just append the new header
-  Object.entries(newHeaders).forEach(([key, val]) => {
-    res.headers.set(OVERRIDE_HEADERS, `${res.headers.get(OVERRIDE_HEADERS)},${key}`);
-    res.headers.set(`${MIDDLEWARE_HEADER_PREFIX}-${key}`, val);
-  });
-};
