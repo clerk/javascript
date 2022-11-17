@@ -28,10 +28,17 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
     identifier?: string;
     supportPassword?: boolean;
     supportEmailCode?: boolean;
+    supportEmailLink?: boolean;
+  };
+
+  type SignInWithPhoneNumberParams = {
+    identifier?: string;
+    supportPassword?: boolean;
+    supportPhoneCode?: boolean;
   };
 
   const startSignInWithEmailAddress = (params?: SignInWithEmailAddressParams) => {
-    const { identifier = 'hello@clerk.dev', supportPassword = true, supportEmailCode } = params || {};
+    const { identifier = 'hello@clerk.dev', supportPassword = true, supportEmailCode, supportEmailLink } = params || {};
     baseClient.sign_in = {
       status: 'needs_first_factor',
       identifier,
@@ -39,12 +46,27 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
       supported_first_factors: [
         ...(supportPassword ? [{ strategy: 'password' }] : []),
         ...(supportEmailCode ? [{ strategy: 'email_code', safe_identifier: 'n*****@clerk.dev' }] : []),
+        ...(supportEmailLink ? [{ strategy: 'email_link', safe_identifier: 'n*****@clerk.dev' }] : []),
       ],
       user_data: { ...(createUserFixture() as any) },
     } as SignInJSON;
   };
 
-  return { startSignInWithEmailAddress };
+  const startSignInWithPhoneNumber = (params?: SignInWithPhoneNumberParams) => {
+    const { identifier = '+301234567890', supportPassword = true, supportPhoneCode } = params || {};
+    baseClient.sign_in = {
+      status: 'needs_first_factor',
+      identifier,
+      supported_identifiers: ['phone_number'],
+      supported_first_factors: [
+        ...(supportPassword ? [{ strategy: 'password' }] : []),
+        ...(supportPhoneCode ? [{ strategy: 'phone_code', safe_identifier: '+30********90' }] : []),
+      ],
+      user_data: { ...(createUserFixture() as any) },
+    } as SignInJSON;
+  };
+
+  return { startSignInWithEmailAddress, startSignInWithPhoneNumber };
 };
 
 const createAuthConfigFixtureHelpers = (environment: EnvironmentJSON) => {
