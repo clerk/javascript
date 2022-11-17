@@ -77,7 +77,7 @@ export type ProfileSectionId =
   | 'activeDevices'
   | 'organization-profile'
   | 'organization-danger';
-export type ProfilePageId = 'account' | 'security' | 'organization-settings';
+export type ProfilePageId = 'account' | 'security' | 'organization-settings' | 'organization-members';
 
 type NavbarItemId = 'account' | 'security';
 
@@ -296,6 +296,10 @@ export type ElementsConfig = {
   tagPillIcon: WithOptions<never, never, never>;
   tagPillContainer: WithOptions<never, never, never>;
 
+  tabPanel: WithOptions<never, never, never>;
+  tabButton: WithOptions<never, never, never>;
+  tabListContainer: WithOptions<never, never, never>;
+
   selectButton: WithOptions<never, never, never>;
   selectButtonIcon: WithOptions<never, never, never>;
   selectOptionsContainer: WithOptions<never, never, never>;
@@ -354,6 +358,9 @@ export type ElementsConfig = {
   fileDropAreaHint: WithOptions<never, never, never>;
   fileDropAreaButtonPrimary: WithOptions<never, never, never>;
   fileDropAreaFooterHint: WithOptions<never, never, never>;
+
+  invitationsSentIconBox: WithOptions<never, never, never>;
+  invitationsSentIcon: WithOptions<never, never, never>;
 
   accordionTriggerButton: WithOptions<never, never, never>;
   accordionContent: WithOptions<never, never, never>;

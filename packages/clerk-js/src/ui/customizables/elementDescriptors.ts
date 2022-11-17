@@ -173,6 +173,10 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'tagPillIcon',
   'tagPillContainer',
 
+  'tabPanel',
+  'tabButton',
+  'tabListContainer',
+
   'selectButton',
   'selectButtonIcon',
   'selectOptionsContainer',
@@ -230,6 +234,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'fileDropAreaHint',
   'fileDropAreaButtonPrimary',
   'fileDropAreaFooterHint',
+
+  'invitationsSentIconBox',
+  'invitationsSentIcon',
 
   'accordionTriggerButton',
   'accordionContent',

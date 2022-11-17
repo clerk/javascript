@@ -1,6 +1,6 @@
 import { useWizard, Wizard } from '../../common';
 import { useCoreOrganization } from '../../contexts';
-import { Flex, localizationKeys, Text } from '../../customizables';
+import { descriptors, Flex, localizationKeys, Text } from '../../customizables';
 import { ContentPage, IconCircle, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { Email } from '../../icons';
 import { InviteMembersForm } from './InviteMembersForm';
@@ -45,7 +45,11 @@ export const InvitationsSentMessage = () => {
       center
       gap={4}
     >
-      <IconCircle icon={Email} />
+      <IconCircle
+        boxElementDescriptor={descriptors.invitationsSentIconBox}
+        iconElementDescriptor={descriptors.invitationsSentIcon}
+        icon={Email}
+      />
       <Text localizationKey={localizationKeys('organizationProfile.invitePage.successMessage')} />
     </Flex>
   );

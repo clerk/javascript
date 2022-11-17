@@ -39,7 +39,7 @@ export const MembersListTable = (props: MembersListTableProps) => {
   return (
     <Col
       gap={4}
-      sx={t => ({ width: '100%', padding: `${t.space.$8} 0` })}
+      sx={{ width: '100%' }}
     >
       <Flex sx={{ overflowX: 'auto' }}>
         <Table sx={{ width: '100%' }}>
