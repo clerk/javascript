@@ -1,5 +1,5 @@
 import { useWizard, Wizard } from '../../common';
-import { useCoreOrganization } from '../../contexts';
+import { useCoreOrganization, useOrganizationProfileContext } from '../../contexts';
 import { Flex, localizationKeys, Text } from '../../customizables';
 import { ContentPage, IconCircle, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { Email } from '../../icons';
@@ -12,6 +12,7 @@ export const InviteMembersPage = withCardStateProvider(() => {
   const card = useCardState();
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
   const { organization } = useCoreOrganization();
+  const { __unstable_manageBillingUrl } = useOrganizationProfileContext();
 
   if (!organization) {
     return null;
@@ -24,6 +25,7 @@ export const InviteMembersPage = withCardStateProvider(() => {
         headerSubtitle={subtitle}
         Breadcrumbs={OrganizationProfileBreadcrumbs}
       >
+        {__unstable_manageBillingUrl && 'show org billing'}
         <InviteMembersForm
           organization={organization}
           onSuccess={wizard.nextStep}

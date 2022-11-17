@@ -11,7 +11,8 @@ import {
 import { localizationKeys } from '../../customizables';
 import { Action, OrganizationPreview, PersonalWorkspacePreview, PopoverCard, useCardState } from '../../elements';
 import { RootBox } from '../../elements/RootBox';
-import { CogFilled } from '../../icons';
+import { Billing, CogFilled } from '../../icons';
+import { useRouter } from '../../router';
 import { PropsOfComponent } from '../../styledSystem';
 import { OrganizationActionList } from './OtherOrganizationActions';
 
@@ -24,8 +25,11 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
     const { openOrganizationProfile, openCreateOrganization } = useCoreClerk();
     const { organization: currentOrg } = useCoreOrganization();
     const { isLoaded, setActive } = useCoreOrganizationList();
+    const router = useRouter();
     const {
       hidePersonal,
+      __unstable_manageBillingUrl,
+      __unstable_manageBillingLabel,
       createOrganizationMode,
       organizationProfileMode,
       afterLeaveOrganizationUrl,
@@ -64,7 +68,11 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       if (organizationProfileMode === 'navigation') {
         return navigateOrganizationProfile();
       }
-      openOrganizationProfile({ afterLeaveOrganizationUrl });
+      openOrganizationProfile({
+        afterLeaveOrganizationUrl,
+        __unstable_manageBillingUrl,
+        __unstable_manageBillingLabel,
+      });
     };
 
     const manageOrganizationButton = (
@@ -72,6 +80,15 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
         icon={CogFilled}
         label={localizationKeys('organizationSwitcher.action__manageOrganization')}
         onClick={handleManageOrganizationClicked}
+        sx={t => ({ margin: `${t.space.$2} 0` })}
+      />
+    );
+
+    const billingOrganizationButton = (
+      <Action
+        icon={Billing}
+        label={__unstable_manageBillingLabel ? __unstable_manageBillingLabel() : 'Manage billing'}
+        onClick={() => router.navigate(__unstable_manageBillingUrl())}
         sx={t => ({ margin: `${t.space.$2} 0` })}
       />
     );
@@ -92,6 +109,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
                   sx={theme => ({ padding: `0 ${theme.space.$6}` })}
                 />
                 {manageOrganizationButton}
+                {__unstable_manageBillingUrl && billingOrganizationButton}
               </>
             ) : (
               !hidePersonal && (
