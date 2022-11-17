@@ -95,13 +95,13 @@ describe('SignInStart', () => {
       expect(fixtures.signIn.create).toHaveBeenCalled();
     });
 
-    it.skip('navigates to /factor-one page when user clicks on Continue button and create needs a first factor', async () => {
+    it('navigates to /factor-one page when user clicks on Continue button and create needs a first factor', async () => {
       let mockRouteNavigateFn: any;
       const { wrapper, fixtures } = await createFixture(f => {
         f.withEmailAddress();
         mockRouteNavigateFn = f.mockRouteNavigate();
       });
-      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ responseStatus: 'needs_first_factor' }));
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' }));
       const { userEvent } = render(<SignInStart />, { wrapper });
       await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.dev');
       await userEvent.click(screen.getByText('Continue'));
