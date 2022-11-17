@@ -8,7 +8,7 @@ import {
   useCoreUser,
   useOrganizationSwitcherContext,
 } from '../../contexts';
-import { localizationKeys } from '../../customizables';
+import { descriptors, localizationKeys } from '../../customizables';
 import { Action, OrganizationPreview, PersonalWorkspacePreview, PopoverCard, useCardState } from '../../elements';
 import { RootBox } from '../../elements/RootBox';
 import { CogFilled } from '../../icons';
@@ -92,6 +92,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
             {currentOrg ? (
               <>
                 <OrganizationPreview
+                  elementId={'organizationSwitcher'}
                   gap={5}
                   organization={currentOrg}
                   user={user}

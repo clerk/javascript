@@ -1,4 +1,5 @@
 import { UserResource } from '@clerk/types';
+import { UserPreviewId } from '@clerk/types/src';
 import React from 'react';
 
 import { descriptors, Flex, LocalizationKey, Text, useLocalizations } from '../customizables';
@@ -6,14 +7,14 @@ import { PropsOfComponent } from '../styledSystem';
 import { getFullName, getIdentifier } from '../utils';
 import { UserAvatar } from './UserAvatar';
 
-export type UserPreviewProps = Omit<PropsOfComponent<typeof Flex>, 'title'> & {
+export type UserPreviewProps = Omit<PropsOfComponent<typeof Flex>, 'title' | 'elementId'> & {
   user?: Partial<UserResource>;
   size?: 'lg' | 'md' | 'sm';
   icon?: React.ReactNode;
   badge?: React.ReactNode;
   imageUrl?: string | null;
   rounded?: boolean;
-  elementId?: any;
+  elementId?: UserPreviewId;
   title?: LocalizationKey | string;
   subtitle?: LocalizationKey | string;
   showAvatar?: boolean;

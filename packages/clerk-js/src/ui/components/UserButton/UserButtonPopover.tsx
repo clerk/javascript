@@ -71,7 +71,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
       >
         <PopoverCard.Main elementDescriptor={descriptors.userButtonPopoverMain}>
           <UserPreview
-            elementId={'userButton' as any}
+            elementId={'userButton'}
             user={user}
             sx={theme => ({ padding: `0 ${theme.space.$6}`, marginBottom: theme.space.$2 })}
           />

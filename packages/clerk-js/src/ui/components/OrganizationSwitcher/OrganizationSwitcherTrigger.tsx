@@ -24,6 +24,7 @@ export const OrganizationSwitcherTrigger = React.forwardRef<HTMLButtonElement, O
       >
         {organization && (
           <OrganizationPreview
+            elementId={'organizationSwitcher'}
             gap={3}
             size={'sm'}
             organization={organization}

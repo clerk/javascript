@@ -81,6 +81,9 @@ export type ProfilePageId = 'account' | 'security' | 'organization-settings' | '
 
 type NavbarItemId = 'account' | 'security';
 
+export type UserPreviewId = 'userButton' | 'personalWorkspace';
+export type OrganizationPreviewId = 'organizationSwitcher';
+
 /**
  * A type that describes the states and the ids that we will combine
  * in order to create all theming combinations
@@ -254,29 +257,21 @@ export type ElementsConfig = {
 
   // TODO: Test this idea. Instead of userButtonUserPreview, have a userPreview__userButton instead
   // Same for other repeated selectors, eg avatar
-  userPreview: WithOptions<'userButton', never, never>;
-  userPreviewAvatarContainer: WithOptions<'userButton', never, never>;
-  userPreviewAvatarBox: WithOptions<'userButton', never, never>;
-  userPreviewAvatarImage: WithOptions<'userButton', never, never>;
-  userPreviewTextContainer: WithOptions<'userButton', never, never>;
-  userPreviewMainIdentifier: WithOptions<'userButton', never, never>;
-  userPreviewSecondaryIdentifier: WithOptions<'userButton', never, never>;
+  userPreview: WithOptions<UserPreviewId, never, never>;
+  userPreviewAvatarContainer: WithOptions<UserPreviewId, never, never>;
+  userPreviewAvatarBox: WithOptions<UserPreviewId, never, never>;
+  userPreviewAvatarImage: WithOptions<UserPreviewId, never, never>;
+  userPreviewTextContainer: WithOptions<UserPreviewId, never, never>;
+  userPreviewMainIdentifier: WithOptions<UserPreviewId, never, never>;
+  userPreviewSecondaryIdentifier: WithOptions<UserPreviewId, never, never>;
 
-  // personalWorkspacePreview: WithOptions<'organizationSwitcher', never, never>;
-  // personalWorkspacePreviewAvatarContainer: WithOptions<'organizationSwitcher', never, never>;
-  // personalWorkspacePreviewAvatarBox: WithOptions<'organizationSwitcher', never, never>;
-  // personalWorkspacePreviewAvatarImage: WithOptions<'organizationSwitcher', never, never>;
-  // personalWorkspacePreviewTextContainer: WithOptions<'organizationSwitcher', never, never>;
-  // personalWorkspacePreviewMainIdentifier: WithOptions<'organizationSwitcher', never, never>;
-  // personalWorkspacePreviewSecondaryIdentifier: WithOptions<'organizationSwitcher', never, never>;
-
-  // organizationPreview: WithOptions<'organizationSwitcher', never, never>;
-  // organizationPreviewAvatarContainer: WithOptions<'organizationSwitcher', never, never>;
-  // organizationPreviewAvatarBox: WithOptions<'organizationSwitcher', never, never>;
-  // organizationPreviewAvatarImage: WithOptions<'organizationSwitcher', never, never>;
-  // organizationPreviewTextContainer: WithOptions<'organizationSwitcher', never, never>;
-  // organizationPreviewMainIdentifier: WithOptions<'organizationSwitcher', never, never>;
-  // organizationPreviewSecondaryIdentifier: WithOptions<'organizationSwitcher', never, never>;
+  organizationPreview: WithOptions<OrganizationPreviewId, never, never>;
+  organizationPreviewAvatarContainer: WithOptions<OrganizationPreviewId, never, never>;
+  organizationPreviewAvatarBox: WithOptions<OrganizationPreviewId, never, never>;
+  organizationPreviewAvatarImage: WithOptions<OrganizationPreviewId, never, never>;
+  organizationPreviewTextContainer: WithOptions<OrganizationPreviewId, never, never>;
+  organizationPreviewMainIdentifier: WithOptions<OrganizationPreviewId, never, never>;
+  organizationPreviewSecondaryIdentifier: WithOptions<OrganizationPreviewId, never, never>;
 
   organizationProfilePage: WithOptions<never, never, never>;
 
