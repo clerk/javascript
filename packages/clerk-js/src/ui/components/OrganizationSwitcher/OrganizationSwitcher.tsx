@@ -1,6 +1,8 @@
+import React from 'react';
+
 import { withOrganizationsEnabledGuard } from '../../common';
 import { withCoreUserGuard } from '../../contexts';
-import { Flow } from '../../customizables';
+import { Flex, Flow } from '../../customizables';
 import { withCardStateProvider } from '../../elements';
 import { Portal } from '../../elements/Portal';
 import { usePopover } from '../../hooks';
@@ -15,19 +17,26 @@ const _OrganizationSwitcher = () => {
 
   return (
     <Flow.Root flow='organizationSwitcher'>
-      <OrganizationSwitcherTrigger
-        ref={reference}
-        onClick={toggle}
+      <Flex
+        // elementDescriptor={descriptors.organizationSwitcherBox}
         isOpen={isOpen}
-      />
-      <Portal>
-        <OrganizationSwitcherPopover
+        align='center'
+        gap={2}
+      >
+        <OrganizationSwitcherTrigger
+          ref={reference}
+          onClick={toggle}
           isOpen={isOpen}
-          close={toggle}
-          ref={floating}
-          style={{ ...styles }}
         />
-      </Portal>
+        <Portal>
+          <OrganizationSwitcherPopover
+            isOpen={isOpen}
+            close={toggle}
+            ref={floating}
+            style={{ ...styles }}
+          />
+        </Portal>
+      </Flex>
     </Flow.Root>
   );
 };

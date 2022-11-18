@@ -8,7 +8,7 @@ import {
   useCoreUser,
   useOrganizationSwitcherContext,
 } from '../../contexts';
-import { Box, Button, Icon, localizationKeys } from '../../customizables';
+import { Box, Button, Icon, localizationKeys, Text } from '../../customizables';
 import { Action, Actions, OrganizationPreview, PersonalWorkspacePreview } from '../../elements';
 import { useCardState } from '../../elements/contexts';
 import { common, PropsOfComponent } from '../../styledSystem';
@@ -43,34 +43,36 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
         border: `${t.borders.$normal} ${t.colors.$blackAlpha200}`,
         borderRight: 0,
         borderLeft: 0,
-        paddingBottom: t.space.$2,
-        gap: 2,
+        paddingTop: t.space.$3,
+        paddingBottom: t.space.$3,
       })}
     >
       {currentOrg && !hidePersonal && (
-        <Actions
-          sx={t => ({
-            borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha200}`,
-            padding: `${t.space.$2} 0`,
-          })}
+        <PreviewButton
+          sx={t => ({ marginBottom: t.space.$4 })}
+          onClick={onPersonalWorkspaceClick}
         >
-          <PreviewButton
-            block
-            onClick={onPersonalWorkspaceClick}
-          >
-            <PersonalWorkspacePreview
-              gap={3}
-              user={{ profileImageUrl: user.profileImageUrl }}
-              size='sm'
-              title={localizationKeys('organizationSwitcher.personalWorkspace')}
-            />
-          </PreviewButton>
-        </Actions>
+          <PersonalWorkspacePreview
+            user={user}
+            subtitle={localizationKeys('organizationSwitcher.personalWorkspace')}
+          />
+        </PreviewButton>
+      )}
+      {!!otherOrgs.length && (
+        <Text
+          size='xss'
+          colorScheme='neutral'
+          sx={t => ({
+            paddingLeft: t.space.$6,
+            marginBottom: t.space.$1,
+            textTransform: 'uppercase',
+          })}
+          localizationKey={localizationKeys('organizationSwitcher.listTitle')}
+        />
       )}
       <Box
         sx={t => ({
-          paddingTop: t.space.$2,
-          maxHeight: `calc(3 * ${t.sizes.$12} + ${t.space.$2})`,
+          maxHeight: `calc(3.5 * ${t.sizes.$14})`,
           overflowY: 'auto',
           ...common.unstyledScrollbar(t),
         })}
@@ -78,15 +80,12 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
         {otherOrgs.map(organization => (
           <PreviewButton
             block
-            sx={t => ({
-              height: t.space.$12,
-            })}
             key={organization.id}
             onClick={() => onOrganizationClick(organization)}
           >
             <OrganizationPreview
-              gap={3}
               organization={organization}
+              user={user}
               size='sm'
             />
           </PreviewButton>
@@ -107,19 +106,19 @@ const PreviewButton = (props: PropsOfComponent<typeof Button>) => {
       colorScheme='neutral'
       focusRing={false}
       isDisabled={card.isLoading}
+      {...rest}
       sx={[
         t => ({
-          minHeight: 'unset',
+          height: t.sizes.$14,
           borderRadius: 0,
           justifyContent: 'space-between',
-          padding: `${t.space.$2} ${t.space.$6}`,
+          padding: `${t.space.$3} ${t.space.$6}`,
           ':hover > svg': {
             visibility: 'initial',
           },
         }),
         sx,
       ]}
-      {...rest}
     >
       {children}
       <Icon

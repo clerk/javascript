@@ -92,7 +92,6 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
             {currentOrg ? (
               <>
                 <OrganizationPreview
-                  gap={5}
                   organization={currentOrg}
                   user={user}
                   sx={theme => ({ padding: `0 ${theme.space.$6}` })}
@@ -102,10 +101,9 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
             ) : (
               !hidePersonal && (
                 <PersonalWorkspacePreview
-                  gap={5}
-                  user={{ profileImageUrl: user.profileImageUrl }}
+                  user={user}
                   sx={theme => ({ padding: `0 ${theme.space.$6}`, marginBottom: theme.space.$6 })}
-                  title={localizationKeys('organizationSwitcher.personalWorkspace')}
+                  subtitle={localizationKeys('organizationSwitcher.personalWorkspace')}
                 />
               )
             )}

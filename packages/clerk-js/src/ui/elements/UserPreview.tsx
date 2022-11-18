@@ -1,20 +1,19 @@
 import { UserResource } from '@clerk/types';
 import React from 'react';
 
-import { descriptors, Flex, LocalizationKey, Text, useLocalizations } from '../customizables';
+import { descriptors, Flex, LocalizationKey, Text } from '../customizables';
 import { PropsOfComponent } from '../styledSystem';
 import { getFullName, getIdentifier } from '../utils';
 import { UserAvatar } from './UserAvatar';
 
-export type UserPreviewProps = Omit<PropsOfComponent<typeof Flex>, 'title'> & {
-  user?: Partial<UserResource>;
+export type UserPreviewProps = PropsOfComponent<typeof Flex> & {
+  user: Partial<UserResource>;
   size?: 'lg' | 'md' | 'sm';
   icon?: React.ReactNode;
   badge?: React.ReactNode;
   imageUrl?: string | null;
   rounded?: boolean;
   elementId?: any;
-  title?: LocalizationKey | string;
   subtitle?: LocalizationKey | string;
   showAvatar?: boolean;
 };
@@ -30,14 +29,11 @@ export const UserPreview = (props: UserPreviewProps) => {
     badge,
     elementId,
     sx,
-    title,
     subtitle,
     ...rest
   } = props;
-  const { t } = useLocalizations();
-  const name = getFullName({ ...user });
-  const identifier = getIdentifier({ ...user });
-  const localizedTitle = t(title);
+  const name = getFullName(user);
+  const identifier = getIdentifier(user);
 
   return (
     <Flex
@@ -59,7 +55,7 @@ export const UserPreview = (props: UserPreviewProps) => {
             boxElementDescriptor={descriptors.userPreviewAvatarBox}
             imageElementDescriptor={descriptors.userPreviewAvatarImage}
             {...user}
-            imageUrl={imageUrl || user?.profileImageUrl}
+            imageUrl={imageUrl || user.profileImageUrl}
             size={t => ({ sm: t.sizes.$8, md: t.sizes.$11, lg: t.sizes.$12x5 }[size])}
             optimize
             rounded={rounded}
@@ -80,7 +76,7 @@ export const UserPreview = (props: UserPreviewProps) => {
           variant={size === 'md' ? 'regularMedium' : 'smallMedium'}
           truncate
         >
-          {localizedTitle || name || identifier} {badge}
+          {name || identifier} {badge}
         </Text>
         {(subtitle || (name && identifier)) && (
           <Text

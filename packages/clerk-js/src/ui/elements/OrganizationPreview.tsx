@@ -22,7 +22,7 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
 
   return (
     <Flex
-      gap={4}
+      gap={3}
       align='center'
       sx={[{ minWidth: '0px', width: '100%' }, sx]}
       {...rest}
