@@ -31,12 +31,15 @@ export const bindCreateFixtures = (componentName: Parameters<typeof createFixtur
 };
 
 const createFixtures =
-  (componentName: UnpackContext<typeof ComponentContext>['componentName']) => async (configFn?: ConfigFn) => {
+  (componentName: UnpackContext<typeof ComponentContext>['componentName']) =>
+  async (...configFns: ConfigFn[]) => {
     const baseEnvironment = createBaseEnvironmentJSON();
     const baseClient = createBaseClientJSON();
+    configFns = configFns.filter(Boolean);
 
-    if (configFn) {
-      configFn(createInitialStateConfigParam(baseEnvironment, baseClient));
+    if (configFns.length) {
+      const fParam = createInitialStateConfigParam(baseEnvironment, baseClient);
+      configFns.forEach(configFn => configFn(fParam));
     }
 
     const environmentMock = new Environment(baseEnvironment);
