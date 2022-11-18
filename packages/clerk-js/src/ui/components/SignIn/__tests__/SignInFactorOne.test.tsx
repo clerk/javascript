@@ -131,26 +131,110 @@ describe('SignInFactorOne', () => {
       screen.getByText(`Sign in with your password`);
     });
 
-    it('should go back to the main screen when clicking the "<- Back" button from the "Use another method" page', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
+    it('should go back to the main screen ommwhen clicking the "<- Back" button from the "Use another method" page', async () => {
+      const { wrapper } = await createFixtures(f => {
         f.withEmailAddress();
         f.withPassword();
-        f.withPreferredSignInStrategy({ strategy: 'otp' });
+        f.withPreferredSignInStrategy({ strategy: 'password' });
         f.startSignInWithEmailAddress({ supportEmailCode: true });
       });
 
-      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
       await userEvent.click(screen.getByText('Back'));
-      screen.getByText('Check your email');
+      screen.getByText('Enter your password');
     });
 
-    it.todo('should list all the enabled first factor methods');
-    it.todo('clicking the password method should show the password input');
-    it.todo('clicking the email link method should show the magic link screen');
-    it.todo('clicking the email code method should show the email code input');
-    it.todo('clicking the phone code method should show the phone code input');
+    it('should list all the enabled first factor methods', async () => {
+      const email = 'test@clerk.dev';
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword();
+        f.startSignInWithEmailAddress({ supportEmailCode: true, identifier: email });
+      });
+      const { userEvent } = render(<SignInFactorOne />, { wrapper });
+      await userEvent.click(screen.getByText('Use another method'));
+      screen.getByText(`Send code to ${email}`);
+      screen.getByText(`Sign in with your password`);
+      const deactivatedMethod = screen.queryByText(`Send link to ${email}`);
+      expect(deactivatedMethod).not.toBeInTheDocument();
+    });
+
+    it('clicking the password method should show the password input', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword();
+        f.startSignInWithEmailAddress({ supportEmailCode: true });
+      });
+      const { userEvent } = render(<SignInFactorOne />, { wrapper });
+      await userEvent.click(screen.getByText('Use another method'));
+      await userEvent.click(screen.getByText('Sign in with your password'));
+      screen.getByText('Enter your password');
+    });
+
+    it('clicking the email link method should show the magic link screen', async () => {
+      const email = 'test@clerk.dev';
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword();
+        f.withPreferredSignInStrategy({ strategy: 'password' });
+        f.startSignInWithEmailAddress({ supportEmailLink: true, identifier: email });
+      });
+      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
+      fixtures.signIn.createMagicLinkFlow.mockImplementation(
+        () =>
+          ({
+            startMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+            cancelMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+          } as any),
+      );
+      const { userEvent } = render(<SignInFactorOne />, { wrapper });
+      await userEvent.click(screen.getByText('Use another method'));
+      screen.getByText(`Send link to ${email}`);
+      await userEvent.click(screen.getByText(`Send link to ${email}`));
+      screen.getByText('Check your email');
+      screen.getByText('Verification link');
+    });
+
+    it('clicking the email code method should show the email code input', async () => {
+      const email = 'test@clerk.dev';
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword();
+        f.withPreferredSignInStrategy({ strategy: 'password' });
+        f.startSignInWithEmailAddress({ supportEmailCode: true, identifier: email });
+      });
+      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
+      fixtures.signIn.createMagicLinkFlow.mockReturnValue({
+        startMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+        cancelMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+      } as any);
+      const { userEvent } = render(<SignInFactorOne />, { wrapper });
+      await userEvent.click(screen.getByText('Use another method'));
+      screen.getByText(`Send code to ${email}`);
+      await userEvent.click(screen.getByText(`Send code to ${email}`));
+      screen.getByText('Check your email');
+      screen.getByText('Verification code');
+    });
+
+    it('clicking the phone code method should show the phone code input', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword();
+        f.withPreferredSignInStrategy({ strategy: 'password' });
+        f.startSignInWithPhoneNumber({ supportPhoneCode: true });
+      });
+      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
+      fixtures.signIn.createMagicLinkFlow.mockReturnValue({
+        startMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+        cancelMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+      } as any);
+      const { userEvent } = render(<SignInFactorOne />, { wrapper });
+      await userEvent.click(screen.getByText('Use another method'));
+      screen.getByText(/Send code to \+/);
+      await userEvent.click(screen.getByText(/Send code to \+/));
+      screen.getByText('Check your phone');
+    });
 
     describe('Get Help', () => {
       it('should render the get help component when clicking the "Get Help" button', async () => {
@@ -178,7 +262,19 @@ describe('SignInFactorOne', () => {
         screen.getByText('Use another method');
       });
 
-      it.todo('should open a "mailto:" link when clicking the email support button');
+      it('should open a "mailto:" link when clicking the email support button', async () => {
+        const { wrapper } = await createFixtures(f => {
+          f.withEmailAddress({ first_factors: ['email_code', 'email_link'] });
+          f.startSignInWithEmailAddress({ supportEmailCode: true, supportEmailLink: true });
+        });
+
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.click(screen.getByText('Use another method'));
+        await userEvent.click(screen.getByText('Get help'));
+        screen.getByText('Email support');
+        await userEvent.click(screen.getByText('Email support'));
+        //TODO: check that location.href setter is called
+      });
     });
   });
 });
