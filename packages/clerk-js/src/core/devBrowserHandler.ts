@@ -8,13 +8,7 @@ import {
   removeSearchParameterFromHash,
   runIframe,
 } from '../utils';
-import {
-  DEV_BROWSER_SSO_JWT_HTTP_HEADER,
-  DEV_BROWSER_SSO_JWT_KEY,
-  DEV_BROWSER_SSO_JWT_PARAMETER,
-  TEST_SSO_JWT_KEY,
-  TEST_SSO_JWT_SEARCH_PARAM_NAME,
-} from './constants';
+import { DEV_BROWSER_SSO_JWT_HTTP_HEADER, DEV_BROWSER_SSO_JWT_KEY, DEV_BROWSER_SSO_JWT_PARAMETER } from './constants';
 import { clerkErrorDevInitFailed } from './errors';
 import { FapiClient } from './fapiClient';
 
@@ -39,7 +33,7 @@ export default function createDevBrowserHandler({
   devSessionSyncMode,
 }: CreateDevBrowserHandlerOptions): DevBrowserHandler {
   const cookieHandler = createCookieHandler();
-  const key = devSessionSyncMode === 'cookieless' ? TEST_SSO_JWT_KEY : DEV_BROWSER_SSO_JWT_KEY;
+  const key = DEV_BROWSER_SSO_JWT_KEY;
 
   function getDevBrowserJWT() {
     return localStorage.getItem(key);
@@ -111,13 +105,13 @@ export default function createDevBrowserHandler({
     // 1. Get the JWT from hash search parameters when the redirection comes from Clerk Hosted Pages
     const devBrowserToken = getSearchParameterFromHash({
       hash: window.location.hash,
-      paramName: TEST_SSO_JWT_SEARCH_PARAM_NAME,
+      paramName: DEV_BROWSER_SSO_JWT_PARAMETER,
     });
 
     if (devBrowserToken) {
       window.location.hash = removeSearchParameterFromHash({
         hash: window.location.hash,
-        paramName: TEST_SSO_JWT_SEARCH_PARAM_NAME,
+        paramName: DEV_BROWSER_SSO_JWT_PARAMETER,
       });
 
       setDevBrowserJWT(devBrowserToken);
