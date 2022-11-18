@@ -56,7 +56,9 @@
     "typescript": "*"
   },
   "peerDependencies": {
-    "next": ">=10"
+    "next": ">=10",
+    "react": ">=16",
+    "react-dom": ">=16"
   },
   "engines": {
     "node": ">=14"
