@@ -83,12 +83,13 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
     );
 
     return (
-      <RootBox>
+      <RootBox elementDescriptor={descriptors.organizationSwitcherPopoverRootBox}>
         <PopoverCard.Root
+          elementDescriptor={descriptors.organizationSwitcherPopoverCard}
           ref={ref}
           {...rest}
         >
-          <PopoverCard.Main>
+          <PopoverCard.Main elementDescriptor={descriptors.organizationSwitcherPopoverMain}>
             {currentOrg ? (
               <>
                 <OrganizationPreview
@@ -116,7 +117,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
               onOrganizationClick={handleOrganizationClicked}
             />
           </PopoverCard.Main>
-          <PopoverCard.Footer />
+          <PopoverCard.Footer elementDescriptor={descriptors.organizationSwitcherPopoverFooter} />
         </PopoverCard.Root>
       </RootBox>
     );

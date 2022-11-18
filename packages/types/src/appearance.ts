@@ -234,26 +234,28 @@ export type ElementsConfig = {
   userButtonPopoverFooterPages: WithOptions<never, never, never>;
   userButtonPopoverFooterPagesLink: WithOptions<'terms' | 'privacy', never, never>;
 
-  // organizationSwitcherBox: WithOptions<never, 'open', never>;
-  // organizationSwitcherOuterIdentifier: WithOptions<never, 'open', never>;
-  // organizationSwitcherTrigger: WithOptions<never, 'open', never>;
-  // organizationSwitcherTriggerBox: WithOptions<never, 'open', never>;
-  // organizationSwitcherTitle: WithOptions<never, 'open', never>;
-  // organizationSwitcherAvatarBox: WithOptions<never, 'open', never>;
-  // organizationSwitcherAvatarImage: WithOptions<never, 'open', never>;
-  // organizationSwitcherPersonalWorkspace: WithOptions<never, 'open', never>;
-  // organizationSwitcherPopoverRootBox: WithOptions<never, never, never>;
-  // organizationSwitcherPopoverCard: WithOptions<never, never, never>;
-  // organizationSwitcherPopoverMain: WithOptions<never, never, never>;
-  // organizationSwitcherPopoverUserPreview: WithOptions<never, never, never>;
-  // organizationSwitcherPopoverActions: WithOptions<never, never, never>;
-  // organizationSwitcherPopoverActionButton: WithOptions<'manageOrganization' | 'createOrganization', never, never>;
-  // organizationSwitcherPopoverActionButtonIconBox: WithOptions<'manageOrganization' | 'createOrganization', never, never>;
-  // organizationSwitcherPopoverActionButtonIcon: WithOptions<'manageOrganization' | 'createOrganization', never, never>;
-  // organizationSwitcherPopoverActionButtonText: WithOptions<'manageOrganization' | 'createOrganization', never, never>;
-  // organizationSwitcherPopoverFooter: WithOptions<never, never, never>;
-  // organizationSwitcherPopoverFooterPages: WithOptions<never, never, never>;
-  // organizationSwitcherPopoverFooterPagesLink: WithOptions<'terms' | 'privacy', never, never>;
+  organizationSwitcherTrigger: WithOptions<never, 'open', never>;
+  organizationSwitcherTriggerIcon: WithOptions<never, 'open', never>;
+  organizationSwitcherPopoverRootBox: WithOptions<never, never, never>;
+  organizationSwitcherPopoverCard: WithOptions<never, never, never>;
+  organizationSwitcherPopoverMain: WithOptions<never, never, never>;
+  organizationSwitcherPopoverActions: WithOptions<never, never, never>;
+  organizationSwitcherPopoverActionButton: WithOptions<
+    'manageOrganization' | 'createOrganization' | 'switchOrganization',
+    never,
+    never
+  >;
+  organizationSwitcherPreviewButton: WithOptions<never, never, never>;
+  organizationSwitcherPopoverActionButtonIconBox: WithOptions<
+    'manageOrganization' | 'createOrganization',
+    never,
+    never
+  >;
+  organizationSwitcherPopoverActionButtonIcon: WithOptions<'manageOrganization' | 'createOrganization', never, never>;
+  organizationSwitcherPopoverActionButtonText: WithOptions<'manageOrganization' | 'createOrganization', never, never>;
+  organizationSwitcherPopoverFooter: WithOptions<never, never, never>;
+  organizationSwitcherPopoverFooterPages: WithOptions<never, never, never>;
+  organizationSwitcherPopoverFooterPagesLink: WithOptions<'terms' | 'privacy', never, never>;
 
   // TODO: Test this idea. Instead of userButtonUserPreview, have a userPreview__userButton instead
   // Same for other repeated selectors, eg avatar
