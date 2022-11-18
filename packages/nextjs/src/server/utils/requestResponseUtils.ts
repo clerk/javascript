@@ -46,9 +46,10 @@ export function getHeader(req: RequestLike, name: string): string | null | undef
     return req.headers.get(name);
   }
 
-  // @ts-expect-error
   // If no header has been determined for IncomingMessage case, check if available within private `socket` headers
-  return req.headers[name] || req.socket?._httpMessage?.getHeader(name);
+  // When deployed to vercel, req.headers for API routes is a `IncomingHttpHeaders` key-val object which does not follow
+  // the Headers spec so the name is no longer case-insensitive.
+  return req.headers[name] || req.headers[name.toLowerCase()] || (req.socket as any)?._httpMessage?.getHeader(name);
 }
 
 export function getCookie(req: RequestLike, name: string): string | undefined {
