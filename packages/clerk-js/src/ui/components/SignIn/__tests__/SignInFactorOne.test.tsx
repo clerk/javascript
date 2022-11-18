@@ -25,12 +25,9 @@ describe('SignInFactorOne', () => {
   describe('Navigation', () => {
     it.todo('navigates to SignInStart component when user clicks the edit icon');
     it('navigates to SignInStart component if the user lands on SignInFactorOne directly without calling signIn.create', async () => {
-      let spy: any;
-      const { wrapper, fixtures } = await createFixture(f => {
-        spy = f.mockRouteNavigate();
-      });
+      const { wrapper, fixtures } = await createFixture(f => {});
       render(<SignInFactorOne />, { wrapper });
-      expect(spy).toHaveBeenCalledWith('../');
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('../');
     });
   });
 

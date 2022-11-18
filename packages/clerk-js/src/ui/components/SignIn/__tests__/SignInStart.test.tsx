@@ -96,24 +96,20 @@ describe('SignInStart', () => {
     });
 
     it('navigates to /factor-one page when user clicks on Continue button and create needs a first factor', async () => {
-      let mockRouteNavigateFn: any;
       const { wrapper, fixtures } = await createFixture(f => {
         f.withEmailAddress();
-        mockRouteNavigateFn = f.mockRouteNavigate();
       });
       fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' }));
       const { userEvent } = render(<SignInStart />, { wrapper });
       await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.dev');
       await userEvent.click(screen.getByText('Continue'));
       expect(fixtures.signIn.create).toHaveBeenCalled();
-      expect(mockRouteNavigateFn).toHaveBeenCalledWith('factor-one');
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('factor-one');
     });
 
     it('navigates to /factor-two page when user clicks on Continue button and create needs a second factor', async () => {
-      let mockRouteNavigateFn: any;
       const { wrapper, fixtures } = await createFixture(f => {
         f.withEmailAddress();
-        mockRouteNavigateFn = f.mockRouteNavigate();
       });
       fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_second_factor' }));
 
@@ -122,7 +118,7 @@ describe('SignInStart', () => {
       await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.dev');
       await userEvent.click(screen.getByText('Continue'));
       expect(fixtures.signIn.create).toHaveBeenCalled();
-      expect(mockRouteNavigateFn).toHaveBeenCalledWith('factor-two');
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('factor-two');
     });
   });
 });
