@@ -58,7 +58,7 @@ import {
   windowNavigate,
 } from '../utils';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
-import { ERROR_CODES, TEST_SSO_JWT_SEARCH_PARAM_NAME } from './constants';
+import { ERROR_CODES, DEV_BROWSER_SSO_JWT_PARAMETER } from './constants';
 import createDevBrowserHandler, { DevBrowserHandler } from './devBrowserHandler';
 import {
   clerkErrorInitFailed,
@@ -601,7 +601,7 @@ export default class Clerk implements ClerkInterface {
 
       toURL.hash = setSearchParameterInHash({
         hash: toURL.hash,
-        paramName: TEST_SSO_JWT_SEARCH_PARAM_NAME,
+        paramName: DEV_BROWSER_SSO_JWT_PARAMETER,
         paramValue: devBrowserJwt,
       });
     }
