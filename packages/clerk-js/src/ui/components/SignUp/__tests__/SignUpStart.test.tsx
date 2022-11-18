@@ -1,13 +1,13 @@
 import React from 'react';
 
-import { createFixture as _createFixture, render, screen } from '../../../../testUtils';
+import { bindCreateFixtures, render, screen } from '../../../../testUtils';
 import { SignUpStart } from '../SignUpStart';
 
-const createFixture = _createFixture('SignUp');
+const { createFixtures } = bindCreateFixtures('SignUp');
 
 describe('SignUpStart', () => {
   it('renders the component', async () => {
-    const { wrapper } = await createFixture();
+    const { wrapper } = await createFixtures();
     render(<SignUpStart />, { wrapper });
     screen.getByText(/create/i);
   });

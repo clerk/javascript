@@ -1,14 +1,14 @@
 import { describe, it, jest } from '@jest/globals';
 import React from 'react';
 
-import { createFixture as _createFixture, render, screen } from '../../../../testUtils';
+import { bindCreateFixtures, render, screen } from '../../../../testUtils';
 import { SignInFactorOne } from '../SignInFactorOne';
 
-const createFixture = _createFixture('SignIn');
+const { createFixtures } = bindCreateFixtures('SignIn');
 
 describe('SignInFactorOne', () => {
   it('renders the component', async () => {
-    const { wrapper, fixtures } = await createFixture(f => {
+    const { wrapper, fixtures } = await createFixtures(f => {
       f.withEmailAddress();
       f.withPassword();
       f.withPreferredSignInStrategy({ strategy: 'otp' });
@@ -25,7 +25,7 @@ describe('SignInFactorOne', () => {
   describe('Navigation', () => {
     it.todo('navigates to SignInStart component when user clicks the edit icon');
     it('navigates to SignInStart component if the user lands on SignInFactorOne directly without calling signIn.create', async () => {
-      const { wrapper, fixtures } = await createFixture(f => {});
+      const { wrapper, fixtures } = await createFixtures(f => {});
       render(<SignInFactorOne />, { wrapper });
       expect(fixtures.router.navigate).toHaveBeenCalledWith('../');
     });
@@ -39,7 +39,7 @@ describe('SignInFactorOne', () => {
   describe('Selected First Factor Method', () => {
     describe('Password', () => {
       it('shows an input to fill with password', async () => {
-        const { wrapper } = await createFixture(f => {
+        const { wrapper } = await createFixtures(f => {
           f.withEmailAddress();
           f.withPassword();
           f.withPreferredSignInStrategy({ strategy: 'password' });
@@ -56,7 +56,7 @@ describe('SignInFactorOne', () => {
 
     describe('Verification link', () => {
       it('shows message to use the magic link in their email', async () => {
-        const { wrapper, fixtures } = await createFixture(f => {
+        const { wrapper, fixtures } = await createFixtures(f => {
           f.withEmailAddress();
           f.withMagicLink();
           f.startSignInWithEmailAddress({ supportEmailLink: true, supportPassword: false });
@@ -81,7 +81,7 @@ describe('SignInFactorOne', () => {
 
     describe('Email Code', () => {
       it('shows an input to add the code sent to email', async () => {
-        const { wrapper, fixtures } = await createFixture(f => {
+        const { wrapper, fixtures } = await createFixtures(f => {
           f.withEmailAddress();
           f.withPassword();
           f.withPreferredSignInStrategy({ strategy: 'otp' });
@@ -99,7 +99,7 @@ describe('SignInFactorOne', () => {
 
     describe('Phone Code', () => {
       it('shows an input to add the code sent to phone', async () => {
-        const { wrapper, fixtures } = await createFixture(f => {
+        const { wrapper, fixtures } = await createFixtures(f => {
           f.withPhoneNumber();
           f.withPreferredSignInStrategy({ strategy: 'otp' });
           f.startSignInWithPhoneNumber({ supportPhoneCode: true, supportPassword: false });
@@ -118,7 +118,7 @@ describe('SignInFactorOne', () => {
   describe('Use another method', () => {
     it('should render the other authentication methods list component when clicking on "Use another method"', async () => {
       const email = 'test@clerk.dev';
-      const { wrapper } = await createFixture(f => {
+      const { wrapper } = await createFixtures(f => {
         f.withEmailAddress({ first_factors: ['email_code', 'email_link'] });
         f.withPassword();
         f.startSignInWithEmailAddress({ supportEmailCode: true, supportEmailLink: true, identifier: email });
@@ -132,7 +132,7 @@ describe('SignInFactorOne', () => {
     });
 
     it('should go back to the main screen when clicking the "<- Back" button from the "Use another method" page', async () => {
-      const { wrapper, fixtures } = await createFixture(f => {
+      const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress();
         f.withPassword();
         f.withPreferredSignInStrategy({ strategy: 'otp' });
@@ -154,7 +154,7 @@ describe('SignInFactorOne', () => {
 
     describe('Get Help', () => {
       it('should render the get help component when clicking the "Get Help" button', async () => {
-        const { wrapper } = await createFixture(f => {
+        const { wrapper } = await createFixtures(f => {
           f.withEmailAddress({ first_factors: ['email_code', 'email_link'] });
           f.startSignInWithEmailAddress({ supportEmailCode: true, supportEmailLink: true });
         });
@@ -166,7 +166,7 @@ describe('SignInFactorOne', () => {
       });
 
       it('should go back to "Use another method" screen when clicking the "<- Back" button', async () => {
-        const { wrapper } = await createFixture(f => {
+        const { wrapper } = await createFixtures(f => {
           f.withEmailAddress({ first_factors: ['email_code', 'email_link'] });
           f.startSignInWithEmailAddress({ supportEmailCode: true, supportEmailLink: true });
         });

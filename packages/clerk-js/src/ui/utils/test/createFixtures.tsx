@@ -26,8 +26,12 @@ const createInitialStateConfigParam = (baseEnvironment: EnvironmentJSON, baseCli
 type FParam = ReturnType<typeof createInitialStateConfigParam>;
 type ConfigFn = (f: FParam) => void;
 
-export const createFixture = (componentName: UnpackContext<typeof ComponentContext>['componentName']) => {
-  return async (configFn?: ConfigFn) => {
+export const bindCreateFixtures = (componentName: Parameters<typeof createFixtures>[0]) => {
+  return { createFixtures: createFixtures(componentName) };
+};
+
+const createFixtures =
+  (componentName: UnpackContext<typeof ComponentContext>['componentName']) => async (configFn?: ConfigFn) => {
     const baseEnvironment = createBaseEnvironmentJSON();
     const baseClient = createBaseClientJSON();
 
@@ -78,4 +82,3 @@ export const createFixture = (componentName: UnpackContext<typeof ComponentConte
 
     return { wrapper: MockClerkProvider, fixtures };
   };
-};

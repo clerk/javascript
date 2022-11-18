@@ -1,14 +1,14 @@
 import { OAUTH_PROVIDERS } from '@clerk/types';
 import React from 'react';
 
-import { createFixture as _createFixture, render, screen } from '../../../../testUtils';
+import { bindCreateFixtures, render, screen } from '../../../../testUtils';
 import { SignInStart } from '../SignInStart';
 
-const createFixture = _createFixture('SignIn');
+const { createFixtures } = bindCreateFixtures('SignIn');
 
 describe('SignInStart', () => {
   it('renders the component', async () => {
-    const { wrapper } = await createFixture(f => {
+    const { wrapper } = await createFixtures(f => {
       f.withEmailAddress();
       f.withSupportEmail();
     });
@@ -18,7 +18,7 @@ describe('SignInStart', () => {
 
   describe('Login Methods', () => {
     it('enables login with email address', async () => {
-      const { wrapper } = await createFixture(f => {
+      const { wrapper } = await createFixtures(f => {
         f.withEmailAddress();
       });
 
@@ -27,7 +27,7 @@ describe('SignInStart', () => {
     });
 
     it('enables login with username', async () => {
-      const { wrapper } = await createFixture(f => {
+      const { wrapper } = await createFixtures(f => {
         f.withUsername();
       });
 
@@ -36,7 +36,7 @@ describe('SignInStart', () => {
     });
 
     it('enables login with phone number', async () => {
-      const { wrapper } = await createFixture(f => {
+      const { wrapper } = await createFixtures(f => {
         f.withPhoneNumber();
       });
       render(<SignInStart />, { wrapper });
@@ -44,7 +44,7 @@ describe('SignInStart', () => {
     });
 
     it('enables login with all three (email address, phone number, username)', async () => {
-      const { wrapper } = await createFixture(f => {
+      const { wrapper } = await createFixtures(f => {
         f.withPhoneNumber();
         f.withUsername();
         f.withEmailAddress();
@@ -56,7 +56,7 @@ describe('SignInStart', () => {
 
   describe('Social OAuth', () => {
     it.each(OAUTH_PROVIDERS)('shows the "Continue with $name" social OAuth button', async ({ provider, name }) => {
-      const { wrapper } = await createFixture(f => {
+      const { wrapper } = await createFixtures(f => {
         f.withSocialProvider({ provider });
       });
 
@@ -67,7 +67,7 @@ describe('SignInStart', () => {
     });
 
     it('uses the "cl-socialButtonsIconButton__SOCIALOAUTHNAME" classname when rendering the social button icon only', async () => {
-      const { wrapper } = await createFixture(f => {
+      const { wrapper } = await createFixtures(f => {
         OAUTH_PROVIDERS.forEach(({ provider }) => {
           f.withSocialProvider({ provider });
         });
@@ -85,7 +85,7 @@ describe('SignInStart', () => {
 
   describe('navigation', () => {
     it('calls create on clicking Continue button', async () => {
-      const { wrapper, fixtures } = await createFixture(f => {
+      const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress();
       });
       fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' }));
@@ -96,7 +96,7 @@ describe('SignInStart', () => {
     });
 
     it('navigates to /factor-one page when user clicks on Continue button and create needs a first factor', async () => {
-      const { wrapper, fixtures } = await createFixture(f => {
+      const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress();
       });
       fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' }));
@@ -108,7 +108,7 @@ describe('SignInStart', () => {
     });
 
     it('navigates to /factor-two page when user clicks on Continue button and create needs a second factor', async () => {
-      const { wrapper, fixtures } = await createFixture(f => {
+      const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress();
       });
       fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_second_factor' }));

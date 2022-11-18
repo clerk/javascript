@@ -1,14 +1,14 @@
 import { describe, it } from '@jest/globals';
 import React from 'react';
-import { createFixture as _createFixture, render } from 'testUtils';
+import { bindCreateFixtures, render } from 'testUtils';
 
 import { SignInFactorTwo } from '../SignInFactorTwo';
 
-const createFixture = _createFixture('SignIn');
+const { createFixtures } = bindCreateFixtures('SignIn');
 
 describe('SignInFactorTwo', () => {
   it('renders the component', async () => {
-    const { wrapper } = await createFixture(f => {
+    const { wrapper } = await createFixtures(f => {
       f.withEmailAddress();
     });
     render(<SignInFactorTwo />, { wrapper });

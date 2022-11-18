@@ -7,6 +7,6 @@ const render = (ui: React.ReactElement, options?: RenderOptions) => {
   return { ..._render(ui, { ...options }), userEvent };
 };
 
-export * from './ui/utils/test/createFixture';
+export * from './ui/utils/test/createFixtures';
 export * from '@testing-library/react';
 export { render };
