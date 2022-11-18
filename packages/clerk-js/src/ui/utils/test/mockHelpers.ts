@@ -24,6 +24,7 @@ export const mockClerkMethods = (clerk: LoadedClerk): DeepJestMocked<LoadedClerk
   mockMethodsOf(clerk.client.signIn);
   mockMethodsOf(clerk.client.signUp);
   mockProp(clerk, 'navigate');
+  mockProp(clerk, 'setActive');
   return clerk as any as DeepJestMocked<LoadedClerk>;
 };
 

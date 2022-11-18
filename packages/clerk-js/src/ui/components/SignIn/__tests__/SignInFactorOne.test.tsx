@@ -1,4 +1,5 @@
 import { describe, it, jest } from '@jest/globals';
+import { waitFor } from '@testing-library/dom';
 import React from 'react';
 
 import { bindCreateFixtures, render, screen } from '../../../../testUtils';
@@ -7,6 +8,15 @@ import { SignInFactorOne } from '../SignInFactorOne';
 const { createFixtures } = bindCreateFixtures('SignIn');
 
 describe('SignInFactorOne', () => {
+  // beforeEach(() => {
+  //   jest.useFakeTimers();
+  // });
+  //
+  // afterEach(() => {
+  //   jest.runOnlyPendingTimers();
+  //   jest.useRealTimers();
+  // });
+
   it('renders the component', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withEmailAddress();
@@ -23,7 +33,24 @@ describe('SignInFactorOne', () => {
   it.todo('prefills the phone number if the identifier is a phone number');
 
   describe('Navigation', () => {
-    it.todo('navigates to SignInStart component when user clicks the edit icon');
+    it('navigates to SignInStart component when user clicks the edit icon', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword();
+        f.withPreferredSignInStrategy({ strategy: 'otp' });
+        f.startSignInWithEmailAddress({ supportEmailCode: true });
+      });
+      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
+      const { container, userEvent } = render(<SignInFactorOne />, { wrapper });
+      container.getElementsByClassName('cl-identityPreviewEditButton');
+      const editButton = container.getElementsByClassName('cl-identityPreviewEditButton').item(0);
+      expect(editButton).toBeDefined();
+      if (editButton) {
+        await userEvent.click(editButton);
+      }
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('../');
+    });
+
     it('navigates to SignInStart component if the user lands on SignInFactorOne directly without calling signIn.create', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {});
       render(<SignInFactorOne />, { wrapper });
@@ -32,8 +59,33 @@ describe('SignInFactorOne', () => {
   });
 
   describe('Submitting', () => {
-    it.todo('navigates to SignInFactorTwo page when user submits first factor and second factor is enabled');
-    it.todo('sets an active session when user submits first factor successfully and second factor does not exist');
+    it('navigates to SignInFactorTwo page when user submits first factor and second factor is enabled', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withPhoneNumber();
+        f.withPreferredSignInStrategy({ strategy: 'otp' });
+        f.startSignInWithPhoneNumber({ supportPhoneCode: true, supportPassword: false });
+      });
+      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
+      fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(Promise.resolve({ status: 'needs_second_factor' }));
+      const { userEvent } = render(<SignInFactorOne />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+      // VerificationCodeCard line 42, sleeps for 750
+      await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('../factor-two'));
+    });
+
+    it('sets an active session when user submits first factor successfully and second factor does not exist', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withPhoneNumber();
+        f.withPreferredSignInStrategy({ strategy: 'otp' });
+        f.startSignInWithPhoneNumber({ supportPhoneCode: true, supportPassword: false });
+      });
+      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
+      fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(Promise.resolve({ status: 'complete' }));
+      const { userEvent } = render(<SignInFactorOne />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+      // VerificationCodeCard line 42, sleeps for 750
+      await waitFor(() => expect(fixtures.clerk.setActive).toHaveBeenCalled());
+    });
   });
 
   describe('Selected First Factor Method', () => {
@@ -75,7 +127,32 @@ describe('SignInFactorOne', () => {
         screen.getByText('Use the verification link sent your email');
       });
 
-      it.todo('enables the "Resend link" button after 60 seconds');
+      // it.skip('enables the "Resend link" button after 60 seconds', async () => {
+      //   const { wrapper, fixtures } = await createFixtures(f => {
+      //     f.withEmailAddress();
+      //     f.withMagicLink();
+      //     f.startSignInWithEmailAddress({ supportEmailLink: true, supportPassword: false });
+      //   });
+      //
+      //   fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
+      //   fixtures.signIn.createMagicLinkFlow.mockImplementation(
+      //     () =>
+      //       ({
+      //         startMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+      //         cancelMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+      //       } as any),
+      //   );
+      //
+      //   const { getByText } = render(<SignInFactorOne />, { wrapper });
+      //   act(() => {
+      //     jest.advanceTimersByTime(20000);
+      //   });
+      //
+      //   const asd = getByText('Resend link').closest('button');
+      //   console.log(asd);
+      //
+      //   expect(getByText('Resend link').closest('button')).toHaveAttribute('disabled');
+      // });
       it.todo('shows message to use the magic link in their email');
     });
 
@@ -110,8 +187,38 @@ describe('SignInFactorOne', () => {
       });
 
       it.todo('enables the "Resend code" button after 30 seconds');
-      it.todo('auto submits when typing all the 6 digits of the code');
+      it('auto submits when typing all the 6 digits of the code', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withPhoneNumber();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInWithPhoneNumber({ supportPhoneCode: true, supportPassword: false });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
+        fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(Promise.resolve());
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+        expect(fixtures.signIn.attemptFirstFactor).toHaveBeenCalled();
+      });
+
       it.todo('shows a UI error when submission fails');
+
+      // it.only('shows a UI error when submission fails', async () => {
+      //   const { wrapper, fixtures } = await createFixtures(f => {
+      //     f.withPhoneNumber();
+      //     f.withPreferredSignInStrategy({ strategy: 'otp' });
+      //     f.startSignInWithPhoneNumber({ supportPhoneCode: true, supportPassword: false });
+      //   });
+      //   fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
+      //   fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(
+      //     Promise.reject({
+      //       errors: [{ code: 'form_code_incorrect', long_message: 'Incorrect code', message: 'is incorrect' }],
+      //     }),
+      //   );
+      //   const { userEvent } = render(<SignInFactorOne />, { wrapper });
+      //   await userEvent.type(screen.getByLabelText(/Enter verification code/i), '000000');
+      //   expect(fixtures.signIn.attemptFirstFactor).toHaveBeenCalled();
+      //   screen.getByLabelText(/Incorrect code/i);
+      // });
     });
   });
 
@@ -131,7 +238,7 @@ describe('SignInFactorOne', () => {
       screen.getByText(`Sign in with your password`);
     });
 
-    it('should go back to the main screen ommwhen clicking the "<- Back" button from the "Use another method" page', async () => {
+    it('should go back to the main screen when clicking the "<- Back" button from the "Use another method" page', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withEmailAddress();
         f.withPassword();
