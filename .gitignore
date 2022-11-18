@@ -51,3 +51,5 @@ Thumbs.db
 
 lerna-debug.log
 packages/*/coverage
+.next
+.env.local
