@@ -12,7 +12,6 @@ import {
   SESSION_COOKIE_NAME,
 } from '../types';
 import {
-  getAuthResultFromRequest,
   getCookie,
   nextJsVersionCanOverrideRequestHeaders,
   setPrivateAuthResultOnRequest,
@@ -43,11 +42,6 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
   return async (req: NextRequest, event: NextFetchEvent) => {
     const { headers } = req;
     const { jwtKey, authorizedParties } = opts;
-
-    // throw an error if the request already includes an auth result, because that means it has been spoofed
-    if (getAuthResultFromRequest(req)) {
-      throw new Error('withClerkMiddleware: Auth violation detected');
-    }
 
     // get auth state, check if we need to return an interstitial
     const cookieToken = getCookie(req, SESSION_COOKIE_NAME);
