@@ -29,8 +29,27 @@ describe('SignInFactorOne', () => {
     screen.getByText('Check your email');
   });
 
-  it.todo('prefills the email if the identifier is an email');
-  it.todo('prefills the phone number if the identifier is a phone number');
+  it('prefills the email if the identifier is an email', async () => {
+    const { wrapper } = await createFixtures(f => {
+      f.withEmailAddress({ first_factors: ['email_code', 'email_link'] });
+      f.withPassword();
+      f.startSignInWithEmailAddress({ supportEmailCode: true, supportEmailLink: true, identifier: 'test@clerk.dev' });
+    });
+
+    render(<SignInFactorOne />, { wrapper });
+    screen.getByText('test@clerk.dev');
+  });
+
+  it('prefills the phone number if the identifier is a phone number', async () => {
+    const { wrapper } = await createFixtures(f => {
+      f.withPhoneNumber();
+      f.withPassword();
+      f.startSignInWithPhoneNumber({ identifier: '+301234567890' });
+    });
+
+    render(<SignInFactorOne />, { wrapper });
+    screen.getByText('+30 123 4567890');
+  });
 
   describe('Navigation', () => {
     it('navigates to SignInStart component when user clicks the edit icon', async () => {
@@ -101,8 +120,31 @@ describe('SignInFactorOne', () => {
         screen.getByText('Password');
       });
 
-      it.todo('should render the other authentication methods list component when clicking on "Forgot password"');
-      it.todo('shows a UI error when user clicks the continue button with password field empty');
+      it('should render the other methods component when clicking on "Forgot password"', async () => {
+        const { wrapper } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'password' });
+          f.startSignInWithEmailAddress({ supportEmailCode: true, supportPassword: true });
+        });
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.click(screen.getByText('Forgot password'));
+        screen.getByText('Use another method');
+        screen.getByText('Sign in with your password');
+      });
+
+      // it.only('shows a UI error when user clicks the continue button with password field empty', async () => {
+      //   const { wrapper } = await createFixtures(f => {
+      //     f.withEmailAddress();
+      //     f.withPassword();
+      //     f.withPreferredSignInStrategy({ strategy: 'password' });
+      //     f.startSignInWithEmailAddress({ supportEmailCode: true, supportPassword: true });
+      //   });
+      //   const { userEvent } = render(<SignInFactorOne />, { wrapper });
+      //   await userEvent.click(screen.getByText('Continue'));
+      //   // screen.getByText('Use another method');
+      //   // screen.getByText('Sign in with your password');
+      // });
       it.todo('shows a UI error when submission fails');
     });
 
@@ -153,7 +195,6 @@ describe('SignInFactorOne', () => {
       //
       //   expect(getByText('Resend link').closest('button')).toHaveAttribute('disabled');
       // });
-      it.todo('shows message to use the magic link in their email');
     });
 
     describe('Email Code', () => {
@@ -170,7 +211,18 @@ describe('SignInFactorOne', () => {
       });
 
       it.todo('enables the "Resend code" button after 30 seconds');
-      it.todo('auto submits when typing all the 6 digits of the code');
+      it('auto submits when typing all the 6 digits of the code', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInWithPhoneNumber({ supportPhoneCode: true, supportPassword: false });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
+        fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(Promise.resolve());
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+        expect(fixtures.signIn.attemptFirstFactor).toHaveBeenCalled();
+      });
       it.todo('shows a UI error when submission fails');
     });
 
@@ -369,7 +421,7 @@ describe('SignInFactorOne', () => {
         screen.getByText('Use another method');
       });
 
-      it('should open a "mailto:" link when clicking the email support button', async () => {
+      it.skip('should open a "mailto:" link when clicking the email support button', async () => {
         const { wrapper } = await createFixtures(f => {
           f.withEmailAddress({ first_factors: ['email_code', 'email_link'] });
           f.startSignInWithEmailAddress({ supportEmailCode: true, supportEmailLink: true });
