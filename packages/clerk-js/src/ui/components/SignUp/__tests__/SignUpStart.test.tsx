@@ -1,3 +1,4 @@
+import { OAUTH_PROVIDERS } from '@clerk/types';
 import React from 'react';
 
 import { bindCreateFixtures, render, screen } from '../../../../testUtils';
@@ -108,6 +109,41 @@ describe('SignUpStart', () => {
       });
       render(<SignUpStart />, { wrapper });
       expect(screen.getByText('Continue').tagName.toUpperCase()).toBe('BUTTON');
+    });
+
+    it.each(OAUTH_PROVIDERS)('shows the "Continue with $name" social OAuth button', async ({ provider, name }) => {
+      const { wrapper } = await createFixtures(f => {
+        f.withSocialProvider({ provider });
+      });
+
+      render(<SignUpStart />, { wrapper });
+      screen.getByText(`Continue with ${name}`);
+    });
+
+    it('displays the "or" divider when using oauth and email options', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress({ required: true });
+        f.withSocialProvider({ provider: 'google' });
+      });
+
+      render(<SignUpStart />, { wrapper });
+      screen.getByText(/Continue with/i);
+      screen.getByText(/or/i);
+    });
+  });
+
+  describe('Sign in Link', () => {
+    it('Shows the Sign In message with the appropriate link', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress({ required: true });
+        f.withPassword({ required: true });
+      });
+      render(<SignUpStart />, { wrapper });
+
+      const signInLink = screen.getByText('Have an account?').nextElementSibling;
+      expect(signInLink?.textContent).toBe('Sign in');
+      expect(signInLink?.tagName.toUpperCase()).toBe('A');
+      expect(signInLink?.getAttribute('href')).toMatch(/sign-in/);
     });
   });
 });
