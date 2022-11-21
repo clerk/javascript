@@ -133,7 +133,7 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
       title: 'Check your email',
       subtitle: 'to continue to {{applicationName}}',
       formTitle: 'Verification link',
-      formSubtitle: 'Use the verification link sent your email',
+      formSubtitle: 'Use the verification link sent to your email',
       resendButton: 'Resend link',
       unusedTab: {
         title: 'You may close this tab',
