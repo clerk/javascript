@@ -58,7 +58,7 @@ export function formatRelative(
   const dayName = DAYS_EN[a.getDay()];
 
   if (differenceInDays < -6) {
-    return a.toLocaleDateString();
+    return a.toLocaleDateString(locale);
   }
   if (differenceInDays < -1) {
     return `last ${dayName} at ${time12Hour}`;
