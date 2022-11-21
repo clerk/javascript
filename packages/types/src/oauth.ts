@@ -27,6 +27,8 @@ export type LineOauthProvider = 'line';
 export type InstagramOauthProvider = 'instagram';
 export type CoinbaseOauthProvider = 'coinbase';
 export type SpotifyOauthProvider = 'spotify';
+export type XeroOauthProvider = 'xero';
+export type BoxOauthProvider = 'box';
 
 export type OAuthProvider =
   | FacebookOauthProvider
@@ -48,7 +50,9 @@ export type OAuthProvider =
   | LineOauthProvider
   | InstagramOauthProvider
   | CoinbaseOauthProvider
-  | SpotifyOauthProvider;
+  | SpotifyOauthProvider
+  | XeroOauthProvider
+  | BoxOauthProvider;
 
 export const OAUTH_PROVIDERS: OAuthProviderData[] = [
   {
@@ -170,6 +174,18 @@ export const OAUTH_PROVIDERS: OAuthProviderData[] = [
     strategy: 'oauth_spotify',
     name: 'Spotify',
     docsUrl: 'https://clerk.dev/docs/authentication/social-connection-with-spotify',
+  },
+  {
+    provider: 'xero',
+    strategy: 'oauth_xero',
+    name: 'Xero',
+    docsUrl: 'https://clerk.dev/docs/authentication/social-connection-with-xero',
+  },
+  {
+    provider: 'box',
+    strategy: 'oauth_box',
+    name: 'Box',
+    docsUrl: 'https://clerk.dev/docs/authentication/social-connection-with-box',
   },
 ];
 
