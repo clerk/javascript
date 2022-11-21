@@ -4,6 +4,7 @@ import {
   EnvironmentJSON,
   OAuthProvider,
   SignInJSON,
+  SignUpJSON,
   UserSettingsJSON,
 } from '@clerk/types';
 
@@ -20,7 +21,7 @@ export const createEnvironmentFixtureHelpers = (baseEnvironment: EnvironmentJSON
 };
 
 export const createClientFixtureHelpers = (baseClient: ClientJSON) => {
-  return { ...createSignInFixtureHelpers(baseClient) };
+  return { ...createSignInFixtureHelpers(baseClient), ...createSignUpFixtureHelpers(baseClient) };
 };
 
 const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
@@ -67,6 +68,34 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
   };
 
   return { startSignInWithEmailAddress, startSignInWithPhoneNumber };
+};
+
+const createSignUpFixtureHelpers = (baseClient: ClientJSON) => {
+  type SignUpWithEmailAddressParams = {
+    emailAddress?: string;
+  };
+
+  type SignUpWithPhoneNumberParams = {
+    phoneNumber?: string;
+  };
+
+  const startSignUpWithEmailAddress = (params?: SignUpWithEmailAddressParams) => {
+    const { emailAddress = 'hello@clerk.dev' } = params || {};
+    baseClient.sign_up = {
+      status: 'missing_requirements',
+      email_address: emailAddress,
+    } as SignUpJSON;
+  };
+
+  const startSignUpWithPhoneNumber = (params?: SignUpWithPhoneNumberParams) => {
+    const { phoneNumber = '+301234567890' } = params || {};
+    baseClient.sign_up = {
+      status: 'missing_requirements',
+      phone_number: phoneNumber,
+    } as SignUpJSON;
+  };
+
+  return { startSignUpWithEmailAddress, startSignUpWithPhoneNumber };
 };
 
 const createAuthConfigFixtureHelpers = (environment: EnvironmentJSON) => {
