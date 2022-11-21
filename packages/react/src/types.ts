@@ -28,9 +28,12 @@ export interface MountProps {
   props?: any;
 }
 
-export interface BrowserClerk extends Clerk {
+export interface HeadlessBrowserClerk extends Clerk {
   load: (opts?: ClerkOptions) => Promise<void>;
   updateClient: (client: ClientResource) => void;
+}
+
+export interface BrowserClerk extends HeadlessBrowserClerk {
   onComponentsReady: Promise<void>;
   components: any;
 }
