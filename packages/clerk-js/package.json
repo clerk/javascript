@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "4.16.0-staging.1",
+  "version": "4.16.0-staging.2",
   "license": "MIT",
   "description": "Clerk.dev JS library",
   "keywords": [
@@ -38,7 +38,7 @@
     "test:coverage": "jest --collectCoverage"
   },
   "dependencies": {
-    "@clerk/shared": "^0.5.4-staging.1",
+    "@clerk/shared": "^0.5.4-staging.2",
     "@clerk/types": "^3.17.0-staging.1",
     "@emotion/cache": "^11.10.5",
     "@emotion/react": "^11.10.5",

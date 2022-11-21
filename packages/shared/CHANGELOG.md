@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.5.4-staging.2](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.5.4-staging.1...@clerk/shared@0.5.4-staging.2) (2022-11-21)
+
+### Bug Fixes
+
+- **shared:** Add optional locale param to `formatRelative` ([0582eb7](https://github.com/clerkinc/clerk_docker/commit/0582eb78de7c1807e1709d038cfda13cb6db589d))
+- **shared:** Fix failing tests ([08bff82](https://github.com/clerkinc/clerk_docker/commit/08bff821466986d9698fd209eca2ae0872fe9147))
+
 ### [0.5.3](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.5.3-staging.1...@clerk/shared@0.5.3) (2022-11-18)
 
 **Note:** Version bump only for package @clerk/shared
