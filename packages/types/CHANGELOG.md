@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.17.0-staging.2](https://github.com/clerkinc/javascript/compare/@clerk/types@3.17.0-staging.1...@clerk/types@3.17.0-staging.2) (2022-11-21)
+
+### Features
+
+- **types:** Introduce Xero & Box OAuth provider types ([d7da1f2](https://github.com/clerkinc/javascript/commit/d7da1f2cbefef2841781202ac2853402c0b8eb2b))
+
 ### [3.16.1](https://github.com/clerkinc/javascript/compare/@clerk/types@3.16.1-staging.1...@clerk/types@3.16.1) (2022-11-18)
 
 **Note:** Version bump only for package @clerk/types

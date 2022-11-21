@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.0-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.10.0-staging.0...@clerk/clerk-expo@0.10.0-staging.1) (2022-11-21)
+
+### Bug Fixes
+
+- **clerk-react:** Add HeadlessBrowserClerk ([4236147](https://github.com/clerkinc/javascript/commit/4236147201b32e3f1d60ebbe2c36de8e89e5e2f6))
+
 ## [0.10.0-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.9.74-staging.1...@clerk/clerk-expo@0.10.0-staging.0) (2022-11-21)
 
 ### Features
