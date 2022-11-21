@@ -16,6 +16,10 @@ export interface BrowserClerkConstructor {
   new (frontendApi: string): BrowserClerk;
 }
 
+export interface HeadlessBrowserClerkConstrutor {
+  new (frontendApi: string): HeadlessBrowserClerk;
+}
+
 export type WithClerkProp<T> = T & { clerk: LoadedClerk };
 
 export type WithUserProp<T> = T & { user: UserResource };
@@ -38,7 +42,13 @@ export interface BrowserClerk extends HeadlessBrowserClerk {
   components: any;
 }
 
-export type ClerkProp = BrowserClerkConstructor | BrowserClerk | undefined | null;
+export type ClerkProp =
+  | BrowserClerkConstructor
+  | BrowserClerk
+  | HeadlessBrowserClerk
+  | HeadlessBrowserClerkConstrutor
+  | undefined
+  | null;
 
 type ButtonProps = {
   afterSignInUrl?: string;

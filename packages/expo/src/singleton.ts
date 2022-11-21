@@ -13,7 +13,7 @@ type BuildClerkOptions = {
   tokenCache?: TokenCache;
 };
 
-export function buildClerk({ frontendApi, tokenCache }: BuildClerkOptions): ClerkProp {
+export function buildClerk({ frontendApi, tokenCache }: BuildClerkOptions): HeadlessBrowserClerk {
   if (!clerk) {
     const getToken = (tokenCache && tokenCache.getToken) ?? getTokenFromMemory;
     const saveToken = (tokenCache && tokenCache.saveToken) ?? saveTokenInMemory;
