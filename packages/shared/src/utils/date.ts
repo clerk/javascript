@@ -43,7 +43,11 @@ function normalizeDate(d: Date | string | number): Date {
  * | Next 6 days               | Sunday at 04:30 AM        |
  * | Other                     | 12/31/2017                |
  */
-export function formatRelative(date: Date, relativeTo: Date): string {
+export function formatRelative(
+  date: Date,
+  relativeTo: Date,
+  locale?: Parameters<typeof Date.prototype.toLocaleDateString>[0],
+): string {
   if (!date || !relativeTo) {
     return '';
   }
@@ -71,7 +75,7 @@ export function formatRelative(date: Date, relativeTo: Date): string {
   if (differenceInDays < 7) {
     return `${dayName} at ${time12Hour}`;
   }
-  return a.toLocaleDateString();
+  return a.toLocaleDateString(locale);
 }
 
 export function addYears(initialDate: Date | number | string, yearsToAdd: number): Date {
