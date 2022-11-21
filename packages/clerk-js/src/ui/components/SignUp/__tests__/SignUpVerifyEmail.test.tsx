@@ -20,4 +20,91 @@ describe('SignUpVerifyEmail', () => {
     render(<SignUpVerifyEmail />, { wrapper });
     screen.getByText('test@clerk.dev');
   });
+
+  it('shows the verify with link message', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withEmailAddress({ required: true, verifications: ['email_link'] });
+      f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.dev' });
+    });
+    fixtures.signUp.createMagicLinkFlow.mockImplementation(
+      () =>
+        ({
+          startMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+          cancelMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+        } as any),
+    );
+
+    render(<SignUpVerifyEmail />, { wrapper });
+    screen.getAllByText(/Verification Link/i);
+  });
+
+  it('shows the verify with code message', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withEmailAddress({ required: true, verifications: ['email_code'] });
+      f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.dev' });
+    });
+    fixtures.signUp.createMagicLinkFlow.mockImplementation(
+      () =>
+        ({
+          startMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+          cancelMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+        } as any),
+    );
+
+    render(<SignUpVerifyEmail />, { wrapper });
+    screen.getAllByText(/Verification Code/i);
+  });
+
+  it('clicking on the edit icon navigates to the previous route', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withEmailAddress({ required: true });
+      f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.dev' });
+    });
+    const { userEvent } = render(<SignUpVerifyEmail />, { wrapper });
+    await userEvent.click(
+      screen.getByRole('button', {
+        name: /edit/i,
+      }),
+    ),
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('../');
+  });
+
+  it('Resend link button exists', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withEmailAddress({ required: true, verifications: ['email_link'] });
+      f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.dev' });
+    });
+    fixtures.signUp.createMagicLinkFlow.mockImplementation(
+      () =>
+        ({
+          startMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+          cancelMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+        } as any),
+    );
+
+    render(<SignUpVerifyEmail />, { wrapper });
+    const resendButton = screen.getByText(/Resend link/i);
+    expect(resendButton.tagName.toUpperCase()).toBe('BUTTON');
+  });
+
+  it('Resend code button exists', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withEmailAddress({ required: true, verifications: ['email_code'] });
+      f.startSignUpWithEmailAddress({ emailAddress: 'test@clerk.dev' });
+    });
+    fixtures.signUp.createMagicLinkFlow.mockImplementation(
+      () =>
+        ({
+          startMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+          cancelMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+        } as any),
+    );
+
+    render(<SignUpVerifyEmail />, { wrapper });
+    const resendButton = screen.getByText(/Resend code/i);
+    expect(resendButton.tagName.toUpperCase()).toBe('BUTTON');
+  });
+
+  it.todo('Resend link button is pressable after 60 seconds');
+  it.todo('Resend code button is pressable after 30 seconds');
 });

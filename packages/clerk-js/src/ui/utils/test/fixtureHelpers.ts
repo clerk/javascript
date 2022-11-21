@@ -73,6 +73,8 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
 const createSignUpFixtureHelpers = (baseClient: ClientJSON) => {
   type SignUpWithEmailAddressParams = {
     emailAddress?: string;
+    supportEmailCode?: boolean;
+    supportEmailLink?: boolean;
   };
 
   type SignUpWithPhoneNumberParams = {
@@ -80,10 +82,15 @@ const createSignUpFixtureHelpers = (baseClient: ClientJSON) => {
   };
 
   const startSignUpWithEmailAddress = (params?: SignUpWithEmailAddressParams) => {
-    const { emailAddress = 'hello@clerk.dev' } = params || {};
+    const { emailAddress = 'hello@clerk.dev', supportEmailLink = true, supportEmailCode = true } = params || {};
     baseClient.sign_up = {
       status: 'missing_requirements',
       email_address: emailAddress,
+      verifications: (supportEmailLink || supportEmailCode) && {
+        email_address: {
+          strategy: (supportEmailLink && 'email_link') || (supportEmailCode && 'email_code'),
+        },
+      },
     } as SignUpJSON;
   };
 

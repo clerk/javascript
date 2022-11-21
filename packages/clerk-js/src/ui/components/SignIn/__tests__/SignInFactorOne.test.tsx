@@ -166,7 +166,7 @@ describe('SignInFactorOne', () => {
         );
 
         render(<SignInFactorOne />, { wrapper });
-        screen.getByText('Use the verification link sent your email');
+        screen.getByText('Use the verification link sent to your email');
       });
 
       // it.skip('enables the "Resend link" button after 60 seconds', async () => {
