@@ -2,7 +2,7 @@ import React from 'react';
 
 import { buildURL } from '../../utils/url';
 import { buildAuthQueryString, parseAuthProp } from '../common/authPropHelpers';
-import { useCoreClerk, useEnvironment } from '../contexts';
+import { useEnvironment } from '../contexts';
 import { useNavigate } from '../hooks';
 import type { ParsedQs } from '../router';
 import { useRouter } from '../router';
