@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { getLongestValidCountryCode } from '../../../ui/utils/phoneUtils';
 import { Flex, Input, Text } from '../../customizables';
 import { Select, SelectButton, SelectOptionList } from '../../elements';
 import { PropsOfComponent } from '../../styledSystem';
@@ -38,8 +39,29 @@ export const PhoneInput = (props: PhoneInputProps) => {
   const selectedCountryOption = React.useMemo(() => {
     return countryOptions.find(o => o.country.iso === selectedIso) || countryOptions[0];
   }, [selectedIso]);
+  const dynamicPadding = selectedCountryOption.country.code.length * 5; // this is to calculate the padding of the input field depending the length of country code
 
   React.useEffect(callOnChangeProp, [cleanPhoneNumber]);
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const inputValue = e.clipboardData.getData('text');
+
+    if (inputValue.includes('+')) {
+      const { phoneNumberValue, selectedCountry } = getLongestValidCountryCode(inputValue);
+
+      if (selectedCountry) {
+        setSelectedIso(selectedCountry?.iso);
+        setPhoneNumber(phoneNumberValue, selectedCountry?.iso);
+        return;
+      }
+      setPhoneNumber(inputValue);
+    }
+  };
+
+  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPhoneNumber(e.target.value);
+  };
 
   return (
     <Flex
@@ -86,6 +108,7 @@ export const PhoneInput = (props: PhoneInputProps) => {
             })}
           >
             <Flag iso={selectedIso} />
+            <Text sx={{ paddingLeft: '4px' }}>+{selectedCountryOption.country.code}</Text>
           </SelectButton>
         </Flex>
         <SelectOptionList
@@ -95,10 +118,11 @@ export const PhoneInput = (props: PhoneInputProps) => {
       </Select>
       <Input
         value={formattedPhoneNumber}
-        onChange={el => setPhoneNumber(el.target.value)}
+        onPaste={handlePaste}
+        onChange={handlePhoneNumberChange}
         maxLength={25}
         type='tel'
-        sx={theme => ({ paddingLeft: theme.space.$20 })}
+        sx={theme => ({ paddingLeft: `calc(${theme.space.$20} + ${dynamicPadding}px)` })}
         ref={phoneInputRef}
         {...rest}
       />
