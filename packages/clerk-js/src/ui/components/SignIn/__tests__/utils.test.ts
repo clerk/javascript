@@ -1,6 +1,6 @@
 import { SignInResource } from '@clerk/types';
 
-import { determineSalutation, determineStartingSignInFactor } from './utils';
+import { determineSalutation, determineStartingSignInFactor } from '../utils';
 
 describe('determineStrategy(signIn, displayConfig)', () => {
   describe('with password as the preferred sign in strategy', () => {
