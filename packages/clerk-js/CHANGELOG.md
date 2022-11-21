@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.16.0-staging.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.16.0-staging.2...@clerk/clerk-js@4.16.0-staging.3) (2022-11-21)
+
+**Note:** Version bump only for package @clerk/clerk-js
+
+## [4.16.0-staging.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.16.0-staging.1...@clerk/clerk-js@4.16.0-staging.2) (2022-11-21)
+
+### Features
+
+- **clerk-js:** Export all ClerkJS error utilities ([c225288](https://github.com/clerkinc/javascript/commit/c2252881516da07d7ccac288ebfb3ba9e86cee5c))
+- **clerk-js:** Improve DX for headless import ([8d64310](https://github.com/clerkinc/javascript/commit/8d64310ab23c6e21f8a687e503521245acad8211))
+
+### [4.15.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.15.2-staging.1...@clerk/clerk-js@4.15.2) (2022-11-18)
+
+**Note:** Version bump only for package @clerk/clerk-js
+
 ### [4.15.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.15.0...@clerk/clerk-js@4.15.1) (2022-11-15)
 
 ### Bug Fixes

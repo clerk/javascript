@@ -25,4 +25,6 @@ export {
   MagicLinkErrorCode,
 } from '@clerk/clerk-react';
 
+export { clerk as Clerk } from './singleton';
+
 export * from './ClerkProvider';

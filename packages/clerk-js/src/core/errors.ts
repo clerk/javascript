@@ -102,3 +102,7 @@ export function clerkInvalidFAPIResponse(status: string | null, supportEmail: st
     `${errorPrefix} Response: ${status || 0} not supported yet.\nFor more information contact us at ${supportEmail}`,
   );
 }
+
+export function clerkMissingDevBrowserJwt(): never {
+  throw new Error(`${errorPrefix} Missing dev browser jwt. Please contact support.`);
+}

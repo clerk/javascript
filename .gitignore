@@ -51,3 +51,10 @@ Thumbs.db
 
 lerna-debug.log
 packages/*/coverage
+.next
+.env.local
+.yalc
+yalc.lock
+playground/*/build
+playground/*/public/build
+playground/*/.cache

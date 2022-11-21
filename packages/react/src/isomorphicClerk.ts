@@ -23,11 +23,18 @@ import type {
 import { OrganizationProfileProps, OrganizationSwitcherProps } from '@clerk/types/src';
 
 import { noFrontendApiError } from './errors';
-import type { BrowserClerk, BrowserClerkConstructor, ClerkProp, IsomorphicClerkOptions } from './types';
+import type {
+  BrowserClerk,
+  BrowserClerkConstructor,
+  ClerkProp,
+  HeadlessBrowserClerk,
+  HeadlessBrowserClerkConstrutor,
+  IsomorphicClerkOptions,
+} from './types';
 import { inClientSide, isConstructor, loadScript } from './utils';
 
 export interface Global {
-  Clerk?: BrowserClerk;
+  Clerk?: HeadlessBrowserClerk | BrowserClerk;
 }
 
 declare const global: Global;
@@ -48,7 +55,7 @@ export default class IsomorphicClerk {
   private frontendApi: string;
   private options: IsomorphicClerkOptions;
   private Clerk: ClerkProp;
-  private clerkjs: BrowserClerk | null = null;
+  private clerkjs: BrowserClerk | HeadlessBrowserClerk | null = null;
   private preopenSignIn?: null | SignInProps = null;
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
@@ -90,7 +97,7 @@ export default class IsomorphicClerk {
     void this.loadClerkJS();
   }
 
-  async loadClerkJS(): Promise<BrowserClerk | undefined> {
+  async loadClerkJS(): Promise<HeadlessBrowserClerk | BrowserClerk | undefined> {
     if (this.mode !== 'browser' || this.#loaded) {
       return;
     }
@@ -114,9 +121,9 @@ export default class IsomorphicClerk {
     try {
       if (this.Clerk) {
         // Set a fixed Clerk version
-        let c;
+        let c: ClerkProp;
 
-        if (isConstructor<BrowserClerkConstructor>(this.Clerk)) {
+        if (isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstrutor>(this.Clerk)) {
           // Construct a new Clerk object if a constructor is passed
           c = new this.Clerk(this.frontendApi);
           await c.load(this.options);
@@ -181,7 +188,7 @@ export default class IsomorphicClerk {
     throw new Error(errorMsg);
   }
 
-  private hydrateClerkJS = async (clerkjs: BrowserClerk | undefined) => {
+  private hydrateClerkJS = async (clerkjs: BrowserClerk | HeadlessBrowserClerk | undefined) => {
     if (!clerkjs) {
       throw new Error('Failed to hydrate latest Clerk JS');
     }
@@ -526,6 +533,15 @@ export default class IsomorphicClerk {
       callback();
     } else {
       this.premountMethodCalls.set('redirectToUserProfile', callback);
+    }
+  };
+
+  redirectToHome = (): void => {
+    const callback = () => this.clerkjs?.redirectToHome();
+    if (this.clerkjs && this.#loaded) {
+      callback();
+    } else {
+      this.premountMethodCalls.set('redirectToHome', callback);
     }
   };
 

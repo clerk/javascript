@@ -1,5 +1,5 @@
 import { RequestCookie } from 'next/dist/server/web/spec-extension/cookies';
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 import { AUTH_RESULT, RequestLike } from '../types';
 
@@ -14,7 +14,7 @@ export function setPrivateAuthResultOnRequest({ req, authResult }: RequestProps)
 
 // Tries to extract auth result from the request using several strategies
 export function getAuthResultFromRequest(req: RequestLike): string | null | undefined {
-  return getPrivateAuthResult(req) || getQueryParam(req, AUTH_RESULT) || getHeader(req, AUTH_RESULT);
+  return getPrivateAuthResult(req) || getHeader(req, AUTH_RESULT) || getQueryParam(req, AUTH_RESULT);
 }
 
 function getPrivateAuthResult(req: RequestLike): string | null | undefined {
@@ -46,9 +46,10 @@ export function getHeader(req: RequestLike, name: string): string | null | undef
     return req.headers.get(name);
   }
 
-  // @ts-expect-error
   // If no header has been determined for IncomingMessage case, check if available within private `socket` headers
-  return req.headers[name] || req.socket?._httpMessage?.getHeader(name);
+  // When deployed to vercel, req.headers for API routes is a `IncomingHttpHeaders` key-val object which does not follow
+  // the Headers spec so the name is no longer case-insensitive.
+  return req.headers[name] || req.headers[name.toLowerCase()] || (req.socket as any)?._httpMessage?.getHeader(name);
 }
 
 export function getCookie(req: RequestLike, name: string): string | undefined {
@@ -78,3 +79,44 @@ function isNextRequest(val: unknown): val is NextRequest {
     return false;
   }
 }
+
+const OVERRIDE_HEADERS = 'x-middleware-override-headers';
+const MIDDLEWARE_HEADER_PREFIX = 'x-middleware-request' as string;
+
+export const setRequestHeadersOnNextResponse = (
+  res: NextResponse | Response,
+  req: NextRequest,
+  newHeaders: Record<string, string>,
+) => {
+  if (!res.headers.get(OVERRIDE_HEADERS)) {
+    // Emulate a user setting overrides by explicitly adding the required nextjs headers
+    // https://github.com/vercel/next.js/pull/41380
+    // @ts-expect-error
+    res.headers.set(OVERRIDE_HEADERS, [...req.headers.keys()]);
+    req.headers.forEach((val, key) => {
+      res.headers.set(`${MIDDLEWARE_HEADER_PREFIX}-${key}`, val);
+    });
+  }
+
+  // Now that we have normalised res to include overrides, just append the new header
+  Object.entries(newHeaders).forEach(([key, val]) => {
+    res.headers.set(OVERRIDE_HEADERS, `${res.headers.get(OVERRIDE_HEADERS)},${key}`);
+    res.headers.set(`${MIDDLEWARE_HEADER_PREFIX}-${key}`, val);
+  });
+};
+
+/**
+ * Test whether the currently installed nextjs version supports overriding the request headers.
+ * This feature was added in nextjs v13.0.1
+ * https://github.com/vercel/next.js/pull/41380
+ */
+export const nextJsVersionCanOverrideRequestHeaders = () => {
+  try {
+    const headerKey = 'clerkTest';
+    const headerKeyInRes = `${MIDDLEWARE_HEADER_PREFIX}-${headerKey}`;
+    const res = NextResponse.next({ request: { headers: new Headers({ [headerKey]: 'true' }) } });
+    return res.headers.has(headerKeyInRes);
+  } catch (e) {
+    return false;
+  }
+};

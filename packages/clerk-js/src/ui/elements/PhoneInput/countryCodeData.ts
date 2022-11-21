@@ -7,7 +7,7 @@ export type PhonePattern = CountryCodeData[number][3] | '';
 type PositionalCountryType = [CountryName, CountryIso, DialingCode, PhonePattern?];
 
 const data = [
-  ['United States', 'us', '1', '(...) ...-....'],
+  ['United States', 'us', '1', '(...) ...-....', 100],
   ['United Kingdom', 'gb', '44', '.... ......'],
   ['India', 'in', '91', '.....-.....'],
   ['Canada', 'ca', '1', '(...) ...-....'],
@@ -541,13 +541,21 @@ export interface CountryEntry {
   iso: CountryIso;
   code: DialingCode;
   pattern: PhonePattern;
+  priority: number;
 }
 
-const createEntry = ([name, iso, code, pattern = '' as any]: CountryCodeData[number]): CountryEntry => ({
+const createEntry = ([
+  name,
+  iso,
+  code,
+  pattern = '' as any,
+  priority = 0 as any,
+]: CountryCodeData[number]): CountryEntry => ({
   name,
   iso,
   code,
   pattern,
+  priority,
 });
 
 export type IsoToCountryMapType = ReadonlyMap<CountryIso, CountryEntry>;

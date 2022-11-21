@@ -2,7 +2,7 @@ import 'regenerator-runtime/runtime';
 
 import Clerk from './core/clerk';
 
-export { MagicLinkError, MagicLinkErrorCode, isMagicLinkError } from './core/resources';
+export * from './core/resources/Error';
 
 export default Clerk;
 

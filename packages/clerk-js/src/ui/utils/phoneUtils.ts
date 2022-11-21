@@ -1,5 +1,6 @@
 import {
   CodeToCountryIsoMap,
+  CountryEntry,
   CountryIso,
   IsoToCountryMap,
   SubAreaCodeSets,
@@ -114,4 +115,29 @@ export function parsePhoneString(str: string) {
 export function stringToFormattedPhoneString(str: string): string {
   const parsed = parsePhoneString(str);
   return `+${parsed.code} ${formatPhoneNumber(parsed.number, parsed.pattern, parsed.code)}`;
+}
+
+export const byPriority = (a: CountryEntry, b: CountryEntry) => {
+  return b.priority - a.priority;
+};
+
+export function getLongestValidCountryCode(value: string) {
+  const maxCountryCodeLength = 4;
+  let phoneNumberValue = '';
+  const numberValue = value.replace('+', '');
+  const matchingCountries = [];
+
+  for (let i = maxCountryCodeLength; i > 0; i--) {
+    const code = numberValue.slice(0, i);
+    const countries = [...IsoToCountryMap.values()].filter(o => o.code === code);
+
+    if (countries.length) {
+      matchingCountries.push(...countries);
+    }
+  }
+
+  const selectedCountry = matchingCountries.sort(byPriority)[0];
+  phoneNumberValue = numberValue.slice(selectedCountry?.code.length, value.length);
+
+  return { phoneNumberValue, selectedCountry };
 }

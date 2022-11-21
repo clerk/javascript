@@ -27,7 +27,7 @@
     "prettier": "^2.6.0",
     "pretty-quick": "^3.1.3",
     "rimraf": "^3.0.2",
-    "turbo": "^1.5.5",
+    "turbo": "1.5.5",
     "typescript": "4.8.4"
   },
   "scripts": {
@@ -44,7 +44,7 @@
     "graduate": "lerna version --conventional-graduate",
     "release:staging": "lerna publish from-package --dist-tag staging",
     "release": "lerna publish from-package",
-    "prerelease": "npx rimraf packages/*/dist && turbo run build test --concurrency=${TURBO_CONCURRENCY:-2}",
+    "prerelease": "npx rimraf packages/*/dist && turbo run build test --concurrency=${TURBO_CONCURRENCY:-2} --force",
     "release:next": "lerna publish from-package --dist-tag next",
     "version": "./scripts/version-info.sh",
     "nuke": "rm -r node_modules; for d in packages/*/node_modules; do echo $d; rm -r $d; done",

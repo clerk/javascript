@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.5.0-staging.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@4.5.0-staging.2...@clerk/clerk-react@4.5.0-staging.3) (2022-11-21)
+
+### Bug Fixes
+
+- **clerk-react:** Add HeadlessBrowserClerk ([4236147](https://github.com/clerkinc/javascript/commit/4236147201b32e3f1d60ebbe2c36de8e89e5e2f6))
+
+## [4.5.0-staging.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@4.5.0-staging.1...@clerk/clerk-react@4.5.0-staging.2) (2022-11-21)
+
+### Features
+
+- **clerk-js:** Improve DX for headless import ([8d64310](https://github.com/clerkinc/javascript/commit/8d64310ab23c6e21f8a687e503521245acad8211))
+
+### [4.4.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@4.4.3-staging.1...@clerk/clerk-react@4.4.3) (2022-11-18)
+
+**Note:** Version bump only for package @clerk/clerk-react
+
 ### [4.4.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@4.4.2-staging.3...@clerk/clerk-react@4.4.2) (2022-11-15)
 
 **Note:** Version bump only for package @clerk/clerk-react

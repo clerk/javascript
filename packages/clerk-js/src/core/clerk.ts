@@ -8,10 +8,12 @@ import type {
   ClientResource,
   CreateOrganizationParams,
   CreateOrganizationProps,
+  DevSessionSyncMode,
   EnvironmentJSON,
   EnvironmentResource,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
+  InstanceType,
   ListenerCallback,
   OrganizationInvitationResource,
   OrganizationMembershipResource,
@@ -33,6 +35,7 @@ import type {
   UserProfileProps,
   UserResource,
 } from '@clerk/types';
+import { Instance } from '@popperjs/core';
 
 import packageJSON from '../../package.json';
 import type { ComponentControls, MountComponentRenderer } from '../ui';
@@ -44,20 +47,24 @@ import {
   getClerkQueryParam,
   hasExternalAccountSignUpError,
   ignoreEventValue,
+  inActiveBrowserTab,
+  inBrowser,
   isAccountsHostedPages,
   isDevOrStagingUrl,
   isError,
+  setSearchParameterInHash,
   stripOrigin,
   validateFrontendApi,
   windowNavigate,
 } from '../utils';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
-import { ERROR_CODES } from './constants';
+import { ERROR_CODES, DEV_BROWSER_SSO_JWT_PARAMETER } from './constants';
 import createDevBrowserHandler, { DevBrowserHandler } from './devBrowserHandler';
 import {
   clerkErrorInitFailed,
   clerkErrorInvalidFrontendApi,
   clerkErrorNoFrontendApi,
+  clerkMissingDevBrowserJwt,
   clerkOAuthCallbackDidNotCompleteSignInSIgnUp,
 } from './errors';
 import createFapiClient, { FapiClient, FapiRequestCallback } from './fapiClient';
@@ -86,6 +93,7 @@ const defaultOptions: ClerkOptions = {
   polling: true,
   standardBrowser: true,
   touchSession: true,
+  __experimental__devSessionSyncMode: 'cookie',
 };
 
 export default class Clerk implements ClerkInterface {
@@ -97,18 +105,19 @@ export default class Clerk implements ClerkInterface {
   public user?: UserResource | null;
   public frontendApi: string;
 
-  #environment?: EnvironmentResource | null;
-  #componentControls?: ComponentControls | null;
-  #listeners: Array<(emission: Resources) => void> = [];
-  #options: ClerkOptions = {};
-  #isReady = false;
-  #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
-  #fapiClient: FapiClient;
   #authService: AuthenticationService | null = null;
+  #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
+  #componentControls?: ComponentControls | null;
   #devBrowserHandler: DevBrowserHandler | null = null;
-  #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
+  #environment?: EnvironmentResource | null;
+  #fapiClient: FapiClient;
+  #instanceType: InstanceType;
+  #isReady = false;
   #lastOrganizationInvitation: OrganizationInvitationResource | null = null;
   #lastOrganizationMember: OrganizationMembershipResource | null = null;
+  #listeners: Array<(emission: Resources) => void> = [];
+  #options: ClerkOptions = {};
+  #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
 
   get version(): string {
     return Clerk.version;
@@ -127,6 +136,8 @@ export default class Clerk implements ClerkInterface {
     }
 
     this.frontendApi = frontendApi;
+
+    this.#instanceType = isDevOrStagingUrl(this.frontendApi) ? 'development' : 'production';
     this.#fapiClient = createFapiClient(this);
 
     BaseResource.clerk = this;
@@ -402,7 +413,7 @@ export default class Clerk implements ClerkInterface {
     //1. setLastActiveSession to passed usersession (add a param).
     //   Note that this will also update the session's active organization
     //   id.
-    if (typeof document != 'undefined' && document.hasFocus()) {
+    if (inActiveBrowserTab()) {
       await this.#touchLastActiveSession(session);
     }
 
@@ -460,7 +471,7 @@ export default class Clerk implements ClerkInterface {
     }
 
     //1. setLastActiveSession to passed usersession (add a param)
-    if (typeof document != 'undefined' && document.hasFocus()) {
+    if (inActiveBrowserTab()) {
       await this.#touchLastActiveSession(session);
     }
 
@@ -542,7 +553,7 @@ export default class Clerk implements ClerkInterface {
     }
     const { signInUrl } = this.#environment.displayConfig;
     const url = appendAsQueryParams(signInUrl, opts);
-    return this.navigate(url);
+    return this.redirectWithAuth(url);
   };
 
   public redirectToSignUp = async (options?: RedirectOptions): Promise<unknown> => {
@@ -555,14 +566,47 @@ export default class Clerk implements ClerkInterface {
     }
     const { signUpUrl } = this.#environment.displayConfig;
     const url = appendAsQueryParams(signUpUrl, opts);
-    return this.navigate(url);
+    return this.redirectWithAuth(url);
   };
 
   public redirectToUserProfile = async (): Promise<unknown> => {
     if (!this.#environment || !this.#environment.displayConfig) {
       return;
     }
-    return this.navigate(this.#environment.displayConfig.userProfileUrl);
+    return this.redirectWithAuth(this.#environment.displayConfig.userProfileUrl);
+  };
+
+  public redirectToHome = async (): Promise<unknown> => {
+    if (!this.#environment || !this.#environment.displayConfig) {
+      return;
+    }
+    return this.redirectWithAuth(this.#environment.displayConfig.homeUrl);
+  };
+
+  public redirectWithAuth = async (to: string): Promise<unknown> => {
+    if (!inBrowser()) {
+      return;
+    }
+
+    if (this.#instanceType === 'production' || this.#options.__experimental__devSessionSyncMode === 'cookie') {
+      return this.navigate(to);
+    }
+
+    const toURL = new URL(to, window.location.href);
+    if (toURL.origin !== window.location.origin) {
+      const devBrowserJwt = this.#devBrowserHandler?.getDevBrowserJWT();
+      if (!devBrowserJwt) {
+        return clerkMissingDevBrowserJwt();
+      }
+
+      toURL.hash = setSearchParameterInHash({
+        hash: toURL.hash,
+        paramName: DEV_BROWSER_SSO_JWT_PARAMETER,
+        paramValue: devBrowserJwt,
+      });
+    }
+
+    return this.navigate(toURL.href);
   };
 
   public redirectToOrganizationProfile = async (): Promise<unknown> => {
@@ -882,18 +926,23 @@ export default class Clerk implements ClerkInterface {
 
   #loadInStandardBrowser = async (): Promise<void> => {
     this.#authService = new AuthenticationService(this);
+    this.#pageLifecycle = createPageLifecycle();
 
     this.#devBrowserHandler = createDevBrowserHandler({
       frontendApi: this.frontendApi,
       fapiClient: this.#fapiClient,
+      devSessionSyncMode: this.#options.__experimental__devSessionSyncMode!,
     });
 
     this.#pageLifecycle = createPageLifecycle();
 
-    const isFapiDevOrStaging = isDevOrStagingUrl(this.frontendApi);
     const isInAccountsHostedPages = isAccountsHostedPages(window?.location.hostname);
 
-    await this.#devBrowserHandler.setup({ purge: !isFapiDevOrStaging });
+    if (this.#instanceType === 'production') {
+      await this.#devBrowserHandler.clear();
+    } else {
+      await this.#devBrowserHandler.setup();
+    }
 
     this.#setupListeners();
 
@@ -902,7 +951,7 @@ export default class Clerk implements ClerkInterface {
       retries++;
 
       try {
-        const shouldTouchEnv = isFapiDevOrStaging && !isInAccountsHostedPages;
+        const shouldTouchEnv = this.#instanceType === 'development' && !isInAccountsHostedPages;
 
         const [environment, client] = await Promise.all([
           Environment.getInstance().fetch({ touch: shouldTouchEnv }),
@@ -924,7 +973,9 @@ export default class Clerk implements ClerkInterface {
         break;
       } catch (err) {
         if (isError(err, 'dev_browser_unauthenticated')) {
-          await this.#devBrowserHandler.setup({ purge: true });
+          // Purge and try setup again
+          await this.#devBrowserHandler.clear();
+          await this.#devBrowserHandler.setup();
         } else {
           throw err;
         }

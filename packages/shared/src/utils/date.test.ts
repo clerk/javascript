@@ -48,7 +48,7 @@ describe.concurrent('date utils', () => {
     ];
 
     it.each(cases)('.formatRelative(%s, %s) => %s', (a, b, expected) => {
-      expect(formatRelative(a as Date, b as Date)).toBe(expected);
+      expect(formatRelative(a as Date, b as Date, 'en-US')).toBe(expected);
     });
   });
 

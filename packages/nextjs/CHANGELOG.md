@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.6.2-staging.3](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.6.2-staging.2...@clerk/nextjs@4.6.2-staging.3) (2022-11-21)
+
+**Note:** Version bump only for package @clerk/nextjs
+
+### [4.6.2-staging.2](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.6.2-staging.1...@clerk/nextjs@4.6.2-staging.2) (2022-11-21)
+
+### Bug Fixes
+
+- **nextjs:** Remove optional auth violation error from withClerkMiddleware ([1760b90](https://github.com/clerkinc/javascript/commit/1760b9092ff22e57b24d0475e4ec6b49dd5a7ecd))
+
+### [4.6.1](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.6.1-staging.2...@clerk/nextjs@4.6.1) (2022-11-18)
+
+**Note:** Version bump only for package @clerk/nextjs
+
 ## [4.6.0](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.6.0-staging.5...@clerk/nextjs@4.6.0) (2022-11-15)
 
 **Note:** Version bump only for package @clerk/nextjs

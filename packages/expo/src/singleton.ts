@@ -1,24 +1,23 @@
-// @ts-ignore
-import Clerk from '@clerk/clerk-js/dist/clerk.headless';
 import type { FapiRequestInit, FapiResponse } from '@clerk/clerk-js/dist/types/src/core/fapiClient';
-import type { ClerkProp } from '@clerk/clerk-react';
+import Clerk from '@clerk/clerk-js/headless';
+import type { HeadlessBrowserClerk } from '@clerk/clerk-react';
 
 import { getToken as getTokenFromMemory, saveToken as saveTokenInMemory, TokenCache } from './cache';
 
 const KEY = '__clerk_client_jwt';
 
-export let clerk: ClerkProp;
+export let clerk: HeadlessBrowserClerk;
 
 type BuildClerkOptions = {
   frontendApi: string;
   tokenCache?: TokenCache;
 };
 
-export function buildClerk({ frontendApi, tokenCache }: BuildClerkOptions): ClerkProp {
-  const getToken = (tokenCache && tokenCache.getToken) ?? getTokenFromMemory;
-  const saveToken = (tokenCache && tokenCache.saveToken) ?? saveTokenInMemory;
-
+export function buildClerk({ frontendApi, tokenCache }: BuildClerkOptions): HeadlessBrowserClerk {
   if (!clerk) {
+    const getToken = (tokenCache && tokenCache.getToken) ?? getTokenFromMemory;
+    const saveToken = (tokenCache && tokenCache.saveToken) ?? saveTokenInMemory;
+
     clerk = new Clerk(frontendApi);
 
     if (!tokenCache) {

@@ -18,6 +18,9 @@ import { ActiveSessionResource } from './session';
 import { UserResource } from './user';
 import { DeepPartial, DeepSnakeToCamel } from './utils';
 
+export type DevSessionSyncMode = 'cookie' | 'cookieless';
+export type InstanceType = 'production' | 'development';
+
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
 export type BeforeEmitCallback = (session: ActiveSessionResource | null) => void | Promise<any>;
@@ -55,6 +58,8 @@ export interface Clerk {
 
   /** Clerk Frontend API string. */
   frontendApi: string;
+
+  instanceType?: InstanceType;
 
   /** Client handling most Clerk operations. */
   client?: ClientResource;
@@ -291,6 +296,11 @@ export interface Clerk {
   redirectToUserProfile: () => void;
 
   /**
+   * Redirects to the configured home URL. Retrieved from {@link environment}.
+   */
+  redirectToHome: () => void;
+
+  /**
    * Redirects to the configured URL where <OrganizationProfile /> is mounted. Retrieved from {@link environment}.
    */
   redirectToOrganizationProfile: () => void;
@@ -396,6 +406,7 @@ export interface ClerkOptions {
   /** Optional support email for display in authentication screens */
   supportEmail?: string;
   touchSession?: boolean;
+  __experimental__devSessionSyncMode?: DevSessionSyncMode;
 }
 
 export interface Resources {
