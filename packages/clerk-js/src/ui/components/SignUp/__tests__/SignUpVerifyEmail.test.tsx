@@ -29,8 +29,8 @@ describe('SignUpVerifyEmail', () => {
     fixtures.signUp.createMagicLinkFlow.mockImplementation(
       () =>
         ({
-          startMagicLinkFlow: jest.fn(() => new Promise(() => {})),
-          cancelMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+          startMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
+          cancelMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
         } as any),
     );
 
@@ -46,8 +46,8 @@ describe('SignUpVerifyEmail', () => {
     fixtures.signUp.createMagicLinkFlow.mockImplementation(
       () =>
         ({
-          startMagicLinkFlow: jest.fn(() => new Promise(() => {})),
-          cancelMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+          startMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
+          cancelMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
         } as any),
     );
 
@@ -77,8 +77,8 @@ describe('SignUpVerifyEmail', () => {
     fixtures.signUp.createMagicLinkFlow.mockImplementation(
       () =>
         ({
-          startMagicLinkFlow: jest.fn(() => new Promise(() => {})),
-          cancelMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+          startMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
+          cancelMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
         } as any),
     );
 
@@ -95,8 +95,8 @@ describe('SignUpVerifyEmail', () => {
     fixtures.signUp.createMagicLinkFlow.mockImplementation(
       () =>
         ({
-          startMagicLinkFlow: jest.fn(() => new Promise(() => {})),
-          cancelMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+          startMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
+          cancelMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
         } as any),
     );
 

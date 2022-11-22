@@ -1,3 +1,4 @@
+import { SignInResource } from '@clerk/types';
 import { describe, it, jest } from '@jest/globals';
 import { waitFor } from '@testing-library/dom';
 import React from 'react';
@@ -24,7 +25,7 @@ describe('SignInFactorOne', () => {
       f.withPreferredSignInStrategy({ strategy: 'otp' });
       f.startSignInWithEmailAddress({ supportEmailCode: true });
     });
-    fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
+    fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
     render(<SignInFactorOne />, { wrapper });
     screen.getByText('Check your email');
   });
@@ -59,7 +60,7 @@ describe('SignInFactorOne', () => {
         f.withPreferredSignInStrategy({ strategy: 'otp' });
         f.startSignInWithEmailAddress({ supportEmailCode: true });
       });
-      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
+      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
       const { container, userEvent } = render(<SignInFactorOne />, { wrapper });
       container.getElementsByClassName('cl-identityPreviewEditButton');
       const editButton = container.getElementsByClassName('cl-identityPreviewEditButton').item(0);
@@ -71,7 +72,7 @@ describe('SignInFactorOne', () => {
     });
 
     it('navigates to SignInStart component if the user lands on SignInFactorOne directly without calling signIn.create', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {});
+      const { wrapper, fixtures } = await createFixtures();
       render(<SignInFactorOne />, { wrapper });
       expect(fixtures.router.navigate).toHaveBeenCalledWith('../');
     });
@@ -84,8 +85,10 @@ describe('SignInFactorOne', () => {
         f.withPreferredSignInStrategy({ strategy: 'otp' });
         f.startSignInWithPhoneNumber({ supportPhoneCode: true, supportPassword: false });
       });
-      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
-      fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(Promise.resolve({ status: 'needs_second_factor' }));
+      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+      fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(
+        Promise.resolve({ status: 'needs_second_factor' } as SignInResource),
+      );
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
       // VerificationCodeCard line 42, sleeps for 750
@@ -98,8 +101,8 @@ describe('SignInFactorOne', () => {
         f.withPreferredSignInStrategy({ strategy: 'otp' });
         f.startSignInWithPhoneNumber({ supportPhoneCode: true, supportPassword: false });
       });
-      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
-      fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(Promise.resolve({ status: 'complete' }));
+      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+      fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(Promise.resolve({ status: 'complete' } as SignInResource));
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
       // VerificationCodeCard line 42, sleeps for 750
@@ -156,12 +159,12 @@ describe('SignInFactorOne', () => {
           f.startSignInWithEmailAddress({ supportEmailLink: true, supportPassword: false });
         });
 
-        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
         fixtures.signIn.createMagicLinkFlow.mockImplementation(
           () =>
             ({
-              startMagicLinkFlow: jest.fn(() => new Promise(() => {})),
-              cancelMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+              startMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
+              cancelMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
             } as any),
         );
 
@@ -205,7 +208,7 @@ describe('SignInFactorOne', () => {
           f.withPreferredSignInStrategy({ strategy: 'otp' });
           f.startSignInWithEmailAddress({ supportEmailCode: true });
         });
-        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
         render(<SignInFactorOne />, { wrapper });
         screen.getByText('Enter the verification code sent to your email address');
       });
@@ -218,8 +221,8 @@ describe('SignInFactorOne', () => {
           f.withPreferredSignInStrategy({ strategy: 'otp' });
           f.startSignInWithPhoneNumber({ supportPhoneCode: true, supportPassword: false });
         });
-        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
-        fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(Promise.resolve());
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
         await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
         expect(fixtures.signIn.attemptFirstFactor).toHaveBeenCalled();
@@ -234,7 +237,7 @@ describe('SignInFactorOne', () => {
           f.withPreferredSignInStrategy({ strategy: 'otp' });
           f.startSignInWithPhoneNumber({ supportPhoneCode: true, supportPassword: false });
         });
-        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
         render(<SignInFactorOne />, { wrapper });
         screen.getByText('Enter the verification code sent to your phone number');
       });
@@ -246,8 +249,8 @@ describe('SignInFactorOne', () => {
           f.withPreferredSignInStrategy({ strategy: 'otp' });
           f.startSignInWithPhoneNumber({ supportPhoneCode: true, supportPassword: false });
         });
-        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
-        fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(Promise.resolve());
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
         await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
         expect(fixtures.signIn.attemptFirstFactor).toHaveBeenCalled();
@@ -340,12 +343,12 @@ describe('SignInFactorOne', () => {
         f.withPreferredSignInStrategy({ strategy: 'password' });
         f.startSignInWithEmailAddress({ supportEmailLink: true, identifier: email });
       });
-      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
+      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
       fixtures.signIn.createMagicLinkFlow.mockImplementation(
         () =>
           ({
-            startMagicLinkFlow: jest.fn(() => new Promise(() => {})),
-            cancelMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+            startMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
+            cancelMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
           } as any),
       );
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
@@ -364,10 +367,10 @@ describe('SignInFactorOne', () => {
         f.withPreferredSignInStrategy({ strategy: 'password' });
         f.startSignInWithEmailAddress({ supportEmailCode: true, identifier: email });
       });
-      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
+      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
       fixtures.signIn.createMagicLinkFlow.mockReturnValue({
-        startMagicLinkFlow: jest.fn(() => new Promise(() => {})),
-        cancelMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+        startMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
+        cancelMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
       } as any);
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
@@ -384,10 +387,10 @@ describe('SignInFactorOne', () => {
         f.withPreferredSignInStrategy({ strategy: 'password' });
         f.startSignInWithPhoneNumber({ supportPhoneCode: true });
       });
-      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
+      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
       fixtures.signIn.createMagicLinkFlow.mockReturnValue({
-        startMagicLinkFlow: jest.fn(() => new Promise(() => {})),
-        cancelMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+        startMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
+        cancelMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
       } as any);
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));

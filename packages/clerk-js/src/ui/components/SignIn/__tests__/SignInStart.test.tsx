@@ -1,4 +1,4 @@
-import { OAUTH_PROVIDERS } from '@clerk/types';
+import { OAUTH_PROVIDERS, SignInResource } from '@clerk/types';
 import React from 'react';
 
 import { bindCreateFixtures, render, screen } from '../../../../testUtils';
@@ -88,7 +88,7 @@ describe('SignInStart', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress();
       });
-      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' }));
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
       const { userEvent } = render(<SignInStart />, { wrapper });
       await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.dev');
       await userEvent.click(screen.getByText('Continue'));
@@ -99,7 +99,7 @@ describe('SignInStart', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress();
       });
-      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' }));
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
       const { userEvent } = render(<SignInStart />, { wrapper });
       await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.dev');
       await userEvent.click(screen.getByText('Continue'));
@@ -111,7 +111,7 @@ describe('SignInStart', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress();
       });
-      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_second_factor' }));
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_second_factor' } as SignInResource));
 
       const { userEvent } = render(<SignInStart />, { wrapper });
       expect(screen.getByText('Continue')).toBeInTheDocument();

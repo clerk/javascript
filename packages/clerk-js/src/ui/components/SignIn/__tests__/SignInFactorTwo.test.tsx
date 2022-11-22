@@ -1,7 +1,7 @@
 import { describe, it } from '@jest/globals';
 import React from 'react';
-import { bindCreateFixtures, render } from 'testUtils';
 
+import { bindCreateFixtures, render } from '../../../../testUtils';
 import { SignInFactorTwo } from '../SignInFactorTwo';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
