@@ -106,6 +106,7 @@ const PreviewButton = (props: PropsOfComponent<typeof Button>) => {
       variant='ghost'
       colorScheme='neutral'
       focusRing={false}
+      hoverAsFocus
       isDisabled={card.isLoading}
       sx={[
         t => ({

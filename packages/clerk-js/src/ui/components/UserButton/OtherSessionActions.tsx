@@ -30,6 +30,7 @@ export const UserPreviewButton = (props: UserPreviewButtonProps) => {
       variant='ghost'
       colorScheme='neutral'
       focusRing={false}
+      hoverAsFocus
       isDisabled={card.isLoading}
       {...rest}
       sx={[

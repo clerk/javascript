@@ -8,7 +8,7 @@ import { Spinner } from './Spinner';
 
 const vars = createCssVariables('accent', 'accentDark', 'accentDarker', 'accentLighter', 'accentLightest', 'border');
 
-const { applyVariants, filterProps } = createVariants(theme => {
+const { applyVariants, filterProps } = createVariants((theme, opts: { hoverAsFocus: boolean }) => {
   return {
     base: {
       margin: 0,
@@ -60,19 +60,22 @@ const { applyVariants, filterProps } = createVariants(theme => {
         solid: {
           backgroundColor: vars.accent,
           color: theme.colors.$colorTextOnPrimaryBackground,
-          '&:hover, :focus': { backgroundColor: vars.accentDark },
+          '&:hover': { backgroundColor: vars.accentDark },
+          '&:focus': opts.hoverAsFocus ? { backgroundColor: vars.accentDark } : undefined,
           '&:active': { backgroundColor: vars.accentDarker },
         },
         outline: {
           border: theme.borders.$normal,
           borderColor: vars.accentLighter,
           color: vars.accent,
-          '&:hover, :focus': { backgroundColor: vars.accentLightest },
+          '&:hover': { backgroundColor: vars.accentLightest },
+          '&:focus': opts.hoverAsFocus ? { backgroundColor: vars.accentLightest } : undefined,
           '&:active': { backgroundColor: vars.accentLighter },
         },
         ghost: {
           color: vars.accent,
-          '&:hover, :focus': { backgroundColor: vars.accentLightest },
+          '&:hover': { backgroundColor: vars.accentLightest },
+          '&:focus': opts.hoverAsFocus ? { backgroundColor: vars.accentLightest } : undefined,
           '&:active': { backgroundColor: vars.accentLighter },
         },
         icon: {
@@ -80,7 +83,8 @@ const { applyVariants, filterProps } = createVariants(theme => {
           border: theme.borders.$normal,
           borderRadius: theme.radii.$lg,
           borderColor: vars.border,
-          '&:hover, :focus': { backgroundColor: vars.accentLightest },
+          '&:hover': { backgroundColor: vars.accentLightest },
+          '&:focus': opts.hoverAsFocus ? { backgroundColor: vars.accentLightest } : undefined,
           '&:active': { backgroundColor: vars.accentLighter },
         },
         ghostIcon: {
@@ -88,7 +92,8 @@ const { applyVariants, filterProps } = createVariants(theme => {
           minHeight: theme.sizes.$6,
           width: theme.sizes.$6,
           padding: `${theme.space.$1} ${theme.space.$1}`,
-          '&:hover, :focus': { color: vars.accentDark },
+          '&:hover': { color: vars.accentDark },
+          '&:focus': opts.hoverAsFocus ? { backgroundColor: vars.accentDark } : undefined,
           '&:active': { color: vars.accentDarker },
         },
         link: {
@@ -99,7 +104,8 @@ const { applyVariants, filterProps } = createVariants(theme => {
           textTransform: 'none',
           padding: 0,
           color: vars.accent,
-          '&:hover, :focus': { textDecoration: 'underline' },
+          '&:hover': { textDecoration: 'underline' },
+          '&:focus': opts.hoverAsFocus ? { textDecoration: 'underline' } : undefined,
           '&:active': { color: vars.accentDark },
         },
         roundWrapper: { padding: 0, margin: 0, height: 'unset', width: 'unset', minHeight: 'unset' },
@@ -126,6 +132,7 @@ type OwnProps = PrimitiveProps<'button'> & {
   loadingText?: string;
   isDisabled?: boolean;
   isActive?: boolean;
+  hoverAsFocus?: boolean;
 };
 type ButtonProps = OwnProps & StyleVariants<typeof applyVariants>;
 

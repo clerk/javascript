@@ -159,6 +159,7 @@ export const MenuItem = (props: MenuItemProps) => {
     <Button
       ref={buttonRef}
       focusRing={false}
+      hoverAsFocus
       variant='ghost'
       colorScheme={destructive ? 'danger' : 'neutral'}
       role='menuitem'
@@ -173,9 +174,6 @@ export const MenuItem = (props: MenuItemProps) => {
           borderRadius: theme.radii.$none,
           paddingLeft: theme.space.$4,
           paddingRight: theme.space.$4,
-          ':focus': {
-            backgroundColor: theme.colors.$blackAlpha200,
-          },
         }),
         sx,
       ]}

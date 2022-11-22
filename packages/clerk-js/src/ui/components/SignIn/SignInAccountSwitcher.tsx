@@ -91,6 +91,7 @@ const UserPreviewButton = (props: UserPreviewButtonProps) => {
       variant='ghost'
       colorScheme='neutral'
       focusRing={false}
+      hoverAsFocus
       isDisabled={card.isLoading}
       sx={theme => ({ height: theme.sizes.$14, justifyContent: 'flex-start' })}
       {...rest}
