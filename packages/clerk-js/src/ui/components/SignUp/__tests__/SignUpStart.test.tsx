@@ -134,7 +134,7 @@ describe('SignUpStart', () => {
 
   describe('Sign in Link', () => {
     it('Shows the Sign In message with the appropriate link', async () => {
-      const { wrapper } = await createFixtures(f => {
+      const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress({ required: true });
         f.withPassword({ required: true });
       });
@@ -143,7 +143,7 @@ describe('SignUpStart', () => {
       const signInLink = screen.getByText('Have an account?').nextElementSibling;
       expect(signInLink?.textContent).toBe('Sign in');
       expect(signInLink?.tagName.toUpperCase()).toBe('A');
-      expect(signInLink?.getAttribute('href')).toMatch(/sign-in/);
+      expect(signInLink?.getAttribute('href')).toMatch(fixtures.environment.displayConfig.signInUrl);
     });
   });
 });

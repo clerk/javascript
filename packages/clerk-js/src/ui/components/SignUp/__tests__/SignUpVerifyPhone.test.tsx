@@ -5,7 +5,7 @@ import { SignUpVerifyPhone } from '../SignUpVerifyPhone';
 
 const { createFixtures } = bindCreateFixtures('SignUp');
 
-describe('SignUpVerifyEmail', () => {
+describe('SignUpVerifyPhone', () => {
   it('renders the component', async () => {
     const { wrapper } = await createFixtures();
     render(<SignUpVerifyPhone />, { wrapper });
