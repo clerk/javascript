@@ -178,7 +178,7 @@ describe('SignInFactorTwo', () => {
           f.withEmailAddress();
           f.withPassword();
           f.withPreferredSignInStrategy({ strategy: 'otp' });
-          f.startSignInFactorTwo({ identifier: 'stefanos@clerk.dev', supportPhoneCode: false, supportTotp: true });
+          f.startSignInFactorTwo({ identifier: 'test@clerk.dev', supportPhoneCode: false, supportTotp: true });
         });
         fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
         const { getByText } = render(<SignInFactorTwo />, { wrapper });
@@ -190,7 +190,7 @@ describe('SignInFactorTwo', () => {
           f.withEmailAddress();
           f.withPassword();
           f.withPreferredSignInStrategy({ strategy: 'otp' });
-          f.startSignInFactorTwo({ identifier: 'stefanos@clerk.dev', supportPhoneCode: false, supportTotp: true });
+          f.startSignInFactorTwo({ identifier: 'test@clerk.dev', supportPhoneCode: false, supportTotp: true });
         });
         fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
         fixtures.signIn.attemptSecondFactor.mockReturnValueOnce(
@@ -206,7 +206,7 @@ describe('SignInFactorTwo', () => {
           f.withEmailAddress();
           f.withPassword();
           f.withPreferredSignInStrategy({ strategy: 'otp' });
-          f.startSignInFactorTwo({ identifier: 'stefanos@clerk.dev', supportPhoneCode: false, supportTotp: true });
+          f.startSignInFactorTwo({ identifier: 'test@clerk.dev', supportPhoneCode: false, supportTotp: true });
         });
         fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
         fixtures.signIn.attemptSecondFactor.mockRejectedValueOnce(
@@ -235,7 +235,7 @@ describe('SignInFactorTwo', () => {
           f.withPassword();
           f.withPreferredSignInStrategy({ strategy: 'otp' });
           f.startSignInFactorTwo({
-            identifier: 'stefanos@clerk.dev',
+            identifier: 'test@clerk.dev',
             supportPhoneCode: false,
             supportBackupCode: true,
           });
@@ -251,7 +251,7 @@ describe('SignInFactorTwo', () => {
           f.withPassword();
           f.withPreferredSignInStrategy({ strategy: 'otp' });
           f.startSignInFactorTwo({
-            identifier: 'stefanos@clerk.dev',
+            identifier: 'test@clerk.dev',
             supportPhoneCode: false,
             supportBackupCode: true,
           });
@@ -272,7 +272,7 @@ describe('SignInFactorTwo', () => {
           f.withPassword();
           f.withPreferredSignInStrategy({ strategy: 'otp' });
           f.startSignInFactorTwo({
-            identifier: 'stefanos@clerk.dev',
+            identifier: 'test@clerk.dev',
             supportPhoneCode: false,
             supportBackupCode: true,
           });
@@ -295,7 +295,7 @@ describe('SignInFactorTwo', () => {
           f.withPassword();
           f.withPreferredSignInStrategy({ strategy: 'otp' });
           f.startSignInFactorTwo({
-            identifier: 'stefanos@clerk.dev',
+            identifier: 'test@clerk.dev',
             supportPhoneCode: false,
             supportBackupCode: true,
           });
