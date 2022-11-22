@@ -107,7 +107,12 @@ export const PhoneInput = (props: PhoneInputProps) => {
             })}
           >
             <Flag iso={selectedIso} />
-            <Text sx={{ paddingLeft: '4px' }}>+{selectedCountryOption.country.code}</Text>
+            <Text
+              variant={'smallRegular'}
+              sx={{ paddingLeft: '4px' }}
+            >
+              +{selectedCountryOption.country.code}
+            </Text>
           </SelectButton>
         </Flex>
         <SelectOptionList
