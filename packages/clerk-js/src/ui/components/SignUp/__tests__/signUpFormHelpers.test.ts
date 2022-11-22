@@ -1,4 +1,4 @@
-import { determineActiveFields, getInitialActiveIdentifier } from './signUpFormHelpers';
+import { determineActiveFields, getInitialActiveIdentifier } from '../signUpFormHelpers';
 
 describe('determineActiveFields()', () => {
   // For specs refer to https://www.notion.so/clerkdev/Vocabulary-8f775765258643978f5811c88b140b2d
