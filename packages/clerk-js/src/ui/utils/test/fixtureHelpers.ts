@@ -42,6 +42,7 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
     identifier?: string;
     supportPhoneCode?: boolean;
     supportTotp?: boolean;
+    supportBackupCode?: boolean;
   };
 
   const startSignInWithEmailAddress = (params?: SignInWithEmailAddressParams) => {
@@ -74,7 +75,7 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
   };
 
   const startSignInFactorTwo = (params?: SignInFactorTwoParams) => {
-    const { identifier = 'hello@clerk.dev', supportPhoneCode = true, supportTotp } = params || {};
+    const { identifier = 'hello@clerk.dev', supportPhoneCode = true, supportTotp, supportBackupCode } = params || {};
     baseClient.sign_in = {
       status: 'needs_second_factor',
       identifier,
@@ -82,6 +83,7 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
       supported_second_factors: [
         ...(supportPhoneCode ? [{ strategy: 'phone_code', safe_identifier: identifier || 'n*****@clerk.dev' }] : []),
         ...(supportTotp ? [{ strategy: 'totp', safe_identifier: identifier || 'n*****@clerk.dev' }] : []),
+        ...(supportBackupCode ? [{ strategy: 'backup_code', safe_identifier: identifier || 'n*****@clerk.dev' }] : []),
       ],
       user_data: { ...(createUserFixture() as any) },
     } as SignInJSON;

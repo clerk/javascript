@@ -1,8 +1,10 @@
 import { SignInResource } from '@clerk/types';
-import { describe, it } from '@jest/globals';
+import { describe, it, jest } from '@jest/globals';
+import { getByText } from '@testing-library/dom';
 import React from 'react';
 
-import { bindCreateFixtures, fireEvent, render, screen, waitFor } from '../../../../testUtils';
+import { ClerkAPIResponseError } from '../../../../core/resources';
+import { act, bindCreateFixtures, fireEvent, render, screen, waitFor } from '../../../../testUtils';
 import { SignInFactorTwo } from '../SignInFactorTwo';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
@@ -57,25 +59,269 @@ describe('SignInFactorTwo', () => {
 
   describe('Selected Second Factor Method', () => {
     describe('Phone Code', () => {
-      it.todo('renders the correct screen with the text "Check your phone"');
+      it('renders the correct screen with the text "Check your phone"', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInWithPhoneNumber({ supportPhoneCode: true });
+          f.startSignInFactorTwo({ identifier: '+3012345567890', supportPhoneCode: true, supportTotp: false });
+        });
+        fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        render(<SignInFactorTwo />, { wrapper });
+        screen.getByText('Check your phone');
+      });
+
+      // this is coming from the backend, so maybe we have nothing to test here
       it.todo('hides with * the phone number digits except the last 2');
-      it.todo('enables the "Resend code" button after 30 seconds');
-      it.todo('resets the 30 seconds timer when clicking the "Resend code" button');
-      it.todo('auto submits when typing all the 6 digits of the code');
-      it.todo('shows a UI error when submission fails');
+
+      it('enables the "Resend code" button after 30 seconds', async () => {
+        jest.useFakeTimers();
+
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInWithPhoneNumber({ supportPhoneCode: true });
+          f.startSignInFactorTwo({ identifier: '+3012345567890', supportPhoneCode: true, supportTotp: false });
+        });
+
+        fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        const { getByText } = render(<SignInFactorTwo />, { wrapper });
+        expect(getByText('Resend code', { exact: false }).closest('button')).toHaveAttribute('disabled');
+        act(() => {
+          jest.advanceTimersByTime(15000);
+        });
+        expect(getByText('Resend code', { exact: false }).closest('button')).toHaveAttribute('disabled');
+        act(() => {
+          jest.advanceTimersByTime(15000);
+        });
+        expect(getByText('Resend code', { exact: false }).closest('button')).not.toHaveAttribute('disabled');
+
+        jest.useRealTimers();
+      });
+
+      // calls prepareSecondFactor a second time and it blocks somewhere
+      it.skip('resets the 30 seconds timer when clicking the "Resend code" button', async () => {
+        jest.useFakeTimers();
+
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInWithPhoneNumber({ supportPhoneCode: true });
+          f.startSignInFactorTwo({ identifier: '+3012345567890', supportPhoneCode: true, supportTotp: false });
+        });
+
+        fixtures.signIn.prepareSecondFactor.mockImplementation(() => Promise.resolve({} as SignInResource));
+        const { getByText, userEvent } = render(<SignInFactorTwo />, { wrapper });
+        expect(getByText('Resend code', { exact: false }).closest('button')).toHaveAttribute('disabled');
+        act(() => {
+          jest.advanceTimersByTime(30000);
+        });
+        expect(getByText('Resend code').closest('button')).not.toHaveAttribute('disabled');
+        await userEvent.click(getByText('Resend code'));
+        // act(() => {
+        //   jest.advanceTimersByTime(1000);
+        // });
+        // await waitFor(() => expect(getByText('Resend code', { exact: false })).toBeDefined());
+        // expect(getByText('Resend code', { exact: false }).closest('button')).not.toHaveAttribute('disabled');
+
+        jest.useRealTimers();
+      });
+
+      it('auto submits when typing all the 6 digits of the code', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInWithPhoneNumber({ supportPhoneCode: true });
+          f.startSignInFactorTwo({ identifier: '+3012345567890', supportPhoneCode: true, supportTotp: false });
+        });
+        fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        fixtures.signIn.attemptSecondFactor.mockReturnValueOnce(
+          Promise.resolve({ status: 'complete' } as SignInResource),
+        );
+        const { userEvent } = render(<SignInFactorTwo />, { wrapper });
+        await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+        expect(fixtures.signIn.attemptSecondFactor).toHaveBeenCalled();
+      });
+
+      it('shows a UI error when submission fails', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInWithPhoneNumber({ supportPhoneCode: true });
+          f.startSignInFactorTwo({ identifier: '+3012345567890', supportPhoneCode: true, supportTotp: false });
+        });
+        fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        fixtures.signIn.attemptSecondFactor.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Error', {
+            data: [
+              {
+                code: 'form_code_incorrect',
+                long_message: 'Incorrect phone code',
+                message: 'is incorrect',
+                meta: { param_name: 'code' },
+              },
+            ],
+            status: 422,
+          }),
+        );
+        const { userEvent } = render(<SignInFactorTwo />, { wrapper });
+        await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+        await waitFor(() => expect(screen.getByText('Incorrect phone code')).toBeDefined());
+      });
     });
 
     describe('Authenticator app', () => {
-      it.todo('renders the correct screen with the text "Authenticator app"');
-      it.todo('auto submits when typing all the 6 digits of the code');
-      it.todo('shows a UI error when submission fails');
+      it('renders the correct screen with the text "Authenticator app"', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInFactorTwo({ identifier: 'stefanos@clerk.dev', supportPhoneCode: false, supportTotp: true });
+        });
+        fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        const { getByText } = render(<SignInFactorTwo />, { wrapper });
+        expect(getByText('Enter the verification code generated by your authenticator app')).toBeDefined();
+      });
+
+      it('auto submits when typing all the 6 digits of the code', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInFactorTwo({ identifier: 'stefanos@clerk.dev', supportPhoneCode: false, supportTotp: true });
+        });
+        fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        fixtures.signIn.attemptSecondFactor.mockReturnValueOnce(
+          Promise.resolve({ status: 'complete' } as SignInResource),
+        );
+        const { userEvent } = render(<SignInFactorTwo />, { wrapper });
+        await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+        expect(fixtures.signIn.attemptSecondFactor).toHaveBeenCalled();
+      });
+
+      it('shows a UI error when submission fails', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInFactorTwo({ identifier: 'stefanos@clerk.dev', supportPhoneCode: false, supportTotp: true });
+        });
+        fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        fixtures.signIn.attemptSecondFactor.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Error', {
+            data: [
+              {
+                code: 'form_code_incorrect',
+                long_message: 'Incorrect authenticator code',
+                message: 'is incorrect',
+                meta: { param_name: 'code' },
+              },
+            ],
+            status: 422,
+          }),
+        );
+        const { userEvent } = render(<SignInFactorTwo />, { wrapper });
+        await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+        await waitFor(() => expect(screen.getByText('Incorrect authenticator code')).toBeDefined());
+      });
     });
 
     describe('Backup code', () => {
-      it.todo('renders the correct screen with the text "Enter a backup code"');
-      it.todo('submits the value when user clicks the continue button');
-      it.todo('shows a UI error when user clicks the continue button with password field empty');
-      it.todo('shows a UI error when submission fails');
+      it('renders the correct screen with the text "Enter a backup code"', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInFactorTwo({
+            identifier: 'stefanos@clerk.dev',
+            supportPhoneCode: false,
+            supportBackupCode: true,
+          });
+        });
+        fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        const { getByText } = render(<SignInFactorTwo />, { wrapper });
+        expect(getByText('Enter a backup code')).toBeDefined();
+      });
+
+      it('submits the value when user clicks the continue button', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInFactorTwo({
+            identifier: 'stefanos@clerk.dev',
+            supportPhoneCode: false,
+            supportBackupCode: true,
+          });
+        });
+        fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        fixtures.signIn.attemptSecondFactor.mockReturnValueOnce(
+          Promise.resolve({ status: 'complete' } as SignInResource),
+        );
+        const { getByText, getByLabelText, userEvent } = render(<SignInFactorTwo />, { wrapper });
+        await userEvent.type(getByLabelText('Backup code'), '123456');
+        await userEvent.click(getByText('Continue'));
+        expect(fixtures.signIn.attemptSecondFactor).toHaveBeenCalled();
+      });
+
+      it('does not proceed when user clicks the continue button with password field empty', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInFactorTwo({
+            identifier: 'stefanos@clerk.dev',
+            supportPhoneCode: false,
+            supportBackupCode: true,
+          });
+        });
+        fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        fixtures.signIn.attemptSecondFactor.mockReturnValueOnce(
+          Promise.resolve({ status: 'complete' } as SignInResource),
+        );
+        const { getByText, userEvent } = render(<SignInFactorTwo />, { wrapper });
+
+        // type nothing in the input field
+
+        await userEvent.click(getByText('Continue'));
+        expect(fixtures.signIn.attemptSecondFactor).not.toHaveBeenCalled();
+      });
+
+      it('shows a UI error when submission fails', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInFactorTwo({
+            identifier: 'stefanos@clerk.dev',
+            supportPhoneCode: false,
+            supportBackupCode: true,
+          });
+        });
+        fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        fixtures.signIn.attemptSecondFactor.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Error', {
+            data: [
+              {
+                code: 'form_code_incorrect',
+                long_message: 'Incorrect backup code',
+                message: 'is incorrect',
+                meta: { param_name: 'code' },
+              },
+            ],
+            status: 422,
+          }),
+        );
+        const { userEvent, getByLabelText, getByText } = render(<SignInFactorTwo />, { wrapper });
+        await userEvent.type(getByLabelText('Backup code'), '123456');
+        await userEvent.click(getByText('Continue'));
+        await waitFor(() => expect(screen.getByText('Incorrect backup code')).toBeDefined());
+      });
     });
   });
 
