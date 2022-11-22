@@ -55,6 +55,7 @@ export const Action = (props: ActionProps) => {
       colorScheme='neutral'
       textVariant='buttonSmallRegular'
       focusRing={false}
+      hoverAsFocus
       // TODO: colors should be colorTextSecondary
       sx={[
         theme => ({
