@@ -1,7 +1,8 @@
+import { SignInResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 import React from 'react';
 
-import { bindCreateFixtures, render } from '../../../../testUtils';
+import { bindCreateFixtures, fireEvent, render, screen, waitFor } from '../../../../testUtils';
 import { SignInFactorTwo } from '../SignInFactorTwo';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
@@ -15,11 +16,43 @@ describe('SignInFactorTwo', () => {
   });
 
   describe('Navigation', () => {
+    //This isn't yet implemented in the component
     it.todo('navigates to SignInStart component if user lands on SignInFactorTwo page but they should not');
   });
 
   describe('Submitting', () => {
-    it.todo('sets an active session when user submits second factor successfully');
+    it('correctly shows the input for code submission', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInFactorTwo();
+      });
+      fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+      fixtures.signIn.attemptSecondFactor.mockReturnValueOnce(
+        Promise.resolve({ status: 'complete' } as SignInResource),
+      );
+      render(<SignInFactorTwo />, { wrapper });
+
+      const inputs = screen.getAllByLabelText(/digit/i);
+      expect(inputs.length).toBe(6);
+    });
+
+    it('sets an active session when user submits second factor successfully', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInFactorTwo();
+      });
+      fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+      fixtures.signIn.attemptSecondFactor.mockReturnValueOnce(
+        Promise.resolve({ status: 'complete' } as SignInResource),
+      );
+      render(<SignInFactorTwo />, { wrapper });
+
+      const inputs = screen.getAllByLabelText(/digit/i);
+      inputs.every(input => {
+        return fireEvent.change(input, { target: { value: '1' } });
+      });
+      await waitFor(() => {
+        expect(fixtures.clerk.setActive).toBeCalled();
+      });
+    });
   });
 
   describe('Selected Second Factor Method', () => {
