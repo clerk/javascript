@@ -1,6 +1,5 @@
 import { SignInResource } from '@clerk/types';
 import { describe, it, jest } from '@jest/globals';
-import { getByText } from '@testing-library/dom';
 import React from 'react';
 
 import { ClerkAPIResponseError } from '../../../../core/resources';
@@ -101,8 +100,7 @@ describe('SignInFactorTwo', () => {
         jest.useRealTimers();
       });
 
-      // calls prepareSecondFactor a second time and it blocks somewhere
-      it.skip('resets the 30 seconds timer when clicking the "Resend code" button', async () => {
+      it('disables again the resend code button after clicking it', async () => {
         jest.useFakeTimers();
 
         const { wrapper, fixtures } = await createFixtures(f => {
@@ -113,7 +111,7 @@ describe('SignInFactorTwo', () => {
           f.startSignInFactorTwo({ identifier: '+3012345567890', supportPhoneCode: true, supportTotp: false });
         });
 
-        fixtures.signIn.prepareSecondFactor.mockImplementation(() => Promise.resolve({} as SignInResource));
+        fixtures.signIn.prepareSecondFactor.mockReturnValue(Promise.resolve({} as SignInResource));
         const { getByText, userEvent } = render(<SignInFactorTwo />, { wrapper });
         expect(getByText('Resend code', { exact: false }).closest('button')).toHaveAttribute('disabled');
         act(() => {
@@ -121,11 +119,10 @@ describe('SignInFactorTwo', () => {
         });
         expect(getByText('Resend code').closest('button')).not.toHaveAttribute('disabled');
         await userEvent.click(getByText('Resend code'));
-        // act(() => {
-        //   jest.advanceTimersByTime(1000);
-        // });
-        // await waitFor(() => expect(getByText('Resend code', { exact: false })).toBeDefined());
-        // expect(getByText('Resend code', { exact: false }).closest('button')).not.toHaveAttribute('disabled');
+        act(() => {
+          jest.advanceTimersByTime(1000);
+        });
+        expect(getByText('Resend code', { exact: false }).closest('button')).toHaveAttribute('disabled');
 
         jest.useRealTimers();
       });
