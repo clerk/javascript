@@ -39,7 +39,6 @@ export const PhoneInput = (props: PhoneInputProps) => {
   const selectedCountryOption = React.useMemo(() => {
     return countryOptions.find(o => o.country.iso === selectedIso) || countryOptions[0];
   }, [selectedIso]);
-  const dynamicPadding = selectedCountryOption.country.code.length * 5; // this is to calculate the padding of the input field depending the length of country code
 
   React.useEffect(callOnChangeProp, [cleanPhoneNumber]);
 
@@ -122,7 +121,9 @@ export const PhoneInput = (props: PhoneInputProps) => {
         onChange={handlePhoneNumberChange}
         maxLength={25}
         type='tel'
-        sx={theme => ({ paddingLeft: `calc(${theme.space.$20} + ${dynamicPadding}px)` })}
+        sx={theme => ({
+          paddingLeft: `calc(${theme.space.$20} + ${selectedCountryOption.country.code.length + 1}ch)`,
+        })}
         ref={phoneInputRef}
         {...rest}
       />
