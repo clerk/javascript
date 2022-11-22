@@ -3,21 +3,13 @@ import { describe, it, jest } from '@jest/globals';
 import { waitFor } from '@testing-library/dom';
 import React from 'react';
 
-import { bindCreateFixtures, render, screen } from '../../../../testUtils';
+import { ClerkAPIResponseError } from '../../../../core/resources';
+import { act, bindCreateFixtures, render, screen } from '../../../../testUtils';
 import { SignInFactorOne } from '../SignInFactorOne';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
 
 describe('SignInFactorOne', () => {
-  // beforeEach(() => {
-  //   jest.useFakeTimers();
-  // });
-  //
-  // afterEach(() => {
-  //   jest.runOnlyPendingTimers();
-  //   jest.useRealTimers();
-  // });
-
   it('renders the component', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withEmailAddress();
@@ -136,19 +128,32 @@ describe('SignInFactorOne', () => {
         screen.getByText('Sign in with your password');
       });
 
-      // it.only('shows a UI error when user clicks the continue button with password field empty', async () => {
-      //   const { wrapper } = await createFixtures(f => {
-      //     f.withEmailAddress();
-      //     f.withPassword();
-      //     f.withPreferredSignInStrategy({ strategy: 'password' });
-      //     f.startSignInWithEmailAddress({ supportEmailCode: true, supportPassword: true });
-      //   });
-      //   const { userEvent } = render(<SignInFactorOne />, { wrapper });
-      //   await userEvent.click(screen.getByText('Continue'));
-      //   // screen.getByText('Use another method');
-      //   // screen.getByText('Sign in with your password');
-      // });
-      it.todo('shows a UI error when submission fails');
+      it('shows a UI error when submission fails', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'password' });
+          f.startSignInWithPhoneNumber({ supportPassword: true });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        fixtures.signIn.attemptFirstFactor.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Error', {
+            data: [
+              {
+                code: 'form_code_incorrect',
+                long_message: 'Incorrect Password',
+                message: 'is incorrect',
+                meta: { param_name: 'password' },
+              },
+            ],
+            status: 422,
+          }),
+        );
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.type(screen.getByLabelText('Password'), '123456');
+        await userEvent.click(screen.getByText('Continue'));
+        await waitFor(() => expect(screen.getByText('Incorrect Password')).toBeDefined());
+      });
     });
 
     describe('Verification link', () => {
@@ -172,32 +177,37 @@ describe('SignInFactorOne', () => {
         screen.getByText('Use the verification link sent to your email');
       });
 
-      // it.skip('enables the "Resend link" button after 60 seconds', async () => {
-      //   const { wrapper, fixtures } = await createFixtures(f => {
-      //     f.withEmailAddress();
-      //     f.withMagicLink();
-      //     f.startSignInWithEmailAddress({ supportEmailLink: true, supportPassword: false });
-      //   });
-      //
-      //   fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
-      //   fixtures.signIn.createMagicLinkFlow.mockImplementation(
-      //     () =>
-      //       ({
-      //         startMagicLinkFlow: jest.fn(() => new Promise(() => {})),
-      //         cancelMagicLinkFlow: jest.fn(() => new Promise(() => {})),
-      //       } as any),
-      //   );
-      //
-      //   const { getByText } = render(<SignInFactorOne />, { wrapper });
-      //   act(() => {
-      //     jest.advanceTimersByTime(20000);
-      //   });
-      //
-      //   const asd = getByText('Resend link').closest('button');
-      //   console.log(asd);
-      //
-      //   expect(getByText('Resend link').closest('button')).toHaveAttribute('disabled');
-      // });
+      it('enables the "Resend link" button after 60 seconds', async () => {
+        jest.useFakeTimers();
+
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withMagicLink();
+          f.startSignInWithEmailAddress({ supportEmailLink: true, supportPassword: false });
+        });
+
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        fixtures.signIn.createMagicLinkFlow.mockImplementation(
+          () =>
+            ({
+              startMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+              cancelMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+            } as any),
+        );
+
+        const { getByText } = render(<SignInFactorOne />, { wrapper });
+        expect(getByText('Resend link', { exact: false }).closest('button')).toHaveAttribute('disabled');
+        act(() => {
+          jest.advanceTimersByTime(30000);
+        });
+        expect(getByText('Resend link', { exact: false }).closest('button')).toHaveAttribute('disabled');
+        act(() => {
+          jest.advanceTimersByTime(30000);
+        });
+        expect(getByText('Resend link', { exact: false }).closest('button')).not.toHaveAttribute('disabled');
+
+        jest.useRealTimers();
+      });
     });
 
     describe('Email Code', () => {
@@ -213,7 +223,30 @@ describe('SignInFactorOne', () => {
         screen.getByText('Enter the verification code sent to your email address');
       });
 
-      it.todo('enables the "Resend code" button after 30 seconds');
+      it('enables the "Resend code" button after 30 seconds', async () => {
+        jest.useFakeTimers();
+
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInWithEmailAddress({ supportEmailCode: true });
+        });
+
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        const { getByText } = render(<SignInFactorOne />, { wrapper });
+        expect(getByText('Resend code', { exact: false }).closest('button')).toHaveAttribute('disabled');
+        act(() => {
+          jest.advanceTimersByTime(15000);
+        });
+        expect(getByText('Resend code', { exact: false }).closest('button')).toHaveAttribute('disabled');
+        act(() => {
+          jest.advanceTimersByTime(15000);
+        });
+        expect(getByText('Resend code', { exact: false }).closest('button')).not.toHaveAttribute('disabled');
+
+        jest.useRealTimers();
+      });
 
       it('auto submits when typing all the 6 digits of the code', async () => {
         const { wrapper, fixtures } = await createFixtures(f => {
@@ -229,7 +262,31 @@ describe('SignInFactorOne', () => {
         await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
         expect(fixtures.signIn.attemptFirstFactor).toHaveBeenCalled();
       });
-      it.todo('shows a UI error when submission fails');
+
+      it('shows a UI error when submission fails', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInWithPhoneNumber({ supportPhoneCode: true, supportPassword: false });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        fixtures.signIn.attemptFirstFactor.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Error', {
+            data: [
+              {
+                code: 'form_code_incorrect',
+                long_message: 'Incorrect code',
+                message: 'is incorrect',
+                meta: { param_name: 'code' },
+              },
+            ],
+            status: 422,
+          }),
+        );
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+        await waitFor(() => expect(screen.getByText('Incorrect code')).toBeDefined());
+      });
     });
 
     describe('Phone Code', () => {
@@ -244,7 +301,30 @@ describe('SignInFactorOne', () => {
         screen.getByText('Enter the verification code sent to your phone number');
       });
 
-      it.todo('enables the "Resend code" button after 30 seconds');
+      it('enables the "Resend code" button after 30 seconds', async () => {
+        jest.useFakeTimers();
+
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withPhoneNumber();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInWithPhoneNumber({ supportPhoneCode: true, supportPassword: false });
+        });
+
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        const { getByText } = render(<SignInFactorOne />, { wrapper });
+        expect(getByText('Resend code', { exact: false }).closest('button')).toHaveAttribute('disabled');
+        act(() => {
+          jest.advanceTimersByTime(15000);
+        });
+        expect(getByText('Resend code', { exact: false }).closest('button')).toHaveAttribute('disabled');
+        act(() => {
+          jest.advanceTimersByTime(15000);
+        });
+        expect(getByText('Resend code', { exact: false }).closest('button')).not.toHaveAttribute('disabled');
+
+        jest.useRealTimers();
+      });
+
       it('auto submits when typing all the 6 digits of the code', async () => {
         const { wrapper, fixtures } = await createFixtures(f => {
           f.withPhoneNumber();
@@ -260,25 +340,30 @@ describe('SignInFactorOne', () => {
         expect(fixtures.signIn.attemptFirstFactor).toHaveBeenCalled();
       });
 
-      it.todo('shows a UI error when submission fails');
-
-      // it.only('shows a UI error when submission fails', async () => {
-      //   const { wrapper, fixtures } = await createFixtures(f => {
-      //     f.withPhoneNumber();
-      //     f.withPreferredSignInStrategy({ strategy: 'otp' });
-      //     f.startSignInWithPhoneNumber({ supportPhoneCode: true, supportPassword: false });
-      //   });
-      //   fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve());
-      //   fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(
-      //     Promise.reject({
-      //       errors: [{ code: 'form_code_incorrect', long_message: 'Incorrect code', message: 'is incorrect' }],
-      //     }),
-      //   );
-      //   const { userEvent } = render(<SignInFactorOne />, { wrapper });
-      //   await userEvent.type(screen.getByLabelText(/Enter verification code/i), '000000');
-      //   expect(fixtures.signIn.attemptFirstFactor).toHaveBeenCalled();
-      //   screen.getByLabelText(/Incorrect code/i);
-      // });
+      it('shows a UI error when submission fails', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withPhoneNumber();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInWithPhoneNumber({ supportPhoneCode: true, supportPassword: false });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        fixtures.signIn.attemptFirstFactor.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Error', {
+            data: [
+              {
+                code: 'form_code_incorrect',
+                long_message: 'Incorrect phone code',
+                message: 'is incorrect',
+                meta: { param_name: 'code' },
+              },
+            ],
+            status: 422,
+          }),
+        );
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+        await waitFor(() => expect(screen.getByText('Incorrect phone code')).toBeDefined());
+      });
     });
   });
 
