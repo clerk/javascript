@@ -84,6 +84,7 @@ const createSignUpFixtureHelpers = (baseClient: ClientJSON) => {
   const startSignUpWithEmailAddress = (params?: SignUpWithEmailAddressParams) => {
     const { emailAddress = 'hello@clerk.dev', supportEmailLink = true, supportEmailCode = true } = params || {};
     baseClient.sign_up = {
+      id: 'sua_2HseAXFGN12eqlwARPMxyyUa9o9',
       status: 'missing_requirements',
       email_address: emailAddress,
       verifications: (supportEmailLink || supportEmailCode) && {
@@ -97,6 +98,7 @@ const createSignUpFixtureHelpers = (baseClient: ClientJSON) => {
   const startSignUpWithPhoneNumber = (params?: SignUpWithPhoneNumberParams) => {
     const { phoneNumber = '+301234567890' } = params || {};
     baseClient.sign_up = {
+      id: 'sua_2HseAXFGN12eqlwARPMxyyUa9o9',
       status: 'missing_requirements',
       phone_number: phoneNumber,
     } as SignUpJSON;

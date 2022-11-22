@@ -61,6 +61,7 @@ const createFixtures =
       clerk: clerkMock,
       signIn: clerkMock.client.signIn,
       signUp: clerkMock.client.signUp,
+      environment: environmentMock,
       router: routerMock,
     };
 
