@@ -222,7 +222,9 @@ describe('SignInFactorOne', () => {
           f.startSignInWithPhoneNumber({ supportPhoneCode: true, supportPassword: false });
         });
         fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
-        fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(
+          Promise.resolve({ status: 'complete' } as SignInResource),
+        );
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
         await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
         expect(fixtures.signIn.attemptFirstFactor).toHaveBeenCalled();
@@ -250,7 +252,9 @@ describe('SignInFactorOne', () => {
           f.startSignInWithPhoneNumber({ supportPhoneCode: true, supportPassword: false });
         });
         fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
-        fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(
+          Promise.resolve({ status: 'complete' } as SignInResource),
+        );
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
         await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
         expect(fixtures.signIn.attemptFirstFactor).toHaveBeenCalled();
@@ -359,7 +363,7 @@ describe('SignInFactorOne', () => {
       screen.getByText('Verification link');
     });
 
-    it.skip('clicking the email code method should show the email code input', async () => {
+    it('clicking the email code method should show the email code input', async () => {
       const email = 'test@clerk.dev';
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress();
@@ -412,7 +416,7 @@ describe('SignInFactorOne', () => {
         screen.getByText('Email support');
       });
 
-      it.skip('should go back to "Use another method" screen when clicking the "<- Back" button', async () => {
+      it('should go back to "Use another method" screen when clicking the "<- Back" button', async () => {
         const { wrapper } = await createFixtures(f => {
           f.withEmailAddress({ first_factors: ['email_code', 'email_link'] });
           f.startSignInWithEmailAddress({ supportEmailCode: true, supportEmailLink: true });
@@ -425,7 +429,7 @@ describe('SignInFactorOne', () => {
         screen.getByText('Use another method');
       });
 
-      it.skip('should open a "mailto:" link when clicking the email support button', async () => {
+      it('should open a "mailto:" link when clicking the email support button', async () => {
         const { wrapper } = await createFixtures(f => {
           f.withEmailAddress({ first_factors: ['email_code', 'email_link'] });
           f.startSignInWithEmailAddress({ supportEmailCode: true, supportEmailLink: true });
