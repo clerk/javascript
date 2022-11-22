@@ -3,7 +3,7 @@ import UserEvent from '@testing-library/user-event';
 import React from 'react';
 
 const render = (ui: React.ReactElement, options?: RenderOptions) => {
-  const userEvent = UserEvent.setup();
+  const userEvent = UserEvent.setup({ delay: null });
   return { ..._render(ui, { ...options }), userEvent };
 };
 
