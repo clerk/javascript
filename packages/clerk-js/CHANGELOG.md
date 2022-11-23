@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.16.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.16.0...@clerk/clerk-js@4.16.1) (2022-11-23)
+
+### Bug Fixes
+
+- **clerk-js:** Add headless folder to final package ([b22d6f9](https://github.com/clerkinc/javascript/commit/b22d6f93d35254a679086d790509757b4b589f11))
+
 ## [4.16.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.16.0-staging.5...@clerk/clerk-js@4.16.0) (2022-11-22)
 
 ### Bug Fixes
