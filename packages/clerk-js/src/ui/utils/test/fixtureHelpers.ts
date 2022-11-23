@@ -84,7 +84,7 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
   };
 
   const startSignInFactorTwo = (params?: SignInFactorTwoParams) => {
-    const { identifier = 'hello@clerk.dev', supportPhoneCode = true, supportTotp, supportBackupCode } = params || {};
+    const { identifier = '+306911111111', supportPhoneCode = true, supportTotp, supportBackupCode } = params || {};
     baseClient.sign_in = {
       status: 'needs_second_factor',
       identifier,

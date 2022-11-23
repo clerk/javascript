@@ -190,8 +190,8 @@ describe('SignInFactorOne', () => {
         fixtures.signIn.createMagicLinkFlow.mockImplementation(
           () =>
             ({
-              startMagicLinkFlow: jest.fn(() => new Promise(() => {})),
-              cancelMagicLinkFlow: jest.fn(() => new Promise(() => {})),
+              startMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
+              cancelMagicLinkFlow: jest.fn(() => new Promise(() => ({}))),
             } as any),
         );
 

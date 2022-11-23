@@ -178,7 +178,7 @@ describe('SignInFactorTwo', () => {
           f.withEmailAddress();
           f.withPassword();
           f.withPreferredSignInStrategy({ strategy: 'otp' });
-          f.startSignInFactorTwo({ identifier: 'test@clerk.dev', supportPhoneCode: false, supportTotp: true });
+          f.startSignInFactorTwo({ supportPhoneCode: false, supportTotp: true });
         });
         fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
         const { getByText } = render(<SignInFactorTwo />, { wrapper });
@@ -190,7 +190,7 @@ describe('SignInFactorTwo', () => {
           f.withEmailAddress();
           f.withPassword();
           f.withPreferredSignInStrategy({ strategy: 'otp' });
-          f.startSignInFactorTwo({ identifier: 'test@clerk.dev', supportPhoneCode: false, supportTotp: true });
+          f.startSignInFactorTwo({ supportPhoneCode: false, supportTotp: true });
         });
         fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
         fixtures.signIn.attemptSecondFactor.mockReturnValueOnce(
@@ -206,7 +206,7 @@ describe('SignInFactorTwo', () => {
           f.withEmailAddress();
           f.withPassword();
           f.withPreferredSignInStrategy({ strategy: 'otp' });
-          f.startSignInFactorTwo({ identifier: 'test@clerk.dev', supportPhoneCode: false, supportTotp: true });
+          f.startSignInFactorTwo({ supportPhoneCode: false, supportTotp: true });
         });
         fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
         fixtures.signIn.attemptSecondFactor.mockRejectedValueOnce(
@@ -235,7 +235,6 @@ describe('SignInFactorTwo', () => {
           f.withPassword();
           f.withPreferredSignInStrategy({ strategy: 'otp' });
           f.startSignInFactorTwo({
-            identifier: 'test@clerk.dev',
             supportPhoneCode: false,
             supportBackupCode: true,
           });
@@ -251,7 +250,6 @@ describe('SignInFactorTwo', () => {
           f.withPassword();
           f.withPreferredSignInStrategy({ strategy: 'otp' });
           f.startSignInFactorTwo({
-            identifier: 'test@clerk.dev',
             supportPhoneCode: false,
             supportBackupCode: true,
           });
@@ -272,7 +270,6 @@ describe('SignInFactorTwo', () => {
           f.withPassword();
           f.withPreferredSignInStrategy({ strategy: 'otp' });
           f.startSignInFactorTwo({
-            identifier: 'test@clerk.dev',
             supportPhoneCode: false,
             supportBackupCode: true,
           });
@@ -295,7 +292,6 @@ describe('SignInFactorTwo', () => {
           f.withPassword();
           f.withPreferredSignInStrategy({ strategy: 'otp' });
           f.startSignInFactorTwo({
-            identifier: 'test@clerk.dev',
             supportPhoneCode: false,
             supportBackupCode: true,
           });
@@ -323,17 +319,168 @@ describe('SignInFactorTwo', () => {
   });
 
   describe('Use another method', () => {
-    it.todo('renders the other authentication methods list component when clicking on "Use another method"');
-    it.todo('goes back to the main screen when clicking the "<- Back" button');
-    it.todo('lists all the enabled second factor methods');
-    it.todo('shows the SMS code input when clicking the Phone code method');
-    it.todo('shows the Authenticator app screen when clicking the Authenticator app method');
-    it.todo('shows the Backup code screen when clicking the Backup code method');
+    it('renders the other authentication methods list component when clicking on "Use another method"', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword();
+        f.startSignInFactorTwo({
+          supportPhoneCode: true,
+          supportBackupCode: true,
+          supportTotp: true,
+        });
+      });
+
+      fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+      const { userEvent } = render(<SignInFactorTwo />, { wrapper });
+      await userEvent.click(screen.getByText('Use another method'));
+    });
+
+    it('goes back to the main screen when clicking the "<- Back" button', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword();
+        f.startSignInFactorTwo({
+          supportPhoneCode: true,
+          supportBackupCode: true,
+          supportTotp: false,
+        });
+      });
+
+      fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+      const { userEvent } = render(<SignInFactorTwo />, { wrapper });
+      await userEvent.click(screen.getByText('Use another method'));
+      await userEvent.click(screen.getByText('Back'));
+      screen.getByText('Check your phone');
+    });
+
+    it('lists all the enabled second factor methods', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword();
+        f.startSignInFactorTwo({
+          supportPhoneCode: true,
+          supportBackupCode: true,
+          supportTotp: true,
+        });
+      });
+
+      fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+      const { userEvent } = render(<SignInFactorTwo />, { wrapper });
+      await userEvent.click(screen.getByText('Use another method'));
+      screen.getByText(/Send code to \+/i);
+      screen.getByText(/Use a backup code/i);
+      screen.getByText(/Authenticator/i);
+    });
+
+    it('shows the SMS code input when clicking the Phone code method', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword();
+        f.startSignInFactorTwo({
+          supportPhoneCode: true,
+          supportBackupCode: true,
+          supportTotp: true,
+        });
+      });
+
+      fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+      const { userEvent } = render(<SignInFactorTwo />, { wrapper });
+      await userEvent.click(screen.getByText('Use another method'));
+      await userEvent.click(screen.getByText(/Send code to \+/i));
+      screen.getByText(/Check your phone/i);
+    });
+    it('shows the Authenticator app screen when clicking the Authenticator app method', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword();
+        f.startSignInFactorTwo({
+          supportPhoneCode: true,
+          supportBackupCode: true,
+          supportTotp: true,
+        });
+      });
+
+      fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+      const { userEvent } = render(<SignInFactorTwo />, { wrapper });
+      await userEvent.click(screen.getByText('Use another method'));
+      await userEvent.click(screen.getByText(/authenticator/i));
+      screen.getByText(/Enter the verification code/i);
+      screen.getByText(/authenticator/i);
+    });
+
+    it('shows the Backup code screen when clicking the Backup code method', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword();
+        f.startSignInFactorTwo({
+          supportPhoneCode: true,
+          supportBackupCode: true,
+          supportTotp: true,
+        });
+      });
+
+      fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+      const { userEvent } = render(<SignInFactorTwo />, { wrapper });
+      await userEvent.click(screen.getByText('Use another method'));
+      await userEvent.click(screen.getByText(/backup/i));
+      screen.getByText(/enter a backup code/i);
+    });
 
     describe('Get Help', () => {
-      it.todo('renders the get help component when clicking the "Get Help" button');
-      it.todo('goes back to "Use another method" screen when clicking the "<- Back" button');
-      it.todo('opens a "mailto:" link when clicking the email support button');
+      it('should render the get help component when clicking the "Get Help" button', async () => {
+        const { wrapper } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.startSignInFactorTwo({
+            supportPhoneCode: true,
+            supportBackupCode: true,
+            supportTotp: true,
+          });
+        });
+
+        const { userEvent } = render(<SignInFactorTwo />, { wrapper });
+        await userEvent.click(screen.getByText('Use another method'));
+        await userEvent.click(screen.getByText('Get help'));
+        screen.getByText('Email support');
+      });
+
+      it('should go back to "Use another method" screen when clicking the "<- Back" button', async () => {
+        const { wrapper } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.startSignInFactorTwo({
+            supportPhoneCode: true,
+            supportBackupCode: true,
+            supportTotp: true,
+          });
+        });
+
+        const { userEvent } = render(<SignInFactorTwo />, { wrapper });
+        await userEvent.click(screen.getByText('Use another method'));
+        await userEvent.click(screen.getByText('Get help'));
+        await userEvent.click(screen.getByText('Back'));
+        screen.getByText('Use another method');
+      });
+
+      // this test needs us to mock the window.location.href to work properly
+      it.skip('should open a "mailto:" link when clicking the email support button', async () => {
+        const { wrapper } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.startSignInFactorTwo({
+            supportPhoneCode: true,
+            supportBackupCode: true,
+            supportTotp: true,
+          });
+        });
+
+        const { userEvent } = render(<SignInFactorTwo />, { wrapper });
+        await userEvent.click(screen.getByText('Use another method'));
+        await userEvent.click(screen.getByText('Get help'));
+        screen.getByText('Email support');
+        await userEvent.click(screen.getByText('Email support'));
+        //TODO: check that location.href setter is called
+      });
     });
   });
 });
