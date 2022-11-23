@@ -122,6 +122,8 @@ const socials = Object.freeze(
     'oauth_instagram',
     'oauth_coinbase',
     'oauth_spotify',
+    'oauth_xero',
+    'oauth_box',
   ]),
 );
 

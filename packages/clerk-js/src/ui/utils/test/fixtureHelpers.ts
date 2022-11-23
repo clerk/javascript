@@ -1,6 +1,7 @@
 import {
   ClientJSON,
   DisplayConfigJSON,
+  EmailAddressJSON,
   EnvironmentJSON,
   OAuthProvider,
   SessionJSON,
@@ -24,7 +25,98 @@ export const createEnvironmentFixtureHelpers = (baseEnvironment: EnvironmentJSON
 };
 
 export const createClientFixtureHelpers = (baseClient: ClientJSON) => {
-  return { ...createSignInFixtureHelpers(baseClient), ...createSignUpFixtureHelpers(baseClient) };
+  return {
+    ...createSignInFixtureHelpers(baseClient),
+    ...createSignUpFixtureHelpers(baseClient),
+    ...createUserFixtureHelpers(baseClient),
+  };
+};
+
+const createUserFixtureHelpers = (baseClient: ClientJSON) => {
+  type WithUserParams = Omit<Partial<UserJSON>, 'email_addresses'> & {
+    email_addresses: Array<string | Partial<EmailAddressJSON>>;
+  };
+
+  const createEmail = (params: Partial<EmailAddressJSON>): EmailAddressJSON => {
+    return {
+      object: 'email_address',
+      id: '',
+      email_address: '',
+      reserved: false,
+      verification: {
+        status: 'verified',
+        strategy: 'email_link',
+        attempts: null,
+        expire_at: 1635977979774,
+      },
+      linked_to: [],
+      ...params,
+    } as EmailAddressJSON;
+  };
+
+  const createUser = (params: WithUserParams): UserJSON => {
+    const res = {
+      object: 'user',
+      id: params.id,
+      primary_email_address_id: '',
+      primary_phone_number_id: '',
+      primary_web3_wallet_id: '',
+      profile_image_url: '',
+      username: 'testUsername',
+      phone_numbers: [],
+      web3_wallets: [],
+      external_accounts: [],
+      organization_memberships: [],
+      password: '',
+      profile_image_id: '',
+      first_name: 'FirstName',
+      last_name: 'LastName',
+      password_enabled: false,
+      totp_enabled: false,
+      backup_code_enabled: false,
+      two_factor_enabled: false,
+      public_metadata: {},
+      unsafe_metadata: {},
+      last_sign_in_at: null,
+      updated_at: new Date().getTime(),
+      created_at: new Date().getTime(),
+      ...params,
+      email_addresses: (params.email_addresses || []).map(e =>
+        typeof e === 'string' ? () => createEmail({ email_address: e }) : createEmail,
+      ),
+    } as any as UserJSON;
+    res.primary_email_address_id = res.email_addresses[0]?.id;
+    return res;
+  };
+
+  const createPublicUserData = (params: WithUserParams) => {
+    return {
+      first_name: 'FirstName',
+      last_name: 'LastName',
+      profile_image_url: '',
+      identifier: 'email@test.com',
+      user_id: '',
+      ...params,
+    } as PublicUserDataJSON;
+  };
+
+  const withUser = (params: WithUserParams) => {
+    baseClient.sessions = baseClient.sessions || [];
+    const session = {
+      status: 'active',
+      id: baseClient.sessions.length.toString(),
+      object: 'session',
+      last_active_organization_id: null,
+      actor: null,
+      user: createUser(params),
+      public_user_data: createPublicUserData(params),
+      created_at: new Date().getTime(),
+      updated_at: new Date().getTime(),
+    } as SessionJSON;
+    baseClient.sessions.push(session);
+  };
+
+  return { withUser };
 };
 
 const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
@@ -46,12 +138,6 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
     supportPhoneCode?: boolean;
     supportTotp?: boolean;
     supportBackupCode?: boolean;
-  };
-
-  type ActiveSessionParams = {
-    first_name?: string;
-    last_name?: string;
-    identifier?: string;
   };
 
   const startSignInWithEmailAddress = (params?: SignInWithEmailAddressParams) => {
@@ -98,63 +184,7 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
     } as SignInJSON;
   };
 
-  const withActiveSessions = (params: ActiveSessionParams[]) => {
-    baseClient.sessions = params.map((session, index) => {
-      return {
-        status: 'active',
-        id: index.toString(),
-        object: 'session',
-        expire_at: new Date('2032-12-17').getTime(),
-        abandon_at: new Date('2032-12-17').getTime(),
-        last_active_at: new Date().getTime(),
-        last_active_token: {
-          jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
-          object: 'token',
-        },
-        last_active_organization_id: null,
-        actor: null,
-        user: {
-          object: 'user',
-          id: index.toString(),
-          external_id: index.toString(),
-          primary_email_address_id: '',
-          primary_phone_number_id: '',
-          primary_web3_wallet_id: '',
-          profile_image_url: '',
-          username: session.identifier || 'email@test.com',
-          email_addresses: [],
-          phone_numbers: [],
-          web3_wallets: [],
-          external_accounts: [],
-          organization_memberships: [],
-          password_enabled: true,
-          password: '',
-          profile_image_id: '',
-          first_name: session.first_name || 'FirstName',
-          last_name: session.last_name || 'LastName',
-          totp_enabled: true,
-          backup_code_enabled: true,
-          two_factor_enabled: true,
-          public_metadata: {},
-          unsafe_metadata: {},
-          last_sign_in_at: null,
-          updated_at: new Date().getTime(),
-          created_at: new Date().getTime(),
-        } as UserJSON,
-        public_user_data: {
-          first_name: session.first_name || 'FirstName',
-          last_name: session.last_name || 'LastName',
-          profile_image_url: '',
-          identifier: session.identifier || 'email@test.com',
-          user_id: index.toString(),
-        } as PublicUserDataJSON,
-        created_at: new Date().getTime(),
-        updated_at: new Date().getTime(),
-      } as SessionJSON;
-    });
-  };
-
-  return { startSignInWithEmailAddress, startSignInWithPhoneNumber, startSignInFactorTwo, withActiveSessions };
+  return { startSignInWithEmailAddress, startSignInWithPhoneNumber, startSignInFactorTwo };
 };
 
 const createSignUpFixtureHelpers = (baseClient: ClientJSON) => {
