@@ -54,8 +54,8 @@ describe('SignInAccountSwitcher', () => {
     expect(fixtures.router.navigate).toHaveBeenCalled();
   });
 
-  it.skip('signs out of all accounts when user clicks on "Sign out of all accounts"', async () => {
-    const { wrapper } = await createFixtures(f => {
+  it('signs out when user clicks on "Sign out of all accounts"', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
       f.withActiveSessions([
         { first_name: 'Nick', last_name: 'Kouk', identifier: 'test1@clerk.dev' },
         { first_name: 'Mike', last_name: 'Lamar', identifier: 'test2@clerk.dev' },
@@ -67,8 +67,6 @@ describe('SignInAccountSwitcher', () => {
     expect(getByText('Mike Lamar')).toBeDefined();
     expect(getByText('Graciela Brennan')).toBeDefined();
     await userEvent.click(getByText('Sign out of all accounts'));
-    expect(getByText('Nick Kouk')).not.toBeDefined();
-    expect(getByText('Mike Lamar')).not.toBeDefined();
-    expect(getByText('Graciela Brennan')).not.toBeDefined();
+    expect(fixtures.clerk.signOut).toHaveBeenCalled();
   });
 });
