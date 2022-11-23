@@ -25,7 +25,7 @@ const createBaseAuthConfig = (): AuthConfigJSON => {
   return {
     object: 'auth_config',
     id: 'aac_1',
-    single_session_mode: false,
+    single_session_mode: true,
   };
 };
 

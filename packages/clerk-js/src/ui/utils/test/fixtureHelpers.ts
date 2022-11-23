@@ -198,7 +198,7 @@ const createAuthConfigFixtureHelpers = (environment: EnvironmentJSON) => {
   const ac = environment.auth_config;
   const withMultiSessionMode = () => {
     // TODO:
-    ac.single_session_mode = true;
+    ac.single_session_mode = false;
   };
   return { withMultiSessionMode };
 };
