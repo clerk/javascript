@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Col, Icon, localizationKeys } from '../../customizables';
+import { Col, Icon, localizationKeys, useLocalizations } from '../../customizables';
 import { useNavigate } from '../../hooks';
 import { DotCircle } from '../../icons';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
@@ -8,6 +8,7 @@ import { UserProfileAccordion } from './UserProfileAccordion';
 
 export const MfaBackupCodeAccordion = () => {
   const { navigate } = useNavigate();
+  const { t } = useLocalizations();
 
   return (
     <UserProfileAccordion
@@ -17,7 +18,7 @@ export const MfaBackupCodeAccordion = () => {
           sx={theme => ({ color: theme.colors.$blackAlpha700 })}
         />
       }
-      title='Backup codes'
+      title={t(localizationKeys('userProfile.start.mfaSection.backupCodes.headerTitle'))}
     >
       <Col gap={4}>
         <LinkButtonWithDescription

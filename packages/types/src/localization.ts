@@ -277,6 +277,7 @@ type _LocalizationResource = {
           actionLabel__setDefault: LocalizationValue;
         };
         backupCodes: {
+          headerTitle: LocalizationValue;
           title__regenerate: LocalizationValue;
           subtitle__regenerate: LocalizationValue;
           actionLabel__regenerate: LocalizationValue;

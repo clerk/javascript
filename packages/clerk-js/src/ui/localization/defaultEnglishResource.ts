@@ -269,6 +269,7 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
           actionLabel__setDefault: 'Set as default',
         },
         backupCodes: {
+          headerTitle: 'Backup codes',
           title__regenerate: 'Regenerate backup codes',
           subtitle__regenerate:
             'Get a fresh set of secure backup codes. Prior backup codes will be deleted and cannot be used.',
