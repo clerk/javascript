@@ -1,9 +1,9 @@
 import { SignInResource } from '@clerk/types';
-import { describe, it, jest } from '@jest/globals';
+import { describe, it } from '@jest/globals';
 import React from 'react';
 
 import { ClerkAPIResponseError } from '../../../../core/resources';
-import { act, bindCreateFixtures, fireEvent, render, screen, waitFor } from '../../../../testUtils';
+import { bindCreateFixtures, render, runFakeTimers, screen, waitFor } from '../../../../testUtils';
 import { SignInFactorTwo } from '../SignInFactorTwo';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
@@ -72,8 +72,6 @@ describe('SignInFactorTwo', () => {
       it.todo('hides with * the phone number digits except the last 2');
 
       it('enables the "Resend code" button after 30 seconds', async () => {
-        jest.useFakeTimers();
-
         const { wrapper, fixtures } = await createFixtures(f => {
           f.withEmailAddress();
           f.withPassword();
@@ -82,24 +80,19 @@ describe('SignInFactorTwo', () => {
           f.startSignInFactorTwo({ identifier: '+3012345567890', supportPhoneCode: true, supportTotp: false });
         });
 
-        fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
-        const { getByText } = render(<SignInFactorTwo />, { wrapper });
-        expect(getByText('Resend code', { exact: false }).closest('button')).toHaveAttribute('disabled');
-        act(() => {
-          jest.advanceTimersByTime(15000);
+        runFakeTimers(timers => {
+          fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+          const { getByText } = render(<SignInFactorTwo />, { wrapper });
+          expect(getByText('Resend code', { exact: false }).closest('button')).toHaveAttribute('disabled');
+          timers.advanceTimersByTime(15000);
+          expect(getByText('Resend code', { exact: false }).closest('button')).toHaveAttribute('disabled');
+          getByText('(15)', { exact: false });
+          timers.advanceTimersByTime(15000);
+          expect(getByText('Resend code', { exact: false }).closest('button')).not.toHaveAttribute('disabled');
         });
-        expect(getByText('Resend code', { exact: false }).closest('button')).toHaveAttribute('disabled');
-        act(() => {
-          jest.advanceTimersByTime(15000);
-        });
-        expect(getByText('Resend code', { exact: false }).closest('button')).not.toHaveAttribute('disabled');
-
-        jest.useRealTimers();
       });
 
       it('disables again the resend code button after clicking it', async () => {
-        jest.useFakeTimers();
-
         const { wrapper, fixtures } = await createFixtures(f => {
           f.withEmailAddress();
           f.withPassword();
@@ -107,21 +100,17 @@ describe('SignInFactorTwo', () => {
           f.startSignInWithPhoneNumber({ supportPhoneCode: true });
           f.startSignInFactorTwo({ identifier: '+3012345567890', supportPhoneCode: true, supportTotp: false });
         });
-
         fixtures.signIn.prepareSecondFactor.mockReturnValue(Promise.resolve({} as SignInResource));
-        const { getByText, userEvent } = render(<SignInFactorTwo />, { wrapper });
-        expect(getByText('Resend code', { exact: false }).closest('button')).toHaveAttribute('disabled');
-        act(() => {
-          jest.advanceTimersByTime(30000);
-        });
-        expect(getByText('Resend code').closest('button')).not.toHaveAttribute('disabled');
-        await userEvent.click(getByText('Resend code'));
-        act(() => {
-          jest.advanceTimersByTime(1000);
-        });
-        expect(getByText('Resend code', { exact: false }).closest('button')).toHaveAttribute('disabled');
 
-        jest.useRealTimers();
+        await runFakeTimers(async timers => {
+          const { getByText, userEvent } = render(<SignInFactorTwo />, { wrapper });
+          expect(getByText('Resend code', { exact: false }).closest('button')).toHaveAttribute('disabled');
+          timers.advanceTimersByTime(30000);
+          expect(getByText('Resend code').closest('button')).not.toHaveAttribute('disabled');
+          await userEvent.click(getByText('Resend code'));
+          timers.advanceTimersByTime(1000);
+          expect(getByText('Resend code', { exact: false }).closest('button')).toHaveAttribute('disabled');
+        });
       });
 
       it('auto submits when typing all the 6 digits of the code', async () => {
