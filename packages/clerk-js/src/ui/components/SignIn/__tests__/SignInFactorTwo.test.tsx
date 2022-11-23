@@ -44,12 +44,9 @@ describe('SignInFactorTwo', () => {
       fixtures.signIn.attemptSecondFactor.mockReturnValueOnce(
         Promise.resolve({ status: 'complete' } as SignInResource),
       );
-      render(<SignInFactorTwo />, { wrapper });
+      const { userEvent } = render(<SignInFactorTwo />, { wrapper });
 
-      const inputs = screen.getAllByLabelText(/digit/i);
-      inputs.every(input => {
-        return fireEvent.change(input, { target: { value: '1' } });
-      });
+      await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
       await waitFor(() => {
         expect(fixtures.clerk.setActive).toBeCalled();
       });
