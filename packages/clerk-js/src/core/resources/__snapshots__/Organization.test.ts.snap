@@ -15,7 +15,7 @@ Organization {
   "name": "test_name",
   "pathRoot": "/organizations",
   "pendingInvitationsCount": 10,
-  "publicMetadata": Object {
+  "publicMetadata": {
     "public": "metadata",
   },
   "removeMember": [Function],

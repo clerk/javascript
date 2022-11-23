@@ -2,9 +2,8 @@ import { ClerkAPIError, SignInCreateParams } from '@clerk/types';
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
-import { getClerkQueryParam } from '../../../utils/getClerkQueryParam';
-import { ERROR_CODES, getIdentifierControlDisplayValues } from '../../common/constants';
-import { withRedirectToHome } from '../../common/withRedirectToHome';
+import { getClerkQueryParam } from '../../../utils';
+import { ERROR_CODES, getIdentifierControlDisplayValues, withRedirectToHome } from '../../common';
 import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import {
@@ -15,9 +14,9 @@ import {
   Header,
   LoadingCard,
   SocialButtonsReversibleContainerWithDivider,
+  useCardState,
   withCardStateProvider,
 } from '../../elements';
-import { useCardState } from '../../elements/contexts';
 import { useLoadingStatus, useNavigate } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { buildRequest, FormControlState, handleError, isMobileDevice, useFormControl } from '../../utils';

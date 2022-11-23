@@ -298,6 +298,7 @@ export const NavbarMenuButtonRow = (props: PropsOfComponent<typeof Button>) => {
       <Button
         elementDescriptor={descriptors.navbarMobileMenuButton}
         {...props}
+        // @ts-ignore
         onClick={open}
         size='xs'
         variant='ghost'

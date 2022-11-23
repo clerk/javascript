@@ -1,10 +1,8 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "jsx": "react-jsx",
     "noImplicitReturns": false
-    //    "strict": false
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "./setupJestAfterEnv.ts"],
   "exclude": ["node_modules"]
 }
