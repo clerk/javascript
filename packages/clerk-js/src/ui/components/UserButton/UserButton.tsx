@@ -2,16 +2,15 @@ import React from 'react';
 
 import { useCoreUser, useUserButtonContext, withCoreUserGuard } from '../../contexts';
 import { descriptors, Flex, Flow, Text } from '../../customizables';
-import { withCardStateProvider } from '../../elements';
-import { Portal } from '../../elements/Portal';
+import { Popover, withCardStateProvider, withFloatingTree } from '../../elements';
 import { usePopover } from '../../hooks';
 import { getFullName, getIdentifier } from '../../utils';
 import { UserButtonPopover } from './UserButtonPopover';
 import { UserButtonTrigger } from './UserButtonTrigger';
 
-const _UserButton = () => {
+const _UserButton = withFloatingTree(() => {
   const { defaultOpen } = useUserButtonContext();
-  const { floating, reference, styles, toggle, isOpen } = usePopover({
+  const { floating, reference, styles, toggle, isOpen, nodeId, context } = usePopover({
     defaultOpen,
     placement: 'bottom-end',
     offset: 8,
@@ -31,18 +30,21 @@ const _UserButton = () => {
           onClick={toggle}
           isOpen={isOpen}
         />
-        <Portal>
+        <Popover
+          nodeId={nodeId}
+          context={context}
+          isOpen={isOpen}
+        >
           <UserButtonPopover
-            isOpen={isOpen}
             close={toggle}
             ref={floating}
             style={{ ...styles }}
           />
-        </Portal>
+        </Popover>
       </Flex>
     </Flow.Root>
   );
-};
+});
 
 const UserButtonTopLevelIdentifier = () => {
   const user = useCoreUser();

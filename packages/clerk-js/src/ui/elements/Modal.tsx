@@ -3,7 +3,8 @@ import React from 'react';
 import { descriptors, Flex } from '../customizables';
 import { usePopover, useSafeLayoutEffect, useScrollLock } from '../hooks';
 import { animations, mqu, ThemableCssProp } from '../styledSystem';
-import { Portal } from './Portal';
+import { withFloatingTree } from './contexts';
+import { Popover } from './Popover';
 
 type ModalProps = React.PropsWithChildren<{
   handleOpen?: () => void;
@@ -12,16 +13,14 @@ type ModalProps = React.PropsWithChildren<{
   containerSx?: ThemableCssProp;
 }>;
 
-export const Modal = (props: ModalProps) => {
+export const Modal = withFloatingTree((props: ModalProps) => {
   const { handleClose, handleOpen, contentSx, containerSx } = props;
-  const { floating, isOpen } = usePopover({ defaultOpen: true, autoUpdate: false, bubbles: false });
+  const { floating, isOpen, context, nodeId } = usePopover({
+    defaultOpen: true,
+    autoUpdate: false,
+    bubbles: false,
+  });
   const { disableScroll, enableScroll } = useScrollLock(document.body);
-  const containerRef = React.useRef<HTMLDivElement>(null);
-
-  React.useEffect(() => {
-    floating(containerRef.current);
-    containerRef.current?.focus();
-  }, []);
 
   React.useEffect(() => {
     if (!isOpen) {
@@ -36,12 +35,13 @@ export const Modal = (props: ModalProps) => {
     return () => enableScroll();
   });
 
-  if (!isOpen) {
-    return null;
-  }
-
   return (
-    <Portal>
+    <Popover
+      nodeId={nodeId}
+      context={context}
+      isOpen={isOpen}
+      order={['floating', 'content']}
+    >
       <Flex
         aria-hidden
         elementDescriptor={descriptors.modalBackdrop}
@@ -65,9 +65,9 @@ export const Modal = (props: ModalProps) => {
       >
         <Flex
           elementDescriptor={descriptors.modalContent}
-          ref={containerRef}
-          aria-modal='true'
+          ref={floating}
           tabIndex={0}
+          aria-modal='true'
           role='dialog'
           sx={[
             t => ({
@@ -84,6 +84,6 @@ export const Modal = (props: ModalProps) => {
           {props.children}
         </Flex>
       </Flex>
-    </Portal>
+    </Popover>
   );
-};
+});

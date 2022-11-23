@@ -1,14 +1,13 @@
 import { withOrganizationsEnabledGuard } from '../../common';
 import { withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
-import { withCardStateProvider } from '../../elements';
-import { Portal } from '../../elements/Portal';
+import { Popover, withCardStateProvider, withFloatingTree } from '../../elements';
 import { usePopover } from '../../hooks';
 import { OrganizationSwitcherPopover } from './OrganizationSwitcherPopover';
 import { OrganizationSwitcherTrigger } from './OrganizationSwitcherTrigger';
 
-const _OrganizationSwitcher = () => {
-  const { floating, reference, styles, toggle, isOpen } = usePopover({
+const _OrganizationSwitcher = withFloatingTree(() => {
+  const { floating, reference, styles, toggle, isOpen, nodeId, context } = usePopover({
     placement: 'bottom-start',
     offset: 8,
   });
@@ -20,17 +19,20 @@ const _OrganizationSwitcher = () => {
         onClick={toggle}
         isOpen={isOpen}
       />
-      <Portal>
+      <Popover
+        nodeId={nodeId}
+        context={context}
+        isOpen={isOpen}
+      >
         <OrganizationSwitcherPopover
-          isOpen={isOpen}
           close={toggle}
           ref={floating}
           style={{ ...styles }}
         />
-      </Portal>
+      </Popover>
     </Flow.Root>
   );
-};
+});
 
 export const OrganizationSwitcher = withOrganizationsEnabledGuard(
   withCoreUserGuard(withCardStateProvider(_OrganizationSwitcher)),

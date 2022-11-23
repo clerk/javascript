@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "4.16.0-staging.3",
+  "version": "4.16.0",
   "license": "MIT",
   "description": "Clerk.dev JS library",
   "keywords": [
@@ -38,8 +38,8 @@
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
   },
   "dependencies": {
-    "@clerk/shared": "^0.5.4-staging.3",
-    "@clerk/types": "^3.17.0-staging.2",
+    "@clerk/shared": "^0.5.4",
+    "@clerk/types": "^3.17.0",
     "@emotion/cache": "^11.10.5",
     "@emotion/react": "^11.10.5",
     "@floating-ui/react-dom-interactions": "^0.6.3",
@@ -116,7 +116,7 @@
     "files": [
       {
         "path": "./dist/clerk.browser.js",
-        "maxSize": "175kB"
+        "maxSize": "178kB"
       },
       {
         "path": "./dist/clerk.headless.js",

@@ -8,7 +8,7 @@ import { Spinner } from './Spinner';
 
 const vars = createCssVariables('accent', 'accentDark', 'accentDarker', 'accentLighter', 'accentLightest', 'border');
 
-const { applyVariants, filterProps } = createVariants(theme => {
+const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) => {
   return {
     base: {
       margin: 0,
@@ -61,6 +61,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
           backgroundColor: vars.accent,
           color: theme.colors.$colorTextOnPrimaryBackground,
           '&:hover': { backgroundColor: vars.accentDark },
+          '&:focus': props.hoverAsFocus ? { backgroundColor: vars.accentDark } : undefined,
           '&:active': { backgroundColor: vars.accentDarker },
         },
         outline: {
@@ -68,11 +69,13 @@ const { applyVariants, filterProps } = createVariants(theme => {
           borderColor: vars.accentLighter,
           color: vars.accent,
           '&:hover': { backgroundColor: vars.accentLightest },
+          '&:focus': props.hoverAsFocus ? { backgroundColor: vars.accentLightest } : undefined,
           '&:active': { backgroundColor: vars.accentLighter },
         },
         ghost: {
           color: vars.accent,
           '&:hover': { backgroundColor: vars.accentLightest },
+          '&:focus': props.hoverAsFocus ? { backgroundColor: vars.accentLightest } : undefined,
           '&:active': { backgroundColor: vars.accentLighter },
         },
         icon: {
@@ -81,6 +84,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
           borderRadius: theme.radii.$lg,
           borderColor: vars.border,
           '&:hover': { backgroundColor: vars.accentLightest },
+          '&:focus': props.hoverAsFocus ? { backgroundColor: vars.accentLightest } : undefined,
           '&:active': { backgroundColor: vars.accentLighter },
         },
         ghostIcon: {
@@ -89,6 +93,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
           width: theme.sizes.$6,
           padding: `${theme.space.$1} ${theme.space.$1}`,
           '&:hover': { color: vars.accentDark },
+          '&:focus': props.hoverAsFocus ? { backgroundColor: vars.accentDark } : undefined,
           '&:active': { color: vars.accentDarker },
         },
         link: {
@@ -100,6 +105,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
           padding: 0,
           color: vars.accent,
           '&:hover': { textDecoration: 'underline' },
+          '&:focus': props.hoverAsFocus ? { textDecoration: 'underline' } : undefined,
           '&:active': { color: vars.accentDark },
         },
         roundWrapper: { padding: 0, margin: 0, height: 'unset', width: 'unset', minHeight: 'unset' },
@@ -126,12 +132,22 @@ type OwnProps = PrimitiveProps<'button'> & {
   loadingText?: string;
   isDisabled?: boolean;
   isActive?: boolean;
+  hoverAsFocus?: boolean;
 };
 type ButtonProps = OwnProps & StyleVariants<typeof applyVariants>;
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
   const parsedProps: ButtonProps = { ...props, isDisabled: props.isDisabled || props.isLoading };
-  const { isLoading, isDisabled, loadingText, children, onClick: onClickProp, ...rest } = filterProps(parsedProps);
+  const {
+    isLoading,
+    isDisabled,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    hoverAsFocus,
+    loadingText,
+    children,
+    onClick: onClickProp,
+    ...rest
+  } = filterProps(parsedProps);
 
   const onClick: React.MouseEventHandler<HTMLButtonElement> = e => {
     if (rest.type !== 'submit') {
@@ -172,7 +188,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
 
 const SimpleButton = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
   const parsedProps: ButtonProps = { ...props, isDisabled: props.isDisabled || props.isLoading };
-  const { loadingText, isDisabled, children, onClick: onClickProp, ...rest } = filterProps(parsedProps);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { loadingText, isDisabled, hoverAsFocus, children, onClick: onClickProp, ...rest } = filterProps(parsedProps);
 
   const onClick: React.MouseEventHandler<HTMLButtonElement> = e => {
     if (rest.type !== 'submit') {

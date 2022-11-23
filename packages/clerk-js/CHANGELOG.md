@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.16.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.16.0-staging.5...@clerk/clerk-js@4.16.0) (2022-11-22)
+
+### Bug Fixes
+
+- **clerk-js:** Adjust picker text size in PhoneInput ([5f6ec69](https://github.com/clerkinc/javascript/commit/5f6ec691ee8225a187214e748ceb2997fa75d26a))
+
 ## [4.16.0-staging.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.16.0-staging.2...@clerk/clerk-js@4.16.0-staging.3) (2022-11-21)
 
 **Note:** Version bump only for package @clerk/clerk-js
