@@ -3,10 +3,13 @@ import {
   DisplayConfigJSON,
   EnvironmentJSON,
   OAuthProvider,
+  SessionJSON,
   SignInJSON,
   SignUpJSON,
+  UserJSON,
   UserSettingsJSON,
 } from '@clerk/types';
+import { PublicUserDataJSON } from '@clerk/types/src';
 
 import { createUserFixture } from './fixtures';
 
@@ -43,6 +46,12 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
     supportPhoneCode?: boolean;
     supportTotp?: boolean;
     supportBackupCode?: boolean;
+  };
+
+  type ActiveSessionParams = {
+    first_name?: string;
+    last_name?: string;
+    identifier?: string;
   };
 
   const startSignInWithEmailAddress = (params?: SignInWithEmailAddressParams) => {
@@ -89,7 +98,63 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
     } as SignInJSON;
   };
 
-  return { startSignInWithEmailAddress, startSignInWithPhoneNumber, startSignInFactorTwo };
+  const withActiveSessions = (params: ActiveSessionParams[]) => {
+    baseClient.sessions = params.map((session, index) => {
+      return {
+        status: 'active',
+        id: index.toString(),
+        object: 'session',
+        expire_at: new Date('2032-12-17').getTime(),
+        abandon_at: new Date('2032-12-17').getTime(),
+        last_active_at: new Date().getTime(),
+        last_active_token: {
+          jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+          object: 'token',
+        },
+        last_active_organization_id: null,
+        actor: null,
+        user: {
+          object: 'user',
+          id: index.toString(),
+          external_id: index.toString(),
+          primary_email_address_id: '',
+          primary_phone_number_id: '',
+          primary_web3_wallet_id: '',
+          profile_image_url: '',
+          username: session.identifier || 'email@test.com',
+          email_addresses: [],
+          phone_numbers: [],
+          web3_wallets: [],
+          external_accounts: [],
+          organization_memberships: [],
+          password_enabled: true,
+          password: '',
+          profile_image_id: '',
+          first_name: session.first_name || 'FirstName',
+          last_name: session.last_name || 'LastName',
+          totp_enabled: true,
+          backup_code_enabled: true,
+          two_factor_enabled: true,
+          public_metadata: {},
+          unsafe_metadata: {},
+          last_sign_in_at: null,
+          updated_at: new Date().getTime(),
+          created_at: new Date().getTime(),
+        } as UserJSON,
+        public_user_data: {
+          first_name: session.first_name || 'FirstName',
+          last_name: session.last_name || 'LastName',
+          profile_image_url: '',
+          identifier: session.identifier || 'email@test.com',
+          user_id: index.toString(),
+        } as PublicUserDataJSON,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON;
+    });
+  };
+
+  return { startSignInWithEmailAddress, startSignInWithPhoneNumber, startSignInFactorTwo, withActiveSessions };
 };
 
 const createSignUpFixtureHelpers = (baseClient: ClientJSON) => {
