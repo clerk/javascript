@@ -1,8 +1,8 @@
 import { act, render, screen, userEvent } from '@clerk/shared/testUtils';
 import React from 'react';
 
-import Clerk from '../../core/clerk';
-import { HashRouter, Route, useRouter } from './';
+import Clerk from '../../../core/clerk';
+import { HashRouter, Route, useRouter } from '..';
 
 const mockNavigate = jest.fn();
 

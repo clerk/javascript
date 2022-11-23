@@ -1,4 +1,4 @@
-import { getQueryParams, stringifyQueryParams } from './querystring';
+import { getQueryParams, stringifyQueryParams } from '../querystring';
 
 describe('getQueryParams(string)', () => {
   it('parses a querystring', () => {

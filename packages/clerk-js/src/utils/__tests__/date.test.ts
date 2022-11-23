@@ -1,4 +1,4 @@
-import { unixEpochToDate } from './date';
+import { unixEpochToDate } from '../date';
 
 describe('date utilities', () => {
   beforeAll(() => {

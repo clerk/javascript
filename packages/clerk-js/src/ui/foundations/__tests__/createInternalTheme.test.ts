@@ -1,4 +1,4 @@
-import { createInternalTheme } from './createInternalTheme';
+import { createInternalTheme } from '../createInternalTheme';
 
 describe('createInternalTheme', () => {
   it('handles empty objects', () => {

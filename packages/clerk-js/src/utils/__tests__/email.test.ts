@@ -1,4 +1,4 @@
-import { buildEmailAddress } from './email';
+import { buildEmailAddress } from '../email';
 
 test.each([
   ['', 'support@clerk.dev'],

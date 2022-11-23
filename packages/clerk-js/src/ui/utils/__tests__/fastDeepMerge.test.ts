@@ -1,4 +1,4 @@
-import { fastDeepMergeAndKeep, fastDeepMergeAndReplace } from './fastDeepMerge';
+import { fastDeepMergeAndKeep, fastDeepMergeAndReplace } from '../fastDeepMerge';
 
 describe('fastDeepMergeReplace', () => {
   it('merges simple objects', () => {

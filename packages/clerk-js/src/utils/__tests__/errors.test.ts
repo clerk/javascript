@@ -1,5 +1,5 @@
-import type { ClerkAPIResponseError } from '../core/resources/Error';
-import { isError } from './errors';
+import type { ClerkAPIResponseError } from '../../core/resources/Error';
+import { isError } from '../errors';
 
 describe('isError(err, code)', () => {
   it('check if the the API response contains at least one error of the provided code', () => {

@@ -1,4 +1,4 @@
-import { joinPaths } from './path';
+import { joinPaths } from '../path';
 
 describe('joinPaths(a, b)', () => {
   const cases = [

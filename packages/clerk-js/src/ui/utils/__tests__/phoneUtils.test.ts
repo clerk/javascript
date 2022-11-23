@@ -4,7 +4,7 @@ import {
   getCountryIsoFromFormattedNumber,
   getFlagEmojiFromCountryIso,
   getLongestValidCountryCode,
-} from './phoneUtils';
+} from '../phoneUtils';
 
 describe('phoneUtils', () => {
   describe('countryIsoToFlagEmoji(iso)', () => {

@@ -11,7 +11,7 @@ import {
   removeSearchParameterFromHash,
   setSearchParameterInHash,
   trimTrailingSlash,
-} from './url';
+} from '../url';
 
 describe('isAccountsHostedPages(url)', () => {
   const goodUrls: Array<[string | URL, boolean]> = [

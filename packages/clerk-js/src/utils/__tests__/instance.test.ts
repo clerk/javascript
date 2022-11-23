@@ -1,4 +1,4 @@
-import { validateFrontendApi } from './instance';
+import { validateFrontendApi } from '../instance';
 
 describe('validateFrontendApi(str)', () => {
   it.each([

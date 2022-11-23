@@ -1,11 +1,11 @@
 import { renderHook } from '@clerk/shared/testUtils';
 
-import { useSupportEmail } from './useSupportEmail';
+import { useSupportEmail } from '../useSupportEmail';
 
 const mockUseOptions = jest.fn();
 const mockUseEnvironment = jest.fn();
 
-jest.mock('../contexts', () => {
+jest.mock('../../contexts', () => {
   return {
     useCoreClerk: () => {
       return {

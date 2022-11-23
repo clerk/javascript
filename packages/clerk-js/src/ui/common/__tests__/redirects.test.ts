@@ -1,4 +1,4 @@
-import { buildMagicLinkRedirectUrl, buildSSOCallbackURL } from './redirects';
+import { buildMagicLinkRedirectUrl, buildSSOCallbackURL } from '../redirects';
 
 describe('buildMagicLinkRedirectUrl(routing, baseUrl)', () => {
   it('handles empty routing strategy based routing ', function () {

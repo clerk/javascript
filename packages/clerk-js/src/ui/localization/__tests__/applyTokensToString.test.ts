@@ -1,4 +1,4 @@
-import { applyTokensToString } from './applyTokensToString';
+import { applyTokensToString } from '../applyTokensToString';
 
 describe('applyTokensToString', function () {
   const tokens = {

@@ -1,5 +1,5 @@
-import { createCssVariables } from './createCssVariables';
-import { createVariants } from './createVariants';
+import { createCssVariables } from '../createCssVariables';
+import { createVariants } from '../createVariants';
 
 const baseTheme = {
   fontSizes: {

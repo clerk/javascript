@@ -1,6 +1,6 @@
 import { noop } from '@clerk/shared/testUtils';
 
-import { ignoreEventValue } from './ignoreEventValue';
+import { ignoreEventValue } from '../ignoreEventValue';
 
 describe('ignoreNonEventValue', () => {
   it('allows non event values', () => {
