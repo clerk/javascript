@@ -112,7 +112,6 @@ describe('SignInStart', () => {
         f.withEmailAddress();
       });
       fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_second_factor' } as SignInResource));
-
       const { userEvent } = render(<SignInStart />, { wrapper });
       expect(screen.getByText('Continue')).toBeInTheDocument();
       await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.dev');
