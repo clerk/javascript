@@ -30,7 +30,7 @@ export const bindCreateFixtures = (componentName: Parameters<typeof unbindCreate
   return { createFixtures: unbindCreateFixtures(componentName) };
 };
 
-const unbindCreateFixtures = (componentName: UnpackContext<typeof ComponentContext>['componentName']) => {
+const unbindCreateFixtures = <N extends UnpackContext<typeof ComponentContext>['componentName']>(componentName: N) => {
   const createFixtures = async (...configFns: ConfigFn[]) => {
     const baseEnvironment = createBaseEnvironmentJSON();
     const baseClient = createBaseClientJSON();
@@ -64,6 +64,13 @@ const unbindCreateFixtures = (componentName: UnpackContext<typeof ComponentConte
       router: routerMock,
     };
 
+    let componentContextProps: Partial<UnpackContext<typeof ComponentContext> & { componentName: N }>;
+    const props = {
+      setProps: (props: typeof componentContextProps) => {
+        componentContextProps = props;
+      },
+    };
+
     const MockClerkProvider = (props: any) => {
       const { children } = props;
       return (
@@ -73,7 +80,9 @@ const unbindCreateFixtures = (componentName: UnpackContext<typeof ComponentConte
               <AppearanceProvider appearanceKey={'signIn'}>
                 <FlowMetadataProvider flow={componentName as any}>
                   <InternalThemeProvider>
-                    <ComponentContext.Provider value={{ componentName }}>{children}</ComponentContext.Provider>
+                    <ComponentContext.Provider value={{ ...componentContextProps, componentName }}>
+                      {children}
+                    </ComponentContext.Provider>
                   </InternalThemeProvider>
                 </FlowMetadataProvider>
               </AppearanceProvider>
@@ -83,7 +92,7 @@ const unbindCreateFixtures = (componentName: UnpackContext<typeof ComponentConte
       );
     };
 
-    return { wrapper: MockClerkProvider, fixtures };
+    return { wrapper: MockClerkProvider, fixtures, props };
   };
   createFixtures.config = (fn: ConfigFn) => fn;
   return createFixtures;
