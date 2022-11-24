@@ -1,5 +1,5 @@
 import { useWizard, Wizard } from '../../common';
-import { Button, localizationKeys, Text } from '../../customizables';
+import { Button, descriptors, localizationKeys, Text } from '../../customizables';
 import { ContentPage, FormButtonContainer, NavigateToFlowStartButton, withCardStateProvider } from '../../elements';
 import { MfaBackupCodeCreatePage } from './MfaBackupCodeCreatePage';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
@@ -36,9 +36,13 @@ const AddBackupCode = (props: AddBackupCodeProps) => {
           textVariant='buttonExtraSmallBold'
           onClick={onContinue}
           localizationKey={localizationKeys('userProfile.formButtonPrimary__finish')}
+          elementDescriptor={descriptors.formButtonPrimary}
         />
 
-        <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
+        <NavigateToFlowStartButton
+          localizationKey={localizationKeys('userProfile.formButtonReset')}
+          elementDescriptor={descriptors.formButtonReset}
+        />
       </FormButtonContainer>
     </ContentPage>
   );

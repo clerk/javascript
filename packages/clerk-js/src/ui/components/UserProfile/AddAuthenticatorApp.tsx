@@ -3,7 +3,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import React from 'react';
 
 import { useCoreUser } from '../../contexts';
-import { Button, Col, LocalizationKey, localizationKeys, Text } from '../../customizables';
+import { Button, Col, descriptors, LocalizationKey, localizationKeys, Text } from '../../customizables';
 import {
   ClipboardInput,
   ContentPage,
@@ -111,9 +111,13 @@ export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
               textVariant='buttonExtraSmallBold'
               onClick={onContinue}
               localizationKey={localizationKeys('userProfile.formButtonPrimary__continue')}
+              elementDescriptor={descriptors.formButtonPrimary}
             />
 
-            <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
+            <NavigateToFlowStartButton
+              localizationKey={localizationKeys('userProfile.formButtonReset')}
+              elementDescriptor={descriptors.formButtonReset}
+            />
           </FormButtonContainer>
         </>
       )}

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Text } from '../customizables';
+import { descriptors, Text } from '../customizables';
 import { ContentPage, FormButtonContainer, NavigateToFlowStartButton } from '../elements';
 import { LocalizationKey, localizationKeys } from '../localization';
 import { PropsOfComponent } from '../styledSystem';
@@ -34,6 +34,7 @@ export const SuccessPage = (props: SuccessPageProps) => {
           autoFocus
           //Do we need a separate key here?
           localizationKey={finishLabel || localizationKeys('userProfile.formButtonPrimary__finish')}
+          elementDescriptor={descriptors.formButtonPrimary}
           {...(onFinish ? { onClick: onFinish } : {})}
         />
       </FormButtonContainer>
