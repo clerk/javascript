@@ -277,38 +277,90 @@ export interface Clerk {
   navigate: CustomNavigation;
 
   /**
-   * Redirects to the configured sign in URL. Retrieved from {@link environment}.
+   *
+   * Decorates the provided url with the auth token for development instances.
+   *
+   * @param {string} to
+   */
+  buildUrlWithAuth(to: string): string;
+
+  /**
+   * Returns the configured url where <SignIn/> is mounted or a custom sign-in page is rendered.
+   *
+   * @param opts A {@link RedirectOptions} object
+   *
+   */
+  buildSignInUrl(opts?: RedirectOptions): string;
+
+  /**
+   * Returns the configured url where <SignUp/> is mounted or a custom sign-up page is rendered.
+   *
+   * @param opts A {@link RedirectOptions} object
+   *
+   */
+  buildSignUpUrl(opts?: RedirectOptions): string;
+
+  /**
+   * Returns the url where <UserProfile /> is mounted or a custom user-profile page is rendered.
+   */
+  buildUserProfileUrl(): string;
+
+  /**
+   * Returns the configured url where <CreateOrganization /> is mounted or a custom create-organization page is rendered.
+   */
+  buildCreateOrganizationUrl(): string;
+
+  /**
+   * Returns the configured url where <OrganizationProfile /> is mounted or a custom organization-profile page is rendered.
+   */
+  buildOrganizationProfileUrl(): string;
+
+  /**
+   * Returns the configured home URL of the instance.
+   */
+  buildHomeUrl(): string;
+
+  /**
+   *
+   * Redirects to the provided url after decorating it with the auth token for development instances.
+   *
+   * @param {string} to
+   */
+  redirectWithAuth(to: string): Promise<unknown>;
+
+  /**
+   * Redirects to the configured URL where <SignIn/> is mounted.
    *
    * @param opts A {@link RedirectOptions} object
    */
   redirectToSignIn(opts?: RedirectOptions): Promise<unknown>;
 
   /**
-   * Redirects to the configured sign up URL. Retrieved from {@link environment}.
+   * Redirects to the configured URL where <SignUp/> is mounted.
    *
    * @param opts A {@link RedirectOptions} object
    */
   redirectToSignUp(opts?: RedirectOptions): Promise<unknown>;
 
   /**
-   * Redirects to the configured user profile URL. Retrieved from {@link environment}.
+   * Redirects to the configured URL where <UserProfile/> is mounted.
    */
   redirectToUserProfile: () => void;
 
   /**
-   * Redirects to the configured home URL. Retrieved from {@link environment}.
-   */
-  redirectToHome: () => void;
-
-  /**
-   * Redirects to the configured URL where <OrganizationProfile /> is mounted. Retrieved from {@link environment}.
+   * Redirects to the configured URL where <OrganizationProfile /> is mounted.
    */
   redirectToOrganizationProfile: () => void;
 
   /**
-   * Redirects to the configured URL where <CreateOrganization /> is mounted. Retrieved from {@link environment}.
+   * Redirects to the configured URL where <CreateOrganization /> is mounted.
    */
   redirectToCreateOrganization: () => void;
+
+  /**
+   * Redirects to the configured home URL of the instance.
+   */
+  redirectToHome: () => void;
 
   /**
    * Completes an OAuth flow started by {@link Clerk.client.signIn.authenticateWithRedirect} or {@link Clerk.client.signUp.authenticateWithRedirect}
