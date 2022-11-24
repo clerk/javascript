@@ -4,6 +4,7 @@ import {
   EmailAddressJSON,
   EnvironmentJSON,
   OAuthProvider,
+  PhoneNumberJSON,
   SessionJSON,
   SignInJSON,
   SignUpJSON,
@@ -33,8 +34,9 @@ export const createClientFixtureHelpers = (baseClient: ClientJSON) => {
 };
 
 const createUserFixtureHelpers = (baseClient: ClientJSON) => {
-  type WithUserParams = Omit<Partial<UserJSON>, 'email_addresses'> & {
-    email_addresses: Array<string | Partial<EmailAddressJSON>>;
+  type WithUserParams = Omit<Partial<UserJSON>, 'email_addresses' | 'phone_numbers'> & {
+    email_addresses?: Array<string | Partial<EmailAddressJSON>>;
+    phone_numbers?: Array<string | Partial<PhoneNumberJSON>>;
   };
 
   const createEmail = (params?: Partial<EmailAddressJSON>): EmailAddressJSON => {
@@ -54,6 +56,23 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
     } as EmailAddressJSON;
   };
 
+  const createPhoneNumber = (params?: Partial<PhoneNumberJSON>): PhoneNumberJSON => {
+    return {
+      object: 'phone_number',
+      id: '',
+      phone_number: '+30 691 1111111',
+      reserved: false,
+      verification: {
+        status: 'verified',
+        strategy: 'phone_code',
+        attempts: null,
+        expire_at: 1635977979774,
+      },
+      linked_to: [],
+      ...params,
+    } as PhoneNumberJSON;
+  };
+
   const createUser = (params: WithUserParams): UserJSON => {
     const res = {
       object: 'user',
@@ -63,7 +82,6 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
       primary_web3_wallet_id: '',
       profile_image_url: '',
       username: 'testUsername',
-      phone_numbers: [],
       web3_wallets: [],
       external_accounts: [],
       organization_memberships: [],
@@ -83,6 +101,9 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
       ...params,
       email_addresses: (params.email_addresses || []).map(e =>
         typeof e === 'string' ? createEmail({ email_address: e }) : createEmail(),
+      ),
+      phone_numbers: (params.phone_numbers || []).map(n =>
+        typeof n === 'string' ? createPhoneNumber({ phone_number: n }) : createPhoneNumber(),
       ),
     } as any as UserJSON;
     res.primary_email_address_id = res.email_addresses[0]?.id;
@@ -170,7 +191,7 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
   };
 
   const startSignInFactorTwo = (params?: SignInFactorTwoParams) => {
-    const { identifier = '+306911111111', supportPhoneCode = true, supportTotp, supportBackupCode } = params || {};
+    const { identifier = '+30 691 1111111', supportPhoneCode = true, supportTotp, supportBackupCode } = params || {};
     baseClient.sign_in = {
       status: 'needs_second_factor',
       identifier,
