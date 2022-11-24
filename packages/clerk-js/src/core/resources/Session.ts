@@ -1,6 +1,13 @@
 import { deepSnakeToCamel } from '@clerk/shared';
-import type { ActJWTClaim, PublicUserData, SessionJSON, SessionResource, SessionStatus } from '@clerk/types';
-import { GetToken, GetTokenOptions, UserResource } from '@clerk/types/src';
+import type {
+  ActJWTClaim,
+  PublicUserData,
+  SessionJSON,
+  SessionResource,
+  SessionStatus,
+  TokenResource,
+} from '@clerk/types';
+import { GetToken, GetTokenOptions, UserResource } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { SessionTokenCache } from '../tokenCache';
@@ -12,7 +19,7 @@ export class Session extends BaseResource implements SessionResource {
   id!: string;
   status!: SessionStatus;
   lastActiveAt!: Date;
-  lastActiveToken!: Token | null;
+  lastActiveToken!: TokenResource | null;
   lastActiveOrganizationId!: string | null;
   actor!: ActJWTClaim | null;
   user!: UserResource | null;
