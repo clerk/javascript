@@ -19,11 +19,8 @@ interface TokenCacheValue {
 
 interface TokenCache {
   set(entry: TokenCacheEntry): void;
-
   get(cacheKeyJSON: TokenCacheKeyJSON, leeway?: number): TokenCacheEntry | undefined;
-
   clear(): void;
-
   size(): number;
 }
 
@@ -48,15 +45,15 @@ export class TokenCacheKey {
   }
 }
 
-export function MemoryTokenCache(prefix = KEY_PREFIX): TokenCache {
-  let cache: Record<string, TokenCacheValue> = {};
+const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
+  const cache = new Map<string, TokenCacheValue>();
 
   const size = () => {
-    return Object.keys(cache).length;
+    return cache.size;
   };
 
   const clear = () => {
-    cache = {};
+    cache.clear();
   };
 
   const set = (entry: TokenCacheEntry) => {
@@ -69,8 +66,8 @@ export function MemoryTokenCache(prefix = KEY_PREFIX): TokenCache {
     const value: TokenCacheValue = { entry };
 
     const deleteKey = () => {
-      if (cache[key] === value) {
-        delete cache[key];
+      if (cache.get(key) === value) {
+        cache.delete(key);
       }
     };
 
@@ -93,13 +90,12 @@ export function MemoryTokenCache(prefix = KEY_PREFIX): TokenCache {
         deleteKey();
       });
 
-    cache[key] = value;
+    cache.set(key, value);
   };
 
   const get = (cacheKeyJSON: TokenCacheKeyJSON, leeway = LEEWAY): TokenCacheEntry | undefined => {
     const cacheKey = new TokenCacheKey(prefix, cacheKeyJSON);
-    const key = cacheKey.toKey();
-    const value: TokenCacheValue = cache[key];
+    const value = cache.get(cacheKey.toKey());
 
     if (!value) {
       return;
@@ -109,7 +105,7 @@ export function MemoryTokenCache(prefix = KEY_PREFIX): TokenCache {
     const willExpireSoon = value.expiresAt && value.expiresAt - leeway < nowSeconds;
 
     if (willExpireSoon) {
-      delete cache[key];
+      cache.delete(cacheKey.toKey());
       return;
     }
 
@@ -117,6 +113,6 @@ export function MemoryTokenCache(prefix = KEY_PREFIX): TokenCache {
   };
 
   return { get, set, clear, size };
-}
+};
 
 export const SessionTokenCache = MemoryTokenCache();
