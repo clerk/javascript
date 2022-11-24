@@ -2,7 +2,7 @@ import { TOTPResource } from '@clerk/types';
 import React from 'react';
 
 import { useCoreUser } from '../../contexts';
-import { Col, localizationKeys } from '../../customizables';
+import { Col, descriptors, localizationKeys } from '../../customizables';
 import {
   ContentPage,
   FormButtonContainer,
@@ -68,7 +68,10 @@ export const VerifyTOTP = (props: VerifyTOTPProps) => {
       </Col>
 
       <FormButtonContainer sx={{ marginTop: 0 }}>
-        <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
+        <NavigateToFlowStartButton
+          localizationKey={localizationKeys('userProfile.formButtonReset')}
+          elementDescriptor={descriptors.formButtonReset}
+        />
       </FormButtonContainer>
     </ContentPage>
   );

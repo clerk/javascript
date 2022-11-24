@@ -2,7 +2,7 @@ import { BackupCodeResource } from '@clerk/types';
 import React from 'react';
 
 import { useCoreUser } from '../../contexts';
-import { localizationKeys, Text } from '../../customizables';
+import { descriptors, localizationKeys, Text } from '../../customizables';
 import {
   ContentPage,
   FormButtonContainer,
@@ -63,6 +63,7 @@ export const MfaBackupCodeCreatePage = () => {
               variant='solid'
               autoFocus
               localizationKey={localizationKeys('userProfile.formButtonPrimary__finish')}
+              elementDescriptor={descriptors.formButtonPrimary}
             />
           </FormButtonContainer>
         </>
