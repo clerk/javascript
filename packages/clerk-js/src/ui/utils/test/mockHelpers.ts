@@ -3,9 +3,13 @@ import { jest } from '@jest/globals';
 
 import { RouteContextValue } from '../../router';
 
-type DeepJestMocked<T> = T extends object
+type FunctionLike = (...args: any) => any;
+
+type DeepJestMocked<T> = T extends FunctionLike
+  ? jest.Mocked<T>
+  : T extends object
   ? {
-      [k in keyof T]: T[k] extends object ? jest.Mocked<T[k]> : T[k];
+      [k in keyof T]: DeepJestMocked<T[k]>;
     }
   : T;
 
@@ -24,6 +28,10 @@ export const mockClerkMethods = (clerk: LoadedClerk): DeepJestMocked<LoadedClerk
   mockMethodsOf(clerk);
   mockMethodsOf(clerk.client.signIn);
   mockMethodsOf(clerk.client.signUp);
+  clerk.client.sessions.forEach(session => {
+    mockMethodsOf(session);
+    mockMethodsOf(session.user);
+  });
   mockProp(clerk, 'navigate');
   mockProp(clerk, 'setActive');
   return clerk as any as DeepJestMocked<LoadedClerk>;

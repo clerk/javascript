@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useEnvironment } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
-import { Header } from '../../elements';
+import { CardAlert, Header, useCardState, withCardStateProvider } from '../../elements';
 import { NavbarMenuButtonRow } from '../../elements/Navbar';
 import { ActiveDevicesSection } from './ActiveDevicesSection';
 import { ConnectedAccountsSection } from './ConnectedAccountsSection';
@@ -15,8 +15,9 @@ import { UserProfileSection } from './UserProfileSection';
 import { getSecondFactors } from './utils';
 import { Web3Section } from './Web3Section';
 
-export const RootPage = () => {
+export const RootPage = withCardStateProvider(() => {
   const { attributes, social, instanceIsPasswordBased } = useEnvironment().userSettings;
+  const card = useCardState();
   const showUsername = attributes.username.enabled;
   const showEmail = attributes.email_address.enabled;
   const showPhone = attributes.phone_number.enabled;
@@ -31,6 +32,7 @@ export const RootPage = () => {
       gap={8}
     >
       <NavbarMenuButtonRow />
+      <CardAlert>{card.error}</CardAlert>
       <Col
         elementDescriptor={descriptors.profilePage}
         elementId={descriptors.profilePage.setId('account')}
@@ -69,4 +71,4 @@ export const RootPage = () => {
       </Col>
     </Col>
   );
-};
+});

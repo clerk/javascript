@@ -37,11 +37,11 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
     email_addresses: Array<string | Partial<EmailAddressJSON>>;
   };
 
-  const createEmail = (params: Partial<EmailAddressJSON>): EmailAddressJSON => {
+  const createEmail = (params?: Partial<EmailAddressJSON>): EmailAddressJSON => {
     return {
       object: 'email_address',
       id: '',
-      email_address: '',
+      email_address: 'test@clerk.dev',
       reserved: false,
       verification: {
         status: 'verified',
@@ -82,7 +82,7 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
       created_at: new Date().getTime(),
       ...params,
       email_addresses: (params.email_addresses || []).map(e =>
-        typeof e === 'string' ? () => createEmail({ email_address: e }) : createEmail,
+        typeof e === 'string' ? createEmail({ email_address: e }) : createEmail(),
       ),
     } as any as UserJSON;
     res.primary_email_address_id = res.email_addresses[0]?.id;
