@@ -77,6 +77,7 @@ const tsLoaderDev = {
     {
       loader: 'ts-loader',
       options: {
+        configFile: 'tsconfig.dev.json',
         transpileOnly: true,
         getCustomTransformers: () => ({
           before: [ReactRefreshTypeScript()],
