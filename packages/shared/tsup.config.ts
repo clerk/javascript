@@ -15,5 +15,6 @@ export default defineConfig(overrideOptions => {
     format: ['cjs', 'esm'],
     define: { PACKAGE_VERSION: `"${version}"`, __DEV__: `${!isProd}` },
     external: ['@testing-library', 'react', 'react-test-renderer', 'jest', 'jest-environment-jsdom', 'react-dom'],
+    legacyOutput: true,
   };
 });
