@@ -74,5 +74,28 @@ describe('RootPage', () => {
         expect(emailButton.closest('button')).not.toBeNull();
       });
     });
+
+    it('shows the phone numbers section with the phone numbers of the user and has appropriate buttons', async () => {
+      const numbers = ['+30 691 1111111', '+30 692 2222222'];
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withPhoneNumber();
+        f.withUser({
+          phone_numbers: numbers,
+          first_name: 'George',
+          last_name: 'Clerk',
+        });
+      });
+      fixtures.clerk.user!.getSessions.mockReturnValue(Promise.resolve([]));
+
+      render(<RootPage />, { wrapper });
+      screen.getByText(/Phone numbers/i);
+      const numberButtons: HTMLElement[] = [];
+      numbers.forEach(number => {
+        numberButtons.push(screen.getByText(number));
+      });
+      numberButtons.forEach(numberButton => {
+        expect(numberButton.closest('button')).not.toBeNull();
+      });
+    });
   });
 });
