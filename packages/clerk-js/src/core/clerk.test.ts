@@ -37,6 +37,9 @@ describe('Clerk singleton', () => {
     signInUrl: 'http://test.host/sign-in',
     signUpUrl: 'http://test.host/sign-up',
     userProfileUrl: 'http://test.host/user-profile',
+    homeUrl: 'http://test.host/home',
+    createOrganizationUrl: 'http://test.host/create-organization',
+    organizationProfileUrl: 'http://test.host/organization-profile',
   } as DisplayConfig;
 
   let mockWindowLocation;
@@ -102,7 +105,7 @@ describe('Clerk singleton', () => {
     mockNavigate = jest.fn((to: string) => Promise.resolve(to));
   });
 
-  describe('.redirectTo(SignUp|SignIn|UserProfile)', () => {
+  describe('.redirectTo(SignUp|SignIn|UserProfile|Home|CreateOrganization|OrganizationProfile)', () => {
     let sut: Clerk;
 
     beforeEach(async () => {
@@ -112,19 +115,34 @@ describe('Clerk singleton', () => {
       });
     });
 
-    it('redirects to signInUrl', () => {
-      sut.redirectToSignIn({ redirectUrl: 'https://www.example.com/' });
+    it('redirects to signInUrl', async () => {
+      await sut.redirectToSignIn({ redirectUrl: 'https://www.example.com/' });
       expect(mockNavigate).toHaveBeenCalledWith('/sign-in#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
     });
 
-    it('redirects to signUpUrl', () => {
-      sut.redirectToSignUp({ redirectUrl: 'https://www.example.com/' });
+    it('redirects to signUpUrl', async () => {
+      await sut.redirectToSignUp({ redirectUrl: 'https://www.example.com/' });
       expect(mockNavigate).toHaveBeenCalledWith('/sign-up#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
     });
 
-    it('redirects to userProfileUrl', () => {
-      sut.redirectToUserProfile();
+    it('redirects to userProfileUrl', async () => {
+      await sut.redirectToUserProfile();
       expect(mockNavigate).toHaveBeenCalledWith('/user-profile');
+    });
+
+    it('redirects to home', async () => {
+      await sut.redirectToHome();
+      expect(mockNavigate).toHaveBeenCalledWith('/home');
+    });
+
+    it('redirects to create organization', async () => {
+      await sut.redirectToCreateOrganization();
+      expect(mockNavigate).toHaveBeenCalledWith('/create-organization');
+    });
+
+    it('redirects to organization profile', async () => {
+      await sut.redirectToOrganizationProfile();
+      expect(mockNavigate).toHaveBeenCalledWith('/organization-profile');
     });
   });
 

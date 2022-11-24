@@ -8,7 +8,6 @@ import type {
   ClientResource,
   CreateOrganizationParams,
   CreateOrganizationProps,
-  DevSessionSyncMode,
   EnvironmentJSON,
   EnvironmentResource,
   HandleMagicLinkVerificationParams,
@@ -35,7 +34,6 @@ import type {
   UserProfileProps,
   UserResource,
 } from '@clerk/types';
-import { Instance } from '@popperjs/core';
 
 import packageJSON from '../../package.json';
 import type { ComponentControls, MountComponentRenderer } from '../ui';
@@ -58,7 +56,7 @@ import {
   windowNavigate,
 } from '../utils';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
-import { ERROR_CODES, DEV_BROWSER_SSO_JWT_PARAMETER } from './constants';
+import { DEV_BROWSER_SSO_JWT_PARAMETER, ERROR_CODES } from './constants';
 import createDevBrowserHandler, { DevBrowserHandler } from './devBrowserHandler';
 import {
   clerkErrorInitFailed,
@@ -543,56 +541,13 @@ export default class Clerk implements ClerkInterface {
     return await customNavigate(stripOrigin(toURL));
   };
 
-  public redirectToSignIn = async (options?: RedirectOptions): Promise<unknown> => {
-    const opts: RedirectOptions = {
-      ...options,
-      redirectUrl: options?.redirectUrl || window.location.href,
-    };
-    if (!this.#environment || !this.#environment.displayConfig) {
-      return;
-    }
-    const { signInUrl } = this.#environment.displayConfig;
-    const url = appendAsQueryParams(signInUrl, opts);
-    return this.redirectWithAuth(url);
-  };
-
-  public redirectToSignUp = async (options?: RedirectOptions): Promise<unknown> => {
-    const opts: RedirectOptions = {
-      ...options,
-      redirectUrl: options?.redirectUrl || window.location.href,
-    };
-    if (!this.#environment || !this.#environment.displayConfig) {
-      return;
-    }
-    const { signUpUrl } = this.#environment.displayConfig;
-    const url = appendAsQueryParams(signUpUrl, opts);
-    return this.redirectWithAuth(url);
-  };
-
-  public redirectToUserProfile = async (): Promise<unknown> => {
-    if (!this.#environment || !this.#environment.displayConfig) {
-      return;
-    }
-    return this.redirectWithAuth(this.#environment.displayConfig.userProfileUrl);
-  };
-
-  public redirectToHome = async (): Promise<unknown> => {
-    if (!this.#environment || !this.#environment.displayConfig) {
-      return;
-    }
-    return this.redirectWithAuth(this.#environment.displayConfig.homeUrl);
-  };
-
-  public redirectWithAuth = async (to: string): Promise<unknown> => {
-    if (!inBrowser()) {
-      return;
-    }
-
+  public buildUrlWithAuth(to: string): string {
     if (this.#instanceType === 'production' || this.#options.__experimental__devSessionSyncMode === 'cookie') {
-      return this.navigate(to);
+      return to;
     }
 
     const toURL = new URL(to, window.location.href);
+
     if (toURL.origin !== window.location.origin) {
       const devBrowserJwt = this.#devBrowserHandler?.getDevBrowserJWT();
       if (!devBrowserJwt) {
@@ -606,21 +561,101 @@ export default class Clerk implements ClerkInterface {
       });
     }
 
-    return this.navigate(toURL.href);
+    return toURL.href;
+  }
+
+  public buildSignInUrl(options?: RedirectOptions): string {
+    const opts: RedirectOptions = {
+      ...options,
+      redirectUrl: options?.redirectUrl || window.location.href,
+    };
+    if (!this.#environment || !this.#environment.displayConfig) {
+      return '';
+    }
+    const { signInUrl } = this.#environment.displayConfig;
+    return this.buildUrlWithAuth(appendAsQueryParams(signInUrl, opts));
+  }
+
+  public buildSignUpUrl(options?: RedirectOptions): string {
+    const opts: RedirectOptions = {
+      ...options,
+      redirectUrl: options?.redirectUrl || window.location.href,
+    };
+    if (!this.#environment || !this.#environment.displayConfig) {
+      return '';
+    }
+    const { signUpUrl } = this.#environment.displayConfig;
+    return this.buildUrlWithAuth(appendAsQueryParams(signUpUrl, opts));
+  }
+
+  public buildUserProfileUrl(): string {
+    if (!this.#environment || !this.#environment.displayConfig) {
+      return '';
+    }
+    return this.buildUrlWithAuth(this.#environment.displayConfig.userProfileUrl);
+  }
+
+  public buildHomeUrl(): string {
+    if (!this.#environment || !this.#environment.displayConfig) {
+      return '';
+    }
+    return this.buildUrlWithAuth(this.#environment.displayConfig.homeUrl);
+  }
+
+  public buildCreateOrganizationUrl(): string {
+    if (!this.#environment || !this.#environment.displayConfig) {
+      return '';
+    }
+    return this.buildUrlWithAuth(this.#environment.displayConfig.createOrganizationUrl);
+  }
+
+  public buildOrganizationProfileUrl(): string {
+    if (!this.#environment || !this.#environment.displayConfig) {
+      return '';
+    }
+    return this.buildUrlWithAuth(this.#environment.displayConfig.organizationProfileUrl);
+  }
+
+  public redirectWithAuth = async (to: string): Promise<unknown> => {
+    if (inBrowser()) {
+      return this.navigate(this.buildUrlWithAuth(to));
+    }
   };
 
-  public redirectToOrganizationProfile = async (): Promise<unknown> => {
-    if (!this.#environment || !this.#environment.displayConfig) {
-      return;
+  public redirectToSignIn = async (options?: RedirectOptions): Promise<unknown> => {
+    if (inBrowser()) {
+      return this.navigate(this.buildSignInUrl(options));
     }
-    return this.navigate(this.#environment.displayConfig.organizationProfileUrl);
+  };
+
+  public redirectToSignUp = async (options?: RedirectOptions): Promise<unknown> => {
+    if (inBrowser()) {
+      return this.navigate(this.buildSignUpUrl(options));
+    }
+  };
+
+  public redirectToUserProfile = async (): Promise<unknown> => {
+    if (inBrowser()) {
+      return this.navigate(this.buildUserProfileUrl());
+    }
   };
 
   public redirectToCreateOrganization = async (): Promise<unknown> => {
-    if (!this.#environment || !this.#environment.displayConfig) {
-      return;
+    if (inBrowser()) {
+      return this.navigate(this.buildCreateOrganizationUrl());
     }
-    return this.navigate(this.#environment.displayConfig.createOrganizationUrl);
+  };
+
+  public redirectToOrganizationProfile = async (): Promise<unknown> => {
+    if (inBrowser()) {
+      return this.navigate(this.buildOrganizationProfileUrl());
+    }
+  };
+
+  public redirectToHome = async (): Promise<unknown> => {
+    if (inBrowser()) {
+      return this.navigate(this.buildHomeUrl());
+    }
   };
 
   public handleMagicLinkVerification = async (
