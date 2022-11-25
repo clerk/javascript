@@ -27,7 +27,6 @@ const setWindowQueryParams = (params: Array<[string, string]>) => {
 };
 
 describe('Clerk singleton', () => {
-  const { location } = window;
   // Use a FAPI value for local production instances to avoid triggering the devInit flow during testing
   const frontendApi = 'clerk.abcef.12345.prod.lclclerk.com';
 
@@ -43,7 +42,6 @@ describe('Clerk singleton', () => {
   } as DisplayConfig;
 
   let mockWindowLocation;
-  let mockWindowDocument;
   let mockHref: jest.Mock;
 
   beforeEach(() => {
@@ -103,47 +101,6 @@ describe('Clerk singleton', () => {
     );
 
     mockNavigate = jest.fn((to: string) => Promise.resolve(to));
-  });
-
-  describe('.redirectTo(SignUp|SignIn|UserProfile|Home|CreateOrganization|OrganizationProfile)', () => {
-    let sut: Clerk;
-
-    beforeEach(async () => {
-      sut = new Clerk(frontendApi);
-      await sut.load({
-        navigate: mockNavigate,
-      });
-    });
-
-    it('redirects to signInUrl', async () => {
-      await sut.redirectToSignIn({ redirectUrl: 'https://www.example.com/' });
-      expect(mockNavigate).toHaveBeenCalledWith('/sign-in#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
-    });
-
-    it('redirects to signUpUrl', async () => {
-      await sut.redirectToSignUp({ redirectUrl: 'https://www.example.com/' });
-      expect(mockNavigate).toHaveBeenCalledWith('/sign-up#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
-    });
-
-    it('redirects to userProfileUrl', async () => {
-      await sut.redirectToUserProfile();
-      expect(mockNavigate).toHaveBeenCalledWith('/user-profile');
-    });
-
-    it('redirects to home', async () => {
-      await sut.redirectToHome();
-      expect(mockNavigate).toHaveBeenCalledWith('/home');
-    });
-
-    it('redirects to create organization', async () => {
-      await sut.redirectToCreateOrganization();
-      expect(mockNavigate).toHaveBeenCalledWith('/create-organization');
-    });
-
-    it('redirects to organization profile', async () => {
-      await sut.redirectToOrganizationProfile();
-      expect(mockNavigate).toHaveBeenCalledWith('/organization-profile');
-    });
   });
 
   describe('.setActive', () => {
