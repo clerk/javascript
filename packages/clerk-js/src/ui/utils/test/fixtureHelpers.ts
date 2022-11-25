@@ -11,7 +11,6 @@ import {
   SignUpJSON,
   UserJSON,
   UserSettingsJSON,
-  VerificationJSON,
 } from '@clerk/types';
 import { PublicUserDataJSON } from '@clerk/types/src';
 

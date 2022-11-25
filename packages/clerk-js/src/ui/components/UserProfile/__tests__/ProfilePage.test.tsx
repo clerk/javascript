@@ -21,7 +21,7 @@ describe('ProfilePage', () => {
     });
     render(<ProfilePage />, { wrapper });
 
-    screen.getAllByText(/Update Profile/i);
+    screen.getByRole('heading', { name: /Update Profile/i });
   });
   describe('First and last name', () => {
     it('first and last name inputs exists if name is enabled', async () => {
