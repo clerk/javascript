@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.17.0-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.17.0-staging.0...@clerk/clerk-js@4.17.0-staging.1) (2022-11-25)
+
+### Bug Fixes
+
+- **clerk-js:** Ensure #/ prefix for hashes ([0243403](https://github.com/clerkinc/javascript/commit/0243403f9ff71bf1da164b1a4f5019d63445fdde))
+
 ### [4.16.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.16.2-staging.0...@clerk/clerk-js@4.16.2) (2022-11-25)
 
 **Note:** Version bump only for package @clerk/clerk-js
