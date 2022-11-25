@@ -23,6 +23,7 @@ describe('ProfilePage', () => {
 
     screen.getByRole('heading', { name: /Update Profile/i });
   });
+
   describe('First and last name', () => {
     it('first and last name inputs exists if name is enabled', async () => {
       const { wrapper } = await createFixtures(f => {
