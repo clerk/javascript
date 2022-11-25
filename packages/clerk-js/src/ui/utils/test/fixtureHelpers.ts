@@ -13,6 +13,7 @@ import {
   UserSettingsJSON,
 } from '@clerk/types';
 import { PublicUserDataJSON } from '@clerk/types/src';
+import { access } from 'fs';
 
 import { createUserFixture } from './fixtures';
 
