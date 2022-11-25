@@ -4,7 +4,7 @@ import { waitFor } from '@testing-library/dom';
 import React from 'react';
 
 import { ClerkAPIResponseError } from '../../../../core/resources';
-import { act, bindCreateFixtures, render, screen } from '../../../../testUtils';
+import { act, bindCreateFixtures, render, runFakeTimers, screen } from '../../../../testUtils';
 import { SignInFactorOne } from '../SignInFactorOne';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
@@ -81,10 +81,13 @@ describe('SignInFactorOne', () => {
       fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(
         Promise.resolve({ status: 'needs_second_factor' } as SignInResource),
       );
-      const { userEvent } = render(<SignInFactorOne />, { wrapper });
-      await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-      // VerificationCodeCard line 42, sleeps for 750
-      await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('../factor-two'));
+      await runFakeTimers(async timers => {
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+
+        await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+        timers.runOnlyPendingTimers();
+        await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('../factor-two'));
+      });
     });
 
     it('sets an active session when user submits first factor successfully and second factor does not exist', async () => {
@@ -95,10 +98,15 @@ describe('SignInFactorOne', () => {
       });
       fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
       fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(Promise.resolve({ status: 'complete' } as SignInResource));
-      const { userEvent } = render(<SignInFactorOne />, { wrapper });
-      await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-      // VerificationCodeCard line 42, sleeps for 750
-      await waitFor(() => expect(fixtures.clerk.setActive).toHaveBeenCalled());
+      await runFakeTimers(async timers => {
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+
+        await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+        timers.runOnlyPendingTimers();
+        await waitFor(() => {
+          expect(fixtures.clerk.setActive).toHaveBeenCalled();
+        });
+      });
     });
   });
 

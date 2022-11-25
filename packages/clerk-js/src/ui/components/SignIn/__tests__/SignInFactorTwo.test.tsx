@@ -36,7 +36,7 @@ describe('SignInFactorTwo', () => {
       expect(inputs.length).toBe(6);
     });
 
-    it('sets an active session when user submits second factor successfully', async () => {
+    it.only('sets an active session when user submits second factor successfully', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.startSignInFactorTwo();
       });
@@ -44,11 +44,14 @@ describe('SignInFactorTwo', () => {
       fixtures.signIn.attemptSecondFactor.mockReturnValueOnce(
         Promise.resolve({ status: 'complete' } as SignInResource),
       );
-      const { userEvent } = render(<SignInFactorTwo />, { wrapper });
+      await runFakeTimers(async timers => {
+        const { userEvent } = render(<SignInFactorTwo />, { wrapper });
 
-      await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-      await waitFor(() => {
-        expect(fixtures.clerk.setActive).toBeCalled();
+        await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+        timers.runOnlyPendingTimers();
+        await waitFor(() => {
+          expect(fixtures.clerk.setActive).toHaveBeenCalled();
+        });
       });
     });
   });
