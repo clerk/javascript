@@ -9,12 +9,13 @@ import {
   FullHeightLoader,
   NavigateToFlowStartButton,
   useCardState,
+  withCardStateProvider,
 } from '../../elements';
 import { handleError } from '../../utils';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
-export const MfaBackupCodeCreatePage = () => {
+export const MfaBackupCodeCreatePage = withCardStateProvider(() => {
   const user = useCoreUser();
   const card = useCardState();
   const [backupCode, setBackupCode] = React.useState<BackupCodeResource | undefined>(undefined);
@@ -70,4 +71,4 @@ export const MfaBackupCodeCreatePage = () => {
       )}
     </ContentPage>
   );
-};
+});
