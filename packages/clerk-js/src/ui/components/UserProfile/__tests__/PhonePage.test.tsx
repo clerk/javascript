@@ -6,24 +6,20 @@ import { PhonePage } from '../PhonePage';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
 
-const defaultFixtures = f => {
+const initConfig = createFixtures.config(f => {
   f.withPhoneNumber();
   f.withUser({ email_addresses: ['test@clerk.dev'] });
-};
+});
 
 describe('PhonePage', () => {
   it('renders the component', async () => {
-    const { wrapper } = await createFixtures(f => {
-      defaultFixtures(f);
-    });
+    const { wrapper } = await createFixtures(initConfig);
 
     render(<PhonePage />, { wrapper });
   });
 
   it('shows the title', async () => {
-    const { wrapper } = await createFixtures(f => {
-      defaultFixtures(f);
-    });
+    const { wrapper } = await createFixtures(initConfig);
 
     render(<PhonePage />, { wrapper });
 
@@ -32,9 +28,7 @@ describe('PhonePage', () => {
 
   describe('Inputs', () => {
     it('shows the input field for the new phone number', async () => {
-      const { wrapper } = await createFixtures(f => {
-        defaultFixtures(f);
-      });
+      const { wrapper } = await createFixtures(initConfig);
 
       render(<PhonePage />, { wrapper });
 
@@ -44,9 +38,7 @@ describe('PhonePage', () => {
 
   describe('Form buttons', () => {
     it('navigates to the root page upon pressing cancel', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        defaultFixtures(f);
-      });
+      const { wrapper, fixtures } = await createFixtures(initConfig);
 
       const { userEvent } = render(<PhonePage />, { wrapper });
 
@@ -55,18 +47,14 @@ describe('PhonePage', () => {
     });
 
     it('continue button is disabled by default', async () => {
-      const { wrapper } = await createFixtures(f => {
-        defaultFixtures(f);
-      });
+      const { wrapper } = await createFixtures(initConfig);
       render(<PhonePage />, { wrapper });
 
       expect(screen.getByText(/continue/i, { exact: false }).closest('button')).toHaveAttribute('disabled');
     });
 
     it('calls the appropriate function if continue is pressed', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        defaultFixtures(f);
-      });
+      const { wrapper, fixtures } = await createFixtures(initConfig);
       fixtures.clerk.user!.createPhoneNumber.mockReturnValueOnce(Promise.resolve({} as any));
       const { userEvent } = render(<PhonePage />, { wrapper });
 

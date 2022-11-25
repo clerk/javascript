@@ -6,25 +6,21 @@ import { RemoveEmailPage } from '../RemoveResourcePage';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
 
-const defaultFixtures = f => {
+const initConfig = createFixtures.config(f => {
   f.withEmailAddress();
   f.withUser({ email_addresses: [{ email_address: 'test@clerk.dev', id: 'id' }] });
-};
+});
 
 describe('RemoveEmailPage', () => {
   it('renders the component', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
-      defaultFixtures(f);
-    });
+    const { wrapper, fixtures } = await createFixtures(initConfig);
 
     fixtures.router.params.id = 'id';
     render(<RemoveEmailPage />, { wrapper });
   });
 
   it('shows the title', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
-      defaultFixtures(f);
-    });
+    const { wrapper, fixtures } = await createFixtures(initConfig);
 
     fixtures.router.params.id = 'id';
     render(<RemoveEmailPage />, { wrapper });
@@ -34,9 +30,7 @@ describe('RemoveEmailPage', () => {
 
   describe('User information', () => {
     it('references the email of the user in the message', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        defaultFixtures(f);
-      });
+      const { wrapper, fixtures } = await createFixtures(initConfig);
 
       fixtures.router.params.id = 'id';
       render(<RemoveEmailPage />, { wrapper });
@@ -47,9 +41,7 @@ describe('RemoveEmailPage', () => {
 
   describe('Form buttons', () => {
     it('navigates to the previous page when pressing cancel', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        defaultFixtures(f);
-      });
+      const { wrapper, fixtures } = await createFixtures(initConfig);
 
       fixtures.router.params.id = 'id';
       const { userEvent } = render(<RemoveEmailPage />, { wrapper });
@@ -59,9 +51,7 @@ describe('RemoveEmailPage', () => {
     });
 
     it('calls the appropriate function upon pressing continue', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        defaultFixtures(f);
-      });
+      const { wrapper, fixtures } = await createFixtures(initConfig);
 
       fixtures.router.params.id = 'id';
       //@ts-expect-error

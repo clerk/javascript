@@ -7,15 +7,13 @@ import { MfaBackupCodeCreatePage } from '../MfaBackupCodeCreatePage';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
 
-const defaultFixtures = f => {
+const initConfig = createFixtures.config(f => {
   f.withUser({ email_addresses: ['test@clerk.dev'] });
-};
+});
 
 describe('MfaBackupCodeCreatePage', () => {
   it('renders the component', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
-      defaultFixtures(f);
-    });
+    const { wrapper, fixtures } = await createFixtures(initConfig);
 
     fixtures.clerk.user?.createBackupCode.mockResolvedValueOnce({} as BackupCodeResource);
     render(<MfaBackupCodeCreatePage />, { wrapper });
@@ -24,9 +22,7 @@ describe('MfaBackupCodeCreatePage', () => {
   });
 
   it('shows the title', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
-      defaultFixtures(f);
-    });
+    const { wrapper, fixtures } = await createFixtures(initConfig);
 
     fixtures.clerk.user?.createBackupCode.mockResolvedValueOnce({} as BackupCodeResource);
     render(<MfaBackupCodeCreatePage />, { wrapper });
@@ -38,9 +34,7 @@ describe('MfaBackupCodeCreatePage', () => {
 
   describe('Form buttons', () => {
     it('navigates to the root page when pressing finish', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        defaultFixtures(f);
-      });
+      const { wrapper, fixtures } = await createFixtures(initConfig);
 
       fixtures.clerk.user?.createBackupCode.mockResolvedValueOnce({} as BackupCodeResource);
       const { userEvent } = render(<MfaBackupCodeCreatePage />, { wrapper });
