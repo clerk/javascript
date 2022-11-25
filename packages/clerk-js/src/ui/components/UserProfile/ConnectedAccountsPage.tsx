@@ -16,7 +16,6 @@ import {
 import { useEnabledThirdPartyProviders, useNavigate } from '../../hooks';
 import { useRouter } from '../../router';
 import { handleError, sleep } from '../../utils';
-import { OrganizationProfileBreadcrumbs } from '../OrganizationProfile/OrganizationProfileNavbar';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 export const ConnectedAccountsPage = withCardStateProvider(() => {
