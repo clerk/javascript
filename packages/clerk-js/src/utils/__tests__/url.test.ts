@@ -310,10 +310,13 @@ describe('getSearchParameterFromHash(options)', () => {
 
 describe('setSearchParameterInHash(options)', () => {
   const testCases: Array<[string, string, string, string]> = [
-    ['#a-hash', 'foo', '42', 'a-hash?foo=42'],
-    ['a-hash', 'foo', '', 'a-hash?foo='],
-    ['#a-hash?foo=42', 'bar', '84', 'a-hash?foo=42&bar=84'],
-    ['#a-hash?foo=42', 'foo', '84', 'a-hash?foo=84'],
+    ['', 'foo', '42', '/?foo=42'],
+    ['#', 'foo', '42', '/?foo=42'],
+    ['#a-hash', 'foo', '42', '/a-hash?foo=42'],
+    ['a-hash', 'foo', '', '/a-hash?foo='],
+    ['#a-hash?foo=42', 'bar', '84', '/a-hash?foo=42&bar=84'],
+    ['#a-hash?foo=42', 'foo', '84', '/a-hash?foo=84'],
+    ['#/a-hash?foo=42', 'foo', '84', '/a-hash?foo=84'],
   ];
 
   test.each(testCases)(
@@ -332,10 +335,10 @@ describe('setSearchParameterInHash(options)', () => {
 
 describe('removeSearchParameterFromHash(options)', () => {
   const testCases: Array<[string, string, string | null]> = [
-    ['#random-hash', 'foo', 'random-hash'],
-    ['random-hash', 'foo', 'random-hash'],
-    ['#random-hash?foo=42', 'foo', 'random-hash'],
-    ['random-hash?foo=42&bar=84', 'bar', 'random-hash?foo=42'],
+    ['#random-hash', 'foo', '/random-hash'],
+    ['random-hash', 'foo', '/random-hash'],
+    ['#random-hash?foo=42', 'foo', '/random-hash'],
+    ['random-hash?foo=42&bar=84', 'bar', '/random-hash?foo=42'],
   ];
 
   test.each(testCases)('hash=(%s), paramName=(%s), expected value=(%s)', (hash, paramName, expectedParamValue) => {

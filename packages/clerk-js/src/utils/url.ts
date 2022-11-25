@@ -224,6 +224,10 @@ export const appendAsQueryParams = (
     const sameOrigin = base.origin === url.origin;
     params.append(camelToSnake(key), sameOrigin ? stripOrigin(url) : url + '');
   }
+
+  // The following line will prepend the hash with a `/`.
+  // This is required for ClerkJS Components Hash router to work as expected
+  // as it treats the hash as sub-path with its nested querystring parameters.
   return base + (params.toString() ? '#/?' + params.toString() : '');
 };
 
@@ -256,7 +260,11 @@ export function setSearchParameterInHash({
   const h = hash.startsWith('#') ? hash.substring(1) : hash;
   const dummyUrlForHash = new URL(h, DUMMY_URL_BASE);
   dummyUrlForHash.searchParams.set(paramName, paramValue);
-  return dummyUrlForHash.href.replace(DUMMY_URL_BASE, '').replace('/', '');
+
+  // The following line will prepend the hash with a `/`.
+  // This is required for ClerkJS Components Hash router to work as expected
+  // as it treats the hash as sub-path with its nested querystring parameters.
+  return dummyUrlForHash.href.replace(DUMMY_URL_BASE, '');
 }
 
 export function removeSearchParameterFromHash({
@@ -269,5 +277,9 @@ export function removeSearchParameterFromHash({
   const h = hash.startsWith('#') ? hash.substring(1) : hash;
   const dummyUrlForHash = new URL(h, DUMMY_URL_BASE);
   dummyUrlForHash.searchParams.delete(paramName);
-  return dummyUrlForHash.href.replace(DUMMY_URL_BASE, '').replace('/', '');
+
+  // The following line will prepend the hash with a `/`.
+  // This is required for ClerkJS Components Hash router to work as expected
+  // as it treats the hash as sub-path with its nested querystring parameters.
+  return dummyUrlForHash.href.replace(DUMMY_URL_BASE, '');
 }
