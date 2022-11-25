@@ -6,24 +6,20 @@ import { RemoveMfaPhoneCodePage } from '../RemoveResourcePage';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
 
-const defaultFixtures = f => {
+const initConfig = createFixtures.config(f => {
   f.withPhoneNumber();
   f.withUser({ phone_numbers: [{ phone_number: '+306911111111', id: 'id' }] });
-};
+});
 
 describe('RemoveMfaPhoneCodePage', () => {
   it('renders the component', async () => {
-    const { wrapper } = await createFixtures(f => {
-      defaultFixtures(f);
-    });
+    const { wrapper } = await createFixtures(initConfig);
 
     render(<RemoveMfaPhoneCodePage />, { wrapper });
   });
 
   it('shows the title and phone number', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
-      defaultFixtures(f);
-    });
+    const { wrapper, fixtures } = await createFixtures(initConfig);
 
     fixtures.router.params.id = 'id';
     render(<RemoveMfaPhoneCodePage />, { wrapper });
@@ -34,9 +30,7 @@ describe('RemoveMfaPhoneCodePage', () => {
 
   describe('Form buttons', () => {
     it('navigates to the previous page when pressing cancel', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        defaultFixtures(f);
-      });
+      const { wrapper, fixtures } = await createFixtures(initConfig);
 
       fixtures.router.params.id = 'id';
       const { userEvent } = render(<RemoveMfaPhoneCodePage />, { wrapper });
@@ -46,9 +40,7 @@ describe('RemoveMfaPhoneCodePage', () => {
     });
 
     it('calls the appropriate function upon pressing continue', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        defaultFixtures(f);
-      });
+      const { wrapper, fixtures } = await createFixtures(initConfig);
 
       fixtures.router.params.id = 'id';
       //@ts-expect-error

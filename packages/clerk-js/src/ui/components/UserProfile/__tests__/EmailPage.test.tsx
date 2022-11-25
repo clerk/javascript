@@ -6,24 +6,20 @@ import { EmailPage } from '../EmailPage';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
 
-const defaultFixtures = f => {
+const initConfig = createFixtures.config(f => {
   f.withEmailAddress();
   f.withUser({ email_addresses: [{ email_address: 'test@clerk.dev' }] });
-};
+});
 
 describe('EmailPage', () => {
   it('renders the component', async () => {
-    const { wrapper } = await createFixtures(f => {
-      defaultFixtures(f);
-    });
+    const { wrapper } = await createFixtures(initConfig);
 
     render(<EmailPage />, { wrapper });
   });
 
   it('shows the title', async () => {
-    const { wrapper } = await createFixtures(f => {
-      defaultFixtures(f);
-    });
+    const { wrapper } = await createFixtures(initConfig);
 
     render(<EmailPage />, { wrapper });
 
@@ -32,9 +28,7 @@ describe('EmailPage', () => {
 
   describe('Inputs', () => {
     it('shows the input field for the new email address', async () => {
-      const { wrapper } = await createFixtures(f => {
-        defaultFixtures(f);
-      });
+      const { wrapper } = await createFixtures(initConfig);
 
       render(<EmailPage />, { wrapper });
 
@@ -44,9 +38,7 @@ describe('EmailPage', () => {
 
   describe('Form buttons', () => {
     it('navigates to the root page upon pressing cancel', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        defaultFixtures(f);
-      });
+      const { wrapper, fixtures } = await createFixtures(initConfig);
 
       const { userEvent } = render(<EmailPage />, { wrapper });
 
@@ -55,18 +47,14 @@ describe('EmailPage', () => {
     });
 
     it('continue button is disabled by default', async () => {
-      const { wrapper } = await createFixtures(f => {
-        defaultFixtures(f);
-      });
+      const { wrapper } = await createFixtures(initConfig);
       render(<EmailPage />, { wrapper });
 
       expect(screen.getByText(/continue/i, { exact: false }).closest('button')).toHaveAttribute('disabled');
     });
 
     it('calls the appropriate function if continue is pressed', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        defaultFixtures(f);
-      });
+      const { wrapper, fixtures } = await createFixtures(initConfig);
       fixtures.clerk.user!.createEmailAddress.mockReturnValueOnce(Promise.resolve({} as any));
       const { userEvent } = render(<EmailPage />, { wrapper });
 
