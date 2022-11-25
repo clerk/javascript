@@ -13,11 +13,10 @@ const defaultFixtures = f => {
 
 describe('RemoveMfaTOTPPAge', () => {
   it('renders the component', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
+    const { wrapper } = await createFixtures(f => {
       defaultFixtures(f);
     });
 
-    fixtures.router.params.id = 'id';
     render(<RemoveMfaTOTPPage />, { wrapper });
   });
 
