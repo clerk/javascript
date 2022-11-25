@@ -23,7 +23,7 @@ describe('UsernamePage', () => {
 
     render(<UsernamePage />, { wrapper });
 
-    screen.getByRole('heading', { name: 'Update username' });
+    screen.getByRole('heading', { name: /Update username/i });
   });
 
   describe('Actions', () => {
