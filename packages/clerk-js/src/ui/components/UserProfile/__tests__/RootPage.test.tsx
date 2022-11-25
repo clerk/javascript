@@ -109,7 +109,7 @@ describe('RootPage', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withSocialProvider({ provider: 'google' });
         f.withUser({
-          external_accounts: ['google'],
+          external_accounts: [{ provider: 'google', email_address: 'testgoogle@clerk.dev' }],
           first_name: 'George',
           last_name: 'Clerk',
         });
@@ -119,6 +119,7 @@ describe('RootPage', () => {
       render(<RootPage />, { wrapper });
       await waitFor(() => expect(fixtures.clerk.user?.getSessions).toHaveBeenCalled());
       screen.getByText(/Connected Accounts/i);
+      screen.getByText(/testgoogle@clerk.dev/i);
       const externalAccountButton = screen.getByText(/google/i);
       expect(externalAccountButton.closest('button')).not.toBeNull();
     });
@@ -158,6 +159,10 @@ describe('RootPage', () => {
       render(<RootPage />, { wrapper });
       await waitFor(() => expect(fixtures.clerk.user?.getSessions).toHaveBeenCalled());
       screen.getByText(/Active Devices/i);
+      expect(await screen.findByText(/Chrome/i)).toBeInTheDocument();
+      screen.getByText(/107.0.0.0/i);
+      screen.getByText(/Athens/i);
+      screen.getByText(/Greece/i);
       const externalAccountButton = await screen.findByText(/Macintosh/i);
       expect(externalAccountButton.closest('button')).not.toBeNull();
     });
