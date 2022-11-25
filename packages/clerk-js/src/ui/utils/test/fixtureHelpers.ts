@@ -3,6 +3,7 @@ import {
   DisplayConfigJSON,
   EmailAddressJSON,
   EnvironmentJSON,
+  ExternalAccountJSON,
   OAuthProvider,
   PhoneNumberJSON,
   SessionJSON,
@@ -10,6 +11,7 @@ import {
   SignUpJSON,
   UserJSON,
   UserSettingsJSON,
+  VerificationJSON,
 } from '@clerk/types';
 import { PublicUserDataJSON } from '@clerk/types/src';
 
@@ -34,9 +36,10 @@ export const createClientFixtureHelpers = (baseClient: ClientJSON) => {
 };
 
 const createUserFixtureHelpers = (baseClient: ClientJSON) => {
-  type WithUserParams = Omit<Partial<UserJSON>, 'email_addresses' | 'phone_numbers'> & {
+  type WithUserParams = Omit<Partial<UserJSON>, 'email_addresses' | 'phone_numbers' | 'external_accounts'> & {
     email_addresses?: Array<string | Partial<EmailAddressJSON>>;
     phone_numbers?: Array<string | Partial<PhoneNumberJSON>>;
+    external_accounts?: Array<OAuthProvider | Partial<ExternalAccountJSON>>;
   };
 
   const createEmail = (params?: Partial<EmailAddressJSON>): EmailAddressJSON => {
@@ -73,6 +76,29 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
     } as PhoneNumberJSON;
   };
 
+  const createExternalAccount = (params?: Partial<ExternalAccountJSON>): ExternalAccountJSON => {
+    return {
+      id: 'test_id',
+      object: 'external_account',
+      provider: 'google',
+      identification_id: '98675202',
+      provider_user_id: '3232',
+      approved_scopes: '',
+      email_address: 'test@clerk.dev',
+      first_name: 'First name',
+      last_name: 'Last name',
+      avatar_url: '',
+      username: 'ewfwefew',
+      verification: {
+        status: 'verified',
+        strategy: '',
+        attempts: null,
+        expire_at: 1635977979774,
+      },
+      ...params,
+    } as ExternalAccountJSON;
+  };
+
   const createUser = (params: WithUserParams): UserJSON => {
     const res = {
       object: 'user',
@@ -83,7 +109,6 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
       profile_image_url: '',
       username: 'testUsername',
       web3_wallets: [],
-      external_accounts: [],
       organization_memberships: [],
       password: '',
       profile_image_id: '',
@@ -104,6 +129,9 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
       ),
       phone_numbers: (params.phone_numbers || []).map(n =>
         typeof n === 'string' ? createPhoneNumber({ phone_number: n }) : createPhoneNumber(),
+      ),
+      external_accounts: (params.external_accounts || []).map(p =>
+        typeof p === 'string' ? createExternalAccount({ provider: p }) : createExternalAccount(),
       ),
     } as any as UserJSON;
     res.primary_email_address_id = res.email_addresses[0]?.id;
