@@ -45,7 +45,7 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
   const createEmail = (params?: Partial<EmailAddressJSON>): EmailAddressJSON => {
     return {
       object: 'email_address',
-      id: '',
+      id: params?.email_address || '',
       email_address: 'test@clerk.dev',
       reserved: false,
       verification: {
@@ -62,7 +62,7 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
   const createPhoneNumber = (params?: Partial<PhoneNumberJSON>): PhoneNumberJSON => {
     return {
       object: 'phone_number',
-      id: '',
+      id: params?.phone_number || '',
       phone_number: '+30 691 1111111',
       reserved: false,
       verification: {
@@ -78,7 +78,7 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
 
   const createExternalAccount = (params?: Partial<ExternalAccountJSON>): ExternalAccountJSON => {
     return {
-      id: 'test_id',
+      id: params?.provider || '',
       object: 'external_account',
       provider: 'google',
       identification_id: '98675202',
@@ -88,7 +88,7 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
       first_name: 'First name',
       last_name: 'Last name',
       avatar_url: '',
-      username: 'ewfwefew',
+      username: '',
       verification: {
         status: 'verified',
         strategy: '',
@@ -125,13 +125,13 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
       created_at: new Date().getTime(),
       ...params,
       email_addresses: (params.email_addresses || []).map(e =>
-        typeof e === 'string' ? createEmail({ email_address: e }) : createEmail(),
+        typeof e === 'string' ? createEmail({ email_address: e }) : createEmail(e),
       ),
       phone_numbers: (params.phone_numbers || []).map(n =>
-        typeof n === 'string' ? createPhoneNumber({ phone_number: n }) : createPhoneNumber(),
+        typeof n === 'string' ? createPhoneNumber({ phone_number: n }) : createPhoneNumber(n),
       ),
       external_accounts: (params.external_accounts || []).map(p =>
-        typeof p === 'string' ? createExternalAccount({ provider: p }) : createExternalAccount(),
+        typeof p === 'string' ? createExternalAccount({ provider: p }) : createExternalAccount(p),
       ),
     } as any as UserJSON;
     res.primary_email_address_id = res.email_addresses[0]?.id;
