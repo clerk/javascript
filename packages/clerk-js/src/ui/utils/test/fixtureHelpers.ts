@@ -49,15 +49,17 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
     organization_memberships?: Array<string | OrgParams>;
   };
 
+  const getOrganizationId = (orgParams: OrgParams) => orgParams?.id || orgParams?.name || 'test_id';
+
   const createOrganization = (params: OrgParams): OrganizationMembershipJSON => {
     const { role, ...orgParams } = params;
     return {
       created_at: new Date().getTime(),
-      id: orgParams?.id || orgParams?.name || 'test_id',
+      id: getOrganizationId(orgParams),
       object: 'organization_membership',
       organization: {
         created_at: new Date().getTime(),
-        id: orgParams?.id || orgParams?.name || 'test_id',
+        id: getOrganizationId(orgParams),
         logo_url: null,
         max_allowed_memberships: 3,
         members_count: 1,
@@ -187,17 +189,20 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
   const withUser = (params: WithUserParams) => {
     baseClient.sessions = baseClient.sessions || [];
 
-    const activeOrg = params?.organization_memberships?.length
-      ? typeof params?.organization_memberships?.[0] === 'string'
-        ? params?.organization_memberships?.[0]
-        : params?.organization_memberships?.[0]?.id || params?.organization_memberships?.[0]?.name
-      : null;
+    // set the first organization as active
+    let activeOrganization: string | null = null;
+    if (params?.organization_memberships?.length) {
+      activeOrganization =
+        typeof params.organization_memberships[0] === 'string'
+          ? params.organization_memberships[0]
+          : getOrganizationId(params.organization_memberships[0]);
+    }
 
     const session = {
       status: 'active',
       id: baseClient.sessions.length.toString(),
       object: 'session',
-      last_active_organization_id: activeOrg,
+      last_active_organization_id: activeOrganization,
       actor: null,
       user: createUser(params),
       public_user_data: createPublicUserData(params),
