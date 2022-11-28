@@ -425,6 +425,7 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
     },
     backupCodePage: {
       title: 'Add backup code verification',
+      title__codelist: 'Backup codes',
       subtitle__codelist: 'Store them securely and keep them secret.',
       infoText1: 'Backup codes will be enabled for this account.',
       infoText2:
@@ -433,6 +434,10 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
         'You can use one of these to sign in to your account, if you lose access to your authentication device.',
       successMessage:
         'Backup codes are now enabled. You can use one of these to sign in to your account, if you lose access to your authentication device. Each code can only be used once.',
+      actionLabel__copy: 'Copy all',
+      actionLabel__copied: 'Copied!',
+      actionLabel__download: 'Download .txt',
+      actionLabel__print: 'Print',
     },
   },
   userButton: {
