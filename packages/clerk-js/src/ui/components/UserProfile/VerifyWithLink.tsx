@@ -4,7 +4,7 @@ import React from 'react';
 import { EmailLinkStatusCard } from '../../common';
 import { buildMagicLinkRedirectUrl } from '../../common/redirects';
 import { useEnvironment, useUserProfileContext } from '../../contexts';
-import { localizationKeys } from '../../customizables';
+import { descriptors, localizationKeys } from '../../customizables';
 import { FormButtonContainer, NavigateToFlowStartButton, useCardState, VerificationLink } from '../../elements';
 import { useMagicLink } from '../../hooks';
 import { handleError } from '../../utils';
@@ -53,7 +53,10 @@ export const VerifyWithLink = (props: VerifyWithLinkProps) => {
         onResendCodeClicked={startVerification}
       />
       <FormButtonContainer>
-        <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
+        <NavigateToFlowStartButton
+          localizationKey={localizationKeys('userProfile.formButtonReset')}
+          elementDescriptor={descriptors.formButtonReset}
+        />
       </FormButtonContainer>
     </>
   );

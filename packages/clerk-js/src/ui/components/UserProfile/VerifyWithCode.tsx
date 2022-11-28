@@ -1,7 +1,7 @@
 import { EmailAddressResource, PhoneNumberResource } from '@clerk/types';
 import React from 'react';
 
-import { localizationKeys } from '../../customizables';
+import { descriptors, localizationKeys } from '../../customizables';
 import { FormButtonContainer, NavigateToFlowStartButton, useCardState, useCodeControl } from '../../elements';
 import { CodeForm } from '../../elements/CodeForm';
 import { useLoadingStatus } from '../../hooks';
@@ -64,7 +64,10 @@ export const VerifyWithCode = (props: VerifyWithCodeProps) => {
         onResendCodeClicked={prepare}
       />
       <FormButtonContainer>
-        <NavigateToFlowStartButton localizationKey={localizationKeys('userProfile.formButtonReset')} />
+        <NavigateToFlowStartButton
+          localizationKey={localizationKeys('userProfile.formButtonReset')}
+          elementDescriptor={descriptors.formButtonReset}
+        />
       </FormButtonContainer>
     </>
   );
