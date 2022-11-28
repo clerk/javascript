@@ -54,8 +54,7 @@ describe('RemovePhonePage', () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
 
       fixtures.router.params.id = 'id';
-      //@ts-expect-error
-      fixtures.clerk.user!.phoneNumbers[0].destroy = jest.fn().mockResolvedValue({});
+      fixtures.clerk.user?.phoneNumbers[0].destroy.mockResolvedValue();
       const { userEvent } = render(<RemovePhonePage />, { wrapper });
 
       await userEvent.click(screen.getByRole('button', { name: /continue/i }));

@@ -50,12 +50,12 @@ describe('RemoveEmailPage', () => {
       expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
     });
 
-    it('calls the appropriate function upon pressing continue', async () => {
+    it.only('calls the appropriate function upon pressing continue', async () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
 
       fixtures.router.params.id = 'id';
-      //@ts-expect-error
-      fixtures.clerk.user!.emailAddresses[0].destroy = jest.fn().mockResolvedValue({});
+      console.log(fixtures.clerk.user?.emailAddresses[0]);
+      fixtures.clerk.user?.emailAddresses[0].destroy.mockResolvedValue();
       const { userEvent } = render(<RemoveEmailPage />, { wrapper });
 
       await userEvent.click(screen.getByRole('button', { name: /continue/i }));

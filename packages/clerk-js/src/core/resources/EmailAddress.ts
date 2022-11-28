@@ -77,13 +77,9 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
     return { startMagicLinkFlow, cancelMagicLinkFlow: stop };
   };
 
-  destroy(): Promise<void> {
-    return this._baseDelete();
-  }
+  destroy = (): Promise<void> => this._baseDelete();
 
-  toString(): string {
-    return this.emailAddress;
-  }
+  toString = (): string => this.emailAddress;
 
   protected fromJSON(data: EmailAddressJSON): this {
     this.id = data.id;
