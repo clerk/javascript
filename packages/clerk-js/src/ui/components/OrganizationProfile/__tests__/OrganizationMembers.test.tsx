@@ -128,6 +128,10 @@ describe('OrganizationMembers', () => {
     expect(await findByText('Member')).toBeDefined();
   });
 
+  it.todo('removes member from organization when clicking the respective button on a user row');
+  it.todo('changes role on a member from organization when clicking the respective button on a user row');
+  it.todo('changes tab and renders the pending invites list');
+
   it.skip('shows the "You" badge when the member id from the list matches the current session user id', async () => {
     const membersList: OrganizationMembershipResource[] = [
       createFakeMember({ id: '1', orgId: '1', role: 'admin', identifier: 'test_user1' }),
