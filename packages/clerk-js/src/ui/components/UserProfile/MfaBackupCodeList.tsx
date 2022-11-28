@@ -2,7 +2,7 @@ import React from 'react';
 
 import { PrintableComponent, usePrintable } from '../../common';
 import { useCoreUser, useEnvironment } from '../../contexts';
-import { Button, Col, Flex, Grid, Heading, LocalizationKey, Text } from '../../customizables';
+import { Button, Col, Flex, Grid, Heading, LocalizationKey, localizationKeys, Text } from '../../customizables';
 import { useClipboard } from '../../hooks';
 import { mqu } from '../../styledSystem';
 import { getIdentifier } from '../../utils';
@@ -40,7 +40,7 @@ export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
     <>
       <Col gap={1}>
         <Text
-          localizationKey={'Backup codes'}
+          localizationKey={localizationKeys('userProfile.backupCodePage.title__codelist')}
           variant='regularMedium'
         />
         <Text
@@ -71,25 +71,26 @@ export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
           variant='link'
           colorScheme='primary'
           onClick={onCopy}
-        >
-          {!hasCopied ? 'Copy all' : 'Copied!'}
-        </Button>
+          localizationKey={
+            !hasCopied
+              ? localizationKeys('userProfile.backupCodePage.actionLabel__copy')
+              : localizationKeys('userProfile.backupCodePage.actionLabel__copied')
+          }
+        />
 
         <Button
           variant='link'
           colorScheme='primary'
           onClick={onDownloadTxtFile}
-        >
-          Download .txt
-        </Button>
+          localizationKey={localizationKeys('userProfile.backupCodePage.actionLabel__download')}
+        />
 
         <Button
           variant='link'
           colorScheme='primary'
           onClick={print}
-        >
-          Print
-        </Button>
+          localizationKey={localizationKeys('userProfile.backupCodePage.actionLabel__print')}
+        />
       </Flex>
 
       <PrintableComponent {...printableProps}>

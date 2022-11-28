@@ -425,11 +425,16 @@ type _LocalizationResource = {
     };
     backupCodePage: {
       title: LocalizationValue;
+      title__codelist: LocalizationValue;
       subtitle__codelist: LocalizationValue;
       infoText1: LocalizationValue;
       infoText2: LocalizationValue;
       successSubtitle: LocalizationValue;
       successMessage: LocalizationValue;
+      actionLabel__copy: LocalizationValue;
+      actionLabel__copied: LocalizationValue;
+      actionLabel__download: LocalizationValue;
+      actionLabel__print: LocalizationValue;
     };
   };
   userButton: {
