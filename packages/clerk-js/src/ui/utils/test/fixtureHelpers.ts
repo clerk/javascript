@@ -5,6 +5,8 @@ import {
   EnvironmentJSON,
   ExternalAccountJSON,
   OAuthProvider,
+  OrganizationJSON,
+  OrganizationMembershipJSON,
   PhoneNumberJSON,
   SessionJSON,
   SignInJSON,
@@ -12,8 +14,7 @@ import {
   UserJSON,
   UserSettingsJSON,
 } from '@clerk/types';
-import { PublicUserDataJSON } from '@clerk/types/src';
-import { access } from 'fs';
+import { MembershipRole, PublicUserDataJSON } from '@clerk/types/src';
 
 import { createUserFixture } from './fixtures';
 
@@ -36,10 +37,44 @@ export const createClientFixtureHelpers = (baseClient: ClientJSON) => {
 };
 
 const createUserFixtureHelpers = (baseClient: ClientJSON) => {
-  type WithUserParams = Omit<Partial<UserJSON>, 'email_addresses' | 'phone_numbers' | 'external_accounts'> & {
+  type OrgParams = Partial<OrganizationJSON> & { role?: MembershipRole };
+
+  type WithUserParams = Omit<
+    Partial<UserJSON>,
+    'email_addresses' | 'phone_numbers' | 'external_accounts' | 'organization_memberships'
+  > & {
     email_addresses?: Array<string | Partial<EmailAddressJSON>>;
     phone_numbers?: Array<string | Partial<PhoneNumberJSON>>;
     external_accounts?: Array<OAuthProvider | Partial<ExternalAccountJSON>>;
+    organization_memberships?: Array<string | OrgParams>;
+  };
+
+  const getOrganizationId = (orgParams: OrgParams) => orgParams?.id || orgParams?.name || 'test_id';
+
+  const createOrganization = (params: OrgParams): OrganizationMembershipJSON => {
+    const { role, ...orgParams } = params;
+    return {
+      created_at: new Date().getTime(),
+      id: getOrganizationId(orgParams),
+      object: 'organization_membership',
+      organization: {
+        created_at: new Date().getTime(),
+        id: getOrganizationId(orgParams),
+        logo_url: null,
+        max_allowed_memberships: 3,
+        members_count: 1,
+        name: 'Org',
+        object: 'organization',
+        pending_invitations_count: 0,
+        public_metadata: {},
+        slug: null,
+        updated_at: new Date().getTime(),
+        ...orgParams,
+      } as OrganizationJSON,
+      public_metadata: {},
+      role: role || 'admin',
+      updated_at: new Date().getTime(),
+    } as OrganizationMembershipJSON;
   };
 
   const createEmail = (params?: Partial<EmailAddressJSON>): EmailAddressJSON => {
@@ -109,7 +144,6 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
       profile_image_url: '',
       username: 'testUsername',
       web3_wallets: [],
-      organization_memberships: [],
       password: '',
       profile_image_id: '',
       first_name: 'FirstName',
@@ -133,6 +167,9 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
       external_accounts: (params.external_accounts || []).map(p =>
         typeof p === 'string' ? createExternalAccount({ provider: p }) : createExternalAccount(p),
       ),
+      organization_memberships: (params.organization_memberships || []).map(o =>
+        typeof o === 'string' ? createOrganization({ name: o }) : createOrganization(o),
+      ),
     } as any as UserJSON;
     res.primary_email_address_id = res.email_addresses[0]?.id;
     return res;
@@ -151,11 +188,21 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
 
   const withUser = (params: WithUserParams) => {
     baseClient.sessions = baseClient.sessions || [];
+
+    // set the first organization as active
+    let activeOrganization: string | null = null;
+    if (params?.organization_memberships?.length) {
+      activeOrganization =
+        typeof params.organization_memberships[0] === 'string'
+          ? params.organization_memberships[0]
+          : getOrganizationId(params.organization_memberships[0]);
+    }
+
     const session = {
       status: 'active',
       id: baseClient.sessions.length.toString(),
       object: 'session',
-      last_active_organization_id: null,
+      last_active_organization_id: activeOrganization,
       actor: null,
       user: createUser(params),
       public_user_data: createPublicUserData(params),
