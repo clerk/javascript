@@ -8,7 +8,7 @@ import {
   useCoreUser,
   useOrganizationSwitcherContext,
 } from '../../contexts';
-import { localizationKeys } from '../../customizables';
+import { Flex, localizationKeys } from '../../customizables';
 import { Action, OrganizationPreview, PersonalWorkspacePreview, PopoverCard, useCardState } from '../../elements';
 import { RootBox } from '../../elements/RootBox';
 import { Billing, CogFilled } from '../../icons';
@@ -81,7 +81,6 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
         icon={CogFilled}
         label={localizationKeys('organizationSwitcher.action__manageOrganization')}
         onClick={handleManageOrganizationClicked}
-        sx={t => ({ margin: `${t.space.$2} 0` })}
       />
     );
 
@@ -90,7 +89,6 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
         icon={Billing}
         label={__unstable_manageBillingLabel ? __unstable_manageBillingLabel() : 'Manage billing'}
         onClick={() => router.navigate(__unstable_manageBillingUrl())}
-        sx={t => ({ margin: `${t.space.$2} 0` })}
       />
     );
 
@@ -109,8 +107,13 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
                   user={user}
                   sx={theme => ({ padding: `0 ${theme.space.$6}` })}
                 />
-                {manageOrganizationButton}
-                {__unstable_manageBillingUrl && billingOrganizationButton}
+                <Flex
+                  direction='col'
+                  sx={t => ({ margin: `${t.space.$2} 0` })}
+                >
+                  {manageOrganizationButton}
+                  {__unstable_manageBillingUrl && billingOrganizationButton}
+                </Flex>
               </>
             ) : (
               !hidePersonal && (
