@@ -1,8 +1,36 @@
 import { useCoreClerk, useEnvironment } from '../contexts';
 import { titleize } from '../shared';
 
+export const timeString = (val: Date | string | number, locale?: string): string => {
+  try {
+    return new Date(val).toLocaleString(locale || 'en-US', {
+      hour: '2-digit',
+      minute: 'numeric',
+      hour12: true,
+    });
+  } catch (e) {
+    console.warn(e);
+    return '';
+  }
+};
+
+export const weekday = (
+  val: Date | string | number,
+  locale?: string,
+  weekday?: 'long' | 'short' | 'narrow' | undefined,
+) => {
+  try {
+    return new Intl.DateTimeFormat(locale || 'en-US', { weekday: weekday || 'long' }).format(new Date(val));
+  } catch (e) {
+    console.warn(e);
+    return '';
+  }
+};
+
 const MODIFIERS = {
   titleize,
+  timeString,
+  weekday,
 } as const;
 
 export type GlobalTokens = {
@@ -20,7 +48,7 @@ export type GlobalTokens = {
 export type Tokens = GlobalTokens & Record<string, string>;
 
 type Token = keyof Tokens | string;
-type Modifier = keyof typeof MODIFIERS;
+type Modifier = { modifierName: keyof typeof MODIFIERS; params: string[] };
 type TokenExpression = { token: Token; modifiers: Modifier[] };
 
 export const applyTokensToString = (s: string | undefined, tokens: Tokens): string => {
@@ -57,7 +85,7 @@ const parseTokensFromLocalizedString = (
     .filter(match => match[0] in tokens)
     .map(([token, ...modifiers]) => ({
       token,
-      modifiers: modifiers.filter(assertKnownModifier),
+      modifiers: modifiers.map(m => getModifierWithParams(m)).filter(m => assertKnownModifier(m.modifierName)),
     }));
 
   let normalisedString = s;
@@ -66,15 +94,30 @@ const parseTokensFromLocalizedString = (
     // replace it with its localized value in the next step
     normalisedString = normalisedString.replace(/{{.+?}}/, `_++${token}++_`);
   });
-  return { expressions, normalisedString };
+  return { expressions: expressions as TokenExpression[], normalisedString };
 };
 
 const applyTokenExpressions = (s: string, expressions: TokenExpression[], tokens: Tokens) => {
   expressions.forEach(({ token, modifiers }) => {
-    const value = modifiers.reduce((acc, mod) => MODIFIERS[mod](acc), tokens[token]);
+    // @ts-ignore
+    const value = modifiers.reduce((acc, mod) => MODIFIERS[mod.modifierName](acc, ...mod.params), tokens[token]);
     s = s.replace(`_++${token}++_`, value);
   });
   return s;
 };
 
 const assertKnownModifier = (s: any): s is Modifier => Object.prototype.hasOwnProperty.call(MODIFIERS, s);
+
+const getModifierWithParams = (modifierExpression: string): { modifierName: string; params: string[] } => {
+  const parts = modifierExpression
+    .split(/[(,)]/g)
+    .map(m => m.trim())
+    .filter(m => !!m);
+  if (parts.length === 1) {
+    const [modifierName] = parts;
+    return { modifierName, params: [] };
+  } else {
+    const [modifierName, ...params] = parts;
+    return { modifierName, params: params.map(p => p.replace(/['"]+/g, '')) };
+  }
+};

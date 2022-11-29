@@ -1,5 +1,14 @@
 const MILLISECONDS_IN_DAY = 86400000;
-const DAYS_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+export function getNumericDateString(val: Date | number | string): string {
+  try {
+    const date = new Date(val);
+    return new Intl.DateTimeFormat('en-US').format(date);
+  } catch (e) {
+    console.warn(e);
+    return '';
+  }
+}
 
 export function dateTo12HourTime(date: Date): string {
   if (!date) {
@@ -30,10 +39,16 @@ function normalizeDate(d: Date | string | number): Date {
   }
 }
 
+export type DateFormatRelativeParams = {
+  date: Date | string | number;
+  relativeTo: Date | string | number;
+};
+
+export type RelativeDateCase = 'numeric' | 'previous6DaysAt' | 'lastDayAt' | 'sameDayAt' | 'nextDayAt' | 'next6DaysAt';
+
 /*
  * Follows date-fns format, see here:
  * https://date-fns.org/v2.21.1/docs/formatRelative
- * TODO: support localisation
  * | Distance to the base date | Result                    |
  * |---------------------------|---------------------------|
  * | Previous 6 days           | last Sunday at 04:30 AM   |
@@ -43,39 +58,36 @@ function normalizeDate(d: Date | string | number): Date {
  * | Next 6 days               | Sunday at 04:30 AM        |
  * | Other                     | 12/31/2017                |
  */
-export function formatRelative(
-  date: Date,
-  relativeTo: Date,
-  locale?: Parameters<typeof Date.prototype.toLocaleDateString>[0],
-): string {
+export function formatRelative({
+  date,
+  relativeTo,
+}: DateFormatRelativeParams): { relativeDateCase: RelativeDateCase; date: Date } | null {
   if (!date || !relativeTo) {
-    return '';
+    return null;
   }
   const a = normalizeDate(date);
   const b = normalizeDate(relativeTo);
   const differenceInDays = differenceInCalendarDays(b, a, { absolute: false });
-  const time12Hour = dateTo12HourTime(a);
-  const dayName = DAYS_EN[a.getDay()];
 
   if (differenceInDays < -6) {
-    return a.toLocaleDateString(locale);
+    return { relativeDateCase: 'numeric', date: a };
   }
   if (differenceInDays < -1) {
-    return `last ${dayName} at ${time12Hour}`;
+    return { relativeDateCase: 'previous6DaysAt', date: a };
   }
   if (differenceInDays === -1) {
-    return `yesterday at ${time12Hour}`;
+    return { relativeDateCase: 'lastDayAt', date: a };
   }
   if (differenceInDays === 0) {
-    return `today at ${time12Hour}`;
+    return { relativeDateCase: 'sameDayAt', date: a };
   }
   if (differenceInDays === 1) {
-    return `tomorrow at ${time12Hour}`;
+    return { relativeDateCase: 'nextDayAt', date: a };
   }
   if (differenceInDays < 7) {
-    return `${dayName} at ${time12Hour}`;
+    return { relativeDateCase: 'next6DaysAt', date: a };
   }
-  return a.toLocaleDateString(locale);
+  return { relativeDateCase: 'numeric', date: a };
 }
 
 export function addYears(initialDate: Date | number | string, yearsToAdd: number): Date {

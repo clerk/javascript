@@ -1,9 +1,19 @@
-import { formatRelative } from '@clerk/shared';
+import { formatRelative, getNumericDateString } from '@clerk/shared';
 import { SessionWithActivitiesResource } from '@clerk/types';
 import React from 'react';
 
 import { useCoreSession, useCoreUser } from '../../contexts';
-import { Badge, Col, descriptors, Flex, Icon, localizationKeys, Text } from '../../customizables';
+import {
+  Badge,
+  Col,
+  descriptors,
+  Flex,
+  Icon,
+  LocalizationKey,
+  localizationKeys,
+  Text,
+  useLocalizations,
+} from '../../customizables';
 import { FullHeightLoader } from '../../elements';
 import { DeviceLaptop, DeviceMobile } from '../../icons';
 import { mqu } from '../../styledSystem';
@@ -79,6 +89,7 @@ const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
   const title = deviceType ? deviceType : isMobile ? 'Mobile device' : 'Desktop device';
   const browser = `${browserName || ''} ${browserVersion || ''}`.trim() || 'Web browser';
   const location = [city || '', country || ''].filter(Boolean).join(', ').trim() || null;
+  const { t } = useLocalizations();
 
   return (
     <Flex
@@ -154,11 +165,49 @@ const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
         <Text
           variant='smallRegular'
           colorScheme='neutral'
-          sx={{ textTransform: 'capitalize' }}
         >
-          {formatRelative(props.session.lastActiveAt || new Date(), new Date())}
+          {getRelativeToNowDate(props.session.lastActiveAt, t)}
         </Text>
       </Col>
     </Flex>
   );
+};
+
+type RelativeDateKeys =
+  | 'relativeDates.previous6DaysAt'
+  | 'relativeDates.lastDayAt'
+  | 'relativeDates.sameDayAt'
+  | 'relativeDates.nextDayAt'
+  | 'relativeDates.next6DaysAt';
+
+const getRelativeToNowDate = (
+  date: Date,
+  t: (localizationKey: string | LocalizationKey | undefined) => string,
+): string => {
+  let localizationKey: RelativeDateKeys;
+  const relativeDate = formatRelative({ date: date || new Date(), relativeTo: new Date() });
+  if (!relativeDate) {
+    return '';
+  }
+  switch (relativeDate.relativeDateCase) {
+    case 'previous6DaysAt':
+      localizationKey = 'relativeDates.previous6DaysAt';
+      break;
+    case 'lastDayAt':
+      localizationKey = 'relativeDates.lastDayAt';
+      break;
+    case 'sameDayAt':
+      localizationKey = 'relativeDates.sameDayAt';
+      break;
+    case 'nextDayAt':
+      localizationKey = 'relativeDates.nextDayAt';
+      break;
+    case 'next6DaysAt':
+      localizationKey = 'relativeDates.next6DaysAt';
+      break;
+    case 'numeric':
+    default:
+      return getNumericDateString(relativeDate.date);
+  }
+  return t(localizationKeys(localizationKey, { lastActiveAt: relativeDate.date }));
 };

@@ -518,4 +518,11 @@ type _LocalizationResource = {
     form_password_incorrect: LocalizationValue;
     not_allowed_access: LocalizationValue;
   };
+  relativeDates: {
+    previous6DaysAt: LocalizationValue;
+    lastDayAt: LocalizationValue;
+    sameDayAt: LocalizationValue;
+    nextDayAt: LocalizationValue;
+    next6DaysAt: LocalizationValue;
+  };
 };

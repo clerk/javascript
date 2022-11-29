@@ -522,4 +522,11 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
     form_password_incorrect: '',
     not_allowed_access: '',
   },
+  relativeDates: {
+    previous6DaysAt: "Last {{ lastActiveAt | weekday('en-US','long') }} at {{ lastActiveAt | timeString('en-US') }}",
+    lastDayAt: "Yesterday at {{ lastActiveAt | timeString('en-US') }}",
+    sameDayAt: "Today at {{ lastActiveAt | timeString('en-US') }}",
+    nextDayAt: "Tomorrow at {{ lastActiveAt | timeString('en-US') }}",
+    next6DaysAt: "{{ lastActiveAt | weekday('en-US','long') }} at {{ lastActiveAt | timeString('en-US') }}",
+  },
 } as const;
