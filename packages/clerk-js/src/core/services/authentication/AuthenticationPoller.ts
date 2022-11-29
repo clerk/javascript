@@ -7,7 +7,7 @@ const INTERVAL_IN_MS = 5 * 1000;
 
 export class AuthenticationPoller {
   private lock = SafeLock(REFRESH_SESSION_TOKEN_LOCK_KEY);
-  private workerTimers = createWorkerTimers().workerTimers;
+  private workerTimers = createWorkerTimers();
   private timerId: ReturnType<typeof this.workerTimers.setInterval> | null = null;
 
   public startPollingForSessionToken(cb: () => unknown): void {

@@ -31,7 +31,6 @@ export const WebWorkerMinifyPlugin: Plugin = {
     build.onLoad({ filter: /\.worker\.ts/ }, async args => {
       const f = await readFile(args.path);
       const js = await transform(f, { loader: 'ts', minify: true });
-      console.log(js.code);
       return { loader: 'text', contents: js.code };
     });
   },

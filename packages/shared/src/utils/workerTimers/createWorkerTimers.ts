@@ -21,7 +21,7 @@ export const createWorkerTimers = () => {
     const setInterval = globalThis.setInterval as WorkerSetTimeout;
     const clearTimeout = globalThis.clearTimeout as WorkerClearTimeout;
     const clearInterval = globalThis.clearInterval as WorkerClearTimeout;
-    return { workerTimers: { setTimeout, setInterval, clearTimeout, clearInterval } };
+    return { setTimeout, setInterval, clearTimeout, clearInterval };
   }
 
   let id = 0;
@@ -59,5 +59,5 @@ export const createWorkerTimers = () => {
     post({ type: 'clearInterval', id });
   };
 
-  return { workerTimers: { setTimeout, setInterval, clearTimeout, clearInterval } };
+  return { setTimeout, setInterval, clearTimeout, clearInterval };
 };
