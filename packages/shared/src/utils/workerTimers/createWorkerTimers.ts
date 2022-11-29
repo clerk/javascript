@@ -10,43 +10,57 @@ import {
 // @ts-ignore
 import pollerWorkerSource from './workerTimers.worker';
 
-const createWebWorker = (source: string, opts: ConstructorParameters<typeof Worker>[1] = {}) => {
-  const workerFile = new Blob([source]);
-  const workerScript = globalThis.URL.createObjectURL(workerFile);
-  return new Worker(workerScript, opts);
+const createWebWorker = (source: string, opts: ConstructorParameters<typeof Worker>[1] = {}): Worker | null => {
+  if (typeof Worker === 'undefined') {
+    return null;
+  }
+
+  try {
+    const blob = new Blob([source], { type: 'application/javascript; charset=utf-8' });
+    const workerScript = globalThis.URL.createObjectURL(blob);
+    return new Worker(workerScript, opts);
+  } catch (e) {
+    console.warn('Clerk: Cannot create worker from blob. Consider adding worker-src blob:; to your CSP');
+    return null;
+  }
+};
+
+const fallbackTimers = () => {
+  const setTimeout = globalThis.setTimeout.bind(globalThis) as WorkerSetTimeout;
+  const setInterval = globalThis.setInterval.bind(globalThis) as WorkerSetTimeout;
+  const clearTimeout = globalThis.clearTimeout.bind(globalThis) as WorkerClearTimeout;
+  const clearInterval = globalThis.clearInterval.bind(globalThis) as WorkerClearTimeout;
+  return { setTimeout, setInterval, clearTimeout, clearInterval, cleanup: noop };
 };
 
 export const createWorkerTimers = () => {
-  if (typeof Worker === 'undefined') {
-    const setTimeout = globalThis.setTimeout as WorkerSetTimeout;
-    const setInterval = globalThis.setInterval as WorkerSetTimeout;
-    const clearTimeout = globalThis.clearTimeout as WorkerClearTimeout;
-    const clearInterval = globalThis.clearInterval as WorkerClearTimeout;
-    return { setTimeout, setInterval, clearTimeout, clearInterval, cleanup: noop };
-  }
-
   let id = 0;
-  const callbacks = new Map<WorkerTimerId, WorkerTimeoutCallback>();
   const generateId = () => id++;
-  let worker: Worker | undefined;
-  let post: ((p: WorkerTimerEvent) => void) | undefined;
+  const callbacks = new Map<WorkerTimerId, WorkerTimeoutCallback>();
+  const post = (w: Worker | null, p: WorkerTimerEvent) => w?.postMessage(p);
+  const handleMessage = (e: MessageEvent<WorkerTimerResponseEvent>) => {
+    callbacks.get(e.data.id)?.();
+  };
+
+  let worker = createWebWorker(pollerWorkerSource, { name: 'clerk-timers' });
+  worker?.addEventListener('message', handleMessage);
+
+  if (!worker) {
+    return fallbackTimers();
+  }
 
   const init = () => {
     if (!worker) {
       worker = createWebWorker(pollerWorkerSource, { name: 'clerk-timers' });
-      post = (p: WorkerTimerEvent) => worker?.postMessage(p);
-      worker.addEventListener('message', e => {
-        const data = e.data as WorkerTimerResponseEvent;
-        callbacks.get(data.id)?.();
-      });
+      worker?.addEventListener('message', handleMessage);
     }
   };
 
   const cleanup = () => {
     if (worker) {
       worker.terminate();
-      worker = undefined;
-      post = undefined;
+      worker = null;
+      callbacks.clear();
     }
   };
 
@@ -54,7 +68,7 @@ export const createWorkerTimers = () => {
     init();
     const id = generateId();
     callbacks.set(id, cb);
-    post?.({ type: 'setTimeout', id, ms });
+    post(worker, { type: 'setTimeout', id, ms });
     return id;
   };
 
@@ -62,20 +76,20 @@ export const createWorkerTimers = () => {
     init();
     const id = generateId();
     callbacks.set(id, cb);
-    post?.({ type: 'setInterval', id, ms });
+    post(worker, { type: 'setInterval', id, ms });
     return id;
   };
 
   const clearTimeout: WorkerClearTimeout = id => {
     init();
     callbacks.delete(id);
-    post?.({ type: 'clearTimeout', id });
+    post(worker, { type: 'clearTimeout', id });
   };
 
   const clearInterval: WorkerClearTimeout = id => {
     init();
     callbacks.delete(id);
-    post?.({ type: 'clearInterval', id });
+    post(worker, { type: 'clearInterval', id });
   };
 
   return { setTimeout, setInterval, clearTimeout, clearInterval, cleanup };
