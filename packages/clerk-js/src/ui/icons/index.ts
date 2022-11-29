@@ -35,3 +35,4 @@ export { default as Times } from './times.svg';
 export { default as Trash } from './trash.svg';
 export { default as UserAdd } from './userAdd.svg';
 export { default as ThreeDots } from './threeDots.svg';
+export { default as Billing } from './billing.svg';

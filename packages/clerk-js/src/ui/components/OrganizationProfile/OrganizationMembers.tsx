@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useCoreOrganization } from '../../contexts';
+import { useCoreOrganization, useOrganizationProfileContext } from '../../contexts';
 import { Col, descriptors, Flex, localizationKeys, Text } from '../../customizables';
 import {
   CardAlert,
@@ -19,11 +19,13 @@ import { useNavigate } from '../../hooks';
 import { UserAdd } from '../../icons';
 import { ActiveMembersList } from './ActiveMembersList';
 import { InvitedMembersList } from './InvitedMembersList';
+import { MembershipWidget } from './MembershipWidget';
 
 export const OrganizationMembers = withCardStateProvider(() => {
   const { navigate } = useNavigate();
   const card = useCardState();
   const { membership } = useCoreOrganization();
+  const { __unstable_manageBillingUrl } = useOrganizationProfileContext();
   const isAdmin = membership?.role === 'admin';
 
   return (
@@ -73,7 +75,16 @@ export const OrganizationMembers = withCardStateProvider(() => {
           </TabsList>
           <TabPanels>
             <TabPanel sx={{ width: '100%' }}>
-              <ActiveMembersList />
+              <Flex
+                sx={t => ({
+                  flexDirection: 'column',
+                  width: '100%',
+                  marginTop: __unstable_manageBillingUrl ? t.space.$4 : 0,
+                })}
+              >
+                {isAdmin && __unstable_manageBillingUrl && <MembershipWidget />}
+                <ActiveMembersList />
+              </Flex>
             </TabPanel>
             {isAdmin && (
               <TabPanel sx={{ width: '100%' }}>

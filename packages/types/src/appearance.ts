@@ -231,7 +231,7 @@ export type ElementsConfig = {
 
   // organizationSwitcherBox: WithOptions<never, 'open', never>;
   // organizationSwitcherOuterIdentifier: WithOptions<never, 'open', never>;
-  // organizationSwitcherTrigger: WithOptions<never, 'open', never>;
+  organizationSwitcherTrigger: WithOptions<never, 'open', never>;
   // organizationSwitcherTriggerBox: WithOptions<never, 'open', never>;
   // organizationSwitcherTitle: WithOptions<never, 'open', never>;
   // organizationSwitcherAvatarBox: WithOptions<never, 'open', never>;
