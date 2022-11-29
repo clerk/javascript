@@ -14,7 +14,7 @@ export type Poller = {
 };
 
 export function Poller({ delayInMs }: PollerOptions = { delayInMs: 1000 }): Poller {
-  const { workerTimers } = createWorkerTimers();
+  const workerTimers = createWorkerTimers();
 
   let timerId: number | undefined;
   let stopped = false;
