@@ -18,7 +18,6 @@ import { ActiveSessionResource } from './session';
 import { UserResource } from './user';
 import { DeepPartial, DeepSnakeToCamel } from './utils';
 
-export type DevSessionSyncMode = 'cookie' | 'cookieless';
 export type InstanceType = 'production' | 'development';
 
 export type ListenerCallback = (emission: Resources) => void;
@@ -458,7 +457,6 @@ export interface ClerkOptions {
   /** Optional support email for display in authentication screens */
   supportEmail?: string;
   touchSession?: boolean;
-  __experimental__devSessionSyncMode?: DevSessionSyncMode;
 }
 
 export interface Resources {

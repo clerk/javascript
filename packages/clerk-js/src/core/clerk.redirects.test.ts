@@ -3,6 +3,7 @@ import { Client, DisplayConfig, Environment } from './resources/internal';
 
 const mockClientFetch = jest.fn();
 const mockEnvironmentFetch = jest.fn();
+const mockIsCookieless = jest.fn();
 
 jest.mock('./resources/Client');
 jest.mock('./resources/Environment');
@@ -14,6 +15,7 @@ jest.mock('./devBrowserHandler', () => () => ({
   getDevBrowserJWT: jest.fn(() => 'db_deadbeef'),
   setDevBrowserJWT: jest.fn(),
   removeDevBrowserJWT: jest.fn(),
+  isCookieless: mockIsCookieless,
 }));
 
 Client.getInstance = jest.fn().mockImplementation(() => {
@@ -96,17 +98,16 @@ describe('Clerk singleton - Redirects', () => {
             displayConfig: mockDisplayConfigWithSameOrigin,
           }),
         );
+        mockIsCookieless.mockReturnValue(true);
 
         clerkForProductionInstance = new Clerk(productionFrontendApi);
         await clerkForProductionInstance.load({
           navigate: mockNavigate,
-          __experimental__devSessionSyncMode: 'cookieless',
         });
 
         clerkForDevelopmentInstance = new Clerk(developmentFrontendApi);
         await clerkForDevelopmentInstance.load({
           navigate: mockNavigate,
-          __experimental__devSessionSyncMode: 'cookieless',
         });
       });
 
@@ -167,17 +168,16 @@ describe('Clerk singleton - Redirects', () => {
             displayConfig: mockDisplayConfigWithDifferentOrigin,
           }),
         );
+        mockIsCookieless.mockReturnValue(true);
 
         clerkForProductionInstance = new Clerk(productionFrontendApi);
         await clerkForProductionInstance.load({
           navigate: mockNavigate,
-          __experimental__devSessionSyncMode: 'cookieless',
         });
 
         clerkForDevelopmentInstance = new Clerk(developmentFrontendApi);
         await clerkForDevelopmentInstance.load({
           navigate: mockNavigate,
-          __experimental__devSessionSyncMode: 'cookieless',
         });
       });
 
@@ -258,16 +258,16 @@ describe('Clerk singleton - Redirects', () => {
 
     describe('for cookie-based dev instances', () => {
       beforeEach(async () => {
+        mockIsCookieless.mockReturnValue(false);
+
         clerkForProductionInstance = new Clerk(productionFrontendApi);
         await clerkForProductionInstance.load({
           navigate: mockNavigate,
-          __experimental__devSessionSyncMode: 'cookie',
         });
 
         clerkForDevelopmentInstance = new Clerk(developmentFrontendApi);
         await clerkForDevelopmentInstance.load({
           navigate: mockNavigate,
-          __experimental__devSessionSyncMode: 'cookie',
         });
       });
 
@@ -282,16 +282,16 @@ describe('Clerk singleton - Redirects', () => {
 
     describe('for cookieless dev instances', () => {
       beforeEach(async () => {
+        mockIsCookieless.mockReturnValue(true);
+
         clerkForProductionInstance = new Clerk(productionFrontendApi);
         await clerkForProductionInstance.load({
           navigate: mockNavigate,
-          __experimental__devSessionSyncMode: 'cookieless',
         });
 
         clerkForDevelopmentInstance = new Clerk(developmentFrontendApi);
         await clerkForDevelopmentInstance.load({
           navigate: mockNavigate,
-          __experimental__devSessionSyncMode: 'cookieless',
         });
       });
 
