@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.5.4-staging.5](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@4.5.4-staging.4...@clerk/clerk-react@4.5.4-staging.5) (2022-11-29)
+
+**Note:** Version bump only for package @clerk/clerk-react
+
 ### [4.5.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@4.5.3-staging.0...@clerk/clerk-react@4.5.3) (2022-11-25)
 
 **Note:** Version bump only for package @clerk/clerk-react
