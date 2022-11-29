@@ -112,7 +112,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
 
   // 'organizationSwitcherBox',
   // 'organizationSwitcherOuterIdentifier',
-  // 'organizationSwitcherTrigger',
+  'organizationSwitcherTrigger',
   // 'organizationSwitcherTriggerBox',
   // 'organizationSwitcherTitle',
   // 'organizationSwitcherAvatarBox',

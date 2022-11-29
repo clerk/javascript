@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useCoreOrganization, useCoreUser, useOrganizationSwitcherContext } from '../../contexts';
-import { Button, Icon, localizationKeys } from '../../customizables';
+import { Button, descriptors, Icon, localizationKeys } from '../../customizables';
 import { OrganizationPreview, PersonalWorkspacePreview } from '../../elements';
 import { Selector } from '../../icons';
 import { PropsOfComponent } from '../../styledSystem';
@@ -16,6 +16,7 @@ export const OrganizationSwitcherTrigger = React.forwardRef<HTMLButtonElement, O
 
     return (
       <Button
+        elementDescriptor={descriptors.organizationSwitcherTrigger}
         variant='ghost'
         colorScheme='neutral'
         sx={t => ({ minHeight: 0, padding: `0 ${t.space.$2} 0 0` })}
