@@ -22,6 +22,7 @@ export function Poller({ delayInMs }: PollerOptions = { delayInMs: 1000 }): Poll
   const stop: PollerStop = () => {
     if (timerId) {
       workerTimers.clearTimeout(timerId);
+      workerTimers.cleanup();
     }
     stopped = true;
   };
