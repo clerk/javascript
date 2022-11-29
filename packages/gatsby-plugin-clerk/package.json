@@ -44,7 +44,7 @@
     "typescript": "*"
   },
   "peerDependencies": {
-    "gatsby": "^4.0.0"
+    "gatsby": "^4.24.8"
   },
   "engines": {
     "node": ">=16"
