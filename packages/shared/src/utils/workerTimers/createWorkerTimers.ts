@@ -1,3 +1,4 @@
+import { noop } from '../noop';
 import {
   WorkerClearTimeout,
   WorkerSetTimeout,
@@ -21,43 +22,61 @@ export const createWorkerTimers = () => {
     const setInterval = globalThis.setInterval as WorkerSetTimeout;
     const clearTimeout = globalThis.clearTimeout as WorkerClearTimeout;
     const clearInterval = globalThis.clearInterval as WorkerClearTimeout;
-    return { setTimeout, setInterval, clearTimeout, clearInterval };
+    return { setTimeout, setInterval, clearTimeout, clearInterval, cleanup: noop };
   }
 
   let id = 0;
   const callbacks = new Map<WorkerTimerId, WorkerTimeoutCallback>();
   const generateId = () => id++;
-  const worker = createWebWorker(pollerWorkerSource, { name: 'clerk-timers' });
-  const post = (p: WorkerTimerEvent) => worker.postMessage(p);
+  let worker: Worker | undefined;
+  let post: ((p: WorkerTimerEvent) => void) | undefined;
 
-  worker.addEventListener('message', e => {
-    const data = e.data as WorkerTimerResponseEvent;
-    callbacks.get(data.id)?.();
-  });
+  const init = () => {
+    if (!worker) {
+      worker = createWebWorker(pollerWorkerSource, { name: 'clerk-timers' });
+      post = (p: WorkerTimerEvent) => worker?.postMessage(p);
+      worker.addEventListener('message', e => {
+        const data = e.data as WorkerTimerResponseEvent;
+        callbacks.get(data.id)?.();
+      });
+    }
+  };
+
+  const cleanup = () => {
+    if (worker) {
+      worker.terminate();
+      worker = undefined;
+      post = undefined;
+    }
+  };
 
   const setTimeout: WorkerSetTimeout = (cb, ms) => {
+    init();
     const id = generateId();
     callbacks.set(id, cb);
-    post({ type: 'setTimeout', id, ms });
+    post?.({ type: 'setTimeout', id, ms });
     return id;
   };
 
   const setInterval: WorkerSetTimeout = (cb, ms) => {
+    init();
     const id = generateId();
     callbacks.set(id, cb);
-    post({ type: 'setInterval', id, ms });
+    post?.({ type: 'setInterval', id, ms });
     return id;
   };
 
   const clearTimeout: WorkerClearTimeout = id => {
+    init();
     callbacks.delete(id);
-    post({ type: 'clearTimeout', id });
+    post?.({ type: 'clearTimeout', id });
   };
 
   const clearInterval: WorkerClearTimeout = id => {
+    init();
     callbacks.delete(id);
-    post({ type: 'clearInterval', id });
+    post?.({ type: 'clearInterval', id });
   };
 
-  return { setTimeout, setInterval, clearTimeout, clearInterval };
+  return { setTimeout, setInterval, clearTimeout, clearInterval, cleanup };
 };
