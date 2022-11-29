@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.18.0-staging.6](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.18.0-staging.5...@clerk/clerk-js@4.18.0-staging.6) (2022-11-29)
+
+### Bug Fixes
+
+- **clerk-js:** Fix cookieless logic ([698740e](https://github.com/clerkinc/javascript/commit/698740e41108ba24ba39a64997fdafdce58d0f8e))
+
 ## [4.17.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.17.0-staging.1...@clerk/clerk-js@4.17.0) (2022-11-25)
 
 **Note:** Version bump only for package @clerk/clerk-js
