@@ -32,7 +32,7 @@ export default function createDevBrowserHandler({
   const cookieHandler = createCookieHandler();
   const key = DEV_BROWSER_SSO_JWT_KEY;
 
-  let isCookielessDev = false;
+  let isCookielessDev = true;
 
   function getDevBrowserJWT() {
     return localStorage.getItem(key);
@@ -135,6 +135,8 @@ export default function createDevBrowserHandler({
       isCookielessDev = true;
       const data = await resp.json();
       setDevBrowserJWT(data?.token);
+    } else {
+      isCookielessDev = false;
     }
   }
 
