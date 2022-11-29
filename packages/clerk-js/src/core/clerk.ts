@@ -451,56 +451,7 @@ export default class Clerk implements ClerkInterface {
     session: ActiveSessionResource | string | null,
     beforeEmit?: BeforeEmitCallback,
   ): Promise<void> => {
-    if (!this.client) {
-      throw new Error('setSession is being called before the client is loaded. Wait for init.');
-    }
-
-    if (typeof session === 'string') {
-      session = (this.client.sessions.find(x => x.id === session) as ActiveSessionResource) || null;
-    }
-
-    this.#authService?.setAuthCookiesFromSession(session);
-
-    // If this.session exists, then signout was triggered by the current tab
-    // and should emit. Other tabs should not emit the same event again
-    if (this.session && session === null) {
-      this.#broadcastSignOutEvent();
-    }
-
-    //1. setLastActiveSession to passed usersession (add a param)
-    if (inActiveBrowserTab()) {
-      await this.#touchLastActiveSession(session);
-    }
-
-    //2. If there's a beforeEmit, typically we're navigating.  Emit the session as
-    //   undefined, then wait for beforeEmit to complete before emitting the new session.
-    //   When undefined, neither SignedIn nor SignedOut renders, which avoids flickers or
-    //   automatic reloading when reloading shouldn't be happening.
-    const beforeUnloadTracker = createBeforeUnloadTracker();
-    if (beforeEmit) {
-      beforeUnloadTracker.startTracking();
-      this.session = undefined;
-      this.organization = undefined;
-      this.user = undefined;
-      this.#emit();
-      await beforeEmit(session);
-      beforeUnloadTracker.stopTracking();
-    }
-
-    //3. Check if hard reloading (onbeforeunload).  If not, set the user/session and emit
-    if (beforeUnloadTracker.isUnloading()) {
-      return;
-    }
-
-    this.session = session;
-    this.organization =
-      (this.session?.user.organizationMemberships || [])
-        .map(om => om.organization)
-        .find(org => org.id === this.session?.lastActiveOrganizationId) || null;
-    this.user = this.session ? this.session.user : null;
-
-    this.#emit();
-    this.#resetComponentsState();
+    return this.setActive({ session, beforeEmit });
   };
 
   public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
