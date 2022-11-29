@@ -1,3 +1,5 @@
+import { createWorkerTimers } from './workerTimers';
+
 export type PollerStop = () => void;
 export type PollerCallback = (stop: PollerStop) => Promise<unknown>;
 export type PollerRun = (cb: PollerCallback) => Promise<void>;
@@ -12,11 +14,15 @@ export type Poller = {
 };
 
 export function Poller({ delayInMs }: PollerOptions = { delayInMs: 1000 }): Poller {
+  const { workerTimers } = createWorkerTimers();
+
   let timerId: number | undefined;
   let stopped = false;
 
   const stop: PollerStop = () => {
-    clearTimeout(timerId);
+    if (timerId) {
+      workerTimers.clearTimeout(timerId);
+    }
     stopped = true;
   };
 
@@ -26,7 +32,10 @@ export function Poller({ delayInMs }: PollerOptions = { delayInMs: 1000 }): Poll
     if (stopped) {
       return;
     }
-    timerId = setTimeout(() => run(cb), delayInMs) as any as number;
+
+    timerId = workerTimers.setTimeout(() => {
+      void run(cb);
+    }, delayInMs) as any as number;
   };
 
   return { run, stop };
