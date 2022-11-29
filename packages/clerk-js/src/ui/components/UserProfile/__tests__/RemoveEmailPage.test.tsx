@@ -50,11 +50,10 @@ describe('RemoveEmailPage', () => {
       expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
     });
 
-    it.only('calls the appropriate function upon pressing continue', async () => {
+    it('calls the appropriate function upon pressing continue', async () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
 
       fixtures.router.params.id = 'id';
-      console.log(fixtures.clerk.user?.emailAddresses[0]);
       fixtures.clerk.user?.emailAddresses[0].destroy.mockResolvedValue();
       const { userEvent } = render(<RemoveEmailPage />, { wrapper });
 
