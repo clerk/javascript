@@ -1,5 +1,3 @@
-import { DevSessionSyncMode } from '@clerk/types';
-
 import {
   buildURL,
   createCookieHandler,
@@ -18,22 +16,23 @@ export interface DevBrowserHandler {
   getDevBrowserJWT(): string | null;
   setDevBrowserJWT(jwt: string): void;
   removeDevBrowserJWT(): void;
+  isCookieless(): boolean;
 }
 
 export type CreateDevBrowserHandlerOptions = {
   frontendApi: string;
   fapiClient: FapiClient;
-  devSessionSyncMode: DevSessionSyncMode;
 };
 
 // export type DevBrowserHandler = ReturnType<typeof createDevBrowserHandler>;
 export default function createDevBrowserHandler({
   frontendApi,
   fapiClient,
-  devSessionSyncMode,
 }: CreateDevBrowserHandlerOptions): DevBrowserHandler {
   const cookieHandler = createCookieHandler();
   const key = DEV_BROWSER_SSO_JWT_KEY;
+
+  let isCookielessDev = false;
 
   function getDevBrowserJWT() {
     return localStorage.getItem(key);
@@ -48,7 +47,7 @@ export default function createDevBrowserHandler({
     localStorage.removeItem(key);
   }
 
-  // location.host == *.lcl.dev
+  // location.host == *.[lcl.dev](http://lcl.dev)
   async function setFirstPartyCookieForDevBrowser(): Promise<void> {
     const setFirstPartyCookieUrl = fapiClient.buildUrl({
       method: 'POST',
@@ -68,7 +67,7 @@ export default function createDevBrowserHandler({
     cookieHandler.setDevBrowserInittedCookie();
   }
 
-  // location.host != *.lcl.dev
+  // location.host != *.[lcl.dev](http://lcl.dev)
   async function setThirdPartyCookieForDevBrowser(): Promise<void> {
     const fapiOrigin = `https://${frontendApi}`;
     const origin = window.location.origin;
@@ -132,14 +131,21 @@ export default function createDevBrowserHandler({
       method: 'POST',
     });
 
-    const data = await resp.json();
-    setDevBrowserJWT(data?.token);
+    if (resp.status === 200) {
+      isCookielessDev = true;
+      const data = await resp.json();
+      setDevBrowserJWT(data?.token);
+    }
   }
 
   async function clear() {
     removeDevBrowserJWT();
     cookieHandler.removeAllDevBrowserCookies();
     return Promise.resolve();
+  }
+
+  function isCookieless(): boolean {
+    return isCookielessDev;
   }
 
   async function setup(): Promise<void> {
@@ -162,8 +168,10 @@ export default function createDevBrowserHandler({
       });
     }
 
-    if (devSessionSyncMode === 'cookieless') {
-      return setCookielessDevBrowser();
+    await setCookielessDevBrowser();
+
+    if (isCookieless()) {
+      return;
     }
 
     if (devOrStgHost && !cookieHandler.getDevBrowserInittedCookie()) {
@@ -181,5 +189,6 @@ export default function createDevBrowserHandler({
     getDevBrowserJWT,
     setDevBrowserJWT,
     removeDevBrowserJWT,
+    isCookieless,
   };
 }

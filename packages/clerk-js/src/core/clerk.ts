@@ -91,7 +91,6 @@ const defaultOptions: ClerkOptions = {
   polling: true,
   standardBrowser: true,
   touchSession: true,
-  __experimental__devSessionSyncMode: 'cookie',
 };
 
 export default class Clerk implements ClerkInterface {
@@ -542,7 +541,7 @@ export default class Clerk implements ClerkInterface {
   };
 
   public buildUrlWithAuth(to: string): string {
-    if (this.#instanceType === 'production' || this.#options.__experimental__devSessionSyncMode === 'cookie') {
+    if (this.#instanceType === 'production' || !this.#devBrowserHandler?.isCookieless()) {
       return to;
     }
 
@@ -966,7 +965,6 @@ export default class Clerk implements ClerkInterface {
     this.#devBrowserHandler = createDevBrowserHandler({
       frontendApi: this.frontendApi,
       fapiClient: this.#fapiClient,
-      devSessionSyncMode: this.#options.__experimental__devSessionSyncMode!,
     });
 
     this.#pageLifecycle = createPageLifecycle();
