@@ -1,8 +1,8 @@
 <p align="center">
   <a href="https://clerk.dev?utm_source=github&utm_medium=clerk_javascript" target="_blank" rel="noopener noreferrer">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./docs/clerk-logo-dark.png">
-      <img src="./docs/clerk-logo-light.png" height="64">
+      <source media="(prefers-color-scheme: dark)" srcset="https://images.clerk.dev/static/logo-dark-mode-400x400.png">
+      <img src="https://images.clerk.dev/static/logo-light-mode-400x400.png" height="64">
     </picture>
   </a>
   <br />
