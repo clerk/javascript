@@ -88,7 +88,16 @@ export const OrganizationMembers = withCardStateProvider(() => {
             </TabPanel>
             {isAdmin && (
               <TabPanel sx={{ width: '100%' }}>
-                <InvitedMembersList />
+                <Flex
+                  sx={t => ({
+                    flexDirection: 'column',
+                    width: '100%',
+                    marginTop: __unstable_manageBillingUrl ? t.space.$4 : 0,
+                  })}
+                >
+                  {isAdmin && __unstable_manageBillingUrl && <MembershipWidget />}
+                  <InvitedMembersList />
+                </Flex>
               </TabPanel>
             )}
           </TabPanels>
