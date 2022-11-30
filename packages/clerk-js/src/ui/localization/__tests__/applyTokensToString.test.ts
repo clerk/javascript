@@ -26,25 +26,25 @@ describe('applyTokensToString', function () {
     ],
     ['', ''],
     [undefined, ''],
-    ["Last {{ date | weekday('en-US','long') }} at {{ date | timeString('en-US') }}", 'Last Saturday at 12:00 AM'],
-    ["Last {{ date | weekday('fr-FR','long') }} at {{ date | timeString('fr-FR') }}", 'Last samedi at 00:00 AM'],
+    ["Last {{ date | weekday('en-US','long') }} at {{ date | timeString('en-US') }}", 'Last Friday at 10:00 PM'],
+    ["Last {{ date | weekday('fr-FR','long') }} at {{ date | timeString('fr-FR') }}", 'Last vendredi at 10:00 PM'],
     [
-      "Προηγούμενο {{ date | weekday('el-GR','long') }} στις {{ date | timeString('el-GR') }}",
-      'Προηγούμενο Σάββατο στις 12:00 π.μ.',
+      "Προηγούμενη {{ date | weekday('el-GR','long') }} στις {{ date | timeString('el-GR') }}",
+      'Προηγούμενη Παρασκευή στις 10:00 μ.μ.',
     ],
     [
-      "Προηγούμενο {{ date | weekday('el-GR') }} στις {{ date | timeString('el-GR') }}",
-      'Προηγούμενο Σάββατο στις 12:00 π.μ.',
+      "Προηγούμενη {{ date | weekday('el-GR') }} στις {{ date | timeString('el-GR') }}",
+      'Προηγούμενη Παρασκευή στις 10:00 μ.μ.',
     ],
     [
       "Last {{ dateString | weekday('en-US','long') }} at {{ dateString | timeString('en-US') }}",
-      'Last Saturday at 12:00 AM',
+      'Last Friday at 10:00 PM',
     ],
     [
       "Last {{ dateNumber | weekday('en-US','long') }} at {{ dateNumber | timeString('en-US') }}",
-      'Last Saturday at 12:00 AM',
+      'Last Friday at 10:00 PM',
     ],
-    ['Last {{ date | weekday }} at {{ date | timeString }}', 'Last Saturday at 12:00 AM'],
+    ['Last {{ date | weekday }} at {{ date | timeString }}', 'Last Friday at 10:00 PM'],
   ];
 
   it.each(cases)('.applyTokensToString(%s, tokens) => %s', (input, expected) => {
