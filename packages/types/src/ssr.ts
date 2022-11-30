@@ -24,7 +24,9 @@ type SsrSessionState<SessionType> =
       session: SessionType | undefined;
     };
 
-type SsrOrganizationState<OrganizationType> = { organization: null } | { organization: OrganizationType | undefined };
+type SsrOrganizationState<OrganizationType> =
+  | { organization: null; organizationId: null }
+  | { organization: OrganizationType | undefined; organizationId: string };
 
 type SsrUserState<UserType> =
   | {
@@ -44,6 +46,7 @@ export type InitialState =
       userId: undefined;
       session: undefined;
       sessionId: undefined;
+      organizationId: undefined;
       organization: undefined;
     }
   | (SsrSessionState<SessionJSON> & SsrUserState<UserJSON> & SsrOrganizationState<OrganizationJSON>);

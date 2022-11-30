@@ -1,4 +1,4 @@
-import type { ActJWTClaim, GetToken, SignOut } from '@clerk/types';
+import type { ActJWTClaim, GetToken, MembershipRole, SignOut } from '@clerk/types';
 
 import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
@@ -13,6 +13,9 @@ type UseAuthReturn =
       userId: undefined;
       sessionId: undefined;
       actor: undefined;
+      orgId: undefined;
+      orgRole: undefined;
+      orgSlug: undefined;
       signOut: SignOut;
       getToken: GetToken;
     }
@@ -22,6 +25,9 @@ type UseAuthReturn =
       userId: null;
       sessionId: null;
       actor: null;
+      orgId: null;
+      orgRole: null;
+      orgSlug: null;
       signOut: SignOut;
       getToken: GetToken;
     }
@@ -31,6 +37,21 @@ type UseAuthReturn =
       userId: string;
       sessionId: string;
       actor: ActJWTClaim | null;
+      orgId: null;
+      orgRole: null;
+      orgSlug: null;
+      signOut: SignOut;
+      getToken: GetToken;
+    }
+  | {
+      isLoaded: true;
+      isSignedIn: true;
+      userId: string;
+      sessionId: string;
+      actor: ActJWTClaim | null;
+      orgId: string;
+      orgRole: MembershipRole;
+      orgSlug: string | null;
       signOut: SignOut;
       getToken: GetToken;
     };
@@ -77,7 +98,7 @@ type UseAuth = () => UseAuthReturn;
  * }
  */
 export const useAuth: UseAuth = () => {
-  const { sessionId, userId, actor } = useAuthContext();
+  const { sessionId, userId, actor, orgId, orgRole, orgSlug } = useAuthContext();
   const isomorphicClerk = useIsomorphicClerkContext() as unknown as IsomorphicClerk;
 
   const getToken: GetToken = createGetToken(isomorphicClerk);
@@ -90,6 +111,9 @@ export const useAuth: UseAuth = () => {
       sessionId,
       userId,
       actor: undefined,
+      orgId: undefined,
+      orgRole: undefined,
+      orgSlug: undefined,
       signOut,
       getToken,
     };
@@ -102,18 +126,39 @@ export const useAuth: UseAuth = () => {
       sessionId,
       userId,
       actor: null,
+      orgId: null,
+      orgRole: null,
+      orgSlug: null,
       signOut,
       getToken,
     };
   }
 
-  if (!!sessionId && !!userId) {
+  if (!!sessionId && !!userId && !!orgId && !!orgRole) {
     return {
       isLoaded: true,
       isSignedIn: true,
       sessionId,
       userId,
       actor: actor || null,
+      orgId,
+      orgRole,
+      orgSlug: orgSlug || null,
+      signOut,
+      getToken,
+    };
+  }
+
+  if (!!sessionId && !!userId && !orgId) {
+    return {
+      isLoaded: true,
+      isSignedIn: true,
+      sessionId,
+      userId,
+      actor: actor || null,
+      orgId: null,
+      orgRole: null,
+      orgSlug: null,
       signOut,
       getToken,
     };

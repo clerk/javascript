@@ -47,10 +47,21 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
   const clerkCtx = React.useMemo(() => ({ value: clerk }), [clerkLoaded]);
   const clientCtx = React.useMemo(() => ({ value: state.client }), [state.client]);
 
-  const { sessionId, session, userId, user } = derivedState;
-  const actor = session?.actor;
+  const { sessionId, session, userId, user, organizationId, organization } = derivedState;
+  const actor = session?.actor || null;
+  const organizationMembership = organization
+    ? session?.user.organizationMemberships.find(m => m.organization.id === organizationId)
+    : organization;
+  const orgId = organizationId;
+  const orgRole = organizationMembership ? organizationMembership.role : organizationMembership;
+  const orgSlug = organizationMembership ? organizationMembership.organization.slug : organizationMembership;
 
-  const authCtx = React.useMemo(() => ({ value: { sessionId, userId, actor } }), [sessionId, userId, actor]);
+  const authCtx = React.useMemo(
+    () => ({
+      value: { sessionId, userId, actor, orgId, orgRole, orgSlug },
+    }),
+    [sessionId, userId, actor, orgId, orgRole, orgSlug],
+  );
   const userCtx = React.useMemo(() => ({ value: user }), [userId, user]);
   const sessionCtx = React.useMemo(() => ({ value: session }), [sessionId, session]);
   const organizationCtx = React.useMemo(() => {
@@ -61,7 +72,12 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
         lastOrganizationMember: derivedState.lastOrganizationMember,
       },
     };
-  }, [derivedState.organization, derivedState.lastOrganizationInvitation, derivedState.lastOrganizationMember]);
+  }, [
+    derivedState.organizationId,
+    derivedState.organization,
+    derivedState.lastOrganizationInvitation,
+    derivedState.lastOrganizationMember,
+  ]);
 
   return (
     // @ts-expect-error
@@ -107,6 +123,7 @@ function deriveState(
 ): {
   userId: string | null | undefined;
   sessionId: string | null | undefined;
+  organizationId: string | null | undefined;
   session: ActiveSessionResource | null | undefined;
   user: UserResource | null | undefined;
   organization: OrganizationResource | null | undefined;
@@ -122,11 +139,13 @@ function deriveState(
     const session = initialState.session as any as ActiveSessionResource;
 
     const organization = initialState.organization as any as OrganizationResource;
+    const organizationId = initialState.organizationId;
     return {
       sessionId,
       session,
       userId,
       user,
+      organizationId,
       organization,
       lastOrganizationInvitation: null,
       lastOrganizationMember: null,
@@ -136,8 +155,18 @@ function deriveState(
   const user = state.user;
   const sessionId: string | null | undefined = state.session ? state.session.id : state.session;
   const session = state.session;
+  const organizationId: string | null | undefined = state.organization ? state.organization.id : state.organization;
   const organization = state.organization;
   const lastOrganizationInvitation = state.lastOrganizationInvitation;
   const lastOrganizationMember = state.lastOrganizationMember;
-  return { sessionId, session, userId, user, organization, lastOrganizationInvitation, lastOrganizationMember };
+  return {
+    sessionId,
+    session,
+    userId,
+    user,
+    organization,
+    organizationId,
+    lastOrganizationInvitation,
+    lastOrganizationMember,
+  };
 }
