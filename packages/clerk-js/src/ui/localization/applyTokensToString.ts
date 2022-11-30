@@ -100,7 +100,6 @@ const parseTokensFromLocalizedString = (
 
 const applyTokenExpressions = (s: string, expressions: TokenExpression[], tokens: Tokens) => {
   expressions.forEach(({ token, modifiers }) => {
-    // @ts-ignore
     const value = modifiers.reduce((acc, mod) => {
       try {
         return MODIFIERS[mod.modifierName](acc, ...mod.params);

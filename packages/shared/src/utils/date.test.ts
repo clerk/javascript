@@ -1,4 +1,4 @@
-import { addYears, dateTo12HourTime, differenceInCalendarDays, formatRelative } from './date';
+import { addYears, dateTo12HourTime, differenceInCalendarDays, formatRelative, RelativeDateCase } from './date';
 
 describe.concurrent('date utils', () => {
   describe.concurrent('dateTo12HourTime(date)', () => {
@@ -36,19 +36,19 @@ describe.concurrent('date utils', () => {
   });
 
   describe.concurrent('formatRelative(date)', () => {
-    const cases: Array<[Date | undefined, Date | undefined, string]> = [
-      [undefined, undefined, ''],
-      [new Date('1/1/2020 23:15'), new Date('1/1/2020'), 'today at 11:15 PM'],
-      [new Date('1/5/2020 23:15'), new Date('1/6/2020'), 'yesterday at 11:15 PM'],
-      [new Date('1/3/2020 23:15'), new Date('1/6/2020'), 'last Friday at 11:15 PM'],
-      [new Date('1/7/2020 23:15'), new Date('1/6/2020'), 'tomorrow at 11:15 PM'],
-      [new Date('1/10/2020 23:15'), new Date('1/6/2020'), 'Friday at 11:15 PM'],
-      [new Date('12/10/2020 23:15'), new Date('1/6/2020'), '12/10/2020'],
-      [new Date('12/10/2020 23:15'), new Date('1/6/2021'), '12/10/2020'],
+    const cases: Array<[Date | undefined, Date | undefined, RelativeDateCase | null]> = [
+      [undefined, undefined, null],
+      [new Date('1/1/2020 23:15'), new Date('1/1/2020'), 'sameDayAt'],
+      [new Date('1/5/2020 23:15'), new Date('1/6/2020'), 'lastDayAt'],
+      [new Date('1/3/2020 23:15'), new Date('1/6/2020'), 'previous6DaysAt'],
+      [new Date('1/7/2020 23:15'), new Date('1/6/2020'), 'nextDayAt'],
+      [new Date('1/10/2020 23:15'), new Date('1/6/2020'), 'next6DaysAt'],
+      [new Date('12/10/2020 23:15'), new Date('1/6/2020'), 'numeric'],
+      [new Date('12/10/2020 23:15'), new Date('1/6/2021'), 'numeric'],
     ];
 
     it.each(cases)('.formatRelative(%s, %s) => %s', (a, b, expected) => {
-      expect(formatRelative(a as Date, b as Date, 'en-US')).toBe(expected);
+      expect(formatRelative({ date: a as Date, relativeTo: b as Date })?.relativeDateCase || null).toBe(expected);
     });
   });
 
