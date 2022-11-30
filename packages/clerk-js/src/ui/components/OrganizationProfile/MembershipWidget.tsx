@@ -11,10 +11,6 @@ export const MembershipWidget = () => {
     return null;
   }
 
-  const reachedOrganizationMemberLimit =
-    !!__unstable_manageBillingMembersLimit &&
-    __unstable_manageBillingMembersLimit <= organization.pendingInvitationsCount + organization.membersCount;
-
   return (
     <Flex
       sx={theme => ({
@@ -31,10 +27,10 @@ export const MembershipWidget = () => {
             lineHeight: t.lineHeights.$tall,
           })}
         >
-          Membership
+          Members can be given access to applications.
         </Text>
 
-        {reachedOrganizationMemberLimit && (
+        {__unstable_manageBillingMembersLimit > 0 && (
           <Link
             variant='regularRegular'
             sx={t => ({
