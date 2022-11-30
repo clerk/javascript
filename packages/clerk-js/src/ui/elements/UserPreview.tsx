@@ -2,7 +2,7 @@ import { UserResource } from '@clerk/types';
 import React from 'react';
 
 import { descriptors, Flex, LocalizationKey, Text, useLocalizations } from '../customizables';
-import { PropsOfComponent } from '../styledSystem';
+import { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { getFullName, getIdentifier } from '../utils';
 import { UserAvatar } from './UserAvatar';
 
@@ -14,6 +14,7 @@ export type UserPreviewProps = Omit<PropsOfComponent<typeof Flex>, 'title'> & {
   imageUrl?: string | null;
   rounded?: boolean;
   elementId?: any;
+  avatarSx?: ThemableCssProp;
   title?: LocalizationKey | string;
   subtitle?: LocalizationKey | string;
   showAvatar?: boolean;
@@ -32,6 +33,7 @@ export const UserPreview = (props: UserPreviewProps) => {
     sx,
     title,
     subtitle,
+    avatarSx,
     ...rest
   } = props;
   const { t } = useLocalizations();
@@ -62,6 +64,7 @@ export const UserPreview = (props: UserPreviewProps) => {
             imageUrl={imageUrl || user?.profileImageUrl}
             size={t => ({ sm: t.sizes.$8, md: t.sizes.$11, lg: t.sizes.$12x5 }[size])}
             optimize
+            sx={avatarSx}
             rounded={rounded}
           />
           {icon && <Flex sx={{ position: 'absolute', left: 0, bottom: 0 }}>{icon}</Flex>}
