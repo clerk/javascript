@@ -12,6 +12,7 @@ export * from './instance';
 export * from './jwt';
 export * from './pageLifecycle';
 export * from './path';
+export * from './props';
 export * from './querystring';
 export * from './runtime';
 export * from './runWithExponentialBackOff';

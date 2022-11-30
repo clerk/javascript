@@ -1,3 +1,4 @@
+import { runIfFunctionOrReturn } from '../../../utils';
 import { useWizard, Wizard } from '../../common';
 import { useCoreOrganization, useOrganizationProfileContext } from '../../contexts';
 import { Flex, localizationKeys, Text } from '../../customizables';
@@ -21,7 +22,8 @@ export const InviteMembersPage = withCardStateProvider(() => {
 
   const reachedOrganizationMemberLimit =
     !!__unstable_manageBillingMembersLimit &&
-    __unstable_manageBillingMembersLimit <= organization.pendingInvitationsCount + organization.membersCount;
+    runIfFunctionOrReturn(__unstable_manageBillingMembersLimit) <=
+      organization.pendingInvitationsCount + organization.membersCount;
 
   return (
     <Wizard {...wizard.props}>

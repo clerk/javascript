@@ -1,6 +1,7 @@
 import { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
+import { runIfFunctionOrReturn } from '../../../utils';
 import {
   useCoreClerk,
   useCoreOrganization,
@@ -88,8 +89,8 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
     const billingOrganizationButton = (
       <Action
         icon={Billing}
-        label={__unstable_manageBillingLabel ? __unstable_manageBillingLabel() : 'Manage billing'}
-        onClick={() => router.navigate(__unstable_manageBillingUrl())}
+        label={runIfFunctionOrReturn(__unstable_manageBillingLabel) || 'Manage billing'}
+        onClick={() => router.navigate(runIfFunctionOrReturn(__unstable_manageBillingUrl))}
       />
     );
 

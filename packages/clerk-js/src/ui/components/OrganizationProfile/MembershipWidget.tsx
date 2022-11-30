@@ -1,4 +1,5 @@
 import { useRouter } from '../../../ui/router';
+import { runIfFunctionOrReturn } from '../../../utils';
 import { useCoreOrganization, useOrganizationProfileContext } from '../../contexts';
 import { Col, Flex, Link, Text } from '../../customizables';
 
@@ -31,7 +32,7 @@ export const MembershipWidget = () => {
           Members can be given access to applications.
         </Text>
 
-        {__unstable_manageBillingMembersLimit > 0 && (
+        {runIfFunctionOrReturn(__unstable_manageBillingMembersLimit) > 0 && (
           <Link
             variant='regularRegular'
             sx={t => ({
@@ -40,9 +41,9 @@ export const MembershipWidget = () => {
               marginTop: t.space.$1,
               fontWeight: t.fontWeights.$normal,
             })}
-            onClick={() => router.navigate(__unstable_manageBillingUrl())}
+            onClick={() => router.navigate(runIfFunctionOrReturn(__unstable_manageBillingUrl))}
           >
-            {__unstable_manageBillingLabel || 'Manage billing'}
+            {runIfFunctionOrReturn(__unstable_manageBillingLabel) || 'Manage billing'}
           </Link>
         )}
       </Col>
@@ -56,7 +57,9 @@ export const MembershipWidget = () => {
           })}
         >
           {organization?.membersCount + organization?.pendingInvitationsCount} of{' '}
-          {!__unstable_manageBillingMembersLimit ? 'unlimited' : __unstable_manageBillingMembersLimit} members
+          {__unstable_manageBillingMembersLimit
+            ? `${runIfFunctionOrReturn(__unstable_manageBillingMembersLimit)} members}`
+            : 'unlimited'}
         </Text>
       </Col>
     </Flex>
