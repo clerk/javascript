@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Flex, Icon, Input, LocalizationKey, Text, useLocalizations } from '../customizables';
+import { descriptors, Flex, Icon, Input, LocalizationKey, Text, useLocalizations } from '../customizables';
 import { Plus } from '../icons';
 import { common, PropsOfComponent } from '../styledSystem';
 
@@ -96,6 +96,7 @@ export const TagInput = (props: TagInputProps) => {
 
   return (
     <Flex
+      elementDescriptor={descriptors.tagInputContainer}
       align={'start'}
       gap={2}
       wrap='wrap'
@@ -154,6 +155,7 @@ const TagPill = (props: TagPillProps) => {
 
   return (
     <Flex
+      elementDescriptor={descriptors.tagPillContainer}
       onClick={onRemoveClick}
       gap={1}
       center
@@ -176,6 +178,7 @@ const TagPill = (props: TagPillProps) => {
         {children}
       </Text>
       <Icon
+        elementDescriptor={descriptors.tagPillIcon}
         size='sm'
         icon={Plus}
         sx={t => ({ color: t.colors.$blackAlpha500, transform: 'translateY(1px) rotate(45deg)' })}

@@ -8,7 +8,7 @@ import { ApplicationLogo } from './ApplicationLogo';
 import { useFlowMetadata } from './contexts';
 import { PoweredByClerkTag } from './PoweredByClerk';
 
-type CardProps = PropsOfComponent<typeof BaseCard> & React.PropsWithChildren<{}>;
+type CardProps = PropsOfComponent<typeof BaseCard> & React.PropsWithChildren<Record<never, never>>;
 
 export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => {
   const appearance = useAppearance();

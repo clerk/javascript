@@ -25,6 +25,7 @@ export const OrganizationSwitcherTrigger = React.forwardRef<HTMLButtonElement, O
       >
         {organization && (
           <OrganizationPreview
+            elementId={'organizationSwitcher'}
             gap={3}
             size={'sm'}
             organization={organization}
@@ -44,6 +45,7 @@ export const OrganizationSwitcherTrigger = React.forwardRef<HTMLButtonElement, O
           />
         )}
         <Icon
+          elementDescriptor={descriptors.organizationSwitcherTriggerIcon}
           icon={Selector}
           sx={t => ({ color: t.colors.$blackAlpha400, marginLeft: `${t.space.$2}` })}
         />

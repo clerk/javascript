@@ -1,4 +1,5 @@
 import { createContextAndHook } from '@clerk/shared';
+import { NavbarItemId } from '@clerk/types';
 import React, { useEffect } from 'react';
 
 import {
@@ -35,7 +36,7 @@ export const NavbarContextProvider = (props: React.PropsWithChildren<Record<neve
 
 export type NavbarRoute = {
   name: LocalizationKey;
-  id: string;
+  id: NavbarItemId;
   icon: React.ComponentType;
   path: string;
 };
@@ -79,7 +80,7 @@ export const NavBar = (props: NavBarProps) => {
         for (const entry of entries) {
           const id = entry.target?.id?.split('section-')[1];
           if (entry.isIntersecting && id) {
-            return setActiveId(id);
+            return setActiveId(id as NavbarItemId);
           }
         }
       };
@@ -135,7 +136,7 @@ export const NavBar = (props: NavBarProps) => {
           elementDescriptor={descriptors.navbarButton}
           elementId={descriptors.navbarButton.setId(r.id as any)}
           iconElementDescriptor={descriptors.navbarButtonIcon}
-          iconElementId={descriptors.navbarButtonIcon.setId(r.id as any)}
+          iconElementId={descriptors.navbarButtonIcon.setId(r.id) as any}
           onClick={() => navigateAndScroll(r)}
           icon={r.icon}
           isActive={activeId === r.id}

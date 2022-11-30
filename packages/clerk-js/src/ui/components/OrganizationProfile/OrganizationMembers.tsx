@@ -34,8 +34,8 @@ export const OrganizationMembers = withCardStateProvider(() => {
       <CardAlert>{card.error}</CardAlert>
       <NavbarMenuButtonRow />
       <Col
-        // elementDescriptor={descriptors.profilePage}
-        // elementId={descriptors.profilePage.setId('account')}
+        elementDescriptor={descriptors.profilePage}
+        elementId={descriptors.profilePage.setId('organization-members')}
         gap={8}
       >
         <Flex

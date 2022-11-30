@@ -2,10 +2,9 @@ import React from 'react';
 
 import { useCoreOrganization } from '../../contexts';
 import { Col, descriptors, Flex, Icon, localizationKeys } from '../../customizables';
-import { Header, IconButton, NavbarMenuButtonRow, OrganizationPreview } from '../../elements';
+import { Header, IconButton, NavbarMenuButtonRow, OrganizationPreview, ProfileSection } from '../../elements';
 import { useNavigate } from '../../hooks';
 import { Times } from '../../icons';
-import { ProfileSection } from '../UserProfile/Section';
 import { BlockButton } from '../UserProfile/UserProfileBlockButtons';
 
 export const OrganizationSettings = () => {
@@ -16,8 +15,8 @@ export const OrganizationSettings = () => {
     >
       <NavbarMenuButtonRow />
       <Col
-        // elementDescriptor={descriptors.profilePage}
-        // elementId={descriptors.profilePage.setId('account')}
+        elementDescriptor={descriptors.profilePage}
+        elementId={descriptors.profilePage.setId('organization-settings')}
         gap={8}
       >
         <Header.Root>
@@ -53,7 +52,7 @@ const OrganizationProfileSection = () => {
   return (
     <ProfileSection
       title={localizationKeys('organizationProfile.profilePage.title')}
-      // id='organization-profile'
+      id='organization-profile'
     >
       {isAdmin ? <BlockButton onClick={() => navigate('profile')}>{profile}</BlockButton> : profile}
     </ProfileSection>
@@ -70,7 +69,7 @@ const OrganizationDangerSection = () => {
 
   return (
     <ProfileSection
-      // id='organization-danger'
+      id='organization-danger'
       title={localizationKeys('organizationProfile.profilePage.dangerSection.title')}
       sx={t => ({ marginBottom: t.space.$4 })}
     >

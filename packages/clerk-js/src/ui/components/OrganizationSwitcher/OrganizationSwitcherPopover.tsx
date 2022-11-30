@@ -9,7 +9,7 @@ import {
   useCoreUser,
   useOrganizationSwitcherContext,
 } from '../../contexts';
-import { Flex, localizationKeys } from '../../customizables';
+import { descriptors, Flex, localizationKeys } from '../../customizables';
 import { Action, OrganizationPreview, PersonalWorkspacePreview, PopoverCard, useCardState } from '../../elements';
 import { RootBox } from '../../elements/RootBox';
 import { Billing, CogFilled } from '../../icons';
@@ -95,15 +95,17 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
     );
 
     return (
-      <RootBox>
+      <RootBox elementDescriptor={descriptors.organizationSwitcherPopoverRootBox}>
         <PopoverCard.Root
+          elementDescriptor={descriptors.organizationSwitcherPopoverCard}
           ref={ref}
           {...rest}
         >
-          <PopoverCard.Main>
+          <PopoverCard.Main elementDescriptor={descriptors.organizationSwitcherPopoverMain}>
             {currentOrg ? (
               <>
                 <OrganizationPreview
+                  elementId={'organizationSwitcher'}
                   gap={5}
                   organization={currentOrg}
                   user={user}
@@ -133,7 +135,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
               onOrganizationClick={handleOrganizationClicked}
             />
           </PopoverCard.Main>
-          <PopoverCard.Footer />
+          <PopoverCard.Footer elementDescriptor={descriptors.organizationSwitcherPopoverFooter} />
         </PopoverCard.Root>
       </RootBox>
     );

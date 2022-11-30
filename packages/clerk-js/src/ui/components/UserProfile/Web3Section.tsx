@@ -2,10 +2,10 @@ import { Web3WalletResource } from '@clerk/types';
 
 import { useCoreUser } from '../../contexts';
 import { Col, Flex, Image, localizationKeys } from '../../customizables';
+import { ProfileSection } from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useNavigate } from '../../hooks/useNavigate';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
-import { ProfileSection } from './Section';
 import { UserProfileAccordion } from './UserProfileAccordion';
 import { AddBlockButton } from './UserProfileBlockButtons';
 

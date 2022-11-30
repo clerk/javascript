@@ -1,12 +1,10 @@
-import React from 'react';
-
 import { useCoreUser, useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
+import { ProfileSection } from '../../elements';
 import { useNavigate } from '../../hooks';
 import { MfaBackupCodeAccordion } from './MfaBackupCodeAccordion';
 import { MfaPhoneCodeAccordion } from './MfaPhoneCodeAccordion';
 import { MfaTOTPAccordion } from './MfaTOTPAccordion';
-import { ProfileSection } from './Section';
 import { AddBlockButton } from './UserProfileBlockButtons';
 import { defaultFirst, getSecondFactors, getSecondFactorsAvailableToAdd } from './utils';
 

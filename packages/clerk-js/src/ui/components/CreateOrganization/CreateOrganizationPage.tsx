@@ -104,12 +104,14 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
         headerTitle={title}
         headerSubtitle={subtitle}
       >
-        <InviteMembersForm
-          organization={organization!}
-          resetButtonLabel={localizationKeys('createOrganization.invitePage.formButtonReset')}
-          onSuccess={wizard.nextStep}
-          onReset={completeFlow}
-        />
+        {organization && (
+          <InviteMembersForm
+            organization={organization}
+            resetButtonLabel={localizationKeys('createOrganization.invitePage.formButtonReset')}
+            onSuccess={wizard.nextStep}
+            onReset={completeFlow}
+          />
+        )}
       </ContentPage>
       <SuccessPage
         title={title}
