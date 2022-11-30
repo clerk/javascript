@@ -1,5 +1,6 @@
+import { titleize } from '@clerk/shared';
+
 import { useCoreClerk, useEnvironment } from '../contexts';
-import { titleize } from '../shared';
 
 export const timeString = (val: Date | string | number, locale?: string): string => {
   try {
