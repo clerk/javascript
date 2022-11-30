@@ -20,7 +20,7 @@ export const BillingWidget = ({ __unstable_manageBillingUrl, __unstable_manageBi
           lineHeight: t.lineHeights.$tall,
         })}
       >
-        This organization is limited to {__unstable_manageBillingMembersLimit} memberships.
+        This organization is limited to {__unstable_manageBillingMembersLimit} members.
         <br />
         <Link
           variant='regularRegular'
@@ -31,7 +31,7 @@ export const BillingWidget = ({ __unstable_manageBillingUrl, __unstable_manageBi
           })}
           onClick={() => router.navigate(__unstable_manageBillingUrl())}
         >
-          Upgrade for unlimited memberships
+          Upgrade for unlimited members
         </Link>
       </Text>
     </Flex>
