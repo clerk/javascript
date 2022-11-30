@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.18.0-staging.8](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.18.0-staging.7...@clerk/clerk-js@4.18.0-staging.8) (2022-11-30)
+
+### Bug Fixes
+
+- **clerk-js:** Rename billing widget ([61a1a6a](https://github.com/clerkinc/javascript/commit/61a1a6acfa90db24e1288f793217ec2315e7f8fb))
+- **clerk-js:** Rename memberships widget ([20cf1e4](https://github.com/clerkinc/javascript/commit/20cf1e4fe42d11b0f2f10551c4060f4282e7eb5b))
+
 ## [4.18.0-staging.7](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.18.0-staging.6...@clerk/clerk-js@4.18.0-staging.7) (2022-11-29)
 
 **Note:** Version bump only for package @clerk/clerk-js
