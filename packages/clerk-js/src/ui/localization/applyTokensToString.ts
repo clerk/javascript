@@ -101,7 +101,14 @@ const parseTokensFromLocalizedString = (
 const applyTokenExpressions = (s: string, expressions: TokenExpression[], tokens: Tokens) => {
   expressions.forEach(({ token, modifiers }) => {
     // @ts-ignore
-    const value = modifiers.reduce((acc, mod) => MODIFIERS[mod.modifierName](acc, ...mod.params), tokens[token]);
+    const value = modifiers.reduce((acc, mod) => {
+      try {
+        return MODIFIERS[mod.modifierName](acc, ...mod.params);
+      } catch (e) {
+        console.warn(e);
+        return '';
+      }
+    }, tokens[token]);
     s = s.replace(`_++${token}++_`, value);
   });
   return s;

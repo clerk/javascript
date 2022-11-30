@@ -7,12 +7,7 @@ export function isIPV4Address(str: string | undefined | null): boolean {
 
 export function titleize(str: string | undefined | null): string {
   const s = str || '';
-  try {
-    return s.charAt(0).toUpperCase() + s.slice(1);
-  } catch (e) {
-    console.warn(e);
-    return s;
-  }
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 export function snakeToCamel(str: string | undefined): string {
