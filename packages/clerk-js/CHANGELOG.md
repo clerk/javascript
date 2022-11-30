@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.19.0-staging.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.19.0-staging.1...@clerk/clerk-js@4.19.0-staging.2) (2022-11-30)
+
+### Bug Fixes
+
+- **clerk-js:** Update typo ([4278a9e](https://github.com/clerkinc/javascript/commit/4278a9e5ceb92de5a53d6ee938b59e08bd1ecb39))
+
 ## [4.19.0-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.19.0-staging.0...@clerk/clerk-js@4.19.0-staging.1) (2022-11-30)
 
 ### Bug Fixes
