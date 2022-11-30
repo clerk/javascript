@@ -62,6 +62,7 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
               gap={3}
               user={{ profileImageUrl: user.profileImageUrl }}
               size='sm'
+              avatarSx={t => ({ marginLeft: `calc(${t.space.$3}/2)` })}
               title={localizationKeys('organizationSwitcher.personalWorkspace')}
             />
           </PreviewButton>
@@ -86,6 +87,7 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
           >
             <OrganizationPreview
               gap={3}
+              avatarSx={t => ({ marginLeft: `calc(${t.space.$3}/2)` })}
               organization={organization}
               size='sm'
             />

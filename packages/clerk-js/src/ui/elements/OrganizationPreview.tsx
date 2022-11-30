@@ -2,7 +2,7 @@ import { OrganizationResource, UserResource } from '@clerk/types';
 import React from 'react';
 
 import { Flex, Text } from '../customizables';
-import { PropsOfComponent } from '../styledSystem';
+import { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { roleLocalizationKey } from '../utils';
 import { OrganizationAvatar } from './OrganizationAvatar';
 
@@ -10,6 +10,7 @@ export type OrganizationPreviewProps = PropsOfComponent<typeof Flex> & {
   organization: OrganizationResource;
   user?: UserResource;
   size?: 'lg' | 'md' | 'sm';
+  avatarSx?: ThemableCssProp;
   icon?: React.ReactNode;
   badge?: React.ReactNode;
   rounded?: boolean;
@@ -17,7 +18,7 @@ export type OrganizationPreviewProps = PropsOfComponent<typeof Flex> & {
 };
 
 export const OrganizationPreview = (props: OrganizationPreviewProps) => {
-  const { organization, size = 'md', icon, rounded = false, badge, sx, user, ...rest } = props;
+  const { organization, size = 'md', icon, rounded = false, badge, sx, user, avatarSx, ...rest } = props;
   const role = user?.organizationMemberships.find(membership => membership.organization.id === organization.id)?.role;
 
   return (
@@ -35,6 +36,7 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
           {...organization}
           size={t => ({ sm: t.sizes.$8, md: t.sizes.$11, lg: t.sizes.$12x5 }[size])}
           optimize
+          sx={avatarSx}
           rounded={rounded}
         />
         {icon && <Flex sx={{ position: 'absolute', left: 0, bottom: 0 }}>{icon}</Flex>}
