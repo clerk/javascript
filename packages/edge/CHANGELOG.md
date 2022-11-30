@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [1.12.15](https://github.com/clerkinc/javascript/compare/@clerk/edge@1.12.15-staging.4...@clerk/edge@1.12.15) (2022-11-30)
+
+**Note:** Version bump only for package @clerk/edge
+
 ### [1.12.15-staging.4](https://github.com/clerkinc/javascript/compare/@clerk/edge@1.12.15-staging.3...@clerk/edge@1.12.15-staging.4) (2022-11-29)
 
 **Note:** Version bump only for package @clerk/edge

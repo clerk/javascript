@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [1.2.30](https://github.com/clerkinc/javascript/compare/@clerk/themes@1.2.30-staging.4...@clerk/themes@1.2.30) (2022-11-30)
+
+**Note:** Version bump only for package @clerk/themes
+
 ### [1.2.30-staging.4](https://github.com/clerkinc/javascript/compare/@clerk/themes@1.2.30-staging.3...@clerk/themes@1.2.30-staging.4) (2022-11-29)
 
 **Note:** Version bump only for package @clerk/themes
