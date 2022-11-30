@@ -58,7 +58,7 @@ export const MembershipWidget = () => {
         >
           {organization?.membersCount + organization?.pendingInvitationsCount} of{' '}
           {__unstable_manageBillingMembersLimit
-            ? `${runIfFunctionOrReturn(__unstable_manageBillingMembersLimit)} members}`
+            ? `${runIfFunctionOrReturn(__unstable_manageBillingMembersLimit)} members`
             : 'unlimited'}
         </Text>
       </Col>
