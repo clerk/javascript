@@ -1,7 +1,7 @@
 import { createContextAndHook } from '@clerk/shared';
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 
-import { Button, Col, Flex } from '../customizables';
+import { Button, descriptors, Flex } from '../customizables';
 import { PropsOfComponent } from '../styledSystem';
 import { getValidChildren } from '../utils';
 
@@ -21,23 +21,18 @@ const TabsContextProvider = (props: React.PropsWithChildren<{ value: TabsContext
   return <TabsContext.Provider value={ctxValue}>{props.children}</TabsContext.Provider>;
 };
 
-type TabsProps = PropsOfComponent<typeof Col> & {
+type TabsProps = PropsWithChildren<{
   defaultIndex?: number;
-};
+}>;
 
 export const Tabs = (props: TabsProps) => {
-  const { defaultIndex = 0, children, sx, ...rest } = props;
+  const { defaultIndex = 0, children } = props;
   const [selectedIndex, setSelectedIndex] = React.useState(defaultIndex);
   const [focusedIndex, setFocusedIndex] = React.useState(-1);
 
   return (
     <TabsContextProvider value={{ selectedIndex, setSelectedIndex, focusedIndex, setFocusedIndex }}>
-      <Col
-        sx={sx}
-        {...rest}
-      >
-        {children}
-      </Col>
+      {children}
     </TabsContextProvider>
   );
 };
@@ -72,6 +67,7 @@ export const TabsList = (props: TabsListProps) => {
 
   return (
     <Flex
+      elementDescriptor={descriptors.tabListContainer}
       onKeyDown={onKeyDown}
       sx={[theme => ({ borderBottom: theme.borders.$normal, borderColor: theme.colors.$blackAlpha300 }), sx]}
       {...rest}
@@ -81,7 +77,7 @@ export const TabsList = (props: TabsListProps) => {
   );
 };
 
-type TabProps = PropsOfComponent<typeof Flex>;
+type TabProps = PropsOfComponent<typeof Button>;
 type TabPropsWithTabIndex = TabProps & { tabIndex?: number };
 export const Tab = (props: TabProps) => {
   const { children, sx, tabIndex, isDisabled, ...rest } = props as TabPropsWithTabIndex;
@@ -113,22 +109,20 @@ export const Tab = (props: TabProps) => {
   }, [isFocused]);
 
   return (
-    <Flex
-      sx={[{ position: 'relative' }, sx]}
-      {...rest}
-    >
-      <Button
-        onClick={onClick}
-        focusRing={isActive}
-        isDisabled={isDisabled}
-        tabIndex={isActive ? 0 : -1}
-        variant='ghost'
-        aria-selected={isActive}
-        id={`cl-tab-${tabIndex}`}
-        aria-controls={`cl-tabpanel-${tabIndex}`}
-        role='tab'
-        ref={buttonRef}
-        sx={t => ({
+    <Button
+      elementDescriptor={descriptors.tabButton}
+      onClick={onClick}
+      focusRing={isActive}
+      isDisabled={isDisabled}
+      tabIndex={isActive ? 0 : -1}
+      variant='ghost'
+      aria-selected={isActive}
+      id={`cl-tab-${tabIndex}`}
+      aria-controls={`cl-tabpanel-${tabIndex}`}
+      role='tab'
+      ref={buttonRef}
+      sx={[
+        t => ({
           background: t.colors.$transparent,
           color: isActive ? t.colors.$blackAlpha900 : t.colors.$blackAlpha700,
           gap: t.space.$1x5,
@@ -138,17 +132,18 @@ export const Tab = (props: TabProps) => {
           borderRadius: 0,
           width: 'fit-content',
           '&:hover, :focus': { backgroundColor: t.colors.$transparent },
-        })}
-      >
-        {children}
-      </Button>
-    </Flex>
+        }),
+        sx,
+      ]}
+      {...rest}
+    >
+      {children}
+    </Button>
   );
 };
 
-type TabPanelsProps = PropsOfComponent<typeof Flex>;
-export const TabPanels = (props: TabPanelsProps) => {
-  const { sx, children, ...rest } = props;
+export const TabPanels = (props: PropsWithChildren<Record<never, never>>) => {
+  const { children } = props;
 
   const childrenWithProps = getValidChildren(children).map((child, index) =>
     React.cloneElement(child, {
@@ -156,14 +151,7 @@ export const TabPanels = (props: TabPanelsProps) => {
     }),
   );
 
-  return (
-    <Flex
-      sx={sx}
-      {...rest}
-    >
-      {childrenWithProps}
-    </Flex>
-  );
+  return <>{childrenWithProps}</>;
 };
 
 type TabPanelProps = PropsOfComponent<typeof Flex>;
@@ -184,6 +172,7 @@ export const TabPanel = (props: TabPanelProps) => {
 
   return (
     <Flex
+      elementDescriptor={descriptors.tabPanel}
       id={`cl-tabpanel-${tabIndex}`}
       role='tabpanel'
       tabIndex={0}

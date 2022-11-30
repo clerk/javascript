@@ -8,7 +8,7 @@ import {
   useCoreUser,
   useOrganizationSwitcherContext,
 } from '../../contexts';
-import { Box, Button, Icon, localizationKeys } from '../../customizables';
+import { Box, Button, descriptors, Icon, localizationKeys } from '../../customizables';
 import { Action, Actions, OrganizationPreview, PersonalWorkspacePreview } from '../../elements';
 import { useCardState } from '../../elements/contexts';
 import { common, PropsOfComponent } from '../../styledSystem';
@@ -30,6 +30,14 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
 
   const createOrganizationButton = (
     <Action
+      elementDescriptor={descriptors.organizationSwitcherPopoverActionButton}
+      elementId={descriptors.organizationSwitcherPopoverActionButton.setId('createOrganization')}
+      iconBoxElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonIconBox}
+      iconBoxElementId={descriptors.organizationSwitcherPopoverActionButtonIconBox.setId('createOrganization')}
+      iconElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonIcon}
+      iconElementId={descriptors.organizationSwitcherPopoverActionButtonIcon.setId('createOrganization')}
+      textElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonText}
+      textElementId={descriptors.organizationSwitcherPopoverActionButtonText.setId('createOrganization')}
       icon={Plus}
       label={localizationKeys('organizationSwitcher.action__createOrganization')}
       onClick={onCreateOrganizationClick}
@@ -38,6 +46,7 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
 
   return (
     <Actions
+      elementDescriptor={descriptors.organizationSwitcherPopoverActions}
       sx={t => ({
         backgroundColor: t.colors.$blackAlpha20,
         border: `${t.borders.$normal} ${t.colors.$blackAlpha200}`,
@@ -49,6 +58,7 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
     >
       {currentOrg && !hidePersonal && (
         <Actions
+          elementDescriptor={descriptors.organizationSwitcherPopoverActions}
           sx={t => ({
             borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha200}`,
             padding: `${t.space.$2} 0`,
@@ -105,6 +115,7 @@ const PreviewButton = (props: PropsOfComponent<typeof Button>) => {
 
   return (
     <Button
+      elementDescriptor={descriptors.organizationSwitcherPreviewButton}
       variant='ghost'
       colorScheme='neutral'
       focusRing={false}

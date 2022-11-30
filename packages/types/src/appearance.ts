@@ -74,10 +74,15 @@ export type ProfileSectionId =
   | 'web3Wallets'
   | 'password'
   | 'mfa'
-  | 'activeDevices';
-export type ProfilePageId = 'account' | 'security';
+  | 'activeDevices'
+  | 'organization-profile'
+  | 'organization-danger';
+export type ProfilePageId = 'account' | 'security' | 'organization-settings' | 'organization-members';
 
-type NavbarItemId = 'account' | 'security';
+export type NavbarItemId = 'account' | 'security';
+
+export type UserPreviewId = 'userButton' | 'personalWorkspace';
+export type OrganizationPreviewId = 'organizationSwitcher';
 
 /**
  * A type that describes the states and the ids that we will combine
@@ -229,53 +234,48 @@ export type ElementsConfig = {
   userButtonPopoverFooterPages: WithOptions<never, never, never>;
   userButtonPopoverFooterPagesLink: WithOptions<'terms' | 'privacy', never, never>;
 
-  // organizationSwitcherBox: WithOptions<never, 'open', never>;
-  // organizationSwitcherOuterIdentifier: WithOptions<never, 'open', never>;
   organizationSwitcherTrigger: WithOptions<never, 'open', never>;
-  // organizationSwitcherTriggerBox: WithOptions<never, 'open', never>;
-  // organizationSwitcherTitle: WithOptions<never, 'open', never>;
-  // organizationSwitcherAvatarBox: WithOptions<never, 'open', never>;
-  // organizationSwitcherAvatarImage: WithOptions<never, 'open', never>;
-  // organizationSwitcherPersonalWorkspace: WithOptions<never, 'open', never>;
-  // organizationSwitcherPopoverRootBox: WithOptions<never, never, never>;
-  // organizationSwitcherPopoverCard: WithOptions<never, never, never>;
-  // organizationSwitcherPopoverMain: WithOptions<never, never, never>;
-  // organizationSwitcherPopoverUserPreview: WithOptions<never, never, never>;
-  // organizationSwitcherPopoverActions: WithOptions<never, never, never>;
-  // organizationSwitcherPopoverActionButton: WithOptions<'manageOrganization' | 'createOrganization', never, never>;
-  // organizationSwitcherPopoverActionButtonIconBox: WithOptions<'manageOrganization' | 'createOrganization', never, never>;
-  // organizationSwitcherPopoverActionButtonIcon: WithOptions<'manageOrganization' | 'createOrganization', never, never>;
-  // organizationSwitcherPopoverActionButtonText: WithOptions<'manageOrganization' | 'createOrganization', never, never>;
-  // organizationSwitcherPopoverFooter: WithOptions<never, never, never>;
-  // organizationSwitcherPopoverFooterPages: WithOptions<never, never, never>;
-  // organizationSwitcherPopoverFooterPagesLink: WithOptions<'terms' | 'privacy', never, never>;
+  organizationSwitcherTriggerIcon: WithOptions<never, 'open', never>;
+  organizationSwitcherPopoverRootBox: WithOptions<never, never, never>;
+  organizationSwitcherPopoverCard: WithOptions<never, never, never>;
+  organizationSwitcherPopoverMain: WithOptions<never, never, never>;
+  organizationSwitcherPopoverActions: WithOptions<never, never, never>;
+  organizationSwitcherPopoverActionButton: WithOptions<
+    'manageOrganization' | 'createOrganization' | 'switchOrganization',
+    never,
+    never
+  >;
+  organizationSwitcherPreviewButton: WithOptions<never, never, never>;
+  organizationSwitcherPopoverActionButtonIconBox: WithOptions<
+    'manageOrganization' | 'createOrganization',
+    never,
+    never
+  >;
+  organizationSwitcherPopoverActionButtonIcon: WithOptions<'manageOrganization' | 'createOrganization', never, never>;
+  organizationSwitcherPopoverActionButtonText: WithOptions<'manageOrganization' | 'createOrganization', never, never>;
+  organizationSwitcherPopoverFooter: WithOptions<never, never, never>;
+  organizationSwitcherPopoverFooterPages: WithOptions<never, never, never>;
+  organizationSwitcherPopoverFooterPagesLink: WithOptions<'terms' | 'privacy', never, never>;
 
   // TODO: Test this idea. Instead of userButtonUserPreview, have a userPreview__userButton instead
   // Same for other repeated selectors, eg avatar
-  userPreview: WithOptions<'userButton', never, never>;
-  userPreviewAvatarContainer: WithOptions<'userButton', never, never>;
-  userPreviewAvatarBox: WithOptions<'userButton', never, never>;
-  userPreviewAvatarImage: WithOptions<'userButton', never, never>;
-  userPreviewTextContainer: WithOptions<'userButton', never, never>;
-  userPreviewMainIdentifier: WithOptions<'userButton', never, never>;
-  userPreviewSecondaryIdentifier: WithOptions<'userButton', never, never>;
+  userPreview: WithOptions<UserPreviewId, never, never>;
+  userPreviewAvatarContainer: WithOptions<UserPreviewId, never, never>;
+  userPreviewAvatarBox: WithOptions<UserPreviewId, never, never>;
+  userPreviewAvatarImage: WithOptions<UserPreviewId, never, never>;
+  userPreviewTextContainer: WithOptions<UserPreviewId, never, never>;
+  userPreviewMainIdentifier: WithOptions<UserPreviewId, never, never>;
+  userPreviewSecondaryIdentifier: WithOptions<UserPreviewId, never, never>;
 
-  // personalWorkspacePreview: WithOptions<'organizationSwitcher', never, never>;
-  // personalWorkspacePreviewAvatarContainer: WithOptions<'organizationSwitcher', never, never>;
-  // personalWorkspacePreviewAvatarBox: WithOptions<'organizationSwitcher', never, never>;
-  // personalWorkspacePreviewAvatarImage: WithOptions<'organizationSwitcher', never, never>;
-  // personalWorkspacePreviewTextContainer: WithOptions<'organizationSwitcher', never, never>;
-  // personalWorkspacePreviewMainIdentifier: WithOptions<'organizationSwitcher', never, never>;
-  // personalWorkspacePreviewSecondaryIdentifier: WithOptions<'organizationSwitcher', never, never>;
+  organizationPreview: WithOptions<OrganizationPreviewId, never, never>;
+  organizationPreviewAvatarContainer: WithOptions<OrganizationPreviewId, never, never>;
+  organizationPreviewAvatarBox: WithOptions<OrganizationPreviewId, never, never>;
+  organizationPreviewAvatarImage: WithOptions<OrganizationPreviewId, never, never>;
+  organizationPreviewTextContainer: WithOptions<OrganizationPreviewId, never, never>;
+  organizationPreviewMainIdentifier: WithOptions<OrganizationPreviewId, never, never>;
+  organizationPreviewSecondaryIdentifier: WithOptions<OrganizationPreviewId, never, never>;
 
-  // organizationPreview: WithOptions<'organizationSwitcher', never, never>;
-  // organizationPreviewAvatarContainer: WithOptions<'organizationSwitcher', never, never>;
-  // organizationPreviewAvatarBox: WithOptions<'organizationSwitcher', never, never>;
-  // organizationPreviewAvatarImage: WithOptions<'organizationSwitcher', never, never>;
-  // organizationPreviewTextContainer: WithOptions<'organizationSwitcher', never, never>;
-  // organizationPreviewMainIdentifier: WithOptions<'organizationSwitcher', never, never>;
-  // organizationPreviewSecondaryIdentifier: WithOptions<'organizationSwitcher', never, never>;
-
+  organizationProfilePage: WithOptions<never, never, never>;
   identityPreview: WithOptions<never, never, never>;
   identityPreviewAvatarBox: WithOptions<never, never, never>;
   identityPreviewAvatarImage: WithOptions<never, never, never>;
@@ -287,6 +287,18 @@ export type ElementsConfig = {
   alertIcon: WithOptions<AlertId, never, never>;
   alertText: WithOptions<AlertId, never, never>;
   alertTextContainer: WithOptions<AlertId, never, never>;
+
+  tagInputContainer: WithOptions<never, never, never>;
+  tagPillIcon: WithOptions<never, never, never>;
+  tagPillContainer: WithOptions<never, never, never>;
+
+  tabPanel: WithOptions<never, never, never>;
+  tabButton: WithOptions<never, never, never>;
+  tabListContainer: WithOptions<never, never, never>;
+
+  selectButton: WithOptions<never, never, never>;
+  selectButtonIcon: WithOptions<never, never, never>;
+  selectOptionsContainer: WithOptions<never, never, never>;
 
   loader: WithOptions<never, never, never>;
   loaderIcon: WithOptions<never, ErrorState, never>;
@@ -342,6 +354,9 @@ export type ElementsConfig = {
   fileDropAreaHint: WithOptions<never, never, never>;
   fileDropAreaButtonPrimary: WithOptions<never, never, never>;
   fileDropAreaFooterHint: WithOptions<never, never, never>;
+
+  invitationsSentIconBox: WithOptions<never, never, never>;
+  invitationsSentIcon: WithOptions<never, never, never>;
 
   accordionTriggerButton: WithOptions<never, never, never>;
   accordionContent: WithOptions<never, never, never>;

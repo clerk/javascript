@@ -110,26 +110,20 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'userButtonPopoverFooterPages',
   'userButtonPopoverFooterPagesLink',
 
-  // 'organizationSwitcherBox',
-  // 'organizationSwitcherOuterIdentifier',
   'organizationSwitcherTrigger',
-  // 'organizationSwitcherTriggerBox',
-  // 'organizationSwitcherTitle',
-  // 'organizationSwitcherAvatarBox',
-  // 'organizationSwitcherAvatarImage',
-  // 'organizationSwitcherPersonalWorkspace',
-  // 'organizationSwitcherPopoverRootBox',
-  // 'organizationSwitcherPopoverCard',
-  // 'organizationSwitcherPopoverMain',
-  // 'organizationSwitcherPopoverUserPreview',
-  // 'organizationSwitcherPopoverActions',
-  // 'organizationSwitcherPopoverActionButton',
-  // 'organizationSwitcherPopoverActionButtonIconBox',
-  // 'organizationSwitcherPopoverActionButtonIcon',
-  // 'organizationSwitcherPopoverActionButtonText',
-  // 'organizationSwitcherPopoverFooter',
-  // 'organizationSwitcherPopoverFooterPages',
-  // 'organizationSwitcherPopoverFooterPagesLink',
+  'organizationSwitcherTriggerIcon',
+  'organizationSwitcherPopoverRootBox',
+  'organizationSwitcherPopoverCard',
+  'organizationSwitcherPopoverMain',
+  'organizationSwitcherPopoverActions',
+  'organizationSwitcherPopoverActionButton',
+  'organizationSwitcherPreviewButton',
+  'organizationSwitcherPopoverActionButtonIconBox',
+  'organizationSwitcherPopoverActionButtonIcon',
+  'organizationSwitcherPopoverActionButtonText',
+  'organizationSwitcherPopoverFooter',
+  'organizationSwitcherPopoverFooterPages',
+  'organizationSwitcherPopoverFooterPagesLink',
 
   'userPreview',
   'userPreviewAvatarContainer',
@@ -139,21 +133,15 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'userPreviewMainIdentifier',
   'userPreviewSecondaryIdentifier',
 
-  // 'personalWorkspacePreview',
-  // 'personalWorkspacePreviewAvatarContainer',
-  // 'personalWorkspacePreviewAvatarBox',
-  // 'personalWorkspacePreviewAvatarImage',
-  // 'personalWorkspacePreviewTextContainer',
-  // 'personalWorkspacePreviewMainIdentifier',
-  // 'personalWorkspacePreviewSecondaryIdentifier',
+  'organizationPreview',
+  'organizationPreviewAvatarContainer',
+  'organizationPreviewAvatarBox',
+  'organizationPreviewAvatarImage',
+  'organizationPreviewTextContainer',
+  'organizationPreviewMainIdentifier',
+  'organizationPreviewSecondaryIdentifier',
 
-  // 'organizationPreview',
-  // 'organizationPreviewAvatarContainer',
-  // 'organizationPreviewAvatarBox',
-  // 'organizationPreviewAvatarImage',
-  // 'organizationPreviewTextContainer',
-  // 'organizationPreviewMainIdentifier',
-  // 'organizationPreviewSecondaryIdentifier',
+  'organizationProfilePage',
 
   'identityPreview',
   'identityPreviewAvatarBox',
@@ -166,6 +154,18 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'alertIcon',
   'alertText',
   'alertTextContainer',
+
+  'tagInputContainer',
+  'tagPillIcon',
+  'tagPillContainer',
+
+  'tabPanel',
+  'tabButton',
+  'tabListContainer',
+
+  'selectButton',
+  'selectButtonIcon',
+  'selectOptionsContainer',
 
   'loader',
   'loaderIcon',
@@ -221,6 +221,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'fileDropAreaButtonPrimary',
   'fileDropAreaFooterHint',
 
+  'invitationsSentIconBox',
+  'invitationsSentIcon',
+
   'accordionTriggerButton',
   'accordionContent',
 
@@ -252,7 +255,7 @@ export type ElementDescriptor<K extends keyof ElementsConfig = any> = {
   getObjectKeyWithState: (state: AllowedStates<K> | never) => ObjectKeyWithState<K>;
   getObjectKeyWithId: (param: ElementId<AllowedIds<K>> | never) => ObjectKeyWithIds<K>;
   getObjectKeyWithIdAndState: (id: ElementId<AllowedIds<K>>, state: AllowedStates<K>) => ObjectKeyWithIdAndState<K>;
-  setId: <Id extends AllowedIds<K>>(id: Id) => ElementId<Id>;
+  setId: <Id extends AllowedIds<K>>(id?: Id) => ElementId<Id> | undefined;
 };
 
 type ElementDescriptors = { [k in keyof ElementsConfig as ElementObjectKey<k>]: ElementDescriptor<k> };
@@ -284,7 +287,7 @@ const createElementDescriptor = <K extends keyof ElementsConfig>(key: K): Elemen
     getObjectKeyWithId: idObj => (objectKey + OBJ_KEY_DELIMITER + idObj.id) as any,
     getObjectKeyWithIdAndState: (idObj, state) =>
       (objectKey + OBJ_KEY_DELIMITER + idObj.id + OBJ_KEY_DELIMITER + state) as any,
-    setId: id => ({ id, __type: 'id' }),
+    setId: id => (id ? { id, __type: 'id' } : undefined),
   };
 };
 

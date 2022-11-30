@@ -52,3 +52,4 @@ export * from './NavigateToFlowStartButton';
 export * from './SuccessPage';
 export * from './IconCircle';
 export * from './Popover';
+export * from './Section';

@@ -5,7 +5,7 @@ import { useAppearance } from './AppearanceContext';
 import { appendEmojiSeparator, generateClassName } from './classGeneration';
 import { ElementDescriptor, ElementId } from './elementDescriptors';
 
-type Customizable<T = {}> = T & {
+type Customizable<T = Record<never, never>> = T & {
   elementDescriptor?: ElementDescriptor | Array<ElementDescriptor | undefined>;
   elementId?: ElementId;
   css?: never;

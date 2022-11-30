@@ -3,12 +3,11 @@ import React from 'react';
 
 import { useCoreSession, useCoreUser } from '../../contexts';
 import { Badge, Col, descriptors, Flex, Icon, localizationKeys, Text, useLocalizations } from '../../customizables';
-import { FullHeightLoader } from '../../elements';
+import { FullHeightLoader, ProfileSection } from '../../elements';
 import { DeviceLaptop, DeviceMobile } from '../../icons';
 import { mqu } from '../../styledSystem';
 import { getRelativeToNowDateKey } from '../../utils';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
-import { ProfileSection } from './Section';
 import { UserProfileAccordion } from './UserProfileAccordion';
 import { currentSessionFirst } from './utils';
 
