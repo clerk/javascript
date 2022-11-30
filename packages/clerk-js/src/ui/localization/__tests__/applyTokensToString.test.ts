@@ -6,7 +6,7 @@ describe('applyTokensToString', function () {
     'user.firstName': 'nikos',
     identifier: 'nikos@hello.dev',
     provider: 'google',
-    date: new Date('01-01-2022'),
+    date: new Date('2021-12-31T22:00:00.000Z'),
     dateString: '2021-12-31T22:00:00.000Z',
     dateNumber: 1640988000000,
   };
