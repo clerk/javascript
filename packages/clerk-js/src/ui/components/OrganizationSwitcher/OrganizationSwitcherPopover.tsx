@@ -72,6 +72,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       openOrganizationProfile({
         afterLeaveOrganizationUrl,
         __unstable_manageBillingUrl,
+        __unstable_manageBillingLabel,
         __unstable_manageBillingMembersLimit,
       });
     };

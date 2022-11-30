@@ -4,7 +4,8 @@ import { Col, Flex, Link, Text } from '../../customizables';
 
 export const MembershipWidget = () => {
   const { organization } = useCoreOrganization();
-  const { __unstable_manageBillingUrl, __unstable_manageBillingMembersLimit } = useOrganizationProfileContext();
+  const { __unstable_manageBillingUrl, __unstable_manageBillingLabel, __unstable_manageBillingMembersLimit } =
+    useOrganizationProfileContext();
   const router = useRouter();
 
   if (!organization) {
@@ -41,7 +42,7 @@ export const MembershipWidget = () => {
             })}
             onClick={() => router.navigate(__unstable_manageBillingUrl())}
           >
-            Add payment method on Stripe
+            {__unstable_manageBillingLabel || 'Manage billing'}
           </Link>
         )}
       </Col>
