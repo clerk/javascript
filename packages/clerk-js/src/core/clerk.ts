@@ -493,9 +493,10 @@ export default class Clerk implements ClerkInterface {
     }
 
     this.session = session;
-    this.organization = (this.session?.user.organizationMemberships || [])
-      .map(om => om.organization)
-      .find(org => org.id === this.session?.lastActiveOrganizationId);
+    this.organization =
+      (this.session?.user.organizationMemberships || [])
+        .map(om => om.organization)
+        .find(org => org.id === this.session?.lastActiveOrganizationId) || null;
     this.user = this.session ? this.session.user : null;
 
     this.#emit();
@@ -903,9 +904,10 @@ export default class Clerk implements ClerkInterface {
         (this.#options.selectInitialSession
           ? this.#options.selectInitialSession(newClient)
           : this.#defaultSession(newClient)) || null;
-      this.organization = (this.session?.user.organizationMemberships || [])
-        .map(om => om.organization)
-        .find(org => org.id === this.session?.lastActiveOrganizationId);
+      this.organization =
+        (this.session?.user.organizationMemberships || [])
+          .map(om => om.organization)
+          .find(org => org.id === this.session?.lastActiveOrganizationId) || null;
       this.user = this.session ? this.session.user : null;
     }
     this.client = newClient;
@@ -913,9 +915,10 @@ export default class Clerk implements ClerkInterface {
     if (this.session) {
       const lastId = this.session.id;
       this.session = newClient.activeSessions.find(x => x.id === lastId);
-      this.organization = (this.session?.user.organizationMemberships || [])
-        .map(om => om.organization)
-        .find(org => org.id === this.session?.lastActiveOrganizationId);
+      this.organization =
+        (this.session?.user.organizationMemberships || [])
+          .map(om => om.organization)
+          .find(org => org.id === this.session?.lastActiveOrganizationId) || null;
       this.user = this.session ? this.session.user : null;
     }
 
