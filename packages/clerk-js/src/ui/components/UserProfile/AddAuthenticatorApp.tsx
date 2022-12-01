@@ -59,6 +59,7 @@ export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
                 />
 
                 <QRCodeSVG
+                  style={{ border: '10px solid white' }}
                   size={200}
                   value={totp.uri || ''}
                 />
