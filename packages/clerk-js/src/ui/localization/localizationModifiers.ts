@@ -2,11 +2,7 @@ import { normalizeDate, titleize } from '@clerk/shared';
 
 const timeString = (val: Date | string | number, locale?: string) => {
   try {
-    return normalizeDate(val).toLocaleString(locale || 'en-US', {
-      hour: '2-digit',
-      minute: 'numeric',
-      hour12: true,
-    });
+    return new Intl.DateTimeFormat(locale || 'en-US', { timeStyle: 'short' }).format(normalizeDate(val));
   } catch (e) {
     console.warn(e);
     return '';
