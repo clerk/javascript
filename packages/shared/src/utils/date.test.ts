@@ -38,11 +38,11 @@ describe.concurrent('date utils', () => {
   describe.concurrent('formatRelative(date)', () => {
     const cases: Array<[Date | undefined, Date | undefined, RelativeDateCase | null]> = [
       [undefined, undefined, null],
-      [new Date('1/1/2020 23:15'), new Date('1/1/2020'), 'sameDayAt'],
-      [new Date('1/5/2020 23:15'), new Date('1/6/2020'), 'lastDayAt'],
-      [new Date('1/3/2020 23:15'), new Date('1/6/2020'), 'previous6DaysAt'],
-      [new Date('1/7/2020 23:15'), new Date('1/6/2020'), 'nextDayAt'],
-      [new Date('1/10/2020 23:15'), new Date('1/6/2020'), 'next6DaysAt'],
+      [new Date('1/1/2020 23:15'), new Date('1/1/2020'), 'sameDay'],
+      [new Date('1/5/2020 23:15'), new Date('1/6/2020'), 'lastDay'],
+      [new Date('1/3/2020 23:15'), new Date('1/6/2020'), 'previous6Days'],
+      [new Date('1/7/2020 23:15'), new Date('1/6/2020'), 'nextDay'],
+      [new Date('1/10/2020 23:15'), new Date('1/6/2020'), 'next6Days'],
       [new Date('12/10/2020 23:15'), new Date('1/6/2020'), 'numeric'],
       [new Date('12/10/2020 23:15'), new Date('1/6/2021'), 'numeric'],
     ];

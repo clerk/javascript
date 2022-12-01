@@ -39,25 +39,13 @@ function normalizeDate(d: Date | string | number): Date {
   }
 }
 
-export type DateFormatRelativeParams = {
+type DateFormatRelativeParams = {
   date: Date | string | number;
   relativeTo: Date | string | number;
 };
 
-export type RelativeDateCase = 'numeric' | 'previous6DaysAt' | 'lastDayAt' | 'sameDayAt' | 'nextDayAt' | 'next6DaysAt';
+type RelativeDateCase = 'numeric' | 'previous6Days' | 'lastDay' | 'sameDay' | 'nextDay' | 'next6Days';
 
-/*
- * Follows date-fns format, see here:
- * https://date-fns.org/v2.21.1/docs/formatRelative
- * | Distance to the base date | Result                    |
- * |---------------------------|---------------------------|
- * | Previous 6 days           | last Sunday at 04:30 AM   |
- * | Last day                  | yesterday at 04:30 AM     |
- * | Same day                  | today at 04:30 AM         |
- * | Next day                  | tomorrow at 04:30 AM      |
- * | Next 6 days               | Sunday at 04:30 AM        |
- * | Other                     | 12/31/2017                |
- */
 export function formatRelative({
   date,
   relativeTo,
@@ -73,19 +61,19 @@ export function formatRelative({
     return { relativeDateCase: 'numeric', date: a };
   }
   if (differenceInDays < -1) {
-    return { relativeDateCase: 'previous6DaysAt', date: a };
+    return { relativeDateCase: 'previous6Days', date: a };
   }
   if (differenceInDays === -1) {
-    return { relativeDateCase: 'lastDayAt', date: a };
+    return { relativeDateCase: 'lastDay', date: a };
   }
   if (differenceInDays === 0) {
-    return { relativeDateCase: 'sameDayAt', date: a };
+    return { relativeDateCase: 'sameDay', date: a };
   }
   if (differenceInDays === 1) {
-    return { relativeDateCase: 'nextDayAt', date: a };
+    return { relativeDateCase: 'nextDay', date: a };
   }
   if (differenceInDays < 7) {
-    return { relativeDateCase: 'next6DaysAt', date: a };
+    return { relativeDateCase: 'next6Days', date: a };
   }
   return { relativeDateCase: 'numeric', date: a };
 }

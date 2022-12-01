@@ -173,12 +173,7 @@ const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
   );
 };
 
-type RelativeDateKeys =
-  | 'relativeDates.previous6DaysAt'
-  | 'relativeDates.lastDayAt'
-  | 'relativeDates.sameDayAt'
-  | 'relativeDates.nextDayAt'
-  | 'relativeDates.next6DaysAt';
+type RelativeDateKeys = 'dates.previous6Days' | 'dates.lastDay' | 'dates.sameDay' | 'dates.nextDay' | 'dates.next6Days';
 
 const getRelativeToNowDate = (
   date: Date,
@@ -190,20 +185,20 @@ const getRelativeToNowDate = (
     return '';
   }
   switch (relativeDate.relativeDateCase) {
-    case 'previous6DaysAt':
-      localizationKey = 'relativeDates.previous6DaysAt';
+    case 'previous6Days':
+      localizationKey = 'dates.previous6Days';
       break;
-    case 'lastDayAt':
-      localizationKey = 'relativeDates.lastDayAt';
+    case 'lastDay':
+      localizationKey = 'dates.lastDay';
       break;
-    case 'sameDayAt':
-      localizationKey = 'relativeDates.sameDayAt';
+    case 'sameDay':
+      localizationKey = 'dates.sameDay';
       break;
-    case 'nextDayAt':
-      localizationKey = 'relativeDates.nextDayAt';
+    case 'nextDay':
+      localizationKey = 'dates.nextDay';
       break;
-    case 'next6DaysAt':
-      localizationKey = 'relativeDates.next6DaysAt';
+    case 'next6Days':
+      localizationKey = 'dates.next6Days';
       break;
     case 'numeric':
     default:
