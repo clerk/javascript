@@ -1,8 +1,9 @@
 import React from 'react';
 
-import { Button, descriptors, Flex, Icon, Input } from '../customizables';
+import { descriptors, Flex, Icon, Input } from '../customizables';
 import { EyeSlash } from '../icons';
 import { PropsOfComponent } from '../styledSystem';
+import { IconButton } from './IconButton';
 
 export const PasswordInput = (props: PropsOfComponent<typeof Input>) => {
   const [hidden, setHidden] = React.useState(true);
@@ -19,8 +20,10 @@ export const PasswordInput = (props: PropsOfComponent<typeof Input>) => {
         type={hidden ? 'password' : 'text'}
         sx={theme => ({ paddingRight: theme.space.$8 })}
       />
-      <Button
+      <IconButton
         elementDescriptor={descriptors.formFieldInputShowPasswordButton}
+        iconElementDescriptor={descriptors.formFieldInputShowPasswordIcon}
+        aria-label={`${hidden ? 'Show' : 'Hide'}password'`}
         variant='ghostIcon'
         tabIndex={-1}
         colorScheme={hidden ? 'neutral' : 'primary'}
@@ -31,12 +34,8 @@ export const PasswordInput = (props: PropsOfComponent<typeof Input>) => {
           marginRight: theme.space.$3,
           ...(hidden && { color: theme.colors.$blackAlpha400 }),
         })}
-      >
-        <Icon
-          elementDescriptor={descriptors.formFieldInputShowPasswordIcon}
-          icon={EyeSlash}
-        />
-      </Button>
+        icon={EyeSlash}
+      />
     </Flex>
   );
 };
