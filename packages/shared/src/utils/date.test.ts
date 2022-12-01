@@ -43,8 +43,8 @@ describe.concurrent('date utils', () => {
       [new Date('1/3/2020 23:15'), new Date('1/6/2020'), 'previous6Days'],
       [new Date('1/7/2020 23:15'), new Date('1/6/2020'), 'nextDay'],
       [new Date('1/10/2020 23:15'), new Date('1/6/2020'), 'next6Days'],
-      [new Date('12/10/2020 23:15'), new Date('1/6/2020'), 'numeric'],
-      [new Date('12/10/2020 23:15'), new Date('1/6/2021'), 'numeric'],
+      [new Date('12/10/2020 23:15'), new Date('1/6/2020'), 'other'],
+      [new Date('12/10/2020 23:15'), new Date('1/6/2021'), 'other'],
     ];
 
     it.each(cases)('.formatRelative(%s, %s) => %s', (a, b, expected) => {

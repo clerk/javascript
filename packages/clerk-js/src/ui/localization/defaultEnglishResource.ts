@@ -523,10 +523,11 @@ export const defaultResource: DeepRequired<LocalizationResource> = {
     not_allowed_access: '',
   },
   dates: {
-    previous6Days: "Last {{ lastActiveAt | weekday('en-US','long') }} at {{ lastActiveAt | timeString('en-US') }}",
-    lastDay: "Yesterday at {{ lastActiveAt | timeString('en-US') }}",
-    sameDay: "Today at {{ lastActiveAt | timeString('en-US') }}",
-    nextDay: "Tomorrow at {{ lastActiveAt | timeString('en-US') }}",
-    next6Days: "{{ lastActiveAt | weekday('en-US','long') }} at {{ lastActiveAt | timeString('en-US') }}",
+    previous6Days: "Last {{ date | weekday('en-US','long') }} at {{ date | timeString('en-US') }}",
+    lastDay: "Yesterday at {{ date | timeString('en-US') }}",
+    sameDay: "Today at {{ date | timeString('en-US') }}",
+    nextDay: "Tomorrow at {{ date | timeString('en-US') }}",
+    next6Days: "{{ date | weekday('en-US','long') }} at {{ date | timeString('en-US') }}",
+    numeric: "{{ date | numeric('en-US') }}",
   },
 } as const;

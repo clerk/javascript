@@ -1,8 +1,8 @@
-import { titleize } from '@clerk/shared';
+import { normalizeDate, titleize } from '@clerk/shared';
 
-const timeString = (val: Date | string | number, locale?: string): string => {
+const timeString = (val: Date | string | number, locale?: string) => {
   try {
-    return new Date(val).toLocaleString(locale || 'en-US', {
+    return normalizeDate(val).toLocaleString(locale || 'en-US', {
       hour: '2-digit',
       minute: 'numeric',
       hour12: true,
@@ -14,14 +14,25 @@ const timeString = (val: Date | string | number, locale?: string): string => {
 };
 const weekday = (val: Date | string | number, locale?: string, weekday?: 'long' | 'short' | 'narrow' | undefined) => {
   try {
-    return new Intl.DateTimeFormat(locale || 'en-US', { weekday: weekday || 'long' }).format(new Date(val));
+    return new Intl.DateTimeFormat(locale || 'en-US', { weekday: weekday || 'long' }).format(normalizeDate(val));
   } catch (e) {
     console.warn(e);
     return '';
   }
 };
+
+const numeric = (val: Date | number | string, locale?: string) => {
+  try {
+    return new Intl.DateTimeFormat(locale || 'en-US').format(normalizeDate(val));
+  } catch (e) {
+    console.warn(e);
+    return '';
+  }
+};
+
 export const MODIFIERS = {
   titleize,
   timeString,
   weekday,
+  numeric,
 } as const;

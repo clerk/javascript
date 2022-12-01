@@ -18,3 +18,4 @@ export * from './range';
 export * from './getValidReactChildren';
 export * from './roleLocalizationKey';
 export * from './userUtils';
+export * from './getRelativeToNowDateKey';

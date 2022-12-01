@@ -524,5 +524,6 @@ type _LocalizationResource = {
     sameDay: LocalizationValue;
     nextDay: LocalizationValue;
     next6Days: LocalizationValue;
+    numeric: LocalizationValue;
   };
 };
