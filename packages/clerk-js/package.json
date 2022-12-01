@@ -35,8 +35,8 @@
     "prepublishOnly": "npm run build",
     "postpublish": "node ./scripts/purge-cache.mjs",
     "start": "echo \"Noop\"",
-    "test": "TZ=UTC jest",
-    "test:coverage": "TZ=UTC jest --collectCoverage && open coverage/lcov-report/index.html"
+    "test": "jest",
+    "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
   },
   "dependencies": {
     "@clerk/shared": "^0.6.0",
