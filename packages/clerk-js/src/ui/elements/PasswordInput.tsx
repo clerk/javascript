@@ -23,7 +23,7 @@ export const PasswordInput = (props: PropsOfComponent<typeof Input>) => {
       <IconButton
         elementDescriptor={descriptors.formFieldInputShowPasswordButton}
         iconElementDescriptor={descriptors.formFieldInputShowPasswordIcon}
-        aria-label={`${hidden ? 'Show' : 'Hide'}password'`}
+        aria-label={`${hidden ? 'Show' : 'Hide'} password`}
         variant='ghostIcon'
         tabIndex={-1}
         colorScheme={hidden ? 'neutral' : 'primary'}
