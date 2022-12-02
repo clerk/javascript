@@ -17,6 +17,7 @@ labels: 'Status: Feature Request'
 - [ ] `@clerk/backend-core`
 - [ ] `@clerk/clerk-sdk-node`
 - [ ] `@clerk/edge`
+- [ ] `@clerk/localizations`
 - [ ] other:
 
 ## Description

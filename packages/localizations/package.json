@@ -1,0 +1,52 @@
+{
+  "name": "@clerk/localizations",
+  "version": "1.0.0",
+  "license": "MIT",
+  "description": "Localizations for the Clerk components",
+  "keywords": [
+    "react",
+    "next",
+    "auth",
+    "authentication",
+    "passwordless",
+    "session",
+    "jwt",
+    "customisation",
+    "localizations"
+  ],
+  "author": "Clerk",
+  "source": "src/index.ts",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "prepublishOnly": "npm run build",
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch",
+    "clean": "rimraf ./dist",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@clerk/types": "^3.20.0",
+    "typescript": "*"
+  },
+  "peerDependencies": {
+    "react": ">=16"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/clerkinc/javascript.git"
+  },
+  "bugs": {
+    "url": "https://github.com/clerkinc/javascript/issues"
+  },
+  "homepage": "https://clerk.dev/"
+}

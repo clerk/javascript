@@ -14,6 +14,7 @@ COPY packages/nextjs/package.json ./packages/nextjs/
 COPY packages/sdk-node/package.json ./packages/sdk-node/
 COPY packages/shared/package.json ./packages/shared/
 COPY packages/types/package.json ./packages/types/
+COPY packages/localizations/package.json ./packages/localizations/
 
 RUN npm install
 
