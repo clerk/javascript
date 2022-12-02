@@ -57,6 +57,7 @@ export const Avatar = (props: AvatarProps) => {
         src={src || ''}
         width='100%'
         height='100%'
+        sx={{ objectFit: 'cover' }}
         onError={() => setError(true)}
       />
     );
@@ -76,7 +77,6 @@ export const Avatar = (props: AvatarProps) => {
           borderColor: theme.colors.$avatarBorder,
           backgroundColor: theme.colors.$avatarBackground,
           color: theme.colors.$colorText,
-          objectFit: 'cover',
           backgroundClip: 'padding-box',
         }),
         sx,
