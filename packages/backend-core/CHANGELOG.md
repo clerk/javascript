@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [2.11.8](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@2.11.8-staging.0...@clerk/backend-core@2.11.8) (2022-12-02)
+
+**Note:** Version bump only for package @clerk/backend-core
+
 ### [2.11.7](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@2.11.7-staging.4...@clerk/backend-core@2.11.7) (2022-11-30)
 
 **Note:** Version bump only for package @clerk/backend-core
