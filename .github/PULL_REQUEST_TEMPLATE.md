@@ -14,6 +14,7 @@
 - [ ] `@clerk/remix`
 - [ ] `@clerk/types`
 - [ ] `@clerk/themes`
+- [ ] `@clerk/localizations`
 - [ ] `@clerk/clerk-expo`
 - [ ] `@clerk/backend-core`
 - [ ] `@clerk/clerk-sdk-node`
