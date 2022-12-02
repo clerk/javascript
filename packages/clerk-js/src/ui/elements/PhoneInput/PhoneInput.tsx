@@ -54,8 +54,8 @@ export const PhoneInput = (props: PhoneInputProps) => {
         setPhoneNumber(phoneNumberValue, selectedCountry?.iso);
         return;
       }
-      setPhoneNumber(inputValue);
     }
+    setPhoneNumber(inputValue);
   };
 
   const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
