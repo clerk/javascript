@@ -346,6 +346,9 @@ export type ElementsConfig = {
   accordionTriggerButton: WithOptions<never, never, never>;
   accordionContent: WithOptions<never, never, never>;
 
+  qrCodeRow: WithOptions<never, never, never>;
+  qrCodeContainer: WithOptions<never, never, never>;
+
   // default descriptors
   badge: WithOptions<'primary' | 'actionRequired', never, never>;
   button: WithOptions<never, LoadingState, never>;

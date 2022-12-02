@@ -1,7 +1,7 @@
 import { TOTPResource } from '@clerk/types';
-import { QRCodeSVG } from 'qrcode.react';
 import React from 'react';
 
+import { QRCode } from '../../common';
 import { useCoreUser } from '../../contexts';
 import { Button, Col, descriptors, LocalizationKey, localizationKeys, Text } from '../../customizables';
 import {
@@ -58,11 +58,7 @@ export const AddAuthenticatorApp = (props: AddAuthenticatorAppProps) => {
                   localizationKey={localizationKeys('userProfile.mfaTOTPPage.authenticatorApp.infoText__ableToScan')}
                 />
 
-                <QRCodeSVG
-                  style={{ border: '10px solid white' }}
-                  size={200}
-                  value={totp.uri || ''}
-                />
+                <QRCode url={totp.uri || ''} />
 
                 <Button
                   variant='link'

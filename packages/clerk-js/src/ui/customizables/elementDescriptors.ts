@@ -224,6 +224,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'accordionTriggerButton',
   'accordionContent',
 
+  'qrCodeRow',
+  'qrCodeContainer',
+
   'badge',
   'button',
   'providerIcon',
