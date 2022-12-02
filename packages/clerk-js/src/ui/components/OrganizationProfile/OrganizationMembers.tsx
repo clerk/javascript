@@ -1,7 +1,5 @@
-import React from 'react';
-
 import { useCoreOrganization, useOrganizationProfileContext } from '../../contexts';
-import { Col, descriptors, Flex, localizationKeys, Text } from '../../customizables';
+import { Col, descriptors, Flex, Icon, localizationKeys, Text } from '../../customizables';
 import {
   CardAlert,
   Header,
@@ -53,8 +51,15 @@ export const OrganizationMembers = withCardStateProvider(() => {
           </Header.Root>
           {isAdmin && (
             <IconButton
+              aria-label='Invite'
               onClick={() => navigate('invite-members')}
-              icon={UserAdd}
+              icon={
+                <Icon
+                  icon={UserAdd}
+                  size={'sm'}
+                  sx={t => ({ marginRight: t.space.$2 })}
+                />
+              }
               textVariant='buttonExtraSmallBold'
               localizationKey={localizationKeys('organizationProfile.membersPage.action__invite')}
             />

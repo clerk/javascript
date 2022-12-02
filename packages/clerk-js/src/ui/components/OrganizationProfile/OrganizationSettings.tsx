@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useCoreOrganization } from '../../contexts';
-import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
+import { Col, descriptors, Flex, Icon, localizationKeys } from '../../customizables';
 import { Header, IconButton, NavbarMenuButtonRow, OrganizationPreview } from '../../elements';
 import { useNavigate } from '../../hooks';
 import { Times } from '../../icons';
@@ -76,7 +76,14 @@ const OrganizationDangerSection = () => {
     >
       <Flex gap={4}>
         <IconButton
-          icon={Times}
+          aria-label='Leave organization'
+          icon={
+            <Icon
+              icon={Times}
+              size={'sm'}
+              sx={t => ({ marginRight: t.space.$2 })}
+            />
+          }
           variant='outline'
           colorScheme='danger'
           textVariant='buttonExtraSmallBold'
