@@ -1,12 +1,12 @@
-import { formatRelative } from '@clerk/shared';
 import { SessionWithActivitiesResource } from '@clerk/types';
 import React from 'react';
 
 import { useCoreSession, useCoreUser } from '../../contexts';
-import { Badge, Col, descriptors, Flex, Icon, localizationKeys, Text } from '../../customizables';
+import { Badge, Col, descriptors, Flex, Icon, localizationKeys, Text, useLocalizations } from '../../customizables';
 import { FullHeightLoader } from '../../elements';
 import { DeviceLaptop, DeviceMobile } from '../../icons';
 import { mqu } from '../../styledSystem';
+import { getRelativeToNowDateKey } from '../../utils';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
 import { ProfileSection } from './Section';
 import { UserProfileAccordion } from './UserProfileAccordion';
@@ -79,6 +79,7 @@ const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
   const title = deviceType ? deviceType : isMobile ? 'Mobile device' : 'Desktop device';
   const browser = `${browserName || ''} ${browserVersion || ''}`.trim() || 'Web browser';
   const location = [city || '', country || ''].filter(Boolean).join(', ').trim() || null;
+  const { t } = useLocalizations();
 
   return (
     <Flex
@@ -154,9 +155,8 @@ const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
         <Text
           variant='smallRegular'
           colorScheme='neutral'
-          sx={{ textTransform: 'capitalize' }}
         >
-          {formatRelative(props.session.lastActiveAt || new Date(), new Date())}
+          {t(getRelativeToNowDateKey(props.session.lastActiveAt))}
         </Text>
       </Col>
     </Flex>

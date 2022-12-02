@@ -1,5 +1,4 @@
 const MILLISECONDS_IN_DAY = 86400000;
-const DAYS_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 export function dateTo12HourTime(date: Date): string {
   if (!date) {
@@ -22,7 +21,7 @@ export function differenceInCalendarDays(a: Date, b: Date, { absolute = true } =
   return absolute ? Math.abs(diff) : diff;
 }
 
-function normalizeDate(d: Date | string | number): Date {
+export function normalizeDate(d: Date | string | number): Date {
   try {
     return new Date(d || new Date());
   } catch (e) {
@@ -30,52 +29,41 @@ function normalizeDate(d: Date | string | number): Date {
   }
 }
 
-/*
- * Follows date-fns format, see here:
- * https://date-fns.org/v2.21.1/docs/formatRelative
- * TODO: support localisation
- * | Distance to the base date | Result                    |
- * |---------------------------|---------------------------|
- * | Previous 6 days           | last Sunday at 04:30 AM   |
- * | Last day                  | yesterday at 04:30 AM     |
- * | Same day                  | today at 04:30 AM         |
- * | Next day                  | tomorrow at 04:30 AM      |
- * | Next 6 days               | Sunday at 04:30 AM        |
- * | Other                     | 12/31/2017                |
- */
-export function formatRelative(
-  date: Date,
-  relativeTo: Date,
-  locale?: Parameters<typeof Date.prototype.toLocaleDateString>[0],
-): string {
+type DateFormatRelativeParams = {
+  date: Date | string | number;
+  relativeTo: Date | string | number;
+};
+
+type RelativeDateCase = 'previous6Days' | 'lastDay' | 'sameDay' | 'nextDay' | 'next6Days' | 'other';
+type RelativeDateReturn = { relativeDateCase: RelativeDateCase; date: Date } | null;
+export function formatRelative(props: DateFormatRelativeParams): RelativeDateReturn {
+  const { date, relativeTo } = props;
   if (!date || !relativeTo) {
-    return '';
+    return null;
   }
   const a = normalizeDate(date);
   const b = normalizeDate(relativeTo);
   const differenceInDays = differenceInCalendarDays(b, a, { absolute: false });
-  const time12Hour = dateTo12HourTime(a);
-  const dayName = DAYS_EN[a.getDay()];
 
   if (differenceInDays < -6) {
-    return a.toLocaleDateString(locale);
+    return { relativeDateCase: 'other', date: a };
   }
   if (differenceInDays < -1) {
-    return `last ${dayName} at ${time12Hour}`;
+    return { relativeDateCase: 'previous6Days', date: a };
   }
   if (differenceInDays === -1) {
-    return `yesterday at ${time12Hour}`;
+    return { relativeDateCase: 'lastDay', date: a };
   }
   if (differenceInDays === 0) {
-    return `today at ${time12Hour}`;
+    return { relativeDateCase: 'sameDay', date: a };
   }
   if (differenceInDays === 1) {
-    return `tomorrow at ${time12Hour}`;
+    return { relativeDateCase: 'nextDay', date: a };
   }
   if (differenceInDays < 7) {
-    return `${dayName} at ${time12Hour}`;
+    return { relativeDateCase: 'next6Days', date: a };
   }
-  return a.toLocaleDateString(locale);
+  return { relativeDateCase: 'other', date: a };
 }
 
 export function addYears(initialDate: Date | number | string, yearsToAdd: number): Date {
