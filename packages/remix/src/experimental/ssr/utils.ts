@@ -1,9 +1,15 @@
+import { AuthState, default as Clerk } from '@clerk/backend';
 import { LIB_VERSION } from '@clerk/clerk-react/dist/info';
 import { json } from '@remix-run/server-runtime';
 import cookie from 'cookie';
 
-import { AuthState, clerk } from '../clerk';
 import { LoaderFunctionArgs, LoaderFunctionArgsWithAuth } from './types';
+
+// Generate an internal utility Clerk Instance that can be used for its local utility functions.
+// Since, the apiKey can not be set at this points across Remix runtimes, this clerk instance is
+// not able to make Clerk Backend API requests. For now, we will just use an empty string to initiate
+// the instance.
+const __internalClerkInstance = Clerk({ apiKey: '' });
 
 /**
  * Inject `auth`, `user` and `session` properties into `request`
@@ -35,8 +41,8 @@ export function sanitizeAuthData(authState: AuthState): any {
 
   const user = authState.user ? { ...authState.user } : authState.user;
   const organization = authState.user ? { ...authState.user } : authState.user;
-  clerk.toSSRResource(user);
-  clerk.toSSRResource(organization);
+  __internalClerkInstance.toSSRResource(user);
+  __internalClerkInstance.toSSRResource(organization);
 
   return { ...authState, user, organization };
 }
@@ -84,8 +90,8 @@ export const interstitialJsonResponse = (authState: AuthState, opts: { loader: '
   return json(
     wrapWithClerkState({
       __loader: opts.loader,
-      __clerk_ssr_interstitial_html: clerk.localInterstitial({
-        debugData: clerk.debugAuthState(authState),
+      __clerk_ssr_interstitial_html: __internalClerkInstance.localInterstitial({
+        debugData: __internalClerkInstance.debugAuthState(authState),
         frontendApi: authState.frontendApi,
         pkgVersion: LIB_VERSION,
       }),
@@ -104,7 +110,7 @@ export const returnLoaderResultJsonResponse = (opts: { authState: AuthState; cal
     ...wrapWithClerkState({
       __clerk_ssr_state: rest,
       __frontendApi: opts.authState.frontendApi,
-      __clerk_debug: clerk.debugAuthState(opts.authState),
+      __clerk_debug: __internalClerkInstance.debugAuthState(opts.authState),
     }),
   });
 };
