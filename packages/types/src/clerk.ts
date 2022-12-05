@@ -473,24 +473,8 @@ export interface Resources {
 export type RoutingStrategy = 'path' | 'hash' | 'virtual';
 
 export type RoutingOptions =
-  | {
-      /**
-       * Page routing strategy
-       */
-      routing?: Exclude<RoutingStrategy, 'path'>;
-      /**
-       * Root URL where the component is mounted on, eg: '/sign-in'
-       */
-      path?: never;
-    }
-  | {
-      routing: 'path';
-      path: string;
-    }
-  | {
-      routing?: never;
-      path: string;
-    };
+  | { path: string; routing?: Extract<RoutingStrategy, 'path'> }
+  | { path?: never; routing?: Extract<RoutingStrategy, 'hash' | 'virtual'> };
 
 export type RedirectOptions = {
   /**
