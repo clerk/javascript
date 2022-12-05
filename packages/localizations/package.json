@@ -15,21 +15,24 @@
     "localizations"
   ],
   "author": "Clerk",
-  "source": "src/index.ts",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "types": "./dist/types/index.d.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/esm/index.js",
   "files": [
     "dist"
   ],
   "scripts": {
     "prepublishOnly": "npm run build",
-    "build": "tsc -p tsconfig.build.json",
-    "dev": "tsc -p tsconfig.build.json --watch",
+    "dev": "tsup --watch",
+    "build": "tsup --env.NODE_ENV production",
     "clean": "rimraf ./dist",
     "lint": "eslint ."
   },
+  "dependencies": {
+    "@clerk/types": "^3.20.0"
+  },
   "devDependencies": {
-    "@clerk/types": "^3.20.0",
+    "tsup": "*",
     "typescript": "*"
   },
   "peerDependencies": {
