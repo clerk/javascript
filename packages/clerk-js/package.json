@@ -40,6 +40,7 @@
   },
   "dependencies": {
     "@clerk/shared": "^0.7.0",
+    "@clerk/localizations": "^1.0.0",
     "@clerk/types": "^3.20.0",
     "@emotion/cache": "^11.10.5",
     "@emotion/react": "^11.10.5",

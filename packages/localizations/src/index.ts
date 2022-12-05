@@ -1,3 +1,3 @@
-export * from './en-US';
-export * from './fr';
-export * from './de';
+export { enUS } from './en-US';
+export { fr } from './fr';
+export { de } from './de';
