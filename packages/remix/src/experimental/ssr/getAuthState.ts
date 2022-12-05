@@ -1,4 +1,5 @@
-import { AuthState, clerk } from '../clerk';
+import { AuthState, default as Clerk } from '@clerk/backend';
+
 import { noApiKeyError, noFrontendApiError } from '../errors';
 import { assertEnvVar, getEnvVariable } from '../utils';
 import { LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
@@ -30,7 +31,7 @@ export async function getAuthState(args: LoaderFunctionArgs, opts: RootAuthLoade
 
   const cookieToken = cookies['__session'];
   const headerToken = headers.get('authorization')?.replace('Bearer ', '');
-  const authState: AuthState = await clerk.authState({
+  const authState: AuthState = await Clerk({ apiKey, jwtKey }).authState({
     apiKey,
     jwtKey,
     frontendApi,
