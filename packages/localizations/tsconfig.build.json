@@ -3,7 +3,7 @@
     "outDir": "dist",
     "baseUrl": ".",
     "lib": ["es6", "dom"],
-    "module": "commonjs",
+    "module": "es6",
     "moduleResolution": "node",
     "declaration": true,
     "declarationMap": false,
