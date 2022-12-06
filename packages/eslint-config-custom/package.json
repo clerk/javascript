@@ -5,11 +5,11 @@
   "private": true,
   "license": "MIT",
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.15.0",
-    "@typescript-eslint/parser": "^5.15.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-config-turbo": "latest",
+    "@typescript-eslint/eslint-plugin": "5.45.1",
+    "@typescript-eslint/parser": "5.45.1",
+    "eslint-config-prettier": "8.5.0",
+    "eslint-config-turbo": "0.0.7",
     "eslint-plugin-react": "7.28.0",
-    "eslint-plugin-simple-import-sort": "^7.0.0"
+    "eslint-plugin-simple-import-sort": "7.0.0"
   }
 }
