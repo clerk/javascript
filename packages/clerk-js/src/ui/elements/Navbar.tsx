@@ -122,7 +122,7 @@ export const NavBar = (props: NavBarProps) => {
       }
       return false;
     });
-  }, [router]);
+  }, [router.currentPath]);
 
   const items = (
     <Col
