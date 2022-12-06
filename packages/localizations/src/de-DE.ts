@@ -1,6 +1,6 @@
 import { DeepRequired, LocalizationResource } from '@clerk/types';
 
-export const de: DeepRequired<LocalizationResource> = {
+export const deDe: DeepRequired<LocalizationResource> = {
   socialButtonsBlockButton: 'Weiter mit {{provider|titleize}}',
   dividerText: 'oder',
   formFieldLabel__emailAddress: 'E-Mail-Addresse',

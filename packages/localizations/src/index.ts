@@ -1,3 +1,3 @@
 export { enUS } from './en-US';
-export { fr } from './fr';
-export { de } from './de';
+export { frFR } from './fr-FR';
+export { deDe } from './de-DE';
