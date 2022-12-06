@@ -93,6 +93,7 @@ export type SignedInAuthState = {
   user?: User;
   orgId?: string;
   orgRole?: string;
+  orgSlug?: string;
   organization?: Organization;
   getToken: ServerGetToken;
 };
@@ -110,6 +111,7 @@ export type SignedOutAuthState = {
   user: null;
   orgId: null;
   orgRole: null;
+  orgSlug: null;
   organization: null;
   getToken: ServerGetToken;
 };
@@ -198,7 +200,7 @@ export async function getAuthState(options: AuthStateOptions): Promise<AuthState
   }
 
   async function signedIn(sessionClaims: JwtPayload): Promise<SignedInAuthState> {
-    const { sid: sessionId, org_id: orgId, org_role: orgRole, sub: userId } = sessionClaims;
+    const { sid: sessionId, org_id: orgId, org_role: orgRole, org_slug: orgSlug, sub: userId } = sessionClaims;
     const {
       apiKey,
       apiUrl,
@@ -250,6 +252,7 @@ export async function getAuthState(options: AuthStateOptions): Promise<AuthState
       user,
       orgId,
       orgRole,
+      orgSlug,
       organization,
       getToken,
     };
@@ -286,6 +289,7 @@ export async function getAuthState(options: AuthStateOptions): Promise<AuthState
       actor: null,
       orgId: null,
       orgRole: null,
+      orgSlug: null,
       organization: null,
       getToken: () => Promise.resolve(null),
     };
