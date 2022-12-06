@@ -1,6 +1,7 @@
 import type { OAuthStrategy } from '@clerk/types';
 import type { ExternalAccountResource } from '@clerk/types/src';
 
+import { useRouter } from '../../../ui/router';
 import { useCoreUser } from '../../contexts';
 import { Badge, Col, descriptors, Flex, Image, localizationKeys } from '../../customizables';
 import { ProfileSection, useCardState, UserPreview } from '../../elements';
@@ -43,12 +44,16 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
   const card = useCardState();
   const user = useCoreUser();
   const { navigate } = useNavigate();
+  const router = useRouter();
   const { providerToDisplayData } = useEnabledThirdPartyProviders();
   const error = account.verification?.error?.longMessage;
   const label = account.username || account.emailAddress;
+  const defaultOpen = !!router.urlStateParam.path;
 
+  // console.log(defaultOpen, 'defaultOpen ')
   return (
     <UserProfileAccordion
+      defaultOpen={defaultOpen}
       icon={
         <Image
           elementDescriptor={[descriptors.providerIcon]}

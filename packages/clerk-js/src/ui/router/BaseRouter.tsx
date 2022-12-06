@@ -3,7 +3,7 @@ import React from 'react';
 
 import { getQueryParams, trimTrailingSlash } from '../../utils';
 import { useCoreClerk } from '../contexts';
-import { useWindowEventListener } from '../hooks';
+import { useReadParamState, useWindowEventListener } from '../hooks';
 import { newPaths } from './newPaths';
 import { match } from './pathToRegexp';
 import { Route } from './Route';
@@ -33,6 +33,8 @@ export const BaseRouter = ({
   children,
 }: BaseRouterProps): JSX.Element => {
   const { navigate: externalNavigate } = useCoreClerk();
+  const { urlStateParam, removeQueryParam } = useReadParamState();
+
   const [routeParts, setRouteParts] = React.useState({
     path: getPath(),
     queryString: getQueryString(),
@@ -78,6 +80,7 @@ export const BaseRouter = ({
   }, [currentPath, currentQueryString, getPath, getQueryString]);
 
   useWindowEventListener(refreshEvents, refresh);
+  removeQueryParam();
 
   // TODO: Look into the real possible types of globalNavigate
   const baseNavigate = async (toURL: URL | undefined): Promise<unknown> => {
@@ -129,6 +132,7 @@ export const BaseRouter = ({
         resolve: resolve.bind(this),
         refresh: refresh.bind(this),
         params: {},
+        urlStateParam: urlStateParam,
       }}
     >
       <Route path={basePath}>{children}</Route>

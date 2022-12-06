@@ -1,6 +1,7 @@
 import type { ExternalAccountResource, OAuthStrategy } from '@clerk/types';
 import React from 'react';
 
+import { serializeAndAppendModalState } from '../../../utils';
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser, useUserProfileContext } from '../../contexts';
 import { Col, Image, localizationKeys, Text } from '../../customizables';
@@ -46,24 +47,8 @@ const AddConnectedAccount = () => {
   const user = useCoreUser();
   const { navigate } = useNavigate();
   const { strategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
-  const { currentPath } = useRouter();
-  const isModal = useUserProfileContext().mode === 'modal';
-  const componentName = useUserProfileContext().componentName;
-
-  const serializeAndAppendModalState = (url: string, isModal: boolean) => {
-    if (!isModal) {
-      return url;
-    }
-
-    const redirectParams = {
-      path: currentPath.replace('/CLERK-ROUTER/VIRTUAL/user', '') || '',
-      componentName,
-    };
-
-    const encodedRedirectParams = btoa(JSON.stringify(redirectParams));
-
-    return `${window.location.href}?__clerk_state=${encodedRedirectParams}`;
-  };
+  const { componentName, mode } = useUserProfileContext();
+  const isModal = mode === 'modal';
 
   const enabledStrategies = strategies.filter(s => s.startsWith('oauth')) as OAuthStrategy[];
   const connectedStrategies = user.verifiedExternalAccounts.map(a => 'oauth_' + a.provider) as OAuthStrategy[];
@@ -79,7 +64,9 @@ const AddConnectedAccount = () => {
     user
       .createExternalAccount({
         strategy: strategy,
-        redirect_url: serializeAndAppendModalState(window.location.href, isModal),
+        redirect_url: isModal
+          ? serializeAndAppendModalState({ url: window.location.href, currentPath: '#/user', componentName })
+          : window.location.href,
       })
       .then(res => {
         if (res.verification?.externalVerificationRedirectURL) {

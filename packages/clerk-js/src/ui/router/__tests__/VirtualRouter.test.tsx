@@ -37,7 +37,7 @@ const ShowPreserved = () => {
 const Tester = () => (
   <VirtualRouter
     preservedParams={['preserved']}
-    startPath='/'
+    startPath={'/' + ''}
   >
     <Route index>
       <div id='index'>Index</div>
