@@ -5,11 +5,11 @@ import { LoaderFunctionArgs, LoaderFunctionReturn, RootAuthLoaderCallback, RootA
 import {
   assertObject,
   injectAuthIntoRequest,
+  interstitialJsonResponse,
   isRedirect,
   isResponse,
   returnLoaderResultJsonResponse,
   sanitizeAuthData,
-  throwInterstitialJsonResponse,
 } from './utils';
 
 interface RootAuthLoader {
@@ -39,7 +39,7 @@ export const rootAuthLoader: RootAuthLoader = async (
   const { authData, showInterstitial, errorReason } = await getAuthData(args.request, opts);
 
   if (showInterstitial) {
-    throw throwInterstitialJsonResponse({ frontendApi, errorReason });
+    throw interstitialJsonResponse({ frontendApi, errorReason, loader: 'root' });
   }
 
   if (!callback) {

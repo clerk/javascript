@@ -1,21 +1,18 @@
-import { json } from '@remix-run/server-runtime';
-
-import { getAuthInterstitialErrorRendered, noRequestPassedInGetAuth } from '../errors';
+import { noRequestPassedInGetAuth } from '../errors';
 import { getAuthData } from './getAuthData';
 import { GetAuthReturn, LoaderFunctionArgs } from './types';
-import { sanitizeAuthData } from './utils';
+import { interstitialJsonResponse, sanitizeAuthData } from './utils';
 
-const EMPTY_INTERSTITIAL_RESPONSE = { message: getAuthInterstitialErrorRendered };
-
-export async function getAuth(argsOrReq: Request | LoaderFunctionArgs): GetAuthReturn {
+export async function getAuth(argsOrReq: Request | LoaderFunctionArgs, opts?: any): GetAuthReturn {
   if (!argsOrReq) {
     throw new Error(noRequestPassedInGetAuth);
   }
   const request = 'request' in argsOrReq ? argsOrReq.request : argsOrReq;
-  const { authData, showInterstitial } = await getAuthData(request);
+  const { authData, showInterstitial, errorReason } = await getAuthData(request);
 
   if (showInterstitial || !authData) {
-    throw json(EMPTY_INTERSTITIAL_RESPONSE, { status: 401 });
+    const frontendApi = process.env.CLERK_FRONTEND_API || opts.frontendApi;
+    throw interstitialJsonResponse({ frontendApi, errorReason, loader: 'nested' });
   }
 
   return sanitizeAuthData(authData);
