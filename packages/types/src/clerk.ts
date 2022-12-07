@@ -260,10 +260,8 @@ export interface Clerk {
   setActive: SetActive;
 
   /**
-   * Set the current session explicitly.
-   *
-   * Setting the session to `null` deletes the active session.
-   *
+   * @deprecated This method is deprecated and will be removed in the future. Use {@link Clerk.setActive} instead
+   * Set the current session explicitly. Setting the session to `null` deletes the active session.
    * @param session Passed session resource object, session id (string version) or null
    * @param beforeEmit Callback run just before the active session is set to the passed object. Can be used to hook up for pre-navigation actions.
    */
@@ -271,12 +269,10 @@ export interface Clerk {
 
   /**
    * Function used to commit a navigation after certain steps in the Clerk processes.
-   *
    */
   navigate: CustomNavigation;
 
   /**
-   *
    * Decorates the provided url with the auth token for development instances.
    *
    * @param {string} to
@@ -287,7 +283,6 @@ export interface Clerk {
    * Returns the configured url where <SignIn/> is mounted or a custom sign-in page is rendered.
    *
    * @param opts A {@link RedirectOptions} object
-   *
    */
   buildSignInUrl(opts?: RedirectOptions): string;
 
@@ -295,7 +290,6 @@ export interface Clerk {
    * Returns the configured url where <SignUp/> is mounted or a custom sign-up page is rendered.
    *
    * @param opts A {@link RedirectOptions} object
-   *
    */
   buildSignUpUrl(opts?: RedirectOptions): string;
 

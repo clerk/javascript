@@ -2,7 +2,7 @@ import { TokenResource } from '@clerk/types';
 import jwtGen from 'jsonwebtoken';
 
 import { Token } from './resources/internal';
-import { MemoryTokenCache } from './tokenCache';
+import { SessionTokenCache } from './tokenCache';
 
 // This is required since abstract TS methods are undefined in Jest
 jest.mock('./resources/Base', () => {
@@ -25,7 +25,7 @@ const jwt = jwtGen.sign(
 
 describe('MemoryTokenCache', () => {
   it('caches tokenResolver while is pending until the JWT expiration', async () => {
-    const cache = MemoryTokenCache();
+    const cache = SessionTokenCache;
     const token = new Token({
       object: 'token',
       id: 'foo',
