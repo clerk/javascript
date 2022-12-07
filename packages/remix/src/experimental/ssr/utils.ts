@@ -80,9 +80,10 @@ export function assertObject(val: any, error?: string): asserts val is Record<st
 /**
  * @internal
  */
-export const throwInterstitialJsonResponse = (authState: AuthState) => {
-  throw json(
+export const interstitialJsonResponse = (authState: AuthState, opts: { loader: 'root' | 'nested' }) => {
+  return json(
     wrapWithClerkState({
+      __loader: opts.loader,
       __clerk_ssr_interstitial_html: clerk.localInterstitial({
         debugData: clerk.debugAuthState(authState),
         frontendApi: authState.frontendApi,

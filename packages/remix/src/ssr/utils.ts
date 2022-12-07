@@ -75,12 +75,17 @@ export function assertObject(val: any, error?: string): asserts val is Record<st
 /**
  * @internal
  */
-export const throwInterstitialJsonResponse = (opts: { frontendApi: string; errorReason: string | undefined }) => {
-  throw json(
+export const interstitialJsonResponse = (opts: {
+  frontendApi: string;
+  errorReason: string | undefined;
+  loader: 'root' | 'nested';
+}) => {
+  return json(
     wrapWithClerkState({
       __clerk_ssr_interstitial: true,
       __frontendApi: opts.frontendApi,
       __lastAuthResult: opts.errorReason,
+      __loader: opts.loader,
     }),
     { status: 401 },
   );
