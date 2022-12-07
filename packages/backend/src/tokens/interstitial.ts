@@ -76,23 +76,27 @@ export function loadInterstitialFromLocal({
 }
 
 // TODO: Add caching to Interstitial
-export async function loadInterstitialFromBAPI({ apiUrl, frontendApi, pkgVersion }: LoadInterstitialOptions) {
-  const url = new URL(apiUrl);
-  url.pathname = joinPaths(url.pathname, API_VERSION, '/public/interstitial');
-  url.searchParams.append('clerk_js_version', getClerkJsMajorVersionOrTag(frontendApi, pkgVersion));
-  url.searchParams.append('frontendApi', frontendApi);
-
-  const response = await callWithRetry(() => runtime.fetch(url.href));
+export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions) {
+  const url = buildPublicInterstitialUrl(options);
+  const response = await callWithRetry(() => runtime.fetch(buildPublicInterstitialUrl(options)));
 
   if (!response.ok) {
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.ContactSupport,
-      message: `Error loading Clerk Interstitial from ${url.href} with code=${response.status}`,
+      message: `Error loading Clerk Interstitial from ${url} with code=${response.status}`,
       reason: TokenVerificationErrorReason.RemoteInterstitialFailedToLoad,
     });
   }
 
   return response.text();
+}
+
+export function buildPublicInterstitialUrl({ apiUrl, frontendApi, pkgVersion }: LoadInterstitialOptions) {
+  const url = new URL(apiUrl);
+  url.pathname = joinPaths(url.pathname, API_VERSION, '/public/interstitial');
+  url.searchParams.append('clerk_js_version', getClerkJsMajorVersionOrTag(frontendApi, pkgVersion));
+  url.searchParams.append('frontendApi', frontendApi);
+  return url.href;
 }
 
 // TODO: Move to @clerk/shared as the same logic is used in @clerk/react

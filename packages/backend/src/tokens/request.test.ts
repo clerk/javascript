@@ -3,14 +3,14 @@ import sinon from 'sinon';
 
 import runtime from '../runtime';
 import { jsonOk } from '../util/mockFetch';
-import { type AuthStateOptions, getAuthState } from './authState';
 import { mockJwks, mockJwt, mockJwtPayload } from './fixtures';
+import { type AuthenticateRequestOptions, authenticateRequest } from './request';
 
 export default (QUnit: QUnit) => {
   const { module, test, todo } = QUnit;
 
   /* An otherwise bare state on a request. */
-  const defaultMockAuthState: AuthStateOptions = {
+  const defaultMockAuthenticateRequestOptions: AuthenticateRequestOptions = {
     apiKey: 'deadbeef',
     apiUrl: 'https://api.clerk.test',
     apiVersion: 'v1',
@@ -20,7 +20,7 @@ export default (QUnit: QUnit) => {
     skipJwksCache: true,
   };
 
-  module('tokens.getAuthState(options)', hooks => {
+  module('tokens.authenticateRequest(options)', hooks => {
     let fakeClock;
     let fakeFetch;
 
@@ -45,12 +45,12 @@ export default (QUnit: QUnit) => {
     });
 
     test('returns the signed in state when a valid token is in HTTP Authorization header', async assert => {
-      const authState = await getAuthState({
-        ...defaultMockAuthState,
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
         headerToken: mockJwt,
       });
 
-      assert.propContains(authState, {
+      assert.propContains(requestState, {
         frontendApi: 'cafe.babe.clerk.ts',
         isSignedIn: true,
         isInterstitial: false,
@@ -75,13 +75,13 @@ export default (QUnit: QUnit) => {
     );
 
     test('returns the signed out state when a token with invalid authorizedParties is in HTTP Authorization header', async assert => {
-      const authState = await getAuthState({
-        ...defaultMockAuthState,
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
         headerToken: mockJwt,
         authorizedParties: ['whatever'],
       });
 
-      assert.propEqual(authState, {
+      assert.propEqual(requestState, {
         frontendApi: 'cafe.babe.clerk.ts',
         isSignedIn: false,
         isInterstitial: false,
@@ -103,12 +103,12 @@ export default (QUnit: QUnit) => {
     });
 
     test('returns the signed out state when an invalid token is in HTTP Authorization header', async assert => {
-      const authState = await getAuthState({
-        ...defaultMockAuthState,
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
         headerToken: 'test_header_token',
       });
 
-      assert.propEqual(authState, {
+      assert.propEqual(requestState, {
         frontendApi: 'cafe.babe.clerk.ts',
         isSignedIn: false,
         isInterstitial: false,
@@ -136,13 +136,13 @@ export default (QUnit: QUnit) => {
 //   const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
 //   testBase.buildAuthenticatedState = jest.fn();
 //   mockIsDevelopmentOrStaging.mockImplementationOnce(() => true);
-//   const authStateResult = await testBase.getAuthState({
-//     ...defaultAuthState,
+//   const requestStateResult = await testBase.authenticateRequest({
+//     ...defaultrequestState,
 //     userAgent: nonBrowserUserAgent,
 //     clientUat: '12345',
 //   });
 //   expect(testBase.buildAuthenticatedState).toHaveBeenCalledTimes(0);
-//   expect(authStateResult).toEqual({
+//   expect(requestStateResult).toEqual({
 //     status: AuthStatus.SignedOut,
 //     errorReason: AuthErrorReason.HeaderMissingNonBrowser,
 //   });
@@ -151,22 +151,22 @@ export default (QUnit: QUnit) => {
 // it('returns signed out when no header token is present in cross-origin request', async () => {
 //   const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
 //   mockCrossOrigin.mockImplementationOnce(() => true);
-//   const authStateResult = await testBase.getAuthState({ ...defaultAuthState, origin: 'https://clerk.dev' });
+//   const requestStateResult = await testBase.authenticateRequest({ ...defaultrequestState, origin: 'https://clerk.dev' });
 //   expect(mockCrossOrigin).toHaveBeenCalledTimes(1);
-//   expect(authStateResult).toEqual({ status: AuthStatus.SignedOut, errorReason: AuthErrorReason.HeaderMissingCORS });
+//   expect(requestStateResult).toEqual({ status: AuthStatus.SignedOut, errorReason: AuthErrorReason.HeaderMissingCORS });
 // });
 
 // it('returns interstitial when in development we find no clientUat', async () => {
 //   const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
 //   mockFetchInterstitial.mockImplementationOnce(() => Promise.resolve(mockInterstitialValue));
 //   mockIsDevelopmentOrStaging.mockImplementationOnce(() => true);
-//   const authStateResult = await testBase.getAuthState({
-//     ...defaultAuthState,
+//   const requestStateResult = await testBase.authenticateRequest({
+//     ...defaultrequestState,
 //     fetchInterstitial: mockFetchInterstitial,
 //   });
 
 //   expect(mockFetchInterstitial).toHaveBeenCalledTimes(1);
-//   expect(authStateResult).toEqual({
+//   expect(requestStateResult).toEqual({
 //     status: AuthStatus.Interstitial,
 //     interstitial: mockInterstitialValue,
 //     errorReason: AuthErrorReason.UATMissing,
@@ -176,8 +176,8 @@ export default (QUnit: QUnit) => {
 // it('returns signed out on first production load without cookieToken and clientUat', async () => {
 //   const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
 //   mockIsProduction.mockImplementationOnce(() => true);
-//   const authStateResult = await testBase.getAuthState({ ...defaultAuthState });
-//   expect(authStateResult).toEqual({ status: AuthStatus.SignedOut, errorReason: AuthErrorReason.CookieAndUATMissing });
+//   const requestStateResult = await testBase.authenticateRequest({ ...defaultrequestState });
+//   expect(requestStateResult).toEqual({ status: AuthStatus.SignedOut, errorReason: AuthErrorReason.CookieAndUATMissing });
 // });
 
 // it('returns interstitial on development after auth action on Clerk-hosted UIs', async () => {
@@ -185,15 +185,15 @@ export default (QUnit: QUnit) => {
 //   mockFetchInterstitial.mockImplementationOnce(() => Promise.resolve(mockInterstitialValue));
 //   mockIsDevelopmentOrStaging.mockImplementationOnce(() => true);
 //   mockCrossOrigin.mockImplementationOnce(() => true);
-//   const authStateResult = await testBase.getAuthState({
-//     ...defaultAuthState,
+//   const requestStateResult = await testBase.authenticateRequest({
+//     ...defaultrequestState,
 //     fetchInterstitial: mockFetchInterstitial,
 //     referrer: 'https://random.clerk.hosted.ui',
 //     clientUat: '12345',
 //   });
 
 //   expect(mockFetchInterstitial).toHaveBeenCalledTimes(1);
-//   expect(authStateResult).toEqual({
+//   expect(requestStateResult).toEqual({
 //     status: AuthStatus.Interstitial,
 //     interstitial: mockInterstitialValue,
 //     errorReason: AuthErrorReason.CrossOriginReferrer,
@@ -203,21 +203,21 @@ export default (QUnit: QUnit) => {
 // it('returns signed out on clientUat signaled as 0', async () => {
 //   const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
 //   mockIsProduction.mockImplementationOnce(() => true);
-//   const authStateResult = await testBase.getAuthState({ ...defaultAuthState, clientUat: '0' });
-//   expect(authStateResult).toEqual({ status: AuthStatus.SignedOut, errorReason: AuthErrorReason.StandardSignedOut });
+//   const requestStateResult = await testBase.authenticateRequest({ ...defaultrequestState, clientUat: '0' });
+//   expect(requestStateResult).toEqual({ status: AuthStatus.SignedOut, errorReason: AuthErrorReason.StandardSignedOut });
 // });
 
 // it('returns interstitial when on production and have a valid clientUat value without cookieToken', async () => {
 //   const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
 //   mockIsProduction.mockImplementationOnce(() => true);
 //   mockFetchInterstitial.mockImplementationOnce(() => Promise.resolve(mockInterstitialValue));
-//   const authStateResult = await testBase.getAuthState({
-//     ...defaultAuthState,
+//   const requestStateResult = await testBase.authenticateRequest({
+//     ...defaultrequestState,
 //     clientUat: '12345',
 //     fetchInterstitial: mockFetchInterstitial,
 //   });
 //   expect(mockFetchInterstitial).toHaveBeenCalledTimes(1);
-//   expect(authStateResult).toEqual({
+//   expect(requestStateResult).toEqual({
 //     status: AuthStatus.Interstitial,
 //     interstitial: mockInterstitialValue,
 //     errorReason: AuthErrorReason.CookieMissing,
@@ -228,12 +228,12 @@ export default (QUnit: QUnit) => {
 //   const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
 //   const validJwtToken = { sessionClaims: { iat: Number(new Date()) + 50 } };
 //   testBase.buildAuthenticatedState = jest.fn().mockImplementationOnce(() => validJwtToken);
-//   const authStateResult = await testBase.getAuthState({
-//     ...defaultAuthState,
+//   const requestStateResult = await testBase.authenticateRequest({
+//     ...defaultrequestState,
 //     clientUat: String(new Date().getTime()),
 //     cookieToken: 'valid_token',
 //   });
-//   expect(authStateResult).toEqual(validJwtToken);
+//   expect(requestStateResult).toEqual(validJwtToken);
 // });
 
 // it('returns interstitial cookieToken is valid but token iat is in past date', async () => {
@@ -242,14 +242,14 @@ export default (QUnit: QUnit) => {
 //   const validJwtToken = { sessionClaims: { iat: Number(new Date()) - 50 } };
 //   testBase.buildAuthenticatedState = jest.fn().mockImplementationOnce(() => validJwtToken);
 //   mockFetchInterstitial.mockImplementationOnce(() => Promise.resolve(mockInterstitialValue));
-//   const authStateResult = await testBase.getAuthState({
-//     ...defaultAuthState,
+//   const requestStateResult = await testBase.authenticateRequest({
+//     ...defaultrequestState,
 //     clientUat: String(new Date().getTime()),
 //     cookieToken: 'valid_token',
 //     fetchInterstitial: mockFetchInterstitial,
 //   });
 //   expect(mockFetchInterstitial).toHaveBeenCalledTimes(1);
-//   expect(authStateResult).toEqual({
+//   expect(requestStateResult).toEqual({
 //     status: AuthStatus.Interstitial,
 //     interstitial: mockInterstitialValue,
 //     errorReason: AuthErrorReason.CookieOutDated,

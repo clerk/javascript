@@ -1,2 +1,9 @@
+export * from './authObjects';
 export * from './factory';
-export { type AuthState } from './authState';
+export {
+  AuthStatus,
+  type AuthenticateRequestOptions,
+  type OptionalVerifyTokenOptions,
+  type RequestState,
+  type RequiredVerifyTokenOptions,
+} from './request';

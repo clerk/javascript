@@ -2,15 +2,15 @@ import { LIB_VERSION } from '@clerk/clerk-react/dist/info';
 import { json } from '@remix-run/server-runtime';
 import cookie from 'cookie';
 
-import { AuthState, clerk } from '../clerk';
+import { AuthObject, clerkClient, RequestState } from '../clerk';
 import { LoaderFunctionArgs, LoaderFunctionArgsWithAuth } from './types';
 
 /**
  * Inject `auth`, `user` and `session` properties into `request`
  * @internal
  */
-export function injectAuthIntoRequest(args: LoaderFunctionArgs, authState: AuthState): LoaderFunctionArgsWithAuth {
-  const { user, session, userId, sessionId, getToken, sessionClaims } = authState;
+export function injectAuthIntoRequest(args: LoaderFunctionArgs, authObject: AuthObject): LoaderFunctionArgsWithAuth {
+  const { user, session, userId, sessionId, getToken, sessionClaims } = authObject;
   (args.request as any).auth = {
     userId,
     sessionId,
@@ -20,25 +20,6 @@ export function injectAuthIntoRequest(args: LoaderFunctionArgs, authState: AuthS
   (args.request as any).user = user;
   (args.request as any).session = session;
   return args as LoaderFunctionArgsWithAuth;
-}
-
-/**
- * See `packages/nextjs/src/middleware/utils/sanitizeAuthData.ts`
- * TODO: Make a shared function
- *
- * @internal
- */
-export function sanitizeAuthData(authState: AuthState): any {
-  if (!authState.isSignedIn) {
-    return authState;
-  }
-
-  const user = authState.user ? { ...authState.user } : authState.user;
-  const organization = authState.user ? { ...authState.user } : authState.user;
-  clerk.toSSRResource(user);
-  clerk.toSSRResource(organization);
-
-  return { ...authState, user, organization };
 }
 
 /**
@@ -80,13 +61,13 @@ export function assertObject(val: any, error?: string): asserts val is Record<st
 /**
  * @internal
  */
-export const interstitialJsonResponse = (authState: AuthState, opts: { loader: 'root' | 'nested' }) => {
+export const interstitialJsonResponse = (requestState: RequestState, opts: { loader: 'root' | 'nested' }) => {
   return json(
     wrapWithClerkState({
       __loader: opts.loader,
-      __clerk_ssr_interstitial_html: clerk.localInterstitial({
-        debugData: clerk.debugAuthState(authState),
-        frontendApi: authState.frontendApi,
+      __clerk_ssr_interstitial_html: clerkClient.localInterstitial({
+        debugData: clerkClient.debugRequestState(requestState),
+        frontendApi: requestState.frontendApi,
         pkgVersion: LIB_VERSION,
       }),
     }),
@@ -97,14 +78,14 @@ export const interstitialJsonResponse = (authState: AuthState, opts: { loader: '
 /**
  * @internal
  */
-export const returnLoaderResultJsonResponse = (opts: { authState: AuthState; callbackResult?: any }) => {
-  const { reason, message, isSignedIn, isInterstitial, ...rest } = opts.authState;
+export const returnLoaderResultJsonResponse = (opts: { requestState: RequestState; callbackResult?: any }) => {
+  const { reason, message, isSignedIn, isInterstitial, ...rest } = opts.requestState;
   return json({
     ...(opts.callbackResult || {}),
     ...wrapWithClerkState({
       __clerk_ssr_state: rest,
-      __frontendApi: opts.authState.frontendApi,
-      __clerk_debug: clerk.debugAuthState(opts.authState),
+      __frontendApi: opts.requestState.frontendApi,
+      __clerk_debug: clerkClient.debugRequestState(opts.requestState),
     }),
   });
 };

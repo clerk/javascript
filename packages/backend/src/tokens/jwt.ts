@@ -92,6 +92,7 @@ export function decodeJwt(token: string): Jwt {
       header: rawHeader,
       payload: rawPayload,
       signature: rawSignature,
+      text: token,
     },
   };
 }
