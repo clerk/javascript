@@ -61,6 +61,7 @@ export default (QUnit: QUnit) => {
         user: undefined,
         orgId: undefined,
         orgRole: undefined,
+        orgSlug: undefined,
         organization: undefined,
         getToken: {},
       });
@@ -95,6 +96,7 @@ export default (QUnit: QUnit) => {
         user: null,
         orgId: null,
         orgRole: null,
+        orgSlug: null,
         organization: null,
         getToken: {},
       });
@@ -121,6 +123,7 @@ export default (QUnit: QUnit) => {
         user: null,
         orgId: null,
         orgRole: null,
+        orgSlug: null,
         organization: null,
         getToken: {},
       });
