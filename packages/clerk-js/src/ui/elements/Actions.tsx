@@ -61,7 +61,7 @@ export const Action = (props: ActionProps) => {
         theme => ({
           flex: '1',
           borderRadius: 0,
-          gap: theme.space.$5,
+          gap: theme.space.$4,
           padding: `${theme.space.$3x5} ${theme.space.$6}`,
           justifyContent: 'flex-start',
         }),
