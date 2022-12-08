@@ -1,14 +1,17 @@
 import { json, LoaderFunction } from '@remix-run/cloudflare';
 import { useLoaderData } from '@remix-run/react';
 import { getAuth } from '@clerk/remix/experimental/ssr.server';
-import { Clerk } from '@clerk/remix/experimental/api.server';
+import { createClerkClient } from '@clerk/remix/experimental/api.server';
 import { useUser, SignedIn, SignedOut, ClerkLoaded, RedirectToSignIn, UserButton } from '@clerk/remix/experimental';
 
 export const loader: LoaderFunction = async args => {
   const authState = await getAuth(args);
-  const { data: count } = await new Clerk.users.getCount();
-  console.log('User count', count);
-  console.log('AuthState', authState);
+
+  const { data: count } = await createClerkClient({
+    apiKey: globalThis['CLERK_API_KEY'],
+  }).users.getCount();
+
+  console.log('AuthState from loader:', authState);
   return json({ userId: authState.userId, count });
 };
 
@@ -23,6 +26,7 @@ export default function Index() {
           <RedirectToSignIn />
         </SignedOut>
         <ul>
+          <li>Total users: {count}</li>
           <li>
             ClerkJS client state:
             <ClerkLoaded>

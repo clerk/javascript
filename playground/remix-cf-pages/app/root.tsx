@@ -8,9 +8,7 @@ export const loader: LoaderFunction = args => {
     args,
     ({ request }) => {
       const { user } = request;
-
-      console.log('User:', user);
-
+      console.log('Loaded yser from root loader:', user);
       return { user };
     },
     {

@@ -53,6 +53,7 @@ Thumbs.db
 lerna-debug.log
 packages/*/coverage
 .next
+.dev.vars
 .env.local
 .yalc
 yalc.lock
