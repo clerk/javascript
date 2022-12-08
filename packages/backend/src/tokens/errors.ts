@@ -1,8 +1,12 @@
 import { type TokenCarrier } from './authState';
 
 export enum TokenVerificationErrorReason {
-  TokenInvalid = 'token-invalid',
   TokenExpired = 'token-expired',
+  TokenInvalid = 'token-invalid',
+  TokenInvalidAlgorithm = 'token-invalid-algorithm',
+  TokenInvalidAuthorizedParties = 'token-invalid-authorized-parties',
+  TokenInvalidIssuer = 'token-invalid-issuer',
+  TokenInvalidSignature = 'token-invalid-signature',
   TokenNotActiveYet = 'token-not-active-yet',
   TokenVerificationFailed = 'token-verification-failed',
 
@@ -19,6 +23,7 @@ export enum TokenVerificationErrorReason {
 
 export enum TokenVerificationErrorAction {
   ContactSupport = 'Contact support@clerk.dev',
+  EnsureClerkJWT = 'Make sure that this is a valid Clerk generate JWT.',
   SetClerkJWTKey = 'Set the CLERK_JWT_KEY environment variable.',
   SetClerkAPIKey = 'Set the CLERK_API_KEY environment variable.',
 }
