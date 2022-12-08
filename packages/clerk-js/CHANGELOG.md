@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.21.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.21.0-staging.0...@clerk/clerk-js@4.21.0) (2022-12-08)
+
+### Bug Fixes
+
+- **clerk-js:** Tweak options spacing in organization switcher ([b43dac2](https://github.com/clerkinc/javascript/commit/b43dac25265e4ba6b59969b3c98609a64ff5a9a8))
+- **clerk-js:** Tweak options spacing in organization switcher ([c1f1a7c](https://github.com/clerkinc/javascript/commit/c1f1a7c994951bb6a2162e08772c59d4a640debc))
+
 ## [4.20.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.20.0-staging.1...@clerk/clerk-js@4.20.0) (2022-12-02)
 
 **Note:** Version bump only for package @clerk/clerk-js
