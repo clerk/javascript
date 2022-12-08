@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.21.1](https://github.com/clerkinc/javascript/compare/@clerk/types@3.21.0...@clerk/types@3.21.1) (2022-12-08)
+
+### Reverts
+
+- Revert "feat(clerk-js,types): Terse paths parameters (#572)" (#603) ([d535eac](https://github.com/clerkinc/javascript/commit/d535eace3d7733ce3b848bb05f1b0c02e5faf15d)), closes [#572](https://github.com/clerkinc/javascript/issues/572) [#603](https://github.com/clerkinc/javascript/issues/603)
+
 ## [3.21.0](https://github.com/clerkinc/javascript/compare/@clerk/types@3.21.0-staging.0...@clerk/types@3.21.0) (2022-12-08)
 
 **Note:** Version bump only for package @clerk/types
