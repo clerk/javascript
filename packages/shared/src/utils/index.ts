@@ -5,6 +5,7 @@ export * from './cookies';
 export * from './date';
 export * from './file';
 export * from './index';
+export * from './keys';
 export * from './isRetinaDisplay';
 export * from './localStorageBroadcastChannel';
 export * from './mimeTypeExtensions';
