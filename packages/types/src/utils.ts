@@ -35,13 +35,6 @@ export type DeepRequired<T> = Required<{
 }>;
 
 /**
- * Omit without union flattening
- * */
-export type Without<T, W> = {
-  [P in keyof T as Exclude<P, W>]: T[P];
-};
-
-/**
  * Internal type used by RecordToPath
  */
 type PathImpl<T, Key extends keyof T> = Key extends string
