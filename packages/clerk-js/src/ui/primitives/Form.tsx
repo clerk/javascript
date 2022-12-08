@@ -11,7 +11,7 @@ export const Form = React.forwardRef<HTMLFormElement, FormProps>((props, ref) =>
       direction='col'
       as='form'
       {...props}
-      // @ts-ignore
+      // @ts-expect-error
       ref={ref}
     />
   );

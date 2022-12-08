@@ -49,7 +49,6 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   },
 }));
 
-// @ts-ignore
 export type GridProps = StateProps & BoxProps & StyleVariants<typeof applyVariants>;
 
 export const Grid = React.forwardRef<HTMLDivElement, GridProps>((props, ref) => {

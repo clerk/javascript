@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { common, createCssVariables, createVariants, PropsOfComponent, StyleVariants } from '../styledSystem';
 import { colors } from '../utils';
 import { Flex } from './Flex';

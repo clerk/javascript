@@ -10,7 +10,6 @@ const { applyVariants } = createVariants(() => ({
   variants: {},
 }));
 
-// @ts-ignore
 export type BoxProps = StateProps & PrimitiveProps<'div'> & AsProp & StyleVariants<typeof applyVariants>;
 
 export const Box = React.forwardRef<HTMLDivElement, BoxProps>((props, ref) => {

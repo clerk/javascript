@@ -1,6 +1,3 @@
-// eslint-disable-next-line no-restricted-imports
-import React from 'react';
-
 import { animations, createCssVariables, createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
 
 const { size, thickness, speed } = createCssVariables('speed', 'size', 'thickness');

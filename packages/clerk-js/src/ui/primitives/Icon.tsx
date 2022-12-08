@@ -30,7 +30,7 @@ export const Icon = (props: IconProps): JSX.Element => {
   return (
     <Icon
       {...filterProps(rest)}
-      // @ts-ignore
+      // @ts-expect-error
       css={applyVariants(props)}
     />
   );
