@@ -12,7 +12,7 @@ type UseAuthReturn =
       isSignedIn: undefined;
       userId: undefined;
       sessionId: undefined;
-      actor: null;
+      actor: undefined;
       signOut: SignOut;
       getToken: GetToken;
     }
@@ -89,7 +89,7 @@ export const useAuth: UseAuth = () => {
       isSignedIn: undefined,
       sessionId,
       userId,
-      actor: null,
+      actor: undefined,
       signOut,
       getToken,
     };
@@ -113,7 +113,7 @@ export const useAuth: UseAuth = () => {
       isSignedIn: true,
       sessionId,
       userId,
-      actor,
+      actor: actor || null,
       signOut,
       getToken,
     };
