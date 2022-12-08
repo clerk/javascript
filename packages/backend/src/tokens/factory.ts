@@ -1,16 +1,24 @@
 import { type ApiClient } from '../api';
 import { API_URL, API_VERSION } from '../constants';
-import { type AuthStateOptions, AuthState, getAuthState } from './authState';
-import { type LoadInterstitialOptions, loadInterstitialFromBAPI, loadInterstitialFromLocal } from './interstitial';
-import { toSSRResource } from './utils';
+import {
+  type LoadInterstitialOptions,
+  buildPublicInterstitialUrl,
+  loadInterstitialFromBAPI,
+  loadInterstitialFromLocal,
+} from './interstitial';
+import {
+  type AuthenticateRequestOptions,
+  authenticateRequest as authenticateRequestOriginal,
+  debugRequestState,
+} from './request';
 
-export type CreateAuthStateOptions = Partial<
-  Pick<AuthStateOptions, 'apiKey' | 'apiUrl' | 'apiVersion' | 'frontendApi' | 'jwtKey'>
+export type CreateAuthenticateRequestOptions = Partial<
+  Pick<AuthenticateRequestOptions, 'apiKey' | 'apiUrl' | 'apiVersion' | 'frontendApi' | 'jwtKey'>
 > & {
   apiClient: ApiClient;
 };
 
-export function createAuthState(options: CreateAuthStateOptions) {
+export function createAuthenticateRequest(options: CreateAuthenticateRequestOptions) {
   const {
     apiKey: buildtimeApiKey = '',
     apiUrl = API_URL,
@@ -19,12 +27,12 @@ export function createAuthState(options: CreateAuthStateOptions) {
     frontendApi: buildtimeFrontendApi = '',
   } = options;
 
-  const authState = ({
+  const authenticateRequest = ({
     apiKey: runtimeApiKey,
     frontendApi: runtimeFrontendApi,
     ...rest
-  }: Omit<AuthStateOptions, 'apiUrl' | 'apiVersion'>) =>
-    getAuthState({
+  }: Omit<AuthenticateRequestOptions, 'apiUrl' | 'apiVersion'>) =>
+    authenticateRequestOriginal({
       ...rest,
       apiKey: runtimeApiKey || buildtimeApiKey,
       apiUrl,
@@ -37,23 +45,17 @@ export function createAuthState(options: CreateAuthStateOptions) {
   const remotePublicInterstitial = ({ frontendApi: runtimeFrontendApi, ...rest }: LoadInterstitialOptions) =>
     loadInterstitialFromBAPI({ ...rest, apiUrl, frontendApi: runtimeFrontendApi || buildtimeFrontendApi });
 
+  const remotePublicInterstitialUrl = buildPublicInterstitialUrl;
+
   // TODO: Replace this function with remotePublicInterstitial
   const remotePrivateInterstitial = () => apiClient.interstitial.getInterstitial();
 
-  const debugAuthState = ({ frontendApi, isSignedIn, isInterstitial, reason, message }: AuthState) => ({
-    frontendApi,
-    isSignedIn,
-    isInterstitial,
-    reason,
-    message,
-  });
-
   return {
-    authState,
+    authenticateRequest,
     localInterstitial,
     remotePublicInterstitial,
     remotePrivateInterstitial,
-    toSSRResource,
-    debugAuthState,
+    remotePublicInterstitialUrl,
+    debugRequestState,
   };
 }

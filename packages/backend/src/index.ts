@@ -1,19 +1,19 @@
 import { type CreateBackendApiOptions, createBackendApiClient } from './api';
-import { type CreateAuthStateOptions, createAuthState } from './tokens';
+import { type CreateAuthenticateRequestOptions, createAuthenticateRequest } from './tokens';
 
 export * from './api/resources';
-export { type AuthState } from './tokens';
+export * from './tokens';
 export * from './tokens/jwt';
 export * from './tokens/verify';
 
-export type ClerkOptions = CreateBackendApiOptions & Pick<CreateAuthStateOptions, 'jwtKey'>;
+export type ClerkOptions = CreateBackendApiOptions & Pick<CreateAuthenticateRequestOptions, 'jwtKey'>;
 
 export default function Clerk(options: ClerkOptions) {
   const apiClient = createBackendApiClient(options);
-  const authState = createAuthState({ ...options, apiClient });
+  const requestState = createAuthenticateRequest({ ...options, apiClient });
 
   return {
     ...apiClient,
-    ...authState,
+    ...requestState,
   };
 }

@@ -1,28 +1,33 @@
-import type { ActClaim, JwtPayload, ServerGetToken } from '@clerk/types';
+import type { JwtPayload } from '@clerk/types';
 
 import { createBackendApiClient } from '../api';
-import { Organization, Session, User } from '../api/resources';
 import { API_URL, API_VERSION } from '../constants';
 import { isDevelopmentFromApiKey, isProductionFromApiKey } from '../util/instance';
 import { checkCrossOrigin } from '../util/request';
+import {
+  type SignedInAuthObject,
+  type SignedOutAuthObject,
+  signedInAuthObject,
+  signedOutAuthObject,
+} from './authObjects';
 import { TokenVerificationError, TokenVerificationErrorReason } from './errors';
-import { createGetToken } from './getToken';
 import { type VerifyTokenOptions, verifyToken } from './verify';
 
-type RequiredVerifyTokenOptions = Required<Pick<VerifyTokenOptions, 'apiKey' | 'apiUrl' | 'apiVersion'>>;
-type OptionalVerifyTokenOptions = Partial<
-  Pick<VerifyTokenOptions, 'authorizedParties' | 'clockSkewInSeconds' | 'jwksCacheTtlInMs' | 'skipJwksCache' | 'jwtKey'>
->;
-
-export type TokenCarrier = 'header' | 'cookie';
-
-type LoadResourcesOptions = {
+export type LoadResourcesOptions = {
   loadSession?: boolean;
   loadUser?: boolean;
   loadOrganization?: boolean;
 };
 
-export type AuthStateOptions = RequiredVerifyTokenOptions &
+export type RequiredVerifyTokenOptions = Required<Pick<VerifyTokenOptions, 'apiKey' | 'apiUrl' | 'apiVersion'>>;
+
+export type OptionalVerifyTokenOptions = Partial<
+  Pick<VerifyTokenOptions, 'authorizedParties' | 'clockSkewInSeconds' | 'jwksCacheTtlInMs' | 'skipJwksCache' | 'jwtKey'>
+>;
+
+export type TokenCarrier = 'header' | 'cookie';
+
+export type AuthenticateRequestOptions = RequiredVerifyTokenOptions &
   OptionalVerifyTokenOptions &
   LoadResourcesOptions & {
     /* Client token cookie value */
@@ -49,96 +54,73 @@ export type AuthStateOptions = RequiredVerifyTokenOptions &
     userAgent?: string;
   };
 
-export enum AuthStateReason {
+export enum AuthStatus {
+  SignedIn = 'signed-in',
+  SignedOut = 'signed-out',
+  Interstitial = 'interstitial',
+}
+
+export enum AuthReason {
   TokenVerificationError = 'token-verification-error',
-  JWTKeyMissing = 'jwt-key-missing',
-  InlineKeyMissing = 'inline-key-missing',
-  InlineKeyInvalid = 'inline-key-invalid',
-  HeaderExpired = 'header-expired',
-  HeaderEarly = 'header-early',
-  HeaderInvalid = 'header-invalid',
-  HeaderInvalidIssuer = 'header-invalid-issuer',
   HeaderMissingNonBrowser = 'header-missing-non-browser',
   HeaderMissingCORS = 'header-missing-cors',
-  HeaderUnauthorizedParty = 'header-unauthorized-party',
-  HeaderVerificationFailed = 'header-verification-failed',
-  UATMissing = 'uat-missing',
+  CookieUATMissing = 'uat-missing',
   CrossOriginReferrer = 'cross-origin-referrer',
   CookieAndUATMissing = 'cookie-and-uat-missing',
+  StandardSignedIn = 'standard-signed-in',
   StandardSignedOut = 'standard-signed-out',
   CookieMissing = 'cookie-missing',
-  CookieExpired = 'cookie-expired',
-  CookieEarly = 'cookie-early',
-  CookieInvalid = 'cookie-invalid',
-  CookieInvalidIssuer = 'cookie-invalid-issuer',
   CookieOutDated = 'cookie-outdated',
-  CookieUnauthorizedParty = 'cookie-unauthorized-party',
-  CookieVerificationFailed = 'cookie-verification-failed',
   UnexpectedError = 'unexpected-error',
-  PublicKeyFetchError = 'pk-fetch-error',
   Unknown = 'unknown',
 }
 
-export type SignedInAuthState = {
+export type SignedInState = {
+  status: AuthStatus.SignedIn;
+  reason: null;
+  message: null;
   frontendApi: string;
   isSignedIn: true;
   isInterstitial: false;
-  reason: null;
-  message: null;
-  sessionClaims: JwtPayload;
-  sessionId: string;
-  session?: Session;
-  actor?: ActClaim;
-  userId: string;
-  user?: User;
-  orgId?: string;
-  orgRole?: string;
-  orgSlug?: string;
-  organization?: Organization;
-  getToken: ServerGetToken;
+  toAuth: () => SignedInAuthObject;
 };
 
-export type SignedOutAuthState = {
+export type SignedOutState = {
+  status: AuthStatus.SignedOut;
+  message: string;
+  reason: AuthReason;
   frontendApi: string;
   isSignedIn: false;
   isInterstitial: false;
-  message: string;
-  reason: AuthStateReason;
-  sessionClaims: null;
-  sessionId: null;
-  session: null;
-  userId: null;
-  user: null;
-  orgId: null;
-  orgRole: null;
-  orgSlug: null;
-  organization: null;
-  getToken: ServerGetToken;
+  toAuth: () => SignedOutAuthObject;
 };
 
-export type InterstitialAuthState = Omit<SignedOutAuthState, 'isInterstitial'> & {
+export type InterstitialState = Omit<SignedOutState, 'isInterstitial' | 'status' | 'toAuth'> & {
+  status: AuthStatus.Interstitial;
   isSignedIn: false;
   isInterstitial: true;
-  reason: AuthStateReason;
+  reason: AuthReason;
+  toAuth: () => null;
 };
 
-export type AuthState = SignedInAuthState | SignedOutAuthState | InterstitialAuthState;
+export type RequestState = SignedInState | SignedOutState | InterstitialState;
 
-export async function getAuthState(options: AuthStateOptions): Promise<AuthState> {
+export async function authenticateRequest(options: AuthenticateRequestOptions): Promise<RequestState> {
   options.apiUrl = options.apiUrl || API_URL;
   options.apiVersion = options.apiVersion || API_VERSION;
 
-  async function handleRequestWithTokenInHeader() {
+  async function authenticateRequestWithTokenInHeader() {
     const { headerToken } = options;
 
     try {
-      return await buildAuthenticatedState(headerToken!);
+      const sessionClaims = await verifyRequestState(headerToken!);
+      return await signedIn(sessionClaims);
     } catch (err) {
       return handleError(err, 'header');
     }
   }
 
-  async function handleRequestWithTokenInCookie() {
+  async function authenticateRequestWithTokenInCookie() {
     const signedOutOrInterstitial = runInterstitialRules(options, [
       nonBrowserRequestInDevRule,
       crossOriginRequestWithoutHeader,
@@ -155,27 +137,26 @@ export async function getAuthState(options: AuthStateOptions): Promise<AuthState
 
     try {
       const { cookieToken, clientUat } = options;
-      const authenticatedState = await buildAuthenticatedState(cookieToken!);
+      const sessionClaims = await verifyRequestState(cookieToken!);
+      const state = await signedIn(sessionClaims);
 
-      if (!clientUat || cookieTokenIsOutdated(authenticatedState.sessionClaims, clientUat)) {
-        return interstitial(AuthStateReason.CookieOutDated);
+      if (!clientUat || cookieTokenIsOutdated(state.toAuth().sessionClaims, clientUat)) {
+        return interstitial(AuthReason.CookieOutDated);
       }
 
-      return authenticatedState;
+      return state;
     } catch (err) {
       return handleError(err, 'cookie');
     }
   }
 
-  async function buildAuthenticatedState(token: string) {
+  function verifyRequestState(token: string) {
     const issuer = (iss: string) => iss.startsWith('https://clerk.');
 
-    const sessionClaims = await verifyToken(token, {
+    return verifyToken(token, {
       ...options,
       issuer,
     });
-
-    return signedIn(sessionClaims);
   }
 
   function handleError(err: unknown, tokenCarrier: TokenCarrier) {
@@ -188,25 +169,26 @@ export async function getAuthState(options: AuthStateOptions): Promise<AuthState
       ].includes(err.reason);
 
       if (reasonToReturnInterstitial) {
-        return interstitial(AuthStateReason.TokenVerificationError, err.getFullMessage());
+        return interstitial(AuthReason.TokenVerificationError, err.getFullMessage());
       }
-      return signedOut(AuthStateReason.TokenVerificationError, err.getFullMessage());
+      return signedOut(AuthReason.TokenVerificationError, err.getFullMessage());
     }
-    return signedOut(AuthStateReason.UnexpectedError, (err as Error).message);
+    return signedOut(AuthReason.UnexpectedError, (err as Error).message);
   }
 
   function cookieTokenIsOutdated(jwt: JwtPayload, clientUat: string) {
     return jwt.iat < Number.parseInt(clientUat);
   }
 
-  async function signedIn(sessionClaims: JwtPayload): Promise<SignedInAuthState> {
-    const { sid: sessionId, org_id: orgId, org_role: orgRole, org_slug: orgSlug, sub: userId } = sessionClaims;
+  async function signedIn(sessionClaims: JwtPayload): Promise<SignedInState> {
+    const { sid: sessionId, org_id: orgId, sub: userId } = sessionClaims;
+
     const {
       apiKey,
       apiUrl,
       apiVersion,
-      frontendApi,
       cookieToken,
+      frontendApi,
       headerToken,
       loadSession,
       loadUser,
@@ -225,78 +207,57 @@ export async function getAuthState(options: AuthStateOptions): Promise<AuthState
       loadOrganization && orgId ? organizations.getOrganization({ organizationId: orgId }) : Promise.resolve(undefined),
     ]);
 
-    // TODO: Returns errors that might occur when loading resources while building signed-in state.
     const session = sessionResp && !sessionResp.errors ? sessionResp.data : undefined;
     const user = userResp && !userResp.errors ? userResp.data : undefined;
     const organization = organizationResp && !organizationResp.errors ? organizationResp.data : undefined;
-    const actor = sessionClaims.act;
 
-    const getToken = createGetToken({
-      sessionId,
-      cookieToken,
-      headerToken,
-      fetcher: (...args) => sessions.getToken(...args),
+    const authObject = signedInAuthObject(sessionClaims, {
+      apiKey,
+      apiUrl,
+      apiVersion,
+      token: cookieToken || headerToken || '',
+      session,
+      user,
+      organization,
     });
 
     return {
+      status: AuthStatus.SignedIn,
+      reason: null,
+      message: null,
       frontendApi,
       isSignedIn: true,
       isInterstitial: false,
-      message: null,
-      reason: null,
-      actor,
-      sessionClaims,
-      sessionId,
-      session,
-      userId,
-      user,
-      orgId,
-      orgRole,
-      orgSlug,
-      organization,
-      getToken,
+      toAuth: () => authObject,
     };
   }
 
-  function signedOut(reason: AuthStateReason, message = ''): SignedOutAuthState {
+  function signedOut(reason: AuthReason, message = ''): SignedOutState {
     return {
+      status: AuthStatus.SignedOut,
+      reason,
+      message,
+      frontendApi: options.frontendApi,
       isSignedIn: false,
       isInterstitial: false,
-      reason,
-      message,
-      ..._signedOutState(),
+      toAuth: () => signedOutAuthObject(),
     };
   }
 
-  function interstitial(reason: AuthStateReason, message = ''): InterstitialAuthState {
+  function interstitial(reason: AuthReason, message = ''): InterstitialState {
     return {
+      status: AuthStatus.Interstitial,
+      reason,
+      message,
+      frontendApi: options.frontendApi,
       isSignedIn: false,
       isInterstitial: true,
-      reason,
-      message,
-      ..._signedOutState(),
+      toAuth: () => null,
     };
   }
 
-  function _signedOutState() {
-    return {
-      frontendApi: options.frontendApi,
-      sessionClaims: null,
-      sessionId: null,
-      session: null,
-      userId: null,
-      user: null,
-      actor: null,
-      orgId: null,
-      orgRole: null,
-      orgSlug: null,
-      organization: null,
-      getToken: () => Promise.resolve(null),
-    };
-  }
-
-  type InterstitialRule = (opts: AuthStateOptions) => AuthState | undefined;
-  type RunRules = (opts: AuthStateOptions, rules: InterstitialRule[]) => AuthState | undefined;
+  type InterstitialRule = (opts: AuthenticateRequestOptions) => RequestState | undefined;
+  type RunRules = (opts: AuthenticateRequestOptions, rules: InterstitialRule[]) => RequestState | undefined;
 
   const runInterstitialRules: RunRules = (opts, rules) => {
     for (const rule of rules) {
@@ -316,7 +277,7 @@ export async function getAuthState(options: AuthStateOptions): Promise<AuthState
   // automatically treated as signed out. This exception is needed for development, because the any // missing uat throws an interstitial in development.
   const nonBrowserRequestInDevRule: InterstitialRule = ({ apiKey, userAgent }) => {
     if (isDevelopmentFromApiKey(apiKey) && !userAgent?.startsWith('Mozilla/')) {
-      return signedOut(AuthStateReason.HeaderMissingNonBrowser);
+      return signedOut(AuthReason.HeaderMissingNonBrowser);
     }
     return undefined;
   };
@@ -339,7 +300,7 @@ export async function getAuthState(options: AuthStateOptions): Promise<AuthState
       });
 
     if (isCrossOrigin) {
-      return signedOut(AuthStateReason.HeaderMissingCORS);
+      return signedOut(AuthReason.HeaderMissingCORS);
     }
     return undefined;
   };
@@ -347,7 +308,7 @@ export async function getAuthState(options: AuthStateOptions): Promise<AuthState
   const potentialFirstLoadInDevWhenUATMissing: InterstitialRule = ({ apiKey, clientUat }) => {
     const res = isDevelopmentFromApiKey(apiKey);
     if (res && !clientUat) {
-      return interstitial(AuthStateReason.UATMissing);
+      return interstitial(AuthReason.CookieUATMissing);
     }
     return undefined;
   };
@@ -365,14 +326,14 @@ export async function getAuthState(options: AuthStateOptions): Promise<AuthState
       checkCrossOrigin({ originURL: new URL(referrer), host, forwardedHost, forwardedPort, forwardedProto });
 
     if (isDevelopmentFromApiKey(apiKey) && crossOriginReferrer) {
-      return interstitial(AuthStateReason.CrossOriginReferrer);
+      return interstitial(AuthReason.CrossOriginReferrer);
     }
     return undefined;
   };
 
   const potentialFirstRequestOnProductionEnvironment: InterstitialRule = ({ apiKey, clientUat, cookieToken }) => {
     if (isProductionFromApiKey(apiKey) && !clientUat && !cookieToken) {
-      return signedOut(AuthStateReason.CookieAndUATMissing);
+      return signedOut(AuthReason.CookieAndUATMissing);
     }
     return undefined;
   };
@@ -385,21 +346,29 @@ export async function getAuthState(options: AuthStateOptions): Promise<AuthState
   // };
   const isNormalSignedOutState: InterstitialRule = ({ clientUat }) => {
     if (clientUat === '0') {
-      return signedOut(AuthStateReason.StandardSignedOut);
+      return signedOut(AuthReason.StandardSignedOut);
     }
     return undefined;
   };
 
-  //This happens when a signed in user visits a new subdomain for the first time. The uat will be available because it's set on naked domain, but session will be missing. It can also happen if the cookieToken is manually removed during development.
+  // This happens when a signed in user visits a new subdomain for the first time. The uat will be available because it's set on naked domain, but session will be missing. It can also happen if the cookieToken is manually removed during development.
   const hasClientUatButCookieIsMissingInProd: InterstitialRule = ({ clientUat, cookieToken }) => {
     if (clientUat && !cookieToken) {
-      return interstitial(AuthStateReason.CookieMissing);
+      return interstitial(AuthReason.CookieMissing);
     }
     return undefined;
   };
 
   if (options.headerToken) {
-    return handleRequestWithTokenInHeader();
+    return authenticateRequestWithTokenInHeader();
   }
-  return handleRequestWithTokenInCookie();
+  return authenticateRequestWithTokenInCookie();
 }
+
+export const debugRequestState = ({ frontendApi, isSignedIn, isInterstitial, reason, message }: RequestState) => ({
+  frontendApi,
+  isSignedIn,
+  isInterstitial,
+  reason,
+  message,
+});

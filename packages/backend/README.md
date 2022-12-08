@@ -90,10 +90,10 @@ clerk.users;
 // These functions should be used by framework-specific libraries, such as @clerk/nextjs or @clerk/remix.
 
 // Compute the authentication state given the request parameters.
-clerk.authState(options);
+clerk.authenticateRequest(options);
 
-// Build debug payload of the auth state.
-clerk.debugAuthState(authState);
+// Build debug payload of the request state.
+clerk.debugRequestState(requestState);
 
 // Load clerk interstitial from this package
 clerk.localInterstitial(options);
@@ -150,6 +150,70 @@ Verifies that the JWT has a valid signature. The key needs to be provided.
 import { hasValidSignature } from '@clerk/backend';
 
 hasValidSignature(token, jwk);
+```
+
+#### debugRequestState(requestState)
+
+Generates a debug payload for the request state
+
+```js
+import { debugRequestState } from '@clerk/backend';
+
+debugRequestState(requestState);
+```
+
+#### loadInterstitialFromLocal(options)
+
+Generates a debug payload for the request state. The debug payload is available via `window.__clerk_debug`.
+
+```js
+import { loadInterstitialFromLocal } from '@clerk/backend';
+
+loadInterstitialFromLocal({
+  frontendApi: '...',
+  pkgVersion: '...',
+  debugData: {},
+});
+```
+
+#### signedInAuthObject(sessionClaims, options)
+
+Builds the AuthObject when the user is signed in.
+
+```js
+import { signedInAuthObject } from '@clerk/backend';
+
+signedInAuthObject(jwtPayload, options);
+```
+
+#### signedOutAuthObject()
+
+Builds the empty AuthObject when the user is signed out.
+
+```js
+import { signedOutAuthObject } from '@clerk/backend';
+
+signedOutAuthObject();
+```
+
+#### sanitizeAuthObject(authObject)
+
+Removes sensitive private metadata from user and organization resources in the AuthObject
+
+```js
+import { sanitizeAuthObject } from '@clerk/backend';
+
+sanitizeAuthObject(authObject);
+```
+
+#### prunePrivateMetadata(obj)
+
+Removes any `private_metadata` and `privateMetadata` attributes from the object to avoid leaking sensitive information to the browser during SSR.
+
+```js
+import { prunePrivateMetadata } from '@clerk/backend';
+
+prunePrivateMetadata(obj);
 ```
 
 ## License

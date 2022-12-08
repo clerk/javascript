@@ -1,2 +1,11 @@
+export * from './authObjects';
 export * from './factory';
-export { type AuthState } from './authState';
+export { loadInterstitialFromLocal } from './interstitial';
+export {
+  AuthStatus,
+  debugRequestState,
+  type AuthenticateRequestOptions,
+  type OptionalVerifyTokenOptions,
+  type RequestState,
+  type RequiredVerifyTokenOptions,
+} from './request';

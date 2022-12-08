@@ -4,7 +4,12 @@ export interface Jwt {
   header: JwtHeader;
   payload: JwtPayload;
   signature: Uint8Array;
-  raw: { header: string; payload: string; signature: string };
+  raw: {
+    header: string;
+    payload: string;
+    signature: string;
+    text: string;
+  };
 }
 
 // standard header claims https://www.rfc-editor.org/rfc/rfc7515.html#section-4.1
