@@ -4,7 +4,7 @@ import { base64url } from 'rfc4648';
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
 import runtime from '../runtime';
-import { TokenVerificationError, TokenVerificationErrorReason } from './errors';
+import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from './errors';
 
 type IssuerResolver = string | ((iss: string) => boolean);
 
@@ -108,18 +108,8 @@ export type VerifyJwtOptions = {
 export async function verifyJwt(
   token: string,
   { audience, authorizedParties, clockSkewInSeconds = DEFAULT_CLOCK_SKEW_IN_SECONDS, issuer, key }: VerifyJwtOptions,
-): Promise<{ valid: true; payload: JwtPayload } | { valid: false; reason: string }> {
-  let decoded: Jwt;
-
-  // Decode JWT and shallow known error to respect the return type of the verifyJWT function
-  try {
-    decoded = decodeJwt(token);
-  } catch (err) {
-    if (err instanceof TokenVerificationError) {
-      return { valid: false, reason: err.reason };
-    }
-    throw err;
-  }
+): Promise<JwtPayload> {
+  const decoded = decodeJwt(token);
 
   const { header, payload } = decoded;
 
@@ -128,18 +118,20 @@ export async function verifyJwt(
 
   // Verify type
   if (typeof typ !== 'undefined' && typ !== 'JWT') {
-    return {
-      valid: false,
-      reason: `Invalid JWT type ${JSON.stringify(typ)}. Expected "JWT".`,
-    };
+    throw new TokenVerificationError({
+      action: TokenVerificationErrorAction.EnsureClerkJWT,
+      reason: TokenVerificationErrorReason.TokenInvalid,
+      message: `Invalid JWT type ${JSON.stringify(typ)}. Expected "JWT".`,
+    });
   }
 
   // Verify algorithm
   if (!algToHash[alg]) {
-    return {
-      valid: false,
-      reason: `Invalid JWT algorithm ${JSON.stringify(alg)}. Supported: ${algs}.`,
-    };
+    throw new TokenVerificationError({
+      action: TokenVerificationErrorAction.EnsureClerkJWT,
+      reason: TokenVerificationErrorReason.TokenInvalidAlgorithm,
+      message: `Invalid JWT algorithm ${JSON.stringify(alg)}. Supported: ${algs}.`,
+    });
   }
 
   // Payload verifications
@@ -147,26 +139,29 @@ export async function verifyJwt(
 
   // Verify subject claim (sub)
   if (typeof sub !== 'string') {
-    return {
-      valid: false,
-      reason: `Subject claim (sub) is required and must be a string. Received ${JSON.stringify(sub)}.`,
-    };
+    throw new TokenVerificationError({
+      action: TokenVerificationErrorAction.EnsureClerkJWT,
+      reason: TokenVerificationErrorReason.TokenVerificationFailed,
+      message: `Subject claim (sub) is required and must be a string. Received ${JSON.stringify(sub)}.`,
+    });
   }
 
   // Verify audience claim (aud)
   if (typeof aud === 'string') {
     if (aud !== audience) {
-      return {
-        valid: false,
-        reason: `Invalid JWT audience claim (aud) ${JSON.stringify(aud)}. Expected "${audience}".`,
-      };
+      throw new TokenVerificationError({
+        action: TokenVerificationErrorAction.EnsureClerkJWT,
+        reason: TokenVerificationErrorReason.TokenVerificationFailed,
+        message: `Invalid JWT audience claim (aud) ${JSON.stringify(aud)}. Expected "${audience}".`,
+      });
     }
   } else if (Array.isArray(aud) && aud.length > 0 && aud.every(a => typeof a === 'string')) {
     if (!aud.includes(audience)) {
-      return {
-        valid: false,
-        reason: `Invalid JWT audience claim array (aud) ${JSON.stringify(aud)}. Does not include "${audience}".`,
-      };
+      throw new TokenVerificationError({
+        action: TokenVerificationErrorAction.EnsureClerkJWT,
+        reason: TokenVerificationErrorReason.TokenVerificationFailed,
+        message: `Invalid JWT audience claim array (aud) ${JSON.stringify(aud)}. Does not include "${audience}".`,
+      });
     }
   } else {
     // Notice: Clerk JWTs use AZP claim instead of Audience
@@ -181,78 +176,81 @@ export async function verifyJwt(
 
   // Verify authorized parties claim (azp)
   if (azp && authorizedParties && authorizedParties.length > 0 && !authorizedParties.includes(azp)) {
-    return {
-      valid: false,
-      reason: `Invalid JWT Authorized party claim (azp) ${JSON.stringify(azp)}. Expected "${authorizedParties}".`,
-    };
+    throw new TokenVerificationError({
+      reason: TokenVerificationErrorReason.TokenInvalidAuthorizedParties,
+      message: `Invalid JWT Authorized party claim (azp) ${JSON.stringify(azp)}. Expected "${authorizedParties}".`,
+    });
   }
 
   // Verify issuer claim (iss)
   if (typeof issuer === 'function' && !issuer(iss)) {
-    return {
-      valid: false,
-      reason: 'Failed JWT issuer resolver. Make sure that the resolver returns a truthy value.',
-    };
+    throw new TokenVerificationError({
+      reason: TokenVerificationErrorReason.TokenInvalidIssuer,
+      message: 'Failed JWT issuer resolver. Make sure that the resolver returns a truthy value.',
+    });
   } else if (typeof issuer === 'string' && iss && iss !== issuer) {
-    return {
-      valid: false,
-      reason: `Invalid JWT issuer claim (iss) ${JSON.stringify(decoded.payload.iss)}. Expected "${issuer}".`,
-    };
+    throw new TokenVerificationError({
+      reason: TokenVerificationErrorReason.TokenInvalidIssuer,
+      message: `Invalid JWT issuer claim (iss) ${JSON.stringify(decoded.payload.iss)}. Expected "${issuer}".`,
+    });
   }
 
   // Verify expiration claim (exp)
   if (typeof exp !== 'number') {
-    return {
-      valid: false,
-      reason: `Invalid JWT expiry date claim (exp) ${JSON.stringify(exp)}. Expected number.`,
-    };
+    throw new TokenVerificationError({
+      action: TokenVerificationErrorAction.EnsureClerkJWT,
+      reason: TokenVerificationErrorReason.TokenVerificationFailed,
+      message: `Invalid JWT expiry date claim (exp) ${JSON.stringify(exp)}. Expected number.`,
+    });
   }
   const currentDate = new Date(Date.now());
   const expiryDate = new Date(0);
   expiryDate.setUTCSeconds(exp);
   const expired = expiryDate.getTime() <= currentDate.getTime() - clockSkewInSeconds;
   if (expired) {
-    return {
-      valid: false,
-      reason: `JWT is expired. Expiry date: ${expiryDate}, Current date: ${currentDate}.`,
-    };
+    throw new TokenVerificationError({
+      reason: TokenVerificationErrorReason.TokenExpired,
+      message: `JWT is expired. Expiry date: ${expiryDate}, Current date: ${currentDate}.`,
+    });
   }
 
   // Verify activation claim (nbf)
   if (nbf !== undefined) {
     if (typeof nbf !== 'number') {
-      return {
-        valid: false,
-        reason: `Invalid JWT not before date claim (nbf) ${JSON.stringify(nbf)}. Expected number.`,
-      };
+      throw new TokenVerificationError({
+        action: TokenVerificationErrorAction.EnsureClerkJWT,
+        reason: TokenVerificationErrorReason.TokenVerificationFailed,
+        message: `Invalid JWT not before date claim (nbf) ${JSON.stringify(nbf)}. Expected number.`,
+      });
     }
     const notBeforeDate = new Date(0);
     notBeforeDate.setUTCSeconds(nbf);
     const early = notBeforeDate.getTime() > currentDate.getTime() + clockSkewInSeconds;
     if (early) {
-      return {
-        valid: false,
-        reason: `JWT cannot be used prior to not before date claim (nbf). Not before date: ${notBeforeDate}; Current date: ${currentDate};`,
-      };
+      throw new TokenVerificationError({
+        reason: TokenVerificationErrorReason.TokenNotActiveYet,
+        message: `JWT cannot be used prior to not before date claim (nbf). Not before date: ${notBeforeDate}; Current date: ${currentDate};`,
+      });
     }
   }
 
   // Verify issued at claim (iat)
   if (iat !== undefined) {
     if (typeof iat !== 'number') {
-      return {
-        valid: false,
-        reason: `Invalid JWT issued at date claim (iat) ${JSON.stringify(iat)}. Expected number.`,
-      };
+      throw new TokenVerificationError({
+        action: TokenVerificationErrorAction.EnsureClerkJWT,
+        reason: TokenVerificationErrorReason.TokenVerificationFailed,
+        message: `Invalid JWT issued at date claim (iat) ${JSON.stringify(iat)}. Expected number.`,
+      });
     }
     const issuedAtDate = new Date(0);
     issuedAtDate.setUTCSeconds(iat);
     const postIssued = issuedAtDate.getTime() > currentDate.getTime() + clockSkewInSeconds;
     if (postIssued) {
-      return {
-        valid: false,
-        reason: `JWT issued at date claim (iat) is in the future. Issued at date: ${issuedAtDate}; Current date: ${currentDate};`,
-      };
+      throw new TokenVerificationError({
+        reason: TokenVerificationErrorReason.TokenNotActiveYet,
+        message: `JWT issued at date claim (iat) is in the future. Issued at date: ${issuedAtDate}; Current date: ${currentDate};`,
+      });
     }
   }
 
@@ -261,15 +259,19 @@ export async function verifyJwt(
   try {
     signatureValid = await hasValidSignature(decoded, key);
   } catch (err) {
-    return { valid: false, reason: `Error verifying JWT signature. ${err}` };
+    throw new TokenVerificationError({
+      action: TokenVerificationErrorAction.EnsureClerkJWT,
+      reason: TokenVerificationErrorReason.TokenVerificationFailed,
+      message: `Error verifying JWT signature. ${err}`,
+    });
   }
 
   if (!signatureValid) {
-    return { valid: false, reason: 'JWT signature is invalid.' };
+    throw new TokenVerificationError({
+      reason: TokenVerificationErrorReason.TokenInvalidSignature,
+      message: 'JWT signature is invalid.',
+    });
   }
 
-  return {
-    valid: true,
-    payload,
-  };
+  return payload;
 }

@@ -34,7 +34,7 @@ export async function verifyToken(token: string, options: VerifyTokenOptions): P
   let key;
 
   if (jwtKey) {
-    key = await loadClerkJWKFromLocal(jwtKey);
+    key = loadClerkJWKFromLocal(jwtKey);
   } else if (apiKey) {
     // TODO: Fetch JWKS from Frontend API instead of Backend API
     //
@@ -57,20 +57,12 @@ export async function verifyToken(token: string, options: VerifyTokenOptions): P
     });
   }
 
-  const result = await verifyJwt(token, {
+  const payload = await verifyJwt(token, {
     authorizedParties,
     clockSkewInSeconds,
     key,
     issuer,
   });
 
-  if (!result.valid) {
-    throw new TokenVerificationError({
-      // Not to be confused with TokenVerificationErrorReason. This text says why JWT verification failed.
-      message: result.reason,
-      reason: TokenVerificationErrorReason.TokenVerificationFailed,
-    });
-  }
-
-  return result.payload;
+  return payload;
 }

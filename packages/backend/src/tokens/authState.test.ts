@@ -87,7 +87,7 @@ export default (QUnit: QUnit) => {
         isInterstitial: false,
         reason: 'token-verification-error',
         message:
-          'Invalid JWT Authorized party claim (azp) "https://accounts.inspired.puma-74.lcl.dev". Expected "whatever". (reason=token-verification-failed, token-carrier=header)',
+          'Invalid JWT Authorized party claim (azp) "https://accounts.inspired.puma-74.lcl.dev". Expected "whatever". (reason=token-invalid-authorized-parties, token-carrier=header)',
         sessionClaims: null,
         sessionId: null,
         session: null,
