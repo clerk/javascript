@@ -1,4 +1,4 @@
-import { type TokenCarrier } from './authState';
+import { type TokenCarrier } from './request';
 
 export enum TokenVerificationErrorReason {
   TokenExpired = 'token-expired',
