@@ -52,8 +52,12 @@ export default (QUnit: QUnit) => {
 
       assert.propContains(requestState, {
         frontendApi: 'cafe.babe.clerk.ts',
+        status: 'signed-in',
         isSignedIn: true,
         isInterstitial: false,
+      });
+
+      assert.propContains(requestState.toAuth(), {
         sessionClaims: mockJwtPayload,
         sessionId: mockJwtPayload.sid,
         session: undefined,
@@ -83,15 +87,19 @@ export default (QUnit: QUnit) => {
 
       assert.propEqual(requestState, {
         frontendApi: 'cafe.babe.clerk.ts',
+        status: 'signed-out',
         isSignedIn: false,
         isInterstitial: false,
-        reason: 'token-verification-error',
+        reason: 'token-invalid-authorized-parties',
         message:
           'Invalid JWT Authorized party claim (azp) "https://accounts.inspired.puma-74.lcl.dev". Expected "whatever". (reason=token-invalid-authorized-parties, token-carrier=header)',
+        toAuth: {},
+      });
+
+      assert.propContains(requestState.toAuth(), {
         sessionClaims: null,
         sessionId: null,
         session: null,
-        actor: null,
         userId: null,
         user: null,
         orgId: null,
@@ -110,15 +118,19 @@ export default (QUnit: QUnit) => {
 
       assert.propEqual(requestState, {
         frontendApi: 'cafe.babe.clerk.ts',
+        status: 'signed-out',
         isSignedIn: false,
         isInterstitial: false,
         message:
           'Invalid JWT form. A JWT consists of three parts separated by dots. (reason=token-invalid, token-carrier=header)',
-        reason: 'token-verification-error',
+        reason: 'token-invalid',
+        toAuth: {},
+      });
+
+      assert.propContains(requestState.toAuth(), {
         sessionClaims: null,
         sessionId: null,
         session: null,
-        actor: null,
         userId: null,
         user: null,
         orgId: null,
