@@ -60,8 +60,7 @@ export enum AuthStatus {
   Interstitial = 'interstitial',
 }
 
-export enum AuthReason {
-  TokenVerificationError = 'token-verification-error',
+export enum RequestErrorReason {
   HeaderMissingNonBrowser = 'header-missing-non-browser',
   HeaderMissingCORS = 'header-missing-cors',
   CookieUATMissing = 'uat-missing',
@@ -74,6 +73,8 @@ export enum AuthReason {
   UnexpectedError = 'unexpected-error',
   Unknown = 'unknown',
 }
+
+export type AuthReason = RequestErrorReason | TokenVerificationErrorReason;
 
 export type SignedInState = {
   status: AuthStatus.SignedIn;
@@ -141,7 +142,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       const state = await signedIn(sessionClaims);
 
       if (!clientUat || cookieTokenIsOutdated(state.toAuth().sessionClaims, clientUat)) {
-        return interstitial(AuthReason.CookieOutDated);
+        return interstitial(RequestErrorReason.CookieOutDated);
       }
 
       return state;
@@ -169,11 +170,11 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       ].includes(err.reason);
 
       if (reasonToReturnInterstitial) {
-        return interstitial(AuthReason.TokenVerificationError, err.getFullMessage());
+        return interstitial(err.reason, err.getFullMessage());
       }
-      return signedOut(AuthReason.TokenVerificationError, err.getFullMessage());
+      return signedOut(err.reason, err.getFullMessage());
     }
-    return signedOut(AuthReason.UnexpectedError, (err as Error).message);
+    return signedOut(RequestErrorReason.UnexpectedError, (err as Error).message);
   }
 
   function cookieTokenIsOutdated(jwt: JwtPayload, clientUat: string) {
@@ -277,7 +278,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
   // automatically treated as signed out. This exception is needed for development, because the any // missing uat throws an interstitial in development.
   const nonBrowserRequestInDevRule: InterstitialRule = ({ apiKey, userAgent }) => {
     if (isDevelopmentFromApiKey(apiKey) && !userAgent?.startsWith('Mozilla/')) {
-      return signedOut(AuthReason.HeaderMissingNonBrowser);
+      return signedOut(RequestErrorReason.HeaderMissingNonBrowser);
     }
     return undefined;
   };
@@ -300,7 +301,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       });
 
     if (isCrossOrigin) {
-      return signedOut(AuthReason.HeaderMissingCORS);
+      return signedOut(RequestErrorReason.HeaderMissingCORS);
     }
     return undefined;
   };
@@ -308,7 +309,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
   const potentialFirstLoadInDevWhenUATMissing: InterstitialRule = ({ apiKey, clientUat }) => {
     const res = isDevelopmentFromApiKey(apiKey);
     if (res && !clientUat) {
-      return interstitial(AuthReason.CookieUATMissing);
+      return interstitial(RequestErrorReason.CookieUATMissing);
     }
     return undefined;
   };
@@ -326,14 +327,14 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       checkCrossOrigin({ originURL: new URL(referrer), host, forwardedHost, forwardedPort, forwardedProto });
 
     if (isDevelopmentFromApiKey(apiKey) && crossOriginReferrer) {
-      return interstitial(AuthReason.CrossOriginReferrer);
+      return interstitial(RequestErrorReason.CrossOriginReferrer);
     }
     return undefined;
   };
 
   const potentialFirstRequestOnProductionEnvironment: InterstitialRule = ({ apiKey, clientUat, cookieToken }) => {
     if (isProductionFromApiKey(apiKey) && !clientUat && !cookieToken) {
-      return signedOut(AuthReason.CookieAndUATMissing);
+      return signedOut(RequestErrorReason.CookieAndUATMissing);
     }
     return undefined;
   };
@@ -346,7 +347,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
   // };
   const isNormalSignedOutState: InterstitialRule = ({ clientUat }) => {
     if (clientUat === '0') {
-      return signedOut(AuthReason.StandardSignedOut);
+      return signedOut(RequestErrorReason.StandardSignedOut);
     }
     return undefined;
   };
@@ -354,7 +355,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
   // This happens when a signed in user visits a new subdomain for the first time. The uat will be available because it's set on naked domain, but session will be missing. It can also happen if the cookieToken is manually removed during development.
   const hasClientUatButCookieIsMissingInProd: InterstitialRule = ({ clientUat, cookieToken }) => {
     if (clientUat && !cookieToken) {
-      return interstitial(AuthReason.CookieMissing);
+      return interstitial(RequestErrorReason.CookieMissing);
     }
     return undefined;
   };
