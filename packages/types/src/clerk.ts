@@ -464,10 +464,6 @@ export interface Resources {
 
 export type RoutingStrategy = 'path' | 'hash' | 'virtual';
 
-export type RoutingOptions =
-  | { path: string; routing?: Extract<RoutingStrategy, 'path'> }
-  | { path?: never; routing?: Extract<RoutingStrategy, 'hash' | 'virtual'> };
-
 export type RedirectOptions = {
   /**
    * Full URL or path to navigate after successful sign in.
@@ -512,7 +508,15 @@ export type SetActiveParams = {
 
 export type SetActive = (params: SetActiveParams) => Promise<void>;
 
-export type SignInProps = RoutingOptions & {
+export type SignInProps = {
+  /*
+   * Page routing strategy
+   */
+  routing?: RoutingStrategy;
+  /*
+   * Root URL where the component is mounted on, eg: '/sign in'
+   */
+  path?: string;
   /**
    * Full URL or path to for the sign up process.
    * Used to fill the "Sign up" link in the SignUp component.
@@ -526,7 +530,15 @@ export type SignInProps = RoutingOptions & {
   appearance?: SignInTheme;
 } & RedirectOptions;
 
-export type SignUpProps = RoutingOptions & {
+export type SignUpProps = {
+  /*
+   * Page routing strategy
+   */
+  routing?: RoutingStrategy;
+  /*
+   * Root URL where the component is mounted on, eg: '/sign up'
+   */
+  path?: string;
   /**
    * Full URL or path to for the sign in process.
    * Used to fill the "Sign in" link in the SignUp component.
@@ -540,7 +552,15 @@ export type SignUpProps = RoutingOptions & {
   appearance?: SignUpTheme;
 } & RedirectOptions;
 
-export type UserProfileProps = RoutingOptions & {
+export type UserProfileProps = {
+  /*
+   * Page routing strategy
+   */
+  routing?: RoutingStrategy;
+  /*
+   * Root URL where the component is mounted on, eg: '/user'
+   */
+  path?: string;
   /*
    * Renders only a specific view of the component eg: 'security'
    */
@@ -553,7 +573,15 @@ export type UserProfileProps = RoutingOptions & {
   appearance?: UserProfileTheme;
 };
 
-export type OrganizationProfileProps = RoutingOptions & {
+export type OrganizationProfileProps = {
+  /*
+   * Page routing strategy
+   */
+  routing?: RoutingStrategy;
+  /*
+   * Root URL where the component is mounted on, eg: '/user'
+   */
+  path?: string;
   /**
    * Full URL or path to navigate to after the user leaves the currently active organization.
    * @default undefined
@@ -567,7 +595,15 @@ export type OrganizationProfileProps = RoutingOptions & {
   appearance?: OrganizationProfileTheme;
 };
 
-export type CreateOrganizationProps = RoutingOptions & {
+export type CreateOrganizationProps = {
+  /*
+   * Page routing strategy
+   */
+  routing?: RoutingStrategy;
+  /*
+   * Root URL where the component is mounted on, eg: '/user'
+   */
+  path?: string;
   /**
    * Full URL or path to navigate after creating a new organization.
    * @default undefined
