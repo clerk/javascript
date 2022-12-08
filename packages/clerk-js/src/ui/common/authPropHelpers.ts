@@ -1,5 +1,5 @@
 import { camelToSnake } from '@clerk/shared';
-import type { DisplayConfigResource, RoutingOptions, RoutingStrategy } from '@clerk/types';
+import type { DisplayConfigResource } from '@clerk/types';
 import type { ParsedQs } from 'qs';
 import qs from 'qs';
 
@@ -77,14 +77,4 @@ export const buildAuthQueryString = (data: BuildAuthQueryStringArgs): string | n
     }
   }
   return Object.keys(query).length === 0 ? null : qs.stringify(query);
-};
-
-export const normalizeRoutingOptions = ({
-  routing,
-  path,
-}: {
-  routing?: RoutingStrategy;
-  path?: string;
-}): RoutingOptions => {
-  return { routing: !!path && routing === undefined ? 'path' : routing, path } as RoutingOptions;
 };
