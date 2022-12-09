@@ -14,7 +14,7 @@
     "npm": ">=8.5.0"
   },
   "devDependencies": {
-    "@clerk/backend": "^0.0.1",
+    "@clerk/backend": "^0.1.1",
     "@commitlint/cli": "^16.0.2",
     "@commitlint/config-conventional": "^16.0.0",
     "@commitlint/config-lerna-scopes": "^16.0.0",

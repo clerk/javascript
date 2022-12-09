@@ -25,11 +25,11 @@
   },
   "dependencies": {
     "@clerk/types": "^3.22.0-staging.0",
-    "@types/node": "^16.11.55",
-    "node-fetch-native": "^0.1.7",
-    "rfc4648": "^1.5.2",
-    "snakecase-keys": "^5.4.4",
-    "tslib": "^2.3.1"
+    "@types/node": "16.18.6",
+    "node-fetch-native": "0.1.8",
+    "rfc4648": "1.5.2",
+    "snakecase-keys": "5.4.4",
+    "tslib": "2.4.1"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^3.18.0",

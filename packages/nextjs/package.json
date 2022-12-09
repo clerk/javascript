@@ -40,7 +40,7 @@
     "@clerk/clerk-sdk-node": "^4.5.11-staging.0",
     "@clerk/edge": "^1.12.19-staging.0",
     "@clerk/types": "^3.22.0-staging.0",
-    "tslib": "^2.3.1"
+    "tslib": "2.4.1"
   },
   "devDependencies": {
     "@types/node": "^16.11.55",

@@ -27,7 +27,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "csstype": "^3.1.0"
+    "csstype": "3.1.1"
   },
   "devDependencies": {
     "jest": "^27.4.7",

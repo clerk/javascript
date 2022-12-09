@@ -32,11 +32,11 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@clerk/clerk-react": "^4.3.3-staging.3",
-    "@clerk/clerk-sdk-node": "^4.4.6-staging.3",
-    "@clerk/types": "^3.14.0-staging.3",
-    "cookie": "^0.5.0",
-    "tslib": "^2.3.1"
+    "@clerk/clerk-react": "^4.5.5",
+    "@clerk/clerk-sdk-node": "^4.5.8",
+    "@clerk/types": "^3.20.0",
+    "cookie": "0.5.0",
+    "tslib": "2.4.1"
   },
   "devDependencies": {
     "@types/cookie": "^0.5.0",
