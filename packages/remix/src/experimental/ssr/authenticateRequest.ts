@@ -1,4 +1,4 @@
-import { AuthState, default as Clerk } from '@clerk/backend';
+import { type RequestState, default as Clerk } from '@clerk/backend';
 
 import { noApiKeyError, noFrontendApiError } from '../errors';
 import { assertEnvVar, getEnvVariable } from '../utils';
@@ -8,7 +8,7 @@ import { parseCookies } from './utils';
 /**
  * @internal
  */
-export async function getAuthState(args: LoaderFunctionArgs, opts: RootAuthLoaderOptions = {}): Promise<AuthState> {
+export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoaderOptions = {}): Promise<RequestState> {
   const { request, context } = args;
   const { loadSession, loadUser, loadOrganization, authorizedParties } = opts;
 
@@ -31,7 +31,8 @@ export async function getAuthState(args: LoaderFunctionArgs, opts: RootAuthLoade
 
   const cookieToken = cookies['__session'];
   const headerToken = headers.get('authorization')?.replace('Bearer ', '');
-  const authState: AuthState = await Clerk({ apiKey, jwtKey }).authState({
+
+  return Clerk({ apiKey, jwtKey }).authenticateRequest({
     apiKey,
     jwtKey,
     frontendApi,
@@ -49,6 +50,4 @@ export async function getAuthState(args: LoaderFunctionArgs, opts: RootAuthLoade
     userAgent: headers.get('user-agent') as string,
     authorizedParties,
   });
-
-  return authState;
 }
