@@ -23,6 +23,7 @@ import type {
   Web3WalletResource,
 } from '@clerk/types';
 
+import { getFullName } from '../../ui/utils';
 import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { BackupCode } from './BackupCode';
@@ -245,8 +246,8 @@ export class User extends BaseResource implements UserResource {
     this.externalId = data.external_id;
     this.firstName = data.first_name;
     this.lastName = data.last_name;
-    if (this.firstName && this.lastName) {
-      this.fullName = this.firstName + ' ' + this.lastName;
+    if (this.firstName || this.lastName) {
+      this.fullName = getFullName({ firstName: this.firstName, lastName: this.lastName });
     }
 
     this.profileImageUrl = data.profile_image_url;
