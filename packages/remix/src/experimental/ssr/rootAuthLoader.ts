@@ -1,5 +1,7 @@
+import { sanitizeAuthObject } from '@clerk/backend';
+
 import { invalidRootLoaderCallbackResponseReturn, invalidRootLoaderCallbackReturn } from '../errors';
-import { getAuthState } from './getAuthState';
+import { authenticateRequest } from './authenticateRequest';
 import { LoaderFunctionArgs, LoaderFunctionReturn, RootAuthLoaderCallback, RootAuthLoaderOptions } from './types';
 import {
   assertObject,
@@ -8,7 +10,6 @@ import {
   isRedirect,
   isResponse,
   returnLoaderResultJsonResponse,
-  sanitizeAuthData,
 } from './utils';
 
 interface RootAuthLoader {
@@ -32,17 +33,17 @@ export const rootAuthLoader: RootAuthLoader = async (
     ? cbOrOptions
     : {};
 
-  const authState = await getAuthState(args, opts);
+  const requestState = await authenticateRequest(args, opts);
 
-  if (authState.isInterstitial) {
-    throw interstitialJsonResponse(authState, { loader: 'root' });
+  if (requestState.isInterstitial) {
+    throw interstitialJsonResponse(requestState, { loader: 'root' });
   }
 
   if (!callback) {
-    return returnLoaderResultJsonResponse({ authState });
+    return returnLoaderResultJsonResponse({ requestState });
   }
 
-  const callbackResult = await callback(injectAuthIntoRequest(args, sanitizeAuthData(authState)));
+  const callbackResult = await callback(injectAuthIntoRequest(args, sanitizeAuthObject(requestState.toAuth())));
   assertObject(callbackResult, invalidRootLoaderCallbackReturn);
 
   // Pass through custom responses
@@ -53,5 +54,5 @@ export const rootAuthLoader: RootAuthLoader = async (
     throw new Error(invalidRootLoaderCallbackResponseReturn);
   }
 
-  return returnLoaderResultJsonResponse({ authState, callbackResult });
+  return returnLoaderResultJsonResponse({ requestState, callbackResult });
 };

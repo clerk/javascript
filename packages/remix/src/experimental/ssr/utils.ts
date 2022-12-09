@@ -1,22 +1,16 @@
-import { AuthState, default as Clerk } from '@clerk/backend';
+import { type AuthObject, type RequestState, debugRequestState, loadInterstitialFromLocal } from '@clerk/backend';
 import { LIB_VERSION } from '@clerk/clerk-react/dist/info';
 import { json } from '@remix-run/server-runtime';
 import cookie from 'cookie';
 
 import { LoaderFunctionArgs, LoaderFunctionArgsWithAuth } from './types';
 
-// Generate an internal utility Clerk Instance that can be used for its local utility functions.
-// Since, the apiKey can not be set at this points across Remix runtimes, this clerk instance is
-// not able to make Clerk Backend API requests. For now, we will just use an empty string to initiate
-// the instance.
-const __internalClerkInstance = Clerk({ apiKey: '' });
-
 /**
  * Inject `auth`, `user` and `session` properties into `request`
  * @internal
  */
-export function injectAuthIntoRequest(args: LoaderFunctionArgs, authState: AuthState): LoaderFunctionArgsWithAuth {
-  const { user, session, userId, sessionId, getToken, sessionClaims } = authState;
+export function injectAuthIntoRequest(args: LoaderFunctionArgs, authObject: AuthObject): LoaderFunctionArgsWithAuth {
+  const { user, session, userId, sessionId, getToken, sessionClaims } = authObject;
   (args.request as any).auth = {
     userId,
     sessionId,
@@ -26,25 +20,6 @@ export function injectAuthIntoRequest(args: LoaderFunctionArgs, authState: AuthS
   (args.request as any).user = user;
   (args.request as any).session = session;
   return args as LoaderFunctionArgsWithAuth;
-}
-
-/**
- * See `packages/nextjs/src/middleware/utils/sanitizeAuthData.ts`
- * TODO: Make a shared function
- *
- * @internal
- */
-export function sanitizeAuthData(authState: AuthState): any {
-  if (!authState.isSignedIn) {
-    return authState;
-  }
-
-  const user = authState.user ? { ...authState.user } : authState.user;
-  const organization = authState.user ? { ...authState.user } : authState.user;
-  __internalClerkInstance.toSSRResource(user);
-  __internalClerkInstance.toSSRResource(organization);
-
-  return { ...authState, user, organization };
 }
 
 /**
@@ -86,13 +61,13 @@ export function assertObject(val: any, error?: string): asserts val is Record<st
 /**
  * @internal
  */
-export const interstitialJsonResponse = (authState: AuthState, opts: { loader: 'root' | 'nested' }) => {
+export const interstitialJsonResponse = (requestState: RequestState, opts: { loader: 'root' | 'nested' }) => {
   return json(
     wrapWithClerkState({
       __loader: opts.loader,
-      __clerk_ssr_interstitial_html: __internalClerkInstance.localInterstitial({
-        debugData: __internalClerkInstance.debugAuthState(authState),
-        frontendApi: authState.frontendApi,
+      __clerk_ssr_interstitial_html: loadInterstitialFromLocal({
+        debugData: debugRequestState(requestState),
+        frontendApi: requestState.frontendApi,
         pkgVersion: LIB_VERSION,
       }),
     }),
@@ -103,14 +78,14 @@ export const interstitialJsonResponse = (authState: AuthState, opts: { loader: '
 /**
  * @internal
  */
-export const returnLoaderResultJsonResponse = (opts: { authState: AuthState; callbackResult?: any }) => {
-  const { reason, message, isSignedIn, isInterstitial, ...rest } = opts.authState;
+export const returnLoaderResultJsonResponse = (opts: { requestState: RequestState; callbackResult?: any }) => {
+  const { reason, message, isSignedIn, isInterstitial, ...rest } = opts.requestState;
   return json({
     ...(opts.callbackResult || {}),
     ...wrapWithClerkState({
       __clerk_ssr_state: rest,
-      __frontendApi: opts.authState.frontendApi,
-      __clerk_debug: __internalClerkInstance.debugAuthState(opts.authState),
+      __frontendApi: opts.requestState.frontendApi,
+      __clerk_debug: debugRequestState(opts.requestState),
     }),
   });
 };

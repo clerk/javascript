@@ -1,17 +1,19 @@
+import { sanitizeAuthObject } from '@clerk/backend';
+
 import { noLoaderArgsPassedInGetAuth } from '../errors';
-import { getAuthState } from './getAuthState';
+import { authenticateRequest } from './authenticateRequest';
 import { GetAuthReturn, LoaderFunctionArgs } from './types';
-import { interstitialJsonResponse, sanitizeAuthData } from './utils';
+import { interstitialJsonResponse } from './utils';
 
 export async function getAuth(args: LoaderFunctionArgs): GetAuthReturn {
   if (!args || (args && (!args.request || !args.context))) {
     throw new Error(noLoaderArgsPassedInGetAuth);
   }
-  const authState = await getAuthState(args);
+  const requestState = await authenticateRequest(args);
 
-  if (authState.isInterstitial || !authState) {
-    throw interstitialJsonResponse(authState, { loader: 'nested' });
+  if (requestState.isInterstitial || !requestState) {
+    throw interstitialJsonResponse(requestState, { loader: 'nested' });
   }
 
-  return sanitizeAuthData(authState);
+  return sanitizeAuthObject(requestState.toAuth());
 }

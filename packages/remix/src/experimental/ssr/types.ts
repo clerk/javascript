@@ -1,7 +1,7 @@
-import { AuthState, Organization, Session, User } from '@clerk/backend';
+import { AuthObject, Organization, Session, User } from '@clerk/backend';
 import { DataFunctionArgs, LoaderFunction } from '@remix-run/server-runtime';
 
-export type GetAuthReturn = Promise<AuthState>;
+export type GetAuthReturn = Promise<AuthObject>;
 
 export type RootAuthLoaderOptions = {
   frontendApi?: string;
@@ -31,7 +31,7 @@ export type LoaderFunctionArgsWithAuth<Options extends RootAuthLoaderOptions = a
 };
 
 export type RequestWithAuth<Options extends RootAuthLoaderOptions = any> = LoaderFunctionArgs['request'] & {
-  auth: Omit<AuthState, 'session' | 'user' | 'organization'>;
+  auth: Omit<AuthObject, 'session' | 'user' | 'organization'>;
 } & (Options extends { loadSession: true } ? { session: Session | null } : {}) &
   (Options extends { loadUser: true } ? { user: User | null } : {}) &
   (Options extends { loadOrganization: true } ? { organization: Organization | null } : {});
