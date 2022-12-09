@@ -6,9 +6,9 @@
   "typings": "dist/cjs/index.d.ts",
   "files": [
     "dist",
-    "instance.js",
-    "instance.d.ts",
-    "package.json"
+    "package.json",
+    "esm",
+    "cjs"
   ],
   "engines": {
     "node": ">=14"
