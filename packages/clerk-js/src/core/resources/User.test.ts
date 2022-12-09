@@ -241,4 +241,13 @@ describe('User', () => {
       path: '/me/backup_codes/',
     });
   });
+
+  it('sets the right fullname', () => {
+    expect(new User({ first_name: 'Firstname' } as unknown as UserJSON).fullName).toBe('Firstname');
+    expect(new User({ last_name: 'Lastname' } as unknown as UserJSON).fullName).toBe('Lastname');
+    expect(new User({ first_name: 'Firstname', last_name: 'Lastname' } as unknown as UserJSON).fullName).toBe(
+      'Firstname Lastname',
+    );
+    expect(new User({} as unknown as UserJSON).fullName).toBe(null);
+  });
 });
