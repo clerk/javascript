@@ -23,6 +23,7 @@ import type {
   Web3WalletResource,
 } from '@clerk/types';
 
+import { getFullName } from '../../ui/utils';
 import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { BackupCode } from './BackupCode';
@@ -245,29 +246,31 @@ export class User extends BaseResource implements UserResource {
     this.externalId = data.external_id;
     this.firstName = data.first_name;
     this.lastName = data.last_name;
-    if (this.firstName && this.lastName) {
-      this.fullName = this.firstName + ' ' + this.lastName;
+    if (this.firstName || this.lastName) {
+      this.fullName = getFullName({ firstName: this.firstName, lastName: this.lastName });
     }
 
     this.profileImageUrl = data.profile_image_url;
     this.username = data.username;
     this.passwordEnabled = data.password_enabled;
-    this.emailAddresses = data.email_addresses.map(ea => new EmailAddress(ea, this.path() + '/email_addresses'));
+    this.emailAddresses = (data.email_addresses || []).map(
+      ea => new EmailAddress(ea, this.path() + '/email_addresses'),
+    );
 
     this.primaryEmailAddressId = data.primary_email_address_id;
     this.primaryEmailAddress = this.emailAddresses.find(({ id }) => id === this.primaryEmailAddressId) || null;
 
-    this.phoneNumbers = data.phone_numbers.map(ph => new PhoneNumber(ph, this.path() + '/phone_numbers'));
+    this.phoneNumbers = (data.phone_numbers || []).map(ph => new PhoneNumber(ph, this.path() + '/phone_numbers'));
 
     this.primaryPhoneNumberId = data.primary_phone_number_id;
     this.primaryPhoneNumber = this.phoneNumbers.find(({ id }) => id === this.primaryPhoneNumberId) || null;
 
-    this.web3Wallets = data.web3_wallets.map(ph => new Web3Wallet(ph, this.path() + '/web3_wallets'));
+    this.web3Wallets = (data.web3_wallets || []).map(ph => new Web3Wallet(ph, this.path() + '/web3_wallets'));
 
     this.primaryWeb3WalletId = data.primary_web3_wallet_id;
     this.primaryWeb3Wallet = this.web3Wallets.find(({ id }) => id === this.primaryWeb3WalletId) || null;
 
-    this.externalAccounts = data.external_accounts.map(
+    this.externalAccounts = (data.external_accounts || []).map(
       ea => new ExternalAccount(ea, this.path() + '/external_accounts'),
     );
 

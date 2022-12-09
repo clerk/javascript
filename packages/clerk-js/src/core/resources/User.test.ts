@@ -241,4 +241,25 @@ describe('User', () => {
       path: '/me/backup_codes/',
     });
   });
+
+  describe('Set the right fullName', () => {
+    const cases: Array<[string | null | undefined, string | null | undefined, string | null | undefined]> = [
+      // firstName, lastName, fullName
+      ['A', 'B', 'A B'],
+      ['', 'B', 'B'],
+      ['A', '', 'A'],
+      ['', '', null],
+      [null, '', null],
+      [null, null, null],
+      [undefined, undefined, null],
+    ];
+
+    it.each(cases)("firstName: '%s', lastName: '%s'  =>  fullName: '%s'", (first_name, last_name, fullName) => {
+      const user = new User({
+        first_name,
+        last_name,
+      } as unknown as UserJSON);
+      expect(user.fullName).toBe(fullName);
+    });
+  });
 });
