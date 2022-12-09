@@ -127,6 +127,7 @@ export const PhoneInput = (props: PhoneInputProps) => {
         maxLength={25}
         type='tel'
         sx={theme => ({
+          // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
           paddingLeft: `calc(${theme.space.$20} + ${selectedCountryOption.country.code.length + 1}ch)`,
         })}
         ref={phoneInputRef}

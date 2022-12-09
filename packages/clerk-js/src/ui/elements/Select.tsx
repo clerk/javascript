@@ -1,5 +1,5 @@
 import { createContextAndHook } from '@clerk/shared';
-import React, { PropsWithChildren, useState } from 'react';
+import React, { PropsWithChildren, ReactElement, useState } from 'react';
 
 import { usePopover, useSearchInput } from '../../ui/hooks';
 import { Button, descriptors, Flex, Icon, Text } from '../customizables';
@@ -126,7 +126,7 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
       {React.Children.count(children) ? children : defaultChildren}
     </SelectStateCtx.Provider>
   );
-});
+}) as <O extends Option>(props: PropsWithChildren<SelectProps<O>>) => ReactElement;
 
 type SelectOptionBuilderProps<O extends Option> = {
   option: Option;
