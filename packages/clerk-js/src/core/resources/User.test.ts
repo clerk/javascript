@@ -242,12 +242,24 @@ describe('User', () => {
     });
   });
 
-  it('sets the right fullname', () => {
-    expect(new User({ first_name: 'Firstname' } as unknown as UserJSON).fullName).toBe('Firstname');
-    expect(new User({ last_name: 'Lastname' } as unknown as UserJSON).fullName).toBe('Lastname');
-    expect(new User({ first_name: 'Firstname', last_name: 'Lastname' } as unknown as UserJSON).fullName).toBe(
-      'Firstname Lastname',
-    );
-    expect(new User({} as unknown as UserJSON).fullName).toBe(null);
+  describe('Set the right fullName', () => {
+    const cases: Array<[string | null | undefined, string | null | undefined, string | null | undefined]> = [
+      // firstName, lastName, fullName
+      ['A', 'B', 'A B'],
+      ['', 'B', 'B'],
+      ['A', '', 'A'],
+      ['', '', null],
+      [null, '', null],
+      [null, null, null],
+      [undefined, undefined, null],
+    ];
+
+    it.each(cases)("firstName: '%s', lastName: '%s'  =>  fullName: '%s'", (first_name, last_name, fullName) => {
+      const user = new User({
+        first_name,
+        last_name,
+      } as unknown as UserJSON);
+      expect(user.fullName).toBe(fullName);
+    });
   });
 });
