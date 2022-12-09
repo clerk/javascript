@@ -1,5 +1,4 @@
 import { UserResource } from '@clerk/types';
-import React from 'react';
 
 import { Avatar } from '../elements';
 import { PropsOfComponent } from '../styledSystem';

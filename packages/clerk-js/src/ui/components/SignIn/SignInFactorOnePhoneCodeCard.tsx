@@ -1,5 +1,4 @@
 import { PhoneCodeFactor } from '@clerk/types';
-import React from 'react';
 
 import { useEnvironment } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';

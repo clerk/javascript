@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Badge, Col, Icon, localizationKeys, useLocalizations } from '../../customizables';
 import { useNavigate } from '../../hooks';
 import { AuthApp } from '../../icons';

@@ -1,5 +1,4 @@
 import { TOTPFactor } from '@clerk/types';
-import React from 'react';
 
 import { Flow, localizationKeys } from '../../customizables';
 import { SignInFactorTwoCodeCard, SignInFactorTwoCodeForm } from './SignInFactorTwoCodeForm';

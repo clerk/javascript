@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { descriptors, Flex } from '../customizables';
 import { Spinner } from '../primitives';
 import { CardAlert } from './Alert';

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Button, Flex, Icon } from '../../customizables';
 import { Actions, UserPreview, UserPreviewProps } from '../../elements';
 import { useCardState } from '../../elements/contexts';

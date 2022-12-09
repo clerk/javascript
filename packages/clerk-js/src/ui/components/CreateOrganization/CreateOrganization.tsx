@@ -1,5 +1,4 @@
 import { CreateOrganizationProps } from '@clerk/types';
-import React from 'react';
 
 import { withOrganizationsEnabledGuard } from '../../common';
 import { ComponentContext, withCoreUserGuard } from '../../contexts';

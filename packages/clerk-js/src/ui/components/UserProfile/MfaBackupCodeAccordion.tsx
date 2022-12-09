@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Col, Icon, localizationKeys, useLocalizations } from '../../customizables';
 import { useNavigate } from '../../hooks';
 import { DotCircle } from '../../icons';

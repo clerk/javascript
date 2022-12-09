@@ -1,5 +1,4 @@
 import { PhoneNumberResource } from '@clerk/types';
-import React from 'react';
 
 import { Badge, Col, Icon, localizationKeys } from '../../customizables';
 import { FormattedPhoneNumberText, useCardState } from '../../elements';

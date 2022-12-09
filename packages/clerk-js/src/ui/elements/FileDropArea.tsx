@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Button, Col, descriptors, Flex, Icon, localizationKeys, Text } from '../customizables';
+import { Button, Col, descriptors, localizationKeys, Text } from '../customizables';
 import { Folder } from '../icons';
 import { animations, mqu } from '../styledSystem';
 import { colors } from '../utils';

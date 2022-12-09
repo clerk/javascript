@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Button, descriptors, Flex, Icon, Input } from '../customizables';
 import { useClipboard } from '../hooks';
 import { Clipboard, TickShield } from '../icons';

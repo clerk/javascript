@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { useEnvironment } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { CardAlert, Header, useCardState, withCardStateProvider } from '../../elements';

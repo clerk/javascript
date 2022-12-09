@@ -21,7 +21,6 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
   const card = useCardState();
   const signIn = useCoreSignIn();
   const signInContext = useSignInContext();
-  const { displayConfig } = useEnvironment();
   const { signInUrl } = useEnvironment().displayConfig;
   const { navigate } = useRouter();
   const { navigateAfterSignIn } = useSignInContext();

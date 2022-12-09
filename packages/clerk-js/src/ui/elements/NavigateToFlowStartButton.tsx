@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Button } from '../customizables';
 import { useRouter } from '../router';
 import { PropsOfComponent } from '../styledSystem';

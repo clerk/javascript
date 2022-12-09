@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { localizationKeys } from '../../customizables';
 import { ErrorCard } from '../../elements';
 import { PropsOfComponent } from '../../styledSystem';
