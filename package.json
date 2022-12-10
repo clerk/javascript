@@ -14,7 +14,6 @@
     "npm": ">=8.5.0"
   },
   "devDependencies": {
-    "@clerk/backend": "^0.1.1",
     "@commitlint/cli": "^16.0.2",
     "@commitlint/config-conventional": "^16.0.0",
     "@commitlint/config-lerna-scopes": "^16.0.0",
@@ -30,7 +29,7 @@
     "rimraf": "^3.0.2",
     "tsup": "^6.5.0",
     "turbo": "^1.6.3",
-    "typescript": "4.8.4"
+    "typescript": "4.9.4"
   },
   "scripts": {
     "dev": "turbo dev --filter=@clerk/* --filter=!@clerk/expo",
