@@ -25,9 +25,9 @@ type CreateVariantsConfig<V> = {
   defaultVariants?: DefaultVariants<V>;
 };
 
-interface ApplyVariants<T, V> {
+type ApplyVariants<T, V> = {
   (props?: VariantNameToKeyMap<V>): (theme: T) => StyleRule;
-}
+};
 
 export type StyleVariants<T extends () => any> = Parameters<T>[0];
 

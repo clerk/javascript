@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { useCoreUser, useUserButtonContext, withCoreUserGuard } from '../../contexts';
 import { descriptors, Flex, Flow, Text } from '../../customizables';
 import { Popover, withCardStateProvider, withFloatingTree } from '../../elements';

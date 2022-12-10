@@ -1,11 +1,10 @@
 import React from 'react';
 
-import { useCoreSignUp, useEnvironment } from '../../contexts';
+import { useCoreSignUp } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
 import { SignUpVerificationCodeForm } from './SignUpVerificationCodeForm';
 
 export const SignUpEmailCodeCard = () => {
-  const { displayConfig } = useEnvironment();
   const signUp = useCoreSignUp();
 
   React.useEffect(() => {

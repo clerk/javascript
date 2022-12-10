@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { common, createVariants, StyleVariants } from '../styledSystem';
 import { Flex, FlexProps } from './Flex';
 

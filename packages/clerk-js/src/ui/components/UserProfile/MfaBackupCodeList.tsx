@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { PrintableComponent, usePrintable } from '../../common';
 import { useCoreUser, useEnvironment } from '../../contexts';
 import { Button, Col, Flex, Grid, Heading, LocalizationKey, localizationKeys, Text } from '../../customizables';

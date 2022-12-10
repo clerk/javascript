@@ -1,6 +1,5 @@
 import { assertContextExists, ClientContext, useClientContext } from '@clerk/shared';
 import { SessionResource, SignInResource, SignUpResource } from '@clerk/types';
-import React from 'react';
 
 export const CoreClientContext = ClientContext;
 

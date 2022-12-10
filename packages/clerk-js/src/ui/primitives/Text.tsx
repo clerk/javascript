@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { common, createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
 import { applyDataStateProps } from './applyDataStateProps';
 
@@ -46,7 +44,6 @@ export type TextProps = PrimitiveProps<'p'> & { isDisabled?: boolean } & StyleVa
 export const Text = (props: TextProps): JSX.Element => {
   const { as: As = 'p', ...rest } = props;
   return (
-    // @ts-ignore
     <As
       {...applyDataStateProps(filterProps(rest))}
       css={applyVariants(props)}

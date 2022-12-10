@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { ProfileCardContent } from '../../elements';
 import { Route, Switch } from '../../router';
 import { PropsOfComponent } from '../../styledSystem';

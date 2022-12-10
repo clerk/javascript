@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Button, Icon, LocalizationKey } from '../customizables';
 import { ThreeDots } from '../icons';
 import { Menu, MenuItem, MenuList, MenuTrigger } from './Menu';

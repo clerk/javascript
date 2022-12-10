@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { common, createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
 
 const { applyVariants, filterProps } = createVariants(theme => ({

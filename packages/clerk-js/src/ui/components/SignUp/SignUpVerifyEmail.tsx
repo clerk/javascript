@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { useEnvironment } from '../../contexts';
 import { withCardStateProvider } from '../../elements';
 import { SignUpEmailCodeCard } from './SignUpEmailCodeCard';

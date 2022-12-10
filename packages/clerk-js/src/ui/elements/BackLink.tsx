@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Flex, Icon, localizationKeys, Text } from '../customizables';
 import { ElementDescriptor } from '../customizables/elementDescriptors';
 import { ArrowLeftIcon } from '../icons';

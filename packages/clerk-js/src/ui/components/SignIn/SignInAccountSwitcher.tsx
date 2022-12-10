@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { withRedirectToHome } from '../../common/withRedirectToHome';
 import { useEnvironment, useSignInContext } from '../../contexts';
 import { Button, Col, descriptors, Flow, Icon } from '../../customizables';

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { useCoreOrganization } from '../../contexts';
 import { Col, descriptors, Flex, Icon, localizationKeys } from '../../customizables';
 import { Header, IconButton, NavbarMenuButtonRow, OrganizationPreview, ProfileSection } from '../../elements';

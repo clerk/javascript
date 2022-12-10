@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Flex } from '../customizables';
 import { LocalizationKey, localizationKeys } from '../localization';
 import { PropsOfComponent } from '../styledSystem';

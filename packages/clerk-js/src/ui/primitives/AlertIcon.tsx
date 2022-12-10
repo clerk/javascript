@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { ExclamationCircle, ExclamationTriangle } from '../icons';
 import { createVariants, StyleVariants } from '../styledSystem';
 
@@ -21,7 +19,6 @@ const { applyVariants, filterProps } = createVariants(theme => ({
 
 type OwnProps = { variant: 'danger' | 'warning' };
 
-// @ts-ignore
 export type AlertIconProps = OwnProps & StyleVariants<typeof applyVariants>;
 
 export const AlertIcon = (props: AlertIconProps): JSX.Element => {

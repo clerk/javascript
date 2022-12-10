@@ -1,5 +1,4 @@
 import { SignUpResource } from '@clerk/types';
-import React from 'react';
 
 import { useCoreClerk, useSignUpContext } from '../../contexts';
 import { LocalizationKey } from '../../customizables';

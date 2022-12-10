@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Col } from '../customizables';
 import { PropsOfComponent } from '../styledSystem';
 

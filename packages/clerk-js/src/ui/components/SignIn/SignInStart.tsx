@@ -25,7 +25,7 @@ import { SignInSocialButtons } from './SignInSocialButtons';
 export function _SignInStart(): JSX.Element {
   const card = useCardState();
   const status = useLoadingStatus();
-  const { userSettings, displayConfig } = useEnvironment();
+  const { userSettings } = useEnvironment();
   const { setActive } = useCoreClerk();
   const signIn = useCoreSignIn();
   const { navigate } = useNavigate();

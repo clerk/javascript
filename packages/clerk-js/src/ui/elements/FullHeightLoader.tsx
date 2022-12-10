@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Flex, Spinner } from '../customizables';
 
 export const FullHeightLoader = (): JSX.Element => {

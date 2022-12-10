@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Flex, Text } from '../../customizables';
 
 export const MfaBackupCodeTile = (props: { code: string }) => {

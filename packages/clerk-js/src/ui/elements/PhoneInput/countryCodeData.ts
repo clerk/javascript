@@ -4,8 +4,6 @@ export type CountryIso = CountryCodeData[number][1];
 export type DialingCode = CountryCodeData[number][2];
 export type PhonePattern = CountryCodeData[number][3] | '';
 
-type PositionalCountryType = [CountryName, CountryIso, DialingCode, PhonePattern?];
-
 const data = [
   ['United States', 'us', '1', '(...) ...-....', 100],
   ['United Kingdom', 'gb', '44', '.... ......'],

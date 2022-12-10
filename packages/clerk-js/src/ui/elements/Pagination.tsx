@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { Button, Flex, localizationKeys, Text } from '../customizables';
 import { mqu, PropsOfComponent } from '../styledSystem';
