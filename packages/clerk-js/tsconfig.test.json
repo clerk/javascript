@@ -1,8 +1,5 @@
 {
   "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "noImplicitReturns": false
-  },
   "include": ["src/**/*", "./setupJestAfterEnv.ts"],
   "exclude": ["node_modules"]
 }
