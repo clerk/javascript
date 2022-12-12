@@ -84,6 +84,8 @@ export type NavbarItemId = 'account' | 'security';
 export type UserPreviewId = 'userButton' | 'personalWorkspace';
 export type OrganizationPreviewId = 'organizationSwitcher';
 
+export type FooterActionId = 'help' | 'alternative' | 'signUp' | 'signIn';
+
 /**
  * A type that describes the states and the ids that we will combine
  * in order to create all theming combinations
@@ -153,7 +155,7 @@ export type ElementsConfig = {
   main: WithOptions<never, never, never>;
 
   footer: WithOptions<never, never, never>;
-  footerAction: WithOptions<never, never, never>;
+  footerAction: WithOptions<FooterActionId, never, never>;
   footerActionText: WithOptions<never, never, never>;
   footerActionLink: WithOptions<never, never, never>;
   footerPages: WithOptions<never, never, never>;

@@ -63,7 +63,7 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
           </Col>
         </Col>
         <Footer.Root>
-          <Footer.Action>
+          <Footer.Action elementId='help'>
             <Footer.ActionLink
               localizationKey={localizationKeys('signIn.alternativeMethods.actionLink')}
               onClick={onHavingTroubleClick}
