@@ -76,6 +76,11 @@ export const deDe: DeepRequired<LocalizationResource> = {
       loading: {
         title: 'Anmeldung...',
       },
+      verifiedSwitchTab: {
+        title: 'E-Mail erfolgreich verifiziert',
+        subtitle: 'Kehren Sie zum neu geöffneten Tab zurück, um fortzufahren',
+        subtitleNewTab: 'Kehren Sie zur vorherigen Registerkarte zurück, um fortzufahren',
+      },
     },
     emailCode: {
       title: 'Bestätigen Sie Ihre E-Mail',
@@ -132,6 +137,8 @@ export const deDe: DeepRequired<LocalizationResource> = {
       },
       verifiedSwitchTab: {
         subtitle: 'Kehren Sie zur ursprünglichen Registerkarte zurück, um fortzufahren',
+        titleNewTab: 'Auf einem anderen Tab angemeldet',
+        subtitleNewTab: 'Kehren Sie zum neu geöffneten Tab zurück, um fortzufahren',
       },
       loading: {
         title: 'Einloggen...',
@@ -187,6 +194,11 @@ export const deDe: DeepRequired<LocalizationResource> = {
           'Wenn Sie Schwierigkeiten haben, sich bei Ihrem Konto anzumelden, senden Sie uns eine E-Mail und wir werden mit Ihnen zusammenarbeiten, um den Zugriff so schnell wie möglich wiederherzustellen.',
         blockButton__emailSupport: 'Email Unterstützung',
       },
+    },
+    noAvailableMethods: {
+      title: 'Kann nicht anmelden',
+      subtitle: 'Ein Fehler ist aufgetreten',
+      message: 'Die Anmeldung kann nicht fortgesetzt werden. Es ist kein Authentifizierungsfaktor verfügbar.',
     },
   },
   userProfile: {

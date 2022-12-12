@@ -76,6 +76,11 @@ export const frFR: DeepRequired<LocalizationResource> = {
       loading: {
         title: 'Création de votre compte...',
       },
+      verifiedSwitchTab: {
+        title: 'Courriel vérifié avec succès',
+        subtitle: "Revenez à l'onglet nouvellement ouvert pour continuer",
+        subtitleNewTab: "Revenir à l'onglet précédent pour continuer",
+      },
     },
     emailCode: {
       title: 'Vérifiez votre e-mail',
@@ -131,7 +136,9 @@ export const frFR: DeepRequired<LocalizationResource> = {
         subtitle: 'Vous serez bientôt redirigé',
       },
       verifiedSwitchTab: {
-        subtitle: 'Return to original tab to continue',
+        subtitle: "Revenir à l'onglet d'origine pour continuer",
+        titleNewTab: 'Connecté sur un autre onglet',
+        subtitleNewTab: "Revenez à l'onglet nouvellement ouvert pour continuer",
       },
       loading: {
         title: 'Signing in...',
@@ -187,6 +194,11 @@ export const frFR: DeepRequired<LocalizationResource> = {
           "Si vous rencontrez des difficultés pour vous connecter à votre compte, envoyez-nous un e-mail et nous travaillerons avec vous pour rétablir l'accès dès que possible.",
         blockButton__emailSupport: 'Assistance par e-mail',
       },
+    },
+    noAvailableMethods: {
+      title: 'Impossible de se connecter',
+      subtitle: "Une erreur s'est produite",
+      message: "Impossible de poursuivre la connexion. Aucun facteur d'authentification n'est disponible.",
     },
   },
   userProfile: {
