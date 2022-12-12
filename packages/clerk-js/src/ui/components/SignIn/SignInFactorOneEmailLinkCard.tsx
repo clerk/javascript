@@ -72,8 +72,8 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
   if (showVerifyModal) {
     return (
       <EmailLinkStatusCard
-        title='Signed in on other tab'
-        subtitle='Return to the newly opened tab to continue'
+        title={localizationKeys('signIn.emailLink.verifiedSwitchTab.titleNewTab')}
+        subtitle={localizationKeys('signIn.emailLink.verifiedSwitchTab.subtitleNewTab')}
         status='verified_switch_tab'
       />
     );

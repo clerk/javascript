@@ -65,8 +65,8 @@ export const VerifyWithLink = (props: VerifyWithLinkProps) => {
 export const VerificationSuccessPage = () => {
   return (
     <EmailLinkStatusCard
-      title='Successfully verified email'
-      subtitle='Return to previous tab to continue'
+      title={localizationKeys('signUp.emailLink.verifiedSwitchTab.title')}
+      subtitle={localizationKeys('signUp.emailLink.verifiedSwitchTab.subtitle')}
       status='verified'
     />
   );

@@ -88,6 +88,11 @@ export const enUS: DeepRequired<LocalizationResource> = {
       loading: {
         title: 'Signing up...',
       },
+      verifiedSwitchTab: {
+        title: 'Successfully verified email',
+        subtitle: 'Return to the newly opened tab to continue',
+        subtitleNewTab: 'Return to previous tab to continue',
+      },
     },
     emailCode: {
       title: 'Verify your email',
@@ -144,6 +149,8 @@ export const enUS: DeepRequired<LocalizationResource> = {
       },
       verifiedSwitchTab: {
         subtitle: 'Return to original tab to continue',
+        titleNewTab: 'Signed in on other tab',
+        subtitleNewTab: 'Return to the newly opened tab to continue',
       },
       loading: {
         title: 'Signing in...',
@@ -186,6 +193,11 @@ export const enUS: DeepRequired<LocalizationResource> = {
         content: `If you’re experiencing difficulty signing into your account, email us and we will work with you to restore access as soon as possible.`,
         blockButton__emailSupport: 'Email support',
       },
+    },
+    noAvailableMethods: {
+      title: 'Cannot sign in',
+      subtitle: 'An error occurred',
+      message: "Cannot proceed with sign in. There's no available authentication factor.",
     },
   },
   userProfile: {

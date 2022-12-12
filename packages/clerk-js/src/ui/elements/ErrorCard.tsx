@@ -11,9 +11,9 @@ import { Footer } from './Footer';
 import { Header } from './Header';
 
 type ErrorCardProps = {
-  cardTitle?: string | LocalizationKey;
-  cardSubtitle?: string | LocalizationKey;
-  message?: string;
+  cardTitle?: LocalizationKey;
+  cardSubtitle?: LocalizationKey;
+  message?: LocalizationKey;
   onBackLinkClick?: React.MouseEventHandler | undefined;
 };
 
@@ -45,9 +45,8 @@ export const ErrorCard = (props: ErrorCardProps) => {
             <Text
               variant='smallRegular'
               colorScheme='neutral'
-            >
-              {props.message}
-            </Text>
+              localizationKey={props.message}
+            />
           )}
           {/*TODO: extract  */}
           <Text
