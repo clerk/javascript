@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nextjs",
-  "version": "4.6.11-staging.0",
+  "version": "4.6.11",
   "license": "MIT",
   "description": "Clerk.dev SDK for NextJS",
   "keywords": [
