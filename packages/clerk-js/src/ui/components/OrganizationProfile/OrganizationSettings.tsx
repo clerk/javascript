@@ -14,7 +14,7 @@ export const OrganizationSettings = () => {
       <NavbarMenuButtonRow />
       <Col
         elementDescriptor={descriptors.profilePage}
-        elementId={descriptors.profilePage.setId('organization-settings')}
+        elementId={descriptors.profilePage.setId('organizationSettings')}
         gap={8}
       >
         <Header.Root>
@@ -50,7 +50,7 @@ const OrganizationProfileSection = () => {
   return (
     <ProfileSection
       title={localizationKeys('organizationProfile.profilePage.title')}
-      id='organization-profile'
+      id='organizationProfile'
     >
       {isAdmin ? <BlockButton onClick={() => navigate('profile')}>{profile}</BlockButton> : profile}
     </ProfileSection>
@@ -67,7 +67,7 @@ const OrganizationDangerSection = () => {
 
   return (
     <ProfileSection
-      id='organization-danger'
+      id='organizationDanger'
       title={localizationKeys('organizationProfile.profilePage.dangerSection.title')}
       sx={t => ({ marginBottom: t.space.$4 })}
     >

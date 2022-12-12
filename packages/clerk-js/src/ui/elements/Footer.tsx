@@ -15,7 +15,8 @@ const FooterRoot = (props: React.PropsWithChildren<any>): JSX.Element => {
   );
 };
 
-const FooterAction = (props: React.PropsWithChildren<any>): JSX.Element => {
+type FooterActionProps = PropsOfComponent<typeof Flex>;
+const FooterAction = (props: FooterActionProps): JSX.Element => {
   return (
     <Flex
       elementDescriptor={descriptors.footerAction}

@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { capitalizeFirstLetter } from '../../utils';
+import { useFlowMetadata } from '../elements';
 import { ThemableCssProp } from '../styledSystem';
 import { useAppearance } from './AppearanceContext';
 import { appendEmojiSeparator, generateClassName } from './classGeneration';
@@ -28,6 +30,7 @@ export const makeCustomizable = <P,>(
   const customizableComponent = React.forwardRef((props: Customizable<any>, ref) => {
     const { elementDescriptor, elementId, sx, className, ...restProps } = props;
     const { parsedElements } = useAppearance();
+    const { flow, part } = useFlowMetadata();
     const descriptors = [
       defaultDescriptor,
       ...(Array.isArray(elementDescriptor) ? elementDescriptor : [elementDescriptor]),
@@ -44,7 +47,15 @@ export const makeCustomizable = <P,>(
       );
     }
 
-    const generatedStyles = generateClassName(parsedElements, descriptors, elementId, props);
+    const elementIds = [elementId];
+    if (flow) {
+      elementIds.push({ id: flow });
+    }
+    if (part) {
+      elementIds.push({ id: `${flow}${capitalizeFirstLetter(part)}` });
+    }
+
+    const generatedStyles = generateClassName(parsedElements, descriptors, elementIds, props);
     const generatedClassname = appendEmojiSeparator(generatedStyles.className, className);
     generatedStyles.css.unshift(defaultStyles, sx);
 

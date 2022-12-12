@@ -4,7 +4,7 @@ import { makeCustomizable } from '../customizables/makeCustomizable';
 
 type RootBoxProps = React.PropsWithChildren<{ className: string }>;
 
-const _InvisibleRootBox = React.memo((props: RootBoxProps) => {
+export const InvisibleRootBox = React.memo((props: RootBoxProps) => {
   const [showSpan, setShowSpan] = React.useState(true);
   const parentRef = React.useRef<HTMLElement | null>(null);
 
@@ -33,12 +33,12 @@ const _InvisibleRootBox = React.memo((props: RootBoxProps) => {
   );
 });
 
-export const InvisibleRootBox = makeCustomizable(_InvisibleRootBox, {
-  defaultStyles: t => ({
-    boxSizing: 'border-box',
-    width: 'fit-content',
+// export const InvisibleRootBox = makeCustomizable(_InvisibleRootBox, {
+//   defaultStyles: t => ({
+//     boxSizing: 'border-box',
+//     width: 'fit-content',
 
-    fontFamily: t.fonts.$main,
-    fontStyle: t.fontStyles.$normal,
-  }),
-});
+//     fontFamily: t.fonts.$main,
+//     fontStyle: t.fontStyles.$normal,
+//   }),
+// });

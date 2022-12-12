@@ -24,7 +24,7 @@ type PropsWithState = Partial<Record<'isLoading' | 'isDisabled' | 'hasError' | '
 export const generateClassName = (
   parsedElements: ParsedElements,
   elemDescriptors: ElementDescriptor[],
-  elemId: ElementId | undefined,
+  elemId: ElementId[],
   props: PropsWithState | undefined,
 ) => {
   const state = getElementState(props);
@@ -32,12 +32,16 @@ export const generateClassName = (
   const css: unknown[] = [];
 
   className = addClerkTargettableClassname(className, elemDescriptors);
-  className = addClerkTargettableIdClassname(className, elemDescriptors, elemId);
+  elemId.forEach(id => {
+    className = addClerkTargettableIdClassname(className, elemDescriptors, id);
+  });
   className = addClerkTargettableStateClass(className, state);
   className = addClerkTargettableRequiredAttribute(className, props as any);
 
-  className = addUserProvidedClassnames(className, parsedElements, elemDescriptors, elemId, state);
-  addUserProvidedStyleRules(css, parsedElements, elemDescriptors, elemId, state);
+  elemId.forEach(id => {
+    className = addUserProvidedClassnames(className, parsedElements, elemDescriptors, id, state);
+    addUserProvidedStyleRules(css, parsedElements, elemDescriptors, id, state);
+  });
   return { className, css };
 };
 
