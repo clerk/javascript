@@ -128,7 +128,6 @@ export const RoleSelect = (props: { value: MembershipRole; onChange: any; isDisa
     >
       <SelectButton
         sx={t => ({
-          border: 'none',
           color: t.colors.$colorTextSecondary,
           backgroundColor: 'transparent',
         })}
