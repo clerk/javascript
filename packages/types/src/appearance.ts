@@ -75,11 +75,11 @@ export type ProfileSectionId =
   | 'password'
   | 'mfa'
   | 'activeDevices'
-  | 'organization-profile'
-  | 'organization-danger';
-export type ProfilePageId = 'account' | 'security' | 'organization-settings' | 'organization-members';
+  | 'organizationProfile'
+  | 'organizationDanger';
+export type ProfilePageId = 'account' | 'security' | 'organizationSettings' | 'organizationMembers';
 
-export type NavbarItemId = 'account' | 'security';
+export type NavbarItemId = 'account' | 'security' | 'members' | 'settings';
 
 export type UserPreviewId = 'userButton' | 'personalWorkspace';
 export type OrganizationPreviewId = 'organizationSwitcher';
