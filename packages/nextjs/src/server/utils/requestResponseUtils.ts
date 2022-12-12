@@ -18,7 +18,8 @@ export function getAuthResultFromRequest(req: RequestLike): string | null | unde
 }
 
 function getPrivateAuthResult(req: RequestLike): string | null | undefined {
-  return '_authResult' in req ? req['_authResult'] : undefined;
+  const r = req as never;
+  return '_authResult' in r ? r['_authResult'] : undefined;
 }
 
 function getQueryParam(req: RequestLike, name: string): string | null | undefined {
