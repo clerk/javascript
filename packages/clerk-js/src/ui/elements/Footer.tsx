@@ -1,3 +1,4 @@
+import { FooterActionId } from '@clerk/types';
 import React from 'react';
 
 import { descriptors, Flex, Link, localizationKeys, Text, useAppearance } from '../customizables';
@@ -15,11 +16,16 @@ const FooterRoot = (props: React.PropsWithChildren<any>): JSX.Element => {
   );
 };
 
-const FooterAction = (props: React.PropsWithChildren<any>): JSX.Element => {
+type FooterActionProps = Omit<PropsOfComponent<typeof Flex>, 'elementId'> & {
+  elementId?: FooterActionId;
+};
+const FooterAction = (props: FooterActionProps): JSX.Element => {
+  const { elementId, ...rest } = props;
   return (
     <Flex
       elementDescriptor={descriptors.footerAction}
-      {...props}
+      elementId={descriptors.footerAction.setId(elementId)}
+      {...rest}
       gap={1}
     />
   );

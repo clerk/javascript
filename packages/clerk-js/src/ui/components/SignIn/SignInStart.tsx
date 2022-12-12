@@ -214,7 +214,7 @@ export function _SignInStart(): JSX.Element {
           </SocialButtonsReversibleContainerWithDivider>
         </Col>
         <Footer.Root>
-          <Footer.Action>
+          <Footer.Action elementId='signUp'>
             <Footer.ActionText localizationKey={localizationKeys('signIn.start.actionText')}>
               No account?
             </Footer.ActionText>

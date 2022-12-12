@@ -89,7 +89,7 @@ export const VerificationCodeCard = (props: VerificationCodeCardProps) => {
         />
       </Col>
       <Footer.Root>
-        <Footer.Action>
+        <Footer.Action elementId='alternative'>
           {props.onShowAlternativeMethodsClicked && (
             <Footer.ActionLink
               localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
