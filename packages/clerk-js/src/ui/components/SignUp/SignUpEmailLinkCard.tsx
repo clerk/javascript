@@ -61,8 +61,8 @@ export const SignUpEmailLinkCard = () => {
   if (showVerifyModal) {
     return (
       <EmailLinkStatusCard
-        title='Successfully verified email'
-        subtitle='Return to the newly opened tab to continue'
+        title={localizationKeys('signUp.emailLink.verifiedSwitchTab.title')}
+        subtitle={localizationKeys('signUp.emailLink.verifiedSwitchTab.subtitleNewTab')}
         status='verified_switch_tab'
       />
     );

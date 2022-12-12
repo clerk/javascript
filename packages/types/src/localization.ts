@@ -87,6 +87,11 @@ type _LocalizationResource = {
       loading: {
         title: LocalizationValue;
       };
+      verifiedSwitchTab: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+        subtitleNewTab: LocalizationValue;
+      };
     };
     emailCode: {
       title: LocalizationValue;
@@ -143,6 +148,8 @@ type _LocalizationResource = {
       };
       verifiedSwitchTab: {
         subtitle: LocalizationValue;
+        titleNewTab: LocalizationValue;
+        subtitleNewTab: LocalizationValue;
       };
       loading: {
         title: LocalizationValue;
@@ -197,6 +204,11 @@ type _LocalizationResource = {
         content: LocalizationValue;
         blockButton__emailSupport: LocalizationValue;
       };
+    };
+    noAvailableMethods: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      message: LocalizationValue;
     };
   };
   userProfile: {

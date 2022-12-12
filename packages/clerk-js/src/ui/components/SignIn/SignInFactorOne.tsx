@@ -4,6 +4,7 @@ import React from 'react';
 import { withRedirectToHome } from '../../common/withRedirectToHome';
 import { useCoreSignIn, useEnvironment } from '../../contexts';
 import { ErrorCard, LoadingCard, withCardStateProvider } from '../../elements';
+import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import { AlternativeMethods } from './AlternativeMethods';
 import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
@@ -52,9 +53,9 @@ export function _SignInFactorOne(): JSX.Element {
   if (!currentFactor && signIn.status) {
     return (
       <ErrorCard
-        cardTitle='Cannot sign in'
-        cardSubtitle='An error occurred'
-        message="Cannot proceed with sign in. There's no available authentication factor."
+        cardTitle={localizationKeys('signIn.noAvailableMethods.title')}
+        cardSubtitle={localizationKeys('signIn.noAvailableMethods.subtitle')}
+        message={localizationKeys('signIn.noAvailableMethods.message')}
       />
     );
   }
