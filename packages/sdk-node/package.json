@@ -1,5 +1,5 @@
 {
-  "version": "4.5.13-staging.0",
+  "version": "4.5.13-staging.1",
   "license": "MIT",
   "type": "commonjs",
   "main": "./dist/index.js",
@@ -55,7 +55,7 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@clerk/backend-core": "^2.11.13-staging.0",
+    "@clerk/backend-core": "^2.12.0-staging.0",
     "@clerk/types": "^3.22.2-staging.0",
     "@peculiar/webcrypto": "1.4.1",
     "@types/cookies": "0.7.7",
