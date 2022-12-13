@@ -1,12 +1,28 @@
 {
   "version": "4.5.12",
   "license": "MIT",
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
-  "typings": "dist/cjs/index.d.ts",
+  "type": "commonjs",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.js"
+    },
+    "./esm/instance": {
+      "types": "./dist/types/instance.d.ts",
+      "default": "./dist/instance.mjs"
+    },
+    "./cjs/instance": {
+      "types": "./dist/types/instance.d.ts",
+      "default": "./dist/instance.js"
+    }
+  },
   "files": [
     "dist",
-    "package.json",
     "esm",
     "cjs"
   ],
@@ -14,9 +30,8 @@
     "node": ">=14"
   },
   "scripts": {
-    "build:es5": "node ./scripts/info.js && tsc -p tsconfig.build.json",
-    "build:esm": "node ./scripts/info.js && tsc -p tsconfig.esm.json",
-    "build": "run-p build:es5 build:esm",
+    "dev": "tsup --watch",
+    "build": "tsup --env.NODE_ENV production",
     "clean": "rimraf ./dist",
     "lint": "eslint .",
     "test": "jest",

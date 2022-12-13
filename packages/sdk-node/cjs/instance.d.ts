@@ -1,2 +1,2 @@
-export * from '../dist/cjs/instance';
-export { default } from '../dist/cjs/instance';
+export * from '../dist/types/instance';
+export { default } from '../dist/types/instance';
