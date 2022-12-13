@@ -16,7 +16,7 @@ declare global {
 export interface OrganizationResource {
   id: string;
   name: string;
-  slug: string;
+  slug: string | null;
   logoUrl: string | null;
   membersCount: number;
   pendingInvitationsCount: number;
