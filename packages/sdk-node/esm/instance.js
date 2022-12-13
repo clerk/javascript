@@ -1,1 +1,1 @@
-module.exports = require('../dist/esm/instance');
+export * from './../dist/instance.mjs';

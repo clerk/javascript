@@ -1,1 +1,1 @@
-module.exports = require('../dist/cjs/instance');
+module.exports = require('./../dist/instance');

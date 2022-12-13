@@ -1,19 +1,21 @@
 {
-  "include": ["src"],
-  "exclude": ["dist", "esm", "src/__tests__"],
   "compilerOptions": {
-    "strict": true,
     "declaration": true,
-    "declarationMap": false,
-    "downlevelIteration": true,
-    "sourceMap": false,
+    "declarationDir": "dist/types",
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
+    "moduleResolution": "node",
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "forceConsistentCasingInFileNames": true,
-    "target": "ES2020",
-    "moduleResolution": "node",
-    "esModuleInterop": true
-  }
+    "resolveJsonModule": true,
+    "sourceMap": false,
+    "strict": true,
+    "target": "ES2020"
+  },
+  "exclude": ["node_modules"],
+  "include": ["src/index.ts", "src/instance.ts"]
 }
