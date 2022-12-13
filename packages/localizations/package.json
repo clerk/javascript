@@ -1,6 +1,6 @@
 {
   "name": "@clerk/localizations",
-  "version": "1.1.4-staging.0",
+  "version": "1.1.4",
   "license": "MIT",
   "description": "Localizations for the Clerk components",
   "keywords": [
@@ -29,7 +29,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@clerk/types": "^3.22.2-staging.0"
+    "@clerk/types": "^3.22.2"
   },
   "devDependencies": {
     "tsup": "*",
