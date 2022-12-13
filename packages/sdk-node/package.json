@@ -14,11 +14,13 @@
     },
     "./esm/instance": {
       "types": "./dist/types/instance.d.ts",
-      "default": "./dist/instance.mjs"
+      "require": "./dist/instance.js",
+      "import": "./dist/instance.mjs"
     },
     "./cjs/instance": {
       "types": "./dist/types/instance.d.ts",
-      "default": "./dist/instance.js"
+      "require": "./dist/instance.js",
+      "import": "./dist/instance.mjs"
     }
   },
   "files": [
