@@ -1,15 +1,14 @@
 import { headers } from 'next/headers';
 import { NextRequest } from 'next/server';
 
-import { getAuthEdge } from '../server/getAuthEdge';
-import { buildClerkProps } from '../server/utils/getAuth';
+import { buildClerkProps, getAuth } from '../server/getAuth';
 
 const buildRequestLike = () => {
   return new NextRequest('https://placeholder.com', { headers: headers() });
 };
 
 export const auth = () => {
-  return getAuthEdge(buildRequestLike());
+  return getAuth(buildRequestLike());
 };
 
 export const initialState = () => {
