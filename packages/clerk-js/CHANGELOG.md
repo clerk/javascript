@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.21.7](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.21.6...@clerk/clerk-js@4.21.7) (2022-12-14)
+
+### Bug Fixes
+
+- **clerk-js:** Fix spacing between membership widget and members table ([255d495](https://github.com/clerkinc/javascript/commit/255d49568c687a4b8cc44f4c88bfc44f3bf5d049))
+
 ### [4.21.6](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.21.6-staging.0...@clerk/clerk-js@4.21.6) (2022-12-13)
 
 **Note:** Version bump only for package @clerk/clerk-js
