@@ -1,25 +1,31 @@
+import { AuthObject } from '@clerk/backend';
 import { RequestCookie } from 'next/dist/server/web/spec-extension/cookies';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { AUTH_RESULT, RequestLike } from '../types';
+import { constants } from './constants';
+import { RequestLike } from './types';
 
-type RequestProps = {
-  req: NextRequest;
-  authResult: string;
-};
-
-export function setPrivateAuthResultOnRequest({ req, authResult }: RequestProps): void {
-  Object.assign(req, { _authResult: authResult });
+export function setCustomAttributeOnRequest(req: RequestLike, key: string, value: string): void {
+  Object.assign(req, { [key]: value });
 }
 
-// Tries to extract auth result from the request using several strategies
-export function getAuthResultFromRequest(req: RequestLike): string | null | undefined {
-  return getPrivateAuthResult(req) || getHeader(req, AUTH_RESULT) || getQueryParam(req, AUTH_RESULT);
+export function getCustomAttributeFromRequest(req: RequestLike, key: string): string | null | undefined {
+  // @ts-expect-error
+  return key in req ? req[key] : undefined;
 }
 
-function getPrivateAuthResult(req: RequestLike): string | null | undefined {
-  const r = req as never;
-  return '_authResult' in r ? r['_authResult'] : undefined;
+export function setAuthStatusOnRequest(req: RequestLike, value: string) {
+  return setCustomAttributeOnRequest(req, constants.Attributes.AuthStatus, value);
+}
+
+// Tries to extract auth status from the request using several strategies
+// TODO: Rename Auth status and align the naming across media
+export function getAuthStatusFromRequest(req: RequestLike): string | null | undefined {
+  return (
+    getCustomAttributeFromRequest(req, constants.Attributes.AuthStatus) ||
+    getHeader(req, constants.Headers.AuthStatus) ||
+    getQueryParam(req, constants.SearchParams.AuthStatus)
+  );
 }
 
 function getQueryParam(req: RequestLike, name: string): string | null | undefined {
@@ -120,4 +126,12 @@ export const nextJsVersionCanOverrideRequestHeaders = () => {
   } catch (e) {
     return false;
   }
+};
+
+export const injectSSRStateIntoObject = (obj: any, authObject: AuthObject) => {
+  // Serializing the state on dev env is a temp workaround for the following issue:
+  // https://github.com/vercel/next.js/discussions/11209|Next.js
+  const __clerk_ssr_state =
+    process.env.NODE_ENV !== 'production' ? JSON.parse(JSON.stringify({ ...authObject })) : { ...authObject };
+  return { ...obj, __clerk_ssr_state };
 };
