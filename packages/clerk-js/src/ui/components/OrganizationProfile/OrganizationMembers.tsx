@@ -81,11 +81,11 @@ export const OrganizationMembers = withCardStateProvider(() => {
           <TabPanels>
             <TabPanel sx={{ width: '100%' }}>
               <Flex
-                sx={t => ({
-                  flexDirection: 'column',
+                gap={4}
+                direction='col'
+                sx={{
                   width: '100%',
-                  marginTop: __unstable_manageBillingUrl ? t.space.$4 : 0,
-                })}
+                }}
               >
                 {isAdmin && __unstable_manageBillingUrl && <MembershipWidget />}
                 <ActiveMembersList />
@@ -94,11 +94,11 @@ export const OrganizationMembers = withCardStateProvider(() => {
             {isAdmin && (
               <TabPanel sx={{ width: '100%' }}>
                 <Flex
-                  sx={t => ({
-                    flexDirection: 'column',
+                  direction='col'
+                  gap={4}
+                  sx={{
                     width: '100%',
-                    marginTop: __unstable_manageBillingUrl ? t.space.$4 : 0,
-                  })}
+                  }}
                 >
                   {isAdmin && __unstable_manageBillingUrl && <MembershipWidget />}
                   <InvitedMembersList />
