@@ -20,9 +20,7 @@ import {
 
 const DEFAULT_API_URL = process.env.CLERK_API_URL || 'https://api.clerk.dev';
 const DEFAULT_API_VERSION = process.env.CLERK_API_VERSION || 'v1';
-
-// Using public interstitial endpoint for time being
-const INTERSTITIAL_URL = `${DEFAULT_API_URL}/${DEFAULT_API_VERSION}/public/interstitial?frontendApi=${process.env.NEXT_PUBLIC_CLERK_FRONTEND_API}`;
+const PUBLIC_INTERSTITIAL_URL = buildPublicInsterstitialUrl(); // Using public interstitial endpoint for time being
 
 type WithAuthOptions = {
   jwtKey?: string;
@@ -68,7 +66,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
     // Therefore we have to resort to a public interstitial endpoint
 
     if (status === AuthStatus.Interstitial) {
-      const response = NextResponse.rewrite(INTERSTITIAL_URL);
+      const response = NextResponse.rewrite(PUBLIC_INTERSTITIAL_URL);
       response.headers.set(AUTH_RESULT, errorReason as string);
       return response;
     }
@@ -144,4 +142,16 @@ export function handleMiddlewareResult({ req, res, authResult }: HandleMiddlewar
   }
 
   return res;
+}
+
+function buildPublicInsterstitialUrl(): string {
+  const url = new URL(`${DEFAULT_API_URL}/${DEFAULT_API_VERSION}/public/interstitial`);
+
+  if (process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+    url.searchParams.append('publishable_key', process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+  } else if (process.env.NEXT_PUBLIC_CLERK_FRONTEND_API) {
+    url.searchParams.append('frontendApi', process.env.NEXT_PUBLIC_CLERK_FRONTEND_API);
+  }
+
+  return url.href;
 }
