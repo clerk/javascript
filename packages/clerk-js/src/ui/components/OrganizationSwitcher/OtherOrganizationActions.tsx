@@ -69,10 +69,9 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
             onClick={onPersonalWorkspaceClick}
           >
             <PersonalWorkspacePreview
-              gap={3}
               user={{ profileImageUrl: user.profileImageUrl }}
               size='sm'
-              avatarSx={t => ({ marginLeft: `calc(${t.space.$3}/2)` })}
+              avatarSx={t => ({ margin: `0 calc(${t.space.$3}/2)` })}
               title={localizationKeys('organizationSwitcher.personalWorkspace')}
             />
           </PreviewButton>
@@ -96,8 +95,7 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
             onClick={() => onOrganizationClick(organization)}
           >
             <OrganizationPreview
-              gap={3}
-              avatarSx={t => ({ marginLeft: `calc(${t.space.$3}/2)` })}
+              avatarSx={t => ({ margin: `0 calc(${t.space.$3}/2)` })}
               organization={organization}
               size='sm'
             />
@@ -126,7 +124,7 @@ const PreviewButton = (props: PropsOfComponent<typeof Button>) => {
           minHeight: 'unset',
           borderRadius: 0,
           justifyContent: 'space-between',
-          padding: `${t.space.$2} ${t.space.$6}`,
+          padding: `${t.space.$3} ${t.space.$6}`,
           ':hover > svg': {
             visibility: 'initial',
           },

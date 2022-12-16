@@ -47,6 +47,7 @@ export const UserPreviewButton = (props: UserPreviewButtonProps) => {
       <UserPreview
         user={user}
         size='sm'
+        avatarSx={t => ({ margin: `0 calc(${t.space.$3}/2)` })}
       />
 
       <Icon
