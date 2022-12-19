@@ -78,7 +78,7 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
           </Flex>
         </Flex>
         <Footer.Root>
-          <Footer.Action elementId='help'>
+          <Footer.Action elementId='havingTrouble'>
             <Footer.ActionLink
               localizationKey={localizationKeys('signIn.alternativeMethods.actionLink')}
               onClick={onHavingTroubleClick}

@@ -254,7 +254,7 @@ function _SignUpStart(): JSX.Element {
           </SocialButtonsReversibleContainerWithDivider>
         </Flex>
         <Footer.Root>
-          <Footer.Action elementId='signIn'>
+          <Footer.Action elementId='signUp'>
             <Footer.ActionText localizationKey={localizationKeys('signUp.start.actionText')}>
               Have an account?
             </Footer.ActionText>
