@@ -126,10 +126,7 @@ export const NavBar = (props: NavBarProps) => {
   }, [router.currentPath]);
 
   const items = (
-    <Col
-      elementDescriptor={descriptors.navbarButtons}
-      gap={2}
-    >
+    <Col elementDescriptor={descriptors.navbarButtons}>
       {routes.map(r => (
         <NavButton
           key={r.id}
