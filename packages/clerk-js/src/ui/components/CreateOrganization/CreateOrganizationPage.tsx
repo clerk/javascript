@@ -18,7 +18,7 @@ import { OrganizationProfileAvatarUploader } from '../OrganizationProfile/Organi
 
 export const CreateOrganizationPage = withCardStateProvider(() => {
   const title = localizationKeys('createOrganization.title');
-  const subtitle = localizationKeys('createOrganization.subtitle');
+  const inviteTitle = localizationKeys('organizationProfile.invitePage.title');
   const card = useCardState();
   const [file, setFile] = React.useState<File | null>();
   const { createOrganization } = useCoreOrganizations();
@@ -67,7 +67,6 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
       <ContentPage
         Breadcrumbs={null}
         headerTitle={title}
-        headerSubtitle={subtitle}
         sx={t => ({ minHeight: t.sizes.$60 })}
       >
         <Form.Root onSubmit={onSubmit}>
@@ -101,8 +100,8 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
       </ContentPage>
       <ContentPage
         Breadcrumbs={null}
-        headerTitle={title}
-        headerSubtitle={subtitle}
+        headerTitle={inviteTitle}
+        sx={t => ({ minHeight: t.sizes.$60 })}
       >
         {organization && (
           <InviteMembersForm

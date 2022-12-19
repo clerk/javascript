@@ -59,12 +59,11 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => 
 });
 
 export const ProfileCard = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => {
+  const { sx, children, ...rest } = props;
   const { branded } = useEnvironment().displayConfig;
-
   return (
     <BaseCard
       direction='row'
-      {...props}
       sx={[
         t => ({
           padding: 0,
@@ -76,11 +75,12 @@ export const ProfileCard = React.forwardRef<HTMLDivElement, CardProps>((props, r
             margin: branded ? `0 0 ${t.space.$7} 0` : '0',
           },
         }),
-        props.sx,
+        sx,
       ]}
+      {...rest}
       ref={ref}
     >
-      {props.children}
+      {children}
       {branded && <PoweredByClerkTag />}
     </BaseCard>
   );
