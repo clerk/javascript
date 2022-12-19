@@ -3,7 +3,6 @@ import { LocalizationKey, localizationKeys } from '../localization';
 import { useRouter } from '../router';
 import { PropsOfComponent } from '../styledSystem';
 import { Form } from './Form';
-import { useNavigateToFlowStart } from './NavigateToFlowStartButton';
 
 type FormButtonsProps = PropsOfComponent<typeof Form.SubmitButton> & {
   isDisabled?: boolean;

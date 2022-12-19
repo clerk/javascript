@@ -51,7 +51,7 @@ describe('ConnectedAccountsPage', () => {
   });
 
   describe('Form buttons', () => {
-    it('navigates to the previous page when pressing cancel', async () => {
+    it('navigates to the root page when pressing cancel', async () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
 
       const { userEvent } = render(<ConnectedAccountsPage />, { wrapper });

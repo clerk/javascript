@@ -34,7 +34,7 @@ describe('RemoveMfaTOTPPAge', () => {
       const { userEvent } = render(<RemoveMfaTOTPPage />, { wrapper });
 
       await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
-      expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('..');
     });
 
     it('calls the appropriate function when pressing continue', async () => {
