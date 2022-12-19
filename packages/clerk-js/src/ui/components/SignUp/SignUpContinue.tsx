@@ -185,7 +185,7 @@ function _SignUpContinue() {
           </SocialButtonsReversibleContainerWithDivider>
         </Flex>
         <Footer.Root>
-          <Footer.Action elementId='signIn'>
+          <Footer.Action elementId='signUp'>
             <Footer.ActionText localizationKey={localizationKeys('signUp.continue.actionText')} />
             <Footer.ActionLink
               localizationKey={localizationKeys('signUp.continue.actionLink')}

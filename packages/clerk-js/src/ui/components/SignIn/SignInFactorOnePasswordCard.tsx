@@ -78,7 +78,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
           </Form.Root>
         </Flex>
         <Footer.Root>
-          <Footer.Action elementId='alternative'>
+          <Footer.Action elementId='alternativeMethods'>
             <Footer.ActionLink
               localizationKey={localizationKeys('signIn.password.actionLink')}
               onClick={onShowAlternativeMethodsClick}

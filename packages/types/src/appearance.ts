@@ -84,7 +84,7 @@ export type NavbarItemId = 'account' | 'security' | 'members' | 'settings';
 export type UserPreviewId = 'userButton' | 'personalWorkspace';
 export type OrganizationPreviewId = 'organizationSwitcher';
 
-export type FooterActionId = 'help' | 'alternative' | 'signUp' | 'signIn';
+export type FooterActionId = 'havingTrouble' | 'alternativeMethods' | 'signUp' | 'signIn';
 
 /**
  * A type that describes the states and the ids that we will combine

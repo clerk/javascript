@@ -67,7 +67,7 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
         </Form.Root>
       </Col>
       <Footer.Root>
-        <Footer.Action elementId='alternative'>
+        <Footer.Action elementId='alternativeMethods'>
           {onShowAlternativeMethodsClicked && (
             <Footer.ActionLink
               localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
