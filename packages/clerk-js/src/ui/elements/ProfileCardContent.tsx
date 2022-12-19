@@ -48,7 +48,7 @@ export const ProfileCardContent = (props: ProfileCardContentProps) => {
   );
 };
 
-const ScrollerContainer = (props: React.PropsWithChildren<{}>) => {
+const ScrollerContainer = (props: React.PropsWithChildren<Record<never, never>>) => {
   return (
     <Col
       elementDescriptor={descriptors.scrollBox}

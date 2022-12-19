@@ -14,6 +14,7 @@ export const InviteMembersPage = withCardStateProvider(() => {
   const card = useCardState();
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
   const { organization } = useCoreOrganization();
+  //@ts-expect-error
   const { __unstable_manageBillingUrl, __unstable_manageBillingMembersLimit } = useOrganizationProfileContext();
 
   if (!organization) {
