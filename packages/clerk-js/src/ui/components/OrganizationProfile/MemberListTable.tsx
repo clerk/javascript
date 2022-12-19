@@ -10,6 +10,7 @@ import {
   Table,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tr,
@@ -88,10 +89,17 @@ export const MembersListTable = (props: MembersListTableProps) => {
 const EmptyRow = () => {
   return (
     <Tr>
-      <Td
-        colSpan={3}
-        localizationKey={localizationKeys('organizationProfile.membersPage.detailsTitle__emptyRow')}
-      />
+      <Td colSpan={4}>
+        <Text
+          localizationKey={localizationKeys('organizationProfile.membersPage.detailsTitle__emptyRow')}
+          sx={t => ({
+            margin: 'auto',
+            display: 'block',
+            width: 'fit-content',
+            fontSize: t.fontSizes.$xs,
+          })}
+        />
+      </Td>
     </Tr>
   );
 };

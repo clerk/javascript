@@ -6,6 +6,8 @@ import { Box, BoxProps } from './Box';
 const { applyVariants, filterProps } = createVariants(theme => {
   return {
     base: {
+      borderBottom: theme.borders.$normal,
+      borderColor: theme.colors.$blackAlpha300,
       borderCollapse: 'collapse',
       'td:not(:first-of-type)': {
         paddingLeft: theme.space.$2,

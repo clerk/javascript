@@ -59,8 +59,11 @@ const RowInformation = (props: RowInfoProps) => {
         })}
         localizationKey={localizationKeys('paginationRowText__displaying')}
       />{' '}
-      <Text as='span'>
-        {startingRow} - {endingRow}
+      <Text
+        as='span'
+        sx={t => ({ fontWeight: t.fontWeights.$medium })}
+      >
+        {startingRow === endingRow && [0, 1].includes(startingRow) ? startingRow : `${startingRow} – ${endingRow}`}
       </Text>{' '}
       <Text
         as='span'
