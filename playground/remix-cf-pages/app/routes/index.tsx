@@ -1,30 +1,30 @@
-import { json, LoaderFunction } from '@remix-run/cloudflare';
+import { json, LoaderFunction, redirect } from '@remix-run/cloudflare';
 import { useLoaderData } from '@remix-run/react';
 import { getAuth } from '@clerk/remix/experimental/ssr.server';
 import { createClerkClient } from '@clerk/remix/experimental/api.server';
-import { useUser, SignedIn, SignedOut, ClerkLoaded, RedirectToSignIn, UserButton } from '@clerk/remix/experimental';
+import { ClerkLoaded, SignedIn, UserButton, useUser } from '@clerk/remix/experimental';
 
 export const loader: LoaderFunction = async args => {
-  const authState = await getAuth(args);
+  const { userId } = await getAuth(args);
+  if (!userId) {
+    return redirect('/sign-in');
+  }
 
-  const { data: count } = await createClerkClient({
-    apiKey: args.context['CLERK_API_KEY'],
-  }).users.getCount();
+  const clerkClient = createClerkClient({ apiKey: args.context['CLERK_API_KEY'] });
+  const { data: count } = await clerkClient.users.getCount();
 
-  console.log('AuthState from loader:', authState);
-  return json({ userId: authState.userId, count });
+  console.log('AuthState from loader:', userId);
+  return json({ userId: userId, count });
 };
 
 export default function Index() {
   const { user, isLoaded } = useUser();
   const { userId, count } = useLoaderData();
+
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif', lineHeight: '1.4' }}>
       <h1>Welcome to Remix</h1>
       <div>
-        <SignedOut>
-          <RedirectToSignIn />
-        </SignedOut>
         <ul>
           <li>Total users: {count}</li>
           <li>
