@@ -514,7 +514,6 @@ type _LocalizationResource = {
   };
   createOrganization: {
     title: LocalizationValue;
-    subtitle: LocalizationValue;
     invitePage: {
       formButtonReset: LocalizationValue;
     };

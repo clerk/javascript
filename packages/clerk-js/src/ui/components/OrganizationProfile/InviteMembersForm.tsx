@@ -3,7 +3,16 @@ import React from 'react';
 
 import { ClerkAPIResponseError } from '../../../core/resources/Error';
 import { Flex, Text } from '../../customizables';
-import { Alert, Form, FormButtonContainer, Select, TagInput, useCardState } from '../../elements';
+import {
+  Alert,
+  Form,
+  FormButtonContainer,
+  Select,
+  SelectButton,
+  SelectOptionList,
+  TagInput,
+  useCardState,
+} from '../../elements';
 import { useNavigate } from '../../hooks';
 import { LocalizationKey, localizationKeys, useLocalizations } from '../../localization';
 import { handleError, roleLocalizationKey, useFormControl } from '../../utils';
@@ -116,7 +125,12 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
             <Select
               {...roleField.props}
               onChange={option => roleField.setValue(option.value)}
-            />
+            >
+              <SelectButton sx={t => ({ width: t.sizes.$48, justifyContent: 'space-between', display: 'flex' })}>
+                {roleField.props.options?.find(o => o.value === roleField.value)?.label}
+              </SelectButton>
+              <SelectOptionList sx={t => ({ minWidth: t.sizes.$48 })} />
+            </Select>
           </Flex>
         </Form.ControlRow>
         <FormButtonContainer>

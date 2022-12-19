@@ -518,7 +518,6 @@ export const enUS: DeepRequired<LocalizationResource> = {
   },
   createOrganization: {
     title: 'Create Organization',
-    subtitle: 'Set the organization profile',
     invitePage: {
       formButtonReset: 'Skip',
     },

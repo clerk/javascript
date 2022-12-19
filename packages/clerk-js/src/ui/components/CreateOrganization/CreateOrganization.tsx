@@ -24,7 +24,7 @@ const _CreateOrganization = (_: CreateOrganizationProps) => {
 
 const AuthenticatedRoutes = withCoreUserGuard(() => {
   return (
-    <ProfileCard>
+    <ProfileCard sx={t => ({ width: t.sizes.$120 })}>
       <ProfileCardContent>
         <CreateOrganizationPage />
       </ProfileCardContent>
