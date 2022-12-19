@@ -1,6 +1,6 @@
 {
   "name": "@clerk/edge",
-  "version": "1.12.22-staging.0",
+  "version": "1.12.22-staging.1",
   "license": "MIT",
   "description": "Clerk SDK for serverless and edge environments",
   "keywords": [
@@ -38,8 +38,8 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@clerk/backend-core": "^2.12.1-staging.0",
-    "@clerk/types": "^3.23.0-staging.0",
+    "@clerk/backend-core": "^2.12.1-staging.1",
+    "@clerk/types": "^3.23.0-staging.1",
     "@peculiar/webcrypto": "1.4.1",
     "@types/node": "16.18.6"
   },
