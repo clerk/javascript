@@ -48,7 +48,7 @@ describe('UsernamePage', () => {
       const { userEvent } = render(<UsernamePage />, { wrapper });
 
       await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
-      expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('..');
     });
   });
 });

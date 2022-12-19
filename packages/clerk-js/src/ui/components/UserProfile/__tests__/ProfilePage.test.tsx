@@ -110,7 +110,7 @@ describe('ProfilePage', () => {
       const { userEvent } = render(<ProfilePage />, { wrapper });
 
       await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
-      expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('..');
     });
 
     it('pressing cancel navigates to the root page', async () => {
@@ -123,7 +123,7 @@ describe('ProfilePage', () => {
       const { userEvent } = render(<ProfilePage />, { wrapper });
 
       await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
-      expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('..');
     });
 
     it('continue button is disabled by default', async () => {
