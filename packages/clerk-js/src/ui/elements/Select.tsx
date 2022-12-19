@@ -349,6 +349,7 @@ export const SelectButton = (props: PropsOfComponent<typeof Button>) => {
       onClick={onTriggerClick}
       sx={[
         theme => ({
+          fontWeight: theme.fontWeights.$normal,
           color: theme.colors.$colorInputText,
           backgroundColor: theme.colors.$colorInputBackground,
           ...common.borderVariants(theme).normal,

@@ -23,6 +23,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
   const { navigate } = useNavigate();
   const card = useCardState();
   const { membership } = useCoreOrganization();
+  //@ts-expect-error
   const { __unstable_manageBillingUrl } = useOrganizationProfileContext();
   const isAdmin = membership?.role === 'admin';
 
@@ -67,15 +68,9 @@ export const OrganizationMembers = withCardStateProvider(() => {
         </Flex>
         <Tabs>
           <TabsList>
-            <Tab>
-              <Text localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__active')} />
-            </Tab>
+            <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__active')} />
             {isAdmin && (
-              <Tab>
-                <Text
-                  localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__invited')}
-                />
-              </Tab>
+              <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__invited')} />
             )}
           </TabsList>
           <TabPanels>
