@@ -136,8 +136,8 @@ export function handleMiddlewareResult({ req, res, authResult }: HandleMiddlewar
       // request headers, we don't need to fall back to the searchParams strategy.
       // In this case, we won't set them at all in order to avoid having them visible in the req.url
       setRequestHeadersOnNextResponse(res, req, { [AUTH_RESULT]: authResult });
-      const hdrs = [] as string[];
-      res.headers.forEach(h => hdrs.push(h));
+      const hdrs = [] as string[][];
+      res.headers.forEach((v, k) => hdrs.push([k, v]));
       console.log('appdir :: handleMiddlewareResult', hdrs);
     } else {
       res.headers.set(AUTH_RESULT, authResult);
