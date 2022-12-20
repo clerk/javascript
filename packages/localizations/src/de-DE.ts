@@ -504,6 +504,7 @@ export const deDe: DeepRequired<LocalizationResource> = {
       successMessage: 'Einladungen erfolgreich versendet',
       detailsTitle__inviteFailed:
         'Die Einladungen konnten nicht versendet werden. Beheben Sie Folgendes und versuchen Sie es erneut:',
+      formButtonPrimary__continue: 'Einladungen verschicken',
     },
     membersPage: {
       detailsTitle__emptyRow: 'Keine Mitglieder zum Anzeigen',

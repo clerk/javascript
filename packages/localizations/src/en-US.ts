@@ -495,6 +495,7 @@ export const enUS: DeepRequired<LocalizationResource> = {
       subtitle: 'Invite new members to this organization',
       successMessage: 'Invitations successfully sent',
       detailsTitle__inviteFailed: 'The invitations could not be sent. Fix the following and try again:',
+      formButtonPrimary__continue: 'Send invitations',
     },
     membersPage: {
       detailsTitle__emptyRow: 'No members to display',

@@ -115,6 +115,7 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
       <SuccessPage
         title={title}
         content={<InvitationsSentMessage />}
+        sx={t => ({ minHeight: t.sizes.$60 })}
         onFinish={completeFlow}
       />
     </Wizard>

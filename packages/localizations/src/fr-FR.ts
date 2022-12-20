@@ -503,6 +503,7 @@ export const frFR: DeepRequired<LocalizationResource> = {
       successMessage: 'Les invitations ont été envoyées.',
       detailsTitle__inviteFailed:
         'Les invitations suivantes n’ont pas pu être envoyées. Veuillez régler ce problème et réessayer:',
+      formButtonPrimary__continue: 'Envoyer des invitations',
     },
     membersPage: {
       detailsTitle__emptyRow: 'Aucun membre',

@@ -491,6 +491,7 @@ type _LocalizationResource = {
       subtitle: LocalizationValue;
       successMessage: LocalizationValue;
       detailsTitle__inviteFailed: LocalizationValue;
+      formButtonPrimary__continue: LocalizationValue;
     };
     membersPage: {
       detailsTitle__emptyRow: LocalizationValue;
