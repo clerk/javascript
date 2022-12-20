@@ -69,7 +69,13 @@ export const TabsList = (props: TabsListProps) => {
     <Flex
       elementDescriptor={descriptors.tabListContainer}
       onKeyDown={onKeyDown}
-      sx={[theme => ({ borderBottom: theme.borders.$normal, borderColor: theme.colors.$blackAlpha300 }), sx]}
+      sx={[
+        theme => ({
+          borderBottom: theme.borders.$normal,
+          borderColor: theme.colors.$blackAlpha300,
+        }),
+        sx,
+      ]}
       {...rest}
     >
       {childrenWithProps}
@@ -128,6 +134,7 @@ export const Tab = (props: TabProps) => {
           gap: t.space.$1x5,
           fontWeight: t.fontWeights.$medium,
           borderBottom: t.borders.$normal,
+          marginBottom: '-1px',
           borderColor: isActive ? t.colors.$blackAlpha700 : t.colors.$transparent,
           borderRadius: 0,
           width: 'fit-content',
