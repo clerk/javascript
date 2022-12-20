@@ -49,23 +49,24 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
       elementDescriptor={descriptors.organizationSwitcherPopoverActions}
       sx={t => ({
         backgroundColor: t.colors.$blackAlpha20,
-        border: `${t.borders.$normal} ${t.colors.$blackAlpha200}`,
+        borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha200}`,
         borderRight: 0,
         borderLeft: 0,
-        paddingBottom: t.space.$2,
-        gap: 2,
       })}
     >
-      {currentOrg && !hidePersonal && (
-        <Actions
-          elementDescriptor={descriptors.organizationSwitcherPopoverActions}
-          sx={t => ({
-            borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha200}`,
-            padding: `${t.space.$2} 0`,
-          })}
-        >
+      <Box
+        sx={t => ({
+          maxHeight: `calc(4 * ${t.sizes.$12})`,
+          overflowY: 'auto',
+          ...common.unstyledScrollbar(t),
+        })}
+      >
+        {currentOrg && !hidePersonal && (
           <PreviewButton
             block
+            sx={t => ({
+              height: t.space.$12,
+            })}
             onClick={onPersonalWorkspaceClick}
           >
             <PersonalWorkspacePreview
@@ -75,16 +76,7 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
               title={localizationKeys('organizationSwitcher.personalWorkspace')}
             />
           </PreviewButton>
-        </Actions>
-      )}
-      <Box
-        sx={t => ({
-          paddingTop: t.space.$2,
-          maxHeight: `calc(3 * ${t.sizes.$12} + ${t.space.$2})`,
-          overflowY: 'auto',
-          ...common.unstyledScrollbar(t),
-        })}
-      >
+        )}
         {otherOrgs.map(organization => (
           <PreviewButton
             block
