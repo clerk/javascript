@@ -14,6 +14,12 @@ export function setPrivateAuthResultOnRequest({ req, authResult }: RequestProps)
 
 // Tries to extract auth result from the request using several strategies
 export function getAuthResultFromRequest(req: RequestLike): string | null | undefined {
+  console.log(
+    'appdir :: getAuthResultFromRequest',
+    getPrivateAuthResult(req),
+    getHeader(req, AUTH_RESULT),
+    getQueryParam(req, AUTH_RESULT),
+  );
   return getPrivateAuthResult(req) || getHeader(req, AUTH_RESULT) || getQueryParam(req, AUTH_RESULT);
 }
 
