@@ -29,8 +29,11 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
     const router = useRouter();
     const {
       hidePersonal,
+      //@ts-expect-error
       __unstable_manageBillingUrl,
+      //@ts-expect-error
       __unstable_manageBillingLabel,
+      //@ts-expect-error
       __unstable_manageBillingMembersLimit,
       createOrganizationMode,
       organizationProfileMode,
@@ -72,6 +75,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       }
       openOrganizationProfile({
         afterLeaveOrganizationUrl,
+        //@ts-expect-error
         __unstable_manageBillingUrl,
         __unstable_manageBillingLabel,
         __unstable_manageBillingMembersLimit,
@@ -113,7 +117,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
                 />
                 <Flex
                   direction='col'
-                  sx={t => ({ margin: `${t.space.$2} 0` })}
+                  sx={t => ({ marginTop: t.space.$2 })}
                 >
                   {manageOrganizationButton}
                   {__unstable_manageBillingUrl && billingOrganizationButton}
