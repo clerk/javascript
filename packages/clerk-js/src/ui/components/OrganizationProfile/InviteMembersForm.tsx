@@ -137,6 +137,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
           <Form.SubmitButton
             block={false}
             isDisabled={!canSubmit}
+            localizationKey={localizationKeys('organizationProfile.invitePage.formButtonPrimary__continue')}
           />
           <Form.ResetButton
             localizationKey={resetButtonLabel || localizationKeys('userProfile.formButtonReset')}

@@ -1,6 +1,7 @@
 import { MembershipRole, OrganizationInvitationResource } from '@clerk/types';
 import { describe } from '@jest/globals';
 import { waitFor } from '@testing-library/dom';
+import React from 'react';
 
 import { ClerkAPIResponseError } from '../../../../core/resources';
 import { render } from '../../../../testUtils';
@@ -11,7 +12,7 @@ const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
 describe('InviteMembersPage', () => {
   it('renders the component', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
+    const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
     });
@@ -21,7 +22,7 @@ describe('InviteMembersPage', () => {
   });
 
   describe('Submitting', () => {
-    it('enables the Continue button when one or more email has been entered', async () => {
+    it('enables the Send button when one or more email has been entered', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
@@ -31,15 +32,15 @@ describe('InviteMembersPage', () => {
       });
 
       const { getByRole, userEvent, getByPlaceholderText } = render(<InviteMembersPage />, { wrapper });
-      expect(getByRole('button', { name: 'Continue' })).toBeDisabled();
+      expect(getByRole('button', { name: 'Send invitations' })).toBeDisabled();
       await userEvent.type(
         getByPlaceholderText('Enter or paste one or more email addresses, separated by spaces or commas'),
         'test+1@clerk.dev,',
       );
-      expect(getByRole('button', { name: 'Continue' })).not.toBeDisabled();
+      expect(getByRole('button', { name: 'Send invitations' })).not.toBeDisabled();
     });
 
-    it('sends invite to email entered and basic member role when clicking Continue', async () => {
+    it('sends invite to email entered and basic member role when clicking Send', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
@@ -54,7 +55,7 @@ describe('InviteMembersPage', () => {
         getByPlaceholderText('Enter or paste one or more email addresses, separated by spaces or commas'),
         'test+1@clerk.dev,',
       );
-      await userEvent.click(getByRole('button', { name: 'Continue' }));
+      await userEvent.click(getByRole('button', { name: 'Send invitations' }));
       expect(fixtures.clerk.organization?.inviteMembers).toHaveBeenCalledWith({
         emailAddresses: ['test+1@clerk.dev'],
         role: 'basic_member' as MembershipRole,
@@ -76,7 +77,7 @@ describe('InviteMembersPage', () => {
         getByPlaceholderText('Enter or paste one or more email addresses, separated by spaces or commas'),
         'test+1@clerk.dev,test+2@clerk.dev,test+3@clerk.dev,test+4@clerk.dev,',
       );
-      await userEvent.click(getByRole('button', { name: 'Continue' }));
+      await userEvent.click(getByRole('button', { name: 'Send invitations' }));
       expect(fixtures.clerk.organization?.inviteMembers).toHaveBeenCalledWith({
         emailAddresses: ['test+1@clerk.dev', 'test+2@clerk.dev', 'test+3@clerk.dev', 'test+4@clerk.dev'],
         role: 'basic_member' as MembershipRole,
@@ -100,7 +101,7 @@ describe('InviteMembersPage', () => {
       );
       await userEvent.click(getByRole('button', { name: 'Member' }));
       await userEvent.click(getByText('Admin'));
-      await userEvent.click(getByRole('button', { name: 'Continue' }));
+      await userEvent.click(getByRole('button', { name: 'Send invitations' }));
       expect(fixtures.clerk.organization?.inviteMembers).toHaveBeenCalledWith({
         emailAddresses: ['test+1@clerk.dev'],
         role: 'admin' as MembershipRole,
@@ -134,7 +135,7 @@ describe('InviteMembersPage', () => {
         getByPlaceholderText('Enter or paste one or more email addresses, separated by spaces or commas'),
         'test+1@clerk.dev,',
       );
-      await userEvent.click(getByRole('button', { name: 'Continue' }));
+      await userEvent.click(getByRole('button', { name: 'Send invitations' }));
       await waitFor(() =>
         expect(getByText('The invitations could not be sent. Fix the following and try again:')).toBeDefined(),
       );
