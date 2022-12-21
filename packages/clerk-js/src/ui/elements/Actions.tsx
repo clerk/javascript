@@ -10,6 +10,20 @@ export const Actions = (props: PropsOfComponent<typeof Flex>) => {
   return <Col {...props} />;
 };
 
+export const DarkerActions = (props: PropsOfComponent<typeof Flex>) => {
+  return (
+    <Actions
+      sx={t => ({
+        backgroundColor: t.colors.$blackAlpha20,
+        border: `${t.borders.$normal} ${t.colors.$blackAlpha200}`,
+        borderRight: 0,
+        borderLeft: 0,
+      })}
+      {...props}
+    />
+  );
+};
+
 type ActionProps = Omit<PropsOfComponent<typeof Button>, 'label'> & {
   icon: React.ComponentType;
   label: LocalizationKey;

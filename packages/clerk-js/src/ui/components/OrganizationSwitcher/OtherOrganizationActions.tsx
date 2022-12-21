@@ -9,7 +9,7 @@ import {
   useOrganizationSwitcherContext,
 } from '../../contexts';
 import { Box, descriptors, localizationKeys } from '../../customizables';
-import { Action, Actions, OrganizationPreview, PersonalWorkspacePreview, PreviewButton } from '../../elements';
+import { Action, DarkerActions, OrganizationPreview, PersonalWorkspacePreview, PreviewButton } from '../../elements';
 import { common } from '../../styledSystem';
 
 type OrganizationActionListProps = {
@@ -44,15 +44,7 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
   );
 
   return (
-    <Actions
-      elementDescriptor={descriptors.organizationSwitcherPopoverActions}
-      sx={t => ({
-        backgroundColor: t.colors.$blackAlpha20,
-        borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha200}`,
-        borderRight: 0,
-        borderLeft: 0,
-      })}
-    >
+    <DarkerActions elementDescriptor={descriptors.organizationSwitcherPopoverActions}>
       <Box
         sx={t => ({
           maxHeight: `calc(4 * ${t.sizes.$12})`,
@@ -92,6 +84,6 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
         ))}
       </Box>
       {createOrganizationButton}
-    </Actions>
+    </DarkerActions>
   );
 };

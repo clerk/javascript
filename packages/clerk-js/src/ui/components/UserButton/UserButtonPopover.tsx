@@ -3,11 +3,10 @@ import React from 'react';
 
 import { useCoreSession, useCoreUser, useEnvironment, useUserButtonContext } from '../../contexts';
 import { descriptors, localizationKeys } from '../../customizables';
-import { Action, Actions, PopoverCard, PreviewButton, UserPreview } from '../../elements';
+import { Action, Actions, DarkerActions, PopoverCard, PreviewButton, UserPreview } from '../../elements';
 import { RootBox } from '../../elements/RootBox';
 import { CogFilled, Plus, SignOut, SignOutDouble, SwitchArrows } from '../../icons';
 import { PropsOfComponent } from '../../styledSystem';
-import { SessionActions } from './OtherSessionActions';
 import { useMultisessionActions } from './useMultisessionActions';
 
 type UserButtonPopoverProps = { close: () => void } & PropsOfComponent<typeof PopoverCard.Root>;
@@ -36,7 +35,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
 
   const sessionActions = authConfig.singleSessionMode ? null : otherSessions.length > 0 ? (
     <>
-      <SessionActions>
+      <DarkerActions>
         {otherSessions.map(session => (
           <PreviewButton
             key={session.id}
@@ -53,7 +52,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
           </PreviewButton>
         ))}
         {addAccountButton}
-      </SessionActions>
+      </DarkerActions>
       <Actions>
         <Action
           icon={SignOutDouble}
@@ -63,7 +62,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
       </Actions>
     </>
   ) : (
-    <SessionActions>{addAccountButton}</SessionActions>
+    <DarkerActions>{addAccountButton}</DarkerActions>
   );
 
   return (
