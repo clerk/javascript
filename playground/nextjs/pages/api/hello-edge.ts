@@ -6,8 +6,8 @@ export const config = {
 };
 
 export default async function handler(req: NextRequest) {
+  // @ts-ignore
   const { userId } = getAuth(req);
-  console.log('/api/hello-edge ', auth.userId, req.nextUrl.toString());
 
   return new Response(
     JSON.stringify({

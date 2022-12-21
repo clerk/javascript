@@ -12,6 +12,7 @@ const UserProfilePage: NextPage = () => {
       {Object.entries(controlComponents).map(entry => {
         return (
           <RenderRedirectToggle
+            key={entry[0]}
             name={entry[0]}
             Component={entry[1]}
           />
