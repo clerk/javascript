@@ -9,8 +9,15 @@ import {
   useCoreUser,
   useOrganizationSwitcherContext,
 } from '../../contexts';
-import { descriptors, Flex, localizationKeys } from '../../customizables';
-import { Action, OrganizationPreview, PersonalWorkspacePreview, PopoverCard, useCardState } from '../../elements';
+import { descriptors, localizationKeys } from '../../customizables';
+import {
+  Action,
+  Actions,
+  OrganizationPreview,
+  PersonalWorkspacePreview,
+  PopoverCard,
+  useCardState,
+} from '../../elements';
 import { RootBox } from '../../elements/RootBox';
 import { Billing, CogFilled } from '../../icons';
 import { useRouter } from '../../router';
@@ -113,15 +120,12 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
                   gap={4}
                   organization={currentOrg}
                   user={user}
-                  sx={theme => ({ padding: `0 ${theme.space.$6}` })}
+                  sx={theme => t => ({ padding: `0 ${theme.space.$6}`, marginBottom: t.space.$2 })}
                 />
-                <Flex
-                  direction='col'
-                  sx={t => ({ marginTop: t.space.$2 })}
-                >
+                <Actions>
                   {manageOrganizationButton}
                   {__unstable_manageBillingUrl && billingOrganizationButton}
-                </Flex>
+                </Actions>
               </>
             ) : (
               !hidePersonal && (
