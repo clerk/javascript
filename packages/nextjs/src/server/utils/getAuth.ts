@@ -22,13 +22,12 @@ export const createGetAuth = ({ sessions }: CreateGetAuthParams): GetAuth => {
     const authResult = getAuthResultFromRequest(req);
 
     if (!authResult) {
-      console.log('appdir :: getAuth :: no authresult');
-      //   throw new Error(
-      //     'You need to use "withClerkMiddleware" in your Next.js middleware file. See https://clerk.dev/docs/quickstarts/get-started-with-nextjs',
-      //   );
+      throw new Error(
+        'You need to use "withClerkMiddleware" in your Next.js middleware file. See https://clerk.dev/docs/quickstarts/get-started-with-nextjs',
+      );
     }
 
-    if (!!authResult && authResult !== AuthResult.StandardSignedIn) {
+    if (authResult !== AuthResult.StandardSignedIn) {
       // Signed out case assumed
       return { sessionId: null, userId: null, orgId: null, getToken: signedOutGetToken, claims: null };
     }
