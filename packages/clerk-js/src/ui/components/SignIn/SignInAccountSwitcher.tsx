@@ -1,12 +1,11 @@
 import { withRedirectToHome } from '../../common/withRedirectToHome';
 import { useEnvironment, useSignInContext } from '../../contexts';
-import { Button, Col, descriptors, Flow, Icon } from '../../customizables';
-import { Card, CardAlert, Header, UserPreview, UserPreviewProps, withCardStateProvider } from '../../elements';
+import { Col, descriptors, Flow, Icon } from '../../customizables';
+import { Card, CardAlert, Header, PreviewButton, UserPreview, withCardStateProvider } from '../../elements';
 import { ArrowBlockButton } from '../../elements/ArrowBlockButton';
 import { useCardState } from '../../elements/contexts';
 import { useNavigate } from '../../hooks';
 import { Plus, SignOutDouble } from '../../icons';
-import { PropsOfComponent } from '../../styledSystem';
 import { useMultisessionActions } from '../UserButton/useMultisessionActions';
 
 const _SignInAccountSwitcher = () => {
@@ -37,11 +36,13 @@ const _SignInAccountSwitcher = () => {
         >
           <Col>
             {activeSessions.map(s => (
-              <UserPreviewButton
+              <PreviewButton
                 key={s.id}
-                user={s.user}
                 onClick={handleSessionClicked(s)}
-              />
+                sx={theme => ({ height: theme.sizes.$14, justifyContent: 'flex-start' })}
+              >
+                <UserPreview user={s.user} />
+              </PreviewButton>
             ))}
           </Col>
           <Col gap={2}>
@@ -77,24 +78,3 @@ const _SignInAccountSwitcher = () => {
   );
 };
 export const SignInAccountSwitcher = withRedirectToHome(withCardStateProvider(_SignInAccountSwitcher));
-
-type UserPreviewButtonProps = PropsOfComponent<typeof Button> & UserPreviewProps;
-
-const UserPreviewButton = (props: UserPreviewButtonProps) => {
-  const card = useCardState();
-  const { user, ...rest } = props;
-
-  return (
-    <Button
-      variant='ghost'
-      colorScheme='neutral'
-      focusRing={false}
-      hoverAsFocus
-      isDisabled={card.isLoading}
-      sx={theme => ({ height: theme.sizes.$14, justifyContent: 'flex-start' })}
-      {...rest}
-    >
-      <UserPreview user={user} />
-    </Button>
-  );
-};
