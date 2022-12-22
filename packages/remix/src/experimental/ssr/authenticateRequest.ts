@@ -1,4 +1,4 @@
-import { type RequestState, default as Clerk } from '@clerk/backend';
+import { type RequestState, Clerk } from '@clerk/backend';
 
 import { noApiKeyError, noFrontendApiError } from '../errors';
 import { assertEnvVar, getEnvVariable } from '../utils';
