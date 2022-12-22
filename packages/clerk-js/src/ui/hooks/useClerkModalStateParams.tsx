@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { readAndRemoveStateParam, removeClerkQueryParam } from '../../utils';
+import { readStateParam, removeClerkQueryParam } from '../../utils';
 
-export const useReadParamState = () => {
+export const useClerkModalStateParams = () => {
   const contentRef = React.useRef({ path: '', componentName: '' });
-  const decodedRedirectParams = readAndRemoveStateParam();
+  const decodedRedirectParams = readStateParam();
 
   React.useLayoutEffect(() => {
     if (decodedRedirectParams) {
@@ -16,7 +16,7 @@ export const useReadParamState = () => {
     contentRef.current = { path: '', componentName: '' };
   };
 
-  const removeQueryParam = () => removeClerkQueryParam('__clerk_state');
+  const removeQueryParam = () => removeClerkQueryParam('__clerk_modal_state');
 
   return { urlStateParam: contentRef.current, decodedRedirectParams, clearUrlStateParam, removeQueryParam };
 };

@@ -1,7 +1,7 @@
 import React from 'react';
 
+import { useClerkModalStateParams } from '../hooks';
 import { BaseRouter } from './BaseRouter';
-
 export const VIRTUAL_ROUTER_BASE_PATH = 'CLERK-ROUTER/VIRTUAL';
 
 interface VirtualRouterProps {
@@ -20,6 +20,11 @@ export const VirtualRouter = ({
   const [currentURL, setCurrentURL] = React.useState(
     new URL('/' + VIRTUAL_ROUTER_BASE_PATH + startPath, window.location.origin),
   );
+  const { urlStateParam, removeQueryParam } = useClerkModalStateParams();
+
+  if (urlStateParam.componentName) {
+    removeQueryParam();
+  }
 
   const internalNavigate = (toURL: URL | undefined) => {
     if (!toURL) {
@@ -41,6 +46,7 @@ export const VirtualRouter = ({
       internalNavigate={internalNavigate}
       onExternalNavigate={onExternalNavigate}
       preservedParams={preservedParams}
+      urlStateParam={urlStateParam}
     >
       {children}
     </BaseRouter>

@@ -3,7 +3,7 @@ import React from 'react';
 
 import { getQueryParams, trimTrailingSlash } from '../../utils';
 import { useCoreClerk } from '../contexts';
-import { useReadParamState, useWindowEventListener } from '../hooks';
+import { useWindowEventListener } from '../hooks';
 import { newPaths } from './newPaths';
 import { match } from './pathToRegexp';
 import { Route } from './Route';
@@ -18,6 +18,7 @@ interface BaseRouterProps {
   onExternalNavigate?: () => any;
   refreshEvents?: Array<keyof WindowEventMap>;
   preservedParams?: string[];
+  urlStateParam?: { path: string; componentName: string };
   children: React.ReactNode;
 }
 
@@ -30,10 +31,10 @@ export const BaseRouter = ({
   onExternalNavigate,
   refreshEvents,
   preservedParams,
+  urlStateParam,
   children,
 }: BaseRouterProps): JSX.Element => {
   const { navigate: externalNavigate } = useCoreClerk();
-  const { urlStateParam, removeQueryParam } = useReadParamState();
 
   const [routeParts, setRouteParts] = React.useState({
     path: getPath(),
@@ -80,7 +81,6 @@ export const BaseRouter = ({
   }, [currentPath, currentQueryString, getPath, getQueryString]);
 
   useWindowEventListener(refreshEvents, refresh);
-  removeQueryParam();
 
   // TODO: Look into the real possible types of globalNavigate
   const baseNavigate = async (toURL: URL | undefined): Promise<unknown> => {

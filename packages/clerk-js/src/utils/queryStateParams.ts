@@ -1,25 +1,25 @@
-import { getClerkQueryParam } from '../utils';
+import { encodeB64, getClerkQueryParam } from '../utils';
+
+export const buildUrl = ({ base, path }: { base: string; path: string | undefined }) => {
+  if (!path) {
+    return base;
+  }
+
+  return base + path;
+};
 
 export const decodeBase64Json = (value: string) => {
   return JSON.parse(atob(value));
 };
 
-export const encodeBase64Json = (value: { path: string; componentName: string }) => {
-  return btoa(JSON.stringify(value));
-};
+export const readStateParam = () => {
+  const urlClerkState = getClerkQueryParam('__clerk_modal_state') ?? '';
 
-export const readAndRemoveStateParam = () => {
-  const urlClerkState = getClerkQueryParam('__clerk_state') ?? '';
-
-  return urlClerkState ? decodeBase64Json(urlClerkState) : null;
+  return urlClerkState ? JSON.parse(atob(urlClerkState)) : null;
 };
 
 type SerializeAndAppendModalStateProps = { url: string; currentPath: string; componentName: string };
-export const serializeAndAppendModalState = ({
-  url,
-  currentPath,
-  componentName,
-}: SerializeAndAppendModalStateProps) => {
+export const appendModalState = ({ url, currentPath = '', componentName }: SerializeAndAppendModalStateProps) => {
   const regexPattern = /CLERK-ROUTER\/VIRTUAL\/.*\//;
 
   const redirectParams = {
@@ -27,12 +27,12 @@ export const serializeAndAppendModalState = ({
     componentName,
   };
 
-  const encodedRedirectParams = encodeBase64Json(redirectParams);
+  const encodedRedirectParams = encodeB64(JSON.stringify(redirectParams));
 
   const urlWithParams = new URL(url);
   const searchParams = urlWithParams.searchParams;
 
-  searchParams.set('__clerk_state', encodedRedirectParams);
+  searchParams.set('__clerk_modal_state', encodedRedirectParams);
 
   urlWithParams.search = searchParams.toString();
 

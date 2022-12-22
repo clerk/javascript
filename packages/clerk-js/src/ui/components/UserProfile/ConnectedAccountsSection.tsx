@@ -2,7 +2,8 @@ import type { OAuthStrategy } from '@clerk/types';
 import type { ExternalAccountResource } from '@clerk/types/src';
 
 import { useRouter } from '../../../ui/router';
-import { useCoreUser } from '../../contexts';
+import { appendModalState } from '../../../utils';
+import { useCoreUser, useUserProfileContext } from '../../contexts';
 import { Badge, Col, descriptors, Flex, Image, localizationKeys } from '../../customizables';
 import { ProfileSection, useCardState, UserPreview } from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
@@ -48,9 +49,10 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
   const { providerToDisplayData } = useEnabledThirdPartyProviders();
   const error = account.verification?.error?.longMessage;
   const label = account.username || account.emailAddress;
-  const defaultOpen = !!router.urlStateParam.path;
+  const defaultOpen = !!router.urlStateParam?.componentName;
+  const { componentName, mode } = useUserProfileContext();
+  const isModal = mode === 'modal';
 
-  // console.log(defaultOpen, 'defaultOpen ')
   return (
     <UserProfileAccordion
       defaultOpen={defaultOpen}
@@ -102,7 +104,9 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
               return user
                 .createExternalAccount({
                   strategy: account.verification!.strategy as OAuthStrategy,
-                  redirect_url: window.location.href,
+                  redirect_url: isModal
+                    ? appendModalState({ url: window.location.href, currentPath: '', componentName })
+                    : window.location.href,
                 })
                 .then(res => navigate(res.verification!.externalVerificationRedirectURL))
                 .catch(err => handleError(err, [], card.setError));

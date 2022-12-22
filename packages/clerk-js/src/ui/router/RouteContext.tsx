@@ -17,7 +17,7 @@ export interface RouteContextValue {
   queryParams: ParsedQs;
   preservedParams?: string[];
   getMatchData: (path?: string, index?: boolean) => false | object;
-  urlStateParam: { path: string; componentName: string };
+  urlStateParam?: { path: string; componentName: string };
 }
 
 export const RouteContext = React.createContext<RouteContextValue | null>(null);

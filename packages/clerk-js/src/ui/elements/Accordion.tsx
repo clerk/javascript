@@ -26,19 +26,22 @@ export const AccordionItem = (props: AccordionItemProps) => {
   };
 
   React.useEffect(() => {
-    setTimeout(() => {
-      setIsOpen(defaultOpen);
-    }, 0);
+    setIsOpen(defaultOpen);
   }, [defaultOpen]);
 
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
+    let requestRef: number;
     if (scrollOnOpen && isOpen && contentRef.current) {
-      contentRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      requestRef = requestAnimationFrame(() => {
+        contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
     }
-  }, [isOpen, scrollOnOpen, contentRef.current]);
+
+    return () => cancelAnimationFrame(requestRef);
+  }, [isOpen]);
 
   return (
-    <Col ref={contentRef}>
+    <Col>
       <ArrowBlockButton
         elementDescriptor={descriptors.accordionTriggerButton}
         variant='ghost'
@@ -65,6 +68,7 @@ export const AccordionItem = (props: AccordionItemProps) => {
       </ArrowBlockButton>
       {isOpen && (
         <Col
+          ref={contentRef}
           elementDescriptor={descriptors.accordionContent}
           sx={t => ({
             animation: `${animations.blockBigIn} ${t.transitionDuration.$slow} ease`,

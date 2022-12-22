@@ -1,7 +1,7 @@
 import type { ExternalAccountResource, OAuthStrategy } from '@clerk/types';
 import React from 'react';
 
-import { serializeAndAppendModalState } from '../../../utils';
+import { appendModalState } from '../../../utils';
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser, useUserProfileContext } from '../../contexts';
 import { Col, Image, localizationKeys, Text } from '../../customizables';
@@ -65,7 +65,7 @@ const AddConnectedAccount = () => {
       .createExternalAccount({
         strategy: strategy,
         redirect_url: isModal
-          ? serializeAndAppendModalState({ url: window.location.href, currentPath: '#/user', componentName })
+          ? appendModalState({ url: window.location.href, currentPath: '', componentName })
           : window.location.href,
       })
       .then(res => {

@@ -15,6 +15,7 @@ import { createRoot } from 'react-dom/client';
 
 import { PRESERVED_QUERYSTRING_PARAMS } from '../core/constants';
 import { clerkUIErrorDOMElementNotFound } from '../core/errors';
+import { buildUrl } from '../utils';
 import { CreateOrganization, CreateOrganizationModal } from './components/CreateOrganization';
 import { ImpersonationFab } from './components/ImpersonationFab';
 import { OrganizationProfile, OrganizationProfileModal } from './components/OrganizationProfile';
@@ -27,7 +28,7 @@ import { EnvironmentProvider, OptionsProvider } from './contexts';
 import { CoreClerkContextWrapper } from './contexts/CoreClerkContextWrapper';
 import { AppearanceProvider } from './customizables';
 import { FlowMetadataProvider, Modal } from './elements';
-import { useReadParamState, useSafeLayoutEffect } from './hooks';
+import { useClerkModalStateParams, useSafeLayoutEffect } from './hooks';
 import Portal from './portal';
 import { VirtualRouter } from './router';
 import { InternalThemeProvider } from './styledSystem';
@@ -156,7 +157,7 @@ const Components = (props: ComponentsProps) => {
   const { signInModal, signUpModal, userProfileModal, organizationProfileModal, createOrganizationModal, nodes } =
     state;
 
-  const { urlStateParam, clearUrlStateParam, decodedRedirectParams } = useReadParamState();
+  const { urlStateParam, clearUrlStateParam, decodedRedirectParams } = useClerkModalStateParams();
 
   useSafeLayoutEffect(() => {
     if (decodedRedirectParams) {
@@ -219,7 +220,7 @@ const Components = (props: ComponentsProps) => {
             <VirtualRouter
               preservedParams={PRESERVED_QUERYSTRING_PARAMS}
               onExternalNavigate={() => componentsControls.closeModal('signIn')}
-              startPath={'/sign-in' + urlStateParam?.path}
+              startPath={buildUrl({ base: '/sign-in', path: urlStateParam?.path })}
             >
               <SignInModal {...signInModal} />
               <SignUpModal
@@ -246,7 +247,7 @@ const Components = (props: ComponentsProps) => {
             <VirtualRouter
               preservedParams={PRESERVED_QUERYSTRING_PARAMS}
               onExternalNavigate={() => componentsControls.closeModal('signUp')}
-              startPath={'/sign-up' + urlStateParam?.path}
+              startPath={buildUrl({ base: '/sign-up', path: urlStateParam?.path })}
             >
               <SignInModal
                 afterSignInUrl={signUpModal?.afterSignInUrl}
@@ -277,7 +278,7 @@ const Components = (props: ComponentsProps) => {
             <VirtualRouter
               preservedParams={PRESERVED_QUERYSTRING_PARAMS}
               onExternalNavigate={() => componentsControls.closeModal('userProfile')}
-              startPath={'/user' + urlStateParam?.path}
+              startPath={buildUrl({ base: '/user', path: urlStateParam?.path })}
             >
               <UserProfileModal />
             </VirtualRouter>
@@ -303,7 +304,7 @@ const Components = (props: ComponentsProps) => {
             <VirtualRouter
               preservedParams={PRESERVED_QUERYSTRING_PARAMS}
               onExternalNavigate={() => componentsControls.closeModal('organizationProfile')}
-              startPath={'/organization' + urlStateParam?.path}
+              startPath={buildUrl({ base: '/organization', path: urlStateParam?.path })}
             >
               <OrganizationProfileModal {...organizationProfileModal} />
             </VirtualRouter>
@@ -329,7 +330,7 @@ const Components = (props: ComponentsProps) => {
             <VirtualRouter
               preservedParams={PRESERVED_QUERYSTRING_PARAMS}
               onExternalNavigate={() => componentsControls.closeModal('createOrganization')}
-              startPath={'/create-organization' + urlStateParam?.path}
+              startPath={buildUrl({ base: '/create-organization', path: urlStateParam?.path })}
             >
               <CreateOrganizationModal {...createOrganizationModal} />
             </VirtualRouter>
