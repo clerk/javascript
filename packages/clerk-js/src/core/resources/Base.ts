@@ -1,5 +1,6 @@
 import type { ClerkAPIErrorJSON, ClerkResourceJSON, ClerkResourceReloadParams, DeletedObjectJSON } from '@clerk/types';
 
+import { runWithExponentialBackOff } from '../../utils';
 import { clerkMissingFapiClientInResources } from '../errors';
 import type { FapiClient, FapiRequestInit, FapiResponseJSON, HTTPMethod } from '../fapiClient';
 import type { Clerk } from './internal';
@@ -31,7 +32,10 @@ export abstract class BaseResource {
       clerkMissingFapiClientInResources();
     }
 
-    const { payload, status, statusText } = await BaseResource.fapiClient.request<J>(requestInit);
+    const { payload, status, statusText } = await runWithExponentialBackOff(
+      () => BaseResource.fapiClient.request<J>(requestInit),
+      { maxRetries: 4, firstDelay: 800 },
+    );
 
     // TODO: Link to Client payload piggybacking design document
     if (requestInit.method !== 'GET' || opts.forceUpdateClient) {

@@ -31,7 +31,10 @@ const createExponentialDelayAsyncFn = (opts: { firstDelay: Milliseconds; timeMul
   };
 };
 
-export const runWithExponentialBackOff = async <T>(callback: () => T, options: BackoffOptions = {}): Promise<T> => {
+export const runWithExponentialBackOff = async <T>(
+  callback: () => T | Promise<T>,
+  options: BackoffOptions = {},
+): Promise<T> => {
   let iterationsCount = 0;
   const { maxRetries, shouldRetry, firstDelay, timeMultiple } = {
     ...defaultOptions,
