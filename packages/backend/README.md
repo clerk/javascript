@@ -52,7 +52,7 @@ npm install @clerk/backend
 ```
 
 ```
-import Clerk from '@clerk/backend';
+import { Clerk } from '@clerk/backend';
 
 const clerk = Clerk({ apiKey: '...' });
 
@@ -66,7 +66,7 @@ await clerk.users.getUser("user_...");
 Create Clerk SDK that includes an HTTP Rest client for the Backend API and session verification helpers. The clerk object contains the following APIs and methods:
 
 ```js
-import Clerk from '@clerk/backend';
+import { Clerk } from '@clerk/backend';
 
 const clerk = Clerk({ apiKey: '...' });
 
