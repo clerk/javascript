@@ -1,6 +1,7 @@
 {
   "name": "gatsby-plugin-clerk",
-  "private": true,
+  "private": false,
+  "version": "3.0.0-alpha.3",
   "license": "MIT",
   "description": "Clerk.dev SDK for Gatsby",
   "keywords": [
@@ -26,15 +27,16 @@
   ],
   "scripts": {
     "prepublishOnly": "npm run build",
-    "build": "tsc -p tsconfig.build.json",
-    "dev": "tsc -p tsconfig.build.json --watch",
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
     "clean": "rimraf ./dist",
     "lint": "eslint ."
   },
   "dependencies": {
-    "@clerk/clerk-react": "^4.5.5",
-    "@clerk/clerk-sdk-node": "^4.5.8",
-    "@clerk/types": "^3.20.0",
+    "@clerk/backend": "^0.3.1",
+    "@clerk/clerk-react": "^4.7.0",
+    "@clerk/clerk-sdk-node": "^4.5.14",
+    "@clerk/types": "^3.23.0",
     "cookie": "0.5.0",
     "tslib": "2.4.1"
   },
@@ -44,10 +46,10 @@
     "typescript": "*"
   },
   "peerDependencies": {
-    "gatsby": "^4.24.8"
+    "gatsby": "^4.0.0 || ^5.0.0"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=18.0.0"
   },
   "publishConfig": {
     "access": "public"
