@@ -1,4 +1,3 @@
-export * from './getAuthData';
+export * from './authenticateRequest';
 export * from './injectAuthIntoRequest';
 export * from './serializeProps';
-export * from './sanitizeAuthData';

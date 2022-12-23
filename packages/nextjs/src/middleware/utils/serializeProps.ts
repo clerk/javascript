@@ -3,10 +3,6 @@ import type { GetServerSidePropsResult } from 'next';
 import type { AuthData } from '../types';
 
 /**
- *
- * Next.js
- *
- * @export
  * @param callbackResult The results from the wrapped (user-provided) getServerSideProps callback.
  * @param authData
  */
