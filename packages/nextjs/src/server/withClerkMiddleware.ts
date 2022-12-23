@@ -1,9 +1,8 @@
 import { type OptionalVerifyTokenOptions, AuthStatus } from '@clerk/backend';
-import { API_KEY } from '@clerk/backend-core';
 import { NextMiddleware, NextMiddlewareResult } from 'next/dist/server/web/types';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 
-import { API_URL, clerkClient, FRONTEND_API } from './clerk';
+import { API_KEY, API_URL, clerkClient, FRONTEND_API } from './clerk';
 import { constants } from './constants';
 import {
   getCookie,
@@ -29,7 +28,6 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
 
     // get auth state, check if we need to return an interstitial
     const cookieToken = getCookie(req, constants.Cookies.Session);
-
     const headerToken = headers.get('authorization')?.replace('Bearer ', '');
 
     const requestState = await clerkClient.authenticateRequest({
