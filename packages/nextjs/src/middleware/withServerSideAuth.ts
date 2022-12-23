@@ -1,7 +1,9 @@
 import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
+import { API_URL, clerkClient, FRONTEND_API, sanitizeAuthObject } from '../server/clerk';
+import { constants } from '../server/constants';
 import { WithServerSideAuthCallback, WithServerSideAuthOptions, WithServerSideAuthResult } from './types';
-import { getAuthData, injectAuthIntoRequest, injectSSRStateIntoProps, sanitizeAuthData } from './utils';
+import { authenticateRequest, injectAuthIntoRequest, injectSSRStateIntoProps } from './utils';
 
 const EMPTY_GSSP_RESPONSE = { props: {} };
 
@@ -16,17 +18,29 @@ interface WithServerSideAuth {
   (opts?: WithServerSideAuthOptions): WithServerSideAuthResult<void>;
 }
 
+/**
+ * @deprecated The /middleware path is deprecated and will be removed in the next major release.
+ * Use the exports from /server instead
+ */
 export const withServerSideAuth: WithServerSideAuth = (cbOrOptions: any, options?: any): any => {
   const cb = typeof cbOrOptions === 'function' ? cbOrOptions : undefined;
   const opts = (options ? options : typeof cbOrOptions !== 'function' ? cbOrOptions : {}) || {};
 
   return async (ctx: GetServerSidePropsContext) => {
-    const authData = await getAuthData(ctx, opts);
-    if (!authData) {
+    const requestState = await authenticateRequest(ctx, opts);
+
+    if (requestState.isInterstitial) {
+      ctx.res.setHeader(constants.Headers.AuthMessage, requestState.message);
+      ctx.res.setHeader(constants.Headers.AuthReason, requestState.reason);
+      ctx.res.writeHead(401, { 'Content-Type': 'text/html' });
+      const interstitial = await clerkClient.remotePublicInterstitial({ apiUrl: API_URL, frontendApi: FRONTEND_API });
+      ctx.res.end(interstitial);
       return EMPTY_GSSP_RESPONSE;
     }
-    const contextWithAuth = injectAuthIntoRequest(ctx, authData);
+
+    const legacyAuthData = { ...requestState.toAuth(), claims: requestState.toAuth().sessionClaims };
+    const contextWithAuth = injectAuthIntoRequest(ctx, legacyAuthData);
     const callbackResult = (await cb?.(contextWithAuth)) || {};
-    return injectSSRStateIntoProps(callbackResult, sanitizeAuthData(authData));
+    return injectSSRStateIntoProps(callbackResult, sanitizeAuthObject(legacyAuthData));
   };
 };
