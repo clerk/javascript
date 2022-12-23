@@ -1,1 +1,1 @@
-export { clerkClient } from '../edge-middleware';
+export { clerkClient } from '../server/clerk';
