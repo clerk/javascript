@@ -38,7 +38,7 @@ export abstract class BaseResource {
     if (requestInit.method === 'GET') {
       fapiResponse = await runWithExponentialBackOff(() => BaseResource.fapiClient.request<J>(requestInit), {
         maxRetries: 4,
-        firstDelay: 800,
+        firstDelay: 500,
       });
     } else {
       fapiResponse = await BaseResource.fapiClient.request<J>(requestInit);
