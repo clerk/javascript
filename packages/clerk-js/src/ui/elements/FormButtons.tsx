@@ -3,6 +3,7 @@ import { LocalizationKey, localizationKeys } from '../localization';
 import { useRouter } from '../router';
 import { PropsOfComponent } from '../styledSystem';
 import { Form } from './Form';
+import { useNavigateToFlowStart } from './NavigateToFlowStartButton';
 
 type FormButtonsProps = PropsOfComponent<typeof Form.SubmitButton> & {
   isDisabled?: boolean;
@@ -11,7 +12,7 @@ type FormButtonsProps = PropsOfComponent<typeof Form.SubmitButton> & {
 };
 
 export const FormButtons = (props: FormButtonsProps) => {
-  const router = useRouter();
+  const { navigateToFlowStart } = useNavigateToFlowStart();
   const { isDisabled, submitLabel, resetLabel, ...rest } = props;
   return (
     <FormButtonContainer>
@@ -26,7 +27,7 @@ export const FormButtons = (props: FormButtonsProps) => {
         // Should the default key come from userProfile?
         localizationKey={resetLabel || localizationKeys('userProfile.formButtonReset')}
         block={false}
-        onClick={() => router.navigate('..')}
+        onClick={navigateToFlowStart}
       />
     </FormButtonContainer>
   );
