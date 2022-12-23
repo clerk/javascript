@@ -1,4 +1,17 @@
-export { default as Clerk } from '@clerk/clerk-sdk-node';
+import { Clerk } from '@clerk/backend';
+
+import { clerkClient } from '../server';
+
+const createClerkClient = Clerk;
+
+export { createClerkClient };
+
+export * from '@clerk/backend';
+
 export { requireAuth } from './requireAuth';
 export { withAuth } from './withAuth';
-export * from '@clerk/clerk-sdk-node';
+
+const { users, smsMessages, sessions, emailAddresses, phoneNumbers, emails, invitations, organizations, clients } =
+  clerkClient;
+
+export { users, smsMessages, sessions, emailAddresses, phoneNumbers, emails, invitations, organizations, clients };
