@@ -30,7 +30,11 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
       size: {
         iconLg: { minHeight: theme.sizes.$14, width: theme.sizes.$14 },
         xs: { minHeight: theme.sizes.$1x5, padding: `${theme.space.$1x5} ${theme.space.$1x5}` },
-        md: { minHeight: theme.sizes.$9, padding: `${theme.space.$2x5} ${theme.space.$4}` },
+        md: {
+          minHeight: theme.sizes.$9,
+          padding: `${theme.space.$2x5} ${theme.space.$5}`,
+          letterSpacing: theme.sizes.$xxs,
+        },
       },
       colorScheme: {
         primary: {
