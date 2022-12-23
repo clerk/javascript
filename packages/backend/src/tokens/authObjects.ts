@@ -108,7 +108,7 @@ export function prunePrivateMetadata(resource?: { private_metadata: any } | { pr
   return resource;
 }
 
-export function sanitizeAuthObject(authObject: any) {
+export function sanitizeAuthObject<T extends Record<any, any>>(authObject: T): T {
   const user = authObject.user ? { ...authObject.user } : authObject.user;
   const organization = authObject.organization ? { ...authObject.organization } : authObject.organization;
 
