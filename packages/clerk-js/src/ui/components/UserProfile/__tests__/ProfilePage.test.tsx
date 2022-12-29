@@ -161,7 +161,7 @@ describe('ProfilePage', () => {
           last_name: 'L',
         });
       });
-      fixtures.clerk.user!.update.mockReturnValueOnce(Promise.resolve({} as any));
+      fixtures.clerk.user?.update.mockReturnValueOnce(Promise.resolve({} as any));
       const { userEvent } = render(<ProfilePage />, { wrapper });
 
       await userEvent.type(screen.getByLabelText(/first name/i), 'George');

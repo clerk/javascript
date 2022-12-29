@@ -1,5 +1,6 @@
 import { MembershipRole } from '@clerk/types';
 import { describe } from '@jest/globals';
+import React from 'react';
 
 import { render } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';

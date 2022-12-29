@@ -1,6 +1,7 @@
 import { MembershipRole, OrganizationInvitationResource } from '@clerk/types';
 import { describe } from '@jest/globals';
 import { waitFor } from '@testing-library/dom';
+import React from 'react';
 
 import { ClerkAPIResponseError } from '../../../../core/resources';
 import { render } from '../../../../testUtils';
@@ -11,7 +12,7 @@ const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
 describe('InviteMembersPage', () => {
   it('renders the component', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
+    const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
     });

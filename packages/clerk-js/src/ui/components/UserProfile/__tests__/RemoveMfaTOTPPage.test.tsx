@@ -40,7 +40,7 @@ describe('RemoveMfaTOTPPAge', () => {
     it('calls the appropriate function when pressing continue', async () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
 
-      fixtures.clerk.user!.disableTOTP.mockResolvedValueOnce({} as DeletedObjectResource);
+      fixtures.clerk.user?.disableTOTP.mockResolvedValueOnce({} as DeletedObjectResource);
       const { userEvent } = render(<RemoveMfaTOTPPage />, { wrapper });
 
       await userEvent.click(screen.getByRole('button', { name: /continue/i }));

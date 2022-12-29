@@ -8,7 +8,7 @@ import { Route, Switch } from '../../router';
 import { CreateOrganizationCtx } from '../../types';
 import { CreateOrganizationPage } from './CreateOrganizationPage';
 
-const _CreateOrganization = (_: CreateOrganizationProps) => {
+const _CreateOrganization = () => {
   return (
     <Flow.Root flow='createOrganization'>
       <Flow.Part>
@@ -50,7 +50,7 @@ export const CreateOrganizationModal = (props: CreateOrganizationProps): JSX.Ele
     <Route path='createOrganization'>
       <ComponentContext.Provider value={createOrganizationProps}>
         <div>
-          <CreateOrganization {...createOrganizationProps} />
+          <CreateOrganization />
         </div>
       </ComponentContext.Provider>
     </Route>

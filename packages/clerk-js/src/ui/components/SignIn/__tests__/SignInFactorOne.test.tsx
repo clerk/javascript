@@ -205,11 +205,11 @@ describe('SignInFactorOne', () => {
 
         const { getByText } = render(<SignInFactorOne />, { wrapper });
         expect(getByText('Resend link', { exact: false }).closest('button')).toHaveAttribute('disabled');
-        act(() => {
+        await act(() => {
           jest.advanceTimersByTime(30000);
         });
         expect(getByText('Resend link', { exact: false }).closest('button')).toHaveAttribute('disabled');
-        act(() => {
+        await act(() => {
           jest.advanceTimersByTime(30000);
         });
         expect(getByText('Resend link', { exact: false }).closest('button')).not.toHaveAttribute('disabled');
@@ -244,11 +244,11 @@ describe('SignInFactorOne', () => {
         fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
         const { getByText } = render(<SignInFactorOne />, { wrapper });
         expect(getByText('Resend code', { exact: false }).closest('button')).toHaveAttribute('disabled');
-        act(() => {
+        await act(() => {
           jest.advanceTimersByTime(15000);
         });
         expect(getByText('Resend code', { exact: false }).closest('button')).toHaveAttribute('disabled');
-        act(() => {
+        await act(() => {
           jest.advanceTimersByTime(15000);
         });
         expect(getByText('Resend code', { exact: false }).closest('button')).not.toHaveAttribute('disabled');
@@ -321,11 +321,11 @@ describe('SignInFactorOne', () => {
         fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
         const { getByText } = render(<SignInFactorOne />, { wrapper });
         expect(getByText('Resend code', { exact: false }).closest('button')).toHaveAttribute('disabled');
-        act(() => {
+        await act(() => {
           jest.advanceTimersByTime(15000);
         });
         expect(getByText('Resend code', { exact: false }).closest('button')).toHaveAttribute('disabled');
-        act(() => {
+        await act(() => {
           jest.advanceTimersByTime(15000);
         });
         expect(getByText('Resend code', { exact: false }).closest('button')).not.toHaveAttribute('disabled');

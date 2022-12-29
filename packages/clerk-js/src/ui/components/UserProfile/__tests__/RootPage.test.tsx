@@ -12,7 +12,7 @@ describe('RootPage', () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.dev'] });
     });
-    fixtures.clerk.user!.getSessions.mockReturnValue(Promise.resolve([]));
+    fixtures.clerk.user?.getSessions.mockReturnValue(Promise.resolve([]));
 
     render(<RootPage />, { wrapper });
     await waitFor(() => expect(fixtures.clerk.user?.getSessions).toHaveBeenCalled());
