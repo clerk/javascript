@@ -184,8 +184,9 @@ export default class IsomorphicClerk {
   throwError(errorMsg: string): void {
     if (process.env.NODE_ENV === 'production') {
       console.error(errorMsg);
+    } else {
+      throw new Error(errorMsg);
     }
-    throw new Error(errorMsg);
   }
 
   private hydrateClerkJS = async (clerkjs: BrowserClerk | HeadlessBrowserClerk | undefined) => {
