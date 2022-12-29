@@ -8,9 +8,11 @@ body {
 
 body {
   background: #e7e7e7;
+  color: black;
 }
 body.dark-mode {
   background: black;
+  color: white;
 }
 
 a {
@@ -20,14 +22,4 @@ a {
 
 * {
   box-sizing: border-box;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-  body {
-    color: white;
-    background: black;
-  }
 }
