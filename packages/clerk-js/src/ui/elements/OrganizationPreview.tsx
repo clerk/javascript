@@ -58,6 +58,7 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
           elementDescriptor={descriptors.organizationPreviewMainIdentifier}
           elementId={descriptors.organizationPreviewMainIdentifier.setId(elementId)}
           variant={size === 'md' ? 'regularMedium' : 'smallMedium'}
+          colorScheme='inherit'
           truncate
         >
           {organization.name} {badge}

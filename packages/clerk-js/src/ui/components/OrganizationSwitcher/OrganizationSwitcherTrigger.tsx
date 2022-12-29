@@ -47,7 +47,7 @@ export const OrganizationSwitcherTrigger = React.forwardRef<HTMLButtonElement, O
         <Icon
           elementDescriptor={descriptors.organizationSwitcherTriggerIcon}
           icon={Selector}
-          sx={t => ({ color: t.colors.$blackAlpha400, marginLeft: `${t.space.$2}` })}
+          sx={t => ({ opacity: t.opacity.$sm, marginLeft: `${t.space.$2}` })}
         />
       </Button>
     );

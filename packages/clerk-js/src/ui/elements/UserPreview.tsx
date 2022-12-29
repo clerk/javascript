@@ -81,6 +81,7 @@ export const UserPreview = (props: UserPreviewProps) => {
           elementDescriptor={descriptors.userPreviewMainIdentifier}
           elementId={descriptors.userPreviewMainIdentifier.setId(elementId)}
           variant={size === 'md' ? 'regularMedium' : 'smallMedium'}
+          colorScheme='inherit'
           truncate
         >
           {localizedTitle || name || identifier} {badge}
