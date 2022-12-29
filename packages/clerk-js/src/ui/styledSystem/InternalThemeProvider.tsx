@@ -21,6 +21,7 @@ type InternalThemeProviderProps = React.PropsWithChildren<{
 
 export const InternalThemeProvider = (props: InternalThemeProviderProps) => {
   const { parsedInternalTheme } = useAppearance();
+
   return (
     <CacheProvider value={cache}>
       <ThemeProvider theme={parsedInternalTheme}>{props.children}</ThemeProvider>

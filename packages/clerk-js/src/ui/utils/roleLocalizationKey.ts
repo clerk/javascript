@@ -1,6 +1,6 @@
 import { MembershipRole } from '@clerk/types';
 
-import { LocalizationKey, localizationKeys } from '../localization';
+import { LocalizationKey, localizationKeys } from '../localization/localizationKeys';
 
 const roleToLocalizationKey: Record<MembershipRole, LocalizationKey> = {
   basic_member: localizationKeys('membershipRole__basicMember'),
