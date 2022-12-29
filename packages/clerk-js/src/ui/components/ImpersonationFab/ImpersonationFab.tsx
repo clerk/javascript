@@ -146,7 +146,7 @@ const _ImpersonationFab = () => {
       window.innerWidth - current.offsetLeft - current.offsetWidth - e.movementX
     }px`;
     document.documentElement.style.setProperty(rightProperty, rightOffestBasedOnViewportAndContent);
-    document.documentElement.style.setProperty(topProperty, `${current.offsetTop + e.movementY}px`);
+    document.documentElement.style.setProperty(topProperty, `${current.offsetTop - -e.movementY}px`);
   }, []);
 
   const repositionFabOnResize = () => {
