@@ -76,7 +76,6 @@ export const Avatar = (props: AvatarProps) => {
           border: theme.borders.$normal,
           borderColor: theme.colors.$avatarBorder,
           backgroundColor: theme.colors.$avatarBackground,
-          color: theme.colors.$colorText,
           backgroundClip: 'padding-box',
         }),
         sx,
@@ -93,6 +92,7 @@ const InitialsAvatarFallback = (props: { initials: string }) => {
   return (
     <Text
       as='span'
+      colorScheme='inherit'
       sx={{ ...common.centeredFlex('inline-flex'), width: '100%' }}
     >
       {initials}
