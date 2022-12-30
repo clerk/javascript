@@ -173,6 +173,7 @@ const NavbarContainer = (props: React.PropsWithChildren<Record<never, never>>) =
         [mqu.md]: {
           display: 'none',
         },
+        color: t.colors.$colorText,
       })}
     >
       {props.children}
@@ -215,6 +216,7 @@ const MobileNavbarContainer = withFloatingTree((props: React.PropsWithChildren<R
           zIndex: t.zIndices.$navbar,
           borderRadius: t.radii.$xl,
           overflow: 'hidden',
+          color: t.colors.$colorText,
         })}
       >
         <Col
