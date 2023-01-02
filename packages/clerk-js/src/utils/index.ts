@@ -15,7 +15,6 @@ export * from './path';
 export * from './props';
 export * from './querystring';
 export * from './runtime';
-export * from './runWithExponentialBackOff';
 export * from './safeLock';
 export * from './script';
 export * from './url';

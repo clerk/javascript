@@ -1,6 +1,6 @@
+import { runWithExponentialBackOff } from '@clerk/shared';
 import type { ClerkAPIErrorJSON, ClerkResourceJSON, ClerkResourceReloadParams, DeletedObjectJSON } from '@clerk/types';
 
-import { runWithExponentialBackOff } from '../../utils';
 import { clerkMissingFapiClientInResources } from '../errors';
 import type { FapiClient, FapiRequestInit, FapiResponse, FapiResponseJSON, HTTPMethod } from '../fapiClient';
 import type { Clerk } from './internal';
