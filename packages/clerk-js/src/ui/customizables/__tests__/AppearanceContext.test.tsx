@@ -6,6 +6,7 @@ import { Box, useAppearance } from '..';
 import { AppearanceProvider } from '../AppearanceContext';
 import { renderHook } from '@testing-library/react';
 import { knownColors } from '../testUtils';
+import { InternalTheme } from '../../foundations';
 
 const themeAColor = 'blue';
 const themeA = {
@@ -61,7 +62,9 @@ describe('AppearanceProvider', () => {
       </AppearanceProvider>,
     );
   });
+});
 
+describe('AppearanceProvider internalTheme flows', () => {
   it('sets the theme correctly from the globalAppearance prop', () => {
     const wrapper = ({ children }: any) => (
       <AppearanceProvider
@@ -73,6 +76,7 @@ describe('AppearanceProvider', () => {
     );
 
     const { result } = renderHook(() => useAppearance(), { wrapper });
+
     expect(result.current.parsedInternalTheme.colors.$primary500).toBe(knownColors[themeAColor]);
     expect(result.current.parsedInternalTheme.colors.$danger500).toBe(knownColors[themeAColor]);
     expect(result.current.parsedInternalTheme.colors.$success500).toBe(knownColors[themeAColor]);
@@ -103,6 +107,7 @@ describe('AppearanceProvider', () => {
     );
 
     const { result } = renderHook(() => useAppearance(), { wrapper });
+
     expect(result.current.parsedInternalTheme.colors.$primary500).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$danger500).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$success500).toBe(knownColors[themeBColor]);
@@ -134,6 +139,7 @@ describe('AppearanceProvider', () => {
     );
 
     const { result } = renderHook(() => useAppearance(), { wrapper });
+
     expect(result.current.parsedInternalTheme.colors.$primary500).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$danger500).toBe(knownColors[themeBColor]);
     expect(result.current.parsedInternalTheme.colors.$success500).toBe(knownColors[themeBColor]);
@@ -151,5 +157,70 @@ describe('AppearanceProvider', () => {
     expect(result.current.parsedInternalTheme.fontWeights.$normal).toBe(themeB.variables.fontWeight.normal);
     expect(result.current.parsedInternalTheme.options.$fontSmoothing).toBe(themeB.variables.fontSmoothing);
     expect(result.current.parsedInternalTheme.space.$1).toContain(themeB.variables.spacingUnit);
+  });
+});
+
+describe('AppearanceProvider element flows', () => {
+  it('sets the parsedElements correctly from the globalAppearance prop', () => {
+    const wrapper = ({ children }: any) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        globalAppearance={{
+          elements: {
+            alert: { backgroundColor: themeAColor },
+          },
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    expect(result.current.parsedElements[0]['alert'].backgroundColor).toBe(themeAColor);
+  });
+
+  it('sets the parsedElements correctly from the globalAppearance and appearance prop', () => {
+    const wrapper = ({ children }: any) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        globalAppearance={{
+          elements: {
+            alert: { backgroundColor: themeAColor },
+          },
+        }}
+        appearance={{
+          elements: {
+            alert: { backgroundColor: themeBColor },
+          },
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    expect(result.current.parsedElements[0]['alert'].backgroundColor).toBe(themeAColor);
+    expect(result.current.parsedElements[1]['alert'].backgroundColor).toBe(themeBColor);
+  });
+
+  it('sets the parsedElements correctly when a function is passed for the elements', () => {
+    const wrapper = ({ children }: any) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        globalAppearance={{
+          variables: {
+            colorPrimary: themeAColor,
+          },
+          elements: ({ theme }) => ({
+            alert: { backgroundColor: theme.colors.$primary500 },
+          }),
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    expect(result.current.parsedElements[0]['alert'].backgroundColor).toBe(knownColors[themeAColor]);
   });
 });
