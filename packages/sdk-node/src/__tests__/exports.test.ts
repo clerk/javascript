@@ -1,7 +1,7 @@
-import * as moduleExports from '..';
+import * as publicExports from '..';
 
 describe('module exports', () => {
-  it.skip('should not change unless explicitly set', () => {
-    expect(moduleExports).toMatchSnapshot();
+  it('should not change unless explicitly set', () => {
+    expect(Object.keys(publicExports).sort()).toMatchSnapshot();
   });
 });
