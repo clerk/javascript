@@ -2,7 +2,7 @@
 import { render, screen } from '../../../testUtils';
 import React from 'react';
 
-import { Box } from '..';
+import { Box, Button, descriptors } from '..';
 import { AppearanceProvider } from '../AppearanceContext';
 import { knownColors } from '../testUtils';
 import { InternalThemeProvider } from '../../styledSystem';
@@ -61,5 +61,55 @@ describe('Theme used in sx callback', () => {
     );
 
     expect(screen.getByTestId('test')).toHaveStyleRule('background-color', knownColors.red);
+  });
+});
+
+describe('Styles for specific elements', () => {
+  it.skip('styles propagate to the correct element specified', () => {
+    render(
+      <AppearanceProvider
+        appearanceKey='signIn'
+        globalAppearance={{
+          elements: {
+            breadcrumbs: {
+              backgroundColor: 'yellow',
+            },
+          },
+        }}
+      >
+        <InternalThemeProvider>
+          <Button
+            elementDescriptor={descriptors.breadcrumbs}
+            data-testid='test'
+          />
+        </InternalThemeProvider>
+      </AppearanceProvider>,
+    );
+
+    expect(screen.getByTestId('test')).toHaveStyleRule('background-color', 'yellow');
+  });
+
+  it.skip('styles propagate to the correct element specified', () => {
+    render(
+      <AppearanceProvider
+        appearanceKey='signIn'
+        globalAppearance={{
+          elements: {
+            button: {
+              backgroundColor: 'yellow',
+            },
+          },
+        }}
+      >
+        <InternalThemeProvider>
+          <Button
+            elementDescriptor={descriptors.breadcrumbs}
+            data-testid='test'
+          />
+        </InternalThemeProvider>
+      </AppearanceProvider>,
+    );
+
+    expect(screen.getByTestId('test')).toHaveStyleRule('background-color', 'yellow');
   });
 });
