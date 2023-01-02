@@ -4,6 +4,7 @@ export const Attributes = {
 
 export const Cookies = {
   Session: '__session',
+  ClientUat: '__client_uat',
 } as const;
 
 export const Headers = {
@@ -13,6 +14,11 @@ export const Headers = {
   NextRewrite: 'x-middleware-rewrite',
   NextResume: 'x-middleware-next',
   NextRedirect: 'Location',
+  Authorization: 'authorization',
+  ForwardedPort: 'x-forwarded-port',
+  ForwardedHost: 'x-forwarded-host',
+  Referrer: 'referer',
+  UserAgent: 'user-agent',
 } as const;
 
 export const SearchParams = {
