@@ -6,7 +6,6 @@ import { Box, useAppearance } from '..';
 import { AppearanceProvider } from '../AppearanceContext';
 import { renderHook } from '@testing-library/react';
 import { knownColors } from '../testUtils';
-import { InternalTheme } from '../../foundations';
 
 const themeAColor = 'blue';
 const themeA = {
@@ -66,7 +65,7 @@ describe('AppearanceProvider', () => {
 
 describe('AppearanceProvider internalTheme flows', () => {
   it('sets the theme correctly from the globalAppearance prop', () => {
-    const wrapper = ({ children }: any) => (
+    const wrapper = ({ children }) => (
       <AppearanceProvider
         appearanceKey='signIn'
         globalAppearance={themeA}
@@ -97,7 +96,7 @@ describe('AppearanceProvider internalTheme flows', () => {
   });
 
   it('sets the theme correctly from the appearance prop', () => {
-    const wrapper = ({ children }: any) => (
+    const wrapper = ({ children }) => (
       <AppearanceProvider
         appearanceKey='signIn'
         appearance={themeB}
@@ -128,7 +127,7 @@ describe('AppearanceProvider internalTheme flows', () => {
   });
 
   it('merges the globalAppearance with the appearance in the theme', () => {
-    const wrapper = ({ children }: any) => (
+    const wrapper = ({ children }) => (
       <AppearanceProvider
         appearanceKey='signIn'
         globalAppearance={themeA}
@@ -162,7 +161,7 @@ describe('AppearanceProvider internalTheme flows', () => {
 
 describe('AppearanceProvider element flows', () => {
   it('sets the parsedElements correctly from the globalAppearance prop', () => {
-    const wrapper = ({ children }: any) => (
+    const wrapper = ({ children }) => (
       <AppearanceProvider
         appearanceKey='signIn'
         globalAppearance={{
@@ -180,7 +179,7 @@ describe('AppearanceProvider element flows', () => {
   });
 
   it('sets the parsedElements correctly from the globalAppearance and appearance prop', () => {
-    const wrapper = ({ children }: any) => (
+    const wrapper = ({ children }) => (
       <AppearanceProvider
         appearanceKey='signIn'
         globalAppearance={{
@@ -204,7 +203,7 @@ describe('AppearanceProvider element flows', () => {
   });
 
   it('sets the parsedElements correctly when a function is passed for the elements', () => {
-    const wrapper = ({ children }: any) => (
+    const wrapper = ({ children }) => (
       <AppearanceProvider
         appearanceKey='signIn'
         globalAppearance={{
@@ -222,5 +221,115 @@ describe('AppearanceProvider element flows', () => {
 
     const { result } = renderHook(() => useAppearance(), { wrapper });
     expect(result.current.parsedElements[0]['alert'].backgroundColor).toBe(knownColors[themeAColor]);
+  });
+});
+
+describe('AppearanceProvider layout flows', () => {
+  it('sets the parsedLayout correctly from the globalAppearance prop', () => {
+    const wrapper = ({ children }) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        globalAppearance={{
+          layout: {
+            helpPageUrl: 'test',
+            logoImageUrl: 'test',
+            privacyPageUrl: 'test',
+            termsPageUrl: 'test',
+            logoPlacement: 'inside',
+            showOptionalFields: false,
+            socialButtonsPlacement: 'bottom',
+            socialButtonsVariant: 'iconButton',
+          },
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    expect(result.current.parsedLayout.helpPageUrl).toBe('test');
+    expect(result.current.parsedLayout.logoImageUrl).toBe('test');
+    expect(result.current.parsedLayout.privacyPageUrl).toBe('test');
+    expect(result.current.parsedLayout.termsPageUrl).toBe('test');
+    expect(result.current.parsedLayout.logoPlacement).toBe('inside');
+    expect(result.current.parsedLayout.showOptionalFields).toBe(false);
+    expect(result.current.parsedLayout.socialButtonsPlacement).toBe('bottom');
+    expect(result.current.parsedLayout.socialButtonsVariant).toBe('iconButton');
+  });
+
+  it('sets the parsedLayout correctly from the appearance prop', () => {
+    const wrapper = ({ children }) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        appearance={{
+          layout: {
+            helpPageUrl: 'test2',
+            logoImageUrl: 'test2',
+            privacyPageUrl: 'test2',
+            termsPageUrl: 'test2',
+            logoPlacement: 'outside',
+            showOptionalFields: true,
+            socialButtonsPlacement: 'top',
+            socialButtonsVariant: 'blockButton',
+          },
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    expect(result.current.parsedLayout.helpPageUrl).toBe('test2');
+    expect(result.current.parsedLayout.logoImageUrl).toBe('test2');
+    expect(result.current.parsedLayout.privacyPageUrl).toBe('test2');
+    expect(result.current.parsedLayout.termsPageUrl).toBe('test2');
+    expect(result.current.parsedLayout.logoPlacement).toBe('outside');
+    expect(result.current.parsedLayout.showOptionalFields).toBe(true);
+    expect(result.current.parsedLayout.socialButtonsPlacement).toBe('top');
+    expect(result.current.parsedLayout.socialButtonsVariant).toBe('blockButton');
+  });
+
+  it('sets the parsedLayout correctly from the globalAppearance and appearance prop', () => {
+    const wrapper = ({ children }) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        globalAppearance={{
+          layout: {
+            helpPageUrl: 'test',
+            logoImageUrl: 'test',
+            privacyPageUrl: 'test',
+            termsPageUrl: 'test',
+            logoPlacement: 'inside',
+            showOptionalFields: false,
+            socialButtonsPlacement: 'bottom',
+            socialButtonsVariant: 'iconButton',
+          },
+        }}
+        appearance={{
+          layout: {
+            helpPageUrl: 'test2',
+            logoImageUrl: 'test2',
+            privacyPageUrl: 'test2',
+            termsPageUrl: 'test2',
+            logoPlacement: 'outside',
+            showOptionalFields: true,
+            socialButtonsPlacement: 'top',
+            socialButtonsVariant: 'blockButton',
+          },
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    expect(result.current.parsedLayout.helpPageUrl).toBe('test2');
+    expect(result.current.parsedLayout.logoImageUrl).toBe('test2');
+    expect(result.current.parsedLayout.privacyPageUrl).toBe('test2');
+    expect(result.current.parsedLayout.termsPageUrl).toBe('test2');
+    expect(result.current.parsedLayout.logoPlacement).toBe('outside');
+    expect(result.current.parsedLayout.showOptionalFields).toBe(true);
+    expect(result.current.parsedLayout.socialButtonsPlacement).toBe('top');
+    expect(result.current.parsedLayout.socialButtonsVariant).toBe('blockButton');
   });
 });

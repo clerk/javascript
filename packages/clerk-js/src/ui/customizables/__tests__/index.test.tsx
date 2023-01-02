@@ -8,7 +8,7 @@ import { knownColors } from '../testUtils';
 import { InternalThemeProvider } from '../../styledSystem';
 
 describe('Theme used in sx callback', () => {
-  it('theme matches the globalAppearance', () => {
+  it('styles match the theme/globalAppearance', () => {
     render(
       <AppearanceProvider
         appearanceKey='signIn'
@@ -26,7 +26,7 @@ describe('Theme used in sx callback', () => {
     expect(screen.getByTestId('test')).toHaveStyleRule('background-color', knownColors.blue);
   });
 
-  it('theme matches appearance', () => {
+  it('styles match the theme/appearance', () => {
     render(
       <AppearanceProvider
         appearanceKey='signIn'
@@ -44,7 +44,7 @@ describe('Theme used in sx callback', () => {
     expect(screen.getByTestId('test')).toHaveStyleRule('background-color', knownColors.red);
   });
 
-  it('theme matches merged result from globalAppearance and appearance', () => {
+  it('styles match the merged result from globalAppearance and appearance', () => {
     render(
       <AppearanceProvider
         appearanceKey='signIn'
