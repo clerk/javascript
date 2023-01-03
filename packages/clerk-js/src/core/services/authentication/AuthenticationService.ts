@@ -1,6 +1,7 @@
+import { runWithExponentialBackOff } from '@clerk/shared';
 import { Clerk, EnvironmentResource, SessionResource, TokenResource } from '@clerk/types';
 
-import { CookieHandler, createCookieHandler, inBrowser, runWithExponentialBackOff } from '../../../utils';
+import { CookieHandler, createCookieHandler, inBrowser } from '../../../utils';
 import { clerkCoreErrorTokenRefreshFailed } from '../../errors';
 import { AuthenticationPoller } from './AuthenticationPoller';
 
