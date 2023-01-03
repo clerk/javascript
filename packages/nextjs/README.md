@@ -27,7 +27,8 @@
 
 ## Overview
 
-Clerk is the easiest way to add authentication and user management to your Next.js application. Add sign up, sign in, and profile management to your application in minutes.
+Clerk is the easiest way to add authentication and user management to your Next.js application. Add sign up, sign in,
+and profile management to your application in minutes.
 
 ## Getting Started
 
@@ -60,13 +61,18 @@ npm run dev
 
 Clerk requires your application to be wrapped in the `<ClerkProvider/>` context.
 
-Set `NEXT_PUBLIC_CLERK_FRONTEND_API` to your Frontend API in your `.env.local` file to make the environment variable accessible to the Provider.
+Set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` to your Publishable Key in your `.env.local` file to make the environment
+variable accessible to the Provider.
+
+If you are using the previous version of Clerk keys, set `NEXT_PUBLIC_CLERK_FRONTEND_API` to your Frontend API in
+your `.env.local` file.
 
 ```sh
 NEXT_PUBLIC_CLERK_FRONTEND_API=clerk.[your-domain].[tld]
 ```
 
-An implementation of `<ClerkProvider />` with our flexible Control Components to build an authentication flow in `pages/_app.js`:
+An implementation of `<ClerkProvider />` with our flexible Control Components to build an authentication flow
+in `pages/_app.js`:
 
 ```jsx
 import { ClerkProvider, RedirectToSignIn, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
@@ -94,19 +100,24 @@ function MyApp({ Component, pageProps }) {
 export default MyApp;
 ```
 
-_For further details and examples, please refer to our [Documentation](https://clerk.dev/docs?utm_source=github&utm_medium=clerk_nextjs)._
+_For further details and examples, please refer to
+our [Documentation](https://clerk.dev/docs?utm_source=github&utm_medium=clerk_nextjs)._
 
 ## Support
 
 You can get in touch with us in any of the following ways:
 
-- Join our official community [Discord server](https://discord.com/invite/b5rXHjAg7A)?utm_source=github&utm_medium=clerk_react
-- Open a [GitHub support issue](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=question&template=ask_a_question.md&title=Support%3A+)
+- Join our official community [Discord server](https://discord.com/invite/b5rXHjAg7A)
+  ?utm_source=github&utm_medium=clerk_react
+- Open
+  a [GitHub support issue](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=question&template=ask_a_question.md&title=Support%3A+)
 - Contact options listed on [our Support page](https://clerk.dev/support?utm_source=github&utm_medium=clerk_nextjs)
 
 ## Contributing
 
-We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerkinc/javascript/blob/main/packages/nextjs/docs/CONTRIBUTING.md).
+We're open to all community contributions! If you'd like to contribute in any way, please
+read [our contribution guidelines](https://github.com/clerkinc/javascript/blob/main/packages/nextjs/docs/CONTRIBUTING.md)
+.
 
 ## Security
 
@@ -114,7 +125,8 @@ We're open to all community contributions! If you'd like to contribute in any wa
 
 `@clerk/nextjs` is provided **"as is"** without any **warranty**. Use at your own risk.
 
-_For more information and to report security issues, please refer to our [security documentation](https://github.com/clerkinc/javascript/blob/main/packages/nextjs/docs/SECURITY.md)._
+_For more information and to report security issues, please refer to
+our [security documentation](https://github.com/clerkinc/javascript/blob/main/packages/nextjs/docs/SECURITY.md)._
 
 ## License
 
