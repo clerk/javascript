@@ -3,6 +3,7 @@ import {
   type SignedInAuthObject,
   type SignedOutAuthObject,
   AuthStatus,
+  constants,
   decodeJwt,
   sanitizeAuthObject,
   signedInAuthObject,
@@ -10,7 +11,6 @@ import {
 } from '@clerk/backend';
 
 import { API_KEY, API_URL, API_VERSION } from './clerk';
-import { constants } from './constants';
 import type { RequestLike } from './types';
 import { getAuthStatusFromRequest, getCookie, getHeader, injectSSRStateIntoObject } from './utils';
 
