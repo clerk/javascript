@@ -45,7 +45,7 @@ This package provides Clerk Backend API resources and low-level authentication u
 
 ## How to use
 
-Requires Node >= 16.
+Works on Node >= 16 or on any V8 Isolates runtimes such as Cloudflare Workers.
 
 ```sh
 npm install @clerk/backend
