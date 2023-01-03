@@ -1,9 +1,8 @@
-import { type OptionalVerifyTokenOptions, AuthStatus } from '@clerk/backend';
+import { type OptionalVerifyTokenOptions, AuthStatus, constants } from '@clerk/backend';
 import { NextMiddleware, NextMiddlewareResult } from 'next/dist/server/web/types';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 
 import { API_KEY, API_URL, clerkClient, FRONTEND_API } from './clerk';
-import { constants } from './constants';
 import {
   getCookie,
   nextJsVersionCanOverrideRequestHeaders,

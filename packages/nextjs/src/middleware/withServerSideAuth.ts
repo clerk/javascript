@@ -1,7 +1,7 @@
+import { constants } from '@clerk/backend';
 import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
 import { API_URL, clerkClient, FRONTEND_API, sanitizeAuthObject } from '../server/clerk';
-import { constants } from '../server/constants';
 import { WithServerSideAuthCallback, WithServerSideAuthOptions, WithServerSideAuthResult } from './types';
 import { authenticateRequest, injectAuthIntoRequest, injectSSRStateIntoProps } from './utils';
 

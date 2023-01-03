@@ -1,7 +1,7 @@
+import { constants } from '@clerk/backend';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { API_KEY, API_URL, AuthObject, clerkClient, FRONTEND_API, RequestState } from '../server';
-import { constants } from '../server/constants';
 
 export type LegacyAuthObject<T extends AuthObject> = Pick<T, 'sessionId' | 'userId' | 'actor' | 'getToken'> & {
   claims: AuthObject['sessionClaims'];

@@ -1,8 +1,7 @@
-import { AuthObject } from '@clerk/backend';
+import { AuthObject, constants } from '@clerk/backend';
 import { RequestCookie } from 'next/dist/server/web/spec-extension/cookies';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { constants } from './constants';
 import { RequestLike } from './types';
 
 export function setCustomAttributeOnRequest(req: RequestLike, key: string, value: string): void {

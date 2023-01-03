@@ -5,6 +5,7 @@ export * from './api/resources';
 export * from './tokens';
 export * from './tokens/jwt';
 export * from './tokens/verify';
+export { constants } from './constants';
 
 export type ClerkOptions = CreateBackendApiOptions & Pick<CreateAuthenticateRequestOptions, 'jwtKey'>;
 
