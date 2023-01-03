@@ -5,7 +5,7 @@ import React from 'react';
 import { Box, useAppearance } from '..';
 import { AppearanceProvider } from '../AppearanceContext';
 import { renderHook } from '@testing-library/react';
-import { knownColors } from '../testUtils';
+import { knownColors } from './testUtils';
 
 const themeAColor = 'blue';
 const themeA = {
