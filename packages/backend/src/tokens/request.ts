@@ -152,7 +152,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
   }
 
   function verifyRequestState(token: string) {
-    const issuer = (iss: string) => iss.startsWith('https://clerk.');
+    const issuer = (iss: string) => iss.startsWith('https://clerk.') || iss.includes('.clerk.accounts');
 
     return verifyToken(token, {
       ...options,
