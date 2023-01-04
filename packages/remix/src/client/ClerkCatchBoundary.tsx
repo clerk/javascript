@@ -1,4 +1,3 @@
-import { LIB_VERSION } from '@clerk/clerk-react/dist/info';
 import { useCatch } from '@remix-run/react';
 import React from 'react';
 
@@ -7,17 +6,10 @@ import { Interstitial } from './Interstitial';
 export function ClerkCatchBoundary(RootCatchBoundary?: () => JSX.Element) {
   return () => {
     const { data } = useCatch();
-    const { __clerk_ssr_interstitial, __frontendApi, __lastAuthResult } =
-      data?.clerkState?.__internal_clerk_state || {};
+    const { __clerk_ssr_interstitial_html } = data?.clerkState?.__internal_clerk_state || {};
 
-    if (__clerk_ssr_interstitial) {
-      return (
-        <Interstitial
-          frontendApi={__frontendApi}
-          version={LIB_VERSION}
-          debugData={{ __lastAuthResult }}
-        />
-      );
+    if (__clerk_ssr_interstitial_html) {
+      return <Interstitial html={__clerk_ssr_interstitial_html} />;
     }
 
     if (!RootCatchBoundary) {

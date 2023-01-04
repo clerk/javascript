@@ -38,12 +38,12 @@ Looks like you didn't pass 'clerkState' to "<ClerkProvider clerkState={...}>".
 ${ssrExample}
 `);
 
-export const noRequestPassedInGetAuth = createErrorMessage(`
-You're calling 'getAuth()' from a loader, without providing the 'request' object.
+export const noLoaderArgsPassedInGetAuth = createErrorMessage(`
+You're calling 'getAuth()' from a loader, without providing the loader args object.
 Example:
 
-export const loader: LoaderFunction = async ({request}) => {
-  const { sessionId } = await getAuth(request);
+export const loader: LoaderFunction = async (args) => {
+  const { sessionId } = await getAuth(args);
   ...
 };
 `);
@@ -70,4 +70,8 @@ export const noFrontendApiError = createErrorMessage(`
 The CLERK_FRONTEND_API environment variable must be set before using Clerk.
 During development, grab the Frontend Api value from the Clerk Dashboard, create an .env file and set the CLERK_FRONTEND_API key.
 For production apps, please consult the Remix documentation on environment variables.
+`);
+
+export const noApiKeyError = createErrorMessage(`
+  The CLERK_API_KEY environment variable must be set to use SSR and @clerk/remix/api.');
 `);
