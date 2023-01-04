@@ -28,19 +28,19 @@ describe('RemoveMfaTOTPPAge', () => {
   });
 
   describe('Form buttons', () => {
-    it('navigates to the previous page when pressing cancel', async () => {
+    it('navigates to the root page when pressing cancel', async () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
 
       const { userEvent } = render(<RemoveMfaTOTPPage />, { wrapper });
 
       await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
-      expect(fixtures.router.navigate).toHaveBeenCalledWith('..');
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
     });
 
     it('calls the appropriate function when pressing continue', async () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
 
-      fixtures.clerk.user!.disableTOTP.mockResolvedValueOnce({} as DeletedObjectResource);
+      fixtures.clerk.user?.disableTOTP.mockResolvedValueOnce({} as DeletedObjectResource);
       const { userEvent } = render(<RemoveMfaTOTPPage />, { wrapper });
 
       await userEvent.click(screen.getByRole('button', { name: /continue/i }));

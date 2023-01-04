@@ -40,14 +40,14 @@ describe('RemovePhonePage', () => {
   });
 
   describe('Form buttons', () => {
-    it('navigates to the previous page when pressing cancel', async () => {
+    it('navigates to the root page when pressing cancel', async () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
 
       fixtures.router.params.id = 'id';
       const { userEvent } = render(<RemovePhonePage />, { wrapper });
 
       await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
-      expect(fixtures.router.navigate).toHaveBeenCalledWith('..');
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
     });
 
     it('calls the appropriate function upon pressing continue', async () => {

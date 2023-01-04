@@ -43,7 +43,7 @@ describe('PhonePage', () => {
       const { userEvent } = render(<PhonePage />, { wrapper });
 
       await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
-      expect(fixtures.router.navigate).toHaveBeenCalledWith('..');
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
     });
 
     it('continue button is disabled by default', async () => {
@@ -55,7 +55,7 @@ describe('PhonePage', () => {
 
     it('calls the appropriate function if continue is pressed', async () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
-      fixtures.clerk.user!.createPhoneNumber.mockReturnValueOnce(Promise.resolve({} as any));
+      fixtures.clerk.user?.createPhoneNumber.mockReturnValueOnce(Promise.resolve({} as any));
       const { userEvent } = render(<PhonePage />, { wrapper });
 
       await userEvent.type(screen.getByLabelText(/phone number/i), '6911111111');
