@@ -499,6 +499,7 @@ export const itIT: DeepRequired<LocalizationResource> = {
       subtitle: 'Invita un nuovo membro in questa organizzazione',
       successMessage: 'Invito inviato con successo',
       detailsTitle__inviteFailed: "L'invito non puó essere inviato. Correggi i seguenti e riprova:",
+      formButtonPrimary__continue: 'Invia inviti',
     },
     membersPage: {
       detailsTitle__emptyRow: 'Nessun membro da visualizzare',
@@ -522,7 +523,6 @@ export const itIT: DeepRequired<LocalizationResource> = {
   },
   createOrganization: {
     title: 'Crea organizzazione',
-    subtitle: "Imposta il profile dell'organizzazione",
     invitePage: {
       formButtonReset: 'Salta',
     },
