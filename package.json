@@ -37,8 +37,8 @@
   "scripts": {
     "dev": "turbo dev --filter=@clerk/* --filter=!@clerk/expo",
     "dev:playground": "echo 'Not ready for use yet' && exit 1 && turbo dev --filter=@playground/*",
-    "build": "turbo build --concurrency=${TURBO_CONCURRENCY:-2}",
-    "test": "turbo test --concurrency=${TURBO_CONCURRENCY:-2}",
+    "build": "turbo build --filter=!gatsby-plugin-clerk --filter=!@clerk/remix --concurrency=${TURBO_CONCURRENCY:-2}",
+    "test": "turbo test --filter=!gatsby-plugin-clerk --filter=!@clerk/remix --concurrency=${TURBO_CONCURRENCY:-2}",
     "clean": "turbo clean",
     "lint": "turbo lint",
     "lint-fix": "eslint . --ext .ts",
