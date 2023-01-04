@@ -8,6 +8,7 @@ const timeString = (val: Date | string | number, locale?: string) => {
     return '';
   }
 };
+
 const weekday = (val: Date | string | number, locale?: string, weekday?: 'long' | 'short' | 'narrow' | undefined) => {
   try {
     return new Intl.DateTimeFormat(locale || 'en-US', { weekday: weekday || 'long' }).format(normalizeDate(val));
