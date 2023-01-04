@@ -27,6 +27,7 @@ Array [
   "User",
   "Verification",
   "clients",
+  "constants",
   "createAuthenticateRequest",
   "createClerkClient",
   "debugRequestState",

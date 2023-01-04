@@ -29,6 +29,7 @@ Array [
   "clerkApi",
   "clerkClient",
   "clients",
+  "constants",
   "createAuthenticateRequest",
   "createClerkClient",
   "debugRequestState",

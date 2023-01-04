@@ -1,16 +1,8 @@
-import { AuthObject } from '@clerk/backend';
-import { ClerkAPIError } from '@clerk/types';
+import { ClerkMiddlewareOptions, createClerkExpressRequireAuth, WithAuthProp } from '@clerk/clerk-sdk-node';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { authenticateRequest, handleInterstitialCase, LegacyAuthObject, runMiddleware } from './utils';
-
-type WithAuthProp<T> = { auth: LegacyAuthObject<AuthObject> } & T;
-
-type ClerkMiddlewareOptions = {
-  onError?: (error: ClerkAPIError) => unknown;
-  authorizedParties?: string[];
-  jwtKey?: string;
-};
+import { API_URL, clerkClient, FRONTEND_API } from '../server';
+import { runMiddleware } from './utils';
 
 type NextApiHandlerWithAuth<T = any> = (
   req: WithAuthProp<NextApiRequest>,
@@ -21,17 +13,13 @@ type NextApiHandlerWithAuth<T = any> = (
  * @deprecated The /api path is deprecated and will be removed in the next major release.
  * Use the exports from /server instead
  */
-
 export function withAuth(handler: NextApiHandlerWithAuth, options?: ClerkMiddlewareOptions): NextApiHandlerWithAuth {
   return async (req, res) => {
-    await runMiddleware(req, res, async (req, res, next) => {
-      const requestState = await authenticateRequest(req, options);
-      if (requestState.isInterstitial) {
-        return handleInterstitialCase(res, requestState);
-      }
-      req.auth = { ...requestState.toAuth, claims: requestState.toAuth().sessionClaims };
-      return next();
-    });
+    await runMiddleware(
+      req,
+      res,
+      createClerkExpressRequireAuth({ clerkClient, frontendApi: FRONTEND_API, apiUrl: API_URL })(options),
+    );
 
     return handler(req, res);
   };
