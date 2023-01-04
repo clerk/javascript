@@ -14,18 +14,19 @@ import {
 
 interface RootAuthLoader {
   <Options extends RootAuthLoaderOptions>(
-    args: LoaderFunctionArgs,
+    argsOrReq: Request | LoaderFunctionArgs,
     callback: RootAuthLoaderCallback<Options>,
     options?: Options,
   ): Promise<LoaderFunctionReturn>;
-  (args: LoaderFunctionArgs, options?: RootAuthLoaderOptions): Promise<LoaderFunctionReturn>;
+  (argsOrReq: Request | LoaderFunctionArgs, options?: RootAuthLoaderOptions): Promise<LoaderFunctionReturn>;
 }
 
 export const rootAuthLoader: RootAuthLoader = async (
-  args: LoaderFunctionArgs,
+  argsOrReq: Request | LoaderFunctionArgs,
   cbOrOptions: any,
   options?: any,
 ): Promise<LoaderFunctionReturn> => {
+  const args = 'request' in argsOrReq ? { ...argsOrReq } : { request: argsOrReq, context: {}, params: {} };
   const callback = typeof cbOrOptions === 'function' ? cbOrOptions : undefined;
   const opts: RootAuthLoaderOptions = options
     ? options
