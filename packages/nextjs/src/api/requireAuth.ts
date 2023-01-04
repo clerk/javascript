@@ -1,21 +1,13 @@
-import { SignedInAuthObject } from '@clerk/backend';
-import { ClerkAPIError } from '@clerk/types';
+import { ClerkMiddlewareOptions, createClerkExpressRequireAuth, RequireAuthProp } from '@clerk/clerk-sdk-node';
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
-import { authenticateRequest, handleInterstitialCase, LegacyAuthObject, runMiddleware } from './utils';
-
-type RequireAuthProp<T> = { auth: LegacyAuthObject<SignedInAuthObject> } & T;
+import { API_URL, clerkClient, FRONTEND_API } from '../server';
+import { runMiddleware } from './utils';
 
 type NextApiHandlerRequireAuth<T = any> = (
   req: RequireAuthProp<NextApiRequest>,
   res: NextApiResponse<T>,
 ) => void | Promise<void>;
-
-type ClerkMiddlewareOptions = {
-  onError?: (error: ClerkAPIError) => unknown;
-  authorizedParties?: string[];
-  jwtKey?: string;
-};
 
 /**
  * @deprecated The /api path is deprecated and will be removed in the next major release.
@@ -24,16 +16,11 @@ type ClerkMiddlewareOptions = {
 export function requireAuth(handler: NextApiHandlerRequireAuth, options?: ClerkMiddlewareOptions): NextApiHandler {
   return async (req, res) => {
     try {
-      await runMiddleware(req, res, async (req, res, next) => {
-        const requestState = await authenticateRequest(req, options);
-        if (requestState.isInterstitial) {
-          return handleInterstitialCase(res, requestState);
-        }
-
-        req.auth = { ...requestState.toAuth(), claims: requestState.toAuth().sessionClaims };
-        return requestState.isSignedIn ? next() : next(new Error('Unauthenticated'));
-      });
-
+      await runMiddleware(
+        req,
+        res,
+        createClerkExpressRequireAuth({ clerkClient, apiUrl: API_URL, frontendApi: FRONTEND_API })(options),
+      );
       return handler(req as RequireAuthProp<NextApiRequest>, res);
     } catch (error) {
       // @ts-ignore
