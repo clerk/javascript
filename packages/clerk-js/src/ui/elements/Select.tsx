@@ -246,7 +246,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
       return onTriggerClick();
     }
 
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && focusedIndex >= 0) {
       e.preventDefault();
       return select(options[focusedIndex]);
     }
