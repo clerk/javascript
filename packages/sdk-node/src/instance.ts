@@ -1,8 +1,8 @@
-import Clerk from './Clerk';
+import { Clerk } from '@clerk/backend';
 
 export default Clerk;
 
-export { WithAuthProp, RequireAuthProp } from './Clerk';
+export { WithAuthProp, RequireAuthProp } from './types';
 
 export {
   AllowlistIdentifier,
@@ -21,4 +21,4 @@ export {
   SMSMessage,
   User,
   Verification,
-} from '@clerk/backend-core';
+} from '@clerk/backend';
