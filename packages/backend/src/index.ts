@@ -7,11 +7,20 @@ export * from './tokens/jwt';
 export * from './tokens/verify';
 export { constants } from './constants';
 
-export type ClerkOptions = CreateBackendApiOptions & Pick<CreateAuthenticateRequestOptions, 'jwtKey'>;
+export type ClerkOptions = CreateBackendApiOptions &
+  Partial<Pick<CreateAuthenticateRequestOptions['mutableOptions'], 'jwtKey'>>;
 
 export function Clerk(options: ClerkOptions) {
-  const apiClient = createBackendApiClient(options);
-  const requestState = createAuthenticateRequest({ ...options, apiClient });
+  const mutableOptions = { ...options };
+  const apiClient = createBackendApiClient(mutableOptions);
+  const requestState = createAuthenticateRequest({ mutableOptions, apiClient });
 
-  return { ...apiClient, ...requestState };
+  return {
+    ...apiClient,
+    ...requestState,
+    /**
+     * @deprecated This prop has been deprecated and will be removed in the next major release.
+     */
+    __unstable_mutableOptions: mutableOptions,
+  };
 }

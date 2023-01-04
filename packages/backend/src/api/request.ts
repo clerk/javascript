@@ -1,6 +1,8 @@
 import type { ClerkAPIError, ClerkAPIErrorJSON } from '@clerk/types';
+import deepmerge from 'deepmerge';
 import snakecaseKeys from 'snakecase-keys';
 
+import { API_URL, API_VERSION, USER_AGENT } from '../constants';
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
 import runtime from '../runtime';
@@ -36,14 +38,17 @@ export type ClerkBackendApiResponse<T> =
 
 export type RequestFunction = ReturnType<typeof buildRequest>;
 
-export function buildRequest({ apiUrl, apiKey, apiVersion, userAgent }: CreateBackendApiOptions) {
-  return async function request<T>({
-    path,
-    method,
-    queryParams,
-    headerParams,
-    bodyParams,
-  }: ClerkBackendApiRequestOptions): Promise<ClerkBackendApiResponse<T>> {
+export function buildRequest(mutableOptions: CreateBackendApiOptions) {
+  async function request<T>(requestOptions: ClerkBackendApiRequestOptions): Promise<ClerkBackendApiResponse<T>> {
+    const {
+      apiKey,
+      apiUrl = API_URL,
+      apiVersion = API_VERSION,
+      userAgent = USER_AGENT,
+      httpOptions = {},
+    } = mutableOptions;
+    const { path, method, queryParams, headerParams, bodyParams } = requestOptions;
+
     if (!apiKey) {
       throw Error(
         'Missing Clerk API Key. Go to https://dashboard.clerk.dev and get your Clerk API Key for your instance.',
@@ -80,12 +85,14 @@ export function buildRequest({ apiUrl, apiKey, apiVersion, userAgent }: CreateBa
     const body = hasBody ? { body: JSON.stringify(snakecaseKeys(bodyParams, { deep: false })) } : null;
 
     try {
-      const res = await runtime.fetch(finalUrl.href, {
-        method,
-        // @ts-expect-error
-        headers,
-        ...body,
-      });
+      const res = await runtime.fetch(
+        finalUrl.href,
+        deepmerge(httpOptions, {
+          method,
+          headers,
+          ...body,
+        }),
+      );
 
       // TODO: Parse JSON or Text response based on a response header
       const isJSONResponse = headers && headers['Content-Type'] === 'application/json';
@@ -117,7 +124,9 @@ export function buildRequest({ apiUrl, apiKey, apiVersion, userAgent }: CreateBa
         errors: parseErrors(err as ClerkAPIErrorJSON[]),
       };
     }
-  };
+  }
+
+  return { mutableOptions, request };
 }
 
 function parseErrors(data: ClerkAPIErrorJSON[] = []): ClerkAPIError[] {
