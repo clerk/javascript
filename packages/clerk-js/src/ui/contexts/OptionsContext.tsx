@@ -5,7 +5,7 @@ export const OptionsContext = React.createContext<ClerkOptions>({});
 
 interface OptionsProviderProps {
   children: React.ReactNode;
-  value: any;
+  value: ClerkOptions;
 }
 
 function OptionsProvider({ children, value }: OptionsProviderProps): JSX.Element {
