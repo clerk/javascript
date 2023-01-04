@@ -22,3 +22,19 @@ export type { LooseAuthProp, StrictAuthProp, WithAuthProp, RequireAuthProp, Cler
 
 export { createClerkExpressRequireAuth, ClerkExpressRequireAuth } from './clerkExpressRequireAuth';
 export { createClerkExpressWithAuth, ClerkExpressWithAuth } from './clerkExpressWithAuth';
+
+export const setClerkApiKey = (value: string) => {
+  clerkClient.__unstable_mutableOptions.apiKey = value;
+};
+
+export const setClerkServerApiUrl = (value: string) => {
+  clerkClient.__unstable_mutableOptions.apiKey = value;
+};
+
+export const setClerkApiVersion = (value: string) => {
+  clerkClient.__unstable_mutableOptions.apiVersion = value;
+};
+
+export const setClerkHttpOptions = (value: RequestInit) => {
+  clerkClient.__unstable_mutableOptions.httpOptions = value;
+};

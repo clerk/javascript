@@ -1,4 +1,3 @@
-import { API_URL, API_VERSION, USER_AGENT } from '../constants';
 import {
   AllowlistIdentifierAPI,
   ClientAPI,
@@ -25,19 +24,17 @@ export type CreateBackendApiOptions = {
   apiVersion?: string;
   /* Library/SDK name */
   userAgent?: string;
+  /**
+   * @deprecated This option has been deprecated and will be removed with the next major release.
+   * A RequestInit init object used by the `request` method.
+   */
+  httpOptions?: RequestInit;
 };
 
 export type ApiClient = ReturnType<typeof createBackendApiClient>;
 
-export function createBackendApiClient(options: CreateBackendApiOptions) {
-  const { apiKey, apiUrl = API_URL, apiVersion = API_VERSION, userAgent = USER_AGENT } = options;
-
-  const request = buildRequest({
-    apiKey,
-    apiUrl,
-    apiVersion,
-    userAgent,
-  });
+export function createBackendApiClient(mutableOptions: CreateBackendApiOptions) {
+  const request = buildRequest(mutableOptions);
 
   return {
     allowlistIdentifiers: new AllowlistIdentifierAPI(request),

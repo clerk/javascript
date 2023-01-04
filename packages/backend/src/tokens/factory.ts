@@ -12,20 +12,21 @@ import {
   debugRequestState,
 } from './request';
 
-export type CreateAuthenticateRequestOptions = Partial<
-  Pick<AuthenticateRequestOptions, 'apiKey' | 'apiUrl' | 'apiVersion' | 'frontendApi' | 'jwtKey'>
-> & {
+export type CreateAuthenticateRequestOptions = {
+  mutableOptions: Partial<
+    Pick<AuthenticateRequestOptions, 'apiKey' | 'apiUrl' | 'apiVersion' | 'frontendApi' | 'jwtKey'>
+  >;
   apiClient: ApiClient;
 };
 
-export function createAuthenticateRequest(options: CreateAuthenticateRequestOptions) {
+export function createAuthenticateRequest(params: CreateAuthenticateRequestOptions) {
+  const { apiClient } = params;
   const {
     apiKey: buildtimeApiKey = '',
     apiUrl = API_URL,
     apiVersion = API_VERSION,
-    apiClient,
     frontendApi: buildtimeFrontendApi = '',
-  } = options;
+  } = params.mutableOptions;
 
   const authenticateRequest = ({
     apiKey: runtimeApiKey,
