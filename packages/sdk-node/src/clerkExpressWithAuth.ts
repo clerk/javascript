@@ -1,21 +1,15 @@
-import { Clerk } from '@clerk/backend';
-
 import { authenticateRequest, handleInterstitialCase } from './authenticateRequest';
 import { API_KEY, API_URL, clerkClient } from './clerkClient';
+import { CreateClerkExpressMiddlewareOptions } from './clerkExpressRequireAuth';
 import type { ClerkMiddlewareOptions, MiddlewareWithAuthProp, WithAuthProp } from './types';
 
-export const createClerkExpressWithAuth = (createOpts: {
-  clerkClient: ReturnType<typeof Clerk>;
-  apiKey?: string;
-  frontendApi?: string;
-  apiUrl?: string;
-}) => {
-  const { clerkClient, apiUrl = '', frontendApi = '', apiKey = '' } = createOpts;
+export const createClerkExpressWithAuth = (createOpts: CreateClerkExpressMiddlewareOptions) => {
+  const { clerkClient, apiUrl = '', frontendApi = '', apiKey = '', publishableKey = '' } = createOpts;
   return (options: ClerkMiddlewareOptions = {}): MiddlewareWithAuthProp => {
     return async (req, res, next) => {
-      const requestState = await authenticateRequest(clerkClient, apiKey, frontendApi, req, options);
+      const requestState = await authenticateRequest(clerkClient, apiKey, frontendApi, publishableKey, req, options);
       if (requestState.isInterstitial) {
-        const interstitial = await clerkClient.remotePublicInterstitial({ apiUrl, frontendApi });
+        const interstitial = await clerkClient.remotePublicInterstitial({ apiUrl, frontendApi, publishableKey });
         return handleInterstitialCase(res, requestState, interstitial);
       }
       (req as WithAuthProp<any>).auth = {

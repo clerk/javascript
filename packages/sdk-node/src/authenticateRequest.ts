@@ -7,6 +7,7 @@ export const authenticateRequest = (
   clerkClient: ReturnType<typeof Clerk>,
   apiKey: string,
   frontendApi: string,
+  publishableKey: string,
   req: ExpressRequest,
   options?: ClerkMiddlewareOptions,
 ) => {
@@ -14,6 +15,7 @@ export const authenticateRequest = (
   return clerkClient.authenticateRequest({
     apiKey,
     frontendApi,
+    publishableKey,
     jwtKey,
     authorizedParties,
     cookieToken: req.cookies[constants.Cookies.Session] || '',

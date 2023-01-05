@@ -40,6 +40,8 @@ export type AuthenticateRequestOptions = RequiredVerifyTokenOptions &
     origin?: string;
     /* Clerk frontend Api value */
     frontendApi: string;
+    /* Clerk Publishable Key value */
+    publishableKey: string;
     /* Request host header value */
     host: string;
     /* Request forwarded host value */
@@ -81,6 +83,7 @@ export type SignedInState = {
   reason: null;
   message: null;
   frontendApi: string;
+  publishableKey: string;
   isSignedIn: true;
   isInterstitial: false;
   toAuth: () => SignedInAuthObject;
@@ -91,6 +94,7 @@ export type SignedOutState = {
   message: string;
   reason: AuthReason;
   frontendApi: string;
+  publishableKey: string;
   isSignedIn: false;
   isInterstitial: false;
   toAuth: () => SignedOutAuthObject;
@@ -190,6 +194,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       apiVersion,
       cookieToken,
       frontendApi,
+      publishableKey,
       headerToken,
       loadSession,
       loadUser,
@@ -230,6 +235,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       reason: null,
       message: null,
       frontendApi,
+      publishableKey,
       isSignedIn: true,
       isInterstitial: false,
       toAuth: () => authObject,
@@ -242,6 +248,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       reason,
       message,
       frontendApi: options.frontendApi,
+      publishableKey: options.publishableKey,
       isSignedIn: false,
       isInterstitial: false,
       toAuth: () => signedOutAuthObject(),
@@ -254,6 +261,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       reason,
       message,
       frontendApi: options.frontendApi,
+      publishableKey: options.publishableKey,
       isSignedIn: false,
       isInterstitial: true,
       toAuth: () => null,
@@ -369,10 +377,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
   return authenticateRequestWithTokenInCookie();
 }
 
-export const debugRequestState = ({ frontendApi, isSignedIn, isInterstitial, reason, message }: RequestState) => ({
-  frontendApi,
-  isSignedIn,
-  isInterstitial,
-  reason,
-  message,
-});
+export const debugRequestState = (params: RequestState) => {
+  const { frontendApi, isSignedIn, isInterstitial, reason, message, publishableKey } = params;
+  return { frontendApi, isSignedIn, isInterstitial, reason, message, publishableKey };
+};

@@ -14,7 +14,7 @@ import {
 
 export type CreateAuthenticateRequestOptions = {
   mutableOptions: Partial<
-    Pick<AuthenticateRequestOptions, 'apiKey' | 'apiUrl' | 'apiVersion' | 'frontendApi' | 'jwtKey'>
+    Pick<AuthenticateRequestOptions, 'apiKey' | 'apiUrl' | 'apiVersion' | 'frontendApi' | 'publishableKey' | 'jwtKey'>
   >;
   apiClient: ApiClient;
 };
@@ -26,11 +26,13 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
     apiUrl = API_URL,
     apiVersion = API_VERSION,
     frontendApi: buildtimeFrontendApi = '',
+    publishableKey: buildtimePublishableKey = '',
   } = params.mutableOptions;
 
   const authenticateRequest = ({
     apiKey: runtimeApiKey,
     frontendApi: runtimeFrontendApi,
+    publishableKey: runtimePublishableKey,
     ...rest
   }: Omit<AuthenticateRequestOptions, 'apiUrl' | 'apiVersion'>) =>
     authenticateRequestOriginal({
@@ -39,12 +41,22 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
       apiUrl,
       apiVersion,
       frontendApi: runtimeFrontendApi || buildtimeFrontendApi,
+      publishableKey: runtimePublishableKey || buildtimePublishableKey,
     });
 
   const localInterstitial = loadInterstitialFromLocal;
 
-  const remotePublicInterstitial = ({ frontendApi: runtimeFrontendApi, ...rest }: LoadInterstitialOptions) =>
-    loadInterstitialFromBAPI({ ...rest, apiUrl, frontendApi: runtimeFrontendApi || buildtimeFrontendApi });
+  const remotePublicInterstitial = ({
+    frontendApi: runtimeFrontendApi,
+    publishableKey: runtimePublishableKey,
+    ...rest
+  }: LoadInterstitialOptions) =>
+    loadInterstitialFromBAPI({
+      ...rest,
+      apiUrl,
+      frontendApi: runtimeFrontendApi || buildtimeFrontendApi,
+      publishableKey: runtimeFrontendApi || buildtimeFrontendApi,
+    });
 
   const remotePublicInterstitialUrl = buildPublicInterstitialUrl;
 
