@@ -37,9 +37,31 @@ export type ClerkBackendApiResponse<T> =
     };
 
 export type RequestFunction = ReturnType<typeof buildRequest>;
+type LegacyRequestFunction = <T>(requestOptions: ClerkBackendApiRequestOptions) => Promise<T>;
+
+/**
+ * Switching to the { data, errors } format is a breaking change, so we will skip it for now
+ * until we release v5 of the related SDKs.
+ * This HOF wraps the request helper and transforms the new return to the legacy return.
+ * TODO: Simply remove this wrapper and the ClerkAPIResponseError before the v5 release.
+ */
+const withLegacyReturn =
+  (cb: any): LegacyRequestFunction =>
+  async (...args) => {
+    // @ts-ignore
+    const { data, errors, status, statusText } = await cb<T>(...args);
+    if (errors === null) {
+      return data;
+    } else {
+      throw new ClerkAPIResponseError(statusText || '', {
+        data: errors,
+        status: status || '',
+      });
+    }
+  };
 
 export function buildRequest(mutableOptions: CreateBackendApiOptions) {
-  async function request<T>(requestOptions: ClerkBackendApiRequestOptions): Promise<ClerkBackendApiResponse<T>> {
+  const request = async <T>(requestOptions: ClerkBackendApiRequestOptions): Promise<ClerkBackendApiResponse<T>> => {
     const {
       apiKey,
       apiUrl = API_URL,
@@ -84,8 +106,9 @@ export function buildRequest(mutableOptions: CreateBackendApiOptions) {
     const hasBody = method !== 'GET' && bodyParams && Object.keys(bodyParams).length > 0;
     const body = hasBody ? { body: JSON.stringify(snakecaseKeys(bodyParams, { deep: false })) } : null;
 
+    let res: Response | undefined = undefined;
     try {
-      const res = await runtime.fetch(
+      res = await runtime.fetch(
         finalUrl.href,
         deepmerge(httpOptions, {
           method,
@@ -103,7 +126,7 @@ export function buildRequest(mutableOptions: CreateBackendApiOptions) {
       }
 
       return {
-        data: deserialize(data) as T,
+        data: deserialize(data),
         errors: null,
       };
     } catch (err) {
@@ -122,11 +145,15 @@ export function buildRequest(mutableOptions: CreateBackendApiOptions) {
       return {
         data: null,
         errors: parseErrors(err as ClerkAPIErrorJSON[]),
+        // TODO: To be removed with withLegacyReturn
+        // @ts-expect-error
+        status: res?.status,
+        statusText: res?.statusText,
       };
     }
-  }
+  };
 
-  return { mutableOptions, request };
+  return withLegacyReturn(request);
 }
 
 function parseErrors(data: ClerkAPIErrorJSON[] = []): ClerkAPIError[] {
@@ -143,4 +170,24 @@ function parseError(error: ClerkAPIErrorJSON): ClerkAPIError {
       sessionId: error?.meta?.session_id,
     },
   };
+}
+
+class ClerkAPIResponseError extends Error {
+  clerkError: true;
+
+  status: number;
+  message: string;
+
+  errors: ClerkAPIError[];
+
+  constructor(message: string, { data, status }: { data: ClerkAPIError[]; status: number }) {
+    super(message);
+
+    Object.setPrototypeOf(this, ClerkAPIResponseError.prototype);
+
+    this.clerkError = true;
+    this.message = message;
+    this.status = status;
+    this.errors = data;
+  }
 }
