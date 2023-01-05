@@ -76,7 +76,7 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
             onAvatarChange={async file => await setFile(file)}
             onAvatarRemove={file ? onAvatarRemove : null}
           />
-          <Form.ControlRow>
+          <Form.ControlRow elementId={nameField.id}>
             <Form.Control
               sx={{ flexBasis: '80%' }}
               {...nameField.props}

@@ -33,7 +33,7 @@ export const UsernamePage = withCardStateProvider(() => {
         Breadcrumbs={UserProfileBreadcrumbs}
       >
         <Form.Root onSubmit={updatePassword}>
-          <Form.ControlRow>
+          <Form.ControlRow elementId={usernameField.id}>
             <Form.Control
               {...usernameField.props}
               required

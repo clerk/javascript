@@ -66,7 +66,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
           gap={8}
         >
           <Form.Root onSubmit={handlePasswordSubmit}>
-            <Form.ControlRow>
+            <Form.ControlRow elementId={passwordControl.id}>
               <Form.Control
                 {...passwordControl.props}
                 autoFocus

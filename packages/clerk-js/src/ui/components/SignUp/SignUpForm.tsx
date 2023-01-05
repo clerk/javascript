@@ -30,7 +30,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
   return (
     <Form.Root onSubmit={handleSubmit}>
       {(shouldShow('firstName') || shouldShow('lastName')) && (
-        <Form.ControlRow>
+        <Form.ControlRow elementId='name'>
           {shouldShow('firstName') && (
             <Form.Control
               {...{
@@ -52,7 +52,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
         </Form.ControlRow>
       )}
       {shouldShow('username') && (
-        <Form.ControlRow>
+        <Form.ControlRow elementId='username'>
           <Form.Control
             {...{
               ...formState.username.props,
@@ -63,7 +63,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
         </Form.ControlRow>
       )}
       {shouldShow('emailAddress') && (
-        <Form.ControlRow>
+        <Form.ControlRow elementId='emailAddress'>
           <Form.Control
             {...{
               ...formState.emailAddress.props,
@@ -76,7 +76,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
         </Form.ControlRow>
       )}
       {shouldShow('phoneNumber') && (
-        <Form.ControlRow>
+        <Form.ControlRow elementId='phoneNumber'>
           <Form.Control
             {...{
               ...formState.phoneNumber.props,
@@ -89,7 +89,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
         </Form.ControlRow>
       )}
       {shouldShow('password') && (
-        <Form.ControlRow>
+        <Form.ControlRow elementId='password'>
           <Form.Control
             {...{
               ...formState.password.props,

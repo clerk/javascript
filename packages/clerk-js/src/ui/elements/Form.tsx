@@ -1,4 +1,5 @@
 import { createContextAndHook } from '@clerk/shared';
+import { FieldId } from '@clerk/types';
 import React from 'react';
 
 import { Button, descriptors, Flex, Form as FormPrim, localizationKeys } from '../customizables';
@@ -95,13 +96,15 @@ const FormReset = (props: PropsOfComponent<typeof Button>) => {
   );
 };
 
-const FormControlRow = (props: React.PropsWithChildren<any>) => {
+const FormControlRow = (props: Omit<PropsOfComponent<typeof Flex>, 'elementId'> & { elementId?: FieldId }) => {
+  const { elementId, ...rest } = props;
   return (
     <Flex
       elementDescriptor={descriptors.formFieldRow}
+      elementId={descriptors.formFieldRow.setId(elementId)}
       justify='between'
       gap={4}
-      {...props}
+      {...rest}
     />
   );
 };

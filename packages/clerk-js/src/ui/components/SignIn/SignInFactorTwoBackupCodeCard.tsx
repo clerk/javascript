@@ -56,7 +56,7 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
         gap={8}
       >
         <Form.Root onSubmit={handleBackupCodeSubmit}>
-          <Form.ControlRow>
+          <Form.ControlRow elementId={codeControl.id}>
             <Form.Control
               {...codeControl.props}
               autoFocus

@@ -78,7 +78,7 @@ export const AddPhone = (props: AddPhoneProps) => {
       Breadcrumbs={UserProfileBreadcrumbs}
     >
       <Form.Root onSubmit={addPhone}>
-        <Form.ControlRow>
+        <Form.ControlRow elementId={phoneField.id}>
           <Form.Control
             {...phoneField.props}
             required

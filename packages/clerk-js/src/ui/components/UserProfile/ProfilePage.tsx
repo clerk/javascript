@@ -89,7 +89,7 @@ export const ProfilePage = withCardStateProvider(() => {
             onAvatarRemove={isDefaultProfileImage(user.profileImageUrl) ? onAvatarRemove : null}
           />
           {showFirstName && (
-            <Form.ControlRow>
+            <Form.ControlRow elementId={firstNameField.id}>
               <Form.Control
                 {...firstNameField.props}
                 required={first_name.required}
@@ -97,7 +97,7 @@ export const ProfilePage = withCardStateProvider(() => {
             </Form.ControlRow>
           )}
           {showLastName && (
-            <Form.ControlRow>
+            <Form.ControlRow elementId={lastNameField.id}>
               <Form.Control
                 {...lastNameField.props}
                 required={last_name.required}

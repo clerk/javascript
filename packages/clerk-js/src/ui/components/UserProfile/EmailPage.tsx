@@ -52,7 +52,7 @@ export const EmailPage = withCardStateProvider(() => {
     <Wizard {...wizard.props}>
       <ContentPage headerTitle={title}>
         <Form.Root onSubmit={addEmail}>
-          <Form.ControlRow>
+          <Form.ControlRow elementId={emailField.id}>
             <Form.Control
               {...emailField.props}
               required
