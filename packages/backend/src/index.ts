@@ -8,12 +8,12 @@ export * from './tokens/verify';
 export { constants } from './constants';
 
 export type ClerkOptions = CreateBackendApiOptions &
-  Partial<Pick<CreateAuthenticateRequestOptions['mutableOptions'], 'jwtKey'>>;
+  Partial<Pick<CreateAuthenticateRequestOptions['options'], 'jwtKey'>>;
 
 export function Clerk(options: ClerkOptions) {
-  const mutableOptions = { ...options };
-  const apiClient = createBackendApiClient(mutableOptions);
-  const requestState = createAuthenticateRequest({ mutableOptions, apiClient });
+  const opts = { ...options };
+  const apiClient = createBackendApiClient(opts);
+  const requestState = createAuthenticateRequest({ options: opts, apiClient });
 
   return {
     ...apiClient,
@@ -21,6 +21,6 @@ export function Clerk(options: ClerkOptions) {
     /**
      * @deprecated This prop has been deprecated and will be removed in the next major release.
      */
-    __unstable_mutableOptions: mutableOptions,
+    __unstable_options: opts,
   };
 }

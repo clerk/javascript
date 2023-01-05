@@ -60,15 +60,9 @@ const withLegacyReturn =
     }
   };
 
-export function buildRequest(mutableOptions: CreateBackendApiOptions) {
+export function buildRequest(options: CreateBackendApiOptions) {
   const request = async <T>(requestOptions: ClerkBackendApiRequestOptions): Promise<ClerkBackendApiResponse<T>> => {
-    const {
-      apiKey,
-      apiUrl = API_URL,
-      apiVersion = API_VERSION,
-      userAgent = USER_AGENT,
-      httpOptions = {},
-    } = mutableOptions;
+    const { apiKey, apiUrl = API_URL, apiVersion = API_VERSION, userAgent = USER_AGENT, httpOptions = {} } = options;
     const { path, method, queryParams, headerParams, bodyParams } = requestOptions;
 
     if (!apiKey) {

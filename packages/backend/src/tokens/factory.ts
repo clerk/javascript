@@ -13,7 +13,7 @@ import {
 } from './request';
 
 export type CreateAuthenticateRequestOptions = {
-  mutableOptions: Partial<
+  options: Partial<
     Pick<AuthenticateRequestOptions, 'apiKey' | 'apiUrl' | 'apiVersion' | 'frontendApi' | 'publishableKey' | 'jwtKey'>
   >;
   apiClient: ApiClient;
@@ -27,7 +27,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
     apiVersion = API_VERSION,
     frontendApi: buildtimeFrontendApi = '',
     publishableKey: buildtimePublishableKey = '',
-  } = params.mutableOptions;
+  } = params.options;
 
   const authenticateRequest = ({
     apiKey: runtimeApiKey,
@@ -55,7 +55,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
       ...rest,
       apiUrl,
       frontendApi: runtimeFrontendApi || buildtimeFrontendApi,
-      publishableKey: runtimeFrontendApi || buildtimeFrontendApi,
+      publishableKey: runtimePublishableKey || buildtimePublishableKey,
     });
 
   const remotePublicInterstitialUrl = buildPublicInterstitialUrl;
