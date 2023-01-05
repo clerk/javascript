@@ -1,7 +1,7 @@
 import { constants } from '@clerk/backend';
 import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
-import { API_URL, clerkClient, FRONTEND_API, sanitizeAuthObject } from '../server/clerk';
+import { API_URL, clerkClient, FRONTEND_API, PUBLISHABLE_KEY, sanitizeAuthObject } from '../server/clerk';
 import { WithServerSideAuthCallback, WithServerSideAuthOptions, WithServerSideAuthResult } from './types';
 import { authenticateRequest, injectAuthIntoRequest, injectSSRStateIntoProps } from './utils';
 
@@ -33,7 +33,11 @@ export const withServerSideAuth: WithServerSideAuth = (cbOrOptions: any, options
       ctx.res.setHeader(constants.Headers.AuthMessage, requestState.message);
       ctx.res.setHeader(constants.Headers.AuthReason, requestState.reason);
       ctx.res.writeHead(401, { 'Content-Type': 'text/html' });
-      const interstitial = await clerkClient.remotePublicInterstitial({ apiUrl: API_URL, frontendApi: FRONTEND_API });
+      const interstitial = await clerkClient.remotePublicInterstitial({
+        apiUrl: API_URL,
+        publishableKey: PUBLISHABLE_KEY,
+        frontendApi: FRONTEND_API,
+      });
       ctx.res.end(interstitial);
       return EMPTY_GSSP_RESPONSE;
     }

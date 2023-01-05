@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from 'next';
 
-import { API_KEY, clerkClient, FRONTEND_API } from '../../server/clerk';
+import { API_KEY, clerkClient, FRONTEND_API, PUBLISHABLE_KEY } from '../../server';
 import { WithServerSideAuthOptions } from '../types';
 
 /**
@@ -16,6 +16,7 @@ export async function authenticateRequest(ctx: GetServerSidePropsContext, opts: 
     ...opts,
     apiKey: API_KEY,
     frontendApi: FRONTEND_API,
+    publishableKey: PUBLISHABLE_KEY,
     cookieToken,
     headerToken,
     clientUat: cookies['__client_uat'],

@@ -2,7 +2,7 @@ import { type OptionalVerifyTokenOptions, AuthStatus, constants } from '@clerk/b
 import { NextMiddleware, NextMiddlewareResult } from 'next/dist/server/web/types';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 
-import { API_KEY, API_URL, clerkClient, FRONTEND_API } from './clerk';
+import { API_KEY, API_URL, clerkClient, FRONTEND_API, PUBLISHABLE_KEY } from './clerk';
 import {
   getCookie,
   nextJsVersionCanOverrideRequestHeaders,
@@ -34,6 +34,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
       // TODO: Make apiKey optional
       apiKey: API_KEY,
       frontendApi: FRONTEND_API,
+      publishableKey: PUBLISHABLE_KEY,
       cookieToken,
       headerToken,
       clientUat: getCookie(req, '__client_uat'),
@@ -53,6 +54,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
         clerkClient.remotePublicInterstitialUrl({
           apiUrl: API_URL,
           frontendApi: FRONTEND_API,
+          publishableKey: PUBLISHABLE_KEY,
         }),
       );
       response.headers.set(constants.Headers.AuthReason, requestState.reason);

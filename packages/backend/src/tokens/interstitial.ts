@@ -10,15 +10,13 @@ import { TokenVerificationError, TokenVerificationErrorAction, TokenVerification
 export type LoadInterstitialOptions = {
   apiUrl: string;
   frontendApi: string;
+  publishableKey: string;
   pkgVersion?: string;
   debugData?: any;
 };
 
-export function loadInterstitialFromLocal({
-  frontendApi,
-  pkgVersion,
-  debugData,
-}: Omit<LoadInterstitialOptions, 'apiUrl'>) {
+export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions, 'apiUrl'>) {
+  const { debugData, frontendApi, pkgVersion, publishableKey } = options;
   return `
     <head>
         <meta charset="UTF-8" />
@@ -63,7 +61,11 @@ export function loadInterstitialFromLocal({
             };
             (() => {
                 const script = document.createElement('script');
-                script.setAttribute('data-clerk-frontend-api', '${frontendApi}');
+                ${
+                  publishableKey
+                    ? `script.setAttribute('data-clerk-publishable-key', '${publishableKey}');`
+                    : `script.setAttribute('data-clerk-frontend-api', '${frontendApi}');`
+                }
                 script.async = true;
                 script.src = '${getScriptUrl(frontendApi, pkgVersion)}';
                 script.crossOrigin = 'anonymous';
@@ -91,11 +93,16 @@ export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions)
   return response.text();
 }
 
-export function buildPublicInterstitialUrl({ apiUrl, frontendApi, pkgVersion }: LoadInterstitialOptions) {
+export function buildPublicInterstitialUrl(options: LoadInterstitialOptions) {
+  const { apiUrl, frontendApi, pkgVersion, publishableKey } = options;
   const url = new URL(apiUrl);
   url.pathname = joinPaths(url.pathname, API_VERSION, '/public/interstitial');
   url.searchParams.append('clerk_js_version', getClerkJsMajorVersionOrTag(frontendApi, pkgVersion));
-  url.searchParams.append('frontendApi', frontendApi);
+  if (publishableKey) {
+    url.searchParams.append('publishable_key', publishableKey);
+  } else {
+    url.searchParams.append('frontend_api', frontendApi);
+  }
   return url.href;
 }
 
