@@ -38,7 +38,8 @@ describe('authenticateRequest', () => {
     const clerkClient = mockClerkClient();
     const apiKey = 'apiKey';
     const frontendApi = 'frontendApi';
-    await authenticateRequest(clerkClient as any, apiKey, frontendApi, req, options);
+    const publishableKey = 'publishableKey';
+    await authenticateRequest(clerkClient as any, apiKey, frontendApi, publishableKey, req, options);
     expect(clerkClient.authenticateRequest).toHaveBeenCalledWith({
       authorizedParties: ['party1'],
       clientUat: 'token',
@@ -47,6 +48,7 @@ describe('authenticateRequest', () => {
       forwardedPort: 'port',
       apiKey: apiKey,
       frontendApi: frontendApi,
+      publishableKey: publishableKey,
       headerToken: 'token',
       host: 'host',
       jwtKey: 'jwtKey',

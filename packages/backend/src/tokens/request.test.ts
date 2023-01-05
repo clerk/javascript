@@ -15,6 +15,8 @@ export default (QUnit: QUnit) => {
     apiUrl: 'https://api.clerk.test',
     apiVersion: 'v1',
     frontendApi: 'cafe.babe.clerk.ts',
+    // TODO: How do we test this?
+    publishableKey: '',
     host: 'example.com',
     userAgent: 'Mozilla/TestAgent',
     skipJwksCache: true,
@@ -52,6 +54,7 @@ export default (QUnit: QUnit) => {
 
       assert.propContains(requestState, {
         frontendApi: 'cafe.babe.clerk.ts',
+        publishableKey: '',
         status: 'signed-in',
         isSignedIn: true,
         isInterstitial: false,
@@ -87,6 +90,7 @@ export default (QUnit: QUnit) => {
 
       assert.propEqual(requestState, {
         frontendApi: 'cafe.babe.clerk.ts',
+        publishableKey: '',
         status: 'signed-out',
         isSignedIn: false,
         isInterstitial: false,
@@ -118,6 +122,7 @@ export default (QUnit: QUnit) => {
 
       assert.propEqual(requestState, {
         frontendApi: 'cafe.babe.clerk.ts',
+        publishableKey: '',
         status: 'signed-out',
         isSignedIn: false,
         isInterstitial: false,

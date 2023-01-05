@@ -27,18 +27,18 @@ export default (QUnit: QUnit) => {
 
       const payload = await apiClient.users.getUser('user_deadbeef');
 
-      if (!payload.data) {
-        assert.false(true, 'This assertion should never fail. We need to check for payload.data to make TS happy.');
+      if (!payload) {
+        assert.false(true, 'This assertion should never fail. We need to check for payload to make TS happy.');
         return;
       }
 
-      assert.equal(payload.data.firstName, 'John');
-      assert.equal(payload.data.lastName, 'Doe');
-      assert.equal(payload.data.emailAddresses[0].emailAddress, 'john.doe@clerk.test');
-      assert.equal(payload.data.phoneNumbers[0].phoneNumber, '+311-555-2368');
-      assert.equal(payload.data.externalAccounts[0].emailAddress, 'john.doe@clerk.test');
-      assert.equal(payload.data.publicMetadata.zodiac_sign, 'leo');
-      assert.equal(payload.errors, null);
+      assert.equal(payload.firstName, 'John');
+      assert.equal(payload.lastName, 'Doe');
+      assert.equal(payload.emailAddresses[0].emailAddress, 'john.doe@clerk.test');
+      assert.equal(payload.phoneNumbers[0].phoneNumber, '+311-555-2368');
+      assert.equal(payload.externalAccounts[0].emailAddress, 'john.doe@clerk.test');
+      assert.equal(payload.publicMetadata.zodiac_sign, 'leo');
+      // assert.equal(payload.errors, null);
 
       assert.ok(
         fakeFetch.calledOnceWith('https://api.clerk.test/v1/users/user_deadbeef', {
@@ -58,18 +58,18 @@ export default (QUnit: QUnit) => {
 
       const payload = await apiClient.users.getUserList({ offset: 2, limit: 5 });
 
-      if (!payload.data) {
-        assert.false(true, 'This assertion should never fail. We need to check for payload.data to make TS happy.');
+      if (!payload) {
+        assert.false(true, 'This assertion should never fail. We need to check for payload to make TS happy.');
         return;
       }
 
-      assert.equal(payload.data[0].firstName, 'John');
-      assert.equal(payload.data[0].lastName, 'Doe');
-      assert.equal(payload.data[0].emailAddresses[0].emailAddress, 'john.doe@clerk.test');
-      assert.equal(payload.data[0].phoneNumbers[0].phoneNumber, '+311-555-2368');
-      assert.equal(payload.data[0].externalAccounts[0].emailAddress, 'john.doe@clerk.test');
-      assert.equal(payload.data[0].publicMetadata.zodiac_sign, 'leo');
-      assert.equal(payload.errors, null);
+      assert.equal(payload[0].firstName, 'John');
+      assert.equal(payload[0].lastName, 'Doe');
+      assert.equal(payload[0].emailAddresses[0].emailAddress, 'john.doe@clerk.test');
+      assert.equal(payload[0].phoneNumbers[0].phoneNumber, '+311-555-2368');
+      assert.equal(payload[0].externalAccounts[0].emailAddress, 'john.doe@clerk.test');
+      assert.equal(payload[0].publicMetadata.zodiac_sign, 'leo');
+      // assert.equal(payload.errors, null);
 
       assert.ok(
         fakeFetch.calledOnceWith('https://api.clerk.test/v1/users?offset=2&limit=5', {
@@ -119,11 +119,13 @@ export default (QUnit: QUnit) => {
       fakeFetch = sinon.stub(runtime, 'fetch');
       fakeFetch.onCall(0).returns(jsonNotOk([mockErrorPayload]));
 
-      const payload = await apiClient.users.getUser('user_deadbeef');
-
-      assert.equal(payload.data, null);
-      // @ts-expect-error
-      assert.equal(payload.errors[0].code, 'whatever_error');
+      try {
+        await apiClient.users.getUser('user_deadbeef');
+      } catch (e: any) {
+        assert.equal(e.clerkError, true);
+        assert.equal(e.status, 422);
+        assert.equal(e.errors[0].code, 'whatever_error');
+      }
 
       assert.ok(
         fakeFetch.calledOnceWith('https://api.clerk.test/v1/users/user_deadbeef', {
