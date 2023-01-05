@@ -2,6 +2,7 @@ import { type OptionalVerifyTokenOptions, AuthStatus, constants } from '@clerk/b
 import { NextMiddleware, NextMiddlewareResult } from 'next/dist/server/web/types';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 
+import { constants as nextConstants } from '../constants';
 import { API_KEY, API_URL, clerkClient, FRONTEND_API, PUBLISHABLE_KEY } from './clerk';
 import {
   getCookie,
@@ -86,20 +87,20 @@ export function handleMiddlewareResult({ req, res, authStatus }: HandleMiddlewar
   }
 
   // redirect() case, return early
-  if (res.headers.get(constants.Headers.NextRedirect)) {
+  if (res.headers.get(nextConstants.Headers.NextRedirect)) {
     return res;
   }
 
   let rewriteURL;
 
   // next() case, convert to a rewrite
-  if (res.headers.get(constants.Headers.NextResume) === '1') {
-    res.headers.delete(constants.Headers.NextResume);
+  if (res.headers.get(nextConstants.Headers.NextResume) === '1') {
+    res.headers.delete(nextConstants.Headers.NextResume);
     rewriteURL = new URL(req.url);
   }
 
   // rewrite() case, set auth result only if origin remains the same
-  const rewriteURLHeader = res.headers.get(constants.Headers.NextRewrite);
+  const rewriteURLHeader = res.headers.get(nextConstants.Headers.NextRewrite);
 
   if (rewriteURLHeader) {
     const reqURL = new URL(req.url);
@@ -121,7 +122,7 @@ export function handleMiddlewareResult({ req, res, authStatus }: HandleMiddlewar
       res.headers.set(constants.Headers.AuthStatus, authStatus);
       rewriteURL.searchParams.set(constants.SearchParams.AuthStatus, authStatus);
     }
-    res.headers.set(constants.Headers.NextRewrite, rewriteURL.href);
+    res.headers.set(nextConstants.Headers.NextRewrite, rewriteURL.href);
   }
 
   return res;

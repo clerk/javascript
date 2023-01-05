@@ -24,17 +24,17 @@ export { createClerkExpressRequireAuth, ClerkExpressRequireAuth } from './clerkE
 export { createClerkExpressWithAuth, ClerkExpressWithAuth } from './clerkExpressWithAuth';
 
 export const setClerkApiKey = (value: string) => {
-  clerkClient.__unstable_mutableOptions.apiKey = value;
+  clerkClient.__unstable_options.apiKey = value;
 };
 
 export const setClerkServerApiUrl = (value: string) => {
-  clerkClient.__unstable_mutableOptions.apiKey = value;
+  clerkClient.__unstable_options.apiKey = value;
 };
 
 export const setClerkApiVersion = (value: string) => {
-  clerkClient.__unstable_mutableOptions.apiVersion = value;
+  clerkClient.__unstable_options.apiVersion = value;
 };
 
 export const setClerkHttpOptions = (value: RequestInit) => {
-  clerkClient.__unstable_mutableOptions.httpOptions = value;
+  clerkClient.__unstable_options.httpOptions = value;
 };

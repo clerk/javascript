@@ -33,8 +33,8 @@ export type CreateBackendApiOptions = {
 
 export type ApiClient = ReturnType<typeof createBackendApiClient>;
 
-export function createBackendApiClient(mutableOptions: CreateBackendApiOptions) {
-  const request = buildRequest(mutableOptions);
+export function createBackendApiClient(options: CreateBackendApiOptions) {
+  const request = buildRequest(options);
 
   return {
     allowlistIdentifiers: new AllowlistIdentifierAPI(request),
