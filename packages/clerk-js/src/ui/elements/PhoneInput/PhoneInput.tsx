@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 
 import { getLongestValidCountryCode } from '../../../ui/utils/phoneUtils';
 import { Flex, Input, Text } from '../../customizables';
@@ -174,18 +174,18 @@ const CountryCodeListItem = React.memo((props: CountryCodeListItemProps) => {
 });
 
 const Flag = (props: { iso: CountryIso }) => {
-  const [isWindows, setIsWindows] = useState(false);
+  const [supportsCountryEmoji, setSupportsCountryEmoji] = useState(false);
 
   useLayoutEffect(() => {
-    setIsWindows(window.navigator.userAgent.indexOf('Windows') > -1);
+    setSupportsCountryEmoji(!window.navigator.userAgent.includes('Windows'));
   }, []);
 
   return (
     <>
-      {isWindows ? (
-        <Text variant='smallBold'>{props.iso.toUpperCase()}</Text>
-      ) : (
+      {supportsCountryEmoji ? (
         <Flex sx={theme => ({ fontSize: theme.fontSizes.$md })}>{getFlagEmojiFromCountryIso(props.iso)}</Flex>
+      ) : (
+        <Text variant='smallBold'>{props.iso.toUpperCase()}</Text>
       )}
     </>
   );
