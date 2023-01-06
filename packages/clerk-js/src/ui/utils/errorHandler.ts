@@ -18,9 +18,6 @@ function setFieldErrors(fieldStates: Array<FormControlState<string>>, errors: Cl
     const error = errors.find(err => {
       return err.meta!.paramName === field.id || snakeToCamel(err.meta!.paramName) === field.id;
     });
-    if (!error) {
-      return;
-    }
     field.setError(error || undefined);
   });
 }
