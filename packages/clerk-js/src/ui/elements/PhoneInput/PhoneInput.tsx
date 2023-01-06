@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 
 import { getLongestValidCountryCode } from '../../../ui/utils/phoneUtils';
 import { Flex, Input, Text } from '../../customizables';
@@ -137,11 +137,10 @@ export const PhoneInput = (props: PhoneInputProps) => {
   );
 };
 
-type CountryCodeListItem = PropsOfComponent<typeof Flex> & {
+type CountryCodeListItemProps = PropsOfComponent<typeof Flex> & {
   country: CountryEntry;
 };
-
-const CountryCodeListItem = React.memo((props: CountryCodeListItem) => {
+const CountryCodeListItem = React.memo((props: CountryCodeListItemProps) => {
   const { country, sx, ...rest } = props;
   return (
     <Flex
@@ -175,5 +174,19 @@ const CountryCodeListItem = React.memo((props: CountryCodeListItem) => {
 });
 
 const Flag = (props: { iso: CountryIso }) => {
-  return <Flex sx={theme => ({ fontSize: theme.fontSizes.$md })}>{getFlagEmojiFromCountryIso(props.iso)}</Flex>;
+  const [supportsCountryEmoji, setSupportsCountryEmoji] = useState(false);
+
+  useLayoutEffect(() => {
+    setSupportsCountryEmoji(!window.navigator.userAgent.includes('Windows'));
+  }, []);
+
+  return (
+    <>
+      {supportsCountryEmoji ? (
+        <Flex sx={theme => ({ fontSize: theme.fontSizes.$md })}>{getFlagEmojiFromCountryIso(props.iso)}</Flex>
+      ) : (
+        <Text variant='smallBold'>{props.iso.toUpperCase()}</Text>
+      )}
+    </>
+  );
 };
