@@ -40,6 +40,7 @@ const defaultLayout: ParsedLayout = {
   helpPageUrl: '',
   privacyPageUrl: '',
   termsPageUrl: '',
+  avatarShimmer: true,
 };
 
 /**
