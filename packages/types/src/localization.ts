@@ -515,6 +515,10 @@ type _LocalizationResource = {
   };
   createOrganization: {
     title: LocalizationValue;
+    /**
+     * @deprecated This key is no longer used and will be removed in the next major version
+     */
+    subtitle: LocalizationValue;
     invitePage: {
       formButtonReset: LocalizationValue;
     };

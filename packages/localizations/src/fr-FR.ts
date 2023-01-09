@@ -527,6 +527,7 @@ export const frFR: DeepRequired<LocalizationResource> = {
   },
   createOrganization: {
     title: 'Créer une organisation',
+    subtitle: 'Créer une organisation pour votre équipe',
     invitePage: {
       formButtonReset: 'Passer',
     },
