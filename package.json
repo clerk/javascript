@@ -48,7 +48,7 @@
     "graduate": "lerna version --conventional-graduate",
     "release:staging": "lerna publish from-package --dist-tag staging",
     "release": "lerna publish from-package",
-    "prerelease": "npx rimraf packages/*/dist && turbo run build test --concurrency=${TURBO_CONCURRENCY:-2} --force",
+    "prerelease": "npx rimraf packages/*/dist && turbo run build test --filter=!gatsby-plugin-clerk --filter=!@clerk/remix --concurrency=${TURBO_CONCURRENCY:-2} --force",
     "release:next": "lerna publish from-package --dist-tag next",
     "version": "./scripts/version-info.sh",
     "nuke": "rm -r node_modules; for d in packages/*/node_modules; do echo $d; rm -r $d; done",
