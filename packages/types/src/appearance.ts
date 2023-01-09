@@ -65,7 +65,6 @@ export type FieldId =
   | 'identifier'
   | 'username'
   | 'code'
-  | 'name'
   | 'role';
 export type ProfileSectionId =
   | 'profile'
