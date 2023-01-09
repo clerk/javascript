@@ -8,8 +8,9 @@ import verifyTest from './dist/tokens/verify.test.js';
 import jwtTest from './dist/tokens/jwt.test.js';
 
 import utilRequestTest from './dist/util/request.test.js';
+import factoryTest from './dist/api/factory.test.js';
 
 // Add them to the suite array
-const suites = [apiTest, requestTest, utilRequestTest, keysTest, verifyTest, pathTest, jwtTest];
+const suites = [apiTest, requestTest, utilRequestTest, keysTest, verifyTest, pathTest, jwtTest, factoryTest];
 
 export default suites;
