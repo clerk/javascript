@@ -17,7 +17,11 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
   // 2. Then try from globalThis (Cloudflare Workers).
   // 3. Then from loader context (Cloudflare Pages).
   // 4. Otherwise check if the user passed the key in the getAuth function or the rootAuthLoader.
-  const apiKey = getEnvVariable('CLERK_API_KEY') || (context?.CLERK_API_KEY as string) || opts.apiKey;
+  const apiKey =
+    getEnvVariable('CLERK_SECRET_KEY') ||
+    getEnvVariable('CLERK_API_KEY') ||
+    (context?.CLERK_API_KEY as string) ||
+    opts.apiKey;
   assertEnvVar(apiKey, noApiKeyError);
 
   const frontendApi =

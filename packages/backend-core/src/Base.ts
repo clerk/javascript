@@ -17,7 +17,7 @@ import { mapErrorReasonResponse, TokenVerificationError } from './util/errors';
 import { checkClaims, isExpired } from './util/jwt';
 import { checkCrossOrigin } from './util/request';
 
-export const API_KEY = process.env.CLERK_API_KEY || '';
+export const API_KEY = process.env.CLERK_SECRET_KEY || process.env.CLERK_API_KEY || '';
 
 type ImportKeyFunction = (...args: any[]) => Promise<CryptoKey | PeculiarCryptoKey>;
 type LoadCryptoKeyFunction = (token: string) => Promise<CryptoKey>;
