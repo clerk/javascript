@@ -12,16 +12,30 @@ type AccordionItemProps = React.PropsWithChildren<{
   defaultOpen?: boolean;
   toggleable?: boolean;
   scrollOnOpen?: boolean;
+  onCloseCallback?: () => void;
 }>;
 
 export const AccordionItem = (props: AccordionItemProps) => {
-  const { children, title, icon, defaultOpen = false, toggleable = true, scrollOnOpen = false, badge } = props;
+  const {
+    children,
+    title,
+    icon,
+    defaultOpen = false,
+    toggleable = true,
+    scrollOnOpen = false,
+    badge,
+    onCloseCallback = null,
+  } = props;
   const [isOpen, setIsOpen] = React.useState(defaultOpen);
   const contentRef = React.useRef<HTMLDivElement>(null);
 
   const toggle = () => {
     if (toggleable) {
       setIsOpen(s => !s);
+    }
+
+    if (isOpen && onCloseCallback) {
+      onCloseCallback();
     }
   };
 

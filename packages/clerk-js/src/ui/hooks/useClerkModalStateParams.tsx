@@ -3,7 +3,7 @@ import React from 'react';
 import { readStateParam, removeClerkQueryParam } from '../../utils';
 
 export const useClerkModalStateParams = () => {
-  const contentRef = React.useRef({ path: '', componentName: '' });
+  const contentRef = React.useRef({ startPath: '', path: '', componentName: '' });
   const decodedRedirectParams = readStateParam();
 
   React.useLayoutEffect(() => {
@@ -13,10 +13,15 @@ export const useClerkModalStateParams = () => {
   }, []);
 
   const clearUrlStateParam = () => {
-    contentRef.current = { path: '', componentName: '' };
+    contentRef.current = { startPath: '', path: '', componentName: '' };
   };
 
   const removeQueryParam = () => removeClerkQueryParam('__clerk_modal_state');
 
-  return { urlStateParam: contentRef.current, decodedRedirectParams, clearUrlStateParam, removeQueryParam };
+  return {
+    urlStateParam: { ...contentRef.current, clearUrlStateParam },
+    decodedRedirectParams,
+    clearUrlStateParam,
+    removeQueryParam,
+  };
 };

@@ -18,13 +18,24 @@ export const readStateParam = () => {
   return urlClerkState ? JSON.parse(atob(urlClerkState)) : null;
 };
 
-type SerializeAndAppendModalStateProps = { url: string; currentPath: string; componentName: string };
-export const appendModalState = ({ url, currentPath = '', componentName }: SerializeAndAppendModalStateProps) => {
+type SerializeAndAppendModalStateProps = {
+  url: string;
+  startPath?: string;
+  currentPath?: string;
+  componentName: string;
+};
+export const appendModalState = ({
+  url,
+  startPath = '/user',
+  currentPath = '',
+  componentName,
+}: SerializeAndAppendModalStateProps) => {
   const regexPattern = /CLERK-ROUTER\/VIRTUAL\/.*\//;
 
   const redirectParams = {
     path: currentPath.replace(regexPattern, '') || '',
     componentName,
+    startPath,
   };
 
   const encodedRedirectParams = encodeB64(JSON.stringify(redirectParams));

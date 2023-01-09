@@ -64,9 +64,7 @@ const AddConnectedAccount = () => {
     user
       .createExternalAccount({
         strategy: strategy,
-        redirect_url: isModal
-          ? appendModalState({ url: window.location.href, currentPath: '', componentName })
-          : window.location.href,
+        redirect_url: isModal ? appendModalState({ url: window.location.href, componentName }) : window.location.href,
       })
       .then(res => {
         if (res.verification?.externalVerificationRedirectURL) {

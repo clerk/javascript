@@ -11,6 +11,10 @@ export const useNavigateToFlowStart = () => {
     if (to !== router.currentPath) {
       return router.navigate(to);
     }
+
+    if (router.urlStateParam?.path) {
+      return router.navigate('/' + router.basePath + router.urlStateParam?.startPath);
+    }
   };
   return { navigateToFlowStart };
 };

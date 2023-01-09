@@ -56,6 +56,7 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
   return (
     <UserProfileAccordion
       defaultOpen={defaultOpen}
+      onCloseCallback={router.urlStateParam?.clearUrlStateParam}
       icon={
         <Image
           elementDescriptor={[descriptors.providerIcon]}
@@ -105,7 +106,7 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
                 .createExternalAccount({
                   strategy: account.verification!.strategy as OAuthStrategy,
                   redirect_url: isModal
-                    ? appendModalState({ url: window.location.href, currentPath: '', componentName })
+                    ? appendModalState({ url: window.location.href, componentName })
                     : window.location.href,
                 })
                 .then(res => navigate(res.verification!.externalVerificationRedirectURL))
