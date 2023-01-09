@@ -52,7 +52,7 @@ export const PasswordPage = withCardStateProvider(() => {
           onSubmit={updatePassword}
           onBlur={validateForm}
         >
-          <Form.ControlRow>
+          <Form.ControlRow elementId={passwordField.id}>
             <Form.Control
               {...passwordField.props}
               minLength={6}
@@ -60,7 +60,7 @@ export const PasswordPage = withCardStateProvider(() => {
               autoFocus
             />
           </Form.ControlRow>
-          <Form.ControlRow>
+          <Form.ControlRow elementId={confirmField.id}>
             <Form.Control {...confirmField.props} />
           </Form.ControlRow>
           <FormButtons isDisabled={!canSubmit} />

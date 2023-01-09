@@ -57,6 +57,7 @@ export type AlertId = 'danger' | 'warning';
 export type FieldId =
   | 'firstName'
   | 'lastName'
+  | 'name'
   | 'emailAddress'
   | 'phoneNumber'
   | 'password'
@@ -64,7 +65,7 @@ export type FieldId =
   | 'identifier'
   | 'username'
   | 'code'
-  | 'name';
+  | 'role';
 export type ProfileSectionId =
   | 'profile'
   | 'username'
@@ -197,7 +198,7 @@ export type ElementsConfig = {
   verificationLinkStatusText: WithOptions<never, never, never>;
 
   form: WithOptions<never, ErrorState, never>;
-  formFieldRow: WithOptions<never, never, never>;
+  formFieldRow: WithOptions<FieldId, never, never>;
   formField: WithOptions<FieldId, ControlState, never>;
   formFieldLabelRow: WithOptions<FieldId, ControlState, never>;
   formFieldLabel: WithOptions<FieldId, ControlState, never>;

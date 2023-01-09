@@ -73,7 +73,7 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
             onAvatarChange={uploadAvatar}
             onAvatarRemove={organization.logoUrl ? onAvatarRemove : null}
           />
-          <Form.ControlRow>
+          <Form.ControlRow elementId={nameField.id}>
             <Form.Control
               {...nameField.props}
               required

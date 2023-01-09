@@ -92,7 +92,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
       )}
 
       <Form.Root onSubmit={onSubmit}>
-        <Form.ControlRow>
+        <Form.ControlRow elementId={emailAddressField.id}>
           <Flex
             direction='col'
             gap={2}
@@ -106,7 +106,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
             />
           </Flex>
         </Form.ControlRow>
-        <Form.ControlRow>
+        <Form.ControlRow elementId={roleField.id}>
           <Flex
             direction='col'
             gap={2}

@@ -201,7 +201,7 @@ export function _SignInStart(): JSX.Element {
             )}
             {standardFormAttributes.length ? (
               <Form.Root onSubmit={handleFirstPartySubmit}>
-                <Form.ControlRow>
+                <Form.ControlRow elementId={identifierField.id}>
                   <Form.Control
                     {...identifierField.props}
                     autoFocus={shouldAutofocus}
@@ -238,6 +238,7 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
   }
   return (
     <Form.ControlRow
+      elementId={field.id}
       sx={!field.value ? { opacity: 0, height: 0, pointerEvents: 'none', marginTop: '-1rem' } : undefined}
     >
       <Form.Control
