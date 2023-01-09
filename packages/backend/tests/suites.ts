@@ -6,7 +6,9 @@ import pathTest from './dist/util/path.test.js';
 import verifyTest from './dist/tokens/verify.test.js';
 import keysTest from './dist/tokens/keys.test.js';
 
+import utilRequestTest from './dist/util/request.test.js';
+
 // Add them to the suite array
-const suites = [apiTest, requestTest, verifyTest, keysTest, pathTest];
+const suites = [apiTest, requestTest, utilRequestTest, verifyTest, keysTest, pathTest];
 
 export default suites;
