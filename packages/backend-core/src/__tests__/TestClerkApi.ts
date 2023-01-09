@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 import { ClerkBackendAPI } from '../api/ClerkBackendApi';
 import { ClerkAPIResponseError } from '../api/errors';
 
-const defaultAPIKey = process.env.CLERK_API_KEY || '';
+const defaultAPIKey = process.env.CLERK_SECRET_KEY || process.env.CLERK_API_KEY || '';
 const defaultAPIVersion = process.env.CLERK_API_VERSION || 'v1';
 
 export const defaultServerAPIUrl = process.env.CLERK_API_URL || 'https://api.clerk.dev';

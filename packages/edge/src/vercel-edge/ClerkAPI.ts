@@ -54,6 +54,10 @@ export const ClerkAPI = new ClerkBackendAPI(defaultParams);
 
 export const createClerkClient: CreateClerkClient = params => {
   const { apiKey, ...rest } = params || {};
-  const instance = new ClerkBackendAPI({ apiKey: apiKey || process.env.CLERK_API_KEY, ...defaultParams, ...rest });
+  const instance = new ClerkBackendAPI({
+    apiKey: apiKey || process.env.CLERK_SECRET_KEY || process.env.CLERK_API_KEY,
+    ...defaultParams,
+    ...rest,
+  });
   return extractClerkApiFromInstance(instance);
 };

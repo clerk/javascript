@@ -89,7 +89,7 @@ const returnReferrerAsXForwardedHostToFixLocalDevGatsbyProxy = (headers: Map<str
 
   if (
     process.env.NODE_ENV === 'development' &&
-    isDevelopmentOrStaging(process.env.CLERK_API_KEY || '') &&
+    isDevelopmentOrStaging(process.env.CLERK_SECRET_KEY || process.env.CLERK_API_KEY || '') &&
     hostUrl.hostname === referrerUrl.hostname
   ) {
     return referrerUrl.host;

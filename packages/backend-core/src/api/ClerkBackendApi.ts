@@ -19,7 +19,7 @@ import {
 import { MISSING_API_CLIENT_ERROR, MISSING_API_KEY } from './errors';
 import { deserialize } from './resources/Deserializer';
 
-const DEFAULT_API_KEY = process.env.CLERK_API_KEY || '';
+const DEFAULT_API_KEY = process.env.CLERK_SECRET_KEY || process.env.CLERK_API_KEY || '';
 const DEFAULT_API_URL = process.env.CLERK_API_URL || 'https://api.clerk.dev';
 const DEFAULT_API_VERSION = process.env.CLERK_API_VERSION || 'v1';
 
