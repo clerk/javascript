@@ -220,6 +220,7 @@ export type ElementsConfig = {
 
   avatarBox: WithOptions<never, never, never>;
   avatarImage: WithOptions<never, never, never>;
+  avatarShimmerBox: WithOptions<never, never, never>;
 
   // TODO: We can remove "Popover" from these:
   userButtonBox: WithOptions<never, 'open', never>;
@@ -563,6 +564,11 @@ export type Layout = {
    * prebuilt components. Clicking the link will open the passed URL in a new tab
    */
   privacyPageUrl?: string;
+  /**
+   * This option controls whether the avatar shimmer animation happens when hovering the <UserButton /> and <OrganizationSwitcher/>
+   * @default true
+   */
+  avatarShimmer?: boolean;
 };
 
 export type SignInTheme = Theme;

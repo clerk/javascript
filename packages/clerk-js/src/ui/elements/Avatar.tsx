@@ -1,7 +1,7 @@
 import { isRetinaDisplay } from '@clerk/shared';
 import React from 'react';
 
-import { descriptors, Flex, Image, Text } from '../customizables';
+import { Box, descriptors, Flex, Image, Text } from '../customizables';
 import type { ElementDescriptor } from '../customizables/elementDescriptors';
 import type { InternalTheme } from '../foundations';
 import type { PropsOfComponent } from '../styledSystem';
@@ -65,23 +65,54 @@ export const Avatar = (props: AvatarProps) => {
   // TODO: Revise size handling. Do we need to be this dynamic or should we use the theme instead?
   return (
     <Flex
-      elementDescriptor={[boxElementDescriptor || descriptors.avatarBox]}
+      elementDescriptor={[boxElementDescriptor, descriptors.avatarBox]}
       sx={[
-        theme => ({
+        t => ({
           flexShrink: 0,
-          borderRadius: rounded ? theme.radii.$circle : theme.radii.$md,
+          borderRadius: rounded ? t.radii.$circle : t.radii.$md,
           overflow: 'hidden',
-          width: size(theme),
-          height: size(theme),
-          border: theme.borders.$normal,
-          borderColor: theme.colors.$avatarBorder,
-          backgroundColor: theme.colors.$avatarBackground,
+          width: 'var(--cl-avatar-size)',
+          height: 'var(--cl-avatar-size)',
+          backgroundColor: t.colors.$avatarBackground,
           backgroundClip: 'padding-box',
+          position: 'relative',
+          boxShadow: 'var(--cl-shimmer-hover-shadow)',
+          transition: `box-shadow ${t.transitionDuration.$slower} ${t.transitionTiming.$easeOut}`,
+          '--cl-avatar-size': size(t),
         }),
         sx,
       ]}
     >
       {ImgOrFallback}
+
+      {/**
+       * This Box is the "shimmer" effect for the avatar.
+       * The ":after" selector is responsible for the border shimmer animation.
+       */}
+      <Box
+        elementDescriptor={descriptors.avatarShimmerBox}
+        sx={t => ({
+          overflow: 'hidden',
+          background: t.colors.$whiteAlpha500,
+          position: 'absolute',
+          width: '25%',
+          height: '100%',
+          transition: `all ${t.transitionDuration.$slower} ${t.transitionTiming.$easeOut}`,
+          transform: 'var(--cl-shimmer-hover-transform, skewX(-45deg) translateX(-300%))',
+          ':after': {
+            display: 'block',
+            content: "''",
+            position: 'absolute',
+            width: '400%',
+            height: '100%',
+            transform: 'var(--cl-shimmer-hover-after-transform, skewX(45deg) translateX(75%))',
+            transition: `all ${t.transitionDuration.$slower} ${t.transitionTiming.$easeOut}`,
+            border: t.borders.$heavy,
+            borderColor: t.colors.$whiteAlpha500,
+            borderRadius: rounded ? t.radii.$circle : t.radii.$md,
+          },
+        })}
+      />
     </Flex>
   );
 };

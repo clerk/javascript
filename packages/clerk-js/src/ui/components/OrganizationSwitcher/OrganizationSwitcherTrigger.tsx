@@ -1,15 +1,18 @@
-import React from 'react';
+import { forwardRef } from 'react';
 
 import { useCoreOrganization, useCoreUser, useOrganizationSwitcherContext } from '../../contexts';
 import { Button, descriptors, Icon, localizationKeys } from '../../customizables';
-import { OrganizationPreview, PersonalWorkspacePreview } from '../../elements';
+import { OrganizationPreview, PersonalWorkspacePreview, withAvatarShimmer } from '../../elements';
 import { Selector } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
 
-type OrganizationSwitcherTriggerProps = PropsOfComponent<typeof Button> & { isOpen: boolean };
+type OrganizationSwitcherTriggerProps = PropsOfComponent<typeof Button> & {
+  isOpen: boolean;
+};
 
-export const OrganizationSwitcherTrigger = React.forwardRef<HTMLButtonElement, OrganizationSwitcherTriggerProps>(
-  (props, ref) => {
+export const OrganizationSwitcherTrigger = withAvatarShimmer(
+  forwardRef<HTMLButtonElement, OrganizationSwitcherTriggerProps>((props, ref) => {
+    const { sx, ...rest } = props;
     const user = useCoreUser();
     const { organization } = useCoreOrganization();
     const { hidePersonal } = useOrganizationSwitcherContext();
@@ -19,9 +22,9 @@ export const OrganizationSwitcherTrigger = React.forwardRef<HTMLButtonElement, O
         elementDescriptor={descriptors.organizationSwitcherTrigger}
         variant='ghost'
         colorScheme='neutral'
-        sx={t => ({ minHeight: 0, padding: `0 ${t.space.$2} 0 0` })}
-        {...props}
+        sx={[t => ({ minHeight: 0, padding: `0 ${t.space.$2} 0 0` }), sx]}
         ref={ref}
+        {...rest}
       >
         {organization && (
           <OrganizationPreview
@@ -51,5 +54,5 @@ export const OrganizationSwitcherTrigger = React.forwardRef<HTMLButtonElement, O
         />
       </Button>
     );
-  },
+  }),
 );
