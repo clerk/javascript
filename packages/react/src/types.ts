@@ -1,4 +1,12 @@
-import type { Clerk, ClerkOptions, ClientResource, LoadedClerk, RedirectOptions, UserResource } from '@clerk/types';
+import type {
+  Clerk,
+  ClerkOptions,
+  ClientResource,
+  LoadedClerk,
+  RedirectOptions,
+  SessionResource,
+  UserResource,
+} from '@clerk/types';
 
 declare global {
   interface Window {
@@ -30,9 +38,11 @@ export interface HeadlessBrowserClerkConstrutor {
   new (frontendApi: string): HeadlessBrowserClerk;
 }
 
-export type WithClerkProp<T> = T & { clerk: LoadedClerk };
+export type WithClerkProp<T = unknown> = T & { clerk: LoadedClerk };
 
-export type WithUserProp<T> = T & { user: UserResource };
+export type WithUserProp<T = unknown> = T & { user: UserResource };
+
+export type WithSessionProp<T = unknown> = T & { session: SessionResource };
 
 // Clerk object
 export interface MountProps {
