@@ -11,7 +11,7 @@ import {
   signedInAuthObject,
   signedOutAuthObject,
 } from './authObjects';
-import { TokenVerificationError, TokenVerificationErrorReason } from './errors';
+import { TokenVerificationError, TokenVerificationErrorReason, type TokenCarrier } from './errors';
 import { type VerifyTokenOptions, verifyToken } from './verify';
 
 export type LoadResourcesOptions = {
@@ -27,8 +27,6 @@ export type RequiredVerifyTokenOptions = Required<
 export type OptionalVerifyTokenOptions = Partial<
   Pick<VerifyTokenOptions, 'authorizedParties' | 'clockSkewInSeconds' | 'jwksCacheTtlInMs' | 'skipJwksCache' | 'jwtKey'>
 >;
-
-export type TokenCarrier = 'header' | 'cookie';
 
 export type AuthenticateRequestOptions = RequiredVerifyTokenOptions &
   OptionalVerifyTokenOptions &
