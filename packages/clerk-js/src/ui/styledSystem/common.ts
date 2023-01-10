@@ -76,7 +76,6 @@ const textVariants = (t: InternalTheme) => {
   const buttonSmallRegular = {
     ...smallRegular,
     fontFamily: t.fonts.$buttons,
-    lineHeight: t.lineHeights.$shortest,
   };
 
   const buttonRegularRegular = {
