@@ -34,13 +34,17 @@ function setInCache(
 }
 
 const LocalJwkKid = 'local';
+const PEM_HEADER = '-----BEGIN PUBLIC KEY-----';
+const PEM_TRAILER = '-----END PUBLIC KEY-----';
+const RSA_PREFIX = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA';
+const RSA_SUFFIX = 'IDAQAB';
 
 /**
  *
  * Loads a local PEM key usually from process.env and transform it to JsonWebKey format.
  * The result is also cached on the module level to avoid unnecessary computations in subsequent invocations.
  *
- * @param {string} key
+ * @param {string} localKey
  * @returns {JsonWebKey} key
  */
 export function loadClerkJWKFromLocal(localKey?: string): JsonWebKey {
@@ -53,21 +57,22 @@ export function loadClerkJWKFromLocal(localKey?: string): JsonWebKey {
       });
     }
 
-    // Notice:
-    // Currently Next.js in development mode cannot parse PEM key format, but it can parse JWKs.
-    // This is a simple way to convert our PEM keys to JWKs until the bug is resolved.
-    const RSA_PREFIX = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA';
-    const RSA_SUFFIX = 'IDAQAB';
+    const modulus = localKey
+      .replace(/(\r\n|\n|\r)/gm, '')
+      .replace(PEM_HEADER, '')
+      .replace(PEM_TRAILER, '')
+      .replace(RSA_PREFIX, '')
+      .replace(RSA_SUFFIX, '')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_');
 
     // JWK https://datatracker.ietf.org/doc/html/rfc7517
     setInCache(
       {
         kid: 'local',
         kty: 'RSA',
-        n: localKey
-          .slice(RSA_PREFIX.length, RSA_SUFFIX.length * -1)
-          .replace(/\+/g, '-')
-          .replace(/\//g, '_'),
+        alg: 'RS256',
+        n: modulus,
         e: 'AQAB',
       },
       -1, // local key never expires in cache
