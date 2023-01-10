@@ -3,6 +3,9 @@ import React from 'react';
 import { createVariants, StyleVariants } from '../styledSystem';
 
 const { applyVariants, filterProps } = createVariants(theme => ({
+  base: {
+    flexShrink: 0,
+  },
   variants: {
     size: {
       sm: { width: theme.sizes.$3, height: theme.sizes.$3 },
