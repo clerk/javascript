@@ -45,10 +45,11 @@ export function ClerkProvider(props: React.PropsWithChildren<{ initialState: any
   const { children, initialState } = props;
   const navigate = useAwaitableNavigate();
   return (
-    // @ts-expect-error
     <ReactClerkProvider
       frontendApi={process.env.NEXT_PUBLIC_CLERK_FRONTEND_API || ''}
       publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || ''}
+      // @ts-expect-error
+      proxyUrl={process.env.NEXT_PUBLIC_CLERK_PROXY_URL}
       navigate={navigate}
       initialState={initialState}
     >

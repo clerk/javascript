@@ -18,17 +18,19 @@ type NextClerkProviderProps = {
 export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JSX.Element {
   // @ts-expect-error
   // Allow for overrides without making the type public
-  const { authServerSideProps, frontendApi, publishableKey, __clerk_ssr_state, clerkJSUrl, ...restProps } = rest;
+  const { authServerSideProps, frontendApi, publishableKey, proxyUrl, __clerk_ssr_state, clerkJSUrl, ...restProps } =
+    rest;
   const { push } = useRouter();
 
   ReactClerkProvider.displayName = 'ReactClerkProvider';
 
   return (
-    // @ts-expect-error
     <ReactClerkProvider
       frontendApi={frontendApi || process.env.NEXT_PUBLIC_CLERK_FRONTEND_API || ''}
       publishableKey={publishableKey || process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || ''}
       clerkJSUrl={clerkJSUrl || process.env.NEXT_PUBLIC_CLERK_JS}
+      // @ts-expect-error
+      proxyUrl={proxyUrl || process.env.NEXT_PUBLIC_CLERK_PROXY_URL}
       navigate={to => push(to)}
       // withServerSideAuth automatically injects __clerk_ssr_state
       // getAuth returns a user-facing authServerSideProps that hides __clerk_ssr_state
