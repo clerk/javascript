@@ -1,39 +1,25 @@
+import { type AuthObject, type RequestState, debugRequestState, loadInterstitialFromLocal } from '@clerk/backend';
+import { LIB_VERSION } from '@clerk/clerk-react/dist/info';
 import { json } from '@remix-run/server-runtime';
 import cookie from 'cookie';
 
-import { AuthData } from './getAuthData';
 import { LoaderFunctionArgs, LoaderFunctionArgsWithAuth } from './types';
 
 /**
  * Inject `auth`, `user` and `session` properties into `request`
  * @internal
  */
-export function injectAuthIntoRequest(args: LoaderFunctionArgs, authData: AuthData): LoaderFunctionArgsWithAuth {
-  const { user, session, userId, sessionId, getToken, claims } = authData;
+export function injectAuthIntoRequest(args: LoaderFunctionArgs, authObject: AuthObject): LoaderFunctionArgsWithAuth {
+  const { user, session, userId, sessionId, getToken, sessionClaims } = authObject;
   (args.request as any).auth = {
     userId,
     sessionId,
     getToken,
-    actor: claims?.act || null,
+    actor: sessionClaims?.act || null,
   };
   (args.request as any).user = user;
   (args.request as any).session = session;
   return args as LoaderFunctionArgsWithAuth;
-}
-
-/**
- * See `packages/nextjs/src/middleware/utils/sanitizeAuthData.ts`
- * TODO: Make a shared function
- *
- * @internal
- */
-export function sanitizeAuthData(authData: AuthData): any {
-  const user = authData.user ? { ...authData.user } : authData.user;
-  if (user) {
-    // @ts-expect-error;
-    delete user['privateMetadata'];
-  }
-  return { ...authData, user };
 }
 
 /**
@@ -75,19 +61,16 @@ export function assertObject(val: any, error?: string): asserts val is Record<st
 /**
  * @internal
  */
-export const interstitialJsonResponse = (opts: {
-  frontendApi: string;
-  publishableKey: string;
-  errorReason: string | undefined;
-  loader: 'root' | 'nested';
-}) => {
+export const interstitialJsonResponse = (requestState: RequestState, opts: { loader: 'root' | 'nested' }) => {
   return json(
     wrapWithClerkState({
-      __clerk_ssr_interstitial: true,
-      __frontendApi: opts.frontendApi,
-      __publishableKey: opts.publishableKey,
-      __lastAuthResult: opts.errorReason,
       __loader: opts.loader,
+      __clerk_ssr_interstitial_html: loadInterstitialFromLocal({
+        debugData: debugRequestState(requestState),
+        frontendApi: requestState.frontendApi,
+        publishableKey: requestState.publishableKey,
+        pkgVersion: LIB_VERSION,
+      }),
     }),
     { status: 401 },
   );
@@ -96,20 +79,14 @@ export const interstitialJsonResponse = (opts: {
 /**
  * @internal
  */
-export const returnLoaderResultJsonResponse = (opts: {
-  authData: AuthData | null;
-  frontendApi: string;
-  publishableKey: string;
-  errorReason: string | undefined;
-  callbackResult?: any;
-}) => {
+export const returnLoaderResultJsonResponse = (opts: { requestState: RequestState; callbackResult?: any }) => {
+  const { reason, message, isSignedIn, isInterstitial, ...rest } = opts.requestState;
   return json({
     ...(opts.callbackResult || {}),
     ...wrapWithClerkState({
-      __clerk_ssr_state: opts.authData,
-      __frontendApi: opts.frontendApi,
-      __publishableKey: opts.publishableKey,
-      __lastAuthResult: opts.errorReason || '',
+      __clerk_ssr_state: rest,
+      __frontendApi: opts.requestState.frontendApi,
+      __clerk_debug: debugRequestState(opts.requestState),
     }),
   });
 };

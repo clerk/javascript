@@ -38,12 +38,12 @@ Looks like you didn't pass 'clerkState' to "<ClerkProvider clerkState={...}>".
 ${ssrExample}
 `);
 
-export const noRequestPassedInGetAuth = createErrorMessage(`
-You're calling 'getAuth()' from a loader, without providing the 'request' object.
+export const noLoaderArgsPassedInGetAuth = createErrorMessage(`
+You're calling 'getAuth()' from a loader, without providing the loader args object.
 Example:
 
-export const loader: LoaderFunction = async ({request}) => {
-  const { sessionId } = await getAuth(request);
+export const loader: LoaderFunction = async (args) => {
+  const { sessionId } = await getAuth(args);
   ...
 };
 `);
@@ -64,4 +64,8 @@ export const loader: LoaderFunction = args => rootAuthLoader(args, ({ auth }) =>
     const posts: Post[] = database.getPostsByUserId(userId);
     return { data: posts };
 })
+`);
+
+export const noApiKeyError = createErrorMessage(`
+  The CLERK_API_KEY environment variable must be set to use SSR and @clerk/remix/api.');
 `);

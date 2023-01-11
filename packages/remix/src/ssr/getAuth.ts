@@ -1,20 +1,19 @@
-import { noRequestPassedInGetAuth } from '../errors';
-import { getAuthData } from './getAuthData';
+import { sanitizeAuthObject } from '@clerk/backend';
+
+import { noLoaderArgsPassedInGetAuth } from '../errors';
+import { authenticateRequest } from './authenticateRequest';
 import { GetAuthReturn, LoaderFunctionArgs } from './types';
-import { interstitialJsonResponse, sanitizeAuthData } from './utils';
+import { interstitialJsonResponse } from './utils';
 
-export async function getAuth(argsOrReq: Request | LoaderFunctionArgs, opts?: any): GetAuthReturn {
-  if (!argsOrReq) {
-    throw new Error(noRequestPassedInGetAuth);
+export async function getAuth(args: LoaderFunctionArgs): GetAuthReturn {
+  if (!args || (args && (!args.request || !args.context))) {
+    throw new Error(noLoaderArgsPassedInGetAuth);
   }
-  const request = 'request' in argsOrReq ? argsOrReq.request : argsOrReq;
-  const { authData, showInterstitial, errorReason } = await getAuthData(request);
+  const requestState = await authenticateRequest(args);
 
-  if (showInterstitial || !authData) {
-    const frontendApi = process.env.CLERK_FRONTEND_API || opts.frontendApi;
-    const publishableKey = process.env.CLERK_PUBLISHABLE_KEY || opts.publishableKey;
-    throw interstitialJsonResponse({ frontendApi, publishableKey, errorReason, loader: 'nested' });
+  if (requestState.isInterstitial || !requestState) {
+    throw interstitialJsonResponse(requestState, { loader: 'nested' });
   }
 
-  return sanitizeAuthData(authData);
+  return sanitizeAuthObject(requestState.toAuth());
 }

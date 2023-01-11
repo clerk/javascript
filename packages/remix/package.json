@@ -19,7 +19,6 @@
   "typings": "dist/index.d.ts",
   "files": [
     "dist",
-    "experimental",
     "api.server.d.ts",
     "api.server.js",
     "ssr.server.d.ts",
