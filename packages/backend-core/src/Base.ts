@@ -191,6 +191,7 @@ export class Base {
     authorizedParties,
     fetchInterstitial,
     jwtKey,
+    apiKey,
   }: AuthStateParams): Promise<AuthState> => {
     if (headerToken) {
       return this.buildAuthenticatedState(headerToken, {
@@ -201,8 +202,8 @@ export class Base {
       });
     }
 
-    const isDevelopmentKey = isDevelopmentOrStaging(API_KEY);
-    const isProductionKey = isProduction(API_KEY);
+    const isDevelopmentKey = isDevelopmentOrStaging(apiKey || API_KEY);
+    const isProductionKey = isProduction(apiKey || API_KEY);
 
     // In development or staging environments only, based on the request's
     // User Agent, detect non-browser requests (e.g. scripts). If there

@@ -22,10 +22,15 @@ const DEFAULT_API_URL = process.env.CLERK_API_URL || 'https://api.clerk.dev';
 const DEFAULT_API_VERSION = process.env.CLERK_API_VERSION || 'v1';
 
 // Using public interstitial endpoint for time being
-const INTERSTITIAL_URL = `${DEFAULT_API_URL}/${DEFAULT_API_VERSION}/public/interstitial?frontendApi=${process.env.NEXT_PUBLIC_CLERK_FRONTEND_API}`;
+const buildInterstitialUrl = (opts: { frontendApi: string | undefined }) => {
+  const frontendApi = opts.frontendApi || process.env.NEXT_PUBLIC_CLERK_FRONTEND_API;
+  return `${DEFAULT_API_URL}/${DEFAULT_API_VERSION}/public/interstitial?frontendApi=${frontendApi}`;
+};
 
 type WithAuthOptions = {
   jwtKey?: string;
+  frontendApi?: string;
+  apiKey?: string;
   authorizedParties?: string[];
 };
 
@@ -41,7 +46,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
 
   return async (req: NextRequest, event: NextFetchEvent) => {
     const { headers } = req;
-    const { jwtKey, authorizedParties } = opts;
+    const { jwtKey, authorizedParties, frontendApi, apiKey } = opts;
 
     // get auth state, check if we need to return an interstitial
     const cookieToken = getCookie(req, SESSION_COOKIE_NAME);
@@ -60,6 +65,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
       userAgent: headers.get('user-agent'),
       fetchInterstitial: () => null, // not applicable since middleware can't render a response itself
       jwtKey,
+      apiKey,
       authorizedParties,
     });
 
@@ -68,7 +74,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
     // Therefore we have to resort to a public interstitial endpoint
 
     if (status === AuthStatus.Interstitial) {
-      const response = NextResponse.rewrite(INTERSTITIAL_URL);
+      const response = NextResponse.rewrite(buildInterstitialUrl({ frontendApi }));
       response.headers.set(AUTH_RESULT, errorReason as string);
       return response;
     }

@@ -1,21 +1,26 @@
-import { createGetToken, Organization, Session, signedOutGetToken, User } from '@clerk/backend-core';
+import { CreateClerkClient, createGetToken, Organization, Session, signedOutGetToken, User } from '@clerk/backend-core';
 import { ClerkJWTClaims } from '@clerk/types';
 
 import { sanitizeAuthData } from '../../middleware/utils/sanitizeAuthData';
 import { injectSSRStateIntoObject } from '../../middleware/utils/serializeProps';
 import type { RequestLike } from '../types';
-import { AuthData, AuthResult, SESSION_COOKIE_NAME, SessionsApi } from '../types';
+import { AuthData, AuthResult, SESSION_COOKIE_NAME } from '../types';
 import { getAuthDataFromClaims } from './getAuthDataFromClaims';
 import { getAuthResultFromRequest, getCookie, getHeader } from './requestResponseUtils';
 
 type GetAuthResult = AuthData;
 
-export type GetAuth = (req: RequestLike) => GetAuthResult;
+export type GetAuth = (req: RequestLike, opts?: GetAuthOptions) => GetAuthResult;
 
-type CreateGetAuthParams = { sessions: SessionsApi };
+type CreateGetAuthParams = { createClerkClient: CreateClerkClient };
 
-export const createGetAuth = ({ sessions }: CreateGetAuthParams): GetAuth => {
-  return ((req: RequestLike) => {
+type GetAuthOptions = {
+  apiKey?: string;
+};
+
+export const createGetAuth = ({ createClerkClient }: CreateGetAuthParams): GetAuth => {
+  return (req, opts) => {
+    const { apiKey } = opts || {};
     // When the auth result is set, we trust that the middleware has already run
     // Then, we don't have to re-verify the JWT here,
     // we can just strip out the claims manually.
@@ -39,10 +44,10 @@ export const createGetAuth = ({ sessions }: CreateGetAuthParams): GetAuth => {
       headerToken,
       cookieToken,
       sessionId: authData.sessionId,
-      fetcher: sessions.getToken,
+      fetcher: createClerkClient({ apiKey }).sessions.getToken,
     });
     return { ...authData, getToken, claims: sessionClaims };
-  }) as GetAuth;
+  };
 };
 
 type BuildClerkPropsInitState = { user?: User | null; session?: Session | null; organization?: Organization | null };

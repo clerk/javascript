@@ -67,4 +67,5 @@ export type AuthStateParams = {
   fetchInterstitial: () => Promise<string> | null;
   /* Value corresponding to the JWT verification key */
   jwtKey?: string;
+  apiKey?: string;
 };
