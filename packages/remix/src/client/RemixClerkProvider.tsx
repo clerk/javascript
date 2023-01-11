@@ -2,12 +2,9 @@ import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import { IsomorphicClerkOptions } from '@clerk/clerk-react/dist/types';
 import React from 'react';
 
-import { __internal__setErrorThrowerOptions } from '../errorThrower';
 import { assertValidClerkState, warnForSsr } from '../utils';
 import { ClerkState } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
-
-__internal__setErrorThrowerOptions({ packageName: '@clerk/remix' });
 
 export * from '@clerk/clerk-react';
 
@@ -22,14 +19,14 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
   ReactClerkProvider.displayName = 'ReactClerkProvider';
 
   assertValidClerkState(clerkState);
-  const { __clerk_ssr_state, __lastAuthResult } = clerkState?.__internal_clerk_state || {};
+  const { __clerk_ssr_state, __clerk_debug } = clerkState?.__internal_clerk_state || {};
 
   React.useEffect(() => {
     warnForSsr(clerkState);
   }, []);
 
   React.useEffect(() => {
-    (window as any).__clerk_debug = { __lastAuthResult };
+    (window as any).__clerk_debug = __clerk_debug;
   }, []);
 
   return (

@@ -1,6 +1,7 @@
+import { sanitizeAuthObject } from '@clerk/backend';
+
 import { invalidRootLoaderCallbackResponseReturn, invalidRootLoaderCallbackReturn } from '../errors';
-import { errorThrower } from '../errorThrower';
-import { getAuthData } from './getAuthData';
+import { authenticateRequest } from './authenticateRequest';
 import { LoaderFunctionArgs, LoaderFunctionReturn, RootAuthLoaderCallback, RootAuthLoaderOptions } from './types';
 import {
   assertObject,
@@ -9,7 +10,6 @@ import {
   isRedirect,
   isResponse,
   returnLoaderResultJsonResponse,
-  sanitizeAuthData,
 } from './utils';
 
 interface RootAuthLoader {
@@ -33,24 +33,17 @@ export const rootAuthLoader: RootAuthLoader = async (
     ? cbOrOptions
     : {};
 
-  const frontendApi = process.env.CLERK_FRONTEND_API || opts.frontendApi || '';
-  const publishableKey = process.env.CLERK_PUBLISHABLE_KEY || opts.publishableKey || '';
+  const requestState = await authenticateRequest(args, opts);
 
-  if (!frontendApi && !publishableKey) {
-    errorThrower.throwMissingFrontendApiPublishableKeyError();
-  }
-
-  const { authData, showInterstitial, errorReason } = await getAuthData(args.request, opts);
-
-  if (showInterstitial) {
-    throw interstitialJsonResponse({ frontendApi, publishableKey, errorReason, loader: 'root' });
+  if (requestState.isInterstitial) {
+    throw interstitialJsonResponse(requestState, { loader: 'root' });
   }
 
   if (!callback) {
-    return returnLoaderResultJsonResponse({ authData, frontendApi, publishableKey, errorReason });
+    return returnLoaderResultJsonResponse({ requestState });
   }
 
-  const callbackResult = await callback(injectAuthIntoRequest(args, sanitizeAuthData(authData!)));
+  const callbackResult = await callback(injectAuthIntoRequest(args, sanitizeAuthObject(requestState.toAuth())));
   assertObject(callbackResult, invalidRootLoaderCallbackReturn);
 
   // Pass through custom responses
@@ -61,5 +54,5 @@ export const rootAuthLoader: RootAuthLoader = async (
     throw new Error(invalidRootLoaderCallbackResponseReturn);
   }
 
-  return returnLoaderResultJsonResponse({ authData, frontendApi, publishableKey, errorReason, callbackResult });
+  return returnLoaderResultJsonResponse({ requestState, callbackResult });
 };
