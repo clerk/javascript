@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [2.12.2](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@2.12.1...@clerk/backend-core@2.12.2) (2023-01-11)
+
+### Bug Fixes
+
+- **nextjs,backend-core:** Support apiKey, jwtKey and frontendApi as runtime values ([33f3d35](https://github.com/clerkinc/javascript/commit/33f3d359e0150092a12ec07b5badf6de103fbe83))
+
 ### [2.12.1](https://github.com/clerkinc/javascript/compare/@clerk/backend-core@2.12.1-staging.1...@clerk/backend-core@2.12.1) (2022-12-19)
 
 **Note:** Version bump only for package @clerk/backend-core

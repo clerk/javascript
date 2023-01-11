@@ -1,5 +1,5 @@
 {
-  "version": "4.5.14",
+  "version": "4.5.15",
   "license": "MIT",
   "type": "commonjs",
   "main": "./dist/index.js",
@@ -55,7 +55,7 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@clerk/backend-core": "^2.12.1",
+    "@clerk/backend-core": "^2.12.2",
     "@clerk/types": "^3.23.0",
     "@peculiar/webcrypto": "1.4.1",
     "@types/cookies": "0.7.7",
