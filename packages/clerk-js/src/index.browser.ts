@@ -15,7 +15,14 @@ const frontendApi =
   window.__clerk_frontend_api ||
   '';
 
-window.Clerk = new Clerk(publishableKey || frontendApi);
+const proxyUrl =
+  document.querySelector('script[data-clerk-proxy-url]')?.getAttribute('data-clerk-proxy-url') ||
+  window.__clerk_proxy_url ||
+  '';
+
+window.Clerk = new Clerk(publishableKey || frontendApi, {
+  proxyUrl,
+});
 
 if (module.hot) {
   module.hot.accept();

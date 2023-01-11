@@ -58,7 +58,7 @@ export interface FapiClient {
   request<T>(requestInit: FapiRequestInit): Promise<FapiResponse<T>>;
 }
 
-export default function createFapiClient(clerkInstance: Clerk): FapiClient {
+export default function createFapiClient(clerkInstance: Omit<Clerk, 'proxyUrl'>): FapiClient {
   const onBeforeRequestCallbacks: Array<FapiRequestCallback<unknown>> = [];
   const onAfterResponseCallbacks: Array<FapiRequestCallback<unknown>> = [];
 
@@ -122,6 +122,19 @@ export default function createFapiClient(clerkInstance: Clerk): FapiClient {
 
   function buildUrl(requestInit: FapiRequestInit): URL {
     const { path } = requestInit;
+
+    if ((clerkInstance as Clerk).proxyUrl) {
+      const proxyBase = new URL(`https://${(clerkInstance as Clerk).proxyUrl}`);
+      const proxyPath = proxyBase.pathname.slice(1, proxyBase.pathname.length);
+      return buildUrlUtil(
+        {
+          base: proxyBase.origin,
+          pathname: `${proxyPath}/v1${path}`,
+          search: buildQueryString(requestInit),
+        },
+        { stringify: false },
+      );
+    }
 
     return buildUrlUtil(
       {

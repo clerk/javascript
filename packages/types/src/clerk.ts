@@ -64,6 +64,9 @@ export interface Clerk {
   /** Clerk Publishable Key string. */
   publishableKey?: string;
 
+  /** Clerk Proxy url string. */
+  proxyUrl?: string;
+
   instanceType?: InstanceType;
 
   /** Client handling most Clerk operations. */
