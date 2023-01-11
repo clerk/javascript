@@ -5,13 +5,17 @@ import { createBackendApiClient } from '../api';
 import { API_URL, API_VERSION } from '../constants';
 import { isDevelopmentFromApiKey, isProductionFromApiKey } from '../util/instance';
 import { checkCrossOrigin } from '../util/request';
+import { signedInAuthObject, signedOutAuthObject } from './authObjects';
 import {
-  type SignedInAuthObject,
-  type SignedOutAuthObject,
-  signedInAuthObject,
-  signedOutAuthObject,
-} from './authObjects';
-import { TokenVerificationError, TokenVerificationErrorReason, type TokenCarrier } from './errors';
+  type AuthReason,
+  type InterstitialState,
+  type RequestState,
+  type SignedInState,
+  type SignedOutState,
+  AuthErrorReason,
+  AuthStatus,
+} from './authStatus';
+import { type TokenCarrier, TokenVerificationError, TokenVerificationErrorReason } from './errors';
 import { type VerifyTokenOptions, verifyToken } from './verify';
 
 export type LoadResourcesOptions = {
@@ -57,60 +61,6 @@ export type AuthenticateRequestOptions = RequiredVerifyTokenOptions &
     userAgent?: string;
   };
 
-export enum AuthStatus {
-  SignedIn = 'signed-in',
-  SignedOut = 'signed-out',
-  Interstitial = 'interstitial',
-}
-
-export enum RequestErrorReason {
-  HeaderMissingNonBrowser = 'header-missing-non-browser',
-  HeaderMissingCORS = 'header-missing-cors',
-  CookieUATMissing = 'uat-missing',
-  CrossOriginReferrer = 'cross-origin-referrer',
-  CookieAndUATMissing = 'cookie-and-uat-missing',
-  StandardSignedIn = 'standard-signed-in',
-  StandardSignedOut = 'standard-signed-out',
-  CookieMissing = 'cookie-missing',
-  CookieOutDated = 'cookie-outdated',
-  UnexpectedError = 'unexpected-error',
-  Unknown = 'unknown',
-}
-
-export type AuthReason = RequestErrorReason | TokenVerificationErrorReason;
-
-export type SignedInState = {
-  status: AuthStatus.SignedIn;
-  reason: null;
-  message: null;
-  frontendApi: string;
-  publishableKey: string;
-  isSignedIn: true;
-  isInterstitial: false;
-  toAuth: () => SignedInAuthObject;
-};
-
-export type SignedOutState = {
-  status: AuthStatus.SignedOut;
-  message: string;
-  reason: AuthReason;
-  frontendApi: string;
-  publishableKey: string;
-  isSignedIn: false;
-  isInterstitial: false;
-  toAuth: () => SignedOutAuthObject;
-};
-
-export type InterstitialState = Omit<SignedOutState, 'isInterstitial' | 'status' | 'toAuth'> & {
-  status: AuthStatus.Interstitial;
-  isSignedIn: false;
-  isInterstitial: true;
-  reason: AuthReason;
-  toAuth: () => null;
-};
-
-export type RequestState = SignedInState | SignedOutState | InterstitialState;
-
 export async function authenticateRequest(options: AuthenticateRequestOptions): Promise<RequestState> {
   options.frontendApi = options.frontendApi || parsePublishableKey(options.publishableKey)?.frontendApi || '';
   options.apiUrl = options.apiUrl || API_URL;
@@ -148,7 +98,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       const state = await signedIn(sessionClaims);
 
       if (!clientUat || cookieTokenIsOutdated(state.toAuth().sessionClaims, clientUat)) {
-        return interstitial(RequestErrorReason.CookieOutDated);
+        return interstitial(AuthErrorReason.CookieOutDated);
       }
 
       return state;
@@ -180,7 +130,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       }
       return signedOut(err.reason, err.getFullMessage());
     }
-    return signedOut(RequestErrorReason.UnexpectedError, (err as Error).message);
+    return signedOut(AuthErrorReason.UnexpectedError, (err as Error).message);
   }
 
   function cookieTokenIsOutdated(jwt: JwtPayload, clientUat: string) {
@@ -299,7 +249,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
   const nonBrowserRequestInDevRule: InterstitialRule = ({ apiKey, secretKey, userAgent }) => {
     const key = secretKey || apiKey;
     if (isDevelopmentFromApiKey(key) && !userAgent?.startsWith('Mozilla/')) {
-      return signedOut(RequestErrorReason.HeaderMissingNonBrowser);
+      return signedOut(AuthErrorReason.HeaderMissingNonBrowser);
     }
     return undefined;
   };
@@ -322,7 +272,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       });
 
     if (isCrossOrigin) {
-      return signedOut(RequestErrorReason.HeaderMissingCORS);
+      return signedOut(AuthErrorReason.HeaderMissingCORS);
     }
     return undefined;
   };
@@ -332,7 +282,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
 
     const res = isDevelopmentFromApiKey(key);
     if (res && !clientUat) {
-      return interstitial(RequestErrorReason.CookieUATMissing);
+      return interstitial(AuthErrorReason.CookieUATMissing);
     }
     return undefined;
   };
@@ -352,7 +302,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
     const key = secretKey || apiKey;
 
     if (isDevelopmentFromApiKey(key) && crossOriginReferrer) {
-      return interstitial(RequestErrorReason.CrossOriginReferrer);
+      return interstitial(AuthErrorReason.CrossOriginReferrer);
     }
     return undefined;
   };
@@ -366,7 +316,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
     const key = secretKey || apiKey;
 
     if (isProductionFromApiKey(key) && !clientUat && !cookieToken) {
-      return signedOut(RequestErrorReason.CookieAndUATMissing);
+      return signedOut(AuthErrorReason.CookieAndUATMissing);
     }
     return undefined;
   };
@@ -379,7 +329,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
   // };
   const isNormalSignedOutState: InterstitialRule = ({ clientUat }) => {
     if (clientUat === '0') {
-      return signedOut(RequestErrorReason.StandardSignedOut);
+      return signedOut(AuthErrorReason.StandardSignedOut);
     }
     return undefined;
   };
@@ -387,7 +337,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
   // This happens when a signed in user visits a new subdomain for the first time. The uat will be available because it's set on naked domain, but session will be missing. It can also happen if the cookieToken is manually removed during development.
   const hasClientUatButCookieIsMissingInProd: InterstitialRule = ({ clientUat, cookieToken }) => {
     if (clientUat && !cookieToken) {
-      return interstitial(RequestErrorReason.CookieMissing);
+      return interstitial(AuthErrorReason.CookieMissing);
     }
     return undefined;
   };
