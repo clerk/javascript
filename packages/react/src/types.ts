@@ -13,8 +13,11 @@ declare global {
   interface Window {
     __clerk_frontend_api?: string;
     __clerk_publishable_key?: string;
+    __clerk_proxy_url?: ClerkConstructorOptions['proxyUrl'];
   }
 }
+
+export type ClerkConstructorOptions = Pick<Clerk, 'proxyUrl'>;
 
 export type IsomorphicClerkOptions = ClerkOptions & {
   Clerk?: ClerkProp;
@@ -23,11 +26,11 @@ export type IsomorphicClerkOptions = ClerkOptions & {
 } & PublishableKeyOrFrontendApi;
 
 export interface BrowserClerkConstructor {
-  new (publishableKey: string): BrowserClerk;
+  new (publishableKey: string, options?: ClerkConstructorOptions): BrowserClerk;
 }
 
 export interface HeadlessBrowserClerkConstrutor {
-  new (publishableKey: string): HeadlessBrowserClerk;
+  new (publishableKey: string, options?: ClerkConstructorOptions): HeadlessBrowserClerk;
 }
 
 export type WithClerkProp<T = unknown> = T & { clerk: LoadedClerk };
