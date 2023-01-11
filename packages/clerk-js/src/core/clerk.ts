@@ -91,6 +91,7 @@ declare global {
     Clerk?: Clerk;
     __clerk_frontend_api?: string;
     __clerk_publishable_key?: string;
+    __clerk_proxy_url?: Pick<ClerkInterface, 'proxyUrl'>['proxyUrl'];
   }
 }
 
@@ -99,6 +100,8 @@ const defaultOptions: ClerkOptions = {
   standardBrowser: true,
   touchSession: true,
 };
+
+type ClerkConstructorOptions = Pick<ClerkInterface, 'proxyUrl'>;
 
 export default class Clerk implements ClerkInterface {
   public static mountComponentRenderer?: MountComponentRenderer;
@@ -109,6 +112,7 @@ export default class Clerk implements ClerkInterface {
   public user?: UserResource | null;
   public frontendApi: string;
   public publishableKey?: string;
+  public proxyUrl?: ClerkConstructorOptions['proxyUrl'];
 
   #authService: AuthenticationService | null = null;
   #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
@@ -132,8 +136,10 @@ export default class Clerk implements ClerkInterface {
     return this.#isReady;
   }
 
-  public constructor(key: string) {
+  public constructor(key: string, options?: unknown) {
     key = (key || '').trim();
+
+    this.proxyUrl = (options as ClerkConstructorOptions | undefined)?.proxyUrl;
 
     if (isLegacyFrontendApiKey(key)) {
       if (!validateFrontendApi(key)) {
