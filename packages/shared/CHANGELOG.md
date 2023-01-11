@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.8.4](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.8.3...@clerk/shared@0.8.4) (2023-01-11)
+
+### Bug Fixes
+
+- **types:** Replace the type modifier with the older import syntax ([c7f5cfb](https://github.com/clerkinc/clerk_docker/commit/c7f5cfbeddabab0f17a7addb709416acbaa93967))
+
 ### [0.8.3](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.8.3-staging.1...@clerk/shared@0.8.3) (2022-12-19)
 
 **Note:** Version bump only for package @clerk/shared
