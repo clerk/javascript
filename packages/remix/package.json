@@ -33,7 +33,6 @@
   "dependencies": {
     "@clerk/backend": "^0.4.0-staging.2",
     "@clerk/clerk-react": "^4.8.0-staging.1",
-    "@clerk/clerk-sdk-node": "^4.6.0-staging.2",
     "@clerk/types": "^3.24.0-staging.1",
     "cookie": "0.5.0",
     "tslib": "2.4.1"
