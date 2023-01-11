@@ -5,8 +5,8 @@
       "packages/*"
     ]
   },
-  "version": "0.0.0",
   "license": "MIT",
+  "version": "0.0.0",
   "private": true,
   "packageManager": "npm@8.5.0",
   "engines": {
@@ -37,8 +37,8 @@
   "scripts": {
     "dev": "turbo dev --filter=@clerk/* --filter=!@clerk/expo",
     "dev:playground": "echo 'Not ready for use yet' && exit 1 && turbo dev --filter=@playground/*",
-    "build": "turbo build --filter=!gatsby-plugin-clerk --filter=!@clerk/remix --concurrency=${TURBO_CONCURRENCY:-2}",
-    "test": "turbo test --filter=!gatsby-plugin-clerk --filter=!@clerk/remix --concurrency=${TURBO_CONCURRENCY:-2}",
+    "build": "turbo build --filter=!gatsby-plugin-clerk --concurrency=${TURBO_CONCURRENCY:-2}",
+    "test": "turbo test --filter=!gatsby-plugin-clerk --concurrency=${TURBO_CONCURRENCY:-2}",
     "clean": "turbo clean",
     "lint": "turbo lint",
     "lint-fix": "eslint . --ext .ts",
@@ -48,7 +48,7 @@
     "graduate": "lerna version --conventional-graduate",
     "release:staging": "lerna publish from-package --dist-tag staging",
     "release": "lerna publish from-package",
-    "prerelease": "npx rimraf packages/*/dist && turbo run build test --filter=!gatsby-plugin-clerk --filter=!@clerk/remix --concurrency=${TURBO_CONCURRENCY:-2} --force",
+    "prerelease": "npx rimraf packages/*/dist && turbo run build test --filter=!gatsby-plugin-clerk --concurrency=${TURBO_CONCURRENCY:-2} --force",
     "release:next": "lerna publish from-package --dist-tag next",
     "version": "./scripts/version-info.sh",
     "nuke": "rm -r node_modules; for d in packages/*/node_modules; do echo $d; rm -r $d; done",
