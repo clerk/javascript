@@ -4,10 +4,17 @@ import { DataFunctionArgs, LoaderFunction } from '@remix-run/server-runtime';
 export type GetAuthReturn = Promise<AuthObject>;
 
 export type RootAuthLoaderOptions = {
+  /**
+   * @deprecated Use `publishableKey` instead.
+   */
   frontendApi?: string;
   publishableKey?: string;
   jwtKey?: string;
+  /**
+   * @deprecated Use `secretKey` instead.
+   */
   apiKey?: string;
+  secretKey?: string;
   loadUser?: boolean;
   loadSession?: boolean;
   loadOrganization?: boolean;
