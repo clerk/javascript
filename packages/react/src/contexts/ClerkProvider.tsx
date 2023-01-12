@@ -22,7 +22,7 @@ function ClerkProviderBase(props: ClerkProviderProps): JSX.Element {
   const { frontendApi = '', publishableKey = '' } = restIsomorphicClerkOptions;
 
   if (!publishableKey && !frontendApi) {
-    errorThrower.throwMissingFrontendApiPublishableKeyError();
+    errorThrower.throwMissingFrontendApiOrPublishableKeyError();
   } else if (publishableKey && !isPublishableKey(publishableKey)) {
     errorThrower.throwInvalidPublishableKeyError({ key: publishableKey });
   } else if (frontendApi && !isLegacyFrontendApiKey(frontendApi)) {

@@ -44,7 +44,7 @@ function getScriptSrc({ publishableKey, frontendApi, scriptUrl, scriptVariant = 
   } else if (frontendApi) {
     scriptHost = frontendApi;
   } else {
-    errorThrower.throwMissingFrontendApiPublishableKeyError();
+    errorThrower.throwMissingFrontendApiOrPublishableKeyError();
   }
 
   const variant = scriptVariant ? `${scriptVariant.replace(/\.+$/, '')}.` : '';
