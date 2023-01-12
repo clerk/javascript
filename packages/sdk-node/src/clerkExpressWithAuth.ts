@@ -4,12 +4,12 @@ import { CreateClerkExpressMiddlewareOptions } from './clerkExpressRequireAuth';
 import type { ClerkMiddlewareOptions, MiddlewareWithAuthProp, WithAuthProp } from './types';
 
 export const createClerkExpressWithAuth = (createOpts: CreateClerkExpressMiddlewareOptions) => {
-  const { clerkClient, apiUrl = '', frontendApi = '', apiKey = '', publishableKey = '' } = createOpts;
+  const { clerkClient, frontendApi = '', apiKey = '', publishableKey = '' } = createOpts;
   return (options: ClerkMiddlewareOptions = {}): MiddlewareWithAuthProp => {
     return async (req, res, next) => {
       const requestState = await authenticateRequest(clerkClient, apiKey, frontendApi, publishableKey, req, options);
       if (requestState.isInterstitial) {
-        const interstitial = await clerkClient.remotePublicInterstitial({ apiUrl, frontendApi, publishableKey });
+        const interstitial = await clerkClient.remotePrivateInterstitial();
         return handleInterstitialCase(res, requestState, interstitial);
       }
       (req as WithAuthProp<any>).auth = {
@@ -21,4 +21,8 @@ export const createClerkExpressWithAuth = (createOpts: CreateClerkExpressMiddlew
   };
 };
 
-export const ClerkExpressWithAuth = createClerkExpressWithAuth({ clerkClient, apiUrl: API_URL, apiKey: API_KEY });
+export const ClerkExpressWithAuth = createClerkExpressWithAuth({
+  clerkClient,
+  apiUrl: API_URL,
+  apiKey: API_KEY,
+});

@@ -16,11 +16,8 @@ const mockClerkClient = () => ({
 describe('authenticateRequest', () => {
   it('correctly parses the req object', async () => {
     const req = {
-      cookies: {
-        [constants.Cookies.Session]: 'token',
-        [constants.Cookies.ClientUat]: 'token',
-      },
       headers: {
+        ['cookie']: `${constants.Cookies.Session}=token; expires=Mon, 27 june 2022 12:00:00 UTC;${constants.Cookies.ClientUat}=token; expires=Mon, 27 june 2022 12:00:00 UTC;`,
         [constants.Headers.Authorization]: 'Bearer token',
         [constants.Headers.ForwardedPort]: 'port',
         [constants.Headers.ForwardedHost]: 'host',
