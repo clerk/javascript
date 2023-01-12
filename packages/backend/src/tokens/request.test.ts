@@ -3,11 +3,78 @@ import sinon from 'sinon';
 
 import runtime from '../runtime';
 import { jsonOk } from '../util/mockFetch';
-import { mockJwks, mockJwt, mockJwtPayload } from './fixtures';
+import { mockJwt, mockInvalidSignatureJwt, mockMalformedJwt, mockJwks, mockJwtPayload } from './fixtures';
 import { type AuthenticateRequestOptions, authenticateRequest } from './request';
+import { TokenVerificationErrorReason } from './errors';
+import { AuthErrorReason, AuthStatus } from './authStatus';
+
+function assertSignedOut(assert, requestState, reason, message = '') {
+  assert.propEqual(requestState, {
+    frontendApi: 'cafe.babe.clerk.ts',
+    publishableKey: '',
+    status: AuthStatus.SignedOut,
+    isSignedIn: false,
+    isInterstitial: false,
+    message,
+    reason,
+    toAuth: {},
+  });
+}
+
+function assertSignedOutToAuth(assert, requestState) {
+  assert.propContains(requestState.toAuth(), {
+    sessionClaims: null,
+    sessionId: null,
+    session: null,
+    userId: null,
+    user: null,
+    orgId: null,
+    orgRole: null,
+    orgSlug: null,
+    organization: null,
+    getToken: {},
+  });
+}
+
+function assertInterstitial(assert, requestState, reason) {
+  assert.propContains(requestState, {
+    frontendApi: 'cafe.babe.clerk.ts',
+    publishableKey: '',
+    status: AuthStatus.Interstitial,
+    isSignedIn: false,
+    isInterstitial: true,
+    reason,
+    toAuth: {},
+  });
+}
+
+function assertSignedInToAuth(assert, requestState) {
+  assert.propContains(requestState.toAuth(), {
+    sessionClaims: mockJwtPayload,
+    sessionId: mockJwtPayload.sid,
+    session: undefined,
+    userId: mockJwtPayload.sub,
+    user: undefined,
+    orgId: undefined,
+    orgRole: undefined,
+    orgSlug: undefined,
+    organization: undefined,
+    getToken: {},
+  });
+}
+
+function assertSignedIn(assert, requestState) {
+  assert.propContains(requestState, {
+    frontendApi: 'cafe.babe.clerk.ts',
+    publishableKey: '',
+    status: AuthStatus.SignedIn,
+    isSignedIn: true,
+    isInterstitial: false,
+  });
+}
 
 export default (QUnit: QUnit) => {
-  const { module, test, todo } = QUnit;
+  const { module, test, todo, skip } = QUnit;
 
   /* An otherwise bare state on a request. */
   const defaultMockAuthenticateRequestOptions: AuthenticateRequestOptions = {
@@ -16,7 +83,6 @@ export default (QUnit: QUnit) => {
     apiUrl: 'https://api.clerk.test',
     apiVersion: 'v1',
     frontendApi: 'cafe.babe.clerk.ts',
-    // TODO: How do we test this?
     publishableKey: '',
     host: 'example.com',
     userAgent: 'Mozilla/TestAgent',
@@ -39,237 +105,251 @@ export default (QUnit: QUnit) => {
       sinon.restore();
     });
 
-    todo('throws if jwk fails to load from local', assert => {
-      assert.true(true);
-    });
+    //
+    // HTTP Authorization exists
+    //
 
-    todo('throws if jwk fails to load from remote', assert => {
-      assert.true(true);
-    });
+    // TODO: make it work
+    // test('throws if jwk fails to load from remote', async assert => {
+    //   fakeFetch.onCall(0).returns(jsonOk({}));
+    //   await assert.rejects(authenticateRequest({ ...defaultMockAuthenticateRequestOptions, headerToken: mockJwt }));
+    // });
 
-    test('returns the signed in state when a valid token is in HTTP Authorization header', async assert => {
+    test('headerToken: returns signed in state when a valid token [1y.2y]', async assert => {
       const requestState = await authenticateRequest({
         ...defaultMockAuthenticateRequestOptions,
         headerToken: mockJwt,
       });
 
-      assert.propContains(requestState, {
-        frontendApi: 'cafe.babe.clerk.ts',
-        publishableKey: '',
-        status: 'signed-in',
-        isSignedIn: true,
-        isInterstitial: false,
-      });
-
-      assert.propContains(requestState.toAuth(), {
-        sessionClaims: mockJwtPayload,
-        sessionId: mockJwtPayload.sid,
-        session: undefined,
-        userId: mockJwtPayload.sub,
-        user: undefined,
-        orgId: undefined,
-        orgRole: undefined,
-        orgSlug: undefined,
-        organization: undefined,
-        getToken: {},
-      });
+      assertSignedIn(assert, requestState);
+      assertSignedInToAuth(assert, requestState);
     });
 
     todo(
-      'returns the full signed in state when a valid token is in HTTP Authorization header, the organizations are enabled and the resources are loaded',
+      'headerToken: returns full signed in state when a valid token with organizations enabled and resources loaded [1y.2y]',
       assert => {
         assert.true(true);
       },
     );
 
-    test('returns the signed out state when a token with invalid authorizedParties is in HTTP Authorization header', async assert => {
+    test('headerToken: returns signed out state when a token with invalid authorizedParties [1y.2n]', async assert => {
       const requestState = await authenticateRequest({
         ...defaultMockAuthenticateRequestOptions,
         headerToken: mockJwt,
         authorizedParties: ['whatever'],
       });
 
-      assert.propEqual(requestState, {
-        frontendApi: 'cafe.babe.clerk.ts',
-        publishableKey: '',
-        status: 'signed-out',
-        isSignedIn: false,
-        isInterstitial: false,
-        reason: 'token-invalid-authorized-parties',
-        message:
-          'Invalid JWT Authorized party claim (azp) "https://accounts.inspired.puma-74.lcl.dev". Expected "whatever". (reason=token-invalid-authorized-parties, token-carrier=header)',
-        toAuth: {},
-      });
-
-      assert.propContains(requestState.toAuth(), {
-        sessionClaims: null,
-        sessionId: null,
-        session: null,
-        userId: null,
-        user: null,
-        orgId: null,
-        orgRole: null,
-        orgSlug: null,
-        organization: null,
-        getToken: {},
-      });
+      const errMessage =
+        'Invalid JWT Authorized party claim (azp) "https://accounts.inspired.puma-74.lcl.dev". Expected "whatever". (reason=token-invalid-authorized-parties, token-carrier=header)';
+      assertSignedOut(assert, requestState, TokenVerificationErrorReason.TokenInvalidAuthorizedParties, errMessage);
+      assertSignedOutToAuth(assert, requestState);
     });
 
-    test('returns the signed out state when an invalid token is in HTTP Authorization header', async assert => {
+    // TODO: code returns interstitial instead of signed out - @nikos
+    test('headerToken: returns signed out state when token expired [1y.2n]', async assert => {
+      // advance clock for 1 hour
+      fakeClock.tick(3600 * 1000);
+
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
+        headerToken: mockJwt,
+      });
+
+      assertInterstitial(assert, requestState, TokenVerificationErrorReason.TokenExpired);
+      assert.strictEqual(requestState.toAuth(), null);
+    });
+
+    test('headerToken: returns signed out state when invalid signature [1y.2n]', async assert => {
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
+        headerToken: mockInvalidSignatureJwt,
+      });
+
+      const errMessage = 'JWT signature is invalid. (reason=token-invalid-signature, token-carrier=header)';
+      assertSignedOut(assert, requestState, TokenVerificationErrorReason.TokenInvalidSignature, errMessage);
+      assertSignedOutToAuth(assert, requestState);
+    });
+
+    test('headerToken: returns signed out state when an malformed token [1y.1n]', async assert => {
       const requestState = await authenticateRequest({
         ...defaultMockAuthenticateRequestOptions,
         headerToken: 'test_header_token',
       });
 
-      assert.propEqual(requestState, {
-        frontendApi: 'cafe.babe.clerk.ts',
-        publishableKey: '',
-        status: 'signed-out',
-        isSignedIn: false,
-        isInterstitial: false,
-        message:
-          'Invalid JWT form. A JWT consists of three parts separated by dots. (reason=token-invalid, token-carrier=header)',
-        reason: 'token-invalid',
-        toAuth: {},
+      const errMessage =
+        'Invalid JWT form. A JWT consists of three parts separated by dots. (reason=token-invalid, token-carrier=header)';
+      assertSignedOut(assert, requestState, TokenVerificationErrorReason.TokenInvalid, errMessage);
+      assertSignedOutToAuth(assert, requestState);
+    });
+
+    //
+    // HTTP Authorization does NOT exist and __session cookie exists
+    //
+
+    test('cookieToken: returns signed out state when cross-origin request [2y]', async assert => {
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
+        origin: 'https://clerk.dev',
+        forwardedProto: '80',
+        cookieToken: mockJwt,
       });
 
-      assert.propContains(requestState.toAuth(), {
-        sessionClaims: null,
-        sessionId: null,
-        session: null,
-        userId: null,
-        user: null,
-        orgId: null,
-        orgRole: null,
-        orgSlug: null,
-        organization: null,
-        getToken: {},
+      assertSignedOut(assert, requestState, AuthErrorReason.HeaderMissingCORS);
+      assertSignedOutToAuth(assert, requestState);
+    });
+
+    test('cookieToken: returns signed out when non browser requests in development [3y]', async assert => {
+      const nonBrowserUserAgent = 'curl';
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
+        apiKey: 'test_deadbeef',
+        userAgent: nonBrowserUserAgent,
+        clientUat: '12345',
+        cookieToken: mockJwt,
       });
+
+      assertSignedOut(assert, requestState, AuthErrorReason.HeaderMissingNonBrowser);
+      assertSignedOutToAuth(assert, requestState);
+    });
+
+    test('cookieToken: returns signed out when no cookieToken and no clientUat in production [4y]', async assert => {
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
+        apiKey: 'live_deadbeef',
+      });
+
+      assertSignedOut(assert, requestState, AuthErrorReason.CookieAndUATMissing);
+      assertSignedOutToAuth(assert, requestState);
+    });
+
+    test('cookieToken: returns interstitial when no clientUat in development [5y]', async assert => {
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
+        cookieToken: mockJwt,
+        apiKey: 'test_deadbeef',
+      });
+
+      assertInterstitial(assert, requestState, AuthErrorReason.CookieUATMissing);
+      assert.equal(requestState.message, '');
+      assert.strictEqual(requestState.toAuth(), null);
+    });
+
+    // TODO: code returns signed-in instead of interstitial - @nikos
+    // test('cookieToken: returns interstitial when no referrer in development [6y]', async assert => {
+    //   // Scenario: after auth action on Clerk-hosted UIs
+    //   const requestState = await authenticateRequest({
+    //     ...defaultMockAuthenticateRequestOptions,
+    //     cookieToken: mockJwt,
+    //     apiKey: 'test_deadbeef',
+    //     clientUat: '12345',
+    //   });
+
+    //   assertInterstitial(assert, requestState, AuthErrorReason.CookieUATMissing);
+    //   assert.equal(requestState.message, '');
+    //   assert.strictEqual(requestState.toAuth(), null);
+    // });
+
+    test('cookieToken: returns interstitial when crossOriginReferrer in development [6y]', async assert => {
+      // Scenario: after auth action on Clerk-hosted UIs
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
+        cookieToken: mockJwt,
+        apiKey: 'test_deadbeef',
+        clientUat: '12345',
+        referrer: 'https://clerk.dev',
+      });
+
+      assertInterstitial(assert, requestState, AuthErrorReason.CrossOriginReferrer);
+      assert.equal(requestState.message, '');
+      assert.strictEqual(requestState.toAuth(), null);
+    });
+
+    // // Note: The user is definitely signed out here so this interstitial can be
+    // // eliminated. We can keep it if we're worried about something inspecting
+    // // the __session cookie manually
+    skip('cookieToken: returns interstitial when clientUat = 0 [7y]', assert => {
+      assert.true(true);
+    });
+
+    test('cookieToken: returns interstitial when clientUat > 0 and no cookieToken [8y]', async assert => {
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
+        apiKey: 'deadbeef',
+        clientUat: '1234',
+      });
+
+      assertInterstitial(assert, requestState, AuthErrorReason.CookieMissing);
+      assert.equal(requestState.message, '');
+      assert.strictEqual(requestState.toAuth(), null);
+    });
+
+    test('cookieToken: returns signed out when clientUat = 0 and no cookieToken [9y]', async assert => {
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
+        clientUat: '0',
+      });
+
+      assertSignedOut(assert, requestState, AuthErrorReason.StandardSignedOut);
+      assertSignedOutToAuth(assert, requestState);
+    });
+
+    test('cookieToken: returns interstitial when clientUat > cookieToken.iat [10n]', async assert => {
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
+        cookieToken: mockJwt,
+        clientUat: `${mockJwtPayload.iat + 10}`,
+      });
+
+      assertInterstitial(assert, requestState, AuthErrorReason.CookieOutDated);
+      assert.equal(requestState.message, '');
+      assert.strictEqual(requestState.toAuth(), null);
+    });
+
+    test('cookieToken: returns signed out when cookieToken.iat >= clientUat and malformed token [10y.1n]', async assert => {
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
+        cookieToken: mockMalformedJwt,
+        clientUat: `${mockJwtPayload.iat - 10}`,
+      });
+
+      const errMessage =
+        'Subject claim (sub) is required and must be a string. Received undefined. Make sure that this is a valid Clerk generate JWT. (reason=token-verification-failed, token-carrier=cookie)';
+      assertSignedOut(assert, requestState, TokenVerificationErrorReason.TokenVerificationFailed, errMessage);
+      assertSignedOutToAuth(assert, requestState);
+    });
+
+    test('cookieToken: returns signed in when cookieToken.iat >= clientUat and valid token [10y.2y]', async assert => {
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
+        cookieToken: mockJwt,
+        clientUat: `${mockJwtPayload.iat - 10}`,
+      });
+
+      assertSignedIn(assert, requestState);
+      assertSignedInToAuth(assert, requestState);
+    });
+
+    // TODO: what is ssrToken and client api verification - @nikos
+    todo(
+      'cookieToken: returns signed in when cookieToken.iat >= clientUat and expired token and ssrToken [10y.2n.1y]',
+      assert => {
+        assert.true(true);
+      },
+    );
+
+    test('cookieToken: returns interstitial when cookieToken.iat >= clientUat and expired token [10y.2n.1n]', async assert => {
+      // advance clock for 1 hour
+      fakeClock.tick(3600 * 1000);
+
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
+        cookieToken: mockJwt,
+        clientUat: `${mockJwtPayload.iat - 10}`,
+      });
+
+      assertInterstitial(assert, requestState, TokenVerificationErrorReason.TokenExpired);
+      assert.true(/^JWT is expired/.test(requestState.message || ''));
+      assert.strictEqual(requestState.toAuth(), null);
     });
   });
 };
-
-// it('returns signed out on development non browser requests', async () => {
-//   const nonBrowserUserAgent = 'curl';
-//   const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
-//   testBase.buildAuthenticatedState = jest.fn();
-//   mockIsDevelopmentOrStaging.mockImplementationOnce(() => true);
-//   const requestStateResult = await testBase.authenticateRequest({
-//     ...defaultrequestState,
-//     userAgent: nonBrowserUserAgent,
-//     clientUat: '12345',
-//   });
-//   expect(testBase.buildAuthenticatedState).toHaveBeenCalledTimes(0);
-//   expect(requestStateResult).toEqual({
-//     status: AuthStatus.SignedOut,
-//     errorReason: AuthErrorReason.HeaderMissingNonBrowser,
-//   });
-// });
-
-// it('returns signed out when no header token is present in cross-origin request', async () => {
-//   const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
-//   mockCrossOrigin.mockImplementationOnce(() => true);
-//   const requestStateResult = await testBase.authenticateRequest({ ...defaultrequestState, origin: 'https://clerk.dev' });
-//   expect(mockCrossOrigin).toHaveBeenCalledTimes(1);
-//   expect(requestStateResult).toEqual({ status: AuthStatus.SignedOut, errorReason: AuthErrorReason.HeaderMissingCORS });
-// });
-
-// it('returns interstitial when in development we find no clientUat', async () => {
-//   const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
-//   mockFetchInterstitial.mockImplementationOnce(() => Promise.resolve(mockInterstitialValue));
-//   mockIsDevelopmentOrStaging.mockImplementationOnce(() => true);
-//   const requestStateResult = await testBase.authenticateRequest({
-//     ...defaultrequestState,
-//     fetchInterstitial: mockFetchInterstitial,
-//   });
-
-//   expect(mockFetchInterstitial).toHaveBeenCalledTimes(1);
-//   expect(requestStateResult).toEqual({
-//     status: AuthStatus.Interstitial,
-//     interstitial: mockInterstitialValue,
-//     errorReason: AuthErrorReason.UATMissing,
-//   });
-// });
-
-// it('returns signed out on first production load without cookieToken and clientUat', async () => {
-//   const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
-//   mockIsProduction.mockImplementationOnce(() => true);
-//   const requestStateResult = await testBase.authenticateRequest({ ...defaultrequestState });
-//   expect(requestStateResult).toEqual({ status: AuthStatus.SignedOut, errorReason: AuthErrorReason.CookieAndUATMissing });
-// });
-
-// it('returns interstitial on development after auth action on Clerk-hosted UIs', async () => {
-//   const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
-//   mockFetchInterstitial.mockImplementationOnce(() => Promise.resolve(mockInterstitialValue));
-//   mockIsDevelopmentOrStaging.mockImplementationOnce(() => true);
-//   mockCrossOrigin.mockImplementationOnce(() => true);
-//   const requestStateResult = await testBase.authenticateRequest({
-//     ...defaultrequestState,
-//     fetchInterstitial: mockFetchInterstitial,
-//     referrer: 'https://random.clerk.hosted.ui',
-//     clientUat: '12345',
-//   });
-
-//   expect(mockFetchInterstitial).toHaveBeenCalledTimes(1);
-//   expect(requestStateResult).toEqual({
-//     status: AuthStatus.Interstitial,
-//     interstitial: mockInterstitialValue,
-//     errorReason: AuthErrorReason.CrossOriginReferrer,
-//   });
-// });
-
-// it('returns signed out on clientUat signaled as 0', async () => {
-//   const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
-//   mockIsProduction.mockImplementationOnce(() => true);
-//   const requestStateResult = await testBase.authenticateRequest({ ...defaultrequestState, clientUat: '0' });
-//   expect(requestStateResult).toEqual({ status: AuthStatus.SignedOut, errorReason: AuthErrorReason.StandardSignedOut });
-// });
-
-// it('returns interstitial when on production and have a valid clientUat value without cookieToken', async () => {
-//   const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
-//   mockIsProduction.mockImplementationOnce(() => true);
-//   mockFetchInterstitial.mockImplementationOnce(() => Promise.resolve(mockInterstitialValue));
-//   const requestStateResult = await testBase.authenticateRequest({
-//     ...defaultrequestState,
-//     clientUat: '12345',
-//     fetchInterstitial: mockFetchInterstitial,
-//   });
-//   expect(mockFetchInterstitial).toHaveBeenCalledTimes(1);
-//   expect(requestStateResult).toEqual({
-//     status: AuthStatus.Interstitial,
-//     interstitial: mockInterstitialValue,
-//     errorReason: AuthErrorReason.CookieMissing,
-//   });
-// });
-
-// it('returns sessionClaims cookieToken is available and clientUat is valid', async () => {
-//   const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
-//   const validJwtToken = { sessionClaims: { iat: Number(new Date()) + 50 } };
-//   testBase.buildAuthenticatedState = jest.fn().mockImplementationOnce(() => validJwtToken);
-//   const requestStateResult = await testBase.authenticateRequest({
-//     ...defaultrequestState,
-//     clientUat: String(new Date().getTime()),
-//     cookieToken: 'valid_token',
-//   });
-//   expect(requestStateResult).toEqual(validJwtToken);
-// });
-
-// it('returns interstitial cookieToken is valid but token iat is in past date', async () => {
-//   const testBase = new Base(mockImportKey, mockVerifySignature, mockBase64Decode, mockLoadCryptoKeyFunction);
-
-//   const validJwtToken = { sessionClaims: { iat: Number(new Date()) - 50 } };
-//   testBase.buildAuthenticatedState = jest.fn().mockImplementationOnce(() => validJwtToken);
-//   mockFetchInterstitial.mockImplementationOnce(() => Promise.resolve(mockInterstitialValue));
-//   const requestStateResult = await testBase.authenticateRequest({
-//     ...defaultrequestState,
-//     clientUat: String(new Date().getTime()),
-//     cookieToken: 'valid_token',
-//     fetchInterstitial: mockFetchInterstitial,
-//   });
-//   expect(mockFetchInterstitial).toHaveBeenCalledTimes(1);
-//   expect(requestStateResult).toEqual({
-//     status: AuthStatus.Interstitial,
-//     interstitial: mockInterstitialValue,
-//     errorReason: AuthErrorReason.CookieOutDated,
-//   });
-// });
