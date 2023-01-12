@@ -46,7 +46,7 @@ function getCount(item: { total_count: number }) {
 function jsonToObject(item: any): any {
   // Special case: DeletedObject
   // TODO: Improve this check
-  if ('object' in item && 'deleted' in item) {
+  if (typeof item !== 'string' && 'object' in item && 'deleted' in item) {
     return DeletedObject.fromJSON(item);
   }
 
