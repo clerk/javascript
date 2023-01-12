@@ -49,7 +49,7 @@ export const setClerkApiKey = (value: string) => {
 };
 
 export const setClerkServerApiUrl = (value: string) => {
-  clerkClient.__unstable_options.apiKey = value;
+  clerkClient.__unstable_options.apiUrl = value;
 };
 
 export const setClerkApiVersion = (value: string) => {
