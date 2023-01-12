@@ -76,7 +76,7 @@ export class UserAPI extends AbstractAPI {
   }
 
   public async createUser(params: CreateUserParams) {
-    return this.request({
+    return this.request<User>({
       method: 'POST',
       path: basePath,
       bodyParams: params,
