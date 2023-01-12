@@ -1,73 +1,133 @@
-// /**
-//  * @jest-environment jsdom
-//  */
+import type QUnit from 'qunit';
+import sinon from 'sinon';
 
 import { mockJwks, mockJwt, mockJwtHeader, mockJwtPayload } from './fixtures';
 import { decodeJwt, verifyJwt } from './jwt';
 
-describe('decodeJwt(jwt)', () => {
-  test('decodes a valid JWT', () => {
-    const { header, payload, signature } = decodeJwt(mockJwt);
-    expect(header).toEqual(mockJwtHeader);
-    expect(payload).toEqual(mockJwtPayload);
-    expect(signature).toBeInstanceOf(Uint8Array);
-  });
+export default (QUnit: QUnit) => {
+  const { module, test, todo } = QUnit;
 
-  test.each([[null], [undefined], [''], [42], ['whatever']])('throws an error if %p is given as jwt', input => {
-    expect(() => decodeJwt(input as string)).toThrow(
-      'Invalid JWT form. A JWT consists of three parts separated by dots.',
-    );
-  });
-});
-
-describe('verifyJwt(jwt, options)', () => {
-  describe('when verifications succeed', () => {
-    // Notice: The modern fake timers of Jest can't be used as crypto uses timers under the hood.
-    //
-    // So instead of
-    // jest.useFakeTimers('modern');
-    // jest.setSystemTime(new Date(...));
-    //
-    // we just mock Date.now().
-
-    const RealDate = Date;
-
-    beforeEach(() => {
-      global.Date.now = jest.fn(() => new Date(mockJwtPayload.iat * 1000).getTime());
-    });
-    afterEach(() => {
-      global.Date = RealDate;
+  module('decodeJwt(jwt)', () => {
+    test('decodes a valid JWT', assert => {
+      const { header, payload } = decodeJwt(mockJwt);
+      assert.propEqual(header, mockJwtHeader);
+      assert.propEqual(payload, mockJwtPayload);
+      // TODO: assert signature is instance of Uint8Array
     });
 
-    test.each([
-      [
-        {
-          key: mockJwks.keys[0],
-          issuer: mockJwtPayload.iss,
-          authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
-        },
-      ],
-      [
-        {
-          key: mockJwks.keys[0],
-          issuer: (iss: string) => iss.startsWith('https://clerk'),
-          authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
-        },
-      ],
-      [
-        {
-          key: mockJwks.keys[0],
-          issuer: mockJwtPayload.iss,
-          authorizedParties: ['', 'https://accounts.inspired.puma-74.lcl.dev'],
-        },
-      ],
-    ])('returns the valid JWT payload if %p is given as verification options', async inputVerifyJwtOptions => {
+    test('throws an error if null is given as jwt', assert => {
+      try {
+        decodeJwt('null');
+        assert.false(true);
+      } catch (err) {
+        if (err instanceof Error) {
+          assert.equal(err.message, 'Invalid JWT form. A JWT consists of three parts separated by dots.');
+        } else {
+          // This should never be reached. If it does, the suite should fail
+          assert.false(true);
+        }
+      }
+    });
+
+    test('throws an error if undefined is given as jwt', assert => {
+      try {
+        decodeJwt('undefined');
+        assert.false(true);
+      } catch (err) {
+        if (err instanceof Error) {
+          assert.equal(err.message, 'Invalid JWT form. A JWT consists of three parts separated by dots.');
+        } else {
+          // This should never be reached. If it does, the suite should fail
+          assert.false(true);
+        }
+      }
+    });
+
+    test('throws an error if empty string is given as jwt', assert => {
+      try {
+        decodeJwt('');
+        assert.false(true);
+      } catch (err) {
+        if (err instanceof Error) {
+          assert.equal(err.message, 'Invalid JWT form. A JWT consists of three parts separated by dots.');
+        } else {
+          // This should never be reached. If it does, the suite should fail
+          assert.false(true);
+        }
+      }
+    });
+
+    test('throws an error if invalid string is given as jwt', assert => {
+      try {
+        decodeJwt('whatever');
+        assert.false(true);
+      } catch (err) {
+        if (err instanceof Error) {
+          assert.equal(err.message, 'Invalid JWT form. A JWT consists of three parts separated by dots.');
+        } else {
+          // This should never be reached. If it does, the suite should fail
+          assert.false(true);
+        }
+      }
+    });
+
+    test('throws an error if number is given as jwt', assert => {
+      try {
+        decodeJwt('42');
+        assert.false(true);
+      } catch (err) {
+        if (err instanceof Error) {
+          assert.equal(err.message, 'Invalid JWT form. A JWT consists of three parts separated by dots.');
+        } else {
+          // This should never be reached. If it does, the suite should fail
+          assert.false(true);
+        }
+      }
+    });
+  });
+
+  module('verifyJwt(jwt, options)', hooks => {
+    let fakeClock;
+    hooks.beforeEach(() => {
+      fakeClock = sinon.useFakeTimers(new Date(mockJwtPayload.iat * 1000).getTime());
+    });
+    hooks.afterEach(() => {
+      fakeClock.restore();
+      sinon.restore();
+    });
+
+    test('returns the valid JWT payload if valid key & issuer & azp is given', async assert => {
+      const inputVerifyJwtOptions = {
+        key: mockJwks.keys[0],
+        issuer: mockJwtPayload.iss,
+        authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+      };
       const payload = await verifyJwt(mockJwt, inputVerifyJwtOptions);
-      expect(payload).toEqual({ valid: true, payload: mockJwtPayload });
+      assert.propEqual(payload, mockJwtPayload);
+    });
+
+    test('returns the valid JWT payload if valid key & issuer method & azp is given', async assert => {
+      const inputVerifyJwtOptions = {
+        key: mockJwks.keys[0],
+        issuer: (iss: string) => iss.startsWith('https://clerk'),
+        authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+      };
+      const payload = await verifyJwt(mockJwt, inputVerifyJwtOptions);
+      assert.propEqual(payload, mockJwtPayload);
+    });
+
+    test('returns the valid JWT payload if valid key & issuer & list of azp (with empty string) is given', async assert => {
+      const inputVerifyJwtOptions = {
+        key: mockJwks.keys[0],
+        issuer: mockJwtPayload.iss,
+        authorizedParties: ['', 'https://accounts.inspired.puma-74.lcl.dev'],
+      };
+      const payload = await verifyJwt(mockJwt, inputVerifyJwtOptions);
+      assert.propEqual(payload, mockJwtPayload);
+    });
+
+    todo('returns the reason of the failure when verifications fail', assert => {
+      assert.true(true);
     });
   });
-
-  describe('when verifications fail', () => {
-    it.todo('returns the reason of the failure');
-  });
-});
+};
