@@ -98,7 +98,7 @@ export default class IsomorphicClerk {
     }
 
     if (typeof this.publishableKey === 'undefined' && typeof this.frontendApi === 'undefined') {
-      errorThrower.throwMissingFrontendApiPublishableKeyError();
+      errorThrower.throwMissingFrontendApiOrPublishableKeyError();
     }
 
     // Store frontendAPI value on window as a fallback. This value can be used as a

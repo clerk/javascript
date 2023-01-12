@@ -20,7 +20,7 @@ export interface ErrorThrower {
   setMessages(options: ErrorThrowerOptions): ErrorThrower;
   throwInvalidPublishableKeyError(params: { key?: string }): never;
   throwInvalidFrontendApiError(params: { key?: string }): never;
-  throwMissingFrontendApiPublishableKeyError(): never;
+  throwMissingFrontendApiOrPublishableKeyError(): never;
 }
 
 export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerOptions): ErrorThrower {
@@ -68,7 +68,7 @@ export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerO
       throw new Error(buildMessage(messages.InvalidFrontendApiErrorMessage, params));
     },
 
-    throwMissingFrontendApiPublishableKeyError(): never {
+    throwMissingFrontendApiOrPublishableKeyError(): never {
       throw new Error(buildMessage(messages.MissingFrontendApiPublishableKeyErrorMessage));
     },
   };
