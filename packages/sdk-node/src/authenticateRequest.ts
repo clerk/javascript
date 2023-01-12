@@ -1,7 +1,12 @@
 import { Clerk, constants, RequestState } from '@clerk/backend';
+import cookie from 'cookie';
 import { Request as ExpressRequest } from 'express';
 
 import { ClerkMiddlewareOptions } from './types';
+
+const parseCookies = (req: ExpressRequest) => {
+  return cookie.parse(req.headers['cookie'] || '');
+};
 
 export const authenticateRequest = (
   clerkClient: ReturnType<typeof Clerk>,
@@ -11,6 +16,7 @@ export const authenticateRequest = (
   req: ExpressRequest,
   options?: ClerkMiddlewareOptions,
 ) => {
+  const cookies = parseCookies(req);
   const { jwtKey, authorizedParties } = options || {};
   return clerkClient.authenticateRequest({
     apiKey,
@@ -18,9 +24,9 @@ export const authenticateRequest = (
     publishableKey,
     jwtKey,
     authorizedParties,
-    cookieToken: req.cookies[constants.Cookies.Session] || '',
+    cookieToken: cookies[constants.Cookies.Session] || '',
     headerToken: req.headers[constants.Headers.Authorization]?.replace('Bearer ', '') || '',
-    clientUat: req.cookies[constants.Cookies.ClientUat] || '',
+    clientUat: cookies[constants.Cookies.ClientUat] || '',
     host: req.headers.host as string,
     forwardedPort: req.headers[constants.Headers.ForwardedPort] as string,
     forwardedHost: req.headers[constants.Headers.ForwardedHost] as string,
