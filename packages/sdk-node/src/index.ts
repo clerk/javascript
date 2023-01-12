@@ -11,10 +11,31 @@ import type {
 export * from '@clerk/backend';
 export { createClerkClient, clerkClient };
 
-const { users, smsMessages, sessions, emailAddresses, phoneNumbers, emails, invitations, organizations, clients } =
-  clerkClient;
+const {
+  users,
+  smsMessages,
+  sessions,
+  emailAddresses,
+  phoneNumbers,
+  emails,
+  invitations,
+  organizations,
+  clients,
+  allowlistIdentifiers,
+} = clerkClient;
 
-export { users, smsMessages, sessions, emailAddresses, phoneNumbers, emails, invitations, organizations, clients };
+export {
+  users,
+  smsMessages,
+  sessions,
+  emailAddresses,
+  phoneNumbers,
+  emails,
+  invitations,
+  organizations,
+  clients,
+  allowlistIdentifiers,
+};
 
 export default clerkClient;
 
