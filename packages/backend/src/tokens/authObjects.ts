@@ -1,7 +1,8 @@
 import type { ActClaim, JwtPayload, ServerGetToken, ServerGetTokenOptions } from '@clerk/types';
 
 import { type Organization, type Session, type User, createBackendApiClient } from '../api';
-import { AuthenticateRequestOptions, RequestState } from './request';
+import { AuthenticateRequestOptions } from './request';
+import { RequestState } from './authStatus';
 
 type AuthObjectDebugData = Partial<AuthenticateRequestOptions & RequestState>;
 type CreateAuthObjectDebug = (data?: AuthObjectDebugData) => AuthObjectDebug;
