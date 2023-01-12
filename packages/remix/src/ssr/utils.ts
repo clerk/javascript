@@ -86,6 +86,7 @@ export const returnLoaderResultJsonResponse = (opts: { requestState: RequestStat
     ...wrapWithClerkState({
       __clerk_ssr_state: rest,
       __frontendApi: opts.requestState.frontendApi,
+      __publishableKey: opts.requestState.publishableKey,
       __clerk_debug: debugRequestState(opts.requestState),
     }),
   });

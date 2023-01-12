@@ -19,7 +19,8 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
   ReactClerkProvider.displayName = 'ReactClerkProvider';
 
   assertValidClerkState(clerkState);
-  const { __clerk_ssr_state, __clerk_debug } = clerkState?.__internal_clerk_state || {};
+  const { __clerk_ssr_state, __frontendApi, __publishableKey, __clerk_debug } =
+    clerkState?.__internal_clerk_state || {};
 
   React.useEffect(() => {
     warnForSsr(clerkState);
@@ -33,6 +34,8 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
     <ReactClerkProvider
       navigate={awaitableNavigate}
       initialState={__clerk_ssr_state}
+      frontendApi={__frontendApi as any}
+      publishableKey={__publishableKey as any}
       {...restProps}
     >
       {children}
