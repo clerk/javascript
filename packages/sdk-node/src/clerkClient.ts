@@ -8,12 +8,17 @@ export const API_VERSION = process.env.CLERK_API_VERSION || 'v1';
 export const API_KEY = process.env.CLERK_SECRET_KEY || process.env.CLERK_API_KEY || '';
 export const PUBLISHABLE_KEY = process.env.CLERK_PUBLISHABLE_KEY || '';
 
-export const Clerk = (options: ClerkOptions) => {
+/**
+ * This needs to be a *named* function in order to support the older
+ * new Clerk() syntax for v4 compatibility.
+ * Arrow functions can never be called with the new keyword because they do not have the [[Construct]] method
+ */
+export function Clerk(options: ClerkOptions) {
   const clerkClient = _Clerk(options);
   const expressWithAuth = createClerkExpressWithAuth({ ...options, clerkClient });
   const expressRequireAuth = createClerkExpressRequireAuth({ ...options, clerkClient });
   return { ...clerkClient, expressWithAuth, expressRequireAuth };
-};
+}
 
 export const createClerkClient = Clerk;
 
