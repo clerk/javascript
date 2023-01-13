@@ -1,6 +1,7 @@
 import { isDevelopmentFromApiKey, isProductionFromApiKey } from '../util/instance';
 import { checkCrossOrigin } from '../util/request';
-import { type RequestState, AuthErrorReason, interstitial, signedOut } from './authStatus';
+import { type RequestState, AuthErrorReason, interstitial, signedOut, signedIn } from './authStatus';
+import { verifyToken } from './verify';
 
 export type InterstitialRule = <T>(opts: T) => Promise<RequestState | undefined>;
 
@@ -91,3 +92,44 @@ export const hasClientUatButCookieIsMissingInProd: InterstitialRule = async opti
   }
   return undefined;
 };
+
+export const hasValidHeaderToken: InterstitialRule = async options => {
+  const { headerToken } = options as any;
+  const sessionClaims = await verifyRequestState(options, headerToken!);
+  return await signedIn(options, sessionClaims);
+};
+
+export const hasValidCookieToken: InterstitialRule = async options => {
+  const { cookieToken, clientUat } = options as any;
+  const sessionClaims = await verifyRequestState(options, cookieToken!);
+  const state = await signedIn(options, sessionClaims);
+
+  const jwt = state.toAuth().sessionClaims;
+  const cookieTokenIsOutdated = jwt.iat < Number.parseInt(clientUat);
+
+  if (!clientUat || cookieTokenIsOutdated) {
+    return interstitial(options, AuthErrorReason.CookieOutDated);
+  }
+
+  return state;
+};
+
+export async function runInterstitialRules<T>(opts: T, rules: InterstitialRule[]): Promise<RequestState> {
+  for (const rule of rules) {
+    const res = await rule(opts);
+    if (res) {
+      return res;
+    }
+  }
+
+  return signedOut<T>(opts, AuthErrorReason.UnexpectedError);
+}
+
+async function verifyRequestState(options: any, token: string) {
+  const issuer = (iss: string) => iss.startsWith('https://clerk.') || iss.includes('.clerk.accounts');
+
+  return verifyToken(token, {
+    ...options,
+    issuer,
+  });
+}

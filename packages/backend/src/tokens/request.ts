@@ -1,13 +1,10 @@
 import { parsePublishableKey } from '@clerk/shared';
-import type { JwtPayload } from '@clerk/types';
-
 import { API_URL, API_VERSION } from '../constants';
-import { type RequestState, AuthErrorReason, signedIn, signedOut, interstitial } from './authStatus';
+import { type RequestState, AuthErrorReason, interstitial, signedOut } from './authStatus';
+import { type VerifyTokenOptions } from './verify';
 import { type TokenCarrier, TokenVerificationError, TokenVerificationErrorReason } from './errors';
-import { type VerifyTokenOptions, verifyToken } from './verify';
 
 import {
-  type InterstitialRule,
   nonBrowserRequestInDevRule,
   crossOriginRequestWithoutHeader,
   potentialFirstLoadInDevWhenUATMissing,
@@ -15,6 +12,9 @@ import {
   potentialFirstRequestOnProductionEnvironment,
   isNormalSignedOutState,
   hasClientUatButCookieIsMissingInProd,
+  hasValidCookieToken,
+  hasValidHeaderToken,
+  runInterstitialRules,
 } from './interstitialRule';
 
 export type LoadResourcesOptions = {
@@ -66,11 +66,9 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
   options.apiVersion = options.apiVersion || API_VERSION;
 
   async function authenticateRequestWithTokenInHeader() {
-    const { headerToken } = options;
-
     try {
-      const sessionClaims = await verifyRequestState(headerToken!);
-      return await signedIn<AuthenticateRequestOptions>(options, sessionClaims);
+      const state = await runInterstitialRules(options, [hasValidHeaderToken]);
+      return state;
     } catch (err) {
       return handleError(err, 'header');
     }
@@ -78,7 +76,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
 
   async function authenticateRequestWithTokenInCookie() {
     try {
-      const signedOutOrInterstitial = await runInterstitialRules(options, [
+      const state = await runInterstitialRules(options, [
         nonBrowserRequestInDevRule,
         crossOriginRequestWithoutHeader,
         potentialFirstLoadInDevWhenUATMissing,
@@ -86,33 +84,13 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
         potentialFirstRequestOnProductionEnvironment,
         isNormalSignedOutState,
         hasClientUatButCookieIsMissingInProd,
+        hasValidCookieToken,
       ]);
-
-      if (signedOutOrInterstitial) {
-        return signedOutOrInterstitial;
-      }
-
-      const { cookieToken, clientUat } = options;
-      const sessionClaims = await verifyRequestState(cookieToken!);
-      const state = await signedIn<AuthenticateRequestOptions>(options, sessionClaims);
-
-      if (!clientUat || cookieTokenIsOutdated(state.toAuth().sessionClaims, clientUat)) {
-        return interstitial<AuthenticateRequestOptions>(options, AuthErrorReason.CookieOutDated);
-      }
 
       return state;
     } catch (err) {
       return handleError(err, 'cookie');
     }
-  }
-
-  function verifyRequestState(token: string) {
-    const issuer = (iss: string) => iss.startsWith('https://clerk.') || iss.includes('.clerk.accounts');
-
-    return verifyToken(token, {
-      ...options,
-      issuer,
-    });
   }
 
   function handleError(err: unknown, tokenCarrier: TokenCarrier) {
@@ -131,22 +109,6 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
     }
     return signedOut<AuthenticateRequestOptions>(options, AuthErrorReason.UnexpectedError, (err as Error).message);
   }
-
-  function cookieTokenIsOutdated(jwt: JwtPayload, clientUat: string) {
-    return jwt.iat < Number.parseInt(clientUat);
-  }
-
-  type RunRules = (opts: AuthenticateRequestOptions, rules: InterstitialRule[]) => Promise<RequestState | undefined>;
-
-  const runInterstitialRules: RunRules = async (opts, rules) => {
-    for (const rule of rules) {
-      const res = await rule(opts);
-      if (res) {
-        return res;
-      }
-    }
-    return undefined;
-  };
 
   if (options.headerToken) {
     return authenticateRequestWithTokenInHeader();
