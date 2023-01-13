@@ -2,7 +2,7 @@ import { isDevelopmentFromApiKey, isProductionFromApiKey } from '../util/instanc
 import { checkCrossOrigin } from '../util/request';
 import { type RequestState, AuthErrorReason, interstitial, signedOut } from './authStatus';
 
-export type InterstitialRule = <T>(opts: T) => RequestState | undefined;
+export type InterstitialRule = <T>(opts: T) => Promise<RequestState | undefined>;
 
 // In development or staging environments only, based on the request's
 // User Agent, detect non-browser requests (e.g. scripts). Since there
@@ -10,7 +10,7 @@ export type InterstitialRule = <T>(opts: T) => RequestState | undefined;
 // prevent interstitial rendering
 // In production, script requests will be missing both uat and session cookies, which will be
 // automatically treated as signed out. This exception is needed for development, because the any // missing uat throws an interstitial in development.
-export const nonBrowserRequestInDevRule: InterstitialRule = options => {
+export const nonBrowserRequestInDevRule: InterstitialRule = async options => {
   const { apiKey, secretKey, userAgent } = options as any;
   const key = secretKey || apiKey;
   if (isDevelopmentFromApiKey(key) && !userAgent?.startsWith('Mozilla/')) {
@@ -19,7 +19,7 @@ export const nonBrowserRequestInDevRule: InterstitialRule = options => {
   return undefined;
 };
 
-export const crossOriginRequestWithoutHeader: InterstitialRule = options => {
+export const crossOriginRequestWithoutHeader: InterstitialRule = async options => {
   const { origin, host, forwardedHost, forwardedPort, forwardedProto } = options as any;
   const isCrossOrigin =
     origin &&
@@ -37,7 +37,7 @@ export const crossOriginRequestWithoutHeader: InterstitialRule = options => {
   return undefined;
 };
 
-export const potentialFirstLoadInDevWhenUATMissing: InterstitialRule = options => {
+export const potentialFirstLoadInDevWhenUATMissing: InterstitialRule = async options => {
   const { apiKey, secretKey, clientUat } = options as any;
   const key = secretKey || apiKey;
   const res = isDevelopmentFromApiKey(key);
@@ -47,7 +47,7 @@ export const potentialFirstLoadInDevWhenUATMissing: InterstitialRule = options =
   return undefined;
 };
 
-export const potentialRequestAfterSignInOrOurFromClerkHostedUiInDev: InterstitialRule = options => {
+export const potentialRequestAfterSignInOrOurFromClerkHostedUiInDev: InterstitialRule = async options => {
   const { apiKey, secretKey, referrer, host, forwardedHost, forwardedPort, forwardedProto } = options as any;
   const crossOriginReferrer =
     referrer && checkCrossOrigin({ originURL: new URL(referrer), host, forwardedHost, forwardedPort, forwardedProto });
@@ -59,7 +59,7 @@ export const potentialRequestAfterSignInOrOurFromClerkHostedUiInDev: Interstitia
   return undefined;
 };
 
-export const potentialFirstRequestOnProductionEnvironment: InterstitialRule = options => {
+export const potentialFirstRequestOnProductionEnvironment: InterstitialRule = async options => {
   const { apiKey, secretKey, clientUat, cookieToken } = options as any;
   const key = secretKey || apiKey;
 
@@ -75,7 +75,7 @@ export const potentialFirstRequestOnProductionEnvironment: InterstitialRule = op
 //     return { status: AuthStatus.Interstitial, errorReason: '' as any };
 //   }
 // };
-export const isNormalSignedOutState: InterstitialRule = options => {
+export const isNormalSignedOutState: InterstitialRule = async options => {
   const { clientUat } = options as any;
   if (clientUat === '0') {
     return signedOut(options, AuthErrorReason.StandardSignedOut);
@@ -84,7 +84,7 @@ export const isNormalSignedOutState: InterstitialRule = options => {
 };
 
 // This happens when a signed in user visits a new subdomain for the first time. The uat will be available because it's set on naked domain, but session will be missing. It can also happen if the cookieToken is manually removed during development.
-export const hasClientUatButCookieIsMissingInProd: InterstitialRule = options => {
+export const hasClientUatButCookieIsMissingInProd: InterstitialRule = async options => {
   const { clientUat, cookieToken } = options as any;
   if (clientUat && !cookieToken) {
     return interstitial(options, AuthErrorReason.CookieMissing);

@@ -78,7 +78,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
 
   async function authenticateRequestWithTokenInCookie() {
     try {
-      const signedOutOrInterstitial = runInterstitialRules(options, [
+      const signedOutOrInterstitial = await runInterstitialRules(options, [
         nonBrowserRequestInDevRule,
         crossOriginRequestWithoutHeader,
         potentialFirstLoadInDevWhenUATMissing,
@@ -136,11 +136,11 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
     return jwt.iat < Number.parseInt(clientUat);
   }
 
-  type RunRules = (opts: AuthenticateRequestOptions, rules: InterstitialRule[]) => RequestState | undefined;
+  type RunRules = (opts: AuthenticateRequestOptions, rules: InterstitialRule[]) => Promise<RequestState | undefined>;
 
-  const runInterstitialRules: RunRules = (opts, rules) => {
+  const runInterstitialRules: RunRules = async (opts, rules) => {
     for (const rule of rules) {
-      const res = rule(opts);
+      const res = await rule(opts);
       if (res) {
         return res;
       }
