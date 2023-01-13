@@ -1,4 +1,16 @@
-import { clerkClient, createClerkClient } from './clerkClient';
+import {
+  Clerk,
+  clerkClient,
+  ClerkExpressRequireAuth,
+  ClerkExpressWithAuth,
+  createClerkClient,
+  setClerkApiKey,
+  setClerkApiVersion,
+  setClerkHttpOptions,
+  setClerkServerApiUrl,
+} from './clerkClient';
+import { createClerkExpressRequireAuth } from './clerkExpressRequireAuth';
+import { createClerkExpressWithAuth } from './clerkExpressWithAuth';
 import type {
   ClerkMiddleware,
   ClerkMiddlewareOptions,
@@ -9,7 +21,22 @@ import type {
 } from './types';
 
 export * from '@clerk/backend';
-export { createClerkClient, clerkClient };
+/**
+ * The order of these exports is important, as we want Clerk from clerk/sdk-node
+ * to shadow the Clerk export from clerk/backend, because it needs to support
+ * 2 additional apis: clerk.expressWithAuth, clerk.expressRequireAuth
+ */
+export {
+  createClerkClient,
+  clerkClient,
+  setClerkApiKey,
+  setClerkApiVersion,
+  setClerkHttpOptions,
+  setClerkServerApiUrl,
+  Clerk,
+  ClerkExpressRequireAuth,
+  ClerkExpressWithAuth,
+};
 
 const {
   users,
@@ -41,21 +68,5 @@ export default clerkClient;
 
 export type { LooseAuthProp, StrictAuthProp, WithAuthProp, RequireAuthProp, ClerkMiddleware, ClerkMiddlewareOptions };
 
-export { createClerkExpressRequireAuth, ClerkExpressRequireAuth } from './clerkExpressRequireAuth';
-export { createClerkExpressWithAuth, ClerkExpressWithAuth } from './clerkExpressWithAuth';
-
-export const setClerkApiKey = (value: string) => {
-  clerkClient.__unstable_options.apiKey = value;
-};
-
-export const setClerkServerApiUrl = (value: string) => {
-  clerkClient.__unstable_options.apiUrl = value;
-};
-
-export const setClerkApiVersion = (value: string) => {
-  clerkClient.__unstable_options.apiVersion = value;
-};
-
-export const setClerkHttpOptions = (value: RequestInit) => {
-  clerkClient.__unstable_options.httpOptions = value;
-};
+export { createClerkExpressRequireAuth };
+export { createClerkExpressWithAuth };

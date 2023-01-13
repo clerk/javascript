@@ -1,7 +1,6 @@
 import { Clerk } from '@clerk/backend';
 
 import { authenticateRequest, handleInterstitialCase } from './authenticateRequest';
-import { API_KEY, API_URL, clerkClient } from './clerkClient';
 import type { ClerkMiddlewareOptions, MiddlewareRequireAuthProp, RequireAuthProp } from './types';
 
 export type CreateClerkExpressMiddlewareOptions = {
@@ -33,9 +32,3 @@ export const createClerkExpressRequireAuth = (createOpts: CreateClerkExpressMidd
     };
   };
 };
-
-export const ClerkExpressRequireAuth = createClerkExpressRequireAuth({
-  clerkClient,
-  apiUrl: API_URL,
-  apiKey: API_KEY,
-});

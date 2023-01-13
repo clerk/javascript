@@ -34,8 +34,8 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
     frontendApi: runtimeFrontendApi,
     publishableKey: runtimePublishableKey,
     ...rest
-  }: Omit<AuthenticateRequestOptions, 'apiUrl' | 'apiVersion'>) =>
-    authenticateRequestOriginal({
+  }: Omit<AuthenticateRequestOptions, 'apiUrl' | 'apiVersion'>) => {
+    return authenticateRequestOriginal({
       ...rest,
       apiKey: runtimeApiKey || buildtimeApiKey,
       apiUrl,
@@ -43,6 +43,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
       frontendApi: runtimeFrontendApi || buildtimeFrontendApi,
       publishableKey: runtimePublishableKey || buildtimePublishableKey,
     });
+  };
 
   const localInterstitial = loadInterstitialFromLocal;
 
@@ -50,13 +51,14 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
     frontendApi: runtimeFrontendApi,
     publishableKey: runtimePublishableKey,
     ...rest
-  }: LoadInterstitialOptions) =>
-    loadInterstitialFromBAPI({
+  }: LoadInterstitialOptions) => {
+    return loadInterstitialFromBAPI({
       ...rest,
       apiUrl,
       frontendApi: runtimeFrontendApi || buildtimeFrontendApi,
       publishableKey: runtimePublishableKey || buildtimePublishableKey,
     });
+  };
 
   const remotePublicInterstitialUrl = buildPublicInterstitialUrl;
 
