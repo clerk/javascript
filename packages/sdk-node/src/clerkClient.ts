@@ -1,9 +1,21 @@
-import { Clerk } from '@clerk/backend';
+import { Clerk as _Clerk, ClerkOptions } from '@clerk/backend';
+
+import { createClerkExpressRequireAuth } from './clerkExpressRequireAuth';
+import { createClerkExpressWithAuth } from './clerkExpressWithAuth';
 
 export const API_URL = process.env.CLERK_API_URL || 'https://api.clerk.dev';
 export const API_VERSION = process.env.CLERK_API_VERSION || 'v1';
 export const API_KEY = process.env.CLERK_SECRET_KEY || process.env.CLERK_API_KEY || '';
 export const PUBLISHABLE_KEY = process.env.CLERK_PUBLISHABLE_KEY || '';
+
+export const Clerk = (options: ClerkOptions) => {
+  const clerkClient = _Clerk(options);
+  const expressWithAuth = createClerkExpressWithAuth({ ...options, clerkClient });
+  const expressRequireAuth = createClerkExpressRequireAuth({ ...options, clerkClient });
+  return { ...clerkClient, expressWithAuth, expressRequireAuth };
+};
+
+export const createClerkClient = Clerk;
 
 export const clerkClient = Clerk({
   apiKey: API_KEY,
@@ -12,4 +24,27 @@ export const clerkClient = Clerk({
   userAgent: '@clerk/clerk-sdk-node',
 });
 
-export const createClerkClient = Clerk;
+/**
+ * Stand-alone express middlewares bound to the pre-initialised clerkClient
+ */
+export const ClerkExpressRequireAuth = createClerkExpressRequireAuth({ clerkClient, apiUrl: API_URL, apiKey: API_KEY });
+export const ClerkExpressWithAuth = createClerkExpressWithAuth({ clerkClient, apiUrl: API_URL, apiKey: API_KEY });
+
+/**
+ * Stand-alone setters bound to the pre-initialised clerkClient
+ */
+export const setClerkApiKey = (value: string) => {
+  clerkClient.__unstable_options.apiKey = value;
+};
+
+export const setClerkServerApiUrl = (value: string) => {
+  clerkClient.__unstable_options.apiUrl = value;
+};
+
+export const setClerkApiVersion = (value: string) => {
+  clerkClient.__unstable_options.apiVersion = value;
+};
+
+export const setClerkHttpOptions = (value: RequestInit) => {
+  clerkClient.__unstable_options.httpOptions = value;
+};
