@@ -17,6 +17,7 @@
   "scripts": {
     "tsc": "tsc",
     "start:app-level": "nodemon src/app-level-middleware.ts",
-    "start:router-level": "nodemon src/router-level-middelware.ts"
+    "start:router-level": "nodemon src/router-level-middelware.ts",
+    "start:runtime-keys": "nodemon src/runtime-keys-middleware.ts"
   }
 }
