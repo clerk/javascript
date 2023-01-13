@@ -1,4 +1,4 @@
-import { Clerk } from '@clerk/backend';
+import { Clerk } from './clerkClient';
 
 export default Clerk;
 
