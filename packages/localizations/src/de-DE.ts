@@ -481,7 +481,7 @@ export const deDe: DeepRequired<LocalizationResource> = {
       headerTitle__members: 'Mitglieder',
       headerTitle__settings: 'Einstellungen',
       headerSubtitle__members: 'Anzeigen und Verwalten von Organisationsmitgliedern',
-      headerSubtitle__settings: 'Anzeigen und Verwalten von Organisationsmitgliedern',
+      headerSubtitle__settings: 'Organisationseinstellungen verwalten',
     },
     profilePage: {
       title: 'Organisationsprofil',

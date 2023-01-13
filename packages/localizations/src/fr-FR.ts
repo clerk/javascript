@@ -480,7 +480,7 @@ export const frFR: DeepRequired<LocalizationResource> = {
       headerTitle__members: 'Membres',
       headerTitle__settings: 'Réglages',
       headerSubtitle__members: "Afficher et gérer les membres de l'organisation",
-      headerSubtitle__settings: "Afficher et gérer les membres de l'organisation",
+      headerSubtitle__settings: "Gérer les paramètres de l'organisation",
     },
     profilePage: {
       title: 'Profil de l’organisation',

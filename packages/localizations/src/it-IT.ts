@@ -477,7 +477,7 @@ export const itIT: DeepRequired<LocalizationResource> = {
       headerTitle__members: 'Membri',
       headerTitle__settings: 'Impostazioni',
       headerSubtitle__members: "Consulta e gestisci i membri dell'organizzazione",
-      headerSubtitle__settings: "Consulta e gestisci i membri dell'organizzazione",
+      headerSubtitle__settings: "Gestisci le impostazioni dell'organizzazione",
     },
     profilePage: {
       title: "Profilo dell'organizzazione",

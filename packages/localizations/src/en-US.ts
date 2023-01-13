@@ -473,7 +473,7 @@ export const enUS: DeepRequired<LocalizationResource> = {
       headerTitle__members: 'Members',
       headerTitle__settings: 'Settings',
       headerSubtitle__members: 'View and manage organization members',
-      headerSubtitle__settings: 'View and manage organization members',
+      headerSubtitle__settings: 'Manage organization settings',
     },
     profilePage: {
       title: 'Organization Profile',
