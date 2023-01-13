@@ -12,7 +12,7 @@ export default (QUnit: QUnit) => {
       const { header, payload } = decodeJwt(mockJwt);
       assert.propEqual(header, mockJwtHeader);
       assert.propEqual(payload, mockJwtPayload);
-      // TODO: assert signature is instance of Uint8Array
+      // TODO: @dimkl assert signature is instance of Uint8Array
     });
 
     test('throws an error if null is given as jwt', assert => {

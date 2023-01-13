@@ -81,12 +81,9 @@ export default (QUnit: QUnit) => {
     });
 
     test('retries five times with exponential back-off policy to fetch JWKS before it fails', async assert => {
-      // TODO: remove sinon.restore & fakeFetch.restore
-      // currently it seems that the fetch stub is stuck and does not resolve with retries
-      fakeFetch.restore();
-      sinon.restore();
-      fakeFetch = sinon.stub(runtime, 'fetch');
-
+      // Since the stub the clock and the retry mechanism schedules a retry every some seconds,
+      // we need to restore the clock to allow the retries execution
+      fakeClock.restore();
       fakeFetch.onCall(0).returns(jsonError('something awful happened', 503));
       fakeFetch.onCall(1).returns(jsonError('server error'));
       fakeFetch.onCall(2).returns(jsonError('server error'));

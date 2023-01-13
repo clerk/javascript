@@ -109,11 +109,19 @@ export default (QUnit: QUnit) => {
     // HTTP Authorization exists
     //
 
-    // TODO: make it work
-    // test('throws if jwk fails to load from remote', async assert => {
-    //   fakeFetch.onCall(0).returns(jsonOk({}));
-    //   await assert.rejects(authenticateRequest({ ...defaultMockAuthenticateRequestOptions, headerToken: mockJwt }));
-    // });
+    test('returns signed out state if jwk fails to load from remote', async assert => {
+      fakeFetch.onCall(0).returns(jsonOk({}));
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
+        headerToken: mockJwt,
+        skipJwksCache: false,
+      });
+
+      const errMessage =
+        'The JWKS endpoint did not contain any signing keys. Contact support@clerk.dev. Contact support@clerk.dev (reason=jwk-remote-failed-to-load, token-carrier=header)';
+      assertSignedOut(assert, requestState, TokenVerificationErrorReason.RemoteJWKFailedToLoad, errMessage);
+      assertSignedOutToAuth(assert, requestState);
+    });
 
     test('headerToken: returns signed in state when a valid token [1y.2y]', async assert => {
       const requestState = await authenticateRequest({
@@ -145,8 +153,7 @@ export default (QUnit: QUnit) => {
       assertSignedOutToAuth(assert, requestState);
     });
 
-    // TODO: code returns interstitial instead of signed out - @nikos
-    test('headerToken: returns signed out state when token expired [1y.2n]', async assert => {
+    test('headerToken: returns interstitial state when token expired [1y.2n]', async assert => {
       // advance clock for 1 hour
       fakeClock.tick(3600 * 1000);
 
@@ -234,20 +241,19 @@ export default (QUnit: QUnit) => {
       assert.strictEqual(requestState.toAuth(), null);
     });
 
-    // TODO: code returns signed-in instead of interstitial - @nikos
-    // test('cookieToken: returns interstitial when no referrer in development [6y]', async assert => {
-    //   // Scenario: after auth action on Clerk-hosted UIs
-    //   const requestState = await authenticateRequest({
-    //     ...defaultMockAuthenticateRequestOptions,
-    //     cookieToken: mockJwt,
-    //     apiKey: 'test_deadbeef',
-    //     clientUat: '12345',
-    //   });
+    test('cookieToken: returns interstitial when no referrer in development [6y]', async assert => {
+      // Scenario: after auth action on Clerk-hosted UIs
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
+        cookieToken: mockJwt,
+        apiKey: 'test_deadbeef',
+        clientUat: '12345',
+      });
 
-    //   assertInterstitial(assert, requestState, AuthErrorReason.CookieUATMissing);
-    //   assert.equal(requestState.message, '');
-    //   assert.strictEqual(requestState.toAuth(), null);
-    // });
+      assertInterstitial(assert, requestState, AuthErrorReason.CookieUATMissing);
+      assert.equal(requestState.message, '');
+      assert.strictEqual(requestState.toAuth(), null);
+    });
 
     test('cookieToken: returns interstitial when crossOriginReferrer in development [6y]', async assert => {
       // Scenario: after auth action on Clerk-hosted UIs
@@ -329,7 +335,6 @@ export default (QUnit: QUnit) => {
       assertSignedInToAuth(assert, requestState);
     });
 
-    // TODO: what is ssrToken and client api verification - @nikos
     todo(
       'cookieToken: returns signed in when cookieToken.iat >= clientUat and expired token and ssrToken [10y.2n.1y]',
       assert => {
