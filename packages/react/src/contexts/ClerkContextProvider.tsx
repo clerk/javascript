@@ -50,7 +50,7 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
   const { sessionId, session, userId, user, organizationId, organization } = derivedState;
   const actor = session?.actor || null;
   const organizationMembership = organization
-    ? session?.user.organizationMemberships.find(m => m.organization.id === organizationId)
+    ? user?.organizationMemberships.find(m => m.organization.id === organizationId)
     : organization;
   const orgId = organizationId;
   const orgRole = organizationMembership ? organizationMembership.role : organizationMembership;
