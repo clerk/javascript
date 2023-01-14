@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.7.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@4.7.1...@clerk/clerk-react@4.7.2) (2023-01-14)
+
+### Bug Fixes
+
+- **clerk-react:** Fix useAuth failing after user update ([5283f77](https://github.com/clerkinc/javascript/commit/5283f771749b0ab8621f3b62c5724f9b2b565522))
+
 ### [4.7.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@4.7.0...@clerk/clerk-react@4.7.1) (2023-01-11)
 
 **Note:** Version bump only for package @clerk/clerk-react
