@@ -23,6 +23,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
   const { apiClient } = params;
   const {
     apiKey: buildtimeApiKey = '',
+    jwtKey: buildtimeJwtKey = '',
     apiUrl = API_URL,
     apiVersion = API_VERSION,
     frontendApi: buildtimeFrontendApi = '',
@@ -33,6 +34,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
     apiKey: runtimeApiKey,
     frontendApi: runtimeFrontendApi,
     publishableKey: runtimePublishableKey,
+    jwtKey: runtimeJwtKey,
     ...rest
   }: Omit<AuthenticateRequestOptions, 'apiUrl' | 'apiVersion'>) => {
     return authenticateRequestOriginal({
@@ -42,6 +44,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
       apiVersion,
       frontendApi: runtimeFrontendApi || buildtimeFrontendApi,
       publishableKey: runtimePublishableKey || buildtimePublishableKey,
+      jwtKey: runtimeJwtKey || buildtimeJwtKey,
     });
   };
 
