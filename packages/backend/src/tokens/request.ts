@@ -6,12 +6,13 @@ import { isDevelopmentFromApiKey, isProductionFromApiKey } from '../util/instanc
 import { checkCrossOrigin } from '../util/request';
 import {
   type SignedInAuthObject,
-  type SignedOutAuthObject,
   signedInAuthObject,
+  type SignedOutAuthObject,
   signedOutAuthObject,
 } from './authObjects';
 import { TokenVerificationError, TokenVerificationErrorReason } from './errors';
-import { type VerifyTokenOptions, verifyToken } from './verify';
+import { verifyToken, type VerifyTokenOptions } from './verify';
+import { parsePublishableKey } from '@clerk/shared';
 
 export type LoadResourcesOptions = {
   loadSession?: boolean;
@@ -111,6 +112,7 @@ export type InterstitialState = Omit<SignedOutState, 'isInterstitial' | 'status'
 export type RequestState = SignedInState | SignedOutState | InterstitialState;
 
 export async function authenticateRequest(options: AuthenticateRequestOptions): Promise<RequestState> {
+  options.frontendApi = options.frontendApi || parsePublishableKey(options.publishableKey)?.frontendApi || '';
   options.apiUrl = options.apiUrl || API_URL;
   options.apiVersion = options.apiVersion || API_VERSION;
 
