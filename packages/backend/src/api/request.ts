@@ -138,7 +138,7 @@ export function buildRequest(options: CreateBackendApiOptions) {
 
       return {
         data: null,
-        errors: parseErrors(err as ClerkAPIErrorJSON[]),
+        errors: parseErrors(err),
         // TODO: To be removed with withLegacyReturn
         // @ts-expect-error
         status: res?.status,
@@ -150,8 +150,12 @@ export function buildRequest(options: CreateBackendApiOptions) {
   return withLegacyReturn(request);
 }
 
-function parseErrors(data: ClerkAPIErrorJSON[] = []): ClerkAPIError[] {
-  return data.length > 0 ? data.map(parseError) : [];
+function parseErrors(data: unknown): ClerkAPIError[] {
+  if (!!data && typeof data === 'object' && 'errors' in data) {
+    const errors = data.errors as ClerkAPIErrorJSON[];
+    return errors.length > 0 ? errors.map(parseError) : [];
+  }
+  return [];
 }
 
 function parseError(error: ClerkAPIErrorJSON): ClerkAPIError {
