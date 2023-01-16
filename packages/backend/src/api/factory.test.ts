@@ -117,7 +117,7 @@ export default (QUnit: QUnit) => {
     test('executes a failed backend API request and parses the error response', async assert => {
       const mockErrorPayload = { code: 'whatever_error', message: 'whatever error', meta: {} };
       fakeFetch = sinon.stub(runtime, 'fetch');
-      fakeFetch.onCall(0).returns(jsonNotOk([mockErrorPayload]));
+      fakeFetch.onCall(0).returns(jsonNotOk({ errors: [mockErrorPayload] }));
 
       try {
         await apiClient.users.getUser('user_deadbeef');
