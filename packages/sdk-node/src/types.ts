@@ -1,7 +1,7 @@
 import { AuthObject, SignedInAuthObject } from '@clerk/backend';
 import { NextFunction, Request, Response } from 'express';
 
-type LegacyAuthObject<T extends AuthObject> = Pick<T, 'sessionId' | 'userId' | 'actor' | 'getToken'> & {
+type LegacyAuthObject<T extends AuthObject> = Pick<T, 'sessionId' | 'userId' | 'actor' | 'getToken' | 'debug'> & {
   claims: AuthObject['sessionClaims'];
 };
 
