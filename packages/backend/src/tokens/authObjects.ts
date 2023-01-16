@@ -1,6 +1,11 @@
 import type { ActClaim, JwtPayload, ServerGetToken, ServerGetTokenOptions } from '@clerk/types';
 
 import { type Organization, type Session, type User, createBackendApiClient } from '../api';
+import { AuthenticateRequestOptions, RequestState } from './request';
+
+type AuthObjectDebugData = Partial<AuthenticateRequestOptions & RequestState>;
+type CreateAuthObjectDebug = (data?: AuthObjectDebugData) => AuthObjectDebug;
+type AuthObjectDebug = () => unknown;
 
 export type SignedInAuthObjectOptions = {
   apiKey: string;
@@ -24,6 +29,7 @@ export type SignedInAuthObject = {
   orgSlug: string | undefined;
   organization: Organization | undefined;
   getToken: ServerGetToken;
+  debug: AuthObjectDebug;
 };
 
 export type SignedOutAuthObject = {
@@ -38,11 +44,25 @@ export type SignedOutAuthObject = {
   orgSlug: null;
   organization: null;
   getToken: ServerGetToken;
+  debug: AuthObjectDebug;
 };
 
 export type AuthObject = SignedInAuthObject | SignedOutAuthObject;
 
-export function signedInAuthObject(sessionClaims: JwtPayload, options: SignedInAuthObjectOptions): SignedInAuthObject {
+const createDebug: CreateAuthObjectDebug = data => {
+  return () => {
+    const res = { ...data } || {};
+    res.apiKey = (res.apiKey || '').substring(0, 7);
+    res.jwtKey = (res.jwtKey || '').substring(0, 7);
+    return { ...res };
+  };
+};
+
+export function signedInAuthObject(
+  sessionClaims: JwtPayload,
+  options: SignedInAuthObjectOptions,
+  debugData?: AuthObjectDebugData,
+): SignedInAuthObject {
   const {
     act: actor,
     sid: sessionId,
@@ -77,10 +97,11 @@ export function signedInAuthObject(sessionClaims: JwtPayload, options: SignedInA
     orgSlug,
     organization,
     getToken,
+    debug: createDebug(debugData),
   };
 }
 
-export function signedOutAuthObject(): SignedOutAuthObject {
+export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutAuthObject {
   return {
     sessionClaims: null,
     sessionId: null,
@@ -93,6 +114,7 @@ export function signedOutAuthObject(): SignedOutAuthObject {
     orgSlug: null,
     organization: null,
     getToken: () => Promise.resolve(null),
+    debug: createDebug(debugData),
   };
 }
 

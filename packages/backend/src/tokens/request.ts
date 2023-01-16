@@ -126,21 +126,21 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
   }
 
   async function authenticateRequestWithTokenInCookie() {
-    const signedOutOrInterstitial = runInterstitialRules(options, [
-      nonBrowserRequestInDevRule,
-      crossOriginRequestWithoutHeader,
-      potentialFirstLoadInDevWhenUATMissing,
-      potentialRequestAfterSignInOrOurFromClerkHostedUiInDev,
-      potentialFirstRequestOnProductionEnvironment,
-      isNormalSignedOutState,
-      hasClientUatButCookieIsMissingInProd,
-    ]);
-
-    if (signedOutOrInterstitial) {
-      return signedOutOrInterstitial;
-    }
-
     try {
+      const signedOutOrInterstitial = runInterstitialRules(options, [
+        nonBrowserRequestInDevRule,
+        crossOriginRequestWithoutHeader,
+        potentialFirstLoadInDevWhenUATMissing,
+        potentialRequestAfterSignInOrOurFromClerkHostedUiInDev,
+        potentialFirstRequestOnProductionEnvironment,
+        isNormalSignedOutState,
+        hasClientUatButCookieIsMissingInProd,
+      ]);
+
+      if (signedOutOrInterstitial) {
+        return signedOutOrInterstitial;
+      }
+
       const { cookieToken, clientUat } = options;
       const sessionClaims = await verifyRequestState(cookieToken!);
       const state = await signedIn(sessionClaims);
@@ -201,11 +201,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       loadOrganization,
     } = options;
 
-    const { sessions, users, organizations } = createBackendApiClient({
-      apiKey,
-      apiUrl,
-      apiVersion,
-    });
+    const { sessions, users, organizations } = createBackendApiClient({ apiKey, apiUrl, apiVersion });
 
     const [sessionResp, userResp, organizationResp] = await Promise.all([
       loadSession ? sessions.getSession(sessionId) : Promise.resolve(undefined),
@@ -220,15 +216,19 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
     // const user = userResp && !userResp.errors ? userResp.data : undefined;
     // const organization = organizationResp && !organizationResp.errors ? organizationResp.data : undefined;
 
-    const authObject = signedInAuthObject(sessionClaims, {
-      apiKey,
-      apiUrl,
-      apiVersion,
-      token: cookieToken || headerToken || '',
-      session,
-      user,
-      organization,
-    });
+    const authObject = signedInAuthObject(
+      sessionClaims,
+      {
+        apiKey,
+        apiUrl,
+        apiVersion,
+        token: cookieToken || headerToken || '',
+        session,
+        user,
+        organization,
+      },
+      { ...options, status: AuthStatus.SignedIn },
+    );
 
     return {
       status: AuthStatus.SignedIn,
@@ -251,7 +251,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       publishableKey: options.publishableKey,
       isSignedIn: false,
       isInterstitial: false,
-      toAuth: () => signedOutAuthObject(),
+      toAuth: () => signedOutAuthObject({ ...options, status: AuthStatus.SignedOut, reason, message }),
     };
   }
 
