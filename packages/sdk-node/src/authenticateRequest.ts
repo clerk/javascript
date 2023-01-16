@@ -1,6 +1,6 @@
 import { Clerk, constants, RequestState } from '@clerk/backend';
 import cookie from 'cookie';
-import { Request as ExpressRequest } from 'express';
+import { Request as ExpressRequest, Response as ExpressResponse } from 'express';
 
 import { ClerkMiddlewareOptions } from './types';
 
@@ -35,11 +35,15 @@ export const authenticateRequest = (
   });
 };
 
-export const handleInterstitialCase = (res: any, requestState: RequestState, interstitial: string) => {
+export const handleInterstitialCase = (res: ExpressResponse, requestState: RequestState, interstitial: string) => {
   if (requestState.isInterstitial) {
-    res.setHeader(constants.Headers.AuthMessage, requestState.message);
-    res.setHeader(constants.Headers.AuthReason, requestState.reason);
     res.writeHead(401, { 'Content-Type': 'text/html' });
     res.end(interstitial);
   }
+};
+
+export const decorateResponseWithObservabilityHeaders = (res: ExpressResponse, requestState: RequestState) => {
+  requestState.message && res.setHeader(constants.Headers.AuthMessage, requestState.message);
+  requestState.reason && res.setHeader(constants.Headers.AuthReason, requestState.reason);
+  requestState.status && res.setHeader(constants.Headers.AuthStatus, requestState.status);
 };

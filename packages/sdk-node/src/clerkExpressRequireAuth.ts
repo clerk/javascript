@@ -1,6 +1,10 @@
 import { Clerk } from '@clerk/backend';
 
-import { authenticateRequest, handleInterstitialCase } from './authenticateRequest';
+import {
+  authenticateRequest,
+  decorateResponseWithObservabilityHeaders,
+  handleInterstitialCase,
+} from './authenticateRequest';
 import type { ClerkMiddlewareOptions, MiddlewareRequireAuthProp, RequireAuthProp } from './types';
 
 export type CreateClerkExpressMiddlewareOptions = {
@@ -17,6 +21,8 @@ export const createClerkExpressRequireAuth = (createOpts: CreateClerkExpressMidd
   return (options: ClerkMiddlewareOptions = {}): MiddlewareRequireAuthProp => {
     return async (req, res, next) => {
       const requestState = await authenticateRequest(clerkClient, apiKey, frontendApi, publishableKey, req, options);
+      decorateResponseWithObservabilityHeaders(res, requestState);
+
       if (requestState.isInterstitial) {
         const interstitial = await clerkClient.remotePrivateInterstitial();
         return handleInterstitialCase(res, requestState, interstitial);
