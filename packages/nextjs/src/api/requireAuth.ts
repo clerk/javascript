@@ -1,7 +1,7 @@
 import { ClerkMiddlewareOptions, createClerkExpressRequireAuth, RequireAuthProp } from '@clerk/clerk-sdk-node';
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
-import { API_URL, clerkClient, FRONTEND_API } from '../server';
+import { API_URL, clerkClient, FRONTEND_API, PUBLISHABLE_KEY } from '../server';
 import { runMiddleware } from './utils';
 
 type NextApiHandlerRequireAuth<T = any> = (
@@ -19,7 +19,12 @@ export function requireAuth(handler: NextApiHandlerRequireAuth, options?: ClerkM
       await runMiddleware(
         req,
         res,
-        createClerkExpressRequireAuth({ clerkClient, apiUrl: API_URL, frontendApi: FRONTEND_API })(options),
+        createClerkExpressRequireAuth({
+          clerkClient,
+          apiUrl: API_URL,
+          frontendApi: FRONTEND_API,
+          publishableKey: PUBLISHABLE_KEY,
+        })(options),
       );
       return handler(req as RequireAuthProp<NextApiRequest>, res);
     } catch (error) {
