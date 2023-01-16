@@ -86,29 +86,12 @@ export type LoadClerkJWKFromRemoteOptions = {
   kid: string;
   jwksCacheTtlInMs?: number;
   skipJwksCache?: boolean;
-} & (
-  | {
-      apiKey: string;
-      secretKey?: never;
-      apiUrl?: string;
-      apiVersion?: string;
-      issuer?: never;
-    }
-  | {
-      apiKey?: never;
-      secretKey: string;
-      apiUrl?: string;
-      apiVersion?: string;
-      issuer?: never;
-    }
-  | {
-      apiKey?: never;
-      secretKey?: never;
-      apiUrl?: never;
-      apiVersion?: never;
-      issuer: string;
-    }
-);
+  secretKey?: string;
+  apiKey?: string;
+  apiUrl?: string;
+  apiVersion?: string;
+  issuer?: string;
+};
 
 /**
  *

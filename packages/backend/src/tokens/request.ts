@@ -1,3 +1,4 @@
+import { parsePublishableKey } from '@clerk/shared';
 import type { JwtPayload } from '@clerk/types';
 
 import { createBackendApiClient } from '../api';
@@ -6,13 +7,12 @@ import { isDevelopmentFromApiKey, isProductionFromApiKey } from '../util/instanc
 import { checkCrossOrigin } from '../util/request';
 import {
   type SignedInAuthObject,
-  signedInAuthObject,
   type SignedOutAuthObject,
+  signedInAuthObject,
   signedOutAuthObject,
 } from './authObjects';
 import { TokenVerificationError, TokenVerificationErrorReason } from './errors';
-import { verifyToken, type VerifyTokenOptions } from './verify';
-import { parsePublishableKey } from '@clerk/shared';
+import { type VerifyTokenOptions, verifyToken } from './verify';
 
 export type LoadResourcesOptions = {
   loadSession?: boolean;
