@@ -112,16 +112,16 @@ export function buildPublicInterstitialUrl(options: LoadInterstitialOptions) {
 
 // TODO: Move to @clerk/shared as the same logic is used in @clerk/react
 const getClerkJsMajorVersionOrTag = (frontendApi: string, pkgVersion?: string) => {
+  if (!pkgVersion && isStaging(frontendApi)) {
+    return 'staging';
+  }
+
   if (!pkgVersion) {
     return 'latest';
   }
 
   if (pkgVersion.includes('next')) {
     return 'next';
-  }
-
-  if (isStaging(frontendApi)) {
-    return 'staging';
   }
 
   return pkgVersion.split('.')[0] || 'latest';
