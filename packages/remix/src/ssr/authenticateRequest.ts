@@ -1,7 +1,7 @@
 import { type RequestState, Clerk } from '@clerk/backend';
 
-import { noApiKeyError } from '../errors';
-import { assertEnvVar, getEnvVariable } from '../utils';
+import { noSecretKeyOrApiKeyError } from '../errors';
+import { getEnvVariable } from '../utils';
 import { LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
 import { parseCookies } from './utils';
 
@@ -17,10 +17,11 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
   // 2. Then try from globalThis (Cloudflare Workers).
   // 3. Then from loader context (Cloudflare Pages).
   // 4. Otherwise check if the user passed the key in the getAuth function or the rootAuthLoader.
-  const secretKey = getEnvVariable('CLERK_SECRET_KEY') || (context?.CLERK_SECRET_KEY as string) || opts.secretKey;
-  const legacyApiKey = getEnvVariable('CLERK_API_KEY') || (context?.CLERK_API_KEY as string) || opts.apiKey;
-  const apiKey = secretKey || legacyApiKey;
-  assertEnvVar(apiKey, noApiKeyError);
+  const secretKey = getEnvVariable('CLERK_SECRET_KEY') || (context?.CLERK_SECRET_KEY as string) || opts.secretKey || '';
+  const apiKey = getEnvVariable('CLERK_API_KEY') || (context?.CLERK_API_KEY as string) || opts.apiKey || '';
+  if (!secretKey && !apiKey) {
+    throw new Error(noSecretKeyOrApiKeyError);
+  }
 
   const frontendApi =
     getEnvVariable('CLERK_FRONTEND_API') || (context?.CLERK_FRONTEND_API as string) || opts.frontendApi || '';
@@ -36,8 +37,9 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
   const cookieToken = cookies['__session'];
   const headerToken = headers.get('authorization')?.replace('Bearer ', '');
 
-  return Clerk({ apiKey, jwtKey }).authenticateRequest({
+  return Clerk({ apiKey, secretKey, jwtKey }).authenticateRequest({
     apiKey,
+    secretKey,
     jwtKey,
     frontendApi,
     publishableKey,

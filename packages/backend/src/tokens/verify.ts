@@ -12,12 +12,13 @@ export type VerifyTokenOptions = Pick<
   'authorizedParties' | 'audience' | 'issuer' | 'clockSkewInSeconds'
 > & { jwtKey?: string } & Pick<
     LoadClerkJWKFromRemoteOptions,
-    'apiKey' | 'apiUrl' | 'apiVersion' | 'jwksCacheTtlInMs' | 'skipJwksCache'
+    'apiKey' | 'secretKey' | 'apiUrl' | 'apiVersion' | 'jwksCacheTtlInMs' | 'skipJwksCache'
   >;
 
 export async function verifyToken(token: string, options: VerifyTokenOptions): Promise<JwtPayload> {
   const {
     apiKey,
+    secretKey,
     apiUrl,
     apiVersion,
     authorizedParties,
@@ -35,20 +36,16 @@ export async function verifyToken(token: string, options: VerifyTokenOptions): P
 
   if (jwtKey) {
     key = loadClerkJWKFromLocal(jwtKey);
-  } else if (apiKey) {
+  } else if (apiKey || secretKey) {
     // TODO: Fetch JWKS from Frontend API instead of Backend API
     //
     // Currently JWKS are fetched from Backend API without using the JWT issuer. This should change
     // with the new Backend key format so that the API Key is not required for token verification and
     // the jwks retrieval is driven from the current JWT header.
-    key = await loadClerkJWKFromRemote({
-      apiUrl,
-      apiKey,
-      apiVersion,
-      kid,
-      jwksCacheTtlInMs,
-      skipJwksCache,
-    });
+    const opts = apiKey
+      ? ({ apiUrl, apiKey, apiVersion, kid, jwksCacheTtlInMs, skipJwksCache } as LoadClerkJWKFromRemoteOptions)
+      : ({ apiUrl, secretKey, apiVersion, kid, jwksCacheTtlInMs, skipJwksCache } as LoadClerkJWKFromRemoteOptions);
+    key = await loadClerkJWKFromRemote(opts);
   } else {
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.SetClerkJWTKey,

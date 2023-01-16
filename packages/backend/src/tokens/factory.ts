@@ -14,7 +14,10 @@ import {
 
 export type CreateAuthenticateRequestOptions = {
   options: Partial<
-    Pick<AuthenticateRequestOptions, 'apiKey' | 'apiUrl' | 'apiVersion' | 'frontendApi' | 'publishableKey' | 'jwtKey'>
+    Pick<
+      AuthenticateRequestOptions,
+      'apiKey' | 'secretKey' | 'apiUrl' | 'apiVersion' | 'frontendApi' | 'publishableKey' | 'jwtKey'
+    >
   >;
   apiClient: ApiClient;
 };
@@ -23,6 +26,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
   const { apiClient } = params;
   const {
     apiKey: buildtimeApiKey = '',
+    secretKey: buildtimeSecretKey = '',
     jwtKey: buildtimeJwtKey = '',
     apiUrl = API_URL,
     apiVersion = API_VERSION,
@@ -32,6 +36,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
 
   const authenticateRequest = ({
     apiKey: runtimeApiKey,
+    secretKey: runtimeSecretKey,
     frontendApi: runtimeFrontendApi,
     publishableKey: runtimePublishableKey,
     jwtKey: runtimeJwtKey,
@@ -40,6 +45,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
     return authenticateRequestOriginal({
       ...rest,
       apiKey: runtimeApiKey || buildtimeApiKey,
+      secretKey: runtimeSecretKey || buildtimeSecretKey,
       apiUrl,
       apiVersion,
       frontendApi: runtimeFrontendApi || buildtimeFrontendApi,

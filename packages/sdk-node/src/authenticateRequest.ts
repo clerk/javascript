@@ -11,6 +11,7 @@ const parseCookies = (req: ExpressRequest) => {
 export const authenticateRequest = (
   clerkClient: ReturnType<typeof Clerk>,
   apiKey: string,
+  secretKey: string,
   frontendApi: string,
   publishableKey: string,
   req: ExpressRequest,
@@ -20,6 +21,7 @@ export const authenticateRequest = (
   const { jwtKey, authorizedParties } = options || {};
   return clerkClient.authenticateRequest({
     apiKey,
+    secretKey,
     frontendApi,
     publishableKey,
     jwtKey,

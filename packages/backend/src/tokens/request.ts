@@ -1,3 +1,4 @@
+import { parsePublishableKey } from '@clerk/shared';
 import type { JwtPayload } from '@clerk/types';
 
 import { createBackendApiClient } from '../api';
@@ -6,13 +7,12 @@ import { isDevelopmentFromApiKey, isProductionFromApiKey } from '../util/instanc
 import { checkCrossOrigin } from '../util/request';
 import {
   type SignedInAuthObject,
-  signedInAuthObject,
   type SignedOutAuthObject,
+  signedInAuthObject,
   signedOutAuthObject,
 } from './authObjects';
 import { TokenVerificationError, TokenVerificationErrorReason } from './errors';
-import { verifyToken, type VerifyTokenOptions } from './verify';
-import { parsePublishableKey } from '@clerk/shared';
+import { type VerifyTokenOptions, verifyToken } from './verify';
 
 export type LoadResourcesOptions = {
   loadSession?: boolean;
@@ -20,7 +20,9 @@ export type LoadResourcesOptions = {
   loadOrganization?: boolean;
 };
 
-export type RequiredVerifyTokenOptions = Required<Pick<VerifyTokenOptions, 'apiKey' | 'apiUrl' | 'apiVersion'>>;
+export type RequiredVerifyTokenOptions = Required<
+  Pick<VerifyTokenOptions, 'apiKey' | 'secretKey' | 'apiUrl' | 'apiVersion'>
+>;
 
 export type OptionalVerifyTokenOptions = Partial<
   Pick<VerifyTokenOptions, 'authorizedParties' | 'clockSkewInSeconds' | 'jwksCacheTtlInMs' | 'skipJwksCache' | 'jwtKey'>
@@ -192,6 +194,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
 
     const {
       apiKey,
+      secretKey,
       apiUrl,
       apiVersion,
       cookieToken,
@@ -203,7 +206,12 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       loadOrganization,
     } = options;
 
-    const { sessions, users, organizations } = createBackendApiClient({ apiKey, apiUrl, apiVersion });
+    const { sessions, users, organizations } = createBackendApiClient({
+      apiKey,
+      secretKey,
+      apiUrl,
+      apiVersion,
+    });
 
     const [sessionResp, userResp, organizationResp] = await Promise.all([
       loadSession ? sessions.getSession(sessionId) : Promise.resolve(undefined),
@@ -222,6 +230,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       sessionClaims,
       {
         apiKey,
+        secretKey,
         apiUrl,
         apiVersion,
         token: cookieToken || headerToken || '',
@@ -289,8 +298,9 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
   // prevent interstitial rendering
   // In production, script requests will be missing both uat and session cookies, which will be
   // automatically treated as signed out. This exception is needed for development, because the any // missing uat throws an interstitial in development.
-  const nonBrowserRequestInDevRule: InterstitialRule = ({ apiKey, userAgent }) => {
-    if (isDevelopmentFromApiKey(apiKey) && !userAgent?.startsWith('Mozilla/')) {
+  const nonBrowserRequestInDevRule: InterstitialRule = ({ apiKey, secretKey, userAgent }) => {
+    const key = secretKey || apiKey;
+    if (isDevelopmentFromApiKey(key) && !userAgent?.startsWith('Mozilla/')) {
       return signedOut(RequestErrorReason.HeaderMissingNonBrowser);
     }
     return undefined;
@@ -319,8 +329,10 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
     return undefined;
   };
 
-  const potentialFirstLoadInDevWhenUATMissing: InterstitialRule = ({ apiKey, clientUat }) => {
-    const res = isDevelopmentFromApiKey(apiKey);
+  const potentialFirstLoadInDevWhenUATMissing: InterstitialRule = ({ apiKey, secretKey, clientUat }) => {
+    const key = secretKey || apiKey;
+
+    const res = isDevelopmentFromApiKey(key);
     if (res && !clientUat) {
       return interstitial(RequestErrorReason.CookieUATMissing);
     }
@@ -329,6 +341,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
 
   const potentialRequestAfterSignInOrOurFromClerkHostedUiInDev: InterstitialRule = ({
     apiKey,
+    secretKey,
     referrer,
     host,
     forwardedHost,
@@ -338,15 +351,23 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
     const crossOriginReferrer =
       referrer &&
       checkCrossOrigin({ originURL: new URL(referrer), host, forwardedHost, forwardedPort, forwardedProto });
+    const key = secretKey || apiKey;
 
-    if (isDevelopmentFromApiKey(apiKey) && crossOriginReferrer) {
+    if (isDevelopmentFromApiKey(key) && crossOriginReferrer) {
       return interstitial(RequestErrorReason.CrossOriginReferrer);
     }
     return undefined;
   };
 
-  const potentialFirstRequestOnProductionEnvironment: InterstitialRule = ({ apiKey, clientUat, cookieToken }) => {
-    if (isProductionFromApiKey(apiKey) && !clientUat && !cookieToken) {
+  const potentialFirstRequestOnProductionEnvironment: InterstitialRule = ({
+    apiKey,
+    secretKey,
+    clientUat,
+    cookieToken,
+  }) => {
+    const key = secretKey || apiKey;
+
+    if (isProductionFromApiKey(key) && !clientUat && !cookieToken) {
       return signedOut(RequestErrorReason.CookieAndUATMissing);
     }
     return undefined;

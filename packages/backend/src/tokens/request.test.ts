@@ -12,6 +12,7 @@ export default (QUnit: QUnit) => {
   /* An otherwise bare state on a request. */
   const defaultMockAuthenticateRequestOptions: AuthenticateRequestOptions = {
     apiKey: 'deadbeef',
+    secretKey: '',
     apiUrl: 'https://api.clerk.test',
     apiVersion: 'v1',
     frontendApi: 'cafe.babe.clerk.ts',

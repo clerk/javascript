@@ -66,8 +66,8 @@ export const loader: LoaderFunction = args => rootAuthLoader(args, ({ auth }) =>
 })
 `);
 
-export const noApiKeyError = createErrorMessage(`
-A secretKey must be provided in order to use SSR and the exports from @clerk/remix/api.');
-If your runtime supports environment variables, you can add a CLERK_SECRET_KEY variable to your config.
+export const noSecretKeyOrApiKeyError = createErrorMessage(`
+A secretKey or apiKey must be provided in order to use SSR and the exports from @clerk/remix/api.');
+If your runtime supports environment variables, you can add a CLERK_SECRET_KEY or CLERK_API_KEY variable to your config.
 Otherwise, you can pass a secretKey parameter to rootAuthLoader or getAuth.
 `);

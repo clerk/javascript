@@ -86,20 +86,12 @@ export type LoadClerkJWKFromRemoteOptions = {
   kid: string;
   jwksCacheTtlInMs?: number;
   skipJwksCache?: boolean;
-} & (
-  | {
-      apiKey: string;
-      apiUrl?: string;
-      apiVersion?: string;
-      issuer?: never;
-    }
-  | {
-      apiKey?: never;
-      apiUrl?: never;
-      apiVersion?: never;
-      issuer: string;
-    }
-);
+  secretKey?: string;
+  apiKey?: string;
+  apiUrl?: string;
+  apiVersion?: string;
+  issuer?: string;
+};
 
 /**
  *
@@ -116,6 +108,7 @@ export type LoadClerkJWKFromRemoteOptions = {
  */
 export async function loadClerkJWKFromRemote({
   apiKey,
+  secretKey,
   apiUrl,
   apiVersion,
   issuer,
@@ -125,9 +118,10 @@ export async function loadClerkJWKFromRemote({
 }: LoadClerkJWKFromRemoteOptions): Promise<JsonWebKey> {
   if (skipJwksCache || !getFromCache(kid)) {
     let fetcher;
+    const key = secretKey || apiKey || '';
 
     if (apiUrl) {
-      fetcher = () => fetchJWKSFromBAPI(apiUrl, apiKey, apiVersion);
+      fetcher = () => fetchJWKSFromBAPI(apiUrl, key, apiVersion);
     } else if (issuer) {
       fetcher = () => fetchJWKSFromFAPI(issuer);
     } else {
@@ -181,11 +175,12 @@ async function fetchJWKSFromFAPI(issuer: string) {
   return response.json();
 }
 
-async function fetchJWKSFromBAPI(apiUrl: string = API_URL, apiKey: string, apiVersion: string = API_VERSION) {
-  if (!apiKey) {
+async function fetchJWKSFromBAPI(apiUrl: string = API_URL, key: string, apiVersion: string = API_VERSION) {
+  if (!key) {
     throw new TokenVerificationError({
-      action: TokenVerificationErrorAction.SetClerkAPIKey,
-      message: 'Missing Clerk API Key. Go to https://dashboard.clerk.dev and get your Clerk API Key for your instance.',
+      action: TokenVerificationErrorAction.SetClerkSecretKeyOrAPIKey,
+      message:
+        'Missing Clerk Secret Key or API Key. Go to https://dashboard.clerk.dev and get your key for your instance.',
       reason: TokenVerificationErrorReason.RemoteJWKFailedToLoad,
     });
   }
@@ -195,7 +190,7 @@ async function fetchJWKSFromBAPI(apiUrl: string = API_URL, apiKey: string, apiVe
 
   const response = await runtime.fetch(url.href, {
     headers: {
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${key}`,
       'Content-Type': 'application/json',
     },
   });
