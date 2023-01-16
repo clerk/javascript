@@ -1,3 +1,5 @@
+import { parsePublishableKey } from '@clerk/shared';
+
 import { API_VERSION } from '../constants';
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
@@ -79,6 +81,7 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
 
 // TODO: Add caching to Interstitial
 export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions) {
+  options.frontendApi = options.frontendApi || parsePublishableKey(options.publishableKey)?.frontendApi || '';
   const url = buildPublicInterstitialUrl(options);
   const response = await callWithRetry(() => runtime.fetch(buildPublicInterstitialUrl(options)));
 
@@ -94,6 +97,7 @@ export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions)
 }
 
 export function buildPublicInterstitialUrl(options: LoadInterstitialOptions) {
+  options.frontendApi = options.frontendApi || parsePublishableKey(options.publishableKey)?.frontendApi || '';
   const { apiUrl, frontendApi, pkgVersion, publishableKey } = options;
   const url = new URL(apiUrl);
   url.pathname = joinPaths(url.pathname, API_VERSION, '/public/interstitial');
