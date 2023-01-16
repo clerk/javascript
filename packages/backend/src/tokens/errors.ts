@@ -25,7 +25,7 @@ export enum TokenVerificationErrorAction {
   ContactSupport = 'Contact support@clerk.dev',
   EnsureClerkJWT = 'Make sure that this is a valid Clerk generate JWT.',
   SetClerkJWTKey = 'Set the CLERK_JWT_KEY environment variable.',
-  SetClerkAPIKey = 'Set the CLERK_API_KEY environment variable.',
+  SetClerkSecretKeyOrAPIKey = 'Set the CLERK_SECRET_KEY or CLERK_API_KEY environment variable.',
 }
 
 export class TokenVerificationError extends Error {

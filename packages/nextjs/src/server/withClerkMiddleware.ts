@@ -3,7 +3,7 @@ import { NextMiddleware, NextMiddlewareResult } from 'next/dist/server/web/types
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
-import { API_KEY, API_URL, clerkClient, FRONTEND_API, PUBLISHABLE_KEY } from './clerk';
+import { API_KEY, API_URL, clerkClient, FRONTEND_API, PUBLISHABLE_KEY, SECRET_KEY } from './clerk';
 import {
   getCookie,
   nextJsVersionCanOverrideRequestHeaders,
@@ -32,8 +32,8 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
 
     const requestState = await clerkClient.authenticateRequest({
       ...opts,
-      // TODO: Make apiKey optional
       apiKey: API_KEY,
+      secretKey: SECRET_KEY,
       frontendApi: FRONTEND_API,
       publishableKey: PUBLISHABLE_KEY,
       cookieToken,

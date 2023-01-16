@@ -62,12 +62,21 @@ const withLegacyReturn =
 
 export function buildRequest(options: CreateBackendApiOptions) {
   const request = async <T>(requestOptions: ClerkBackendApiRequestOptions): Promise<ClerkBackendApiResponse<T>> => {
-    const { apiKey, apiUrl = API_URL, apiVersion = API_VERSION, userAgent = USER_AGENT, httpOptions = {} } = options;
+    const {
+      apiKey,
+      secretKey,
+      apiUrl = API_URL,
+      apiVersion = API_VERSION,
+      userAgent = USER_AGENT,
+      httpOptions = {},
+    } = options;
     const { path, method, queryParams, headerParams, bodyParams } = requestOptions;
 
-    if (!apiKey) {
+    const key = secretKey || apiKey;
+
+    if (!key) {
       throw Error(
-        'Missing Clerk API Key. Go to https://dashboard.clerk.dev and get your Clerk API Key for your instance.',
+        'Missing Clerk Secret Key or API Key. Go to https://dashboard.clerk.dev and get your key for your instance.',
       );
     }
 
@@ -90,7 +99,7 @@ export function buildRequest(options: CreateBackendApiOptions) {
 
     // Build headers
     const headers = {
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${key}`,
       'Content-Type': 'application/json',
       'Clerk-Backend-SDK': userAgent,
       ...headerParams,

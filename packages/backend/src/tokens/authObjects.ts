@@ -8,7 +8,11 @@ type CreateAuthObjectDebug = (data?: AuthObjectDebugData) => AuthObjectDebug;
 type AuthObjectDebug = () => unknown;
 
 export type SignedInAuthObjectOptions = {
-  apiKey: string;
+  /**
+   * @deprecated Use `secretKey` instead.
+   */
+  apiKey?: string;
+  secretKey?: string;
   apiUrl: string;
   apiVersion: string;
   token: string;
@@ -71,10 +75,11 @@ export function signedInAuthObject(
     org_slug: orgSlug,
     sub: userId,
   } = sessionClaims;
-  const { apiKey, apiUrl, apiVersion, token, session, user, organization } = options;
+  const { apiKey, secretKey, apiUrl, apiVersion, token, session, user, organization } = options;
 
   const { sessions } = createBackendApiClient({
     apiKey,
+    secretKey,
     apiUrl,
     apiVersion,
   });

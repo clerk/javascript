@@ -16,8 +16,13 @@ import {
 import { buildRequest } from './request';
 
 export type CreateBackendApiOptions = {
-  /* Backend API key */
-  apiKey: string;
+  /**
+   * Backend API key
+   * @deprecated Use `secretKey` instead.
+   */
+  apiKey?: string;
+  /* Secret Key */
+  secretKey?: string;
   /* Backend API URL */
   apiUrl?: string;
   /* Backend API version */

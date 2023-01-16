@@ -9,20 +9,32 @@ import type { ClerkMiddlewareOptions, MiddlewareRequireAuthProp, RequireAuthProp
 
 export type CreateClerkExpressMiddlewareOptions = {
   clerkClient: ReturnType<typeof Clerk>;
+  /**
+   * @deprecated Use `secretKey` instead.
+   */
   apiKey?: string;
+  /* Secret Key */
+  secretKey?: string;
   frontendApi?: string;
   publishableKey?: string;
   apiUrl?: string;
 };
 
 export const createClerkExpressRequireAuth = (createOpts: CreateClerkExpressMiddlewareOptions) => {
-  const { clerkClient, frontendApi = '', apiKey = '', publishableKey = '' } = createOpts;
+  const { clerkClient, frontendApi = '', apiKey = '', secretKey = '', publishableKey = '' } = createOpts;
 
   return (options: ClerkMiddlewareOptions = {}): MiddlewareRequireAuthProp => {
     return async (req, res, next) => {
-      const requestState = await authenticateRequest(clerkClient, apiKey, frontendApi, publishableKey, req, options);
+      const requestState = await authenticateRequest(
+        clerkClient,
+        apiKey,
+        secretKey,
+        frontendApi,
+        publishableKey,
+        req,
+        options,
+      );
       decorateResponseWithObservabilityHeaders(res, requestState);
-
       if (requestState.isInterstitial) {
         const interstitial = await clerkClient.remotePrivateInterstitial();
         return handleInterstitialCase(res, requestState, interstitial);
