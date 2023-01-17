@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.8.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@4.8.0...@clerk/clerk-react@4.8.1) (2023-01-17)
+
+### Bug Fixes
+
+- **clerk-react:** Add data-clerk-publishable-key attribute only when PK is available ([8d44f54](https://github.com/clerkinc/javascript/commit/8d44f54434754e2c31b4a77b58a28ae969ce5a09))
+
 ## [4.8.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@4.8.0-staging.4...@clerk/clerk-react@4.8.0) (2023-01-17)
 
 **Note:** Version bump only for package @clerk/clerk-react
