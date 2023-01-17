@@ -241,8 +241,8 @@ export default (QUnit: QUnit) => {
       assert.strictEqual(requestState.toAuth(), null);
     });
 
-    test('cookieToken: returns interstitial when no referrer in development [6y]', async assert => {
-      // Scenario: after auth action on Clerk-hosted UIs
+    // Omit because it caused view-source to always returns the interstitial in development mode (there's no referrer for view-source)
+    skip('cookieToken: returns interstitial when no referrer in development [6y]', async assert => {
       const requestState = await authenticateRequest({
         ...defaultMockAuthenticateRequestOptions,
         cookieToken: mockJwt,
@@ -250,7 +250,7 @@ export default (QUnit: QUnit) => {
         clientUat: '12345',
       });
 
-      assertInterstitial(assert, requestState, AuthErrorReason.CookieUATMissing);
+      assertInterstitial(assert, requestState, AuthErrorReason.CrossOriginReferrer);
       assert.equal(requestState.message, '');
       assert.strictEqual(requestState.toAuth(), null);
     });
