@@ -28,8 +28,9 @@
     "@clerk/types": "^3.24.0-staging.1",
     "@peculiar/webcrypto": "1.4.1",
     "@types/node": "16.18.6",
-    "deepmerge": "^4.2.2",
-    "node-fetch-native": "0.1.8",
+    "deepmerge": "4.2.2",
+    "node-fetch": "2.6.8",
+    "node-fetch-native": "1.0.1",
     "rfc4648": "1.5.2",
     "snakecase-keys": "5.4.4",
     "tslib": "2.4.1"
