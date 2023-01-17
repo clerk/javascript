@@ -21,16 +21,10 @@ export type IsomorphicClerkOptions = ClerkOptions & {
   clerkJSVariant?: 'headless' | '';
 } & (
     | {
-        /**
-         * @deprecated Use `publishableKey` instead
-         */
         frontendApi?: never;
         publishableKey: string;
       }
     | {
-        /**
-         * @deprecated Use `publishableKey` instead
-         */
         frontendApi: string;
         publishableKey?: never;
       }
