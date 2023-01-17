@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.0](https://github.com/clerkinc/javascript/compare/@clerk/backend@0.4.0-staging.7...@clerk/backend@0.4.0) (2023-01-17)
+
+### Bug Fixes
+
+- **backend,clerk-sdk-node,shared:** Support node12 runtimes ([fdcd6b3](https://github.com/clerkinc/javascript/commit/fdcd6b3f7c61490297a5fdfa80228cbb7787b49b))
+- **backend:** Polyfill webcrypto for node14 and node12 ([329bd6d](https://github.com/clerkinc/javascript/commit/329bd6d3426929e2cee06aeb04fd910b394a920f))
+
 ### [0.3.2](https://github.com/clerkinc/javascript/compare/@clerk/backend@0.3.2-staging.0...@clerk/backend@0.3.2) (2022-12-23)
 
 **Note:** Version bump only for package @clerk/backend

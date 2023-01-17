@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.6.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@4.6.0-staging.8...@clerk/clerk-sdk-node@4.6.0) (2023-01-17)
+
+### Bug Fixes
+
+- **backend,clerk-sdk-node,shared:** Support node12 runtimes ([fdcd6b3](https://github.com/clerkinc/javascript/commit/fdcd6b3f7c61490297a5fdfa80228cbb7787b49b))
+
 ### [4.5.14](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@4.5.14-staging.1...@clerk/clerk-sdk-node@4.5.14) (2022-12-19)
 
 **Note:** Version bump only for package @clerk/clerk-sdk-node

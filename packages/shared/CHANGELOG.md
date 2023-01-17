@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.0](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.9.0-staging.2...@clerk/shared@0.9.0) (2023-01-17)
+
+### Bug Fixes
+
+- **backend,clerk-sdk-node,shared:** Support node12 runtimes ([fdcd6b3](https://github.com/clerkinc/clerk_docker/commit/fdcd6b3f7c61490297a5fdfa80228cbb7787b49b))
+- **shared:** Replace atob with isomorphicAtob ([bfb1825](https://github.com/clerkinc/clerk_docker/commit/bfb1825e78cdf9970425dc79f3f9610e8a2699f7))
+
 ### [0.8.3](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.8.3-staging.1...@clerk/shared@0.8.3) (2022-12-19)
 
 **Note:** Version bump only for package @clerk/shared
