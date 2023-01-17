@@ -7,7 +7,7 @@ export default defineConfig(overrideOptions => {
 
   return {
     entry: ['src/index.ts'],
-    onSuccess: 'tsc',
+    onSuccess: 'tsc && npm run build:runtime',
     minify: isProd,
     sourcemap: true,
     format: ['cjs', 'esm'],
