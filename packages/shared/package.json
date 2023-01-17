@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "0.9.0-staging.2",
+  "version": "0.9.0-staging.3",
   "description": "Internal package utils used by the Clerk SDKs",
   "types": "./dist/types/index.d.ts",
   "main": "./dist/index.js",
