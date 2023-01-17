@@ -19,7 +19,8 @@ const app: Application = express();
 app.use(clerk.expressWithAuth());
 
 app.get('/', async (req: WithAuthProp<Request>, res: Response) => {
-  const { userId } = req.auth;
+  const { userId, debug } = req.auth;
+  console.log(debug());
   const user = userId ? await clerk.users.getUser(userId) : null;
   res.json({ auth: req.auth, user });
 });
