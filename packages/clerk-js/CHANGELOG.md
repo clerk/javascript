@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.23.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.23.0...@clerk/clerk-js@4.23.1) (2023-01-17)
+
+### Bug Fixes
+
+- **clerk-js:** Add missing dev instance suffix for new accounts.dev urls ([cb2e516](https://github.com/clerkinc/javascript/commit/cb2e516fb8c45c7438a867083a641b9ee4cab2f9))
+
 ## [4.23.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.23.0-staging.3...@clerk/clerk-js@4.23.0) (2023-01-17)
 
 **Note:** Version bump only for package @clerk/clerk-js
