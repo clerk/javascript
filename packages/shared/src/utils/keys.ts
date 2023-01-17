@@ -1,5 +1,7 @@
 import { PublishableKey } from '@clerk/types';
 
+import { isomorphicAtob } from './isomorphicAtob';
+
 const PUBLISHABLE_KEY_LIVE_PREFIX = 'pk_live_';
 const PUBLISHABLE_KEY_TEST_PREFIX = 'pk_test_';
 
@@ -22,7 +24,7 @@ export function parsePublishableKey(key: string): PublishableKey | null {
 
   const instanceType = key.startsWith(PUBLISHABLE_KEY_LIVE_PREFIX) ? 'production' : 'development';
 
-  let frontendApi = atob(key.split('_')[2]);
+  let frontendApi = isomorphicAtob(key.split('_')[2]);
 
   if (!frontendApi.endsWith('$')) {
     return null;
@@ -41,7 +43,7 @@ export function isPublishableKey(key: string) {
 
   const hasValidPrefix = key.startsWith(PUBLISHABLE_KEY_LIVE_PREFIX) || key.startsWith(PUBLISHABLE_KEY_TEST_PREFIX);
 
-  const hasValidFrontendApiPostfix = atob(key.split('_')[2] || '').endsWith('$');
+  const hasValidFrontendApiPostfix = isomorphicAtob(key.split('_')[2] || '').endsWith('$');
 
   return hasValidPrefix && hasValidFrontendApiPostfix;
 }
