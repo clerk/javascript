@@ -97,7 +97,7 @@ export default class IsomorphicClerk {
       return;
     }
 
-    if (typeof this.publishableKey === 'undefined' && typeof this.frontendApi === 'undefined') {
+    if (!this.publishableKey && !this.frontendApi) {
       errorThrower.throwMissingFrontendApiOrPublishableKeyError();
     }
 

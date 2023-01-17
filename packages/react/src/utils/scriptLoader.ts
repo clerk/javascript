@@ -38,13 +38,8 @@ function getScriptSrc({ publishableKey, frontendApi, scriptUrl, scriptVariant = 
     return scriptUrl;
   }
 
-  let scriptHost: string;
-  if (publishableKey) {
-    const { frontendApi } = parsePublishableKey(publishableKey)!;
-    scriptHost = frontendApi;
-  } else if (frontendApi) {
-    scriptHost = frontendApi;
-  } else {
+  const scriptHost = publishableKey ? parsePublishableKey(publishableKey)?.frontendApi : frontendApi;
+  if (!scriptHost) {
     errorThrower.throwMissingFrontendApiOrPublishableKeyError();
   }
 
@@ -83,8 +78,17 @@ export async function loadScript(params: LoadScriptParams): Promise<HTMLScriptEl
     }
 
     const script = document.createElement('script');
-    script.setAttribute('data-clerk-publishable-key', publishableKey!);
-    script.setAttribute('data-clerk-frontend-api', frontendApi!);
+
+    if (!publishableKey && !frontendApi) {
+      errorThrower.throwMissingFrontendApiOrPublishableKeyError();
+    }
+
+    if (publishableKey) {
+      script.setAttribute('data-clerk-publishable-key', publishableKey);
+    } else if (frontendApi) {
+      script.setAttribute('data-clerk-frontend-api', frontendApi);
+    }
+
     script.setAttribute('crossorigin', 'anonymous');
     script.async = true;
 
