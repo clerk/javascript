@@ -25,6 +25,7 @@ export const DEV_OR_STAGING_SUFFIXES = [
   '.stg.lclclerk.com',
   '.accounts.lclclerk.com',
   'accountsstage.dev',
+  'accounts.dev',
 ];
 
 const devOrStagingUrlCache = new Map<string, boolean>();
