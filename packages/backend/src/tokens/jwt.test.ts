@@ -12,77 +12,42 @@ export default (QUnit: QUnit) => {
       const { header, payload } = decodeJwt(mockJwt);
       assert.propEqual(header, mockJwtHeader);
       assert.propEqual(payload, mockJwtPayload);
-      // TODO: assert signature is instance of Uint8Array
+      // TODO: @dimkl assert signature is instance of Uint8Array
     });
 
     test('throws an error if null is given as jwt', assert => {
-      try {
-        decodeJwt('null');
-        assert.false(true);
-      } catch (err) {
-        if (err instanceof Error) {
-          assert.equal(err.message, 'Invalid JWT form. A JWT consists of three parts separated by dots.');
-        } else {
-          // This should never be reached. If it does, the suite should fail
-          assert.false(true);
-        }
-      }
+      assert.throws(
+        () => decodeJwt('null'),
+        new Error('Invalid JWT form. A JWT consists of three parts separated by dots.'),
+      );
     });
 
     test('throws an error if undefined is given as jwt', assert => {
-      try {
-        decodeJwt('undefined');
-        assert.false(true);
-      } catch (err) {
-        if (err instanceof Error) {
-          assert.equal(err.message, 'Invalid JWT form. A JWT consists of three parts separated by dots.');
-        } else {
-          // This should never be reached. If it does, the suite should fail
-          assert.false(true);
-        }
-      }
+      assert.throws(
+        () => decodeJwt('undefined'),
+        new Error('Invalid JWT form. A JWT consists of three parts separated by dots.'),
+      );
     });
 
     test('throws an error if empty string is given as jwt', assert => {
-      try {
-        decodeJwt('');
-        assert.false(true);
-      } catch (err) {
-        if (err instanceof Error) {
-          assert.equal(err.message, 'Invalid JWT form. A JWT consists of three parts separated by dots.');
-        } else {
-          // This should never be reached. If it does, the suite should fail
-          assert.false(true);
-        }
-      }
+      assert.throws(
+        () => decodeJwt('undefined'),
+        new Error('Invalid JWT form. A JWT consists of three parts separated by dots.'),
+      );
     });
 
     test('throws an error if invalid string is given as jwt', assert => {
-      try {
-        decodeJwt('whatever');
-        assert.false(true);
-      } catch (err) {
-        if (err instanceof Error) {
-          assert.equal(err.message, 'Invalid JWT form. A JWT consists of three parts separated by dots.');
-        } else {
-          // This should never be reached. If it does, the suite should fail
-          assert.false(true);
-        }
-      }
+      assert.throws(
+        () => decodeJwt('undefined'),
+        new Error('Invalid JWT form. A JWT consists of three parts separated by dots.'),
+      );
     });
 
     test('throws an error if number is given as jwt', assert => {
-      try {
-        decodeJwt('42');
-        assert.false(true);
-      } catch (err) {
-        if (err instanceof Error) {
-          assert.equal(err.message, 'Invalid JWT form. A JWT consists of three parts separated by dots.');
-        } else {
-          // This should never be reached. If it does, the suite should fail
-          assert.false(true);
-        }
-      }
+      assert.throws(
+        () => decodeJwt('42'),
+        new Error('Invalid JWT form. A JWT consists of three parts separated by dots.'),
+      );
     });
   });
 

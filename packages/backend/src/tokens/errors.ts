@@ -1,4 +1,4 @@
-import { type TokenCarrier } from './request';
+export type TokenCarrier = 'header' | 'cookie';
 
 export enum TokenVerificationErrorReason {
   TokenExpired = 'token-expired',
