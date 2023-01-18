@@ -1,4 +1,4 @@
-import { Clerk as _Clerk, ClerkOptions } from '@clerk/backend';
+import { Clerk as _Clerk, ClerkOptions, decodeJwt, verifyToken } from '@clerk/backend';
 
 import { createClerkExpressRequireAuth } from './clerkExpressRequireAuth';
 import { createClerkExpressWithAuth } from './clerkExpressWithAuth';
@@ -17,8 +17,19 @@ export function Clerk(options: ClerkOptions) {
   const clerkClient = _Clerk(options);
   const expressWithAuth = createClerkExpressWithAuth({ ...options, clerkClient });
   const expressRequireAuth = createClerkExpressRequireAuth({ ...options, clerkClient });
-  return { ...clerkClient, expressWithAuth, expressRequireAuth };
+  return { ...clerkClient, expressWithAuth, expressRequireAuth, ...createBasePropForRedwoodCompatibility() };
 }
+
+const createBasePropForRedwoodCompatibility = () => {
+  const verifySessionToken = (token: string) => {
+    const { payload } = decodeJwt(token);
+    return verifyToken(token, {
+      issuer: payload.iss,
+      jwtKey: process.env.CLERK_JWT_KEY,
+    });
+  };
+  return { base: { verifySessionToken } };
+};
 
 export const createClerkClient = Clerk;
 
