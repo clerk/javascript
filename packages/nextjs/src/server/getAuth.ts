@@ -10,7 +10,7 @@ import {
   signedOutAuthObject,
 } from '@clerk/backend';
 
-import { API_KEY, API_URL, API_VERSION } from './clerk';
+import { API_KEY, API_URL, API_VERSION, SECRET_KEY } from './clerk';
 import type { RequestLike } from './types';
 import { getAuthStatusFromRequest, getCookie, getHeader, injectSSRStateIntoObject } from './utils';
 
@@ -34,6 +34,7 @@ export const getAuth = (req: RequestLike): SignedInAuthObject | SignedOutAuthObj
 
   return signedInAuthObject(jwt.payload, {
     apiKey: API_KEY,
+    secretKey: SECRET_KEY,
     apiUrl: API_URL,
     apiVersion: API_VERSION,
     token: jwt.raw.text,
@@ -71,6 +72,7 @@ export const buildClerkProps: BuildClerkProps = (req, initState = {}) => {
 
   const authObject = signedInAuthObject(payload, {
     apiKey: API_KEY,
+    secretKey: SECRET_KEY,
     apiUrl: API_URL,
     apiVersion: API_VERSION,
     token: raw.text,

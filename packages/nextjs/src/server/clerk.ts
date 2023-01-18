@@ -9,6 +9,7 @@ export const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || 
 
 const clerkClient = Clerk({
   apiKey: API_KEY,
+  secretKey: SECRET_KEY,
   apiUrl: API_URL,
   apiVersion: API_VERSION,
   // TODO: Fetch version from package.json
