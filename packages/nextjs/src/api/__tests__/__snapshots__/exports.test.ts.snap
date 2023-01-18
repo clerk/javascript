@@ -27,6 +27,7 @@ Array [
   "User",
   "Verification",
   "allowlistIdentifiers",
+  "clerkClient",
   "clients",
   "constants",
   "createAuthenticateRequest",
