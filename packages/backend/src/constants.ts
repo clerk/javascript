@@ -3,6 +3,7 @@ export const API_VERSION = 'v1';
 
 // TODO: Get information from package.json or define them from ESBuild
 export const USER_AGENT = `@clerk/backend`;
+export const MAX_CACHE_LAST_UPDATED_AT_SECONDS = 5 * 60;
 
 const Attributes = {
   AuthStatus: '__clerkAuthStatus',

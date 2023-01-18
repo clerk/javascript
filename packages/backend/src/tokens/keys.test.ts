@@ -113,6 +113,8 @@ export default (QUnit: QUnit) => {
     });
 
     test('throws an error when JWKS can not be fetched from Backend or Frontend API', async assert => {
+      // advance clock for 5 minutes and 1 second
+      fakeClock.tick(5 * 60 * 1000 + 1);
       try {
         await loadClerkJWKFromRemote({
           apiKey: 'deadbeef',
@@ -123,6 +125,26 @@ export default (QUnit: QUnit) => {
         if (err instanceof Error) {
           assert.propEqual(err, {
             reason: 'jwk-remote-failed-to-load',
+            action: 'Contact support@clerk.dev',
+          });
+        } else {
+          // This should never be reached. If it does, the suite should fail
+          assert.false(true);
+        }
+      }
+    });
+
+    test('throws an error when JWKS can not be fetched from Backend or Frontend API and cache updated less than 5 minutes ago', async assert => {
+      try {
+        await loadClerkJWKFromRemote({
+          apiKey: 'deadbeef',
+          kid: 'ins_whatever',
+        });
+        assert.false(true);
+      } catch (err) {
+        if (err instanceof Error) {
+          assert.propEqual(err, {
+            reason: 'jwk-remote-missing',
             action: 'Contact support@clerk.dev',
           });
         } else {

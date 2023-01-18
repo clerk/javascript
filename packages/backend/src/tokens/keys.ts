@@ -1,4 +1,4 @@
-import { API_URL, API_VERSION } from '../constants';
+import { API_URL, API_VERSION, MAX_CACHE_LAST_UPDATED_AT_SECONDS } from '../constants';
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
 import runtime from '../runtime';
@@ -11,6 +11,7 @@ type JsonWebKeyWithKid = JsonWebKey & { kid: string };
 type JsonWebKeyCache = Record<string, JsonWebKeyWithKid>;
 
 let cache: JsonWebKeyCache = {};
+let lastUpdatedAt = 0;
 
 function getFromCache(kid: string) {
   return cache[kid];
@@ -21,6 +22,7 @@ function setInCache(
   jwksCacheTtlInMs: number = 1000 * 60 * 60, // 1 hour
 ) {
   cache[jwk.kid] = jwk;
+  lastUpdatedAt = Date.now();
 
   if (jwksCacheTtlInMs >= 0) {
     setTimeout(() => {
@@ -116,7 +118,8 @@ export async function loadClerkJWKFromRemote({
   jwksCacheTtlInMs = 1000 * 60 * 60, // 1 hour,
   skipJwksCache,
 }: LoadClerkJWKFromRemoteOptions): Promise<JsonWebKey> {
-  if (skipJwksCache || !getFromCache(kid)) {
+  const shouldRefreshCache = !getFromCache(kid) && reachedMaxCacheUpdatedAt();
+  if (skipJwksCache || shouldRefreshCache) {
     let fetcher;
     const key = secretKey || apiKey || '';
 
@@ -204,4 +207,8 @@ async function fetchJWKSFromBAPI(apiUrl: string = API_URL, key: string, apiVersi
   }
 
   return response.json();
+}
+
+function reachedMaxCacheUpdatedAt() {
+  return Date.now() - lastUpdatedAt >= MAX_CACHE_LAST_UPDATED_AT_SECONDS * 1000;
 }
