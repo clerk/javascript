@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.6.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@4.6.1-staging.0...@clerk/clerk-sdk-node@4.6.1) (2023-01-18)
+
+### Bug Fixes
+
+- **clerk-sdk-node:** Remove unused jsonwebtoken dependency ([6af3d9e](https://github.com/clerkinc/javascript/commit/6af3d9ea7e2d47f07f65c1133e634986b048bf74))
+
 ## [4.6.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@4.6.0-staging.8...@clerk/clerk-sdk-node@4.6.0) (2023-01-17)
 
 ### Bug Fixes
