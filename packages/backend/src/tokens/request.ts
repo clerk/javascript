@@ -1,21 +1,20 @@
-import { parsePublishableKey } from '@clerk/shared';
 import { API_URL, API_VERSION } from '../constants';
+import { parsePublishableKey } from '../util/parsePublishableKey';
 import { type RequestState, AuthErrorReason, interstitial, signedOut } from './authStatus';
-import { type VerifyTokenOptions } from './verify';
 import { type TokenCarrier, TokenVerificationError, TokenVerificationErrorReason } from './errors';
-
 import {
-  nonBrowserRequestInDevRule,
   crossOriginRequestWithoutHeader,
-  potentialFirstLoadInDevWhenUATMissing,
-  potentialRequestAfterSignInOrOurFromClerkHostedUiInDev,
-  potentialFirstRequestOnProductionEnvironment,
-  isNormalSignedOutState,
   hasClientUatButCookieIsMissingInProd,
   hasValidCookieToken,
   hasValidHeaderToken,
+  isNormalSignedOutState,
+  nonBrowserRequestInDevRule,
+  potentialFirstLoadInDevWhenUATMissing,
+  potentialFirstRequestOnProductionEnvironment,
+  potentialRequestAfterSignInOrOurFromClerkHostedUiInDev,
   runInterstitialRules,
 } from './interstitialRule';
+import { type VerifyTokenOptions } from './verify';
 
 export type LoadResourcesOptions = {
   loadSession?: boolean;
