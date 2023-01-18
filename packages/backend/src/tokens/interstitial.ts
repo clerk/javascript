@@ -1,11 +1,10 @@
-import { parsePublishableKey } from '@clerk/shared';
-
 import { API_VERSION } from '../constants';
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
 import runtime from '../runtime';
 import { callWithRetry } from '../util/callWithRetry';
 import { isStaging } from '../util/instance';
+import { parsePublishableKey } from '../util/parsePublishableKey';
 import { joinPaths } from '../util/path';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from './errors';
 
