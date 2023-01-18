@@ -19,7 +19,7 @@ interface WithServerSideAuth {
 }
 
 /**
- * @deprecated The /middleware path is deprecated and will be removed in the next major release.
+ * @deprecated The /ssr path is deprecated and will be removed in the next major release.
  * Use the exports from /server instead
  */
 export const withServerSideAuth: WithServerSideAuth = (cbOrOptions: any, options?: any): any => {
