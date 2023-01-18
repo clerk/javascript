@@ -57,6 +57,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
           frontendApi: FRONTEND_API,
           publishableKey: PUBLISHABLE_KEY,
         }),
+        { status: 401 },
       );
       response.headers.set(constants.Headers.AuthReason, requestState.reason);
       response.headers.set(constants.Headers.AuthMessage, requestState.message);
