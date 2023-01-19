@@ -1,6 +1,6 @@
 {
   "name": "@clerk/edge",
-  "version": "1.13.0",
+  "version": "1.13.1",
   "license": "MIT",
   "description": "Clerk SDK for serverless and edge environments",
   "keywords": [
@@ -38,7 +38,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@clerk/backend-core": "^2.13.0",
+    "@clerk/backend-core": "^2.13.1",
     "@clerk/types": "^3.24.0",
     "@peculiar/webcrypto": "1.4.1",
     "@types/node": "16.18.6"
