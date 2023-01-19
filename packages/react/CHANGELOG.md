@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.8.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@4.8.1...@clerk/clerk-react@4.8.2) (2023-01-19)
+
+### Bug Fixes
+
+- **clerk-react:** Do not throw missing key error if a Clerk instance is used ([a300016](https://github.com/clerkinc/javascript/commit/a3000164483e7ed947d448f7593e0ce4dd110db3))
+- **clerk-react:** Do not throw missing key error in isomorphicClerk.load ([8b3b763](https://github.com/clerkinc/javascript/commit/8b3b763ed67d3af101573627fc7b00fb0a526b9b))
+
 ### [4.8.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@4.8.0...@clerk/clerk-react@4.8.1) (2023-01-17)
 
 ### Bug Fixes
