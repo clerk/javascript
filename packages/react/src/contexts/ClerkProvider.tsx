@@ -19,14 +19,16 @@ export type ClerkProviderProps = IsomorphicClerkOptions & {
 
 function ClerkProviderBase(props: ClerkProviderProps): JSX.Element {
   const { initialState, children, ...restIsomorphicClerkOptions } = props;
-  const { frontendApi = '', publishableKey = '' } = restIsomorphicClerkOptions;
+  const { frontendApi = '', publishableKey = '', Clerk: userInitialisedClerk } = restIsomorphicClerkOptions;
 
-  if (!publishableKey && !frontendApi) {
-    errorThrower.throwMissingFrontendApiOrPublishableKeyError();
-  } else if (publishableKey && !isPublishableKey(publishableKey)) {
-    errorThrower.throwInvalidPublishableKeyError({ key: publishableKey });
-  } else if (frontendApi && !isLegacyFrontendApiKey(frontendApi)) {
-    errorThrower.throwInvalidFrontendApiError({ key: frontendApi });
+  if (!userInitialisedClerk) {
+    if (!publishableKey && !frontendApi) {
+      errorThrower.throwMissingFrontendApiOrPublishableKeyError();
+    } else if (publishableKey && !isPublishableKey(publishableKey)) {
+      errorThrower.throwInvalidPublishableKeyError({ key: publishableKey });
+    } else if (frontendApi && !isLegacyFrontendApiKey(frontendApi)) {
+      errorThrower.throwInvalidFrontendApiError({ key: frontendApi });
+    }
   }
 
   return (
