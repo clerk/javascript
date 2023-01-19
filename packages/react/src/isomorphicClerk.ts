@@ -30,7 +30,7 @@ import type {
   HeadlessBrowserClerkConstrutor,
   IsomorphicClerkOptions,
 } from './types';
-import { errorThrower, inClientSide, isConstructor, loadScript } from './utils';
+import { inClientSide, isConstructor, loadScript } from './utils';
 
 export interface Global {
   Clerk?: HeadlessBrowserClerk | BrowserClerk;
@@ -95,10 +95,6 @@ export default class IsomorphicClerk {
   async loadClerkJS(): Promise<HeadlessBrowserClerk | BrowserClerk | undefined> {
     if (this.mode !== 'browser' || this.#loaded) {
       return;
-    }
-
-    if (!this.publishableKey && !this.frontendApi) {
-      errorThrower.throwMissingFrontendApiOrPublishableKeyError();
     }
 
     // Store frontendAPI value on window as a fallback. This value can be used as a
