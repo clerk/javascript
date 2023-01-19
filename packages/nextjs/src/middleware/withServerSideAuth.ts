@@ -29,7 +29,7 @@ export const withServerSideAuth: WithServerSideAuth = (cbOrOptions: any, options
   return async (ctx: GetServerSidePropsContext) => {
     const requestState = await authenticateRequest(ctx, opts);
 
-    if (requestState.isInterstitial) {
+    if (requestState.isInterstitial || requestState.isUnknown) {
       ctx.res.setHeader(constants.Headers.AuthMessage, requestState.message);
       ctx.res.setHeader(constants.Headers.AuthReason, requestState.reason);
       ctx.res.writeHead(401, { 'Content-Type': 'text/html' });

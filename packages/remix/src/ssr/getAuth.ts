@@ -13,7 +13,7 @@ export async function getAuth(args: LoaderFunctionArgs, opts?: GetAuthOptions): 
   }
   const requestState = await authenticateRequest(args, opts);
 
-  if (requestState.isInterstitial) {
+  if (requestState.isInterstitial || requestState.isUnknown) {
     throw interstitialJsonResponse(requestState, { loader: 'nested' });
   }
 

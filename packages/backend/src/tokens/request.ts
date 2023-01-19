@@ -1,6 +1,6 @@
 import { API_URL, API_VERSION } from '../constants';
 import { parsePublishableKey } from '../util/parsePublishableKey';
-import { type RequestState, AuthErrorReason, interstitial, signedOut, unknownState } from './authStatus';
+import { type RequestState, AuthErrorReason, interstitial, signedOut } from './authStatus';
 import { type TokenCarrier, TokenVerificationError, TokenVerificationErrorReason } from './errors';
 import {
   crossOriginRequestWithoutHeader,
@@ -102,9 +102,6 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       ].includes(err.reason);
 
       if (reasonToReturnInterstitial) {
-        if (tokenCarrier === 'header') {
-          return unknownState<AuthenticateRequestOptions>(options, err.reason, err.getFullMessage());
-        }
         return interstitial<AuthenticateRequestOptions>(options, err.reason, err.getFullMessage());
       }
       return signedOut<AuthenticateRequestOptions>(options, err.reason, err.getFullMessage());
