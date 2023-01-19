@@ -50,6 +50,19 @@ function assertInterstitial(assert, requestState: RequestState, reason: AuthReas
   });
 }
 
+function assertUnknown(assert, requestState: RequestState, reason: AuthReason) {
+  assert.propContains(requestState, {
+    frontendApi: 'cafe.babe.clerk.ts',
+    publishableKey: '',
+    status: AuthStatus.Unknown,
+    isSignedIn: false,
+    isInterstitial: false,
+    isUnknown: true,
+    reason,
+    toAuth: {},
+  });
+}
+
 function assertSignedInToAuth(assert, requestState: RequestState) {
   assert.propContains(requestState.toAuth(), {
     sessionClaims: mockJwtPayload,
@@ -165,7 +178,7 @@ export default (QUnit: QUnit) => {
         headerToken: mockJwt,
       });
 
-      assertInterstitial(assert, requestState, TokenVerificationErrorReason.TokenExpired);
+      assertUnknown(assert, requestState, TokenVerificationErrorReason.TokenExpired);
       assert.strictEqual(requestState.toAuth(), null);
     });
 
