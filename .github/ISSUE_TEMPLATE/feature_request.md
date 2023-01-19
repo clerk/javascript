@@ -14,7 +14,6 @@ labels: 'Status: Feature Request'
 - [ ] `@clerk/nextjs`
 - [ ] `@clerk/remix`
 - [ ] `@clerk/clerk-expo`
-- [ ] `@clerk/backend-core`
 - [ ] `@clerk/clerk-sdk-node`
 - [ ] `@clerk/edge`
 - [ ] `@clerk/localizations`
