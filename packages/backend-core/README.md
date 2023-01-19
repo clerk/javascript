@@ -27,6 +27,10 @@
 
 ---
 
+# Deprecation warning
+
+This package has been deprecated in favor of the isomorphic [`@clerk/backend`](https://github.com/clerkinc/javascript) which is now used across all server-enabled Clerk packages. This package will not receive any future updates. It should not be used directly - please use as a reference only.
+
 ## Overview
 
 This package provides Clerk Backend API core resources and low-level authentication utilities for JavaScript environments. It is mostly used as the base for other Clerk SDKs.

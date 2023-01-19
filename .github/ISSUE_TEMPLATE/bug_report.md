@@ -24,9 +24,8 @@ labels: 'Status: Triage'
 - [ ] `@clerk/themes`
 - [ ] `@clerk/localizations`
 - [ ] `@clerk/clerk-expo`
-- [ ] `@clerk/backend-core`
 - [ ] `@clerk/clerk-sdk-node`
-- [ ] `@clerk/edge`
+- [ ] `@clerk/backend`
 - [ ] other:
 
 ### Version:

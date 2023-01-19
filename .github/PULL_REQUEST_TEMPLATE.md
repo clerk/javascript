@@ -17,9 +17,7 @@
 - [ ] `@clerk/localizations`
 - [ ] `@clerk/clerk-expo`
 - [ ] `@clerk/backend`
-- [ ] `@clerk/backend-core`
 - [ ] `@clerk/clerk-sdk-node`
-- [ ] `@clerk/edge`
 - [ ] `@clerk/shared`
 - [ ] `build/tooling/chore`
 
