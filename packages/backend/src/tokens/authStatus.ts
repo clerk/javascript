@@ -9,6 +9,7 @@ export enum AuthStatus {
   SignedIn = 'signed-in',
   SignedOut = 'signed-out',
   Interstitial = 'interstitial',
+  Unknown = 'unknown',
 }
 
 export type SignedInState = {
@@ -19,6 +20,7 @@ export type SignedInState = {
   publishableKey: string;
   isSignedIn: true;
   isInterstitial: false;
+  isUnknown: false;
   toAuth: () => SignedInAuthObject;
 };
 
@@ -30,15 +32,20 @@ export type SignedOutState = {
   publishableKey: string;
   isSignedIn: false;
   isInterstitial: false;
+  isUnknown: false;
   toAuth: () => SignedOutAuthObject;
 };
 
 export type InterstitialState = Omit<SignedOutState, 'isInterstitial' | 'status' | 'toAuth'> & {
   status: AuthStatus.Interstitial;
-  isSignedIn: false;
   isInterstitial: true;
-  reason: AuthReason;
   toAuth: () => null;
+};
+
+export type UnknownState = Omit<InterstitialState, 'status' | 'isInterstitial' | 'isUnknown'> & {
+  status: AuthStatus.Unknown;
+  isInterstitial: false;
+  isUnknown: true;
 };
 
 export enum AuthErrorReason {
@@ -57,7 +64,7 @@ export enum AuthErrorReason {
 
 export type AuthReason = AuthErrorReason | TokenVerificationErrorReason;
 
-export type RequestState = SignedInState | SignedOutState | InterstitialState;
+export type RequestState = SignedInState | SignedOutState | InterstitialState | UnknownState;
 
 export async function signedIn<T>(options: T, sessionClaims: JwtPayload): Promise<SignedInState> {
   const {
@@ -118,6 +125,7 @@ export async function signedIn<T>(options: T, sessionClaims: JwtPayload): Promis
     publishableKey,
     isSignedIn: true,
     isInterstitial: false,
+    isUnknown: false,
     toAuth: () => authObject,
   };
 }
@@ -133,6 +141,7 @@ export function signedOut<T>(options: T, reason: AuthReason, message = ''): Sign
     publishableKey,
     isSignedIn: false,
     isInterstitial: false,
+    isUnknown: false,
     toAuth: () => signedOutAuthObject({ ...options, status: AuthStatus.SignedOut, reason, message }),
   };
 }
@@ -147,6 +156,22 @@ export function interstitial<T>(options: T, reason: AuthReason, message = ''): I
     publishableKey: publishableKey,
     isSignedIn: false,
     isInterstitial: true,
+    isUnknown: false,
+    toAuth: () => null,
+  };
+}
+
+export function unknownState<T>(options: T, reason: AuthReason, message = ''): UnknownState {
+  const { frontendApi, publishableKey } = options as any;
+  return {
+    status: AuthStatus.Unknown,
+    reason,
+    message,
+    frontendApi: frontendApi,
+    publishableKey: publishableKey,
+    isSignedIn: false,
+    isInterstitial: false,
+    isUnknown: true,
     toAuth: () => null,
   };
 }

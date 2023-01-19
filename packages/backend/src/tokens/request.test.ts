@@ -3,25 +3,26 @@ import sinon from 'sinon';
 
 import runtime from '../runtime';
 import { jsonOk } from '../util/mockFetch';
-import { mockJwt, mockInvalidSignatureJwt, mockMalformedJwt, mockJwks, mockJwtPayload } from './fixtures';
-import { type AuthenticateRequestOptions, authenticateRequest } from './request';
+import { type AuthReason, type RequestState, AuthErrorReason, AuthStatus } from './authStatus';
 import { TokenVerificationErrorReason } from './errors';
-import { AuthErrorReason, AuthStatus } from './authStatus';
+import { mockInvalidSignatureJwt, mockJwks, mockJwt, mockJwtPayload, mockMalformedJwt } from './fixtures';
+import { type AuthenticateRequestOptions, authenticateRequest } from './request';
 
-function assertSignedOut(assert, requestState, reason, message = '') {
+function assertSignedOut(assert, requestState: RequestState, reason: AuthReason, message = '') {
   assert.propEqual(requestState, {
     frontendApi: 'cafe.babe.clerk.ts',
     publishableKey: '',
     status: AuthStatus.SignedOut,
     isSignedIn: false,
     isInterstitial: false,
+    isUnknown: false,
     message,
     reason,
     toAuth: {},
   });
 }
 
-function assertSignedOutToAuth(assert, requestState) {
+function assertSignedOutToAuth(assert, requestState: RequestState) {
   assert.propContains(requestState.toAuth(), {
     sessionClaims: null,
     sessionId: null,
@@ -36,19 +37,20 @@ function assertSignedOutToAuth(assert, requestState) {
   });
 }
 
-function assertInterstitial(assert, requestState, reason) {
+function assertInterstitial(assert, requestState: RequestState, reason: AuthReason) {
   assert.propContains(requestState, {
     frontendApi: 'cafe.babe.clerk.ts',
     publishableKey: '',
     status: AuthStatus.Interstitial,
     isSignedIn: false,
     isInterstitial: true,
+    isUnknown: false,
     reason,
     toAuth: {},
   });
 }
 
-function assertSignedInToAuth(assert, requestState) {
+function assertSignedInToAuth(assert, requestState: RequestState) {
   assert.propContains(requestState.toAuth(), {
     sessionClaims: mockJwtPayload,
     sessionId: mockJwtPayload.sid,
@@ -63,13 +65,14 @@ function assertSignedInToAuth(assert, requestState) {
   });
 }
 
-function assertSignedIn(assert, requestState) {
+function assertSignedIn(assert, requestState: RequestState) {
   assert.propContains(requestState, {
     frontendApi: 'cafe.babe.clerk.ts',
     publishableKey: '',
     status: AuthStatus.SignedIn,
     isSignedIn: true,
     isInterstitial: false,
+    isUnknown: false,
   });
 }
 
