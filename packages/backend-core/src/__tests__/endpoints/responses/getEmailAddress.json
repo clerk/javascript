@@ -1,7 +1,0 @@
-{
-  "id": "idn_banana",
-  "object": "email_address",
-  "email_address": "banana@cherry.com",
-  "reserved": true,
-  "linked_to": []
-}
