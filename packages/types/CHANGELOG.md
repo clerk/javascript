@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.24.1](https://github.com/clerkinc/javascript/compare/@clerk/types@3.24.0...@clerk/types@3.24.1) (2023-01-20)
+
+### Bug Fixes
+
+- **nextjs,types:** Make frontendApi or publishableKey mutually exclusive but optional ([953c276](https://github.com/clerkinc/javascript/commit/953c27622ba24054172d6f4178bd5af50f73fa36))
+
 ## [3.24.0](https://github.com/clerkinc/javascript/compare/@clerk/types@3.24.0-staging.1...@clerk/types@3.24.0) (2023-01-17)
 
 **Note:** Version bump only for package @clerk/types

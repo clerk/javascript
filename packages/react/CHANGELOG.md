@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.8.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@4.8.2...@clerk/clerk-react@4.8.3) (2023-01-20)
+
+### Bug Fixes
+
+- **nextjs,types:** Make frontendApi or publishableKey mutually exclusive but optional ([953c276](https://github.com/clerkinc/javascript/commit/953c27622ba24054172d6f4178bd5af50f73fa36))
+
 ### [4.8.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@4.8.1...@clerk/clerk-react@4.8.2) (2023-01-19)
 
 ### Bug Fixes

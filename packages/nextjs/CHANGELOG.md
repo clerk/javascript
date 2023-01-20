@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.7.5](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.7.4...@clerk/nextjs@4.7.5) (2023-01-20)
+
+### Bug Fixes
+
+- **nextjs,types:** Make frontendApi or publishableKey mutually exclusive but optional ([953c276](https://github.com/clerkinc/javascript/commit/953c27622ba24054172d6f4178bd5af50f73fa36))
+
 ### [4.7.4](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.7.3...@clerk/nextjs@4.7.4) (2023-01-19)
 
 **Note:** Version bump only for package @clerk/nextjs

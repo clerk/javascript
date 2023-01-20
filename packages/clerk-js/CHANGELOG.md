@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.23.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.23.1...@clerk/clerk-js@4.23.2) (2023-01-20)
+
+**Note:** Version bump only for package @clerk/clerk-js
+
 ### [4.23.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.23.0...@clerk/clerk-js@4.23.1) (2023-01-17)
 
 ### Bug Fixes
