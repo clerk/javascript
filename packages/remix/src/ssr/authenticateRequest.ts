@@ -31,13 +31,15 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
 
   const jwtKey = getEnvVariable('CLERK_JWT_KEY') || (context?.CLERK_JWT_KEY as string) || opts.jwtKey;
 
+  const proxyUrl = getEnvVariable('CLERK_PROXY_URL') || (context?.CLERK_PROXY_URL as string) || opts.proxyUrl || '';
+
   const { headers } = request;
   const cookies = parseCookies(request);
 
   const cookieToken = cookies['__session'];
   const headerToken = headers.get('authorization')?.replace('Bearer ', '');
 
-  return Clerk({ apiKey, secretKey, jwtKey }).authenticateRequest({
+  return Clerk({ apiKey, secretKey, jwtKey, proxyUrl }).authenticateRequest({
     apiKey,
     secretKey,
     jwtKey,
@@ -56,5 +58,6 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     referrer: headers.get('referer') || '',
     userAgent: headers.get('user-agent') as string,
     authorizedParties,
+    proxyUrl,
   });
 }

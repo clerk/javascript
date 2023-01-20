@@ -3,7 +3,7 @@ import { NextMiddleware, NextMiddlewareResult } from 'next/dist/server/web/types
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
-import { API_KEY, API_URL, clerkClient, FRONTEND_API, PUBLISHABLE_KEY, SECRET_KEY } from './clerk';
+import { API_KEY, API_URL, clerkClient, FRONTEND_API, PROXY_URL, PUBLISHABLE_KEY, SECRET_KEY } from './clerk';
 import {
   getCookie,
   nextJsVersionCanOverrideRequestHeaders,
@@ -45,6 +45,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
       forwardedHost: headers.get('x-forwarded-host') || undefined,
       referrer: headers.get('referer') || undefined,
       userAgent: headers.get('user-agent') || undefined,
+      proxyUrl: PROXY_URL,
     });
 
     // Interstitial case

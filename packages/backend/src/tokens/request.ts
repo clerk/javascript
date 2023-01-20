@@ -57,6 +57,8 @@ export type AuthenticateRequestOptions = RequiredVerifyTokenOptions &
     referrer?: string;
     /* Request user-agent value */
     userAgent?: string;
+    /* Proxy url for FAPI requests */
+    proxyUrl?: string;
   };
 
 export async function authenticateRequest(options: AuthenticateRequestOptions): Promise<RequestState> {
@@ -119,6 +121,6 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
 }
 
 export const debugRequestState = (params: RequestState) => {
-  const { frontendApi, isSignedIn, isInterstitial, reason, message, publishableKey } = params;
-  return { frontendApi, isSignedIn, isInterstitial, reason, message, publishableKey };
+  const { frontendApi, isSignedIn, proxyUrl, isInterstitial, reason, message, publishableKey } = params;
+  return { frontendApi, isSignedIn, proxyUrl, isInterstitial, reason, message, publishableKey };
 };

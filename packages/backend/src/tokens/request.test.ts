@@ -103,6 +103,7 @@ export default (QUnit: QUnit) => {
     host: 'example.com',
     userAgent: 'Mozilla/TestAgent',
     skipJwksCache: true,
+    proxyUrl: '',
   };
 
   module('tokens.authenticateRequest(options)', hooks => {

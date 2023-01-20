@@ -10,6 +10,7 @@ export type RootAuthLoaderOptions = {
   frontendApi?: string;
   publishableKey?: string;
   jwtKey?: string;
+  proxyUrl?: string;
   /**
    * @deprecated Use `secretKey` instead.
    */
