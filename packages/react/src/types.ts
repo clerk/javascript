@@ -3,6 +3,7 @@ import type {
   ClerkOptions,
   ClientResource,
   LoadedClerk,
+  PublishableKeyOrFrontendApi,
   RedirectOptions,
   SessionResource,
   UserResource,
@@ -19,16 +20,7 @@ export type IsomorphicClerkOptions = ClerkOptions & {
   Clerk?: ClerkProp;
   clerkJSUrl?: string;
   clerkJSVariant?: 'headless' | '';
-} & (
-    | {
-        frontendApi?: never;
-        publishableKey: string;
-      }
-    | {
-        frontendApi: string;
-        publishableKey?: never;
-      }
-  );
+} & PublishableKeyOrFrontendApi;
 
 export interface BrowserClerkConstructor {
   new (frontendApi: string): BrowserClerk;
