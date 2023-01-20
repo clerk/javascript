@@ -1,5 +1,6 @@
 import { __internal__setErrorThrowerOptions, ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import { IsomorphicClerkOptions } from '@clerk/clerk-react/dist/types';
+import { PublishableKeyOrFrontendApi } from '@clerk/types';
 import { useRouter } from 'next/router';
 import React from 'react';
 
@@ -11,7 +12,8 @@ export * from '@clerk/clerk-react';
 
 type NextClerkProviderProps = {
   children: React.ReactNode;
-} & IsomorphicClerkOptions;
+} & Omit<IsomorphicClerkOptions, keyof PublishableKeyOrFrontendApi> &
+  Partial<PublishableKeyOrFrontendApi>;
 
 export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JSX.Element {
   // @ts-expect-error
