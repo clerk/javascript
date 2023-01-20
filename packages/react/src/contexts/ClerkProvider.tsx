@@ -26,7 +26,7 @@ function ClerkProviderBase(props: ClerkProviderProps): JSX.Element {
       errorThrower.throwMissingFrontendApiOrPublishableKeyError();
     } else if (publishableKey && !isPublishableKey(publishableKey)) {
       errorThrower.throwInvalidPublishableKeyError({ key: publishableKey });
-    } else if (frontendApi && !isLegacyFrontendApiKey(frontendApi)) {
+    } else if (!publishableKey && frontendApi && !isLegacyFrontendApiKey(frontendApi)) {
       errorThrower.throwInvalidFrontendApiError({ key: frontendApi });
     }
   }
