@@ -20,7 +20,7 @@ export const createClerkExpressWithAuth = (createOpts: CreateClerkExpressMiddlew
         options,
       );
       decorateResponseWithObservabilityHeaders(res, requestState);
-      if (requestState.isInterstitial) {
+      if (requestState.isInterstitial || requestState.isUnknown) {
         const interstitial = await clerkClient.remotePrivateInterstitial();
         return handleInterstitialCase(res, requestState, interstitial);
       }

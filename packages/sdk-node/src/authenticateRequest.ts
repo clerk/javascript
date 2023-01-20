@@ -38,7 +38,7 @@ export const authenticateRequest = (
 };
 
 export const handleInterstitialCase = (res: ExpressResponse, requestState: RequestState, interstitial: string) => {
-  if (requestState.isInterstitial) {
+  if (requestState.isInterstitial || requestState.isUnknown) {
     res.writeHead(401, { 'Content-Type': 'text/html' });
     res.end(interstitial);
   }

@@ -50,7 +50,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
     // Interstitial case
     // Note: there is currently no way to rewrite to a protected endpoint
     // Therefore we have to resort to a public interstitial endpoint
-    if (requestState.isInterstitial || !requestState) {
+    if (requestState.isInterstitial || requestState.isUnknown) {
       const response = NextResponse.rewrite(
         clerkClient.remotePublicInterstitialUrl({
           apiUrl: API_URL,
