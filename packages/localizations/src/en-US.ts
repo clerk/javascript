@@ -332,7 +332,7 @@ export const enUS: DeepRequired<LocalizationResource> = {
       emailCode: {
         formHint: 'An email containing a verification code will be sent to this email address.',
         formTitle: 'Verification code',
-        formSubtitle: 'Enter the verification code send to {{identifier}}',
+        formSubtitle: 'Enter the verification code sent to {{identifier}}',
         resendButton: 'Resend code',
         successMessage: 'The email {{identifier}} has been added to your account.',
       },
