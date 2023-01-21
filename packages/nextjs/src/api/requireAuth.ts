@@ -9,10 +9,6 @@ type NextApiHandlerRequireAuth<T = any> = (
   res: NextApiResponse<T>,
 ) => void | Promise<void>;
 
-/**
- * @deprecated The /api path is deprecated and will be removed in the next major release.
- * Use the exports from /server instead
- */
 export function requireAuth(handler: NextApiHandlerRequireAuth, options?: ClerkMiddlewareOptions): NextApiHandler {
   return async (req, res) => {
     try {
