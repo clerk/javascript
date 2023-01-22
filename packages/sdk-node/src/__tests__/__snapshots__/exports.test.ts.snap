@@ -48,6 +48,7 @@ Array [
   "organizations",
   "phoneNumbers",
   "prunePrivateMetadata",
+  "requireAuth",
   "sanitizeAuthObject",
   "sessions",
   "setClerkApiKey",
@@ -60,5 +61,6 @@ Array [
   "users",
   "verifyJwt",
   "verifyToken",
+  "withAuth",
 ]
 `;
