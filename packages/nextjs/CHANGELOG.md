@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.7.6](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.7.5...@clerk/nextjs@4.7.6) (2023-01-22)
+
+### Bug Fixes
+
+- **nextjs:** Use correct middleware helper in withAuth ([8c24e1a](https://github.com/clerkinc/javascript/commit/8c24e1ac2c4e5bacdbad7f5e4c610ec0ca42ff46))
+
 ### [4.7.5](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.7.4...@clerk/nextjs@4.7.5) (2023-01-20)
 
 ### Bug Fixes

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.6.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@4.6.2...@clerk/clerk-sdk-node@4.6.3) (2023-01-22)
+
+### Bug Fixes
+
+- **clerk-sdk-node:** Introduce withAuth and requireAuth in clerk-sdk-node ([eb39837](https://github.com/clerkinc/javascript/commit/eb3983717fa10be271bcec27259de262b2382790))
+
 ### [4.6.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@4.6.1...@clerk/clerk-sdk-node@4.6.2) (2023-01-20)
 
 **Note:** Version bump only for package @clerk/clerk-sdk-node
