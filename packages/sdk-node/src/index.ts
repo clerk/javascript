@@ -70,3 +70,6 @@ export type { LooseAuthProp, StrictAuthProp, WithAuthProp, RequireAuthProp, Cler
 
 export { createClerkExpressRequireAuth };
 export { createClerkExpressWithAuth };
+
+export { withAuth } from './withAuth';
+export { requireAuth } from './requireAuth';

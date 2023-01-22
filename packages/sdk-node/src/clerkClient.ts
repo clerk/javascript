@@ -1,4 +1,10 @@
-import { Clerk as _Clerk, ClerkOptions, decodeJwt, verifyToken } from '@clerk/backend';
+import {
+  Clerk as _Clerk,
+  ClerkOptions,
+  decodeJwt,
+  verifyToken as _verifyToken,
+  VerifyTokenOptions,
+} from '@clerk/backend';
 
 import { createClerkExpressRequireAuth } from './clerkExpressRequireAuth';
 import { createClerkExpressWithAuth } from './clerkExpressWithAuth';
@@ -17,13 +23,24 @@ export function Clerk(options: ClerkOptions) {
   const clerkClient = _Clerk(options);
   const expressWithAuth = createClerkExpressWithAuth({ ...options, clerkClient });
   const expressRequireAuth = createClerkExpressRequireAuth({ ...options, clerkClient });
-  return { ...clerkClient, expressWithAuth, expressRequireAuth, ...createBasePropForRedwoodCompatibility() };
+  const verifyToken = (token: string, verifyOpts?: VerifyTokenOptions) => {
+    const issuer = (iss: string) => iss.startsWith('https://clerk.') || iss.includes('.clerk.accounts');
+    return _verifyToken(token, { issuer, ...options, ...verifyOpts });
+  };
+
+  return {
+    ...clerkClient,
+    expressWithAuth,
+    expressRequireAuth,
+    verifyToken,
+    ...createBasePropForRedwoodCompatibility(),
+  };
 }
 
 const createBasePropForRedwoodCompatibility = () => {
   const verifySessionToken = (token: string) => {
     const { payload } = decodeJwt(token);
-    return verifyToken(token, {
+    return _verifyToken(token, {
       issuer: payload.iss,
       jwtKey: process.env.CLERK_JWT_KEY,
     });
@@ -43,8 +60,19 @@ export const clerkClient = Clerk({
 /**
  * Stand-alone express middlewares bound to the pre-initialised clerkClient
  */
-export const ClerkExpressRequireAuth = createClerkExpressRequireAuth({ clerkClient, apiUrl: API_URL, apiKey: API_KEY });
-export const ClerkExpressWithAuth = createClerkExpressWithAuth({ clerkClient, apiUrl: API_URL, apiKey: API_KEY });
+export const ClerkExpressRequireAuth = createClerkExpressRequireAuth({
+  clerkClient,
+  apiUrl: API_URL,
+  apiKey: API_KEY,
+  secretKey: API_KEY,
+});
+
+export const ClerkExpressWithAuth = createClerkExpressWithAuth({
+  clerkClient,
+  apiUrl: API_URL,
+  apiKey: API_KEY,
+  secretKey: API_KEY,
+});
 
 /**
  * Stand-alone setters bound to the pre-initialised clerkClient
