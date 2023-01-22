@@ -73,6 +73,6 @@
   },
   "homepage": "https://clerk.dev/",
   "engines": {
-    "node": ">=16"
+    "node": ">=14"
   }
 }
