@@ -15,12 +15,13 @@ export const loader: LoaderFunction = async args => {
   // const { data: count } = await clerkClient.users.getCount();
 
   // console.log('AuthState from loader:', userId);
-  return json({ authObject });
+  return json(authObject);
 };
 
 export default function Index() {
   const { user, isLoaded } = useUser();
-  const { userId, count, authObject } = useLoaderData();
+  const authObject = useLoaderData();
+  const { userId, count } = authObject;
 
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif', lineHeight: '1.4' }}>
