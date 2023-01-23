@@ -46,7 +46,7 @@ export const OrganizationProfile = withRedirectToHome(
   withOrganizationsEnabledGuard(withCardStateProvider(_OrganizationProfile), 'OrganizationProfile', {
     mode: 'redirect',
   }),
-  'noOrganization',
+  'organizationProfile',
 );
 
 export const OrganizationProfileModal = (props: OrganizationProfileProps): JSX.Element => {

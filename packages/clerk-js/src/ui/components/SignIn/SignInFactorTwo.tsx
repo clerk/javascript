@@ -81,4 +81,4 @@ export function _SignInFactorTwo(): JSX.Element {
   }
 }
 
-export const SignInFactorTwo = withRedirectToHome(withCardStateProvider(_SignInFactorTwo), 'singleSession');
+export const SignInFactorTwo = withRedirectToHome(withCardStateProvider(_SignInFactorTwo), 'signIn');

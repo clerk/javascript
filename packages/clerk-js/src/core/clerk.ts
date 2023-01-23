@@ -42,6 +42,10 @@ import type { ComponentControls, MountComponentRenderer } from '../ui';
 import {
   appendAsQueryParams,
   buildURL,
+  canShowOrganizationProfile,
+  canShowSignIn,
+  canShowSignUp,
+  canShowUserProfile,
   createBeforeUnloadTracker,
   createPageLifecycle,
   errorThrower,
@@ -211,6 +215,9 @@ export default class Clerk implements ClerkInterface {
 
   public openSignIn = (props?: SignInProps): void => {
     this.assertComponentsReady(this.#componentControls);
+    if (!canShowSignIn(this, this.#environment) && this.#instanceType === 'development') {
+      return console.warn('Cannot open SignIn because a session exists and single session mode is enabled.');
+    }
     this.#componentControls?.openModal('signIn', props || {});
   };
 
@@ -221,6 +228,9 @@ export default class Clerk implements ClerkInterface {
 
   public openSignUp = (props?: SignInProps): void => {
     this.assertComponentsReady(this.#componentControls);
+    if (!canShowSignUp(this, this.#environment) && this.#instanceType === 'development') {
+      return console.warn('Cannot open SignUp because a session exists and single session mode is enabled.');
+    }
     this.#componentControls?.openModal('signUp', props || {});
   };
 
@@ -231,6 +241,9 @@ export default class Clerk implements ClerkInterface {
 
   public openUserProfile = (props?: UserProfileProps): void => {
     this.assertComponentsReady(this.#componentControls);
+    if (!canShowUserProfile(this) && this.#instanceType === 'development') {
+      return console.warn('Cannot open UserProfile because no session is present.');
+    }
     this.#componentControls?.openModal('userProfile', props || {});
   };
 
@@ -241,6 +254,9 @@ export default class Clerk implements ClerkInterface {
 
   public openOrganizationProfile = (props?: OrganizationProfileProps): void => {
     this.assertComponentsReady(this.#componentControls);
+    if (!canShowOrganizationProfile(this) && this.#instanceType === 'development') {
+      return console.warn('Cannot open OrganizationProfile because there is no active organization.');
+    }
     this.#componentControls?.openModal('organizationProfile', props || {});
   };
 

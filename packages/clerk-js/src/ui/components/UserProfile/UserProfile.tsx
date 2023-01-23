@@ -40,7 +40,7 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
   );
 });
 
-export const UserProfile = withRedirectToHome(withCardStateProvider(_UserProfile), 'noUser');
+export const UserProfile = withRedirectToHome(withCardStateProvider(_UserProfile), 'userProfile');
 
 export const UserProfileModal = (props: UserProfileProps): JSX.Element => {
   const userProfileProps: UserProfileCtx = {

@@ -1,50 +1,60 @@
 import type { SignInProps, SignUpProps } from '@clerk/types';
-import React, { useContext } from 'react';
+import React from 'react';
 
-import { CoreOrganizationContext, CoreUserContext, useEnvironment } from '../contexts';
-import { CoreSessionContext } from '../contexts/CoreSessionContext';
+import { canShowOrganizationProfile, canShowSignIn, canShowSignUp, canShowUserProfile } from '../../utils';
+import { useCoreClerk, useEnvironment } from '../contexts';
 import { useNavigate } from '../hooks';
 
 export function withRedirectToHome<P extends SignInProps | SignUpProps | { continueExisting?: boolean }>(
   Component: React.ComponentType<P>,
-  when: 'singleSession' | 'noUser' | 'noOrganization',
+  when: 'signIn' | 'signUp' | 'userProfile' | 'organizationProfile',
 ): (props: P) => null | JSX.Element {
   const displayName = Component.displayName || Component.name || 'Component';
   Component.displayName = displayName;
 
   const HOC = (props: P) => {
     const { navigate } = useNavigate();
-    const { authConfig, displayConfig } = useEnvironment();
-    const { singleSessionMode } = authConfig;
-    const userCtx = useContext(CoreUserContext);
-    const organizationCtx = useContext(CoreOrganizationContext);
-    const sessionCtx = useContext(CoreSessionContext);
-    const session = sessionCtx?.value;
-    const user = userCtx?.value;
-    const organization = organizationCtx?.value;
+    const clerk = useCoreClerk();
+    const environment = useEnvironment();
 
     let shouldRedirect = false;
+    let warning = '';
     switch (when) {
-      case 'singleSession':
-        if (singleSessionMode && !!session) {
+      case 'signIn':
+        if (!canShowSignIn(clerk, environment)) {
           shouldRedirect = true;
+          warning =
+            'Cannot render SignIn because a session exists and single session mode is enabled. Redirecting to the home url...';
         }
         break;
-      case 'noUser':
-        if (!user) {
+      case 'signUp':
+        if (!canShowSignUp(clerk, environment)) {
           shouldRedirect = true;
+          warning =
+            'Cannot render SignUp because a session exists and single session mode is enabled. Redirecting to the home url...';
         }
         break;
-      case 'noOrganization':
-        if (!organization?.organization) {
+      case 'userProfile':
+        if (!canShowUserProfile(clerk)) {
           shouldRedirect = true;
+          warning = 'Cannot render UserProfile because no user exists. Redirecting to the home url...';
+        }
+        break;
+      case 'organizationProfile':
+        if (!canShowOrganizationProfile(clerk)) {
+          shouldRedirect = true;
+          warning =
+            'Cannot render OrganizationProfile because no active organization exists. Redirecting to the home url...';
         }
         break;
     }
 
     React.useEffect(() => {
       if (shouldRedirect) {
-        navigate(displayConfig.homeUrl);
+        if (warning) {
+          console.warn(warning);
+        }
+        navigate(environment.displayConfig.homeUrl);
       }
     }, []);
 
@@ -52,7 +62,6 @@ export function withRedirectToHome<P extends SignInProps | SignUpProps | { conti
       return null;
     }
 
-    // @ts-ignore
     return <Component {...props} />;
   };
 
