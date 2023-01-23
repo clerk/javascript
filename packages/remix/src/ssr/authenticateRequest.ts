@@ -1,4 +1,4 @@
-import { type RequestState, Clerk } from '@clerk/backend';
+import { type RequestState, Clerk, debugRequestState } from '@clerk/backend';
 
 import { noSecretKeyOrApiKeyError } from '../errors';
 import { getEnvVariable } from '../utils';

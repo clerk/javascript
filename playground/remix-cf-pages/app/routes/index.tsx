@@ -6,6 +6,7 @@ import { ClerkLoaded, SignedIn, UserButton, useUser } from '@clerk/remix';
 
 export const loader: LoaderFunction = async args => {
   const authObject = await getAuth(args);
+  console.log('DEBUG', authObject.debug());
   // const { userId } = authObject;
   // if (!userId) {
   //   return json({ userId: null, count: -1, authObject });
@@ -15,17 +16,20 @@ export const loader: LoaderFunction = async args => {
   // const { data: count } = await clerkClient.users.getCount();
 
   // console.log('AuthState from loader:', userId);
-  return json(authObject);
+  return json({ authObject, debug: authObject.debug() });
 };
 
 export default function Index() {
   const { user, isLoaded } = useUser();
-  const authObject = useLoaderData();
+  const { authObject, debug } = useLoaderData();
   const { userId, count } = authObject;
 
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif', lineHeight: '1.4' }}>
       <h1>Welcome to Remix</h1>
+      <h2>Auth Object</h2>
+      <pre>{JSON.stringify(authObject)}</pre>
+      <h2>Debug</h2>
       <pre>{JSON.stringify(authObject)}</pre>
       <div>
         <ul>
