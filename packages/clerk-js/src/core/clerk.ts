@@ -442,10 +442,7 @@ export default class Clerk implements ClerkInterface {
     const beforeUnloadTracker = createBeforeUnloadTracker();
     if (beforeEmit) {
       beforeUnloadTracker.startTracking();
-      this.session = undefined;
-      this.organization = undefined;
-      this.user = undefined;
-      this.#emit();
+      this.#setIntermediateState();
       await beforeEmit(session);
       beforeUnloadTracker.stopTracking();
     }
@@ -456,13 +453,8 @@ export default class Clerk implements ClerkInterface {
     }
 
     this.session = session;
-    this.organization =
-      organization === null
-        ? null
-        : (this.session?.user.organizationMemberships || [])
-            .map(om => om.organization)
-            .find(org => org.id === this.session?.lastActiveOrganizationId);
-    this.user = this.session ? this.session.user : null;
+    this.organization = organization === null ? null : this.#getLastActiveOrganizationFromSession();
+    this.#aliasUser();
 
     this.#emit();
     this.#resetComponentsState();
@@ -876,22 +868,16 @@ export default class Clerk implements ClerkInterface {
         (this.#options.selectInitialSession
           ? this.#options.selectInitialSession(newClient)
           : this.#defaultSession(newClient)) || null;
-      this.organization =
-        (this.session?.user.organizationMemberships || [])
-          .map(om => om.organization)
-          .find(org => org.id === this.session?.lastActiveOrganizationId) || null;
-      this.user = this.session ? this.session.user : null;
+      this.organization = this.#getLastActiveOrganizationFromSession();
+      this.#aliasUser();
     }
     this.client = newClient;
 
     if (this.session) {
       const lastId = this.session.id;
       this.session = newClient.activeSessions.find(x => x.id === lastId);
-      this.organization =
-        (this.session?.user.organizationMemberships || [])
-          .map(om => om.organization)
-          .find(org => org.id === this.session?.lastActiveOrganizationId) || null;
-      this.user = this.session ? this.session.user : null;
+      this.organization = this.#getLastActiveOrganizationFromSession();
+      this.#aliasUser();
     }
 
     this.#emit();
@@ -1072,6 +1058,24 @@ export default class Clerk implements ClerkInterface {
       this.closeSignUp();
       this.closeSignIn();
     }
+  };
+
+  #setIntermediateState = () => {
+    this.session = undefined;
+    this.organization = undefined;
+    this.user = undefined;
+    this.#emit();
+  };
+
+  #getLastActiveOrganizationFromSession = () => {
+    const orgMemberships = this.session?.user.organizationMemberships || [];
+    return (
+      orgMemberships.map(om => om.organization).find(org => org.id === this.session?.lastActiveOrganizationId) || null
+    );
+  };
+
+  #aliasUser = () => {
+    this.user = this.session ? this.session.user : null;
   };
 
   assertComponentsReady(components: ComponentControls | null | undefined): asserts components is ComponentControls {
