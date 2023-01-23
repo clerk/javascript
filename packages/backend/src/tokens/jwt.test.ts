@@ -5,7 +5,7 @@ import { mockJwks, mockJwt, mockJwtHeader, mockJwtPayload } from './fixtures';
 import { decodeJwt, verifyJwt } from './jwt';
 
 export default (QUnit: QUnit) => {
-  const { module, test, todo } = QUnit;
+  const { module, test } = QUnit;
 
   module('decodeJwt(jwt)', () => {
     test('decodes a valid JWT', assert => {
@@ -91,8 +91,8 @@ export default (QUnit: QUnit) => {
       assert.propEqual(payload, mockJwtPayload);
     });
 
-    todo('returns the reason of the failure when verifications fail', assert => {
-      assert.true(true);
-    });
+    // todo('returns the reason of the failure when verifications fail', assert => {
+    //   assert.true(true);
+    // });
   });
 };
