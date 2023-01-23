@@ -38,8 +38,8 @@ export default function Index() {
           </li>
           <li>
             ClerkJS server state:
+            <div>Server user id: {userId}</div>
             <SignedIn>
-              <div>Server user id: {userId}</div>
               <UserButton />
             </SignedIn>
           </li>
