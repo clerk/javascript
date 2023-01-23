@@ -10,7 +10,7 @@ import type {
 import { OrganizationProfileProps } from '@clerk/types';
 import { UserProfileProps } from '@clerk/types/src';
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 import { PRESERVED_QUERYSTRING_PARAMS } from '../core/constants';
 import { clerkUIErrorDOMElementNotFound } from '../core/errors';
@@ -121,13 +121,12 @@ export const mountComponentRenderer = (
     document.body.appendChild(clerkRoot);
   }
 
-  ReactDOM.render<ComponentsProps>(
+  createRoot(clerkRoot).render(
     <Components
       clerk={clerk}
       environment={environment}
       options={options}
     />,
-    clerkRoot,
   );
 
   return componentsControls;
