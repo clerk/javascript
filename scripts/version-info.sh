@@ -10,7 +10,6 @@ cd $SCRIPT_DIR/..
 # Run required version scripts (TODO: centralize)
 node ./packages/react/scripts/info.js && git add ./packages/react/src/info.ts
 node ./packages/sdk-node/scripts/info.js && git add ./packages/sdk-node/src/info.ts
-node ./packages/edge/scripts/info.cjs && git add ./packages/edge/src/info.ts
 
 # Update central package-lock with new dependency versions
 npm install --package-lock-only && git add ./package-lock.json
