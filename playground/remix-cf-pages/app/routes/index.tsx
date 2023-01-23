@@ -36,6 +36,7 @@ export default function Index() {
               <div>Client user id: {isLoaded ? user?.id : 'n/a'}</div>
             </ClerkLoaded>
           </li>
+          MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA5h4wScqCNJZlgm7ppX6lYr61ImMA8IL1wS2LuwXPxtSdQ+zauaOOkSVOyjef1RH1mHcjnOrYGg8NiRMziiH1NUSQhC2kKlnW69Q1wKG+mbcPpUfEaTRLidsGVUaunRPm2GbdRtQAL9ONgad8ze4NEt3E5Lf5Y+5klfl0D2LBgAWpfYcEcMri1+zp417q1Uz2DnnnZ6cxSGxMdD+avB5kETDLRWPcpaWqb83kLDD6kZGxM6Yawk0PMy/0worhc5VLlv1omgsTlFHN+oasV2EvMPPNkyDsTqc2siSVXT4sjmZimQ4kaaXqwfkZreH2woikxwE6YlSzC+kH2DRkXlttpQIDAQAB
           <li>
             ClerkJS server state:
             <div>Server user id: {userId}</div>
