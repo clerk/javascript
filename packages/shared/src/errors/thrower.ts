@@ -1,7 +1,7 @@
 const DefaultMessages = Object.freeze({
   InvalidFrontendApiErrorMessage: `The frontendApi passed to Clerk is invalid. You can get your Frontend API key at https://dashboard.clerk.dev/last-active?path=api-keys. (key={{key}})`,
   InvalidPublishableKeyErrorMessage: `The publishableKey passed to Clerk is invalid. You can get your Publishable key at https://dashboard.clerk.dev/last-active?path=api-keys. (key={{key}})`,
-  MissingFrontendApiPublishableKeyErrorMessage: `Missing frontendApi or publishableKey. You can get your key at https://dashboard.clerk.dev/last-active?path=api-keys.`,
+  MissingPublishableKeyErrorMessage: `Missing publishableKey. You can get your key at https://dashboard.clerk.dev/last-active?path=api-keys.`,
 });
 
 type MessageKeys = keyof typeof DefaultMessages;
@@ -20,7 +20,7 @@ export interface ErrorThrower {
   setMessages(options: ErrorThrowerOptions): ErrorThrower;
   throwInvalidPublishableKeyError(params: { key?: string }): never;
   throwInvalidFrontendApiError(params: { key?: string }): never;
-  throwMissingFrontendApiOrPublishableKeyError(): never;
+  throwMissingPublishableKeyError(): never;
 }
 
 export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerOptions): ErrorThrower {
@@ -68,8 +68,8 @@ export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerO
       throw new Error(buildMessage(messages.InvalidFrontendApiErrorMessage, params));
     },
 
-    throwMissingFrontendApiOrPublishableKeyError(): never {
-      throw new Error(buildMessage(messages.MissingFrontendApiPublishableKeyErrorMessage));
+    throwMissingPublishableKeyError(): never {
+      throw new Error(buildMessage(messages.MissingPublishableKeyErrorMessage));
     },
   };
 }
