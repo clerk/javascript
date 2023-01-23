@@ -114,8 +114,8 @@ export type LoadClerkJWKFromRemoteOptions = {
 export async function loadClerkJWKFromRemote({
   apiKey,
   secretKey,
-  apiUrl,
-  apiVersion,
+  apiUrl = API_URL,
+  apiVersion = API_VERSION,
   issuer,
   kid,
   jwksCacheTtlInMs = 1000 * 60 * 60, // 1 hour,
@@ -124,9 +124,9 @@ export async function loadClerkJWKFromRemote({
   const shouldRefreshCache = !getFromCache(kid) && reachedMaxCacheUpdatedAt();
   if (skipJwksCache || shouldRefreshCache) {
     let fetcher;
-    const key = secretKey || apiKey || '';
+    const key = secretKey || apiKey;
 
-    if (apiUrl) {
+    if (key) {
       fetcher = () => fetchJWKSFromBAPI(apiUrl, key, apiVersion);
     } else if (issuer) {
       fetcher = () => fetchJWKSFromFAPI(issuer);
@@ -181,7 +181,7 @@ async function fetchJWKSFromFAPI(issuer: string) {
   return response.json();
 }
 
-async function fetchJWKSFromBAPI(apiUrl: string = API_URL, key: string, apiVersion: string = API_VERSION) {
+async function fetchJWKSFromBAPI(apiUrl: string, key: string, apiVersion: string) {
   if (!key) {
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.SetClerkSecretKeyOrAPIKey,

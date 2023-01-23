@@ -4,7 +4,7 @@ import sinon from 'sinon';
 import runtime from '../runtime';
 import { jsonError, jsonOk } from '../util/mockFetch';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from './errors';
-import { mockJwks, mockJwtPayload, mockRsaJwk, mockRsaJwkKid, mockPEMKey, mockPEMJwtKey, mockPEMJwk } from './fixtures';
+import { mockJwks, mockJwtPayload, mockPEMJwk, mockPEMJwtKey, mockPEMKey, mockRsaJwk, mockRsaJwkKid } from './fixtures';
 import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from './keys';
 
 export default (QUnit: QUnit) => {
@@ -46,19 +46,78 @@ export default (QUnit: QUnit) => {
       sinon.restore();
     });
 
-    test('loads JWKS from Backend API when apiUrl and apiKey are provided', async assert => {
+    test('loads JWKS from Backend API when apiKey is provided', async assert => {
+      fakeFetch.onCall(0).returns(jsonOk(mockJwks));
       const jwk = await loadClerkJWKFromRemote({
-        apiUrl: 'https://api.clerk.test',
         apiKey: 'deadbeef',
         kid: mockRsaJwkKid,
+        skipJwksCache: true,
+      });
+
+      fakeFetch.calledOnceWith('https://api.clerk.dev/v1/jwks', {
+        method: 'GET',
+        headers: {
+          Authorization: 'Bearer deadbeef',
+          'Content-Type': 'application/json',
+          'Clerk-Backend-SDK': '@clerk/backend',
+        },
+      });
+      assert.propEqual(jwk, mockRsaJwk);
+    });
+
+    test('loads JWKS from Backend API when secretKey is provided', async assert => {
+      fakeFetch.onCall(0).returns(jsonOk(mockJwks));
+      const jwk = await loadClerkJWKFromRemote({
+        secretKey: 'sk_test_deadbeef',
+        kid: mockRsaJwkKid,
+        skipJwksCache: true,
+      });
+
+      fakeFetch.calledOnceWith('https://api.clerk.dev/v1/jwks', {
+        method: 'GET',
+        headers: {
+          Authorization: 'Bearer deadbeef',
+          'Content-Type': 'application/json',
+          'Clerk-Backend-SDK': '@clerk/backend',
+        },
       });
       assert.propEqual(jwk, mockRsaJwk);
     });
 
     test('loads JWKS from Frontend API when issuer is provided', async assert => {
+      fakeFetch.onCall(0).returns(jsonOk(mockJwks));
       const jwk = await loadClerkJWKFromRemote({
-        issuer: 'https://accounts.inspired.puma-74.lcl.dev',
+        issuer: 'https://clerk.inspired.puma-74.lcl.dev',
         kid: mockRsaJwkKid,
+        skipJwksCache: true,
+      });
+
+      fakeFetch.calledOnceWith('https://clerk.inspired.puma-74.lcl.dev/.well-known/jwks.json', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Clerk-Backend-SDK': '@clerk/backend',
+        },
+      });
+      assert.propEqual(jwk, mockRsaJwk);
+    });
+
+    test('loads JWKS from Backend API using the provided apiUrl', async assert => {
+      fakeFetch.onCall(0).returns(jsonOk(mockJwks));
+      const jwk = await loadClerkJWKFromRemote({
+        secretKey: 'sk_test_deadbeef',
+        apiUrl: 'https://api.clerk.test',
+        kid: mockRsaJwkKid,
+        skipJwksCache: true,
+      });
+
+      fakeFetch.calledOnceWith('https://api.clerk.test/v1/jwks', {
+        method: 'GET',
+        headers: {
+          Authorization: 'Bearer sk_test_deadbeef',
+          'Content-Type': 'application/json',
+          'Clerk-Backend-SDK': '@clerk/backend',
+        },
       });
       assert.propEqual(jwk, mockRsaJwk);
     });
@@ -66,14 +125,12 @@ export default (QUnit: QUnit) => {
     test('caches JWK by kid', async assert => {
       fakeFetch.onCall(0).returns(jsonOk(mockJwks));
       let jwk = await loadClerkJWKFromRemote({
-        apiUrl: 'https://api.clerk.test',
         apiKey: 'deadbeef',
         kid: mockRsaJwkKid,
         skipJwksCache: true,
       });
       assert.propEqual(jwk, mockRsaJwk);
       jwk = await loadClerkJWKFromRemote({
-        apiUrl: 'https://api.clerk.test',
         apiKey: 'deadbeef',
         kid: mockRsaJwkKid,
       });
@@ -92,7 +149,6 @@ export default (QUnit: QUnit) => {
 
       try {
         await loadClerkJWKFromRemote({
-          apiUrl: 'https://api.clerk.test',
           apiKey: 'deadbeef',
           kid: 'ins_whatever',
           skipJwksCache: true,
@@ -113,12 +169,10 @@ export default (QUnit: QUnit) => {
     });
 
     test('throws an error when JWKS can not be fetched from Backend or Frontend API', async assert => {
-      // advance clock for 5 minutes and 1 second
-      fakeClock.tick(5 * 60 * 1000 + 1);
       try {
         await loadClerkJWKFromRemote({
-          apiKey: 'deadbeef',
           kid: 'ins_whatever',
+          skipJwksCache: true,
         });
         assert.false(true);
       } catch (err) {
@@ -159,7 +213,6 @@ export default (QUnit: QUnit) => {
 
       try {
         await loadClerkJWKFromRemote({
-          apiUrl: 'https://api.clerk.test',
           apiKey: 'deadbeef',
           kid: 'ins_whatever',
         });

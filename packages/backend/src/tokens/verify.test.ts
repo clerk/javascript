@@ -38,12 +38,47 @@ export default (QUnit: QUnit) => {
       assert.ok(fakeFetch.calledOnce);
     });
 
+    test('verifies the token by fetching the JWKs from Backend API when secretKey is provided ', async assert => {
+      const payload = await verifyToken(mockJwt, {
+        secretKey: 'a-valid-key',
+        authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+        issuer: 'https://clerk.inspired.puma-74.lcl.dev',
+        skipJwksCache: true,
+      });
+
+      fakeFetch.calledOnceWith('https://clerk.inspired.puma-74.lcl.dev/v1/jwks', {
+        method: 'GET',
+        headers: {
+          Authorization: 'Bearer a-valid-key',
+          'Content-Type': 'application/json',
+          'Clerk-Backend-SDK': '@clerk/backend',
+        },
+      });
+      assert.propEqual(payload, mockJwtPayload);
+    });
+
+    test('verifies the token by fetching the JWKs from Frontend API when issuer (string) is provided ', async assert => {
+      const payload = await verifyToken(mockJwt, {
+        authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+        issuer: 'https://clerk.inspired.puma-74.lcl.dev',
+        skipJwksCache: true,
+      });
+
+      fakeFetch.calledOnceWith('https://clerk.inspired.puma-74.lcl.dev/.well-known/jwks.json', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Clerk-Backend-SDK': '@clerk/backend',
+        },
+      });
+      assert.propEqual(payload, mockJwtPayload);
+    });
+
     test('throws an error when the verification fails', async assert => {
       try {
         await verifyToken(mockJwt, {
-          apiUrl: 'https://api.clerk.test',
           apiKey: 'a-valid-key',
-          issuer: 'whatever',
+          issuer: 'https://clerk.whatever.lcl.dev',
           skipJwksCache: true,
         });
         // This should never be reached. If it does, the suite should fail
@@ -52,7 +87,7 @@ export default (QUnit: QUnit) => {
         if (err instanceof Error) {
           assert.equal(
             err.message,
-            'Invalid JWT issuer claim (iss) "https://clerk.inspired.puma-74.lcl.dev". Expected "whatever".',
+            'Invalid JWT issuer claim (iss) "https://clerk.inspired.puma-74.lcl.dev". Expected "https://clerk.whatever.lcl.dev".',
           );
         } else {
           // This should never be reached. If it does, the suite should fail
