@@ -40,7 +40,7 @@ function getScriptSrc({ publishableKey, frontendApi, scriptUrl, scriptVariant = 
 
   const scriptHost = publishableKey ? parsePublishableKey(publishableKey)?.frontendApi : frontendApi;
   if (!scriptHost) {
-    errorThrower.throwMissingFrontendApiOrPublishableKeyError();
+    errorThrower.throwMissingPublishableKeyError();
   }
 
   const variant = scriptVariant ? `${scriptVariant.replace(/\.+$/, '')}.` : '';
@@ -80,7 +80,7 @@ export async function loadScript(params: LoadScriptParams): Promise<HTMLScriptEl
     const script = document.createElement('script');
 
     if (!publishableKey && !frontendApi) {
-      errorThrower.throwMissingFrontendApiOrPublishableKeyError();
+      errorThrower.throwMissingPublishableKeyError();
     }
 
     if (publishableKey) {

@@ -10,8 +10,8 @@ describe.concurrent('ErrorThrower', () => {
   });
 
   it('throws the correct error message and interpolates pkg if no parameters are provided', () => {
-    expect(() => errorThrower.throwMissingFrontendApiOrPublishableKeyError()).toThrow(
-      '@clerk/test-package: Missing frontendApi or publishableKey. You can get your key at https://dashboard.clerk.dev/last-active?path=api-keys.',
+    expect(() => errorThrower.throwMissingPublishableKeyError()).toThrow(
+      '@clerk/test-package: Missing publishableKey. You can get your key at https://dashboard.clerk.dev/last-active?path=api-keys.',
     );
   });
 
