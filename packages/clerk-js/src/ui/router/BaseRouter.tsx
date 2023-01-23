@@ -89,9 +89,7 @@ export const BaseRouter = ({
       if (onExternalNavigate) {
         onExternalNavigate();
       }
-      const res = await externalNavigate(toURL.href);
-      refresh();
-      return res;
+      return await externalNavigate(toURL.href);
     }
 
     // For internal navigation, preserve any query params
