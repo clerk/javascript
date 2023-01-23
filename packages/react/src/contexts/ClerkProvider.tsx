@@ -23,7 +23,7 @@ function ClerkProviderBase(props: ClerkProviderProps): JSX.Element {
 
   if (!userInitialisedClerk) {
     if (!publishableKey && !frontendApi) {
-      errorThrower.throwMissingFrontendApiOrPublishableKeyError();
+      errorThrower.throwMissingPublishableKeyError();
     } else if (publishableKey && !isPublishableKey(publishableKey)) {
       errorThrower.throwInvalidPublishableKeyError({ key: publishableKey });
     } else if (!publishableKey && frontendApi && !isLegacyFrontendApiKey(frontendApi)) {
