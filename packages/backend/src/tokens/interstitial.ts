@@ -11,13 +11,14 @@ import { TokenVerificationError, TokenVerificationErrorAction, TokenVerification
 export type LoadInterstitialOptions = {
   apiUrl: string;
   frontendApi: string;
+  proxyUrl?: string;
   publishableKey: string;
   pkgVersion?: string;
   debugData?: any;
 };
 
 export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions, 'apiUrl'>) {
-  const { debugData, frontendApi, pkgVersion, publishableKey } = options;
+  const { debugData, frontendApi, pkgVersion, publishableKey, proxyUrl } = options;
   return `
     <head>
         <meta charset="UTF-8" />
@@ -26,6 +27,7 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
         <script>
             window.__clerk_frontend_api = '${frontendApi}';
             window.__clerk_debug = ${JSON.stringify(debugData || {})};
+            window.__clerk_proxy_url = '${proxyUrl}';
             window.startClerk = async () => {
                 function formRedirect(){
                     const form = '<form method="get" action="" name="redirect"></form>';

@@ -95,14 +95,14 @@ export const hasClientUatButCookieIsMissingInProd: InterstitialRule = async opti
 };
 
 export const hasValidHeaderToken: InterstitialRule = async options => {
-  const { headerToken } = options as any;
-  const sessionClaims = await verifyRequestState(options, headerToken);
+  const { headerToken, proxyUrl } = options as any;
+  const sessionClaims = await verifyRequestState(options, headerToken, proxyUrl);
   return await signedIn(options, sessionClaims);
 };
 
 export const hasValidCookieToken: InterstitialRule = async options => {
-  const { cookieToken, clientUat } = options as any;
-  const sessionClaims = await verifyRequestState(options, cookieToken);
+  const { cookieToken, clientUat, proxyUrl } = options as any;
+  const sessionClaims = await verifyRequestState(options, cookieToken, proxyUrl);
   const state = await signedIn(options, sessionClaims);
 
   const jwt = state.toAuth().sessionClaims;
@@ -126,11 +126,11 @@ export async function runInterstitialRules<T>(opts: T, rules: InterstitialRule[]
   return signedOut<T>(opts, AuthErrorReason.UnexpectedError);
 }
 
-async function verifyRequestState(options: any, token: string) {
-  const issuer = (iss: string) => iss.startsWith('https://clerk.') || iss.includes('.clerk.accounts');
+async function verifyRequestState(options: any, token: string, issuer = '') {
+  const defaultIssuer = (iss: string) => iss.startsWith('https://clerk.') || iss.includes('.clerk.accounts');
 
   return verifyToken(token, {
     ...options,
-    issuer,
+    issuer: issuer || defaultIssuer,
   });
 }

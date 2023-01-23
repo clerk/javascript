@@ -1,6 +1,6 @@
 import type { GetServerSidePropsContext } from 'next';
 
-import { API_KEY, clerkClient, FRONTEND_API, PUBLISHABLE_KEY, SECRET_KEY } from '../../server';
+import { API_KEY, clerkClient, FRONTEND_API, PROXY_URL, PUBLISHABLE_KEY, SECRET_KEY } from '../../server';
 import type { WithServerSideAuthOptions } from '../types';
 
 /**
@@ -27,5 +27,6 @@ export async function authenticateRequest(ctx: GetServerSidePropsContext, opts: 
     forwardedHost: headers['x-forwarded-host'] as string,
     referrer: headers.referer,
     userAgent: headers['user-agent'] as string,
+    proxyUrl: PROXY_URL,
   });
 }

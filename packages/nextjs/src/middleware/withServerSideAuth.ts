@@ -6,6 +6,7 @@ import {
   clerkClient,
   FRONTEND_API,
   makeAuthObjectSerializable,
+  PROXY_URL,
   PUBLISHABLE_KEY,
   sanitizeAuthObject,
 } from '../server/clerk';
@@ -44,6 +45,7 @@ export const withServerSideAuth: WithServerSideAuth = (cbOrOptions: any, options
         apiUrl: API_URL,
         publishableKey: PUBLISHABLE_KEY,
         frontendApi: FRONTEND_API,
+        proxyUrl: PROXY_URL,
       });
       ctx.res.end(interstitial);
       return EMPTY_GSSP_RESPONSE;

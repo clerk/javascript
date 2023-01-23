@@ -54,6 +54,7 @@ export const interstitialJsonResponse = (requestState: RequestState, opts: { loa
       __clerk_ssr_interstitial_html: loadInterstitialFromLocal({
         debugData: debugRequestState(requestState),
         frontendApi: requestState.frontendApi,
+        proxyUrl: requestState.proxyUrl || '',
         publishableKey: requestState.publishableKey,
         pkgVersion: LIB_VERSION,
       }),
