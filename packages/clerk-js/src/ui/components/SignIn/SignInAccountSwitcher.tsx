@@ -77,4 +77,4 @@ const _SignInAccountSwitcher = () => {
     </Flow.Part>
   );
 };
-export const SignInAccountSwitcher = withRedirectToHome(withCardStateProvider(_SignInAccountSwitcher));
+export const SignInAccountSwitcher = withRedirectToHome(withCardStateProvider(_SignInAccountSwitcher), 'singleSession');

@@ -1,6 +1,7 @@
 import type { UserProfileProps } from '@clerk/types';
 import React from 'react';
 
+import { withRedirectToHome } from '../../common';
 import { ComponentContext, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { ProfileCard, withCardStateProvider } from '../../elements';
@@ -39,7 +40,7 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
   );
 });
 
-export const UserProfile = withCardStateProvider(_UserProfile);
+export const UserProfile = withRedirectToHome(withCardStateProvider(_UserProfile), 'noUser');
 
 export const UserProfileModal = (props: UserProfileProps): JSX.Element => {
   const userProfileProps: UserProfileCtx = {

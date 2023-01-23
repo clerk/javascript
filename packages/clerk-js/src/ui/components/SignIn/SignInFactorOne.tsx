@@ -117,4 +117,4 @@ export function _SignInFactorOne(): JSX.Element {
   }
 }
 
-export const SignInFactorOne = withRedirectToHome(withCardStateProvider(_SignInFactorOne));
+export const SignInFactorOne = withRedirectToHome(withCardStateProvider(_SignInFactorOne), 'singleSession');

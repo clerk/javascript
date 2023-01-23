@@ -40,7 +40,7 @@ describe('withRedirectToHome(Component)', () => {
       });
 
       it('navigates to home_url', () => {
-        const Component = withRedirectToHome(Tester);
+        const Component = withRedirectToHome(Tester, 'singleSession');
         render(
           <CoreSessionContext.Provider value={{ value: { id: 'sess_id' } as any }}>
             <Component />
@@ -67,7 +67,7 @@ describe('withRedirectToHome(Component)', () => {
       });
 
       it('renders the wrapped component', () => {
-        const Component = withRedirectToHome(Tester);
+        const Component = withRedirectToHome(Tester, 'singleSession');
         render(
           <CoreSessionContext.Provider value={{ value: { id: 'sess_id' } as any }}>
             <Component />
@@ -95,7 +95,7 @@ describe('withRedirectToHome(Component)', () => {
     });
 
     it('renders the wrapped component', () => {
-      const Component = withRedirectToHome(Tester);
+      const Component = withRedirectToHome(Tester, 'singleSession');
       render(
         <CoreSessionContext.Provider value={{ value: undefined }}>
           <Component />

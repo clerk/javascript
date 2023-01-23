@@ -250,4 +250,4 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
   );
 };
 
-export const SignInStart = withRedirectToHome(withCardStateProvider(_SignInStart));
+export const SignInStart = withRedirectToHome(withCardStateProvider(_SignInStart), 'singleSession');

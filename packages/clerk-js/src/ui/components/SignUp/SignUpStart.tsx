@@ -266,4 +266,4 @@ function _SignUpStart(): JSX.Element {
   );
 }
 
-export const SignUpStart = withRedirectToHome(withCardStateProvider(_SignUpStart));
+export const SignUpStart = withRedirectToHome(withCardStateProvider(_SignUpStart), 'singleSession');
