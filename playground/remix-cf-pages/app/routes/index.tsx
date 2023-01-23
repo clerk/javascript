@@ -5,8 +5,6 @@ import { createClerkClient } from '@clerk/remix/api.server';
 import { ClerkLoaded, SignedIn, UserButton, useUser } from '@clerk/remix';
 import runtime from '@clerk/backend/dist/runtime';
 
-runtime.fetch.bind(globalThis);
-
 export const loader: LoaderFunction = async args => {
   const authObject = await getAuth(args);
   const debug = authObject.debug();
