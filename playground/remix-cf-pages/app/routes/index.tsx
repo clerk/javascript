@@ -5,19 +5,17 @@ import { createClerkClient } from '@clerk/remix/api.server';
 import { ClerkLoaded, SignedIn, UserButton, useUser } from '@clerk/remix';
 
 export const loader: LoaderFunction = async args => {
-  args.context['CLERK_API_KEY'];
-
   const authObject = await getAuth(args);
-  const { userId } = authObject;
-  if (!userId) {
-    return json({ userId: null, count: -1, authObject });
-  }
+  // const { userId } = authObject;
+  // if (!userId) {
+  //   return json({ userId: null, count: -1, authObject });
+  // }
 
-  const clerkClient = createClerkClient({ apiKey: args.context['CLERK_API_KEY'] });
-  const { data: count } = await clerkClient.users.getCount();
+  // const clerkClient = createClerkClient({ apiKey: args.context['CLERK_API_KEY'] });
+  // const { data: count } = await clerkClient.users.getCount();
 
-  console.log('AuthState from loader:', userId);
-  return json({ userId: userId, count, authObject });
+  // console.log('AuthState from loader:', userId);
+  return json({ authObject });
 };
 
 export default function Index() {
