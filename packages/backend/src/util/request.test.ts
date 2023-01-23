@@ -3,7 +3,7 @@ import type QUnit from 'qunit';
 import { checkCrossOrigin } from './request';
 
 export default (QUnit: QUnit) => {
-  const { module, test, todo } = QUnit;
+  const { module, test } = QUnit;
 
   module('check cross-origin-referrer request utility', () => {
     test('is not CO with IPv6', async assert => {
@@ -24,12 +24,12 @@ export default (QUnit: QUnit) => {
       assert.true(checkCrossOrigin({ originURL, host }));
     });
 
-    todo(
-      'we cannot detect if the request is CO when HTTPS to HTTP and no other information is carried over',
-      async assert => {
-        assert.true(true);
-      },
-    );
+    // todo(
+    //   'we cannot detect if the request is CO when HTTPS to HTTP and no other information is carried over',
+    //   async assert => {
+    //     assert.true(true);
+    //   },
+    // );
 
     test('is CO when HTTPS to HTTP with present x-forwarded-proto', async assert => {
       const originURL = new URL('https://localhost');

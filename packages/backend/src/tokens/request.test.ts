@@ -90,7 +90,7 @@ function assertSignedIn(assert, requestState: RequestState) {
 }
 
 export default (QUnit: QUnit) => {
-  const { module, test, todo, skip } = QUnit;
+  const { module, test, skip } = QUnit;
 
   /* An otherwise bare state on a request. */
   const defaultMockAuthenticateRequestOptions: AuthenticateRequestOptions = {
@@ -149,12 +149,12 @@ export default (QUnit: QUnit) => {
       assertSignedInToAuth(assert, requestState);
     });
 
-    todo(
-      'headerToken: returns full signed in state when a valid token with organizations enabled and resources loaded [1y.2y]',
-      assert => {
-        assert.true(true);
-      },
-    );
+    // todo(
+    //   'headerToken: returns full signed in state when a valid token with organizations enabled and resources loaded [1y.2y]',
+    //   assert => {
+    //     assert.true(true);
+    //   },
+    // );
 
     test('headerToken: returns signed out state when a token with invalid authorizedParties [1y.2n]', async assert => {
       const requestState = await authenticateRequest({
@@ -351,12 +351,12 @@ export default (QUnit: QUnit) => {
       assertSignedInToAuth(assert, requestState);
     });
 
-    todo(
-      'cookieToken: returns signed in when cookieToken.iat >= clientUat and expired token and ssrToken [10y.2n.1y]',
-      assert => {
-        assert.true(true);
-      },
-    );
+    // todo(
+    //   'cookieToken: returns signed in when cookieToken.iat >= clientUat and expired token and ssrToken [10y.2n.1y]',
+    //   assert => {
+    //     assert.true(true);
+    //   },
+    // );
 
     test('cookieToken: returns interstitial when cookieToken.iat >= clientUat and expired token [10y.2n.1n]', async assert => {
       // advance clock for 1 hour
