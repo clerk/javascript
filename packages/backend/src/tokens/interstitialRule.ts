@@ -130,6 +130,6 @@ async function verifyRequestState(options: any, token: string) {
 
   return verifyToken(token, {
     ...options,
-    issuer,
+    issuer: options.proxyUrl || issuer,
   });
 }
