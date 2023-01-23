@@ -3,10 +3,34 @@ import { useLoaderData } from '@remix-run/react';
 import { getAuth } from '@clerk/remix/ssr.server';
 import { createClerkClient } from '@clerk/remix/api.server';
 import { ClerkLoaded, SignedIn, UserButton, useUser } from '@clerk/remix';
+import runtime from '@clerk/backend/dist/runtime';
 
 export const loader: LoaderFunction = async args => {
   const authObject = await getAuth(args);
-  console.log('DEBUG', authObject.debug());
+  const debug = authObject.debug();
+
+  let payload = {};
+
+  try {
+    const url = new URL('https://api.clerk.dev/v1/jwks');
+    const key = args.context?.CLERK_API_KEY;
+    const response = await runtime.fetch(url.href, {
+      headers: {
+        Authorization: `Bearer ${key}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      console.log('ERROR on JWKS');
+    }
+
+    payload = await response.json();
+  } catch (err) {
+    // @ts-ignore
+    payload = { err, stack: err.stack };
+  }
+
   // const { userId } = authObject;
   // if (!userId) {
   //   return json({ userId: null, count: -1, authObject });
@@ -16,12 +40,12 @@ export const loader: LoaderFunction = async args => {
   // const { data: count } = await clerkClient.users.getCount();
 
   // console.log('AuthState from loader:', userId);
-  return json({ authObject, debug: authObject.debug() });
+  return json({ authObject, debug, payload });
 };
 
 export default function Index() {
   const { user, isLoaded } = useUser();
-  const { authObject, debug } = useLoaderData();
+  const { authObject, debug, payload } = useLoaderData();
   const { userId, count } = authObject;
 
   return (
@@ -31,6 +55,8 @@ export default function Index() {
       <pre>{JSON.stringify(authObject)}</pre>
       <h2>Debug</h2>
       <pre>{JSON.stringify(debug)}</pre>
+      <h2>JWKS Payload</h2>
+      <pre>{JSON.stringify(payload)}</pre>
       <div>
         <ul>
           <li>Total users: {count}</li>
