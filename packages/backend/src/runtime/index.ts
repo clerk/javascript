@@ -22,7 +22,15 @@ type Runtime = {
   fetch: typeof global.fetch;
 };
 
+// Invoking the global.fetch without binding it first to the globalObject fails in
+// Cloudflare Workers with an "Illegal Invocation" error.
+//
+// The globalThis object is supported for Node >= 12.0.
+//
+// https://github.com/supabase/supabase/issues/4417
+const globalFetch = fetch.bind(globalThis);
+
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
-const runtime: Runtime = { crypto, fetch };
+const runtime: Runtime = { crypto, fetch: globalFetch };
 export default runtime;
