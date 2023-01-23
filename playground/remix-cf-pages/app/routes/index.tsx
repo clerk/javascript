@@ -5,8 +5,7 @@ import { createClerkClient } from '@clerk/remix/api.server';
 import { ClerkLoaded, SignedIn, UserButton, useUser } from '@clerk/remix';
 
 export const loader: LoaderFunction = async args => {
-  // const authObject = await getAuth(args);
-  const authObject = { foo: 42 };
+  const authObject = await getAuth(args);
   // const { userId } = authObject;
   // if (!userId) {
   //   return json({ userId: null, count: -1, authObject });
