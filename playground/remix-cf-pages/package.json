@@ -11,8 +11,7 @@
     "yalc:add": "yalc add @clerk/types && yalc add @clerk/remix && yalc add @clerk/backend"
   },
   "dependencies": {
-    "@clerk/backend": "staging",
-    "@clerk/remix": "staging",
+    "@clerk/remix": "2.0.5-staging.1",
     "@remix-run/cloudflare": "^1.7.5",
     "@remix-run/cloudflare-pages": "^1.7.5",
     "@remix-run/react": "^1.7.5",
