@@ -30,7 +30,7 @@ export default function Index() {
       <h2>Auth Object</h2>
       <pre>{JSON.stringify(authObject)}</pre>
       <h2>Debug</h2>
-      <pre>{JSON.stringify(authObject)}</pre>
+      <pre>{JSON.stringify(debug)}</pre>
       <div>
         <ul>
           <li>Total users: {count}</li>
