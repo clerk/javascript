@@ -1,13 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`/client public exports should not include a breaking change 1`] = `
-Object {
+{
   "AuthenticateWithRedirectCallback": [Function],
   "ClerkLoaded": [Function],
   "ClerkLoading": [Function],
   "ClerkProvider": [Function],
   "CreateOrganization": [Function],
-  "MagicLinkErrorCode": Object {
+  "MagicLinkErrorCode": {
     "Expired": "expired",
     "Failed": "failed",
   },
