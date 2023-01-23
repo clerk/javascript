@@ -14,7 +14,7 @@ export const loader: LoaderFunction = async args => {
   try {
     const url = new URL('https://api.clerk.dev/v1/jwks');
     const key = args.context?.CLERK_API_KEY;
-    const response = await runtime.fetch(url.href, {
+    const response = await runtime.fetch.bind(globalThis)(url.href, {
       headers: {
         Authorization: `Bearer ${key}`,
         'Content-Type': 'application/json',
