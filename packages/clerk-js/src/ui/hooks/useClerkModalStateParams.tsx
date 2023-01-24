@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { CLERK_MODAL_STATE } from '../../core/constants';
 import { readStateParam, removeClerkQueryParam } from '../../utils';
 
 export const useClerkModalStateParams = () => {
@@ -16,7 +17,7 @@ export const useClerkModalStateParams = () => {
     contentRef.current = { startPath: '', path: '', componentName: '' };
   };
 
-  const removeQueryParam = () => removeClerkQueryParam('__clerk_modal_state');
+  const removeQueryParam = () => removeClerkQueryParam(CLERK_MODAL_STATE);
 
   return {
     urlStateParam: { ...contentRef.current, clearUrlStateParam },

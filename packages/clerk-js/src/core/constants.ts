@@ -7,3 +7,5 @@ export const DEV_BROWSER_SSO_JWT_HTTP_HEADER = 'Clerk-Cookie';
 // TODO: Clerk should not depend on ./ui
 // Remove this dependency after components v4
 export { ERROR_CODES } from '../ui/common/constants';
+
+export const CLERK_MODAL_STATE = '__clerk_modal_state';

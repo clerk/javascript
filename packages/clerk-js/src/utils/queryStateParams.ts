@@ -1,6 +1,7 @@
+import { CLERK_MODAL_STATE } from '../core/constants';
 import { encodeB64, getClerkQueryParam } from '../utils';
 
-export const buildUrl = ({ base, path }: { base: string; path: string | undefined }) => {
+export const buildVirtualRouterUrl = ({ base, path }: { base: string; path: string | undefined }) => {
   if (!path) {
     return base;
   }
@@ -8,12 +9,8 @@ export const buildUrl = ({ base, path }: { base: string; path: string | undefine
   return base + path;
 };
 
-export const decodeBase64Json = (value: string) => {
-  return JSON.parse(atob(value));
-};
-
 export const readStateParam = () => {
-  const urlClerkState = getClerkQueryParam('__clerk_modal_state') ?? '';
+  const urlClerkState = getClerkQueryParam(CLERK_MODAL_STATE) ?? '';
 
   return urlClerkState ? JSON.parse(atob(urlClerkState)) : null;
 };
@@ -24,6 +21,7 @@ type SerializeAndAppendModalStateProps = {
   currentPath?: string;
   componentName: string;
 };
+
 export const appendModalState = ({
   url,
   startPath = '/user',
@@ -43,7 +41,7 @@ export const appendModalState = ({
   const urlWithParams = new URL(url);
   const searchParams = urlWithParams.searchParams;
 
-  searchParams.set('__clerk_modal_state', encodedRedirectParams);
+  searchParams.set(CLERK_MODAL_STATE, encodedRedirectParams);
 
   urlWithParams.search = searchParams.toString();
 
