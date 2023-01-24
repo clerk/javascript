@@ -1,108 +1,134 @@
-import { render, screen } from '@clerk/shared/testUtils';
-import type { EnvironmentResource } from '@clerk/types';
 import React from 'react';
 
-import type { AuthConfig, DisplayConfig } from '../../../core/resources';
-import { CoreSessionContext, useEnvironment } from '../../contexts';
+import { bindCreateFixtures, render, screen } from '../../../testUtils';
 import { withRedirectToHome } from '../withRedirectToHome';
 
-const mockNavigate = jest.fn();
-jest.mock('ui/hooks', () => ({
-  useNavigate: () => ({ navigate: mockNavigate }),
-}));
+const { createFixtures } = bindCreateFixtures('SignIn');
 
-jest.mock('ui/contexts', () => ({
-  ...jest.requireActual('ui/contexts'),
-  useEnvironment: jest.fn(),
-}));
-
-const Tester = () => <div>Tester</div>;
-
-describe('withRedirectToHome(Component)', () => {
-  beforeEach(() => {
-    mockNavigate.mockReset();
-  });
-
-  describe('when there is a session', () => {
-    describe('and the instance is in single session mode', () => {
-      beforeEach(() => {
-        (useEnvironment as jest.Mock).mockImplementation(
-          () =>
-            ({
-              displayConfig: {
-                homeUrl: 'http://my-home.com',
-              } as Partial<DisplayConfig>,
-              authConfig: {
-                singleSessionMode: true,
-              } as Partial<AuthConfig>,
-            } as Partial<EnvironmentResource>),
-        );
+describe('withRedirectHome', () => {
+  describe('signIn', () => {
+    it('redirects if a session is present and single session mode is enabled', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({});
       });
 
-      it('navigates to home_url', () => {
-        const Component = withRedirectToHome(Tester, 'singleSession');
-        render(
-          <CoreSessionContext.Provider value={{ value: { id: 'sess_id' } as any }}>
-            <Component />
-          </CoreSessionContext.Provider>,
-        );
-        expect(mockNavigate).toHaveBeenNthCalledWith(1, 'http://my-home.com');
-        expect(screen.queryByText('Tester')).not.toBeInTheDocument();
-      });
+      const WithHOC = withRedirectToHome(() => <></>, 'signIn');
+
+      render(<WithHOC />, { wrapper });
+
+      expect(fixtures.router.navigate).toHaveBeenCalledWith(fixtures.environment.displayConfig.homeUrl);
     });
 
-    describe('and the instance is not in single session mode', () => {
-      beforeEach(() => {
-        (useEnvironment as jest.Mock).mockImplementation(
-          () =>
-            ({
-              displayConfig: {
-                homeUrl: 'http://my-home.com',
-              } as Partial<DisplayConfig>,
-              authConfig: {
-                singleSessionMode: false,
-              } as Partial<AuthConfig>,
-            } as Partial<EnvironmentResource>),
-        );
+    it('renders the children if is a session is not present', async () => {
+      const { wrapper } = await createFixtures();
+
+      const WithHOC = withRedirectToHome(() => <>test</>, 'signIn');
+
+      render(<WithHOC />, { wrapper });
+
+      screen.getByText('test');
+    });
+
+    it('renders the children if multi session mode is enabled and a session is present', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withUser({});
+        f.withMultiSessionMode();
       });
 
-      it('renders the wrapped component', () => {
-        const Component = withRedirectToHome(Tester, 'singleSession');
-        render(
-          <CoreSessionContext.Provider value={{ value: { id: 'sess_id' } as any }}>
-            <Component />
-          </CoreSessionContext.Provider>,
-        );
-        expect(mockNavigate).not.toHaveBeenCalled();
-        expect(screen.queryByText('Tester')).toBeInTheDocument();
-      });
+      const WithHOC = withRedirectToHome(() => <>test</>, 'signIn');
+
+      render(<WithHOC />, { wrapper });
+
+      screen.getByText('test');
     });
   });
 
-  describe('when there is no session', () => {
-    beforeEach(() => {
-      (useEnvironment as jest.Mock).mockImplementation(
-        () =>
-          ({
-            displayConfig: {
-              homeUrl: 'http://my-home.com',
-            } as Partial<DisplayConfig>,
-            authConfig: {
-              singleSessionMode: true,
-            } as Partial<AuthConfig>,
-          } as Partial<EnvironmentResource>),
-      );
+  describe('signUp', () => {
+    it('redirects if a session is present and single session mode is enabled', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({});
+      });
+
+      const WithHOC = withRedirectToHome(() => <></>, 'signUp');
+
+      render(<WithHOC />, { wrapper });
+
+      expect(fixtures.router.navigate).toHaveBeenCalledWith(fixtures.environment.displayConfig.homeUrl);
     });
 
-    it('renders the wrapped component', () => {
-      const Component = withRedirectToHome(Tester, 'singleSession');
-      render(
-        <CoreSessionContext.Provider value={{ value: undefined }}>
-          <Component />
-        </CoreSessionContext.Provider>,
-      );
-      expect(mockNavigate).not.toHaveBeenCalled();
-      expect(screen.queryByText('Tester')).toBeInTheDocument();
+    it('renders the children if is a session is not present', async () => {
+      const { wrapper } = await createFixtures();
+
+      const WithHOC = withRedirectToHome(() => <>test</>, 'signUp');
+
+      render(<WithHOC />, { wrapper });
+
+      screen.getByText('test');
+    });
+
+    it('renders the children if multi session mode is enabled and a session is present', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withUser({});
+        f.withMultiSessionMode();
+      });
+
+      const WithHOC = withRedirectToHome(() => <>test</>, 'signUp');
+
+      render(<WithHOC />, { wrapper });
+
+      screen.getByText('test');
+    });
+  });
+
+  describe('userProfile', () => {
+    it('redirects if no user is present', async () => {
+      const { wrapper, fixtures } = await createFixtures();
+
+      const WithHOC = withRedirectToHome(() => <></>, 'userProfile');
+
+      render(<WithHOC />, { wrapper });
+
+      expect(fixtures.router.navigate).toHaveBeenCalledWith(fixtures.environment.displayConfig.homeUrl);
+    });
+
+    it('renders the children if is a user is present', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withUser({});
+      });
+
+      const WithHOC = withRedirectToHome(() => <>test</>, 'userProfile');
+
+      render(<WithHOC />, { wrapper });
+
+      screen.getByText('test');
+    });
+  });
+
+  describe('organizationProfile', () => {
+    it('redirects if no organization is active', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({});
+        f.withOrganizations();
+      });
+
+      const WithHOC = withRedirectToHome(() => <></>, 'organizationProfile');
+
+      render(<WithHOC />, { wrapper });
+
+      expect(fixtures.router.navigate).toHaveBeenCalledWith(fixtures.environment.displayConfig.homeUrl);
+    });
+
+    it('renders the children if is an organization is active', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withUser({ organization_memberships: ['Org1'] });
+        f.withOrganizations();
+      });
+
+      const WithHOC = withRedirectToHome(() => <>test</>, 'organizationProfile');
+
+      render(<WithHOC />, { wrapper });
+
+      screen.getByText('test');
     });
   });
 });
