@@ -1,5 +1,5 @@
 import { isDevelopmentFromApiKey, isProductionFromApiKey } from '../util/instance';
-import { checkCrossOrigin } from '../util/request';
+import { checkCrossOrigin, convertHostHeaderValueToURL } from '../util/request';
 import type { RequestState } from './authStatus';
 import { AuthErrorReason, interstitial, signedIn, signedOut } from './authStatus';
 import { verifyToken } from './verify';
@@ -131,6 +131,6 @@ async function verifyRequestState(options: any, token: string, issuer = '') {
 
   return verifyToken(token, {
     ...options,
-    issuer: issuer || defaultIssuer,
+    issuer: issuer ? convertHostHeaderValueToURL(issuer) : defaultIssuer,
   });
 }

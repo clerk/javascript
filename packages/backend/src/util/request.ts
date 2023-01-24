@@ -37,7 +37,7 @@ export function checkCrossOrigin({
   return false;
 }
 
-function convertHostHeaderValueToURL(host: string): URL {
+export function convertHostHeaderValueToURL(host: string): URL {
   /**
    * The protocol is added for the URL constructor to work properly.
    * We do not check for the protocol at any point later on.
