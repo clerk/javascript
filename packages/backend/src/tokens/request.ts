@@ -1,7 +1,7 @@
 import { API_URL, API_VERSION } from '../constants';
 import { parsePublishableKey } from '../util/parsePublishableKey';
-import { type RequestState, AuthErrorReason, interstitial, signedOut, unknownState } from './authStatus';
-import { type TokenCarrier, TokenVerificationError, TokenVerificationErrorReason } from './errors';
+import { AuthErrorReason, interstitial, RequestState, signedOut, unknownState } from './authStatus';
+import { TokenCarrier, TokenVerificationError, TokenVerificationErrorReason } from './errors';
 import {
   crossOriginRequestWithoutHeader,
   hasClientUatButCookieIsMissingInProd,
@@ -14,7 +14,7 @@ import {
   potentialRequestAfterSignInOrOurFromClerkHostedUiInDev,
   runInterstitialRules,
 } from './interstitialRule';
-import { type VerifyTokenOptions } from './verify';
+import { VerifyTokenOptions } from './verify';
 
 export type LoadResourcesOptions = {
   loadSession?: boolean;

@@ -1,14 +1,14 @@
-import { type ApiClient } from '../api';
+import { ApiClient } from '../api';
 import { API_URL, API_VERSION } from '../constants';
 import {
-  type LoadInterstitialOptions,
   buildPublicInterstitialUrl,
   loadInterstitialFromBAPI,
   loadInterstitialFromLocal,
+  LoadInterstitialOptions,
 } from './interstitial';
 import {
-  type AuthenticateRequestOptions,
   authenticateRequest as authenticateRequestOriginal,
+  AuthenticateRequestOptions,
   debugRequestState,
 } from './request';
 
