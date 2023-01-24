@@ -117,6 +117,18 @@ describe('Clerk singleton', () => {
       mockSession.touch.mockReset();
     });
 
+    it('does not call session touch on signout', async () => {
+      mockSession.touch.mockReturnValueOnce(Promise.resolve());
+      mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
+
+      const sut = new Clerk(frontendApi);
+      await sut.load();
+      await sut.setActive({ session: null });
+      await waitFor(() => {
+        expect(mockSession.touch).not.toHaveBeenCalled();
+      });
+    });
+
     it('calls session.touch by default', async () => {
       mockSession.touch.mockReturnValueOnce(Promise.resolve());
       mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
