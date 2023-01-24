@@ -452,11 +452,9 @@ export default class Clerk implements ClerkInterface {
       return;
     }
 
-    this.session = session;
-    this.organization = organization === null ? null : this.#getLastActiveOrganizationFromSession();
-    this.#aliasUser();
-
+    this.#setSessionAndOrganization(session);
     this.#emit();
+
     this.#resetComponentsState();
   };
 
@@ -864,20 +862,17 @@ export default class Clerk implements ClerkInterface {
     if (!this.client) {
       // This is the first time client is being
       // set, so we also need to set session
-      this.session =
-        (this.#options.selectInitialSession
-          ? this.#options.selectInitialSession(newClient)
-          : this.#defaultSession(newClient)) || null;
-      this.organization = this.#getLastActiveOrganizationFromSession();
-      this.#aliasUser();
+      const session = this.#options.selectInitialSession
+        ? this.#options.selectInitialSession(newClient)
+        : this.#defaultSession(newClient);
+      this.#setSessionAndOrganization(session);
     }
     this.client = newClient;
 
     if (this.session) {
       const lastId = this.session.id;
-      this.session = newClient.activeSessions.find(x => x.id === lastId);
-      this.organization = this.#getLastActiveOrganizationFromSession();
-      this.#aliasUser();
+      const session = newClient.activeSessions.find(x => x.id === lastId);
+      this.#setSessionAndOrganization(session);
     }
 
     this.#emit();
@@ -1072,6 +1067,12 @@ export default class Clerk implements ClerkInterface {
     return (
       orgMemberships.map(om => om.organization).find(org => org.id === this.session?.lastActiveOrganizationId) || null
     );
+  };
+
+  #setSessionAndOrganization = (session?: ActiveSessionResource | null, organization?: OrganizationResource | null) => {
+    this.session = session || null;
+    this.organization = organization === null ? null : this.#getLastActiveOrganizationFromSession();
+    this.#aliasUser();
   };
 
   #aliasUser = () => {
