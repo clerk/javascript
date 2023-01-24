@@ -55,7 +55,10 @@ export interface Clerk {
 
   loaded: boolean;
 
-  /** Clerk Frontend API string. */
+  /**
+   * Clerk Frontend API string
+   * @deprecated Use `publishableKey` instead.
+   */
   frontendApi: string;
 
   /** Clerk Publishable Key string. */

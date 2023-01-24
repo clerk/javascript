@@ -15,6 +15,9 @@ export type CreateClerkExpressMiddlewareOptions = {
   apiKey?: string;
   /* Secret Key */
   secretKey?: string;
+  /**
+   * @deprecated Use `publishableKey` instead.
+   */
   frontendApi?: string;
   publishableKey?: string;
   apiUrl?: string;

@@ -63,6 +63,9 @@ function getScriptSrc({ publishableKey, frontendApi, scriptUrl, scriptVariant = 
 export type ScriptVariant = '' | 'headless';
 
 export interface LoadScriptParams {
+  /**
+   * @deprecated Use `publishableKey` instead.
+   */
   frontendApi?: string;
   publishableKey?: string;
   scriptUrl?: string;
