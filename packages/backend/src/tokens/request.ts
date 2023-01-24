@@ -60,7 +60,7 @@ export type AuthenticateRequestOptions = RequiredVerifyTokenOptions &
   };
 
 export async function authenticateRequest(options: AuthenticateRequestOptions): Promise<RequestState> {
-  options.frontendApi = options.frontendApi || parsePublishableKey(options.publishableKey)?.frontendApi || '';
+  options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
   options.apiUrl = options.apiUrl || API_URL;
   options.apiVersion = options.apiVersion || API_VERSION;
 
