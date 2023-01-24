@@ -6,6 +6,9 @@ import { UserResource } from './user';
 export type ServerGetTokenOptions = { template?: string };
 export type ServerGetToken = (options?: ServerGetTokenOptions) => Promise<string | null>;
 
+/**
+ * @deprecated
+ */
 export type ServerSideAuth = {
   sessionId: string | null;
   userId: string | null;

@@ -1,3 +1,4 @@
+import { Organization } from '@clerk/backend';
 import type { Session, User } from '@clerk/clerk-sdk-node';
 import { ServerSideAuth } from '@clerk/types';
 import { GetServerDataProps } from 'gatsby';
@@ -7,7 +8,8 @@ export type WithServerAuthResult<CallbackReturn> = (props: GetServerDataProps) =
 export type GetServerDataPropsWithAuth<Options extends WithServerAuthOptions = any> = GetServerDataProps & {
   auth: ServerSideAuth;
 } & (Options extends { loadSession: true } ? { session: Session | null } : {}) &
-  (Options extends { loadUser: true } ? { user: User | null } : {});
+  (Options extends { loadUser: true } ? { user: User | null } : {}) &
+  (Options extends { loadOrg: true } ? { organization: Organization | null } : {});
 
 export type WithServerAuthCallback<Return, Options extends WithServerAuthOptions> = (
   props: GetServerDataPropsWithAuth<Options>,
@@ -16,7 +18,7 @@ export type WithServerAuthCallback<Return, Options extends WithServerAuthOptions
 export type WithServerAuthOptions = {
   loadUser?: boolean;
   loadSession?: boolean;
-  // TODO: Add support for the following options
-  // jwtKey?: string;
-  // authorizedParties?: string[];
+  loadOrg?: boolean;
+  jwtKey?: string;
+  authorizedParties?: string[];
 };
