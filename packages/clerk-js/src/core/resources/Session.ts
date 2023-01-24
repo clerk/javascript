@@ -79,11 +79,7 @@ export class Session extends BaseResource implements SessionResource {
       });
     }
 
-    // If it's a session token, retrieve it with their session id, otherwise it's a jwt template token
-    // and retrieve it using the session id concatenated with the jwt template name.
-    // e.g. session id is 'sess_abc12345' and jwt template name is 'haris'
-    // The session token ID will be 'sess_abc12345' and the jwt template token ID will be 'sess_abc12345-haris'
-    const tokenId = template ? `${this.id}-${template}` : this.id;
+    const tokenId = this.#getCacheId(template);
     const cachedEntry = skipCache ? undefined : SessionTokenCache.get({ tokenId }, leewayInSeconds);
 
     if (cachedEntry) {
@@ -96,13 +92,21 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   #hydrateCache = (token: Token | null) => {
-    if (token && SessionTokenCache.size() === 0) {
+    if (token) {
       SessionTokenCache.set({
-        tokenId: this.id,
+        tokenId: this.#getCacheId(),
         tokenResolver: Promise.resolve(token),
       });
     }
   };
+
+  // If it's a session token, retrieve it with their session id, otherwise it's a jwt template token
+  // and retrieve it using the session id concatenated with the jwt template name.
+  // e.g. session id is 'sess_abc12345' and jwt template name is 'haris'
+  // The session token ID will be 'sess_abc12345' and the jwt template token ID will be 'sess_abc12345-haris'
+  #getCacheId(template?: string) {
+    return `${template ? `${this.id}-${template}` : this.id}-${this.updatedAt.getTime()}`;
+  }
 
   #isLegacyIntegrationRequest = (template: string | undefined): boolean => {
     return (template || '').startsWith('integration_');
