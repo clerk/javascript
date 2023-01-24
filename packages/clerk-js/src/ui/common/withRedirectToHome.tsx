@@ -51,7 +51,7 @@ export function withRedirectToHome<P extends SignInProps | SignUpProps | { conti
 
     React.useEffect(() => {
       if (shouldRedirect) {
-        if (warning) {
+        if (warning && environment.displayConfig.instanceEnvironmentType === 'development') {
           console.warn(warning);
         }
         navigate(environment.displayConfig.homeUrl);
