@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.6.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@4.6.3-staging.1...@clerk/clerk-sdk-node@4.6.3) (2023-01-24)
+
+### Bug Fixes
+
+- **backend,clerk-sdk-node,shared:** Drop support for NodeJS 12 ([d9169ab](https://github.com/clerkinc/javascript/commit/d9169ab4873e1745d7250628f5bf8c8f7da49421))
+
 ### [4.6.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@4.6.1...@clerk/clerk-sdk-node@4.6.2) (2023-01-20)
 
 **Note:** Version bump only for package @clerk/clerk-sdk-node
