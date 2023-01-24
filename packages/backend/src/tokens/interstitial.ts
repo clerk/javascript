@@ -80,7 +80,7 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
 
 // TODO: Add caching to Interstitial
 export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions) {
-  options.frontendApi = options.frontendApi || parsePublishableKey(options.publishableKey)?.frontendApi || '';
+  options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
   const url = buildPublicInterstitialUrl(options);
   const response = await callWithRetry(() => runtime.fetch(buildPublicInterstitialUrl(options)));
 
@@ -96,7 +96,7 @@ export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions)
 }
 
 export function buildPublicInterstitialUrl(options: LoadInterstitialOptions) {
-  options.frontendApi = options.frontendApi || parsePublishableKey(options.publishableKey)?.frontendApi || '';
+  options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
   const { apiUrl, frontendApi, pkgVersion, publishableKey } = options;
   const url = new URL(apiUrl);
   url.pathname = joinPaths(url.pathname, API_VERSION, '/public/interstitial');
