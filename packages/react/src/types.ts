@@ -23,11 +23,11 @@ export type IsomorphicClerkOptions = ClerkOptions & {
 } & PublishableKeyOrFrontendApi;
 
 export interface BrowserClerkConstructor {
-  new (frontendApi: string): BrowserClerk;
+  new (publishableKey: string): BrowserClerk;
 }
 
 export interface HeadlessBrowserClerkConstrutor {
-  new (frontendApi: string): HeadlessBrowserClerk;
+  new (publishableKey: string): HeadlessBrowserClerk;
 }
 
 export type WithClerkProp<T = unknown> = T & { clerk: LoadedClerk };

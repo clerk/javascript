@@ -89,6 +89,9 @@ export type LoadClerkJWKFromRemoteOptions = {
   jwksCacheTtlInMs?: number;
   skipJwksCache?: boolean;
   secretKey?: string;
+  /**
+   * @deprecated Use `secretKey` instead.
+   */
   apiKey?: string;
   apiUrl?: string;
   apiVersion?: string;
