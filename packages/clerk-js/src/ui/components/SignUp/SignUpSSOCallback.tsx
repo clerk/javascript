@@ -1,4 +1,3 @@
-import { SSOCallback } from '../../common';
-import { withRedirectToHome } from '../../common/withRedirectToHome';
+import { SSOCallback, withRedirectToHomeSingleSessionGuard } from '../../common';
 
-export const SignUpSSOCallback = withRedirectToHome(SSOCallback, 'signUp');
+export const SignUpSSOCallback = withRedirectToHomeSingleSessionGuard(SSOCallback);

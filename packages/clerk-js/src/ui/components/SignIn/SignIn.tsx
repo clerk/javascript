@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 import type { SignInProps } from '@clerk/types';
 import React from 'react';
+=======
+import { SignInProps } from '@clerk/types';
+import React, { useLayoutEffect } from 'react';
+>>>>>>> d7e18ddc (refactor(clerk-js): Dry withRedirectToHome HOCs)
 
 import { SignInEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import { ComponentContext, useCoreClerk, useSignInContext, withCoreSessionSwitchGuard } from '../../contexts';

@@ -1,13 +1,16 @@
-import type { SignInProps, SignUpProps } from '@clerk/types';
+import type { ComponentType } from 'react';
 import React from 'react';
 
-import { canShowOrganizationProfile, canShowSignIn, canShowSignUp, canShowUserProfile } from '../../utils';
-import { useCoreClerk, useEnvironment } from '../contexts';
+import type { AvailableComponentProps } from '../../ui/types';
+import type { MeetsRequirement } from '../../utils';
+import { meetsRequirement } from '../../utils';
+import { useCoreClerk, useEnvironment, useOptions } from '../contexts';
 import { useNavigate } from '../hooks';
 
-export function withRedirectToHome<P extends SignInProps | SignUpProps | { continueExisting?: boolean }>(
-  Component: React.ComponentType<P>,
-  when: 'signIn' | 'signUp' | 'userProfile' | 'organizationProfile',
+function withRedirectToHome<P extends AvailableComponentProps>(
+  Component: ComponentType<P>,
+  condition: MeetsRequirement,
+  warning?: string,
 ): (props: P) => null | JSX.Element {
   const displayName = Component.displayName || Component.name || 'Component';
   Component.displayName = displayName;
@@ -16,39 +19,9 @@ export function withRedirectToHome<P extends SignInProps | SignUpProps | { conti
     const { navigate } = useNavigate();
     const clerk = useCoreClerk();
     const environment = useEnvironment();
+    const options = useOptions();
 
-    let shouldRedirect = false;
-    let warning = '';
-    switch (when) {
-      case 'signIn':
-        if (!canShowSignIn(clerk, environment)) {
-          shouldRedirect = true;
-          warning =
-            'Cannot render SignIn because a session exists and single session mode is enabled. Redirecting to the home url...';
-        }
-        break;
-      case 'signUp':
-        if (!canShowSignUp(clerk, environment)) {
-          shouldRedirect = true;
-          warning =
-            'Cannot render SignUp because a session exists and single session mode is enabled. Redirecting to the home url...';
-        }
-        break;
-      case 'userProfile':
-        if (!canShowUserProfile(clerk)) {
-          shouldRedirect = true;
-          warning = 'Cannot render UserProfile because no user exists. Redirecting to the home url...';
-        }
-        break;
-      case 'organizationProfile':
-        if (!canShowOrganizationProfile(clerk)) {
-          shouldRedirect = true;
-          warning =
-            'Cannot render OrganizationProfile because no active organization exists. Redirecting to the home url...';
-        }
-        break;
-    }
-
+    const shouldRedirect = !condition(clerk, environment, options);
     React.useEffect(() => {
       if (shouldRedirect) {
         if (warning && environment.displayConfig.instanceEnvironmentType === 'development') {
@@ -69,3 +42,24 @@ export function withRedirectToHome<P extends SignInProps | SignUpProps | { conti
 
   return HOC;
 }
+
+export const withRedirectToHomeSingleSessionGuard = <P extends AvailableComponentProps>(Component: ComponentType<P>) =>
+  withRedirectToHome(
+    Component,
+    meetsRequirement.singleSession,
+    'Cannot render the component as a session already exists and single session mode is enabled. Redirecting to the home url.',
+  );
+
+export const withRedirectToHomeUserGuard = <P extends AvailableComponentProps>(Component: ComponentType<P>) =>
+  withRedirectToHome(
+    Component,
+    meetsRequirement.user,
+    'Cannot render the component as no user exists. Redirecting to the home url.',
+  );
+
+export const withRedirectToHomeOrganizationGuard = <P extends AvailableComponentProps>(Component: ComponentType<P>) =>
+  withRedirectToHome(
+    Component,
+    meetsRequirement.organization,
+    'Cannot render the component as there is no active organization. Redirecting to the home url.',
+  );

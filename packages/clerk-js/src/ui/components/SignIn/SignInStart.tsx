@@ -3,7 +3,7 @@ import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { getClerkQueryParam } from '../../../utils';
-import { ERROR_CODES, getIdentifierControlDisplayValues, withRedirectToHome } from '../../common';
+import { ERROR_CODES, getIdentifierControlDisplayValues, withRedirectToHomeSingleSessionGuard } from '../../common';
 import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import {
@@ -250,4 +250,4 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
   );
 };
 
-export const SignInStart = withRedirectToHome(withCardStateProvider(_SignInStart), 'signIn');
+export const SignInStart = withRedirectToHomeSingleSessionGuard(withCardStateProvider(_SignInStart));
