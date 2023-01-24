@@ -1,7 +1,7 @@
 import type { JwtPayload } from '@clerk/types';
 
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from './errors';
-import { type VerifyJwtOptions, decodeJwt, verifyJwt } from './jwt';
+import { decodeJwt, verifyJwt, VerifyJwtOptions } from './jwt';
 import { loadClerkJWKFromLocal, loadClerkJWKFromRemote, LoadClerkJWKFromRemoteOptions } from './keys';
 
 /**

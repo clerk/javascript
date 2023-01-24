@@ -1,4 +1,4 @@
-import { type ErrorThrowerOptions, buildErrorThrower } from '@clerk/shared';
+import { buildErrorThrower, ErrorThrowerOptions } from '@clerk/shared';
 
 const errorThrower = buildErrorThrower({ packageName: '@clerk/react' });
 

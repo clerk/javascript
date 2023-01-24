@@ -1,6 +1,6 @@
 import { isDevelopmentFromApiKey, isProductionFromApiKey } from '../util/instance';
 import { checkCrossOrigin } from '../util/request';
-import { type RequestState, AuthErrorReason, interstitial, signedOut, signedIn } from './authStatus';
+import { AuthErrorReason, interstitial, RequestState, signedIn, signedOut } from './authStatus';
 import { verifyToken } from './verify';
 
 export type InterstitialRule = <T>(opts: T) => Promise<RequestState | undefined>;
@@ -95,13 +95,13 @@ export const hasClientUatButCookieIsMissingInProd: InterstitialRule = async opti
 
 export const hasValidHeaderToken: InterstitialRule = async options => {
   const { headerToken } = options as any;
-  const sessionClaims = await verifyRequestState(options, headerToken!);
+  const sessionClaims = await verifyRequestState(options, headerToken);
   return await signedIn(options, sessionClaims);
 };
 
 export const hasValidCookieToken: InterstitialRule = async options => {
   const { cookieToken, clientUat } = options as any;
-  const sessionClaims = await verifyRequestState(options, cookieToken!);
+  const sessionClaims = await verifyRequestState(options, cookieToken);
   const state = await signedIn(options, sessionClaims);
 
   const jwt = state.toAuth().sessionClaims;

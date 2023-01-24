@@ -1,4 +1,4 @@
-import { type OptionalVerifyTokenOptions, AuthStatus, constants } from '@clerk/backend';
+import { AuthStatus, constants, OptionalVerifyTokenOptions } from '@clerk/backend';
 import { NextMiddleware, NextMiddlewareResult } from 'next/dist/server/web/types';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 

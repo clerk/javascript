@@ -1,12 +1,12 @@
 import type { Organization, Session, User } from '@clerk/backend';
 import {
-  type SignedInAuthObject,
-  type SignedOutAuthObject,
   AuthStatus,
   constants,
   decodeJwt,
   sanitizeAuthObject,
+  SignedInAuthObject,
   signedInAuthObject,
+  SignedOutAuthObject,
   signedOutAuthObject,
 } from '@clerk/backend';
 
