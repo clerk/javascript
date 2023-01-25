@@ -51,6 +51,8 @@ export default class IsomorphicClerk {
   private readonly frontendApi?: string;
   private readonly publishableKey?: string;
   private readonly proxyUrl?: ClerkConstructorOptions['proxyUrl'];
+  private readonly domain?: ClerkConstructorOptions['domain'];
+  private readonly isSatellite?: ClerkConstructorOptions['isSatellite'];
   private readonly options: IsomorphicClerkOptions;
   private readonly Clerk: ClerkProp;
   private clerkjs: BrowserClerk | HeadlessBrowserClerk | null = null;
@@ -91,6 +93,8 @@ export default class IsomorphicClerk {
     this.frontendApi = frontendApi;
     this.publishableKey = publishableKey;
     this.proxyUrl = (options as ClerkConstructorOptions | undefined)?.proxyUrl;
+    this.domain = (options as ClerkConstructorOptions | undefined)?.domain;
+    this.isSatellite = (options as ClerkConstructorOptions | undefined)?.isSatellite;
     this.options = options;
     this.Clerk = Clerk;
     this.mode = inClientSide() ? 'browser' : 'server';
@@ -115,6 +119,8 @@ export default class IsomorphicClerk {
     window.__clerk_frontend_api = this.frontendApi;
     window.__clerk_publishable_key = this.publishableKey;
     window.__clerk_proxy_url = this.proxyUrl;
+    window.__clerk_domain = this.domain;
+    window.__clerk_is_satellite = this.isSatellite;
 
     try {
       if (this.Clerk) {
@@ -125,6 +131,8 @@ export default class IsomorphicClerk {
           // Construct a new Clerk object if a constructor is passed
           c = new this.Clerk(this.publishableKey || this.frontendApi || '', {
             proxyUrl: this.proxyUrl,
+            domain: this.domain,
+            isSatellite: this.isSatellite,
           });
           await c.load(this.options);
         } else {
@@ -143,6 +151,8 @@ export default class IsomorphicClerk {
           frontendApi: this.frontendApi,
           publishableKey: this.publishableKey,
           proxyUrl: this.proxyUrl,
+          domain: this.domain,
+          isSatellite: this.isSatellite,
           scriptUrl: this.options.clerkJSUrl,
           scriptVariant: this.options.clerkJSVariant,
         });
