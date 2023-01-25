@@ -93,14 +93,16 @@ import { AuthenticationService } from './services';
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 
-type ClerkConstructorOptions = Pick<ClerkInterface, 'proxyUrl'>;
+type ClerkConstructorOptions = Pick<ClerkInterface, 'proxyUrl' | 'domain' | 'isSatellite'>;
 
 declare global {
   interface Window {
     Clerk?: Clerk;
     __clerk_frontend_api?: string;
     __clerk_publishable_key?: string;
-    __clerk_proxy_url?: Pick<ClerkInterface, 'proxyUrl'>['proxyUrl'];
+    __clerk_proxy_url?: ClerkConstructorOptions['proxyUrl'];
+    __clerk_domain?: ClerkConstructorOptions['domain'];
+    __clerk_is_satellite?: ClerkConstructorOptions['isSatellite'];
   }
 }
 
@@ -120,6 +122,8 @@ export default class Clerk implements ClerkInterface {
   public readonly frontendApi: string;
   public readonly publishableKey?: string;
   public readonly proxyUrl?: ClerkConstructorOptions['proxyUrl'];
+  public readonly domain?: ClerkConstructorOptions['domain'];
+  public readonly isSatellite?: ClerkConstructorOptions['isSatellite'];
 
   #authService: AuthenticationService | null = null;
   #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
@@ -152,6 +156,9 @@ export default class Clerk implements ClerkInterface {
       errorThrower.throwInvalidProxyUrl({ url: _unfilteredProxy });
     }
     this.proxyUrl = proxyUrlToAbsoluteURL(_unfilteredProxy);
+
+    this.domain = (options as ClerkConstructorOptions | undefined)?.domain;
+    this.isSatellite = (options as ClerkConstructorOptions | undefined)?.isSatellite;
 
     if (isLegacyFrontendApiKey(key)) {
       if (!validateFrontendApi(key)) {
@@ -949,9 +956,33 @@ export default class Clerk implements ClerkInterface {
     this.#componentControls?.updateProps(props);
   };
 
+  #syncWithPrimary = () => {
+    const q = new URLSearchParams({
+      redirect_url: `${window.location.href}?synced=true`,
+    });
+    window.location.replace(new URL(`/v1/client/sync?${q.toString()}`, `https://${this.domain}`).toString());
+  };
+
   #loadInStandardBrowser = async (): Promise<void> => {
+    console.log('----- isSatellite -----', this.isSatellite);
+    if (this.isSatellite) {
+      const q = new URLSearchParams(window.location.search);
+      if (q.get('synced') !== 'true') {
+        this.#syncWithPrimary();
+        return;
+      } else if (q.get('synced') === 'true') {
+        q.delete('synced');
+        const queryString = q.toString() ? `?${q.toString()}` : '';
+        window.history.replaceState({}, '', `${window.location.pathname}${queryString}`);
+      }
+    }
+
     this.#authService = new AuthenticationService(this);
     this.#pageLifecycle = createPageLifecycle();
+
+    console.log('----- loadInStandardBrowser -----', this.domain);
+    console.log('----- loadInStandardBrowser -----', this.frontendApi);
+    console.log('----- loadInStandardBrowser -----', window.location.host);
 
     this.#devBrowserHandler = createDevBrowserHandler({
       frontendApi: this.frontendApi,

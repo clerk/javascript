@@ -140,7 +140,7 @@ export default function createFapiClient(clerkInstance: Omit<Clerk, 'proxyUrl'>)
 
     return buildUrlUtil(
       {
-        base: `https://${clerkInstance.frontendApi}`,
+        base: `https://${clerkInstance.domain || clerkInstance.frontendApi}`,
         pathname: `v1${path}`,
         search: buildQueryString(requestInit),
       },
