@@ -20,8 +20,18 @@ const proxyUrl =
   window.__clerk_proxy_url ||
   '';
 
+const domain =
+  document.querySelector('script[data-clerk-domain]')?.getAttribute('data-clerk-domain') || window.__clerk_domain || '';
+
+const isSatellite =
+  document.querySelector('script[data-clerk-is-satellite]')?.getAttribute('data-clerk-is-satellite') === 'true' ||
+  window.__clerk_is_satellite ||
+  false;
+
 window.Clerk = new Clerk(publishableKey || frontendApi, {
   proxyUrl,
+  domain,
+  isSatellite,
 });
 
 if (module.hot) {
