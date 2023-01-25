@@ -485,7 +485,7 @@ export default class Clerk implements ClerkInterface {
       newSession = this.#getSessionFromClient(newSession?.id);
     }
 
-    this.#authService?.setAuthCookiesFromSession(newSession);
+    await this.#authService?.setAuthCookiesFromSession(newSession);
 
     //2. If there's a beforeEmit, typically we're navigating.  Emit the session as
     //   undefined, then wait for beforeEmit to complete before emitting the new session.
@@ -1046,7 +1046,7 @@ export default class Clerk implements ClerkInterface {
         this.#environment = environment;
         this.updateClient(client);
 
-        this.#authService.initAuth({
+        await this.#authService.initAuth({
           enablePolling: this.#options.polling,
           environment: this.#environment,
         });

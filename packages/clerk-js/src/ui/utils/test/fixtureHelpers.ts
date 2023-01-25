@@ -82,6 +82,9 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
       public_user_data: createPublicUserData(params),
       created_at: new Date().getTime(),
       updated_at: new Date().getTime(),
+      last_active_token: {
+        jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzU4NzY3OTAsImRhdGEiOiJmb29iYXIiLCJpYXQiOjE2NzU4NzY3MzB9.Z1BC47lImYvaAtluJlY-kBo0qOoAk42Xb-gNrB2SxJg',
+      },
     } as SessionJSON;
     baseClient.sessions.push(session);
   };

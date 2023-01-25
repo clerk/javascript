@@ -21,18 +21,18 @@ export class AuthenticationService {
 
   constructor(private clerk: Clerk) {}
 
-  public initAuth = (opts: InitParams): void => {
+  public async initAuth(opts: InitParams): Promise<void> {
     this.enablePolling = opts.enablePolling ?? true;
     this.environment = opts.environment;
-    this.setAuthCookiesFromSession(this.clerk.session);
+    await this.setAuthCookiesFromSession(this.clerk.session);
     this.setClientUatCookieForDevelopmentInstances();
     this.clearLegacyAuthV1Cookies();
     this.startPollingForToken();
     this.refreshTokenOnVisibilityChange();
-  };
+  }
 
-  public setAuthCookiesFromSession(session: SessionResource | undefined | null): void {
-    this.updateSessionCookie(session?.lastActiveToken);
+  public async setAuthCookiesFromSession(session: SessionResource | undefined | null): Promise<void> {
+    this.updateSessionCookie(await session?.getToken());
     this.setClientUatCookieForDevelopmentInstances();
   }
 

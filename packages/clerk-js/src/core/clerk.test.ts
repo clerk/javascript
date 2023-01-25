@@ -113,6 +113,7 @@ describe('Clerk singleton', () => {
       status: 'active',
       user: {},
       touch: jest.fn(),
+      getToken: jest.fn(),
     };
     let cookieSpy;
 
@@ -278,6 +279,7 @@ describe('Clerk singleton', () => {
       id: '1',
       status: 'active',
       user: {},
+      getToken: jest.fn(),
     };
     let cookieSpy;
 
@@ -331,8 +333,8 @@ describe('Clerk singleton', () => {
 
   describe('.signOut()', () => {
     const mockClientDestroy = jest.fn();
-    const mockSession1 = { id: '1', remove: jest.fn(), status: 'active', user: {} };
-    const mockSession2 = { id: '2', remove: jest.fn(), status: 'active', user: {} };
+    const mockSession1 = { id: '1', remove: jest.fn(), status: 'active', user: {}, getToken: jest.fn() };
+    const mockSession2 = { id: '2', remove: jest.fn(), status: 'active', user: {}, getToken: jest.fn() };
 
     beforeEach(() => {
       mockClientDestroy.mockReset();
