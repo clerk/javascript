@@ -1,9 +1,14 @@
 import { constants } from '@clerk/backend';
 import { clerkClient } from '@clerk/clerk-sdk-node';
+// @stef
+// TODO:
+// 1. create a clerkClient file, similar to nextjs src
+// 2. can we add the clerk keys to the plugin config? iof yes, how do w read t hem?
+// 3. if no, are there any gatsby-specific envs? eg next_public_ prefix?
 import { API_KEY, FRONTEND_API, PUBLISHABLE_KEY, SECRET_KEY } from '@clerk/nextjs/dist/server';
-import { GetServerDataProps } from 'gatsby';
+import type { GetServerDataProps } from 'gatsby';
 
-import { WithServerAuthOptions } from './types';
+import type { WithServerAuthOptions } from './types';
 import { parseCookies } from './utils';
 
 export function authenticateRequest(context: GetServerDataProps, options: WithServerAuthOptions) {
