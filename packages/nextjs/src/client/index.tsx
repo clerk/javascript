@@ -1,8 +1,10 @@
 import { __internal__setErrorThrowerOptions, ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
-import { IsomorphicClerkOptions } from '@clerk/clerk-react/dist/types';
-import { PublishableKeyOrFrontendApi } from '@clerk/types';
+import type { IsomorphicClerkOptions } from '@clerk/clerk-react/dist/types';
+import type { PublishableKeyOrFrontendApi } from '@clerk/types';
 import { useRouter } from 'next/router';
 import React from 'react';
+
+import { invalidateNextRouterCache } from './invalidateNextRouterCache';
 
 __internal__setErrorThrowerOptions({
   packageName: '@clerk/nextjs',
@@ -23,6 +25,10 @@ export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JS
   const { push } = useRouter();
 
   ReactClerkProvider.displayName = 'ReactClerkProvider';
+
+  React.useLayoutEffect(() => {
+    window.__unstable__onBeforeSetActive = invalidateNextRouterCache;
+  }, []);
 
   return (
     <ReactClerkProvider

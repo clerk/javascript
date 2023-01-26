@@ -1,8 +1,9 @@
-import { ActiveSessionResource, SignInJSON, SignUpJSON } from '@clerk/types';
+import type { ActiveSessionResource, SignInJSON, SignUpJSON } from '@clerk/types';
 import { waitFor } from '@testing-library/dom';
 
 import Clerk from './clerk';
-import { Client, DisplayConfig, Environment, MagicLinkErrorCode, SignIn, SignUp } from './resources/internal';
+import type { DisplayConfig } from './resources/internal';
+import { Client, Environment, MagicLinkErrorCode, SignIn, SignUp } from './resources/internal';
 
 const mockClientFetch = jest.fn();
 const mockEnvironmentFetch = jest.fn();
@@ -151,6 +152,35 @@ describe('Clerk singleton', () => {
       await waitFor(() => {
         expect(mockSession.touch).not.toHaveBeenCalled();
       });
+    });
+
+    it('calls __unstable__onBeforeSetActive before session.touch', async () => {
+      mockSession.touch.mockReturnValueOnce(Promise.resolve());
+      mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
+
+      (window as any).__unstable__onBeforeSetActive = () => {
+        expect(mockSession.touch).not.toHaveBeenCalled();
+      };
+
+      const sut = new Clerk(frontendApi);
+      await sut.load();
+      await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+      expect(mockSession.touch).toHaveBeenCalled();
+    });
+
+    it('calls __unstable__onAfterSetActive after beforeEmit and session.touch', async () => {
+      const beforeEmitMock = jest.fn();
+      mockSession.touch.mockReturnValueOnce(Promise.resolve());
+      mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
+
+      (window as any).__unstable__onAfterSetActive = () => {
+        expect(mockSession.touch).toHaveBeenCalled();
+        expect(beforeEmitMock).toHaveBeenCalled();
+      };
+
+      const sut = new Clerk(frontendApi);
+      await sut.load();
+      await sut.setActive({ session: mockSession as any as ActiveSessionResource, beforeEmit: beforeEmitMock });
     });
   });
 
