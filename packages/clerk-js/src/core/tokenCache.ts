@@ -27,6 +27,8 @@ interface TokenCache {
 const KEY_PREFIX = 'clerk';
 const DELIMITER = '::';
 const LEEWAY = 10;
+// This value should have the same value as the INTERVAL_IN_MS in AuthenticationPoller
+const SYNC_LEEWAY = 5;
 
 export class TokenCacheKey {
   static fromKey(key: string): TokenCacheKey {
@@ -100,7 +102,9 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
 
     const nowSeconds = Math.floor(Date.now() / 1000);
     const elapsedSeconds = nowSeconds - value.createdAt;
-    const expiresSoon = value.expiresIn! - elapsedSeconds < leeway;
+    // We will include the authentication poller interval as part of the leeway to ensure
+    // that the cache value will be valid for more than the SYNC_LEEWAY or the leeway in the next poll.
+    const expiresSoon = value.expiresIn! - elapsedSeconds < (leeway || 1) + SYNC_LEEWAY;
 
     if (expiresSoon) {
       cache.delete(cacheKey.toKey());

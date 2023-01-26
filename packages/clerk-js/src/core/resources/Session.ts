@@ -66,8 +66,8 @@ export class Session extends BaseResource implements SessionResource {
       return null;
     }
 
-    const { leewayInSeconds = 10, template, skipCache = false } = options || {};
-    if (!template && leewayInSeconds >= 60) {
+    const { leewayInSeconds, template, skipCache = false } = options || {};
+    if (!template && Number(leewayInSeconds) >= 60) {
       throw new Error('Leeway can not exceed the token lifespan (60 seconds)');
     }
 
