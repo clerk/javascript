@@ -22,7 +22,9 @@
     "gatsby-ssr.js",
     "gatsby-node.js",
     "ssr.js",
-    "ssr.d.ts"
+    "ssr.d.ts",
+    "api.js",
+    "api.d.ts"
   ],
   "scripts": {
     "prepublishOnly": "npm run build",
