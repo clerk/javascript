@@ -118,7 +118,7 @@ describe('Clerk singleton', () => {
       mockSession.touch.mockReset();
     });
 
-    it('does not call session touch on signout', async () => {
+    it('does not call session touch on signOut', async () => {
       mockSession.touch.mockReturnValueOnce(Promise.resolve());
       mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
 
