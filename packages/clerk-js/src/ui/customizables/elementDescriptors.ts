@@ -1,4 +1,4 @@
-import { ElementObjectKey, ElementsConfig, IdSelectors, StateSelectors } from '@clerk/types';
+import type { ElementObjectKey, ElementsConfig, IdSelectors, StateSelectors } from '@clerk/types';
 
 import { containsAllOfType, fromEntries } from '../utils';
 

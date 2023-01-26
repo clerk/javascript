@@ -1,7 +1,7 @@
 import { descriptors, Icon } from '../../customizables';
 import { ArrowBlockButton } from '../../elements';
 import { Plus } from '../../icons';
-import { PropsOfComponent } from '../../styledSystem';
+import type { PropsOfComponent } from '../../styledSystem';
 
 type BlockButtonProps = PropsOfComponent<typeof ArrowBlockButton>;
 

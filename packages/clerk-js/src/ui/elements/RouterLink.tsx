@@ -1,6 +1,6 @@
 import { Link } from '../customizables';
 import { useRouter } from '../router';
-import { PropsOfComponent } from '../styledSystem';
+import type { PropsOfComponent } from '../styledSystem';
 
 type RouterLinkProps = PropsOfComponent<typeof Link> & {
   to?: string;

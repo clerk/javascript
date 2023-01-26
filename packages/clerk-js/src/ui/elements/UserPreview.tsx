@@ -1,8 +1,9 @@
-import { UserPreviewId, UserResource } from '@clerk/types';
+import type { UserPreviewId, UserResource } from '@clerk/types';
 import React from 'react';
 
-import { descriptors, Flex, LocalizationKey, Text, useLocalizations } from '../customizables';
-import { PropsOfComponent, ThemableCssProp } from '../styledSystem';
+import type { LocalizationKey } from '../customizables';
+import { descriptors, Flex, Text, useLocalizations } from '../customizables';
+import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { getFullName, getIdentifier } from '../utils';
 import { UserAvatar } from './UserAvatar';
 

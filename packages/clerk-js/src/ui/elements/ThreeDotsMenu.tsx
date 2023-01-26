@@ -1,4 +1,5 @@
-import { Button, Icon, LocalizationKey } from '../customizables';
+import type { LocalizationKey } from '../customizables';
+import { Button, Icon } from '../customizables';
 import { ThreeDots } from '../icons';
 import { Menu, MenuItem, MenuList, MenuTrigger } from './Menu';
 

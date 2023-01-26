@@ -1,8 +1,9 @@
-import { ProfileSectionId } from '@clerk/types';
+import type { ProfileSectionId } from '@clerk/types';
 
-import { Col, descriptors, Flex, LocalizationKey, Text } from '../customizables';
-import { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
-import { PropsOfComponent } from '../styledSystem';
+import type { LocalizationKey } from '../customizables';
+import { Col, descriptors, Flex, Text } from '../customizables';
+import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
+import type { PropsOfComponent } from '../styledSystem';
 
 type ProfileSectionProps = Omit<PropsOfComponent<typeof Flex>, 'title'> & {
   title: LocalizationKey;

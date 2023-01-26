@@ -1,6 +1,6 @@
 import { joinPaths } from '../../util/path';
-import { Organization, OrganizationInvitation, OrganizationMembership } from '../resources';
-import { OrganizationMembershipRole } from '../resources/Enums';
+import type { Organization, OrganizationInvitation, OrganizationMembership } from '../resources';
+import type { OrganizationMembershipRole } from '../resources/Enums';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/organizations';

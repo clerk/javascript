@@ -1,4 +1,4 @@
-import { Web3WalletResource } from '@clerk/types';
+import type { Web3WalletResource } from '@clerk/types';
 
 import { useCoreUser } from '../../contexts';
 import { Col, Flex, Image, localizationKeys } from '../../customizables';

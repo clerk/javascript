@@ -4,7 +4,8 @@ import { buildSSOCallbackURL } from '../../common/redirects';
 import { useCoreClerk, useCoreSignIn, useSignInContext } from '../../contexts';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { useCardState } from '../../elements/contexts';
-import { SocialButtons, SocialButtonsProps } from '../../elements/SocialButtons';
+import type { SocialButtonsProps } from '../../elements/SocialButtons';
+import { SocialButtons } from '../../elements/SocialButtons';
 import { useNavigate } from '../../hooks';
 import { handleError } from '../../utils';
 

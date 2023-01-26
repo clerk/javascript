@@ -1,5 +1,5 @@
 import { noop } from '../noop';
-import {
+import type {
   WorkerClearTimeout,
   WorkerSetTimeout,
   WorkerTimeoutCallback,

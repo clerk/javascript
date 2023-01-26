@@ -1,7 +1,7 @@
-import { ActJWTClaim } from './jwt';
-import { ClerkResource } from './resource';
-import { TokenResource } from './token';
-import { UserResource } from './user';
+import type { ActJWTClaim } from './jwt';
+import type { ClerkResource } from './resource';
+import type { TokenResource } from './token';
+import type { UserResource } from './user';
 
 export interface SessionResource extends ClerkResource {
   id: string;

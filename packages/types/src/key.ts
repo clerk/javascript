@@ -1,4 +1,4 @@
-import { InstanceType } from './clerk';
+import type { InstanceType } from './clerk';
 
 export type PublishableKey = {
   frontendApi: string;

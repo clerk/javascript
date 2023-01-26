@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Flex, Input } from '../customizables';
-import { PropsOfComponent } from '../styledSystem';
+import type { PropsOfComponent } from '../styledSystem';
 
 type InputWithIcon = PropsOfComponent<typeof Input> & { leftIcon?: React.ReactElement };
 

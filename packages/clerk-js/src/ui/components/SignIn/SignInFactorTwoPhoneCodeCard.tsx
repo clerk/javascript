@@ -1,8 +1,9 @@
-import { PhoneCodeFactor } from '@clerk/types';
+import type { PhoneCodeFactor } from '@clerk/types';
 
 import { useCoreSignIn } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
-import { SignInFactorTwoCodeCard, SignInFactorTwoCodeForm } from './SignInFactorTwoCodeForm';
+import type { SignInFactorTwoCodeCard } from './SignInFactorTwoCodeForm';
+import { SignInFactorTwoCodeForm } from './SignInFactorTwoCodeForm';
 
 type SignInFactorTwoPhoneCodeCardProps = SignInFactorTwoCodeCard & { factor: PhoneCodeFactor };
 

@@ -1,4 +1,4 @@
-import { PhoneNumberResource } from '@clerk/types';
+import type { PhoneNumberResource } from '@clerk/types';
 
 import { useCoreUser } from '../../contexts';
 import { Badge, Col, localizationKeys, Text } from '../../customizables';

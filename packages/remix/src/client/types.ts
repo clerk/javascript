@@ -1,4 +1,4 @@
-import { InitialState } from '@clerk/types';
+import type { InitialState } from '@clerk/types';
 
 export type ClerkState = {
   __type: 'clerkState';

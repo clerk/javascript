@@ -1,6 +1,7 @@
-import { FieldId } from '@clerk/types';
+import type { FieldId } from '@clerk/types';
 import React from 'react';
 
+import type { LocalizationKey } from '../customizables';
 import {
   descriptors,
   Flex,
@@ -9,12 +10,11 @@ import {
   FormLabel,
   Input,
   Link,
-  LocalizationKey,
   localizationKeys,
   Text,
   useLocalizations,
 } from '../customizables';
-import { PropsOfComponent } from '../styledSystem';
+import type { PropsOfComponent } from '../styledSystem';
 import { useCardState } from './contexts';
 import { PasswordInput } from './PasswordInput';
 import { PhoneInput } from './PhoneInput';

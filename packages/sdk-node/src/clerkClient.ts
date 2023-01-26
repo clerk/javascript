@@ -1,10 +1,5 @@
-import {
-  Clerk as _Clerk,
-  ClerkOptions,
-  decodeJwt,
-  verifyToken as _verifyToken,
-  VerifyTokenOptions,
-} from '@clerk/backend';
+import type { ClerkOptions, VerifyTokenOptions } from '@clerk/backend';
+import { Clerk as _Clerk, decodeJwt, verifyToken as _verifyToken } from '@clerk/backend';
 
 import { createClerkExpressRequireAuth } from './clerkExpressRequireAuth';
 import { createClerkExpressWithAuth } from './clerkExpressWithAuth';

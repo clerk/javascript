@@ -1,7 +1,8 @@
-import { TOTPFactor } from '@clerk/types';
+import type { TOTPFactor } from '@clerk/types';
 
 import { Flow, localizationKeys } from '../../customizables';
-import { SignInFactorTwoCodeCard, SignInFactorTwoCodeForm } from './SignInFactorTwoCodeForm';
+import type { SignInFactorTwoCodeCard } from './SignInFactorTwoCodeForm';
+import { SignInFactorTwoCodeForm } from './SignInFactorTwoCodeForm';
 
 type SignInFactorTwoTOTPCardProps = SignInFactorTwoCodeCard & { factor: TOTPFactor };
 

@@ -1,4 +1,4 @@
-import { TokenJSON } from './JSON';
+import type { TokenJSON } from './JSON';
 
 export class Token {
   constructor(readonly jwt: string) {}

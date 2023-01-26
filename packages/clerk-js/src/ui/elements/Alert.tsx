@@ -1,7 +1,9 @@
 import React from 'react';
 
-import { Alert as AlertCust, AlertIcon, Col, descriptors, LocalizationKey, Text } from '../customizables';
-import { animations, PropsOfComponent } from '../styledSystem';
+import type { LocalizationKey } from '../customizables';
+import { Alert as AlertCust, AlertIcon, Col, descriptors, Text } from '../customizables';
+import type { PropsOfComponent } from '../styledSystem';
+import { animations } from '../styledSystem';
 
 type _AlertProps = {
   variant?: 'danger' | 'warning';

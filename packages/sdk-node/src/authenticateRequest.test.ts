@@ -1,5 +1,5 @@
 import { constants } from '@clerk/backend';
-import { Request } from 'express';
+import type { Request } from 'express';
 
 import { authenticateRequest } from './authenticateRequest';
 

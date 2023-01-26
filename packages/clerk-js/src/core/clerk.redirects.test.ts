@@ -1,5 +1,6 @@
 import Clerk from './clerk';
-import { Client, DisplayConfig, Environment } from './resources/internal';
+import type { DisplayConfig } from './resources/internal';
+import { Client, Environment } from './resources/internal';
 
 const mockClientFetch = jest.fn();
 const mockEnvironmentFetch = jest.fn();

@@ -1,6 +1,6 @@
 import type { JwtPayload } from '@clerk/types';
 import type { SignedInAuthObject, SignedOutAuthObject } from './authObjects';
-import { TokenVerificationErrorReason } from './errors';
+import type { TokenVerificationErrorReason } from './errors';
 
 import { createBackendApiClient } from '../api';
 import { signedInAuthObject, signedOutAuthObject } from './authObjects';

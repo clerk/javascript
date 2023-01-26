@@ -1,10 +1,5 @@
-import {
-  CodeToCountryIsoMap,
-  CountryEntry,
-  CountryIso,
-  IsoToCountryMap,
-  SubAreaCodeSets,
-} from '../elements/PhoneInput/countryCodeData';
+import type { CountryEntry, CountryIso } from '../elements/PhoneInput/countryCodeData';
+import { CodeToCountryIsoMap, IsoToCountryMap, SubAreaCodeSets } from '../elements/PhoneInput/countryCodeData';
 
 // offset between uppercase ascii and regional indicator symbols
 const OFFSET = 127397;

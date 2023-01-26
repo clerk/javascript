@@ -23,7 +23,7 @@ import type {
   Web3SignatureConfig,
   Web3SignatureFactor,
 } from '@clerk/types';
-import { AuthenticateWithWeb3Params } from '@clerk/types/src';
+import type { AuthenticateWithWeb3Params } from '@clerk/types/src';
 
 import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from '../../utils';
 import {

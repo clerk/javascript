@@ -1,8 +1,9 @@
-import { SignInFactor } from '@clerk/types';
+import type { SignInFactor } from '@clerk/types';
 import React from 'react';
 
 import { useCoreSignIn } from '../../contexts';
-import { Col, descriptors, Flow, LocalizationKey, localizationKeys } from '../../customizables';
+import type { LocalizationKey } from '../../customizables';
+import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { ArrowBlockButton, Card, CardAlert, Footer, Header } from '../../elements';
 import { useCardState } from '../../elements/contexts';
 import { backupCodePrefFactorComparator, formatSafeIdentifier } from '../../utils';

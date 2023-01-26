@@ -1,4 +1,4 @@
-import { ClerkResource } from './resource';
+import type { ClerkResource } from './resource';
 
 export interface AuthConfigResource extends ClerkResource {
   /**

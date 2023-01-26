@@ -1,4 +1,4 @@
-import { HandleOAuthCallbackParams } from '@clerk/types';
+import type { HandleOAuthCallbackParams } from '@clerk/types';
 import React from 'react';
 
 import { useAuthContext } from '../contexts/AuthContext';

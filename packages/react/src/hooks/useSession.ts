@@ -1,4 +1,4 @@
-import { ActiveSessionResource } from '@clerk/types';
+import type { ActiveSessionResource } from '@clerk/types';
 
 import { useSessionContext } from '../contexts/SessionContext';
 

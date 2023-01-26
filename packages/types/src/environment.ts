@@ -1,8 +1,8 @@
-import { AuthConfigResource } from './authConfig';
-import { DisplayConfigResource } from './displayConfig';
-import { OrganizationSettingsResource } from './organizationSettings';
-import { ClerkResource } from './resource';
-import { UserSettingsResource } from './userSettings';
+import type { AuthConfigResource } from './authConfig';
+import type { DisplayConfigResource } from './displayConfig';
+import type { OrganizationSettingsResource } from './organizationSettings';
+import type { ClerkResource } from './resource';
+import type { UserSettingsResource } from './userSettings';
 
 export interface EnvironmentResource extends ClerkResource {
   userSettings: UserSettingsResource;

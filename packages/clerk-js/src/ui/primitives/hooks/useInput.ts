@@ -1,4 +1,5 @@
-import React, { FormEvent } from 'react';
+import type { FormEvent } from 'react';
+import React from 'react';
 
 export function useInput(callback: React.FormEventHandler<HTMLInputElement> | null | undefined): {
   onChange: React.FormEventHandler<HTMLInputElement>;

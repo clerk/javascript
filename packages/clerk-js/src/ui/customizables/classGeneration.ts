@@ -1,8 +1,9 @@
 import type { Elements, ElementState } from '@clerk/types';
 
 import type { FlowMetadata } from '../elements/contexts';
-import { CLASS_PREFIX, ElementDescriptor, ElementId } from './elementDescriptors';
-import { ParsedElements } from './parseAppearance';
+import type { ElementDescriptor, ElementId } from './elementDescriptors';
+import { CLASS_PREFIX } from './elementDescriptors';
+import type { ParsedElements } from './parseAppearance';
 
 const STATE_PROP_TO_CLASSNAME = Object.freeze({
   loading: ` ${CLASS_PREFIX}loading`,

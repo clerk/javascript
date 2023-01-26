@@ -1,4 +1,4 @@
-import { MembershipRole } from '@clerk/types';
+import type { MembershipRole } from '@clerk/types';
 import { describe } from '@jest/globals';
 import React from 'react';
 

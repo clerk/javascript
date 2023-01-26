@@ -1,4 +1,4 @@
-import { UserResource } from '@clerk/types';
+import type { UserResource } from '@clerk/types';
 
 export const getIdentifier = (user: Partial<UserResource>): string => {
   if (user.username) {

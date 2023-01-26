@@ -1,4 +1,4 @@
-import { OrganizationResource } from '@clerk/types';
+import type { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
 import { Plus, SwitchArrows } from '../../../ui/icons';

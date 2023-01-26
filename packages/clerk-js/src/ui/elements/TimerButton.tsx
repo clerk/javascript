@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 
 import { Button, useLocalizations } from '../customizables';
 import { useSafeLayoutEffect } from '../hooks';
-import { PropsOfComponent } from '../styledSystem';
+import type { PropsOfComponent } from '../styledSystem';
 
 type TimerButtonProps = PropsOfComponent<typeof Button> & {
   throttleTimeInSec?: number;

@@ -1,6 +1,7 @@
 import type { Web3Provider } from '@clerk/types';
 
-import { LocalizationKey, localizationKeys } from '../localization/localizationKeys';
+import type { LocalizationKey } from '../localization/localizationKeys';
+import { localizationKeys } from '../localization/localizationKeys';
 
 const FirstFactorConfigs = Object.freeze({
   email_address: {

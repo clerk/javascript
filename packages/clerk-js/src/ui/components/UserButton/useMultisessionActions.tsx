@@ -1,5 +1,4 @@
-import { ActiveSessionResource, UserButtonProps, UserResource } from '@clerk/types';
-import React from 'react';
+import type { ActiveSessionResource, UserButtonProps, UserResource } from '@clerk/types';
 
 import { windowNavigate } from '../../../utils/windowNavigate';
 import { useCoreClerk, useCoreSessionList } from '../../contexts';

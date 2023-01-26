@@ -1,5 +1,5 @@
-import { OrganizationResource } from './organization';
-import { PublicUserData } from './session';
+import type { OrganizationResource } from './organization';
+import type { PublicUserData } from './session';
 
 declare global {
   /**

@@ -1,4 +1,4 @@
-import { Web3Strategy } from './strategies';
+import type { Web3Strategy } from './strategies';
 
 export interface Web3ProviderData {
   provider: Web3Provider;

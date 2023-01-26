@@ -7,7 +7,7 @@ import type {
   SessionStatus,
   TokenResource,
 } from '@clerk/types';
-import { GetToken, GetTokenOptions, UserResource } from '@clerk/types';
+import type { GetToken, GetTokenOptions, UserResource } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { SessionTokenCache } from '../tokenCache';

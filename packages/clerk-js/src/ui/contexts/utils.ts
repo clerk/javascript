@@ -1,4 +1,4 @@
-import { Clerk } from '@clerk/types';
+import type { Clerk } from '@clerk/types';
 
 import { clerkCoreErrorContextProviderNotFound, clerkCoreErrorNoClerkSingleton } from '../../core/errors';
 

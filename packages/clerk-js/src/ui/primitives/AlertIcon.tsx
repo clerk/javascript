@@ -1,5 +1,6 @@
 import { ExclamationCircle, ExclamationTriangle } from '../icons';
-import { createVariants, StyleVariants } from '../styledSystem';
+import type { StyleVariants } from '../styledSystem';
+import { createVariants } from '../styledSystem';
 
 const { applyVariants, filterProps } = createVariants(theme => ({
   base: {

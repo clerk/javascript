@@ -1,4 +1,4 @@
-import { SessionResource } from '@clerk/types';
+import type { SessionResource } from '@clerk/types';
 import React from 'react';
 
 import { useSessionContext } from '../contexts/SessionContext';

@@ -1,8 +1,10 @@
 import React from 'react';
 
-import { descriptors, Flex, Icon, Input, LocalizationKey, Text, useLocalizations } from '../customizables';
+import type { LocalizationKey } from '../customizables';
+import { descriptors, Flex, Icon, Input, Text, useLocalizations } from '../customizables';
 import { Plus } from '../icons';
-import { common, PropsOfComponent } from '../styledSystem';
+import type { PropsOfComponent } from '../styledSystem';
+import { common } from '../styledSystem';
 
 type Tag = string;
 

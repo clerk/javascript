@@ -1,4 +1,4 @@
-import { InternalTheme, InternalThemeFoundations } from './defaultFoundations';
+import type { InternalTheme, InternalThemeFoundations } from './defaultFoundations';
 
 export const createInternalTheme = (foundations: InternalThemeFoundations): InternalTheme => {
   const res = {} as any;

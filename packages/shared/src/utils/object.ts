@@ -16,7 +16,7 @@ const createDeepObjectTransformer = (transform: any) => {
     }
 
     const copy = { ...obj };
-    const keys = Object.keys(copy) as string[];
+    const keys = Object.keys(copy);
     for (const oldName of keys) {
       const newName = transform(oldName.toString());
       if (newName !== oldName) {

@@ -1,7 +1,7 @@
-import { OAuthProvider } from '@clerk/types';
+import type { OAuthProvider } from '@clerk/types';
 
 import { joinPaths } from '../../util/path';
-import { OauthAccessToken, OrganizationMembership, User } from '../resources';
+import type { OauthAccessToken, OrganizationMembership, User } from '../resources';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/users';

@@ -1,7 +1,8 @@
 import React from 'react';
 
-import { PrimitiveProps } from '../styledSystem';
-import { Box, BoxProps } from './Box';
+import type { PrimitiveProps } from '../styledSystem';
+import type { BoxProps } from './Box';
+import { Box } from './Box';
 
 export type TheadProps = PrimitiveProps<'thead'> & Omit<BoxProps, 'as'>;
 

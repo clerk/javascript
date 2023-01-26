@@ -1,7 +1,7 @@
-import { SignOutCallback, SignOutOptions } from '@clerk/types';
+import type { SignOutCallback, SignOutOptions } from '@clerk/types';
 import React from 'react';
 
-import { WithClerkProp } from '../types';
+import type { WithClerkProp } from '../types';
 import { assertSingleChild, normalizeWithDefaultValue, safeExecute } from '../utils';
 import { withClerk } from './withClerk';
 

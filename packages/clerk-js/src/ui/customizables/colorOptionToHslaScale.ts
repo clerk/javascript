@@ -1,4 +1,4 @@
-import { ColorScale, CssColorOrScale, HslaColor, HslaColorString } from '@clerk/types';
+import type { ColorScale, CssColorOrScale, HslaColor, HslaColorString } from '@clerk/types';
 
 import { colors, fromEntries } from '../utils';
 

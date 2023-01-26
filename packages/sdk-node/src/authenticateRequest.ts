@@ -1,8 +1,9 @@
-import { Clerk, constants, RequestState } from '@clerk/backend';
+import type { Clerk, RequestState } from '@clerk/backend';
+import { constants } from '@clerk/backend';
 import cookie from 'cookie';
-import { Request as ExpressRequest, Response as ExpressResponse } from 'express';
+import type { Request as ExpressRequest, Response as ExpressResponse } from 'express';
 
-import { ClerkMiddlewareOptions } from './types';
+import type { ClerkMiddlewareOptions } from './types';
 
 const parseCookies = (req: ExpressRequest) => {
   return cookie.parse(req.headers['cookie'] || '');

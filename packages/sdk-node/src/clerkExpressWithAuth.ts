@@ -3,7 +3,7 @@ import {
   decorateResponseWithObservabilityHeaders,
   handleInterstitialCase,
 } from './authenticateRequest';
-import { CreateClerkExpressMiddlewareOptions } from './clerkExpressRequireAuth';
+import type { CreateClerkExpressMiddlewareOptions } from './clerkExpressRequireAuth';
 import type { ClerkMiddlewareOptions, MiddlewareWithAuthProp, WithAuthProp } from './types';
 
 export const createClerkExpressWithAuth = (createOpts: CreateClerkExpressMiddlewareOptions) => {

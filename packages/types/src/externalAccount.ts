@@ -1,5 +1,5 @@
-import { OAuthProvider } from './oauth';
-import { VerificationResource } from './verification';
+import type { OAuthProvider } from './oauth';
+import type { VerificationResource } from './verification';
 
 export interface ExternalAccountResource {
   id: string;

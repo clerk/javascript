@@ -1,5 +1,5 @@
 import { joinPaths } from '../../util/path';
-import { DeletedObject, EmailAddress } from '../resources';
+import type { DeletedObject, EmailAddress } from '../resources';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/email_addresses';

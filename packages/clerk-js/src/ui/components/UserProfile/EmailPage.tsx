@@ -1,4 +1,4 @@
-import { EmailAddressResource } from '@clerk/types';
+import type { EmailAddressResource } from '@clerk/types';
 import React from 'react';
 
 import { useWizard, Wizard } from '../../common';

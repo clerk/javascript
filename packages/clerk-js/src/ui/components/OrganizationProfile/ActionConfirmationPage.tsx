@@ -1,6 +1,7 @@
 import { useWizard, Wizard } from '../../common';
 import { useCoreOrganization, useCoreUser, useOrganizationProfileContext } from '../../contexts';
-import { LocalizationKey, localizationKeys, Text } from '../../customizables';
+import type { LocalizationKey } from '../../customizables';
+import { localizationKeys, Text } from '../../customizables';
 import {
   ContentPage,
   Form,

@@ -14,10 +14,11 @@ import {
 } from '../../elements';
 import { useCardState } from '../../elements/contexts';
 import { useNavigate } from '../../hooks';
-import { buildRequest, FormControlState, handleError, useFormControl } from '../../utils';
+import type { FormControlState } from '../../utils';
+import { buildRequest, handleError, useFormControl } from '../../utils';
 import { SignUpForm } from './SignUpForm';
+import type { ActiveIdentifier } from './signUpFormHelpers';
 import {
-  ActiveIdentifier,
   determineActiveFields,
   emailOrPhone,
   getInitialActiveIdentifier,

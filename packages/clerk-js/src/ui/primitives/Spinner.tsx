@@ -1,4 +1,5 @@
-import { animations, createCssVariables, createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
+import type { PrimitiveProps, StyleVariants } from '../styledSystem';
+import { animations, createCssVariables, createVariants } from '../styledSystem';
 
 const { size, thickness, speed } = createCssVariables('speed', 'size', 'thickness');
 

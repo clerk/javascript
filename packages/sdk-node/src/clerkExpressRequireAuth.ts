@@ -1,4 +1,4 @@
-import { Clerk } from '@clerk/backend';
+import type { Clerk } from '@clerk/backend';
 
 import {
   authenticateRequest,

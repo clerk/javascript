@@ -1,4 +1,4 @@
-import { MembershipRole, OrganizationMembershipResource } from '@clerk/types';
+import type { MembershipRole, OrganizationMembershipResource } from '@clerk/types';
 
 import { useCoreOrganization, useCoreUser } from '../../contexts';
 import { Badge, localizationKeys, Td, Text } from '../../customizables';

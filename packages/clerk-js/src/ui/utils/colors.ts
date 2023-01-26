@@ -7,7 +7,7 @@
  * https://github.com/Qix-/color
  */
 
-import { HslaColor, HslaColorString } from '@clerk/types';
+import type { HslaColor, HslaColorString } from '@clerk/types';
 
 const abbrRegex = /^#([a-f0-9]{3,4})$/i;
 const hexRegex = /^#([a-f0-9]{6})([a-f0-9]{2})?$/i;

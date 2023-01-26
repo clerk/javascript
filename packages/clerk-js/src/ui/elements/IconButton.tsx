@@ -1,8 +1,8 @@
 import { cloneElement, isValidElement } from 'react';
 
 import { Button, Icon, useLocalizations } from '../customizables';
-import { ElementDescriptor } from '../customizables/elementDescriptors';
-import { PropsOfComponent } from '../styledSystem';
+import type { ElementDescriptor } from '../customizables/elementDescriptors';
+import type { PropsOfComponent } from '../styledSystem';
 
 export const IconButton = (
   props: PropsOfComponent<typeof Button> & {

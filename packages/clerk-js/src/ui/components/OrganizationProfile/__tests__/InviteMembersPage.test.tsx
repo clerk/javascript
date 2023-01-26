@@ -1,4 +1,4 @@
-import { MembershipRole, OrganizationInvitationResource } from '@clerk/types';
+import type { MembershipRole, OrganizationInvitationResource } from '@clerk/types';
 import { describe } from '@jest/globals';
 import { waitFor } from '@testing-library/dom';
 import React from 'react';

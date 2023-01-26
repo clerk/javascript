@@ -1,5 +1,5 @@
 import { camelToSnake, isIPV4Address } from '@clerk/shared';
-import { SignUpResource } from '@clerk/types';
+import type { SignUpResource } from '@clerk/types';
 
 import { loadScript } from '../utils';
 import { joinPaths } from './path';

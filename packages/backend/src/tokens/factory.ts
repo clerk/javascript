@@ -1,16 +1,9 @@
-import { ApiClient } from '../api';
+import type { ApiClient } from '../api';
 import { API_URL, API_VERSION } from '../constants';
-import {
-  buildPublicInterstitialUrl,
-  loadInterstitialFromBAPI,
-  loadInterstitialFromLocal,
-  LoadInterstitialOptions,
-} from './interstitial';
-import {
-  authenticateRequest as authenticateRequestOriginal,
-  AuthenticateRequestOptions,
-  debugRequestState,
-} from './request';
+import type { LoadInterstitialOptions } from './interstitial';
+import { buildPublicInterstitialUrl, loadInterstitialFromBAPI, loadInterstitialFromLocal } from './interstitial';
+import type { AuthenticateRequestOptions } from './request';
+import { authenticateRequest as authenticateRequestOriginal, debugRequestState } from './request';
 
 export type CreateAuthenticateRequestOptions = {
   options: Partial<

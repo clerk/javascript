@@ -1,4 +1,4 @@
-import { UserResource } from '@clerk/types';
+import type { UserResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 import React from 'react';
 

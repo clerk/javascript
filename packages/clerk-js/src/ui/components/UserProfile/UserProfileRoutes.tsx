@@ -1,6 +1,6 @@
 import { ProfileCardContent } from '../../elements';
 import { Route, Switch } from '../../router';
-import { PropsOfComponent } from '../../styledSystem';
+import type { PropsOfComponent } from '../../styledSystem';
 import { ConnectedAccountsPage } from './ConnectedAccountsPage';
 import { EmailPage } from './EmailPage';
 import { MfaBackupCodeCreatePage } from './MfaBackupCodeCreatePage';

@@ -1,4 +1,5 @@
-import React, { ChangeEventHandler } from 'react';
+import type { ChangeEventHandler } from 'react';
+import React from 'react';
 
 type Unarray<T> = T extends Array<infer U> ? U : T;
 

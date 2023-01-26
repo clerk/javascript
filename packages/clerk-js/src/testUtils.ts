@@ -1,8 +1,8 @@
 // eslint-disable-next-line no-restricted-imports
 import { matchers } from '@emotion/jest';
-import { render as _render, RenderOptions } from '@testing-library/react';
+import type { RenderOptions } from '@testing-library/react';
+import { render as _render } from '@testing-library/react';
 import UserEvent from '@testing-library/user-event';
-import React from 'react';
 
 expect.extend(matchers);
 

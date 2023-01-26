@@ -1,7 +1,8 @@
 import React from 'react';
 
-import { Col, descriptors, LocalizationKey } from '../customizables';
-import { PropsOfComponent } from '../styledSystem';
+import type { LocalizationKey } from '../customizables';
+import { Col, descriptors } from '../customizables';
+import type { PropsOfComponent } from '../styledSystem';
 import { CardAlert, Header, NavbarMenuButtonRow, useCardState } from './index';
 
 type PageProps = PropsOfComponent<typeof Col> & {

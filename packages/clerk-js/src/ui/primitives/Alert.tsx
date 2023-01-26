@@ -1,5 +1,7 @@
-import { common, createVariants, StyleVariants } from '../styledSystem';
-import { Flex, FlexProps } from './Flex';
+import type { StyleVariants } from '../styledSystem';
+import { common, createVariants } from '../styledSystem';
+import type { FlexProps } from './Flex';
+import { Flex } from './Flex';
 
 const { applyVariants, filterProps } = createVariants(theme => ({
   base: {

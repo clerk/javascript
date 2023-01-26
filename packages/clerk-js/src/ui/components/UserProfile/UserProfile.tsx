@@ -1,11 +1,11 @@
-import { UserProfileProps } from '@clerk/types';
+import type { UserProfileProps } from '@clerk/types';
 import React from 'react';
 
 import { ComponentContext, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { ProfileCard, withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
-import { UserProfileCtx } from '../../types';
+import type { UserProfileCtx } from '../../types';
 import { UserProfileNavbar } from './UserProfileNavbar';
 import { UserProfileRoutes } from './UserProfileRoutes';
 import { VerificationSuccessPage } from './VerifyWithLink';

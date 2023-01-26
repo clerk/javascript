@@ -1,4 +1,4 @@
-import { HslaColor } from '@clerk/types';
+import type { HslaColor } from '@clerk/types';
 
 import { colors } from '../colors';
 

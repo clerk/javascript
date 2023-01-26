@@ -1,4 +1,4 @@
-import { Web3Strategy, Web3WalletResource } from '@clerk/types';
+import type { Web3Strategy, Web3WalletResource } from '@clerk/types';
 import React from 'react';
 
 import { generateSignatureWithMetamask, getMetamaskIdentifier } from '../../../utils/web3';

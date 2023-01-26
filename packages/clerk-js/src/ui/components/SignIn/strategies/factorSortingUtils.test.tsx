@@ -1,4 +1,4 @@
-import { SignInFactor, SignInStrategy } from '@clerk/types';
+import type { SignInFactor, SignInStrategy } from '@clerk/types';
 
 import {
   allStrategiesButtonsComparator,

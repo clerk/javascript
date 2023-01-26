@@ -1,4 +1,4 @@
-import { CreateOrganizationParams, OrganizationMembershipResource, OrganizationResource } from '@clerk/types';
+import type { CreateOrganizationParams, OrganizationMembershipResource, OrganizationResource } from '@clerk/types';
 
 import { useClerkInstanceContext } from './contexts';
 

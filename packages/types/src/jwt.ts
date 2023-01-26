@@ -1,4 +1,4 @@
-import { MembershipRole } from './organizationMembership';
+import type { MembershipRole } from './organizationMembership';
 
 export interface JWT {
   encoded: { header: string; payload: string; signature: string };

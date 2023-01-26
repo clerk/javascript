@@ -1,4 +1,4 @@
-import { ClerkAPIError } from './api';
+import type { ClerkAPIError } from './api';
 
 export interface VerificationResource {
   attempts: number | null;

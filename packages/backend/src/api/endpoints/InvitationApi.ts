@@ -1,5 +1,5 @@
 import { joinPaths } from '../../util/path';
-import { Invitation } from '../resources/Invitation';
+import type { Invitation } from '../resources/Invitation';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/invitations';

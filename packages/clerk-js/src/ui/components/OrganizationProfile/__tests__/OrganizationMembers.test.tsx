@@ -1,4 +1,4 @@
-import { MembershipRole, OrganizationMembershipResource, OrganizationResource } from '@clerk/types';
+import type { MembershipRole, OrganizationMembershipResource, OrganizationResource } from '@clerk/types';
 import { describe, it, jest } from '@jest/globals';
 import { queryByRole } from '@testing-library/dom';
 import React from 'react';

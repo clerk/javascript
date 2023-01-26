@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { common, createVariants, mqu, PrimitiveProps, RequiredProp, StyleVariants } from '../styledSystem';
+import type { PrimitiveProps, RequiredProp, StyleVariants } from '../styledSystem';
+import { common, createVariants, mqu } from '../styledSystem';
 import { useFormControl } from './hooks';
 import { useInput } from './hooks/useInput';
 

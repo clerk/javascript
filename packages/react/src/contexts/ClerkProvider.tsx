@@ -1,5 +1,5 @@
 import { isLegacyFrontendApiKey, isPublishableKey } from '@clerk/shared';
-import { InitialState } from '@clerk/types';
+import type { InitialState } from '@clerk/types';
 import React from 'react';
 
 import { multipleClerkProvidersError } from '../errors';

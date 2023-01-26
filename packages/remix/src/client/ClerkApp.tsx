@@ -1,7 +1,8 @@
 import { useLoaderData } from '@remix-run/react';
 import React from 'react';
 
-import { ClerkProvider, RemixClerkProviderProps } from './RemixClerkProvider';
+import type { RemixClerkProviderProps } from './RemixClerkProvider';
+import { ClerkProvider } from './RemixClerkProvider';
 
 type ClerkAppOptions = Partial<Omit<RemixClerkProviderProps, 'navigate' | 'children' | 'clerkState'>>;
 

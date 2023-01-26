@@ -1,4 +1,4 @@
-import { Color, ColorString, HslaColor, RgbaColor, TransparentColor } from '@clerk/types';
+import type { Color, ColorString, HslaColor, RgbaColor, TransparentColor } from '@clerk/types';
 
 const IS_HEX_COLOR_REGEX = /^#?([A-F0-9]{6}|[A-F0-9]{3})$/i;
 

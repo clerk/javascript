@@ -1,11 +1,11 @@
 import React from 'react';
 
 import { isMagicLinkError, MagicLinkErrorCode } from '../../core/resources/Error';
-import { VerificationStatus } from '../../utils/getClerkQueryParam';
+import type { VerificationStatus } from '../../utils/getClerkQueryParam';
 import { completeSignUpFlow } from '../components/SignUp/util';
 import { useCoreClerk, useCoreSignUp } from '../contexts';
 import { useNavigate } from '../hooks/useNavigate';
-import { LocalizationKey } from '../localization';
+import type { LocalizationKey } from '../localization';
 import { sleep } from '../utils';
 import { EmailLinkStatusCard } from './EmailLinkStatusCard';
 

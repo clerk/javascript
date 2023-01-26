@@ -1,7 +1,7 @@
-import { GetServerDataProps, GetServerDataReturn } from 'gatsby';
+import type { GetServerDataProps, GetServerDataReturn } from 'gatsby';
 
 import { getAuthData } from './getAuthData';
-import { WithServerAuthCallback, WithServerAuthOptions, WithServerAuthResult } from './types';
+import type { WithServerAuthCallback, WithServerAuthOptions, WithServerAuthResult } from './types';
 import { injectAuthIntoContext, injectSSRStateIntoProps, sanitizeAuthData } from './utils';
 
 interface WithServerAuth {

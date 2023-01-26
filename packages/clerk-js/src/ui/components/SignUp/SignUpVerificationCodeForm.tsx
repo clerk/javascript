@@ -1,8 +1,9 @@
-import { SignUpResource } from '@clerk/types';
+import type { SignUpResource } from '@clerk/types';
 
 import { useCoreClerk, useSignUpContext } from '../../contexts';
-import { LocalizationKey } from '../../customizables';
-import { VerificationCodeCard, VerificationCodeCardProps } from '../../elements';
+import type { LocalizationKey } from '../../customizables';
+import type { VerificationCodeCardProps } from '../../elements';
+import { VerificationCodeCard } from '../../elements';
 import { useNavigate } from '../../hooks/useNavigate';
 import { completeSignUpFlow } from './util';
 

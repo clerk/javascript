@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { ThemableCssProp } from '../styledSystem';
+import type { ThemableCssProp } from '../styledSystem';
 import { useAppearance } from './AppearanceContext';
 import { appendEmojiSeparator, generateClassName } from './classGeneration';
-import { ElementDescriptor, ElementId } from './elementDescriptors';
+import type { ElementDescriptor, ElementId } from './elementDescriptors';
 
 type Customizable<T = Record<never, never>> = T & {
   elementDescriptor?: ElementDescriptor | Array<ElementDescriptor | undefined>;

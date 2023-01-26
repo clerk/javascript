@@ -1,7 +1,8 @@
 import { Flex } from '../customizables';
-import { LocalizationKey, localizationKeys } from '../localization';
+import type { LocalizationKey } from '../localization';
+import { localizationKeys } from '../localization';
 import { useRouter } from '../router';
-import { PropsOfComponent } from '../styledSystem';
+import type { PropsOfComponent } from '../styledSystem';
 import { Form } from './Form';
 import { useNavigateToFlowStart } from './NavigateToFlowStartButton';
 

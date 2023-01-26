@@ -1,4 +1,5 @@
-import { common, createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
+import type { PrimitiveProps, StyleVariants } from '../styledSystem';
+import { common, createVariants } from '../styledSystem';
 
 const { applyVariants, filterProps } = createVariants(theme => ({
   base: {

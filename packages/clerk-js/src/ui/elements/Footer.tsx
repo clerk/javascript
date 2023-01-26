@@ -1,8 +1,9 @@
-import { FooterActionId } from '@clerk/types';
+import type { FooterActionId } from '@clerk/types';
 import React from 'react';
 
 import { descriptors, Flex, Link, localizationKeys, Text, useAppearance } from '../customizables';
-import { mqu, PropsOfComponent } from '../styledSystem';
+import type { PropsOfComponent } from '../styledSystem';
+import { mqu } from '../styledSystem';
 import { RouterLink } from './RouterLink';
 
 const FooterRoot = (props: React.PropsWithChildren<any>): JSX.Element => {

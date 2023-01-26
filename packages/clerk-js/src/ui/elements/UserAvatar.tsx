@@ -1,7 +1,7 @@
-import { UserResource } from '@clerk/types';
+import type { UserResource } from '@clerk/types';
 
 import { Avatar } from '../elements';
-import { PropsOfComponent } from '../styledSystem';
+import type { PropsOfComponent } from '../styledSystem';
 import { getFullName, getInitials } from '../utils';
 
 type UserAvatarProps = PropsOfComponent<typeof Avatar> &

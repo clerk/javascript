@@ -1,7 +1,7 @@
 import { Button, descriptors, Flex, Icon, Input } from '../customizables';
 import { useClipboard } from '../hooks';
 import { Clipboard, TickShield } from '../icons';
-import { PropsOfComponent } from '../styledSystem';
+import type { PropsOfComponent } from '../styledSystem';
 
 export const ClipboardInput = (props: PropsOfComponent<typeof Input>) => {
   const { id, value, ...rest } = props;

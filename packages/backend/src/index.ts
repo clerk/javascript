@@ -1,5 +1,7 @@
-import { createBackendApiClient, CreateBackendApiOptions } from './api';
-import { createAuthenticateRequest, CreateAuthenticateRequestOptions } from './tokens';
+import type { CreateBackendApiOptions } from './api';
+import { createBackendApiClient } from './api';
+import type { CreateAuthenticateRequestOptions } from './tokens';
+import { createAuthenticateRequest } from './tokens';
 
 export * from './api/resources';
 export * from './tokens';

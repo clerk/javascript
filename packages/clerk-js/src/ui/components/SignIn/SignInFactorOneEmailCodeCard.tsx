@@ -1,8 +1,9 @@
-import { EmailCodeFactor } from '@clerk/types';
+import type { EmailCodeFactor } from '@clerk/types';
 
 import { useEnvironment } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
-import { SignInFactorOneCodeCard, SignInFactorOneCodeForm } from './SignInFactorOneCodeForm';
+import type { SignInFactorOneCodeCard } from './SignInFactorOneCodeForm';
+import { SignInFactorOneCodeForm } from './SignInFactorOneCodeForm';
 
 type SignInFactorOneEmailCodeCardProps = SignInFactorOneCodeCard & { factor: EmailCodeFactor };
 

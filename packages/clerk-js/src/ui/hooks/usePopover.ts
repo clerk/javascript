@@ -1,3 +1,4 @@
+import type { UseFloatingProps } from '@floating-ui/react-dom-interactions';
 import {
   autoUpdate,
   flip,
@@ -6,7 +7,6 @@ import {
   useDismiss,
   useFloating,
   useFloatingNodeId,
-  UseFloatingProps,
 } from '@floating-ui/react-dom-interactions';
 import React, { useEffect } from 'react';
 

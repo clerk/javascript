@@ -1,4 +1,4 @@
-import { OrganizationResource } from '@clerk/types';
+import type { OrganizationResource } from '@clerk/types';
 import React from 'react';
 
 import { runIfFunctionOrReturn } from '../../../utils';
@@ -21,7 +21,7 @@ import {
 import { RootBox } from '../../elements/RootBox';
 import { Billing, CogFilled } from '../../icons';
 import { useRouter } from '../../router';
-import { PropsOfComponent } from '../../styledSystem';
+import type { PropsOfComponent } from '../../styledSystem';
 import { OrganizationActionList } from './OtherOrganizationActions';
 
 type OrganizationSwitcherPopoverProps = { close: () => void } & PropsOfComponent<typeof PopoverCard.Root>;

@@ -16,15 +16,11 @@ import {
 } from '../../elements';
 import { useCardState } from '../../elements/contexts';
 import { useLoadingStatus, useNavigate } from '../../hooks';
-import { buildRequest, FormControlState, handleError, useFormControl } from '../../utils';
+import type { FormControlState } from '../../utils';
+import { buildRequest, handleError, useFormControl } from '../../utils';
 import { SignUpForm } from './SignUpForm';
-import {
-  ActiveIdentifier,
-  determineActiveFields,
-  emailOrPhone,
-  getInitialActiveIdentifier,
-  showFormFields,
-} from './signUpFormHelpers';
+import type { ActiveIdentifier } from './signUpFormHelpers';
+import { determineActiveFields, emailOrPhone, getInitialActiveIdentifier, showFormFields } from './signUpFormHelpers';
 import { SignUpSocialButtons } from './SignUpSocialButtons';
 import { completeSignUpFlow } from './util';
 

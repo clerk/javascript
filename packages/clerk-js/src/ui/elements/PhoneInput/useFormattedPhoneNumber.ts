@@ -2,7 +2,8 @@ import React from 'react';
 
 import { useLocalStorage } from '../../hooks';
 import { extractDigits, formatPhoneNumber } from '../../utils';
-import { CountryIso, IsoToCountryMap } from './countryCodeData';
+import type { CountryIso } from './countryCodeData';
+import { IsoToCountryMap } from './countryCodeData';
 
 type UseFormattedPhoneNumberProps = { defaultPhone?: string };
 

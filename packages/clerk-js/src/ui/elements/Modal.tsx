@@ -2,7 +2,8 @@ import React from 'react';
 
 import { descriptors, Flex } from '../customizables';
 import { usePopover, useSafeLayoutEffect, useScrollLock } from '../hooks';
-import { animations, mqu, ThemableCssProp } from '../styledSystem';
+import type { ThemableCssProp } from '../styledSystem';
+import { animations, mqu } from '../styledSystem';
 import { withFloatingTree } from './contexts';
 import { Popover } from './Popover';
 

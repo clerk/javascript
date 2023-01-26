@@ -1,7 +1,7 @@
 import { parsePublishableKey } from '@clerk/shared';
 
 import { LIB_VERSION } from '../info';
-import { BrowserClerk } from '../types';
+import type { BrowserClerk } from '../types';
 import { errorThrower } from './errorThrower';
 
 export interface Global {

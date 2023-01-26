@@ -1,5 +1,5 @@
-import { JWT } from './jwt';
-import { ClerkResource } from './resource';
+import type { JWT } from './jwt';
+import type { ClerkResource } from './resource';
 
 export interface TokenResource extends ClerkResource {
   jwt: JWT;

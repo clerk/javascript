@@ -1,4 +1,4 @@
-import { SignInProps, SignUpProps } from '@clerk/types';
+import type { SignInProps, SignUpProps } from '@clerk/types';
 import React, { useContext } from 'react';
 
 import { useEnvironment } from '../contexts';

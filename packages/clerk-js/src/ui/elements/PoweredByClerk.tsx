@@ -3,7 +3,8 @@ import React from 'react';
 import { useEnvironment } from '../contexts';
 import { Flex, Icon, Link, Text } from '../customizables';
 import { LogoMark } from '../icons';
-import { InternalTheme, mqu, PropsOfComponent } from '../styledSystem';
+import type { InternalTheme, PropsOfComponent } from '../styledSystem';
+import { mqu } from '../styledSystem';
 
 export const PoweredByClerkText = React.memo(() => {
   const { branded } = useEnvironment().displayConfig;

@@ -1,4 +1,4 @@
-import { BackupCodeJSON, BackupCodeResource } from '@clerk/types';
+import type { BackupCodeJSON, BackupCodeResource } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';

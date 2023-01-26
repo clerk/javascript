@@ -1,4 +1,4 @@
-import { DeepPartial, LocalizationResource } from '@clerk/types';
+import type { DeepPartial, LocalizationResource } from '@clerk/types';
 import { dequal as deepEqual } from 'dequal';
 
 import { useOptions } from '../contexts';

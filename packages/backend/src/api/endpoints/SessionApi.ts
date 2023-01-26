@@ -1,6 +1,6 @@
 import { joinPaths } from '../../util/path';
-import { Session } from '../resources/Session';
-import { Token } from '../resources/Token';
+import type { Session } from '../resources/Session';
+import type { Token } from '../resources/Token';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/sessions';

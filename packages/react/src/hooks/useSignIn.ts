@@ -1,4 +1,4 @@
-import { SetActive, SetSession, SignInResource } from '@clerk/types';
+import type { SetActive, SetSession, SignInResource } from '@clerk/types';
 
 import { useClientContext } from '../contexts/ClientContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';

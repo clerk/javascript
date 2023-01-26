@@ -1,4 +1,4 @@
-import { ClientJSON, EnvironmentJSON, LoadedClerk } from '@clerk/types';
+import type { ClientJSON, EnvironmentJSON, LoadedClerk } from '@clerk/types';
 import { jest } from '@jest/globals';
 import React from 'react';
 

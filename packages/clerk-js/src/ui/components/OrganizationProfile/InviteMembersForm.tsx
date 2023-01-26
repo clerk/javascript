@@ -1,4 +1,4 @@
-import { MembershipRole, OrganizationResource } from '@clerk/types';
+import type { MembershipRole, OrganizationResource } from '@clerk/types';
 import React from 'react';
 
 import { ClerkAPIResponseError } from '../../../core/resources/Error';
@@ -14,7 +14,8 @@ import {
   useCardState,
 } from '../../elements';
 import { useNavigate } from '../../hooks';
-import { LocalizationKey, localizationKeys, useLocalizations } from '../../localization';
+import type { LocalizationKey } from '../../localization';
+import { localizationKeys, useLocalizations } from '../../localization';
 import { handleError, roleLocalizationKey, useFormControl } from '../../utils';
 
 const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);

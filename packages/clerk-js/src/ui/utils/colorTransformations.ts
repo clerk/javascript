@@ -1,4 +1,4 @@
-import { Color, HslaColor, RgbaColor, TransparentColor } from '@clerk/types';
+import type { Color, HslaColor, RgbaColor, TransparentColor } from '@clerk/types';
 
 import {
   isHSLColor,

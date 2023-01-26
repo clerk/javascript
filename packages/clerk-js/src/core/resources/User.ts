@@ -27,6 +27,7 @@ import { getFullName } from '../../ui/utils';
 import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { BackupCode } from './BackupCode';
+import type { RetrieveMembershipsParams } from './internal';
 import {
   BaseResource,
   DeletedObject,
@@ -35,7 +36,6 @@ import {
   Image,
   OrganizationMembership,
   PhoneNumber,
-  RetrieveMembershipsParams,
   SessionWithActivities,
   TOTP,
   Web3Wallet,

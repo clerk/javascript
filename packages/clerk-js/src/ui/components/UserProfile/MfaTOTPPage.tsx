@@ -1,4 +1,4 @@
-import { TOTPResource } from '@clerk/types';
+import type { TOTPResource } from '@clerk/types';
 import React from 'react';
 
 import { useWizard, Wizard } from '../../common';

@@ -1,10 +1,11 @@
-import { EmailCodeFactor, PhoneCodeFactor } from '@clerk/types';
+import type { EmailCodeFactor, PhoneCodeFactor } from '@clerk/types';
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { useCoreClerk, useCoreSignIn, useSignInContext } from '../../contexts';
-import { LocalizationKey } from '../../customizables';
-import { VerificationCodeCard, VerificationCodeCardProps } from '../../elements';
+import type { LocalizationKey } from '../../customizables';
+import type { VerificationCodeCardProps } from '../../elements';
+import { VerificationCodeCard } from '../../elements';
 import { useCardState } from '../../elements/contexts';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';

@@ -1,4 +1,5 @@
-import { ClerkMiddlewareOptions, createClerkExpressRequireAuth, RequireAuthProp } from '@clerk/clerk-sdk-node';
+import type { ClerkMiddlewareOptions, RequireAuthProp } from '@clerk/clerk-sdk-node';
+import { createClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
 import { API_URL, clerkClient, FRONTEND_API, PUBLISHABLE_KEY } from '../server';

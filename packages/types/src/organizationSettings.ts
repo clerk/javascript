@@ -1,5 +1,5 @@
-import { ClerkResourceJSON } from './json';
-import { ClerkResource } from './resource';
+import type { ClerkResourceJSON } from './json';
+import type { ClerkResource } from './resource';
 
 export interface OrganizationSettingsJSON extends ClerkResourceJSON {
   id: never;

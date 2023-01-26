@@ -1,5 +1,5 @@
 import { Col } from '../customizables';
-import { PropsOfComponent } from '../styledSystem';
+import type { PropsOfComponent } from '../styledSystem';
 
 export const RootBox = (props: PropsOfComponent<typeof Col>) => {
   return (

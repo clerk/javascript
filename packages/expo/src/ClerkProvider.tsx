@@ -1,10 +1,7 @@
 import './polyfills';
 
-import {
-  __internal__setErrorThrowerOptions,
-  ClerkProvider as ClerkReactProvider,
-  ClerkProviderProps as ClerkReactProviderProps,
-} from '@clerk/clerk-react';
+import type { ClerkProviderProps as ClerkReactProviderProps } from '@clerk/clerk-react';
+import { __internal__setErrorThrowerOptions, ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
 import React from 'react';
 
 import type { TokenCache } from './cache';

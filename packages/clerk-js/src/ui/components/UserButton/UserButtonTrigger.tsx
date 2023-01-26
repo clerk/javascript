@@ -3,7 +3,7 @@ import React from 'react';
 import { useCoreUser } from '../../contexts';
 import { Button, descriptors } from '../../customizables';
 import { UserAvatar } from '../../elements';
-import { PropsOfComponent } from '../../styledSystem';
+import type { PropsOfComponent } from '../../styledSystem';
 
 type UserButtonTriggerProps = PropsOfComponent<typeof Button> & { isOpen: boolean };
 

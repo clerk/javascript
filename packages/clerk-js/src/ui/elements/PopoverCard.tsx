@@ -2,7 +2,8 @@ import React from 'react';
 
 import { useEnvironment } from '../contexts';
 import { descriptors, Flex, Flow, Link, localizationKeys, useAppearance } from '../customizables';
-import { animations, PropsOfComponent } from '../styledSystem';
+import type { PropsOfComponent } from '../styledSystem';
+import { animations } from '../styledSystem';
 import { BaseCard } from './Card';
 import { PoweredByClerkText } from './PoweredByClerk';
 

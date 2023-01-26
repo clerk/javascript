@@ -1,4 +1,4 @@
-import IsomorphicClerk from '../isomorphicClerk';
+import type IsomorphicClerk from '../isomorphicClerk';
 
 /**
  * @internal

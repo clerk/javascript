@@ -1,9 +1,12 @@
 import { createContextAndHook } from '@clerk/shared';
-import React, { cloneElement, isValidElement, PropsWithChildren, useLayoutEffect, useRef } from 'react';
+import type { PropsWithChildren } from 'react';
+import React, { cloneElement, isValidElement, useLayoutEffect, useRef } from 'react';
 
 import { Button, Col } from '../customizables';
-import { usePopover, UsePopoverReturn } from '../hooks';
-import { animations, PropsOfComponent } from '../styledSystem';
+import type { UsePopoverReturn } from '../hooks';
+import { usePopover } from '../hooks';
+import type { PropsOfComponent } from '../styledSystem';
+import { animations } from '../styledSystem';
 import { colors } from '../utils/colors';
 import { withFloatingTree } from './contexts';
 import { Popover } from './Popover';

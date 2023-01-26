@@ -1,10 +1,11 @@
 import React from 'react';
 
-import { Button, Col, Flex, Icon, LocalizationKey, Spinner, Text } from '../customizables';
-import { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
+import type { LocalizationKey } from '../customizables';
+import { Button, Col, Flex, Icon, Spinner, Text } from '../customizables';
+import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { useCardState } from '../elements/contexts';
 import { useLoadingStatus } from '../hooks';
-import { PropsOfComponent } from '../styledSystem';
+import type { PropsOfComponent } from '../styledSystem';
 
 export const Actions = (props: PropsOfComponent<typeof Flex>) => {
   return <Col {...props} />;

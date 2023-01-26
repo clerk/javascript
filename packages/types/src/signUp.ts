@@ -1,22 +1,22 @@
-import {
+import type {
   BirthdayAttribute,
   FirstNameAttribute,
   GenderAttribute,
   LastNameAttribute,
   PasswordAttribute,
 } from './attributes';
-import { AttemptEmailAddressVerificationParams, PrepareEmailAddressVerificationParams } from './emailAddress';
-import {
+import type { AttemptEmailAddressVerificationParams, PrepareEmailAddressVerificationParams } from './emailAddress';
+import type {
   EmailAddressIdentifier,
   EmailAddressOrPhoneNumberIdentifier,
   PhoneNumberIdentifier,
   UsernameIdentifier,
   Web3WalletIdentifier,
 } from './identifiers';
-import { AuthenticateWithRedirectParams } from './oauth';
-import { AttemptPhoneNumberVerificationParams, PreparePhoneNumberVerificationParams } from './phoneNumber';
-import { ClerkResource } from './resource';
-import {
+import type { AuthenticateWithRedirectParams } from './oauth';
+import type { AttemptPhoneNumberVerificationParams, PreparePhoneNumberVerificationParams } from './phoneNumber';
+import type { ClerkResource } from './resource';
+import type {
   EmailCodeStrategy,
   EmailLinkStrategy,
   OAuthStrategy,
@@ -25,8 +25,8 @@ import {
   Web3Strategy,
 } from './strategies';
 import type { SnakeToCamel } from './utils';
-import { CreateMagicLinkFlowReturn, StartMagicLinkFlowParams, VerificationResource } from './verification';
-import { AttemptWeb3WalletVerificationParams, AuthenticateWithWeb3Params } from './web3Wallet';
+import type { CreateMagicLinkFlowReturn, StartMagicLinkFlowParams, VerificationResource } from './verification';
+import type { AttemptWeb3WalletVerificationParams, AuthenticateWithWeb3Params } from './web3Wallet';
 
 export interface SignUpResource extends ClerkResource {
   status: SignUpStatus | null;

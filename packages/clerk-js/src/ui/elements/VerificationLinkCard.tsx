@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { Col, descriptors, Flow, LocalizationKey, localizationKeys, Text } from '../customizables';
+import type { LocalizationKey } from '../customizables';
+import { Col, descriptors, Flow, localizationKeys, Text } from '../customizables';
 import { useRouter } from '../router';
 import { CardAlert } from './Alert';
 import { Card } from './Card';

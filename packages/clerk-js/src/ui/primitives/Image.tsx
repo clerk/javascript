@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { PrimitiveProps, StateProps } from '../styledSystem';
+import type { PrimitiveProps, StateProps } from '../styledSystem';
 import { applyDataStateProps } from './applyDataStateProps';
 
 export type ImageProps = PrimitiveProps<'img'> & StateProps;

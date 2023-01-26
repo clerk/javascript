@@ -1,4 +1,4 @@
-import { SignInResource } from '@clerk/types';
+import type { SignInResource } from '@clerk/types';
 import { describe, it, jest } from '@jest/globals';
 import { waitFor } from '@testing-library/dom';
 import React from 'react';

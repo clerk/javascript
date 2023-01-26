@@ -3,7 +3,7 @@ import type { ActJWTClaim, GetToken, MembershipRole, SignOut } from '@clerk/type
 import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { invalidStateError } from '../errors';
-import IsomorphicClerk from '../isomorphicClerk';
+import type IsomorphicClerk from '../isomorphicClerk';
 import { createGetToken, createSignOut } from './utils';
 
 type UseAuthReturn =

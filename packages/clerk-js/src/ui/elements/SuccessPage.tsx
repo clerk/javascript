@@ -2,8 +2,9 @@ import React from 'react';
 
 import { descriptors, Text } from '../customizables';
 import { ContentPage, FormButtonContainer, NavigateToFlowStartButton } from '../elements';
-import { LocalizationKey, localizationKeys } from '../localization';
-import { PropsOfComponent } from '../styledSystem';
+import type { LocalizationKey } from '../localization';
+import { localizationKeys } from '../localization';
+import type { PropsOfComponent } from '../styledSystem';
 
 type SuccessPageProps = Omit<PropsOfComponent<typeof ContentPage>, 'headerTitle' | 'title'> & {
   title: LocalizationKey;

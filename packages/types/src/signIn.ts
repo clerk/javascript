@@ -1,4 +1,4 @@
-import {
+import type {
   BackupCodeAttempt,
   BackupCodeFactor,
   EmailCodeAttempt,
@@ -20,17 +20,22 @@ import {
   Web3SignatureConfig,
   Web3SignatureFactor,
 } from './factors';
-import { EmailAddressIdentifier, PhoneNumberIdentifier, UsernameIdentifier, Web3WalletIdentifier } from './identifiers';
-import {
+import type {
+  EmailAddressIdentifier,
+  PhoneNumberIdentifier,
+  UsernameIdentifier,
+  Web3WalletIdentifier,
+} from './identifiers';
+import type {
   ClerkResourceJSON,
   SignInFirstFactorJSON,
   SignInSecondFactorJSON,
   UserDataJSON,
   VerificationJSON,
 } from './json';
-import { AuthenticateWithRedirectParams } from './oauth';
-import { ClerkResource } from './resource';
-import {
+import type { AuthenticateWithRedirectParams } from './oauth';
+import type { ClerkResource } from './resource';
+import type {
   BackupCodeStrategy,
   EmailCodeStrategy,
   EmailLinkStrategy,
@@ -41,8 +46,8 @@ import {
   TOTPStrategy,
   Web3Strategy,
 } from './strategies';
-import { CreateMagicLinkFlowReturn, StartMagicLinkFlowParams, VerificationResource } from './verification';
-import { AuthenticateWithWeb3Params } from './web3Wallet';
+import type { CreateMagicLinkFlowReturn, StartMagicLinkFlowParams, VerificationResource } from './verification';
+import type { AuthenticateWithWeb3Params } from './web3Wallet';
 
 export interface SignInResource extends ClerkResource {
   status: SignInStatus | null;

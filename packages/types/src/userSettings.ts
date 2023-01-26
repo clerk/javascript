@@ -1,6 +1,6 @@
-import { ClerkResourceJSON } from './json';
-import { ClerkResource } from './resource';
-import { OAuthStrategy, Web3Strategy } from './strategies';
+import type { ClerkResourceJSON } from './json';
+import type { ClerkResource } from './resource';
+import type { OAuthStrategy, Web3Strategy } from './strategies';
 
 type Attribute =
   | 'email_address'

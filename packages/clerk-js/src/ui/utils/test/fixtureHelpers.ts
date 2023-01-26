@@ -1,4 +1,4 @@
-import {
+import type {
   ClientJSON,
   DisplayConfigJSON,
   EmailAddressJSON,
@@ -14,7 +14,7 @@ import {
   UserJSON,
   UserSettingsJSON,
 } from '@clerk/types';
-import { MembershipRole, PublicUserDataJSON } from '@clerk/types/src';
+import type { MembershipRole, PublicUserDataJSON } from '@clerk/types/src';
 
 import { createUserFixture } from './fixtures';
 

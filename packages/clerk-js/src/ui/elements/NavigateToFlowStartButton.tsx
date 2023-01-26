@@ -1,6 +1,6 @@
 import { Button } from '../customizables';
 import { useRouter } from '../router';
-import { PropsOfComponent } from '../styledSystem';
+import type { PropsOfComponent } from '../styledSystem';
 
 type NavigateToFlowStartButtonProps = PropsOfComponent<typeof Button>;
 

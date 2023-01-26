@@ -1,5 +1,5 @@
 import { joinPaths } from '../../util/path';
-import { SignInToken } from '../resources/SignInTokens';
+import type { SignInToken } from '../resources/SignInTokens';
 import { AbstractAPI } from './AbstractApi';
 
 type CreateSignInTokensParams = {

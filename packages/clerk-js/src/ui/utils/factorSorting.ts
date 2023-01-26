@@ -1,4 +1,4 @@
-import { SignInFactor, SignInStrategy } from '@clerk/types';
+import type { SignInFactor, SignInStrategy } from '@clerk/types';
 
 const makeSortingOrderMap = <T extends string>(arr: T[]): Record<T, number> =>
   arr.reduce((acc, k, i) => {

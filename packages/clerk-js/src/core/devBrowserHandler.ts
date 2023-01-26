@@ -8,7 +8,7 @@ import {
 } from '../utils';
 import { DEV_BROWSER_SSO_JWT_HTTP_HEADER, DEV_BROWSER_SSO_JWT_KEY, DEV_BROWSER_SSO_JWT_PARAMETER } from './constants';
 import { clerkErrorDevInitFailed } from './errors';
-import { FapiClient } from './fapiClient';
+import type { FapiClient } from './fapiClient';
 
 export interface DevBrowserHandler {
   clear(): Promise<void>;

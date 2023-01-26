@@ -1,6 +1,7 @@
 import { isDevelopmentFromApiKey, isProductionFromApiKey } from '../util/instance';
 import { checkCrossOrigin } from '../util/request';
-import { AuthErrorReason, interstitial, RequestState, signedIn, signedOut } from './authStatus';
+import type { RequestState } from './authStatus';
+import { AuthErrorReason, interstitial, signedIn, signedOut } from './authStatus';
 import { verifyToken } from './verify';
 
 export type InterstitialRule = <T>(opts: T) => Promise<RequestState | undefined>;

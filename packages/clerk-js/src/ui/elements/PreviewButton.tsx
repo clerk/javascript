@@ -1,5 +1,5 @@
 import { Button, Icon } from '../customizables';
-import { PropsOfComponent } from '../styledSystem';
+import type { PropsOfComponent } from '../styledSystem';
 import { useCardState } from './contexts';
 
 type PreviewButtonProps = Omit<PropsOfComponent<typeof Button>, 'icon'> & {

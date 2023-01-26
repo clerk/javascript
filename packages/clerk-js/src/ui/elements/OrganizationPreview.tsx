@@ -1,8 +1,8 @@
-import { OrganizationPreviewId, OrganizationResource, UserResource } from '@clerk/types';
+import type { OrganizationPreviewId, OrganizationResource, UserResource } from '@clerk/types';
 import React from 'react';
 
 import { descriptors, Flex, Text } from '../customizables';
-import { PropsOfComponent, ThemableCssProp } from '../styledSystem';
+import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { roleLocalizationKey } from '../utils';
 import { OrganizationAvatar } from './OrganizationAvatar';
 

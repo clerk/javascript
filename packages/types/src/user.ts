@@ -1,17 +1,17 @@
-import { BackupCodeResource } from './backupCode';
-import { DeletedObjectResource } from './deletedObject';
-import { EmailAddressResource } from './emailAddress';
-import { ExternalAccountResource } from './externalAccount';
-import { ImageResource } from './image';
-import { UserJSON } from './json';
-import { OrganizationMembershipResource } from './organizationMembership';
-import { PhoneNumberResource } from './phoneNumber';
-import { ClerkResource } from './resource';
-import { SessionWithActivitiesResource } from './session';
-import { OAuthStrategy } from './strategies';
-import { TOTPResource } from './totp';
-import { SnakeToCamel } from './utils';
-import { Web3WalletResource } from './web3Wallet';
+import type { BackupCodeResource } from './backupCode';
+import type { DeletedObjectResource } from './deletedObject';
+import type { EmailAddressResource } from './emailAddress';
+import type { ExternalAccountResource } from './externalAccount';
+import type { ImageResource } from './image';
+import type { UserJSON } from './json';
+import type { OrganizationMembershipResource } from './organizationMembership';
+import type { PhoneNumberResource } from './phoneNumber';
+import type { ClerkResource } from './resource';
+import type { SessionWithActivitiesResource } from './session';
+import type { OAuthStrategy } from './strategies';
+import type { TOTPResource } from './totp';
+import type { SnakeToCamel } from './utils';
+import type { Web3WalletResource } from './web3Wallet';
 
 declare global {
   /**

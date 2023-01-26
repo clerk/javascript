@@ -1,7 +1,7 @@
-import { GetServerSidePropsContext } from 'next';
+import type { GetServerSidePropsContext } from 'next';
 
 import { API_KEY, clerkClient, FRONTEND_API, PUBLISHABLE_KEY, SECRET_KEY } from '../../server';
-import { WithServerSideAuthOptions } from '../types';
+import type { WithServerSideAuthOptions } from '../types';
 
 /**
  * @internal

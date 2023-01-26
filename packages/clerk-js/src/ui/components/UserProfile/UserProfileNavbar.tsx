@@ -1,9 +1,10 @@
 import React from 'react';
 
-import { Breadcrumbs, NavBar, NavbarContextProvider, NavbarRoute } from '../../elements';
+import type { NavbarRoute } from '../../elements';
+import { Breadcrumbs, NavBar, NavbarContextProvider } from '../../elements';
 import { TickShield, User } from '../../icons';
 import { localizationKeys } from '../../localization';
-import { PropsOfComponent } from '../../styledSystem';
+import type { PropsOfComponent } from '../../styledSystem';
 
 const userProfileRoutes: NavbarRoute[] = [
   {
