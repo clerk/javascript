@@ -79,7 +79,6 @@ import {
   OrganizationMembership,
 } from './resources/internal';
 import { AuthenticationService } from './services';
-import { SessionTokenCache } from './tokenCache';
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 
@@ -390,50 +389,46 @@ export default class Clerk implements ClerkInterface {
       throw new Error('setActive is being called before the client is loaded. Wait for init.');
     }
 
-    if (session === undefined) {
-      if (!this.session) {
-        throw new Error(
-          'setActive should either be called with a session param or there should be already an active session.',
-        );
-      }
-      session = this.session;
+    if (session === undefined && !this.session) {
+      throw new Error(
+        'setActive should either be called with a session param or there should be already an active session.',
+      );
     }
 
     if (typeof session === 'string') {
       session = (this.client.sessions.find(x => x.id === session) as ActiveSessionResource) || null;
     }
 
+    let newSession = (session === undefined ? this.session : session) as ActiveSessionResource | null;
+
     // At this point, the `session` variable should contain either an `ActiveSessionResource`
     // or `null`.
     // We now want to set the last active organization id on that session (if it exists).
     // However, if the `organization` parameter is not given (i.e. `undefined`), we want
     // to keep the organization id that the session had.
-    if (session && organization !== undefined) {
-      if (organization === null) {
-        session.lastActiveOrganizationId = null;
-      } else if (typeof organization === 'string') {
-        session.lastActiveOrganizationId = organization;
-      } else {
-        session.lastActiveOrganizationId = organization.id;
-      }
-
-      SessionTokenCache.clear();
+    const shouldSwitchOrganization = organization !== undefined;
+    if (newSession && shouldSwitchOrganization) {
+      const organizationId = typeof organization === 'string' ? organization : organization?.id;
+      newSession.lastActiveOrganizationId = organizationId || null;
     }
-
-    this.#authService?.setAuthCookiesFromSession(session);
 
     // If this.session exists, then signout was triggered by the current tab
     // and should emit. Other tabs should not emit the same event again
-    if (this.session && session === null) {
+    const shouldSignoutSession = this.session && newSession === null;
+    if (shouldSignoutSession) {
       this.#broadcastSignOutEvent();
     }
 
-    //1. setLastActiveSession to passed usersession (add a param).
+    //1. setLastActiveSession to passed user session (add a param).
     //   Note that this will also update the session's active organization
     //   id.
     if (inActiveBrowserTab()) {
-      await this.#touchLastActiveSession(session);
+      await this.#touchLastActiveSession(newSession);
+      // reload session from updated client
+      newSession = this.#getSessionFromClient(newSession?.id);
     }
+
+    this.#authService?.setAuthCookiesFromSession(newSession);
 
     //2. If there's a beforeEmit, typically we're navigating.  Emit the session as
     //   undefined, then wait for beforeEmit to complete before emitting the new session.
@@ -442,11 +437,8 @@ export default class Clerk implements ClerkInterface {
     const beforeUnloadTracker = createBeforeUnloadTracker();
     if (beforeEmit) {
       beforeUnloadTracker.startTracking();
-      this.session = undefined;
-      this.organization = undefined;
-      this.user = undefined;
-      this.#emit();
-      await beforeEmit(session);
+      this.#setTransitiveState();
+      await beforeEmit(newSession);
       beforeUnloadTracker.stopTracking();
     }
 
@@ -455,16 +447,9 @@ export default class Clerk implements ClerkInterface {
       return;
     }
 
-    this.session = session;
-    this.organization =
-      organization === null
-        ? null
-        : (this.session?.user.organizationMemberships || [])
-            .map(om => om.organization)
-            .find(org => org.id === this.session?.lastActiveOrganizationId);
-    this.user = this.session ? this.session.user : null;
-
+    this.#setAccessors(newSession);
     this.#emit();
+
     this.#resetComponentsState();
   };
 
@@ -872,26 +857,16 @@ export default class Clerk implements ClerkInterface {
     if (!this.client) {
       // This is the first time client is being
       // set, so we also need to set session
-      this.session =
-        (this.#options.selectInitialSession
-          ? this.#options.selectInitialSession(newClient)
-          : this.#defaultSession(newClient)) || null;
-      this.organization =
-        (this.session?.user.organizationMemberships || [])
-          .map(om => om.organization)
-          .find(org => org.id === this.session?.lastActiveOrganizationId) || null;
-      this.user = this.session ? this.session.user : null;
+      const session = this.#options.selectInitialSession
+        ? this.#options.selectInitialSession(newClient)
+        : this.#defaultSession(newClient);
+      this.#setAccessors(session);
     }
     this.client = newClient;
 
     if (this.session) {
-      const lastId = this.session.id;
-      this.session = newClient.activeSessions.find(x => x.id === lastId);
-      this.organization =
-        (this.session?.user.organizationMemberships || [])
-          .map(om => om.organization)
-          .find(org => org.id === this.session?.lastActiveOrganizationId) || null;
-      this.user = this.session ? this.session.user : null;
+      const session = this.#getSessionFromClient(this.session.id);
+      this.#setAccessors(session);
     }
 
     this.#emit();
@@ -1041,11 +1016,11 @@ export default class Clerk implements ClerkInterface {
   };
 
   // TODO: Be more conservative about touches. Throttle, don't touch when only one user, etc
-  #touchLastActiveSession = (session: ActiveSessionResource | null): Promise<unknown> => {
+  #touchLastActiveSession = async (session: ActiveSessionResource | null): Promise<void> => {
     if (!session || !this.#options.touchSession) {
       return Promise.resolve();
     }
-    return session.touch().catch(noop);
+    await session.touch().catch(noop);
   };
 
   #emit = (): void => {
@@ -1072,6 +1047,34 @@ export default class Clerk implements ClerkInterface {
       this.closeSignUp();
       this.closeSignIn();
     }
+  };
+
+  #setTransitiveState = () => {
+    this.session = undefined;
+    this.organization = undefined;
+    this.user = undefined;
+    this.#emit();
+  };
+
+  #getLastActiveOrganizationFromSession = () => {
+    const orgMemberships = this.session?.user.organizationMemberships || [];
+    return (
+      orgMemberships.map(om => om.organization).find(org => org.id === this.session?.lastActiveOrganizationId) || null
+    );
+  };
+
+  #setAccessors = (session?: ActiveSessionResource | null) => {
+    this.session = session || null;
+    this.organization = this.#getLastActiveOrganizationFromSession();
+    this.#aliasUser();
+  };
+
+  #getSessionFromClient = (sessionId: string | undefined): ActiveSessionResource | null => {
+    return this.client?.activeSessions.find(x => x.id === sessionId) || null;
+  };
+
+  #aliasUser = () => {
+    this.user = this.session ? this.session.user : null;
   };
 
   assertComponentsReady(components: ComponentControls | null | undefined): asserts components is ComponentControls {

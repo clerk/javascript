@@ -117,6 +117,18 @@ describe('Clerk singleton', () => {
       mockSession.touch.mockReset();
     });
 
+    it('does not call session touch on signout', async () => {
+      mockSession.touch.mockReturnValueOnce(Promise.resolve());
+      mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
+
+      const sut = new Clerk(frontendApi);
+      await sut.load();
+      await sut.setActive({ session: null });
+      await waitFor(() => {
+        expect(mockSession.touch).not.toHaveBeenCalled();
+      });
+    });
+
     it('calls session.touch by default', async () => {
       mockSession.touch.mockReturnValueOnce(Promise.resolve());
       mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
@@ -367,7 +379,7 @@ describe('Clerk singleton', () => {
       sut.client.signUp.create = mockSignUpCreate;
       sut.setActive = mockSetActive;
 
-      sut.handleRedirectCallback();
+      await sut.handleRedirectCallback();
 
       await waitFor(() => {
         expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true });
@@ -422,7 +434,7 @@ describe('Clerk singleton', () => {
       }
       sut.client.signUp.create = mockSignUpCreate;
 
-      sut.handleRedirectCallback();
+      await sut.handleRedirectCallback();
 
       await waitFor(() => {
         expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true });
@@ -489,7 +501,7 @@ describe('Clerk singleton', () => {
       sut.client.signIn.create = mockSignInCreate;
       sut.setActive = mockSetActive;
 
-      sut.handleRedirectCallback();
+      await sut.handleRedirectCallback();
 
       await waitFor(() => {
         expect(mockSignInCreate).toHaveBeenCalledWith({ transfer: true });
@@ -540,7 +552,7 @@ describe('Clerk singleton', () => {
       });
       sut.setActive = mockSetActive;
 
-      sut.handleRedirectCallback();
+      await sut.handleRedirectCallback();
 
       await waitFor(() => {
         expect(mockSetActive).toHaveBeenCalled();
@@ -594,7 +606,7 @@ describe('Clerk singleton', () => {
       sut.client.signUp.create = mockSignUpCreate;
       sut.setActive = mockSetActive;
 
-      sut.handleRedirectCallback();
+      await sut.handleRedirectCallback();
 
       await waitFor(() => {
         expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true });
@@ -635,7 +647,7 @@ describe('Clerk singleton', () => {
         navigate: mockNavigate,
       });
 
-      sut.handleRedirectCallback();
+      await sut.handleRedirectCallback();
 
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledWith('/sign-in#/factor-two');
@@ -837,7 +849,7 @@ describe('Clerk singleton', () => {
         navigate: mockNavigate,
       });
 
-      sut.handleRedirectCallback();
+      await sut.handleRedirectCallback();
 
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledWith('/sign-up');
@@ -885,7 +897,7 @@ describe('Clerk singleton', () => {
         navigate: mockNavigate,
       });
 
-      sut.handleRedirectCallback();
+      await sut.handleRedirectCallback();
 
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledWith('/sign-up');
@@ -926,7 +938,7 @@ describe('Clerk singleton', () => {
         navigate: mockNavigate,
       });
 
-      sut.handleRedirectCallback();
+      await sut.handleRedirectCallback();
 
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledWith('/sign-up#/continue');
