@@ -1,4 +1,4 @@
-import { clerkClient, withAuth } from '@clerk/clerk-sdk-node';
+import { clerkClient, withAuth } from 'gatsby-plugin-clerk/api';
 
 interface ContactBody {
   message: string;
