@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.23.5](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.23.3-staging.2...@clerk/clerk-js@4.23.5) (2023-01-26)
+
+### Bug Fixes
+
+- **clerk-js:** Await mountComponentRenderer to mount the components before firing loaded event ([8b9cf52](https://github.com/clerkinc/javascript/commit/8b9cf526666b405b2d68b883ba33e925d4ba3b27))
+
 ### [4.23.4](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.23.3-staging.2...@clerk/clerk-js@4.23.4) (2023-01-26)
 
 ### Bug Fixes
