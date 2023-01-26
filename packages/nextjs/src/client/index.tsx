@@ -21,10 +21,23 @@ type NextClerkProviderProps = {
   Partial<PublishableKeyOrFrontendApi>;
 
 export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JSX.Element {
-  // @ts-expect-error
   // Allow for overrides without making the type public
-  const { authServerSideProps, frontendApi, publishableKey, proxyUrl, __clerk_ssr_state, clerkJSUrl, ...restProps } =
-    rest;
+  const {
+    // @ts-expect-error
+    authServerSideProps,
+    frontendApi,
+    publishableKey,
+    // @ts-expect-error
+    proxyUrl,
+    // @ts-expect-error
+    domain,
+    // @ts-expect-error
+    isSatellite,
+    // @ts-expect-error
+    __clerk_ssr_state,
+    clerkJSUrl,
+    ...restProps
+  } = rest;
   const { push } = useRouter();
 
   ReactClerkProvider.displayName = 'ReactClerkProvider';
@@ -39,7 +52,9 @@ export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JS
       publishableKey={publishableKey || process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || ''}
       clerkJSUrl={clerkJSUrl || process.env.NEXT_PUBLIC_CLERK_JS}
       // @ts-expect-error
-      proxyUrl={proxyUrl || process.env.NEXT_PUBLIC_CLERK_PROXY_URL}
+      proxyUrl={proxyUrl || process.env.NEXT_PUBLIC_CLERK_PROXY_URL || ''}
+      domain={domain || ''}
+      isSatellite={isSatellite || false}
       navigate={to => push(to)}
       // withServerSideAuth automatically injects __clerk_ssr_state
       // getAuth returns a user-facing authServerSideProps that hides __clerk_ssr_state
