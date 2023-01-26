@@ -1,5 +1,5 @@
-import { AuthObject } from '@clerk/backend';
-import { prunePrivateMetadata } from '@clerk/backend/src';
+import type { AuthObject } from '@clerk/backend';
+import { prunePrivateMetadata } from '@clerk/backend';
 import cookie from 'cookie';
 import type { GetServerDataProps } from 'gatsby';
 

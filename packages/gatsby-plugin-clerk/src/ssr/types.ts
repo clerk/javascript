@@ -1,7 +1,7 @@
-import { Organization } from '@clerk/backend';
+import type { Organization } from '@clerk/backend';
 import type { Session, User } from '@clerk/clerk-sdk-node';
-import { ServerSideAuth } from '@clerk/types';
-import { GetServerDataProps } from 'gatsby';
+import type { ServerSideAuth } from '@clerk/types';
+import type { GetServerDataProps } from 'gatsby';
 
 export type WithServerAuthResult<CallbackReturn> = (props: GetServerDataProps) => Promise<Awaited<CallbackReturn>>;
 
