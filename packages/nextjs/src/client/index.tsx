@@ -1,8 +1,10 @@
 import { __internal__setErrorThrowerOptions, ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
-import { IsomorphicClerkOptions } from '@clerk/clerk-react/dist/types';
-import { PublishableKeyOrFrontendApi } from '@clerk/types';
+import type { IsomorphicClerkOptions } from '@clerk/clerk-react/dist/types';
+import type { PublishableKeyOrFrontendApi } from '@clerk/types';
 import { useRouter } from 'next/router';
 import React from 'react';
+
+import { invalidateNextRouterNon200ResponseCache } from './invalidateNextRouterNon200ResponseCache';
 
 __internal__setErrorThrowerOptions({
   packageName: '@clerk/nextjs',
@@ -16,13 +18,18 @@ type NextClerkProviderProps = {
   Partial<PublishableKeyOrFrontendApi>;
 
 export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JSX.Element {
-  // @ts-expect-error
   // Allow for overrides without making the type public
-  const { authServerSideProps, frontendApi, publishableKey, proxyUrl, __clerk_ssr_state, clerkJSUrl, ...restProps } =
-    rest;
+  // @ts-expect-error
+  // prettier-ignore
+  const { authServerSideProps, frontendApi, publishableKey, proxyUrl, __clerk_ssr_state, clerkJSUrl, navigate: userNavigate, ...restProps } = rest;
   const { push } = useRouter();
 
   ReactClerkProvider.displayName = 'ReactClerkProvider';
+
+  const navigate = async (to: string) => {
+    await invalidateNextRouterNon200ResponseCache();
+    return (userNavigate || push)(to);
+  };
 
   return (
     <ReactClerkProvider
@@ -31,7 +38,7 @@ export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JS
       clerkJSUrl={clerkJSUrl || process.env.NEXT_PUBLIC_CLERK_JS}
       // @ts-expect-error
       proxyUrl={proxyUrl || process.env.NEXT_PUBLIC_CLERK_PROXY_URL}
-      navigate={to => push(to)}
+      navigate={navigate}
       // withServerSideAuth automatically injects __clerk_ssr_state
       // getAuth returns a user-facing authServerSideProps that hides __clerk_ssr_state
       initialState={authServerSideProps?.__clerk_ssr_state || __clerk_ssr_state}
