@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.9.3](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.9.2-staging.0...@clerk/shared@0.9.3) (2023-01-26)
+
+### Bug Fixes
+
+- **backend,clerk-sdk-node,shared:** Drop support for NodeJS 12 ([d9169ab](https://github.com/clerkinc/clerk_docker/commit/d9169ab4873e1745d7250628f5bf8c8f7da49421))
+- **clerk-js:** Await mountComponentRenderer to mount the components before firing loaded event ([8b9cf52](https://github.com/clerkinc/clerk_docker/commit/8b9cf526666b405b2d68b883ba33e925d4ba3b27))
+
 ### [0.9.2](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.9.2-staging.0...@clerk/shared@0.9.2) (2023-01-24)
 
 ### Bug Fixes
