@@ -1,7 +1,7 @@
-import { OrganizationJSON, SessionJSON, UserJSON } from './json';
+import type { OrganizationJSON, SessionJSON, UserJSON } from './json';
 import type { ActJWTClaim, ClerkJWTClaims } from './jwt';
-import { SessionResource } from './session';
-import { UserResource } from './user';
+import type { SessionResource } from './session';
+import type { UserResource } from './user';
 
 export type ServerGetTokenOptions = { template?: string };
 export type ServerGetToken = (options?: ServerGetTokenOptions) => Promise<string | null>;

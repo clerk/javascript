@@ -1,4 +1,4 @@
-import { Attributes, EnvironmentResource, PhoneNumberResource, UserResource } from '@clerk/types';
+import type { Attributes, EnvironmentResource, PhoneNumberResource, UserResource } from '@clerk/types';
 
 type IDable = { id: string };
 

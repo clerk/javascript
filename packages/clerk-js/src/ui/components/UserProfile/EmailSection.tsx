@@ -1,4 +1,4 @@
-import { EmailAddressResource } from '@clerk/types';
+import type { EmailAddressResource } from '@clerk/types';
 
 import { useCoreUser } from '../../contexts';
 import { Badge, Col, localizationKeys } from '../../customizables';

@@ -1,6 +1,8 @@
-import { AuthStatus, constants, OptionalVerifyTokenOptions } from '@clerk/backend';
-import { NextMiddleware, NextMiddlewareResult } from 'next/dist/server/web/types';
-import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
+import type { AuthStatus, OptionalVerifyTokenOptions } from '@clerk/backend';
+import { constants } from '@clerk/backend';
+import type { NextMiddleware, NextMiddlewareResult } from 'next/dist/server/web/types';
+import type { NextFetchEvent, NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
 import { API_KEY, API_URL, clerkClient, FRONTEND_API, PUBLISHABLE_KEY, SECRET_KEY } from './clerk';

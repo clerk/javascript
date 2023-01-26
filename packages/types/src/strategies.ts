@@ -1,5 +1,5 @@
-import { OAuthProvider } from './oauth';
-import { Web3Provider } from './web3';
+import type { OAuthProvider } from './oauth';
+import type { Web3Provider } from './web3';
 
 export type PasswordStrategy = 'password';
 export type PhoneCodeStrategy = 'phone_code';

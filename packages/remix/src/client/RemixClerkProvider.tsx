@@ -1,9 +1,9 @@
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
-import { IsomorphicClerkOptions } from '@clerk/clerk-react/dist/types';
+import type { IsomorphicClerkOptions } from '@clerk/clerk-react/dist/types';
 import React from 'react';
 
 import { assertValidClerkState, warnForSsr } from '../utils';
-import { ClerkState } from './types';
+import type { ClerkState } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
 
 export * from '@clerk/clerk-react';

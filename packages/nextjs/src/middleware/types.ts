@@ -1,6 +1,6 @@
 import type { Organization, Session, User } from '@clerk/backend';
-import { ClerkJWTClaims, ServerSideAuth } from '@clerk/types';
-import { GetServerSidePropsContext } from 'next';
+import type { ClerkJWTClaims, ServerSideAuth } from '@clerk/types';
+import type { GetServerSidePropsContext } from 'next';
 
 /**
  * @deprecated The /middleware path is deprecated and will be removed in the next major release.

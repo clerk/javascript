@@ -1,10 +1,11 @@
 import React from 'react';
 
 import { useCoreOrganization } from '../../contexts';
-import { Breadcrumbs, NavBar, NavbarContextProvider, NavbarRoute, OrganizationPreview } from '../../elements';
+import type { NavbarRoute } from '../../elements';
+import { Breadcrumbs, NavBar, NavbarContextProvider, OrganizationPreview } from '../../elements';
 import { CogFilled, User } from '../../icons';
 import { localizationKeys } from '../../localization';
-import { PropsOfComponent } from '../../styledSystem';
+import type { PropsOfComponent } from '../../styledSystem';
 
 const organizationProfileRoutes: NavbarRoute[] = [
   {

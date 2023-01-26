@@ -1,10 +1,11 @@
-import { AuthStatus, createGetToken, createSignedOutState, Session, User } from '@clerk/backend-core';
+import type { Session, User } from '@clerk/backend-core';
+import { AuthStatus, createGetToken, createSignedOutState } from '@clerk/backend-core';
 import { isDevelopmentOrStaging } from '@clerk/backend-core/src/util/clerkApiKey';
 import Clerk, { sessions, users } from '@clerk/clerk-sdk-node';
-import { ClerkJWTClaims, ServerGetToken } from '@clerk/types';
-import { GetServerDataProps } from 'gatsby';
+import type { ClerkJWTClaims, ServerGetToken } from '@clerk/types';
+import type { GetServerDataProps } from 'gatsby';
 
-import { WithServerAuthOptions } from './types';
+import type { WithServerAuthOptions } from './types';
 import { parseCookies } from './utils';
 
 export type AuthData = {

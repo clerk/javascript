@@ -1,8 +1,8 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 
 import { API_URL, clerkClient, PUBLISHABLE_KEY } from './clerkClient';
 import { createClerkExpressRequireAuth } from './clerkExpressRequireAuth';
-import { ClerkMiddlewareOptions, RequireAuthProp } from './types';
+import type { ClerkMiddlewareOptions, RequireAuthProp } from './types';
 import { runMiddleware } from './utils';
 
 type ExpressApiHandlerRequireAuth<T = any> = (req: RequireAuthProp<Request>, res: Response<T>) => void | Promise<void>;

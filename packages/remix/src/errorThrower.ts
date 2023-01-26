@@ -1,4 +1,5 @@
-import { buildErrorThrower, ErrorThrowerOptions } from '@clerk/shared';
+import type { ErrorThrowerOptions } from '@clerk/shared';
+import { buildErrorThrower } from '@clerk/shared';
 
 const errorThrower = buildErrorThrower({ packageName: '@clerk/remix' });
 

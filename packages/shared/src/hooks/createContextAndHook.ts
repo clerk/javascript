@@ -1,4 +1,4 @@
-import { DeepPartial } from '@clerk/types';
+import type { DeepPartial } from '@clerk/types';
 import React from 'react';
 
 export function assertContextExists(contextVal: unknown, msgOrCtx: string | React.Context<any>): asserts contextVal {

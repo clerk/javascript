@@ -1,4 +1,4 @@
-import { Color } from '@clerk/types';
+import type { Color } from '@clerk/types';
 
 import { colorToSameTypeString, hexStringToRgbaColor, stringToHslaColor, stringToSameTypeColor } from './cssColorUtils';
 

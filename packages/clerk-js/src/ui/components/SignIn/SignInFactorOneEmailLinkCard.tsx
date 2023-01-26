@@ -1,11 +1,12 @@
-import { EmailLinkFactor, SignInResource } from '@clerk/types';
+import type { EmailLinkFactor, SignInResource } from '@clerk/types';
 import React from 'react';
 
 import { EmailLinkStatusCard } from '../../common';
 import { buildMagicLinkRedirectUrl } from '../../common/redirects';
 import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
-import { VerificationCodeCardProps, VerificationLinkCard } from '../../elements';
+import type { VerificationCodeCardProps } from '../../elements';
+import { VerificationLinkCard } from '../../elements';
 import { useCardState } from '../../elements/contexts';
 import { useMagicLink } from '../../hooks/useMagicLink';
 import { useRouter } from '../../router/RouteContext';

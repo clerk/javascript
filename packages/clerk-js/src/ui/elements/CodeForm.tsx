@@ -1,7 +1,9 @@
 import React from 'react';
 
-import { Col, descriptors, LocalizationKey, Text } from '../customizables';
-import { CodeControl, useCodeControl } from './CodeControl';
+import type { LocalizationKey } from '../customizables';
+import { Col, descriptors, Text } from '../customizables';
+import type { useCodeControl } from './CodeControl';
+import { CodeControl } from './CodeControl';
 import { TimerButton } from './TimerButton';
 
 type CodeFormProps = {

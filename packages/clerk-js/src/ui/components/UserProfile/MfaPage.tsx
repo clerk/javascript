@@ -1,4 +1,4 @@
-import { VerificationStrategy } from '@clerk/types';
+import type { VerificationStrategy } from '@clerk/types';
 import React from 'react';
 
 import { useCoreUser, useEnvironment } from '../../contexts';

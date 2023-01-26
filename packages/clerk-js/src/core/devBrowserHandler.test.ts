@@ -1,4 +1,5 @@
-import createDevBrowserHandler, { CreateDevBrowserHandlerOptions } from './devBrowserHandler';
+import type { CreateDevBrowserHandlerOptions } from './devBrowserHandler';
+import createDevBrowserHandler from './devBrowserHandler';
 
 describe('detBrowserHandler', () => {
   const { getDevBrowserJWT, setDevBrowserJWT, removeDevBrowserJWT } = createDevBrowserHandler(

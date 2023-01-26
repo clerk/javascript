@@ -1,4 +1,4 @@
-import { JWT, JWTClaims } from '@clerk/types';
+import type { JWT, JWTClaims } from '@clerk/types';
 
 import { urlDecodeB64 } from './encoders';
 

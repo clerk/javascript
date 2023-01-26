@@ -1,4 +1,4 @@
-import { SignInFactor } from '@clerk/types';
+import type { SignInFactor } from '@clerk/types';
 import React from 'react';
 
 import { withRedirectToHome } from '../../common/withRedirectToHome';

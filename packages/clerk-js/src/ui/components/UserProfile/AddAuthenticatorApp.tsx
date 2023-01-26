@@ -1,9 +1,10 @@
-import { TOTPResource } from '@clerk/types';
+import type { TOTPResource } from '@clerk/types';
 import React from 'react';
 
 import { QRCode } from '../../common';
 import { useCoreUser } from '../../contexts';
-import { Button, Col, descriptors, LocalizationKey, localizationKeys, Text } from '../../customizables';
+import type { LocalizationKey } from '../../customizables';
+import { Button, Col, descriptors, localizationKeys, Text } from '../../customizables';
 import {
   ClipboardInput,
   ContentPage,

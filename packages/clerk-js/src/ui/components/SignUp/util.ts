@@ -1,4 +1,4 @@
-import { SignUpResource } from '@clerk/types';
+import type { SignUpResource } from '@clerk/types';
 
 type CompleteSignUpFlowProps = {
   signUp: SignUpResource;

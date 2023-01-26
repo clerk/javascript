@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { descriptors, Flex, Flow, Icon, LocalizationKey, localizationKeys, Text } from '../customizables';
+import type { LocalizationKey } from '../customizables';
+import { descriptors, Flex, Flow, Icon, localizationKeys, Text } from '../customizables';
 import { useSupportEmail } from '../hooks/useSupportEmail';
 import { Email } from '../icons';
 import { CardAlert } from './Alert';

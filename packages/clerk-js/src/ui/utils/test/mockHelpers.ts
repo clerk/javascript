@@ -1,7 +1,7 @@
-import { LoadedClerk } from '@clerk/types';
+import type { LoadedClerk } from '@clerk/types';
 import { jest } from '@jest/globals';
 
-import { RouteContextValue } from '../../router';
+import type { RouteContextValue } from '../../router';
 
 type FunctionLike = (...args: any) => any;
 

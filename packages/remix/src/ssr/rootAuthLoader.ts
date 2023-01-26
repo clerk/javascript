@@ -2,7 +2,7 @@ import { sanitizeAuthObject } from '@clerk/backend';
 
 import { invalidRootLoaderCallbackResponseReturn, invalidRootLoaderCallbackReturn } from '../errors';
 import { authenticateRequest } from './authenticateRequest';
-import { LoaderFunctionArgs, LoaderFunctionReturn, RootAuthLoaderCallback, RootAuthLoaderOptions } from './types';
+import type { LoaderFunctionArgs, LoaderFunctionReturn, RootAuthLoaderCallback, RootAuthLoaderOptions } from './types';
 import {
   assertObject,
   injectAuthIntoRequest,

@@ -1,10 +1,10 @@
-import { MembershipRole } from '@clerk/types';
+import type { MembershipRole } from '@clerk/types';
 import React from 'react';
 
+import type { LocalizationKey } from '../../customizables';
 import {
   Col,
   Flex,
-  LocalizationKey,
   localizationKeys,
   Spinner,
   Table,
@@ -17,7 +17,7 @@ import {
   useLocalizations,
 } from '../../customizables';
 import { Pagination, Select, SelectButton, SelectOptionList } from '../../elements';
-import { PropsOfComponent } from '../../styledSystem';
+import type { PropsOfComponent } from '../../styledSystem';
 import { roleLocalizationKey } from '../../utils';
 
 type MembersListTableProps = {

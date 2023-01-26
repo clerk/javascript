@@ -1,8 +1,8 @@
 import { constants } from '@clerk/backend';
-import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
+import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
 import { API_URL, clerkClient, FRONTEND_API, PUBLISHABLE_KEY, sanitizeAuthObject } from '../server/clerk';
-import { WithServerSideAuthCallback, WithServerSideAuthOptions, WithServerSideAuthResult } from './types';
+import type { WithServerSideAuthCallback, WithServerSideAuthOptions, WithServerSideAuthResult } from './types';
 import { authenticateRequest, injectAuthIntoRequest, injectSSRStateIntoProps } from './utils';
 
 const EMPTY_GSSP_RESPONSE = { props: {} };

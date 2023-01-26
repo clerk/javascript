@@ -1,8 +1,8 @@
-import * as CSS from 'csstype';
+import type * as CSS from 'csstype';
 
-import { OAuthProvider } from './oauth';
-import { BuiltInColors, TransparentColor } from './theme';
-import { Web3Provider } from './web3';
+import type { OAuthProvider } from './oauth';
+import type { BuiltInColors, TransparentColor } from './theme';
+import type { Web3Provider } from './web3';
 
 type CSSProperties = CSS.PropertiesFallback<number | string>;
 type CSSPropertiesWithMultiValues = { [K in keyof CSSProperties]: CSSProperties[K] };

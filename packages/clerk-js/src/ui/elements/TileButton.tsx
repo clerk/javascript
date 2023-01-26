@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Button, Col, Icon, Text } from '../customizables';
-import { PropsOfComponent } from '../styledSystem';
+import type { PropsOfComponent } from '../styledSystem';
 
 export const TileButton = (props: PropsOfComponent<typeof Button> & { icon: React.ComponentType }) => {
   const { icon, ...rest } = props;

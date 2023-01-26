@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { common, createVariants, PrimitiveProps, RequiredProp, StateProps, StyleVariants } from '../styledSystem';
+import type { PrimitiveProps, RequiredProp, StateProps, StyleVariants } from '../styledSystem';
+import { common, createVariants } from '../styledSystem';
 import { applyDataStateProps } from './applyDataStateProps';
 import { useFormControl } from './hooks';
 

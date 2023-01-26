@@ -1,6 +1,6 @@
 import { ProfileCardContent } from '../../elements';
 import { Route, Switch } from '../../router';
-import { PropsOfComponent } from '../../styledSystem';
+import type { PropsOfComponent } from '../../styledSystem';
 import { LeaveOrganizationPage } from './ActionConfirmationPage';
 import { InviteMembersPage } from './InviteMembersPage';
 import { OrganizationMembers } from './OrganizationMembers';

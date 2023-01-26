@@ -1,4 +1,5 @@
-import { buildErrorThrower, ErrorThrowerOptions } from './thrower';
+import type { ErrorThrowerOptions } from './thrower';
+import { buildErrorThrower } from './thrower';
 
 describe.concurrent('ErrorThrower', () => {
   const errorThrower = buildErrorThrower({ packageName: '@clerk/test-package' });

@@ -1,5 +1,5 @@
 import { Organization } from '../resources';
-import { OrganizationMembershipRole } from './Enums';
+import type { OrganizationMembershipRole } from './Enums';
 import type { OrganizationMembershipJSON, OrganizationMembershipPublicUserDataJSON } from './JSON';
 
 export class OrganizationMembership {

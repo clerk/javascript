@@ -1,6 +1,7 @@
-import { OrganizationResource } from '@clerk/types';
+import type { OrganizationResource } from '@clerk/types';
 
-import { AvatarUploader, AvatarUploaderProps, OrganizationAvatar } from '../../elements';
+import type { AvatarUploaderProps } from '../../elements';
+import { AvatarUploader, OrganizationAvatar } from '../../elements';
 import { localizationKeys } from '../../localization';
 
 export const OrganizationProfileAvatarUploader = (

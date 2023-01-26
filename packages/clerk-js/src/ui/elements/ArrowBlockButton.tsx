@@ -1,9 +1,10 @@
 import React from 'react';
 
-import { Button, Flex, Icon, LocalizationKey, SimpleButton, Spinner, Text } from '../customizables';
-import { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
+import type { Button, LocalizationKey } from '../customizables';
+import { Flex, Icon, SimpleButton, Spinner, Text } from '../customizables';
+import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { ArrowRightIcon } from '../icons';
-import { PropsOfComponent, ThemableCssProp } from '../styledSystem';
+import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 
 type ArrowBlockButtonProps = PropsOfComponent<typeof Button> & {
   icon?: React.ReactElement;

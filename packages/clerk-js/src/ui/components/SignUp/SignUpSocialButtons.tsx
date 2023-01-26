@@ -1,11 +1,12 @@
-import { OAuthStrategy } from '@clerk/types';
+import type { OAuthStrategy } from '@clerk/types';
 import React from 'react';
 
 import { buildSSOCallbackURL } from '../../common/redirects';
 import { useCoreClerk, useCoreSignUp, useSignUpContext } from '../../contexts';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { useCardState } from '../../elements';
-import { SocialButtons, SocialButtonsProps } from '../../elements/SocialButtons';
+import type { SocialButtonsProps } from '../../elements/SocialButtons';
+import { SocialButtons } from '../../elements/SocialButtons';
 import { useNavigate } from '../../hooks';
 import { handleError } from '../../utils';
 

@@ -1,8 +1,10 @@
-import { AuthObject, constants } from '@clerk/backend';
-import { RequestCookie } from 'next/dist/server/web/spec-extension/cookies';
-import { NextRequest, NextResponse } from 'next/server';
+import type { AuthObject } from '@clerk/backend';
+import { constants } from '@clerk/backend';
+import type { RequestCookie } from 'next/dist/server/web/spec-extension/cookies';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
-import { RequestLike } from './types';
+import type { RequestLike } from './types';
 
 export function setCustomAttributeOnRequest(req: RequestLike, key: string, value: string): void {
   Object.assign(req, { [key]: value });

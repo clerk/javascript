@@ -1,6 +1,6 @@
-import { GetServerSidePropsContext } from 'next';
+import type { GetServerSidePropsContext } from 'next';
 
-import { AuthData, ContextWithAuth } from '../types';
+import type { AuthData, ContextWithAuth } from '../types';
 
 /**
  * Inject `auth`, `user` and `session` properties into ctx.request

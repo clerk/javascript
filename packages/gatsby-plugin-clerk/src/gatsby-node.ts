@@ -1,4 +1,4 @@
-import { GatsbyNode } from 'gatsby';
+import type { GatsbyNode } from 'gatsby';
 
 export const onCreateWebpackConfig: GatsbyNode['onCreateWebpackConfig'] = ({ actions, stage }) => {
   const excludedStages: Array<typeof stage> = ['build-javascript', 'develop'];

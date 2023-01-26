@@ -2,21 +2,21 @@
  * Currently representing API DTOs in their JSON form.
  */
 
-import { FontFamily } from './appearance';
-import { DisplayConfigJSON } from './displayConfig';
+import type { FontFamily } from './appearance';
+import type { DisplayConfigJSON } from './displayConfig';
 import type { ActJWTClaim } from './jwt';
-import { OAuthProvider } from './oauth';
-import { OrganizationInvitationStatus } from './organizationInvitation';
-import { MembershipRole } from './organizationMembership';
-import { OrganizationSettingsJSON } from './organizationSettings';
-import { SessionStatus } from './session';
-import { SignInFirstFactor, SignInJSON, SignInSecondFactor } from './signIn';
-import { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUp';
-import { OAuthStrategy } from './strategies';
-import { BoxShadow, Color, EmUnit, FontWeight, HexColor } from './theme';
-import { UserSettingsJSON } from './userSettings';
-import { CamelToSnake } from './utils';
-import { VerificationStatus } from './verification';
+import type { OAuthProvider } from './oauth';
+import type { OrganizationInvitationStatus } from './organizationInvitation';
+import type { MembershipRole } from './organizationMembership';
+import type { OrganizationSettingsJSON } from './organizationSettings';
+import type { SessionStatus } from './session';
+import type { SignInFirstFactor, SignInJSON, SignInSecondFactor } from './signIn';
+import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUp';
+import type { OAuthStrategy } from './strategies';
+import type { BoxShadow, Color, EmUnit, FontWeight, HexColor } from './theme';
+import type { UserSettingsJSON } from './userSettings';
+import type { CamelToSnake } from './utils';
+import type { VerificationStatus } from './verification';
 
 export interface ClerkResourceJSON {
   // TODO: Shall we make this optional?

@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { Button, Col, Flex, LocalizationKey, localizationKeys, Text } from '../customizables';
+import type { LocalizationKey } from '../customizables';
+import { Button, Col, Flex, localizationKeys, Text } from '../customizables';
 import { handleError } from '../utils';
 import { useCardState } from './contexts';
 import { FileDropArea } from './FileDropArea';

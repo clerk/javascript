@@ -1,8 +1,7 @@
 // eslint-disable-next-line no-restricted-imports
-import { Interpolation as _Interpolation } from '@emotion/react';
-import React from 'react';
+import type { Interpolation as _Interpolation } from '@emotion/react';
 
-import { InternalTheme } from '../foundations';
+import type { InternalTheme } from '../foundations';
 
 type StyleRule = Exclude<_Interpolation<InternalTheme>, string | number | boolean>;
 

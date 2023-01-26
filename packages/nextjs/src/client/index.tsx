@@ -1,6 +1,6 @@
 import { __internal__setErrorThrowerOptions, ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
-import { IsomorphicClerkOptions } from '@clerk/clerk-react/dist/types';
-import { PublishableKeyOrFrontendApi } from '@clerk/types';
+import type { IsomorphicClerkOptions } from '@clerk/clerk-react/dist/types';
+import type { PublishableKeyOrFrontendApi } from '@clerk/types';
 import { useRouter } from 'next/router';
 import React from 'react';
 

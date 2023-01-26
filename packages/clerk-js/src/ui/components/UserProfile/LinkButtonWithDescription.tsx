@@ -1,6 +1,7 @@
-import { Button, Col, Flex, LocalizationKey, Text, useLocalizations } from '../../customizables';
+import type { LocalizationKey } from '../../customizables';
+import { Button, Col, Flex, Text, useLocalizations } from '../../customizables';
 import { useLoadingStatus } from '../../hooks';
-import { PropsOfComponent } from '../../styledSystem';
+import type { PropsOfComponent } from '../../styledSystem';
 
 type LinkButtonWithTextDescriptionProps = Omit<PropsOfComponent<typeof Button>, 'title'> & {
   title: LocalizationKey;

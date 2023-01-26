@@ -1,7 +1,8 @@
 import React from 'react';
 
-import { PrimitiveProps } from '../styledSystem';
-import { Flex, FlexProps } from './Flex';
+import type { PrimitiveProps } from '../styledSystem';
+import type { FlexProps } from './Flex';
+import { Flex } from './Flex';
 
 export type FormProps = PrimitiveProps<'form'> & Omit<FlexProps, 'onSubmit'>;
 

@@ -1,4 +1,4 @@
-import { PublishableKey } from '@clerk/types';
+import type { PublishableKey } from '@clerk/types';
 
 import { isomorphicAtob } from './isomorphicAtob';
 

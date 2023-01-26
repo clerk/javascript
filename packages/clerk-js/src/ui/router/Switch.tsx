@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { Route, RouteProps } from './Route';
+import type { RouteProps } from './Route';
+import { Route } from './Route';
 import { useRouter } from './RouteContext';
 
 function assertRoute(v: any): v is React.ReactElement<RouteProps> {

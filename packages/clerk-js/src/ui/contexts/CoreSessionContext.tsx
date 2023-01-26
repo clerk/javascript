@@ -1,5 +1,5 @@
 import { assertContextExists, SessionContext, useSessionContext } from '@clerk/shared';
-import { SessionResource } from '@clerk/types';
+import type { SessionResource } from '@clerk/types';
 import React from 'react';
 
 import { clerkCoreErrorSessionIsNotDefined } from '../../core/errors';

@@ -20,7 +20,7 @@ import type {
   UserProfileProps,
   UserResource,
 } from '@clerk/types';
-import { OrganizationProfileProps, OrganizationSwitcherProps } from '@clerk/types/src';
+import type { OrganizationProfileProps, OrganizationSwitcherProps } from '@clerk/types/src';
 
 import type {
   BrowserClerk,

@@ -2,7 +2,8 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser } from '../../contexts';
-import { LocalizationKey, localizationKeys, Text } from '../../customizables';
+import type { LocalizationKey } from '../../customizables';
+import { localizationKeys, Text } from '../../customizables';
 import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';

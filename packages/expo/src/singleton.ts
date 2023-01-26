@@ -2,7 +2,8 @@ import type { FapiRequestInit, FapiResponse } from '@clerk/clerk-js/dist/types/s
 import Clerk from '@clerk/clerk-js/headless';
 import type { HeadlessBrowserClerk } from '@clerk/clerk-react';
 
-import { getToken as getTokenFromMemory, saveToken as saveTokenInMemory, TokenCache } from './cache';
+import type { TokenCache } from './cache';
+import { getToken as getTokenFromMemory, saveToken as saveTokenInMemory } from './cache';
 
 const KEY = '__clerk_client_jwt';
 

@@ -1,11 +1,13 @@
 import React from 'react';
 
-import { VerificationStatus } from '../../utils/getClerkQueryParam';
-import { Col, descriptors, Flex, Flow, Icon, LocalizationKey, localizationKeys, Spinner, Text } from '../customizables';
+import type { VerificationStatus } from '../../utils/getClerkQueryParam';
+import type { LocalizationKey } from '../customizables';
+import { Col, descriptors, Flex, Flow, Icon, localizationKeys, Spinner, Text } from '../customizables';
 import { Card, CardAlert, Header } from '../elements';
 import { useCardState } from '../elements/contexts';
 import { ExclamationTriangle, SwitchArrows, TickShield } from '../icons';
-import { animations, InternalTheme } from '../styledSystem';
+import type { InternalTheme } from '../styledSystem';
+import { animations } from '../styledSystem';
 
 type EmailLinkStatusCardProps = React.PropsWithChildren<{
   title: LocalizationKey;

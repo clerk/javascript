@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { SignUpButtonProps, WithClerkProp } from '../types';
+import type { SignUpButtonProps, WithClerkProp } from '../types';
 import { assertSingleChild, normalizeWithDefaultValue, safeExecute } from '../utils';
 import { withClerk } from './withClerk';
 

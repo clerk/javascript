@@ -1,4 +1,4 @@
-import { EmailAddressResource, PhoneNumberResource } from '@clerk/types';
+import type { EmailAddressResource, PhoneNumberResource } from '@clerk/types';
 import React from 'react';
 
 import { descriptors, localizationKeys } from '../../customizables';

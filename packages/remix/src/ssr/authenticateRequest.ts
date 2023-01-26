@@ -1,8 +1,9 @@
-import { Clerk, RequestState } from '@clerk/backend';
+import type { RequestState } from '@clerk/backend';
+import { Clerk } from '@clerk/backend';
 
 import { noSecretKeyOrApiKeyError } from '../errors';
 import { getEnvVariable } from '../utils';
-import { LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
+import type { LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
 import { parseCookies } from './utils';
 
 /**

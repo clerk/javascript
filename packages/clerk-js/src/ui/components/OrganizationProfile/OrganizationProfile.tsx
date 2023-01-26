@@ -1,4 +1,4 @@
-import { OrganizationProfileProps } from '@clerk/types';
+import type { OrganizationProfileProps } from '@clerk/types';
 import React from 'react';
 
 import { withOrganizationsEnabledGuard } from '../../common';
@@ -6,7 +6,7 @@ import { ComponentContext, useCoreOrganization, withCoreUserGuard } from '../../
 import { Flow } from '../../customizables';
 import { ProfileCard, withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
-import { OrganizationProfileCtx } from '../../types';
+import type { OrganizationProfileCtx } from '../../types';
 import { OrganizationProfileNavbar } from './OrganizationProfileNavbar';
 import { OrganizationProfileRoutes } from './OrganizationProfileRoutes';
 

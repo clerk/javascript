@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Col, descriptors, Heading, Text } from '../customizables';
-import { PropsOfComponent } from '../styledSystem';
+import type { PropsOfComponent } from '../styledSystem';
 import { BackLink as BackLinkEl } from './BackLink';
 
 const Root = React.memo((props: PropsOfComponent<typeof Col>): JSX.Element => {

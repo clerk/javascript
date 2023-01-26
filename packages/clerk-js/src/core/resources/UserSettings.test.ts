@@ -1,4 +1,4 @@
-import { UserSettingsJSON } from '@clerk/types';
+import type { UserSettingsJSON } from '@clerk/types';
 
 import { UserSettings } from './internal';
 

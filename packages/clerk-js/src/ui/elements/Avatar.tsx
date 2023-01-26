@@ -2,9 +2,10 @@ import { isRetinaDisplay } from '@clerk/shared';
 import React from 'react';
 
 import { descriptors, Flex, Image, Text } from '../customizables';
-import { ElementDescriptor } from '../customizables/elementDescriptors';
-import { InternalTheme } from '../foundations';
-import { common, PropsOfComponent } from '../styledSystem';
+import type { ElementDescriptor } from '../customizables/elementDescriptors';
+import type { InternalTheme } from '../foundations';
+import type { PropsOfComponent } from '../styledSystem';
+import { common } from '../styledSystem';
 
 type AvatarProps = PropsOfComponent<typeof Flex> & {
   size?: (theme: InternalTheme) => string | number;

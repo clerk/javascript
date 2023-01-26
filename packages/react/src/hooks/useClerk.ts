@@ -1,4 +1,4 @@
-import { LoadedClerk } from '@clerk/types';
+import type { LoadedClerk } from '@clerk/types';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 

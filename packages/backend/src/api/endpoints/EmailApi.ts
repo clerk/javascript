@@ -1,4 +1,4 @@
-import { Email } from '../resources/Email';
+import type { Email } from '../resources/Email';
 import { AbstractAPI } from './AbstractApi';
 
 type EmailParams = {

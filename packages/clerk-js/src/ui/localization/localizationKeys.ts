@@ -1,6 +1,6 @@
-import { PathValue, RecordToPath } from '@clerk/types';
+import type { PathValue, RecordToPath } from '@clerk/types';
 
-import { defaultResource } from './defaultEnglishResource';
+import type { defaultResource } from './defaultEnglishResource';
 
 type Value = string | number | boolean | Date;
 type Whitespace = ' ' | '\t' | '\n' | '\r';

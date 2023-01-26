@@ -1,4 +1,4 @@
-import { UserResource } from '@clerk/types';
+import type { UserResource } from '@clerk/types';
 
 import { useUserContext } from '../contexts/UserContext';
 

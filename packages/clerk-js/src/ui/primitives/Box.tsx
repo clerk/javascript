@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { AsProp, createVariants, PrimitiveProps, StateProps, StyleVariants } from '../styledSystem';
+import type { AsProp, PrimitiveProps, StateProps, StyleVariants } from '../styledSystem';
+import { createVariants } from '../styledSystem';
 import { applyDataStateProps } from './applyDataStateProps';
 
 const { applyVariants } = createVariants(() => ({

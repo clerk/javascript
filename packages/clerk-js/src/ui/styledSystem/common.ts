@@ -1,4 +1,4 @@
-import { InternalTheme } from './types';
+import type { InternalTheme } from './types';
 
 const textVariants = (t: InternalTheme) => {
   const base = {

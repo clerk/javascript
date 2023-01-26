@@ -1,7 +1,7 @@
-import { Appearance, DeepPartial, Elements, Layout, Theme } from '@clerk/types';
+import type { Appearance, DeepPartial, Elements, Layout, Theme } from '@clerk/types';
 
 import { createInternalTheme, defaultInternalTheme } from '../foundations';
-import { InternalTheme } from '../styledSystem';
+import type { InternalTheme } from '../styledSystem';
 import { fastDeepMergeAndReplace } from '../utils';
 import {
   createColorScales,

@@ -1,4 +1,4 @@
-import { OrganizationInvitationResource } from '@clerk/types';
+import type { OrganizationInvitationResource } from '@clerk/types';
 
 import { useCoreOrganization } from '../../contexts';
 import { localizationKeys, Td, Text } from '../../customizables';

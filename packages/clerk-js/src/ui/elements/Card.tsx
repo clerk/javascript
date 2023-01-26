@@ -2,8 +2,9 @@ import React from 'react';
 
 import { useEnvironment } from '../contexts';
 import { descriptors, Flex, generateFlowPartClassname, useAppearance } from '../customizables';
-import { ElementDescriptor } from '../customizables/elementDescriptors';
-import { mqu, PropsOfComponent } from '../styledSystem';
+import type { ElementDescriptor } from '../customizables/elementDescriptors';
+import type { PropsOfComponent } from '../styledSystem';
+import { mqu } from '../styledSystem';
 import { ApplicationLogo } from './ApplicationLogo';
 import { useFlowMetadata } from './contexts';
 import { PoweredByClerkTag } from './PoweredByClerk';

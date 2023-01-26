@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { FlowMetadata, FlowMetadataProvider, InvisibleRootBox, useFlowMetadata } from '../elements';
+import type { FlowMetadata } from '../elements';
+import { FlowMetadataProvider, InvisibleRootBox, useFlowMetadata } from '../elements';
 import { InternalThemeProvider } from '../styledSystem';
 import { generateFlowClassname } from './classGeneration';
 import { descriptors } from './index';

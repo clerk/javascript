@@ -3,9 +3,10 @@ import React, { useLayoutEffect, useState } from 'react';
 import { getLongestValidCountryCode } from '../../../ui/utils/phoneUtils';
 import { Flex, Input, Text } from '../../customizables';
 import { Select, SelectButton, SelectOptionList } from '../../elements';
-import { PropsOfComponent } from '../../styledSystem';
+import type { PropsOfComponent } from '../../styledSystem';
 import { getFlagEmojiFromCountryIso } from '../../utils';
-import { CountryEntry, CountryIso, IsoToCountryMap } from './countryCodeData';
+import type { CountryEntry, CountryIso } from './countryCodeData';
+import { IsoToCountryMap } from './countryCodeData';
 import { useFormattedPhoneNumber } from './useFormattedPhoneNumber';
 
 const createSelectOption = (country: CountryEntry) => {

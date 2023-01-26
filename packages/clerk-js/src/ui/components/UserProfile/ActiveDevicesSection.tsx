@@ -1,4 +1,4 @@
-import { SessionWithActivitiesResource } from '@clerk/types';
+import type { SessionWithActivitiesResource } from '@clerk/types';
 import React from 'react';
 
 import { useCoreSession, useCoreUser } from '../../contexts';

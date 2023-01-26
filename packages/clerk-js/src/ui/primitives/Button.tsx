@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { common, createCssVariables, createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
+import type { PrimitiveProps, StyleVariants } from '../styledSystem';
+import { common, createCssVariables, createVariants } from '../styledSystem';
 import { colors } from '../utils';
 import { applyDataStateProps } from './applyDataStateProps';
 import { Flex } from './Flex';

@@ -1,4 +1,4 @@
-import { BackupCodeResource } from '@clerk/types';
+import type { BackupCodeResource } from '@clerk/types';
 import React from 'react';
 
 import { useCoreUser } from '../../contexts';

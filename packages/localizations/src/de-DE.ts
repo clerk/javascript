@@ -1,4 +1,4 @@
-import { DeepRequired, LocalizationResource } from '@clerk/types';
+import type { DeepRequired, LocalizationResource } from '@clerk/types';
 
 export const deDe: DeepRequired<LocalizationResource> = {
   socialButtonsBlockButton: 'Weiter mit {{provider|titleize}}',

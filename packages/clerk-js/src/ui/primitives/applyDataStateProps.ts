@@ -1,4 +1,4 @@
-import { StateProps } from '../styledSystem';
+import type { StateProps } from '../styledSystem';
 
 export const applyDataStateProps = (props: any) => {
   const { hasError, isDisabled, isLoading, isOpen, isActive, ...rest } = props as StateProps;

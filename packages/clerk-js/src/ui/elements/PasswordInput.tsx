@@ -2,7 +2,7 @@ import React from 'react';
 
 import { descriptors, Flex, Input } from '../customizables';
 import { EyeSlash } from '../icons';
-import { PropsOfComponent } from '../styledSystem';
+import type { PropsOfComponent } from '../styledSystem';
 import { IconButton } from './IconButton';
 
 export const PasswordInput = (props: PropsOfComponent<typeof Input>) => {

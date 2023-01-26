@@ -1,4 +1,5 @@
-import { common, createCssVariables, createVariants, PropsOfComponent, StyleVariants } from '../styledSystem';
+import type { PropsOfComponent, StyleVariants } from '../styledSystem';
+import { common, createCssVariables, createVariants } from '../styledSystem';
 import { colors } from '../utils';
 import { Flex } from './Flex';
 

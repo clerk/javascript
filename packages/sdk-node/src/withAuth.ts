@@ -1,8 +1,8 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 
 import { API_URL, clerkClient, PUBLISHABLE_KEY } from './clerkClient';
 import { createClerkExpressWithAuth } from './clerkExpressWithAuth';
-import { ClerkMiddlewareOptions, WithAuthProp } from './types';
+import type { ClerkMiddlewareOptions, WithAuthProp } from './types';
 import { runMiddleware } from './utils';
 
 type ExpressApiHandlerWithAuth<T = any> = (req: WithAuthProp<Request>, res: Response<T>) => void | Promise<void>;

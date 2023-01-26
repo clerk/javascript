@@ -1,6 +1,7 @@
 import { withCardStateProvider } from '../elements';
 import { localizationKeys } from '../localization';
-import { EmailLinkVerify, EmailLinkVerifyProps } from './EmailLinkVerify';
+import type { EmailLinkVerifyProps } from './EmailLinkVerify';
+import { EmailLinkVerify } from './EmailLinkVerify';
 
 const signInLocalizationKeys = {
   verified: {

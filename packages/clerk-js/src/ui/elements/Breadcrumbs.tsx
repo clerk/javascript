@@ -1,10 +1,12 @@
 import React from 'react';
 
-import { descriptors, Flex, Icon, Link, LocalizationKey, Text, useLocalizations } from '../customizables';
+import type { LocalizationKey } from '../customizables';
+import { descriptors, Flex, Icon, Link, Text, useLocalizations } from '../customizables';
 import { useNavigateToFlowStart } from '../elements';
 import { useRouter } from '../router';
-import { mqu, PropsOfComponent } from '../styledSystem';
-import { NavbarRoute } from './Navbar';
+import type { PropsOfComponent } from '../styledSystem';
+import { mqu } from '../styledSystem';
+import type { NavbarRoute } from './Navbar';
 
 type BreadcrumbsProps = {
   title: LocalizationKey;

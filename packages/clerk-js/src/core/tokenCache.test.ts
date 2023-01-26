@@ -1,4 +1,4 @@
-import { TokenResource } from '@clerk/types';
+import type { TokenResource } from '@clerk/types';
 import jwtGen from 'jsonwebtoken';
 
 import { Token } from './resources/internal';

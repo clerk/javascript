@@ -1,4 +1,4 @@
-import { UserJSON } from '@clerk/types';
+import type { UserJSON } from '@clerk/types';
 
 import { BaseResource } from './internal';
 import { User } from './User';

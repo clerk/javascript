@@ -1,7 +1,9 @@
-import { ClerkAPIError } from '@clerk/types';
-import React, { HTMLInputTypeAttribute } from 'react';
+import type { ClerkAPIError } from '@clerk/types';
+import type { HTMLInputTypeAttribute } from 'react';
+import React from 'react';
 
-import { LocalizationKey, useLocalizations } from '../localization';
+import type { LocalizationKey } from '../localization';
+import { useLocalizations } from '../localization';
 
 type SelectOption = { value: string; label?: string };
 

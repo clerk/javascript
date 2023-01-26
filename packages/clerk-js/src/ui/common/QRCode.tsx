@@ -1,7 +1,7 @@
 import { QRCodeSVG } from 'qrcode.react';
 
 import { descriptors, Flex } from '../customizables';
-import { PropsOfComponent } from '../styledSystem';
+import type { PropsOfComponent } from '../styledSystem';
 
 type QRCodeProps = PropsOfComponent<typeof Flex> & { url: string; size?: number };
 

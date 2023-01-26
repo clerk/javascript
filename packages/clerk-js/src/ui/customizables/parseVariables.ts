@@ -1,7 +1,7 @@
-import { Theme } from '@clerk/types';
+import type { Theme } from '@clerk/types';
 
 import { spaceScaleKeys } from '../foundations/sizes';
-import { fontSizes, fontWeights } from '../foundations/typography';
+import type { fontSizes, fontWeights } from '../foundations/typography';
 import { colors, fromEntries, removeUndefinedProps } from '../utils';
 import { colorOptionToHslaAlphaScale, colorOptionToHslaLightnessScale } from './colorOptionToHslaScale';
 

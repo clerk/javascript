@@ -1,9 +1,9 @@
-import { RequestState } from '@clerk/backend';
-import { NextFunction, Request, Response } from 'express';
+import type { RequestState } from '@clerk/backend';
+import type { NextFunction, Request, Response } from 'express';
 
 import { createClerkExpressRequireAuth } from '../clerkExpressRequireAuth';
 import { createClerkExpressWithAuth } from '../clerkExpressWithAuth';
-import { WithAuthProp } from '../types';
+import type { WithAuthProp } from '../types';
 
 const mockNext = jest.fn();
 

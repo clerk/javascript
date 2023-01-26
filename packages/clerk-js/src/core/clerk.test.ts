@@ -1,8 +1,9 @@
-import { ActiveSessionResource, SignInJSON, SignUpJSON } from '@clerk/types';
+import type { ActiveSessionResource, SignInJSON, SignUpJSON } from '@clerk/types';
 import { waitFor } from '@testing-library/dom';
 
 import Clerk from './clerk';
-import { Client, DisplayConfig, Environment, MagicLinkErrorCode, SignIn, SignUp } from './resources/internal';
+import type { DisplayConfig } from './resources/internal';
+import { Client, Environment, MagicLinkErrorCode, SignIn, SignUp } from './resources/internal';
 
 const mockClientFetch = jest.fn();
 const mockEnvironmentFetch = jest.fn();

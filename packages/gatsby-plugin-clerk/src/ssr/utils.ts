@@ -3,7 +3,7 @@ import cookie from 'cookie';
 import type { GetServerDataProps } from 'gatsby';
 
 import type { AuthData } from './getAuthData';
-import { GetServerDataPropsWithAuth } from './types';
+import type { GetServerDataPropsWithAuth } from './types';
 
 /**
  * @internal

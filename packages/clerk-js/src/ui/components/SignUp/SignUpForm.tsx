@@ -2,8 +2,8 @@ import React from 'react';
 
 import { useAppearance } from '../../customizables';
 import { Form } from '../../elements';
-import { FormControlState } from '../../utils';
-import { ActiveIdentifier, Fields } from './signUpFormHelpers';
+import type { FormControlState } from '../../utils';
+import type { ActiveIdentifier, Fields } from './signUpFormHelpers';
 
 type SignUpFormProps = {
   handleSubmit: React.FormEventHandler;

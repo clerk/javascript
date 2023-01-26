@@ -1,5 +1,5 @@
 import { joinPaths } from '../../util/path';
-import { AllowlistIdentifier } from '../resources/AllowlistIdentifier';
+import type { AllowlistIdentifier } from '../resources/AllowlistIdentifier';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/allowlist_identifiers';

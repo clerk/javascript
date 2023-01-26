@@ -1,4 +1,4 @@
-import { SMSMessage } from '../resources/SMSMessage';
+import type { SMSMessage } from '../resources/SMSMessage';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/sms_messages';

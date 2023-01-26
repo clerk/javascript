@@ -1,4 +1,5 @@
-import { Plugin, transform } from 'esbuild';
+import type { Plugin } from 'esbuild';
+import { transform } from 'esbuild';
 import { readFile } from 'fs/promises';
 import { defineConfig } from 'tsup';
 

@@ -4,7 +4,7 @@ import { useCoreOrganization, useCoreUser, useOrganizationSwitcherContext } from
 import { Button, descriptors, Icon, localizationKeys } from '../../customizables';
 import { OrganizationPreview, PersonalWorkspacePreview } from '../../elements';
 import { Selector } from '../../icons';
-import { PropsOfComponent } from '../../styledSystem';
+import type { PropsOfComponent } from '../../styledSystem';
 
 type OrganizationSwitcherTriggerProps = PropsOfComponent<typeof Button> & { isOpen: boolean };
 

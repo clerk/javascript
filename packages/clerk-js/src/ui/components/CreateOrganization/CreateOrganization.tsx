@@ -1,11 +1,11 @@
-import { CreateOrganizationProps } from '@clerk/types';
+import type { CreateOrganizationProps } from '@clerk/types';
 
 import { withOrganizationsEnabledGuard } from '../../common';
 import { ComponentContext, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { ProfileCard, ProfileCardContent, withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
-import { CreateOrganizationCtx } from '../../types';
+import type { CreateOrganizationCtx } from '../../types';
 import { CreateOrganizationPage } from './CreateOrganizationPage';
 
 const _CreateOrganization = () => {

@@ -1,4 +1,4 @@
-import { SignInProps } from '@clerk/types';
+import type { SignInProps } from '@clerk/types';
 import React from 'react';
 
 import { SignInEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';

@@ -1,6 +1,6 @@
-import { ClerkPaginationParams } from './api';
-import { OrganizationInvitationResource } from './organizationInvitation';
-import { MembershipRole, OrganizationMembershipResource } from './organizationMembership';
+import type { ClerkPaginationParams } from './api';
+import type { OrganizationInvitationResource } from './organizationInvitation';
+import type { MembershipRole, OrganizationMembershipResource } from './organizationMembership';
 
 declare global {
   /**

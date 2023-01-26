@@ -1,10 +1,12 @@
 import { createContextAndHook } from '@clerk/shared';
-import React, { PropsWithChildren, ReactElement, useState } from 'react';
+import type { PropsWithChildren, ReactElement } from 'react';
+import React, { useState } from 'react';
 
 import { usePopover, useSearchInput } from '../../ui/hooks';
 import { Button, descriptors, Flex, Icon, Text } from '../customizables';
 import { Caret, MagnifyingGlass } from '../icons';
-import { animations, common, PropsOfComponent, ThemableCssProp } from '../styledSystem';
+import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
+import { animations, common } from '../styledSystem';
 import { colors } from '../utils';
 import { withFloatingTree } from './contexts';
 import { InputWithIcon } from './InputWithIcon';

@@ -1,4 +1,4 @@
-import { SignUpProps } from '@clerk/types';
+import type { SignUpProps } from '@clerk/types';
 import React from 'react';
 
 import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';

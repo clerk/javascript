@@ -1,4 +1,4 @@
-import { ClerkAPIError } from '@clerk/types';
+import type { ClerkAPIError } from '@clerk/types';
 
 import { getClerkAPIErrorMessage, getGlobalError } from '../utils';
 

@@ -1,4 +1,4 @@
-import { ActiveSessionResource } from '@clerk/types';
+import type { ActiveSessionResource } from '@clerk/types';
 import React from 'react';
 
 import { useCoreSession, useCoreUser, useEnvironment, useUserButtonContext } from '../../contexts';
@@ -6,7 +6,7 @@ import { descriptors, localizationKeys } from '../../customizables';
 import { Action, Actions, PopoverCard, PreviewButton, SecondaryActions, UserPreview } from '../../elements';
 import { RootBox } from '../../elements/RootBox';
 import { CogFilled, Plus, SignOut, SignOutDouble, SwitchArrows } from '../../icons';
-import { PropsOfComponent } from '../../styledSystem';
+import type { PropsOfComponent } from '../../styledSystem';
 import { useMultisessionActions } from './useMultisessionActions';
 
 type UserButtonPopoverProps = { close: () => void } & PropsOfComponent<typeof PopoverCard.Root>;

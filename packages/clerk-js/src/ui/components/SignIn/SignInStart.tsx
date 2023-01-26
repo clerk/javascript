@@ -1,4 +1,4 @@
-import { ClerkAPIError, SignInCreateParams } from '@clerk/types';
+import type { ClerkAPIError, SignInCreateParams } from '@clerk/types';
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
@@ -19,7 +19,8 @@ import {
 } from '../../elements';
 import { useLoadingStatus, useNavigate } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
-import { buildRequest, FormControlState, handleError, isMobileDevice, useFormControl } from '../../utils';
+import type { FormControlState } from '../../utils';
+import { buildRequest, handleError, isMobileDevice, useFormControl } from '../../utils';
 import { SignInSocialButtons } from './SignInSocialButtons';
 
 export function _SignInStart(): JSX.Element {

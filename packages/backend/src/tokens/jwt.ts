@@ -1,4 +1,4 @@
-import { Jwt, JwtPayload } from '@clerk/types';
+import type { Jwt, JwtPayload } from '@clerk/types';
 import { base64url } from 'rfc4648';
 
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js

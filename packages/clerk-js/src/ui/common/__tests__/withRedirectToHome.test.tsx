@@ -1,8 +1,8 @@
 import { render, screen } from '@clerk/shared/testUtils';
-import { EnvironmentResource } from '@clerk/types';
+import type { EnvironmentResource } from '@clerk/types';
 import React from 'react';
 
-import { AuthConfig, DisplayConfig } from '../../../core/resources';
+import type { AuthConfig, DisplayConfig } from '../../../core/resources';
 import { CoreSessionContext, useEnvironment } from '../../contexts';
 import { withRedirectToHome } from '../withRedirectToHome';
 

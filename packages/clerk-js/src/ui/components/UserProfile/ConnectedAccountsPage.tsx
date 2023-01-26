@@ -1,4 +1,4 @@
-import { ExternalAccountResource, OAuthStrategy } from '@clerk/types';
+import type { ExternalAccountResource, OAuthStrategy } from '@clerk/types';
 import React from 'react';
 
 import { useWizard, Wizard } from '../../common';

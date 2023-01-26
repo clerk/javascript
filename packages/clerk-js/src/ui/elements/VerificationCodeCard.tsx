@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { Col, descriptors, LocalizationKey, localizationKeys } from '../customizables';
+import type { LocalizationKey } from '../customizables';
+import { Col, descriptors, localizationKeys } from '../customizables';
 import { useLoadingStatus } from '../hooks';
 import { handleError, sleep, useFormControl } from '../utils';
 import { CardAlert } from './Alert';

@@ -5,7 +5,7 @@ import type {
   UserButtonProps,
   UserProfileProps,
 } from '@clerk/types';
-import { OrganizationProfileProps, OrganizationSwitcherProps } from '@clerk/types';
+import type { OrganizationProfileProps, OrganizationSwitcherProps } from '@clerk/types';
 
 export type { SignInProps, SignUpProps, UserButtonProps, UserProfileProps };
 

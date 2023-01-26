@@ -1,5 +1,5 @@
 import { titleize } from '@clerk/shared';
-import { PreferredSignInStrategy, SignInFactor, SignInResource, SignInStrategy } from '@clerk/types';
+import type { PreferredSignInStrategy, SignInFactor, SignInResource, SignInStrategy } from '@clerk/types';
 
 import { PREFERRED_SIGN_IN_STRATEGIES } from '../../common/constants';
 import { otpPrefFactorComparator, passwordPrefFactorComparator } from './strategies/factorSortingUtils';

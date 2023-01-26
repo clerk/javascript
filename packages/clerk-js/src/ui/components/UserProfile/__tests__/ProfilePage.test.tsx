@@ -1,4 +1,4 @@
-import { ImageResource } from '@clerk/types';
+import type { ImageResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 import React from 'react';
 

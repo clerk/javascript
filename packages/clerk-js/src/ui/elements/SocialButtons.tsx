@@ -1,9 +1,9 @@
-import { OAuthProvider, OAuthStrategy, Web3Provider, Web3Strategy } from '@clerk/types';
+import type { OAuthProvider, OAuthStrategy, Web3Provider, Web3Strategy } from '@clerk/types';
 import React from 'react';
 
 import { Button, descriptors, Grid, Image, localizationKeys, useAppearance } from '../customizables';
 import { useEnabledThirdPartyProviders } from '../hooks';
-import { PropsOfComponent } from '../styledSystem';
+import type { PropsOfComponent } from '../styledSystem';
 import { sleep } from '../utils';
 import { ArrowBlockButton } from './ArrowBlockButton';
 import { useCardState } from './contexts';

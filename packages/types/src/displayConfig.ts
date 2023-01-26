@@ -1,5 +1,5 @@
-import { DisplayThemeJSON } from './json';
-import { ClerkResource } from './resource';
+import type { DisplayThemeJSON } from './json';
+import type { ClerkResource } from './resource';
 
 export type PreferredSignInStrategy = 'password' | 'otp';
 

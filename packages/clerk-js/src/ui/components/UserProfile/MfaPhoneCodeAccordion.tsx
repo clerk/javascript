@@ -1,4 +1,4 @@
-import { PhoneNumberResource } from '@clerk/types';
+import type { PhoneNumberResource } from '@clerk/types';
 
 import { Badge, Col, Icon, localizationKeys } from '../../customizables';
 import { FormattedPhoneNumberText, useCardState } from '../../elements';

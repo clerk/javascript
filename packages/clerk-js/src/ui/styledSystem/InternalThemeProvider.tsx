@@ -5,7 +5,7 @@ import { CacheProvider, ThemeProvider } from '@emotion/react';
 import React from 'react';
 
 import { useAppearance } from '../customizables';
-import { InternalTheme } from './index';
+import type { InternalTheme } from './index';
 
 const el = document.querySelector('style#cl-style-insertion-point');
 

@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useEnvironment } from '../contexts';
 import { descriptors, Flex, Image, useAppearance } from '../customizables';
-import { PropsOfComponent } from '../styledSystem';
+import type { PropsOfComponent } from '../styledSystem';
 
 type WidthInRem = `${string}rem`;
 const getContainerHeightForImageRatio = (imageRef: React.RefObject<HTMLImageElement>, remWidth: WidthInRem) => {

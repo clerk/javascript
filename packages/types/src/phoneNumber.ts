@@ -1,7 +1,7 @@
-import { IdentificationLinkResource } from './identificationLink';
-import { ClerkResource } from './resource';
-import { PhoneCodeStrategy } from './strategies';
-import { VerificationResource } from './verification';
+import type { IdentificationLinkResource } from './identificationLink';
+import type { ClerkResource } from './resource';
+import type { PhoneCodeStrategy } from './strategies';
+import type { VerificationResource } from './verification';
 
 export type PhoneNumberVerificationStrategy = PhoneCodeStrategy;
 

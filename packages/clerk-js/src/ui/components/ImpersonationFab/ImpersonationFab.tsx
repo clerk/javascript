@@ -1,13 +1,14 @@
-import React, { PointerEventHandler, useEffect, useRef } from 'react';
+import type { PointerEventHandler } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import { useCoreClerk, useCoreSession, withCoreUserGuard } from '../../contexts';
+import type { LocalizationKey } from '../../customizables';
 import {
   Col,
   descriptors,
   Flex,
   Icon,
   Link,
-  LocalizationKey,
   localizationKeys,
   Text,
   useAppearance,
@@ -15,7 +16,8 @@ import {
 } from '../../customizables';
 import { Portal } from '../../elements/Portal';
 import { Eye } from '../../icons';
-import { mqu, PropsOfComponent } from '../../styledSystem';
+import type { PropsOfComponent } from '../../styledSystem';
+import { mqu } from '../../styledSystem';
 import { getFullName, getIdentifier } from '../../utils';
 
 type EyeCircleProps = PropsOfComponent<typeof Col> & {

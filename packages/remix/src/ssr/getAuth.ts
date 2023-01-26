@@ -2,7 +2,7 @@ import { sanitizeAuthObject } from '@clerk/backend';
 
 import { noLoaderArgsPassedInGetAuth } from '../errors';
 import { authenticateRequest } from './authenticateRequest';
-import { GetAuthReturn, LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
+import type { GetAuthReturn, LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
 import { interstitialJsonResponse } from './utils';
 
 type GetAuthOptions = Pick<RootAuthLoaderOptions, 'apiKey' | 'secretKey'>;

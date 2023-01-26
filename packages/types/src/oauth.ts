@@ -1,4 +1,4 @@
-import { OAuthStrategy } from './strategies';
+import type { OAuthStrategy } from './strategies';
 
 export interface OAuthProviderData {
   provider: OAuthProvider;

@@ -1,4 +1,4 @@
-import { UpdateUserParams } from '@clerk/types';
+import type { UpdateUserParams } from '@clerk/types';
 
 import { normalizeUnsafeMetadata } from '../resourceParams';
 

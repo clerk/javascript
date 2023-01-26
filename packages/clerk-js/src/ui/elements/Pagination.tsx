@@ -1,7 +1,8 @@
 import { useState } from 'react';
 
 import { Button, Flex, localizationKeys, Text } from '../customizables';
-import { mqu, PropsOfComponent } from '../styledSystem';
+import type { PropsOfComponent } from '../styledSystem';
+import { mqu } from '../styledSystem';
 import { range } from '../utils';
 
 type UsePaginationProps = {

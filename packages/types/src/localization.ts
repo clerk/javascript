@@ -1,4 +1,4 @@
-import { DeepPartial } from './utils';
+import type { DeepPartial } from './utils';
 
 export type LocalizationValue = string;
 

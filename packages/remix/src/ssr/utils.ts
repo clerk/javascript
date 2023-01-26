@@ -1,9 +1,10 @@
-import { AuthObject, debugRequestState, loadInterstitialFromLocal, RequestState } from '@clerk/backend';
+import type { AuthObject, RequestState } from '@clerk/backend';
+import { debugRequestState, loadInterstitialFromLocal } from '@clerk/backend';
 import { LIB_VERSION } from '@clerk/clerk-react/dist/info';
 import { json } from '@remix-run/server-runtime';
 import cookie from 'cookie';
 
-import { LoaderFunctionArgs, LoaderFunctionArgsWithAuth } from './types';
+import type { LoaderFunctionArgs, LoaderFunctionArgsWithAuth } from './types';
 
 /**
  * Inject `auth`, `user` and `session` properties into `request`

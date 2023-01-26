@@ -1,4 +1,4 @@
-import { OrganizationInvitationStatus, OrganizationMembershipRole } from './Enums';
+import type { OrganizationInvitationStatus, OrganizationMembershipRole } from './Enums';
 import type { OrganizationInvitationJSON } from './JSON';
 
 export class OrganizationInvitation {

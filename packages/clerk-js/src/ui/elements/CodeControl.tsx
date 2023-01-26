@@ -1,8 +1,9 @@
 import React from 'react';
 
 import { descriptors, Flex, FormErrorText, Input, Spinner } from '../customizables';
-import { common, PropsOfComponent } from '../styledSystem';
-import { FormControlState } from '../utils';
+import type { PropsOfComponent } from '../styledSystem';
+import { common } from '../styledSystem';
+import type { FormControlState } from '../utils';
 
 type UseCodeInputOptions = {
   length?: number;

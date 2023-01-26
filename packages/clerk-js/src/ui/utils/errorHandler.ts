@@ -1,8 +1,8 @@
 import { snakeToCamel } from '@clerk/shared';
-import { ClerkAPIError } from '@clerk/types';
+import type { ClerkAPIError } from '@clerk/types';
 
 import { isClerkAPIResponseError, isKnownError, isMetamaskError } from '../../core/resources/internal';
-import { FormControlState } from './useFormControl';
+import type { FormControlState } from './useFormControl';
 
 interface ParserErrors {
   fieldErrors: ClerkAPIError[];

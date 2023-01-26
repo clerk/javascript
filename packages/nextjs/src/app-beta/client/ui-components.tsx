@@ -8,7 +8,7 @@ import {
   UserButton as OgUserButton,
   UserProfile,
 } from '@clerk/clerk-react';
-import { SignInProps, SignUpProps, UserButtonProps } from '@clerk/types';
+import type { SignInProps, SignUpProps, UserButtonProps } from '@clerk/types';
 import { usePathname, useSearchParams } from 'next/navigation';
 import React from 'react';
 

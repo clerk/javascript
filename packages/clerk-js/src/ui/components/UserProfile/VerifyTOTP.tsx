@@ -1,4 +1,4 @@
-import { TOTPResource } from '@clerk/types';
+import type { TOTPResource } from '@clerk/types';
 import React from 'react';
 
 import { useCoreUser } from '../../contexts';

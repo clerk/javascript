@@ -1,5 +1,5 @@
-import { AuthObject, Organization, Session, User } from '@clerk/backend';
-import { DataFunctionArgs, LoaderFunction } from '@remix-run/server-runtime';
+import type { AuthObject, Organization, Session, User } from '@clerk/backend';
+import type { DataFunctionArgs, LoaderFunction } from '@remix-run/server-runtime';
 
 export type GetAuthReturn = Promise<AuthObject>;
 

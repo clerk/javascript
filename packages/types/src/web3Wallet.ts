@@ -1,6 +1,6 @@
-import { ClerkResource } from './resource';
-import { Web3Strategy } from './strategies';
-import { VerificationResource } from './verification';
+import type { ClerkResource } from './resource';
+import type { Web3Strategy } from './strategies';
+import type { VerificationResource } from './verification';
 
 export type PrepareWeb3WalletVerificationParams = {
   strategy: Web3Strategy;

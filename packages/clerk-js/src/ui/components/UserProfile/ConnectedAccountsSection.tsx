@@ -1,5 +1,5 @@
-import { OAuthStrategy } from '@clerk/types';
-import { ExternalAccountResource } from '@clerk/types/src';
+import type { OAuthStrategy } from '@clerk/types';
+import type { ExternalAccountResource } from '@clerk/types/src';
 
 import { useCoreUser } from '../../contexts';
 import { Badge, Col, descriptors, Flex, Image, localizationKeys } from '../../customizables';

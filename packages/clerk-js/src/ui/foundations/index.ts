@@ -1,5 +1,6 @@
 import { createInternalTheme } from './createInternalTheme';
-import { defaultInternalThemeFoundations, InternalTheme, InternalThemeFoundations } from './defaultFoundations';
+import type { InternalTheme, InternalThemeFoundations } from './defaultFoundations';
+import { defaultInternalThemeFoundations } from './defaultFoundations';
 
 const defaultInternalTheme = createInternalTheme(defaultInternalThemeFoundations);
 

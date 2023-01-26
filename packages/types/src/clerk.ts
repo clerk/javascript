@@ -1,4 +1,4 @@
-import {
+import type {
   Appearance,
   CreateOrganizationTheme,
   OrganizationProfileTheme,
@@ -8,15 +8,15 @@ import {
   UserButtonTheme,
   UserProfileTheme,
 } from './appearance';
-import { ClientResource } from './client';
-import { DisplayThemeJSON } from './json';
-import { LocalizationResource } from './localization';
-import { OrganizationResource } from './organization';
-import { OrganizationInvitationResource } from './organizationInvitation';
-import { MembershipRole, OrganizationMembershipResource } from './organizationMembership';
-import { ActiveSessionResource } from './session';
-import { UserResource } from './user';
-import { DeepPartial, DeepSnakeToCamel } from './utils';
+import type { ClientResource } from './client';
+import type { DisplayThemeJSON } from './json';
+import type { LocalizationResource } from './localization';
+import type { OrganizationResource } from './organization';
+import type { OrganizationInvitationResource } from './organizationInvitation';
+import type { MembershipRole, OrganizationMembershipResource } from './organizationMembership';
+import type { ActiveSessionResource } from './session';
+import type { UserResource } from './user';
+import type { DeepPartial, DeepSnakeToCamel } from './utils';
 
 export type InstanceType = 'production' | 'development';
 

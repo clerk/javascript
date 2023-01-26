@@ -1,4 +1,4 @@
-import { DeepRequired, LocalizationResource } from '@clerk/types';
+import type { DeepRequired, LocalizationResource } from '@clerk/types';
 
 const commonTexts = {
   signIn: {

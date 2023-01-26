@@ -1,6 +1,6 @@
 import { localizationKeys } from '../../customizables';
 import { ErrorCard } from '../../elements';
-import { PropsOfComponent } from '../../styledSystem';
+import type { PropsOfComponent } from '../../styledSystem';
 
 export const HavingTrouble = (props: PropsOfComponent<typeof ErrorCard>) => {
   const { onBackLinkClick } = props;

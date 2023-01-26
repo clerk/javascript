@@ -1,7 +1,9 @@
 import React from 'react';
 
-import { createVariants, PrimitiveProps, StyleVariants } from '../styledSystem';
-import { Box, BoxProps } from './Box';
+import type { PrimitiveProps, StyleVariants } from '../styledSystem';
+import { createVariants } from '../styledSystem';
+import type { BoxProps } from './Box';
+import { Box } from './Box';
 
 const { applyVariants, filterProps } = createVariants(theme => {
   return {

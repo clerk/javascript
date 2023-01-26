@@ -1,9 +1,10 @@
-import { PhoneNumberResource } from '@clerk/types';
+import type { PhoneNumberResource } from '@clerk/types';
 import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser } from '../../contexts';
-import { Col, LocalizationKey, localizationKeys, Text } from '../../customizables';
+import type { LocalizationKey } from '../../customizables';
+import { Col, localizationKeys, Text } from '../../customizables';
 import {
   ArrowBlockButton,
   ContentPage,

@@ -1,5 +1,5 @@
 import { createContextAndHook } from '@clerk/shared';
-import { ClerkAPIError } from '@clerk/types';
+import type { ClerkAPIError } from '@clerk/types';
 import React from 'react';
 
 import { useLocalizations } from '../../customizables';

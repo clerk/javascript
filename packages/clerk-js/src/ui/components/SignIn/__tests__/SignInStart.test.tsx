@@ -1,4 +1,5 @@
-import { OAUTH_PROVIDERS, SignInResource } from '@clerk/types';
+import type { SignInResource } from '@clerk/types';
+import { OAUTH_PROVIDERS } from '@clerk/types';
 import React from 'react';
 
 import { bindCreateFixtures, render, screen } from '../../../../testUtils';

@@ -1,4 +1,4 @@
-import { SignInResource } from '@clerk/types';
+import type { SignInResource } from '@clerk/types';
 
 import { determineSalutation, determineStartingSignInFactor } from '../utils';
 

@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { animations, createVariants, StyleVariants } from '../styledSystem';
+import type { StyleVariants } from '../styledSystem';
+import { animations, createVariants } from '../styledSystem';
 import { useFormControl } from './hooks';
 import { Text } from './Text';
 

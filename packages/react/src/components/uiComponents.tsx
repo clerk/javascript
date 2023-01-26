@@ -1,4 +1,4 @@
-import {
+import type {
   CreateOrganizationProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
@@ -9,7 +9,7 @@ import {
 } from '@clerk/types';
 import React from 'react';
 
-import { MountProps, WithClerkProp } from '../types';
+import type { MountProps, WithClerkProp } from '../types';
 import { withClerk } from './withClerk';
 
 // README: <Portal/> should be a class pure component in order for mount and unmount

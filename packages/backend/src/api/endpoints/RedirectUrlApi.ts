@@ -1,5 +1,5 @@
 import { joinPaths } from '../../util/path';
-import { RedirectUrl } from '../resources/RedirectUrl';
+import type { RedirectUrl } from '../resources/RedirectUrl';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/redirect_urls';

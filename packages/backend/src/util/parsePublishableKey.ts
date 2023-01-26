@@ -1,4 +1,4 @@
-import { PublishableKey } from '@clerk/types';
+import type { PublishableKey } from '@clerk/types';
 
 const PUBLISHABLE_KEY_LIVE_PREFIX = 'pk_live_';
 const PUBLISHABLE_KEY_TEST_PREFIX = 'pk_test_';

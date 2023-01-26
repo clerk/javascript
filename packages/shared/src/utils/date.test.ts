@@ -1,4 +1,5 @@
-import { addYears, dateTo12HourTime, differenceInCalendarDays, formatRelative, RelativeDateCase } from './date';
+import type { RelativeDateCase } from './date';
+import { addYears, dateTo12HourTime, differenceInCalendarDays, formatRelative } from './date';
 
 describe.concurrent('date utils', () => {
   describe.concurrent('dateTo12HourTime(date)', () => {

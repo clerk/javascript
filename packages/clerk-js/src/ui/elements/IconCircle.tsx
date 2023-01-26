@@ -1,6 +1,6 @@
 import { Flex, Icon } from '../customizables';
-import { ElementDescriptor } from '../customizables/elementDescriptors';
-import { PropsOfComponent } from '../styledSystem';
+import type { ElementDescriptor } from '../customizables/elementDescriptors';
+import type { PropsOfComponent } from '../styledSystem';
 
 type IconCircleProps = Pick<PropsOfComponent<typeof Icon>, 'icon'> &
   PropsOfComponent<typeof Flex> & {
