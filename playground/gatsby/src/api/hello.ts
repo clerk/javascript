@@ -1,4 +1,4 @@
-import { clerkClient, withAuth } from 'gatsby-plugin-clerk/server';
+import { clerkClient, withAuth } from '@clerk/clerk-sdk-node';
 
 interface ContactBody {
   message: string;
@@ -6,7 +6,7 @@ interface ContactBody {
 
 const handler = withAuth(async (req, res) => {
   const users = await clerkClient.users.getUserList();
-  res.send({ title: `I am TYPESCRIPT`, message: req.body.message, auth: req.auth });
+  res.send({ title: `We have ${users.length} users`, message: req.body.message, auth: req.auth });
 });
 
 export default handler;
