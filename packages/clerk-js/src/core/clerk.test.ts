@@ -153,6 +153,35 @@ describe('Clerk singleton', () => {
         expect(mockSession.touch).not.toHaveBeenCalled();
       });
     });
+
+    it('calls __unstable__onBeforeSetActive before session.touch', async () => {
+      mockSession.touch.mockReturnValueOnce(Promise.resolve());
+      mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
+
+      (window as any).__unstable__onBeforeSetActive = () => {
+        expect(mockSession.touch).not.toHaveBeenCalled();
+      };
+
+      const sut = new Clerk(frontendApi);
+      await sut.load();
+      await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+      expect(mockSession.touch).toHaveBeenCalled();
+    });
+
+    it('calls __unstable__onAfterSetActive after beforeEmit and session.touch', async () => {
+      const beforeEmitMock = jest.fn();
+      mockSession.touch.mockReturnValueOnce(Promise.resolve());
+      mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
+
+      (window as any).__unstable__onAfterSetActive = () => {
+        expect(mockSession.touch).toHaveBeenCalled();
+        expect(beforeEmitMock).toHaveBeenCalled();
+      };
+
+      const sut = new Clerk(frontendApi);
+      await sut.load();
+      await sut.setActive({ session: mockSession as any as ActiveSessionResource, beforeEmit: beforeEmitMock });
+    });
   });
 
   describe('.load()', () => {
