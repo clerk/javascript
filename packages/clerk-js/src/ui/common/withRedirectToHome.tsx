@@ -2,14 +2,14 @@ import type { ComponentType } from 'react';
 import React from 'react';
 
 import type { AvailableComponentProps } from '../../ui/types';
-import type { ClerkRequirement } from '../../utils';
+import type { ComponentGuard } from '../../utils';
 import { noOrganizationExists, noUserExists, sessionExistsAndSingleSessionModeEnabled } from '../../utils';
 import { useCoreClerk, useEnvironment, useOptions } from '../contexts';
 import { useNavigate } from '../hooks';
 
 function withRedirectToHome<P extends AvailableComponentProps>(
   Component: ComponentType<P>,
-  requirement: ClerkRequirement,
+  condition: ComponentGuard,
   warning?: string,
 ): (props: P) => null | JSX.Element {
   const displayName = Component.displayName || Component.name || 'Component';
@@ -21,7 +21,7 @@ function withRedirectToHome<P extends AvailableComponentProps>(
     const environment = useEnvironment();
     const options = useOptions();
 
-    const shouldRedirect = requirement(clerk, environment, options);
+    const shouldRedirect = condition(clerk, environment, options);
     React.useEffect(() => {
       if (shouldRedirect) {
         if (warning && environment.displayConfig.instanceEnvironmentType === 'development') {
