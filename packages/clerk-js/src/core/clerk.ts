@@ -1,10 +1,5 @@
-import {
-  inClientSide,
-  isLegacyFrontendApiKey,
-  LocalStorageBroadcastChannel,
-  noop,
-  parsePublishableKey,
-} from '@clerk/shared';
+import type { LocalStorageBroadcastChannel } from '@clerk/shared';
+import { inClientSide, isLegacyFrontendApiKey, noop, parsePublishableKey } from '@clerk/shared';
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
@@ -65,13 +60,15 @@ import {
 } from '../utils';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { DEV_BROWSER_SSO_JWT_PARAMETER, ERROR_CODES } from './constants';
-import createDevBrowserHandler, { DevBrowserHandler } from './devBrowserHandler';
+import type { DevBrowserHandler } from './devBrowserHandler';
+import createDevBrowserHandler from './devBrowserHandler';
 import {
   clerkErrorInitFailed,
   clerkMissingDevBrowserJwt,
   clerkOAuthCallbackDidNotCompleteSignInSIgnUp,
 } from './errors';
-import createFapiClient, { FapiClient, FapiRequestCallback } from './fapiClient';
+import type { FapiClient, FapiRequestCallback } from './fapiClient';
+import createFapiClient from './fapiClient';
 import {
   BaseResource,
   Client,
@@ -908,11 +905,11 @@ export default class Clerk implements ClerkInterface {
     return this.#environment;
   }
 
-  __unstable__setEnvironment = (env: EnvironmentJSON): void => {
+  __unstable__setEnvironment = async (env: EnvironmentJSON) => {
     this.#environment = new Environment(env);
 
     if (Clerk.mountComponentRenderer) {
-      this.#componentControls = Clerk.mountComponentRenderer(this, this.#environment, this.#options);
+      this.#componentControls = await Clerk.mountComponentRenderer(this, this.#environment, this.#options);
     }
   };
 
@@ -972,7 +969,7 @@ export default class Clerk implements ClerkInterface {
         });
 
         if (Clerk.mountComponentRenderer) {
-          this.#componentControls = Clerk.mountComponentRenderer(this, this.#environment, this.#options);
+          this.#componentControls = await Clerk.mountComponentRenderer(this, this.#environment, this.#options);
         }
 
         break;
@@ -1004,7 +1001,7 @@ export default class Clerk implements ClerkInterface {
     // TODO: Add an auth service also for non standard browsers that will poll for the __session JWT but won't use cookies
 
     if (Clerk.mountComponentRenderer) {
-      this.#componentControls = Clerk.mountComponentRenderer(this, this.#environment, this.#options);
+      this.#componentControls = await Clerk.mountComponentRenderer(this, this.#environment, this.#options);
     }
   };
 

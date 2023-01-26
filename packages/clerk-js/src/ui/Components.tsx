@@ -1,16 +1,17 @@
+import { createDeferredPromise } from '@clerk/shared';
 import type {
   Appearance,
   Clerk,
   ClerkOptions,
   CreateOrganizationProps,
   EnvironmentResource,
+  OrganizationProfileProps,
   SignInProps,
   SignUpProps,
+  UserProfileProps,
 } from '@clerk/types';
-import { OrganizationProfileProps } from '@clerk/types';
-import { UserProfileProps } from '@clerk/types/src';
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 import { PRESERVED_QUERYSTRING_PARAMS } from '../core/constants';
 import { clerkUIErrorDOMElementNotFound } from '../core/errors';
@@ -30,16 +31,9 @@ import { useSafeLayoutEffect } from './hooks';
 import Portal from './portal';
 import { VirtualRouter } from './router';
 import { InternalThemeProvider } from './styledSystem';
-import type { AvailableComponentProps } from './types';
-import { AvailableComponentCtx } from './types';
+import type { AvailableComponentCtx, AvailableComponentProps } from './types';
 
 const ROOT_ELEMENT_ID = 'clerk-components';
-
-export type MountComponentRenderer = (
-  clerk: Clerk,
-  environment: EnvironmentResource,
-  options: ClerkOptions,
-) => ComponentControls;
 
 export type ComponentControls = {
   mountComponent: (params: {
@@ -85,6 +79,7 @@ interface ComponentsProps {
   clerk: Clerk;
   environment: EnvironmentResource;
   options: ClerkOptions;
+  onComponentsMounted: () => void;
 }
 
 interface ComponentsState {
@@ -106,11 +101,11 @@ function assertDOMElement(element: HTMLElement): asserts element {
   }
 }
 
-export const mountComponentRenderer = (
+export const mountComponentRenderer = async (
   clerk: Clerk,
   environment: EnvironmentResource,
   options: ClerkOptions,
-): ComponentControls => {
+): Promise<ComponentControls> => {
   // TODO: Init of components should start
   // before /env and /client requests
   let clerkRoot = document.getElementById(ROOT_ELEMENT_ID);
@@ -121,17 +116,21 @@ export const mountComponentRenderer = (
     document.body.appendChild(clerkRoot);
   }
 
-  ReactDOM.render<ComponentsProps>(
+  const deferredPromise = createDeferredPromise();
+  createRoot(clerkRoot).render(
     <Components
       clerk={clerk}
       environment={environment}
       options={options}
+      onComponentsMounted={deferredPromise.resolve}
     />,
-    clerkRoot,
   );
 
+  await deferredPromise.promise;
   return componentsControls;
 };
+
+export type MountComponentRenderer = typeof mountComponentRenderer;
 
 const componentsControls = {} as ComponentControls;
 
@@ -186,6 +185,8 @@ const Components = (props: ComponentsProps) => {
     componentsControls.openModal = (name, props) => {
       setState(s => ({ ...s, [name + 'Modal']: props }));
     };
+
+    props.onComponentsMounted();
   }, []);
 
   const mountedSignInModal = (
