@@ -1,6 +1,6 @@
 {
   "name": "gatsby-plugin-clerk",
-  "version": "4.0.0-staging.1",
+  "version": "4.0.0-staging.2",
   "license": "MIT",
   "description": "Clerk.dev SDK for Gatsby",
   "keywords": [
