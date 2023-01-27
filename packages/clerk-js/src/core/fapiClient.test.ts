@@ -10,29 +10,11 @@ const fapiClient = createFapiClient({
   },
 } as Clerk);
 
-const proxyUrl = 'example.com/__clerk';
+const proxyUrl = 'https://clerk.dev/api/__clerk';
 
 const fapiClientWithProxy = createFapiClient({
   frontendApi: 'clerk.example.com',
-  proxyUrl: `example.com`,
-  version: '42.0.0',
-  session: {
-    id: 'deadbeef',
-  },
-} as Clerk);
-
-const fapiClientWithProxyPath = createFapiClient({
-  frontendApi: 'clerk.example.com',
   proxyUrl,
-  version: '42.0.0',
-  session: {
-    id: 'deadbeef',
-  },
-} as Clerk);
-
-const fapiClientWithProxyPath2 = createFapiClient({
-  frontendApi: 'clerk.example.com',
-  proxyUrl: 'example.com/api/__clerk',
   version: '42.0.0',
   session: {
     id: 'deadbeef',
@@ -98,20 +80,7 @@ describe('buildUrl(options)', () => {
   });
 
   it('returns the full frontend API URL using proxy url', () => {
-    expect(fapiClientWithProxy.buildUrl({ path: '/foo' }).href).toBe(
-      `https://example.com/v1/foo?_clerk_js_version=42.0.0`,
-    );
-  });
-
-  it('returns the full frontend API URL using proxy url path', () => {
-    expect(fapiClientWithProxyPath.buildUrl({ path: '/foo' }).href).toBe(
-      `https://${proxyUrl}/v1/foo?_clerk_js_version=42.0.0`,
-    );
-  });
-  it('returns the full frontend API URL using proxy url path 2', () => {
-    expect(fapiClientWithProxyPath2.buildUrl({ path: '/foo' }).href).toBe(
-      `https://example.com/api/__clerk/v1/foo?_clerk_js_version=42.0.0`,
-    );
+    expect(fapiClientWithProxy.buildUrl({ path: '/foo' }).href).toBe(`${proxyUrl}/v1/foo?_clerk_js_version=42.0.0`);
   });
 
   it('adds _clerk_session_id as a query parameter if provided and path does not start with client', () => {
@@ -166,7 +135,7 @@ describe('request', () => {
     });
 
     expect(fetch).toHaveBeenCalledWith(
-      'https://example.com/v1/foo?_clerk_js_version=42.0.0&_clerk_session_id=deadbeef',
+      `${proxyUrl}/v1/foo?_clerk_js_version=42.0.0&_clerk_session_id=deadbeef`,
       expect.objectContaining({
         credentials: 'include',
         method: 'GET',

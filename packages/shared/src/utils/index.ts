@@ -12,6 +12,7 @@ export * from './mimeTypeExtensions';
 export * from './noop';
 export * from './object';
 export * from './poller';
+export * from './proxy';
 export * from './ssr';
 export * from './string';
 export * from './url';

@@ -1,5 +1,12 @@
 import type { LocalStorageBroadcastChannel } from '@clerk/shared';
-import { inClientSide, isLegacyFrontendApiKey, noop, parsePublishableKey } from '@clerk/shared';
+import {
+  inClientSide,
+  isLegacyFrontendApiKey,
+  isValidProxyUrl,
+  noop,
+  parsePublishableKey,
+  proxyUrlToAbsoluteURL,
+} from '@clerk/shared';
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
@@ -138,7 +145,12 @@ export default class Clerk implements ClerkInterface {
   public constructor(key: string, options?: unknown) {
     key = (key || '').trim();
 
-    this.proxyUrl = (options as ClerkConstructorOptions | undefined)?.proxyUrl;
+    const _unfilteredProxy = (options as ClerkConstructorOptions | undefined)?.proxyUrl;
+
+    if (!isValidProxyUrl(_unfilteredProxy)) {
+      errorThrower.throwInvalidProxyUrl({ url: _unfilteredProxy });
+    }
+    this.proxyUrl = proxyUrlToAbsoluteURL(this.proxyUrl);
 
     if (isLegacyFrontendApiKey(key)) {
       if (!validateFrontendApi(key)) {
