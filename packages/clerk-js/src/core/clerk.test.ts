@@ -2,8 +2,9 @@ import type { ActiveSessionResource, SignInJSON, SignUpJSON } from '@clerk/types
 import { waitFor } from '@testing-library/dom';
 
 import Clerk from './clerk';
-import type { DisplayConfig } from './resources/internal';
+import type { DisplayConfig, Organization } from './resources/internal';
 import { Client, Environment, MagicLinkErrorCode, SignIn, SignUp } from './resources/internal';
+import { AuthenticationService } from './services';
 
 const mockClientFetch = jest.fn();
 const mockEnvironmentFetch = jest.fn();
@@ -45,6 +46,12 @@ describe('Clerk singleton', () => {
   let mockWindowLocation;
   let mockHref: jest.Mock;
 
+  afterAll(() => {
+    Object.defineProperty(global.window, 'location', {
+      value: oldWindowLocation,
+    });
+  });
+
   beforeEach(() => {
     mockHref = jest.fn();
     mockWindowLocation = {
@@ -57,21 +64,11 @@ describe('Clerk singleton', () => {
       set href(v: string) {
         mockHref(v);
       },
-    } as any;
+    };
 
     Object.defineProperty(global.window, 'location', { value: mockWindowLocation });
     Object.defineProperty(global.window.document, 'hasFocus', { value: () => true, configurable: true });
 
-    // sut = new Clerk(frontendApi);
-  });
-
-  afterAll(() => {
-    Object.defineProperty(global.window, 'location', {
-      value: oldWindowLocation,
-    });
-  });
-
-  beforeEach(() => {
     const mockAddEventListener = (type: string, callback: (e: any) => void) => {
       if (type === 'message') {
         callback({
@@ -112,10 +109,17 @@ describe('Clerk singleton', () => {
       user: {},
       touch: jest.fn(),
     };
+    let cookieSpy;
 
     beforeEach(() => {
+      cookieSpy = jest.spyOn(AuthenticationService.prototype, 'setAuthCookiesFromSession');
+    });
+
+    afterEach(() => {
       mockSession.remove.mockReset();
       mockSession.touch.mockReset();
+
+      cookieSpy?.mockRestore();
     });
 
     it('does not call session touch on signOut', async () => {
@@ -127,6 +131,7 @@ describe('Clerk singleton', () => {
       await sut.setActive({ session: null });
       await waitFor(() => {
         expect(mockSession.touch).not.toHaveBeenCalled();
+        expect(cookieSpy).toBeCalledWith(null);
       });
     });
 
@@ -139,6 +144,7 @@ describe('Clerk singleton', () => {
       await sut.setActive({ session: mockSession as any as ActiveSessionResource });
       await waitFor(() => {
         expect(mockSession.touch).toHaveBeenCalled();
+        expect(cookieSpy).toBeCalledWith(mockSession);
       });
     });
 
@@ -151,6 +157,7 @@ describe('Clerk singleton', () => {
       await sut.setActive({ session: mockSession as any as ActiveSessionResource });
       await waitFor(() => {
         expect(mockSession.touch).not.toHaveBeenCalled();
+        expect(cookieSpy).toBeCalledWith(mockSession);
       });
     });
 
@@ -181,6 +188,80 @@ describe('Clerk singleton', () => {
       const sut = new Clerk(frontendApi);
       await sut.load();
       await sut.setActive({ session: mockSession as any as ActiveSessionResource, beforeEmit: beforeEmitMock });
+    });
+
+    // TODO: @dimkl include set transitive state
+    it('calls session.touch -> set cookie -> before emit with touched session on session switch', async () => {
+      const mockSession2 = {
+        id: '2',
+        remove: jest.fn(),
+        status: 'active',
+        user: {},
+        touch: jest.fn(),
+      };
+      mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession, mockSession2] }));
+
+      const sut = new Clerk(frontendApi);
+      await sut.load();
+
+      const executionOrder: string[] = [];
+      mockSession2.touch.mockImplementationOnce(() => {
+        sut.session = mockSession2 as any;
+        executionOrder.push('session.touch');
+        return Promise.resolve();
+      });
+      cookieSpy.mockImplementationOnce(() => {
+        executionOrder.push('set cookie');
+        return Promise.resolve();
+      });
+      const beforeEmitMock = jest.fn().mockImplementationOnce(() => {
+        executionOrder.push('before emit');
+        return Promise.resolve();
+      });
+
+      await sut.setActive({ session: mockSession2 as any as ActiveSessionResource, beforeEmit: beforeEmitMock });
+
+      await waitFor(() => {
+        expect(executionOrder).toEqual(['session.touch', 'set cookie', 'before emit']);
+        expect(mockSession2.touch).toHaveBeenCalled();
+        expect(cookieSpy).toBeCalledWith(mockSession2);
+        expect(beforeEmitMock).toBeCalledWith(mockSession2);
+        expect(sut.session).toMatchObject(mockSession2);
+      });
+    });
+
+    // TODO: @dimkl include set transitive state
+    it('calls with lastActiveOrganizationId session.touch -> set cookie -> before emit -> set accessors with touched session on organization switch', async () => {
+      mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
+
+      const sut = new Clerk(frontendApi);
+      await sut.load();
+
+      const executionOrder: string[] = [];
+      mockSession.touch.mockImplementationOnce(() => {
+        sut.session = mockSession as any;
+        executionOrder.push('session.touch');
+        return Promise.resolve();
+      });
+      cookieSpy.mockImplementationOnce(() => {
+        executionOrder.push('set cookie');
+        return Promise.resolve();
+      });
+      const beforeEmitMock = jest.fn().mockImplementationOnce(() => {
+        executionOrder.push('before emit');
+        return Promise.resolve();
+      });
+
+      await sut.setActive({ organization: { id: 'org-id' } as Organization, beforeEmit: beforeEmitMock });
+
+      await waitFor(() => {
+        expect(executionOrder).toEqual(['session.touch', 'set cookie', 'before emit']);
+        expect(mockSession.touch).toHaveBeenCalled();
+        expect((mockSession as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org-id');
+        expect(cookieSpy).toBeCalledWith(mockSession);
+        expect(beforeEmitMock).toBeCalledWith(mockSession);
+        expect(sut.session).toMatchObject(mockSession);
+      });
     });
   });
 
