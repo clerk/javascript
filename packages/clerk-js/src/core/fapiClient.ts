@@ -123,8 +123,10 @@ export default function createFapiClient(clerkInstance: Omit<Clerk, 'proxyUrl'>)
   function buildUrl(requestInit: FapiRequestInit): URL {
     const { path } = requestInit;
 
-    if ((clerkInstance as Clerk).proxyUrl) {
-      const proxyBase = new URL(`https://${(clerkInstance as Clerk).proxyUrl}`);
+    const { proxyUrl } = clerkInstance as Clerk;
+
+    if (proxyUrl) {
+      const proxyBase = new URL(proxyUrl);
       const proxyPath = proxyBase.pathname.slice(1, proxyBase.pathname.length);
       return buildUrlUtil(
         {
