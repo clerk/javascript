@@ -32,8 +32,7 @@ export const ptBR: DeepRequired<LocalizationResource> = {
   formFieldLabel__organizationName: 'Nome da organização',
   formFieldLabel__role: 'Função',
   formFieldInputPlaceholder__emailAddress: '',
-  formFieldInputPlaceholder__emailAddresses:
-  'Insira um ou mais endereços de e-mail separados por espaços ou vírgulas',
+  formFieldInputPlaceholder__emailAddresses: 'Insira um ou mais endereços de e-mail separados por espaços ou vírgulas',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
   formFieldInputPlaceholder__emailAddress_phoneNumber: '',
@@ -190,14 +189,15 @@ export const ptBR: DeepRequired<LocalizationResource> = {
       blockButton__backupCode: 'Utilize um código de backup',
       getHelp: {
         title: 'Ajuda',
-        content: 'Se estiver com dificuldades para entrar em sua conta, envie um e-mail para nós que iremos te ajudar a restaurar seu acesso o mais rápido possível.',
+        content:
+          'Se estiver com dificuldades para entrar em sua conta, envie um e-mail para nós que iremos te ajudar a restaurar seu acesso o mais rápido possível.',
         blockButton__emailSupport: 'E-mail de suporte',
       },
     },
     noAvailableMethods: {
       title: 'Não foi possível conectar',
       subtitle: 'Aconteceu um erro',
-      message: "Não foi possível conectar. Não há nenhum método de autenticação disponível.",
+      message: 'Não foi possível conectar. Não há nenhum método de autenticação disponível.',
     },
   },
   userProfile: {
@@ -225,8 +225,7 @@ export const ptBR: DeepRequired<LocalizationResource> = {
         detailsSubtitle__primary: 'Este é seu e-mail principal',
         detailsAction__primary: 'Completar verificação',
         detailsTitle__nonPrimary: 'Definir como e-mail principal',
-        detailsSubtitle__nonPrimary:
-          'Defina este e-mail como principal para receber as comunicações sobre sua conta',
+        detailsSubtitle__nonPrimary: 'Defina este e-mail como principal para receber as comunicações sobre sua conta',
         detailsAction__nonPrimary: 'Definir como principal',
         detailsTitle__unverified: 'E-mail não verificado',
         detailsSubtitle__unverified: 'Este e-mail não foi verificado e pode ter limitações de funcionalidade',
@@ -305,7 +304,7 @@ export const ptBR: DeepRequired<LocalizationResource> = {
         destructiveActionSubtitle: 'Sair da sua conta neste dispositivo',
         destructiveAction: 'Sair do dispositivo',
       },
-      Web3WalletsSection: {
+      web3WalletsSection: {
         title: 'Carteiras Web3',
         primaryButton: 'Carteiras Web3',
         destructiveActionTitle: 'Remover',
@@ -363,10 +362,10 @@ export const ptBR: DeepRequired<LocalizationResource> = {
       },
     },
     connectedAccountPage: {
-      title: "Conecte uma conta",
-      formHint: "Selecione um provedor para conectar sua conta.",
+      title: 'Conecte uma conta',
+      formHint: 'Selecione um provedor para conectar sua conta.',
       formHint__noAccounts: 'Não há provedores de conta externos disponíveis.',
-      socialButtonsBlockButton: "Conectar conta {{provider|titleize}}",
+      socialButtonsBlockButton: 'Conectar conta {{provider|titleize}}',
       successMessage: 'O provedor foi adicionado à sua conta',
       removeResource: {
         title: 'Remover conta conectada',
@@ -376,7 +375,7 @@ export const ptBR: DeepRequired<LocalizationResource> = {
         successMessage: '{{connectedAccount}} foi removido da sua conta.',
       },
     },
-    Web3WalletPage: {
+    web3WalletPage: {
       title: 'Adicionar carteira Web3',
       subtitle__availableWallets: 'Selecione uma carteira Web3 para conectar à sua conta.',
       subtitle__unavailableWallets: 'Não há carteiras Web3 disponíveis.',
@@ -405,7 +404,8 @@ export const ptBR: DeepRequired<LocalizationResource> = {
       authenticatorApp: {
         infoText__ableToScan:
           'Configure um novo método de login no seu aplicativo autenticador e escaneie o seguinte código QR para vinculá-lo à sua conta.',
-        infoText__unableToScan: 'Configure um novo método de login no seu aplicativo autenticador e insira a chave informada abaixo.',
+        infoText__unableToScan:
+          'Configure um novo método de login no seu aplicativo autenticador e insira a chave informada abaixo.',
         inputLabel__unableToScan1:
           "Certifique-se de que o 'One-time passwords' está habilitado, em seguida, conclua a vinculação de sua conta.",
         inputLabel__unableToScan2:
@@ -423,7 +423,8 @@ export const ptBR: DeepRequired<LocalizationResource> = {
     mfaPhoneCodePage: {
       title: 'Adicionar verificação por SMS',
       primaryButton__addPhoneNumber: 'Adicione um número de telefone',
-      subtitle__availablePhoneNumbers: 'Selecione um número de telefone para registrar a verificação em duas etapas por código SMS.',
+      subtitle__availablePhoneNumbers:
+        'Selecione um número de telefone para registrar a verificação em duas etapas por código SMS.',
       subtitle__unavailablePhoneNumbers:
         'Não há números de telefone disponíveis para registrar a verificação em duas etapas por código SMS.',
       successMessage:
@@ -484,7 +485,7 @@ export const ptBR: DeepRequired<LocalizationResource> = {
         leaveOrganization: {
           title: 'Sair da organização',
           messageLine1:
-          'Tem certeza de que deseja sair desta organização? Você perderá o acesso à ela e aos aplicativos dela.',
+            'Tem certeza de que deseja sair desta organização? Você perderá o acesso à ela e aos aplicativos dela.',
           messageLine2: 'Esta ação é permanente e não pode ser desfeita.',
           successMessage: 'Você saiu da organização.',
         },
