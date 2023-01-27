@@ -35,6 +35,7 @@ export const PasswordInput = (props: PropsOfComponent<typeof Input>) => {
           ...(hidden && { color: theme.colors.$blackAlpha400 }),
         })}
         icon={EyeSlash}
+        type='button'
       />
     </Flex>
   );
