@@ -5,30 +5,43 @@ import qs from 'qs';
 
 import type { SignInCtx, SignUpCtx } from '../types';
 
-type ParseAuthPropArgs =
-  | {
-      ctx: Omit<SignUpCtx, 'componentName'>;
-      queryParams: ParsedQs;
-      displayConfig: DisplayConfigResource;
-      field: keyof Pick<SignUpCtx, 'afterSignUpUrl' | 'afterSignInUrl'>;
-    }
-  | {
-      ctx: Omit<SignInCtx, 'componentName'>;
-      queryParams: ParsedQs;
-      displayConfig: DisplayConfigResource;
-      field: keyof Pick<SignUpCtx, 'afterSignUpUrl' | 'afterSignInUrl'>;
-    };
+type ExtractAuthUrlKey =
+  | keyof Pick<SignUpCtx, 'afterSignUpUrl' | 'afterSignInUrl'>
+  | keyof Pick<SignInCtx, 'afterSignUpUrl' | 'afterSignInUrl'>;
 
-export const parseAuthProp = ({ ctx, queryParams, displayConfig, field }: ParseAuthPropArgs): string => {
-  const snakeCaseField = camelToSnake(field);
+type ExtractAuthPropOptions =
+  | { queryParams: ParsedQs; displayConfig: DisplayConfigResource } & (
+      | {
+          ctx: Omit<SignUpCtx, 'componentName'>;
+        }
+      | {
+          ctx: Omit<SignInCtx, 'componentName'>;
+        }
+    );
+
+/**
+ *
+ * extractAuthProp(key, options)
+ *
+ * Retrieve auth redirect props passed through querystring parameters, component props
+ * or display config settings.
+ *
+ * The priority is:
+ * Querystring parameters > ClerkJS component props > Display configuration payload
+ */
+export const extractAuthProp = (
+  key: ExtractAuthUrlKey,
+  { ctx, queryParams, displayConfig }: ExtractAuthPropOptions,
+): string => {
+  const snakeCaseField = camelToSnake(key);
   const queryParamValue = queryParams[snakeCaseField];
 
   return (
     (typeof queryParamValue === 'string' ? queryParamValue : null) ||
     (typeof queryParams.redirect_url === 'string' ? queryParams.redirect_url : null) ||
-    ctx[field] ||
+    ctx[key] ||
     ctx.redirectUrl ||
-    displayConfig[field]
+    displayConfig[key]
   );
 };
 
