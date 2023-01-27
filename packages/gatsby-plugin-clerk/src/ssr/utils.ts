@@ -1,42 +1,33 @@
-import type { ServerSideAuth } from '@clerk/types';
+import type { AuthObject } from '@clerk/backend';
+import { prunePrivateMetadata } from '@clerk/backend';
 import cookie from 'cookie';
 import type { GetServerDataProps } from 'gatsby';
-
-import type { AuthData } from './getAuthData';
-import type { GetServerDataPropsWithAuth } from './types';
 
 /**
  * @internal
  */
-export function injectAuthIntoContext(context: GetServerDataProps, authData: AuthData): GetServerDataPropsWithAuth {
-  const { user, session, claims, ...auth } = authData || {};
+export function injectAuthIntoContext(context: GetServerDataProps, authData: AuthObject) {
+  const { user, session } = authData || {};
   return {
     ...context,
-    auth: {
-      ...auth,
-      claims,
-      actor: claims?.act || null,
-    } as ServerSideAuth,
+    auth: authData,
     user: user || null,
     session: session || null,
   };
 }
 
 /**
- * See `packages/nextjs/src/middleware/utils/sanitizeAuthData.ts`
- * TODO: Make a shared function
- *
- * @internal
+ *  @internal
  */
-export function sanitizeAuthData(authData: AuthData): any {
-  const user = authData.user ? { ...authData.user } : authData.user;
-  if (user) {
-    // @ts-expect-error;
-    delete user['privateMetadata'];
-  }
-  return { ...authData, user };
-}
+export function sanitizeAuthObject<T extends Record<any, any>>(authObject: T): T {
+  const user = authObject.user ? { ...authObject.user } : authObject.user;
+  const organization = authObject.organization ? { ...authObject.organization } : authObject.organization;
 
+  prunePrivateMetadata(user);
+  prunePrivateMetadata(organization);
+
+  return { ...authObject, user, organization };
+}
 /**
  * Wraps obscured clerk internals with a readable `clerkState` key.
  * This is intended to be passed by the user into <ClerkProvider>
@@ -48,8 +39,6 @@ export const wrapWithClerkState = (data: any) => {
 };
 
 /**
- * TODO: Make a shared function
- *
  * @internal
  */
 export const parseCookies = (headers: any) => {

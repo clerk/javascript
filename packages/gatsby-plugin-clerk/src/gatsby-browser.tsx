@@ -3,7 +3,7 @@ import React from 'react';
 
 import { ClerkProvider } from './GatsbyClerkProvider';
 
-export const wrapPageElement: GatsbyBrowser['wrapPageElement'] = ({ element, props }, options) => {
+export const wrapPageElement: GatsbyBrowser['wrapPageElement'] = ({ element, props }) => {
   let clerkSsrState: any;
   if ((props.serverData as any)?.clerkState) {
     clerkSsrState = (props.serverData as any).clerkState;
@@ -12,8 +12,12 @@ export const wrapPageElement: GatsbyBrowser['wrapPageElement'] = ({ element, pro
 
   return (
     <ClerkProvider
+      frontendApi={process.env.GATSBY_CLERK_FRONTEND_API || ''}
+      publishableKey={process.env.GATSBY_CLERK_PUBLISHABLE_KEY || ''}
+      clerkJSUrl={process.env.GATSBY_CLERK_JS}
+      // @ts-expect-error
+      proxyUrl={process.env.GATSBY_CLERK_PROXY_URL}
       clerkState={clerkSsrState || {}}
-      {...(options as any)}
     >
       {element}
     </ClerkProvider>
