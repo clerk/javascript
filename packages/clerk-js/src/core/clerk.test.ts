@@ -120,6 +120,9 @@ describe('Clerk singleton', () => {
       mockSession.touch.mockReset();
 
       cookieSpy?.mockRestore();
+      // cleanup global window pollution
+      (window as any).__unstable__onBeforeSetActive = null;
+      (window as any).__unstable__onAfterSetActive = null;
     });
 
     it('does not call session touch on signOut', async () => {
