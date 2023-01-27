@@ -15,11 +15,10 @@ declare global {
     __clerk_publishable_key?: string;
     __clerk_proxy_url?: ClerkConstructorOptions['proxyUrl'];
     __clerk_domain?: ClerkConstructorOptions['domain'];
-    __clerk_is_satellite?: ClerkConstructorOptions['isSatellite'];
   }
 }
 
-export type ClerkConstructorOptions = Pick<Clerk, 'proxyUrl' | 'domain' | 'isSatellite'>;
+export type ClerkConstructorOptions = Pick<Clerk, 'proxyUrl' | 'domain'>;
 
 export type IsomorphicClerkOptions = ClerkOptions & {
   Clerk?: ClerkProp;

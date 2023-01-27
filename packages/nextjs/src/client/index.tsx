@@ -31,7 +31,6 @@ export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JS
     proxyUrl,
     // @ts-expect-error
     domain,
-    // @ts-expect-error
     isSatellite,
     // @ts-expect-error
     __clerk_ssr_state,
