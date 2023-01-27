@@ -287,9 +287,30 @@ export function removeSearchParameterFromHash({
   return dummyUrlForHash.href.replace(DUMMY_URL_BASE, '');
 }
 
+export function isValidUrl(val?: string): val is string {
+  if (!val) {
+    return false;
+  }
+
+  try {
+    new URL(val);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+export function isDataUri(val?: string): val is string {
+  if (val?.startsWith('data:')) {
+    return true;
+  }
+
+  return false;
+}
+
 export const generateSrc = ({ src, width }: { src?: string; width: number }) => {
-  if (!src) {
-    return '';
+  if (!isValidUrl(src) || isDataUri(src)) {
+    return src;
   }
 
   const newSrc = new URL(src);
