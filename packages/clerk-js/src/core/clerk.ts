@@ -93,7 +93,7 @@ import { AuthenticationService } from './services';
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 
-type ClerkConstructorOptions = Pick<ClerkInterface, 'proxyUrl' | 'domain' | 'isSatellite'>;
+type ClerkConstructorOptions = Pick<ClerkInterface, 'proxyUrl' | 'domain'>;
 
 declare global {
   interface Window {
@@ -102,7 +102,6 @@ declare global {
     __clerk_publishable_key?: string;
     __clerk_proxy_url?: ClerkConstructorOptions['proxyUrl'];
     __clerk_domain?: ClerkConstructorOptions['domain'];
-    __clerk_is_satellite?: ClerkConstructorOptions['isSatellite'];
   }
 }
 
@@ -110,6 +109,7 @@ const defaultOptions: ClerkOptions = {
   polling: true,
   standardBrowser: true,
   touchSession: true,
+  isSatellite: false,
 };
 
 export default class Clerk implements ClerkInterface {
@@ -123,7 +123,6 @@ export default class Clerk implements ClerkInterface {
   public readonly publishableKey?: string;
   public readonly proxyUrl?: ClerkConstructorOptions['proxyUrl'];
   public readonly domain?: ClerkConstructorOptions['domain'];
-  public readonly isSatellite?: ClerkConstructorOptions['isSatellite'];
 
   #authService: AuthenticationService | null = null;
   #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
@@ -158,7 +157,6 @@ export default class Clerk implements ClerkInterface {
     this.proxyUrl = proxyUrlToAbsoluteURL(_unfilteredProxy);
 
     this.domain = (options as ClerkConstructorOptions | undefined)?.domain;
-    this.isSatellite = (options as ClerkConstructorOptions | undefined)?.isSatellite;
 
     if (isLegacyFrontendApiKey(key)) {
       if (!validateFrontendApi(key)) {
@@ -964,8 +962,8 @@ export default class Clerk implements ClerkInterface {
   };
 
   #loadInStandardBrowser = async (): Promise<void> => {
-    console.log('----- isSatellite -----', this.isSatellite);
-    if (this.isSatellite) {
+    console.log('----- isSatellite -----', this.#options.isSatellite);
+    if (this.#options.isSatellite) {
       const q = new URLSearchParams(window.location.search);
       if (q.get('synced') !== 'true') {
         this.#syncWithPrimary();

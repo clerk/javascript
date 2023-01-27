@@ -1,5 +1,4 @@
 import { parsePublishableKey } from '@clerk/shared';
-import type { Clerk as ClerkInterface } from '@clerk/types';
 
 import { LIB_VERSION } from '../info';
 import type { BrowserClerk } from '../types';
@@ -72,7 +71,6 @@ export interface LoadScriptParams {
   proxyUrl?: string;
 
   domain?: string;
-  isSatellite?: boolean;
   scriptUrl?: string;
 
   scriptVariant?: ScriptVariant;
@@ -80,7 +78,7 @@ export interface LoadScriptParams {
 
 export async function loadScript(params: LoadScriptParams): Promise<HTMLScriptElement | null> {
   return new Promise((resolve, reject) => {
-    const { frontendApi, publishableKey, proxyUrl, domain, isSatellite } = params;
+    const { frontendApi, publishableKey, proxyUrl, domain } = params;
 
     if (global.Clerk) {
       resolve(null);
@@ -102,10 +100,6 @@ export async function loadScript(params: LoadScriptParams): Promise<HTMLScriptEl
     }
     if (domain) {
       script.setAttribute('data-clerk-domain', domain);
-    }
-
-    if (isSatellite) {
-      script.setAttribute('data-clerk-is-satellite', isSatellite ? 'true' : 'false');
     }
 
     script.setAttribute('crossorigin', 'anonymous');

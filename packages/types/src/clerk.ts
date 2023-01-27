@@ -73,12 +73,6 @@ export interface Clerk {
    */
   domain?: string;
 
-  /**
-   * @experimental
-   * Indicates if the app is a Satellite app.
-   */
-  isSatellite?: boolean;
-
   instanceType?: InstanceType;
 
   /** Client handling most Clerk operations. */
@@ -472,6 +466,11 @@ export interface ClerkOptions {
   /** Optional support email for display in authentication screens */
   supportEmail?: string;
   touchSession?: boolean;
+  /**
+   * @experimental
+   * Indicates if the app is a Satellite app.
+   */
+  isSatellite?: boolean;
 }
 
 export interface Resources {
