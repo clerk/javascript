@@ -27,7 +27,7 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
         <script>
             window.__clerk_frontend_api = '${frontendApi}';
             window.__clerk_debug = ${JSON.stringify(debugData || {})};
-            window.__clerk_proxy_url = '${proxyUrl}';
+            ${proxyUrl ? `window.__clerk_proxy_url = ${proxyUrl}` : ''}
             window.startClerk = async () => {
                 function formRedirect(){
                     const form = '<form method="get" action="" name="redirect"></form>';
@@ -69,6 +69,7 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
                     ? `script.setAttribute('data-clerk-publishable-key', '${publishableKey}');`
                     : `script.setAttribute('data-clerk-frontend-api', '${frontendApi}');`
                 }
+                ${proxyUrl ? `script.setAttribute('data-clerk-proxy-url', '${proxyUrl}')` : ''};
                 script.async = true;
                 script.src = '${getScriptUrl(frontendApi, pkgVersion)}';
                 script.crossOrigin = 'anonymous';
