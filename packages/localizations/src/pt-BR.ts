@@ -12,7 +12,7 @@ const commonTexts = {
   },
 } as const;
 
-export const enUS: DeepRequired<LocalizationResource> = {
+export const ptBR: DeepRequired<LocalizationResource> = {
   socialButtonsBlockButton: 'Continuar com {{provider|titleize}}',
   dividerText: 'ou',
   formFieldLabel__emailAddress: 'Seu e-mail',
