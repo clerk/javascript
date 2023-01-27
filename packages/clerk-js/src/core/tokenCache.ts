@@ -1,7 +1,5 @@
 import type { TokenResource } from '@clerk/types';
 
-import { clerkCoreErrorExpiredToken } from './errors';
-
 interface TokenCacheKeyJSON {
   audience?: string;
   tokenId: string;
@@ -11,10 +9,12 @@ interface TokenCacheEntry extends TokenCacheKeyJSON {
   tokenResolver: Promise<TokenResource>;
 }
 
+type Seconds = number;
+
 interface TokenCacheValue {
   entry: TokenCacheEntry;
-  expiresAt?: number;
-  expiresIn?: number;
+  createdAt: Seconds;
+  expiresIn?: Seconds;
 }
 
 interface TokenCache {
@@ -27,6 +27,8 @@ interface TokenCache {
 const KEY_PREFIX = 'clerk';
 const DELIMITER = '::';
 const LEEWAY = 10;
+// This value should have the same value as the INTERVAL_IN_MS in AuthenticationPoller
+const SYNC_LEEWAY = 5;
 
 export class TokenCacheKey {
   static fromKey(key: string): TokenCacheKey {
@@ -63,7 +65,9 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     });
 
     const key = cacheKey.toKey();
-    const value: TokenCacheValue = { entry };
+
+    const createdAt = Math.floor(Date.now() / 1000);
+    const value: TokenCacheValue = { entry, createdAt };
 
     const deleteKey = () => {
       if (cache.get(key) === value) {
@@ -73,16 +77,11 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
 
     entry.tokenResolver
       .then(newToken => {
-        const nowSeconds = Math.floor(Date.now() / 1000);
         const expiresAt = newToken.jwt.claims.exp;
-        const expiresIn = expiresAt - nowSeconds;
-
-        if (expiresIn <= 0) {
-          clerkCoreErrorExpiredToken(expiresAt);
-        }
+        const issuedAt = newToken.jwt.claims.iat;
+        const expiresIn: Seconds = expiresAt - issuedAt;
 
         // Mutate cached value and set expirations
-        value.expiresAt = expiresAt;
         value.expiresIn = expiresIn;
         setTimeout(deleteKey, expiresIn * 1000);
       })
@@ -102,9 +101,12 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     }
 
     const nowSeconds = Math.floor(Date.now() / 1000);
-    const willExpireSoon = value.expiresAt && value.expiresAt - leeway < nowSeconds;
+    const elapsedSeconds = nowSeconds - value.createdAt;
+    // We will include the authentication poller interval as part of the leeway to ensure
+    // that the cache value will be valid for more than the SYNC_LEEWAY or the leeway in the next poll.
+    const expiresSoon = value.expiresIn! - elapsedSeconds < (leeway || 1) + SYNC_LEEWAY;
 
-    if (willExpireSoon) {
+    if (expiresSoon) {
       cache.delete(cacheKey.toKey());
       return;
     }

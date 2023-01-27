@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "0.9.3-staging.3",
+  "version": "0.9.3-staging.4",
   "description": "Internal package utils used by the Clerk SDKs",
   "types": "./dist/types/index.d.ts",
   "main": "./dist/index.js",
@@ -18,7 +18,7 @@
     "test:watch": "vitest"
   },
   "devDependencies": {
-    "@clerk/types": "^3.25.0-staging.0",
+    "@clerk/types": "^3.25.0-staging.1",
     "@testing-library/dom": "^8.19.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",

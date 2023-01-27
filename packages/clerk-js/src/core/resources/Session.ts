@@ -66,17 +66,13 @@ export class Session extends BaseResource implements SessionResource {
       return null;
     }
 
-    const { leewayInSeconds = 10, template, skipCache = false } = options || {};
-    if (!template && leewayInSeconds >= 60) {
+    const { leewayInSeconds, template, skipCache = false } = options || {};
+    if (!template && Number(leewayInSeconds) >= 60) {
       throw new Error('Leeway can not exceed the token lifespan (60 seconds)');
     }
 
-    if (!!template && this.#isLegacyIntegrationRequest(template)) {
-      return this.#handleLegacyIntegrationToken({
-        template,
-        leewayInSeconds,
-        skipCache,
-      });
+    if (this.#isLegacyIntegrationRequest(template)) {
+      return this.#handleLegacyIntegrationToken({ template, leewayInSeconds, skipCache });
     }
 
     const tokenId = this.#getCacheId(template);
@@ -91,7 +87,7 @@ export class Session extends BaseResource implements SessionResource {
     return tokenResolver.then(res => res.getRawString());
   };
 
-  #hydrateCache = (token: Token | null) => {
+  #hydrateCache = (token: TokenResource | null) => {
     if (token) {
       SessionTokenCache.set({
         tokenId: this.#getCacheId(),
@@ -109,7 +105,7 @@ export class Session extends BaseResource implements SessionResource {
   }
 
   #isLegacyIntegrationRequest = (template: string | undefined): boolean => {
-    return (template || '').startsWith('integration_');
+    return !!template && template.startsWith('integration_');
   };
 
   #removeLegacyIntegrationPrefix = (template: string | undefined): string => {

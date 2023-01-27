@@ -54,10 +54,6 @@ export function clerkMissingFapiClientInResources(): never {
   throw new Error(`${errorPrefix} Missing FAPI client in resources.`);
 }
 
-export function clerkCoreErrorExpiredToken(expiresAt: number): never {
-  throw new Error(`${errorPrefix} Token has expired (exp='${expiresAt}').`);
-}
-
 export function clerkCoreErrorTokenRefreshFailed(message: string): never {
   throw new Error(`${errorPrefix} Token refresh failed (error='${message}')`);
 }

@@ -58,17 +58,17 @@ npm run dev
 
 Clerk requires your application to be wrapped in the `<ClerkProvider/>` context.
 
-If using Create React App, set `REACT_APP_CLERK_FRONTEND_API` to your Frontend API in your `.env.local` file to make the environment variable accessible on `process.env` and pass it as the `frontendApi` prop.
+If using Create React App, set `REACT_APP_CLERK_PUBLISHABLE_KEY` to your Publishable key in your `.env.local` file to make the environment variable accessible on `process.env` and pass it as the `publishableKey` prop.
 
 ```jsx
 import { render } from 'react-dom';
 
 import { ClerkProvider, SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
 
-const frontendApi = process.env.REACT_APP_CLERK_FRONTEND_API;
+const publishableKey = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
 
 render(
-  <ClerkProvider frontendApi={frontendApi}>
+  <ClerkProvider publishableKey={publishableKey}>
     <App />
   </ClerkProvider>,
   document.getElementById('root'),

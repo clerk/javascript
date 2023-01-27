@@ -286,3 +286,53 @@ export function removeSearchParameterFromHash({
   // as it treats the hash as sub-path with its nested querystring parameters.
   return dummyUrlForHash.href.replace(DUMMY_URL_BASE, '');
 }
+
+export function isValidUrl(val?: string): val is string {
+  if (!val) {
+    return false;
+  }
+
+  try {
+    new URL(val);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+export function isDataUri(val?: string): val is string {
+  if (val?.startsWith('data:')) {
+    return true;
+  }
+
+  return false;
+}
+
+export const generateSrc = ({ src, width }: { src?: string; width: number }) => {
+  if (!isValidUrl(src) || isDataUri(src)) {
+    return src;
+  }
+
+  const newSrc = new URL(src);
+  if (width) {
+    newSrc.searchParams.append('width', width?.toString());
+  }
+
+  return newSrc.href;
+};
+
+export const generateSrcSet = ({
+  src,
+  width,
+  xDescriptors,
+}: {
+  src?: string;
+  width: number;
+  xDescriptors: number[];
+}) => {
+  if (!src) {
+    return '';
+  }
+
+  return xDescriptors.map(i => `${generateSrc({ src, width: width * i })} ${i}x`).toString();
+};
