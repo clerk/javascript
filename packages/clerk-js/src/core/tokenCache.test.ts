@@ -24,6 +24,34 @@ const jwt = jwtGen.sign(
 );
 
 describe('MemoryTokenCache', () => {
+  describe('clear()', () => {
+    it('removes all entries', () => {
+      const cache = SessionTokenCache;
+      const token = new Token({
+        object: 'token',
+        id: 'foo',
+        jwt,
+      });
+
+      const tokenResolver = new Promise<TokenResource>(resolve => setTimeout(() => resolve(token), 100));
+      const key = {
+        tokenId: 'foo',
+        audience: 'bar',
+      };
+
+      // Add a tokenResolver to cache
+      cache.set({ ...key, tokenResolver });
+
+      expect(cache.get(key)).toBeDefined();
+      expect(cache.size()).toEqual(1);
+
+      cache.clear();
+
+      expect(cache.get(key)).toBeUndefined();
+      expect(cache.size()).toEqual(0);
+    });
+  });
+
   it('caches tokenResolver while is pending until the JWT expiration', async () => {
     const cache = SessionTokenCache;
     const token = new Token({
@@ -77,11 +105,65 @@ describe('MemoryTokenCache', () => {
 
     // Add another tokenResolver to cache
     cache.set({ ...key, tokenResolver });
+  });
 
-    // Clear the cache
-    cache.clear();
+  describe('get(key, leeway)', () => {
+    it('includes 5 seconds sync leeway', async () => {
+      const cache = SessionTokenCache;
+      const token = new Token({
+        object: 'token',
+        id: 'foo',
+        jwt,
+      });
 
-    // Cache is empty, tokenResolver has been removed due to cache clearance
-    expect(cache.get(key)).toBeUndefined();
+      const tokenResolver = new Promise<TokenResource>(resolve => resolve(token));
+      const key = { tokenId: 'foo', audience: 'bar' };
+
+      cache.set({ ...key, tokenResolver });
+      // Wait tokenResolver to resolve
+      jest.advanceTimersByTime(100);
+      await tokenResolver;
+
+      expect(cache.get(key)).toMatchObject(key);
+
+      // 45s since token created
+      jest.advanceTimersByTime(45 * 1000);
+      expect(cache.get(key)).toMatchObject(key);
+
+      // 46s since token created
+      jest.advanceTimersByTime(1 * 1000);
+      expect(cache.get(key)).toBeUndefined();
+    });
+
+    it('includes 5 seconds sync leeway even if leeway is removed', async () => {
+      const cache = SessionTokenCache;
+      const token = new Token({
+        object: 'token',
+        id: 'foo',
+        jwt,
+      });
+
+      const tokenResolver = new Promise<TokenResource>(resolve => resolve(token));
+      const key = { tokenId: 'foo', audience: 'bar' };
+
+      cache.set({ ...key, tokenResolver });
+      // Wait tokenResolver to resolve
+      jest.advanceTimersByTime(100);
+      await tokenResolver;
+
+      expect(cache.get(key)).toMatchObject(key);
+
+      // 45s since token created
+      jest.advanceTimersByTime(45 * 1000);
+      expect(cache.get(key, 0)).toMatchObject(key);
+
+      // 54s since token created
+      jest.advanceTimersByTime(9 * 1000);
+      expect(cache.get(key, 0)).toMatchObject(key);
+
+      // 55s since token created
+      jest.advanceTimersByTime(1 * 1000);
+      expect(cache.get(key, 0)).toBeUndefined();
+    });
   });
 });
