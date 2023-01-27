@@ -1,6 +1,6 @@
 import type { GetServerDataProps } from 'gatsby';
 
-import { API_KEY, clerkClient, constants, FRONTEND_API, PUBLISHABLE_KEY, SECRET_KEY } from './clerk';
+import { API_KEY, clerkClient, constants, FRONTEND_API, PUBLISHABLE_KEY, SECRET_KEY } from './clerkClient';
 import type { WithServerAuthOptions } from './types';
 import { parseCookies } from './utils';
 

@@ -3,9 +3,6 @@ import { prunePrivateMetadata } from '@clerk/backend';
 import cookie from 'cookie';
 import type { GetServerDataProps } from 'gatsby';
 
-import type { AuthData } from './getAuthData';
-import type { GetServerDataPropsWithAuth } from './types';
-
 /**
  * @internal
  */

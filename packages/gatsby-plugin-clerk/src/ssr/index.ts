@@ -1,2 +1,2 @@
 export * from './withServerAuth';
-export * from './clerk';
+export * from './clerkClient';
