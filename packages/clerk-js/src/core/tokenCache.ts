@@ -79,7 +79,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
       .then(newToken => {
         const expiresAt = newToken.jwt.claims.exp;
         const issuedAt = newToken.jwt.claims.iat;
-        const expiresIn = expiresAt - issuedAt;
+        const expiresIn: Seconds = expiresAt - issuedAt;
 
         // Mutate cached value and set expirations
         value.expiresIn = expiresIn;
