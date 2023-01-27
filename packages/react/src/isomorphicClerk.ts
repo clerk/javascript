@@ -39,18 +39,20 @@ export interface Global {
 
 declare const global: Global;
 
+type GenericFunction<TArgs = never> = (...args: TArgs[]) => unknown;
+
 type MethodName<T> = {
-  [P in keyof T]: T[P] extends Function ? P : never;
+  [P in keyof T]: T[P] extends GenericFunction ? P : never;
 }[keyof T];
 type MethodCallback = () => Promise<unknown> | unknown;
 
 export default class IsomorphicClerk {
-  private mode: 'browser' | 'server';
-  private frontendApi?: string;
-  private publishableKey?: string;
-  private proxyUrl?: ClerkConstructorOptions['proxyUrl'];
-  private options: IsomorphicClerkOptions;
-  private Clerk: ClerkProp;
+  private readonly mode: 'browser' | 'server';
+  private readonly frontendApi?: string;
+  private readonly publishableKey?: string;
+  private readonly proxyUrl?: ClerkConstructorOptions['proxyUrl'];
+  private readonly options: IsomorphicClerkOptions;
+  private readonly Clerk: ClerkProp;
   private clerkjs: BrowserClerk | HeadlessBrowserClerk | null = null;
   private preopenSignIn?: null | SignInProps = null;
   private preopenSignUp?: null | SignUpProps = null;
