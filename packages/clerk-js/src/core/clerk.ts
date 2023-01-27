@@ -92,6 +92,8 @@ import { AuthenticationService } from './services';
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 
+type ClerkConstructorOptions = Pick<ClerkInterface, 'proxyUrl'>;
+
 declare global {
   interface Window {
     Clerk?: Clerk;
@@ -107,8 +109,6 @@ const defaultOptions: ClerkOptions = {
   touchSession: true,
 };
 
-type ClerkConstructorOptions = Pick<ClerkInterface, 'proxyUrl'>;
-
 export default class Clerk implements ClerkInterface {
   public static mountComponentRenderer?: MountComponentRenderer;
   public static version: string = packageJSON.version;
@@ -116,9 +116,9 @@ export default class Clerk implements ClerkInterface {
   public session?: ActiveSessionResource | null;
   public organization?: OrganizationResource | null;
   public user?: UserResource | null;
-  public frontendApi: string;
-  public publishableKey?: string;
-  public proxyUrl?: ClerkConstructorOptions['proxyUrl'];
+  public readonly frontendApi: string;
+  public readonly publishableKey?: string;
+  public readonly proxyUrl?: ClerkConstructorOptions['proxyUrl'];
 
   #authService: AuthenticationService | null = null;
   #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
