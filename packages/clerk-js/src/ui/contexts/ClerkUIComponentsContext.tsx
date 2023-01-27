@@ -1,8 +1,8 @@
 import React from 'react';
 
 import { buildURL } from '../../utils/url';
-import { buildAuthQueryString, parseAuthProp } from '../common/authPropHelpers';
-import { useEnvironment } from '../contexts';
+import { buildAuthQueryString, extractAuthProp } from '../common/authPropHelpers';
+import { useCoreClerk, useEnvironment } from '../contexts';
 import { useNavigate } from '../hooks';
 import type { ParsedQs } from '../router';
 import { useRouter } from '../router';
@@ -32,26 +32,27 @@ export const useSignUpContext = (): SignUpContextType => {
   const { navigate } = useNavigate();
   const { displayConfig } = useEnvironment();
   const { queryParams } = useRouter();
+  const clerk = useCoreClerk();
 
   if (componentName !== 'SignUp') {
     throw new Error('Clerk: useSignUpContext called outside of the mounted SignUp component.');
   }
 
-  // Retrieve values passed through props or qs
-  // props always take priority over qs
-  const afterSignUpUrl = parseAuthProp({
-    ctx,
-    queryParams,
-    displayConfig,
-    field: 'afterSignUpUrl',
-  });
+  const afterSignUpUrl = clerk.buildUrlWithAuth(
+    extractAuthProp('afterSignUpUrl', {
+      ctx,
+      queryParams,
+      displayConfig,
+    }),
+  );
 
-  const afterSignInUrl = parseAuthProp({
-    ctx,
-    queryParams,
-    displayConfig,
-    field: 'afterSignInUrl',
-  });
+  const afterSignInUrl = clerk.buildUrlWithAuth(
+    extractAuthProp('afterSignInUrl', {
+      ctx,
+      queryParams,
+      displayConfig,
+    }),
+  );
 
   const navigateAfterSignUp = () => navigate(afterSignUpUrl);
 
@@ -98,26 +99,27 @@ export const useSignInContext = (): SignInContextType => {
   const { navigate } = useNavigate();
   const { displayConfig } = useEnvironment();
   const { queryParams } = useRouter();
+  const clerk = useCoreClerk();
 
   if (componentName !== 'SignIn') {
     throw new Error('Clerk: useSignInContext called outside of the mounted SignIn component.');
   }
 
-  // Retrieve values passed through props or qs
-  // props always take priority over qs
-  const afterSignUpUrl = parseAuthProp({
-    ctx,
-    queryParams,
-    displayConfig,
-    field: 'afterSignUpUrl',
-  });
+  const afterSignUpUrl = clerk.buildUrlWithAuth(
+    extractAuthProp('afterSignUpUrl', {
+      ctx,
+      queryParams,
+      displayConfig,
+    }),
+  );
 
-  const afterSignInUrl = parseAuthProp({
-    ctx,
-    queryParams,
-    displayConfig,
-    field: 'afterSignInUrl',
-  });
+  const afterSignInUrl = clerk.buildUrlWithAuth(
+    extractAuthProp('afterSignInUrl', {
+      ctx,
+      queryParams,
+      displayConfig,
+    }),
+  );
 
   const navigateAfterSignIn = () => navigate(afterSignInUrl);
 
