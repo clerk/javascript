@@ -231,7 +231,7 @@ export const ptBR: DeepRequired<LocalizationResource> = {
         detailsSubtitle__unverified: 'Este e-mail não foi verificado e pode ter limitações de funcionalidade',
         detailsAction__unverified: 'Completar verificação',
         destructiveActionTitle: 'Remover',
-        destructiveActionSubtitle: 'Você não conseguirá mais acessar o Camifa utilizando este e-mail',
+        destructiveActionSubtitle: 'Você não conseguirá conectar novamente utilizando este endereço de e-mail',
         destructiveAction: 'Remover e-mail',
       },
       phoneNumbersSection: {
