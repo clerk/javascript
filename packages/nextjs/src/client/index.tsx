@@ -7,7 +7,7 @@ import React from 'react';
 import { invalidateNextRouterCache } from './invalidateNextRouterCache';
 
 // TODO: Import from shared once [JS-118] is done
-export const useSafeLayoutEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect;
+const useSafeLayoutEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect;
 
 __internal__setErrorThrowerOptions({
   packageName: '@clerk/nextjs',
