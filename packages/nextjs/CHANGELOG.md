@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.8.1](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.8.0...@clerk/nextjs@4.8.1) (2023-01-30)
+
+### Bug Fixes
+
+- **nextjs:** Use useSafeLayoutEffect to mute Nextjs warning ([#742](https://github.com/clerkinc/javascript/issues/742)) ([03d63eb](https://github.com/clerkinc/javascript/commit/03d63eb5d27a5796e626e742b6a20ab23670d3fe))
+
 ## [4.8.0](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.8.0-staging.1...@clerk/nextjs@4.8.0) (2023-01-27)
 
 **Note:** Version bump only for package @clerk/nextjs
