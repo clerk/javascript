@@ -29,7 +29,7 @@ export const runFakeTimers = <T extends RunFakeTimersCallback, R extends ReturnT
     // @ts-expect-error
     return res.finally(() => jest.useRealTimers());
   }
-  jest.useFakeTimers();
+  jest.useRealTimers();
   // @ts-ignore
   return;
 };
