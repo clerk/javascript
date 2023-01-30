@@ -1,7 +1,7 @@
 import type { SignInFactor } from '@clerk/types';
 import React from 'react';
 
-import { withRedirectToHome } from '../../common/withRedirectToHome';
+import { withRedirectToHomeSingleSessionGuard } from '../../common';
 import { useCoreSignIn, useEnvironment } from '../../contexts';
 import { ErrorCard, LoadingCard, withCardStateProvider } from '../../elements';
 import { localizationKeys } from '../../localization';
@@ -117,4 +117,4 @@ export function _SignInFactorOne(): JSX.Element {
   }
 }
 
-export const SignInFactorOne = withRedirectToHome(withCardStateProvider(_SignInFactorOne));
+export const SignInFactorOne = withRedirectToHomeSingleSessionGuard(withCardStateProvider(_SignInFactorOne));

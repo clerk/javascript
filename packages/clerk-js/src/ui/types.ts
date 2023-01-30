@@ -1,15 +1,31 @@
 import type {
   CreateOrganizationProps,
+  OrganizationProfileProps,
+  OrganizationSwitcherProps,
   SignInProps,
   SignUpProps,
   UserButtonProps,
   UserProfileProps,
 } from '@clerk/types';
-import type { OrganizationProfileProps, OrganizationSwitcherProps } from '@clerk/types';
 
-export type { SignInProps, SignUpProps, UserButtonProps, UserProfileProps };
+export type {
+  SignInProps,
+  SignUpProps,
+  UserButtonProps,
+  UserProfileProps,
+  OrganizationSwitcherProps,
+  OrganizationProfileProps,
+  CreateOrganizationProps,
+};
 
-export type AvailableComponentProps = SignInProps | SignUpProps | UserProfileProps | UserButtonProps;
+export type AvailableComponentProps =
+  | SignInProps
+  | SignUpProps
+  | UserProfileProps
+  | UserButtonProps
+  | OrganizationSwitcherProps
+  | OrganizationProfileProps
+  | CreateOrganizationProps;
 
 type ComponentMode = 'modal' | 'mounted';
 

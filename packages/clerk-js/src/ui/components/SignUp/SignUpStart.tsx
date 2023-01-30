@@ -1,8 +1,8 @@
 import React from 'react';
 
 import { getClerkQueryParam } from '../../../utils/getClerkQueryParam';
+import { withRedirectToHomeSingleSessionGuard } from '../../common';
 import { ERROR_CODES } from '../../common/constants';
-import { withRedirectToHome } from '../../common/withRedirectToHome';
 import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance } from '../../customizables';
 import {
@@ -266,4 +266,4 @@ function _SignUpStart(): JSX.Element {
   );
 }
 
-export const SignUpStart = withRedirectToHome(withCardStateProvider(_SignUpStart));
+export const SignUpStart = withRedirectToHomeSingleSessionGuard(withCardStateProvider(_SignUpStart));

@@ -201,4 +201,4 @@ function _SignUpContinue() {
 }
 
 // TODO: flow / page naming
-export const SignUpContinue = withRedirectToHome(withCardStateProvider(_SignUpContinue));
+export const SignUpContinue = withCardStateProvider(_SignUpContinue);
