@@ -150,7 +150,7 @@ export default class Clerk implements ClerkInterface {
     if (!isValidProxyUrl(_unfilteredProxy)) {
       errorThrower.throwInvalidProxyUrl({ url: _unfilteredProxy });
     }
-    this.proxyUrl = proxyUrlToAbsoluteURL(this.proxyUrl);
+    this.proxyUrl = proxyUrlToAbsoluteURL(_unfilteredProxy);
 
     if (isLegacyFrontendApiKey(key)) {
       if (!validateFrontendApi(key)) {
