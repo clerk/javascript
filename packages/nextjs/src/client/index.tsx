@@ -6,6 +6,9 @@ import React from 'react';
 
 import { invalidateNextRouterCache } from './invalidateNextRouterCache';
 
+// TODO: Import from shared once [JS-118] is done
+export const useSafeLayoutEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect;
+
 __internal__setErrorThrowerOptions({
   packageName: '@clerk/nextjs',
 });
@@ -26,7 +29,7 @@ export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JS
 
   ReactClerkProvider.displayName = 'ReactClerkProvider';
 
-  React.useLayoutEffect(() => {
+  useSafeLayoutEffect(() => {
     window.__unstable__onBeforeSetActive = invalidateNextRouterCache;
   }, []);
 
