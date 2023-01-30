@@ -106,6 +106,7 @@ export function Route(props: RouteProps): JSX.Element | null {
         },
         refresh: router.refresh,
         params: paramsDict,
+        urlStateParam: router.urlStateParam,
       }}
     >
       {props.canActivate ? (

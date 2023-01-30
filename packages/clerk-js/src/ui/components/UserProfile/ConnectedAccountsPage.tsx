@@ -1,8 +1,9 @@
 import type { ExternalAccountResource, OAuthStrategy } from '@clerk/types';
 import React from 'react';
 
+import { appendModalState } from '../../../utils';
 import { useWizard, Wizard } from '../../common';
-import { useCoreUser } from '../../contexts';
+import { useCoreUser, useUserProfileContext } from '../../contexts';
 import { Col, Image, localizationKeys, Text } from '../../customizables';
 import {
   ArrowBlockButton,
@@ -46,6 +47,8 @@ const AddConnectedAccount = () => {
   const user = useCoreUser();
   const { navigate } = useNavigate();
   const { strategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
+  const { componentName, mode } = useUserProfileContext();
+  const isModal = mode === 'modal';
 
   const enabledStrategies = strategies.filter(s => s.startsWith('oauth')) as OAuthStrategy[];
   const connectedStrategies = user.verifiedExternalAccounts.map(a => 'oauth_' + a.provider) as OAuthStrategy[];
@@ -59,7 +62,10 @@ const AddConnectedAccount = () => {
     // If yes, refactor and cleanup:
     card.setLoading(strategy);
     user
-      .createExternalAccount({ strategy: strategy, redirect_url: window.location.href })
+      .createExternalAccount({
+        strategy: strategy,
+        redirect_url: isModal ? appendModalState({ url: window.location.href, componentName }) : window.location.href,
+      })
       .then(res => {
         if (res.verification?.externalVerificationRedirectURL) {
           return navigate(res.verification.externalVerificationRedirectURL);

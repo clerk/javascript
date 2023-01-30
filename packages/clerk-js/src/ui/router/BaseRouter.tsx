@@ -18,6 +18,7 @@ interface BaseRouterProps {
   onExternalNavigate?: () => any;
   refreshEvents?: Array<keyof WindowEventMap>;
   preservedParams?: string[];
+  urlStateParam?: { startPath: string; path: string; componentName: string; clearUrlStateParam: () => void };
   children: React.ReactNode;
 }
 
@@ -30,9 +31,11 @@ export const BaseRouter = ({
   onExternalNavigate,
   refreshEvents,
   preservedParams,
+  urlStateParam,
   children,
 }: BaseRouterProps): JSX.Element => {
   const { navigate: externalNavigate } = useCoreClerk();
+
   const [routeParts, setRouteParts] = React.useState({
     path: getPath(),
     queryString: getQueryString(),
@@ -129,6 +132,7 @@ export const BaseRouter = ({
         resolve: resolve.bind(this),
         refresh: refresh.bind(this),
         params: {},
+        urlStateParam: urlStateParam,
       }}
     >
       <Route path={basePath}>{children}</Route>

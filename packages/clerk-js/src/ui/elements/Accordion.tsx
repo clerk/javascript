@@ -12,10 +12,20 @@ type AccordionItemProps = React.PropsWithChildren<{
   defaultOpen?: boolean;
   toggleable?: boolean;
   scrollOnOpen?: boolean;
+  onCloseCallback?: () => void;
 }>;
 
 export const AccordionItem = (props: AccordionItemProps) => {
-  const { children, title, icon, defaultOpen = false, toggleable = true, scrollOnOpen = false, badge } = props;
+  const {
+    children,
+    title,
+    icon,
+    defaultOpen = false,
+    toggleable = true,
+    scrollOnOpen = false,
+    badge,
+    onCloseCallback = null,
+  } = props;
   const [isOpen, setIsOpen] = React.useState(defaultOpen);
   const contentRef = React.useRef<HTMLDivElement>(null);
 
@@ -23,12 +33,25 @@ export const AccordionItem = (props: AccordionItemProps) => {
     if (toggleable) {
       setIsOpen(s => !s);
     }
+
+    if (isOpen && onCloseCallback) {
+      onCloseCallback();
+    }
   };
 
+  React.useEffect(() => {
+    setIsOpen(defaultOpen);
+  }, [defaultOpen]);
+
   React.useLayoutEffect(() => {
+    let requestRef: number;
     if (scrollOnOpen && isOpen && contentRef.current) {
-      contentRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      requestRef = requestAnimationFrame(() => {
+        contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
     }
+
+    return () => cancelAnimationFrame(requestRef);
   }, [isOpen]);
 
   return (
@@ -59,8 +82,8 @@ export const AccordionItem = (props: AccordionItemProps) => {
       </ArrowBlockButton>
       {isOpen && (
         <Col
-          elementDescriptor={descriptors.accordionContent}
           ref={contentRef}
+          elementDescriptor={descriptors.accordionContent}
           sx={t => ({
             animation: `${animations.blockBigIn} ${t.transitionDuration.$slow} ease`,
             padding: `${t.space.$4} ${t.space.$8}`,
