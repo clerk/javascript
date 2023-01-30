@@ -13,8 +13,6 @@ jest.mock('./resources/Base', () => {
   };
 });
 
-jest.useFakeTimers();
-
 const jwt = jwtGen.sign(
   {
     exp: Math.floor(Date.now() / 1000) + 60,
@@ -24,6 +22,14 @@ const jwt = jwtGen.sign(
 );
 
 describe('MemoryTokenCache', () => {
+  beforeAll(() => {
+    jest.useFakeTimers();
+  });
+
+  afterAll(() => {
+    jest.useRealTimers();
+  });
+
   describe('clear()', () => {
     it('removes all entries', () => {
       const cache = SessionTokenCache;
@@ -116,12 +122,10 @@ describe('MemoryTokenCache', () => {
         jwt,
       });
 
-      const tokenResolver = new Promise<TokenResource>(resolve => resolve(token));
+      const tokenResolver = Promise.resolve(token);
       const key = { tokenId: 'foo', audience: 'bar' };
 
       cache.set({ ...key, tokenResolver });
-      // Wait tokenResolver to resolve
-      jest.advanceTimersByTime(100);
       await tokenResolver;
 
       expect(cache.get(key)).toMatchObject(key);
@@ -143,12 +147,10 @@ describe('MemoryTokenCache', () => {
         jwt,
       });
 
-      const tokenResolver = new Promise<TokenResource>(resolve => resolve(token));
+      const tokenResolver = Promise.resolve(token);
       const key = { tokenId: 'foo', audience: 'bar' };
 
       cache.set({ ...key, tokenResolver });
-      // Wait tokenResolver to resolve
-      jest.advanceTimersByTime(100);
       await tokenResolver;
 
       expect(cache.get(key)).toMatchObject(key);
