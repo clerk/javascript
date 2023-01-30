@@ -27,6 +27,20 @@ type UserMetadataParams = {
   unsafeMetadata?: Record<string, unknown>;
 };
 
+type PasswordHasher =
+  | 'argon2i'
+  | 'argon2id'
+  | 'bcrypt'
+  | 'md5'
+  | 'pbkdf2_sha256_django'
+  | 'pbkdf2_sha1'
+  | 'scrypt_firebase';
+
+type UserPasswordHashingParams = {
+  passwordDigest: string;
+  passwordHasher: PasswordHasher;
+};
+
 type CreateUserParams = {
   externalId?: string;
   emailAddress?: string[];
@@ -39,7 +53,8 @@ type CreateUserParams = {
   skipPasswordRequirement?: boolean;
   totpSecret?: string;
   backupCodes?: string[];
-} & UserMetadataParams;
+} & UserMetadataParams &
+  (UserPasswordHashingParams | {});
 
 interface UpdateUserParams extends UserMetadataParams {
   firstName?: string;
