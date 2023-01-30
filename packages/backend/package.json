@@ -63,6 +63,7 @@
       "default": "./dist/runtime/browser/fetch.mjs"
     }
   },
+  "homepage": "https://clerk.dev/",
   "repository": {
     "type": "git",
     "url": "https://github.com/clerkinc/javascript.git"
@@ -70,7 +71,6 @@
   "bugs": {
     "url": "https://github.com/clerkinc/javascript/issues"
   },
-  "homepage": "https://clerk.dev/",
   "engines": {
     "node": ">=14"
   }
