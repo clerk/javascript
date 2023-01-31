@@ -1,9 +1,9 @@
 import type { JwtPayload } from '@clerk/types';
-import type { SignedInAuthObject, SignedOutAuthObject } from './authObjects';
-import type { TokenVerificationErrorReason } from './errors';
 
 import { createBackendApiClient } from '../api';
+import type { SignedInAuthObject, SignedOutAuthObject } from './authObjects';
 import { signedInAuthObject, signedOutAuthObject } from './authObjects';
+import type { TokenVerificationErrorReason } from './errors';
 
 export enum AuthStatus {
   SignedIn = 'signed-in',
@@ -19,6 +19,8 @@ export type SignedInState = {
   frontendApi: string;
   proxyUrl?: string;
   publishableKey: string;
+  isSatellite: boolean;
+  domain: string;
   isSignedIn: true;
   isInterstitial: false;
   isUnknown: false;
@@ -32,6 +34,8 @@ export type SignedOutState = {
   frontendApi: string;
   proxyUrl?: string;
   publishableKey: string;
+  isSatellite: boolean;
+  domain: string;
   isSignedIn: false;
   isInterstitial: false;
   isUnknown: false;
@@ -78,6 +82,8 @@ export async function signedIn<T>(options: T, sessionClaims: JwtPayload): Promis
     frontendApi,
     proxyUrl,
     publishableKey,
+    domain,
+    isSatellite,
     headerToken,
     loadSession,
     loadUser,
@@ -127,6 +133,8 @@ export async function signedIn<T>(options: T, sessionClaims: JwtPayload): Promis
     frontendApi,
     proxyUrl,
     publishableKey,
+    domain,
+    isSatellite,
     isSignedIn: true,
     isInterstitial: false,
     isUnknown: false,
@@ -135,7 +143,7 @@ export async function signedIn<T>(options: T, sessionClaims: JwtPayload): Promis
 }
 
 export function signedOut<T>(options: T, reason: AuthReason, message = ''): SignedOutState {
-  const { frontendApi, publishableKey, proxyUrl } = options as any;
+  const { frontendApi, publishableKey, proxyUrl, isSatellite, domain } = options as any;
 
   return {
     status: AuthStatus.SignedOut,
@@ -144,6 +152,8 @@ export function signedOut<T>(options: T, reason: AuthReason, message = ''): Sign
     frontendApi,
     proxyUrl,
     publishableKey,
+    isSatellite,
+    domain,
     isSignedIn: false,
     isInterstitial: false,
     isUnknown: false,
@@ -152,14 +162,16 @@ export function signedOut<T>(options: T, reason: AuthReason, message = ''): Sign
 }
 
 export function interstitial<T>(options: T, reason: AuthReason, message = ''): InterstitialState {
-  const { frontendApi, publishableKey, proxyUrl } = options as any;
+  const { frontendApi, publishableKey, proxyUrl, isSatellite, domain } = options as any;
   return {
     status: AuthStatus.Interstitial,
     reason,
     message,
-    frontendApi: frontendApi,
+    frontendApi,
+    publishableKey,
+    isSatellite,
+    domain,
     proxyUrl,
-    publishableKey: publishableKey,
     isSignedIn: false,
     isInterstitial: true,
     isUnknown: false,
@@ -168,13 +180,15 @@ export function interstitial<T>(options: T, reason: AuthReason, message = ''): I
 }
 
 export function unknownState<T>(options: T, reason: AuthReason, message = ''): UnknownState {
-  const { frontendApi, publishableKey } = options as any;
+  const { frontendApi, publishableKey, isSatellite, domain } = options as any;
   return {
     status: AuthStatus.Unknown,
     reason,
     message,
-    frontendApi: frontendApi,
-    publishableKey: publishableKey,
+    frontendApi,
+    publishableKey,
+    isSatellite,
+    domain,
     isSignedIn: false,
     isInterstitial: false,
     isUnknown: true,

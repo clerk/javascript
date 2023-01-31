@@ -3,6 +3,17 @@ import type { DataFunctionArgs, LoaderFunction } from '@remix-run/server-runtime
 
 export type GetAuthReturn = Promise<AuthObject>;
 
+export type RootAuthLoaderOptionsWithExperimental = RootAuthLoaderOptions & {
+  /**
+   * @experimental
+   */
+  isSatellite?: boolean;
+  /**
+   * @experimental
+   */
+  domain?: string;
+};
+
 export type RootAuthLoaderOptions = {
   /**
    * @deprecated Use `publishableKey` instead.

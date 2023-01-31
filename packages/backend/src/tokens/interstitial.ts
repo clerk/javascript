@@ -15,10 +15,20 @@ export type LoadInterstitialOptions = {
   publishableKey: string;
   pkgVersion?: string;
   debugData?: any;
+  isSatellite?: boolean;
+  domain?: string;
 };
 
-export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions, 'apiUrl'>) {
-  const { debugData, frontendApi, pkgVersion, publishableKey, proxyUrl } = options;
+export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions, 'apiUrl' | 'isSatellite' | 'domain' | 'proxyUrl'>) {
+  const {
+    debugData,
+    frontendApi,
+    pkgVersion,
+    publishableKey,
+    proxyUrl,
+    isSatellite = false,
+    domain,
+  } = options as LoadInterstitialOptions;
   return `
     <head>
         <meta charset="UTF-8" />
@@ -28,6 +38,7 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
             window.__clerk_frontend_api = '${frontendApi}';
             window.__clerk_debug = ${JSON.stringify(debugData || {})};
             ${proxyUrl ? `window.__clerk_proxy_url = ${proxyUrl}` : ''}
+            ${domain ? `window.__clerk_domain = '${domain}'` : ''}
             window.startClerk = async () => {
                 function formRedirect(){
                     const form = '<form method="get" action="" name="redirect"></form>';
@@ -50,13 +61,17 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
 
                 const Clerk = window.Clerk;
                 try {
-                    await Clerk.load();
-                    if(window.location.href.indexOf("#") === -1){
-                      window.location.href = window.location.href;
-                    } else if (window.navigator.userAgent.toLowerCase().includes("firefox/")){
-                        formRedirect();
-                    } else {
-                        window.location.reload();
+                    await Clerk.load({
+                        isSatellite: ${isSatellite},
+                    });
+                    if(Clerk.loaded){
+                      if(window.location.href.indexOf("#") === -1){
+                        window.location.href = window.location.href;
+                      } else if (window.navigator.userAgent.toLowerCase().includes("firefox/")){
+                          formRedirect();
+                      } else {
+                          window.location.reload();
+                      }
                     }
                 } catch (err) {
                     console.error('Clerk: ', err);
@@ -69,9 +84,11 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
                     ? `script.setAttribute('data-clerk-publishable-key', '${publishableKey}');`
                     : `script.setAttribute('data-clerk-frontend-api', '${frontendApi}');`
                 }
+
+                ${domain ? `script.setAttribute('data-clerk-domain', '${domain}');` : ''}
                 ${proxyUrl ? `script.setAttribute('data-clerk-proxy-url', '${proxyUrl}')` : ''};
                 script.async = true;
-                script.src = '${getScriptUrl(frontendApi, pkgVersion)}';
+                script.src = '${getScriptUrl(domain || frontendApi, pkgVersion)}';
                 script.crossOrigin = 'anonymous';
                 script.addEventListener('load', startClerk);
                 document.body.appendChild(script);

@@ -35,6 +35,20 @@ export type OptionalVerifyTokenOptions = Partial<
   >
 >;
 
+export type AuthenticateRequestOptionsWithExperimental = {
+  /**
+   * @experimental
+   */
+  domain?: string;
+  /**
+   * @experimental
+   */
+  isSatellite?: boolean;
+
+  /* Proxy url for FAPI requests */
+  proxyUrl?: string;
+} & AuthenticateRequestOptions;
+
 export type AuthenticateRequestOptions = RequiredVerifyTokenOptions &
   OptionalVerifyTokenOptions &
   LoadResourcesOptions & {
@@ -62,12 +76,14 @@ export type AuthenticateRequestOptions = RequiredVerifyTokenOptions &
     referrer?: string;
     /* Request user-agent value */
     userAgent?: string;
-    /* Proxy url for FAPI requests */
-    proxyUrl?: string;
   };
 
 export async function authenticateRequest(options: AuthenticateRequestOptions): Promise<RequestState> {
-  options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
+  options.frontendApi =
+    (options as AuthenticateRequestOptionsWithExperimental).domain ||
+    parsePublishableKey(options.publishableKey)?.frontendApi ||
+    options.frontendApi ||
+    '';
   options.apiUrl = options.apiUrl || API_URL;
   options.apiVersion = options.apiVersion || API_VERSION;
 
@@ -126,6 +142,6 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
 }
 
 export const debugRequestState = (params: RequestState) => {
-  const { frontendApi, isSignedIn, proxyUrl, isInterstitial, reason, message, publishableKey } = params;
-  return { frontendApi, isSignedIn, proxyUrl, isInterstitial, reason, message, publishableKey };
+  const { frontendApi, isSignedIn, proxyUrl, isInterstitial, reason, message, publishableKey, isSatellite, domain } = params;
+  return { frontendApi, isSignedIn, proxyUrl, isInterstitial, reason, message, publishableKey, isSatellite, domain };
 };

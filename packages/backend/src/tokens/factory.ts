@@ -2,7 +2,7 @@ import type { ApiClient } from '../api';
 import { API_URL, API_VERSION } from '../constants';
 import type { LoadInterstitialOptions } from './interstitial';
 import { buildPublicInterstitialUrl, loadInterstitialFromBAPI, loadInterstitialFromLocal } from './interstitial';
-import type { AuthenticateRequestOptions } from './request';
+import type { AuthenticateRequestOptions, AuthenticateRequestOptionsWithExperimental } from './request';
 import { authenticateRequest as authenticateRequestOriginal, debugRequestState } from './request';
 
 export type CreateAuthenticateRequestOptions = {
@@ -26,6 +26,10 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
     frontendApi: buildtimeFrontendApi = '',
     proxyUrl: buildProxyUrl = '',
     publishableKey: buildtimePublishableKey = '',
+    // @ts-expect-error
+    isSatellite: buildtimeIsSatellite = false,
+    // @ts-expect-error
+    domain: buildtimeDomain = '',
   } = params.options;
 
   const authenticateRequest = ({
@@ -37,6 +41,9 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
     jwtKey: runtimeJwtKey,
     ...rest
   }: Omit<AuthenticateRequestOptions, 'apiUrl' | 'apiVersion'>) => {
+    const { isSatellite: runtimeIsSatellite, domain: runtimeDomain } =
+      rest as Partial<AuthenticateRequestOptionsWithExperimental>;
+
     return authenticateRequestOriginal({
       ...rest,
       apiKey: runtimeApiKey || buildtimeApiKey,
@@ -46,6 +53,9 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
       frontendApi: runtimeFrontendApi || buildtimeFrontendApi,
       proxyUrl: runtimeProxyUrl || buildProxyUrl,
       publishableKey: runtimePublishableKey || buildtimePublishableKey,
+      // @ts-expect-error
+      isSatellite: runtimeIsSatellite || buildtimeIsSatellite,
+      domain: runtimeDomain || buildtimeDomain,
       jwtKey: runtimeJwtKey || buildtimeJwtKey,
     });
   };
