@@ -44,8 +44,7 @@
     "@clerk/types": "^3.25.1-staging.0",
     "@emotion/cache": "11.10.5",
     "@emotion/react": "11.10.5",
-    "@floating-ui/react-dom-interactions": "0.6.6",
-    "@popperjs/core": "2.11.6",
+    "@floating-ui/react": "0.19.0",
     "browser-tabs-lock": "1.2.15",
     "classnames": "2.3.2",
     "copy-to-clipboard": "3.3.3",
@@ -56,7 +55,6 @@
     "qs": "6.11.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-popper": "2.3.0",
     "regenerator-runtime": "0.13.11"
   },
   "devDependencies": {
@@ -118,7 +116,7 @@
     "files": [
       {
         "path": "./dist/clerk.browser.js",
-        "maxSize": "181kB"
+        "maxSize": "185kB"
       },
       {
         "path": "./dist/clerk.headless.js",

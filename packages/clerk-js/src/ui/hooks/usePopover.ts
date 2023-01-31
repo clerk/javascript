@@ -1,13 +1,5 @@
-import type { UseFloatingProps } from '@floating-ui/react-dom-interactions';
-import {
-  autoUpdate,
-  flip,
-  offset,
-  shift,
-  useDismiss,
-  useFloating,
-  useFloatingNodeId,
-} from '@floating-ui/react-dom-interactions';
+import type { UseFloatingProps } from '@floating-ui/react';
+import { autoUpdate, flip, offset, shift, useDismiss, useFloating, useFloatingNodeId } from '@floating-ui/react';
 import React, { useEffect } from 'react';
 
 type UsePopoverProps = {
@@ -15,7 +7,12 @@ type UsePopoverProps = {
   placement?: UseFloatingProps['placement'];
   offset?: Parameters<typeof offset>[0];
   autoUpdate?: boolean;
-  bubbles?: boolean;
+  bubbles?:
+    | boolean
+    | {
+        escapeKey?: boolean;
+        outsidePress?: boolean;
+      };
 };
 
 export type UsePopoverReturn = ReturnType<typeof usePopover>;
@@ -24,7 +21,7 @@ export const usePopover = (props: UsePopoverProps = {}) => {
   const { bubbles = true } = props;
   const [isOpen, setIsOpen] = React.useState(props.defaultOpen || false);
   const nodeId = useFloatingNodeId();
-  const { update, reference, floating, strategy, x, y, context, refs } = useFloating({
+  const { update, reference, floating, strategy, x, y, context } = useFloating({
     open: isOpen,
     onOpenChange: setIsOpen,
     nodeId,
@@ -34,24 +31,6 @@ export const usePopover = (props: UsePopoverProps = {}) => {
   });
 
   useDismiss(context, { bubbles });
-
-  useEffect(() => {
-    const handleFocus = (e: FocusEvent) => {
-      if (!e.relatedTarget) {
-        (refs.floating.current as HTMLElement | null)?.focus();
-      }
-    };
-
-    if (!bubbles) {
-      window.addEventListener('focusout', handleFocus);
-    }
-
-    return () => {
-      if (!bubbles) {
-        window.removeEventListener('focusout', handleFocus);
-      }
-    };
-  }, [bubbles]);
 
   useEffect(() => {
     if (props.defaultOpen) {

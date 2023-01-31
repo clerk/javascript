@@ -1,7 +1,7 @@
-import type { FloatingContext, ReferenceType } from '@floating-ui/react-dom-interactions';
-import { FloatingFocusManager, FloatingNode, FloatingPortal } from '@floating-ui/react-dom-interactions';
-import React from 'react';
+import type { FloatingContext, ReferenceType } from '@floating-ui/react';
+import { FloatingFocusManager, FloatingNode, FloatingPortal } from '@floating-ui/react';
 import type { PropsWithChildren } from 'react';
+import React from 'react';
 
 type PopoverProps = PropsWithChildren<{
   context: FloatingContext<ReferenceType>;

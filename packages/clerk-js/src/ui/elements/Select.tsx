@@ -82,7 +82,7 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
     children,
     ...rest
   } = props;
-  const popoverCtx = usePopover({ autoUpdate: false });
+  const popoverCtx = usePopover({ autoUpdate: false, bubbles: false });
   const togglePopover = popoverCtx.toggle;
   const focusedItemRef = React.useRef<HTMLDivElement>(null);
   const searchInputCtx = useSearchInput({
