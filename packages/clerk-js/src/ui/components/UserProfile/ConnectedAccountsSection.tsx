@@ -52,10 +52,11 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
   const defaultOpen = !!router.urlStateParam?.componentName;
   const { componentName, mode } = useUserProfileContext();
   const isModal = mode === 'modal';
+  const visitedProvider = account.provider === router.urlStateParam?.socialProvider;
 
   return (
     <UserProfileAccordion
-      defaultOpen={defaultOpen}
+      defaultOpen={visitedProvider && defaultOpen}
       onCloseCallback={router.urlStateParam?.clearUrlStateParam}
       icon={
         <Image

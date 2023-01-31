@@ -18,7 +18,13 @@ interface BaseRouterProps {
   onExternalNavigate?: () => any;
   refreshEvents?: Array<keyof WindowEventMap>;
   preservedParams?: string[];
-  urlStateParam?: { startPath: string; path: string; componentName: string; clearUrlStateParam: () => void };
+  urlStateParam?: {
+    startPath: string;
+    path: string;
+    componentName: string;
+    clearUrlStateParam: () => void;
+    socialProvider: string;
+  };
   children: React.ReactNode;
 }
 
