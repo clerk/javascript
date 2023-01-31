@@ -5,9 +5,12 @@ import {
   buildURL,
   getAllETLDs,
   getSearchParameterFromHash,
+  hasBannedProtocol,
   hasExternalAccountSignUpError,
   isAccountsHostedPages,
+  isDataUri,
   isDevOrStagingUrl,
+  isValidUrl,
   removeSearchParameterFromHash,
   setSearchParameterInHash,
   trimTrailingSlash,
@@ -54,6 +57,63 @@ describe('isDevOrStagingUrl(url)', () => {
   test.each([...goodUrls, ...badUrls])('.isDevOrStagingUrl(%s)', (a, expected) => {
     // @ts-ignore
     expect(isDevOrStagingUrl(a)).toBe(expected);
+  });
+});
+
+describe('isValidUrl(url)', () => {
+  const cases: Array<[string, boolean]> = [
+    ['https://www.clerk.dev/', true],
+    ['https://www.clerk.dev/?test=clerk', true],
+    ['https://www.clerk.dev', true],
+    ['https://clerk.dev', true],
+    ['www.clerk.dev/', false],
+    ['www.clerk.dev', false],
+    ['www.clerk', false],
+    ['clerk.dev', false],
+    ['clerk.dev?clerk=yes', false],
+    ['clerk.dev#/?clerk=yes', false],
+  ];
+
+  test.each(cases)('.isValidUrl(%s)', (a, expected) => {
+    expect(isValidUrl(a)).toBe(expected);
+  });
+});
+
+describe('isValidUrl(url,base)', () => {
+  const cases: Array<[string, string | undefined, boolean]> = [
+    ['', 'https://www.clerk.dev/', true],
+    ['/test', 'https://www.clerk.dev/', true],
+    ['/test?clerk=true', 'https://www.clerk.dev/', true],
+    ['/test?clerk=true', '', false],
+    ['/test?clerk=true', undefined, false],
+  ];
+
+  test.each(cases)('.isValidUrl(%s,%s)', (a, b, expected) => {
+    expect(isValidUrl(a, b)).toBe(expected);
+  });
+});
+
+describe('isDataUri(url)', () => {
+  const cases: Array<[string, boolean]> = [
+    ['https://www.clerk.dev/', false],
+    ['data:image/png;base64,iVBORw0KGgoAAA5ErkJggg==', true],
+  ];
+
+  test.each(cases)('.isDataUri(%s)', (a, expected) => {
+    expect(isDataUri(a)).toBe(expected);
+  });
+});
+
+describe('hasBannedProtocol(url)', () => {
+  const cases: Array<[string, boolean]> = [
+    ['https://www.clerk.dev/', false],
+    ['http://www.clerk.dev/', false],
+    ['javascript:console.log(document.cookies)', true],
+    ['data:image/png;base64,iVBORw0KGgoAAA5ErkJggg==', false],
+  ];
+
+  test.each(cases)('.hasBannedProtocol(%s)', (a, expected) => {
+    expect(hasBannedProtocol(a)).toBe(expected);
   });
 });
 

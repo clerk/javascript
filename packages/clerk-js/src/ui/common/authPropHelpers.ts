@@ -3,6 +3,7 @@ import type { DisplayConfigResource } from '@clerk/types';
 import type { ParsedQs } from 'qs';
 import qs from 'qs';
 
+import { hasBannedProtocol, isValidUrl } from '../../utils';
 import type { SignInCtx, SignUpCtx } from '../types';
 
 type ExtractAuthUrlKey =
@@ -36,13 +37,18 @@ export const extractAuthProp = (
   const snakeCaseField = camelToSnake(key);
   const queryParamValue = queryParams[snakeCaseField];
 
-  return (
+  const url =
     (typeof queryParamValue === 'string' ? queryParamValue : null) ||
     (typeof queryParams.redirect_url === 'string' ? queryParams.redirect_url : null) ||
     ctx[key] ||
     ctx.redirectUrl ||
-    displayConfig[key]
-  );
+    displayConfig[key];
+
+  if (!isValidUrl(url) || hasBannedProtocol(url)) {
+    return '';
+  }
+
+  return url;
 };
 
 interface BuildAuthQueryStringArgs {
