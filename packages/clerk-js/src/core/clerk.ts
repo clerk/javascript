@@ -202,7 +202,7 @@ export default class Clerk implements ClerkInterface {
     }
 
     const session = this.client.activeSessions.find(s => s.id === opts.sessionId);
-    const shouldSignOutCurrent = this.session?.id === session?.id;
+    const shouldSignOutCurrent = session?.id && this.session?.id === session.id;
     await session?.remove();
     if (shouldSignOutCurrent) {
       return this.setActive({
