@@ -196,12 +196,11 @@ export default class Clerk implements ClerkInterface {
     };
 
     if (this.#options.standardBrowser) {
-      await this.#loadInStandardBrowser();
+      this.#isReady = await this.#loadInStandardBrowser();
     } else {
       await this.#loadInNonStandardBrowser();
+      this.#isReady = true;
     }
-
-    this.#isReady = true;
   };
 
   public signOut: SignOut = async (callbackOrOptions?: SignOutCallback | SignOutOptions, options?: SignOutOptions) => {
@@ -954,33 +953,38 @@ export default class Clerk implements ClerkInterface {
     this.#componentControls?.updateProps(props);
   };
 
-  #syncWithPrimary = () => {
+  #redirectToSyncWithPrimary = () => {
     const q = new URLSearchParams({
       redirect_url: `${window.location.href}?synced=true`,
     });
     window.location.replace(new URL(`/v1/client/sync?${q.toString()}`, `https://${this.domain}`).toString());
   };
 
-  #loadInStandardBrowser = async (): Promise<void> => {
-    console.log('----- isSatellite -----', this.#options.isSatellite);
+  #stripSyncedQueryParam = (q: URLSearchParams) => {
+    q.delete('synced');
+    const queryString = q.toString() ? `?${q.toString()}` : '';
+    window.history.replaceState({}, '', `${window.location.pathname}${queryString}`);
+  };
+
+  #shouldSyncWithMain = () => {
+    const q = new URLSearchParams(window.location.search);
+    if (q.get('synced') !== 'true') {
+      this.#redirectToSyncWithPrimary();
+      return true;
+    }
+    this.#stripSyncedQueryParam(q);
+    return false;
+  };
+
+  #loadInStandardBrowser = async (): Promise<boolean> => {
     if (this.#options.isSatellite) {
-      const q = new URLSearchParams(window.location.search);
-      if (q.get('synced') !== 'true') {
-        this.#syncWithPrimary();
-        return;
-      } else if (q.get('synced') === 'true') {
-        q.delete('synced');
-        const queryString = q.toString() ? `?${q.toString()}` : '';
-        window.history.replaceState({}, '', `${window.location.pathname}${queryString}`);
+      if (this.#shouldSyncWithMain()) {
+        return false;
       }
     }
 
     this.#authService = new AuthenticationService(this);
     this.#pageLifecycle = createPageLifecycle();
-
-    console.log('----- loadInStandardBrowser -----', this.domain);
-    console.log('----- loadInStandardBrowser -----', this.frontendApi);
-    console.log('----- loadInStandardBrowser -----', window.location.host);
 
     this.#devBrowserHandler = createDevBrowserHandler({
       frontendApi: this.frontendApi,
@@ -1041,6 +1045,8 @@ export default class Clerk implements ClerkInterface {
         clerkErrorInitFailed();
       }
     }
+
+    return true;
   };
 
   #loadInNonStandardBrowser = async (): Promise<void> => {
