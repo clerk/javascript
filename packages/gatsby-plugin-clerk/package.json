@@ -20,7 +20,6 @@
     "dist",
     "gatsby-browser.js",
     "gatsby-ssr.js",
-    "gatsby-node.js",
     "ssr.js",
     "ssr.d.ts",
     "api.js",

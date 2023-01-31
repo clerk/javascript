@@ -28,6 +28,10 @@ export function authenticateRequest(context: GetServerDataProps, options: WithSe
 }
 
 const returnReferrerAsXForwardedHostToFixLocalDevGatsbyProxy = (headers: Map<string, unknown>) => {
+  if (process.env.NODE_ENV !== 'development') {
+    return headers.get(constants.Headers.ForwardedHost) as string;
+  }
+
   const forwardedHost = headers.get(constants.Headers.ForwardedHost) as string;
   if (forwardedHost) {
     return forwardedHost;
@@ -36,11 +40,7 @@ const returnReferrerAsXForwardedHostToFixLocalDevGatsbyProxy = (headers: Map<str
   const referrerUrl = new URL(headers.get(constants.Headers.Referrer) as string);
   const hostUrl = new URL('https://' + (headers.get(constants.Headers.Host) as string));
 
-  if (
-    process.env.NODE_ENV === 'development' &&
-    isDevelopmentOrStaging(SECRET_KEY || API_KEY || '') &&
-    hostUrl.hostname === referrerUrl.hostname
-  ) {
+  if (isDevelopmentOrStaging(SECRET_KEY || API_KEY || '') && hostUrl.hostname === referrerUrl.hostname) {
     return referrerUrl.host;
   }
 
