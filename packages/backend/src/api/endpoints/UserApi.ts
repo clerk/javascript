@@ -13,6 +13,7 @@ type UserCountParams = {
   web3Wallet?: string[];
   query?: string;
   userId?: string[];
+  externalId?: string[];
 };
 
 type UserListParams = UserCountParams & {
