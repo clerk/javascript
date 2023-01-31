@@ -28,6 +28,8 @@ export const DEV_OR_STAGING_SUFFIXES = [
   'accounts.dev',
 ];
 
+const BANNED_URI_PROTOCOLS = ['javascript:'] as const;
+
 const devOrStagingUrlCache = new Map<string, boolean>();
 const accountsCache = new Map<string, boolean>();
 
@@ -287,13 +289,13 @@ export function removeSearchParameterFromHash({
   return dummyUrlForHash.href.replace(DUMMY_URL_BASE, '');
 }
 
-export function isValidUrl(val?: string): val is string {
-  if (!val) {
+export function isValidUrl(val: unknown, base?: string): val is string {
+  if (!val && !base) {
     return false;
   }
 
   try {
-    new URL(val);
+    new URL(val as string, base);
     return true;
   } catch (e) {
     return false;
@@ -301,11 +303,19 @@ export function isValidUrl(val?: string): val is string {
 }
 
 export function isDataUri(val?: string): val is string {
-  if (val?.startsWith('data:')) {
-    return true;
+  if (!isValidUrl(val)) {
+    return false;
   }
 
-  return false;
+  return new URL(val).protocol === 'data:';
+}
+
+export function hasBannedProtocol(val: string | URL) {
+  if (!isValidUrl(val)) {
+    return false;
+  }
+  const protocol = new URL(val).protocol;
+  return BANNED_URI_PROTOCOLS.some(bp => bp === protocol);
 }
 
 export const generateSrc = ({ src, width }: { src?: string; width: number }) => {
