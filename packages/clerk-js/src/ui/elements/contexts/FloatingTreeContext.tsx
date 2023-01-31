@@ -1,4 +1,4 @@
-import { FloatingTree, useFloatingParentNodeId } from '@floating-ui/react-dom-interactions';
+import { FloatingTree, useFloatingParentNodeId } from '@floating-ui/react';
 import React from 'react';
 
 export const withFloatingTree = <T,>(Component: React.ComponentType<T>): React.ComponentType<T> => {

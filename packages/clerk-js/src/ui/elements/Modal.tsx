@@ -19,7 +19,6 @@ export const Modal = withFloatingTree((props: ModalProps) => {
   const { floating, isOpen, context, nodeId } = usePopover({
     defaultOpen: true,
     autoUpdate: false,
-    bubbles: false,
   });
   const { disableScroll, enableScroll } = useScrollLock(document.body);
 

@@ -23,6 +23,7 @@ export const Menu = withFloatingTree((props: MenuProps) => {
   const popoverCtx = usePopover({
     placement: 'right-start',
     offset: 8,
+    bubbles: false,
   });
 
   const value = React.useMemo(() => ({ value: { popoverCtx } }), [{ ...popoverCtx }]);
