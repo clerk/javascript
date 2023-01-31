@@ -3,7 +3,7 @@ import { Clerk } from '@clerk/backend';
 
 import { noSecretKeyOrApiKeyError } from '../errors';
 import { getEnvVariable } from '../utils';
-import type { LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
+import type { LoaderFunctionArgs, RootAuthLoaderOptions, RootAuthLoaderOptionsWithExperimental } from './types';
 import { parseCookies } from './utils';
 
 /**
@@ -11,7 +11,8 @@ import { parseCookies } from './utils';
  */
 export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoaderOptions = {}): Promise<RequestState> {
   const { request, context } = args;
-  const { loadSession, loadUser, loadOrganization, authorizedParties } = opts;
+  const { loadSession, loadUser, loadOrganization, authorizedParties, isSatellite } =
+    opts as RootAuthLoaderOptionsWithExperimental;
 
   // Fetch environment variables across Remix runtimes.
   // 1. First try from process.env if exists (Node).
@@ -34,6 +35,12 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
 
   const apiUrl = getEnvVariable('CLERK_API_URL') || (context?.CLERK_API_URL as string);
 
+  const domain =
+    getEnvVariable('CLERK_DOMAIN') ||
+    (context?.CLERK_DOMAIN as string) ||
+    (opts as RootAuthLoaderOptionsWithExperimental).domain ||
+    '';
+
   const proxyUrl = getEnvVariable('CLERK_PROXY_URL') || (context?.CLERK_PROXY_URL as string) || opts.proxyUrl || '';
 
   const { headers } = request;
@@ -42,7 +49,8 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
   const cookieToken = cookies['__session'];
   const headerToken = headers.get('authorization')?.replace('Bearer ', '');
 
-  return Clerk({ apiUrl, apiKey, secretKey, jwtKey, proxyUrl }).authenticateRequest({
+  // @ts-expect-error
+  return Clerk({ apiUrl, apiKey, secretKey, jwtKey, proxyUrl, isSatellite, domain }).authenticateRequest({
     apiKey,
     secretKey,
     jwtKey,
@@ -62,5 +70,8 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     userAgent: headers.get('user-agent') as string,
     authorizedParties,
     proxyUrl,
+    // @ts-expect-error
+    isSatellite,
+    domain,
   });
 }

@@ -6,7 +6,8 @@ import { jsonOk } from '../util/mockFetch';
 import { type AuthReason, type RequestState, AuthErrorReason, AuthStatus } from './authStatus';
 import { TokenVerificationErrorReason } from './errors';
 import { mockInvalidSignatureJwt, mockJwks, mockJwt, mockJwtPayload, mockMalformedJwt } from './fixtures';
-import { type AuthenticateRequestOptions, authenticateRequest } from './request';
+import type { AuthenticateRequestOptionsWithExperimental } from './request';
+import { authenticateRequest } from './request';
 
 function assertSignedOut(assert, requestState: RequestState, reason: AuthReason, message = '') {
   assert.propEqual(requestState, {
@@ -17,6 +18,8 @@ function assertSignedOut(assert, requestState: RequestState, reason: AuthReason,
     isSignedIn: false,
     isInterstitial: false,
     isUnknown: false,
+    isSatellite: false,
+    domain: '',
     message,
     reason,
     toAuth: {},
@@ -47,6 +50,8 @@ function assertInterstitial(assert, requestState: RequestState, reason: AuthReas
     isSignedIn: false,
     isInterstitial: true,
     isUnknown: false,
+    isSatellite: false,
+    domain: '',
     reason,
     toAuth: {},
   });
@@ -60,6 +65,8 @@ function assertUnknown(assert, requestState: RequestState, reason: AuthReason) {
     isSignedIn: false,
     isInterstitial: false,
     isUnknown: true,
+    isSatellite: false,
+    domain: '',
     reason,
     toAuth: {},
   });
@@ -89,6 +96,8 @@ function assertSignedIn(assert, requestState: RequestState) {
     isSignedIn: true,
     isInterstitial: false,
     isUnknown: false,
+    isSatellite: false,
+    domain: '',
   });
 }
 
@@ -96,7 +105,7 @@ export default (QUnit: QUnit) => {
   const { module, test, skip } = QUnit;
 
   /* An otherwise bare state on a request. */
-  const defaultMockAuthenticateRequestOptions: AuthenticateRequestOptions = {
+  const defaultMockAuthenticateRequestOptions: AuthenticateRequestOptionsWithExperimental = {
     apiKey: 'deadbeef',
     secretKey: '',
     apiUrl: 'https://api.clerk.test',
@@ -107,6 +116,8 @@ export default (QUnit: QUnit) => {
     host: 'example.com',
     userAgent: 'Mozilla/TestAgent',
     skipJwksCache: true,
+    isSatellite: false,
+    domain: '',
   };
 
   module('tokens.authenticateRequest(options)', hooks => {
