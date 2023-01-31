@@ -4,7 +4,7 @@ import { CLERK_MODAL_STATE } from '../../core/constants';
 import { readStateParam, removeClerkQueryParam } from '../../utils';
 
 export const useClerkModalStateParams = () => {
-  const contentRef = React.useRef({ startPath: '', path: '', componentName: '' });
+  const contentRef = React.useRef({ startPath: '', path: '', componentName: '', socialProvider: '' });
   const decodedRedirectParams = readStateParam();
 
   React.useLayoutEffect(() => {
@@ -14,7 +14,7 @@ export const useClerkModalStateParams = () => {
   }, []);
 
   const clearUrlStateParam = () => {
-    contentRef.current = { startPath: '', path: '', componentName: '' };
+    contentRef.current = { startPath: '', path: '', componentName: '', socialProvider: '' };
   };
 
   const removeQueryParam = () => removeClerkQueryParam(CLERK_MODAL_STATE);

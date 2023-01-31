@@ -20,6 +20,7 @@ type SerializeAndAppendModalStateProps = {
   startPath?: string;
   currentPath?: string;
   componentName: string;
+  socialProvider?: string;
 };
 
 export const appendModalState = ({
@@ -27,6 +28,7 @@ export const appendModalState = ({
   startPath = '/user',
   currentPath = '',
   componentName,
+  socialProvider = '',
 }: SerializeAndAppendModalStateProps) => {
   const regexPattern = /CLERK-ROUTER\/VIRTUAL\/.*\//;
 
@@ -34,6 +36,7 @@ export const appendModalState = ({
     path: currentPath.replace(regexPattern, '') || '',
     componentName,
     startPath,
+    socialProvider,
   };
 
   const encodedRedirectParams = encodeB64(JSON.stringify(redirectParams));
