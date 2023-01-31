@@ -450,10 +450,10 @@ export default class Clerk implements ClerkInterface {
       newSession.lastActiveOrganizationId = organizationId || null;
     }
 
-    // If this.session exists, then signout was triggered by the current tab
+    // If this.session exists, then signOut was triggered by the current tab
     // and should emit. Other tabs should not emit the same event again
-    const shouldSignoutSession = this.session && newSession === null;
-    if (shouldSignoutSession) {
+    const shouldSignOutSession = this.session && newSession === null;
+    if (shouldSignOutSession) {
       this.#broadcastSignOutEvent();
     }
 
