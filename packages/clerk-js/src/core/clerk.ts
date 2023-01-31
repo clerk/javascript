@@ -199,7 +199,7 @@ export default class Clerk implements ClerkInterface {
   };
 
   public signOut: SignOut = async (callbackOrOptions?: SignOutCallback | SignOutOptions, options?: SignOutOptions) => {
-    if (!this.client || !this.session) {
+    if (!this.client || this.client.sessions.length === 0) {
       return;
     }
     const cb = typeof callbackOrOptions === 'function' ? callbackOrOptions : undefined;
@@ -214,7 +214,7 @@ export default class Clerk implements ClerkInterface {
     }
 
     const session = this.client.activeSessions.find(s => s.id === opts.sessionId);
-    const shouldSignOutCurrent = this.session.id === session?.id;
+    const shouldSignOutCurrent = session?.id && this.session?.id === session.id;
     await session?.remove();
     if (shouldSignOutCurrent) {
       return this.setActive({

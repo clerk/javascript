@@ -232,6 +232,7 @@ describe('Clerk singleton', () => {
       mockClientFetch.mockReturnValue(
         Promise.resolve({
           activeSessions: [],
+          sessions: [],
           destroy: mockClientDestroy,
         }),
       );
@@ -247,6 +248,7 @@ describe('Clerk singleton', () => {
       mockClientFetch.mockReturnValue(
         Promise.resolve({
           activeSessions: [mockSession1, mockSession2],
+          sessions: [mockSession1, mockSession2],
           destroy: mockClientDestroy,
         }),
       );
@@ -265,6 +267,7 @@ describe('Clerk singleton', () => {
       mockClientFetch.mockReturnValue(
         Promise.resolve({
           activeSessions: [mockSession1],
+          sessions: [mockSession1],
           destroy: mockClientDestroy,
         }),
       );
@@ -284,6 +287,7 @@ describe('Clerk singleton', () => {
       mockClientFetch.mockReturnValue(
         Promise.resolve({
           activeSessions: [mockSession1, mockSession2],
+          sessions: [mockSession1, mockSession2],
           destroy: mockClientDestroy,
         }),
       );
@@ -305,6 +309,7 @@ describe('Clerk singleton', () => {
       mockClientFetch.mockReturnValue(
         Promise.resolve({
           activeSessions: [mockSession1, mockSession2],
+          sessions: [mockSession1, mockSession2],
           destroy: mockClientDestroy,
         }),
       );
