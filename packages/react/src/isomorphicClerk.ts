@@ -159,7 +159,7 @@ export default class IsomorphicClerk {
         await global.Clerk.load(this.options);
       }
 
-      return this.hydrateClerkJS(global.Clerk);
+      return global.Clerk?.loaded ? this.hydrateClerkJS(global.Clerk) : undefined;
     } catch (err) {
       let message;
 
