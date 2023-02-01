@@ -33,8 +33,8 @@ Clerk is the easiest way to add authentication and user management to your Gatsb
 
 ### Prerequisites
 
-- Gatsby v4+
-- Node.js v16+
+- Gatsby v5+
+- Node.js v18+
 
 ### Installation
 
@@ -47,31 +47,32 @@ npm install gatsby-plugin-clerk
 Make sure the following environment variables are set in a `.env` file:
 
 ```sh
-CLERK_API_KEY=[backend-api-key]
+GATSBY_CLERK_PUBLISHABLE_KEY=your_publishable_key
+CLERK_SECRET_KEY=your_secret_key
 ```
 
 You can get these from the [API Keys](https://dashboard.clerk.dev/last-active?path=api-keys) screen in your Clerk dashboard.
 
-To initialize Clerk with your Gatsby application, simply register the plugin in your `gatsby-config.ts`/`gatsby-config.js` file:
+To initialize Clerk with your Gatsby application, simply register the plugin in your `gatsby-config.ts`/`gatsby-config.js` file.
+Also, use `dotenv` to access environment variables.
 
 ```ts
 // gatsby-config.ts
 import type { GatsbyConfig } from 'gatsby';
 
+require('dotenv').config({
+  path: `.env.${process.env.NODE_ENV}`,
+});
+
 const config: GatsbyConfig = {
   // ...the rest of your config object
-  plugins: [
-    {
-      resolve: 'gatsby-plugin-clerk',
-      options: {
-        frontendApi: [frontend - api - key],
-      },
-    },
-  ],
+  plugins: ['gatsby-plugin-clerk'],
 };
 
 export default config;
 ```
+
+### Client-side
 
 After those changes are made, you can use Clerk components in your pages.
 
@@ -97,25 +98,51 @@ const IndexPage = () => {
 export default IndexPage;
 ```
 
-Or even during SSR:
+### Server-Side Rendering (SSR)
 
-```ts
+Using `withServerAuth` from `'gatsby-plugin-clerk/ssr'`. Example file `/pages/ssr.tsx`:
+
+```tsx
+import * as React from 'react';
+import { GetServerData } from 'gatsby';
 import { withServerAuth } from 'gatsby-plugin-clerk/ssr';
 
-export const getServerData = withServerAuth(async ({ auth }) => {
-  const { getToken, sessionId, userId } = auth;
-  // fetch data using auth data or a custom JWT
-  const hasuraToken = await getToken({ template: 'hasura ' });
-  const posts = db.fetchPosts(hasuraToken);
-  return { props: { posts } };
+export const getServerData: GetServerData<any> = withServerAuth(
+  async props => {
+    return { props: { data: '1', auth: props.auth } };
+  },
+  { loadUser: true },
+);
+
+function SSRPage({ serverData }: any) {
+  return (
+    <main>
+      <h1>SSR Page with Clerk</h1>
+      <pre>{JSON.stringify(serverData, null, 2)}</pre>
+    </main>
+  );
+}
+
+export default SSRPage;
+```
+
+### Server API routes
+
+Importing `'gatsby-plugin-clerk/api'` gives acces to all the exports coming from `@clerk/sdk-node`. Example file `/api/hello.ts`:
+
+```ts
+import { clerkClient, withAuth } from 'gatsby-plugin-clerk/api';
+
+interface ContactBody {
+  message: string;
+}
+
+const handler = withAuth(async (req, res) => {
+  const users = await clerkClient.users.getUserList();
+  res.send({ title: `We have ${users.length} users`, auth: req.auth });
 });
 
-const PostsPage = ({ serverData }) => {
-  console.log(serverData);
-  return <div>...</div>;
-};
-
-export default PostsPage;
+export default handler;
 ```
 
 _For further details and examples, please refer to our [Documentation](https://clerk.dev/docs/get-started/gatsby?utm_source=github&utm_medium=gatsby_plugin_clerk)._
