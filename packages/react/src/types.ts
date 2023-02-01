@@ -19,8 +19,9 @@ declare global {
 }
 
 export type ClerkConstructorOptions = Pick<Clerk, 'proxyUrl' | 'domain'>;
+export type NoExperimentalClerkOptions = Omit<ClerkOptions, 'isSatellite'>;
 
-export type IsomorphicClerkOptions = ClerkOptions & {
+export type IsomorphicClerkOptions = NoExperimentalClerkOptions & {
   Clerk?: ClerkProp;
   clerkJSUrl?: string;
   clerkJSVariant?: 'headless' | '';
@@ -49,7 +50,7 @@ export interface MountProps {
 }
 
 export interface HeadlessBrowserClerk extends Clerk {
-  load: (opts?: ClerkOptions) => Promise<void>;
+  load: (opts?: Omit<ClerkOptions, 'isSatellite'>) => Promise<void>;
   updateClient: (client: ClientResource) => void;
 }
 

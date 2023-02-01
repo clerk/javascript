@@ -185,7 +185,7 @@ export default class Clerk implements ClerkInterface {
 
   public isReady = (): boolean => this.#isReady;
 
-  public load = async (options?: ClerkOptions): Promise<void> => {
+  public load = async (options?: Omit<ClerkOptions, 'isSatellite'>): Promise<void> => {
     if (this.#isReady) {
       return;
     }
