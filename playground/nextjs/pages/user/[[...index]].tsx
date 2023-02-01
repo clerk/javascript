@@ -18,10 +18,3 @@ const UserProfilePage: NextPage = () => {
 };
 
 export default UserProfilePage;
-
-// drivepoint.gr/user
-//   -> middleware -> clerk auth flow -> middleware handler -> inject headers
-//         -> /user page ->
-//               -> getServerSideProps
-//                            -> getAuth
-//                                       -> render page

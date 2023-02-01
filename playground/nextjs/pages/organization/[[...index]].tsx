@@ -2,7 +2,7 @@ import { OrganizationProfile } from '@clerk/nextjs';
 import type { NextPage } from 'next';
 import React from 'react';
 
-const UserProfilePage: NextPage = () => {
+const OrganizationProfilePage: NextPage = () => {
   return (
     <div
       style={{ display: 'flex', flexDirection: 'column', gap: '2rem', justifyContent: 'center', alignItems: 'center' }}
@@ -12,4 +12,4 @@ const UserProfilePage: NextPage = () => {
   );
 };
 
-export default UserProfilePage;
+export default OrganizationProfilePage;
