@@ -1,7 +1,7 @@
 const createErrorMessage = (msg: string) => {
   return `🔒 Clerk: ${msg.trim()}
 
-For more info, check out the docs: https://docs.clerk.dev,
+For more info, check out the docs: https://clerk.dev/docs,
 or come say hi in our discord server: https://rebrand.ly/clerk-discord
 
 `;
@@ -48,20 +48,23 @@ export const loader: LoaderFunction = async (args) => {
 };
 `);
 
-export const invalidRootLoaderCallbackResponseReturn = createErrorMessage(`
-You're returning an invalid 'Response' object from the 'rootAuthLoader' in root.tsx.
-You can return numbers, strings, objects, booleans, and redirect 'Response' objects (status codes in the range of 300 to 400)
-`);
-
 export const invalidRootLoaderCallbackReturn = createErrorMessage(`
-You're returning an invalid value from 'rootAuthLoader' in root.tsx.
-You can only return plain objects or redirect 'Response' objects (status codes in the range of 300 to 400).
-If you want to return a primitive value or an array, wrap the response with an object.
+You're returning an invalid response from the 'rootAuthLoader' called from the loader in root.tsx.
+You can only return plain objects, responses created using the Remix 'json()' and 'redirect()' helpers,
+custom redirect 'Response' instances (status codes in the range of 300 to 400),
+or custom json 'Response' instances (containing a body that is a valid json string).
+If you want to return a primitive value or an array, you can always wrap the response with an object.
+
 Example:
 
 export const loader: LoaderFunction = args => rootAuthLoader(args, ({ auth }) => {
     const { userId } = auth;
     const posts: Post[] = database.getPostsByUserId(userId);
+
+    return json({ data: posts })
+    // or
+    return new Response(JSON.stringify({ data: posts }), { headers: { 'Content-Type': 'application/json' } });
+    // or
     return { data: posts };
 })
 `);

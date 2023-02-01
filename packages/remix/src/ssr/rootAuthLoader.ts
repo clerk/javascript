@@ -1,15 +1,15 @@
 import { sanitizeAuthObject } from '@clerk/backend';
 
-import { invalidRootLoaderCallbackResponseReturn, invalidRootLoaderCallbackReturn } from '../errors';
+import { invalidRootLoaderCallbackReturn } from '../errors';
 import { authenticateRequest } from './authenticateRequest';
 import type { LoaderFunctionArgs, LoaderFunctionReturn, RootAuthLoaderCallback, RootAuthLoaderOptions } from './types';
 import {
   assertObject,
   injectAuthIntoRequest,
+  injectRequestStateIntoResponse,
   interstitialJsonResponse,
   isRedirect,
   isResponse,
-  returnLoaderResultJsonResponse,
 } from './utils';
 
 interface RootAuthLoader {
@@ -23,14 +23,14 @@ interface RootAuthLoader {
 
 export const rootAuthLoader: RootAuthLoader = async (
   args: LoaderFunctionArgs,
-  cbOrOptions: any,
+  handlerOrOptions: any,
   options?: any,
 ): Promise<LoaderFunctionReturn> => {
-  const callback = typeof cbOrOptions === 'function' ? cbOrOptions : undefined;
+  const handler = typeof handlerOrOptions === 'function' ? handlerOrOptions : undefined;
   const opts: RootAuthLoaderOptions = options
     ? options
-    : !!cbOrOptions && typeof cbOrOptions !== 'function'
-    ? cbOrOptions
+    : !!handlerOrOptions && typeof handlerOrOptions !== 'function'
+    ? handlerOrOptions
     : {};
 
   const requestState = await authenticateRequest(args, opts);
@@ -39,20 +39,28 @@ export const rootAuthLoader: RootAuthLoader = async (
     throw interstitialJsonResponse(requestState, { loader: 'root' });
   }
 
-  if (!callback) {
-    return returnLoaderResultJsonResponse({ requestState });
+  if (!handler) {
+    // if the user did not provide a handler, simply inject requestState into an empty response
+    return injectRequestStateIntoResponse(new Response(), requestState);
   }
 
-  const callbackResult = await callback(injectAuthIntoRequest(args, sanitizeAuthObject(requestState.toAuth())));
-  assertObject(callbackResult, invalidRootLoaderCallbackReturn);
+  const handlerResult = await handler(injectAuthIntoRequest(args, sanitizeAuthObject(requestState.toAuth())));
+  assertObject(handlerResult, invalidRootLoaderCallbackReturn);
 
-  // Pass through custom responses
-  if (isResponse(callbackResult)) {
-    if (isRedirect(callbackResult)) {
-      return callbackResult;
+  if (isResponse(handlerResult)) {
+    try {
+      // respect and pass-through any redirects without modifying them
+      if (isRedirect(handlerResult)) {
+        return handlerResult;
+      }
+      // clone and try to inject requestState into all json-like responses
+      // if this fails, the user probably didn't return a json object or a valid json string
+      return injectRequestStateIntoResponse(handlerResult, requestState);
+    } catch (e) {
+      throw new Error(invalidRootLoaderCallbackReturn);
     }
-    throw new Error(invalidRootLoaderCallbackResponseReturn);
   }
 
-  return returnLoaderResultJsonResponse({ requestState, callbackResult });
+  // if the user returned a plain object, simply inject requestState into an empty response
+  return injectRequestStateIntoResponse(new Response(), requestState);
 };
