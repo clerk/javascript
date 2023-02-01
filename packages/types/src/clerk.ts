@@ -468,7 +468,6 @@ export interface ClerkOptions {
   touchSession?: boolean;
   /**
    * @experimental
-   * Indicates if the app is a Satellite app.
    */
   isSatellite?: boolean;
 }

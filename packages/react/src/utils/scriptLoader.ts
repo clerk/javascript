@@ -72,7 +72,6 @@ export interface LoadScriptParams {
 
   domain?: string;
   scriptUrl?: string;
-
   scriptVariant?: ScriptVariant;
 }
 
