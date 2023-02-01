@@ -54,6 +54,7 @@ export const ApplicationLogo = (props: ApplicationLogoProps) => {
         elementDescriptor={descriptors.logoImage}
         alt={applicationName}
         src={imageSrc}
+        size={200}
         onLoad={() => setLoaded(true)}
         sx={{
           display: loaded ? 'inline-block' : 'none',
