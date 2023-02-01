@@ -31,7 +31,6 @@ export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JS
     proxyUrl,
     // @ts-expect-error
     domain,
-    isSatellite,
     // @ts-expect-error
     __clerk_ssr_state,
     clerkJSUrl,
@@ -53,7 +52,6 @@ export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JS
       // @ts-expect-error
       proxyUrl={proxyUrl || process.env.NEXT_PUBLIC_CLERK_PROXY_URL || ''}
       domain={domain || ''}
-      isSatellite={isSatellite || false}
       navigate={to => push(to)}
       // withServerSideAuth automatically injects __clerk_ssr_state
       // getAuth returns a user-facing authServerSideProps that hides __clerk_ssr_state
