@@ -32,13 +32,15 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
 
   const jwtKey = getEnvVariable('CLERK_JWT_KEY') || (context?.CLERK_JWT_KEY as string) || opts.jwtKey;
 
+  const apiUrl = getEnvVariable('CLERK_API_URL') || (context?.CLERK_API_URL as string);
+
   const { headers } = request;
   const cookies = parseCookies(request);
 
   const cookieToken = cookies['__session'];
   const headerToken = headers.get('authorization')?.replace('Bearer ', '');
 
-  return Clerk({ apiKey, secretKey, jwtKey }).authenticateRequest({
+  return Clerk({ apiUrl, apiKey, secretKey, jwtKey }).authenticateRequest({
     apiKey,
     secretKey,
     jwtKey,
