@@ -25,7 +25,6 @@ const { applyVariants, filterProps } = createVariants((theme, props: OwnProps) =
       ...common.disabled(theme),
       transitionProperty: theme.transitionProperty.$common,
       transitionDuration: theme.transitionDuration.$controls,
-      type: undefined,
     },
     variants: {
       textVariant: common.textVariants(theme),
@@ -165,7 +164,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
   return (
     <button
       {...applyDataStateProps(rest)}
-      type={rest.type}
+      // Explicitly remove type=submit or type=button
+      // to prevent global css resets (eg tailwind) from affecting
+      // the default styles of our components
+      type={undefined}
       onClick={onClick}
       disabled={isDisabled}
       css={applyVariants(parsedProps)}
