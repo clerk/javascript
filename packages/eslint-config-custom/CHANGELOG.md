@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.0.8](https://github.com/clerkinc/clerk_docker/compare/eslint-config-custom@0.0.8-staging.0...eslint-config-custom@0.0.8) (2023-02-01)
+
+**Note:** Version bump only for package eslint-config-custom
+
 ### [0.0.7](https://github.com/clerkinc/clerk_docker/compare/eslint-config-custom@0.0.7-staging.0...eslint-config-custom@0.0.7) (2023-01-27)
 
 **Note:** Version bump only for package eslint-config-custom

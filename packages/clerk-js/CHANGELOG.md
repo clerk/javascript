@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.25.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.25.0-staging.5...@clerk/clerk-js@4.25.0) (2023-02-01)
+
+### Bug Fixes
+
+- **clerk-js:** Do not discard relative redirect urls ([#754](https://github.com/clerkinc/javascript/issues/754)) ([6b227ff](https://github.com/clerkinc/javascript/commit/6b227ffac5ded2ef30f5f586891c2985c7569805))
+
 ## [4.24.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.24.0-staging.2...@clerk/clerk-js@4.24.0) (2023-01-27)
 
 **Note:** Version bump only for package @clerk/clerk-js
