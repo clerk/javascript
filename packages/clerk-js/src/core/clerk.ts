@@ -953,34 +953,34 @@ export default class Clerk implements ClerkInterface {
     this.#componentControls?.updateProps(props);
   };
 
-  #redirectToSyncWithPrimary = () => {
+  #syncWithPrimary = () => {
     const q = new URLSearchParams({
       redirect_url: `${window.location.href}?synced=true`,
     });
     window.location.replace(new URL(`/v1/client/sync?${q.toString()}`, `https://${this.domain}`).toString());
   };
 
-  #stripSyncedQueryParam = (q: URLSearchParams) => {
-    q.delete('synced');
-    const queryString = q.toString() ? `?${q.toString()}` : '';
-    window.history.replaceState({}, '', `${window.location.pathname}${queryString}`);
-  };
+  #handleSyncedQueryParam = () => {
+    function stripSyncedQueryParam(q: URLSearchParams) {
+      q.delete('synced');
+      const queryString = q.toString() ? `?${q.toString()}` : '';
+      window.history.replaceState({}, '', `${window.location.pathname}${queryString}`);
+    }
 
-  #shouldSyncWithMain = () => {
     const q = new URLSearchParams(window.location.search);
     if (q.get('synced') !== 'true') {
-      this.#redirectToSyncWithPrimary();
       return true;
     }
-    this.#stripSyncedQueryParam(q);
+    stripSyncedQueryParam(q);
     return false;
   };
 
+  #shouldSyncWithPrimary = () => this.#options.isSatellite && this.#handleSyncedQueryParam();
+
   #loadInStandardBrowser = async (): Promise<boolean> => {
-    if (this.#options.isSatellite) {
-      if (this.#shouldSyncWithMain()) {
-        return false;
-      }
+    if (this.#shouldSyncWithPrimary()) {
+      this.#syncWithPrimary();
+      return false;
     }
 
     this.#authService = new AuthenticationService(this);

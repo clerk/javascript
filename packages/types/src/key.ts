@@ -14,14 +14,3 @@ export type PublishableKeyOrFrontendApi =
       frontendApi: string;
       publishableKey?: never;
     };
-
-// export type SatelliteApp =
-//   | { isSatellite?: never }
-//   | {
-//       isSatellite: ClerkInterface['isSatellite'];
-//       proxyUrl: ClerkInterface['proxyUrl'];
-//     }
-//   | {
-//       isSatellite: ClerkInterface['isSatellite'];
-//       domain?: ClerkInterface['domain'];
-//     };
