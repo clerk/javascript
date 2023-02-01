@@ -24,8 +24,11 @@ labels: 'Status: Triage'
 - [ ] `@clerk/themes`
 - [ ] `@clerk/localizations`
 - [ ] `@clerk/clerk-expo`
-- [ ] `@clerk/clerk-sdk-node`
 - [ ] `@clerk/backend`
+- [ ] `@clerk/clerk-sdk-node`
+- [ ] `@clerk/shared`
+- [ ] `gatsby-plugin-clerk`
+- [ ] `build/tooling/chore`
 - [ ] other:
 
 ### Version:
