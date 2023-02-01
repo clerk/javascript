@@ -44,7 +44,7 @@ export const extractAuthProp = (
     ctx.redirectUrl ||
     displayConfig[key];
 
-  if (!isValidUrl(url) || hasBannedProtocol(url)) {
+  if (!isValidUrl(url, { includeRelativeUrls: true }) || hasBannedProtocol(url)) {
     return '';
   }
 

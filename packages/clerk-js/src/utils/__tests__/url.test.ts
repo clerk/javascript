@@ -80,16 +80,16 @@ describe('isValidUrl(url)', () => {
 });
 
 describe('isValidUrl(url,base)', () => {
-  const cases: Array<[string, string | undefined, boolean]> = [
-    ['', 'https://www.clerk.dev/', true],
-    ['/test', 'https://www.clerk.dev/', true],
-    ['/test?clerk=true', 'https://www.clerk.dev/', true],
-    ['/test?clerk=true', '', false],
-    ['/test?clerk=true', undefined, false],
+  const cases: Array<[string, boolean]> = [
+    ['', true],
+    ['/', true],
+    ['/test', true],
+    ['/test?clerk=true', true],
+    ['/?clerk=true', true],
   ];
 
-  test.each(cases)('.isValidUrl(%s,%s)', (a, b, expected) => {
-    expect(isValidUrl(a, b)).toBe(expected);
+  test.each(cases)('.isValidUrl(%s,%s)', (a, expected) => {
+    expect(isValidUrl(a, { includeRelativeUrls: true })).toBe(expected);
   });
 });
 
@@ -108,6 +108,9 @@ describe('hasBannedProtocol(url)', () => {
   const cases: Array<[string, boolean]> = [
     ['https://www.clerk.dev/', false],
     ['http://www.clerk.dev/', false],
+    ['/sign-in', false],
+    ['/sign-in?test=1', false],
+    ['/?test', false],
     ['javascript:console.log(document.cookies)', true],
     ['data:image/png;base64,iVBORw0KGgoAAA5ErkJggg==', false],
   ];

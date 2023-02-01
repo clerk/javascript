@@ -289,13 +289,14 @@ export function removeSearchParameterFromHash({
   return dummyUrlForHash.href.replace(DUMMY_URL_BASE, '');
 }
 
-export function isValidUrl(val: unknown, base?: string): val is string {
-  if (!val && !base) {
+export function isValidUrl(val: unknown, opts?: { includeRelativeUrls?: boolean }): val is string {
+  const { includeRelativeUrls = false } = opts || {};
+  if (!val && !includeRelativeUrls) {
     return false;
   }
 
   try {
-    new URL(val as string, base);
+    new URL(val as string, includeRelativeUrls ? DUMMY_URL_BASE : undefined);
     return true;
   } catch (e) {
     return false;
