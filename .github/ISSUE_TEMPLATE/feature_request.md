@@ -13,10 +13,15 @@ labels: 'Status: Feature Request'
 - [ ] `@clerk/clerk-react`
 - [ ] `@clerk/nextjs`
 - [ ] `@clerk/remix`
-- [ ] `@clerk/clerk-expo`
-- [ ] `@clerk/clerk-sdk-node`
-- [ ] `@clerk/edge`
+- [ ] `@clerk/types`
+- [ ] `@clerk/themes`
 - [ ] `@clerk/localizations`
+- [ ] `@clerk/clerk-expo`
+- [ ] `@clerk/backend`
+- [ ] `@clerk/clerk-sdk-node`
+- [ ] `@clerk/shared`
+- [ ] `gatsby-plugin-clerk`
+- [ ] `build/tooling/chore`
 - [ ] other:
 
 ## Description
