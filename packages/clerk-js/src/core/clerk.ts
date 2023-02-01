@@ -2,6 +2,7 @@ import type { LocalStorageBroadcastChannel } from '@clerk/shared';
 import {
   inClientSide,
   isLegacyFrontendApiKey,
+  isValidBrowserOnline,
   isValidProxyUrl,
   noop,
   parsePublishableKey,
@@ -437,7 +438,7 @@ export default class Clerk implements ClerkInterface {
       session = (this.client.sessions.find(x => x.id === session) as ActiveSessionResource) || null;
     }
 
-    let newSession = (session === undefined ? this.session : session) as ActiveSessionResource | null;
+    let newSession = session === undefined ? this.session : session;
 
     // At this point, the `session` variable should contain either an `ActiveSessionResource`
     // or `null`.
@@ -999,6 +1000,9 @@ export default class Clerk implements ClerkInterface {
           // Purge and try setup again
           await this.#devBrowserHandler.clear();
           await this.#devBrowserHandler.setup();
+        } else if (!isValidBrowserOnline()) {
+          console.warn(err);
+          break;
         } else {
           throw err;
         }
