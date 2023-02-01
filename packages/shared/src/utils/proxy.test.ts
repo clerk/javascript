@@ -25,11 +25,26 @@ describe('isProxyUrlRelative(key)', () => {
 });
 
 describe('proxyUrlToAbsoluteURL(url)', () => {
-  global.window = Object.create(window);
-  // @ts-ignore
-  global.window.location = {
-    origin: 'https://clerk.dev',
-  };
+  const currentLocation = global.window.location;
+
+  beforeEach(() => {
+    Object.defineProperty(global.window, 'location', {
+      get() {
+        return {
+          origin: 'https://clerk.dev',
+        };
+      },
+      configurable: true,
+    });
+  });
+
+  afterEach(() => {
+    Object.defineProperty(global.window, 'location', {
+      value: currentLocation,
+      writable: true,
+    });
+  });
+
   it('returns an absolute URL made from window.location.origin and the partial a path', () => {
     expect(proxyUrlToAbsoluteURL('/api/__clerk')).toBe('https://clerk.dev/api/__clerk');
   });

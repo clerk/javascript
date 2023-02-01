@@ -1,5 +1,3 @@
-import { vi } from 'vitest';
-
 import { LocalStorageBroadcastChannel } from './localStorageBroadcastChannel';
 
 const bcName = 'clerk';
@@ -10,11 +8,11 @@ describe('LocalStorageBroadcastChannel', () => {
     localStorageMock = (() => {
       const store: Record<string, any> = {};
       return {
-        setItem: vi.fn((key, value) => {
+        setItem: jest.fn((key, value) => {
           store[key] = value;
           window.dispatchEvent(new StorageEvent('storage', { key, newValue: value }));
         }),
-        removeItem: vi.fn(key => {
+        removeItem: jest.fn(key => {
           store[key] = undefined;
           window.dispatchEvent(new Event('storage'));
         }),
@@ -24,9 +22,9 @@ describe('LocalStorageBroadcastChannel', () => {
   });
 
   it('notifies other LocalStorageBroadcastChannel with same name', () => {
-    const tab1ClerkBCListener = vi.fn();
-    const tab1DifferentBCListener = vi.fn();
-    const tab2ClerkBCListener = vi.fn();
+    const tab1ClerkBCListener = jest.fn();
+    const tab1DifferentBCListener = jest.fn();
+    const tab2ClerkBCListener = jest.fn();
 
     const tab1ClerkBC = new LocalStorageBroadcastChannel(bcName);
     const tab1DifferentBC = new LocalStorageBroadcastChannel('somethingElse');

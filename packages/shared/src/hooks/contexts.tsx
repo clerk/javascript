@@ -7,7 +7,6 @@ import type {
   OrganizationResource,
   UserResource,
 } from '@clerk/types';
-import React from 'react';
 
 import { createContextAndHook } from './createContextAndHook';
 

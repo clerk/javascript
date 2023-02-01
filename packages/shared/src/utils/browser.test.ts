@@ -1,5 +1,3 @@
-import { vi } from 'vitest';
-
 import { detectUserAgentRobot, inBrowser, isValidBrowserOnline } from './browser';
 
 describe('inBrowser()', () => {
@@ -43,10 +41,10 @@ describe('isValidBrowserOnline', () => {
   let connectionGetter: any;
 
   beforeEach(() => {
-    userAgentGetter = vi.spyOn(window.navigator, 'userAgent', 'get');
-    webdriverGetter = vi.spyOn(window.navigator, 'webdriver', 'get');
+    userAgentGetter = jest.spyOn(window.navigator, 'userAgent', 'get');
+    webdriverGetter = jest.spyOn(window.navigator, 'webdriver', 'get');
     // @ts-ignore
-    connectionGetter = vi.spyOn(window.navigator, 'connection', 'get');
+    connectionGetter = jest.spyOn(window.navigator, 'connection', 'get');
   });
 
   it('returns TRUE if user agent is online, has disabled webdriver, and not a bot', () => {
