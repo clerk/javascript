@@ -9,20 +9,21 @@
   },
   "dependencies": {
     "@clerk/backend": "file:.yalc/@clerk/backend",
+    "@clerk/clerk-react": "file:.yalc/@clerk/clerk-react",
     "@clerk/remix": "file:.yalc/@clerk/remix",
     "@clerk/types": "file:.yalc/@clerk/types",
-    "@remix-run/node": "^1.7.5",
-    "@remix-run/react": "^1.7.5",
-    "@remix-run/serve": "^1.7.5",
+    "@remix-run/node": "^1.12.0",
+    "@remix-run/react": "^1.12.0",
+    "@remix-run/serve": "^1.12.0",
     "isbot": "^3.6.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@remix-run/dev": "^1.7.5",
-    "@remix-run/eslint-config": "^1.7.5",
-    "@types/react": "^18.0.25",
-    "@types/react-dom": "^18.0.8",
+    "@remix-run/dev": "^1.12.0",
+    "@remix-run/eslint-config": "^1.12.0",
+    "@types/react": "^18.0.27",
+    "@types/react-dom": "^18.0.10",
     "eslint": "^8.27.0",
     "typescript": "^4.8.4"
   },
