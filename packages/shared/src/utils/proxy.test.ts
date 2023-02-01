@@ -1,6 +1,6 @@
 import { isProxyUrlRelative, isValidProxyUrl, proxyUrlToAbsoluteURL } from './proxy';
 
-describe.concurrent('isValidProxyUrl(key)', () => {
+describe('isValidProxyUrl(key)', () => {
   it('returns true if the proxyUrl is valid', () => {
     expect(isValidProxyUrl('https://proxy-app.dev/api/__clerk')).toBe(true);
   });
@@ -14,7 +14,7 @@ describe.concurrent('isValidProxyUrl(key)', () => {
   });
 });
 
-describe.concurrent('isProxyUrlRelative(key)', () => {
+describe('isProxyUrlRelative(key)', () => {
   it('returns true if the proxyUrl starts with `/`', () => {
     expect(isProxyUrlRelative('/api/__clerk')).toBe(true);
   });
@@ -24,7 +24,7 @@ describe.concurrent('isProxyUrlRelative(key)', () => {
   });
 });
 
-describe.concurrent('proxyUrlToAbsoluteURL(url)', () => {
+describe('proxyUrlToAbsoluteURL(url)', () => {
   global.window = Object.create(window);
   // @ts-ignore
   global.window.location = {

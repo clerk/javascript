@@ -4,7 +4,7 @@ import { LocalStorageBroadcastChannel } from './localStorageBroadcastChannel';
 
 const bcName = 'clerk';
 
-describe.concurrent('LocalStorageBroadcastChannel', () => {
+describe('LocalStorageBroadcastChannel', () => {
   let localStorageMock;
   beforeEach(() => {
     localStorageMock = (() => {

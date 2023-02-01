@@ -1,6 +1,6 @@
 import { toSentence } from './array';
 
-describe.concurrent('toSentence', () => {
+describe('toSentence', () => {
   it('returns a single item as-is', () => {
     expect(toSentence(['xyz'])).toBe('xyz');
     expect(toSentence(['abc'])).toBe('abc');

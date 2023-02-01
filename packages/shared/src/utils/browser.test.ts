@@ -2,7 +2,7 @@ import { vi } from 'vitest';
 
 import { detectUserAgentRobot, inBrowser, isValidBrowserOnline } from './browser';
 
-describe.concurrent('inBrowser()', () => {
+describe('inBrowser()', () => {
   it('returns true if window is defined', () => {
     expect(inBrowser()).toBe(true);
   });

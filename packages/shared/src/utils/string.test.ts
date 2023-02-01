@@ -1,6 +1,6 @@
 import { isIPV4Address, titleize } from './string';
 
-describe.concurrent('isIPV4Address(str)', () => {
+describe('isIPV4Address(str)', () => {
   it('checks if as string is an IP V4', () => {
     expect(isIPV4Address(null)).toBe(false);
     expect(isIPV4Address(undefined)).toBe(false);
@@ -9,7 +9,7 @@ describe.concurrent('isIPV4Address(str)', () => {
   });
 });
 
-describe.concurrent('titleize(str)', () => {
+describe('titleize(str)', () => {
   it('titleizes the string', () => {
     expect(titleize(null)).toBe('');
     expect(titleize(undefined)).toBe('');

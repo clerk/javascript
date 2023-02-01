@@ -2,7 +2,7 @@ import type { Color } from '@clerk/types';
 
 import { colorToSameTypeString, hexStringToRgbaColor, stringToHslaColor, stringToSameTypeColor } from './cssColorUtils';
 
-describe.concurrent('stringToHslaColor(color)', function () {
+describe('stringToHslaColor(color)', function () {
   const hsla = { h: 195, s: 1, l: 0.5 };
   const cases: Array<[string, Color | null]> = [
     ['', null],
@@ -18,7 +18,7 @@ describe.concurrent('stringToHslaColor(color)', function () {
   });
 });
 
-describe.concurrent('hexStringToRgbaColor(color)', function () {
+describe('hexStringToRgbaColor(color)', function () {
   const cases: Array<[string, Color | null]> = [
     ['#00bfff', { r: 0, g: 191, b: 255 }],
     ['00bfff', { r: 0, g: 191, b: 255 }],
@@ -29,7 +29,7 @@ describe.concurrent('hexStringToRgbaColor(color)', function () {
   });
 });
 
-describe.concurrent('stringToSameTypeColor(color)', function () {
+describe('stringToSameTypeColor(color)', function () {
   const cases: Array<[string, Color | null]> = [
     ['', ''],
     ['invalid', ''],
@@ -52,7 +52,7 @@ describe.concurrent('stringToSameTypeColor(color)', function () {
   });
 });
 
-describe.concurrent('colorToSameTypeString(color)', function () {
+describe('colorToSameTypeString(color)', function () {
   const cases: Array<[Color, string]> = [
     ['', ''],
     ['invalid', ''],
