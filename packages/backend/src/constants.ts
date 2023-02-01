@@ -25,10 +25,15 @@ const Headers = {
   UserAgent: 'user-agent',
   Origin: 'origin',
   Host: 'host',
+  ContentType: 'content-type',
 } as const;
 
 const SearchParams = {
   AuthStatus: Headers.AuthStatus,
+} as const;
+
+const ContentTypes = {
+  Json: 'application/json',
 } as const;
 
 export const constants = {
@@ -36,4 +41,5 @@ export const constants = {
   Cookies,
   Headers,
   SearchParams,
+  ContentTypes,
 } as const;
