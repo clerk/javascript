@@ -1,5 +1,5 @@
 import type { AuthObject, RequestState } from '@clerk/backend';
-import { debugRequestState, loadInterstitialFromLocal } from '@clerk/backend';
+import { constants, debugRequestState, loadInterstitialFromLocal } from '@clerk/backend';
 import { LIB_VERSION } from '@clerk/clerk-react/dist/info';
 import { json } from '@remix-run/server-runtime';
 import cookie from 'cookie';
@@ -23,9 +23,6 @@ export function injectAuthIntoRequest(args: LoaderFunctionArgs, authObject: Auth
   return args as LoaderFunctionArgsWithAuth;
 }
 
-/**
- * @internal
- */
 export function isResponse(value: any): value is Response {
   return (
     value != null &&
@@ -36,32 +33,20 @@ export function isResponse(value: any): value is Response {
   );
 }
 
-/**
- * @internal
- */
 export function isRedirect(res: Response): boolean {
   return res.status >= 300 && res.status < 400;
 }
 
-/**
- * @internal
- */
 export const parseCookies = (req: Request) => {
   return cookie.parse(req.headers.get('cookie') || '');
 };
 
-/**
- * @internal
- */
 export function assertObject(val: any, error?: string): asserts val is Record<string, unknown> {
   if (!val || typeof val !== 'object' || Array.isArray(val)) {
     throw new Error(error || '');
   }
 }
 
-/**
- * @internal
- */
 export const interstitialJsonResponse = (requestState: RequestState, opts: { loader: 'root' | 'nested' }) => {
   return json(
     wrapWithClerkState({
@@ -77,20 +62,21 @@ export const interstitialJsonResponse = (requestState: RequestState, opts: { loa
   );
 };
 
-/**
- * @internal
- */
-export const returnLoaderResultJsonResponse = (opts: { requestState: RequestState; callbackResult?: any }) => {
-  const { reason, message, isSignedIn, isInterstitial, ...rest } = opts.requestState;
-  return json({
-    ...(opts.callbackResult || {}),
-    ...wrapWithClerkState({
-      __clerk_ssr_state: rest,
-      __frontendApi: opts.requestState.frontendApi,
-      __publishableKey: opts.requestState.publishableKey,
-      __clerk_debug: debugRequestState(opts.requestState),
-    }),
+export const injectRequestStateIntoResponse = async (response: Response, requestState: RequestState) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { reason, message, isSignedIn, isInterstitial, ...rest } = requestState;
+  const clone = response.clone();
+  const data = await clone.json();
+  const clerkState = wrapWithClerkState({
+    __clerk_ssr_state: rest,
+    __frontendApi: requestState.frontendApi,
+    __publishableKey: requestState.publishableKey,
+    __clerk_debug: debugRequestState(requestState),
   });
+  // set the correct content-type header in case the user returned a `Response` directly
+  // without setting the header, instead of using the `json()` helper
+  clone.headers.set(constants.Headers.ContentType, constants.ContentTypes.Json);
+  return json({ ...(data || {}), ...clerkState }, clone);
 };
 
 /**
