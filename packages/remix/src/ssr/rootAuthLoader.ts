@@ -41,7 +41,7 @@ export const rootAuthLoader: RootAuthLoader = async (
 
   if (!handler) {
     // if the user did not provide a handler, simply inject requestState into an empty response
-    return injectRequestStateIntoResponse(new Response(), requestState);
+    return injectRequestStateIntoResponse(new Response(JSON.stringify({})), requestState);
   }
 
   const handlerResult = await handler(injectAuthIntoRequest(args, sanitizeAuthObject(requestState.toAuth())));
@@ -62,5 +62,5 @@ export const rootAuthLoader: RootAuthLoader = async (
   }
 
   // if the user returned a plain object, simply inject requestState into an empty response
-  return injectRequestStateIntoResponse(new Response(), requestState);
+  return injectRequestStateIntoResponse(new Response(JSON.stringify({})), requestState);
 };
