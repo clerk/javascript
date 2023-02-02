@@ -51,6 +51,7 @@ import {
   appendAsQueryParams,
   buildURL,
   createBeforeUnloadTracker,
+  createClerkQueryParam,
   createPageLifecycle,
   errorThrower,
   getClerkQueryParam,
@@ -63,6 +64,7 @@ import {
   isError,
   noOrganizationExists,
   noUserExists,
+  removeClerkQueryParam,
   sessionExistsAndSingleSessionModeEnabled,
   setSearchParameterInHash,
   stripOrigin,
@@ -955,23 +957,16 @@ export default class Clerk implements ClerkInterface {
 
   #syncWithPrimary = () => {
     const q = new URLSearchParams({
-      redirect_url: `${window.location.href}?synced=true`,
+      redirect_url: createClerkQueryParam('__clerk_synced', 'true').toString(),
     });
     window.location.replace(new URL(`/v1/client/sync?${q.toString()}`, `https://${this.domain}`).toString());
   };
 
   #handleSyncedQueryParam = () => {
-    function stripSyncedQueryParam(q: URLSearchParams) {
-      q.delete('synced');
-      const queryString = q.toString() ? `?${q.toString()}` : '';
-      window.history.replaceState({}, '', `${window.location.pathname}${queryString}`);
-    }
-
-    const q = new URLSearchParams(window.location.search);
-    if (q.get('synced') !== 'true') {
+    if (getClerkQueryParam('__clerk_synced') !== 'true') {
       return true;
     }
-    stripSyncedQueryParam(q);
+    removeClerkQueryParam('__clerk_synced');
     return false;
   };
 
