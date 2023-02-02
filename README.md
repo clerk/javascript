@@ -47,6 +47,7 @@ For package specific details on installation, architecture and usage usage, you 
 - [`@clerk/clerk-react`](./packages/react) Clerk package for React applications.
 - [`@clerk/clerk-expo`](./packages/expo) Clerk package for the Expo universal app framework.
 - [`@clerk/types`](./packages/types) Main TypeScript typings for Clerk libraries.
+- [`@clerk/fastify`](./packages/fastify): Clerk package for Fastify.
 - ...
 
 Additionally there are packages which act as shared utilities or building blocks.

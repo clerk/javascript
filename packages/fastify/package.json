@@ -1,0 +1,55 @@
+{
+  "name": "@clerk/fastify",
+  "version": "0.0.1",
+  "license": "MIT",
+  "private": true,
+  "description": "Clerk.dev SDK for Fastify",
+  "keywords": [
+    "auth",
+    "authentication",
+    "passwordless",
+    "session",
+    "jwt",
+    "fastify"
+  ],
+  "author": "Clerk",
+  "types": "./dist/types/index.d.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/esm/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "prepublishOnly": "npm run build",
+    "dev": "tsup --watch",
+    "build": "tsup --env.NODE_ENV production",
+    "clean": "rimraf ./dist",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@clerk/types": "^3.25.1",
+    "@clerk/clerk-sdk-node": "^4.6.5"
+  },
+  "devDependencies": {
+    "tsup": "*",
+    "typescript": "*"
+  },
+  "peerDependencies": {
+    "fastify": ">=4"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/clerkinc/javascript.git"
+  },
+  "bugs": {
+    "url": "https://github.com/clerkinc/javascript/issues"
+  },
+  "homepage": "https://clerk.dev/",
+  "sideEffects": false
+}
