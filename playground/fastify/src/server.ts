@@ -1,20 +1,11 @@
 import 'dotenv/config';
-import Fastify, { FastifyInstance } from 'fastify';
-import { withAuth } from '@clerk/clerk-sdk-node';
-import type { WithAuthProp } from '@clerk/clerk-sdk-node';
-import type { FastifyRequest, FastifyReply } from 'fastify';
+import Fastify from 'fastify';
+import { clerkPlugin, getAuth } from '@clerk/fastify';
+import type { FastifyInstance } from 'fastify';
 
 const server: FastifyInstance = Fastify({ logger: true });
 
-server.addHook('onRequest', async (_: any, reply: any) => {
-  // reply.setHeader = reply.raw.setHeader.bind(reply.raw);
-  // reply.writeHead = reply.raw.writeHead.bind(reply.raw);
-  // reply.end = reply.raw.end.bind(reply.raw);
-
-  reply.setHeader = (...args: any[]) => reply.raw.setHeader(...args);
-  reply.writeHead = (...args: any[]) => reply.raw.writeHead(...args);
-  reply.end = (...args: any[]) => reply.raw.end(...args);
-});
+server.register(clerkPlugin);
 
 server.route({
   method: 'GET',
@@ -34,17 +25,9 @@ server.route({
       },
     },
   },
-  // this function is executed for every request before the handler is executed
-  preHandler: withAuth<FastifyRequest, FastifyReply>((request: WithAuthProp<FastifyRequest>, reply: FastifyReply) => {
-    const { sessionId } = request.auth;
-    console.log({ sessionId });
-    if (!sessionId) {
-      reply.status(401);
-      reply.send({ error: 'User could not be verified' });
-    }
-  }),
-  // @ts-ignore
-  handler: async (request, reply) => {
+  handler: async (request, _reply) => {
+    const auth = getAuth(request);
+    console.log('====auth===', auth);
     return { hello: 'world' };
   },
 });
