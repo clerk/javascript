@@ -1,11 +1,11 @@
 import type { Clerk, RequestState } from '@clerk/backend';
 import { constants } from '@clerk/backend';
 import cookie from 'cookie';
-import type { Request as ExpressRequest, Response as ExpressResponse } from 'express';
+import type { IncomingMessage, ServerResponse } from 'http';
 
 import type { ClerkMiddlewareOptions } from './types';
 
-const parseCookies = (req: ExpressRequest) => {
+const parseCookies = (req: IncomingMessage) => {
   return cookie.parse(req.headers['cookie'] || '');
 };
 
@@ -15,7 +15,7 @@ export const authenticateRequest = (
   secretKey: string,
   frontendApi: string,
   publishableKey: string,
-  req: ExpressRequest,
+  req: IncomingMessage,
   options?: ClerkMiddlewareOptions,
 ) => {
   const cookies = parseCookies(req);
@@ -38,14 +38,14 @@ export const authenticateRequest = (
   });
 };
 
-export const handleInterstitialCase = (res: ExpressResponse, requestState: RequestState, interstitial: string) => {
+export const handleInterstitialCase = (res: ServerResponse, requestState: RequestState, interstitial: string) => {
   if (requestState.isInterstitial || requestState.isUnknown) {
     res.writeHead(401, { 'Content-Type': 'text/html' });
     res.end(interstitial);
   }
 };
 
-export const decorateResponseWithObservabilityHeaders = (res: ExpressResponse, requestState: RequestState) => {
+export const decorateResponseWithObservabilityHeaders = (res: ServerResponse, requestState: RequestState) => {
   requestState.message && res.setHeader(constants.Headers.AuthMessage, requestState.message);
   requestState.reason && res.setHeader(constants.Headers.AuthReason, requestState.reason);
   requestState.status && res.setHeader(constants.Headers.AuthStatus, requestState.status);
