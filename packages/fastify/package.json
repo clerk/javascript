@@ -2,7 +2,6 @@
   "name": "@clerk/fastify",
   "version": "0.0.2-staging.0",
   "license": "MIT",
-  "private": true,
   "description": "Clerk.dev SDK for Fastify",
   "keywords": [
     "auth",
@@ -27,15 +26,18 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@clerk/clerk-sdk-node": "^4.6.5",
-    "@clerk/types": "^3.25.1"
+    "@clerk/clerk-sdk-node": "^4.7.0-staging.1",
+    "@clerk/types": "^3.26.0-staging.1",
+    "@clerk/backend": "^0.6.0-staging.0",
+    "cookies": "^0.8.0"
   },
   "devDependencies": {
     "tsup": "*",
     "typescript": "*"
   },
   "peerDependencies": {
-    "fastify": ">=4"
+    "fastify": ">=4",
+    "fastify-plugin": "^4.5.0"
   },
   "engines": {
     "node": ">=14"
