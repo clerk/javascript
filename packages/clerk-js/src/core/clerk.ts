@@ -955,11 +955,16 @@ export default class Clerk implements ClerkInterface {
     this.#componentControls?.updateProps(props);
   };
 
-  #syncWithPrimary = () => {
+  #syncWithPrimary = async () => {
     const q = new URLSearchParams({
       redirect_url: createClerkQueryParam('__clerk_synced', 'true').toString(),
     });
-    window.location.replace(new URL(`/v1/client/sync?${q.toString()}`, `https://${this.domain}`).toString());
+    if (this.proxyUrl) {
+      const proxy = new URL(this.proxyUrl);
+      windowNavigate(new URL(`${proxy.pathname}/v1/client/sync?${q.toString()}`, proxy.origin).toString());
+    } else {
+      await this.navigate(new URL(`/v1/client/sync?${q.toString()}`, `https://${this.domain}`).toString());
+    }
   };
 
   #handleSyncedQueryParam = () => {
@@ -974,7 +979,7 @@ export default class Clerk implements ClerkInterface {
 
   #loadInStandardBrowser = async (): Promise<boolean> => {
     if (this.#shouldSyncWithPrimary()) {
-      this.#syncWithPrimary();
+      await this.#syncWithPrimary();
       return false;
     }
 
