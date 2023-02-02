@@ -15,11 +15,20 @@ type TagInputProps = Pick<PropsOfComponent<typeof Flex>, 'sx'> & {
   onChange: React.ChangeEventHandler<HTMLInputElement>;
   validate?: (tag: Tag) => boolean;
   placeholder?: LocalizationKey | string;
+  autoFocus?: boolean;
 };
 
 export const TagInput = (props: TagInputProps) => {
   const { t } = useLocalizations();
-  const { sx, placeholder, validate = () => true, value: valueProp, onChange: onChangeProp, ...rest } = props;
+  const {
+    sx,
+    placeholder,
+    validate = () => true,
+    value: valueProp,
+    onChange: onChangeProp,
+    autoFocus,
+    ...rest
+  } = props;
   const tags = valueProp.split(',').map(sanitize).filter(Boolean);
   const tagsSet = new Set(tags);
   const keyReleasedRef = React.useRef(true);
@@ -138,6 +147,7 @@ export const TagInput = (props: TagInputProps) => {
         onChange={handleChange}
         onPaste={handlePaste}
         focusRing={false}
+        autoFocus={autoFocus}
         sx={t => ({
           flexGrow: 1,
           border: 'none',

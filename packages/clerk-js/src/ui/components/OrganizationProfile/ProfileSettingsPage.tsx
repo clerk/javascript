@@ -76,6 +76,7 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
           <Form.ControlRow elementId={nameField.id}>
             <Form.Control
               {...nameField.props}
+              autoFocus
               required
             />
           </Form.ControlRow>
