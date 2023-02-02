@@ -1,6 +1,6 @@
 import { isProxyUrlRelative, isValidProxyUrl, proxyUrlToAbsoluteURL } from './proxy';
 
-describe.concurrent('isValidProxyUrl(key)', () => {
+describe('isValidProxyUrl(key)', () => {
   it('returns true if the proxyUrl is valid', () => {
     expect(isValidProxyUrl('https://proxy-app.dev/api/__clerk')).toBe(true);
   });
@@ -14,7 +14,7 @@ describe.concurrent('isValidProxyUrl(key)', () => {
   });
 });
 
-describe.concurrent('isProxyUrlRelative(key)', () => {
+describe('isProxyUrlRelative(key)', () => {
   it('returns true if the proxyUrl starts with `/`', () => {
     expect(isProxyUrlRelative('/api/__clerk')).toBe(true);
   });
@@ -24,12 +24,27 @@ describe.concurrent('isProxyUrlRelative(key)', () => {
   });
 });
 
-describe.concurrent('proxyUrlToAbsoluteURL(url)', () => {
-  global.window = Object.create(window);
-  // @ts-ignore
-  global.window.location = {
-    origin: 'https://clerk.dev',
-  };
+describe('proxyUrlToAbsoluteURL(url)', () => {
+  const currentLocation = global.window.location;
+
+  beforeEach(() => {
+    Object.defineProperty(global.window, 'location', {
+      get() {
+        return {
+          origin: 'https://clerk.dev',
+        };
+      },
+      configurable: true,
+    });
+  });
+
+  afterEach(() => {
+    Object.defineProperty(global.window, 'location', {
+      value: currentLocation,
+      writable: true,
+    });
+  });
+
   it('returns an absolute URL made from window.location.origin and the partial a path', () => {
     expect(proxyUrlToAbsoluteURL('/api/__clerk')).toBe('https://clerk.dev/api/__clerk');
   });

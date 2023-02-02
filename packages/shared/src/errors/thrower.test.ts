@@ -1,7 +1,7 @@
 import type { ErrorThrowerOptions } from './thrower';
 import { buildErrorThrower } from './thrower';
 
-describe.concurrent('ErrorThrower', () => {
+describe('ErrorThrower', () => {
   const errorThrower = buildErrorThrower({ packageName: '@clerk/test-package' });
 
   it('throws the correct error message and interpolates pkg and known parameters', () => {

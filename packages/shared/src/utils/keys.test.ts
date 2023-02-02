@@ -1,6 +1,6 @@
 import { buildPublishableKey, isLegacyFrontendApiKey, isPublishableKey, parsePublishableKey } from './keys';
 
-describe.concurrent('buildPublishableKey(key)', () => {
+describe('buildPublishableKey(key)', () => {
   const cases = [
     ['example.clerk.accounts.dev', 'pk_live_ZXhhbXBsZS5jbGVyay5hY2NvdW50cy5kZXYk'],
     ['foo-bar-13.clerk.accounts.dev', 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk'],
@@ -15,7 +15,7 @@ describe.concurrent('buildPublishableKey(key)', () => {
   );
 });
 
-describe.concurrent('parsePublishableKey(key)', () => {
+describe('parsePublishableKey(key)', () => {
   const cases = [
     [null, null],
     [undefined, null],
@@ -37,7 +37,7 @@ describe.concurrent('parsePublishableKey(key)', () => {
   });
 });
 
-describe.concurrent('isPublishableKey(key)', () => {
+describe('isPublishableKey(key)', () => {
   it('returns true if the key is a valid publishable key', () => {
     expect(isPublishableKey('pk_live_Y2xlcmsuY2xlcmsuZGV2JA==')).toBe(true);
   });
@@ -47,7 +47,7 @@ describe.concurrent('isPublishableKey(key)', () => {
   });
 });
 
-describe.concurrent('isLegacyFrontendApiKey(key)', () => {
+describe('isLegacyFrontendApiKey(key)', () => {
   it('returns true if the key is a valid legacy frontend Api key', () => {
     expect(isLegacyFrontendApiKey('clerk.clerk.dev')).toBe(true);
   });

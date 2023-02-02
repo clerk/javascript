@@ -1,6 +1,6 @@
 import { parseSearchParams } from './url';
 
-describe.concurrent('parseSearchParams(queryString)', () => {
+describe('parseSearchParams(queryString)', () => {
   it('parses query string and returns a URLSearchParams object', () => {
     let searchParams = parseSearchParams('');
     expect(searchParams.get('foo')).toBeNull();

@@ -1,8 +1,8 @@
 import type { RelativeDateCase } from './date';
 import { addYears, dateTo12HourTime, differenceInCalendarDays, formatRelative } from './date';
 
-describe.concurrent('date utils', () => {
-  describe.concurrent('dateTo12HourTime(date)', () => {
+describe('date utils', () => {
+  describe('dateTo12HourTime(date)', () => {
     const cases: Array<[Date | undefined, string]> = [
       [undefined, ''],
       [new Date('1/1/2020 23:15'), '11:15 PM'],
@@ -17,7 +17,7 @@ describe.concurrent('date utils', () => {
     });
   });
 
-  describe.concurrent('differenceInCalendarDays(date1, date2)', () => {
+  describe('differenceInCalendarDays(date1, date2)', () => {
     const cases: Array<[Date | undefined, Date, { absolute: boolean }, number]> = [
       [undefined, new Date(), { absolute: true }, 0],
       [new Date('1/1/2020'), new Date('1/2/2020'), { absolute: true }, 1],
@@ -36,7 +36,7 @@ describe.concurrent('date utils', () => {
     });
   });
 
-  describe.concurrent('formatRelative(date)', () => {
+  describe('formatRelative(date)', () => {
     const cases: Array<[Date | undefined, Date | undefined, RelativeDateCase | null]> = [
       [undefined, undefined, null],
       [new Date('1/1/2020 23:15'), new Date('1/1/2020'), 'sameDay'],
@@ -53,7 +53,7 @@ describe.concurrent('date utils', () => {
     });
   });
 
-  describe.concurrent('addYears(date, number)', () => {
+  describe('addYears(date, number)', () => {
     const cases: Array<[Date, number, Date]> = [
       [new Date('1/1/2020 23:15'), 1, new Date('1/1/2021 23:15')],
       [new Date('1/1/2019 23:15'), 1, new Date('1/1/2020 23:15')],

@@ -1,6 +1,6 @@
 import { deepCamelToSnake, deepSnakeToCamel } from './object';
 
-describe.concurrent('camelToSnakeKeys', () => {
+describe('camelToSnakeKeys', () => {
   it('creates a copy and does not modify the original', () => {
     const original = {
       an_arr: [{ hello_there: 'hey' }],
