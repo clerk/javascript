@@ -111,6 +111,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
             <Text localizationKey={localizationKeys('formFieldLabel__emailAddresses')} />
             <TagInput
               {...emailAddressField.props}
+              autoFocus
               validate={isEmail}
               sx={{ width: '100%' }}
             />

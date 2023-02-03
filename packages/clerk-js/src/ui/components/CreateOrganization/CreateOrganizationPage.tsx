@@ -78,6 +78,7 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
           <Form.ControlRow elementId={nameField.id}>
             <Form.Control
               sx={{ flexBasis: '80%' }}
+              autoFocus
               {...nameField.props}
               required
             />

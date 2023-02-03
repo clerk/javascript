@@ -91,6 +91,7 @@ export const ProfilePage = withCardStateProvider(() => {
           {showFirstName && (
             <Form.ControlRow elementId={firstNameField.id}>
               <Form.Control
+                autoFocus
                 {...firstNameField.props}
                 required={first_name.required}
               />
