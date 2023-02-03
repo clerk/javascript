@@ -77,7 +77,7 @@ const clerkWithMiddleware = (opts: Record<never, never>) => {
 
 const plugin: FastifyPluginCallback = (instance: FastifyInstance, opts, done) => {
   polyfillServerResponseMethods(instance);
-  instance.decorateRequest('auth', {});
+  instance.decorateRequest('auth', null);
   // run clerk as a middleware to all scoped routes
   instance.addHook('preHandler', clerkWithMiddleware(opts));
 
