@@ -3,11 +3,11 @@ import {
   AuthStatus,
   constants,
   decodeJwt,
+  makeAuthObjectSerializable,
   sanitizeAuthObject,
   signedInAuthObject,
   signedOutAuthObject,
 } from '@clerk/backend';
-import { makeAuthObjectSerializable } from '@clerk/backend/src';
 
 import { API_KEY, API_URL, API_VERSION, SECRET_KEY } from './clerk';
 import type { RequestLike } from './types';
