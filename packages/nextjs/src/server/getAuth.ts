@@ -1,4 +1,4 @@
-import type { Organization, Session, User, SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend';
+import type { Organization, Session, SignedInAuthObject, SignedOutAuthObject, User } from '@clerk/backend';
 import {
   AuthStatus,
   constants,
@@ -7,6 +7,7 @@ import {
   signedInAuthObject,
   signedOutAuthObject,
 } from '@clerk/backend';
+import { makeAuthObjectSerializable } from '@clerk/backend/src';
 
 import { API_KEY, API_URL, API_VERSION, SECRET_KEY } from './clerk';
 import type { RequestLike } from './types';
@@ -76,7 +77,7 @@ export const buildClerkProps: BuildClerkProps = (req, initState = {}) => {
     token: raw.text,
   });
 
-  const sanitizedAuthObject = sanitizeAuthObject({ ...authObject, ...initState });
+  const sanitizedAuthObject = makeAuthObjectSerializable(sanitizeAuthObject({ ...authObject, ...initState }));
   return injectSSRStateIntoObject({}, sanitizedAuthObject);
 };
 

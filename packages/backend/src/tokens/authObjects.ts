@@ -147,6 +147,20 @@ export function sanitizeAuthObject<T extends Record<any, any>>(authObject: T): T
   return { ...authObject, user, organization };
 }
 
+/**
+ * Auth objects moving through the server -> client boundary need to be serializable
+ * as we need to ensure that they can be transferred via the network as pure strings.
+ * Some frameworks like Remix or Next (/pages dir only) handle this serialization by simply
+ * ignoring any non-serializable keys, however Nextjs /app directory is stricter and
+ * throws an error if a non-serializable value is found.
+ */
+export const makeAuthObjectSerializable = <T extends Record<string, unknown>>(obj: T): T => {
+  // remove any non-serializable props from the returned object
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { debug, getToken, ...rest } = obj as unknown as AuthObject;
+  return rest as unknown as T;
+};
+
 type TokenFetcher = (sessionId: string, template: string) => Promise<string>;
 
 type CreateGetToken = (params: { sessionId: string; sessionToken: string; fetcher: TokenFetcher }) => ServerGetToken;
