@@ -1,7 +1,14 @@
 import { constants } from '@clerk/backend';
 import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
-import { API_URL, clerkClient, FRONTEND_API, PUBLISHABLE_KEY, sanitizeAuthObject } from '../server/clerk';
+import {
+  API_URL,
+  clerkClient,
+  FRONTEND_API,
+  makeAuthObjectSerializable,
+  PUBLISHABLE_KEY,
+  sanitizeAuthObject,
+} from '../server/clerk';
 import type { WithServerSideAuthCallback, WithServerSideAuthOptions, WithServerSideAuthResult } from './types';
 import { authenticateRequest, injectAuthIntoRequest, injectSSRStateIntoProps } from './utils';
 
@@ -45,6 +52,6 @@ export const withServerSideAuth: WithServerSideAuth = (cbOrOptions: any, options
     const legacyAuthData = { ...requestState.toAuth(), claims: requestState.toAuth().sessionClaims };
     const contextWithAuth = injectAuthIntoRequest(ctx, legacyAuthData);
     const callbackResult = (await cb?.(contextWithAuth)) || {};
-    return injectSSRStateIntoProps(callbackResult, sanitizeAuthObject(legacyAuthData));
+    return injectSSRStateIntoProps(callbackResult, makeAuthObjectSerializable(sanitizeAuthObject(legacyAuthData)));
   };
 };

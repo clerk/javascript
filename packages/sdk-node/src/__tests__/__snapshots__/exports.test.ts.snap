@@ -45,6 +45,7 @@ Array [
   "hasValidSignature",
   "invitations",
   "loadInterstitialFromLocal",
+  "makeAuthObjectSerializable",
   "organizations",
   "phoneNumbers",
   "prunePrivateMetadata",
