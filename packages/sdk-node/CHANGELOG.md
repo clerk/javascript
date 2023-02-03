@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.6.6](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@4.6.5-staging.4...@clerk/clerk-sdk-node@4.6.6) (2023-02-03)
+
+### Bug Fixes
+
+- **backend,nextjs:** Serialize auth objects before sending to client ([#760](https://github.com/clerkinc/javascript/issues/760)) ([0614c97](https://github.com/clerkinc/javascript/commit/0614c97e55829961dcd1ff398ac12dbef101bf5b))
+
 ### [4.6.5](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@4.6.5-staging.4...@clerk/clerk-sdk-node@4.6.5) (2023-02-01)
 
 **Note:** Version bump only for package @clerk/clerk-sdk-node

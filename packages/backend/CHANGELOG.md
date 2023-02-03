@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.5.2](https://github.com/clerkinc/javascript/compare/@clerk/backend@0.5.1...@clerk/backend@0.5.2) (2023-02-03)
+
+### Bug Fixes
+
+- **backend,nextjs:** Serialize auth objects before sending to client ([#760](https://github.com/clerkinc/javascript/issues/760)) ([0614c97](https://github.com/clerkinc/javascript/commit/0614c97e55829961dcd1ff398ac12dbef101bf5b))
+
 ### [0.5.1](https://github.com/clerkinc/javascript/compare/@clerk/backend@0.5.1-staging.4...@clerk/backend@0.5.1) (2023-02-01)
 
 **Note:** Version bump only for package @clerk/backend
