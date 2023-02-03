@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "0.10.0",
+  "version": "0.10.1-staging.0",
   "description": "Internal package utils used by the Clerk SDKs",
   "types": "./dist/types/index.d.ts",
   "main": "./dist/index.js",
@@ -18,19 +18,19 @@
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
   },
   "devDependencies": {
-    "@clerk/types": "^3.25.1",
+    "@clerk/types": "^3.26.0-staging.0",
     "@testing-library/dom": "^8.19.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^14.4.3",
     "@types/js-cookie": "^3.0.2",
+    "jest": "*",
+    "jest-environment-jsdom": "*",
     "js-cookie": "^3.0.1",
     "swr": "^1.3.0",
-    "tsup": "*",
-    "typescript": "*",
-    "jest": "*",
     "ts-jest": "^29.0.3",
-    "jest-environment-jsdom": "*"
+    "tsup": "*",
+    "typescript": "*"
   },
   "peerDependencies": {
     "react": "18.2.0",
