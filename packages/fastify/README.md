@@ -27,13 +27,17 @@
 
 ## Overview
 
-`@clerk/fastify` contains localized strings for applications using Clerk.
+[Clerk](https://clerk.dev?utm_source=github&utm_medium=clerk_fastify) is the easiest way to add authentication and user management to your Fastify application. To gain a better understanding of the Clerk Backend API and SDK, refer to
+the <a href="https://clerk.dev/docs/reference/node/getting-started?utm_source=github&utm_medium=clerk_fastify" target="_blank">Fastify SDK</a> and <a href="https://reference.clerk.dev/reference/backend-api-reference" target="_blank">Backend API</a> documentation.
 
 ## Getting Started
 
+To use this plugin you should first create a Clerk application and retrieve a `Secret Key` and a `Publishable Key` for you application (see [here](https://clerk.dev/docs/reference/node/getting-started#set-c-l-e-r-k-s-e-c-r-e-t-key)) to be used as environment variables `CLERK_PUBLISHABLE_KEY` & `CLERK_SECRET_KEY`.
+
 ### Prerequisites
 
-- Clerk
+- Node.js v14+
+- Fastify v4+
 
 ### Installation
 
@@ -49,22 +53,90 @@ npm run build
 
 ## Usage
 
+Retrieve your Backend API key from the [API Keys](https://dashboard.clerk.dev/last-active?path=api-keys) screen in your Clerk dashboard and set it as an environment variable in a `.env` file:
+
+```sh
+CLERK_PUBLISHABLE_KEY=pk_*******
+CLERK_SECRET_KEY=sk_******
+```
+
+You will then be able to access all the available methods.
+
 ```javascript
-import { ClerkProvider } from '@clerk/nextjs';
-import { frFR } from '@clerk/fastify';
+import 'dotenv/config'; // To read CLERK_API_KEY
+import Fastify from 'fastify';
+import { clerkPlugin, getAuth } from '@clerk/fastify';
+import type { FastifyInstance } from 'fastify';
 
-function MyApp({ Component, pageProps }) {
-  return (
-    <ClerkProvider
-      localization={frFR}
-      {...pageProps}
-    >
-      <Component {...pageProps} />
-    </ClerkProvider>
-  );
-}
+const server: FastifyInstance = Fastify({ logger: true });
 
-export default MyApp;
+server.register(clerkPlugin);
+
+server.get('/private', async (req, reply) => {
+  const auth = getAuth(req);
+  if (!auth.userId) {
+    return reply.code(403).send();
+  }
+  return { hello: 'world' };
+});
+
+const start = async () => {
+  try {
+    await server.listen({ port: 3000 });
+  } catch (err) {
+    server.log.error(err);
+    process.exit(1);
+  }
+};
+start();
+```
+
+### Scoped routes
+
+Support authenticated routes that the Clerk middleware will run as plugin in `preHandler` hook and unauthenticated routes that will not trigger the middleware using the Fastify [docs](https://www.fastify.io/docs/latest/Guides/Getting-Started/#loading-order-of-your-plugins).
+
+```javascript
+import 'dotenv/config'; // To read CLERK_PUBLISHABLE_KEY
+import Fastify from 'fastify';
+import fp from 'fastify-plugin';
+import { clerkPlugin, getAuth } from '@clerk/fastify';
+import type { FastifyReply, FastifyRequest, FastifyInstance } from 'fastify';
+
+const server: FastifyInstance = Fastify({ logger: true });
+
+const privateRoutes = async (fastify: FastifyInstance, _opts: any) => {
+  fastify.register(clerkPlugin);
+
+  fastify.get('/private', async (req: FastifyRequest, reply: FastifyReply) => {
+    const auth = getAuth(req);
+
+    if (!auth.userId) {
+      return reply.code(403).send();
+    }
+
+    return { hello: 'world', auth };
+  });
+};
+
+server.register(
+  fp(async function (app, _opts) {
+    app.register(privateRoutes);
+  }),
+);
+
+server.get('/public', async (req, _reply) => {
+  return { hello: 'world' };
+});
+
+const start = async () => {
+  try {
+    await server.listen({ port: 3000 });
+  } catch (err) {
+    server.log.error(err);
+    process.exit(1);
+  }
+};
+start();
 ```
 
 ## Support
