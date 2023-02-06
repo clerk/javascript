@@ -7,6 +7,8 @@ export const dark = unstable_createTheme({
     colorAlphaShade: 'white',
     colorText: 'white',
     colorInputText: 'white',
+    colorShimmer: 'rgba(255,255,255,0.36)',
+    shadowShimmer: '1px 1px 2px rgba(0,0,0,0.36)',
   },
   elements: {
     providerIcon__apple: { filter: 'invert(1)' },

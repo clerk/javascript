@@ -19,6 +19,7 @@ export const createColorScales = (theme: Theme) => {
     colorInputText: toHSLA(variables.colorInputText),
     colorBackground: toHSLA(variables.colorBackground),
     colorInputBackground: toHSLA(variables.colorInputBackground),
+    colorShimmer: toHSLA(variables.colorShimmer),
   });
 };
 
@@ -89,6 +90,11 @@ export const createFontWeightScale = (theme: Theme): Record<keyof typeof fontWei
 export const createFonts = (theme: Theme) => {
   const { fontFamily, fontFamilyButtons } = theme.variables || {};
   return removeUndefinedProps({ main: fontFamily, buttons: fontFamilyButtons });
+};
+
+export const createShadows = (theme: Theme) => {
+  const { shadowShimmer } = theme.variables || {};
+  return removeUndefinedProps({ shadowShimmer });
 };
 
 const splitCssUnit = (str: string) => {
