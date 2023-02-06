@@ -308,6 +308,7 @@ export type ElementsConfig = {
 
   modalBackdrop: WithOptions<never, never, never>;
   modalContent: WithOptions<never, never, never>;
+  modalCloseButton: WithOptions<never, never, never>;
 
   profileSection: WithOptions<ProfileSectionId, never, never>;
   profileSectionTitle: WithOptions<ProfileSectionId, never, never>;

@@ -172,6 +172,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
 
   'modalBackdrop',
   'modalContent',
+  'modalCloseButton',
 
   'profileSection',
   'profileSectionTitle',
