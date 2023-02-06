@@ -957,7 +957,7 @@ export default class Clerk implements ClerkInterface {
 
   #syncWithPrimary = async () => {
     const q = new URLSearchParams({
-      redirect_url: createClerkQueryParam('__clerk_synced', 'true').toString(),
+      redirect_url: window.location.href,
     });
     if (this.proxyUrl) {
       const proxy = new URL(this.proxyUrl);
@@ -968,10 +968,11 @@ export default class Clerk implements ClerkInterface {
   };
 
   #handleSyncedQueryParam = () => {
-    if (getClerkQueryParam('__clerk_synced') !== 'true') {
+    const paramName = '__clerk_synced';
+    if (getClerkQueryParam(paramName) !== 'true') {
       return true;
     }
-    removeClerkQueryParam('__clerk_synced');
+    removeClerkQueryParam(paramName);
     return false;
   };
 
