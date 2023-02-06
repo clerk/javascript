@@ -9,3 +9,4 @@ export const DEV_BROWSER_SSO_JWT_HTTP_HEADER = 'Clerk-Cookie';
 export { ERROR_CODES } from '../ui/common/constants';
 
 export const CLERK_MODAL_STATE = '__clerk_modal_state';
+export const CLERK_SYNCED = '__clerk_synced';

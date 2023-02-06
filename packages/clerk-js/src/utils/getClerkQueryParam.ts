@@ -1,10 +1,12 @@
+import { CLERK_SYNCED } from '../core/constants';
+
 const ClerkQueryParams = [
   '__clerk_status',
   '__clerk_created_session',
   '__clerk_invitation_token',
   '__clerk_ticket',
   '__clerk_modal_state',
-  '__clerk_synced',
+  CLERK_SYNCED,
 ] as const;
 
 type ClerkQueryParam = typeof ClerkQueryParams[number];

@@ -51,7 +51,6 @@ import {
   appendAsQueryParams,
   buildURL,
   createBeforeUnloadTracker,
-  createClerkQueryParam,
   createPageLifecycle,
   errorThrower,
   getClerkQueryParam,
@@ -72,7 +71,7 @@ import {
   windowNavigate,
 } from '../utils';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
-import { DEV_BROWSER_SSO_JWT_PARAMETER, ERROR_CODES } from './constants';
+import { CLERK_SYNCED, DEV_BROWSER_SSO_JWT_PARAMETER, ERROR_CODES } from './constants';
 import type { DevBrowserHandler } from './devBrowserHandler';
 import createDevBrowserHandler from './devBrowserHandler';
 import {
@@ -955,9 +954,9 @@ export default class Clerk implements ClerkInterface {
     this.#componentControls?.updateProps(props);
   };
 
-  #hasSynced = () => getClerkQueryParam(clerkSyncedParam) === 'true';
+  #hasSynced = () => getClerkQueryParam(CLERK_SYNCED) === 'true';
 
-  #clearSynced = () => removeClerkQueryParam(clerkSyncedParam);
+  #clearSynced = () => removeClerkQueryParam(CLERK_SYNCED);
 
   #syncWithPrimary = async () => {
     const q = new URLSearchParams({
@@ -1163,5 +1162,3 @@ export default class Clerk implements ClerkInterface {
     }
   }
 }
-
-const clerkSyncedParam = '__clerk_synced';
