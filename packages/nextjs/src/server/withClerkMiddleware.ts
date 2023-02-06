@@ -1,4 +1,4 @@
-import type { AuthStatus, OptionalVerifyTokenOptions } from '@clerk/backend';
+import type { AuthStatus } from '@clerk/backend';
 import { constants } from '@clerk/backend';
 import type { NextMiddleware, NextMiddlewareResult } from 'next/dist/server/web/types';
 import type { NextFetchEvent, NextRequest } from 'next/server';
@@ -16,14 +16,14 @@ import {
   PUBLISHABLE_KEY,
   SECRET_KEY,
 } from './clerk';
+import type { WithAuthOptions } from './types';
 import {
   getCookie,
+  handleIsSatelliteBooleanOrFn,
   nextJsVersionCanOverrideRequestHeaders,
   setAuthStatusOnRequest,
   setRequestHeadersOnNextResponse,
 } from './utils';
-
-type WithAuthOptions = OptionalVerifyTokenOptions;
 
 interface WithClerkMiddleware {
   (handler: NextMiddleware, opts?: WithAuthOptions): NextMiddleware;
@@ -39,6 +39,8 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
 
   return async (req: NextRequest, event: NextFetchEvent) => {
     const { headers } = req;
+
+    const isSatellite = handleIsSatelliteBooleanOrFn(opts, new URL(req.url)) || IS_SATELLITE;
 
     // get auth state, check if we need to return an interstitial
     const cookieToken = getCookie(req, constants.Cookies.Session);
@@ -61,7 +63,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
       userAgent: headers.get('user-agent') || undefined,
       proxyUrl,
       // @ts-expect-error
-      isSatellite: IS_SATELLITE,
+      isSatellite,
       domain: DOMAIN,
     });
 
