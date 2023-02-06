@@ -13,12 +13,13 @@ import {
 } from './utils';
 
 interface RootAuthLoader {
-  <Options extends Omit<RootAuthLoaderOptions, 'proxyUrl'>>(
+  <Options extends RootAuthLoaderOptions>(
     args: LoaderFunctionArgs,
     callback: RootAuthLoaderCallback<Options>,
     options?: Options,
   ): Promise<LoaderFunctionReturn>;
-  (args: LoaderFunctionArgs, options?: Omit<RootAuthLoaderOptions, 'proxyUrl'>): Promise<LoaderFunctionReturn>;
+
+  (args: LoaderFunctionArgs, options?: RootAuthLoaderOptions): Promise<LoaderFunctionReturn>;
 }
 
 export const rootAuthLoader: RootAuthLoader = async (

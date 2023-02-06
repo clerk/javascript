@@ -36,6 +36,7 @@ export type SignOutOptions = {
 
 export interface SignOut {
   (options?: SignOutOptions): Promise<void>;
+
   (signOutCallback?: SignOutCallback, options?: SignOutOptions): Promise<void>;
 }
 
@@ -469,7 +470,7 @@ export interface ClerkOptions {
   /**
    * @experimental
    */
-  isSatellite?: boolean;
+  isSatellite?: boolean | ((url: URL) => boolean);
 }
 
 export interface Resources {
@@ -642,7 +643,7 @@ export type UserButtonProps = {
    */
   showName?: boolean;
   /**
-    Controls the default state of the UserButton
+   Controls the default state of the UserButton
    */
   defaultOpen?: boolean;
   /**

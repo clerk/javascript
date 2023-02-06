@@ -1,4 +1,5 @@
 import type { AuthObject, Organization, Session, User } from '@clerk/backend';
+import type { ClerkOptions } from '@clerk/types/src';
 import type { DataFunctionArgs, LoaderFunction } from '@remix-run/server-runtime';
 
 export type GetAuthReturn = Promise<AuthObject>;
@@ -7,11 +8,15 @@ export type RootAuthLoaderOptionsWithExperimental = RootAuthLoaderOptions & {
   /**
    * @experimental
    */
-  isSatellite?: boolean;
+  isSatellite?: ClerkOptions['isSatellite'];
   /**
    * @experimental
    */
   domain?: string;
+  /**
+   * @experimental
+   */
+  proxyUrl?: string;
 };
 
 export type RootAuthLoaderOptions = {
@@ -21,7 +26,6 @@ export type RootAuthLoaderOptions = {
   frontendApi?: string;
   publishableKey?: string;
   jwtKey?: string;
-  proxyUrl?: string;
   /**
    * @deprecated Use `secretKey` instead.
    */

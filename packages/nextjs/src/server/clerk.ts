@@ -8,6 +8,7 @@ export const FRONTEND_API = process.env.NEXT_PUBLIC_CLERK_FRONTEND_API || '';
 export const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '';
 export const DOMAIN = process.env.NEXT_PUBLIC_CLERK_DOMAIN || '';
 export const PROXY_URL = process.env.NEXT_PUBLIC_CLERK_PROXY_URL || '';
+export const IS_SATELLITE = process.env.NEXT_PUBLIC_CLERK_IS_SATELLITE === 'true' || false;
 
 const clerkClient = Clerk({
   apiKey: API_KEY,
@@ -19,6 +20,7 @@ const clerkClient = Clerk({
   proxyUrl: PROXY_URL,
   // @ts-expect-error
   domain: DOMAIN,
+  isSatellite: IS_SATELLITE,
 });
 
 const createClerkClient = Clerk;

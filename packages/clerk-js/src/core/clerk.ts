@@ -147,6 +147,13 @@ export default class Clerk implements ClerkInterface {
     return this.#isReady;
   }
 
+  get isSatellite(): boolean {
+    if (typeof this.#options.isSatellite === 'function') {
+      return this.#options.isSatellite(new URL(window.location.href));
+    }
+    return this.#options.isSatellite || false;
+  }
+
   public constructor(key: string, options?: unknown) {
     key = (key || '').trim();
 
@@ -971,7 +978,7 @@ export default class Clerk implements ClerkInterface {
   };
 
   #loadInStandardBrowser = async (): Promise<boolean> => {
-    if (this.#options.isSatellite) {
+    if (this.isSatellite) {
       if (!this.#hasSynced()) {
         await this.#syncWithPrimary();
         return false;

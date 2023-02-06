@@ -5,6 +5,7 @@ import { json } from '@remix-run/server-runtime';
 import cookie from 'cookie';
 
 import type { LoaderFunctionArgs, LoaderFunctionArgsWithAuth } from './types';
+import type { RootAuthLoaderOptionsWithExperimental } from './types';
 
 /**
  * Inject `auth`, `user` and `session` properties into `request`
@@ -91,4 +92,14 @@ export const injectRequestStateIntoResponse = async (response: Response, request
  */
 export const wrapWithClerkState = (data: any) => {
   return { clerkState: { __internal_clerk_state: { ...data } } };
+};
+
+export const handleIsSatelliteBooleanOrFn = (
+  isSatellite: RootAuthLoaderOptionsWithExperimental['isSatellite'],
+  url: URL,
+) => {
+  if (typeof isSatellite === 'function') {
+    return isSatellite(url);
+  }
+  return isSatellite;
 };
