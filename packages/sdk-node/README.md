@@ -53,7 +53,8 @@ npm run build
 Retrieve your Backend API key from the [API Keys](https://dashboard.clerk.dev/last-active?path=api-keys) screen in your Clerk dashboard and set it as an environment variable in a `.env` file:
 
 ```sh
-CLERK_API_KEY=[backend-api-key]
+CLERK_PUBLISHABLE_KEY=pk_*******
+CLERK_SECRET_KEY=sk_******
 ```
 
 You will then be able to access all the available methods.
