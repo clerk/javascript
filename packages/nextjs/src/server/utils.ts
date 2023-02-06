@@ -4,7 +4,7 @@ import type { RequestCookie } from 'next/dist/server/web/spec-extension/cookies'
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import type { RequestLike } from './types';
+import type { RequestLike, WithAuthOptionsExperimental } from './types';
 
 export function setCustomAttributeOnRequest(req: RequestLike, key: string, value: string): void {
   Object.assign(req, { [key]: value });
@@ -135,4 +135,12 @@ export const injectSSRStateIntoObject = (obj: any, authObject: AuthObject) => {
   const __clerk_ssr_state =
     process.env.NODE_ENV !== 'production' ? JSON.parse(JSON.stringify({ ...authObject })) : { ...authObject };
   return { ...obj, __clerk_ssr_state };
+};
+
+// TODO: Make this a generic and move to @clerk/shared
+export const handleIsSatelliteBooleanOrFn = (opts: WithAuthOptionsExperimental, url: URL): boolean => {
+  if (typeof opts.isSatellite === 'function') {
+    return opts.isSatellite(url);
+  }
+  return opts.isSatellite || false;
 };
