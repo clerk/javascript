@@ -35,12 +35,10 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => 
         {...props}
         sx={[
           t => ({
-            margin: branded ? `0 ${t.space.$7}` : undefined,
             width: t.sizes.$100,
             maxWidth: `calc(100vw - ${t.sizes.$20})`,
             [mqu.sm]: {
               maxWidth: `calc(100vw - ${t.sizes.$3})`,
-              margin: branded ? `0 0 ${t.space.$7} 0` : '0',
             },
             padding: `${t.space.$9x5} ${t.space.$8} ${t.space.$12} ${t.space.$8}`,
             [mqu.xs]: {
@@ -70,10 +68,8 @@ export const ProfileCard = React.forwardRef<HTMLDivElement, CardProps>((props, r
           padding: 0,
           width: t.sizes.$220,
           maxWidth: `calc(100vw - ${t.sizes.$20})`,
-          margin: branded ? `0 ${t.space.$7}` : undefined,
           [mqu.sm]: {
             maxWidth: `calc(100vw - ${t.sizes.$3})`,
-            margin: branded ? `0 0 ${t.space.$7} 0` : '0',
           },
         }),
         sx,

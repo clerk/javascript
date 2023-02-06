@@ -36,3 +36,4 @@ export { default as Trash } from './trash.svg';
 export { default as UserAdd } from './userAdd.svg';
 export { default as ThreeDots } from './threeDots.svg';
 export { default as Billing } from './billing.svg';
+export { default as Close } from './close.svg';

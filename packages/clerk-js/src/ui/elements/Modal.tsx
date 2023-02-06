@@ -1,10 +1,12 @@
 import React from 'react';
 
-import { descriptors, Flex } from '../customizables';
+import { descriptors, Flex, Icon } from '../customizables';
 import { usePopover, useSafeLayoutEffect, useScrollLock } from '../hooks';
+import { Close } from '../icons';
 import type { ThemableCssProp } from '../styledSystem';
 import { animations, mqu } from '../styledSystem';
 import { withFloatingTree } from './contexts';
+import { IconButton } from './IconButton';
 import { Popover } from './Popover';
 
 type ModalProps = React.PropsWithChildren<{
@@ -16,7 +18,7 @@ type ModalProps = React.PropsWithChildren<{
 
 export const Modal = withFloatingTree((props: ModalProps) => {
   const { handleClose, handleOpen, contentSx, containerSx } = props;
-  const { floating, isOpen, context, nodeId } = usePopover({
+  const { floating, isOpen, context, nodeId, toggle } = usePopover({
     defaultOpen: true,
     autoUpdate: false,
   });
@@ -71,6 +73,7 @@ export const Modal = withFloatingTree((props: ModalProps) => {
           role='dialog'
           sx={[
             t => ({
+              position: 'relative',
               outline: 0,
               animation: `${animations.modalSlideAndFade} 180ms ${t.transitionTiming.$easeOut}`,
               margin: `${t.space.$16} 0`,
@@ -82,6 +85,29 @@ export const Modal = withFloatingTree((props: ModalProps) => {
           ]}
         >
           {props.children}
+          <IconButton
+            elementDescriptor={descriptors.modalCloseButton}
+            variant='ghost'
+            colorScheme='neutral'
+            aria-label='Close modal'
+            onClick={toggle}
+            icon={
+              <Icon
+                icon={Close}
+                size='sm'
+              />
+            }
+            sx={t => ({
+              opacity: t.opacity.$inactive,
+              ':hover': {
+                opacity: 0.8,
+              },
+              position: 'absolute',
+              top: t.space.$3,
+              padding: t.space.$3,
+              right: t.space.$3,
+            })}
+          />
         </Flex>
       </Flex>
     </Popover>
