@@ -25,6 +25,8 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
   const noop = () => undefined;
   const [handler = noop, opts = {}] = args as [NextMiddleware, WithAuthOptions] | [];
 
+  const proxyUrl = opts?.proxyUrl || PROXY_URL;
+
   return async (req: NextRequest, event: NextFetchEvent) => {
     const { headers } = req;
 
@@ -47,7 +49,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
       forwardedHost: headers.get('x-forwarded-host') || undefined,
       referrer: headers.get('referer') || undefined,
       userAgent: headers.get('user-agent') || undefined,
-      proxyUrl: PROXY_URL,
+      proxyUrl,
     });
 
     // Interstitial case

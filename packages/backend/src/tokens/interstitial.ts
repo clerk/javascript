@@ -100,7 +100,7 @@ export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions)
 
 export function buildPublicInterstitialUrl(options: LoadInterstitialOptions) {
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
-  const { apiUrl, frontendApi, pkgVersion, publishableKey } = options;
+  const { apiUrl, frontendApi, pkgVersion, publishableKey, proxyUrl } = options;
   const url = new URL(apiUrl);
   url.pathname = joinPaths(url.pathname, API_VERSION, '/public/interstitial');
   url.searchParams.append('clerk_js_version', getClerkJsMajorVersionOrTag(frontendApi, pkgVersion));
@@ -108,6 +108,9 @@ export function buildPublicInterstitialUrl(options: LoadInterstitialOptions) {
     url.searchParams.append('publishable_key', publishableKey);
   } else {
     url.searchParams.append('frontend_api', frontendApi);
+  }
+  if (proxyUrl) {
+    url.searchParams.append('proxy_url', proxyUrl);
   }
   return url.href;
 }
