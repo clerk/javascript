@@ -23,7 +23,8 @@
     "dev": "tsup --watch",
     "build": "tsup --env.NODE_ENV production",
     "clean": "rimraf ./dist",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "jest"
   },
   "dependencies": {
     "@clerk/clerk-sdk-node": "^4.7.0-staging.1",
@@ -33,7 +34,9 @@
   },
   "devDependencies": {
     "tsup": "*",
-    "typescript": "*"
+    "typescript": "*",
+    "jest": "*",
+    "ts-jest": "*"
   },
   "peerDependencies": {
     "fastify": ">=4",
