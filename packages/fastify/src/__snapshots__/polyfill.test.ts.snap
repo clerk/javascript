@@ -1,0 +1,34 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`polyfill polyfillServerResponseMethods(fastify) decorates reply with server response methods 1`] = `
+[MockFunction] {
+  "calls": [
+    [
+      "setHeader",
+      [Function],
+    ],
+    [
+      "writeHead",
+      [Function],
+    ],
+    [
+      "end",
+      [Function],
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": undefined,
+    },
+    {
+      "type": "return",
+      "value": undefined,
+    },
+    {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;

@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`constants from environment variables 1`] = `
+{
+  "API_KEY": "CLERK_API_KEY",
+  "API_URL": "CLERK_API_URL",
+  "API_VERSION": "CLERK_API_VERSION",
+  "Cookies": {
+    "ClientUat": "__client_uat",
+    "Session": "__session",
+  },
+  "FRONTEND_API": "CLERK_FRONTEND_API",
+  "Headers": {
+    "AuthMessage": "x-clerk-auth-message",
+    "AuthReason": "x-clerk-auth-reason",
+    "AuthStatus": "x-clerk-auth-status",
+    "Authorization": "authorization",
+    "ContentType": "content-type",
+    "ForwardedHost": "x-forwarded-host",
+    "ForwardedPort": "x-forwarded-port",
+    "Host": "host",
+    "Origin": "origin",
+    "Referrer": "referer",
+    "UserAgent": "user-agent",
+  },
+  "JWT_KEY": "CLERK_JWT_KEY",
+  "PUBLISHABLE_KEY": "CLERK_PUBLISHABLE_KEY",
+  "SECRET_KEY": "CLERK_SECRET_KEY",
+}
+`;
