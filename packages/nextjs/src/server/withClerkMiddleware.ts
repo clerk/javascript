@@ -5,7 +5,7 @@ import type { NextFetchEvent, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
-import { API_KEY, API_URL, clerkClient, FRONTEND_API, PUBLISHABLE_KEY, SECRET_KEY } from './clerk';
+import { API_KEY, API_URL, clerkClient, FRONTEND_API, PROXY_URL, PUBLISHABLE_KEY, SECRET_KEY } from './clerk';
 import {
   getCookie,
   nextJsVersionCanOverrideRequestHeaders,
@@ -24,6 +24,8 @@ interface WithClerkMiddleware {
 export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => {
   const noop = () => undefined;
   const [handler = noop, opts = {}] = args as [NextMiddleware, WithAuthOptions] | [];
+
+  const proxyUrl = opts?.proxyUrl || PROXY_URL;
 
   return async (req: NextRequest, event: NextFetchEvent) => {
     const { headers } = req;
@@ -47,6 +49,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
       forwardedHost: headers.get('x-forwarded-host') || undefined,
       referrer: headers.get('referer') || undefined,
       userAgent: headers.get('user-agent') || undefined,
+      proxyUrl,
     });
 
     // Interstitial case

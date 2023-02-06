@@ -17,6 +17,7 @@ export type SignedInState = {
   reason: null;
   message: null;
   frontendApi: string;
+  proxyUrl?: string;
   publishableKey: string;
   isSignedIn: true;
   isInterstitial: false;
@@ -29,6 +30,7 @@ export type SignedOutState = {
   message: string;
   reason: AuthReason;
   frontendApi: string;
+  proxyUrl?: string;
   publishableKey: string;
   isSignedIn: false;
   isInterstitial: false;
@@ -74,6 +76,7 @@ export async function signedIn<T>(options: T, sessionClaims: JwtPayload): Promis
     apiVersion,
     cookieToken,
     frontendApi,
+    proxyUrl,
     publishableKey,
     headerToken,
     loadSession,
@@ -122,6 +125,7 @@ export async function signedIn<T>(options: T, sessionClaims: JwtPayload): Promis
     reason: null,
     message: null,
     frontendApi,
+    proxyUrl,
     publishableKey,
     isSignedIn: true,
     isInterstitial: false,
@@ -131,13 +135,14 @@ export async function signedIn<T>(options: T, sessionClaims: JwtPayload): Promis
 }
 
 export function signedOut<T>(options: T, reason: AuthReason, message = ''): SignedOutState {
-  const { frontendApi, publishableKey } = options as any;
+  const { frontendApi, publishableKey, proxyUrl } = options as any;
 
   return {
     status: AuthStatus.SignedOut,
     reason,
     message,
     frontendApi,
+    proxyUrl,
     publishableKey,
     isSignedIn: false,
     isInterstitial: false,
@@ -147,12 +152,13 @@ export function signedOut<T>(options: T, reason: AuthReason, message = ''): Sign
 }
 
 export function interstitial<T>(options: T, reason: AuthReason, message = ''): InterstitialState {
-  const { frontendApi, publishableKey } = options as any;
+  const { frontendApi, publishableKey, proxyUrl } = options as any;
   return {
     status: AuthStatus.Interstitial,
     reason,
     message,
     frontendApi: frontendApi,
+    proxyUrl,
     publishableKey: publishableKey,
     isSignedIn: false,
     isInterstitial: true,

@@ -11,13 +11,14 @@ import { TokenVerificationError, TokenVerificationErrorAction, TokenVerification
 export type LoadInterstitialOptions = {
   apiUrl: string;
   frontendApi: string;
+  proxyUrl?: string;
   publishableKey: string;
   pkgVersion?: string;
   debugData?: any;
 };
 
 export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions, 'apiUrl'>) {
-  const { debugData, frontendApi, pkgVersion, publishableKey } = options;
+  const { debugData, frontendApi, pkgVersion, publishableKey, proxyUrl } = options;
   return `
     <head>
         <meta charset="UTF-8" />
@@ -26,6 +27,7 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
         <script>
             window.__clerk_frontend_api = '${frontendApi}';
             window.__clerk_debug = ${JSON.stringify(debugData || {})};
+            ${proxyUrl ? `window.__clerk_proxy_url = ${proxyUrl}` : ''}
             window.startClerk = async () => {
                 function formRedirect(){
                     const form = '<form method="get" action="" name="redirect"></form>';
@@ -67,6 +69,7 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
                     ? `script.setAttribute('data-clerk-publishable-key', '${publishableKey}');`
                     : `script.setAttribute('data-clerk-frontend-api', '${frontendApi}');`
                 }
+                ${proxyUrl ? `script.setAttribute('data-clerk-proxy-url', '${proxyUrl}')` : ''};
                 script.async = true;
                 script.src = '${getScriptUrl(frontendApi, pkgVersion)}';
                 script.crossOrigin = 'anonymous';
@@ -97,7 +100,7 @@ export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions)
 
 export function buildPublicInterstitialUrl(options: LoadInterstitialOptions) {
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
-  const { apiUrl, frontendApi, pkgVersion, publishableKey } = options;
+  const { apiUrl, frontendApi, pkgVersion, publishableKey, proxyUrl } = options;
   const url = new URL(apiUrl);
   url.pathname = joinPaths(url.pathname, API_VERSION, '/public/interstitial');
   url.searchParams.append('clerk_js_version', getClerkJsMajorVersionOrTag(frontendApi, pkgVersion));
@@ -105,6 +108,9 @@ export function buildPublicInterstitialUrl(options: LoadInterstitialOptions) {
     url.searchParams.append('publishable_key', publishableKey);
   } else {
     url.searchParams.append('frontend_api', frontendApi);
+  }
+  if (proxyUrl) {
+    url.searchParams.append('proxy_url', proxyUrl);
   }
   return url.href;
 }

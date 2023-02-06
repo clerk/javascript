@@ -12,7 +12,7 @@ import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from './keys';
 export type VerifyTokenOptions = Pick<
   VerifyJwtOptions,
   'authorizedParties' | 'audience' | 'issuer' | 'clockSkewInSeconds'
-> & { jwtKey?: string } & Pick<
+> & { jwtKey?: string; proxyUrl?: string } & Pick<
     LoadClerkJWKFromRemoteOptions,
     'apiKey' | 'secretKey' | 'apiUrl' | 'apiVersion' | 'jwksCacheTtlInMs' | 'skipJwksCache'
   >;

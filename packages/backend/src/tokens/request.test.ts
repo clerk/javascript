@@ -12,6 +12,7 @@ function assertSignedOut(assert, requestState: RequestState, reason: AuthReason,
   assert.propEqual(requestState, {
     frontendApi: 'cafe.babe.clerk.ts',
     publishableKey: '',
+    proxyUrl: '',
     status: AuthStatus.SignedOut,
     isSignedIn: false,
     isInterstitial: false,
@@ -41,6 +42,7 @@ function assertInterstitial(assert, requestState: RequestState, reason: AuthReas
   assert.propContains(requestState, {
     frontendApi: 'cafe.babe.clerk.ts',
     publishableKey: '',
+    proxyUrl: '',
     status: AuthStatus.Interstitial,
     isSignedIn: false,
     isInterstitial: true,
@@ -82,6 +84,7 @@ function assertSignedIn(assert, requestState: RequestState) {
   assert.propContains(requestState, {
     frontendApi: 'cafe.babe.clerk.ts',
     publishableKey: '',
+    proxyUrl: '',
     status: AuthStatus.SignedIn,
     isSignedIn: true,
     isInterstitial: false,
@@ -100,6 +103,7 @@ export default (QUnit: QUnit) => {
     apiVersion: 'v1',
     frontendApi: 'cafe.babe.clerk.ts',
     publishableKey: '',
+    proxyUrl: '',
     host: 'example.com',
     userAgent: 'Mozilla/TestAgent',
     skipJwksCache: true,

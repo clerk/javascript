@@ -9,7 +9,7 @@ export type CreateAuthenticateRequestOptions = {
   options: Partial<
     Pick<
       AuthenticateRequestOptions,
-      'apiKey' | 'secretKey' | 'apiUrl' | 'apiVersion' | 'frontendApi' | 'publishableKey' | 'jwtKey'
+      'apiKey' | 'secretKey' | 'apiUrl' | 'apiVersion' | 'frontendApi' | 'publishableKey' | 'jwtKey' | 'proxyUrl'
     >
   >;
   apiClient: ApiClient;
@@ -24,6 +24,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
     apiUrl = API_URL,
     apiVersion = API_VERSION,
     frontendApi: buildtimeFrontendApi = '',
+    proxyUrl: buildProxyUrl = '',
     publishableKey: buildtimePublishableKey = '',
   } = params.options;
 
@@ -31,6 +32,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
     apiKey: runtimeApiKey,
     secretKey: runtimeSecretKey,
     frontendApi: runtimeFrontendApi,
+    proxyUrl: runtimeProxyUrl,
     publishableKey: runtimePublishableKey,
     jwtKey: runtimeJwtKey,
     ...rest
@@ -42,6 +44,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
       apiUrl,
       apiVersion,
       frontendApi: runtimeFrontendApi || buildtimeFrontendApi,
+      proxyUrl: runtimeProxyUrl || buildProxyUrl,
       publishableKey: runtimePublishableKey || buildtimePublishableKey,
       jwtKey: runtimeJwtKey || buildtimeJwtKey,
     });
@@ -52,12 +55,14 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
   const remotePublicInterstitial = ({
     frontendApi: runtimeFrontendApi,
     publishableKey: runtimePublishableKey,
+    proxyUrl: runtimeProxyUrl,
     ...rest
   }: LoadInterstitialOptions) => {
     return loadInterstitialFromBAPI({
       ...rest,
       apiUrl,
       frontendApi: runtimeFrontendApi || buildtimeFrontendApi,
+      proxyUrl: runtimeProxyUrl || buildProxyUrl,
       publishableKey: runtimePublishableKey || buildtimePublishableKey,
     });
   };
