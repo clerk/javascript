@@ -5,7 +5,17 @@ import type { NextFetchEvent, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
-import { API_KEY, API_URL, clerkClient, FRONTEND_API, PROXY_URL, PUBLISHABLE_KEY, SECRET_KEY } from './clerk';
+import {
+  API_KEY,
+  API_URL,
+  clerkClient,
+  DOMAIN,
+  FRONTEND_API,
+  IS_SATELLITE,
+  PROXY_URL,
+  PUBLISHABLE_KEY,
+  SECRET_KEY,
+} from './clerk';
 import {
   getCookie,
   nextJsVersionCanOverrideRequestHeaders,
@@ -50,6 +60,9 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
       referrer: headers.get('referer') || undefined,
       userAgent: headers.get('user-agent') || undefined,
       proxyUrl,
+      // @ts-expect-error
+      isSatellite: IS_SATELLITE,
+      domain: DOMAIN,
     });
 
     // Interstitial case
