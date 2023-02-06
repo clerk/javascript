@@ -955,6 +955,10 @@ export default class Clerk implements ClerkInterface {
     this.#componentControls?.updateProps(props);
   };
 
+  #hasSynced = () => getClerkQueryParam(clerkSyncedParam) === 'true';
+
+  #clearSynced = () => removeClerkQueryParam(clerkSyncedParam);
+
   #syncWithPrimary = async () => {
     const q = new URLSearchParams({
       redirect_url: window.location.href,
@@ -967,21 +971,14 @@ export default class Clerk implements ClerkInterface {
     }
   };
 
-  #handleSyncedQueryParam = () => {
-    const paramName = '__clerk_synced';
-    if (getClerkQueryParam(paramName) !== 'true') {
-      return true;
-    }
-    removeClerkQueryParam(paramName);
-    return false;
-  };
-
-  #shouldSyncWithPrimary = () => this.#options.isSatellite && this.#handleSyncedQueryParam();
-
   #loadInStandardBrowser = async (): Promise<boolean> => {
-    if (this.#shouldSyncWithPrimary()) {
-      await this.#syncWithPrimary();
-      return false;
+    if (this.#options.isSatellite) {
+      if (!this.#hasSynced()) {
+        await this.#syncWithPrimary();
+        return false;
+      }
+
+      this.#clearSynced();
     }
 
     this.#authService = new AuthenticationService(this);
@@ -1166,3 +1163,5 @@ export default class Clerk implements ClerkInterface {
     }
   }
 }
+
+const clerkSyncedParam = '__clerk_synced';
