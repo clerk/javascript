@@ -71,14 +71,13 @@ export const Avatar = (props: AvatarProps) => {
           flexShrink: 0,
           borderRadius: rounded ? t.radii.$circle : t.radii.$md,
           overflow: 'hidden',
-          width: 'var(--cl-avatar-size)',
-          height: 'var(--cl-avatar-size)',
+          width: size(t),
+          height: size(t),
           backgroundColor: t.colors.$avatarBackground,
           backgroundClip: 'padding-box',
           position: 'relative',
           boxShadow: 'var(--cl-shimmer-hover-shadow)',
           transition: `box-shadow ${t.transitionDuration.$slower} ${t.transitionTiming.$easeOut}`,
-          '--cl-avatar-size': size(t),
         }),
         sx,
       ]}
@@ -90,10 +89,9 @@ export const Avatar = (props: AvatarProps) => {
        * The ":after" selector is responsible for the border shimmer animation.
        */}
       <Box
-        elementDescriptor={descriptors.avatarShimmerBox}
         sx={t => ({
           overflow: 'hidden',
-          background: t.colors.$whiteAlpha500,
+          background: t.colors.$colorShimmer,
           position: 'absolute',
           width: '25%',
           height: '100%',
@@ -108,7 +106,7 @@ export const Avatar = (props: AvatarProps) => {
             transform: 'var(--cl-shimmer-hover-after-transform, skewX(45deg) translateX(75%))',
             transition: `all ${t.transitionDuration.$slower} ${t.transitionTiming.$easeOut}`,
             border: t.borders.$heavy,
-            borderColor: t.colors.$whiteAlpha500,
+            borderColor: t.colors.$colorShimmer,
             borderRadius: rounded ? t.radii.$circle : t.radii.$md,
           },
         })}

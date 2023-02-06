@@ -9,6 +9,7 @@ import {
   createFontSizeScale,
   createFontWeightScale,
   createRadiiUnits,
+  createShadows,
   createSpaceScale,
   createThemeOptions,
 } from './parseVariables';
@@ -40,7 +41,6 @@ const defaultLayout: ParsedLayout = {
   helpPageUrl: '',
   privacyPageUrl: '',
   termsPageUrl: '',
-  avatarShimmer: true,
 };
 
 /**
@@ -111,5 +111,6 @@ const createInternalThemeFromVariables = (theme: Theme | undefined): DeepPartial
   const fontWeights = { ...createFontWeightScale(theme) };
   const fonts = { ...createFonts(theme) };
   const options = { ...createThemeOptions(theme) };
-  return createInternalTheme({ colors, radii, space, fontSizes, fontWeights, fonts, options } as any);
+  const shadows = { ...createShadows(theme) };
+  return createInternalTheme({ colors, radii, space, fontSizes, fontWeights, fonts, options, shadows } as any);
 };
