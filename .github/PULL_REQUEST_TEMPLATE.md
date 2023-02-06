@@ -19,6 +19,7 @@
 - [ ] `@clerk/backend`
 - [ ] `@clerk/clerk-sdk-node`
 - [ ] `@clerk/shared`
+- [ ] `@clerk/fastify`
 - [ ] `gatsby-plugin-clerk`
 - [ ] `build/tooling/chore`
 
