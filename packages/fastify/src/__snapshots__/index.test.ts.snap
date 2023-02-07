@@ -42,40 +42,40 @@ exports[`@clerk/fastify exports clerkPlugin, getAuth 1`] = `
       "jwtKey": "",
       "secretKey": "TEST_API_KEY",
     },
-    "allowlistIdentifiers": de {
+    "allowlistIdentifiers": AllowlistIdentifierAPI {
       "request": [Function],
     },
     "authenticateRequest": [Function],
-    "clients": ce {
+    "clients": ClientAPI {
       "request": [Function],
     },
     "debugRequestState": [Function],
-    "emailAddresses": me {
+    "emailAddresses": EmailAddressAPI {
       "request": [Function],
     },
-    "emails": ge {
+    "emails": EmailAPI {
       "request": [Function],
     },
-    "interstitial": fe {
+    "interstitial": InterstitialAPI {
       "request": [Function],
     },
-    "invitations": ye {
+    "invitations": InvitationAPI {
       "request": [Function],
     },
     "localInterstitial": [Function],
-    "organizations": he {
+    "organizations": OrganizationAPI {
       "request": [Function],
     },
-    "phoneNumbers": Se {
+    "phoneNumbers": PhoneNumberAPI {
       "request": [Function],
     },
-    "redirectUrls": ke {
+    "redirectUrls": RedirectUrlAPI {
       "request": [Function],
     },
     "remotePrivateInterstitial": [Function],
     "remotePublicInterstitial": [Function],
     "remotePublicInterstitialUrl": [Function],
-    "sessions": _e {
+    "sessions": SessionAPI {
       "getSession": [Function],
       "getSessionList": [Function],
       "getToken": [Function],
@@ -83,13 +83,13 @@ exports[`@clerk/fastify exports clerkPlugin, getAuth 1`] = `
       "revokeSession": [Function],
       "verifySession": [Function],
     },
-    "signInTokens": Ie {
+    "signInTokens": SignInTokenAPI {
       "request": [Function],
     },
-    "smsMessages": Ae {
+    "smsMessages": SMSMessageAPI {
       "request": [Function],
     },
-    "users": we {
+    "users": UserAPI {
       "request": [Function],
     },
   },
