@@ -1,3 +1,4 @@
+import type { ClerkOptions } from '@clerk/types';
 import { parse } from 'cookie';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 
@@ -5,7 +6,7 @@ import { clerkClient } from './clerk';
 import * as constants from './constants';
 import { getSingleValueFromArrayHeader } from './utils';
 
-export const withClerkMiddleware = (options: Record<never, never>) => {
+export const withClerkMiddleware = (options: ClerkOptions) => {
   return async (req: FastifyRequest, reply: FastifyReply) => {
     const cookies = parse(req.raw.headers.cookie || '');
 
