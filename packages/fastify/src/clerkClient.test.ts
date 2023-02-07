@@ -1,11 +1,15 @@
 const ClerkMock = jest.fn(() => {
   return 'clerkClient';
 });
-jest.mock('@clerk/clerk-sdk-node', () => {
-  return { Clerk: ClerkMock };
+
+jest.mock('@clerk/backend', () => {
+  return {
+    ...jest.requireActual('@clerk/backend'),
+    Clerk: ClerkMock,
+  };
 });
 
-import { clerkClient } from './clerk';
+import { clerkClient } from './clerkClient';
 
 describe('clerk', () => {
   afterAll(() => {

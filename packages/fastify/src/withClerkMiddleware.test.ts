@@ -1,20 +1,22 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import Fastify from 'fastify';
 
+import { clerkPlugin, getAuth } from './index';
+
 const authenticateRequestMock = jest.fn();
 const localInterstitialMock = jest.fn();
-jest.mock('@clerk/clerk-sdk-node', () => {
+
+jest.mock('@clerk/backend', () => {
   return {
+    ...jest.requireActual('@clerk/backend'),
     Clerk: () => {
       return {
-        authenticateRequest: authenticateRequestMock,
-        localInterstitial: localInterstitialMock,
+        authenticateRequest: (...args: any) => authenticateRequestMock(...args),
+        localInterstitial: (...args: any) => localInterstitialMock(...args),
       };
     },
   };
 });
-
-import { clerkPlugin, getAuth } from './index';
 
 describe('withClerkMiddleware(options)', () => {
   beforeEach(() => {

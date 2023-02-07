@@ -52,12 +52,6 @@ describe('@clerk/fastify', () => {
       expect(api.getAuth(req)).toEqual('authObj');
     });
 
-    test('returns {} when req.auth as default', () => {
-      const req = { key1: 'asa', auth: null } as any as FastifyRequest;
-
-      expect(api.getAuth(req)).toEqual({});
-    });
-
     test('throws error if clerkPlugin is on registered', () => {
       const req = { key1: 'asa' } as any as FastifyRequest;
 

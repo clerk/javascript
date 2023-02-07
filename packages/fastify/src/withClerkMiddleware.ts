@@ -2,7 +2,7 @@ import type { ClerkOptions } from '@clerk/types';
 import { parse } from 'cookie';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 
-import { clerkClient } from './clerk';
+import { clerkClient } from './clerkClient';
 import * as constants from './constants';
 import { getSingleValueFromArrayHeader } from './utils';
 
@@ -43,6 +43,7 @@ export const withClerkMiddleware = (options: ClerkOptions) => {
         .send();
       return;
     }
+
     if (requestState.isInterstitial) {
       const interstitialHtmlPage = clerkClient.localInterstitial({
         frontendApi: constants.FRONTEND_API,
