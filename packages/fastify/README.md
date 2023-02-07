@@ -63,7 +63,7 @@ CLERK_SECRET_KEY=sk_******
 You will then be able to access all the available methods.
 
 ```javascript
-import 'dotenv/config'; // To read CLERK_API_KEY
+import 'dotenv/config'; // To read CLERK_PUBLISHABLE_KEY
 import Fastify from 'fastify';
 import { clerkPlugin, getAuth } from '@clerk/fastify';
 import type { FastifyInstance } from 'fastify';
@@ -98,7 +98,6 @@ Support authenticated routes that the Clerk middleware will run as plugin in `pr
 ```javascript
 import 'dotenv/config'; // To read CLERK_PUBLISHABLE_KEY
 import Fastify from 'fastify';
-import fp from 'fastify-plugin';
 import { clerkPlugin, getAuth } from '@clerk/fastify';
 import type { FastifyReply, FastifyRequest, FastifyInstance } from 'fastify';
 
@@ -118,13 +117,9 @@ const privateRoutes = async (fastify: FastifyInstance, _opts: any) => {
   });
 };
 
-server.register(
-  fp(async function (app, _opts) {
-    app.register(privateRoutes);
-  }),
-);
+server.register(privateRoutes);
 
-server.get('/public', async (req, _reply) => {
+server.get('/public', async (_req, _reply) => {
   return { hello: 'world' };
 });
 

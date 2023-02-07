@@ -21,5 +21,10 @@ export const clerkPlugin = fp(plugin, {
 
 export const getAuth = (req: FastifyRequest) => {
   const authReq = req as WithAuthProp<FastifyRequest>;
+
+  if (authReq.auth === undefined) {
+    throw new Error('The `clerkPlugin` plugin should be registered before using the `getAuth`!');
+  }
+
   return authReq.auth || {};
 };

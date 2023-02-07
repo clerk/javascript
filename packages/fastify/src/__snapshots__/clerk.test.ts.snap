@@ -4,7 +4,6 @@ exports[`clerk initializes clerk with constants 1`] = `
 [
   [
     {
-      "apiKey": "TEST_API_KEY",
       "apiUrl": "https://api.clerk.dev",
       "apiVersion": "v1",
       "jwtKey": "",
