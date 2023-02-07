@@ -1,6 +1,6 @@
 {
   "name": "@clerk/fastify",
-  "version": "0.0.1",
+  "version": "0.0.2-staging.0",
   "license": "MIT",
   "private": true,
   "description": "Clerk.dev SDK for Fastify",
@@ -27,8 +27,8 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@clerk/types": "^3.25.1",
-    "@clerk/clerk-sdk-node": "^4.6.5"
+    "@clerk/clerk-sdk-node": "^4.6.5",
+    "@clerk/types": "^3.25.1"
   },
   "devDependencies": {
     "tsup": "*",
