@@ -14,6 +14,13 @@ Object.defineProperty(navigatorMock, 'webdriver', {
   configurable: true,
 });
 
+Object.defineProperty(navigatorMock, 'onLine', {
+  get() {
+    return true;
+  },
+  configurable: true,
+});
+
 Object.defineProperty(navigatorMock, 'connection', {
   get() {
     return { downlink: 10, rtt: 100 };

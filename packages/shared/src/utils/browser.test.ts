@@ -38,49 +38,66 @@ describe('detectUserAgentRobot', () => {
 describe('isValidBrowserOnline', () => {
   let userAgentGetter: any;
   let webdriverGetter: any;
+  let onLineGetter: any;
   let connectionGetter: any;
 
   beforeEach(() => {
     userAgentGetter = jest.spyOn(window.navigator, 'userAgent', 'get');
     webdriverGetter = jest.spyOn(window.navigator, 'webdriver', 'get');
+    onLineGetter = jest.spyOn(window.navigator, 'onLine', 'get');
     // @ts-ignore
     connectionGetter = jest.spyOn(window.navigator, 'connection', 'get');
   });
 
-  it('returns TRUE if user agent is online, has disabled webdriver, and not a bot', () => {
+  it('returns TRUE if connection is online, navigator is online, has disabled webdriver, and not a bot', () => {
     userAgentGetter.mockReturnValue(
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/109.0',
     );
     webdriverGetter.mockReturnValue(false);
+    onLineGetter.mockReturnValue(true);
     connectionGetter.mockReturnValue({ downlink: 10, rtt: 100 });
 
     expect(isValidBrowserOnline()).toBe(true);
   });
 
-  it('returns FALSE if user agent is online, has disabled webdriver, and is a bot', () => {
+  it('returns FALSE if connection is online, navigator is online, has disabled webdriver, and is a bot', () => {
     userAgentGetter.mockReturnValue('msnbot-NewsBlogs/2.0b (+http://search.msn.com/msnbot.htm)');
     webdriverGetter.mockReturnValue(false);
+    onLineGetter.mockReturnValue(true);
     connectionGetter.mockReturnValue({ downlink: 10, rtt: 100 });
 
     expect(isValidBrowserOnline()).toBe(false);
   });
 
-  it('returns FALSE if user agent is online, has ENABLED the webdriver flag, and is not a bot', () => {
+  it('returns FALSE if connection is online, navigator is online, has ENABLED the webdriver flag, and is not a bot', () => {
     userAgentGetter.mockReturnValue(
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/109.0',
     );
     webdriverGetter.mockReturnValue(true);
+    onLineGetter.mockReturnValue(true);
     connectionGetter.mockReturnValue({ downlink: 10, rtt: 100 });
 
     expect(isValidBrowserOnline()).toBe(false);
   });
 
-  it('returns FALSE if user agent is NOT online, has disabled the webdriver flag, and is not a bot', () => {
+  it('returns FALSE if connection is NOT online, navigator is online, has disabled the webdriver flag, and is not a bot', () => {
     userAgentGetter.mockReturnValue(
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/109.0',
     );
     webdriverGetter.mockReturnValue(false);
+    onLineGetter.mockReturnValue(true);
     connectionGetter.mockReturnValue({ downlink: 0, rtt: 0 });
+
+    expect(isValidBrowserOnline()).toBe(false);
+  });
+
+  it('returns FALSE if connection is online, navigator is NOT online, has disabled the webdriver flag, and is not a bot', () => {
+    userAgentGetter.mockReturnValue(
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/109.0',
+    );
+    webdriverGetter.mockReturnValue(false);
+    onLineGetter.mockReturnValue(false);
+    connectionGetter.mockReturnValue({ downlink: 10, rtt: 100 });
 
     expect(isValidBrowserOnline()).toBe(false);
   });
@@ -90,6 +107,7 @@ describe('isValidBrowserOnline', () => {
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/109.0',
     );
     webdriverGetter.mockReturnValue(false);
+    onLineGetter.mockReturnValue(true);
     connectionGetter.mockReturnValue(undefined);
 
     expect(isValidBrowserOnline()).toBe(true);
