@@ -82,5 +82,7 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     // @ts-expect-error
     isSatellite,
     domain,
+
+    isSynced: new URL(request.url).searchParams.get('__clerk_synced') === 'true',
   });
 }

@@ -2,6 +2,7 @@ import { isDevelopmentFromApiKey, isProductionFromApiKey } from '../util/instanc
 import { checkCrossOrigin } from '../util/request';
 import type { RequestState } from './authStatus';
 import { AuthErrorReason, interstitial, signedIn, signedOut } from './authStatus';
+import type { AuthenticateRequestOptionsWithExperimental } from './request';
 import { verifyToken } from './verify';
 
 export type InterstitialRule = <T>(opts: T) => Promise<RequestState | undefined>;
@@ -128,10 +129,31 @@ export async function runInterstitialRules<T>(opts: T, rules: InterstitialRule[]
 }
 
 async function verifyRequestState(options: any, token: string) {
-  const issuer = (iss: string) => iss.startsWith('https://clerk.') || iss.includes('.clerk.accounts');
+  // TODO: we have an issue with issuer if proxied primary & regular satellite
+  const issuer = (iss: string) =>
+    iss.startsWith('https://clerk.') || iss.includes('.clerk.accounts') || iss === 'https://primary.dev/api/__clerk';
 
   return verifyToken(token, {
     ...options,
     issuer: options?.proxyUrl || issuer,
   });
+}
+
+export async function isSatelliteAndMissingUat(options: any) {
+  const { clientUat, isSatellite, isSynced = false } = options as AuthenticateRequestOptionsWithExperimental;
+  if (isSatellite && (!clientUat || clientUat === '0') && !isSynced) {
+    console.log('-------inside isSatelliteAndMissingUat');
+    return interstitial(options, AuthErrorReason.CookieUATMissing);
+  }
+  // console.log('----isSatelliteAndMissingUat');
+  // console.log('----isSatellite', isSatellite);
+  // console.log('----clientUat', clientUat);
+  // console.log('----result', isSatellite && (!clientUat || clientUat === '0'));
+
+  if (isSatellite && (!clientUat || clientUat === '0') && !isSynced) {
+    console.log('-------inside isSatelliteAndMissingUat');
+    return interstitial(options, AuthErrorReason.CookieUATMissing);
+  }
+
+  return undefined;
 }

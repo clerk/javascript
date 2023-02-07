@@ -40,7 +40,7 @@ export function loadInterstitialFromLocal(
         <script>
             window.__clerk_frontend_api = '${frontendApi}';
             window.__clerk_debug = ${JSON.stringify(debugData || {})};
-            ${proxyUrl ? `window.__clerk_proxy_url = ${proxyUrl}` : ''}
+            ${proxyUrl ? `window.__clerk_proxy_url = '${proxyUrl}'` : ''}
             ${domain ? `window.__clerk_domain = '${domain}'` : ''}
             window.startClerk = async () => {
                 function formRedirect(){
