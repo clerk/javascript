@@ -33,9 +33,23 @@ exports[`@clerk/fastify clerkPlugin() polyfills reply with server response metho
 }
 `;
 
-exports[`@clerk/fastify exports clerkPlugin, withAuth, getAuth 1`] = `
+exports[`@clerk/fastify exports clerkPlugin, getAuth 1`] = `
 {
   "clerkPlugin": [Function],
   "getAuth": [Function],
 }
+`;
+
+exports[`@clerk/fastify getAuth(req) throws error if clerkPlugin is on registered 1`] = `
+"🔒 Clerk: The "clerkPlugin" should be registered before using the "getAuth".
+Example:
+
+import { clerkPlugin } from '@clerk/fastify';
+
+const server: FastifyInstance = Fastify({ logger: true });
+server.register(clerkPlugin);
+
+For more info, check out the docs: https://clerk.dev/docs,
+or come say hi in our discord server: https://rebrand.ly/clerk-discord
+"
 `;
