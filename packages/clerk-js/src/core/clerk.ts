@@ -51,7 +51,6 @@ import {
   appendAsQueryParams,
   buildURL,
   createBeforeUnloadTracker,
-  createClerkQueryParam,
   createPageLifecycle,
   errorThrower,
   getClerkQueryParam,
@@ -72,7 +71,7 @@ import {
   windowNavigate,
 } from '../utils';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
-import { DEV_BROWSER_SSO_JWT_PARAMETER, ERROR_CODES } from './constants';
+import { CLERK_SYNCED, DEV_BROWSER_SSO_JWT_PARAMETER, ERROR_CODES } from './constants';
 import type { DevBrowserHandler } from './devBrowserHandler';
 import createDevBrowserHandler from './devBrowserHandler';
 import {
@@ -955,9 +954,13 @@ export default class Clerk implements ClerkInterface {
     this.#componentControls?.updateProps(props);
   };
 
+  #hasSynced = () => getClerkQueryParam(CLERK_SYNCED) === 'true';
+
+  #clearSynced = () => removeClerkQueryParam(CLERK_SYNCED);
+
   #syncWithPrimary = async () => {
     const q = new URLSearchParams({
-      redirect_url: createClerkQueryParam('__clerk_synced', 'true').toString(),
+      redirect_url: window.location.href,
     });
     if (this.proxyUrl) {
       const proxy = new URL(this.proxyUrl);
@@ -967,20 +970,14 @@ export default class Clerk implements ClerkInterface {
     }
   };
 
-  #handleSyncedQueryParam = () => {
-    if (getClerkQueryParam('__clerk_synced') !== 'true') {
-      return true;
-    }
-    removeClerkQueryParam('__clerk_synced');
-    return false;
-  };
-
-  #shouldSyncWithPrimary = () => this.#options.isSatellite && this.#handleSyncedQueryParam();
-
   #loadInStandardBrowser = async (): Promise<boolean> => {
-    if (this.#shouldSyncWithPrimary()) {
-      await this.#syncWithPrimary();
-      return false;
+    if (this.#options.isSatellite) {
+      if (!this.#hasSynced()) {
+        await this.#syncWithPrimary();
+        return false;
+      }
+
+      this.#clearSynced();
     }
 
     this.#authService = new AuthenticationService(this);
