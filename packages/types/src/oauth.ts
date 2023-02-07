@@ -29,6 +29,7 @@ export type CoinbaseOauthProvider = 'coinbase';
 export type SpotifyOauthProvider = 'spotify';
 export type XeroOauthProvider = 'xero';
 export type BoxOauthProvider = 'box';
+export type WebflowOauthProvider = 'webflow';
 
 export type OAuthProvider =
   | FacebookOauthProvider
@@ -52,7 +53,8 @@ export type OAuthProvider =
   | CoinbaseOauthProvider
   | SpotifyOauthProvider
   | XeroOauthProvider
-  | BoxOauthProvider;
+  | BoxOauthProvider
+  | WebflowOauthProvider;
 
 export const OAUTH_PROVIDERS: OAuthProviderData[] = [
   {
