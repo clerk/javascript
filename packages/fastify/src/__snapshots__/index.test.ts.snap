@@ -35,7 +35,66 @@ exports[`@clerk/fastify clerkPlugin() polyfills reply with server response metho
 
 exports[`@clerk/fastify exports clerkPlugin, getAuth 1`] = `
 {
+  "clerkClient": {
+    "__unstable_options": {
+      "apiUrl": "https://api.clerk.dev",
+      "apiVersion": "v1",
+      "jwtKey": "",
+      "secretKey": "TEST_API_KEY",
+    },
+    "allowlistIdentifiers": de {
+      "request": [Function],
+    },
+    "authenticateRequest": [Function],
+    "clients": ce {
+      "request": [Function],
+    },
+    "debugRequestState": [Function],
+    "emailAddresses": me {
+      "request": [Function],
+    },
+    "emails": ge {
+      "request": [Function],
+    },
+    "interstitial": fe {
+      "request": [Function],
+    },
+    "invitations": ye {
+      "request": [Function],
+    },
+    "localInterstitial": [Function],
+    "organizations": he {
+      "request": [Function],
+    },
+    "phoneNumbers": Se {
+      "request": [Function],
+    },
+    "redirectUrls": ke {
+      "request": [Function],
+    },
+    "remotePrivateInterstitial": [Function],
+    "remotePublicInterstitial": [Function],
+    "remotePublicInterstitialUrl": [Function],
+    "sessions": _e {
+      "getSession": [Function],
+      "getSessionList": [Function],
+      "getToken": [Function],
+      "request": [Function],
+      "revokeSession": [Function],
+      "verifySession": [Function],
+    },
+    "signInTokens": Ie {
+      "request": [Function],
+    },
+    "smsMessages": Ae {
+      "request": [Function],
+    },
+    "users": we {
+      "request": [Function],
+    },
+  },
   "clerkPlugin": [Function],
+  "createClerkClient": [Function],
   "getAuth": [Function],
 }
 `;
