@@ -30,7 +30,7 @@
     "@clerk/clerk-sdk-node": "^4.7.0-staging.1",
     "@clerk/types": "^3.26.0-staging.1",
     "@clerk/backend": "^0.6.0-staging.0",
-    "cookies": "^0.8.0"
+    "cookies": "0.8.0"
   },
   "devDependencies": {
     "tsup": "*",
