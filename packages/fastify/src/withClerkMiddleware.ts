@@ -41,7 +41,8 @@ export const withClerkMiddleware = (options: Record<never, never>) => {
         .header(Headers.AuthMessage, requestState.message)
         .send();
       return;
-    } else if (requestState.isInterstitial) {
+    }
+    if (requestState.isInterstitial) {
       const interstitialHtmlPage = clerkClient.localInterstitial({
         frontendApi: FRONTEND_API,
         publishableKey: PUBLISHABLE_KEY,
