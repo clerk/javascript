@@ -10,7 +10,7 @@ import * as api from './index';
 import { createFastifyInstanceMock } from './test/utils';
 
 describe('@clerk/fastify', () => {
-  test('exports clerkPlugin, withAuth, getAuth', () => {
+  test('exports clerkPlugin, getAuth', () => {
     expect(api).toMatchSnapshot();
   });
 
@@ -53,9 +53,15 @@ describe('@clerk/fastify', () => {
     });
 
     test('returns {} when req.auth as default', () => {
-      const req = { key1: 'asa' } as any as FastifyRequest;
+      const req = { key1: 'asa', auth: null } as any as FastifyRequest;
 
       expect(api.getAuth(req)).toEqual({});
+    });
+
+    test('throws error if clerkPlugin is on registered', () => {
+      const req = { key1: 'asa' } as any as FastifyRequest;
+
+      expect(() => api.getAuth(req)).toThrowErrorMatchingSnapshot();
     });
   });
 });

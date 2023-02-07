@@ -2,6 +2,7 @@ import type { WithAuthProp } from '@clerk/clerk-sdk-node';
 import type { FastifyInstance, FastifyPluginCallback, FastifyRequest } from 'fastify';
 import fp from 'fastify-plugin';
 
+import { pluginRegistrationRequired } from './errors';
 import { polyfillServerResponseMethods } from './polyfill';
 import { withClerkMiddleware } from './withClerkMiddleware';
 
@@ -23,7 +24,7 @@ export const getAuth = (req: FastifyRequest) => {
   const authReq = req as WithAuthProp<FastifyRequest>;
 
   if (authReq.auth === undefined) {
-    throw new Error('The `clerkPlugin` plugin should be registered before using the `getAuth`!');
+    throw new Error(pluginRegistrationRequired);
   }
 
   return authReq.auth || {};
