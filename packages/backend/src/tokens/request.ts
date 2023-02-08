@@ -150,3 +150,5 @@ export const debugRequestState = (params: RequestState) => {
     params;
   return { frontendApi, isSignedIn, proxyUrl, isInterstitial, reason, message, publishableKey, isSatellite, domain };
 };
+
+export type DebugRequestSate = ReturnType<typeof debugRequestState>;

@@ -7,6 +7,7 @@ import { isStaging } from '../util/instance';
 import { parsePublishableKey } from '../util/parsePublishableKey';
 import { joinPaths } from '../util/path';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from './errors';
+import type { DebugRequestSate } from './request';
 
 export type LoadInterstitialOptions = {
   apiUrl: string;
@@ -14,7 +15,7 @@ export type LoadInterstitialOptions = {
   proxyUrl?: string;
   publishableKey: string;
   pkgVersion?: string;
-  debugData?: any;
+  debugData?: DebugRequestSate;
   isSatellite?: boolean;
   domain?: string;
 };
@@ -66,6 +67,7 @@ export function loadInterstitialFromLocal(
                 try {
                     await Clerk.load({
                         isSatellite: ${isSatellite},
+                        shouldSyncLink: ${debugData?.reason !== 'satellite-cookie-missing'},
                     });
                     if(Clerk.loaded){
                       if(window.location.href.indexOf("#") === -1){
