@@ -4,6 +4,8 @@ import type { Clerk, EnvironmentResource, SessionResource, TokenResource } from 
 import type { CookieHandler } from '../../../utils';
 import { createCookieHandler, inBrowser } from '../../../utils';
 import { clerkCoreErrorTokenRefreshFailed } from '../../errors';
+import type { ClerkAPIResponseError } from '../../resources';
+import { isClerkAPIResponseError } from '../../resources';
 import { AuthenticationPoller } from './AuthenticationPoller';
 
 type InitParams = {
@@ -73,7 +75,7 @@ export class AuthenticationService {
 
   private getNewToken() {
     return runWithExponentialBackOff(() => this.clerk.session?.getToken(), {
-      shouldRetry: e => !this.isUnauthorizedError(e),
+      shouldRetry: e => !this.isUnauthorizedError(e as any),
       maxRetries: 8,
     });
   }
@@ -108,13 +110,16 @@ export class AuthenticationService {
   }
 
   private handleGetTokenError(e: any) {
-    if (this.isUnauthorizedError(e) || this.isNetworkError(e)) {
-      return;
+    if (isClerkAPIResponseError(e)) {
+      if (this.isUnauthorizedError(e) || this.isNetworkError(e)) {
+        return;
+      }
+      clerkCoreErrorTokenRefreshFailed(e.toString());
     }
     clerkCoreErrorTokenRefreshFailed(e.message || e);
   }
 
-  private isUnauthorizedError(e: any) {
+  private isUnauthorizedError(e: ClerkAPIResponseError) {
     const status = e?.status;
     const code = e?.errors?.[0]?.code;
     return code === 'authentication_invalid' && status === 401;
@@ -122,7 +127,7 @@ export class AuthenticationService {
 
   private isNetworkError(e: any) {
     // TODO: revise during error handling epic
-    const message = ((e.message + e.name || '') as string).toLowerCase().replace(/\s+/g, '');
+    const message = (`${e.message}${e.name}` || '').toLowerCase().replace(/\s+/g, '');
     return message.includes('networkerror');
   }
 }
