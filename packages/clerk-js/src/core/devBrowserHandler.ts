@@ -12,11 +12,16 @@ import type { FapiClient } from './fapiClient';
 
 export interface DevBrowserHandler {
   clear(): Promise<void>;
+
   setup(): Promise<void>;
+
   getDevBrowserJWT(): string | null;
+
   setDevBrowserJWT(jwt: string): void;
+
   removeDevBrowserJWT(): void;
-  isCookieless(): boolean;
+
+  usesUrlBasedSessionSync(): boolean;
 }
 
 export type CreateDevBrowserHandlerOptions = {
@@ -32,7 +37,7 @@ export default function createDevBrowserHandler({
   const cookieHandler = createCookieHandler();
   const key = DEV_BROWSER_SSO_JWT_KEY;
 
-  let isCookielessDev = true;
+  let usesUrlBasedSessionSyncing = true;
 
   function getDevBrowserJWT() {
     return localStorage.getItem(key);
@@ -100,7 +105,7 @@ export default function createDevBrowserHandler({
     }
   }
 
-  async function setCookielessDevBrowser(): Promise<void> {
+  async function setUrlBasedSessionSyncBrowser(): Promise<void> {
     // 1. Get the JWT from hash search parameters when the redirection comes from Clerk Hosted Pages
     const devBrowserToken = getSearchParameterFromHash({
       hash: window.location.hash,
@@ -132,11 +137,11 @@ export default function createDevBrowserHandler({
     });
 
     if (resp.status === 200) {
-      isCookielessDev = true;
+      usesUrlBasedSessionSyncing = true;
       const data = await resp.json();
       setDevBrowserJWT(data?.token);
     } else {
-      isCookielessDev = false;
+      usesUrlBasedSessionSyncing = false;
     }
   }
 
@@ -146,8 +151,8 @@ export default function createDevBrowserHandler({
     return Promise.resolve();
   }
 
-  function isCookieless(): boolean {
-    return isCookielessDev;
+  function usesUrlBasedSessionSync(): boolean {
+    return usesUrlBasedSessionSyncing;
   }
 
   async function setup(): Promise<void> {
@@ -170,9 +175,9 @@ export default function createDevBrowserHandler({
       });
     }
 
-    await setCookielessDevBrowser();
+    await setUrlBasedSessionSyncBrowser();
 
-    if (isCookieless()) {
+    if (usesUrlBasedSessionSync()) {
       return;
     }
 
@@ -191,6 +196,6 @@ export default function createDevBrowserHandler({
     getDevBrowserJWT,
     setDevBrowserJWT,
     removeDevBrowserJWT,
-    isCookieless,
+    usesUrlBasedSessionSync,
   };
 }

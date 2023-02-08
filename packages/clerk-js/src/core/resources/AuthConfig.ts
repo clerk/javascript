@@ -4,7 +4,7 @@ import { BaseResource } from './internal';
 
 export class AuthConfig extends BaseResource implements AuthConfigResource {
   singleSessionMode!: boolean;
-  cookielessDev!: boolean;
+  urlBasedSessionSyncing!: boolean;
 
   public constructor(data: AuthConfigJSON) {
     super();
@@ -13,7 +13,7 @@ export class AuthConfig extends BaseResource implements AuthConfigResource {
 
   protected fromJSON(data: AuthConfigJSON | null): this {
     this.singleSessionMode = data ? data.single_session_mode : true;
-    this.cookielessDev = data ? data.cookieless_dev : false;
+    this.urlBasedSessionSyncing = data ? data.url_based_session_syncing : false;
     return this;
   }
 }
