@@ -112,6 +112,7 @@ const defaultOptions: ClerkOptions = {
   standardBrowser: true,
   touchSession: true,
   isSatellite: false,
+  shouldSyncLink: true,
 };
 
 export default class Clerk implements ClerkInterface {
@@ -979,7 +980,7 @@ export default class Clerk implements ClerkInterface {
   };
 
   #loadInStandardBrowser = async (): Promise<boolean> => {
-    if (this.isSatellite) {
+    if (this.isSatellite && this.#options.shouldSyncLink) {
       if (!this.#hasSynced()) {
         await this.#syncWithPrimary();
         return false;

@@ -471,6 +471,11 @@ export interface ClerkOptions {
    * @experimental
    */
   isSatellite?: boolean | ((url: URL) => boolean);
+
+  /**
+   * @experimental
+   */
+  shouldSyncLink?: boolean;
 }
 
 export interface Resources {
