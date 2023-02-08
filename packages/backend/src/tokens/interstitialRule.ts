@@ -139,21 +139,12 @@ async function verifyRequestState(options: any, token: string) {
   });
 }
 
-export async function isSatelliteAndMissingUat(options: any) {
+export const isSatelliteAndMissingUat: InterstitialRule = async options => {
   const { clientUat, isSatellite, isSynced = false } = options as AuthenticateRequestOptionsWithExperimental;
-  if (isSatellite && (!clientUat || clientUat === '0') && !isSynced) {
-    console.log('-------inside isSatelliteAndMissingUat');
-    return interstitial(options, AuthErrorReason.CookieUATMissing);
-  }
-  // console.log('----isSatelliteAndMissingUat');
-  // console.log('----isSatellite', isSatellite);
-  // console.log('----clientUat', clientUat);
-  // console.log('----result', isSatellite && (!clientUat || clientUat === '0'));
 
   if (isSatellite && (!clientUat || clientUat === '0') && !isSynced) {
-    console.log('-------inside isSatelliteAndMissingUat');
     return interstitial(options, AuthErrorReason.CookieUATMissing);
   }
 
   return undefined;
-}
+};
