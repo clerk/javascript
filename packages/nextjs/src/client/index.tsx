@@ -17,6 +17,15 @@ export * from '@clerk/clerk-react';
 
 type NextClerkProviderProps = {
   children: React.ReactNode;
+  /**
+   * If set to true, the NextJS middleware will be invoked
+   * every time the client-side auth state changes (sign-out, sign-in, organization switch etc.).
+   * That way, any auth-dependent logic can be placed inside the middleware.
+   * Example: Configuring the middleware to force a redirect to `/sign-in` when the user signs out
+   *
+   * @default true
+   */
+  __unstable_invokeMiddlewareOnAuthStateChange: boolean;
 } & Omit<IsomorphicClerkOptions, keyof PublishableKeyOrFrontendApi> &
   Partial<PublishableKeyOrFrontendApi>;
 
@@ -34,6 +43,7 @@ export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JS
     // @ts-expect-error
     __clerk_ssr_state,
     clerkJSUrl,
+    __unstable_invokeMiddlewareOnAuthStateChange = true,
     ...restProps
   } = rest;
   const { push } = useRouter();
@@ -42,6 +52,14 @@ export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JS
 
   useSafeLayoutEffect(() => {
     window.__unstable__onBeforeSetActive = invalidateNextRouterCache;
+    window.__unstable__onAfterSetActive = () => {
+      // Re-run the middleware every time there auth state changes.
+      // This enables complete control from a centralised place (NextJS middleware),
+      // as we will invoke it every time the client-side auth state changes, eg: signing-out, switching orgs, etc.
+      if (__unstable_invokeMiddlewareOnAuthStateChange) {
+        void push(window.location.href);
+      }
+    };
   }, []);
 
   return (
