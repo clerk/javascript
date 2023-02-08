@@ -60,6 +60,12 @@ export class ClerkAPIResponseError extends Error {
     this.clerkError = true;
     this.errors = parseErrors(data);
   }
+
+  public toString = () => {
+    return `[${this.name}]\nMessage:${this.message}\nStatus:${this.status}\nSerialized errors: ${this.errors.map(e =>
+      JSON.stringify(e),
+    )}`;
+  };
 }
 
 export class MagicLinkError extends Error {
