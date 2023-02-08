@@ -201,7 +201,7 @@ export interface SessionWithActivitiesJSON extends Omit<SessionJSON, 'user'> {
 
 export interface AuthConfigJSON extends ClerkResourceJSON {
   single_session_mode: boolean;
-  cookieless_dev: boolean;
+  url_based_session_syncing: boolean;
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {

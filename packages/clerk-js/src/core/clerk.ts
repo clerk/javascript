@@ -552,7 +552,7 @@ export default class Clerk implements ClerkInterface {
   };
 
   public buildUrlWithAuth(to: string): string {
-    if (this.#instanceType === 'production' || !this.#devBrowserHandler?.isCookieless()) {
+    if (this.#instanceType === 'production' || !this.#devBrowserHandler?.usesUrlBasedSessionSync()) {
       return to;
     }
 
