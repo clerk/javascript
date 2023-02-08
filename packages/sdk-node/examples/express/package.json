@@ -1,7 +1,7 @@
 {
   "name": "clerk-sdk-node-express-example",
   "dependencies": {
-    "@clerk/clerk-sdk-node": "file:../../dist",
+    "@clerk/clerk-sdk-node": "file:../../",
     "dotenv": "latest",
     "express": "latest"
   },
