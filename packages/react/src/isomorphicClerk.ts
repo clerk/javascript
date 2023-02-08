@@ -1,6 +1,7 @@
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
+  Clerk,
   ClientResource,
   CreateOrganizationParams,
   CreateOrganizationProps,
@@ -44,6 +45,7 @@ type GenericFunction<TArgs = never> = (...args: TArgs[]) => unknown;
 type MethodName<T> = {
   [P in keyof T]: T[P] extends GenericFunction ? P : never;
 }[keyof T];
+
 type MethodCallback = () => Promise<unknown> | unknown;
 
 export default class IsomorphicClerk {
@@ -514,6 +516,15 @@ export default class IsomorphicClerk {
       void callback();
     } else {
       this.premountMethodCalls.set('navigate', callback);
+    }
+  };
+
+  redirectWithAuth = (...args: Parameters<Clerk['redirectWithAuth']>): void => {
+    const callback = () => this.clerkjs?.redirectWithAuth(...args);
+    if (this.clerkjs && this.#loaded) {
+      void callback();
+    } else {
+      this.premountMethodCalls.set('redirectWithAuth', callback);
     }
   };
 
