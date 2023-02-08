@@ -34,7 +34,14 @@ export const HashRouter = ({ preservedParams, children }: HashRouterProps): JSX.
   };
 
   const getQueryString = (): string => {
-    return fakeUrl().search;
+    // Construct a search string that combines all search params of the current url
+    // and all search params found within the fragment part of the current url, which is normally ignored.
+    // The search params from the fragment need to be appending last, so they take priority over any other params,
+    // so we can be sure that we introduce no changes to the existing behavior
+    const tempUrl = new URL(window.location.href);
+    const urlWithFragmentPart = fakeUrl();
+    urlWithFragmentPart.searchParams.forEach((value, key) => tempUrl.searchParams.set(key, value));
+    return tempUrl.search;
   };
 
   return (
