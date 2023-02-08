@@ -1,4 +1,4 @@
 folders:
   - path: /
     exclude:
-      - ./**/*.tests.ts
+      - ./**/*.test.ts
