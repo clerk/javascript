@@ -137,9 +137,14 @@ export async function runInterstitialRules<T>(opts: T, rules: InterstitialRule[]
 }
 
 async function verifyRequestState(options: any, token: string) {
-  // TODO: we have an issue with issuer if proxied primary & regular satellite
-  const issuer = (iss: string) =>
-    iss.startsWith('https://clerk.') || iss.includes('.clerk.accounts') || iss === 'https://primary.dev/api/__clerk';
+  const issuer = (iss: string) => iss.startsWith('https://clerk.') || iss.includes('.clerk.accounts');
+
+  if (options?.isSatellite) {
+    return verifyToken(token, {
+      ...options,
+      issuer: null,
+    });
+  }
 
   return verifyToken(token, {
     ...options,
