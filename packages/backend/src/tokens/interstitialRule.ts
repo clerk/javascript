@@ -88,17 +88,9 @@ export const isNormalSignedOutState: InterstitialRule = async options => {
 
 // This happens when a signed in user visits a new subdomain for the first time. The uat will be available because it's set on naked domain, but session will be missing. It can also happen if the cookieToken is manually removed during development.
 export const hasPositiveClientUatButCookieIsMissing: InterstitialRule = async options => {
-  const {
-    clientUat,
-    isSatellite,
-    cookieToken,
-    isSynced = false,
-  } = options as AuthenticateRequestOptionsWithExperimental;
+  const { clientUat, cookieToken } = options as AuthenticateRequestOptionsWithExperimental;
 
   if (clientUat && Number.parseInt(clientUat) > 0 && !cookieToken) {
-    if (isSatellite && isSynced) {
-      return interstitial(options, AuthErrorReason.SatelliteCookieMissing);
-    }
     return interstitial(options, AuthErrorReason.CookieMissing);
   }
   return undefined;
@@ -152,11 +144,26 @@ async function verifyRequestState(options: any, token: string) {
   });
 }
 
-export const isSatelliteAndMissingUat: InterstitialRule = async options => {
+export const isSatelliteAndNeedsSync: InterstitialRule = async options => {
   const { clientUat, isSatellite, isSynced = false } = options as AuthenticateRequestOptionsWithExperimental;
 
   if (isSatellite && (!clientUat || clientUat === '0') && !isSynced) {
-    return interstitial(options, AuthErrorReason.SatelliteCookieUATMissing);
+    return interstitial(options, AuthErrorReason.SatelliteCookieNeedsSync);
+  }
+
+  return undefined;
+};
+
+export const isSatelliteAlreadySyncedButCookieIsMissing: InterstitialRule = async options => {
+  const {
+    clientUat,
+    cookieToken,
+    isSatellite,
+    isSynced = false,
+  } = options as AuthenticateRequestOptionsWithExperimental;
+
+  if (clientUat && Number.parseInt(clientUat) > 0 && !cookieToken && !!isSatellite && isSynced) {
+    return interstitial(options, AuthErrorReason.SatelliteCookieMissing);
   }
 
   return undefined;
