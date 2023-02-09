@@ -99,13 +99,13 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
   async function authenticateRequestWithTokenInCookie() {
     try {
       const state = await runInterstitialRules(options, [
-        nonBrowserRequestInDevRule,
         crossOriginRequestWithoutHeader,
+        nonBrowserRequestInDevRule,
+        potentialFirstRequestOnProductionEnvironment,
         potentialFirstLoadInDevWhenUATMissing,
         potentialRequestAfterSignInOrOurFromClerkHostedUiInDev,
-        potentialFirstRequestOnProductionEnvironment,
-        isNormalSignedOutState,
         hasPositiveClientUatButCookieIsMissing,
+        isNormalSignedOutState,
         hasValidCookieToken,
       ]);
 
