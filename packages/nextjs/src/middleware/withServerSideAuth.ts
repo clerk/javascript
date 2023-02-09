@@ -45,7 +45,13 @@ export const withServerSideAuth: WithServerSideAuth = (cbOrOptions: any, options
   return async (ctx: GetServerSidePropsContext) => {
     const requestState = await authenticateRequest(ctx, opts);
 
-    if (requestState.isInterstitial || requestState.isUnknown) {
+    if (requestState.isUnknown) {
+      decorateResponseWithObservabilityHeaders(ctx.res, requestState);
+      ctx.res.writeHead(401, { 'Content-Type': 'text/html' });
+      ctx.res.end();
+      return EMPTY_GSSP_RESPONSE;
+    }
+    if (requestState.isInterstitial) {
       decorateResponseWithObservabilityHeaders(ctx.res, requestState);
       ctx.res.writeHead(401, { 'Content-Type': 'text/html' });
       const interstitial = await clerkClient.remotePublicInterstitial({

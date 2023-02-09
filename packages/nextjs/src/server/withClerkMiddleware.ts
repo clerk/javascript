@@ -1,4 +1,4 @@
-import type { AuthStatus } from '@clerk/backend';
+import type { AuthStatus, RequestState } from '@clerk/backend';
 import { constants } from '@clerk/backend';
 import type { NextMiddleware, NextMiddlewareResult } from 'next/dist/server/web/types';
 import type { NextFetchEvent, NextRequest } from 'next/server';
@@ -30,6 +30,12 @@ interface WithClerkMiddleware {
 
   (): NextMiddleware;
 }
+
+export const decorateResponseWithObservabilityHeaders = (res: NextResponse, requestState: RequestState) => {
+  requestState.message && res.headers.set(constants.Headers.AuthMessage, requestState.message);
+  requestState.reason && res.headers.set(constants.Headers.AuthReason, requestState.reason);
+  requestState.status && res.headers.set(constants.Headers.AuthStatus, requestState.status);
+};
 
 export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => {
   const noop = () => undefined;
@@ -70,7 +76,12 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
     // Interstitial case
     // Note: there is currently no way to rewrite to a protected endpoint
     // Therefore we have to resort to a public interstitial endpoint
-    if (requestState.isInterstitial || requestState.isUnknown) {
+    if (requestState.isUnknown) {
+      const response = new NextResponse(null, { status: 401, headers: { 'Content-Type': 'text/html' } });
+      decorateResponseWithObservabilityHeaders(response, requestState);
+      return response;
+    }
+    if (requestState.isInterstitial) {
       const response = NextResponse.rewrite(
         clerkClient.remotePublicInterstitialUrl({
           apiUrl: API_URL,
@@ -79,8 +90,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
         }),
         { status: 401 },
       );
-      response.headers.set(constants.Headers.AuthReason, requestState.reason);
-      response.headers.set(constants.Headers.AuthMessage, requestState.message);
+      decorateResponseWithObservabilityHeaders(response, requestState);
       return response;
     }
 
