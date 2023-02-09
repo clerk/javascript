@@ -86,9 +86,10 @@ export const isNormalSignedOutState: InterstitialRule = async options => {
 };
 
 // This happens when a signed in user visits a new subdomain for the first time. The uat will be available because it's set on naked domain, but session will be missing. It can also happen if the cookieToken is manually removed during development.
-export const hasClientUatButCookieIsMissingInProd: InterstitialRule = async options => {
+export const hasPositiveClientUatButCookieIsMissing: InterstitialRule = async options => {
   const { clientUat, cookieToken } = options as any;
-  if (clientUat && !cookieToken) {
+
+  if (clientUat && Number.parseInt(clientUat) > 0 && !cookieToken) {
     return interstitial(options, AuthErrorReason.CookieMissing);
   }
   return undefined;

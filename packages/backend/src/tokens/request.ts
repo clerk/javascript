@@ -6,7 +6,7 @@ import type { TokenCarrier } from './errors';
 import { TokenVerificationError, TokenVerificationErrorReason } from './errors';
 import {
   crossOriginRequestWithoutHeader,
-  hasClientUatButCookieIsMissingInProd,
+  hasPositiveClientUatButCookieIsMissing,
   hasValidCookieToken,
   hasValidHeaderToken,
   isNormalSignedOutState,
@@ -105,7 +105,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
         potentialRequestAfterSignInOrOurFromClerkHostedUiInDev,
         potentialFirstRequestOnProductionEnvironment,
         isNormalSignedOutState,
-        hasClientUatButCookieIsMissingInProd,
+        hasPositiveClientUatButCookieIsMissing,
         hasValidCookieToken,
       ]);
 
@@ -142,6 +142,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
 }
 
 export const debugRequestState = (params: RequestState) => {
-  const { frontendApi, isSignedIn, proxyUrl, isInterstitial, reason, message, publishableKey, isSatellite, domain } = params;
+  const { frontendApi, isSignedIn, proxyUrl, isInterstitial, reason, message, publishableKey, isSatellite, domain } =
+    params;
   return { frontendApi, isSignedIn, proxyUrl, isInterstitial, reason, message, publishableKey, isSatellite, domain };
 };
