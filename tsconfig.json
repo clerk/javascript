@@ -2,7 +2,6 @@
   "compileOnSave": false,
   "compilerOptions": {
     "alwaysStrict": false,
-    "baseUrl": "packages",
     "declaration": true,
     "declarationMap": false,
     "downlevelIteration": true,
