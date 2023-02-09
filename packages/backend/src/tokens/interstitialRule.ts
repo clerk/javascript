@@ -2,10 +2,13 @@ import { isDevelopmentFromApiKey, isProductionFromApiKey } from '../util/instanc
 import { checkCrossOrigin } from '../util/request';
 import type { RequestState } from './authStatus';
 import { AuthErrorReason, interstitial, signedIn, signedOut } from './authStatus';
-import type { AuthenticateRequestOptionsWithExperimental } from './request';
+import type { AuthenticateRequestOptions, AuthenticateRequestOptionsWithExperimental } from './request';
 import { verifyToken } from './verify';
 
-export type InterstitialRule = <T>(opts: T) => Promise<RequestState | undefined>;
+type InterstitialRuleResult = RequestState | undefined;
+type InterstitialRule = <T extends AuthenticateRequestOptions>(
+  opts: T,
+) => Promise<InterstitialRuleResult> | InterstitialRuleResult;
 
 // In development or staging environments only, based on the request's
 // User Agent, detect non-browser requests (e.g. scripts). Since there
@@ -13,8 +16,8 @@ export type InterstitialRule = <T>(opts: T) => Promise<RequestState | undefined>
 // prevent interstitial rendering
 // In production, script requests will be missing both uat and session cookies, which will be
 // automatically treated as signed out. This exception is needed for development, because the any // missing uat throws an interstitial in development.
-export const nonBrowserRequestInDevRule: InterstitialRule = async options => {
-  const { apiKey, secretKey, userAgent } = options as any;
+export const nonBrowserRequestInDevRule: InterstitialRule = options => {
+  const { apiKey, secretKey, userAgent } = options;
   const key = secretKey || apiKey;
   if (isDevelopmentFromApiKey(key) && !userAgent?.startsWith('Mozilla/')) {
     return signedOut(options, AuthErrorReason.HeaderMissingNonBrowser);
@@ -22,8 +25,8 @@ export const nonBrowserRequestInDevRule: InterstitialRule = async options => {
   return undefined;
 };
 
-export const crossOriginRequestWithoutHeader: InterstitialRule = async options => {
-  const { origin, host, forwardedHost, forwardedPort, forwardedProto } = options as any;
+export const crossOriginRequestWithoutHeader: InterstitialRule = options => {
+  const { origin, host, forwardedHost, forwardedPort, forwardedProto } = options;
   const isCrossOrigin =
     origin &&
     checkCrossOrigin({
@@ -40,8 +43,8 @@ export const crossOriginRequestWithoutHeader: InterstitialRule = async options =
   return undefined;
 };
 
-export const potentialFirstLoadInDevWhenUATMissing: InterstitialRule = async options => {
-  const { apiKey, secretKey, clientUat } = options as any;
+export const potentialFirstLoadInDevWhenUATMissing: InterstitialRule = options => {
+  const { apiKey, secretKey, clientUat } = options;
   const key = secretKey || apiKey;
   const res = isDevelopmentFromApiKey(key);
   if (res && !clientUat) {
@@ -50,8 +53,8 @@ export const potentialFirstLoadInDevWhenUATMissing: InterstitialRule = async opt
   return undefined;
 };
 
-export const potentialRequestAfterSignInOrOurFromClerkHostedUiInDev: InterstitialRule = async options => {
-  const { apiKey, secretKey, referrer, host, forwardedHost, forwardedPort, forwardedProto } = options as any;
+export const potentialRequestAfterSignInOrOurFromClerkHostedUiInDev: InterstitialRule = options => {
+  const { apiKey, secretKey, referrer, host, forwardedHost, forwardedPort, forwardedProto } = options;
   const crossOriginReferrer =
     referrer && checkCrossOrigin({ originURL: new URL(referrer), host, forwardedHost, forwardedPort, forwardedProto });
   const key = secretKey || apiKey;
@@ -62,8 +65,8 @@ export const potentialRequestAfterSignInOrOurFromClerkHostedUiInDev: Interstitia
   return undefined;
 };
 
-export const potentialFirstRequestOnProductionEnvironment: InterstitialRule = async options => {
-  const { apiKey, secretKey, clientUat, cookieToken } = options as any;
+export const potentialFirstRequestOnProductionEnvironment: InterstitialRule = options => {
+  const { apiKey, secretKey, clientUat, cookieToken } = options;
   const key = secretKey || apiKey;
 
   if (isProductionFromApiKey(key) && !clientUat && !cookieToken) {
@@ -78,8 +81,8 @@ export const potentialFirstRequestOnProductionEnvironment: InterstitialRule = as
 //     return { status: AuthStatus.Interstitial, errorReason: '' as any };
 //   }
 // };
-export const isNormalSignedOutState: InterstitialRule = async options => {
-  const { clientUat } = options as any;
+export const isNormalSignedOutState: InterstitialRule = options => {
+  const { clientUat } = options;
   if (clientUat === '0') {
     return signedOut(options, AuthErrorReason.StandardSignedOut);
   }
@@ -117,7 +120,10 @@ export const hasValidCookieToken: InterstitialRule = async options => {
   return state;
 };
 
-export async function runInterstitialRules<T>(opts: T, rules: InterstitialRule[]): Promise<RequestState> {
+export async function runInterstitialRules<T extends AuthenticateRequestOptions>(
+  opts: T,
+  rules: InterstitialRule[],
+): Promise<RequestState> {
   for (const rule of rules) {
     const res = await rule(opts);
     if (res) {
@@ -125,15 +131,16 @@ export async function runInterstitialRules<T>(opts: T, rules: InterstitialRule[]
     }
   }
 
-  return signedOut<T>(opts, AuthErrorReason.UnexpectedError);
+  return signedOut(opts, AuthErrorReason.UnexpectedError);
 }
 
-async function verifyRequestState(options: any, token: string) {
+async function verifyRequestState(options: AuthenticateRequestOptions, token: string) {
+  const { isSatellite, proxyUrl } = options as AuthenticateRequestOptionsWithExperimental;
   let issuer;
-  if (options?.isSatellite) {
+  if (isSatellite) {
     issuer = null;
-  } else if (options?.proxyUrl) {
-    issuer = options?.proxyUrl;
+  } else if (proxyUrl) {
+    issuer = proxyUrl;
   } else {
     issuer = (iss: string) => iss.startsWith('https://clerk.') || iss.includes('.clerk.accounts');
   }
@@ -141,7 +148,7 @@ async function verifyRequestState(options: any, token: string) {
   return verifyToken(token, { ...options, issuer });
 }
 
-export const isSatelliteAndNeedsSync: InterstitialRule = async options => {
+export const isSatelliteAndNeedsSync: InterstitialRule = options => {
   const { clientUat, isSatellite, isSynced = false } = options as AuthenticateRequestOptionsWithExperimental;
 
   if (isSatellite && (!clientUat || clientUat === '0') && !isSynced) {
@@ -151,7 +158,7 @@ export const isSatelliteAndNeedsSync: InterstitialRule = async options => {
   return undefined;
 };
 
-export const isSatelliteAlreadySyncedButCookieIsMissing: InterstitialRule = async options => {
+export const isSatelliteAlreadySyncedButCookieIsMissing: InterstitialRule = options => {
   const { clientUat, cookieToken, isSatellite, isSynced } = options as AuthenticateRequestOptionsWithExperimental;
 
   if (clientUat && Number.parseInt(clientUat) > 0 && !cookieToken && isSatellite && isSynced) {
