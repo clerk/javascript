@@ -54,7 +54,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
       publishableKey: PUBLISHABLE_KEY,
       cookieToken,
       headerToken,
-      clientUat: getCookie(req, '__client_uat'),
+      clientUat: getCookie(req, constants.Cookies.ClientUat),
       origin: headers.get('origin') || undefined,
       host: headers.get('host') as string,
       forwardedPort: headers.get('x-forwarded-port') || undefined,
