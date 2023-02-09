@@ -1,14 +1,7 @@
-import jwtGen from 'jsonwebtoken';
-
 import { decode } from '../jwt';
 
-const jwt = jwtGen.sign(
-  {
-    exp: Math.floor(Date.now() / 1000) + 60,
-    data: 'foobar',
-  },
-  'secret',
-);
+const jwt =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzU4NzY3OTAsImRhdGEiOiJmb29iYXIiLCJpYXQiOjE2NzU4NzY3MzB9.Z1BC47lImYvaAtluJlY-kBo0qOoAk42Xb-gNrB2SxJg';
 
 describe('decode(token)', () => {
   it('decodes a JWT token', () => {

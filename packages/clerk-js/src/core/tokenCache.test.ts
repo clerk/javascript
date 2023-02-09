@@ -1,5 +1,4 @@
 import type { TokenResource } from '@clerk/types';
-import jwtGen from 'jsonwebtoken';
 
 import { Token } from './resources/internal';
 import { SessionTokenCache } from './tokenCache';
@@ -13,13 +12,8 @@ jest.mock('./resources/Base', () => {
   };
 });
 
-const jwt = jwtGen.sign(
-  {
-    exp: Math.floor(Date.now() / 1000) + 60,
-    data: 'foobar',
-  },
-  'secret',
-);
+const jwt =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzU4NzY3OTAsImRhdGEiOiJmb29iYXIiLCJpYXQiOjE2NzU4NzY3MzB9.Z1BC47lImYvaAtluJlY-kBo0qOoAk42Xb-gNrB2SxJg';
 
 describe('MemoryTokenCache', () => {
   beforeAll(() => {
