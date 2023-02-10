@@ -163,16 +163,15 @@ export default class IsomorphicClerk {
 
       return global.Clerk?.loaded ? this.hydrateClerkJS(global.Clerk) : undefined;
     } catch (err) {
-      let message;
-
-      if (err instanceof Error) {
-        message = err.message;
+      const error = err as Error;
+      // In Next.js we can throw a full screen error in development mode.
+      // However, in production throwing an error results in an infinite loop.
+      // More info at: https://github.com/vercel/next.js/issues/6973
+      if (process.env.NODE_ENV === 'production') {
+        console.error(error.stack || error.message || error);
       } else {
-        message = String(err);
+        throw err;
       }
-
-      this.throwError(message);
-
       return;
     }
   }
@@ -185,18 +184,6 @@ export default class IsomorphicClerk {
     this.loadedListeners.forEach(cb => cb());
     this.loadedListeners = [];
   };
-
-  // Custom wrapper to throw an error, since we need to apply different handling between
-  // production and development builds. In Next.js we can throw a full screen error in
-  // development mode. However, in production throwing an error results in an infinite loop
-  // as shown at https://github.com/vercel/next.js/issues/6973
-  throwError(errorMsg: string): void {
-    if (process.env.NODE_ENV === 'production') {
-      console.error(errorMsg);
-    } else {
-      throw new Error(errorMsg);
-    }
-  }
 
   private hydrateClerkJS = (clerkjs: BrowserClerk | HeadlessBrowserClerk | undefined) => {
     if (!clerkjs) {
