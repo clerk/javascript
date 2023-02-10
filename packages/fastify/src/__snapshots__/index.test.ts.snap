@@ -1,37 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`@clerk/fastify clerkPlugin() polyfills reply with server response methods 1`] = `
-[MockFunction] {
-  "calls": [
-    [
-      "setHeader",
-      [Function],
-    ],
-    [
-      "writeHead",
-      [Function],
-    ],
-    [
-      "end",
-      [Function],
-    ],
-  ],
-  "results": [
-    {
-      "type": "return",
-      "value": undefined,
-    },
-    {
-      "type": "return",
-      "value": undefined,
-    },
-    {
-      "type": "return",
-      "value": undefined,
-    },
-  ],
-}
-`;
+exports[`@clerk/fastify clerkPlugin() polyfills reply with server response methods 1`] = `[MockFunction]`;
 
 exports[`@clerk/fastify exports clerkPlugin, getAuth 1`] = `
 {
