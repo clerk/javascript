@@ -46,6 +46,7 @@ const createBasePropForRedwoodCompatibility = () => {
 export const createClerkClient = Clerk;
 
 export const clerkClient = Clerk({
+  secretKey: API_KEY,
   apiKey: API_KEY,
   apiUrl: API_URL,
   apiVersion: API_VERSION,
