@@ -4,6 +4,7 @@ import {
   authenticateRequest,
   decorateResponseWithObservabilityHeaders,
   handleInterstitialCase,
+  handleUnknownCase,
 } from './authenticateRequest';
 import type { ClerkMiddlewareOptions, MiddlewareRequireAuthProp, RequireAuthProp } from './types';
 
@@ -38,7 +39,10 @@ export const createClerkExpressRequireAuth = (createOpts: CreateClerkExpressMidd
         options,
       );
       decorateResponseWithObservabilityHeaders(res, requestState);
-      if (requestState.isInterstitial || requestState.isUnknown) {
+      if (requestState.isUnknown) {
+        return handleUnknownCase(res, requestState);
+      }
+      if (requestState.isInterstitial) {
         const interstitial = await clerkClient.remotePrivateInterstitial();
         return handleInterstitialCase(res, requestState, interstitial);
       }

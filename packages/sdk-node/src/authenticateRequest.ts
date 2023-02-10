@@ -37,9 +37,15 @@ export const authenticateRequest = (
     userAgent: req.headers['user-agent'] as string,
   });
 };
+export const handleUnknownCase = (res: ServerResponse, requestState: RequestState) => {
+  if (requestState.isUnknown) {
+    res.writeHead(401, { 'Content-Type': 'text/html' });
+    res.end();
+  }
+};
 
 export const handleInterstitialCase = (res: ServerResponse, requestState: RequestState, interstitial: string) => {
-  if (requestState.isInterstitial || requestState.isUnknown) {
+  if (requestState.isInterstitial) {
     res.writeHead(401, { 'Content-Type': 'text/html' });
     res.end(interstitial);
   }
