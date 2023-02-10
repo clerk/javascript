@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "0.11.2-staging.1",
+  "version": "0.11.2",
   "description": "Internal package utils used by the Clerk SDKs",
   "types": "./dist/types/index.d.ts",
   "main": "./dist/index.js",
@@ -18,7 +18,7 @@
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
   },
   "devDependencies": {
-    "@clerk/types": "^3.27.0-staging.1",
+    "@clerk/types": "^3.27.0",
     "@testing-library/dom": "^8.19.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
