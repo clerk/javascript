@@ -10,6 +10,7 @@ import {
   interstitialJsonResponse,
   isRedirect,
   isResponse,
+  unknownResponse,
 } from './utils';
 
 interface RootAuthLoader {
@@ -36,7 +37,11 @@ export const rootAuthLoader: RootAuthLoader = async (
 
   const requestState = await authenticateRequest(args, opts);
 
-  if (requestState.isInterstitial || requestState.isUnknown) {
+  if (requestState.isUnknown) {
+    throw unknownResponse();
+  }
+
+  if (requestState.isInterstitial) {
     throw interstitialJsonResponse(requestState, { loader: 'root' });
   }
 

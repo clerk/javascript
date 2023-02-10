@@ -48,6 +48,10 @@ export function assertObject(val: any, error?: string): asserts val is Record<st
   }
 }
 
+export const unknownResponse = () => {
+  return json(null, { status: 401 });
+};
+
 export const interstitialJsonResponse = (requestState: RequestState, opts: { loader: 'root' | 'nested' }) => {
   return json(
     wrapWithClerkState({
