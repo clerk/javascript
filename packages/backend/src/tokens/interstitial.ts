@@ -67,7 +67,7 @@ export function loadInterstitialFromLocal(
                 try {
                     await Clerk.load({
                         isSatellite: ${isSatellite},
-                        shouldSyncLink: ${debugData?.reason !== 'satellite-cookie-missing'},
+                        shouldSyncLink: ${isSatellite && debugData?.reason !== 'satellite-cookie-missing'},
                     });
                     if(Clerk.loaded){
                       if(window.location.href.indexOf("#") === -1){

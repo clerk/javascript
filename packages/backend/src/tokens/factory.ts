@@ -30,6 +30,8 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
     isSatellite: buildtimeIsSatellite = false,
     // @ts-expect-error
     domain: buildtimeDomain = '',
+    // @ts-expect-error
+    isSynced: buildtimeIsSynced = false,
   } = params.options;
 
   const authenticateRequest = ({
@@ -41,8 +43,11 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
     jwtKey: runtimeJwtKey,
     ...rest
   }: Omit<AuthenticateRequestOptions, 'apiUrl' | 'apiVersion'>) => {
-    const { isSatellite: runtimeIsSatellite, domain: runtimeDomain } =
-      rest as Partial<AuthenticateRequestOptionsWithExperimental>;
+    const {
+      isSatellite: runtimeIsSatellite,
+      domain: runtimeDomain,
+      isSynced: runtimeIsSynced,
+    } = rest as Partial<AuthenticateRequestOptionsWithExperimental>;
 
     return authenticateRequestOriginal({
       ...rest,
@@ -57,6 +62,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
       isSatellite: runtimeIsSatellite || buildtimeIsSatellite,
       domain: runtimeDomain || buildtimeDomain,
       jwtKey: runtimeJwtKey || buildtimeJwtKey,
+      isSynced: runtimeIsSynced || buildtimeIsSynced,
     });
   };
 

@@ -155,14 +155,9 @@ export const isSatelliteAndNeedsSync: InterstitialRule = async options => {
 };
 
 export const isSatelliteAlreadySyncedButCookieIsMissing: InterstitialRule = async options => {
-  const {
-    clientUat,
-    cookieToken,
-    isSatellite,
-    isSynced = false,
-  } = options as AuthenticateRequestOptionsWithExperimental;
+  const { clientUat, cookieToken, isSatellite, isSynced } = options as AuthenticateRequestOptionsWithExperimental;
 
-  if (clientUat && Number.parseInt(clientUat) > 0 && !cookieToken && !!isSatellite && isSynced) {
+  if (clientUat && Number.parseInt(clientUat) > 0 && !cookieToken && isSatellite && isSynced) {
     return interstitial(options, AuthErrorReason.SatelliteCookieMissing);
   }
 
