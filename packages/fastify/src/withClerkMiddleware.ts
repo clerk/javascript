@@ -1,14 +1,16 @@
-import type { ClerkOptions } from '@clerk/types';
 import { parse } from 'cookie';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 
 import { clerkClient } from './clerkClient';
 import * as constants from './constants';
+import type { ClerkFastifyOptions } from './types';
 import { getSingleValueFromArrayHeader } from './utils';
 
-export const withClerkMiddleware = (options: ClerkOptions) => {
+export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
   return async (req: FastifyRequest, reply: FastifyReply) => {
     const cookies = parse(req.raw.headers.cookie || '');
+    const secretKey = options.secretKey || constants.SECRET_KEY;
+    const publishableKey = options.publishableKey || constants.PUBLISHABLE_KEY;
 
     // get auth state, check if we need to return an interstitial
     const cookieToken = cookies[constants.Cookies.Session];
@@ -19,10 +21,10 @@ export const withClerkMiddleware = (options: ClerkOptions) => {
 
     const requestState = await clerkClient.authenticateRequest({
       ...options,
+      secretKey,
+      publishableKey,
       apiKey: constants.API_KEY,
-      secretKey: constants.SECRET_KEY,
       frontendApi: constants.FRONTEND_API,
-      publishableKey: constants.PUBLISHABLE_KEY,
       cookieToken,
       headerToken,
       clientUat: cookies[constants.Cookies.ClientUat],
@@ -46,9 +48,10 @@ export const withClerkMiddleware = (options: ClerkOptions) => {
 
     if (requestState.isInterstitial) {
       const interstitialHtmlPage = clerkClient.localInterstitial({
+        publishableKey,
         frontendApi: constants.FRONTEND_API,
-        publishableKey: constants.PUBLISHABLE_KEY,
       });
+
       reply
         .code(401)
         .header(constants.Headers.AuthReason, requestState.reason)
