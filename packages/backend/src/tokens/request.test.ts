@@ -41,7 +41,14 @@ function assertSignedOutToAuth(assert, requestState: RequestState) {
   });
 }
 
-function assertInterstitial(assert, requestState: RequestState, reason: AuthReason) {
+function assertInterstitial(
+  assert,
+  requestState: RequestState,
+  expectedState: {
+    reason: AuthReason;
+    isSatellite?: boolean;
+  },
+) {
   assert.propContains(requestState, {
     frontendApi: 'cafe.babe.clerk.ts',
     publishableKey: '',
@@ -52,8 +59,8 @@ function assertInterstitial(assert, requestState: RequestState, reason: AuthReas
     isUnknown: false,
     isSatellite: false,
     domain: '',
-    reason,
     toAuth: {},
+    ...expectedState,
   });
 }
 
@@ -118,6 +125,7 @@ export default (QUnit: QUnit) => {
     skipJwksCache: true,
     isSatellite: false,
     domain: '',
+    isSynced: false,
   };
 
   module('tokens.authenticateRequest(options)', hooks => {
@@ -250,6 +258,21 @@ export default (QUnit: QUnit) => {
       assertSignedOutToAuth(assert, requestState);
     });
 
+    test('cookieToken: returns interstitial when clientUat is missing or equals to 0 and is satellite and not is synced [11y]', async assert => {
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
+        apiKey: 'deadbeef',
+        clientUat: '0',
+        // @ts-expect-error
+        isSatellite: true,
+        isSynced: false,
+      });
+
+      assertInterstitial(assert, requestState, { reason: AuthErrorReason.SatelliteCookieNeedsSync, isSatellite: true });
+      assert.equal(requestState.message, '');
+      assert.strictEqual(requestState.toAuth(), null);
+    });
+
     test('cookieToken: returns signed out when no cookieToken and no clientUat in production [4y]', async assert => {
       const requestState = await authenticateRequest({
         ...defaultMockAuthenticateRequestOptions,
@@ -267,7 +290,7 @@ export default (QUnit: QUnit) => {
         apiKey: 'test_deadbeef',
       });
 
-      assertInterstitial(assert, requestState, AuthErrorReason.CookieUATMissing);
+      assertInterstitial(assert, requestState, { reason: AuthErrorReason.CookieUATMissing });
       assert.equal(requestState.message, '');
       assert.strictEqual(requestState.toAuth(), null);
     });
@@ -281,7 +304,7 @@ export default (QUnit: QUnit) => {
         clientUat: '12345',
       });
 
-      assertInterstitial(assert, requestState, AuthErrorReason.CrossOriginReferrer);
+      assertInterstitial(assert, requestState, { reason: AuthErrorReason.CrossOriginReferrer });
       assert.equal(requestState.message, '');
       assert.strictEqual(requestState.toAuth(), null);
     });
@@ -296,7 +319,7 @@ export default (QUnit: QUnit) => {
         referrer: 'https://clerk.dev',
       });
 
-      assertInterstitial(assert, requestState, AuthErrorReason.CrossOriginReferrer);
+      assertInterstitial(assert, requestState, { reason: AuthErrorReason.CrossOriginReferrer });
       assert.equal(requestState.message, '');
       assert.strictEqual(requestState.toAuth(), null);
     });
@@ -308,6 +331,21 @@ export default (QUnit: QUnit) => {
       assert.true(true);
     });
 
+    test('cookieToken: returns interstitial when clientUat > 0 and no cookieToken and is satellite and is synced [8y-note]', async assert => {
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
+        apiKey: 'deadbeef',
+        clientUat: '1234',
+        // @ts-expect-error
+        isSatellite: true,
+        isSynced: true,
+      });
+
+      assertInterstitial(assert, requestState, { reason: AuthErrorReason.SatelliteCookieMissing, isSatellite: true });
+      assert.equal(requestState.message, '');
+      assert.strictEqual(requestState.toAuth(), null);
+    });
+
     test('cookieToken: returns interstitial when clientUat > 0 and no cookieToken [8y]', async assert => {
       const requestState = await authenticateRequest({
         ...defaultMockAuthenticateRequestOptions,
@@ -315,7 +353,7 @@ export default (QUnit: QUnit) => {
         clientUat: '1234',
       });
 
-      assertInterstitial(assert, requestState, AuthErrorReason.CookieMissing);
+      assertInterstitial(assert, requestState, { reason: AuthErrorReason.CookieMissing });
       assert.equal(requestState.message, '');
       assert.strictEqual(requestState.toAuth(), null);
     });
@@ -337,7 +375,7 @@ export default (QUnit: QUnit) => {
         clientUat: `${mockJwtPayload.iat + 10}`,
       });
 
-      assertInterstitial(assert, requestState, AuthErrorReason.CookieOutDated);
+      assertInterstitial(assert, requestState, { reason: AuthErrorReason.CookieOutDated });
       assert.equal(requestState.message, '');
       assert.strictEqual(requestState.toAuth(), null);
     });
@@ -383,7 +421,7 @@ export default (QUnit: QUnit) => {
         clientUat: `${mockJwtPayload.iat - 10}`,
       });
 
-      assertInterstitial(assert, requestState, TokenVerificationErrorReason.TokenExpired);
+      assertInterstitial(assert, requestState, { reason: TokenVerificationErrorReason.TokenExpired });
       assert.true(/^JWT is expired/.test(requestState.message || ''));
       assert.strictEqual(requestState.toAuth(), null);
     });
