@@ -91,6 +91,7 @@ import {
   OrganizationMembership,
 } from './resources/internal';
 import { AuthenticationService } from './services';
+import { warnings } from './warnings';
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 
@@ -240,7 +241,7 @@ export default class Clerk implements ClerkInterface {
   public openSignIn = (props?: SignInProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (sessionExistsAndSingleSessionModeEnabled(this, this.#environment) && this.#instanceType === 'development') {
-      return console.warn('Cannot open SignIn because a session exists and single session mode is enabled.');
+      return console.info(warnings.cannotOpenSignUpOrSignUp);
     }
     this.#componentControls?.openModal('signIn', props || {});
   };
@@ -253,7 +254,7 @@ export default class Clerk implements ClerkInterface {
   public openSignUp = (props?: SignInProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (sessionExistsAndSingleSessionModeEnabled(this, this.#environment) && this.#instanceType === 'development') {
-      return console.warn('Cannot open SignUp because a session exists and single session mode is enabled.');
+      return console.info(warnings.cannotOpenSignUpOrSignUp);
     }
     this.#componentControls?.openModal('signUp', props || {});
   };
@@ -266,7 +267,7 @@ export default class Clerk implements ClerkInterface {
   public openUserProfile = (props?: UserProfileProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (noUserExists(this) && this.#instanceType === 'development') {
-      return console.warn('Cannot open UserProfile because no session is present.');
+      return console.info(warnings.cannotOpenUserProfile);
     }
     this.#componentControls?.openModal('userProfile', props || {});
   };
@@ -279,7 +280,7 @@ export default class Clerk implements ClerkInterface {
   public openOrganizationProfile = (props?: OrganizationProfileProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (noOrganizationExists(this) && this.#instanceType === 'development') {
-      return console.warn('Cannot open OrganizationProfile because there is no active organization.');
+      return console.info(warnings.cannotOpenOrgProfile);
     }
     this.#componentControls?.openModal('organizationProfile', props || {});
   };

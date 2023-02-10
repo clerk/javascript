@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react';
 import React from 'react';
 
+import { warnings } from '../../core/warnings';
 import type { AvailableComponentProps } from '../../ui/types';
 import type { ComponentGuard } from '../../utils';
 import { noOrganizationExists, noUserExists, sessionExistsAndSingleSessionModeEnabled } from '../../utils';
@@ -25,7 +26,7 @@ function withRedirectToHome<P extends AvailableComponentProps>(
     React.useEffect(() => {
       if (shouldRedirect) {
         if (warning && environment.displayConfig.instanceEnvironmentType === 'development') {
-          console.warn(warning);
+          console.info(warning);
         }
         navigate(environment.displayConfig.homeUrl);
       }
@@ -47,19 +48,11 @@ export const withRedirectToHomeSingleSessionGuard = <P extends AvailableComponen
   withRedirectToHome(
     Component,
     sessionExistsAndSingleSessionModeEnabled,
-    'Cannot render the component as a session already exists and single session mode is enabled. Redirecting to the home url.',
+    warnings.cannotRenderComponentWhenSessionExists,
   );
 
 export const withRedirectToHomeUserGuard = <P extends AvailableComponentProps>(Component: ComponentType<P>) =>
-  withRedirectToHome(
-    Component,
-    noUserExists,
-    'Cannot render the component as no user exists. Redirecting to the home url.',
-  );
+  withRedirectToHome(Component, noUserExists, warnings.cannotRenderComponentWhenUserDoesNotExist);
 
 export const withRedirectToHomeOrganizationGuard = <P extends AvailableComponentProps>(Component: ComponentType<P>) =>
-  withRedirectToHome(
-    Component,
-    noOrganizationExists,
-    'Cannot render the component as there is no active organization. Redirecting to the home url.',
-  );
+  withRedirectToHome(Component, noOrganizationExists, warnings.cannotRenderComponentWhenOrgDoesNotExist);
