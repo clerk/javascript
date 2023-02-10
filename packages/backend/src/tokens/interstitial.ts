@@ -19,7 +19,10 @@ export type LoadInterstitialOptions = {
   domain?: string;
 };
 
-export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions, 'apiUrl' | 'isSatellite' | 'domain' | 'proxyUrl'>) {
+export function loadInterstitialFromLocal(
+  options: Omit<LoadInterstitialOptions, 'apiUrl' | 'isSatellite' | 'domain' | 'proxyUrl'>,
+) {
+  options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
   const {
     debugData,
     frontendApi,

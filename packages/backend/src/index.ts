@@ -10,7 +10,7 @@ export * from './tokens/verify';
 export { constants } from './constants';
 
 export type ClerkOptions = CreateBackendApiOptions &
-  Partial<Pick<CreateAuthenticateRequestOptions['options'], 'jwtKey' | 'proxyUrl'>>;
+  Partial<Pick<CreateAuthenticateRequestOptions['options'], 'jwtKey' | 'proxyUrl' | 'secretKey' | 'publishableKey'>>;
 
 export function Clerk(options: ClerkOptions) {
   const opts = { ...options };
