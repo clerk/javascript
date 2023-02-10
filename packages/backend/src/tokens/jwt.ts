@@ -101,7 +101,7 @@ export type VerifyJwtOptions = {
   audience?: string | string[];
   authorizedParties?: string[];
   clockSkewInSeconds?: number;
-  issuer: IssuerResolver;
+  issuer: IssuerResolver | string | null;
   key: JsonWebKey;
 };
 
