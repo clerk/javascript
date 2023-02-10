@@ -129,19 +129,16 @@ export async function runInterstitialRules<T>(opts: T, rules: InterstitialRule[]
 }
 
 async function verifyRequestState(options: any, token: string) {
-  const issuer = (iss: string) => iss.startsWith('https://clerk.') || iss.includes('.clerk.accounts');
-
+  let issuer;
   if (options?.isSatellite) {
-    return verifyToken(token, {
-      ...options,
-      issuer: null,
-    });
+    issuer = null;
+  } else if (options?.proxyUrl) {
+    issuer = options?.proxyUrl;
+  } else {
+    issuer = (iss: string) => iss.startsWith('https://clerk.') || iss.includes('.clerk.accounts');
   }
 
-  return verifyToken(token, {
-    ...options,
-    issuer: options?.proxyUrl || issuer,
-  });
+  return verifyToken(token, { ...options, issuer });
 }
 
 export const isSatelliteAndNeedsSync: InterstitialRule = async options => {
