@@ -35,78 +35,105 @@ Clerk is the easiest way to add authentication and user management to your Expo 
 
 - React v16+
 - Node.js v14+
+- An application built using Expo
+
+If an expo app already exists, you can skip this section and go straight to Installation.
+Otherwise, you can create a new Expo app by running:
+
+```
+npx create-expo-app my-app
+cd my-app
+```
 
 ### Installation
+
+Next, install the Clerk Expo SDK:
 
 ```sh
 npm install @clerk/clerk-expo
 ```
 
-### Build
+### Usage
 
-To build the package locally with the TypeScript compiler, run:
-
-```sh
-npm run build
-```
-
-To build the package in watch mode, run the following:
-
-```sh
-npm run dev
-```
-
-## Usage
-
-Clerk requires your application to be wrapped in the `<ClerkProvider/>` context and passed your Frontend API as the `frontendApi` prop.
+Clerk requires your application to be wrapped in the `<ClerkProvider/>` context and passed your Publishable Key the `publishableKey` prop.
 
 With Expo, the entry point is typically `App.js`:
 
 ```jsx
-import { ClerkProvider, useUser, withClerk } from '@clerk/clerk-expo';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-
-const frontendApi = 'clerk.[your-domain].[tld]';
+import { StatusBar } from 'expo-status-bar';
+import { StyleSheet, Text, View } from 'react-native';
+import { ClerkProvider } from '@clerk/clerk-expo';
 
 export default function App() {
   return (
-    <ClerkProvider frontendApi={frontendApi}>
-      <Main />
+    <ClerkProvider publishableKey={'your-publishable-key'}>
+      <View style={styles.container}>
+        <Text>Open up App.js to start working on your app!</Text>
+        <StatusBar style='auto' />
+      </View>
     </ClerkProvider>
   );
 }
 
-const Main = withClerk(({ clerk }) => {
-  const { user } = useUser({ withAssertions: true });
-  const handleSignIn = () => clerk.openSignIn();
-  const handleSignOut = () => clerk.signOut();
-
-  return (
-    <View style={styles.container}>
-      {user ? (
-        <>
-          <Text>You are signed in</Text>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleSignOut}
-          >
-            <Text>Sign out</Text>
-          </TouchableOpacity>
-        </>
-      ) : (
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleSignIn}
-        >
-          <Text>Sign in</Text>
-        </TouchableOpacity>
-      )}
-    </View>
-  );
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
 ```
 
-_For further details and examples, please refer to our [Documentation](https://clerk.dev/docs?utm_source=github&utm_medium=clerk_react?utm_source=github&utm_medium=clerk_expo)._
+A token cache is required to work with Clerk and Expo. This is entirely up to you how you handle the token cache - in this example we're going to use the `expo-secure-store` library. First, install it by running
+
+```
+npm i expo-secure-store
+```
+
+and then add the tokenCache to your entry file, as shown here:
+
+```diff
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, Text, View } from "react-native";
+import { ClerkProvider } from "@clerk/clerk-expo";
++ import * as SecureStore from "expo-secure-store";
+
++ const tokenCache = {
++  getToken(key) {
++    return SecureStore.getItemAsync(key);
++  },
++  saveToken(key, value) {
++    return SecureStore.setItemAsync(key, value);
++  },
++};
+
+export default function App() {
+  return (
+    <ClerkProvider
+      publishableKey={"your-publishable-key"}
++     tokenCache={tokenCache}
+    >
+      <View style={styles.container}>
+        <Text>Open up App.js to start working on your app!</Text>
+        <StatusBar style="auto" />
+      </View>
+    </ClerkProvider>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
+
+```
+
+_The section above covers the basic setup. For further details and examples, please refer to our [Clerk Expo Documentation](https://clerk.dev/docs?utm_source=github&utm_medium=clerk_expo)._
 
 ## Support
 
