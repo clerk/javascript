@@ -515,6 +515,7 @@ type _LocalizationResource = {
   };
   createOrganization: {
     title: LocalizationValue;
+    formButtonSubmit: LocalizationValue;
     /**
      * @deprecated This key is no longer used and will be removed in the next major version
      */
