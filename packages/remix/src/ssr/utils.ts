@@ -76,6 +76,9 @@ export const injectRequestStateIntoResponse = async (response: Response, request
     __clerk_ssr_state: rest,
     __frontendApi: requestState.frontendApi,
     __publishableKey: requestState.publishableKey,
+    __proxyUrl: requestState.proxyUrl,
+    __domain: requestState.domain,
+    __isSatellite: requestState.isSatellite,
     __clerk_debug: debugRequestState(requestState),
   });
   // set the correct content-type header in case the user returned a `Response` directly
