@@ -15,11 +15,13 @@ export type RemixClerkProviderProps = {
 
 export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): JSX.Element {
   const awaitableNavigate = useAwaitableNavigate();
-  const { clerkState, ...restProps } = rest;
+
+  // @ts-expect-error
+  const { clerkState, proxyUrl, domain, isSatellite, ...restProps } = rest;
   ReactClerkProvider.displayName = 'ReactClerkProvider';
 
   assertValidClerkState(clerkState);
-  const { __clerk_ssr_state, __frontendApi, __publishableKey, __clerk_debug } =
+  const { __clerk_ssr_state, __frontendApi, __publishableKey, __proxyUrl, __domain, __isSatellite, __clerk_debug } =
     clerkState?.__internal_clerk_state || {};
 
   React.useEffect(() => {
@@ -36,6 +38,10 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
       initialState={__clerk_ssr_state}
       frontendApi={__frontendApi as any}
       publishableKey={__publishableKey as any}
+      //@ts-expect-error
+      proxyUrl={proxyUrl || __proxyUrl}
+      domain={domain || __domain}
+      isSatellite={isSatellite || __isSatellite}
       {...restProps}
     >
       {children}

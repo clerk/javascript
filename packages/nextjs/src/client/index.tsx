@@ -41,6 +41,8 @@ export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JS
     // @ts-expect-error
     domain,
     // @ts-expect-error
+    isSatellite,
+    // @ts-expect-error
     __clerk_ssr_state,
     clerkJSUrl,
     __unstable_invokeMiddlewareOnAuthStateChange = true,
@@ -69,7 +71,8 @@ export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JS
       clerkJSUrl={clerkJSUrl || process.env.NEXT_PUBLIC_CLERK_JS}
       // @ts-expect-error
       proxyUrl={proxyUrl || process.env.NEXT_PUBLIC_CLERK_PROXY_URL || ''}
-      domain={domain || ''}
+      domain={domain || process.env.NEXT_PUBLIC_CLERK_DOMAIN || ''}
+      isSatellite={isSatellite || process.env.NEXT_PUBLIC_CLERK_IS_SATELLITE === 'true'}
       navigate={to => push(to)}
       // withServerSideAuth automatically injects __clerk_ssr_state
       // getAuth returns a user-facing authServerSideProps that hides __clerk_ssr_state

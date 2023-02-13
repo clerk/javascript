@@ -7,6 +7,9 @@ export type ClerkState = {
     __clerk_ssr_state: InitialState;
     __frontendApi: string | undefined;
     __publishableKey: string | undefined;
+    __proxyUrl: string | undefined;
+    __domain: string | undefined;
+    __isSatellite: boolean;
     __clerk_debug: any;
   };
 };
