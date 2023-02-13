@@ -24,7 +24,7 @@ export const neobrutalism = unstable_createTheme({
       bold: 700,
     },
   },
-  elements: () => ({
+  elements: {
     card: {
       boxShadow: '7px 7px 0px #000',
       border: '3px solid #000',
@@ -57,5 +57,5 @@ export const neobrutalism = unstable_createTheme({
         boxShadow: 'none',
       },
     },
-  }),
+  },
 });
