@@ -5,6 +5,7 @@ import { __internal__setErrorThrowerOptions, ClerkProvider as ClerkReactProvider
 import React from 'react';
 
 import type { TokenCache } from './cache';
+import { MemoryTokenCache } from './cache';
 import { isReactNative } from './runtime';
 import { buildClerk } from './singleton';
 
@@ -18,7 +19,7 @@ export type ClerkProviderProps = ClerkReactProviderProps & {
 };
 
 export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
-  const { children, tokenCache, frontendApi, publishableKey, ...rest } = props;
+  const { children, tokenCache = MemoryTokenCache, frontendApi, publishableKey, ...rest } = props;
   const key =
     publishableKey || process.env.CLERK_PUBLISHABLE_KEY || frontendApi || process.env.CLERK_FRONTEND_API || '';
 
