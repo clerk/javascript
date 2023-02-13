@@ -1,4 +1,4 @@
-import { DeepRequired, LocalizationResource } from '@clerk/types';
+import type { DeepRequired, LocalizationResource } from '@clerk/types';
 
 const commonTexts = {
   signIn: {
@@ -520,6 +520,7 @@ export const ptBR: DeepRequired<LocalizationResource> = {
   },
   createOrganization: {
     title: 'Criar organização',
+    formButtonSubmit: 'Criar organização',
     subtitle: 'Configure o perfil da organização',
     invitePage: {
       formButtonReset: 'Pular',

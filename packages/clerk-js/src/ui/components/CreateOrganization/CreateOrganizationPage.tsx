@@ -87,7 +87,7 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
             <Form.SubmitButton
               block={false}
               isDisabled={!canSubmit}
-              localizationKey={'Create organization'}
+              localizationKey={localizationKeys('createOrganization.formButtonSubmit')}
             />
             {mode === 'modal' && (
               <Form.ResetButton
