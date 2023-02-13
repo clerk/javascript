@@ -3,7 +3,6 @@ import Clerk from '@clerk/clerk-js/headless';
 import type { HeadlessBrowserClerk } from '@clerk/clerk-react';
 
 import type { TokenCache } from './cache';
-import { getToken as getTokenFromMemory, saveToken as saveTokenInMemory } from './cache';
 
 const KEY = '__clerk_client_jwt';
 
@@ -11,19 +10,15 @@ export let clerk: HeadlessBrowserClerk;
 
 type BuildClerkOptions = {
   key: string;
-  tokenCache?: TokenCache;
+  tokenCache: TokenCache;
 };
 
 export function buildClerk({ key, tokenCache }: BuildClerkOptions): HeadlessBrowserClerk {
   if (!clerk) {
-    const getToken = (tokenCache && tokenCache.getToken) ?? getTokenFromMemory;
-    const saveToken = (tokenCache && tokenCache.saveToken) ?? saveTokenInMemory;
+    const getToken = tokenCache.getToken;
+    const saveToken = tokenCache.saveToken;
 
     clerk = new Clerk(key);
-
-    if (!tokenCache) {
-      return clerk;
-    }
 
     // @ts-expect-error
     clerk.__unstable__onBeforeRequest(async (requestInit: FapiRequestInit) => {

@@ -3,12 +3,17 @@ export interface TokenCache {
   saveToken: (key: string, token: string) => Promise<void>;
 }
 
-const cache: Record<string, string> = {};
+const createMemoryTokenCache = (): TokenCache => {
+  const cache: Record<string, string> = {};
+  return {
+    saveToken: (key, token) => {
+      cache[key] = token;
+      return Promise.resolve();
+    },
+    getToken: key => {
+      return Promise.resolve(cache[key]);
+    },
+  };
+};
 
-export async function saveToken(key: string, value: string): Promise<void> {
-  cache[key] = value;
-}
-
-export async function getToken(key: string): Promise<string> {
-  return cache[key];
-}
+export const MemoryTokenCache = createMemoryTokenCache();
