@@ -26,7 +26,17 @@ export interface JwtHeader {
   x5c?: string | string[];
 }
 
-export interface JwtPayload {
+declare global {
+  /**
+   * If you want to provide custom types for the getAuth().sessionClaims object,
+   * simply redeclare this interface in the global namespace and provide your own custom keys.
+   */
+  interface CustomJwtSessionClaims {
+    [k: string]: unknown;
+  }
+}
+
+export interface JwtPayload extends CustomJwtSessionClaims {
   /**
    * Encoded token supporting the `getRawString` method.
    */
