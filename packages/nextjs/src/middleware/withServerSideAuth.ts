@@ -42,6 +42,10 @@ export const withServerSideAuth: WithServerSideAuth = (cbOrOptions: any, options
   const cb = typeof cbOrOptions === 'function' ? cbOrOptions : undefined;
   const opts = (options ? options : typeof cbOrOptions !== 'function' ? cbOrOptions : {}) || {};
 
+  // Support both loadOrganization and the older loadOrg option without breaking changes
+  // TODO: Remove pre v5
+  options.loadOrganization = options.loadOrganization || options.loadOrg || undefined;
+
   return async (ctx: GetServerSidePropsContext) => {
     const requestState = await authenticateRequest(ctx, opts);
 
