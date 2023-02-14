@@ -122,7 +122,7 @@ export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions)
 
 export function buildPublicInterstitialUrl(options: LoadInterstitialOptions) {
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
-  const { apiUrl, frontendApi, pkgVersion, publishableKey, proxyUrl } = options;
+  const { apiUrl, frontendApi, pkgVersion, publishableKey, proxyUrl, debugData, isSatellite, domain } = options;
   const url = new URL(apiUrl);
   url.pathname = joinPaths(url.pathname, API_VERSION, '/public/interstitial');
   url.searchParams.append('clerk_js_version', getClerkJsMajorVersionOrTag(frontendApi, pkgVersion));
@@ -134,6 +134,20 @@ export function buildPublicInterstitialUrl(options: LoadInterstitialOptions) {
   if (proxyUrl) {
     url.searchParams.append('proxy_url', proxyUrl);
   }
+
+  const shouldSync = isSatellite && debugData?.reason === 'satellite-cookie-missing';
+  if (shouldSync) {
+    url.searchParams.append('should_sync_link', 'true');
+  }
+
+  if (isSatellite) {
+    url.searchParams.append('is_satellite', 'true');
+  }
+
+  if (domain) {
+    url.searchParams.append('domain', domain);
+  }
+
   return url.href;
 }
 
