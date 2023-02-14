@@ -73,3 +73,13 @@ export type PathValue<T, P extends RecordToPath<T>> = P extends `${infer Key}.${
   : P extends keyof T
   ? T[P]
   : never;
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+type IsSerializable<T> = T extends Function ? false : true;
+
+/**
+ * Excludes any non-serializable prop from an object
+ */
+export type Serializable<T> = {
+  [K in keyof T as IsSerializable<T[K]> extends true ? K : never]: T[K];
+};
