@@ -22,14 +22,13 @@ export type ServerSideAuth = {
 
 export type InitialState = Serializable<{
   sessionClaims: JwtPayload;
-  sessionId: string;
+  sessionId: string | undefined;
   session: SessionResource | undefined;
   actor: ActClaim | undefined;
-  userId: string;
+  userId: string | undefined;
   user: UserResource | undefined;
   orgId: string | undefined;
   orgRole: MembershipRole | undefined;
   orgSlug: string | undefined;
   organization: OrganizationResource | undefined;
-  getToken: ServerGetToken;
 }>;
