@@ -14,7 +14,7 @@ export async function getAuth(args: LoaderFunctionArgs, opts?: GetAuthOptions): 
   const requestState = await authenticateRequest(args, opts);
 
   if (requestState.isUnknown) {
-    throw unknownResponse();
+    throw unknownResponse(requestState);
   }
 
   if (requestState.isInterstitial) {

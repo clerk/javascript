@@ -48,8 +48,36 @@ export function assertObject(val: any, error?: string): asserts val is Record<st
   }
 }
 
-export const unknownResponse = () => {
-  return json(null, { status: 401 });
+const οbservabilityHeadersFromRequestState = (requestState: RequestState): Headers => {
+  const headers = {} as Record<string, string>;
+
+  if (requestState.message) {
+    headers[constants.Headers.AuthMessage] = requestState.message;
+  }
+  if (requestState.reason) {
+    headers[constants.Headers.AuthReason] = requestState.reason;
+  }
+  if (requestState.status) {
+    headers[constants.Headers.AuthStatus] = requestState.status;
+  }
+
+  return new Headers(headers);
+};
+
+/**
+ * Retrieve Clerk auth headers. Should be used only for debugging and not in production.
+ * @internal
+ */
+export const getClerkDebugHeaders = (headers: Headers) => {
+  return {
+    [constants.Headers.AuthMessage]: headers.get(constants.Headers.AuthMessage),
+    [constants.Headers.AuthReason]: headers.get(constants.Headers.AuthReason),
+    [constants.Headers.AuthStatus]: headers.get(constants.Headers.AuthStatus),
+  };
+};
+
+export const unknownResponse = (requestState: RequestState) => {
+  return json(null, { status: 401, headers: οbservabilityHeadersFromRequestState(requestState) });
 };
 
 export const interstitialJsonResponse = (requestState: RequestState, opts: { loader: 'root' | 'nested' }) => {
@@ -67,7 +95,7 @@ export const interstitialJsonResponse = (requestState: RequestState, opts: { loa
         domain: requestState.domain,
       }),
     }),
-    { status: 401 },
+    { status: 401, headers: οbservabilityHeadersFromRequestState(requestState) },
   );
 };
 
@@ -88,6 +116,10 @@ export const injectRequestStateIntoResponse = async (response: Response, request
   // set the correct content-type header in case the user returned a `Response` directly
   // without setting the header, instead of using the `json()` helper
   clone.headers.set(constants.Headers.ContentType, constants.ContentTypes.Json);
+  οbservabilityHeadersFromRequestState(requestState).forEach((value, key) => {
+    clone.headers.set(key, value);
+  });
+
   return json({ ...(data || {}), ...clerkState }, clone);
 };
 
