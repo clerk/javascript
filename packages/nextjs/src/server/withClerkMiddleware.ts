@@ -1,5 +1,6 @@
 import type { AuthStatus, RequestState } from '@clerk/backend';
 import { constants } from '@clerk/backend';
+import { debugRequestState } from '@clerk/backend';
 import type { NextMiddleware, NextMiddlewareResult } from 'next/dist/server/web/types';
 import type { NextFetchEvent, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -87,6 +88,10 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
           apiUrl: API_URL,
           frontendApi: FRONTEND_API,
           publishableKey: PUBLISHABLE_KEY,
+          proxyUrl: requestState.proxyUrl,
+          isSatellite: requestState.isSatellite,
+          domain: requestState.domain,
+          debugData: debugRequestState(requestState),
         }),
         { status: 401 },
       );
