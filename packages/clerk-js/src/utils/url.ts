@@ -15,6 +15,7 @@ declare global {
 
 // This is used as a dummy base when we need to invoke "new URL()" but we don't care about the URL origin.
 const DUMMY_URL_BASE = 'http://clerk-dummy';
+const CLERK_IMAGE_URL_BASE = 'https://image.clerk.dev/';
 
 export const DEV_OR_STAGING_SUFFIXES = [
   '.lcl.dev',
@@ -318,6 +319,10 @@ export function hasBannedProtocol(val: string | URL) {
   const protocol = new URL(val).protocol;
   return BANNED_URI_PROTOCOLS.some(bp => bp === protocol);
 }
+
+export const isClerkImage = (src?: string): boolean => {
+  return !!src?.includes(CLERK_IMAGE_URL_BASE);
+};
 
 export const generateSrc = ({ src, width }: { src?: string; width: number }) => {
   if (!isValidUrl(src) || isDataUri(src)) {
