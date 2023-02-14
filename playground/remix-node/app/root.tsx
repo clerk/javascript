@@ -1,6 +1,7 @@
-import type { LoaderFunction, MetaFunction } from '@remix-run/node';
+import type { LoaderFunction, MetaFunction, Headers } from '@remix-run/node';
 import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react';
 import { rootAuthLoader } from '@clerk/remix/ssr.server';
+import { getClerkDebugHeaders } from '@clerk/remix/ssr.server';
 import { ClerkApp, ClerkCatchBoundary } from '@clerk/remix';
 
 export const loader: LoaderFunction = args => {
@@ -16,6 +17,21 @@ export const loader: LoaderFunction = args => {
     { loadUser: true },
   );
 };
+
+export function headers({
+  actionHeaders,
+  loaderHeaders,
+  parentHeaders,
+}: {
+  actionHeaders: Headers;
+  loaderHeaders: Headers;
+  parentHeaders: Headers;
+}) {
+  return {
+    'x-parent-header': parentHeaders.get('x-parent-header'),
+    ...getClerkDebugHeaders(loaderHeaders),
+  };
+}
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
