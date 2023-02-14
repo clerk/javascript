@@ -35,7 +35,6 @@ export const Avatar = (props: AvatarProps) => {
   const [error, setError] = React.useState(false);
   const avatarExists = hasAvatar(imageUrl);
   let src;
-
   if (!avatarExists) {
     src = GRAVATAR_DEFAULT_AVATAR;
   } else if (!optimize && imageUrl) {
