@@ -71,15 +71,23 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
   const remotePublicInterstitial = ({
     frontendApi: runtimeFrontendApi,
     publishableKey: runtimePublishableKey,
+    // @ts-expect-error
     proxyUrl: runtimeProxyUrl,
+    // @ts-expect-error
+    isSatellite: runtimeIsSatellite,
+    // @ts-expect-error
+    domain: runtimeDomain,
     ...rest
-  }: LoadInterstitialOptions) => {
+  }: Omit<LoadInterstitialOptions, 'isSatellite' | 'domain' | 'proxyUrl'>) => {
     return loadInterstitialFromBAPI({
       ...rest,
       apiUrl,
       frontendApi: runtimeFrontendApi || buildtimeFrontendApi,
-      proxyUrl: runtimeProxyUrl || buildProxyUrl,
       publishableKey: runtimePublishableKey || buildtimePublishableKey,
+      // @ts-expect-error
+      proxyUrl: runtimeProxyUrl || buildProxyUrl,
+      isSatellite: runtimeIsSatellite || buildtimeIsSatellite,
+      domain: runtimeDomain || buildtimeDomain,
     });
   };
 

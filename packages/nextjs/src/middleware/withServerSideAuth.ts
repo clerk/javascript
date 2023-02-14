@@ -1,5 +1,5 @@
 import type { RequestState } from '@clerk/backend';
-import { constants } from '@clerk/backend';
+import { constants, debugRequestState } from '@clerk/backend';
 import type { ServerResponse } from 'http';
 import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
@@ -8,7 +8,6 @@ import {
   clerkClient,
   FRONTEND_API,
   makeAuthObjectSerializable,
-  PROXY_URL,
   PUBLISHABLE_KEY,
   sanitizeAuthObject,
 } from '../server/clerk';
@@ -62,7 +61,11 @@ export const withServerSideAuth: WithServerSideAuth = (cbOrOptions: any, options
         apiUrl: API_URL,
         publishableKey: PUBLISHABLE_KEY,
         frontendApi: FRONTEND_API,
-        proxyUrl: PROXY_URL,
+        // @ts-ignore
+        proxyUrl: requestState.proxyUrl,
+        isSatellite: requestState.isSatellite,
+        domain: requestState.domain,
+        debugData: debugRequestState(requestState),
       });
       ctx.res.end(interstitial);
       return EMPTY_GSSP_RESPONSE;
