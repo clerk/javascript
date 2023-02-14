@@ -25,7 +25,7 @@ type NextClerkProviderProps = {
    *
    * @default true
    */
-  __unstable_invokeMiddlewareOnAuthStateChange: boolean;
+  __unstable_invokeMiddlewareOnAuthStateChange?: boolean;
 } & Omit<IsomorphicClerkOptions, keyof PublishableKeyOrFrontendApi> &
   Partial<PublishableKeyOrFrontendApi>;
 
