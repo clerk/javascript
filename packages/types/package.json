@@ -22,7 +22,7 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "build": "tsc -p tsconfig.json",
-    "dev": "npm run build -- --watch",
+    "dev": "tsc -p tsconfig.json --watch",
     "clean": "rimraf ./dist",
     "lint": "eslint ."
   },
