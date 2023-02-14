@@ -15,7 +15,11 @@ export type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
 export type WithServerSideAuthOptions = {
   loadUser?: boolean;
   loadSession?: boolean;
+  /**
+   * @deprecated use loadOrganization instead
+   */
   loadOrg?: boolean;
+  loadOrganization?: boolean;
   jwtKey?: string;
   authorizedParties?: string[];
 };
