@@ -1,6 +1,6 @@
 {
   "name": "@clerk/remix",
-  "version": "2.2.3-staging.1",
+  "version": "2.2.3-staging.2",
   "license": "MIT",
   "description": "Clerk.dev SDK for Remix",
   "keywords": [
@@ -31,8 +31,8 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@clerk/backend": "^0.6.3-staging.1",
-    "@clerk/clerk-react": "^4.11.3-staging.1",
+    "@clerk/backend": "^0.7.0-staging.0",
+    "@clerk/clerk-react": "^4.11.3-staging.2",
     "@clerk/types": "^3.28.0-staging.0",
     "cookie": "0.5.0",
     "tslib": "2.4.1"
