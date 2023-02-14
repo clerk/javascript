@@ -40,7 +40,7 @@ export const getAuth = (req: RequestLike): SignedInAuthObject | SignedOutAuthObj
   });
 };
 
-type BuildClerkPropsInitState = { user?: User; session?: Session; organization?: Organization };
+type BuildClerkPropsInitState = { user?: User | null; session?: Session | null; organization?: Organization | null };
 
 /**
  * To enable Clerk SSR support, include this object to the `props`

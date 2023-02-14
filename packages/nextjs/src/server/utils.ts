@@ -1,4 +1,3 @@
-import type { AuthObject } from '@clerk/backend';
 import { constants } from '@clerk/backend';
 import type { RequestCookie } from 'next/dist/server/web/spec-extension/cookies';
 import type { NextRequest } from 'next/server';
@@ -129,11 +128,12 @@ export const nextJsVersionCanOverrideRequestHeaders = () => {
   }
 };
 
-export const injectSSRStateIntoObject = (obj: any, authObject: AuthObject) => {
+export const injectSSRStateIntoObject = <O, T>(obj: O, authObject: T) => {
   // Serializing the state on dev env is a temp workaround for the following issue:
   // https://github.com/vercel/next.js/discussions/11209|Next.js
-  const __clerk_ssr_state =
-    process.env.NODE_ENV !== 'production' ? JSON.parse(JSON.stringify({ ...authObject })) : { ...authObject };
+  const __clerk_ssr_state = (
+    process.env.NODE_ENV !== 'production' ? JSON.parse(JSON.stringify({ ...authObject })) : { ...authObject }
+  ) as T;
   return { ...obj, __clerk_ssr_state };
 };
 
