@@ -10,20 +10,40 @@ import type {
   SignUpProps,
   UserProfileProps,
 } from '@clerk/types';
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import { PRESERVED_QUERYSTRING_PARAMS } from '../core/constants';
 import { clerkUIErrorDOMElementNotFound } from '../core/errors';
 import { buildVirtualRouterUrl } from '../utils';
-import { CreateOrganization, CreateOrganizationModal } from './components/CreateOrganization';
-import { ImpersonationFab } from './components/ImpersonationFab';
-import { OrganizationProfile, OrganizationProfileModal } from './components/OrganizationProfile';
-import { OrganizationSwitcher } from './components/OrganizationSwitcher';
-import { SignIn, SignInModal } from './components/SignIn';
-import { SignUp, SignUpModal } from './components/SignUp';
-import { UserButton } from './components/UserButton';
-import { UserProfile, UserProfileModal } from './components/UserProfile';
+const SignIn = lazy(() => import('./components/SignIn').then(module => ({ default: module.SignIn })));
+const SignInModal = lazy(() => import('./components/SignIn').then(module => ({ default: module.SignInModal })));
+const SignUp = lazy(() => import('./components/SignUp').then(module => ({ default: module.SignUp })));
+const SignUpModal = lazy(() => import('./components/SignUp').then(module => ({ default: module.SignUpModal })));
+const UserButton = lazy(() => import('./components/UserButton').then(module => ({ default: module.UserButton })));
+const UserProfile = lazy(() => import('./components/UserProfile').then(module => ({ default: module.UserProfile })));
+const UserProfileModal = lazy(() =>
+  import('./components/UserProfile').then(module => ({ default: module.UserProfileModal })),
+);
+const CreateOrganization = lazy(() =>
+  import('./components/CreateOrganization').then(module => ({ default: module.CreateOrganization })),
+);
+const CreateOrganizationModal = lazy(() =>
+  import('./components/CreateOrganization').then(module => ({ default: module.CreateOrganizationModal })),
+);
+const OrganizationProfile = lazy(() =>
+  import('./components/OrganizationProfile').then(module => ({ default: module.OrganizationProfile })),
+);
+const OrganizationProfileModal = lazy(() =>
+  import('./components/OrganizationProfile').then(module => ({ default: module.OrganizationProfileModal })),
+);
+const OrganizationSwitcher = lazy(() =>
+  import('./components/OrganizationSwitcher').then(module => ({ default: module.OrganizationSwitcher })),
+);
+const ImpersonationFab = lazy(() =>
+  import('./components/ImpersonationFab').then(module => ({ default: module.ImpersonationFab })),
+);
+
 import { EnvironmentProvider, OptionsProvider } from './contexts';
 import { CoreClerkContextWrapper } from './contexts/CoreClerkContextWrapper';
 import { AppearanceProvider } from './customizables';
@@ -375,12 +395,14 @@ const Components = (props: ComponentsProps) => {
             );
           })}
 
-          {signInModal && mountedSignInModal}
-          {signUpModal && mountedSignUpModal}
-          {userProfileModal && mountedUserProfileModal}
-          {organizationProfileModal && mountedOrganizationProfileModal}
-          {createOrganizationModal && mountedCreateOrganizationModal}
-          {mountedImpersonationFab}
+          <Suspense fallback={''}>
+            {signInModal && mountedSignInModal}
+            {signUpModal && mountedSignUpModal}
+            {userProfileModal && mountedUserProfileModal}
+            {organizationProfileModal && mountedOrganizationProfileModal}
+            {createOrganizationModal && mountedCreateOrganizationModal}
+            {mountedImpersonationFab}
+          </Suspense>
         </OptionsProvider>
       </EnvironmentProvider>
     </CoreClerkContextWrapper>
