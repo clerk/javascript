@@ -85,9 +85,8 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
       <Col gap={4}>
         {!error && (
           <UserPreview
-            user={user}
+            externalAccount={account}
             size='lg'
-            imageUrl={account.avatarUrl || null}
             icon={
               <Image
                 alt={providerToDisplayData[account.provider].name}

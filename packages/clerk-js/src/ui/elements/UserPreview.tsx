@@ -1,4 +1,4 @@
-import type { UserPreviewId, UserResource } from '@clerk/types';
+import type { ExternalAccountResource, UserPreviewId, UserResource } from '@clerk/types';
 import React from 'react';
 
 import type { LocalizationKey } from '../customizables';
@@ -8,7 +8,6 @@ import { getFullName, getIdentifier } from '../utils';
 import { UserAvatar } from './UserAvatar';
 
 export type UserPreviewProps = Omit<PropsOfComponent<typeof Flex>, 'title' | 'elementId'> & {
-  user?: Partial<UserResource>;
   size?: 'lg' | 'md' | 'sm';
   icon?: React.ReactNode;
   badge?: React.ReactNode;
@@ -19,11 +18,21 @@ export type UserPreviewProps = Omit<PropsOfComponent<typeof Flex>, 'title' | 'el
   title?: LocalizationKey | string;
   subtitle?: LocalizationKey | string;
   showAvatar?: boolean;
-};
+} & (
+    | {
+        user?: Partial<UserResource>;
+        externalAccount?: null | undefined;
+      }
+    | {
+        user?: null | undefined;
+        externalAccount?: Partial<ExternalAccountResource>;
+      }
+  );
 
 export const UserPreview = (props: UserPreviewProps) => {
   const {
     user,
+    externalAccount,
     size = 'md',
     showAvatar = true,
     icon,
@@ -38,8 +47,8 @@ export const UserPreview = (props: UserPreviewProps) => {
     ...rest
   } = props;
   const { t } = useLocalizations();
-  const name = getFullName({ ...user });
-  const identifier = getIdentifier({ ...user });
+  const name = getFullName({ ...user }) || getFullName({ ...externalAccount });
+  const identifier = getIdentifier({ ...user }) || externalAccount?.accountIdentifier?.();
   const localizedTitle = t(title);
 
   return (
@@ -62,15 +71,19 @@ export const UserPreview = (props: UserPreviewProps) => {
             boxElementDescriptor={descriptors.userPreviewAvatarBox}
             imageElementDescriptor={descriptors.userPreviewAvatarImage}
             {...user}
-            imageUrl={imageUrl || user?.profileImageUrl}
+            {...externalAccount}
+            name={name}
+            profileImageUrl={imageUrl || user?.profileImageUrl || externalAccount?.avatarUrl}
             size={t => ({ sm: t.sizes.$8, md: t.sizes.$11, lg: t.sizes.$12x5 }[size])}
             optimize
             sx={avatarSx}
             rounded={rounded}
           />
+
           {icon && <Flex sx={{ position: 'absolute', left: 0, bottom: 0 }}>{icon}</Flex>}
         </Flex>
       )}
+
       <Flex
         elementDescriptor={descriptors.userPreviewTextContainer}
         elementId={descriptors.userPreviewTextContainer.setId(elementId)}
@@ -87,6 +100,7 @@ export const UserPreview = (props: UserPreviewProps) => {
         >
           {localizedTitle || name || identifier} {badge}
         </Text>
+
         {(subtitle || (name && identifier)) && (
           <Text
             elementDescriptor={descriptors.userPreviewSecondaryIdentifier}
