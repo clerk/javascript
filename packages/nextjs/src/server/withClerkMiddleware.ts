@@ -88,6 +88,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
           apiUrl: API_URL,
           frontendApi: FRONTEND_API,
           publishableKey: PUBLISHABLE_KEY,
+          // @ts-expect-error
           proxyUrl: requestState.proxyUrl,
           isSatellite: requestState.isSatellite,
           domain: requestState.domain,

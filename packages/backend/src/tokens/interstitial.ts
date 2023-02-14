@@ -104,7 +104,9 @@ export function loadInterstitialFromLocal(
 }
 
 // TODO: Add caching to Interstitial
-export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions) {
+export async function loadInterstitialFromBAPI(
+  options: Omit<LoadInterstitialOptions, 'isSatellite' | 'domain' | 'proxyUrl'>,
+) {
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
   const url = buildPublicInterstitialUrl(options);
   const response = await callWithRetry(() => runtime.fetch(buildPublicInterstitialUrl(options)));
@@ -120,9 +122,12 @@ export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions)
   return response.text();
 }
 
-export function buildPublicInterstitialUrl(options: LoadInterstitialOptions) {
+export function buildPublicInterstitialUrl(
+  options: Omit<LoadInterstitialOptions, 'isSatellite' | 'domain' | 'proxyUrl'>,
+) {
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
-  const { apiUrl, frontendApi, pkgVersion, publishableKey, proxyUrl, debugData, isSatellite, domain } = options;
+  const { apiUrl, frontendApi, pkgVersion, publishableKey, proxyUrl, debugData, isSatellite, domain } =
+    options as LoadInterstitialOptions;
   const url = new URL(apiUrl);
   url.pathname = joinPaths(url.pathname, API_VERSION, '/public/interstitial');
   url.searchParams.append('clerk_js_version', getClerkJsMajorVersionOrTag(frontendApi, pkgVersion));
