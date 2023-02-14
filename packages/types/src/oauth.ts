@@ -29,6 +29,7 @@ export type CoinbaseOauthProvider = 'coinbase';
 export type SpotifyOauthProvider = 'spotify';
 export type XeroOauthProvider = 'xero';
 export type BoxOauthProvider = 'box';
+export type SlackOauthProvider = 'slack';
 
 export type OAuthProvider =
   | FacebookOauthProvider
@@ -52,7 +53,8 @@ export type OAuthProvider =
   | CoinbaseOauthProvider
   | SpotifyOauthProvider
   | XeroOauthProvider
-  | BoxOauthProvider;
+  | BoxOauthProvider
+  | SlackOauthProvider;
 
 export const OAUTH_PROVIDERS: OAuthProviderData[] = [
   {
@@ -186,6 +188,12 @@ export const OAUTH_PROVIDERS: OAuthProviderData[] = [
     strategy: 'oauth_box',
     name: 'Box',
     docsUrl: 'https://clerk.dev/docs/authentication/social-connection-with-box',
+  },
+  {
+    provider: 'slack',
+    strategy: 'oauth_slack',
+    name: 'Slack',
+    docsUrl: 'https://clerk.dev/docs/authentication/social-connection-with-slack',
   },
 ];
 
