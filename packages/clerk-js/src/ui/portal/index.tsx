@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom';
 
 import { clerkErrorPathRouterMissingPath } from '../../core/errors';
@@ -19,7 +19,7 @@ export default class Portal<CtxType extends AvailableComponentCtx> extends React
 
     const el = (
       <ComponentContext.Provider value={{ componentName: componentName, ...props } as CtxType}>
-        {React.createElement(component, props)}
+        <Suspense fallback={''}>{React.createElement(component, props)}</Suspense>
       </ComponentContext.Provider>
     );
 
