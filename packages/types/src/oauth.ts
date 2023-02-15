@@ -160,12 +160,6 @@ export const OAUTH_PROVIDERS: OAuthProviderData[] = [
     docsUrl: 'https://clerk.dev/docs/authentication/social-connection-with-line',
   },
   {
-    provider: 'instagram',
-    strategy: 'oauth_instagram',
-    name: 'Instagram',
-    docsUrl: 'https://clerk.dev/docs/authentication/social-connection-with-instagram',
-  },
-  {
     provider: 'coinbase',
     strategy: 'oauth_coinbase',
     name: 'Coinbase',
