@@ -1,4 +1,33 @@
 folders:
-  - path: /
+  - path: /packages/backend
     exclude:
       - ./**/*.test.ts
+  - path: /packages/clerk-js
+    exclude:
+      - ./**/*.test.ts
+  - path: /packages/eslint-config-custom
+  - path: /packages/expo
+  - path: /packages/fastify
+    exclude:
+      - ./**/*.test.ts
+  - path: /packages/gatsby-plugin-clerk
+    exclude:
+      - ./**/*.test.ts
+  - path: /packages/localizations
+  - path: /packages/nextjs
+    exclude:
+      - ./**/*.test.ts
+  - path: /packages/react
+    exclude:
+      - ./**/*.test.ts
+  - path: /packages/remix
+    exclude:
+      - ./**/*.test.ts
+  - path: /packages/sdk-node
+    exclude:
+      - ./**/*.test.ts
+  - path: /packages/shared
+    exclude:
+      - ./**/*.test.ts
+  - path: /packages/themes
+  - path: /packages/types
