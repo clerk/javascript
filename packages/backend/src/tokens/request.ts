@@ -15,7 +15,7 @@ import {
   nonBrowserRequestInDevRule,
   potentialFirstLoadInDevWhenUATMissing,
   potentialFirstRequestOnProductionEnvironment,
-  potentialRequestAfterSignInOrOurFromClerkHostedUiInDev,
+  potentialRequestAfterSignInOrOutFromClerkHostedUiInDev,
   runInterstitialRules,
 } from './interstitialRule';
 import type { VerifyTokenOptions } from './verify';
@@ -108,7 +108,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
         isSatelliteAndNeedsSync,
         potentialFirstRequestOnProductionEnvironment,
         potentialFirstLoadInDevWhenUATMissing,
-        potentialRequestAfterSignInOrOurFromClerkHostedUiInDev,
+        potentialRequestAfterSignInOrOutFromClerkHostedUiInDev,
         isSatelliteAlreadySyncedButCookieIsMissing,
         hasPositiveClientUatButCookieIsMissing,
         isNormalSignedOutState,
