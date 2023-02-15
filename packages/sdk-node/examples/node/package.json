@@ -3,7 +3,7 @@
   "license": "MIT",
   "type": "module",
   "dependencies": {
-    "@clerk/clerk-sdk-node": "file:../../dist",
+    "@clerk/clerk-sdk-node": "latest",
     "dotenv": "^8.6.0",
     "log-that-http": "^1.0.1"
   },

@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@clerk/nextjs": "file:../../packages/nextjs/",
+    "@clerk/nextjs": "*",
     "next": "^13.0.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"

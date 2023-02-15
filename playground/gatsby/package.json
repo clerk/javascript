@@ -16,10 +16,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@clerk/backend": "file:.yalc/@clerk/backend",
-    "@clerk/clerk-sdk-node": "file:.yalc/@clerk/clerk-sdk-node",
+    "@clerk/backend": "*",
+    "@clerk/clerk-sdk-node": "*",
     "gatsby": "5.4.2",
-    "gatsby-plugin-clerk": "file:.yalc/gatsby-plugin-clerk",
+    "gatsby-plugin-clerk": "*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
