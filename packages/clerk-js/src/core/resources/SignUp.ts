@@ -178,10 +178,14 @@ export class SignUp extends BaseResource implements SignUpResource {
     return this.authenticateWithWeb3({ identifier, generateSignature: generateSignatureWithMetamask });
   };
 
-  public authenticateWithRedirect = async (params: AuthenticateWithRedirectParams): Promise<void> => {
-    const { redirectUrl, redirectUrlComplete, strategy } = params || {};
+  public authenticateWithRedirect = async ({
+    redirectUrl,
+    redirectUrlComplete,
+    strategy,
+    continueSignUp = false,
+  }: AuthenticateWithRedirectParams): Promise<void> => {
     const authenticateFn = (args: SignUpCreateParams | SignUpUpdateParams) =>
-      this.id ? this.update(args) : this.create(args);
+      continueSignUp && this.id ? this.update(args) : this.create(args);
     const { verifications } = await authenticateFn({
       strategy,
       redirectUrl,

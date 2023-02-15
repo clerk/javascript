@@ -244,4 +244,8 @@ export type AuthenticateWithRedirectParams = {
    * Full URL or path to navigate after the OAuth flow completes.
    */
   redirectUrlComplete: string;
+  /**
+   * Whether to continue (i.e. PATCH) an existing SignUp (if present) or create a new SignUp
+   */
+  continueSignUp?: boolean;
 };
