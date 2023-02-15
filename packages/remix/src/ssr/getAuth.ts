@@ -3,7 +3,7 @@ import { sanitizeAuthObject } from '@clerk/backend';
 import { noLoaderArgsPassedInGetAuth } from '../errors';
 import { authenticateRequest } from './authenticateRequest';
 import type { GetAuthReturn, LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
-import { interstitialJsonResponse } from './utils';
+import { interstitialJsonResponse, unknownResponse } from './utils';
 
 type GetAuthOptions = Pick<RootAuthLoaderOptions, 'apiKey' | 'secretKey'>;
 
@@ -13,7 +13,11 @@ export async function getAuth(args: LoaderFunctionArgs, opts?: GetAuthOptions): 
   }
   const requestState = await authenticateRequest(args, opts);
 
-  if (requestState.isInterstitial || requestState.isUnknown) {
+  if (requestState.isUnknown) {
+    throw unknownResponse();
+  }
+
+  if (requestState.isInterstitial) {
     throw interstitialJsonResponse(requestState, { loader: 'nested' });
   }
 
