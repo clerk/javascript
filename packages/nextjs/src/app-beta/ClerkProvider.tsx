@@ -7,7 +7,6 @@ import { ClerkProvider as ClerkProviderClient } from './client/ClerkProvider';
 
 type NextAppClerkProviderProps = {
   children: React.ReactNode;
-  initialState?: InitialState;
 } & Omit<IsomorphicClerkOptions, keyof PublishableKeyOrFrontendApi> &
   Partial<PublishableKeyOrFrontendApi>;
 
