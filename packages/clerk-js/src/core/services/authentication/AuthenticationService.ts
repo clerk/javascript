@@ -35,7 +35,7 @@ export class AuthenticationService {
     this.setClientUatCookieForDevelopmentInstances();
   }
 
-  public setAuthCookiesFromToken(token: string): void {
+  public setAuthCookiesFromToken(token: string | undefined): void {
     this.updateSessionCookie(token);
     this.setClientUatCookieForDevelopmentInstances();
   }
