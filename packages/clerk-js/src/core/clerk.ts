@@ -985,7 +985,8 @@ export default class Clerk implements ClerkInterface {
         await this.#syncWithPrimary();
         return false;
       }
-
+    }
+    if (this.isSatellite && this.#hasSynced()) {
       this.#clearSynced();
     }
 

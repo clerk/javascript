@@ -52,7 +52,6 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
     // get auth state, check if we need to return an interstitial
     const cookieToken = getCookie(req, constants.Cookies.Session);
     const headerToken = headers.get('authorization')?.replace('Bearer ', '');
-
     const requestState = await clerkClient.authenticateRequest({
       ...opts,
       apiKey: API_KEY,
@@ -72,6 +71,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
       // @ts-expect-error
       isSatellite,
       domain: DOMAIN,
+      isSynced: new URL(req.url).searchParams.get('__clerk_synced') === 'true',
     });
 
     // Interstitial case

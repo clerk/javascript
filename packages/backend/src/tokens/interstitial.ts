@@ -93,7 +93,7 @@ export function loadInterstitialFromLocal(
                 ${domain ? `script.setAttribute('data-clerk-domain', '${domain}');` : ''}
                 ${proxyUrl ? `script.setAttribute('data-clerk-proxy-url', '${proxyUrl}')` : ''};
                 script.async = true;
-                script.src = '${getScriptUrl(domain || frontendApi, pkgVersion)}';
+                script.src = '${getScriptUrl(frontendApi, pkgVersion)}';
                 script.crossOrigin = 'anonymous';
                 script.addEventListener('load', startClerk);
                 document.body.appendChild(script);
@@ -140,7 +140,7 @@ export function buildPublicInterstitialUrl(
     url.searchParams.append('proxy_url', proxyUrl);
   }
 
-  const shouldSync = isSatellite && debugData?.reason === 'satellite-cookie-missing';
+  const shouldSync = isSatellite && debugData?.reason !== 'satellite-cookie-missing';
   if (shouldSync) {
     url.searchParams.append('should_sync_link', 'true');
   }
