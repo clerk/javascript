@@ -1,7 +1,8 @@
+import { useSafeLayoutEffect } from '@clerk/shared';
 import React from 'react';
 
 import { descriptors, Flex, Icon } from '../customizables';
-import { usePopover, useSafeLayoutEffect, useScrollLock } from '../hooks';
+import { usePopover, useScrollLock } from '../hooks';
 import { Close } from '../icons';
 import type { ThemableCssProp } from '../styledSystem';
 import { animations, mqu } from '../styledSystem';
