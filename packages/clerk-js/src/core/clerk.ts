@@ -45,8 +45,7 @@ import type {
   UserResource,
 } from '@clerk/types';
 
-import packageJSON from '../../package.json';
-import type { ComponentControls, MountComponentRenderer } from '../ui';
+import type { ComponentControls, MountComponentRenderer } from '../ui/Components';
 import {
   appendAsQueryParams,
   buildURL,
@@ -117,7 +116,7 @@ const defaultOptions: ClerkOptions = {
 
 export default class Clerk implements ClerkInterface {
   public static mountComponentRenderer?: MountComponentRenderer;
-  public static version: string = packageJSON.version;
+  public static version: string = __PKG_VERSION__;
   public client?: ClientResource;
   public session?: ActiveSessionResource | null;
   public organization?: OrganizationResource | null;

@@ -95,7 +95,8 @@ const loadSvgs = {
 const defineConstants = ({ mode, packageJSON }) => [
   new webpack.DefinePlugin({
     __DEV__: mode !== 'production',
-    __CLERKJS_VERSION__: JSON.stringify(packageJSON.version),
+    __PKG_VERSION__: JSON.stringify(packageJSON.version),
+    __PKG_NAME__: JSON.stringify(packageJSON.name),
   }),
   new webpack.EnvironmentPlugin({
     CLERK_ENV: mode,
