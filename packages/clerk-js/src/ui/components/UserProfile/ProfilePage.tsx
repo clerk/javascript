@@ -1,10 +1,11 @@
 import React from 'react';
 
+import { isDefaultProfileImage } from '../../../utils/user';
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser, useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
-import { handleError, isDefaultProfileImage, useFormControl } from '../../utils';
+import { handleError, useFormControl } from '../../utils';
 import { UserProfileAvatarUploader } from './UserProfileAvatarUploader';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 

@@ -23,9 +23,9 @@ import type {
   Web3WalletResource,
 } from '@clerk/types';
 
-import { getFullName } from '../../ui/utils';
 import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
+import { getFullName } from '../../utils/user';
 import { BackupCode } from './BackupCode';
 import type { RetrieveMembershipsParams } from './internal';
 import {

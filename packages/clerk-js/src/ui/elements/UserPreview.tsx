@@ -1,10 +1,10 @@
 import type { UserPreviewId, UserResource } from '@clerk/types';
 import React from 'react';
 
+import { getFullName, getIdentifier } from '../../utils/user';
 import type { LocalizationKey } from '../customizables';
 import { descriptors, Flex, Text, useLocalizations } from '../customizables';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
-import { getFullName, getIdentifier } from '../utils';
 import { UserAvatar } from './UserAvatar';
 
 export type UserPreviewProps = Omit<PropsOfComponent<typeof Flex>, 'title' | 'elementId'> & {

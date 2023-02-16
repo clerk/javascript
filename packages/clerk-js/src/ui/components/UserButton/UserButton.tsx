@@ -1,8 +1,8 @@
+import { getFullName, getIdentifier } from '../../../utils/user';
 import { useCoreUser, useUserButtonContext, withCoreUserGuard } from '../../contexts';
 import { descriptors, Flex, Flow, Text } from '../../customizables';
 import { Popover, withCardStateProvider, withFloatingTree } from '../../elements';
 import { usePopover } from '../../hooks';
-import { getFullName, getIdentifier } from '../../utils';
 import { UserButtonPopover } from './UserButtonPopover';
 import { UserButtonTrigger } from './UserButtonTrigger';
 
