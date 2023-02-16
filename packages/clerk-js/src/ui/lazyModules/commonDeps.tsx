@@ -4,15 +4,37 @@ import type { FlowMetadata } from '../elements';
 import type { ClerkComponentName } from './components';
 import { ClerkComponents } from './components';
 
-const CoreClerkContextWrapper = lazy(() => import('../contexts').then(m => ({ default: m.CoreClerkContextWrapper })));
-const EnvironmentProvider = lazy(() => import('../contexts').then(m => ({ default: m.EnvironmentProvider })));
-const OptionsProvider = lazy(() => import('../contexts').then(m => ({ default: m.OptionsProvider })));
-const AppearanceProvider = lazy(() => import('../customizables').then(m => ({ default: m.AppearanceProvider })));
-const VirtualRouter = lazy(() => import('../router').then(m => ({ default: m.VirtualRouter })));
-const InternalThemeProvider = lazy(() => import('../styledSystem').then(m => ({ default: m.InternalThemeProvider })));
-const Portal = lazy(() => import('./../portal').then(m => ({ default: m.default })));
-const FlowMetadataProvider = lazy(() => import('./../elements').then(m => ({ default: m.FlowMetadataProvider })));
-const Modal = lazy(() => import('./../elements').then(m => ({ default: m.Modal })));
+const CoreClerkContextWrapper = lazy(() =>
+  import(/* webpackChunkName: "CoreClerkContextWrapper" */ '../contexts').then(m => ({
+    default: m.CoreClerkContextWrapper,
+  })),
+);
+const EnvironmentProvider = lazy(() =>
+  import(/* webpackChunkName: "EnvironmentProvider" */ '../contexts').then(m => ({ default: m.EnvironmentProvider })),
+);
+const OptionsProvider = lazy(() =>
+  import(/* webpackChunkName: "OptionsProvider" */ '../contexts').then(m => ({ default: m.OptionsProvider })),
+);
+const AppearanceProvider = lazy(() =>
+  import(/* webpackChunkName: "AppearanceProvider" */ '../customizables').then(m => ({
+    default: m.AppearanceProvider,
+  })),
+);
+const VirtualRouter = lazy(() =>
+  import(/* webpackChunkName: "VirtualRouter" */ '../router').then(m => ({ default: m.VirtualRouter })),
+);
+const InternalThemeProvider = lazy(() =>
+  import(/* webpackChunkName: "InternalThemeProvider" */ '../styledSystem').then(m => ({
+    default: m.InternalThemeProvider,
+  })),
+);
+const Portal = lazy(() => import(/* webpackChunkName: "Portal" */ './../portal').then(m => ({ default: m.default })));
+const FlowMetadataProvider = lazy(() =>
+  import(/* webpackChunkName: "FlowMetadataProvider" */ './../elements').then(m => ({
+    default: m.FlowMetadataProvider,
+  })),
+);
+const Modal = lazy(() => import(/* webpackChunkName: "Modal" */ './../elements').then(m => ({ default: m.Modal })));
 
 type LazyProvidersProps = React.PropsWithChildren<{ clerk: any; environment: any; options: any; children: any }>;
 

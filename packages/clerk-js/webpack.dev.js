@@ -35,9 +35,22 @@ const getProductionConfig = (mode = 'production', env) => {
     },
     output: {
       path: path.resolve(__dirname, 'dist'),
+      chunkFilename: '[name].chunk.js',
       filename: '[name].js',
       libraryTarget: 'umd',
       globalObject: 'globalThis',
+    },
+    optimization: {
+      splitChunks: {
+        name: (module, chunks) => chunks.map(chunk => chunk.name).join('-'),
+        cacheGroups: {
+          reactDomVendor: {
+            test: /[\\/]node_modules[\\/](react-dom)[\\/]/,
+            name: 'vendor-react-dom',
+            chunks: 'all',
+          },
+        },
+      },
     },
   };
 };
