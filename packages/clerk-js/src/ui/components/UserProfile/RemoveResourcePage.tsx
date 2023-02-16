@@ -7,13 +7,13 @@ import { localizationKeys, Text } from '../../customizables';
 import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
-import { handleError } from '../../utils';
+import { fastDeepCopyAndReturn, handleError } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 export const RemoveEmailPage = () => {
   const user = useCoreUser();
   const { id } = useRouter().params;
-  const ref = React.useRef(user.emailAddresses.find(e => e.id === id));
+  const ref = React.useRef(fastDeepCopyAndReturn(user.emailAddresses.find(e => e.id === id)));
 
   if (!ref.current) {
     return null;
@@ -37,7 +37,7 @@ export const RemoveEmailPage = () => {
 export const RemovePhonePage = () => {
   const user = useCoreUser();
   const { id } = useRouter().params;
-  const ref = React.useRef(user.phoneNumbers.find(e => e.id === id));
+  const ref = React.useRef(fastDeepCopyAndReturn(user.phoneNumbers.find(e => e.id === id)));
 
   if (!ref.current) {
     return null;
@@ -61,7 +61,7 @@ export const RemovePhonePage = () => {
 export const RemoveConnectedAccountPage = () => {
   const user = useCoreUser();
   const { id } = useRouter().params;
-  const ref = React.useRef(user.externalAccounts.find(e => e.id === id));
+  const ref = React.useRef(fastDeepCopyAndReturn(user.externalAccounts.find(e => e.id === id)));
   const { providerToDisplayData } = useEnabledThirdPartyProviders();
 
   if (!ref.current) {
@@ -86,7 +86,7 @@ export const RemoveConnectedAccountPage = () => {
 export const RemoveWeb3WalletPage = () => {
   const user = useCoreUser();
   const { id } = useRouter().params;
-  const ref = React.useRef(user.web3Wallets.find(e => e.id === id));
+  const ref = React.useRef(fastDeepCopyAndReturn(user.web3Wallets.find(e => e.id === id)));
 
   if (!ref.current) {
     return null;
@@ -111,7 +111,7 @@ export const RemoveMfaPhoneCodePage = () => {
   const user = useCoreUser();
   const { id } = useRouter().params;
   // TODO: This logic will need to change when we add more 2fa methods
-  const ref = React.useRef(user.phoneNumbers.find(e => e.id === id));
+  const ref = React.useRef(fastDeepCopyAndReturn(user.phoneNumbers.find(e => e.id === id)));
 
   if (!ref.current) {
     return null;
