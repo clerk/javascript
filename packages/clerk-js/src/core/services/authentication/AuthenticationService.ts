@@ -35,6 +35,11 @@ export class AuthenticationService {
     this.setClientUatCookieForDevelopmentInstances();
   }
 
+  public setAuthCookiesFromToken(token: string): void {
+    this.updateSessionCookie(token);
+    this.setClientUatCookieForDevelopmentInstances();
+  }
+
   private startPollingForToken() {
     if (!this.enablePolling) {
       return;

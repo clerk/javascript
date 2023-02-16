@@ -40,6 +40,7 @@ import type {
   SignOutOptions,
   SignUpProps,
   SignUpResource,
+  TokenResource,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
@@ -82,6 +83,7 @@ import {
   clerkMissingProxyUrlAndDomain,
   clerkOAuthCallbackDidNotCompleteSignInSIgnUp,
 } from './errors';
+import { eventBus } from './eventBus';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import createFapiClient from './fapiClient';
 import {
@@ -1120,6 +1122,13 @@ export default class Clerk implements ClerkInterface {
       if (data.type === 'signout') {
         void this.handleUnauthenticated({ broadcast: false });
       }
+    });
+
+    // set cookie on token update
+    eventBus.addEventListener('token:update', event => {
+      const tokenEvent = event as CustomEvent;
+      const token = tokenEvent.detail.token as TokenResource;
+      this.#authService?.setAuthCookiesFromToken(token.getRawString());
     });
   };
 
