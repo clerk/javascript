@@ -16,32 +16,63 @@ import { createRoot } from 'react-dom/client';
 import { PRESERVED_QUERYSTRING_PARAMS } from '../core/constants';
 import { clerkUIErrorDOMElementNotFound } from '../core/errors';
 import { buildVirtualRouterUrl } from '../utils';
-const SignIn = lazy(() => import('./components/SignIn').then(module => ({ default: module.SignIn })));
-const SignInModal = lazy(() => import('./components/SignIn').then(module => ({ default: module.SignInModal })));
-const SignUp = lazy(() => import('./components/SignUp').then(module => ({ default: module.SignUp })));
-const SignUpModal = lazy(() => import('./components/SignUp').then(module => ({ default: module.SignUpModal })));
-const UserButton = lazy(() => import('./components/UserButton').then(module => ({ default: module.UserButton })));
-const UserProfile = lazy(() => import('./components/UserProfile').then(module => ({ default: module.UserProfile })));
+
+const SignIn = lazy(() =>
+  import(/* webpackChunkName: "SignIn" */ './components/SignIn').then(module => ({ default: module.SignIn })),
+);
+const SignInModal = lazy(() =>
+  import(/* webpackChunkName: "SignInModal" */ './components/SignIn').then(module => ({ default: module.SignInModal })),
+);
+const SignUp = lazy(() =>
+  import(/* webpackChunkName: "SignUp" */ './components/SignUp').then(module => ({ default: module.SignUp })),
+);
+const SignUpModal = lazy(() =>
+  import(/* webpackChunkName: "SignUpModal" */ './components/SignUp').then(module => ({ default: module.SignUpModal })),
+);
+const UserButton = lazy(() =>
+  import(/* webpackChunkName: "UserButton" */ './components/UserButton').then(module => ({
+    default: module.UserButton,
+  })),
+);
+const UserProfile = lazy(() =>
+  import(/* webpackChunkName: "UserProfile" */ './components/UserProfile').then(module => ({
+    default: module.UserProfile,
+  })),
+);
 const UserProfileModal = lazy(() =>
-  import('./components/UserProfile').then(module => ({ default: module.UserProfileModal })),
+  import(/* webpackChunkName: "UserProfileModal" */ './components/UserProfile').then(module => ({
+    default: module.UserProfileModal,
+  })),
 );
 const CreateOrganization = lazy(() =>
-  import('./components/CreateOrganization').then(module => ({ default: module.CreateOrganization })),
+  import(/* webpackChunkName: "CreateOrganization" */ './components/CreateOrganization').then(module => ({
+    default: module.CreateOrganization,
+  })),
 );
 const CreateOrganizationModal = lazy(() =>
-  import('./components/CreateOrganization').then(module => ({ default: module.CreateOrganizationModal })),
+  import(/* webpackChunkName: "CreateOrganizationModal" */ './components/CreateOrganization').then(module => ({
+    default: module.CreateOrganizationModal,
+  })),
 );
 const OrganizationProfile = lazy(() =>
-  import('./components/OrganizationProfile').then(module => ({ default: module.OrganizationProfile })),
+  import(/* webpackChunkName: "OrganizationProfile" */ './components/OrganizationProfile').then(module => ({
+    default: module.OrganizationProfile,
+  })),
 );
 const OrganizationProfileModal = lazy(() =>
-  import('./components/OrganizationProfile').then(module => ({ default: module.OrganizationProfileModal })),
+  import(/* webpackChunkName: "OrganizationProfileModal" */ './components/OrganizationProfile').then(module => ({
+    default: module.OrganizationProfileModal,
+  })),
 );
 const OrganizationSwitcher = lazy(() =>
-  import('./components/OrganizationSwitcher').then(module => ({ default: module.OrganizationSwitcher })),
+  import(/* webpackChunkName: "OrganizationSwitcher" */ './components/OrganizationSwitcher').then(module => ({
+    default: module.OrganizationSwitcher,
+  })),
 );
 const ImpersonationFab = lazy(() =>
-  import('./components/ImpersonationFab').then(module => ({ default: module.ImpersonationFab })),
+  import(/* webpackChunkName: "ImpersonationFab" */ './components/ImpersonationFab').then(module => ({
+    default: module.ImpersonationFab,
+  })),
 );
 
 import { EnvironmentProvider, OptionsProvider } from './contexts';
