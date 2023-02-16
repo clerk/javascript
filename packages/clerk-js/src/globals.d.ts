@@ -1,6 +1,7 @@
 declare global {
   const __DEV__: boolean;
-  const __CLERKJS_VERSION__: string;
+  const __PKG_NAME__: string;
+  const __PKG_VERSION__: string;
 
   interface Window {
     __unstable__onBeforeSetActive: () => void;
