@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom';
 
+import { PRESERVED_QUERYSTRING_PARAMS } from '../../core/constants';
 import { clerkErrorPathRouterMissingPath } from '../../core/errors';
 import { ComponentContext } from '../contexts';
 import { HashRouter, PathRouter } from '../router';
@@ -10,12 +11,11 @@ type PortalProps<CtxType extends AvailableComponentCtx, PropsType = Omit<CtxType
   node: HTMLDivElement;
   component: React.FunctionComponent<PropsType> | React.ComponentClass<PropsType, any>;
   props: PropsType & { path?: string; routing?: string };
-  preservedParams?: string[];
 } & Pick<CtxType, 'componentName'>;
 
 export default class Portal<CtxType extends AvailableComponentCtx> extends React.PureComponent<PortalProps<CtxType>> {
   render(): React.ReactPortal {
-    const { props, component, componentName, node, preservedParams } = this.props;
+    const { props, component, componentName, node } = this.props;
 
     const el = (
       <ComponentContext.Provider value={{ componentName: componentName, ...props } as CtxType}>
@@ -34,7 +34,7 @@ export default class Portal<CtxType extends AvailableComponentCtx> extends React
 
       return ReactDOM.createPortal(
         <PathRouter
-          preservedParams={preservedParams}
+          preservedParams={PRESERVED_QUERYSTRING_PARAMS}
           basePath={props.path}
         >
           {el}
@@ -43,6 +43,6 @@ export default class Portal<CtxType extends AvailableComponentCtx> extends React
       );
     }
 
-    return ReactDOM.createPortal(<HashRouter preservedParams={preservedParams}>{el}</HashRouter>, node);
+    return ReactDOM.createPortal(<HashRouter preservedParams={PRESERVED_QUERYSTRING_PARAMS}>{el}</HashRouter>, node);
   }
 }

@@ -45,7 +45,7 @@ import type {
   UserResource,
 } from '@clerk/types';
 
-import type { ComponentControls, MountComponentRenderer } from '../ui/Components';
+import type { MountComponentRenderer } from '../ui/Components';
 import {
   appendAsQueryParams,
   buildURL,
@@ -128,7 +128,7 @@ export default class Clerk implements ClerkInterface {
 
   #authService: AuthenticationService | null = null;
   #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
-  #componentControls?: ComponentControls | null;
+  #componentControls?: ReturnType<MountComponentRenderer> | null;
   #devBrowserHandler: DevBrowserHandler | null = null;
   #environment?: EnvironmentResource | null;
   #fapiClient: FapiClient;
@@ -243,12 +243,12 @@ export default class Clerk implements ClerkInterface {
     if (sessionExistsAndSingleSessionModeEnabled(this, this.#environment) && this.#instanceType === 'development') {
       return console.info(warnings.cannotOpenSignUpOrSignUp);
     }
-    this.#componentControls?.openModal('signIn', props || {});
+    void this.#componentControls.ensureMounted(controls => controls.openModal('signIn', props || {}));
   };
 
   public closeSignIn = (): void => {
     this.assertComponentsReady(this.#componentControls);
-    this.#componentControls?.closeModal('signIn');
+    void this.#componentControls.ensureMounted(controls => controls.closeModal('signIn'));
   };
 
   public openSignUp = (props?: SignInProps): void => {
@@ -256,12 +256,12 @@ export default class Clerk implements ClerkInterface {
     if (sessionExistsAndSingleSessionModeEnabled(this, this.#environment) && this.#instanceType === 'development') {
       return console.info(warnings.cannotOpenSignUpOrSignUp);
     }
-    this.#componentControls?.openModal('signUp', props || {});
+    void this.#componentControls.ensureMounted(controls => controls.openModal('signUp', props || {}));
   };
 
   public closeSignUp = (): void => {
     this.assertComponentsReady(this.#componentControls);
-    this.#componentControls?.closeModal('signUp');
+    void this.#componentControls.ensureMounted(controls => controls.closeModal('signUp'));
   };
 
   public openUserProfile = (props?: UserProfileProps): void => {
@@ -269,12 +269,12 @@ export default class Clerk implements ClerkInterface {
     if (noUserExists(this) && this.#instanceType === 'development') {
       return console.info(warnings.cannotOpenUserProfile);
     }
-    this.#componentControls?.openModal('userProfile', props || {});
+    void this.#componentControls.ensureMounted(controls => controls.openModal('userProfile', props || {}));
   };
 
   public closeUserProfile = (): void => {
     this.assertComponentsReady(this.#componentControls);
-    this.#componentControls?.closeModal('userProfile');
+    void this.#componentControls.ensureMounted(controls => controls.closeModal('userProfile'));
   };
 
   public openOrganizationProfile = (props?: OrganizationProfileProps): void => {
@@ -282,141 +282,161 @@ export default class Clerk implements ClerkInterface {
     if (noOrganizationExists(this) && this.#instanceType === 'development') {
       return console.info(warnings.cannotOpenOrgProfile);
     }
-    this.#componentControls?.openModal('organizationProfile', props || {});
+    void this.#componentControls.ensureMounted(controls => controls.openModal('organizationProfile', props || {}));
   };
 
   public closeOrganizationProfile = (): void => {
     this.assertComponentsReady(this.#componentControls);
-    this.#componentControls?.closeModal('organizationProfile');
+    void this.#componentControls.ensureMounted(controls => controls.closeModal('organizationProfile'));
   };
 
   public openCreateOrganization = (props?: CreateOrganizationProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    this.#componentControls?.openModal('createOrganization', props || {});
+    void this.#componentControls.ensureMounted(controls => controls.openModal('createOrganization', props || {}));
   };
 
   public closeCreateOrganization = (): void => {
     this.assertComponentsReady(this.#componentControls);
-    this.#componentControls?.closeModal('createOrganization');
+    void this.#componentControls.ensureMounted(controls => controls.closeModal('createOrganization'));
   };
 
   public mountSignIn = (node: HTMLDivElement, props?: SignInProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    this.#componentControls.mountComponent({
-      name: 'SignIn',
-      appearanceKey: 'signIn',
-      node,
-      props,
-    });
+    void this.#componentControls.ensureMounted(controls =>
+      controls.mountComponent({
+        name: 'SignIn',
+        appearanceKey: 'signIn',
+        node,
+        props,
+      }),
+    );
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
-    this.#componentControls.unmountComponent({
-      node,
-    });
+    void this.#componentControls.ensureMounted(controls =>
+      controls.unmountComponent({
+        node,
+      }),
+    );
   };
 
   public mountSignUp = (node: HTMLDivElement, props?: SignUpProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    this.#componentControls.mountComponent({
-      name: 'SignUp',
-      appearanceKey: 'signUp',
-      node,
-      props,
-    });
+    void this.#componentControls.ensureMounted(controls =>
+      controls.mountComponent({
+        name: 'SignUp',
+        appearanceKey: 'signUp',
+        node,
+        props,
+      }),
+    );
   };
 
   public unmountSignUp = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
-    this.#componentControls.unmountComponent({
-      node,
-    });
+    void this.#componentControls.ensureMounted(controls =>
+      controls.unmountComponent({
+        node,
+      }),
+    );
   };
 
   public mountUserProfile = (node: HTMLDivElement, props?: UserProfileProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    this.#componentControls.mountComponent({
-      name: 'UserProfile',
-      appearanceKey: 'userProfile',
-      node,
-      props,
-    });
+    void this.#componentControls.ensureMounted(controls =>
+      controls.mountComponent({
+        name: 'UserProfile',
+        appearanceKey: 'userProfile',
+        node,
+        props,
+      }),
+    );
   };
 
   public unmountUserProfile = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
-    this.#componentControls.unmountComponent({
-      node,
-    });
+    void this.#componentControls.ensureMounted(controls =>
+      controls.unmountComponent({
+        node,
+      }),
+    );
   };
 
-  public mountOrganizationProfile = (node: HTMLDivElement, props?: OrganizationProfileProps): void => {
+  public mountOrganizationProfile = (node: HTMLDivElement, props?: OrganizationProfileProps) => {
     this.assertComponentsReady(this.#componentControls);
-    this.#componentControls.mountComponent({
-      name: 'OrganizationProfile',
-      appearanceKey: 'userProfile',
-      node,
-      props,
-    });
+    void this.#componentControls.ensureMounted(controls =>
+      controls.mountComponent({
+        name: 'OrganizationProfile',
+        appearanceKey: 'userProfile',
+        node,
+        props,
+      }),
+    );
   };
 
-  public unmountOrganizationProfile = (node: HTMLDivElement): void => {
+  public unmountOrganizationProfile = (node: HTMLDivElement) => {
     this.assertComponentsReady(this.#componentControls);
-    this.#componentControls.unmountComponent({
-      node,
-    });
+    void this.#componentControls.ensureMounted(controls =>
+      controls.unmountComponent({
+        node,
+      }),
+    );
   };
 
-  public mountCreateOrganization = (node: HTMLDivElement, props?: CreateOrganizationProps): void => {
+  public mountCreateOrganization = (node: HTMLDivElement, props?: CreateOrganizationProps) => {
     this.assertComponentsReady(this.#componentControls);
-    this.#componentControls.mountComponent({
-      name: 'CreateOrganization',
-      appearanceKey: 'createOrganization',
-      node,
-      props,
-    });
+    void this.#componentControls?.ensureMounted(controls =>
+      controls.mountComponent({
+        name: 'CreateOrganization',
+        appearanceKey: 'createOrganization',
+        node,
+        props,
+      }),
+    );
   };
 
-  public unmountCreateOrganization = (node: HTMLDivElement): void => {
+  public unmountCreateOrganization = (node: HTMLDivElement) => {
     this.assertComponentsReady(this.#componentControls);
-    this.#componentControls.unmountComponent({
-      node,
-    });
+    void this.#componentControls?.ensureMounted(controls =>
+      controls.unmountComponent({
+        node,
+      }),
+    );
   };
 
-  public mountOrganizationSwitcher = (node: HTMLDivElement, props?: OrganizationSwitcherProps): void => {
+  public mountOrganizationSwitcher = (node: HTMLDivElement, props?: OrganizationSwitcherProps) => {
     this.assertComponentsReady(this.#componentControls);
-    this.#componentControls.mountComponent({
-      name: 'OrganizationSwitcher',
-      appearanceKey: 'organizationSwitcher',
-      node,
-      props,
-    });
+    void this.#componentControls?.ensureMounted(controls =>
+      controls.mountComponent({
+        name: 'OrganizationSwitcher',
+        appearanceKey: 'organizationSwitcher',
+        node,
+        props,
+      }),
+    );
   };
 
   public unmountOrganizationSwitcher = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
-    this.#componentControls.unmountComponent({
-      node,
-    });
+    void this.#componentControls?.ensureMounted(controls => controls.unmountComponent({ node }));
   };
 
-  public mountUserButton = (node: HTMLDivElement, props?: UserButtonProps): void => {
+  public mountUserButton = (node: HTMLDivElement, props?: UserButtonProps) => {
     this.assertComponentsReady(this.#componentControls);
-    this.#componentControls.mountComponent({
-      name: 'UserButton',
-      appearanceKey: 'userButton',
-      node,
-      props,
-    });
+    void this.#componentControls?.ensureMounted(controls =>
+      controls.mountComponent({
+        name: 'UserButton',
+        appearanceKey: 'userButton',
+        node,
+        props,
+      }),
+    );
   };
 
   public unmountUserButton = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
-    this.#componentControls.unmountComponent({
-      node,
-    });
+    void this.#componentControls?.ensureMounted(controls => controls.unmountComponent({ node }));
   };
 
   /**
@@ -944,7 +964,7 @@ export default class Clerk implements ClerkInterface {
     this.#environment = new Environment(env);
 
     if (Clerk.mountComponentRenderer) {
-      this.#componentControls = await Clerk.mountComponentRenderer(this, this.#environment, this.#options);
+      this.#componentControls = Clerk.mountComponentRenderer(this, this.#environment, this.#options);
     }
   };
 
@@ -956,10 +976,10 @@ export default class Clerk implements ClerkInterface {
     this.#fapiClient.onAfterResponse(callback);
   };
 
-  __unstable__updateProps = (props: any): void => {
+  __unstable__updateProps = (props: any) => {
     // The expect-error directive below is safe since `updateAppearanceProp` is only used
     // in the v4 build. This will be removed when v4 becomes the main stable version
-    this.#componentControls?.updateProps(props);
+    return this.#componentControls?.ensureMounted(controls => controls.updateProps(props));
   };
 
   #hasSynced = () => getClerkQueryParam(CLERK_SYNCED) === 'true';
@@ -1029,7 +1049,7 @@ export default class Clerk implements ClerkInterface {
         });
 
         if (Clerk.mountComponentRenderer) {
-          this.#componentControls = await Clerk.mountComponentRenderer(this, this.#environment, this.#options);
+          this.#componentControls = Clerk.mountComponentRenderer(this, this.#environment, this.#options);
         }
 
         break;
@@ -1066,7 +1086,7 @@ export default class Clerk implements ClerkInterface {
     // TODO: Add an auth service also for non standard browsers that will poll for the __session JWT but won't use cookies
 
     if (Clerk.mountComponentRenderer) {
-      this.#componentControls = await Clerk.mountComponentRenderer(this, this.#environment, this.#options);
+      this.#componentControls = Clerk.mountComponentRenderer(this, this.#environment, this.#options);
     }
   };
 
@@ -1161,11 +1181,11 @@ export default class Clerk implements ClerkInterface {
     this.user = this.session ? this.session.user : null;
   };
 
-  assertComponentsReady(components: ComponentControls | null | undefined): asserts components is ComponentControls {
+  assertComponentsReady(controls: unknown): asserts controls is ReturnType<MountComponentRenderer> {
     if (!Clerk.mountComponentRenderer) {
       throw new Error('ClerkJS was loaded without UI components.');
     }
-    if (!components) {
+    if (!controls) {
       throw new Error('ClerkJS components are not ready yet.');
     }
   }
