@@ -25,6 +25,7 @@
   },
   "scripts": {
     "build": "npm run build:bundle && (npm run build:declarations || true) && npm run bundlewatch",
+    "build:analyze": "npm run build:bundle -- --profile --env serveAnalyzer",
     "build:stats": "npm run build --json > stats.json",
     "bundlewatch": "bundlewatch",
     "build:bundle": "webpack --config webpack.dev.js --env production",

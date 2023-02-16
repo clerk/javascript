@@ -16,13 +16,13 @@ module.exports = env => {
     resolve: {
       extensions: ['.ts', '.tsx', '.js', '.jsx'],
     },
-    ...(isProduction ? getProductionConfig(mode) : getDevelopmentConfig(mode, env)),
+    ...(isProduction ? getProductionConfig(mode, env) : getDevelopmentConfig(mode, env)),
   };
 };
 
-const getProductionConfig = (mode = 'production') => {
+const getProductionConfig = (mode = 'production', env) => {
   return {
-    plugins: [...defineConstants({ mode, packageJSON })],
+    plugins: [...defineConstants({ mode, packageJSON }), ...(env.serveAnalyzer ? [new BundleAnalyzerPlugin()] : [])],
     devtool: undefined,
     entry: {
       clerk: './src/index.ts',
@@ -43,12 +43,11 @@ const getProductionConfig = (mode = 'production') => {
 };
 
 const getDevelopmentConfig = (mode = 'development', env) => {
-  const serveAnalyzer = env.serveAnalyzer;
   return {
     plugins: [
       new ReactRefreshWebpackPlugin({ overlay: { sockHost: 'js.lclclerk.com' } }),
       ...defineConstants({ mode, packageJSON }),
-      ...(serveAnalyzer ? [new BundleAnalyzerPlugin()] : []),
+      ...(env.serveAnalyzer ? [new BundleAnalyzerPlugin()] : []),
     ],
     devtool: 'eval-cheap-source-map',
     entry: './src/index.browser.ts',
