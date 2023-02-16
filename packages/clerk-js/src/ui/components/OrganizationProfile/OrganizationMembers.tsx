@@ -1,5 +1,5 @@
 import { useCoreOrganization, useOrganizationProfileContext } from '../../contexts';
-import { Col, descriptors, Flex, Icon, localizationKeys, Text } from '../../customizables';
+import { Col, descriptors, Flex, Icon, localizationKeys } from '../../customizables';
 import {
   CardAlert,
   Header,

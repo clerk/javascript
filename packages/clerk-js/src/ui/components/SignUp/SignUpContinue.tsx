@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { withRedirectToHome } from '../../common/withRedirectToHome';
 import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import {
