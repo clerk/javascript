@@ -1,8 +1,8 @@
 import type { UserResource } from '@clerk/types';
 
+import { getFullName, getInitials } from '../../utils/user';
 import { Avatar } from '../elements';
 import type { PropsOfComponent } from '../styledSystem';
-import { getFullName, getInitials } from '../utils';
 
 type UserAvatarProps = PropsOfComponent<typeof Avatar> &
   Partial<Pick<UserResource, 'firstName' | 'lastName' | 'profileImageUrl'>> & {
