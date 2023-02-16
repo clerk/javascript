@@ -35,20 +35,26 @@ const getProductionConfig = (mode = 'production') => {
     },
     output: {
       path: path.resolve(__dirname, 'dist'),
+      chunkFilename: `[name].[fullhash:6].${packageJSON.version}.js`,
       filename: '[name].js',
       libraryTarget: 'umd',
       globalObject: 'globalThis',
+    },
+    optimization: {
+      splitChunks: {
+        name: (module, chunks) =>
+          chunks.map(chunk => chunk.name.replace('Organization', 'Org').replace('User', 'Us').slice(0, 4)).join('-'),
+      },
     },
   };
 };
 
 const getDevelopmentConfig = (mode = 'development', env) => {
-  const serveAnalyzer = env.serveAnalyzer;
   return {
     plugins: [
       new ReactRefreshWebpackPlugin({ overlay: { sockHost: 'js.lclclerk.com' } }),
       ...defineConstants({ mode, packageJSON }),
-      ...(serveAnalyzer ? [new BundleAnalyzerPlugin()] : []),
+      ...(env.serveAnalyzer ? [new BundleAnalyzerPlugin()] : []),
     ],
     devtool: 'eval-cheap-source-map',
     entry: './src/index.browser.ts',
@@ -110,6 +116,13 @@ const devServerOutput = {
     crossOriginLoading: 'anonymous',
     filename: 'clerk.browser.js',
     libraryTarget: 'umd',
+    chunkFilename: `[name].[fullhash:6].${packageJSON.version}.js`,
+  },
+  optimization: {
+    splitChunks: {
+      name: (module, chunks) =>
+        chunks.map(chunk => chunk.name.replace('Organization', 'Org').replace('User', 'Us').slice(0, 4)).join('-'),
+    },
   },
   devServer: {
     // https: true,
