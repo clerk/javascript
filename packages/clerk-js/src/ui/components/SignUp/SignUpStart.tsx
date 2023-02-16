@@ -1,8 +1,8 @@
 import React from 'react';
 
+import { ERROR_CODES } from '../../../core/constants';
 import { getClerkQueryParam } from '../../../utils/getClerkQueryParam';
 import { withRedirectToHomeSingleSessionGuard } from '../../common';
-import { ERROR_CODES } from '../../common/constants';
 import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance } from '../../customizables';
 import {
