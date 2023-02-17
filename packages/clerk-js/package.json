@@ -79,7 +79,7 @@
     "@types/webpack-dev-server": "^4.7.2",
     "@types/webpack-env": "^1.16.4",
     "babel-loader": "^8.2.5",
-    "babel-plugin-module-resolver": "^4.1.0",
+    "babel-plugin-module-resolver": "^5.0.0",
     "bundlewatch": "^0.3.3",
     "jest": "*",
     "jest-environment-jsdom": "*",
