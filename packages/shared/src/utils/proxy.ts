@@ -3,7 +3,11 @@ export function isValidProxyUrl(key: string | undefined) {
     return true;
   }
 
-  return key.startsWith('https://') || isProxyUrlRelative(key);
+  return isHttpOrHttps(key) || isProxyUrlRelative(key);
+}
+
+export function isHttpOrHttps(key: string | undefined) {
+  return key?.startsWith('https://') || key?.startsWith('http://') || false;
 }
 
 export function isProxyUrlRelative(key: string) {

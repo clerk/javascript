@@ -1,4 +1,4 @@
-import { parsePublishableKey } from '@clerk/shared';
+import { isValidProxyUrl, parsePublishableKey, proxyUrlToAbsoluteURL } from '@clerk/shared';
 
 import { LIB_VERSION } from '../info';
 import type { BrowserClerk } from '../types';
@@ -33,12 +33,24 @@ const forceStagingReleaseForClerkFapi = (frontendApi: string): boolean => {
   );
 };
 
-function getScriptSrc({ publishableKey, frontendApi, scriptUrl, scriptVariant = '' }: LoadScriptParams): string {
+function getScriptSrc({
+  publishableKey,
+  frontendApi,
+  scriptUrl,
+  scriptVariant = '',
+  proxyUrl,
+}: LoadScriptParams): string {
   if (scriptUrl) {
     return scriptUrl;
   }
 
-  const scriptHost = publishableKey ? parsePublishableKey(publishableKey)?.frontendApi : frontendApi;
+  let scriptHost = '';
+  if (!!proxyUrl && isValidProxyUrl(proxyUrl)) {
+    scriptHost = proxyUrlToAbsoluteURL(proxyUrl).replace(/http(s)?:\/\//, '');
+  } else {
+    scriptHost = parsePublishableKey(publishableKey)?.frontendApi || frontendApi || '';
+  }
+
   if (!scriptHost) {
     errorThrower.throwMissingPublishableKeyError();
   }
@@ -49,7 +61,7 @@ function getScriptSrc({ publishableKey, frontendApi, scriptUrl, scriptVariant = 
   };
   const nonStableTag = extractNonStableTag(LIB_VERSION);
 
-  if (forceStagingReleaseForClerkFapi(scriptHost!)) {
+  if (forceStagingReleaseForClerkFapi(scriptHost)) {
     return nonStableTag ? getUrlForTag(nonStableTag) : getUrlForTag('staging');
   }
 

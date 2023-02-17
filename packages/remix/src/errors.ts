@@ -74,3 +74,7 @@ A secretKey or apiKey must be provided in order to use SSR and the exports from 
 If your runtime supports environment variables, you can add a CLERK_SECRET_KEY or CLERK_API_KEY variable to your config.
 Otherwise, you can pass a secretKey parameter to rootAuthLoader or getAuth.
 `);
+
+export const noRelativeProxyInSSR = createErrorMessage(
+  `Only a absolute URL that starts with https is allowed to be used in SSR`,
+);

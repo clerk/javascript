@@ -13,7 +13,7 @@ export function buildPublishableKey(frontendApi: string): string {
   return `${keyPrefix}${btoa(`${frontendApi}$`)}`;
 }
 
-export function parsePublishableKey(key: string): PublishableKey | null {
+export function parsePublishableKey(key: string | undefined): PublishableKey | null {
   key = key || '';
 
   if (!isPublishableKey(key)) {

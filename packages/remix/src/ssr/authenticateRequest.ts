@@ -1,7 +1,8 @@
 import type { RequestState } from '@clerk/backend';
 import { Clerk } from '@clerk/backend';
+import { isHttpOrHttps } from '@clerk/shared';
 
-import { noSecretKeyOrApiKeyError } from '../errors';
+import { noRelativeProxyInSSR, noSecretKeyOrApiKeyError } from '../errors';
 import { getEnvVariable } from '../utils';
 import type { LoaderFunctionArgs, RootAuthLoaderOptions, RootAuthLoaderOptionsWithExperimental } from './types';
 import { handleIsSatelliteBooleanOrFn, parseCookies } from './utils';
@@ -51,6 +52,10 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     (context?.CLERK_PROXY_URL as string) ||
     (opts as RootAuthLoaderOptionsWithExperimental).proxyUrl ||
     '';
+
+  if (!!proxyUrl && !isHttpOrHttps(proxyUrl)) {
+    throw new Error(noRelativeProxyInSSR);
+  }
 
   const { headers } = request;
   const cookies = parseCookies(request);
