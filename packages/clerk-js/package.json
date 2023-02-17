@@ -85,7 +85,6 @@
     "jest-environment-jsdom": "*",
     "node-fetch": "^2.6.0",
     "react-refresh-typescript": "^2.0.5",
-    "react-test-renderer": "^18.2.0",
     "semver": "^7.3.5",
     "ts-loader": "^9.3.0",
     "typescript": "*",

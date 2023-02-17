@@ -16,7 +16,7 @@ export default defineConfig(overrideOptions => {
     sourcemap: true,
     format: ['cjs', 'esm'],
     define: { PACKAGE_VERSION: `"${version}"`, __DEV__: `${!isProd}` },
-    external: ['@testing-library', 'react', 'react-test-renderer', 'jest', 'jest-environment-jsdom', 'react-dom'],
+    external: ['@testing-library', 'react', 'jest', 'jest-environment-jsdom', 'react-dom'],
     legacyOutput: true,
     esbuildPlugins: [WebWorkerMinifyPlugin],
   };
