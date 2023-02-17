@@ -84,7 +84,6 @@
     "bundlewatch": "^0.3.3",
     "css-loader": "^6.7.1",
     "fork-ts-checker-webpack-plugin": "^7.2.11",
-    "identity-obj-proxy": "^3.0.0",
     "jest": "*",
     "jest-environment-jsdom": "*",
     "node-fetch": "^2.6.0",
