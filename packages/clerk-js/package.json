@@ -25,7 +25,7 @@
   },
   "scripts": {
     "build": "npm run build:bundle && (npm run build:declarations || true) && npm run bundlewatch",
-    "build:stats": "npm run build --json > stats.json",
+    "build:stats": "webpack --config webpack.dev.js --env production --json | tail -n +2 > stats.json",
     "bundlewatch": "bundlewatch",
     "build:bundle": "webpack --config webpack.dev.js --env production",
     "build:declarations": "tsc -p tsconfig.declarations.json",
