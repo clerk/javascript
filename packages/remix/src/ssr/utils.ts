@@ -17,6 +17,7 @@ export function injectAuthIntoRequest(args: LoaderFunctionArgs, authObject: Auth
     userId,
     sessionId,
     getToken,
+    sessionClaims,
     actor: sessionClaims?.act || null,
   };
   (args.request as any).user = user;
