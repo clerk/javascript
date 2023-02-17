@@ -42,3 +42,13 @@ export const fastDeepMergeAndKeep = (
     }
   }
 };
+
+export const fastDeepCopyAndReturn = <T extends Record<any, any> | undefined | null>(source: T): T => {
+  if (!source) {
+    return source;
+  }
+
+  const target = {};
+  fastDeepMergeAndReplace(source, target);
+  return target as T;
+};
