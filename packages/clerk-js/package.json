@@ -80,7 +80,6 @@
     "babel-loader": "^8.2.5",
     "babel-plugin-module-resolver": "^4.1.0",
     "bundlewatch": "^0.3.3",
-    "fork-ts-checker-webpack-plugin": "^7.2.11",
     "jest": "*",
     "jest-environment-jsdom": "*",
     "node-fetch": "^2.6.0",
@@ -96,8 +95,7 @@
     "webpack": "^5.72.1",
     "webpack-bundle-analyzer": "^4.5.0",
     "webpack-cli": "^4.9.2",
-    "webpack-dev-server": "^4.9.0",
-    "webpack-merge": "^5.8.0"
+    "webpack-dev-server": "^4.9.0"
   },
   "browserslist": "last 2 versions, ios_saf > 12, Safari > 12, > 1%, not dead, not ie > 0",
   "bundlewatch": {
