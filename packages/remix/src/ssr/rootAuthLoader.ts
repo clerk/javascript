@@ -38,7 +38,7 @@ export const rootAuthLoader: RootAuthLoader = async (
   const requestState = await authenticateRequest(args, opts);
 
   if (requestState.isUnknown) {
-    throw unknownResponse();
+    throw unknownResponse(requestState);
   }
 
   if (requestState.isInterstitial) {
