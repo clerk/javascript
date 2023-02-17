@@ -93,7 +93,7 @@ export function loadInterstitialFromLocal(
                 ${domain ? `script.setAttribute('data-clerk-domain', '${domain}');` : ''}
                 ${proxyUrl ? `script.setAttribute('data-clerk-proxy-url', '${proxyUrl}')` : ''};
                 script.async = true;
-                script.src = '${getScriptUrl(frontendApi, pkgVersion)}';
+                script.src = '${getScriptUrl(proxyUrl || frontendApi, pkgVersion)}';
                 script.crossOrigin = 'anonymous';
                 script.addEventListener('load', startClerk);
                 document.body.appendChild(script);
@@ -174,6 +174,7 @@ const getClerkJsMajorVersionOrTag = (frontendApi: string, pkgVersion?: string) =
 };
 
 const getScriptUrl = (frontendApi: string, pkgVersion?: string) => {
+  const noSchemeFrontendApi = frontendApi.replace(/http(s)?:\/\//, '');
   const major = getClerkJsMajorVersionOrTag(frontendApi, pkgVersion);
-  return `https://${frontendApi}/npm/@clerk/clerk-js@${major}/dist/clerk.browser.js`;
+  return `https://${noSchemeFrontendApi}/npm/@clerk/clerk-js@${major}/dist/clerk.browser.js`;
 };

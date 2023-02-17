@@ -25,6 +25,7 @@ import {
   setAuthStatusOnRequest,
   setRequestHeadersOnNextResponse,
 } from './utils';
+import { isHttpOrHttps } from './utils';
 
 interface WithClerkMiddleware {
   (handler: NextMiddleware, opts?: WithAuthOptions): NextMiddleware;
@@ -43,6 +44,10 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
   const [handler = noop, opts = {}] = args as [NextMiddleware, WithAuthOptions] | [];
 
   const proxyUrl = opts?.proxyUrl || PROXY_URL;
+
+  if (!!proxyUrl && !isHttpOrHttps(proxyUrl)) {
+    throw new Error(`Only a absolute URL that starts with https is allowed to be used in SSR`);
+  }
 
   return async (req: NextRequest, event: NextFetchEvent) => {
     const { headers } = req;
