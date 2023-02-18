@@ -10,9 +10,7 @@ import { SocialButtons } from '../../elements/SocialButtons';
 import { useNavigate } from '../../hooks';
 import { handleError } from '../../utils';
 
-export type SignUpSocialButtonsProps = SocialButtonsProps & { continueSignUp?: boolean };
-
-export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) => {
+export const SignUpSocialButtons = React.memo((props: SocialButtonsProps) => {
   const clerk = useCoreClerk();
   const { navigate } = useNavigate();
   const card = useCardState();
@@ -21,14 +19,13 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
   const signUp = useCoreSignUp();
   const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signUpUrl);
   const redirectUrlComplete = ctx.afterSignUpUrl || displayConfig.afterSignUpUrl;
-  const { continueSignUp = false, ...rest } = props;
 
   return (
     <SocialButtons
-      {...rest}
+      {...props}
       oauthCallback={(strategy: OAuthStrategy) => {
         return signUp
-          .authenticateWithRedirect({ strategy, redirectUrl, redirectUrlComplete, continueSignUp })
+          .authenticateWithRedirect({ strategy, redirectUrl, redirectUrlComplete })
           .catch(err => handleError(err, [], card.setError));
       }}
       web3Callback={() => {

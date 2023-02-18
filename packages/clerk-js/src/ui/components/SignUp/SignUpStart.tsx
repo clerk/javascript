@@ -236,7 +236,6 @@ function _SignUpStart(): JSX.Element {
               <SignUpSocialButtons
                 enableOAuthProviders={showOauthProviders}
                 enableWeb3Providers={showWeb3Providers}
-                continueSignUp={missingRequirementsWithTicket}
               />
             )}
             {shouldShowForm && (
