@@ -980,8 +980,11 @@ export default class Clerk implements ClerkInterface {
   };
 
   #loadInStandardBrowser = async (): Promise<boolean> => {
+    this.#authService = new AuthenticationService(this);
     if (this.isSatellite && this.#options.shouldSyncLink) {
       if (!this.#hasSynced()) {
+        // set session cookie to avoid throwing an extra interstitial
+        this.#authService?.setAuthCookiesFromSession(this.session);
         await this.#syncWithPrimary();
         return false;
       }
@@ -990,7 +993,6 @@ export default class Clerk implements ClerkInterface {
       this.#clearSynced();
     }
 
-    this.#authService = new AuthenticationService(this);
     this.#pageLifecycle = createPageLifecycle();
 
     this.#devBrowserHandler = createDevBrowserHandler({
