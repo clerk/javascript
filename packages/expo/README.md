@@ -101,10 +101,20 @@ import { ClerkProvider } from "@clerk/clerk-expo";
 
 + const tokenCache = {
 +  getToken(key) {
-+    return SecureStore.getItemAsync(key);
++    try {
++     return SecureStore.getItemAsync(key);
++    }
++    catch (err) {
++     return null;
++    }
 +  },
 +  saveToken(key, value) {
-+    return SecureStore.setItemAsync(key, value);
++    try {
++     return SecureStore.setItemAsync(key, value);
++    }
++    catch (err) {
++     return null;
++    }
 +  },
 +};
 
