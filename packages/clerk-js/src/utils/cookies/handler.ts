@@ -1,11 +1,38 @@
 import { addYears } from '@clerk/shared';
-import type { ClientResource } from '@clerk/types';
+import { convertUint8ArrayToHex } from '@clerk/shared';
+import type { BuildCookieName, ClientResource } from '@clerk/types';
 
 import { buildURL, getAllETLDs } from '../url';
 import { clientCookie } from './client';
 import { clientUatCookie } from './client_uat';
 import { inittedCookie } from './initted';
 import { sessionCookie } from './session';
+
+export const buildCookieName = async (options: BuildCookieName) => {
+  const { publishableKey, domain, proxyUrl, isSatellite } = options;
+
+  const items = [] as string[];
+
+  if (publishableKey) {
+    items.push(publishableKey);
+  }
+
+  if (isSatellite && domain) {
+    items.push(domain);
+  }
+
+  if (proxyUrl) {
+    items.push(proxyUrl);
+  }
+
+  const stringValue = items.join('-');
+
+  const toUint8 = new TextEncoder().encode(stringValue);
+  const buffer = await crypto.subtle.digest('SHA-1', toUint8);
+  const hash = Array.from(new Uint8Array(buffer));
+
+  return `__client_uat_${convertUint8ArrayToHex(hash).slice(0, 12)}`;
+};
 
 const COOKIE_PATH = '/';
 export type CookieHandler = ReturnType<typeof createCookieHandler>;
@@ -34,7 +61,7 @@ export const createCookieHandler = () => {
     });
   };
 
-  const setClientUatCookie = (client: ClientResource | undefined) => {
+  const setClientUatCookie = async (client: ClientResource | undefined, options: BuildCookieName) => {
     const expires = addYears(Date.now(), 1);
     const sameSite = 'Strict';
     const secure = false;
@@ -47,11 +74,29 @@ export const createCookieHandler = () => {
       val = Math.floor(client.updatedAt.getTime() / 1000).toString();
     }
 
-    return clientUatCookie.set(val, {
-      expires,
-      sameSite,
-      secure,
-    });
+    const clientUatName = await buildCookieName(options);
+    console.log(clientUatName, 'clientUatName');
+
+    // also create with legacy __client_uat naming for backwards compatibility reasons
+    clientUatCookie.set(
+      val,
+      {
+        expires,
+        sameSite,
+        secure,
+      },
+      '__client_uat',
+    );
+
+    return clientUatCookie.set(
+      val,
+      {
+        expires,
+        sameSite,
+        secure,
+      },
+      '__client_uat_666', // clientUatName
+    );
   };
 
   // Third party cookie helpers

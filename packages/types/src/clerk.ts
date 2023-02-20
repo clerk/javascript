@@ -74,6 +74,12 @@ export interface Clerk {
    */
   domain?: string;
 
+  /**
+   * @experimental
+   * Indicatess if application is satellite
+   */
+  isSatellite?: boolean | ((url: URL) => boolean);
+
   instanceType?: InstanceType;
 
   /** Client handling most Clerk operations. */
@@ -794,3 +800,5 @@ export interface AuthenticateWithMetamaskParams {
 export interface LoadedClerk extends Clerk {
   client: ClientResource;
 }
+
+export type BuildCookieName = Pick<Clerk, 'publishableKey' | 'domain' | 'proxyUrl' | 'isSatellite'>;

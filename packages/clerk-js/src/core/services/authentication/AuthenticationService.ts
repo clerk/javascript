@@ -93,8 +93,10 @@ export class AuthenticationService {
   }
 
   private setClientUatCookieForDevelopmentInstances() {
+    const { publishableKey, domain, proxyUrl, isSatellite } = this.clerk;
+
     if (!this.environment?.isProduction() && this.inCustomDevelopmentDomain()) {
-      this.cookies.setClientUatCookie(this.clerk.client);
+      void this.cookies.setClientUatCookie(this.clerk.client, { publishableKey, domain, proxyUrl, isSatellite });
     }
   }
 

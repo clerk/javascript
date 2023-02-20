@@ -184,6 +184,7 @@ export default class Clerk implements ClerkInterface {
 
       const { frontendApi, instanceType } = publishableKey as PublishableKey;
 
+      this.publishableKey = key;
       this.frontendApi = frontendApi;
       this.#instanceType = instanceType;
     }

@@ -1,7 +1,5 @@
 import { createCookieHandler } from '@clerk/shared';
 
-const CLIENT_UAT_COOKIE_NAME = '__client_uat';
-
 /**
  *
  * This is a long-lived JS cookie used in AuthV2 development instances, to
@@ -12,4 +10,4 @@ const CLIENT_UAT_COOKIE_NAME = '__client_uat';
  *
  * https://docs.google.com/document/d/1PGAykkmPjx5Mtdi6j-yHc5Qy-uasjtcXnfGKDy3cHIE/edit#
  */
-export const clientUatCookie = createCookieHandler(CLIENT_UAT_COOKIE_NAME);
+export const clientUatCookie = createCookieHandler();
