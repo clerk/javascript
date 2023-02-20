@@ -6,6 +6,7 @@ import { callWithRetry } from '../util/callWithRetry';
 import { isStaging } from '../util/instance';
 import { parsePublishableKey } from '../util/parsePublishableKey';
 import { joinPaths } from '../util/path';
+import { AuthErrorReason } from './authStatus';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from './errors';
 import type { DebugRequestSate } from './request';
 
@@ -67,7 +68,7 @@ export function loadInterstitialFromLocal(
                 try {
                     await Clerk.load({
                         isSatellite: ${isSatellite},
-                        shouldSyncLink: ${isSatellite && debugData?.reason !== 'satellite-cookie-missing'},
+                        shouldSyncLink: ${debugData?.reason === AuthErrorReason.SatelliteCookieNeedsSync},
                     });
                     if(Clerk.loaded){
                       if(window.location.href.indexOf("#") === -1){
@@ -140,7 +141,7 @@ export function buildPublicInterstitialUrl(
     url.searchParams.append('proxy_url', proxyUrl);
   }
 
-  const shouldSync = isSatellite && debugData?.reason !== 'satellite-cookie-missing';
+  const shouldSync = debugData?.reason === AuthErrorReason.SatelliteCookieNeedsSync;
   if (shouldSync) {
     url.searchParams.append('should_sync_link', 'true');
   }
