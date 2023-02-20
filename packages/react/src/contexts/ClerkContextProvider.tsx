@@ -76,7 +76,15 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
         <SessionContext.Provider value={sessionCtx}>
           <OrganizationContext.Provider value={organizationCtx}>
             <AuthContext.Provider value={authCtx}>
-              <UserContext.Provider value={userCtx}>{children}</UserContext.Provider>
+              {/**
+               * This ensures that nothing will be displayed until clerk is loaded
+               * If the app requires for the sync/link to be performed, clerkLoaded will be false
+               * and none the content of the page will not flicker and no other request will be made
+               *
+               * At this moment checking clerkLoaded to achieve this makes sense because
+               * sync/link fires always by clerk-js
+               */}
+              <UserContext.Provider value={userCtx}>{clerkLoaded && children}</UserContext.Provider>
             </AuthContext.Provider>
           </OrganizationContext.Provider>
         </SessionContext.Provider>
