@@ -4,8 +4,7 @@ import { LIB_VERSION } from '@clerk/clerk-react/dist/info';
 import { json } from '@remix-run/server-runtime';
 import cookie from 'cookie';
 
-import type { LoaderFunctionArgs, LoaderFunctionArgsWithAuth } from './types';
-import type { RootAuthLoaderOptionsWithExperimental } from './types';
+import type { LoaderFunctionArgs, LoaderFunctionArgsWithAuth, RootAuthLoaderOptionsWithExperimental } from './types';
 
 /**
  * Inject `auth`, `user` and `session` properties into `request`
@@ -89,6 +88,7 @@ export const interstitialJsonResponse = (requestState: RequestState, opts: { loa
         frontendApi: requestState.frontendApi,
         publishableKey: requestState.publishableKey,
         pkgVersion: LIB_VERSION,
+        shouldSyncLink: requestState.reason === 'satellite-needs-sync',
         // @ts-expect-error
         proxyUrl: requestState.proxyUrl,
         isSatellite: requestState.isSatellite,
