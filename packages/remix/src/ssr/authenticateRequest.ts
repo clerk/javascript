@@ -1,16 +1,58 @@
 import type { RequestState } from '@clerk/backend';
-import { Clerk } from '@clerk/backend';
-import { isHttpOrHttps } from '@clerk/shared';
+import { Clerk, convertToSHA1 } from '@clerk/backend';
+import { isHttpOrHttps, requestProxyUrlToAbsoluteURL } from '@clerk/shared';
 
 import { noRelativeProxyInSSR, noSecretKeyOrApiKeyError } from '../errors';
 import { getEnvVariable } from '../utils';
 import type { LoaderFunctionArgs, RootAuthLoaderOptions, RootAuthLoaderOptionsWithExperimental } from './types';
 import { handleIsSatelliteBooleanOrFn, parseCookies } from './utils';
 
+// move to utils
+export const getCookieForInstance = (cookies: any, name: string) => {
+  if (cookies[name]) {
+    return cookies[name];
+  }
+
+  return cookies['__client_uat'];
+};
+
+export type buildCookieNameOptions = Pick<
+  RootAuthLoaderOptionsWithExperimental,
+  'publishableKey' | 'domain' | 'proxyUrl' | 'isSatellite'
+>;
+export const buildCookieName = async ({ options, request }: { options: buildCookieNameOptions; request: Request }) => {
+  const { publishableKey, domain, proxyUrl, isSatellite } = options;
+  const keyArray = [] as string[];
+
+  if (publishableKey) {
+    keyArray.push(publishableKey);
+  }
+
+  if (isSatellite && domain) {
+    keyArray.push(domain);
+  }
+
+  if (proxyUrl) {
+    keyArray.push(requestProxyUrlToAbsoluteURL(proxyUrl, new URL(request.url).origin));
+  }
+
+  const stringValue = keyArray.join('-');
+  console.log(stringValue, 'stringValue');
+
+  const toUint8 = new TextEncoder().encode(stringValue);
+
+  // eslint-disable-next-line @typescript-eslint/await-thenable
+  const result = await convertToSHA1(toUint8);
+  return `__client_uat_${result.slice(0, 12)}`;
+};
+
 /**
  * @internal
  */
-export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoaderOptions = {}): Promise<RequestState> {
+export async function authenticateRequest(
+  args: LoaderFunctionArgs,
+  opts: RootAuthLoaderOptions = {},
+): Promise<RequestState> {
   const { request, context } = args;
   const { loadSession, loadUser, loadOrganization, authorizedParties } = opts as RootAuthLoaderOptionsWithExperimental;
 
@@ -62,6 +104,9 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
 
   const cookieToken = cookies['__session'];
   const headerToken = headers.get('authorization')?.replace('Bearer ', '');
+
+  const clientUatName = await buildCookieName({ options: { publishableKey, domain, proxyUrl, isSatellite }, request });
+  console.log(clientUatName, 'clientUatName');
 
   // @ts-expect-error
   return Clerk({ apiUrl, apiKey, secretKey, jwtKey, proxyUrl, isSatellite, domain }).authenticateRequest({

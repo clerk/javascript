@@ -8,6 +8,7 @@ export * from './tokens';
 export * from './tokens/jwt';
 export * from './tokens/verify';
 export { constants } from './constants';
+export * from './util';
 
 export type ClerkOptions = CreateBackendApiOptions &
   Partial<Pick<CreateAuthenticateRequestOptions['options'], 'jwtKey' | 'proxyUrl' | 'secretKey' | 'publishableKey'>>;

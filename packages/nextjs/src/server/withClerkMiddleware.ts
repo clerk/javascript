@@ -1,6 +1,6 @@
 import type { AuthStatus, RequestState } from '@clerk/backend';
-import { constants } from '@clerk/backend';
-import { debugRequestState } from '@clerk/backend';
+import { constants, convertToSHA1, debugRequestState } from '@clerk/backend';
+import { requestProxyUrlToAbsoluteURL } from '@clerk/shared';
 import type { NextMiddleware, NextMiddlewareResult } from 'next/dist/server/web/types';
 import type { NextFetchEvent, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -33,6 +33,47 @@ interface WithClerkMiddleware {
   (): NextMiddleware;
 }
 
+export const getCookieForInstance = (cookies: any, name: string) => {
+  if (cookies[name]) {
+    return cookies[name];
+  }
+
+  return cookies['__client_uat'];
+};
+
+export type buildCookieNameOptions = {
+  publishableKey: string;
+  domain: string;
+  proxyUrl: string;
+  isSatellite: boolean;
+};
+
+export const buildCookieName = async ({ options, request }: { options: buildCookieNameOptions; request: Request }) => {
+  const { publishableKey, domain, proxyUrl, isSatellite } = options;
+  const keyArray = [] as string[];
+
+  if (publishableKey) {
+    keyArray.push(publishableKey);
+  }
+
+  if (isSatellite && domain) {
+    keyArray.push(domain);
+  }
+
+  if (proxyUrl) {
+    keyArray.push(requestProxyUrlToAbsoluteURL(proxyUrl, new URL(request.url).origin));
+  }
+
+  const stringValue = keyArray.join('-');
+  console.log(stringValue, 'stringValue');
+
+  const toUint8 = new TextEncoder().encode(stringValue);
+
+  // eslint-disable-next-line @typescript-eslint/await-thenable
+  const result = await convertToSHA1(toUint8);
+  return `__client_uat_${result.slice(0, 12)}`;
+};
+
 export const decorateResponseWithObservabilityHeaders = (res: NextResponse, requestState: RequestState) => {
   requestState.message && res.headers.set(constants.Headers.AuthMessage, requestState.message);
   requestState.reason && res.headers.set(constants.Headers.AuthReason, requestState.reason);
@@ -54,6 +95,12 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
 
     const isSatellite = handleIsSatelliteBooleanOrFn(opts, new URL(req.url)) || IS_SATELLITE;
 
+    const clientUatName = await buildCookieName({
+      options: { publishableKey: PUBLISHABLE_KEY, domain: DOMAIN, proxyUrl, isSatellite },
+      request: req,
+    });
+    // console.log(clientUatName, 'clientUatName');
+    // console.log(opts, 'opts');
     // get auth state, check if we need to return an interstitial
     const cookieToken = getCookie(req, constants.Cookies.Session);
     const headerToken = headers.get('authorization')?.replace('Bearer ', '');

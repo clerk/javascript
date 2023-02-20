@@ -20,3 +20,10 @@ export function proxyUrlToAbsoluteURL(url: string | undefined): string {
   }
   return isProxyUrlRelative(url) ? new URL(url, window.location.origin).toString() : url;
 }
+
+export function requestProxyUrlToAbsoluteURL(url: string | undefined, origin: string | undefined): string {
+  if (!url) {
+    return '';
+  }
+  return isProxyUrlRelative(url) ? new URL(url, origin).toString() : url;
+}
