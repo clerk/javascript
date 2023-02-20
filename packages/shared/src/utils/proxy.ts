@@ -7,7 +7,7 @@ export function isValidProxyUrl(key: string | undefined) {
 }
 
 export function isHttpOrHttps(key: string | undefined) {
-  return key?.startsWith('https://') || key?.startsWith('http://') || false;
+  return /^http(s)?:\/\//.test(key || '');
 }
 
 export function isProxyUrlRelative(key: string) {

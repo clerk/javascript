@@ -145,7 +145,7 @@ export const handleIsSatelliteBooleanOrFn = (opts: WithAuthOptionsExperimental, 
   return opts.isSatellite || false;
 };
 
-// TODO: use @clerk/shared once is tree-shakeable
+// TODO: use @clerk/shared once it is tree-shakeable
 export function isHttpOrHttps(key: string | undefined) {
-  return key?.startsWith('https://') || key?.startsWith('http://') || false;
+  return /^http(s)?:\/\//.test(key || '');
 }
