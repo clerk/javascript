@@ -55,10 +55,12 @@
   },
   "imports": {
     "#crypto": {
+      "edge-light": "./dist/runtime/browser/crypto.mjs",
       "node": "./dist/runtime/node/crypto.js",
       "default": "./dist/runtime/browser/crypto.mjs"
     },
     "#fetch": {
+      "edge-light": "./dist/runtime/browser/fetch.mjs",
       "node": "./dist/runtime/node/fetch.js",
       "default": "./dist/runtime/browser/fetch.mjs"
     }
