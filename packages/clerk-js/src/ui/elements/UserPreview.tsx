@@ -96,9 +96,16 @@ export const UserPreview = (props: UserPreviewProps) => {
           elementId={descriptors.userPreviewMainIdentifier.setId(elementId)}
           variant={size === 'md' ? 'regularMedium' : 'smallMedium'}
           colorScheme='inherit'
-          truncate
+          sx={{ display: 'flex' }}
         >
-          {localizedTitle || name || identifier} {badge}
+          <Text
+            as='span'
+            truncate
+          >
+            {localizedTitle || name || identifier}
+          </Text>
+
+          {badge}
         </Text>
 
         {(subtitle || (name && identifier)) && (
