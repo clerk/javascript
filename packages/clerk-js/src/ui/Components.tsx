@@ -11,6 +11,7 @@ import type {
   UserProfileProps,
 } from '@clerk/types';
 import React, { Suspense } from 'react';
+import { createRoot } from 'react-dom/client';
 
 import { clerkUIErrorDOMElementNotFound } from '../core/errors';
 import { buildVirtualRouterUrl } from '../utils';
@@ -97,20 +98,20 @@ export const mountComponentRenderer = (clerk: Clerk, environment: EnvironmentRes
   const mountComponentControls = () => {
     const deferredPromise = createDeferredPromise();
     console.log('will load createroot');
-    return import(/* webpackChunkName: "ReactDOM" */ 'react-dom/client').then(({ createRoot }) => {
-      createRoot(clerkRoot!).render(
-        <Components
-          clerk={clerk}
-          environment={environment}
-          options={options}
-          onComponentsMounted={deferredPromise.resolve}
-        />,
-      );
-      return deferredPromise.promise.then(() => componentsControls);
-    });
+    createRoot(clerkRoot!).render(
+      <Components
+        clerk={clerk}
+        environment={environment}
+        options={options}
+        onComponentsMounted={deferredPromise.resolve}
+      />,
+    );
+    return deferredPromise.promise.then(() => componentsControls);
   };
 
-  let componentsControlsResolver: ReturnType<typeof mountComponentControls> | undefined;
+  // let componentsControlsResolver: ReturnType<typeof mountComponentControls> | undefined;
+  let loaded = false;
+  let controls: ComponentControls | undefined;
 
   return {
     ensureMounted: async (cb: (controls: ComponentControls) => unknown) => {
@@ -118,10 +119,15 @@ export const mountComponentRenderer = (clerk: Clerk, environment: EnvironmentRes
       // and any calls to .mount before mountComponentControls resolves will fire in order.
       // Otherwise, we risk having components rendered multiple times, or having
       // .unmountComponent incorrectly called before the component is rendered
-      if (!componentsControlsResolver) {
-        componentsControlsResolver = mountComponentControls();
+      // if (!componentsControlsResolver) {
+      //   componentsControlsResolver = mountComponentControls();
+      // }
+      if (!loaded) {
+        controls = await mountComponentControls();
+        loaded = true;
       }
-      return componentsControlsResolver.then(controls => cb(controls));
+      return controls;
+      // return componentsControlsResolver.then(controls => cb(controls));
     },
   };
 };
