@@ -30,7 +30,6 @@ import type { AvailableComponentProps } from './types';
 const ROOT_ELEMENT_ID = 'clerk-components';
 
 export type ComponentControls = {
-  mounted: boolean;
   mountComponent: (params: {
     appearanceKey: Uncapitalize<ClerkComponentName>;
     name: ClerkComponentName;
@@ -107,7 +106,6 @@ export const mountComponentRenderer = (clerk: Clerk, environment: EnvironmentRes
           onComponentsMounted={deferredPromise.resolve}
         />,
       );
-      componentsControls.mounted = true;
       return deferredPromise.promise.then(() => componentsControls);
     });
   };
@@ -130,9 +128,7 @@ export const mountComponentRenderer = (clerk: Clerk, environment: EnvironmentRes
 
 export type MountComponentRenderer = typeof mountComponentRenderer;
 
-const componentsControls = {
-  mounted: false,
-} as ComponentControls;
+const componentsControls = {} as ComponentControls;
 
 const componentNodes = Object.freeze({
   SignUp: 'signUpModal',
