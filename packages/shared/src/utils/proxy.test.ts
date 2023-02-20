@@ -1,4 +1,4 @@
-import { isProxyUrlRelative, isValidProxyUrl, proxyUrlToAbsoluteURL } from './proxy';
+import { isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl, proxyUrlToAbsoluteURL } from './proxy';
 
 describe('isValidProxyUrl(key)', () => {
   it('returns true if the proxyUrl is valid', () => {
@@ -21,6 +21,18 @@ describe('isProxyUrlRelative(key)', () => {
 
   it('returns false if the proxyUrl does not starts with `/`', () => {
     expect(isProxyUrlRelative('proxy-app.dev/api/__clerk==')).toBe(false);
+  });
+});
+
+describe('isHttpOrHttps(key)', () => {
+  it.each([
+    ['http://clerk.dev/api/__clerk', true],
+    ['http://clerk.dev/api/__clerk', true],
+    [undefined, false],
+    ['/api/__clerk', false],
+    ['', false],
+  ])('.isHttpOrHttps(%s)', (key, expected) => {
+    expect(isHttpOrHttps(key)).toBe(expected);
   });
 });
 
