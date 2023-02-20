@@ -6,7 +6,6 @@ import { callWithRetry } from '../util/callWithRetry';
 import { isStaging } from '../util/instance';
 import { parsePublishableKey } from '../util/parsePublishableKey';
 import { joinPaths } from '../util/path';
-import { AuthErrorReason } from './authStatus';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from './errors';
 import type { DebugRequestSate } from './request';
 
@@ -19,6 +18,7 @@ export type LoadInterstitialOptions = {
   debugData?: DebugRequestSate;
   isSatellite?: boolean;
   domain?: string;
+  shouldSyncLink?: boolean;
 };
 
 export function loadInterstitialFromLocal(
@@ -33,6 +33,7 @@ export function loadInterstitialFromLocal(
     proxyUrl,
     isSatellite = false,
     domain,
+    shouldSyncLink = false,
   } = options as LoadInterstitialOptions;
   return `
     <head>
@@ -68,7 +69,7 @@ export function loadInterstitialFromLocal(
                 try {
                     await Clerk.load({
                         isSatellite: ${isSatellite},
-                        shouldSyncLink: ${debugData?.reason === AuthErrorReason.SatelliteCookieNeedsSync},
+                        shouldSyncLink: ${shouldSyncLink},
                     });
                     if(Clerk.loaded){
                       if(window.location.href.indexOf("#") === -1){
@@ -127,8 +128,16 @@ export function buildPublicInterstitialUrl(
   options: Omit<LoadInterstitialOptions, 'isSatellite' | 'domain' | 'proxyUrl'>,
 ) {
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
-  const { apiUrl, frontendApi, pkgVersion, publishableKey, proxyUrl, debugData, isSatellite, domain } =
-    options as LoadInterstitialOptions;
+  const {
+    apiUrl,
+    frontendApi,
+    pkgVersion,
+    publishableKey,
+    proxyUrl,
+    shouldSyncLink = false,
+    isSatellite,
+    domain,
+  } = options as LoadInterstitialOptions;
   const url = new URL(apiUrl);
   url.pathname = joinPaths(url.pathname, API_VERSION, '/public/interstitial');
   url.searchParams.append('clerk_js_version', getClerkJsMajorVersionOrTag(frontendApi, pkgVersion));
@@ -141,8 +150,7 @@ export function buildPublicInterstitialUrl(
     url.searchParams.append('proxy_url', proxyUrl);
   }
 
-  const shouldSync = debugData?.reason === AuthErrorReason.SatelliteCookieNeedsSync;
-  if (shouldSync) {
+  if (shouldSyncLink) {
     url.searchParams.append('should_sync_link', 'true');
   }
 
