@@ -7,19 +7,15 @@ import cookie from 'cookie';
 import type { LoaderFunctionArgs, LoaderFunctionArgsWithAuth, RootAuthLoaderOptionsWithExperimental } from './types';
 
 /**
- * Inject `auth`, `user` and `session` properties into `request`
+ * Inject `auth`, `user` , `organization` and `session` properties into request
  * @internal
  */
 export function injectAuthIntoRequest(args: LoaderFunctionArgs, authObject: AuthObject): LoaderFunctionArgsWithAuth {
-  const { user, session, userId, sessionId, getToken, sessionClaims } = authObject;
-  (args.request as any).auth = {
-    userId,
-    sessionId,
-    getToken,
-    actor: sessionClaims?.act || null,
-  };
-  (args.request as any).user = user;
-  (args.request as any).session = session;
+  const { user, session, organization, ...rest } = authObject;
+  const auth = { ...rest, actor: rest.sessionClaims?.act || null };
+
+  Object.assign(args.request, { user, session, organization, auth });
+
   return args as LoaderFunctionArgsWithAuth;
 }
 
