@@ -65,8 +65,12 @@ interface UpdateUserParams extends UserMetadataParams {
   password?: string;
   primaryEmailAddressID?: string;
   primaryPhoneNumberID?: string;
+  primaryWeb3WalletID?: string;
+  profileImageID?: string;
   totpSecret?: string;
   backupCodes?: string[];
+  externalId?: string;
+  createdAt?: Date;
 }
 
 type GetOrganizationMembershipListParams = {
