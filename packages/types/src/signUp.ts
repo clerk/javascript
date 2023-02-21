@@ -28,6 +28,17 @@ import type { SnakeToCamel } from './utils';
 import type { CreateMagicLinkFlowReturn, StartMagicLinkFlowParams, VerificationResource } from './verification';
 import type { AttemptWeb3WalletVerificationParams, AuthenticateWithWeb3Params } from './web3Wallet';
 
+declare global {
+  /**
+   * If you want to provide custom types for the user.unsafeMetadata object,
+   * simply redeclare this rule in the global namespace.
+   * Every user object will use the provided type.
+   */
+  interface SignUpUnsafeMetadata {
+    [k: string]: unknown;
+  }
+}
+
 export interface SignUpResource extends ClerkResource {
   status: SignUpStatus | null;
   requiredFields: SignUpField[];
@@ -70,11 +81,15 @@ export interface SignUpResource extends ClerkResource {
 
   createMagicLinkFlow: () => CreateMagicLinkFlowReturn<StartMagicLinkFlowParams, SignUpResource>;
 
-  authenticateWithRedirect: (params: AuthenticateWithRedirectParams) => Promise<void>;
+  authenticateWithRedirect: (
+    params: AuthenticateWithRedirectParams & { unsafeMetadata: SignUpUnsafeMetadata },
+  ) => Promise<void>;
 
-  authenticateWithWeb3: (params: AuthenticateWithWeb3Params) => Promise<SignUpResource>;
+  authenticateWithWeb3: (
+    params: AuthenticateWithWeb3Params & { unsafeMetadata: SignUpUnsafeMetadata },
+  ) => Promise<SignUpResource>;
 
-  authenticateWithMetamask: () => Promise<SignUpResource>;
+  authenticateWithMetamask: (params: { unsafeMetadata: SignUpUnsafeMetadata }) => Promise<SignUpResource>;
 }
 
 export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
@@ -143,13 +158,16 @@ export type SignUpCreateParams = Partial<
     redirectUrl: string;
     actionCompleteRedirectUrl: string;
     transfer: boolean;
-    unsafeMetadata: Record<string, unknown>;
+    unsafeMetadata: SignUpUnsafeMetadata;
     ticket: string;
   } & SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>
 >;
 
 export type SignUpUpdateParams = SignUpCreateParams;
 
+export type SignUpAuthenticateWithMetamaskParams = {
+  unsafeMetadata?: SignUpUnsafeMetadata;
+};
 export interface SignUpVerificationsResource {
   emailAddress: SignUpVerificationResource;
   phoneNumber: SignUpVerificationResource;

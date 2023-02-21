@@ -10,6 +10,7 @@ import type {
   PrepareEmailAddressVerificationParams,
   PreparePhoneNumberVerificationParams,
   PrepareVerificationParams,
+  SignUpAuthenticateWithMetamaskParams,
   SignUpCreateParams,
   SignUpField,
   SignUpIdentificationField,
@@ -158,10 +159,12 @@ export class SignUp extends BaseResource implements SignUpResource {
     return this.attemptVerification({ signature: generatedSignature, strategy: 'web3_metamask_signature' });
   };
 
-  public authenticateWithWeb3 = async (params: AuthenticateWithWeb3Params): Promise<SignUpResource> => {
-    const { generateSignature, identifier } = params || {};
+  public authenticateWithWeb3 = async (
+    params: AuthenticateWithWeb3Params & { unsafeMetadata?: SignUpUnsafeMetadata },
+  ): Promise<SignUpResource> => {
+    const { generateSignature, identifier, unsafeMetadata } = params || {};
     const web3Wallet = identifier || this.web3wallet!;
-    await this.create({ web3Wallet });
+    await this.create({ web3Wallet, unsafeMetadata });
     await this.prepareWeb3WalletVerification();
 
     const { nonce } = this.verifications.web3Wallet;
@@ -173,9 +176,13 @@ export class SignUp extends BaseResource implements SignUpResource {
     return this.attemptWeb3WalletVerification({ signature });
   };
 
-  public authenticateWithMetamask = async (): Promise<SignUpResource> => {
+  public authenticateWithMetamask = async (params?: SignUpAuthenticateWithMetamaskParams): Promise<SignUpResource> => {
     const identifier = await getMetamaskIdentifier();
-    return this.authenticateWithWeb3({ identifier, generateSignature: generateSignatureWithMetamask });
+    return this.authenticateWithWeb3({
+      identifier,
+      generateSignature: generateSignatureWithMetamask,
+      unsafeMetadata: params?.unsafeMetadata,
+    });
   };
 
   public authenticateWithRedirect = async ({
@@ -183,13 +190,15 @@ export class SignUp extends BaseResource implements SignUpResource {
     redirectUrlComplete,
     strategy,
     continueSignUp = false,
-  }: AuthenticateWithRedirectParams): Promise<void> => {
+    unsafeMetadata,
+  }: AuthenticateWithRedirectParams & { unsafeMetadata?: SignUpUnsafeMetadata }): Promise<void> => {
     const authenticateFn = (args: SignUpCreateParams | SignUpUpdateParams) =>
       continueSignUp && this.id ? this.update(args) : this.create(args);
     const { verifications } = await authenticateFn({
       strategy,
       redirectUrl,
       actionCompleteRedirectUrl: redirectUrlComplete,
+      unsafeMetadata,
     });
     const { externalAccount } = verifications;
     const { status, externalVerificationRedirectURL } = externalAccount;
