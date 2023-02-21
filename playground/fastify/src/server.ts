@@ -1,4 +1,5 @@
-import 'dotenv/config';
+import './loadEnv';
+
 import Fastify from 'fastify';
 import type { FastifyInstance } from 'fastify';
 import { privateRoutes, publicRoutes } from './routes';
