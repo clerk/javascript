@@ -270,7 +270,7 @@ export const esES: DeepRequired<LocalizationResource> = {
         primaryButton__setPassword: 'Establecer contraseña ',
       },
       mfaSection: {
-        title: 'verificación de dos pasos',
+        title: 'Verificación de dos pasos',
         primaryButton: 'Añadir verificación de dos pasos',
         phoneCode: {
           destructiveActionTitle: 'Eliminar',
