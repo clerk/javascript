@@ -2,7 +2,7 @@ import type { OAuthProvider, OAuthScope, OAuthStrategy } from '@clerk/types';
 import type { ExternalAccountResource } from '@clerk/types/src';
 
 import { useRouter } from '../../../ui/router';
-import { appendModalState } from '../../../utils';
+import { appendRedirectState, buildExternalAccountRedirectUrl } from '../../../utils';
 import { useCoreUser, useUserProfileContext } from '../../contexts';
 import { Badge, Col, descriptors, Flex, Image, localizationKeys } from '../../customizables';
 import { ProfileSection, useCardState, UserPreview } from '../../elements';
@@ -49,9 +49,9 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
   const { providerToDisplayData } = useEnabledThirdPartyProviders();
   const error = account.verification?.error?.longMessage;
   const label = account.username || account.emailAddress;
-  const defaultOpen = !!router.urlStateParam?.componentName;
-  const { additionalOAuthScopes, componentName, mode } = useUserProfileContext();
+  const { additionalOAuthScopes, componentName, path, mode } = useUserProfileContext();
   const isModal = mode === 'modal';
+  const defaultOpen = !!router.urlStateParam;
   const visitedProvider = account.provider === router.urlStateParam?.socialProvider;
   const additionalScopes = findAdditionalScopes(account, additionalOAuthScopes);
   const reauthorizationRequired = additionalScopes.length > 0 && account.approvedScopes != '';
@@ -66,7 +66,11 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
     : localizationKeys('userProfile.start.connectedAccountsSection.actionLabel__reauthorize');
 
   const handleOnClick = async () => {
-    const redirectUrl = isModal ? appendModalState({ url: window.location.href, componentName }) : window.location.href;
+    const redirectUrl = appendRedirectState({
+      url: buildExternalAccountRedirectUrl({ routing: router.routing, path }),
+      componentName,
+      modal: isModal,
+    });
 
     try {
       let response: ExternalAccountResource;
@@ -74,13 +78,13 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
         response = await account.reauthorize({ additionalScopes, redirectUrl });
       } else {
         response = await user.createExternalAccount({
-          strategy: account.verification!.strategy as OAuthStrategy,
+          strategy: account.verification?.strategy as OAuthStrategy,
           redirectUrl,
           additionalScopes,
         });
       }
 
-      navigate(response.verification!.externalVerificationRedirectURL);
+      navigate(response.verification?.externalVerificationRedirectURL);
     } catch (err) {
       handleError(err, [], card.setError);
     }
@@ -88,7 +92,7 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
 
   return (
     <UserProfileAccordion
-      defaultOpen={visitedProvider && defaultOpen}
+      defaultOpen={defaultOpen && visitedProvider}
       onCloseCallback={router.urlStateParam?.clearUrlStateParam}
       icon={
         <Image

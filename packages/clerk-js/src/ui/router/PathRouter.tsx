@@ -59,6 +59,7 @@ export const PathRouter = ({ basePath, preservedParams, children }: PathRouterPr
       internalNavigate={internalNavigate}
       refreshEvents={['popstate']}
       preservedParams={preservedParams}
+      routing={'path'}
     >
       {children}
     </BaseRouter>

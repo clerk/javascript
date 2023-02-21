@@ -1,3 +1,4 @@
+import type { RoutingStrategy } from '@clerk/types';
 import type { ParsedQs } from 'qs';
 import React from 'react';
 
@@ -18,6 +19,7 @@ export interface RouteContextValue {
   queryParams: ParsedQs;
   preservedParams?: string[];
   getMatchData: (path?: string, index?: boolean) => false | object;
+  routing: RoutingStrategy;
   urlStateParam?: {
     startPath: string;
     path: string;

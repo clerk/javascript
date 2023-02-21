@@ -20,11 +20,6 @@ export const VirtualRouter = ({
   const [currentURL, setCurrentURL] = React.useState(
     new URL('/' + VIRTUAL_ROUTER_BASE_PATH + startPath, window.location.origin),
   );
-  const { urlStateParam, removeQueryParam } = useClerkModalStateParams();
-
-  if (urlStateParam.componentName) {
-    removeQueryParam();
-  }
 
   const internalNavigate = (toURL: URL | undefined) => {
     if (!toURL) {
@@ -47,7 +42,7 @@ export const VirtualRouter = ({
       internalNavigate={internalNavigate}
       onExternalNavigate={onExternalNavigate}
       preservedParams={preservedParams}
-      urlStateParam={urlStateParam}
+      routing={'virtual'}
     >
       {children}
     </BaseRouter>

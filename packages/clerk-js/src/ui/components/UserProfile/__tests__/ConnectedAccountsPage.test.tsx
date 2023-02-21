@@ -3,6 +3,7 @@ import { describe, it } from '@jest/globals';
 import React from 'react';
 
 import { bindCreateFixtures, render, screen } from '../../../../testUtils';
+import { appendAsQueryParams } from '../../../../utils';
 import { ConnectedAccountsPage } from '../ConnectedAccountsPage';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
@@ -44,7 +45,8 @@ describe('ConnectedAccountsPage', () => {
 
       await userEvent.click(screen.getByText(/connect google account/i));
       expect(fixtures.clerk.user?.createExternalAccount).toHaveBeenCalledWith({
-        redirectUrl: window.location.href,
+        redirectUrl:
+          'http://localhost/?__clerk_redirect_state=eyJwYXRoIjoiIiwiY29tcG9uZW50TmFtZSI6IlVzZXJQcm9maWxlIiwic3RhcnRQYXRoIjoiL3VzZXIiLCJzb2NpYWxQcm92aWRlciI6Imdvb2dsZSIsIm1vZGFsIjpmYWxzZX0%3D',
         strategy: 'oauth_google',
         additionalScopes: [],
       });

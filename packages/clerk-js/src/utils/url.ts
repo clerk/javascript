@@ -1,5 +1,5 @@
 import { camelToSnake, createDevOrStagingUrlCache, isIPV4Address } from '@clerk/shared';
-import type { SignUpResource } from '@clerk/types';
+import type { RoutingStrategy, SignUpResource } from '@clerk/types';
 
 import { loadScript } from '../utils';
 import { joinPaths } from './path';
@@ -315,4 +315,12 @@ export const generateSrcSet = ({
   }
 
   return xDescriptors.map(i => `${generateSrc({ src, width: width * i })} ${i}x`).toString();
+};
+
+export const buildExternalAccountRedirectUrl = ({ routing, path }: { routing: RoutingStrategy; path?: string }) => {
+  return routing === 'hash'
+    ? window.location.href.replace(window.location.hash, '')
+    : routing === 'path' && path
+    ? path
+    : window.location.href;
 };
