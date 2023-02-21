@@ -980,19 +980,11 @@ export default class Clerk implements ClerkInterface {
   };
 
   #loadInStandardBrowser = async (): Promise<boolean> => {
-    this.#authService = new AuthenticationService(this);
-    if (this.isSatellite && this.#options.shouldSyncLink) {
-      if (!this.#hasSynced()) {
-        // set session cookie to avoid throwing an extra interstitial
-        this.#authService?.setAuthCookiesFromSession(this.session);
-        await this.#syncWithPrimary();
-        return false;
-      }
-    }
     if (this.isSatellite && this.#hasSynced()) {
       this.#clearSynced();
     }
 
+    this.#authService = new AuthenticationService(this);
     this.#pageLifecycle = createPageLifecycle();
 
     this.#devBrowserHandler = createDevBrowserHandler({
@@ -1026,6 +1018,15 @@ export default class Clerk implements ClerkInterface {
 
         this.#environment = environment;
         this.updateClient(client);
+
+        if (this.isSatellite && this.#options.shouldSyncLink) {
+          if (!this.#hasSynced()) {
+            // set session cookie to avoid throwing an extra interstitial
+            this.#authService?.setAuthCookiesFromSession(this.session);
+            await this.#syncWithPrimary();
+            return false;
+          }
+        }
 
         this.#authService.initAuth({
           enablePolling: this.#options.polling,
