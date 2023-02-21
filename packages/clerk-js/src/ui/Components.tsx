@@ -307,7 +307,7 @@ const Components = (props: ComponentsProps) => {
         {[...nodes].map(([node, component]) => {
           return (
             <LazyComponentRenderer
-              key={component.name}
+              key={component.key}
               node={node}
               globalAppearance={state.appearance}
               appearanceKey={component.appearanceKey}
