@@ -3,3 +3,4 @@ export { frFR } from './fr-FR';
 export { deDe } from './de-DE';
 export { itIT } from './it-IT';
 export { ptBR } from './pt-BR';
+export { esES } from './es-ES';
