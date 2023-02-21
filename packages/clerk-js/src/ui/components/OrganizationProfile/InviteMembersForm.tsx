@@ -52,6 +52,10 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
     placeholder: localizationKeys('formFieldInputPlaceholder__emailAddresses'),
   });
 
+  const {
+    props: { errorText, ...restEmailAddressProps },
+  } = emailAddressField;
+
   const roleField = useFormControl('role', 'basic_member', {
     options: roles,
     // label: localizationKeys('formFieldLabel__firstName'),
@@ -110,7 +114,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
           >
             <Text localizationKey={localizationKeys('formFieldLabel__emailAddresses')} />
             <TagInput
-              {...emailAddressField.props}
+              {...restEmailAddressProps}
               autoFocus
               validate={isEmail}
               sx={{ width: '100%' }}
