@@ -59,6 +59,7 @@ const createDebug: CreateAuthObjectDebug = data => {
   return () => {
     const res = { ...data } || {};
     res.apiKey = (res.apiKey || '').substring(0, 7);
+    res.secretKey = (res.secretKey || '').substring(0, 7);
     res.jwtKey = (res.jwtKey || '').substring(0, 7);
     return { ...res };
   };
@@ -104,7 +105,7 @@ export function signedInAuthObject(
     orgSlug,
     organization,
     getToken,
-    debug: createDebug(debugData),
+    debug: createDebug({ ...options, ...debugData }),
   };
 }
 

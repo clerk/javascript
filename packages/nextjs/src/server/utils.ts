@@ -14,10 +14,6 @@ export function getCustomAttributeFromRequest(req: RequestLike, key: string): st
   return key in req ? req[key] : undefined;
 }
 
-export function setAuthStatusOnRequest(req: RequestLike, value: string) {
-  return setCustomAttributeOnRequest(req, constants.Attributes.AuthStatus, value);
-}
-
 // Tries to extract auth status from the request using several strategies
 // TODO: Rename Auth status and align the naming across media
 export function getAuthStatusFromRequest(req: RequestLike): string | null | undefined {

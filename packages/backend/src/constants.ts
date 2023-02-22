@@ -7,6 +7,8 @@ export const MAX_CACHE_LAST_UPDATED_AT_SECONDS = 5 * 60;
 
 const Attributes = {
   AuthStatus: '__clerkAuthStatus',
+  AuthReason: '__clerkAuthReason',
+  AuthMessage: '__clerkAuthMessage',
 } as const;
 
 const Cookies = {

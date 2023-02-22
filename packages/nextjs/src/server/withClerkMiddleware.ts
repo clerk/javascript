@@ -1,6 +1,5 @@
 import type { AuthStatus, RequestState } from '@clerk/backend';
-import { constants } from '@clerk/backend';
-import { debugRequestState } from '@clerk/backend';
+import { constants, debugRequestState } from '@clerk/backend';
 import type { NextMiddleware, NextMiddlewareResult } from 'next/dist/server/web/types';
 import type { NextFetchEvent, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -21,11 +20,11 @@ import type { WithAuthOptions } from './types';
 import {
   getCookie,
   handleIsSatelliteBooleanOrFn,
+  isHttpOrHttps,
   nextJsVersionCanOverrideRequestHeaders,
-  setAuthStatusOnRequest,
+  setCustomAttributeOnRequest,
   setRequestHeadersOnNextResponse,
 } from './utils';
-import { isHttpOrHttps } from './utils';
 
 interface WithClerkMiddleware {
   (handler: NextMiddleware, opts?: WithAuthOptions): NextMiddleware;
@@ -106,7 +105,9 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
     }
 
     // Set auth result on request in a private property so that middleware can read it too
-    setAuthStatusOnRequest(req, requestState.status);
+    setCustomAttributeOnRequest(req, constants.Attributes.AuthStatus, requestState.status);
+    setCustomAttributeOnRequest(req, constants.Attributes.AuthMessage, requestState.message || '');
+    setCustomAttributeOnRequest(req, constants.Attributes.AuthReason, requestState.reason || '');
 
     // get result from provided handler
     const res = await handler(req, event);
