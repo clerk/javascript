@@ -28,9 +28,9 @@ interface WithServerSideAuth {
 }
 
 const decorateResponseWithObservabilityHeaders = (res: ServerResponse, requestState: RequestState) => {
-  requestState.message && res.setHeader(constants.Headers.AuthMessage, requestState.message);
-  requestState.reason && res.setHeader(constants.Headers.AuthReason, requestState.reason);
-  requestState.status && res.setHeader(constants.Headers.AuthStatus, requestState.status);
+  requestState.message && res.setHeader(constants.Headers.AuthMessage, encodeURIComponent(requestState.message));
+  requestState.reason && res.setHeader(constants.Headers.AuthReason, encodeURIComponent(requestState.reason));
+  requestState.status && res.setHeader(constants.Headers.AuthStatus, encodeURIComponent(requestState.status));
 };
 
 /**

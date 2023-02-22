@@ -33,9 +33,9 @@ interface WithClerkMiddleware {
 }
 
 export const decorateResponseWithObservabilityHeaders = (res: NextResponse, requestState: RequestState) => {
-  requestState.message && res.headers.set(constants.Headers.AuthMessage, requestState.message);
-  requestState.reason && res.headers.set(constants.Headers.AuthReason, requestState.reason);
-  requestState.status && res.headers.set(constants.Headers.AuthStatus, requestState.status);
+  requestState.message && res.headers.set(constants.Headers.AuthMessage, encodeURIComponent(requestState.message));
+  requestState.reason && res.headers.set(constants.Headers.AuthReason, encodeURIComponent(requestState.reason));
+  requestState.status && res.headers.set(constants.Headers.AuthStatus, encodeURIComponent(requestState.status));
 };
 
 export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => {
