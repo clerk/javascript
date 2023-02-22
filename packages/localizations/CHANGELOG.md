@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.0-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/localizations@1.4.5-staging.1...@clerk/localizations@1.5.0-staging.0) (2023-02-22)
+
+### Features
+
+- **localizations:** Add spanish localization ([2379cde](https://github.com/clerkinc/javascript/commit/2379cdecbb98a58c761b499a465fc457d852ba4d))
+- **localizations:** Add spanish localization ([381a6c1](https://github.com/clerkinc/javascript/commit/381a6c19788ecdd9e435e826d10a5ebd36e6b326))
+- **localizations:** Add spanish localization ([97a6208](https://github.com/clerkinc/javascript/commit/97a620885a15744f5116021262aa9daae9257268))
+
 ### [1.4.4](https://github.com/clerkinc/javascript/compare/@clerk/localizations@1.4.4-staging.0...@clerk/localizations@1.4.4) (2023-02-17)
 
 **Note:** Version bump only for package @clerk/localizations

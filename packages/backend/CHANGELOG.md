@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.8.1-staging.4](https://github.com/clerkinc/javascript/compare/@clerk/backend@0.8.1-staging.3...@clerk/backend@0.8.1-staging.4) (2023-02-22)
+
+### Bug Fixes
+
+- **backend:** Update user params ([624402f](https://github.com/clerkinc/javascript/commit/624402fa0e2ff00819254d0fe0e6e7f44bdbe42c))
+
 ## [0.8.0](https://github.com/clerkinc/javascript/compare/@clerk/backend@0.8.0-staging.0...@clerk/backend@0.8.0) (2023-02-17)
 
 **Note:** Version bump only for package @clerk/backend

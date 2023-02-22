@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.28.2-staging.2](https://github.com/clerkinc/javascript/compare/@clerk/types@3.28.2-staging.1...@clerk/types@3.28.2-staging.2) (2023-02-22)
+
+### Bug Fixes
+
+- **clerk-js:** Pass unsafe metadata to sign up methods ([e2510e6](https://github.com/clerkinc/javascript/commit/e2510e65b726c113de977fb8252cdcd708ad9bb7))
+
 ### [3.28.1](https://github.com/clerkinc/javascript/compare/@clerk/types@3.28.1-staging.0...@clerk/types@3.28.1) (2023-02-17)
 
 **Note:** Version bump only for package @clerk/types
