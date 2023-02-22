@@ -60,3 +60,7 @@ Additionally there are packages which act as shared utilities or building blocks
 - `npm run build`.
 
 \* See the [docs folder](./docs) for additional repository documentation.
+
+## Cleanup
+
+To clean existing builds and installed dependencies of the monorepo and setup again, run `npm run nuke`.
