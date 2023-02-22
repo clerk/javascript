@@ -27,7 +27,8 @@ export async function buildClientUatName({ options, url }: { options: buildCooki
 
   const stringValue = keyArray.join('-');
 
-  const toUint8 = new TextEncoder().encode(stringValue);
+  const encoder = new TextEncoder();
+  const toUint8 = encoder.encode(stringValue);
 
   // eslint-disable-next-line @typescript-eslint/await-thenable
   const result = await convertToSHA1(toUint8);

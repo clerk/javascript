@@ -12,3 +12,11 @@ export function runMiddleware(req: IncomingMessage, res: ServerResponse, fn: (..
     });
   });
 }
+
+export const getClientUat = (cookies: any, name: string) => {
+  if (cookies[name]) {
+    return cookies[name];
+  }
+
+  return cookies['__client_uat'];
+};

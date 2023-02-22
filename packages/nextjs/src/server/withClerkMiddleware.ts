@@ -66,7 +66,6 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
       url: req.url,
     });
 
-    console.log(clientUatName, 'clientUatName');
     // get auth state, check if we need to return an interstitial
     const cookieToken = getCookie(req, constants.Cookies.Session);
     const headerToken = headers.get('authorization')?.replace('Bearer ', '');

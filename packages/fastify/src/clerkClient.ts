@@ -10,3 +10,5 @@ export const clerkClient = createClerkClient({
   apiVersion: API_VERSION,
   jwtKey: JWT_KEY,
 });
+
+export * from '@clerk/backend';

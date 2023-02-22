@@ -1,15 +1,16 @@
 import type { Clerk, RequestState } from '@clerk/backend';
-import { constants } from '@clerk/backend';
+import { buildClientUatName, constants } from '@clerk/backend';
 import cookie from 'cookie';
 import type { IncomingMessage, ServerResponse } from 'http';
 
 import type { ClerkMiddlewareOptions } from './types';
+import { getClientUat } from './utils';
 
 const parseCookies = (req: IncomingMessage) => {
   return cookie.parse(req.headers['cookie'] || '');
 };
 
-export const authenticateRequest = (
+export const authenticateRequest = async (
   clerkClient: ReturnType<typeof Clerk>,
   apiKey: string,
   secretKey: string,
@@ -20,6 +21,12 @@ export const authenticateRequest = (
 ) => {
   const cookies = parseCookies(req);
   const { jwtKey, authorizedParties } = options || {};
+
+  const clientUatName = await buildClientUatName({
+    options: { publishableKey },
+    url: req.url as string,
+  });
+
   return clerkClient.authenticateRequest({
     apiKey,
     secretKey,
@@ -29,7 +36,7 @@ export const authenticateRequest = (
     authorizedParties,
     cookieToken: cookies[constants.Cookies.Session] || '',
     headerToken: req.headers[constants.Headers.Authorization]?.replace('Bearer ', '') || '',
-    clientUat: cookies[constants.Cookies.ClientUat] || '',
+    clientUat: getClientUat(cookies, clientUatName) || '',
     host: req.headers.host as string,
     forwardedPort: req.headers[constants.Headers.ForwardedPort] as string,
     forwardedHost: req.headers[constants.Headers.ForwardedHost] as string,

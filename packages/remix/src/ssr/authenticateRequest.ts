@@ -3,9 +3,9 @@ import { buildClientUatName, Clerk } from '@clerk/backend';
 import { isHttpOrHttps } from '@clerk/shared';
 
 import { noRelativeProxyInSSR, noSecretKeyOrApiKeyError } from '../errors';
-import { getClientUat, getEnvVariable } from '../utils';
+import { getEnvVariable } from '../utils';
 import type { LoaderFunctionArgs, RootAuthLoaderOptions, RootAuthLoaderOptionsWithExperimental } from './types';
-import { handleIsSatelliteBooleanOrFn, parseCookies } from './utils';
+import { getClientUat, handleIsSatelliteBooleanOrFn, parseCookies } from './utils';
 
 /**
  * @internal

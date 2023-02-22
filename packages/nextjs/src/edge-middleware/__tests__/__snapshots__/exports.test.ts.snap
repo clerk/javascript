@@ -27,6 +27,7 @@ Array [
   "User",
   "Verification",
   "allowlistIdentifiers",
+  "buildClientUatName",
   "clerkApi",
   "clerkClient",
   "clients",

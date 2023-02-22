@@ -1,4 +1,11 @@
 import { jest } from '@jest/globals';
+import { TextEncoder, TextDecoder } from 'util';
+import crypto from 'crypto';
+
+global.TextEncoder = TextEncoder;
+//@ts-expect-error
+global.TextDecoder = TextDecoder;
+// global.crypto = crypto
 
 window.ResizeObserver =
   window.ResizeObserver ||
@@ -20,6 +27,17 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: jest.fn(),
     dispatchEvent: jest.fn(),
   })),
+});
+
+Object.defineProperty(global.self, 'crypto', {
+  value: {
+    getRandomValues: (arr: any) => crypto.randomBytes(arr.length),
+    subtle: {
+      digest: (algorithm: string, data: Uint8Array) => {
+        return new Promise((resolve, reject) => resolve({}));
+      },
+    },
+  },
 });
 
 //@ts-expect-error

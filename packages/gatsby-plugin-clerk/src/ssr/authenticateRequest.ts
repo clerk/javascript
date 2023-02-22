@@ -1,20 +1,33 @@
 import type { GetServerDataProps } from 'gatsby';
 
-import { API_KEY, clerkClient, constants, FRONTEND_API, PUBLISHABLE_KEY, SECRET_KEY } from './clerkClient';
+import {
+  API_KEY,
+  buildClientUatName,
+  clerkClient,
+  constants,
+  FRONTEND_API,
+  PUBLISHABLE_KEY,
+  SECRET_KEY,
+} from './clerkClient';
 import type { WithServerAuthOptions } from './types';
-import { parseCookies } from './utils';
+import { getClientUat, parseCookies } from './utils';
 
-export function authenticateRequest(context: GetServerDataProps, options: WithServerAuthOptions) {
+export async function authenticateRequest(context: GetServerDataProps, options: WithServerAuthOptions) {
   const { headers } = context;
   const cookies = parseCookies(headers);
   const cookieToken = cookies[constants.Cookies.Session];
   const headerToken = (headers.get(constants.Headers.Authorization) as string)?.replace('Bearer ', '');
 
+  const clientUatName = await buildClientUatName({
+    options: { publishableKey: PUBLISHABLE_KEY },
+    url: headers.get(constants.Headers.Origin) as string,
+  });
+
   return clerkClient.authenticateRequest({
     ...options,
     cookieToken,
     headerToken,
-    clientUat: cookies[constants.Cookies.ClientUat],
+    clientUat: getClientUat(cookies, clientUatName),
     host: headers.get(constants.Headers.Host) as string,
     forwardedPort: headers.get(constants.Headers.ForwardedPort) as string,
     forwardedHost: returnReferrerAsXForwardedHostToFixLocalDevGatsbyProxy(headers),

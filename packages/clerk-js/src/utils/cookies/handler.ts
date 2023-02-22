@@ -27,7 +27,8 @@ export const buildCookieName = async (options: BuildCookieName) => {
 
   const stringValue = items.join('-');
 
-  const toUint8 = new TextEncoder().encode(stringValue);
+  const encoder = new TextEncoder();
+  const toUint8 = encoder.encode(stringValue);
   const buffer = await crypto.subtle.digest('SHA-1', toUint8);
   const hash = Array.from(new Uint8Array(buffer));
 
@@ -95,7 +96,7 @@ export const createCookieHandler = () => {
         sameSite,
         secure,
       },
-      '__client_uat_666', // clientUatName
+      clientUatName,
     );
   };
 
