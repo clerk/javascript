@@ -117,6 +117,7 @@ export async function signedIn<T>(options: T, sessionClaims: JwtPayload): Promis
   const authObject = signedInAuthObject(
     sessionClaims,
     {
+      secretKey,
       apiKey,
       apiUrl,
       apiVersion,
