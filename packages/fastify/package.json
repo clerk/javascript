@@ -1,6 +1,6 @@
 {
   "name": "@clerk/fastify",
-  "version": "0.1.5-staging.5",
+  "version": "0.1.5-staging.6",
   "license": "MIT",
   "description": "Clerk.dev SDK for Fastify",
   "keywords": [
@@ -27,7 +27,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@clerk/backend": "^0.8.1-staging.5",
+    "@clerk/backend": "^0.8.1-staging.6",
     "@clerk/types": "^3.28.2-staging.2",
     "cookies": "0.8.0"
   },
