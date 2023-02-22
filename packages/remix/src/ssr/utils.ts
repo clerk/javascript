@@ -142,3 +142,11 @@ export const handleIsSatelliteBooleanOrFn = (
   }
   return isSatellite;
 };
+
+export const getClientUat = (cookies: any, name: string) => {
+  if (cookies[name]) {
+    return cookies[name];
+  }
+
+  return cookies['__client_uat'];
+};

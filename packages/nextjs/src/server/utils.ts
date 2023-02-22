@@ -149,3 +149,12 @@ export const handleIsSatelliteBooleanOrFn = (opts: WithAuthOptionsExperimental, 
 export function isHttpOrHttps(key: string | undefined) {
   return /^http(s)?:\/\//.test(key || '');
 }
+
+export const getClientUat = (name: string, req: RequestLike) => {
+  const cookieName = getCookie(req, name);
+  if (cookieName) {
+    return cookieName;
+  }
+
+  return getCookie(req, constants.Cookies.ClientUat);
+};

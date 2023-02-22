@@ -10,8 +10,6 @@ export async function authenticateRequest(ctx: GetServerSidePropsContext, opts: 
   const { headers, cookies } = ctx.req;
 
   const cookieToken = cookies['__session'];
-  // console.log(cookies, 'cookieToken')
-  // console.log(opts, 'opts')
   const headerToken = headers.authorization?.replace('Bearer ', '');
 
   return clerkClient.authenticateRequest({

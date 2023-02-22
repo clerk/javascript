@@ -9,7 +9,7 @@ import { inittedCookie } from './initted';
 import { sessionCookie } from './session';
 
 export const buildCookieName = async (options: BuildCookieName) => {
-  const { publishableKey, domain, proxyUrl, isSatellite } = options;
+  const { publishableKey, domain = '', proxyUrl = '', isSatellite = false } = options;
 
   const items = [] as string[];
 
@@ -77,7 +77,7 @@ export const createCookieHandler = () => {
     const clientUatName = await buildCookieName(options);
     console.log(clientUatName, 'clientUatName');
 
-    // also create with legacy __client_uat naming for backwards compatibility reasons
+    // also create with legacy __client_uat naming for backwards compatibility
     clientUatCookie.set(
       val,
       {
