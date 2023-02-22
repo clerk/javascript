@@ -1,5 +1,6 @@
 'use client';
 // !!! Note the import from react
+import type { ClerkProviderProps } from '@clerk/clerk-react';
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useCallback, useEffect } from 'react';
@@ -41,11 +42,14 @@ export const useAwaitableNavigate = () => {
   }, []);
 };
 
-export function ClerkProvider(props: React.PropsWithChildren<{ initialState: any }>) {
-  const { children, initialState } = props;
+export type NextAppBetaClerkProviderProps = Pick<ClerkProviderProps, 'children' | 'initialState' | 'localization'>;
+
+export function ClerkProvider(props: NextAppBetaClerkProviderProps) {
+  const { children, initialState, ...restProps } = props;
   const navigate = useAwaitableNavigate();
   return (
     <ReactClerkProvider
+      {...restProps}
       frontendApi={process.env.NEXT_PUBLIC_CLERK_FRONTEND_API || ''}
       publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || ''}
       // @ts-expect-error
