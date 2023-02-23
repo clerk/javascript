@@ -47,7 +47,14 @@ const _UserButton = withFloatingTree(() => {
 const UserButtonTopLevelIdentifier = () => {
   const user = useCoreUser();
   const { showName } = useUserButtonContext();
-  return showName ? <Text variant='regularMedium'>{getFullName(user) || getIdentifier(user)}</Text> : null;
+  return showName ? (
+    <Text
+      variant='regularMedium'
+      elementDescriptor={descriptors.userButtonOuterIdentifier}
+    >
+      {getFullName(user) || getIdentifier(user)}
+    </Text>
+  ) : null;
 };
 
 export const UserButton = withCoreUserGuard(withCardStateProvider(_UserButton));
