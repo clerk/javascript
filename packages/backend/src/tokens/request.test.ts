@@ -125,7 +125,7 @@ export default (QUnit: QUnit) => {
     skipJwksCache: true,
     isSatellite: false,
     domain: '',
-    isSynced: false,
+    hasJustSynced: false,
   };
 
   module('tokens.authenticateRequest(options)', hooks => {
@@ -265,7 +265,7 @@ export default (QUnit: QUnit) => {
         clientUat: '0',
         // @ts-expect-error
         isSatellite: true,
-        isSynced: false,
+        hasJustSynced: false,
       });
 
       assertInterstitial(assert, requestState, {

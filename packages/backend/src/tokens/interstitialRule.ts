@@ -149,9 +149,9 @@ async function verifyRequestState(options: AuthenticateRequestOptions, token: st
 }
 
 export const isSatelliteAndNeedsSyncing: InterstitialRule = options => {
-  const { clientUat, isSatellite, isSynced = false } = options as AuthenticateRequestOptionsWithExperimental;
+  const { clientUat, isSatellite, hasJustSynced = false } = options as AuthenticateRequestOptionsWithExperimental;
 
-  if (isSatellite && (!clientUat || clientUat === '0') && !isSynced) {
+  if (isSatellite && (!clientUat || clientUat === '0') && !hasJustSynced) {
     return interstitial(options, AuthErrorReason.SatelliteCookieNeedsSyncing);
   }
 

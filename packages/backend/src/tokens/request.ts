@@ -49,7 +49,7 @@ export type AuthenticateRequestOptionsWithExperimental = {
   /* Proxy url for FAPI requests */
   proxyUrl?: string;
 
-  isSynced?: boolean;
+  hasJustSynced?: boolean;
 } & AuthenticateRequestOptions;
 
 export type AuthenticateRequestOptions = RequiredVerifyTokenOptions &
