@@ -82,6 +82,7 @@ import {
   clerkMissingProxyUrlAndDomain,
   clerkOAuthCallbackDidNotCompleteSignInSIgnUp,
 } from './errors';
+import { eventBus, events } from './events';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import createFapiClient from './fapiClient';
 import {
@@ -1120,6 +1121,11 @@ export default class Clerk implements ClerkInterface {
       if (data.type === 'signout') {
         void this.handleUnauthenticated({ broadcast: false });
       }
+    });
+
+    // set cookie on token update
+    eventBus.on(events.TokenUpdate, ({ token }) => {
+      this.#authService?.setAuthCookiesFromToken(token?.getRawString());
     });
   };
 

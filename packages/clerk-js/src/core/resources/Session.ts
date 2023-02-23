@@ -10,6 +10,7 @@ import type {
 import type { GetToken, GetTokenOptions, UserResource } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
+import { eventBus, events } from '../events';
 import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, Token, User } from './internal';
 
@@ -84,7 +85,10 @@ export class Session extends BaseResource implements SessionResource {
     const path = template ? `${this.path()}/tokens/${template}` : `${this.path()}/tokens`;
     const tokenResolver = Token.create(path);
     SessionTokenCache.set({ tokenId, tokenResolver });
-    return tokenResolver.then(res => res.getRawString());
+    return tokenResolver.then(token => {
+      eventBus.dispatch(events.TokenUpdate, { token });
+      return token.getRawString();
+    });
   };
 
   #hydrateCache = (token: TokenResource | null) => {
@@ -93,6 +97,7 @@ export class Session extends BaseResource implements SessionResource {
         tokenId: this.#getCacheId(),
         tokenResolver: Promise.resolve(token),
       });
+      eventBus.dispatch(events.TokenUpdate, { token });
     }
   };
 
@@ -120,15 +125,18 @@ export class Session extends BaseResource implements SessionResource {
     if (cachedEntry) {
       return cachedEntry.tokenResolver.then(res => res.getRawString());
     }
-    const resolver = Token.create(this.user!.pathRoot + '/tokens', {
+    const tokenResolver = Token.create(this.user!.pathRoot + '/tokens', {
       service: this.#removeLegacyIntegrationPrefix(template),
     });
     SessionTokenCache.set({
       tokenId: this.user!.id,
       audience: template,
-      tokenResolver: resolver,
+      tokenResolver,
     });
-    return resolver.then(res => res.getRawString());
+    return tokenResolver.then(token => {
+      eventBus.dispatch(events.TokenUpdate, { token });
+      return token.getRawString();
+    });
   };
 
   protected fromJSON(data: SessionJSON): this {

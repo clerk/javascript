@@ -1,10 +1,12 @@
-import type { ActiveSessionResource, SignInJSON, SignUpJSON } from '@clerk/types';
+import type { ActiveSessionResource, SignInJSON, SignUpJSON, TokenResource } from '@clerk/types';
 import { waitFor } from '@testing-library/dom';
 
 import Clerk from './clerk';
+import { eventBus, events } from './events';
 import type { DisplayConfig, Organization } from './resources/internal';
 import { Client, Environment, MagicLinkErrorCode, SignIn, SignUp } from './resources/internal';
 import { AuthenticationService } from './services';
+import { mockJwt } from './test/fixtures';
 
 const mockClientFetch = jest.fn();
 const mockEnvironmentFetch = jest.fn();
@@ -99,6 +101,7 @@ describe('Clerk singleton', () => {
     );
 
     mockNavigate = jest.fn((to: string) => Promise.resolve(to));
+    eventBus.off(events.TokenUpdate);
   });
 
   describe('.setActive', () => {
@@ -269,6 +272,24 @@ describe('Clerk singleton', () => {
   });
 
   describe('.load()', () => {
+    const mockSession = {
+      id: '1',
+      status: 'active',
+      user: {},
+    };
+    let cookieSpy;
+
+    beforeEach(() => {
+      cookieSpy = jest.spyOn(AuthenticationService.prototype, 'setAuthCookiesFromToken');
+    });
+
+    afterEach(() => {
+      cookieSpy?.mockRestore();
+      // cleanup global window pollution
+      (window as any).__unstable__onBeforeSetActive = null;
+      (window as any).__unstable__onAfterSetActive = null;
+    });
+
     it('gracefully handles an incorrect value returned from the user provided selectInitialSession', async () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
@@ -297,6 +318,22 @@ describe('Clerk singleton', () => {
         expect(sut.session).not.toBe(undefined);
         expect(sut.session).toBe(null);
       });
+    });
+
+    it('updates auth cookie on token:update event', async () => {
+      mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
+
+      const sut = new Clerk(frontendApi);
+      await sut.load();
+
+      const token = {
+        jwt: {},
+        getRawString: () => mockJwt,
+      } as TokenResource;
+      eventBus.dispatch(events.TokenUpdate, { token });
+
+      expect(cookieSpy).toBeCalledTimes(1);
+      expect(cookieSpy).toBeCalledWith(mockJwt);
     });
   });
 
