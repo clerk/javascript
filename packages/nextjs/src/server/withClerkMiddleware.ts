@@ -12,6 +12,7 @@ import {
   DOMAIN,
   FRONTEND_API,
   IS_SATELLITE,
+  JS_VERSION,
   PROXY_URL,
   PUBLISHABLE_KEY,
   SECRET_KEY,
@@ -92,6 +93,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
           apiUrl: API_URL,
           frontendApi: FRONTEND_API,
           publishableKey: PUBLISHABLE_KEY,
+          pkgVersion: JS_VERSION,
           // @ts-expect-error
           proxyUrl: requestState.proxyUrl,
           isSatellite: requestState.isSatellite,

@@ -7,6 +7,7 @@ import {
   API_URL,
   clerkClient,
   FRONTEND_API,
+  JS_VERSION,
   makeAuthObjectSerializable,
   PUBLISHABLE_KEY,
   sanitizeAuthObject,
@@ -61,6 +62,7 @@ export const withServerSideAuth: WithServerSideAuth = (cbOrOptions: any, options
         apiUrl: API_URL,
         publishableKey: PUBLISHABLE_KEY,
         frontendApi: FRONTEND_API,
+        pkgVersion: JS_VERSION,
         // @ts-ignore
         proxyUrl: requestState.proxyUrl,
         isSatellite: requestState.isSatellite,
