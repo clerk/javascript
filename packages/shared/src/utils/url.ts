@@ -4,3 +4,7 @@ export function parseSearchParams(queryString = ''): URLSearchParams {
   }
   return new URLSearchParams(queryString);
 }
+
+export function stripScheme(url = ''): string {
+  return (url || '').replace(/^.+:\/\//, '');
+}
