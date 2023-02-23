@@ -268,7 +268,10 @@ export default (QUnit: QUnit) => {
         isSynced: false,
       });
 
-      assertInterstitial(assert, requestState, { reason: AuthErrorReason.SatelliteCookieNeedsSync, isSatellite: true });
+      assertInterstitial(assert, requestState, {
+        reason: AuthErrorReason.SatelliteCookieNeedsSyncing,
+        isSatellite: true,
+      });
       assert.equal(requestState.message, '');
       assert.strictEqual(requestState.toAuth(), null);
     });
@@ -329,21 +332,6 @@ export default (QUnit: QUnit) => {
     // // the __session cookie manually
     skip('cookieToken: returns interstitial when clientUat = 0 [7y]', assert => {
       assert.true(true);
-    });
-
-    test('cookieToken: returns interstitial when clientUat > 0 and no cookieToken and is satellite and is synced [8y-note]', async assert => {
-      const requestState = await authenticateRequest({
-        ...defaultMockAuthenticateRequestOptions,
-        apiKey: 'deadbeef',
-        clientUat: '1234',
-        // @ts-expect-error
-        isSatellite: true,
-        isSynced: true,
-      });
-
-      assertInterstitial(assert, requestState, { reason: AuthErrorReason.SatelliteCookieMissing, isSatellite: true });
-      assert.equal(requestState.message, '');
-      assert.strictEqual(requestState.toAuth(), null);
     });
 
     test('cookieToken: returns interstitial when clientUat > 0 and no cookieToken [8y]', async assert => {

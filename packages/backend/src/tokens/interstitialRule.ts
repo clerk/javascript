@@ -148,21 +148,11 @@ async function verifyRequestState(options: AuthenticateRequestOptions, token: st
   return verifyToken(token, { ...options, issuer });
 }
 
-export const isSatelliteAndNeedsSync: InterstitialRule = options => {
+export const isSatelliteAndNeedsSyncing: InterstitialRule = options => {
   const { clientUat, isSatellite, isSynced = false } = options as AuthenticateRequestOptionsWithExperimental;
 
   if (isSatellite && (!clientUat || clientUat === '0') && !isSynced) {
-    return interstitial(options, AuthErrorReason.SatelliteCookieNeedsSync);
-  }
-
-  return undefined;
-};
-
-export const isSatelliteAlreadySyncedButCookieIsMissing: InterstitialRule = options => {
-  const { clientUat, cookieToken, isSatellite, isSynced } = options as AuthenticateRequestOptionsWithExperimental;
-
-  if (clientUat && Number.parseInt(clientUat) > 0 && !cookieToken && isSatellite && isSynced) {
-    return interstitial(options, AuthErrorReason.SatelliteCookieMissing);
+    return interstitial(options, AuthErrorReason.SatelliteCookieNeedsSyncing);
   }
 
   return undefined;
