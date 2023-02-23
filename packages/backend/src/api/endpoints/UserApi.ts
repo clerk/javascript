@@ -79,6 +79,11 @@ type GetOrganizationMembershipListParams = {
   offset?: number;
 };
 
+type VerifyPasswordParams = {
+  userId: string;
+  password: string;
+}
+
 export class UserAPI extends AbstractAPI {
   public async getUserList(params: UserListParams = {}) {
     return this.request<User[]>({
@@ -164,6 +169,17 @@ export class UserAPI extends AbstractAPI {
       method: 'GET',
       path: joinPaths(basePath, userId, 'organization_memberships'),
       queryParams: { limit, offset },
+    });
+  }
+
+  public async verifyPassword(params: VerifyPasswordParams) {
+    const { userId, password } = params;
+    this.requireId(userId);
+
+    return this.request<{verified: true}>({
+      method: 'POST',
+      path: joinPaths(basePath, userId, 'verify_password'),
+      bodyParams: { userId, password },
     });
   }
 }
