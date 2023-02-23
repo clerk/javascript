@@ -92,7 +92,6 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
           apiUrl: API_URL,
           frontendApi: FRONTEND_API,
           publishableKey: PUBLISHABLE_KEY,
-          shouldSyncLink: requestState.reason === 'satellite-needs-sync',
           // @ts-expect-error
           proxyUrl: requestState.proxyUrl,
           isSatellite: requestState.isSatellite,

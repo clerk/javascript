@@ -84,7 +84,6 @@ export const interstitialJsonResponse = (requestState: RequestState, opts: { loa
         frontendApi: requestState.frontendApi,
         publishableKey: requestState.publishableKey,
         pkgVersion: LIB_VERSION,
-        shouldSyncLink: requestState.reason === 'satellite-needs-sync',
         // @ts-expect-error
         proxyUrl: requestState.proxyUrl,
         isSatellite: requestState.isSatellite,
