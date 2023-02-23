@@ -273,12 +273,17 @@ const Components = (props: ComponentsProps) => {
               onExternalNavigate={() => componentsControls.closeModal('signIn')}
               startPath={buildVirtualRouterUrl({ base: '/sign-in', path: urlStateParam?.path })}
             >
-              <SignInModal {...signInModal} />
-              <SignUpModal
-                afterSignInUrl={signInModal?.afterSignInUrl}
-                afterSignUpUrl={signInModal?.afterSignUpUrl}
-                redirectUrl={signInModal?.redirectUrl}
-              />
+              <Suspense fallback={''}>
+                <SignInModal {...signInModal} />
+              </Suspense>
+
+              <Suspense fallback={''}>
+                <SignUpModal
+                  afterSignInUrl={signInModal?.afterSignInUrl}
+                  afterSignUpUrl={signInModal?.afterSignUpUrl}
+                  redirectUrl={signInModal?.redirectUrl}
+                />
+              </Suspense>
             </VirtualRouter>
           </Modal>
         </InternalThemeProvider>
@@ -300,12 +305,14 @@ const Components = (props: ComponentsProps) => {
               onExternalNavigate={() => componentsControls.closeModal('signUp')}
               startPath={buildVirtualRouterUrl({ base: '/sign-up', path: urlStateParam?.path })}
             >
-              <SignInModal
-                afterSignInUrl={signUpModal?.afterSignInUrl}
-                afterSignUpUrl={signUpModal?.afterSignUpUrl}
-                redirectUrl={signUpModal?.redirectUrl}
-              />
-              <SignUpModal {...signUpModal} />
+              <Suspense fallback={''}>
+                <SignInModal
+                  afterSignInUrl={signUpModal?.afterSignInUrl}
+                  afterSignUpUrl={signUpModal?.afterSignUpUrl}
+                  redirectUrl={signUpModal?.redirectUrl}
+                />
+                <SignUpModal {...signUpModal} />
+              </Suspense>
             </VirtualRouter>
           </Modal>
         </InternalThemeProvider>
@@ -331,7 +338,9 @@ const Components = (props: ComponentsProps) => {
               onExternalNavigate={() => componentsControls.closeModal('userProfile')}
               startPath={buildVirtualRouterUrl({ base: '/user', path: urlStateParam?.path })}
             >
-              <UserProfileModal />
+              <Suspense fallback={''}>
+                <UserProfileModal />
+              </Suspense>
             </VirtualRouter>
           </Modal>
         </InternalThemeProvider>
@@ -357,7 +366,9 @@ const Components = (props: ComponentsProps) => {
               onExternalNavigate={() => componentsControls.closeModal('organizationProfile')}
               startPath={buildVirtualRouterUrl({ base: '/organizationProfile', path: urlStateParam?.path })}
             >
-              <OrganizationProfileModal {...organizationProfileModal} />
+              <Suspense fallback={''}>
+                <OrganizationProfileModal {...organizationProfileModal} />
+              </Suspense>
             </VirtualRouter>
           </Modal>
         </InternalThemeProvider>
@@ -383,7 +394,9 @@ const Components = (props: ComponentsProps) => {
               onExternalNavigate={() => componentsControls.closeModal('createOrganization')}
               startPath={buildVirtualRouterUrl({ base: '/createOrganization', path: urlStateParam?.path })}
             >
-              <CreateOrganizationModal {...createOrganizationModal} />
+              <Suspense fallback={''}>
+                <CreateOrganizationModal {...createOrganizationModal} />
+              </Suspense>
             </VirtualRouter>
           </Modal>
         </InternalThemeProvider>
@@ -397,7 +410,9 @@ const Components = (props: ComponentsProps) => {
       appearanceKey='impersonationFab'
     >
       <InternalThemeProvider>
-        <ImpersonationFab />
+        <Suspense fallback={''}>
+          <ImpersonationFab />
+        </Suspense>
       </InternalThemeProvider>
     </AppearanceProvider>
   );
@@ -426,14 +441,12 @@ const Components = (props: ComponentsProps) => {
             );
           })}
 
-          <Suspense fallback={''}>
-            {signInModal && mountedSignInModal}
-            {signUpModal && mountedSignUpModal}
-            {userProfileModal && mountedUserProfileModal}
-            {organizationProfileModal && mountedOrganizationProfileModal}
-            {createOrganizationModal && mountedCreateOrganizationModal}
-            {mountedImpersonationFab}
-          </Suspense>
+          {signInModal && mountedSignInModal}
+          {signUpModal && mountedSignUpModal}
+          {userProfileModal && mountedUserProfileModal}
+          {organizationProfileModal && mountedOrganizationProfileModal}
+          {createOrganizationModal && mountedCreateOrganizationModal}
+          {mountedImpersonationFab}
         </OptionsProvider>
       </EnvironmentProvider>
     </CoreClerkContextWrapper>
