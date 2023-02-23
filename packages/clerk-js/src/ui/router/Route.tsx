@@ -1,3 +1,4 @@
+import { pathFromFullPath } from '@clerk/shared';
 import React from 'react';
 
 import { trimTrailingSlash } from '../../utils';
@@ -13,12 +14,14 @@ interface RouteGuardProps {
 interface UnguardedRouteProps {
   path?: string;
   index?: boolean;
+  flowStart?: boolean;
   canActivate?: never;
   fallbackPath?: never;
 }
 type GuardedRouteProps = {
   path?: string;
   index?: boolean;
+  flowStart?: boolean;
 } & RouteGuardProps;
 
 export type RouteProps = React.PropsWithChildren<UnguardedRouteProps | GuardedRouteProps>;
@@ -84,11 +87,16 @@ export function Route(props: RouteProps): JSX.Element | null {
     paramsDict[key] = value;
   }
 
+  const flowStartPath = props.flowStart
+    ? pathFromFullPath(fullPath).replace(props.path || '', '') || router.flowStartPath
+    : router.flowStartPath;
+
   return (
     <RouteContext.Provider
       value={{
         basePath: router.basePath,
         startPath: router.startPath,
+        flowStartPath: flowStartPath,
         indexPath: indexPath,
         fullPath: fullPath,
         currentPath: router.currentPath,

@@ -53,6 +53,7 @@ export const PathRouter = ({ basePath, preservedParams, children }: PathRouterPr
     <BaseRouter
       basePath={basePath.substring(1)}
       startPath={''}
+      flowStartPath={''}
       getPath={getPath}
       getQueryString={getQueryString}
       internalNavigate={internalNavigate}

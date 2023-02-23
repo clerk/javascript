@@ -12,7 +12,10 @@ export const OrganizationProfileRoutes = (props: PropsOfComponent<typeof Profile
     <ProfileCardContent contentRef={props.contentRef}>
       <Route path='organization-settings'>
         <Switch>
-          <Route path='profile'>
+          <Route
+            path='profile'
+            flowStart
+          >
             <ProfileSettingsPage />
           </Route>
           <Route path='leave'>

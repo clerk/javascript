@@ -4,6 +4,7 @@ import React from 'react';
 export interface RouteContextValue {
   basePath: string;
   startPath: string;
+  flowStartPath: string;
   fullPath: string;
   indexPath: string;
   currentPath: string;
