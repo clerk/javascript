@@ -972,7 +972,7 @@ export default class Clerk implements ClerkInterface {
 
     if (this.proxyUrl) {
       const proxy = new URL(this.proxyUrl);
-      primarySyncUrl = new URL(`${proxy.pathname}/v1/client/sync}`, proxy.origin);
+      primarySyncUrl = new URL(`${proxy.pathname}/v1/client/sync`, proxy.origin);
     } else if (this.domain) {
       primarySyncUrl = new URL(`/v1/client/sync`, `https://${stripScheme(this.domain)}`);
     } else {
