@@ -179,7 +179,7 @@ export class UserAPI extends AbstractAPI {
     return this.request<{verified: true}>({
       method: 'POST',
       path: joinPaths(basePath, userId, 'verify_password'),
-      bodyParams: { userId, password },
+      bodyParams: { password },
     });
   }
 }
