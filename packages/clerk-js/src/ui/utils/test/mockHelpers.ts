@@ -48,6 +48,7 @@ export const mockRouteContextValue = (): DeepJestMocked<RouteContextValue> => {
   return {
     basePath: '',
     startPath: '',
+    flowStartPath: '',
     fullPath: '',
     indexPath: '',
     currentPath: '',

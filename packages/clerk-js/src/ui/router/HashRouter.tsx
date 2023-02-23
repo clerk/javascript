@@ -41,6 +41,7 @@ export const HashRouter = ({ preservedParams, children }: HashRouterProps): JSX.
     <BaseRouter
       getPath={getPath}
       basePath={hashRouterBase}
+      flowStartPath={''}
       startPath={''}
       getQueryString={getQueryString}
       internalNavigate={internalNavigate}
