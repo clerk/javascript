@@ -33,13 +33,6 @@ interface WithClerkMiddleware {
   (): NextMiddleware;
 }
 
-export type buildCookieNameOptions = {
-  publishableKey: string;
-  domain: string;
-  proxyUrl: string;
-  isSatellite: boolean;
-};
-
 export const decorateResponseWithObservabilityHeaders = (res: NextResponse, requestState: RequestState) => {
   requestState.message && res.headers.set(constants.Headers.AuthMessage, requestState.message);
   requestState.reason && res.headers.set(constants.Headers.AuthReason, requestState.reason);

@@ -70,7 +70,6 @@ export async function authenticateRequest(
     options: { publishableKey, domain, proxyUrl, isSatellite },
     url: request.url,
   });
-  console.log(clientUatName, 'clientUatName');
 
   // @ts-expect-error
   return Clerk({ apiUrl, apiKey, secretKey, jwtKey, proxyUrl, isSatellite, domain }).authenticateRequest({

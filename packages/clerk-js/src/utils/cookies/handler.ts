@@ -8,7 +8,7 @@ import { clientUatCookie } from './client_uat';
 import { inittedCookie } from './initted';
 import { sessionCookie } from './session';
 
-export const buildCookieName = async (options: BuildCookieName) => {
+export const buildClientUatName = async (options: BuildCookieName) => {
   const { publishableKey, domain = '', proxyUrl = '', isSatellite = false } = options;
 
   const items = [] as string[];
@@ -33,6 +33,33 @@ export const buildCookieName = async (options: BuildCookieName) => {
   const hash = Array.from(new Uint8Array(buffer));
 
   return `__client_uat_${convertUint8ArrayToHex(hash).slice(0, 12)}`;
+};
+
+export const buildClerkDbJwtName = async (options: BuildCookieName) => {
+  const { publishableKey, domain = '', proxyUrl = '', isSatellite = false } = options;
+
+  const items = [] as string[];
+
+  if (publishableKey) {
+    items.push(publishableKey);
+  }
+
+  if (isSatellite && domain) {
+    items.push(domain);
+  }
+
+  if (proxyUrl) {
+    items.push(proxyUrl);
+  }
+
+  const stringValue = items.join('-');
+
+  const encoder = new TextEncoder();
+  const toUint8 = encoder.encode(stringValue);
+  const buffer = await crypto.subtle.digest('SHA-1', toUint8);
+  const hash = Array.from(new Uint8Array(buffer));
+
+  return `clerk-db-jwt-${convertUint8ArrayToHex(hash).slice(0, 12)}`;
 };
 
 const COOKIE_PATH = '/';
@@ -75,8 +102,7 @@ export const createCookieHandler = () => {
       val = Math.floor(client.updatedAt.getTime() / 1000).toString();
     }
 
-    const clientUatName = await buildCookieName(options);
-    console.log(clientUatName, 'clientUatName');
+    const clientUatName = await buildClientUatName(options);
 
     // also create with legacy __client_uat naming for backwards compatibility
     clientUatCookie.set(

@@ -27,12 +27,14 @@ export interface DevBrowserHandler {
 export type CreateDevBrowserHandlerOptions = {
   frontendApi: string;
   fapiClient: FapiClient;
+  devBrowserSSOJwtKey: string;
 };
 
 // export type DevBrowserHandler = ReturnType<typeof createDevBrowserHandler>;
 export default function createDevBrowserHandler({
   frontendApi,
   fapiClient,
+  devBrowserSSOJwtKey,
 }: CreateDevBrowserHandlerOptions): DevBrowserHandler {
   const cookieHandler = createCookieHandler();
   const key = DEV_BROWSER_SSO_JWT_KEY;
@@ -40,11 +42,17 @@ export default function createDevBrowserHandler({
   let usesUrlBasedSessionSyncing = true;
 
   function getDevBrowserJWT() {
-    return localStorage.getItem(key);
+    const keyValue = localStorage.getItem(devBrowserSSOJwtKey);
+
+    if (!keyValue) {
+      localStorage.removeItem(key);
+    }
+
+    return keyValue;
   }
 
   function setDevBrowserJWT(jwt: string) {
-    localStorage.setItem(key, jwt);
+    localStorage.setItem(devBrowserSSOJwtKey, jwt);
   }
 
   function removeDevBrowserJWT() {

@@ -49,6 +49,7 @@ import packageJSON from '../../package.json';
 import type { ComponentControls, MountComponentRenderer } from '../ui';
 import {
   appendAsQueryParams,
+  buildClerkDbJwtName,
   buildURL,
   createBeforeUnloadTracker,
   createPageLifecycle,
@@ -140,6 +141,7 @@ export default class Clerk implements ClerkInterface {
   #listeners: Array<(emission: Resources) => void> = [];
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
+  #devBrowserSSOJwtKey: string;
 
   get version(): string {
     return Clerk.version;
@@ -994,9 +996,11 @@ export default class Clerk implements ClerkInterface {
     this.#authService = new AuthenticationService(this);
     this.#pageLifecycle = createPageLifecycle();
 
+    this.#devBrowserSSOJwtKey = await buildClerkDbJwtName({ publishableKey: this.publishableKey });
     this.#devBrowserHandler = createDevBrowserHandler({
       frontendApi: this.frontendApi,
       fapiClient: this.#fapiClient,
+      devBrowserSSOJwtKey: this.#devBrowserSSOJwtKey,
     });
 
     this.#pageLifecycle = createPageLifecycle();
