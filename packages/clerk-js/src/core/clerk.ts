@@ -79,6 +79,7 @@ import createDevBrowserHandler from './devBrowserHandler';
 import {
   clerkErrorInitFailed,
   clerkMissingDevBrowserJwt,
+  clerkMissingProxyUrlAndDomain,
   clerkOAuthCallbackDidNotCompleteSignInSIgnUp,
 } from './errors';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
@@ -976,8 +977,7 @@ export default class Clerk implements ClerkInterface {
     } else if (this.domain) {
       primarySyncUrl = new URL(`/v1/client/sync`, `https://${stripScheme(this.domain)}`);
     } else {
-      // TODO: Throw error if both proxyUrl and domain is missing
-      // Check https://github.com/clerkinc/javascript/blob/3a11cac5e71bae29f6daece8d9cb1908017d37db/packages/clerk-js/src/core/errors.ts#L1
+      clerkMissingProxyUrlAndDomain();
     }
 
     primarySyncUrl?.searchParams.append('redirect_url', window.location.href);
