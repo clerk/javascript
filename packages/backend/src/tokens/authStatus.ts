@@ -55,17 +55,17 @@ export type UnknownState = Omit<InterstitialState, 'status' | 'isInterstitial' |
 };
 
 export enum AuthErrorReason {
-  HeaderMissingNonBrowser = 'header-missing-non-browser',
-  HeaderMissingCORS = 'header-missing-cors',
-  CookieUATMissing = 'uat-missing',
-  SatelliteCookieNeedsSync = 'satellite-needs-sync',
-  CrossOriginReferrer = 'cross-origin-referrer',
   CookieAndUATMissing = 'cookie-and-uat-missing',
+  CookieMissing = 'cookie-missing',
+  CookieOutDated = 'cookie-outdated',
+  CookieUATMissing = 'uat-missing',
+  CrossOriginReferrer = 'cross-origin-referrer',
+  HeaderMissingCORS = 'header-missing-cors',
+  HeaderMissingNonBrowser = 'header-missing-non-browser',
+  SatelliteCookieMissing = 'satellite-cookie-missing',
+  SatelliteCookieNeedsSync = 'satellite-needs-sync',
   StandardSignedIn = 'standard-signed-in',
   StandardSignedOut = 'standard-signed-out',
-  CookieMissing = 'cookie-missing',
-  SatelliteCookieMissing = 'satellite-cookie-missing',
-  CookieOutDated = 'cookie-outdated',
   UnexpectedError = 'unexpected-error',
   Unknown = 'unknown',
 }
