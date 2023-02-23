@@ -35,15 +35,17 @@ const getProductionConfig = (mode = 'production') => {
     },
     output: {
       path: path.resolve(__dirname, 'dist'),
-      chunkFilename: `[name].[fullhash:6].${packageJSON.version}.js`,
+      chunkFilename: pathData =>
+        !(pathData.chunk.name || '').startsWith('shared')
+          ? `[name].[fullhash:6].${packageJSON.version}.js`
+          : `shared-[id].[fullhash:6].${packageJSON.version}.js`,
       filename: '[name].js',
       libraryTarget: 'umd',
       globalObject: 'globalThis',
     },
     optimization: {
       splitChunks: {
-        name: (module, chunks) =>
-          chunks.map(chunk => chunk.name.replace('Organization', 'Org').replace('User', 'Us').slice(0, 4)).join('-'),
+        name: (module, chunks) => (chunks.length > 0 ? `shared-${chunks.map(chunk => chunk.name).join('-')}` : ''),
       },
     },
   };
