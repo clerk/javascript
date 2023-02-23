@@ -88,6 +88,6 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     isSatellite,
     domain,
 
-    isSynced: new URL(request.url).searchParams.get('__clerk_synced') === 'true',
+    hasJustSynced: new URL(request.url).searchParams.get('__clerk_synced') === 'true',
   });
 }

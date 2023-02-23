@@ -75,7 +75,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
       // @ts-expect-error
       isSatellite,
       domain: DOMAIN,
-      isSynced: new URL(req.url).searchParams.get('__clerk_synced') === 'true',
+      hasJustSynced: new URL(req.url).searchParams.get('__clerk_synced') === 'true',
     });
 
     // Interstitial case
