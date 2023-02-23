@@ -10,8 +10,7 @@ import {
   hasValidCookieToken,
   hasValidHeaderToken,
   isNormalSignedOutState,
-  isSatelliteAlreadySyncedButCookieIsMissing,
-  isSatelliteAndNeedsSync,
+  isSatelliteAndNeedsSyncing,
   nonBrowserRequestInDevRule,
   potentialFirstLoadInDevWhenUATMissing,
   potentialFirstRequestOnProductionEnvironment,
@@ -50,7 +49,7 @@ export type AuthenticateRequestOptionsWithExperimental = {
   /* Proxy url for FAPI requests */
   proxyUrl?: string;
 
-  isSynced?: boolean;
+  hasJustSynced?: boolean;
 } & AuthenticateRequestOptions;
 
 export type AuthenticateRequestOptions = RequiredVerifyTokenOptions &
@@ -105,11 +104,10 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
       const state = await runInterstitialRules(options, [
         crossOriginRequestWithoutHeader,
         nonBrowserRequestInDevRule,
-        isSatelliteAndNeedsSync,
+        isSatelliteAndNeedsSyncing,
         potentialFirstRequestOnProductionEnvironment,
         potentialFirstLoadInDevWhenUATMissing,
         potentialRequestAfterSignInOrOutFromClerkHostedUiInDev,
-        isSatelliteAlreadySyncedButCookieIsMissing,
         hasPositiveClientUatButCookieIsMissing,
         isNormalSignedOutState,
         hasValidCookieToken,

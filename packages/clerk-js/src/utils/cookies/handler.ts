@@ -34,6 +34,10 @@ export const createCookieHandler = () => {
     });
   };
 
+  const getClientUatCookie = (): number => {
+    return parseInt(clientUatCookie.get() || '0', 10);
+  };
+
   const setClientUatCookie = (client: ClientResource | undefined) => {
     const expires = addYears(Date.now(), 1);
     const sameSite = 'Strict';
@@ -99,6 +103,7 @@ export const createCookieHandler = () => {
     getDevBrowserInittedCookie,
     setDevBrowserInittedCookie,
     setSessionCookie,
+    getClientUatCookie,
     setClientUatCookie,
     removeSessionCookie,
     removeAllDevBrowserCookies,

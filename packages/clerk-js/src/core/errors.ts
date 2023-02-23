@@ -91,3 +91,9 @@ export function clerkInvalidFAPIResponse(status: string | null, supportEmail: st
 export function clerkMissingDevBrowserJwt(): never {
   throw new Error(`${errorPrefix} Missing dev browser jwt. Please contact support.`);
 }
+
+export function clerkMissingProxyUrlAndDomain(): never {
+  throw new Error(
+    `${errorPrefix} Missing domain and proxyUrl. A satellite application needs to specify a domain or a proxyUrl`,
+  );
+}

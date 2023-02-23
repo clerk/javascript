@@ -7,6 +7,7 @@ import {
   noop,
   parsePublishableKey,
   proxyUrlToAbsoluteURL,
+  stripScheme,
 } from '@clerk/shared';
 import type {
   ActiveSessionResource,
@@ -51,6 +52,7 @@ import {
   appendAsQueryParams,
   buildURL,
   createBeforeUnloadTracker,
+  createCookieHandler,
   createPageLifecycle,
   errorThrower,
   getClerkQueryParam,
@@ -77,8 +79,10 @@ import createDevBrowserHandler from './devBrowserHandler';
 import {
   clerkErrorInitFailed,
   clerkMissingDevBrowserJwt,
+  clerkMissingProxyUrlAndDomain,
   clerkOAuthCallbackDidNotCompleteSignInSIgnUp,
 } from './errors';
+import { eventBus, events } from './events';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import createFapiClient from './fapiClient';
 import {
@@ -112,7 +116,6 @@ const defaultOptions: ClerkOptions = {
   standardBrowser: true,
   touchSession: true,
   isSatellite: false,
-  shouldSyncLink: false,
 };
 
 export default class Clerk implements ClerkInterface {
@@ -208,8 +211,7 @@ export default class Clerk implements ClerkInterface {
     if (this.#options.standardBrowser) {
       this.#isReady = await this.#loadInStandardBrowser();
     } else {
-      await this.#loadInNonStandardBrowser();
-      this.#isReady = true;
+      this.#isReady = await this.#loadInNonStandardBrowser();
     }
   };
 
@@ -963,31 +965,50 @@ export default class Clerk implements ClerkInterface {
     this.#componentControls?.updateProps(props);
   };
 
-  #hasSynced = () => getClerkQueryParam(CLERK_SYNCED) === 'true';
+  #hasJustSynced = () => getClerkQueryParam(CLERK_SYNCED) === 'true';
 
-  #clearSynced = () => removeClerkQueryParam(CLERK_SYNCED);
+  #clearJustSynced = () => removeClerkQueryParam(CLERK_SYNCED);
 
-  #syncWithPrimary = async () => {
-    const q = new URLSearchParams({
-      redirect_url: window.location.href,
-    });
+  #buildPrimarySyncUrl = (): string => {
+    let primarySyncUrl;
+
     if (this.proxyUrl) {
       const proxy = new URL(this.proxyUrl);
-      windowNavigate(new URL(`${proxy.pathname}/v1/client/sync?${q.toString()}`, proxy.origin).toString());
+      primarySyncUrl = new URL(`${proxy.pathname}/v1/client/sync`, proxy.origin);
+    } else if (this.domain) {
+      primarySyncUrl = new URL(`/v1/client/sync`, `https://${stripScheme(this.domain)}`);
     } else {
-      await this.navigate(new URL(`/v1/client/sync?${q.toString()}`, `https://${this.domain}`).toString());
+      clerkMissingProxyUrlAndDomain();
     }
+
+    primarySyncUrl?.searchParams.append('redirect_url', window.location.href);
+
+    return primarySyncUrl?.toString() || '';
+  };
+
+  #shouldSyncWithPrimary = (): boolean => {
+    if (!this.isSatellite) {
+      return false;
+    }
+
+    if (this.#hasJustSynced()) {
+      this.#clearJustSynced();
+      return false;
+    }
+
+    const cookieHandler = createCookieHandler();
+    return cookieHandler.getClientUatCookie() <= 0;
+  };
+
+  #syncWithPrimary = async () => {
+    await this.navigate(this.#buildPrimarySyncUrl());
   };
 
   #loadInStandardBrowser = async (): Promise<boolean> => {
-    if (this.#options.shouldSyncLink) {
-      if (!this.#hasSynced()) {
-        await this.#syncWithPrimary();
-        return false;
-      }
-    }
-    if (this.isSatellite && this.#hasSynced()) {
-      this.#clearSynced();
+    if (this.#shouldSyncWithPrimary()) {
+      await this.#syncWithPrimary();
+      // ClerkJS is not considered loaded during the sync/link process with the primary domain
+      return false;
     }
 
     this.#authService = new AuthenticationService(this);
@@ -1056,7 +1077,7 @@ export default class Clerk implements ClerkInterface {
     return true;
   };
 
-  #loadInNonStandardBrowser = async (): Promise<void> => {
+  #loadInNonStandardBrowser = async (): Promise<boolean> => {
     const [environment, client] = await Promise.all([
       Environment.getInstance().fetch({ touch: false }),
       Client.getInstance().fetch(),
@@ -1070,6 +1091,8 @@ export default class Clerk implements ClerkInterface {
     if (Clerk.mountComponentRenderer) {
       this.#componentControls = await Clerk.mountComponentRenderer(this, this.#environment, this.#options);
     }
+
+    return true;
   };
 
   #defaultSession = (client: ClientResource): ActiveSessionResource | null => {
@@ -1098,6 +1121,11 @@ export default class Clerk implements ClerkInterface {
       if (data.type === 'signout') {
         void this.handleUnauthenticated({ broadcast: false });
       }
+    });
+
+    // set cookie on token update
+    eventBus.on(events.TokenUpdate, ({ token }) => {
+      this.#authService?.setAuthCookiesFromToken(token?.getRawString());
     });
   };
 

@@ -75,7 +75,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
       // @ts-expect-error
       isSatellite,
       domain: DOMAIN,
-      isSynced: new URL(req.url).searchParams.get('__clerk_synced') === 'true',
+      hasJustSynced: new URL(req.url).searchParams.get('__clerk_synced') === 'true',
     });
 
     // Interstitial case
@@ -92,7 +92,6 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
           apiUrl: API_URL,
           frontendApi: FRONTEND_API,
           publishableKey: PUBLISHABLE_KEY,
-          shouldSyncLink: requestState.reason === 'satellite-needs-sync',
           // @ts-expect-error
           proxyUrl: requestState.proxyUrl,
           isSatellite: requestState.isSatellite,
