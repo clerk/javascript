@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.0](https://github.com/clerkinc/javascript/compare/@clerk/localizations@1.5.0-staging.1...@clerk/localizations@1.5.0) (2023-02-24)
+
+### Features
+
+- **localizations:** Improve de-DE translations ([#796](https://github.com/clerkinc/javascript/issues/796)) ([8d595a5](https://github.com/clerkinc/javascript/commit/8d595a549c6b6c79c9dbfb2460119d7aaa32b66b))
+
 ## [1.5.0-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/localizations@1.4.5-staging.1...@clerk/localizations@1.5.0-staging.0) (2023-02-22)
 
 ### Features

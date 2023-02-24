@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.1.5](https://github.com/clerkinc/javascript/compare/@clerk/fastify@0.1.5-staging.7...@clerk/fastify@0.1.5) (2023-02-24)
+
+**Note:** Version bump only for package @clerk/fastify
+
 ### [0.1.5-staging.4](https://github.com/clerkinc/javascript/compare/@clerk/fastify@0.1.5-staging.3...@clerk/fastify@0.1.5-staging.4) (2023-02-22)
 
 **Note:** Version bump only for package @clerk/fastify
