@@ -36,6 +36,7 @@ const forceStagingReleaseForClerkFapi = (frontendApi: string): boolean => {
 function getScriptSrc({
   publishableKey,
   frontendApi,
+  domain,
   scriptUrl,
   scriptVariant = '',
   proxyUrl,
@@ -47,6 +48,8 @@ function getScriptSrc({
   let scriptHost = '';
   if (!!proxyUrl && isValidProxyUrl(proxyUrl)) {
     scriptHost = proxyUrlToAbsoluteURL(proxyUrl).replace(/http(s)?:\/\//, '');
+  } else if (domain) {
+    scriptHost = domain;
   } else {
     scriptHost = parsePublishableKey(publishableKey)?.frontendApi || frontendApi || '';
   }
@@ -110,7 +113,7 @@ export async function loadScript(params: LoadScriptParams): Promise<HTMLScriptEl
       script.setAttribute('data-clerk-proxy-url', proxyUrl);
     }
     if (domain) {
-      script.setAttribute('data-clerk-domain', domain);
+      script.setAttribute('data-clerk-domain', domain.replace('clerk.', ''));
     }
 
     script.setAttribute('crossorigin', 'anonymous');
