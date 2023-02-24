@@ -99,7 +99,7 @@ export class AuthenticationService {
   }
 
   private setClientUatCookieForDevelopmentInstances() {
-    if (!this.environment?.isProduction() && this.inCustomDevelopmentDomain()) {
+    if (this.environment && this.environment.isDevelopmentOrStaging() && this.inCustomDevelopmentDomain()) {
       this.cookies.setClientUatCookie(this.clerk.client);
     }
   }

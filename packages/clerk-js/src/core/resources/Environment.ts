@@ -47,6 +47,10 @@ export class Environment extends BaseResource implements EnvironmentResource {
     return this.displayConfig.instanceEnvironmentType === 'production';
   };
 
+  isDevelopmentOrStaging = (): boolean => {
+    return !this.isProduction();
+  };
+
   onWindowLocationHost = (): boolean => {
     return this.displayConfig.backendHost === window.location.host;
   };
