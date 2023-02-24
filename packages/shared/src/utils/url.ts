@@ -8,3 +8,10 @@ export function parseSearchParams(queryString = ''): URLSearchParams {
 export function stripScheme(url = ''): string {
   return (url || '').replace(/^.+:\/\//, '');
 }
+
+export function addClerkPrefix(str: string | undefined) {
+  if (typeof str === 'undefined') {
+    return undefined;
+  }
+  return `clerk.${str}`;
+}

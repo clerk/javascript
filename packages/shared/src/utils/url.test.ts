@@ -1,4 +1,4 @@
-import { parseSearchParams, stripScheme } from './url';
+import { addClerkPrefix, parseSearchParams, stripScheme } from './url';
 
 describe('parseSearchParams(queryString)', () => {
   it('parses query string and returns a URLSearchParams object', () => {
@@ -28,5 +28,21 @@ describe('stripScheme(url)', () => {
 
   it.each(cases)('removes scheme from url: %p', (urlInput, urlOutput) => {
     expect(stripScheme(urlInput)).toBe(urlOutput);
+  });
+});
+
+describe('addClerkPrefix(str)', () => {
+  const undefinedCase = [[undefined, undefined]];
+
+  it.each(undefinedCase)('attempts to the prefix clerk. to %p', (urlInput, urlOutput) => {
+    expect(addClerkPrefix(urlInput)).toBe(urlOutput);
+  });
+
+  const cases = [
+    ['', 'clerk.'],
+    ['example.com', 'clerk.example.com'],
+  ];
+  it.each(cases)('attempts to the prefix clerk. to %p', (urlInput, urlOutput) => {
+    expect(addClerkPrefix(urlInput)).toBe(urlOutput);
   });
 });

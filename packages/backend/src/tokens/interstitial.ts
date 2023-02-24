@@ -20,6 +20,14 @@ export type LoadInterstitialOptions = {
   isSatellite?: boolean;
 } & DomainOrProxyUrl;
 
+// TODO: use the same function from @clerk/shared once treeshakable
+function addClerkPrefix(str: string | undefined) {
+  if (typeof str === 'undefined') {
+    return undefined;
+  }
+  return `clerk.${str}`;
+}
+
 export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions, 'apiUrl'>) {
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
   const { debugData, frontendApi, pkgVersion, publishableKey, proxyUrl, isSatellite = false, domain } = options;
@@ -82,7 +90,7 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
                 ${domain ? `script.setAttribute('data-clerk-domain', '${domain}');` : ''}
                 ${proxyUrl ? `script.setAttribute('data-clerk-proxy-url', '${proxyUrl}')` : ''};
                 script.async = true;
-                script.src = '${getScriptUrl(proxyUrl || `clerk.${domain}` || frontendApi, pkgVersion)}';
+                script.src = '${getScriptUrl(proxyUrl || addClerkPrefix(domain) || frontendApi, pkgVersion)}';
                 script.crossOrigin = 'anonymous';
                 script.addEventListener('load', startClerk);
                 document.body.appendChild(script);
