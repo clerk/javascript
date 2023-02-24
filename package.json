@@ -55,7 +55,7 @@
     "prerelease": "npx rimraf packages/*/dist && turbo run build test --concurrency=${TURBO_CONCURRENCY:-2} --force",
     "release:next": "lerna publish from-package --dist-tag next",
     "version": "./scripts/version-info.sh",
-    "nuke": "rm -r node_modules; for d in packages/*/node_modules; do echo $d; rm -r $d; done; packages/*/dist;",
+    "nuke": "rm -r node_modules; for d in packages/*; do echo $d; rm -r $d/node_modules $d/dist; done;",
     "yalc:all": "for d in packages/*/; do echo $d; cd $d; yalc push --replace; cd '../../'; done",
     "prepare": "husky install"
   }
