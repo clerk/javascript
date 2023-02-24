@@ -82,7 +82,7 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
                 ${domain ? `script.setAttribute('data-clerk-domain', '${domain}');` : ''}
                 ${proxyUrl ? `script.setAttribute('data-clerk-proxy-url', '${proxyUrl}')` : ''};
                 script.async = true;
-                script.src = '${getScriptUrl(proxyUrl || frontendApi, pkgVersion)}';
+                script.src = '${getScriptUrl(proxyUrl || `clerk.${domain}` || frontendApi, pkgVersion)}';
                 script.crossOrigin = 'anonymous';
                 script.addEventListener('load', startClerk);
                 document.body.appendChild(script);
