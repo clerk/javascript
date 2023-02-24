@@ -91,6 +91,7 @@ describe('Clerk singleton', () => {
         authConfig: {},
         displayConfig: mockDisplayConfig,
         isSingleSession: () => false,
+        isProduction: () => false,
       }),
     );
 
@@ -291,16 +292,6 @@ describe('Clerk singleton', () => {
     });
 
     it('gracefully handles an incorrect value returned from the user provided selectInitialSession', async () => {
-      mockEnvironmentFetch.mockReturnValue(
-        Promise.resolve({
-          authConfig: {},
-          displayConfig: mockDisplayConfig,
-          isSingleSession: () => false,
-          isProduction: () => false,
-          onWindowLocationHost: () => false,
-        }),
-      );
-
       mockClientFetch.mockReturnValue(
         Promise.resolve({
           activeSessions: [],

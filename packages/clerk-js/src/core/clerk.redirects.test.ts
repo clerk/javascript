@@ -97,8 +97,10 @@ describe('Clerk singleton - Redirects', () => {
           Promise.resolve({
             authConfig: {},
             displayConfig: mockDisplayConfigWithSameOrigin,
+            isProduction: () => false,
           }),
         );
+
         mockUsesUrlBasedSessionSync.mockReturnValue(true);
 
         clerkForProductionInstance = new Clerk(productionFrontendApi);
@@ -110,6 +112,10 @@ describe('Clerk singleton - Redirects', () => {
         await clerkForDevelopmentInstance.load({
           navigate: mockNavigate,
         });
+      });
+
+      afterEach(() => {
+        mockEnvironmentFetch.mockRestore();
       });
 
       it('redirects to signInUrl', async () => {
@@ -167,8 +173,10 @@ describe('Clerk singleton - Redirects', () => {
           Promise.resolve({
             authConfig: {},
             displayConfig: mockDisplayConfigWithDifferentOrigin,
+            isProduction: () => false,
           }),
         );
+
         mockUsesUrlBasedSessionSync.mockReturnValue(true);
 
         clerkForProductionInstance = new Clerk(productionFrontendApi);
@@ -180,6 +188,10 @@ describe('Clerk singleton - Redirects', () => {
         await clerkForDevelopmentInstance.load({
           navigate: mockNavigate,
         });
+      });
+
+      afterEach(() => {
+        mockEnvironmentFetch.mockRestore();
       });
 
       it('redirects to signInUrl', async () => {

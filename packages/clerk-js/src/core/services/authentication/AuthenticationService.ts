@@ -23,6 +23,7 @@ export class AuthenticationService {
 
   public initAuth = (opts: InitParams): void => {
     this.enablePolling = opts.enablePolling ?? true;
+    this.environment = opts.environment;
     this.setAuthCookiesFromSession(this.clerk.session);
     this.setClientUatCookieForDevelopmentInstances();
     this.clearLegacyAuthV1Cookies();
