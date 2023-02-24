@@ -11,5 +11,6 @@ export interface EnvironmentResource extends ClerkResource {
   displayConfig: DisplayConfigResource;
   isSingleSession: () => boolean;
   isProduction: () => boolean;
+  isDevelopmentOrStaging: () => boolean;
   onWindowLocationHost: () => boolean;
 }
