@@ -168,7 +168,9 @@ export default class Clerk implements ClerkInterface {
     }
     this.proxyUrl = proxyUrlToAbsoluteURL(_unfilteredProxy);
 
-    this.domain = options?.domain;
+    this.domain = (options)?.domain
+      ? `clerk.${(options).domain}`
+      : undefined;
 
     if (isLegacyFrontendApiKey(key)) {
       if (!validateFrontendApi(key)) {
