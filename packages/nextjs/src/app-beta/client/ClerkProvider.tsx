@@ -1,5 +1,6 @@
 'use client';
 // !!! Note the import from react
+import type { ClerkProviderProps } from '@clerk/clerk-react';
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useCallback, useEffect } from 'react';
@@ -12,6 +13,7 @@ declare global {
 }
 
 export const useAwaitableNavigate = () => {
+  // eslint-disable-next-line @typescript-eslint/unbound-method
   const { push, refresh } = useRouter();
   const pathname = usePathname();
 
@@ -41,19 +43,12 @@ export const useAwaitableNavigate = () => {
   }, []);
 };
 
-export function ClerkProvider(props: React.PropsWithChildren<{ initialState: any }>) {
-  const { children, initialState } = props;
+export function ClerkProvider(props: ClerkProviderProps) {
   const navigate = useAwaitableNavigate();
   return (
     <ReactClerkProvider
-      frontendApi={process.env.NEXT_PUBLIC_CLERK_FRONTEND_API || ''}
-      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || ''}
-      // @ts-expect-error
-      proxyUrl={process.env.NEXT_PUBLIC_CLERK_PROXY_URL}
       navigate={navigate}
-      initialState={initialState}
-    >
-      {children}
-    </ReactClerkProvider>
+      {...props}
+    />
   );
 }
