@@ -1,5 +1,6 @@
 import type { LocalStorageBroadcastChannel } from '@clerk/shared';
 import {
+  addClerkPrefix,
   inClientSide,
   isLegacyFrontendApiKey,
   isValidBrowserOnline,
@@ -168,9 +169,7 @@ export default class Clerk implements ClerkInterface {
     }
     this.proxyUrl = proxyUrlToAbsoluteURL(_unfilteredProxy);
 
-    this.domain = (options)?.domain
-      ? `clerk.${(options).domain}`
-      : undefined;
+    this.domain = addClerkPrefix(options?.domain);
 
     if (isLegacyFrontendApiKey(key)) {
       if (!validateFrontendApi(key)) {
