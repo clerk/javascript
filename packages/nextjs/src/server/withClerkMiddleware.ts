@@ -44,6 +44,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
   const [handler = noop, opts = {}] = args as [NextMiddleware, WithAuthOptions] | [];
 
   const proxyUrl = opts?.proxyUrl || PROXY_URL;
+  const domain = (opts)?.domain || DOMAIN;
 
   if (!!proxyUrl && !isHttpOrHttps(proxyUrl)) {
     throw new Error(`Only a absolute URL that starts with https is allowed to be used in SSR`);
@@ -74,7 +75,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
       userAgent: headers.get('user-agent') || undefined,
       proxyUrl,
       isSatellite,
-      domain: DOMAIN,
+      domain,
       searchParams: new URL(req.url).searchParams,
     });
 
