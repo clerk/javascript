@@ -98,6 +98,7 @@ describe('Clerk singleton - Redirects', () => {
             authConfig: {},
             displayConfig: mockDisplayConfigWithSameOrigin,
             isProduction: () => false,
+            isDevelopmentOrStaging: () => true,
           }),
         );
 
@@ -174,6 +175,7 @@ describe('Clerk singleton - Redirects', () => {
             authConfig: {},
             displayConfig: mockDisplayConfigWithDifferentOrigin,
             isProduction: () => false,
+            isDevelopmentOrStaging: () => true,
           }),
         );
 

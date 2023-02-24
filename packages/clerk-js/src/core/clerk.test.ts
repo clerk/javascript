@@ -92,6 +92,7 @@ describe('Clerk singleton', () => {
         displayConfig: mockDisplayConfig,
         isSingleSession: () => false,
         isProduction: () => false,
+        isDevelopmentOrStaging: () => true,
       }),
     );
 
@@ -482,6 +483,7 @@ describe('Clerk singleton', () => {
           displayConfig: mockDisplayConfig,
           isSingleSession: () => false,
           isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
           onWindowLocationHost: () => false,
         }),
       );
@@ -541,6 +543,7 @@ describe('Clerk singleton', () => {
           displayConfig: mockDisplayConfig,
           isSingleSession: () => false,
           isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
           onWindowLocationHost: () => false,
         }),
       );
@@ -596,6 +599,7 @@ describe('Clerk singleton', () => {
           displayConfig: mockDisplayConfig,
           isSingleSession: () => false,
           isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
           onWindowLocationHost: () => false,
         }),
       );
@@ -663,6 +667,7 @@ describe('Clerk singleton', () => {
           displayConfig: mockDisplayConfig,
           isSingleSession: () => false,
           isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
           onWindowLocationHost: () => false,
         }),
       );
@@ -713,6 +718,7 @@ describe('Clerk singleton', () => {
           displayConfig: mockDisplayConfig,
           isSingleSession: () => false,
           isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
           onWindowLocationHost: () => false,
         }),
       );
@@ -768,6 +774,7 @@ describe('Clerk singleton', () => {
           displayConfig: mockDisplayConfig,
           isSingleSession: () => false,
           isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
           onWindowLocationHost: () => false,
         }),
       );
@@ -808,6 +815,7 @@ describe('Clerk singleton', () => {
           displayConfig: mockDisplayConfig,
           isSingleSession: () => false,
           isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
           onWindowLocationHost: () => false,
         }),
       );
@@ -851,6 +859,7 @@ describe('Clerk singleton', () => {
           displayConfig: mockDisplayConfig,
           isSingleSession: () => false,
           isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
           onWindowLocationHost: () => false,
         }),
       );
@@ -906,6 +915,7 @@ describe('Clerk singleton', () => {
           displayConfig: mockDisplayConfig,
           isSingleSession: () => false,
           isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
           onWindowLocationHost: () => false,
         }),
       );
@@ -962,6 +972,7 @@ describe('Clerk singleton', () => {
           displayConfig: mockDisplayConfig,
           isSingleSession: () => false,
           isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
           onWindowLocationHost: () => false,
         }),
       );
@@ -1010,6 +1021,7 @@ describe('Clerk singleton', () => {
           displayConfig: mockDisplayConfig,
           isSingleSession: () => false,
           isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
           onWindowLocationHost: () => false,
         }),
       );
@@ -1058,6 +1070,7 @@ describe('Clerk singleton', () => {
           displayConfig: mockDisplayConfig,
           isSingleSession: () => false,
           isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
           onWindowLocationHost: () => false,
         }),
       );
