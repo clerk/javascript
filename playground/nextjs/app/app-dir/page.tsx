@@ -1,5 +1,3 @@
-// import { auth, clerkClient, currentUser, SignedIn, SignedOut, SignIn, UserButton } from '@clerk/nextjs/app-beta';
-
 import {
   auth,
   clerkClient,
@@ -9,7 +7,7 @@ import {
   SignedOut,
   SignIn,
   UserButton,
-} from '@clerk/nextjs/dist/app-beta';
+} from '@clerk/nextjs/app-beta';
 
 export default async function Page() {
   const { userId } = auth();
