@@ -1,6 +1,6 @@
 {
   "name": "@clerk/themes",
-  "version": "1.4.1-staging.0",
+  "version": "1.4.1",
   "license": "MIT",
   "description": "Themes for the Clerk auth components",
   "keywords": [
@@ -28,7 +28,7 @@
     "lint": "eslint ."
   },
   "devDependencies": {
-    "@clerk/types": "^3.28.3-staging.0",
+    "@clerk/types": "^3.28.3",
     "typescript": "*"
   },
   "peerDependencies": {

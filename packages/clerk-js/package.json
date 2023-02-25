@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "4.28.1-staging.1",
+  "version": "4.28.1",
   "license": "MIT",
   "description": "Clerk.dev JS library",
   "keywords": [
@@ -39,9 +39,9 @@
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
   },
   "dependencies": {
-    "@clerk/localizations": "^1.5.1-staging.0",
-    "@clerk/shared": "^0.12.1-staging.0",
-    "@clerk/types": "^3.28.3-staging.0",
+    "@clerk/localizations": "^1.5.1",
+    "@clerk/shared": "^0.12.1",
+    "@clerk/types": "^3.28.3",
     "@emotion/cache": "11.10.5",
     "@emotion/react": "11.10.5",
     "@floating-ui/react": "0.19.0",
@@ -110,5 +110,6 @@
   "homepage": "https://clerk.dev/",
   "bugs": {
     "url": "https://github.com/clerkinc/javascript/issues"
-  }
+  },
+  "gitHead": "6f990357a7da3c5224587b4add4a626308468d27"
 }

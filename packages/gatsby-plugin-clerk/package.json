@@ -1,6 +1,6 @@
 {
   "name": "gatsby-plugin-clerk",
-  "version": "4.1.6-staging.0",
+  "version": "4.1.6",
   "license": "MIT",
   "description": "Clerk.dev SDK for Gatsby",
   "keywords": [
@@ -33,10 +33,10 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@clerk/backend": "^0.9.1-staging.0",
-    "@clerk/clerk-react": "^4.11.6-staging.0",
-    "@clerk/clerk-sdk-node": "^4.7.6-staging.0",
-    "@clerk/types": "^3.28.3-staging.0",
+    "@clerk/backend": "^0.9.1",
+    "@clerk/clerk-react": "^4.11.6",
+    "@clerk/clerk-sdk-node": "^4.7.6",
+    "@clerk/types": "^3.28.3",
     "cookie": "0.5.0",
     "tslib": "2.4.1"
   },
@@ -61,5 +61,6 @@
   "bugs": {
     "url": "https://github.com/clerkinc/javascript/issues"
   },
-  "homepage": "https://clerk.dev/"
+  "homepage": "https://clerk.dev/",
+  "gitHead": "6f990357a7da3c5224587b4add4a626308468d27"
 }

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-expo",
-  "version": "0.12.6-staging.1",
+  "version": "0.12.6",
   "license": "MIT",
   "description": "Clerk.dev React Native/Expo library",
   "keywords": [
@@ -27,13 +27,13 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@clerk/clerk-js": "^4.28.1-staging.1",
-    "@clerk/clerk-react": "^4.11.6-staging.0",
+    "@clerk/clerk-js": "^4.28.1",
+    "@clerk/clerk-react": "^4.11.6",
     "base-64": "1.0.0",
     "react-native-url-polyfill": "1.3.0"
   },
   "devDependencies": {
-    "@clerk/types": "^3.28.3-staging.0",
+    "@clerk/types": "^3.28.3",
     "@types/jest": "^27.4.0",
     "@types/node": "^16.11.55",
     "@types/react": "*",
@@ -61,5 +61,5 @@
     "url": "https://github.com/clerkinc/javascript/issues"
   },
   "homepage": "https://clerk.dev/",
-  "gitHead": "1b19a43b61f712756ab4d8c9ccbee6e8bddbe4ce"
+  "gitHead": "6f990357a7da3c5224587b4add4a626308468d27"
 }
