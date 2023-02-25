@@ -98,7 +98,7 @@ export const frFR: DeepRequired<LocalizationResource> = {
     },
     continue: {
       title: 'Remplir les champs manquants',
-      subtitle: 'pour continuer à {{applicationName}}',
+      subtitle: 'pour continuer vers {{applicationName}}',
       actionText: 'Vous avez déjà un compte ?',
       actionLink: "S'identifier",
     },
@@ -106,7 +106,7 @@ export const frFR: DeepRequired<LocalizationResource> = {
   signIn: {
     start: {
       title: "S'identifier",
-      subtitle: 'pour continuer à {{applicationName}}',
+      subtitle: 'pour continuer vers {{applicationName}}',
       actionText: "Vous n'avez pas encore de compte ?",
       actionLink: "S'inscrire",
     },
@@ -117,14 +117,14 @@ export const frFR: DeepRequired<LocalizationResource> = {
     },
     emailCode: {
       title: 'Vérifiez votre messagerie',
-      subtitle: 'pour continuer à {{applicationName}}',
+      subtitle: 'pour continuer vers {{applicationName}}',
       formTitle: 'Le code de vérification',
       formSubtitle: 'Entrez le code de vérification envoyé à votre adresse e-mail',
       resendButton: 'Renvoyer le code',
     },
     emailLink: {
       title: 'Vérifiez votre messagerie',
-      subtitle: 'pour continuer à {{applicationName}}',
+      subtitle: 'pour continuer vers {{applicationName}}',
       formTitle: 'lien de vérification',
       formSubtitle: 'Utilisez le lien de vérification envoyé par e-mail',
       resendButton: 'Renvoyer le lien',
@@ -155,7 +155,7 @@ export const frFR: DeepRequired<LocalizationResource> = {
     },
     phoneCode: {
       title: 'Regarde ton Téléphone',
-      subtitle: 'pour continuer à {{applicationName}}',
+      subtitle: 'pour continuer vers {{applicationName}}',
       formTitle: 'Le code de vérification',
       formSubtitle: 'Entrez le code de vérification envoyé à votre numéro de téléphone',
       resendButton: 'Renvoyer le code',
@@ -175,7 +175,7 @@ export const frFR: DeepRequired<LocalizationResource> = {
     },
     backupCodeMfa: {
       title: 'Entrez un code de récupération',
-      subtitle: 'pour continuer à {{applicationName}}',
+      subtitle: 'pour continuer vers {{applicationName}}',
       formTitle: '',
       formSubtitle: '',
     },
