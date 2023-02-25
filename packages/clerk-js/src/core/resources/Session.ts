@@ -86,7 +86,10 @@ export class Session extends BaseResource implements SessionResource {
     const tokenResolver = Token.create(path);
     SessionTokenCache.set({ tokenId, tokenResolver });
     return tokenResolver.then(token => {
-      eventBus.dispatch(events.TokenUpdate, { token });
+      // Dispatch tokenUpdate only for __session tokens and not JWT templates
+      if (!template) {
+        eventBus.dispatch(events.TokenUpdate, { token });
+      }
       return token.getRawString();
     });
   };
