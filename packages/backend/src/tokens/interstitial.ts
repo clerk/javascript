@@ -20,19 +20,10 @@ export type LoadInterstitialOptions = {
   domain?: string;
 };
 
-export function loadInterstitialFromLocal(
-  options: Omit<LoadInterstitialOptions, 'apiUrl' | 'isSatellite' | 'domain' | 'proxyUrl'>,
-) {
+// TODO: COR-164 improve type-safety
+export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions, 'apiUrl'>) {
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
-  const {
-    debugData,
-    frontendApi,
-    pkgVersion,
-    publishableKey,
-    proxyUrl,
-    isSatellite = false,
-    domain,
-  } = options as LoadInterstitialOptions;
+  const { debugData, frontendApi, pkgVersion, publishableKey, proxyUrl, isSatellite = false, domain } = options;
   return `
     <head>
         <meta charset="UTF-8" />
@@ -103,9 +94,8 @@ export function loadInterstitialFromLocal(
 }
 
 // TODO: Add caching to Interstitial
-export async function loadInterstitialFromBAPI(
-  options: Omit<LoadInterstitialOptions, 'isSatellite' | 'domain' | 'proxyUrl'>,
-) {
+// TODO: COR-164 improve type-safety
+export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions) {
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
   const url = buildPublicInterstitialUrl(options);
   const response = await callWithRetry(() => runtime.fetch(buildPublicInterstitialUrl(options)));
@@ -121,12 +111,10 @@ export async function loadInterstitialFromBAPI(
   return response.text();
 }
 
-export function buildPublicInterstitialUrl(
-  options: Omit<LoadInterstitialOptions, 'isSatellite' | 'domain' | 'proxyUrl'>,
-) {
+// TODO: COR-164 improve type-safety
+export function buildPublicInterstitialUrl(options: LoadInterstitialOptions) {
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
-  const { apiUrl, frontendApi, pkgVersion, publishableKey, proxyUrl, isSatellite, domain } =
-    options as LoadInterstitialOptions;
+  const { apiUrl, frontendApi, pkgVersion, publishableKey, proxyUrl, isSatellite, domain } = options;
   const url = new URL(apiUrl);
   url.pathname = joinPaths(url.pathname, API_VERSION, '/public/interstitial');
   url.searchParams.append('clerk_js_version', getClerkJsMajorVersionOrTag(frontendApi, pkgVersion));

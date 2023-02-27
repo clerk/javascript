@@ -6,7 +6,7 @@ import { jsonOk } from '../util/mockFetch';
 import { type AuthReason, type RequestState, AuthErrorReason, AuthStatus } from './authStatus';
 import { TokenVerificationErrorReason } from './errors';
 import { mockInvalidSignatureJwt, mockJwks, mockJwt, mockJwtPayload, mockMalformedJwt } from './fixtures';
-import type { AuthenticateRequestOptionsWithExperimental } from './request';
+import type { AuthenticateRequestOptions } from './request';
 import { authenticateRequest } from './request';
 
 function assertSignedOut(assert, requestState: RequestState, reason: AuthReason, message = '') {
@@ -112,7 +112,7 @@ export default (QUnit: QUnit) => {
   const { module, test, skip } = QUnit;
 
   /* An otherwise bare state on a request. */
-  const defaultMockAuthenticateRequestOptions: AuthenticateRequestOptionsWithExperimental = {
+  const defaultMockAuthenticateRequestOptions = {
     apiKey: 'deadbeef',
     secretKey: '',
     apiUrl: 'https://api.clerk.test',
@@ -126,7 +126,7 @@ export default (QUnit: QUnit) => {
     isSatellite: false,
     domain: '',
     hasJustSynced: false,
-  };
+  } satisfies AuthenticateRequestOptions;
 
   module('tokens.authenticateRequest(options)', hooks => {
     let fakeClock;
@@ -263,7 +263,6 @@ export default (QUnit: QUnit) => {
         ...defaultMockAuthenticateRequestOptions,
         apiKey: 'deadbeef',
         clientUat: '0',
-        // @ts-expect-error
         isSatellite: true,
         hasJustSynced: false,
       });

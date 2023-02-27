@@ -19,7 +19,6 @@ const clerkClient = Clerk({
   // TODO: Fetch version from package.json
   userAgent: '@clerk/nextjs',
   proxyUrl: PROXY_URL,
-  // @ts-expect-error
   domain: DOMAIN,
   isSatellite: IS_SATELLITE,
 });

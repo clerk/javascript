@@ -9,8 +9,14 @@ export * from './tokens/jwt';
 export * from './tokens/verify';
 export { constants } from './constants';
 
+// TODO: COR-164 improve type-safety
 export type ClerkOptions = CreateBackendApiOptions &
-  Partial<Pick<CreateAuthenticateRequestOptions['options'], 'jwtKey' | 'proxyUrl' | 'secretKey' | 'publishableKey'>>;
+  Partial<
+    Pick<
+      CreateAuthenticateRequestOptions['options'],
+      'jwtKey' | 'proxyUrl' | 'secretKey' | 'publishableKey' | 'domain' | 'isSatellite'
+    >
+  >;
 
 export function Clerk(options: ClerkOptions) {
   const opts = { ...options };

@@ -63,7 +63,6 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
   const cookieToken = cookies['__session'];
   const headerToken = headers.get('authorization')?.replace('Bearer ', '');
 
-  // @ts-expect-error
   return Clerk({ apiUrl, apiKey, secretKey, jwtKey, proxyUrl, isSatellite, domain }).authenticateRequest({
     apiKey,
     secretKey,
@@ -84,10 +83,8 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     userAgent: headers.get('user-agent') as string,
     authorizedParties,
     proxyUrl,
-    // @ts-expect-error
     isSatellite,
     domain,
-
     hasJustSynced: new URL(request.url).searchParams.get('__clerk_synced') === 'true',
   });
 }
