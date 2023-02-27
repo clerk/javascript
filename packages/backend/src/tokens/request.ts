@@ -36,22 +36,6 @@ export type OptionalVerifyTokenOptions = Partial<
   >
 >;
 
-export type AuthenticateRequestOptionsWithExperimental = {
-  /**
-   * @experimental
-   */
-  domain?: string;
-  /**
-   * @experimental
-   */
-  isSatellite?: boolean;
-
-  /* Proxy url for FAPI requests */
-  proxyUrl?: string;
-
-  hasJustSynced?: boolean;
-} & AuthenticateRequestOptions;
-
 export type AuthenticateRequestOptions = RequiredVerifyTokenOptions &
   OptionalVerifyTokenOptions &
   LoadResourcesOptions & {
@@ -79,14 +63,23 @@ export type AuthenticateRequestOptions = RequiredVerifyTokenOptions &
     referrer?: string;
     /* Request user-agent value */
     userAgent?: string;
+    /**
+     * @experimental
+     */
+    domain?: string;
+    /**
+     * @experimental
+     */
+    isSatellite?: boolean;
+    /**
+     * @experimental
+     */
+    hasJustSynced?: boolean;
   };
 
 export async function authenticateRequest(options: AuthenticateRequestOptions): Promise<RequestState> {
   options.frontendApi =
-    (options as AuthenticateRequestOptionsWithExperimental).domain ||
-    parsePublishableKey(options.publishableKey)?.frontendApi ||
-    options.frontendApi ||
-    '';
+    options.domain || parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
   options.apiUrl = options.apiUrl || API_URL;
   options.apiVersion = options.apiVersion || API_VERSION;
 

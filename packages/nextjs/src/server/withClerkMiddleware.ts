@@ -73,7 +73,6 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
       referrer: headers.get('referer') || undefined,
       userAgent: headers.get('user-agent') || undefined,
       proxyUrl,
-      // @ts-expect-error
       isSatellite,
       domain: DOMAIN,
       hasJustSynced: new URL(req.url).searchParams.get('__clerk_synced') === 'true',
@@ -94,7 +93,6 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
           frontendApi: FRONTEND_API,
           publishableKey: PUBLISHABLE_KEY,
           pkgVersion: JS_VERSION,
-          // @ts-expect-error
           proxyUrl: requestState.proxyUrl,
           isSatellite: requestState.isSatellite,
           domain: requestState.domain,

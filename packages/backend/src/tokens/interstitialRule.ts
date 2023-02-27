@@ -2,7 +2,7 @@ import { isDevelopmentFromApiKey, isProductionFromApiKey } from '../util/instanc
 import { checkCrossOrigin } from '../util/request';
 import type { RequestState } from './authStatus';
 import { AuthErrorReason, interstitial, signedIn, signedOut } from './authStatus';
-import type { AuthenticateRequestOptions, AuthenticateRequestOptionsWithExperimental } from './request';
+import type { AuthenticateRequestOptions } from './request';
 import { verifyToken } from './verify';
 
 type InterstitialRuleResult = RequestState | undefined;
@@ -91,7 +91,7 @@ export const isNormalSignedOutState: InterstitialRule = options => {
 
 // This happens when a signed in user visits a new subdomain for the first time. The uat will be available because it's set on naked domain, but session will be missing. It can also happen if the cookieToken is manually removed during development.
 export const hasPositiveClientUatButCookieIsMissing: InterstitialRule = options => {
-  const { clientUat, cookieToken } = options as AuthenticateRequestOptionsWithExperimental;
+  const { clientUat, cookieToken } = options;
 
   if (clientUat && Number.parseInt(clientUat) > 0 && !cookieToken) {
     return interstitial(options, AuthErrorReason.CookieMissing);
@@ -135,7 +135,7 @@ export async function runInterstitialRules<T extends AuthenticateRequestOptions>
 }
 
 async function verifyRequestState(options: AuthenticateRequestOptions, token: string) {
-  const { isSatellite, proxyUrl } = options as AuthenticateRequestOptionsWithExperimental;
+  const { isSatellite, proxyUrl } = options;
   let issuer;
   if (isSatellite) {
     issuer = null;
@@ -149,7 +149,7 @@ async function verifyRequestState(options: AuthenticateRequestOptions, token: st
 }
 
 export const isSatelliteAndNeedsSyncing: InterstitialRule = options => {
-  const { clientUat, isSatellite, hasJustSynced = false } = options as AuthenticateRequestOptionsWithExperimental;
+  const { clientUat, isSatellite, hasJustSynced = false } = options;
 
   if (isSatellite && (!clientUat || clientUat === '0') && !hasJustSynced) {
     return interstitial(options, AuthErrorReason.SatelliteCookieNeedsSyncing);
