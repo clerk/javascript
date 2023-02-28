@@ -1,6 +1,7 @@
 import React, { lazy, Suspense } from 'react';
 
 import type { FlowMetadata } from '../elements';
+import type { ThemableCssProp } from '../styledSystem';
 import type { ClerkComponentName } from './components';
 import { ClerkComponents } from './components';
 
@@ -10,7 +11,7 @@ const OptionsProvider = lazy(() => import('../contexts').then(m => ({ default: m
 const AppearanceProvider = lazy(() => import('../customizables').then(m => ({ default: m.AppearanceProvider })));
 const VirtualRouter = lazy(() => import('../router').then(m => ({ default: m.VirtualRouter })));
 const InternalThemeProvider = lazy(() => import('../styledSystem').then(m => ({ default: m.InternalThemeProvider })));
-const Portal = lazy(() => import('./../portal').then(m => ({ default: m.default })));
+const Portal = lazy(() => import('./../portal'));
 const FlowMetadataProvider = lazy(() => import('./../elements').then(m => ({ default: m.FlowMetadataProvider })));
 const Modal = lazy(() => import('./../elements').then(m => ({ default: m.Modal })));
 
@@ -26,14 +27,21 @@ export const LazyProviders = (props: LazyProvidersProps) => {
   );
 };
 
-type LazyComponentRendererProps = React.PropsWithChildren<{
-  globalAppearance: any;
+type _AppearanceProviderProps = Parameters<typeof AppearanceProvider>[0];
+type AppearanceProviderProps = {
+  globalAppearance?: _AppearanceProviderProps['globalAppearance'];
   appearanceKey: any;
-  componentAppearance: any;
-  node: any;
-  componentName: any;
-  componentProps: any;
-}>;
+  componentAppearance?: _AppearanceProviderProps['appearance'];
+};
+type PortalProps = Parameters<typeof Portal>[0];
+
+type LazyComponentRendererProps = React.PropsWithChildren<
+  {
+    node: PortalProps['node'];
+    componentName: any;
+    componentProps: any;
+  } & AppearanceProviderProps
+>;
 
 export const LazyComponentRenderer = (props: LazyComponentRendererProps) => {
   return (
@@ -44,7 +52,7 @@ export const LazyComponentRenderer = (props: LazyComponentRendererProps) => {
     >
       <Portal
         node={props.node}
-        component={ClerkComponents[props.componentName as keyof typeof ClerkComponents]}
+        component={ClerkComponents[props.componentName as ClerkComponentName]}
         props={props.componentProps}
         componentName={props.componentName}
       />
@@ -52,18 +60,19 @@ export const LazyComponentRenderer = (props: LazyComponentRendererProps) => {
   );
 };
 
-type LazyModalRendererProps = React.PropsWithChildren<{
-  componentName: ClerkComponentName;
-  flowName?: FlowMetadata['flow'];
-  globalAppearance: any;
-  componentAppearance?: any;
-  appearanceKey: any;
-  startPath?: string;
-  onClose?: any;
-  onExternalNavigate?: any;
-  modalContainerSx?: any;
-  modalContentSx?: any;
-}>;
+type ModalProps = Parameters<typeof Modal>[0];
+
+type LazyModalRendererProps = React.PropsWithChildren<
+  {
+    componentName: ClerkComponentName;
+    flowName?: FlowMetadata['flow'];
+    startPath?: string;
+    onClose?: ModalProps['handleClose'];
+    onExternalNavigate?: () => any;
+    modalContainerSx?: ThemableCssProp;
+    modalContentSx?: ThemableCssProp;
+  } & AppearanceProviderProps
+>;
 
 export const LazyModalRenderer = (props: LazyModalRendererProps) => {
   return (
