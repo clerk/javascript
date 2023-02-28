@@ -18,6 +18,7 @@ import type {
   ClientResource,
   CreateOrganizationParams,
   CreateOrganizationProps,
+  DomainOrProxyUrl,
   EnvironmentJSON,
   EnvironmentResource,
   HandleMagicLinkVerificationParams,
@@ -99,15 +100,13 @@ import { warnings } from './warnings';
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 
-type ClerkConstructorOptions = Pick<ClerkInterface, 'proxyUrl' | 'domain'>;
-
 declare global {
   interface Window {
     Clerk?: Clerk;
     __clerk_frontend_api?: string;
     __clerk_publishable_key?: string;
-    __clerk_proxy_url?: ClerkConstructorOptions['proxyUrl'];
-    __clerk_domain?: ClerkConstructorOptions['domain'];
+    __clerk_proxy_url?: ClerkInterface['proxyUrl'];
+    __clerk_domain?: ClerkInterface['domain'];
   }
 }
 
@@ -127,8 +126,8 @@ export default class Clerk implements ClerkInterface {
   public user?: UserResource | null;
   public readonly frontendApi: string;
   public readonly publishableKey?: string;
-  public readonly proxyUrl?: ClerkConstructorOptions['proxyUrl'];
-  public readonly domain?: ClerkConstructorOptions['domain'];
+  public readonly proxyUrl?: ClerkInterface['proxyUrl'];
+  public readonly domain?: ClerkInterface['domain'];
 
   #authService: AuthenticationService | null = null;
   #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
@@ -159,7 +158,7 @@ export default class Clerk implements ClerkInterface {
     return this.#options.isSatellite || false;
   }
 
-  public constructor(key: string, options?: ClerkConstructorOptions) {
+  public constructor(key: string, options?: DomainOrProxyUrl) {
     key = (key || '').trim();
 
     const _unfilteredProxy = options?.proxyUrl;
