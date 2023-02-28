@@ -169,7 +169,7 @@ export default class Clerk implements ClerkInterface {
     }
     this.proxyUrl = proxyUrlToAbsoluteURL(_unfilteredProxy);
 
-    this.domain = addClerkPrefix(options?.domain);
+    this.domain = stripScheme(addClerkPrefix(options?.domain));
 
     if (isLegacyFrontendApiKey(key)) {
       if (!validateFrontendApi(key)) {
@@ -976,7 +976,7 @@ export default class Clerk implements ClerkInterface {
       const proxy = new URL(this.proxyUrl);
       primarySyncUrl = new URL(`${proxy.pathname}/v1/client/sync`, proxy.origin);
     } else if (this.domain) {
-      primarySyncUrl = new URL(`/v1/client/sync`, `https://${stripScheme(this.domain)}`);
+      primarySyncUrl = new URL(`/v1/client/sync`, `https://${this.domain}`);
     } else {
       clerkMissingProxyUrlAndDomain();
     }
