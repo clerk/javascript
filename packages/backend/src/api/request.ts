@@ -7,6 +7,7 @@ import { API_URL, API_VERSION, USER_AGENT } from '../constants';
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
 import runtime from '../runtime';
 import { joinPaths } from '../util/path';
+import { validateSecretKey } from '../util/validateSecretKey';
 import type { CreateBackendApiOptions } from './factory';
 import { deserialize } from './resources/Deserializer';
 
@@ -72,13 +73,9 @@ export function buildRequest(options: CreateBackendApiOptions) {
     } = options;
     const { path, method, queryParams, headerParams, bodyParams } = requestOptions;
 
-    const key = secretKey || apiKey;
+    const key = secretKey || apiKey || '';
 
-    if (!key) {
-      throw Error(
-        'Missing Clerk Secret Key or API Key. Go to https://dashboard.clerk.dev and get your key for your instance.',
-      );
-    }
+    validateSecretKey(key);
 
     const url = joinPaths(apiUrl, apiVersion, path);
 
