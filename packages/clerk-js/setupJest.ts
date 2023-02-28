@@ -22,6 +22,9 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 });
 
+global.__PKG_NAME__ = '';
+global.__PKG_VERSION__ = '';
+
 //@ts-expect-error
 global.IntersectionObserver = class IntersectionObserver {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
