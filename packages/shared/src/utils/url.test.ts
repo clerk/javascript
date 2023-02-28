@@ -32,15 +32,19 @@ describe('stripScheme(url)', () => {
 });
 
 describe('addClerkPrefix(str)', () => {
-  const undefinedCase = [[undefined, undefined]];
+  const undefinedCase = [[undefined, '']];
 
   it.each(undefinedCase)('attempts to the prefix clerk. to %p', (urlInput, urlOutput) => {
     expect(addClerkPrefix(urlInput)).toBe(urlOutput);
   });
 
   const cases = [
-    ['', 'clerk.'],
+    ['', ''],
     ['example.com', 'clerk.example.com'],
+    ['clerk.example.com', 'clerk.example.com'],
+    ['clerk.clerk.example.com', 'clerk.example.com'],
+    ['clerk.dev', 'clerk.clerk.dev'],
+    ['clerk.clerk.dev', 'clerk.clerk.dev'],
   ];
   it.each(cases)('attempts to the prefix clerk. to %p', (urlInput, urlOutput) => {
     expect(addClerkPrefix(urlInput)).toBe(urlOutput);
