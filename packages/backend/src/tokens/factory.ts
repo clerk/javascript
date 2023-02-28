@@ -84,9 +84,9 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
       apiUrl,
       frontendApi: runtimeFrontendApi || buildtimeFrontendApi,
       publishableKey: runtimePublishableKey || buildtimePublishableKey,
-      proxyUrl: runtimeProxyUrl || buildProxyUrl,
+      proxyUrl: (runtimeProxyUrl || buildProxyUrl) as any,
       isSatellite: runtimeIsSatellite || buildtimeIsSatellite,
-      domain: runtimeDomain || buildtimeDomain,
+      domain: (runtimeDomain || buildtimeDomain) as any,
     });
   };
 

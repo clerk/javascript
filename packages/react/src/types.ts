@@ -2,6 +2,7 @@ import type {
   Clerk,
   ClerkOptions,
   ClientResource,
+  DomainOrProxyUrl,
   LoadedClerk,
   PublishableKeyOrFrontendApi,
   RedirectOptions,
@@ -13,27 +14,24 @@ declare global {
   interface Window {
     __clerk_frontend_api?: string;
     __clerk_publishable_key?: string;
-    __clerk_proxy_url?: ClerkConstructorOptions['proxyUrl'];
-    __clerk_domain?: ClerkConstructorOptions['domain'];
+    __clerk_proxy_url?: Clerk['proxyUrl'];
+    __clerk_domain?: Clerk['domain'];
   }
 }
 
-// TODO: COR-164 improve type-safety
-export type ClerkConstructorOptions = Pick<Clerk, 'proxyUrl' | 'domain'>;
-
-export type IsomorphicClerkOptions = ClerkOptions &
-  ClerkConstructorOptions & {
-    Clerk?: ClerkProp;
-    clerkJSUrl?: string;
-    clerkJSVariant?: 'headless' | '';
-  } & PublishableKeyOrFrontendApi;
+export type IsomorphicClerkOptions = ClerkOptions & {
+  Clerk?: ClerkProp;
+  clerkJSUrl?: string;
+  clerkJSVariant?: 'headless' | '';
+} & PublishableKeyOrFrontendApi &
+  DomainOrProxyUrl;
 
 export interface BrowserClerkConstructor {
-  new (publishableKey: string, options?: ClerkConstructorOptions): BrowserClerk;
+  new (publishableKey: string, options?: DomainOrProxyUrl): BrowserClerk;
 }
 
 export interface HeadlessBrowserClerkConstrutor {
-  new (publishableKey: string, options?: ClerkConstructorOptions): HeadlessBrowserClerk;
+  new (publishableKey: string, options?: DomainOrProxyUrl): HeadlessBrowserClerk;
 }
 
 export type WithClerkProp<T = unknown> = T & { clerk: LoadedClerk };

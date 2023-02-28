@@ -63,9 +63,9 @@ export const withServerSideAuth: WithServerSideAuth = (cbOrOptions: any, options
         publishableKey: PUBLISHABLE_KEY,
         frontendApi: FRONTEND_API,
         pkgVersion: JS_VERSION,
-        proxyUrl: requestState.proxyUrl,
+        proxyUrl: requestState.proxyUrl as any,
         isSatellite: requestState.isSatellite,
-        domain: requestState.domain,
+        domain: requestState.domain as any,
         debugData: debugRequestState(requestState),
       });
       ctx.res.end(interstitial);

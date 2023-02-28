@@ -26,7 +26,6 @@ import type { OrganizationProfileProps, OrganizationSwitcherProps } from '@clerk
 import type {
   BrowserClerk,
   BrowserClerkConstructor,
-  ClerkConstructorOptions,
   ClerkProp,
   HeadlessBrowserClerk,
   HeadlessBrowserClerkConstrutor,
@@ -52,8 +51,8 @@ export default class IsomorphicClerk {
   private readonly mode: 'browser' | 'server';
   private readonly frontendApi?: string;
   private readonly publishableKey?: string;
-  private readonly proxyUrl?: ClerkConstructorOptions['proxyUrl'];
-  private readonly domain?: ClerkConstructorOptions['domain'];
+  private readonly proxyUrl?: Clerk['proxyUrl'];
+  private readonly domain?: Clerk['domain'];
   private readonly options: IsomorphicClerkOptions;
   private readonly Clerk: ClerkProp;
   private clerkjs: BrowserClerk | HeadlessBrowserClerk | null = null;
@@ -93,8 +92,8 @@ export default class IsomorphicClerk {
     const { Clerk = null, frontendApi, publishableKey } = options || {};
     this.frontendApi = frontendApi;
     this.publishableKey = publishableKey;
-    this.proxyUrl = (options as ClerkConstructorOptions | undefined)?.proxyUrl;
-    this.domain = (options as ClerkConstructorOptions | undefined)?.domain;
+    this.proxyUrl = options?.proxyUrl;
+    this.domain = options?.domain;
     this.options = options;
     this.Clerk = Clerk;
     this.mode = inClientSide() ? 'browser' : 'server';
@@ -129,7 +128,9 @@ export default class IsomorphicClerk {
         if (isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstrutor>(this.Clerk)) {
           // Construct a new Clerk object if a constructor is passed
           c = new this.Clerk(this.publishableKey || this.frontendApi || '', {
+            // @ts-expect-error
             proxyUrl: this.proxyUrl,
+            // @ts-expect-error
             domain: this.domain,
           });
           await c.load(this.options);

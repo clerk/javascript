@@ -1,10 +1,9 @@
 import type { AuthObject, Organization, Session, User } from '@clerk/backend';
-import type { Clerk as ClerkInterface, ClerkOptions } from '@clerk/types';
+import type { ClerkOptions, DomainOrProxyUrl } from '@clerk/types';
 import type { DataFunctionArgs, LoaderFunction } from '@remix-run/server-runtime';
 
 export type GetAuthReturn = Promise<AuthObject>;
 
-// TODO: COR-164 improve type-safety
 export type RootAuthLoaderOptions = {
   /**
    * @deprecated Use `publishableKey` instead.
@@ -21,7 +20,7 @@ export type RootAuthLoaderOptions = {
   loadSession?: boolean;
   loadOrganization?: boolean;
   authorizedParties?: [];
-} & Pick<ClerkInterface, 'domain' | 'proxyUrl'> &
+} & Partial<DomainOrProxyUrl> &
   Pick<ClerkOptions, 'isSatellite'>;
 
 export type RootAuthLoaderCallback<Options extends RootAuthLoaderOptions> = (

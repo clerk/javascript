@@ -9,7 +9,6 @@ export * from './tokens/jwt';
 export * from './tokens/verify';
 export { constants } from './constants';
 
-// TODO: COR-164 improve type-safety
 export type ClerkOptions = CreateBackendApiOptions &
   Partial<
     Pick<
