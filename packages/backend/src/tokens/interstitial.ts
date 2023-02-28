@@ -1,3 +1,5 @@
+import type { DomainOrProxyUrl } from '@clerk/types';
+
 import { API_VERSION } from '../constants';
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
@@ -12,15 +14,12 @@ import type { DebugRequestSate } from './request';
 export type LoadInterstitialOptions = {
   apiUrl: string;
   frontendApi: string;
-  proxyUrl?: string;
   publishableKey: string;
   pkgVersion?: string;
   debugData?: DebugRequestSate;
   isSatellite?: boolean;
-  domain?: string;
-};
+} & DomainOrProxyUrl;
 
-// TODO: COR-164 improve type-safety
 export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions, 'apiUrl'>) {
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
   const { debugData, frontendApi, pkgVersion, publishableKey, proxyUrl, isSatellite = false, domain } = options;
@@ -94,7 +93,6 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
 }
 
 // TODO: Add caching to Interstitial
-// TODO: COR-164 improve type-safety
 export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions) {
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
   const url = buildPublicInterstitialUrl(options);
@@ -111,7 +109,6 @@ export async function loadInterstitialFromBAPI(options: LoadInterstitialOptions)
   return response.text();
 }
 
-// TODO: COR-164 improve type-safety
 export function buildPublicInterstitialUrl(options: LoadInterstitialOptions) {
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
   const { apiUrl, frontendApi, pkgVersion, publishableKey, proxyUrl, isSatellite, domain } = options;
