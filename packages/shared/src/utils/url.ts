@@ -10,8 +10,16 @@ export function stripScheme(url = ''): string {
 }
 
 export function addClerkPrefix(str: string | undefined) {
-  if (typeof str === 'undefined') {
-    return undefined;
+  if (!str) {
+    return '';
   }
-  return `clerk.${str}`;
+  let regex;
+  if (str?.match(/(clerk\.)?dev$/)) {
+    regex = /(clerk\.)*(?=clerk\.)/;
+  } else {
+    regex = /clerk\./gi;
+  }
+
+  const stripped = str.replace(regex, '');
+  return `clerk.${stripped}`;
 }
