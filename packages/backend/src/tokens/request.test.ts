@@ -125,7 +125,7 @@ export default (QUnit: QUnit) => {
     skipJwksCache: true,
     isSatellite: false,
     domain: '',
-    hasJustSynced: false,
+    searchParams: new URLSearchParams(),
   } satisfies AuthenticateRequestOptions;
 
   module('tokens.authenticateRequest(options)', hooks => {
@@ -264,7 +264,6 @@ export default (QUnit: QUnit) => {
         apiKey: 'deadbeef',
         clientUat: '0',
         isSatellite: true,
-        hasJustSynced: false,
       });
 
       assertInterstitial(assert, requestState, {

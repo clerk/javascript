@@ -75,7 +75,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
       proxyUrl,
       isSatellite,
       domain: DOMAIN,
-      hasJustSynced: new URL(req.url).searchParams.get('__clerk_synced') === 'true',
+      searchParams: new URL(req.url).searchParams,
     });
 
     // Interstitial case

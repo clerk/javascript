@@ -19,7 +19,6 @@ export type CreateAuthenticateRequestOptions = {
       | 'proxyUrl'
       | 'domain'
       | 'isSatellite'
-      | 'hasJustSynced'
     >
   >;
   apiClient: ApiClient;
@@ -38,7 +37,6 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
     publishableKey: buildtimePublishableKey = '',
     isSatellite: buildtimeIsSatellite = false,
     domain: buildtimeDomain = '',
-    hasJustSynced: buildtimeHasJustSynced = false,
   } = params.options;
 
   const authenticateRequest = ({
@@ -50,7 +48,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
     jwtKey: runtimeJwtKey,
     isSatellite: runtimeIsSatellite,
     domain: runtimeDomain,
-    hasJustSynced: runtimeHasJustSynced,
+    searchParams,
     ...rest
   }: Omit<AuthenticateRequestOptions, 'apiUrl' | 'apiVersion'>) => {
     return authenticateRequestOriginal({
@@ -65,7 +63,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
       isSatellite: runtimeIsSatellite || buildtimeIsSatellite,
       domain: runtimeDomain || buildtimeDomain,
       jwtKey: runtimeJwtKey || buildtimeJwtKey,
-      hasJustSynced: runtimeHasJustSynced || buildtimeHasJustSynced,
+      searchParams,
     });
   };
 
