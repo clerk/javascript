@@ -40,13 +40,11 @@ import { withClerk } from './withClerk';
 // });
 
 // Portal.displayName = 'ClerkPortal';
-class Portal extends React.PureComponent<MountProps, {}> {
+class Portal extends React.PureComponent<MountProps, Record<never, never>> {
   private portalRef = React.createRef<HTMLDivElement>();
 
-  componentDidUpdate(prevProps: Readonly<MountProps>) {
-    if (prevProps.props.appearance !== this.props.props.appearance) {
-      this.props.updateProps({ node: this.portalRef.current, props: this.props.props });
-    }
+  componentDidUpdate() {
+    this.props.updateProps({ node: this.portalRef.current, props: this.props.props });
   }
 
   componentDidMount() {
