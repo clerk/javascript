@@ -18,14 +18,15 @@ declare global {
   }
 }
 
+// TODO: COR-164 improve type-safety
 export type ClerkConstructorOptions = Pick<Clerk, 'proxyUrl' | 'domain'>;
-export type NoExperimentalClerkOptions = Omit<ClerkOptions, 'isSatellite'>;
 
-export type IsomorphicClerkOptions = NoExperimentalClerkOptions & {
-  Clerk?: ClerkProp;
-  clerkJSUrl?: string;
-  clerkJSVariant?: 'headless' | '';
-} & PublishableKeyOrFrontendApi;
+export type IsomorphicClerkOptions = ClerkOptions &
+  ClerkConstructorOptions & {
+    Clerk?: ClerkProp;
+    clerkJSUrl?: string;
+    clerkJSVariant?: 'headless' | '';
+  } & PublishableKeyOrFrontendApi;
 
 export interface BrowserClerkConstructor {
   new (publishableKey: string, options?: ClerkConstructorOptions): BrowserClerk;

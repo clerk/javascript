@@ -13,10 +13,10 @@ type NextAppClerkProviderProps = {
 export function ClerkProvider(props: NextAppClerkProviderProps) {
   const state = (initialState()?.__clerk_ssr_state || { sessionId: null, orgId: null, userId: null }) as InitialState;
   return (
+    // @ts-expect-error
     <ClerkProviderClient
       frontendApi={process.env.NEXT_PUBLIC_CLERK_FRONTEND_API || ''}
       publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || ''}
-      // @ts-expect-error
       proxyUrl={process.env.NEXT_PUBLIC_CLERK_PROXY_URL}
       initialState={state}
       {...props}

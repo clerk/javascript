@@ -3,7 +3,7 @@ import type { RequestCookie } from 'next/dist/server/web/spec-extension/cookies'
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import type { RequestLike, WithAuthOptionsExperimental } from './types';
+import type { RequestLike, WithAuthOptions } from './types';
 
 export function setCustomAttributeOnRequest(req: RequestLike, key: string, value: string): void {
   Object.assign(req, { [key]: value });
@@ -134,7 +134,7 @@ export const injectSSRStateIntoObject = <O, T>(obj: O, authObject: T) => {
 };
 
 // TODO: Make this a generic and move to @clerk/shared
-export const handleIsSatelliteBooleanOrFn = (opts: WithAuthOptionsExperimental, url: URL): boolean => {
+export const handleIsSatelliteBooleanOrFn = (opts: WithAuthOptions, url: URL): boolean => {
   if (typeof opts.isSatellite === 'function') {
     return opts.isSatellite(url);
   }
