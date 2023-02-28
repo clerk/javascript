@@ -1,4 +1,4 @@
-import { isValidProxyUrl, parsePublishableKey, proxyUrlToAbsoluteURL } from '@clerk/shared';
+import { addClerkPrefix, isValidProxyUrl, parsePublishableKey, proxyUrlToAbsoluteURL } from '@clerk/shared';
 
 import { LIB_VERSION } from '../info';
 import type { BrowserClerk } from '../types';
@@ -49,7 +49,7 @@ function getScriptSrc({
   if (!!proxyUrl && isValidProxyUrl(proxyUrl)) {
     scriptHost = proxyUrlToAbsoluteURL(proxyUrl).replace(/http(s)?:\/\//, '');
   } else if (domain) {
-    scriptHost = domain;
+    scriptHost = addClerkPrefix(domain);
   } else {
     scriptHost = parsePublishableKey(publishableKey)?.frontendApi || frontendApi || '';
   }
@@ -113,7 +113,7 @@ export async function loadScript(params: LoadScriptParams): Promise<HTMLScriptEl
       script.setAttribute('data-clerk-proxy-url', proxyUrl);
     }
     if (domain) {
-      script.setAttribute('data-clerk-domain', domain.replace('clerk.', ''));
+      script.setAttribute('data-clerk-domain', domain);
     }
 
     script.setAttribute('crossorigin', 'anonymous');
