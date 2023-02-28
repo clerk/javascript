@@ -63,7 +63,6 @@ export const withServerSideAuth: WithServerSideAuth = (cbOrOptions: any, options
         publishableKey: PUBLISHABLE_KEY,
         frontendApi: FRONTEND_API,
         pkgVersion: JS_VERSION,
-        // @ts-ignore
         proxyUrl: requestState.proxyUrl,
         isSatellite: requestState.isSatellite,
         domain: requestState.domain,

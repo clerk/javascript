@@ -33,7 +33,6 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
     awaitableNavigateRef.current = awaitableNavigate;
   }, [awaitableNavigate]);
 
-  // @ts-expect-error
   const { clerkState, proxyUrl, domain, isSatellite, ...restProps } = rest;
   ReactClerkProvider.displayName = 'ReactClerkProvider';
 
@@ -55,7 +54,6 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
       initialState={__clerk_ssr_state}
       frontendApi={__frontendApi as any}
       publishableKey={__publishableKey as any}
-      //@ts-expect-error
       proxyUrl={proxyUrl || __proxyUrl}
       domain={domain || __domain}
       isSatellite={isSatellite || __isSatellite}

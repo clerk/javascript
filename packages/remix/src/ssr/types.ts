@@ -1,24 +1,10 @@
 import type { AuthObject, Organization, Session, User } from '@clerk/backend';
-import type { ClerkOptions } from '@clerk/types/src';
+import type { Clerk as ClerkInterface, ClerkOptions } from '@clerk/types';
 import type { DataFunctionArgs, LoaderFunction } from '@remix-run/server-runtime';
 
 export type GetAuthReturn = Promise<AuthObject>;
 
-export type RootAuthLoaderOptionsWithExperimental = RootAuthLoaderOptions & {
-  /**
-   * @experimental
-   */
-  isSatellite?: ClerkOptions['isSatellite'];
-  /**
-   * @experimental
-   */
-  domain?: string;
-  /**
-   * @experimental
-   */
-  proxyUrl?: string;
-};
-
+// TODO: COR-164 improve type-safety
 export type RootAuthLoaderOptions = {
   /**
    * @deprecated Use `publishableKey` instead.
@@ -35,7 +21,8 @@ export type RootAuthLoaderOptions = {
   loadSession?: boolean;
   loadOrganization?: boolean;
   authorizedParties?: [];
-};
+} & Pick<ClerkInterface, 'domain' | 'proxyUrl'> &
+  Pick<ClerkOptions, 'isSatellite'>;
 
 export type RootAuthLoaderCallback<Options extends RootAuthLoaderOptions> = (
   args: LoaderFunctionArgsWithAuth<Options>,

@@ -36,11 +36,8 @@ export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JS
     authServerSideProps,
     frontendApi,
     publishableKey,
-    // @ts-expect-error
     proxyUrl,
-    // @ts-expect-error
     domain,
-    // @ts-expect-error
     isSatellite,
     // @ts-expect-error
     __clerk_ssr_state,
@@ -65,11 +62,11 @@ export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JS
   }, []);
 
   return (
+    // @ts-expect-error
     <ReactClerkProvider
       frontendApi={frontendApi || process.env.NEXT_PUBLIC_CLERK_FRONTEND_API || ''}
       publishableKey={publishableKey || process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || ''}
       clerkJSUrl={clerkJSUrl || process.env.NEXT_PUBLIC_CLERK_JS}
-      // @ts-expect-error
       proxyUrl={proxyUrl || process.env.NEXT_PUBLIC_CLERK_PROXY_URL || ''}
       domain={domain || process.env.NEXT_PUBLIC_CLERK_DOMAIN || ''}
       isSatellite={isSatellite || process.env.NEXT_PUBLIC_CLERK_IS_SATELLITE === 'true'}

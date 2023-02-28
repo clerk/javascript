@@ -1,10 +1,11 @@
 import type { AuthObject, RequestState } from '@clerk/backend';
 import { constants, debugRequestState, loadInterstitialFromLocal } from '@clerk/backend';
 import { LIB_VERSION } from '@clerk/clerk-react/dist/info';
+import type { ClerkOptions } from '@clerk/types';
 import { json } from '@remix-run/server-runtime';
 import cookie from 'cookie';
 
-import type { LoaderFunctionArgs, LoaderFunctionArgsWithAuth, RootAuthLoaderOptionsWithExperimental } from './types';
+import type { LoaderFunctionArgs, LoaderFunctionArgsWithAuth } from './types';
 
 /**
  * Inject `auth`, `user` , `organization` and `session` properties into request
@@ -127,10 +128,7 @@ export const wrapWithClerkState = (data: any) => {
   return { clerkState: { __internal_clerk_state: { ...data } } };
 };
 
-export const handleIsSatelliteBooleanOrFn = (
-  isSatellite: RootAuthLoaderOptionsWithExperimental['isSatellite'],
-  url: URL,
-) => {
+export const handleIsSatelliteBooleanOrFn = (isSatellite: ClerkOptions['isSatellite'], url: URL) => {
   if (typeof isSatellite === 'function') {
     return isSatellite(url);
   }

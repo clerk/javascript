@@ -11,11 +11,11 @@ export const wrapPageElement: GatsbyBrowser['wrapPageElement'] = ({ element, pro
   }
 
   return (
+    // @ts-expect-error
     <ClerkProvider
       frontendApi={process.env.GATSBY_CLERK_FRONTEND_API || ''}
       publishableKey={process.env.GATSBY_CLERK_PUBLISHABLE_KEY || ''}
       clerkJSUrl={process.env.GATSBY_CLERK_JS}
-      // @ts-expect-error
       proxyUrl={process.env.GATSBY_CLERK_PROXY_URL}
       clerkState={clerkSsrState || {}}
     >

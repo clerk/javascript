@@ -4,7 +4,7 @@ import { isHttpOrHttps } from '@clerk/shared';
 
 import { noRelativeProxyInSSR, noSecretKeyOrApiKeyError } from '../errors';
 import { getEnvVariable } from '../utils';
-import type { LoaderFunctionArgs, RootAuthLoaderOptions, RootAuthLoaderOptionsWithExperimental } from './types';
+import type { LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
 import { handleIsSatelliteBooleanOrFn, parseCookies } from './utils';
 
 /**
@@ -12,7 +12,7 @@ import { handleIsSatelliteBooleanOrFn, parseCookies } from './utils';
  */
 export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoaderOptions = {}): Promise<RequestState> {
   const { request, context } = args;
-  const { loadSession, loadUser, loadOrganization, authorizedParties } = opts as RootAuthLoaderOptionsWithExperimental;
+  const { loadSession, loadUser, loadOrganization, authorizedParties } = opts;
 
   // Fetch environment variables across Remix runtimes.
   // 1. First try from process.env if exists (Node).
@@ -35,23 +35,15 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
 
   const apiUrl = getEnvVariable('CLERK_API_URL') || (context?.CLERK_API_URL as string);
 
-  const domain =
-    getEnvVariable('CLERK_DOMAIN') ||
-    (context?.CLERK_DOMAIN as string) ||
-    (opts as RootAuthLoaderOptionsWithExperimental).domain ||
-    '';
+  const domain = getEnvVariable('CLERK_DOMAIN') || (context?.CLERK_DOMAIN as string) || opts.domain || '';
 
   const isSatellite =
     getEnvVariable('CLERK_IS_SATELLITE') === 'true' ||
     (context?.CLERK_IS_SATELLITE as string) === 'true' ||
-    handleIsSatelliteBooleanOrFn((opts as RootAuthLoaderOptionsWithExperimental).isSatellite, new URL(request.url)) ||
+    handleIsSatelliteBooleanOrFn(opts.isSatellite, new URL(request.url)) ||
     false;
 
-  const proxyUrl =
-    getEnvVariable('CLERK_PROXY_URL') ||
-    (context?.CLERK_PROXY_URL as string) ||
-    (opts as RootAuthLoaderOptionsWithExperimental).proxyUrl ||
-    '';
+  const proxyUrl = getEnvVariable('CLERK_PROXY_URL') || (context?.CLERK_PROXY_URL as string) || opts.proxyUrl || '';
 
   if (!!proxyUrl && !isHttpOrHttps(proxyUrl)) {
     throw new Error(noRelativeProxyInSSR);
