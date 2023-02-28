@@ -5,48 +5,45 @@ export const events = {
 } as const;
 
 type ClerkEvent = typeof events[keyof typeof events];
-type EventType<T> = Record<string, unknown> & T;
+type EventHandler<E extends ClerkEvent> = (payload: EventPayload[E]) => void;
 
 type TokenUpdatePayload = { token: TokenResource | null };
 
 type EventPayload = {
-  [events.TokenUpdate]: EventType<TokenUpdatePayload>;
+  [events.TokenUpdate]: TokenUpdatePayload;
 };
 
-class ClerkEventBus extends EventTarget {
-  #handlers = {} as Record<ClerkEvent, Array<any>>;
+const createEventBus = () => {
+  const eventToHandlersMap = new Map<ClerkEvent, Array<EventHandler<any>>>();
 
-  on<E extends ClerkEvent, P extends EventPayload[E]>(eventName: E, callback: (evt: P) => void): void {
-    const handler = (e: Event) => {
-      callback((e as CustomEvent).detail);
-    };
-
-    if (!this.#handlers[eventName]) {
-      this.#handlers[eventName] = [];
+  const on = <E extends ClerkEvent>(event: E, handler: EventHandler<E>) => {
+    if (!eventToHandlersMap.get(event)) {
+      eventToHandlersMap.set(event, []);
     }
-    this.#handlers[eventName].push({ callback, handler });
+    eventToHandlersMap.get(event)?.push(handler);
+  };
 
-    this.addEventListener(eventName, handler);
-  }
+  const dispatch = <E extends ClerkEvent>(event: E, payload: EventPayload[E]) => {
+    (eventToHandlersMap.get(event) || []).forEach(h => typeof h === 'function' && h(payload));
+  };
 
-  dispatch<E extends ClerkEvent, P extends EventPayload[E]>(eventName: E, data: P): void {
-    this.dispatchEvent(new CustomEvent(eventName, { detail: data }));
-  }
-
-  off<E extends ClerkEvent, P extends EventPayload[E]>(eventName: E, callback?: (evt: P) => void): void {
-    if (!this.#handlers[eventName]) {
+  const off = <E extends ClerkEvent>(event: E, handler?: EventHandler<E>) => {
+    const handlers = eventToHandlersMap.get(event) || [];
+    if (!handlers.length) {
       return;
     }
 
-    if (callback) {
-      const { handler } = this.#handlers[eventName].find(({ callback }) => callback === callback) || {};
-      this.removeEventListener(eventName, handler);
-    } else {
-      this.#handlers[eventName].forEach(({ handler }) => {
-        this.removeEventListener(eventName, handler);
-      });
+    if (handler) {
+      eventToHandlersMap.set(
+        event,
+        handlers.filter(h => h !== handler),
+      );
     }
-  }
-}
 
-export const eventBus = new ClerkEventBus();
+    eventToHandlersMap.set(event, []);
+  };
+
+  return { on, dispatch, off };
+};
+
+export const eventBus = createEventBus();
