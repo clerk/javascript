@@ -159,17 +159,17 @@ export default class Clerk implements ClerkInterface {
     return this.#options.isSatellite || false;
   }
 
-  public constructor(key: string, options?: unknown) {
+  public constructor(key: string, options?: ClerkConstructorOptions) {
     key = (key || '').trim();
 
-    const _unfilteredProxy = (options as ClerkConstructorOptions | undefined)?.proxyUrl;
+    const _unfilteredProxy = options?.proxyUrl;
 
     if (!isValidProxyUrl(_unfilteredProxy)) {
       errorThrower.throwInvalidProxyUrl({ url: _unfilteredProxy });
     }
     this.proxyUrl = proxyUrlToAbsoluteURL(_unfilteredProxy);
 
-    this.domain = (options as ClerkConstructorOptions | undefined)?.domain;
+    this.domain = options?.domain;
 
     if (isLegacyFrontendApiKey(key)) {
       if (!validateFrontendApi(key)) {
