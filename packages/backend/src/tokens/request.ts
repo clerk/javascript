@@ -74,7 +74,7 @@ export type AuthenticateRequestOptions = RequiredVerifyTokenOptions &
     /**
      * @experimental
      */
-    hasJustSynced?: boolean;
+    searchParams?: URLSearchParams;
   };
 
 export async function authenticateRequest(options: AuthenticateRequestOptions): Promise<RequestState> {

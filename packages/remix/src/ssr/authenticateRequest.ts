@@ -77,6 +77,6 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     proxyUrl,
     isSatellite,
     domain,
-    hasJustSynced: new URL(request.url).searchParams.get('__clerk_synced') === 'true',
+    searchParams: new URL(request.url).searchParams,
   });
 }
