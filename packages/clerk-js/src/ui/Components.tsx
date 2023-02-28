@@ -14,6 +14,7 @@ import React, { Suspense } from 'react';
 
 import { clerkUIErrorDOMElementNotFound } from '../core/errors';
 import { buildVirtualRouterUrl } from '../utils';
+// Using `./hooks` instead of `./hooks/useClerkModalStateParams` will increase the bundle size
 import { useClerkModalStateParams } from './hooks/useClerkModalStateParams';
 import { LazyComponentRenderer, LazyModalRenderer, LazyProviders } from './lazyModules/commonDeps';
 import type { ClerkComponentName } from './lazyModules/components';
@@ -286,6 +287,7 @@ const Components = (props: ComponentsProps) => {
   );
 
   // TODO: Only show when impersonating, otherwise everything will load eagerly
+  // @ts-ignore
   const mountedImpersonationFab = (
     <LazyModalRenderer
       globalAppearance={state.appearance}
