@@ -19,6 +19,7 @@ export * from './jwt';
 export * from './key';
 export * from './localization';
 export * from './jwtv2';
+export * from './multiDomain';
 export * from './oauth';
 export * from './organization';
 export * from './organizationInvitation';
