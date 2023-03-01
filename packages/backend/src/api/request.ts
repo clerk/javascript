@@ -6,8 +6,8 @@ import { API_URL, API_VERSION, USER_AGENT } from '../constants';
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
 // For more information refer to https://sinonjs.org/how-to/stub-dependency/
 import runtime from '../runtime';
+import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { joinPaths } from '../util/path';
-import { validateSecretKey } from '../util/validateSecretKey';
 import type { CreateBackendApiOptions } from './factory';
 import { deserialize } from './resources/Deserializer';
 
@@ -73,9 +73,9 @@ export function buildRequest(options: CreateBackendApiOptions) {
     } = options;
     const { path, method, queryParams, headerParams, bodyParams } = requestOptions;
 
-    const key = secretKey || apiKey || '';
+    const key = secretKey || apiKey;
 
-    validateSecretKey(key);
+    assertValidSecretKey(key);
 
     const url = joinPaths(apiUrl, apiVersion, path);
 
