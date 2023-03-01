@@ -25,11 +25,11 @@
   },
   "scripts": {
     "build": "npm run build:bundle && (npm run build:declarations || true) && npm run bundlewatch",
-    "build:stats": "webpack --config webpack.dev.js --env production --json | tail -n +2 > stats.json",
+    "build:stats": "webpack --config webpack.config.js --env production --json | tail -n +2 > stats.json",
     "bundlewatch": "bundlewatch",
-    "build:bundle": "webpack --config webpack.dev.js --env production",
+    "build:bundle": "npm run clean && webpack --config webpack.config.js --env production",
     "build:declarations": "tsc -p tsconfig.declarations.json",
-    "dev": "webpack serve --config webpack.dev.js",
+    "dev": "webpack serve --config webpack.config.js",
     "clean": "rimraf ./dist",
     "lint": "eslint .",
     "prepublishOnly": "npm run build",
@@ -90,7 +90,8 @@
     "webpack": "^5.72.1",
     "webpack-bundle-analyzer": "^4.5.0",
     "webpack-cli": "^4.9.2",
-    "webpack-dev-server": "^4.9.0"
+    "webpack-dev-server": "^4.9.0",
+    "webpack-merge": "^5.8.0"
   },
   "browserslist": "last 2 versions, ios_saf > 12, Safari > 12, > 1%, not dead, not ie > 0",
   "bundlewatch": {
