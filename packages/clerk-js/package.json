@@ -51,9 +51,11 @@
     "dequal": "2.0.3",
     "qrcode.react": "3.1.0",
     "qs": "6.11.0",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
     "regenerator-runtime": "0.13.11"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",
