@@ -45,6 +45,8 @@ describe('addClerkPrefix(str)', () => {
     ['clerk.clerk.example.com', 'clerk.example.com'],
     ['clerk.dev', 'clerk.clerk.dev'],
     ['clerk.clerk.dev', 'clerk.clerk.dev'],
+    ['satellite.dev', 'clerk.satellite.dev'],
+    ['clerk.satellite.dev', 'clerk.satellite.dev'],
   ];
   it.each(cases)('attempts to the prefix clerk. to %p', (urlInput, urlOutput) => {
     expect(addClerkPrefix(urlInput)).toBe(urlOutput);
