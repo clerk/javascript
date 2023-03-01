@@ -33,10 +33,10 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
     );
   };
 
-  const handleManageAccountClicked: React.MouseEventHandler<HTMLButtonElement> = () => {
+  const handleManageAccountClicked = () => {
     if (opts.userProfileMode === 'navigation') {
       return navigate(opts.userProfileUrl).finally(async () => {
-        await sleep(1000);
+        await sleep(300);
         opts.actionCompleteCallback?.();
       });
     }
