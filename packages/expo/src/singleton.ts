@@ -18,7 +18,6 @@ export function buildClerk({ key, tokenCache }: BuildClerkOptions): HeadlessBrow
     const getToken = tokenCache.getToken;
     const saveToken = tokenCache.saveToken;
     // TODO: DO NOT ACCEPT THIS
-    // @ts-expect-error
     clerk = new Clerk(key);
 
     // @ts-expect-error
