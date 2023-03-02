@@ -14,7 +14,6 @@ __internal__setErrorThrowerOptions({
 });
 
 export type ClerkProviderProps = ClerkReactProviderProps & {
-  children: React.ReactNode;
   tokenCache?: TokenCache;
 };
 

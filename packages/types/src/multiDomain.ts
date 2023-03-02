@@ -1,9 +1,9 @@
 export type DomainOrProxyUrl =
   | {
       proxyUrl?: never;
-      domain: string;
+      domain?: string;
     }
   | {
-      proxyUrl: string;
+      proxyUrl?: string;
       domain?: never;
     };
