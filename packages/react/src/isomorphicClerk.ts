@@ -64,6 +64,7 @@ export default class IsomorphicClerk {
   private premountSignUpNodes = new Map<HTMLDivElement, SignUpProps>();
   private premountUserProfileNodes = new Map<HTMLDivElement, UserProfileProps>();
   private premountUserButtonNodes = new Map<HTMLDivElement, UserButtonProps>();
+  private premountImpersonationFABNodes = new Map<HTMLDivElement, {}>();
   private premountOrganizationProfileNodes = new Map<HTMLDivElement, OrganizationProfileProps>();
   private premountCreateOrganizationNodes = new Map<HTMLDivElement, CreateOrganizationProps>();
   private premountOrganizationSwitcherNodes = new Map<HTMLDivElement, OrganizationSwitcherProps>();
@@ -220,6 +221,14 @@ export default class IsomorphicClerk {
     this.premountUserButtonNodes.forEach((props: UserButtonProps, node: HTMLDivElement) => {
       clerkjs.mountUserButton(node, props);
     });
+
+    this.premountImpersonationFABNodes.forEach((_, node) => {
+      clerkjs.mountImpersonationFAB(node, {});
+    });
+
+    const newDiv = document.createElement('div');
+    document.body.appendChild(newDiv);
+    clerkjs.mountImpersonationFAB(newDiv, {});
 
     this.#loaded = true;
     this.emitLoaded();
@@ -484,6 +493,14 @@ export default class IsomorphicClerk {
       this.clerkjs.unmountUserButton(node);
     } else {
       this.premountUserButtonNodes.delete(node);
+    }
+  };
+
+  mountImpersonationFAB = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.mountImpersonationFAB(node, {});
+    } else {
+      this.premountImpersonationFABNodes.set(node, {});
     }
   };
 
