@@ -19,6 +19,7 @@ import type {
   ClientResource,
   CreateOrganizationParams,
   CreateOrganizationProps,
+  CustomNavigation,
   DomainOrProxyUrl,
   EnvironmentJSON,
   EnvironmentResource,
@@ -76,6 +77,7 @@ import {
 } from '../utils';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { CLERK_SYNCED, DEV_BROWSER_SSO_JWT_PARAMETER, ERROR_CODES } from './constants';
+import { navigationDebugLog } from './debug';
 import type { DevBrowserHandler } from './devBrowserHandler';
 import createDevBrowserHandler from './devBrowserHandler';
 import {
@@ -116,6 +118,7 @@ const defaultOptions: ClerkOptions = {
   standardBrowser: true,
   touchSession: true,
   isSatellite: false,
+  debug: false,
 };
 
 export default class Clerk implements ClerkInterface {
@@ -125,6 +128,7 @@ export default class Clerk implements ClerkInterface {
   public session?: ActiveSessionResource | null;
   public organization?: OrganizationResource | null;
   public user?: UserResource | null;
+  public debug?: boolean;
   public readonly frontendApi: string;
   public readonly publishableKey?: string;
   public readonly proxyUrl?: ClerkInterface['proxyUrl'];
@@ -202,11 +206,12 @@ export default class Clerk implements ClerkInterface {
     if (this.#isReady) {
       return;
     }
-
     this.#options = {
       ...defaultOptions,
       ...options,
     };
+
+    this.debug = this.#options.debug;
 
     if (this.#options.standardBrowser) {
       this.#isReady = await this.#loadInStandardBrowser();
@@ -538,20 +543,22 @@ export default class Clerk implements ClerkInterface {
     return unsubscribe;
   };
 
-  public navigate = async (to: string | undefined): Promise<unknown> => {
-    if (!to) {
-      return;
-    }
-
+  public navigate: CustomNavigation = async to => {
     const toURL = new URL(to, window.location.href);
     const customNavigate = this.#options.navigate;
 
     if (toURL.origin !== window.location.origin || !customNavigate) {
+      if (this.#options.debug) {
+        console.info(navigationDebugLog({ to: toURL.href, navigationType: 'window' }));
+      }
       windowNavigate(toURL);
       return;
     }
 
     // React router only wants the path, search or hash portion.
+    if (this.#options.debug) {
+      console.info(navigationDebugLog({ to: toURL.href, navigationType: 'custom' }));
+    }
     return await customNavigate(stripOrigin(toURL));
   };
 

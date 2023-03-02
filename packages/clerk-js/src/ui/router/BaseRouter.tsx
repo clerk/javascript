@@ -1,6 +1,7 @@
 import qs from 'qs';
 import React from 'react';
 
+import { navigationDebugLog } from '../../core/debug';
 import { getQueryParams, trimTrailingSlash } from '../../utils';
 import { useCoreClerk } from '../contexts';
 import { useWindowEventListener } from '../hooks';
@@ -40,7 +41,7 @@ export const BaseRouter = ({
   urlStateParam,
   children,
 }: BaseRouterProps): JSX.Element => {
-  const { navigate: externalNavigate } = useCoreClerk();
+  const { navigate: externalNavigate, debug } = useCoreClerk();
 
   const [routeParts, setRouteParts] = React.useState({
     path: getPath(),
@@ -89,14 +90,11 @@ export const BaseRouter = ({
   useWindowEventListener(refreshEvents, refresh);
 
   // TODO: Look into the real possible types of globalNavigate
-  const baseNavigate = async (toURL: URL | undefined): Promise<unknown> => {
-    if (!toURL) {
-      return;
-    }
-
+  const baseNavigate = async (toURL: URL): Promise<unknown> => {
     if (toURL.origin !== window.location.origin || !toURL.pathname.startsWith('/' + basePath)) {
-      if (onExternalNavigate) {
-        onExternalNavigate();
+      onExternalNavigate?.();
+      if (debug) {
+        console.info(navigationDebugLog({ to: toURL.href, navigationType: 'custom' }));
       }
       const res = await externalNavigate(toURL.href);
       refresh();
@@ -113,6 +111,9 @@ export const BaseRouter = ({
         }
       });
       toURL.search = qs.stringify(toQueryParams);
+    }
+    if (debug) {
+      console.info(navigationDebugLog({ to: toURL.pathname, navigationType: 'internal' }));
     }
     const internalNavRes = await internalNavigate(toURL);
     setRouteParts({ path: toURL.pathname, queryString: toURL.search });

@@ -53,6 +53,7 @@ export default class IsomorphicClerk {
   private readonly publishableKey?: string;
   private readonly proxyUrl?: Clerk['proxyUrl'];
   private readonly domain?: Clerk['domain'];
+  private readonly debug?: boolean;
   private readonly options: IsomorphicClerkOptions;
   private readonly Clerk: ClerkProp;
   private clerkjs: BrowserClerk | HeadlessBrowserClerk | null = null;
@@ -92,8 +93,9 @@ export default class IsomorphicClerk {
     const { Clerk = null, frontendApi, publishableKey } = options || {};
     this.frontendApi = frontendApi;
     this.publishableKey = publishableKey;
-    this.proxyUrl = options?.proxyUrl;
-    this.domain = options?.domain;
+    this.proxyUrl = options.proxyUrl;
+    this.domain = options.domain;
+    this.debug = options.debug;
     this.options = options;
     this.Clerk = Clerk;
     this.mode = inClientSide() ? 'browser' : 'server';

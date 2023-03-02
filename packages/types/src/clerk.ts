@@ -289,6 +289,11 @@ export interface Clerk {
   navigate: CustomNavigation;
 
   /**
+   * Controls whether Clerk will log debug related information in the console.
+   */
+  debug?: boolean;
+
+  /**
    * Decorates the provided url with the auth token for development instances.
    *
    * @param {string} to
@@ -459,7 +464,8 @@ export type ClerkThemeOptions = DeepSnakeToCamel<DeepPartial<DisplayThemeJSON>>;
 export interface ClerkOptions {
   appearance?: Appearance;
   localization?: LocalizationResource;
-  navigate?: (to: string) => Promise<unknown> | unknown;
+  navigate?: CustomNavigation;
+  debug?: boolean;
   polling?: boolean;
   selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;
   /** Controls if ClerkJS will load with the standard browser setup using Clerk cookies */
