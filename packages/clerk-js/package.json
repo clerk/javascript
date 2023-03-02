@@ -30,6 +30,7 @@
     "build:bundle": "npm run clean && webpack --config webpack.config.js --env production",
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "dev": "webpack serve --config webpack.config.js",
+    "dev:headless": "webpack serve --config webpack.config.js --env variant=\"clerk.headless.browser\"",
     "clean": "rimraf ./dist",
     "lint": "eslint .",
     "prepublishOnly": "npm run build",
