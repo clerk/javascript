@@ -14,6 +14,7 @@ import React, { Suspense } from 'react';
 
 import { clerkUIErrorDOMElementNotFound } from '../core/errors';
 import { buildVirtualRouterUrl } from '../utils';
+import type { AppearanceCascade } from './customizables/parseAppearance';
 // Using `./hooks` instead of `./hooks/useClerkModalStateParams` will increase the bundle size
 import { useClerkModalStateParams } from './hooks/useClerkModalStateParams';
 import { LazyComponentRenderer, LazyModalRenderer, LazyProviders } from './lazyModules/commonDeps';
@@ -32,7 +33,7 @@ const ROOT_ELEMENT_ID = 'clerk-components';
 
 export type ComponentControls = {
   mountComponent: (params: {
-    appearanceKey: Uncapitalize<ClerkComponentName>;
+    appearanceKey: Uncapitalize<AppearanceCascade['appearanceKey']>;
     name: ClerkComponentName;
     node: HTMLDivElement;
     props?: AvailableComponentProps;
@@ -54,7 +55,7 @@ export type ComponentControls = {
 interface HtmlNodeOptions {
   key: string;
   name: ClerkComponentName;
-  appearanceKey: Uncapitalize<ClerkComponentName>;
+  appearanceKey: Uncapitalize<AppearanceCascade['appearanceKey']>;
   props?: AvailableComponentProps;
 }
 

@@ -30,7 +30,7 @@ export const LazyProviders = (props: LazyProvidersProps) => {
 type _AppearanceProviderProps = Parameters<typeof AppearanceProvider>[0];
 type AppearanceProviderProps = {
   globalAppearance?: _AppearanceProviderProps['globalAppearance'];
-  appearanceKey: any;
+  appearanceKey: _AppearanceProviderProps['appearanceKey'];
   componentAppearance?: _AppearanceProviderProps['appearance'];
 };
 type PortalProps = Parameters<typeof Portal>[0];
