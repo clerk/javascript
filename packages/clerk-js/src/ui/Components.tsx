@@ -15,13 +15,12 @@ import React, { Suspense } from 'react';
 import { clerkUIErrorDOMElementNotFound } from '../core/errors';
 import { buildVirtualRouterUrl } from '../utils';
 import type { AppearanceCascade } from './customizables/parseAppearance';
-// Using `./hooks` instead of `./hooks/useClerkModalStateParams` will increase the bundle size
+// NOTE: Using `./hooks` instead of `./hooks/useClerkModalStateParams` will increase the bundle size
 import { useClerkModalStateParams } from './hooks/useClerkModalStateParams';
 import { LazyComponentRenderer, LazyModalRenderer, LazyProviders } from './lazyModules/commonDeps';
 import type { ClerkComponentName } from './lazyModules/components';
 import {
   CreateOrganizationModal,
-  ImpersonationFab,
   OrganizationProfileModal,
   SignInModal,
   SignUpModal,
@@ -295,7 +294,7 @@ const Components = (props: ComponentsProps) => {
       appearanceKey={'impersonationFab'}
       componentName={'ImpersonationFab'}
     >
-      <ImpersonationFab />
+      {/*<ImpersonationFab />*/}
     </LazyModalRenderer>
   );
 

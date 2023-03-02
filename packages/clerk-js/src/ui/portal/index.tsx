@@ -10,7 +10,8 @@ import type { AvailableComponentCtx } from '../types';
 type PortalProps<CtxType extends AvailableComponentCtx, PropsType = Omit<CtxType, 'componentName'>> = {
   node: HTMLDivElement;
   component: React.FunctionComponent<PropsType> | React.ComponentClass<PropsType, any>;
-  props: PropsType & { path?: string; routing?: string };
+  // Aligning this with props attributes of ComponentControls
+  props?: PropsType & { path?: string; routing?: string };
 } & Pick<CtxType, 'componentName'>;
 
 export default class Portal<CtxType extends AvailableComponentCtx> extends React.PureComponent<PortalProps<CtxType>> {
@@ -27,8 +28,8 @@ export default class Portal<CtxType extends AvailableComponentCtx> extends React
       return ReactDOM.createPortal(el, node);
     }
 
-    if (props.routing === 'path') {
-      if (!props.path) {
+    if (props?.routing === 'path') {
+      if (!props?.path) {
         clerkErrorPathRouterMissingPath(componentName);
       }
 
