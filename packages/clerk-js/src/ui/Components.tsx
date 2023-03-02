@@ -286,18 +286,6 @@ const Components = (props: ComponentsProps) => {
     </LazyModalRenderer>
   );
 
-  // TODO: Only show when impersonating, otherwise everything will load eagerly
-  // @ts-ignore
-  const mountedImpersonationFab = (
-    <LazyModalRenderer
-      globalAppearance={state.appearance}
-      appearanceKey={'impersonationFab'}
-      componentName={'ImpersonationFab'}
-    >
-      {/*<ImpersonationFab />*/}
-    </LazyModalRenderer>
-  );
-
   return (
     <Suspense fallback={''}>
       <LazyProviders
@@ -324,7 +312,6 @@ const Components = (props: ComponentsProps) => {
         {userProfileModal && mountedUserProfileModal}
         {organizationProfileModal && mountedOrganizationProfileModal}
         {createOrganizationModal && mountedCreateOrganizationModal}
-        {/*{mountedImpersonationFab}*/}
       </LazyProviders>
     </Suspense>
   );

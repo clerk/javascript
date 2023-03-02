@@ -441,6 +441,18 @@ export default class Clerk implements ClerkInterface {
     void this.#componentControls?.ensureMounted(controls => controls.unmountComponent({ node }));
   };
 
+  public mountImpersonationFAB = (node: HTMLDivElement, props = {}) => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls?.ensureMounted(controls =>
+      controls.mountComponent({
+        name: 'ImpersonationFab',
+        appearanceKey: 'impersonationFab',
+        node,
+        props,
+      }),
+    );
+  };
+
   /**
    * `setActive` can be used to set the active session and/or organization.
    * It will eventually replace `setSession`.

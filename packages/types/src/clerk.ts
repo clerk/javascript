@@ -200,6 +200,14 @@ export interface Clerk {
   unmountUserButton: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mount a user button component at the target element.
+   *
+   * @param targetNode Target node to mount the UserButton component.
+   * @param userButtonProps User button configuration parameters.
+   */
+  mountImpersonationFAB: (targetNode: HTMLDivElement, props: {}) => void;
+
+  /**
    * Mount a user profile component at the target element.
    *
    * @param targetNode Target to mount the UserProfile component.
