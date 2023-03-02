@@ -90,12 +90,14 @@ export const LazyModalRenderer = (props: LazyModalRendererProps) => {
               contentSx={props.modalContentSx}
             >
               {props.startPath ? (
-                <VirtualRouter
-                  startPath={props.startPath}
-                  onExternalNavigate={props.onExternalNavigate}
-                >
-                  {props.children}
-                </VirtualRouter>
+                <Suspense>
+                  <VirtualRouter
+                    startPath={props.startPath}
+                    onExternalNavigate={props.onExternalNavigate}
+                  >
+                    {props.children}
+                  </VirtualRouter>
+                </Suspense>
               ) : (
                 props.children
               )}
