@@ -128,11 +128,9 @@ export default class IsomorphicClerk {
         if (isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstrutor>(this.Clerk)) {
           // Construct a new Clerk object if a constructor is passed
           c = new this.Clerk(this.publishableKey || this.frontendApi || '', {
-            // @ts-expect-error
             proxyUrl: this.proxyUrl,
-            // @ts-expect-error
             domain: this.domain,
-          });
+          } as any);
           await c.load(this.options);
         } else {
           // Otherwise use the instantiated Clerk object
