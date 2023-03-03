@@ -104,7 +104,7 @@
       },
       {
         "path": "./dist/clerk.headless.js",
-        "maxSize": "50kB"
+        "maxSize": "43kB"
       }
     ]
   },
