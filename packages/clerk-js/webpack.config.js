@@ -10,6 +10,20 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 const isProduction = mode => mode === 'production';
 const isDevelopment = mode => !isProduction(mode);
 
+const variants = {
+  clerk: 'clerk',
+  clerkBrowser: 'clerk.browser',
+  clerkHeadless: 'clerk.headless',
+  clerkHeadlessBrowser: 'clerk.headless.browser',
+};
+
+const variantToSourceFile = {
+  [variants.clerk]: './src/index.ts',
+  [variants.clerkBrowser]: './src/index.browser.ts',
+  [variants.clerkHeadless]: './src/index.headless.ts',
+  [variants.clerkHeadlessBrowser]: './src/index.headless.browser.ts',
+};
+
 /** @type { () => import('webpack').Configuration } */
 const common = ({ mode }) => {
   return {
@@ -85,6 +99,7 @@ const commonForProd = () => {
     },
   };
 };
+
 /** @type { () => (import('webpack').Configuration) } */
 const externalsForHeadless = () => {
   return {
@@ -95,76 +110,47 @@ const externalsForHeadless = () => {
   };
 };
 
+const entryForVariant = variant => {
+  return { entry: { [variant]: variantToSourceFile[variant] } };
+};
+
 /** @type { () => (import('webpack').Configuration)[] } */
 const prodConfig = ({ mode }) => {
-  const entryToSourceMap = {
-    clerk: './src/index.ts',
-    'clerk.browser': './src/index.browser.ts',
-    'clerk.headless': './src/index.headless.ts',
-    'clerk.headless.browser': './src/index.headless.browser.ts',
-  };
-
   const entryToConfigMap = {
-    clerk: {
-      ...common({ mode }),
-      ...commonForProd(),
-    },
-    'clerk.browser': {
-      ...common({ mode }),
-      ...commonForProd(),
-    },
-    'clerk.headless': {
-      ...common({ mode }),
-      ...commonForProd(),
-      ...externalsForHeadless(),
-    },
-    'clerk.headless.browser': {
-      ...common({ mode }),
-      ...commonForProd(),
-      ...externalsForHeadless(),
-    },
+    // prettier-ignore
+    [variants.clerk]: merge(
+      entryForVariant(variants.clerk),
+      common({ mode }),
+      commonForProd(),
+    ),
+    // prettier-ignore
+    [variants.clerkBrowser]: merge(
+      entryForVariant(variants.clerkBrowser),
+      common({ mode }),
+      commonForProd(),
+    ),
+    [variants.clerkHeadless]: merge(
+      entryForVariant(variants.clerkHeadless),
+      common({ mode }),
+      commonForProd(),
+      // externalsForHeadless(),
+    ),
+    [variants.clerkHeadlessBrowser]: merge(
+      entryForVariant(variants.clerkHeadlessBrowser),
+      common({ mode }),
+      commonForProd(),
+      // externalsForHeadless(),
+    ),
   };
 
-  const configs = [];
-
-  for (const entry of Object.keys(entryToSourceMap)) {
-    console.log('Will build for ', entry);
-    configs.push({
-      ...entryToConfigMap[entry],
-      entry: {
-        [entry]: entryToSourceMap[entry],
-      },
-    });
-  }
-
-  return configs;
+  return [...Object.values(entryToConfigMap)];
 };
 
-const devServerOutput = () => {
-  return {
-    output: {
-      publicPath: 'https://js.lclclerk.com/npm/',
-      crossOriginLoading: 'anonymous',
-      filename: 'clerk.browser.js',
-      libraryTarget: 'umd',
-    },
-    devServer: {
-      allowedHosts: ['all'],
-      headers: { 'Access-Control-Allow-Origin': '*' },
-      host: '0.0.0.0',
-      port: 4000,
-      hot: true,
-      liveReload: false,
-      client: { webSocketURL: 'auto://js.lclclerk.com/ws' },
-    },
-  };
-};
-
-/** @type { () => import('webpack').Configuration } */
 const devConfig = ({ mode, env }) => {
-  return merge(
-    common({ mode }),
-    {
+  const variant = env.variant || variants.clerkBrowser;
+
+  const commonForDev = () => {
+    return {
       module: {
         rules: [svgLoader(), typescriptLoaderDev()],
       },
@@ -173,10 +159,56 @@ const devConfig = ({ mode, env }) => {
         ...(env.serveAnalyzer ? [new BundleAnalyzerPlugin()] : []),
       ],
       devtool: 'eval-cheap-source-map',
-      entry: './src/index.browser.ts',
-    },
-    devServerOutput(),
-  );
+      output: {
+        publicPath: 'https://js.lclclerk.com/npm/',
+        crossOriginLoading: 'anonymous',
+        filename: `${variant}.js`,
+        libraryTarget: 'umd',
+      },
+      devServer: {
+        allowedHosts: ['all'],
+        headers: { 'Access-Control-Allow-Origin': '*' },
+        host: '0.0.0.0',
+        port: 4000,
+        hot: true,
+        liveReload: false,
+        client: { webSocketURL: 'auto://js.lclclerk.com/ws' },
+      },
+    };
+  };
+
+  const entryToConfigMap = {
+    // prettier-ignore
+    [variants.clerk]: merge(
+      entryForVariant(variants.clerk),
+      common({ mode }),
+      commonForDev(),
+    ),
+    // prettier-ignore
+    [variants.clerkBrowser]: merge(
+      entryForVariant(variants.clerkBrowser),
+      common({ mode }),
+      commonForDev(),
+    ),
+    [variants.clerkHeadless]: merge(
+      entryForVariant(variants.clerkHeadless),
+      common({ mode }),
+      commonForDev(),
+      // externalsForHeadless(),
+    ),
+    [variants.clerkHeadlessBrowser]: merge(
+      entryForVariant(variants.clerkHeadlessBrowser),
+      common({ mode }),
+      commonForDev(),
+      // externalsForHeadless(),
+    ),
+  };
+
+  if (!entryToConfigMap[variant]) {
+    throw new Error('Clerk variant does not exist in config');
+  }
+
+  return entryToConfigMap[variant];
 };
 
 module.exports = env => {
