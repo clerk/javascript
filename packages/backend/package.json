@@ -14,7 +14,7 @@
     "build": "run-s clean build:runtime build:lib",
     "build:lib": "tsup --env.NODE_ENV production",
     "build:tests": "tsc -p tsconfig.test.json",
-    "build:runtime": "mkdir -p dist/runtime && cp -r src/runtime/* dist/runtime",
+    "build:runtime": "rsync -r --include '*/' --include '*.js' --include '*.mjs' --exclude='*' src/runtime dist",
     "clean": "rimraf ./dist",
     "lint": "eslint .",
     "test": "run-s build:runtime build:tests test:node test:edge-runtime test:cloudflare-miniflare",
