@@ -2,7 +2,7 @@ import type { PointerEventHandler } from 'react';
 import React, { useEffect, useRef } from 'react';
 
 import { getFullName, getIdentifier } from '../../../utils/user';
-import { useCoreClerk, useCoreSession, withCoreUserGuard } from '../../contexts';
+import { useCoreClerk, useCoreSession } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
   Col,
@@ -15,10 +15,9 @@ import {
   useAppearance,
   useLocalizations,
 } from '../../customizables';
-import { Portal } from '../../elements/Portal';
 import { Eye } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
-import { InternalThemeProvider, mqu } from '../../styledSystem';
+import { mqu } from '../../styledSystem';
 
 type EyeCircleProps = PropsOfComponent<typeof Col> & {
   width: string;
@@ -170,68 +169,62 @@ const _ImpersonationFab = () => {
   const titleLength = t(title).length;
 
   return (
-    <Portal>
-      <Flex
-        ref={containerRef}
-        elementDescriptor={descriptors.impersonationFab}
-        onPointerDown={onPointerDown}
-        align='center'
+    <Flex
+      ref={containerRef}
+      elementDescriptor={descriptors.impersonationFab}
+      onPointerDown={onPointerDown}
+      align='center'
+      sx={t => ({
+        touchAction: 'none', //for drag to work on mobile consistently
+        position: 'fixed',
+        overflow: 'hidden',
+        top: `var(${topProperty}, ${defaultTop}px)`,
+        right: `var(${rightProperty}, ${defaultRight}px)`,
+        zIndex: t.zIndices.$fab,
+        boxShadow: t.shadows.$fabShadow,
+        borderRadius: t.radii.$halfHeight, //to match the circular eye perfectly
+        backgroundColor: t.colors.$white,
+        fontFamily: t.fonts.$main,
+        ':hover': {
+          cursor: 'grab',
+        },
+        ':hover #cl-impersonationText': {
+          transition: `max-width ${t.transitionDuration.$slowest} ease, opacity ${t.transitionDuration.$slower} ease ${t.transitionDuration.$slowest}`,
+          maxWidth: `min(calc(50vw - ${eyeWidth} - 2 * ${defaultRight}px), ${titleLength}ch)`,
+          [mqu.md]: {
+            maxWidth: `min(calc(100vw - ${eyeWidth} - 2 * ${defaultRight}px), ${titleLength}ch)`,
+          },
+          opacity: 1,
+        },
+        ':hover #cl-impersonationEye': {
+          transform: 'rotate(-180deg)',
+        },
+      })}
+    >
+      <EyeCircle
+        id='cl-impersonationEye'
+        width={eyeWidth}
+        height={eyeHeight}
         sx={t => ({
-          touchAction: 'none', //for drag to work on mobile consistently
-          position: 'fixed',
-          overflow: 'hidden',
-          top: `var(${topProperty}, ${defaultTop}px)`,
-          right: `var(${rightProperty}, ${defaultRight}px)`,
-          zIndex: t.zIndices.$fab,
-          boxShadow: t.shadows.$fabShadow,
-          borderRadius: t.radii.$halfHeight, //to match the circular eye perfectly
-          backgroundColor: t.colors.$white,
-          fontFamily: t.fonts.$main,
-          ':hover': {
-            cursor: 'grab',
-          },
-          ':hover #cl-impersonationText': {
-            transition: `max-width ${t.transitionDuration.$slowest} ease, opacity ${t.transitionDuration.$slower} ease ${t.transitionDuration.$slowest}`,
-            maxWidth: `min(calc(50vw - ${eyeWidth} - 2 * ${defaultRight}px), ${titleLength}ch)`,
-            [mqu.md]: {
-              maxWidth: `min(calc(100vw - ${eyeWidth} - 2 * ${defaultRight}px), ${titleLength}ch)`,
-            },
-            opacity: 1,
-          },
-          ':hover #cl-impersonationEye': {
-            transform: 'rotate(-180deg)',
-          },
+          transition: `transform ${t.transitionDuration.$slowest} ease`,
+        })}
+      />
+
+      <Flex
+        id='cl-impersonationText'
+        sx={t => ({
+          transition: `max-width ${t.transitionDuration.$slowest} ease, opacity ${t.transitionDuration.$fast} ease`,
+          maxWidth: '0px',
+          opacity: 0,
         })}
       >
-        <EyeCircle
-          id='cl-impersonationEye'
-          width={eyeWidth}
-          height={eyeHeight}
-          sx={t => ({
-            transition: `transform ${t.transitionDuration.$slowest} ease`,
-          })}
+        <FabContent
+          title={title}
+          signOutText={localizationKeys('impersonationFab.action__signOut')}
         />
-
-        <Flex
-          id='cl-impersonationText'
-          sx={t => ({
-            transition: `max-width ${t.transitionDuration.$slowest} ease, opacity ${t.transitionDuration.$fast} ease`,
-            maxWidth: '0px',
-            opacity: 0,
-          })}
-        >
-          <FabContent
-            title={title}
-            signOutText={localizationKeys('impersonationFab.action__signOut')}
-          />
-        </Flex>
       </Flex>
-    </Portal>
+    </Flex>
   );
 };
 
-export const ImpersonationFab = withCoreUserGuard(() => (
-  <InternalThemeProvider>
-    <_ImpersonationFab />
-  </InternalThemeProvider>
-));
+export const ImpersonationFab = _ImpersonationFab;
