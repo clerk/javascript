@@ -1,6 +1,7 @@
 import type { ClerkAPIError } from './api';
+import type { ClerkResource } from './resource';
 
-export interface VerificationResource {
+export interface VerificationResource extends ClerkResource {
   attempts: number | null;
   error: ClerkAPIError | null;
   expireAt: Date | null;

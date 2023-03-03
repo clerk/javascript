@@ -1,4 +1,5 @@
 import type { OrganizationResource } from './organization';
+import type { ClerkResource } from './resource';
 import type { PublicUserData } from './session';
 
 declare global {
@@ -12,7 +13,7 @@ declare global {
   }
 }
 
-export interface OrganizationMembershipResource {
+export interface OrganizationMembershipResource extends ClerkResource {
   id: string;
   organization: OrganizationResource;
   publicMetadata: OrganizationMembershipPublicMetadata;

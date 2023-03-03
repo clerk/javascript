@@ -1,7 +1,8 @@
 import type { OAuthProvider } from './oauth';
+import type { ClerkResource } from './resource';
 import type { VerificationResource } from './verification';
 
-export interface ExternalAccountResource {
+export interface ExternalAccountResource extends ClerkResource {
   id: string;
   identificationId: string;
   provider: OAuthProvider;

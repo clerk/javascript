@@ -1,5 +1,6 @@
 import type {
   AddMemberParams,
+  ClerkResourceReloadParams,
   CreateOrganizationParams,
   GetMembershipsParams,
   GetPendingInvitationsParams,
@@ -18,8 +19,6 @@ import { unixEpochToDate } from '../../utils/date';
 import { BaseResource, OrganizationInvitation, OrganizationMembership } from './internal';
 
 export class Organization extends BaseResource implements OrganizationResource {
-  pathRoot = '/organizations';
-
   id!: string;
   name!: string;
   slug!: string;
@@ -165,5 +164,21 @@ export class Organization extends BaseResource implements OrganizationResource {
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     return this;
+  }
+
+  public async reload(params?: ClerkResourceReloadParams): Promise<this> {
+    const { rotatingTokenNonce } = params || {};
+    const json = await BaseResource._fetch(
+      {
+        method: 'GET',
+        path: `/me/organization_memberships`,
+        rotatingTokenNonce,
+      },
+      { forceUpdateClient: true },
+    );
+    const currentOrganization = (json?.response as unknown as OrganizationMembershipJSON[]).find(
+      orgMem => orgMem.organization.id === this.id,
+    );
+    return this.fromJSON(currentOrganization?.organization as OrganizationJSON);
   }
 }

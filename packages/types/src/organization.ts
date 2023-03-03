@@ -1,6 +1,7 @@
 import type { ClerkPaginationParams } from './api';
 import type { OrganizationInvitationResource } from './organizationInvitation';
 import type { MembershipRole, OrganizationMembershipResource } from './organizationMembership';
+import type { ClerkResource } from './resource';
 
 declare global {
   /**
@@ -13,7 +14,7 @@ declare global {
   }
 }
 
-export interface OrganizationResource {
+export interface OrganizationResource extends ClerkResource {
   id: string;
   name: string;
   slug: string | null;

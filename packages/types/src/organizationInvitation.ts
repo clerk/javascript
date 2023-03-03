@@ -1,4 +1,5 @@
 import type { MembershipRole } from './organizationMembership';
+import type { ClerkResource } from './resource';
 
 declare global {
   /**
@@ -11,7 +12,7 @@ declare global {
   }
 }
 
-export interface OrganizationInvitationResource {
+export interface OrganizationInvitationResource extends ClerkResource {
   id: string;
   emailAddress: string;
   organizationId: string;

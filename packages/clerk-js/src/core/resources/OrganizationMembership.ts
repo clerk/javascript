@@ -1,4 +1,5 @@
 import type {
+  ClerkResourceReloadParams,
   MembershipRole,
   OrganizationMembershipJSON,
   OrganizationMembershipResource,
@@ -70,6 +71,22 @@ export class OrganizationMembership extends BaseResource implements Organization
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     return this;
+  }
+
+  public async reload(params?: ClerkResourceReloadParams): Promise<this> {
+    const { rotatingTokenNonce } = params || {};
+    const json = await BaseResource._fetch(
+      {
+        method: 'GET',
+        path: `/me/organization_memberships`,
+        rotatingTokenNonce,
+      },
+      { forceUpdateClient: true },
+    );
+    const currentMembership = (json?.response as unknown as OrganizationMembershipJSON[]).find(
+      orgMem => orgMem.id === this.id,
+    );
+    return this.fromJSON(currentMembership as OrganizationMembershipJSON);
   }
 }
 
