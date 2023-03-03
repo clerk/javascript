@@ -205,6 +205,7 @@ export interface SignInTokenJSON extends ClerkResourceJSON {
   user_id: string;
   token: string;
   status: 'pending' | 'accepted' | 'revoked';
+  url: string;
   created_at: number;
   updated_at: number;
 }
