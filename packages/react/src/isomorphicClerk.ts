@@ -64,7 +64,7 @@ export default class IsomorphicClerk {
   private premountSignUpNodes = new Map<HTMLDivElement, SignUpProps>();
   private premountUserProfileNodes = new Map<HTMLDivElement, UserProfileProps>();
   private premountUserButtonNodes = new Map<HTMLDivElement, UserButtonProps>();
-  private premountImpersonationFABNodes = new Map<HTMLDivElement, {}>();
+  // private premountImpersonationFABNodes = new Map<HTMLDivElement, {}>();
   private premountOrganizationProfileNodes = new Map<HTMLDivElement, OrganizationProfileProps>();
   private premountCreateOrganizationNodes = new Map<HTMLDivElement, CreateOrganizationProps>();
   private premountOrganizationSwitcherNodes = new Map<HTMLDivElement, OrganizationSwitcherProps>();
@@ -185,6 +185,13 @@ export default class IsomorphicClerk {
     this.loadedListeners = [];
   };
 
+  private mountImpersonationFAB = () => {
+    // this aims to be a replacement for clerk-js/src/ui/elements/Portal.tsx
+    const newDiv = document.createElement('div');
+    document.body.appendChild(newDiv);
+    this.clerkjs?.mountImpersonationFAB?.(newDiv, {});
+  };
+
   private hydrateClerkJS = (clerkjs: BrowserClerk | HeadlessBrowserClerk | undefined) => {
     if (!clerkjs) {
       throw new Error('Failed to hydrate latest Clerk JS');
@@ -222,13 +229,15 @@ export default class IsomorphicClerk {
       clerkjs.mountUserButton(node, props);
     });
 
-    this.premountImpersonationFABNodes.forEach((_, node) => {
-      clerkjs.mountImpersonationFAB(node, {});
-    });
+    /**
+     * Probably this is not needed because only 1 FAB should be mounted, and
+     * premount will not happen as this function is in charge of mounting the FAB
+     */
+    // this.premountImpersonationFABNodes.forEach((_, node) => {
+    //   clerkjs.mountImpersonationFAB(node, {});
+    // });
 
-    const newDiv = document.createElement('div');
-    document.body.appendChild(newDiv);
-    clerkjs.mountImpersonationFAB(newDiv, {});
+    this.mountImpersonationFAB();
 
     this.#loaded = true;
     this.emitLoaded();
@@ -496,13 +505,13 @@ export default class IsomorphicClerk {
     }
   };
 
-  mountImpersonationFAB = (node: HTMLDivElement): void => {
-    if (this.clerkjs && this.#loaded) {
-      this.clerkjs.mountImpersonationFAB(node, {});
-    } else {
-      this.premountImpersonationFABNodes.set(node, {});
-    }
-  };
+  // mountImpersonationFAB = (node: HTMLDivElement): void => {
+  //   if (this.clerkjs && this.#loaded) {
+  //     this.clerkjs.mountImpersonationFAB(node, {});
+  //   } else {
+  //     this.premountImpersonationFABNodes.set(node, {});
+  //   }
+  // };
 
   addListener = (listener: (emission: Resources) => void): void => {
     const callback = () => this.clerkjs?.addListener(listener);
