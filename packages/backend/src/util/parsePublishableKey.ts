@@ -49,8 +49,8 @@ export function isPublishableKey(key: string) {
 const isomorphicAtob = (data: string) => {
   if (typeof atob !== 'undefined' && typeof atob === 'function') {
     return atob(data);
-  } else if (typeof Buffer !== 'undefined') {
-    return new Buffer(data, 'base64').toString();
+  } else if (typeof globalThis !== 'undefined' && globalThis.Buffer) {
+    return new globalThis.Buffer(data, 'base64').toString();
   }
   return data;
 };
