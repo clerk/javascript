@@ -10,7 +10,7 @@ import { Menu } from '../icons';
 import { useRouter } from '../router';
 import type { PropsOfComponent } from '../styledSystem';
 import { animations, mqu } from '../styledSystem';
-import { colors } from '../utils';
+import { colors, sleep } from '../utils';
 import { withFloatingTree } from './contexts';
 import { useNavigateToFlowStart } from './NavigateToFlowStartButton';
 import { Popover } from './Popover';
@@ -63,6 +63,8 @@ export const NavBar = (props: NavBarProps) => {
         await navigate(route.path);
       }
       const el = contentRef.current?.querySelector(getSectionId(route.id));
+      //sleep to avoid conflict with floating-ui close
+      await sleep(10);
       el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
