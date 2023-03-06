@@ -127,8 +127,7 @@ export interface OrganizationJSON extends ClerkResourceJSON {
   name: string;
   slug: string | null;
   logo_url: string | null;
-  membersCount: number;
-  pendingInvitationsCount: number;
+  members_count: number | null;
   public_metadata: Record<string, unknown> | null;
   private_metadata?: Record<string, unknown>;
   created_by: string;
