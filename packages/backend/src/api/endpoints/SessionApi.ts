@@ -14,39 +14,40 @@ type QueryParams = {
 };
 
 export class SessionAPI extends AbstractAPI {
-  public getSessionList = async (queryParams?: QueryParams) =>
-    this.request<Session[]>({
+  public async getSessionList(queryParams?: QueryParams) {
+    return this.request<Session[]>({
       method: 'GET',
       path: basePath,
       queryParams: queryParams,
     });
+  }
 
-  public getSession = async (sessionId: string) => {
+  public async getSession(sessionId: string) {
     this.requireId(sessionId);
     return this.request<Session>({
       method: 'GET',
       path: joinPaths(basePath, sessionId),
     });
-  };
+  }
 
-  public revokeSession = async (sessionId: string) => {
+  public async revokeSession(sessionId: string) {
     this.requireId(sessionId);
     return this.request<Session>({
       method: 'POST',
       path: joinPaths(basePath, sessionId, 'revoke'),
     });
-  };
+  }
 
-  public verifySession = async (sessionId: string, token: string) => {
+  public async verifySession(sessionId: string, token: string) {
     this.requireId(sessionId);
     return this.request<Session>({
       method: 'POST',
       path: joinPaths(basePath, sessionId, 'verify'),
       bodyParams: { token },
     });
-  };
+  }
 
-  public getToken = async (sessionId: string, template: string) => {
+  public async getToken(sessionId: string, template: string) {
     this.requireId(sessionId);
     return (
       (await this.request<Token>({
@@ -54,5 +55,5 @@ export class SessionAPI extends AbstractAPI {
         path: joinPaths(basePath, sessionId, 'tokens', template || ''),
       })) as any
     ).jwt;
-  };
+  }
 }
