@@ -129,6 +129,7 @@ export interface OrganizationJSON extends ClerkResourceJSON {
   logo_url: string | null;
   public_metadata: Record<string, unknown> | null;
   private_metadata?: Record<string, unknown>;
+  created_by: string;
   created_at: number;
   updated_at: number;
 }
