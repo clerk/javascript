@@ -19,7 +19,7 @@ declare global {
   }
 }
 
-export type IsomorphicClerkOptions = ClerkOptions & {
+export type IsomorphicClerkOptions = Omit<ClerkOptions, 'isSatellite'> & {
   Clerk?: ClerkProp;
   clerkJSUrl?: string;
   clerkJSVariant?: 'headless' | '';
