@@ -1,10 +1,10 @@
-import type { ClientJSON, EnvironmentJSON, LoadedClerk } from '@clerk/types';
+import type { ClerkOptions, ClientJSON, EnvironmentJSON, LoadedClerk } from '@clerk/types';
 import { jest } from '@jest/globals';
 import React from 'react';
 
 import { default as ClerkCtor } from '../../../core/clerk';
 import { Client, Environment } from '../../../core/resources';
-import { ComponentContext, EnvironmentProvider } from '../../contexts';
+import { ComponentContext, EnvironmentProvider, OptionsProvider } from '../../contexts';
 import { CoreClerkContextWrapper } from '../../contexts/CoreClerkContextWrapper';
 import { AppearanceProvider } from '../../customizables';
 import { FlowMetadataProvider } from '../../elements';
@@ -26,11 +26,11 @@ const createInitialStateConfigParam = (baseEnvironment: EnvironmentJSON, baseCli
 type FParam = ReturnType<typeof createInitialStateConfigParam>;
 type ConfigFn = (f: FParam) => void;
 
-export const bindCreateFixtures = (componentName: Parameters<typeof unbindCreateFixtures>[0]) => {
-  return { createFixtures: unbindCreateFixtures(componentName) };
+export const bindCreateFixtures = (componentName: Parameters<typeof unboundCreateFixtures>[0]) => {
+  return { createFixtures: unboundCreateFixtures(componentName) };
 };
 
-const unbindCreateFixtures = <N extends UnpackContext<typeof ComponentContext>['componentName']>(componentName: N) => {
+const unboundCreateFixtures = <N extends UnpackContext<typeof ComponentContext>['componentName']>(componentName: N) => {
   const createFixtures = async (...configFns: ConfigFn[]) => {
     const baseEnvironment = createBaseEnvironmentJSON();
     const baseClient = createBaseClientJSON();
@@ -53,7 +53,7 @@ const unbindCreateFixtures = <N extends UnpackContext<typeof ComponentContext>['
     const tempClerk = new ClerkCtor(frontendApi);
     await tempClerk.load();
     const clerkMock = mockClerkMethods(tempClerk as LoadedClerk);
-
+    const optionsMock = {} as ClerkOptions;
     const routerMock = mockRouteContextValue();
 
     const fixtures = {
@@ -62,6 +62,7 @@ const unbindCreateFixtures = <N extends UnpackContext<typeof ComponentContext>['
       signUp: clerkMock.client.signUp,
       environment: environmentMock,
       router: routerMock,
+      options: optionsMock,
     };
 
     let componentContextProps: Partial<UnpackContext<typeof ComponentContext> & { componentName: N }>;
@@ -73,20 +74,23 @@ const unbindCreateFixtures = <N extends UnpackContext<typeof ComponentContext>['
 
     const MockClerkProvider = (props: any) => {
       const { children } = props;
+      console.log(optionsMock);
       return (
         <CoreClerkContextWrapper clerk={clerkMock}>
           <EnvironmentProvider value={environmentMock}>
-            <RouteContext.Provider value={routerMock}>
-              <AppearanceProvider appearanceKey={'signIn'}>
-                <FlowMetadataProvider flow={componentName as any}>
-                  <InternalThemeProvider>
-                    <ComponentContext.Provider value={{ ...componentContextProps, componentName }}>
-                      {children}
-                    </ComponentContext.Provider>
-                  </InternalThemeProvider>
-                </FlowMetadataProvider>
-              </AppearanceProvider>
-            </RouteContext.Provider>
+            <OptionsProvider value={optionsMock}>
+              <RouteContext.Provider value={routerMock}>
+                <AppearanceProvider appearanceKey={'signIn'}>
+                  <FlowMetadataProvider flow={componentName as any}>
+                    <InternalThemeProvider>
+                      <ComponentContext.Provider value={{ ...componentContextProps, componentName }}>
+                        {children}
+                      </ComponentContext.Provider>
+                    </InternalThemeProvider>
+                  </FlowMetadataProvider>
+                </AppearanceProvider>
+              </RouteContext.Provider>
+            </OptionsProvider>
           </EnvironmentProvider>
         </CoreClerkContextWrapper>
       );
