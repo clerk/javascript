@@ -1,6 +1,6 @@
-import type { DeepRequired, LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/types';
 
-export const frFR: DeepRequired<LocalizationResource> = {
+export const frFR: LocalizationResource = {
   socialButtonsBlockButton: 'Continuer avec {{provider|titleize}}',
   dividerText: 'ou',
   formFieldLabel__emailAddress: 'Adresse e-mail',
@@ -543,6 +543,7 @@ export const frFR: DeepRequired<LocalizationResource> = {
     form_code_incorrect: 'Code incorrect',
     form_password_incorrect: 'Mot de passe incorrect',
     not_allowed_access: '',
+    form_identifier_exists: '',
   },
   dates: {
     previous6Days: "{{ date | weekday('fr-FR','long') }} dernier à {{ date | timeString('fr-FR') }}",

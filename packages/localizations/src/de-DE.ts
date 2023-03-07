@@ -1,6 +1,6 @@
-import type { DeepRequired, LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/types';
 
-export const deDe: DeepRequired<LocalizationResource> = {
+export const deDe: LocalizationResource = {
   socialButtonsBlockButton: 'Weiter mit {{provider|titleize}}',
   dividerText: 'oder',
   formFieldLabel__emailAddress: 'E-Mail-Adresse',
@@ -278,8 +278,7 @@ export const deDe: DeepRequired<LocalizationResource> = {
           destructiveActionLabel: 'Telefonnummer entfernen',
           title__default: 'Standard',
           title__setDefault: 'Als Standard festlegen',
-          subtitle__default:
-            'Dieser Methode wird bei der Anmeldung als zweiter Faktor verwendet.',
+          subtitle__default: 'Dieser Methode wird bei der Anmeldung als zweiter Faktor verwendet.',
           subtitle__setDefault:
             'Legen Sie diese Methode als Standardmethode fest, um sie als standardmäßigen zweiten Faktor bei der Anmeldung zu verwenden.',
           actionLabel__setDefault: 'Als Standard einstellen',
@@ -294,8 +293,7 @@ export const deDe: DeepRequired<LocalizationResource> = {
         totp: {
           headerTitle: 'Authentifizierungs-App',
           title: 'Standardfaktor',
-          subtitle:
-            'Dieser Faktor wird bei der Anmeldung als standardmäßiger zweiter Faktor verwendet.',
+          subtitle: 'Dieser Faktor wird bei der Anmeldung als standardmäßiger zweiter Faktor verwendet.',
           destructiveActionTitle: 'Entfernen',
           destructiveActionSubtitle:
             'Entfernen Sie die Authentifizierungs-App aus den zweistufigen Überprüfungsmethoden',
@@ -423,7 +421,8 @@ export const deDe: DeepRequired<LocalizationResource> = {
       removeResource: {
         title: 'Entfernen Sie die Bestätigung in zwei Schritten',
         messageLine1: 'Bei der Anmeldung sind keine Bestätigungscodes von diesem Authentifikator mehr erforderlich.',
-        messageLine2: 'Ihr Konto ist möglicherweise nicht mehr so sicher. Sind Sie sich sicher, dass Sie fortfahren wollen?',
+        messageLine2:
+          'Ihr Konto ist möglicherweise nicht mehr so sicher. Sind Sie sich sicher, dass Sie fortfahren wollen?',
         successMessage: 'Die zweistufige Verifizierung über die Authentifizierungs-App wurde entfernt.',
       },
     },
@@ -544,6 +543,7 @@ export const deDe: DeepRequired<LocalizationResource> = {
     form_code_incorrect: '',
     form_password_incorrect: '',
     not_allowed_access: '',
+    form_identifier_exists: '',
   },
   dates: {
     previous6Days: "Letzte {{ date | weekday('de-DE','long') }} um {{ date | timeString('de-DE') }}",

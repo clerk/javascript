@@ -1,4 +1,4 @@
-import type { DeepRequired, LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/types';
 
 const commonTexts = {
   signIn: {
@@ -12,7 +12,7 @@ const commonTexts = {
   },
 } as const;
 
-export const ptBR: DeepRequired<LocalizationResource> = {
+export const ptBR: LocalizationResource = {
   socialButtonsBlockButton: 'Continuar com {{provider|titleize}}',
   dividerText: 'ou',
   formFieldLabel__emailAddress: 'Seu e-mail',

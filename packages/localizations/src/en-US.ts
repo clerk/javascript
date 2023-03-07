@@ -1,4 +1,4 @@
-import type { DeepRequired, LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/types';
 
 const commonTexts = {
   signIn: {
@@ -12,7 +12,7 @@ const commonTexts = {
   },
 } as const;
 
-export const enUS: DeepRequired<LocalizationResource> = {
+export const enUS: LocalizationResource = {
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
   dividerText: 'or',
   formFieldLabel__emailAddress: 'Email address',
@@ -535,6 +535,7 @@ export const enUS: DeepRequired<LocalizationResource> = {
     form_code_incorrect: '',
     form_password_incorrect: '',
     not_allowed_access: '',
+    form_identifier_exists: '',
   },
   dates: {
     previous6Days: "Last {{ date | weekday('en-US','long') }} at {{ date | timeString('en-US') }}",
