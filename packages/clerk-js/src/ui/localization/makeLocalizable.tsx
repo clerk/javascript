@@ -71,11 +71,19 @@ export const useLocalizations = () => {
     if (!error || typeof error === 'string') {
       return t(error);
     }
-    const { code, message, longMessage } = error || {};
+    const { code, message, longMessage, meta } = error || {};
+    const { paramName = '' } = meta || {};
+
     if (!code) {
       return '';
     }
-    return t(localizationKeys(`unstable__errors.${code}` as any)) || longMessage || message;
+
+    return (
+      t(localizationKeys(`unstable__errors.${code}__${paramName}` as any)) ||
+      t(localizationKeys(`unstable__errors.${code}` as any)) ||
+      longMessage ||
+      message
+    );
   };
 
   return { t, translateError };

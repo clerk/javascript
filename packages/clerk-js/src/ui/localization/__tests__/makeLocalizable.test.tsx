@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { bindCreateFixtures, render, renderHook, screen } from '../../../testUtils';
 import {
   Badge,
@@ -90,5 +88,50 @@ describe('Test localizable components', () => {
     });
 
     screen.getByText('11/12/1999'); // this key makes use of numeric('en-US')
+  });
+
+  it('translates errors using the values provided in unstable_errors', async () => {
+    const { wrapper, fixtures } = await createFixtures();
+    fixtures.options.localization = {
+      unstable__errors: {
+        form_identifier_not_found: 'form_identifier_not_found',
+        form_password_pwned: 'form_password_pwned',
+        form_username_invalid_length: 'form_username_invalid_length',
+        form_param_format_invalid: 'form_param_format_invalid',
+        form_password_length_too_short: 'form_password_length_too_short',
+        form_param_nil: 'form_param_nil',
+        form_code_incorrect: 'form_code_incorrect',
+        form_password_incorrect: 'form_password_incorrect',
+        not_allowed_access: 'not_allowed_access',
+        form_identifier_exists: 'form_identifier_exists',
+        form_identifier_exists__username: 'form_identifier_exists__username',
+        form_identifier_exists__email_address: 'form_identifier_exists__email_address',
+      },
+    };
+    const { result } = renderHook(() => useLocalizations(), { wrapper });
+    const { translateError } = result.current;
+    expect(translateError({ code: 'code-does-not-exist', message: 'message' })).toBe('message');
+    expect(translateError({ code: 'form_identifier_not_found', message: 'message' } as any)).toBe(
+      'form_identifier_not_found',
+    );
+    expect(translateError({ code: 'form_password_pwned', message: 'message' })).toBe('form_password_pwned');
+    expect(translateError({ code: 'form_username_invalid_length', message: 'message' })).toBe(
+      'form_username_invalid_length',
+    );
+    expect(translateError({ code: 'form_param_format_invalid', message: 'message' })).toBe('form_param_format_invalid');
+    expect(translateError({ code: 'form_password_length_too_short', message: 'message' })).toBe(
+      'form_password_length_too_short',
+    );
+    expect(translateError({ code: 'form_param_nil', message: 'message' })).toBe('form_param_nil');
+    expect(translateError({ code: 'form_code_incorrect', message: 'message' })).toBe('form_code_incorrect');
+    expect(translateError({ code: 'form_password_incorrect', message: 'message' })).toBe('form_password_incorrect');
+    expect(translateError({ code: 'not_allowed_access', message: 'message' })).toBe('not_allowed_access');
+    expect(translateError({ code: 'form_identifier_exists', message: 'message' })).toBe('form_identifier_exists');
+    expect(
+      translateError({ code: 'form_identifier_exists', message: 'message', meta: { paramName: 'username' } }),
+    ).toBe('form_identifier_exists__username');
+    expect(
+      translateError({ code: 'form_identifier_exists', message: 'message', meta: { paramName: 'email_address' } }),
+    ).toBe('form_identifier_exists__email_address');
   });
 });

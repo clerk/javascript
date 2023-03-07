@@ -74,7 +74,6 @@ const unboundCreateFixtures = <N extends UnpackContext<typeof ComponentContext>[
 
     const MockClerkProvider = (props: any) => {
       const { children } = props;
-      console.log(optionsMock);
       return (
         <CoreClerkContextWrapper clerk={clerkMock}>
           <EnvironmentProvider value={environmentMock}>
