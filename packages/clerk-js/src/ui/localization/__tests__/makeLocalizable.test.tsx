@@ -8,9 +8,7 @@ import {
   Link,
   localizationKeys,
   SimpleButton,
-  Td,
   Text,
-  Th,
   useLocalizations,
 } from '../../customizables';
 
@@ -24,8 +22,6 @@ const localizableElements = [
   { name: 'Heading', el: Heading },
   { name: 'Link', el: Link },
   { name: 'SimpleButton', el: SimpleButton },
-  { name: 'Td', el: Td },
-  { name: 'Th', el: Th },
   { name: 'Text', el: Text },
 ];
 
