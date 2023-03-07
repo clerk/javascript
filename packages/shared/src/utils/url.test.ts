@@ -34,7 +34,7 @@ describe('stripScheme(url)', () => {
 describe('addClerkPrefix(str)', () => {
   const undefinedCase = [[undefined, '']];
 
-  it.each(undefinedCase)('attempts to the prefix clerk. to %p', (urlInput, urlOutput) => {
+  it.each(undefinedCase)('attempts to add the prefix clerk. to %p', (urlInput, urlOutput) => {
     expect(addClerkPrefix(urlInput)).toBe(urlOutput);
   });
 
@@ -43,16 +43,19 @@ describe('addClerkPrefix(str)', () => {
     ['example.com', 'clerk.example.com'],
     ['clerk.example.com', 'clerk.example.com'],
     ['clerk.clerk.example.com', 'clerk.example.com'],
+    ['clerk.abc', 'clerk.clerk.abc'],
     ['clerk.com', 'clerk.clerk.com'],
     ['clerk.dev', 'clerk.clerk.dev'],
     ['clerk.clerk.com', 'clerk.clerk.com'],
+    ['clerk.clerk.clerk.com', 'clerk.clerk.com'],
     ['clerk.clerk.dev', 'clerk.clerk.dev'],
+    ['clerk.clerk.clerk.dev', 'clerk.clerk.dev'],
     ['satellite.dev', 'clerk.satellite.dev'],
     ['clerk.satellite.dev', 'clerk.satellite.dev'],
     ['quick-marten-1.clerk.accounts.lclclerk.com', 'quick-marten-1.clerk.accounts.lclclerk.com'],
     ['noble-fox-4.clerk.accounts.dev', 'noble-fox-4.clerk.accounts.dev'],
   ];
-  it.each(cases)('attempts to the prefix clerk. to %p', (urlInput, urlOutput) => {
+  it.each(cases)('attempts to add the prefix clerk. to %p', (urlInput, urlOutput) => {
     expect(addClerkPrefix(urlInput)).toBe(urlOutput);
   });
 });
