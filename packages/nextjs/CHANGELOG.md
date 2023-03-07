@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.11.5](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.11.4...@clerk/nextjs@4.11.5) (2023-03-07)
+
+### Bug Fixes
+
+- **nextjs:** Stop exporting the /api helpers based on the runtime ([224426a](https://github.com/clerkinc/javascript/commit/224426aca9fe5fda33e728445d590204a7e99fc9))
+
 ### [4.11.4](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.11.4-staging.1...@clerk/nextjs@4.11.4) (2023-03-07)
 
 **Note:** Version bump only for package @clerk/nextjs
