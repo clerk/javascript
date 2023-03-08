@@ -5,6 +5,7 @@ folders:
   - path: /packages/clerk-js
     exclude:
       - ./**/*.test.ts
+      - ./**/test/fixtureHelpers.ts
   - path: /packages/eslint-config-custom
   - path: /packages/expo
   - path: /packages/fastify
