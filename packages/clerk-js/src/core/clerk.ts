@@ -543,7 +543,11 @@ export default class Clerk implements ClerkInterface {
     return unsubscribe;
   };
 
-  public navigate: CustomNavigation = async to => {
+  public navigate = async (to: string | undefined) => {
+    if (!to) {
+      return;
+    }
+
     const toURL = new URL(to, window.location.href);
     const customNavigate = this.#options.navigate;
 

@@ -464,7 +464,7 @@ export type ClerkThemeOptions = DeepSnakeToCamel<DeepPartial<DisplayThemeJSON>>;
 export interface ClerkOptions {
   appearance?: Appearance;
   localization?: LocalizationResource;
-  navigate?: CustomNavigation;
+  navigate?: (to: string) => Promise<unknown> | unknown;
   debug?: boolean;
   polling?: boolean;
   selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;
