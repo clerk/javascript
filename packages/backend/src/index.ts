@@ -2,7 +2,6 @@ import type { CreateBackendApiOptions } from './api';
 import { createBackendApiClient } from './api';
 import type { CreateAuthenticateRequestOptions } from './tokens';
 import { createAuthenticateRequest } from './tokens';
-import { assertValidSecretKey } from './util/assertValidSecretKey';
 
 export * from './api/resources';
 export * from './tokens';
@@ -20,7 +19,6 @@ export type ClerkOptions = CreateBackendApiOptions &
 
 export function Clerk(options: ClerkOptions) {
   const opts = { ...options };
-  assertValidSecretKey(opts.secretKey || opts.apiKey);
   const apiClient = createBackendApiClient(opts);
   const requestState = createAuthenticateRequest({ options: opts, apiClient });
 

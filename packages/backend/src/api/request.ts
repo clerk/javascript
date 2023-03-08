@@ -72,7 +72,6 @@ export function buildRequest(options: CreateBackendApiOptions) {
       httpOptions = {},
     } = options;
     const { path, method, queryParams, headerParams, bodyParams } = requestOptions;
-
     const key = secretKey || apiKey;
 
     assertValidSecretKey(key);

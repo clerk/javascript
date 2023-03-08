@@ -1,4 +1,5 @@
 import { API_URL, API_VERSION } from '../constants';
+import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { parsePublishableKey } from '../util/parsePublishableKey';
 import type { RequestState } from './authStatus';
 import { AuthErrorReason, interstitial, signedOut, unknownState } from './authStatus';
@@ -82,6 +83,8 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
     options.domain || parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
   options.apiUrl = options.apiUrl || API_URL;
   options.apiVersion = options.apiVersion || API_VERSION;
+
+  assertValidSecretKey(options.secretKey || options.apiKey);
 
   async function authenticateRequestWithTokenInHeader() {
     try {
