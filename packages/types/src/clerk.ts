@@ -581,10 +581,6 @@ export type UserProfileProps = {
    * Root URL where the component is mounted on, eg: '/user'
    */
   path?: string;
-  /*
-   * Renders only a specific view of the component eg: 'security'
-   */
-  only?: 'account' | 'security';
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
