@@ -126,8 +126,8 @@ export default class Clerk implements ClerkInterface {
   public readonly frontendApi: string;
   public readonly publishableKey?: string;
   public readonly proxyUrl?: ClerkInterface['proxyUrl'];
-  public readonly domain?: ClerkInterface['domain'];
 
+  #domain?: ClerkInterface['domain'];
   #authService: SessionCookieService | null = null;
   #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
   #componentControls?: ReturnType<MountComponentRenderer> | null;
@@ -157,6 +157,13 @@ export default class Clerk implements ClerkInterface {
     return this.#options.isSatellite || false;
   }
 
+  get domain(): string {
+    if (typeof this.#domain === 'function') {
+      return this.#domain(new URL(window.location.href));
+    }
+    return stripScheme(addClerkPrefix(this.#domain || ''));
+  }
+
   public constructor(key: string, options?: DomainOrProxyUrl) {
     key = (key || '').trim();
 
@@ -167,7 +174,7 @@ export default class Clerk implements ClerkInterface {
     }
     this.proxyUrl = proxyUrlToAbsoluteURL(_unfilteredProxy);
 
-    this.domain = stripScheme(addClerkPrefix(options?.domain));
+    this.#domain = options?.domain;
 
     if (isLegacyFrontendApiKey(key)) {
       if (!validateFrontendApi(key)) {

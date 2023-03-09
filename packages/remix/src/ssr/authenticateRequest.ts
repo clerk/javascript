@@ -5,7 +5,7 @@ import { isHttpOrHttps } from '@clerk/shared';
 import { noRelativeProxyInSSR, noSecretKeyOrApiKeyError } from '../errors';
 import { getEnvVariable } from '../utils';
 import type { LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
-import { handleIsSatelliteBooleanOrFn, parseCookies } from './utils';
+import { handleDomainStringOrFn, handleIsSatelliteBooleanOrFn, parseCookies } from './utils';
 
 /**
  * @internal
@@ -35,7 +35,11 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
 
   const apiUrl = getEnvVariable('CLERK_API_URL') || (context?.CLERK_API_URL as string);
 
-  const domain = getEnvVariable('CLERK_DOMAIN') || (context?.CLERK_DOMAIN as string) || opts.domain || '';
+  const domain =
+    getEnvVariable('CLERK_DOMAIN') ||
+    (context?.CLERK_DOMAIN as string) ||
+    handleDomainStringOrFn(opts.domain, new URL(request.url)) ||
+    '';
 
   const isSatellite =
     getEnvVariable('CLERK_IS_SATELLITE') === 'true' ||
