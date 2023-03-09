@@ -5,8 +5,8 @@ import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/organizations';
 
-type MetadataParams = {
-  publicMetadata?: Record<string, unknown>;
+type MetadataParams<TPublic = OrganizationPublicMetadata> = {
+  publicMetadata?: TPublic;
   privateMetadata?: Record<string, unknown>;
 };
 
@@ -47,7 +47,7 @@ type UpdateOrganizationMembershipParams = CreateOrganizationMembershipParams;
 type UpdateOrganizationMembershipMetadataParams = {
   organizationId: string;
   userId: string;
-} & MetadataParams;
+} & MetadataParams<OrganizationMembershipPublicMetadata>;
 
 type DeleteOrganizationMembershipParams = {
   organizationId: string;
@@ -60,7 +60,7 @@ type CreateOrganizationInvitationParams = {
   emailAddress: string;
   role: OrganizationMembershipRole;
   redirectUrl?: string;
-  publicMetadata?: Record<string, unknown>;
+  publicMetadata?: OrganizationInvitationPublicMetadata;
 };
 
 type GetPendingOrganizationInvitationListParams = {

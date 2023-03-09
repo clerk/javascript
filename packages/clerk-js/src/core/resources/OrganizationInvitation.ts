@@ -14,7 +14,7 @@ export class OrganizationInvitation extends BaseResource implements Organization
   id!: string;
   emailAddress!: string;
   organizationId!: string;
-  publicMetadata: Record<string, unknown> = {};
+  publicMetadata: OrganizationInvitationPublicMetadata = {};
   status!: OrganizationInvitationStatus;
   role!: MembershipRole;
   createdAt!: Date;

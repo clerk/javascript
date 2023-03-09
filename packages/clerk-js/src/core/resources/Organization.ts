@@ -23,7 +23,7 @@ export class Organization extends BaseResource implements OrganizationResource {
   name!: string;
   slug!: string;
   logoUrl!: string;
-  publicMetadata: Record<string, unknown> = {};
+  publicMetadata: OrganizationPublicMetadata = {};
   createdAt!: Date;
   updatedAt!: Date;
   membersCount = 0;
