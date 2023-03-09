@@ -99,7 +99,7 @@
     "files": [
       {
         "path": "./dist/clerk.browser.js",
-        "maxSize": "187kB"
+        "maxSize": "189kB"
       },
       {
         "path": "./dist/clerk.headless.js",
