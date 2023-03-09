@@ -3,6 +3,7 @@ import React from 'react';
 import { useEnvironment } from '../contexts';
 import { descriptors, Flex, Image, useAppearance } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
+import { RouterLink } from './RouterLink';
 
 type WidthInRem = `${string}rem`;
 const getContainerHeightForImageRatio = (imageRef: React.RefObject<HTMLImageElement>, remWidth: WidthInRem) => {
@@ -28,7 +29,7 @@ type ApplicationLogoProps = PropsOfComponent<typeof Flex>;
 export const ApplicationLogo = (props: ApplicationLogoProps) => {
   const imageRef = React.useRef<HTMLImageElement>(null);
   const [loaded, setLoaded] = React.useState(false);
-  const { logoUrl, applicationName } = useEnvironment().displayConfig;
+  const { logoUrl, applicationName, homeUrl } = useEnvironment().displayConfig;
   const { parsedLayout } = useAppearance();
   // TODO: Should we throw an error if logoImageUrl is not a valid url?
   const imageSrc = parsedLayout.logoImageUrl || logoUrl;
@@ -36,6 +37,21 @@ export const ApplicationLogo = (props: ApplicationLogoProps) => {
   if (!imageSrc) {
     return null;
   }
+
+  const image = (
+    <Image
+      ref={imageRef}
+      elementDescriptor={descriptors.logoImage}
+      alt={applicationName}
+      src={imageSrc}
+      size={200}
+      onLoad={() => setLoaded(true)}
+      sx={{
+        display: loaded ? 'inline-block' : 'none',
+        height: '100%',
+      }}
+    />
+  );
 
   return (
     <Flex
@@ -49,18 +65,7 @@ export const ApplicationLogo = (props: ApplicationLogoProps) => {
         props.sx,
       ]}
     >
-      <Image
-        ref={imageRef}
-        elementDescriptor={descriptors.logoImage}
-        alt={applicationName}
-        src={imageSrc}
-        size={200}
-        onLoad={() => setLoaded(true)}
-        sx={{
-          display: loaded ? 'inline-block' : 'none',
-          height: '100%',
-        }}
-      />
+      {homeUrl ? <RouterLink to={homeUrl}>{image}</RouterLink> : image}
     </Flex>
   );
 };
