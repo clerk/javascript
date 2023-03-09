@@ -151,6 +151,14 @@ export const handleIsSatelliteBooleanOrFn = (opts: WithAuthOptions, url: URL): b
   return opts.isSatellite || false;
 };
 
+// TODO: Make this a generic and move to @clerk/shared
+export const handleDomainStringOrFn = (opts: WithAuthOptions, url: URL): string => {
+  if (typeof opts.domain === 'function') {
+    return opts.domain(url);
+  }
+  return opts.domain || '';
+};
+
 // TODO: use @clerk/shared once it is tree-shakeable
 export function isHttpOrHttps(key: string | undefined) {
   return /^http(s)?:\/\//.test(key || '');

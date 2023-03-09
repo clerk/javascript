@@ -21,6 +21,7 @@ import type {
   UserProfileProps,
   UserResource,
 } from '@clerk/types';
+import type { Clerk as ClerkInterface } from '@clerk/types';
 import type { OrganizationProfileProps, OrganizationSwitcherProps } from '@clerk/types/src';
 
 import type {
@@ -52,7 +53,6 @@ export default class IsomorphicClerk {
   private readonly frontendApi?: string;
   private readonly publishableKey?: string;
   private readonly proxyUrl?: Clerk['proxyUrl'];
-  private readonly domain?: Clerk['domain'];
   private readonly options: IsomorphicClerkOptions;
   private readonly Clerk: ClerkProp;
   private clerkjs: BrowserClerk | HeadlessBrowserClerk | null = null;
@@ -71,6 +71,7 @@ export default class IsomorphicClerk {
   private loadedListeners: Array<() => void> = [];
 
   #loaded = false;
+  #domain?: ClerkInterface['domain'];
 
   get loaded(): boolean {
     return this.#loaded;
@@ -88,12 +89,19 @@ export default class IsomorphicClerk {
     return this.#instance;
   }
 
+  get domain(): string {
+    if (typeof this.#domain === 'function') {
+      return this.#domain(new URL(window.location.href));
+    }
+    return this.#domain || '';
+  }
+
   constructor(options: IsomorphicClerkOptions) {
     const { Clerk = null, frontendApi, publishableKey } = options || {};
     this.frontendApi = frontendApi;
     this.publishableKey = publishableKey;
     this.proxyUrl = options?.proxyUrl;
-    this.domain = options?.domain;
+    this.#domain = options?.domain;
     this.options = options;
     this.Clerk = Clerk;
     this.mode = inClientSide() ? 'browser' : 'server';

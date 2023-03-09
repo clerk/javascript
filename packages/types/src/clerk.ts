@@ -73,7 +73,7 @@ export interface Clerk {
    * @experimental
    * Clerk Satellite Frontend API string.
    */
-  domain?: string;
+  domain?: string | ((url: URL) => string);
 
   instanceType?: InstanceType;
 

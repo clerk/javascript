@@ -1,5 +1,5 @@
 import type { AuthObject, Organization, Session, User } from '@clerk/backend';
-import type { ClerkOptions, DomainOrProxyUrl } from '@clerk/types';
+import type { DomainOrProxyUrl } from '@clerk/types';
 import type { DataFunctionArgs, LoaderFunction } from '@remix-run/server-runtime';
 
 export type GetAuthReturn = Promise<AuthObject>;
@@ -20,8 +20,7 @@ export type RootAuthLoaderOptions = {
   loadSession?: boolean;
   loadOrganization?: boolean;
   authorizedParties?: [];
-} & Partial<DomainOrProxyUrl> &
-  Pick<ClerkOptions, 'isSatellite'>;
+} & DomainOrProxyUrl;
 
 export type RootAuthLoaderCallback<Options extends RootAuthLoaderOptions> = (
   args: LoaderFunctionArgsWithAuth<Options>,
