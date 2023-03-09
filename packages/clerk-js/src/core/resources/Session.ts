@@ -119,19 +119,21 @@ export class Session extends BaseResource implements SessionResource {
     });
   };
 
-  protected fromJSON(data: SessionJSON): this {
-    this.id = data.id;
-    this.status = data.status;
-    this.expireAt = unixEpochToDate(data.expire_at);
-    this.abandonAt = unixEpochToDate(data.abandon_at);
-    this.lastActiveAt = unixEpochToDate(data.last_active_at);
-    this.lastActiveOrganizationId = data.last_active_organization_id;
-    this.actor = data.actor;
-    this.createdAt = unixEpochToDate(data.created_at);
-    this.updatedAt = unixEpochToDate(data.updated_at);
-    this.user = new User(data.user);
-    this.publicUserData = deepSnakeToCamel(data.public_user_data) as PublicUserData;
-    this.lastActiveToken = data.last_active_token ? new Token(data.last_active_token) : null;
+  protected fromJSON(data: SessionJSON | null): this {
+    if (data) {
+      this.id = data.id;
+      this.status = data.status;
+      this.expireAt = unixEpochToDate(data.expire_at);
+      this.abandonAt = unixEpochToDate(data.abandon_at);
+      this.lastActiveAt = unixEpochToDate(data.last_active_at);
+      this.lastActiveOrganizationId = data.last_active_organization_id;
+      this.actor = data.actor;
+      this.createdAt = unixEpochToDate(data.created_at);
+      this.updatedAt = unixEpochToDate(data.updated_at);
+      this.user = new User(data.user);
+      this.publicUserData = deepSnakeToCamel(data.public_user_data) as PublicUserData;
+      this.lastActiveToken = data.last_active_token ? new Token(data.last_active_token) : null;
+    }
     return this;
   }
 

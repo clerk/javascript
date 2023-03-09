@@ -155,16 +155,18 @@ export class Organization extends BaseResource implements OrganizationResource {
     }).then(res => new Organization(res?.response as OrganizationJSON));
   };
 
-  protected fromJSON(data: OrganizationJSON): this {
-    this.id = data.id;
-    this.name = data.name;
-    this.slug = data.slug;
-    this.logoUrl = data.logo_url;
-    this.publicMetadata = data.public_metadata;
-    this.membersCount = data.members_count;
-    this.pendingInvitationsCount = data.pending_invitations_count;
-    this.createdAt = unixEpochToDate(data.created_at);
-    this.updatedAt = unixEpochToDate(data.updated_at);
+  protected fromJSON(data: OrganizationJSON | null): this {
+    if (data) {
+      this.id = data.id;
+      this.name = data.name;
+      this.slug = data.slug;
+      this.logoUrl = data.logo_url;
+      this.publicMetadata = data.public_metadata;
+      this.membersCount = data.members_count;
+      this.pendingInvitationsCount = data.pending_invitations_count;
+      this.createdAt = unixEpochToDate(data.created_at);
+      this.updatedAt = unixEpochToDate(data.updated_at);
+    }
     return this;
   }
 

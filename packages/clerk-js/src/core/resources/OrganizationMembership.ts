@@ -54,22 +54,24 @@ export class OrganizationMembership extends BaseResource implements Organization
     return updatedMembership;
   };
 
-  protected fromJSON(data: OrganizationMembershipJSON): this {
-    this.id = data.id;
-    this.organization = new Organization(data.organization);
-    this.publicMetadata = data.public_metadata;
-    if (data.public_user_data) {
-      this.publicUserData = {
-        firstName: data.public_user_data.first_name,
-        lastName: data.public_user_data.last_name,
-        profileImageUrl: data.public_user_data.profile_image_url,
-        identifier: data.public_user_data.identifier,
-        userId: data.public_user_data.user_id,
-      };
+  protected fromJSON(data: OrganizationMembershipJSON | null): this {
+    if (data) {
+      this.id = data.id;
+      this.organization = new Organization(data.organization);
+      this.publicMetadata = data.public_metadata;
+      if (data.public_user_data) {
+        this.publicUserData = {
+          firstName: data.public_user_data.first_name,
+          lastName: data.public_user_data.last_name,
+          profileImageUrl: data.public_user_data.profile_image_url,
+          identifier: data.public_user_data.identifier,
+          userId: data.public_user_data.user_id,
+        };
+      }
+      this.role = data.role;
+      this.createdAt = unixEpochToDate(data.created_at);
+      this.updatedAt = unixEpochToDate(data.updated_at);
     }
-    this.role = data.role;
-    this.createdAt = unixEpochToDate(data.created_at);
-    this.updatedAt = unixEpochToDate(data.updated_at);
     return this;
   }
 

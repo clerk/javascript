@@ -19,15 +19,16 @@ export class TOTP extends BaseResource implements TOTPResource {
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: TOTPJSON): this {
-    this.id = data.id;
-    this.secret = data.secret;
-    this.uri = data.uri;
-    this.verified = data.verified;
-    this.backupCodes = data.backup_codes;
-    this.updatedAt = unixEpochToDate(data.updated_at);
-    this.createdAt = unixEpochToDate(data.created_at);
-
+  protected fromJSON(data: TOTPJSON | null): this {
+    if (data) {
+      this.id = data.id;
+      this.secret = data.secret;
+      this.uri = data.uri;
+      this.verified = data.verified;
+      this.backupCodes = data.backup_codes;
+      this.updatedAt = unixEpochToDate(data.updated_at);
+      this.createdAt = unixEpochToDate(data.created_at);
+    }
     return this;
   }
 }

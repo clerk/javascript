@@ -1,6 +1,4 @@
-import type { ClerkResource } from './resource';
-
-export interface DeletedObjectResource extends ClerkResource {
+export interface DeletedObjectResource {
   object: string;
   id?: string;
   slug?: string;

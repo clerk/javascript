@@ -16,11 +16,13 @@ export class BackupCode extends BaseResource implements BackupCodeResource {
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: BackupCodeJSON): this {
-    this.id = data.id;
-    this.codes = data.codes;
-    this.updatedAt = unixEpochToDate(data.updated_at);
-    this.createdAt = unixEpochToDate(data.created_at);
+  protected fromJSON(data: BackupCodeJSON | null): this {
+    if (data) {
+      this.id = data.id;
+      this.codes = data.codes;
+      this.updatedAt = unixEpochToDate(data.updated_at);
+      this.createdAt = unixEpochToDate(data.created_at);
+    }
 
     return this;
   }

@@ -1,4 +1,4 @@
-import { camelToSnake } from '@clerk/shared';
+import { camelToSnake, runWithExponentialBackOff } from '@clerk/shared';
 import type { Clerk, ClerkAPIErrorJSON, ClientJSON } from '@clerk/types';
 import qs from 'qs';
 
@@ -185,16 +185,26 @@ export default function createFapiClient(clerkInstance: Omit<Clerk, 'proxyUrl'>)
     const overwrittenRequestMethod = method === 'GET' ? 'GET' : 'POST';
     let response: Response;
     const urlStr = requestInit.url.toString();
+    const fetchOpts: FapiRequestInit = {
+      ...requestInit,
+      credentials: 'include',
+      method: overwrittenRequestMethod,
+    };
 
     try {
-      response = beforeRequestCallbacksResult
-        ? await fetch(urlStr, {
-            ...requestInit,
-            credentials: 'include',
-            method: overwrittenRequestMethod,
-          })
-        : // Mock an empty json response
-          new Response('{}', requestInit);
+      if (beforeRequestCallbacksResult) {
+        response =
+          // retry only on GET requests for safety
+          overwrittenRequestMethod === 'GET'
+            ? await runWithExponentialBackOff(() => fetch(urlStr, fetchOpts), {
+                maxRetries: 6,
+                firstDelay: 500,
+                maxDelay: 5000,
+              })
+            : await fetch(urlStr, fetchOpts);
+      } else {
+        response = new Response('{}', requestInit); // Mock an empty json response
+      }
     } catch (e) {
       clerkNetworkError(urlStr, e);
     }

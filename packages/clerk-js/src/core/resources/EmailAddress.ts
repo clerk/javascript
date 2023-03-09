@@ -81,11 +81,13 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
 
   toString = (): string => this.emailAddress;
 
-  protected fromJSON(data: EmailAddressJSON): this {
-    this.id = data.id;
-    this.emailAddress = data.email_address;
-    this.verification = new Verification(data.verification);
-    this.linkedTo = (data.linked_to || []).map(link => new IdentificationLink(link));
+  protected fromJSON(data: EmailAddressJSON | null): this {
+    if (data) {
+      this.id = data.id;
+      this.emailAddress = data.email_address;
+      this.verification = new Verification(data.verification);
+      this.linkedTo = (data.linked_to || []).map(link => new IdentificationLink(link));
+    }
     return this;
   }
 }

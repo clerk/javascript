@@ -1,4 +1,4 @@
-import { runWithExponentialBackOff } from '@clerk/shared';
+import { isValidBrowserOnline } from '@clerk/shared';
 import type { ClerkAPIErrorJSON, ClerkResourceJSON, ClerkResourceReloadParams, DeletedObjectJSON } from '@clerk/types';
 
 import { clerkMissingFapiClientInResources } from '../errors';
@@ -34,15 +34,17 @@ export abstract class BaseResource {
 
     let fapiResponse: FapiResponse<J>;
 
-    // retry only on GET requests for safety
-    if (requestInit.method === 'GET') {
-      fapiResponse = await runWithExponentialBackOff(() => BaseResource.fapiClient.request<J>(requestInit), {
-        maxRetries: 4,
-        firstDelay: 500,
-      });
-    } else {
+    try {
       fapiResponse = await BaseResource.fapiClient.request<J>(requestInit);
+    } catch (e) {
+      if (!isValidBrowserOnline()) {
+        console.warn(e);
+        return null;
+      } else {
+        throw e;
+      }
     }
+
     const { payload, status, statusText } = fapiResponse;
 
     // TODO: Link to Client payload piggybacking design document
