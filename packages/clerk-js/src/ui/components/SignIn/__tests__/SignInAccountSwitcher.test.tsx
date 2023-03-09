@@ -1,22 +1,21 @@
 import { describe, it } from '@jest/globals';
-import React from 'react';
 
 import { bindCreateFixtures, render } from '../../../../testUtils';
 import { SignInAccountSwitcher } from '../SignInAccountSwitcher';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
 
+const initConfig = createFixtures.config(f => {
+  f.withMultiSessionMode();
+  f.withUser({ first_name: 'Nick', last_name: 'Kouk', email_addresses: ['test1@clerk.dev'] });
+  f.withUser({ first_name: 'Mike', last_name: 'Lamar', email_addresses: ['test2@clerk.dev'] });
+  f.withUser({ first_name: 'Graciela', last_name: 'Brennan', email_addresses: ['test3@clerk.dev'] });
+});
+
 describe('SignInAccountSwitcher', () => {
   it('renders the component', async () => {
     const { wrapper } = await createFixtures();
     render(<SignInAccountSwitcher />, { wrapper });
-  });
-
-  const initConfig = createFixtures.config(f => {
-    f.withMultiSessionMode();
-    f.withUser({ first_name: 'Nick', last_name: 'Kouk', email_addresses: ['test1@clerk.dev'] });
-    f.withUser({ first_name: 'Mike', last_name: 'Lamar', email_addresses: ['test2@clerk.dev'] });
-    f.withUser({ first_name: 'Graciela', last_name: 'Brennan', email_addresses: ['test3@clerk.dev'] });
   });
 
   it('renders a list of buttons with all signed in accounts', async () => {
