@@ -11,7 +11,7 @@ import { BaseResource, Organization } from './internal';
 
 export class OrganizationMembership extends BaseResource implements OrganizationMembershipResource {
   id!: string;
-  publicMetadata: Record<string, unknown> = {};
+  publicMetadata: OrganizationMembershipPublicMetadata = {};
   publicUserData!: PublicUserData;
   organization!: Organization;
   role!: MembershipRole;
