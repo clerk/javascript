@@ -1,4 +1,4 @@
-import type { ExternalAccountResource, OAuthStrategy } from '@clerk/types';
+import type { ExternalAccountResource, OAuthProvider, OAuthStrategy } from '@clerk/types';
 import React from 'react';
 
 import { appendModalState } from '../../../utils';
@@ -47,7 +47,7 @@ const AddConnectedAccount = () => {
   const user = useCoreUser();
   const { navigate } = useNavigate();
   const { strategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
-  const { componentName, mode } = useUserProfileContext();
+  const { additionalOAuthScopes, componentName, mode } = useUserProfileContext();
   const isModal = mode === 'modal';
 
   const enabledStrategies = strategies.filter(s => s.startsWith('oauth')) as OAuthStrategy[];
@@ -58,19 +58,20 @@ const AddConnectedAccount = () => {
   });
 
   const connect = (strategy: OAuthStrategy) => {
+    const socialProvider = strategy.replace('oauth_', '') as OAuthProvider;
+    const redirectUrl = isModal
+      ? appendModalState({ url: window.location.href, componentName, socialProvider: socialProvider })
+      : window.location.href;
+    const additionalScopes = additionalOAuthScopes ? additionalOAuthScopes[socialProvider] : [];
+
     // TODO: Decide if we should keep using this strategy
     // If yes, refactor and cleanup:
     card.setLoading(strategy);
     user
       .createExternalAccount({
         strategy: strategy,
-        redirect_url: isModal
-          ? appendModalState({
-              url: window.location.href,
-              componentName,
-              socialProvider: strategy.replace('oauth_', ''),
-            })
-          : window.location.href,
+        redirectUrl,
+        additionalScopes,
       })
       .then(res => {
         if (res.verification?.externalVerificationRedirectURL) {
