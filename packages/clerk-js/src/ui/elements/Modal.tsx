@@ -1,14 +1,16 @@
-import { useSafeLayoutEffect } from '@clerk/shared';
+import { createContextAndHook, useSafeLayoutEffect } from '@clerk/shared';
 import React from 'react';
 
-import { descriptors, Flex, Icon } from '../customizables';
+import { descriptors, Flex } from '../customizables';
 import { usePopover, useScrollLock } from '../hooks';
-import { Close } from '../icons';
 import type { ThemableCssProp } from '../styledSystem';
 import { animations, mqu } from '../styledSystem';
 import { withFloatingTree } from './contexts';
-import { IconButton } from './IconButton';
 import { Popover } from './Popover';
+
+export const [ModalContext, useModalContext, useUnsafeModalContext] = createContextAndHook<{ toggle: () => void }>(
+  'ModalContext',
+);
 
 type ModalProps = React.PropsWithChildren<{
   handleOpen?: () => void;
@@ -38,6 +40,8 @@ export const Modal = withFloatingTree((props: ModalProps) => {
     return () => enableScroll();
   });
 
+  const modalCtx = React.useMemo(() => ({ value: { toggle } }), [toggle]);
+
   return (
     <Popover
       nodeId={nodeId}
@@ -45,72 +49,51 @@ export const Modal = withFloatingTree((props: ModalProps) => {
       isOpen={isOpen}
       order={['floating', 'content']}
     >
-      <Flex
-        aria-hidden
-        elementDescriptor={descriptors.modalBackdrop}
-        sx={[
-          t => ({
-            animation: `${animations.fadeIn} 150ms ${t.transitionTiming.$common}`,
-            zIndex: t.zIndices.$modal,
-            backgroundColor: t.colors.$modalBackdrop,
-            // ...common.centeredFlex(),
-            alignItems: 'flex-start',
-            justifyContent: 'center',
-            overflow: 'auto',
-            width: '100vw',
-            height: ['100vh', '-webkit-fill-available'],
-            position: 'fixed',
-            left: 0,
-            top: 0,
-          }),
-          containerSx,
-        ]}
-      >
+      <ModalContext.Provider value={modalCtx}>
         <Flex
-          elementDescriptor={descriptors.modalContent}
-          ref={floating}
-          tabIndex={0}
-          aria-modal='true'
-          role='dialog'
+          aria-hidden
+          elementDescriptor={descriptors.modalBackdrop}
           sx={[
             t => ({
-              position: 'relative',
-              outline: 0,
-              animation: `${animations.modalSlideAndFade} 180ms ${t.transitionTiming.$easeOut}`,
-              margin: `${t.space.$16} 0`,
-              [mqu.sm]: {
-                margin: `${t.space.$10} 0`,
-              },
+              animation: `${animations.fadeIn} 150ms ${t.transitionTiming.$common}`,
+              zIndex: t.zIndices.$modal,
+              backgroundColor: t.colors.$modalBackdrop,
+              // ...common.centeredFlex(),
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+              overflow: 'auto',
+              width: '100vw',
+              height: ['100vh', '-webkit-fill-available'],
+              position: 'fixed',
+              left: 0,
+              top: 0,
             }),
-            contentSx,
+            containerSx,
           ]}
         >
-          {props.children}
-          <IconButton
-            elementDescriptor={descriptors.modalCloseButton}
-            variant='ghost'
-            colorScheme='neutral'
-            aria-label='Close modal'
-            onClick={toggle}
-            icon={
-              <Icon
-                icon={Close}
-                size='sm'
-              />
-            }
-            sx={t => ({
-              opacity: t.opacity.$inactive,
-              ':hover': {
-                opacity: 0.8,
-              },
-              position: 'absolute',
-              top: t.space.$3,
-              padding: t.space.$3,
-              right: t.space.$3,
-            })}
-          />
+          <Flex
+            elementDescriptor={descriptors.modalContent}
+            ref={floating}
+            tabIndex={0}
+            aria-modal='true'
+            role='dialog'
+            sx={[
+              t => ({
+                position: 'relative',
+                outline: 0,
+                animation: `${animations.modalSlideAndFade} 180ms ${t.transitionTiming.$easeOut}`,
+                margin: `${t.space.$16} 0`,
+                [mqu.sm]: {
+                  margin: `${t.space.$10} 0`,
+                },
+              }),
+              contentSx,
+            ]}
+          >
+            {props.children}
+          </Flex>
         </Flex>
-      </Flex>
+      </ModalContext.Provider>
     </Popover>
   );
 });
