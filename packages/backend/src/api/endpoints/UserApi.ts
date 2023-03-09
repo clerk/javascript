@@ -23,7 +23,7 @@ type UserListParams = UserCountParams & {
 };
 
 type UserMetadataParams = {
-  publicMetadata?: Record<string, unknown>;
+  publicMetadata?: UserPublicMetadata;
   privateMetadata?: Record<string, unknown>;
   unsafeMetadata?: Record<string, unknown>;
 };
@@ -82,7 +82,7 @@ type GetOrganizationMembershipListParams = {
 type VerifyPasswordParams = {
   userId: string;
   password: string;
-}
+};
 
 type VerifyTOTPParams = {
   userId: string;
@@ -181,13 +181,13 @@ export class UserAPI extends AbstractAPI {
     const { userId, password } = params;
     this.requireId(userId);
 
-    return this.request<{verified: true}>({
+    return this.request<{ verified: true }>({
       method: 'POST',
       path: joinPaths(basePath, userId, 'verify_password'),
       bodyParams: { password },
     });
   }
-  
+
   public async verifyTOTP(params: VerifyTOTPParams) {
     const { userId, code } = params;
     this.requireId(userId);
