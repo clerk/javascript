@@ -60,6 +60,7 @@ type CreateOrganizationInvitationParams = {
   emailAddress: string;
   role: OrganizationMembershipRole;
   redirectUrl?: string;
+  publicMetadata?: Record<string, unknown>;
 };
 
 type GetPendingOrganizationInvitationListParams = {
