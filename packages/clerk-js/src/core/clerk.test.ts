@@ -281,14 +281,8 @@ describe('Clerk singleton', () => {
       user: {},
       getToken: jest.fn(),
     };
-    let cookieSpy;
-
-    beforeEach(() => {
-      cookieSpy = jest.spyOn(AuthenticationService.prototype, 'setAuthCookiesFromToken');
-    });
 
     afterEach(() => {
-      cookieSpy?.mockRestore();
       // cleanup global window pollution
       (window as any).__unstable__onBeforeSetActive = null;
       (window as any).__unstable__onAfterSetActive = null;
@@ -326,8 +320,7 @@ describe('Clerk singleton', () => {
       } as TokenResource;
       eventBus.dispatch(events.TokenUpdate, { token });
 
-      expect(cookieSpy).toBeCalledTimes(1);
-      expect(cookieSpy).toBeCalledWith(mockJwt);
+      expect(document.cookie).toContain(mockJwt);
     });
   });
 

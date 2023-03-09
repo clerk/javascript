@@ -4,6 +4,7 @@ import type { Clerk, EnvironmentResource, SessionResource, TokenResource } from 
 import type { CookieHandler } from '../../../utils';
 import { createCookieHandler, inBrowser } from '../../../utils';
 import { clerkCoreErrorTokenRefreshFailed } from '../../errors';
+import { eventBus, events } from '../../events';
 import { isClerkAPIResponseError } from '../../resources';
 import { AuthenticationPoller } from './AuthenticationPoller';
 
@@ -28,15 +29,15 @@ export class AuthenticationService {
     this.clearLegacyAuthV1Cookies();
     this.startPollingForToken();
     this.refreshTokenOnVisibilityChange();
+
+    // set cookie on token update
+    eventBus.on(events.TokenUpdate, ({ token }) => {
+      this.updateSessionCookie(token?.getRawString());
+    });
   }
 
   public async setAuthCookiesFromSession(session: SessionResource | undefined | null): Promise<void> {
     this.updateSessionCookie(await session?.getToken());
-    this.setClientUatCookieForDevelopmentInstances();
-  }
-
-  public setAuthCookiesFromToken(token: string | undefined): void {
-    this.updateSessionCookie(token);
     this.setClientUatCookieForDevelopmentInstances();
   }
 
