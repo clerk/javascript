@@ -44,6 +44,7 @@ describe('addClerkPrefix(str)', () => {
     ['clerk.example.com', 'clerk.example.com'],
     ['clerk.clerk.example.com', 'clerk.example.com'],
     ['clerk.dev', 'clerk.clerk.dev'],
+    ['clerk.com', 'clerk.clerk.com'],
     ['clerk.clerk.dev', 'clerk.clerk.dev'],
     ['satellite.dev', 'clerk.satellite.dev'],
     ['clerk.satellite.dev', 'clerk.satellite.dev'],
