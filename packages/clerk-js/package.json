@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "4.31.0-staging.2",
+  "version": "4.31.0-staging.3",
   "license": "MIT",
   "description": "Clerk.dev JS library",
   "keywords": [
