@@ -69,13 +69,7 @@ export interface UserResource extends ClerkResource {
   isPrimaryIdentification: (ident: EmailAddressResource | PhoneNumberResource | Web3WalletResource) => boolean;
   getSessions: () => Promise<SessionWithActivitiesResource[]>;
   setProfileImage: (params: SetProfileImageParams) => Promise<ImageResource>;
-  createExternalAccount: ({
-    strategy,
-    redirect_url,
-  }: {
-    strategy: OAuthStrategy;
-    redirect_url?: string;
-  }) => Promise<ExternalAccountResource>;
+  createExternalAccount: (params: CreateExternalAccountParams) => Promise<ExternalAccountResource>;
   createTOTP: () => Promise<TOTPResource>;
   verifyTOTP: (params: VerifyTOTPParams) => Promise<TOTPResource>;
   disableTOTP: () => Promise<DeletedObjectResource>;
@@ -90,6 +84,15 @@ export type CreateEmailAddressParams = { email: string };
 export type CreatePhoneNumberParams = { phoneNumber: string };
 export type CreateWeb3WalletParams = { web3Wallet: string };
 export type SetProfileImageParams = { file: Blob | File | null };
+export type CreateExternalAccountParams = {
+  strategy: OAuthStrategy;
+  redirectUrl?: string;
+  additionalScopes?: string[];
+  /**
+   * @deprecated Use `redirectUrl` instead.
+   */
+  redirect_url?: string;
+};
 export type VerifyTOTPParams = { code: string };
 
 type UpdateUserJSON = Pick<

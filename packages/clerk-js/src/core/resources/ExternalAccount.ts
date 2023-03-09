@@ -33,7 +33,7 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
   }
 
   reauthorize = (params: ReauthorizeExternalAccountParams): Promise<ExternalAccountResource> => {
-    const { additionalScopes, redirectUrl } = params;
+    const { additionalScopes, redirectUrl } = params || {};
 
     return this._basePatch({
       action: 'reauthorize',

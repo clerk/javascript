@@ -23,7 +23,11 @@ describe('User', () => {
       external_accounts: [],
     } as unknown as UserJSON);
 
-    await user.createExternalAccount({ strategy: 'oauth_dropbox', redirect_url: 'https://www.example.com' });
+    await user.createExternalAccount({
+      strategy: 'oauth_dropbox',
+      redirectUrl: 'https://www.example.com',
+      additionalScopes: ['view'],
+    });
 
     // @ts-ignore
     expect(BaseResource._fetch).toHaveBeenCalledWith({
@@ -32,6 +36,7 @@ describe('User', () => {
       body: {
         redirect_url: 'https://www.example.com',
         strategy: 'oauth_dropbox',
+        additional_scope: ['view'],
       },
     });
   });
