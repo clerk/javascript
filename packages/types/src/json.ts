@@ -52,11 +52,16 @@ export interface ImageJSON {
   public_url: string;
 }
 
+export interface ResponseHeaderOptionsJSON {
+  country: string;
+}
+
 export interface EnvironmentJSON extends ClerkResourceJSON {
   auth_config: AuthConfigJSON;
   display_config: DisplayConfigJSON;
   user_settings: UserSettingsJSON;
   organization_settings: OrganizationSettingsJSON;
+  response_headers: ResponseHeaderOptionsJSON;
 }
 
 export interface ClientJSON extends ClerkResourceJSON {

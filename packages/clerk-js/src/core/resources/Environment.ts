@@ -18,6 +18,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
   displayConfig!: DisplayConfigResource;
   userSettings!: UserSettingsResource;
   organizationSettings!: OrganizationSettingsResource;
+  responseHeaders: { country: string };
 
   public static getInstance(): Environment {
     if (!Environment.instance) {
@@ -58,6 +59,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
   protected fromJSON(data: EnvironmentJSON | null): this {
     if (data) {
       this.authConfig = new AuthConfig(data.auth_config);
+      this.responseHeaders = data.response_headers;
       this.displayConfig = new DisplayConfig(data.display_config);
       this.userSettings = new UserSettings(data.user_settings);
       this.organizationSettings = new OrganizationSettings(data.organization_settings);

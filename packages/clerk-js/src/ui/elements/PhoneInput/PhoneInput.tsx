@@ -20,14 +20,15 @@ const createSelectOption = (country: CountryEntry) => {
 
 const countryOptions = [...IsoToCountryMap.values()].map(createSelectOption);
 
-type PhoneInputProps = PropsOfComponent<typeof Input>;
+type PhoneInputProps = PropsOfComponent<typeof Input> & { defaultSelectedIso?: CountryIso };
 
 export const PhoneInput = (props: PhoneInputProps) => {
-  const { onChange: onChangeProp, value, ...rest } = props;
+  const { onChange: onChangeProp, value, defaultSelectedIso = 'us', ...rest } = props;
   const phoneInputRef = React.useRef<HTMLInputElement>(null);
   const { setPhoneNumber, cleanPhoneNumber, formattedPhoneNumber, selectedIso, setSelectedIso } =
     useFormattedPhoneNumber({
       defaultPhone: value as string,
+      defaultSelectedIso: defaultSelectedIso.toLowerCase() as CountryIso,
     });
 
   const callOnChangeProp = () => {
