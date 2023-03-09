@@ -26,10 +26,12 @@ export function addClerkPrefix(str: string | undefined) {
     return '';
   }
   let regex;
-  if (str?.match(/(clerk\.)+dev$/)) {
+  if (str.match(/^(clerk\.)+\w*$/)) {
     regex = /(clerk\.)*(?=clerk\.)/;
+  } else if (str.match(/\.clerk.accounts/)) {
+    return str;
   } else {
-    regex = /clerk\./gi;
+    regex = /^(clerk\.)*/gi;
   }
 
   const stripped = str.replace(regex, '');
