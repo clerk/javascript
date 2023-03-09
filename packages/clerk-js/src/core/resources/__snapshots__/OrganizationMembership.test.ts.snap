@@ -17,7 +17,7 @@ OrganizationMembership {
     "logoUrl": "https://path-to-logo.png",
     "membersCount": 1,
     "name": "test_name",
-    "pathRoot": "",
+    "pathRoot": "/organizations",
     "pendingInvitationsCount": 10,
     "publicMetadata": {
       "public": "metadata",
