@@ -53,7 +53,8 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
   const { additionalOAuthScopes, componentName, mode } = useUserProfileContext();
   const isModal = mode === 'modal';
   const visitedProvider = account.provider === router.urlStateParam?.socialProvider;
-  const [reauthorizationRequired, additionalScopes] = isReauthorizationRequired(account, additionalOAuthScopes);
+  const additionalScopes = findAdditionalScopes(account, additionalOAuthScopes);
+  const reauthorizationRequired = additionalScopes.length > 0 && account.approvedScopes != '';
   const title = !reauthorizationRequired
     ? localizationKeys('userProfile.start.connectedAccountsSection.title__conectionFailed')
     : localizationKeys('userProfile.start.connectedAccountsSection.title__reauthorize');
@@ -74,7 +75,8 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
       } else {
         response = await user.createExternalAccount({
           strategy: account.verification!.strategy as OAuthStrategy,
-          redirect_url: redirectUrl,
+          redirectUrl,
+          additionalScopes,
         });
       }
 
@@ -147,21 +149,17 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
   );
 };
 
-function isReauthorizationRequired(
-  account: ExternalAccountResource,
-  scopes?: Record<OAuthProvider, string[]>,
-): [boolean, string[]] {
-  if (!account.approvedScopes || !scopes) {
-    // OAuth flow has not been completed yet OR no additional scopes have been injected, return early
-    return [false, []];
+function findAdditionalScopes(account: ExternalAccountResource, scopes?: Record<OAuthProvider, string[]>): string[] {
+  if (!scopes) {
+    return [];
   }
 
   const additionalScopes = scopes[account.provider] || [];
   const currentScopes = account.approvedScopes.split(' ');
   const missingScopes = additionalScopes.filter(scope => !currentScopes.includes(scope));
   if (missingScopes.length === 0) {
-    return [false, []];
+    return [];
   }
 
-  return [true, additionalScopes];
+  return additionalScopes;
 }
