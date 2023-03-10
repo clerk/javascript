@@ -18,6 +18,7 @@ export const createBaseEnvironmentJSON = (): EnvironmentJSON => {
     display_config: createBaseDisplayConfig(),
     organization_settings: createBaseOrganizationSettings(),
     user_settings: createBaseUserSettings(),
+    meta: { responseHeaders: { country: 'us' } },
   };
 };
 
