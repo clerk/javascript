@@ -15,6 +15,7 @@ import { PoweredByClerkTag } from './PoweredByClerk';
 type CardProps = PropsOfComponent<typeof BaseCard> & React.PropsWithChildren<Record<never, never>>;
 
 export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => {
+  const { sx, children, ...rest } = props;
   const appearance = useAppearance();
   const flowMetadata = useFlowMetadata();
   const { branded } = useEnvironment().displayConfig;
@@ -35,7 +36,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => 
         elementDescriptor={descriptors.card}
         className={generateFlowPartClassname(flowMetadata)}
         gap={8}
-        {...props}
+        {...rest}
         sx={[
           t => ({
             width: t.sizes.$100,
@@ -49,12 +50,12 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => 
               padding: `${t.space.$8} ${t.space.$5} ${t.space.$10} ${t.space.$5}`,
             },
           }),
-          props.sx,
+          sx,
         ]}
         ref={ref}
       >
         {appearance.parsedLayout.logoPlacement === 'inside' && <ApplicationLogo />}
-        {props.children}
+        {children}
         {branded && <PoweredByClerkTag />}
       </BaseCard>
     </>
@@ -92,7 +93,7 @@ export const ProfileCard = React.forwardRef<HTMLDivElement, CardProps>((props, r
 type BaseCardProps = PropsOfComponent<typeof Flex>;
 
 export const BaseCard = React.forwardRef<HTMLDivElement, BaseCardProps>((props, ref) => {
-  const { children, ...rest } = props;
+  const { children, sx, ...rest } = props;
   const flowMetadata = useFlowMetadata();
   const { toggle } = useUnsafeModalContext();
 
@@ -112,7 +113,7 @@ export const BaseCard = React.forwardRef<HTMLDivElement, BaseCardProps>((props, 
           boxShadow: t.shadows.$cardDropShadow,
           border: '1px solid transparent',
         }),
-        rest.sx,
+        sx,
       ]}
       ref={ref}
     >
