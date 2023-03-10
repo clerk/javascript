@@ -55,7 +55,7 @@ export interface ImageJSON {
 // move CountryIso types from clerkjs to this repo. Hence the any type in country
 // packages/clerk-js/src/ui/elements/PhoneInput/countryCodeData.ts
 export interface ResponseHeaderOptionsJSON {
-  responseHeaders: { country: any };
+  responseHeaders: { country: string | null };
 }
 
 export interface EnvironmentJSON extends ClerkResourceJSON {

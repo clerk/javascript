@@ -1,7 +1,6 @@
 import type { FieldId } from '@clerk/types';
 import React from 'react';
 
-import type { CountryIso } from '../../ui/elements/PhoneInput/countryCodeData';
 import type { LocalizationKey } from '../customizables';
 import {
   descriptors,
@@ -30,7 +29,6 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
   label: string | LocalizationKey;
   placeholder?: string | LocalizationKey;
   actionLabel?: string | LocalizationKey;
-  defaultSelectedIso?: CountryIso;
 };
 
 // TODO: Convert this into a Component?

@@ -2,7 +2,6 @@ import { camelToSnake } from '@clerk/shared';
 import type { Clerk, ClerkAPIErrorJSON, ClientJSON } from '@clerk/types';
 import qs from 'qs';
 
-import type { CountryIso } from '../ui/elements/PhoneInput/countryCodeData';
 import { buildEmailAddress as buildEmailAddressUtil, buildURL as buildUrlUtil } from '../utils';
 import { clerkNetworkError } from './errors';
 
@@ -44,7 +43,7 @@ export interface FapiResponseJSON<T> {
   meta?: {
     client?: ClientJSON;
     session_id?: string;
-    responseHeaders?: { country: CountryIso } | unknown;
+    responseHeaders?: { country: string | null };
   };
 }
 
