@@ -111,7 +111,9 @@ export abstract class BaseResource {
       },
       opts,
     );
-    return this.fromJSON((json?.response || json) as J);
+
+    const data = json?.response ? { ...json.response, ...json.meta } : json;
+    return this.fromJSON(data as J);
   }
 
   protected async _baseMutate<J extends ClerkResourceJSON | null>({

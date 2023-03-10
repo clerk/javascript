@@ -1,6 +1,5 @@
 import type { AuthConfigResource } from './authConfig';
 import type { DisplayConfigResource } from './displayConfig';
-import type { ResponseHeaderOptionsJSON } from './json';
 import type { OrganizationSettingsResource } from './organizationSettings';
 import type { ClerkResource } from './resource';
 import type { UserSettingsResource } from './userSettings';
@@ -14,5 +13,5 @@ export interface EnvironmentResource extends ClerkResource {
   isProduction: () => boolean;
   isDevelopmentOrStaging: () => boolean;
   onWindowLocationHost: () => boolean;
-  responseHeaders: ResponseHeaderOptionsJSON;
+  country: any;
 }

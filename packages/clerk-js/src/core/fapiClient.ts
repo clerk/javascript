@@ -2,6 +2,7 @@ import { camelToSnake } from '@clerk/shared';
 import type { Clerk, ClerkAPIErrorJSON, ClientJSON } from '@clerk/types';
 import qs from 'qs';
 
+import type { CountryIso } from '../ui/elements/PhoneInput/countryCodeData';
 import { buildEmailAddress as buildEmailAddressUtil, buildURL as buildUrlUtil } from '../utils';
 import { clerkNetworkError } from './errors';
 
@@ -43,6 +44,7 @@ export interface FapiResponseJSON<T> {
   meta?: {
     client?: ClientJSON;
     session_id?: string;
+    responseHeaders?: { country: CountryIso } | unknown;
   };
 }
 
@@ -204,7 +206,7 @@ export default function createFapiClient(clerkInstance: Omit<Clerk, 'proxyUrl'>)
 
     const json: FapiResponseJSON<T> = await response.json();
     const fapiResponse: FapiResponse<T> = Object.assign(response, {
-      payload: { ...json, response_headers: responseHeaders },
+      payload: { ...json, meta: { ...json?.meta, responseHeaders } },
     });
     await runAfterResponseCallbacks(requestInit, fapiResponse);
     return fapiResponse;

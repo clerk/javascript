@@ -53,7 +53,7 @@ export const AddPhone = (props: AddPhoneProps) => {
   const { title, onSuccess, resourceRef } = props;
   const card = useCardState();
   const user = useCoreUser();
-  const { responseHeaders } = useEnvironment();
+  const { country } = useEnvironment();
 
   const phoneField = useFormControl('phoneNumber', '', {
     type: 'tel',
@@ -83,7 +83,7 @@ export const AddPhone = (props: AddPhoneProps) => {
         <Form.ControlRow elementId={phoneField.id}>
           <Form.Control
             {...phoneField.props}
-            defaultSelectedIso={responseHeaders?.country}
+            defaultSelectedIso={country}
             required
             autoFocus
           />
