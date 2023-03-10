@@ -5,6 +5,8 @@ import { NextResponse } from 'next/server';
 
 import type { RequestLike, WithAuthOptions } from './types';
 
+type AuthKey = 'AuthStatus' | 'AuthMessage' | 'AuthReason';
+
 export function setCustomAttributeOnRequest(req: RequestLike, key: string, value: string): void {
   Object.assign(req, { [key]: value });
 }
@@ -12,6 +14,14 @@ export function setCustomAttributeOnRequest(req: RequestLike, key: string, value
 export function getCustomAttributeFromRequest(req: RequestLike, key: string): string | null | undefined {
   // @ts-expect-error
   return key in req ? req[key] : undefined;
+}
+
+export function getAuthKeyFromRequest(req: RequestLike, key: AuthKey): string | null | undefined {
+  return (
+    getCustomAttributeFromRequest(req, constants.Attributes[key]) ||
+    getHeader(req, constants.Headers[key]) ||
+    (key === 'AuthStatus' ? getQueryParam(req, constants.SearchParams.AuthStatus) : undefined)
+  );
 }
 
 // Tries to extract auth status from the request using several strategies

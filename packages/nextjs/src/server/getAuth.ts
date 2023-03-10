@@ -12,9 +12,9 @@ import {
 import { API_KEY, API_URL, API_VERSION, SECRET_KEY } from './clerk';
 import type { RequestLike } from './types';
 import {
+  getAuthKeyFromRequest,
   getAuthStatusFromRequest,
   getCookie,
-  getCustomAttributeFromRequest,
   getHeader,
   injectSSRStateIntoObject,
 } from './utils';
@@ -23,11 +23,9 @@ export const getAuth = (req: RequestLike): SignedInAuthObject | SignedOutAuthObj
   // When the auth status is set, we trust that the middleware has already run
   // Then, we don't have to re-verify the JWT here,
   // we can just strip out the claims manually.
-  const authStatus = getAuthStatusFromRequest(req);
-  // Better observability when getAuth is called within the middleware, where we can access
-  // the message and the reason easily
-  const authMessage = getCustomAttributeFromRequest(req, constants.Attributes.AuthMessage);
-  const authReason = getCustomAttributeFromRequest(req, constants.Attributes.AuthReason);
+  const authStatus = getAuthKeyFromRequest(req, 'AuthStatus');
+  const authMessage = getAuthKeyFromRequest(req, 'AuthMessage');
+  const authReason = getAuthKeyFromRequest(req, 'AuthReason');
 
   if (!authStatus) {
     throw new Error(
