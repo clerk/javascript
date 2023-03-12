@@ -2,7 +2,7 @@ import type { PhoneNumberResource } from '@clerk/types';
 import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
-import { useCoreUser, useEnvironment } from '../../contexts';
+import { useCoreUser } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { localizationKeys, Text } from '../../customizables';
 import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
@@ -53,7 +53,6 @@ export const AddPhone = (props: AddPhoneProps) => {
   const { title, onSuccess, resourceRef } = props;
   const card = useCardState();
   const user = useCoreUser();
-  const { country } = useEnvironment();
 
   const phoneField = useFormControl('phoneNumber', '', {
     type: 'tel',
@@ -83,7 +82,6 @@ export const AddPhone = (props: AddPhoneProps) => {
         <Form.ControlRow elementId={phoneField.id}>
           <Form.Control
             {...phoneField.props}
-            defaultSelectedIso={country}
             required
             autoFocus
           />

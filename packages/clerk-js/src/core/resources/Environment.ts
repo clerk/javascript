@@ -19,7 +19,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
   displayConfig!: DisplayConfigResource;
   userSettings!: UserSettingsResource;
   organizationSettings!: OrganizationSettingsResource;
-  country!: CountryIso;
+  country!: CountryIso | null;
 
   public static getInstance(): Environment {
     if (!Environment.instance) {
@@ -60,7 +60,8 @@ export class Environment extends BaseResource implements EnvironmentResource {
   protected fromJSON(data: EnvironmentJSON | null): this {
     if (data) {
       this.authConfig = new AuthConfig(data.auth_config);
-      this.country = data.meta.responseHeaders.country;
+      const country = data.meta?.responseHeaders?.country;
+      this.country = (country ? country.toLowerCase() : null) as CountryIso | null;
       this.displayConfig = new DisplayConfig(data.display_config);
       this.userSettings = new UserSettings(data.user_settings);
       this.organizationSettings = new OrganizationSettings(data.organization_settings);

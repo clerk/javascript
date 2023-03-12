@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { useEnvironment } from '../../../ui/contexts';
 import { useAppearance } from '../../customizables';
 import { Form } from '../../elements';
 import type { FormControlState } from '../../utils';
@@ -17,7 +16,6 @@ type SignUpFormProps = {
 export const SignUpForm = (props: SignUpFormProps) => {
   const { handleSubmit, fields, formState, canToggleEmailPhone, handleEmailPhoneToggle } = props;
   const { showOptionalFields } = useAppearance().parsedLayout;
-  const { country } = useEnvironment();
 
   const shouldShow = (name: keyof typeof fields) => {
     // In case both email & phone are optional, then don't take into account the
@@ -85,7 +83,6 @@ export const SignUpForm = (props: SignUpFormProps) => {
               isRequired: fields.phoneNumber!.required,
               isOptional: !fields.phoneNumber!.required,
             }}
-            defaultSelectedIso={country}
             actionLabel={canToggleEmailPhone ? 'Use email instead' : undefined}
             onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('emailAddress') : undefined}
           />
