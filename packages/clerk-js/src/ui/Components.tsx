@@ -21,6 +21,7 @@ import { LazyComponentRenderer, LazyModalRenderer, LazyProviders } from './lazyM
 import type { ClerkComponentName } from './lazyModules/components';
 import {
   CreateOrganizationModal,
+  ImpersonationFab,
   OrganizationProfileModal,
   SignInModal,
   SignUpModal,
@@ -49,6 +50,8 @@ export type ComponentControls = {
     props: T extends 'signIn' ? SignInProps : T extends 'signUp' ? SignUpProps : UserProfileProps,
   ) => void;
   closeModal: (modal: 'signIn' | 'signUp' | 'userProfile' | 'organizationProfile' | 'createOrganization') => void;
+  // Special case, as the impersonation fab mounts automatically
+  mountImpersonationFab: () => void;
 };
 
 interface HtmlNodeOptions {
@@ -74,6 +77,7 @@ interface ComponentsState {
   organizationProfileModal: null | OrganizationProfileProps;
   createOrganizationModal: null | CreateOrganizationProps;
   nodes: Map<HTMLDivElement, HtmlNodeOptions>;
+  impersonationFab: boolean;
 }
 
 let portalCt = 0;
@@ -148,6 +152,7 @@ const Components = (props: ComponentsProps) => {
     organizationProfileModal: null,
     createOrganizationModal: null,
     nodes: new Map(),
+    impersonationFab: false,
   });
   const { signInModal, signUpModal, userProfileModal, organizationProfileModal, createOrganizationModal, nodes } =
     state;
@@ -198,6 +203,10 @@ const Components = (props: ComponentsProps) => {
 
     componentsControls.openModal = (name, props) => {
       setState(s => ({ ...s, [name + 'Modal']: props }));
+    };
+
+    componentsControls.mountImpersonationFab = () => {
+      setState(s => ({ ...s, impersonationFab: true }));
     };
 
     props.onComponentsMounted();
@@ -312,6 +321,7 @@ const Components = (props: ComponentsProps) => {
         {userProfileModal && mountedUserProfileModal}
         {organizationProfileModal && mountedOrganizationProfileModal}
         {createOrganizationModal && mountedCreateOrganizationModal}
+        {state.impersonationFab && <ImpersonationFab globalAppearance={state.appearance} />}
       </LazyProviders>
     </Suspense>
   );

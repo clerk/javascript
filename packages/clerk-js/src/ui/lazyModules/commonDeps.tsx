@@ -5,15 +5,21 @@ import type { ThemableCssProp } from '../styledSystem';
 import type { ClerkComponentName } from './components';
 import { ClerkComponents } from './components';
 
-const CoreClerkContextWrapper = lazy(() => import('../contexts').then(m => ({ default: m.CoreClerkContextWrapper })));
-const EnvironmentProvider = lazy(() => import('../contexts').then(m => ({ default: m.EnvironmentProvider })));
-const OptionsProvider = lazy(() => import('../contexts').then(m => ({ default: m.OptionsProvider })));
-const AppearanceProvider = lazy(() => import('../customizables').then(m => ({ default: m.AppearanceProvider })));
-const VirtualRouter = lazy(() => import('../router').then(m => ({ default: m.VirtualRouter })));
-const InternalThemeProvider = lazy(() => import('../styledSystem').then(m => ({ default: m.InternalThemeProvider })));
-const Portal = lazy(() => import('./../portal'));
-const FlowMetadataProvider = lazy(() => import('./../elements').then(m => ({ default: m.FlowMetadataProvider })));
-const Modal = lazy(() => import('./../elements').then(m => ({ default: m.Modal })));
+export const CoreClerkContextWrapper = lazy(() =>
+  import('../contexts').then(m => ({ default: m.CoreClerkContextWrapper })),
+);
+export const EnvironmentProvider = lazy(() => import('../contexts').then(m => ({ default: m.EnvironmentProvider })));
+export const OptionsProvider = lazy(() => import('../contexts').then(m => ({ default: m.OptionsProvider })));
+export const AppearanceProvider = lazy(() => import('../customizables').then(m => ({ default: m.AppearanceProvider })));
+export const VirtualRouter = lazy(() => import('../router').then(m => ({ default: m.VirtualRouter })));
+export const InternalThemeProvider = lazy(() =>
+  import('../styledSystem').then(m => ({ default: m.InternalThemeProvider })),
+);
+export const Portal = lazy(() => import('./../portal'));
+export const FlowMetadataProvider = lazy(() =>
+  import('./../elements').then(m => ({ default: m.FlowMetadataProvider })),
+);
+export const Modal = lazy(() => import('./../elements').then(m => ({ default: m.Modal })));
 
 type LazyProvidersProps = React.PropsWithChildren<{ clerk: any; environment: any; options: any; children: any }>;
 
@@ -33,8 +39,6 @@ type AppearanceProviderProps = {
   appearanceKey: _AppearanceProviderProps['appearanceKey'];
   componentAppearance?: _AppearanceProviderProps['appearance'];
 };
-type PortalProps = Parameters<typeof Portal>[0];
-
 type LazyComponentRendererProps = React.PropsWithChildren<
   {
     node: PortalProps['node'];
@@ -42,6 +46,8 @@ type LazyComponentRendererProps = React.PropsWithChildren<
     componentProps: any;
   } & AppearanceProviderProps
 >;
+
+type PortalProps = Parameters<typeof Portal>[0];
 
 export const LazyComponentRenderer = (props: LazyComponentRendererProps) => {
   return (

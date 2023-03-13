@@ -68,8 +68,10 @@ export const OrganizationSwitcher = lazy(() =>
   })),
 );
 
-export const ImpersonationFab = lazy(
-  () => import(/* webpackChunkName: "ImpersonationFabWrapper" */ './MountedImpersonationFAB'),
+export const ImpersonationFab = lazy(() =>
+  import(/* webpackChunkName: "ImpersonationFabWrapper" */ './LazyImpersonationFAB').then(module => ({
+    default: module.LazyImpersonationFab,
+  })),
 );
 
 export const ClerkComponents = {
@@ -85,7 +87,6 @@ export const ClerkComponents = {
   UserProfileModal,
   OrganizationProfileModal,
   CreateOrganizationModal,
-  ImpersonationFab,
 };
 
 export type ClerkComponentName = keyof typeof ClerkComponents;
