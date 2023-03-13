@@ -1047,8 +1047,6 @@ export default class Clerk implements ClerkInterface {
       fapiClient: this.#fapiClient,
     });
 
-    this.#pageLifecycle = createPageLifecycle();
-
     const isInAccountsHostedPages = isAccountsHostedPages(window?.location.hostname);
 
     if (this.#instanceType === 'production') {
