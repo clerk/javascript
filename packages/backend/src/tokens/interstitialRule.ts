@@ -43,6 +43,18 @@ export const crossOriginRequestWithoutHeader: InterstitialRule = options => {
   return undefined;
 };
 
+export const isPrimaryInDevAndSyncing: InterstitialRule = options => {
+  const { apiKey, secretKey, isSatellite, searchParams } = options;
+  const isSyncing = searchParams?.get('__clerk_syncing') === 'true';
+  const key = secretKey || apiKey;
+  const isDev = isDevelopmentFromApiKey(key);
+
+  if (isDev && !isSatellite && isSyncing) {
+    return interstitial(options, AuthErrorReason.UnexpectedError);
+  }
+  return undefined;
+};
+
 export const potentialFirstLoadInDevWhenUATMissing: InterstitialRule = options => {
   const { apiKey, secretKey, clientUat } = options;
   const key = secretKey || apiKey;
@@ -54,12 +66,15 @@ export const potentialFirstLoadInDevWhenUATMissing: InterstitialRule = options =
 };
 
 export const potentialRequestAfterSignInOrOutFromClerkHostedUiInDev: InterstitialRule = options => {
-  const { apiKey, secretKey, referrer, host, forwardedHost, forwardedPort, forwardedProto } = options;
+  const { apiKey, secretKey, referrer, host, forwardedHost, forwardedPort, forwardedProto, isSatellite, searchParams } =
+    options;
   const crossOriginReferrer =
     referrer && checkCrossOrigin({ originURL: new URL(referrer), host, forwardedHost, forwardedPort, forwardedProto });
   const key = secretKey || apiKey;
 
-  if (isDevelopmentFromApiKey(key) && crossOriginReferrer) {
+  const hasJustSynced = searchParams?.get('__clerk_synced') === 'true';
+
+  if (!isSatellite && !hasJustSynced && isDevelopmentFromApiKey(key) && crossOriginReferrer) {
     return interstitial(options, AuthErrorReason.CrossOriginReferrer);
   }
   return undefined;
