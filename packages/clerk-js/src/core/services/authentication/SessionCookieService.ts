@@ -6,7 +6,7 @@ import { createCookieHandler, inBrowser } from '../../../utils';
 import { clerkCoreErrorTokenRefreshFailed } from '../../errors';
 import { eventBus, events } from '../../events';
 import { isClerkAPIResponseError } from '../../resources';
-import { AuthenticationPoller } from './AuthenticationPoller';
+import { SessionCookiePoller } from './SessionCookiePoller';
 
 type InitParams = {
   environment: EnvironmentResource;
@@ -17,7 +17,7 @@ export class SessionCookieService {
   private enablePolling = true;
   private cookies: CookieHandler = createCookieHandler();
   private environment: EnvironmentResource | undefined;
-  private poller: AuthenticationPoller | null = null;
+  private poller: SessionCookiePoller | null = null;
 
   constructor(private clerk: Clerk) {}
 
@@ -46,7 +46,7 @@ export class SessionCookieService {
       return;
     }
     if (!this.poller) {
-      this.poller = new AuthenticationPoller();
+      this.poller = new SessionCookiePoller();
     }
     this.poller.startPollingForSessionToken(() => this.refreshSessionToken());
   }
