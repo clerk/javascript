@@ -124,7 +124,9 @@ const entryForVariant = variant => {
 };
 
 /** @type { () => (import('webpack').Configuration)[] } */
-const prodConfig = ({ mode }) => {
+const prodConfig = ({ mode, env }) => {
+  const variant = env.variant || undefined;
+
   const entryToConfigMap = {
     // prettier-ignore
     [variants.clerk]: merge(
@@ -151,6 +153,13 @@ const prodConfig = ({ mode }) => {
       // externalsForHeadless(),
     ),
   };
+
+  if (variant) {
+    if (!entryToConfigMap[variant]) {
+      throw new Error('Clerk variant does not exist in config');
+    }
+    return entryToConfigMap[variant];
+  }
 
   return [...Object.values(entryToConfigMap)];
 };
@@ -231,5 +240,5 @@ const devConfig = ({ mode, env }) => {
 
 module.exports = env => {
   const mode = env.production ? 'production' : 'development';
-  return isProduction(mode) ? prodConfig({ mode }) : devConfig({ mode, env });
+  return isProduction(mode) ? prodConfig({ mode, env }) : devConfig({ mode, env });
 };
