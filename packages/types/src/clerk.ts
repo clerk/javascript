@@ -592,7 +592,7 @@ export type UserProfileProps = {
    * Specify additional scopes per OAuth provider that your users would like to provide if not already approved.
    * e.g. <UserProfile additionalOAuthScopes={{google: ['foo', 'bar'], github: ['qux']}} />
    */
-  additionalOAuthScopes?: Record<OAuthProvider, string[]>;
+  additionalOAuthScopes?: Partial<Record<OAuthProvider, string[]>>;
 };
 
 export type OrganizationProfileProps = {
