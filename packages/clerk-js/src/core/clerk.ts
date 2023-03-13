@@ -938,6 +938,11 @@ export default class Clerk implements ClerkInterface {
       ?.organization;
   };
 
+  public updateEnvironment(environment: EnvironmentResource) {
+    this.#environment = environment;
+    this.#authService?.setEnvironment(environment);
+  }
+
   updateClient = (newClient: ClientResource): void => {
     if (!this.client) {
       // This is the first time client is being
@@ -1069,13 +1074,11 @@ export default class Clerk implements ClerkInterface {
           Client.getInstance().fetch(),
         ]);
 
-        this.#environment = environment;
         this.updateClient(client);
-
-        await this.#authService.initAuth({
-          enablePolling: this.#options.polling,
-          environment: this.#environment,
-        });
+        // updateEnvironment should be called after updateClient
+        // because authService#setEnviroment depends on clerk.session that is being
+        // set in updateClient
+        this.updateEnvironment(environment);
 
         if (Clerk.mountComponentRenderer) {
           this.#componentControls = Clerk.mountComponentRenderer(this, this.#environment, this.#options);

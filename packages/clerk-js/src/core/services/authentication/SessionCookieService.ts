@@ -8,32 +8,25 @@ import { eventBus, events } from '../../events';
 import { isClerkAPIResponseError } from '../../resources';
 import { SessionCookiePoller } from './SessionCookiePoller';
 
-type InitParams = {
-  environment: EnvironmentResource;
-  enablePolling?: boolean;
-};
-
 export class SessionCookieService {
-  private enablePolling = true;
   private cookies: CookieHandler = createCookieHandler();
   private environment: EnvironmentResource | undefined;
   private poller: SessionCookiePoller | null = null;
 
-  constructor(private clerk: Clerk) {}
-
-  public async initAuth(opts: InitParams): Promise<void> {
-    this.enablePolling = opts.enablePolling ?? true;
-    this.environment = opts.environment;
-    await this.setAuthCookiesFromSession(this.clerk.session);
-    this.setClientUatCookieForDevelopmentInstances();
-    this.clearLegacyAuthV1Cookies();
-    this.startPollingForToken();
-    this.refreshTokenOnVisibilityChange();
-
+  constructor(private clerk: Clerk) {
     // set cookie on token update
     eventBus.on(events.TokenUpdate, ({ token }) => {
       this.updateSessionCookie(token?.getRawString());
     });
+
+    this.refreshTokenOnVisibilityChange();
+    this.startPollingForToken();
+  }
+
+  public setEnvironment(environment: EnvironmentResource) {
+    this.environment = environment;
+    this.clearLegacyAuthV1Cookies();
+    this.setClientUatCookieForDevelopmentInstances();
   }
 
   public async setAuthCookiesFromSession(session: SessionResource | undefined | null): Promise<void> {
@@ -42,9 +35,6 @@ export class SessionCookieService {
   }
 
   private startPollingForToken() {
-    if (!this.enablePolling) {
-      return;
-    }
     if (!this.poller) {
       this.poller = new SessionCookiePoller();
     }
