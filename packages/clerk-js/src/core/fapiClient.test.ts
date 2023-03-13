@@ -144,6 +144,33 @@ describe('request', () => {
     );
   });
 
+  it('returns payload and meta', async () => {
+    const resp = await fapiClientWithProxy.request({
+      path: '/foo',
+    });
+
+    expect(resp.payload?.meta).toBeDefined();
+  });
+
+  it('returns array response as array', async () => {
+    // @ts-ignore
+    global.fetch.mockResolvedValueOnce(
+      Promise.resolve<RecursivePartial<Response>>({
+        headers: {
+          get: jest.fn(() => 'sess_43'),
+        },
+        json: () => Promise.resolve([{ foo: 42 }]),
+      }),
+    );
+
+    const resp = await fapiClientWithProxy.request({
+      path: '/foo',
+    });
+
+    expect(Array.isArray(resp.payload)).toEqual(true);
+    expect(resp.payload?.meta).toBeDefined();
+  });
+
   describe('for production instances', () => {
     it.todo('does not append the __dev_session cookie value to the query string');
     it.todo('does not set the __dev_session cookie from the response Clerk-Cookie header');
