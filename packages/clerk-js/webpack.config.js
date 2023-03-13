@@ -99,7 +99,6 @@ const commonForProd = () => {
       globalObject: 'globalThis',
     },
     optimization: {
-      minimize: false,
       splitChunks: {
         name: (module, chunks) => {
           if (!chunks.length) {
