@@ -204,9 +204,10 @@ export default function createFapiClient(clerkInstance: Omit<Clerk, 'proxyUrl'>)
     };
 
     const json: FapiResponseJSON<T> = await response.json();
-    const fapiResponse: FapiResponse<T> = Object.assign(response, {
-      payload: { ...json, meta: { ...json?.meta, responseHeaders } },
-    });
+    const fapiResponse: FapiResponse<T> = Object.assign(response, { payload: json });
+    if (fapiResponse.payload) {
+      fapiResponse.payload.meta = { ...json?.meta, responseHeaders };
+    }
     await runAfterResponseCallbacks(requestInit, fapiResponse);
     return fapiResponse;
   }
