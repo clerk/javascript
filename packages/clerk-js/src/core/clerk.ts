@@ -441,18 +441,6 @@ export default class Clerk implements ClerkInterface {
     void this.#componentControls?.ensureMounted(controls => controls.unmountComponent({ node }));
   };
 
-  public mountImpersonationFAB = (node: HTMLDivElement, props = {}) => {
-    this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls?.ensureMounted(controls =>
-      controls.mountComponent({
-        name: 'ImpersonationFab',
-        appearanceKey: 'impersonationFab',
-        node,
-        props,
-      }),
-    );
-  };
-
   /**
    * `setActive` can be used to set the active session and/or organization.
    * It will eventually replace `setSession`.
@@ -1105,6 +1093,7 @@ export default class Clerk implements ClerkInterface {
       }
     }
 
+    this.#handleImpersonationFab();
     return true;
   };
 
@@ -1220,6 +1209,15 @@ export default class Clerk implements ClerkInterface {
 
   #aliasUser = () => {
     this.user = this.session ? this.session.user : null;
+  };
+
+  #handleImpersonationFab = () => {
+    this.addListener(({ session }) => {
+      const isImpersonating = !!session?.actor;
+      if (isImpersonating) {
+        void this.#componentControls?.ensureMounted(controls => controls.mountImpersonationFab());
+      }
+    });
   };
 
   assertComponentsReady(controls: unknown): asserts controls is ReturnType<MountComponentRenderer> {
