@@ -13,7 +13,7 @@ type InitParams = {
   enablePolling?: boolean;
 };
 
-export class AuthenticationService {
+export class SessionCookieService {
   private enablePolling = true;
   private cookies: CookieHandler = createCookieHandler();
   private environment: EnvironmentResource | undefined;

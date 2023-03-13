@@ -5,7 +5,7 @@ import Clerk from './clerk';
 import { eventBus, events } from './events';
 import type { DisplayConfig, Organization } from './resources/internal';
 import { Client, Environment, MagicLinkErrorCode, SignIn, SignUp } from './resources/internal';
-import { AuthenticationService } from './services';
+import { SessionCookieService } from './services';
 import { mockJwt } from './test/fixtures';
 
 const mockClientFetch = jest.fn();
@@ -118,7 +118,7 @@ describe('Clerk singleton', () => {
     let cookieSpy;
 
     beforeEach(() => {
-      cookieSpy = jest.spyOn(AuthenticationService.prototype, 'setAuthCookiesFromSession');
+      cookieSpy = jest.spyOn(SessionCookieService.prototype, 'setAuthCookiesFromSession');
     });
 
     afterEach(() => {

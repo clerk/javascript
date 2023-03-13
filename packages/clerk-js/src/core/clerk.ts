@@ -94,7 +94,7 @@ import {
   Organization,
   OrganizationMembership,
 } from './resources/internal';
-import { AuthenticationService } from './services';
+import { SessionCookieService } from './services';
 import { warnings } from './warnings';
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
@@ -128,7 +128,7 @@ export default class Clerk implements ClerkInterface {
   public readonly proxyUrl?: ClerkInterface['proxyUrl'];
   public readonly domain?: ClerkInterface['domain'];
 
-  #authService: AuthenticationService | null = null;
+  #authService: SessionCookieService | null = null;
   #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
   #componentControls?: ReturnType<MountComponentRenderer> | null;
   #devBrowserHandler: DevBrowserHandler | null = null;
@@ -1039,7 +1039,7 @@ export default class Clerk implements ClerkInterface {
       return false;
     }
 
-    this.#authService = new AuthenticationService(this);
+    this.#authService = new SessionCookieService(this);
     this.#pageLifecycle = createPageLifecycle();
 
     this.#devBrowserHandler = createDevBrowserHandler({
