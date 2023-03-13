@@ -93,17 +93,24 @@ const commonForProd = () => {
     },
     output: {
       path: path.resolve(__dirname, 'dist'),
-      chunkFilename: pathData =>
-        !(pathData.chunk.name || '').startsWith('shared')
-          ? `[name].[fullhash:6].${packageJSON.version}.js`
-          : `shared-[id].[fullhash:6].${packageJSON.version}.js`,
+      chunkFilename: `[name]::[fullhash:6]::${packageJSON.version}.js`,
       filename: '[name].js',
       libraryTarget: 'umd',
       globalObject: 'globalThis',
     },
     optimization: {
+      minimize: false,
       splitChunks: {
-        name: (module, chunks) => (chunks.length > 0 ? `shared-${chunks.map(chunk => chunk.name).join('-')}` : ''),
+        name: (module, chunks) => {
+          if (!chunks.length) {
+            return '';
+          }
+          const name = chunks
+            .map(chunk => chunk.name)
+            .filter(Boolean)
+            .join('-');
+          return `shared-${name}`;
+        },
       },
     },
   };
