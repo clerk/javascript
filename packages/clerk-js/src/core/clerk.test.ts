@@ -1361,4 +1361,64 @@ describe('Clerk singleton', () => {
       expect(mockSetActive).not.toHaveBeenCalled();
     });
   });
+
+  /**
+   * TODO:
+   * 1) Write better test names for this.domain and this.isSatellite
+   * 2) Write test for when to throw errors in proxy url and multi-domain prod
+   * 3) Write test the mimic sync/link in prod
+   */
+  describe('Clerk().isSatellite and Clerk().domain getters', () => {
+    it('domain is string, isSatellite is true', async () => {
+      const sut = new Clerk(frontendApi, {
+        domain: 'example.com',
+      });
+
+      await sut.load({
+        isSatellite: true,
+      });
+
+      expect(sut.domain).toBe('clerk.example.com');
+      expect(sut.isSatellite).toBe(true);
+    });
+
+    it('domain is string, isSatellite is function returning true', async () => {
+      const sut = new Clerk(frontendApi, {
+        domain: 'example.com',
+      });
+
+      await sut.load({
+        isSatellite: url => url.host === 'test.host',
+      });
+
+      expect(sut.domain).toBe('clerk.example.com');
+      expect(sut.isSatellite).toBe(true);
+    });
+
+    it('domain is string with scheme and clerk prefix, isSatellite is true', async () => {
+      const sut = new Clerk(frontendApi, {
+        domain: 'https://clerk.example.com',
+      });
+
+      await sut.load({
+        isSatellite: true,
+      });
+
+      expect(sut.domain).toBe('clerk.example.com');
+      expect(sut.isSatellite).toBe(true);
+    });
+
+    it('domain is function that returns the url of the website, isSatellite is true', async () => {
+      const sut = new Clerk(frontendApi, {
+        domain: url => url.href.replace(/\/$/, ''),
+      });
+
+      await sut.load({
+        isSatellite: true,
+      });
+
+      expect(sut.domain).toBe('clerk.test.host');
+      expect(sut.isSatellite).toBe(true);
+    });
+  });
 });
