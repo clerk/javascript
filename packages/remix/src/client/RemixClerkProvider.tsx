@@ -37,8 +37,16 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
   ReactClerkProvider.displayName = 'ReactClerkProvider';
 
   assertValidClerkState(clerkState);
-  const { __clerk_ssr_state, __frontendApi, __publishableKey, __proxyUrl, __domain, __isSatellite, __clerk_debug } =
-    clerkState?.__internal_clerk_state || {};
+  const {
+    __clerk_ssr_state,
+    __frontendApi,
+    __publishableKey,
+    __proxyUrl,
+    __domain,
+    __isSatellite,
+    __clerk_debug,
+    __signInUrl,
+  } = clerkState?.__internal_clerk_state || {};
 
   React.useEffect(() => {
     warnForSsr(clerkState);
@@ -57,6 +65,7 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
       proxyUrl={__proxyUrl as any}
       domain={__domain as any}
       isSatellite={__isSatellite}
+      signInUrl={__signInUrl}
       {...restProps}
     >
       {children}
