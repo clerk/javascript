@@ -1,6 +1,8 @@
 import type { LocalStorageBroadcastChannel } from '@clerk/shared';
 import {
   addClerkPrefix,
+  handleDomainStringOrFn,
+  handleIsSatelliteBooleanOrFn,
   inClientSide,
   isLegacyFrontendApiKey,
   isValidBrowserOnline,
@@ -151,20 +153,23 @@ export default class Clerk implements ClerkInterface {
   }
 
   get isSatellite(): boolean {
-    if (typeof this.#options.isSatellite === 'function') {
-      return this.#options.isSatellite(new URL(window.location.href));
-    }
-    return this.#options.isSatellite || false;
+    return handleIsSatelliteBooleanOrFn({ isSatellite: this.#options.isSatellite }, new URL(window.location.href));
   }
 
   get domain(): string {
-    if (typeof this.#domain === 'function') {
-      return this.#domain(new URL(window.location.href));
-    }
-    return stripScheme(addClerkPrefix(this.#domain || ''));
+    return addClerkPrefix(
+      stripScheme(
+        handleDomainStringOrFn(
+          {
+            domain: this.#domain,
+          },
+          new URL(window.location.href),
+        ),
+      ),
+    );
   }
 
-  public constructor(key: string, options?: DomainOrProxyUrl) {
+  public constructor(key: string, options?: Omit<DomainOrProxyUrl, 'isSatellite'>) {
     key = (key || '').trim();
 
     const _unfilteredProxy = options?.proxyUrl;
@@ -203,7 +208,7 @@ export default class Clerk implements ClerkInterface {
 
   public isReady = (): boolean => this.#isReady;
 
-  public load = async (options?: Omit<ClerkOptions, 'isSatellite'>): Promise<void> => {
+  public load = async (options?: ClerkOptions): Promise<void> => {
     if (this.#isReady) {
       return;
     }

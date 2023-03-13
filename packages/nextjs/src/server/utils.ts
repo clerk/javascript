@@ -143,7 +143,7 @@ export const injectSSRStateIntoObject = <O, T>(obj: O, authObject: T) => {
   return { ...obj, __clerk_ssr_state };
 };
 
-// TODO: Make this a generic and move to @clerk/shared
+// TODO: Use the same function defined in @clerk/shared once the package is tree shakeable
 export const handleIsSatelliteBooleanOrFn = (opts: WithAuthOptions, url: URL): boolean => {
   if (typeof opts.isSatellite === 'function') {
     return opts.isSatellite(url);
@@ -151,7 +151,7 @@ export const handleIsSatelliteBooleanOrFn = (opts: WithAuthOptions, url: URL): b
   return opts.isSatellite || false;
 };
 
-// TODO: Make this a generic and move to @clerk/shared
+// TODO: Use the same function defined in @clerk/shared once the package is tree shakeable
 export const handleDomainStringOrFn = (opts: WithAuthOptions, url: URL): string => {
   if (typeof opts.domain === 'function') {
     return opts.domain(url);

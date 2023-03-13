@@ -1,7 +1,6 @@
 import type { AuthObject, RequestState } from '@clerk/backend';
 import { constants, debugRequestState, loadInterstitialFromLocal } from '@clerk/backend';
 import { LIB_VERSION } from '@clerk/clerk-react/dist/info';
-import type { Clerk as ClerkInterface, ClerkOptions } from '@clerk/types';
 import { json } from '@remix-run/server-runtime';
 import cookie from 'cookie';
 
@@ -126,18 +125,4 @@ export const injectRequestStateIntoResponse = async (response: Response, request
  */
 export const wrapWithClerkState = (data: any) => {
   return { clerkState: { __internal_clerk_state: { ...data } } };
-};
-
-export const handleIsSatelliteBooleanOrFn = (isSatellite: ClerkOptions['isSatellite'], url: URL): boolean => {
-  if (typeof isSatellite === 'function') {
-    return isSatellite(url);
-  }
-  return isSatellite || false;
-};
-
-export const handleDomainStringOrFn = (domain: ClerkInterface['domain'], url: URL): string => {
-  if (typeof domain === 'function') {
-    return domain(url);
-  }
-  return domain || '';
 };
