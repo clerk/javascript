@@ -98,20 +98,6 @@ const commonForProd = () => {
       libraryTarget: 'umd',
       globalObject: 'globalThis',
     },
-    optimization: {
-      splitChunks: {
-        name: (module, chunks) => {
-          if (!chunks.length) {
-            return '';
-          }
-          const name = chunks
-            .map(chunk => chunk.name)
-            .filter(Boolean)
-            .join('-');
-          return `shared-${name}`;
-        },
-      },
-    },
   };
 };
 
@@ -192,10 +178,16 @@ const devConfig = ({ mode, env }) => {
       },
       optimization: {
         splitChunks: {
-          name: (module, chunks) =>
-            chunks
-              .map(chunk => chunk.name?.replace('Organization', 'Org')?.replace('User', 'Us')?.slice(0, 4))
-              ?.join('-'),
+          name: (module, chunks) => {
+            if (!chunks.length) {
+              return '';
+            }
+
+            return chunks
+              .map(chunk => chunk.name)
+              .filter(Boolean)
+              .join('-');
+          },
         },
       },
       devServer: {
