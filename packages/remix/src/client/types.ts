@@ -10,6 +10,7 @@ export type ClerkState = {
     __proxyUrl: string | undefined;
     __domain: string | undefined;
     __isSatellite: boolean;
+    __signInUrl: string | undefined;
     __clerk_debug: any;
   };
 };
