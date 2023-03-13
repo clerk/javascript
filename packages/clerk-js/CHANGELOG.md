@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.32.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.32.0...@clerk/clerk-js@4.32.1) (2023-03-13)
+
+### Bug Fixes
+
+- **clerk-js:** Fix infinite loading of active devices in user profile ([f6d6d2c](https://github.com/clerkinc/javascript/commit/f6d6d2c52667502d6bd557fcb64432356a60965b))
+
 ## [4.32.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.32.0-staging.2...@clerk/clerk-js@4.32.0) (2023-03-10)
 
 **Note:** Version bump only for package @clerk/clerk-js
