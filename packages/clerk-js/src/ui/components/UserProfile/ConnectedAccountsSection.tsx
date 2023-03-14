@@ -149,7 +149,10 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
   );
 };
 
-function findAdditionalScopes(account: ExternalAccountResource, scopes?: Record<OAuthProvider, string[]>): string[] {
+function findAdditionalScopes(
+  account: ExternalAccountResource,
+  scopes?: Partial<Record<OAuthProvider, string[]>>,
+): string[] {
   if (!scopes) {
     return [];
   }

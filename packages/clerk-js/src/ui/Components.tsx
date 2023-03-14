@@ -280,7 +280,7 @@ const Components = (props: ComponentsProps) => {
               onExternalNavigate={() => componentsControls.closeModal('userProfile')}
               startPath={buildVirtualRouterUrl({ base: '/user', path: urlStateParam?.path })}
             >
-              <UserProfileModal />
+              <UserProfileModal {...userProfileModal} />
             </VirtualRouter>
           </Modal>
         </InternalThemeProvider>
