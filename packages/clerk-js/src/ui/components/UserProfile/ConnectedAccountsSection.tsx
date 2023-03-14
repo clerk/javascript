@@ -1,4 +1,4 @@
-import type { OAuthProvider, OAuthStrategy } from '@clerk/types';
+import type { OAuthProvider, OAuthScope, OAuthStrategy } from '@clerk/types';
 import type { ExternalAccountResource } from '@clerk/types/src';
 
 import { useRouter } from '../../../ui/router';
@@ -151,7 +151,7 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
 
 function findAdditionalScopes(
   account: ExternalAccountResource,
-  scopes?: Partial<Record<OAuthProvider, string[]>>,
+  scopes?: Partial<Record<OAuthProvider, OAuthScope[]>>,
 ): string[] {
   if (!scopes) {
     return [];
