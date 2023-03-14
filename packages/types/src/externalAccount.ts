@@ -1,9 +1,9 @@
-import type { OAuthProvider } from './oauth';
+import type { OAuthProvider, OAuthScope } from './oauth';
 import type { ClerkResource } from './resource';
 import type { VerificationResource } from './verification';
 
 export type ReauthorizeExternalAccountParams = {
-  additionalScopes: string[];
+  additionalScopes: OAuthScope[];
   redirectUrl?: string;
 };
 

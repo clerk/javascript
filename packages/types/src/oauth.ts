@@ -1,5 +1,7 @@
 import type { OAuthStrategy } from './strategies';
 
+export type OAuthScope = string;
+
 export interface OAuthProviderData {
   provider: OAuthProvider;
   strategy: OAuthStrategy;

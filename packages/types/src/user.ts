@@ -4,6 +4,7 @@ import type { EmailAddressResource } from './emailAddress';
 import type { ExternalAccountResource } from './externalAccount';
 import type { ImageResource } from './image';
 import type { UserJSON } from './json';
+import type { OAuthScope } from './oauth';
 import type { OrganizationMembershipResource } from './organizationMembership';
 import type { PhoneNumberResource } from './phoneNumber';
 import type { ClerkResource } from './resource';
@@ -87,7 +88,7 @@ export type SetProfileImageParams = { file: Blob | File | null };
 export type CreateExternalAccountParams = {
   strategy: OAuthStrategy;
   redirectUrl?: string;
-  additionalScopes?: string[];
+  additionalScopes?: OAuthScope[];
   /**
    * @deprecated Use `redirectUrl` instead.
    */
