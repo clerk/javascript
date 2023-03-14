@@ -685,6 +685,12 @@ export type UserButtonProps = {
    * prop of ClerkProvided (if one is provided)
    */
   appearance?: UserButtonTheme & { userProfile?: UserProfileTheme };
+
+  /*
+   * Specify options for the underlying <UserProfile /> component.
+   * e.g. <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
+   */
+  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes'>;
 };
 
 export type OrganizationSwitcherProps = {

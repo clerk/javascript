@@ -14,7 +14,7 @@ type UseMultisessionActionsParams = {
   navigateAfterSwitchSession?: () => any;
   userProfileUrl?: string;
   signInUrl?: string;
-} & Pick<UserButtonProps, 'userProfileMode' | 'appearance'>;
+} & Pick<UserButtonProps, 'userProfileMode' | 'appearance' | 'userProfileProps'>;
 
 export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   const { setActive, signOut, openUserProfile } = useCoreClerk();
@@ -42,7 +42,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
     }
 
     // The UserButton can also accept an appearance object for the nested UserProfile modal
-    openUserProfile({ appearance: opts.appearance?.userProfile });
+    openUserProfile({ ...opts.userProfileProps, appearance: opts.appearance?.userProfile });
     return opts.actionCompleteCallback?.();
   };
 
