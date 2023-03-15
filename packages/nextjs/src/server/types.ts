@@ -1,5 +1,5 @@
 import type { OptionalVerifyTokenOptions } from '@clerk/backend';
-import type { DomainOrProxyUrl } from '@clerk/types';
+import type { MultiDomainAndOrProxy } from '@clerk/types';
 import type { IncomingMessage } from 'http';
 import type { NextApiRequest } from 'next';
 import type { NextApiRequestCookies } from 'next/dist/server/api-utils';
@@ -12,4 +12,4 @@ type GsspRequest = IncomingMessage & {
 
 export type RequestLike = NextRequest | NextApiRequest | GsspRequest;
 
-export type WithAuthOptions = OptionalVerifyTokenOptions & DomainOrProxyUrl;
+export type WithAuthOptions = OptionalVerifyTokenOptions & MultiDomainAndOrProxy;

@@ -1,6 +1,6 @@
 import { __internal__setErrorThrowerOptions, ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import type { IsomorphicClerkOptions } from '@clerk/clerk-react/dist/types';
-import type { PublishableKeyOrFrontendApi } from '@clerk/types';
+import type { MultiDomainAndOrProxy, PublishableKeyOrFrontendApi } from '@clerk/types';
 import { useRouter } from 'next/router';
 import React from 'react';
 
@@ -27,7 +27,9 @@ type NextClerkProviderProps = {
    */
   __unstable_invokeMiddlewareOnAuthStateChange?: boolean;
 } & Omit<IsomorphicClerkOptions, keyof PublishableKeyOrFrontendApi> &
-  Partial<PublishableKeyOrFrontendApi>;
+  Partial<PublishableKeyOrFrontendApi> &
+  Omit<IsomorphicClerkOptions, keyof MultiDomainAndOrProxy> &
+  MultiDomainAndOrProxy;
 
 export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JSX.Element {
   // Allow for overrides without making the type public

@@ -169,7 +169,7 @@ export default class Clerk implements ClerkInterface {
     );
   }
 
-  public constructor(key: string, options?: Omit<DomainOrProxyUrl, 'isSatellite'>) {
+  public constructor(key: string, options?: DomainOrProxyUrl) {
     key = (key || '').trim();
 
     const _unfilteredProxy = options?.proxyUrl;
