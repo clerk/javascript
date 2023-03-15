@@ -7,19 +7,19 @@ import type { Clerk as ClerkInterface, ClerkOptions } from './clerk';
  * 3) isSatellite and proxy is set
  * 4) isSatellite and domain is set
  */
-export type DomainOrProxyUrl =
+export type MultiDomainAndOrProxy =
   | {
       isSatellite?: never;
       proxyUrl?: never | string;
       domain?: never;
     }
   | {
-      isSatellite: ClerkOptions['isSatellite'];
+      isSatellite: Exclude<ClerkOptions['isSatellite'], undefined>;
       proxyUrl?: never;
-      domain: ClerkInterface['domain'];
+      domain: Exclude<ClerkInterface['domain'], undefined>;
     }
   | {
-      isSatellite: ClerkOptions['isSatellite'];
+      isSatellite: Exclude<ClerkOptions['isSatellite'], undefined>;
       proxyUrl: string;
       domain?: never;
     };
@@ -38,5 +38,15 @@ export type MultiDomainAndOrProxyPrimitives =
   | {
       isSatellite: boolean;
       proxyUrl: string;
+      domain?: never;
+    };
+
+export type DomainOrProxyUrl =
+  | {
+      proxyUrl?: never;
+      domain?: ClerkInterface['domain'];
+    }
+  | {
+      proxyUrl?: string;
       domain?: never;
     };

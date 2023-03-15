@@ -1,5 +1,5 @@
 import type { AuthObject, Organization, Session, User } from '@clerk/backend';
-import type { DomainOrProxyUrl } from '@clerk/types';
+import type { MultiDomainAndOrProxy } from '@clerk/types';
 import type { DataFunctionArgs, LoaderFunction } from '@remix-run/server-runtime';
 
 export type GetAuthReturn = Promise<AuthObject>;
@@ -20,7 +20,7 @@ export type RootAuthLoaderOptions = {
   loadSession?: boolean;
   loadOrganization?: boolean;
   authorizedParties?: [];
-} & DomainOrProxyUrl;
+} & MultiDomainAndOrProxy;
 
 export type RootAuthLoaderCallback<Options extends RootAuthLoaderOptions> = (
   args: LoaderFunctionArgsWithAuth<Options>,
