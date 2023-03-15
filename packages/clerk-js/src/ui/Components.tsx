@@ -245,7 +245,7 @@ const Components = (props: ComponentsProps) => {
       startPath={buildVirtualRouterUrl({ base: '/sign-up', path: urlStateParam?.path })}
       componentName={'SignUpModal'}
     >
-      <SignInModal {...signUpModal} />
+      <SignInModal {...signInModal} />
       <SignUpModal {...signUpModal} />
     </LazyModalRenderer>
   );
@@ -263,7 +263,7 @@ const Components = (props: ComponentsProps) => {
       modalContainerSx={{ alignItems: 'center' }}
       modalContentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
     >
-      <UserProfileModal />
+      <UserProfileModal {...userProfileModal} />
     </LazyModalRenderer>
   );
 
