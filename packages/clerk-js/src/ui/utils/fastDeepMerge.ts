@@ -46,35 +46,3 @@ export const fastDeepMergeAndKeep = (
     }
   }
 };
-
-function deepMerge(source: Record<any, any> | undefined | null, target: Record<any, any> | undefined | null) {
-  if (!source || !target) {
-    return;
-  }
-
-  if (isObject(target) && isObject(source)) {
-    Object.keys(source).forEach(key => {
-      if (isObject(source[key])) {
-        if (!(key in target)) {
-          Object.assign(target, { [key]: source[key] });
-        } else {
-          target[key] = deepMerge(target[key], source[key]);
-        }
-      } else {
-        Object.assign(target, { [key]: source[key] });
-      }
-    });
-  }
-
-  return target;
-}
-
-export const deepCopyAndReturn = <T extends Record<any, any> | undefined | null>(source: T): T => {
-  if (!source) {
-    return source;
-  }
-
-  const target = {};
-  deepMerge(source, target);
-  return target as T;
-};

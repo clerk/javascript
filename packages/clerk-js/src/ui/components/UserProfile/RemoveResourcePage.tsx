@@ -7,13 +7,14 @@ import { localizationKeys, Text } from '../../customizables';
 import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
-import { deepCopyAndReturn, handleError } from '../../utils';
+import { handleError } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
 export const RemoveEmailPage = () => {
   const user = useCoreUser();
   const { id } = useRouter().params;
-  const ref = React.useRef(deepCopyAndReturn(user.emailAddresses.find(e => e.id === id)));
+  const resource = user.emailAddresses.find(e => e.id === id);
+  const ref = React.useRef(resource?.emailAddress);
 
   if (!ref.current) {
     return null;
@@ -23,13 +24,13 @@ export const RemoveEmailPage = () => {
     <RemoveResourcePage
       title={localizationKeys('userProfile.emailAddressPage.removeResource.title')}
       messageLine1={localizationKeys('userProfile.emailAddressPage.removeResource.messageLine1', {
-        identifier: ref.current.emailAddress,
+        identifier: ref.current,
       })}
       messageLine2={localizationKeys('userProfile.emailAddressPage.removeResource.messageLine2')}
       successMessage={localizationKeys('userProfile.emailAddressPage.removeResource.successMessage', {
-        emailAddress: ref.current.emailAddress,
+        emailAddress: ref.current,
       })}
-      deleteResource={() => Promise.resolve(ref.current?.destroy())}
+      deleteResource={() => Promise.resolve(resource?.destroy())}
     />
   );
 };
@@ -37,7 +38,8 @@ export const RemoveEmailPage = () => {
 export const RemovePhonePage = () => {
   const user = useCoreUser();
   const { id } = useRouter().params;
-  const ref = React.useRef(deepCopyAndReturn(user.phoneNumbers.find(e => e.id === id)));
+  const resource = user.phoneNumbers.find(e => e.id === id);
+  const ref = React.useRef(resource?.phoneNumber);
 
   if (!ref.current) {
     return null;
@@ -47,13 +49,13 @@ export const RemovePhonePage = () => {
     <RemoveResourcePage
       title={localizationKeys('userProfile.phoneNumberPage.removeResource.title')}
       messageLine1={localizationKeys('userProfile.phoneNumberPage.removeResource.messageLine1', {
-        identifier: ref.current.phoneNumber,
+        identifier: ref.current,
       })}
       messageLine2={localizationKeys('userProfile.phoneNumberPage.removeResource.messageLine2')}
       successMessage={localizationKeys('userProfile.phoneNumberPage.removeResource.successMessage', {
-        phoneNumber: ref.current.phoneNumber,
+        phoneNumber: ref.current,
       })}
-      deleteResource={() => Promise.resolve(ref.current?.destroy())}
+      deleteResource={() => Promise.resolve(resource?.destroy())}
     />
   );
 };
@@ -61,7 +63,8 @@ export const RemovePhonePage = () => {
 export const RemoveConnectedAccountPage = () => {
   const user = useCoreUser();
   const { id } = useRouter().params;
-  const ref = React.useRef(deepCopyAndReturn(user.externalAccounts.find(e => e.id === id)));
+  const resource = user.externalAccounts.find(e => e.id === id);
+  const ref = React.useRef(resource?.provider);
   const { providerToDisplayData } = useEnabledThirdPartyProviders();
 
   if (!ref.current) {
@@ -72,13 +75,13 @@ export const RemoveConnectedAccountPage = () => {
     <RemoveResourcePage
       title={localizationKeys('userProfile.connectedAccountPage.removeResource.title')}
       messageLine1={localizationKeys('userProfile.connectedAccountPage.removeResource.messageLine1', {
-        identifier: providerToDisplayData[ref.current.provider]?.name,
+        identifier: providerToDisplayData[ref.current]?.name,
       })}
       messageLine2={localizationKeys('userProfile.connectedAccountPage.removeResource.messageLine2')}
       successMessage={localizationKeys('userProfile.connectedAccountPage.removeResource.successMessage', {
-        connectedAccount: providerToDisplayData[ref.current.provider]?.name,
+        connectedAccount: providerToDisplayData[ref.current]?.name,
       })}
-      deleteResource={() => Promise.resolve(ref.current?.destroy())}
+      deleteResource={() => Promise.resolve(resource?.destroy())}
     />
   );
 };
@@ -86,7 +89,8 @@ export const RemoveConnectedAccountPage = () => {
 export const RemoveWeb3WalletPage = () => {
   const user = useCoreUser();
   const { id } = useRouter().params;
-  const ref = React.useRef(deepCopyAndReturn(user.web3Wallets.find(e => e.id === id)));
+  const resource = user.web3Wallets.find(e => e.id === id);
+  const ref = React.useRef(resource?.web3Wallet);
 
   if (!ref.current) {
     return null;
@@ -96,13 +100,13 @@ export const RemoveWeb3WalletPage = () => {
     <RemoveResourcePage
       title={localizationKeys('userProfile.web3WalletPage.removeResource.title')}
       messageLine1={localizationKeys('userProfile.web3WalletPage.removeResource.messageLine1', {
-        identifier: ref.current.web3Wallet,
+        identifier: ref.current,
       })}
       messageLine2={localizationKeys('userProfile.web3WalletPage.removeResource.messageLine2')}
       successMessage={localizationKeys('userProfile.web3WalletPage.removeResource.successMessage', {
-        web3Wallet: ref.current.web3Wallet,
+        web3Wallet: ref.current,
       })}
-      deleteResource={() => Promise.resolve(ref.current?.destroy())}
+      deleteResource={() => Promise.resolve(resource?.destroy())}
     />
   );
 };
@@ -111,7 +115,8 @@ export const RemoveMfaPhoneCodePage = () => {
   const user = useCoreUser();
   const { id } = useRouter().params;
   // TODO: This logic will need to change when we add more 2fa methods
-  const ref = React.useRef(deepCopyAndReturn(user.phoneNumbers.find(e => e.id === id)));
+  const resource = user.phoneNumbers.find(e => e.id === id);
+  const ref = React.useRef(resource?.phoneNumber);
 
   if (!ref.current) {
     return null;
@@ -121,13 +126,13 @@ export const RemoveMfaPhoneCodePage = () => {
     <RemoveResourcePage
       title={localizationKeys('userProfile.mfaPhoneCodePage.removeResource.title')}
       messageLine1={localizationKeys('userProfile.mfaPhoneCodePage.removeResource.messageLine1', {
-        identifier: ref.current.phoneNumber,
+        identifier: ref.current,
       })}
       messageLine2={localizationKeys('userProfile.mfaPhoneCodePage.removeResource.messageLine2')}
       successMessage={localizationKeys('userProfile.mfaPhoneCodePage.removeResource.successMessage', {
-        mfaPhoneCode: ref.current.phoneNumber,
+        mfaPhoneCode: ref.current,
       })}
-      deleteResource={() => Promise.resolve(ref.current?.setReservedForSecondFactor({ reserved: false }))}
+      deleteResource={() => Promise.resolve(resource?.setReservedForSecondFactor({ reserved: false }))}
     />
   );
 };
