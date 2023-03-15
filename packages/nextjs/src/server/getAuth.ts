@@ -11,13 +11,7 @@ import {
 
 import { API_KEY, API_URL, API_VERSION, SECRET_KEY } from './clerk';
 import type { RequestLike } from './types';
-import {
-  getAuthKeyFromRequest,
-  getAuthStatusFromRequest,
-  getCookie,
-  getHeader,
-  injectSSRStateIntoObject,
-} from './utils';
+import { getAuthKeyFromRequest, getCookie, getHeader, injectSSRStateIntoObject } from './utils';
 
 export const getAuth = (req: RequestLike): SignedInAuthObject | SignedOutAuthObject => {
   // When the auth status is set, we trust that the middleware has already run
@@ -72,21 +66,27 @@ type BuildClerkPropsInitState = { user?: User | null; session?: Session | null; 
 type BuildClerkProps = (req: RequestLike, authState?: BuildClerkPropsInitState) => Record<string, unknown>;
 
 export const buildClerkProps: BuildClerkProps = (req, initState = {}) => {
-  const authStatus = getAuthStatusFromRequest(req);
+  const authStatus = getAuthKeyFromRequest(req, 'AuthStatus');
+  const authMessage = getAuthKeyFromRequest(req, 'AuthMessage');
+  const authReason = getAuthKeyFromRequest(req, 'AuthReason');
 
-  if (!authStatus || authStatus !== AuthStatus.SignedIn) {
-    return {};
-  }
-
-  const { payload, raw } = parseJwt(req);
-
-  const authObject = signedInAuthObject(payload, {
+  const options = {
     apiKey: API_KEY,
     secretKey: SECRET_KEY,
     apiUrl: API_URL,
     apiVersion: API_VERSION,
-    token: raw.text,
-  });
+    authStatus,
+    authMessage,
+    authReason,
+  };
+
+  let authObject;
+  if (!authStatus || authStatus !== AuthStatus.SignedIn) {
+    authObject = signedOutAuthObject(options);
+  } else {
+    const { payload, raw } = parseJwt(req);
+    authObject = signedInAuthObject(payload, { ...options, token: raw.text });
+  }
 
   const sanitizedAuthObject = makeAuthObjectSerializable(sanitizeAuthObject({ ...authObject, ...initState }));
   return injectSSRStateIntoObject({}, sanitizedAuthObject);
