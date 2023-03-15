@@ -93,7 +93,7 @@ const commonForProd = () => {
     },
     output: {
       path: path.resolve(__dirname, 'dist'),
-      chunkFilename: `[name]::[fullhash:6]::${packageJSON.version}.js`,
+      chunkFilename: `[name]_[fullhash:6]_${packageJSON.version}.js`,
       filename: '[name].js',
       libraryTarget: 'umd',
       globalObject: 'globalThis',
