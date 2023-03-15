@@ -69,8 +69,8 @@ export const OrganizationSwitcher = lazy(() =>
 );
 
 export const ImpersonationFab = lazy(() =>
-  import(/* webpackChunkName: "ImpersonationFabWrapper" */ './LazyImpersonationFAB').then(module => ({
-    default: module.LazyImpersonationFab,
+  import(/* webpackChunkName: "ImpersonationFab" */ './../components/ImpersonationFab').then(module => ({
+    default: module.ImpersonationFab,
   })),
 );
 

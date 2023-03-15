@@ -1,3 +1,4 @@
+import type { Appearance } from '@clerk/types';
 import React, { lazy, Suspense } from 'react';
 
 import type { FlowMetadata } from '../elements';
@@ -5,21 +6,15 @@ import type { ThemableCssProp } from '../styledSystem';
 import type { ClerkComponentName } from './components';
 import { ClerkComponents } from './components';
 
-export const CoreClerkContextWrapper = lazy(() =>
-  import('../contexts').then(m => ({ default: m.CoreClerkContextWrapper })),
-);
-export const EnvironmentProvider = lazy(() => import('../contexts').then(m => ({ default: m.EnvironmentProvider })));
-export const OptionsProvider = lazy(() => import('../contexts').then(m => ({ default: m.OptionsProvider })));
-export const AppearanceProvider = lazy(() => import('../customizables').then(m => ({ default: m.AppearanceProvider })));
-export const VirtualRouter = lazy(() => import('../router').then(m => ({ default: m.VirtualRouter })));
-export const InternalThemeProvider = lazy(() =>
-  import('../styledSystem').then(m => ({ default: m.InternalThemeProvider })),
-);
-export const Portal = lazy(() => import('./../portal'));
-export const FlowMetadataProvider = lazy(() =>
-  import('./../elements').then(m => ({ default: m.FlowMetadataProvider })),
-);
-export const Modal = lazy(() => import('./../elements').then(m => ({ default: m.Modal })));
+const CoreClerkContextWrapper = lazy(() => import('../contexts').then(m => ({ default: m.CoreClerkContextWrapper })));
+const EnvironmentProvider = lazy(() => import('../contexts').then(m => ({ default: m.EnvironmentProvider })));
+const OptionsProvider = lazy(() => import('../contexts').then(m => ({ default: m.OptionsProvider })));
+const AppearanceProvider = lazy(() => import('../customizables').then(m => ({ default: m.AppearanceProvider })));
+const VirtualRouter = lazy(() => import('../router').then(m => ({ default: m.VirtualRouter })));
+const InternalThemeProvider = lazy(() => import('../styledSystem').then(m => ({ default: m.InternalThemeProvider })));
+const Portal = lazy(() => import('./../portal'));
+const FlowMetadataProvider = lazy(() => import('./../elements').then(m => ({ default: m.FlowMetadataProvider })));
+const Modal = lazy(() => import('./../elements').then(m => ({ default: m.Modal })));
 
 type LazyProvidersProps = React.PropsWithChildren<{ clerk: any; environment: any; options: any; children: any }>;
 
@@ -110,6 +105,25 @@ export const LazyModalRenderer = (props: LazyModalRendererProps) => {
             </Modal>
           </InternalThemeProvider>
         </FlowMetadataProvider>
+      </AppearanceProvider>
+    </Suspense>
+  );
+};
+
+/**
+ * This component automatically mounts when impersonating, without a user action.
+ * We want to hotload the /ui dependencies only if we're actually impersonating.
+ */
+export const LazyImpersonationFabProvider = (
+  props: React.PropsWithChildren<{ globalAppearance: Appearance | undefined }>,
+) => {
+  return (
+    <Suspense>
+      <AppearanceProvider
+        globalAppearance={props.globalAppearance}
+        appearanceKey={'impersonationFab'}
+      >
+        {props.children}
       </AppearanceProvider>
     </Suspense>
   );

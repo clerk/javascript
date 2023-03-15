@@ -17,7 +17,6 @@ import { buildVirtualRouterUrl } from '../utils';
 import type { AppearanceCascade } from './customizables/parseAppearance';
 // NOTE: Using `./hooks` instead of `./hooks/useClerkModalStateParams` will increase the bundle size
 import { useClerkModalStateParams } from './hooks/useClerkModalStateParams';
-import { LazyComponentRenderer, LazyModalRenderer, LazyProviders } from './lazyModules/commonDeps';
 import type { ClerkComponentName } from './lazyModules/components';
 import {
   CreateOrganizationModal,
@@ -27,6 +26,12 @@ import {
   SignUpModal,
   UserProfileModal,
 } from './lazyModules/components';
+import {
+  LazyComponentRenderer,
+  LazyImpersonationFabProvider,
+  LazyModalRenderer,
+  LazyProviders,
+} from './lazyModules/providers';
 import type { AvailableComponentProps } from './types';
 
 const ROOT_ELEMENT_ID = 'clerk-components';
@@ -101,7 +106,7 @@ export const mountComponentRenderer = (clerk: Clerk, environment: EnvironmentRes
 
   const mountComponentControls = () => {
     const deferredPromise = createDeferredPromise();
-    return import(/* webpackChunkName: "ReactDOM" */ 'react-dom/client').then(({ createRoot }) => {
+    return import('./lazyModules/common').then(({ createRoot }) => {
       createRoot(clerkRoot!).render(
         <Components
           clerk={clerk}
@@ -321,7 +326,11 @@ const Components = (props: ComponentsProps) => {
         {userProfileModal && mountedUserProfileModal}
         {organizationProfileModal && mountedOrganizationProfileModal}
         {createOrganizationModal && mountedCreateOrganizationModal}
-        {state.impersonationFab && <ImpersonationFab globalAppearance={state.appearance} />}
+        {state.impersonationFab && (
+          <LazyImpersonationFabProvider globalAppearance={state.appearance}>
+            <ImpersonationFab />
+          </LazyImpersonationFabProvider>
+        )}
       </LazyProviders>
     </Suspense>
   );
