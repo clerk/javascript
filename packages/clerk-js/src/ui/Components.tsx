@@ -22,6 +22,7 @@ import {
   CreateOrganizationModal,
   ImpersonationFab,
   OrganizationProfileModal,
+  preloadComponent,
   SignInModal,
   SignUpModal,
   UserProfileModal,
@@ -104,33 +105,33 @@ export const mountComponentRenderer = (clerk: Clerk, environment: EnvironmentRes
     document.body.appendChild(clerkRoot);
   }
 
-  const mountComponentControls = () => {
-    const deferredPromise = createDeferredPromise();
-    return import('./lazyModules/common').then(({ createRoot }) => {
-      createRoot(clerkRoot!).render(
-        <Components
-          clerk={clerk}
-          environment={environment}
-          options={options}
-          onComponentsMounted={deferredPromise.resolve}
-        />,
-      );
-      return deferredPromise.promise.then(() => componentsControls);
-    });
-  };
-
-  let componentsControlsResolver: ReturnType<typeof mountComponentControls> | undefined;
+  let componentsControlsResolver: Promise<ComponentControls> | undefined;
 
   return {
-    ensureMounted: async (cb: (controls: ComponentControls) => unknown) => {
+    ensureMounted: async (opts?: { preloadHint: ClerkComponentName }) => {
+      const { preloadHint } = opts || {};
       // This mechanism ensures that mountComponentControls will only be called once
       // and any calls to .mount before mountComponentControls resolves will fire in order.
       // Otherwise, we risk having components rendered multiple times, or having
       // .unmountComponent incorrectly called before the component is rendered
       if (!componentsControlsResolver) {
-        componentsControlsResolver = mountComponentControls();
+        const deferredPromise = createDeferredPromise();
+        if (preloadHint) {
+          void preloadComponent(preloadHint);
+        }
+        componentsControlsResolver = import('./lazyModules/common').then(({ createRoot }) => {
+          createRoot(clerkRoot!).render(
+            <Components
+              clerk={clerk}
+              environment={environment}
+              options={options}
+              onComponentsMounted={deferredPromise.resolve}
+            />,
+          );
+          return deferredPromise.promise.then(() => componentsControls);
+        });
       }
-      return componentsControlsResolver.then(controls => cb(controls));
+      return componentsControlsResolver.then(controls => controls);
     },
   };
 };
