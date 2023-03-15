@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.32.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.32.1...@clerk/clerk-js@4.32.2) (2023-03-15)
+
+### Bug Fixes
+
+- **types,clerk-js:** Allow passing additionalOAuthScopes prop to UserButton ([20079af](https://github.com/clerkinc/javascript/commit/20079af10308cdb87762f698100ad351a8569ab1))
+
 ### [4.32.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.32.0...@clerk/clerk-js@4.32.1) (2023-03-13)
 
 ### Bug Fixes

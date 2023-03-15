@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.30.2](https://github.com/clerkinc/javascript/compare/@clerk/types@3.30.1...@clerk/types@3.30.2) (2023-03-15)
+
+### Bug Fixes
+
+- **types,clerk-js:** Allow passing additionalOAuthScopes prop to UserButton ([20079af](https://github.com/clerkinc/javascript/commit/20079af10308cdb87762f698100ad351a8569ab1))
+- **types:** UserProfile additionalOAuthScopes prop support subset of supported OAuth providers ([4add2fd](https://github.com/clerkinc/javascript/commit/4add2fdf249294506ef438a47a300ceeac2b1a76))
+
 ### [3.30.1](https://github.com/clerkinc/javascript/compare/@clerk/types@3.30.1-staging.2...@clerk/types@3.30.1) (2023-03-10)
 
 **Note:** Version bump only for package @clerk/types
