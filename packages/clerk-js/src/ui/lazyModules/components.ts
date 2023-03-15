@@ -1,16 +1,16 @@
 import { lazy } from 'react';
 
 const componentImportPaths = {
-  SignIn: () => import(/* webpackChunkName: "SignIn" */ './../components/SignIn'),
-  SignUp: () => import(/* webpackChunkName: "SignUp" */ './../components/SignUp'),
-  UserButton: () => import(/* webpackChunkName: "UserButton" */ './../components/UserButton'),
-  UserProfile: () => import(/* webpackChunkName: "UserProfile" */ './../components/UserProfile'),
-  CreateOrganization: () => import(/* webpackChunkName: "CreateOrganization" */ './../components/CreateOrganization'),
+  SignIn: () => import(/* webpackChunkName: "signin" */ './../components/SignIn'),
+  SignUp: () => import(/* webpackChunkName: "signup" */ './../components/SignUp'),
+  UserButton: () => import(/* webpackChunkName: "userbutton" */ './../components/UserButton'),
+  UserProfile: () => import(/* webpackChunkName: "userprofile" */ './../components/UserProfile'),
+  CreateOrganization: () => import(/* webpackChunkName: "createorganization" */ './../components/CreateOrganization'),
   OrganizationProfile: () =>
-    import(/* webpackChunkName: "OrganizationProfile" */ './../components/OrganizationProfile'),
+    import(/* webpackChunkName: "organizationprofile" */ './../components/OrganizationProfile'),
   OrganizationSwitcher: () =>
-    import(/* webpackChunkName: "OrganizationSwitcher" */ './../components/OrganizationSwitcher'),
-  ImpersonationFab: () => import(/* webpackChunkName: "ImpersonationFab" */ './../components/ImpersonationFab'),
+    import(/* webpackChunkName: "organizationswitcher" */ './../components/OrganizationSwitcher'),
+  ImpersonationFab: () => import(/* webpackChunkName: "impersonationfab" */ './../components/ImpersonationFab'),
 } as const;
 
 export const SignIn = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignIn })));
