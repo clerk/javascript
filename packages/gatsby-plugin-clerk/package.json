@@ -1,6 +1,6 @@
 {
   "name": "gatsby-plugin-clerk",
-  "version": "4.1.12",
+  "version": "4.1.13",
   "license": "MIT",
   "description": "Clerk.dev SDK for Gatsby",
   "keywords": [
@@ -33,10 +33,10 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@clerk/backend": "^0.13.2",
-    "@clerk/clerk-react": "^4.12.5",
-    "@clerk/clerk-sdk-node": "^4.7.12",
-    "@clerk/types": "^3.30.2",
+    "@clerk/backend": "^0.13.3",
+    "@clerk/clerk-react": "^4.12.6",
+    "@clerk/clerk-sdk-node": "^4.7.13",
+    "@clerk/types": "^3.31.0",
     "cookie": "0.5.0",
     "tslib": "2.4.1"
   },

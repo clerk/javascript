@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.31.0](https://github.com/clerkinc/javascript/compare/@clerk/types@3.30.2...@clerk/types@3.31.0) (2023-03-15)
+
+### Features
+
+- **types:** Introduce Linear OAuth provider ([6f09aeb](https://github.com/clerkinc/javascript/commit/6f09aeb82fff6f46d5ff51f28d4b13b8b038543c))
+
 ### [3.30.2](https://github.com/clerkinc/javascript/compare/@clerk/types@3.30.1...@clerk/types@3.30.2) (2023-03-15)
 
 ### Bug Fixes
