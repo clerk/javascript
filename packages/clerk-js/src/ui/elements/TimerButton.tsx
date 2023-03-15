@@ -1,7 +1,7 @@
+import { useSafeLayoutEffect } from '@clerk/shared';
 import React, { useEffect } from 'react';
 
 import { Button, useLocalizations } from '../customizables';
-import { useSafeLayoutEffect } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
 
 type TimerButtonProps = PropsOfComponent<typeof Button> & {

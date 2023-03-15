@@ -1,4 +1,4 @@
-import { createDeferredPromise } from '@clerk/shared';
+import { createDeferredPromise, useSafeLayoutEffect } from '@clerk/shared';
 import type {
   Appearance,
   Clerk,
@@ -10,36 +10,37 @@ import type {
   SignUpProps,
   UserProfileProps,
 } from '@clerk/types';
-import React from 'react';
-import { createRoot } from 'react-dom/client';
+import React, { Suspense } from 'react';
 
-import { PRESERVED_QUERYSTRING_PARAMS } from '../core/constants';
 import { clerkUIErrorDOMElementNotFound } from '../core/errors';
 import { buildVirtualRouterUrl } from '../utils';
-import { CreateOrganization, CreateOrganizationModal } from './components/CreateOrganization';
-import { ImpersonationFab } from './components/ImpersonationFab';
-import { OrganizationProfile, OrganizationProfileModal } from './components/OrganizationProfile';
-import { OrganizationSwitcher } from './components/OrganizationSwitcher';
-import { SignIn, SignInModal } from './components/SignIn';
-import { SignUp, SignUpModal } from './components/SignUp';
-import { UserButton } from './components/UserButton';
-import { UserProfile, UserProfileModal } from './components/UserProfile';
-import { EnvironmentProvider, OptionsProvider } from './contexts';
-import { CoreClerkContextWrapper } from './contexts/CoreClerkContextWrapper';
-import { AppearanceProvider } from './customizables';
-import { FlowMetadataProvider, Modal } from './elements';
-import { useClerkModalStateParams, useSafeLayoutEffect } from './hooks';
-import Portal from './portal';
-import { VirtualRouter } from './router';
-import { InternalThemeProvider } from './styledSystem';
-import type { AvailableComponentCtx, AvailableComponentProps } from './types';
+import type { AppearanceCascade } from './customizables/parseAppearance';
+// NOTE: Using `./hooks` instead of `./hooks/useClerkModalStateParams` will increase the bundle size
+import { useClerkModalStateParams } from './hooks/useClerkModalStateParams';
+import type { ClerkComponentName } from './lazyModules/components';
+import {
+  CreateOrganizationModal,
+  ImpersonationFab,
+  OrganizationProfileModal,
+  preloadComponent,
+  SignInModal,
+  SignUpModal,
+  UserProfileModal,
+} from './lazyModules/components';
+import {
+  LazyComponentRenderer,
+  LazyImpersonationFabProvider,
+  LazyModalRenderer,
+  LazyProviders,
+} from './lazyModules/providers';
+import type { AvailableComponentProps } from './types';
 
 const ROOT_ELEMENT_ID = 'clerk-components';
 
 export type ComponentControls = {
   mountComponent: (params: {
-    appearanceKey: Uncapitalize<AvailableComponentNames>;
-    name: AvailableComponentNames;
+    appearanceKey: Uncapitalize<AppearanceCascade['appearanceKey']>;
+    name: ClerkComponentName;
     node: HTMLDivElement;
     props?: AvailableComponentProps;
   }) => void;
@@ -55,24 +56,14 @@ export type ComponentControls = {
     props: T extends 'signIn' ? SignInProps : T extends 'signUp' ? SignUpProps : UserProfileProps,
   ) => void;
   closeModal: (modal: 'signIn' | 'signUp' | 'userProfile' | 'organizationProfile' | 'createOrganization') => void;
+  // Special case, as the impersonation fab mounts automatically
+  mountImpersonationFab: () => void;
 };
-
-const AvailableComponents = {
-  SignIn,
-  SignUp,
-  UserButton,
-  UserProfile,
-  OrganizationSwitcher,
-  OrganizationProfile,
-  CreateOrganization,
-};
-
-type AvailableComponentNames = keyof typeof AvailableComponents;
 
 interface HtmlNodeOptions {
   key: string;
-  name: AvailableComponentNames;
-  appearanceKey: Uncapitalize<AvailableComponentNames>;
+  name: ClerkComponentName;
+  appearanceKey: Uncapitalize<AppearanceCascade['appearanceKey']>;
   props?: AvailableComponentProps;
 }
 
@@ -92,6 +83,7 @@ interface ComponentsState {
   organizationProfileModal: null | OrganizationProfileProps;
   createOrganizationModal: null | CreateOrganizationProps;
   nodes: Map<HTMLDivElement, HtmlNodeOptions>;
+  impersonationFab: boolean;
 }
 
 let portalCt = 0;
@@ -102,11 +94,7 @@ function assertDOMElement(element: HTMLElement): asserts element {
   }
 }
 
-export const mountComponentRenderer = async (
-  clerk: Clerk,
-  environment: EnvironmentResource,
-  options: ClerkOptions,
-): Promise<ComponentControls> => {
+export const mountComponentRenderer = (clerk: Clerk, environment: EnvironmentResource, options: ClerkOptions) => {
   // TODO: Init of components should start
   // before /env and /client requests
   let clerkRoot = document.getElementById(ROOT_ELEMENT_ID);
@@ -117,18 +105,35 @@ export const mountComponentRenderer = async (
     document.body.appendChild(clerkRoot);
   }
 
-  const deferredPromise = createDeferredPromise();
-  createRoot(clerkRoot).render(
-    <Components
-      clerk={clerk}
-      environment={environment}
-      options={options}
-      onComponentsMounted={deferredPromise.resolve}
-    />,
-  );
+  let componentsControlsResolver: Promise<ComponentControls> | undefined;
 
-  await deferredPromise.promise;
-  return componentsControls;
+  return {
+    ensureMounted: async (opts?: { preloadHint: ClerkComponentName }) => {
+      const { preloadHint } = opts || {};
+      // This mechanism ensures that mountComponentControls will only be called once
+      // and any calls to .mount before mountComponentControls resolves will fire in order.
+      // Otherwise, we risk having components rendered multiple times, or having
+      // .unmountComponent incorrectly called before the component is rendered
+      if (!componentsControlsResolver) {
+        const deferredPromise = createDeferredPromise();
+        if (preloadHint) {
+          void preloadComponent(preloadHint);
+        }
+        componentsControlsResolver = import('./lazyModules/common').then(({ createRoot }) => {
+          createRoot(clerkRoot!).render(
+            <Components
+              clerk={clerk}
+              environment={environment}
+              options={options}
+              onComponentsMounted={deferredPromise.resolve}
+            />,
+          );
+          return deferredPromise.promise.then(() => componentsControls);
+        });
+      }
+      return componentsControlsResolver.then(controls => controls);
+    },
+  };
 };
 
 export type MountComponentRenderer = typeof mountComponentRenderer;
@@ -153,6 +158,7 @@ const Components = (props: ComponentsProps) => {
     organizationProfileModal: null,
     createOrganizationModal: null,
     nodes: new Map(),
+    impersonationFab: false,
   });
   const { signInModal, signUpModal, userProfileModal, organizationProfileModal, createOrganizationModal, nodes } =
     state;
@@ -205,184 +211,128 @@ const Components = (props: ComponentsProps) => {
       setState(s => ({ ...s, [name + 'Modal']: props }));
     };
 
+    componentsControls.mountImpersonationFab = () => {
+      setState(s => ({ ...s, impersonationFab: true }));
+    };
+
     props.onComponentsMounted();
   }, []);
 
   const mountedSignInModal = (
-    <AppearanceProvider
+    <LazyModalRenderer
       globalAppearance={state.appearance}
-      appearanceKey='signIn'
-      appearance={signInModal?.appearance}
+      appearanceKey={'signIn'}
+      componentAppearance={signInModal?.appearance}
+      flowName={'signIn'}
+      onClose={() => componentsControls.closeModal('signIn')}
+      onExternalNavigate={() => componentsControls.closeModal('signIn')}
+      startPath={buildVirtualRouterUrl({ base: '/sign-in', path: urlStateParam?.path })}
+      componentName={'SignInModal'}
     >
-      <FlowMetadataProvider flow={'signIn'}>
-        <InternalThemeProvider>
-          <Modal handleClose={() => componentsControls.closeModal('signIn')}>
-            <VirtualRouter
-              preservedParams={PRESERVED_QUERYSTRING_PARAMS}
-              onExternalNavigate={() => componentsControls.closeModal('signIn')}
-              startPath={buildVirtualRouterUrl({ base: '/sign-in', path: urlStateParam?.path })}
-            >
-              <SignInModal {...signInModal} />
-              <SignUpModal
-                afterSignInUrl={signInModal?.afterSignInUrl}
-                afterSignUpUrl={signInModal?.afterSignUpUrl}
-                redirectUrl={signInModal?.redirectUrl}
-              />
-            </VirtualRouter>
-          </Modal>
-        </InternalThemeProvider>
-      </FlowMetadataProvider>
-    </AppearanceProvider>
+      <SignInModal {...signInModal} />
+      <SignUpModal {...signInModal} />
+    </LazyModalRenderer>
   );
 
   const mountedSignUpModal = (
-    <AppearanceProvider
+    <LazyModalRenderer
       globalAppearance={state.appearance}
-      appearanceKey='signUp'
-      appearance={signUpModal?.appearance}
+      appearanceKey={'signUp'}
+      componentAppearance={signUpModal?.appearance}
+      flowName={'signUp'}
+      onClose={() => componentsControls.closeModal('signUp')}
+      onExternalNavigate={() => componentsControls.closeModal('signUp')}
+      startPath={buildVirtualRouterUrl({ base: '/sign-up', path: urlStateParam?.path })}
+      componentName={'SignUpModal'}
     >
-      <FlowMetadataProvider flow={'signUp'}>
-        <InternalThemeProvider>
-          <Modal handleClose={() => componentsControls.closeModal('signUp')}>
-            <VirtualRouter
-              preservedParams={PRESERVED_QUERYSTRING_PARAMS}
-              onExternalNavigate={() => componentsControls.closeModal('signUp')}
-              startPath={buildVirtualRouterUrl({ base: '/sign-up', path: urlStateParam?.path })}
-            >
-              <SignInModal
-                afterSignInUrl={signUpModal?.afterSignInUrl}
-                afterSignUpUrl={signUpModal?.afterSignUpUrl}
-                redirectUrl={signUpModal?.redirectUrl}
-              />
-              <SignUpModal {...signUpModal} />
-            </VirtualRouter>
-          </Modal>
-        </InternalThemeProvider>
-      </FlowMetadataProvider>
-    </AppearanceProvider>
+      <SignInModal {...signInModal} />
+      <SignUpModal {...signUpModal} />
+    </LazyModalRenderer>
   );
 
   const mountedUserProfileModal = (
-    <AppearanceProvider
+    <LazyModalRenderer
       globalAppearance={state.appearance}
-      appearanceKey='userProfile'
-      appearance={userProfileModal?.appearance}
+      appearanceKey={'userProfile'}
+      componentAppearance={userProfileModal?.appearance}
+      flowName={'userProfile'}
+      onClose={() => componentsControls.closeModal('userProfile')}
+      onExternalNavigate={() => componentsControls.closeModal('userProfile')}
+      startPath={buildVirtualRouterUrl({ base: '/user', path: urlStateParam?.path })}
+      componentName={'SignUpModal'}
+      modalContainerSx={{ alignItems: 'center' }}
+      modalContentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
     >
-      <FlowMetadataProvider flow='userProfile'>
-        <InternalThemeProvider>
-          <Modal
-            handleClose={() => componentsControls.closeModal('userProfile')}
-            containerSx={{ alignItems: 'center' }}
-            contentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
-          >
-            <VirtualRouter
-              preservedParams={PRESERVED_QUERYSTRING_PARAMS}
-              onExternalNavigate={() => componentsControls.closeModal('userProfile')}
-              startPath={buildVirtualRouterUrl({ base: '/user', path: urlStateParam?.path })}
-            >
-              <UserProfileModal />
-            </VirtualRouter>
-          </Modal>
-        </InternalThemeProvider>
-      </FlowMetadataProvider>
-    </AppearanceProvider>
+      <UserProfileModal {...userProfileModal} />
+    </LazyModalRenderer>
   );
 
   const mountedOrganizationProfileModal = (
-    <AppearanceProvider
+    <LazyModalRenderer
       globalAppearance={state.appearance}
-      appearanceKey='organizationProfile'
-      appearance={organizationProfileModal?.appearance}
+      appearanceKey={'organizationProfile'}
+      componentAppearance={organizationProfileModal?.appearance}
+      flowName={'organizationProfile'}
+      onClose={() => componentsControls.closeModal('organizationProfile')}
+      onExternalNavigate={() => componentsControls.closeModal('organizationProfile')}
+      startPath={buildVirtualRouterUrl({ base: '/organizationProfile', path: urlStateParam?.path })}
+      componentName={'OrganizationProfileModal'}
+      modalContainerSx={{ alignItems: 'center' }}
+      modalContentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
     >
-      <FlowMetadataProvider flow='organizationProfile'>
-        <InternalThemeProvider>
-          <Modal
-            handleClose={() => componentsControls.closeModal('organizationProfile')}
-            containerSx={{ alignItems: 'center' }}
-            contentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
-          >
-            <VirtualRouter
-              preservedParams={PRESERVED_QUERYSTRING_PARAMS}
-              onExternalNavigate={() => componentsControls.closeModal('organizationProfile')}
-              startPath={buildVirtualRouterUrl({ base: '/organizationProfile', path: urlStateParam?.path })}
-            >
-              <OrganizationProfileModal {...organizationProfileModal} />
-            </VirtualRouter>
-          </Modal>
-        </InternalThemeProvider>
-      </FlowMetadataProvider>
-    </AppearanceProvider>
+      <OrganizationProfileModal {...organizationProfileModal} />
+    </LazyModalRenderer>
   );
 
   const mountedCreateOrganizationModal = (
-    <AppearanceProvider
+    <LazyModalRenderer
       globalAppearance={state.appearance}
-      appearanceKey='createOrganization'
-      appearance={createOrganizationModal?.appearance}
+      appearanceKey={'createOrganization'}
+      componentAppearance={createOrganizationModal?.appearance}
+      flowName={'createOrganization'}
+      onClose={() => componentsControls.closeModal('createOrganization')}
+      onExternalNavigate={() => componentsControls.closeModal('createOrganization')}
+      startPath={buildVirtualRouterUrl({ base: '/createOrganization', path: urlStateParam?.path })}
+      componentName={'CreateOrganizationModal'}
+      modalContainerSx={{ alignItems: 'center' }}
+      modalContentSx={t => ({ height: `min(${t.sizes.$120}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
     >
-      <FlowMetadataProvider flow='createOrganization'>
-        <InternalThemeProvider>
-          <Modal
-            handleClose={() => componentsControls.closeModal('createOrganization')}
-            containerSx={{ alignItems: 'center' }}
-            contentSx={t => ({ height: `min(${t.sizes.$120}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
-          >
-            <VirtualRouter
-              preservedParams={PRESERVED_QUERYSTRING_PARAMS}
-              onExternalNavigate={() => componentsControls.closeModal('createOrganization')}
-              startPath={buildVirtualRouterUrl({ base: '/createOrganization', path: urlStateParam?.path })}
-            >
-              <CreateOrganizationModal {...createOrganizationModal} />
-            </VirtualRouter>
-          </Modal>
-        </InternalThemeProvider>
-      </FlowMetadataProvider>
-    </AppearanceProvider>
-  );
-
-  const mountedImpersonationFab = (
-    <AppearanceProvider
-      globalAppearance={state.appearance}
-      appearanceKey='impersonationFab'
-    >
-      <InternalThemeProvider>
-        <ImpersonationFab />
-      </InternalThemeProvider>
-    </AppearanceProvider>
+      <CreateOrganizationModal {...createOrganizationModal} />
+    </LazyModalRenderer>
   );
 
   return (
-    <CoreClerkContextWrapper clerk={props.clerk}>
-      <EnvironmentProvider value={props.environment}>
-        <OptionsProvider value={state.options}>
-          {[...nodes].map(([node, component]) => {
-            return (
-              <AppearanceProvider
-                key={component.key}
-                globalAppearance={state.appearance}
-                appearanceKey={component.appearanceKey}
-                appearance={component.props?.appearance}
-              >
-                <Portal<AvailableComponentCtx>
-                  componentName={component.name}
-                  key={component.key}
-                  component={AvailableComponents[component.name]}
-                  props={component.props || {}}
-                  node={node}
-                  preservedParams={PRESERVED_QUERYSTRING_PARAMS}
-                />
-              </AppearanceProvider>
-            );
-          })}
+    <Suspense fallback={''}>
+      <LazyProviders
+        clerk={props.clerk}
+        environment={props.environment}
+        options={state.options}
+      >
+        {[...nodes].map(([node, component]) => {
+          return (
+            <LazyComponentRenderer
+              key={component.key}
+              node={node}
+              globalAppearance={state.appearance}
+              appearanceKey={component.appearanceKey}
+              componentAppearance={component.props?.appearance}
+              componentName={component.name}
+              componentProps={component.props}
+            />
+          );
+        })}
 
-          {signInModal && mountedSignInModal}
-          {signUpModal && mountedSignUpModal}
-          {userProfileModal && mountedUserProfileModal}
-          {organizationProfileModal && mountedOrganizationProfileModal}
-          {createOrganizationModal && mountedCreateOrganizationModal}
-          {mountedImpersonationFab}
-        </OptionsProvider>
-      </EnvironmentProvider>
-    </CoreClerkContextWrapper>
+        {signInModal && mountedSignInModal}
+        {signUpModal && mountedSignUpModal}
+        {userProfileModal && mountedUserProfileModal}
+        {organizationProfileModal && mountedOrganizationProfileModal}
+        {createOrganizationModal && mountedCreateOrganizationModal}
+        {state.impersonationFab && (
+          <LazyImpersonationFabProvider globalAppearance={state.appearance}>
+            <ImpersonationFab />
+          </LazyImpersonationFabProvider>
+        )}
+      </LazyProviders>
+    </Suspense>
   );
 };

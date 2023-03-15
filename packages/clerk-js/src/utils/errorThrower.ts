@@ -1,7 +1,5 @@
 import { buildErrorThrower } from '@clerk/shared';
 
-import packageJSON from '../../package.json';
-
-const errorThrower = buildErrorThrower({ packageName: packageJSON.name });
+const errorThrower = buildErrorThrower({ packageName: __PKG_NAME__ });
 
 export { errorThrower };

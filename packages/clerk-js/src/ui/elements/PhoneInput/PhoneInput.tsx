@@ -1,6 +1,7 @@
 import React, { useLayoutEffect, useState } from 'react';
 
 import { getLongestValidCountryCode } from '../../../ui/utils/phoneUtils';
+import { useEnvironment } from '../../contexts';
 import { Flex, Input, Text } from '../../customizables';
 import { Select, SelectButton, SelectOptionList } from '../../elements';
 import type { PropsOfComponent } from '../../styledSystem';
@@ -20,14 +21,15 @@ const createSelectOption = (country: CountryEntry) => {
 
 const countryOptions = [...IsoToCountryMap.values()].map(createSelectOption);
 
-type PhoneInputProps = PropsOfComponent<typeof Input>;
+type PhoneInputProps = PropsOfComponent<typeof Input> & { defaultSelectedIso?: CountryIso };
 
-export const PhoneInput = (props: PhoneInputProps) => {
-  const { onChange: onChangeProp, value, ...rest } = props;
+const PhoneInputBase = (props: PhoneInputProps) => {
+  const { onChange: onChangeProp, value, defaultSelectedIso = 'us', ...rest } = props;
   const phoneInputRef = React.useRef<HTMLInputElement>(null);
   const { setPhoneNumber, cleanPhoneNumber, formattedPhoneNumber, selectedIso, setSelectedIso } =
     useFormattedPhoneNumber({
       defaultPhone: value as string,
+      defaultSelectedIso: defaultSelectedIso.toLowerCase() as CountryIso,
     });
 
   const callOnChangeProp = () => {
@@ -189,5 +191,16 @@ const Flag = (props: { iso: CountryIso }) => {
         <Text variant='smallBold'>{props.iso.toUpperCase()}</Text>
       )}
     </>
+  );
+};
+
+export const PhoneInput = (props: Omit<PhoneInputProps, 'dd'>) => {
+  const { country } = useEnvironment();
+
+  return (
+    <PhoneInputBase
+      {...props}
+      defaultSelectedIso={(country || 'us') as CountryIso}
+    />
   );
 };

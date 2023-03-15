@@ -44,7 +44,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
   const [handler = noop, opts = {}] = args as [NextMiddleware, WithAuthOptions] | [];
 
   const proxyUrl = opts?.proxyUrl || PROXY_URL;
-  const domain = (opts)?.domain || DOMAIN;
+  const domain = opts?.domain || DOMAIN;
 
   if (!!proxyUrl && !isHttpOrHttps(proxyUrl)) {
     throw new Error(`Only a absolute URL that starts with https is allowed to be used in SSR`);
@@ -113,7 +113,9 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
     // get result from provided handler
     const res = await handler(req, event);
 
-    return handleMiddlewareResult({ req, res, authStatus: requestState.status });
+    const { status: authStatus, reason: authReason, message: authMessage } = requestState;
+
+    return handleMiddlewareResult({ req, res, authStatus, authReason, authMessage });
   };
 };
 
@@ -121,10 +123,18 @@ type HandleMiddlewareResultProps = {
   req: NextRequest;
   res: NextMiddlewareResult;
   authStatus: AuthStatus;
+  authReason: string | null;
+  authMessage: string | null;
 };
 
 // Auth result will be set as both a query param & header when applicable
-export function handleMiddlewareResult({ req, res, authStatus }: HandleMiddlewareResultProps): NextMiddlewareResult {
+export function handleMiddlewareResult({
+  req,
+  res,
+  authStatus,
+  authMessage,
+  authReason,
+}: HandleMiddlewareResultProps): NextMiddlewareResult {
   // pass-through case, convert to next()
   if (!res) {
     res = NextResponse.next();
@@ -161,10 +171,18 @@ export function handleMiddlewareResult({ req, res, authStatus }: HandleMiddlewar
       // If we detect that the host app is using a nextjs installation that reliably sets the
       // request headers, we don't need to fall back to the searchParams strategy.
       // In this case, we won't set them at all in order to avoid having them visible in the req.url
-      setRequestHeadersOnNextResponse(res, req, { [constants.Headers.AuthStatus]: authStatus });
+      setRequestHeadersOnNextResponse(res, req, {
+        [constants.Headers.AuthStatus]: authStatus,
+        [constants.Headers.AuthMessage]: authMessage || '',
+        [constants.Headers.AuthReason]: authReason || '',
+      });
     } else {
       res.headers.set(constants.Headers.AuthStatus, authStatus);
+      res.headers.set(constants.Headers.AuthMessage, authMessage || '');
+      res.headers.set(constants.Headers.AuthReason, authReason || '');
       rewriteURL.searchParams.set(constants.SearchParams.AuthStatus, authStatus);
+      rewriteURL.searchParams.set(constants.Headers.AuthMessage, authMessage || '');
+      rewriteURL.searchParams.set(constants.Headers.AuthReason, authReason || '');
     }
     res.headers.set(nextConstants.Headers.NextRewrite, rewriteURL.href);
   }

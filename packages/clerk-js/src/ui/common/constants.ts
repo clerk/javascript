@@ -79,12 +79,3 @@ export function getWeb3ProviderData(name: Web3Provider): Web3ProviderData | unde
 export function svgUrl(id: string): string {
   return `https://images.clerk.dev/static/${id}.svg`;
 }
-
-export const ERROR_CODES = {
-  FORM_IDENTIFIER_NOT_FOUND: 'form_identifier_not_found',
-  FORM_PASSWORD_INCORRECT: 'form_password_incorrect',
-  INVALID_STRATEGY_FOR_USER: 'strategy_for_user_invalid',
-  NOT_ALLOWED_TO_SIGN_UP: 'not_allowed_to_sign_up',
-  OAUTH_ACCESS_DENIED: 'oauth_access_denied',
-  NOT_ALLOWED_ACCESS: 'not_allowed_access',
-};

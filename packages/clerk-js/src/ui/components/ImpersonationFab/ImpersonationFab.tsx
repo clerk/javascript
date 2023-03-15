@@ -1,6 +1,7 @@
 import type { PointerEventHandler } from 'react';
 import React, { useEffect, useRef } from 'react';
 
+import { getFullName, getIdentifier } from '../../../utils/user';
 import { useCoreClerk, useCoreSession, withCoreUserGuard } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
@@ -17,8 +18,7 @@ import {
 import { Portal } from '../../elements/Portal';
 import { Eye } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
-import { mqu } from '../../styledSystem';
-import { getFullName, getIdentifier } from '../../utils';
+import { InternalThemeProvider, mqu } from '../../styledSystem';
 
 type EyeCircleProps = PropsOfComponent<typeof Col> & {
   width: string;
@@ -230,4 +230,8 @@ const _ImpersonationFab = () => {
   );
 };
 
-export const ImpersonationFab = withCoreUserGuard(_ImpersonationFab);
+export const ImpersonationFab = withCoreUserGuard(() => (
+  <InternalThemeProvider>
+    <_ImpersonationFab />
+  </InternalThemeProvider>
+));

@@ -13,24 +13,28 @@ export type EmailCodeFactor = {
   strategy: EmailCodeStrategy;
   emailAddressId: string;
   safeIdentifier: string;
+  primary?: boolean;
 };
 
 export type EmailLinkFactor = {
   strategy: EmailLinkStrategy;
   emailAddressId: string;
   safeIdentifier: string;
+  primary?: boolean;
 };
 
 export type PhoneCodeFactor = {
   strategy: PhoneCodeStrategy;
   phoneNumberId: string;
   safeIdentifier: string;
+  primary?: boolean;
   default?: boolean;
 };
 
 export type Web3SignatureFactor = {
   strategy: Web3Strategy;
   web3WalletId: string;
+  primary?: boolean;
 };
 
 export type PasswordFactor = {

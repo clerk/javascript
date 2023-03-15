@@ -1,5 +1,7 @@
 import type { OAuthStrategy } from './strategies';
 
+export type OAuthScope = string;
+
 export interface OAuthProviderData {
   provider: OAuthProvider;
   strategy: OAuthStrategy;
@@ -30,6 +32,7 @@ export type SpotifyOauthProvider = 'spotify';
 export type XeroOauthProvider = 'xero';
 export type BoxOauthProvider = 'box';
 export type SlackOauthProvider = 'slack';
+export type LinearOauthProvider = 'linear';
 
 export type OAuthProvider =
   | FacebookOauthProvider
@@ -54,7 +57,8 @@ export type OAuthProvider =
   | SpotifyOauthProvider
   | XeroOauthProvider
   | BoxOauthProvider
-  | SlackOauthProvider;
+  | SlackOauthProvider
+  | LinearOauthProvider;
 
 export const OAUTH_PROVIDERS: OAuthProviderData[] = [
   {
@@ -194,6 +198,12 @@ export const OAUTH_PROVIDERS: OAuthProviderData[] = [
     strategy: 'oauth_slack',
     name: 'Slack',
     docsUrl: 'https://clerk.dev/docs/authentication/social-connection-with-slack',
+  },
+  {
+    provider: 'linear',
+    strategy: 'oauth_linear',
+    name: 'Linear',
+    docsUrl: 'https://clerk.dev/docs/authentication/social-connection-with-linear',
   },
 ];
 

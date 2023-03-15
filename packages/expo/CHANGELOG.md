@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.12.13](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.12.13-staging.2...@clerk/clerk-expo@0.12.13) (2023-03-10)
+
+**Note:** Version bump only for package @clerk/clerk-expo
+
+### [0.12.12](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.12.12-staging.3...@clerk/clerk-expo@0.12.12) (2023-03-09)
+
+**Note:** Version bump only for package @clerk/clerk-expo
+
 ### [0.12.11](https://github.com/clerkinc/javascript/compare/@clerk/clerk-expo@0.12.10...@clerk/clerk-expo@0.12.11) (2023-03-07)
 
 **Note:** Version bump only for package @clerk/clerk-expo

@@ -19,6 +19,8 @@ import { unixEpochToDate } from '../../utils/date';
 import { BaseResource, OrganizationInvitation, OrganizationMembership } from './internal';
 
 export class Organization extends BaseResource implements OrganizationResource {
+  pathRoot = '/organizations';
+
   id!: string;
   name!: string;
   slug!: string;

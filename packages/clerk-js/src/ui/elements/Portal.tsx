@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 
 type PortalProps = React.PropsWithChildren<{}>;
 
+// No longer In use
 export const Portal = (props: PortalProps) => {
   const elRef = React.useRef(document.createElement('div'));
 
