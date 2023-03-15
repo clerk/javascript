@@ -23,10 +23,6 @@ export const fastDeepMergeAndReplace = (
   }
 };
 
-export function isObject(item: any) {
-  return item && typeof item === 'object' && !Array.isArray(item);
-}
-
 export const fastDeepMergeAndKeep = (
   source: Record<any, any> | undefined | null,
   target: Record<any, any> | undefined | null,
