@@ -17,16 +17,22 @@ import { buildVirtualRouterUrl } from '../utils';
 import type { AppearanceCascade } from './customizables/parseAppearance';
 // NOTE: Using `./hooks` instead of `./hooks/useClerkModalStateParams` will increase the bundle size
 import { useClerkModalStateParams } from './hooks/useClerkModalStateParams';
-import { LazyComponentRenderer, LazyModalRenderer, LazyProviders } from './lazyModules/commonDeps';
 import type { ClerkComponentName } from './lazyModules/components';
 import {
   CreateOrganizationModal,
   ImpersonationFab,
   OrganizationProfileModal,
+  preloadComponent,
   SignInModal,
   SignUpModal,
   UserProfileModal,
 } from './lazyModules/components';
+import {
+  LazyComponentRenderer,
+  LazyImpersonationFabProvider,
+  LazyModalRenderer,
+  LazyProviders,
+} from './lazyModules/providers';
 import type { AvailableComponentProps } from './types';
 
 const ROOT_ELEMENT_ID = 'clerk-components';
@@ -99,33 +105,33 @@ export const mountComponentRenderer = (clerk: Clerk, environment: EnvironmentRes
     document.body.appendChild(clerkRoot);
   }
 
-  const mountComponentControls = () => {
-    const deferredPromise = createDeferredPromise();
-    return import(/* webpackChunkName: "ReactDOM" */ 'react-dom/client').then(({ createRoot }) => {
-      createRoot(clerkRoot!).render(
-        <Components
-          clerk={clerk}
-          environment={environment}
-          options={options}
-          onComponentsMounted={deferredPromise.resolve}
-        />,
-      );
-      return deferredPromise.promise.then(() => componentsControls);
-    });
-  };
-
-  let componentsControlsResolver: ReturnType<typeof mountComponentControls> | undefined;
+  let componentsControlsResolver: Promise<ComponentControls> | undefined;
 
   return {
-    ensureMounted: async (cb: (controls: ComponentControls) => unknown) => {
+    ensureMounted: async (opts?: { preloadHint: ClerkComponentName }) => {
+      const { preloadHint } = opts || {};
       // This mechanism ensures that mountComponentControls will only be called once
       // and any calls to .mount before mountComponentControls resolves will fire in order.
       // Otherwise, we risk having components rendered multiple times, or having
       // .unmountComponent incorrectly called before the component is rendered
       if (!componentsControlsResolver) {
-        componentsControlsResolver = mountComponentControls();
+        const deferredPromise = createDeferredPromise();
+        if (preloadHint) {
+          void preloadComponent(preloadHint);
+        }
+        componentsControlsResolver = import('./lazyModules/common').then(({ createRoot }) => {
+          createRoot(clerkRoot!).render(
+            <Components
+              clerk={clerk}
+              environment={environment}
+              options={options}
+              onComponentsMounted={deferredPromise.resolve}
+            />,
+          );
+          return deferredPromise.promise.then(() => componentsControls);
+        });
       }
-      return componentsControlsResolver.then(controls => cb(controls));
+      return componentsControlsResolver.then(controls => controls);
     },
   };
 };
@@ -321,7 +327,11 @@ const Components = (props: ComponentsProps) => {
         {userProfileModal && mountedUserProfileModal}
         {organizationProfileModal && mountedOrganizationProfileModal}
         {createOrganizationModal && mountedCreateOrganizationModal}
-        {state.impersonationFab && <ImpersonationFab globalAppearance={state.appearance} />}
+        {state.impersonationFab && (
+          <LazyImpersonationFabProvider globalAppearance={state.appearance}>
+            <ImpersonationFab />
+          </LazyImpersonationFabProvider>
+        )}
       </LazyProviders>
     </Suspense>
   );
