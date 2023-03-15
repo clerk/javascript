@@ -98,6 +98,32 @@ const commonForProd = () => {
       libraryTarget: 'umd',
       globalObject: 'globalThis',
     },
+    plugins: [
+      // new webpack.optimize.LimitChunkCountPlugin({
+      //   maxChunks: 5,
+      // }),
+      // new webpack.optimize.MinChunkSizePlugin({
+      //   minChunkSize: 10000,
+      // })
+    ],
+    optimization: {
+      splitChunks: {
+        cacheGroups: {
+          common: {
+            minChunks: 1,
+            name: 'ui-common',
+            priority: -20,
+            test: module => module.resource && !module.resource.includes('/ui/components'),
+          },
+          defaultVendors: {
+            minChunks: 1,
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            priority: -10,
+          },
+        },
+      },
+    },
   };
 };
 
@@ -117,7 +143,7 @@ const entryForVariant = variant => {
 
 /** @type { () => (import('webpack').Configuration)[] } */
 const prodConfig = ({ mode, env }) => {
-  const variant = env.variant || undefined;
+  const variant = env.variant;
 
   const entryToConfigMap = {
     // prettier-ignore
