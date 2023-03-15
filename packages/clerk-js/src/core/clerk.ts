@@ -245,12 +245,14 @@ export default class Clerk implements ClerkInterface {
     if (sessionExistsAndSingleSessionModeEnabled(this, this.#environment) && this.#instanceType === 'development') {
       return console.info(warnings.cannotOpenSignUpOrSignUp);
     }
-    void this.#componentControls.ensureMounted(controls => controls.openModal('signIn', props || {}));
+    void this.#componentControls
+      .ensureMounted({ preloadHint: 'SignIn' })
+      .then(controls => controls.openModal('signIn', props || {}));
   };
 
   public closeSignIn = (): void => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted(controls => controls.closeModal('signIn'));
+    void this.#componentControls.ensureMounted().then(controls => controls.closeModal('signIn'));
   };
 
   public openSignUp = (props?: SignInProps): void => {
@@ -258,12 +260,14 @@ export default class Clerk implements ClerkInterface {
     if (sessionExistsAndSingleSessionModeEnabled(this, this.#environment) && this.#instanceType === 'development') {
       return console.info(warnings.cannotOpenSignUpOrSignUp);
     }
-    void this.#componentControls.ensureMounted(controls => controls.openModal('signUp', props || {}));
+    void this.#componentControls
+      .ensureMounted({ preloadHint: 'SignUp' })
+      .then(controls => controls.openModal('signUp', props || {}));
   };
 
   public closeSignUp = (): void => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted(controls => controls.closeModal('signUp'));
+    void this.#componentControls.ensureMounted().then(controls => controls.closeModal('signUp'));
   };
 
   public openUserProfile = (props?: UserProfileProps): void => {
@@ -271,12 +275,14 @@ export default class Clerk implements ClerkInterface {
     if (noUserExists(this) && this.#instanceType === 'development') {
       return console.info(warnings.cannotOpenUserProfile);
     }
-    void this.#componentControls.ensureMounted(controls => controls.openModal('userProfile', props || {}));
+    void this.#componentControls
+      .ensureMounted({ preloadHint: 'UserProfile' })
+      .then(controls => controls.openModal('userProfile', props || {}));
   };
 
   public closeUserProfile = (): void => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted(controls => controls.closeModal('userProfile'));
+    void this.#componentControls.ensureMounted().then(controls => controls.closeModal('userProfile'));
   };
 
   public openOrganizationProfile = (props?: OrganizationProfileProps): void => {
@@ -284,27 +290,31 @@ export default class Clerk implements ClerkInterface {
     if (noOrganizationExists(this) && this.#instanceType === 'development') {
       return console.info(warnings.cannotOpenOrgProfile);
     }
-    void this.#componentControls.ensureMounted(controls => controls.openModal('organizationProfile', props || {}));
+    void this.#componentControls
+      .ensureMounted({ preloadHint: 'OrganizationProfile' })
+      .then(controls => controls.openModal('organizationProfile', props || {}));
   };
 
   public closeOrganizationProfile = (): void => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted(controls => controls.closeModal('organizationProfile'));
+    void this.#componentControls.ensureMounted().then(controls => controls.closeModal('organizationProfile'));
   };
 
   public openCreateOrganization = (props?: CreateOrganizationProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted(controls => controls.openModal('createOrganization', props || {}));
+    void this.#componentControls
+      .ensureMounted({ preloadHint: 'CreateOrganization' })
+      .then(controls => controls.openModal('createOrganization', props || {}));
   };
 
   public closeCreateOrganization = (): void => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted(controls => controls.closeModal('createOrganization'));
+    void this.#componentControls.ensureMounted().then(controls => controls.closeModal('createOrganization'));
   };
 
   public mountSignIn = (node: HTMLDivElement, props?: SignInProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted(controls =>
+    void this.#componentControls.ensureMounted({ preloadHint: 'SignIn' }).then(controls =>
       controls.mountComponent({
         name: 'SignIn',
         appearanceKey: 'signIn',
@@ -316,7 +326,7 @@ export default class Clerk implements ClerkInterface {
 
   public unmountSignIn = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted(controls =>
+    void this.#componentControls.ensureMounted().then(controls =>
       controls.unmountComponent({
         node,
       }),
@@ -325,7 +335,7 @@ export default class Clerk implements ClerkInterface {
 
   public mountSignUp = (node: HTMLDivElement, props?: SignUpProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted(controls =>
+    void this.#componentControls.ensureMounted({ preloadHint: 'SignUp' }).then(controls =>
       controls.mountComponent({
         name: 'SignUp',
         appearanceKey: 'signUp',
@@ -337,7 +347,7 @@ export default class Clerk implements ClerkInterface {
 
   public unmountSignUp = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted(controls =>
+    void this.#componentControls.ensureMounted().then(controls =>
       controls.unmountComponent({
         node,
       }),
@@ -346,7 +356,7 @@ export default class Clerk implements ClerkInterface {
 
   public mountUserProfile = (node: HTMLDivElement, props?: UserProfileProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted(controls =>
+    void this.#componentControls.ensureMounted({ preloadHint: 'UserProfile' }).then(controls =>
       controls.mountComponent({
         name: 'UserProfile',
         appearanceKey: 'userProfile',
@@ -358,7 +368,7 @@ export default class Clerk implements ClerkInterface {
 
   public unmountUserProfile = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted(controls =>
+    void this.#componentControls.ensureMounted().then(controls =>
       controls.unmountComponent({
         node,
       }),
@@ -367,7 +377,7 @@ export default class Clerk implements ClerkInterface {
 
   public mountOrganizationProfile = (node: HTMLDivElement, props?: OrganizationProfileProps) => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted(controls =>
+    void this.#componentControls.ensureMounted({ preloadHint: 'OrganizationProfile' }).then(controls =>
       controls.mountComponent({
         name: 'OrganizationProfile',
         appearanceKey: 'userProfile',
@@ -379,7 +389,7 @@ export default class Clerk implements ClerkInterface {
 
   public unmountOrganizationProfile = (node: HTMLDivElement) => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted(controls =>
+    void this.#componentControls.ensureMounted().then(controls =>
       controls.unmountComponent({
         node,
       }),
@@ -388,7 +398,7 @@ export default class Clerk implements ClerkInterface {
 
   public mountCreateOrganization = (node: HTMLDivElement, props?: CreateOrganizationProps) => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls?.ensureMounted(controls =>
+    void this.#componentControls?.ensureMounted({ preloadHint: 'CreateOrganization' }).then(controls =>
       controls.mountComponent({
         name: 'CreateOrganization',
         appearanceKey: 'createOrganization',
@@ -400,7 +410,7 @@ export default class Clerk implements ClerkInterface {
 
   public unmountCreateOrganization = (node: HTMLDivElement) => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls?.ensureMounted(controls =>
+    void this.#componentControls?.ensureMounted().then(controls =>
       controls.unmountComponent({
         node,
       }),
@@ -409,7 +419,7 @@ export default class Clerk implements ClerkInterface {
 
   public mountOrganizationSwitcher = (node: HTMLDivElement, props?: OrganizationSwitcherProps) => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls?.ensureMounted(controls =>
+    void this.#componentControls?.ensureMounted({ preloadHint: 'OrganizationSwitcher' }).then(controls =>
       controls.mountComponent({
         name: 'OrganizationSwitcher',
         appearanceKey: 'organizationSwitcher',
@@ -421,12 +431,12 @@ export default class Clerk implements ClerkInterface {
 
   public unmountOrganizationSwitcher = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls?.ensureMounted(controls => controls.unmountComponent({ node }));
+    void this.#componentControls?.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
 
   public mountUserButton = (node: HTMLDivElement, props?: UserButtonProps) => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls?.ensureMounted(controls =>
+    void this.#componentControls?.ensureMounted({ preloadHint: 'UserButton' }).then(controls =>
       controls.mountComponent({
         name: 'UserButton',
         appearanceKey: 'userButton',
@@ -438,7 +448,7 @@ export default class Clerk implements ClerkInterface {
 
   public unmountUserButton = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls?.ensureMounted(controls => controls.unmountComponent({ node }));
+    void this.#componentControls?.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
 
   /**
@@ -981,7 +991,7 @@ export default class Clerk implements ClerkInterface {
   __unstable__updateProps = (props: any) => {
     // The expect-error directive below is safe since `updateAppearanceProp` is only used
     // in the v4 build. This will be removed when v4 becomes the main stable version
-    return this.#componentControls?.ensureMounted(controls => controls.updateProps(props));
+    return this.#componentControls?.ensureMounted().then(controls => controls.updateProps(props));
   };
 
   #hasJustSynced = () => getClerkQueryParam(CLERK_SYNCED) === 'true';
@@ -1215,7 +1225,7 @@ export default class Clerk implements ClerkInterface {
     this.addListener(({ session }) => {
       const isImpersonating = !!session?.actor;
       if (isImpersonating) {
-        void this.#componentControls?.ensureMounted(controls => controls.mountImpersonationFab());
+        void this.#componentControls?.ensureMounted().then(controls => controls.mountImpersonationFab());
       }
     });
   };
