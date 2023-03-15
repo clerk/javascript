@@ -1,13 +1,15 @@
-import { deepSnakeToCamel } from '@clerk/shared';
+import { deepSnakeToCamel, isUnauthorizedError, runWithExponentialBackOff } from '@clerk/shared';
 import type {
   ActJWTClaim,
+  GetToken,
+  GetTokenOptions,
   PublicUserData,
   SessionJSON,
   SessionResource,
   SessionStatus,
   TokenResource,
+  UserResource,
 } from '@clerk/types';
-import type { GetToken, GetTokenOptions, UserResource } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { eventBus, events } from '../events';
@@ -63,34 +65,9 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   getToken: GetToken = async (options?: GetTokenOptions): Promise<string | null> => {
-    if (!this.user) {
-      return null;
-    }
-
-    const { leewayInSeconds, template, skipCache = false } = options || {};
-    if (!template && Number(leewayInSeconds) >= 60) {
-      throw new Error('Leeway can not exceed the token lifespan (60 seconds)');
-    }
-
-    if (this.#isLegacyIntegrationRequest(template)) {
-      return this.#handleLegacyIntegrationToken({ template, leewayInSeconds, skipCache });
-    }
-
-    const tokenId = this.#getCacheId(template);
-    const cachedEntry = skipCache ? undefined : SessionTokenCache.get({ tokenId }, leewayInSeconds);
-
-    if (cachedEntry) {
-      return cachedEntry.tokenResolver.then(res => res.getRawString());
-    }
-    const path = template ? `${this.path()}/tokens/${template}` : `${this.path()}/tokens`;
-    const tokenResolver = Token.create(path);
-    SessionTokenCache.set({ tokenId, tokenResolver });
-    return tokenResolver.then(token => {
-      // Dispatch tokenUpdate only for __session tokens and not JWT templates
-      if (!template) {
-        eventBus.dispatch(events.TokenUpdate, { token });
-      }
-      return token.getRawString();
+    return runWithExponentialBackOff(() => this._getToken(options), {
+      shouldRetry: e => !isUnauthorizedError(e),
+      maxRetries: 8,
     });
   };
 
@@ -156,5 +133,37 @@ export class Session extends BaseResource implements SessionResource {
     this.publicUserData = deepSnakeToCamel(data.public_user_data) as PublicUserData;
     this.lastActiveToken = data.last_active_token ? new Token(data.last_active_token) : null;
     return this;
+  }
+
+  private async _getToken(options?: GetTokenOptions): Promise<string | null> {
+    if (!this.user) {
+      return null;
+    }
+
+    const { leewayInSeconds, template, skipCache = false } = options || {};
+    if (!template && Number(leewayInSeconds) >= 60) {
+      throw new Error('Leeway can not exceed the token lifespan (60 seconds)');
+    }
+
+    if (this.#isLegacyIntegrationRequest(template)) {
+      return this.#handleLegacyIntegrationToken({ template, leewayInSeconds, skipCache });
+    }
+
+    const tokenId = this.#getCacheId(template);
+    const cachedEntry = skipCache ? undefined : SessionTokenCache.get({ tokenId }, leewayInSeconds);
+
+    if (cachedEntry) {
+      return cachedEntry.tokenResolver.then(res => res.getRawString());
+    }
+    const path = template ? `${this.path()}/tokens/${template}` : `${this.path()}/tokens`;
+    const tokenResolver = Token.create(path);
+    SessionTokenCache.set({ tokenId, tokenResolver });
+    return tokenResolver.then(token => {
+      // Dispatch tokenUpdate only for __session tokens and not JWT templates
+      if (!template) {
+        eventBus.dispatch(events.TokenUpdate, { token });
+      }
+      return token.getRawString();
+    });
   }
 }
