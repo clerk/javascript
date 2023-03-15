@@ -245,7 +245,7 @@ const Components = (props: ComponentsProps) => {
       startPath={buildVirtualRouterUrl({ base: '/sign-up', path: urlStateParam?.path })}
       componentName={'SignUpModal'}
     >
-      <SignInModal {...signInModal} />
+      <SignInModal {...signUpModal} />
       <SignUpModal {...signUpModal} />
     </LazyModalRenderer>
   );
