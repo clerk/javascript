@@ -29,11 +29,7 @@ const createExponentialDelayAsyncFn = (opts: {
     const constant = opts.firstDelay;
     const base = opts.timeMultiple;
     const delay = constant * Math.pow(base, timesCalled);
-    if (!opts.maxDelay) {
-      return delay;
-    } else {
-      return delay <= opts.maxDelay ? delay : opts.maxDelay;
-    }
+    return Math.min(opts.maxDelay || delay, delay);
   };
 
   return async (): Promise<void> => {

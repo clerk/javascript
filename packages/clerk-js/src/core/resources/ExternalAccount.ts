@@ -43,24 +43,26 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
   destroy = (): Promise<void> => this._baseDelete();
 
   protected fromJSON(data: ExternalAccountJSON | null): this {
-    if (data) {
-      this.id = data.id;
-      this.identificationId = data.identification_id;
-      this.providerUserId = data.provider_user_id;
-      this.approvedScopes = data.approved_scopes;
-      this.avatarUrl = data.avatar_url;
-      this.emailAddress = data.email_address;
-      this.firstName = data.first_name;
-      this.lastName = data.last_name;
-      // TODO: Send the provider name the `oauth` prefix from FAPI
-      this.provider = (data.provider || '').replace('oauth_', '') as OAuthProvider;
-      this.username = data.username;
-      this.publicMetadata = data.public_metadata;
-      this.label = data.label;
+    if (!data) {
+      return this;
+    }
 
-      if (data.verification) {
-        this.verification = new Verification(data.verification);
-      }
+    this.id = data.id;
+    this.identificationId = data.identification_id;
+    this.providerUserId = data.provider_user_id;
+    this.approvedScopes = data.approved_scopes;
+    this.avatarUrl = data.avatar_url;
+    this.emailAddress = data.email_address;
+    this.firstName = data.first_name;
+    this.lastName = data.last_name;
+    // TODO: Send the provider name the `oauth` prefix from FAPI
+    this.provider = (data.provider || '').replace('oauth_', '') as OAuthProvider;
+    this.username = data.username;
+    this.publicMetadata = data.public_metadata;
+    this.label = data.label;
+
+    if (data.verification) {
+      this.verification = new Verification(data.verification);
     }
     return this;
   }

@@ -43,11 +43,12 @@ export class Image extends BaseResource implements ImageResource {
   }
 
   protected fromJSON(data: ImageJSON | null): this {
-    if (data) {
-      this.id = data.id;
-      this.name = data.name;
-      this.publicUrl = data.public_url;
+    if (!data) {
+      return this;
     }
+    this.id = data.id;
+    this.name = data.name;
+    this.publicUrl = data.public_url;
     return this;
   }
 }

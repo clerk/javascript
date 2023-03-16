@@ -44,17 +44,18 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
   }
 
   protected fromJSON(data: UserSettingsJSON | null): this {
-    if (data) {
-      this.social = data.social;
-      this.attributes = data.attributes;
-      this.signIn = data.sign_in;
-      this.signUp = data.sign_up;
-      this.socialProviderStrategies = this.getSocialProviderStrategies(data.social);
-      this.authenticatableSocialStrategies = this.getAuthenticatableSocialStrategies(data.social);
-      this.web3FirstFactors = this.getWeb3FirstFactors(data.attributes);
-      this.enabledFirstFactorIdentifiers = this.getEnabledFirstFactorIdentifiers(data.attributes);
+    if (!data) {
+      return this;
     }
-    return this;
+
+    this.social = data.social;
+    this.attributes = data.attributes;
+    this.signIn = data.sign_in;
+    this.signUp = data.sign_up;
+    this.socialProviderStrategies = this.getSocialProviderStrategies(data.social);
+    this.authenticatableSocialStrategies = this.getAuthenticatableSocialStrategies(data.social);
+    this.web3FirstFactors = this.getWeb3FirstFactors(data.attributes);
+    this.enabledFirstFactorIdentifiers = this.getEnabledFirstFactorIdentifiers(data.attributes);
   }
 
   private getEnabledFirstFactorIdentifiers(attributes: Attributes): Array<keyof UserSettingsResource['attributes']> {

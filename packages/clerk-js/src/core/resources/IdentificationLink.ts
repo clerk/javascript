@@ -12,10 +12,12 @@ export class IdentificationLink extends BaseResource implements IdentificationLi
   }
 
   protected fromJSON(data: IdentificationLinkJSON | null): this {
-    if (data) {
-      this.id = data.id;
-      this.type = data.type;
+    if (!data) {
+      return this;
     }
+
+    this.id = data.id;
+    this.type = data.type;
     return this;
   }
 }
