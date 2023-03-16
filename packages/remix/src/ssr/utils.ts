@@ -100,7 +100,7 @@ export const injectRequestStateIntoResponse = async (response: Response, request
   const clone = response.clone();
   const data = await clone.json();
   const clerkState = wrapWithClerkState({
-    __clerk_ssr_state: rest,
+    __clerk_ssr_state: rest.toAuth(),
     __frontendApi: requestState.frontendApi,
     __publishableKey: requestState.publishableKey,
     __proxyUrl: requestState.proxyUrl,
