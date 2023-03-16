@@ -6,7 +6,7 @@ import type { PropsOfComponent } from '../styledSystem';
 type InputWithIcon = PropsOfComponent<typeof Input> & { leftIcon?: React.ReactElement };
 
 export const InputWithIcon = React.forwardRef<HTMLInputElement, InputWithIcon>((props, ref) => {
-  const { leftIcon, ...rest } = props;
+  const { leftIcon, sx, ...rest } = props;
   return (
     <Flex
       center
@@ -29,7 +29,7 @@ export const InputWithIcon = React.forwardRef<HTMLInputElement, InputWithIcon>((
             width: '100%',
             paddingLeft: theme.space.$10,
           }),
-          rest.sx,
+          sx,
         ]}
         ref={ref}
       />

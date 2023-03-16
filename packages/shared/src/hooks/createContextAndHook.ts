@@ -1,4 +1,3 @@
-import type { DeepPartial } from '@clerk/types';
 import React from 'react';
 
 export function assertContextExists(contextVal: unknown, msgOrCtx: string | React.Context<any>): asserts contextVal {
@@ -20,7 +19,7 @@ type UseCtxFn<T> = () => T;
 export const createContextAndHook = <CtxVal>(
   displayName: string,
   options?: Options,
-): [ContextOf<CtxVal>, UseCtxFn<CtxVal>, UseCtxFn<CtxVal | DeepPartial<CtxVal>>] => {
+): [ContextOf<CtxVal>, UseCtxFn<CtxVal>, UseCtxFn<CtxVal | Partial<CtxVal>>] => {
   const { assertCtxFn = assertContextExists } = options || {};
   const Ctx = React.createContext<{ value: CtxVal } | undefined>(undefined);
   Ctx.displayName = displayName;
