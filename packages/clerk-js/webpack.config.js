@@ -93,9 +93,36 @@ const commonForProd = () => {
     },
     output: {
       path: path.resolve(__dirname, 'dist'),
+      chunkFilename: `[name]_[fullhash:6]_${packageJSON.version}.js`,
       filename: '[name].js',
       libraryTarget: 'umd',
       globalObject: 'globalThis',
+    },
+    plugins: [
+      // new webpack.optimize.LimitChunkCountPlugin({
+      //   maxChunks: 5,
+      // }),
+      // new webpack.optimize.MinChunkSizePlugin({
+      //   minChunkSize: 10000,
+      // })
+    ],
+    optimization: {
+      splitChunks: {
+        cacheGroups: {
+          common: {
+            minChunks: 1,
+            name: 'ui-common',
+            priority: -20,
+            test: module => module.resource && !module.resource.includes('/ui/components'),
+          },
+          defaultVendors: {
+            minChunks: 1,
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            priority: -10,
+          },
+        },
+      },
     },
   };
 };
@@ -115,7 +142,9 @@ const entryForVariant = variant => {
 };
 
 /** @type { () => (import('webpack').Configuration)[] } */
-const prodConfig = ({ mode }) => {
+const prodConfig = ({ mode, env }) => {
+  const variant = env.variant;
+
   const entryToConfigMap = {
     // prettier-ignore
     [variants.clerk]: merge(
@@ -143,6 +172,13 @@ const prodConfig = ({ mode }) => {
     ),
   };
 
+  if (variant) {
+    if (!entryToConfigMap[variant]) {
+      throw new Error('Clerk variant does not exist in config');
+    }
+    return entryToConfigMap[variant];
+  }
+
   return [...Object.values(entryToConfigMap)];
 };
 
@@ -164,6 +200,21 @@ const devConfig = ({ mode, env }) => {
         crossOriginLoading: 'anonymous',
         filename: `${variant}.js`,
         libraryTarget: 'umd',
+        chunkFilename: `[name].[fullhash:6].${packageJSON.version}.js`,
+      },
+      optimization: {
+        splitChunks: {
+          name: (module, chunks) => {
+            if (!chunks.length) {
+              return '';
+            }
+
+            return chunks
+              .map(chunk => chunk.name)
+              .filter(Boolean)
+              .join('-');
+          },
+        },
       },
       devServer: {
         allowedHosts: ['all'],
@@ -213,5 +264,5 @@ const devConfig = ({ mode, env }) => {
 
 module.exports = env => {
   const mode = env.production ? 'production' : 'development';
-  return isProduction(mode) ? prodConfig({ mode }) : devConfig({ mode, env });
+  return isProduction(mode) ? prodConfig({ mode, env }) : devConfig({ mode, env });
 };

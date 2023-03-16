@@ -44,8 +44,9 @@ describe('ConnectedAccountsPage', () => {
 
       await userEvent.click(screen.getByText(/connect google account/i));
       expect(fixtures.clerk.user?.createExternalAccount).toHaveBeenCalledWith({
-        redirect_url: window.location.href,
+        redirectUrl: window.location.href,
         strategy: 'oauth_google',
+        additionalScopes: [],
       });
     });
   });

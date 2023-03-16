@@ -1,11 +1,11 @@
-import { createContextAndHook } from '@clerk/shared';
+import { createContextAndHook, useSafeLayoutEffect } from '@clerk/shared';
 import type { NavbarItemId } from '@clerk/types';
 import React, { useEffect } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { Button, Col, descriptors, Flex, Icon, localizationKeys, useLocalizations } from '../customizables';
 import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
-import { useNavigate, usePopover, useSafeLayoutEffect } from '../hooks';
+import { useNavigate, usePopover } from '../hooks';
 import { Menu } from '../icons';
 import { useRouter } from '../router';
 import type { PropsOfComponent } from '../styledSystem';

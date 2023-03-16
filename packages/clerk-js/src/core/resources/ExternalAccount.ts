@@ -1,5 +1,11 @@
 import { titleize } from '@clerk/shared';
-import type { ExternalAccountJSON, ExternalAccountResource, OAuthProvider, VerificationResource } from '@clerk/types';
+import type {
+  ExternalAccountJSON,
+  ExternalAccountResource,
+  OAuthProvider,
+  ReauthorizeExternalAccountParams,
+  VerificationResource,
+} from '@clerk/types';
 
 import { BaseResource } from './Base';
 import { Verification } from './Verification';
@@ -26,6 +32,14 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
     this.fromJSON(data);
   }
 
+  reauthorize = (params: ReauthorizeExternalAccountParams): Promise<ExternalAccountResource> => {
+    const { additionalScopes, redirectUrl } = params || {};
+
+    return this._basePatch({
+      action: 'reauthorize',
+      body: { additional_scope: additionalScopes, redirect_url: redirectUrl },
+    });
+  };
   destroy = (): Promise<void> => this._baseDelete();
 
   protected fromJSON(data: ExternalAccountJSON): this {

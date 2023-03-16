@@ -10,6 +10,7 @@ export interface SessionResource extends ClerkResource {
   abandonAt: Date;
   lastActiveToken: TokenResource | null;
   lastActiveOrganizationId: string | null;
+  lastActiveAt: Date;
   actor: ActJWTClaim | null;
   user: UserResource | null;
   publicUserData: PublicUserData;

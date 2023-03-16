@@ -1,10 +1,9 @@
-import { runWithExponentialBackOff } from '@clerk/shared';
+import { isNetworkError, isUnauthorizedError } from '@clerk/shared';
 import type { Clerk, EnvironmentResource, SessionResource, TokenResource } from '@clerk/types';
 
 import type { CookieHandler } from '../../../utils';
 import { createCookieHandler, inBrowser } from '../../../utils';
 import { clerkCoreErrorTokenRefreshFailed } from '../../errors';
-import type { ClerkAPIResponseError } from '../../resources';
 import { isClerkAPIResponseError } from '../../resources';
 import { AuthenticationPoller } from './AuthenticationPoller';
 
@@ -21,18 +20,18 @@ export class AuthenticationService {
 
   constructor(private clerk: Clerk) {}
 
-  public initAuth = (opts: InitParams): void => {
+  public async initAuth(opts: InitParams): Promise<void> {
     this.enablePolling = opts.enablePolling ?? true;
     this.environment = opts.environment;
-    this.setAuthCookiesFromSession(this.clerk.session);
+    await this.setAuthCookiesFromSession(this.clerk.session);
     this.setClientUatCookieForDevelopmentInstances();
     this.clearLegacyAuthV1Cookies();
     this.startPollingForToken();
     this.refreshTokenOnVisibilityChange();
-  };
+  }
 
-  public setAuthCookiesFromSession(session: SessionResource | undefined | null): void {
-    this.updateSessionCookie(session?.lastActiveToken);
+  public async setAuthCookiesFromSession(session: SessionResource | undefined | null): Promise<void> {
+    this.updateSessionCookie(await session?.getToken());
     this.setClientUatCookieForDevelopmentInstances();
   }
 
@@ -80,10 +79,7 @@ export class AuthenticationService {
   }
 
   private getNewToken() {
-    return runWithExponentialBackOff(() => this.clerk.session?.getToken(), {
-      shouldRetry: e => !this.isUnauthorizedError(e as any),
-      maxRetries: 8,
-    });
+    return this.clerk.session?.getToken();
   }
 
   private setSessionCookie(token: TokenResource | string) {
@@ -117,23 +113,11 @@ export class AuthenticationService {
 
   private handleGetTokenError(e: any) {
     if (isClerkAPIResponseError(e)) {
-      if (this.isUnauthorizedError(e) || this.isNetworkError(e)) {
+      if (isUnauthorizedError(e) || isNetworkError(e)) {
         return;
       }
       clerkCoreErrorTokenRefreshFailed(e.toString());
     }
     clerkCoreErrorTokenRefreshFailed(e.message || e);
-  }
-
-  private isUnauthorizedError(e: ClerkAPIResponseError) {
-    const status = e?.status;
-    const code = e?.errors?.[0]?.code;
-    return code === 'authentication_invalid' && status === 401;
-  }
-
-  private isNetworkError(e: any) {
-    // TODO: revise during error handling epic
-    const message = (`${e.message}${e.name}` || '').toLowerCase().replace(/\s+/g, '');
-    return message.includes('networkerror');
   }
 }

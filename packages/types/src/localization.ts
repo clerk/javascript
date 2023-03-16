@@ -266,7 +266,10 @@ type _LocalizationResource = {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
         title__conectionFailed: LocalizationValue;
+        title__reauthorize: LocalizationValue;
+        subtitle__reauthorize: LocalizationValue;
         actionLabel__conectionFailed: LocalizationValue;
+        actionLabel__reauthorize: LocalizationValue;
         destructiveActionTitle: LocalizationValue;
         destructiveActionSubtitle: LocalizationValue;
         destructiveActionAccordionSubtitle: LocalizationValue;

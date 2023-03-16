@@ -43,6 +43,7 @@ export interface FapiResponseJSON<T> {
   meta?: {
     client?: ClientJSON;
     session_id?: string;
+    responseHeaders?: { country: string | null };
   };
 }
 
@@ -197,8 +198,16 @@ export default function createFapiClient(clerkInstance: Omit<Clerk, 'proxyUrl'>)
     } catch (e) {
       clerkNetworkError(urlStr, e);
     }
+
+    const responseHeaders = {
+      country: response.headers.get('x-country'),
+    };
+
     const json: FapiResponseJSON<T> = await response.json();
     const fapiResponse: FapiResponse<T> = Object.assign(response, { payload: json });
+    if (fapiResponse.payload) {
+      fapiResponse.payload.meta = { ...json?.meta, responseHeaders };
+    }
     await runAfterResponseCallbacks(requestInit, fapiResponse);
     return fapiResponse;
   }

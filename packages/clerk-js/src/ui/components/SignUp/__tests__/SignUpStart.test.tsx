@@ -146,4 +146,26 @@ describe('SignUpStart', () => {
       expect(signInLink?.getAttribute('href')).toMatch(fixtures.environment.displayConfig.signInUrl);
     });
   });
+
+  describe('Preserved values from FAPI', () => {
+    it('Shows the values from the sign up object as default prepopulated values', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress({ required: true });
+        f.withPhoneNumber({ required: true });
+        f.withName({ required: true });
+      });
+
+      fixtures.clerk.client.signUp.emailAddress = 'george@clerk.dev';
+      fixtures.clerk.client.signUp.firstName = 'George';
+      fixtures.clerk.client.signUp.lastName = 'Clerk';
+      fixtures.clerk.client.signUp.phoneNumber = '123456789';
+
+      const screen = render(<SignUpStart />, { wrapper });
+
+      expect(screen.getByRole('textbox', { name: 'Email address' })).toHaveValue('george@clerk.dev');
+      expect(screen.getByRole('textbox', { name: 'First name' })).toHaveValue('George');
+      expect(screen.getByRole('textbox', { name: 'Last name' })).toHaveValue('Clerk');
+      expect(screen.getByRole('textbox', { name: 'Phone number' })).toHaveValue('(123) 456-789');
+    });
+  });
 });

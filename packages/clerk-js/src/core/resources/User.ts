@@ -2,6 +2,7 @@ import type {
   BackupCodeJSON,
   BackupCodeResource,
   CreateEmailAddressParams,
+  CreateExternalAccountParams,
   CreatePhoneNumberParams,
   CreateWeb3WalletParams,
   DeletedObjectJSON,
@@ -10,7 +11,6 @@ import type {
   ExternalAccountJSON,
   ExternalAccountResource,
   ImageResource,
-  OAuthStrategy,
   OrganizationMembershipResource,
   PhoneNumberResource,
   SetProfileImageParams,
@@ -23,9 +23,9 @@ import type {
   Web3WalletResource,
 } from '@clerk/types';
 
-import { getFullName } from '../../ui/utils';
 import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
+import { getFullName } from '../../utils/user';
 import { BackupCode } from './BackupCode';
 import type { RetrieveMembershipsParams } from './internal';
 import {
@@ -66,8 +66,8 @@ export class User extends BaseResource implements UserResource {
   twoFactorEnabled = false;
   totpEnabled = false;
   backupCodeEnabled = false;
-  publicMetadata: Record<string, unknown> = {};
-  unsafeMetadata: Record<string, unknown> = {};
+  publicMetadata: UserPublicMetadata = {};
+  unsafeMetadata: UserUnsafeMetadata = {};
   lastSignInAt: Date | null = null;
   updatedAt: Date | null = null;
   createdAt: Date | null = null;
@@ -130,18 +130,18 @@ export class User extends BaseResource implements UserResource {
     ).create();
   };
 
-  createExternalAccount = async ({
-    strategy,
-    redirect_url,
-  }: {
-    strategy: OAuthStrategy;
-    redirect_url?: string;
-  }): Promise<ExternalAccountResource> => {
+  createExternalAccount = async (params: CreateExternalAccountParams): Promise<ExternalAccountResource> => {
+    const { strategy, redirectUrl, additionalScopes, redirect_url } = params || {};
+
     const json = (
       await BaseResource._fetch<ExternalAccountJSON>({
         path: '/me/external_accounts',
         method: 'POST',
-        body: { strategy, redirect_url } as any,
+        body: {
+          strategy,
+          redirect_url: redirectUrl || redirect_url,
+          additional_scope: additionalScopes,
+        } as any,
       })
     )?.response as unknown as ExternalAccountJSON;
 

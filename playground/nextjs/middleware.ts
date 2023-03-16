@@ -1,4 +1,4 @@
-import { withClerkMiddleware } from '@clerk/nextjs/server';
+import { getAuth, withClerkMiddleware } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
 // Set the paths that don't require the user to be signed in
@@ -8,6 +8,8 @@ const isPublic = (path: string) => {
   return publicPaths.find(x => path.match(new RegExp(`^${x}$`.replace('*$', '($|/)'))));
 };
 export default withClerkMiddleware(req => {
+  const { debug } = getAuth(req);
+  console.log('middleware:debug', debug());
   return NextResponse.next();
 });
 export const config = { matcher: '/((?!.*\\.).*)' };

@@ -1,10 +1,10 @@
+import { getIdentifier } from '../../../utils/user';
 import { PrintableComponent, usePrintable } from '../../common';
 import { useCoreUser, useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Button, Col, Flex, Grid, Heading, localizationKeys, Text } from '../../customizables';
 import { useClipboard } from '../../hooks';
 import { mqu } from '../../styledSystem';
-import { getIdentifier } from '../../utils';
 import { MfaBackupCodeTile } from './MfaBackupCodeTile';
 
 type MfaBackupCodeListProps = {

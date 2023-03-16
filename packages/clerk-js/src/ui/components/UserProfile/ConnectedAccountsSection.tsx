@@ -1,4 +1,4 @@
-import type { OAuthStrategy } from '@clerk/types';
+import type { OAuthProvider, OAuthScope, OAuthStrategy } from '@clerk/types';
 import type { ExternalAccountResource } from '@clerk/types/src';
 
 import { useRouter } from '../../../ui/router';
@@ -50,9 +50,41 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
   const error = account.verification?.error?.longMessage;
   const label = account.username || account.emailAddress;
   const defaultOpen = !!router.urlStateParam?.componentName;
-  const { componentName, mode } = useUserProfileContext();
+  const { additionalOAuthScopes, componentName, mode } = useUserProfileContext();
   const isModal = mode === 'modal';
   const visitedProvider = account.provider === router.urlStateParam?.socialProvider;
+  const additionalScopes = findAdditionalScopes(account, additionalOAuthScopes);
+  const reauthorizationRequired = additionalScopes.length > 0 && account.approvedScopes != '';
+  const title = !reauthorizationRequired
+    ? localizationKeys('userProfile.start.connectedAccountsSection.title__conectionFailed')
+    : localizationKeys('userProfile.start.connectedAccountsSection.title__reauthorize');
+  const subtitle = !reauthorizationRequired
+    ? (error as any)
+    : localizationKeys('userProfile.start.connectedAccountsSection.subtitle__reauthorize');
+  const actionLabel = !reauthorizationRequired
+    ? localizationKeys('userProfile.start.connectedAccountsSection.actionLabel__conectionFailed')
+    : localizationKeys('userProfile.start.connectedAccountsSection.actionLabel__reauthorize');
+
+  const handleOnClick = async () => {
+    const redirectUrl = isModal ? appendModalState({ url: window.location.href, componentName }) : window.location.href;
+
+    try {
+      let response: ExternalAccountResource;
+      if (reauthorizationRequired) {
+        response = await account.reauthorize({ additionalScopes, redirectUrl });
+      } else {
+        response = await user.createExternalAccount({
+          strategy: account.verification!.strategy as OAuthStrategy,
+          redirectUrl,
+          additionalScopes,
+        });
+      }
+
+      navigate(response.verification!.externalVerificationRedirectURL);
+    } catch (err) {
+      handleError(err, [], card.setError);
+    }
+  };
 
   return (
     <UserProfileAccordion
@@ -73,7 +105,7 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
           center
         >
           {`${providerToDisplayData[account.provider].name} ${label ? `(${label})` : ''}`}
-          {error && (
+          {(error || reauthorizationRequired) && (
             <Badge
               colorScheme='danger'
               localizationKey={localizationKeys('badge__requiresAction')}
@@ -83,35 +115,23 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
       }
     >
       <Col gap={4}>
-        {!error && (
-          <UserPreview
-            externalAccount={account}
-            size='lg'
-            icon={
-              <Image
-                alt={providerToDisplayData[account.provider].name}
-                src={providerToDisplayData[account.provider].iconUrl}
-                sx={theme => ({ width: theme.sizes.$4 })}
-              />
-            }
-          />
-        )}
-        {error && (
+        <UserPreview
+          externalAccount={account}
+          size='lg'
+          icon={
+            <Image
+              alt={providerToDisplayData[account.provider].name}
+              src={providerToDisplayData[account.provider].iconUrl}
+              sx={theme => ({ width: theme.sizes.$4 })}
+            />
+          }
+        />
+        {(error || reauthorizationRequired) && (
           <LinkButtonWithDescription
-            title={localizationKeys('userProfile.start.connectedAccountsSection.title__conectionFailed')}
-            subtitle={error as any}
-            actionLabel={localizationKeys('userProfile.start.connectedAccountsSection.actionLabel__conectionFailed')}
-            onClick={() => {
-              return user
-                .createExternalAccount({
-                  strategy: account.verification!.strategy as OAuthStrategy,
-                  redirect_url: isModal
-                    ? appendModalState({ url: window.location.href, componentName })
-                    : window.location.href,
-                })
-                .then(res => navigate(res.verification!.externalVerificationRedirectURL))
-                .catch(err => handleError(err, [], card.setError));
-            }}
+            title={title}
+            subtitle={subtitle}
+            actionLabel={actionLabel}
+            onClick={handleOnClick}
           />
         )}
 
@@ -128,3 +148,21 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
     </UserProfileAccordion>
   );
 };
+
+function findAdditionalScopes(
+  account: ExternalAccountResource,
+  scopes?: Partial<Record<OAuthProvider, OAuthScope[]>>,
+): string[] {
+  if (!scopes) {
+    return [];
+  }
+
+  const additionalScopes = scopes[account.provider] || [];
+  const currentScopes = account.approvedScopes.split(' ');
+  const missingScopes = additionalScopes.filter(scope => !currentScopes.includes(scope));
+  if (missingScopes.length === 0) {
+    return [];
+  }
+
+  return additionalScopes;
+}

@@ -11,6 +11,7 @@ import type {
 import type { ClientResource } from './client';
 import type { DisplayThemeJSON } from './json';
 import type { LocalizationResource } from './localization';
+import type { OAuthProvider, OAuthScope } from './oauth';
 import type { OrganizationResource } from './organization';
 import type { OrganizationInvitationResource } from './organizationInvitation';
 import type { MembershipRole, OrganizationMembershipResource } from './organizationMembership';
@@ -587,6 +588,11 @@ export type UserProfileProps = {
    * prop of ClerkProvided (if one is provided)
    */
   appearance?: UserProfileTheme;
+  /*
+   * Specify additional scopes per OAuth provider that your users would like to provide if not already approved.
+   * e.g. <UserProfile additionalOAuthScopes={{google: ['foo', 'bar'], github: ['qux']}} />
+   */
+  additionalOAuthScopes?: Partial<Record<OAuthProvider, OAuthScope[]>>;
 };
 
 export type OrganizationProfileProps = {
@@ -679,6 +685,12 @@ export type UserButtonProps = {
    * prop of ClerkProvided (if one is provided)
    */
   appearance?: UserButtonTheme & { userProfile?: UserProfileTheme };
+
+  /*
+   * Specify options for the underlying <UserProfile /> component.
+   * e.g. <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
+   */
+  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes'>;
 };
 
 export type OrganizationSwitcherProps = {
