@@ -48,13 +48,11 @@ export interface AddMemberParams {
 export interface InviteMemberParams {
   emailAddress: string;
   role: MembershipRole;
-  redirectUrl?: string;
 }
 
 export interface InviteMembersParams {
   emailAddresses: string[];
   role: MembershipRole;
-  redirectUrl?: string;
 }
 
 export interface UpdateMembershipParams {

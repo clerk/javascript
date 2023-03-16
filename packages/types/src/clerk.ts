@@ -774,13 +774,11 @@ export interface HandleMagicLinkVerificationParams {
 export type CreateOrganizationInvitationParams = {
   emailAddress: string;
   role: MembershipRole;
-  redirectUrl?: string;
 };
 
 export type CreateBulkOrganizationInvitationParams = {
   emailAddresses: string[];
   role: MembershipRole;
-  redirectUrl?: string;
 };
 
 export interface CreateOrganizationParams {
