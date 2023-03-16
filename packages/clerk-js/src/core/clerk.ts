@@ -83,7 +83,6 @@ import {
   clerkMissingProxyUrlAndDomain,
   clerkOAuthCallbackDidNotCompleteSignInSIgnUp,
 } from './errors';
-import { eventBus, events } from './events';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import createFapiClient from './fapiClient';
 import {
@@ -95,7 +94,7 @@ import {
   Organization,
   OrganizationMembership,
 } from './resources/internal';
-import { AuthenticationService } from './services';
+import { SessionCookieService } from './services';
 import { warnings } from './warnings';
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
@@ -129,7 +128,7 @@ export default class Clerk implements ClerkInterface {
   public readonly proxyUrl?: ClerkInterface['proxyUrl'];
   public readonly domain?: ClerkInterface['domain'];
 
-  #authService: AuthenticationService | null = null;
+  #authService: SessionCookieService | null = null;
   #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
   #componentControls?: ReturnType<MountComponentRenderer> | null;
   #devBrowserHandler: DevBrowserHandler | null = null;
@@ -939,6 +938,11 @@ export default class Clerk implements ClerkInterface {
       ?.organization;
   };
 
+  public updateEnvironment(environment: EnvironmentResource) {
+    this.#environment = environment;
+    this.#authService?.setEnvironment(environment);
+  }
+
   updateClient = (newClient: ClientResource): void => {
     if (!this.client) {
       // This is the first time client is being
@@ -1040,15 +1044,13 @@ export default class Clerk implements ClerkInterface {
       return false;
     }
 
-    this.#authService = new AuthenticationService(this);
+    this.#authService = new SessionCookieService(this);
     this.#pageLifecycle = createPageLifecycle();
 
     this.#devBrowserHandler = createDevBrowserHandler({
       frontendApi: this.frontendApi,
       fapiClient: this.#fapiClient,
     });
-
-    this.#pageLifecycle = createPageLifecycle();
 
     const isInAccountsHostedPages = isAccountsHostedPages(window?.location.hostname);
 
@@ -1072,13 +1074,11 @@ export default class Clerk implements ClerkInterface {
           Client.getInstance().fetch(),
         ]);
 
-        this.#environment = environment;
         this.updateClient(client);
-
-        await this.#authService.initAuth({
-          enablePolling: this.#options.polling,
-          environment: this.#environment,
-        });
+        // updateEnvironment should be called after updateClient
+        // because authService#setEnviroment depends on clerk.session that is being
+        // set in updateClient
+        this.updateEnvironment(environment);
 
         if (Clerk.mountComponentRenderer) {
           this.#componentControls = Clerk.mountComponentRenderer(this, this.#environment, this.#options);
@@ -1151,11 +1151,6 @@ export default class Clerk implements ClerkInterface {
       if (data.type === 'signout') {
         void this.handleUnauthenticated({ broadcast: false });
       }
-    });
-
-    // set cookie on token update
-    eventBus.on(events.TokenUpdate, ({ token }) => {
-      this.#authService?.setAuthCookiesFromToken(token?.getRawString());
     });
   };
 

@@ -5,7 +5,7 @@ import { SafeLock } from '../../../utils';
 const REFRESH_SESSION_TOKEN_LOCK_KEY = 'clerk.lock.refreshSessionToken';
 const INTERVAL_IN_MS = 5 * 1000;
 
-export class AuthenticationPoller {
+export class SessionCookiePoller {
   private lock = SafeLock(REFRESH_SESSION_TOKEN_LOCK_KEY);
   private workerTimers = createWorkerTimers();
   private timerId: ReturnType<typeof this.workerTimers.setInterval> | null = null;

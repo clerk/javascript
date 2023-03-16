@@ -1,1 +1,1 @@
-export * from './authentication/AuthenticationService';
+export * from './authentication/SessionCookieService';
