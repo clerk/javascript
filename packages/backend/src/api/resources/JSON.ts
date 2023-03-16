@@ -132,6 +132,7 @@ export interface OrganizationJSON extends ClerkResourceJSON {
   created_by: string;
   created_at: number;
   updated_at: number;
+  max_allowed_memberships: number;
 }
 
 export interface OrganizationInvitationJSON extends ClerkResourceJSON {
