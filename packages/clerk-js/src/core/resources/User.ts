@@ -241,7 +241,11 @@ export class User extends BaseResource implements UserResource {
     return this.phoneNumbers.filter(phone => phone.verification.status === 'verified').length > 0;
   }
 
-  protected fromJSON(data: UserJSON): this {
+  protected fromJSON(data: UserJSON | null): this {
+    if (!data) {
+      return this;
+    }
+
     this.id = data.id;
     this.externalId = data.external_id;
     this.firstName = data.first_name;
@@ -289,7 +293,6 @@ export class User extends BaseResource implements UserResource {
 
     this.updatedAt = unixEpochToDate(data.updated_at);
     this.createdAt = unixEpochToDate(data.created_at);
-
     return this;
   }
 }

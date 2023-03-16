@@ -32,7 +32,11 @@ export class Token extends BaseResource implements TokenResource {
     return this.jwt?.claims.__raw;
   };
 
-  protected fromJSON(data: TokenJSON): this {
+  protected fromJSON(data: TokenJSON | null): this {
+    if (!data) {
+      return this;
+    }
+
     this.jwt = decode(data.jwt);
     return this;
   }

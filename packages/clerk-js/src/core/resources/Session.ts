@@ -119,7 +119,11 @@ export class Session extends BaseResource implements SessionResource {
     });
   };
 
-  protected fromJSON(data: SessionJSON): this {
+  protected fromJSON(data: SessionJSON | null): this {
+    if (!data) {
+      return this;
+    }
+
     this.id = data.id;
     this.status = data.status;
     this.expireAt = unixEpochToDate(data.expire_at);

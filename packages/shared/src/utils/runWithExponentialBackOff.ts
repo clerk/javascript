@@ -3,6 +3,7 @@ type Milliseconds = number;
 type BackoffOptions = Partial<{
   maxRetries: number;
   firstDelay: Milliseconds;
+  maxDelay: Milliseconds;
   timeMultiple: number;
   shouldRetry: (error: unknown, iterationsCount: number) => boolean;
 }>;
@@ -10,19 +11,25 @@ type BackoffOptions = Partial<{
 const defaultOptions: Required<BackoffOptions> = {
   maxRetries: 10,
   firstDelay: 125,
+  maxDelay: 0,
   timeMultiple: 2,
   shouldRetry: () => true,
 };
 
 const sleep = async (ms: Milliseconds) => new Promise(s => setTimeout(s, ms));
 
-const createExponentialDelayAsyncFn = (opts: { firstDelay: Milliseconds; timeMultiple: number }) => {
+const createExponentialDelayAsyncFn = (opts: {
+  firstDelay: Milliseconds;
+  maxDelay: Milliseconds;
+  timeMultiple: number;
+}) => {
   let timesCalled = 0;
 
   const calculateDelayInMs = () => {
     const constant = opts.firstDelay;
     const base = opts.timeMultiple;
-    return constant * Math.pow(base, timesCalled);
+    const delay = constant * Math.pow(base, timesCalled);
+    return Math.min(opts.maxDelay || delay, delay);
   };
 
   return async (): Promise<void> => {
@@ -36,12 +43,12 @@ export const runWithExponentialBackOff = async <T>(
   options: BackoffOptions = {},
 ): Promise<T> => {
   let iterationsCount = 0;
-  const { maxRetries, shouldRetry, firstDelay, timeMultiple } = {
+  const { maxRetries, shouldRetry, firstDelay, maxDelay, timeMultiple } = {
     ...defaultOptions,
     ...options,
   };
   const maxRetriesReached = () => iterationsCount === maxRetries;
-  const delay = createExponentialDelayAsyncFn({ firstDelay, timeMultiple });
+  const delay = createExponentialDelayAsyncFn({ firstDelay, maxDelay, timeMultiple });
 
   while (!maxRetriesReached()) {
     try {

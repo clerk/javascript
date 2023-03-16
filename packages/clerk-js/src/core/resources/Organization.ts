@@ -155,7 +155,11 @@ export class Organization extends BaseResource implements OrganizationResource {
     }).then(res => new Organization(res?.response as OrganizationJSON));
   };
 
-  protected fromJSON(data: OrganizationJSON): this {
+  protected fromJSON(data: OrganizationJSON | null): this {
+    if (!data) {
+      return this;
+    }
+
     this.id = data.id;
     this.name = data.name;
     this.slug = data.slug;

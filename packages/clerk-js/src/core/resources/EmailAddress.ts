@@ -81,7 +81,11 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
 
   toString = (): string => this.emailAddress;
 
-  protected fromJSON(data: EmailAddressJSON): this {
+  protected fromJSON(data: EmailAddressJSON | null): this {
+    if (!data) {
+      return this;
+    }
+
     this.id = data.id;
     this.emailAddress = data.email_address;
     this.verification = new Verification(data.verification);

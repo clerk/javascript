@@ -42,7 +42,11 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
   };
   destroy = (): Promise<void> => this._baseDelete();
 
-  protected fromJSON(data: ExternalAccountJSON): this {
+  protected fromJSON(data: ExternalAccountJSON | null): this {
+    if (!data) {
+      return this;
+    }
+
     this.id = data.id;
     this.identificationId = data.identification_id;
     this.providerUserId = data.provider_user_id;
@@ -60,7 +64,6 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
     if (data.verification) {
       this.verification = new Verification(data.verification);
     }
-
     return this;
   }
 

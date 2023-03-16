@@ -1092,7 +1092,7 @@ export default class Clerk implements ClerkInterface {
           await this.#devBrowserHandler.setup();
         } else if (!isValidBrowserOnline()) {
           console.warn(err);
-          break;
+          return false;
         } else {
           throw err;
         }

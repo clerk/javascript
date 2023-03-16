@@ -54,7 +54,11 @@ export class OrganizationMembership extends BaseResource implements Organization
     return updatedMembership;
   };
 
-  protected fromJSON(data: OrganizationMembershipJSON): this {
+  protected fromJSON(data: OrganizationMembershipJSON | null): this {
+    if (!data) {
+      return this;
+    }
+
     this.id = data.id;
     this.organization = new Organization(data.organization);
     this.publicMetadata = data.public_metadata;

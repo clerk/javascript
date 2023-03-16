@@ -35,7 +35,11 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: DisplayConfigJSON): this {
+  protected fromJSON(data: DisplayConfigJSON | null): this {
+    if (!data) {
+      return this;
+    }
+
     this.id = data.id;
     this.instanceEnvironmentType = data.instance_environment_type;
     this.applicationName = data.application_name;

@@ -58,7 +58,11 @@ export class SessionWithActivities extends BaseResource implements SessionWithAc
     return this._basePost({ action: 'revoke', body: {} });
   }
 
-  protected fromJSON(data: SessionWithActivitiesJSON): this {
+  protected fromJSON(data: SessionWithActivitiesJSON | null): this {
+    if (!data) {
+      return this;
+    }
+
     this.id = data.id;
     this.status = data.status;
     this.expireAt = unixEpochToDate(data.expire_at);

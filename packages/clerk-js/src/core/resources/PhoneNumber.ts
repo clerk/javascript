@@ -70,7 +70,11 @@ export class PhoneNumber extends BaseResource implements PhoneNumberResource {
     return this.phoneNumber;
   };
 
-  protected fromJSON(data: PhoneNumberJSON): this {
+  protected fromJSON(data: PhoneNumberJSON | null): this {
+    if (!data) {
+      return this;
+    }
+
     this.id = data.id;
     this.phoneNumber = data.phone_number;
     this.reservedForSecondFactor = data.reserved_for_second_factor;

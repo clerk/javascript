@@ -11,10 +11,10 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: OrganizationSettingsJSON): this {
-    data = data || {};
-    this.enabled = data.enabled || false;
-    this.maxAllowedMemberships = data.max_allowed_memberships || 0;
+  protected fromJSON(data: OrganizationSettingsJSON | null): this {
+    const { enabled = false, max_allowed_memberships = 0 } = data || {};
+    this.enabled = enabled;
+    this.maxAllowedMemberships = max_allowed_memberships;
     return this;
   }
 }
