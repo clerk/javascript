@@ -64,3 +64,12 @@ Additionally there are packages which act as shared utilities or building blocks
 ## Cleanup
 
 To clean existing builds and installed dependencies of the monorepo and setup again, run `npm run nuke`.
+
+## How to add a new localization key
+
+- Add the key types to the types [package](./packages/types/src/localization.ts).
+- Add the corresponding localization values for every supported language in the [localizations package](./packages/localizations/)
+- Replace the plain string (if there is one) with the localization value like so:  
+  `<Text>Role</Text>`  
+  becomes  
+  `<Text localizationKey={localizationKeys('formFieldLabel__role')} />`
