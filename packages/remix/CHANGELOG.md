@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [2.2.14](https://github.com/clerkinc/javascript/compare/@clerk/remix@2.2.13...@clerk/remix@2.2.14) (2023-03-16)
+
+### Bug Fixes
+
+- **remix:** Inject clerk_ssr_state the requestState data ([50e3298](https://github.com/clerkinc/javascript/commit/50e3298066ad78fdaeb18556ec808130953e93d9))
+
 ### [2.2.13](https://github.com/clerkinc/javascript/compare/@clerk/remix@2.2.12...@clerk/remix@2.2.13) (2023-03-15)
 
 **Note:** Version bump only for package @clerk/remix

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.31.1](https://github.com/clerkinc/javascript/compare/@clerk/types@3.31.0...@clerk/types@3.31.1) (2023-03-16)
+
+### Bug Fixes
+
+- **clerk-js:** Removed unsupported props when inviting org members ([32e9984](https://github.com/clerkinc/javascript/commit/32e998441886efa10d53f36fd406da6e2070fbcf))
+
 ## [3.31.0](https://github.com/clerkinc/javascript/compare/@clerk/types@3.30.2...@clerk/types@3.31.0) (2023-03-15)
 
 ### Features
