@@ -33,9 +33,8 @@ export const setWebpackChunkPublicPath = () => {
     const matches = hrefWithoutFilename.match(VERSION_REGEX) || [];
     const tag = matches[1];
     __webpack_public_path__ = tag ? hrefWithoutFilename.replace(tag, __PKG_VERSION__) : hrefWithoutFilename;
-    console.log(__webpack_public_path__);
   } catch (e) {
-    console.log(e);
+    //
   }
 };
 
