@@ -8,9 +8,7 @@ import { animations, mqu } from '../styledSystem';
 import { withFloatingTree } from './contexts';
 import { Popover } from './Popover';
 
-export const [ModalContext, useModalContext, useUnsafeModalContext] = createContextAndHook<{ toggle: () => void }>(
-  'ModalContext',
-);
+export const [ModalContext, _, useUnsafeModalContext] = createContextAndHook<{ toggle: () => void }>('ModalContext');
 
 type ModalProps = React.PropsWithChildren<{
   handleOpen?: () => void;
