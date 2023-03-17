@@ -1,11 +1,11 @@
 import type { RequestState } from '@clerk/backend';
 import { Clerk } from '@clerk/backend';
-import { isHttpOrHttps } from '@clerk/shared';
+import { handleValueOrFn, isHttpOrHttps } from '@clerk/shared';
 
 import { noRelativeProxyInSSR, noSecretKeyOrApiKeyError } from '../errors';
 import { getEnvVariable } from '../utils';
 import type { LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
-import { handleIsSatelliteBooleanOrFn, parseCookies } from './utils';
+import { parseCookies } from './utils';
 
 /**
  * @internal
@@ -35,12 +35,16 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
 
   const apiUrl = getEnvVariable('CLERK_API_URL') || (context?.CLERK_API_URL as string);
 
-  const domain = getEnvVariable('CLERK_DOMAIN') || (context?.CLERK_DOMAIN as string) || opts.domain || '';
+  const domain =
+    getEnvVariable('CLERK_DOMAIN') ||
+    (context?.CLERK_DOMAIN as string) ||
+    handleValueOrFn(opts.domain, new URL(request.url)) ||
+    '';
 
   const isSatellite =
     getEnvVariable('CLERK_IS_SATELLITE') === 'true' ||
     (context?.CLERK_IS_SATELLITE as string) === 'true' ||
-    handleIsSatelliteBooleanOrFn(opts.isSatellite, new URL(request.url)) ||
+    handleValueOrFn(opts.isSatellite, new URL(request.url)) ||
     false;
 
   const proxyUrl = getEnvVariable('CLERK_PROXY_URL') || (context?.CLERK_PROXY_URL as string) || opts.proxyUrl || '';

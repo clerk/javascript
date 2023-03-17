@@ -4,6 +4,7 @@ import type {
   ClientResource,
   DomainOrProxyUrl,
   LoadedClerk,
+  MultiDomainAndOrProxy,
   PublishableKeyOrFrontendApi,
   RedirectOptions,
   SessionResource,
@@ -24,7 +25,7 @@ export type IsomorphicClerkOptions = Omit<ClerkOptions, 'isSatellite'> & {
   clerkJSUrl?: string;
   clerkJSVariant?: 'headless' | '';
 } & PublishableKeyOrFrontendApi &
-  DomainOrProxyUrl;
+  MultiDomainAndOrProxy;
 
 export interface BrowserClerkConstructor {
   new (publishableKey: string, options?: DomainOrProxyUrl): BrowserClerk;
