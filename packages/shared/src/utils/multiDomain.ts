@@ -1,18 +1,18 @@
-import type { Clerk as ClerkInterface, ClerkOptions } from '@clerk/types';
-
-export const handleIsSatelliteBooleanOrFn = <T extends { isSatellite?: ClerkOptions['isSatellite'] }>(
-  opts: T,
-  url: URL,
-): boolean => {
-  if (typeof opts.isSatellite === 'function') {
-    return opts.isSatellite(url);
+type VOrFnReturnsV<T> = T | undefined | ((v: URL) => T);
+export function handleValueOrFn<T>(value: VOrFnReturnsV<T>, url: URL): T | undefined;
+export function handleValueOrFn<T>(value: VOrFnReturnsV<T>, url: URL, defaultValue: T): T;
+export function handleValueOrFn<T>(value: VOrFnReturnsV<T>, url: URL, defaultValue?: unknown): unknown {
+  if (typeof value === 'function') {
+    return (value as (v: URL) => T)(url);
   }
-  return opts.isSatellite || false;
-};
 
-export const handleDomainStringOrFn = <T extends { domain?: ClerkInterface['domain'] }>(opts: T, url: URL): string => {
-  if (typeof opts.domain === 'function') {
-    return opts.domain(url);
+  if (typeof value !== 'undefined') {
+    return value;
   }
-  return opts.domain || '';
-};
+
+  if (typeof defaultValue !== 'undefined') {
+    return defaultValue;
+  }
+
+  return undefined;
+}
