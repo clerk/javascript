@@ -1,6 +1,6 @@
 import type { RequestState } from '@clerk/backend';
 import { Clerk } from '@clerk/backend';
-import { handleDomainStringOrFn, handleIsSatelliteBooleanOrFn, isHttpOrHttps } from '@clerk/shared';
+import { handleValueOrFn, isHttpOrHttps } from '@clerk/shared';
 
 import { noRelativeProxyInSSR, noSecretKeyOrApiKeyError } from '../errors';
 import { getEnvVariable } from '../utils';
@@ -38,13 +38,13 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
   const domain =
     getEnvVariable('CLERK_DOMAIN') ||
     (context?.CLERK_DOMAIN as string) ||
-    handleDomainStringOrFn(opts, new URL(request.url)) ||
+    handleValueOrFn(opts.domain, new URL(request.url)) ||
     '';
 
   const isSatellite =
     getEnvVariable('CLERK_IS_SATELLITE') === 'true' ||
     (context?.CLERK_IS_SATELLITE as string) === 'true' ||
-    handleIsSatelliteBooleanOrFn(opts, new URL(request.url)) ||
+    handleValueOrFn(opts.isSatellite, new URL(request.url)) ||
     false;
 
   const proxyUrl = getEnvVariable('CLERK_PROXY_URL') || (context?.CLERK_PROXY_URL as string) || opts.proxyUrl || '';

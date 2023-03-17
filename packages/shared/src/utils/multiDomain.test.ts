@@ -1,31 +1,33 @@
-import { handleDomainStringOrFn, handleIsSatelliteBooleanOrFn } from './multiDomain';
+import { handleValueOrFn } from './multiDomain';
 
 const url = new URL('https://example.com');
 
-describe('handleIsSatelliteBooleanOrFn(opts)', () => {
+describe('handleValueOrFn(opts)', () => {
   it.each([
-    [{}, false],
-    [{ isSatellite: true }, true],
-    [{ isSatellite: false }, false],
-    [{ isSatellite: undefined }, false],
-    [{ isSatellite: () => true }, true],
-    [{ isSatellite: () => false }, false],
-  ])('.handleIsSatelliteBooleanOrFn(%s)', (key, expected) => {
-    expect(handleIsSatelliteBooleanOrFn(key, url)).toBe(expected);
+    [undefined, undefined],
+    [true, true],
+    [false, false],
+    [() => true, true],
+    [() => false, false],
+    ['', ''],
+    ['some-domain', 'some-domain'],
+    ['clerk.dev', 'clerk.dev'],
+    [url => url.host, 'example.com'],
+    [() => 'some-other-domain', 'some-other-domain'],
+  ])('.handleValueOrFn(%s)', (key, expected) => {
+    expect(handleValueOrFn(key, url)).toBe(expected);
   });
 });
 
-type OptionsWithDomain = Parameters<typeof handleDomainStringOrFn>[0];
-
-describe('handleDomainStringOrFn(opts)', () => {
-  it.each<[OptionsWithDomain, string]>([
-    [{}, ''],
-    [{ domain: '' }, ''],
-    [{ domain: 'some-domain' }, 'some-domain'],
-    [{ domain: 'clerk.dev' }, 'clerk.dev'],
-    [{ domain: url => url.host }, 'example.com'],
-    [{ domain: () => 'some-other-domain' }, 'some-other-domain'],
-  ])('.handleDomainStringOrFn(%s)', (key, expected) => {
-    expect(handleDomainStringOrFn(key, url)).toBe(expected);
+describe('handleValueOrFn(opts) with defaults', () => {
+  it.each([
+    [undefined, undefined, undefined],
+    [undefined, true, true],
+    [true, true, false],
+    [undefined, false, false],
+    [false, false, undefined],
+    [undefined, 'some-domain', 'some-domain'],
+  ])('.handleValueOrFn(%s)', (key, expected, defaultValue) => {
+    expect(handleValueOrFn(key, url, defaultValue)).toBe(expected);
   });
 });

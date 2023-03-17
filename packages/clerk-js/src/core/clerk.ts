@@ -1,8 +1,7 @@
 import type { LocalStorageBroadcastChannel } from '@clerk/shared';
 import {
   addClerkPrefix,
-  handleDomainStringOrFn,
-  handleIsSatelliteBooleanOrFn,
+  handleValueOrFn,
   inClientSide,
   isLegacyFrontendApiKey,
   isValidBrowserOnline,
@@ -153,20 +152,11 @@ export default class Clerk implements ClerkInterface {
   }
 
   get isSatellite(): boolean {
-    return handleIsSatelliteBooleanOrFn({ isSatellite: this.#options.isSatellite }, new URL(window.location.href));
+    return handleValueOrFn(this.#options.isSatellite, new URL(window.location.href), false);
   }
 
   get domain(): string {
-    return addClerkPrefix(
-      stripScheme(
-        handleDomainStringOrFn(
-          {
-            domain: this.#domain,
-          },
-          new URL(window.location.href),
-        ),
-      ),
-    );
+    return addClerkPrefix(stripScheme(handleValueOrFn(this.#domain, new URL(window.location.href))));
   }
 
   public constructor(key: string, options?: DomainOrProxyUrl) {

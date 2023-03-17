@@ -1,3 +1,4 @@
+import { handleValueOrFn } from '@clerk/shared';
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
@@ -90,10 +91,7 @@ export default class IsomorphicClerk {
   }
 
   get domain(): string {
-    if (typeof this.#domain === 'function') {
-      return this.#domain(new URL(window.location.href));
-    }
-    return this.#domain || '';
+    return handleValueOrFn(this.#domain, new URL(window.location.href), '');
   }
 
   constructor(options: IsomorphicClerkOptions) {
