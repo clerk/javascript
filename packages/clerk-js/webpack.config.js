@@ -42,6 +42,27 @@ const common = ({ mode }) => {
         NODE_ENV: mode,
       }),
     ],
+    output: {
+      chunkFilename: `[name]_[fullhash:6]_${packageJSON.version}.js`,
+    },
+    optimization: {
+      splitChunks: {
+        cacheGroups: {
+          common: {
+            minChunks: 1,
+            name: 'ui-common',
+            priority: -20,
+            test: module => module.resource && !module.resource.includes('/ui/components'),
+          },
+          defaultVendors: {
+            minChunks: 1,
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            priority: -10,
+          },
+        },
+      },
+    },
   };
 };
 
@@ -93,7 +114,6 @@ const commonForProd = () => {
     },
     output: {
       path: path.resolve(__dirname, 'dist'),
-      chunkFilename: `[name]_[fullhash:6]_${packageJSON.version}.js`,
       filename: '[name].js',
       libraryTarget: 'umd',
       globalObject: 'globalThis',
@@ -106,24 +126,6 @@ const commonForProd = () => {
       //   minChunkSize: 10000,
       // })
     ],
-    optimization: {
-      splitChunks: {
-        cacheGroups: {
-          common: {
-            minChunks: 1,
-            name: 'ui-common',
-            priority: -20,
-            test: module => module.resource && !module.resource.includes('/ui/components'),
-          },
-          defaultVendors: {
-            minChunks: 1,
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            priority: -10,
-          },
-        },
-      },
-    },
   };
 };
 
@@ -200,21 +202,9 @@ const devConfig = ({ mode, env }) => {
         crossOriginLoading: 'anonymous',
         filename: `${variant}.js`,
         libraryTarget: 'umd',
-        chunkFilename: `[name].[fullhash:6].${packageJSON.version}.js`,
       },
       optimization: {
-        splitChunks: {
-          name: (module, chunks) => {
-            if (!chunks.length) {
-              return '';
-            }
-
-            return chunks
-              .map(chunk => chunk.name)
-              .filter(Boolean)
-              .join('-');
-          },
-        },
+        minimize: false,
       },
       devServer: {
         allowedHosts: ['all'],
