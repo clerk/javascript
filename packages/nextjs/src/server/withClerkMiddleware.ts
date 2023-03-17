@@ -20,8 +20,7 @@ import {
 import type { WithAuthOptions } from './types';
 import {
   getCookie,
-  handleDomainStringOrFn,
-  handleIsSatelliteBooleanOrFn,
+  handleValueOrFn,
   isHttpOrHttps,
   nextJsVersionCanOverrideRequestHeaders,
   setCustomAttributeOnRequest,
@@ -53,8 +52,8 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
   return async (req: NextRequest, event: NextFetchEvent) => {
     const { headers } = req;
 
-    const isSatellite = handleIsSatelliteBooleanOrFn(opts, new URL(req.url)) || IS_SATELLITE;
-    const domain = handleDomainStringOrFn(opts, new URL(req.url)) || DOMAIN;
+    const isSatellite = handleValueOrFn(opts.isSatellite, new URL(req.url), IS_SATELLITE);
+    const domain = handleValueOrFn(opts.domain, new URL(req.url), DOMAIN);
 
     // get auth state, check if we need to return an interstitial
     const cookieToken = getCookie(req, constants.Cookies.Session);
