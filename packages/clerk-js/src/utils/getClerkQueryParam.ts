@@ -1,4 +1,4 @@
-import { CLERK_SYNCED } from '../core/constants';
+import { CLERK_SYNCED, CLERK_SYNCING } from '../core/constants';
 
 const ClerkQueryParams = [
   '__clerk_status',
@@ -7,6 +7,7 @@ const ClerkQueryParams = [
   '__clerk_ticket',
   '__clerk_modal_state',
   CLERK_SYNCED,
+  CLERK_SYNCING,
 ] as const;
 
 type ClerkQueryParam = typeof ClerkQueryParams[number];
@@ -18,6 +19,7 @@ type ClerkQueryParamsToValuesMap = {
   __clerk_ticket: string;
   __clerk_modal_state: string;
   __clerk_synced: string;
+  __clerk_syncing: string;
 };
 
 export type VerificationStatus = 'expired' | 'failed' | 'loading' | 'verified' | 'verified_switch_tab';
