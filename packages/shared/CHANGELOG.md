@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.13.5](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.13.4...@clerk/shared@0.13.5) (2023-03-17)
+
+### Bug Fixes
+
+- **shared,clerk-js,clerk-expo,clerk-react:** Remove react-dom as from peerDependencies ([67f3370](https://github.com/clerkinc/clerk_docker/commit/67f3370f54143d2a457777ae8b8836ea92e69d44))
+
 ### [0.13.4](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.13.3...@clerk/shared@0.13.4) (2023-03-16)
 
 **Note:** Version bump only for package @clerk/shared

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.12.8](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@4.12.7...@clerk/clerk-react@4.12.8) (2023-03-17)
+
+### Bug Fixes
+
+- **shared,clerk-js,clerk-expo,clerk-react:** Remove react-dom as from peerDependencies ([67f3370](https://github.com/clerkinc/javascript/commit/67f3370f54143d2a457777ae8b8836ea92e69d44))
+
 ### [4.12.7](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@4.12.6...@clerk/clerk-react@4.12.7) (2023-03-16)
 
 **Note:** Version bump only for package @clerk/clerk-react
