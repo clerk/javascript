@@ -29,7 +29,8 @@ export const setWebpackChunkPublicPath = () => {
   try {
     // @ts-expect-error
     const scriptUrl = new URL(document.currentScript.src);
-    const hrefWithoutFilename = new URL(scriptUrl.href.split('/').slice(0, -1).join('/')).href;
+    let hrefWithoutFilename = new URL(scriptUrl.href.split('/').slice(0, -1).join('/')).href;
+    hrefWithoutFilename += hrefWithoutFilename.endsWith('/') ? '' : '/';
     const matches = hrefWithoutFilename.match(VERSION_REGEX) || [];
     const tag = matches[1];
     __webpack_public_path__ = tag ? hrefWithoutFilename.replace(tag, __PKG_VERSION__) : hrefWithoutFilename;
