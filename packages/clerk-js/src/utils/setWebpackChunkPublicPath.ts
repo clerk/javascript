@@ -24,19 +24,23 @@
  *  - clerk.browser.js loads from https://pk.accounts.dev/npm/@clerk/clerk-js@staging/dist/clerk.browser.js
  *  - all other chunks need to be loaded from https://pk.accounts.dev/npm/@clerk/clerk-js@__PKG_VERSION__/dist/
  */
-export const setWebpackChunkPublicPath = () => {
-  const VERSION_REGEX = /@clerk\/clerk-js@(.+?)\//;
-  try {
-    // @ts-expect-error
-    const scriptUrl = new URL(document.currentScript.src);
-    let hrefWithoutFilename = new URL(scriptUrl.href.split('/').slice(0, -1).join('/')).href;
-    hrefWithoutFilename += hrefWithoutFilename.endsWith('/') ? '' : '/';
-    const matches = hrefWithoutFilename.match(VERSION_REGEX) || [];
-    const tag = matches[1];
-    __webpack_public_path__ = tag ? hrefWithoutFilename.replace(tag, __PKG_VERSION__) : hrefWithoutFilename;
-  } catch (e) {
-    //
-  }
-};
+if (!__DEV__) {
+  const setWebpackChunkPublicPath = () => {
+    const VERSION_REGEX = /@clerk\/clerk-js@(.+?)\//;
+    try {
+      // @ts-expect-error
+      const scriptUrl = new URL(document.currentScript.src);
+      let hrefWithoutFilename = new URL(scriptUrl.href.split('/').slice(0, -1).join('/')).href;
+      hrefWithoutFilename += hrefWithoutFilename.endsWith('/') ? '' : '/';
+      const matches = hrefWithoutFilename.match(VERSION_REGEX) || [];
+      const tag = matches[1];
+      __webpack_public_path__ = tag ? hrefWithoutFilename.replace(tag, __PKG_VERSION__) : hrefWithoutFilename;
+    } catch (e) {
+      //
+    }
+  };
+  setWebpackChunkPublicPath();
+}
 
-setWebpackChunkPublicPath();
+// Make this file a module to ESM TS happy
+export {};
