@@ -3,7 +3,7 @@ import type { RequestCookie } from 'next/dist/server/web/spec-extension/cookies'
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import type { RequestLike, WithAuthOptions } from './types';
+import type { RequestLike } from './types';
 
 type AuthKey = 'AuthStatus' | 'AuthMessage' | 'AuthReason';
 
@@ -144,20 +144,24 @@ export const injectSSRStateIntoObject = <O, T>(obj: O, authObject: T) => {
 };
 
 // TODO: Use the same function defined in @clerk/shared once the package is tree shakeable
-export const handleIsSatelliteBooleanOrFn = (opts: WithAuthOptions, url: URL): boolean => {
-  if (typeof opts.isSatellite === 'function') {
-    return opts.isSatellite(url);
+type VOrFnReturnsV<T> = T | undefined | ((v: URL) => T);
+export function handleValueOrFn<T>(value: VOrFnReturnsV<T>, url: URL): T | undefined;
+export function handleValueOrFn<T>(value: VOrFnReturnsV<T>, url: URL, defaultValue: T): T;
+export function handleValueOrFn<T>(value: VOrFnReturnsV<T>, url: URL, defaultValue?: unknown): unknown {
+  if (typeof value === 'function') {
+    return (value as (v: URL) => T)(url);
   }
-  return opts.isSatellite || false;
-};
 
-// TODO: Use the same function defined in @clerk/shared once the package is tree shakeable
-export const handleDomainStringOrFn = (opts: WithAuthOptions, url: URL): string => {
-  if (typeof opts.domain === 'function') {
-    return opts.domain(url);
+  if (typeof value !== 'undefined') {
+    return value;
   }
-  return opts.domain || '';
-};
+
+  if (typeof defaultValue !== 'undefined') {
+    return defaultValue;
+  }
+
+  return undefined;
+}
 
 // TODO: use @clerk/shared once it is tree-shakeable
 export function isHttpOrHttps(key: string | undefined) {
