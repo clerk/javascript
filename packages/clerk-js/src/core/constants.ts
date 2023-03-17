@@ -6,6 +6,7 @@ export const DEV_BROWSER_SSO_JWT_HTTP_HEADER = 'Clerk-Cookie';
 
 export const CLERK_MODAL_STATE = '__clerk_modal_state';
 export const CLERK_SYNCED = '__clerk_synced';
+export const CLERK_SYNCING = '__clerk_syncing';
 
 export const ERROR_CODES = {
   FORM_IDENTIFIER_NOT_FOUND: 'form_identifier_not_found',

@@ -472,6 +472,7 @@ export interface ClerkOptions {
    * @experimental
    */
   isSatellite?: boolean | ((url: URL) => boolean);
+  signInUrl?: string;
 }
 
 export interface Resources {

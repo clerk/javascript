@@ -97,3 +97,7 @@ export function clerkMissingProxyUrlAndDomain(): never {
     `${errorPrefix} Missing domain and proxyUrl. A satellite application needs to specify a domain or a proxyUrl`,
   );
 }
+
+export function clerkMissingSignInUrlAsSatellite(): never {
+  throw new Error(`${errorPrefix} Missing signInUrl. Pass a signInUrl for dev instances if an app is satellite`);
+}
