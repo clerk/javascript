@@ -3,7 +3,7 @@ import type { ClerkResource } from './resource';
 import type { VerificationResource } from './verification';
 
 export type ReauthorizeExternalAccountParams = {
-  additionalScopes: OAuthScope[];
+  additionalScopes?: OAuthScope[];
   redirectUrl?: string;
 };
 
