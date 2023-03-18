@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-expo",
-  "version": "0.13.0-staging.10",
+  "version": "0.13.0-staging.13",
   "license": "MIT",
   "description": "Clerk.dev React Native/Expo library",
   "keywords": [
@@ -27,13 +27,13 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@clerk/clerk-js": "^4.33.0-staging.10",
-    "@clerk/clerk-react": "^4.13.0-staging.7",
+    "@clerk/clerk-js": "^4.33.0-staging.13",
+    "@clerk/clerk-react": "^4.13.0-staging.9",
     "base-64": "1.0.0",
     "react-native-url-polyfill": "1.3.0"
   },
   "devDependencies": {
-    "@clerk/types": "^3.31.0-staging.4",
+    "@clerk/types": "^3.31.0-staging.5",
     "@types/jest": "^27.4.0",
     "@types/node": "^16.11.55",
     "@types/react": "*",
@@ -44,8 +44,7 @@
     "typescript": "*"
   },
   "peerDependencies": {
-    "react": ">=16",
-    "react-dom": ">=16"
+    "react": ">=16"
   },
   "engines": {
     "node": ">=14"

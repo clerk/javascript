@@ -1,6 +1,7 @@
 import type { LocalStorageBroadcastChannel } from '@clerk/shared';
 import {
   addClerkPrefix,
+  handleValueOrFn,
   inClientSide,
   isLegacyFrontendApiKey,
   isValidBrowserOnline,
@@ -126,8 +127,8 @@ export default class Clerk implements ClerkInterface {
   public readonly frontendApi: string;
   public readonly publishableKey?: string;
   public readonly proxyUrl?: ClerkInterface['proxyUrl'];
-  public readonly domain?: ClerkInterface['domain'];
 
+  #domain?: ClerkInterface['domain'];
   #authService: SessionCookieService | null = null;
   #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
   #componentControls?: ReturnType<MountComponentRenderer> | null;
@@ -151,10 +152,11 @@ export default class Clerk implements ClerkInterface {
   }
 
   get isSatellite(): boolean {
-    if (typeof this.#options.isSatellite === 'function') {
-      return this.#options.isSatellite(new URL(window.location.href));
-    }
-    return this.#options.isSatellite || false;
+    return handleValueOrFn(this.#options.isSatellite, new URL(window.location.href), false);
+  }
+
+  get domain(): string {
+    return addClerkPrefix(stripScheme(handleValueOrFn(this.#domain, new URL(window.location.href))));
   }
 
   public constructor(key: string, options?: DomainOrProxyUrl) {
@@ -167,7 +169,7 @@ export default class Clerk implements ClerkInterface {
     }
     this.proxyUrl = proxyUrlToAbsoluteURL(_unfilteredProxy);
 
-    this.domain = stripScheme(addClerkPrefix(options?.domain));
+    this.#domain = options?.domain;
 
     if (isLegacyFrontendApiKey(key)) {
       if (!validateFrontendApi(key)) {
@@ -196,7 +198,7 @@ export default class Clerk implements ClerkInterface {
 
   public isReady = (): boolean => this.#isReady;
 
-  public load = async (options?: Omit<ClerkOptions, 'isSatellite'>): Promise<void> => {
+  public load = async (options?: ClerkOptions): Promise<void> => {
     if (this.#isReady) {
       return;
     }

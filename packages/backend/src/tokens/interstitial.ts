@@ -1,4 +1,4 @@
-import type { DomainOrProxyUrl } from '@clerk/types';
+import type { MultiDomainAndOrProxyPrimitives } from '@clerk/types';
 
 import { API_VERSION } from '../constants';
 // DO NOT CHANGE: Runtime needs to be imported as a default export so that we can stub its dependencies with Sinon.js
@@ -18,7 +18,7 @@ export type LoadInterstitialOptions = {
   pkgVersion?: string;
   debugData?: DebugRequestSate;
   isSatellite?: boolean;
-} & DomainOrProxyUrl;
+} & MultiDomainAndOrProxyPrimitives;
 
 // TODO: use the same function from @clerk/shared once treeshakable
 export function addClerkPrefix(str: string | undefined) {

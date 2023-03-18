@@ -20,13 +20,15 @@ type CreateParams = {
   slug?: string;
   /* The User id for the user creating the organization. The user will become an administrator for the organization. */
   createdBy: string;
+  maxAllowedMemberships?: number;
 } & MetadataParams;
 
 type GetOrganizationParams = { organizationId: string } | { slug: string };
 
 type UpdateParams = {
   name?: string;
-};
+  maxAllowedMemberships?: number;
+} & MetadataParams;
 
 type UpdateMetadataParams = MetadataParams;
 

@@ -20,7 +20,7 @@ import {
 import type { WithAuthOptions } from './types';
 import {
   getCookie,
-  handleIsSatelliteBooleanOrFn,
+  handleValueOrFn,
   isHttpOrHttps,
   nextJsVersionCanOverrideRequestHeaders,
   setCustomAttributeOnRequest,
@@ -44,7 +44,6 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
   const [handler = noop, opts = {}] = args as [NextMiddleware, WithAuthOptions] | [];
 
   const proxyUrl = opts?.proxyUrl || PROXY_URL;
-  const domain = opts?.domain || DOMAIN;
 
   if (!!proxyUrl && !isHttpOrHttps(proxyUrl)) {
     throw new Error(`Only a absolute URL that starts with https is allowed to be used in SSR`);
@@ -53,7 +52,8 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
   return async (req: NextRequest, event: NextFetchEvent) => {
     const { headers } = req;
 
-    const isSatellite = handleIsSatelliteBooleanOrFn(opts, new URL(req.url)) || IS_SATELLITE;
+    const isSatellite = handleValueOrFn(opts.isSatellite, new URL(req.url), IS_SATELLITE);
+    const domain = handleValueOrFn(opts.domain, new URL(req.url), DOMAIN);
 
     // get auth state, check if we need to return an interstitial
     const cookieToken = getCookie(req, constants.Cookies.Session);

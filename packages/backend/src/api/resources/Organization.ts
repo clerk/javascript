@@ -11,6 +11,7 @@ export class Organization {
     readonly updatedAt: number,
     readonly publicMetadata: Record<string, unknown> | null = {},
     readonly privateMetadata: Record<string, unknown> = {},
+    readonly maxAllowedMemberships: number,
   ) {}
 
   static fromJSON(data: OrganizationJSON): Organization {
@@ -24,6 +25,7 @@ export class Organization {
       data.updated_at,
       data.public_metadata,
       data.private_metadata,
+      data.max_allowed_memberships,
     );
   }
 }
