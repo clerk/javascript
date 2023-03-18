@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.32.6](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.32.5...@clerk/clerk-js@4.32.6) (2023-03-18)
+
+### Bug Fixes
+
+- **clerk-js:** Revert to old navigateToFlowStart behaviour ([#949](https://github.com/clerkinc/javascript/issues/949)) ([ffbc2e1](https://github.com/clerkinc/javascript/commit/ffbc2e19ba2fd8ec15666901cba48f0dfcd9fefa))
+
 ### [4.32.5](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.32.4...@clerk/clerk-js@4.32.5) (2023-03-17)
 
 ### Bug Fixes
