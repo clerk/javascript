@@ -1,0 +1,59 @@
+{
+  "name": "@clerk/clerk-vue",
+  "version": "0.0.1",
+  "license": "MIT",
+  "description": "Clerk.dev Vue library",
+  "keywords": [
+    "clerk",
+    "vue",
+    "auth",
+    "authentication",
+    "passwordless",
+    "session",
+    "jwt"
+  ],
+  "author": "Clerk",
+  "source": "src/index.ts",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch",
+    "clean": "rimraf ./dist",
+    "lint": "eslint .",
+    "prepublishOnly": "npm run build",
+    "test:coverage": "echo \"Error: no test specified yet\"",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@clerk/shared": "^0.14.0-staging.1",
+    "@clerk/types": "^3.31.0-staging.2",
+    "@clerk/clerk-react": "^4.13.0-staging.5",
+    "vue": "^3.2.47",
+    "tslib": "2.4.1"
+  },
+  "devDependencies": {
+    "typescript": "*"
+  },
+  "peerDependencies": {
+    "vue": ">=3.2.0"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/clerkinc/javascript.git"
+  },
+  "homepage": "https://clerk.dev/",
+  "bugs": {
+    "url": "https://github.com/clerkinc/javascript/issues"
+  },
+  "gitHead": "1b19a43b61f712756ab4d8c9ccbee6e8bddbe4ce"
+}
