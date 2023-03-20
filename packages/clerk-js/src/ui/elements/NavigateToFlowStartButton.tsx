@@ -7,7 +7,7 @@ type NavigateToFlowStartButtonProps = PropsOfComponent<typeof Button>;
 export const useNavigateToFlowStart = () => {
   const router = useRouter();
   const navigateToFlowStart = async () => {
-    const to = '/' + router.basePath + router.startPath;
+    const to = '/' + router.basePath + router.flowStartPath;
     if (to !== router.currentPath) {
       return router.navigate(to);
     }

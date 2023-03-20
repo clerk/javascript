@@ -88,7 +88,10 @@ export function Route(props: RouteProps): JSX.Element | null {
   }
 
   const flowStartPath = props.flowStart
-    ? pathFromFullPath(fullPath).replace(props.path || '', '') || router.flowStartPath
+    ? pathFromFullPath(fullPath)
+        .replace(props.path || '', '')
+        //replace the base path for path routing to work
+        .replace('/' + router.basePath, '') || router.flowStartPath
     : router.flowStartPath;
 
   return (

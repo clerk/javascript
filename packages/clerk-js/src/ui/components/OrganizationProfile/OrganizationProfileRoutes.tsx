@@ -18,7 +18,10 @@ export const OrganizationProfileRoutes = (props: PropsOfComponent<typeof Profile
           >
             <ProfileSettingsPage />
           </Route>
-          <Route path='leave'>
+          <Route
+            path='leave'
+            flowStart
+          >
             <LeaveOrganizationPage />
           </Route>
           <Route index>
@@ -28,7 +31,10 @@ export const OrganizationProfileRoutes = (props: PropsOfComponent<typeof Profile
       </Route>
       <Route>
         <Switch>
-          <Route path='invite-members'>
+          <Route
+            path='invite-members'
+            flowStart
+          >
             <InviteMembersPage />
           </Route>
           <Route index>
