@@ -1,6 +1,6 @@
 <p align="center">
-  <a href="https://clerk.dev?utm_source=github&utm_medium=clerk_nextjs" target="_blank" rel="noopener noreferrer">
-    <img src="https://images.clerk.dev/static/logo-light-mode-400x400.png" height="64">
+  <a href="https://clerk.com?utm_source=github&utm_medium=clerk_nextjs" target="_blank" rel="noopener noreferrer">
+    <img src="https://images.clerk.com/static/logo-light-mode-400x400.png" height="64">
   </a>
   <br />
 </p>
@@ -10,7 +10,7 @@
 <div align="center">
 
 [![Chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://discord.com/invite/b5rXHjAg7A)
-[![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.dev/docs?utm_source=github&utm_medium=clerk_nextjs)
+[![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=clerk_nextjs)
 [![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
 
 [Changelog](https://github.com/clerkinc/javascript/blob/main/packages/nextjs/CHANGELOG.md)
@@ -101,7 +101,7 @@ export default MyApp;
 ```
 
 _For further details and examples, please refer to
-our [Documentation](https://clerk.dev/docs?utm_source=github&utm_medium=clerk_nextjs)._
+our [Documentation](https://clerk.com/docs?utm_source=github&utm_medium=clerk_nextjs)._
 
 ## Support
 
@@ -111,7 +111,7 @@ You can get in touch with us in any of the following ways:
   ?utm_source=github&utm_medium=clerk_react
 - Open
   a [GitHub support issue](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=question&template=ask_a_question.md&title=Support%3A+)
-- Contact options listed on [our Support page](https://clerk.dev/support?utm_source=github&utm_medium=clerk_nextjs)
+- Contact options listed on [our Support page](https://clerk.com/support?utm_source=github&utm_medium=clerk_nextjs)
 
 ## Contributing
 
