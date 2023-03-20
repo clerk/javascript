@@ -10,6 +10,9 @@ type InterstitialRule = <T extends AuthenticateRequestOptions>(
   opts: T,
 ) => Promise<InterstitialRuleResult> | InterstitialRuleResult;
 
+const isSyncing = (qp?: URLSearchParams) => qp?.get('__clerk_syncing') === 'true';
+const hasJustSynced = (qp?: URLSearchParams) => qp?.get('__clerk_synced') === 'true';
+
 // In development or staging environments only, based on the request's
 // User Agent, detect non-browser requests (e.g. scripts). Since there
 // is no Authorization header, consider the user as signed out and
@@ -45,12 +48,11 @@ export const crossOriginRequestWithoutHeader: InterstitialRule = options => {
 
 export const isPrimaryInDevAndSyncing: InterstitialRule = options => {
   const { apiKey, secretKey, isSatellite, searchParams } = options;
-  const isSyncing = searchParams?.get('__clerk_syncing') === 'true';
   const key = secretKey || apiKey;
   const isDev = isDevelopmentFromApiKey(key);
 
-  if (isDev && !isSatellite && isSyncing) {
-    return interstitial(options, AuthErrorReason.UnexpectedError);
+  if (isDev && !isSatellite && isSyncing(searchParams)) {
+    return interstitial(options, AuthErrorReason.PrimaryRespondsToSyncing);
   }
   return undefined;
 };
@@ -65,6 +67,10 @@ export const potentialFirstLoadInDevWhenUATMissing: InterstitialRule = options =
   return undefined;
 };
 
+/**
+ * NOTE: Exclude any satellite app that has just synced from throwing an interstitial.
+ * It is expected that a primary app will trigger a redirect back to the satellite app.
+ */
 export const potentialRequestAfterSignInOrOutFromClerkHostedUiInDev: InterstitialRule = options => {
   const { apiKey, secretKey, referrer, host, forwardedHost, forwardedPort, forwardedProto, isSatellite, searchParams } =
     options;
@@ -72,9 +78,7 @@ export const potentialRequestAfterSignInOrOutFromClerkHostedUiInDev: Interstitia
     referrer && checkCrossOrigin({ originURL: new URL(referrer), host, forwardedHost, forwardedPort, forwardedProto });
   const key = secretKey || apiKey;
 
-  const hasJustSynced = searchParams?.get('__clerk_synced') === 'true';
-
-  if (!isSatellite && !hasJustSynced && isDevelopmentFromApiKey(key) && crossOriginReferrer) {
+  if (!isSatellite && !hasJustSynced(searchParams) && isDevelopmentFromApiKey(key) && crossOriginReferrer) {
     return interstitial(options, AuthErrorReason.CrossOriginReferrer);
   }
   return undefined;
@@ -166,12 +170,10 @@ async function verifyRequestState(options: AuthenticateRequestOptions, token: st
 export const isSatelliteAndNeedsSyncing: InterstitialRule = options => {
   const { clientUat, isSatellite, searchParams, secretKey, apiKey } = options;
 
-  const hasJustSynced = searchParams?.get('__clerk_synced') === 'true';
-
   const key = secretKey || apiKey;
   const isDev = isDevelopmentFromApiKey(key);
 
-  if (isSatellite && (!clientUat || clientUat === '0') && !hasJustSynced && !isDev) {
+  if (isSatellite && (!clientUat || clientUat === '0') && !hasJustSynced(searchParams) && !isDev) {
     return interstitial(options, AuthErrorReason.SatelliteCookieNeedsSyncing);
   }
 
