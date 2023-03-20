@@ -1,7 +1,7 @@
 export function assertValidSecretKey(val: unknown): asserts val is string {
   if (!val || typeof val !== 'string') {
     throw Error(
-      'Missing Clerk Secret Key or API Key. Go to https://dashboard.clerk.dev and get your key for your instance.',
+      'Missing Clerk Secret Key or API Key. Go to https://dashboard.clerk.com and get your key for your instance.',
     );
   }
 

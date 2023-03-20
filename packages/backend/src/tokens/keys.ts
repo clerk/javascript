@@ -186,7 +186,7 @@ async function fetchJWKSFromBAPI(apiUrl: string, key: string, apiVersion: string
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.SetClerkSecretKeyOrAPIKey,
       message:
-        'Missing Clerk Secret Key or API Key. Go to https://dashboard.clerk.dev and get your key for your instance.',
+        'Missing Clerk Secret Key or API Key. Go to https://dashboard.clerk.com and get your key for your instance.',
       reason: TokenVerificationErrorReason.RemoteJWKFailedToLoad,
     });
   }

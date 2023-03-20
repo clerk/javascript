@@ -235,7 +235,7 @@ export default (QUnit: QUnit) => {
     test('cookieToken: returns signed out state when cross-origin request [2y]', async assert => {
       const requestState = await authenticateRequest({
         ...defaultMockAuthenticateRequestOptions,
-        origin: 'https://clerk.dev',
+        origin: 'https://clerk.com',
         forwardedProto: '80',
         cookieToken: mockJwt,
       });
@@ -317,7 +317,7 @@ export default (QUnit: QUnit) => {
         cookieToken: mockJwt,
         apiKey: 'test_deadbeef',
         clientUat: '12345',
-        referrer: 'https://clerk.dev',
+        referrer: 'https://clerk.com',
       });
 
       assertInterstitial(assert, requestState, { reason: AuthErrorReason.CrossOriginReferrer });
