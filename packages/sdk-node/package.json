@@ -66,7 +66,7 @@
     "snakecase-keys": "3.2.1",
     "tslib": "2.4.1"
   },
-  "description": "Clerk (clerk.dev) server SDK for usage with node",
+  "description": "Clerk server SDK for usage with node",
   "repository": {
     "type": "git",
     "url": "https://github.com/clerkinc/javascript.git"
@@ -79,7 +79,7 @@
   "bugs": {
     "url": "https://github.com/clerkinc/javascript/issues"
   },
-  "homepage": "https://clerk.dev/",
+  "homepage": "https://clerk.com/",
   "publishConfig": {
     "access": "public"
   },
