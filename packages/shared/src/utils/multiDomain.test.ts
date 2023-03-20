@@ -11,7 +11,7 @@ describe('handleValueOrFn(opts)', () => {
     [() => false, false],
     ['', ''],
     ['some-domain', 'some-domain'],
-    ['clerk.dev', 'clerk.dev'],
+    ['clerk.com', 'clerk.com'],
     [url => url.host, 'example.com'],
     [() => 'some-other-domain', 'some-other-domain'],
   ])('.handleValueOrFn(%s)', (key, expected) => {

@@ -6,13 +6,13 @@ describe('ErrorThrower', () => {
 
   it('throws the correct error message and interpolates pkg and known parameters', () => {
     expect(() => errorThrower.throwInvalidPublishableKeyError({ key: 'whatever' })).toThrow(
-      '@clerk/test-package: The publishableKey passed to Clerk is invalid. You can get your Publishable key at https://dashboard.clerk.dev/last-active?path=api-keys. (key=whatever)',
+      '@clerk/test-package: The publishableKey passed to Clerk is invalid. You can get your Publishable key at https://dashboard.clerk.com/last-active?path=api-keys. (key=whatever)',
     );
   });
 
   it('throws the correct error message and interpolates pkg if no parameters are provided', () => {
     expect(() => errorThrower.throwMissingPublishableKeyError()).toThrow(
-      '@clerk/test-package: Missing publishableKey. You can get your key at https://dashboard.clerk.dev/last-active?path=api-keys.',
+      '@clerk/test-package: Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.',
     );
   });
 
