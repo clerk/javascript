@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.7.15](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@4.7.14...@clerk/clerk-sdk-node@4.7.15) (2023-03-20)
+
+### Bug Fixes
+
+- **clerk-sdk-node:** Encode debug headers to avod Node app crash ([#958](https://github.com/clerkinc/javascript/issues/958)) ([83a768c](https://github.com/clerkinc/javascript/commit/83a768c597e522252ff14419223c6d36604c3556))
+
 ### [4.7.14](https://github.com/clerkinc/javascript/compare/@clerk/clerk-sdk-node@4.7.13...@clerk/clerk-sdk-node@4.7.14) (2023-03-16)
 
 **Note:** Version bump only for package @clerk/clerk-sdk-node
