@@ -77,5 +77,5 @@ export function getWeb3ProviderData(name: Web3Provider): Web3ProviderData | unde
 }
 
 export function svgUrl(id: string): string {
-  return `https://images.clerk.dev/static/${id}.svg`;
+  return `https://images.clerk.com/static/${id}.svg`;
 }

@@ -19,33 +19,33 @@ describe('buildMagicLinkRedirectUrl(routing, baseUrl)', () => {
         {
           routing: 'path',
           path: '',
-          authQueryString: 'redirectUrl=https://clerk.dev',
+          authQueryString: 'redirectUrl=https://clerk.com',
         } as any,
         '',
       ),
-    ).toBe('http://localhost/verify?redirectUrl=https://clerk.dev');
+    ).toBe('http://localhost/verify?redirectUrl=https://clerk.com');
 
     expect(
       buildMagicLinkRedirectUrl(
         {
           routing: 'path',
           path: '/sign-in',
-          authQueryString: 'redirectUrl=https://clerk.dev',
+          authQueryString: 'redirectUrl=https://clerk.com',
         } as any,
         '',
       ),
-    ).toBe('http://localhost/sign-in/verify?redirectUrl=https://clerk.dev');
+    ).toBe('http://localhost/sign-in/verify?redirectUrl=https://clerk.com');
 
     expect(
       buildMagicLinkRedirectUrl(
         {
           routing: 'path',
           path: '/sign-in',
-          authQueryString: 'redirectUrl=https://clerk.dev',
+          authQueryString: 'redirectUrl=https://clerk.com',
         } as any,
-        'https://accounts.clerk.dev/sign-in',
+        'https://accounts.clerk.com/sign-in',
       ),
-    ).toBe('http://localhost/sign-in/verify?redirectUrl=https://clerk.dev');
+    ).toBe('http://localhost/sign-in/verify?redirectUrl=https://clerk.com');
   });
 
   it('returns the magic link redirect url for components using hash based routing ', function () {
@@ -75,33 +75,33 @@ describe('buildMagicLinkRedirectUrl(routing, baseUrl)', () => {
         {
           routing: 'hash',
           path: '',
-          authQueryString: 'redirectUrl=https://clerk.dev',
+          authQueryString: 'redirectUrl=https://clerk.com',
         } as any,
         '',
       ),
-    ).toBe('http://localhost/#/verify?redirectUrl=https://clerk.dev');
+    ).toBe('http://localhost/#/verify?redirectUrl=https://clerk.com');
 
     expect(
       buildMagicLinkRedirectUrl(
         {
           routing: 'hash',
           path: '/sign-in',
-          authQueryString: 'redirectUrl=https://clerk.dev',
+          authQueryString: 'redirectUrl=https://clerk.com',
         } as any,
         '',
       ),
-    ).toBe('http://localhost/#/verify?redirectUrl=https://clerk.dev');
+    ).toBe('http://localhost/#/verify?redirectUrl=https://clerk.com');
 
     expect(
       buildMagicLinkRedirectUrl(
         {
           routing: 'hash',
           path: '/sign-in',
-          authQueryString: 'redirectUrl=https://clerk.dev',
+          authQueryString: 'redirectUrl=https://clerk.com',
         } as any,
-        'https://accounts.clerk.dev/sign-in',
+        'https://accounts.clerk.com/sign-in',
       ),
-    ).toBe('http://localhost/#/verify?redirectUrl=https://clerk.dev');
+    ).toBe('http://localhost/#/verify?redirectUrl=https://clerk.com');
   });
 
   it('returns the magic link redirect url for components using virtual routing ', function () {
@@ -109,20 +109,20 @@ describe('buildMagicLinkRedirectUrl(routing, baseUrl)', () => {
       buildMagicLinkRedirectUrl(
         {
           routing: 'virtual',
-          authQueryString: 'redirectUrl=https://clerk.dev',
+          authQueryString: 'redirectUrl=https://clerk.com',
         } as any,
-        'https://accounts.clerk.dev/sign-in',
+        'https://accounts.clerk.com/sign-in',
       ),
-    ).toBe('https://accounts.clerk.dev/sign-in/verify?redirectUrl=https://clerk.dev');
+    ).toBe('https://accounts.clerk.com/sign-in/verify?redirectUrl=https://clerk.com');
 
     expect(
       buildMagicLinkRedirectUrl(
         {
           routing: 'virtual',
         } as any,
-        'https://accounts.clerk.dev/sign-in',
+        'https://accounts.clerk.com/sign-in',
       ),
-    ).toBe('https://accounts.clerk.dev/sign-in/verify');
+    ).toBe('https://accounts.clerk.com/sign-in/verify');
   });
 });
 

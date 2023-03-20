@@ -16,6 +16,7 @@ declare global {
 // This is used as a dummy base when we need to invoke "new URL()" but we don't care about the URL origin.
 const DUMMY_URL_BASE = 'http://clerk-dummy';
 const CLERK_IMAGE_URL_BASES = [
+  'https://images.clerk.com/',
   'https://images.clerk.dev/',
   'https://images.clerkstage.dev/',
   'https://images.lclclerk.com/',
