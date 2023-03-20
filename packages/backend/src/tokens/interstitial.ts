@@ -23,7 +23,7 @@ export type LoadInterstitialOptions = {
 } & MultiDomainAndOrProxyPrimitives;
 
 // TODO: use the same function from @clerk/shared once treeshakable
-export function addClerkPrefix(str: string | undefined) {
+function addClerkPrefix(str: string | undefined) {
   if (!str) {
     return '';
   }
@@ -38,6 +38,50 @@ export function addClerkPrefix(str: string | undefined) {
 
   const stripped = str.replace(regex, '');
   return `clerk.${stripped}`;
+}
+
+export function getClerkLoadArgs(args: Pick<LoadInterstitialOptions, 'isSatellite' | 'signInUrl'>) {
+  const map = new Map<keyof typeof args, typeof args>();
+  for (const key in args) {
+    const k = key as keyof typeof args;
+    if (args[k]) {
+      map.set(k, args[k] as any);
+    }
+  }
+  return Object.fromEntries(map);
+}
+
+export function addScriptAttributes(
+  args: Partial<Pick<LoadInterstitialOptions, 'frontendApi' | 'domain' | 'proxyUrl' | 'publishableKey'>>,
+) {
+  const clerkAttrPrefix = 'data-clerk-';
+
+  const attributesMap = {
+    publishableKey: 'publishable-key',
+    frontendApi: 'frontend-api',
+    domain: 'domain',
+    proxyUrl: 'proxy-url',
+  } as const;
+
+  const attributes = [] as {
+    attributeName: keyof typeof args;
+    attributeValue: string;
+  }[];
+
+  for (const key in args) {
+    const k = key as keyof typeof args;
+    if (args[k]) {
+      attributes.push({
+        attributeName: key as keyof typeof args,
+        attributeValue: args[k] as string,
+      });
+    }
+  }
+
+  return attributes.map(
+    ({ attributeName, attributeValue }) =>
+      `script.setAttribute('${clerkAttrPrefix}${attributesMap[attributeName]}', '${attributeValue}')`,
+  );
 }
 
 export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions, 'apiUrl'>) {
@@ -85,10 +129,7 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
 
                 const Clerk = window.Clerk;
                 try {
-                    await Clerk.load({
-                        isSatellite: ${isSatellite},
-                        signInUrl: ${signInUrl ? `'${signInUrl}'` : undefined}
-                    });
+                    await Clerk.load(${JSON.stringify(getClerkLoadArgs({ isSatellite, signInUrl }))});
                     if(Clerk.loaded){
                       if(window.location.href.indexOf("#") === -1){
                         window.location.href = window.location.href;
@@ -104,14 +145,12 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
             };
             (() => {
                 const script = document.createElement('script');
-                ${
-                  publishableKey
-                    ? `script.setAttribute('data-clerk-publishable-key', '${publishableKey}');`
-                    : `script.setAttribute('data-clerk-frontend-api', '${frontendApi}');`
-                }
-
-                ${domain ? `script.setAttribute('data-clerk-domain', '${domain}');` : ''}
-                ${proxyUrl ? `script.setAttribute('data-clerk-proxy-url', '${proxyUrl}')` : ''};
+                ${addScriptAttributes({
+                  frontendApi,
+                  publishableKey,
+                  proxyUrl,
+                  domain,
+                }).join(';\n')}
                 script.async = true;
                 script.src = '${getScriptUrl(proxyUrl || domainOnlyInProd || frontendApi, pkgVersion)}';
                 script.crossOrigin = 'anonymous';
