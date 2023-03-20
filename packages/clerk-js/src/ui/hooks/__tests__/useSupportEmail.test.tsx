@@ -9,7 +9,7 @@ jest.mock('../../contexts', () => {
   return {
     useCoreClerk: () => {
       return {
-        frontendApi: 'clerk.clerk.dev',
+        frontendApi: 'clerk.clerk.com',
       };
     },
     useEnvironment: () => mockUseEnvironment(),
@@ -39,6 +39,6 @@ describe('useSupportEmail', () => {
     mockUseEnvironment.mockImplementationOnce(() => ({ displayConfig: { supportEmail: null } }));
     const { result } = renderHook(() => useSupportEmail());
 
-    expect(result.current).toBe('support@clerk.dev');
+    expect(result.current).toBe('support@clerk.com');
   });
 });

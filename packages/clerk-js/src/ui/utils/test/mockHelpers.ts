@@ -58,7 +58,7 @@ export const mockRouteContextValue = (): DeepJestMocked<RouteContextValue> => {
     matches: jest.fn(),
     baseNavigate: jest.fn(),
     navigate: jest.fn(),
-    resolve: jest.fn((to: string) => new URL(to, 'https://clerk.dev')),
+    resolve: jest.fn((to: string) => new URL(to, 'https://clerk.com')),
     refresh: jest.fn(),
     params: {},
   };

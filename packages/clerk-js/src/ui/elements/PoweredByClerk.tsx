@@ -87,7 +87,7 @@ export const PoweredByClerkTag = React.memo(
 const LogoMarkIconLink = () => {
   return (
     <Link
-      href='https://www.clerk.dev?utm_source=clerk&utm_medium=components'
+      href='https://www.clerk.com?utm_source=clerk&utm_medium=components'
       colorScheme='neutral'
       sx={{
         color: 'inherit',
