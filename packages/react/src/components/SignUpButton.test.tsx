@@ -23,7 +23,7 @@ jest.mock('./withClerk', () => {
   };
 });
 
-const url = 'https://www.clerk.dev';
+const url = 'https://www.clerk.com';
 
 describe('<SignUpButton/>', () => {
   beforeAll(() => {
