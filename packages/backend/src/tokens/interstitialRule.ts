@@ -164,11 +164,14 @@ async function verifyRequestState(options: AuthenticateRequestOptions, token: st
 }
 
 export const isSatelliteAndNeedsSyncing: InterstitialRule = options => {
-  const { clientUat, isSatellite, searchParams } = options;
+  const { clientUat, isSatellite, searchParams, secretKey, apiKey } = options;
 
   const hasJustSynced = searchParams?.get('__clerk_synced') === 'true';
 
-  if (isSatellite && (!clientUat || clientUat === '0') && !hasJustSynced) {
+  const key = secretKey || apiKey;
+  const isDev = isDevelopmentFromApiKey(key);
+
+  if (isSatellite && (!clientUat || clientUat === '0') && !hasJustSynced && !isDev) {
     return interstitial(options, AuthErrorReason.SatelliteCookieNeedsSyncing);
   }
 

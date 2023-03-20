@@ -19,6 +19,7 @@ export type LoadInterstitialOptions = {
   pkgVersion?: string;
   debugData?: DebugRequestSate;
   isSatellite?: boolean;
+  signInUrl?: string;
 } & MultiDomainAndOrProxyPrimitives;
 
 // TODO: use the same function from @clerk/shared once treeshakable
@@ -42,7 +43,16 @@ export function addClerkPrefix(str: string | undefined) {
 export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions, 'apiUrl'>) {
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
   const domainOnlyInProd = !isDevOrStagingUrl(options.frontendApi) ? addClerkPrefix(options.domain) : '';
-  const { debugData, frontendApi, pkgVersion, publishableKey, proxyUrl, isSatellite = false, domain } = options;
+  const {
+    debugData,
+    frontendApi,
+    pkgVersion,
+    publishableKey,
+    proxyUrl,
+    isSatellite = false,
+    domain,
+    signInUrl,
+  } = options;
   return `
     <head>
         <meta charset="UTF-8" />
@@ -76,7 +86,8 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
                 const Clerk = window.Clerk;
                 try {
                     await Clerk.load({
-                        isSatellite: ${isSatellite}
+                        isSatellite: ${isSatellite},
+                        signInUrl: ${signInUrl ? `'${signInUrl}'` : undefined}
                     });
                     if(Clerk.loaded){
                       if(window.location.href.indexOf("#") === -1){
