@@ -26,8 +26,8 @@ describe('isProxyUrlRelative(key)', () => {
 
 describe('isHttpOrHttps(key)', () => {
   it.each([
-    ['http://clerk.dev/api/__clerk', true],
-    ['http://clerk.dev/api/__clerk', true],
+    ['http://clerk.com/api/__clerk', true],
+    ['http://clerk.com/api/__clerk', true],
     [undefined, false],
     ['/api/__clerk', false],
     ['', false],
@@ -43,7 +43,7 @@ describe('proxyUrlToAbsoluteURL(url)', () => {
     Object.defineProperty(global.window, 'location', {
       get() {
         return {
-          origin: 'https://clerk.dev',
+          origin: 'https://clerk.com',
         };
       },
       configurable: true,
@@ -58,11 +58,11 @@ describe('proxyUrlToAbsoluteURL(url)', () => {
   });
 
   it('returns an absolute URL made from window.location.origin and the partial a path', () => {
-    expect(proxyUrlToAbsoluteURL('/api/__clerk')).toBe('https://clerk.dev/api/__clerk');
+    expect(proxyUrlToAbsoluteURL('/api/__clerk')).toBe('https://clerk.com/api/__clerk');
   });
 
   it('returns the same value as the parameter given as it already an absolute URL', () => {
-    expect(proxyUrlToAbsoluteURL('https://clerk.dev/api/__clerk')).toBe('https://clerk.dev/api/__clerk');
+    expect(proxyUrlToAbsoluteURL('https://clerk.com/api/__clerk')).toBe('https://clerk.com/api/__clerk');
   });
   it('returns empty string if parameter is undefined', () => {
     expect(proxyUrlToAbsoluteURL(undefined)).toBe('');

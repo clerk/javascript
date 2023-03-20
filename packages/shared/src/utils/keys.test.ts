@@ -43,13 +43,13 @@ describe('isPublishableKey(key)', () => {
   });
 
   it('returns false if the key is not a valid publishable key', () => {
-    expect(isPublishableKey('clerk.clerk.dev')).toBe(false);
+    expect(isPublishableKey('clerk.clerk.com')).toBe(false);
   });
 });
 
 describe('isLegacyFrontendApiKey(key)', () => {
   it('returns true if the key is a valid legacy frontend Api key', () => {
-    expect(isLegacyFrontendApiKey('clerk.clerk.dev')).toBe(true);
+    expect(isLegacyFrontendApiKey('clerk.clerk.com')).toBe(true);
   });
   it('returns true if the key is not a valid legacy frontend Api key', () => {
     expect(isLegacyFrontendApiKey('pk_live_Y2xlcmsuY2xlcmsuZGV2JA==')).toBe(false);
