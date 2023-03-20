@@ -2,7 +2,7 @@
   "name": "@clerk/fastify",
   "version": "0.1.12-staging.6",
   "license": "MIT",
-  "description": "Clerk.dev SDK for Fastify",
+  "description": "Clerk SDK for Fastify",
   "keywords": [
     "auth",
     "authentication",
@@ -54,6 +54,6 @@
   "bugs": {
     "url": "https://github.com/clerkinc/javascript/issues"
   },
-  "homepage": "https://clerk.dev/",
+  "homepage": "https://clerk.com/",
   "sideEffects": false
 }
