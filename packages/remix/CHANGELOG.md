@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [2.2.17](https://github.com/clerkinc/javascript/compare/@clerk/remix@2.2.16...@clerk/remix@2.2.17) (2023-03-21)
+
+### Bug Fixes
+
+- **remix:** Fix support for plain objects in handler result ([#962](https://github.com/clerkinc/javascript/issues/962)) ([25ec3fb](https://github.com/clerkinc/javascript/commit/25ec3fbdc314b30f4d6dd695e6f79f679053f8ab))
+
 ### [2.2.16](https://github.com/clerkinc/javascript/compare/@clerk/remix@2.2.15...@clerk/remix@2.2.16) (2023-03-21)
 
 **Note:** Version bump only for package @clerk/remix
