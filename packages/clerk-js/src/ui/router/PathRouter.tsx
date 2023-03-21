@@ -36,8 +36,12 @@ export const PathRouter = ({ basePath, preservedParams, children }: PathRouterPr
   React.useEffect(() => {
     const effect = async () => {
       if (window.location.hash.startsWith('#/')) {
+        const url = new URL(window.location.href);
         const hashToPath = new URL(window.location.pathname + window.location.hash.substr(1), window.location.href);
         hashToPath.pathname = trimTrailingSlash(hashToPath.pathname);
+        for (const [key, value] of url.searchParams) {
+          hashToPath.searchParams.append(key, value);
+        }
         await navigate(stripOrigin(hashToPath));
         setStripped(true);
       }
