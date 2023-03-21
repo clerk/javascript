@@ -1,4 +1,4 @@
-import { camelToSnake, isIPV4Address } from '@clerk/shared';
+import { camelToSnake, createDevOrStagingUrlCache, isIPV4Address } from '@clerk/shared';
 import type { SignUpResource } from '@clerk/types';
 
 import { loadScript } from '../utils';
@@ -36,22 +36,9 @@ export const DEV_OR_STAGING_SUFFIXES = [
 
 const BANNED_URI_PROTOCOLS = ['javascript:'] as const;
 
-const devOrStagingUrlCache = new Map<string, boolean>();
+const { isDevOrStagingUrl } = createDevOrStagingUrlCache();
+export { isDevOrStagingUrl };
 const accountsCache = new Map<string, boolean>();
-
-export function isDevOrStagingUrl(url: string | URL): boolean {
-  if (!url) {
-    return false;
-  }
-
-  const hostname = typeof url === 'string' ? url : url.hostname;
-  let res = devOrStagingUrlCache.get(hostname);
-  if (res === undefined) {
-    res = DEV_OR_STAGING_SUFFIXES.some(s => hostname.endsWith(s));
-    devOrStagingUrlCache.set(hostname, res);
-  }
-  return res;
-}
 
 export function isAccountsHostedPages(url: string | URL = window.location.hostname): boolean {
   if (!url) {

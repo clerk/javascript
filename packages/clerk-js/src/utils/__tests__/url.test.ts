@@ -9,7 +9,6 @@ import {
   hasExternalAccountSignUpError,
   isAccountsHostedPages,
   isDataUri,
-  isDevOrStagingUrl,
   isValidUrl,
   removeSearchParameterFromHash,
   setSearchParameterInHash,
@@ -32,31 +31,6 @@ describe('isAccountsHostedPages(url)', () => {
   test.each(goodUrls)('.isAccountsHostedPages(%s)', (a, expected) => {
     // @ts-ignore
     expect(isAccountsHostedPages(a)).toBe(expected);
-  });
-});
-
-describe('isDevOrStagingUrl(url)', () => {
-  const goodUrls: Array<[string | URL, boolean]> = [
-    ['https://www.google.com', false],
-    ['https://www.clerk.com', false],
-    ['https://www.lclclerk.com', false],
-    ['clerk.prod.lclclerk.com', false],
-    ['something.dev.lclclerk.com', true],
-    ['something.lcl.dev', true],
-    ['https://www.something.stg.lclclerk.com', true],
-    [new URL('https://www.lclclerk.com'), false],
-    [new URL('https://www.something.stg.lclclerk.com'), true],
-    [new URL('https://www.something.stg.lclclerk.com:4000'), true],
-  ];
-
-  const badUrls: Array<[string | null, boolean]> = [
-    ['', false],
-    [null, false],
-  ];
-
-  test.each([...goodUrls, ...badUrls])('.isDevOrStagingUrl(%s)', (a, expected) => {
-    // @ts-ignore
-    expect(isDevOrStagingUrl(a)).toBe(expected);
   });
 });
 
