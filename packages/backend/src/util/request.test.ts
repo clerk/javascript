@@ -49,7 +49,7 @@ export default (QUnit: QUnit) => {
     });
 
     test('is CO with cross origin auth domain', async assert => {
-      const originURL = new URL('https://accounts.clerk.dev');
+      const originURL = new URL('https://accounts.clerk.com');
       const host = new URL('https://localhost').host;
       assert.true(checkCrossOrigin({ originURL, host }));
     });

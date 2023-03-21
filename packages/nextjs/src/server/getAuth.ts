@@ -23,7 +23,7 @@ export const getAuth = (req: RequestLike): SignedInAuthObject | SignedOutAuthObj
 
   if (!authStatus) {
     throw new Error(
-      'You need to use "withClerkMiddleware" in your Next.js middleware file. See https://clerk.dev/docs/quickstarts/get-started-with-nextjs',
+      'You need to use "withClerkMiddleware" in your Next.js middleware file. See https://clerk.com/docs/quickstarts/get-started-with-nextjs',
     );
   }
 

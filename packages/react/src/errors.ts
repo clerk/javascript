@@ -30,4 +30,4 @@ export function isMagicLinkError(err: any): err is MagicLinkError {
 }
 
 export const invalidStateError =
-  'Invalid state. Feel free to submit a bug or reach out to support here: https://clerk.dev/support';
+  'Invalid state. Feel free to submit a bug or reach out to support here: https://clerk.com/support';

@@ -10,7 +10,7 @@ const fapiClient = createFapiClient({
   },
 } as Clerk);
 
-const proxyUrl = 'https://clerk.dev/api/__clerk';
+const proxyUrl = 'https://clerk.com/api/__clerk';
 
 const fapiClientWithProxy = createFapiClient({
   frontendApi: 'clerk.example.com',

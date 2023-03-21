@@ -2,7 +2,7 @@
   "name": "@clerk/clerk-react",
   "version": "4.13.0-staging.9",
   "license": "MIT",
-  "description": "Clerk.dev React library",
+  "description": "Clerk React library",
   "keywords": [
     "clerk",
     "react",
@@ -60,7 +60,7 @@
     "type": "git",
     "url": "https://github.com/clerkinc/javascript.git"
   },
-  "homepage": "https://clerk.dev/",
+  "homepage": "https://clerk.com/",
   "bugs": {
     "url": "https://github.com/clerkinc/javascript/issues"
   },
