@@ -67,6 +67,6 @@ export const rootAuthLoader: RootAuthLoader = async (
     }
   }
 
-  // if the user returned a plain object, simply inject requestState into an empty response
-  return injectRequestStateIntoResponse(new Response(JSON.stringify({})), requestState);
+  // if the user returned a plain object, create an empty response and inject requestState and handlerResult
+  return injectRequestStateIntoResponse(new Response(JSON.stringify(handlerResult)), requestState);
 };
