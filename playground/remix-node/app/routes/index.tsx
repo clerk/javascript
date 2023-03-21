@@ -8,7 +8,8 @@ export const loader: LoaderFunction = async args => {
 
 export default function Index() {
   const user = useUser();
-  console.log('User:', user);
+  console.log({ user });
+
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif', lineHeight: '1.4' }}>
       <h1>Welcome to Remix</h1>

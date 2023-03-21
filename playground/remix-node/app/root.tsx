@@ -1,5 +1,5 @@
 import type { LoaderFunction, MetaFunction, Headers } from '@remix-run/node';
-import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react';
+import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from '@remix-run/react';
 import { rootAuthLoader } from '@clerk/remix/ssr.server';
 import { getClerkDebugHeaders } from '@clerk/remix/ssr.server';
 import { ClerkApp, ClerkCatchBoundary } from '@clerk/remix';
@@ -10,9 +10,9 @@ export const loader: LoaderFunction = args => {
     ({ request }) => {
       const { user } = request;
 
-      console.log('User:', user);
+      console.log('root User:', user);
 
-      return { user };
+      return null;
     },
     { loadUser: true },
   );
@@ -42,6 +42,9 @@ export const meta: MetaFunction = () => ({
 export const CatchBoundary = ClerkCatchBoundary();
 
 function App() {
+  const loaderData = useLoaderData();
+  console.log('root: ', { loaderData });
+
   return (
     <html lang='en'>
       <head>
