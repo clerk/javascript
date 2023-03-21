@@ -3,6 +3,7 @@ import { addClerkPrefix, isValidProxyUrl, parsePublishableKey, proxyUrlToAbsolut
 import { LIB_VERSION } from '../info';
 import type { BrowserClerk } from '../types';
 import { errorThrower } from './errorThrower';
+import { isDevOrStagingUrl } from './isDevOrStageUrl';
 
 export interface Global {
   Clerk?: BrowserClerk;
@@ -48,7 +49,7 @@ function getScriptSrc({
   let scriptHost = '';
   if (!!proxyUrl && isValidProxyUrl(proxyUrl)) {
     scriptHost = proxyUrlToAbsoluteURL(proxyUrl).replace(/http(s)?:\/\//, '');
-  } else if (domain) {
+  } else if (domain && !isDevOrStagingUrl(parsePublishableKey(publishableKey)?.frontendApi || frontendApi || '')) {
     scriptHost = addClerkPrefix(domain);
   } else {
     scriptHost = parsePublishableKey(publishableKey)?.frontendApi || frontendApi || '';
