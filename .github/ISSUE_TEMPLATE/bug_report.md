@@ -32,15 +32,33 @@ labels: 'Status: Triage'
 - [ ] `build/tooling/chore`
 - [ ] other:
 
-### Version:
+### Dependencies + versions
 
-```
-0.0.0
+Provide a json with the dependencies used in your project (copy paste from yarn.lock / package-lock.json) or a github project / template that reproduces the issue.
+
+**Please remember to include the `@clerk/*` packages and their versions!!**
+
+Example:
+
+```json
+{  
+  "dependencies": {
+    "react": "18.2.0"
+  },
+  "devDependencies": {
+    "@clerk/types": "3.31.0",
+    "@clerk/clerk-react": "4.13.0"
+  },
+  "peerDependencies": {
+    "react": "18.2.0"
+  }
+}
+
 ```
 
 ### Browser/OS
 
-If applicable e.g. `Chrome latest`
+If applicable e.g. `Chrome {version}`, `Node {version}` , `Bun {version}` , `Cloudflare worker {version}`
 
 ## Description
 

@@ -33,7 +33,7 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
     awaitableNavigateRef.current = awaitableNavigate;
   }, [awaitableNavigate]);
 
-  const { clerkState, proxyUrl, domain, isSatellite, ...restProps } = rest;
+  const { clerkState, ...restProps } = rest;
   ReactClerkProvider.displayName = 'ReactClerkProvider';
 
   assertValidClerkState(clerkState);
@@ -54,9 +54,9 @@ export function ClerkProvider({ children, ...rest }: RemixClerkProviderProps): J
       initialState={__clerk_ssr_state}
       frontendApi={__frontendApi as any}
       publishableKey={__publishableKey as any}
-      proxyUrl={(proxyUrl || __proxyUrl) as any}
-      domain={(domain || __domain) as any}
-      isSatellite={isSatellite || __isSatellite}
+      proxyUrl={__proxyUrl as any}
+      domain={__domain as any}
+      isSatellite={__isSatellite}
       {...restProps}
     >
       {children}
