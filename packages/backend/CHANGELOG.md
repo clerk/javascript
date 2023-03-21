@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.13.5](https://github.com/clerkinc/javascript/compare/@clerk/backend@0.13.4...@clerk/backend@0.13.5) (2023-03-21)
+
+### Bug Fixes
+
+- **backend:** Extract base64url from the rfc4648 3rd-party package ([#961](https://github.com/clerkinc/javascript/issues/961)) ([99a4da3](https://github.com/clerkinc/javascript/commit/99a4da3812a3f4a299d8dbabe57d78620f1c93f3))
+
 ### [0.13.4](https://github.com/clerkinc/javascript/compare/@clerk/backend@0.13.3...@clerk/backend@0.13.4) (2023-03-16)
 
 **Note:** Version bump only for package @clerk/backend

@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.1.17](https://github.com/clerkinc/javascript/compare/gatsby-plugin-clerk@4.1.16...gatsby-plugin-clerk@4.1.17) (2023-03-21)
+
+**Note:** Version bump only for package gatsby-plugin-clerk
+
 ### [4.1.16](https://github.com/clerkinc/javascript/compare/gatsby-plugin-clerk@4.1.15...gatsby-plugin-clerk@4.1.16) (2023-03-20)
 
 **Note:** Version bump only for package gatsby-plugin-clerk
