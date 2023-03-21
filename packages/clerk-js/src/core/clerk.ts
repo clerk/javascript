@@ -160,7 +160,15 @@ export default class Clerk implements ClerkInterface {
   }
 
   get domain(): string {
-    return addClerkPrefix(stripScheme(handleValueOrFn(this.#domain, new URL(window.location.href))));
+    const strippedDomainString = stripScheme(handleValueOrFn(this.#domain, new URL(window.location.href)));
+    if (this.#instanceType === 'production') {
+      return addClerkPrefix(strippedDomainString);
+    }
+    return strippedDomainString;
+  }
+
+  get instanceType() {
+    return this.#instanceType;
   }
 
   public constructor(key: string, options?: DomainOrProxyUrl) {

@@ -75,6 +75,9 @@ export interface Clerk {
    */
   domain?: string | ((url: URL) => string);
 
+  /** Clerk Flag for satellite apps. */
+  isSatellite: boolean;
+
   instanceType?: InstanceType;
 
   /** Client handling most Clerk operations. */

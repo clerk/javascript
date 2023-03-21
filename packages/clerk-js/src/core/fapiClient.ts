@@ -59,7 +59,7 @@ export interface FapiClient {
   request<T>(requestInit: FapiRequestInit): Promise<FapiResponse<T>>;
 }
 
-export default function createFapiClient(clerkInstance: Omit<Clerk, 'proxyUrl'>): FapiClient {
+export default function createFapiClient(clerkInstance: Clerk): FapiClient {
   const onBeforeRequestCallbacks: Array<FapiRequestCallback<unknown>> = [];
   const onAfterResponseCallbacks: Array<FapiRequestCallback<unknown>> = [];
 
@@ -101,6 +101,10 @@ export default function createFapiClient(clerkInstance: Omit<Clerk, 'proxyUrl'>)
       searchParams.append('rotating_token_nonce', rotatingTokenNonce);
     }
 
+    if (clerkInstance.instanceType === 'development' && clerkInstance.isSatellite) {
+      searchParams.append('__domain', clerkInstance.domain);
+    }
+
     // Due to a known Safari bug regarding CORS requests, we are forced to always use GET or POST method.
     // The original HTTP method is used as a query string parameter instead of as an actual method to
     // avoid triggering a CORS OPTION request as it currently breaks cookie dropping in Safari.
@@ -124,7 +128,9 @@ export default function createFapiClient(clerkInstance: Omit<Clerk, 'proxyUrl'>)
   function buildUrl(requestInit: FapiRequestInit): URL {
     const { path } = requestInit;
 
-    const { proxyUrl } = clerkInstance as Clerk;
+    const { proxyUrl, domain, frontendApi, instanceType } = clerkInstance;
+
+    const domainOnlyInProd = instanceType === 'production' ? domain : '';
 
     if (proxyUrl) {
       const proxyBase = new URL(proxyUrl);
@@ -141,7 +147,7 @@ export default function createFapiClient(clerkInstance: Omit<Clerk, 'proxyUrl'>)
 
     return buildUrlUtil(
       {
-        base: `https://${clerkInstance.domain || clerkInstance.frontendApi}`,
+        base: `https://${domainOnlyInProd || frontendApi}`,
         pathname: `v1${path}`,
         search: buildQueryString(requestInit),
       },
