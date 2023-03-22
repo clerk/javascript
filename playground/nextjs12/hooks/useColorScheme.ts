@@ -53,10 +53,10 @@ export const attachListener = (pref, setScheme) => {
 const initialPreference = getPreference(values);
 
 export const useColorScheme = (): { scheme: typeof PREFERENCES[keyof typeof PREFERENCES] } => {
-  if (typeof window !== 'undefined' && !('matchMedia' in window)) {
-    // can not detect
-    return { scheme: PREFERENCES.NONE };
-  }
+  // if (typeof window !== 'undefined' && !('matchMedia' in window)) {
+  //   // can not detect
+  //   return { scheme: PREFERENCES.NONE };
+  // }
   const [scheme, setScheme] = useState(initialPreference ? initialPreference.preference : PREFERENCES.NONE);
 
   useEffect(() => {
