@@ -2,5 +2,6 @@
   "extends": "./tsconfig.build.json",
   "compilerOptions": {
     "incremental": true
-  }
+  },
+  "exclude": ["src/**/*.test.ts", "src/**/__tests__"]
 }
