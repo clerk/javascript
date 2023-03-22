@@ -12,6 +12,7 @@ const UserProfilePage: NextPage = () => {
       {Object.entries(controlComponents).map(entry => {
         return (
           <RenderRedirectToggle
+            key={entry[0]}
             name={entry[0]}
             Component={entry[1]}
           />
@@ -27,7 +28,7 @@ const RenderRedirectToggle = (props: any) => {
 
   return (
     <div>
-      <button onClick={() => setOpen(true)}>Render redirect: {props.name}</button>
+      <button onClick={() => setOpen(true)}>Render redirect: {name}</button>
       {open && <Component />}
     </div>
   );

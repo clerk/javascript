@@ -5,7 +5,7 @@ import { ClerkProvider, OrganizationSwitcher, SignInButton, UserButton } from '@
 import { dark, neobrutalism, shadesOfPurple } from '@clerk/themes';
 import Link from 'next/link';
 import React, { useState } from 'react';
-import { useColorScheme } from './hooks/useColorScheme';
+import { useColorScheme } from '../hooks/useColorScheme';
 
 const themes = { default: undefined, dark, neobrutalism, shadesOfPurple };
 
