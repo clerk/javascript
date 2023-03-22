@@ -158,7 +158,7 @@ describe('SignUpStart', () => {
       fixtures.clerk.client.signUp.emailAddress = 'george@clerk.dev';
       fixtures.clerk.client.signUp.firstName = 'George';
       fixtures.clerk.client.signUp.lastName = 'Clerk';
-      fixtures.clerk.client.signUp.phoneNumber = '123456789';
+      fixtures.clerk.client.signUp.phoneNumber = '+1123456789';
 
       const screen = render(<SignUpStart />, { wrapper });
 

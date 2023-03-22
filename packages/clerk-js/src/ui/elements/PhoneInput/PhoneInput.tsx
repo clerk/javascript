@@ -54,7 +54,12 @@ const PhoneInputBase = (props: PhoneInputProps) => {
   };
 
   const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNumber(e.target.value);
+    const inputValue = e.target.value;
+    if (inputValue.includes('+')) {
+      setNumberAndIso(inputValue);
+    } else {
+      setNumber(inputValue);
+    }
   };
 
   return (
@@ -119,6 +124,9 @@ const PhoneInputBase = (props: PhoneInputProps) => {
         value={formattedNumber}
         onPaste={handlePaste}
         onChange={handlePhoneNumberChange}
+        onInput={e => {
+          console.log('input', e);
+        }}
         maxLength={25}
         type='tel'
         sx={theme => ({
