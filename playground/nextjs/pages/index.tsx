@@ -40,6 +40,12 @@ const Home: NextPage = () => {
           <li>
             <Link href={'/redirect-helpers'}>Redirect helpers</Link>
           </li>
+          <li>
+            <Link href={'/session-examples'}>Session Examples</Link>
+          </li>
+          <li>
+            <Link href={'/user-examples'}>User examples</Link>
+          </li>
         </ul>
       </main>
     </div>
