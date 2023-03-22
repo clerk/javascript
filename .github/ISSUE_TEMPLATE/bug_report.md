@@ -28,6 +28,7 @@ labels: 'Status: Triage'
 - [ ] `@clerk/clerk-sdk-node`
 - [ ] `@clerk/shared`
 - [ ] `@clerk/fastify`
+- [ ] `@clerk/chrome-extension`
 - [ ] `gatsby-plugin-clerk`
 - [ ] `build/tooling/chore`
 - [ ] other:
