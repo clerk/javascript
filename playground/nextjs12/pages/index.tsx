@@ -1,3 +1,4 @@
+import React from 'react';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -39,6 +40,12 @@ const Home: NextPage = () => {
           </li>
           <li>
             <Link href={'/redirect-helpers'}>Redirect helpers</Link>
+          </li>
+          <li>
+            <Link href={'/session-examples'}>Session Examples</Link>
+          </li>
+          <li>
+            <Link href={'/user-examples'}>User examples</Link>
           </li>
         </ul>
       </main>
