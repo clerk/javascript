@@ -1,11 +1,11 @@
 import React from 'react';
 
 import { useLocalStorage } from '../../hooks';
-import { extractDigits, formatPhoneNumber } from '../../utils';
+import { extractDigits, formatPhoneNumber, parsePhoneString } from '../../utils';
 import type { CountryIso } from './countryCodeData';
 import { IsoToCountryMap } from './countryCodeData';
 
-type UseFormattedPhoneNumberProps = { defaultPhone?: string; defaultSelectedIso?: CountryIso };
+type UseFormattedPhoneNumberProps = { initPhoneWithCode: string; locationBasedCountryIso?: CountryIso };
 
 const format = (str: string, iso: CountryIso) => {
   if (!str) {
@@ -15,31 +15,53 @@ const format = (str: string, iso: CountryIso) => {
   return formatPhoneNumber(str, country?.pattern, country?.code);
 };
 
-export const useFormattedPhoneNumber = (props: UseFormattedPhoneNumberProps = {}) => {
-  const [selectedIso, setSelectedIso] = useLocalStorage<CountryIso>(
+export const useFormattedPhoneNumber = (props: UseFormattedPhoneNumberProps) => {
+  const [number, setNumber] = React.useState(() => {
+    const { number } = parsePhoneString(props.initPhoneWithCode || '');
+    return number;
+  });
+
+  // Initialise local storage with the iso we get from the headers
+  // but respect and remember an iso explicitly set by the user (picker or paste)
+  const [iso, setIso] = useLocalStorage<CountryIso>(
     'selectedCountryIso',
-    props.defaultSelectedIso || 'us',
+    parsePhoneString(props.initPhoneWithCode || '').number
+      ? parsePhoneString(props.initPhoneWithCode || '').iso
+      : props.locationBasedCountryIso || 'us',
   );
-  const [phoneNum, setPhoneNum] = React.useState(() => format(props.defaultPhone || '', selectedIso));
 
   React.useEffect(() => {
-    setPhoneNumber(phoneNum);
-  }, [selectedIso, phoneNum]);
+    setNumber(extractDigits(number));
+  }, [iso, number]);
 
-  const cleanPhoneNumber = React.useMemo(() => {
-    if (!phoneNum) {
+  const numberWithCode = React.useMemo(() => {
+    if (!number) {
       return '';
     }
-    const dialCode = IsoToCountryMap.get(selectedIso)?.code || '1';
-    return '+' + extractDigits(`${dialCode}${phoneNum}`);
-  }, [selectedIso, phoneNum]);
+    const dialCode = IsoToCountryMap.get(iso)?.code || '1';
+    return '+' + extractDigits(`${dialCode}${number}`);
+  }, [iso, number]);
 
-  const setPhoneNumber = React.useCallback(
-    (str: string, iso?: CountryIso) => {
-      setPhoneNum(format(str, iso || selectedIso));
+  const formattedNumber = React.useMemo(() => {
+    return format(number, iso);
+  }, [iso, number]);
+
+  const setNumberAndIso = React.useCallback(
+    (str: string) => {
+      const { iso, number } = parsePhoneString(str);
+      setNumber(number);
+      setIso(iso);
     },
-    [selectedIso, phoneNum],
+    [iso, number],
   );
 
-  return { selectedIso, setSelectedIso, setPhoneNumber, cleanPhoneNumber, formattedPhoneNumber: phoneNum };
+  return {
+    setNumber,
+    setIso,
+    setNumberAndIso,
+    iso,
+    number,
+    numberWithCode,
+    formattedNumber,
+  };
 };
