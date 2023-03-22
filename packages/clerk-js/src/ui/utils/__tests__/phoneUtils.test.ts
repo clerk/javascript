@@ -1,9 +1,9 @@
 import {
   extractDigits,
   formatPhoneNumber,
+  getCountryFromPhoneString,
   getCountryIsoFromFormattedNumber,
   getFlagEmojiFromCountryIso,
-  getLongestValidCountryCode,
 } from '../phoneUtils';
 
 describe('phoneUtils', () => {
@@ -163,7 +163,7 @@ describe('phoneUtils', () => {
     });
   });
 
-  describe('formattedNumberToFlagEmoji(formattedNumber)', () => {
+  describe('getCountryIsoFromFormattedNumber(formattedNumber)', () => {
     it('handles edge cases', () => {
       const res = getCountryIsoFromFormattedNumber(undefined as any);
       expect(res).toBe('us');
@@ -184,9 +184,9 @@ describe('phoneUtils', () => {
       expect(res).toBe('ca');
     });
 
-    it('handles a non-US phone starting with 1 but has a potential non-US code', () => {
+    it('prioritizes US for a non-US phone starting with 1 that has a potential non-US code', () => {
       const res = getCountryIsoFromFormattedNumber('+1242 123123');
-      expect(res).toBe('bs');
+      expect(res).toBe('us');
     });
 
     it('handles a non-US phone starting with code != 1', () => {
@@ -195,30 +195,29 @@ describe('phoneUtils', () => {
     });
 
     it('handles a non-US phone without a format pattern', () => {
-      const res = getCountryIsoFromFormattedNumber('+1758 123123');
-      expect(res).toBe('lc');
+      expect(getCountryIsoFromFormattedNumber('+71111111111')).toBe('ru');
     });
   });
 
   describe('getLongestValidCountryCode(value)', () => {
     it('finds valid country and returns phone number value without country code', () => {
-      const res = getLongestValidCountryCode('+12064563059');
-      expect(res.phoneNumberValue).toBe('2064563059');
-      expect(res.selectedCountry).not.toBe(undefined);
-      expect(res.selectedCountry?.code).toBe('1');
+      const res = getCountryFromPhoneString('+12064563059');
+      expect(res.number).toBe('2064563059');
+      expect(res.country).not.toBe(undefined);
+      expect(res.country.code).toBe('1');
     });
 
     it('finds valid country by applying priority', () => {
-      const res = getLongestValidCountryCode('+1242123123');
-      expect(res.phoneNumberValue).toBe('242123123');
-      expect(res.selectedCountry).not.toBe(undefined);
-      expect(res.selectedCountry?.code).toBe('1');
+      const res = getCountryFromPhoneString('+1242123123');
+      expect(res.number).toBe('242123123');
+      expect(res.country).not.toBe(undefined);
+      expect(res.country.code).toBe('1');
     });
 
-    it('does not find valid country code and returns phone number value as is', () => {
-      const res = getLongestValidCountryCode('+699090909090');
-      expect(res.phoneNumberValue).toBe('699090909090');
-      expect(res.selectedCountry).toBe(undefined);
+    it('falls back to US if a valid country code is not found', () => {
+      const res = getCountryFromPhoneString('+699090909090');
+      expect(res.number).toBe('99090909090');
+      expect(res.country.iso).toBe('us');
     });
   });
 });
