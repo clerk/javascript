@@ -1,5 +1,5 @@
 import type { CountryEntry, CountryIso } from '../elements/PhoneInput/countryCodeData';
-import { CodeToCountryIsoMap, IsoToCountryMap, SubAreaCodeSets } from '../elements/PhoneInput/countryCodeData';
+import { CodeToCountriesMap, IsoToCountryMap, SubAreaCodeSets } from '../elements/PhoneInput/countryCodeData';
 
 // offset between uppercase ascii and regional indicator symbols
 const OFFSET = 127397;
@@ -21,15 +21,18 @@ export function getCountryIsoFromFormattedNumber(formattedNumber: string, fallba
     return fallbackIso;
   }
 
+  // Try to match US first based on subarea code
   if (number.startsWith('1') && phoneNumberBelongsTo('us', number)) {
     return 'us';
   }
 
+  // Try to match CA first based on subarea code
   if (number.startsWith('1') && phoneNumberBelongsTo('ca', number)) {
     return 'ca';
   }
 
-  return getCountryIsoFromPhoneCode(number, fallbackIso);
+  // Otherwise, use the most specific code or fallback to US
+  return getCountryFromPhoneString(number).country.iso;
 }
 
 export function formatPhoneNumber(phoneNumber: string, pattern: string | undefined, countryCode?: string): string {
@@ -58,19 +61,6 @@ export function extractDigits(formattedPhone: string): string {
   return (formattedPhone || '').replace(/[^\d]/g, '');
 }
 
-function getCountryIsoFromPhoneCode(phoneWithCode: string, fallbackIso: string): string {
-  // max phone code length is 4 digits
-  // try to match more specific codes first
-  for (const i of [4, 3, 2]) {
-    const potentialCode = phoneWithCode.substring(0, i);
-    const countryIso = CodeToCountryIsoMap.get(potentialCode as any);
-    if (countryIso) {
-      return countryIso;
-    }
-  }
-  return fallbackIso;
-}
-
 function phoneNumberBelongsTo(iso: 'us' | 'ca', phoneWithCode: string) {
   if (!iso || !IsoToCountryMap.get(iso) || !phoneWithCode) {
     return false;
@@ -90,7 +80,6 @@ function maxDigitCountForPattern(pattern: string) {
 }
 
 // https://en.wikipedia.org/wiki/E.164
-
 const MAX_PHONE_NUMBER_LENGTH = 15;
 function maxE164CompliantLength(countryCode?: string) {
   const usCountryCode = '1';
@@ -100,11 +89,13 @@ function maxE164CompliantLength(countryCode?: string) {
 }
 
 export function parsePhoneString(str: string) {
-  const iso = getCountryIsoFromFormattedNumber(str) as CountryIso;
+  const digits = extractDigits(str);
+  const iso = getCountryIsoFromFormattedNumber(digits) as CountryIso;
   const pattern = IsoToCountryMap.get(iso)?.pattern || '';
   const code = IsoToCountryMap.get(iso)?.code || '';
-  const number = str.replace(`+${code}`, '');
-  return { iso, pattern, code, number };
+  const number = digits.slice(code.length);
+  const formattedNumberWithCode = `+${code} ${formatPhoneNumber(number, pattern, code)}`;
+  return { iso, pattern, code, number, formattedNumberWithCode };
 }
 
 export function stringToFormattedPhoneString(str: string): string {
@@ -116,23 +107,23 @@ export const byPriority = (a: CountryEntry, b: CountryEntry) => {
   return b.priority - a.priority;
 };
 
-export function getLongestValidCountryCode(value: string) {
-  const maxCountryCodeLength = 4;
-  let phoneNumberValue = '';
-  const numberValue = value.replace('+', '');
+export function getCountryFromPhoneString(phone: string): { number: string; country: CountryEntry } {
+  const phoneWithCode = extractDigits(phone);
   const matchingCountries = [];
 
-  for (let i = maxCountryCodeLength; i > 0; i--) {
-    const code = numberValue.slice(0, i);
-    const countries = [...IsoToCountryMap.values()].filter(o => o.code === code);
+  // Max country code length is 4. Try to match more specific codes first
+  for (const i of [4, 3, 2, 1]) {
+    const potentialCode = phoneWithCode.substring(0, i);
+    const countries = CodeToCountriesMap.get(potentialCode as any) || [];
 
     if (countries.length) {
       matchingCountries.push(...countries);
     }
   }
 
-  const selectedCountry = matchingCountries.sort(byPriority)[0];
-  phoneNumberValue = numberValue.slice(selectedCountry?.code.length, value.length);
+  const fallbackCountry = IsoToCountryMap.get('us');
+  const country: CountryEntry = matchingCountries.sort(byPriority)[0] || fallbackCountry;
+  const number = phoneWithCode.slice(country?.code.length || 0);
 
-  return { phoneNumberValue, selectedCountry };
+  return { number, country };
 }
