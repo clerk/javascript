@@ -64,9 +64,15 @@ const PhoneInputBase = (props: PhoneInputProps) => {
 
   return (
     <Flex
-      direction='col'
-      justify='center'
-      sx={theme => ({ position: 'relative', borderRadius: theme.radii.$md, zIndex: 1 })}
+      direction='row'
+      center
+      sx={theme => ({
+        position: 'relative',
+        borderRadius: theme.radii.$md,
+        zIndex: 1,
+        border: theme.borders.$normal,
+        borderColor: theme.colors.$blackAlpha300, // we use this value in the Input primitive
+      })}
     >
       <Select
         value={selectedCountryOption.value}
@@ -92,9 +98,6 @@ const PhoneInputBase = (props: PhoneInputProps) => {
       >
         <Flex
           sx={{
-            position: 'absolute',
-            height: `calc(100% - 2px)`,
-            marginLeft: '1px',
             zIndex: 2,
           }}
         >
@@ -126,10 +129,12 @@ const PhoneInputBase = (props: PhoneInputProps) => {
         onChange={handlePhoneNumberChange}
         maxLength={25}
         type='tel'
-        sx={theme => ({
-          // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-          paddingLeft: `calc(${theme.space.$20} + ${selectedCountryOption.country.code.length + 1}ch)`,
-        })}
+        sx={{
+          borderColor: 'transparent',
+          height: '100%',
+          borderTopLeftRadius: '0',
+          borderBottomLeftRadius: '0',
+        }}
         ref={phoneInputRef}
         {...rest}
       />
