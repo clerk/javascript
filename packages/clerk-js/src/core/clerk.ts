@@ -1045,8 +1045,6 @@ export default class Clerk implements ClerkInterface {
       primarySyncUrl = new URL(`${proxy.pathname}/v1/client/sync`, proxy.origin);
     } else if (this.domain) {
       primarySyncUrl = new URL(`/v1/client/sync`, `https://${this.domain}`);
-    } else {
-      clerkMissingProxyUrlAndDomain();
     }
 
     primarySyncUrl?.searchParams.append('redirect_url', window.location.href);
