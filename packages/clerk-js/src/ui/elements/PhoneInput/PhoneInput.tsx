@@ -124,9 +124,6 @@ const PhoneInputBase = (props: PhoneInputProps) => {
         value={formattedNumber}
         onPaste={handlePaste}
         onChange={handlePhoneNumberChange}
-        onInput={e => {
-          console.log('input', e);
-        }}
         maxLength={25}
         type='tel'
         sx={theme => ({
