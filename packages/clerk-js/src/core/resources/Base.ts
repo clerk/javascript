@@ -47,6 +47,11 @@ export abstract class BaseResource {
 
     const { payload, status, statusText } = fapiResponse;
 
+    if (payload?.meta) {
+      const country = payload.meta.responseHeaders?.country;
+      this.clerk.__internal_setCountry(country ? country.toLowerCase() : null);
+    }
+
     // TODO: Link to Client payload piggybacking design document
     if (requestInit.method !== 'GET' || opts.forceUpdateClient) {
       this._updateClient<J>(payload);

@@ -21,10 +21,7 @@ export const useFormattedPhoneNumber = (props: UseFormattedPhoneNumberProps) => 
     return number;
   });
 
-  // Initialise local storage with the iso we get from the headers
-  // but respect and remember an iso explicitly set by the user (picker or paste)
-  const [iso, setIso] = useLocalStorage<CountryIso>(
-    'selectedCountryIso',
+  const [iso, setIso] = React.useState(
     parsePhoneString(props.initPhoneWithCode || '').number
       ? parsePhoneString(props.initPhoneWithCode || '').iso
       : props.locationBasedCountryIso || 'us',
