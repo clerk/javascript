@@ -221,6 +221,8 @@ const SingleCharInput = React.forwardRef<
         textAlign: 'center',
         ...common.textVariants(theme).xlargeMedium,
         padding: `${theme.space.$0x5} 0`,
+        boxSizing: 'content-box',
+        minWidth: '1ch',
         maxWidth: theme.sizes.$7,
         borderRadius: theme.radii.$none,
         border: 'none',
