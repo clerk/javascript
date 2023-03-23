@@ -10,6 +10,7 @@ export const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || 
 export const DOMAIN = process.env.NEXT_PUBLIC_CLERK_DOMAIN || '';
 export const PROXY_URL = process.env.NEXT_PUBLIC_CLERK_PROXY_URL || '';
 export const IS_SATELLITE = process.env.NEXT_PUBLIC_CLERK_IS_SATELLITE === 'true' || false;
+export const SIGN_IN_URL = process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || '';
 
 const clerkClient = Clerk({
   apiKey: API_KEY,
