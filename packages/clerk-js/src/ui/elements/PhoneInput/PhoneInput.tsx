@@ -2,7 +2,7 @@ import React, { useLayoutEffect, useState } from 'react';
 
 import { getLongestValidCountryCode } from '../../../ui/utils/phoneUtils';
 import { useEnvironment } from '../../contexts';
-import { Flex, Input, Text } from '../../customizables';
+import { descriptors, Flex, Input, Text } from '../../customizables';
 import { Select, SelectButton, SelectOptionList } from '../../elements';
 import type { PropsOfComponent } from '../../styledSystem';
 import { getFlagEmojiFromCountryIso } from '../../utils';
@@ -67,6 +67,7 @@ const PhoneInputBase = (props: PhoneInputProps) => {
 
   return (
     <Flex
+      elementDescriptor={descriptors.phoneInputBox}
       direction='row'
       center
       sx={theme => ({
