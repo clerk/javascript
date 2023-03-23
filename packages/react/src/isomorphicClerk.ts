@@ -7,6 +7,7 @@ import type {
   ClientResource,
   CreateOrganizationParams,
   CreateOrganizationProps,
+  DomainOrProxyUrl,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
   OrganizationMembershipResource,
@@ -72,7 +73,7 @@ export default class IsomorphicClerk {
   private loadedListeners: Array<() => void> = [];
 
   #loaded = false;
-  #domain?: ClerkInterface['domain'];
+  #domain: DomainOrProxyUrl['domain'];
 
   get loaded(): boolean {
     return this.#loaded;
