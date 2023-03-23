@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { createSlug, isSlug } from '../../../utils/organizationUtils';
 import { useWizard, Wizard } from '../../common';
 import { useCoreClerk, useCoreOrganization, useCoreOrganizations, useCreateOrganizationContext } from '../../contexts';
 import {
@@ -34,6 +35,12 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
     placeholder: localizationKeys('formFieldInputPlaceholder__organizationName'),
   });
 
+  const slugField = useFormControl('slug', '', {
+    type: 'text',
+    label: 'Slug URL', // TODO add localization key
+    placeholder: 'my-org', // TODO add localization key
+  });
+
   const dataChanged = !!nameField.value;
   const canSubmit = dataChanged || !!file;
 
@@ -43,11 +50,11 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
       return;
     }
 
-    return createOrganization?.({ name: nameField.value })
+    return createOrganization?.({ name: nameField.value, slug: slugField.value })
       .then(org => (file ? org.setLogo({ file }) : org))
       .then(org => setActive({ organization: org }))
       .then(wizard.nextStep)
-      .catch(err => handleError(err, [nameField], card.setError));
+      .catch(err => handleError(err, [nameField, slugField], card.setError));
   };
 
   const completeFlow = () => {
@@ -60,6 +67,25 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
   const onAvatarRemove = () => {
     card.setIdle();
     return setFile(null);
+  };
+
+  const onChangeName = (event: React.ChangeEvent<HTMLInputElement>) => {
+    nameField.setValue(event.target.value);
+    updateSlugField(createSlug(event.target.value), undefined);
+  };
+
+  const onChangeSlug = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.value && !isSlug(event.target.value)) {
+      updateSlugField(event.target.value, 'Can contain only lowercase alphanumeric characters and the dash "-" symbol');
+      return;
+    }
+
+    updateSlugField(createSlug(event.target.value), undefined);
+  };
+
+  const updateSlugField = (val: string, err: string | undefined) => {
+    slugField.setValue(val);
+    slugField.setError(err);
   };
 
   return (
@@ -80,6 +106,15 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
               sx={{ flexBasis: '80%' }}
               autoFocus
               {...nameField.props}
+              onChange={onChangeName}
+              required
+            />
+          </Form.ControlRow>
+          <Form.ControlRow elementId={slugField.id}>
+            <Form.Control
+              sx={{ flexBasis: '80%' }}
+              {...slugField.props}
+              onChange={onChangeSlug}
               required
             />
           </Form.ControlRow>
