@@ -12,4 +12,7 @@ type GsspRequest = IncomingMessage & {
 
 export type RequestLike = NextRequest | NextApiRequest | GsspRequest;
 
-export type WithAuthOptions = OptionalVerifyTokenOptions & MultiDomainAndOrProxy;
+export type WithAuthOptions = OptionalVerifyTokenOptions &
+  MultiDomainAndOrProxy & {
+    signInUrl?: string;
+  };

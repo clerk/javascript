@@ -16,6 +16,7 @@ import {
   PROXY_URL,
   PUBLISHABLE_KEY,
   SECRET_KEY,
+  SIGN_IN_URL,
 } from './clerk';
 import type { WithAuthOptions } from './types';
 import {
@@ -102,6 +103,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
           isSatellite: requestState.isSatellite,
           domain: requestState.domain as any,
           debugData: debugRequestState(requestState),
+          signInUrl: opts?.signInUrl || SIGN_IN_URL,
         }),
         { status: 401 },
       );
