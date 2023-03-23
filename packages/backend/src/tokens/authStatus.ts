@@ -21,6 +21,7 @@ export type SignedInState = {
   publishableKey: string;
   isSatellite: boolean;
   domain: string;
+  signInUrl: string;
   isSignedIn: true;
   isInterstitial: false;
   isUnknown: false;
@@ -36,6 +37,7 @@ export type SignedOutState = {
   publishableKey: string;
   isSatellite: boolean;
   domain: string;
+  signInUrl: string;
   isSignedIn: false;
   isInterstitial: false;
   isUnknown: false;
@@ -90,6 +92,7 @@ export async function signedIn<T>(options: T, sessionClaims: JwtPayload): Promis
     loadSession,
     loadUser,
     loadOrganization,
+    signInUrl,
   } = options as any;
 
   const { sid: sessionId, org_id: orgId, sub: userId } = sessionClaims;
@@ -138,6 +141,7 @@ export async function signedIn<T>(options: T, sessionClaims: JwtPayload): Promis
     publishableKey,
     domain,
     isSatellite,
+    signInUrl,
     isSignedIn: true,
     isInterstitial: false,
     isUnknown: false,
@@ -146,7 +150,7 @@ export async function signedIn<T>(options: T, sessionClaims: JwtPayload): Promis
 }
 
 export function signedOut<T>(options: T, reason: AuthReason, message = ''): SignedOutState {
-  const { frontendApi, publishableKey, proxyUrl, isSatellite, domain } = options as any;
+  const { frontendApi, publishableKey, proxyUrl, isSatellite, domain, signInUrl } = options as any;
 
   return {
     status: AuthStatus.SignedOut,
@@ -157,6 +161,7 @@ export function signedOut<T>(options: T, reason: AuthReason, message = ''): Sign
     publishableKey,
     isSatellite,
     domain,
+    signInUrl,
     isSignedIn: false,
     isInterstitial: false,
     isUnknown: false,
@@ -165,7 +170,7 @@ export function signedOut<T>(options: T, reason: AuthReason, message = ''): Sign
 }
 
 export function interstitial<T>(options: T, reason: AuthReason, message = ''): InterstitialState {
-  const { frontendApi, publishableKey, proxyUrl, isSatellite, domain } = options as any;
+  const { frontendApi, publishableKey, proxyUrl, isSatellite, domain, signInUrl } = options as any;
   return {
     status: AuthStatus.Interstitial,
     reason,
@@ -175,6 +180,7 @@ export function interstitial<T>(options: T, reason: AuthReason, message = ''): I
     isSatellite,
     domain,
     proxyUrl,
+    signInUrl,
     isSignedIn: false,
     isInterstitial: true,
     isUnknown: false,
@@ -183,7 +189,7 @@ export function interstitial<T>(options: T, reason: AuthReason, message = ''): I
 }
 
 export function unknownState<T>(options: T, reason: AuthReason, message = ''): UnknownState {
-  const { frontendApi, publishableKey, isSatellite, domain } = options as any;
+  const { frontendApi, publishableKey, isSatellite, domain, signInUrl } = options as any;
   return {
     status: AuthStatus.Unknown,
     reason,
@@ -192,6 +198,7 @@ export function unknownState<T>(options: T, reason: AuthReason, message = ''): U
     publishableKey,
     isSatellite,
     domain,
+    signInUrl,
     isSignedIn: false,
     isInterstitial: false,
     isUnknown: true,
