@@ -24,16 +24,22 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
     placeholder: localizationKeys('formFieldInputPlaceholder__organizationName'),
   });
 
+  const slugField = useFormControl('slug', organization?.slug || '', {
+    type: 'text',
+    label: 'Slug URL', // TODO add localization key
+    placeholder: 'my-org', // TODO add localization key
+  });
+
   if (!organization) {
     return null;
   }
 
-  const dataChanged = organization.name !== nameField.value;
+  const dataChanged = organization.name !== nameField.value || organization.slug !== slugField.value;
   const canSubmit = dataChanged || avatarChanged;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    return (dataChanged ? organization.update({ name: nameField.value }) : Promise.resolve())
+    return (dataChanged ? organization.update({ name: nameField.value, slug: slugField.value }) : Promise.resolve())
       .then(wizard.nextStep)
       .catch(err => {
         handleError(err, [nameField], card.setError);
@@ -77,6 +83,12 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
             <Form.Control
               {...nameField.props}
               autoFocus
+              required
+            />
+          </Form.ControlRow>
+          <Form.ControlRow elementId={slugField.id}>
+            <Form.Control
+              {...slugField.props}
               required
             />
           </Form.ControlRow>

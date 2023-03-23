@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { createSlug, isSlug } from '../../../utils/organizationUtils';
+import { createSlug, isSlug } from '../../../utils';
 import { useWizard, Wizard } from '../../common';
 import { useCoreClerk, useCoreOrganization, useCoreOrganizations, useCreateOrganizationContext } from '../../contexts';
 import {
