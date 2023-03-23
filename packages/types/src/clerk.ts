@@ -69,11 +69,8 @@ export interface Clerk {
   /** Clerk Proxy url string. */
   proxyUrl?: string;
 
-  /**
-   * @experimental
-   * Clerk Satellite Frontend API string.
-   */
-  domain?: string | ((url: URL) => string);
+  /** Clerk Satellite Frontend API string. */
+  domain: string;
 
   /** Clerk Flag for satellite apps. */
   isSatellite: boolean;

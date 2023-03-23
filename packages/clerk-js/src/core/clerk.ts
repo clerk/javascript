@@ -132,7 +132,7 @@ export default class Clerk implements ClerkInterface {
   public readonly publishableKey?: string;
   public readonly proxyUrl?: ClerkInterface['proxyUrl'];
 
-  #domain?: ClerkInterface['domain'];
+  #domain: DomainOrProxyUrl['domain'];
   #authService: SessionCookieService | null = null;
   #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
   #componentControls?: ReturnType<MountComponentRenderer> | null;
