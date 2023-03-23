@@ -20,6 +20,7 @@ export type RootAuthLoaderOptions = {
   loadSession?: boolean;
   loadOrganization?: boolean;
   authorizedParties?: [];
+  signInUrl?: string;
 } & MultiDomainAndOrProxy;
 
 export type RootAuthLoaderCallback<Options extends RootAuthLoaderOptions> = (

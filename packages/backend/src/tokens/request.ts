@@ -77,6 +77,10 @@ export type AuthenticateRequestOptions = RequiredVerifyTokenOptions &
      * @experimental
      */
     searchParams?: URLSearchParams;
+    /**
+     * @experimental
+     */
+    signInUrl?: string;
   };
 
 export async function authenticateRequest(options: AuthenticateRequestOptions): Promise<RequestState> {

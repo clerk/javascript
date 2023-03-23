@@ -82,3 +82,7 @@ export const noRelativeProxyInSSR = createErrorMessage(
 export const satelliteAndMissingProxyUrlAndDomain = createErrorMessage(
   `Missing domain and proxyUrl. A satellite application needs to specify a domain or a proxyUrl`,
 );
+
+export const satelliteAndMissingSignInUrl = createErrorMessage(
+  `Missing signInUrl. Pass a signInUrl for dev instances if an app is satellite`,
+);

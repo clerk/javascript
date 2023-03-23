@@ -1,11 +1,18 @@
 import type { RequestState } from '@clerk/backend';
 import { Clerk } from '@clerk/backend';
-import { handleValueOrFn, isHttpOrHttps } from '@clerk/shared';
+import { createDevOrStagingUrlCache, handleValueOrFn, isHttpOrHttps, parsePublishableKey } from '@clerk/shared';
 
-import { noRelativeProxyInSSR, noSecretKeyOrApiKeyError, satelliteAndMissingProxyUrlAndDomain } from '../errors';
+import {
+  noRelativeProxyInSSR,
+  noSecretKeyOrApiKeyError,
+  satelliteAndMissingProxyUrlAndDomain,
+  satelliteAndMissingSignInUrl,
+} from '../errors';
 import { getEnvVariable } from '../utils';
 import type { LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
 import { parseCookies } from './utils';
+
+const { isDevOrStagingUrl } = createDevOrStagingUrlCache();
 
 /**
  * @internal
@@ -49,12 +56,19 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
 
   const proxyUrl = getEnvVariable('CLERK_PROXY_URL') || (context?.CLERK_PROXY_URL as string) || opts.proxyUrl || '';
 
+  const signInUrl =
+    getEnvVariable('CLERK_SIGN_IN_URL') || (context?.CLERK_SIGN_IN_URL as string) || opts.signInUrl || '';
+
   if (!!proxyUrl && !isHttpOrHttps(proxyUrl)) {
     throw new Error(noRelativeProxyInSSR);
   }
 
   if (isSatellite && !proxyUrl && !domain) {
     throw new Error(satelliteAndMissingProxyUrlAndDomain);
+  }
+
+  if (isSatellite && !signInUrl && isDevOrStagingUrl(parsePublishableKey(publishableKey)?.frontendApi || frontendApi)) {
+    throw new Error(satelliteAndMissingSignInUrl);
   }
 
   const { headers } = request;
@@ -86,5 +100,6 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     isSatellite,
     domain,
     searchParams: new URL(request.url).searchParams,
+    signInUrl,
   });
 }
