@@ -6,6 +6,7 @@ import { API_VERSION } from '../constants';
 import runtime from '../runtime';
 import { callWithRetry } from '../util/callWithRetry';
 import { isStaging } from '../util/instance';
+import { isDevOrStagingUrl } from '../util/isDevOrStagingUrl';
 import { parsePublishableKey } from '../util/parsePublishableKey';
 import { joinPaths } from '../util/path';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from './errors';
@@ -40,6 +41,7 @@ export function addClerkPrefix(str: string | undefined) {
 
 export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions, 'apiUrl'>) {
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
+  const domainOnlyInProd = !isDevOrStagingUrl(options.frontendApi) ? addClerkPrefix(options.domain) : '';
   const { debugData, frontendApi, pkgVersion, publishableKey, proxyUrl, isSatellite = false, domain } = options;
   return `
     <head>
@@ -100,7 +102,7 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
                 ${domain ? `script.setAttribute('data-clerk-domain', '${domain}');` : ''}
                 ${proxyUrl ? `script.setAttribute('data-clerk-proxy-url', '${proxyUrl}')` : ''};
                 script.async = true;
-                script.src = '${getScriptUrl(proxyUrl || addClerkPrefix(domain) || frontendApi, pkgVersion)}';
+                script.src = '${getScriptUrl(proxyUrl || domainOnlyInProd || frontendApi, pkgVersion)}';
                 script.crossOrigin = 'anonymous';
                 script.addEventListener('load', startClerk);
                 document.body.appendChild(script);
