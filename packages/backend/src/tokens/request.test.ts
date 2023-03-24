@@ -97,7 +97,13 @@ function assertSignedInToAuth(assert, requestState: RequestState) {
   });
 }
 
-function assertSignedIn(assert, requestState: RequestState) {
+function assertSignedIn(
+  assert,
+  requestState: RequestState,
+  expectedState?: {
+    isSatellite?: boolean;
+  },
+) {
   assert.propContains(requestState, {
     frontendApi: 'cafe.babe.clerk.ts',
     publishableKey: '',
@@ -109,6 +115,7 @@ function assertSignedIn(assert, requestState: RequestState) {
     isSatellite: false,
     signInUrl: '',
     domain: '',
+    ...expectedState,
   });
 }
 
@@ -279,6 +286,25 @@ export default (QUnit: QUnit) => {
       assert.strictEqual(requestState.toAuth(), null);
     });
 
+    test('cookieToken: returns interstitial when app is not satellite and responds to syncing on dev instances[12y]', async assert => {
+      const sp = new URLSearchParams();
+      sp.set('__clerk_satellite_url', 'http://localhost:3000');
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
+        apiKey: 'sk_test_deadbeef',
+        clientUat: '12345',
+        isSatellite: false,
+        cookieToken: mockJwt,
+        searchParams: sp,
+      });
+
+      assertInterstitial(assert, requestState, {
+        reason: AuthErrorReason.PrimaryRespondsToSyncing,
+      });
+      assert.equal(requestState.message, '');
+      assert.strictEqual(requestState.toAuth(), null);
+    });
+
     test('cookieToken: returns signed out when no cookieToken and no clientUat in production [4y]', async assert => {
       const requestState = await authenticateRequest({
         ...defaultMockAuthenticateRequestOptions,
@@ -328,6 +354,23 @@ export default (QUnit: QUnit) => {
       assertInterstitial(assert, requestState, { reason: AuthErrorReason.CrossOriginReferrer });
       assert.equal(requestState.message, '');
       assert.strictEqual(requestState.toAuth(), null);
+    });
+
+    test('cookieToken: returns undefined when crossOriginReferrer in development and is satellite [6n]', async assert => {
+      // Scenario: after auth action on Clerk-hosted UIs
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
+        cookieToken: mockJwt,
+        apiKey: 'pk_test_deadbeef',
+        clientUat: '12345',
+        referrer: 'https://clerk.com',
+        isSatellite: true,
+      });
+
+      assertSignedIn(assert, requestState, {
+        isSatellite: true,
+      });
+      assertSignedInToAuth(assert, requestState);
     });
 
     // // Note: The user is definitely signed out here so this interstitial can be
