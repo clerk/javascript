@@ -53,6 +53,7 @@ type CodeControlProps = UseCodeControlReturn['otpInputProps'] & {
 export const CodeControl = React.forwardRef<{ reset: any }, CodeControlProps>((props, ref) => {
   const [disabled, setDisabled] = React.useState(false);
   const refs = React.useRef<Array<HTMLInputElement | null>>([]);
+  const firstClickRef = React.useRef(false);
   const { values, setValues, isDisabled, errorText, isSuccessfullyFilled, isLoading, length } = props;
 
   React.useImperativeHandle(ref, () => ({
@@ -90,6 +91,14 @@ export const CodeControl = React.forwardRef<{ reset: any }, CodeControlProps>((p
 
   const handleOnClick = (index: number) => (e: React.MouseEvent<HTMLInputElement>) => {
     e.preventDefault();
+    // Focus on the first digit, when the first click happens.
+    // This is helpful especially for mobile (iOS) devices that cannot autofocus
+    // and user needs to manually tap the input area
+    if (!firstClickRef.current) {
+      focusInputAt(0);
+      firstClickRef.current = true;
+      return;
+    }
     focusInputAt(index);
   };
 
