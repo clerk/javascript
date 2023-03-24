@@ -1,4 +1,5 @@
 import type { ActJWTClaim, GetToken, MembershipRole, SignOut } from '@clerk/types';
+import { useCallback } from 'react';
 
 import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
@@ -101,8 +102,8 @@ export const useAuth: UseAuth = () => {
   const { sessionId, userId, actor, orgId, orgRole, orgSlug } = useAuthContext();
   const isomorphicClerk = useIsomorphicClerkContext() as unknown as IsomorphicClerk;
 
-  const getToken: GetToken = createGetToken(isomorphicClerk);
-  const signOut: SignOut = createSignOut(isomorphicClerk);
+  const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
+  const signOut: SignOut = useCallback(createSignOut(isomorphicClerk), [isomorphicClerk]);
 
   if (sessionId === undefined && userId === undefined) {
     return {
