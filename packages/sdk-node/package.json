@@ -42,7 +42,7 @@
   "name": "@clerk/clerk-sdk-node",
   "author": {
     "name": "Clerk, Inc.",
-    "email": "developers@clerk.dev",
+    "email": "support@clerk.com",
     "url": "https://github.com/clerkinc/clerk-sdk-node"
   },
   "devDependencies": {
