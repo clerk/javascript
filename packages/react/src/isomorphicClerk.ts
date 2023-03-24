@@ -242,7 +242,6 @@ export default class IsomorphicClerk {
   get session(): ActiveSessionResource | undefined | null {
     if (this.clerkjs) {
       return this.clerkjs.session;
-      // TODO: add ssr condition
     } else {
       return undefined;
     }

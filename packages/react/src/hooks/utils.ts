@@ -15,20 +15,22 @@ const clerkLoaded = (isomorphicClerk: IsomorphicClerk) => {
 /**
  * @internal
  */
-export const createGetToken = (isomorphicClerk: IsomorphicClerk) => async (options: any) => {
-  await clerkLoaded(isomorphicClerk);
-  if (!isomorphicClerk.session) {
-    return null;
-  }
-  return isomorphicClerk.session.getToken(options);
+export const createGetToken = (isomorphicClerk: IsomorphicClerk) => {
+  return async (options: any) => {
+    await clerkLoaded(isomorphicClerk);
+    if (!isomorphicClerk.session) {
+      return null;
+    }
+    return isomorphicClerk.session.getToken(options);
+  };
 };
 
 /**
  * @internal
  */
-export const createSignOut =
-  (isomorphicClerk: IsomorphicClerk) =>
-  async (...args: any) => {
+export const createSignOut = (isomorphicClerk: IsomorphicClerk) => {
+  return async (...args: any) => {
     await clerkLoaded(isomorphicClerk);
     return isomorphicClerk.signOut(...args);
   };
+};
