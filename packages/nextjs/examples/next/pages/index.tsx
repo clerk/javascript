@@ -22,7 +22,7 @@ const Home: NextPage = () => {
         [path]: JSON.stringify(body, null, '  '),
       });
     } catch (e) {
-      setResponse({ ...responses, [path]: '// There was an error with the request. Please contact support@clerk.dev' });
+      setResponse({ ...responses, [path]: '// There was an error with the request. Please contact support@clerk.com' });
     }
   };
 
