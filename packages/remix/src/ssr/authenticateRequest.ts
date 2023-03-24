@@ -12,7 +12,7 @@ import { parseCookies } from './utils';
  */
 export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoaderOptions = {}): Promise<RequestState> {
   const { request, context } = args;
-  const { loadSession, loadUser, loadOrganization, authorizedParties } = opts;
+  const { loadSession, loadUser, loadOrganization, audience, authorizedParties } = opts;
 
   // Fetch environment variables across Remix runtimes.
   // 1. First try from process.env if exists (Node).
@@ -77,6 +77,7 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     forwardedHost: headers.get('x-forwarded-host') as string,
     referrer: headers.get('referer') || '',
     userAgent: headers.get('user-agent') as string,
+    audience,
     authorizedParties,
     proxyUrl,
     isSatellite,

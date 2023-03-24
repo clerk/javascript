@@ -149,7 +149,7 @@ export async function verifyJwt(
 
   // Verify audience claim (aud)
   if (typeof aud === 'string') {
-    if (aud !== audience) {
+    if (audience && aud !== audience) {
       throw new TokenVerificationError({
         action: TokenVerificationErrorAction.EnsureClerkJWT,
         reason: TokenVerificationErrorReason.TokenVerificationFailed,
@@ -157,7 +157,7 @@ export async function verifyJwt(
       });
     }
   } else if (Array.isArray(aud) && aud.length > 0 && aud.every(a => typeof a === 'string')) {
-    if (!aud.includes(audience)) {
+    if (audience && !aud.includes(audience)) {
       throw new TokenVerificationError({
         action: TokenVerificationErrorAction.EnsureClerkJWT,
         reason: TokenVerificationErrorReason.TokenVerificationFailed,

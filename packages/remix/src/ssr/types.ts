@@ -1,4 +1,4 @@
-import type { AuthObject, Organization, Session, User } from '@clerk/backend';
+import type { AuthObject, OptionalVerifyTokenOptions, Organization, Session, User } from '@clerk/backend';
 import type { MultiDomainAndOrProxy } from '@clerk/types';
 import type { DataFunctionArgs, LoaderFunction } from '@remix-run/server-runtime';
 
@@ -19,8 +19,8 @@ export type RootAuthLoaderOptions = {
   loadUser?: boolean;
   loadSession?: boolean;
   loadOrganization?: boolean;
-  authorizedParties?: [];
-} & MultiDomainAndOrProxy;
+} & Pick<OptionalVerifyTokenOptions, 'audience' | 'authorizedParties'> &
+  MultiDomainAndOrProxy;
 
 export type RootAuthLoaderCallback<Options extends RootAuthLoaderOptions> = (
   args: LoaderFunctionArgsWithAuth<Options>,
