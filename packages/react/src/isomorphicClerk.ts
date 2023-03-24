@@ -160,7 +160,7 @@ export default class IsomorphicClerk {
         });
 
         if (!global.Clerk) {
-          throw new Error('Failed to download latest ClerkJS. Contact support@clerk.dev.');
+          throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
         }
 
         await global.Clerk.load(this.options);
