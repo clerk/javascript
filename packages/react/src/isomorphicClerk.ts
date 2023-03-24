@@ -2,6 +2,7 @@ import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
   Clerk,
+  Clerk as ClerkInterface,
   ClientResource,
   CreateOrganizationParams,
   CreateOrganizationProps,
@@ -160,7 +161,10 @@ export default class IsomorphicClerk {
         await global.Clerk.load(this.options);
       }
 
-      return global.Clerk?.loaded ? this.hydrateClerkJS(global.Clerk) : undefined;
+      if (global.Clerk?.loaded || global.Clerk?.isReady()) {
+        return this.hydrateClerkJS(global.Clerk);
+      }
+      return;
     } catch (err) {
       const error = err as Error;
       // In Next.js we can throw a full screen error in development mode.
