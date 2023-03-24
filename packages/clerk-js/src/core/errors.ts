@@ -94,10 +94,16 @@ export function clerkMissingDevBrowserJwt(): never {
 
 export function clerkMissingProxyUrlAndDomain(): never {
   throw new Error(
-    `${errorPrefix} Missing domain and proxyUrl. A satellite application needs to specify a domain or a proxyUrl`,
+    `${errorPrefix} Missing domain and proxyUrl. A satellite application needs to specify a domain or a proxyUrl.`,
   );
 }
 
 export function clerkMissingSignInUrlAsSatellite(): never {
-  throw new Error(`${errorPrefix} Missing signInUrl. Pass a signInUrl for dev instances if an app is satellite`);
+  throw new Error(
+    `${errorPrefix} Missing signInUrl. A satellite application needs to specify the signInUrl for development instances.`,
+  );
+}
+
+export function clerkRedirectUrlIsMissingScheme(): never {
+  throw new Error(`${errorPrefix} Invalid redirect_url. A valid http or https url should be used for the redirection.`);
 }
