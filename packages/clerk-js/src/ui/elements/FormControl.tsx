@@ -8,6 +8,7 @@ import {
   FormControl as FormControlPrim,
   FormErrorText,
   FormLabel,
+  Icon,
   Input,
   Link,
   localizationKeys,
@@ -29,6 +30,7 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
   label: string | LocalizationKey;
   placeholder?: string | LocalizationKey;
   actionLabel?: string | LocalizationKey;
+  icon?: React.ComponentType;
 };
 
 // TODO: Convert this into a Component?
@@ -39,7 +41,7 @@ const getInputElementForType = (type: FormControlProps['type']) => {
 export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props, ref) => {
   const { t } = useLocalizations();
   const card = useCardState();
-  const { id, errorText, isRequired, isOptional, label, actionLabel, onActionClicked, sx, placeholder, ...rest } =
+  const { id, errorText, isRequired, isOptional, label, actionLabel, onActionClicked, sx, placeholder, icon, ...rest } =
     props;
   const hasError = !!errorText;
   const isDisabled = props.isDisabled || card.isLoading;
@@ -70,9 +72,20 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
           hasError={hasError}
           isDisabled={isDisabled}
           isRequired={isRequired}
-          sx={{ marginRight: 'auto' }}
+          sx={{ marginRight: 'auto', display: 'flex', alignItems: 'center' }}
         >
           {typeof label === 'string' ? label : undefined}
+          {icon && (
+            <Icon
+              icon={icon}
+              sx={theme => ({
+                marginLeft: theme.space.$0x5,
+                color: theme.colors.$blackAlpha400,
+                width: theme.sizes.$4,
+                height: theme.sizes.$4,
+              })}
+            />
+          )}
         </FormLabel>
         {isOptional && !actionLabel && (
           <Text

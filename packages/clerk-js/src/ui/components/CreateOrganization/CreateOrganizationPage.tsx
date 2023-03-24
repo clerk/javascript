@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { Question } from '../../../ui/icons';
 import { createSlug, isSlug } from '../../../utils';
 import { useWizard, Wizard } from '../../common';
 import { useCoreClerk, useCoreOrganization, useCoreOrganizations, useCreateOrganizationContext } from '../../contexts';
@@ -115,6 +116,7 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
               sx={{ flexBasis: '80%' }}
               {...slugField.props}
               onChange={onChangeSlug}
+              icon={Question}
               required
             />
           </Form.ControlRow>
