@@ -36,7 +36,7 @@ labels: 'Status: Triage'
 
 Provide a json with the dependencies used in your project (copy paste from yarn.lock / package-lock.json) or a github project / template that reproduces the issue.
 
-**Please remember to include the `@clerk/*` packages and their versions!!**
+**Include the @clerk/* packages and their versions!**
 
 Example:
 
