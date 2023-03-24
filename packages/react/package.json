@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-react",
-  "version": "4.13.0-staging.12",
+  "version": "4.13.0-staging.13",
   "license": "MIT",
   "description": "Clerk React library",
   "keywords": [
