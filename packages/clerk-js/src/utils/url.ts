@@ -133,7 +133,7 @@ interface BuildURLOptions<T> {
  * References:
  * https://developer.mozilla.org/en-US/docs/Web/API/URL
  *
- * @param {URLParams} params
+ * @param {BuildURLParams} params
  * @param {BuildURLOptions} options
  * @returns {URL | string} Returns the URL href
  */
@@ -143,7 +143,7 @@ export function buildURL<B extends boolean>(
 ): B extends true ? string : URL;
 
 export function buildURL(params: BuildURLParams, options: BuildURLOptions<boolean> = {}): URL | string {
-  const { base, hashPath, hashSearch, ...rest } = params;
+  const { base, hashPath, hashSearch, searchParams, ...rest } = params;
 
   let fallbackBase = '';
   // This check is necessary for React native environments where window is undefined.
@@ -156,6 +156,14 @@ export function buildURL(params: BuildURLParams, options: BuildURLOptions<boolea
   }
 
   const url = new URL(base || '', fallbackBase);
+
+  // Properly copy URLSearchParams
+  if (searchParams instanceof URLSearchParams) {
+    searchParams.forEach((value, key) => {
+      url.searchParams.set(key, value);
+    });
+  }
+
   Object.assign(url, rest);
 
   // Treat that hash part of the main URL as if it's another URL with a pathname and a search.
@@ -214,8 +222,8 @@ export function stripOrigin(url: URL | string): string {
  *
  * Strips the trailing slashes from a string
  *
- * @param {path} string
  * @returns {string} Returns the string without trailing slashes
+ * @param path
  */
 export const trimTrailingSlash = (path: string): string => {
   return (path || '').replace(/\/+$/, '');

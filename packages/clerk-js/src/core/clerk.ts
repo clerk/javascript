@@ -3,6 +3,7 @@ import {
   addClerkPrefix,
   handleValueOrFn,
   inClientSide,
+  isHttpOrHttps,
   isLegacyFrontendApiKey,
   isValidBrowserOnline,
   isValidProxyUrl,
@@ -84,6 +85,7 @@ import {
   clerkMissingProxyUrlAndDomain,
   clerkMissingSignInUrlAsSatellite,
   clerkOAuthCallbackDidNotCompleteSignInSIgnUp,
+  clerkRedirectUrlIsMissingScheme,
 } from './errors';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import createFapiClient from './fapiClient';
@@ -664,13 +666,17 @@ export default class Clerk implements ClerkInterface {
     return this.buildUrlWithAuth(this.#environment.displayConfig.organizationProfileUrl);
   }
 
-  public redirectToSatellite = async (): Promise<unknown> => {
-    const redirectUrl = new URL(window.location.href).searchParams.get('redirect_url') as string;
-    const primarySyncUrl = new URL(`/`, redirectUrl);
-    primarySyncUrl.searchParams.append(CLERK_SYNCED, 'true');
-
+  #redirectToSatellite = async (): Promise<unknown> => {
     if (inBrowser()) {
-      return this.navigate(this.buildUrlWithAuth(primarySyncUrl.toString(), false));
+      const redirectUrl = new URL(window.location.href).searchParams.get('redirect_url') as string;
+      if (!isHttpOrHttps(redirectUrl)) {
+        clerkRedirectUrlIsMissingScheme();
+      }
+      const searchParams = new URLSearchParams({
+        [CLERK_SYNCED]: 'true',
+      });
+      const backToSatelliteUrl = buildURL({ base: redirectUrl, searchParams }, { stringify: true });
+      return this.navigate(this.buildUrlWithAuth(backToSatelliteUrl, false));
     }
   };
 
@@ -1019,15 +1025,15 @@ export default class Clerk implements ClerkInterface {
 
   #clearJustSynced = () => removeClerkQueryParam(CLERK_SYNCED);
 
-  #buildSyncUrlWithSignInUrl = (): string => {
-    const primarySyncUrl = new URL(`/`, this.#options.signInUrl);
-    primarySyncUrl?.searchParams.append(CLERK_SYNCING, 'true');
-    primarySyncUrl?.searchParams.append('redirect_url', window.location.href);
-
-    return primarySyncUrl?.toString() || '';
+  #buildSyncUrlForDevelopmentInstances = (): string => {
+    const searchParams = new URLSearchParams({
+      [CLERK_SYNCING]: 'true',
+      redirect_url: window.location.href,
+    });
+    return buildURL({ base: this.#options.signInUrl, searchParams }, { stringify: true });
   };
 
-  #buildSyncUrlWithFAPI = (): string => {
+  #buildSyncUrlForProductionInstances = (): string => {
     let primarySyncUrl;
 
     if (this.proxyUrl) {
@@ -1049,19 +1055,24 @@ export default class Clerk implements ClerkInterface {
       this.#clearJustSynced();
       return false;
     }
-    return this.#shouldSyncWithPrimaryDev() || this.#shouldSyncWithPrimaryProd() || this.#shouldRedirectToSatellite();
+
+    if (!this.isSatellite) {
+      return false;
+    }
+
+    return this.#shouldSyncWithPrimaryDev() || this.#shouldSyncWithPrimaryProd();
   };
 
   #shouldSyncWithPrimaryDev = (): boolean => {
-    if (this.isSatellite && !this.#options.signInUrl && this.#instanceType === 'development') {
+    if (this.#instanceType === 'development' && !this.#options.signInUrl) {
       clerkMissingSignInUrlAsSatellite();
     }
 
-    return this.isSatellite && this.#instanceType === 'development';
+    return this.#instanceType === 'development';
   };
 
   #shouldSyncWithPrimaryProd = (): boolean => {
-    if (!this.isSatellite || this.#instanceType === 'development') {
+    if (this.#instanceType === 'development') {
       return false;
     }
 
@@ -1070,7 +1081,7 @@ export default class Clerk implements ClerkInterface {
   };
 
   #shouldRedirectToSatellite = (): boolean => {
-    if (this.isSatellite || this.#instanceType === 'production') {
+    if (this.#instanceType === 'production') {
       return false;
     }
 
@@ -1079,11 +1090,9 @@ export default class Clerk implements ClerkInterface {
 
   #syncWithPrimary = async () => {
     if (this.#shouldSyncWithPrimaryDev()) {
-      await this.navigate(this.#buildSyncUrlWithSignInUrl());
-    } else if (this.#shouldRedirectToSatellite()) {
-      await this.redirectToSatellite();
+      await this.navigate(this.#buildSyncUrlForDevelopmentInstances());
     } else if (this.#shouldSyncWithPrimaryProd()) {
-      await this.navigate(this.#buildSyncUrlWithFAPI());
+      await this.navigate(this.#buildSyncUrlForProductionInstances());
     }
   };
 
@@ -1096,6 +1105,9 @@ export default class Clerk implements ClerkInterface {
     if (this.#shouldSyncWithPrimary()) {
       await this.#syncWithPrimary();
       // ClerkJS is not considered loaded during the sync/link process with the primary domain
+      return false;
+    } else if (this.#shouldRedirectToSatellite()) {
+      await this.#redirectToSatellite();
       return false;
     }
 
