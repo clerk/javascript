@@ -1,18 +1,18 @@
 const errorPrefix = 'ClerkJS:';
 
 export function clerkNetworkError(url: string, e: Error): never {
-  throw new Error(`${errorPrefix} Network error at "${url}" - ${e}. Please try again or contact support@clerk.dev`);
+  throw new Error(`${errorPrefix} Network error at "${url}" - ${e}. Please try again or contact support@clerk.com`);
 }
 
 export function clerkErrorInitFailed(): never {
-  throw new Error(`${errorPrefix} Something went wrong initializing Clerk. Please contact support@clerk.dev`);
+  throw new Error(`${errorPrefix} Something went wrong initializing Clerk. Please contact support@clerk.com`);
 }
 
 export function clerkErrorDevInitFailed(msg?: string): never {
   throw new Error(
     `${errorPrefix} Something went wrong initializing Clerk in development mode${
       msg && ` - ${msg}`
-    }. Please contact support@clerk.dev`,
+    }. Please contact support@clerk.com`,
   );
 }
 

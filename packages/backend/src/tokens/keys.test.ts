@@ -158,7 +158,7 @@ export default (QUnit: QUnit) => {
         if (err instanceof Error) {
           assert.propEqual(err, {
             reason: 'jwk-remote-failed-to-load',
-            action: 'Contact support@clerk.dev',
+            action: 'Contact support@clerk.com',
           });
         } else {
           // This should never be reached. If it does, the suite should fail
@@ -179,7 +179,7 @@ export default (QUnit: QUnit) => {
         if (err instanceof Error) {
           assert.propEqual(err, {
             reason: 'jwk-remote-failed-to-load',
-            action: 'Contact support@clerk.dev',
+            action: 'Contact support@clerk.com',
           });
         } else {
           // This should never be reached. If it does, the suite should fail
@@ -199,7 +199,7 @@ export default (QUnit: QUnit) => {
         if (err instanceof Error) {
           assert.propEqual(err, {
             reason: 'jwk-remote-missing',
-            action: 'Contact support@clerk.dev',
+            action: 'Contact support@clerk.com',
           });
         } else {
           // This should never be reached. If it does, the suite should fail
@@ -221,7 +221,7 @@ export default (QUnit: QUnit) => {
         if (err instanceof Error) {
           assert.propEqual(err, {
             reason: 'jwk-remote-missing',
-            action: 'Contact support@clerk.dev',
+            action: 'Contact support@clerk.com',
           });
         } else {
           // This should never be reached. If it does, the suite should fail

@@ -143,7 +143,7 @@ export async function loadClerkJWKFromRemote({
     if (!keys || !keys.length) {
       throw new TokenVerificationError({
         action: TokenVerificationErrorAction.ContactSupport,
-        message: 'The JWKS endpoint did not contain any signing keys. Contact support@clerk.dev.',
+        message: 'The JWKS endpoint did not contain any signing keys. Contact support@clerk.com.',
         reason: TokenVerificationErrorReason.RemoteJWKFailedToLoad,
       });
     }

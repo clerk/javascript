@@ -1,6 +1,5 @@
 import React, { useLayoutEffect, useState } from 'react';
 
-import { getLongestValidCountryCode } from '../../../ui/utils/phoneUtils';
 import { useEnvironment } from '../../contexts';
 import { descriptors, Flex, Input, Text } from '../../customizables';
 import { Select, SelectButton, SelectOptionList } from '../../elements';
@@ -21,48 +20,46 @@ const createSelectOption = (country: CountryEntry) => {
 
 const countryOptions = [...IsoToCountryMap.values()].map(createSelectOption);
 
-type PhoneInputProps = PropsOfComponent<typeof Input> & { defaultSelectedIso?: CountryIso };
+type PhoneInputProps = PropsOfComponent<typeof Input> & { locationBasedCountryIso?: CountryIso };
 
 const PhoneInputBase = (props: PhoneInputProps) => {
-  const { onChange: onChangeProp, value, defaultSelectedIso = 'us', ...rest } = props;
+  const { onChange: onChangeProp, value, locationBasedCountryIso, ...rest } = props;
   const phoneInputRef = React.useRef<HTMLInputElement>(null);
-  const { setPhoneNumber, cleanPhoneNumber, formattedPhoneNumber, selectedIso, setSelectedIso } =
-    useFormattedPhoneNumber({
-      defaultPhone: value as string,
-      defaultSelectedIso: defaultSelectedIso.toLowerCase() as CountryIso,
-    });
+  const { setNumber, setIso, setNumberAndIso, numberWithCode, iso, formattedNumber } = useFormattedPhoneNumber({
+    initPhoneWithCode: value as string,
+    locationBasedCountryIso,
+  });
 
   const callOnChangeProp = () => {
     // Quick and dirty way to match this component's public API
     // with every other Input component, so we can use the same helpers
     // without worrying about the underlying implementation details
-    onChangeProp?.({ target: { value: cleanPhoneNumber } } as any);
+    onChangeProp?.({ target: { value: numberWithCode } } as any);
   };
 
   const selectedCountryOption = React.useMemo(() => {
-    return countryOptions.find(o => o.country.iso === selectedIso) || countryOptions[0];
-  }, [selectedIso]);
+    return countryOptions.find(o => o.country.iso === iso) || countryOptions[0];
+  }, [iso]);
 
-  React.useEffect(callOnChangeProp, [cleanPhoneNumber]);
+  React.useEffect(callOnChangeProp, [numberWithCode]);
 
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
     const inputValue = e.clipboardData.getData('text');
-
     if (inputValue.includes('+')) {
-      const { phoneNumberValue, selectedCountry } = getLongestValidCountryCode(inputValue);
-
-      if (selectedCountry) {
-        setSelectedIso(selectedCountry?.iso);
-        setPhoneNumber(phoneNumberValue, selectedCountry?.iso);
-        return;
-      }
+      setNumberAndIso(inputValue);
+    } else {
+      setNumber(inputValue);
     }
-    setPhoneNumber(inputValue);
   };
 
   const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPhoneNumber(e.target.value);
+    const inputValue = e.target.value;
+    if (inputValue.includes('+')) {
+      setNumberAndIso(inputValue);
+    } else {
+      setNumber(inputValue);
+    }
   };
 
   return (
@@ -93,7 +90,7 @@ const PhoneInputBase = (props: PhoneInputProps) => {
           />
         )}
         onChange={option => {
-          setSelectedIso(option.country.iso);
+          setIso(option.country.iso);
           phoneInputRef.current?.focus();
         }}
         noResultsMessage='No countries found'
@@ -113,7 +110,7 @@ const PhoneInputBase = (props: PhoneInputProps) => {
               borderTopRightRadius: '0',
             })}
           >
-            <Flag iso={selectedIso} />
+            <Flag iso={iso} />
             <Text
               variant={'smallRegular'}
               sx={{ paddingLeft: '4px' }}
@@ -128,7 +125,7 @@ const PhoneInputBase = (props: PhoneInputProps) => {
         />
       </Select>
       <Input
-        value={formattedPhoneNumber}
+        value={formattedNumber}
         onPaste={handlePaste}
         onChange={handlePhoneNumberChange}
         maxLength={25}
@@ -201,12 +198,12 @@ const Flag = (props: { iso: CountryIso }) => {
 };
 
 export const PhoneInput = (props: Omit<PhoneInputProps, 'dd'>) => {
-  const { country } = useEnvironment();
+  const environment = useEnvironment();
 
   return (
     <PhoneInputBase
       {...props}
-      defaultSelectedIso={(country || 'us') as CountryIso}
+      locationBasedCountryIso={environment.countryIso as CountryIso}
     />
   );
 };

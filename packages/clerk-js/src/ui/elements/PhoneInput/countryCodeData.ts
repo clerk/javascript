@@ -6,12 +6,12 @@ export type PhonePattern = CountryCodeData[number][3] | '';
 
 const data = [
   ['United States', 'us', '1', '(...) ...-....', 100],
-  ['United Kingdom', 'gb', '44', '.... ......'],
-  ['India', 'in', '91', '.....-.....'],
-  ['Canada', 'ca', '1', '(...) ...-....'],
-  ['Germany', 'de', '49', '... .......'],
-  ['France', 'fr', '33', '. .. .. .. ..'],
-  ['Russia', 'ru', '7', '... ...-..-..'],
+  ['United Kingdom', 'gb', '44', '.... ......', 100],
+  ['India', 'in', '91', '.....-.....', 100],
+  ['Canada', 'ca', '1', '(...) ...-....', 100],
+  ['Germany', 'de', '49', '... .......', 100],
+  ['France', 'fr', '33', '. .. .. .. ..', 100],
+  ['Russia', 'ru', '7', '... ...-..-..', 100],
   ['Afghanistan', 'af', '93'],
   ['Albania', 'al', '355'],
   ['Algeria ', 'dz', '213'],
@@ -563,9 +563,11 @@ export const IsoToCountryMap: IsoToCountryMapType = data.reduce(
   new Map<CountryIso, CountryEntry>(),
 );
 
-export type CodeToCountryIsoMapType = ReadonlyMap<DialingCode, CountryIso>;
+export type CodeToCountryIsoMapType = ReadonlyMap<DialingCode, CountryEntry[]>;
 
-export const CodeToCountryIsoMap: CodeToCountryIsoMapType = data.reduce(
-  (acc, cur) => acc.set(cur[2], cur[1]),
-  new Map<DialingCode, CountryIso>(),
-);
+export const CodeToCountriesMap: CodeToCountryIsoMapType = data.reduce((acc, cur) => {
+  const code = cur[2];
+  const country = createEntry(cur);
+  acc.get(code) ? acc.get(code)!.push(country) : acc.set(code, [country]);
+  return acc;
+}, new Map<DialingCode, CountryEntry[]>());

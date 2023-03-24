@@ -3,6 +3,7 @@ import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
   Clerk,
+  Clerk as ClerkInterface,
   ClientResource,
   CreateOrganizationParams,
   CreateOrganizationProps,
@@ -22,7 +23,6 @@ import type {
   UserProfileProps,
   UserResource,
 } from '@clerk/types';
-import type { Clerk as ClerkInterface } from '@clerk/types';
 import type { OrganizationProfileProps, OrganizationSwitcherProps } from '@clerk/types/src';
 
 import type {
@@ -160,13 +160,16 @@ export default class IsomorphicClerk {
         });
 
         if (!global.Clerk) {
-          throw new Error('Failed to download latest ClerkJS. Contact support@clerk.dev.');
+          throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
         }
 
         await global.Clerk.load(this.options);
       }
 
-      return global.Clerk?.loaded ? this.hydrateClerkJS(global.Clerk) : undefined;
+      if (global.Clerk?.loaded || global.Clerk?.isReady()) {
+        return this.hydrateClerkJS(global.Clerk);
+      }
+      return;
     } catch (err) {
       const error = err as Error;
       // In Next.js we can throw a full screen error in development mode.
