@@ -6,7 +6,7 @@ We take the security of our systems seriously, and we value the security communi
 
 **Please do not report security vulnerabilities through public GitHub issues.**
 
-If you believe you’ve found a security vulnerability in one of our products or platforms, please send it to us by emailing [security@clerk.dev](mailto:security@clerk.dev). Please include the following details with your report:
+If you believe you’ve found a security vulnerability in one of our products or platforms, please send it to us by emailing [support@clerk.com](mailto:support@clerk.com). Please include the following details with your report:
 
 1. Description of the location and potential impact of the vulnerability; and
 
