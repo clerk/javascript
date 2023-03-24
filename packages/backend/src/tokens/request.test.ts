@@ -157,7 +157,7 @@ export default (QUnit: QUnit) => {
       });
 
       const errMessage =
-        'The JWKS endpoint did not contain any signing keys. Contact support@clerk.dev. Contact support@clerk.dev (reason=jwk-remote-failed-to-load, token-carrier=header)';
+        'The JWKS endpoint did not contain any signing keys. Contact support@clerk.com. Contact support@clerk.com (reason=jwk-remote-failed-to-load, token-carrier=header)';
       assertSignedOut(assert, requestState, TokenVerificationErrorReason.RemoteJWKFailedToLoad, errMessage);
       assertSignedOutToAuth(assert, requestState);
     });
