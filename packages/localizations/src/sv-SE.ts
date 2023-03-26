@@ -265,7 +265,7 @@ export const svSE: LocalizationResource = {
         actionLabel__conectionFailed: 'Försök igen',
         actionLabel__reauthorize: 'Autorisera nu',
         destructiveActionTitle: 'Ta bort',
-        destructiveActionSubtitle: 'Ta bort detta anslutna konto från ditt konto',
+        destructiveActionSubtitle: 'Ta bort detta anslutna konto från dina konton',
         destructiveActionAccordionSubtitle: 'Ta bort anslutet konto',
       },
       passwordSection: {
@@ -472,7 +472,7 @@ export const svSE: LocalizationResource = {
     action__addAccount: 'Lägg till konto',
   },
   organizationSwitcher: {
-    personalWorkspace: 'Personligt arbetsområde',
+    personalWorkspace: 'Personligt Arbetsområde',
     notSelected: 'Ingen organisation vald',
     action__createOrganization: 'Skapa organisation',
     action__manageOrganization: 'Hantera organisation',
