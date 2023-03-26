@@ -76,7 +76,7 @@ import {
   windowNavigate,
 } from '../utils';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
-import { CLERK_SYNCED, CLERK_SYNCING, DEV_BROWSER_SSO_JWT_PARAMETER, ERROR_CODES } from './constants';
+import { CLERK_SATELLITE_URL, CLERK_SYNCED, DEV_BROWSER_SSO_JWT_PARAMETER, ERROR_CODES } from './constants';
 import type { DevBrowserHandler } from './devBrowserHandler';
 import createDevBrowserHandler from './devBrowserHandler';
 import {
@@ -668,14 +668,13 @@ export default class Clerk implements ClerkInterface {
     if (!inBrowser()) {
       return;
     }
-    const redirectUrl = new URL(window.location.href).searchParams.get('redirect_url') as string;
-    if (!isHttpOrHttps(redirectUrl)) {
-      clerkRedirectUrlIsMissingScheme();
-    }
     const searchParams = new URLSearchParams({
       [CLERK_SYNCED]: 'true',
     });
-    const backToSatelliteUrl = buildURL({ base: redirectUrl, searchParams }, { stringify: true });
+    const backToSatelliteUrl = buildURL(
+      { base: getClerkQueryParam(CLERK_SATELLITE_URL) as string, searchParams },
+      { stringify: true },
+    );
     return this.navigate(this.buildUrlWithAuth(backToSatelliteUrl, false));
   };
 
@@ -1020,14 +1019,12 @@ export default class Clerk implements ClerkInterface {
   };
 
   #hasJustSynced = () => getClerkQueryParam(CLERK_SYNCED) === 'true';
-  #isRequestingSyncing = () => getClerkQueryParam(CLERK_SYNCING) === 'true';
 
   #clearJustSynced = () => removeClerkQueryParam(CLERK_SYNCED);
 
   #buildSyncUrlForDevelopmentInstances = (): string => {
     const searchParams = new URLSearchParams({
-      [CLERK_SYNCING]: 'true',
-      redirect_url: window.location.href,
+      [CLERK_SATELLITE_URL]: window.location.href,
     });
     return buildURL({ base: this.#options.signInUrl, searchParams }, { stringify: true });
   };
@@ -1084,7 +1081,16 @@ export default class Clerk implements ClerkInterface {
       return false;
     }
 
-    return this.#isRequestingSyncing();
+    const satelliteUrl = getClerkQueryParam(CLERK_SATELLITE_URL);
+    if (!satelliteUrl) {
+      return false;
+    }
+
+    if (!isHttpOrHttps(satelliteUrl)) {
+      clerkRedirectUrlIsMissingScheme();
+    }
+
+    return true;
   };
 
   #syncWithPrimary = async () => {
