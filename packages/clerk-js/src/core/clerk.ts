@@ -589,7 +589,7 @@ export default class Clerk implements ClerkInterface {
     return await customNavigate(stripOrigin(toURL));
   };
 
-  public buildUrlWithAuth(to: string, throwError = true): string {
+  public buildUrlWithAuth(to: string): string {
     if (this.#instanceType === 'production' || !this.#devBrowserHandler?.usesUrlBasedSessionSync()) {
       return to;
     }
@@ -598,17 +598,15 @@ export default class Clerk implements ClerkInterface {
 
     if (toURL.origin !== window.location.origin) {
       const devBrowserJwt = this.#devBrowserHandler?.getDevBrowserJWT();
-      if (!devBrowserJwt && throwError) {
+      if (!devBrowserJwt) {
         return clerkMissingDevBrowserJwt();
       }
 
-      if (devBrowserJwt) {
-        toURL.hash = setSearchParameterInHash({
-          hash: toURL.hash,
-          paramName: DEV_BROWSER_SSO_JWT_PARAMETER,
-          paramValue: devBrowserJwt,
-        });
-      }
+      toURL.hash = setSearchParameterInHash({
+        hash: toURL.hash,
+        paramName: DEV_BROWSER_SSO_JWT_PARAMETER,
+        paramValue: devBrowserJwt,
+      });
     }
 
     return toURL.href;
@@ -667,17 +665,18 @@ export default class Clerk implements ClerkInterface {
   }
 
   #redirectToSatellite = async (): Promise<unknown> => {
-    if (inBrowser()) {
-      const redirectUrl = new URL(window.location.href).searchParams.get('redirect_url') as string;
-      if (!isHttpOrHttps(redirectUrl)) {
-        clerkRedirectUrlIsMissingScheme();
-      }
-      const searchParams = new URLSearchParams({
-        [CLERK_SYNCED]: 'true',
-      });
-      const backToSatelliteUrl = buildURL({ base: redirectUrl, searchParams }, { stringify: true });
-      return this.navigate(this.buildUrlWithAuth(backToSatelliteUrl, false));
+    if (!inBrowser()) {
+      return;
     }
+    const redirectUrl = new URL(window.location.href).searchParams.get('redirect_url') as string;
+    if (!isHttpOrHttps(redirectUrl)) {
+      clerkRedirectUrlIsMissingScheme();
+    }
+    const searchParams = new URLSearchParams({
+      [CLERK_SYNCED]: 'true',
+    });
+    const backToSatelliteUrl = buildURL({ base: redirectUrl, searchParams }, { stringify: true });
+    return this.navigate(this.buildUrlWithAuth(backToSatelliteUrl, false));
   };
 
   public redirectWithAuth = async (to: string): Promise<unknown> => {
