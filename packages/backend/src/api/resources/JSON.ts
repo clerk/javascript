@@ -1,4 +1,5 @@
 import type {
+  InvitationStatus,
   OrganizationInvitationStatus,
   OrganizationMembershipRole,
   SignInFactorStrategy,
@@ -107,6 +108,7 @@ export interface InvitationJSON extends ClerkResourceJSON {
   public_metadata: Record<string, unknown> | null;
   created_at: number;
   updated_at: number;
+  status: InvitationStatus;
   revoked?: boolean;
 }
 
