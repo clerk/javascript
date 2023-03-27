@@ -64,6 +64,7 @@ export interface UserResource extends ClerkResource {
   createdAt: Date | null;
 
   update: (params: UpdateUserParams) => Promise<UserResource>;
+  updatePassword: (params: UpdateUserPasswordParams) => Promise<UserResource>;
   createEmailAddress: (params: CreateEmailAddressParams) => Promise<EmailAddressResource>;
   createPhoneNumber: (params: CreatePhoneNumberParams) => Promise<PhoneNumberResource>;
   createWeb3Wallet: (params: CreateWeb3WalletParams) => Promise<Web3WalletResource>;
@@ -75,9 +76,13 @@ export interface UserResource extends ClerkResource {
   verifyTOTP: (params: VerifyTOTPParams) => Promise<TOTPResource>;
   disableTOTP: () => Promise<DeletedObjectResource>;
   createBackupCode: () => Promise<BackupCodeResource>;
+
   get verifiedExternalAccounts(): ExternalAccountResource[];
+
   get unverifiedExternalAccounts(): ExternalAccountResource[];
+
   get hasVerifiedEmailAddress(): boolean;
+
   get hasVerifiedPhoneNumber(): boolean;
 }
 
@@ -108,4 +113,17 @@ type UpdateUserJSON = Pick<
   | 'unsafe_metadata'
 >;
 
-export type UpdateUserParams = Partial<SnakeToCamel<UpdateUserJSON>>;
+export type UpdateUserParams = Partial<
+  SnakeToCamel<UpdateUserJSON> & {
+    /**
+     * @deprecated This will be removed in the next major version. Please use `updatePassword(params)` instead
+     */
+    password: string;
+  }
+>;
+
+export type UpdateUserPasswordParams = {
+  newPassword: string;
+  currentPassword?: string;
+  signOutOfOtherSessions?: boolean;
+};
