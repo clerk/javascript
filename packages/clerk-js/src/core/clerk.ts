@@ -749,7 +749,7 @@ export default class Clerk implements ClerkInterface {
     params: HandleOAuthCallbackParams = {},
     customNavigate?: (to: string) => Promise<unknown>,
   ): Promise<unknown> => {
-    if (!this.isReady || !this.#environment || !this.client) {
+    if (!this.#isReady || !this.#environment || !this.client) {
       return;
     }
     const { signIn, signUp } = this.client;
