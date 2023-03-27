@@ -2,7 +2,7 @@ import type { ClerkResourceJSON } from './json';
 import type { ClerkResource } from './resource';
 import type { OAuthStrategy, Web3Strategy } from './strategies';
 
-type Attribute =
+export type Attribute =
   | 'email_address'
   | 'phone_number'
   | 'username'

@@ -60,6 +60,7 @@ export type FieldId =
   | 'name'
   | 'emailAddress'
   | 'phoneNumber'
+  | 'emailAddressOrUsername'
   | 'password'
   | 'confirmPassword'
   | 'identifier'
