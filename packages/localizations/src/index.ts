@@ -5,3 +5,4 @@ export { itIT } from './it-IT';
 export { ptBR } from './pt-BR';
 export { esES } from './es-ES';
 export { ruRU } from './ru-RU';
+export { svSE } from './sv-SE';
