@@ -1,54 +1,44 @@
-import type { Web3Provider } from '@clerk/types';
+import type { Attribute, FieldId, Web3Provider } from '@clerk/types';
 
 import type { LocalizationKey } from '../localization/localizationKeys';
 import { localizationKeys } from '../localization/localizationKeys';
 
 const FirstFactorConfigs = Object.freeze({
   email_address: {
+    id: 'emailAddress',
     label: localizationKeys('formFieldLabel__emailAddress'),
     placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress'),
     type: 'email',
   },
   phone_number: {
+    id: 'phoneNumber',
     label: localizationKeys('formFieldLabel__phoneNumber'),
     placeholder: localizationKeys('formFieldInputPlaceholder__phoneNumber'),
     type: 'tel',
   },
   username: {
+    id: 'username',
     label: localizationKeys('formFieldLabel__username'),
     placeholder: localizationKeys('formFieldInputPlaceholder__username'),
     type: 'text',
   },
-  email_address_phone_number: {
-    label: localizationKeys('formFieldLabel__emailAddress_phoneNumber'),
-    placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress_phoneNumber'),
-    type: 'text',
-  },
   email_address_username: {
+    id: 'emailAddressOrUsername',
     label: localizationKeys('formFieldLabel__emailAddress_username'),
     placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress_username'),
     type: 'text',
   },
-  phone_number_username: {
-    label: localizationKeys('formFieldLabel__phoneNumber_username'),
-    placeholder: localizationKeys('formFieldInputPlaceholder__phoneNumber_username'),
-    type: 'text',
-  },
-  email_address_phone_number_username: {
-    label: localizationKeys('formFieldLabel__emailAddress_phoneNumber_username'),
-    placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress_phoneNumber_username'),
-    type: 'text',
-  },
   default: {
+    id: 'identifier',
     label: '',
     placeholder: '',
     type: 'text',
   },
-} as Record<string, { label: string | LocalizationKey; type: string; placeholder: string | LocalizationKey }>);
+} as Record<string, { id: FieldId; label: string | LocalizationKey; type: string; placeholder: string | LocalizationKey }>);
 
-export const getIdentifierControlDisplayValues = (attributes: string[]) => {
-  const indexKey = attributes.length == 0 ? null : [...attributes].sort().join('_');
-  return FirstFactorConfigs[indexKey || 'default'];
+export const getIdentifierControlDisplayValues = (attributeGroups: Attribute[][], index: number) => {
+  const attributeCycle = attributeGroups.length == 0 ? null : [...attributeGroups].sort().map(a => a.join('_'));
+  return FirstFactorConfigs[attributeCycle?.[index % attributeCycle.length] || 'default'];
 };
 
 export const PREFERRED_SIGN_IN_STRATEGIES = Object.freeze({

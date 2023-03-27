@@ -58,7 +58,7 @@ export function clerkCoreErrorTokenRefreshFailed(message: string): never {
   throw new Error(`${errorPrefix} Token refresh failed (error='${message}')`);
 }
 
-export function clerkOAuthCallbackDidNotCompleteSignInSIgnUp(type: 'sign in' | 'sign up'): never {
+export function clerkOAuthCallbackDidNotCompleteSignInSignUp(type: 'sign in' | 'sign up'): never {
   throw new Error(
     `${errorPrefix} Something went wrong initializing Clerk during the ${type} flow. Please contact support.`,
   );

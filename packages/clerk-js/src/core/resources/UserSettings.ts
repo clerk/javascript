@@ -49,7 +49,9 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     }
 
     this.social = data.social;
-    this.attributes = data.attributes;
+    this.attributes = Object.fromEntries(
+      Object.entries(data.attributes).map(a => [a[0], { ...a[1], name: a[0] }]),
+    ) as Attributes;
     this.signIn = data.sign_in;
     this.signUp = data.sign_up;
     this.socialProviderStrategies = this.getSocialProviderStrategies(data.social);

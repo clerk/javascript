@@ -1,11 +1,12 @@
-import type { ClerkAPIError, SignInCreateParams } from '@clerk/types';
-import React from 'react';
+import type { Attribute, ClerkAPIError, SignInCreateParams } from '@clerk/types';
+import React, { useState } from 'react';
 
 import { ERROR_CODES } from '../../../core/constants';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { getClerkQueryParam } from '../../../utils';
 import { getIdentifierControlDisplayValues, withRedirectToHomeSingleSessionGuard } from '../../common';
 import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
+import type { LocalizationKey } from '../../customizables';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import {
   Card,
@@ -24,6 +25,23 @@ import type { FormControlState } from '../../utils';
 import { buildRequest, handleError, isMobileDevice, useFormControl } from '../../utils';
 import { SignInSocialButtons } from './SignInSocialButtons';
 
+const identifiers: { group: Attribute[]; action: (enabled: Attribute[]) => LocalizationKey }[] = [
+  { group: ['email_address', 'username'], action: () => 'Use phone' },
+  {
+    group: ['phone_number'],
+    action: (enabled: Attribute[]) => {
+      switch (true) {
+        case (['email_address', 'username'] as Attribute[]).every(el => enabled.includes(el)):
+          return 'Use email or username';
+        case enabled.includes('username'):
+          return 'Use username';
+        default:
+          return 'Use email';
+      }
+    },
+  },
+];
+
 export function _SignInStart(): JSX.Element {
   const card = useCardState();
   const status = useLoadingStatus();
@@ -33,6 +51,22 @@ export function _SignInStart(): JSX.Element {
   const { navigate } = useNavigate();
   const { navigateAfterSignIn, signUpUrl } = useSignInContext();
   const supportEmail = useSupportEmail();
+  const [identifierIndex, setIdentifierIndex] = useState<number>(0);
+  const activeIdentifiers = identifiers
+    .map(identifier => ({
+      action: identifier.action,
+      group: identifier.group.filter(attribute =>
+        userSettings.enabledFirstFactorIdentifiers.includes(attribute as any),
+      ),
+    }))
+    .filter(i => i.group.length > 0);
+
+  console.log(activeIdentifiers);
+
+  //switch identifiers in a cyclic manner
+  const switchIdentifier = () => {
+    setIdentifierIndex(i => (i + 1) % activeIdentifiers.length);
+  };
 
   const organizationTicket = getClerkQueryParam('__clerk_ticket') || '';
 
@@ -40,15 +74,17 @@ export function _SignInStart(): JSX.Element {
   const web3FirstFactors = userSettings.web3FirstFactors;
   const authenticatableSocialStrategies = userSettings.authenticatableSocialStrategies;
   const passwordBasedInstance = userSettings.instanceIsPasswordBased;
-  const identifierInputDisplayValues = getIdentifierControlDisplayValues(standardFormAttributes);
-
+  const identifierInputDisplayValues = getIdentifierControlDisplayValues(
+    activeIdentifiers.map(i => i.group),
+    identifierIndex,
+  );
   const instantPasswordField = useFormControl('password', '', {
     type: 'password',
     label: localizationKeys('formFieldLabel__password'),
     placeholder: localizationKeys('formFieldInputPlaceholder__password') as any,
   });
 
-  const identifierField = useFormControl('identifier', '', {
+  const identifierField = useFormControl(identifierInputDisplayValues.id, '', {
     ...identifierInputDisplayValues,
     isRequired: true,
   });
@@ -205,7 +241,14 @@ export function _SignInStart(): JSX.Element {
               <Form.Root onSubmit={handleFirstPartySubmit}>
                 <Form.ControlRow elementId={identifierField.id}>
                   <Form.Control
+                    actionLabel={
+                      activeIdentifiers.length > 1
+                        ? activeIdentifiers[identifierIndex].action(userSettings.enabledFirstFactorIdentifiers)
+                        : undefined
+                    }
+                    onActionClicked={switchIdentifier}
                     {...identifierField.props}
+                    type={identifierField.id === 'phoneNumber' ? 'tel' : undefined}
                     autoFocus={shouldAutofocus}
                   />
                 </Form.ControlRow>
