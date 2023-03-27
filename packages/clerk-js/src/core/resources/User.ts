@@ -17,6 +17,7 @@ import type {
   TOTPJSON,
   TOTPResource,
   UpdateUserParams,
+  UpdateUserPasswordParams,
   UserJSON,
   UserResource,
   VerifyTOTPParams,
@@ -196,6 +197,13 @@ export class User extends BaseResource implements UserResource {
   update = (params: UpdateUserParams): Promise<UserResource> => {
     return this._basePatch({
       body: normalizeUnsafeMetadata(params),
+    });
+  };
+
+  updatePassword = (params: UpdateUserPasswordParams): Promise<UserResource> => {
+    return this._basePatch({
+      body: params,
+      path: `${this.path()}/password`,
     });
   };
 
