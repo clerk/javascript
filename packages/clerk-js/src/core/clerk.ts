@@ -132,7 +132,7 @@ export default class Clerk implements ClerkInterface {
   public readonly publishableKey?: string;
   public readonly proxyUrl?: ClerkInterface['proxyUrl'];
 
-  #domain?: ClerkInterface['domain'];
+  #domain: DomainOrProxyUrl['domain'];
   #authService: SessionCookieService | null = null;
   #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
   #componentControls?: ReturnType<MountComponentRenderer> | null;
@@ -160,7 +160,15 @@ export default class Clerk implements ClerkInterface {
   }
 
   get domain(): string {
-    return addClerkPrefix(stripScheme(handleValueOrFn(this.#domain, new URL(window.location.href))));
+    const strippedDomainString = stripScheme(handleValueOrFn(this.#domain, new URL(window.location.href)));
+    if (this.#instanceType === 'production') {
+      return addClerkPrefix(strippedDomainString);
+    }
+    return strippedDomainString;
+  }
+
+  get instanceType() {
+    return this.#instanceType;
   }
 
   public constructor(key: string, options?: DomainOrProxyUrl) {
@@ -1037,8 +1045,6 @@ export default class Clerk implements ClerkInterface {
       primarySyncUrl = new URL(`${proxy.pathname}/v1/client/sync`, proxy.origin);
     } else if (this.domain) {
       primarySyncUrl = new URL(`/v1/client/sync`, `https://${this.domain}`);
-    } else {
-      clerkMissingProxyUrlAndDomain();
     }
 
     primarySyncUrl?.searchParams.append('redirect_url', window.location.href);

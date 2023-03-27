@@ -1,4 +1,6 @@
-import type { Clerk as ClerkInterface, ClerkOptions } from './clerk';
+import type { ClerkOptions } from './clerk';
+
+type DOMAIN = string | ((url: URL) => string);
 
 /**
  * DomainOrProxyUrl supports the following cases
@@ -16,7 +18,7 @@ export type MultiDomainAndOrProxy =
   | {
       isSatellite: Exclude<ClerkOptions['isSatellite'], undefined>;
       proxyUrl?: never;
-      domain: Exclude<ClerkInterface['domain'], undefined>;
+      domain: DOMAIN;
     }
   | {
       isSatellite: Exclude<ClerkOptions['isSatellite'], undefined>;
@@ -44,7 +46,7 @@ export type MultiDomainAndOrProxyPrimitives =
 export type DomainOrProxyUrl =
   | {
       proxyUrl?: never;
-      domain?: ClerkInterface['domain'];
+      domain?: DOMAIN;
     }
   | {
       proxyUrl?: string;

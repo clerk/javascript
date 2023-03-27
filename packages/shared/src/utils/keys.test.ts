@@ -1,4 +1,10 @@
-import { buildPublishableKey, isLegacyFrontendApiKey, isPublishableKey, parsePublishableKey } from './keys';
+import {
+  buildPublishableKey,
+  createDevOrStagingUrlCache,
+  isLegacyFrontendApiKey,
+  isPublishableKey,
+  parsePublishableKey,
+} from './keys';
 
 describe('buildPublishableKey(key)', () => {
   const cases = [
@@ -53,5 +59,32 @@ describe('isLegacyFrontendApiKey(key)', () => {
   });
   it('returns true if the key is not a valid legacy frontend Api key', () => {
     expect(isLegacyFrontendApiKey('pk_live_Y2xlcmsuY2xlcmsuZGV2JA==')).toBe(false);
+  });
+});
+
+describe('isDevOrStagingUrl(url)', () => {
+  const { isDevOrStagingUrl } = createDevOrStagingUrlCache();
+
+  const goodUrls: Array<[string | URL, boolean]> = [
+    ['https://www.google.com', false],
+    ['https://www.clerk.dev', false],
+    ['https://www.lclclerk.com', false],
+    ['clerk.prod.lclclerk.com', false],
+    ['something.dev.lclclerk.com', true],
+    ['something.lcl.dev', true],
+    ['https://www.something.stg.lclclerk.com', true],
+    [new URL('https://www.lclclerk.com'), false],
+    [new URL('https://www.something.stg.lclclerk.com'), true],
+    [new URL('https://www.something.stg.lclclerk.com:4000'), true],
+  ];
+
+  const badUrls: Array<[string | null, boolean]> = [
+    ['', false],
+    [null, false],
+  ];
+
+  test.each([...goodUrls, ...badUrls])('.isDevOrStagingUrl(%s)', (a, expected) => {
+    // @ts-ignore
+    expect(isDevOrStagingUrl(a)).toBe(expected);
   });
 });
