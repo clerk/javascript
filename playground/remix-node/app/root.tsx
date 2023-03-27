@@ -12,7 +12,7 @@ export const loader: LoaderFunction = args => {
 
       console.log('root User:', user);
 
-      return null;
+      return { user };
     },
     { loadUser: true },
   );
