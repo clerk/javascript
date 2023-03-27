@@ -1056,10 +1056,10 @@ export default class Clerk implements ClerkInterface {
       return false;
     }
 
-    return this.#shouldSyncWithPrimaryDev() || this.#shouldSyncWithPrimaryProd();
+    return this.#shouldSyncWithPrimaryInDevelopment() || this.#shouldSyncWithPrimaryInProduction();
   };
 
-  #shouldSyncWithPrimaryDev = (): boolean => {
+  #shouldSyncWithPrimaryInDevelopment = (): boolean => {
     if (this.#instanceType === 'development' && !this.#options.signInUrl) {
       clerkMissingSignInUrlAsSatellite();
     }
@@ -1067,7 +1067,7 @@ export default class Clerk implements ClerkInterface {
     return this.#instanceType === 'development';
   };
 
-  #shouldSyncWithPrimaryProd = (): boolean => {
+  #shouldSyncWithPrimaryInProduction = (): boolean => {
     if (this.#instanceType === 'development') {
       return false;
     }
@@ -1078,6 +1078,10 @@ export default class Clerk implements ClerkInterface {
 
   #shouldRedirectToSatellite = (): boolean => {
     if (this.#instanceType === 'production') {
+      return false;
+    }
+
+    if (this.isSatellite) {
       return false;
     }
 
@@ -1094,19 +1098,27 @@ export default class Clerk implements ClerkInterface {
   };
 
   #syncWithPrimary = async () => {
-    if (this.#shouldSyncWithPrimaryDev()) {
+    if (this.#shouldSyncWithPrimaryInDevelopment()) {
       await this.navigate(this.#buildSyncUrlForDevelopmentInstances());
-    } else if (this.#shouldSyncWithPrimaryProd()) {
+    } else if (this.#shouldSyncWithPrimaryInProduction()) {
       await this.navigate(this.#buildSyncUrlForProductionInstances());
     }
   };
 
   #loadInStandardBrowser = async (): Promise<boolean> => {
+    // Dev Browser handling
     this.#devBrowserHandler = createDevBrowserHandler({
       frontendApi: this.frontendApi,
       fapiClient: this.#fapiClient,
     });
 
+    if (this.#instanceType === 'production') {
+      await this.#devBrowserHandler.clear();
+    } else {
+      await this.#devBrowserHandler.setup();
+    }
+
+    // Multidomain SSO handling
     if (this.#shouldSyncWithPrimary()) {
       await this.#syncWithPrimary();
       // ClerkJS is not considered loaded during the sync/link process with the primary domain
@@ -1120,12 +1132,6 @@ export default class Clerk implements ClerkInterface {
     this.#pageLifecycle = createPageLifecycle();
 
     const isInAccountsHostedPages = isAccountsHostedPages(window?.location.hostname);
-
-    if (this.#instanceType === 'production') {
-      await this.#devBrowserHandler.clear();
-    } else {
-      await this.#devBrowserHandler.setup();
-    }
 
     this.#setupListeners();
 
