@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "4.32.6",
+  "version": "4.32.7",
   "license": "MIT",
   "description": "Clerk.dev JS library",
   "keywords": [
@@ -40,9 +40,9 @@
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
   },
   "dependencies": {
-    "@clerk/localizations": "^1.7.4",
-    "@clerk/shared": "^0.13.5",
-    "@clerk/types": "^3.31.1",
+    "@clerk/localizations": "^1.7.5",
+    "@clerk/shared": "^0.13.6",
+    "@clerk/types": "^3.31.2",
     "@emotion/cache": "11.10.5",
     "@emotion/react": "11.10.5",
     "@floating-ui/react": "0.19.0",

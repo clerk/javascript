@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.31.2](https://github.com/clerkinc/javascript/compare/@clerk/types@3.31.1...@clerk/types@3.31.2) (2023-03-27)
+
+### Bug Fixes
+
+- **clerk-js,types:** Improve and test useFormattedPhoneNumber to account for all user events ([f1a0018](https://github.com/clerkinc/javascript/commit/f1a0018e45b7467b37967f2d62ae03aa44c31ed3))
+
 ### [3.31.1](https://github.com/clerkinc/javascript/compare/@clerk/types@3.31.0...@clerk/types@3.31.1) (2023-03-16)
 
 ### Bug Fixes

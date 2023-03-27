@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.12.9](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@4.12.8...@clerk/clerk-react@4.12.9) (2023-03-27)
+
+### Bug Fixes
+
+- **clerk-react:** Fallback to Clerk.isReady if Clerk.loaded is not available ([#977](https://github.com/clerkinc/javascript/issues/977)) ([9ef449b](https://github.com/clerkinc/javascript/commit/9ef449b32613ba49e728a32216331f8e863cc6bf))
+- **clerk-react:** Memoize useAuth.getToken and useAuth.signOut ([#980](https://github.com/clerkinc/javascript/issues/980)) ([1e06245](https://github.com/clerkinc/javascript/commit/1e06245939fb7cfdd423c514a84dac73f4428c61))
+
 ### [4.12.8](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@4.12.7...@clerk/clerk-react@4.12.8) (2023-03-17)
 
 ### Bug Fixes
