@@ -18,12 +18,12 @@ import {
   SECRET_KEY,
   SIGN_IN_URL,
 } from './clerk';
-import { isDevOrStagingUrl } from './isDevOrStagingUrl';
-import { parsePublishableKey } from './parsePublishableKey';
+import { missingDomainAndProxy, missingSignInUrlInDev, unsupportedRelativePathProxyUrl } from './errors';
 import type { WithAuthOptions } from './types';
 import {
   getCookie,
   handleValueOrFn,
+  isDevelopmentFromApiKey,
   isHttpOrHttps,
   nextJsVersionCanOverrideRequestHeaders,
   setCustomAttributeOnRequest,
@@ -49,7 +49,7 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
   const proxyUrl = opts?.proxyUrl || PROXY_URL;
 
   if (!!proxyUrl && !isHttpOrHttps(proxyUrl)) {
-    throw new Error(`Only a absolute URL that starts with https is allowed to be used in SSR`);
+    throw new Error(unsupportedRelativePathProxyUrl);
   }
 
   return async (req: NextRequest, event: NextFetchEvent) => {
@@ -60,19 +60,11 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
     const signInUrl = opts?.signInUrl || SIGN_IN_URL;
 
     if (isSatellite && !proxyUrl && !domain) {
-      throw new Error(`Missing domain and proxyUrl. A satellite application needs to specify a domain or a proxyUrl`);
+      throw new Error(missingDomainAndProxy);
     }
 
-    if (
-      isSatellite &&
-      !signInUrl &&
-      isDevOrStagingUrl(parsePublishableKey(PUBLISHABLE_KEY)?.frontendApi || FRONTEND_API)
-    ) {
-      throw new Error(`Missing signInUrl. Pass a signInUrl for dev instances if an app is satellite`);
-    }
-
-    if (isSatellite && !proxyUrl && !domain) {
-      throw new Error(`Missing domain and proxyUrl. A satellite application needs to specify a domain or a proxyUrl`);
+    if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromApiKey(SECRET_KEY || API_KEY)) {
+      throw new Error(missingSignInUrlInDev);
     }
 
     // get auth state, check if we need to return an interstitial

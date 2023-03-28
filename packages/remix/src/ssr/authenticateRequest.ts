@@ -1,6 +1,6 @@
 import type { RequestState } from '@clerk/backend';
 import { Clerk } from '@clerk/backend';
-import { createDevOrStagingUrlCache, handleValueOrFn, isHttpOrHttps, parsePublishableKey } from '@clerk/shared';
+import { handleValueOrFn, isHttpOrHttps } from '@clerk/shared';
 
 import {
   noRelativeProxyInSSR,
@@ -12,7 +12,9 @@ import { getEnvVariable } from '../utils';
 import type { LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
 import { parseCookies } from './utils';
 
-const { isDevOrStagingUrl } = createDevOrStagingUrlCache();
+function isDevelopmentFromApiKey(apiKey: string): boolean {
+  return apiKey.startsWith('test_') || apiKey.startsWith('sk_test_');
+}
 
 /**
  * @internal
@@ -67,7 +69,7 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     throw new Error(satelliteAndMissingProxyUrlAndDomain);
   }
 
-  if (isSatellite && !signInUrl && isDevOrStagingUrl(parsePublishableKey(publishableKey)?.frontendApi || frontendApi)) {
+  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromApiKey(secretKey || apiKey)) {
     throw new Error(satelliteAndMissingSignInUrl);
   }
 
