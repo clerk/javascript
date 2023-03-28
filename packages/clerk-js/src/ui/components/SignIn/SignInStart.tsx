@@ -51,13 +51,14 @@ export function _SignInStart(): JSX.Element {
     placeholder: localizationKeys('formFieldInputPlaceholder__password') as any,
   });
 
-  const identifierField = useFormControl(identifierInputDisplayValues.id, '', {
+  const identifierField = useFormControl('identifier', '', {
     ...identifierInputDisplayValues,
     isRequired: true,
   });
 
   const switchToNextIdentifier = () => {
     setIdentifierIndex(i => i + 1);
+    identifierField.setValue('');
   };
 
   React.useEffect(() => {

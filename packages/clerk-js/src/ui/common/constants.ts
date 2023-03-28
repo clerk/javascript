@@ -1,45 +1,40 @@
-import type { Attribute, FieldId, Web3Provider } from '@clerk/types';
+import type { Attribute, Web3Provider } from '@clerk/types';
 
 import type { LocalizationKey } from '../localization/localizationKeys';
 import { localizationKeys } from '../localization/localizationKeys';
 
 const FirstFactorConfigs = Object.freeze({
   email_address_username: {
-    id: 'emailAddressOrUsername',
     label: localizationKeys('formFieldLabel__emailAddress_username'),
     placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress_username'),
     type: 'text',
     action: localizationKeys('signIn.start.useEmailOrUsernameActionLink'),
   },
   email_address: {
-    id: 'emailAddress',
     label: localizationKeys('formFieldLabel__emailAddress'),
     placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress'),
     type: 'email',
     action: localizationKeys('signIn.start.useEmailActionLink'),
   },
   phone_number: {
-    id: 'phoneNumber',
     label: localizationKeys('formFieldLabel__phoneNumber'),
     placeholder: localizationKeys('formFieldInputPlaceholder__phoneNumber'),
     type: 'tel',
     action: localizationKeys('signIn.start.usePhoneActionLink'),
   },
   username: {
-    id: 'username',
     label: localizationKeys('formFieldLabel__username'),
     placeholder: localizationKeys('formFieldInputPlaceholder__username'),
     type: 'text',
     action: localizationKeys('signIn.start.useUsernameActionLink'),
   },
   default: {
-    id: 'identifier',
     label: '',
     placeholder: '',
     type: 'text',
     action: '',
   },
-} as Record<string, { id: FieldId; label: string | LocalizationKey; type: string; placeholder: string | LocalizationKey; action?: string | LocalizationKey }>);
+} as Record<string, { label: string | LocalizationKey; type: string; placeholder: string | LocalizationKey; action?: string | LocalizationKey }>);
 
 export const getIdentifierControlDisplayValues = (attributes: Attribute[], index: number) => {
   let newAttributes: string[] = [...attributes];
