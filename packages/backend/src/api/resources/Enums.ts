@@ -45,3 +45,5 @@ export type SignUpAttributeRequirements = (
   | 'age'
   | 'gender'
 )[][];
+
+export type InvitationStatus = 'pending' | 'accepted' | 'revoked';
