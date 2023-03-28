@@ -31,3 +31,6 @@ export function isMagicLinkError(err: any): err is MagicLinkError {
 
 export const invalidStateError =
   'Invalid state. Feel free to submit a bug or reach out to support here: https://clerk.com/support';
+
+export const domainAsFunctionError =
+  'The usage of a function as domain is not supported in non-browser environments. Please contact support@clerk.com';
