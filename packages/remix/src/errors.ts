@@ -83,6 +83,6 @@ export const satelliteAndMissingProxyUrlAndDomain = createErrorMessage(
   `Missing domain and proxyUrl. A satellite application needs to specify a domain or a proxyUrl`,
 );
 
-export const satelliteAndMissingSignInUrl = createErrorMessage(
-  `Missing signInUrl. Pass a signInUrl for dev instances if an app is satellite`,
-);
+export const satelliteAndMissingSignInUrl = createErrorMessage(`
+Invalid signInUrl. A satellite application requires a signInUrl for development instances.
+Check if signInUrl is missing from your configuration or it is not a absolute URL.`);

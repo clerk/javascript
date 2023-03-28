@@ -167,3 +167,7 @@ export function handleValueOrFn<T>(value: VOrFnReturnsV<T>, url: URL, defaultVal
 export function isHttpOrHttps(key: string | undefined) {
   return /^http(s)?:\/\//.test(key || '');
 }
+
+export function isDevelopmentFromApiKey(apiKey: string): boolean {
+  return apiKey.startsWith('test_') || apiKey.startsWith('sk_test_');
+}

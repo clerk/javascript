@@ -1,5 +1,6 @@
 import { API_URL, API_VERSION } from '../constants';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
+import { isDevelopmentFromApiKey } from '../util/instance';
 import { parsePublishableKey } from '../util/parsePublishableKey';
 import type { RequestState } from './authStatus';
 import { AuthErrorReason, interstitial, signedOut, unknownState } from './authStatus';
@@ -83,12 +84,29 @@ export type AuthenticateRequestOptions = RequiredVerifyTokenOptions &
     signInUrl?: string;
   };
 
+function assertSignInUrlExists(signInUrl: string | undefined, key: string): asserts signInUrl is string {
+  if (!signInUrl && isDevelopmentFromApiKey(key)) {
+    throw new Error(`Missing signInUrl. Pass a signInUrl for dev instances if an app is satellite`);
+  }
+}
+
+function assertProxyUrlOrDomain(proxyUrlOrDomain: string | undefined) {
+  if (!proxyUrlOrDomain) {
+    throw new Error(`Missing domain and proxyUrl. A satellite application needs to specify a domain or a proxyUrl`);
+  }
+}
+
 export async function authenticateRequest(options: AuthenticateRequestOptions): Promise<RequestState> {
   options.frontendApi = parsePublishableKey(options.publishableKey)?.frontendApi || options.frontendApi || '';
   options.apiUrl = options.apiUrl || API_URL;
   options.apiVersion = options.apiVersion || API_VERSION;
 
   assertValidSecretKey(options.secretKey || options.apiKey);
+
+  if (options.isSatellite) {
+    assertSignInUrlExists(options.signInUrl, options.secretKey || options.apiKey);
+    assertProxyUrlOrDomain(options.proxyUrl || options.domain);
+  }
 
   async function authenticateRequestWithTokenInHeader() {
     try {

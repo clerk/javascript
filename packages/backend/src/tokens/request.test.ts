@@ -48,6 +48,7 @@ function assertInterstitial(
   expectedState: {
     reason: AuthReason;
     isSatellite?: boolean;
+    domain?: string;
   },
 ) {
   assert.propContains(requestState, {
@@ -102,6 +103,8 @@ function assertSignedIn(
   requestState: RequestState,
   expectedState?: {
     isSatellite?: boolean;
+    signInUrl?: string;
+    domain?: string;
   },
 ) {
   assert.propContains(requestState, {
@@ -276,11 +279,13 @@ export default (QUnit: QUnit) => {
         apiKey: 'deadbeef',
         clientUat: '0',
         isSatellite: true,
+        domain: 'satellite.dev',
       });
 
       assertInterstitial(assert, requestState, {
         reason: AuthErrorReason.SatelliteCookieNeedsSyncing,
         isSatellite: true,
+        domain: 'satellite.dev',
       });
       assert.equal(requestState.message, '');
       assert.strictEqual(requestState.toAuth(), null);
@@ -365,10 +370,14 @@ export default (QUnit: QUnit) => {
         clientUat: '12345',
         referrer: 'https://clerk.com',
         isSatellite: true,
+        signInUrl: 'https://localhost:3000/sign-in/',
+        domain: 'localhost:3001',
       });
 
       assertSignedIn(assert, requestState, {
         isSatellite: true,
+        signInUrl: 'https://localhost:3000/sign-in/',
+        domain: 'localhost:3001',
       });
       assertSignedInToAuth(assert, requestState);
     });
