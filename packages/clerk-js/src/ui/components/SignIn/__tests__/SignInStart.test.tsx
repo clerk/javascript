@@ -2,7 +2,7 @@ import type { SignInResource } from '@clerk/types';
 import { OAUTH_PROVIDERS } from '@clerk/types';
 import React from 'react';
 
-import { bindCreateFixtures, render, screen } from '../../../../testUtils';
+import { bindCreateFixtures, fireEvent, render, screen } from '../../../../testUtils';
 import { SignInStart } from '../SignInStart';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
@@ -51,7 +51,7 @@ describe('SignInStart', () => {
         f.withEmailAddress();
       });
       render(<SignInStart />, { wrapper });
-      screen.getByText(/email address, phone number or username/i);
+      screen.getByText(/email address or username/i);
     });
   });
 
@@ -119,6 +119,85 @@ describe('SignInStart', () => {
       await userEvent.click(screen.getByText('Continue'));
       expect(fixtures.signIn.create).toHaveBeenCalled();
       expect(fixtures.router.navigate).toHaveBeenCalledWith('factor-two');
+    });
+  });
+
+  describe('Identifier switching', () => {
+    it('shows the email label', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withSupportEmail();
+      });
+      render(<SignInStart />, { wrapper });
+      screen.getByText(/email address/i);
+    });
+
+    it('shows the phone label', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withPhoneNumber();
+        f.withSupportEmail();
+      });
+      render(<SignInStart />, { wrapper });
+      screen.getByText(/phone number/i);
+    });
+
+    it('prioritizes phone over username', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withUsername();
+        f.withPhoneNumber();
+        f.withSupportEmail();
+      });
+      render(<SignInStart />, { wrapper });
+      screen.getByText(/phone number/i);
+    });
+
+    it('shows the use phone action', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withUsername();
+        f.withPhoneNumber();
+        f.withSupportEmail();
+      });
+      render(<SignInStart />, { wrapper });
+      screen.getByText(/use phone/i);
+    });
+
+    it('shows the use username action', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withUsername();
+        f.withPhoneNumber();
+        f.withSupportEmail();
+      });
+      render(<SignInStart />, { wrapper });
+      screen.getByText(/use username/i);
+    });
+
+    it('shows the username action upon clicking on use phone', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withUsername();
+        f.withPhoneNumber();
+        f.withSupportEmail();
+      });
+      render(<SignInStart />, { wrapper });
+      let button = screen.getByText(/use username/i);
+      fireEvent.click(button);
+
+      screen.getByText(/username/i);
+
+      button = screen.getByText(/use phone/i);
+      fireEvent.click(button);
+
+      screen.getByText(/use username/i);
+    });
+
+    it('shows an input with type="tel" for the phone number', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withPhoneNumber();
+        f.withSupportEmail();
+      });
+      render(<SignInStart />, { wrapper });
+
+      expect(screen.getByRole('textbox', { name: /phone number/i })).toHaveAttribute('type', 'tel');
     });
   });
 });
