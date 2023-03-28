@@ -56,8 +56,8 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     this.signUp = data.sign_up;
     this.socialProviderStrategies = this.getSocialProviderStrategies(data.social);
     this.authenticatableSocialStrategies = this.getAuthenticatableSocialStrategies(data.social);
-    this.web3FirstFactors = this.getWeb3FirstFactors(data.attributes);
-    this.enabledFirstFactorIdentifiers = this.getEnabledFirstFactorIdentifiers(data.attributes);
+    this.web3FirstFactors = this.getWeb3FirstFactors(this.attributes);
+    this.enabledFirstFactorIdentifiers = this.getEnabledFirstFactorIdentifiers(this.attributes);
   }
 
   private getEnabledFirstFactorIdentifiers(attributes: Attributes): Array<keyof UserSettingsResource['attributes']> {
