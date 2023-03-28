@@ -10,7 +10,7 @@ type InterstitialRule = <T extends AuthenticateRequestOptions>(
   opts: T,
 ) => Promise<InterstitialRuleResult> | InterstitialRuleResult;
 
-const isSyncing = (qp?: URLSearchParams) => qp?.get('__clerk_syncing') === 'true';
+const shouldRedirectToSatelliteUrl = (qp?: URLSearchParams) => !!qp?.get('__clerk_satellite_url');
 const hasJustSynced = (qp?: URLSearchParams) => qp?.get('__clerk_synced') === 'true';
 
 // In development or staging environments only, based on the request's
@@ -46,12 +46,12 @@ export const crossOriginRequestWithoutHeader: InterstitialRule = options => {
   return undefined;
 };
 
-export const isPrimaryInDevAndSyncing: InterstitialRule = options => {
+export const isPrimaryInDevAndRedirectsToSatellite: InterstitialRule = options => {
   const { apiKey, secretKey, isSatellite, searchParams } = options;
   const key = secretKey || apiKey;
   const isDev = isDevelopmentFromApiKey(key);
 
-  if (isDev && !isSatellite && isSyncing(searchParams)) {
+  if (isDev && !isSatellite && shouldRedirectToSatelliteUrl(searchParams)) {
     return interstitial(options, AuthErrorReason.PrimaryRespondsToSyncing);
   }
   return undefined;
@@ -167,6 +167,10 @@ async function verifyRequestState(options: AuthenticateRequestOptions, token: st
   return verifyToken(token, { ...options, issuer });
 }
 
+/**
+ * Avoid throwing this rule for development instances
+ * Let the next rule for UatMissing to fire if needed
+ */
 export const isSatelliteAndNeedsSyncing: InterstitialRule = options => {
   const { clientUat, isSatellite, searchParams, secretKey, apiKey } = options;
 
