@@ -15,7 +15,7 @@
   "jsdelivr": "dist/clerk.browser.js",
   "main": "dist/clerk.js",
   "module": "dist/clerk.js",
-  "typings": "dist/types/src/index.d.ts",
+  "types": "dist/types/index.d.ts",
   "files": [
     "dist",
     "headless"
