@@ -151,13 +151,26 @@ const prodConfig = ({ mode, env }) => {
     // prettier-ignore
     [variants.clerk]: merge(
       entryForVariant(variants.clerk),
-      common({ mode }),
+      common({mode}),
       commonForProd(),
+      {
+        // Include the lazy chunks in the bundle as well
+        // so that the final bundle can be imported and bundled again
+        // by a different bundler, eg the webpack instance used by react-scripts
+        // This is very similar to using new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1}),
+        module: {
+          parser: {
+            javascript: {
+              dynamicImportMode: 'eager'
+            }
+          }
+        }
+      }
     ),
     // prettier-ignore
     [variants.clerkBrowser]: merge(
       entryForVariant(variants.clerkBrowser),
-      common({ mode }),
+      common({mode}),
       commonForProd(),
     ),
     [variants.clerkHeadless]: merge(
@@ -222,13 +235,13 @@ const devConfig = ({ mode, env }) => {
     // prettier-ignore
     [variants.clerk]: merge(
       entryForVariant(variants.clerk),
-      common({ mode }),
+      common({mode}),
       commonForDev(),
     ),
     // prettier-ignore
     [variants.clerkBrowser]: merge(
       entryForVariant(variants.clerkBrowser),
-      common({ mode }),
+      common({mode}),
       commonForDev(),
     ),
     [variants.clerkHeadless]: merge(
