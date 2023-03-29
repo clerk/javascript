@@ -76,15 +76,22 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
         >
           {typeof label === 'string' ? label : undefined}
           {icon && (
-            <Icon
-              icon={icon}
-              sx={theme => ({
-                marginLeft: theme.space.$0x5,
-                color: theme.colors.$blackAlpha400,
-                width: theme.sizes.$4,
-                height: theme.sizes.$4,
-              })}
-            />
+            // TODO: This is a temporary fix. Replace this when the tooltip component is introduced
+            // https://linear.app/clerk/issue/COR-241/create-tooltip-component-and-use-it-for-slug-explanation
+            <a
+              href='#0'
+              title='A slug is a human-readable ID that must be unique.  It’s often used in URLs.'
+            >
+              <Icon
+                icon={icon}
+                sx={theme => ({
+                  marginLeft: theme.space.$0x5,
+                  color: theme.colors.$blackAlpha400,
+                  width: theme.sizes.$4,
+                  height: theme.sizes.$4,
+                })}
+              />
+            </a>
           )}
         </FormLabel>
         {isOptional && !actionLabel && (

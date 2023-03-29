@@ -38,8 +38,8 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
 
   const slugField = useFormControl('slug', '', {
     type: 'text',
-    label: 'Slug URL', // TODO add localization key
-    placeholder: 'my-org', // TODO add localization key
+    label: localizationKeys('formFieldLabel__organizationSlug'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__organizationSlug'),
   });
 
   const dataChanged = !!nameField.value;
