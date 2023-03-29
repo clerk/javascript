@@ -22,7 +22,10 @@ describe('ProfileSettingsPage', () => {
   it('enables the continue button if the name changes value', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
-      f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
+      f.withUser({
+        email_addresses: ['test@clerk.dev'],
+        organization_memberships: [{ name: 'Org1', slug: '', role: 'admin' }],
+      });
     });
 
     const { getByLabelText, userEvent, getByRole } = render(<ProfileSettingsPage />, { wrapper });
@@ -34,7 +37,10 @@ describe('ProfileSettingsPage', () => {
   it('updates organization name on clicking continue', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
-      f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
+      f.withUser({
+        email_addresses: ['test@clerk.dev'],
+        organization_memberships: [{ name: 'Org1', slug: '', role: 'admin' }],
+      });
     });
 
     fixtures.clerk.organization?.update.mockResolvedValue({} as OrganizationResource);
@@ -42,13 +48,33 @@ describe('ProfileSettingsPage', () => {
     await userEvent.type(getByLabelText('Organization name'), '234');
     expect(getByDisplayValue('Org1234')).toBeDefined();
     await userEvent.click(getByRole('button', { name: 'Continue' }));
-    expect(fixtures.clerk.organization?.update).toHaveBeenCalledWith({ name: 'Org1234' });
+    expect(fixtures.clerk.organization?.update).toHaveBeenCalledWith({ name: 'Org1234', slug: '' });
+  });
+
+  it('updates organization slug on clicking continue', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withUser({
+        email_addresses: ['test@clerk.dev'],
+        organization_memberships: [{ name: 'Org1', slug: '', role: 'admin' }],
+      });
+    });
+
+    fixtures.clerk.organization?.update.mockResolvedValue({} as OrganizationResource);
+    const { getByDisplayValue, getByLabelText, userEvent, getByRole } = render(<ProfileSettingsPage />, { wrapper });
+    await userEvent.type(getByLabelText('Slug URL'), 'my-org');
+    expect(getByDisplayValue('my-org')).toBeDefined();
+    await userEvent.click(getByRole('button', { name: 'Continue' }));
+    expect(fixtures.clerk.organization?.update).toHaveBeenCalledWith({ name: 'Org1', slug: 'my-org' });
   });
 
   it('opens file drop area to update organization logo on clicking "Upload image"', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
-      f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
+      f.withUser({
+        email_addresses: ['test@clerk.dev'],
+        organization_memberships: [{ name: 'Org1', slug: '', role: 'admin' }],
+      });
     });
 
     const { userEvent, getByRole } = render(<ProfileSettingsPage />, { wrapper });
