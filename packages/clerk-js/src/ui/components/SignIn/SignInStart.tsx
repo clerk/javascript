@@ -58,9 +58,9 @@ export function _SignInStart(): JSX.Element {
     isRequired: true,
   });
 
-  const switchToNextIdentifier = () => {
+  const switchToNextIdentifier = (value?: string) => {
     setIdentifierIndex(i => i + 1);
-    identifierField.setValue('');
+    identifierField.setValue(value || '');
   };
 
   // show password if it's autofilled by the browser
@@ -80,6 +80,16 @@ export function _SignInStart(): JSX.Element {
       clearInterval(intervalId);
     };
   }, []);
+
+  //switch to the phone input (if available) if a "+" is entered
+  //(either by the browser or the user)
+  //this does not work in chrome as it does not fire the change event and the value is
+  //not available via js
+  React.useLayoutEffect(() => {
+    if (identifierField.value.startsWith('+') && identifierIndex === 0) {
+      switchToNextIdentifier(identifierField.value);
+    }
+  }, [identifierField.value]);
 
   React.useEffect(() => {
     if (!organizationTicket) {
@@ -234,7 +244,9 @@ export function _SignInStart(): JSX.Element {
                 <Form.ControlRow elementId={identifierField.id}>
                   <Form.Control
                     actionLabel={identifierInputDisplayValues.action}
-                    onActionClicked={switchToNextIdentifier}
+                    onActionClicked={() => {
+                      switchToNextIdentifier();
+                    }}
                     {...identifierField.props}
                     autoFocus={shouldAutofocus}
                   />
