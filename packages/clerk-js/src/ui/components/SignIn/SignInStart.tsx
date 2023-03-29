@@ -1,5 +1,5 @@
 import type { ClerkAPIError, SignInCreateParams } from '@clerk/types';
-import React, { useState } from 'react';
+import React, { forwardRef, useRef, useState } from 'react';
 
 import { ERROR_CODES } from '../../../core/constants';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
@@ -34,6 +34,7 @@ export function _SignInStart(): JSX.Element {
   const { navigateAfterSignIn, signUpUrl } = useSignInContext();
   const supportEmail = useSupportEmail();
   const [identifierIndex, setIdentifierIndex] = useState(0);
+  const [passwordAutofilled, setPasswordAutofilled] = useState(false);
 
   const organizationTicket = getClerkQueryParam('__clerk_ticket') || '';
 
@@ -45,6 +46,7 @@ export function _SignInStart(): JSX.Element {
     userSettings.enabledFirstFactorIdentifiers,
     identifierIndex,
   );
+  const passwordInputRef = useRef<HTMLInputElement>(null);
   const instantPasswordField = useFormControl('password', '', {
     type: 'password',
     label: localizationKeys('formFieldLabel__password'),
@@ -60,6 +62,24 @@ export function _SignInStart(): JSX.Element {
     setIdentifierIndex(i => i + 1);
     identifierField.setValue('');
   };
+
+  // show password if it's autofilled by the browser
+  React.useLayoutEffect(() => {
+    const intervalId = setInterval(() => {
+      if (passwordInputRef?.current) {
+        const autofilled =
+          window.getComputedStyle(passwordInputRef.current, ':autofill').animationName === 'onAutoFillStart';
+        if (autofilled) {
+          setPasswordAutofilled(autofilled);
+          clearInterval(intervalId);
+        }
+      }
+    }, 500);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
 
   React.useEffect(() => {
     if (!organizationTicket) {
@@ -219,7 +239,11 @@ export function _SignInStart(): JSX.Element {
                     autoFocus={shouldAutofocus}
                   />
                 </Form.ControlRow>
-                <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
+                <InstantPasswordRow
+                  field={passwordBasedInstance ? instantPasswordField : undefined}
+                  autofilled={passwordAutofilled}
+                  ref={passwordInputRef}
+                />
                 <Form.SubmitButton>Continue</Form.SubmitButton>
               </Form.Root>
             ) : null}
@@ -244,21 +268,26 @@ export function _SignInStart(): JSX.Element {
   );
 }
 
-const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> }) => {
-  if (!field) {
-    return null;
-  }
-  return (
-    <Form.ControlRow
-      elementId={field.id}
-      sx={!field.value ? { opacity: 0, height: 0, pointerEvents: 'none', marginTop: '-1rem' } : undefined}
-    >
-      <Form.Control
-        {...field.props}
-        tabIndex={!field.value ? -1 : undefined}
-      />
-    </Form.ControlRow>
-  );
-};
+const InstantPasswordRow = forwardRef<HTMLInputElement, { field?: FormControlState<'password'>; autofilled?: boolean }>(
+  ({ field, autofilled }, ref) => {
+    if (!field) {
+      return null;
+    }
+    return (
+      <Form.ControlRow
+        elementId={field.id}
+        sx={
+          !field.value && !autofilled ? { opacity: 0, height: 0, pointerEvents: 'none', marginTop: '-1rem' } : undefined
+        }
+      >
+        <Form.Control
+          {...field.props}
+          ref={ref}
+          tabIndex={!field.value ? -1 : undefined}
+        />
+      </Form.ControlRow>
+    );
+  },
+);
 
 export const SignInStart = withRedirectToHomeSingleSessionGuard(withCardStateProvider(_SignInStart));

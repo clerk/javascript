@@ -23,6 +23,9 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
     [mqu.ios]: {
       fontSize: theme.fontSizes.$md,
     },
+    ':autofill': {
+      animationName: 'onAutoFillStart',
+    },
   },
   variants: {},
 }));
