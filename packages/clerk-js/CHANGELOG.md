@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.34.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.34.0-staging.1...@clerk/clerk-js@4.34.0) (2023-03-29)
+
+### Bug Fixes
+
+- **clerk-js:** Bring back error for missing proxyUrlAndDomain ([f1ebfd8](https://github.com/clerkinc/javascript/commit/f1ebfd8526906c32d4a40f00985a6b2303fd39a4))
+
 ## [4.32.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.32.0-staging.2...@clerk/clerk-js@4.32.0) (2023-03-10)
 
 **Note:** Version bump only for package @clerk/clerk-js
