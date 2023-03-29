@@ -1062,6 +1062,10 @@ export default class Clerk implements ClerkInterface {
       return false;
     }
 
+    if (!this.proxyUrl && !this.domain) {
+      clerkMissingProxyUrlAndDomain();
+    }
+
     return this.#shouldSyncWithPrimaryInDevelopment() || this.#shouldSyncWithPrimaryInProduction();
   };
 
