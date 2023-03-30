@@ -1,4 +1,4 @@
-import type { Organization } from '@clerk/backend';
+import type { AuthenticateRequestOptions, Organization } from '@clerk/backend';
 import type { Session, User } from '@clerk/clerk-sdk-node';
 import type { ServerSideAuth } from '@clerk/types';
 import type { GetServerDataProps } from 'gatsby';
@@ -21,4 +21,5 @@ export type WithServerAuthOptions = {
   loadOrg?: boolean;
   jwtKey?: string;
   authorizedParties?: string[];
+  audience?: AuthenticateRequestOptions['audience'];
 };
