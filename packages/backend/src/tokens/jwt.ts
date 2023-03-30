@@ -33,6 +33,10 @@ const jwksAlgToCryptoAlg: Record<string, string> = {
 
 const algs = Object.keys(algToHash);
 
+const isArrayString = (s: unknown): s is string[] => {
+  return Array.isArray(s) && s.length > 0 && s.every(a => typeof a === 'string');
+};
+
 export async function hasValidSignature(jwt: Jwt, jwk: JsonWebKey) {
   const { header, signature, raw } = jwt;
   const encoder = new TextEncoder();
@@ -148,23 +152,11 @@ export async function verifyJwt(
   }
 
   // Verify audience claim (aud)
-  if (typeof aud === 'string') {
-    if (aud !== audience) {
-      throw new TokenVerificationError({
-        action: TokenVerificationErrorAction.EnsureClerkJWT,
-        reason: TokenVerificationErrorReason.TokenVerificationFailed,
-        message: `Invalid JWT audience claim (aud) ${JSON.stringify(aud)}. Expected "${audience}".`,
-      });
-    }
-  } else if (Array.isArray(aud) && aud.length > 0 && aud.every(a => typeof a === 'string')) {
-    if (!aud.includes(audience)) {
-      throw new TokenVerificationError({
-        action: TokenVerificationErrorAction.EnsureClerkJWT,
-        reason: TokenVerificationErrorReason.TokenVerificationFailed,
-        message: `Invalid JWT audience claim array (aud) ${JSON.stringify(aud)}. Does not include "${audience}".`,
-      });
-    }
-  } else {
+  const audiences = [audience].flat().filter(a => !!a);
+  const shouldVerifyAudience = audiences.length > 0 && aud;
+
+  if (!shouldVerifyAudience) {
+    // Avoid verifying aud claim & audience param
     // Notice: Clerk JWTs use AZP claim instead of Audience
     //
     // return {
@@ -173,6 +165,26 @@ export async function verifyJwt(
     //     aud,
     //   )}. Expected a string or a non-empty array of strings.`,
     // };
+  } else if (typeof aud === 'string') {
+    if (!audiences.includes(aud)) {
+      throw new TokenVerificationError({
+        action: TokenVerificationErrorAction.EnsureClerkJWT,
+        reason: TokenVerificationErrorReason.TokenVerificationFailed,
+        message: `Invalid JWT audience claim (aud) ${JSON.stringify(aud)}. Is not included in "${JSON.stringify(
+          audiences,
+        )}".`,
+      });
+    }
+  } else if (isArrayString(aud)) {
+    if (!aud.some(a => audiences.includes(a))) {
+      throw new TokenVerificationError({
+        action: TokenVerificationErrorAction.EnsureClerkJWT,
+        reason: TokenVerificationErrorReason.TokenVerificationFailed,
+        message: `Invalid JWT audience claim array (aud) ${JSON.stringify(aud)}. Is not included in "${JSON.stringify(
+          audiences,
+        )}".`,
+      });
+    }
   }
 
   // Verify authorized parties claim (azp)
