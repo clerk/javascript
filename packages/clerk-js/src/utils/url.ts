@@ -254,42 +254,6 @@ export function getSearchParameterFromHash({
   return dummyUrlForHash.searchParams.get(paramName);
 }
 
-export function setSearchParameterInHash({
-  hash = window.location.hash,
-  paramName,
-  paramValue,
-}: {
-  hash?: string;
-  paramName: string;
-  paramValue: string;
-}) {
-  const h = hash.startsWith('#') ? hash.substring(1) : hash;
-  const dummyUrlForHash = new URL(h, DUMMY_URL_BASE);
-  dummyUrlForHash.searchParams.set(paramName, paramValue);
-
-  // The following line will prepend the hash with a `/`.
-  // This is required for ClerkJS Components Hash router to work as expected
-  // as it treats the hash as sub-path with its nested querystring parameters.
-  return dummyUrlForHash.href.replace(DUMMY_URL_BASE, '');
-}
-
-export function removeSearchParameterFromHash({
-  hash = window.location.hash,
-  paramName,
-}: {
-  hash?: string;
-  paramName: string;
-}) {
-  const h = hash.startsWith('#') ? hash.substring(1) : hash;
-  const dummyUrlForHash = new URL(h, DUMMY_URL_BASE);
-  dummyUrlForHash.searchParams.delete(paramName);
-
-  // The following line will prepend the hash with a `/`.
-  // This is required for ClerkJS Components Hash router to work as expected
-  // as it treats the hash as sub-path with its nested querystring parameters.
-  return dummyUrlForHash.href.replace(DUMMY_URL_BASE, '');
-}
-
 export function isValidUrl(val: unknown, opts?: { includeRelativeUrls?: boolean }): val is string {
   const { includeRelativeUrls = false } = opts || {};
   if (!val && !includeRelativeUrls) {
