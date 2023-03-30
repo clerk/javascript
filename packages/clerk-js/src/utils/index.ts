@@ -26,4 +26,3 @@ export * from './web3';
 export * from './windowNavigate';
 export * from './componentGuards';
 export * from './queryStateParams';
-export * from './createSlug';

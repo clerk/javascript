@@ -59,7 +59,7 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
       sx={sx}
     >
       <Flex
-        justify='between'
+        justify={icon ? 'start' : 'between'}
         align='center'
         elementDescriptor={descriptors.formFieldLabelRow}
         elementId={descriptors.formFieldLabelRow.setId(id)}
@@ -72,27 +72,24 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
           hasError={hasError}
           isDisabled={isDisabled}
           isRequired={isRequired}
-          sx={{ marginRight: 'auto', display: 'flex', alignItems: 'center' }}
+          sx={{ display: 'flex', alignItems: 'center' }}
         >
           {typeof label === 'string' ? label : undefined}
-          {icon && (
-            // TODO: This is a temporary fix. Replace this when the tooltip component is introduced
-            <a
-              href='#0'
-              title='A slug is a human-readable ID that must be unique.  It’s often used in URLs.'
-            >
-              <Icon
-                icon={icon}
-                sx={theme => ({
-                  marginLeft: theme.space.$0x5,
-                  color: theme.colors.$blackAlpha400,
-                  width: theme.sizes.$4,
-                  height: theme.sizes.$4,
-                })}
-              />
-            </a>
-          )}
         </FormLabel>
+        {icon && (
+          // TODO: This is a temporary fix. Replace this when the tooltip component is introduced
+          <p title='A slug is a human-readable ID that must be unique.  It’s often used in URLs.'>
+            <Icon
+              icon={icon}
+              sx={theme => ({
+                marginLeft: theme.space.$0x5,
+                color: theme.colors.$blackAlpha400,
+                width: theme.sizes.$4,
+                height: theme.sizes.$4,
+              })}
+            />
+          </p>
+        )}
         {isOptional && !actionLabel && (
           <Text
             localizationKey={localizationKeys('formFieldHintText__optional')}

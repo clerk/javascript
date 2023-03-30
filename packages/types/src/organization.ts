@@ -62,7 +62,7 @@ export interface UpdateMembershipParams {
 
 export interface UpdateOrganizationParams {
   name: string;
-  slug: string;
+  slug?: string;
 }
 
 export interface SetOrganizationLogoParams {

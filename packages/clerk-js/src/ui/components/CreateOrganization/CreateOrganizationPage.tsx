@@ -1,9 +1,10 @@
 import React from 'react';
 
-import { Question } from '../../../ui/icons';
-import { createSlug, isSlug } from '../../../utils';
+import { QuestionMark } from '../../../ui/icons';
+import { createSlug, isValidSlug } from '../../../ui/utils';
 import { useWizard, Wizard } from '../../common';
 import { useCoreClerk, useCoreOrganization, useCoreOrganizations, useCreateOrganizationContext } from '../../contexts';
+import { localizationKeys, useLocalizations } from '../../customizables';
 import {
   ContentPage,
   Form,
@@ -12,7 +13,6 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
-import { localizationKeys } from '../../localization';
 import { handleError, useFormControl } from '../../utils';
 import { InviteMembersForm } from '../OrganizationProfile/InviteMembersForm';
 import { InvitationsSentMessage } from '../OrganizationProfile/InviteMembersPage';
@@ -22,6 +22,7 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
   const title = localizationKeys('createOrganization.title');
   const inviteTitle = localizationKeys('organizationProfile.invitePage.title');
   const card = useCardState();
+  const { t } = useLocalizations();
   const [file, setFile] = React.useState<File | null>();
   const { createOrganization } = useCoreOrganizations();
   const { setActive, closeCreateOrganization } = useCoreClerk();
@@ -72,21 +73,21 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
 
   const onChangeName = (event: React.ChangeEvent<HTMLInputElement>) => {
     nameField.setValue(event.target.value);
-    updateSlugField(createSlug(event.target.value), undefined);
+    updateSlugField(createSlug(event.target.value));
   };
 
   const onChangeSlug = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.value && !isSlug(event.target.value)) {
-      updateSlugField(event.target.value, 'Can contain only lowercase alphanumeric characters and the dash "-" symbol');
+    if (event.target.value && !isValidSlug(event.target.value)) {
+      updateSlugField(event.target.value, t(localizationKeys('formFieldErrorText__organizationSlug')));
       return;
     }
 
-    updateSlugField(createSlug(event.target.value), undefined);
+    updateSlugField(createSlug(event.target.value));
   };
 
-  const updateSlugField = (val: string, err: string | undefined) => {
+  const updateSlugField = (val: string, errorMessage?: string | undefined) => {
     slugField.setValue(val);
-    slugField.setError(err);
+    slugField.setError(errorMessage as string);
   };
 
   return (
@@ -116,7 +117,7 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
               sx={{ flexBasis: '80%' }}
               {...slugField.props}
               onChange={onChangeSlug}
-              icon={Question}
+              icon={QuestionMark}
               required
             />
           </Form.ControlRow>
