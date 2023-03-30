@@ -36,7 +36,8 @@ const FirstFactorConfigs = Object.freeze({
   },
 } as Record<string, { label: string | LocalizationKey; type: string; placeholder: string | LocalizationKey; action?: string | LocalizationKey }>);
 
-export const getIdentifierControlDisplayValues = (attributes: Attribute[], index: number) => {
+export type SignInStartIdentifier = 'email_address' | 'username' | 'phone_number' | 'email_address_username';
+export const getIdentifiers = (attributes: Attribute[]): SignInStartIdentifier[] => {
   let newAttributes: string[] = [...attributes];
   //merge email_address and username attributes
   if (['email_address', 'username'].every(r => newAttributes.includes(r))) {
@@ -44,14 +45,25 @@ export const getIdentifierControlDisplayValues = (attributes: Attribute[], index
     newAttributes.unshift('email_address_username');
   }
 
+  return newAttributes as SignInStartIdentifier[];
+};
+
+export const getIdentifierControlDisplayValues = (
+  identifiers: SignInStartIdentifier[],
+  identifier: SignInStartIdentifier,
+) => {
+  const index = identifiers.indexOf(identifier);
+
+  if (index === -1) {
+    return FirstFactorConfigs['default'];
+  }
+
   return (
     {
-      ...FirstFactorConfigs[newAttributes[index % newAttributes.length]],
+      ...FirstFactorConfigs[identifiers[index % identifiers.length]],
       //return the action that corresponds to the next valid identifier in the cycle
       action:
-        newAttributes.length > 1
-          ? FirstFactorConfigs[newAttributes[(index + 1) % newAttributes.length]].action
-          : undefined,
+        identifiers.length > 1 ? FirstFactorConfigs[identifiers[(index + 1) % identifiers.length]].action : undefined,
     } || FirstFactorConfigs['default']
   );
 };

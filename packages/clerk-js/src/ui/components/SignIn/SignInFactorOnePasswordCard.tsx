@@ -68,6 +68,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
           <Form.Root onSubmit={handlePasswordSubmit}>
             {/* For password managers */}
             <input
+              readOnly
               id='identifier-field'
               name='identifier'
               value={signIn.identifier || ''}

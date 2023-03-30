@@ -1,10 +1,11 @@
 import type { ClerkAPIError, SignInCreateParams } from '@clerk/types';
-import React, { forwardRef, useRef, useState } from 'react';
+import React, { forwardRef, useMemo, useRef, useState } from 'react';
 
 import { ERROR_CODES } from '../../../core/constants';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { getClerkQueryParam } from '../../../utils';
-import { getIdentifierControlDisplayValues, withRedirectToHomeSingleSessionGuard } from '../../common';
+import type { SignInStartIdentifier } from '../../common';
+import { getIdentifierControlDisplayValues, getIdentifiers, withRedirectToHomeSingleSessionGuard } from '../../common';
 import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import {
@@ -33,8 +34,12 @@ export function _SignInStart(): JSX.Element {
   const { navigate } = useNavigate();
   const { navigateAfterSignIn, signUpUrl } = useSignInContext();
   const supportEmail = useSupportEmail();
-  const [identifierIndex, setIdentifierIndex] = useState(0);
   const [passwordAutofilled, setPasswordAutofilled] = useState(false);
+  const identifierAttributes = useMemo<SignInStartIdentifier[]>(
+    () => getIdentifiers(userSettings.enabledFirstFactorIdentifiers),
+    [userSettings.enabledFirstFactorIdentifiers],
+  );
+  const [identifierAttribute, setIdentifierAttribute] = useState<SignInStartIdentifier>(identifierAttributes[0] || '');
 
   const organizationTicket = getClerkQueryParam('__clerk_ticket') || '';
 
@@ -42,10 +47,7 @@ export function _SignInStart(): JSX.Element {
   const web3FirstFactors = userSettings.web3FirstFactors;
   const authenticatableSocialStrategies = userSettings.authenticatableSocialStrategies;
   const passwordBasedInstance = userSettings.instanceIsPasswordBased;
-  const identifierInputDisplayValues = getIdentifierControlDisplayValues(
-    userSettings.enabledFirstFactorIdentifiers,
-    identifierIndex,
-  );
+  const identifierInputDisplayValues = getIdentifierControlDisplayValues(identifierAttributes, identifierAttribute);
   const passwordInputRef = useRef<HTMLInputElement>(null);
   const instantPasswordField = useFormControl('password', '', {
     type: 'password',
@@ -58,8 +60,15 @@ export function _SignInStart(): JSX.Element {
     isRequired: true,
   });
 
-  const switchToNextIdentifier = (value?: string) => {
-    setIdentifierIndex(i => i + 1);
+  const switchToNextIdentifier = () => {
+    setIdentifierAttribute(
+      i => identifierAttributes[(identifierAttributes.indexOf(i) + 1) % identifierAttributes.length],
+    );
+    identifierField.setValue('');
+  };
+
+  const switchToPhoneInput = (value?: string) => {
+    setIdentifierAttribute('phone_number');
     identifierField.setValue(value || '');
   };
 
@@ -81,15 +90,19 @@ export function _SignInStart(): JSX.Element {
     };
   }, []);
 
-  //switch to the phone input (if available) if a "+" is entered
-  //(either by the browser or the user)
-  //this does not work in chrome as it does not fire the change event and the value is
-  //not available via js
+  // switch to the phone input (if available) if a "+" is entered
+  // (either by the browser or the user)
+  // this does not work in chrome as it does not fire the change event and the value is
+  // not available via js
   React.useLayoutEffect(() => {
-    if (identifierField.value.startsWith('+') && identifierIndex === 0) {
-      switchToNextIdentifier(identifierField.value);
+    if (
+      identifierField.value.startsWith('+') &&
+      identifierAttributes.includes('phone_number') &&
+      identifierAttribute !== 'phone_number'
+    ) {
+      switchToPhoneInput(identifierField.value);
     }
-  }, [identifierField.value]);
+  }, [identifierField.value, identifierAttributes]);
 
   React.useEffect(() => {
     if (!organizationTicket) {
@@ -244,9 +257,7 @@ export function _SignInStart(): JSX.Element {
                 <Form.ControlRow elementId={identifierField.id}>
                   <Form.Control
                     actionLabel={identifierInputDisplayValues.action}
-                    onActionClicked={() => {
-                      switchToNextIdentifier();
-                    }}
+                    onActionClicked={switchToNextIdentifier}
                     {...identifierField.props}
                     autoFocus={shouldAutofocus}
                   />
