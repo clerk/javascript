@@ -47,7 +47,7 @@ export const authenticateRequest = (opts: {
 }) => {
   const { clerkClient, apiKey, secretKey, frontendApi, publishableKey, req, options } = opts;
   const cookies = parseCookies(req);
-  const { jwtKey, authorizedParties } = options || {};
+  const { jwtKey, authorizedParties, audience } = options || {};
 
   const requestUrl = getRequestUrl(req);
   const isSatellite =
@@ -68,6 +68,7 @@ export const authenticateRequest = (opts: {
   }
 
   return clerkClient.authenticateRequest({
+    audience,
     apiKey,
     secretKey,
     frontendApi,
