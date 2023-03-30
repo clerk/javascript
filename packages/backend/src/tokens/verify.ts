@@ -23,6 +23,7 @@ export async function verifyToken(token: string, options: VerifyTokenOptions): P
     secretKey,
     apiUrl,
     apiVersion,
+    audience,
     authorizedParties,
     clockSkewInSeconds,
     issuer,
@@ -53,6 +54,7 @@ export async function verifyToken(token: string, options: VerifyTokenOptions): P
   }
 
   return await verifyJwt(token, {
+    audience,
     authorizedParties,
     clockSkewInSeconds,
     key,
