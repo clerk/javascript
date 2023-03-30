@@ -10,6 +10,7 @@ import type {
   PrepareEmailAddressVerificationParams,
   PreparePhoneNumberVerificationParams,
   PrepareVerificationParams,
+  SAMLParams,
   SignUpAuthenticateWithMetamaskParams,
   SignUpCreateParams,
   SignUpField,
@@ -202,6 +203,33 @@ export class SignUp extends BaseResource implements SignUpResource {
     });
     const { externalAccount } = verifications;
     const { status, externalVerificationRedirectURL } = externalAccount;
+
+    if (status === 'unverified' && !!externalVerificationRedirectURL) {
+      windowNavigate(externalVerificationRedirectURL);
+    } else {
+      clerkInvalidFAPIResponse(status, SignUp.fapiClient.buildEmailAddress('support'));
+    }
+  };
+
+  public authenticateWithSAML = async ({
+    redirectUrl,
+    redirectUrlComplete,
+    strategy,
+    identifier,
+    continueSignUp = false,
+    unsafeMetadata,
+  }: SAMLParams & { unsafeMetadata?: SignUpUnsafeMetadata }): Promise<void> => {
+    const authenticateFn = (args: SignUpCreateParams | SignUpUpdateParams) =>
+      continueSignUp && this.id ? this.update(args) : this.create(args);
+    const { verifications } = await authenticateFn({
+      strategy,
+      identifier,
+      redirectUrl,
+      actionCompleteRedirectUrl: redirectUrlComplete,
+      unsafeMetadata,
+    });
+    const { samlAccount } = verifications;
+    const { status, externalVerificationRedirectURL } = samlAccount;
 
     if (status === 'unverified' && !!externalVerificationRedirectURL) {
       windowNavigate(externalVerificationRedirectURL);

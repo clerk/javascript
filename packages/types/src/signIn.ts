@@ -14,6 +14,8 @@ import type {
   PhoneCodeConfig,
   PhoneCodeFactor,
   PhoneCodeSecondFactorConfig,
+  SAMLConfig,
+  SAMLFactor,
   TOTPAttempt,
   TOTPFactor,
   Web3Attempt,
@@ -35,6 +37,7 @@ import type {
 } from './json';
 import type { AuthenticateWithRedirectParams } from './oauth';
 import type { ClerkResource } from './resource';
+import type { SAMLParams } from './saml';
 import type {
   BackupCodeStrategy,
   EmailCodeStrategy,
@@ -42,6 +45,7 @@ import type {
   OAuthStrategy,
   PasswordStrategy,
   PhoneCodeStrategy,
+  SAMLStrategy,
   TicketStrategy,
   TOTPStrategy,
   Web3Strategy,
@@ -72,6 +76,8 @@ export interface SignInResource extends ClerkResource {
 
   authenticateWithRedirect: (params: AuthenticateWithRedirectParams) => Promise<void>;
 
+  authenticateWithSAML: (params: SAMLParams) => Promise<void>;
+
   authenticateWithWeb3: (params: AuthenticateWithWeb3Params) => Promise<SignInResource>;
 
   authenticateWithMetamask: () => Promise<SignInResource>;
@@ -93,7 +99,8 @@ export type SignInFirstFactor =
   | PhoneCodeFactor
   | PasswordFactor
   | Web3SignatureFactor
-  | OauthFactor;
+  | OauthFactor
+  | SAMLFactor;
 
 export type SignInSecondFactor = PhoneCodeFactor | TOTPFactor | BackupCodeFactor;
 
@@ -110,7 +117,8 @@ export type PrepareFirstFactorParams =
   | EmailLinkConfig
   | PhoneCodeConfig
   | Web3SignatureConfig
-  | OAuthConfig;
+  | OAuthConfig
+  | SAMLConfig;
 
 export type AttemptFirstFactorParams = EmailCodeAttempt | PhoneCodeAttempt | PasswordAttempt | Web3Attempt;
 
@@ -136,6 +144,12 @@ export type SignInCreateParams = (
   | {
       strategy: PhoneCodeStrategy | EmailCodeStrategy | Web3Strategy;
       identifier: string;
+    }
+  | {
+      strategy: SAMLStrategy;
+      identifier: string;
+      redirectUrl: string;
+      actionCompleteRedirectUrl?: string;
     }
   | {
       strategy: EmailLinkStrategy;

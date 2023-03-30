@@ -8,6 +8,7 @@ import type {
   TOTPStrategy,
   Web3Strategy,
 } from './strategies';
+import type { SAMLStrategy } from './strategies';
 
 export type EmailCodeFactor = {
   strategy: EmailCodeStrategy;
@@ -43,6 +44,11 @@ export type PasswordFactor = {
 
 export type OauthFactor = {
   strategy: OAuthStrategy;
+  identifier: string;
+};
+
+export type SAMLFactor = {
+  strategy: SAMLStrategy;
 };
 
 export type TOTPFactor = {
@@ -60,6 +66,10 @@ export type EmailLinkConfig = Omit<EmailLinkFactor, 'safeIdentifier'> & {
 export type PhoneCodeConfig = Omit<PhoneCodeFactor, 'safeIdentifier'>;
 export type Web3SignatureConfig = Web3SignatureFactor;
 export type OAuthConfig = OauthFactor & {
+  redirectUrl: string;
+  actionCompleteRedirectUrl: string;
+};
+export type SAMLConfig = SAMLFactor & {
   redirectUrl: string;
   actionCompleteRedirectUrl: string;
 };

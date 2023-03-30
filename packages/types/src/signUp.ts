@@ -16,11 +16,13 @@ import type {
 import type { AuthenticateWithRedirectParams } from './oauth';
 import type { AttemptPhoneNumberVerificationParams, PreparePhoneNumberVerificationParams } from './phoneNumber';
 import type { ClerkResource } from './resource';
+import type { SAMLParams } from './saml';
 import type {
   EmailCodeStrategy,
   EmailLinkStrategy,
   OAuthStrategy,
   PhoneCodeStrategy,
+  SAMLStrategy,
   TicketStrategy,
   Web3Strategy,
 } from './strategies';
@@ -90,6 +92,8 @@ export interface SignUpResource extends ClerkResource {
   ) => Promise<SignUpResource>;
 
   authenticateWithMetamask: (params: { unsafeMetadata: SignUpUnsafeMetadata }) => Promise<SignUpResource>;
+
+  authenticateWithSAML: (params: SAMLParams & { unsafeMetadata: SignUpUnsafeMetadata }) => Promise<void>;
 }
 
 export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
@@ -154,7 +158,8 @@ export type SignUpCreateParams = Partial<
     externalAccountStrategy: string;
     externalAccountRedirectUrl: string;
     externalAccountActionCompleteRedirectUrl: string;
-    strategy: OAuthStrategy | TicketStrategy;
+    strategy: OAuthStrategy | TicketStrategy | SAMLStrategy;
+    identifier: string;
     redirectUrl: string;
     actionCompleteRedirectUrl: string;
     transfer: boolean;
@@ -168,10 +173,12 @@ export type SignUpUpdateParams = SignUpCreateParams;
 export type SignUpAuthenticateWithMetamaskParams = {
   unsafeMetadata?: SignUpUnsafeMetadata;
 };
+
 export interface SignUpVerificationsResource {
   emailAddress: SignUpVerificationResource;
   phoneNumber: SignUpVerificationResource;
   externalAccount: VerificationResource;
+  samlAccount: VerificationResource;
   web3Wallet: VerificationResource;
 }
 

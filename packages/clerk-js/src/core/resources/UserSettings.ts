@@ -17,6 +17,7 @@ import { BaseResource } from './internal';
 export class UserSettings extends BaseResource implements UserSettingsResource {
   id = undefined;
   social!: OAuthProviders;
+  saml!: string[];
   attributes!: Attributes;
   signIn!: SignInData;
   signUp!: SignUpData;
@@ -49,6 +50,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     }
 
     this.social = data.social;
+    this.saml = data.saml || [];
     this.attributes = data.attributes;
     this.signIn = data.sign_in;
     this.signUp = data.sign_up;

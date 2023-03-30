@@ -10,6 +10,7 @@ import type {
   PhoneCodeConfig,
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
+  SAMLParams,
   SignInCreateParams,
   SignInFirstFactor,
   SignInIdentifier,
@@ -152,6 +153,23 @@ export class SignIn extends BaseResource implements SignInResource {
     const { strategy, redirectUrl, redirectUrlComplete } = params || {};
     const { firstFactorVerification } = await this.create({
       strategy,
+      redirectUrl: redirectUrl,
+      actionCompleteRedirectUrl: redirectUrlComplete,
+    });
+    const { status, externalVerificationRedirectURL } = firstFactorVerification;
+
+    if (status === 'unverified' && externalVerificationRedirectURL) {
+      windowNavigate(externalVerificationRedirectURL);
+    } else {
+      clerkInvalidFAPIResponse(status, SignIn.fapiClient.buildEmailAddress('support'));
+    }
+  };
+
+  public authenticateWithSAML = async (params: SAMLParams): Promise<void> => {
+    const { strategy, identifier, redirectUrl, redirectUrlComplete } = params || {};
+    const { firstFactorVerification } = await this.create({
+      strategy,
+      identifier,
       redirectUrl: redirectUrl,
       actionCompleteRedirectUrl: redirectUrlComplete,
     });

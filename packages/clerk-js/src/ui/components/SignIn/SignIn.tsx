@@ -8,6 +8,7 @@ import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
 import { SignInAccountSwitcher } from './SignInAccountSwitcher';
 import { SignInFactorOne } from './SignInFactorOne';
 import { SignInFactorTwo } from './SignInFactorTwo';
+import { SignInSAML } from './SignInSAML';
 import { SignInSSOCallback } from './SignInSSOCallback';
 import { SignInStart } from './SignInStart';
 
@@ -48,6 +49,9 @@ function SignInRoutes(): JSX.Element {
             redirectUrlComplete={signInContext.afterSignInUrl || signInContext.redirectUrl || undefined}
             redirectUrl='../factor-two'
           />
+        </Route>
+        <Route path='saml'>
+          <SignInSAML />
         </Route>
         <Route index>
           <SignInStart />

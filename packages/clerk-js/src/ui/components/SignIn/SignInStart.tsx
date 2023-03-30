@@ -1,12 +1,12 @@
 import type { ClerkAPIError, SignInCreateParams } from '@clerk/types';
-import React from 'react';
+import React, { use } from 'react';
 
 import { ERROR_CODES } from '../../../core/constants';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { getClerkQueryParam } from '../../../utils';
 import { getIdentifierControlDisplayValues, withRedirectToHomeSingleSessionGuard } from '../../common';
 import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
-import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
+import { Button, Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import {
   Card,
   CardAlert,
@@ -41,6 +41,8 @@ export function _SignInStart(): JSX.Element {
   const authenticatableSocialStrategies = userSettings.authenticatableSocialStrategies;
   const passwordBasedInstance = userSettings.instanceIsPasswordBased;
   const identifierInputDisplayValues = getIdentifierControlDisplayValues(standardFormAttributes);
+
+  const showSAML = userSettings.saml.length > 0;
 
   const instantPasswordField = useFormControl('password', '', {
     type: 'password',
@@ -110,6 +112,7 @@ export function _SignInStart(): JSX.Element {
         void (await signIn.create({}));
       }
     }
+
     void handleOauthError();
   }, []);
 
@@ -211,6 +214,14 @@ export function _SignInStart(): JSX.Element {
                 </Form.ControlRow>
                 <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
                 <Form.SubmitButton>Continue</Form.SubmitButton>
+                {showSAML && (
+                  <Button
+                    block
+                    variant='link'
+                    localizationKey={localizationKeys('signIn.start.saml')}
+                    onClick={() => navigate('saml')}
+                  />
+                )}
               </Form.Root>
             ) : null}
           </SocialButtonsReversibleContainerWithDivider>

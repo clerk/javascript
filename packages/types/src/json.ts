@@ -223,6 +223,7 @@ export interface SignUpVerificationsJSON {
   phone_number: SignUpVerificationJSON;
   web3_wallet: SignUpVerificationJSON;
   external_account: VerificationJSON;
+  saml_account: VerificationJSON;
 }
 
 export interface SignUpVerificationJSON extends VerificationJSON {

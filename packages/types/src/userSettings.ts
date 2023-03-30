@@ -11,7 +11,8 @@ type Attribute =
   | 'password'
   | 'web3_wallet'
   | 'authenticator_app'
-  | 'backup_code';
+  | 'backup_code'
+  | 'saml';
 
 export type VerificationStrategy = 'email_link' | 'email_code' | 'phone_code' | 'totp' | 'backup_code';
 
@@ -59,6 +60,7 @@ export interface UserSettingsJSON extends ClerkResourceJSON {
   object: never;
   attributes: Attributes;
   social: OAuthProviders;
+  saml: string[];
   sign_in: SignInData;
   sign_up: SignUpData;
 }
@@ -66,6 +68,7 @@ export interface UserSettingsJSON extends ClerkResourceJSON {
 export interface UserSettingsResource extends ClerkResource {
   id?: undefined;
   social: OAuthProviders;
+  saml: string[];
   attributes: Attributes;
   signIn: SignInData;
   signUp: SignUpData;

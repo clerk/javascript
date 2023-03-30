@@ -75,6 +75,7 @@ type _LocalizationResource = {
       subtitle: LocalizationValue;
       actionText: LocalizationValue;
       actionLink: LocalizationValue;
+      saml: LocalizationValue;
     };
     emailLink: {
       title: LocalizationValue;
@@ -114,6 +115,10 @@ type _LocalizationResource = {
       actionText: LocalizationValue;
       actionLink: LocalizationValue;
     };
+    saml: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+    };
   };
   signIn: {
     start: {
@@ -121,6 +126,7 @@ type _LocalizationResource = {
       subtitle: LocalizationValue;
       actionText: LocalizationValue;
       actionLink: LocalizationValue;
+      saml: LocalizationValue;
     };
     password: {
       title: LocalizationValue;
@@ -178,6 +184,10 @@ type _LocalizationResource = {
       formTitle: LocalizationValue;
       formSubtitle: LocalizationValue;
       resendButton: LocalizationValue;
+    };
+    saml: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
     };
     totpMfa: {
       title: LocalizationValue;

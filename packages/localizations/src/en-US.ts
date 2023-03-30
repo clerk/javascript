@@ -75,6 +75,7 @@ export const enUS: LocalizationResource = {
       subtitle: 'to continue to {{applicationName}}',
       actionText: 'Have an account?',
       actionLink: 'Sign in',
+      saml: 'Continue with SAML SSO',
     },
     emailLink: {
       title: 'Verify your email',
@@ -114,6 +115,10 @@ export const enUS: LocalizationResource = {
       actionText: 'Have an account?',
       actionLink: 'Sign in',
     },
+    saml: {
+      title: 'Sign up with SAML SSO',
+      subtitle: 'to continue to {{applicationName}}',
+    },
   },
   signIn: {
     start: {
@@ -121,6 +126,7 @@ export const enUS: LocalizationResource = {
       subtitle: 'to continue to {{applicationName}}',
       actionText: 'No account?',
       actionLink: 'Sign up',
+      saml: 'Continue with SAML SSO',
     },
     password: {
       title: 'Enter your password',
@@ -167,6 +173,10 @@ export const enUS: LocalizationResource = {
     },
     phoneCode: { ...commonTexts.signIn.phoneCode },
     phoneCodeMfa: { ...commonTexts.signIn.phoneCode, subtitle: '' },
+    saml: {
+      title: 'Sign in with SAML SSO',
+      subtitle: 'to continue to {{applicationName}}',
+    },
     totpMfa: {
       title: 'Two-step verification',
       subtitle: '',

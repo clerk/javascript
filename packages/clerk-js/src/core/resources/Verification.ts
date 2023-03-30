@@ -57,6 +57,7 @@ export class SignUpVerifications implements SignUpVerificationsResource {
   phoneNumber: SignUpVerificationResource;
   web3Wallet: SignUpVerificationResource;
   externalAccount: VerificationResource;
+  samlAccount: VerificationResource;
 
   constructor(data: SignUpVerificationsJSON | null) {
     if (data) {
@@ -64,11 +65,13 @@ export class SignUpVerifications implements SignUpVerificationsResource {
       this.phoneNumber = new SignUpVerification(data.phone_number);
       this.web3Wallet = new SignUpVerification(data.web3_wallet);
       this.externalAccount = new Verification(data.external_account);
+      this.samlAccount = new Verification(data.saml_account);
     } else {
       this.emailAddress = new SignUpVerification(null);
       this.phoneNumber = new SignUpVerification(null);
       this.web3Wallet = new SignUpVerification(null);
       this.externalAccount = new Verification(null);
+      this.samlAccount = new Verification(null);
     }
   }
 }

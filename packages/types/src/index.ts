@@ -27,6 +27,7 @@ export * from './organizationMembership';
 export * from './organizationSettings';
 export * from './phoneNumber';
 export * from './resource';
+export * from './saml';
 export * from './session';
 export * from './signIn';
 export * from './signUp';

@@ -10,4 +10,5 @@ export type TOTPStrategy = 'totp';
 export type BackupCodeStrategy = 'backup_code';
 
 export type OAuthStrategy = `oauth_${OAuthProvider}`;
+export type SAMLStrategy = 'saml';
 export type Web3Strategy = `web3_${Web3Provider}_signature`;
