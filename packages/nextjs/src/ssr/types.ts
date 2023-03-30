@@ -1,4 +1,4 @@
-import type { Organization, Session, User } from '@clerk/backend';
+import type { AuthenticateRequestOptions, Organization, Session, User } from '@clerk/backend';
 import type { ClerkJWTClaims, ServerSideAuth } from '@clerk/types';
 import type { GetServerSidePropsContext } from 'next';
 
@@ -22,6 +22,7 @@ export type WithServerSideAuthOptions = {
   loadOrganization?: boolean;
   jwtKey?: string;
   authorizedParties?: string[];
+  audience?: AuthenticateRequestOptions['audience'];
 };
 
 /**
