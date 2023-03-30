@@ -3,6 +3,12 @@ import type { Attribute, Web3Provider } from '@clerk/types';
 import type { LocalizationKey } from '../localization/localizationKeys';
 import { localizationKeys } from '../localization/localizationKeys';
 
+type FirstFactorConfig = {
+  label: string | LocalizationKey;
+  type: string;
+  placeholder: string | LocalizationKey;
+  action?: string | LocalizationKey;
+};
 const FirstFactorConfigs = Object.freeze({
   email_address_username: {
     label: localizationKeys('formFieldLabel__emailAddress_username'),
@@ -34,10 +40,10 @@ const FirstFactorConfigs = Object.freeze({
     type: 'text',
     action: '',
   },
-} as Record<string, { label: string | LocalizationKey; type: string; placeholder: string | LocalizationKey; action?: string | LocalizationKey }>);
+} as Record<SignInStartIdentifier | 'default', FirstFactorConfig>);
 
 export type SignInStartIdentifier = 'email_address' | 'username' | 'phone_number' | 'email_address_username';
-export const getIdentifiers = (attributes: Attribute[]): SignInStartIdentifier[] => {
+export const groupIdentifiers = (attributes: Attribute[]): SignInStartIdentifier[] => {
   let newAttributes: string[] = [...attributes];
   //merge email_address and username attributes
   if (['email_address', 'username'].every(r => newAttributes.includes(r))) {
@@ -51,21 +57,18 @@ export const getIdentifiers = (attributes: Attribute[]): SignInStartIdentifier[]
 export const getIdentifierControlDisplayValues = (
   identifiers: SignInStartIdentifier[],
   identifier: SignInStartIdentifier,
-) => {
+): { currentIdentifier: FirstFactorConfig; nextIdentifier?: FirstFactorConfig } => {
   const index = identifiers.indexOf(identifier);
 
   if (index === -1) {
-    return FirstFactorConfigs['default'];
+    return { currentIdentifier: { ...FirstFactorConfigs['default'] }, nextIdentifier: undefined };
   }
 
-  return (
-    {
-      ...FirstFactorConfigs[identifiers[index % identifiers.length]],
-      //return the action that corresponds to the next valid identifier in the cycle
-      action:
-        identifiers.length > 1 ? FirstFactorConfigs[identifiers[(index + 1) % identifiers.length]].action : undefined,
-    } || FirstFactorConfigs['default']
-  );
+  return {
+    currentIdentifier: { ...FirstFactorConfigs[identifier] },
+    nextIdentifier:
+      identifiers.length > 1 ? { ...FirstFactorConfigs[identifiers[(index + 1) % identifiers.length]] } : undefined,
+  };
 };
 
 export const PREFERRED_SIGN_IN_STRATEGIES = Object.freeze({

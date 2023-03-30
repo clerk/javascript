@@ -1,11 +1,15 @@
 import type { ClerkAPIError, SignInCreateParams } from '@clerk/types';
-import React, { forwardRef, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 
 import { ERROR_CODES } from '../../../core/constants';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { getClerkQueryParam } from '../../../utils';
 import type { SignInStartIdentifier } from '../../common';
-import { getIdentifierControlDisplayValues, getIdentifiers, withRedirectToHomeSingleSessionGuard } from '../../common';
+import {
+  getIdentifierControlDisplayValues,
+  groupIdentifiers,
+  withRedirectToHomeSingleSessionGuard,
+} from '../../common';
 import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import {
@@ -34,9 +38,8 @@ export function _SignInStart(): JSX.Element {
   const { navigate } = useNavigate();
   const { navigateAfterSignIn, signUpUrl } = useSignInContext();
   const supportEmail = useSupportEmail();
-  const [passwordAutofilled, setPasswordAutofilled] = useState(false);
   const identifierAttributes = useMemo<SignInStartIdentifier[]>(
-    () => getIdentifiers(userSettings.enabledFirstFactorIdentifiers),
+    () => groupIdentifiers(userSettings.enabledFirstFactorIdentifiers),
     [userSettings.enabledFirstFactorIdentifiers],
   );
   const [identifierAttribute, setIdentifierAttribute] = useState<SignInStartIdentifier>(identifierAttributes[0] || '');
@@ -47,8 +50,10 @@ export function _SignInStart(): JSX.Element {
   const web3FirstFactors = userSettings.web3FirstFactors;
   const authenticatableSocialStrategies = userSettings.authenticatableSocialStrategies;
   const passwordBasedInstance = userSettings.instanceIsPasswordBased;
-  const identifierInputDisplayValues = getIdentifierControlDisplayValues(identifierAttributes, identifierAttribute);
-  const passwordInputRef = useRef<HTMLInputElement>(null);
+  const { currentIdentifier, nextIdentifier } = getIdentifierControlDisplayValues(
+    identifierAttributes,
+    identifierAttribute,
+  );
   const instantPasswordField = useFormControl('password', '', {
     type: 'password',
     label: localizationKeys('formFieldLabel__password'),
@@ -56,7 +61,7 @@ export function _SignInStart(): JSX.Element {
   });
 
   const identifierField = useFormControl('identifier', '', {
-    ...identifierInputDisplayValues,
+    ...currentIdentifier,
     isRequired: true,
   });
 
@@ -71,24 +76,6 @@ export function _SignInStart(): JSX.Element {
     setIdentifierAttribute('phone_number');
     identifierField.setValue(value || '');
   };
-
-  // show password if it's autofilled by the browser
-  React.useLayoutEffect(() => {
-    const intervalId = setInterval(() => {
-      if (passwordInputRef?.current) {
-        const autofilled =
-          window.getComputedStyle(passwordInputRef.current, ':autofill').animationName === 'onAutoFillStart';
-        if (autofilled) {
-          setPasswordAutofilled(autofilled);
-          clearInterval(intervalId);
-        }
-      }
-    }, 500);
-
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, []);
 
   // switch to the phone input (if available) if a "+" is entered
   // (either by the browser or the user)
@@ -256,17 +243,13 @@ export function _SignInStart(): JSX.Element {
               <Form.Root onSubmit={handleFirstPartySubmit}>
                 <Form.ControlRow elementId={identifierField.id}>
                   <Form.Control
-                    actionLabel={identifierInputDisplayValues.action}
+                    actionLabel={nextIdentifier?.action}
                     onActionClicked={switchToNextIdentifier}
                     {...identifierField.props}
                     autoFocus={shouldAutofocus}
                   />
                 </Form.ControlRow>
-                <InstantPasswordRow
-                  field={passwordBasedInstance ? instantPasswordField : undefined}
-                  autofilled={passwordAutofilled}
-                  ref={passwordInputRef}
-                />
+                <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
                 <Form.SubmitButton>Continue</Form.SubmitButton>
               </Form.Root>
             ) : null}
@@ -291,26 +274,44 @@ export function _SignInStart(): JSX.Element {
   );
 }
 
-const InstantPasswordRow = forwardRef<HTMLInputElement, { field?: FormControlState<'password'>; autofilled?: boolean }>(
-  ({ field, autofilled }, ref) => {
-    if (!field) {
-      return null;
-    }
-    return (
-      <Form.ControlRow
-        elementId={field.id}
-        sx={
-          !field.value && !autofilled ? { opacity: 0, height: 0, pointerEvents: 'none', marginTop: '-1rem' } : undefined
+const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> }) => {
+  const [autofilled, setAutofilled] = useState(false);
+  const ref = useRef<HTMLInputElement>(null);
+
+  // show password if it's autofilled by the browser
+  React.useLayoutEffect(() => {
+    const intervalId = setInterval(() => {
+      if (ref?.current) {
+        const autofilled = window.getComputedStyle(ref.current, ':autofill').animationName === 'onAutoFillStart';
+        if (autofilled) {
+          setAutofilled(autofilled);
+          clearInterval(intervalId);
         }
-      >
-        <Form.Control
-          {...field.props}
-          ref={ref}
-          tabIndex={!field.value ? -1 : undefined}
-        />
-      </Form.ControlRow>
-    );
-  },
-);
+      }
+    }, 500);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
+
+  if (!field) {
+    return null;
+  }
+  return (
+    <Form.ControlRow
+      elementId={field.id}
+      sx={
+        !field.value && !autofilled ? { opacity: 0, height: 0, pointerEvents: 'none', marginTop: '-1rem' } : undefined
+      }
+    >
+      <Form.Control
+        {...field.props}
+        ref={ref}
+        tabIndex={!field.value ? -1 : undefined}
+      />
+    </Form.ControlRow>
+  );
+};
 
 export const SignInStart = withRedirectToHomeSingleSessionGuard(withCardStateProvider(_SignInStart));

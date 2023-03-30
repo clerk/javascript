@@ -131,13 +131,17 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
         onChange={handlePhoneNumberChange}
         maxLength={25}
         type='tel'
-        sx={{
-          borderColor: 'transparent',
-          height: '100%',
-          borderTopLeftRadius: '0',
-          borderBottomLeftRadius: '0',
-        }}
+        sx={[
+          {
+            borderColor: 'transparent',
+            height: '100%',
+            borderTopLeftRadius: '0',
+            borderBottomLeftRadius: '0',
+          },
+          sx,
+        ]}
         ref={phoneInputRef}
+        //use our internal ref while forwarding
         //@ts-expect-error
         ref={mergeRefs(phoneInputRef, ref)}
         {...rest}
