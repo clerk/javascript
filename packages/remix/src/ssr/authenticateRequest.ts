@@ -2,7 +2,7 @@ import type { RequestState } from '@clerk/backend';
 import { Clerk } from '@clerk/backend';
 import { handleValueOrFn, isHttpOrHttps } from '@clerk/shared';
 
-import { noRelativeProxyInSSR, noSecretKeyOrApiKeyError } from '../errors';
+import { noRelativeProxyInSSR, noSecretKeyOrApiKeyError, satelliteAndMissingProxyUrlAndDomain } from '../errors';
 import { getEnvVariable } from '../utils';
 import type { LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
 import { parseCookies } from './utils';
@@ -51,6 +51,10 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
 
   if (!!proxyUrl && !isHttpOrHttps(proxyUrl)) {
     throw new Error(noRelativeProxyInSSR);
+  }
+
+  if (isSatellite && !proxyUrl && !domain) {
+    throw new Error(satelliteAndMissingProxyUrlAndDomain);
   }
 
   const { headers } = request;

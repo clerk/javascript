@@ -78,3 +78,7 @@ Otherwise, you can pass a secretKey parameter to rootAuthLoader or getAuth.
 export const noRelativeProxyInSSR = createErrorMessage(
   `Only a absolute URL that starts with https is allowed to be used in SSR`,
 );
+
+export const satelliteAndMissingProxyUrlAndDomain = createErrorMessage(
+  `Missing domain and proxyUrl. A satellite application needs to specify a domain or a proxyUrl`,
+);

@@ -25,16 +25,14 @@
  *  - all other chunks need to be loaded from https://pk.accounts.dev/npm/@clerk/clerk-js@__PKG_VERSION__/dist/
  */
 if (!__DEV__) {
+  const CLERKJS_NPM_PATH_REGEX = /(^.*\/@clerk\/clerk-js@)(.+?)(\/dist.*)/;
   const setWebpackChunkPublicPath = () => {
-    const VERSION_REGEX = /@clerk\/clerk-js@(.+?)\//;
     try {
       // @ts-expect-error
       const scriptUrl = new URL(document.currentScript.src);
       let hrefWithoutFilename = new URL(scriptUrl.href.split('/').slice(0, -1).join('/')).href;
       hrefWithoutFilename += hrefWithoutFilename.endsWith('/') ? '' : '/';
-      const matches = hrefWithoutFilename.match(VERSION_REGEX) || [];
-      const tag = matches[1];
-      __webpack_public_path__ = tag ? hrefWithoutFilename.replace(tag, __PKG_VERSION__) : hrefWithoutFilename;
+      __webpack_public_path__ = hrefWithoutFilename.replace(CLERKJS_NPM_PATH_REGEX, `$1${__PKG_VERSION__}$3`);
     } catch (e) {
       //
     }

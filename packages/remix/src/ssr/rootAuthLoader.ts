@@ -14,11 +14,11 @@ import {
 } from './utils';
 
 interface RootAuthLoader {
-  <Options extends RootAuthLoaderOptions>(
+  <Options extends RootAuthLoaderOptions, Callback extends RootAuthLoaderCallback<Options>>(
     args: LoaderFunctionArgs,
-    callback: RootAuthLoaderCallback<Options>,
+    callback: Callback,
     options?: Options,
-  ): Promise<LoaderFunctionReturn>;
+  ): Promise<ReturnType<Callback>>;
 
   (args: LoaderFunctionArgs, options?: RootAuthLoaderOptions): Promise<LoaderFunctionReturn>;
 }

@@ -77,7 +77,7 @@ type LazyModalRendererProps = React.PropsWithChildren<
 
 export const LazyModalRenderer = (props: LazyModalRendererProps) => {
   return (
-    <Suspense fallback={'Loading...'}>
+    <Suspense fallback={''}>
       <AppearanceProvider
         globalAppearance={props.globalAppearance}
         appearanceKey={props.appearanceKey}

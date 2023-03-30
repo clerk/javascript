@@ -55,6 +55,10 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
     const isSatellite = handleValueOrFn(opts.isSatellite, new URL(req.url), IS_SATELLITE);
     const domain = handleValueOrFn(opts.domain, new URL(req.url), DOMAIN);
 
+    if (isSatellite && !proxyUrl && !domain) {
+      throw new Error(`Missing domain and proxyUrl. A satellite application needs to specify a domain or a proxyUrl`);
+    }
+
     // get auth state, check if we need to return an interstitial
     const cookieToken = getCookie(req, constants.Cookies.Session);
     const headerToken = headers.get('authorization')?.replace('Bearer ', '');

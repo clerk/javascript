@@ -1,3 +1,4 @@
+import type { InvitationStatus } from './Enums';
 import type { InvitationJSON } from './JSON';
 
 export class Invitation {
@@ -7,6 +8,7 @@ export class Invitation {
     readonly publicMetadata: Record<string, unknown> | null,
     readonly createdAt: number,
     readonly updatedAt: number,
+    readonly status: InvitationStatus,
     readonly revoked?: boolean,
   ) {}
 
@@ -17,6 +19,7 @@ export class Invitation {
       data.public_metadata,
       data.created_at,
       data.updated_at,
+      data.status,
       data.revoked,
     );
   }

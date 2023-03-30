@@ -22,7 +22,6 @@ import {
   emailOrPhone,
   getInitialActiveIdentifier,
   minimizeFieldsForExistingSignup,
-  showFormFields,
 } from './signUpFormHelpers';
 import { SignUpSocialButtons } from './SignUpSocialButtons';
 import { completeSignUpFlow } from './util';
@@ -173,15 +172,13 @@ function _SignUpContinue() {
                 enableWeb3Providers={showWeb3Providers}
               />
             )}
-            {showFormFields(userSettings) && (
-              <SignUpForm
-                handleSubmit={handleSubmit}
-                fields={fields}
-                formState={formState}
-                canToggleEmailPhone={canToggleEmailPhone}
-                handleEmailPhoneToggle={handleChangeActive}
-              />
-            )}
+            <SignUpForm
+              handleSubmit={handleSubmit}
+              fields={fields}
+              formState={formState}
+              canToggleEmailPhone={canToggleEmailPhone}
+              handleEmailPhoneToggle={handleChangeActive}
+            />
           </SocialButtonsReversibleContainerWithDivider>
         </Flex>
         <Footer.Root>

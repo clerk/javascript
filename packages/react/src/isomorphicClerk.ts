@@ -3,10 +3,10 @@ import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
   Clerk,
-  Clerk as ClerkInterface,
   ClientResource,
   CreateOrganizationParams,
   CreateOrganizationProps,
+  DomainOrProxyUrl,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
   OrganizationMembershipResource,
@@ -25,6 +25,7 @@ import type {
 } from '@clerk/types';
 import type { OrganizationProfileProps, OrganizationSwitcherProps } from '@clerk/types/src';
 
+import { unsupportedNonBrowserDomainFunction } from './errors';
 import type {
   BrowserClerk,
   BrowserClerkConstructor,
@@ -72,7 +73,7 @@ export default class IsomorphicClerk {
   private loadedListeners: Array<() => void> = [];
 
   #loaded = false;
-  #domain?: ClerkInterface['domain'];
+  #domain: DomainOrProxyUrl['domain'];
 
   get loaded(): boolean {
     return this.#loaded;
@@ -91,6 +92,14 @@ export default class IsomorphicClerk {
   }
 
   get domain(): string {
+    // This getter can run in environments where window is not available.
+    // In those cases we should expect and use domain as a string
+    if (!inClientSide()) {
+      if (typeof this.#domain === 'function') {
+        throw new Error(unsupportedNonBrowserDomainFunction);
+      }
+      return this.#domain || '';
+    }
     return handleValueOrFn(this.#domain, new URL(window.location.href), '');
   }
 

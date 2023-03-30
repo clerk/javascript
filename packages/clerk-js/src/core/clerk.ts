@@ -3,6 +3,7 @@ import {
   addClerkPrefix,
   handleValueOrFn,
   inClientSide,
+  isHttpOrHttps,
   isLegacyFrontendApiKey,
   isValidBrowserOnline,
   isValidProxyUrl,
@@ -75,14 +76,16 @@ import {
   windowNavigate,
 } from '../utils';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
-import { CLERK_SYNCED, DEV_BROWSER_SSO_JWT_PARAMETER, ERROR_CODES } from './constants';
+import { CLERK_SATELLITE_URL, CLERK_SYNCED, DEV_BROWSER_SSO_JWT_PARAMETER, ERROR_CODES } from './constants';
 import type { DevBrowserHandler } from './devBrowserHandler';
 import createDevBrowserHandler from './devBrowserHandler';
 import {
   clerkErrorInitFailed,
   clerkMissingDevBrowserJwt,
   clerkMissingProxyUrlAndDomain,
+  clerkMissingSignInUrlAsSatellite,
   clerkOAuthCallbackDidNotCompleteSignInSIgnUp,
+  clerkRedirectUrlIsMissingScheme,
 } from './errors';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import createFapiClient from './fapiClient';
@@ -115,6 +118,7 @@ const defaultOptions: ClerkOptions = {
   standardBrowser: true,
   touchSession: true,
   isSatellite: false,
+  signInUrl: undefined,
 };
 
 export default class Clerk implements ClerkInterface {
@@ -128,7 +132,7 @@ export default class Clerk implements ClerkInterface {
   public readonly publishableKey?: string;
   public readonly proxyUrl?: ClerkInterface['proxyUrl'];
 
-  #domain?: ClerkInterface['domain'];
+  #domain: DomainOrProxyUrl['domain'];
   #authService: SessionCookieService | null = null;
   #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
   #componentControls?: ReturnType<MountComponentRenderer> | null;
@@ -156,7 +160,15 @@ export default class Clerk implements ClerkInterface {
   }
 
   get domain(): string {
-    return addClerkPrefix(stripScheme(handleValueOrFn(this.#domain, new URL(window.location.href))));
+    const strippedDomainString = stripScheme(handleValueOrFn(this.#domain, new URL(window.location.href)));
+    if (this.#instanceType === 'production') {
+      return addClerkPrefix(strippedDomainString);
+    }
+    return strippedDomainString;
+  }
+
+  get instanceType() {
+    return this.#instanceType;
   }
 
   public constructor(key: string, options?: DomainOrProxyUrl) {
@@ -660,6 +672,20 @@ export default class Clerk implements ClerkInterface {
     return this.buildUrlWithAuth(this.#environment.displayConfig.organizationProfileUrl);
   }
 
+  #redirectToSatellite = async (): Promise<unknown> => {
+    if (!inBrowser()) {
+      return;
+    }
+    const searchParams = new URLSearchParams({
+      [CLERK_SYNCED]: 'true',
+    });
+    const backToSatelliteUrl = buildURL(
+      { base: getClerkQueryParam(CLERK_SATELLITE_URL) as string, searchParams },
+      { stringify: true },
+    );
+    return this.navigate(this.buildUrlWithAuth(backToSatelliteUrl, false));
+  };
+
   public redirectWithAuth = async (to: string): Promise<unknown> => {
     if (inBrowser()) {
       return this.navigate(this.buildUrlWithAuth(to));
@@ -749,7 +775,7 @@ export default class Clerk implements ClerkInterface {
     params: HandleOAuthCallbackParams = {},
     customNavigate?: (to: string) => Promise<unknown>,
   ): Promise<unknown> => {
-    if (!this.isReady || !this.#environment || !this.client) {
+    if (!this.#isReady || !this.#environment || !this.client) {
       return;
     }
     const { signIn, signUp } = this.client;
@@ -1004,7 +1030,14 @@ export default class Clerk implements ClerkInterface {
 
   #clearJustSynced = () => removeClerkQueryParam(CLERK_SYNCED);
 
-  #buildPrimarySyncUrl = (): string => {
+  #buildSyncUrlForDevelopmentInstances = (): string => {
+    const searchParams = new URLSearchParams({
+      [CLERK_SATELLITE_URL]: window.location.href,
+    });
+    return buildURL({ base: this.#options.signInUrl, searchParams }, { stringify: true });
+  };
+
+  #buildSyncUrlForProductionInstances = (): string => {
     let primarySyncUrl;
 
     if (this.proxyUrl) {
@@ -1012,8 +1045,6 @@ export default class Clerk implements ClerkInterface {
       primarySyncUrl = new URL(`${proxy.pathname}/v1/client/sync`, proxy.origin);
     } else if (this.domain) {
       primarySyncUrl = new URL(`/v1/client/sync`, `https://${this.domain}`);
-    } else {
-      clerkMissingProxyUrlAndDomain();
     }
 
     primarySyncUrl?.searchParams.append('redirect_url', window.location.href);
@@ -1022,12 +1053,32 @@ export default class Clerk implements ClerkInterface {
   };
 
   #shouldSyncWithPrimary = (): boolean => {
+    if (this.#hasJustSynced()) {
+      this.#clearJustSynced();
+      return false;
+    }
+
     if (!this.isSatellite) {
       return false;
     }
 
-    if (this.#hasJustSynced()) {
-      this.#clearJustSynced();
+    if (!this.proxyUrl && !this.domain) {
+      clerkMissingProxyUrlAndDomain();
+    }
+
+    return this.#shouldSyncWithPrimaryInDevelopment() || this.#shouldSyncWithPrimaryInProduction();
+  };
+
+  #shouldSyncWithPrimaryInDevelopment = (): boolean => {
+    if (this.#instanceType === 'development' && !this.#options.signInUrl) {
+      clerkMissingSignInUrlAsSatellite();
+    }
+
+    return this.#instanceType === 'development';
+  };
+
+  #shouldSyncWithPrimaryInProduction = (): boolean => {
+    if (this.#instanceType === 'development') {
       return false;
     }
 
@@ -1035,32 +1086,62 @@ export default class Clerk implements ClerkInterface {
     return cookieHandler.getClientUatCookie() <= 0;
   };
 
-  #syncWithPrimary = async () => {
-    await this.navigate(this.#buildPrimarySyncUrl());
-  };
-
-  #loadInStandardBrowser = async (): Promise<boolean> => {
-    if (this.#shouldSyncWithPrimary()) {
-      await this.#syncWithPrimary();
-      // ClerkJS is not considered loaded during the sync/link process with the primary domain
+  #shouldRedirectToSatellite = (): boolean => {
+    if (this.#instanceType === 'production') {
       return false;
     }
 
-    this.#authService = new SessionCookieService(this);
-    this.#pageLifecycle = createPageLifecycle();
+    if (this.isSatellite) {
+      return false;
+    }
 
+    const satelliteUrl = getClerkQueryParam(CLERK_SATELLITE_URL);
+    if (!satelliteUrl) {
+      return false;
+    }
+
+    if (!isHttpOrHttps(satelliteUrl)) {
+      clerkRedirectUrlIsMissingScheme();
+    }
+
+    return true;
+  };
+
+  #syncWithPrimary = async () => {
+    if (this.#shouldSyncWithPrimaryInDevelopment()) {
+      await this.navigate(this.#buildSyncUrlForDevelopmentInstances());
+    } else if (this.#shouldSyncWithPrimaryInProduction()) {
+      await this.navigate(this.#buildSyncUrlForProductionInstances());
+    }
+  };
+
+  #loadInStandardBrowser = async (): Promise<boolean> => {
+    // Dev Browser handling
     this.#devBrowserHandler = createDevBrowserHandler({
       frontendApi: this.frontendApi,
       fapiClient: this.#fapiClient,
     });
-
-    const isInAccountsHostedPages = isAccountsHostedPages(window?.location.hostname);
 
     if (this.#instanceType === 'production') {
       await this.#devBrowserHandler.clear();
     } else {
       await this.#devBrowserHandler.setup();
     }
+
+    // Multidomain SSO handling
+    if (this.#shouldSyncWithPrimary()) {
+      await this.#syncWithPrimary();
+      // ClerkJS is not considered loaded during the sync/link process with the primary domain
+      return false;
+    } else if (this.#shouldRedirectToSatellite()) {
+      await this.#redirectToSatellite();
+      return false;
+    }
+
+    this.#authService = new SessionCookieService(this);
+    this.#pageLifecycle = createPageLifecycle();
+
+    const isInAccountsHostedPages = isAccountsHostedPages(window?.location.hostname);
 
     this.#setupListeners();
 
