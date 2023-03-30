@@ -14,7 +14,7 @@ export type ClerkOptions = CreateBackendApiOptions &
   Partial<
     Pick<
       CreateAuthenticateRequestOptions['options'],
-      'jwtKey' | 'proxyUrl' | 'secretKey' | 'publishableKey' | 'domain' | 'isSatellite'
+      'audience' | 'jwtKey' | 'proxyUrl' | 'secretKey' | 'publishableKey' | 'domain' | 'isSatellite'
     >
   >;
 
