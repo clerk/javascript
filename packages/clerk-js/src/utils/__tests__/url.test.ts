@@ -10,8 +10,6 @@ import {
   isAccountsHostedPages,
   isDataUri,
   isValidUrl,
-  removeSearchParameterFromHash,
-  setSearchParameterInHash,
   trimTrailingSlash,
 } from '../url';
 
@@ -338,49 +336,6 @@ describe('getSearchParameterFromHash(options)', () => {
   test.each(testCases)('hash=(%s), paramName=(%s), expected value=(%s)', (hash, paramName, expectedParamValue) => {
     expect(
       getSearchParameterFromHash({
-        hash,
-        paramName,
-      }),
-    ).toEqual(expectedParamValue);
-  });
-});
-
-describe('setSearchParameterInHash(options)', () => {
-  const testCases: Array<[string, string, string, string]> = [
-    ['', 'foo', '42', '/?foo=42'],
-    ['#', 'foo', '42', '/?foo=42'],
-    ['#a-hash', 'foo', '42', '/a-hash?foo=42'],
-    ['a-hash', 'foo', '', '/a-hash?foo='],
-    ['#a-hash?foo=42', 'bar', '84', '/a-hash?foo=42&bar=84'],
-    ['#a-hash?foo=42', 'foo', '84', '/a-hash?foo=84'],
-    ['#/a-hash?foo=42', 'foo', '84', '/a-hash?foo=84'],
-  ];
-
-  test.each(testCases)(
-    'hash=(%s), paramName=(%s), paramValue=(%s), expected hash=(%s)',
-    (hash, paramName, paramValue, expectedHash) => {
-      expect(
-        setSearchParameterInHash({
-          hash,
-          paramName,
-          paramValue,
-        }),
-      ).toEqual(expectedHash);
-    },
-  );
-});
-
-describe('removeSearchParameterFromHash(options)', () => {
-  const testCases: Array<[string, string, string | null]> = [
-    ['#random-hash', 'foo', '/random-hash'],
-    ['random-hash', 'foo', '/random-hash'],
-    ['#random-hash?foo=42', 'foo', '/random-hash'],
-    ['random-hash?foo=42&bar=84', 'bar', '/random-hash?foo=42'],
-  ];
-
-  test.each(testCases)('hash=(%s), paramName=(%s), expected value=(%s)', (hash, paramName, expectedParamValue) => {
-    expect(
-      removeSearchParameterFromHash({
         hash,
         paramName,
       }),
