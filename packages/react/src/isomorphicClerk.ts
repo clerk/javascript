@@ -1,4 +1,4 @@
-import { handleValueOrFn } from '@clerk/shared';
+import { handleValueOrFn, inClientSide } from '@clerk/shared';
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
@@ -34,7 +34,7 @@ import type {
   HeadlessBrowserClerkConstrutor,
   IsomorphicClerkOptions,
 } from './types';
-import { inClientSide, isConstructor, loadScript } from './utils';
+import { isConstructor, loadScript } from './utils';
 
 export interface Global {
   Clerk?: HeadlessBrowserClerk | BrowserClerk;
