@@ -267,4 +267,28 @@ describe('User', () => {
       expect(user.fullName).toBe(fullName);
     });
   });
+
+  it('.updatePassword triggers a request to change password', async () => {
+    // @ts-ignore
+    BaseResource._fetch = jest.fn().mockReturnValue(Promise.resolve({ response: {} }));
+
+    const user = new User({
+      email_addresses: [],
+      phone_numbers: [],
+      web3_wallets: [],
+      external_accounts: [],
+    } as unknown as UserJSON);
+    const params = {
+      currentPassword: 'current-password',
+      newPassword: 'new-password',
+    };
+    await user.updatePassword(params);
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({
+      method: 'POST',
+      path: '/me/password/change',
+      body: params,
+    });
+  });
 });
