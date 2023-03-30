@@ -16,6 +16,7 @@ export const Image = React.forwardRef<HTMLImageElement, ImageProps>((props, ref)
 
   return (
     <img
+      crossOrigin='anonymous'
       srcSet={shouldAdjustSize ? generateSrcSet({ src, width: size, xDescriptors }) : undefined}
       src={shouldAdjustSize ? generateSrc({ src, width: size * 2 }) : src}
       {...applyDataStateProps(rest)}
