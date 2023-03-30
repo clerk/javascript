@@ -20,7 +20,8 @@ function isDevelopmentFromApiKey(apiKey: string): boolean {
  */
 export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoaderOptions = {}): Promise<RequestState> {
   const { request, context } = args;
-  const { loadSession, loadUser, loadOrganization, authorizedParties } = opts;
+  const { loadSession, loadUser, loadOrganization } = opts;
+  const { audience, authorizedParties } = opts;
 
   // Fetch environment variables across Remix runtimes.
   // 1. First check if the user passed the key in the getAuth function or the rootAuthLoader.
@@ -91,6 +92,7 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
 
   return Clerk({ apiUrl, apiKey, secretKey, jwtKey, proxyUrl, isSatellite, domain }).authenticateRequest({
     apiKey,
+    audience,
     secretKey,
     jwtKey,
     frontendApi,
