@@ -13,17 +13,20 @@ type BuildClerkOptions = {
   tokenCache: TokenCache;
 };
 
+// error handler that logs the error (used in cookie retrieval and token saving)
+const logErrorHandler = (err: Error) => console.error(err);
+
 export async function buildClerk({ publishableKey, tokenCache }: BuildClerkOptions): Promise<ClerkProp> {
   if (!clerk) {
     const clerkFrontendAPIOrigin = convertPublishableKeyToFrontendAPIOrigin(publishableKey);
 
-    const clientCookie = await getClientCookie(clerkFrontendAPIOrigin);
+    const clientCookie = await getClientCookie(clerkFrontendAPIOrigin).catch(logErrorHandler);
 
     // TODO: Listen to client cookie changes and sync updates
     // https://developer.chrome.com/docs/extensions/reference/cookies/#event-onChanged
 
     if (clientCookie) {
-      await tokenCache.saveToken(KEY, clientCookie.value);
+      await tokenCache.saveToken(KEY, clientCookie.value).catch(logErrorHandler);
     }
 
     clerk = new Clerk(publishableKey);
