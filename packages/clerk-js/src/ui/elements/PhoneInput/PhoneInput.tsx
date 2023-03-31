@@ -140,7 +140,6 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
           },
           sx,
         ]}
-        ref={phoneInputRef}
         //use our internal ref while forwarding
         //@ts-expect-error
         ref={mergeRefs(phoneInputRef, ref)}
