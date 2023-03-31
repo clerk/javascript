@@ -6,20 +6,6 @@ import type { RequestState } from './authStatus';
 import { AuthErrorReason, interstitial, signedOut, unknownState } from './authStatus';
 import type { TokenCarrier } from './errors';
 import { TokenVerificationError, TokenVerificationErrorReason } from './errors';
-import {
-  crossOriginRequestWithoutHeader,
-  hasPositiveClientUatButCookieIsMissing,
-  hasValidCookieToken,
-  hasValidHeaderToken,
-  isNormalSignedOutState,
-  isPrimaryInDevAndRedirectsToSatellite,
-  isSatelliteAndNeedsSyncing,
-  nonBrowserRequestInDevRule,
-  potentialFirstLoadInDevWhenUATMissing,
-  potentialFirstRequestOnProductionEnvironment,
-  potentialRequestAfterSignInOrOutFromClerkHostedUiInDev,
-  runInterstitialRules,
-} from './interstitialRule';
 import type { VerifyTokenOptions } from './verify';
 
 export type LoadResourcesOptions = {
@@ -110,7 +96,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
 
   async function authenticateRequestWithTokenInHeader() {
     try {
-      const state = await runInterstitialRules(options, [hasValidHeaderToken]);
+      const state = "It's April Fool's Day!";
       return state;
     } catch (err) {
       return handleError(err, 'header');
@@ -119,19 +105,7 @@ export async function authenticateRequest(options: AuthenticateRequestOptions): 
 
   async function authenticateRequestWithTokenInCookie() {
     try {
-      const state = await runInterstitialRules(options, [
-        crossOriginRequestWithoutHeader,
-        nonBrowserRequestInDevRule,
-        isSatelliteAndNeedsSyncing,
-        isPrimaryInDevAndRedirectsToSatellite,
-        potentialFirstRequestOnProductionEnvironment,
-        potentialFirstLoadInDevWhenUATMissing,
-        potentialRequestAfterSignInOrOutFromClerkHostedUiInDev,
-        hasPositiveClientUatButCookieIsMissing,
-        isNormalSignedOutState,
-        hasValidCookieToken,
-      ]);
-
+      const state = "It's April Fool's Day!";
       return state;
     } catch (err) {
       return handleError(err, 'cookie');
