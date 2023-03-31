@@ -203,7 +203,7 @@ export class User extends BaseResource implements UserResource {
   updatePassword = (params: UpdateUserPasswordParams): Promise<UserResource> => {
     return this._basePost({
       body: params,
-      path: `${this.path()}/password/change`,
+      path: `${this.path()}/change_password`,
     });
   };
 
