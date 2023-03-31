@@ -94,13 +94,13 @@ export default class IsomorphicClerk {
   get domain(): string {
     // This getter can run in environments where window is not available.
     // In those cases we should expect and use domain as a string
-    if (!inClientSide()) {
-      if (typeof this.#domain === 'function') {
-        throw new Error(unsupportedNonBrowserDomainFunction);
-      }
-      return this.#domain || '';
+    if (typeof window !== 'undefined' && window.location) {
+      return handleValueOrFn(this.#domain, new URL(window.location.href), '');
     }
-    return handleValueOrFn(this.#domain, new URL(window.location.href), '');
+    if (typeof this.#domain === 'function') {
+      throw new Error(unsupportedNonBrowserDomainFunction);
+    }
+    return this.#domain || '';
   }
 
   constructor(options: IsomorphicClerkOptions) {
@@ -130,10 +130,12 @@ export default class IsomorphicClerk {
     // For more information refer to:
     // - https://github.com/remix-run/remix/issues/2947
     // - https://github.com/facebook/react/issues/24430
-    window.__clerk_frontend_api = this.frontendApi;
-    window.__clerk_publishable_key = this.publishableKey;
-    window.__clerk_proxy_url = this.proxyUrl;
-    window.__clerk_domain = this.domain;
+    if (typeof window !== 'undefined') {
+      window.__clerk_frontend_api = this.frontendApi;
+      window.__clerk_publishable_key = this.publishableKey;
+      window.__clerk_proxy_url = this.proxyUrl;
+      window.__clerk_domain = this.domain;
+    }
 
     try {
       if (this.Clerk) {
