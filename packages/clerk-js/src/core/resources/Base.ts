@@ -47,8 +47,9 @@ export abstract class BaseResource {
 
     const { payload, status, statusText, headers } = fapiResponse;
 
-    if (payload?.meta) {
-      const country = headers.get('country');
+    if (headers) {
+      const country = headers.get('x-country');
+
       this.clerk.__internal_setCountry(country ? country.toLowerCase() : null);
     }
 
