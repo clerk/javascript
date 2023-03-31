@@ -6,6 +6,7 @@ import keysTest from './dist/tokens/keys.test.js';
 import pathTest from './dist/util/path.test.js';
 import verifyTest from './dist/tokens/verify.test.js';
 import verifyJwtTest from './dist/tokens/jwt/verifyJwt.test.js';
+import jwtAssertionsTest from './dist/tokens/jwt/assertions.test.js';
 
 import utilRequestTest from './dist/util/request.test.js';
 import factoryTest from './dist/api/factory.test.js';
@@ -18,6 +19,7 @@ import redirectTest from './dist/redirections.test.js';
 const suites = [
   apiTest,
   exportsTest,
+  jwtAssertionsTest,
   requestTest,
   utilRequestTest,
   keysTest,

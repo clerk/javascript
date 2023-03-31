@@ -5,6 +5,7 @@ import type { Jwt, JwtPayload } from '@clerk/types';
 import runtime from '../../runtime';
 import { base64url } from '../../util/rfc4648';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
+import { assertAudienceClaim } from './assertions';
 
 type IssuerResolver = string | ((iss: string) => boolean);
 
@@ -32,10 +33,6 @@ const jwksAlgToCryptoAlg: Record<string, string> = {
 };
 
 const algs = Object.keys(algToHash);
-
-const isArrayString = (s: unknown): s is string[] => {
-  return Array.isArray(s) && s.length > 0 && s.every(a => typeof a === 'string');
-};
 
 export async function hasValidSignature(jwt: Jwt, jwk: JsonWebKey) {
   const { header, signature, raw } = jwt;
@@ -151,41 +148,7 @@ export async function verifyJwt(
     });
   }
 
-  // Verify audience claim (aud)
-  const audiences = [audience].flat().filter(a => !!a);
-  const shouldVerifyAudience = audiences.length > 0 && aud;
-
-  if (!shouldVerifyAudience) {
-    // Avoid verifying aud claim & audience param
-    // Notice: Clerk JWTs use AZP claim instead of Audience
-    //
-    // return {
-    //   valid: false,
-    //   reason: `Invalid JWT audience claim (aud) ${JSON.stringify(
-    //     aud,
-    //   )}. Expected a string or a non-empty array of strings.`,
-    // };
-  } else if (typeof aud === 'string') {
-    if (!audiences.includes(aud)) {
-      throw new TokenVerificationError({
-        action: TokenVerificationErrorAction.EnsureClerkJWT,
-        reason: TokenVerificationErrorReason.TokenVerificationFailed,
-        message: `Invalid JWT audience claim (aud) ${JSON.stringify(aud)}. Is not included in "${JSON.stringify(
-          audiences,
-        )}".`,
-      });
-    }
-  } else if (isArrayString(aud)) {
-    if (!aud.some(a => audiences.includes(a))) {
-      throw new TokenVerificationError({
-        action: TokenVerificationErrorAction.EnsureClerkJWT,
-        reason: TokenVerificationErrorReason.TokenVerificationFailed,
-        message: `Invalid JWT audience claim array (aud) ${JSON.stringify(aud)}. Is not included in "${JSON.stringify(
-          audiences,
-        )}".`,
-      });
-    }
-  }
+  assertAudienceClaim([aud], [audience]);
 
   // Verify authorized parties claim (azp)
   if (azp && authorizedParties && authorizedParties.length > 0 && !authorizedParties.includes(azp)) {
