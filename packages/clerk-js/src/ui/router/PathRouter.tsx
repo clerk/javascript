@@ -13,6 +13,7 @@ interface PathRouterProps {
 export const PathRouter = ({ basePath, preservedParams, children }: PathRouterProps): JSX.Element | null => {
   const { navigate } = useCoreClerk();
   const [stripped, setStripped] = React.useState(false);
+
   if (!navigate) {
     throw new Error('Clerk: Missing navigate option.');
   }
@@ -34,19 +35,22 @@ export const PathRouter = ({ basePath, preservedParams, children }: PathRouterPr
   };
 
   React.useEffect(() => {
-    const effect = async () => {
+    const convertHashToPath = async () => {
       if (window.location.hash.startsWith('#/')) {
-        const url = new URL(window.location.href);
-        const hashToPath = new URL(window.location.pathname + window.location.hash.substr(1), window.location.href);
+        const hashToPath = new URL(window.location.pathname + window.location.hash.substring(1), window.location.href);
         hashToPath.pathname = trimTrailingSlash(hashToPath.pathname);
+
+        //transfer search params
+        const url = new URL(window.location.href);
         for (const [key, value] of url.searchParams) {
           hashToPath.searchParams.append(key, value);
         }
+
         await navigate(stripOrigin(hashToPath));
         setStripped(true);
       }
     };
-    void effect();
+    void convertHashToPath();
   }, [setStripped, navigate, window.location.hash]);
 
   if (window.location.hash.startsWith('#/') && !stripped) {
