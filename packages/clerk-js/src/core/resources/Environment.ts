@@ -7,7 +7,6 @@ import type {
   UserSettingsResource,
 } from '@clerk/types';
 
-import type { CountryIso } from '../../ui/elements/PhoneInput/countryCodeData';
 import { AuthConfig, BaseResource, DisplayConfig, UserSettings } from './internal';
 import { OrganizationSettings } from './OrganizationSettings';
 
@@ -19,7 +18,6 @@ export class Environment extends BaseResource implements EnvironmentResource {
   displayConfig!: DisplayConfigResource;
   userSettings!: UserSettingsResource;
   organizationSettings!: OrganizationSettingsResource;
-  countryIso!: CountryIso | null;
 
   public static getInstance(): Environment {
     if (!Environment.instance) {
@@ -60,8 +58,6 @@ export class Environment extends BaseResource implements EnvironmentResource {
   protected fromJSON(data: EnvironmentJSON | null): this {
     if (data) {
       this.authConfig = new AuthConfig(data.auth_config);
-      const countryIso = data.meta?.responseHeaders?.country;
-      this.countryIso = (countryIso ? countryIso.toLowerCase() : null) as CountryIso | null;
       this.displayConfig = new DisplayConfig(data.display_config);
       this.userSettings = new UserSettings(data.user_settings);
       this.organizationSettings = new OrganizationSettings(data.organization_settings);

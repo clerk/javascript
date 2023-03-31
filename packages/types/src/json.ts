@@ -52,18 +52,11 @@ export interface ImageJSON {
   public_url: string;
 }
 
-// move CountryIso types from clerkjs to this repo. Hence the any type in country
-// packages/clerk-js/src/ui/elements/PhoneInput/countryCodeData.ts
-export interface ResponseHeaderOptionsJSON {
-  responseHeaders: { country: string | null };
-}
-
 export interface EnvironmentJSON extends ClerkResourceJSON {
   auth_config: AuthConfigJSON;
   display_config: DisplayConfigJSON;
   user_settings: UserSettingsJSON;
   organization_settings: OrganizationSettingsJSON;
-  meta: ResponseHeaderOptionsJSON;
 }
 
 export interface ClientJSON extends ClerkResourceJSON {

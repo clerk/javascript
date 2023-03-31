@@ -46,6 +46,7 @@ For package specific details on installation, architecture and usage usage, you 
 - [`@clerk/clerk-react`](./packages/react) Clerk package for React applications.
 - [`@clerk/clerk-sdk-node`](./packages/sdk-node): SDK for native Node.js environment and frameworks.
 - [`@clerk/fastify`](./packages/fastify): Clerk package for Fastify.
+- [`@clerk/chrome-extension`](./packages/chrome-extension): Clerk package for Chrome extensions.
 - [`@clerk/nextjs`](./packages/nextjs): Clerk package for Next.js.
 - [`@clerk/remix`](./packages/remix): Clerk package for Remix.
 - [`@clerk/types`](./packages/types) Main TypeScript typings for Clerk libraries.
