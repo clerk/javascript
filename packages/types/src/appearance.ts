@@ -215,7 +215,7 @@ export type ElementsConfig = {
   formFieldInputCopyToClipboardButton: WithOptions<never, never, never>;
   formFieldInputCopyToClipboardIcon: WithOptions<never, never, never>;
 
-  phoneInputBox: WithOptions<never, never, never>;
+  phoneInputBox: WithOptions<never, ControlState, never>;
 
   avatarBox: WithOptions<never, never, never>;
   avatarImage: WithOptions<never, never, never>;
