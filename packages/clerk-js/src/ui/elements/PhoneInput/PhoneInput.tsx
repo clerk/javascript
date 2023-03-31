@@ -67,6 +67,7 @@ const PhoneInputBase = (props: PhoneInputProps) => {
       elementDescriptor={descriptors.phoneInputBox}
       direction='row'
       center
+      hasError={rest.hasError}
       sx={theme => ({
         position: 'relative',
         borderRadius: theme.radii.$md,

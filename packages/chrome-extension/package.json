@@ -20,8 +20,12 @@
   ],
   "scripts": {
     "build": "tsup --env.NODE_ENV production",
+    "clean": "rimraf ./dist",
     "dev": "tsup --watch",
-    "test": "jest"
+    "lint": "eslint .",
+    "test": "jest",
+    "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@clerk/clerk-js": "^4.35.0-staging.1",
