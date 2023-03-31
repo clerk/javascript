@@ -43,7 +43,6 @@ export interface FapiResponseJSON<T> {
   meta?: {
     client?: ClientJSON;
     session_id?: string;
-    responseHeaders?: { country: string | null };
   };
 }
 
@@ -72,7 +71,7 @@ export default function createFapiClient(clerkInstance: Clerk): FapiClient {
   }
 
   async function runBeforeRequestCallbacks(requestInit: FapiRequestInit) {
-    const windowCallback = typeof window !== 'undefined' && (window as any).__unstable__onBeforeRequest;
+    const windowCallback = typeof window !== 'undefined' && (window as never).__unstable__onBeforeRequest;
     for await (const callback of [windowCallback, ...onBeforeRequestCallbacks].filter(s => s)) {
       if ((await callback(requestInit)) === false) {
         return false;
@@ -215,15 +214,8 @@ export default function createFapiClient(clerkInstance: Clerk): FapiClient {
       clerkNetworkError(urlStr, e);
     }
 
-    const responseHeaders = {
-      country: response.headers.get('x-country'),
-    };
-
     const json: FapiResponseJSON<T> = await response.json();
     const fapiResponse: FapiResponse<T> = Object.assign(response, { payload: json });
-    if (fapiResponse.payload) {
-      fapiResponse.payload.meta = { ...json?.meta, responseHeaders };
-    }
     await runAfterResponseCallbacks(requestInit, fapiResponse);
     return fapiResponse;
   }
