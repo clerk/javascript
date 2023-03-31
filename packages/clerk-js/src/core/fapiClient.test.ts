@@ -144,14 +144,6 @@ describe('request', () => {
     );
   });
 
-  it('returns payload and meta', async () => {
-    const resp = await fapiClientWithProxy.request({
-      path: '/foo',
-    });
-
-    expect(resp.payload?.meta).toBeDefined();
-  });
-
   it('returns array response as array', async () => {
     // @ts-ignore
     global.fetch.mockResolvedValueOnce(
@@ -168,7 +160,6 @@ describe('request', () => {
     });
 
     expect(Array.isArray(resp.payload)).toEqual(true);
-    expect(resp.payload?.meta).toBeDefined();
   });
 
   describe('for production instances', () => {

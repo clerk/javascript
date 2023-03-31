@@ -45,7 +45,12 @@ export abstract class BaseResource {
       }
     }
 
-    const { payload, status, statusText } = fapiResponse;
+    const { payload, status, statusText, headers } = fapiResponse;
+
+    if (payload?.meta) {
+      const country = headers.get('country');
+      this.clerk.__internal_setCountry(country ? country.toLowerCase() : null);
+    }
 
     // TODO: Link to Client payload piggybacking design document
     if (requestInit.method !== 'GET' || opts.forceUpdateClient) {
@@ -114,8 +119,7 @@ export abstract class BaseResource {
       opts,
     );
 
-    const data = json?.response ? { ...json.response, ...json.meta } : json;
-    return this.fromJSON(data as J);
+    return this.fromJSON((json?.response || json) as J);
   }
 
   protected async _baseMutate<J extends ClerkResourceJSON | null>({

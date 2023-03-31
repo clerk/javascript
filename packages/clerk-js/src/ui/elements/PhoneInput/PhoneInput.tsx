@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useState } from 'react';
 
-import { useEnvironment } from '../../contexts';
+import { useCoreClerk } from '../../contexts';
 import { descriptors, Flex, Input, Text } from '../../customizables';
 import { Select, SelectButton, SelectOptionList } from '../../elements';
 import type { PropsOfComponent } from '../../styledSystem';
@@ -198,12 +198,13 @@ const Flag = (props: { iso: CountryIso }) => {
 };
 
 export const PhoneInput = (props: Omit<PhoneInputProps, 'dd'>) => {
-  const environment = useEnvironment();
+  // @ts-expect-error
+  const { __internal_country } = useCoreClerk();
 
   return (
     <PhoneInputBase
       {...props}
-      locationBasedCountryIso={environment.countryIso as CountryIso}
+      locationBasedCountryIso={__internal_country as CountryIso}
     />
   );
 };

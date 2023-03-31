@@ -127,6 +127,7 @@ export default class Clerk implements ClerkInterface {
   public session?: ActiveSessionResource | null;
   public organization?: OrganizationResource | null;
   public user?: UserResource | null;
+  public __internal_country?: string | null;
   public readonly frontendApi: string;
   public readonly publishableKey?: string;
   public readonly proxyUrl?: ClerkInterface['proxyUrl'];
@@ -965,6 +966,12 @@ export default class Clerk implements ClerkInterface {
     this.#environment = environment;
     this.#authService?.setEnvironment(environment);
   }
+
+  __internal_setCountry = (country: string | null) => {
+    if (!this.__internal_country) {
+      this.__internal_country = country;
+    }
+  };
 
   updateClient = (newClient: ClientResource): void => {
     if (!this.client) {
