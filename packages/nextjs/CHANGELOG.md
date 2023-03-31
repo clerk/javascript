@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.14.0-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.13.1-staging.0...@clerk/nextjs@4.14.0-staging.0) (2023-03-31)
+
+### Features
+
+- **nextjs:** Add signInUrl to BAPI call for interstitial ([f2003fc](https://github.com/clerkinc/javascript/commit/f2003fcb337d2ec5b0496aebd030ebeb8b544799))
+- **nextjs:** Support new env var NEXT_PUBLIC_CLERK_SIGN_IN_URL ([0d5bd88](https://github.com/clerkinc/javascript/commit/0d5bd88bba65d5c9d8e091449ddd13a6bc640928))
+
 ## [4.13.0](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.13.0-staging.2...@clerk/nextjs@4.13.0) (2023-03-29)
 
 **Note:** Version bump only for package @clerk/nextjs

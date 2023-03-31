@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.5.0-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/remix@2.4.1-staging.0...@clerk/remix@2.5.0-staging.0) (2023-03-31)
+
+### Features
+
+- **remix:** Support new env var CLERK_SIGN_IN_URL ([a64689e](https://github.com/clerkinc/javascript/commit/a64689e2ec3d59e67761df891d67193f0cd161a5))
+
 ## [2.4.0](https://github.com/clerkinc/javascript/compare/@clerk/remix@2.4.0-staging.1...@clerk/remix@2.4.0) (2023-03-29)
 
 **Note:** Version bump only for package @clerk/remix

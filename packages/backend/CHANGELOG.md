@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.0-staging.0](https://github.com/clerkinc/javascript/compare/@clerk/backend@0.15.1-staging.0...@clerk/backend@0.16.0-staging.0) (2023-03-31)
+
+### Features
+
+- **backend:** Add signInUrl to buildPublicInterstitialUrl ([2bbbaa6](https://github.com/clerkinc/javascript/commit/2bbbaa662c6fd8be3e95dc1c4ed3700e47f39f75))
+- **backend:** Support multi-domain in dev instances ([2b8eb75](https://github.com/clerkinc/javascript/commit/2b8eb7542adbc20d7f075603fb5091063faca7e5))
+
+### Bug Fixes
+
+- **backend:** Update interstitial to include signInUrl ([d923618](https://github.com/clerkinc/javascript/commit/d923618f4b285c53c411cc4a4ba821792c4c33e7))
+
 ## [0.15.0](https://github.com/clerkinc/javascript/compare/@clerk/backend@0.15.0-staging.0...@clerk/backend@0.15.0) (2023-03-29)
 
 **Note:** Version bump only for package @clerk/backend
