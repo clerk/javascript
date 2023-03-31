@@ -287,7 +287,7 @@ describe('User', () => {
     // @ts-ignore
     expect(BaseResource._fetch).toHaveBeenCalledWith({
       method: 'POST',
-      path: '/me/password/change',
+      path: '/me/change_password',
       body: params,
     });
   });
