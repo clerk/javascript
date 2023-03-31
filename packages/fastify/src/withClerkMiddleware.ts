@@ -38,12 +38,11 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
 
     // Interstitial cases
     if (requestState.isUnknown) {
-      reply
+      return reply
         .code(401)
         .header(constants.Headers.AuthReason, requestState.reason)
         .header(constants.Headers.AuthMessage, requestState.message)
         .send();
-      return;
     }
 
     if (requestState.isInterstitial) {
@@ -52,13 +51,12 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
         frontendApi: constants.FRONTEND_API,
       });
 
-      reply
+      return reply
         .code(401)
         .header(constants.Headers.AuthReason, requestState.reason)
         .header(constants.Headers.AuthMessage, requestState.message)
         .type('text/html')
         .send(interstitialHtmlPage);
-      return;
     }
 
     // @ts-ignore
