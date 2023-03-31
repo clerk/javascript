@@ -2,7 +2,7 @@ const createErrorMessage = (msg: string) => {
   return `🔒 Clerk: ${msg.trim()}
 
 For more info, check out the docs: https://docs.clerk.com,
-or come say hi in our discord server: https://rebrand.ly/clerk-discord
+or come say hi in our discord server: https://clerk.com/discord
 
 `;
 };
