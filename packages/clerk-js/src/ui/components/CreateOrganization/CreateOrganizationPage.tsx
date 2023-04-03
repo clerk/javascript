@@ -77,17 +77,11 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
   };
 
   const onChangeSlug = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.value && !isValidSlug(event.target.value)) {
-      updateSlugField(event.target.value, t(localizationKeys('formFieldErrorText__organizationSlug')));
-      return;
-    }
-
-    updateSlugField(createSlug(event.target.value));
+    updateSlugField(event.target.value);
   };
 
-  const updateSlugField = (val: string, errorMessage?: string | undefined) => {
+  const updateSlugField = (val: string) => {
     slugField.setValue(val);
-    slugField.setError(errorMessage as string);
   };
 
   return (
