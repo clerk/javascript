@@ -1,4 +1,4 @@
-import type { HandleOAuthCallbackParams } from '@clerk/types';
+import type { HandleOAuthCallbackParams, HandleSAMLCallbackParams } from '@clerk/types';
 import React from 'react';
 
 import { useAuthContext } from '../contexts/AuthContext';
@@ -100,6 +100,17 @@ export const AuthenticateWithRedirectCallback = withClerk(
     return null;
   },
   'AuthenticateWithRedirectCallback',
+);
+
+export const AuthenticateWithSAMLCallback = withClerk(
+  ({ clerk, ...handleSAMLCallbackParams }: WithClerkProp<HandleSAMLCallbackParams>) => {
+    React.useEffect(() => {
+      void clerk.handleSAMLCallback(handleSAMLCallbackParams);
+    }, []);
+
+    return null;
+  },
+  'AuthenticateWithSAMLCallback',
 );
 
 export const MultisessionAppSupport = ({ children }: React.PropsWithChildren<unknown>): JSX.Element => {

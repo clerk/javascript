@@ -381,6 +381,14 @@ export interface Clerk {
   ) => Promise<unknown>;
 
   /**
+   * Completes SAML flow started by {@link Clerk.client.signIn.authenticateWithSAML} or {@link Clerk.client.signUp.authenticateWithSAML}
+   */
+  handleSAMLCallback: (
+    params: HandleSAMLCallbackParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ) => Promise<unknown>;
+
+  /**
    * Completes a Magic Link flow  started by {@link Clerk.client.signIn.createMagicLinkFlow} or {@link Clerk.client.signUp.createMagicLinkFlow}
    */
   handleMagicLinkVerification: (
@@ -450,6 +458,8 @@ export type HandleOAuthCallbackParams = {
    */
   continueSignUpUrl?: string | null;
 };
+
+export type HandleSAMLCallbackParams = HandleOAuthCallbackParams;
 
 // TODO: Make sure Isomorphic Clerk navigate can work with the correct type:
 // (to: string) => Promise<unknown>

@@ -26,6 +26,7 @@ import type {
   EnvironmentResource,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
+  HandleSAMLCallbackParams,
   InstanceType,
   ListenerCallback,
   OrganizationInvitationResource,
@@ -85,6 +86,7 @@ import {
   clerkMissingSignInUrlAsSatellite,
   clerkOAuthCallbackDidNotCompleteSignInSIgnUp,
   clerkRedirectUrlIsMissingScheme,
+  clerkSAMLCallbackDidNotCompleteSignInSignUp,
 } from './errors';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import createFapiClient from './fapiClient';
@@ -884,6 +886,130 @@ export default class Clerk implements ClerkInterface {
     }
 
     if (su.externalAccountStatus === 'verified' && su.status === 'missing_requirements') {
+      return navigateToContinueSignUp();
+    }
+
+    return navigateToSignIn();
+  };
+
+  // TODO - DRY this up
+  public handleSAMLCallback = async (
+    params: HandleSAMLCallbackParams = {},
+    customNavigate?: (to: string) => Promise<unknown>,
+  ): Promise<unknown> => {
+    if (!this.#isReady || !this.#environment || !this.client) {
+      return;
+    }
+    const { signIn, signUp } = this.client;
+    const { displayConfig } = this.#environment;
+    const { firstFactorVerification } = signIn;
+    const { samlAccount } = signUp.verifications;
+    const su = {
+      status: signUp.status,
+      samlAccountStatus: samlAccount.status,
+      samlAccountErrorCode: samlAccount.error?.code,
+      samlAccountSessionId: samlAccount.error?.meta?.sessionId,
+    };
+
+    const si = {
+      status: signIn.status,
+      firstFactorVerificationStatus: firstFactorVerification.status,
+      firstFactorVerificationErrorCode: firstFactorVerification.error?.code,
+      firstFactorVerificationSessionId: firstFactorVerification.error?.meta?.sessionId,
+    };
+
+    const navigate = (to: string) =>
+      customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
+
+    const makeNavigate = (to: string) => () => navigate(to);
+
+    const navigateToSignIn = makeNavigate(displayConfig.signInUrl);
+
+    const navigateToSignUp = makeNavigate(displayConfig.signUpUrl);
+
+    const navigateToFactorTwo = makeNavigate(
+      params.secondFactorUrl ||
+        buildURL({ base: displayConfig.signInUrl, hashPath: '/factor-two' }, { stringify: true }),
+    );
+
+    const navigateAfterSignIn = makeNavigate(
+      params.afterSignInUrl || params.redirectUrl || displayConfig.afterSignInUrl,
+    );
+
+    const navigateAfterSignUp = makeNavigate(
+      params.afterSignUpUrl || params.redirectUrl || displayConfig.afterSignUpUrl,
+    );
+
+    const navigateToContinueSignUp = makeNavigate(
+      params.continueSignUpUrl ||
+        buildURL({ base: displayConfig.signUpUrl, hashPath: '/continue' }, { stringify: true }),
+    );
+
+    const userExistsButNeedsToSignIn =
+      su.samlAccountStatus === 'transferable' && su.samlAccountErrorCode === 'external_account_exists';
+
+    if (userExistsButNeedsToSignIn) {
+      const res = await signIn.create({ transfer: true });
+      switch (res.status) {
+        case 'complete':
+          return this.setActive({
+            session: res.createdSessionId,
+            beforeEmit: navigateAfterSignIn,
+          });
+        case 'needs_second_factor':
+          return navigateToFactorTwo();
+        default:
+          clerkSAMLCallbackDidNotCompleteSignInSignUp('sign in');
+      }
+    }
+
+    const userNeedsToBeCreated = si.firstFactorVerificationStatus === 'transferable';
+
+    if (userNeedsToBeCreated) {
+      const res = await signUp.create({ transfer: true });
+      switch (res.status) {
+        case 'complete':
+          return this.setActive({
+            session: res.createdSessionId,
+            beforeEmit: navigateAfterSignUp,
+          });
+        case 'missing_requirements':
+          return navigateToContinueSignUp();
+        default:
+          clerkOAuthCallbackDidNotCompleteSignInSIgnUp('sign in');
+      }
+    }
+
+    if (si.status === 'needs_second_factor') {
+      return navigateToFactorTwo();
+    }
+
+    const suUserAlreadySignedIn =
+      (su.samlAccountStatus === 'failed' || su.samlAccountStatus === 'unverified') &&
+      su.samlAccountErrorCode === 'identifier_already_signed_in' &&
+      su.samlAccountSessionId;
+
+    const siUserAlreadySignedIn =
+      si.firstFactorVerificationStatus === 'failed' &&
+      si.firstFactorVerificationErrorCode === 'identifier_already_signed_in' &&
+      si.firstFactorVerificationSessionId;
+
+    const userAlreadySignedIn = suUserAlreadySignedIn || siUserAlreadySignedIn;
+    if (userAlreadySignedIn) {
+      const sessionId = si.firstFactorVerificationSessionId || su.samlAccountSessionId;
+      if (sessionId) {
+        return this.setActive({
+          session: sessionId,
+          beforeEmit: navigateAfterSignIn,
+        });
+      }
+    }
+
+    if (hasExternalAccountSignUpError(signUp)) {
+      return navigateToSignUp();
+    }
+
+    if (su.samlAccountStatus === 'verified' && su.status === 'missing_requirements') {
       return navigateToContinueSignUp();
     }
 

@@ -242,6 +242,11 @@ export const hasExternalAccountSignUpError = (signUp: SignUpResource): boolean =
   return !!externalAccount.error;
 };
 
+export const hasSAMLAccountSignUpError = (signUp: SignUpResource): boolean => {
+  const { samlAccount } = signUp.verifications;
+  return !!samlAccount.error;
+};
+
 export function getSearchParameterFromHash({
   hash = window.location.hash,
   paramName,

@@ -64,6 +64,12 @@ export function clerkOAuthCallbackDidNotCompleteSignInSIgnUp(type: 'sign in' | '
   );
 }
 
+export function clerkSAMLCallbackDidNotCompleteSignInSignUp(type: 'sign in' | 'sign up'): never {
+  throw new Error(
+    `${errorPrefix} Something went wrong initializing Clerk during the ${type} flow. Please contact support.`,
+  );
+}
+
 export function clerkVerifyEmailAddressCalledBeforeCreate(type: 'SignIn' | 'SignUp'): never {
   throw new Error(`${errorPrefix} You need to start a ${type} flow by calling ${type}.create() first.`);
 }

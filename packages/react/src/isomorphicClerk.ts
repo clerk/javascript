@@ -9,6 +9,7 @@ import type {
   DomainOrProxyUrl,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
+  HandleSAMLCallbackParams,
   OrganizationMembershipResource,
   OrganizationResource,
   RedirectOptions,
@@ -591,6 +592,15 @@ export default class IsomorphicClerk {
       void callback();
     } else {
       this.premountMethodCalls.set('handleRedirectCallback', callback);
+    }
+  };
+
+  handleSAMLCallback = (params: HandleSAMLCallbackParams): void => {
+    const callback = () => this.clerkjs?.handleSAMLCallback(params);
+    if (this.clerkjs && this.#loaded) {
+      void callback();
+    } else {
+      this.premountMethodCalls.set('handleSAMLCallback', callback);
     }
   };
 

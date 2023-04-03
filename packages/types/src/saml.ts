@@ -2,7 +2,7 @@ import type { SAMLStrategy } from './strategies';
 
 export type AuthenticateWithSAMLParams = {
   /**
-   * Defaults to `saml`, actual SAML connection is selected via the `identifier`.
+   * Defaults to `saml`, actual SAML connection is selected via the `emailAddress`.
    */
   strategy: SAMLStrategy;
   /**
@@ -11,8 +11,8 @@ export type AuthenticateWithSAMLParams = {
   emailAddress: string;
   /**
    * Full URL or path to the route that will complete the SAML flow.
-   * Typically, this will be a simple `/sso-callback` route that calls `Clerk.handleRedirectCallback`
-   * or mounts the <AuthenticateWithRedirectCallback /> component.
+   * Typically, this will be a simple `/sso-callback` route that calls `Clerk.handleSAMLCallback`
+   * or mounts the <AuthenticateWithSAMLCallback /> component.
    */
   redirectUrl: string;
   /**
