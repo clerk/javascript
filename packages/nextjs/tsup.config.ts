@@ -6,14 +6,14 @@ export default defineConfig(overrideOptions => {
   const isProd = overrideOptions.env?.NODE_ENV === 'production';
 
   return {
+    clean: true,
     entry: [
       'src/index.ts',
       'src/ssr/index.ts',
       'src/server/index.ts',
       'src/api/index.ts',
-      'src/middleware/index.ts',
+      'src/edge-middleware/index.ts',
       'src/app-beta/index.ts',
-      'src/client/index.ts',
       'src/constants.ts',
     ],
     onSuccess: 'tsc --emitDeclarationOnly --declaration',
