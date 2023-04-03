@@ -1,6 +1,6 @@
 import type { SAMLStrategy } from './strategies';
 
-export type SAMLParams = {
+export type AuthenticateWithSAMLParams = {
   /**
    * Defaults to `saml`, actual SAML connection is selected via the `identifier`.
    */

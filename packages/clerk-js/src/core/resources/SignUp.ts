@@ -5,12 +5,12 @@ import type {
   AttemptVerificationParams,
   AttemptWeb3WalletVerificationParams,
   AuthenticateWithRedirectParams,
+  AuthenticateWithSAMLParams,
   AuthenticateWithWeb3Params,
   CreateMagicLinkFlowReturn,
   PrepareEmailAddressVerificationParams,
   PreparePhoneNumberVerificationParams,
   PrepareVerificationParams,
-  SAMLParams,
   SignUpAuthenticateWithMetamaskParams,
   SignUpCreateParams,
   SignUpField,
@@ -218,7 +218,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     emailAddress,
     continueSignUp = false,
     unsafeMetadata,
-  }: SAMLParams & { unsafeMetadata?: SignUpUnsafeMetadata }): Promise<void> => {
+  }: AuthenticateWithSAMLParams & { unsafeMetadata?: SignUpUnsafeMetadata }): Promise<void> => {
     const authenticateFn = (args: SignUpCreateParams | SignUpUpdateParams) =>
       continueSignUp && this.id ? this.update(args) : this.create(args);
     const { verifications } = await authenticateFn({

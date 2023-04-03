@@ -4,13 +4,13 @@ import type {
   AttemptFirstFactorParams,
   AttemptSecondFactorParams,
   AuthenticateWithRedirectParams,
+  AuthenticateWithSAMLParams,
   CreateMagicLinkFlowReturn,
   EmailCodeConfig,
   EmailLinkConfig,
   PhoneCodeConfig,
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
-  SAMLParams,
   SignInCreateParams,
   SignInFirstFactor,
   SignInIdentifier,
@@ -165,7 +165,7 @@ export class SignIn extends BaseResource implements SignInResource {
     }
   };
 
-  public authenticateWithSAML = async (params: SAMLParams): Promise<void> => {
+  public authenticateWithSAML = async (params: AuthenticateWithSAMLParams): Promise<void> => {
     const { strategy, emailAddress, redirectUrl, redirectUrlComplete } = params || {};
     const { firstFactorVerification } = await this.create({
       strategy,

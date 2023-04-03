@@ -16,7 +16,7 @@ import type {
 import type { AuthenticateWithRedirectParams } from './oauth';
 import type { AttemptPhoneNumberVerificationParams, PreparePhoneNumberVerificationParams } from './phoneNumber';
 import type { ClerkResource } from './resource';
-import type { SAMLParams } from './saml';
+import type { AuthenticateWithSAMLParams } from './saml';
 import type {
   EmailCodeStrategy,
   EmailLinkStrategy,
@@ -93,7 +93,9 @@ export interface SignUpResource extends ClerkResource {
 
   authenticateWithMetamask: (params: { unsafeMetadata: SignUpUnsafeMetadata }) => Promise<SignUpResource>;
 
-  authenticateWithSAML: (params: SAMLParams & { unsafeMetadata: SignUpUnsafeMetadata }) => Promise<void>;
+  authenticateWithSAML: (
+    params: AuthenticateWithSAMLParams & { unsafeMetadata: SignUpUnsafeMetadata },
+  ) => Promise<void>;
 }
 
 export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';

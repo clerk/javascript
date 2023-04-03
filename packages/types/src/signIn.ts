@@ -37,7 +37,7 @@ import type {
 } from './json';
 import type { AuthenticateWithRedirectParams } from './oauth';
 import type { ClerkResource } from './resource';
-import type { SAMLParams } from './saml';
+import type { AuthenticateWithSAMLParams } from './saml';
 import type {
   BackupCodeStrategy,
   EmailCodeStrategy,
@@ -76,7 +76,7 @@ export interface SignInResource extends ClerkResource {
 
   authenticateWithRedirect: (params: AuthenticateWithRedirectParams) => Promise<void>;
 
-  authenticateWithSAML: (params: SAMLParams) => Promise<void>;
+  authenticateWithSAML: (params: AuthenticateWithSAMLParams) => Promise<void>;
 
   authenticateWithWeb3: (params: AuthenticateWithWeb3Params) => Promise<SignInResource>;
 
