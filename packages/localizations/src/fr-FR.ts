@@ -12,8 +12,10 @@ export const frFR: LocalizationResource = {
   formFieldLabel__phoneNumber_username: "numéro de téléphone ou nom d'utilisateur",
   formFieldLabel__emailAddress_phoneNumber_username: "Adresse e-mail, numéro de téléphone ou nom d'utilisateur",
   formFieldLabel__password: 'Mot de passe',
+  formFieldLabel__currentPassword: 'Mot de passe actuel',
   formFieldLabel__newPassword: 'Nouveau mot de passe',
   formFieldLabel__confirmPassword: 'Confirmez le mot de passe',
+  formFieldLabel__signOutOfOtherSessions: 'Se déconnecter de tous les autres appareils',
   formFieldLabel__firstName: 'Prénom',
   formFieldLabel__lastName: 'Nom de famille',
   formFieldLabel__backupCode: 'Code de récupération',
@@ -395,7 +397,10 @@ export const frFR: LocalizationResource = {
     },
     passwordPage: {
       title: 'Mettre à jour le mot de passe',
+      changePasswordTitle: 'Changer le mot de passe',
       successMessage: 'Votre mot de passe a été mis à jour.',
+      changePasswordSuccessMessage: 'Votre mot de passe a été mis à jour.',
+      sessionsSignedOutSuccessMessage: 'Tous les autres appareils ont été déconnectés.',
     },
     mfaPage: {
       title: 'Ajouter la vérification en deux étapes',

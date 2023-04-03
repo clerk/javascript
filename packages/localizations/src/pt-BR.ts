@@ -24,8 +24,10 @@ export const ptBR: LocalizationResource = {
   formFieldLabel__phoneNumber_username: 'celular ou nome de usuário',
   formFieldLabel__emailAddress_phoneNumber_username: 'E-mail, celular ou nome de usuário',
   formFieldLabel__password: 'Senha',
+  formFieldLabel__currentPassword: 'Senha atual',
   formFieldLabel__newPassword: 'Nova senha',
   formFieldLabel__confirmPassword: 'Confirmar senha',
+  formFieldLabel__signOutOfOtherSessions: 'Desconectar de todos os outros dispositivos',
   formFieldLabel__firstName: 'Nome',
   formFieldLabel__lastName: 'Sobrenome',
   formFieldLabel__backupCode: 'Código de backup',
@@ -389,7 +391,10 @@ export const ptBR: LocalizationResource = {
     },
     passwordPage: {
       title: 'Defina a senha',
+      changePasswordTitle: 'Trocar senha',
       successMessage: 'Sua senha foi salva.',
+      changePasswordSuccessMessage: 'Sua senha foi atualizada.',
+      sessionsSignedOutSuccessMessage: 'Todos os outros dispositivos foram desconectados.',
     },
     mfaPage: {
       title: 'Adicione verificação em duas etapas',

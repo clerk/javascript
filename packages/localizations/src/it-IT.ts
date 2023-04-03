@@ -24,8 +24,10 @@ export const itIT: LocalizationResource = {
   formFieldLabel__phoneNumber_username: 'numero di telefono o nome utente',
   formFieldLabel__emailAddress_phoneNumber_username: 'Indirizzo email, numero di telefono o nome utente',
   formFieldLabel__password: 'Password',
+  formFieldLabel__currentPassword: 'Password corrente',
   formFieldLabel__newPassword: 'Nuova password',
   formFieldLabel__confirmPassword: 'Conferma password',
+  formFieldLabel__signOutOfOtherSessions: 'Disconnetti tutti gli altri dispositivi',
   formFieldLabel__firstName: 'Nome',
   formFieldLabel__lastName: 'Cognome',
   formFieldLabel__backupCode: 'Codice di backup',
@@ -392,7 +394,10 @@ export const itIT: LocalizationResource = {
     },
     passwordPage: {
       title: 'Imposta password',
+      changePasswordTitle: 'Cambia password',
       successMessage: 'La tua password é stata impostata.',
+      changePasswordSuccessMessage: 'La tua password è stata aggiornata.',
+      sessionsSignedOutSuccessMessage: 'Tutti gli altri dispositivi sono stati disconnessi.',
     },
     mfaPage: {
       title: 'Aggiungi verifica in 2 passaggi',
