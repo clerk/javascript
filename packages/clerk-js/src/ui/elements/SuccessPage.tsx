@@ -4,11 +4,12 @@ import { descriptors, Text } from '../customizables';
 import { ContentPage, FormButtonContainer, NavigateToFlowStartButton } from '../elements';
 import type { LocalizationKey } from '../localization';
 import { localizationKeys } from '../localization';
+import { Flex } from '../primitives';
 import type { PropsOfComponent } from '../styledSystem';
 
 type SuccessPageProps = Omit<PropsOfComponent<typeof ContentPage>, 'headerTitle' | 'title'> & {
   title: LocalizationKey;
-  text?: LocalizationKey;
+  text?: LocalizationKey | LocalizationKey[];
   finishLabel?: LocalizationKey;
   content?: React.ReactNode;
   onFinish?: () => void;
@@ -22,11 +23,25 @@ export const SuccessPage = (props: SuccessPageProps) => {
       headerTitle={title}
       {...rest}
     >
-      <Text
-        localizationKey={text}
-        variant='regularRegular'
-      />
-
+      <Flex
+        direction={'row'}
+        gap={1}
+      >
+        {Array.isArray(text) ? (
+          text.map(t => (
+            <Text
+              key={t.key}
+              localizationKey={t}
+              variant='regularRegular'
+            />
+          ))
+        ) : (
+          <Text
+            localizationKey={text}
+            variant='regularRegular'
+          />
+        )}
+      </Flex>
       {content}
 
       <FormButtonContainer>

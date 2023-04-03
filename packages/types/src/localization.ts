@@ -34,8 +34,10 @@ type _LocalizationResource = {
    */
   formFieldLabel__emailAddress_phoneNumber_username: LocalizationValue;
   formFieldLabel__password: LocalizationValue;
+  formFieldLabel__currentPassword: LocalizationValue;
   formFieldLabel__newPassword: LocalizationValue;
   formFieldLabel__confirmPassword: LocalizationValue;
+  formFieldLabel__signOutOfOtherSessions: LocalizationValue;
   formFieldLabel__firstName: LocalizationValue;
   formFieldLabel__lastName: LocalizationValue;
   formFieldLabel__backupCode: LocalizationValue;
@@ -425,6 +427,9 @@ type _LocalizationResource = {
     passwordPage: {
       title: LocalizationValue;
       successMessage: LocalizationValue;
+      changePasswordTitle: LocalizationValue;
+      changePasswordSuccessMessage: LocalizationValue;
+      sessionsSignedOutSuccessMessage: LocalizationValue;
     };
     mfaPage: {
       title: LocalizationValue;

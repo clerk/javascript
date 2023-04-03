@@ -24,8 +24,10 @@ export const enUS: LocalizationResource = {
   formFieldLabel__phoneNumber_username: 'phone number or username',
   formFieldLabel__emailAddress_phoneNumber_username: 'Email address, phone number or username',
   formFieldLabel__password: 'Password',
+  formFieldLabel__currentPassword: 'Current Password',
   formFieldLabel__newPassword: 'New password',
   formFieldLabel__confirmPassword: 'Confirm password',
+  formFieldLabel__signOutOfOtherSessions: 'Sign out of all other devices',
   formFieldLabel__firstName: 'First name',
   formFieldLabel__lastName: 'Last name',
   formFieldLabel__backupCode: 'Backup code',
@@ -400,7 +402,10 @@ export const enUS: LocalizationResource = {
     },
     passwordPage: {
       title: 'Set password',
+      changePasswordTitle: 'Change password',
       successMessage: 'Your password has been set.',
+      changePasswordSuccessMessage: 'Your password has been updated.',
+      sessionsSignedOutSuccessMessage: 'All other devices have been signed out.',
     },
     mfaPage: {
       title: 'Add two-step verification',
