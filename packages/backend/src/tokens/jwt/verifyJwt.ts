@@ -5,20 +5,21 @@ import type { Jwt, JwtPayload } from '@clerk/types';
 import runtime from '../../runtime';
 import { base64url } from '../../util/rfc4648';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
-import { assertAudienceClaim } from './assertions';
-
-type IssuerResolver = string | ((iss: string) => boolean);
+import type { IssuerResolver } from './assertions';
+import {
+  algToHash,
+  assertActivationClaim,
+  assertAudienceClaim,
+  assertAuthorizedPartiesClaim,
+  assertExpirationClaim,
+  assertHeaderAlgorithm,
+  assertHeaderType,
+  assertIssuedAtClaim,
+  assertIssuerClaim,
+  assertSubClaim,
+} from './assertions';
 
 const DEFAULT_CLOCK_SKEW_IN_SECONDS = 5 * 1000;
-
-const algToHash: Record<string, string> = {
-  RS256: 'SHA-256',
-  RS384: 'SHA-384',
-  RS512: 'SHA-512',
-  ES256: 'SHA-256',
-  ES384: 'SHA-384',
-  ES512: 'SHA-512',
-};
 
 const RSA_ALGORITHM_NAME = 'RSASSA-PKCS1-v1_5';
 const EC_ALGORITHM_NAME = 'ECDSA';
@@ -31,8 +32,6 @@ const jwksAlgToCryptoAlg: Record<string, string> = {
   ES384: EC_ALGORITHM_NAME,
   ES512: EC_ALGORITHM_NAME,
 };
-
-const algs = Object.keys(algToHash);
 
 export async function hasValidSignature(jwt: Jwt, jwk: JsonWebKey) {
   const { header, signature, raw } = jwt;
@@ -124,118 +123,19 @@ export async function verifyJwt(
   // Header verifications
   const { typ, alg } = header;
 
-  // Verify type
-  if (typeof typ !== 'undefined' && typ !== 'JWT') {
-    throw new TokenVerificationError({
-      action: TokenVerificationErrorAction.EnsureClerkJWT,
-      reason: TokenVerificationErrorReason.TokenInvalid,
-      message: `Invalid JWT type ${JSON.stringify(typ)}. Expected "JWT".`,
-    });
-  }
-
-  // Verify algorithm
-  if (!algToHash[alg]) {
-    throw new TokenVerificationError({
-      action: TokenVerificationErrorAction.EnsureClerkJWT,
-      reason: TokenVerificationErrorReason.TokenInvalidAlgorithm,
-      message: `Invalid JWT algorithm ${JSON.stringify(alg)}. Supported: ${algs}.`,
-    });
-  }
+  assertHeaderType(typ);
+  assertHeaderAlgorithm(alg);
 
   // Payload verifications
   const { azp, sub, aud, iss, iat, exp, nbf } = payload;
 
-  // Verify subject claim (sub)
-  if (typeof sub !== 'string') {
-    throw new TokenVerificationError({
-      action: TokenVerificationErrorAction.EnsureClerkJWT,
-      reason: TokenVerificationErrorReason.TokenVerificationFailed,
-      message: `Subject claim (sub) is required and must be a string. Received ${JSON.stringify(sub)}.`,
-    });
-  }
-
+  assertSubClaim(sub);
   assertAudienceClaim([aud], [audience]);
-
-  // Verify authorized parties claim (azp)
-  if (azp && authorizedParties && authorizedParties.length > 0 && !authorizedParties.includes(azp)) {
-    throw new TokenVerificationError({
-      reason: TokenVerificationErrorReason.TokenInvalidAuthorizedParties,
-      message: `Invalid JWT Authorized party claim (azp) ${JSON.stringify(azp)}. Expected "${authorizedParties}".`,
-    });
-  }
-
-  // Verify issuer claim (iss)
-  if (typeof issuer === 'function' && !issuer(iss)) {
-    throw new TokenVerificationError({
-      reason: TokenVerificationErrorReason.TokenInvalidIssuer,
-      message: 'Failed JWT issuer resolver. Make sure that the resolver returns a truthy value.',
-    });
-  } else if (typeof issuer === 'string' && iss && iss !== issuer) {
-    throw new TokenVerificationError({
-      reason: TokenVerificationErrorReason.TokenInvalidIssuer,
-      message: `Invalid JWT issuer claim (iss) ${JSON.stringify(decoded.payload.iss)}. Expected "${issuer}".`,
-    });
-  }
-
-  // Verify expiration claim (exp)
-  if (typeof exp !== 'number') {
-    throw new TokenVerificationError({
-      action: TokenVerificationErrorAction.EnsureClerkJWT,
-      reason: TokenVerificationErrorReason.TokenVerificationFailed,
-      message: `Invalid JWT expiry date claim (exp) ${JSON.stringify(exp)}. Expected number.`,
-    });
-  }
-  const currentDate = new Date(Date.now());
-  const expiryDate = new Date(0);
-  expiryDate.setUTCSeconds(exp);
-  const expired = expiryDate.getTime() <= currentDate.getTime() - clockSkew;
-  if (expired) {
-    throw new TokenVerificationError({
-      reason: TokenVerificationErrorReason.TokenExpired,
-      message: `JWT is expired. Expiry date: ${expiryDate}, Current date: ${currentDate}.`,
-    });
-  }
-
-  // Verify activation claim (nbf)
-  if (nbf !== undefined) {
-    if (typeof nbf !== 'number') {
-      throw new TokenVerificationError({
-        action: TokenVerificationErrorAction.EnsureClerkJWT,
-        reason: TokenVerificationErrorReason.TokenVerificationFailed,
-        message: `Invalid JWT not before date claim (nbf) ${JSON.stringify(nbf)}. Expected number.`,
-      });
-    }
-    const notBeforeDate = new Date(0);
-    notBeforeDate.setUTCSeconds(nbf);
-    const early = notBeforeDate.getTime() > currentDate.getTime() + clockSkew;
-    if (early) {
-      throw new TokenVerificationError({
-        action: TokenVerificationErrorAction.EnsureClockSync,
-        reason: TokenVerificationErrorReason.TokenNotActiveYet,
-        message: `JWT cannot be used prior to not before date claim (nbf). Not before date: ${notBeforeDate}; Current date: ${currentDate};`,
-      });
-    }
-  }
-
-  // Verify issued at claim (iat)
-  if (iat !== undefined) {
-    if (typeof iat !== 'number') {
-      throw new TokenVerificationError({
-        action: TokenVerificationErrorAction.EnsureClerkJWT,
-        reason: TokenVerificationErrorReason.TokenVerificationFailed,
-        message: `Invalid JWT issued at date claim (iat) ${JSON.stringify(iat)}. Expected number.`,
-      });
-    }
-    const issuedAtDate = new Date(0);
-    issuedAtDate.setUTCSeconds(iat);
-    const postIssued = issuedAtDate.getTime() > currentDate.getTime() + clockSkew;
-    if (postIssued) {
-      throw new TokenVerificationError({
-        reason: TokenVerificationErrorReason.TokenNotActiveYet,
-        message: `JWT issued at date claim (iat) is in the future. Issued at date: ${issuedAtDate}; Current date: ${currentDate};`,
-      });
-    }
-  }
+  assertAuthorizedPartiesClaim(azp, authorizedParties);
+  assertIssuerClaim(iss, issuer);
+  assertExpirationClaim(exp, clockSkew);
+  assertActivationClaim(nbf, clockSkew);
+  assertIssuedAtClaim(iat, clockSkew);
 
   let signatureValid: boolean;
 
