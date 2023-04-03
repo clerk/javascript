@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { buildURL } from '../../utils/url';
-import { buildAuthQueryString, getRedirectProp } from '../common/authPropHelpers';
+import { buildAuthQueryString, extractAuthProp } from '../common/authPropHelpers';
 import { useCoreClerk, useEnvironment } from '../contexts';
 import { useNavigate } from '../hooks';
 import type { ParsedQs } from '../router';
@@ -38,8 +38,22 @@ export const useSignUpContext = (): SignUpContextType => {
     throw new Error('Clerk: useSignUpContext called outside of the mounted SignUp component.');
   }
 
-  const afterSignUpUrl = clerk.buildUrlWithAuth(getRedirectProp('afterSignUpUrl', { ctx, queryParams, displayConfig }));
-  const afterSignInUrl = clerk.buildUrlWithAuth(getRedirectProp('afterSignInUrl', { ctx, queryParams, displayConfig }));
+  const afterSignUpUrl = clerk.buildUrlWithAuth(
+    extractAuthProp('afterSignUpUrl', {
+      ctx,
+      queryParams,
+      displayConfig,
+    }),
+  );
+
+  const afterSignInUrl = clerk.buildUrlWithAuth(
+    extractAuthProp('afterSignInUrl', {
+      ctx,
+      queryParams,
+      displayConfig,
+    }),
+  );
+
   const navigateAfterSignUp = () => navigate(afterSignUpUrl);
 
   let signInUrl = ctx.signInUrl || displayConfig.signInUrl;
@@ -91,8 +105,22 @@ export const useSignInContext = (): SignInContextType => {
     throw new Error('Clerk: useSignInContext called outside of the mounted SignIn component.');
   }
 
-  const afterSignUpUrl = clerk.buildUrlWithAuth(getRedirectProp('afterSignUpUrl', { ctx, queryParams, displayConfig }));
-  const afterSignInUrl = clerk.buildUrlWithAuth(getRedirectProp('afterSignInUrl', { ctx, queryParams, displayConfig }));
+  const afterSignUpUrl = clerk.buildUrlWithAuth(
+    extractAuthProp('afterSignUpUrl', {
+      ctx,
+      queryParams,
+      displayConfig,
+    }),
+  );
+
+  const afterSignInUrl = clerk.buildUrlWithAuth(
+    extractAuthProp('afterSignInUrl', {
+      ctx,
+      queryParams,
+      displayConfig,
+    }),
+  );
+
   const navigateAfterSignIn = () => navigate(afterSignInUrl);
 
   let signUpUrl = ctx.signUpUrl || displayConfig.signUpUrl;
