@@ -6,9 +6,9 @@ export type SAMLParams = {
    */
   strategy: SAMLStrategy;
   /**
-   * Identifier (e.g. email address), that can be used to select the target SAML connection for this request.
+   * Email address that can be used to select the target SAML connection for this request.
    */
-  identifier: string;
+  emailAddress: string;
   /**
    * Full URL or path to the route that will complete the SAML flow.
    * Typically, this will be a simple `/sso-callback` route that calls `Clerk.handleRedirectCallback`

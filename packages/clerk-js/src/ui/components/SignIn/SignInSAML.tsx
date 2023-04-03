@@ -15,7 +15,7 @@ function _SignInSAML() {
   const redirectUrlComplete = ctx.afterSignInUrl || displayConfig.afterSignInUrl;
 
   const handleEmailAddress = (emailAddress: string) => {
-    return signIn.authenticateWithSAML({ strategy, identifier: emailAddress, redirectUrl, redirectUrlComplete });
+    return signIn.authenticateWithSAML({ strategy, emailAddress, redirectUrl, redirectUrlComplete });
   };
 
   return (

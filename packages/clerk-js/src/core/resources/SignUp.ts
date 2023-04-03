@@ -215,7 +215,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     redirectUrl,
     redirectUrlComplete,
     strategy,
-    identifier,
+    emailAddress,
     continueSignUp = false,
     unsafeMetadata,
   }: SAMLParams & { unsafeMetadata?: SignUpUnsafeMetadata }): Promise<void> => {
@@ -223,7 +223,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       continueSignUp && this.id ? this.update(args) : this.create(args);
     const { verifications } = await authenticateFn({
       strategy,
-      identifier,
+      emailAddress,
       redirectUrl,
       actionCompleteRedirectUrl: redirectUrlComplete,
       unsafeMetadata,

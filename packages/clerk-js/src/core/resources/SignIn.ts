@@ -166,10 +166,10 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public authenticateWithSAML = async (params: SAMLParams): Promise<void> => {
-    const { strategy, identifier, redirectUrl, redirectUrlComplete } = params || {};
+    const { strategy, emailAddress, redirectUrl, redirectUrlComplete } = params || {};
     const { firstFactorVerification } = await this.create({
       strategy,
-      identifier,
+      emailAddress,
       redirectUrl: redirectUrl,
       actionCompleteRedirectUrl: redirectUrlComplete,
     });

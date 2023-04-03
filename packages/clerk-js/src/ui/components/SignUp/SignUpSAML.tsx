@@ -18,7 +18,7 @@ function _SignUpSAML() {
   const handleEmailAddress = (emailAddress: string) => {
     return signUp.authenticateWithSAML({
       strategy,
-      identifier: emailAddress,
+      emailAddress,
       redirectUrl,
       redirectUrlComplete,
       continueSignUp: false,

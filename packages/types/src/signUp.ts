@@ -159,7 +159,7 @@ export type SignUpCreateParams = Partial<
     externalAccountRedirectUrl: string;
     externalAccountActionCompleteRedirectUrl: string;
     strategy: OAuthStrategy | TicketStrategy | SAMLStrategy;
-    identifier: string;
+    emailAddress: string;
     redirectUrl: string;
     actionCompleteRedirectUrl: string;
     transfer: boolean;

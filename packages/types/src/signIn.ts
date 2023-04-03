@@ -147,7 +147,7 @@ export type SignInCreateParams = (
     }
   | {
       strategy: SAMLStrategy;
-      identifier: string;
+      emailAddress: string;
       redirectUrl: string;
       actionCompleteRedirectUrl?: string;
     }
