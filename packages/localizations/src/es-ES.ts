@@ -24,8 +24,10 @@ export const esES: LocalizationResource = {
   formFieldLabel__phoneNumber_username: 'número telefónico o nombre de usuario',
   formFieldLabel__emailAddress_phoneNumber_username: 'Correo electrónico, número telefónico o nombre de usuario',
   formFieldLabel__password: 'Contraseña',
+  formFieldLabel__currentPassword: 'Contraseña actual',
   formFieldLabel__newPassword: 'Nueva contraseña',
   formFieldLabel__confirmPassword: 'Confirme la contraseña',
+  formFieldLabel__signOutOfOtherSessions: 'Cerrar sesión en todos los demás dispositivos',
   formFieldLabel__firstName: 'Nombre',
   formFieldLabel__lastName: 'Apellidos',
   formFieldLabel__backupCode: 'Código de respaldo',
@@ -397,7 +399,10 @@ export const esES: LocalizationResource = {
     },
     passwordPage: {
       title: 'Configurar la clave',
+      changePasswordTitle: 'Cambiar contraseña',
       successMessage: 'Su contraseña ha sido establecida.',
+      changePasswordSuccessMessage: 'Tu contraseña ha sido actualizada.',
+      sessionsSignedOutSuccessMessage: 'Todos los demás dispositivos han cerrado sesión.',
     },
     mfaPage: {
       title: 'Agregar verificación en dos pasos',

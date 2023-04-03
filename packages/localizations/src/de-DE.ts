@@ -12,8 +12,10 @@ export const deDE: LocalizationResource = {
   formFieldLabel__phoneNumber_username: 'Telefonnummer oder Benutzername',
   formFieldLabel__emailAddress_phoneNumber_username: 'E-Mail-Adresse, Telefonnummer oder Benutzername',
   formFieldLabel__password: 'Passwort',
+  formFieldLabel__currentPassword: 'Aktuelles Passwort',
   formFieldLabel__newPassword: 'Neues Passwort',
   formFieldLabel__confirmPassword: 'Passwort bestätigen',
+  formFieldLabel__signOutOfOtherSessions: 'Alle anderen Geräte abmelden',
   formFieldLabel__firstName: 'Vorname',
   formFieldLabel__lastName: 'Nachname',
   formFieldLabel__backupCode: 'Sicherungscode',
@@ -394,7 +396,10 @@ export const deDE: LocalizationResource = {
     },
     passwordPage: {
       title: 'Passwort festlegen',
+      changePasswordTitle: 'Passwort ändern',
       successMessage: 'Ihr Passwort wurde festgelegt.',
+      changePasswordSuccessMessage: 'Dein Passwort wurde aktualisiert.',
+      sessionsSignedOutSuccessMessage: 'Alle anderen Geräte wurden abgemeldet.',
     },
     mfaPage: {
       title: 'Aktivieren Sie Zweifaktor-Authentifizierung',

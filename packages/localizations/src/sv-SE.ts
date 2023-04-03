@@ -24,8 +24,10 @@ export const svSE: LocalizationResource = {
   formFieldLabel__phoneNumber_username: 'Telefonnummer eller användarnamn',
   formFieldLabel__emailAddress_phoneNumber_username: 'E-postadress, telefonnummer eller användarnamn',
   formFieldLabel__password: 'Lösenord',
+  formFieldLabel__currentPassword: 'Nuvarande lösenord',
   formFieldLabel__newPassword: 'Nytt lösenord',
   formFieldLabel__confirmPassword: 'Bekräfta lösenord',
+  formFieldLabel__signOutOfOtherSessions: 'Logga ut från alla andra enheter',
   formFieldLabel__firstName: 'Förnamn',
   formFieldLabel__lastName: 'Efternamn',
   formFieldLabel__backupCode: 'Reserv-kod',
@@ -399,7 +401,10 @@ export const svSE: LocalizationResource = {
     },
     passwordPage: {
       title: 'Ange lösenord',
+      changePasswordTitle: 'Byt lösenord',
       successMessage: 'Ditt lösenord har angetts.',
+      changePasswordSuccessMessage: 'Ditt lösenord har uppdaterats.',
+      sessionsSignedOutSuccessMessage: 'Alla andra enheter har loggats ut.',
     },
     mfaPage: {
       title: 'Lägg till tvåstegsverifiering',

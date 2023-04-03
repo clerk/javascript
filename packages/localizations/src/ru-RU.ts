@@ -24,8 +24,10 @@ export const ruRU: LocalizationResource = {
   formFieldLabel__phoneNumber_username: 'номер телефона или имя пользователя',
   formFieldLabel__emailAddress_phoneNumber_username: 'Почта, номер телефона или имя пользователя',
   formFieldLabel__password: 'Пароль',
+  formFieldLabel__currentPassword: 'Текущий пароль',
   formFieldLabel__newPassword: 'Новый пароль',
   formFieldLabel__confirmPassword: 'Подтверждение пароля',
+  formFieldLabel__signOutOfOtherSessions: 'Выйти со всех других устройств',
   formFieldLabel__firstName: 'Имя',
   formFieldLabel__lastName: 'Фамилия',
   formFieldLabel__backupCode: 'Код восстановления',
@@ -397,7 +399,10 @@ export const ruRU: LocalizationResource = {
     },
     passwordPage: {
       title: 'Установить пароль',
+      changePasswordTitle: 'Изменить пароль',
       successMessage: 'Ваш пароль установлен.',
+      changePasswordSuccessMessage: 'Ваш пароль был обновлен.',
+      sessionsSignedOutSuccessMessage: 'Все другие устройства были выведены из системы.',
     },
     mfaPage: {
       title: 'Добавить двухфакторную аутентификацию',
