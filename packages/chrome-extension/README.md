@@ -32,7 +32,7 @@ the <a href="https://clerk.com/docs/reference/node/getting-started?utm_source=gi
 
 ## Getting Started
 
-To use this package you should first create a Clerk application and retrieve a `Publishable Key` for you application to be used as environment variables `REACT_APP_CLERK_PUBLISHABLE_KEY`.
+To use this package you should first create a Clerk application and retrieve a `Publishable Key` for you application to be used as environment variables `CLERK_PUBLISHABLE_KEY`.
 
 ### Prerequisites
 
@@ -57,7 +57,7 @@ function HelloUser() {
   return <p> Hello user</p>;
 }
 
-const publishableKey = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY || '';
+const publishableKey = process.env.CLERK_PUBLISHABLE_KEY || '';
 
 function ClerkProviderWithRoutes() {
   const navigate = useNavigate();
