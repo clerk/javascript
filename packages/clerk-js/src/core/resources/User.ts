@@ -13,6 +13,7 @@ import type {
   ImageResource,
   OrganizationMembershipResource,
   PhoneNumberResource,
+  RemoveUserPasswordParams,
   SetProfileImageParams,
   TOTPJSON,
   TOTPResource,
@@ -204,6 +205,13 @@ export class User extends BaseResource implements UserResource {
     return this._basePost({
       body: params,
       path: `${this.path()}/change_password`,
+    });
+  };
+
+  removePassword = (params: RemoveUserPasswordParams): Promise<UserResource> => {
+    return this._basePost({
+      body: params,
+      path: `${this.path()}/remove_password`,
     });
   };
 

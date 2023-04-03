@@ -272,12 +272,7 @@ describe('User', () => {
     // @ts-ignore
     BaseResource._fetch = jest.fn().mockReturnValue(Promise.resolve({ response: {} }));
 
-    const user = new User({
-      email_addresses: [],
-      phone_numbers: [],
-      web3_wallets: [],
-      external_accounts: [],
-    } as unknown as UserJSON);
+    const user = new User({} as unknown as UserJSON);
     const params = {
       currentPassword: 'current-password',
       newPassword: 'new-password',
@@ -288,6 +283,24 @@ describe('User', () => {
     expect(BaseResource._fetch).toHaveBeenCalledWith({
       method: 'POST',
       path: '/me/change_password',
+      body: params,
+    });
+  });
+
+  it('.removePassword triggers a request to remove password', async () => {
+    // @ts-ignore
+    BaseResource._fetch = jest.fn().mockReturnValue(Promise.resolve({ response: {} }));
+
+    const user = new User({} as unknown as UserJSON);
+    const params = {
+      currentPassword: 'current-password',
+    };
+    await user.removePassword(params);
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({
+      method: 'POST',
+      path: '/me/remove_password',
       body: params,
     });
   });
