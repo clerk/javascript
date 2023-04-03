@@ -11,7 +11,7 @@ type ExtractAuthUrlKey =
   | keyof Pick<SignInCtx, 'afterSignUpUrl' | 'afterSignInUrl'>;
 
 type ExtractAuthPropOptions =
-  | { queryParams: ParsedQs; displayConfig: DisplayConfigResource; currentUrl?: URL } & (
+  | { queryParams: ParsedQs; displayConfig: DisplayConfigResource } & (
       | {
           ctx: Omit<SignUpCtx, 'componentName'>;
         }
@@ -22,23 +22,24 @@ type ExtractAuthPropOptions =
 
 /**
  *
+ * extractAuthProp(key, options)
+ *
  * Retrieve auth redirect props passed through querystring parameters, component props
  * or display config settings.
  *
  * The priority is:
- * Querystring parameters from the router > current url params > ClerkJS component props > Display configuration payload
+ * Querystring parameters > ClerkJS component props > Display configuration payload
  */
-export const getRedirectProp = (key: ExtractAuthUrlKey, opts: ExtractAuthPropOptions): string => {
-  const { ctx, displayConfig, queryParams: routerParams, currentUrl = new URL(window.location.href) } = opts;
-  const urlParams = currentUrl.searchParams;
-  const snakeCasedKey = camelToSnake(key);
-  const fallbackKey = 'redirect_url';
+export const extractAuthProp = (
+  key: ExtractAuthUrlKey,
+  { ctx, queryParams, displayConfig }: ExtractAuthPropOptions,
+): string => {
+  const snakeCaseField = camelToSnake(key);
+  const queryParamValue = queryParams[snakeCaseField];
 
   const url =
-    (typeof routerParams[snakeCasedKey] === 'string' ? routerParams[snakeCasedKey] : null) ||
-    (typeof routerParams[fallbackKey] === 'string' ? routerParams[fallbackKey] : null) ||
-    urlParams.get(snakeCasedKey) ||
-    urlParams.get(fallbackKey) ||
+    (typeof queryParamValue === 'string' ? queryParamValue : null) ||
+    (typeof queryParams.redirect_url === 'string' ? queryParams.redirect_url : null) ||
     ctx[key] ||
     ctx.redirectUrl ||
     displayConfig[key];
