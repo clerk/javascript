@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { useLocalStorage } from '../../hooks';
 import { extractDigits, formatPhoneNumber, parsePhoneString } from '../../utils';
 import type { CountryIso } from './countryCodeData';
 import { IsoToCountryMap } from './countryCodeData';
