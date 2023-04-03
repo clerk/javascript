@@ -14,3 +14,13 @@ export type PublishableKeyOrFrontendApi =
       frontendApi: string;
       publishableKey?: never;
     };
+
+export type SecretKeyOrApiKey =
+  | {
+      secretKey?: never;
+      apiKey: string;
+    }
+  | {
+      secretKey: string;
+      apiKey?: never;
+    };
