@@ -13,6 +13,7 @@ type Options = {
   placeholder?: string | LocalizationKey;
   type?: HTMLInputTypeAttribute;
   options?: SelectOption[];
+  checked?: boolean;
 };
 
 type FieldStateProps<Id> = {
@@ -26,6 +27,7 @@ type FieldStateProps<Id> = {
 export type FormControlState<Id = string> = FieldStateProps<Id> & {
   setError: (error: string | ClerkAPIError | undefined) => void;
   setValue: (val: string | undefined) => void;
+  setChecked: (isChecked: boolean) => void;
   props: FieldStateProps<Id>;
 };
 
@@ -36,16 +38,23 @@ export const useFormControl = <Id extends string>(
 ): FormControlState<Id> => {
   opts = opts || { type: 'text', label: '', isRequired: false, placeholder: '', options: [] };
   const { translateError } = useLocalizations();
-  const [value, setValueInternal] = React.useState(initialState);
+  const [value, setValueInternal] = React.useState<string>(initialState);
+  const [checked, setCheckedInternal] = React.useState<boolean>(opts?.checked || false);
   const [errorText, setErrorText] = React.useState<string | undefined>(undefined);
 
-  const onChange: FormControlState['onChange'] = event => setValueInternal(event.target.value || '');
+  const onChange: FormControlState['onChange'] = event => {
+    if (opts?.type === 'checkbox') {
+      return setCheckedInternal(event.target.checked);
+    }
+    return setValueInternal(event.target.value || '');
+  };
   const setValue: FormControlState['setValue'] = val => setValueInternal(val || '');
+  const setChecked: FormControlState['setChecked'] = checked => setCheckedInternal(checked);
   const setError: FormControlState['setError'] = error => setErrorText(translateError(error || undefined));
 
-  const props = { id, name: id, value, errorText, onChange, ...opts };
+  const props = { id, name: id, value, checked, errorText, onChange, ...opts };
 
-  return { props, ...props, setError, setValue };
+  return { props, ...props, setError, setValue, setChecked };
 };
 
 type FormControlStateLike = Pick<FormControlState, 'id' | 'value'>;
