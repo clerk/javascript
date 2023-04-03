@@ -8,12 +8,14 @@ import {
   signedInAuthObject,
   signedOutAuthObject,
 } from '@clerk/backend';
+import type { SecretKeyOrApiKey } from '@clerk/types';
 
 import { API_KEY, API_URL, API_VERSION, SECRET_KEY } from './clerk';
 import type { RequestLike } from './types';
 import { getAuthKeyFromRequest, getCookie, getHeader, injectSSRStateIntoObject } from './utils';
 
-export const getAuth = (req: RequestLike): SignedInAuthObject | SignedOutAuthObject => {
+type GetAuthOpts = Partial<SecretKeyOrApiKey>;
+export const getAuth = (req: RequestLike, opts?: GetAuthOpts): SignedInAuthObject | SignedOutAuthObject => {
   // When the auth status is set, we trust that the middleware has already run
   // Then, we don't have to re-verify the JWT here,
   // we can just strip out the claims manually.
@@ -28,8 +30,8 @@ export const getAuth = (req: RequestLike): SignedInAuthObject | SignedOutAuthObj
   }
 
   const options = {
-    apiKey: API_KEY,
-    secretKey: SECRET_KEY,
+    apiKey: opts?.apiKey || API_KEY,
+    secretKey: opts?.secretKey || SECRET_KEY,
     apiUrl: API_URL,
     apiVersion: API_VERSION,
     authStatus,
