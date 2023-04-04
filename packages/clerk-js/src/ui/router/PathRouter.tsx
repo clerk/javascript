@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { stripOrigin, trimTrailingSlash } from '../../utils';
+import { mergeFragmentIntoUrl, stripOrigin } from '../../utils';
 import { useCoreClerk } from '../contexts';
 import { BaseRouter } from './BaseRouter';
 
@@ -18,7 +18,7 @@ export const PathRouter = ({ basePath, preservedParams, children }: PathRouterPr
     throw new Error('Clerk: Missing navigate option.');
   }
 
-  const internalNavigate = (toURL: URL | undefined) => {
+  const internalNavigate = (toURL: URL | string | undefined) => {
     if (!toURL) {
       return;
     }
@@ -34,26 +34,19 @@ export const PathRouter = ({ basePath, preservedParams, children }: PathRouterPr
     return window.location.search;
   };
 
+  const urlHasFragment = window.location.hash.startsWith('#/');
   React.useEffect(() => {
     const convertHashToPath = async () => {
-      if (window.location.hash.startsWith('#/')) {
-        const hashToPath = new URL(window.location.pathname + window.location.hash.substring(1), window.location.href);
-        hashToPath.pathname = trimTrailingSlash(hashToPath.pathname);
-
-        //transfer search params
-        const url = new URL(window.location.href);
-        for (const [key, value] of url.searchParams) {
-          hashToPath.searchParams.append(key, value);
-        }
-
-        await navigate(stripOrigin(hashToPath));
+      if (urlHasFragment) {
+        const url = mergeFragmentIntoUrl(new URL(window.location.href));
+        await internalNavigate(url.href);
         setStripped(true);
       }
     };
     void convertHashToPath();
   }, [setStripped, navigate, window.location.hash]);
 
-  if (window.location.hash.startsWith('#/') && !stripped) {
+  if (urlHasFragment && !stripped) {
     return null;
   }
 

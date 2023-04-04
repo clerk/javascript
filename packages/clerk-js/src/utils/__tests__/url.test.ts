@@ -10,6 +10,7 @@ import {
   isAccountsHostedPages,
   isDataUri,
   isValidUrl,
+  mergeFragmentIntoUrl,
   trimTrailingSlash,
 } from '../url';
 
@@ -340,5 +341,20 @@ describe('getSearchParameterFromHash(options)', () => {
         paramName,
       }),
     ).toEqual(expectedParamValue);
+  });
+});
+
+describe('mergeFragmentIntoUrl(url | string)', () => {
+  const testCases: Array<[string | URL, URL]> = [
+    ['https://test.test#/foo/bar', new URL('https://test.test/foo/bar')],
+    ['https://test.test#/foo/bar?a=a', new URL('https://test.test/foo/bar?a=a')],
+    ['https://test.test?a=a#/foo/bar?b=b', new URL('https://test.test/foo/bar?a=a&b=b')],
+    ['https://test.test?a=a', new URL('https://test.test?a=a')],
+    ['https://test.test/foo', new URL('https://test.test/foo')],
+  ];
+
+  test.each(testCases)('url=(%s), expected value=(%s)', (url, expectedParamValue) => {
+    expect(mergeFragmentIntoUrl(new URL(url)).href).toEqual(expectedParamValue.href);
+    expect(mergeFragmentIntoUrl(url).href).toEqual(expectedParamValue.href);
   });
 });
