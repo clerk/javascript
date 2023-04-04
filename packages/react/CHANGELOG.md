@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.14.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@4.14.1...@clerk/clerk-react@4.14.2) (2023-04-04)
+
+### Reverts
+
+- Revert "chore(clerk-react): Drop vite stale code (#1001)" ([f1bc859](https://github.com/clerkinc/javascript/commit/f1bc8594e746ded75fd41e2c3d1c5de4ec7ed303)), closes [#1001](https://github.com/clerkinc/javascript/issues/1001)
+
 ### [4.14.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-react@4.14.1-staging.3...@clerk/clerk-react@4.14.1) (2023-03-31)
 
 **Note:** Version bump only for package @clerk/clerk-react
