@@ -15,7 +15,9 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
     // outline support for Windows contrast themes
     outline: 'transparent solid 2px',
     outlineOffset: '2px',
-    width: props.type === 'checkbox' ? 'min-content' : '100%',
+    width: props.type === 'checkbox' ? theme.sizes.$4 : '100%',
+    aspectRatio: props.type === 'checkbox' ? '1/1' : 'unset',
+    accentColor: theme.colors.$primary500,
     ...common.textVariants(theme).smallRegular,
     ...common.borderVariants(theme, props).normal,
     ...(props.focusRing === false ? {} : common.focusRingInput(theme)),
