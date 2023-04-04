@@ -304,6 +304,7 @@ export const enUS: LocalizationResource = {
         title: 'Password',
         primaryButton__changePassword: 'Change password',
         primaryButton__setPassword: 'Set password',
+        primaryButton__removePassword: 'Remove password',
       },
       mfaSection: {
         title: 'Two-step verification',
@@ -429,8 +430,10 @@ export const enUS: LocalizationResource = {
     },
     passwordPage: {
       title: 'Set password',
+      removePasswordTitle: 'Remove password',
       changePasswordTitle: 'Change password',
       successMessage: 'Your password has been set.',
+      removePasswordSuccessMessage: 'Your password has been removed your account.',
       changePasswordSuccessMessage: 'Your password has been updated.',
       sessionsSignedOutSuccessMessage: 'All other devices have been signed out.',
     },

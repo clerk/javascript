@@ -101,6 +101,12 @@ export const UserProfileRoutes = (props: PropsOfComponent<typeof ProfileCardCont
       <Route path='password'>
         <PasswordPage />
       </Route>
+
+      {/* TODO: Uncomment these lines once the issue with enabled and required password is resolved */}
+      {/*<Route path='remove-password'>*/}
+      {/*  <PasswordRemovalPage />*/}
+      {/*</Route>*/}
+
       {/*</Route>*/}
     </ProfileCardContent>
   );
