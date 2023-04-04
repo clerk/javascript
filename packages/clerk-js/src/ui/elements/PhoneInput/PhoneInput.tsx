@@ -1,10 +1,10 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { forwardRef, useLayoutEffect, useState } from 'react';
 
 import { useCoreClerk } from '../../contexts';
 import { descriptors, Flex, Input, Text } from '../../customizables';
 import { Select, SelectButton, SelectOptionList } from '../../elements';
 import type { PropsOfComponent } from '../../styledSystem';
-import { getFlagEmojiFromCountryIso } from '../../utils';
+import { getFlagEmojiFromCountryIso, mergeRefs } from '../../utils';
 import type { CountryEntry, CountryIso } from './countryCodeData';
 import { IsoToCountryMap } from './countryCodeData';
 import { useFormattedPhoneNumber } from './useFormattedPhoneNumber';
@@ -22,8 +22,8 @@ const countryOptions = [...IsoToCountryMap.values()].map(createSelectOption);
 
 type PhoneInputProps = PropsOfComponent<typeof Input> & { locationBasedCountryIso?: CountryIso };
 
-const PhoneInputBase = (props: PhoneInputProps) => {
-  const { onChange: onChangeProp, value, locationBasedCountryIso, ...rest } = props;
+const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref) => {
+  const { onChange: onChangeProp, value, locationBasedCountryIso, sx, ...rest } = props;
   const phoneInputRef = React.useRef<HTMLInputElement>(null);
   const { setNumber, setIso, setNumberAndIso, numberWithCode, iso, formattedNumber } = useFormattedPhoneNumber({
     initPhoneWithCode: value as string,
@@ -131,18 +131,23 @@ const PhoneInputBase = (props: PhoneInputProps) => {
         onChange={handlePhoneNumberChange}
         maxLength={25}
         type='tel'
-        sx={{
-          borderColor: 'transparent',
-          height: '100%',
-          borderTopLeftRadius: '0',
-          borderBottomLeftRadius: '0',
-        }}
-        ref={phoneInputRef}
+        sx={[
+          {
+            borderColor: 'transparent',
+            height: '100%',
+            borderTopLeftRadius: '0',
+            borderBottomLeftRadius: '0',
+          },
+          sx,
+        ]}
+        //use our internal ref while forwarding
+        //@ts-expect-error
+        ref={mergeRefs(phoneInputRef, ref)}
         {...rest}
       />
     </Flex>
   );
-};
+});
 
 type CountryCodeListItemProps = PropsOfComponent<typeof Flex> & {
   country: CountryEntry;
@@ -198,7 +203,7 @@ const Flag = (props: { iso: CountryIso }) => {
   );
 };
 
-export const PhoneInput = (props: Omit<PhoneInputProps, 'dd'>) => {
+export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref) => {
   // @ts-expect-error
   const { __internal_country } = useCoreClerk();
 
@@ -206,6 +211,7 @@ export const PhoneInput = (props: Omit<PhoneInputProps, 'dd'>) => {
     <PhoneInputBase
       {...props}
       locationBasedCountryIso={__internal_country as CountryIso}
+      ref={ref}
     />
   );
-};
+});

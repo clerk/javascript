@@ -1,5 +1,5 @@
 import type { FieldId } from '@clerk/types';
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import {
@@ -36,7 +36,7 @@ const getInputElementForType = (type: FormControlProps['type']) => {
   return type === 'password' ? PasswordInput : type === 'tel' ? PhoneInput : Input;
 };
 
-export const FormControl = (props: FormControlProps) => {
+export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props, ref) => {
   const { t } = useLocalizations();
   const card = useCardState();
   const { id, errorText, isRequired, isOptional, label, actionLabel, onActionClicked, sx, placeholder, ...rest } =
@@ -108,6 +108,7 @@ export const FormControl = (props: FormControlProps) => {
         isDisabled={isDisabled}
         isRequired={isRequired}
         {...rest}
+        ref={ref}
         placeholder={t(placeholder)}
       />
       <FormErrorText
@@ -118,4 +119,4 @@ export const FormControl = (props: FormControlProps) => {
       </FormErrorText>
     </FormControlPrim>
   );
-};
+});

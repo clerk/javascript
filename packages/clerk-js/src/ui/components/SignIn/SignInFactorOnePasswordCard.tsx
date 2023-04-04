@@ -66,6 +66,14 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
           gap={8}
         >
           <Form.Root onSubmit={handlePasswordSubmit}>
+            {/* For password managers */}
+            <input
+              readOnly
+              id='identifier-field'
+              name='identifier'
+              value={signIn.identifier || ''}
+              style={{ display: 'none' }}
+            />
             <Form.ControlRow elementId={passwordControl.id}>
               <Form.Control
                 {...passwordControl.props}

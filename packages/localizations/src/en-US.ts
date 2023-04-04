@@ -121,6 +121,10 @@ export const enUS: LocalizationResource = {
       subtitle: 'to continue to {{applicationName}}',
       actionText: 'No account?',
       actionLink: 'Sign up',
+      actionLink__use_email: 'Use email',
+      actionLink__use_phone: 'Use phone',
+      actionLink__use_username: 'Use username',
+      actionLink__use_email_username: 'Use email or username',
     },
     password: {
       title: 'Enter your password',

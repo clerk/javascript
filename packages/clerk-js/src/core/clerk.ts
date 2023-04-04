@@ -83,7 +83,7 @@ import {
   clerkMissingDevBrowserJwt,
   clerkMissingProxyUrlAndDomain,
   clerkMissingSignInUrlAsSatellite,
-  clerkOAuthCallbackDidNotCompleteSignInSIgnUp,
+  clerkOAuthCallbackDidNotCompleteSignInSignUp,
   clerkRedirectUrlIsMissingScheme,
 } from './errors';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
@@ -839,7 +839,7 @@ export default class Clerk implements ClerkInterface {
         case 'needs_second_factor':
           return navigateToFactorTwo();
         default:
-          clerkOAuthCallbackDidNotCompleteSignInSIgnUp('sign in');
+          clerkOAuthCallbackDidNotCompleteSignInSignUp('sign in');
       }
     }
 
@@ -856,7 +856,7 @@ export default class Clerk implements ClerkInterface {
         case 'missing_requirements':
           return navigateToContinueSignUp();
         default:
-          clerkOAuthCallbackDidNotCompleteSignInSIgnUp('sign in');
+          clerkOAuthCallbackDidNotCompleteSignInSignUp('sign in');
       }
     }
 

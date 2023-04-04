@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 import { descriptors, Flex, Input } from '../customizables';
 import { EyeSlash } from '../icons';
 import type { PropsOfComponent } from '../styledSystem';
 import { IconButton } from './IconButton';
 
-export const PasswordInput = (props: PropsOfComponent<typeof Input>) => {
+export const PasswordInput = forwardRef<HTMLInputElement, PropsOfComponent<typeof Input>>((props, ref) => {
   const [hidden, setHidden] = React.useState(true);
   const { id, ...rest } = props;
   return (
@@ -17,6 +17,7 @@ export const PasswordInput = (props: PropsOfComponent<typeof Input>) => {
     >
       <Input
         {...rest}
+        ref={ref}
         type={hidden ? 'password' : 'text'}
         sx={theme => ({ paddingRight: theme.space.$8 })}
       />
@@ -38,4 +39,4 @@ export const PasswordInput = (props: PropsOfComponent<typeof Input>) => {
       />
     </Flex>
   );
-};
+});

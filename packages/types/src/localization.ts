@@ -20,9 +20,18 @@ type _LocalizationResource = {
   formFieldLabel__emailAddresses: LocalizationValue;
   formFieldLabel__phoneNumber: LocalizationValue;
   formFieldLabel__username: LocalizationValue;
+  /**
+   * @deprecated
+   */
   formFieldLabel__emailAddress_phoneNumber: LocalizationValue;
   formFieldLabel__emailAddress_username: LocalizationValue;
+  /**
+   * @deprecated
+   */
   formFieldLabel__phoneNumber_username: LocalizationValue;
+  /**
+   * @deprecated
+   */
   formFieldLabel__emailAddress_phoneNumber_username: LocalizationValue;
   formFieldLabel__password: LocalizationValue;
   formFieldLabel__newPassword: LocalizationValue;
@@ -36,9 +45,18 @@ type _LocalizationResource = {
   formFieldInputPlaceholder__emailAddresses: LocalizationValue;
   formFieldInputPlaceholder__phoneNumber: LocalizationValue;
   formFieldInputPlaceholder__username: LocalizationValue;
+  /**
+   * @deprecated
+   */
   formFieldInputPlaceholder__emailAddress_phoneNumber: LocalizationValue;
   formFieldInputPlaceholder__emailAddress_username: LocalizationValue;
+  /**
+   * @deprecated
+   */
   formFieldInputPlaceholder__phoneNumber_username: LocalizationValue;
+  /**
+   * @deprecated
+   */
   formFieldInputPlaceholder__emailAddress_phoneNumber_username: LocalizationValue;
   formFieldInputPlaceholder__password: LocalizationValue;
   formFieldInputPlaceholder__firstName: LocalizationValue;
@@ -121,6 +139,10 @@ type _LocalizationResource = {
       subtitle: LocalizationValue;
       actionText: LocalizationValue;
       actionLink: LocalizationValue;
+      actionLink__use_email: LocalizationValue;
+      actionLink__use_phone: LocalizationValue;
+      actionLink__use_username: LocalizationValue;
+      actionLink__use_email_username: LocalizationValue;
     };
     password: {
       title: LocalizationValue;

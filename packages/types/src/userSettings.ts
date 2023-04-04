@@ -2,7 +2,7 @@ import type { ClerkResourceJSON } from './json';
 import type { ClerkResource } from './resource';
 import type { OAuthStrategy, Web3Strategy } from './strategies';
 
-type Attribute =
+export type Attribute =
   | 'email_address'
   | 'phone_number'
   | 'username'
@@ -22,16 +22,19 @@ export type OAuthProviderSettings = {
   strategy: OAuthStrategy;
 };
 
-export type AttributeData = {
+export type AttributeDataJSON = {
   enabled: boolean;
   required: boolean;
-  name: Attribute;
   verifications: VerificationStrategy[];
   used_for_first_factor: boolean;
   first_factors: VerificationStrategy[];
   used_for_second_factor: boolean;
   second_factors: VerificationStrategy[];
   verify_at_sign_up: boolean;
+};
+
+export type AttributeData = AttributeDataJSON & {
+  name: Attribute;
 };
 
 export type SignInData = {
@@ -50,6 +53,10 @@ export type OAuthProviders = {
   [provider in OAuthStrategy]: OAuthProviderSettings;
 };
 
+export type AttributesJSON = {
+  [attribute in Attribute]: AttributeDataJSON;
+};
+
 export type Attributes = {
   [attribute in Attribute]: AttributeData;
 };
@@ -57,7 +64,7 @@ export type Attributes = {
 export interface UserSettingsJSON extends ClerkResourceJSON {
   id: never;
   object: never;
-  attributes: Attributes;
+  attributes: AttributesJSON;
   social: OAuthProviders;
   sign_in: SignInData;
   sign_up: SignUpData;

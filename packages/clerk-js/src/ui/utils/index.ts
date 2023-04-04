@@ -16,3 +16,4 @@ export * from './range';
 export * from './getValidReactChildren';
 export * from './roleLocalizationKey';
 export * from './getRelativeToNowDateKey';
+export * from './mergeRefs';
