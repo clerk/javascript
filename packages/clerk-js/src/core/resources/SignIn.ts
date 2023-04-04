@@ -168,14 +168,14 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public authenticateWithRedirect = async (params: AuthenticateWithRedirectParams): Promise<void> => {
-    const { strategy, redirectUrl, redirectUrlComplete } = params || {};
+    const { strategy, samlIdentifier, redirectUrl, redirectUrlComplete } = params || {};
     const { firstFactorVerification } = await this.create({
       strategy,
+      samlIdentifier,
       redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
       actionCompleteRedirectUrl: redirectUrlComplete,
     });
     const { status, externalVerificationRedirectURL } = firstFactorVerification;
-
     if (status === 'unverified' && externalVerificationRedirectURL) {
       windowNavigate(externalVerificationRedirectURL);
     } else {

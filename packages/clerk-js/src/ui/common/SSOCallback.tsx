@@ -1,4 +1,4 @@
-import type { HandleOAuthCallbackParams } from '@clerk/types/src';
+import type { HandleOAuthCallbackParams, HandleSamlCallbackParams } from '@clerk/types/src';
 import React from 'react';
 
 import { useCoreClerk } from '../contexts';
@@ -6,7 +6,7 @@ import { Flow } from '../customizables';
 import { LoadingCard } from '../elements';
 import { useNavigate } from '../hooks';
 
-export const SSOCallback = (props: HandleOAuthCallbackParams) => {
+export const SSOCallback = (props: HandleOAuthCallbackParams | HandleSamlCallbackParams) => {
   const { handleRedirectCallback } = useCoreClerk();
   const { navigate } = useNavigate();
 

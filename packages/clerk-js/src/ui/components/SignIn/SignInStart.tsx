@@ -11,7 +11,7 @@ import {
   withRedirectToHomeSingleSessionGuard,
 } from '../../common';
 import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
-import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
+import { Button, Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import {
   Card,
   CardAlert,
@@ -55,6 +55,7 @@ export function _SignInStart(): JSX.Element {
     identifierAttributes,
     identifierAttribute,
   );
+
   const instantPasswordField = useFormControl('password', '', {
     type: 'password',
     label: localizationKeys('formFieldLabel__password'),
@@ -65,6 +66,9 @@ export function _SignInStart(): JSX.Element {
     ...currentIdentifier,
     isRequired: true,
   });
+
+  // TODO replace with check in first factors?
+  const showSaml = userSettings.saml.length > 0;
 
   const switchToNextIdentifier = () => {
     setIdentifierAttribute(
@@ -153,6 +157,7 @@ export function _SignInStart(): JSX.Element {
         void (await signIn.create({}));
       }
     }
+
     void handleOauthError();
   }, []);
 
@@ -256,6 +261,14 @@ export function _SignInStart(): JSX.Element {
                 </Form.ControlRow>
                 <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
                 <Form.SubmitButton>Continue</Form.SubmitButton>
+                {showSaml && (
+                  <Button
+                    block
+                    variant='link'
+                    localizationKey={localizationKeys('signIn.start.saml')}
+                    onClick={() => navigate('saml')}
+                  />
+                )}
               </Form.Root>
             ) : null}
           </SocialButtonsReversibleContainerWithDivider>

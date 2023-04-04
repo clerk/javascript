@@ -25,7 +25,7 @@ function setFieldErrors(fieldStates: Array<FormControlState<string>>, errors: Cl
 function parseErrors(errors: ClerkAPIError[]): ParserErrors {
   return (errors || []).reduce(
     (memo, err) => {
-      if (err.meta!.paramName) {
+      if (err.meta!.paramName && err.meta!.paramName !== 'strategy') {
         memo.fieldErrors.push(err);
       } else {
         memo.globalErrors.push(err);

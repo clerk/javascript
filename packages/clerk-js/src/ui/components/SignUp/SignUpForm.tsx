@@ -1,7 +1,9 @@
 import React from 'react';
 
-import { useAppearance } from '../../customizables';
+import { useEnvironment } from '../../contexts';
+import { Button, localizationKeys, useAppearance } from '../../customizables';
 import { Form } from '../../elements';
+import { useNavigate } from '../../hooks';
 import type { FormControlState } from '../../utils';
 import type { ActiveIdentifier, Fields } from './signUpFormHelpers';
 
@@ -16,6 +18,10 @@ type SignUpFormProps = {
 export const SignUpForm = (props: SignUpFormProps) => {
   const { handleSubmit, fields, formState, canToggleEmailPhone, handleEmailPhoneToggle } = props;
   const { showOptionalFields } = useAppearance().parsedLayout;
+  const { navigate } = useNavigate();
+  const { userSettings } = useEnvironment();
+
+  const showSaml = userSettings.saml.length > 0;
 
   const shouldShow = (name: keyof typeof fields) => {
     // In case both email & phone are optional, then don't take into account the
@@ -100,6 +106,14 @@ export const SignUpForm = (props: SignUpFormProps) => {
         </Form.ControlRow>
       )}
       <Form.SubmitButton>Continue</Form.SubmitButton>
+      {showSaml && (
+        <Button
+          block
+          variant='link'
+          localizationKey={localizationKeys('signUp.start.saml')}
+          onClick={() => navigate('saml')}
+        />
+      )}
     </Form.Root>
   );
 };

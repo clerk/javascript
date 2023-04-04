@@ -1,3 +1,4 @@
+import type { OAuthStrategy } from '@clerk/types';
 import React from 'react';
 
 import { buildSSOCallbackURL } from '../../common/redirects';
@@ -22,7 +23,7 @@ export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
   return (
     <SocialButtons
       {...props}
-      oauthCallback={strategy => {
+      oauthCallback={(strategy: OAuthStrategy) => {
         return signIn
           .authenticateWithRedirect({ strategy, redirectUrl, redirectUrlComplete })
           .catch(err => handleError(err, [], card.setError));

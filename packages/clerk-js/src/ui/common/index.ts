@@ -4,6 +4,7 @@ export * from './forms';
 export * from './redirects';
 export * from './verification';
 export * from './withRedirectToHome';
+export * from './SamlCard';
 export * from './SSOCallback';
 export * from './EmailLinkVerify';
 export * from './EmailLinkStatusCard';

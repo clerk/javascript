@@ -11,4 +11,5 @@ export type BackupCodeStrategy = 'backup_code';
 export type ResetPasswordCodeStrategy = 'reset_password_code';
 
 export type OAuthStrategy = `oauth_${OAuthProvider}`;
+export type SamlStrategy = 'saml';
 export type Web3Strategy = `web3_${Web3Provider}_signature`;

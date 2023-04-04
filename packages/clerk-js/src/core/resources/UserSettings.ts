@@ -3,6 +3,7 @@ import type {
   OAuthProviders,
   OAuthStrategy,
   PasswordSettingsData,
+  SamlConnection,
   SignInData,
   SignUpData,
   UserSettingsJSON,
@@ -18,6 +19,7 @@ import { BaseResource } from './internal';
 export class UserSettings extends BaseResource implements UserSettingsResource {
   id = undefined;
   social!: OAuthProviders;
+  saml!: SamlConnection[];
   attributes!: Attributes;
   signIn!: SignInData;
   signUp!: SignUpData;
@@ -51,6 +53,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     }
 
     this.social = data.social;
+    this.saml = data.saml || [];
     this.attributes = Object.fromEntries(
       Object.entries(data.attributes).map(a => [a[0], { ...a[1], name: a[0] }]),
     ) as Attributes;

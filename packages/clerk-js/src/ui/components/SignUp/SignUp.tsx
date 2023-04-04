@@ -6,6 +6,7 @@ import { ComponentContext, useCoreClerk, useSignUpContext, withCoreSessionSwitch
 import { Flow } from '../../customizables';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
 import { SignUpContinue } from './SignUpContinue';
+import { SignUpSaml } from './SignUpSaml';
 import { SignUpSSOCallback } from './SignUpSSOCallback';
 import { SignUpStart } from './SignUpStart';
 import { SignUpVerifyEmail } from './SignUpVerifyEmail';
@@ -49,6 +50,9 @@ function SignUpRoutes(): JSX.Element {
         </Route>
         <Route path='continue'>
           <SignUpContinue />
+        </Route>
+        <Route path='saml'>
+          <SignUpSaml />
         </Route>
         <Route index>
           <SignUpStart />
