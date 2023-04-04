@@ -269,6 +269,7 @@ export const ptBR: LocalizationResource = {
         title: 'Senha',
         primaryButton__changePassword: 'Trocar a senha',
         primaryButton__setPassword: 'Defina a senha',
+        primaryButton__removePassword: '',
       },
       mfaSection: {
         title: 'Verificação em duas etapas',
@@ -394,8 +395,10 @@ export const ptBR: LocalizationResource = {
     },
     passwordPage: {
       title: 'Defina a senha',
+      removePasswordTitle: '',
       changePasswordTitle: 'Trocar senha',
       successMessage: 'Sua senha foi salva.',
+      removePasswordSuccessMessage: '',
       changePasswordSuccessMessage: 'Sua senha foi atualizada.',
       sessionsSignedOutSuccessMessage: 'Todos os outros dispositivos foram desconectados.',
     },

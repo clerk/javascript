@@ -272,6 +272,7 @@ export const itIT: LocalizationResource = {
         title: 'Password',
         primaryButton__changePassword: 'Cambia password',
         primaryButton__setPassword: 'Imposta password',
+        primaryButton__removePassword: '',
       },
       mfaSection: {
         title: 'Verifica in 2 passaggi',
@@ -397,8 +398,10 @@ export const itIT: LocalizationResource = {
     },
     passwordPage: {
       title: 'Imposta password',
+      removePasswordTitle: '',
       changePasswordTitle: 'Cambia password',
       successMessage: 'La tua password é stata impostata.',
+      removePasswordSuccessMessage: '',
       changePasswordSuccessMessage: 'La tua password è stata aggiornata.',
       sessionsSignedOutSuccessMessage: 'Tutti gli altri dispositivi sono stati disconnessi.',
     },

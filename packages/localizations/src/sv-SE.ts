@@ -276,6 +276,7 @@ export const svSE: LocalizationResource = {
         title: 'Lösenord',
         primaryButton__changePassword: 'Byt lösenord',
         primaryButton__setPassword: 'Ställ in lösenord',
+        primaryButton__removePassword: '',
       },
       mfaSection: {
         title: 'Tvåstegsverifiering',
@@ -403,8 +404,10 @@ export const svSE: LocalizationResource = {
     },
     passwordPage: {
       title: 'Ange lösenord',
+      removePasswordTitle: '',
       changePasswordTitle: 'Byt lösenord',
       successMessage: 'Ditt lösenord har angetts.',
+      removePasswordSuccessMessage: '',
       changePasswordSuccessMessage: 'Ditt lösenord har uppdaterats.',
       sessionsSignedOutSuccessMessage: 'Alla andra enheter har loggats ut.',
     },
