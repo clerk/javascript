@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nextjs",
-  "version": "4.14.0-staging.2",
+  "version": "4.14.1",
   "license": "MIT",
   "description": "Clerk SDK for NextJS",
   "keywords": [
@@ -30,17 +30,18 @@
   ],
   "scripts": {
     "prepublishOnly": "npm run build",
-    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsup --watch",
+    "build": "tsup --env.NODE_ENV production",
+    "build:analyze": "tsup --metafile --env.NODE_ENV production",
     "clean": "rimraf ./dist",
     "lint": "eslint .",
-    "test": "jest",
-    "dev": "tsc -p tsconfig.build.json --watch"
+    "test": "jest"
   },
   "dependencies": {
-    "@clerk/backend": "^0.16.0-staging.2",
-    "@clerk/clerk-react": "^4.14.1-staging.2",
-    "@clerk/clerk-sdk-node": "^4.8.1-staging.3",
-    "@clerk/types": "^3.33.0-staging.2",
+    "@clerk/backend": "^0.16.0",
+    "@clerk/clerk-react": "^4.14.1",
+    "@clerk/clerk-sdk-node": "^4.8.1",
+    "@clerk/types": "^3.33.0",
     "tslib": "2.4.1"
   },
   "devDependencies": {
@@ -50,6 +51,7 @@
     "jest": "*",
     "node-fetch-native": "^0.1.8",
     "ts-jest": "*",
+    "tsup": "*",
     "typescript": "*"
   },
   "peerDependencies": {

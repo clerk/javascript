@@ -1,6 +1,6 @@
 import type { AuthStatus, RequestState } from '@clerk/backend';
 import { constants, debugRequestState } from '@clerk/backend';
-import type { NextMiddleware, NextMiddlewareResult } from 'next/dist/server/web/types';
+import type { NextMiddleware } from 'next/dist/server/web/types';
 import type { NextFetchEvent, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -30,6 +30,8 @@ import {
   setRequestHeadersOnNextResponse,
 } from './utils';
 
+type NextMiddlewareResult = Awaited<ReturnType<NextMiddleware>>;
+
 interface WithClerkMiddleware {
   (handler: NextMiddleware, opts?: WithAuthOptions): NextMiddleware;
 
@@ -45,7 +47,6 @@ export const decorateResponseWithObservabilityHeaders = (res: NextResponse, requ
 export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => {
   const noop = () => undefined;
   const [handler = noop, opts = {}] = args as [NextMiddleware, WithAuthOptions] | [];
-
   const proxyUrl = opts?.proxyUrl || PROXY_URL;
 
   if (!!proxyUrl && !isHttpOrHttps(proxyUrl)) {
@@ -72,10 +73,10 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
     const headerToken = headers.get('authorization')?.replace('Bearer ', '');
     const requestState = await clerkClient.authenticateRequest({
       ...opts,
-      apiKey: API_KEY,
-      secretKey: SECRET_KEY,
-      frontendApi: FRONTEND_API,
-      publishableKey: PUBLISHABLE_KEY,
+      apiKey: opts.apiKey || API_KEY,
+      secretKey: opts.secretKey || SECRET_KEY,
+      frontendApi: opts.frontendApi || FRONTEND_API,
+      publishableKey: opts.publishableKey || PUBLISHABLE_KEY,
       cookieToken,
       headerToken,
       clientUat: getCookie(req, constants.Cookies.ClientUat),
@@ -104,8 +105,8 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
       const response = NextResponse.rewrite(
         clerkClient.remotePublicInterstitialUrl({
           apiUrl: API_URL,
-          frontendApi: FRONTEND_API,
-          publishableKey: PUBLISHABLE_KEY,
+          frontendApi: opts.frontendApi || FRONTEND_API,
+          publishableKey: opts.publishableKey || PUBLISHABLE_KEY,
           pkgVersion: JS_VERSION,
           proxyUrl: requestState.proxyUrl as any,
           isSatellite: requestState.isSatellite,

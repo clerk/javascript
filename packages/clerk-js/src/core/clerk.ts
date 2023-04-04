@@ -156,15 +156,21 @@ export default class Clerk implements ClerkInterface {
   }
 
   get isSatellite(): boolean {
-    return handleValueOrFn(this.#options.isSatellite, new URL(window.location.href), false);
+    if (inBrowser()) {
+      return handleValueOrFn(this.#options.isSatellite, new URL(window.location.href), false);
+    }
+    return false;
   }
 
   get domain(): string {
-    const strippedDomainString = stripScheme(handleValueOrFn(this.#domain, new URL(window.location.href)));
-    if (this.#instanceType === 'production') {
-      return addClerkPrefix(strippedDomainString);
+    if (inBrowser()) {
+      const strippedDomainString = stripScheme(handleValueOrFn(this.#domain, new URL(window.location.href)));
+      if (this.#instanceType === 'production') {
+        return addClerkPrefix(strippedDomainString);
+      }
+      return strippedDomainString;
     }
-    return strippedDomainString;
+    return '';
   }
 
   get instanceType() {
@@ -581,7 +587,7 @@ export default class Clerk implements ClerkInterface {
   };
 
   public navigate = async (to: string | undefined): Promise<unknown> => {
-    if (!to) {
+    if (!to || !inBrowser()) {
       return;
     }
 

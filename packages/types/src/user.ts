@@ -65,6 +65,7 @@ export interface UserResource extends ClerkResource {
 
   update: (params: UpdateUserParams) => Promise<UserResource>;
   updatePassword: (params: UpdateUserPasswordParams) => Promise<UserResource>;
+  removePassword: (params: RemoveUserPasswordParams) => Promise<UserResource>;
   createEmailAddress: (params: CreateEmailAddressParams) => Promise<EmailAddressResource>;
   createPhoneNumber: (params: CreatePhoneNumberParams) => Promise<PhoneNumberResource>;
   createWeb3Wallet: (params: CreateWeb3WalletParams) => Promise<Web3WalletResource>;
@@ -127,3 +128,5 @@ export type UpdateUserPasswordParams = {
   currentPassword?: string;
   signOutOfOtherSessions?: boolean;
 };
+
+export type RemoveUserPasswordParams = Pick<UpdateUserPasswordParams, 'currentPassword'>;
