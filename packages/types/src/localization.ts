@@ -139,10 +139,10 @@ type _LocalizationResource = {
       subtitle: LocalizationValue;
       actionText: LocalizationValue;
       actionLink: LocalizationValue;
-      useEmailActionLink: LocalizationValue;
-      usePhoneActionLink: LocalizationValue;
-      useEmailOrUsernameActionLink: LocalizationValue;
-      useUsernameActionLink: LocalizationValue;
+      actionLink__use_email: LocalizationValue;
+      actionLink__use_phone: LocalizationValue;
+      actionLink__use_username: LocalizationValue;
+      actionLink__use_email_username: LocalizationValue;
     };
     password: {
       title: LocalizationValue;
