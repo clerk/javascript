@@ -1,10 +1,10 @@
 import React from 'react';
 
 import { QuestionMark } from '../../../ui/icons';
-import { createSlug, isValidSlug } from '../../../ui/utils';
+import { createSlug } from '../../../ui/utils';
 import { useWizard, Wizard } from '../../common';
 import { useCoreClerk, useCoreOrganization, useCoreOrganizations, useCreateOrganizationContext } from '../../contexts';
-import { localizationKeys, useLocalizations } from '../../customizables';
+import { localizationKeys } from '../../customizables';
 import {
   ContentPage,
   Form,
@@ -22,7 +22,6 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
   const title = localizationKeys('createOrganization.title');
   const inviteTitle = localizationKeys('organizationProfile.invitePage.title');
   const card = useCardState();
-  const { t } = useLocalizations();
   const [file, setFile] = React.useState<File | null>();
   const { createOrganization } = useCoreOrganizations();
   const { setActive, closeCreateOrganization } = useCoreClerk();
