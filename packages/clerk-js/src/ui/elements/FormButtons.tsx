@@ -9,6 +9,7 @@ type FormButtonsProps = PropsOfComponent<typeof Form.SubmitButton> & {
   isDisabled?: boolean;
   submitLabel?: LocalizationKey;
   resetLabel?: LocalizationKey;
+  onReset?: () => unknown | Promise<unknown>;
 };
 
 export const FormButtons = (props: FormButtonsProps) => {
@@ -27,7 +28,7 @@ export const FormButtons = (props: FormButtonsProps) => {
         // Should the default key come from userProfile?
         localizationKey={resetLabel || localizationKeys('userProfile.formButtonReset')}
         block={false}
-        onClick={navigateToFlowStart}
+        onClick={props?.onReset || navigateToFlowStart}
       />
     </FormButtonContainer>
   );

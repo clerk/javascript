@@ -278,6 +278,7 @@ type _LocalizationResource = {
         title: LocalizationValue;
         primaryButton__changePassword: LocalizationValue;
         primaryButton__setPassword: LocalizationValue;
+        primaryButton__removePassword: LocalizationValue;
       };
       mfaSection: {
         title: LocalizationValue;
@@ -400,7 +401,9 @@ type _LocalizationResource = {
     };
     passwordPage: {
       title: LocalizationValue;
+      removePasswordTitle: LocalizationValue;
       successMessage: LocalizationValue;
+      removePasswordSuccessMessage: LocalizationValue;
     };
     mfaPage: {
       title: LocalizationValue;
