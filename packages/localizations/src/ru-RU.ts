@@ -270,6 +270,7 @@ export const ruRU: LocalizationResource = {
         title: 'Пароль',
         primaryButton__changePassword: 'Изменить пароль',
         primaryButton__setPassword: 'Установить пароль',
+        primaryButton__removePassword: '',
       },
       mfaSection: {
         title: 'Двухфакторная аутентификация',
@@ -397,7 +398,9 @@ export const ruRU: LocalizationResource = {
     },
     passwordPage: {
       title: 'Установить пароль',
+      removePasswordTitle: '',
       successMessage: 'Ваш пароль установлен.',
+      removePasswordSuccessMessage: '',
     },
     mfaPage: {
       title: 'Добавить двухфакторную аутентификацию',

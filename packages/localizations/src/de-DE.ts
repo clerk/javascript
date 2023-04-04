@@ -268,6 +268,7 @@ export const deDe: LocalizationResource = {
         title: 'Passwort',
         primaryButton__changePassword: 'Passwort ändern',
         primaryButton__setPassword: 'Passwort festlegen',
+        primaryButton__removePassword: '',
       },
       mfaSection: {
         title: 'Zweifaktor-Authentifizierung',
@@ -394,7 +395,9 @@ export const deDe: LocalizationResource = {
     },
     passwordPage: {
       title: 'Passwort festlegen',
+      removePasswordTitle: '',
       successMessage: 'Ihr Passwort wurde festgelegt.',
+      removePasswordSuccessMessage: '',
     },
     mfaPage: {
       title: 'Aktivieren Sie Zweifaktor-Authentifizierung',

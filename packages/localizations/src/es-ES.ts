@@ -268,6 +268,7 @@ export const esES: LocalizationResource = {
         title: 'Contraseña',
         primaryButton__changePassword: 'Cambiar contraseña',
         primaryButton__setPassword: 'Establecer contraseña ',
+        primaryButton__removePassword: '',
       },
       mfaSection: {
         title: 'Verificación de dos pasos',
@@ -397,7 +398,9 @@ export const esES: LocalizationResource = {
     },
     passwordPage: {
       title: 'Configurar la clave',
+      removePasswordTitle: '',
       successMessage: 'Su contraseña ha sido establecida.',
+      removePasswordSuccessMessage: '',
     },
     mfaPage: {
       title: 'Agregar verificación en dos pasos',
