@@ -316,3 +316,45 @@ export const generateSrcSet = ({
 
   return xDescriptors.map(i => `${generateSrc({ src, width: width * i })} ${i}x`).toString();
 };
+
+export const hasUrlInFragment = (_url: URL | string) => {
+  return new URL(_url, DUMMY_URL_BASE).hash.startsWith('#/');
+};
+
+/**
+ * Creates a new URL by merging a fragment-based URL, if found.
+ * The result URL has the original and the fragment pathnames appended
+ * and also includes all search params from both places.
+ *
+ * @example
+ * Input
+ * https://accounts.clerk.com/sign-in?user_param=hello#/verify/factor-one?redirect_url=/protected
+ * Return value:
+ * https://accounts.clerk.com/sign-in/verify/factor-one?user_param=hello&redirect_url=/protected
+ */
+export const mergeFragmentIntoUrl = (_url: string | URL): URL => {
+  const url = new URL(_url);
+
+  if (!hasUrlInFragment(url)) {
+    return url;
+  }
+
+  const fragmentUrl = new URL(url.hash.replace('#/', '/'), url.href);
+  const mergedPathname = [url.pathname, fragmentUrl.pathname]
+    .map(s => s.split('/'))
+    .flat()
+    .filter(Boolean)
+    .join('/');
+
+  const mergedUrl = new URL(mergedPathname, url);
+
+  url.searchParams.forEach((val, key) => {
+    mergedUrl.searchParams.set(key, val);
+  });
+
+  fragmentUrl.searchParams.forEach((val, key) => {
+    mergedUrl.searchParams.set(key, val);
+  });
+
+  return mergedUrl;
+};
