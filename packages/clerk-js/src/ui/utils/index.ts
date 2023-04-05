@@ -17,3 +17,4 @@ export * from './getValidReactChildren';
 export * from './roleLocalizationKey';
 export * from './getRelativeToNowDateKey';
 export * from './mergeRefs';
+export * from './createSlug';

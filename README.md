@@ -26,7 +26,7 @@ Would you like to work on Open Source software and help maintain this repository
 
 ## Documentation and Usage
 
-For how to get started with Clerk, you can refer to the official [documentation page](https://docs.clerk.com/).
+For how to get started with Clerk, you can refer to the official [documentation page](https://clerk.com/docs).
 
 For JavaScript environments/platforms that Clerk supports, there should be a specific package corresponding to the respective technology.
 

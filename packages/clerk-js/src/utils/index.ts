@@ -24,3 +24,5 @@ export * from './script';
 export * from './url';
 export * from './web3';
 export * from './windowNavigate';
+export * from './componentGuards';
+export * from './queryStateParams';

@@ -58,6 +58,7 @@ export type FieldId =
   | 'firstName'
   | 'lastName'
   | 'name'
+  | 'slug'
   | 'emailAddress'
   | 'phoneNumber'
   | 'password'
