@@ -73,6 +73,15 @@ export const enUS: LocalizationResource = {
   membershipRole__admin: 'Admin',
   membershipRole__basicMember: 'Member',
   membershipRole__guestMember: 'Guest',
+  passwordComplexity: {
+    sentencePrefix: 'Your password must contain',
+    minimumLength: '{{length}} or more characters',
+    maximumLength: 'less than {{length}} characters',
+    requireNumbers: 'a number',
+    requireLowercase: 'a lowercase letter',
+    requireUppercase: 'an uppercase letter',
+    requireSpecialCharacter: 'a specrial character',
+  },
   signUp: {
     start: {
       title: 'Create your account',
