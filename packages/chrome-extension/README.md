@@ -125,8 +125,8 @@ Examples of a chrome extension using the `@clerk/chrome-extension` package for a
 can be found in our `clerk-chrome-extension-starter` github repository.
 The 2 supported cases (links to different branches of the same repository):
 
-- [Standalone](https://github.com/clerkinc/clerk-chrome-extension-starter): The extension is using its own authentication
-- [WebSSO](https://github.com/clerkinc/clerk-chrome-extension-starter): The extensions shares authentication with a website in the same browser
+- [Standalone](https://github.com/clerkinc/clerk-chrome-extension-starter/tree/main): The extension is using its own authentication
+- [WebSSO](https://github.com/clerkinc/clerk-chrome-extension-starter/tree/webapp_sso): The extensions shares authentication with a website in the same browser
 
 ## WebSSO required settings
 
@@ -137,13 +137,15 @@ The 2 supported cases (links to different branches of the same repository):
 
 ### Host permissions (in manifest.json)
 
+You will need your Frontend API URL, which can be found in your `Dashboard > API Keys > Advanced > Clerk API URLs`.
+
 ```
 "host_permissions": ["*://YOUR_CLERK_FRONTEND_API_GOES_HERE/"],
 ```
 
 ### Clerk settings
 
-Add your chrome extension origin to your instance allowed_origins using BAPI:
+Add your Chrome extension origin to your instance allowed_origins using BAPI:
 
 ```bash
 curl  -X PATCH https://api.clerk.com/v1/instance \
