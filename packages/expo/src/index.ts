@@ -28,3 +28,4 @@ export {
 export { clerk as Clerk } from './singleton';
 
 export * from './ClerkProvider';
+export * from './useOAuth';

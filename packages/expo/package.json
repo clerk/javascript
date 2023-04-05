@@ -44,7 +44,9 @@
     "typescript": "*"
   },
   "peerDependencies": {
-    "react": ">=16"
+    "react": ">=16",
+    "expo-auth-session": ">=4",
+    "expo-web-browser": ">=12"
   },
   "engines": {
     "node": ">=14"
