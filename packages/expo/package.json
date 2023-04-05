@@ -34,6 +34,7 @@
   },
   "devDependencies": {
     "@clerk/types": "^3.33.0",
+    "@types/base-64": "^1.0.0",
     "@types/jest": "^27.4.0",
     "@types/node": "^16.11.55",
     "@types/react": "*",
@@ -44,9 +45,9 @@
     "typescript": "*"
   },
   "peerDependencies": {
-    "react": ">=16",
     "expo-auth-session": ">=4",
-    "expo-web-browser": ">=12"
+    "expo-web-browser": ">=12",
+    "react": ">=16"
   },
   "engines": {
     "node": ">=14"
