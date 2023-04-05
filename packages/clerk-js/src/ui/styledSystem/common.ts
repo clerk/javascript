@@ -155,15 +155,17 @@ const focusRing = (t: InternalTheme) => {
   } as const;
 };
 
-const focusRingInput = (t: InternalTheme) => {
+const focusRingInput = (t: InternalTheme, props?: any) => {
   return {
     '&:focus': {
       WebkitTapHighlightColor: 'transparent',
-      boxShadow: t.shadows.$focusRingInput.replace('{{color}}', t.colors.$primary200),
+      boxShadow: t.shadows.$focusRingInput.replace(
+        '{{color}}',
+        props?.hasError ? t.colors.$danger200 : props?.isSuccessful ? t.colors.$success200 : t.colors.$primary200,
+      ),
       transitionProperty: t.transitionProperty.$common,
       transitionTimingFunction: t.transitionTiming.$common,
       transitionDuration: t.transitionDuration.$focusRing,
-      borderColor: t.colors.$primary200,
     },
   } as const;
 };
