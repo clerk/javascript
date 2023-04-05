@@ -134,7 +134,11 @@ const borderVariants = (t: InternalTheme, props?: any) => {
 
 const borderColor = (t: InternalTheme, props?: any) => {
   return {
-    borderColor: props?.hasError ? t.colors.$danger500 : t.colors.$blackAlpha300,
+    borderColor: props?.hasError
+      ? t.colors.$danger500
+      : props?.isSuccessful
+      ? t.colors.$success500
+      : t.colors.$blackAlpha300,
   } as const;
 };
 
