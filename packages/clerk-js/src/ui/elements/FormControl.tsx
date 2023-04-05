@@ -8,6 +8,7 @@ import {
   FormControl as FormControlPrim,
   FormErrorText,
   FormLabel,
+  Icon,
   Input,
   Link,
   localizationKeys,
@@ -29,6 +30,7 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
   label: string | LocalizationKey;
   placeholder?: string | LocalizationKey;
   actionLabel?: string | LocalizationKey;
+  icon?: React.ComponentType;
 };
 
 // TODO: Convert this into a Component?
@@ -39,7 +41,7 @@ const getInputElementForType = (type: FormControlProps['type']) => {
 export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props, ref) => {
   const { t } = useLocalizations();
   const card = useCardState();
-  const { id, errorText, isRequired, isOptional, label, actionLabel, onActionClicked, sx, placeholder, ...rest } =
+  const { id, errorText, isRequired, isOptional, label, actionLabel, onActionClicked, sx, placeholder, icon, ...rest } =
     props;
   const hasError = !!errorText;
   const isDisabled = props.isDisabled || card.isLoading;
@@ -57,7 +59,7 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
       sx={sx}
     >
       <Flex
-        justify='between'
+        justify={icon ? 'start' : 'between'}
         align='center'
         elementDescriptor={descriptors.formFieldLabelRow}
         elementId={descriptors.formFieldLabelRow.setId(id)}
@@ -70,10 +72,24 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
           hasError={hasError}
           isDisabled={isDisabled}
           isRequired={isRequired}
-          sx={{ marginRight: 'auto' }}
+          sx={{ display: 'flex', alignItems: 'center' }}
         >
           {typeof label === 'string' ? label : undefined}
         </FormLabel>
+        {icon && (
+          // TODO: This is a temporary fix. Replace this when the tooltip component is introduced
+          <p title='A slug is a human-readable ID that must be unique.  It’s often used in URLs.'>
+            <Icon
+              icon={icon}
+              sx={theme => ({
+                marginLeft: theme.space.$0x5,
+                color: theme.colors.$blackAlpha400,
+                width: theme.sizes.$4,
+                height: theme.sizes.$4,
+              })}
+            />
+          </p>
+        )}
         {isOptional && !actionLabel && (
           <Text
             localizationKey={localizationKeys('formFieldHintText__optional')}

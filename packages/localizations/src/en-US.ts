@@ -30,6 +30,7 @@ export const enUS: LocalizationResource = {
   formFieldLabel__lastName: 'Last name',
   formFieldLabel__backupCode: 'Backup code',
   formFieldLabel__organizationName: 'Organization name',
+  formFieldLabel__organizationSlug: 'Slug URL',
   formFieldLabel__role: 'Role',
   formFieldInputPlaceholder__emailAddress: '',
   formFieldInputPlaceholder__emailAddresses:
@@ -45,6 +46,7 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__lastName: '',
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__organizationName: '',
+  formFieldInputPlaceholder__organizationSlug: '',
   formFieldAction__forgotPassword: 'Forgot password',
   formFieldHintText__optional: 'Optional',
   formButtonPrimary: 'Continue',

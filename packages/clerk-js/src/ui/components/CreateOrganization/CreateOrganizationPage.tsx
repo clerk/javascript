@@ -1,7 +1,10 @@
 import React from 'react';
 
+import { QuestionMark } from '../../../ui/icons';
+import { createSlug } from '../../../ui/utils';
 import { useWizard, Wizard } from '../../common';
 import { useCoreClerk, useCoreOrganization, useCoreOrganizations, useCreateOrganizationContext } from '../../contexts';
+import { localizationKeys } from '../../customizables';
 import {
   ContentPage,
   Form,
@@ -10,7 +13,6 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
-import { localizationKeys } from '../../localization';
 import { handleError, useFormControl } from '../../utils';
 import { InviteMembersForm } from '../OrganizationProfile/InviteMembersForm';
 import { InvitationsSentMessage } from '../OrganizationProfile/InviteMembersPage';
@@ -34,6 +36,12 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
     placeholder: localizationKeys('formFieldInputPlaceholder__organizationName'),
   });
 
+  const slugField = useFormControl('slug', '', {
+    type: 'text',
+    label: localizationKeys('formFieldLabel__organizationSlug'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__organizationSlug'),
+  });
+
   const dataChanged = !!nameField.value;
   const canSubmit = dataChanged || !!file;
 
@@ -43,11 +51,11 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
       return;
     }
 
-    return createOrganization?.({ name: nameField.value })
+    return createOrganization?.({ name: nameField.value, slug: slugField.value })
       .then(org => (file ? org.setLogo({ file }) : org))
       .then(org => setActive({ organization: org }))
       .then(wizard.nextStep)
-      .catch(err => handleError(err, [nameField], card.setError));
+      .catch(err => handleError(err, [nameField, slugField], card.setError));
   };
 
   const completeFlow = () => {
@@ -60,6 +68,19 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
   const onAvatarRemove = () => {
     card.setIdle();
     return setFile(null);
+  };
+
+  const onChangeName = (event: React.ChangeEvent<HTMLInputElement>) => {
+    nameField.setValue(event.target.value);
+    updateSlugField(createSlug(event.target.value));
+  };
+
+  const onChangeSlug = (event: React.ChangeEvent<HTMLInputElement>) => {
+    updateSlugField(event.target.value);
+  };
+
+  const updateSlugField = (val: string) => {
+    slugField.setValue(val);
   };
 
   return (
@@ -80,6 +101,16 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
               sx={{ flexBasis: '80%' }}
               autoFocus
               {...nameField.props}
+              onChange={onChangeName}
+              required
+            />
+          </Form.ControlRow>
+          <Form.ControlRow elementId={slugField.id}>
+            <Form.Control
+              sx={{ flexBasis: '80%' }}
+              {...slugField.props}
+              onChange={onChangeSlug}
+              icon={QuestionMark}
               required
             />
           </Form.ControlRow>

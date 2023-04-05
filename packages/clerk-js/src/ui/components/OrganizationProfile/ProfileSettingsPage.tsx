@@ -24,19 +24,25 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
     placeholder: localizationKeys('formFieldInputPlaceholder__organizationName'),
   });
 
+  const slugField = useFormControl('slug', organization?.slug || '', {
+    type: 'text',
+    label: localizationKeys('formFieldLabel__organizationSlug'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__organizationSlug'),
+  });
+
   if (!organization) {
     return null;
   }
 
-  const dataChanged = organization.name !== nameField.value;
-  const canSubmit = dataChanged || avatarChanged;
+  const dataChanged = organization.name !== nameField.value || organization.slug !== slugField.value;
+  const canSubmit = (dataChanged || avatarChanged) && !slugField.errorText;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    return (dataChanged ? organization.update({ name: nameField.value }) : Promise.resolve())
+    return (dataChanged ? organization.update({ name: nameField.value, slug: slugField.value }) : Promise.resolve())
       .then(wizard.nextStep)
       .catch(err => {
-        handleError(err, [nameField], card.setError);
+        handleError(err, [nameField, slugField], card.setError);
       });
   };
 
@@ -60,6 +66,14 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
       .catch(err => handleError(err, [], card.setError));
   };
 
+  const onChangeSlug = (event: React.ChangeEvent<HTMLInputElement>) => {
+    updateSlugField(event.target.value);
+  };
+
+  const updateSlugField = (val: string) => {
+    slugField.setValue(val);
+  };
+
   return (
     <Wizard {...wizard.props}>
       <ContentPage
@@ -77,6 +91,13 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
             <Form.Control
               {...nameField.props}
               autoFocus
+              required
+            />
+          </Form.ControlRow>
+          <Form.ControlRow elementId={slugField.id}>
+            <Form.Control
+              {...slugField.props}
+              onChange={onChangeSlug}
               required
             />
           </Form.ControlRow>
