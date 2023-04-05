@@ -48,6 +48,16 @@ const common = ({ mode }) => {
     optimization: {
       splitChunks: {
         cacheGroups: {
+          zxcvbnTSCoreVendor: {
+            test: /[\\/]node_modules[\\/](@zxcvbn-ts)[\\/](core)[\\/]/,
+            name: 'zxcvbn-ts-core',
+            chunks: 'all',
+          },
+          zxcvbnTSCommonVendor: {
+            test: /[\\/]node_modules[\\/](@zxcvbn-ts)[\\/](language-common)[\\/]/,
+            name: 'zxcvbn-common',
+            chunks: 'all',
+          },
           common: {
             minChunks: 1,
             name: 'ui-common',
@@ -151,7 +161,7 @@ const prodConfig = ({ mode, env }) => {
     // prettier-ignore
     [variants.clerk]: merge(
       entryForVariant(variants.clerk),
-      common({mode}),
+      common({ mode }),
       commonForProd(),
       {
         // Include the lazy chunks in the bundle as well
@@ -170,7 +180,7 @@ const prodConfig = ({ mode, env }) => {
     // prettier-ignore
     [variants.clerkBrowser]: merge(
       entryForVariant(variants.clerkBrowser),
-      common({mode}),
+      common({ mode }),
       commonForProd(),
     ),
     [variants.clerkHeadless]: merge(
@@ -235,13 +245,13 @@ const devConfig = ({ mode, env }) => {
     // prettier-ignore
     [variants.clerk]: merge(
       entryForVariant(variants.clerk),
-      common({mode}),
+      common({ mode }),
       commonForDev(),
     ),
     // prettier-ignore
     [variants.clerkBrowser]: merge(
       entryForVariant(variants.clerkBrowser),
-      common({mode}),
+      common({ mode }),
       commonForDev(),
     ),
     [variants.clerkHeadless]: merge(
