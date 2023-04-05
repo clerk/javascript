@@ -13,6 +13,8 @@ type MetadataParams<TPublic = OrganizationPublicMetadata> = {
 type GetOrganizationListParams = {
   limit?: number;
   offset?: number;
+  includeMembersCount?: boolean;
+  query?: string;
 };
 
 type CreateParams = {
@@ -27,6 +29,7 @@ type GetOrganizationParams = { organizationId: string } | { slug: string };
 
 type UpdateParams = {
   name?: string;
+  slug?: string;
   maxAllowedMemberships?: number;
 } & MetadataParams;
 

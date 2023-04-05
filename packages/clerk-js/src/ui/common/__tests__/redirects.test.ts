@@ -113,7 +113,7 @@ describe('buildMagicLinkRedirectUrl(routing, baseUrl)', () => {
         } as any,
         'https://accounts.clerk.com/sign-in',
       ),
-    ).toBe('https://accounts.clerk.com/sign-in/verify?redirectUrl=https://clerk.com');
+    ).toBe('https://accounts.clerk.com/sign-in#/verify?redirectUrl=https://clerk.com');
 
     expect(
       buildMagicLinkRedirectUrl(
@@ -122,7 +122,7 @@ describe('buildMagicLinkRedirectUrl(routing, baseUrl)', () => {
         } as any,
         'https://accounts.clerk.com/sign-in',
       ),
-    ).toBe('https://accounts.clerk.com/sign-in/verify');
+    ).toBe('https://accounts.clerk.com/sign-in#/verify');
   });
 });
 

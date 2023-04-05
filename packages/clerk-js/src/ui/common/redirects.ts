@@ -15,7 +15,6 @@ export function buildMagicLinkRedirectUrl(
     authQueryString,
     path,
     endpoint: MAGIC_LINK_VERIFY_PATH_ROUTE,
-    forcePathBased: true,
   });
 }
 
@@ -40,17 +39,9 @@ type BuildRedirectUrlParams = {
   baseUrl: string;
   path: string | undefined;
   endpoint: string;
-  forcePathBased?: boolean;
 };
 
-const buildRedirectUrl = ({
-  routing,
-  authQueryString,
-  baseUrl,
-  path,
-  endpoint,
-  forcePathBased,
-}: BuildRedirectUrlParams): string => {
+const buildRedirectUrl = ({ routing, authQueryString, baseUrl, path, endpoint }: BuildRedirectUrlParams): string => {
   if (!routing || routing === 'hash') {
     return buildHashBasedUrl(authQueryString, endpoint);
   }
@@ -59,7 +50,7 @@ const buildRedirectUrl = ({
     return buildPathBasedUrl(path || '', authQueryString, endpoint);
   }
 
-  return buildVirtualBasedUrl(baseUrl || '', authQueryString, endpoint, forcePathBased);
+  return buildVirtualBasedUrl(baseUrl || '', authQueryString, endpoint);
 };
 
 const buildHashBasedUrl = (authQueryString: AuthQueryString, endpoint: string): string => {
@@ -79,18 +70,7 @@ const buildPathBasedUrl = (path: string, authQueryString: AuthQueryString, endpo
   );
 };
 
-const buildVirtualBasedUrl = (
-  base: string,
-  authQueryString: AuthQueryString,
-  endpoint: string,
-  forcePathBased?: boolean,
-): string => {
-  forcePathBased;
-  if (forcePathBased) {
-    const searchArg = authQueryString ? { search: `?${authQueryString}` } : {};
-    return buildURL({ base: base + endpoint, ...searchArg }, { stringify: true });
-  } else {
-    const hash = endpoint + (authQueryString ? `?${authQueryString}` : '');
-    return buildURL({ base, hash }, { stringify: true });
-  }
+const buildVirtualBasedUrl = (base: string, authQueryString: AuthQueryString, endpoint: string): string => {
+  const hash = endpoint + (authQueryString ? `?${authQueryString}` : '');
+  return buildURL({ base, hash }, { stringify: true });
 };
