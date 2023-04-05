@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { stripOrigin } from '../../utils';
+import { hasUrlInFragment, stripOrigin } from '../../utils';
 import { BaseRouter } from './BaseRouter';
 
 export const hashRouterBase = 'CLERK-ROUTER/HASH';
@@ -22,7 +22,7 @@ export const HashRouter = ({ preservedParams, children }: HashRouterProps): JSX.
   const fakeUrl = (): URL => {
     // Create a URL object with the contents of the hash
     // Use the origin because you can't create a url object without protocol and host
-    if (window.location.hash.startsWith('#/')) {
+    if (hasUrlInFragment(window.location.hash)) {
       return new URL(window.location.origin + window.location.hash.substring(1));
     } else {
       return new URL(window.location.origin);

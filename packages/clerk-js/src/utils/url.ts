@@ -317,6 +317,10 @@ export const generateSrcSet = ({
   return xDescriptors.map(i => `${generateSrc({ src, width: width * i })} ${i}x`).toString();
 };
 
+export const hasUrlInFragment = (_url: URL | string) => {
+  return new URL(_url, DUMMY_URL_BASE).hash.startsWith('#/');
+};
+
 /**
  * Creates a new URL by merging a fragment-based URL, if found.
  * The result URL has the original and the fragment pathnames appended
@@ -330,9 +334,8 @@ export const generateSrcSet = ({
  */
 export const mergeFragmentIntoUrl = (_url: string | URL): URL => {
   const url = new URL(_url);
-  const hasUrlInFragment = url.hash.startsWith('#/');
 
-  if (!hasUrlInFragment) {
+  if (!hasUrlInFragment(url)) {
     return url;
   }
 

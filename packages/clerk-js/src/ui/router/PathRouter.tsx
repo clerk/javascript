@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { mergeFragmentIntoUrl, stripOrigin } from '../../utils';
+import { hasUrlInFragment, mergeFragmentIntoUrl, stripOrigin } from '../../utils';
 import { useCoreClerk } from '../contexts';
 import { BaseRouter } from './BaseRouter';
 
@@ -34,10 +34,9 @@ export const PathRouter = ({ basePath, preservedParams, children }: PathRouterPr
     return window.location.search;
   };
 
-  const urlHasFragment = window.location.hash.startsWith('#/');
   React.useEffect(() => {
     const convertHashToPath = async () => {
-      if (urlHasFragment) {
+      if (hasUrlInFragment(window.location.hash)) {
         const url = mergeFragmentIntoUrl(new URL(window.location.href));
         await internalNavigate(url.href);
         setStripped(true);
@@ -46,7 +45,7 @@ export const PathRouter = ({ basePath, preservedParams, children }: PathRouterPr
     void convertHashToPath();
   }, [setStripped, navigate, window.location.hash]);
 
-  if (urlHasFragment && !stripped) {
+  if (hasUrlInFragment(window.location.hash) && !stripped) {
     return null;
   }
 
