@@ -5,6 +5,7 @@ export * from './useClipboard';
 export * from './useEnabledThirdPartyProviders';
 export * from './useLoadingStatus';
 export * from './usePasswordComplexity';
+export * from './usePasswordStrength';
 export * from './usePopover';
 export * from './useLocalStorage';
 export * from './useSearchInput';

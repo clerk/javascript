@@ -120,6 +120,7 @@ export const PasswordPage = withCardStateProvider(() => {
               {...passwordField.props}
               minLength={6}
               complexity
+              strengthMeter
               required
               autoFocus={!user.passwordEnabled}
             />

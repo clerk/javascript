@@ -1,34 +1,97 @@
 import type { ChangeEvent } from 'react';
+import { useCallback, useRef } from 'react';
 import React, { forwardRef } from 'react';
 
 import { useEnvironment } from '../contexts';
 import { descriptors, Flex, Input } from '../customizables';
-import { usePasswordComplexity } from '../hooks';
+import { usePasswordComplexity, usePasswordStrength } from '../hooks';
 import { EyeSlash } from '../icons';
 import { useFormControl } from '../primitives/hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import { IconButton } from './IconButton';
 
 type PasswordInputProps = PropsOfComponent<typeof Input> & {
+  strengthMeter?: boolean;
   complexity?: boolean;
+};
+
+// TODO: Refactor this logic
+const useComplexityOverStrength = ({ strengthMeter }: { strengthMeter: boolean; complexity: boolean }) => {
+  const formControlProps = useFormControl();
+  const hasComplexityError = useRef(false);
+  const hasComplexitySuccess = useRef(false);
+  return {
+    setStrengthSuccess: useCallback(() => {
+      if (!hasComplexityError.current) {
+        formControlProps.setSuccessful?.(true);
+      }
+    }, []),
+
+    setStrengthError: useCallback((errorMessage: string) => {
+      if (!hasComplexityError.current) {
+        formControlProps.setError?.(errorMessage);
+      }
+    }, []),
+
+    setComplexityError: useCallback((errorMessage: string) => {
+      hasComplexityError.current = !!errorMessage;
+      formControlProps.setError?.(errorMessage);
+    }, []),
+
+    setComplexitySuccess: useCallback(() => {
+      hasComplexityError.current = false;
+      hasComplexitySuccess.current = true;
+      if (!strengthMeter) {
+        formControlProps.setSuccessful?.(true);
+      }
+    }, []),
+  };
 };
 
 export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((props, ref) => {
   const [hidden, setHidden] = React.useState(true);
-  const { id, onChange: onChangeProp, complexity = false, ...rest } = props;
-  const formControlProps = useFormControl();
+  const { id, onChange: onChangeProp, strengthMeter = false, complexity = false, ...rest } = props;
   const {
     userSettings: { passwordSettings },
   } = useEnvironment();
 
+  const { show_zxcvbn } = passwordSettings;
+
+  const { setStrengthError, setComplexityError, setStrengthSuccess, setComplexitySuccess } = useComplexityOverStrength({
+    complexity,
+    strengthMeter: strengthMeter && show_zxcvbn,
+  });
+
+  const { getScore } = usePasswordStrength({
+    onValidationFailed: (_, errorMessage) => {
+      setStrengthError(errorMessage);
+    },
+    onValidationSuccess: () => setStrengthSuccess(),
+  });
+
   const { setPassword } = usePasswordComplexity(passwordSettings, {
     onValidationFailed: (_, errorMessage) => {
-      formControlProps.setError?.(errorMessage);
+      setComplexityError(errorMessage);
     },
-    onValidationSuccess: () => formControlProps.setSuccessful?.(true),
+    onValidationSuccess: () => setComplexitySuccess(),
   });
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    // Lazy load `zxcvbn` on interaction
+    if (strengthMeter && show_zxcvbn) {
+      void Promise.all([import('@zxcvbn-ts/core'), import('@zxcvbn-ts/language-common')])
+        .then(([core, zxcvbnCommonPackage]) => {
+          core.zxcvbnOptions.setOptions({
+            dictionary: {
+              ...zxcvbnCommonPackage.default.dictionary,
+            },
+            graphs: zxcvbnCommonPackage.default.adjacencyGraphs,
+          });
+          return core.zxcvbn;
+        })
+        .then(zxcvbn => getScore(zxcvbn)(e.target.value));
+    }
+
     if (complexity) {
       /**
        * Avoid introducing internal state, treat complexity calculation within callback.
