@@ -91,6 +91,15 @@ type _LocalizationResource = {
   membershipRole__admin: LocalizationValue;
   membershipRole__basicMember: LocalizationValue;
   membershipRole__guestMember: LocalizationValue;
+  passwordComplexity: {
+    sentencePrefix: LocalizationValue;
+    minimumLength: LocalizationValue;
+    maximumLength: LocalizationValue;
+    requireNumbers: LocalizationValue;
+    requireLowercase: LocalizationValue;
+    requireUppercase: LocalizationValue;
+    requireSpecialCharacter: LocalizationValue;
+  };
   signUp: {
     start: {
       title: LocalizationValue;
