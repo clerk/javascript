@@ -6,7 +6,7 @@ const commonTexts = {
       title: 'Check je telefoon',
       subtitle: 'om verder te gaan naar {{applicationName}}',
       formTitle: 'Verificatie code',
-      formSubtitle: 'Geef de verificatie code in die verzonden is naar je telefoonnummer',
+      formSubtitle: 'Voer de verificatiecode in die naar je telefoonnummer is gestuurd',
       resendButton: 'Verstuur code opnieuw',
     },
   },
@@ -33,7 +33,7 @@ export const nlNL: LocalizationResource = {
   formFieldLabel__role: 'Rol',
   formFieldInputPlaceholder__emailAddress: '',
   formFieldInputPlaceholder__emailAddresses:
-    'Typ of plak één of meerdere emailadressen, gescheiden door spaties of komma\'s.',
+    "Typ of plak één of meerdere emailadressen, gescheiden door spaties of komma's.",
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
   formFieldInputPlaceholder__emailAddress_phoneNumber: '',
@@ -52,9 +52,9 @@ export const nlNL: LocalizationResource = {
   backButton: 'Terug',
   footerActionLink__useAnotherMethod: 'Een andere methode gebruiken',
   badge__primary: 'Hoofd',
-  badge__thisDevice: 'Dit toestel',
-  badge__userDevice: 'Gebruikerstoestel',
-  badge__otherImpersonatorDevice: 'Ander immitatie toestel',
+  badge__thisDevice: 'Dit apparaat',
+  badge__userDevice: 'Gebruikersapparaat',
+  badge__otherImpersonatorDevice: 'Ander immitatie apparaat',
   badge__default: 'Standaard',
   badge__unverified: 'Ongeverifieerd',
   badge__requiresAction: 'Actie nodig',
@@ -73,7 +73,7 @@ export const nlNL: LocalizationResource = {
     start: {
       title: 'Maak je account aan',
       subtitle: 'om door te gaan naar {{applicationName}}',
-      actionText: 'Heb je een account?',
+      actionText: 'Heb je al een account?',
       actionLink: 'Inloggen',
     },
     emailLink: {
@@ -197,7 +197,7 @@ export const nlNL: LocalizationResource = {
     noAvailableMethods: {
       title: 'Inloggen onmogelijk',
       subtitle: 'Er heeft zich een fout voorgedaan',
-      message: "Het is niet mogelijk om door te gaan met inloggen. Er is geen beschikbare authenticatiefactor.",
+      message: 'Het is niet mogelijk om door te gaan met inloggen. Er is geen beschikbare authenticatiefactor.',
     },
   },
   userProfile: {
@@ -221,7 +221,7 @@ export const nlNL: LocalizationResource = {
       emailAddressesSection: {
         title: 'E-mailadressen',
         primaryButton: 'Voeg een e-mailadres toe',
-        detailsTitle__primary: 'Voornaamste e-mailadres',
+        detailsTitle__primary: 'Hoofd e-mailadres',
         detailsSubtitle__primary: 'Dit e-mailadres is het hoofd e-mailadres',
         detailsAction__primary: 'Rond verificatie af',
         detailsTitle__nonPrimary: 'Stel in als hoofd e-mailadres',
@@ -253,17 +253,17 @@ export const nlNL: LocalizationResource = {
         destructiveAction: 'Verwijder telefoonnummer',
       },
       connectedAccountsSection: {
-        title: 'Verbonden accounts',
+        title: 'Aangesloten accounts',
         primaryButton: 'Verbind een account',
         title__conectionFailed: 'Probeer mislukte connectie opnieuw',
-        title__reauthorize: 'Herautorisering vereist',
+        title__reauthorize: 'Herautorisering nodig',
         subtitle__reauthorize:
-          'De vereiste scopes zijn bijgewerkt, en u ondervindt mogelijk beperkte functionaliteit. Autoriseer deze applicatie opnieuw om problemen te voorkomen',
+          'De vereiste scopes zijn bijgewerkt, en je ondervindt mogelijk beperkte functionaliteit. Autoriseer deze applicatie opnieuw om problemen te voorkomen',
         actionLabel__conectionFailed: 'Probeer opnieuw',
         actionLabel__reauthorize: 'Authoriseer nu',
         destructiveActionTitle: 'Verwijderen',
-        destructiveActionSubtitle: 'Verwijder dit verbonden account en verwijder het uit uw account',
-        destructiveActionAccordionSubtitle: 'Verwijder verbonden account',
+        destructiveActionSubtitle: 'Verwijder dit aangesloten account en verwijder het uit uw account',
+        destructiveActionAccordionSubtitle: 'Verwijder aangesloten account',
       },
       passwordSection: {
         title: 'Wachtwoord',
@@ -279,16 +279,15 @@ export const nlNL: LocalizationResource = {
           destructiveActionLabel: 'Verwijder telefoonnummer',
           title__default: 'Standaardfactor',
           title__setDefault: 'Stel in als standaardfactor',
-          subtitle__default: 'Deze factor wordt gebruikt als de standaard tweestapsverificatiemethode bij het inloggen.',
-          subtitle__setDefault:
-            'Stel deze factor in als de standaard tweestapsverificatiemethode bij het inloggen.',
+          subtitle__default:
+            'Deze factor wordt gebruikt als de standaard tweestapsverificatiemethode bij het inloggen.',
+          subtitle__setDefault: 'Stel deze factor in als de standaard tweestapsverificatiemethode bij het inloggen.',
           actionLabel__setDefault: 'Stel in als standaard',
         },
         backupCodes: {
           headerTitle: 'Backupcodes',
           title__regenerate: 'Hergenereer backupcodes',
-          subtitle__regenerate:
-            'Genereer een nieuwe set backupcodes. De vorige kunnen niet meer gebruikt worden.',
+          subtitle__regenerate: 'Genereer een nieuwe set backupcodes. De vorige kunnen niet meer gebruikt worden.',
           actionLabel__regenerate: 'Hergenereer codes',
         },
         totp: {
@@ -319,7 +318,7 @@ export const nlNL: LocalizationResource = {
     },
     profilePage: {
       title: 'Profiel bijwerken',
-      imageFormTitle: 'Profielafbeelding',
+      imageFormTitle: 'Profielfoto',
       imageFormSubtitle: 'Afbeelding uploaden',
       imageFormDestructiveActionSubtitle: 'Verwijder afbeelding',
       fileDropAreaTitle: 'Sleep afbeelding hier, of ...',
@@ -336,7 +335,7 @@ export const nlNL: LocalizationResource = {
       emailCode: {
         formHint: 'Een mail met daarin een verificatiecode is verstuurd naar dit adres.',
         formTitle: 'Verificatiecode',
-        formSubtitle: 'Voer de verificatiecode in die verstuur is naar {{identifier}}',
+        formSubtitle: 'Voer de verificatiecode in die verstuurd is naar {{identifier}}',
         resendButton: 'Verstuur code opnieuw',
         successMessage: 'Het e-mailadres {{identifier}} is toegevoegd aan je account.',
       },
@@ -368,7 +367,7 @@ export const nlNL: LocalizationResource = {
     },
     connectedAccountPage: {
       title: 'Verbind externe account',
-      formHint: 'Kies een aanbieder om je account te verbinden.',
+      formHint: 'Kies een provider om je account te verbinden.',
       formHint__noAccounts: 'Er zijn geen beschikbare externe accountproviders.',
       socialButtonsBlockButton: 'Verbind {{provider|titleize}} account',
       successMessage: 'Deze provider is toegevoegd aan je account.',
@@ -407,27 +406,27 @@ export const nlNL: LocalizationResource = {
       successMessage:
         'Tweestapsverificatie is nu ingesteld. Bij het inloggen zal je een verificatiecode van je authenticator app moeten invoeren.',
       authenticatorApp: {
-        infoText__ableToScan:
-          'Scan de QR code met je authenticator app om de authenticator toe te voegen.',
-        infoText__unableToScan: 'Stel een nieuwe aanmeldmethode in op je authenticator en voer de onderstaande sleutel in.',
+        infoText__ableToScan: 'Scan de QR code met je authenticator app om de authenticator toe te voegen.',
+        infoText__unableToScan:
+          'Stel een nieuwe aanmeldmethode in op je authenticator en voer de onderstaande sleutel in.',
         inputLabel__unableToScan1:
           'Zorg ervoor dat tijdsgebaseerde of eenmalige wachtwoorden zijn ingeschakeld, en voltooi vervolgens het koppelen van uw account.',
-        inputLabel__unableToScan2:
-          'Als je authenticator TOTP-URI\'s ondersteunt, kun je ook de volledige URI kopiëren.',
-        buttonAbleToScan__nonPrimary: 'Scan QR code in de plaats',
+        inputLabel__unableToScan2: "Als je authenticator TOTP-URI's ondersteunt, kun je ook de volledige URI kopiëren.",
+        buttonAbleToScan__nonPrimary: 'Alternatief, scan een QR code',
         buttonUnableToScan__nonPrimary: 'Kan je de code niet scannen?',
       },
       removeResource: {
         title: 'Verwijder tweestapsverificatie',
         messageLine1: 'Verificatiecodes van deze authenticator zullen niet langer vereist zijn bij het inloggen.',
-        messageLine2: 'Uw account kan niet meer zo veilig zijn. Weet je zeker dat je door wilt gaan?',
+        messageLine2: 'Uw account is mogelijk niet zo veilig. Weet je zeker dat je door wilt gaan?',
         successMessage: 'Tweestapsverificatie via authenticator-applicatie is verwijderd.',
       },
     },
     mfaPhoneCodePage: {
       title: 'Voeg SMS-code verificatie toe',
       primaryButton__addPhoneNumber: 'Telefoonnummer toevoegen',
-      subtitle__availablePhoneNumbers: 'Selecteer een telefoonnummer om je te registreren voor SMS-code twee-stapsverificatie.',
+      subtitle__availablePhoneNumbers:
+        'Selecteer een telefoonnummer om je te registreren voor SMS-code twee-stapsverificatie.',
       subtitle__unavailablePhoneNumbers:
         'Er zijn geen beschikbare telefoonnummers om te registreren voor SMS-code tweestapsverificatie.',
       successMessage:
@@ -435,7 +434,7 @@ export const nlNL: LocalizationResource = {
       removeResource: {
         title: 'Verwijder tweestapsverificatie',
         messageLine1: '{{identifier}} zal niet langer verificatiecodes ontvangen bij het inloggen.',
-        messageLine2: 'Uw account kan niet meer zo veilig zijn. Weet je zeker dat je door wilt gaan?',
+        messageLine2: 'Uw account is mogelijk niet zo veilig. Weet je zeker dat je door wilt gaan?',
         successMessage: 'SMS-code tweestapsverificatie is verwijderd voor {{mfaPhoneCode}}',
       },
     },
@@ -498,7 +497,8 @@ export const nlNL: LocalizationResource = {
       title: 'Leden uitnodigen',
       subtitle: 'Nodig nieuwe leden uit voor deze organisatie',
       successMessage: 'Uitnodigingen succesvol verzonden',
-      detailsTitle__inviteFailed: 'De uitnodigingen konden niet verzonden worden. Los het volgende op en probeer het opnieuw:',
+      detailsTitle__inviteFailed:
+        'De uitnodigingen konden niet verzonden worden. Los het volgende op en probeer het opnieuw:',
       formButtonPrimary__continue: 'Uitnodigingen verzenden',
     },
     membersPage: {
