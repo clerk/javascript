@@ -1,4 +1,5 @@
 import type { FieldId } from '@clerk/types';
+import type { ClerkAPIError } from '@clerk/types';
 import React, { forwardRef } from 'react';
 
 import type { LocalizationKey } from '../customizables';
@@ -31,6 +32,9 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
   placeholder?: string | LocalizationKey;
   actionLabel?: string | LocalizationKey;
   icon?: React.ComponentType;
+  setError: (error: string | ClerkAPIError | undefined) => void;
+  setSuccessful: (isSuccess: boolean) => void;
+  isSuccessful: boolean;
 };
 
 // TODO: Convert this into a Component?
@@ -49,8 +53,22 @@ const getInputElementForType = (type: FormControlProps['type']) => {
 export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props, ref) => {
   const { t } = useLocalizations();
   const card = useCardState();
-  const { id, errorText, isRequired, isOptional, label, actionLabel, onActionClicked, sx, placeholder, icon, ...rest } =
-    props;
+  const {
+    id,
+    errorText,
+    isRequired,
+    isOptional,
+    label,
+    actionLabel,
+    onActionClicked,
+    sx,
+    placeholder,
+    icon,
+    setError,
+    isSuccessful,
+    setSuccessful,
+    ...rest
+  } = props;
   const hasError = !!errorText;
   const isDisabled = props.isDisabled || card.isLoading;
 
@@ -65,6 +83,9 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
       hasError={hasError}
       isDisabled={isDisabled}
       isRequired={isRequired}
+      setError={setError}
+      isSuccessful={isSuccessful}
+      setSuccessful={setSuccessful}
       sx={sx}
     >
       <Flex
