@@ -9,6 +9,7 @@ describe('Organization', () => {
       public_metadata: { public: 'metadata' },
       slug: 'test_slug',
       logo_url: 'https://url-for-logo.png',
+      image_url: 'https://url-for-logo.png',
       created_at: 12345,
       updated_at: 5678,
       members_count: 1,
