@@ -6,3 +6,4 @@ export { ptBR } from './pt-BR';
 export { esES } from './es-ES';
 export { ruRU } from './ru-RU';
 export { svSE } from './sv-SE';
+export { nlNL, nlBE } from './nl-NL';
