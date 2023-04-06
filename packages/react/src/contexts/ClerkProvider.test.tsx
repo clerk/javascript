@@ -1,3 +1,5 @@
+import { deDe, enUS, esES, frFR, itIT, ptBR, ruRU, svSE } from '@clerk/localizations';
+import { dark } from '@clerk/themes';
 import { expectTypeOf } from 'expect-type';
 
 import type { ClerkProviderProps } from './ClerkProvider';
@@ -68,6 +70,107 @@ describe('ClerkProvider', () => {
       expectTypeOf({ ...defaultProps, clerkJSVariant: '' as const }).toMatchTypeOf<ClerkProviderProps>();
       expectTypeOf({ ...defaultProps, clerkJSVariant: undefined }).toMatchTypeOf<ClerkProviderProps>();
       expectTypeOf({ ...defaultProps, clerkJSVariant: 'test' }).not.toMatchTypeOf<ClerkProviderProps>();
+    });
+  });
+
+  describe('appearance', () => {
+    const defaultProps = { publishableKey: 'test', children: '' };
+
+    it('exists as a prop', () => {
+      expectTypeOf({ ...defaultProps, appearance: {} }).toMatchTypeOf<ClerkProviderProps>();
+    });
+
+    it('includes variables, elements, layout baseTheme', () => {
+      expectTypeOf({
+        ...defaultProps,
+        appearance: { elements: {}, variables: {}, layout: {}, baseTheme: dark },
+      }).toMatchTypeOf<ClerkProviderProps>();
+    });
+
+    it('errors if a non existent key is provided', () => {
+      expectTypeOf({
+        ...defaultProps,
+        appearance: { variables: { nonExistentKey: '' } },
+      }).not.toMatchTypeOf<ClerkProviderProps>();
+
+      expectTypeOf({
+        ...defaultProps,
+        appearance: { layout: { nonExistentKey: '' } },
+      }).not.toMatchTypeOf<ClerkProviderProps>();
+
+      // expectTypeOf({
+      //   ...defaultProps,
+      //   appearance: { elements: { nonExistentKey: '' } },
+      // }).not.toMatchTypeOf<ClerkProviderProps>();
+    });
+  });
+
+  describe('localization', () => {
+    const defaultProps = { publishableKey: 'test', children: '' };
+
+    it('exists as a prop', () => {
+      expectTypeOf({ ...defaultProps, localization: {} }).toMatchTypeOf<ClerkProviderProps>();
+    });
+
+    it('errors if a non existent key is provided', () => {
+      expectTypeOf({
+        ...defaultProps,
+        localization: { a: 'test' },
+      }).not.toMatchTypeOf<ClerkProviderProps>();
+
+      expectTypeOf({
+        ...defaultProps,
+        localization: { signUp: { start: 'test' } },
+      }).not.toMatchTypeOf<ClerkProviderProps>();
+    });
+
+    it('works with all our prebuilt localizations', () => {
+      expectTypeOf({
+        ...defaultProps,
+        localization: deDe,
+      }).toMatchTypeOf<ClerkProviderProps>();
+
+      expectTypeOf({
+        ...defaultProps,
+        localization: frFR,
+      }).toMatchTypeOf<ClerkProviderProps>();
+
+      expectTypeOf({
+        ...defaultProps,
+        localization: enUS,
+      }).toMatchTypeOf<ClerkProviderProps>();
+
+      expectTypeOf({
+        ...defaultProps,
+        localization: esES,
+      }).toMatchTypeOf<ClerkProviderProps>();
+
+      expectTypeOf({
+        ...defaultProps,
+        localization: itIT,
+      }).toMatchTypeOf<ClerkProviderProps>();
+
+      expectTypeOf({
+        ...defaultProps,
+        localization: ptBR,
+      }).toMatchTypeOf<ClerkProviderProps>();
+
+      expectTypeOf({
+        ...defaultProps,
+        localization: ruRU,
+      }).toMatchTypeOf<ClerkProviderProps>();
+
+      expectTypeOf({
+        ...defaultProps,
+        localization: svSE,
+      }).toMatchTypeOf<ClerkProviderProps>();
+    });
+
+    it('is able to receive multiple localizations', () => {
+      expectTypeOf({
+        ...defaultProps,
+        localization: { ...frFR, ...deDe },
+      }).toMatchTypeOf<ClerkProviderProps>();
     });
   });
 
