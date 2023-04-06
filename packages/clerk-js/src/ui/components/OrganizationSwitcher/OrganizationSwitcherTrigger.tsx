@@ -39,7 +39,7 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
           <PersonalWorkspacePreview
             size={'sm'}
             gap={3}
-            user={{ profileImageUrl: user.profileImageUrl }}
+            user={{ imageUrl: user.imageUrl }}
             title={
               hidePersonal
                 ? localizationKeys('organizationSwitcher.notSelected')

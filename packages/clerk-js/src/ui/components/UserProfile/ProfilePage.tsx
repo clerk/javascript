@@ -87,7 +87,7 @@ export const ProfilePage = withCardStateProvider(() => {
           <UserProfileAvatarUploader
             user={user}
             onAvatarChange={uploadAvatar}
-            onAvatarRemove={isDefaultProfileImage(user.profileImageUrl) ? onAvatarRemove : null}
+            onAvatarRemove={isDefaultProfileImage(user.imageUrl) ? onAvatarRemove : null}
           />
           {showFirstName && (
             <Form.ControlRow elementId={firstNameField.id}>

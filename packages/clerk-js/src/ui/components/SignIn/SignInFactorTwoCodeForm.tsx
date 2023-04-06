@@ -73,7 +73,7 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
       onCodeEntryFinishedAction={action}
       onResendCodeClicked={prepare}
       safeIdentifier={'safeIdentifier' in props.factor ? props.factor.safeIdentifier : undefined}
-      profileImageUrl={signIn.userData.profileImageUrl}
+      profileImageUrl={signIn.userData.imageUrl}
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
     />
   );
