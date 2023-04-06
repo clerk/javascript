@@ -45,7 +45,7 @@ const pageToRootNavbarRouteMap = {
   'multi-factor': userProfileRoutes.find(r => r.id === 'security'),
   password: userProfileRoutes.find(r => r.id === 'security'),
   // TODO: Uncomment these lines once the issue with enabled and required password is resolved
-  // 'remove-password': userProfileRoutes.find(r => r.id === 'security'),
+  'remove-password': userProfileRoutes.find(r => r.id === 'security'),
 };
 
 export const UserProfileBreadcrumbs = (props: Pick<PropsOfComponent<typeof Breadcrumbs>, 'title'>) => {
