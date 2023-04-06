@@ -1,6 +1,5 @@
 import type { ImageResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
-import React from 'react';
 
 import { bindCreateFixtures, render, screen } from '../../../../testUtils';
 import { ProfilePage } from '../ProfilePage';
@@ -48,7 +47,7 @@ describe('ProfilePage', () => {
       const { wrapper } = await createFixtures(f => {
         f.withUser({
           email_addresses: ['test@clerk.dev'],
-          profile_image_url: 'https://clerk.com',
+          image_url: 'https://clerk.com',
           first_name: 'F',
           last_name: 'L',
         });
@@ -75,7 +74,7 @@ describe('ProfilePage', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({
           email_addresses: ['test@clerk.dev'],
-          profile_image_url: 'https://clerk.com',
+          image_url: 'https://clerk.com',
         });
       });
       fixtures.clerk.user?.setProfileImage.mockReturnValueOnce(Promise.resolve({} as ImageResource));

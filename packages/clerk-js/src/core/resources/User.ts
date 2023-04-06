@@ -64,6 +64,7 @@ export class User extends BaseResource implements UserResource {
   primaryPhoneNumber: PhoneNumberResource | null = null;
   primaryWeb3WalletId: string | null = null;
   primaryWeb3Wallet: Web3WalletResource | null = null;
+  imageUrl = '';
   profileImageUrl = '';
   twoFactorEnabled = false;
   totpEnabled = false;
@@ -271,6 +272,7 @@ export class User extends BaseResource implements UserResource {
     }
 
     this.profileImageUrl = data.profile_image_url;
+    this.imageUrl = data.image_url;
     this.username = data.username;
     this.passwordEnabled = data.password_enabled;
     this.emailAddresses = (data.email_addresses || []).map(

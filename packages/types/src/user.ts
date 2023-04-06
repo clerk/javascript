@@ -47,7 +47,11 @@ export interface UserResource extends ClerkResource {
   fullName: string | null;
   firstName: string | null;
   lastName: string | null;
+  /**
+   * @deprecated Use image_url instead.
+   */
   profileImageUrl: string;
+  imageUrl: string;
   emailAddresses: EmailAddressResource[];
   phoneNumbers: PhoneNumberResource[];
   web3Wallets: Web3WalletResource[];
