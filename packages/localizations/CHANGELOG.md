@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.0](https://github.com/clerkinc/javascript/compare/@clerk/localizations@1.10.0-staging.0...@clerk/localizations@1.10.0) (2023-04-06)
+
+**Note:** Version bump only for package @clerk/localizations
+
 ### [1.9.1](https://github.com/clerkinc/javascript/compare/@clerk/localizations@1.9.1-staging.2...@clerk/localizations@1.9.1) (2023-03-31)
 
 **Note:** Version bump only for package @clerk/localizations
