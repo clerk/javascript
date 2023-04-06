@@ -82,14 +82,14 @@ export interface SignUpResource extends ClerkResource {
   createMagicLinkFlow: () => CreateMagicLinkFlowReturn<StartMagicLinkFlowParams, SignUpResource>;
 
   authenticateWithRedirect: (
-    params: AuthenticateWithRedirectParams & { unsafeMetadata: SignUpUnsafeMetadata },
+    params: AuthenticateWithRedirectParams & { unsafeMetadata?: SignUpUnsafeMetadata },
   ) => Promise<void>;
 
   authenticateWithWeb3: (
-    params: AuthenticateWithWeb3Params & { unsafeMetadata: SignUpUnsafeMetadata },
+    params: AuthenticateWithWeb3Params & { unsafeMetadata?: SignUpUnsafeMetadata },
   ) => Promise<SignUpResource>;
 
-  authenticateWithMetamask: (params: { unsafeMetadata: SignUpUnsafeMetadata }) => Promise<SignUpResource>;
+  authenticateWithMetamask: (params?: SignUpAuthenticateWithMetamaskParams) => Promise<SignUpResource>;
 }
 
 export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';

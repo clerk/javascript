@@ -80,6 +80,7 @@ import { CLERK_SATELLITE_URL, CLERK_SYNCED, ERROR_CODES } from './constants';
 import type { DevBrowserHandler } from './devBrowserHandler';
 import createDevBrowserHandler from './devBrowserHandler';
 import {
+  clerkErrorInitFailed,
   clerkMissingDevBrowserJwt,
   clerkMissingProxyUrlAndDomain,
   clerkMissingSignInUrlAsSatellite,
@@ -502,7 +503,7 @@ export default class Clerk implements ClerkInterface {
       session = (this.client.sessions.find(x => x.id === session) as ActiveSessionResource) || null;
     }
 
-    let newSession = session === undefined ? this.session : session;
+    let newSession = session ? session : this.session || null;
 
     // At this point, the `session` variable should contain either an `ActiveSessionResource`
     // or `null`.
@@ -685,49 +686,56 @@ export default class Clerk implements ClerkInterface {
       { base: getClerkQueryParam(CLERK_SATELLITE_URL) as string, searchParams },
       { stringify: true },
     );
-    return this.navigate(this.buildUrlWithAuth(backToSatelliteUrl, false));
+    return this.navigate(this.buildUrlWithAuth(backToSatelliteUrl));
   };
 
   public redirectWithAuth = async (to: string): Promise<unknown> => {
     if (inBrowser()) {
       return this.navigate(this.buildUrlWithAuth(to));
     }
+    return;
   };
 
   public redirectToSignIn = async (options?: RedirectOptions): Promise<unknown> => {
     if (inBrowser()) {
       return this.navigate(this.buildSignInUrl(options));
     }
+    return;
   };
 
   public redirectToSignUp = async (options?: RedirectOptions): Promise<unknown> => {
     if (inBrowser()) {
       return this.navigate(this.buildSignUpUrl(options));
     }
+    return;
   };
 
   public redirectToUserProfile = async (): Promise<unknown> => {
     if (inBrowser()) {
       return this.navigate(this.buildUserProfileUrl());
     }
+    return;
   };
 
   public redirectToCreateOrganization = async (): Promise<unknown> => {
     if (inBrowser()) {
       return this.navigate(this.buildCreateOrganizationUrl());
     }
+    return;
   };
 
   public redirectToOrganizationProfile = async (): Promise<unknown> => {
     if (inBrowser()) {
       return this.navigate(this.buildOrganizationProfileUrl());
     }
+    return;
   };
 
   public redirectToHome = async (): Promise<unknown> => {
     if (inBrowser()) {
       return this.navigate(this.buildHomeUrl());
     }
+    return;
   };
 
   public handleMagicLinkVerification = async (
@@ -1172,7 +1180,7 @@ export default class Clerk implements ClerkInterface {
         this.updateEnvironment(environment);
 
         if (Clerk.mountComponentRenderer) {
-          this.#componentControls = Clerk.mountComponentRenderer(this, this.#environment, this.#options);
+          this.#componentControls = Clerk.mountComponentRenderer(this, this.#environment as Environment, this.#options);
         }
 
         break;
