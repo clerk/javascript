@@ -72,6 +72,7 @@ export const ProfileSettingsPage = withCardStateProvider(() => {
 
   const updateSlugField = (val: string) => {
     slugField.setValue(val);
+    slugField.setError(undefined);
   };
 
   return (

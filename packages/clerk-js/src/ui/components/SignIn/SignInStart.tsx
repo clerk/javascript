@@ -1,5 +1,5 @@
 import type { ClerkAPIError, SignInCreateParams } from '@clerk/types';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { ERROR_CODES } from '../../../core/constants';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
@@ -295,9 +295,17 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
     };
   }, []);
 
+  useEffect(() => {
+    //if the field receives a value, we default to normal behaviour
+    if (field?.value && field.value !== '') {
+      setAutofilled(false);
+    }
+  }, [field?.value]);
+
   if (!field) {
     return null;
   }
+
   return (
     <Form.ControlRow
       elementId={field.id}
