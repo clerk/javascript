@@ -8,5 +8,7 @@ export const shadesOfPurple = unstable_createTheme({
     colorPrimary: '#f8d80d',
     colorTextOnPrimaryBackground: '#38375f',
     colorInputText: '#a1fdfe',
+    colorShimmer: 'rgba(161,253,254,0.36)',
+    shadowShimmer: '1px 1px 2px rgba(0,0,0,0.36)',
   },
 });

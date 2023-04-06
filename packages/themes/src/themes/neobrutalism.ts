@@ -23,6 +23,8 @@ export const neobrutalism = unstable_createTheme({
       medium: 600,
       bold: 700,
     },
+    colorShimmer: 'rgba(255,255,255,0.64)',
+    shadowShimmer: '2px 2px 0px #000',
   },
   elements: {
     card: {
