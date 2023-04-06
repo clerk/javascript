@@ -78,7 +78,10 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
         </FormLabel>
         {icon && (
           // TODO: This is a temporary fix. Replace this when the tooltip component is introduced
-          <p title='A slug is a human-readable ID that must be unique.  It’s often used in URLs.'>
+          <Flex
+            as={'span'}
+            title='A slug is a human-readable ID that must be unique.  It’s often used in URLs.'
+          >
             <Icon
               icon={icon}
               sx={theme => ({
@@ -88,7 +91,7 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
                 height: theme.sizes.$4,
               })}
             />
-          </p>
+          </Flex>
         )}
         {isOptional && !actionLabel && (
           <Text
