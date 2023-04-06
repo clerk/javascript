@@ -269,6 +269,7 @@ describe('AppearanceProvider layout flows', () => {
             termsPageUrl: 'test2',
             logoPlacement: 'outside',
             showOptionalFields: true,
+            showSignUpLink: true,
             socialButtonsPlacement: 'top',
             socialButtonsVariant: 'blockButton',
           },
@@ -285,6 +286,7 @@ describe('AppearanceProvider layout flows', () => {
     expect(result.current.parsedLayout.termsPageUrl).toBe('test2');
     expect(result.current.parsedLayout.logoPlacement).toBe('outside');
     expect(result.current.parsedLayout.showOptionalFields).toBe(true);
+    expect(result.current.parsedLayout.showSignUpLink).toBe(true);
     expect(result.current.parsedLayout.socialButtonsPlacement).toBe('top');
     expect(result.current.parsedLayout.socialButtonsVariant).toBe('blockButton');
   });
@@ -301,6 +303,7 @@ describe('AppearanceProvider layout flows', () => {
             termsPageUrl: 'test',
             logoPlacement: 'inside',
             showOptionalFields: false,
+            showSignUpLink: false,
             socialButtonsPlacement: 'bottom',
             socialButtonsVariant: 'iconButton',
           },
@@ -313,6 +316,7 @@ describe('AppearanceProvider layout flows', () => {
             termsPageUrl: 'test2',
             logoPlacement: 'outside',
             showOptionalFields: true,
+            showSignUpLink: true,
             socialButtonsPlacement: 'top',
             socialButtonsVariant: 'blockButton',
           },
@@ -329,6 +333,7 @@ describe('AppearanceProvider layout flows', () => {
     expect(result.current.parsedLayout.termsPageUrl).toBe('test2');
     expect(result.current.parsedLayout.logoPlacement).toBe('outside');
     expect(result.current.parsedLayout.showOptionalFields).toBe(true);
+    expect(result.current.parsedLayout.showSignUpLink).toBe(true);
     expect(result.current.parsedLayout.socialButtonsPlacement).toBe('top');
     expect(result.current.parsedLayout.socialButtonsVariant).toBe('blockButton');
   });

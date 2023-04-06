@@ -11,7 +11,7 @@ import {
   withRedirectToHomeSingleSessionGuard,
 } from '../../common';
 import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
-import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
+import { Col, descriptors, Flow, localizationKeys, useAppearance } from '../../customizables';
 import {
   Card,
   CardAlert,
@@ -38,6 +38,7 @@ export function _SignInStart(): JSX.Element {
   const { navigate } = useNavigate();
   const { navigateAfterSignIn, signUpUrl } = useSignInContext();
   const supportEmail = useSupportEmail();
+  const { showSignUpLink } = useAppearance().parsedLayout;
   const identifierAttributes = useMemo<SignInStartIdentifier[]>(
     () => groupIdentifiers(userSettings.enabledFirstFactorIdentifiers),
     [userSettings.enabledFirstFactorIdentifiers],
@@ -255,20 +256,22 @@ export function _SignInStart(): JSX.Element {
             ) : null}
           </SocialButtonsReversibleContainerWithDivider>
         </Col>
-        <Footer.Root>
-          <Footer.Action elementId='signIn'>
-            <Footer.ActionText localizationKey={localizationKeys('signIn.start.actionText')}>
-              No account?
-            </Footer.ActionText>
-            <Footer.ActionLink
-              localizationKey={localizationKeys('signIn.start.actionLink')}
-              to={signUpUrl}
-            >
-              Sign up
-            </Footer.ActionLink>
-          </Footer.Action>
-          <Footer.Links />
-        </Footer.Root>
+        {showSignUpLink ? (
+          <Footer.Root>
+            <Footer.Action elementId='signIn'>
+              <Footer.ActionText localizationKey={localizationKeys('signIn.start.actionText')}>
+                No account?
+              </Footer.ActionText>
+              <Footer.ActionLink
+                localizationKey={localizationKeys('signIn.start.actionLink')}
+                to={signUpUrl}
+              >
+                Sign up
+              </Footer.ActionLink>
+            </Footer.Action>
+            <Footer.Links />
+          </Footer.Root> 
+        ): null}
       </Card>
     </Flow.Part>
   );

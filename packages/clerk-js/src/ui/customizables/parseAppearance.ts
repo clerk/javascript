@@ -37,6 +37,7 @@ const defaultLayout: ParsedLayout = {
   socialButtonsVariant: 'auto',
   logoImageUrl: '',
   showOptionalFields: true,
+  showSignUpLink: true,
   helpPageUrl: '',
   privacyPageUrl: '',
   termsPageUrl: '',

@@ -4,6 +4,7 @@ import React from 'react';
 
 import { bindCreateFixtures, fireEvent, render, screen } from '../../../../testUtils';
 import { SignInStart } from '../SignInStart';
+import { AppearanceProvider } from '../../../customizables';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
 
@@ -198,6 +199,37 @@ describe('SignInStart', () => {
       render(<SignInStart />, { wrapper });
 
       expect(screen.getByRole('textbox', { name: /phone number/i })).toHaveAttribute('type', 'tel');
+    });
+  });
+
+  describe('Remove signup element', () => {
+    it('shows a link to the signup page', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withSupportEmail();
+      });
+      render(
+        <AppearanceProvider appearanceKey='signIn'>
+          <SignInStart />
+        </AppearanceProvider>,
+        { wrapper },
+      );
+
+      expect(screen.queryByText('No account?')).toBeDefined();
+    });
+
+    it('does not show a link to the signup page', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withSupportEmail();
+      });
+      render(
+        <AppearanceProvider appearanceKey='signIn' appearance={{ layout: { showSignUpLink: false } }}>
+          <SignInStart />
+        </AppearanceProvider>,
+        { wrapper },
+      );
+      expect(screen.queryByText('No account?')).toBeNull();
     });
   });
 });

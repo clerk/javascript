@@ -549,6 +549,11 @@ export type Layout = {
    */
   showOptionalFields?: boolean;
   /**
+   * Controls whether the SignIn will show a link to navigate to the SignUp page.
+   * @default true
+   */
+  showSignUpLink?: boolean;
+  /**
    * This options enables the "Terms" link which is, by default, displayed on the bottom-right corner of the
    * prebuilt components. Clicking the link will open the passed URL in a new tab
    */
