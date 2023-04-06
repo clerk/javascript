@@ -19,7 +19,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PropsOfComponent<typeo
         {...rest}
         ref={ref}
         type={hidden ? 'password' : 'text'}
-        sx={theme => ({ paddingRight: theme.space.$8 })}
+        sx={theme => ({ paddingRight: theme.space.$10 })}
       />
       <IconButton
         elementDescriptor={descriptors.formFieldInputShowPasswordButton}
