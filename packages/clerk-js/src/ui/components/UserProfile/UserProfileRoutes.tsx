@@ -6,6 +6,7 @@ import { EmailPage } from './EmailPage';
 import { MfaBackupCodeCreatePage } from './MfaBackupCodeCreatePage';
 import { MfaPage } from './MfaPage';
 import { PasswordPage } from './PasswordPage';
+import { PasswordRemovalPage } from './PasswordRemovalPage';
 import { PhonePage } from './PhonePage';
 import { ProfilePage } from './ProfilePage';
 import {
@@ -103,9 +104,9 @@ export const UserProfileRoutes = (props: PropsOfComponent<typeof ProfileCardCont
       </Route>
 
       {/* TODO: Uncomment these lines once the issue with enabled and required password is resolved */}
-      {/*<Route path='remove-password'>*/}
-      {/*  <PasswordRemovalPage />*/}
-      {/*</Route>*/}
+      <Route path='remove-password'>
+        <PasswordRemovalPage />
+      </Route>
 
       {/*</Route>*/}
     </ProfileCardContent>

@@ -10,7 +10,7 @@ export const PasswordSection = () => {
 
   const navigateToPasswordPage = () => navigate('password');
   // TODO: Uncomment these lines once the issue with enabled and required password is resolved
-  // const navigateToPasswordRemovalPage = () => navigate('remove-password');
+  const navigateToPasswordRemovalPage = () => navigate('remove-password');
 
   return (
     <ProfileSection
@@ -40,13 +40,13 @@ export const PasswordSection = () => {
         />
 
         {/* TODO: Uncomment these lines once the issue with enabled and required password is resolved */}
-        {/*{passwordEnabled && (*/}
-        {/*  <AddBlockButton*/}
-        {/*    id='password'*/}
-        {/*    onClick={navigateToPasswordRemovalPage}*/}
-        {/*    textLocalizationKey={localizationKeys('userProfile.start.passwordSection.primaryButton__removePassword')}*/}
-        {/*  />*/}
-        {/*)}*/}
+        {passwordEnabled && (
+          <AddBlockButton
+            id='password'
+            onClick={navigateToPasswordRemovalPage}
+            textLocalizationKey={localizationKeys('userProfile.start.passwordSection.primaryButton__removePassword')}
+          />
+        )}
       </Flex>
     </ProfileSection>
   );
