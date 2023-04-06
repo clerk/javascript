@@ -67,7 +67,13 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
       isRequired={isRequired}
       sx={sx}
     >
-      <Flex direction={isCheckbox ? 'row' : 'columnReverse'}>
+      <Flex
+        direction={isCheckbox ? 'row' : 'columnReverse'}
+        sx={{
+          // Setting height to 100% fixes issue with Firefox for our PhoneInput
+          height: '100%',
+        }}
+      >
         <InputElement
           elementDescriptor={descriptors.formFieldInput}
           elementId={descriptors.formFieldInput.setId(id)}
@@ -97,8 +103,8 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
             isRequired={isRequired}
             sx={{
               display: 'flex',
-              alignItems: 'center'
-          }}
+              alignItems: 'center',
+            }}
           >
             {typeof label === 'string' ? label : undefined}
           </FormLabel>
