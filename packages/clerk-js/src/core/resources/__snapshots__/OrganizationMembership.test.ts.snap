@@ -12,6 +12,7 @@ OrganizationMembership {
     "getMemberships": [Function],
     "getPendingInvitations": [Function],
     "id": "test_org_id",
+    "imageUrl": "https://path-to-logo.png",
     "inviteMember": [Function],
     "inviteMembers": [Function],
     "logoUrl": "https://path-to-logo.png",
@@ -36,6 +37,7 @@ OrganizationMembership {
   "publicUserData": {
     "firstName": "test_first_name",
     "identifier": "test@identifier.gr",
+    "imageUrl": "test_url",
     "lastName": "test_last_name",
     "profileImageUrl": "test_url",
     "userId": undefined,
