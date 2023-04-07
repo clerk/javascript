@@ -1,7 +1,6 @@
-import { pathFromFullPath } from '@clerk/shared';
 import React from 'react';
 
-import { trimTrailingSlash } from '../../utils';
+import { pathFromFullPath, trimTrailingSlash } from '../../utils';
 import { newPaths } from './newPaths';
 import { match } from './pathToRegexp';
 import { RouteContext, useRouter } from './RouteContext';
@@ -88,10 +87,9 @@ export function Route(props: RouteProps): JSX.Element | null {
   }
 
   const flowStartPath = props.flowStart
-    ? pathFromFullPath(fullPath)
-        .replace(props.path || '', '')
-        //replace the base path for path routing to work
-        .replace('/' + router.basePath, '') || router.flowStartPath
+    ? //set it as the old full path (the previous step),
+      //replacing the base path for navigateToFlowStart() to work as expected
+      pathFromFullPath(router.fullPath).replace('/' + router.basePath, '')
     : router.flowStartPath;
 
   return (
