@@ -12,7 +12,7 @@ labels: 'Status: Triage'
 - [ ] Go through package changelog files.
 - [ ] Provide the Frontend API key from your application dashboard.
 
-<!-- You can also find us on Discord https://discord.com/invite/b5rXHjAg7A -->
+<!-- You can also find us on Discord https://clerk.com/discord -->
 
 ## Package + Version
 
