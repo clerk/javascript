@@ -7,7 +7,7 @@ labels: 'Status: Triage'
 
 <!-- Requirements: please go through this checklist before opening a new issue -->
 
-- [ ] Review the documentation: https://docs.clerk.com/
+- [ ] Review the documentation: https://clerk.com/docs
 - [ ] Search for existing issues: https://github.com/clerkinc/javascript/issues
 - [ ] Go through package changelog files.
 - [ ] Provide the Frontend API key from your application dashboard.
