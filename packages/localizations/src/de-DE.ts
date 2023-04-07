@@ -554,3 +554,8 @@ export const deDe: LocalizationResource = {
     numeric: "{{ date | numeric('de-DE') }}",
   },
 } as const;
+
+
+export const deDE = deDe;
+
+
