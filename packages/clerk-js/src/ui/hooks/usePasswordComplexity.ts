@@ -3,9 +3,19 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { localizationKeys, useLocalizations } from '../localization';
 
-const testComplexityCases = (password: string) => {
+const testComplexityCases = (
+  password: string,
+  {
+    minLength,
+    maxLength,
+  }: {
+    minLength: number;
+    maxLength: number;
+  },
+) => {
   return {
-    min_length: password.length >= 8,
+    max_length: password.length < maxLength,
+    min_length: password.length >= minLength,
     require_numbers: /\d/.test(password),
     require_lowercase: /[a-z]/.test(password),
     require_uppercase: /[A-Z]/.test(password),
@@ -24,7 +34,9 @@ export const usePasswordComplexity = (
     onValidationSuccess?: () => void;
   },
 ) => {
-  const { min_length, require_lowercase, require_numbers, require_uppercase, require_special_char } = config;
+  const { min_length, max_length, require_lowercase, require_numbers, require_uppercase, require_special_char } =
+    config;
+
   const [_password, _setPassword] = useState('');
   const [failedValidations, setFailedValidations] = useState<ComplexityErrorMessages>({});
   const { t } = useLocalizations();
@@ -32,6 +44,7 @@ export const usePasswordComplexity = (
   const errorMessages = useMemo(
     () =>
       ({
+        max_length: t(localizationKeys('passwordComplexity.maximumLength', { length: max_length })),
         min_length: t(localizationKeys('passwordComplexity.minimumLength', { length: min_length })),
         require_numbers: t(localizationKeys('passwordComplexity.requireNumbers')),
         require_lowercase: t(localizationKeys('passwordComplexity.requireLowercase')),
@@ -42,8 +55,11 @@ export const usePasswordComplexity = (
   );
 
   const passwordComplexity = useMemo(() => {
-    return testComplexityCases(_password);
-  }, [_password]);
+    return testComplexityCases(_password, {
+      maxLength: max_length,
+      minLength: min_length,
+    });
+  }, [_password, min_length, max_length]);
 
   const hasPassedComplexity = useMemo(
     () => Object.keys(failedValidations || {}).length === 0 && !!_password,
@@ -57,8 +73,19 @@ export const usePasswordComplexity = (
 
   const setPassword = useCallback(
     (password: string) => {
-      const testCases = testComplexityCases(password);
-      const keys = { min_length, require_special_char, require_lowercase, require_numbers, require_uppercase };
+      const testCases = testComplexityCases(password, {
+        maxLength: max_length,
+        minLength: min_length,
+      });
+
+      const keys = {
+        max_length,
+        min_length,
+        require_special_char,
+        require_lowercase,
+        require_numbers,
+        require_uppercase,
+      };
 
       const _validationsFailedMap = new Map();
       for (const k in keys) {
@@ -85,7 +112,7 @@ export const usePasswordComplexity = (
       setFailedValidations(_validationsFailed);
       _setPassword(password);
     },
-    [callbacks?.onValidationFailed, callbacks?.onValidationSuccess, t],
+    [callbacks?.onValidationFailed, callbacks?.onValidationSuccess, t, min_length, max_length],
   );
 
   return {
