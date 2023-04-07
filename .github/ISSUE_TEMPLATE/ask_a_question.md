@@ -5,7 +5,7 @@ title: ''
 labels: 'Status: Question'
 ---
 
-<!-- You can find us on Discord https://discord.com/invite/b5rXHjAg7A -->
+<!-- You can find us on Discord https://clerk.com/discord -->
 
 <!-- Requirements: please go through this checklist before opening a new issue -->
 

@@ -161,7 +161,7 @@ npm run dev
 
 You can get in touch with us in any of the following ways:
 
-- Join our official community [Discord server](https://discord.com/invite/b5rXHjAg7A)
+- Join our official community [Discord server](https://clerk.com/discord)
 - Open a [GitHub support issue](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=question&template=ask_a_question.md&title=Support%3A+)
 - Contact options listed on [our Support page](https://clerk.com/support?utm_source=github&utm_medium=gatsby_plugin_clerk)
 
