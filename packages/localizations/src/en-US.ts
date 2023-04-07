@@ -80,7 +80,7 @@ export const enUS: LocalizationResource = {
     requireNumbers: 'a number',
     requireLowercase: 'a lowercase letter',
     requireUppercase: 'an uppercase letter',
-    requireSpecialCharacter: 'a specrial character',
+    requireSpecialCharacter: 'a special character',
   },
   signUp: {
     start: {
