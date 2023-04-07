@@ -71,6 +71,7 @@ export default function createFapiClient(clerkInstance: Clerk): FapiClient {
   }
 
   async function runBeforeRequestCallbacks(requestInit: FapiRequestInit) {
+    //@ts-expect-error
     const windowCallback = typeof window !== 'undefined' && (window as never).__unstable__onBeforeRequest;
     for await (const callback of [windowCallback, ...onBeforeRequestCallbacks].filter(s => s)) {
       if ((await callback(requestInit)) === false) {

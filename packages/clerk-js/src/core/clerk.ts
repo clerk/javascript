@@ -80,6 +80,7 @@ import { CLERK_SATELLITE_URL, CLERK_SYNCED, ERROR_CODES } from './constants';
 import type { DevBrowserHandler } from './devBrowserHandler';
 import createDevBrowserHandler from './devBrowserHandler';
 import {
+  clerkErrorInitFailed,
   clerkMissingDevBrowserJwt,
   clerkMissingProxyUrlAndDomain,
   clerkMissingSignInUrlAsSatellite,
@@ -505,7 +506,7 @@ export default class Clerk implements ClerkInterface {
     let newSession = session === undefined ? this.session : session;
 
     // At this point, the `session` variable should contain either an `ActiveSessionResource`
-    // or `null`.
+    // ,`null` or `undefined`.
     // We now want to set the last active organization id on that session (if it exists).
     // However, if the `organization` parameter is not given (i.e. `undefined`), we want
     // to keep the organization id that the session had.
@@ -685,49 +686,56 @@ export default class Clerk implements ClerkInterface {
       { base: getClerkQueryParam(CLERK_SATELLITE_URL) as string, searchParams },
       { stringify: true },
     );
-    return this.navigate(this.buildUrlWithAuth(backToSatelliteUrl, false));
+    return this.navigate(this.buildUrlWithAuth(backToSatelliteUrl));
   };
 
   public redirectWithAuth = async (to: string): Promise<unknown> => {
     if (inBrowser()) {
       return this.navigate(this.buildUrlWithAuth(to));
     }
+    return;
   };
 
   public redirectToSignIn = async (options?: RedirectOptions): Promise<unknown> => {
     if (inBrowser()) {
       return this.navigate(this.buildSignInUrl(options));
     }
+    return;
   };
 
   public redirectToSignUp = async (options?: RedirectOptions): Promise<unknown> => {
     if (inBrowser()) {
       return this.navigate(this.buildSignUpUrl(options));
     }
+    return;
   };
 
   public redirectToUserProfile = async (): Promise<unknown> => {
     if (inBrowser()) {
       return this.navigate(this.buildUserProfileUrl());
     }
+    return;
   };
 
   public redirectToCreateOrganization = async (): Promise<unknown> => {
     if (inBrowser()) {
       return this.navigate(this.buildCreateOrganizationUrl());
     }
+    return;
   };
 
   public redirectToOrganizationProfile = async (): Promise<unknown> => {
     if (inBrowser()) {
       return this.navigate(this.buildOrganizationProfileUrl());
     }
+    return;
   };
 
   public redirectToHome = async (): Promise<unknown> => {
     if (inBrowser()) {
       return this.navigate(this.buildHomeUrl());
     }
+    return;
   };
 
   public handleMagicLinkVerification = async (
@@ -1172,7 +1180,7 @@ export default class Clerk implements ClerkInterface {
         this.updateEnvironment(environment);
 
         if (Clerk.mountComponentRenderer) {
-          this.#componentControls = Clerk.mountComponentRenderer(this, this.#environment, this.#options);
+          this.#componentControls = Clerk.mountComponentRenderer(this, this.#environment as Environment, this.#options);
         }
 
         break;
@@ -1246,7 +1254,7 @@ export default class Clerk implements ClerkInterface {
   };
 
   // TODO: Be more conservative about touches. Throttle, don't touch when only one user, etc
-  #touchLastActiveSession = async (session: ActiveSessionResource | null): Promise<void> => {
+  #touchLastActiveSession = async (session?: ActiveSessionResource | null): Promise<void> => {
     if (!session || !this.#options.touchSession) {
       return Promise.resolve();
     }

@@ -6,7 +6,7 @@ import { colors, fromEntries, removeUndefinedProps } from '../utils';
 import { colorOptionToHslaAlphaScale, colorOptionToHslaLightnessScale } from './colorOptionToHslaScale';
 
 export const createColorScales = (theme: Theme) => {
-  const variables = theme.variables || {};
+  const variables = (theme.variables || {}) as NonNullable<Theme['variables']>;
   return removeUndefinedProps({
     ...colorOptionToHslaLightnessScale(variables.colorPrimary, 'primary'),
     ...colorOptionToHslaLightnessScale(variables.colorDanger, 'danger'),
@@ -23,7 +23,6 @@ export const createColorScales = (theme: Theme) => {
   });
 };
 
-// TODO:
 export const createThemeOptions = (theme: Theme) => {
   const { fontSmoothing = 'auto !important' } = theme.variables || {};
   return { fontSmoothing };

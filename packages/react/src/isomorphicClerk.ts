@@ -23,6 +23,7 @@ import type {
   UserProfileProps,
   UserResource,
 } from '@clerk/types';
+import type { BeforeEmitCallback } from '@clerk/types';
 import type { OrganizationProfileProps, OrganizationSwitcherProps } from '@clerk/types/src';
 
 import { unsupportedNonBrowserDomainFunction } from './errors';
@@ -323,10 +324,7 @@ export default class IsomorphicClerk {
     }
   };
 
-  setSession = (
-    session: ActiveSessionResource | string | null,
-    beforeEmit?: (session: ActiveSessionResource | null) => void | Promise<any>,
-  ): Promise<void> => {
+  setSession = (session: ActiveSessionResource | string | null, beforeEmit?: BeforeEmitCallback): Promise<void> => {
     return this.setActive({ session, beforeEmit });
   };
 

@@ -70,11 +70,11 @@ const mergeFilledIntoUserDefinedScale = (
   return fromEntries(Object.entries(userDefined).map(([k, v]) => [k, v || generated[k]]));
 };
 
-const prefixAndStringifyHslaScale = (
+const prefixAndStringifyHslaScale = <Prefix extends string>(
   scale: InternalColorScale<HslaColor | undefined>,
-  prefix: string,
-): InternalColorScale<HslaColor> => {
-  const res = {} as InternalColorScale<HslaColor>;
+  prefix: Prefix,
+) => {
+  const res = {} as WithPrefix<InternalColorScale<HslaColorString>, Prefix>;
   for (const key in scale) {
     // @ts-expect-error
     if (scale[key]) {

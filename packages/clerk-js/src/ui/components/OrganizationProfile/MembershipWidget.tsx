@@ -5,6 +5,7 @@ import { Col, Flex, Link, Text } from '../../customizables';
 
 export const MembershipWidget = () => {
   const { organization } = useCoreOrganization();
+  //@ts-expect-error
   const { __unstable_manageBillingUrl, __unstable_manageBillingLabel, __unstable_manageBillingMembersLimit } =
     useOrganizationProfileContext();
   const router = useRouter();

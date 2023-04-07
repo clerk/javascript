@@ -28,7 +28,12 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
       {...rest}
       oauthCallback={(strategy: OAuthStrategy) => {
         return signUp
-          .authenticateWithRedirect({ strategy, redirectUrl, redirectUrlComplete, continueSignUp })
+          .authenticateWithRedirect({
+            strategy,
+            redirectUrl,
+            redirectUrlComplete,
+            continueSignUp,
+          })
           .catch(err => handleError(err, [], card.setError));
       }}
       web3Callback={() => {

@@ -24,7 +24,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "npm run build:bundle && (npm run build:declarations || true) && npm run bundlewatch",
+    "build": "npm run build:bundle && npm run build:declarations && npm run bundlewatch",
     "build:stats": "webpack --config webpack.config.js --env production --json=stats.json --env variant=\"clerk.browser\"",
     "build:analyze": "webpack-bundle-analyzer stats.json dist/",
     "bundlewatch": "bundlewatch",

@@ -23,7 +23,7 @@ export type InstanceType = 'production' | 'development';
 
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
-export type BeforeEmitCallback = (session: ActiveSessionResource | null) => void | Promise<any>;
+export type BeforeEmitCallback = (session?: ActiveSessionResource | null) => void | Promise<any>;
 
 export type SignOutCallback = () => void | Promise<any>;
 
