@@ -69,6 +69,15 @@ export const nlNL: LocalizationResource = {
   membershipRole__admin: 'Admin',
   membershipRole__basicMember: 'Lid',
   membershipRole__guestMember: 'Gast',
+  passwordComplexity: {
+    sentencePrefix: '',
+    minimumLength: '',
+    maximumLength: '',
+    requireNumbers: '',
+    requireLowercase: '',
+    requireUppercase: '',
+    requireSpecialCharacter: '',
+  },
   signUp: {
     start: {
       title: 'Maak je account aan',

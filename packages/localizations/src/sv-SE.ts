@@ -71,6 +71,15 @@ export const svSE: LocalizationResource = {
   membershipRole__admin: 'Admin',
   membershipRole__basicMember: 'Medlem',
   membershipRole__guestMember: 'Gäst',
+  passwordComplexity: {
+    sentencePrefix: '',
+    minimumLength: '',
+    maximumLength: '',
+    requireNumbers: '',
+    requireLowercase: '',
+    requireUppercase: '',
+    requireSpecialCharacter: '',
+  },
   signUp: {
     start: {
       title: 'Skapa ditt konto',

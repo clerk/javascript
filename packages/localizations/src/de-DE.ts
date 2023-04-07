@@ -59,6 +59,15 @@ export const deDE: LocalizationResource = {
   membershipRole__admin: 'Administrator',
   membershipRole__basicMember: 'Mitglied',
   membershipRole__guestMember: 'Gast',
+  passwordComplexity: {
+    sentencePrefix: '',
+    minimumLength: '',
+    maximumLength: '',
+    requireNumbers: '',
+    requireLowercase: '',
+    requireUppercase: '',
+    requireSpecialCharacter: '',
+  },
   signUp: {
     start: {
       title: 'Erstelle deinen Account',

@@ -70,6 +70,15 @@ export const ptBR: LocalizationResource = {
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Membro',
   membershipRole__guestMember: 'Convidado',
+  passwordComplexity: {
+    sentencePrefix: '',
+    minimumLength: '',
+    maximumLength: '',
+    requireNumbers: '',
+    requireLowercase: '',
+    requireUppercase: '',
+    requireSpecialCharacter: '',
+  },
   signUp: {
     start: {
       title: 'Criar sua conta',
