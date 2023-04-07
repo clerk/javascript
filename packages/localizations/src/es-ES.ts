@@ -71,6 +71,15 @@ export const esES: LocalizationResource = {
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Miembro',
   membershipRole__guestMember: 'Invitado',
+  passwordComplexity: {
+    sentencePrefix: '',
+    minimumLength: '',
+    maximumLength: '',
+    requireNumbers: '',
+    requireLowercase: '',
+    requireUppercase: '',
+    requireSpecialCharacter: '',
+  },
   signUp: {
     start: {
       title: 'Crea tu cuenta',

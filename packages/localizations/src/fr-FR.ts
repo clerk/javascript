@@ -59,6 +59,15 @@ export const frFR: LocalizationResource = {
   membershipRole__admin: 'Administrateur',
   membershipRole__basicMember: 'Membre',
   membershipRole__guestMember: 'Invité',
+  passwordComplexity: {
+    sentencePrefix: '',
+    minimumLength: '',
+    maximumLength: '',
+    requireNumbers: '',
+    requireLowercase: '',
+    requireUppercase: '',
+    requireSpecialCharacter: '',
+  },
   signUp: {
     start: {
       title: 'Créez votre compte',

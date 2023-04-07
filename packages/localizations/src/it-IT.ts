@@ -71,6 +71,15 @@ export const itIT: LocalizationResource = {
   membershipRole__admin: 'Amministratore',
   membershipRole__basicMember: 'Utente',
   membershipRole__guestMember: 'Ospite',
+  passwordComplexity: {
+    sentencePrefix: '',
+    minimumLength: '',
+    maximumLength: '',
+    requireNumbers: '',
+    requireLowercase: '',
+    requireUppercase: '',
+    requireSpecialCharacter: '',
+  },
   signUp: {
     start: {
       title: 'Crea il tuo account',

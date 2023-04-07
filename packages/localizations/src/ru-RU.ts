@@ -71,6 +71,15 @@ export const ruRU: LocalizationResource = {
   membershipRole__admin: 'Администратор',
   membershipRole__basicMember: 'Член',
   membershipRole__guestMember: 'Гость',
+  passwordComplexity: {
+    sentencePrefix: '',
+    minimumLength: '',
+    maximumLength: '',
+    requireNumbers: '',
+    requireLowercase: '',
+    requireUppercase: '',
+    requireSpecialCharacter: '',
+  },
   signUp: {
     start: {
       title: 'Создайте Ваш аккаунт',
