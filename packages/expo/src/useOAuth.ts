@@ -6,6 +6,7 @@ import * as WebBrowser from 'expo-web-browser';
 export type UseOAuthFlowParams = {
   strategy: OAuthStrategy;
   redirectUrl?: string;
+  unsafeMetadata?: SignUpUnsafeMetadata;
 };
 
 export type StartOAuthFlowReturnType = {
@@ -17,7 +18,7 @@ export type StartOAuthFlowReturnType = {
 };
 
 export function useOAuth(params: UseOAuthFlowParams) {
-  const { strategy, redirectUrl } = params || {};
+  const { strategy, redirectUrl, unsafeMetadata } = params || {};
   if (!strategy) {
     throw new Error('Missing oauth strategy');
   }
@@ -86,6 +87,7 @@ export function useOAuth(params: UseOAuthFlowParams) {
     } else if (firstFactorVerification.status === 'transferable') {
       await signUp.create({
         transfer: true,
+        unsafeMetadata,
       });
       createdSessionId = signUp.createdSessionId || '';
     }
