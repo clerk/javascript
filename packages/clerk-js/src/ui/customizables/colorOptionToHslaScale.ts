@@ -59,7 +59,6 @@ const fillUserProvidedScaleWithGeneratedHslaColors = <Prefix extends string>(
   const userDefinedHslaColorScale = userDefinedColorToHslaColorScale(colorOption);
   const filledHslaColorScale = generator(userDefinedHslaColorScale['500']);
   const merged = mergeFilledIntoUserDefinedScale(filledHslaColorScale, userDefinedHslaColorScale);
-  //@ts-ignore
   return prefixAndStringifyHslaScale(merged, prefix);
 };
 
