@@ -1,6 +1,6 @@
 import type { LocalizationResource } from '@clerk/types';
 
-export const deDe: LocalizationResource = {
+export const deDE: LocalizationResource = {
   socialButtonsBlockButton: 'Weiter mit {{provider|titleize}}',
   dividerText: 'oder',
   formFieldLabel__emailAddress: 'E-Mail-Adresse',
@@ -556,6 +556,5 @@ export const deDe: LocalizationResource = {
 } as const;
 
 
-export const deDE = deDe;
 
 
