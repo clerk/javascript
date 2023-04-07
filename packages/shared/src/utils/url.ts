@@ -25,7 +25,3 @@ export function addClerkPrefix(str: string | undefined) {
   const stripped = str.replace(regex, '');
   return `clerk.${stripped}`;
 }
-
-export const pathFromFullPath = (fullPath: string) => {
-  return fullPath.replace(/CLERK-ROUTER\/(.*?)\//, '');
-};

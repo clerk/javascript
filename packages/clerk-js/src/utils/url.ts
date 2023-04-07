@@ -358,3 +358,7 @@ export const mergeFragmentIntoUrl = (_url: string | URL): URL => {
 
   return mergedUrl;
 };
+
+export const pathFromFullPath = (fullPath: string) => {
+  return fullPath.replace(/CLERK-ROUTER\/(.*?)\//, '');
+};
