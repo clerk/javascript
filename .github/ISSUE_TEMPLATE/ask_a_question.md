@@ -9,6 +9,6 @@ labels: 'Status: Question'
 
 <!-- Requirements: please go through this checklist before opening a new issue -->
 
-- [ ] Review the documentation: https://docs.clerk.com/
+- [ ] Review the documentation: https://clerk.com/docs
 - [ ] Go through package changelog files. 
 
