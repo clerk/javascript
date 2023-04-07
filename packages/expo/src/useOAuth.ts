@@ -9,10 +9,11 @@ export type UseOAuthFlowParams = {
 };
 
 export type StartOAuthFlowReturnType = {
-  createdSessionId: string | null;
+  createdSessionId: string;
   setActive?: SetActive;
-  signIn?: SignInResource | null;
-  signUp?: SignUpResource | null;
+  signIn?: SignInResource;
+  signUp?: SignUpResource;
+  authSessionResult?: WebBrowser.WebBrowserAuthSessionResult;
 };
 
 export function useOAuth(params: UseOAuthFlowParams) {
@@ -27,7 +28,7 @@ export function useOAuth(params: UseOAuthFlowParams) {
   async function startOAuthFlow(): Promise<StartOAuthFlowReturnType> {
     if (!isSignInLoaded || !isSignUpLoaded) {
       return {
-        createdSessionId: null,
+        createdSessionId: '',
         signIn,
         signUp,
         setActive,
@@ -51,15 +52,24 @@ export function useOAuth(params: UseOAuthFlowParams) {
 
     const { externalVerificationRedirectURL } = signIn.firstFactorVerification;
 
-    const result = await WebBrowser.openAuthSessionAsync(externalVerificationRedirectURL!.toString(), oauthRedirectUrl);
+    const authSessionResult = await WebBrowser.openAuthSessionAsync(
+      externalVerificationRedirectURL!.toString(),
+      oauthRedirectUrl,
+    );
 
     // @ts-expect-error
-    const { type, url } = result || {};
+    const { type, url } = authSessionResult || {};
 
     // TODO: Check all the possible AuthSession results
     // https://docs.expo.dev/versions/latest/sdk/auth-session/#returns-7
     if (type !== 'success') {
-      throw new Error('Something went wrong during the OAuth flow. Try again.');
+      return {
+        authSessionResult,
+        createdSessionId: '',
+        setActive,
+        signIn,
+        signUp,
+      };
     }
 
     const params = new URL(url).searchParams;
@@ -80,7 +90,13 @@ export function useOAuth(params: UseOAuthFlowParams) {
       createdSessionId = signUp.createdSessionId || '';
     }
 
-    return { createdSessionId, signIn, signUp, setActive };
+    return {
+      authSessionResult,
+      createdSessionId,
+      setActive,
+      signIn,
+      signUp,
+    };
   }
 
   return {
