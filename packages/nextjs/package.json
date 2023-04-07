@@ -31,8 +31,8 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "dev": "tsup --watch",
-    "build": "tsup --env.NODE_ENV production",
-    "build:analyze": "tsup --metafile --env.NODE_ENV production",
+    "build": "tsup",
+    "build:analyze": "tsup --metafile",
     "clean": "rimraf ./dist",
     "lint": "eslint .",
     "test": "jest"
