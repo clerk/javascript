@@ -503,10 +503,10 @@ export default class Clerk implements ClerkInterface {
       session = (this.client.sessions.find(x => x.id === session) as ActiveSessionResource) || null;
     }
 
-    let newSession = session ? session : this.session || null;
+    let newSession = session === undefined ? this.session : session;
 
     // At this point, the `session` variable should contain either an `ActiveSessionResource`
-    // or `null`.
+    // ,`null` or `undefined`.
     // We now want to set the last active organization id on that session (if it exists).
     // However, if the `organization` parameter is not given (i.e. `undefined`), we want
     // to keep the organization id that the session had.
@@ -1254,7 +1254,7 @@ export default class Clerk implements ClerkInterface {
   };
 
   // TODO: Be more conservative about touches. Throttle, don't touch when only one user, etc
-  #touchLastActiveSession = async (session: ActiveSessionResource | null): Promise<void> => {
+  #touchLastActiveSession = async (session?: ActiveSessionResource | null): Promise<void> => {
     if (!session || !this.#options.touchSession) {
       return Promise.resolve();
     }
