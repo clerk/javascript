@@ -1,11 +1,18 @@
 import { useSignIn, useSignUp } from '@clerk/clerk-react';
-import type { OAuthStrategy } from '@clerk/types';
+import type { OAuthStrategy, SetActive, SignInResource, SignUpResource } from '@clerk/types';
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 
 export type UseOAuthFlowParams = {
   strategy: OAuthStrategy;
   redirectUrl?: string;
+};
+
+export type StartOAuthFlowReturnType = {
+  createdSessionId: string | null;
+  setActive?: SetActive;
+  signIn?: SignInResource | null;
+  signUp?: SignUpResource | null;
 };
 
 export function useOAuth(params: UseOAuthFlowParams) {
@@ -17,7 +24,7 @@ export function useOAuth(params: UseOAuthFlowParams) {
   const { signIn, setActive, isLoaded: isSignInLoaded } = useSignIn();
   const { signUp, isLoaded: isSignUpLoaded } = useSignUp();
 
-  async function startOAuthFlow() {
+  async function startOAuthFlow(): Promise<StartOAuthFlowReturnType> {
     if (!isSignInLoaded || !isSignUpLoaded) {
       return {
         createdSessionId: null,
