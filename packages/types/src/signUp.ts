@@ -54,7 +54,7 @@ export interface SignUpResource extends ClerkResource {
   phoneNumber: string | null;
   web3wallet: string | null;
   hasPassword: boolean;
-  unsafeMetadata: Record<string, unknown>;
+  unsafeMetadata: SignUpUnsafeMetadata;
   createdSessionId: string | null;
   createdUserId: string | null;
   abandonAt: number | null;
