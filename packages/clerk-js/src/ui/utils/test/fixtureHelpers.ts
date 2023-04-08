@@ -24,7 +24,6 @@ export const createEnvironmentFixtureHelpers = (baseEnvironment: EnvironmentJSON
     ...createDisplayConfigFixtureHelpers(baseEnvironment),
     ...createOrganizationSettingsFixtureHelpers(baseEnvironment),
     ...createUserSettingsFixtureHelpers(baseEnvironment),
-    ...createUserSettingsFixtureHelpers(baseEnvironment),
   };
 };
 
