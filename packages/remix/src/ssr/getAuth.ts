@@ -5,7 +5,7 @@ import { authenticateRequest } from './authenticateRequest';
 import type { GetAuthReturn, LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
 import { interstitialJsonResponse, unknownResponse } from './utils';
 
-type GetAuthOptions = Pick<RootAuthLoaderOptions, 'apiKey' | 'secretKey'>;
+type GetAuthOptions = Pick<RootAuthLoaderOptions, 'apiKey' | 'secretKey' | 'loadUser'>;
 
 export async function getAuth(args: LoaderFunctionArgs, opts?: GetAuthOptions): GetAuthReturn {
   if (!args || (args && (!args.request || !args.context))) {
