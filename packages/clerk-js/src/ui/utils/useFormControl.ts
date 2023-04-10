@@ -45,7 +45,7 @@ export const useFormControl = <Id extends string>(
   const [value, setValueInternal] = React.useState<string>(initialState);
   const [checked, setCheckedInternal] = React.useState<boolean>(opts?.checked || false);
   const [errorText, setErrorText] = React.useState<string | undefined>(undefined);
-  const [_isSuccess, _setSuccess] = React.useState(false);
+  const [isSuccessful, setIsSuccessful] = React.useState(false);
 
   const onChange: FormControlState['onChange'] = event => {
     if (opts?.type === 'checkbox') {
@@ -58,12 +58,12 @@ export const useFormControl = <Id extends string>(
   const setError: FormControlState['setError'] = error => {
     setErrorText(translateError(error || undefined));
     if (typeof error !== 'undefined') {
-      _setSuccess(false);
+      setIsSuccessful(false);
     }
   };
   const setSuccessful: FormControlState['setSuccessful'] = isSuccess => {
     setErrorText(undefined);
-    _setSuccess(isSuccess);
+    setIsSuccessful(isSuccess);
   };
 
   const props = {
@@ -72,7 +72,7 @@ export const useFormControl = <Id extends string>(
     value,
     checked,
     errorText,
-    isSuccessful: _isSuccess,
+    isSuccessful,
     setSuccessful,
     onChange,
     setError,
