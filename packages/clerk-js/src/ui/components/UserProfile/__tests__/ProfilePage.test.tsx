@@ -84,6 +84,20 @@ describe('ProfilePage', () => {
       await userEvent.click(screen.getByText(/remove image/i));
       expect(fixtures.clerk.user?.setProfileImage).toHaveBeenCalledWith({ file: null });
     });
+
+    it('"Remove image" is not shown when a default image exists', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({
+          email_addresses: ['test@clerk.dev'],
+          image_url:
+            'https://img.clerkstage.dev/64656661756c742f696e735f3248326461375851494c494b727555654e464967456b73396878362f757365725f3249454d6b59705573514465427162327564677843717565345757?initials=GD',
+        });
+      });
+      fixtures.clerk.user?.setProfileImage.mockReturnValueOnce(Promise.resolve({} as ImageResource));
+      render(<ProfilePage />, { wrapper });
+
+      expect(screen.queryByText(/remove image/i)).not.toBeInTheDocument();
+    });
   });
 
   describe('Form Buttons', () => {
