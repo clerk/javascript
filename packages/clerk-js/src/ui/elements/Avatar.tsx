@@ -99,6 +99,7 @@ export const Avatar = (props: AvatarProps) => {
           transform: 'var(--cl-shimmer-hover-transform, skewX(-45deg) translateX(-300%))',
           ':after': {
             display: 'block',
+            boxSizing: 'border-box',
             content: "''",
             position: 'absolute',
             width: '400%',
