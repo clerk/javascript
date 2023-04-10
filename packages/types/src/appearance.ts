@@ -485,12 +485,12 @@ export type Variables = {
    * The color of the avatar shimmer
    * @default rgba(255, 255, 255, 0.36)
    */
-  colorShimmer: CssColor;
+  colorShimmer?: CssColor;
   /**
    * The shadow that appears on the avatar when hovered
    * @default rgba(0, 0, 0, 0.36)
    */
-  shadowShimmer: CssColor;
+  shadowShimmer?: CssColor;
 };
 
 export type BaseThemeTaggedType = { __type: 'prebuilt_appearance' };
