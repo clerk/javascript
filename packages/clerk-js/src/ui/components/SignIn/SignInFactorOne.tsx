@@ -7,6 +7,7 @@ import { ErrorCard, LoadingCard, withCardStateProvider } from '../../elements';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import { AlternativeMethods } from './AlternativeMethods';
+import { ResetPasswordCard } from './ResetPassword';
 import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
 import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
 import { SignInFactorOnePasswordCard } from './SignInFactorOnePasswordCard';
@@ -34,6 +35,7 @@ export function _SignInFactorOne(): JSX.Element {
   const router = useRouter();
 
   const lastPreparedFactorKeyRef = React.useRef('');
+  const [prevCurrentFactor, setPrevCurrentFactor] = React.useState<SignInFactor | undefined | null>(() => undefined);
   const [currentFactor, setCurrentFactor] = React.useState<SignInFactor | undefined | null>(() =>
     determineStartingSignInFactor(availableFactors, signIn.identifier, preferredSignInStrategy),
   );
@@ -65,7 +67,10 @@ export function _SignInFactorOne(): JSX.Element {
     lastPreparedFactorKeyRef.current = factorKey(currentFactor);
   };
   const selectFactor = (factor: SignInFactor) => {
-    setCurrentFactor(factor);
+    setCurrentFactor(prevFactor => {
+      setPrevCurrentFactor(prevFactor);
+      return factor;
+    });
     toggleAllStrategies();
   };
   if (showAllStrategies) {
@@ -84,7 +89,17 @@ export function _SignInFactorOne(): JSX.Element {
 
   switch (currentFactor?.strategy) {
     case 'password':
-      return <SignInFactorOnePasswordCard onShowAlternativeMethodsClick={toggleAllStrategies} />;
+      return (
+        <SignInFactorOnePasswordCard
+          onFactorPrepare={() =>
+            setCurrentFactor(prevFactor => {
+              setPrevCurrentFactor(prevFactor);
+              return { strategy: 'reset_password_code', safeIdentifier: signIn.identifier || '' };
+            })
+          }
+          onShowAlternativeMethodsClick={toggleAllStrategies}
+        />
+      );
     case 'email_code':
       return (
         <SignInFactorOneEmailCodeCard
@@ -110,6 +125,21 @@ export function _SignInFactorOne(): JSX.Element {
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
+        />
+      );
+    case 'reset_password_code':
+      return (
+        <ResetPasswordCard
+          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+          onFactorPrepare={handleFactorPrepare}
+          factor={currentFactor}
+          onShowAlternativeMethodsClicked={toggleAllStrategies}
+          onBackLinkClicked={() =>
+            setCurrentFactor(_prevCurrentFactor => {
+              setPrevCurrentFactor(_prevCurrentFactor);
+              return prevCurrentFactor;
+            })
+          }
         />
       );
     default:

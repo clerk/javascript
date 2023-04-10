@@ -18,6 +18,7 @@ type FlowMetadata = {
     | 'totp2Fa'
     | 'backupCode2Fa'
     | 'password'
+    | 'resetPassword'
     | 'emailLink'
     | 'emailLinkVerify'
     | 'emailLinkStatus'

@@ -1,4 +1,4 @@
-import type { EmailCodeFactor, PhoneCodeFactor } from '@clerk/types';
+import type { EmailCodeFactor, PhoneCodeFactor, ResetPasswordCodeFactor } from '@clerk/types';
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
@@ -15,7 +15,7 @@ export type SignInFactorOneCodeCard = Pick<
   VerificationCodeCardProps,
   'onShowAlternativeMethodsClicked' | 'showAlternativeMethods' | 'onBackLinkClicked'
 > & {
-  factor: EmailCodeFactor | PhoneCodeFactor;
+  factor: EmailCodeFactor | PhoneCodeFactor | ResetPasswordCodeFactor;
   factorAlreadyPrepared: boolean;
   onFactorPrepare: () => void;
 };
