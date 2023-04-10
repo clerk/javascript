@@ -259,10 +259,12 @@ export const ruRU: LocalizationResource = {
         title: 'Подключенные аккаунты',
         primaryButton: 'Подключить аккаунт',
         title__conectionFailed: 'Повторная попытка подключения',
+        title__connectionFailed: 'Повторная попытка подключения',
         title__reauthorize: 'Требуется повторная авторизация',
         subtitle__reauthorize:
           'Требуется повторная авторизация этого приложения из-за обновления необходимых областей видимости, и вы можете испытывать ограниченную функциональность. Пожалуйста, повторно авторизуйте это приложение, чтобы избежать проблем',
         actionLabel__conectionFailed: 'Попробовать снова',
+        actionLabel__connectionFailed: 'Попробовать снова',
         actionLabel__reauthorize: 'Авторизовать сейчас',
         destructiveActionTitle: 'Удалить',
         destructiveActionSubtitle: 'Удалите этот подключенный аккаунт из своей учетной записи',

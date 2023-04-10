@@ -56,13 +56,13 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
   const additionalScopes = findAdditionalScopes(account, additionalOAuthScopes);
   const reauthorizationRequired = additionalScopes.length > 0 && account.approvedScopes != '';
   const title = !reauthorizationRequired
-    ? localizationKeys('userProfile.start.connectedAccountsSection.title__conectionFailed')
+    ? localizationKeys('userProfile.start.connectedAccountsSection.title__connectionFailed')
     : localizationKeys('userProfile.start.connectedAccountsSection.title__reauthorize');
   const subtitle = !reauthorizationRequired
     ? (error as any)
     : localizationKeys('userProfile.start.connectedAccountsSection.subtitle__reauthorize');
   const actionLabel = !reauthorizationRequired
-    ? localizationKeys('userProfile.start.connectedAccountsSection.actionLabel__conectionFailed')
+    ? localizationKeys('userProfile.start.connectedAccountsSection.actionLabel__connectionFailed')
     : localizationKeys('userProfile.start.connectedAccountsSection.actionLabel__reauthorize');
 
   const handleOnClick = async () => {
