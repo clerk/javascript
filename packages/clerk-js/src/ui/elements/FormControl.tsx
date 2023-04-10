@@ -35,6 +35,7 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
   setError: (error: string | ClerkAPIError | undefined) => void;
   setSuccessful: (isSuccess: boolean) => void;
   isSuccessful: boolean;
+  hasLostFocus: boolean;
   complexity?: boolean;
 };
 
@@ -69,9 +70,10 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
     isSuccessful,
     setSuccessful,
     complexity,
+    hasLostFocus,
     ...rest
   } = props;
-  const hasError = !!errorText;
+  const hasError = !!errorText && hasLostFocus;
   const isDisabled = props.isDisabled || card.isLoading;
 
   const InputElement = getInputElementForType(props.type);
@@ -181,7 +183,7 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
         elementDescriptor={descriptors.formFieldErrorText}
         elementId={descriptors.formFieldErrorText.setId(id)}
       >
-        {errorText}
+        {hasLostFocus && errorText}
       </FormErrorText>
     </FormControlPrim>
   );
