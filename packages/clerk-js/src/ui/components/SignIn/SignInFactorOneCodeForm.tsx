@@ -11,7 +11,10 @@ import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
 import { handleError } from '../../utils';
 
-export type SignInFactorOneCodeCard = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
+export type SignInFactorOneCodeCard = Pick<
+  VerificationCodeCardProps,
+  'onShowAlternativeMethodsClicked' | 'showAlternativeMethods' | 'onBackLinkClicked'
+> & {
   factor: EmailCodeFactor | PhoneCodeFactor;
   factorAlreadyPrepared: boolean;
   onFactorPrepare: () => void;
@@ -80,7 +83,9 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
       safeIdentifier={props.factor.safeIdentifier}
       profileImageUrl={signIn.userData.imageUrl}
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
+      showAlternativeMethods={props.showAlternativeMethods}
       onIdentityPreviewEditClicked={goBack}
+      onBackLinkClicked={props.onBackLinkClicked}
     />
   );
 };
