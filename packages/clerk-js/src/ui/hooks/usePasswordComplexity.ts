@@ -46,12 +46,12 @@ export const usePasswordComplexity = (config: UsePasswordComplexityConfig, callb
   const errorMessages = useMemo(
     () =>
       ({
-        max_length: t(localizationKeys('passwordComplexity.maximumLength', { length: max_length })),
-        min_length: t(localizationKeys('passwordComplexity.minimumLength', { length: min_length })),
-        require_numbers: t(localizationKeys('passwordComplexity.requireNumbers')),
-        require_lowercase: t(localizationKeys('passwordComplexity.requireLowercase')),
-        require_uppercase: t(localizationKeys('passwordComplexity.requireUppercase')),
-        require_special_char: t(localizationKeys('passwordComplexity.requireSpecialCharacter')),
+        max_length: t(localizationKeys('unstable__errors.passwordComplexity.maximumLength', { length: max_length })),
+        min_length: t(localizationKeys('unstable__errors.passwordComplexity.minimumLength', { length: min_length })),
+        require_numbers: t(localizationKeys('unstable__errors.passwordComplexity.requireNumbers')),
+        require_lowercase: t(localizationKeys('unstable__errors.passwordComplexity.requireLowercase')),
+        require_uppercase: t(localizationKeys('unstable__errors.passwordComplexity.requireUppercase')),
+        require_special_char: t(localizationKeys('unstable__errors.passwordComplexity.requireSpecialCharacter')),
       } satisfies ComplexityErrorMessages),
     [min_length],
   );
@@ -106,7 +106,9 @@ export const usePasswordComplexity = (config: UsePasswordComplexityConfig, callb
 
       if (Object.keys(_validationsFailed).length > 0) {
         const messageWithPrefix = Object.values(_validationsFailed).join(', ');
-        const message = `${t(localizationKeys('passwordComplexity.sentencePrefix'))} ${messageWithPrefix}`;
+        const message = `${t(
+          localizationKeys('unstable__errors.passwordComplexity.sentencePrefix'),
+        )} ${messageWithPrefix}`;
         onValidationFailed(_validationsFailed, message);
       } else {
         onValidationSuccess();

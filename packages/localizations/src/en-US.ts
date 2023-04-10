@@ -73,15 +73,6 @@ export const enUS: LocalizationResource = {
   membershipRole__admin: 'Admin',
   membershipRole__basicMember: 'Member',
   membershipRole__guestMember: 'Guest',
-  passwordComplexity: {
-    sentencePrefix: 'Your password must contain',
-    minimumLength: '{{length}} or more characters',
-    maximumLength: 'less than {{length}} characters',
-    requireNumbers: 'a number',
-    requireLowercase: 'a lowercase letter',
-    requireUppercase: 'an uppercase letter',
-    requireSpecialCharacter: 'a special character',
-  },
   signUp: {
     start: {
       title: 'Create your account',
@@ -562,6 +553,15 @@ export const enUS: LocalizationResource = {
     form_password_incorrect: '',
     not_allowed_access: '',
     form_identifier_exists: '',
+    passwordComplexity: {
+      sentencePrefix: 'Your password must contain',
+      minimumLength: '{{length}} or more characters',
+      maximumLength: 'less than {{length}} characters',
+      requireNumbers: 'a number',
+      requireLowercase: 'a lowercase letter',
+      requireUppercase: 'an uppercase letter',
+      requireSpecialCharacter: 'a special character',
+    },
   },
   dates: {
     previous6Days: "Last {{ date | weekday('en-US','long') }} at {{ date | timeString('en-US') }}",

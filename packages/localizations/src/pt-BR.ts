@@ -70,15 +70,6 @@ export const ptBR: LocalizationResource = {
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Membro',
   membershipRole__guestMember: 'Convidado',
-  passwordComplexity: {
-    sentencePrefix: '',
-    minimumLength: '',
-    maximumLength: '',
-    requireNumbers: '',
-    requireLowercase: '',
-    requireUppercase: '',
-    requireSpecialCharacter: '',
-  },
   signUp: {
     start: {
       title: 'Criar sua conta',
@@ -552,6 +543,15 @@ export const ptBR: LocalizationResource = {
     form_code_incorrect: 'Código incorreto',
     form_password_incorrect: 'Senha incorreta',
     not_allowed_access: 'Acesso não permitido',
+    passwordComplexity: {
+      sentencePrefix: '',
+      minimumLength: '',
+      maximumLength: '',
+      requireNumbers: '',
+      requireLowercase: '',
+      requireUppercase: '',
+      requireSpecialCharacter: '',
+    },
   },
   dates: {
     previous6Days: "Último {{ date | weekday('pt-BR','long') }} às {{ date | timeString('pt-BR') }}",

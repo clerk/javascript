@@ -71,15 +71,6 @@ export const ruRU: LocalizationResource = {
   membershipRole__admin: 'Администратор',
   membershipRole__basicMember: 'Член',
   membershipRole__guestMember: 'Гость',
-  passwordComplexity: {
-    sentencePrefix: '',
-    minimumLength: '',
-    maximumLength: '',
-    requireNumbers: '',
-    requireLowercase: '',
-    requireUppercase: '',
-    requireSpecialCharacter: '',
-  },
   signUp: {
     start: {
       title: 'Создайте Ваш аккаунт',
@@ -561,6 +552,15 @@ export const ruRU: LocalizationResource = {
     form_password_incorrect: '',
     not_allowed_access: '',
     form_identifier_exists: '',
+    passwordComplexity: {
+      sentencePrefix: '',
+      minimumLength: '',
+      maximumLength: '',
+      requireNumbers: '',
+      requireLowercase: '',
+      requireUppercase: '',
+      requireSpecialCharacter: '',
+    },
   },
   dates: {
     previous6Days: "Последний {{ date | weekday('ru-RU','long') }} в {{ date | timeString('ru-RU') }}",

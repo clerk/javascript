@@ -69,15 +69,6 @@ export const nlNL: LocalizationResource = {
   membershipRole__admin: 'Admin',
   membershipRole__basicMember: 'Lid',
   membershipRole__guestMember: 'Gast',
-  passwordComplexity: {
-    sentencePrefix: '',
-    minimumLength: '',
-    maximumLength: '',
-    requireNumbers: '',
-    requireLowercase: '',
-    requireUppercase: '',
-    requireSpecialCharacter: '',
-  },
   signUp: {
     start: {
       title: 'Maak je account aan',
@@ -551,6 +542,15 @@ export const nlNL: LocalizationResource = {
     form_password_incorrect: '',
     not_allowed_access: '',
     form_identifier_exists: '',
+    passwordComplexity: {
+      sentencePrefix: '',
+      minimumLength: '',
+      maximumLength: '',
+      requireNumbers: '',
+      requireLowercase: '',
+      requireUppercase: '',
+      requireSpecialCharacter: '',
+    },
   },
   dates: {
     previous6Days: "Vorige {{ date | weekday('nl-NL','long') }} om {{ date | timeString('nl-NL') }}",
