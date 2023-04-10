@@ -27,11 +27,14 @@ export type VerificationCodeCardProps = {
     reject: (err: unknown) => Promise<void>,
   ) => void;
   onResendCodeClicked?: React.MouseEventHandler;
+  showAlternativeMethods?: boolean;
   onShowAlternativeMethodsClicked?: React.MouseEventHandler;
   onIdentityPreviewEditClicked?: React.MouseEventHandler;
+  onBackLinkClicked?: React.MouseEventHandler;
 };
 
 export const VerificationCodeCard = (props: VerificationCodeCardProps) => {
+  const { showAlternativeMethods = true } = props;
   const [success, setSuccess] = React.useState(false);
   const status = useLoadingStatus();
   const codeControlState = useFormControl('code', '');
@@ -67,13 +70,14 @@ export const VerificationCodeCard = (props: VerificationCodeCardProps) => {
     <Card>
       <CardAlert>{card.error}</CardAlert>
       <Header.Root>
+        {props.onBackLinkClicked && <Header.BackLink onClick={props.onBackLinkClicked} />}
         <Header.Title localizationKey={props.cardTitle} />
         <Header.Subtitle localizationKey={props.cardSubtitle} />
       </Header.Root>
       <IdentityPreview
         identifier={props.safeIdentifier}
         avatarUrl={props.profileImageUrl}
-        onClick={props.onIdentityPreviewEditClicked}
+        onClick={!props.onBackLinkClicked ? props.onIdentityPreviewEditClicked : undefined}
       />
       <Col
         elementDescriptor={descriptors.main}
@@ -89,17 +93,18 @@ export const VerificationCodeCard = (props: VerificationCodeCardProps) => {
           onResendCodeClicked={handleResend}
         />
       </Col>
-      <Footer.Root>
-        <Footer.Action elementId='alternativeMethods'>
-          {props.onShowAlternativeMethodsClicked && (
+
+      {showAlternativeMethods && props.onShowAlternativeMethodsClicked && (
+        <Footer.Root>
+          <Footer.Action elementId='alternativeMethods'>
             <Footer.ActionLink
               localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
               onClick={props.onShowAlternativeMethodsClicked}
             />
-          )}
-        </Footer.Action>
-        <Footer.Links />
-      </Footer.Root>
+          </Footer.Action>
+          <Footer.Links />
+        </Footer.Root>
+      )}
     </Card>
   );
 };
