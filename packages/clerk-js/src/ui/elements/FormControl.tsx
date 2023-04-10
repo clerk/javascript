@@ -71,8 +71,6 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
     setError,
     isSuccessful,
     setSuccessful,
-    strengthMeter,
-    complexity,
     hasLostFocus,
     enableErrorAfterBlur,
     ...rest
@@ -82,7 +80,6 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
 
   const InputElement = getInputElementForType(props.type);
   const isCheckbox = props.type === 'checkbox';
-  const isPasswordInput = props.type === 'password';
 
   return (
     <FormControlPrim
@@ -110,12 +107,6 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
           hasError={hasError}
           isDisabled={isDisabled}
           isRequired={isRequired}
-          {...(isPasswordInput
-            ? {
-                complexity,
-                strengthMeter,
-              }
-            : {})}
           {...rest}
           ref={ref}
           placeholder={t(placeholder)}
