@@ -21,6 +21,8 @@ type FieldStateProps<Id> = {
   name: Id;
   value: string;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
+  onBlur: React.FocusEventHandler<HTMLInputElement>;
+  hasLostFocus: boolean;
   errorText: string | undefined;
   setError: (error: string | ClerkAPIError | undefined) => void;
   setSuccessful: (isSuccess: boolean) => void;
@@ -46,6 +48,7 @@ export const useFormControl = <Id extends string>(
   const [checked, setCheckedInternal] = React.useState<boolean>(opts?.checked || false);
   const [errorText, setErrorText] = React.useState<string | undefined>(undefined);
   const [isSuccessful, setIsSuccessful] = React.useState(false);
+  const [hasLostFocus, setHasLostFocus] = React.useState(false);
 
   const onChange: FormControlState['onChange'] = event => {
     if (opts?.type === 'checkbox') {
@@ -53,6 +56,11 @@ export const useFormControl = <Id extends string>(
     }
     return setValueInternal(event.target.value || '');
   };
+
+  const onBlur: FormControlState['onBlur'] = () => {
+    setHasLostFocus(true);
+  };
+
   const setValue: FormControlState['setValue'] = val => setValueInternal(val || '');
   const setChecked: FormControlState['setChecked'] = checked => setCheckedInternal(checked);
   const setError: FormControlState['setError'] = error => {
@@ -73,9 +81,11 @@ export const useFormControl = <Id extends string>(
     checked,
     errorText,
     isSuccessful,
+    hasLostFocus,
     setSuccessful,
-    onChange,
     setError,
+    onChange,
+    onBlur,
     ...opts,
   };
 
