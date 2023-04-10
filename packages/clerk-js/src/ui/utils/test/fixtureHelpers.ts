@@ -232,6 +232,17 @@ const createOrganizationSettingsFixtureHelpers = (environment: EnvironmentJSON) 
 
 const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
   const us = environment.user_settings;
+  us.password_settings = {
+    disable_hibp: false,
+    min_length: 8,
+    max_length: 999,
+    require_special_char: false,
+    require_numbers: false,
+    require_uppercase: false,
+    require_lowercase: false,
+    show_zxcvbn: false,
+    min_zxcvbn_strength: 0,
+  };
   const emptyAttribute = {
     first_factors: [],
     second_factors: [],
@@ -239,6 +250,13 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     used_for_first_factor: false,
     used_for_second_factor: false,
     verify_at_sign_up: false,
+  };
+
+  const withPasswordComplexity = (opts?: Partial<UserSettingsJSON['password_settings']>) => {
+    us.password_settings = {
+      ...us.password_settings,
+      ...opts,
+    };
   };
 
   const withEmailAddress = (opts?: Partial<UserSettingsJSON['attributes']['email_address']>) => {
@@ -338,6 +356,7 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     withWeb3Wallet,
     withName,
     withPassword,
+    withPasswordComplexity,
     withSocialProvider,
   };
 };

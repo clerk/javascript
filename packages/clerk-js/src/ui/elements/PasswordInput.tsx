@@ -1,13 +1,44 @@
+import type { ChangeEvent } from 'react';
 import React, { forwardRef } from 'react';
 
+import { useEnvironment } from '../contexts';
 import { descriptors, Flex, Input } from '../customizables';
+import { usePasswordComplexity } from '../hooks';
 import { EyeSlash } from '../icons';
+import { useFormControl } from '../primitives/hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import { IconButton } from './IconButton';
 
-export const PasswordInput = forwardRef<HTMLInputElement, PropsOfComponent<typeof Input>>((props, ref) => {
+type PasswordInputProps = PropsOfComponent<typeof Input> & {
+  complexity?: boolean;
+};
+
+export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((props, ref) => {
   const [hidden, setHidden] = React.useState(true);
-  const { id, ...rest } = props;
+  const { id, onChange: onChangeProp, complexity = false, ...rest } = props;
+  const formControlProps = useFormControl();
+  const {
+    userSettings: { passwordSettings },
+  } = useEnvironment();
+
+  const { setPassword } = usePasswordComplexity(passwordSettings, {
+    onValidationFailed: (_, errorMessage) => {
+      formControlProps.setError?.(errorMessage);
+    },
+    onValidationSuccess: () => formControlProps.setSuccessful?.(true),
+  });
+
+  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (complexity) {
+      /**
+       * Avoid introducing internal state, treat complexity calculation within callback.
+       * This removes the overhead of keeping state of whether the component has been touched or not.
+       */
+      setPassword(e.target.value);
+    }
+    return onChangeProp?.(e);
+  };
+
   return (
     <Flex
       elementDescriptor={descriptors.formFieldInputGroup}
@@ -17,10 +48,12 @@ export const PasswordInput = forwardRef<HTMLInputElement, PropsOfComponent<typeo
     >
       <Input
         {...rest}
+        onChange={onChange}
         ref={ref}
         type={hidden ? 'password' : 'text'}
         sx={theme => ({ paddingRight: theme.space.$10 })}
       />
+
       <IconButton
         elementDescriptor={descriptors.formFieldInputShowPasswordButton}
         iconElementDescriptor={descriptors.formFieldInputShowPasswordIcon}

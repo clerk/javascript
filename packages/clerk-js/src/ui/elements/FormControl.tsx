@@ -1,4 +1,5 @@
 import type { FieldId } from '@clerk/types';
+import type { ClerkAPIError } from '@clerk/types';
 import React, { forwardRef } from 'react';
 
 import type { LocalizationKey } from '../customizables';
@@ -31,6 +32,11 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
   placeholder?: string | LocalizationKey;
   actionLabel?: string | LocalizationKey;
   icon?: React.ComponentType;
+  setError: (error: string | ClerkAPIError | undefined) => void;
+  setSuccessful: (isSuccess: boolean) => void;
+  isSuccessful: boolean;
+  hasLostFocus: boolean;
+  complexity?: boolean;
 };
 
 // TODO: Convert this into a Component?
@@ -49,9 +55,25 @@ const getInputElementForType = (type: FormControlProps['type']) => {
 export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props, ref) => {
   const { t } = useLocalizations();
   const card = useCardState();
-  const { id, errorText, isRequired, isOptional, label, actionLabel, onActionClicked, sx, placeholder, icon, ...rest } =
-    props;
-  const hasError = !!errorText;
+  const {
+    id,
+    errorText,
+    isRequired,
+    isOptional,
+    label,
+    actionLabel,
+    onActionClicked,
+    sx,
+    placeholder,
+    icon,
+    setError,
+    isSuccessful,
+    setSuccessful,
+    complexity,
+    hasLostFocus,
+    ...rest
+  } = props;
+  const hasError = !!errorText && hasLostFocus;
   const isDisabled = props.isDisabled || card.isLoading;
 
   const InputElement = getInputElementForType(props.type);
@@ -65,6 +87,9 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
       hasError={hasError}
       isDisabled={isDisabled}
       isRequired={isRequired}
+      setError={setError}
+      isSuccessful={isSuccessful}
+      setSuccessful={setSuccessful}
       sx={sx}
     >
       <Flex
@@ -80,6 +105,7 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
           hasError={hasError}
           isDisabled={isDisabled}
           isRequired={isRequired}
+          complexity={complexity}
           {...rest}
           ref={ref}
           placeholder={t(placeholder)}
@@ -157,7 +183,7 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
         elementDescriptor={descriptors.formFieldErrorText}
         elementId={descriptors.formFieldErrorText.setId(id)}
       >
-        {errorText}
+        {hasLostFocus && errorText}
       </FormErrorText>
     </FormControlPrim>
   );

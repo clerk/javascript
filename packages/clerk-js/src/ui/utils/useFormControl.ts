@@ -21,11 +21,17 @@ type FieldStateProps<Id> = {
   name: Id;
   value: string;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
+  onBlur: React.FocusEventHandler<HTMLInputElement>;
+  hasLostFocus: boolean;
   errorText: string | undefined;
+  setError: (error: string | ClerkAPIError | undefined) => void;
+  setSuccessful: (isSuccess: boolean) => void;
+  isSuccessful: boolean;
 } & Options;
 
 export type FormControlState<Id = string> = FieldStateProps<Id> & {
   setError: (error: string | ClerkAPIError | undefined) => void;
+  setSuccessful: (isSuccess: boolean) => void;
   setValue: (val: string | undefined) => void;
   setChecked: (isChecked: boolean) => void;
   props: FieldStateProps<Id>;
@@ -41,6 +47,8 @@ export const useFormControl = <Id extends string>(
   const [value, setValueInternal] = React.useState<string>(initialState);
   const [checked, setCheckedInternal] = React.useState<boolean>(opts?.checked || false);
   const [errorText, setErrorText] = React.useState<string | undefined>(undefined);
+  const [isSuccessful, setIsSuccessful] = React.useState(false);
+  const [hasLostFocus, setHasLostFocus] = React.useState(false);
 
   const onChange: FormControlState['onChange'] = event => {
     if (opts?.type === 'checkbox') {
@@ -48,11 +56,38 @@ export const useFormControl = <Id extends string>(
     }
     return setValueInternal(event.target.value || '');
   };
+
+  const onBlur: FormControlState['onBlur'] = () => {
+    setHasLostFocus(true);
+  };
+
   const setValue: FormControlState['setValue'] = val => setValueInternal(val || '');
   const setChecked: FormControlState['setChecked'] = checked => setCheckedInternal(checked);
-  const setError: FormControlState['setError'] = error => setErrorText(translateError(error || undefined));
+  const setError: FormControlState['setError'] = error => {
+    setErrorText(translateError(error || undefined));
+    if (typeof error !== 'undefined') {
+      setIsSuccessful(false);
+    }
+  };
+  const setSuccessful: FormControlState['setSuccessful'] = isSuccess => {
+    setErrorText(undefined);
+    setIsSuccessful(isSuccess);
+  };
 
-  const props = { id, name: id, value, checked, errorText, onChange, ...opts };
+  const props = {
+    id,
+    name: id,
+    value,
+    checked,
+    errorText,
+    isSuccessful,
+    hasLostFocus,
+    setSuccessful,
+    setError,
+    onChange,
+    onBlur,
+    ...opts,
+  };
 
   return { props, ...props, setError, setValue, setChecked };
 };
