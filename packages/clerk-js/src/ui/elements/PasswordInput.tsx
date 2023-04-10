@@ -15,7 +15,7 @@ type PasswordInputProps = PropsOfComponent<typeof Input> & {
 
 export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((props, ref) => {
   const [hidden, setHidden] = React.useState(true);
-  const { id, onChange, complexity = false, ...rest } = props;
+  const { id, onChange: onChangeProp, complexity = false, ...rest } = props;
   const formControlProps = useFormControl();
   const {
     userSettings: { passwordSettings },
@@ -23,7 +23,10 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
 
   const { setPassword } = usePasswordComplexity(
     //TODO: Remove this once default values are populated in DB
-    { ...passwordSettings, max_length: passwordSettings.max_length === 0 ? 999 : 0 },
+    {
+      ...passwordSettings,
+      max_length: passwordSettings.max_length === 0 ? 100 : 0,
+    },
     {
       onValidationFailed: (_, errorMessage) => {
         formControlProps.setError?.(errorMessage);
@@ -32,7 +35,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
     },
   );
 
-  const __internalOnChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (complexity) {
       /**
        * Avoid introducing internal state, treat complexity calculation within callback.
@@ -40,7 +43,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
        */
       setPassword(e.target.value);
     }
-    return onChange?.(e);
+    return onChangeProp?.(e);
   };
 
   return (
@@ -52,7 +55,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
     >
       <Input
         {...rest}
-        onChange={__internalOnChange}
+        onChange={onChange}
         ref={ref}
         type={hidden ? 'password' : 'text'}
         sx={theme => ({ paddingRight: theme.space.$10 })}

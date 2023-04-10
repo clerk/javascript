@@ -1,3 +1,4 @@
+import { noop } from '@clerk/shared';
 import type { PasswordSettingsData } from '@clerk/types';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -27,17 +28,18 @@ type ComplexityErrorMessages = {
   [key in keyof Partial<Omit<PasswordSettingsData, 'disable_hibp' | 'min_zxcvbn_strength' | 'show_zxcvbn'>>]: string;
 };
 
-export const usePasswordComplexity = (
-  config: Omit<PasswordSettingsData, 'disable_hibp' | 'min_zxcvbn_strength' | 'show_zxcvbn'>,
-  callbacks?: {
-    onValidationFailed?: (validationErrorMessages: ComplexityErrorMessages, errorMessage: string) => void;
-    onValidationSuccess?: () => void;
-  },
-) => {
+type UsePasswordComplexityConfig = Omit<PasswordSettingsData, 'disable_hibp' | 'min_zxcvbn_strength' | 'show_zxcvbn'>;
+type UsePasswordComplexityCbs = {
+  onValidationFailed?: (validationErrorMessages: ComplexityErrorMessages, errorMessage: string) => void;
+  onValidationSuccess?: () => void;
+};
+
+export const usePasswordComplexity = (config: UsePasswordComplexityConfig, callbacks?: UsePasswordComplexityCbs) => {
+  const { onValidationFailed = noop, onValidationSuccess = noop } = callbacks || {};
   const { min_length, max_length, require_lowercase, require_numbers, require_uppercase, require_special_char } =
     config;
 
-  const [_password, _setPassword] = useState('');
+  const [password, _setPassword] = useState('');
   const [failedValidations, setFailedValidations] = useState<ComplexityErrorMessages>({});
   const { t } = useLocalizations();
 
@@ -55,20 +57,20 @@ export const usePasswordComplexity = (
   );
 
   const passwordComplexity = useMemo(() => {
-    return testComplexityCases(_password, {
+    return testComplexityCases(password, {
       maxLength: max_length,
       minLength: min_length,
     });
-  }, [_password, min_length, max_length]);
+  }, [password, min_length, max_length]);
 
   const hasPassedComplexity = useMemo(
-    () => Object.keys(failedValidations || {}).length === 0 && !!_password,
-    [failedValidations, _password],
+    () => !!password && Object.keys(failedValidations || {}).length === 0,
+    [failedValidations, password],
   );
 
   const hasFailedComplexity = useMemo(
-    () => Object.keys(failedValidations || {}).length > 0 && !!_password,
-    [failedValidations, _password],
+    () => !!password && Object.keys(failedValidations || {}).length > 0,
+    [failedValidations, password],
   );
 
   const setPassword = useCallback(
@@ -105,9 +107,9 @@ export const usePasswordComplexity = (
       if (Object.keys(_validationsFailed).length > 0) {
         const messageWithPrefix = Object.values(_validationsFailed).join(', ');
         const message = `${t(localizationKeys('passwordComplexity.sentencePrefix'))} ${messageWithPrefix}`;
-        callbacks?.onValidationFailed?.(_validationsFailed, message);
+        onValidationFailed(_validationsFailed, message);
       } else {
-        callbacks?.onValidationSuccess?.();
+        onValidationSuccess();
       }
       setFailedValidations(_validationsFailed);
       _setPassword(password);
@@ -116,7 +118,7 @@ export const usePasswordComplexity = (
   );
 
   return {
-    password: _password,
+    password,
     passwordComplexity,
     setPassword,
     failedValidations,
