@@ -71,15 +71,6 @@ export const svSE: LocalizationResource = {
   membershipRole__admin: 'Admin',
   membershipRole__basicMember: 'Medlem',
   membershipRole__guestMember: 'Gäst',
-  passwordComplexity: {
-    sentencePrefix: '',
-    minimumLength: '',
-    maximumLength: '',
-    requireNumbers: '',
-    requireLowercase: '',
-    requireUppercase: '',
-    requireSpecialCharacter: '',
-  },
   signUp: {
     start: {
       title: 'Skapa ditt konto',
@@ -566,6 +557,15 @@ export const svSE: LocalizationResource = {
     form_password_incorrect: '',
     not_allowed_access: '',
     form_identifier_exists: '',
+    passwordComplexity: {
+      sentencePrefix: '',
+      minimumLength: '',
+      maximumLength: '',
+      requireNumbers: '',
+      requireLowercase: '',
+      requireUppercase: '',
+      requireSpecialCharacter: '',
+    },
   },
   dates: {
     previous6Days: "Senaste {{ date | weekday('sv-SE','long') }} klockan {{ date | timeString('sv-SE') }}",

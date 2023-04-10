@@ -59,15 +59,6 @@ export const frFR: LocalizationResource = {
   membershipRole__admin: 'Administrateur',
   membershipRole__basicMember: 'Membre',
   membershipRole__guestMember: 'Invité',
-  passwordComplexity: {
-    sentencePrefix: '',
-    minimumLength: '',
-    maximumLength: '',
-    requireNumbers: '',
-    requireLowercase: '',
-    requireUppercase: '',
-    requireSpecialCharacter: '',
-  },
   signUp: {
     start: {
       title: 'Créez votre compte',
@@ -560,6 +551,15 @@ export const frFR: LocalizationResource = {
     form_password_incorrect: 'Mot de passe incorrect',
     not_allowed_access: '',
     form_identifier_exists: '',
+    passwordComplexity: {
+      sentencePrefix: '',
+      minimumLength: '',
+      maximumLength: '',
+      requireNumbers: '',
+      requireLowercase: '',
+      requireUppercase: '',
+      requireSpecialCharacter: '',
+    },
   },
   dates: {
     previous6Days: "{{ date | weekday('fr-FR','long') }} dernier à {{ date | timeString('fr-FR') }}",

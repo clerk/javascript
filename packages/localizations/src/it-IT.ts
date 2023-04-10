@@ -71,15 +71,6 @@ export const itIT: LocalizationResource = {
   membershipRole__admin: 'Amministratore',
   membershipRole__basicMember: 'Utente',
   membershipRole__guestMember: 'Ospite',
-  passwordComplexity: {
-    sentencePrefix: '',
-    minimumLength: '',
-    maximumLength: '',
-    requireNumbers: '',
-    requireLowercase: '',
-    requireUppercase: '',
-    requireSpecialCharacter: '',
-  },
   signUp: {
     start: {
       title: 'Crea il tuo account',
@@ -556,6 +547,15 @@ export const itIT: LocalizationResource = {
     form_password_incorrect: '',
     not_allowed_access: '',
     form_identifier_exists: '',
+    passwordComplexity: {
+      sentencePrefix: '',
+      minimumLength: '',
+      maximumLength: '',
+      requireNumbers: '',
+      requireLowercase: '',
+      requireUppercase: '',
+      requireSpecialCharacter: '',
+    },
   },
   dates: {
     previous6Days: "{{ date | weekday('it-IT','long') }} alle {{ date | timeString('it-IT') }}",

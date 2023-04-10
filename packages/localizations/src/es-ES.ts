@@ -71,15 +71,6 @@ export const esES: LocalizationResource = {
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Miembro',
   membershipRole__guestMember: 'Invitado',
-  passwordComplexity: {
-    sentencePrefix: '',
-    minimumLength: '',
-    maximumLength: '',
-    requireNumbers: '',
-    requireLowercase: '',
-    requireUppercase: '',
-    requireSpecialCharacter: '',
-  },
   signUp: {
     start: {
       title: 'Crea tu cuenta',
@@ -562,6 +553,15 @@ export const esES: LocalizationResource = {
     form_password_incorrect: '',
     not_allowed_access: '',
     form_identifier_exists: '',
+    passwordComplexity: {
+      sentencePrefix: '',
+      minimumLength: '',
+      maximumLength: '',
+      requireNumbers: '',
+      requireLowercase: '',
+      requireUppercase: '',
+      requireSpecialCharacter: '',
+    },
   },
   dates: {
     previous6Days: "Último {{ date | weekday('es-ES','long') }} en {{ date | timeString('es-ES') }}",
