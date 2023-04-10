@@ -11,11 +11,21 @@ type Options = {
   isRequired?: boolean;
   label: string | LocalizationKey;
   placeholder?: string | LocalizationKey;
-  type?: HTMLInputTypeAttribute;
   options?: SelectOption[];
   checked?: boolean;
   enableErrorAfterBlur?: boolean;
-};
+} & (
+  | {
+      complexity?: never;
+      strengthMeter?: never;
+      type?: Exclude<HTMLInputTypeAttribute, 'password'>;
+    }
+  | {
+      type: Extract<HTMLInputTypeAttribute, 'password'>;
+      complexity: boolean;
+      strengthMeter: boolean;
+    }
+);
 
 type FieldStateProps<Id> = {
   id: Id;
@@ -81,6 +91,11 @@ export const useFormControl = <Id extends string>(
     setErrorText(undefined);
     setIsSuccessful(isSuccess);
   };
+
+  if (opts.type === 'password') {
+    opts.complexity = opts.complexity || false;
+    opts.strengthMeter = opts.strengthMeter || false;
+  }
 
   const props = {
     id,
