@@ -79,7 +79,12 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     // Lazy load `zxcvbn` on interaction
     if (strengthMeter && show_zxcvbn) {
-      void Promise.all([import('@zxcvbn-ts/core'), import('@zxcvbn-ts/language-common')])
+      void Promise.all([
+        // @ts-ignore
+        import(/*webpackIgnore: true*/ 'https://cdn.jsdelivr.net/npm/@zxcvbn-ts/core@2.2.1/+esm'),
+        // @ts-ignore
+        import(/*webpackIgnore: true*/ 'https://cdn.jsdelivr.net/npm/@zxcvbn-ts/language-common@2.0.1/+esm'),
+      ])
         .then(([core, zxcvbnCommonPackage]) => {
           core.zxcvbnOptions.setOptions({
             dictionary: {
