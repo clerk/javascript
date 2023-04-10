@@ -21,19 +21,12 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
     userSettings: { passwordSettings },
   } = useEnvironment();
 
-  const { setPassword } = usePasswordComplexity(
-    //TODO: Remove this once default values are populated in DB
-    {
-      ...passwordSettings,
-      max_length: passwordSettings.max_length === 0 ? 100 : 0,
+  const { setPassword } = usePasswordComplexity(passwordSettings, {
+    onValidationFailed: (_, errorMessage) => {
+      formControlProps.setError?.(errorMessage);
     },
-    {
-      onValidationFailed: (_, errorMessage) => {
-        formControlProps.setError?.(errorMessage);
-      },
-      onValidationSuccess: () => formControlProps.setSuccessful?.(true),
-    },
-  );
+    onValidationSuccess: () => formControlProps.setSuccessful?.(true),
+  });
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (complexity) {
