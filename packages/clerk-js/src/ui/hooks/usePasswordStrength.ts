@@ -26,7 +26,6 @@ export const usePasswordStrength = (callbacks?: {
 
       if (result.feedback.suggestions?.length > 0) {
         const errors = [...result.feedback.suggestions];
-        console.log(result.score, min_zxcvbn_strength);
         const fErrors = errors.map(er => t(localizationKeys(`zxcvbn.suggestions.${er}` as any)));
         if (result.score < min_zxcvbn_strength) {
           fErrors.unshift(t(localizationKeys('zxcvbn.notEnough')));
