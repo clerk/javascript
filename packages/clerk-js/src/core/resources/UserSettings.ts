@@ -56,7 +56,11 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     ) as Attributes;
     this.signIn = data.sign_in;
     this.signUp = data.sign_up;
-    this.passwordSettings = data.password_settings;
+    this.passwordSettings = {
+      ...data.password_settings,
+      min_length: Math.max(data?.password_settings?.min_length, 8),
+      max_length: data?.password_settings?.max_length === 0 ? 100 : data?.password_settings?.max_length,
+    };
     this.socialProviderStrategies = this.getSocialProviderStrategies(data.social);
     this.authenticatableSocialStrategies = this.getAuthenticatableSocialStrategies(data.social);
     this.web3FirstFactors = this.getWeb3FirstFactors(this.attributes);

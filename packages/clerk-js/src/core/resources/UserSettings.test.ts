@@ -56,6 +56,44 @@ describe('UserSettings', () => {
     expect(sut.instanceIsPasswordBased).toEqual(false);
   });
 
+  it('respects default values for min and max length', function () {
+    let sut = new UserSettings({
+      attributes: {
+        password: {
+          enabled: true,
+          required: false,
+        },
+      },
+      password_settings: {
+        min_length: 0,
+        max_length: 0,
+      },
+    } as any as UserSettingsJSON);
+
+    expect(sut.passwordSettings).toMatchObject({
+      min_length: 8,
+      max_length: 100,
+    });
+
+    sut = new UserSettings({
+      attributes: {
+        password: {
+          enabled: true,
+          required: false,
+        },
+      },
+      password_settings: {
+        min_length: 10,
+        max_length: 50,
+      },
+    } as any as UserSettingsJSON);
+
+    expect(sut.passwordSettings).toMatchObject({
+      min_length: 10,
+      max_length: 50,
+    });
+  });
+
   it('returns true if the instance has a valid auth factor', function () {
     let sut = new UserSettings({
       attributes: {
