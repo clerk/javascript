@@ -153,6 +153,14 @@ type _LocalizationResource = {
       subtitle: LocalizationValue;
       actionLink: LocalizationValue;
     };
+    resetPassword: {
+      title_email: LocalizationValue;
+      title_phone: LocalizationValue;
+      subtitle: LocalizationValue;
+      formTitle: LocalizationValue;
+      formSubtitle: LocalizationValue;
+      resendButton: LocalizationValue;
+    };
     emailCode: {
       title: LocalizationValue;
       subtitle: LocalizationValue;

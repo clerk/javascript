@@ -61,7 +61,7 @@ export function _SignInStart(): JSX.Element {
     placeholder: localizationKeys('formFieldInputPlaceholder__password') as any,
   });
 
-  const identifierField = useFormControl('identifier', '', {
+  const identifierField = useFormControl('identifier', 'pantelis+1@clerk.dev', {
     ...currentIdentifier,
     isRequired: true,
   });
