@@ -1,7 +1,7 @@
 import { render, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
 import React from 'react';
 
-import { SignUpButton } from './SignUpButton';
+import { SignUpButton } from '../SignUpButton';
 
 const mockRedirectToSignUp = jest.fn();
 const originalError = console.error;
@@ -10,7 +10,7 @@ const mockClerk = {
   redirectToSignUp: mockRedirectToSignUp,
 } as any;
 
-jest.mock('./withClerk', () => {
+jest.mock('../withClerk', () => {
   return {
     withClerk: (Component: any) => (props: any) => {
       return (

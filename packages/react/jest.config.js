@@ -8,9 +8,9 @@ module.exports = {
 
   moduleDirectories: ['node_modules', '<rootDir>/src'],
   transform: {
-    '^.+\\.m?tsx?$': ['ts-jest', { tsconfig: 'tsconfig.test.json', diagnostics: false }],
+    '^.+\\.m?tsx?$': ['ts-jest', { tsconfig: 'tsconfig.test.json' }],
   },
 
-  testRegex: ['/ui/.*/__tests__/.*.test.[jt]sx?$', '/(core|utils|hooks)/.*.test.[jt]sx?$'],
+  testRegex: ['/ui/.*/__tests__/.*.test.[jt]sx?$', '/.*.test.[jt]sx?$'],
   testPathIgnorePatterns: ['/node_modules/'],
 };

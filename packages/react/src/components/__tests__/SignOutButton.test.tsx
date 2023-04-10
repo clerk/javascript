@@ -1,7 +1,7 @@
 import { render, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
 import React from 'react';
 
-import { SignOutButton } from './SignOutButton';
+import { SignOutButton } from '../SignOutButton';
 
 const mockSignOut = jest.fn();
 const originalError = console.error;
@@ -10,7 +10,7 @@ const mockClerk = {
   signOut: mockSignOut,
 } as any;
 
-jest.mock('./withClerk', () => {
+jest.mock('../withClerk', () => {
   return {
     withClerk: (Component: any) => (props: any) => {
       return (
