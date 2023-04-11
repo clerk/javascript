@@ -76,7 +76,7 @@ export const Avatar = (props: AvatarProps) => {
           backgroundColor: t.colors.$avatarBackground,
           backgroundClip: 'padding-box',
           position: 'relative',
-          boxShadow: 'var(--cl-shimmer-hover-shadow)',
+          // boxShadow: 'var(--cl-shimmer-hover-shadow)',
           transition: `box-shadow ${t.transitionDuration.$slower} ${t.transitionTiming.$easeOut}`,
         }),
         sx,
@@ -90,6 +90,7 @@ export const Avatar = (props: AvatarProps) => {
        */}
       <Box
         sx={t => ({
+          display: 'none',
           overflow: 'hidden',
           background: t.colors.$colorShimmer,
           position: 'absolute',
