@@ -196,7 +196,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       continueSignUp && this.id ? this.update(args) : this.create(args);
     const { verifications } = await authenticateFn({
       strategy,
-      redirectUrl,
+      redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectUrl),
       actionCompleteRedirectUrl: redirectUrlComplete,
       unsafeMetadata,
     });
