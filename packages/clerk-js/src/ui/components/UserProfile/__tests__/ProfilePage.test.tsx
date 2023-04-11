@@ -48,6 +48,7 @@ describe('ProfilePage', () => {
         f.withUser({
           email_addresses: ['test@clerk.dev'],
           image_url: 'https://clerk.com',
+          profile_image_url: 'https://clerk.com',
           first_name: 'F',
           last_name: 'L',
         });
