@@ -15,8 +15,15 @@ type PasswordInputProps = PropsOfComponent<typeof Input> & {
   complexity?: boolean;
 };
 
-// TODO: Refactor this logic
-const useComplexityOverStrength = ({ strengthMeter }: { strengthMeter: boolean; complexity: boolean }) => {
+/**
+ * Coordinate the success and error states between password complexity and strength
+ * `usePasswordStrength` and `usePasswordComplexity` will fire callbacks to handle error state for their own
+ * cases.
+ * This hook aims to synchronize those states and throw 1 error if such exists
+ * - Complexity errors has priority over strength errors.
+ * - To set a field as successful, both complexity and strength need to be successful
+ */
+const useComplexityOverStrength = ({ strengthMeter }: Required<Pick<PasswordInputProps, 'strengthMeter'>>) => {
   const formControlProps = useFormControl();
   const hasComplexityError = useRef(false);
   const hasComplexitySuccess = useRef(false);
@@ -48,6 +55,23 @@ const useComplexityOverStrength = ({ strengthMeter }: { strengthMeter: boolean; 
   };
 };
 
+const loadZxcvbn = () => {
+  return Promise.all([
+    // @ts-ignore
+    import(/*webpackIgnore: true*/ 'https://cdn.jsdelivr.net/npm/@zxcvbn-ts/core@2.2.1/+esm'),
+    // @ts-ignore
+    import(/*webpackIgnore: true*/ 'https://cdn.jsdelivr.net/npm/@zxcvbn-ts/language-common@2.0.1/+esm'),
+  ]).then(([core, zxcvbnCommonPackage]) => {
+    core.zxcvbnOptions.setOptions({
+      dictionary: {
+        ...zxcvbnCommonPackage.default.dictionary,
+      },
+      graphs: zxcvbnCommonPackage.default.adjacencyGraphs,
+    });
+    return core.zxcvbn;
+  });
+};
+
 export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((props, ref) => {
   const [hidden, setHidden] = React.useState(true);
   const { id, onChange: onChangeProp, strengthMeter = false, complexity = false, ...rest } = props;
@@ -58,7 +82,6 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
   const { show_zxcvbn } = passwordSettings;
 
   const { setStrengthError, setComplexityError, setStrengthSuccess, setComplexitySuccess } = useComplexityOverStrength({
-    complexity,
     strengthMeter: strengthMeter && show_zxcvbn,
   });
 
@@ -79,22 +102,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     // Lazy load `zxcvbn` on interaction
     if (strengthMeter && show_zxcvbn) {
-      void Promise.all([
-        // @ts-ignore
-        import(/*webpackIgnore: true*/ 'https://cdn.jsdelivr.net/npm/@zxcvbn-ts/core@2.2.1/+esm'),
-        // @ts-ignore
-        import(/*webpackIgnore: true*/ 'https://cdn.jsdelivr.net/npm/@zxcvbn-ts/language-common@2.0.1/+esm'),
-      ])
-        .then(([core, zxcvbnCommonPackage]) => {
-          core.zxcvbnOptions.setOptions({
-            dictionary: {
-              ...zxcvbnCommonPackage.default.dictionary,
-            },
-            graphs: zxcvbnCommonPackage.default.adjacencyGraphs,
-          });
-          return core.zxcvbn;
-        })
-        .then(zxcvbn => getScore(zxcvbn)(e.target.value));
+      void loadZxcvbn().then(zxcvbn => getScore(zxcvbn)(e.target.value));
     }
 
     if (complexity) {

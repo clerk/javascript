@@ -91,43 +91,6 @@ type _LocalizationResource = {
   membershipRole__admin: LocalizationValue;
   membershipRole__basicMember: LocalizationValue;
   membershipRole__guestMember: LocalizationValue;
-  zxcvbn: {
-    notEnough: LocalizationValue;
-    warnings: {
-      straightRow: LocalizationValue;
-      keyPattern: LocalizationValue;
-      simpleRepeat: LocalizationValue;
-      extendedRepeat: LocalizationValue;
-      sequences: LocalizationValue;
-      recentYears: LocalizationValue;
-      dates: LocalizationValue;
-      topTen: LocalizationValue;
-      topHundred: LocalizationValue;
-      common: LocalizationValue;
-      similarToCommon: LocalizationValue;
-      wordByItself: LocalizationValue;
-      namesByThemselves: LocalizationValue;
-      commonNames: LocalizationValue;
-      userInputs: LocalizationValue;
-      pwned: LocalizationValue;
-    };
-    suggestions: {
-      l33t: LocalizationValue;
-      reverseWords: LocalizationValue;
-      allUppercase: LocalizationValue;
-      capitalization: LocalizationValue;
-      dates: LocalizationValue;
-      recentYears: LocalizationValue;
-      associatedYears: LocalizationValue;
-      sequences: LocalizationValue;
-      repeated: LocalizationValue;
-      longerKeyboardPattern: LocalizationValue;
-      anotherWord: LocalizationValue;
-      useWords: LocalizationValue;
-      noNeed: LocalizationValue;
-      pwned: LocalizationValue;
-    };
-  };
   signUp: {
     start: {
       title: LocalizationValue;
@@ -635,5 +598,42 @@ type UnstableErrors = WithParamName<{
     requireLowercase: LocalizationValue;
     requireUppercase: LocalizationValue;
     requireSpecialCharacter: LocalizationValue;
+  };
+  zxcvbn: {
+    notEnough: LocalizationValue;
+    warnings: {
+      straightRow: LocalizationValue;
+      keyPattern: LocalizationValue;
+      simpleRepeat: LocalizationValue;
+      extendedRepeat: LocalizationValue;
+      sequences: LocalizationValue;
+      recentYears: LocalizationValue;
+      dates: LocalizationValue;
+      topTen: LocalizationValue;
+      topHundred: LocalizationValue;
+      common: LocalizationValue;
+      similarToCommon: LocalizationValue;
+      wordByItself: LocalizationValue;
+      namesByThemselves: LocalizationValue;
+      commonNames: LocalizationValue;
+      userInputs: LocalizationValue;
+      pwned: LocalizationValue;
+    };
+    suggestions: {
+      l33t: LocalizationValue;
+      reverseWords: LocalizationValue;
+      allUppercase: LocalizationValue;
+      capitalization: LocalizationValue;
+      dates: LocalizationValue;
+      recentYears: LocalizationValue;
+      associatedYears: LocalizationValue;
+      sequences: LocalizationValue;
+      repeated: LocalizationValue;
+      longerKeyboardPattern: LocalizationValue;
+      anotherWord: LocalizationValue;
+      useWords: LocalizationValue;
+      noNeed: LocalizationValue;
+      pwned: LocalizationValue;
+    };
   };
 }>;

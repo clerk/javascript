@@ -37,8 +37,6 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
   isSuccessful: boolean;
   hasLostFocus: boolean;
   enableErrorAfterBlur?: boolean;
-  complexity?: boolean;
-  strengthMeter?: boolean;
 };
 
 // TODO: Convert this into a Component?

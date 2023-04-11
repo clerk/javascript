@@ -28,18 +28,18 @@ export const usePasswordStrength = (callbacks?: UsePasswordStrengthCbs) => {
       const result = zxcvbn(password);
       setZxcvbnResult(result);
 
-      if (result.feedback.suggestions?.length > 0) {
+      if (result?.feedback?.suggestions?.length > 0) {
         const errors = [...result.feedback.suggestions];
-        const fErrors = errors.map(er => t(localizationKeys(`zxcvbn.suggestions.${er}` as any)));
+        const fErrors = errors.map(er => t(localizationKeys(`unstable__errors.zxcvbn.suggestions.${er}` as any)));
         if (result.score < min_zxcvbn_strength) {
-          fErrors.unshift(t(localizationKeys('zxcvbn.notEnough')));
+          fErrors.unshift(t(localizationKeys('unstable__errors.zxcvbn.notEnough')));
         }
         onValidationFailed(fErrors, fErrors.join(' '));
       } else if (result.score >= min_zxcvbn_strength) {
         onValidationSuccess?.();
       }
     },
-    [callbacks?.onValidationFailed, callbacks?.onValidationSuccess, min_zxcvbn_strength],
+    [onValidationFailed, onValidationSuccess, min_zxcvbn_strength],
   );
   return {
     getScore,
