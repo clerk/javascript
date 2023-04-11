@@ -12,6 +12,10 @@ export async function loadScript(src = '', { async, defer, globalObject }: LoadS
   return new Promise((resolve, reject) => {
     const existingScript = document.querySelector(`script[src="${src}"]`);
 
+    if (globalObject) {
+      return resolve(existingScript);
+    }
+
     if (existingScript && globalObject) {
       resolve(existingScript);
     }

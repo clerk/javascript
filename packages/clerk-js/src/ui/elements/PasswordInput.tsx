@@ -1,7 +1,9 @@
+import type { Options, ZxcvbnResult } from '@zxcvbn-ts/core';
 import type { ChangeEvent } from 'react';
 import { useCallback, useRef } from 'react';
 import React, { forwardRef } from 'react';
 
+import { loadScript } from '../../utils';
 import { useEnvironment } from '../contexts';
 import { descriptors, Flex, Input } from '../customizables';
 import { usePasswordComplexity, usePasswordStrength } from '../hooks';
@@ -9,6 +11,23 @@ import { EyeSlash } from '../icons';
 import { useFormControl } from '../primitives/hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import { IconButton } from './IconButton';
+
+declare global {
+  export interface Window {
+    zxcvbnts: {
+      core: {
+        zxcvbn: (password: string, userInputs?: (string | number)[]) => ZxcvbnResult;
+        zxcvbnOptions: {
+          setOptions: (options: Partial<Options>) => void;
+        };
+      };
+      'language-common'?: {
+        dictionary: Options['dictionary'];
+        adjacencyGraphs: Options['graphs'];
+      };
+    };
+  }
+}
 
 type PasswordInputProps = PropsOfComponent<typeof Input> & {
   strengthMeter?: boolean;
@@ -57,16 +76,20 @@ const useComplexityOverStrength = ({ strengthMeter }: Required<Pick<PasswordInpu
 
 const loadZxcvbn = () => {
   return Promise.all([
-    // @ts-ignore
-    import(/*webpackIgnore: true*/ 'https://cdn.jsdelivr.net/npm/@zxcvbn-ts/core@2.2.1/+esm'),
-    // @ts-ignore
-    import(/*webpackIgnore: true*/ 'https://cdn.jsdelivr.net/npm/@zxcvbn-ts/language-common@2.0.1/+esm'),
-  ]).then(([core, zxcvbnCommonPackage]) => {
+    loadScript('https://cdn.jsdelivr.net/npm/@zxcvbn-ts/core@2.2.1/dist/zxcvbn-ts.min.js', {
+      globalObject: window.zxcvbnts,
+    }),
+    loadScript('https://cdn.jsdelivr.net/npm/@zxcvbn-ts/language-common@2.0.1/dist/zxcvbn-ts.min.js', {
+      globalObject: window.zxcvbnts,
+    }),
+  ]).then(() => {
+    const core = window.zxcvbnts.core;
+    const zxcvbnCommonPackage = window.zxcvbnts['language-common'];
     core.zxcvbnOptions.setOptions({
       dictionary: {
-        ...zxcvbnCommonPackage.default.dictionary,
+        ...zxcvbnCommonPackage?.dictionary,
       },
-      graphs: zxcvbnCommonPackage.default.adjacencyGraphs,
+      graphs: zxcvbnCommonPackage?.adjacencyGraphs,
     });
     return core.zxcvbn;
   });
