@@ -36,6 +36,7 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
   setSuccessful: (isSuccess: boolean) => void;
   isSuccessful: boolean;
   hasLostFocus: boolean;
+  enableErrorAfterBlur?: boolean;
   complexity?: boolean;
 };
 
@@ -71,6 +72,7 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
     setSuccessful,
     complexity,
     hasLostFocus,
+    enableErrorAfterBlur,
     ...rest
   } = props;
   const hasError = !!errorText && hasLostFocus;
@@ -183,7 +185,7 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
         elementDescriptor={descriptors.formFieldErrorText}
         elementId={descriptors.formFieldErrorText.setId(id)}
       >
-        {hasLostFocus && errorText}
+        {enableErrorAfterBlur ? hasLostFocus && errorText : errorText}
       </FormErrorText>
     </FormControlPrim>
   );
