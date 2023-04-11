@@ -8,18 +8,20 @@ import { EmailsSection } from './EmailSection';
 import { MfaSection } from './MfaSection';
 import { PasswordSection } from './PasswordSection';
 import { PhoneSection } from './PhoneSection';
+import { SamlAccountsSection } from './SamlAccountsSection';
 import { UsernameSection } from './UsernameSection';
 import { UserProfileSection } from './UserProfileSection';
 import { getSecondFactors } from './utils';
 import { Web3Section } from './Web3Section';
 
 export const RootPage = withCardStateProvider(() => {
-  const { attributes, social, instanceIsPasswordBased } = useEnvironment().userSettings;
+  const { attributes, social, saml, instanceIsPasswordBased } = useEnvironment().userSettings;
   const card = useCardState();
   const showUsername = attributes.username.enabled;
   const showEmail = attributes.email_address.enabled;
   const showPhone = attributes.phone_number.enabled;
   const showConnectedAccounts = social && Object.values(social).filter(p => p.enabled).length > 0;
+  const showSamlAccounts = saml && saml.length > 0;
   const showWeb3 = attributes.web3_wallet.enabled;
   const showPassword = instanceIsPasswordBased;
   const showMfa = getSecondFactors(attributes).length > 0;
@@ -49,6 +51,7 @@ export const RootPage = withCardStateProvider(() => {
         {showEmail && <EmailsSection />}
         {showPhone && <PhoneSection />}
         {showConnectedAccounts && <ConnectedAccountsSection />}
+        {showSamlAccounts && <SamlAccountsSection />}
         {showWeb3 && <Web3Section />}
       </Col>
       <Col

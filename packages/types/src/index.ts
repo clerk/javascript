@@ -28,6 +28,7 @@ export * from './organizationSettings';
 export * from './phoneNumber';
 export * from './redirects';
 export * from './resource';
+export * from './samlAccount';
 export * from './session';
 export * from './signIn';
 export * from './signUp';

@@ -43,6 +43,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'socialButtonsBlockButtonArrow',
   'socialButtonsProviderIcon',
 
+  'samlButtonsProviderIcon',
+
   'alternativeMethods',
   'alternativeMethodsBlockButton',
   'alternativeMethodsBlockButtonText',

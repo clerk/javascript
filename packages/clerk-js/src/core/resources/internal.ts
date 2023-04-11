@@ -15,6 +15,7 @@ export * from './PhoneNumber';
 export * from './Organization';
 export * from './OrganizationInvitation';
 export * from './OrganizationMembership';
+export * from './SamlAccount';
 export * from './Session';
 export * from './SessionWithActivities';
 export * from './SignIn';

@@ -1,5 +1,7 @@
 import type { Attributes, EnvironmentResource, PhoneNumberResource, UserResource } from '@clerk/types';
 
+import { svgUrl } from '../../common';
+
 type IDable = { id: string };
 
 export const primaryIdentificationFirst = (primaryId: string | null) => (val1: IDable, val2: IDable) => {
@@ -40,4 +42,18 @@ export function getSecondFactorsAvailableToAdd(attributes: Attributes, user: Use
   }
 
   return sfs;
+}
+
+export function getSamlProviderIconURL(provider: string): string {
+  switch (provider) {
+    case 'okta':
+    case 'google':
+    case 'jumpcloud':
+    case 'rippling':
+    case 'onelogin':
+      return svgUrl(provider);
+    case 'custom':
+    default:
+      return svgUrl('saml');
+  }
 }
