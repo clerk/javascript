@@ -152,7 +152,7 @@ export class SignIn extends BaseResource implements SignInResource {
     const { strategy, redirectUrl, redirectUrlComplete } = params || {};
     const { firstFactorVerification } = await this.create({
       strategy,
-      redirectUrl: redirectUrl,
+      redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
       actionCompleteRedirectUrl: redirectUrlComplete,
     });
     const { status, externalVerificationRedirectURL } = firstFactorVerification;
