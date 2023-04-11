@@ -20,7 +20,7 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
     accentColor: theme.colors.$primary500,
     ...common.textVariants(theme).smallRegular,
     ...common.borderVariants(theme, props).normal,
-    ...(props.focusRing === false ? {} : common.focusRingInput(theme)),
+    ...(props.focusRing === false ? {} : common.focusRingInput(theme, props)),
     ...common.disabled(theme),
     [mqu.ios]: {
       fontSize: theme.fontSizes.$md,
@@ -36,6 +36,7 @@ type OwnProps = {
   isDisabled?: boolean;
   hasError?: boolean;
   focusRing?: boolean;
+  isSuccessful?: boolean;
 };
 
 // @ts-ignore
@@ -43,9 +44,13 @@ export type InputProps = PrimitiveProps<'input'> & StyleVariants<typeof applyVar
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
   const formControlProps = useFormControl() || {};
-  const propsWithoutVariants = filterProps({ ...props, hasError: props.hasError || formControlProps.hasError });
+  const propsWithoutVariants = filterProps({
+    ...props,
+    hasError: props.hasError || formControlProps.hasError,
+    isSuccessful: props.isSuccessful || formControlProps.isSuccessful,
+  });
   const { onChange } = useInput(propsWithoutVariants.onChange);
-  const { isDisabled, hasError, focusRing, isRequired, ...rest } = propsWithoutVariants;
+  const { isDisabled, hasError, focusRing, isRequired, isSuccessful, ...rest } = propsWithoutVariants;
 
   return (
     <input

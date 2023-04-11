@@ -551,6 +551,15 @@ export const deDE: LocalizationResource = {
     form_password_incorrect: '',
     not_allowed_access: '',
     form_identifier_exists: '',
+    passwordComplexity: {
+      sentencePrefix: '',
+      minimumLength: '',
+      maximumLength: '',
+      requireNumbers: '',
+      requireLowercase: '',
+      requireUppercase: '',
+      requireSpecialCharacter: '',
+    },
   },
   dates: {
     previous6Days: "Letzte {{ date | weekday('de-DE','long') }} um {{ date | timeString('de-DE') }}",

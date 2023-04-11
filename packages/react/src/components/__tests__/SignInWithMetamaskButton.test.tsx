@@ -3,7 +3,7 @@
 import { render, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
 import React from 'react';
 
-import { SignInWithMetamaskButton } from './SignInWithMetamaskButton';
+import { SignInWithMetamaskButton } from '../SignInWithMetamaskButton';
 
 const mockAuthenticatewithMetamask = jest.fn();
 const originalError = console.error;
@@ -12,7 +12,7 @@ const mockClerk = {
   authenticateWithMetamask: mockAuthenticatewithMetamask,
 } as any;
 
-jest.mock('./withClerk', () => {
+jest.mock('../withClerk', () => {
   return {
     withClerk: (Component: any) => (props: any) =>
       (

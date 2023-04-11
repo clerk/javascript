@@ -589,4 +589,13 @@ type UnstableErrors = WithParamName<{
   form_password_incorrect: LocalizationValue;
   not_allowed_access: LocalizationValue;
   form_identifier_exists: LocalizationValue;
+  passwordComplexity: {
+    sentencePrefix: LocalizationValue;
+    minimumLength: LocalizationValue;
+    maximumLength: LocalizationValue;
+    requireNumbers: LocalizationValue;
+    requireLowercase: LocalizationValue;
+    requireUppercase: LocalizationValue;
+    requireSpecialCharacter: LocalizationValue;
+  };
 }>;

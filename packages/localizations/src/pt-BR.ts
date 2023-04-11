@@ -543,6 +543,15 @@ export const ptBR: LocalizationResource = {
     form_code_incorrect: 'Código incorreto',
     form_password_incorrect: 'Senha incorreta',
     not_allowed_access: 'Acesso não permitido',
+    passwordComplexity: {
+      sentencePrefix: '',
+      minimumLength: '',
+      maximumLength: '',
+      requireNumbers: '',
+      requireLowercase: '',
+      requireUppercase: '',
+      requireSpecialCharacter: '',
+    },
   },
   dates: {
     previous6Days: "Último {{ date | weekday('pt-BR','long') }} às {{ date | timeString('pt-BR') }}",

@@ -134,7 +134,11 @@ const borderVariants = (t: InternalTheme, props?: any) => {
 
 const borderColor = (t: InternalTheme, props?: any) => {
   return {
-    borderColor: props?.hasError ? t.colors.$danger500 : t.colors.$blackAlpha300,
+    borderColor: props?.hasError
+      ? t.colors.$danger500
+      : props?.isSuccessful
+      ? t.colors.$success500
+      : t.colors.$blackAlpha300,
   } as const;
 };
 
@@ -151,15 +155,17 @@ const focusRing = (t: InternalTheme) => {
   } as const;
 };
 
-const focusRingInput = (t: InternalTheme) => {
+const focusRingInput = (t: InternalTheme, props?: any) => {
   return {
     '&:focus': {
       WebkitTapHighlightColor: 'transparent',
-      boxShadow: t.shadows.$focusRingInput.replace('{{color}}', t.colors.$primary200),
+      boxShadow: t.shadows.$focusRingInput.replace(
+        '{{color}}',
+        props?.hasError ? t.colors.$danger200 : props?.isSuccessful ? t.colors.$success200 : t.colors.$primary200,
+      ),
       transitionProperty: t.transitionProperty.$common,
       transitionTimingFunction: t.transitionTiming.$common,
       transitionDuration: t.transitionDuration.$focusRing,
-      borderColor: t.colors.$primary200,
     },
   } as const;
 };

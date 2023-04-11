@@ -1,7 +1,7 @@
 import { render } from '@clerk/shared/testUtils';
 import React from 'react';
 
-import { useMaxAllowedInstancesGuard, withMaxAllowedInstancesGuard } from './useMaxAllowedInstancesGuard';
+import { useMaxAllowedInstancesGuard, withMaxAllowedInstancesGuard } from '../useMaxAllowedInstancesGuard';
 
 const originalError = console.error;
 const ERR = 'usedMoreThanOnceError';

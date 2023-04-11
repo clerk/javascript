@@ -49,6 +49,18 @@ export type SignUpData = {
   progressive: boolean;
 };
 
+export type PasswordSettingsData = {
+  disable_hibp: boolean;
+  min_length: number;
+  max_length: number;
+  require_special_char: boolean;
+  require_numbers: boolean;
+  require_uppercase: boolean;
+  require_lowercase: boolean;
+  show_zxcvbn: boolean;
+  min_zxcvbn_strength: number;
+};
+
 export type OAuthProviders = {
   [provider in OAuthStrategy]: OAuthProviderSettings;
 };
@@ -68,6 +80,7 @@ export interface UserSettingsJSON extends ClerkResourceJSON {
   social: OAuthProviders;
   sign_in: SignInData;
   sign_up: SignUpData;
+  password_settings: PasswordSettingsData;
 }
 
 export interface UserSettingsResource extends ClerkResource {
@@ -76,6 +89,7 @@ export interface UserSettingsResource extends ClerkResource {
   attributes: Attributes;
   signIn: SignInData;
   signUp: SignUpData;
+  passwordSettings: PasswordSettingsData;
   socialProviderStrategies: OAuthStrategy[];
   authenticatableSocialStrategies: OAuthStrategy[];
   web3FirstFactors: Web3Strategy[];
