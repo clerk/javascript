@@ -10,6 +10,8 @@ import type {
   PhoneCodeConfig,
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
+  ResetPasswordCodeFactorConfig,
+  ResetPasswordParams,
   SignInCreateParams,
   SignInFirstFactor,
   SignInIdentifier,
@@ -61,6 +63,13 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
+  resetPassword = (params: ResetPasswordParams): Promise<SignInResource> => {
+    return this._basePost({
+      body: params,
+      path: `${this.pathRoot}/${this.id}/reset_password`,
+    });
+  };
+
   prepareFirstFactor = (factor: PrepareFirstFactorParams): Promise<SignInResource> => {
     let config;
     switch (factor.strategy) {
@@ -81,6 +90,16 @@ export class SignIn extends BaseResource implements SignInResource {
         break;
       case 'web3_metamask_signature':
         config = { web3WalletId: factor.web3WalletId } as Web3SignatureConfig;
+        break;
+      case 'reset_password_code':
+        if (factor.emailAddressId) {
+          config = { emailAddressId: factor.emailAddressId } as ResetPasswordCodeFactorConfig;
+        }
+        if (factor.phoneNumberId) {
+          config = {
+            phoneNumberId: factor.phoneNumberId,
+          } as ResetPasswordCodeFactorConfig;
+        }
         break;
       default:
         clerkInvalidStrategy('SignIn.prepareFirstFactor', factor.strategy);

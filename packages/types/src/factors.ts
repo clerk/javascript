@@ -5,6 +5,7 @@ import type {
   OAuthStrategy,
   PasswordStrategy,
   PhoneCodeStrategy,
+  ResetPasswordCode,
   TOTPStrategy,
   Web3Strategy,
 } from './strategies';
@@ -51,6 +52,12 @@ export type TOTPFactor = {
 
 export type BackupCodeFactor = {
   strategy: BackupCodeStrategy;
+};
+
+export type ResetPasswordCodeFactorConfig = {
+  strategy: ResetPasswordCode;
+  emailAddressId?: string;
+  phoneNumberId?: string;
 };
 
 export type EmailCodeConfig = Omit<EmailCodeFactor, 'safeIdentifier'>;
