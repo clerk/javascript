@@ -46,6 +46,7 @@ export const PasswordPage = withCardStateProvider(() => {
     type: 'password',
     label: localizationKeys('formFieldLabel__newPassword'),
     isRequired: true,
+    enableErrorAfterBlur: true,
   });
   const confirmField = useFormControl('confirmPassword', '', {
     type: 'password',

@@ -14,6 +14,7 @@ type Options = {
   type?: HTMLInputTypeAttribute;
   options?: SelectOption[];
   checked?: boolean;
+  enableErrorAfterBlur?: boolean;
 };
 
 type FieldStateProps<Id> = {
@@ -42,7 +43,14 @@ export const useFormControl = <Id extends string>(
   initialState: string,
   opts?: Options,
 ): FormControlState<Id> => {
-  opts = opts || { type: 'text', label: '', isRequired: false, placeholder: '', options: [] };
+  opts = opts || {
+    type: 'text',
+    label: '',
+    isRequired: false,
+    placeholder: '',
+    options: [],
+    enableErrorAfterBlur: false,
+  };
   const { translateError } = useLocalizations();
   const [value, setValueInternal] = React.useState<string>(initialState);
   const [checked, setCheckedInternal] = React.useState<boolean>(opts?.checked || false);
@@ -86,6 +94,7 @@ export const useFormControl = <Id extends string>(
     setError,
     onChange,
     onBlur,
+    enableErrorAfterBlur: opts.enableErrorAfterBlur || false,
     ...opts,
   };
 
