@@ -587,6 +587,7 @@ type UnstableErrors = WithParamName<{
   form_param_nil: LocalizationValue;
   form_code_incorrect: LocalizationValue;
   form_password_incorrect: LocalizationValue;
+  form_password_validation_failed: LocalizationValue;
   not_allowed_access: LocalizationValue;
   form_identifier_exists: LocalizationValue;
   passwordComplexity: {

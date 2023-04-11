@@ -553,6 +553,7 @@ export const enUS: LocalizationResource = {
     form_password_incorrect: '',
     not_allowed_access: '',
     form_identifier_exists: '',
+    form_password_validation_failed: 'Invalid password supplied',
     passwordComplexity: {
       sentencePrefix: 'Your password must contain',
       minimumLength: '{{length}} or more characters',
