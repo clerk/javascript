@@ -137,7 +137,7 @@ export type SignInCreateParams = (
       strategy: OAuthStrategy | SamlStrategy;
       redirectUrl: string;
       actionCompleteRedirectUrl?: string;
-      samlIdentifier?: string;
+      identifier?: string;
     }
   | {
       strategy: TicketStrategy;

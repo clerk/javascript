@@ -1,6 +1,5 @@
 import type { SignInResource } from '@clerk/types';
 import { OAUTH_PROVIDERS } from '@clerk/types';
-import React from 'react';
 
 import { bindCreateFixtures, fireEvent, render, screen } from '../../../../testUtils';
 import { SignInStart } from '../SignInStart';

@@ -12,7 +12,7 @@ type SamlCardProps = {
 export const SamlCard = (props: SamlCardProps) => {
   const card = useCardState();
 
-  const samlIdentifierField = useFormControl('emailAddress', '', {
+  const samlIdentifierField = useFormControl('identifier', '', {
     type: 'email',
     label: localizationKeys('formFieldLabel__emailAddress'),
     isRequired: true,
