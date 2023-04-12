@@ -49,6 +49,13 @@
     "lint-fix": "eslint . --ext .ts",
     "nuke": "./scripts/nuke.sh",
     "yalc:all": "for d in packages/*/; do echo $d; cd $d; yalc push --replace; cd '../../'; done",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "changeset": "npx changeset",
+    "version": "npx changeset version && ./scripts/version-info.sh",
+    "version:snapshot": "./scripts/snapshot.mjs",
+    "version:staging": "./scripts/staging.mjs",
+    "release": "npm run build && npx changeset publish && git push --follow-tags",
+    "release:snapshot": "npm run build && npx changeset publish --tag snapshot --no-git-tag",
+    "release:staging": "npm run build && npx changeset publish --tag staging --no-git-tag"
   }
 }
