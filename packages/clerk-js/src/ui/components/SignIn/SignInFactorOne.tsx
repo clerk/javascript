@@ -7,9 +7,9 @@ import { ErrorCard, LoadingCard, withCardStateProvider } from '../../elements';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import { AlternativeMethods } from './AlternativeMethods';
-import { ResetPasswordCard } from './ResetPassword';
 import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
 import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
+import { SignInFactorOneForgotPasswordCard } from './SignInFactorOneForgotPasswordCard';
 import { SignInFactorOnePasswordCard } from './SignInFactorOnePasswordCard';
 import { SignInFactorOnePhoneCodeCard } from './SignInFactorOnePhoneCodeCard';
 import { determineStartingSignInFactor, factorHasLocalStrategy } from './utils';
@@ -94,7 +94,11 @@ export function _SignInFactorOne(): JSX.Element {
           onFactorPrepare={() =>
             setCurrentFactor(prevFactor => {
               setPrevCurrentFactor(prevFactor);
-              return { strategy: 'reset_password_code', safeIdentifier: signIn.identifier || '' };
+              return {
+                strategy: 'reset_password_code',
+                safeIdentifier: signIn.identifier || '',
+                emailAddressId: 'idn_2MxDsWKrBiGQq7tW2waTZ88U7GT',
+              };
             })
           }
           onShowAlternativeMethodsClick={toggleAllStrategies}
@@ -129,7 +133,7 @@ export function _SignInFactorOne(): JSX.Element {
       );
     case 'reset_password_code':
       return (
-        <ResetPasswordCard
+        <SignInFactorOneForgotPasswordCard
           factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}

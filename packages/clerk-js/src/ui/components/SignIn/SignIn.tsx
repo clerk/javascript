@@ -5,6 +5,7 @@ import { SignInEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowC
 import { ComponentContext, useCoreClerk, useSignInContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
+import { ResetPassword } from './ResetPassword';
 import { SignInAccountSwitcher } from './SignInAccountSwitcher';
 import { SignInFactorOne } from './SignInFactorOne';
 import { SignInFactorTwo } from './SignInFactorTwo';
@@ -31,6 +32,9 @@ function SignInRoutes(): JSX.Element {
         </Route>
         <Route path='factor-two'>
           <SignInFactorTwo />
+        </Route>
+        <Route path='reset-password'>
+          <ResetPassword />
         </Route>
         <Route path='sso-callback'>
           <SignInSSOCallback

@@ -135,13 +135,18 @@ export const enUS: LocalizationResource = {
       subtitle: 'to continue to {{applicationName}}',
       actionLink: 'Use another method',
     },
-    resetPassword: {
+    forgotPassword: {
       title_email: 'Check your email',
       title_phone: 'Check your phone',
       subtitle: 'to reset your password',
       formTitle: 'Reset password code',
       formSubtitle: 'Enter the code sent to your email address',
       resendButton: 'Resend code',
+    },
+    resetPassword: {
+      title: 'Reset Password',
+      formButtonPrimary: 'Reset Password',
+      formButtonPrimary__complete: 'Password Changed',
     },
     emailCode: {
       title: 'Check your email',
