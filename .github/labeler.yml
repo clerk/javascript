@@ -1,0 +1,46 @@
+# See https://github.com/actions/labeler
+
+backend:
+  - packages/backend/**
+
+chrome-extension:
+  - packages/chrome-extension/**
+
+clerk-js:
+  - packages/clerk-js/**
+
+expo:
+  - packages/expo/**
+
+fastify:
+  - packages/fastify/**
+
+gatsby:
+  - packages/gatsby-plugin-clerk/**
+
+localizations:
+  - packages/localizations/**
+
+nextjs:
+  - packages/nextjs/**
+
+react:
+  - packages/react/**
+
+remix:
+  - packages/remix/**
+
+sdk-node:
+  - packages/sdk-node/**
+
+themes:
+  - packages/themes/**
+
+types:
+  - packages/types/**
+
+playground:
+  - playground/**
+
+actions:
+  - .github/workflows/**
