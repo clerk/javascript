@@ -590,6 +590,7 @@ type UnstableErrors = WithParamName<{
   form_password_validation_failed: LocalizationValue;
   not_allowed_access: LocalizationValue;
   form_identifier_exists: LocalizationValue;
+  form_password_not_strong_enough: LocalizationValue;
   passwordComplexity: {
     sentencePrefix: LocalizationValue;
     minimumLength: LocalizationValue;
