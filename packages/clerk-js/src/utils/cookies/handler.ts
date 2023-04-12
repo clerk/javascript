@@ -1,7 +1,7 @@
 import { addYears } from '@clerk/shared';
 import type { ClientResource } from '@clerk/types';
 
-import { buildURL, getAllETLDs } from '../url';
+import { getAllETLDs } from '../url';
 import { clientCookie } from './client';
 import { clientUatCookie } from './client_uat';
 import { inittedCookie } from './initted';
@@ -67,38 +67,6 @@ export const createCookieHandler = () => {
     getAllETLDs().forEach(domain => ssoCookie.remove({ domain, path: COOKIE_PATH }));
   };
 
-  const clearLegacyAuthV1SessionCookie = async () => {
-    if (!checkIfHttpOnlyAuthV1SessionCookieExists()) {
-      return;
-    }
-
-    const clearSessionCookieUrl = buildURL(
-      {
-        base: `https://clerk.${window.location.host}`,
-        pathname: 'v1/clear-session-cookie',
-      },
-      { stringify: false },
-    );
-
-    await fetch(clearSessionCookieUrl.toString(), {
-      credentials: 'include',
-    });
-  };
-
-  const checkIfHttpOnlyAuthV1SessionCookieExists = (): boolean => {
-    if (document.cookie.indexOf('__session=') !== -1) {
-      return false;
-    }
-
-    const d = new Date();
-    d.setTime(d.getTime() + 1000);
-
-    document.cookie = `__session=check;path=/;domain=${window.location.host};expires=${d.toUTCString()}`;
-    const cookieExists = document.cookie.indexOf('__session=') === -1;
-    document.cookie = `__session=;path=/;domain=${window.location.host};max-age=-1`;
-    return cookieExists;
-  };
-
   return {
     getDevBrowserInittedCookie,
     setDevBrowserInittedCookie,
@@ -107,6 +75,5 @@ export const createCookieHandler = () => {
     setClientUatCookie,
     removeSessionCookie,
     removeAllDevBrowserCookies,
-    clearLegacyAuthV1SessionCookie,
   };
 };
