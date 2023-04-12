@@ -73,6 +73,16 @@ export const usePasswordComplexity = (config: UsePasswordComplexityConfig, callb
     [failedValidations, password],
   );
 
+  const generateErrorText = useCallback(
+    (failedValidations: ComplexityErrorMessages) => {
+      const messageWithPrefix = Object.values(failedValidations).join(', ');
+      return `${t(localizationKeys('unstable__errors.passwordComplexity.sentencePrefix'))} ${messageWithPrefix}`;
+    },
+    [t],
+  );
+
+  const failedValidationsText = useMemo(() => generateErrorText(failedValidations), [failedValidations]);
+
   const setPassword = useCallback(
     (password: string) => {
       const testCases = testComplexityCases(password, {
@@ -104,17 +114,18 @@ export const usePasswordComplexity = (config: UsePasswordComplexityConfig, callb
 
       const _validationsFailed = Object.fromEntries(_validationsFailedMap);
 
+      let message = '';
       if (Object.keys(_validationsFailed).length > 0) {
-        const messageWithPrefix = Object.values(_validationsFailed).join(', ');
-        const message = `${t(
-          localizationKeys('unstable__errors.passwordComplexity.sentencePrefix'),
-        )} ${messageWithPrefix}`;
+        message = generateErrorText(_validationsFailed);
         onValidationFailed(_validationsFailed, message);
       } else {
         onValidationSuccess();
       }
       setFailedValidations(_validationsFailed);
       _setPassword(password);
+      return {
+        failedValidationsText: message,
+      };
     },
     [callbacks?.onValidationFailed, callbacks?.onValidationSuccess, t, min_length, max_length],
   );
@@ -124,6 +135,7 @@ export const usePasswordComplexity = (config: UsePasswordComplexityConfig, callb
     passwordComplexity,
     setPassword,
     failedValidations,
+    failedValidationsText,
     hasPassedComplexity,
     hasFailedComplexity,
   };

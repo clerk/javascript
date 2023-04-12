@@ -4,6 +4,7 @@ export * from './useMagicLink';
 export * from './useClipboard';
 export * from './useEnabledThirdPartyProviders';
 export * from './useLoadingStatus';
+export * from './usePassword';
 export * from './usePasswordComplexity';
 export * from './usePasswordStrength';
 export * from './usePopover';
