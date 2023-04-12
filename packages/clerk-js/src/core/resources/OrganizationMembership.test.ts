@@ -28,7 +28,6 @@ describe('OrganizationMembership', () => {
         first_name: 'test_first_name',
         last_name: 'test_last_name',
         profile_image_url: 'test_url',
-        image_url: 'test_url',
         identifier: 'test@identifier.gr',
         id: 'test_user_id',
       },

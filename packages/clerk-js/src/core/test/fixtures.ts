@@ -116,7 +116,7 @@ export const createUser = (params: WithUserParams): UserJSON => {
     primary_email_address_id: '',
     primary_phone_number_id: '',
     primary_web3_wallet_id: '',
-    image_url: '',
+    profile_image_url: '',
     username: 'testUsername',
     web3_wallets: [],
     password: '',
