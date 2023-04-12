@@ -88,7 +88,7 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
       isDisabled={isDisabled}
       isRequired={isRequired}
       setError={setError}
-      isSuccessful={isSuccessful}
+      isSuccessful={hasLostFocus && isSuccessful}
       setSuccessful={setSuccessful}
       sx={sx}
     >
