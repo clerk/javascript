@@ -4,7 +4,7 @@ const CLIENT_UAT_COOKIE_NAME = '__client_uat';
 
 /**
  *
- * This is a long-lived JS cookie used in AuthV2 development instances, to
+ * This is a long-lived JS cookie used in development instances, to
  * signal to the customer's backend (SDK) when the Client was last updated and
  * therefore when the SDK should re-concile the state with FAPI.
  *

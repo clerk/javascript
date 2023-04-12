@@ -25,7 +25,6 @@ export class SessionCookieService {
 
   public setEnvironment(environment: EnvironmentResource) {
     this.environment = environment;
-    this.clearLegacyAuthV1Cookies();
     this.setClientUatCookieForDevelopmentInstances();
   }
 
@@ -94,12 +93,6 @@ export class SessionCookieService {
   private inCustomDevelopmentDomain() {
     const domain = this.clerk.frontendApi.replace('clerk.', '');
     return !window.location.host.endsWith(domain);
-  }
-
-  private clearLegacyAuthV1Cookies() {
-    if (this.environment?.isProduction() && this.environment?.onWindowLocationHost()) {
-      void this.cookies.clearLegacyAuthV1SessionCookie();
-    }
   }
 
   private handleGetTokenError(e: any) {
