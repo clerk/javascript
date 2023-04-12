@@ -346,7 +346,7 @@ export const mergeFragmentIntoUrl = (_url: string | URL): URL => {
     .filter(Boolean)
     .join('/');
 
-  const mergedUrl = new URL(mergedPathname, url);
+  const mergedUrl = new URL(mergedPathname, url.origin);
 
   url.searchParams.forEach((val, key) => {
     mergedUrl.searchParams.set(key, val);
