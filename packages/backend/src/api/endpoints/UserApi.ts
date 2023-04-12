@@ -63,6 +63,8 @@ interface UpdateUserParams extends UserMetadataParams {
   lastName?: string;
   username?: string;
   password?: string;
+  skipPasswordChecks?: boolean;
+  signOutOfOtherSessions?: boolean;
   primaryEmailAddressID?: string;
   primaryPhoneNumberID?: string;
   primaryWeb3WalletID?: string;
