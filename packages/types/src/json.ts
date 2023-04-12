@@ -268,11 +268,7 @@ export interface SessionActivityJSON extends ClerkResourceJSON {
 export interface OrganizationJSON extends ClerkResourceJSON {
   object: 'organization';
   id: string;
-  /**
-   * @deprecated Use image_url instead
-   */
   logo_url: string;
-  image_url: string;
   name: string;
   slug: string;
   public_metadata: Record<string, unknown>;

@@ -36,7 +36,6 @@ export const createOrganization = (params: OrgParams): OrganizationMembershipJSO
       created_at: new Date().getTime(),
       id: getOrganizationId(orgParams),
       logo_url: null,
-      image_url: 'https://img.clerk.com',
       max_allowed_memberships: 3,
       members_count: 1,
       name: 'Org',

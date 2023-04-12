@@ -8,7 +8,6 @@ Organization {
   "getMemberships": [Function],
   "getPendingInvitations": [Function],
   "id": "test_id",
-  "imageUrl": "https://url-for-logo.png",
   "inviteMember": [Function],
   "inviteMembers": [Function],
   "logoUrl": "https://url-for-logo.png",
