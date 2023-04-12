@@ -355,6 +355,7 @@ describe('mergeFragmentIntoUrl(url | string)', () => {
     ['https://test.test#data', new URL('https://test.test#data')],
     ['https://test.test/foo?a=a&b=b#/bar?c=c', new URL('https://test.test/foo/bar?a=a&b=b&c=c')],
     ['https://test.test?a=a#/?a=b', new URL('https://test.test?a=b')],
+    ['https://test.test/en-US/sign-in#/?a=b', new URL('https://test.test/en-US/sign-in?a=b')],
   ];
 
   test.each(testCases)('url=(%s), expected value=(%s)', (url, expectedParamValue) => {
