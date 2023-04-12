@@ -76,6 +76,8 @@ function _SignUpContinue() {
       type: 'password',
       label: localizationKeys('formFieldLabel__password'),
       placeholder: localizationKeys('formFieldInputPlaceholder__password'),
+      complexity: true,
+      strengthMeter: true,
     }),
   } as const;
 
