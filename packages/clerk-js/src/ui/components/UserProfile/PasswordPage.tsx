@@ -59,9 +59,10 @@ export const PasswordPage = withCardStateProvider(() => {
     label: localizationKeys('formFieldLabel__signOutOfOtherSessions'),
   });
 
-  const isPasswordMatch =
-    passwordField.value && passwordField.value === confirmField.value && passwordField.value.length > 7;
-  const canSubmit = user.passwordEnabled ? currentPasswordField.value && isPasswordMatch : isPasswordMatch;
+  const isPasswordMatch = passwordField.value === confirmField.value;
+  const hasErrors = !!passwordField.errorText || !!confirmField.errorText;
+  const canSubmit =
+    (user.passwordEnabled ? currentPasswordField.value && isPasswordMatch : isPasswordMatch) && !hasErrors;
 
   const validateForm = () => {
     if (passwordField.value && confirmField.value && passwordField.value !== confirmField.value) {
