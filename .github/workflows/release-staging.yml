@@ -1,0 +1,38 @@
+name: Staging release
+run-name: Staging release from ${{ github.ref_name }}
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  staging-release:
+    if: ${{ github.repository == 'clerkinc/javascript' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Version packages for staging
+        id: version-packages
+        run: npm run version:staging | tail -1 >> "$GITHUB_OUTPUT"
+
+      - name: Staging release
+        if: steps.version-packages.outputs.success == '1'
+        run: npm run release:staging
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
