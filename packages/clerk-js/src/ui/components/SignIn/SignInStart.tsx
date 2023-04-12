@@ -43,6 +43,7 @@ export function _SignInStart(): JSX.Element {
     [userSettings.enabledFirstFactorIdentifiers],
   );
   const [identifierAttribute, setIdentifierAttribute] = useState<SignInStartIdentifier>(identifierAttributes[0] || '');
+  const [hasSwitchedByAutofill, setHasSwitchedByAutofill] = useState(false);
 
   const organizationTicket = getClerkQueryParam('__clerk_ticket') || '';
 
@@ -85,9 +86,13 @@ export function _SignInStart(): JSX.Element {
     if (
       identifierField.value.startsWith('+') &&
       identifierAttributes.includes('phone_number') &&
-      identifierAttribute !== 'phone_number'
+      identifierAttribute !== 'phone_number' &&
+      !hasSwitchedByAutofill
     ) {
       switchToPhoneInput(identifierField.value);
+      // do not switch automatically on subsequent autofills
+      // by the browser to avoid a switch loop
+      setHasSwitchedByAutofill(true);
     }
   }, [identifierField.value, identifierAttributes]);
 

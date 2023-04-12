@@ -61,7 +61,9 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
         align='center'
         {...rest}
       >
-        {objectUrl ? React.cloneElement(avatarPreview, { imageUrl: objectUrl }) : avatarPreview}
+        {objectUrl
+          ? React.cloneElement(avatarPreview, { logoUrl: objectUrl, profileImageUrl: objectUrl })
+          : avatarPreview}
         <Col gap={1}>
           <Text
             localizationKey={title}

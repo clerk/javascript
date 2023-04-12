@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.16.1](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.16.0...@clerk/nextjs@4.16.1) (2023-04-12)
+
+### Reverts
+
+- Revert "chore(nextjs): Use tsup to bundle and minify package" ([5453456](https://github.com/clerkinc/javascript/commit/5453456feedb4dbfbeccbc68ecf5cdd5e6b9e501))
+- Revert "fix(nextjs): Omit test files from production build" ([392fd28](https://github.com/clerkinc/javascript/commit/392fd28ad6f0c1bc5968a1a40c57f91cfd57cc05))
+- Revert "fix(nextjs): Add edge-middleware and drop client/ & middleware/ from tsup.config entry" ([ba85989](https://github.com/clerkinc/javascript/commit/ba85989bf91b3f99e015a82fdf748a79d7404f3d))
+- Revert "chore(nextjs): Update serializable props GH issue link" ([f16e623](https://github.com/clerkinc/javascript/commit/f16e623fe2766274d05efa7cfbbe97d03bda6ff3))
+- Revert "fix(nextjs): Fix serializable issue when build with tsup & tsup config cleanup" ([347f6df](https://github.com/clerkinc/javascript/commit/347f6df8dc23fc51a4a07f1c3942b8f749576541))
+
+## [4.16.0](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.16.0-staging.0...@clerk/nextjs@4.16.0) (2023-04-11)
+
+**Note:** Version bump only for package @clerk/nextjs
+
 ## [4.15.0](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.15.0-staging.1...@clerk/nextjs@4.15.0) (2023-04-06)
 
 **Note:** Version bump only for package @clerk/nextjs

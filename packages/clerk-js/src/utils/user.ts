@@ -12,8 +12,6 @@ export const getInitials = ({ firstName, lastName, name }: NameHelperParams) =>
 
 import type { UserResource } from '@clerk/types';
 
-import { decodeBase16 } from '../utils';
-
 export const getIdentifier = (user: Partial<UserResource>): string => {
   if (user.username) {
     return user.username;
@@ -35,12 +33,5 @@ export const getIdentifier = (user: Partial<UserResource>): string => {
 };
 
 export const isDefaultProfileImage = (url: string) => {
-  let encoded: string;
-  try {
-    encoded = new URL(url).pathname.replace('/', '');
-  } catch {
-    return false;
-  }
-  const decoded = decodeBase16(encoded);
-  return decoded.includes('default');
+  return !(url || '').includes('gravatar');
 };

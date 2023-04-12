@@ -60,7 +60,7 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
             onClick={onPersonalWorkspaceClick}
           >
             <PersonalWorkspacePreview
-              user={{ imageUrl: user.imageUrl }}
+              user={{ profileImageUrl: user.profileImageUrl }}
               size='sm'
               avatarSx={t => ({ margin: `0 calc(${t.space.$3}/2)` })}
               title={localizationKeys('organizationSwitcher.personalWorkspace')}
