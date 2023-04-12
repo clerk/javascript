@@ -1,6 +1,10 @@
 import { defineConfig } from 'tsup';
 
-export default defineConfig(options => {
+import { name, version } from './package.json';
+
+export default defineConfig(overrideOptions => {
+  const isProd = overrideOptions.env?.NODE_ENV === 'production';
+
   return {
     clean: true,
     entry: [
@@ -13,9 +17,14 @@ export default defineConfig(options => {
       'src/constants.ts',
     ],
     onSuccess: 'tsc --emitDeclarationOnly --declaration',
-    minify: !options.watch,
+    minify: isProd,
     sourcemap: true,
     format: ['cjs', 'esm'],
+    define: {
+      PACKAGE_NAME: `"${name}"`,
+      PACKAGE_VERSION: `"${version}"`,
+      __DEV__: `${!isProd}`,
+    },
     legacyOutput: true,
   };
 });
