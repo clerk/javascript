@@ -82,7 +82,12 @@ export interface SignInResource extends ClerkResource {
   createMagicLinkFlow: () => CreateMagicLinkFlowReturn<SignInStartMagicLinkFlowParams, SignInResource>;
 }
 
-export type SignInStatus = 'needs_identifier' | 'needs_first_factor' | 'needs_second_factor' | 'complete';
+export type SignInStatus =
+  | 'needs_identifier'
+  | 'needs_first_factor'
+  | 'needs_second_factor'
+  | 'needs_new_password'
+  | 'complete';
 
 export type SignInIdentifier =
   | UsernameIdentifier
@@ -153,7 +158,7 @@ export type SignInCreateParams = (
 ) & { transfer?: boolean };
 
 export type ResetPasswordParams = {
-  new_password: string;
+  password: string;
 };
 
 export interface SignInStartMagicLinkFlowParams extends StartMagicLinkFlowParams {

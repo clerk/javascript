@@ -66,7 +66,7 @@ export class SignIn extends BaseResource implements SignInResource {
   resetPassword = (params: ResetPasswordParams): Promise<SignInResource> => {
     return this._basePost({
       body: params,
-      path: `${this.pathRoot}/${this.id}/reset_password`,
+      action: 'reset_password',
     });
   };
 

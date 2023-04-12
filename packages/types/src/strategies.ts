@@ -8,7 +8,7 @@ export type EmailLinkStrategy = 'email_link';
 export type TicketStrategy = 'ticket';
 export type TOTPStrategy = 'totp';
 export type BackupCodeStrategy = 'backup_code';
-export type ResetPasswordCode = 'reset_password_code';
+export type ResetPasswordCodeStrategy = 'reset_password_code';
 
 export type OAuthStrategy = `oauth_${OAuthProvider}`;
 export type Web3Strategy = `web3_${Web3Provider}_signature`;
