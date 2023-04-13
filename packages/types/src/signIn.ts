@@ -66,6 +66,8 @@ export interface SignInResource extends ClerkResource {
   identifier: string | null;
   createdSessionId: string | null;
   userData: UserData;
+  // TODO: remove this
+  isResetFlow: boolean;
 
   create: (params: SignInCreateParams) => Promise<SignInResource>;
 

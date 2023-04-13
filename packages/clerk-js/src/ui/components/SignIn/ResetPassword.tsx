@@ -6,12 +6,14 @@ import { useCoreClerk, useCoreSignIn, useSignInContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { Card, CardAlert, Form, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
+import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
 
 export const _ResetPassword = () => {
   const signIn = useCoreSignIn();
   const { navigateAfterSignIn } = useSignInContext();
   const card = useCardState();
+  const { navigate } = useRouter();
   const { setActive } = useCoreClerk();
   const supportEmail = useSupportEmail();
   const [isCompleted, setCompleted] = useState(false);
@@ -38,6 +40,8 @@ export const _ResetPassword = () => {
   };
 
   const resetPassword = async () => {
+    passwordField.setError(undefined);
+    confirmField.setError(undefined);
     try {
       const { status, createdSessionId } = await signIn.resetPassword({
         password: passwordField.value,
@@ -50,8 +54,8 @@ export const _ResetPassword = () => {
             void setActive({ session: createdSessionId, beforeEmit: navigateAfterSignIn });
           }, 2000);
           return;
-        // case 'needs_second_factor':
-        // return navigate('../factor-two');
+        case 'needs_second_factor':
+          return navigate('../factor-two');
         default:
           return console.error(clerkInvalidFAPIResponse(status, supportEmail));
       }
@@ -64,7 +68,7 @@ export const _ResetPassword = () => {
     <Card>
       <CardAlert>{card.error}</CardAlert>
       <Header.Root>
-        <Header.BackLink onClick={() => null} />
+        <Header.BackLink onClick={() => navigate('../')} />
         <Header.Title localizationKey={localizationKeys('signIn.resetPassword.title')} />
       </Header.Root>
       <Col

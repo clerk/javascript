@@ -50,6 +50,8 @@ export class SignIn extends BaseResource implements SignInResource {
   identifier: string | null = null;
   createdSessionId: string | null = null;
   userData: UserData = {};
+  // TODO: remove this
+  isResetFlow = true;
 
   constructor(data: SignInJSON | null = null) {
     super();

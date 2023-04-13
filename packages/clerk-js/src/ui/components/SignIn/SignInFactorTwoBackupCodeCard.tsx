@@ -46,9 +46,13 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
       <Header.Root>
         <Header.Title localizationKey={localizationKeys('signIn.backupCodeMfa.title')} />
         <Header.Subtitle
-          localizationKey={localizationKeys('signIn.backupCodeMfa.subtitle', {
-            applicationName: displayConfig.applicationName,
-          })}
+          localizationKey={
+            signIn?.isResetFlow
+              ? localizationKeys('signIn.forgotPassword.subtitle')
+              : localizationKeys('signIn.backupCodeMfa.subtitle', {
+                  applicationName: displayConfig.applicationName,
+                })
+          }
         />
       </Header.Root>
       <Col
