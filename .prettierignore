@@ -11,3 +11,5 @@ coverage
 .cache
 .yalc
 package-lock.json
+playground
+examples
