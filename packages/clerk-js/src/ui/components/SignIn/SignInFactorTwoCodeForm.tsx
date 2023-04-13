@@ -3,10 +3,11 @@ import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { useCoreClerk, useCoreSignIn, useOptions, useSignInContext } from '../../contexts';
-import type { LocalizationKey } from '../../customizables';
+import { Text } from '../../customizables';
 import type { VerificationCodeCardProps } from '../../elements';
 import { useCardState, VerificationCodeCard } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
+import type { LocalizationKey } from '../../localization';
 import { handleError } from '../../utils';
 
 export type SignInFactorTwoCodeCard = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
@@ -78,6 +79,12 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
         experimental_enableClerkImages ? signIn.userData.experimental_imageUrl : signIn.userData.profileImageUrl
       }
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
-    />
+    >
+      <Text
+        localizationKey={'We need to verify your identity before resetting your password.'}
+        variant='smallRegular'
+        colorScheme='neutral'
+      />
+    </VerificationCodeCard>
   );
 };

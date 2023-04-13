@@ -1,8 +1,9 @@
+import type { PropsWithChildren } from 'react';
 import React from 'react';
 
-import type { LocalizationKey } from '../customizables';
 import { Col, descriptors, localizationKeys } from '../customizables';
 import { useLoadingStatus } from '../hooks';
+import type { LocalizationKey } from '../localization';
 import { handleError, sleep, useFormControl } from '../utils';
 import { CardAlert } from './Alert';
 import { Card } from './Card';
@@ -33,8 +34,8 @@ export type VerificationCodeCardProps = {
   onBackLinkClicked?: React.MouseEventHandler;
 };
 
-export const VerificationCodeCard = (props: VerificationCodeCardProps) => {
-  const { showAlternativeMethods = true } = props;
+export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCardProps>) => {
+  const { showAlternativeMethods = true, children } = props;
   const [success, setSuccess] = React.useState(false);
   const status = useLoadingStatus();
   const codeControlState = useFormControl('code', '');
@@ -74,6 +75,7 @@ export const VerificationCodeCard = (props: VerificationCodeCardProps) => {
         <Header.Title localizationKey={props.cardTitle} />
         <Header.Subtitle localizationKey={props.cardSubtitle} />
       </Header.Root>
+      {children}
       <IdentityPreview
         identifier={props.safeIdentifier}
         avatarUrl={props.profileImageUrl}
