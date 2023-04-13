@@ -28,7 +28,7 @@ export const usePasswordStrength = (callbacks?: UsePasswordStrengthCbs) => {
       setZxcvbnResult(result);
 
       let message = '';
-      if (result?.feedback?.suggestions?.length > 0) {
+      if (result?.feedback?.suggestions?.length > 0 && result.score < min_zxcvbn_strength) {
         const errors = [...result.feedback.suggestions];
         const fErrors = errors.map(er => t(localizationKeys(`unstable__errors.zxcvbn.suggestions.${er}` as any)));
         if (result.score < min_zxcvbn_strength) {
