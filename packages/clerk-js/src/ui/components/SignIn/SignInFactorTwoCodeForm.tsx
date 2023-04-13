@@ -3,7 +3,7 @@ import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { useCoreClerk, useCoreSignIn, useOptions, useSignInContext } from '../../contexts';
-import { Text } from '../../customizables';
+import { localizationKeys, Text } from '../../customizables';
 import type { VerificationCodeCardProps } from '../../elements';
 import { useCardState, VerificationCodeCard } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
@@ -68,7 +68,7 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
   return (
     <VerificationCodeCard
       cardTitle={props.cardTitle}
-      cardSubtitle={props.cardSubtitle}
+      cardSubtitle={signIn?.isResetFlow ? localizationKeys('signIn.forgotPassword.subtitle') : props.cardSubtitle}
       formTitle={props.formTitle}
       formSubtitle={props.formSubtitle}
       resendButton={props.resendButton}
