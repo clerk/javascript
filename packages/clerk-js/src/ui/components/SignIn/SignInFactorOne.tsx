@@ -97,7 +97,6 @@ export function _SignInFactorOne(): JSX.Element {
               return {
                 strategy: 'reset_password_code',
                 safeIdentifier: signIn.identifier || '',
-                emailAddressId: 'idn_2MxDsWKrBiGQq7tW2waTZ88U7GT',
               };
             })
           }

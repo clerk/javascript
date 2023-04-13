@@ -66,8 +66,7 @@ export interface SignInResource extends ClerkResource {
   identifier: string | null;
   createdSessionId: string | null;
   userData: UserData;
-  // TODO: remove this
-  isResetFlow: boolean;
+  resetPasswordFlow: boolean;
 
   create: (params: SignInCreateParams) => Promise<SignInResource>;
 
@@ -212,4 +211,5 @@ export interface SignInJSON extends ClerkResourceJSON {
   first_factor_verification: VerificationJSON | null;
   second_factor_verification: VerificationJSON | null;
   created_session_id: string | null;
+  reset_password_flow: boolean;
 }
