@@ -68,7 +68,7 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
   return (
     <VerificationCodeCard
       cardTitle={props.cardTitle}
-      cardSubtitle={signIn?.isResetFlow ? localizationKeys('signIn.forgotPassword.subtitle') : props.cardSubtitle}
+      cardSubtitle={signIn?.resetPasswordFlow ? localizationKeys('signIn.forgotPassword.subtitle') : props.cardSubtitle}
       formTitle={props.formTitle}
       formSubtitle={props.formSubtitle}
       resendButton={props.resendButton}

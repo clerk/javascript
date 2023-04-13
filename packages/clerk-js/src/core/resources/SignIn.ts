@@ -50,8 +50,7 @@ export class SignIn extends BaseResource implements SignInResource {
   identifier: string | null = null;
   createdSessionId: string | null = null;
   userData: UserData = {};
-  // TODO: remove this
-  isResetFlow = true;
+  resetPasswordFlow = false;
 
   constructor(data: SignInJSON | null = null) {
     super();
@@ -236,6 +235,7 @@ export class SignIn extends BaseResource implements SignInResource {
       this.secondFactorVerification = new Verification(data.second_factor_verification);
       this.createdSessionId = data.created_session_id;
       this.userData = deepSnakeToCamel(data.user_data) as UserData;
+      this.resetPasswordFlow = data.reset_password_flow;
     }
     return this;
   }

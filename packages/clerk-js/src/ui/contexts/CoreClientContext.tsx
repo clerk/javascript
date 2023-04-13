@@ -6,8 +6,7 @@ export const CoreClientContext = ClientContext;
 export function useCoreSignIn(): SignInResource {
   const ctx = useClientContext();
   assertContextExists(ctx, CoreClientContext);
-  // TODO: remove this
-  return { ...ctx.signIn, isResetFlow: true };
+  return ctx.signIn;
 }
 
 export function useCoreSignUp(): SignUpResource {
