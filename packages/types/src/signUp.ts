@@ -92,7 +92,7 @@ export interface SignUpResource extends ClerkResource {
   authenticateWithMetamask: (params?: SignUpAuthenticateWithMetamaskParams) => Promise<SignUpResource>;
 }
 
-export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
+export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned' | 'expired';
 
 export type SignUpField = SignUpAttributeField | SignUpIdentificationField;
 
