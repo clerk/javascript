@@ -4,7 +4,7 @@
   "username": null,
   "first_name": "John",
   "last_name": "Doe",
-  "image_url": null,
+  "profile_image_url": null,
   "primary_email_address_id": "idn_email_address",
   "primary_phone_number_id": "idn_phone_number",
   "password_enabled": false,

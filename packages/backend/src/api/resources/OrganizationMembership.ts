@@ -34,7 +34,6 @@ export class OrganizationMembershipPublicUserData {
     readonly firstName: string | null,
     readonly lastName: string | null,
     readonly profileImageUrl: string,
-    readonly imageUrl: string,
     readonly userId: string,
   ) {}
 
@@ -44,7 +43,6 @@ export class OrganizationMembershipPublicUserData {
       data.first_name,
       data.last_name,
       data.profile_image_url,
-      data.image_url,
       data.user_id,
     );
   }

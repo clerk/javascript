@@ -14,6 +14,7 @@ import type {
   PhoneCodeConfig,
   PhoneCodeFactor,
   PhoneCodeSecondFactorConfig,
+  ResetPasswordCodeFactorConfig,
   TOTPAttempt,
   TOTPFactor,
   Web3Attempt,
@@ -62,6 +63,8 @@ export interface SignInResource extends ClerkResource {
 
   create: (params: SignInCreateParams) => Promise<SignInResource>;
 
+  resetPassword: (params: ResetPasswordParams) => Promise<SignInResource>;
+
   prepareFirstFactor: (params: PrepareFirstFactorParams) => Promise<SignInResource>;
 
   attemptFirstFactor: (params: AttemptFirstFactorParams) => Promise<SignInResource>;
@@ -79,7 +82,12 @@ export interface SignInResource extends ClerkResource {
   createMagicLinkFlow: () => CreateMagicLinkFlowReturn<SignInStartMagicLinkFlowParams, SignInResource>;
 }
 
-export type SignInStatus = 'needs_identifier' | 'needs_first_factor' | 'needs_second_factor' | 'complete';
+export type SignInStatus =
+  | 'needs_identifier'
+  | 'needs_first_factor'
+  | 'needs_second_factor'
+  | 'needs_new_password'
+  | 'complete';
 
 export type SignInIdentifier =
   | UsernameIdentifier
@@ -110,6 +118,7 @@ export type PrepareFirstFactorParams =
   | EmailLinkConfig
   | PhoneCodeConfig
   | Web3SignatureConfig
+  | ResetPasswordCodeFactorConfig
   | OAuthConfig;
 
 export type AttemptFirstFactorParams = EmailCodeAttempt | PhoneCodeAttempt | PasswordAttempt | Web3Attempt;
@@ -147,6 +156,10 @@ export type SignInCreateParams = (
     }
   | { transfer?: boolean }
 ) & { transfer?: boolean };
+
+export type ResetPasswordParams = {
+  password: string;
+};
 
 export interface SignInStartMagicLinkFlowParams extends StartMagicLinkFlowParams {
   emailAddressId: string;

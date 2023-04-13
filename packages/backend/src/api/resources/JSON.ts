@@ -128,11 +128,7 @@ export interface OrganizationJSON extends ClerkResourceJSON {
   object: ObjectType.Organization;
   name: string;
   slug: string | null;
-  /**
-   * @deprecated Use image_url instead
-   */
   logo_url: string | null;
-  image_url: string;
   public_metadata: Record<string, unknown> | null;
   private_metadata?: Record<string, unknown>;
   created_by: string;
@@ -166,11 +162,7 @@ export interface OrganizationMembershipPublicUserDataJSON {
   identifier: string;
   first_name: string | null;
   last_name: string | null;
-  /**
-   * @deprecated Use image_url instead
-   */
   profile_image_url: string;
-  image_url: string;
   user_id: string;
 }
 
@@ -260,11 +252,7 @@ export interface UserJSON extends ClerkResourceJSON {
   last_name: string;
   gender: string;
   birthday: string;
-  /**
-   * @deprecated Use image_url instead
-   */
   profile_image_url: string;
-  image_url: string;
   primary_email_address_id: string;
   primary_phone_number_id: string;
   primary_web3_wallet_id: string;

@@ -47,7 +47,6 @@ describe('ProfilePage', () => {
       const { wrapper } = await createFixtures(f => {
         f.withUser({
           email_addresses: ['test@clerk.dev'],
-          image_url: 'https://clerk.com',
           profile_image_url: 'https://clerk.com',
           first_name: 'F',
           last_name: 'L',
@@ -75,7 +74,7 @@ describe('ProfilePage', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({
           email_addresses: ['test@clerk.dev'],
-          image_url: 'https://clerk.com',
+          profile_image_url: 'https://clerk.com',
         });
       });
       fixtures.clerk.user?.setProfileImage.mockReturnValueOnce(Promise.resolve({} as ImageResource));
