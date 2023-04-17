@@ -14,19 +14,10 @@ jobs:
     if: ${{ startsWith(github.event.comment.body, '!snapshot') && github.repository == 'clerkinc/javascript' && github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout pull request
-        uses: actions/checkout@v3
+      - name: Setup
+        uses: ./.github/workflows/setup.yml
         with:
           ref: refs/pull/${{ github.event.issue.number }}/head
-
-      - name: Setup NodeJS
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          registry-url: "https://registry.npmjs.org"
-
-      - name: Install dependencies
-        run: npm ci
 
       - name: Extract snapshot name
         id: extract-snapshot-name
