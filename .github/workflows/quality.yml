@@ -22,7 +22,7 @@ jobs:
     name: Build and test
     runs-on: ubuntu-latest
     concurrency:
-      group: tests-${{ github.ref }}
+      group: tests-${{ github.ref }}-${{ matrix.node-version }}
       cancel-in-progress: true
 
     steps:
