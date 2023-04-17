@@ -16,16 +16,8 @@ jobs:
     #    if: ${{ github.repository == 'clerkinc/javascript' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-
-      - name: Setup NodeJS
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Install dependencies
-        run: npm i
+      - name: Setup
+        uses: ./.github/workflows/setup.yml
 
       - name: Create Release PR
         id: changesets
