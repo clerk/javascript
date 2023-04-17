@@ -41,12 +41,11 @@
   },
   "scripts": {
     "dev": "turbo dev --filter=@clerk/* --filter=!@clerk/expo",
-    "dev:playground": "echo 'Not ready for use yet' && exit 1 && turbo dev --filter=@playground/*",
     "build": "turbo build --concurrency=${TURBO_CONCURRENCY:-2}",
     "test": "turbo test --concurrency=${TURBO_CONCURRENCY:-2}",
     "clean": "turbo clean",
     "lint": "turbo lint",
-    "lint-fix": "eslint . --ext .ts",
+    "format:ci": "npx prettier --cache --write .",
     "nuke": "./scripts/nuke.sh",
     "yalc:all": "for d in packages/*/; do echo $d; cd $d; yalc push --replace; cd '../../'; done",
     "prepare": "husky install",
@@ -54,8 +53,9 @@
     "version": "npx changeset version && ./scripts/version-info.sh",
     "version:snapshot": "./scripts/snapshot.mjs",
     "version:staging": "./scripts/staging.mjs",
-    "release": "npm run build && npx changeset publish && git push --follow-tags",
-    "release:snapshot": "npm run build && npx changeset publish --tag snapshot --no-git-tag",
-    "release:staging": "npm run build && npx changeset publish --tag staging --no-git-tag"
+    "prepare-release": "npm run build && npm run test",
+    "release": "npm run prepare-release && npx changeset publish && git push --follow-tags",
+    "release:snapshot": "npm run prepare-release && npx changeset publish --tag snapshot --no-git-tag",
+    "release:staging": "npm run prepare-release && npx changeset publish --tag staging --no-git-tag"
   }
 }
