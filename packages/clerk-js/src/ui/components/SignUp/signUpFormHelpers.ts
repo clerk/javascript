@@ -10,7 +10,7 @@ import type { FieldState } from '../../common';
 export type ActiveIdentifier = 'emailAddress' | 'phoneNumber' | null | undefined;
 
 const FieldKeys = ['emailAddress', 'phoneNumber', 'username', 'firstName', 'lastName', 'password', 'ticket'];
-export type FieldKey = typeof FieldKeys[number];
+export type FieldKey = (typeof FieldKeys)[number];
 
 export type FormState<T> = {
   [key in FieldKey]: FieldState<T>;
