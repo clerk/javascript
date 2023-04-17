@@ -21,6 +21,10 @@
     "lint": {
       "dependsOn": [],
       "outputs": []
+    },
+    "bundlewatch": {
+      "dependsOn": ["build"],
+      "outputs": []
     }
   }
 }
