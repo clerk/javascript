@@ -1,0 +1,27 @@
+name: Checkout, setup node and dependencies
+description: Checkout, setup node and dependencies
+inputs:
+  ref:
+    description: 'The ref to checkout. If omitted, the repository’s default branch is used.'
+    required: false
+    default: ''
+  node-version:
+    description: 'The node version to use'
+    required: false
+    default: '18'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ inputs.ref }}
+    - name: Setup NodeJS ${{ inputs.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ inputs.node-version }}
+        registry-url: "https://registry.npmjs.org"
+    - name: Install dependencies
+      shell: bash
+      run: npm ci
