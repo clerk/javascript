@@ -1,0 +1,49 @@
+name: Quality checks
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        node-version: [ 16.19, 18.15, 19.8 ]
+    env:
+      # Bundlewatch
+      BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
+      CI_REPO_OWNER: clerkinc
+      CI_REPO_NAME: javascript
+      CI_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
+      CI_BRANCH: ${{ github.ref	}}
+      CI_BRANCH_BASE: refs/heads/develop
+    name: Build and test
+    runs-on: ubuntu-latest
+    concurrency:
+      group: tests-${{ github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Setup
+        uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm run test
+      - run: npm run bundlewatch
+
+  prettier:
+    name: Check format
+    runs-on: ubuntu-latest
+    concurrency:
+      group: formatter-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Setup
+        uses: ./.github/actions/setup
+      - run: npm run format:check
