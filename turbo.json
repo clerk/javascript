@@ -25,6 +25,10 @@
     "bundlewatch": {
       "dependsOn": ["build"],
       "outputs": []
+    },
+    "format:check": {
+      "dependsOn": [],
+      "outputs": []
     }
   }
 }
