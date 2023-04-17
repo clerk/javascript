@@ -24,10 +24,10 @@
     "access": "public"
   },
   "scripts": {
-    "build": "npm run build:bundle && npm run build:declarations && npm run bundlewatch",
+    "build": "npm run build:bundle && npm run build:declarations",
     "build:stats": "webpack --config webpack.config.js --env production --json=stats.json --env variant=\"clerk.browser\"",
     "build:analyze": "webpack-bundle-analyzer stats.json dist/",
-    "bundlewatch": "bundlewatch --config bundlewatch.config.json",
+    "bundlewatch": "npx bundlewatch --config bundlewatch.config.json",
     "build:bundle": "npm run clean && webpack --config webpack.config.js --env production",
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "dev": "webpack serve --config webpack.config.js",
