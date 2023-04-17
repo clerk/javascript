@@ -13,3 +13,4 @@ coverage
 package-lock.json
 playground
 examples
+/**/scripts/info.js
