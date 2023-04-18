@@ -166,6 +166,9 @@ type _LocalizationResource = {
       formButtonPrimary: LocalizationValue;
       successMessage: LocalizationValue;
     };
+    resetPasswordMfa: {
+      detailsLabel: LocalizationValue;
+    };
     emailCode: {
       title: LocalizationValue;
       subtitle: LocalizationValue;

@@ -1,3 +1,4 @@
+import type { SignInResource } from '@clerk/types';
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
@@ -27,6 +28,10 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
     isRequired: true,
   });
 
+  const isResettingPassword = (resource: SignInResource) =>
+    resource.firstFactorVerification?.strategy === 'reset_password_code' &&
+    resource.firstFactorVerification?.status === 'verified';
+
   const handleBackupCodeSubmit: React.FormEventHandler = e => {
     e.preventDefault();
     return signIn
@@ -34,8 +39,10 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
       .then(res => {
         switch (res.status) {
           case 'complete':
-            if (signIn.resetPasswordFlow) {
-              return navigate(`../reset-password-success?createdSessionId=${res.createdSessionId}`);
+            if (isResettingPassword(res) && res.createdSessionId) {
+              const queryParams = new URLSearchParams();
+              queryParams.set('createdSessionId', res.createdSessionId);
+              return navigate(`../reset-password-success?${queryParams.toString()}`);
             }
             return setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignIn });
           default:
@@ -52,7 +59,7 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
         <Header.Title localizationKey={localizationKeys('signIn.backupCodeMfa.title')} />
         <Header.Subtitle
           localizationKey={
-            signIn?.resetPasswordFlow
+            isResettingPassword(signIn)
               ? localizationKeys('signIn.forgotPassword.subtitle')
               : localizationKeys('signIn.backupCodeMfa.subtitle', {
                   applicationName: displayConfig.applicationName,

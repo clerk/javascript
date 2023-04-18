@@ -53,7 +53,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
   });
 
   const {
-    props: { errorText, ...restEmailAddressProps },
+    props: { errorText, hasLostFocus, setError, isSuccessful, setSuccessful, ...restEmailAddressProps },
   } = emailAddressField;
 
   const roleField = useFormControl('role', 'basic_member', {

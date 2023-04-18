@@ -1,4 +1,5 @@
 import type { LocalizationResource } from '@clerk/types';
+import { LocalizationValue } from '@clerk/types';
 
 const commonTexts = {
   signIn: {
@@ -146,7 +147,10 @@ export const enUS: LocalizationResource = {
     resetPassword: {
       title: 'Reset Password',
       formButtonPrimary: 'Reset Password',
-      successMessage: 'Your password was successfully changes. Now signing you in, please wait a moment.',
+      successMessage: 'Your password was successfully changed. Signing you in, please wait a moment.',
+    },
+    resetPasswordMfa: {
+      detailsLabel: 'We need to verify your identity before resetting your password.',
     },
     emailCode: {
       title: 'Check your email',

@@ -124,6 +124,10 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
         ...(supportEmailCode ? [{ strategy: 'email_code', safe_identifier: identifier || 'n*****@clerk.dev' }] : []),
         ...(supportEmailLink ? [{ strategy: 'email_link', safe_identifier: identifier || 'n*****@clerk.dev' }] : []),
       ],
+      reset_password_flow: {
+        has_new_password: false,
+        comm_type: null,
+      },
       user_data: { ...(createUserFixture() as any) },
     } as SignInJSON;
   };
@@ -138,6 +142,10 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
         ...(supportPassword ? [{ strategy: 'password' }] : []),
         ...(supportPhoneCode ? [{ strategy: 'phone_code', safe_identifier: '+30********90' }] : []),
       ],
+      reset_password_flow: {
+        has_new_password: false,
+        comm_type: null,
+      },
       user_data: { ...(createUserFixture() as any) },
     } as SignInJSON;
   };
@@ -153,6 +161,10 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
         ...(supportTotp ? [{ strategy: 'totp', safe_identifier: identifier || 'n*****@clerk.dev' }] : []),
         ...(supportBackupCode ? [{ strategy: 'backup_code', safe_identifier: identifier || 'n*****@clerk.dev' }] : []),
       ],
+      reset_password_flow: {
+        has_new_password: false,
+        comm_type: null,
+      },
       user_data: { ...(createUserFixture() as any) },
     } as SignInJSON;
   };
