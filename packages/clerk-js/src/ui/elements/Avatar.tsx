@@ -32,7 +32,7 @@ export const Avatar = (props: AvatarProps) => {
     boxElementDescriptor,
     imageElementDescriptor,
   } = props;
-  const [error, setError] = React.useState(false);
+  const [errors, setErrors] = React.useState(0);
   const avatarExists = hasAvatar(imageUrl);
   let src;
   if (!avatarExists) {
@@ -47,7 +47,7 @@ export const Avatar = (props: AvatarProps) => {
   }
 
   const ImgOrFallback =
-    initials && (!avatarExists || error) ? (
+    initials && (!avatarExists || errors > 1) ? (
       <InitialsAvatarFallback initials={initials} />
     ) : (
       <Image
@@ -58,7 +58,8 @@ export const Avatar = (props: AvatarProps) => {
         width='100%'
         height='100%'
         sx={{ objectFit: 'cover' }}
-        onError={() => setError(true)}
+        onError={() => setErrors(e => e + 1)}
+        crossOrigin={errors === 0 ? 'anonymous' : undefined}
       />
     );
 
