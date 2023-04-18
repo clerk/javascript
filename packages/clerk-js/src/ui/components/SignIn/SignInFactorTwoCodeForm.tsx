@@ -2,12 +2,13 @@ import type { PhoneCodeFactor, SignInResource, TOTPFactor } from '@clerk/types';
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
-import { useCoreClerk, useCoreSignIn, useOptions, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useOptions } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
 import type { VerificationCodeCardProps } from '../../elements';
 import { useCardState, VerificationCodeCard } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import type { LocalizationKey } from '../../localization';
+import { useRouter } from '../../router';
 import { handleError } from '../../utils';
 
 export type SignInFactorTwoCodeCard = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
@@ -28,8 +29,7 @@ type SignInFactorTwoCodeFormProps = SignInFactorTwoCodeCard & {
 export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
   const signIn = useCoreSignIn();
   const card = useCardState();
-  const { navigateAfterSignIn } = useSignInContext();
-  const { setActive } = useCoreClerk();
+  const { navigate } = useRouter();
   const supportEmail = useSupportEmail();
   const { experimental_enableClerkImages } = useOptions();
 
@@ -57,7 +57,7 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
         await resolve();
         switch (res.status) {
           case 'complete':
-            return setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignIn });
+            return navigate(`../reset-password-success?createdSessionId=${res.createdSessionId}`);
           default:
             return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
         }
@@ -80,6 +80,7 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
       }
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
     >
+      {/* TODO:  Conditionally render + localization */}
       <Text
         localizationKey={'We need to verify your identity before resetting your password.'}
         variant='smallRegular'

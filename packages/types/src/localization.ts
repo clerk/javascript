@@ -164,9 +164,7 @@ type _LocalizationResource = {
     resetPassword: {
       title: LocalizationValue;
       formButtonPrimary: LocalizationValue;
-      // TODO: remove this
-      formButtonPrimary__complete: LocalizationValue;
-      // formButtonReset: LocalizationValue;
+      successMessage: LocalizationValue;
     };
     emailCode: {
       title: LocalizationValue;

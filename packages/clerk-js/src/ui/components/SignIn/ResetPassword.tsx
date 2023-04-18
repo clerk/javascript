@@ -1,8 +1,6 @@
-import { useState } from 'react';
-
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { withRedirectToHomeSingleSessionGuard } from '../../common';
-import { useCoreClerk, useCoreSignIn, useSignInContext } from '../../contexts';
+import { useCoreSignIn } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { Card, CardAlert, Form, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
@@ -11,12 +9,9 @@ import { handleError, useFormControl } from '../../utils';
 
 export const _ResetPassword = () => {
   const signIn = useCoreSignIn();
-  const { navigateAfterSignIn } = useSignInContext();
   const card = useCardState();
   const { navigate } = useRouter();
-  const { setActive } = useCoreClerk();
   const supportEmail = useSupportEmail();
-  const [isCompleted, setCompleted] = useState(false);
 
   const passwordField = useFormControl('password', '', {
     type: 'password',
@@ -49,11 +44,7 @@ export const _ResetPassword = () => {
 
       switch (status) {
         case 'complete':
-          setCompleted(true);
-          setTimeout(() => {
-            void setActive({ session: createdSessionId, beforeEmit: navigateAfterSignIn });
-          }, 2000);
-          return;
+          return navigate(`../reset-password-success?createdSessionId=${createdSessionId}`);
         case 'needs_second_factor':
           return navigate('../factor-two');
         default:
@@ -90,12 +81,8 @@ export const _ResetPassword = () => {
             <Form.Control {...confirmField.props} />
           </Form.ControlRow>
           <Form.SubmitButton
-            isDisabled={!canSubmit || isCompleted}
-            localizationKey={
-              isCompleted
-                ? localizationKeys('signIn.resetPassword.formButtonPrimary__complete')
-                : localizationKeys('signIn.resetPassword.formButtonPrimary')
-            }
+            isDisabled={!canSubmit}
+            localizationKey={localizationKeys('signIn.resetPassword.formButtonPrimary')}
           />
         </Form.Root>
       </Col>
