@@ -2,7 +2,7 @@ import type { PhoneCodeFactor, SignInResource, TOTPFactor } from '@clerk/types';
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
-import { useCoreSignIn, useOptions } from '../../contexts';
+import { useCoreClerk, useCoreSignIn, useOptions, useSignInContext } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
 import type { VerificationCodeCardProps } from '../../elements';
 import { useCardState, VerificationCodeCard } from '../../elements';
@@ -29,6 +29,8 @@ type SignInFactorTwoCodeFormProps = SignInFactorTwoCodeCard & {
 export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
   const signIn = useCoreSignIn();
   const card = useCardState();
+  const { navigateAfterSignIn } = useSignInContext();
+  const { setActive } = useCoreClerk();
   const { navigate } = useRouter();
   const supportEmail = useSupportEmail();
   const { experimental_enableClerkImages } = useOptions();
@@ -50,6 +52,10 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
       }
     : undefined;
 
+  const isResettingPassword = (resource: SignInResource) =>
+    resource.firstFactorVerification?.strategy === 'reset_password_code' &&
+    resource.firstFactorVerification?.status === 'verified';
+
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
     signIn
       .attemptSecondFactor({ strategy: props.factor.strategy, code })
@@ -57,7 +63,12 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
         await resolve();
         switch (res.status) {
           case 'complete':
-            return navigate(`../reset-password-success?createdSessionId=${res.createdSessionId}`);
+            if (isResettingPassword(res) && res.createdSessionId) {
+              const queryParams = new URLSearchParams();
+              queryParams.set('createdSessionId', res.createdSessionId);
+              return navigate(`../reset-password-success?${queryParams.toString()}`);
+            }
+            return setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignIn });
           default:
             return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
         }
@@ -68,7 +79,9 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
   return (
     <VerificationCodeCard
       cardTitle={props.cardTitle}
-      cardSubtitle={signIn?.resetPasswordFlow ? localizationKeys('signIn.forgotPassword.subtitle') : props.cardSubtitle}
+      cardSubtitle={
+        isResettingPassword(signIn) ? localizationKeys('signIn.forgotPassword.subtitle') : props.cardSubtitle
+      }
       formTitle={props.formTitle}
       formSubtitle={props.formSubtitle}
       resendButton={props.resendButton}
@@ -80,12 +93,13 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
       }
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
     >
-      {/* TODO:  Conditionally render + localization */}
-      <Text
-        localizationKey={'We need to verify your identity before resetting your password.'}
-        variant='smallRegular'
-        colorScheme='neutral'
-      />
+      {isResettingPassword(signIn) && (
+        <Text
+          localizationKey={localizationKeys('signIn.resetPasswordMfa.detailsLabel')}
+          variant='smallRegular'
+          colorScheme='neutral'
+        />
+      )}
     </VerificationCodeCard>
   );
 };

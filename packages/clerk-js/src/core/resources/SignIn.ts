@@ -50,7 +50,6 @@ export class SignIn extends BaseResource implements SignInResource {
   identifier: string | null = null;
   createdSessionId: string | null = null;
   userData: UserData = {};
-  resetPasswordFlow = false;
 
   constructor(data: SignInJSON | null = null) {
     super();
@@ -94,13 +93,10 @@ export class SignIn extends BaseResource implements SignInResource {
         break;
       case 'reset_password_code':
         if (factor.emailAddressId) {
-          config = { emailAddressId: factor.emailAddressId } as ResetPasswordCodeFactorConfig;
+          config = { emailAddressId: factor?.emailAddressId } as ResetPasswordCodeFactorConfig;
+          break;
         }
-        if (factor.phoneNumberId) {
-          config = {
-            phoneNumberId: factor.phoneNumberId,
-          } as ResetPasswordCodeFactorConfig;
-        }
+        config = { phoneNumberId: factor?.phoneNumberId } as ResetPasswordCodeFactorConfig;
         break;
       default:
         clerkInvalidStrategy('SignIn.prepareFirstFactor', factor.strategy);
@@ -235,7 +231,6 @@ export class SignIn extends BaseResource implements SignInResource {
       this.secondFactorVerification = new Verification(data.second_factor_verification);
       this.createdSessionId = data.created_session_id;
       this.userData = deepSnakeToCamel(data.user_data) as UserData;
-      this.resetPasswordFlow = data.reset_password_flow;
     }
     return this;
   }

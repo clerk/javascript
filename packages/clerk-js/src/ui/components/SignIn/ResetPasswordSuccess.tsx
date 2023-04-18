@@ -14,8 +14,9 @@ const useActivateSession = () => {
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>;
-    if (new URLSearchParams(queryString).has('createdSessionId')) {
-      const createdSessionId = new URLSearchParams(queryString).get('createdSessionId');
+    const queryParams = new URLSearchParams(queryString);
+    const createdSessionId = queryParams.get('createdSessionId');
+    if (createdSessionId) {
       timeoutId = setTimeout(() => {
         void setActive({ session: createdSessionId, beforeEmit: navigateAfterSignIn });
       }, 2000);
@@ -28,7 +29,7 @@ const useActivateSession = () => {
     };
   });
 };
-export const _ResetPassword = () => {
+export const _ResetPasswordSuccess = () => {
   const card = useCardState();
   useActivateSession();
   return (
@@ -60,4 +61,4 @@ export const _ResetPassword = () => {
   );
 };
 
-export const ResetPasswordSuccess = withRedirectToHomeSingleSessionGuard(withCardStateProvider(_ResetPassword));
+export const ResetPasswordSuccess = withRedirectToHomeSingleSessionGuard(withCardStateProvider(_ResetPasswordSuccess));

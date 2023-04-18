@@ -1,3 +1,4 @@
+import type { ResetPasswordCodeFactor } from '@clerk/types';
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
@@ -10,7 +11,7 @@ import { handleError, useFormControl } from '../../utils';
 
 type SignInFactorOnePasswordProps = {
   onShowAlternativeMethodsClick: React.MouseEventHandler;
-  onFactorPrepare: () => void;
+  onFactorPrepare: (f: ResetPasswordCodeFactor) => void;
 };
 
 export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps) => {
@@ -48,6 +49,17 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
       .catch(err => handleError(err, [passwordControl], card.setError));
   };
 
+  const resetPasswordFactor = signIn.supportedFirstFactors.find(
+    ({ strategy }) => strategy === 'reset_password_code',
+  ) as ResetPasswordCodeFactor | undefined;
+
+  const goToForgotPassword = () => {
+    resetPasswordFactor &&
+      onFactorPrepare({
+        ...resetPasswordFactor,
+      });
+  };
+
   return (
     <Flow.Part part='password'>
       <Card>
@@ -83,7 +95,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
                 {...passwordControl.props}
                 autoFocus
                 actionLabel={localizationKeys('formFieldAction__forgotPassword')}
-                onActionClicked={onFactorPrepare}
+                onActionClicked={resetPasswordFactor ? goToForgotPassword : onShowAlternativeMethodsClick}
               />
             </Form.ControlRow>
             <Form.SubmitButton />

@@ -66,6 +66,7 @@ export type ResetPasswordCodeFactor = {
   strategy: ResetPasswordCodeStrategy;
   emailAddressId?: string;
   safeIdentifier: string;
+  primary?: boolean;
   phoneNumberId?: string;
 };
 
