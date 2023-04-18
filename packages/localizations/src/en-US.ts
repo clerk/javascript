@@ -146,7 +146,7 @@ export const enUS: LocalizationResource = {
     resetPassword: {
       title: 'Reset Password',
       formButtonPrimary: 'Reset Password',
-      formButtonPrimary__complete: 'Password Changed',
+      successMessage: 'Your password was successfully changes. Now signing you in, please wait a moment.',
     },
     emailCode: {
       title: 'Check your email',
