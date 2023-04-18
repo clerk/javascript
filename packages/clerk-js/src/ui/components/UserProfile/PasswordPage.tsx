@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser } from '../../contexts';
@@ -54,6 +54,7 @@ export const PasswordPage = withCardStateProvider(() => {
     type: 'password',
     label: localizationKeys('formFieldLabel__confirmPassword'),
     isRequired: true,
+    enableErrorAfterBlur: true,
   });
 
   const sessionsField = useFormControl('signOutOfOtherSessions', '', {
@@ -61,17 +62,22 @@ export const PasswordPage = withCardStateProvider(() => {
     label: localizationKeys('formFieldLabel__signOutOfOtherSessions'),
   });
 
-  const isPasswordMatch = passwordField.value === confirmField.value;
+  const isPasswordMatch = passwordField.value.trim().length > 0 && passwordField.value === confirmField.value;
   const hasErrors = !!passwordField.errorText || !!confirmField.errorText;
   const canSubmit =
     (user.passwordEnabled ? currentPasswordField.value && isPasswordMatch : isPasswordMatch) && !hasErrors;
 
+  const checkPasswordMatch = useCallback(
+    (confirmPassword: string) => {
+      return passwordField.value && confirmPassword && passwordField.value !== confirmPassword
+        ? "Passwords don't match."
+        : undefined;
+    },
+    [passwordField.value],
+  );
+
   const validateForm = () => {
-    if (passwordField.value && confirmField.value && passwordField.value !== confirmField.value) {
-      confirmField.setError("Passwords don't match.");
-    } else {
-      confirmField.setError(undefined);
-    }
+    confirmField.setError(checkPasswordMatch(confirmField.value));
   };
 
   const updatePassword = async () => {
@@ -126,7 +132,13 @@ export const PasswordPage = withCardStateProvider(() => {
             />
           </Form.ControlRow>
           <Form.ControlRow elementId={confirmField.id}>
-            <Form.Control {...confirmField.props} />
+            <Form.Control
+              {...confirmField.props}
+              onChange={e => {
+                confirmField.setError(checkPasswordMatch(e.target.value));
+                return confirmField.props.onChange(e);
+              }}
+            />
           </Form.ControlRow>
           <Form.ControlRow elementId={sessionsField.id}>
             <Form.Control {...sessionsField.props} />
