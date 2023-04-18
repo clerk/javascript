@@ -1,0 +1,3 @@
+{
+  "*.{js,jsx,ts,tsx,json}": ["npx prettier --write"]
+}
