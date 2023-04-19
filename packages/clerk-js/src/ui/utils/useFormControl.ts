@@ -1,6 +1,6 @@
 import type { ClerkAPIError } from '@clerk/types';
 import type { HTMLInputTypeAttribute } from 'react';
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import type { LocalizationKey } from '../localization';
 import { useLocalizations } from '../localization';
@@ -14,6 +14,7 @@ type Options = {
   options?: SelectOption[];
   checked?: boolean;
   enableErrorAfterBlur?: boolean;
+  direction?: string;
 } & (
   | {
       complexity?: never;
@@ -33,11 +34,19 @@ type FieldStateProps<Id> = {
   value: string;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
   onBlur: React.FocusEventHandler<HTMLInputElement>;
+  onFocus: React.FocusEventHandler<HTMLInputElement>;
   hasLostFocus: boolean;
   errorText: string | undefined;
   setError: (error: string | ClerkAPIError | undefined) => void;
   setSuccessful: (isSuccess: boolean) => void;
   isSuccessful: boolean;
+  isFocused: boolean;
+  debouncedState: {
+    errorText: string | undefined;
+    isSuccessful: boolean;
+    isFocused: boolean;
+    direction: string | undefined;
+  };
 } & Options;
 
 export type FormControlState<Id = string> = FieldStateProps<Id> & {
@@ -47,6 +56,20 @@ export type FormControlState<Id = string> = FieldStateProps<Id> & {
   setChecked: (isChecked: boolean) => void;
   props: FieldStateProps<Id>;
 };
+
+function useDebounce<T>(value: T, delay?: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(value), delay || 500);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
 
 export const useFormControl = <Id extends string>(
   id: Id,
@@ -60,13 +83,28 @@ export const useFormControl = <Id extends string>(
     placeholder: '',
     options: [],
     enableErrorAfterBlur: false,
+    direction: '',
   };
+
   const { translateError } = useLocalizations();
   const [value, setValueInternal] = React.useState<string>(initialState);
   const [checked, setCheckedInternal] = React.useState<boolean>(opts?.checked || false);
   const [errorText, setErrorText] = React.useState<string | undefined>(undefined);
   const [isSuccessful, setIsSuccessful] = React.useState(false);
   const [hasLostFocus, setHasLostFocus] = React.useState(false);
+  const [isFocused, setFocused] = React.useState(false);
+
+  // Not wrapping this in useMemo causes infinite re-renders
+  const feedbackMemo = useMemo(() => {
+    return {
+      errorText: opts?.enableErrorAfterBlur ? (hasLostFocus ? errorText : '') : errorText,
+      isSuccessful: opts?.enableErrorAfterBlur ? hasLostFocus && isSuccessful : isSuccessful,
+      isFocused,
+      direction: isFocused ? opts?.direction : '',
+    };
+  }, [opts.direction, opts.enableErrorAfterBlur, isFocused, isSuccessful, hasLostFocus, errorText]);
+
+  const debouncedState = useDebounce(feedbackMemo, 300);
 
   const onChange: FormControlState['onChange'] = event => {
     if (opts?.type === 'checkbox') {
@@ -75,7 +113,12 @@ export const useFormControl = <Id extends string>(
     return setValueInternal(event.target.value || '');
   };
 
+  const onFocus: FormControlState['onFocus'] = () => {
+    setFocused(true);
+  };
+
   const onBlur: FormControlState['onBlur'] = () => {
+    setFocused(false);
     setHasLostFocus(true);
   };
 
@@ -109,7 +152,10 @@ export const useFormControl = <Id extends string>(
     setError,
     onChange,
     onBlur,
+    onFocus,
+    isFocused,
     enableErrorAfterBlur: opts.enableErrorAfterBlur || false,
+    debouncedState,
     ...opts,
   };
 

@@ -13,6 +13,8 @@ export * from './AlertIcon';
 export * from './Input';
 export * from './FormControl';
 export * from './FormErrorText';
+export * from './FormSuccessText';
+export * from './FormText';
 export * from './FormLabel';
 export * from './Form';
 export * from './Icon';
