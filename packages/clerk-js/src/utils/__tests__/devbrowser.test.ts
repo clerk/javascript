@@ -7,6 +7,8 @@ describe('setDevBrowserJWTInURL(url, jwt)', () => {
     ['/foo', 'deadbeef', '/foo#__clerk_db_jwt[deadbeef]'],
     ['#foo', 'deadbeef', '#foo__clerk_db_jwt[deadbeef]'],
     ['/foo?bar=42#qux', 'deadbeef', '/foo?bar=42#qux__clerk_db_jwt[deadbeef]'],
+    ['/foo#__clerk_db_jwt[deadbeef]', 'deadbeef', '/foo#__clerk_db_jwt[deadbeef]'],
+    ['/foo?bar=42#qux__clerk_db_jwt[deadbeef]', 'deadbeef', '/foo?bar=42#qux__clerk_db_jwt[deadbeef]'],
   ];
 
   test.each(testCases)(
