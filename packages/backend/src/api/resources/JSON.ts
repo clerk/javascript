@@ -2,11 +2,8 @@ import type {
   InvitationStatus,
   OrganizationInvitationStatus,
   OrganizationMembershipRole,
-  SignInFactorStrategy,
-  SignInIdentifier,
   SignInStatus,
   SignUpAttributeRequirements,
-  SignUpIdentificationRequirements,
   SignUpStatus,
 } from './Enums';
 
@@ -197,11 +194,7 @@ export interface SessionJSON extends ClerkResourceJSON {
 export interface SignInJSON extends ClerkResourceJSON {
   object: ObjectType.SignInToken;
   status: SignInStatus;
-  allowed_identifier_types: SignInIdentifier[];
   identifier: string;
-  allowed_factor_one_strategies: SignInFactorStrategy[];
-  factor_one_verification: VerificationJSON | null;
-  factor_two_verification: VerificationJSON | null;
   created_session_id: string | null;
 }
 
@@ -217,17 +210,12 @@ export interface SignInTokenJSON extends ClerkResourceJSON {
 export interface SignUpJSON extends ClerkResourceJSON {
   object: ObjectType.SignUpAttempt;
   status: SignUpStatus;
-  identification_requirements: SignUpIdentificationRequirements;
   attribute_requirements: SignUpAttributeRequirements;
   username: string | null;
   email_address: string | null;
-  email_address_verification: VerificationJSON | null;
   phone_number: string | null;
-  phone_number_verification: VerificationJSON | null;
   web3_wallet: string | null;
   web3_wallet_verification: VerificationJSON | null;
-  external_account_strategy: string | null;
-  external_account_verification: VerificationJSON | null;
   external_account: any;
   has_password: boolean;
   name_full: string | null;
