@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 import type { StyleVariants } from '../styledSystem';
 import { animations, createVariants } from '../styledSystem';
@@ -15,9 +15,9 @@ const { applyVariants } = createVariants(theme => ({
   variants: {},
 }));
 
-type FormErrorTextProps = React.PropsWithChildren<StyleVariants<typeof applyVariants> & TextProps>;
+type FormTextProps = React.PropsWithChildren<StyleVariants<typeof applyVariants> & TextProps>;
 
-export const FormErrorText = (props: FormErrorTextProps) => {
+export const FormText = forwardRef<HTMLElement, FormTextProps>((props, ref) => {
   const { hasError, errorMessageId } = useFormControl() || {};
 
   if (!hasError && !props.children) {
@@ -25,14 +25,14 @@ export const FormErrorText = (props: FormErrorTextProps) => {
   }
 
   return (
-    // @ts-expect-error
     <Text
+      ref={ref as any}
       variant='smallRegular'
-      colorScheme='danger'
+      colorScheme='neutral'
       aria-live='polite'
       id={errorMessageId}
       {...props}
       css={applyVariants(props)}
     />
   );
-};
+});
