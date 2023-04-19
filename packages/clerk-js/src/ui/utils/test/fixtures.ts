@@ -73,7 +73,6 @@ const createBaseDisplayConfig = (): DisplayConfigJSON => {
     after_leave_organization_url: 'https://dashboard.clerk.com',
     after_create_organization_url: 'https://dashboard.clerk.com',
     support_email: null,
-    backend_host: 'dapi.clerk.com',
     branded: true,
     experimental_force_oauth_first: false,
     clerk_js_version: '4',

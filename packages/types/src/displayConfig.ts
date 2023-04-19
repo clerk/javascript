@@ -13,7 +13,6 @@ export interface DisplayConfigJSON {
   after_sign_up_url: string;
   after_switch_session_url: string;
   application_name: string;
-  backend_host: string;
   branded: boolean;
   home_url: string;
   instance_environment_type: string;
