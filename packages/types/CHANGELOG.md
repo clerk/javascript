@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.35.2](https://github.com/clerkinc/javascript/compare/@clerk/types@3.35.1...@clerk/types@3.35.2) (2023-04-19)
+
+### Bug Fixes
+
+- **clerk-js:** Add resetPassword method as a core resource ([fa70749](https://github.com/clerkinc/javascript/commit/fa70749c3bc0e37433b314ea9e12c5153bf60e0e))
+- **clerk-js:** Refactor types for resetPassword ([fd53901](https://github.com/clerkinc/javascript/commit/fd53901c0fd4ce7c7c81a9239d4818002b83f58c))
+
 ### [3.35.1](https://github.com/clerkinc/javascript/compare/@clerk/types@3.35.1-staging.0...@clerk/types@3.35.1) (2023-04-12)
 
 **Note:** Version bump only for package @clerk/types

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.38.2](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.38.1...@clerk/clerk-js@4.38.2) (2023-04-19)
+
+### Bug Fixes
+
+- **clerk-js:** Add resetPassword method as a core resource ([fa70749](https://github.com/clerkinc/javascript/commit/fa70749c3bc0e37433b314ea9e12c5153bf60e0e))
+- **clerk-js:** Do not append \_\_clerk_db_jwt if it already exists ([2c9082a](https://github.com/clerkinc/javascript/commit/2c9082a15f24d360d67620908a36e5f011985392))
+- **clerk-js:** Refactor types for resetPassword ([fd53901](https://github.com/clerkinc/javascript/commit/fd53901c0fd4ce7c7c81a9239d4818002b83f58c))
+
 ### [4.38.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.38.1-staging.1...@clerk/clerk-js@4.38.1) (2023-04-12)
 
 **Note:** Version bump only for package @clerk/clerk-js
