@@ -47,7 +47,6 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     this.preferredSignInStrategy = data.preferred_sign_in_strategy;
     this.logoUrl = data.logo_url;
     this.faviconUrl = data.favicon_url;
-    this.backendHost = data.backend_host;
     this.homeUrl = data.home_url;
     this.signInUrl = data.sign_in_url;
     this.signUpUrl = data.sign_up_url;
