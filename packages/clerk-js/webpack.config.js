@@ -7,6 +7,11 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 const ReactRefreshTypeScript = require('react-refresh-typescript');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
+require('dotenv').config();
+require('dotenv').config({ path: path.resolve(__dirname, '.env.local') });
+
+const env = { ...process.env };
+
 const isProduction = mode => mode === 'production';
 const isDevelopment = mode => !isProduction(mode);
 
@@ -26,17 +31,24 @@ const variantToSourceFile = {
 
 /** @type { () => import('webpack').Configuration } */
 const common = ({ mode }) => {
+  const envVariables = {
+    __PKG_VERSION__: JSON.stringify(packageJSON.version),
+    __PKG_NAME__: JSON.stringify(packageJSON.name),
+    __DEV__: isDevelopment(mode),
+    __STAGING__: env.CLERK_STAGING === 'true',
+    // TODO: Improve feature flag infrastructure
+    __FF__ENABLE_IMAGES__: env.CLERK_FF_ENABLE_IMAGES === 'true',
+  };
+
+  console.log('Building clerk-js with env: ', envVariables);
+
   return {
     mode,
     resolve: {
       extensions: ['.ts', '.tsx', '.js', '.jsx'],
     },
     plugins: [
-      new webpack.DefinePlugin({
-        __DEV__: isDevelopment(mode),
-        __PKG_VERSION__: JSON.stringify(packageJSON.version),
-        __PKG_NAME__: JSON.stringify(packageJSON.name),
-      }),
+      new webpack.DefinePlugin(envVariables),
       new webpack.EnvironmentPlugin({
         CLERK_ENV: mode,
         NODE_ENV: mode,
