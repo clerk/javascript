@@ -1,4 +1,4 @@
-import type { Clerk, LoadedClerk, Resources } from '@clerk/types';
+import type { Clerk, Resources } from '@clerk/types';
 import React from 'react';
 
 import { CoreClerkContext } from './CoreClerkContext';
@@ -6,7 +6,7 @@ import { CoreClientContext } from './CoreClientContext';
 import { CoreOrganizationContext } from './CoreOrganizationContext';
 import { CoreSessionContext } from './CoreSessionContext';
 import { CoreUserContext } from './CoreUserContext';
-import { assertClerkSingletonExists } from './utils';
+import { assertClerkSingletonLoaded } from './utils';
 
 type CoreClerkContextWrapperProps = {
   clerk: Clerk;
@@ -17,8 +17,8 @@ type CoreClerkContextProviderState = Resources;
 
 export function CoreClerkContextWrapper(props: CoreClerkContextWrapperProps): JSX.Element | null {
   // TODO: Revise Clerk and LoadedClerk
-  const clerk = props.clerk as LoadedClerk;
-  assertClerkSingletonExists(clerk);
+  const clerk = props.clerk;
+  assertClerkSingletonLoaded(clerk);
 
   const [state, setState] = React.useState<CoreClerkContextProviderState>({
     client: clerk.client,

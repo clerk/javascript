@@ -1,9 +1,9 @@
-import type { Clerk } from '@clerk/types';
+import type { Clerk, LoadedClerk } from '@clerk/types';
 
 import { clerkCoreErrorContextProviderNotFound, clerkCoreErrorNoClerkSingleton } from '../../core/errors';
 
-export function assertClerkSingletonExists(clerk: Clerk | undefined): asserts clerk is Clerk {
-  if (!clerk) {
+export function assertClerkSingletonLoaded(clerk: Clerk | undefined): asserts clerk is NonNullable<LoadedClerk> {
+  if (!clerk || !clerk.client) {
     clerkCoreErrorNoClerkSingleton();
   }
 }
