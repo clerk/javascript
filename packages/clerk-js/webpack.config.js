@@ -2,15 +2,19 @@
 const webpack = require('webpack');
 const packageJSON = require('./package.json');
 const path = require('path');
+const fs = require('fs');
 const { merge } = require('webpack-merge');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const ReactRefreshTypeScript = require('react-refresh-typescript');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
-require('dotenv').config();
-require('dotenv').config({ path: path.resolve(__dirname, '.env.local') });
+const dotEnvLocalPath = path.resolve(__dirname, '.env.local');
+const dotEnvProdPath = path.resolve(__dirname, '.env.prod');
 
-const env = { ...process.env };
+const parsedEnv = {
+  local: { ...(fs.existsSync(dotEnvLocalPath) ? require('dotenv').parse(fs.readFileSync(dotEnvLocalPath)) : {}) },
+  prod: { ...(fs.existsSync(dotEnvProdPath) ? require('dotenv').parse(fs.readFileSync(dotEnvProdPath)) : {}) },
+};
 
 const isProduction = mode => mode === 'production';
 const isDevelopment = mode => !isProduction(mode);
@@ -31,6 +35,12 @@ const variantToSourceFile = {
 
 /** @type { () => import('webpack').Configuration } */
 const common = ({ mode }) => {
+  // For production releases, ignore the .env.local and read from .env.prod instead
+  const env = {
+    ...process.env,
+    ...(mode === 'production' ? parsedEnv.prod : parsedEnv.local),
+  };
+
   const envVariables = {
     __PKG_VERSION__: JSON.stringify(packageJSON.version),
     __PKG_NAME__: JSON.stringify(packageJSON.name),
