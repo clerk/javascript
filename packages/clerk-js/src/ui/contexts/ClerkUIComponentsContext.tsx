@@ -1,3 +1,4 @@
+import type { BuildUrlWithAuthParams } from '@clerk/types';
 import React from 'react';
 
 import { buildURL } from '../../utils/url';
@@ -16,6 +17,7 @@ import type {
   UserButtonCtx,
   UserProfileCtx,
 } from '../types';
+import { isRedirectForFAPIInitiatedFlow } from './utils';
 
 export const ComponentContext = React.createContext<AvailableComponentCtx | null>(null);
 
@@ -113,13 +115,22 @@ export const useSignInContext = (): SignInContextType => {
     }),
   );
 
-  const afterSignInUrl = clerk.buildUrlWithAuth(
-    extractAuthProp('afterSignInUrl', {
-      ctx,
-      queryParams,
-      displayConfig,
-    }),
-  );
+  const extractedAfterSignInUrl = extractAuthProp('afterSignInUrl', {
+    ctx,
+    queryParams,
+    displayConfig,
+  });
+
+  const buildUrlWithAuthParams: BuildUrlWithAuthParams = {};
+  if (clerk.instanceType !== 'production' && isRedirectForFAPIInitiatedFlow(clerk, extractedAfterSignInUrl)) {
+    buildUrlWithAuthParams.useQueryParam = true;
+
+    if (clerk.session) {
+      navigate(clerk.buildUrlWithAuth(extractedAfterSignInUrl, buildUrlWithAuthParams));
+    }
+  }
+
+  const afterSignInUrl = clerk.buildUrlWithAuth(extractedAfterSignInUrl, buildUrlWithAuthParams);
 
   const navigateAfterSignIn = () => navigate(afterSignInUrl);
 
