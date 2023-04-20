@@ -1,15 +1,18 @@
-import React from 'react';
+import React, { type ContextType } from 'react';
 
-export function assertContextExists(contextVal: unknown, msgOrCtx: string | React.Context<any>): asserts contextVal {
+export function assertContextExists<T>(
+  contextVal: T,
+  msgOrCtx: string | React.Context<any>,
+): asserts contextVal is NonNullable<T> {
   if (!contextVal) {
     throw typeof msgOrCtx === 'string' ? new Error(msgOrCtx) : new Error(`${msgOrCtx.displayName} not found`);
   }
 }
 
-type Options = { assertCtxFn?: (v: unknown, msg: string) => void };
+type Options<T> = { assertCtxFn?: typeof assertContextExists<T> };
 type ContextOf<T> = React.Context<{ value: T } | undefined>;
 type UseCtxFn<T> = () => T;
-
+type Context<T> = ContextType<ContextOf<T>>;
 /**
  * Creates and returns a Context and two hooks that return the context value.
  * The Context type is derived from the type passed in by the user.
@@ -18,16 +21,16 @@ type UseCtxFn<T> = () => T;
  */
 export const createContextAndHook = <CtxVal>(
   displayName: string,
-  options?: Options,
+  options?: Options<Context<CtxVal>>,
 ): [ContextOf<CtxVal>, UseCtxFn<CtxVal>, UseCtxFn<CtxVal | Partial<CtxVal>>] => {
-  const { assertCtxFn = assertContextExists } = options || {};
-  const Ctx = React.createContext<{ value: CtxVal } | undefined>(undefined);
+  const assertCtxFn: typeof assertContextExists<Context<CtxVal>> = options?.assertCtxFn || assertContextExists;
+  const Ctx = React.createContext<Context<CtxVal>>(undefined);
   Ctx.displayName = displayName;
 
-  const useCtx = () => {
+  const useCtx = (): CtxVal => {
     const ctx = React.useContext(Ctx);
     assertCtxFn(ctx, `${displayName} not found`);
-    return (ctx as any).value as CtxVal;
+    return ctx.value;
   };
 
   const useCtxWithoutGuarantee = () => {
