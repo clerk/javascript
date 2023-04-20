@@ -1,5 +1,7 @@
 import { jest } from '@jest/globals';
 
+const { getFeatureFlags } = require('./scripts/feature-flags.js');
+
 window.ResizeObserver =
   window.ResizeObserver ||
   jest.fn().mockImplementation(() => ({
@@ -22,8 +24,16 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 });
 
+// @ts-ignore
 global.__PKG_NAME__ = '';
+// @ts-ignore
 global.__PKG_VERSION__ = '';
+
+// @ts-ignore
+Object.entries(getFeatureFlags().local).forEach(([key, value]) => {
+  // @ts-ignore
+  global[key] = value;
+});
 
 //@ts-expect-error
 global.IntersectionObserver = class IntersectionObserver {

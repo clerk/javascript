@@ -4,7 +4,7 @@ declare global {
   const __PKG_NAME__: string;
   const __PKG_VERSION__: string;
 
-  const __FF__ENABLE_IMAGES__: boolean;
+  const __CLERK_FF_ENABLE_IMAGES__: boolean;
 
   interface Window {
     __unstable__onBeforeSetActive: () => void;
