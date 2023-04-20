@@ -9,6 +9,11 @@ export type UseOAuthFlowParams = {
   unsafeMetadata?: SignUpUnsafeMetadata;
 };
 
+export type StartOAuthFlowParams = {
+  redirectUrl?: string;
+  unsafeMetadata?: SignUpUnsafeMetadata;
+};
+
 export type StartOAuthFlowReturnType = {
   createdSessionId: string;
   setActive?: SetActive;
@@ -17,8 +22,8 @@ export type StartOAuthFlowReturnType = {
   authSessionResult?: WebBrowser.WebBrowserAuthSessionResult;
 };
 
-export function useOAuth(params: UseOAuthFlowParams) {
-  const { strategy, redirectUrl, unsafeMetadata } = params || {};
+export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
+  const { strategy } = useOAuthParams || {};
   if (!strategy) {
     throw new Error('Missing oauth strategy');
   }
@@ -26,7 +31,7 @@ export function useOAuth(params: UseOAuthFlowParams) {
   const { signIn, setActive, isLoaded: isSignInLoaded } = useSignIn();
   const { signUp, isLoaded: isSignUpLoaded } = useSignUp();
 
-  async function startOAuthFlow(): Promise<StartOAuthFlowReturnType> {
+  async function startOAuthFlow(startOAuthFlowParams: StartOAuthFlowParams): Promise<StartOAuthFlowReturnType> {
     if (!isSignInLoaded || !isSignUpLoaded) {
       return {
         createdSessionId: '',
@@ -44,7 +49,8 @@ export function useOAuth(params: UseOAuthFlowParams) {
     // For more information go to:
     // https://docs.expo.dev/versions/latest/sdk/auth-session/#authsessionmakeredirecturi
     const oauthRedirectUrl =
-      redirectUrl ||
+      startOAuthFlowParams.redirectUrl ||
+      useOAuthParams.redirectUrl ||
       AuthSession.makeRedirectUri({
         path: '/oauth-native-callback',
       });
@@ -87,7 +93,7 @@ export function useOAuth(params: UseOAuthFlowParams) {
     } else if (firstFactorVerification.status === 'transferable') {
       await signUp.create({
         transfer: true,
-        unsafeMetadata,
+        unsafeMetadata: startOAuthFlowParams.unsafeMetadata || useOAuthParams.unsafeMetadata,
       });
       createdSessionId = signUp.createdSessionId || '';
     }
