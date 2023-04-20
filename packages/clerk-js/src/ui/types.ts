@@ -28,41 +28,15 @@ export type AvailableComponentProps =
   | CreateOrganizationProps;
 
 type ComponentMode = 'modal' | 'mounted';
+type Ctx<Props, N extends string> = Props & { componentName: N; mode?: ComponentMode };
 
-export type SignInCtx = SignInProps & {
-  componentName: 'SignIn';
-  mode?: ComponentMode;
-};
-
-export type UserProfileCtx = UserProfileProps & {
-  componentName: 'UserProfile';
-  mode?: ComponentMode;
-};
-
-export type SignUpCtx = SignUpProps & {
-  componentName: 'SignUp';
-  mode?: ComponentMode;
-};
-
-export type UserButtonCtx = UserButtonProps & {
-  componentName: 'UserButton';
-  mode?: ComponentMode;
-};
-
-export type OrganizationProfileCtx = OrganizationProfileProps & {
-  componentName: 'OrganizationProfile';
-  mode?: ComponentMode;
-};
-
-export type CreateOrganizationCtx = CreateOrganizationProps & {
-  componentName: 'CreateOrganization';
-  mode?: ComponentMode;
-};
-
-export type OrganizationSwitcherCtx = OrganizationSwitcherProps & {
-  componentName: 'OrganizationSwitcher';
-  mode?: ComponentMode;
-};
+export type SignInCtx = Ctx<SignInProps, 'SignIn'>;
+export type UserProfileCtx = Ctx<UserProfileProps, 'UserProfile'>;
+export type SignUpCtx = Ctx<SignUpProps, 'SignUp'>;
+export type UserButtonCtx = Ctx<UserButtonProps, 'UserButton'>;
+export type OrganizationProfileCtx = Ctx<OrganizationProfileProps, 'OrganizationProfile'>;
+export type CreateOrganizationCtx = Ctx<CreateOrganizationProps, 'CreateOrganization'>;
+export type OrganizationSwitcherCtx = Ctx<OrganizationSwitcherProps, 'OrganizationSwitcher'>;
 
 export type AvailableComponentCtx =
   | SignInCtx

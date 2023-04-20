@@ -6,16 +6,7 @@ import { useCoreClerk, useEnvironment } from '../contexts';
 import { useNavigate } from '../hooks';
 import type { ParsedQs } from '../router';
 import { useRouter } from '../router';
-import type {
-  AvailableComponentCtx,
-  CreateOrganizationCtx,
-  OrganizationProfileCtx,
-  OrganizationSwitcherCtx,
-  SignInCtx,
-  SignUpCtx,
-  UserButtonCtx,
-  UserProfileCtx,
-} from '../types';
+import type { AvailableComponentCtx, SignInCtx, SignUpCtx, UserProfileCtx } from '../types';
 
 export const ComponentContext = React.createContext<AvailableComponentCtx | null>(null);
 
@@ -28,13 +19,13 @@ export type SignUpContextType = SignUpCtx & {
 };
 
 export const useSignUpContext = (): SignUpContextType => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as SignUpCtx;
+  const ctx = React.useContext(ComponentContext);
   const { navigate } = useNavigate();
   const { displayConfig } = useEnvironment();
   const { queryParams } = useRouter();
   const clerk = useCoreClerk();
 
-  if (componentName !== 'SignUp') {
+  if (ctx?.componentName !== 'SignUp') {
     throw new Error('Clerk: useSignUpContext called outside of the mounted SignUp component.');
   }
 
@@ -75,7 +66,6 @@ export const useSignUpContext = (): SignUpContextType => {
 
   return {
     ...ctx,
-    componentName,
     signInUrl,
     secondFactorUrl,
     afterSignUpUrl,
@@ -95,13 +85,13 @@ export type SignInContextType = SignInCtx & {
 };
 
 export const useSignInContext = (): SignInContextType => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as SignInCtx;
+  const ctx = React.useContext(ComponentContext);
   const { navigate } = useNavigate();
   const { displayConfig } = useEnvironment();
   const { queryParams } = useRouter();
   const clerk = useCoreClerk();
 
-  if (componentName !== 'SignIn') {
+  if (ctx?.componentName !== 'SignIn') {
     throw new Error('Clerk: useSignInContext called outside of the mounted SignIn component.');
   }
 
@@ -139,7 +129,6 @@ export const useSignInContext = (): SignInContextType => {
 
   return {
     ...ctx,
-    componentName,
     signUpUrl,
     afterSignInUrl,
     afterSignUpUrl,
@@ -159,27 +148,26 @@ export type UserProfileContextType = UserProfileCtx & {
 // `routing` and `path`
 // TODO: remove if not needed during the components v2 overhaul
 export const useUserProfileContext = (): UserProfileContextType => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as UserProfileCtx;
+  const ctx = React.useContext(ComponentContext);
   const { queryParams } = useRouter();
 
-  if (componentName !== 'UserProfile') {
+  if (ctx?.componentName !== 'UserProfile') {
     throw new Error('Clerk: useUserProfileContext called outside of the mounted UserProfile component.');
   }
 
   return {
     ...ctx,
-    componentName,
     queryParams,
     authQueryString: '',
   };
 };
 
 export const useUserButtonContext = () => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as UserButtonCtx;
+  const ctx = React.useContext(ComponentContext);
   const { navigate } = useNavigate();
   const { displayConfig } = useEnvironment();
 
-  if (componentName !== 'UserButton') {
+  if (ctx?.componentName !== 'UserButton') {
     throw new Error('Clerk: useUserButtonContext called outside of the mounted UserButton component.');
   }
 
@@ -197,7 +185,6 @@ export const useUserButtonContext = () => {
 
   return {
     ...ctx,
-    componentName,
     navigateAfterMultiSessionSingleSignOut,
     navigateAfterSignOut,
     navigateAfterSwitchSession,
@@ -210,11 +197,11 @@ export const useUserButtonContext = () => {
 };
 
 export const useOrganizationSwitcherContext = () => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as OrganizationSwitcherCtx;
+  const ctx = React.useContext(ComponentContext);
   const { navigate } = useNavigate();
   const { displayConfig } = useEnvironment();
 
-  if (componentName !== 'OrganizationSwitcher') {
+  if (ctx?.componentName !== 'OrganizationSwitcher') {
     throw new Error('Clerk: useUserButtonContext called outside OrganizationSwitcher.');
   }
 
@@ -237,16 +224,15 @@ export const useOrganizationSwitcherContext = () => {
     navigateOrganizationProfile,
     navigateCreateOrganization,
     navigateAfterSwitchOrganization,
-    componentName,
   };
 };
 
 export const useOrganizationProfileContext = () => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as OrganizationProfileCtx;
+  const ctx = React.useContext(ComponentContext);
   const { navigate } = useNavigate();
   const { displayConfig } = useEnvironment();
 
-  if (componentName !== 'OrganizationProfile') {
+  if (ctx?.componentName !== 'OrganizationProfile') {
     throw new Error('Clerk: useOrganizationProfileContext called outside OrganizationProfile.');
   }
 
@@ -256,16 +242,15 @@ export const useOrganizationProfileContext = () => {
   return {
     ...ctx,
     navigateAfterLeaveOrganization,
-    componentName,
   };
 };
 
 export const useCreateOrganizationContext = () => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as CreateOrganizationCtx;
+  const ctx = React.useContext(ComponentContext);
   const { navigate } = useNavigate();
   const { displayConfig } = useEnvironment();
 
-  if (componentName !== 'CreateOrganization') {
+  if (ctx?.componentName !== 'CreateOrganization') {
     throw new Error('Clerk: useCreateOrganizationContext called outside CreateOrganization.');
   }
 
@@ -275,6 +260,5 @@ export const useCreateOrganizationContext = () => {
   return {
     ...ctx,
     navigateAfterCreateOrganization,
-    componentName,
   };
 };
