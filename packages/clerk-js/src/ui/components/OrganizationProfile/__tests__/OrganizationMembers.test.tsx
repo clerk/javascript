@@ -17,6 +17,7 @@ type FakeMemberParams = {
   firstName?: string;
   lastName?: string;
   profileImageUrl?: string;
+  imageUrl?: string;
   createdAt?: Date;
 };
 
@@ -36,6 +37,7 @@ const createFakeMember = (params: FakeMemberParams): OrganizationMembershipResou
       firstName: params?.firstName || 'test_firstName',
       lastName: params?.lastName || 'test_lastName',
       profileImageUrl: params?.profileImageUrl || '',
+      imageUrl: params?.imageUrl || '',
     },
   };
 };

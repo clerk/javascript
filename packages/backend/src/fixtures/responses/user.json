@@ -5,6 +5,7 @@
   "first_name": "John",
   "last_name": "Doe",
   "profile_image_url": null,
+  "image_url": "https://clerk.com",
   "primary_email_address_id": "idn_email_address",
   "primary_phone_number_id": "idn_phone_number",
   "password_enabled": false,

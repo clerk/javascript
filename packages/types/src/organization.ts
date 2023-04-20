@@ -19,6 +19,10 @@ export interface OrganizationResource extends ClerkResource {
   name: string;
   slug: string | null;
   logoUrl: string | null;
+  /**
+   * @experimental
+   */
+  imageUrl: string;
   membersCount: number;
   pendingInvitationsCount: number;
   publicMetadata: OrganizationPublicMetadata;

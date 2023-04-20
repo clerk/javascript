@@ -8,6 +8,7 @@ Organization {
   "getMemberships": [Function],
   "getPendingInvitations": [Function],
   "id": "test_id",
+  "imageUrl": "https://clerk.com",
   "inviteMember": [Function],
   "inviteMembers": [Function],
   "logoUrl": "https://url-for-logo.png",

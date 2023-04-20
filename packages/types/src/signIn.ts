@@ -109,6 +109,10 @@ export interface UserData {
   firstName?: string;
   lastName?: string;
   profileImageUrl?: string;
+  /**
+   * @experimental
+   */
+  imageUrl: string;
 }
 
 export type SignInFactor = SignInFirstFactor | SignInSecondFactor;
