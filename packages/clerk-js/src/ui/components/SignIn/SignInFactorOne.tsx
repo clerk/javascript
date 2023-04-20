@@ -1,4 +1,4 @@
-import type { SignInFactor } from '@clerk/types';
+import type { ResetPasswordCodeFactor, SignInFactor } from '@clerk/types';
 import React from 'react';
 
 import { withRedirectToHomeSingleSessionGuard } from '../../common';
@@ -35,10 +35,13 @@ export function _SignInFactorOne(): JSX.Element {
   const router = useRouter();
 
   const lastPreparedFactorKeyRef = React.useRef('');
-  const [prevCurrentFactor, setPrevCurrentFactor] = React.useState<SignInFactor | undefined | null>(() => undefined);
-  const [currentFactor, setCurrentFactor] = React.useState<SignInFactor | undefined | null>(() =>
-    determineStartingSignInFactor(availableFactors, signIn.identifier, preferredSignInStrategy),
-  );
+  const [{ currentFactor }, setFactor] = React.useState<{
+    currentFactor: SignInFactor | undefined | null;
+    prevCurrentFactor: SignInFactor | undefined | null;
+  }>(() => ({
+    currentFactor: determineStartingSignInFactor(availableFactors, signIn.identifier, preferredSignInStrategy),
+    prevCurrentFactor: undefined,
+  }));
   const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(
     () => !currentFactor || !factorHasLocalStrategy(currentFactor),
   );
@@ -67,10 +70,10 @@ export function _SignInFactorOne(): JSX.Element {
     lastPreparedFactorKeyRef.current = factorKey(currentFactor);
   };
   const selectFactor = (factor: SignInFactor) => {
-    setCurrentFactor(prevFactor => {
-      setPrevCurrentFactor(prevFactor);
-      return factor;
-    });
+    setFactor(prev => ({
+      currentFactor: factor,
+      prevCurrentFactor: prev.currentFactor,
+    }));
     toggleAllStrategies();
   };
   if (showAllStrategies) {
@@ -91,15 +94,15 @@ export function _SignInFactorOne(): JSX.Element {
     case 'password':
       return (
         <SignInFactorOnePasswordCard
-          onFactorPrepare={() =>
-            setCurrentFactor(prevFactor => {
-              setPrevCurrentFactor(prevFactor);
-              return {
-                strategy: 'reset_password_code',
-                safeIdentifier: signIn.identifier || '',
-              };
-            })
-          }
+          onFactorPrepare={(factor: ResetPasswordCodeFactor) => {
+            handleFactorPrepare();
+            setFactor(prev => ({
+              currentFactor: {
+                ...factor,
+              },
+              prevCurrentFactor: prev.currentFactor,
+            }));
+          }}
           onShowAlternativeMethodsClick={toggleAllStrategies}
         />
       );
@@ -138,10 +141,10 @@ export function _SignInFactorOne(): JSX.Element {
           factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
           onBackLinkClicked={() =>
-            setCurrentFactor(_prevCurrentFactor => {
-              setPrevCurrentFactor(_prevCurrentFactor);
-              return prevCurrentFactor;
-            })
+            setFactor(prev => ({
+              currentFactor: prev.prevCurrentFactor,
+              prevCurrentFactor: prev.currentFactor,
+            }))
           }
         />
       );
