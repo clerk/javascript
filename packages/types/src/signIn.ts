@@ -112,7 +112,7 @@ export interface UserData {
   /**
    * @experimental
    */
-  imageUrl: string;
+  imageUrl?: string;
 }
 
 export type SignInFactor = SignInFirstFactor | SignInSecondFactor;
