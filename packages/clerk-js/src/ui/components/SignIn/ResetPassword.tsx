@@ -44,7 +44,12 @@ export const _ResetPassword = () => {
 
       switch (status) {
         case 'complete':
-          return navigate(`../reset-password-success?createdSessionId=${createdSessionId}`);
+          if (createdSessionId) {
+            const queryParams = new URLSearchParams();
+            queryParams.set('createdSessionId', createdSessionId);
+            return navigate(`../reset-password-success?${queryParams.toString()}`);
+          }
+          return console.error(clerkInvalidFAPIResponse(status, supportEmail));
         case 'needs_second_factor':
           return navigate('../factor-two');
         default:
