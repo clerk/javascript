@@ -19,8 +19,8 @@ export const UserAvatar = (props: UserAvatarProps) => {
     <Avatar
       title={generatedName}
       initials={initials}
-      {...rest}
       imageUrl={__CLERK_FF_ENABLE_IMAGES__ ? imageUrl : profileImageUrl}
+      {...rest}
     />
   );
 };
