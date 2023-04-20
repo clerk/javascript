@@ -19,8 +19,8 @@ export const UserAvatar = (props: UserAvatarProps) => {
     <Avatar
       title={generatedName}
       initials={initials}
-      imageUrl={profileImageUrl}
       {...rest}
+      imageUrl={__FF__ENABLE_IMAGES__ ? imageUrl : profileImageUrl}
     />
   );
 };
