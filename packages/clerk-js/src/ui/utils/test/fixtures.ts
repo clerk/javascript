@@ -184,6 +184,6 @@ export const createUserFixture = (): UserJSON => {
   return {
     first_name: 'Firstname',
     last_name: 'Lastname',
-    profile_image_url: 'https://lh3.googleusercontent.com/a/public-photo-kmmfZIb=s1000-c',
+    image_url: 'https://lh3.googleusercontent.com/a/public-photo-kmmfZIb=s1000-c',
   } as UserJSON;
 };

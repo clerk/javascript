@@ -18,7 +18,11 @@ export interface OrganizationResource extends ClerkResource {
   id: string;
   name: string;
   slug: string | null;
+  /**
+   * @deprecated Use imageUrl instead
+   */
   logoUrl: string | null;
+  imageUrl: string;
   membersCount: number;
   pendingInvitationsCount: number;
   publicMetadata: OrganizationPublicMetadata;

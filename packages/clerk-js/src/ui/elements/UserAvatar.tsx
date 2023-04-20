@@ -5,13 +5,12 @@ import { Avatar } from '../elements';
 import type { PropsOfComponent } from '../styledSystem';
 
 type UserAvatarProps = PropsOfComponent<typeof Avatar> &
-  Partial<Pick<UserResource, 'firstName' | 'lastName' | 'profileImageUrl'>> & {
+  Partial<Pick<UserResource, 'firstName' | 'lastName' | 'imageUrl'>> & {
     name?: string | null;
   };
 
 export const UserAvatar = (props: UserAvatarProps) => {
-  //TODO: replace profileImageUrl with imageUrl
-  const { name, firstName, lastName, profileImageUrl, imageUrl, ...rest } = props;
+  const { name, firstName, lastName, imageUrl, ...rest } = props;
   const generatedName = getFullName({ name, firstName, lastName });
   const initials = getInitials({ name, firstName, lastName });
 
@@ -19,7 +18,7 @@ export const UserAvatar = (props: UserAvatarProps) => {
     <Avatar
       title={generatedName}
       initials={initials}
-      imageUrl={profileImageUrl}
+      imageUrl={imageUrl}
       {...rest}
     />
   );
