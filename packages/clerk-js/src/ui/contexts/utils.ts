@@ -8,7 +8,7 @@ export function assertClerkSingletonLoaded(clerk: Clerk | undefined): asserts cl
   }
 }
 
-export function assertContextExists(contextVal: unknown, providerName: string): asserts contextVal {
+export function assertContextExists<V>(contextVal: V, providerName: string): asserts contextVal is NonNullable<V> {
   if (!contextVal) {
     clerkCoreErrorContextProviderNotFound(providerName);
   }
