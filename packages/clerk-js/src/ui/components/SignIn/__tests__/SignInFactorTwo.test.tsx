@@ -1,6 +1,5 @@
 import type { SignInResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
-import React from 'react';
 
 import { ClerkAPIResponseError } from '../../../../core/resources';
 import { bindCreateFixtures, render, runFakeTimers, screen, waitFor } from '../../../../testUtils';
@@ -36,7 +35,7 @@ describe('SignInFactorTwo', () => {
       expect(inputs.length).toBe(6);
     });
 
-    it.only('sets an active session when user submits second factor successfully', async () => {
+    it('sets an active session when user submits second factor successfully', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.startSignInFactorTwo();
       });
