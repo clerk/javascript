@@ -48,6 +48,10 @@ export interface UserResource extends ClerkResource {
   firstName: string | null;
   lastName: string | null;
   profileImageUrl: string;
+  /**
+   * @experimental
+   */
+  experimental_imageUrl: string;
   emailAddresses: EmailAddressResource[];
   phoneNumbers: PhoneNumberResource[];
   web3Wallets: Web3WalletResource[];

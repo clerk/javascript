@@ -2,6 +2,7 @@ import type { ExternalAccountResource, UserPreviewId, UserResource } from '@cler
 import React from 'react';
 
 import { getFullName, getIdentifier } from '../../utils/user';
+import { useOptions } from '../contexts';
 import type { LocalizationKey } from '../customizables';
 import { descriptors, Flex, Text, useLocalizations } from '../customizables';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
@@ -37,7 +38,7 @@ export const UserPreview = (props: UserPreviewProps) => {
     showAvatar = true,
     icon,
     rounded = true,
-    imageUrl,
+    imageUrl: imageUrlProp,
     badge,
     elementId,
     sx,
@@ -46,10 +47,16 @@ export const UserPreview = (props: UserPreviewProps) => {
     avatarSx,
     ...rest
   } = props;
+  const { experimental_enableClerkImages } = useOptions();
   const { t } = useLocalizations();
   const name = getFullName({ ...user }) || getFullName({ ...externalAccount });
   const identifier = getIdentifier({ ...user }) || externalAccount?.accountIdentifier?.();
   const localizedTitle = t(title);
+
+  const imageUrl =
+    imageUrlProp ||
+    (experimental_enableClerkImages ? user?.experimental_imageUrl : user?.profileImageUrl) ||
+    externalAccount?.avatarUrl;
 
   return (
     <Flex
@@ -73,7 +80,7 @@ export const UserPreview = (props: UserPreviewProps) => {
             {...user}
             {...externalAccount}
             name={name}
-            profileImageUrl={imageUrl || user?.profileImageUrl || externalAccount?.avatarUrl}
+            imageUrl={imageUrl}
             size={t => ({ sm: t.sizes.$8, md: t.sizes.$11, lg: t.sizes.$12x5 }[size])}
             optimize
             sx={avatarSx}
