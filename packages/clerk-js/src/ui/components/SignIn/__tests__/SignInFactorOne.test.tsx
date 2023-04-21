@@ -1,7 +1,6 @@
 import type { SignInResource } from '@clerk/types';
 import { describe, it, jest } from '@jest/globals';
 import { waitFor } from '@testing-library/dom';
-import React from 'react';
 
 import { ClerkAPIResponseError } from '../../../../core/resources';
 import { act, bindCreateFixtures, render, runFakeTimers, screen } from '../../../../testUtils';
@@ -128,12 +127,31 @@ describe('SignInFactorOne', () => {
           f.withEmailAddress();
           f.withPassword();
           f.withPreferredSignInStrategy({ strategy: 'password' });
-          f.startSignInWithEmailAddress({ supportEmailCode: true, supportPassword: true });
+          f.startSignInWithEmailAddress({ supportEmailCode: true, supportPassword: true, supportResetPassword: false });
         });
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
         await userEvent.click(screen.getByText('Forgot password'));
         screen.getByText('Use another method');
         screen.getByText('Sign in with your password');
+      });
+
+      it('should render the Forgot Password component when clicking on "Forgot password" (email)', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'password' });
+          f.startSignInWithEmailAddress({
+            supportEmailCode: true,
+            supportPassword: true,
+            supportResetPassword: true,
+          });
+        });
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        await userEvent.click(screen.getByText('Forgot password'));
+        screen.getByText('Check your email');
+        screen.getByText('to reset your password');
       });
 
       it('shows a UI error when submission fails', async () => {
@@ -161,6 +179,53 @@ describe('SignInFactorOne', () => {
         await userEvent.type(screen.getByLabelText('Password'), '123456');
         await userEvent.click(screen.getByText('Continue'));
         await waitFor(() => expect(screen.getByText('Incorrect Password')).toBeDefined());
+      });
+    });
+
+    describe('Forgot Password', () => {
+      it('shows an input to add the code sent to phone', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'password' });
+          f.startSignInWithPhoneNumber({
+            supportPassword: true,
+            supportResetPassword: true,
+          });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.click(screen.getByText('Forgot password'));
+
+        screen.getByText('Check your phone');
+        screen.getByText('Reset password code');
+      });
+
+      it('redirects to `reset-password` on successful code verification', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'password' });
+          f.startSignInWithEmailAddress({
+            supportEmailCode: true,
+            supportPassword: true,
+            supportResetPassword: true,
+          });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(
+          Promise.resolve({ status: 'needs_new_password' } as SignInResource),
+        );
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.click(screen.getByText('Forgot password'));
+        await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+        expect(fixtures.signIn.attemptFirstFactor).toHaveBeenCalledWith({
+          strategy: 'reset_password_code',
+          code: '123456',
+        });
+        await waitFor(() => {
+          expect(fixtures.router.navigate).toHaveBeenCalledWith('../reset-password');
+        });
       });
     });
 
