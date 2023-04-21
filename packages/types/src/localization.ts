@@ -158,7 +158,8 @@ type _LocalizationResource = {
       title_phone: LocalizationValue;
       subtitle: LocalizationValue;
       formTitle: LocalizationValue;
-      formSubtitle: LocalizationValue;
+      formSubtitle_email: LocalizationValue;
+      formSubtitle_phone: LocalizationValue;
       resendButton: LocalizationValue;
     };
     resetPassword: {
