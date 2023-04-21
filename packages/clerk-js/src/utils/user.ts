@@ -35,12 +35,16 @@ export const getIdentifier = (user: Partial<UserResource>): string => {
 };
 
 export const isDefaultProfileImage = (url: string) => {
-  let encoded: string;
+  // Remove this check when renaming experimental_imageUrl to imageUrl
+  if ((url || '').includes('gravatar')) {
+    return true;
+  }
+
   try {
-    encoded = new URL(url).pathname.replace('/', '');
+    const encoded = new URL(url).pathname.replace('/', '');
+    const decoded = decodeBase16(encoded);
+    return decoded.includes('default');
   } catch {
     return false;
   }
-  const decoded = decodeBase16(encoded);
-  return decoded.includes('default');
 };
