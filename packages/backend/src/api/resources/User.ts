@@ -15,7 +15,7 @@ export class User {
     readonly createdAt: number,
     readonly updatedAt: number,
     readonly profileImageUrl: string,
-    readonly imageUrl: string,
+    readonly experimental_imageUrl: string,
     readonly gender: string,
     readonly birthday: string,
     readonly primaryEmailAddressId: string | null,

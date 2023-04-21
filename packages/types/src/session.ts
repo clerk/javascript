@@ -59,7 +59,7 @@ export interface PublicUserData {
   /**
    * @experimental
    */
-  imageUrl: string;
+  experimental_imageUrl: string;
   identifier: string;
   userId?: string;
 }

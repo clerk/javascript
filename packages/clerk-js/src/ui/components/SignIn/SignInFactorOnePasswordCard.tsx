@@ -56,7 +56,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
         </Header.Root>
         <IdentityPreview
           identifier={signIn.identifier}
-          avatarUrl={signIn.userData.imageUrl}
+          avatarUrl={signIn.userData.experimental_imageUrl}
           onClick={goBack}
         />
         {/*TODO: extract main in its own component */}

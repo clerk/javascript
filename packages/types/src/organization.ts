@@ -22,7 +22,7 @@ export interface OrganizationResource extends ClerkResource {
   /**
    * @experimental
    */
-  imageUrl: string;
+  experimental_imageUrl: string;
   membersCount: number;
   pendingInvitationsCount: number;
   publicMetadata: OrganizationPublicMetadata;

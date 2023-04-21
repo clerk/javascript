@@ -6,7 +6,7 @@ export class Organization {
     readonly name: string,
     readonly slug: string | null,
     readonly logoUrl: string | null,
-    readonly imageUrl: string,
+    readonly experimental_imageUrl: string,
     readonly createdBy: string,
     readonly createdAt: number,
     readonly updatedAt: number,

@@ -25,7 +25,7 @@ export class Organization extends BaseResource implements OrganizationResource {
   name!: string;
   slug!: string;
   logoUrl!: string;
-  imageUrl!: string;
+  experimental_imageUrl!: string;
   publicMetadata: OrganizationPublicMetadata = {};
   createdAt!: Date;
   updatedAt!: Date;
@@ -165,7 +165,7 @@ export class Organization extends BaseResource implements OrganizationResource {
     this.name = data.name;
     this.slug = data.slug;
     this.logoUrl = data.logo_url;
-    this.imageUrl = data.image_url;
+    this.experimental_imageUrl = data.image_url;
     this.publicMetadata = data.public_metadata;
     this.membersCount = data.members_count;
     this.pendingInvitationsCount = data.pending_invitations_count;
