@@ -1,3 +1,5 @@
+import { useCallback } from 'react';
+
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { withRedirectToHomeSingleSessionGuard } from '../../common';
 import { useCoreSignIn } from '../../contexts';
@@ -17,21 +19,29 @@ export const _ResetPassword = () => {
     type: 'password',
     label: localizationKeys('formFieldLabel__newPassword'),
     isRequired: true,
+    enableErrorAfterBlur: true,
+    complexity: true,
+    strengthMeter: true,
   });
   const confirmField = useFormControl('confirmPassword', '', {
     type: 'password',
     label: localizationKeys('formFieldLabel__confirmPassword'),
     isRequired: true,
+    enableErrorAfterBlur: true,
   });
 
-  const canSubmit = passwordField.value === confirmField.value && passwordField.value.length > 7;
+  const canSubmit = passwordField.value.trim().length > 7 && passwordField.value === confirmField.value;
 
+  const checkPasswordMatch = useCallback(
+    (confirmPassword: string) => {
+      return passwordField.value && confirmPassword && passwordField.value !== confirmPassword
+        ? "Passwords don't match."
+        : undefined;
+    },
+    [passwordField.value],
+  );
   const validateForm = () => {
-    if (passwordField.value && confirmField.value && passwordField.value !== confirmField.value) {
-      confirmField.setError("Passwords don't match.");
-    } else {
-      confirmField.setError(undefined);
-    }
+    confirmField.setError(checkPasswordMatch(confirmField.value));
   };
 
   const resetPassword = async () => {
@@ -83,7 +93,13 @@ export const _ResetPassword = () => {
             />
           </Form.ControlRow>
           <Form.ControlRow elementId={confirmField.id}>
-            <Form.Control {...confirmField.props} />
+            <Form.Control
+              {...confirmField.props}
+              onChange={e => {
+                confirmField.setError(checkPasswordMatch(e.target.value));
+                return confirmField.props.onChange(e);
+              }}
+            />
           </Form.ControlRow>
           <Form.SubmitButton
             isDisabled={!canSubmit}
