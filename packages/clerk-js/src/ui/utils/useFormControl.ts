@@ -1,7 +1,8 @@
 import type { ClerkAPIError } from '@clerk/types';
 import type { HTMLInputTypeAttribute } from 'react';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 
+import { useDebounce } from '../hooks';
 import type { LocalizationKey } from '../localization';
 import { useLocalizations } from '../localization';
 
@@ -56,20 +57,6 @@ export type FormControlState<Id = string> = FieldStateProps<Id> & {
   setChecked: (isChecked: boolean) => void;
   props: FieldStateProps<Id>;
 };
-
-function useDebounce<T>(value: T, delay?: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedValue(value), delay || 500);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-}
 
 export const useFormControl = <Id extends string>(
   id: Id,
