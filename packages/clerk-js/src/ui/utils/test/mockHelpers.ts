@@ -44,7 +44,7 @@ export const mockClerkMethods = (clerk: LoadedClerk): DeepJestMocked<LoadedClerk
   return clerk as any as DeepJestMocked<LoadedClerk>;
 };
 
-export const mockRouteContextValue = (): DeepJestMocked<RouteContextValue> => {
+export const mockRouteContextValue = ({ queryString = '' }: Partial<DeepJestMocked<RouteContextValue>>) => {
   return {
     basePath: '',
     startPath: '',
@@ -52,7 +52,7 @@ export const mockRouteContextValue = (): DeepJestMocked<RouteContextValue> => {
     fullPath: '',
     indexPath: '',
     currentPath: '',
-    queryString: '',
+    queryString,
     queryParams: {},
     getMatchData: jest.fn(),
     matches: jest.fn(),
@@ -61,5 +61,5 @@ export const mockRouteContextValue = (): DeepJestMocked<RouteContextValue> => {
     resolve: jest.fn((to: string) => new URL(to, 'https://clerk.com')),
     refresh: jest.fn(),
     params: {},
-  };
+  } as RouteContextValue;
 };
