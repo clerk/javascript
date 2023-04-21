@@ -1,11 +1,11 @@
 import { useCoreUser } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
 import { ProfileSection } from '../../elements';
-import { useNavigate } from '../../hooks/useNavigate';
+import { useRouter } from '../../router';
 import { AddBlockButton } from './UserProfileBlockButtons';
 
 export const PasswordSection = () => {
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const { passwordEnabled } = useCoreUser();
 
   const navigateToPage = () => {

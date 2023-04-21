@@ -4,13 +4,13 @@ import { Col, descriptors, Flow, Icon } from '../../customizables';
 import { Card, CardAlert, Header, PreviewButton, UserPreview, withCardStateProvider } from '../../elements';
 import { ArrowBlockButton } from '../../elements/ArrowBlockButton';
 import { useCardState } from '../../elements/contexts';
-import { useNavigate } from '../../hooks';
 import { Plus, SignOutDouble } from '../../icons';
+import { useRouter } from '../../router';
 import { useMultisessionActions } from '../UserButton/useMultisessionActions';
 
 const _SignInAccountSwitcher = () => {
   const card = useCardState();
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const { applicationName, userProfileUrl, signInUrl, afterSignOutAllUrl } = useEnvironment().displayConfig;
   const { navigateAfterSignIn } = useSignInContext();
   const { handleSignOutAllClicked, handleSessionClicked, activeSessions, handleAddAccountClicked } =

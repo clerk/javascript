@@ -7,7 +7,6 @@ import { useCoreUser, useUserProfileContext } from '../../contexts';
 import { Badge, Col, descriptors, Flex, Image, localizationKeys } from '../../customizables';
 import { ProfileSection, useCardState, UserPreview } from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
-import { useNavigate } from '../../hooks/useNavigate';
 import { handleError } from '../../utils';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
 import { UserProfileAccordion } from './UserProfileAccordion';
@@ -15,7 +14,7 @@ import { AddBlockButton } from './UserProfileBlockButtons';
 
 export const ConnectedAccountsSection = () => {
   const user = useCoreUser();
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const accounts = [
     ...user.verifiedExternalAccounts,
     ...user.unverifiedExternalAccounts.filter(a => a.verification?.error),
@@ -44,7 +43,7 @@ export const ConnectedAccountsSection = () => {
 const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResource }) => {
   const card = useCardState();
   const user = useCoreUser();
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const router = useRouter();
   const { providerToDisplayData } = useEnabledThirdPartyProviders();
   const error = account.verification?.error?.longMessage;
@@ -80,7 +79,7 @@ const ConnectedAccountAccordion = ({ account }: { account: ExternalAccountResour
         });
       }
 
-      navigate(response.verification!.externalVerificationRedirectURL);
+      await navigate(response.verification!.externalVerificationRedirectURL?.href || '');
     } catch (err) {
       handleError(err, [], card.setError);
     }

@@ -14,7 +14,7 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
-import { useEnabledThirdPartyProviders, useNavigate } from '../../hooks';
+import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
 import { handleError, sleep } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
@@ -45,7 +45,7 @@ export const ConnectedAccountsPage = withCardStateProvider(() => {
 const AddConnectedAccount = () => {
   const card = useCardState();
   const user = useCoreUser();
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const { strategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
   const { additionalOAuthScopes, componentName, mode } = useUserProfileContext();
   const isModal = mode === 'modal';
@@ -75,8 +75,9 @@ const AddConnectedAccount = () => {
       })
       .then(res => {
         if (res.verification?.externalVerificationRedirectURL) {
-          return navigate(res.verification.externalVerificationRedirectURL);
+          return navigate(res.verification.externalVerificationRedirectURL.href);
         }
+        return;
       })
       .catch(err => handleError(err, [], card.setError))
       .finally(() => {

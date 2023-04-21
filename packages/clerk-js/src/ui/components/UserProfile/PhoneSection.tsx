@@ -3,7 +3,7 @@ import type { PhoneNumberResource } from '@clerk/types';
 import { useCoreUser } from '../../contexts';
 import { Badge, Col, localizationKeys, Text } from '../../customizables';
 import { ProfileSection, useCardState } from '../../elements';
-import { useNavigate } from '../../hooks';
+import { useRouter } from '../../router';
 import { getFlagEmojiFromCountryIso, handleError, parsePhoneString, stringToFormattedPhoneString } from '../../utils';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
 import { UserProfileAccordion } from './UserProfileAccordion';
@@ -12,7 +12,7 @@ import { primaryIdentificationFirst } from './utils';
 
 export const PhoneSection = () => {
   const user = useCoreUser();
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
 
   return (
     <ProfileSection
@@ -38,7 +38,7 @@ export const PhoneSection = () => {
 const PhoneAccordion = ({ phone }: { phone: PhoneNumberResource }) => {
   const card = useCardState();
   const user = useCoreUser();
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const isPrimary = user.primaryPhoneNumberId === phone.id;
   const isVerified = phone.verification.status === 'verified';
   const setPrimary = () => {

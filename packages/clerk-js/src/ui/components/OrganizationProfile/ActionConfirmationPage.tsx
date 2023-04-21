@@ -10,7 +10,7 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
-import { useNavigate } from '../../hooks';
+import { useRouter } from '../../router';
 import { handleError } from '../../utils';
 import { OrganizationProfileBreadcrumbs } from './OrganizationProfileNavbar';
 
@@ -64,7 +64,7 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
   } = props;
   const wizard = useWizard();
   const card = useCardState();
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
 
   const handleSubmit = async () => {
     try {
@@ -98,8 +98,8 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
             <Form.ResetButton
               localizationKey={localizationKeys('userProfile.formButtonReset')}
               block={false}
-              onClick={() => {
-                navigate('..');
+              onClick={async () => {
+                await navigate('..');
               }}
             />
           </FormButtonContainer>

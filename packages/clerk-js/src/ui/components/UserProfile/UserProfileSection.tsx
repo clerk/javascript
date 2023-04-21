@@ -1,11 +1,11 @@
 import { useCoreUser } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { ProfileSection, UserPreview } from '../../elements';
-import { useNavigate } from '../../hooks';
+import { useRouter } from '../../router';
 import { BlockButton } from './UserProfileBlockButtons';
 
 export const UserProfileSection = () => {
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = useCoreUser();
 
   return (

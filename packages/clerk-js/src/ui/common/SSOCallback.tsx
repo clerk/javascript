@@ -4,11 +4,11 @@ import React from 'react';
 import { useCoreClerk } from '../contexts';
 import { Flow } from '../customizables';
 import { LoadingCard } from '../elements';
-import { useNavigate } from '../hooks';
+import { useRouter } from '../router';
 
 export const SSOCallback = (props: HandleOAuthCallbackParams | HandleSamlCallbackParams) => {
   const { handleRedirectCallback } = useCoreClerk();
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
 
   React.useEffect(() => {
     handleRedirectCallback({ ...props }, navigate).catch(() => {

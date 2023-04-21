@@ -23,8 +23,9 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
-import { useLoadingStatus, useNavigate } from '../../hooks';
+import { useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
+import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';
 import { buildRequest, handleError, isMobileDevice, useFormControl } from '../../utils';
 import { SignInSocialButtons } from './SignInSocialButtons';
@@ -35,7 +36,7 @@ export function _SignInStart(): JSX.Element {
   const { userSettings } = useEnvironment();
   const { setActive } = useCoreClerk();
   const signIn = useCoreSignIn();
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const { navigateAfterSignIn, signUpUrl } = useSignInContext();
   const supportEmail = useSupportEmail();
   const identifierAttributes = useMemo<SignInStartIdentifier[]>(

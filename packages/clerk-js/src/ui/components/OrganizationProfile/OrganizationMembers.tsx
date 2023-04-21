@@ -13,14 +13,14 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
-import { useNavigate } from '../../hooks';
 import { UserAdd } from '../../icons';
+import { useRouter } from '../../router';
 import { ActiveMembersList } from './ActiveMembersList';
 import { InvitedMembersList } from './InvitedMembersList';
 import { MembershipWidget } from './MembershipWidget';
 
 export const OrganizationMembers = withCardStateProvider(() => {
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const card = useCardState();
   const { membership } = useCoreOrganization();
   //@ts-expect-error

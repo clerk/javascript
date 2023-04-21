@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useEnvironment } from '../contexts';
-import { useNavigate } from '../hooks';
+import { useRouter } from '../router';
 
 export function withOrganizationsEnabledGuard<P>(
   WrappedComponent: React.ComponentType<P>,
@@ -9,7 +9,7 @@ export function withOrganizationsEnabledGuard<P>(
   options: { mode: 'redirect' | 'hide' },
 ): React.ComponentType<P> {
   const Hoc = (props: P) => {
-    const { navigate } = useNavigate();
+    const { navigate } = useRouter();
     const { organizationSettings, displayConfig } = useEnvironment();
 
     React.useEffect(() => {

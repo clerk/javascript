@@ -1,8 +1,8 @@
 import { useCoreOrganization } from '../../contexts';
 import { Col, descriptors, Flex, Icon, localizationKeys } from '../../customizables';
 import { Header, IconButton, NavbarMenuButtonRow, OrganizationPreview, ProfileSection } from '../../elements';
-import { useNavigate } from '../../hooks';
 import { Times } from '../../icons';
+import { useRouter } from '../../router';
 import { BlockButton } from '../UserProfile/UserProfileBlockButtons';
 
 export const OrganizationSettings = () => {
@@ -33,7 +33,7 @@ export const OrganizationSettings = () => {
 
 const OrganizationProfileSection = () => {
   const { organization, membership } = useCoreOrganization();
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const isAdmin = membership?.role === 'admin';
 
   if (!organization) {
@@ -59,7 +59,7 @@ const OrganizationProfileSection = () => {
 
 const OrganizationDangerSection = () => {
   const { organization, membership } = useCoreOrganization();
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
 
   if (!organization || !membership) {
     return null;

@@ -2,7 +2,6 @@ import React from 'react';
 
 import { buildAuthQueryString, buildURL, pickRedirectionProp } from '../../utils';
 import { useCoreClerk, useEnvironment, useOptions } from '../contexts';
-import { useNavigate } from '../hooks';
 import type { ParsedQs } from '../router';
 import { useRouter } from '../router';
 import type {
@@ -28,7 +27,7 @@ export type SignUpContextType = SignUpCtx & {
 
 export const useSignUpContext = (): SignUpContextType => {
   const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as SignUpCtx;
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
   const { queryParams } = useRouter();
   const options = useOptions();
@@ -98,7 +97,7 @@ export type SignInContextType = SignInCtx & {
 
 export const useSignInContext = (): SignInContextType => {
   const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as SignInCtx;
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
   const { queryParams } = useRouter();
   const options = useOptions();
@@ -181,7 +180,7 @@ export const useUserProfileContext = (): UserProfileContextType => {
 
 export const useUserButtonContext = () => {
   const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as UserButtonCtx;
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
   const options = useOptions();
 
@@ -195,10 +194,10 @@ export const useUserButtonContext = () => {
   const afterMultiSessionSingleSignOutUrl = ctx.afterMultiSessionSingleSignOutUrl || displayConfig.afterSignOutOneUrl;
   const navigateAfterMultiSessionSingleSignOut = () => navigate(afterMultiSessionSingleSignOutUrl);
 
-  const afterSignOutUrl = ctx.afterSignOutUrl;
+  const afterSignOutUrl = ctx.afterSignOutUrl || displayConfig.afterSignOutAllUrl;
   const navigateAfterSignOut = () => navigate(afterSignOutUrl);
 
-  const afterSwitchSessionUrl = ctx.afterSwitchSessionUrl;
+  const afterSwitchSessionUrl = ctx.afterSwitchSessionUrl || displayConfig.afterSwitchSessionUrl;
   const navigateAfterSwitchSession = () => navigate(afterSwitchSessionUrl);
 
   return {
@@ -217,7 +216,7 @@ export const useUserButtonContext = () => {
 
 export const useOrganizationSwitcherContext = () => {
   const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as OrganizationSwitcherCtx;
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
 
   if (componentName !== 'OrganizationSwitcher') {
@@ -249,7 +248,7 @@ export const useOrganizationSwitcherContext = () => {
 
 export const useOrganizationProfileContext = () => {
   const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as OrganizationProfileCtx;
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
 
   if (componentName !== 'OrganizationProfile') {
@@ -268,7 +267,7 @@ export const useOrganizationProfileContext = () => {
 
 export const useCreateOrganizationContext = () => {
   const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as CreateOrganizationCtx;
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
 
   if (componentName !== 'CreateOrganization') {
