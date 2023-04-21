@@ -100,6 +100,7 @@ export const UserPreview = (props: UserPreviewProps) => {
         >
           <Text
             as='span'
+            colorScheme='inherit'
             truncate
           >
             {localizedTitle || name || identifier}
