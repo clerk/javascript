@@ -53,6 +53,7 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
       first_name: 'FirstName',
       last_name: 'LastName',
       profile_image_url: '',
+      image_url: '',
       identifier: 'email@test.com',
       user_id: '',
       ...params,

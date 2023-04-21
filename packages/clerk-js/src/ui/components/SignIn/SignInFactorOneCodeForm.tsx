@@ -2,7 +2,7 @@ import type { EmailCodeFactor, PhoneCodeFactor } from '@clerk/types';
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
-import { useCoreClerk, useCoreSignIn, useSignInContext } from '../../contexts';
+import { useCoreClerk, useCoreSignIn, useOptions, useSignInContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import type { VerificationCodeCardProps } from '../../elements';
 import { VerificationCodeCard } from '../../elements';
@@ -35,6 +35,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   const { navigateAfterSignIn } = useSignInContext();
   const { setActive } = useCoreClerk();
   const supportEmail = useSupportEmail();
+  const { experimental_enableClerkImages } = useOptions();
 
   const goBack = () => {
     return navigate('../');
@@ -81,7 +82,9 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
       onCodeEntryFinishedAction={action}
       onResendCodeClicked={prepare}
       safeIdentifier={props.factor.safeIdentifier}
-      profileImageUrl={signIn.userData.profileImageUrl}
+      profileImageUrl={
+        experimental_enableClerkImages ? signIn.userData.experimental_imageUrl : signIn.userData.profileImageUrl
+      }
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
       showAlternativeMethods={props.showAlternativeMethods}
       onIdentityPreviewEditClicked={goBack}
