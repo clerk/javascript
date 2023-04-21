@@ -2,7 +2,7 @@ import React from 'react';
 
 import { isDefaultProfileImage } from '../../../utils/user';
 import { useWizard, Wizard } from '../../common';
-import { useCoreUser, useEnvironment } from '../../contexts';
+import { useCoreUser, useEnvironment, useOptions } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
@@ -19,6 +19,7 @@ export const ProfilePage = withCardStateProvider(() => {
   const showLastName = last_name.enabled;
   const userFirstName = user.firstName || '';
   const userLastName = user.lastName || '';
+  const { experimental_enableClerkImages } = useOptions();
 
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
 
@@ -87,7 +88,11 @@ export const ProfilePage = withCardStateProvider(() => {
           <UserProfileAvatarUploader
             user={user}
             onAvatarChange={uploadAvatar}
-            onAvatarRemove={!isDefaultProfileImage(user.experimental_imageUrl) ? onAvatarRemove : null}
+            onAvatarRemove={
+              !isDefaultProfileImage(experimental_enableClerkImages ? user.experimental_imageUrl : user.profileImageUrl)
+                ? onAvatarRemove
+                : null
+            }
           />
           {showFirstName && (
             <Form.ControlRow elementId={firstNameField.id}>

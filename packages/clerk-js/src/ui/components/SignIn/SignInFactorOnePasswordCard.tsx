@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
-import { useCoreClerk, useCoreSignIn, useSignInContext } from '../../contexts';
+import { useCoreClerk, useCoreSignIn, useOptions, useSignInContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import { Card, CardAlert, Footer, Form, Header, IdentityPreview, useCardState } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
@@ -24,6 +24,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
     label: localizationKeys('formFieldLabel__password'),
   });
   const { navigate } = useRouter();
+  const { experimental_enableClerkImages } = useOptions();
 
   const goBack = () => {
     return navigate('../');
@@ -56,7 +57,9 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
         </Header.Root>
         <IdentityPreview
           identifier={signIn.identifier}
-          avatarUrl={signIn.userData.experimental_imageUrl}
+          avatarUrl={
+            experimental_enableClerkImages ? signIn.userData.experimental_imageUrl : signIn.userData.profileImageUrl
+          }
           onClick={goBack}
         />
         {/*TODO: extract main in its own component */}

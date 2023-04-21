@@ -1,7 +1,5 @@
 import type { MembershipRole, OrganizationMembershipResource, OrganizationResource } from '@clerk/types';
 import { describe, it, jest } from '@jest/globals';
-import { queryByRole } from '@testing-library/dom';
-import React from 'react';
 
 import { render, waitFor } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
@@ -17,7 +15,7 @@ type FakeMemberParams = {
   firstName?: string;
   lastName?: string;
   profileImageUrl?: string;
-  imageUrl?: string;
+  experimental_imageUrl?: string;
   createdAt?: Date;
 };
 
@@ -37,9 +35,9 @@ const createFakeMember = (params: FakeMemberParams): OrganizationMembershipResou
       firstName: params?.firstName || 'test_firstName',
       lastName: params?.lastName || 'test_lastName',
       profileImageUrl: params?.profileImageUrl || '',
-      imageUrl: params?.imageUrl || '',
+      experimental_imageUrl: params?.experimental_imageUrl || '',
     },
-  };
+  } as any;
 };
 
 describe('OrganizationMembers', () => {

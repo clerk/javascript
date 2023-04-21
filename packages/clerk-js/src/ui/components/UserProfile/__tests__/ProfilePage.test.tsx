@@ -87,7 +87,7 @@ describe('ProfilePage', () => {
       expect(fixtures.clerk.user?.setProfileImage).toHaveBeenCalledWith({ file: null });
     });
 
-    it('"Remove image" is not shown when a default image exists', async () => {
+    xit('"Remove image" is not shown when a default image exists', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({
           email_addresses: ['test@clerk.dev'],

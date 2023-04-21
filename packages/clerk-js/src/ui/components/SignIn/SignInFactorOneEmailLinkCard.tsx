@@ -3,7 +3,7 @@ import React from 'react';
 
 import { EmailLinkStatusCard } from '../../common';
 import { buildMagicLinkRedirectUrl } from '../../common/redirects';
-import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
+import { useCoreClerk, useCoreSignIn, useEnvironment, useOptions, useSignInContext } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
 import type { VerificationCodeCardProps } from '../../elements';
 import { VerificationLinkCard } from '../../elements';
@@ -28,6 +28,7 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
   const { setActive } = useCoreClerk();
   const { startMagicLinkFlow, cancelMagicLinkFlow } = useMagicLink(signIn);
   const [showVerifyModal, setShowVerifyModal] = React.useState(false);
+  const { experimental_enableClerkImages } = useOptions();
 
   React.useEffect(() => {
     void startEmailLinkVerification();
@@ -89,7 +90,9 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
         resendButton={localizationKeys('signIn.emailLink.resendButton')}
         onResendCodeClicked={restartVerification}
         safeIdentifier={props.factor.safeIdentifier}
-        profileImageUrl={signIn.userData.experimental_imageUrl}
+        profileImageUrl={
+          experimental_enableClerkImages ? signIn.userData.experimental_imageUrl : signIn.userData.profileImageUrl
+        }
         onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
       />
     </Flow.Part>
