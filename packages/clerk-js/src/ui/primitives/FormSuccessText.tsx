@@ -1,38 +1,50 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 
+import { Icon } from '../customizables';
+import { CheckCircle } from '../icons';
 import type { StyleVariants } from '../styledSystem';
 import { animations, createVariants } from '../styledSystem';
 import { useFormControl } from './hooks';
-import type { TextProps } from './Text';
 import { Text } from './Text';
 
-const { applyVariants } = createVariants(theme => ({
+export const { applyVariants } = createVariants(theme => ({
   base: {
     willChange: 'transform, opacity, height',
     marginTop: theme.sizes.$2,
     animation: `${animations.textInSmall} ${theme.transitionDuration.$fast}`,
+    display: 'flex',
+    gap: theme.sizes.$2,
+    position: 'absolute',
+    top: '0',
   },
   variants: {},
 }));
 
-type FormSuccessTextProps = React.PropsWithChildren<StyleVariants<typeof applyVariants> & TextProps>;
+export type FormTextProps = React.PropsWithChildren<StyleVariants<typeof applyVariants>>;
 
-export const FormSuccessText = (props: FormSuccessTextProps) => {
-  const { hasError, errorMessageId } = useFormControl() || {};
+export const FormSuccessText = forwardRef<HTMLElement, FormTextProps>((props, ref) => {
+  const { hasError } = useFormControl() || {};
 
   if (!hasError && !props.children) {
     return null;
   }
 
+  const { children, ...rest } = props;
+
   return (
-    // @ts-expect-error
     <Text
+      ref={ref}
       variant='smallRegular'
-      colorScheme='success'
+      colorScheme='neutral'
       aria-live='polite'
-      id={errorMessageId}
-      {...props}
+      {...rest}
       css={applyVariants(props)}
-    />
+    >
+      <Icon
+        colorScheme={'success'}
+        icon={CheckCircle}
+      />
+      {children}
+    </Text>
   );
-};
+});

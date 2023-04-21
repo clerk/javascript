@@ -12,15 +12,14 @@ import {
   FormLabel,
   FormSuccessText,
   FormText,
-  Icon,
+  Icon as IconCustomizable,
   Input,
   Link,
   localizationKeys,
   Text,
   useLocalizations,
 } from '../customizables';
-import { usePrefersReducedMotion } from '../hooks';
-import { CheckCircle, ExclamationCircle } from '../icons';
+import { useDelayUnmount, usePrefersReducedMotion } from '../hooks';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { animations } from '../styledSystem';
 import { useCardState } from './contexts';
@@ -67,21 +66,6 @@ const getInputElementForType = (type: FormControlProps['type']) => {
   return CustomInputs[customInput] || Input;
 };
 
-function useDelayUnmount(isMounted: string, delayTime: number) {
-  const [shouldRender, setShouldRender] = React.useState('');
-
-  React.useEffect(() => {
-    let timeoutId: ReturnType<typeof setTimeout>;
-    if (isMounted && !shouldRender) {
-      timeoutId = setTimeout(() => setShouldRender(isMounted), delayTime);
-    } else if (!isMounted && shouldRender) {
-      timeoutId = setTimeout(() => setShouldRender(''), delayTime);
-    }
-    return () => clearTimeout(timeoutId);
-  }, [isMounted, delayTime, shouldRender]);
-  return shouldRender;
-}
-
 function useFormTextAnimation() {
   const prefersReducedMotion = usePrefersReducedMotion();
 
@@ -105,6 +89,34 @@ function useFormTextAnimation() {
     getFormTextAnimation,
   };
 }
+
+const useCalculateErrorTextHeight = (messageToDisplay: string | undefined) => {
+  const [height, setHeight] = useState(24);
+
+  const calculateHeight = useCallback(
+    (element: HTMLElement | null) => {
+      if (element) {
+        const fontSize = parseInt(getComputedStyle(element).fontSize.replace('px', ''));
+        const width = parseInt(getComputedStyle(element).width.replace('px', ''));
+        const lineHeight = parseInt(getComputedStyle(element).lineHeight.replace('px', '')) / 16;
+        const characters = messageToDisplay?.length || 0;
+
+        setHeight(prevHeight => {
+          const newHeight = 10 + fontSize * lineHeight * Math.ceil(characters / (width / (fontSize * 0.6))); //0.6 is an average character width
+          if (prevHeight < newHeight) {
+            return newHeight;
+          }
+          return prevHeight;
+        });
+      }
+    },
+    [messageToDisplay],
+  );
+  return {
+    height,
+    calculateHeight,
+  };
+};
 
 export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props, ref) => {
   const { t } = useLocalizations();
@@ -142,26 +154,10 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
   const successMessage = useDelayUnmount(_successMessage || '', 500);
   const directionMessage = useDelayUnmount(debouncedState?.isFocused ? direction || '' : '', 500);
 
-  const isSomeMessageVisible = directionMessage || successMessage || errorMessage;
+  const messageToDisplay = directionMessage || successMessage || errorMessage;
+  const isSomeMessageVisible = !!messageToDisplay;
 
-  const [height, setHeight] = useState(24);
-
-  const calculateHeight = useCallback((element: HTMLElement | null) => {
-    if (element) {
-      const fontSize = parseInt(getComputedStyle(element).fontSize.replace('px', ''));
-      const width = parseInt(getComputedStyle(element).width.replace('px', ''));
-      const lineHeight = parseInt(getComputedStyle(element).lineHeight.replace('px', '')) / 16;
-      const characters = direction?.length || 0;
-
-      setHeight(prevHeight => {
-        const newHeight = 10 + fontSize * lineHeight * Math.ceil(characters / (width / (fontSize * 0.6))); //0.6 is an average character width
-        if (prevHeight < newHeight) {
-          return newHeight;
-        }
-        return prevHeight;
-      });
-    }
-  }, []);
+  const { calculateHeight, height } = useCalculateErrorTextHeight(messageToDisplay);
 
   const { getFormTextAnimation } = useFormTextAnimation();
 
@@ -174,6 +170,83 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
     }
     return true;
   }, [enableErrorAfterBlur, hasLostFocus, submittedWithEnter]);
+
+  const ActionLabel = actionLabel ? (
+    <Link
+      localizationKey={actionLabel}
+      elementDescriptor={descriptors.formFieldAction}
+      elementId={descriptors.formFieldLabel.setId(id)}
+      isDisabled={isDisabled}
+      colorScheme='primary'
+      onClick={e => {
+        e.preventDefault();
+        onActionClicked?.(e);
+      }}
+    >
+      {typeof actionLabel === 'string' ? actionLabel : undefined}
+    </Link>
+  ) : null;
+
+  const HintLabel =
+    isOptional && !actionLabel ? (
+      <Text
+        localizationKey={localizationKeys('formFieldHintText__optional')}
+        elementDescriptor={descriptors.formFieldHintText}
+        elementId={descriptors.formFieldHintText.setId(id)}
+        as='span'
+        colorScheme='neutral'
+        variant='smallRegular'
+        isDisabled={isDisabled}
+      />
+    ) : null;
+
+  // TODO: This is a temporary fix. Replace this when the tooltip component is introduced
+  const Icon = icon ? (
+    <Flex
+      as={'span'}
+      title='A slug is a human-readable ID that must be unique.  It’s often used in URLs.'
+    >
+      <IconCustomizable
+        icon={icon}
+        sx={theme => ({
+          marginLeft: theme.space.$0x5,
+          color: theme.colors.$blackAlpha400,
+          width: theme.sizes.$4,
+          height: theme.sizes.$4,
+        })}
+      />
+    </Flex>
+  ) : null;
+
+  const FieldLabel = (
+    <FormLabel
+      localizationKey={typeof label === 'object' ? label : undefined}
+      elementDescriptor={descriptors.formFieldLabel}
+      elementId={descriptors.formFieldLabel.setId(id)}
+      hasError={hasError}
+      isDisabled={isDisabled}
+      isRequired={isRequired}
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+      }}
+    >
+      {typeof label === 'string' ? label : undefined}
+    </FormLabel>
+  );
+
+  const Input = (
+    <InputElement
+      elementDescriptor={descriptors.formFieldInput}
+      elementId={descriptors.formFieldInput.setId(id)}
+      hasError={hasError}
+      isDisabled={isDisabled}
+      isRequired={isRequired}
+      {...rest}
+      ref={ref}
+      placeholder={t(placeholder)}
+    />
+  );
 
   return (
     <FormControlPrim
@@ -188,164 +261,85 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
       setSuccessful={setSuccessful}
       sx={sx}
     >
-      <Flex
-        direction={isCheckbox ? 'row' : 'columnReverse'}
-        sx={
-          {
-            // Setting height to 100% fixes issue with Firefox for our PhoneInput
-            // height: '100%',
-          }
-        }
-      >
-        <InputElement
-          elementDescriptor={descriptors.formFieldInput}
-          elementId={descriptors.formFieldInput.setId(id)}
-          hasError={hasError}
-          isDisabled={isDisabled}
-          isRequired={isRequired}
-          {...rest}
-          ref={ref}
-          placeholder={t(placeholder)}
-        />
-        <Flex
-          justify={icon ? 'start' : 'between'}
-          align='center'
-          elementDescriptor={descriptors.formFieldLabelRow}
-          elementId={descriptors.formFieldLabelRow.setId(id)}
-          sx={theme => ({
-            marginBottom: isCheckbox ? 0 : theme.space.$1,
-            marginLeft: !isCheckbox ? 0 : theme.space.$1,
-          })}
-        >
-          <FormLabel
-            localizationKey={typeof label === 'object' ? label : undefined}
-            elementDescriptor={descriptors.formFieldLabel}
-            elementId={descriptors.formFieldLabel.setId(id)}
-            hasError={hasError}
-            isDisabled={isDisabled}
-            isRequired={isRequired}
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-            }}
+      {isCheckbox ? (
+        <Flex direction={'row'}>
+          {Input}
+          <Flex
+            justify={icon ? 'start' : 'between'}
+            align='center'
+            elementDescriptor={descriptors.formFieldLabelRow}
+            elementId={descriptors.formFieldLabelRow.setId(id)}
+            sx={theme => ({
+              marginBottom: isCheckbox ? 0 : theme.space.$1,
+              marginLeft: !isCheckbox ? 0 : theme.space.$1,
+            })}
           >
-            {typeof label === 'string' ? label : undefined}
-          </FormLabel>
-          {icon && (
-            // TODO: This is a temporary fix. Replace this when the tooltip component is introduced
-            <Flex
-              as={'span'}
-              title='A slug is a human-readable ID that must be unique.  It’s often used in URLs.'
-            >
-              <Icon
-                icon={icon}
-                sx={theme => ({
-                  marginLeft: theme.space.$0x5,
-                  color: theme.colors.$blackAlpha400,
-                  width: theme.sizes.$4,
-                  height: theme.sizes.$4,
-                })}
-              />
-            </Flex>
-          )}
-          {isOptional && !actionLabel && (
-            <Text
-              localizationKey={localizationKeys('formFieldHintText__optional')}
-              elementDescriptor={descriptors.formFieldHintText}
-              elementId={descriptors.formFieldHintText.setId(id)}
-              as='span'
-              colorScheme='neutral'
-              variant='smallRegular'
-              isDisabled={isDisabled}
-            />
-          )}
-          {actionLabel && (
-            <Link
-              localizationKey={actionLabel}
-              elementDescriptor={descriptors.formFieldAction}
-              elementId={descriptors.formFieldLabel.setId(id)}
-              isDisabled={isDisabled}
-              colorScheme='primary'
-              onClick={e => {
-                e.preventDefault();
-                onActionClicked?.(e);
-              }}
-            >
-              {typeof actionLabel === 'string' ? actionLabel : undefined}
-            </Link>
-          )}
+            {FieldLabel}
+            {Icon}
+            {HintLabel}
+            {ActionLabel}
+          </Flex>
         </Flex>
-      </Flex>
+      ) : (
+        <>
+          <Flex
+            justify={icon ? 'start' : 'between'}
+            align='center'
+            elementDescriptor={descriptors.formFieldLabelRow}
+            elementId={descriptors.formFieldLabelRow.setId(id)}
+            sx={theme => ({
+              marginBottom: isCheckbox ? 0 : theme.space.$1,
+              marginLeft: !isCheckbox ? 0 : theme.space.$1,
+            })}
+          >
+            {FieldLabel}
+            {Icon}
+            {HintLabel}
+            {ActionLabel}
+          </Flex>
+          {Input}
+        </>
+      )}
 
       {isSomeMessageVisible && (
         <Box
           style={{
-            height,
+            height, // dynamic height
             position: 'relative',
           }}
           sx={getFormTextAnimation(
             !!debouncedState?.isFocused || !!debouncedState?.isSuccessful || !!debouncedState?.errorText,
           )}
         >
-          {directionMessage && !successMessage && (
+          {/* Display the directions after is success message is unmounted*/}
+          {!successMessage && directionMessage && (
             <FormText
-              variant='smallRegular'
-              colorScheme='neutral'
-              style={{
-                position: 'absolute',
-                top: '0px',
-              }}
               ref={calculateHeight}
               sx={getFormTextAnimation(!!debouncedState?.isFocused && !debouncedState?.isSuccessful)}
             >
               {directionMessage}
             </FormText>
           )}
+
+          {/* Display the error message after the directions is unmounted*/}
           {!directionMessage && errorMessage && (
             <FormErrorText
               elementDescriptor={descriptors.formFieldErrorText}
               elementId={descriptors.formFieldErrorText.setId(id)}
-              style={{
-                position: 'absolute',
-                top: '0px',
-              }}
               sx={getFormTextAnimation(!!debouncedState?.errorText)}
             >
-              <Flex
-                direction={'row'}
-                align={'center'}
-                gap={2}
-              >
-                <Icon
-                  colorScheme={'danger'}
-                  icon={ExclamationCircle}
-                />
-                {errorMessage}
-              </Flex>
+              {errorMessage}
             </FormErrorText>
           )}
+
+          {/* Display the success message after the error message is unmounted*/}
           {!errorMessage && successMessage && (
             <FormSuccessText
               elementDescriptor={descriptors.formFieldErrorText}
               elementId={descriptors.formFieldErrorText.setId(id)}
-              colorScheme={'neutral'}
-              style={{
-                position: 'absolute',
-                top: '0px',
-              }}
               sx={getFormTextAnimation(!!debouncedState?.isSuccessful)}
             >
-              <Flex
-                direction={'row'}
-                align={'center'}
-                gap={2}
-              >
-                <Icon
-                  colorScheme={'success'}
-                  icon={CheckCircle}
-                />
-                {successMessage}
-              </Flex>
+              {successMessage}
             </FormSuccessText>
           )}
         </Box>

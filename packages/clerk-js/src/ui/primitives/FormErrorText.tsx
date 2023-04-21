@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 
+import { Icon } from '../customizables';
+import { ExclamationCircle } from '../icons';
 import type { StyleVariants } from '../styledSystem';
 import { animations, createVariants } from '../styledSystem';
 import { useFormControl } from './hooks';
-import type { TextProps } from './Text';
 import { Text } from './Text';
 
 const { applyVariants } = createVariants(theme => ({
@@ -11,28 +12,40 @@ const { applyVariants } = createVariants(theme => ({
     willChange: 'transform, opacity, height',
     marginTop: theme.sizes.$2,
     animation: `${animations.textInSmall} ${theme.transitionDuration.$fast}`,
+    display: 'flex',
+    gap: theme.sizes.$2,
+    position: 'absolute',
+    top: '0',
   },
   variants: {},
 }));
 
-type FormErrorTextProps = React.PropsWithChildren<StyleVariants<typeof applyVariants> & TextProps>;
+type FormErrorTextProps = React.PropsWithChildren<StyleVariants<typeof applyVariants>>;
 
-export const FormErrorText = (props: FormErrorTextProps) => {
+export const FormErrorText = forwardRef<HTMLElement, FormErrorTextProps>((props, ref) => {
   const { hasError, errorMessageId } = useFormControl() || {};
 
   if (!hasError && !props.children) {
     return null;
   }
 
+  const { children, ...rest } = props;
+
   return (
-    // @ts-expect-error
     <Text
+      ref={ref}
       variant='smallRegular'
       colorScheme='danger'
       aria-live='polite'
       id={errorMessageId}
-      {...props}
+      {...rest}
       css={applyVariants(props)}
-    />
+    >
+      <Icon
+        colorScheme={'danger'}
+        icon={ExclamationCircle}
+      />
+      {children}
+    </Text>
   );
-};
+});
