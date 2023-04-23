@@ -18,6 +18,10 @@ export function setDevBrowserJWTInURL(url: string, jwt: string): string {
 
 export function getDevBrowserJWTFromURL(url: string): string {
   const jwt = extractDevBrowserJWT(url);
+  if (!jwt) {
+    return '';
+  }
+
   let newUrl = url.replace(DEV_BROWSER_JWT_MARKER_REGEXP, '');
 
   if (newUrl.endsWith('#')) {

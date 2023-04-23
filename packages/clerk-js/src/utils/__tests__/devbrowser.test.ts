@@ -39,6 +39,11 @@ describe('getDevBrowserJWTFromURL(url,)', () => {
     replaceStateMock.mockReset();
   });
 
+  it('does not replaceState if the url does not contain a dev browser JWT', () => {
+    expect(getDevBrowserJWTFromURL('/foo')).toEqual('');
+    expect(replaceStateMock).not.toHaveBeenCalled();
+  });
+
   const testCases: Array<[string, string, null | string]> = [
     ['', '', null],
     ['foo', '', null],
@@ -48,8 +53,13 @@ describe('getDevBrowserJWTFromURL(url,)', () => {
     ['#foo__clerk_db_jwt[deadbeef]', 'deadbeef', '#foo'],
     ['/foo?bar=42#qux__clerk_db_jwt[deadbeef]', 'deadbeef', '/foo?bar=42#qux'],
   ];
+
   test.each(testCases)('returns the dev browser JWT from a url. Params: url=(%s), jwt=(%s)', (url, jwt, calledWith) => {
     expect(getDevBrowserJWTFromURL(url)).toEqual(jwt);
-    calledWith && expect(replaceStateMock).toHaveBeenCalledWith(null, '', calledWith);
+    if (calledWith === null) {
+      expect(replaceStateMock).not.toHaveBeenCalled();
+    } else {
+      expect(replaceStateMock).toHaveBeenCalledWith(null, '', calledWith);
+    }
   });
 });
