@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.38.4](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.38.3...@clerk/clerk-js@4.38.4) (2023-04-23)
+
+### Bug Fixes
+
+- **clerk-js:** Do not replaceState if a db JWT is not found in the url ([#1100](https://github.com/clerkinc/javascript/issues/1100)) ([ca6262d](https://github.com/clerkinc/javascript/commit/ca6262dbe331b34c6840a1302fe8ac41821d287b))
+
 ### [4.38.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.38.3-staging.0...@clerk/clerk-js@4.38.3) (2023-04-19)
 
 **Note:** Version bump only for package @clerk/clerk-js
