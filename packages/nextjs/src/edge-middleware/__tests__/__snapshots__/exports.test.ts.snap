@@ -45,6 +45,7 @@ Array [
   "organizations",
   "phoneNumbers",
   "prunePrivateMetadata",
+  "redirect",
   "requireAuth",
   "requireEdgeMiddlewareAuth",
   "sanitizeAuthObject",
