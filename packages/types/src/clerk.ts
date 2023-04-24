@@ -373,10 +373,11 @@ export interface Clerk {
   redirectToHome: () => void;
 
   /**
-   * Completes an OAuth flow started by {@link Clerk.client.signIn.authenticateWithRedirect} or {@link Clerk.client.signUp.authenticateWithRedirect}
+   * Completes an OAuth or SAML redirection flow started by
+   * {@link Clerk.client.signIn.authenticateWithRedirect} or {@link Clerk.client.signUp.authenticateWithRedirect}
    */
   handleRedirectCallback: (
-    params: HandleOAuthCallbackParams,
+    params: HandleOAuthCallbackParams | HandleSamlCallbackParams,
     customNavigate?: (to: string) => Promise<unknown>,
   ) => Promise<unknown>;
 
@@ -450,6 +451,11 @@ export type HandleOAuthCallbackParams = {
    */
   continueSignUpUrl?: string | null;
 };
+
+/**
+ * @experimental
+ */
+export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
 
 // TODO: Make sure Isomorphic Clerk navigate can work with the correct type:
 // (to: string) => Promise<unknown>
