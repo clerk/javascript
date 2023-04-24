@@ -14,6 +14,7 @@ export * from './Input';
 export * from './FormControl';
 export * from './FormErrorText';
 export * from './FormSuccessText';
+export * from './FormWarningText';
 export * from './FormText';
 export * from './FormLabel';
 export * from './Form';

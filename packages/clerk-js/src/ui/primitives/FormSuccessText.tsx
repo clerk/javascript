@@ -4,7 +4,6 @@ import { Icon } from '../customizables';
 import { CheckCircle } from '../icons';
 import type { StyleVariants } from '../styledSystem';
 import { animations, createVariants } from '../styledSystem';
-import { useFormControl } from './hooks';
 import { Text } from './Text';
 
 export const { applyVariants } = createVariants(theme => ({
@@ -23,12 +22,6 @@ export const { applyVariants } = createVariants(theme => ({
 export type FormTextProps = React.PropsWithChildren<StyleVariants<typeof applyVariants>>;
 
 export const FormSuccessText = forwardRef<HTMLElement, FormTextProps>((props, ref) => {
-  const { hasError } = useFormControl() || {};
-
-  if (!hasError && !props.children) {
-    return null;
-  }
-
   const { children, ...rest } = props;
 
   return (

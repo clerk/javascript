@@ -9,6 +9,8 @@ export function useDelayUnmount<T>(isMounted: T, delayTime: number) {
       timeoutId = setTimeout(() => setShouldRender(isMounted), delayTime);
     } else if (!isMounted && shouldRender) {
       timeoutId = setTimeout(() => setShouldRender(undefined), delayTime);
+    } else {
+      setShouldRender(isMounted);
     }
     return () => clearTimeout(timeoutId);
   }, [isMounted, delayTime, shouldRender]);
