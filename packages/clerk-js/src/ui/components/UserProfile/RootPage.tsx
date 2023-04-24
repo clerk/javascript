@@ -21,7 +21,7 @@ export const RootPage = withCardStateProvider(() => {
   const showEmail = attributes.email_address.enabled;
   const showPhone = attributes.phone_number.enabled;
   const showConnectedAccounts = social && Object.values(social).filter(p => p.enabled).length > 0;
-  const showSamlAccounts = saml && saml.length > 0;
+  const showSamlAccounts = saml.enabled;
   const showWeb3 = attributes.web3_wallet.enabled;
   const showPassword = instanceIsPasswordBased;
   const showMfa = getSecondFactors(attributes).length > 0;

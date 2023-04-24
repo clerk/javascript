@@ -3,7 +3,7 @@ import type {
   OAuthProviders,
   OAuthStrategy,
   PasswordSettingsData,
-  SamlConnection,
+  SamlSettings,
   SignInData,
   SignUpData,
   UserSettingsJSON,
@@ -19,7 +19,7 @@ import { BaseResource } from './internal';
 export class UserSettings extends BaseResource implements UserSettingsResource {
   id = undefined;
   social!: OAuthProviders;
-  saml!: SamlConnection[];
+  saml!: SamlSettings;
   attributes!: Attributes;
   signIn!: SignInData;
   signUp!: SignUpData;
