@@ -9,6 +9,7 @@ export * from './ExternalAccount';
 export * from './IdentificationLink';
 export * from './Image';
 export * from './PhoneNumber';
+export * from './SamlAccount';
 export * from './Session';
 export * from './SessionWithActivities';
 export * from './SignIn';
