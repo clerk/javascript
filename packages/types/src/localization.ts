@@ -621,6 +621,7 @@ type UnstableErrors = WithParamName<{
   };
   zxcvbn: {
     notEnough: LocalizationValue;
+    couldBeStronger: LocalizationValue;
     warnings: {
       straightRow: LocalizationValue;
       keyPattern: LocalizationValue;

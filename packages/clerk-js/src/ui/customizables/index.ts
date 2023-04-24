@@ -32,6 +32,7 @@ export const FormControl = makeCustomizable(sanitizeDomProps(Primitives.FormCont
 export const FormLabel = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.FormLabel)));
 export const FormErrorText = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.FormErrorText)));
 export const FormSuccessText = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.FormSuccessText)));
+export const FormWarningText = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.FormWarningText)));
 export const FormText = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.FormText)));
 export const Form = makeCustomizable(sanitizeDomProps(Primitives.Form));
 export const Icon = makeCustomizable(sanitizeDomProps(Primitives.Icon));
