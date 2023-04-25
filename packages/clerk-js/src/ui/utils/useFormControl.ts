@@ -177,7 +177,7 @@ type DebouncingOption = {
 export const useFormControlFeedback = (
   opts: DebouncingOption,
   skipBlur = false,
-  delayTime = 300,
+  delayTime = 100,
 ): DebouncedFeedback => {
   const {
     hasLostFocus = false,
