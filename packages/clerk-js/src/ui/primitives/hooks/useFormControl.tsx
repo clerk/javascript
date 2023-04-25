@@ -13,7 +13,6 @@ export type FormControlProps = {
   isDisabled?: boolean;
   setError: (error: string | ClerkAPIError | undefined) => void;
   setSuccessful: (isSuccess: boolean) => void;
-  isSuccessful: boolean;
   setWarning: (error: string | undefined) => void;
 };
 
@@ -29,7 +28,6 @@ export const FormControlContextProvider = (props: React.PropsWithChildren<FormCo
     hasError = false,
     isDisabled = false,
     setError,
-    isSuccessful,
     setSuccessful,
     setWarning,
   } = props;
@@ -49,12 +47,11 @@ export const FormControlContextProvider = (props: React.PropsWithChildren<FormCo
         errorMessageId,
         isDisabled,
         setError,
-        isSuccessful,
         setSuccessful,
         setWarning,
       },
     }),
-    [isRequired, hasError, id, errorMessageId, isDisabled, setError, isSuccessful, setSuccessful],
+    [isRequired, hasError, id, errorMessageId, isDisabled, setError, setSuccessful],
   );
   return <FormControlContext.Provider value={value}>{props.children}</FormControlContext.Provider>;
 };

@@ -47,10 +47,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
   const propsWithoutVariants = filterProps({
     ...props,
     hasError: props.hasError || formControlProps.hasError,
-    isSuccessful: props.isSuccessful || formControlProps.isSuccessful,
   });
   const { onChange } = useInput(propsWithoutVariants.onChange);
-  const { isDisabled, hasError, focusRing, isRequired, isSuccessful, ...rest } = propsWithoutVariants;
+  const { isDisabled, hasError, focusRing, isRequired, ...rest } = propsWithoutVariants;
 
   return (
     <input

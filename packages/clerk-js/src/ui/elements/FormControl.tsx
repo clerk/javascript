@@ -75,7 +75,7 @@ function useFormTextAnimation() {
         };
       }
       return t => ({
-        animation: `${enterAnimation ? animations.inAnimation : animations.outAnimation} 600ms ${
+        animation: `${enterAnimation ? animations.inAnimation : animations.outAnimation} 300ms ${
           t.transitionTiming.$common
         }`,
       });
@@ -88,28 +88,25 @@ function useFormTextAnimation() {
   };
 }
 
-const useCalculateErrorTextHeight = (messageToDisplay: string | undefined) => {
+const useCalculateErrorTextHeight = () => {
   const [height, setHeight] = useState(24);
 
-  const calculateHeight = useCallback(
-    (element: HTMLElement | null) => {
-      if (element) {
-        const fontSize = parseInt(getComputedStyle(element).fontSize.replace('px', ''));
-        const width = parseInt(getComputedStyle(element).width.replace('px', ''));
-        const lineHeight = parseInt(getComputedStyle(element).lineHeight.replace('px', '')) / 16;
-        const characters = messageToDisplay?.length || 0;
+  const calculateHeight = useCallback((element: HTMLElement | null, messageToDisplay: string | undefined) => {
+    if (element) {
+      const fontSize = parseInt(getComputedStyle(element).fontSize.replace('px', ''));
+      const width = parseInt(getComputedStyle(element).width.replace('px', ''));
+      const lineHeight = parseInt(getComputedStyle(element).lineHeight.replace('px', '')) / 16;
+      const characters = messageToDisplay?.length || 0;
 
-        setHeight(prevHeight => {
-          const newHeight = 10 + fontSize * lineHeight * Math.ceil(characters / (width / (fontSize * 0.6))); //0.6 is an average character width
-          if (prevHeight < newHeight) {
-            return newHeight;
-          }
-          return prevHeight;
-        });
-      }
-    },
-    [messageToDisplay],
-  );
+      setHeight(prevHeight => {
+        const newHeight = 10 + fontSize * lineHeight * Math.ceil(characters / (width / (fontSize * 0.6))); //0.6 is an average character width
+        if (prevHeight < newHeight) {
+          return newHeight;
+        }
+        return prevHeight;
+      });
+    }
+  }, []);
   return {
     height,
     calculateHeight,
@@ -161,16 +158,18 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
     submittedWithEnter,
   );
 
-  const errorMessage = useDelayUnmount(debouncedState.errorText, 500);
-  const _successMessage = debouncedState.isSuccessful ? 'Nice work. Your password is good' : '';
-  const successMessage = useDelayUnmount(_successMessage, 500);
-  const directionMessage = useDelayUnmount(debouncedState.direction, 500);
-  const warningMessage = useDelayUnmount(debouncedState.warningText, 500);
+  const errorMessage = useDelayUnmount(debouncedState.errorText, 200);
+  const _successMessage = debouncedState.isSuccessful
+    ? t(localizationKeys('unstable__errors.zxcvbn.goodPassword'))
+    : '';
+  const successMessage = useDelayUnmount(_successMessage, 200);
+  const directionMessage = useDelayUnmount(debouncedState.direction, 200);
+  const warningMessage = useDelayUnmount(debouncedState.warningText, 200);
 
   const messageToDisplay = directionMessage || successMessage || errorMessage || warningMessage;
   const isSomeMessageVisible = !!messageToDisplay;
 
-  const { calculateHeight, height } = useCalculateErrorTextHeight(messageToDisplay);
+  const { calculateHeight, height } = useCalculateErrorTextHeight();
 
   const { getFormTextAnimation } = useFormTextAnimation();
 
@@ -260,7 +259,6 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
       isDisabled={isDisabled}
       isRequired={isRequired}
       setError={setError}
-      isSuccessful={enableErrorAfterBlur ? hasLostFocus && isSuccessful : isSuccessful}
       setSuccessful={setSuccessful}
       setWarning={setWarning}
       sx={sx}
@@ -311,17 +309,22 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
             height, // dynamic height
             position: 'relative',
           }}
-          sx={getFormTextAnimation(
-            !!debouncedState.direction ||
-              debouncedState.isSuccessful ||
-              !!debouncedState.errorText ||
-              !!debouncedState.warningText,
-          )}
+          sx={[
+            getFormTextAnimation(
+              !!debouncedState.direction ||
+                debouncedState.isSuccessful ||
+                !!debouncedState.errorText ||
+                !!debouncedState.warningText,
+            ),
+            {
+              transition: 'height 200ms ease', // This is expensive but required for a smooth layout shift
+            },
+          ]}
         >
           {/*Display the directions after is success message is unmounted*/}
-          {!successMessage && !warningMessage && directionMessage && (
+          {!successMessage && !warningMessage && !errorMessage && directionMessage && (
             <FormText
-              ref={calculateHeight}
+              ref={e => calculateHeight(e, directionMessage)}
               sx={getFormTextAnimation(
                 debouncedState.isFocused && !debouncedState?.isSuccessful && !debouncedState.warningText,
               )}
@@ -330,8 +333,9 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
             </FormText>
           )}
           {/* Display the error message after the directions is unmounted*/}
-          {!directionMessage && errorMessage && (
+          {errorMessage && (
             <FormErrorText
+              ref={e => calculateHeight(e, errorMessage)}
               elementDescriptor={descriptors.formFieldErrorText}
               elementId={descriptors.formFieldErrorText.setId(id)}
               sx={getFormTextAnimation(!!debouncedState?.errorText)}
@@ -343,6 +347,7 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
           {/* Display the success message after the error message is unmounted*/}
           {!errorMessage && successMessage && (
             <FormSuccessText
+              ref={e => calculateHeight(e, successMessage)}
               elementDescriptor={descriptors.formFieldSuccessText}
               elementId={descriptors.formFieldSuccessText.setId(id)}
               sx={getFormTextAnimation(!!debouncedState?.isSuccessful)}
@@ -353,6 +358,7 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
 
           {warningMessage && (
             <FormWarningText
+              ref={e => calculateHeight(e, warningMessage)}
               elementDescriptor={descriptors.formFieldWarningText}
               elementId={descriptors.formFieldWarningText.setId(id)}
               sx={getFormTextAnimation(!!debouncedState.warningText)}
