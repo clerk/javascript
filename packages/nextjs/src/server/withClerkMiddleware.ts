@@ -17,7 +17,7 @@ import {
   PUBLISHABLE_KEY,
   SECRET_KEY,
   SIGN_IN_URL,
-} from './clerk';
+} from './clerkClient';
 import { missingDomainAndProxy, missingSignInUrlInDev, unsupportedRelativePathProxyUrl } from './errors';
 import type { WithAuthOptions } from './types';
 import {
@@ -34,7 +34,6 @@ type NextMiddlewareResult = Awaited<ReturnType<NextMiddleware>>;
 
 interface WithClerkMiddleware {
   (handler: NextMiddleware, opts?: WithAuthOptions): NextMiddleware;
-
   (): NextMiddleware;
 }
 

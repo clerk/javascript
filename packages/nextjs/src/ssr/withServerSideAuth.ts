@@ -11,7 +11,7 @@ import {
   makeAuthObjectSerializable,
   PUBLISHABLE_KEY,
   sanitizeAuthObject,
-} from '../server/clerk';
+} from '../server/clerkClient';
 import type { WithServerSideAuthCallback, WithServerSideAuthOptions, WithServerSideAuthResult } from './types';
 import { authenticateRequest, injectAuthIntoRequest, injectSSRStateIntoProps } from './utils';
 

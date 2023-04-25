@@ -10,7 +10,7 @@ import {
 } from '@clerk/backend';
 import type { SecretKeyOrApiKey } from '@clerk/types';
 
-import { API_KEY, API_URL, API_VERSION, SECRET_KEY } from './clerk';
+import { API_KEY, API_URL, API_VERSION, SECRET_KEY } from './clerkClient';
 import type { RequestLike } from './types';
 import { getAuthKeyFromRequest, getCookie, getHeader, injectSSRStateIntoObject } from './utils';
 

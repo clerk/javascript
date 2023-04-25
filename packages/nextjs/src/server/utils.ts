@@ -1,7 +1,7 @@
 import { constants } from '@clerk/backend';
 import type { RequestCookie } from 'next/dist/server/web/spec-extension/cookies';
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
+import { headers } from 'next/headers';
+import { NextRequest, NextResponse } from 'next/server';
 
 import type { RequestLike } from './types';
 
@@ -171,3 +171,7 @@ export function isHttpOrHttps(key: string | undefined) {
 export function isDevelopmentFromApiKey(apiKey: string): boolean {
   return apiKey.startsWith('test_') || apiKey.startsWith('sk_test_');
 }
+
+export const buildRequestLike = () => {
+  return new NextRequest('https://placeholder.com', { headers: headers() });
+};

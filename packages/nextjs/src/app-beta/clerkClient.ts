@@ -1,1 +1,1 @@
-export { clerkClient } from '../server/clerk';
+export { clerkClient } from '../server/clerkClient';

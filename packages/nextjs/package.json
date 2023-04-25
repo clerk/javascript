@@ -30,7 +30,7 @@
   ],
   "scripts": {
     "prepublishOnly": "npm run build",
-    "build": "tsc -p tsconfig.build.json",
+    "build": "npm run clean && tsc -p tsconfig.build.json",
     "clean": "rimraf ./dist",
     "lint": "eslint .",
     "test": "jest",
@@ -41,6 +41,7 @@
     "@clerk/clerk-react": "^4.15.4-staging.0",
     "@clerk/clerk-sdk-node": "^4.8.7-staging.0",
     "@clerk/types": "^3.36.0-staging.0",
+    "path-to-regexp": "6.2.1",
     "tslib": "2.4.1"
   },
   "devDependencies": {

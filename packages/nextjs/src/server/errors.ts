@@ -19,3 +19,27 @@ Check if signInUrl is missing from your configuration or it is not a absolute UR
    NEXT_PUBLIC_CLERK_IS_SATELLITE='true'`;
 
 export const unsupportedRelativePathProxyUrl = `Only a absolute URL that starts with https is allowed to be used in SSR`;
+
+// export const missingConfigMatcherError = (url: string, matcher: string) =>
+//   `A request for a NextJS internal route was intercepted by authMiddleware. These requests are normally filtered out using the config.matcher in the middleware.js file.
+// The offending request URL was: ${url}.
+// To resolve, open middleware.js, configure your config.matcher as shown below and restart your dev server:
+//
+// export const config = {
+//   matcher: ${matcher},
+// };
+// `;
+
+export const receivedRequestForIgnoredRoute = (url: string, matcher: string) =>
+  `Clerk: A request for a static file or a NextJS internal route was intercepted by authMiddleware. Usually, these requests require no authentication logic so the authMiddleware ignores them by default.
+However, for improved performance, these requests should be ignored using the default config.matcher API exported from your middleware file.
+The offending request URL was: ${url}.
+
+To resolve this warning, open your middleware file, set your config.matcher as shown below and restart your dev server:
+
+export const config = {
+  matcher: ${matcher},
+};
+
+If you intentionally want to run the authMiddleware for this route, you can exclude it from the default ignoredRoutes.
+`;
