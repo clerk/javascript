@@ -3,6 +3,7 @@ import type { MultiDomainAndOrProxy, PublishableKeyOrFrontendApi, SecretKeyOrApi
 import type { IncomingMessage } from 'http';
 import type { NextApiRequest } from 'next';
 import type { NextApiRequestCookies } from 'next/dist/server/api-utils';
+import type { NextMiddleware } from 'next/dist/server/web/types';
 import type { NextRequest } from 'next/server';
 
 // Request contained in GetServerSidePropsContext, has cookies but not query
@@ -18,3 +19,5 @@ export type WithAuthOptions = Partial<PublishableKeyOrFrontendApi> &
   MultiDomainAndOrProxy & {
     signInUrl?: string;
   };
+
+export type NextMiddlewareResult = Awaited<ReturnType<NextMiddleware>>;

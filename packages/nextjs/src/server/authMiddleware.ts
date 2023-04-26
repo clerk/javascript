@@ -1,4 +1,4 @@
-import type { AuthObject, RequestState } from '@clerk/backend';
+import type { AuthObject } from '@clerk/backend';
 import { constants } from '@clerk/backend';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -6,10 +6,8 @@ import { NextResponse } from 'next/server';
 import { isRedirect, mergeResponses, paths, setHeader } from '../utils';
 import { authenticateRequest, handleInterstitialState, handleUnknownState } from './authenticateRequest';
 import { receivedRequestForIgnoredRoute } from './errors';
-import type { WithAuthOptions } from './types';
-import { handleMiddlewareResult } from './withClerkMiddleware';
-
-type NextMiddlewareResult = Awaited<ReturnType<NextMiddleware>>;
+import type { NextMiddlewareResult, WithAuthOptions } from './types';
+import { decorateRequest } from './utils';
 
 const TMP_SIGN_IN_URL = '/sign-in';
 const TMP_SIGN_UP_URL = '/sign-up';
@@ -153,11 +151,6 @@ const createDefaultAfterAuth = (isPublicRoute: ReturnType<typeof createRouteMatc
 
 const precomputePathRegex = (patterns: Array<string | RegExp>) => {
   return patterns.map(pattern => (pattern instanceof RegExp ? pattern : paths.toRegexp(pattern)));
-};
-
-const decorateRequest = (req: NextRequest, res: NextResponse, requestState: RequestState) => {
-  const { message, status, reason } = requestState;
-  return handleMiddlewareResult({ req, res, authMessage: message, authReason: reason, authStatus: status });
 };
 
 const matchRoutesStartingWith = (path: string) => {

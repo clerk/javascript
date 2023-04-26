@@ -1,10 +1,9 @@
-import type { AuthStatus, RequestState } from '@clerk/backend';
+import type { RequestState } from '@clerk/backend';
 import { constants, debugRequestState } from '@clerk/backend';
 import type { NextMiddleware } from 'next/dist/server/web/types';
 import type { NextFetchEvent, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import { constants as nextConstants } from '../constants';
 import {
   API_KEY,
   API_URL,
@@ -21,16 +20,13 @@ import {
 import { missingDomainAndProxy, missingSignInUrlInDev, unsupportedRelativePathProxyUrl } from './errors';
 import type { WithAuthOptions } from './types';
 import {
+  decorateRequest,
   getCookie,
   handleValueOrFn,
   isDevelopmentFromApiKey,
   isHttpOrHttps,
-  nextJsVersionCanOverrideRequestHeaders,
   setCustomAttributeOnRequest,
-  setRequestHeadersOnNextResponse,
 } from './utils';
-
-type NextMiddlewareResult = Awaited<ReturnType<NextMiddleware>>;
 
 interface WithClerkMiddleware {
   (handler: NextMiddleware, opts?: WithAuthOptions): NextMiddleware;
@@ -126,80 +122,6 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
 
     // get result from provided handler
     const res = await handler(req, event);
-
-    const { status: authStatus, reason: authReason, message: authMessage } = requestState;
-
-    return handleMiddlewareResult({ req, res, authStatus, authReason, authMessage });
+    return decorateRequest(req, res, requestState);
   };
 };
-
-type HandleMiddlewareResultProps = {
-  req: NextRequest;
-  res: NextMiddlewareResult;
-  authStatus: AuthStatus;
-  authReason: string | null;
-  authMessage: string | null;
-};
-
-// Auth result will be set as both a query param & header when applicable
-export function handleMiddlewareResult({
-  req,
-  res,
-  authStatus,
-  authMessage,
-  authReason,
-}: HandleMiddlewareResultProps): NextMiddlewareResult {
-  // pass-through case, convert to next()
-  if (!res) {
-    res = NextResponse.next();
-  }
-
-  // redirect() case, return early
-  if (res.headers.get(nextConstants.Headers.NextRedirect)) {
-    return res;
-  }
-
-  let rewriteURL;
-
-  // next() case, convert to a rewrite
-  if (res.headers.get(nextConstants.Headers.NextResume) === '1') {
-    res.headers.delete(nextConstants.Headers.NextResume);
-    rewriteURL = new URL(req.url);
-  }
-
-  // rewrite() case, set auth result only if origin remains the same
-  const rewriteURLHeader = res.headers.get(nextConstants.Headers.NextRewrite);
-
-  if (rewriteURLHeader) {
-    const reqURL = new URL(req.url);
-    rewriteURL = new URL(rewriteURLHeader);
-
-    // if the origin has changed, return early
-    if (rewriteURL.origin !== reqURL.origin) {
-      return res;
-    }
-  }
-
-  if (rewriteURL) {
-    if (nextJsVersionCanOverrideRequestHeaders()) {
-      // If we detect that the host app is using a nextjs installation that reliably sets the
-      // request headers, we don't need to fall back to the searchParams strategy.
-      // In this case, we won't set them at all in order to avoid having them visible in the req.url
-      setRequestHeadersOnNextResponse(res, req, {
-        [constants.Headers.AuthStatus]: authStatus,
-        [constants.Headers.AuthMessage]: authMessage || '',
-        [constants.Headers.AuthReason]: authReason || '',
-      });
-    } else {
-      res.headers.set(constants.Headers.AuthStatus, authStatus);
-      res.headers.set(constants.Headers.AuthMessage, authMessage || '');
-      res.headers.set(constants.Headers.AuthReason, authReason || '');
-      rewriteURL.searchParams.set(constants.SearchParams.AuthStatus, authStatus);
-      rewriteURL.searchParams.set(constants.Headers.AuthMessage, authMessage || '');
-      rewriteURL.searchParams.set(constants.Headers.AuthReason, authReason || '');
-    }
-    res.headers.set(nextConstants.Headers.NextRewrite, rewriteURL.href);
-  }
-
-  return res;
-}
