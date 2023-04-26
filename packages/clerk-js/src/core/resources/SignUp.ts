@@ -195,6 +195,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   }: AuthenticateWithRedirectParams & { unsafeMetadata?: SignUpUnsafeMetadata }): Promise<void> => {
     const authenticateFn = (args: SignUpCreateParams | SignUpUpdateParams) =>
       continueSignUp && this.id ? this.update(args) : this.create(args);
+
     const { verifications } = await authenticateFn({
       strategy,
       redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectUrl),
@@ -202,6 +203,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       unsafeMetadata,
       emailAddress,
     });
+
     const { externalAccount } = verifications;
     const { status, externalVerificationRedirectURL } = externalAccount;
 

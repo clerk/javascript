@@ -2,14 +2,14 @@ import type { OAuthStrategy, SamlStrategy } from './strategies';
 
 export type AuthenticateWithRedirectParams = {
   /**
-   * Full URL or path to the route that will complete the OAuth flow.
+   * Full URL or path to the route that will complete the OAuth or SAML flow.
    * Typically, this will be a simple `/sso-callback` route that calls `Clerk.handleRedirectCallback`
    * or mounts the <AuthenticateWithRedirectCallback /> component.
    */
   redirectUrl: string;
 
   /**
-   * Full URL or path to navigate after the OAuth flow completes.
+   * Full URL or path to navigate after the OAuth or SAML flow completes.
    */
   redirectUrlComplete: string;
 
