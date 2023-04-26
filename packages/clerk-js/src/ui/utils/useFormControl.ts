@@ -201,8 +201,8 @@ export const useFormControlFeedback = (
 
   const feedbackMemo = useMemo(() => {
     const _errorText = canDisplayFeedback ? errorText : '';
-    const _warningText = canDisplayFeedback ? warningText : '';
-    const _isSuccessful = canDisplayFeedback && isSuccessful;
+    const _warningText = warningText;
+    const _isSuccessful = isSuccessful;
 
     /*
      * On keyboard navigation avoid displaying the direction when an error is present.

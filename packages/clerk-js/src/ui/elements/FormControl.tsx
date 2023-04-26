@@ -78,6 +78,7 @@ function useFormTextAnimation() {
         animation: `${enterAnimation ? animations.inAnimation : animations.outAnimation} 300ms ${
           t.transitionTiming.$common
         }`,
+        transition: 'height 200ms ease', // This is expensive but required for a smooth layout shift
       });
     },
     [prefersReducedMotion],
@@ -139,7 +140,6 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
     setWarning,
     ...rest
   } = props;
-  const hasError = !!errorText && hasLostFocus;
   const isDisabled = props.isDisabled || card.isLoading;
 
   const InputElement = getInputElementForType(props.type);
@@ -225,7 +225,7 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
       localizationKey={typeof label === 'object' ? label : undefined}
       elementDescriptor={descriptors.formFieldLabel}
       elementId={descriptors.formFieldLabel.setId(id)}
-      hasError={hasError}
+      hasError={!!errorMessage}
       isDisabled={isDisabled}
       isRequired={isRequired}
       sx={{
@@ -241,7 +241,7 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
     <InputElement
       elementDescriptor={descriptors.formFieldInput}
       elementId={descriptors.formFieldInput.setId(id)}
-      hasError={hasError}
+      hasError={!!errorMessage}
       isDisabled={isDisabled}
       isRequired={isRequired}
       {...rest}
@@ -255,7 +255,7 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
       elementDescriptor={descriptors.formField}
       elementId={descriptors.formField.setId(id)}
       id={id}
-      hasError={hasError}
+      hasError={!!errorMessage}
       isDisabled={isDisabled}
       isRequired={isRequired}
       setError={setError}
@@ -316,9 +316,6 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
                 !!debouncedState.errorText ||
                 !!debouncedState.warningText,
             ),
-            {
-              transition: 'height 200ms ease', // This is expensive but required for a smooth layout shift
-            },
           ]}
         >
           {/*Display the directions after is success message is unmounted*/}
