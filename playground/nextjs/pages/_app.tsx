@@ -25,7 +25,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     <ClerkProvider
       appearance={{
         baseTheme: themes[selectedTheme],
-        variables: { colorPrimary: '#f85656' },
+        variables: { colorPrimary: '#0284c7' },
       }}
       {...pageProps}
     >

@@ -59,6 +59,11 @@ const navbarSlideIn = keyframes`
   100% {opacity: 1; transform: translateX(0);}
 `;
 
+const dash = keyframes`
+  0% {opacity: 0; transform: translate(-16px, -16px);}
+  100% { opacity: 1; transform: translate(0, 0);}
+`;
+
 export const animations = {
   spinning,
   dropdownSlideInScaleAndFade,
@@ -67,6 +72,7 @@ export const animations = {
   textInSmall,
   textInBig,
   blockBigIn,
+  dash,
   expandIn,
   navbarSlideIn,
 };

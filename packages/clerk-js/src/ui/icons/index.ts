@@ -38,3 +38,4 @@ export { default as ThreeDots } from './threeDots.svg';
 export { default as Billing } from './billing.svg';
 export { default as Close } from './close.svg';
 export { default as QuestionMark } from './question-mark.svg';
+export { AnimatedEye } from './AnimatedEye';
