@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { buildAuthQueryString, buildURL, extractAuthPathByPriority } from '../../utils';
+import { buildAuthQueryString, buildURL, pickRedirectionProp } from '../../utils';
 import { useCoreClerk, useEnvironment, useOptions } from '../contexts';
 import { useNavigate } from '../hooks';
 import type { ParsedQs } from '../router';
@@ -39,7 +39,7 @@ export const useSignUpContext = (): SignUpContextType => {
   }
 
   const afterSignUpUrl = clerk.buildUrlWithAuth(
-    extractAuthPathByPriority('afterSignUpUrl', {
+    pickRedirectionProp('afterSignUpUrl', {
       queryParams,
       ctx,
       options,
@@ -48,7 +48,7 @@ export const useSignUpContext = (): SignUpContextType => {
   );
 
   const afterSignInUrl = clerk.buildUrlWithAuth(
-    extractAuthPathByPriority('afterSignInUrl', {
+    pickRedirectionProp('afterSignInUrl', {
       queryParams,
       ctx,
       options,
@@ -58,7 +58,7 @@ export const useSignUpContext = (): SignUpContextType => {
 
   const navigateAfterSignUp = () => navigate(afterSignUpUrl);
 
-  let signInUrl = extractAuthPathByPriority('signInUrl', { ctx, options, displayConfig }, false);
+  let signInUrl = pickRedirectionProp('signInUrl', { ctx, options, displayConfig }, false);
 
   // Add query strings to the sign in URL
   const authQs = buildAuthQueryString({
@@ -109,7 +109,7 @@ export const useSignInContext = (): SignInContextType => {
   }
 
   const afterSignUpUrl = clerk.buildUrlWithAuth(
-    extractAuthPathByPriority('afterSignUpUrl', {
+    pickRedirectionProp('afterSignUpUrl', {
       queryParams,
       ctx,
       options,
@@ -118,7 +118,7 @@ export const useSignInContext = (): SignInContextType => {
   );
 
   const afterSignInUrl = clerk.buildUrlWithAuth(
-    extractAuthPathByPriority('afterSignInUrl', {
+    pickRedirectionProp('afterSignInUrl', {
       queryParams,
       ctx,
       options,
@@ -128,7 +128,7 @@ export const useSignInContext = (): SignInContextType => {
 
   const navigateAfterSignIn = () => navigate(afterSignInUrl);
 
-  let signUpUrl = extractAuthPathByPriority('signUpUrl', { ctx, options, displayConfig }, false);
+  let signUpUrl = pickRedirectionProp('signUpUrl', { ctx, options, displayConfig }, false);
 
   // Add query strings to the sign in URL
   const authQs = buildAuthQueryString({
@@ -189,7 +189,7 @@ export const useUserButtonContext = () => {
     throw new Error('Clerk: useUserButtonContext called outside of the mounted UserButton component.');
   }
 
-  const signInUrl = extractAuthPathByPriority('signInUrl', { ctx, options, displayConfig }, false);
+  const signInUrl = pickRedirectionProp('signInUrl', { ctx, options, displayConfig }, false);
   const userProfileUrl = ctx.userProfileUrl || displayConfig.userProfileUrl;
 
   const afterMultiSessionSingleSignOutUrl = ctx.afterMultiSessionSingleSignOutUrl || displayConfig.afterSignOutOneUrl;

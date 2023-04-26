@@ -58,7 +58,6 @@ import {
   createCookieHandler,
   createPageLifecycle,
   errorThrower,
-  extractAuthPathByPriority,
   getClerkQueryParam,
   hasExternalAccountSignUpError,
   ignoreEventValue,
@@ -69,6 +68,7 @@ import {
   isError,
   noOrganizationExists,
   noUserExists,
+  pickRedirectionProp,
   removeClerkQueryParam,
   sessionExistsAndSingleSessionModeEnabled,
   setDevBrowserJWTInURL,
@@ -628,11 +628,11 @@ export default class Clerk implements ClerkInterface {
   }
 
   public buildSignInUrl(options?: RedirectOptions): string {
-    return this.#buildSignInOrUpUrl('signInUrl', options);
+    return this.#buildUrl('signInUrl', options);
   }
 
   public buildSignUpUrl(options?: RedirectOptions): string {
-    return this.#buildSignInOrUpUrl('signUpUrl', options);
+    return this.#buildUrl('signUpUrl', options);
   }
 
   public buildUserProfileUrl(): string {
@@ -1312,17 +1312,18 @@ export default class Clerk implements ClerkInterface {
     });
   };
 
-  #buildSignInOrUpUrl = (key: 'signInUrl' | 'signUpUrl', options?: RedirectOptions): string => {
-    const opts: RedirectOptions = {
-      afterSignInUrl: extractAuthPathByPriority('afterSignInUrl', { ctx: options, options: this.#options }, false),
-      afterSignUpUrl: extractAuthPathByPriority('afterSignUpUrl', { ctx: options, options: this.#options }, false),
-      redirectUrl: options?.redirectUrl || window.location.href,
-    };
-    if (!this.#environment || !this.#environment.displayConfig) {
+  #buildUrl = (key: 'signInUrl' | 'signUpUrl', options?: RedirectOptions): string => {
+    if (!this.#isReady || !this.#environment || !this.#environment.displayConfig) {
       return '';
     }
 
-    const signInOrUpUrl = extractAuthPathByPriority(
+    const opts: RedirectOptions = {
+      afterSignInUrl: pickRedirectionProp('afterSignInUrl', { ctx: options, options: this.#options }, false),
+      afterSignUpUrl: pickRedirectionProp('afterSignUpUrl', { ctx: options, options: this.#options }, false),
+      redirectUrl: options?.redirectUrl || window.location.href,
+    };
+
+    const signInOrUpUrl = pickRedirectionProp(
       key,
       { options: this.#options, displayConfig: this.#environment.displayConfig },
       false,

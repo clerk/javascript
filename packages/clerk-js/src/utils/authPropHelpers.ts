@@ -5,9 +5,9 @@ import qs from 'qs';
 
 import { hasBannedProtocol, isValidUrl } from './index';
 
-type ExtractAuthUrlKey = 'afterSignUpUrl' | 'afterSignInUrl' | 'signInUrl' | 'signUpUrl';
+type PickRedirectionUrlKey = 'afterSignUpUrl' | 'afterSignInUrl' | 'signInUrl' | 'signUpUrl';
 
-type ExtractAuthOptions = {
+type PickRedirectionOptions = {
   queryParams?: ParsedQs;
   displayConfig?: DisplayConfigResource;
   options?: ClerkOptions;
@@ -16,7 +16,7 @@ type ExtractAuthOptions = {
 
 /**
  *
- * extractAuthPathByPriority(key, options, accessRedirectUrl)
+ * pickRedirectionProp(key, options, accessRedirectUrl)
  *
  * Retrieve auth redirect props passed through querystring parameters, component props, ClerkProvider props
  * or display config settings.
@@ -27,9 +27,9 @@ type ExtractAuthOptions = {
  * 3. ClerkProvider props
  * 4. Display configuration payload
  */
-export const extractAuthPathByPriority = (
-  key: ExtractAuthUrlKey,
-  { ctx, queryParams, displayConfig, options }: ExtractAuthOptions,
+export const pickRedirectionProp = (
+  key: PickRedirectionUrlKey,
+  { ctx, queryParams, displayConfig, options }: PickRedirectionOptions,
   accessRedirectUrl = true,
 ): string => {
   const snakeCaseField = camelToSnake(key);
