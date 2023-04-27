@@ -4,6 +4,7 @@ import { useWizard, Wizard } from '../../common';
 import { useCoreUser } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
+import { MIN_PASSWORD_LENGTH } from '../../hooks';
 import { handleError, useFormControl } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
@@ -62,7 +63,8 @@ export const PasswordPage = withCardStateProvider(() => {
     label: localizationKeys('formFieldLabel__signOutOfOtherSessions'),
   });
 
-  const isPasswordMatch = passwordField.value.trim().length > 7 && passwordField.value === confirmField.value;
+  const isPasswordMatch =
+    passwordField.value.trim().length >= MIN_PASSWORD_LENGTH && passwordField.value === confirmField.value;
   const hasErrors = !!passwordField.errorText || !!confirmField.errorText;
   const canSubmit =
     (user.passwordEnabled ? currentPasswordField.value && isPasswordMatch : isPasswordMatch) && !hasErrors;

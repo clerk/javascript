@@ -7,7 +7,7 @@ import { Card, CardAlert, Header, useCardState, withCardStateProvider } from '..
 import { Flex, Spinner } from '../../primitives';
 import { useRouter } from '../../router';
 
-const useActivateSession = () => {
+const useSetSessionWithTimeout = () => {
   const { queryString } = useRouter();
   const { setActive } = useCoreClerk();
   const { navigateAfterSignIn } = useSignInContext();
@@ -27,11 +27,11 @@ const useActivateSession = () => {
         clearTimeout(timeoutId);
       }
     };
-  });
+  }, []);
 };
 export const _ResetPasswordSuccess = () => {
   const card = useCardState();
-  useActivateSession();
+  useSetSessionWithTimeout();
   return (
     <Card>
       <CardAlert>{card.error}</CardAlert>

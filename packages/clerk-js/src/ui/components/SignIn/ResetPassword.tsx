@@ -5,6 +5,7 @@ import { withRedirectToHomeSingleSessionGuard } from '../../common';
 import { useCoreSignIn } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { Card, CardAlert, Form, Header, useCardState, withCardStateProvider } from '../../elements';
+import { MIN_PASSWORD_LENGTH } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
@@ -30,7 +31,8 @@ export const _ResetPassword = () => {
     enableErrorAfterBlur: true,
   });
 
-  const canSubmit = passwordField.value.trim().length > 7 && passwordField.value === confirmField.value;
+  const canSubmit =
+    passwordField.value.trim().length >= MIN_PASSWORD_LENGTH && passwordField.value === confirmField.value;
 
   const checkPasswordMatch = useCallback(
     (confirmPassword: string) => {

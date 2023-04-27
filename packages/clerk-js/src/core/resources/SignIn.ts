@@ -32,6 +32,7 @@ import {
   clerkInvalidFAPIResponse,
   clerkInvalidStrategy,
   clerkMissingOptionError,
+  clerkResetPasswordMissingEmailOrPhone,
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
@@ -94,9 +95,11 @@ export class SignIn extends BaseResource implements SignInResource {
       case 'reset_password_code':
         if (factor.emailAddressId) {
           config = { emailAddressId: factor?.emailAddressId } as ResetPasswordCodeFactorConfig;
-          break;
+        } else if (factor.phoneNumberId) {
+          config = { phoneNumberId: factor?.phoneNumberId } as ResetPasswordCodeFactorConfig;
+        } else {
+          clerkResetPasswordMissingEmailOrPhone();
         }
-        config = { phoneNumberId: factor?.phoneNumberId } as ResetPasswordCodeFactorConfig;
         break;
       default:
         clerkInvalidStrategy('SignIn.prepareFirstFactor', factor.strategy);
