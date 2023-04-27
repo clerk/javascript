@@ -1,8 +1,9 @@
-import { SignIn } from '@clerk/nextjs/app-beta';
+import { SignIn } from '@clerk/nextjs';
 
 export default function Page() {
   return (
     <div>
+      here?
       <SignIn
         routing={'path'}
         path={'/sign-in'}

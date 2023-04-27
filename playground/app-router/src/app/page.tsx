@@ -1,6 +1,13 @@
 import Image from 'next/image';
 import styles from './page.module.css';
 
+declare global {
+  interface UserPublicMetadata {
+    spotifyToken?: string;
+    isNewUser?: boolean;
+  }
+}
+
 export default function Home() {
   return (
     <main className={styles.main}>

@@ -1,7 +1,7 @@
 import './globals.css';
 import { Inter } from 'next/font/google';
-import { ClerkProvider } from '@clerk/nextjs/app-beta';
-import Link from 'next/link';
+import { auth, ClerkProvider } from '@clerk/nextjs';
+import { Links } from '@/common/Links';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -11,14 +11,14 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  console.log(auth());
   return (
     <ClerkProvider clerkJSUrl={'https://js.lclclerk.com/npm/clerk.browser.js'}>
       <html lang='en'>
         <body className={inter.className}>
+          <Links />
           <div style={{ margin: '1rem', padding: '1rem', border: '1px solid green' }}>
-            Root layout <br />
-            <Link href={'/'}>Home</Link> || <Link href={'/sign-in'}>Sign in</Link> ||{' '}
-            <Link href={'/sign-up'}>Sign up</Link> ||
+            <h2>Root layout</h2>
             {children}
           </div>
         </body>

@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "npm run yalc && rm -rf .next && next dev --port 4011",
+    "dev1": "npm run yalc && rm -rf .next && next dev --port 4011",
+    "dev": "next dev --port 4011",
     "yalc": "yalc add @clerk/nextjs && yalc add @clerk/clerk-react && yalc add @clerk/backend && yalc add @clerk/types",
     "build": "next build",
     "start": "next start",
@@ -17,7 +18,7 @@
     "@types/node": "18.16.0",
     "@types/react": "18.0.38",
     "@types/react-dom": "18.0.11",
-    "next": "^13.3.1",
+    "next": "^13.3.2-canary.9",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "typescript": "5.0.4"
