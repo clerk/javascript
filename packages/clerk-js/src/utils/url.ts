@@ -1,5 +1,5 @@
 import { camelToSnake, createDevOrStagingUrlCache, isIPV4Address } from '@clerk/shared';
-import type { SignUpResource } from '@clerk/types';
+import type { Clerk, SignUpResource } from '@clerk/types';
 
 import { loadScript } from '../utils';
 import { joinPaths } from './path';
@@ -362,3 +362,16 @@ export const mergeFragmentIntoUrl = (_url: string | URL): URL => {
 export const pathFromFullPath = (fullPath: string) => {
   return fullPath.replace(/CLERK-ROUTER\/(.*?)\//, '');
 };
+
+const frontendApiRedirectPaths: string[] = [
+  '/oauth/authorize', // OAuth2 identify provider flow
+  '/v1/verify', // magic links
+  '/v1/tickets/accept', // ticket flow
+];
+
+export function isRedirectForFAPIInitiatedFlow(clerk: Clerk, redirectUrl: string): boolean {
+  const url = new URL(redirectUrl, DUMMY_URL_BASE);
+  const path = url.pathname;
+
+  return clerk.frontendApi === url.host && frontendApiRedirectPaths.includes(path);
+}
