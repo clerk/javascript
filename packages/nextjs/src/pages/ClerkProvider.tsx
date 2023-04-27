@@ -9,11 +9,9 @@ import { invalidateNextRouterCache } from './invalidateNextRouterCache';
 // TODO: Import from shared once [JS-118] is done
 const useSafeLayoutEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect;
 
-__internal__setErrorThrowerOptions({
-  packageName: '@clerk/nextjs',
-});
+__internal__setErrorThrowerOptions({ packageName: '@clerk/nextjs' });
 
-export * from '@clerk/clerk-react';
+// export * from '@clerk/clerk-react';
 
 type NextClerkProviderProps = {
   children: React.ReactNode;
@@ -80,6 +78,7 @@ export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JS
       initialState={authServerSideProps?.__clerk_ssr_state || __clerk_ssr_state}
       {...restProps}
     >
+      <h2>pages/clerkprovider</h2>
       {children}
     </ReactClerkProvider>
   );

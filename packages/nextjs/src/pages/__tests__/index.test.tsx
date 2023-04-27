@@ -1,6 +1,6 @@
 import { expectTypeOf } from 'expect-type';
 
-import type { ClerkProvider } from '..';
+import type { ClerkProvider } from '../ClerkProvider';
 
 type ClerkProviderProps = Parameters<typeof ClerkProvider>[0];
 
