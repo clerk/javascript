@@ -1,7 +1,7 @@
-// import * as publicExports from '../index';
+import * as publicExports from '../index';
 
 describe('/server public exports', () => {
-  it.skip('should not include a breaking change', () => {
-    // expect(publicExports).toMatchSnapshot();
+  it('should not include a breaking change', () => {
+    expect(Object.keys(publicExports).sort()).toMatchSnapshot();
   });
 });
