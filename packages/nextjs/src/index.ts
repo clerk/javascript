@@ -50,6 +50,7 @@ import * as ComponentsModule from '#components';
 import * as ServerHelperModule from '#server-helpers';
 
 import type { ServerComponentsServerModuleTypes } from './components.server';
-import type { ServerHelpersServerModuleTypes } from './server-helpers.server';
 
-export * from './client';
+export const ClerkProvider = ComponentsModule.ClerkProvider as ServerComponentsServerModuleTypes['ClerkProvider'];
+export const SignedIn = ComponentsModule.SignedIn as ServerComponentsServerModuleTypes['SignedIn'];
+export const SignedOut = ComponentsModule.SignedOut as ServerComponentsServerModuleTypes['SignedOut'];
