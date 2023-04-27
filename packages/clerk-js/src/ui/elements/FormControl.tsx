@@ -9,9 +9,9 @@ import {
   Flex,
   FormControl as FormControlPrim,
   FormErrorText,
+  FormInfoText,
   FormLabel,
   FormSuccessText,
-  FormText,
   FormWarningText,
   Icon as IconCustomizable,
   Input,
@@ -42,7 +42,7 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
   icon?: React.ComponentType;
   setError: (error: string | ClerkAPIError | undefined) => void;
   warningText: string | undefined;
-  setWarning: (error: string | undefined) => void;
+  setWarning: (error: string) => void;
   setSuccessful: (isSuccess: boolean) => void;
   isSuccessful: boolean;
   hasLostFocus: boolean;
@@ -75,10 +75,10 @@ function useFormTextAnimation() {
         };
       }
       return t => ({
-        animation: `${enterAnimation ? animations.inAnimation : animations.outAnimation} 300ms ${
-          t.transitionTiming.$common
-        }`,
-        transition: 'height 200ms ease', // This is expensive but required for a smooth layout shift
+        animation: `${enterAnimation ? animations.inAnimation : animations.outAnimation} ${
+          t.transitionDuration.$slower
+        } ${t.transitionTiming.$common}`,
+        transition: `height ${t.transitionDuration.$slow}  ease`, // This is expensive but required for a smooth layout shift
       });
     },
     [prefersReducedMotion],
@@ -89,8 +89,9 @@ function useFormTextAnimation() {
   };
 }
 
+type Px = number;
 const useCalculateErrorTextHeight = () => {
-  const [height, setHeight] = useState(24);
+  const [height, setHeight] = useState<Px>(24);
 
   const calculateHeight = useCallback((element: HTMLElement | null, messageToDisplay: string | undefined) => {
     if (element) {
@@ -320,14 +321,14 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
         >
           {/*Display the directions after is success message is unmounted*/}
           {!successMessage && !warningMessage && !errorMessage && directionMessage && (
-            <FormText
+            <FormInfoText
               ref={e => calculateHeight(e, directionMessage)}
               sx={getFormTextAnimation(
                 debouncedState.isFocused && !debouncedState?.isSuccessful && !debouncedState.warningText,
               )}
             >
               {directionMessage}
-            </FormText>
+            </FormInfoText>
           )}
           {/* Display the error message after the directions is unmounted*/}
           {errorMessage && (

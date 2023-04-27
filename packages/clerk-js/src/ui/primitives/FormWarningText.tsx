@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 
 import { Icon } from '../customizables';
-import { ExclamationTriangle } from '../icons';
+import { ExclamationCircle } from '../icons';
 import type { FormTextProps } from './FormSuccessText';
 import { applyVariants } from './FormSuccessText';
 import { Text } from './Text';
@@ -20,7 +20,7 @@ export const FormWarningText = forwardRef<HTMLElement, FormTextProps>((props, re
     >
       <Icon
         colorScheme={'warning'}
-        icon={ExclamationTriangle}
+        icon={ExclamationCircle}
       />
       {children}
     </Text>

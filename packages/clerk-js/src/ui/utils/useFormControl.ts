@@ -40,7 +40,7 @@ type FieldStateProps<Id> = {
   errorText: string | undefined;
   warningText: string | undefined;
   setError: (error: string | ClerkAPIError | undefined) => void;
-  setWarning: (error: string | undefined) => void;
+  setWarning: (error: string) => void;
   setSuccessful: (isSuccess: boolean) => void;
   isSuccessful: boolean;
   isFocused: boolean;
@@ -73,7 +73,7 @@ export const useFormControl = <Id extends string>(
   const [value, setValueInternal] = React.useState<string>(initialState);
   const [checked, setCheckedInternal] = React.useState<boolean>(opts?.checked || false);
   const [errorText, setErrorText] = React.useState<string | undefined>(undefined);
-  const [warningText, setWarningText] = React.useState<string | undefined>(undefined);
+  const [warningText, setWarningText] = React.useState('');
   const [isSuccessful, setIsSuccessful] = React.useState(false);
   const [hasLostFocus, setHasLostFocus] = React.useState(false);
   const [isFocused, setFocused] = React.useState(false);
@@ -100,18 +100,18 @@ export const useFormControl = <Id extends string>(
     setErrorText(translateError(error || undefined));
     if (typeof error !== 'undefined') {
       setIsSuccessful(false);
-      setWarningText(undefined);
+      setWarningText('');
     }
   };
   const setSuccessful: FormControlState['setSuccessful'] = isSuccess => {
     setErrorText(undefined);
-    setWarningText(undefined);
+    setWarningText('');
     setIsSuccessful(isSuccess);
   };
 
   const setWarning: FormControlState['setWarning'] = warning => {
-    setWarningText(warning || undefined);
-    if (typeof warning !== 'undefined') {
+    setWarningText(warning);
+    if (warning) {
       setIsSuccessful(false);
       setErrorText(undefined);
     }
