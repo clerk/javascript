@@ -1,5 +1,5 @@
 import { camelToSnake, createDevOrStagingUrlCache, isIPV4Address } from '@clerk/shared';
-import type { Clerk, SignUpResource } from '@clerk/types';
+import type { SignUpResource } from '@clerk/types';
 
 import { loadScript } from '../utils';
 import { joinPaths } from './path';
@@ -369,9 +369,9 @@ const frontendApiRedirectPaths: string[] = [
   '/v1/tickets/accept', // ticket flow
 ];
 
-export function isRedirectForFAPIInitiatedFlow(clerk: Clerk, redirectUrl: string): boolean {
+export function isRedirectForFAPIInitiatedFlow(frontendApi: string, redirectUrl: string): boolean {
   const url = new URL(redirectUrl, DUMMY_URL_BASE);
   const path = url.pathname;
 
-  return clerk.frontendApi === url.host && frontendApiRedirectPaths.includes(path);
+  return frontendApi === url.host && frontendApiRedirectPaths.includes(path);
 }

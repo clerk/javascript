@@ -126,7 +126,10 @@ export const useSignInContext = (): SignInContextType => {
   });
 
   const buildUrlWithAuthParams: BuildUrlWithAuthParams = {};
-  if (clerk.instanceType !== 'production' && isRedirectForFAPIInitiatedFlow(clerk, extractedAfterSignInUrl)) {
+  if (
+    clerk.instanceType !== 'production' &&
+    isRedirectForFAPIInitiatedFlow(clerk.frontendApi, extractedAfterSignInUrl)
+  ) {
     buildUrlWithAuthParams.useQueryParam = true;
 
     if (clerk.session) {
