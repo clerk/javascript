@@ -13,7 +13,7 @@ export type FormControlProps = {
   isDisabled?: boolean;
   setError: (error: string | ClerkAPIError | undefined) => void;
   setSuccessful: (isSuccess: boolean) => void;
-  setWarning: (error: string | undefined) => void;
+  setWarning: (error: string) => void;
 };
 
 type FormControlContextValue = Required<FormControlProps> & { errorMessageId: string };

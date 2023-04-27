@@ -5,7 +5,7 @@ import { applyVariants } from './FormSuccessText';
 import { useFormControl } from './hooks';
 import { Text } from './Text';
 
-export const FormText = forwardRef<HTMLElement, FormTextProps>((props, ref) => {
+export const FormInfoText = forwardRef<HTMLElement, FormTextProps>((props, ref) => {
   const { hasError, errorMessageId } = useFormControl() || {};
 
   if (!hasError && !props.children) {
