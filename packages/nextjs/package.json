@@ -28,6 +28,20 @@
     "ssr.js",
     "app-beta"
   ],
+  "imports": {
+    "#components": {
+      "react-server": "./dist/components.server.js",
+      "default": "./dist/components.client.js"
+    },
+    "#server-helpers": {
+      "react-server": "./dist/server-helpers.server.js",
+      "edge-light": "./dist/server-helpers.server.js",
+      "worker": "./dist/server-helpers.server.js",
+      "node": "./dist/server-helpers.server.js",
+      "browser": "./dist/server-helpers.client.js",
+      "default": "./dist/server-helpers.client.js"
+    }
+  },
   "scripts": {
     "prepublishOnly": "npm run build",
     "build": "npm run clean && tsc -p tsconfig.build.json",
