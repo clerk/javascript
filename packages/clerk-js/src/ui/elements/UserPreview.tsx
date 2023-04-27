@@ -103,11 +103,13 @@ export const UserPreview = (props: UserPreviewProps) => {
           elementId={descriptors.userPreviewMainIdentifier.setId(elementId)}
           variant={size === 'md' ? 'regularMedium' : 'smallMedium'}
           colorScheme='inherit'
-          sx={{ display: 'flex' }}
+          sx={theme => ({ display: 'flex', gap: theme.sizes.$1 })}
         >
           <Text
             as='span'
+            colorScheme='inherit'
             truncate
+            sx={{ fontSize: 'inherit', fontWeight: 'inherit' }}
           >
             {localizedTitle || name || identifier}
           </Text>

@@ -4,7 +4,7 @@ import React, { forwardRef } from 'react';
 import { useEnvironment } from '../contexts';
 import { descriptors, Flex, Input } from '../customizables';
 import { usePassword } from '../hooks/usePassword';
-import { EyeSlash } from '../icons';
+import { Eye, EyeSlash } from '../icons';
 import { useFormControl } from '../primitives/hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import { IconButton } from './IconButton';
@@ -50,22 +50,21 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
         type={hidden ? 'password' : 'text'}
         sx={theme => ({ paddingRight: theme.space.$10 })}
       />
-
       <IconButton
         elementDescriptor={descriptors.formFieldInputShowPasswordButton}
         iconElementDescriptor={descriptors.formFieldInputShowPasswordIcon}
         aria-label={`${hidden ? 'Show' : 'Hide'} password`}
         variant='ghostIcon'
         tabIndex={-1}
-        colorScheme={hidden ? 'neutral' : 'primary'}
+        colorScheme={'neutral'}
         onClick={() => setHidden(s => !s)}
         sx={theme => ({
           position: 'absolute',
           right: 0,
           marginRight: theme.space.$3,
-          ...(hidden && { color: theme.colors.$blackAlpha400 }),
+          color: theme.colors.$blackAlpha400,
         })}
-        icon={EyeSlash}
+        icon={hidden ? Eye : EyeSlash}
       />
     </Flex>
   );
