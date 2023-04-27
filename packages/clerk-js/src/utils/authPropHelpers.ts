@@ -1,48 +1,47 @@
 import { camelToSnake } from '@clerk/shared';
-import type { DisplayConfigResource } from '@clerk/types';
+import type { ClerkOptions, DisplayConfigResource } from '@clerk/types';
 import type { ParsedQs } from 'qs';
 import qs from 'qs';
 
-import { hasBannedProtocol, isValidUrl } from '../../utils';
-import type { SignInCtx, SignUpCtx } from '../types';
+import { hasBannedProtocol, isValidUrl } from './index';
 
-type ExtractAuthUrlKey =
-  | keyof Pick<SignUpCtx, 'afterSignUpUrl' | 'afterSignInUrl'>
-  | keyof Pick<SignInCtx, 'afterSignUpUrl' | 'afterSignInUrl'>;
+type PickRedirectionUrlKey = 'afterSignUpUrl' | 'afterSignInUrl' | 'signInUrl' | 'signUpUrl';
 
-type ExtractAuthPropOptions =
-  | { queryParams: ParsedQs; displayConfig: DisplayConfigResource } & (
-      | {
-          ctx: Omit<SignUpCtx, 'componentName'>;
-        }
-      | {
-          ctx: Omit<SignInCtx, 'componentName'>;
-        }
-    );
+type PickRedirectionOptions = {
+  queryParams?: ParsedQs;
+  displayConfig?: DisplayConfigResource;
+  options?: ClerkOptions;
+  ctx?: any;
+};
 
 /**
  *
- * extractAuthProp(key, options)
+ * pickRedirectionProp(key, options, accessRedirectUrl)
  *
- * Retrieve auth redirect props passed through querystring parameters, component props
+ * Retrieve auth redirect props passed through querystring parameters, component props, ClerkProvider props
  * or display config settings.
  *
  * The priority is:
- * Querystring parameters > ClerkJS component props > Display configuration payload
+ * 1. Querystring parameters
+ * 2. ClerkJS component props
+ * 3. ClerkProvider props
+ * 4. Display configuration payload
  */
-export const extractAuthProp = (
-  key: ExtractAuthUrlKey,
-  { ctx, queryParams, displayConfig }: ExtractAuthPropOptions,
+export const pickRedirectionProp = (
+  key: PickRedirectionUrlKey,
+  { ctx, queryParams, displayConfig, options }: PickRedirectionOptions,
+  accessRedirectUrl = true,
 ): string => {
   const snakeCaseField = camelToSnake(key);
-  const queryParamValue = queryParams[snakeCaseField];
+  const queryParamValue = queryParams?.[snakeCaseField];
 
   const url =
     (typeof queryParamValue === 'string' ? queryParamValue : null) ||
-    (typeof queryParams.redirect_url === 'string' ? queryParams.redirect_url : null) ||
-    ctx[key] ||
-    ctx.redirectUrl ||
-    displayConfig[key];
+    (accessRedirectUrl && typeof queryParams?.redirect_url === 'string' ? queryParams?.redirect_url : null) ||
+    ctx?.[key] ||
+    (accessRedirectUrl ? ctx?.redirectUrl : null) ||
+    options?.[key] ||
+    displayConfig?.[key];
 
   if (!isValidUrl(url, { includeRelativeUrls: true }) || hasBannedProtocol(url)) {
     return '';

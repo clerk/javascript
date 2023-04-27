@@ -7,10 +7,16 @@ export type PublishableKey = {
 
 export type PublishableKeyOrFrontendApi =
   | {
+      /**
+       * @deprecated Use `publishableKey` instead.
+       */
       frontendApi?: never;
       publishableKey: string;
     }
   | {
+      /**
+       * @deprecated Use `publishableKey` instead.
+       */
       frontendApi: string;
       publishableKey?: never;
     };
@@ -18,9 +24,15 @@ export type PublishableKeyOrFrontendApi =
 export type SecretKeyOrApiKey =
   | {
       secretKey?: never;
+      /**
+       * @deprecated Use `secretKey` instead.
+       */
       apiKey: string;
     }
   | {
       secretKey: string;
+      /**
+       * @deprecated Use `secretKey` instead.
+       */
       apiKey?: never;
     };

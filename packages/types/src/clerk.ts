@@ -487,6 +487,9 @@ export interface ClerkOptions {
    */
   isSatellite?: boolean | ((url: URL) => boolean);
   signInUrl?: string;
+  signUpUrl?: string;
+  afterSignInUrl?: string;
+  afterSignUpUrl?: string;
   /**
    * @experimental
    */

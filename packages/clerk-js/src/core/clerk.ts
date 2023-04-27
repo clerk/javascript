@@ -69,6 +69,7 @@ import {
   isError,
   noOrganizationExists,
   noUserExists,
+  pickRedirectionProp,
   removeClerkQueryParam,
   sessionExistsAndSingleSessionModeEnabled,
   setDevBrowserJWTInURL,
@@ -120,6 +121,9 @@ const defaultOptions: ClerkOptions = {
   touchSession: true,
   isSatellite: false,
   signInUrl: undefined,
+  signUpUrl: undefined,
+  afterSignInUrl: undefined,
+  afterSignUpUrl: undefined,
 };
 
 export default class Clerk implements ClerkInterface {
@@ -630,27 +634,11 @@ export default class Clerk implements ClerkInterface {
   }
 
   public buildSignInUrl(options?: RedirectOptions): string {
-    const opts: RedirectOptions = {
-      ...options,
-      redirectUrl: options?.redirectUrl || window.location.href,
-    };
-    if (!this.#environment || !this.#environment.displayConfig) {
-      return '';
-    }
-    const { signInUrl } = this.#environment.displayConfig;
-    return this.buildUrlWithAuth(appendAsQueryParams(signInUrl, opts));
+    return this.#buildUrl('signInUrl', options);
   }
 
   public buildSignUpUrl(options?: RedirectOptions): string {
-    const opts: RedirectOptions = {
-      ...options,
-      redirectUrl: options?.redirectUrl || window.location.href,
-    };
-    if (!this.#environment || !this.#environment.displayConfig) {
-      return '';
-    }
-    const { signUpUrl } = this.#environment.displayConfig;
-    return this.buildUrlWithAuth(appendAsQueryParams(signUpUrl, opts));
+    return this.#buildUrl('signUpUrl', options);
   }
 
   public buildUserProfileUrl(): string {
@@ -1328,6 +1316,25 @@ export default class Clerk implements ClerkInterface {
         void this.#componentControls?.ensureMounted().then(controls => controls.mountImpersonationFab());
       }
     });
+  };
+
+  #buildUrl = (key: 'signInUrl' | 'signUpUrl', options?: RedirectOptions): string => {
+    if (!this.#isReady || !this.#environment || !this.#environment.displayConfig) {
+      return '';
+    }
+
+    const opts: RedirectOptions = {
+      afterSignInUrl: pickRedirectionProp('afterSignInUrl', { ctx: options, options: this.#options }, false),
+      afterSignUpUrl: pickRedirectionProp('afterSignUpUrl', { ctx: options, options: this.#options }, false),
+      redirectUrl: options?.redirectUrl || window.location.href,
+    };
+
+    const signInOrUpUrl = pickRedirectionProp(
+      key,
+      { options: this.#options, displayConfig: this.#environment.displayConfig },
+      false,
+    );
+    return this.buildUrlWithAuth(appendAsQueryParams(signInOrUpUrl, opts));
   };
 
   assertComponentsReady(controls: unknown): asserts controls is ReturnType<MountComponentRenderer> {

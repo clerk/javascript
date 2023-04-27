@@ -1,9 +1,7 @@
 import type { BuildUrlWithAuthParams } from '@clerk/types';
 import React from 'react';
-
-import { buildURL } from '../../utils/url';
-import { buildAuthQueryString, extractAuthProp } from '../common/authPropHelpers';
-import { useCoreClerk, useEnvironment } from '../contexts';
+import { buildAuthQueryString, buildURL, pickRedirectionProp } from '../../utils';
+import { useCoreClerk, useEnvironment, useOptions } from '../contexts';
 import { useNavigate } from '../hooks';
 import type { ParsedQs } from '../router';
 import { useRouter } from '../router';
@@ -34,6 +32,7 @@ export const useSignUpContext = (): SignUpContextType => {
   const { navigate } = useNavigate();
   const { displayConfig } = useEnvironment();
   const { queryParams } = useRouter();
+  const options = useOptions();
   const clerk = useCoreClerk();
 
   if (componentName !== 'SignUp') {
@@ -41,24 +40,26 @@ export const useSignUpContext = (): SignUpContextType => {
   }
 
   const afterSignUpUrl = clerk.buildUrlWithAuth(
-    extractAuthProp('afterSignUpUrl', {
-      ctx,
+    pickRedirectionProp('afterSignUpUrl', {
       queryParams,
+      ctx,
+      options,
       displayConfig,
     }),
   );
 
   const afterSignInUrl = clerk.buildUrlWithAuth(
-    extractAuthProp('afterSignInUrl', {
-      ctx,
+    pickRedirectionProp('afterSignInUrl', {
       queryParams,
+      ctx,
+      options,
       displayConfig,
     }),
   );
 
   const navigateAfterSignUp = () => navigate(afterSignUpUrl);
 
-  let signInUrl = ctx.signInUrl || displayConfig.signInUrl;
+  let signInUrl = pickRedirectionProp('signInUrl', { ctx, options, displayConfig }, false);
 
   // Add query strings to the sign in URL
   const authQs = buildAuthQueryString({
@@ -101,6 +102,7 @@ export const useSignInContext = (): SignInContextType => {
   const { navigate } = useNavigate();
   const { displayConfig } = useEnvironment();
   const { queryParams } = useRouter();
+  const options = useOptions();
   const clerk = useCoreClerk();
 
   if (componentName !== 'SignIn') {
@@ -108,16 +110,18 @@ export const useSignInContext = (): SignInContextType => {
   }
 
   const afterSignUpUrl = clerk.buildUrlWithAuth(
-    extractAuthProp('afterSignUpUrl', {
-      ctx,
+    pickRedirectionProp('afterSignUpUrl', {
       queryParams,
+      ctx,
+      options,
       displayConfig,
     }),
   );
 
-  const extractedAfterSignInUrl = extractAuthProp('afterSignInUrl', {
-    ctx,
+  const extractedAfterSignInUrl = pickRedirectionProp('afterSignInUrl', {
     queryParams,
+    ctx,
+    options,
     displayConfig,
   });
 
@@ -134,7 +138,7 @@ export const useSignInContext = (): SignInContextType => {
 
   const navigateAfterSignIn = () => navigate(afterSignInUrl);
 
-  let signUpUrl = ctx.signUpUrl || displayConfig.signUpUrl;
+  let signUpUrl = pickRedirectionProp('signUpUrl', { ctx, options, displayConfig }, false);
 
   // Add query strings to the sign in URL
   const authQs = buildAuthQueryString({
@@ -189,12 +193,13 @@ export const useUserButtonContext = () => {
   const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as UserButtonCtx;
   const { navigate } = useNavigate();
   const { displayConfig } = useEnvironment();
+  const options = useOptions();
 
   if (componentName !== 'UserButton') {
     throw new Error('Clerk: useUserButtonContext called outside of the mounted UserButton component.');
   }
 
-  const signInUrl = ctx.signInUrl || displayConfig.signInUrl;
+  const signInUrl = pickRedirectionProp('signInUrl', { ctx, options, displayConfig }, false);
   const userProfileUrl = ctx.userProfileUrl || displayConfig.userProfileUrl;
 
   const afterMultiSessionSingleSignOutUrl = ctx.afterMultiSessionSingleSignOutUrl || displayConfig.afterSignOutOneUrl;
