@@ -28,7 +28,7 @@ import {
   setCustomAttributeOnRequest,
 } from './utils';
 
-interface WithClerkMiddleware {
+export interface WithClerkMiddleware {
   (handler: NextMiddleware, opts?: WithAuthOptions): NextMiddleware;
   (): NextMiddleware;
 }
