@@ -9,6 +9,7 @@ import {
   hasExternalAccountSignUpError,
   isAccountsHostedPages,
   isDataUri,
+  isRedirectForFAPIInitiatedFlow,
   isValidUrl,
   mergeFragmentIntoUrl,
   trimTrailingSlash,
@@ -362,4 +363,23 @@ describe('mergeFragmentIntoUrl(url | string)', () => {
     expect(mergeFragmentIntoUrl(new URL(url)).href).toEqual(expectedParamValue.href);
     expect(mergeFragmentIntoUrl(url).href).toEqual(expectedParamValue.href);
   });
+});
+
+describe('isRedirectForFAPIInitiatedFlow(frontendAp: string, redirectUrl: string)', () => {
+  const testCases: Array<[string, string, boolean]> = [
+    ['clerk.foo.bar-53.lcl.dev', 'foo', false],
+    ['clerk.foo.bar-53.lcl.dev', 'https://clerk.foo.bar-53.lcl.dev/deadbeef.', false],
+    ['clerk.foo.bar-53.lcl.dev', 'https://clerk.foo.bar-53.lcl.dev/oauth/authorize', true],
+    ['clerk.foo.bar-53.lcl.dev', 'https://clerk.foo.bar-53.lcl.dev/v1/verify', true],
+    ['clerk.foo.bar-53.lcl.dev', 'https://clerk.foo.bar-53.lcl.dev/v1/tickets/accept', true],
+    ['clerk.foo.bar-53.lcl.dev', 'https://google.com', false],
+    ['clerk.foo.bar-53.lcl.dev', 'https://google.com/v1/verify', false],
+  ];
+
+  test.each(testCases)(
+    'frontendApi=(%s), redirectUrl=(%s), expected value=(%s)',
+    (frontendApi, redirectUrl, expectedValue) => {
+      expect(isRedirectForFAPIInitiatedFlow(frontendApi, redirectUrl)).toEqual(expectedValue);
+    },
+  );
 });
