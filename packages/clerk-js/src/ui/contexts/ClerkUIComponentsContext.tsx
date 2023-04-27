@@ -1,6 +1,7 @@
 import type { BuildUrlWithAuthParams } from '@clerk/types';
 import React from 'react';
-import { buildAuthQueryString, buildURL, pickRedirectionProp } from '../../utils';
+
+import { buildAuthQueryString, buildURL, isRedirectForFAPIInitiatedFlow, pickRedirectionProp } from '../../utils';
 import { useCoreClerk, useEnvironment, useOptions } from '../contexts';
 import { useNavigate } from '../hooks';
 import type { ParsedQs } from '../router';
@@ -15,7 +16,6 @@ import type {
   UserButtonCtx,
   UserProfileCtx,
 } from '../types';
-import { isRedirectForFAPIInitiatedFlow } from './utils';
 
 export const ComponentContext = React.createContext<AvailableComponentCtx | null>(null);
 
