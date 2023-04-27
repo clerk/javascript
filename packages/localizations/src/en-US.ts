@@ -1,5 +1,4 @@
 import type { LocalizationResource } from '@clerk/types';
-import { LocalizationValue } from '@clerk/types';
 
 const commonTexts = {
   signIn: {
@@ -50,6 +49,7 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__organizationName: '',
   formFieldInputPlaceholder__organizationSlug: '',
+  formFieldError__notMatchingPasswords: `Passwords don't match.`,
   formFieldAction__forgotPassword: 'Forgot password',
   formFieldHintText__optional: 'Optional',
   formButtonPrimary: 'Continue',

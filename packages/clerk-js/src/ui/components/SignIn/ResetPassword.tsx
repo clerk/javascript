@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { withRedirectToHomeSingleSessionGuard } from '../../common';
 import { useCoreSignIn } from '../../contexts';
-import { Col, descriptors, localizationKeys } from '../../customizables';
+import { Col, descriptors, localizationKeys, useLocalizations } from '../../customizables';
 import { Card, CardAlert, Form, Header, useCardState, withCardStateProvider } from '../../elements';
 import { MIN_PASSWORD_LENGTH } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
@@ -15,6 +15,7 @@ export const _ResetPassword = () => {
   const card = useCardState();
   const { navigate } = useRouter();
   const supportEmail = useSupportEmail();
+  const { t } = useLocalizations();
 
   const passwordField = useFormControl('password', '', {
     type: 'password',
@@ -37,7 +38,7 @@ export const _ResetPassword = () => {
   const checkPasswordMatch = useCallback(
     (confirmPassword: string) => {
       return passwordField.value && confirmPassword && passwordField.value !== confirmPassword
-        ? "Passwords don't match."
+        ? t(localizationKeys('formFieldError__notMatchingPasswords'))
         : undefined;
     },
     [passwordField.value],
