@@ -41,8 +41,7 @@ export const pickRedirectionProp = (
     ctx?.[key] ||
     (accessRedirectUrl ? ctx?.redirectUrl : null) ||
     options?.[key] ||
-    displayConfig?.[key] ||
-    undefined;
+    displayConfig?.[key];
 
   if (!isValidUrl(url, { includeRelativeUrls: true }) || hasBannedProtocol(url)) {
     return '';
