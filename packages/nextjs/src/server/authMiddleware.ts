@@ -1,5 +1,6 @@
 import type { AuthObject } from '@clerk/backend';
 import { constants } from '@clerk/backend';
+import type Link from 'next/link';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -8,6 +9,20 @@ import { authenticateRequest, handleInterstitialState, handleUnknownState } from
 import { receivedRequestForIgnoredRoute } from './errors';
 import type { NextMiddlewareResult, WithAuthOptions } from './types';
 import { decorateRequest } from './utils';
+
+type WithPathPatternWildcard<T> = `${T & string}(.*)`;
+type NextTypedRoute<T = Parameters<typeof Link>['0']['href']> = T extends string ? T : never;
+
+// For extra safety, we won't recommend using a `/(.*)` route matcher.
+type ExcludeRootPath<T> = T extends '/' ? never : T;
+
+// We want to show suggestions but also allow for free-text input
+// the (string & {}) type prevents the TS compiler from merging the typed union with the string type
+// https://github.com/Microsoft/TypeScript/issues/29729#issuecomment-505826972
+type RouteMatcherWithNextTypedRoutes =
+  | WithPathPatternWildcard<ExcludeRootPath<NextTypedRoute>>
+  | NextTypedRoute
+  | (string & {});
 
 const TMP_SIGN_IN_URL = '/sign-in';
 const TMP_SIGN_UP_URL = '/sign-up';
@@ -25,7 +40,13 @@ export const DEFAULT_CONFIG_MATCHER = ['/((?!.*\\..*|_next).*)', '/'];
  */
 export const DEFAULT_IGNORED_ROUTES = ['/(.*\\..*|_next.*)'];
 
-type RouteMatcherParam = Array<string | RegExp> | string | RegExp | ((req: NextRequest) => boolean);
+type RouteMatcherParam =
+  | Array<RegExp | RouteMatcherWithNextTypedRoutes>
+  | RegExp
+  | RouteMatcherWithNextTypedRoutes
+  | ((req: NextRequest) => boolean);
+
+type IgnoredRoutesParam = Array<RegExp | string> | RegExp | string | ((req: NextRequest) => boolean);
 
 type BeforeAuthHandler = (
   req: NextRequest,
@@ -63,14 +84,14 @@ type AuthMiddlewareParams = WithAuthOptions & {
    * This list typically includes routes for static files or Next.js internals.
    * For improved performance, these routes should be skipped using the default config.matcher instead.
    */
-  ignoredRoutes?: RouteMatcherParam;
+  ignoredRoutes?: IgnoredRoutesParam;
   /**
    * Enables extra debug logging.
    */
   debug?: boolean;
 };
 
-interface AuthMiddleware {
+export interface AuthMiddleware {
   (): NextMiddleware;
   (params: AuthMiddlewareParams): NextMiddleware;
 }
