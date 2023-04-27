@@ -13,14 +13,15 @@ import type {
   UsernameIdentifier,
   Web3WalletIdentifier,
 } from './identifiers';
-import type { AuthenticateWithRedirectParams } from './oauth';
 import type { AttemptPhoneNumberVerificationParams, PreparePhoneNumberVerificationParams } from './phoneNumber';
+import type { AuthenticateWithRedirectParams } from './redirects';
 import type { ClerkResource } from './resource';
 import type {
   EmailCodeStrategy,
   EmailLinkStrategy,
   OAuthStrategy,
   PhoneCodeStrategy,
+  SamlStrategy,
   TicketStrategy,
   Web3Strategy,
 } from './strategies';
@@ -114,6 +115,11 @@ export type PrepareVerificationParams =
       strategy: OAuthStrategy;
       redirectUrl?: string;
       actionCompleteRedirectUrl?: string;
+    }
+  | {
+      strategy: SamlStrategy;
+      redirectUrl?: string;
+      actionCompleteRedirectUrl?: string;
     };
 
 export type AttemptVerificationParams =
@@ -154,7 +160,7 @@ export type SignUpCreateParams = Partial<
     externalAccountStrategy: string;
     externalAccountRedirectUrl: string;
     externalAccountActionCompleteRedirectUrl: string;
-    strategy: OAuthStrategy | TicketStrategy;
+    strategy: OAuthStrategy | SamlStrategy | TicketStrategy;
     redirectUrl: string;
     actionCompleteRedirectUrl: string;
     transfer: boolean;
@@ -168,6 +174,7 @@ export type SignUpUpdateParams = SignUpCreateParams;
 export type SignUpAuthenticateWithMetamaskParams = {
   unsafeMetadata?: SignUpUnsafeMetadata;
 };
+
 export interface SignUpVerificationsResource {
   emailAddress: SignUpVerificationResource;
   phoneNumber: SignUpVerificationResource;

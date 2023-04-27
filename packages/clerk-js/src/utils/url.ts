@@ -362,3 +362,16 @@ export const mergeFragmentIntoUrl = (_url: string | URL): URL => {
 export const pathFromFullPath = (fullPath: string) => {
   return fullPath.replace(/CLERK-ROUTER\/(.*?)\//, '');
 };
+
+const frontendApiRedirectPaths: string[] = [
+  '/oauth/authorize', // OAuth2 identify provider flow
+  '/v1/verify', // magic links
+  '/v1/tickets/accept', // ticket flow
+];
+
+export function isRedirectForFAPIInitiatedFlow(frontendApi: string, redirectUrl: string): boolean {
+  const url = new URL(redirectUrl, DUMMY_URL_BASE);
+  const path = url.pathname;
+
+  return frontendApi === url.host && frontendApiRedirectPaths.includes(path);
+}

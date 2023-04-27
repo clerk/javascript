@@ -293,8 +293,9 @@ export interface Clerk {
    * Decorates the provided url with the auth token for development instances.
    *
    * @param {string} to
+   * @param opts A {@link BuildUrlWithAuthParams} object
    */
-  buildUrlWithAuth(to: string): string;
+  buildUrlWithAuth(to: string, opts?: BuildUrlWithAuthParams): string;
 
   /**
    * Returns the configured url where <SignIn/> is mounted or a custom sign-in page is rendered.
@@ -373,10 +374,11 @@ export interface Clerk {
   redirectToHome: () => void;
 
   /**
-   * Completes an OAuth flow started by {@link Clerk.client.signIn.authenticateWithRedirect} or {@link Clerk.client.signUp.authenticateWithRedirect}
+   * Completes an OAuth or SAML redirection flow started by
+   * {@link Clerk.client.signIn.authenticateWithRedirect} or {@link Clerk.client.signUp.authenticateWithRedirect}
    */
   handleRedirectCallback: (
-    params: HandleOAuthCallbackParams,
+    params: HandleOAuthCallbackParams | HandleSamlCallbackParams,
     customNavigate?: (to: string) => Promise<unknown>,
   ) => Promise<unknown>;
 
@@ -451,6 +453,18 @@ export type HandleOAuthCallbackParams = {
   continueSignUpUrl?: string | null;
 };
 
+/**
+ * @experimental
+ */
+export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
+
+export type BuildUrlWithAuthParams = {
+  /**
+   * Controls if dev browser JWT is added as a query param
+   */
+  useQueryParam?: boolean | null;
+};
+
 // TODO: Make sure Isomorphic Clerk navigate can work with the correct type:
 // (to: string) => Promise<unknown>
 export type CustomNavigation = (to: string) => Promise<unknown> | void;
@@ -473,6 +487,9 @@ export interface ClerkOptions {
    */
   isSatellite?: boolean | ((url: URL) => boolean);
   signInUrl?: string;
+  signUpUrl?: string;
+  afterSignInUrl?: string;
+  afterSignUpUrl?: string;
   /**
    * @experimental
    */

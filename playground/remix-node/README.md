@@ -2,15 +2,32 @@
 
 - [Remix Docs](https://remix.run/docs)
 
-## Development
+## Setup
 
-From your terminal:
+At repository level:
 
-```sh
+```bash
+npm run build
+npm run yalc:all
+```
+
+At current directory level:
+
+```bash
+npm run yalc:add
+npm i
+```
+
+## Run development server
+
+```bash
 npm run dev
 ```
 
 This starts your app in development mode, rebuilding assets on file changes.
+
+To get the latest unpublished changes from the `packages` (if they are not auto updated) use `npm run yalc:all` in repository level or `yalc push --replace` from the updated package
+after an `npm run build` is being executed.
 
 ## Deployment
 

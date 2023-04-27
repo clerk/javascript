@@ -41,6 +41,7 @@ export default (QUnit: QUnit) => {
         'loadInterstitialFromLocal',
         'makeAuthObjectSerializable',
         'prunePrivateMetadata',
+        'redirect',
         'sanitizeAuthObject',
         'signedInAuthObject',
         'signedOutAuthObject',

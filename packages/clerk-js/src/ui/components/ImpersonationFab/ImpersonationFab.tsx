@@ -45,7 +45,10 @@ const EyeCircle = ({ width, height, ...props }: EyeCircleProps) => {
       <Icon
         elementDescriptor={descriptors.impersonationFabIcon}
         icon={Eye}
-        size={undefined}
+        sx={t => ({
+          color: t.colors.$white,
+        })}
+        size={'lg'}
       />
     </Col>
   );

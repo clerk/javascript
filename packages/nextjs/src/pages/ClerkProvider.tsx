@@ -1,15 +1,49 @@
-import { __internal__setErrorThrowerOptions, ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
+import {
+  __internal__setErrorThrowerOptions,
+  ClerkProvider as ReactClerkProvider,
+  SignIn as BaseSignIn,
+  SignUp as BaseSignUp,
+} from '@clerk/clerk-react';
 import type { IsomorphicClerkOptions } from '@clerk/clerk-react/dist/types';
-import type { MultiDomainAndOrProxy, PublishableKeyOrFrontendApi } from '@clerk/types';
+import type { MultiDomainAndOrProxy, PublishableKeyOrFrontendApi, SignInProps, SignUpProps } from '@clerk/types';
 import { useRouter } from 'next/router';
 import React from 'react';
 
 import { invalidateNextRouterCache } from './invalidateNextRouterCache';
+import { ClerkNextProvider, useClerkNextContext } from './NextProviderContext';
 
 // TODO: Import from shared once [JS-118] is done
 const useSafeLayoutEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect;
 
 __internal__setErrorThrowerOptions({ packageName: '@clerk/nextjs' });
+
+export const SignIn = (props: SignInProps) => {
+  const { signInUrl } = useClerkNextContext();
+  if (signInUrl) {
+    return (
+      <BaseSignIn
+        routing='path'
+        path={signInUrl}
+        {...props}
+      />
+    );
+  }
+  return <BaseSignIn {...props} />;
+};
+
+export const SignUp = (props: SignUpProps) => {
+  const { signUpUrl } = useClerkNextContext();
+  if (signUpUrl) {
+    return (
+      <BaseSignUp
+        routing='path'
+        path={signUpUrl}
+        {...props}
+      />
+    );
+  }
+  return <BaseSignUp {...props} />;
+};
 
 type NextClerkProviderProps = {
   children: React.ReactNode;
@@ -38,6 +72,9 @@ export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JS
     domain,
     isSatellite,
     signInUrl,
+    signUpUrl,
+    afterSignInUrl,
+    afterSignUpUrl,
     // @ts-expect-error
     __clerk_ssr_state,
     clerkJSUrl,
@@ -60,23 +97,29 @@ export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JS
     };
   }, []);
 
+  const nextProps = {
+    frontendApi: frontendApi || process.env.NEXT_PUBLIC_CLERK_FRONTEND_API || '',
+    publishableKey: publishableKey || process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '',
+    clerkJSUrl: clerkJSUrl || process.env.NEXT_PUBLIC_CLERK_JS,
+    proxyUrl: proxyUrl || process.env.NEXT_PUBLIC_CLERK_PROXY_URL || '',
+    domain: domain || process.env.NEXT_PUBLIC_CLERK_DOMAIN || '',
+    isSatellite: isSatellite || process.env.NEXT_PUBLIC_CLERK_IS_SATELLITE === 'true',
+    signInUrl: signInUrl || process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || '',
+    signUpUrl: signUpUrl || process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || '',
+    afterSignInUrl: afterSignInUrl || process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL || '',
+    afterSignUpUrl: afterSignUpUrl || process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL || '',
+    navigate: (to: string) => push(to),
+    // withServerSideAuth automatically injects __clerk_ssr_state
+    // getAuth returns a user-facing authServerSideProps that hides __clerk_ssr_state
+    initialState: authServerSideProps?.__clerk_ssr_state || __clerk_ssr_state,
+    ...restProps,
+  };
+
   return (
     // @ts-expect-error
-    <ReactClerkProvider
-      frontendApi={frontendApi || process.env.NEXT_PUBLIC_CLERK_FRONTEND_API || ''}
-      publishableKey={publishableKey || process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || ''}
-      clerkJSUrl={clerkJSUrl || process.env.NEXT_PUBLIC_CLERK_JS}
-      proxyUrl={proxyUrl || process.env.NEXT_PUBLIC_CLERK_PROXY_URL || ''}
-      domain={domain || process.env.NEXT_PUBLIC_CLERK_DOMAIN || ''}
-      isSatellite={isSatellite || process.env.NEXT_PUBLIC_CLERK_IS_SATELLITE === 'true'}
-      signInUrl={signInUrl || process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || ''}
-      navigate={to => push(to)}
-      // withServerSideAuth automatically injects __clerk_ssr_state
-      // getAuth returns a user-facing authServerSideProps that hides __clerk_ssr_state
-      initialState={authServerSideProps?.__clerk_ssr_state || __clerk_ssr_state}
-      {...restProps}
-    >
-      {children}
-    </ReactClerkProvider>
+    <ClerkNextProvider {...nextProps}>
+      {/*@ts-expect-error*/}
+      <ReactClerkProvider {...nextProps}>{children}</ReactClerkProvider>
+    </ClerkNextProvider>
   );
 }

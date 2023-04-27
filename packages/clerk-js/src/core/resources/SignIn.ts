@@ -168,9 +168,10 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public authenticateWithRedirect = async (params: AuthenticateWithRedirectParams): Promise<void> => {
-    const { strategy, redirectUrl, redirectUrlComplete } = params || {};
+    const { strategy, redirectUrl, redirectUrlComplete, identifier } = params || {};
     const { firstFactorVerification } = await this.create({
       strategy,
+      identifier,
       redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
       actionCompleteRedirectUrl: redirectUrlComplete,
     });
