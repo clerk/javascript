@@ -16,6 +16,8 @@ type UsePasswordCbs = {
   onValidationSuccess?: () => void;
 };
 
+export const MIN_PASSWORD_LENGTH = 8;
+
 export const usePassword = (config: UsePasswordConfig, callbacks?: UsePasswordCbs) => {
   const { onValidationFailed = noop, onValidationSuccess = noop } = callbacks || {};
   const { strengthMeter, show_zxcvbn, complexity } = config;
