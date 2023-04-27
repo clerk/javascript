@@ -1,7 +1,6 @@
-import type { BuildUrlWithAuthParams } from '@clerk/types';
 import React from 'react';
 
-import { buildAuthQueryString, buildURL, isRedirectForFAPIInitiatedFlow, pickRedirectionProp } from '../../utils';
+import { buildAuthQueryString, buildURL, pickRedirectionProp } from '../../utils';
 import { useCoreClerk, useEnvironment, useOptions } from '../contexts';
 import { useNavigate } from '../hooks';
 import type { ParsedQs } from '../router';
@@ -118,26 +117,14 @@ export const useSignInContext = (): SignInContextType => {
     }),
   );
 
-  const extractedAfterSignInUrl = pickRedirectionProp('afterSignInUrl', {
-    queryParams,
-    ctx,
-    options,
-    displayConfig,
-  });
-
-  const buildUrlWithAuthParams: BuildUrlWithAuthParams = {};
-  if (
-    clerk.instanceType !== 'production' &&
-    isRedirectForFAPIInitiatedFlow(clerk.frontendApi, extractedAfterSignInUrl)
-  ) {
-    buildUrlWithAuthParams.useQueryParam = true;
-
-    if (clerk.session) {
-      navigate(clerk.buildUrlWithAuth(extractedAfterSignInUrl, buildUrlWithAuthParams));
-    }
-  }
-
-  const afterSignInUrl = clerk.buildUrlWithAuth(extractedAfterSignInUrl, buildUrlWithAuthParams);
+  const afterSignInUrl = clerk.buildUrlWithAuth(
+    pickRedirectionProp('afterSignInUrl', {
+      queryParams,
+      ctx,
+      options,
+      displayConfig,
+    }),
+  );
 
   const navigateAfterSignIn = () => navigate(afterSignInUrl);
 
