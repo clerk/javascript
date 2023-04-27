@@ -36,6 +36,9 @@ type RedirectParams = {
   frontendApi?: string;
 };
 
+// TODO: replace it with @clerk/shared errorThrower.throwMissingPublishableKeyError()
+const missingPublishableKeyErrorMessage = `Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.`;
+
 export function redirect({ redirectAdapter, signUpUrl, signInUrl, frontendApi, publishableKey }: RedirectParams) {
   if (!frontendApi) {
     frontendApi = parsePublishableKey(publishableKey)?.frontendApi;
@@ -45,7 +48,7 @@ export function redirect({ redirectAdapter, signUpUrl, signInUrl, frontendApi, p
 
   const redirectToSignUp = ({ returnBackUrl }: SingUpParams = {}) => {
     if (!signUpUrl && !accountsBaseUrl) {
-      throw new Error('signUpUrl or frontendApi/publishableKey should be provided!');
+      throw new Error(missingPublishableKeyErrorMessage);
     }
 
     const accountsSignUpUrl = `${accountsBaseUrl}/sign-up`;
@@ -54,7 +57,7 @@ export function redirect({ redirectAdapter, signUpUrl, signInUrl, frontendApi, p
 
   const redirectToSignIn = ({ returnBackUrl }: SingInParams = {}) => {
     if (!signInUrl && !accountsBaseUrl) {
-      throw new Error('signInUrl or frontendApi/publishableKey should be provided!');
+      throw new Error(missingPublishableKeyErrorMessage);
     }
 
     const accountsSignInUrl = `${accountsBaseUrl}/sign-in`;
