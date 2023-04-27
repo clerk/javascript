@@ -50,7 +50,7 @@ export const handleUnknownState = (requestState: RequestState) => {
 };
 
 export const handleInterstitialState = (requestState: RequestState, opts: WithAuthOptions) => {
-  const response = NextResponse.rewrite(
+  const response = new NextResponse(
     clerkClient.localInterstitial({
       frontendApi: opts.frontendApi || FRONTEND_API,
       publishableKey: opts.publishableKey || PUBLISHABLE_KEY,
@@ -61,7 +61,12 @@ export const handleInterstitialState = (requestState: RequestState, opts: WithAu
       debugData: debugRequestState(requestState),
       signInUrl: requestState.signInUrl,
     }),
-    { status: 401 },
+    {
+      status: 401,
+      headers: {
+        'content-type': 'text/html',
+      },
+    },
   );
   decorateResponseWithObservabilityHeaders(response, requestState);
   return response;
