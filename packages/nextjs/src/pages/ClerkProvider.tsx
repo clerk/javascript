@@ -11,8 +11,6 @@ const useSafeLayoutEffect = typeof window !== 'undefined' ? React.useLayoutEffec
 
 __internal__setErrorThrowerOptions({ packageName: '@clerk/nextjs' });
 
-// export * from '@clerk/clerk-react';
-
 type NextClerkProviderProps = {
   children: React.ReactNode;
   /**
@@ -78,7 +76,6 @@ export function ClerkProvider({ children, ...rest }: NextClerkProviderProps): JS
       initialState={authServerSideProps?.__clerk_ssr_state || __clerk_ssr_state}
       {...restProps}
     >
-      <h2>pages/clerkprovider</h2>
       {children}
     </ReactClerkProvider>
   );

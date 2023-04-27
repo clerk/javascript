@@ -5,7 +5,6 @@ import { NextResponse } from 'next/server';
 import type { RequestState } from './clerkClient';
 import {
   API_KEY,
-  API_URL,
   clerkClient,
   debugRequestState,
   FRONTEND_API,
@@ -52,8 +51,7 @@ export const handleUnknownState = (requestState: RequestState) => {
 
 export const handleInterstitialState = (requestState: RequestState, opts: WithAuthOptions) => {
   const response = NextResponse.rewrite(
-    clerkClient.remotePublicInterstitialUrl({
-      apiUrl: API_URL,
+    clerkClient.localInterstitial({
       frontendApi: opts.frontendApi || FRONTEND_API,
       publishableKey: opts.publishableKey || PUBLISHABLE_KEY,
       pkgVersion: JS_VERSION,

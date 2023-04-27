@@ -5,11 +5,11 @@ import { auth } from './auth';
 export function SignedIn(props: React.PropsWithChildren<{}>) {
   const { children } = props;
   const { userId } = auth();
-  return userId ? <div>RSC:SignedIn{children}</div> : null;
+  return userId ? <>{children}</> : null;
 }
 
 export function SignedOut(props: React.PropsWithChildren<{}>) {
   const { children } = props;
   const { userId } = auth();
-  return userId ? null : <div>RSC:SignedOut{children}</div>;
+  return userId ? null : <>{children}</>;
 }

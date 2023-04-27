@@ -44,7 +44,6 @@ const useAwaitableNavigate = () => {
 };
 
 export const ClientClerkProvider = (props: ClerkProviderProps) => {
-  console.log('APP-ROUTER/CLIENT/PROVIDER');
   const navigate = useAwaitableNavigate();
   return (
     <ReactClerkProvider

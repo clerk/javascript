@@ -33,7 +33,7 @@
       "react-server": "./dist/components.server.js",
       "default": "./dist/components.client.js"
     },
-    "#server-helpers": {
+    "#server": {
       "react-server": "./dist/server-helpers.server.js",
       "edge-light": "./dist/server-helpers.server.js",
       "worker": "./dist/server-helpers.server.js",

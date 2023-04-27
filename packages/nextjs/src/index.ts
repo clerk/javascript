@@ -67,7 +67,7 @@ import * as ComponentsModule from '#components';
  * application sets moduleResolution to 'NodeNext'.
  */
 // @ts-ignore
-import * as ServerHelperModule from '#server-helpers';
+import * as ServerHelperModule from '#server';
 
 import type { ServerComponentsServerModuleTypes } from './components.server';
 import type { ServerHelpersServerModuleTypes } from './server-helpers.server';
