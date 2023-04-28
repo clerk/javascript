@@ -74,7 +74,9 @@ export default (QUnit: QUnit) => {
 
       assert.raises(
         () => redirectToSignIn({ returnBackUrl }),
-        new Error('signInUrl or frontendApi/publishableKey should be provided!'),
+        new Error(
+          'Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.',
+        ),
       );
     });
 
@@ -218,7 +220,9 @@ export default (QUnit: QUnit) => {
 
       assert.raises(
         () => redirectToSignUp({ returnBackUrl }),
-        new Error('signUpUrl or frontendApi/publishableKey should be provided!'),
+        new Error(
+          'Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.',
+        ),
       );
     });
 
