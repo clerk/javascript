@@ -12,7 +12,7 @@ import factoryTest from './dist/api/factory.test.js';
 
 import exportsTest from './dist/exports.test.js';
 
-import redirectTest from './dist/redirect.test.js';
+import redirectTest from './dist/redirections.test.js';
 
 // Add them to the suite array
 const suites = [
