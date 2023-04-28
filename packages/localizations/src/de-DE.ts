@@ -4,7 +4,7 @@ export const deDE: LocalizationResource = {
   socialButtonsBlockButton: 'Weiter mit {{provider|titleize}}',
   dividerText: 'oder',
   formFieldLabel__emailAddress: 'E-Mail-Adresse',
-  formFieldLabel__emailAddresses: 'E-mailadressen',
+  formFieldLabel__emailAddresses: 'E-Mail-Adressen',
   formFieldLabel__phoneNumber: 'Telefonnummer',
   formFieldLabel__username: 'Nutzername',
   formFieldLabel__emailAddress_phoneNumber: 'E-Mail-Adresse oder Telefonnummer',
