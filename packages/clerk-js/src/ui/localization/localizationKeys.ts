@@ -61,8 +61,8 @@ export type GetICUArgs<Text extends string, T extends RemovePipeUtils<Text>> = T
   T extends readonly string[] ? TupleFindBlocks<T> : FindBlocks<T>
 >;
 
-type DefaultLocalizationKey = RecordToPath<typeof defaultResource>;
-type LocalizationKeyToValue<P extends DefaultLocalizationKey> = PathValue<typeof defaultResource, P>;
+type DefaultLocalizationKey = RecordToPath<typeof defaultResource['resources']>;
+type LocalizationKeyToValue<P extends DefaultLocalizationKey> = PathValue<typeof defaultResource['resources'], P>;
 
 // @ts-ignore
 type LocalizationKeyToParams<P extends DefaultLocalizationKey> = GetICUArgs<LocalizationKeyToValue<P>>;
