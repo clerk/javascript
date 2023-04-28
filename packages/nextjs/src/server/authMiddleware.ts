@@ -7,6 +7,7 @@ import { NextResponse } from 'next/server';
 import { isRedirect, mergeResponses, paths, setHeader } from '../utils';
 import { authenticateRequest, handleInterstitialState, handleUnknownState } from './authenticateRequest';
 import { receivedRequestForIgnoredRoute } from './errors';
+import { redirectToSignIn } from './redirect';
 import type { NextMiddlewareResult, WithAuthOptions } from './types';
 import { decorateRequest } from './utils';
 
@@ -161,10 +162,7 @@ export const createRouteMatcher = (routes: RouteMatcherParam) => {
 const createDefaultAfterAuth = (isPublicRoute: ReturnType<typeof createRouteMatcher>) => {
   return (auth: AuthObject, req: NextRequest) => {
     if (!auth.userId && !isPublicRoute(req)) {
-      // TODO: replace with redirectToSignIn
-      const url = new URL(TMP_SIGN_IN_URL, req.nextUrl.origin);
-      url.searchParams.set('redirect_url', req.url);
-      return NextResponse.redirect(url.toString());
+      return redirectToSignIn({ returnBackUrl: req.url });
     }
     return NextResponse.next();
   };
