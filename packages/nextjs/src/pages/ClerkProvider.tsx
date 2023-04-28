@@ -15,11 +15,7 @@ import { ClerkNextProvider, useClerkNextContext } from './NextProviderContext';
 // TODO: Import from shared once [JS-118] is done
 const useSafeLayoutEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect;
 
-__internal__setErrorThrowerOptions({
-  packageName: '@clerk/nextjs',
-});
-
-export * from '@clerk/clerk-react';
+__internal__setErrorThrowerOptions({ packageName: '@clerk/nextjs' });
 
 export const SignIn = (props: SignInProps) => {
   const { signInUrl } = useClerkNextContext();

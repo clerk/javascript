@@ -20,6 +20,7 @@ const Headers = {
   AuthStatus: 'x-clerk-auth-status',
   AuthReason: 'x-clerk-auth-reason',
   AuthMessage: 'x-clerk-auth-message',
+  EnableDebug: 'x-clerk-debug',
   Authorization: 'authorization',
   ForwardedPort: 'x-forwarded-port',
   ForwardedHost: 'x-forwarded-host',

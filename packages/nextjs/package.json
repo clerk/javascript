@@ -28,9 +28,23 @@
     "ssr.js",
     "app-beta"
   ],
+  "imports": {
+    "#components": {
+      "react-server": "./dist/components.server.js",
+      "default": "./dist/components.client.js"
+    },
+    "#server": {
+      "react-server": "./dist/server-helpers.server.js",
+      "edge-light": "./dist/server-helpers.server.js",
+      "worker": "./dist/server-helpers.server.js",
+      "node": "./dist/server-helpers.server.js",
+      "browser": "./dist/server-helpers.client.js",
+      "default": "./dist/server-helpers.client.js"
+    }
+  },
   "scripts": {
     "prepublishOnly": "npm run build",
-    "build": "tsc -p tsconfig.build.json",
+    "build": "npm run clean && tsc -p tsconfig.build.json",
     "clean": "rimraf ./dist",
     "lint": "eslint .",
     "test": "jest",
@@ -41,6 +55,7 @@
     "@clerk/clerk-react": "^4.15.4-staging.1",
     "@clerk/clerk-sdk-node": "^4.8.7-staging.1",
     "@clerk/types": "^3.36.0-staging.1",
+    "path-to-regexp": "6.2.1",
     "tslib": "2.4.1"
   },
   "devDependencies": {
