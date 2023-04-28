@@ -75,9 +75,8 @@ const AddConnectedAccount = () => {
       })
       .then(res => {
         if (res.verification?.externalVerificationRedirectURL) {
-          return navigate(res.verification.externalVerificationRedirectURL.href);
+          void navigate(res.verification.externalVerificationRedirectURL.href);
         }
-        return;
       })
       .catch(err => handleError(err, [], card.setError))
       .finally(() => {
