@@ -112,7 +112,10 @@ describe('ClerkProvider', () => {
     const defaultProps = { publishableKey: 'test', children: '' };
 
     it('exists as a prop', () => {
-      expectTypeOf({ ...defaultProps, localization: {} }).toMatchTypeOf<ClerkProviderProps>();
+      expectTypeOf({
+        ...defaultProps,
+        localization: {},
+      }).not.toMatchTypeOf<ClerkProviderProps>();
     });
 
     it('errors if a non existent key is provided', () => {

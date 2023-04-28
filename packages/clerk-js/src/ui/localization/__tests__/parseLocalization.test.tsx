@@ -19,14 +19,16 @@ describe('Localization parsing and replacing', () => {
     const { result } = renderHook(() => useLocalizations(), { wrapper: wrapperBefore });
 
     const localizedValue = result.current.t(localizationKeys('backButton'));
-    expect(localizedValue).toBe(defaultResource.backButton);
+    expect(localizedValue).toBe(defaultResource.resources.backButton);
   });
 
   it('Localization value returned from hook is equal to the value declared in the defaultResource', async () => {
     const { wrapper: Wrapper } = await createFixtures();
     const wrapperBefore = ({ children }) => (
       <Wrapper>
-        <OptionsProvider value={{ localization: { backButton: 'test' } }}>{children}</OptionsProvider>
+        <OptionsProvider value={{ localization: { locale: 'en-US', resources: { backButton: 'test' } } }}>
+          {children}
+        </OptionsProvider>
       </Wrapper>
     );
 

@@ -1,4 +1,4 @@
-import type { DeepPartial, LocalizationResources } from '@clerk/types';
+import type { DeepPartial, LocalizationResource, LocalizationResources } from '@clerk/types';
 import { dequal as deepEqual } from 'dequal';
 
 import { useOptions } from '../contexts';
@@ -23,10 +23,13 @@ const parseLocalizationResource = (
   return cache;
 };
 
+const migrateResources = (lresource: LocalizationResource | undefined): LocalizationResources => {
+  return 'resources' in ((lresource as any) || {})
+    ? lresource?.resources || {}
+    : (lresource as LocalizationResources) || {};
+};
+
 export const useParsedLocalizationResource = () => {
   const { localization } = useOptions();
-  return parseLocalizationResource(
-    localization?.resources || {},
-    defaultResource?.resources as any as LocalizationResources,
-  );
+  return parseLocalizationResource(migrateResources(localization), migrateResources(defaultResource));
 };
