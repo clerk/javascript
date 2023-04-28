@@ -22,3 +22,4 @@ export * from './url';
 export * from './workerTimers';
 export * from './runWithExponentialBackOff';
 export * from './isomorphicAtob';
+export * from './testGlob';

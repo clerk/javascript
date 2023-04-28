@@ -1,3 +1,4 @@
+import { testGlob } from '@clerk/shared';
 import { camelToSnake, createDevOrStagingUrlCache, isIPV4Address } from '@clerk/shared';
 import type { SignUpResource } from '@clerk/types';
 
@@ -375,3 +376,26 @@ export function isRedirectForFAPIInitiatedFlow(frontendApi: string, redirectUrl:
 
   return frontendApi === url.host && frontendApiRedirectPaths.includes(path);
 }
+
+const isAllowedRedirect = (_url: string, allowedRedirectOrigins: string[]) => {
+  const url = new URL(_url, DUMMY_URL_BASE);
+
+  //is relative url
+  if (url.origin === DUMMY_URL_BASE) {
+    return true;
+  }
+
+  return allowedRedirectOrigins.some(allowedOrigin => testGlob(allowedOrigin, url.href));
+};
+
+export const getFirstAllowedRedirectAndWarn = (urls: string[], allowedRedirectOrigins: string[]) => {
+  return urls.find(url => {
+    if (!isAllowedRedirect(url, allowedRedirectOrigins)) {
+      console.warn(
+        `Redirect URL ${url} is not on one of the allowedRedirectOrigins, falling back to the default redirect URL.`,
+      );
+      return false;
+    }
+    return true;
+  });
+};

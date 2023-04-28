@@ -168,6 +168,19 @@ export default class Clerk implements ClerkInterface {
     return false;
   }
 
+  get allowedRedirectOrigins(): string[] | undefined {
+    if (!this.#options.allowedRedirectOrigins) {
+      return undefined;
+    }
+
+    const origins = [...(this.#options.allowedRedirectOrigins || [])];
+    if (inBrowser()) {
+      //TODO: also push http(s)://*.etld+1
+      origins.push(window.location.origin);
+    }
+    return origins;
+  }
+
   get domain(): string {
     if (inBrowser()) {
       const strippedDomainString = stripScheme(handleValueOrFn(this.#domain, new URL(window.location.href)));
