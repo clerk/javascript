@@ -13,6 +13,9 @@ import type {
 
 import { BaseResource } from './internal';
 
+const defaultMaxPasswordLength = 72;
+const defaultMinPasswordLength = 8;
+
 /**
  * @internal
  */
@@ -66,8 +69,11 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     this.signUp = data.sign_up;
     this.passwordSettings = {
       ...data.password_settings,
-      min_length: Math.max(data?.password_settings?.min_length, 8),
-      max_length: data?.password_settings?.max_length === 0 ? 100 : data?.password_settings?.max_length,
+      min_length: Math.max(data?.password_settings?.min_length, defaultMinPasswordLength),
+      max_length:
+        data?.password_settings?.max_length === 0
+          ? defaultMaxPasswordLength
+          : Math.min(data?.password_settings?.max_length, defaultMaxPasswordLength),
     };
     this.socialProviderStrategies = this.getSocialProviderStrategies(data.social);
     this.authenticatableSocialStrategies = this.getAuthenticatableSocialStrategies(data.social);
