@@ -3,7 +3,5 @@
 exports[`/client public exports should not include a breaking change 1`] = `
 Object {
   "ClerkProvider": [Function],
-  "SignIn": [Function],
-  "SignUp": [Function],
 }
 `;

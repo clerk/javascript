@@ -52,7 +52,7 @@ type IgnoredRoutesParam = Array<RegExp | string> | RegExp | string | ((req: Next
 type BeforeAuthHandler = (
   req: NextRequest,
   evt: NextFetchEvent,
-) => NextMiddlewareResult | Promise<NextMiddlewareResult> | false;
+) => NextMiddlewareResult | Promise<NextMiddlewareResult> | false | Promise<false>;
 
 type AfterAuthHandler = (
   auth: AuthObject & { isPublicRoute: boolean },
