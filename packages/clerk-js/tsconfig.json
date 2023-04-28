@@ -6,6 +6,7 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "module": "esnext",
+    "lib": ["es2021.intl"],
     "moduleResolution": "Node",
     "noEmit": true,
     "noFallthroughCasesInSwitch": true,
