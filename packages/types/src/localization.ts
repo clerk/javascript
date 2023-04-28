@@ -11,9 +11,15 @@ export type LocalizationValue = string;
  * the default english resource object from {@link https://github.com/clerkinc/javascript our open source repo}
  * as a starting point.
  */
-export type LocalizationResource = DeepPartial<_LocalizationResource>;
+export type LocalizationResource = _LocalizationResource;
+export type LocalizationResources = DeepPartial<_LocalizationResources>;
 
 type _LocalizationResource = {
+  locale: 'en-US' | 'fr-FR' | 'de-DE' | 'da-DK' | 'es-ES' | 'it-IT' | 'nl-NL' | 'nl-BE' | 'pt-BR' | 'ru-RU' | 'sv-SE';
+  resources: LocalizationResources;
+};
+
+type _LocalizationResources = {
   socialButtonsBlockButton: LocalizationValue;
   dividerText: LocalizationValue;
   formFieldLabel__emailAddress: LocalizationValue;

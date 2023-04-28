@@ -2,8 +2,8 @@ export { enUS } from './en-US';
 export { frFR } from './fr-FR';
 /**
  * @deprecated Use `deDE` instead
-*/
-export { deDE as deDe } from './de-DE'; 
+ */
+export { deDE as deDe } from './de-DE';
 export { deDE } from './de-DE';
 export { itIT } from './it-IT';
 export { ptBR } from './pt-BR';
