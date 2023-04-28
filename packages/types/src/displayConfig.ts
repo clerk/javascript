@@ -9,7 +9,6 @@ export interface DisplayConfigJSON {
   after_sign_in_url: string;
   after_sign_out_all_url: string;
   after_sign_out_one_url: string;
-  after_sign_out_url: string;
   after_sign_up_url: string;
   after_switch_session_url: string;
   application_name: string;
