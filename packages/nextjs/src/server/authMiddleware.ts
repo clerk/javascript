@@ -93,8 +93,7 @@ type AuthMiddlewareParams = WithAuthOptions & {
 };
 
 export interface AuthMiddleware {
-  (): NextMiddleware;
-  (params: AuthMiddlewareParams): NextMiddleware;
+  (params?: AuthMiddlewareParams): NextMiddleware;
 }
 
 const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
