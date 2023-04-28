@@ -1,8 +1,7 @@
 import { testGlob } from '@clerk/shared';
-import { camelToSnake, createDevOrStagingUrlCache, isIPV4Address } from '@clerk/shared';
+import { camelToSnake, createDevOrStagingUrlCache } from '@clerk/shared';
 import type { SignUpResource } from '@clerk/types';
 
-import { loadScript } from '../utils';
 import { joinPaths } from './path';
 import { getQueryParams } from './querystring';
 
@@ -55,33 +54,8 @@ export function isAccountsHostedPages(url: string | URL = window.location.hostna
   return res;
 }
 
-export async function getETLDPlusOne(hostname: string = window.location.hostname): Promise<string> {
-  if (isIPV4Address(hostname)) {
-    return hostname;
-  }
-
-  const parts = hostname.split('.');
-
-  // Reuse dynamic loading of TLDParse library as in useTLDParser
-  if (parts.length >= 3) {
-    try {
-      await loadScript('https://cdn.jsdelivr.net/npm/tldts@5/dist/index.umd.min.js', {
-        globalObject: window.tldts,
-      });
-
-      return window.tldts.getDomain(hostname, {
-        allowPrivateDomains: true,
-      });
-    } catch (err) {
-      console.error('Failed to load tldts: ', err);
-    }
-
-    // Poor mans domain splitting if dynamic loading of tldts fails
-    const [, ...domain] = parts;
-    return domain.join('.');
-  }
-
-  return hostname;
+export function getETLDPlusOneFromFrontendApi(frontendApi: string): string {
+  return frontendApi.replace('clerk.', '');
 }
 
 export function getAllETLDs(hostname: string = window.location.hostname): string[] {

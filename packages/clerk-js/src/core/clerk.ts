@@ -60,6 +60,7 @@ import {
   createPageLifecycle,
   errorThrower,
   getClerkQueryParam,
+  getETLDPlusOneFromFrontendApi,
   hasExternalAccountSignUpError,
   ignoreEventValue,
   inActiveBrowserTab,
@@ -175,9 +176,11 @@ export default class Clerk implements ClerkInterface {
 
     const origins = [...(this.#options.allowedRedirectOrigins || [])];
     if (inBrowser()) {
-      //TODO: also push http(s)://*.etld+1
       origins.push(window.location.origin);
+      origins.push(window.location.origin + '/*');
     }
+    origins.push(`https://*.${getETLDPlusOneFromFrontendApi(this.frontendApi)}`);
+    origins.push(`https://*.${getETLDPlusOneFromFrontendApi(this.frontendApi)}/*`);
     return origins;
   }
 
