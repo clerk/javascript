@@ -1,6 +1,6 @@
 import type { ClientResource, InitialState, Resources } from '@clerk/types';
 import type { Accessor, ParentComponent } from 'solid-js';
-import { createEffect, createSignal, on, onCleanup, onMount } from 'solid-js';
+import { createEffect, createSignal, on, onCleanup } from 'solid-js';
 
 import IsomorphicClerk from '../isomorphicClerk';
 import type { IsomorphicClerkOptions } from '../types';
@@ -40,37 +40,36 @@ export const ClerkContextProvider: ParentComponent<ClerkContextProvider> = props
   });
 
   const derivedState = () => deriveState(thisClerk.loaded(), state(), initialState);
-  const clerkCtx = () => ({
-    clerkLoaded: thisClerk.loaded(),
-    value: thisClerk.isomorphicClerk(),
-  });
-
-  const clientCtx = () => ({
-    value: state().client,
-  });
-
-  const userCtx = () => ({ value: state().user });
-  const sessionCtx = () => ({ value: state().session });
-  const organizationCtx = () => ({
-    value: {
-      organization: state().organization,
-      lastOrganizationInvitation: state().lastOrganizationInvitation,
-      lastOrganizationMember: state().lastOrganizationMember,
-    },
-  });
 
   return (
-    // @ts-expect-error its fine
-    <IsomorphicClerkContext.Provider value={clerkCtx}>
-      <ClientContext.Provider value={clientCtx}>
-        <SessionContext.Provider value={sessionCtx}>
-          <OrganizationContext.Provider value={organizationCtx}>
+    <IsomorphicClerkContext.Provider
+      // @ts-expect-error its fine
+      value={() => ({
+        clerkLoaded: thisClerk.loaded(),
+        value: thisClerk.isomorphicClerk(),
+      })}
+    >
+      <ClientContext.Provider
+        value={() => ({
+          value: state().client,
+        })}
+      >
+        <SessionContext.Provider value={() => ({ value: state().session })}>
+          <OrganizationContext.Provider
+            value={() => ({
+              value: {
+                organization: state().organization,
+                lastOrganizationInvitation: state().lastOrganizationInvitation,
+                lastOrganizationMember: state().lastOrganizationMember,
+              },
+            })}
+          >
             <AuthContext.Provider
               value={() => ({
                 value: derivedState(),
               })}
             >
-              <UserContext.Provider value={userCtx}>{props.children}</UserContext.Provider>
+              <UserContext.Provider value={() => ({ value: state().user })}>{props.children}</UserContext.Provider>
             </AuthContext.Provider>
           </OrganizationContext.Provider>
         </SessionContext.Provider>
@@ -102,9 +101,7 @@ const createLoadedIsomorphicClerk = (_options: IsomorphicClerkOptions | Accessor
     ),
   );
 
-  onMount(() => {
-    isomorphicClerk().addOnLoaded(() => setLoaded(true));
-  });
+  isomorphicClerk().addOnLoaded(() => setLoaded(true));
 
   return { isomorphicClerk, loaded };
 };

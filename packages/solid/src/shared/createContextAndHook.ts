@@ -24,10 +24,11 @@ export const createContextAndHook = <CtxVal>(
 ): [ContextOf<CtxVal>, UseCtxFn<Accessor<CtxVal>>, UseCtxFn<CtxVal | Partial<CtxVal>>] => {
   const { assertCtxFn = assertContextExists } = options || {};
   const Ctx = createContext<Accessor<{ value: CtxVal }> | undefined>(undefined);
-  //   @ts-expect-error its fine
-  Ctx.displayName = displayName;
   const useCtx = () => {
     const ctx = useContext(Ctx);
+    console.log({
+      [displayName]: ctx,
+    });
     assertCtxFn(ctx, `${displayName} not found`);
     return (ctx as any).value as Accessor<CtxVal>;
   };

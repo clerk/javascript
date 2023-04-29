@@ -29,11 +29,13 @@ export default function Root() {
       </Head>
       <Body>
         <Suspense>
-          <ErrorBoundary>
-            <Routes>
-              <FileRoutes />
-            </Routes>
-          </ErrorBoundary>
+          <ClerkProvider publishableKey={import.meta.env['VITE_CLERK_PUBLISHABLE_KEY']}>
+            <ErrorBoundary>
+              <Routes>
+                <FileRoutes />
+              </Routes>
+            </ErrorBoundary>
+          </ClerkProvider>
         </Suspense>
         <Scripts />
       </Body>
