@@ -21,21 +21,20 @@ type UseCtxFn<T> = () => T;
 export const createContextAndHook = <CtxVal>(
   displayName: string,
   options?: Options,
-): [ContextOf<CtxVal>, UseCtxFn<CtxVal>, UseCtxFn<CtxVal | Partial<CtxVal>>] => {
+): [ContextOf<CtxVal>, UseCtxFn<Accessor<CtxVal>>, UseCtxFn<CtxVal | Partial<CtxVal>>] => {
   const { assertCtxFn = assertContextExists } = options || {};
-  const Ctx = createContext<{ value: CtxVal } | undefined>(undefined);
+  const Ctx = createContext<Accessor<{ value: CtxVal }> | undefined>(undefined);
   //   @ts-expect-error its fine
   Ctx.displayName = displayName;
   const useCtx = () => {
     const ctx = useContext(Ctx);
     assertCtxFn(ctx, `${displayName} not found`);
-    return (ctx as any).value as CtxVal;
+    return (ctx as any).value as Accessor<CtxVal>;
   };
 
   const useCtxWithoutGuarantee = () => {
     const ctx = useContext(Ctx);
-    return ctx ? ctx.value : {};
+    return ctx ? ctx().value : {};
   };
-  // @ts-expect-error its fine
   return [Ctx, useCtx, useCtxWithoutGuarantee];
 };

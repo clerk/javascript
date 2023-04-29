@@ -49,10 +49,6 @@ export const ClerkContextProvider: ParentComponent<ClerkContextProvider> = props
     value: state().client,
   });
 
-  const authCtx = () => {
-    return { value: derivedState() };
-  };
-
   const userCtx = () => ({ value: state().user });
   const sessionCtx = () => ({ value: state().session });
   const organizationCtx = () => ({
@@ -69,7 +65,11 @@ export const ClerkContextProvider: ParentComponent<ClerkContextProvider> = props
       <ClientContext.Provider value={clientCtx}>
         <SessionContext.Provider value={sessionCtx}>
           <OrganizationContext.Provider value={organizationCtx}>
-            <AuthContext.Provider value={authCtx}>
+            <AuthContext.Provider
+              value={() => ({
+                value: derivedState(),
+              })}
+            >
               <UserContext.Provider value={userCtx}>{props.children}</UserContext.Provider>
             </AuthContext.Provider>
           </OrganizationContext.Provider>
