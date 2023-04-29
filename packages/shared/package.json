@@ -33,6 +33,9 @@
     "tsup": "*",
     "typescript": "*"
   },
+  "dependencies": {
+    "@clerk/utils": "^0.15.4"
+  },
   "peerDependencies": {
     "react": ">=16"
   },

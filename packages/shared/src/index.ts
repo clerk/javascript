@@ -18,3 +18,5 @@ export {
   useSessionContext,
   useUserContext,
 } from './hooks/contexts';
+
+export * from '@clerk/utils';

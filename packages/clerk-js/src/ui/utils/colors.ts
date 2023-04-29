@@ -1,3 +1,5 @@
+/* eslint-disable no-useless-escape */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * These helpers have been extracted from the following libraries,
  * converted to Typescript and adapted to our needs.

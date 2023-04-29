@@ -1,6 +1,6 @@
 import type { RequestState } from '@clerk/backend';
 import { Clerk } from '@clerk/backend';
-import { handleValueOrFn, isHttpOrHttps } from '@clerk/shared';
+import { handleValueOrFn, isHttpOrHttps } from '@clerk/utils';
 
 import {
   noRelativeProxyInSSR,

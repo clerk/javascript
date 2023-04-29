@@ -1,5 +1,5 @@
-import { addYears } from '@clerk/shared';
 import type { ClientResource } from '@clerk/types';
+import { addYears } from '@clerk/utils';
 
 import { getAllETLDs } from '../url';
 import { clientCookie } from './client';

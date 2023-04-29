@@ -10,7 +10,7 @@ export type {
   WithSessionProp,
 } from './types';
 export { useMagicLink } from './hooks/useMagicLink';
-
+export { isMagicLinkError, MagicLinkErrorCode } from '@clerk/utils';
 /**
  * Vite does not define `global` by default
  * One workaround is to use the `define` config prop

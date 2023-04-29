@@ -1,4 +1,6 @@
-import { camelToSnake, createDevOrStagingUrlCache, isIPV4Address } from '@clerk/shared';
+/* eslint-disable @typescript-eslint/restrict-plus-operands */
+// eslint-disable-next-line simple-import-sort/imports
+import { camelToSnake, createDevOrStagingUrlCache, isIPV4Address } from '@clerk/utils';
 import type { SignUpResource } from '@clerk/types';
 
 import { loadScript } from '../utils';
