@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export * from './thrower';
+export * from './utils';
+
 export function isUnauthorizedError(e: any): boolean {
   const status = e?.status;
   const code = e?.errors?.[0]?.code;

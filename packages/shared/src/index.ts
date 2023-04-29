@@ -1,15 +1,4 @@
 /**
- * Errors
- */
-export { buildErrorThrower } from './errors/thrower';
-export type { ErrorThrower, ErrorThrowerOptions } from './errors/thrower';
-
-/**
- * Utils
- */
-export * from './utils';
-
-/**
  * Hooks
  */
 export { assertContextExists, createContextAndHook } from './hooks/createContextAndHook';

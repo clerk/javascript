@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "esnext",
+    "newLine": "LF",
+    "moduleResolution": "node",
+    "strict": true,
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true,
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
+    "outDir": "./dist",
+    "types": ["node", "vite/client"],
+    "module": "esnext"
+  },
+  "include": ["./src"],
+  "exclude": ["node_modules", "dist"]
+}

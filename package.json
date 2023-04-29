@@ -56,7 +56,6 @@
     "release:next": "lerna publish from-package --dist-tag next",
     "version": "./scripts/version-info.sh",
     "nuke": "./scripts/nuke.sh",
-    "yalc:all": "for d in packages/*/; do echo $d; cd $d; yalc push --replace; cd '../../'; done",
-    "prepare": "husky install"
+    "yalc:all": "for d in packages/*/; do echo $d; cd $d; yalc push --replace; cd '../../'; done"
   }
 }

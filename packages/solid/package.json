@@ -1,0 +1,42 @@
+{
+  "name": "@clerk/clerk-solid",
+  "description": "Clerk Solid Library",
+  "author": "OrJDev",
+  "license": "MIT",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "solid": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -p . && rollup -c"
+  },
+  "devDependencies": {
+    "@babel/preset-typescript": "^7.18.6",
+    "@rollup/plugin-babel": "5.3.1",
+    "@rollup/plugin-node-resolve": "13.3.0",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "@types/node": "^18.7.14",
+    "babel-preset-solid": "^1.5.3",
+    "rollup": "^2.79.0",
+    "solid-js": "^1.5.3",
+    "typescript": "^4.8.2",
+    "vite": "^4"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.5.3"
+  },
+  "dependencies": {
+    "@clerk/utils": "^0.15.4"
+  }
+}

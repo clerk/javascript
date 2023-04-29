@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "moduleResolution": "node",
+    "preserveWatchOutput": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "emitDeclarationOnly": true,
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "dist",
+    "resolveJsonModule": true,
+    "declarationDir": "dist/types",
+    "jsx": "react",
+    "lib": ["ES6", "DOM", "WebWorker"]
+  },
+  "exclude": ["node_modules"],
+  "include": ["src/index.ts"]
+}
