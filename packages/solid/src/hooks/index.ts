@@ -4,3 +4,5 @@ export * from './useMagicLink';
 export * from './createSession';
 export * from './createSignIn';
 export * from './createSignUp';
+export * from './createSessionList';
+export * from './createUser';
