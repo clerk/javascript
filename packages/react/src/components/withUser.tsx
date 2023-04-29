@@ -1,8 +1,8 @@
 import type { UserResource } from '@clerk/types';
+import { hocChildrenNotAFunctionError } from '@clerk/utils';
 import React from 'react';
 
 import { useUserContext } from '../contexts/UserContext';
-import { hocChildrenNotAFunctionError } from '../errors';
 
 export const withUser = <P extends { user: UserResource }>(Component: React.ComponentType<P>, displayName?: string) => {
   displayName = displayName || Component.displayName || Component.name || 'Component';

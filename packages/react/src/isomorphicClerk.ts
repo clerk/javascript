@@ -1,4 +1,4 @@
-import { handleValueOrFn, inClientSide } from '@clerk/shared';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
@@ -25,8 +25,9 @@ import type {
 } from '@clerk/types';
 import type { BeforeEmitCallback } from '@clerk/types';
 import type { OrganizationProfileProps, OrganizationSwitcherProps } from '@clerk/types/src';
+import { handleValueOrFn, inClientSide } from '@clerk/utils';
+import { unsupportedNonBrowserDomainFunction } from '@clerk/utils';
 
-import { unsupportedNonBrowserDomainFunction } from './errors';
 import type {
   BrowserClerk,
   BrowserClerkConstructor,
@@ -187,6 +188,7 @@ export default class IsomorphicClerk {
       // In Next.js we can throw a full screen error in development mode.
       // However, in production throwing an error results in an infinite loop.
       // More info at: https://github.com/vercel/next.js/issues/6973
+      // eslint-disable-next-line turbo/no-undeclared-env-vars
       if (process.env.NODE_ENV === 'production') {
         console.error(error.stack || error.message || error);
       } else {

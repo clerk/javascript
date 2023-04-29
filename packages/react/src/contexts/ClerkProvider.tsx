@@ -1,8 +1,8 @@
-import { isLegacyFrontendApiKey, isPublishableKey } from '@clerk/shared';
 import type { InitialState } from '@clerk/types';
+import { isLegacyFrontendApiKey, isPublishableKey } from '@clerk/utils';
+import { multipleClerkProvidersError } from '@clerk/utils';
 import React from 'react';
 
-import { multipleClerkProvidersError } from '../errors';
 import type { IsomorphicClerkOptions } from '../types';
 import { __internal__setErrorThrowerOptions, errorThrower, withMaxAllowedInstancesGuard } from '../utils';
 import { ClerkContextProvider } from './ClerkContextProvider';

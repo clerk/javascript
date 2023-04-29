@@ -1,9 +1,9 @@
 import type { LoadedClerk } from '@clerk/types';
+import { hocChildrenNotAFunctionError } from '@clerk/utils';
 import React from 'react';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { LoadedGuarantee } from '../contexts/StructureContext';
-import { hocChildrenNotAFunctionError } from '../errors';
 
 export const withClerk = <P extends { clerk: LoadedClerk }>(
   Component: React.ComponentType<P>,

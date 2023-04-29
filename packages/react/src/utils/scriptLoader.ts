@@ -1,4 +1,4 @@
-import { addClerkPrefix, isValidProxyUrl, parsePublishableKey, proxyUrlToAbsoluteURL } from '@clerk/shared';
+import { addClerkPrefix, isValidProxyUrl, parsePublishableKey, proxyUrlToAbsoluteURL } from '@clerk/utils';
 
 import { LIB_VERSION } from '../info';
 import type { BrowserClerk } from '../types';

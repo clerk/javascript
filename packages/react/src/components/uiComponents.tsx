@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type {
   CreateOrganizationProps,
   OrganizationProfileProps,
@@ -40,7 +41,7 @@ import { withClerk } from './withClerk';
 // });
 
 // Portal.displayName = 'ClerkPortal';
-class Portal extends React.PureComponent<MountProps, {}> {
+class Portal extends React.PureComponent<MountProps, Record<string, unknown>> {
   private portalRef = React.createRef<HTMLDivElement>();
 
   componentDidUpdate(prevProps: Readonly<MountProps>) {

@@ -11,7 +11,7 @@ export const SignInWithMetamaskButton = withClerk(
     children = normalizeWithDefaultValue(children, 'Sign in with Metamask');
     const child = assertSingleChild(children)('SignInWithMetamaskButton');
 
-    const clickHandler = async () => {
+    const clickHandler = () => {
       async function authenticate() {
         await clerk.authenticateWithMetamask({ redirectUrl });
       }
@@ -19,6 +19,7 @@ export const SignInWithMetamaskButton = withClerk(
     };
 
     const wrappedChildClickHandler: React.MouseEventHandler = async e => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await safeExecute((child as any).props.onClick)(e);
       return clickHandler();
     };

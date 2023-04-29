@@ -1,4 +1,4 @@
-import { noClerkProviderError, noGuaranteedLoadedError } from '../errors';
+import { noClerkProviderError, noGuaranteedLoadedError } from '@clerk/utils';
 
 export function assertWrappedByClerkProvider(contextVal: unknown): asserts contextVal {
   if (!contextVal) {

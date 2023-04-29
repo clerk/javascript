@@ -24,6 +24,7 @@ export function withMaxAllowedInstancesGuard<P>(
   const displayName = WrappedComponent.displayName || WrappedComponent.name || name || 'Component';
   const Hoc = (props: P) => {
     useMaxAllowedInstancesGuard(name, error);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return <WrappedComponent {...(props as any)} />;
   };
   Hoc.displayName = `withMaxAllowedInstancesGuard(${displayName})`;

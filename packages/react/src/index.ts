@@ -9,7 +9,6 @@ export type {
   WithClerkProp,
   WithSessionProp,
 } from './types';
-export { isMagicLinkError, MagicLinkErrorCode } from './errors';
 export { useMagicLink } from './hooks/useMagicLink';
 
 /**
@@ -19,5 +18,6 @@ export { useMagicLink } from './hooks/useMagicLink';
  * We are solving this in the SDK level to reduce setup steps.
  */
 if (typeof global === 'undefined' && typeof window !== 'undefined' && !window.global) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window as any).global = window;
 }

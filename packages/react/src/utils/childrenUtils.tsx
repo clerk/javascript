@@ -1,6 +1,5 @@
+import { multipleChildrenInButtonComponent } from '@clerk/utils';
 import React from 'react';
-
-import { multipleChildrenInButtonComponent } from '../errors';
 
 export const assertSingleChild =
   (children: React.ReactNode) =>
@@ -24,6 +23,7 @@ export const normalizeWithDefaultValue = (children: React.ReactNode | undefined,
 
 export const safeExecute =
   (cb: unknown) =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (...args: any) => {
     if (cb && typeof cb === 'function') {
       return cb(...args);

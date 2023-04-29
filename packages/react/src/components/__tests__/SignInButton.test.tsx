@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { render, screen, userEvent, waitFor } from '@clerk/shared/testUtils';
 import React from 'react';
 
@@ -93,12 +94,12 @@ describe('<SignInButton/>', () => {
     });
   });
 
-  it('uses text passed as children', async () => {
+  it('uses text passed as children', () => {
     render(<SignInButton>text</SignInButton>);
     screen.getByText('text');
   });
 
-  it('throws if multiple children provided', async () => {
+  it('throws if multiple children provided', () => {
     expect(() => {
       render(
         <SignInButton>
