@@ -1,9 +1,12 @@
 'use client';
-// !!! Note the import from react
-import type { ClerkProviderProps } from '@clerk/clerk-react';
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
-import { usePathname, useRouter } from 'next/navigation';
-import React, { useCallback, useEffect } from 'react';
+import React from 'react';
+
+import { ClerkNextOptionsProvider } from '../../client-boundary/NextOptionsContext';
+import { useInvalidateCacheOnAuthChange } from '../../client-boundary/useInvalidateCacheOnAuthChange';
+import { useInvokeMiddlewareOnAuthChange } from '../../client-boundary/useInvokeMiddlewareOnAuthChange';
+import type { NextClerkProviderProps } from '../../types';
+import { useAwaitableNavigate } from './useAwaitableNavigate';
 
 declare global {
   export interface Window {
@@ -12,43 +15,23 @@ declare global {
   }
 }
 
-const useAwaitableNavigate = () => {
-  // eslint-disable-next-line @typescript-eslint/unbound-method
-  const { push, refresh } = useRouter();
-  const pathname = usePathname();
-
-  useEffect(() => {
-    window.__clerk_nav = (to: string) => {
-      return new Promise(res => {
-        window.__clerk_nav_await.push(res);
-        if (to === pathname) {
-          refresh();
-        } else {
-          push(to);
-        }
-      });
-    };
-  }, [pathname]);
-
-  useEffect(() => {
-    if (typeof window.__clerk_nav_await === 'undefined') {
-      window.__clerk_nav_await = [];
-    }
-    window.__clerk_nav_await.forEach(resolve => resolve());
-    window.__clerk_nav_await = [];
+export const ClientClerkProvider = (props: NextClerkProviderProps) => {
+  const { __unstable_invokeMiddlewareOnAuthStateChange = true } = props;
+  const navigate = useAwaitableNavigate();
+  useInvalidateCacheOnAuthChange();
+  useInvokeMiddlewareOnAuthChange({
+    invoke: () => {
+      if (__unstable_invokeMiddlewareOnAuthStateChange) {
+        void navigate(window.location.href);
+      }
+    },
   });
 
-  return useCallback((to: string) => {
-    return window.__clerk_nav(to);
-  }, []);
-};
-
-export const ClientClerkProvider = (props: ClerkProviderProps) => {
-  const navigate = useAwaitableNavigate();
+  const mergedProps = { ...props, navigate };
   return (
-    <ReactClerkProvider
-      navigate={navigate}
-      {...props}
-    />
+    <ClerkNextOptionsProvider options={mergedProps}>
+      {/*// @ts-ignore*/}
+      <ReactClerkProvider {...mergedProps} />
+    </ClerkNextOptionsProvider>
   );
 };
