@@ -3,6 +3,7 @@
   "version": "4.15.4-staging.2",
   "license": "MIT",
   "description": "Clerk React library",
+  "sideEffects": false,
   "keywords": [
     "clerk",
     "react",
