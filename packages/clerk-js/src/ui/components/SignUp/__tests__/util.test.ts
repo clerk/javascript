@@ -1,19 +1,22 @@
-import type { SignUpResource } from '@clerk/types';
+import type { SignUpField, SignUpResource } from '@clerk/types';
 
 import { completeSignUpFlow } from '../util';
 
 const mockHandleComplete = jest.fn();
 const mockNavigate = jest.fn();
+const mockAuthenticateWithRedirect = jest.fn();
 
 describe('completeSignUpFlow', () => {
   beforeEach(() => {
     mockHandleComplete.mockReset();
     mockNavigate.mockReset();
+    mockAuthenticateWithRedirect.mockReset();
   });
 
   it('calls handleComplete if sign up is complete', async () => {
     const mockSignUp = {
       status: 'complete',
+      missingFields: [] as SignUpField[],
     } as SignUpResource;
 
     await completeSignUpFlow({
@@ -29,6 +32,7 @@ describe('completeSignUpFlow', () => {
   it('navigates to verify email page if email still unverified', async () => {
     const mockSignUp = {
       status: 'missing_requirements',
+      missingFields: [] as SignUpField[],
       unverifiedFields: ['email_address', 'phone_number'],
     } as SignUpResource;
 
@@ -47,6 +51,7 @@ describe('completeSignUpFlow', () => {
   it('navigates to verify phone page if phone still unverified', async () => {
     const mockSignUp = {
       status: 'missing_requirements',
+      missingFields: [] as SignUpField[],
       unverifiedFields: ['phone_number'],
     } as SignUpResource;
 
@@ -65,6 +70,7 @@ describe('completeSignUpFlow', () => {
   it('does nothing in any other case', async () => {
     const mockSignUp = {
       status: 'missing_requirements',
+      missingFields: [] as SignUpField[],
     } as SignUpResource;
 
     await completeSignUpFlow({
@@ -75,5 +81,33 @@ describe('completeSignUpFlow', () => {
 
     expect(mockHandleComplete).not.toHaveBeenCalled();
     expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it('initiates a SAML flow if saml is listed as a missing field', async () => {
+    const redirectUrl = 'https://www.in.gr/acs';
+    const redirectUrlComplete = 'https://www.in.gr/tada';
+
+    const mockSignUp = {
+      status: 'missing_requirements',
+      missingFields: ['saml'],
+      authenticateWithRedirect: mockAuthenticateWithRedirect,
+    } as unknown as SignUpResource;
+
+    await completeSignUpFlow({
+      signUp: mockSignUp,
+      handleComplete: mockHandleComplete,
+      navigate: mockNavigate,
+      redirectUrl: 'https://www.in.gr/acs',
+      redirectUrlComplete: 'https://www.in.gr/tada',
+    });
+
+    expect(mockHandleComplete).not.toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(mockAuthenticateWithRedirect).toHaveBeenCalledWith({
+      strategy: 'saml',
+      redirectUrl,
+      redirectUrlComplete,
+      continueSignUp: true,
+    });
   });
 });
