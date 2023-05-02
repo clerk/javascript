@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.12.0-staging.3](https://github.com/clerkinc/javascript/compare/@clerk/localizations@1.12.0-staging.2...@clerk/localizations@1.12.0-staging.3) (2023-05-02)
+
+### Features
+
+- **clerk-js:** Create <ResetPasswordSuccess /> page ([3fbf8e7](https://github.com/clerkinc/javascript/commit/3fbf8e7157774412096ff432e622540ae2d96ef4))
+- **clerk-js:** Introduce Reset Password flow ([e903c4f](https://github.com/clerkinc/javascript/commit/e903c4f430ae629625177637bb14f965a37596e1))
+- **clerk-js:** Localize "Password don't match" field error ([c573599](https://github.com/clerkinc/javascript/commit/c573599a370d4f3925d0e8a87b37f28f157bb62b))
+- **clerk-js:** Reset password for first factor ([280b5df](https://github.com/clerkinc/javascript/commit/280b5df2428b790e679a04004461aadb2717ae2b))
+
+### Bug Fixes
+
+- **clerk-js:** Reset Password missing localization keys ([b1df074](https://github.com/clerkinc/javascript/commit/b1df074ad203e07b55b0051c9f97d4fd26e0fde5))
+- **clerk-js:** Update type of resetPasswordFlow in SignInResource ([637b791](https://github.com/clerkinc/javascript/commit/637b791b0086be35a67e7d8a6a0e7c42989296b5))
+- **localizations:** Make emailAddresses GE translation consistent ([#1117](https://github.com/clerkinc/javascript/issues/1117)) ([0e84519](https://github.com/clerkinc/javascript/commit/0e84519316c43770b2174c17a412854c335a3643))
+
 ### [1.11.3](https://github.com/clerkinc/javascript/compare/@clerk/localizations@1.11.3-staging.0...@clerk/localizations@1.11.3) (2023-04-19)
 
 **Note:** Version bump only for package @clerk/localizations

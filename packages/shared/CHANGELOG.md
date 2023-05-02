@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.15.7-staging.3](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.15.7-staging.2...@clerk/shared@0.15.7-staging.3) (2023-05-02)
+
+**Note:** Version bump only for package @clerk/shared
+
 ### [0.15.6](https://github.com/clerkinc/clerk_docker/compare/@clerk/shared@0.15.6-staging.0...@clerk/shared@0.15.6) (2023-04-19)
 
 **Note:** Version bump only for package @clerk/shared
