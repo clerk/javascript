@@ -15,7 +15,7 @@ type Options = {
   options?: SelectOption[];
   checked?: boolean;
   enableErrorAfterBlur?: boolean;
-  direction?: string;
+  informationText?: string;
 } & (
   | {
       complexity?: never;
@@ -66,7 +66,7 @@ export const useFormControl = <Id extends string>(
     placeholder: '',
     options: [],
     enableErrorAfterBlur: false,
-    direction: '',
+    informationText: '',
   };
 
   const { translateError } = useLocalizations();
@@ -161,7 +161,7 @@ type DebouncedFeedback = {
     warningText: string;
     isSuccessful: boolean;
     isFocused: boolean;
-    direction: string;
+    informationText: string;
   };
 };
 
@@ -172,7 +172,7 @@ type DebouncingOption = {
   enableErrorAfterBlur: boolean | undefined;
   isSuccessful: boolean;
   isFocused: boolean;
-  direction: string | undefined;
+  informationText: string | undefined;
 };
 export const useFormControlFeedback = (
   opts: DebouncingOption,
@@ -186,7 +186,7 @@ export const useFormControlFeedback = (
     enableErrorAfterBlur = false,
     isSuccessful = false,
     isFocused = false,
-    direction = '',
+    informationText = '',
   } = opts;
 
   const canDisplayFeedback = useMemo(() => {
@@ -205,19 +205,30 @@ export const useFormControlFeedback = (
     const _isSuccessful = isSuccessful;
 
     /*
-     * On keyboard navigation avoid displaying the direction when an error is present.
+     * On keyboard navigation avoid displaying the information text when an error is present.
      * This is necessary in order to ensure that users will still be able to see the error message
      *  even if they have pressed Enter (to submit form) and field still has focus.
      */
-    const directionBehaviour = skipBlur ? isFocused && !_isSuccessful && !_errorText : isFocused && !_isSuccessful;
+    const shouldShowInformationText = skipBlur
+      ? isFocused && !_isSuccessful && !_errorText
+      : isFocused && !_isSuccessful;
     return {
       errorText: _errorText,
       isSuccessful: _isSuccessful,
       warningText: _warningText,
       isFocused,
-      direction: directionBehaviour ? direction : '',
+      informationText: shouldShowInformationText ? informationText : '',
     };
-  }, [direction, enableErrorAfterBlur, isFocused, isSuccessful, hasLostFocus, errorText, canDisplayFeedback, skipBlur]);
+  }, [
+    informationText,
+    enableErrorAfterBlur,
+    isFocused,
+    isSuccessful,
+    hasLostFocus,
+    errorText,
+    canDisplayFeedback,
+    skipBlur,
+  ]);
 
   const debouncedState = useSetTimeout(feedbackMemo, delayTime);
 

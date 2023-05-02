@@ -78,7 +78,7 @@ function _SignUpStart(): JSX.Element {
       enableErrorAfterBlur: true,
       complexity: true,
       strengthMeter: true,
-      direction: failedValidationsText,
+      informationText: failedValidationsText,
     }),
     ticket: useFormControl(
       'ticket',

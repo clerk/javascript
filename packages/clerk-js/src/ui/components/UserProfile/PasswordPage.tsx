@@ -56,7 +56,7 @@ export const PasswordPage = withCardStateProvider(() => {
     enableErrorAfterBlur: true,
     complexity: true,
     strengthMeter: true,
-    direction: failedValidationsText,
+    informationText: failedValidationsText,
   });
   const confirmField = useFormControl('confirmPassword', '', {
     type: 'password',
