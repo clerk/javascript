@@ -47,7 +47,7 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
   isSuccessful: boolean;
   hasLostFocus: boolean;
   enableErrorAfterBlur?: boolean;
-  direction?: string;
+  informationText?: string;
   isFocused: boolean;
 };
 
@@ -95,13 +95,15 @@ const useCalculateErrorTextHeight = () => {
 
   const calculateHeight = useCallback((element: HTMLElement | null, messageToDisplay: string | undefined) => {
     if (element) {
-      const fontSize = parseInt(getComputedStyle(element).fontSize.replace('px', ''));
-      const width = parseInt(getComputedStyle(element).width.replace('px', ''));
-      const lineHeight = parseInt(getComputedStyle(element).lineHeight.replace('px', '')) / 16;
+      const computedStyles = getComputedStyle(element);
+      const fontSize = parseInt(computedStyles.fontSize.replace('px', ''));
+      const width = parseInt(computedStyles.width.replace('px', ''));
+      const marginTop = parseInt(computedStyles.marginTop.replace('px', ''));
+      const lineHeight = parseInt(computedStyles.lineHeight.replace('px', '')) / 16;
       const characters = messageToDisplay?.length || 0;
 
       setHeight(prevHeight => {
-        const newHeight = 10 + fontSize * lineHeight * Math.ceil(characters / (width / (fontSize * 0.6))); //0.6 is an average character width
+        const newHeight = marginTop + fontSize * lineHeight * Math.ceil(characters / (width / (fontSize * 0.6))); //0.6 is an average character width
         if (prevHeight < newHeight) {
           return newHeight;
         }
@@ -135,7 +137,7 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
     setSuccessful,
     hasLostFocus,
     enableErrorAfterBlur,
-    direction,
+    informationText,
     isFocused: _isFocused,
     warningText,
     setWarning,
@@ -149,7 +151,7 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
   const { debounced: debouncedState } = useFormControlFeedback(
     {
       errorText,
-      direction,
+      informationText,
       enableErrorAfterBlur,
       isFocused: _isFocused,
       hasLostFocus,
@@ -164,10 +166,10 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
     ? t(localizationKeys('unstable__errors.zxcvbn.goodPassword'))
     : '';
   const successMessage = useDelayedUnmount(_successMessage, 200);
-  const directionMessage = useDelayedUnmount(debouncedState.direction, 200);
+  const informationMessage = useDelayedUnmount(debouncedState.informationText, 200);
   const warningMessage = useDelayedUnmount(debouncedState.warningText, 200);
 
-  const messageToDisplay = directionMessage || successMessage || errorMessage || warningMessage;
+  const messageToDisplay = informationMessage || successMessage || errorMessage || warningMessage;
   const isSomeMessageVisible = !!messageToDisplay;
 
   const { calculateHeight, height } = useCalculateErrorTextHeight();
@@ -312,7 +314,7 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
           }}
           sx={[
             getFormTextAnimation(
-              !!debouncedState.direction ||
+              !!debouncedState.informationText ||
                 debouncedState.isSuccessful ||
                 !!debouncedState.errorText ||
                 !!debouncedState.warningText,
@@ -320,14 +322,14 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
           ]}
         >
           {/*Display the directions after is success message is unmounted*/}
-          {!successMessage && !warningMessage && !errorMessage && directionMessage && (
+          {!successMessage && !warningMessage && !errorMessage && informationMessage && (
             <FormInfoText
-              ref={e => calculateHeight(e, directionMessage)}
+              ref={e => calculateHeight(e, informationMessage)}
               sx={getFormTextAnimation(
                 debouncedState.isFocused && !debouncedState?.isSuccessful && !debouncedState.warningText,
               )}
             >
-              {directionMessage}
+              {informationMessage}
             </FormInfoText>
           )}
           {/* Display the error message after the directions is unmounted*/}
