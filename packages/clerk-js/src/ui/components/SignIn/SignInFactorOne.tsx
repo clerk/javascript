@@ -4,6 +4,7 @@ import React from 'react';
 import { withRedirectToHomeSingleSessionGuard } from '../../common';
 import { useCoreSignIn, useEnvironment } from '../../contexts';
 import { ErrorCard, LoadingCard, withCardStateProvider } from '../../elements';
+import { useEnabledThirdPartyProviders } from '../../hooks';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import { AlternativeMethods } from './AlternativeMethods';
@@ -42,6 +43,15 @@ export function _SignInFactorOne(): JSX.Element {
     currentFactor: determineStartingSignInFactor(availableFactors, signIn.identifier, preferredSignInStrategy),
     prevCurrentFactor: undefined,
   }));
+
+  const { strategies } = useEnabledThirdPartyProviders();
+
+  const shouldAllowForAlternativeStrategies = !!(
+    signIn.supportedFirstFactors.filter(
+      f => !(f.strategy === currentFactor?.strategy) && !(f.strategy === 'reset_password_code'),
+    ).length + strategies.length
+  );
+
   const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(
     () => !currentFactor || !factorHasLocalStrategy(currentFactor),
   );
@@ -65,7 +75,7 @@ export function _SignInFactorOne(): JSX.Element {
     );
   }
 
-  const toggleAllStrategies = () => setShowAllStrategies(s => !s);
+  const toggleAllStrategies = shouldAllowForAlternativeStrategies ? () => setShowAllStrategies(s => !s) : undefined;
   const handleFactorPrepare = () => {
     lastPreparedFactorKeyRef.current = factorKey(currentFactor);
   };
@@ -74,7 +84,7 @@ export function _SignInFactorOne(): JSX.Element {
       currentFactor: factor,
       prevCurrentFactor: prev.currentFactor,
     }));
-    toggleAllStrategies();
+    toggleAllStrategies?.();
   };
   if (showAllStrategies) {
     const canGoBack = factorHasLocalStrategy(currentFactor);
@@ -82,6 +92,7 @@ export function _SignInFactorOne(): JSX.Element {
       <AlternativeMethods
         onBackLinkClick={canGoBack ? toggleAllStrategies : undefined}
         onFactorSelected={selectFactor}
+        currentFactor={currentFactor}
       />
     );
   }
