@@ -32,7 +32,6 @@ import {
   clerkInvalidFAPIResponse,
   clerkInvalidStrategy,
   clerkMissingOptionError,
-  clerkResetPasswordMissingEmailOrPhone,
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
@@ -97,8 +96,6 @@ export class SignIn extends BaseResource implements SignInResource {
           config = { emailAddressId: factor?.emailAddressId } as ResetPasswordCodeFactorConfig;
         } else if (factor.phoneNumberId) {
           config = { phoneNumberId: factor?.phoneNumberId } as ResetPasswordCodeFactorConfig;
-        } else {
-          clerkResetPasswordMissingEmailOrPhone();
         }
         break;
       default:

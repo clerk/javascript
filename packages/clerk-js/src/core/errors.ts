@@ -68,12 +68,6 @@ export function clerkVerifyEmailAddressCalledBeforeCreate(type: 'SignIn' | 'Sign
   throw new Error(`${errorPrefix} You need to start a ${type} flow by calling ${type}.create() first.`);
 }
 
-export function clerkResetPasswordMissingEmailOrPhone(): never {
-  throw new Error(
-    `${errorPrefix} You need to provide either phoneNumberId or an emailAddressId when calling prepareFirstFactor with 'reset_password_code' as strategy`,
-  );
-}
-
 export function clerkInvalidStrategy(functionaName: string, strategy: string): never {
   throw new Error(`${errorPrefix} Strategy "${strategy}" is not a valid strategy for ${functionaName}.`);
 }
