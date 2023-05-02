@@ -60,7 +60,6 @@ const FormRoot = (props: FormProps): JSX.Element => {
         */}
         <button
           type='submit'
-          onClick={() => console.log('firing')}
           aria-hidden
           // Avoid using display:none because safari will ignore the button
           style={{ visibility: 'hidden', position: 'absolute' }}
