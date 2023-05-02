@@ -1,0 +1,28 @@
+{
+  "name": "@playground/solid",
+  "version": "0.0.0",
+  "private": true,
+  "description": "",
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview",
+    "yalc:add": "yalc add -- @clerk/shared @clerk/types @clerk/utils @clerk/backend @clerk/clerk-solid @clerk/clerk-sdk-node"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.9.5",
+    "vite": "^4.1.1",
+    "vite-plugin-solid": "^2.5.0"
+  },
+  "dependencies": {
+    "@clerk/backend": "file:.yalc/@clerk/backend",
+    "@clerk/clerk-sdk-node": "file:.yalc/@clerk/clerk-sdk-node",
+    "@clerk/clerk-solid": "file:.yalc/@clerk/clerk-solid",
+    "@clerk/shared": "file:.yalc/@clerk/shared",
+    "@clerk/types": "file:.yalc/@clerk/types",
+    "@clerk/utils": "file:.yalc/@clerk/utils",
+    "solid-js": "^1.6.10"
+  }
+}
