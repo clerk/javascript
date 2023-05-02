@@ -2,7 +2,7 @@ import type { ClerkAPIError } from '@clerk/types';
 import type { HTMLInputTypeAttribute } from 'react';
 import React, { useMemo } from 'react';
 
-import { useDebounce } from '../hooks';
+import { useSetTimeout } from '../hooks';
 import type { LocalizationKey } from '../localization';
 import { useLocalizations } from '../localization';
 
@@ -219,7 +219,7 @@ export const useFormControlFeedback = (
     };
   }, [direction, enableErrorAfterBlur, isFocused, isSuccessful, hasLostFocus, errorText, canDisplayFeedback, skipBlur]);
 
-  const debouncedState = useDebounce(feedbackMemo, delayTime);
+  const debouncedState = useSetTimeout(feedbackMemo, delayTime);
 
   return {
     debounced: debouncedState,
