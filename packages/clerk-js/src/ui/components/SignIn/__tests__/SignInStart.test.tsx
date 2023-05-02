@@ -127,15 +127,20 @@ describe('SignInStart', () => {
         f.withEmailAddress();
       });
       fixtures.signIn.create.mockReturnValueOnce(
-        Promise.resolve({ status: 'needs_identifier', supportedFirstFactors: ['saml'] } as unknown as SignInResource),
+        Promise.resolve({
+          status: 'needs_identifier',
+          supportedFirstFactors: [{ strategy: 'saml' }],
+        } as unknown as SignInResource),
       );
       const { userEvent } = render(<SignInStart />, { wrapper });
       await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.dev');
       await userEvent.click(screen.getByText('Continue'));
       expect(fixtures.signIn.create).toHaveBeenCalled();
-
-      // FIXME this should pass
-      //expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalled();
+      expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith({
+        strategy: 'saml',
+        redirectUrl: 'http://localhost/#/sso-callback',
+        redirectUrlComplete: 'https://dashboard.clerk.com',
+      });
     });
   });
 

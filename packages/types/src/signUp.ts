@@ -152,7 +152,7 @@ export type SignUpVerifiableField =
   | Web3WalletIdentifier;
 
 // TODO: Does it make sense that the identification *field* holds a *strategy*?
-export type SignUpIdentificationField = SignUpVerifiableField | OAuthStrategy;
+export type SignUpIdentificationField = SignUpVerifiableField | OAuthStrategy | SamlStrategy;
 
 // TODO: Replace with discriminated union type
 export type SignUpCreateParams = Partial<

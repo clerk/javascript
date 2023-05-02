@@ -2,7 +2,7 @@ import React from 'react';
 
 import { ERROR_CODES } from '../../../core/constants';
 import { getClerkQueryParam } from '../../../utils/getClerkQueryParam';
-import { withRedirectToHomeSingleSessionGuard } from '../../common';
+import { buildSSOCallbackURL, withRedirectToHomeSingleSessionGuard } from '../../common';
 import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance } from '../../customizables';
 import {
@@ -33,7 +33,8 @@ function _SignUpStart(): JSX.Element {
   const { navigate } = useNavigate();
   const { attributes } = userSettings;
   const { setActive } = useCoreClerk();
-  const { navigateAfterSignUp, signInUrl } = useSignUpContext();
+  const ctx = useSignUpContext();
+  const { navigateAfterSignUp, signInUrl } = ctx;
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
@@ -192,6 +193,10 @@ function _SignUpStart(): JSX.Element {
 
     card.setLoading();
     card.setError(undefined);
+
+    const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signUpUrl);
+    const redirectUrlComplete = ctx.afterSignInUrl || displayConfig.afterSignUpUrl;
+
     return signUp
       .create(buildRequest(fieldsToSubmit))
       .then(res =>
@@ -201,6 +206,8 @@ function _SignUpStart(): JSX.Element {
           verifyPhonePath: 'verify-phone-number',
           handleComplete: () => setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignUp }),
           navigate,
+          redirectUrl,
+          redirectUrlComplete,
         }),
       )
       .catch(err => handleError(err, fieldsToSubmit, card.setError))
