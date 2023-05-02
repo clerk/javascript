@@ -14,6 +14,7 @@ import { factorHasLocalStrategy } from './utils';
 export type AlternativeMethodsProps = {
   onBackLinkClick: React.MouseEventHandler | undefined;
   onFactorSelected: (factor: SignInFactor) => void;
+  currentFactor: SignInFactor | undefined | null;
 };
 
 export const AlternativeMethods = (props: AlternativeMethodsProps) => {
@@ -29,6 +30,7 @@ export const AlternativeMethods = (props: AlternativeMethodsProps) => {
       onBackLinkClick={props.onBackLinkClick}
       onFactorSelected={props.onFactorSelected}
       onHavingTroubleClick={toggleHavingTrouble}
+      currentFactor={props.currentFactor}
     />
   );
 };
@@ -37,7 +39,9 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
   const { onBackLinkClick, onHavingTroubleClick, onFactorSelected } = props;
   const card = useCardState();
   const { supportedFirstFactors } = useCoreSignIn();
-  const firstPartyFactors = supportedFirstFactors.filter(f => !f.strategy.startsWith('oauth_'));
+  const firstPartyFactors = supportedFirstFactors.filter(
+    f => !f.strategy.startsWith('oauth_') && !(f.strategy === props.currentFactor?.strategy),
+  );
   const validFactors = firstPartyFactors
     .filter(factor => factorHasLocalStrategy(factor))
     .sort(allStrategiesButtonsComparator);
