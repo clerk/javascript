@@ -20,7 +20,7 @@ import {
   Text,
   useLocalizations,
 } from '../customizables';
-import { useDelayUnmount, usePrefersReducedMotion } from '../hooks';
+import { useDelayedUnmount, usePrefersReducedMotion } from '../hooks';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { animations } from '../styledSystem';
 import { useFormControlFeedback } from '../utils';
@@ -78,7 +78,7 @@ function useFormTextAnimation() {
         animation: `${enterAnimation ? animations.inAnimation : animations.outAnimation} ${
           t.transitionDuration.$slower
         } ${t.transitionTiming.$common}`,
-        transition: `height ${t.transitionDuration.$slow}  ease`, // This is expensive but required for a smooth layout shift
+        transition: `height ${t.transitionDuration.$slow}  ${t.transitionTiming.$common}`, // This is expensive but required for a smooth layout shift
       });
     },
     [prefersReducedMotion],
@@ -159,13 +159,13 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
     submittedWithEnter,
   );
 
-  const errorMessage = useDelayUnmount(debouncedState.errorText, 200);
+  const errorMessage = useDelayedUnmount(debouncedState.errorText, 200);
   const _successMessage = debouncedState.isSuccessful
     ? t(localizationKeys('unstable__errors.zxcvbn.goodPassword'))
     : '';
-  const successMessage = useDelayUnmount(_successMessage, 200);
-  const directionMessage = useDelayUnmount(debouncedState.direction, 200);
-  const warningMessage = useDelayUnmount(debouncedState.warningText, 200);
+  const successMessage = useDelayedUnmount(_successMessage, 200);
+  const directionMessage = useDelayedUnmount(debouncedState.direction, 200);
+  const warningMessage = useDelayedUnmount(debouncedState.warningText, 200);
 
   const messageToDisplay = directionMessage || successMessage || errorMessage || warningMessage;
   const isSomeMessageVisible = !!messageToDisplay;
