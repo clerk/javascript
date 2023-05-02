@@ -36,10 +36,6 @@ export const authenticateRequest = async (req: NextRequest, opts: WithAuthOption
     referrer: headers.get('referer') || undefined,
     userAgent: headers.get('user-agent') || undefined,
     searchParams: new URL(req.url).searchParams,
-    // proxyUrl,
-    // isSatellite,
-    // domain,
-    // signInUrl,
   } as any);
 };
 
