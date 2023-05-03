@@ -51,6 +51,7 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__organizationName: '',
   formFieldInputPlaceholder__organizationSlug: '',
   formFieldError__notMatchingPasswords: `Passwords don't match.`,
+  formFieldError__matchingPasswords: 'Passwords match.',
   formFieldAction__forgotPassword: 'Forgot password',
   formFieldHintText__optional: 'Optional',
   formButtonPrimary: 'Continue',
