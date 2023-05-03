@@ -84,7 +84,7 @@ export const PasswordPage = withCardStateProvider(() => {
 
   const displayConfirmPasswordFeedback = (password: string) => {
     if (checkPasswordMatch(password)) {
-      confirmField.setSuccessful(true);
+      confirmField.setSuccessful(t(localizationKeys('formFieldError__matchingPasswords')));
     } else {
       confirmField.setError(t(localizationKeys('formFieldError__notMatchingPasswords')));
     }

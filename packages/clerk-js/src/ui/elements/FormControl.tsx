@@ -43,8 +43,8 @@ type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placehol
   setError: (error: string | ClerkAPIError | undefined) => void;
   warningText: string | undefined;
   setWarning: (error: string) => void;
-  setSuccessful: (isSuccess: boolean) => void;
-  isSuccessful: boolean;
+  setSuccessful: (message: string) => void;
+  successfulText: string;
   hasLostFocus: boolean;
   enableErrorAfterBlur?: boolean;
   informationText?: string;
@@ -133,7 +133,7 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
     placeholder,
     icon,
     setError,
-    isSuccessful,
+    successfulText,
     setSuccessful,
     hasLostFocus,
     enableErrorAfterBlur,
@@ -154,16 +154,13 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
     enableErrorAfterBlur,
     isFocused: _isFocused,
     hasLostFocus,
-    isSuccessful,
+    successfulText,
     warningText,
     skipBlur: submittedWithEnter,
   });
 
   const errorMessage = useFieldMessageVisibility(debouncedState.errorText, 200);
-  const _successMessage = debouncedState.isSuccessful
-    ? t(localizationKeys('unstable__errors.zxcvbn.goodPassword'))
-    : '';
-  const successMessage = useFieldMessageVisibility(_successMessage, 200);
+  const successMessage = useFieldMessageVisibility(debouncedState.successfulText, 200);
   const informationMessage = useFieldMessageVisibility(debouncedState.informationText, 200);
   const warningMessage = useFieldMessageVisibility(debouncedState.warningText, 200);
 
@@ -313,7 +310,7 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
           sx={[
             getFormTextAnimation(
               !!debouncedState.informationText ||
-                debouncedState.isSuccessful ||
+                !!debouncedState.successfulText ||
                 !!debouncedState.errorText ||
                 !!debouncedState.warningText,
             ),
@@ -324,7 +321,7 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
             <FormInfoText
               ref={e => calculateHeight(e, informationMessage)}
               sx={getFormTextAnimation(
-                debouncedState.isFocused && !debouncedState?.isSuccessful && !debouncedState.warningText,
+                debouncedState.isFocused && !debouncedState?.successfulText && !debouncedState.warningText,
               )}
             >
               {informationMessage}
@@ -348,7 +345,7 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
               ref={e => calculateHeight(e, successMessage)}
               elementDescriptor={descriptors.formFieldSuccessText}
               elementId={descriptors.formFieldSuccessText.setId(id)}
-              sx={getFormTextAnimation(!!debouncedState?.isSuccessful)}
+              sx={getFormTextAnimation(!!debouncedState?.successfulText)}
             >
               {successMessage}
             </FormSuccessText>

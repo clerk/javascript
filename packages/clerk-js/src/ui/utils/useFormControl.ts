@@ -38,17 +38,17 @@ type FieldStateProps<Id> = {
   onFocus: React.FocusEventHandler<HTMLInputElement>;
   hasLostFocus: boolean;
   errorText: string | undefined;
-  warningText: string | undefined;
+  warningText: string;
   setError: (error: string | ClerkAPIError | undefined) => void;
-  setWarning: (error: string) => void;
-  setSuccessful: (isSuccess: boolean) => void;
-  isSuccessful: boolean;
+  setWarning: (message: string) => void;
+  setSuccessful: (message: string) => void;
+  successfulText: string;
   isFocused: boolean;
 } & Options;
 
 export type FormControlState<Id = string> = FieldStateProps<Id> & {
   setError: (error: string | ClerkAPIError | undefined) => void;
-  setSuccessful: (isSuccess: boolean) => void;
+  setSuccessful: (message: string) => void;
   setValue: (val: string | undefined) => void;
   setChecked: (isChecked: boolean) => void;
   props: FieldStateProps<Id>;
@@ -74,7 +74,7 @@ export const useFormControl = <Id extends string>(
   const [checked, setCheckedInternal] = React.useState<boolean>(opts?.checked || false);
   const [errorText, setErrorText] = React.useState<string | undefined>(undefined);
   const [warningText, setWarningText] = React.useState('');
-  const [isSuccessful, setIsSuccessful] = React.useState(false);
+  const [successfulText, setSuccessfulText] = React.useState('');
   const [hasLostFocus, setHasLostFocus] = React.useState(false);
   const [isFocused, setFocused] = React.useState(false);
 
@@ -99,20 +99,20 @@ export const useFormControl = <Id extends string>(
   const setError: FormControlState['setError'] = error => {
     setErrorText(translateError(error || undefined));
     if (typeof error !== 'undefined') {
-      setIsSuccessful(false);
+      setSuccessfulText('');
       setWarningText('');
     }
   };
   const setSuccessful: FormControlState['setSuccessful'] = isSuccess => {
     setErrorText('');
     setWarningText('');
-    setIsSuccessful(isSuccess);
+    setSuccessfulText(isSuccess);
   };
 
   const setWarning: FormControlState['setWarning'] = warning => {
     setWarningText(warning);
     if (warning) {
-      setIsSuccessful(false);
+      setSuccessfulText('');
       setErrorText('');
     }
   };
@@ -128,7 +128,7 @@ export const useFormControl = <Id extends string>(
     value,
     checked,
     errorText,
-    isSuccessful,
+    successfulText,
     hasLostFocus,
     setSuccessful,
     setError,
@@ -159,7 +159,7 @@ type DebouncedFeedback = {
   debounced: {
     errorText: string;
     warningText: string;
-    isSuccessful: boolean;
+    successfulText: string;
     isFocused: boolean;
     informationText: string;
   };
@@ -170,7 +170,7 @@ type DebouncingOption = {
   warningText: string | undefined;
   errorText: string | undefined;
   enableErrorAfterBlur: boolean | undefined;
-  isSuccessful: boolean;
+  successfulText: string | undefined;
   isFocused: boolean;
   informationText: string | undefined;
   skipBlur?: boolean;
@@ -182,7 +182,7 @@ export const useFormControlFeedback = (opts: DebouncingOption): DebouncedFeedbac
     errorText = '',
     warningText = '',
     enableErrorAfterBlur = false,
-    isSuccessful = false,
+    successfulText = '',
     isFocused = false,
     informationText = '',
     skipBlur = false,
@@ -202,7 +202,7 @@ export const useFormControlFeedback = (opts: DebouncingOption): DebouncedFeedbac
   const feedbackMemo = useMemo(() => {
     const _errorText = canDisplayFeedback ? errorText : '';
     const _warningText = warningText;
-    const _isSuccessful = isSuccessful;
+    const _successfulText = successfulText;
 
     /*
      * On keyboard navigation avoid displaying the information text when an error is present.
@@ -210,11 +210,11 @@ export const useFormControlFeedback = (opts: DebouncingOption): DebouncedFeedbac
      *  even if they have pressed Enter (to submit form) and field still has focus.
      */
     const shouldShowInformationText = skipBlur
-      ? isFocused && !_isSuccessful && !_errorText
-      : isFocused && !_isSuccessful;
+      ? isFocused && !_successfulText && !_errorText
+      : isFocused && !_successfulText;
     return {
       errorText: _errorText,
-      isSuccessful: _isSuccessful,
+      successfulText: _successfulText,
       warningText: _warningText,
       isFocused,
       informationText: shouldShowInformationText ? informationText : '',
@@ -223,7 +223,7 @@ export const useFormControlFeedback = (opts: DebouncingOption): DebouncedFeedbac
     informationText,
     enableErrorAfterBlur,
     isFocused,
-    isSuccessful,
+    successfulText,
     hasLostFocus,
     errorText,
     canDisplayFeedback,
