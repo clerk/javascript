@@ -35,7 +35,7 @@ type PaginatedResponse = {
 };
 
 function isPaginated(payload: any): payload is PaginatedResponse {
-  return <PaginatedResponse>payload.data !== undefined;
+  return Array.isArray(payload.data) && <PaginatedResponse>payload.data !== undefined;
 }
 
 function getCount(item: { total_count: number }) {
