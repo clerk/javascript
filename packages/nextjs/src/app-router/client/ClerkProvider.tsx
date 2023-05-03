@@ -1,5 +1,6 @@
 'use client';
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
+import { useRouter } from 'next/navigation';
 import React from 'react';
 
 import { ClerkNextOptionsProvider } from '../../client-boundary/NextOptionsContext';
@@ -17,14 +18,17 @@ declare global {
 
 export const ClientClerkProvider = (props: NextClerkProviderProps) => {
   const { __unstable_invokeMiddlewareOnAuthStateChange = true } = props;
+  const router = useRouter();
   const navigate = useAwaitableNavigate();
-  useInvalidateCacheOnAuthChange();
-  useInvokeMiddlewareOnAuthChange({
-    invoke: () => {
-      if (__unstable_invokeMiddlewareOnAuthStateChange) {
-        void navigate(window.location.href);
-      }
-    },
+
+  useInvalidateCacheOnAuthChange(() => {
+    router.refresh();
+  });
+
+  useInvokeMiddlewareOnAuthChange(() => {
+    if (__unstable_invokeMiddlewareOnAuthStateChange) {
+      void navigate(window.location.href);
+    }
   });
 
   const mergedProps = { ...props, navigate };

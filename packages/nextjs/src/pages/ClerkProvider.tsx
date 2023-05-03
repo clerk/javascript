@@ -6,6 +6,7 @@ import { ClerkNextOptionsProvider } from '../client-boundary/NextOptionsContext'
 import { useInvalidateCacheOnAuthChange } from '../client-boundary/useInvalidateCacheOnAuthChange';
 import { useInvokeMiddlewareOnAuthChange } from '../client-boundary/useInvokeMiddlewareOnAuthChange';
 import type { NextClerkProviderProps } from '../types';
+import { invalidateNextRouterCache } from '../utils/invalidateNextRouterCache';
 import { mergeNextClerkPropsWithEnv } from '../utils/mergeNextClerkPropsWithEnv';
 
 __internal__setErrorThrowerOptions({ packageName: '@clerk/nextjs' });
@@ -15,13 +16,11 @@ export function ClerkProvider({ children, ...props }: NextClerkProviderProps): J
   const { push } = useRouter();
   ReactClerkProvider.displayName = 'ReactClerkProvider';
 
-  useInvalidateCacheOnAuthChange();
-  useInvokeMiddlewareOnAuthChange({
-    invoke: () => {
-      if (__unstable_invokeMiddlewareOnAuthStateChange) {
-        void push(window.location.href);
-      }
-    },
+  useInvalidateCacheOnAuthChange(invalidateNextRouterCache);
+  useInvokeMiddlewareOnAuthChange(() => {
+    if (__unstable_invokeMiddlewareOnAuthStateChange) {
+      void push(window.location.href);
+    }
   });
 
   const navigate = (to: string) => push(to);

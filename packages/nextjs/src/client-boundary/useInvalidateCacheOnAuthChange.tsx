@@ -1,8 +1,7 @@
-import { invalidateNextRouterCache } from '../utils/invalidateNextRouterCache';
 import { useSafeLayoutEffect } from './useSafeLayoutEffect';
 
-export const useInvalidateCacheOnAuthChange = () => {
+export const useInvalidateCacheOnAuthChange = (callback: () => void) => {
   useSafeLayoutEffect(() => {
-    window.__unstable__onBeforeSetActive = invalidateNextRouterCache;
+    window.__unstable__onBeforeSetActive = callback;
   }, []);
 };
