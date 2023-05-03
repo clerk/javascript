@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser, useEnvironment } from '../../contexts';
@@ -70,23 +70,28 @@ export const PasswordPage = withCardStateProvider(() => {
     label: localizationKeys('formFieldLabel__signOutOfOtherSessions'),
   });
 
-  const isPasswordMatch =
-    passwordField.value.trim().length >= MIN_PASSWORD_LENGTH && passwordField.value === confirmField.value;
+  const checkPasswordMatch = useCallback(
+    (confirmPassword: string) =>
+      passwordField.value.trim().length >= MIN_PASSWORD_LENGTH && passwordField.value === confirmPassword,
+    [passwordField.value],
+  );
+
+  const isPasswordMatch = useMemo(() => checkPasswordMatch(confirmField.value), [confirmField.value]);
+
   const hasErrors = !!passwordField.errorText || !!confirmField.errorText;
   const canSubmit =
     (user.passwordEnabled ? currentPasswordField.value && isPasswordMatch : isPasswordMatch) && !hasErrors;
 
-  const checkPasswordMatch = useCallback(
-    (confirmPassword: string) => {
-      return passwordField.value && confirmPassword && passwordField.value !== confirmPassword
-        ? t(localizationKeys('formFieldError__notMatchingPasswords'))
-        : undefined;
-    },
-    [passwordField.value],
-  );
+  const displayConfirmPasswordFeedback = (password: string) => {
+    if (checkPasswordMatch(password)) {
+      confirmField.setSuccessful(true);
+    } else {
+      confirmField.setError(t(localizationKeys('formFieldError__notMatchingPasswords')));
+    }
+  };
 
   const validateForm = () => {
-    confirmField.setError(checkPasswordMatch(confirmField.value));
+    displayConfirmPasswordFeedback(confirmField.value);
   };
 
   const updatePassword = async () => {
@@ -144,7 +149,7 @@ export const PasswordPage = withCardStateProvider(() => {
             <Form.Control
               {...confirmField.props}
               onChange={e => {
-                confirmField.setError(checkPasswordMatch(e.target.value));
+                displayConfirmPasswordFeedback(e.target.value);
                 return confirmField.props.onChange(e);
               }}
             />

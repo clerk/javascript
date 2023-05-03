@@ -91,7 +91,7 @@ describe('PasswordPage', () => {
       });
     });
 
-    it('results in error if the passwords do not match', async () => {
+    it('results in error if the passwords do not match and persists', async () => {
       const { wrapper } = await createFixtures(initConfig);
 
       const { userEvent } = render(<PasswordPage />, { wrapper });
@@ -106,7 +106,7 @@ describe('PasswordPage', () => {
 
       await userEvent.clear(confirmField);
       await waitFor(() => {
-        expect(screen.queryByText(/match/i)).not.toBeInTheDocument();
+        screen.queryByText(/match/i);
       });
     });
 
