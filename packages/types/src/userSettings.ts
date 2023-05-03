@@ -50,6 +50,7 @@ export type SignUpData = {
 };
 
 export type PasswordSettingsData = {
+  allowed_special_characters: string;
   disable_hibp: boolean;
   min_length: number;
   max_length: number;
