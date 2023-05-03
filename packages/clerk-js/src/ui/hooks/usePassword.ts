@@ -1,7 +1,9 @@
 import { noop } from '@clerk/shared';
 import type { PasswordSettingsData } from '@clerk/types';
-import { useCallback, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 
+import { localizationKeys, useLocalizations } from '../localization';
+import type { FormControlState } from '../utils';
 import { loadZxcvbn } from '../utils';
 import { usePasswordComplexity } from './usePasswordComplexity';
 import { usePasswordStrength } from './usePasswordStrength';
@@ -77,5 +79,38 @@ export const usePassword = (config: UsePasswordConfig, callbacks?: UsePasswordCb
   return {
     setPassword,
     getScore,
+  };
+};
+
+export const useConfirmPassword = ({
+  passwordField,
+  confirmPasswordField,
+}: {
+  passwordField: FormControlState;
+  confirmPasswordField: FormControlState;
+}) => {
+  const { t } = useLocalizations();
+  const checkPasswordMatch = useCallback(
+    (confirmPassword: string) =>
+      passwordField.value.trim().length >= MIN_PASSWORD_LENGTH && passwordField.value === confirmPassword,
+    [passwordField.value],
+  );
+
+  const isPasswordMatch = useMemo(() => checkPasswordMatch(confirmPasswordField.value), [confirmPasswordField.value]);
+
+  const displayConfirmPasswordFeedback = useCallback(
+    (password: string) => {
+      if (checkPasswordMatch(password)) {
+        confirmPasswordField.setSuccessful(t(localizationKeys('formFieldError__matchingPasswords')));
+      } else {
+        confirmPasswordField.setError(t(localizationKeys('formFieldError__notMatchingPasswords')));
+      }
+    },
+    [confirmPasswordField.setError, confirmPasswordField.setSuccessful, t, checkPasswordMatch],
+  );
+
+  return {
+    displayConfirmPasswordFeedback,
+    isPasswordMatch,
   };
 };

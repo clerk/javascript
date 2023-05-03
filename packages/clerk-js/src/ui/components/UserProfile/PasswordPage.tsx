@@ -1,10 +1,10 @@
-import { useCallback, useMemo, useRef } from 'react';
+import { useRef } from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser, useEnvironment } from '../../contexts';
-import { localizationKeys, useLocalizations } from '../../customizables';
+import { localizationKeys } from '../../customizables';
 import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
-import { MIN_PASSWORD_LENGTH, usePasswordComplexity } from '../../hooks';
+import { useConfirmPassword, usePasswordComplexity } from '../../hooks';
 import { handleError, useFormControl } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
@@ -31,7 +31,6 @@ export const PasswordPage = withCardStateProvider(() => {
     : localizationKeys('userProfile.passwordPage.title');
   const card = useCardState();
   const wizard = useWizard();
-  const { t } = useLocalizations();
 
   // Ensure that messages will not use the updated state of User after a password has been set or changed
   const successPagePropsRef = useRef<Parameters<typeof SuccessPage>[0]>({
@@ -70,25 +69,14 @@ export const PasswordPage = withCardStateProvider(() => {
     label: localizationKeys('formFieldLabel__signOutOfOtherSessions'),
   });
 
-  const checkPasswordMatch = useCallback(
-    (confirmPassword: string) =>
-      passwordField.value.trim().length >= MIN_PASSWORD_LENGTH && passwordField.value === confirmPassword,
-    [passwordField.value],
-  );
-
-  const isPasswordMatch = useMemo(() => checkPasswordMatch(confirmField.value), [confirmField.value]);
+  const { displayConfirmPasswordFeedback, isPasswordMatch } = useConfirmPassword({
+    passwordField,
+    confirmPasswordField: confirmField,
+  });
 
   const hasErrors = !!passwordField.errorText || !!confirmField.errorText;
   const canSubmit =
     (user.passwordEnabled ? currentPasswordField.value && isPasswordMatch : isPasswordMatch) && !hasErrors;
-
-  const displayConfirmPasswordFeedback = (password: string) => {
-    if (checkPasswordMatch(password)) {
-      confirmField.setSuccessful(t(localizationKeys('formFieldError__matchingPasswords')));
-    } else {
-      confirmField.setError(t(localizationKeys('formFieldError__notMatchingPasswords')));
-    }
-  };
 
   const validateForm = () => {
     displayConfirmPasswordFeedback(confirmField.value);

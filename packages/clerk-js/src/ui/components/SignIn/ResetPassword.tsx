@@ -1,11 +1,9 @@
-import { useCallback } from 'react';
-
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { withRedirectToHomeSingleSessionGuard } from '../../common';
 import { useCoreSignIn } from '../../contexts';
-import { Col, descriptors, localizationKeys, useLocalizations } from '../../customizables';
+import { Col, descriptors, localizationKeys } from '../../customizables';
 import { Card, CardAlert, Form, Header, useCardState, withCardStateProvider } from '../../elements';
-import { MIN_PASSWORD_LENGTH } from '../../hooks';
+import { useConfirmPassword } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
@@ -15,7 +13,6 @@ export const _ResetPassword = () => {
   const card = useCardState();
   const { navigate } = useRouter();
   const supportEmail = useSupportEmail();
-  const { t } = useLocalizations();
 
   const passwordField = useFormControl('password', '', {
     type: 'password',
@@ -32,19 +29,16 @@ export const _ResetPassword = () => {
     enableErrorAfterBlur: true,
   });
 
-  const canSubmit =
-    passwordField.value.trim().length >= MIN_PASSWORD_LENGTH && passwordField.value === confirmField.value;
+  const { displayConfirmPasswordFeedback, isPasswordMatch } = useConfirmPassword({
+    passwordField,
+    confirmPasswordField: confirmField,
+  });
 
-  const checkPasswordMatch = useCallback(
-    (confirmPassword: string) => {
-      return passwordField.value && confirmPassword && passwordField.value !== confirmPassword
-        ? t(localizationKeys('formFieldError__notMatchingPasswords'))
-        : undefined;
-    },
-    [passwordField.value],
-  );
+  const hasErrors = !!passwordField.errorText || !!confirmField.errorText;
+  const canSubmit = isPasswordMatch && !hasErrors;
+
   const validateForm = () => {
-    confirmField.setError(checkPasswordMatch(confirmField.value));
+    displayConfirmPasswordFeedback(confirmField.value);
   };
 
   const resetPassword = async () => {
@@ -99,7 +93,7 @@ export const _ResetPassword = () => {
             <Form.Control
               {...confirmField.props}
               onChange={e => {
-                confirmField.setError(checkPasswordMatch(e.target.value));
+                displayConfirmPasswordFeedback(e.target.value);
                 return confirmField.props.onChange(e);
               }}
             />
