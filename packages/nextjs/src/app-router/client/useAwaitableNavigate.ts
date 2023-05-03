@@ -1,35 +1,31 @@
 'use client';
 
-import { usePathname, useRouter } from 'next/navigation';
-import { useCallback, useEffect } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import React, { useCallback, useEffect } from 'react';
+
+type Resolve = (value?: unknown) => void;
 
 export const useAwaitableNavigate = () => {
-  // eslint-disable-next-line @typescript-eslint/unbound-method
-  const { push, refresh } = useRouter();
+  const router = useRouter();
   const pathname = usePathname();
+  const params = useSearchParams();
+  const urlKey = pathname + params.toString();
+  const resolveFunctionsRef = React.useRef<Resolve[]>([]);
 
-  useEffect(() => {
-    window.__clerk_nav = (to: string) => {
-      return new Promise(res => {
-        window.__clerk_nav_await.push(res);
-        if (to === pathname) {
-          refresh();
-        } else {
-          push(to);
-        }
+  const awaitableNav = useCallback(
+    (to: string) => {
+      return new Promise(resolve => {
+        resolveFunctionsRef.current.push(resolve);
+        return router.push(to);
       });
-    };
-  }, [pathname]);
+    },
+    [urlKey],
+  );
 
   useEffect(() => {
-    if (typeof window.__clerk_nav_await === 'undefined') {
-      window.__clerk_nav_await = [];
-    }
-    window.__clerk_nav_await.forEach(resolve => resolve());
-    window.__clerk_nav_await = [];
-  });
+    resolveFunctionsRef.current.forEach(resolve => resolve());
+    resolveFunctionsRef.current = [];
+  }, [urlKey]);
 
-  return useCallback((to: string) => {
-    return window.__clerk_nav(to);
-  }, []);
+  return awaitableNav;
 };
