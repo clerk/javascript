@@ -57,7 +57,7 @@ describe('ResetPassword', () => {
       expect(fixtures.router.navigate).toHaveBeenCalledWith('../factor-two');
     });
 
-    it('results in error if the passwords do not match', async () => {
+    it('results in error if the passwords do not match and persists', async () => {
       const { wrapper } = await createFixtures();
 
       const { userEvent } = render(<ResetPassword />, { wrapper });
@@ -67,12 +67,12 @@ describe('ResetPassword', () => {
       await userEvent.type(confirmField, 'testrwerrwqrwe');
       fireEvent.blur(confirmField);
       await waitFor(() => {
-        screen.getByText(/match/i);
+        screen.getByText(`Passwords don't match.`);
       });
 
       await userEvent.clear(confirmField);
       await waitFor(() => {
-        expect(screen.queryByText(/match/i)).not.toBeInTheDocument();
+        screen.getByText(`Passwords don't match.`);
       });
     });
 
