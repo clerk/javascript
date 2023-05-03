@@ -101,12 +101,38 @@ describe('PasswordPage', () => {
       await userEvent.type(confirmField, 'testrwerrwqrwe');
       fireEvent.blur(confirmField);
       await waitFor(() => {
-        screen.getByText(/match/i);
+        screen.getByText(`Passwords don't match.`);
       });
 
       await userEvent.clear(confirmField);
       await waitFor(() => {
-        screen.queryByText(/match/i);
+        screen.getByText(`Passwords don't match.`);
+      });
+    });
+
+    it(`Displays "Password match" when password match and removes it if they stop`, async () => {
+      const { wrapper } = await createFixtures(initConfig);
+
+      const { userEvent } = render(<PasswordPage />, { wrapper });
+
+      const passwordField = screen.getByLabelText(/new password/i);
+      await userEvent.type(passwordField, 'testewrewr');
+      const confirmField = screen.getByLabelText(/confirm password/i);
+      expect(screen.queryByText(`Passwords match.`)).not.toBeInTheDocument();
+      await userEvent.type(confirmField, 'testewrewr');
+      await waitFor(() => {
+        screen.getByText(`Passwords match.`);
+      });
+
+      await userEvent.type(confirmField, 'testrwerrwqrwe');
+      await waitFor(() => {
+        expect(screen.queryByText(`Passwords match.`)).not.toBeInTheDocument();
+      });
+
+      await userEvent.type(passwordField, 'testrwerrwqrwe');
+      fireEvent.blur(confirmField);
+      await waitFor(() => {
+        screen.getByText(`Passwords match.`);
       });
     });
 
