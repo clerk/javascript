@@ -123,16 +123,23 @@ describe('SignInFactorOne', () => {
       });
 
       it('should render the other methods component when clicking on "Forgot password"', async () => {
+        const email = 'test@clerk.dev';
         const { wrapper } = await createFixtures(f => {
           f.withEmailAddress();
           f.withPassword();
           f.withPreferredSignInStrategy({ strategy: 'password' });
-          f.startSignInWithEmailAddress({ supportEmailCode: true, supportPassword: true, supportResetPassword: false });
+          f.startSignInWithEmailAddress({
+            supportEmailCode: true,
+            supportPassword: true,
+            supportResetPassword: false,
+            identifier: email,
+          });
         });
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
         await userEvent.click(screen.getByText('Forgot password'));
         screen.getByText('Use another method');
-        screen.getByText('Sign in with your password');
+        screen.getByText(`Send code to ${email}`);
+        expect(screen.queryByText('Sign in with your password')).not.toBeInTheDocument();
       });
 
       it('should render the Forgot Password component when clicking on "Forgot password" (email)', async () => {
@@ -453,7 +460,24 @@ describe('SignInFactorOne', () => {
       await userEvent.click(screen.getByText('Use another method'));
       screen.getByText(`Send code to ${email}`);
       screen.getByText(`Send link to ${email}`);
-      screen.getByText(`Sign in with your password`);
+      expect(screen.queryByText(`Sign in with your password`)).not.toBeInTheDocument();
+    });
+
+    it('"Use another method" should not exist if only the current strategy is available', async () => {
+      const email = 'test@clerk.dev';
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress({ first_factors: [], verifications: [] });
+        f.withPassword();
+        f.startSignInWithEmailAddress({
+          supportEmailCode: false,
+          supportEmailLink: false,
+          identifier: email,
+          supportPassword: true,
+        });
+      });
+
+      render(<SignInFactorOne />, { wrapper });
+      expect(screen.queryByText(`Use another method`)).not.toBeInTheDocument();
     });
 
     it('should go back to the main screen when clicking the "<- Back" button from the "Use another method" page', async () => {
@@ -472,25 +496,48 @@ describe('SignInFactorOne', () => {
 
     it('should list all the enabled first factor methods', async () => {
       const email = 'test@clerk.dev';
-      const { wrapper } = await createFixtures(f => {
+      const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress();
         f.withPassword();
+        f.withPreferredSignInStrategy({ strategy: 'otp' });
         f.startSignInWithEmailAddress({ supportEmailCode: true, identifier: email });
       });
+      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
-      screen.getByText(`Send code to ${email}`);
+      screen.getByText(`Sign in with your password`);
+      const deactivatedMethod = screen.queryByText(`Send link to ${email}`);
+      expect(deactivatedMethod).not.toBeInTheDocument();
+    });
+
+    it('should list enabled first factor methods without the current one', async () => {
+      const email = 'test@clerk.dev';
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withSocialProvider({ provider: 'google' });
+        f.withEmailAddress();
+        f.withPassword();
+        f.withPreferredSignInStrategy({ strategy: 'otp' });
+        f.startSignInWithEmailAddress({ supportEmailCode: true, identifier: email });
+      });
+      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+      const { userEvent } = render(<SignInFactorOne />, { wrapper });
+      await userEvent.click(screen.getByText('Use another method'));
+      const currentMethod = screen.queryByText(`Send code to ${email}`);
+      expect(currentMethod).not.toBeInTheDocument();
+      screen.getByText(/Continue with google/i);
       screen.getByText(`Sign in with your password`);
       const deactivatedMethod = screen.queryByText(`Send link to ${email}`);
       expect(deactivatedMethod).not.toBeInTheDocument();
     });
 
     it('clicking the password method should show the password input', async () => {
-      const { wrapper } = await createFixtures(f => {
+      const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress();
         f.withPassword();
+        f.withPreferredSignInStrategy({ strategy: 'otp' });
         f.startSignInWithEmailAddress({ supportEmailCode: true });
       });
+      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
       await userEvent.click(screen.getByText('Sign in with your password'));
