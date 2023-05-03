@@ -129,6 +129,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
             <Text localizationKey={localizationKeys('formFieldLabel__role')} />
             {/*// @ts-expect-error */}
             <Select
+              elementId='role'
               {...roleField.props}
               onChange={option => roleField.setValue(option.value)}
             >
