@@ -4,26 +4,6 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { localizationKeys, useLocalizations } from '../localization';
 
-const testComplexityCases = (
-  password: string,
-  {
-    minLength,
-    maxLength,
-  }: {
-    minLength: number;
-    maxLength: number;
-  },
-) => {
-  return {
-    max_length: password.length < maxLength,
-    min_length: password.length >= minLength,
-    require_numbers: /\d/.test(password),
-    require_lowercase: /[a-z]/.test(password),
-    require_uppercase: /[A-Z]/.test(password),
-    require_special_char: /[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/.test(password),
-  };
-};
-
 type ComplexityErrorMessages = {
   [key in keyof Partial<Omit<PasswordSettingsData, 'disable_hibp' | 'min_zxcvbn_strength' | 'show_zxcvbn'>>]: string;
 };
@@ -34,10 +14,54 @@ type UsePasswordComplexityCbs = {
   onValidationSuccess?: () => void;
 };
 
+const useTestComplexityCases = (config: Pick<UsePasswordComplexityConfig, 'allowed_special_characters'>) => {
+  let specialCharsRegex: RegExp;
+  if (config.allowed_special_characters) {
+    specialCharsRegex = new RegExp(`[${config.allowed_special_characters}]`);
+  } else {
+    specialCharsRegex = /[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/;
+  }
+
+  const testComplexityCases = (
+    password: string,
+    {
+      minLength,
+      maxLength,
+    }: {
+      minLength: number;
+      maxLength: number;
+    },
+  ) => {
+    return {
+      max_length: password.length < maxLength,
+      min_length: password.length >= minLength,
+      require_numbers: /\d/.test(password),
+      require_lowercase: /[a-z]/.test(password),
+      require_uppercase: /[A-Z]/.test(password),
+      require_special_char: specialCharsRegex.test(password),
+    };
+  };
+
+  return {
+    testComplexityCases,
+  };
+};
+
 export const usePasswordComplexity = (config: UsePasswordComplexityConfig, callbacks?: UsePasswordComplexityCbs) => {
   const { onValidationFailed = noop, onValidationSuccess = noop } = callbacks || {};
-  const { min_length, max_length, require_lowercase, require_numbers, require_uppercase, require_special_char } =
-    config;
+  const {
+    min_length,
+    max_length,
+    require_lowercase,
+    require_numbers,
+    require_uppercase,
+    require_special_char,
+    allowed_special_characters,
+  } = config;
+
+  const { testComplexityCases } = useTestComplexityCases({
+    allowed_special_characters,
+  });
 
   const [password, _setPassword] = useState('');
   const [failedValidations, setFailedValidations] = useState<ComplexityErrorMessages>({});
