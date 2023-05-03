@@ -1,4 +1,4 @@
-import type { SignInFactor } from '@clerk/types';
+import type { ResetPasswordCodeFactor, SignInFactor } from '@clerk/types';
 import React from 'react';
 
 import { withRedirectToHomeSingleSessionGuard } from '../../common';
@@ -9,6 +9,7 @@ import { useRouter } from '../../router';
 import { AlternativeMethods } from './AlternativeMethods';
 import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
 import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
+import { SignInFactorOneForgotPasswordCard } from './SignInFactorOneForgotPasswordCard';
 import { SignInFactorOnePasswordCard } from './SignInFactorOnePasswordCard';
 import { SignInFactorOnePhoneCodeCard } from './SignInFactorOnePhoneCodeCard';
 import { determineStartingSignInFactor, factorHasLocalStrategy } from './utils';
@@ -34,9 +35,13 @@ export function _SignInFactorOne(): JSX.Element {
   const router = useRouter();
 
   const lastPreparedFactorKeyRef = React.useRef('');
-  const [currentFactor, setCurrentFactor] = React.useState<SignInFactor | undefined | null>(() =>
-    determineStartingSignInFactor(availableFactors, signIn.identifier, preferredSignInStrategy),
-  );
+  const [{ currentFactor }, setFactor] = React.useState<{
+    currentFactor: SignInFactor | undefined | null;
+    prevCurrentFactor: SignInFactor | undefined | null;
+  }>(() => ({
+    currentFactor: determineStartingSignInFactor(availableFactors, signIn.identifier, preferredSignInStrategy),
+    prevCurrentFactor: undefined,
+  }));
   const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(
     () => !currentFactor || !factorHasLocalStrategy(currentFactor),
   );
@@ -65,7 +70,10 @@ export function _SignInFactorOne(): JSX.Element {
     lastPreparedFactorKeyRef.current = factorKey(currentFactor);
   };
   const selectFactor = (factor: SignInFactor) => {
-    setCurrentFactor(factor);
+    setFactor(prev => ({
+      currentFactor: factor,
+      prevCurrentFactor: prev.currentFactor,
+    }));
     toggleAllStrategies();
   };
   if (showAllStrategies) {
@@ -84,7 +92,20 @@ export function _SignInFactorOne(): JSX.Element {
 
   switch (currentFactor?.strategy) {
     case 'password':
-      return <SignInFactorOnePasswordCard onShowAlternativeMethodsClick={toggleAllStrategies} />;
+      return (
+        <SignInFactorOnePasswordCard
+          onFactorPrepare={(factor: ResetPasswordCodeFactor) => {
+            handleFactorPrepare();
+            setFactor(prev => ({
+              currentFactor: {
+                ...factor,
+              },
+              prevCurrentFactor: prev.currentFactor,
+            }));
+          }}
+          onShowAlternativeMethodsClick={toggleAllStrategies}
+        />
+      );
     case 'email_code':
       return (
         <SignInFactorOneEmailCodeCard
@@ -110,6 +131,21 @@ export function _SignInFactorOne(): JSX.Element {
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
+        />
+      );
+    case 'reset_password_code':
+      return (
+        <SignInFactorOneForgotPasswordCard
+          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+          onFactorPrepare={handleFactorPrepare}
+          factor={currentFactor}
+          onShowAlternativeMethodsClicked={toggleAllStrategies}
+          onBackLinkClicked={() =>
+            setFactor(prev => ({
+              currentFactor: prev.prevCurrentFactor,
+              prevCurrentFactor: prev.currentFactor,
+            }))
+          }
         />
       );
     default:

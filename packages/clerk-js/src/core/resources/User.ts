@@ -14,6 +14,7 @@ import type {
   OrganizationMembershipResource,
   PhoneNumberResource,
   RemoveUserPasswordParams,
+  SamlAccountResource,
   SetProfileImageParams,
   TOTPJSON,
   TOTPResource,
@@ -38,6 +39,7 @@ import {
   Image,
   OrganizationMembership,
   PhoneNumber,
+  SamlAccount,
   SessionWithActivities,
   TOTP,
   Web3Wallet,
@@ -53,6 +55,12 @@ export class User extends BaseResource implements UserResource {
   phoneNumbers: PhoneNumberResource[] = [];
   web3Wallets: Web3WalletResource[] = [];
   externalAccounts: ExternalAccountResource[] = [];
+
+  /**
+   * @experimental
+   */
+  samlAccounts: SamlAccountResource[] = [];
+
   organizationMemberships: OrganizationMembershipResource[] = [];
   passwordEnabled = false;
   firstName: string | null = null;
@@ -65,6 +73,7 @@ export class User extends BaseResource implements UserResource {
   primaryWeb3WalletId: string | null = null;
   primaryWeb3Wallet: Web3WalletResource | null = null;
   profileImageUrl = '';
+  experimental_imageUrl = '';
   twoFactorEnabled = false;
   totpEnabled = false;
   backupCodeEnabled = false;
@@ -271,6 +280,7 @@ export class User extends BaseResource implements UserResource {
     }
 
     this.profileImageUrl = data.profile_image_url;
+    this.experimental_imageUrl = data.image_url;
     this.username = data.username;
     this.passwordEnabled = data.password_enabled;
     this.emailAddresses = (data.email_addresses || []).map(
@@ -295,6 +305,8 @@ export class User extends BaseResource implements UserResource {
     );
 
     this.organizationMemberships = (data.organization_memberships || []).map(om => new OrganizationMembership(om));
+
+    this.samlAccounts = (data.saml_accounts || []).map(sa => new SamlAccount(sa, this.path() + '/saml_accounts'));
 
     this.publicMetadata = data.public_metadata;
     this.unsafeMetadata = data.unsafe_metadata;

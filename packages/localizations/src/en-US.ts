@@ -49,6 +49,7 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__organizationName: '',
   formFieldInputPlaceholder__organizationSlug: '',
+  formFieldError__notMatchingPasswords: `Passwords don't match.`,
   formFieldAction__forgotPassword: 'Forgot password',
   formFieldHintText__optional: 'Optional',
   formButtonPrimary: 'Continue',
@@ -134,6 +135,23 @@ export const enUS: LocalizationResource = {
       title: 'Enter your password',
       subtitle: 'to continue to {{applicationName}}',
       actionLink: 'Use another method',
+    },
+    forgotPassword: {
+      title_email: 'Check your email',
+      title_phone: 'Check your phone',
+      subtitle: 'to reset your password',
+      formTitle: 'Reset password code',
+      formSubtitle_email: 'Enter the code sent to your email address',
+      formSubtitle_phone: 'Enter the code sent to your phone number',
+      resendButton: 'Resend code',
+    },
+    resetPassword: {
+      title: 'Reset Password',
+      formButtonPrimary: 'Reset Password',
+      successMessage: 'Your password was successfully changed. Signing you in, please wait a moment.',
+    },
+    resetPasswordMfa: {
+      detailsLabel: 'We need to verify your identity before resetting your password.',
     },
     emailCode: {
       title: 'Check your email',
@@ -553,7 +571,7 @@ export const enUS: LocalizationResource = {
     form_password_incorrect: '',
     not_allowed_access: '',
     form_identifier_exists: '',
-    form_password_validation_failed: 'Invalid password supplied',
+    form_password_validation_failed: 'Incorrect Password',
     form_password_not_strong_enough: 'Your password is not strong enough.',
     passwordComplexity: {
       sentencePrefix: 'Your password must contain',

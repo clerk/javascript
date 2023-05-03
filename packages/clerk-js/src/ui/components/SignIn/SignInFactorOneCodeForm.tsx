@@ -1,13 +1,12 @@
-import type { EmailCodeFactor, PhoneCodeFactor } from '@clerk/types';
+import type { EmailCodeFactor, PhoneCodeFactor, ResetPasswordCodeFactor } from '@clerk/types';
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
-import { useCoreClerk, useCoreSignIn, useSignInContext } from '../../contexts';
-import type { LocalizationKey } from '../../customizables';
+import { useCoreClerk, useCoreSignIn, useOptions, useSignInContext } from '../../contexts';
 import type { VerificationCodeCardProps } from '../../elements';
-import { VerificationCodeCard } from '../../elements';
-import { useCardState } from '../../elements/contexts';
+import { useCardState, VerificationCodeCard } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
+import type { LocalizationKey } from '../../localization';
 import { useRouter } from '../../router';
 import { handleError } from '../../utils';
 
@@ -15,7 +14,7 @@ export type SignInFactorOneCodeCard = Pick<
   VerificationCodeCardProps,
   'onShowAlternativeMethodsClicked' | 'showAlternativeMethods' | 'onBackLinkClicked'
 > & {
-  factor: EmailCodeFactor | PhoneCodeFactor;
+  factor: EmailCodeFactor | PhoneCodeFactor | ResetPasswordCodeFactor;
   factorAlreadyPrepared: boolean;
   onFactorPrepare: () => void;
 };
@@ -35,6 +34,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   const { navigateAfterSignIn } = useSignInContext();
   const { setActive } = useCoreClerk();
   const supportEmail = useSupportEmail();
+  const { experimental_enableClerkImages } = useOptions();
 
   const goBack = () => {
     return navigate('../');
@@ -64,6 +64,8 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
             return setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignIn });
           case 'needs_second_factor':
             return navigate('../factor-two');
+          case 'needs_new_password':
+            return navigate('../reset-password');
           default:
             return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
         }
@@ -81,7 +83,9 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
       onCodeEntryFinishedAction={action}
       onResendCodeClicked={prepare}
       safeIdentifier={props.factor.safeIdentifier}
-      profileImageUrl={signIn.userData.profileImageUrl}
+      profileImageUrl={
+        experimental_enableClerkImages ? signIn.userData.experimental_imageUrl : signIn.userData.profileImageUrl
+      }
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
       showAlternativeMethods={props.showAlternativeMethods}
       onIdentityPreviewEditClicked={goBack}

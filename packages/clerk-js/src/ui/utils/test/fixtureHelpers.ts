@@ -53,6 +53,7 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
       first_name: 'FirstName',
       last_name: 'LastName',
       profile_image_url: '',
+      image_url: '',
       identifier: 'email@test.com',
       user_id: '',
       ...params,
@@ -97,12 +98,14 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
     supportPassword?: boolean;
     supportEmailCode?: boolean;
     supportEmailLink?: boolean;
+    supportResetPassword?: boolean;
   };
 
   type SignInWithPhoneNumberParams = {
     identifier?: string;
     supportPassword?: boolean;
     supportPhoneCode?: boolean;
+    supportResetPassword?: boolean;
   };
 
   type SignInFactorTwoParams = {
@@ -110,10 +113,17 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
     supportPhoneCode?: boolean;
     supportTotp?: boolean;
     supportBackupCode?: boolean;
+    supportResetPassword?: boolean;
   };
 
   const startSignInWithEmailAddress = (params?: SignInWithEmailAddressParams) => {
-    const { identifier = 'hello@clerk.dev', supportPassword = true, supportEmailCode, supportEmailLink } = params || {};
+    const {
+      identifier = 'hello@clerk.dev',
+      supportPassword = true,
+      supportEmailCode,
+      supportEmailLink,
+      supportResetPassword,
+    } = params || {};
     baseClient.sign_in = {
       status: 'needs_first_factor',
       identifier,
@@ -122,13 +132,27 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
         ...(supportPassword ? [{ strategy: 'password' }] : []),
         ...(supportEmailCode ? [{ strategy: 'email_code', safe_identifier: identifier || 'n*****@clerk.dev' }] : []),
         ...(supportEmailLink ? [{ strategy: 'email_link', safe_identifier: identifier || 'n*****@clerk.dev' }] : []),
+        ...(supportResetPassword
+          ? [
+              {
+                strategy: 'reset_password_code',
+                safe_identifier: identifier || 'n*****@clerk.dev',
+                emailAddressId: 'someNumberId',
+              },
+            ]
+          : []),
       ],
       user_data: { ...(createUserFixture() as any) },
     } as SignInJSON;
   };
 
   const startSignInWithPhoneNumber = (params?: SignInWithPhoneNumberParams) => {
-    const { identifier = '+301234567890', supportPassword = true, supportPhoneCode } = params || {};
+    const {
+      identifier = '+301234567890',
+      supportPassword = true,
+      supportPhoneCode,
+      supportResetPassword = true,
+    } = params || {};
     baseClient.sign_in = {
       status: 'needs_first_factor',
       identifier,
@@ -136,16 +160,33 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
       supported_first_factors: [
         ...(supportPassword ? [{ strategy: 'password' }] : []),
         ...(supportPhoneCode ? [{ strategy: 'phone_code', safe_identifier: '+30********90' }] : []),
+        ...(supportResetPassword
+          ? [{ strategy: 'reset_password_code', safe_identifier: '+30********90', phoneNumberId: 'someNumberId' }]
+          : []),
       ],
       user_data: { ...(createUserFixture() as any) },
     } as SignInJSON;
   };
 
   const startSignInFactorTwo = (params?: SignInFactorTwoParams) => {
-    const { identifier = '+30 691 1111111', supportPhoneCode = true, supportTotp, supportBackupCode } = params || {};
+    const {
+      identifier = '+30 691 1111111',
+      supportPhoneCode = true,
+      supportTotp,
+      supportBackupCode,
+      supportResetPassword,
+    } = params || {};
     baseClient.sign_in = {
       status: 'needs_second_factor',
       identifier,
+      ...(supportResetPassword
+        ? {
+            first_factor_verification: {
+              status: 'verified',
+              strategy: 'reset_password_code',
+            },
+          }
+        : {}),
       supported_identifiers: ['email_address', 'phone_number'],
       supported_second_factors: [
         ...(supportPhoneCode ? [{ strategy: 'phone_code', safe_identifier: identifier || 'n*****@clerk.dev' }] : []),

@@ -1,6 +1,5 @@
 import type { SignInResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
-import React from 'react';
 
 import { ClerkAPIResponseError } from '../../../../core/resources';
 import { bindCreateFixtures, render, runFakeTimers, screen, waitFor } from '../../../../testUtils';
@@ -36,7 +35,19 @@ describe('SignInFactorTwo', () => {
       expect(inputs.length).toBe(6);
     });
 
-    it.only('sets an active session when user submits second factor successfully', async () => {
+    it('correctly shows text indicating user need to complete 2FA to reset password', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInFactorTwo({
+          supportResetPassword: true,
+        });
+      });
+      fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+      render(<SignInFactorTwo />, { wrapper });
+
+      screen.getByText(/before resetting your password/i);
+    });
+
+    it('sets an active session when user submits second factor successfully', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.startSignInFactorTwo();
       });
@@ -52,6 +63,34 @@ describe('SignInFactorTwo', () => {
         await waitFor(() => {
           expect(fixtures.clerk.setActive).toHaveBeenCalled();
         });
+      });
+    });
+
+    it('redirects to reset-password-success after second factor successfully', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInFactorTwo({
+          supportResetPassword: true,
+        });
+      });
+      fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+      fixtures.signIn.attemptSecondFactor.mockReturnValueOnce(
+        Promise.resolve({
+          status: 'complete',
+          firstFactorVerification: {
+            status: 'verified',
+            strategy: 'reset_password_code',
+          },
+          createdSessionId: '1234_session_id',
+        } as SignInResource),
+      );
+      const { userEvent } = render(<SignInFactorTwo />, { wrapper });
+
+      await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+      await waitFor(() => {
+        expect(fixtures.clerk.setActive).not.toHaveBeenCalled();
+        expect(fixtures.router.navigate).toHaveBeenCalledWith(
+          '../reset-password-success?createdSessionId=1234_session_id',
+        );
       });
     });
   });

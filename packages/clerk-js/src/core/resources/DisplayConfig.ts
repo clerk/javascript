@@ -53,7 +53,6 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     this.userProfileUrl = data.user_profile_url;
     this.afterSignInUrl = data.after_sign_in_url;
     this.afterSignUpUrl = data.after_sign_up_url;
-    this.afterSignOutUrl = data.after_sign_out_url;
     this.afterSignOutOneUrl = data.after_sign_out_one_url;
     this.afterSignOutAllUrl = data.after_sign_out_all_url;
     this.afterSwitchSessionUrl = data.after_switch_session_url;

@@ -1,3 +1,4 @@
+import type { SignInResource } from '@clerk/types';
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
@@ -5,6 +6,7 @@ import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '.
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { Card, CardAlert, Footer, Form, Header, useCardState } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
+import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
 
 type SignInFactorTwoBackupCodeCardProps = {
@@ -17,6 +19,7 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
   const { displayConfig } = useEnvironment();
   const { navigateAfterSignIn } = useSignInContext();
   const { setActive } = useCoreClerk();
+  const { navigate } = useRouter();
   const supportEmail = useSupportEmail();
   const card = useCardState();
   const codeControl = useFormControl('code', '', {
@@ -25,13 +28,22 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
     isRequired: true,
   });
 
-  const handleBackupCodeSubmit: React.FormEventHandler = async e => {
+  const isResettingPassword = (resource: SignInResource) =>
+    resource.firstFactorVerification?.strategy === 'reset_password_code' &&
+    resource.firstFactorVerification?.status === 'verified';
+
+  const handleBackupCodeSubmit: React.FormEventHandler = e => {
     e.preventDefault();
     return signIn
       .attemptSecondFactor({ strategy: 'backup_code', code: codeControl.value })
       .then(res => {
         switch (res.status) {
           case 'complete':
+            if (isResettingPassword(res) && res.createdSessionId) {
+              const queryParams = new URLSearchParams();
+              queryParams.set('createdSessionId', res.createdSessionId);
+              return navigate(`../reset-password-success?${queryParams.toString()}`);
+            }
             return setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignIn });
           default:
             return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
@@ -46,9 +58,13 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
       <Header.Root>
         <Header.Title localizationKey={localizationKeys('signIn.backupCodeMfa.title')} />
         <Header.Subtitle
-          localizationKey={localizationKeys('signIn.backupCodeMfa.subtitle', {
-            applicationName: displayConfig.applicationName,
-          })}
+          localizationKey={
+            isResettingPassword(signIn)
+              ? localizationKeys('signIn.forgotPassword.subtitle')
+              : localizationKeys('signIn.backupCodeMfa.subtitle', {
+                  applicationName: displayConfig.applicationName,
+                })
+          }
         />
       </Header.Root>
       <Col

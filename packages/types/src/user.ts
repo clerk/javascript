@@ -8,6 +8,7 @@ import type { OAuthScope } from './oauth';
 import type { OrganizationMembershipResource } from './organizationMembership';
 import type { PhoneNumberResource } from './phoneNumber';
 import type { ClerkResource } from './resource';
+import type { SamlAccountResource } from './samlAccount';
 import type { SessionWithActivitiesResource } from './session';
 import type { OAuthStrategy } from './strategies';
 import type { TOTPResource } from './totp';
@@ -48,10 +49,20 @@ export interface UserResource extends ClerkResource {
   firstName: string | null;
   lastName: string | null;
   profileImageUrl: string;
+  /**
+   * @experimental
+   */
+  experimental_imageUrl: string;
   emailAddresses: EmailAddressResource[];
   phoneNumbers: PhoneNumberResource[];
   web3Wallets: Web3WalletResource[];
   externalAccounts: ExternalAccountResource[];
+
+  /**
+   * @experimental
+   */
+  samlAccounts: SamlAccountResource[];
+
   organizationMemberships: OrganizationMembershipResource[];
   passwordEnabled: boolean;
   totpEnabled: boolean;

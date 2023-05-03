@@ -1,6 +1,6 @@
 import type { FieldId } from '@clerk/types';
 import type { ClerkAPIError } from '@clerk/types';
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useMemo } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import {
@@ -18,6 +18,7 @@ import {
 } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
 import { useCardState } from './contexts';
+import { useFormState } from './Form';
 import { PasswordInput } from './PasswordInput';
 import { PhoneInput } from './PhoneInput';
 
@@ -55,6 +56,7 @@ const getInputElementForType = (type: FormControlProps['type']) => {
 export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props, ref) => {
   const { t } = useLocalizations();
   const card = useCardState();
+  const { submittedWithEnter } = useFormState();
   const {
     id,
     errorText,
@@ -78,6 +80,16 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
 
   const InputElement = getInputElementForType(props.type);
   const isCheckbox = props.type === 'checkbox';
+
+  const shouldDisplayError = useMemo(() => {
+    if (enableErrorAfterBlur) {
+      if (submittedWithEnter) {
+        return true;
+      }
+      return hasLostFocus;
+    }
+    return true;
+  }, [enableErrorAfterBlur, hasLostFocus, submittedWithEnter]);
 
   return (
     <FormControlPrim
@@ -182,7 +194,7 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
         elementDescriptor={descriptors.formFieldErrorText}
         elementId={descriptors.formFieldErrorText.setId(id)}
       >
-        {enableErrorAfterBlur ? hasLostFocus && errorText : errorText}
+        {shouldDisplayError && errorText}
       </FormErrorText>
     </FormControlPrim>
   );

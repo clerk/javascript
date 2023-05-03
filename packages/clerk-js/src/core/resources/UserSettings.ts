@@ -3,6 +3,7 @@ import type {
   OAuthProviders,
   OAuthStrategy,
   PasswordSettingsData,
+  SamlSettings,
   SignInData,
   SignUpData,
   UserSettingsJSON,
@@ -12,12 +13,21 @@ import type {
 
 import { BaseResource } from './internal';
 
+const defaultMaxPasswordLength = 72;
+const defaultMinPasswordLength = 8;
+
 /**
  * @internal
  */
 export class UserSettings extends BaseResource implements UserSettingsResource {
   id = undefined;
   social!: OAuthProviders;
+
+  /**
+   * @experimental
+   */
+  saml!: SamlSettings;
+
   attributes!: Attributes;
   signIn!: SignInData;
   signUp!: SignUpData;
@@ -51,6 +61,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     }
 
     this.social = data.social;
+    this.saml = data.saml;
     this.attributes = Object.fromEntries(
       Object.entries(data.attributes).map(a => [a[0], { ...a[1], name: a[0] }]),
     ) as Attributes;
@@ -58,8 +69,11 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     this.signUp = data.sign_up;
     this.passwordSettings = {
       ...data.password_settings,
-      min_length: Math.max(data?.password_settings?.min_length, 8),
-      max_length: data?.password_settings?.max_length === 0 ? 100 : data?.password_settings?.max_length,
+      min_length: Math.max(data?.password_settings?.min_length, defaultMinPasswordLength),
+      max_length:
+        data?.password_settings?.max_length === 0
+          ? defaultMaxPasswordLength
+          : Math.min(data?.password_settings?.max_length, defaultMaxPasswordLength),
     };
     this.socialProviderStrategies = this.getSocialProviderStrategies(data.social);
     this.authenticatableSocialStrategies = this.getAuthenticatableSocialStrategies(data.social);

@@ -65,6 +65,13 @@ export type OAuthProviders = {
   [provider in OAuthStrategy]: OAuthProviderSettings;
 };
 
+/**
+ * @experimental
+ */
+export type SamlSettings = {
+  enabled: boolean;
+};
+
 export type AttributesJSON = {
   [attribute in Attribute]: AttributeDataJSON;
 };
@@ -78,6 +85,12 @@ export interface UserSettingsJSON extends ClerkResourceJSON {
   object: never;
   attributes: AttributesJSON;
   social: OAuthProviders;
+
+  /**
+   * @experimental
+   */
+  saml: SamlSettings;
+
   sign_in: SignInData;
   sign_up: SignUpData;
   password_settings: PasswordSettingsData;
@@ -86,6 +99,12 @@ export interface UserSettingsJSON extends ClerkResourceJSON {
 export interface UserSettingsResource extends ClerkResource {
   id?: undefined;
   social: OAuthProviders;
+
+  /**
+   * @experimental
+   */
+  saml: SamlSettings;
+
   attributes: Attributes;
   signIn: SignInData;
   signUp: SignUpData;

@@ -1,14 +1,35 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+## Setup
 
-First, run the development server:
+At repository level:
+
+```bash
+npm run build
+npm run yalc:all
+```
+
+At current directory level:
+
+```bash
+npm run yalc:add
+npm i
+```
+
+## Run development server
 
 ```bash
 npm run dev
 # or
 yarn dev
 ```
+
+This starts your app in development mode, rebuilding assets on file changes.
+
+To get the latest unpublished changes from the `packages` (if they are not auto updated) use `npm run yalc:all` in repository level or `yalc push --replace` from the updated package
+after an `npm run build` is being executed.
+
+## Getting Started
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 

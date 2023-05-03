@@ -6,6 +6,7 @@ import type {
   PasswordStrategy,
   PhoneCodeStrategy,
   ResetPasswordCodeStrategy,
+  SamlStrategy,
   TOTPStrategy,
   Web3Strategy,
 } from './strategies';
@@ -46,6 +47,13 @@ export type OauthFactor = {
   strategy: OAuthStrategy;
 };
 
+/**
+ * @experimental
+ */
+export type SamlFactor = {
+  strategy: SamlStrategy;
+};
+
 export type TOTPFactor = {
   strategy: TOTPStrategy;
 };
@@ -58,6 +66,7 @@ export type ResetPasswordCodeFactor = {
   strategy: ResetPasswordCodeStrategy;
   emailAddressId?: string;
   safeIdentifier: string;
+  primary?: boolean;
   phoneNumberId?: string;
 };
 
@@ -70,6 +79,14 @@ export type EmailLinkConfig = Omit<EmailLinkFactor, 'safeIdentifier'> & {
 export type PhoneCodeConfig = Omit<PhoneCodeFactor, 'safeIdentifier'>;
 export type Web3SignatureConfig = Web3SignatureFactor;
 export type OAuthConfig = OauthFactor & {
+  redirectUrl: string;
+  actionCompleteRedirectUrl: string;
+};
+
+/**
+ * @experimental
+ */
+export type SamlConfig = SamlFactor & {
   redirectUrl: string;
   actionCompleteRedirectUrl: string;
 };

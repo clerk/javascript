@@ -44,6 +44,7 @@ Array [
   "organizations",
   "phoneNumbers",
   "prunePrivateMetadata",
+  "redirect",
   "requireAuth",
   "sanitizeAuthObject",
   "sessions",

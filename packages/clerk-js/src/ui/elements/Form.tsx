@@ -1,6 +1,6 @@
 import { createContextAndHook } from '@clerk/shared';
 import type { FieldId } from '@clerk/types';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Button, descriptors, Flex, Form as FormPrim, localizationKeys } from '../customizables';
 import { useLoadingStatus } from '../hooks';
@@ -8,13 +8,18 @@ import type { PropsOfComponent } from '../styledSystem';
 import { useCardState } from './contexts';
 import { FormControl } from './FormControl';
 
-const [FormState, useFormState] = createContextAndHook<{ isLoading: boolean; isDisabled: boolean }>('FormState');
+const [FormState, useFormState] = createContextAndHook<{
+  isLoading: boolean;
+  isDisabled: boolean;
+  submittedWithEnter: boolean;
+}>('FormState');
 
 type FormProps = PropsOfComponent<typeof FormPrim>;
 
 const FormRoot = (props: FormProps): JSX.Element => {
   const card = useCardState();
   const status = useLoadingStatus();
+  const [submittedWithEnter, setSubmittedWithEnter] = useState(false);
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
     e.preventDefault();
@@ -25,6 +30,7 @@ const FormRoot = (props: FormProps): JSX.Element => {
     try {
       card.setLoading();
       status.setLoading();
+      setSubmittedWithEnter(true);
       await props.onSubmit(e);
     } finally {
       card.setIdle();
@@ -33,8 +39,10 @@ const FormRoot = (props: FormProps): JSX.Element => {
   };
 
   const value = React.useMemo(() => {
-    return { value: { isLoading: status.isLoading, isDisabled: card.isLoading || status.isLoading } };
-  }, [card.isLoading, status.isLoading]);
+    return {
+      value: { isLoading: status.isLoading, isDisabled: card.isLoading || status.isLoading, submittedWithEnter },
+    };
+  }, [card.isLoading, status.isLoading, submittedWithEnter]);
 
   return (
     <FormState.Provider value={value}>
@@ -117,3 +125,5 @@ export const Form = {
   SubmitButton: FormSubmit,
   ResetButton: FormReset,
 };
+
+export { useFormState };

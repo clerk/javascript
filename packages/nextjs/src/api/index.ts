@@ -8,7 +8,7 @@ import type {
   WithAuthProp,
 } from '@clerk/clerk-sdk-node';
 
-import { clerkClient } from '../server/clerk';
+import { clerkClient } from '../server/clerkClient';
 
 export * from '@clerk/backend';
 

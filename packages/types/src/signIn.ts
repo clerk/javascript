@@ -14,7 +14,11 @@ import type {
   PhoneCodeConfig,
   PhoneCodeFactor,
   PhoneCodeSecondFactorConfig,
+  ResetPasswordCodeAttempt,
+  ResetPasswordCodeFactor,
   ResetPasswordCodeFactorConfig,
+  SamlConfig,
+  SamlFactor,
   TOTPAttempt,
   TOTPFactor,
   Web3Attempt,
@@ -34,7 +38,7 @@ import type {
   UserDataJSON,
   VerificationJSON,
 } from './json';
-import type { AuthenticateWithRedirectParams } from './oauth';
+import type { AuthenticateWithRedirectParams } from './redirects';
 import type { ClerkResource } from './resource';
 import type {
   BackupCodeStrategy,
@@ -43,6 +47,8 @@ import type {
   OAuthStrategy,
   PasswordStrategy,
   PhoneCodeStrategy,
+  ResetPasswordCodeStrategy,
+  SamlStrategy,
   TicketStrategy,
   TOTPStrategy,
   Web3Strategy,
@@ -100,8 +106,10 @@ export type SignInFirstFactor =
   | EmailLinkFactor
   | PhoneCodeFactor
   | PasswordFactor
+  | ResetPasswordCodeFactor
   | Web3SignatureFactor
-  | OauthFactor;
+  | OauthFactor
+  | SamlFactor;
 
 export type SignInSecondFactor = PhoneCodeFactor | TOTPFactor | BackupCodeFactor;
 
@@ -109,6 +117,10 @@ export interface UserData {
   firstName?: string;
   lastName?: string;
   profileImageUrl?: string;
+  /**
+   * @experimental
+   */
+  experimental_imageUrl?: string;
 }
 
 export type SignInFactor = SignInFirstFactor | SignInSecondFactor;
@@ -119,9 +131,15 @@ export type PrepareFirstFactorParams =
   | PhoneCodeConfig
   | Web3SignatureConfig
   | ResetPasswordCodeFactorConfig
-  | OAuthConfig;
+  | OAuthConfig
+  | SamlConfig;
 
-export type AttemptFirstFactorParams = EmailCodeAttempt | PhoneCodeAttempt | PasswordAttempt | Web3Attempt;
+export type AttemptFirstFactorParams =
+  | EmailCodeAttempt
+  | PhoneCodeAttempt
+  | PasswordAttempt
+  | Web3Attempt
+  | ResetPasswordCodeAttempt;
 
 export type PrepareSecondFactorParams = PhoneCodeSecondFactorConfig;
 
@@ -129,9 +147,10 @@ export type AttemptSecondFactorParams = PhoneCodeAttempt | TOTPAttempt | BackupC
 
 export type SignInCreateParams = (
   | {
-      strategy: OAuthStrategy;
+      strategy: OAuthStrategy | SamlStrategy;
       redirectUrl: string;
       actionCompleteRedirectUrl?: string;
+      identifier?: string;
     }
   | {
       strategy: TicketStrategy;
@@ -167,6 +186,7 @@ export interface SignInStartMagicLinkFlowParams extends StartMagicLinkFlowParams
 
 export type SignInStrategy =
   | PasswordStrategy
+  | ResetPasswordCodeStrategy
   | PhoneCodeStrategy
   | EmailCodeStrategy
   | EmailLinkStrategy
@@ -174,7 +194,8 @@ export type SignInStrategy =
   | Web3Strategy
   | TOTPStrategy
   | BackupCodeStrategy
-  | OAuthStrategy;
+  | OAuthStrategy
+  | SamlStrategy;
 
 export interface SignInJSON extends ClerkResourceJSON {
   object: 'sign_in';

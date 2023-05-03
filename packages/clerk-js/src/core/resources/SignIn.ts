@@ -93,12 +93,9 @@ export class SignIn extends BaseResource implements SignInResource {
         break;
       case 'reset_password_code':
         if (factor.emailAddressId) {
-          config = { emailAddressId: factor.emailAddressId } as ResetPasswordCodeFactorConfig;
-        }
-        if (factor.phoneNumberId) {
-          config = {
-            phoneNumberId: factor.phoneNumberId,
-          } as ResetPasswordCodeFactorConfig;
+          config = { emailAddressId: factor?.emailAddressId } as ResetPasswordCodeFactorConfig;
+        } else if (factor.phoneNumberId) {
+          config = { phoneNumberId: factor?.phoneNumberId } as ResetPasswordCodeFactorConfig;
         }
         break;
       default:
@@ -168,9 +165,10 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public authenticateWithRedirect = async (params: AuthenticateWithRedirectParams): Promise<void> => {
-    const { strategy, redirectUrl, redirectUrlComplete } = params || {};
+    const { strategy, redirectUrl, redirectUrlComplete, identifier } = params || {};
     const { firstFactorVerification } = await this.create({
       strategy,
+      identifier,
       redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
       actionCompleteRedirectUrl: redirectUrlComplete,
     });

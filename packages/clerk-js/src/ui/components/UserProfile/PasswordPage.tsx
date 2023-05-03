@@ -2,8 +2,9 @@ import { useCallback, useRef } from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser } from '../../contexts';
-import { localizationKeys } from '../../customizables';
+import { localizationKeys, useLocalizations } from '../../customizables';
 import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
+import { MIN_PASSWORD_LENGTH } from '../../hooks';
 import { handleError, useFormControl } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
@@ -30,6 +31,7 @@ export const PasswordPage = withCardStateProvider(() => {
     : localizationKeys('userProfile.passwordPage.title');
   const card = useCardState();
   const wizard = useWizard();
+  const { t } = useLocalizations();
 
   // Ensure that messages will not use the updated state of User after a password has been set or changed
   const successPagePropsRef = useRef<Parameters<typeof SuccessPage>[0]>({
@@ -62,7 +64,8 @@ export const PasswordPage = withCardStateProvider(() => {
     label: localizationKeys('formFieldLabel__signOutOfOtherSessions'),
   });
 
-  const isPasswordMatch = passwordField.value.trim().length > 0 && passwordField.value === confirmField.value;
+  const isPasswordMatch =
+    passwordField.value.trim().length >= MIN_PASSWORD_LENGTH && passwordField.value === confirmField.value;
   const hasErrors = !!passwordField.errorText || !!confirmField.errorText;
   const canSubmit =
     (user.passwordEnabled ? currentPasswordField.value && isPasswordMatch : isPasswordMatch) && !hasErrors;
@@ -70,7 +73,7 @@ export const PasswordPage = withCardStateProvider(() => {
   const checkPasswordMatch = useCallback(
     (confirmPassword: string) => {
       return passwordField.value && confirmPassword && passwordField.value !== confirmPassword
-        ? "Passwords don't match."
+        ? t(localizationKeys('formFieldError__notMatchingPasswords'))
         : undefined;
     },
     [passwordField.value],

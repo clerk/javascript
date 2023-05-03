@@ -6,10 +6,16 @@
     "dev": "rm -rf .next && next dev --port 4011",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "yalc:add": "yalc add -- @clerk/shared @clerk/types @clerk/backend @clerk/clerk-react @clerk/clerk-sdk-node @clerk/nextjs"
   },
   "dependencies": {
-    "@clerk/nextjs": "*",
+    "@clerk/backend": "file:.yalc/@clerk/backend",
+    "@clerk/clerk-react": "file:.yalc/@clerk/clerk-react",
+    "@clerk/clerk-sdk-node": "file:.yalc/@clerk/clerk-sdk-node",
+    "@clerk/nextjs": "file:.yalc/@clerk/nextjs",
+    "@clerk/shared": "file:.yalc/@clerk/shared",
+    "@clerk/types": "file:.yalc/@clerk/types",
     "next": "^13.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"

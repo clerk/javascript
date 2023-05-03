@@ -1,3 +1,5 @@
+import { DEV_BROWSER_SSO_JWT_PARAMETER } from '../core/constants';
+
 const DEV_BROWSER_JWT_MARKER = '__clerk_db_jwt';
 const DEV_BROWSER_JWT_MARKER_REGEXP = /__clerk_db_jwt\[(.*)\]/;
 
@@ -6,7 +8,12 @@ function extractDevBrowserJWT(url: string): string {
   return matches ? matches[1] : '';
 }
 
-export function setDevBrowserJWTInURL(url: string, jwt: string): string {
+export function setDevBrowserJWTInURL(url: string, jwt: string, asQueryParam: boolean): string {
+  if (asQueryParam) {
+    const hasQueryParam = (url || '').includes('?');
+    return `${url}${hasQueryParam ? '&' : '?'}${DEV_BROWSER_SSO_JWT_PARAMETER}=${(jwt || '').trim()}`;
+  }
+
   const dbJwt = extractDevBrowserJWT(url);
   if (dbJwt) {
     url.replace(`${DEV_BROWSER_JWT_MARKER}[${dbJwt}]`, jwt);
@@ -18,6 +25,10 @@ export function setDevBrowserJWTInURL(url: string, jwt: string): string {
 
 export function getDevBrowserJWTFromURL(url: string): string {
   const jwt = extractDevBrowserJWT(url);
+  if (!jwt) {
+    return '';
+  }
+
   let newUrl = url.replace(DEV_BROWSER_JWT_MARKER_REGEXP, '');
 
   if (newUrl.endsWith('#')) {

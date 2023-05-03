@@ -1,9 +1,11 @@
+import type { RequestState } from '@clerk/backend';
 import { constants } from '@clerk/backend';
 import type { RequestCookie } from 'next/dist/server/web/spec-extension/cookies';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import type { RequestLike } from './types';
+import { constants as nextConstants } from '../constants';
+import type { NextMiddlewareResult, RequestLike } from './types';
 
 type AuthKey = 'AuthStatus' | 'AuthMessage' | 'AuthReason';
 
@@ -170,4 +172,66 @@ export function isHttpOrHttps(key: string | undefined) {
 
 export function isDevelopmentFromApiKey(apiKey: string): boolean {
   return apiKey.startsWith('test_') || apiKey.startsWith('sk_test_');
+}
+
+// Auth result will be set as both a query param & header when applicable
+export function decorateRequest(
+  req: NextRequest,
+  res: NextMiddlewareResult,
+  requestState: RequestState,
+): NextMiddlewareResult {
+  const { reason, message, status } = requestState;
+  // pass-through case, convert to next()
+  if (!res) {
+    res = NextResponse.next();
+  }
+
+  // redirect() case, return early
+  if (res.headers.get(nextConstants.Headers.NextRedirect)) {
+    return res;
+  }
+
+  let rewriteURL;
+
+  // next() case, convert to a rewrite
+  if (res.headers.get(nextConstants.Headers.NextResume) === '1') {
+    res.headers.delete(nextConstants.Headers.NextResume);
+    rewriteURL = new URL(req.url);
+  }
+
+  // rewrite() case, set auth result only if origin remains the same
+  const rewriteURLHeader = res.headers.get(nextConstants.Headers.NextRewrite);
+
+  if (rewriteURLHeader) {
+    const reqURL = new URL(req.url);
+    rewriteURL = new URL(rewriteURLHeader);
+
+    // if the origin has changed, return early
+    if (rewriteURL.origin !== reqURL.origin) {
+      return res;
+    }
+  }
+
+  if (rewriteURL) {
+    if (nextJsVersionCanOverrideRequestHeaders()) {
+      // If we detect that the host app is using a nextjs installation that reliably sets the
+      // request headers, we don't need to fall back to the searchParams strategy.
+      // In this case, we won't set them at all in order to avoid having them visible in the req.url
+      setRequestHeadersOnNextResponse(res, req, {
+        [constants.Headers.AuthStatus]: status,
+        [constants.Headers.AuthMessage]: message || '',
+        [constants.Headers.AuthReason]: reason || '',
+      });
+    } else {
+      res.headers.set(constants.Headers.AuthStatus, status);
+      res.headers.set(constants.Headers.AuthMessage, message || '');
+      res.headers.set(constants.Headers.AuthReason, reason || '');
+      rewriteURL.searchParams.set(constants.SearchParams.AuthStatus, status);
+      rewriteURL.searchParams.set(constants.Headers.AuthMessage, message || '');
+      rewriteURL.searchParams.set(constants.Headers.AuthReason, reason || '');
+    }
+    res.headers.set(nextConstants.Headers.NextRewrite, rewriteURL.href);
+  }
+
+  return res;
 }
