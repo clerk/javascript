@@ -478,6 +478,7 @@ describe('SignInFactorOne', () => {
 
       render(<SignInFactorOne />, { wrapper });
       expect(screen.queryByText(`Use another method`)).not.toBeInTheDocument();
+      screen.getByText(`Get help`);
     });
 
     it('should go back to the main screen when clicking the "<- Back" button from the "Use another method" page', async () => {

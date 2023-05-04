@@ -8,6 +8,7 @@ import { Card, CardAlert, Footer, Form, Header, IdentityPreview, useCardState } 
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router/RouteContext';
 import { handleError, useFormControl } from '../../utils';
+import { HavingTrouble } from './HavingTrouble';
 
 type SignInFactorOnePasswordProps = {
   onShowAlternativeMethodsClick: React.MouseEventHandler | undefined;
@@ -59,6 +60,8 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
   const passwordControl = usePasswordControl(props);
   const { navigate } = useRouter();
   const { experimental_enableClerkImages } = useOptions();
+  const [showHavingTrouble, setShowHavingTrouble] = React.useState(false);
+  const toggleHavingTrouble = React.useCallback(() => setShowHavingTrouble(s => !s), [setShowHavingTrouble]);
 
   const goBack = () => {
     return navigate('../');
@@ -80,6 +83,10 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
       })
       .catch(err => handleError(err, [passwordControl], card.setError));
   };
+
+  if (showHavingTrouble) {
+    return <HavingTrouble onBackLinkClick={toggleHavingTrouble} />;
+  }
 
   return (
     <Flow.Part part='password'>
@@ -117,17 +124,18 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
             <Form.SubmitButton />
           </Form.Root>
         </Flex>
-        {onShowAlternativeMethodsClick && (
-          <Footer.Root>
-            <Footer.Action elementId='alternativeMethods'>
-              <Footer.ActionLink
-                localizationKey={localizationKeys('signIn.password.actionLink')}
-                onClick={onShowAlternativeMethodsClick}
-              />
-            </Footer.Action>
-            <Footer.Links />
-          </Footer.Root>
-        )}
+
+        <Footer.Root>
+          <Footer.Action elementId={onShowAlternativeMethodsClick ? 'alternativeMethods' : 'havingTrouble'}>
+            <Footer.ActionLink
+              localizationKey={localizationKeys(
+                onShowAlternativeMethodsClick ? 'signIn.password.actionLink' : 'signIn.alternativeMethods.actionLink',
+              )}
+              onClick={onShowAlternativeMethodsClick || toggleHavingTrouble}
+            />
+          </Footer.Action>
+          <Footer.Links />
+        </Footer.Root>
       </Card>
     </Flow.Part>
   );
