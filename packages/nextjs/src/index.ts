@@ -78,7 +78,7 @@ export const SignedOut = ComponentsModule.SignedOut as ServerComponentsServerMod
 
 export const auth = ServerHelperModule.auth as ServerHelpersServerModuleTypes['auth'];
 export const currentUser = ServerHelperModule.currentUser as ServerHelpersServerModuleTypes['currentUser'];
-export const getAuth = ServerHelperModule.getAuth as ServerHelpersServerModuleTypes['getAuth'];
+// export const getAuth = ServerHelperModule.getAuth as ServerHelpersServerModuleTypes['getAuth'];
 export const clerkClient = ServerHelperModule.clerkClient as ServerHelpersServerModuleTypes['clerkClient'];
 export const authMiddleware = ServerHelperModule.authMiddleware as ServerHelpersServerModuleTypes['authMiddleware'];
 export const withClerkMiddleware =
