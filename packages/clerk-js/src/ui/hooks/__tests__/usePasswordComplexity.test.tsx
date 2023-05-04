@@ -5,6 +5,7 @@ const { createFixtures } = bindCreateFixtures('SignIn');
 
 const defaultRenderer = () =>
   usePasswordComplexity({
+    allowed_special_characters: '',
     max_length: 999,
     min_length: 8,
     require_special_char: true,
@@ -63,6 +64,82 @@ describe('usePasswordComplexity', () => {
     expect(result.current.failedValidations).not.toHaveProperty('require_lowercase');
     expect(result.current.failedValidations).not.toHaveProperty('max_length');
     expect(result.current.failedValidations).not.toHaveProperty('min_length');
+
+    await act(() => {
+      result.current.setPassword(`thispasswordfails"`);
+    });
+
+    expect(result.current.failedValidations).not.toHaveProperty('require_special_char');
+  });
+
+  it('uses allowed_special_character from environment', async () => {
+    const { wrapper, fixtures } = await createFixtures(f =>
+      f.withPasswordComplexity({
+        allowed_special_characters: '@',
+        max_length: 999,
+        min_length: 8,
+        require_special_char: true,
+        require_numbers: true,
+        require_lowercase: true,
+        require_uppercase: true,
+      }),
+    );
+    const { result } = renderHook(() => usePasswordComplexity(fixtures.environment.userSettings.passwordSettings), {
+      wrapper,
+    });
+
+    await act(() => {
+      result.current.setPassword('@');
+    });
+
+    expect(result.current.failedValidations).not.toHaveProperty('require_special_char');
+  });
+
+  it('uses allowed_special_character from environment with escaped characters', async () => {
+    const { wrapper, fixtures } = await createFixtures(f =>
+      f.withPasswordComplexity({
+        allowed_special_characters: '[!"#$%&\'()*+,-./:;<=>?@^_`{|}~]',
+        max_length: 999,
+        min_length: 8,
+        require_special_char: true,
+        require_numbers: true,
+        require_lowercase: true,
+        require_uppercase: true,
+      }),
+    );
+    const { result } = renderHook(() => usePasswordComplexity(fixtures.environment.userSettings.passwordSettings), {
+      wrapper,
+    });
+
+    await act(() => {
+      result.current.setPassword('[');
+    });
+
+    expect(result.current.failedValidations).not.toHaveProperty('require_special_char');
+
+    await act(() => {
+      result.current.setPassword(']');
+    });
+
+    expect(result.current.failedValidations).not.toHaveProperty('require_special_char');
+
+    await act(() => {
+      result.current.setPassword('[test]');
+    });
+
+    expect(result.current.failedValidations).not.toHaveProperty('require_special_char');
+
+    await act(() => {
+      result.current.setPassword('test[]');
+    });
+
+    expect(result.current.failedValidations).not.toHaveProperty('require_special_char');
+
+    await act(() => {
+      result.current.setPassword('[!"#$%&\'()*+,-./:;<=>?@^_`{|}~]');
+    });
+
+    expect(result.current.failedValidations).not.toHaveProperty('require_special_char');
   });
 
   it('returns an object with all validations and their status (true:passed, false:failed)', async () => {
