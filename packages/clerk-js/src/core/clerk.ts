@@ -67,6 +67,7 @@ import {
   isAccountsHostedPages,
   isDevOrStagingUrl,
   isError,
+  isRedirectForFAPIInitiatedFlow,
   noOrganizationExists,
   noUserExists,
   pickRedirectionProp,
@@ -630,10 +631,7 @@ export default class Clerk implements ClerkInterface {
       return clerkMissingDevBrowserJwt();
     }
 
-    let asQueryParam = false;
-    if (options && options.useQueryParam) {
-      asQueryParam = options.useQueryParam;
-    }
+    const asQueryParam = !!options?.useQueryParam;
 
     return setDevBrowserJWTInURL(toURL.href, devBrowserJwt, asQueryParam);
   }
@@ -1178,6 +1176,10 @@ export default class Clerk implements ClerkInterface {
         // set in updateClient
         this.updateEnvironment(environment);
 
+        if (await this.#redirectFAPIInitiatedFlow()) {
+          return false;
+        }
+
         if (Clerk.mountComponentRenderer) {
           this.#componentControls = Clerk.mountComponentRenderer(this, this.#environment as Environment, this.#options);
         }
@@ -1350,4 +1352,27 @@ export default class Clerk implements ClerkInterface {
       throw new Error('ClerkJS components are not ready yet.');
     }
   }
+
+  #redirectFAPIInitiatedFlow = async (): Promise<boolean> => {
+    const redirectUrl = new URLSearchParams(window.location.search).get('redirect_url');
+    const isProdInstance = this.instanceType === 'production';
+    const shouldRedirect = redirectUrl !== null && isRedirectForFAPIInitiatedFlow(this.frontendApi, redirectUrl);
+
+    if (isProdInstance || !shouldRedirect) {
+      return false;
+    }
+
+    const userSignedIn = this.session;
+    const signInUrl = this.#environment?.displayConfig.signInUrl;
+    const referrerIsSignInUrl = signInUrl && window.location.href.startsWith(signInUrl);
+
+    // don't redirect if user is not signed in and referrer is sign in url
+    if (!userSignedIn && referrerIsSignInUrl) {
+      return false;
+    }
+
+    const buildUrlWithAuthParams: BuildUrlWithAuthParams = { useQueryParam: true };
+    await this.navigate(this.buildUrlWithAuth(redirectUrl, buildUrlWithAuthParams));
+    return true;
+  };
 }
