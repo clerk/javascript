@@ -89,7 +89,7 @@ export const useLocalizations = () => {
     );
   };
 
-  return { t, translateError, locale: localization?.locale || defaultResource.locale || 'en-US' };
+  return { t, translateError, locale: (localization as any)?.locale || (defaultResource as any)?.locale || 'en-US' };
 };
 
 const localizationKeyAttribute = (localizationKey: LocalizationKey) => {

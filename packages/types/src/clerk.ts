@@ -10,7 +10,7 @@ import type {
 } from './appearance';
 import type { ClientResource } from './client';
 import type { DisplayThemeJSON } from './json';
-import type { LocalizationResource } from './localization';
+import type { LocalizationResource, LocalizationResources } from './localization';
 import type { OAuthProvider, OAuthScope } from './oauth';
 import type { OrganizationResource } from './organization';
 import type { OrganizationInvitationResource } from './organizationInvitation';
@@ -473,7 +473,7 @@ export type ClerkThemeOptions = DeepSnakeToCamel<DeepPartial<DisplayThemeJSON>>;
 
 export interface ClerkOptions {
   appearance?: Appearance;
-  localization?: LocalizationResource;
+  localization?: LocalizationResource | LocalizationResources;
   navigate?: (to: string) => Promise<unknown> | unknown;
   polling?: boolean;
   selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;

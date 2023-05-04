@@ -111,11 +111,21 @@ describe('ClerkProvider', () => {
   describe('localization', () => {
     const defaultProps = { publishableKey: 'test', children: '' };
 
-    it('exists as a prop', () => {
+    it('exists as a prop without locale', () => {
       expectTypeOf({
         ...defaultProps,
         localization: {},
-      }).not.toMatchTypeOf<ClerkProviderProps>();
+      }).toMatchTypeOf<ClerkProviderProps>();
+    });
+
+    it('exists as a prop with locale', () => {
+      expectTypeOf({
+        ...defaultProps,
+        localization: {
+          locale: 'en-US' as const,
+          resources: {},
+        },
+      }).toMatchTypeOf<ClerkProviderProps>();
     });
 
     it('errors if a non existent key is provided', () => {

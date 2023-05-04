@@ -23,9 +23,11 @@ const parseLocalizationResource = (
   return cache;
 };
 
-const migrateResources = (lresource: LocalizationResource | undefined): LocalizationResources => {
+const migrateResources = (
+  lresource: LocalizationResource | LocalizationResources | undefined,
+): LocalizationResources => {
   return 'resources' in ((lresource as any) || {})
-    ? lresource?.resources || {}
+    ? (lresource as any)?.resources || {}
     : (lresource as LocalizationResources) || {};
 };
 
