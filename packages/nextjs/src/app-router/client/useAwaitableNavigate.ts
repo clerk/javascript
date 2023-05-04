@@ -1,31 +1,42 @@
 'use client';
 
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import React, { useCallback, useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useCallback, useEffect } from 'react';
 
-type Resolve = (value?: unknown) => void;
+declare global {
+  interface Window {
+    __clerk_nav_ref: (to: string) => any;
+    __clerk_nav_resolves_ref: Array<(val?: any) => any> | undefined;
+  }
+}
 
 export const useAwaitableNavigate = () => {
-  const router = useRouter();
+  // eslint-disable-next-line @typescript-eslint/unbound-method
+  const { push } = useRouter();
   const pathname = usePathname();
-  const params = useSearchParams();
-  const urlKey = pathname + params.toString();
-  const resolveFunctionsRef = React.useRef<Resolve[]>([]);
-
-  const awaitableNav = useCallback(
-    (to: string) => {
-      return new Promise(resolve => {
-        resolveFunctionsRef.current.push(resolve);
-        return router.push(to);
-      });
-    },
-    [urlKey],
-  );
 
   useEffect(() => {
-    resolveFunctionsRef.current.forEach(resolve => resolve());
-    resolveFunctionsRef.current = [];
-  }, [urlKey]);
+    window.__clerk_nav_ref = (to: string) => {
+      return new Promise(res => {
+        if (window.__clerk_nav_resolves_ref) {
+          window.__clerk_nav_resolves_ref.push(res);
+        } else {
+          window.__clerk_nav_resolves_ref = [res];
+        }
+        push(to);
+      });
+    };
+  }, [pathname]);
 
-  return awaitableNav;
+  useEffect(() => {
+    if (typeof window.__clerk_nav_resolves_ref === 'undefined') {
+      window.__clerk_nav_resolves_ref = [];
+    }
+    window.__clerk_nav_resolves_ref.forEach(resolve => resolve());
+    window.__clerk_nav_resolves_ref = [];
+  });
+
+  return useCallback((to: string) => {
+    return window.__clerk_nav_ref(to);
+  }, []);
 };
