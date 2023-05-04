@@ -195,7 +195,7 @@ function _SignUpStart(): JSX.Element {
     card.setError(undefined);
 
     const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signUpUrl);
-    const redirectUrlComplete = ctx.afterSignInUrl || displayConfig.afterSignUpUrl;
+    const redirectUrlComplete = ctx.afterSignUpUrl || displayConfig.afterSignUpUrl;
 
     return signUp
       .create(buildRequest(fieldsToSubmit))
