@@ -13,6 +13,7 @@ const commonTexts = {
 } as const;
 
 export const enUS: LocalizationResource = {
+  locale: 'en-US',
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
   dividerText: 'or',
   formFieldLabel__emailAddress: 'Email address',

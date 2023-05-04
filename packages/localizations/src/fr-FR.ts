@@ -1,6 +1,7 @@
 import type { LocalizationResource } from '@clerk/types';
 
 export const frFR: LocalizationResource = {
+  locale: 'fr-FR',
   socialButtonsBlockButton: 'Continuer avec {{provider|titleize}}',
   dividerText: 'ou',
   formFieldLabel__emailAddress: 'Adresse e-mail',
