@@ -17,7 +17,10 @@ type UsePasswordComplexityCbs = {
 const useTestComplexityCases = (config: Pick<UsePasswordComplexityConfig, 'allowed_special_characters'>) => {
   let specialCharsRegex: RegExp;
   if (config.allowed_special_characters) {
-    specialCharsRegex = new RegExp(`[${config.allowed_special_characters}]`);
+    // Avoid a nested group by escaping the `[]` characters
+    let escaped = config.allowed_special_characters.replace('[', '\\[');
+    escaped = escaped.replace(']', '\\]');
+    specialCharsRegex = new RegExp(`[${escaped}]`);
   } else {
     specialCharsRegex = /[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/;
   }
