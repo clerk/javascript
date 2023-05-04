@@ -159,4 +159,23 @@ describe('usePasswordComplexity', () => {
       require_uppercase: false,
     });
   });
+
+  it('returns error message with localized conjunction', async () => {
+    const { wrapper } = await createFixtures();
+    const { result } = renderHook(defaultRenderer, { wrapper });
+
+    await act(() => {
+      result.current.setPassword('@aP');
+    });
+
+    expect(result.current.failedValidationsText).toBe('Your password must contain 8 or more characters and a number');
+
+    await act(() => {
+      result.current.setPassword('aP');
+    });
+
+    expect(result.current.failedValidationsText).toBe(
+      'Your password must contain 8 or more characters, a special character, and a number',
+    );
+  });
 });

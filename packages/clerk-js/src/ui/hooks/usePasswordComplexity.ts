@@ -3,6 +3,7 @@ import type { PasswordSettingsData } from '@clerk/types';
 import { useCallback, useMemo, useState } from 'react';
 
 import { localizationKeys, useLocalizations } from '../localization';
+import { canUseListFormat } from '../utils';
 
 type ComplexityErrorMessages = {
   [key in keyof Partial<Omit<PasswordSettingsData, 'disable_hibp' | 'min_zxcvbn_strength' | 'show_zxcvbn'>>]: string;
@@ -68,7 +69,7 @@ export const usePasswordComplexity = (config: UsePasswordComplexityConfig, callb
 
   const [password, _setPassword] = useState('');
   const [failedValidations, setFailedValidations] = useState<ComplexityErrorMessages>({});
-  const { t } = useLocalizations();
+  const { t, locale } = useLocalizations();
 
   const errorMessages = useMemo(
     () =>
@@ -102,7 +103,15 @@ export const usePasswordComplexity = (config: UsePasswordComplexityConfig, callb
 
   const generateErrorText = useCallback(
     (failedValidations: ComplexityErrorMessages) => {
-      const messageWithPrefix = Object.values(failedValidations).join(', ');
+      let messageWithPrefix: string;
+      if (canUseListFormat(locale)) {
+        const formatter = new Intl.ListFormat(locale, { style: 'long', type: 'conjunction' });
+        messageWithPrefix = formatter.format(Object.values(failedValidations).filter(f => !!f));
+      } else {
+        messageWithPrefix = Object.values(failedValidations)
+          .filter(f => !!f)
+          .join(', ');
+      }
       return `${t(localizationKeys('unstable__errors.passwordComplexity.sentencePrefix'))} ${messageWithPrefix}`;
     },
     [t],
