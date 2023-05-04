@@ -13,6 +13,7 @@ const commonTexts = {
 } as const;
 
 export const nlNL: LocalizationResource = {
+  locale: 'nl-NL',
   socialButtonsBlockButton: 'Ga verder met {{provider|titleize}}',
   dividerText: 'or',
   formFieldLabel__emailAddress: 'E-mailadres',
@@ -599,4 +600,7 @@ export const nlNL: LocalizationResource = {
   },
 } as const;
 
-export const nlBE = nlNL;
+export const nlBE: LocalizationResource = {
+  locale: 'nl-BE',
+  ...nlNL,
+};
