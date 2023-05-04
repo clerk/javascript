@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.18.0-staging.4](https://github.com/clerkinc/javascript/compare/@clerk/backend@0.18.0-staging.3...@clerk/backend@0.18.0-staging.4) (2023-05-04)
+
+**Note:** Version bump only for package @clerk/backend
+
 ## [0.18.0-staging.3](https://github.com/clerkinc/javascript/compare/@clerk/backend@0.18.0-staging.2...@clerk/backend@0.18.0-staging.3) (2023-05-02)
 
 **Note:** Version bump only for package @clerk/backend
