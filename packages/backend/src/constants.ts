@@ -23,6 +23,7 @@ const Headers = {
   EnableDebug: 'x-clerk-debug',
   Authorization: 'authorization',
   ForwardedPort: 'x-forwarded-port',
+  ForwardedProto: 'x-forwarded-proto',
   ForwardedHost: 'x-forwarded-host',
   Referrer: 'referer',
   UserAgent: 'user-agent',

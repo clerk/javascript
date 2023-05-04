@@ -10,7 +10,7 @@ npm run build && npm run yalc:all
 Execute in current folder:
 
 ```bash
-touch .env # set PUBLISHABLE_KEY and SECRET_KEY from Clerk Dashboard API keys
+touch .env # set PUBLISHABLE_KEY, SECRET_KEY and JWT_KEY from Clerk Dashboard API keys
 npm i
 rm -rf node_modules/@clerk
 yalc add @clerk/clerk-sdk-node # also add the packages you made changes to, e.g. @clerk/backend @clerk/types.

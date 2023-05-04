@@ -1,4 +1,5 @@
 import type { AuthObject, SignedInAuthObject } from '@clerk/backend';
+import type { MultiDomainAndOrProxy } from '@clerk/types';
 import type { NextFunction, Request, Response } from 'express';
 
 type LegacyAuthObject<T extends AuthObject> = Pick<T, 'sessionId' | 'userId' | 'actor' | 'getToken' | 'debug'> & {
@@ -30,4 +31,5 @@ export type ClerkMiddlewareOptions = {
   authorizedParties?: string[];
   jwtKey?: string;
   strict?: boolean;
-};
+  signInUrl?: string;
+} & MultiDomainAndOrProxy;

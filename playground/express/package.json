@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "ts-node ./src/server.ts"
+    "start": "ts-node ./src/server.ts",
+    "yalc:add": "yalc add -- @clerk/types @clerk/backend @clerk/clerk-sdk-node"
   },
   "author": "",
   "license": "ISC",
