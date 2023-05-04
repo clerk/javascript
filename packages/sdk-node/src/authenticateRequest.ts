@@ -1,5 +1,6 @@
 import type { Clerk, RequestState } from '@clerk/backend';
 import { constants } from '@clerk/backend';
+import { handleValueOrFn, isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from '@clerk/shared';
 import cookie from 'cookie';
 import type { IncomingMessage, ServerResponse } from 'http';
 
@@ -21,6 +22,25 @@ export const authenticateRequest = (opts: {
   const { clerkClient, apiKey, secretKey, frontendApi, publishableKey, req, options } = opts;
   const cookies = parseCookies(req);
   const { jwtKey, authorizedParties } = options || {};
+
+  const requestUrl = getRequestUrl(req);
+  const isSatellite =
+    handleValueOrFn(options?.isSatellite, requestUrl) || process.env.CLERK_IS_SATELLITE === 'true' || false;
+  const domain = handleValueOrFn(options?.domain, requestUrl) || process.env.CLERK_DOMAIN || '';
+  const signInUrl = options?.signInUrl || process.env.CLERK_SIGN_IN_URL || '';
+  const proxyUrl = absoluteProxyUrl(
+    handleValueOrFn(options?.proxyUrl, requestUrl, process.env.CLERK_PROXY_URL) as string,
+    requestUrl.toString(),
+  );
+
+  if (isSatellite && !proxyUrl && !domain) {
+    throw new Error(satelliteAndMissingProxyUrlAndDomain);
+  }
+
+  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromApiKey(secretKey)) {
+    throw new Error(satelliteAndMissingSignInUrl);
+  }
+
   return clerkClient.authenticateRequest({
     apiKey,
     secretKey,
@@ -35,7 +55,11 @@ export const authenticateRequest = (opts: {
     forwardedPort: req.headers[constants.Headers.ForwardedPort] as string,
     forwardedHost: req.headers[constants.Headers.ForwardedHost] as string,
     referrer: req.headers.referer,
-    userAgent: req.headers['user-agent'] as string,
+    userAgent: req.headers[constants.Headers.UserAgent] as string,
+    proxyUrl,
+    isSatellite,
+    domain,
+    signInUrl,
   });
 };
 export const handleUnknownCase = (res: ServerResponse, requestState: RequestState) => {
@@ -57,3 +81,40 @@ export const decorateResponseWithObservabilityHeaders = (res: ServerResponse, re
   requestState.reason && res.setHeader(constants.Headers.AuthReason, encodeURIComponent(requestState.reason));
   requestState.status && res.setHeader(constants.Headers.AuthStatus, encodeURIComponent(requestState.status));
 };
+
+const isDevelopmentFromApiKey = (apiKey: string): boolean =>
+  apiKey.startsWith('test_') || apiKey.startsWith('sk_test_');
+
+const getRequestUrl = (req: IncomingMessage): URL => {
+  return new URL(req.url as string, `${getRequestProto(req)}://${req.headers.host}`);
+};
+
+const getRequestProto = (req: IncomingMessage): string => {
+  // @ts-ignore Optimistic attempt to get the protocol in case
+  // req extends IncomingMessage in a useful way. No guarantee
+  // it'll work.
+  const mightWork = req.connection?.encrypted ? 'https' : 'http';
+  // The x-forwarded-proto header takes precedence.
+  const proto = (req.headers[constants.Headers.ForwardedProto] as string) || mightWork;
+  if (!proto) {
+    throw new Error(missingProto);
+  }
+  // Sometimes the x-forwarded-proto header does not come as a
+  // single value.
+  return proto.split(',')[0].trim();
+};
+
+const absoluteProxyUrl = (relativeOrAbsoluteUrl: string, baseUrl: string): string => {
+  if (!relativeOrAbsoluteUrl || !isValidProxyUrl(relativeOrAbsoluteUrl) || !isProxyUrlRelative(relativeOrAbsoluteUrl)) {
+    return relativeOrAbsoluteUrl;
+  }
+  return new URL(relativeOrAbsoluteUrl, baseUrl).toString();
+};
+
+const satelliteAndMissingProxyUrlAndDomain =
+  'Missing domain and proxyUrl. A satellite application needs to specify a domain or a proxyUrl';
+const satelliteAndMissingSignInUrl = `
+Invalid signInUrl. A satellite application requires a signInUrl for development instances.
+Check if signInUrl is missing from your configuration or it is not a absolute URL.`;
+const missingProto =
+  "Cannot determine the request protocol. Please make sure you've set the X-Forwarded-Proto header with the request protocol (http or https).";
