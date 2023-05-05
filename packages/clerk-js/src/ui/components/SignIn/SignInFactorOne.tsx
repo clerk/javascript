@@ -1,4 +1,4 @@
-import type { ResetPasswordCodeFactor, SignInFactor } from '@clerk/types';
+import type { ResetPasswordCodeFactor, SignInFactor, SignInStrategy } from '@clerk/types';
 import React from 'react';
 
 import { withRedirectToHomeSingleSessionGuard } from '../../common';
@@ -29,6 +29,8 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
   return key;
 };
 
+const isNotResetPasswordStrategy = (strategy: SignInStrategy) => strategy !== 'reset_password_code';
+
 export function _SignInFactorOne(): JSX.Element {
   const signIn = useCoreSignIn();
   const { preferredSignInStrategy } = useEnvironment().displayConfig;
@@ -44,13 +46,13 @@ export function _SignInFactorOne(): JSX.Element {
     prevCurrentFactor: undefined,
   }));
 
-  const { strategies } = useEnabledThirdPartyProviders();
+  const { strategies: OAuthStrategies } = useEnabledThirdPartyProviders();
 
-  const shouldAllowForAlternativeStrategies = !!(
-    signIn.supportedFirstFactors.filter(
-      f => !(f.strategy === currentFactor?.strategy) && !(f.strategy === 'reset_password_code'),
-    ).length + strategies.length
+  const firstFactors = signIn.supportedFirstFactors.filter(
+    f => f.strategy !== currentFactor?.strategy && isNotResetPasswordStrategy(f.strategy),
   );
+
+  const shouldAllowForAlternativeStrategies = firstFactors.length + OAuthStrategies.length > 0;
 
   const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(
     () => !currentFactor || !factorHasLocalStrategy(currentFactor),
