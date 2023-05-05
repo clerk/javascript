@@ -8,7 +8,9 @@ Please note we have a [code of conduct](https://github.com/clerkinc/javascript/b
 
 - [Development environment setup](#development-environment-setup)
 - [Issues and feature requests](#issues-and-feature-requests)
-  - [How to submit a Pull Request](#how-to-submit-a-pull-request)
+- [Commit messages](#commit-messages)
+- [Pull Requests](#pull-requests)
+  - [Notes on Pull Requests](#notes-on-pull-requests)
 - [Publishing packages](#publishing-packages)
 - [License](#license)
 
@@ -20,10 +22,6 @@ The current monorepo setup is based on:
 
 - [Lerna](https://github.com/lerna/lerna) used mostly for task running and versioning.
 - [npm workspaces](https://docs.npmjs.com/cli/v8/using-npm/workspaces) used for package linking.
-
-### A note on commit messages
-
-The processes required for Lerna to manage releases and changelogs is done through the [conventional-commits](https://www.conventionalcommits.org/en/v1.0.0/) specification.
 
 To set up your development environment, please follow these steps:
 
@@ -46,6 +44,8 @@ To set up your development environment, please follow these steps:
    npm run build
    ```
 
+For package specific setup, refer to the `Build` section of the specific package (eg packages/<package_name>/README.md#build).
+
 ## Issues and feature requests
 
 You've found a bug in the source code, a mistake in the documentation or maybe you'd like a new feature? You can help us by [submitting an issue on GitHub](https://github.com/clerkinc/javascript/issues). Before you create an issue, make sure to search the issue archive -- your issue may have already been addressed!
@@ -59,7 +59,17 @@ Please try to create bug reports that are:
 
 **Even better: Submit a pull request with a fix or new feature!**
 
-### How to submit a Pull Request
+## Commit messages
+
+The processes required for Lerna to manage releases and changelogs is done through the [conventional-commits](https://www.conventionalcommits.org/en/v1.0.0/) specification.
+
+Use of `scope` in commit message is **mandatory** and the allowed values are:
+
+- the package names of the monorepo defined in `packages/{package}/package.json`
+- `repo` for repository level changes
+- `release` for releases
+
+## Pull Requests
 
 1. Search our repository for open or closed
    [Pull Requests](https://github.com/clerkinc/javascript/pulls)
@@ -69,6 +79,14 @@ Please try to create bug reports that are:
 4. Commit your changes (`git commit -m 'feat: Add amazing_feature'`). Clerk uses [conventional commits](https://www.conventionalcommits.org), so please follow the specification in your commit messages.
 5. Push to the branch (`git push origin feat/amazing_feature`)
 6. [Open a Pull Request](https://github.com/clerkinc/javascript/compare?expand=1)
+7. Follow the instructions of the pull request template
+
+### Notes on Pull Requests
+
+- Prefer multiple small PRs with related changes (easier to review and provide feedback)
+- Always add description in PRs (describe high level the issue and the solution)
+- (issue related PRs) Add screen recording or steps to reproduce the issue
+- (issue related PRs) Add screen recording or test to verify the fix
 
 ## Publishing packages
 
