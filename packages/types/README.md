@@ -85,7 +85,7 @@ We're open to all community contributions! If you'd like to contribute in any wa
 
 `@clerk/types` is provided **"as is"** without any **warranty**. Use at your own risk.
 
-_For more information and to report security issues, please refer to our [security documentation](https://github.com/clerkinc/javascript/blob/main/packages/types/docs/SECURITY.md)._
+_For more information and to report security issues, please refer to our [security documentation](https://github.com/clerkinc/javascript/blob/main/docs/SECURITY.md)._
 
 ## License
 
