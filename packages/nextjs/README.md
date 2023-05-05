@@ -124,7 +124,7 @@ read [our contribution guidelines](https://github.com/clerkinc/javascript/blob/m
 `@clerk/nextjs` is provided **"as is"** without any **warranty**. Use at your own risk.
 
 _For more information and to report security issues, please refer to
-our [security documentation](https://github.com/clerkinc/javascript/blob/main/packages/nextjs/docs/SECURITY.md)._
+our [security documentation](https://github.com/clerkinc/javascript/blob/main/docs/SECURITY.md)._
 
 ## License
 
