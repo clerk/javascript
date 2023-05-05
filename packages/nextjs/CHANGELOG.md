@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.17.1](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.17.0...@clerk/nextjs@4.17.1) (2023-05-04)
+
+### Bug Fixes
+
+- **nextjs:** Use signInUrl and signUpUrl from the env ([#1151](https://github.com/clerkinc/javascript/issues/1151)) ([0476d79](https://github.com/clerkinc/javascript/commit/0476d79360f59ecce90d8e69a57225bb0d5b73bb))
+
+## [4.17.0](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.17.0-staging.6...@clerk/nextjs@4.17.0) (2023-05-04)
+
+**Note:** Version bump only for package @clerk/nextjs
+
+## [4.17.0-staging.5](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.17.0-staging.4...@clerk/nextjs@4.17.0-staging.5) (2023-05-04)
+
+**Note:** Version bump only for package @clerk/nextjs
+
 ## [4.17.0-staging.1](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.17.0-staging.0...@clerk/nextjs@4.17.0-staging.1) (2023-05-02)
 
 **Note:** Version bump only for package @clerk/nextjs

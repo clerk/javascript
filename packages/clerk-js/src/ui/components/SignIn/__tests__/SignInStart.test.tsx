@@ -121,6 +121,29 @@ describe('SignInStart', () => {
     });
   });
 
+  describe('SAML', () => {
+    it('initiates a SAML flow if saml is listed as a supported first factor', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      fixtures.signIn.create.mockReturnValueOnce(
+        Promise.resolve({
+          status: 'needs_identifier',
+          supportedFirstFactors: [{ strategy: 'saml' }],
+        } as unknown as SignInResource),
+      );
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.dev');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.create).toHaveBeenCalled();
+      expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith({
+        strategy: 'saml',
+        redirectUrl: 'http://localhost/#/sso-callback',
+        redirectUrlComplete: 'https://dashboard.clerk.com',
+      });
+    });
+  });
+
   describe('Identifier switching', () => {
     it('shows the email label', async () => {
       const { wrapper } = await createFixtures(f => {

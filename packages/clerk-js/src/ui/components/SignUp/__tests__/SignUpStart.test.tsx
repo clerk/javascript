@@ -1,5 +1,4 @@
 import { OAUTH_PROVIDERS } from '@clerk/types';
-import React from 'react';
 
 import { bindCreateFixtures, render, screen } from '../../../../testUtils';
 import { SignUpStart } from '../SignUpStart';

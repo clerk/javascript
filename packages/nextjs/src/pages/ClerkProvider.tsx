@@ -3,8 +3,7 @@ import { useRouter } from 'next/router';
 import React from 'react';
 
 import { ClerkNextOptionsProvider } from '../client-boundary/NextOptionsContext';
-import { useInvalidateCacheOnAuthChange } from '../client-boundary/useInvalidateCacheOnAuthChange';
-import { useInvokeMiddlewareOnAuthChange } from '../client-boundary/useInvokeMiddlewareOnAuthChange';
+import { useSafeLayoutEffect } from '../client-boundary/useSafeLayoutEffect';
 import type { NextClerkProviderProps } from '../types';
 import { invalidateNextRouterCache } from '../utils/invalidateNextRouterCache';
 import { mergeNextClerkPropsWithEnv } from '../utils/mergeNextClerkPropsWithEnv';
@@ -16,12 +15,20 @@ export function ClerkProvider({ children, ...props }: NextClerkProviderProps): J
   const { push } = useRouter();
   ReactClerkProvider.displayName = 'ReactClerkProvider';
 
-  useInvalidateCacheOnAuthChange(invalidateNextRouterCache);
-  useInvokeMiddlewareOnAuthChange(() => {
-    if (__unstable_invokeMiddlewareOnAuthStateChange) {
-      void push(window.location.href);
-    }
-  });
+  useSafeLayoutEffect(() => {
+    window.__unstable__onBeforeSetActive = invalidateNextRouterCache;
+  }, []);
+
+  useSafeLayoutEffect(() => {
+    window.__unstable__onAfterSetActive = () => {
+      // Re-run the middleware every time there auth state changes.
+      // This enables complete control from a centralised place (NextJS middleware),
+      // as we will invoke it every time the client-side auth state changes, eg: signing-out, switching orgs, etc.\
+      if (__unstable_invokeMiddlewareOnAuthStateChange) {
+        void push(window.location.href);
+      }
+    };
+  }, []);
 
   const navigate = (to: string) => push(to);
   const mergedProps = mergeNextClerkPropsWithEnv({ ...props, navigate });

@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.36.0](https://github.com/clerkinc/javascript/compare/@clerk/types@3.36.0-staging.4...@clerk/types@3.36.0) (2023-05-04)
+
+**Note:** Version bump only for package @clerk/types
+
+## [3.36.0-staging.4](https://github.com/clerkinc/javascript/compare/@clerk/types@3.36.0-staging.3...@clerk/types@3.36.0-staging.4) (2023-05-04)
+
+### Features
+
+- **clerk-js,types:** Support sign in with SAML strategy ([6da395f](https://github.com/clerkinc/javascript/commit/6da395fd785467aa934896942408bdb5f64aa887))
+- **clerk-js,types:** Support sign up with SAML strategy ([6d9c93e](https://github.com/clerkinc/javascript/commit/6d9c93e9d782f17bbddde1e68c2ce977415b45db))
+- **clerk-js:** Use allowed special characters for password from environment ([dec0512](https://github.com/clerkinc/javascript/commit/dec05120c180e53595e87817a2f44ef62af0f4f1))
+
 ## [3.36.0-staging.3](https://github.com/clerkinc/javascript/compare/@clerk/types@3.36.0-staging.2...@clerk/types@3.36.0-staging.3) (2023-05-02)
 
 ### Features

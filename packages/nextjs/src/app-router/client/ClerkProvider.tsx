@@ -4,8 +4,7 @@ import { useRouter } from 'next/navigation';
 import React from 'react';
 
 import { ClerkNextOptionsProvider } from '../../client-boundary/NextOptionsContext';
-import { useInvalidateCacheOnAuthChange } from '../../client-boundary/useInvalidateCacheOnAuthChange';
-import { useInvokeMiddlewareOnAuthChange } from '../../client-boundary/useInvokeMiddlewareOnAuthChange';
+import { useSafeLayoutEffect } from '../../client-boundary/useSafeLayoutEffect';
 import type { NextClerkProviderProps } from '../../types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
 
@@ -21,15 +20,14 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
   const router = useRouter();
   const navigate = useAwaitableNavigate();
 
-  useInvalidateCacheOnAuthChange(() => {
-    router.refresh();
-  });
-
-  useInvokeMiddlewareOnAuthChange(() => {
-    if (__unstable_invokeMiddlewareOnAuthStateChange) {
-      void navigate(window.location.href);
-    }
-  });
+  useSafeLayoutEffect(() => {
+    window.__unstable__onBeforeSetActive = () => {
+      if (__unstable_invokeMiddlewareOnAuthStateChange) {
+        router.refresh();
+        router.push(window.location.href);
+      }
+    };
+  }, []);
 
   const mergedProps = { ...props, navigate };
   return (

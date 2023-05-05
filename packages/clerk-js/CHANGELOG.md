@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.39.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.39.0-staging.6...@clerk/clerk-js@4.39.0) (2023-05-04)
+
+**Note:** Version bump only for package @clerk/clerk-js
+
+## [4.39.0-staging.5](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.39.0-staging.4...@clerk/clerk-js@4.39.0-staging.5) (2023-05-04)
+
+### Features
+
+- **clerk-js,types:** Support sign in with SAML strategy ([6da395f](https://github.com/clerkinc/javascript/commit/6da395fd785467aa934896942408bdb5f64aa887))
+- **clerk-js,types:** Support sign up with SAML strategy ([6d9c93e](https://github.com/clerkinc/javascript/commit/6d9c93e9d782f17bbddde1e68c2ce977415b45db))
+- **clerk-js:** Use allowed special characters for password from environment ([dec0512](https://github.com/clerkinc/javascript/commit/dec05120c180e53595e87817a2f44ef62af0f4f1))
+
+### Bug Fixes
+
+- **clerk-js:** Escape `allowed_special_characters` from FAPI ([da6b683](https://github.com/clerkinc/javascript/commit/da6b6833d1351a529f40640e821adbc73d121d13))
+
 ## [4.39.0-staging.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.39.0-staging.2...@clerk/clerk-js@4.39.0-staging.3) (2023-05-02)
 
 ### Features

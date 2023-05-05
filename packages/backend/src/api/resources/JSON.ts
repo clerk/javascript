@@ -69,7 +69,11 @@ export interface EmailJSON extends ClerkResourceJSON {
   email_address_id: string | null;
   subject?: string;
   body?: string;
+  body_plain?: string | null;
   status?: string;
+  slug?: string | null;
+  data?: Record<string, any> | null;
+  delivered_by_clerk?: boolean;
 }
 
 export interface EmailAddressJSON extends ClerkResourceJSON {
@@ -239,6 +243,7 @@ export interface SMSMessageJSON extends ClerkResourceJSON {
   phone_number_id: string | null;
   message: string;
   status: string;
+  data?: Record<string, any> | null;
 }
 
 export interface UserJSON extends ClerkResourceJSON {
