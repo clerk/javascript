@@ -14,7 +14,7 @@ export type LocalizationValue = string;
 export type LocalizationResource = DeepPartial<_LocalizationResource>;
 
 type _LocalizationResource = {
-  locale: 'en-US' | 'fr-FR' | 'de-DE' | 'da-DK' | 'es-ES' | 'it-IT' | 'nl-NL' | 'nl-BE' | 'pt-BR' | 'ru-RU' | 'sv-SE';
+  locale: string;
   socialButtonsBlockButton: LocalizationValue;
   dividerText: LocalizationValue;
   formFieldLabel__emailAddress: LocalizationValue;
