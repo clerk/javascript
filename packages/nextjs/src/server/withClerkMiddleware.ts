@@ -17,9 +17,10 @@ import {
   SECRET_KEY,
   SIGN_IN_URL,
 } from './clerkClient';
-import { missingDomainAndProxy, missingSignInUrlInDev, unsupportedRelativePathProxyUrl } from './errors';
+import { missingDomainAndProxy, missingSignInUrlInDev } from './errors';
 import type { WithAuthOptions } from './types';
 import {
+  createProxyUrl,
   decorateRequest,
   getCookie,
   handleValueOrFn,
@@ -30,6 +31,7 @@ import {
 
 export interface WithClerkMiddleware {
   (handler: NextMiddleware, opts?: WithAuthOptions): NextMiddleware;
+
   (): NextMiddleware;
 }
 
@@ -42,14 +44,21 @@ export const decorateResponseWithObservabilityHeaders = (res: NextResponse, requ
 export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => {
   const noop = () => undefined;
   const [handler = noop, opts = {}] = args as [NextMiddleware, WithAuthOptions] | [];
-  const proxyUrl = opts?.proxyUrl || PROXY_URL;
-
-  if (!!proxyUrl && !isHttpOrHttps(proxyUrl)) {
-    throw new Error(unsupportedRelativePathProxyUrl);
-  }
 
   return async (req: NextRequest, event: NextFetchEvent) => {
     const { headers } = req;
+
+    const relativeOrAbsoluteProxyUrl = opts?.proxyUrl || PROXY_URL;
+
+    let proxyUrl;
+    if (!!relativeOrAbsoluteProxyUrl && !isHttpOrHttps(relativeOrAbsoluteProxyUrl)) {
+      proxyUrl = createProxyUrl({
+        request: req,
+        relativePath: relativeOrAbsoluteProxyUrl,
+      });
+    } else {
+      proxyUrl = relativeOrAbsoluteProxyUrl;
+    }
 
     const isSatellite = handleValueOrFn(opts.isSatellite, new URL(req.url), IS_SATELLITE);
     const domain = handleValueOrFn(opts.domain, new URL(req.url), DOMAIN);

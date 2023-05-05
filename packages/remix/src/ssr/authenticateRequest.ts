@@ -1,9 +1,8 @@
 import type { RequestState } from '@clerk/backend';
 import { Clerk } from '@clerk/backend';
-import { handleValueOrFn, isHttpOrHttps } from '@clerk/shared';
+import { createProxyUrl, handleValueOrFn, isHttpOrHttps } from '@clerk/shared';
 
 import {
-  noRelativeProxyInSSR,
   noSecretKeyOrApiKeyError,
   satelliteAndMissingProxyUrlAndDomain,
   satelliteAndMissingSignInUrl,
@@ -56,14 +55,21 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     handleValueOrFn(opts.isSatellite, new URL(request.url)) ||
     false;
 
-  const proxyUrl = getEnvVariable('CLERK_PROXY_URL') || (context?.CLERK_PROXY_URL as string) || opts.proxyUrl || '';
+  const relativeOrAbsoluteProxyUrl =
+    getEnvVariable('CLERK_PROXY_URL') || (context?.CLERK_PROXY_URL as string) || opts.proxyUrl || '';
+
+  let proxyUrl;
+  if (!!relativeOrAbsoluteProxyUrl && !isHttpOrHttps(relativeOrAbsoluteProxyUrl)) {
+    proxyUrl = createProxyUrl({
+      request,
+      relativePath: relativeOrAbsoluteProxyUrl,
+    });
+  } else {
+    proxyUrl = relativeOrAbsoluteProxyUrl;
+  }
 
   const signInUrl =
     getEnvVariable('CLERK_SIGN_IN_URL') || (context?.CLERK_SIGN_IN_URL as string) || opts.signInUrl || '';
-
-  if (!!proxyUrl && !isHttpOrHttps(proxyUrl)) {
-    throw new Error(noRelativeProxyInSSR);
-  }
 
   if (isSatellite && !proxyUrl && !domain) {
     throw new Error(satelliteAndMissingProxyUrlAndDomain);
