@@ -77,6 +77,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
       })}
     >
       <Select
+        elementId='countryCode'
         value={selectedCountryOption.value}
         options={countryOptions}
         optionBuilder={(option, _index, isFocused) => (

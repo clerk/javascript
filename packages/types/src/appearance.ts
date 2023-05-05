@@ -91,6 +91,9 @@ export type OrganizationPreviewId = 'organizationSwitcher';
 
 export type FooterActionId = 'havingTrouble' | 'alternativeMethods' | 'signUp' | 'signIn';
 
+export type MenuId = 'invitation' | 'member';
+export type SelectId = 'countryCode' | 'role';
+
 /**
  * A type that describes the states and the ids that we will combine
  * in order to create all theming combinations
@@ -284,7 +287,9 @@ export type ElementsConfig = {
   organizationPreviewMainIdentifier: WithOptions<OrganizationPreviewId, never, never>;
   organizationPreviewSecondaryIdentifier: WithOptions<OrganizationPreviewId, never, never>;
 
+  membersPageInviteButton: WithOptions<never, never, never>;
   organizationProfilePage: WithOptions<never, never, never>;
+
   identityPreview: WithOptions<never, never, never>;
   identityPreviewAvatarBox: WithOptions<never, never, never>;
   identityPreviewAvatarImage: WithOptions<never, never, never>;
@@ -305,9 +310,15 @@ export type ElementsConfig = {
   tabButton: WithOptions<never, never, never>;
   tabListContainer: WithOptions<never, never, never>;
 
-  selectButton: WithOptions<never, never, never>;
-  selectButtonIcon: WithOptions<never, never, never>;
-  selectOptionsContainer: WithOptions<never, never, never>;
+  selectButton: WithOptions<SelectId, never, never>;
+  selectSearchInput: WithOptions<SelectId, never, never>;
+  selectButtonIcon: WithOptions<SelectId, never, never>;
+  selectOptionsContainer: WithOptions<SelectId, never, never>;
+  selectOption: WithOptions<SelectId, never, never>;
+
+  menuButton: WithOptions<MenuId, never, never>;
+  menuList: WithOptions<MenuId, never, never>;
+  menuItem: WithOptions<MenuId, never, never>;
 
   loader: WithOptions<never, never, never>;
   loaderIcon: WithOptions<never, ErrorState, never>;

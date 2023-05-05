@@ -1,3 +1,5 @@
+import type { MenuId } from '@clerk/types';
+
 import type { LocalizationKey } from '../customizables';
 import { Button, Icon } from '../customizables';
 import { ThreeDots } from '../icons';
@@ -12,12 +14,13 @@ type Action = {
 
 type ThreeDotsMenuProps = {
   actions: Action[];
+  elementId?: MenuId;
 };
 
 export const ThreeDotsMenu = (props: ThreeDotsMenuProps) => {
-  const { actions } = props;
+  const { actions, elementId } = props;
   return (
-    <Menu>
+    <Menu elementId={elementId}>
       <MenuTrigger>
         <Button
           size='xs'

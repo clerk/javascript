@@ -1,8 +1,9 @@
 import { createContextAndHook } from '@clerk/shared';
+import type { MenuId } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
 import React, { cloneElement, isValidElement, useLayoutEffect, useRef } from 'react';
 
-import { Button, Col } from '../customizables';
+import { Button, Col, descriptors } from '../customizables';
 import type { UsePopoverReturn } from '../hooks';
 import { usePopover } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
@@ -13,20 +14,22 @@ import { Popover } from './Popover';
 
 type MenuState = {
   popoverCtx: UsePopoverReturn;
+  elementId?: MenuId;
 };
 
 const [MenuStateCtx, useMenuState] = createContextAndHook<MenuState>('MenuState');
 
-type MenuProps = PropsWithChildren<Record<never, never>>;
+type MenuProps = PropsWithChildren<Record<never, never>> & { elementId?: MenuId };
 
 export const Menu = withFloatingTree((props: MenuProps) => {
+  const { elementId } = props;
   const popoverCtx = usePopover({
     placement: 'right-start',
     offset: 8,
     bubbles: false,
   });
 
-  const value = React.useMemo(() => ({ value: { popoverCtx } }), [{ ...popoverCtx }]);
+  const value = React.useMemo(() => ({ value: { popoverCtx, elementId } }), [{ ...popoverCtx }, elementId]);
 
   return (
     <MenuStateCtx.Provider
@@ -40,7 +43,7 @@ type MenuTriggerProps = React.PropsWithChildren<Record<never, never>>;
 
 export const MenuTrigger = (props: MenuTriggerProps) => {
   const { children } = props;
-  const { popoverCtx } = useMenuState();
+  const { popoverCtx, elementId } = useMenuState();
   const { reference, toggle } = popoverCtx;
 
   if (!isValidElement(children)) {
@@ -50,6 +53,8 @@ export const MenuTrigger = (props: MenuTriggerProps) => {
   return cloneElement(children, {
     // @ts-expect-error
     ref: reference,
+    elementDescriptor: descriptors.menuButton,
+    elementId: descriptors.menuButton.setId(elementId),
     onClick: (e: React.MouseEvent) => {
       children.props?.onClick?.(e);
       toggle();
@@ -71,7 +76,7 @@ type MenuListProps = PropsOfComponent<typeof Col>;
 
 export const MenuList = (props: MenuListProps) => {
   const { sx, ...rest } = props;
-  const { popoverCtx } = useMenuState();
+  const { popoverCtx, elementId } = useMenuState();
   const { floating, styles, isOpen, context, nodeId } = popoverCtx;
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -104,6 +109,8 @@ export const MenuList = (props: MenuListProps) => {
       order={['floating', 'content']}
     >
       <Col
+        elementDescriptor={descriptors.menuList}
+        elementId={descriptors.menuList.setId(elementId)}
         ref={containerRef}
         role='menu'
         onKeyDown={onKeyDown}
@@ -139,7 +146,7 @@ type MenuItemProps = PropsOfComponent<typeof Button> & {
 
 export const MenuItem = (props: MenuItemProps) => {
   const { sx, onClick, destructive, ...rest } = props;
-  const { popoverCtx } = useMenuState();
+  const { popoverCtx, elementId } = useMenuState();
   const { toggle } = popoverCtx;
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -162,6 +169,8 @@ export const MenuItem = (props: MenuItemProps) => {
   return (
     <Button
       ref={buttonRef}
+      elementDescriptor={descriptors.menuItem}
+      elementId={descriptors.menuItem.setId(elementId)}
       focusRing={false}
       hoverAsFocus
       variant='ghost'
