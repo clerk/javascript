@@ -168,6 +168,10 @@ You can get in touch with us in any of the following ways:
 - Open a [GitHub support issue](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=question&template=ask_a_question.md&title=Support%3A+)
 - Contact options listed on [our Support page](https://clerk.com/support?utm_source=github&utm_medium=clerk_chrome_extension)
 
+## Contributing
+
+We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerkinc/javascript/blob/main/docs/CONTRIBUTING.md).
+
 ## Security
 
 `@clerk/chrome-extension` follows good practices of security, but 100% security cannot be assured.

@@ -78,7 +78,7 @@ You can get in touch with us in any of the following ways:
 
 ## Contributing
 
-We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerkinc/javascript/blob/main/packages/sdk-node/docs/CONTRIBUTING.md).
+We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerkinc/javascript/blob/main/docs/CONTRIBUTING.md).
 
 ## Security
 
