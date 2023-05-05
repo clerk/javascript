@@ -7,7 +7,6 @@ import { NextResponse } from 'next/server';
 import { isRedirect, mergeResponses, paths, setHeader, stringifyHeaders } from '../utils';
 import { withLogger } from '../utils/debugLogger';
 import { authenticateRequest, handleInterstitialState, handleUnknownState } from './authenticateRequest';
-import { SIGN_IN_URL, SIGN_UP_URL } from './clerkClient';
 import { receivedRequestForIgnoredRoute } from './errors';
 import { redirectToSignIn } from './redirect';
 import type { NextMiddlewareResult, WithAuthOptions } from './types';
@@ -194,12 +193,19 @@ const withDefaultPublicRoutes = (publicRoutes: RouteMatcherParam | undefined) =>
   if (typeof publicRoutes === 'function') {
     return publicRoutes;
   }
+
   const routes = [publicRoutes || ''].flat().filter(Boolean);
-  if (SIGN_IN_URL) {
-    routes.push(matchRoutesStartingWith(SIGN_IN_URL));
+  // TODO: refactor it to use common config file eg SIGN_IN_URL from ./clerkClient
+  // we use process.env for now to support testing
+  const signInUrl = process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || '';
+  if (signInUrl) {
+    routes.push(matchRoutesStartingWith(signInUrl));
   }
-  if (SIGN_UP_URL) {
-    routes.push(matchRoutesStartingWith(SIGN_UP_URL));
+  // TODO: refactor it to use common config file eg SIGN_UP_URL from ./clerkClient
+  // we use process.env for now to support testing
+  const signUpUrl = process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || '';
+  if (signUpUrl) {
+    routes.push(matchRoutesStartingWith(signUpUrl));
   }
   return routes;
 };
