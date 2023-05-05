@@ -3,26 +3,7 @@ import type { PasswordSettingsData } from '@clerk/types';
 import { useCallback, useMemo, useState } from 'react';
 
 import { localizationKeys, useLocalizations } from '../localization';
-
-const testComplexityCases = (
-  password: string,
-  {
-    minLength,
-    maxLength,
-  }: {
-    minLength: number;
-    maxLength: number;
-  },
-) => {
-  return {
-    max_length: password.length < maxLength,
-    min_length: password.length >= minLength,
-    require_numbers: /\d/.test(password),
-    require_lowercase: /[a-z]/.test(password),
-    require_uppercase: /[A-Z]/.test(password),
-    require_special_char: /[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/.test(password),
-  };
-};
+import { canUseListFormat } from '../utils';
 
 type ComplexityErrorMessages = {
   [key in keyof Partial<Omit<PasswordSettingsData, 'disable_hibp' | 'min_zxcvbn_strength' | 'show_zxcvbn'>>]: string;
@@ -34,14 +15,61 @@ type UsePasswordComplexityCbs = {
   onValidationSuccess?: () => void;
 };
 
+const useTestComplexityCases = (config: Pick<UsePasswordComplexityConfig, 'allowed_special_characters'>) => {
+  let specialCharsRegex: RegExp;
+  if (config.allowed_special_characters) {
+    // Avoid a nested group by escaping the `[]` characters
+    let escaped = config.allowed_special_characters.replace('[', '\\[');
+    escaped = escaped.replace(']', '\\]');
+    specialCharsRegex = new RegExp(`[${escaped}]`);
+  } else {
+    specialCharsRegex = /[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/;
+  }
+
+  const testComplexityCases = (
+    password: string,
+    {
+      minLength,
+      maxLength,
+    }: {
+      minLength: number;
+      maxLength: number;
+    },
+  ) => {
+    return {
+      max_length: password.length < maxLength,
+      min_length: password.length >= minLength,
+      require_numbers: /\d/.test(password),
+      require_lowercase: /[a-z]/.test(password),
+      require_uppercase: /[A-Z]/.test(password),
+      require_special_char: specialCharsRegex.test(password),
+    };
+  };
+
+  return {
+    testComplexityCases,
+  };
+};
+
 export const usePasswordComplexity = (config: UsePasswordComplexityConfig, callbacks?: UsePasswordComplexityCbs) => {
   const { onValidationFailed = noop, onValidationSuccess = noop } = callbacks || {};
-  const { min_length, max_length, require_lowercase, require_numbers, require_uppercase, require_special_char } =
-    config;
+  const {
+    min_length,
+    max_length,
+    require_lowercase,
+    require_numbers,
+    require_uppercase,
+    require_special_char,
+    allowed_special_characters,
+  } = config;
+
+  const { testComplexityCases } = useTestComplexityCases({
+    allowed_special_characters,
+  });
 
   const [password, _setPassword] = useState('');
   const [failedValidations, setFailedValidations] = useState<ComplexityErrorMessages>({});
-  const { t } = useLocalizations();
+  const { t, locale } = useLocalizations();
 
   const errorMessages = useMemo(
     () =>
@@ -75,7 +103,15 @@ export const usePasswordComplexity = (config: UsePasswordComplexityConfig, callb
 
   const generateErrorText = useCallback(
     (failedValidations: ComplexityErrorMessages) => {
-      const messageWithPrefix = Object.values(failedValidations).join(', ');
+      let messageWithPrefix: string;
+      if (canUseListFormat(locale)) {
+        const formatter = new Intl.ListFormat(locale, { style: 'long', type: 'conjunction' });
+        messageWithPrefix = formatter.format(Object.values(failedValidations).filter(f => !!f));
+      } else {
+        messageWithPrefix = Object.values(failedValidations)
+          .filter(f => !!f)
+          .join(', ');
+      }
       return `${t(localizationKeys('unstable__errors.passwordComplexity.sentencePrefix'))} ${messageWithPrefix}`;
     },
     [t],

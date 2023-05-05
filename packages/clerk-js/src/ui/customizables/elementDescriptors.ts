@@ -143,6 +143,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'organizationPreviewMainIdentifier',
   'organizationPreviewSecondaryIdentifier',
 
+  'membersPageInviteButton',
   'organizationProfilePage',
 
   'identityPreview',
@@ -166,8 +167,14 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'tabListContainer',
 
   'selectButton',
+  'selectSearchInput',
   'selectButtonIcon',
   'selectOptionsContainer',
+  'selectOption',
+
+  'menuButton',
+  'menuList',
+  'menuItem',
 
   'loader',
   'loaderIcon',

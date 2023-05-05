@@ -14,6 +14,7 @@ export type LocalizationValue = string;
 export type LocalizationResource = DeepPartial<_LocalizationResource>;
 
 type _LocalizationResource = {
+  locale: string;
   socialButtonsBlockButton: LocalizationValue;
   dividerText: LocalizationValue;
   formFieldLabel__emailAddress: LocalizationValue;
@@ -67,6 +68,7 @@ type _LocalizationResource = {
   formFieldInputPlaceholder__backupCode: LocalizationValue;
   formFieldInputPlaceholder__organizationName: LocalizationValue;
   formFieldInputPlaceholder__organizationSlug: LocalizationValue;
+  formFieldError__notMatchingPasswords: LocalizationValue;
   formFieldAction__forgotPassword: LocalizationValue;
   formFieldHintText__optional: LocalizationValue;
   formButtonPrimary: LocalizationValue;
@@ -152,6 +154,23 @@ type _LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       actionLink: LocalizationValue;
+    };
+    forgotPassword: {
+      title_email: LocalizationValue;
+      title_phone: LocalizationValue;
+      subtitle: LocalizationValue;
+      formTitle: LocalizationValue;
+      formSubtitle_email: LocalizationValue;
+      formSubtitle_phone: LocalizationValue;
+      resendButton: LocalizationValue;
+    };
+    resetPassword: {
+      title: LocalizationValue;
+      formButtonPrimary: LocalizationValue;
+      successMessage: LocalizationValue;
+    };
+    resetPasswordMfa: {
+      detailsLabel: LocalizationValue;
     };
     emailCode: {
       title: LocalizationValue;

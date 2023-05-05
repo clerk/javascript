@@ -3,10 +3,12 @@ import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { useCoreClerk, useCoreSignIn, useOptions, useSignInContext } from '../../contexts';
-import type { LocalizationKey } from '../../customizables';
+import { localizationKeys, Text } from '../../customizables';
 import type { VerificationCodeCardProps } from '../../elements';
 import { useCardState, VerificationCodeCard } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
+import type { LocalizationKey } from '../../localization';
+import { useRouter } from '../../router';
 import { handleError } from '../../utils';
 
 export type SignInFactorTwoCodeCard = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
@@ -29,6 +31,7 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
   const card = useCardState();
   const { navigateAfterSignIn } = useSignInContext();
   const { setActive } = useCoreClerk();
+  const { navigate } = useRouter();
   const supportEmail = useSupportEmail();
   const { experimental_enableClerkImages } = useOptions();
 
@@ -49,6 +52,10 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
       }
     : undefined;
 
+  const isResettingPassword = (resource: SignInResource) =>
+    resource.firstFactorVerification?.strategy === 'reset_password_code' &&
+    resource.firstFactorVerification?.status === 'verified';
+
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
     signIn
       .attemptSecondFactor({ strategy: props.factor.strategy, code })
@@ -56,6 +63,11 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
         await resolve();
         switch (res.status) {
           case 'complete':
+            if (isResettingPassword(res) && res.createdSessionId) {
+              const queryParams = new URLSearchParams();
+              queryParams.set('createdSessionId', res.createdSessionId);
+              return navigate(`../reset-password-success?${queryParams.toString()}`);
+            }
             return setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignIn });
           default:
             return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
@@ -67,7 +79,9 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
   return (
     <VerificationCodeCard
       cardTitle={props.cardTitle}
-      cardSubtitle={props.cardSubtitle}
+      cardSubtitle={
+        isResettingPassword(signIn) ? localizationKeys('signIn.forgotPassword.subtitle') : props.cardSubtitle
+      }
       formTitle={props.formTitle}
       formSubtitle={props.formSubtitle}
       resendButton={props.resendButton}
@@ -78,6 +92,14 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
         experimental_enableClerkImages ? signIn.userData.experimental_imageUrl : signIn.userData.profileImageUrl
       }
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
-    />
+    >
+      {isResettingPassword(signIn) && (
+        <Text
+          localizationKey={localizationKeys('signIn.resetPasswordMfa.detailsLabel')}
+          variant='smallRegular'
+          colorScheme='neutral'
+        />
+      )}
+    </VerificationCodeCard>
   );
 };

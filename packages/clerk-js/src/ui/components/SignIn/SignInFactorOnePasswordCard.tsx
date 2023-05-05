@@ -1,3 +1,4 @@
+import type { ResetPasswordCodeFactor } from '@clerk/types';
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
@@ -7,9 +8,46 @@ import { Card, CardAlert, Footer, Form, Header, IdentityPreview, useCardState } 
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router/RouteContext';
 import { handleError, useFormControl } from '../../utils';
+import { HavingTrouble } from './HavingTrouble';
 
 type SignInFactorOnePasswordProps = {
-  onShowAlternativeMethodsClick: React.MouseEventHandler;
+  onShowAlternativeMethodsClick: React.MouseEventHandler | undefined;
+  onFactorPrepare: (f: ResetPasswordCodeFactor) => void;
+};
+
+const usePasswordControl = (props: SignInFactorOnePasswordProps) => {
+  const { onShowAlternativeMethodsClick, onFactorPrepare } = props;
+  const signIn = useCoreSignIn();
+
+  const passwordControl = useFormControl('password', '', {
+    type: 'password',
+    label: localizationKeys('formFieldLabel__password'),
+  });
+
+  const resetPasswordFactor = signIn.supportedFirstFactors.find(
+    ({ strategy }) => strategy === 'reset_password_code',
+  ) as ResetPasswordCodeFactor | undefined;
+
+  const goToForgotPassword = () => {
+    resetPasswordFactor &&
+      onFactorPrepare({
+        ...resetPasswordFactor,
+      });
+  };
+
+  return {
+    ...passwordControl,
+    props: {
+      ...passwordControl,
+      actionLabel:
+        resetPasswordFactor || onShowAlternativeMethodsClick ? localizationKeys('formFieldAction__forgotPassword') : '',
+      onActionClicked: resetPasswordFactor
+        ? goToForgotPassword
+        : onShowAlternativeMethodsClick
+        ? onShowAlternativeMethodsClick
+        : () => null,
+    },
+  };
 };
 
 export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps) => {
@@ -19,12 +57,11 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
   const signIn = useCoreSignIn();
   const { navigateAfterSignIn } = useSignInContext();
   const supportEmail = useSupportEmail();
-  const passwordControl = useFormControl('password', '', {
-    type: 'password',
-    label: localizationKeys('formFieldLabel__password'),
-  });
+  const passwordControl = usePasswordControl(props);
   const { navigate } = useRouter();
   const { experimental_enableClerkImages } = useOptions();
+  const [showHavingTrouble, setShowHavingTrouble] = React.useState(false);
+  const toggleHavingTrouble = React.useCallback(() => setShowHavingTrouble(s => !s), [setShowHavingTrouble]);
 
   const goBack = () => {
     return navigate('../');
@@ -46,6 +83,10 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
       })
       .catch(err => handleError(err, [passwordControl], card.setError));
   };
+
+  if (showHavingTrouble) {
+    return <HavingTrouble onBackLinkClick={toggleHavingTrouble} />;
+  }
 
   return (
     <Flow.Part part='password'>
@@ -78,21 +119,19 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
               style={{ display: 'none' }}
             />
             <Form.ControlRow elementId={passwordControl.id}>
-              <Form.Control
-                {...passwordControl.props}
-                autoFocus
-                actionLabel={localizationKeys('formFieldAction__forgotPassword')}
-                onActionClicked={onShowAlternativeMethodsClick}
-              />
+              <Form.Control {...passwordControl.props} />
             </Form.ControlRow>
             <Form.SubmitButton />
           </Form.Root>
         </Flex>
+
         <Footer.Root>
-          <Footer.Action elementId='alternativeMethods'>
+          <Footer.Action elementId={onShowAlternativeMethodsClick ? 'alternativeMethods' : 'havingTrouble'}>
             <Footer.ActionLink
-              localizationKey={localizationKeys('signIn.password.actionLink')}
-              onClick={onShowAlternativeMethodsClick}
+              localizationKey={localizationKeys(
+                onShowAlternativeMethodsClick ? 'signIn.password.actionLink' : 'signIn.alternativeMethods.actionLink',
+              )}
+              onClick={onShowAlternativeMethodsClick || toggleHavingTrouble}
             />
           </Footer.Action>
           <Footer.Links />

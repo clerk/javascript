@@ -85,6 +85,7 @@ const InvitationRow = (props: { invitation: OrganizationInvitationResource; onRe
               onClick: onRevoke,
             },
           ]}
+          elementId={'invitation'}
         />
       </Td>
     </RowContainer>

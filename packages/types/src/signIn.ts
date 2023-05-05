@@ -14,6 +14,8 @@ import type {
   PhoneCodeConfig,
   PhoneCodeFactor,
   PhoneCodeSecondFactorConfig,
+  ResetPasswordCodeAttempt,
+  ResetPasswordCodeFactor,
   ResetPasswordCodeFactorConfig,
   SamlConfig,
   SamlFactor,
@@ -45,6 +47,7 @@ import type {
   OAuthStrategy,
   PasswordStrategy,
   PhoneCodeStrategy,
+  ResetPasswordCodeStrategy,
   SamlStrategy,
   TicketStrategy,
   TOTPStrategy,
@@ -103,6 +106,7 @@ export type SignInFirstFactor =
   | EmailLinkFactor
   | PhoneCodeFactor
   | PasswordFactor
+  | ResetPasswordCodeFactor
   | Web3SignatureFactor
   | OauthFactor
   | SamlFactor;
@@ -130,7 +134,12 @@ export type PrepareFirstFactorParams =
   | OAuthConfig
   | SamlConfig;
 
-export type AttemptFirstFactorParams = EmailCodeAttempt | PhoneCodeAttempt | PasswordAttempt | Web3Attempt;
+export type AttemptFirstFactorParams =
+  | EmailCodeAttempt
+  | PhoneCodeAttempt
+  | PasswordAttempt
+  | Web3Attempt
+  | ResetPasswordCodeAttempt;
 
 export type PrepareSecondFactorParams = PhoneCodeSecondFactorConfig;
 
@@ -177,6 +186,7 @@ export interface SignInStartMagicLinkFlowParams extends StartMagicLinkFlowParams
 
 export type SignInStrategy =
   | PasswordStrategy
+  | ResetPasswordCodeStrategy
   | PhoneCodeStrategy
   | EmailCodeStrategy
   | EmailLinkStrategy

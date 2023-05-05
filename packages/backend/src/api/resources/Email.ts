@@ -8,7 +8,11 @@ export class Email {
     readonly toEmailAddress?: string,
     readonly subject?: string,
     readonly body?: string,
+    readonly bodyPlain?: string | null,
     readonly status?: string,
+    readonly slug?: string | null,
+    readonly data?: Record<string, any> | null,
+    readonly deliveredByClerk?: boolean,
   ) {}
 
   static fromJSON(data: EmailJSON): Email {
@@ -19,7 +23,11 @@ export class Email {
       data.to_email_address,
       data.subject,
       data.body,
+      data.body_plain,
       data.status,
+      data.slug,
+      data.data,
+      data.delivered_by_clerk,
     );
   }
 }

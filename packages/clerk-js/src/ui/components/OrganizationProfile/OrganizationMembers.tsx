@@ -52,6 +52,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
           </Header.Root>
           {isAdmin && (
             <IconButton
+              elementDescriptor={descriptors.membersPageInviteButton}
               aria-label='Invite'
               onClick={() => navigate('invite-members')}
               icon={

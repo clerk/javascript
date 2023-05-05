@@ -126,6 +126,7 @@ const MemberRow = (props: {
                 isDisabled: isCurrentUser,
               },
             ]}
+            elementId={'member'}
           />
         )}
       </Td>

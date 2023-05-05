@@ -13,6 +13,7 @@ const commonTexts = {
 } as const;
 
 export const svSE: LocalizationResource = {
+  locale: 'sv-SE',
   socialButtonsBlockButton: 'Fortsätt med {{provider|titleize}}',
   dividerText: 'eller',
   formFieldLabel__emailAddress: 'E-postadress',

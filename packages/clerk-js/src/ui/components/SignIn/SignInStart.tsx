@@ -10,6 +10,7 @@ import {
   groupIdentifiers,
   withRedirectToHomeSingleSessionGuard,
 } from '../../common';
+import { buildSSOCallbackURL } from '../../common/redirects';
 import { useCoreClerk, useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import {
@@ -32,11 +33,12 @@ import { SignInSocialButtons } from './SignInSocialButtons';
 export function _SignInStart(): JSX.Element {
   const card = useCardState();
   const status = useLoadingStatus();
-  const { userSettings } = useEnvironment();
+  const { displayConfig, userSettings } = useEnvironment();
   const { setActive } = useCoreClerk();
   const signIn = useCoreSignIn();
   const { navigate } = useNavigate();
-  const { navigateAfterSignIn, signUpUrl } = useSignInContext();
+  const ctx = useSignInContext();
+  const { navigateAfterSignIn, signUpUrl } = ctx;
   const supportEmail = useSupportEmail();
   const identifierAttributes = useMemo<SignInStartIdentifier[]>(
     () => groupIdentifiers(userSettings.enabledFirstFactorIdentifiers),
@@ -153,6 +155,7 @@ export function _SignInStart(): JSX.Element {
         void (await signIn.create({}));
       }
     }
+
     void handleOauthError();
   }, []);
 
@@ -171,6 +174,12 @@ export function _SignInStart(): JSX.Element {
     try {
       const res = await signIn.create(buildSignInParams(fields));
       switch (res.status) {
+        case 'needs_identifier':
+          // Check if we need to initiate a saml flow
+          if (res.supportedFirstFactors.some(ff => ff.strategy === 'saml')) {
+            await authenticateWithSaml();
+          }
+          break;
         case 'needs_first_factor':
           return navigate('factor-one');
         case 'needs_second_factor':
@@ -188,6 +197,17 @@ export function _SignInStart(): JSX.Element {
     } catch (e) {
       return attemptToRecoverFromSignInError(e);
     }
+  };
+
+  const authenticateWithSaml = async () => {
+    const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signInUrl);
+    const redirectUrlComplete = ctx.afterSignInUrl || displayConfig.afterSignInUrl;
+
+    return signIn.authenticateWithRedirect({
+      strategy: 'saml',
+      redirectUrl,
+      redirectUrlComplete,
+    });
   };
 
   const attemptToRecoverFromSignInError = async (e: any) => {

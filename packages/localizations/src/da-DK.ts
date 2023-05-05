@@ -13,6 +13,7 @@ const commonTexts = {
 } as const;
 
 export const daDK: LocalizationResource = {
+  locale: 'da-DK',
   socialButtonsBlockButton: 'Forsæt med {{provider|titleize}}',
   dividerText: 'eller',
   formFieldLabel__emailAddress: 'E-mailadresse',
@@ -205,7 +206,7 @@ export const daDK: LocalizationResource = {
     noAvailableMethods: {
       title: 'Kan ikke logge ind',
       subtitle: 'En fejl opstod',
-      message: "Kan ikke fortsætte med login. Der er ingen tilgængelig godkendelsesfaktor.",
+      message: 'Kan ikke fortsætte med login. Der er ingen tilgængelig godkendelsesfaktor.',
     },
   },
   userProfile: {
@@ -237,7 +238,8 @@ export const daDK: LocalizationResource = {
           'Indstil denne e-mailadresse som den primære til at modtage kommunikation vedrørende din konto.',
         detailsAction__nonPrimary: 'Sæt som primær',
         detailsTitle__unverified: 'Ubekræftet e-mailadresse',
-        detailsSubtitle__unverified: 'Denne e-mailadresse er ikke blevet bekræftet, og kan være begrænset i funktionalitet',
+        detailsSubtitle__unverified:
+          'Denne e-mailadresse er ikke blevet bekræftet, og kan være begrænset i funktionalitet',
         detailsAction__unverified: 'Færdiggøre bekræftelse',
         destructiveActionTitle: 'Fjern',
         destructiveActionSubtitle: 'Slet denne e-mailadresse og fjern den fra din konto',
@@ -254,7 +256,8 @@ export const daDK: LocalizationResource = {
           'Indstil dette telefonnummer som det primære til at modtage kommunikation vedrørende din konto.',
         detailsAction__nonPrimary: 'Sæt som primær',
         detailsTitle__unverified: 'Ubekræftet telefonnummer',
-        detailsSubtitle__unverified: 'Dette telefonnummer er ikke blevet bekræftet, og kan være begrænset i funktionalitet',
+        detailsSubtitle__unverified:
+          'Dette telefonnummer er ikke blevet bekræftet, og kan være begrænset i funktionalitet',
         detailsAction__unverified: 'Færdiggøre bekræftelse',
         destructiveActionTitle: 'Fjern',
         destructiveActionSubtitle: 'Slet dette telefonnummer og fjern det fra din konto',
@@ -440,7 +443,8 @@ export const daDK: LocalizationResource = {
     mfaPhoneCodePage: {
       title: 'Tilføj SMS bekræftelse',
       primaryButton__addPhoneNumber: 'Tilføj et telefonnummer',
-      subtitle__availablePhoneNumbers: 'Vælg et telefonnummer for at registrere SMS bekræftelse til totrinsbekræftelse.',
+      subtitle__availablePhoneNumbers:
+        'Vælg et telefonnummer for at registrere SMS bekræftelse til totrinsbekræftelse.',
       subtitle__unavailablePhoneNumbers:
         'Der er ingen tilgængelige telefonnumre til at registrere til SMS bekræftelse til totrinsbekræftelse.',
       successMessage:

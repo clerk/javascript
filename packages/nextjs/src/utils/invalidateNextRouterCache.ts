@@ -19,6 +19,8 @@
 type NextDataCache = any;
 
 /**
+ * Only for /pages router
+ *
  * Next currently prefetches the page of every visible Link on the page.
  * For every prefetch request, the middleware runs and the response is cached in
  * window.next.router.sdc or window.next.router.sdc

@@ -6,6 +6,7 @@ import { NextResponse } from 'next/server';
 
 import { isRedirect, mergeResponses, paths, setHeader } from '../utils';
 import { authenticateRequest, handleInterstitialState, handleUnknownState } from './authenticateRequest';
+import { SIGN_IN_URL, SIGN_UP_URL } from './clerkClient';
 import { receivedRequestForIgnoredRoute } from './errors';
 import { redirectToSignIn } from './redirect';
 import type { NextMiddlewareResult, WithAuthOptions } from './types';
@@ -24,11 +25,6 @@ type RouteMatcherWithNextTypedRoutes =
   | WithPathPatternWildcard<ExcludeRootPath<NextTypedRoute>>
   | NextTypedRoute
   | (string & {});
-
-const TMP_SIGN_IN_URL = '/sign-in';
-const TMP_SIGN_UP_URL = '/sign-up';
-// const TMP_AFTER_SIGN_IN_URL = '/';
-// const TMP_AFTER_SIGN_UP_URL = '/';
 
 /**
  * The default ideal matcher that excludes the _next directory (internals) and all static files.
@@ -52,7 +48,7 @@ type IgnoredRoutesParam = Array<RegExp | string> | RegExp | string | ((req: Next
 type BeforeAuthHandler = (
   req: NextRequest,
   evt: NextFetchEvent,
-) => NextMiddlewareResult | Promise<NextMiddlewareResult> | false;
+) => NextMiddlewareResult | Promise<NextMiddlewareResult> | false | Promise<false>;
 
 type AfterAuthHandler = (
   auth: AuthObject & { isPublicRoute: boolean },
@@ -181,7 +177,11 @@ const withDefaultPublicRoutes = (publicRoutes: RouteMatcherParam | undefined) =>
     return publicRoutes;
   }
   const routes = [publicRoutes || ''].flat().filter(Boolean);
-  routes.push(matchRoutesStartingWith(TMP_SIGN_IN_URL));
-  routes.push(matchRoutesStartingWith(TMP_SIGN_UP_URL));
+  if (SIGN_IN_URL) {
+    routes.push(matchRoutesStartingWith(SIGN_IN_URL));
+  }
+  if (SIGN_UP_URL) {
+    routes.push(matchRoutesStartingWith(SIGN_UP_URL));
+  }
   return routes;
 };
