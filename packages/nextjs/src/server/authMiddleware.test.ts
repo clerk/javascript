@@ -224,19 +224,33 @@ describe('authMiddleware(params)', () => {
       expect(resp?.headers.get('x-middleware-rewrite')).toEqual('https://www.clerk.com/public');
     });
 
-    // TODO: @dimikl
-    xit('renders sign-in/sing-up routes', async () => {
-      const signInResp = await authMiddleware({
-        publicRoutes: '/public',
-      })(mockRequest('/sign-in'), {} as NextFetchEvent);
-      expect(signInResp?.status).toEqual(200);
-      expect(signInResp?.headers.get('x-middleware-rewrite')).toEqual('https://www.clerk.com/sign-in');
+    describe('when sign-in/sign-up routes are defined in env', () => {
+      const currentSignInUrl = process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL;
+      const currentSignUpUrl = process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL;
 
-      const signUpResp = await authMiddleware({
-        publicRoutes: '/public',
-      })(mockRequest('/sign-up'), {} as NextFetchEvent);
-      expect(signUpResp?.status).toEqual(200);
-      expect(signUpResp?.headers.get('x-middleware-rewrite')).toEqual('https://www.clerk.com/sign-up');
+      beforeEach(() => {
+        process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL = '/custom-sign-in';
+        process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL = '/custom-sign-up';
+      });
+
+      afterEach(() => {
+        process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL = currentSignInUrl;
+        process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL = currentSignUpUrl;
+      });
+
+      it('renders sign-in/sign-up routes', async () => {
+        const signInResp = await authMiddleware({
+          publicRoutes: '/public',
+        })(mockRequest('/custom-sign-in'), {} as NextFetchEvent);
+        expect(signInResp?.status).toEqual(200);
+        expect(signInResp?.headers.get('x-middleware-rewrite')).toEqual('https://www.clerk.com/custom-sign-in');
+
+        const signUpResp = await authMiddleware({
+          publicRoutes: '/public',
+        })(mockRequest('/custom-sign-up'), {} as NextFetchEvent);
+        expect(signUpResp?.status).toEqual(200);
+        expect(signUpResp?.headers.get('x-middleware-rewrite')).toEqual('https://www.clerk.com/custom-sign-up');
+      });
     });
 
     it('redirects to sign-in for protected route', async () => {
