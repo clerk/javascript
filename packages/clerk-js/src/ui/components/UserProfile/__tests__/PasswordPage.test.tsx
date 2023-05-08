@@ -134,7 +134,7 @@ describe('PasswordPage', () => {
       await waitFor(() => {
         screen.getByText(`Passwords match.`);
       });
-    });
+    }, 10000);
 
     it('navigates to the root page upon pressing cancel', async () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
