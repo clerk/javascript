@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.17.2](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.17.1...@clerk/nextjs@4.17.2) (2023-05-08)
+
+### Bug Fixes
+
+- **nextjs:** Add more middleware logs ([6b9e241](https://github.com/clerkinc/javascript/commit/6b9e2419d641bc8bcc8c99c10d3044dfea0c56c6))
+- **nextjs:** Change the default matchers to improve TRPC support ([587ab99](https://github.com/clerkinc/javascript/commit/587ab99ba3c72981474b4739ac45330f3366fbbf))
+- **nextjs:** Improve default ignoredRoutes warning ([94c234c](https://github.com/clerkinc/javascript/commit/94c234c9a4156d599794a17a68d1247221b9fe11))
+
 ### [4.17.1](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.17.0...@clerk/nextjs@4.17.1) (2023-05-04)
 
 ### Bug Fixes
