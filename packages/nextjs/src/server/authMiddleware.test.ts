@@ -89,7 +89,18 @@ describe('isPublicRoute', () => {
   });
 });
 
-const validRoutes = ['/api', '/api/', '/api/hello', '/trpc', '/trpc/hello', '/trpc/hello.example'];
+const validRoutes = [
+  '/api',
+  '/api/',
+  '/api/hello',
+  '/trpc',
+  '/trpc/hello',
+  '/trpc/hello.example',
+  '/protected',
+  '/protected/',
+  '/protected/hello',
+];
+
 const invalidRoutes = ['/_next', '/favicon.ico', '/_next/test.json', '/files/api.pdf', '/test/api/test.pdf'];
 
 describe('default config matcher', () => {

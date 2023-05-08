@@ -31,7 +31,7 @@ type RouteMatcherWithNextTypedRoutes =
  * The default ideal matcher that excludes the _next directory (internals) and all static files,
  * but it will match the root route (/) and any routes that start with /api or /trpc.
  */
-export const DEFAULT_CONFIG_MATCHER = ['/((?!_next|.+\\..+))', '/', '/(api|trpc)(.*)'];
+export const DEFAULT_CONFIG_MATCHER = ['/((?!.*\\..*|_next).*)', '/', '/(api|trpc)(.*)'];
 
 /**
  * Any routes matching this path will be ignored by the middleware.
