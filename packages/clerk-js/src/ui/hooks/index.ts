@@ -1,4 +1,4 @@
-export * from './useDelayedUnmount';
+export * from './useDelayedVisibility';
 export * from './useNavigate';
 export * from './useWindowEventListener';
 export * from './useMagicLink';
