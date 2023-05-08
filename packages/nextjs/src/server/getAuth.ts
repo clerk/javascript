@@ -10,42 +10,65 @@ import {
 } from '@clerk/backend';
 import type { SecretKeyOrApiKey } from '@clerk/types';
 
+import { withLogger } from '../utils/debugLogger';
 import { API_KEY, API_URL, API_VERSION, SECRET_KEY } from './clerkClient';
+import { getAuthAuthHeaderMissing } from './errors';
 import type { RequestLike } from './types';
 import { getAuthKeyFromRequest, getCookie, getHeader, injectSSRStateIntoObject } from './utils';
 
 type GetAuthOpts = Partial<SecretKeyOrApiKey>;
-export const getAuth = (req: RequestLike, opts?: GetAuthOpts): SignedInAuthObject | SignedOutAuthObject => {
-  // When the auth status is set, we trust that the middleware has already run
-  // Then, we don't have to re-verify the JWT here,
-  // we can just strip out the claims manually.
-  const authStatus = getAuthKeyFromRequest(req, 'AuthStatus');
-  const authMessage = getAuthKeyFromRequest(req, 'AuthMessage');
-  const authReason = getAuthKeyFromRequest(req, 'AuthReason');
 
-  if (!authStatus) {
-    throw new Error(
-      'You need to use "withClerkMiddleware" in your Next.js middleware file. You also need to make sure that your middleware matcher is configured correctly and matches this route or page. See https://clerk.com/docs/quickstarts/get-started-with-nextjs',
-    );
-  }
+export const createGetAuth = ({
+  debugLoggerName,
+  noAuthStatusMessage,
+}: {
+  noAuthStatusMessage: string;
+  debugLoggerName: string;
+}) =>
+  withLogger(debugLoggerName, logger => {
+    return (req: RequestLike, opts?: GetAuthOpts): SignedInAuthObject | SignedOutAuthObject => {
+      const debug = getHeader(req, constants.Headers.EnableDebug) === 'true';
+      if (debug) {
+        logger.enable();
+      }
 
-  const options = {
-    apiKey: opts?.apiKey || API_KEY,
-    secretKey: opts?.secretKey || SECRET_KEY,
-    apiUrl: API_URL,
-    apiVersion: API_VERSION,
-    authStatus,
-    authMessage,
-    authReason,
-  };
+      // When the auth status is set, we trust that the middleware has already run
+      // Then, we don't have to re-verify the JWT here,
+      // we can just strip out the claims manually.
+      const authStatus = getAuthKeyFromRequest(req, 'AuthStatus');
+      const authMessage = getAuthKeyFromRequest(req, 'AuthMessage');
+      const authReason = getAuthKeyFromRequest(req, 'AuthReason');
+      logger.debug('Headers debug', { authStatus, authMessage, authReason });
 
-  if (authStatus !== AuthStatus.SignedIn) {
-    return signedOutAuthObject(options);
-  }
+      if (!authStatus) {
+        throw new Error(noAuthStatusMessage);
+      }
 
-  const jwt = parseJwt(req);
-  return signedInAuthObject(jwt.payload, { ...options, token: jwt.raw.text });
-};
+      const options = {
+        apiKey: opts?.apiKey || API_KEY,
+        secretKey: opts?.secretKey || SECRET_KEY,
+        apiUrl: API_URL,
+        apiVersion: API_VERSION,
+        authStatus,
+        authMessage,
+        authReason,
+      };
+      logger.debug('Options debug', options);
+
+      if (authStatus !== AuthStatus.SignedIn) {
+        return signedOutAuthObject(options);
+      }
+
+      const jwt = parseJwt(req);
+      logger.debug('JWT debug', jwt.raw.text);
+      return signedInAuthObject(jwt.payload, { ...options, token: jwt.raw.text });
+    };
+  });
+
+export const getAuth = createGetAuth({
+  debugLoggerName: 'getAuth()',
+  noAuthStatusMessage: getAuthAuthHeaderMissing(),
+});
 
 type BuildClerkPropsInitState = { user?: User | null; session?: Session | null; organization?: Organization | null };
 
