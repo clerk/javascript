@@ -1,5 +1,5 @@
 import { createContextAndHook, useSafeLayoutEffect } from '@clerk/shared';
-import React from 'react';
+import React, { useRef } from 'react';
 
 import { descriptors, Flex } from '../customizables';
 import { usePopover, useScrollLock } from '../hooks';
@@ -19,11 +19,13 @@ type ModalProps = React.PropsWithChildren<{
 
 export const Modal = withFloatingTree((props: ModalProps) => {
   const { handleClose, handleOpen, contentSx, containerSx } = props;
+  const { disableScroll, enableScroll } = useScrollLock(document.body);
+  const overlayRef = useRef<HTMLDivElement>(null);
   const { floating, isOpen, context, nodeId, toggle } = usePopover({
     defaultOpen: true,
     autoUpdate: false,
+    outsidePress: e => e.target === overlayRef.current,
   });
-  const { disableScroll, enableScroll } = useScrollLock(document.body);
 
   React.useEffect(() => {
     if (!isOpen) {
@@ -50,6 +52,7 @@ export const Modal = withFloatingTree((props: ModalProps) => {
       <ModalContext.Provider value={modalCtx}>
         <Flex
           aria-hidden
+          ref={overlayRef}
           elementDescriptor={descriptors.modalBackdrop}
           sx={[
             t => ({
