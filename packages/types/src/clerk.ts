@@ -493,7 +493,7 @@ export interface ClerkOptions {
   /**
    * @experimental
    */
-  experimental_enableClerkImages?: boolean;
+  experimental_enableClerkImageShimmer?: boolean;
 }
 
 export interface Resources {
