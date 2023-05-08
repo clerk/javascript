@@ -31,3 +31,9 @@ export const config = {
 
 If you intentionally want to run the authMiddleware for this route, you can exclude it from the default ignoredRoutes.
 `;
+
+export const getAuthAuthHeaderMissing = () =>
+  'You need to use "withClerkMiddleware" in your Next.js middleware file. You also need to make sure that your middleware matcher is configured correctly and matches this route or page. See https://clerk.com/docs/quickstarts/get-started-with-nextjs';
+
+export const authAuthHeaderMissing = () =>
+  "Clerk: auth() was called but it looks like you aren't using `authMiddleware` in your middleware file. Please use `authMiddleware` and make sure your middleware matcher is configured correctly and it matches this route or page. See https://clerk.com/docs/quickstarts/get-started-with-nextjs";
