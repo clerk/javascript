@@ -20,7 +20,7 @@ import {
   Text,
   useLocalizations,
 } from '../customizables';
-import { useDelayedUnmount, usePrefersReducedMotion } from '../hooks';
+import { useFieldMessageVisibility, usePrefersReducedMotion } from '../hooks';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { animations } from '../styledSystem';
 import { useFormControlFeedback } from '../utils';
@@ -148,26 +148,24 @@ export const FormControl = forwardRef<HTMLInputElement, FormControlProps>((props
   const InputElement = getInputElementForType(props.type);
   const isCheckbox = props.type === 'checkbox';
 
-  const { debounced: debouncedState } = useFormControlFeedback(
-    {
-      errorText,
-      informationText,
-      enableErrorAfterBlur,
-      isFocused: _isFocused,
-      hasLostFocus,
-      isSuccessful,
-      warningText,
-    },
-    submittedWithEnter,
-  );
+  const { debounced: debouncedState } = useFormControlFeedback({
+    errorText,
+    informationText,
+    enableErrorAfterBlur,
+    isFocused: _isFocused,
+    hasLostFocus,
+    isSuccessful,
+    warningText,
+    skipBlur: submittedWithEnter,
+  });
 
-  const errorMessage = useDelayedUnmount(debouncedState.errorText, 200);
+  const errorMessage = useFieldMessageVisibility(debouncedState.errorText, 200);
   const _successMessage = debouncedState.isSuccessful
     ? t(localizationKeys('unstable__errors.zxcvbn.goodPassword'))
     : '';
-  const successMessage = useDelayedUnmount(_successMessage, 200);
-  const informationMessage = useDelayedUnmount(debouncedState.informationText, 200);
-  const warningMessage = useDelayedUnmount(debouncedState.warningText, 200);
+  const successMessage = useFieldMessageVisibility(_successMessage, 200);
+  const informationMessage = useFieldMessageVisibility(debouncedState.informationText, 200);
+  const warningMessage = useFieldMessageVisibility(debouncedState.warningText, 200);
 
   const messageToDisplay = informationMessage || successMessage || errorMessage || warningMessage;
   const isSomeMessageVisible = !!messageToDisplay;

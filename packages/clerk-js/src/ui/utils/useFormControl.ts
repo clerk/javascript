@@ -104,7 +104,7 @@ export const useFormControl = <Id extends string>(
     }
   };
   const setSuccessful: FormControlState['setSuccessful'] = isSuccess => {
-    setErrorText(undefined);
+    setErrorText('');
     setWarningText('');
     setIsSuccessful(isSuccess);
   };
@@ -113,7 +113,7 @@ export const useFormControl = <Id extends string>(
     setWarningText(warning);
     if (warning) {
       setIsSuccessful(false);
-      setErrorText(undefined);
+      setErrorText('');
     }
   };
 
@@ -173,12 +173,10 @@ type DebouncingOption = {
   isSuccessful: boolean;
   isFocused: boolean;
   informationText: string | undefined;
+  skipBlur?: boolean;
+  delayInMs?: number;
 };
-export const useFormControlFeedback = (
-  opts: DebouncingOption,
-  skipBlur = false,
-  delayTime = 100,
-): DebouncedFeedback => {
+export const useFormControlFeedback = (opts: DebouncingOption): DebouncedFeedback => {
   const {
     hasLostFocus = false,
     errorText = '',
@@ -187,6 +185,8 @@ export const useFormControlFeedback = (
     isSuccessful = false,
     isFocused = false,
     informationText = '',
+    skipBlur = false,
+    delayInMs = 100,
   } = opts;
 
   const canDisplayFeedback = useMemo(() => {
@@ -230,7 +230,7 @@ export const useFormControlFeedback = (
     skipBlur,
   ]);
 
-  const debouncedState = useSetTimeout(feedbackMemo, delayTime);
+  const debouncedState = useSetTimeout(feedbackMemo, delayInMs);
 
   return {
     debounced: debouncedState,
