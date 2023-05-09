@@ -48,7 +48,11 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
   return async (req: NextRequest, event: NextFetchEvent) => {
     const { headers } = req;
 
-    const relativeOrAbsoluteProxyUrl = opts?.proxyUrl || PROXY_URL;
+    const requestURL = createProxyUrl({
+      request: req,
+    });
+
+    const relativeOrAbsoluteProxyUrl = handleValueOrFn(opts?.proxyUrl, new URL(requestURL), PROXY_URL);
 
     let proxyUrl;
     if (!!relativeOrAbsoluteProxyUrl && !isHttpOrHttps(relativeOrAbsoluteProxyUrl)) {

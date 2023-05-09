@@ -21,12 +21,12 @@ export function proxyUrlToAbsoluteURL(url: string | undefined): string {
   return isProxyUrlRelative(url) ? new URL(url, window.location.origin).toString() : url;
 }
 
-export function createProxyUrl({ request, relativePath }: { request: Request; relativePath: string }): string {
+export function createProxyUrl({ request, relativePath }: { request: Request; relativePath?: string }): string {
   const { headers, url: initialUrl } = request;
   const url = new URL(initialUrl);
   const host = headers.get('X-Forwarded-Host') ?? headers.get('host') ?? url.host;
 
   // X-Forwarded-Proto could be 'https, http'
   const protocol = headers.get('X-Forwarded-Proto')?.split(',')[0] ?? url.protocol;
-  return new URL(relativePath, `${protocol}://${host}`).toString();
+  return new URL(relativePath || url.pathname, `${protocol}://${host}`).toString();
 }
