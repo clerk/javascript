@@ -1,6 +1,6 @@
 import type { RequestState } from '@clerk/backend';
 import { Clerk } from '@clerk/backend';
-import { createProxyUrl, handleValueOrFn, isHttpOrHttps } from '@clerk/shared';
+import { getRequestUrl, handleValueOrFn, isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from '@clerk/shared';
 
 import {
   noSecretKeyOrApiKeyError,
@@ -55,7 +55,7 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     handleValueOrFn(opts.isSatellite, new URL(request.url)) ||
     false;
 
-  const requestURL = createProxyUrl({
+  const requestURL = getRequestUrl({
     request,
   });
 
@@ -66,11 +66,8 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
   );
 
   let proxyUrl;
-  if (!!relativeOrAbsoluteProxyUrl && !isHttpOrHttps(relativeOrAbsoluteProxyUrl)) {
-    proxyUrl = createProxyUrl({
-      request,
-      relativePath: relativeOrAbsoluteProxyUrl,
-    });
+  if (isValidProxyUrl(relativeOrAbsoluteProxyUrl) && isProxyUrlRelative(relativeOrAbsoluteProxyUrl)) {
+    proxyUrl = new URL(relativeOrAbsoluteProxyUrl, requestURL).toString();
   } else {
     proxyUrl = relativeOrAbsoluteProxyUrl;
   }

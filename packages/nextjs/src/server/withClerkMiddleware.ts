@@ -20,9 +20,9 @@ import {
 import { missingDomainAndProxy, missingSignInUrlInDev } from './errors';
 import type { WithAuthOptions } from './types';
 import {
-  createProxyUrl,
   decorateRequest,
   getCookie,
+  getRequestUrl,
   handleValueOrFn,
   isDevelopmentFromApiKey,
   isHttpOrHttps,
@@ -48,18 +48,13 @@ export const withClerkMiddleware: WithClerkMiddleware = (...args: unknown[]) => 
   return async (req: NextRequest, event: NextFetchEvent) => {
     const { headers } = req;
 
-    const requestURL = createProxyUrl({
+    const requestURL = getRequestUrl({
       request: req,
     });
-
-    const relativeOrAbsoluteProxyUrl = handleValueOrFn(opts?.proxyUrl, new URL(requestURL), PROXY_URL);
-
+    const relativeOrAbsoluteProxyUrl = handleValueOrFn(opts?.proxyUrl, requestURL, PROXY_URL);
     let proxyUrl;
     if (!!relativeOrAbsoluteProxyUrl && !isHttpOrHttps(relativeOrAbsoluteProxyUrl)) {
-      proxyUrl = createProxyUrl({
-        request: req,
-        relativePath: relativeOrAbsoluteProxyUrl,
-      });
+      proxyUrl = new URL(relativeOrAbsoluteProxyUrl, requestURL).toString();
     } else {
       proxyUrl = relativeOrAbsoluteProxyUrl;
     }
