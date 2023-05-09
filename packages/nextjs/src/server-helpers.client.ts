@@ -8,3 +8,5 @@ export const authMiddleware = () => mockImplementation('authMiddleware()');
 export const getAuth = () => mockImplementation('getAuth()');
 export const clerkClient = () => mockImplementation('clerkClient()');
 export const withClerkMiddleware = () => mockImplementation('withClerkMiddleware()');
+export const redirectToSignIn = () => mockImplementation('redirectToSignIn()');
+export const redirectToSignUp = () => mockImplementation('redirectToSignUp()');
