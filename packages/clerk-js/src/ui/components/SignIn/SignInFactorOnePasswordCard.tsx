@@ -38,7 +38,7 @@ const usePasswordControl = (props: SignInFactorOnePasswordProps) => {
   return {
     ...passwordControl,
     props: {
-      ...passwordControl,
+      ...passwordControl.props,
       actionLabel:
         resetPasswordFactor || onShowAlternativeMethodsClick ? localizationKeys('formFieldAction__forgotPassword') : '',
       onActionClicked: resetPasswordFactor
