@@ -8,6 +8,7 @@ import { Card, CardAlert, Footer, Form, Header, useCardState } from '../../eleme
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
+import { isResetPasswordStrategy } from './utils';
 
 type SignInFactorTwoBackupCodeCardProps = {
   onShowAlternativeMethodsClicked: React.MouseEventHandler;
@@ -29,7 +30,7 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
   });
 
   const isResettingPassword = (resource: SignInResource) =>
-    resource.firstFactorVerification?.strategy === 'reset_password_code' &&
+    isResetPasswordStrategy(resource.firstFactorVerification?.strategy) &&
     resource.firstFactorVerification?.status === 'verified';
 
   const handleBackupCodeSubmit: React.FormEventHandler = e => {
