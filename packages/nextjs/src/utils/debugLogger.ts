@@ -1,20 +1,18 @@
 // TODO: Replace with a more sophisticated logging solution
 
-type Log = string | Record<string, unknown>;
-type Logger<L = Log> = {
+import { logFormatter } from './logFormatter';
+
+export type Log = string | Record<string, unknown>;
+export type LogEntry = Log | Log[];
+export type Logger<L = Log> = {
   commit: () => void;
   debug: (...args: Array<L | (() => L)>) => void;
   enable: () => void;
 };
 
-export const createDebugLogger = (name: string) => (): Logger => {
-  type LogEntry = Log | Log[];
+export const createDebugLogger = (name: string, formatter: (val: LogEntry) => string) => (): Logger => {
   const entries: LogEntry[] = [];
   let isEnabled = false;
-
-  const logEntry = (entry: LogEntry) => {
-    return (Array.isArray(entry) ? entry : [entry]).map(e => JSON.stringify(e)).join(', ');
-  };
 
   return {
     enable: () => {
@@ -29,7 +27,7 @@ export const createDebugLogger = (name: string) => (): Logger => {
       if (isEnabled) {
         console.log(
           `Clerk debug start :: ${name}\n${entries
-            .map(logEntry)
+            .map(log => formatter(log))
             .map(e => `-- ${e}\n`)
             .join('')}`,
         );
@@ -46,9 +44,13 @@ type WithLogger = <L extends Logger, H extends (...args: any[]) => any>(
 export const withLogger: WithLogger = (loggerFactoryOrName, handlerCtor) => {
   return ((...args: any) => {
     const factory =
-      typeof loggerFactoryOrName === 'string' ? createDebugLogger(loggerFactoryOrName) : loggerFactoryOrName;
+      typeof loggerFactoryOrName === 'string'
+        ? createDebugLogger(loggerFactoryOrName, logFormatter)
+        : loggerFactoryOrName;
+
     const logger = factory();
     const handler = handlerCtor(logger as any);
+
     try {
       const res = handler(...args);
       if (typeof res === 'object' && 'then' in res && typeof res.then === 'function') {
