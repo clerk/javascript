@@ -174,14 +174,14 @@ export function isDevelopmentFromApiKey(apiKey: string): boolean {
   return apiKey.startsWith('test_') || apiKey.startsWith('sk_test_');
 }
 // TODO: use @clerk/shared once it is tree-shakeable
-export function createProxyUrl({ request, relativePath }: { request: Request; relativePath: string }): string {
+export function createProxyUrl({ request, relativePath }: { request: Request; relativePath?: string }): string {
   const { headers, url: initialUrl } = request;
   const url = new URL(initialUrl);
   const host = headers.get('X-Forwarded-Host') ?? headers.get('host') ?? url.host;
 
   // X-Forwarded-Proto could be 'https, http'
   const protocol = headers.get('X-Forwarded-Proto')?.split(',')[0] ?? url.protocol;
-  return new URL(relativePath, `${protocol}://${host}`).toString();
+  return new URL(relativePath || url.pathname, `${protocol}://${host}`).toString();
 }
 
 // Auth result will be set as both a query param & header when applicable
