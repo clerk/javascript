@@ -81,5 +81,9 @@ export const currentUser = ServerHelperModule.currentUser as ServerHelpersServer
 // export const getAuth = ServerHelperModule.getAuth as ServerHelpersServerModuleTypes['getAuth'];
 export const clerkClient = ServerHelperModule.clerkClient as ServerHelpersServerModuleTypes['clerkClient'];
 export const authMiddleware = ServerHelperModule.authMiddleware as ServerHelpersServerModuleTypes['authMiddleware'];
+export const redirectToSignIn =
+  ServerHelperModule.redirectToSignIn as ServerHelpersServerModuleTypes['redirectToSignIn'];
+export const redirectToSignUp =
+  ServerHelperModule.redirectToSignUp as ServerHelpersServerModuleTypes['redirectToSignUp'];
 export const withClerkMiddleware =
   ServerHelperModule.withClerkMiddleware as ServerHelpersServerModuleTypes['withClerkMiddleware'];
