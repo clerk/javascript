@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.17.3](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.17.2...@clerk/nextjs@4.17.3) (2023-05-09)
+
+### Bug Fixes
+
+- **nextjs:** Export redirectToSignIn and redirectToSignUp from the top-level ([0769cda](https://github.com/clerkinc/javascript/commit/0769cda833cb653b913377004d65b0b1506042e1))
+- **nextjs:** Export withUser, withSession, withClerk from the top-level ([7b70d00](https://github.com/clerkinc/javascript/commit/7b70d0015972f6e4cbae2c658d16be07002d628a))
+- **nextjs:** Fix default matcher ([7b402ad](https://github.com/clerkinc/javascript/commit/7b402ad299933fe58cde6b3df354c02708e26898))
+- **nextjs:** Improve debug log formatting ([a2ac1a6](https://github.com/clerkinc/javascript/commit/a2ac1a600ee3d2f14902234f70ab1401b5f45ba4))
+
 ### [4.17.2](https://github.com/clerkinc/javascript/compare/@clerk/nextjs@4.17.1...@clerk/nextjs@4.17.2) (2023-05-08)
 
 ### Bug Fixes
