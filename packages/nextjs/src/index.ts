@@ -48,6 +48,15 @@ export {
   useMagicLink,
   MagicLinkErrorCode,
   isMagicLinkError,
+  withUser,
+  withSession,
+  withClerk,
+  WithUserProp,
+  WithUser,
+  WithSessionProp,
+  WithSession,
+  WithClerkProp,
+  WithClerk,
 } from './client-boundary/hooks';
 
 /**
