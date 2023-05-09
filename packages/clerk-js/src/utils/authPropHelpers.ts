@@ -3,7 +3,7 @@ import type { ClerkOptions, DisplayConfigResource } from '@clerk/types';
 import type { ParsedQs } from 'qs';
 import qs from 'qs';
 
-import { getFirstAllowedRedirectAndWarn, hasBannedProtocol, isValidUrl } from './index';
+import { hasBannedProtocol, isAllowedRedirectOrigin, isValidUrl } from './url';
 
 type PickRedirectionUrlKey = 'afterSignUpUrl' | 'afterSignInUrl' | 'signInUrl' | 'signUpUrl';
 
@@ -12,7 +12,6 @@ type PickRedirectionOptions = {
   displayConfig?: DisplayConfigResource;
   options?: ClerkOptions;
   ctx?: any;
-  allowedRedirectOrigins?: string[];
 };
 
 /**
@@ -30,29 +29,33 @@ type PickRedirectionOptions = {
  */
 export const pickRedirectionProp = (
   key: PickRedirectionUrlKey,
-  { ctx, queryParams, displayConfig, options, allowedRedirectOrigins }: PickRedirectionOptions,
+  { ctx, queryParams, displayConfig, options }: PickRedirectionOptions,
   accessRedirectUrl = true,
 ): string => {
   const snakeCaseField = camelToSnake(key);
   const queryParamValue = queryParams?.[snakeCaseField];
 
-  const primaryQueryParamRedirectUrl = typeof queryParamValue === 'string' ? queryParamValue : null;
+  const primaryQueryParamRedirectUrl = typeof queryParamValue === 'string' ? queryParamValue : undefined;
   const secondaryQueryParamRedirectUrl =
-    accessRedirectUrl && typeof queryParams?.redirect_url === 'string' ? queryParams.redirect_url : null;
+    accessRedirectUrl && typeof queryParams?.redirect_url === 'string' ? queryParams.redirect_url : undefined;
 
-  let queryParamUrl: string | null | undefined = primaryQueryParamRedirectUrl || secondaryQueryParamRedirectUrl;
-
-  if (allowedRedirectOrigins) {
-    queryParamUrl = getFirstAllowedRedirectAndWarn(
-      [primaryQueryParamRedirectUrl, secondaryQueryParamRedirectUrl].filter(i => i !== null) as string[],
-      allowedRedirectOrigins,
-    );
+  let queryParamUrl: string | undefined;
+  if (
+    primaryQueryParamRedirectUrl &&
+    isAllowedRedirectOrigin(primaryQueryParamRedirectUrl, options?.allowedRedirectOrigins)
+  ) {
+    queryParamUrl = primaryQueryParamRedirectUrl;
+  } else if (
+    secondaryQueryParamRedirectUrl &&
+    isAllowedRedirectOrigin(secondaryQueryParamRedirectUrl, options?.allowedRedirectOrigins)
+  ) {
+    queryParamUrl = secondaryQueryParamRedirectUrl;
   }
 
   const url =
     queryParamUrl ||
     ctx?.[key] ||
-    (accessRedirectUrl ? ctx?.redirectUrl : null) ||
+    (accessRedirectUrl ? ctx?.redirectUrl : undefined) ||
     options?.[key] ||
     displayConfig?.[key];
 
