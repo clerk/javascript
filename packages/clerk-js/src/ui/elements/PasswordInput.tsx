@@ -28,6 +28,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
     {
       onValidationSuccess: () => formControlProps?.setSuccessful?.(true),
       onValidationFailed: errorMessage => formControlProps?.setError?.(errorMessage),
+      onValidationWarning: errorMessage => formControlProps?.setWarning?.(errorMessage),
     },
   );
 

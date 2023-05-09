@@ -1,9 +1,12 @@
 import { auth, ClerkLoaded, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import React from 'react';
 import { ClientSideWrapper } from '@/app/protected/ClientSideWrapper';
+import { headers } from 'next/headers';
 
 export default function Page() {
-  console.log(auth());
+  const { userId } = auth();
+  console.log('Auth run in /protected', userId, headers().get('x-clerk-debug'), headers().keys());
+  // console.log(auth());
   return (
     <div>
       <h1>Protected page</h1>

@@ -4,13 +4,14 @@ import type Link from 'next/link';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import { isRedirect, mergeResponses, paths, setHeader } from '../utils';
+import { isRedirect, mergeResponses, paths, setHeader, stringifyHeaders } from '../utils';
+import { withLogger } from '../utils/debugLogger';
 import { authenticateRequest, handleInterstitialState, handleUnknownState } from './authenticateRequest';
 import { SIGN_IN_URL, SIGN_UP_URL } from './clerkClient';
 import { receivedRequestForIgnoredRoute } from './errors';
 import { redirectToSignIn } from './redirect';
 import type { NextMiddlewareResult, WithAuthOptions } from './types';
-import { decorateRequest } from './utils';
+import { decorateRequest, setRequestHeadersOnNextResponse } from './utils';
 
 type WithPathPatternWildcard<T> = `${T & string}(.*)`;
 type NextTypedRoute<T = Parameters<typeof Link>['0']['href']> = T extends string ? T : never;
@@ -27,15 +28,16 @@ type RouteMatcherWithNextTypedRoutes =
   | (string & {});
 
 /**
- * The default ideal matcher that excludes the _next directory (internals) and all static files.
+ * The default ideal matcher that excludes the _next directory (internals) and all static files,
+ * but it will match the root route (/) and any routes that start with /api or /trpc.
  */
-export const DEFAULT_CONFIG_MATCHER = ['/((?!.*\\..*|_next).*)', '/'];
+export const DEFAULT_CONFIG_MATCHER = ['/((?!.*\\..*|_next).*)', '/', '/(api|trpc)(.*)'];
 
 /**
  * Any routes matching this path will be ignored by the middleware.
  * This is the inverted version of DEFAULT_CONFIG_MATCHER.
  */
-export const DEFAULT_IGNORED_ROUTES = ['/(.*\\..*|_next.*)'];
+export const DEFAULT_IGNORED_ROUTES = ['/((?!api|trpc))(_next|.+\\..+)(.*)'];
 
 type RouteMatcherParam =
   | Array<RegExp | RouteMatcherWithNextTypedRoutes>
@@ -100,8 +102,16 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
   const isPublicRoute = createRouteMatcher(withDefaultPublicRoutes(publicRoutes));
   const defaultAfterAuth = createDefaultAfterAuth(isPublicRoute);
 
-  return async (req: NextRequest, evt: NextFetchEvent) => {
+  return withLogger('authMiddleware', logger => async (req: NextRequest, evt: NextFetchEvent) => {
+    if (options.debug) {
+      logger.enable();
+    }
+
+    logger.debug('URL debug', { url: req.nextUrl.href, method: req.method, headers: stringifyHeaders(req.headers) });
+    logger.debug('Options debug', { ...options, beforeAuth: !!beforeAuth, afterAuth: !!afterAuth });
+
     if (isIgnoredRoute(req)) {
+      logger.debug({ isIgnoredRoute: true });
       console.warn(receivedRequestForIgnoredRoute(req.nextUrl.href, JSON.stringify(DEFAULT_CONFIG_MATCHER)));
       return setHeader(NextResponse.next(), constants.Headers.AuthReason, 'ignored-route');
     }
@@ -109,32 +119,40 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
     const beforeAuthRes = await (beforeAuth && beforeAuth(req, evt));
 
     if (beforeAuthRes === false) {
+      logger.debug('Before auth returned false, skipping');
       return setHeader(NextResponse.next(), constants.Headers.AuthReason, 'skip');
     } else if (beforeAuthRes && isRedirect(beforeAuthRes)) {
+      logger.debug('Before auth returned redirect, following redirect');
       return setHeader(beforeAuthRes, constants.Headers.AuthReason, 'redirect');
     }
 
     const requestState = await authenticateRequest(req, options);
     if (requestState.isUnknown) {
+      logger.debug('authenticateRequest state is unknown', requestState);
       return handleUnknownState(requestState);
     } else if (requestState.isInterstitial) {
+      logger.debug('authenticateRequest state is interstitial', requestState);
       return handleInterstitialState(requestState, options);
     }
 
     const auth = Object.assign(requestState.toAuth(), { isPublicRoute: isPublicRoute(req) });
+    logger.debug(() => ({ auth: JSON.stringify(auth) }));
     const afterAuthRes = await (afterAuth || defaultAfterAuth)(auth, req, evt);
     const finalRes = mergeResponses(beforeAuthRes, afterAuthRes) || NextResponse.next();
+    logger.debug(() => ({ mergedHeaders: stringifyHeaders(finalRes.headers) }));
 
     if (isRedirect(finalRes)) {
+      logger.debug('Final response is redirect, following redirect');
       return setHeader(finalRes, constants.Headers.AuthReason, 'redirect');
     }
 
     if (options.debug) {
-      setHeader(finalRes, constants.Headers.EnableDebug, 'true');
+      setRequestHeadersOnNextResponse(finalRes, req, { [constants.Headers.EnableDebug]: 'true' });
+      logger.debug(`Added ${constants.Headers.EnableDebug} on request`);
     }
 
     return decorateRequest(req, finalRes, requestState);
-  };
+  });
 };
 
 export { authMiddleware };

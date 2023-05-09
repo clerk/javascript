@@ -13,7 +13,7 @@ export type FormControlProps = {
   isDisabled?: boolean;
   setError: (error: string | ClerkAPIError | undefined) => void;
   setSuccessful: (isSuccess: boolean) => void;
-  isSuccessful: boolean;
+  setWarning: (error: string) => void;
 };
 
 type FormControlContextValue = Required<FormControlProps> & { errorMessageId: string };
@@ -28,8 +28,8 @@ export const FormControlContextProvider = (props: React.PropsWithChildren<FormCo
     hasError = false,
     isDisabled = false,
     setError,
-    isSuccessful,
     setSuccessful,
+    setWarning,
   } = props;
   // TODO: This shouldnt be targettable
   const id = `${propsId}-field`;
@@ -39,8 +39,19 @@ export const FormControlContextProvider = (props: React.PropsWithChildren<FormCo
    */
   const errorMessageId = hasError ? `error-${propsId}` : '';
   const value = React.useMemo(
-    () => ({ value: { isRequired, hasError, id, errorMessageId, isDisabled, setError, isSuccessful, setSuccessful } }),
-    [isRequired, hasError, id, errorMessageId, isDisabled, setError, isSuccessful, setSuccessful],
+    () => ({
+      value: {
+        isRequired,
+        hasError,
+        id,
+        errorMessageId,
+        isDisabled,
+        setError,
+        setSuccessful,
+        setWarning,
+      },
+    }),
+    [isRequired, hasError, id, errorMessageId, isDisabled, setError, setSuccessful],
   );
   return <FormControlContext.Provider value={value}>{props.children}</FormControlContext.Provider>;
 };

@@ -9,13 +9,14 @@ export const Links = () => {
           <Link href={'/'}>Home</Link>
           <Link href={'/sign-in' as any}>Sign in</Link>
           <Link href={'/sign-up' as any}>Sign up</Link>
-          <Link href={'/protected' as any}>Protected</Link>
+          <Link href={'/protected' as any}>Protected (auth())</Link>
+          <Link href={'/action' as any}>Server action</Link>
         </div>
       </div>
       <div>
         <h3>Pages:</h3>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <Link href={'/user' as any}>/user (SSR and gSSP)</Link>
+          <Link href={'/user' as any}>/user (SSR and gSSP) (getAuth())</Link>
           <Link href={'/profile' as any}>/profile (no SSR)</Link>
         </div>
       </div>

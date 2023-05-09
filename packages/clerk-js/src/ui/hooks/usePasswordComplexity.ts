@@ -1,6 +1,6 @@
 import { noop } from '@clerk/shared';
 import type { PasswordSettingsData } from '@clerk/types';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { localizationKeys, useLocalizations } from '../localization';
 import { canUseListFormat } from '../utils';
@@ -68,8 +68,13 @@ export const usePasswordComplexity = (config: UsePasswordComplexityConfig, callb
   });
 
   const [password, _setPassword] = useState('');
-  const [failedValidations, setFailedValidations] = useState<ComplexityErrorMessages>({});
+  const [failedValidations, setFailedValidations] = useState<ComplexityErrorMessages>();
   const { t, locale } = useLocalizations();
+
+  // Populates failedValidations state
+  useEffect(() => {
+    setPassword('');
+  }, []);
 
   const errorMessages = useMemo(
     () =>
@@ -102,7 +107,10 @@ export const usePasswordComplexity = (config: UsePasswordComplexityConfig, callb
   );
 
   const generateErrorText = useCallback(
-    (failedValidations: ComplexityErrorMessages) => {
+    (failedValidations: ComplexityErrorMessages | undefined) => {
+      if (!failedValidations) {
+        return '';
+      }
       let messageWithPrefix: string;
       if (canUseListFormat(locale)) {
         const formatter = new Intl.ListFormat(locale, { style: 'long', type: 'conjunction' });
@@ -119,38 +127,41 @@ export const usePasswordComplexity = (config: UsePasswordComplexityConfig, callb
 
   const failedValidationsText = useMemo(() => generateErrorText(failedValidations), [failedValidations]);
 
-  const setPassword = useCallback(
-    (password: string) => {
-      const testCases = testComplexityCases(password, {
-        maxLength: max_length,
-        minLength: min_length,
-      });
+  const validate = useCallback((password: string) => {
+    const testCases = testComplexityCases(password, {
+      maxLength: max_length,
+      minLength: min_length,
+    });
 
-      const keys = {
-        max_length,
-        min_length,
-        require_special_char,
-        require_lowercase,
-        require_numbers,
-        require_uppercase,
-      };
+    const keys = {
+      max_length,
+      min_length,
+      require_special_char,
+      require_lowercase,
+      require_numbers,
+      require_uppercase,
+    };
 
-      const _validationsFailedMap = new Map();
-      for (const k in keys) {
-        const key = k as keyof typeof keys;
+    const _validationsFailedMap = new Map();
+    for (const k in keys) {
+      const key = k as keyof typeof keys;
 
-        if (!keys[key]) {
-          continue;
-        }
-
-        if (!testCases[key]) {
-          _validationsFailedMap.set(key, errorMessages[key]);
-        }
+      if (!keys[key]) {
+        continue;
       }
 
-      const _validationsFailed = Object.fromEntries(_validationsFailedMap);
+      if (!testCases[key]) {
+        _validationsFailedMap.set(key, errorMessages[key]);
+      }
+    }
 
+    return Object.fromEntries(_validationsFailedMap);
+  }, []);
+
+  const setPassword = useCallback(
+    (password: string) => {
       let message = '';
+      const _validationsFailed = validate(password);
       if (Object.keys(_validationsFailed).length > 0) {
         message = generateErrorText(_validationsFailed);
         onValidationFailed(_validationsFailed, message);

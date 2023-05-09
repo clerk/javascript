@@ -1,10 +1,10 @@
 import { useCallback, useRef } from 'react';
 
 import { useWizard, Wizard } from '../../common';
-import { useCoreUser } from '../../contexts';
+import { useCoreUser, useEnvironment } from '../../contexts';
 import { localizationKeys, useLocalizations } from '../../customizables';
 import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
-import { MIN_PASSWORD_LENGTH } from '../../hooks';
+import { MIN_PASSWORD_LENGTH, usePasswordComplexity } from '../../hooks';
 import { handleError, useFormControl } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
@@ -44,6 +44,11 @@ export const PasswordPage = withCardStateProvider(() => {
     isRequired: true,
   });
 
+  const {
+    userSettings: { passwordSettings },
+  } = useEnvironment();
+  const { failedValidationsText } = usePasswordComplexity(passwordSettings);
+
   const passwordField = useFormControl('newPassword', '', {
     type: 'password',
     label: localizationKeys('formFieldLabel__newPassword'),
@@ -51,6 +56,7 @@ export const PasswordPage = withCardStateProvider(() => {
     enableErrorAfterBlur: true,
     complexity: true,
     strengthMeter: true,
+    informationText: failedValidationsText,
   });
   const confirmField = useFormControl('confirmPassword', '', {
     type: 'password',

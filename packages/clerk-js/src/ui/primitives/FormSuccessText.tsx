@@ -1,13 +1,12 @@
 import React, { forwardRef } from 'react';
 
 import { Icon } from '../customizables';
-import { ExclamationCircle } from '../icons';
+import { CheckCircle } from '../icons';
 import type { StyleVariants } from '../styledSystem';
 import { animations, createVariants } from '../styledSystem';
-import { useFormControl } from './hooks';
 import { Text } from './Text';
 
-const { applyVariants } = createVariants(theme => ({
+export const { applyVariants } = createVariants(theme => ({
   base: {
     willChange: 'transform, opacity, height',
     marginTop: theme.sizes.$2,
@@ -20,30 +19,23 @@ const { applyVariants } = createVariants(theme => ({
   variants: {},
 }));
 
-type FormErrorTextProps = React.PropsWithChildren<StyleVariants<typeof applyVariants>>;
+export type FormTextProps = React.PropsWithChildren<StyleVariants<typeof applyVariants>>;
 
-export const FormErrorText = forwardRef<HTMLElement, FormErrorTextProps>((props, ref) => {
-  const { hasError, errorMessageId } = useFormControl() || {};
-
-  if (!hasError && !props.children) {
-    return null;
-  }
-
+export const FormSuccessText = forwardRef<HTMLElement, FormTextProps>((props, ref) => {
   const { children, ...rest } = props;
 
   return (
     <Text
       ref={ref}
       variant='smallRegular'
-      colorScheme='danger'
+      colorScheme='neutral'
       aria-live='polite'
-      id={errorMessageId}
       {...rest}
       css={applyVariants(props)}
     >
       <Icon
-        colorScheme={'danger'}
-        icon={ExclamationCircle}
+        colorScheme={'success'}
+        icon={CheckCircle}
       />
       {children}
     </Text>

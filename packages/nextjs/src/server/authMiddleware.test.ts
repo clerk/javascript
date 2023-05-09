@@ -1,3 +1,15 @@
+// There is no need to execute the complete authenticateRequest to test authMiddleware
+// This mock SHOULD exist before the import of authenticateRequest
+import type { NextFetchEvent, NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+
+import { paths } from '../utils';
+// used to assert the mock
+import { authenticateRequest } from './authenticateRequest';
+import { authMiddleware, createRouteMatcher, DEFAULT_CONFIG_MATCHER, DEFAULT_IGNORED_ROUTES } from './authMiddleware';
+// used to assert the mock
+import { clerkClient } from './clerkClient';
+
 jest.mock('./authenticateRequest', () => {
   const { handleInterstitialState, handleUnknownState } = jest.requireActual('./authenticateRequest');
   return {
@@ -21,18 +33,6 @@ jest.mock('./clerkClient', () => {
     debugRequestState,
   };
 });
-
-// There is no need to execute the complete authenticateRequest to test authMiddleware
-// This mock SHOULD exist before the import of authenticateRequest
-import type { NextFetchEvent, NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
-
-import { paths } from '../utils';
-// used to assert the mock
-import { authenticateRequest } from './authenticateRequest';
-import { authMiddleware, createRouteMatcher, DEFAULT_CONFIG_MATCHER, DEFAULT_IGNORED_ROUTES } from './authMiddleware';
-// used to assert the mock
-import { clerkClient } from './clerkClient';
 
 const mockRequest = (url: string) => {
   return {
@@ -89,25 +89,61 @@ describe('isPublicRoute', () => {
   });
 });
 
-describe('default matcher', () => {
+const validRoutes = [
+  '/api',
+  '/api/',
+  '/api/hello',
+  '/trpc',
+  '/trpc/hello',
+  '/trpc/hello.example',
+  '/protected',
+  '/protected/',
+  '/protected/hello',
+];
+
+const invalidRoutes = ['/_next', '/favicon.ico', '/_next/test.json', '/files/api.pdf', '/test/api/test.pdf'];
+
+describe('default config matcher', () => {
   it('compiles to regex using path-to-regex', () => {
-    [DEFAULT_CONFIG_MATCHER, DEFAULT_IGNORED_ROUTES].flat().forEach(path => {
+    [DEFAULT_CONFIG_MATCHER].flat().forEach(path => {
       expect(paths.toRegexp(path)).toBeInstanceOf(RegExp);
     });
   });
 
-  it('does not match any static files or next internals', () => {
-    const matcher = createRouteMatcher(DEFAULT_CONFIG_MATCHER);
-    expect(matcher(mockRequest('/_next'))).toBe(false);
-    expect(matcher(mockRequest('/favicon.ico'))).toBe(false);
-    expect(matcher(mockRequest('/_next/test.json'))).toBe(false);
+  describe('does not match any static files or next internals', function () {
+    it.each(invalidRoutes)(`does not match %s`, path => {
+      const matcher = createRouteMatcher(DEFAULT_CONFIG_MATCHER);
+      expect(matcher(mockRequest(path))).toBe(false);
+    });
   });
 
-  it('ignores the files matched by ignoredRoutes', () => {
-    const matcher = createRouteMatcher(DEFAULT_IGNORED_ROUTES);
-    expect(matcher(mockRequest('/_next'))).toBe(true);
-    expect(matcher(mockRequest('/favicon.ico'))).toBe(true);
-    expect(matcher(mockRequest('/_next/test.json'))).toBe(true);
+  describe('matches /api or known framework routes', function () {
+    it.each(validRoutes)(`matches %s`, path => {
+      const matcher = createRouteMatcher(DEFAULT_CONFIG_MATCHER);
+      expect(matcher(mockRequest(path))).toBe(true);
+    });
+  });
+});
+
+describe('default ignored routes matcher', () => {
+  it('compiles to regex using path-to-regex', () => {
+    [DEFAULT_IGNORED_ROUTES].flat().forEach(path => {
+      expect(paths.toRegexp(path)).toBeInstanceOf(RegExp);
+    });
+  });
+
+  describe('matches all static files or next internals', function () {
+    it.each(invalidRoutes)(`matches %s`, path => {
+      const matcher = createRouteMatcher(DEFAULT_IGNORED_ROUTES);
+      expect(matcher(mockRequest(path))).toBe(true);
+    });
+  });
+
+  describe('does not match /api or known framework routes', function () {
+    it.each(validRoutes)(`does not match %s`, path => {
+      const matcher = createRouteMatcher(DEFAULT_IGNORED_ROUTES);
+      expect(matcher(mockRequest(path))).toBe(false);
+    });
   });
 });
 

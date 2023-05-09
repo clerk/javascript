@@ -1,7 +1,7 @@
 import type { SignInResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 
-import { bindCreateFixtures, render, screen } from '../../../../testUtils';
+import { bindCreateFixtures, fireEvent, render, screen, waitFor } from '../../../../testUtils';
 import { ResetPassword } from '../ResetPassword';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
@@ -60,12 +60,20 @@ describe('ResetPassword', () => {
     it('results in error if the passwords do not match', async () => {
       const { wrapper } = await createFixtures();
 
-      const { baseElement, userEvent } = render(<ResetPassword />, { wrapper });
+      const { userEvent } = render(<ResetPassword />, { wrapper });
 
       await userEvent.type(screen.getByLabelText(/new password/i), 'testewrewr');
-      await userEvent.type(screen.getByLabelText(/confirm password/i), 'testrwerrwqrwe');
-      await userEvent.click(baseElement); //so that error renders
-      screen.getByText(/match/i);
+      const confirmField = screen.getByLabelText(/confirm password/i);
+      await userEvent.type(confirmField, 'testrwerrwqrwe');
+      fireEvent.blur(confirmField);
+      await waitFor(() => {
+        screen.getByText(/match/i);
+      });
+
+      await userEvent.clear(confirmField);
+      await waitFor(() => {
+        expect(screen.queryByText(/match/i)).not.toBeInTheDocument();
+      });
     });
 
     it('navigates to the root page upon pressing the back link', async () => {
