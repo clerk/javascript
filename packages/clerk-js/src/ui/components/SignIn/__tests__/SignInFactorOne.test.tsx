@@ -227,7 +227,33 @@ describe('SignInFactorOne', () => {
         await userEvent.click(screen.getByText('Forgot password'));
         await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
         expect(fixtures.signIn.attemptFirstFactor).toHaveBeenCalledWith({
-          strategy: 'reset_password_code',
+          strategy: 'reset_password_email_code',
+          code: '123456',
+        });
+        await waitFor(() => {
+          expect(fixtures.router.navigate).toHaveBeenCalledWith('../reset-password');
+        });
+      });
+
+      it('redirects to `reset-password` on successful code verification received in phone number', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'password' });
+          f.startSignInWithPhoneNumber({
+            supportPassword: true,
+            supportResetPassword: true,
+          });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(
+          Promise.resolve({ status: 'needs_new_password' } as SignInResource),
+        );
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.click(screen.getByText('Forgot password'));
+        await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+        expect(fixtures.signIn.attemptFirstFactor).toHaveBeenCalledWith({
+          strategy: 'reset_password_phone_code',
           code: '123456',
         });
         await waitFor(() => {

@@ -9,6 +9,7 @@ import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router/RouteContext';
 import { handleError, useFormControl } from '../../utils';
 import { HavingTrouble } from './HavingTrouble';
+import { isResetPasswordStrategy } from './utils';
 
 type SignInFactorOnePasswordProps = {
   onShowAlternativeMethodsClick: React.MouseEventHandler | undefined;
@@ -24,9 +25,9 @@ const usePasswordControl = (props: SignInFactorOnePasswordProps) => {
     label: localizationKeys('formFieldLabel__password'),
   });
 
-  const resetPasswordFactor = signIn.supportedFirstFactors.find(
-    ({ strategy }) => strategy === 'reset_password_code',
-  ) as ResetPasswordCodeFactor | undefined;
+  const resetPasswordFactor = signIn.supportedFirstFactors.find(({ strategy }) => isResetPasswordStrategy(strategy)) as
+    | ResetPasswordCodeFactor
+    | undefined;
 
   const goToForgotPassword = () => {
     resetPasswordFactor &&

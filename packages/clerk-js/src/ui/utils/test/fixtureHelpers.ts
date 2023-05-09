@@ -113,7 +113,8 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
     supportPhoneCode?: boolean;
     supportTotp?: boolean;
     supportBackupCode?: boolean;
-    supportResetPassword?: boolean;
+    supportResetPasswordEmail?: boolean;
+    supportResetPasswordPhone?: boolean;
   };
 
   const startSignInWithEmailAddress = (params?: SignInWithEmailAddressParams) => {
@@ -135,9 +136,9 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
         ...(supportResetPassword
           ? [
               {
-                strategy: 'reset_password_code',
+                strategy: 'reset_password_email_code',
                 safe_identifier: identifier || 'n*****@clerk.dev',
-                emailAddressId: 'someNumberId',
+                emailAddressId: 'someEmailId',
               },
             ]
           : []),
@@ -151,7 +152,7 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
       identifier = '+301234567890',
       supportPassword = true,
       supportPhoneCode,
-      supportResetPassword = true,
+      supportResetPassword,
     } = params || {};
     baseClient.sign_in = {
       status: 'needs_first_factor',
@@ -161,7 +162,13 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
         ...(supportPassword ? [{ strategy: 'password' }] : []),
         ...(supportPhoneCode ? [{ strategy: 'phone_code', safe_identifier: '+30********90' }] : []),
         ...(supportResetPassword
-          ? [{ strategy: 'reset_password_code', safe_identifier: '+30********90', phoneNumberId: 'someNumberId' }]
+          ? [
+              {
+                strategy: 'reset_password_phone_code',
+                safe_identifier: identifier || '+30********90',
+                phoneNumberId: 'someNumberId',
+              },
+            ]
           : []),
       ],
       user_data: { ...(createUserFixture() as any) },
@@ -174,16 +181,25 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
       supportPhoneCode = true,
       supportTotp,
       supportBackupCode,
-      supportResetPassword,
+      supportResetPasswordEmail,
+      supportResetPasswordPhone,
     } = params || {};
     baseClient.sign_in = {
       status: 'needs_second_factor',
       identifier,
-      ...(supportResetPassword
+      ...(supportResetPasswordEmail
         ? {
             first_factor_verification: {
               status: 'verified',
-              strategy: 'reset_password_code',
+              strategy: 'reset_password_email_code',
+            },
+          }
+        : {}),
+      ...(supportResetPasswordPhone
+        ? {
+            first_factor_verification: {
+              status: 'verified',
+              strategy: 'reset_password_phone_code',
             },
           }
         : {}),
@@ -274,6 +290,7 @@ const createOrganizationSettingsFixtureHelpers = (environment: EnvironmentJSON) 
 const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
   const us = environment.user_settings;
   us.password_settings = {
+    allowed_special_characters: '',
     disable_hibp: false,
     min_length: 8,
     max_length: 999,

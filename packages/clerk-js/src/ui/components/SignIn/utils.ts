@@ -104,6 +104,7 @@ export function determineSalutation(signIn: Partial<SignInResource>): string {
 }
 
 const localStrategies: SignInStrategy[] = ['email_code', 'password', 'phone_code', 'email_link'];
+
 export function factorHasLocalStrategy(factor: SignInFactor | undefined | null): boolean {
   if (!factor) {
     return false;
@@ -129,3 +130,7 @@ export function determineStartingSignInSecondFactor(secondFactors: SignInFactor[
 
   return secondFactors[0];
 }
+
+const resetPasswordStrategies: SignInStrategy[] = ['reset_password_phone_code', 'reset_password_email_code'];
+export const isResetPasswordStrategy = (strategy: SignInStrategy | string | null | undefined) =>
+  !!strategy && resetPasswordStrategies.includes(strategy as SignInStrategy);

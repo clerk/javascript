@@ -38,7 +38,7 @@ describe('SignInFactorTwo', () => {
     it('correctly shows text indicating user need to complete 2FA to reset password', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.startSignInFactorTwo({
-          supportResetPassword: true,
+          supportResetPasswordEmail: true,
         });
       });
       fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
@@ -69,7 +69,7 @@ describe('SignInFactorTwo', () => {
     it('redirects to reset-password-success after second factor successfully', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.startSignInFactorTwo({
-          supportResetPassword: true,
+          supportResetPasswordPhone: true,
         });
       });
       fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
@@ -78,7 +78,7 @@ describe('SignInFactorTwo', () => {
           status: 'complete',
           firstFactorVerification: {
             status: 'verified',
-            strategy: 'reset_password_code',
+            strategy: 'reset_password_phone_code',
           },
           createdSessionId: '1234_session_id',
         } as SignInResource),
