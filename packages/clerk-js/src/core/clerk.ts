@@ -60,7 +60,6 @@ import {
   createPageLifecycle,
   errorThrower,
   getClerkQueryParam,
-  getETLDPlusOneFromFrontendApi,
   hasExternalAccountSignUpError,
   ignoreEventValue,
   inActiveBrowserTab,
@@ -167,21 +166,6 @@ export default class Clerk implements ClerkInterface {
       return handleValueOrFn(this.#options.isSatellite, new URL(window.location.href), false);
     }
     return false;
-  }
-
-  get allowedRedirectOrigins(): string[] | undefined {
-    if (!this.#options.allowedRedirectOrigins) {
-      return undefined;
-    }
-
-    const origins = [...(this.#options.allowedRedirectOrigins || [])];
-    if (inBrowser()) {
-      origins.push(window.location.origin);
-      origins.push(window.location.origin + '/*');
-    }
-    origins.push(`https://*.${getETLDPlusOneFromFrontendApi(this.frontendApi)}`);
-    origins.push(`https://*.${getETLDPlusOneFromFrontendApi(this.frontendApi)}/*`);
-    return origins;
   }
 
   get domain(): string {
