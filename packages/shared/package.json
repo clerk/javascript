@@ -39,11 +39,10 @@
   },
   "author": "",
   "license": "ISC",
-  "gitHead": "1b19a43b61f712756ab4d8c9ccbee6e8bddbe4ce",
   "publishConfig": {
     "access": "public"
   },
   "dependencies": {
-    "glob-to-regexp": "^0.4.1"
+    "glob-to-regexp": "0.4.1"
   }
 }
