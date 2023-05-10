@@ -1,7 +1,6 @@
 import type { ClerkOptions } from './clerk';
 
-type DOMAIN = string | ((url: URL) => string);
-type PROXY_URL = string | ((url: URL) => string);
+type StringOrURLFnToString = string | ((url: URL) => string);
 
 /**
  * DomainOrProxyUrl supports the following cases
@@ -13,17 +12,17 @@ type PROXY_URL = string | ((url: URL) => string);
 export type MultiDomainAndOrProxy =
   | {
       isSatellite?: never;
-      proxyUrl?: never | PROXY_URL;
+      proxyUrl?: never | StringOrURLFnToString;
       domain?: never;
     }
   | {
       isSatellite: Exclude<ClerkOptions['isSatellite'], undefined>;
       proxyUrl?: never;
-      domain: DOMAIN;
+      domain: StringOrURLFnToString;
     }
   | {
       isSatellite: Exclude<ClerkOptions['isSatellite'], undefined>;
-      proxyUrl: PROXY_URL;
+      proxyUrl: StringOrURLFnToString;
       domain?: never;
     };
 
@@ -47,9 +46,9 @@ export type MultiDomainAndOrProxyPrimitives =
 export type DomainOrProxyUrl =
   | {
       proxyUrl?: never;
-      domain?: DOMAIN;
+      domain?: StringOrURLFnToString;
     }
   | {
-      proxyUrl?: PROXY_URL;
+      proxyUrl?: StringOrURLFnToString;
       domain?: never;
     };
