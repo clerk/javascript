@@ -4,14 +4,14 @@ import { useCoreUser } from '../../contexts';
 import { Col, Flex, Image, localizationKeys } from '../../customizables';
 import { ProfileSection } from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
-import { useNavigate } from '../../hooks/useNavigate';
+import { useRouter } from '../../router';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
 import { UserProfileAccordion } from './UserProfileAccordion';
 import { AddBlockButton } from './UserProfileBlockButtons';
 
 export const Web3Section = () => {
   const user = useCoreUser();
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
 
   return (
     <ProfileSection
@@ -34,7 +34,7 @@ export const Web3Section = () => {
 };
 
 const Web3WalletAccordion = ({ wallet }: { wallet: Web3WalletResource }) => {
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const { strategyToDisplayData } = useEnabledThirdPartyProviders();
   const strategy = wallet.verification.strategy as keyof typeof strategyToDisplayData;
 

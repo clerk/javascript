@@ -1,13 +1,13 @@
 import { Badge, Col, Icon, localizationKeys, useLocalizations } from '../../customizables';
-import { useNavigate } from '../../hooks';
 import { AuthApp } from '../../icons';
+import { useRouter } from '../../router';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
 import { UserProfileAccordion } from './UserProfileAccordion';
 
 // TODO(MFA): Until we implement 'Set default' across MFA factors, we treat TOTP as the default, if enabled
 
 export const MfaTOTPAccordion = () => {
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const { t } = useLocalizations();
 
   return (

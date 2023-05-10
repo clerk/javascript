@@ -12,7 +12,7 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useCardState } from '../../elements/contexts';
-import { useNavigate } from '../../hooks';
+import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';
 import { buildRequest, handleError, useFormControl } from '../../utils';
 import { SignUpForm } from './SignUpForm';
@@ -28,7 +28,7 @@ import { completeSignUpFlow } from './util';
 
 function _SignUpContinue() {
   const card = useCardState();
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const { displayConfig, userSettings } = useEnvironment();
   const { attributes } = userSettings;
   const { setActive } = useCoreClerk();

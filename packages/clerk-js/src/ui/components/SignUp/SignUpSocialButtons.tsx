@@ -7,14 +7,14 @@ import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { useCardState } from '../../elements';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
-import { useNavigate } from '../../hooks';
+import { useRouter } from '../../router';
 import { handleError } from '../../utils';
 
 export type SignUpSocialButtonsProps = SocialButtonsProps & { continueSignUp?: boolean };
 
 export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) => {
   const clerk = useCoreClerk();
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const card = useCardState();
   const { displayConfig } = useEnvironment();
   const ctx = useSignUpContext();

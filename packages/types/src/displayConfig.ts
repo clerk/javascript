@@ -36,7 +36,6 @@ export interface DisplayConfigResource extends ClerkResource {
   afterSignInUrl: string;
   afterSignOutAllUrl: string;
   afterSignOutOneUrl: string;
-  afterSignOutUrl: string;
   afterSignUpUrl: string;
   afterSwitchSessionUrl: string;
   applicationName: string;

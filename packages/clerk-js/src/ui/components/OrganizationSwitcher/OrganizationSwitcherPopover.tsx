@@ -72,7 +72,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       if (createOrganizationMode === 'navigation') {
         return navigateCreateOrganization();
       }
-      openCreateOrganization({ afterCreateOrganizationUrl });
+      return openCreateOrganization({ afterCreateOrganizationUrl });
     };
 
     const handleManageOrganizationClicked = () => {
@@ -80,7 +80,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       if (organizationProfileMode === 'navigation') {
         return navigateOrganizationProfile();
       }
-      openOrganizationProfile({
+      return openOrganizationProfile({
         afterLeaveOrganizationUrl,
         //@ts-expect-error
         __unstable_manageBillingUrl,
