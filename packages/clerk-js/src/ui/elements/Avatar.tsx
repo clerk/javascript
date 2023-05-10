@@ -33,7 +33,7 @@ export const Avatar = (props: AvatarProps) => {
     boxElementDescriptor,
     imageElementDescriptor,
   } = props;
-  const { experimental_enableClerkImages } = useOptions();
+  const { experimental_enableShimmerEffect } = useOptions();
   const [error, setError] = React.useState(false);
   const avatarExists = hasAvatar(imageUrl);
   let src;
@@ -78,7 +78,7 @@ export const Avatar = (props: AvatarProps) => {
           backgroundColor: t.colors.$avatarBackground,
           backgroundClip: 'padding-box',
           position: 'relative',
-          boxShadow: experimental_enableClerkImages ? 'var(--cl-shimmer-hover-shadow)' : 'unset',
+          boxShadow: experimental_enableShimmerEffect ? 'var(--cl-shimmer-hover-shadow)' : 'unset',
           transition: `box-shadow ${t.transitionDuration.$slower} ${t.transitionTiming.$easeOut}`,
         }),
         sx,
@@ -92,7 +92,7 @@ export const Avatar = (props: AvatarProps) => {
        */}
       <Box
         sx={t => ({
-          display: experimental_enableClerkImages ? 'unset' : 'none',
+          display: experimental_enableShimmerEffect ? 'unset' : 'none',
           overflow: 'hidden',
           background: t.colors.$colorShimmer,
           position: 'absolute',
