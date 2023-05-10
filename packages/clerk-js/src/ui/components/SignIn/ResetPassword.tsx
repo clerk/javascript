@@ -1,9 +1,9 @@
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { withRedirectToHomeSingleSessionGuard } from '../../common';
-import { useCoreSignIn } from '../../contexts';
+import { useCoreSignIn, useEnvironment } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { Card, CardAlert, Form, Header, useCardState, withCardStateProvider } from '../../elements';
-import { useConfirmPassword } from '../../hooks';
+import { useConfirmPassword, usePasswordComplexity } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
@@ -13,6 +13,10 @@ export const _ResetPassword = () => {
   const card = useCardState();
   const { navigate } = useRouter();
   const supportEmail = useSupportEmail();
+  const {
+    userSettings: { passwordSettings },
+  } = useEnvironment();
+  const { failedValidationsText } = usePasswordComplexity(passwordSettings);
 
   const passwordField = useFormControl('password', '', {
     type: 'password',
@@ -21,7 +25,9 @@ export const _ResetPassword = () => {
     enableErrorAfterBlur: true,
     complexity: true,
     strengthMeter: true,
+    informationText: failedValidationsText,
   });
+
   const confirmField = useFormControl('confirmPassword', '', {
     type: 'password',
     label: localizationKeys('formFieldLabel__confirmPassword'),

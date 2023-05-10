@@ -17,16 +17,35 @@ describe('ResetPassword', () => {
     screen.getByLabelText(/Confirm password/i);
   });
 
+  it('renders information text below Password field', async () => {
+    const { wrapper } = await createFixtures(f =>
+      f.withPasswordComplexity({
+        allowed_special_characters: '',
+        max_length: 999,
+        min_length: 8,
+        require_special_char: true,
+        require_numbers: true,
+        require_lowercase: true,
+        require_uppercase: true,
+      }),
+    );
+
+    render(<ResetPassword />, { wrapper });
+    screen.getByRole('heading', { name: /Reset password/i });
+
+    const passwordField = screen.getByLabelText(/New password/i);
+    fireEvent.focus(passwordField);
+    await waitFor(() => {
+      screen.getByText(/Your password must contain 8 or more characters/i);
+    });
+  });
+
   describe('Actions', () => {
     it('resets the password and does not require MFA', async () => {
       const { wrapper, fixtures } = await createFixtures();
       fixtures.signIn.resetPassword.mockResolvedValue({
         status: 'complete',
         createdSessionId: '1234_session_id',
-        resetPasswordFlow: {
-          hasNewPassword: true,
-          commType: 'email_address',
-        },
       } as SignInResource);
       const { userEvent } = render(<ResetPassword />, { wrapper });
 
@@ -45,9 +64,6 @@ describe('ResetPassword', () => {
       fixtures.signIn.resetPassword.mockResolvedValue({
         status: 'needs_second_factor',
         createdSessionId: '1234_session_id',
-        resetPasswordFlow: {
-          hasNewPassword: true,
-        },
       } as SignInResource);
       const { userEvent } = render(<ResetPassword />, { wrapper });
 
