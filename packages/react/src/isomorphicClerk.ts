@@ -106,7 +106,7 @@ export default class IsomorphicClerk {
 
   get proxyUrl(): string {
     // This getter can run in environments where window is not available.
-    // In those cases we should expect and use domain as a string
+    // In those cases we should expect and use proxy as a string
     if (typeof window !== 'undefined' && window.location) {
       return handleValueOrFn(this.#proxyUrl, new URL(window.location.href), '');
     }
