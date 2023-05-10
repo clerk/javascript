@@ -32,6 +32,37 @@ const fadeIn = keyframes`
   100% { opacity: 1; }
 `;
 
+const inAnimation = keyframes`
+  0% {
+    opacity: 0;
+    transform: translateY(-5px);
+    max-height: 0;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0px);
+    max-height: 6rem;
+  }
+`;
+
+const outAnimation = keyframes`
+  20% {
+    opacity: 1;
+    transform: translateY(0px);
+    max-height: 6rem;
+  }
+  80% {
+    opacity: 0;
+    transform: translateY(5px);
+    max-height: 0;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(5px);
+    max-height: 0;
+  }
+`;
+
 const textInSmall = keyframes`
   0% {opacity: 0;max-height: 0;}
   100% {opacity: 1;max-height: 3rem;}
@@ -69,4 +100,6 @@ export const animations = {
   blockBigIn,
   expandIn,
   navbarSlideIn,
+  inAnimation,
+  outAnimation,
 };

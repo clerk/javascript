@@ -2,7 +2,7 @@ import type { ChangeEvent } from 'react';
 import React, { forwardRef } from 'react';
 
 import { useEnvironment } from '../contexts';
-import { descriptors, Flex, Input } from '../customizables';
+import { descriptors, Flex, Input, localizationKeys, useLocalizations } from '../customizables';
 import { usePassword } from '../hooks/usePassword';
 import { Eye, EyeSlash } from '../icons';
 import { useFormControl } from '../primitives/hooks';
@@ -22,12 +22,15 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
   } = useEnvironment();
 
   const formControlProps = useFormControl();
+  const { t } = useLocalizations();
 
   const { setPassword } = usePassword(
     { ...passwordSettings, complexity, strengthMeter },
     {
-      onValidationSuccess: () => formControlProps?.setSuccessful?.(true),
+      onValidationSuccess: () =>
+        formControlProps?.setSuccessful?.(t(localizationKeys('unstable__errors.zxcvbn.goodPassword'))),
       onValidationFailed: errorMessage => formControlProps?.setError?.(errorMessage),
+      onValidationWarning: errorMessage => formControlProps?.setWarning?.(errorMessage),
     },
   );
 

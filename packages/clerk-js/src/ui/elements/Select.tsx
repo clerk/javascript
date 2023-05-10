@@ -1,4 +1,5 @@
 import { createContextAndHook } from '@clerk/shared';
+import type { SelectId } from '@clerk/types';
 import type { PropsWithChildren, ReactElement } from 'react';
 import React, { useState } from 'react';
 
@@ -28,11 +29,12 @@ type SelectProps<O extends Option> = {
   comparator?: (term: string, option: O) => boolean;
   noResultsMessage?: string;
   optionBuilder?: OptionBuilder<O>;
+  elementId?: SelectId;
 };
 
 type SelectState<O extends Option> = Pick<
   SelectProps<O>,
-  'placeholder' | 'searchPlaceholder' | 'comparator' | 'noResultsMessage'
+  'placeholder' | 'searchPlaceholder' | 'elementId' | 'comparator' | 'noResultsMessage'
 > & {
   popoverCtx: UsePopoverReturn;
   searchInputCtx: UseSearchInputReturn;
@@ -79,6 +81,7 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
     comparator,
     placeholder = 'Select an option',
     searchPlaceholder,
+    elementId,
     children,
     ...rest
   } = props;
@@ -121,6 +124,7 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
           comparator,
           select,
           onTriggerClick: togglePopover,
+          elementId,
         },
       }}
       {...rest}
@@ -136,11 +140,13 @@ type SelectOptionBuilderProps<O extends Option> = {
   optionBuilder: OptionBuilder<O>;
   handleSelect: (option: Option) => void;
   isFocused: boolean;
+  elementId?: SelectId;
 };
 
 const SelectOptionBuilder = React.memo(
   React.forwardRef((props: SelectOptionBuilderProps<any>, ref?: React.ForwardedRef<HTMLDivElement>) => {
-    const { option, optionBuilder, index, handleSelect, isFocused } = props;
+    const { option, optionBuilder, index, handleSelect, isFocused, elementId } = props;
+
     return (
       <Flex
         ref={ref}
@@ -152,7 +158,11 @@ const SelectOptionBuilder = React.memo(
           handleSelect(option);
         }}
       >
-        {optionBuilder(option, index, isFocused)}
+        {React.cloneElement(optionBuilder(option, index, isFocused) as React.ReactElement<unknown>, {
+          //@ts-expect-error
+          elementDescriptor: descriptors.selectOption,
+          elementId: descriptors.selectOption.setId(elementId),
+        })}
       </Flex>
     );
   }),
@@ -164,10 +174,13 @@ const SelectSearchbar = (props: PropsOfComponent<typeof InputWithIcon>) => {
     // @ts-expect-error
     return () => props.onChange({ target: { value: '' } });
   }, []);
+  const { elementId } = useSelectState();
 
   return (
     <Flex sx={theme => ({ borderBottom: theme.borders.$normal, borderColor: theme.colors.$blackAlpha200 })}>
       <InputWithIcon
+        elementDescriptor={descriptors.selectSearchInput}
+        elementId={descriptors.selectSearchInput.setId(elementId)}
         focusRing={false}
         leftIcon={
           <Icon
@@ -210,6 +223,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
     noResultsMessage,
     select,
     onTriggerClick,
+    elementId,
   } = useSelectState();
   const { filteredItems: options, searchInputProps } = searchInputCtx;
   const [focusedIndex, setFocusedIndex] = useState(0);
@@ -264,6 +278,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
     >
       <Flex
         elementDescriptor={descriptors.selectOptionsContainer}
+        elementId={descriptors.selectOptionsContainer.setId(elementId)}
         ref={floating}
         onKeyDown={onKeyDown}
         direction='col'
@@ -317,6 +332,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
                 optionBuilder={optionBuilder}
                 isFocused={isFocused}
                 handleSelect={select}
+                elementId={elementId}
               />
             );
           })}
@@ -329,7 +345,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
 
 export const SelectButton = (props: PropsOfComponent<typeof Button>) => {
   const { sx, children, ...rest } = props;
-  const { popoverCtx, onTriggerClick, buttonOptionBuilder, selectedOption, placeholder } = useSelectState();
+  const { popoverCtx, onTriggerClick, buttonOptionBuilder, selectedOption, placeholder, elementId } = useSelectState();
   const { isOpen, reference } = popoverCtx;
 
   let show: React.ReactNode = children;
@@ -344,6 +360,7 @@ export const SelectButton = (props: PropsOfComponent<typeof Button>) => {
   return (
     <Button
       elementDescriptor={descriptors.selectButton}
+      elementId={descriptors.selectButton.setId(elementId)}
       ref={reference}
       colorScheme='neutral'
       variant='ghost'
@@ -366,6 +383,7 @@ export const SelectButton = (props: PropsOfComponent<typeof Button>) => {
       {show}
       <Icon
         elementDescriptor={descriptors.selectButtonIcon}
+        elementId={descriptors.selectButtonIcon.setId(elementId)}
         icon={Caret}
         sx={theme => ({
           width: theme.sizes.$3x5,

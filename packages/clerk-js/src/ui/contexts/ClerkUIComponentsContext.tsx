@@ -180,6 +180,7 @@ export const useUserProfileContext = (): UserProfileContextType => {
 
 export const useUserButtonContext = () => {
   const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as UserButtonCtx;
+  const Clerk = useCoreClerk();
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
   const options = useOptions();
@@ -192,7 +193,7 @@ export const useUserButtonContext = () => {
   const userProfileUrl = ctx.userProfileUrl || displayConfig.userProfileUrl;
 
   const afterMultiSessionSingleSignOutUrl = ctx.afterMultiSessionSingleSignOutUrl || displayConfig.afterSignOutOneUrl;
-  const navigateAfterMultiSessionSingleSignOut = () => navigate(afterMultiSessionSingleSignOutUrl);
+  const navigateAfterMultiSessionSingleSignOut = () => Clerk.redirectWithAuth(afterMultiSessionSingleSignOutUrl);
 
   const afterSignOutUrl = ctx.afterSignOutUrl || displayConfig.afterSignOutAllUrl;
   const navigateAfterSignOut = () => navigate(afterSignOutUrl);

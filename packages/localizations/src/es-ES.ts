@@ -13,6 +13,7 @@ const commonTexts = {
 } as const;
 
 export const esES: LocalizationResource = {
+  locale: 'es-ES',
   socialButtonsBlockButton: 'Continuar con {{provider|titleize}}',
   dividerText: 'o',
   formFieldLabel__emailAddress: 'Correo electrónico',
@@ -75,7 +76,7 @@ export const esES: LocalizationResource = {
     start: {
       title: 'Crea tu cuenta',
       subtitle: 'para continuar a {{applicationName}}',
-      actionText: 'Tienes una cuenta?',
+      actionText: '¿Tienes una cuenta?',
       actionLink: 'Entrar',
     },
     emailLink: {
@@ -113,7 +114,7 @@ export const esES: LocalizationResource = {
     continue: {
       title: 'Rellene los campos que faltan',
       subtitle: 'para continuar a {{applicationName}}',
-      actionText: 'Tiene una cuenta?',
+      actionText: '¿Tiene una cuenta?',
       actionLink: 'Entrar',
     },
   },
@@ -121,7 +122,7 @@ export const esES: LocalizationResource = {
     start: {
       title: 'Entrar',
       subtitle: 'para continuar a {{applicationName}}',
-      actionText: 'No tiene cuenta?',
+      actionText: '¿No tiene cuenta?',
       actionLink: 'Regístrese',
     },
     password: {
@@ -431,7 +432,7 @@ export const esES: LocalizationResource = {
       removeResource: {
         title: 'Eliminar la verificación en dos pasos',
         messageLine1: 'El código de verificación de este autenticador ya no será necesario al iniciar sesión.',
-        messageLine2: 'Es posible que su cuenta no sea tan segura. Estás seguro de que quieres continuar?',
+        messageLine2: 'Es posible que su cuenta no sea tan segura. ¿Estás seguro de que quieres continuar?',
         successMessage: 'Se eliminó la verificación en dos pasos a través de la aplicación de autenticación.',
       },
     },
@@ -447,7 +448,7 @@ export const esES: LocalizationResource = {
       removeResource: {
         title: 'Eliminar la verificación en dos pasos',
         messageLine1: '{{identifier}} dejará de recibir el Código de verificación al iniciar sesión.',
-        messageLine2: 'Es posible que su cuenta no sea tan segura. Estás seguro de que quieres continuar?',
+        messageLine2: 'Es posible que su cuenta no sea tan segura. ¿Estás seguro de que quieres continuar?',
         successMessage: 'Se eliminó la verificación de dos pasos del código SMS para {{mfaPhoneCode}}',
       },
     },
@@ -583,7 +584,7 @@ export const esES: LocalizationResource = {
         pwned: 'Su contraseña fue expuesta por una violación de datos en Internet.',
       },
       suggestions: {
-        l33t: "Evita sustituciones predecibles como '@' por '@'",
+        l33t: "Evita sustituciones predecibles como '@' por 'a'",
         reverseWords: 'Evita palabras comunes escritas al revés',
         allUppercase: 'Escribe en mayúsculas algunas, pero no todas las letras.',
         capitalization: 'Escribe en mayúsculas alguna letra más además de la primera.',

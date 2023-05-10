@@ -130,6 +130,7 @@ export const RoleSelect = (props: { value: MembershipRole; onChange: any; isDisa
 
   return (
     <Select
+      elementId='role'
       options={roles}
       value={value}
       onChange={role => onChange(role.value)}

@@ -216,6 +216,26 @@ import { prunePrivateMetadata } from '@clerk/backend';
 prunePrivateMetadata(obj);
 ```
 
+## Support
+
+You can get in touch with us in any of the following ways:
+
+- Join our official community [Discord server](https://clerk.com/discord)
+- Open a [GitHub support issue](https://github.com/clerkinc/javascript/issues/new?assignees=&labels=question&template=ask_a_question.md&title=Support%3A+)
+- Contact options listed on [our Support page](https://clerk.com/support?utm_source=github&utm_medium=clerk_backend)
+
+## Contributing
+
+We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerkinc/javascript/blob/main/docs/CONTRIBUTING.md).
+
+## Security
+
+`@clerk/backend` follows good practices of security, but 100% security cannot be assured.
+
+`@clerk/backend` is provided **"as is"** without any **warranty**. Use at your own risk.
+
+_For more information and to report security issues, please refer to our [security documentation](https://github.com/clerkinc/javascript/blob/main/docs/SECURITY.md)._
+
 ## License
 
 This project is licensed under the **MIT license**.

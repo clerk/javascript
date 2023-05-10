@@ -13,6 +13,7 @@ const commonTexts = {
 } as const;
 
 export const enUS: LocalizationResource = {
+  locale: 'en-US',
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
   dividerText: 'or',
   formFieldLabel__emailAddress: 'Email address',
@@ -49,6 +50,8 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__organizationName: '',
   formFieldInputPlaceholder__organizationSlug: '',
+  formFieldError__notMatchingPasswords: `Passwords don't match.`,
+  formFieldError__matchingPasswords: 'Passwords match.',
   formFieldAction__forgotPassword: 'Forgot password',
   formFieldHintText__optional: 'Optional',
   formButtonPrimary: 'Continue',
@@ -134,6 +137,23 @@ export const enUS: LocalizationResource = {
       title: 'Enter your password',
       subtitle: 'to continue to {{applicationName}}',
       actionLink: 'Use another method',
+    },
+    forgotPassword: {
+      title_email: 'Check your email',
+      title_phone: 'Check your phone',
+      subtitle: 'to reset your password',
+      formTitle: 'Reset password code',
+      formSubtitle_email: 'Enter the code sent to your email address',
+      formSubtitle_phone: 'Enter the code sent to your phone number',
+      resendButton: 'Resend code',
+    },
+    resetPassword: {
+      title: 'Reset Password',
+      formButtonPrimary: 'Reset Password',
+      successMessage: 'Your password was successfully changed. Signing you in, please wait a moment.',
+    },
+    resetPasswordMfa: {
+      detailsLabel: 'We need to verify your identity before resetting your password.',
     },
     emailCode: {
       title: 'Check your email',
@@ -544,7 +564,8 @@ export const enUS: LocalizationResource = {
   },
   unstable__errors: {
     form_identifier_not_found: '',
-    form_password_pwned: '',
+    form_password_pwned:
+      'This password has been found as part of a breach and can not be used, please try another password instead',
     form_username_invalid_length: '',
     form_param_format_invalid: '',
     form_password_length_too_short: '',
@@ -553,7 +574,7 @@ export const enUS: LocalizationResource = {
     form_password_incorrect: '',
     not_allowed_access: '',
     form_identifier_exists: '',
-    form_password_validation_failed: 'Invalid password supplied',
+    form_password_validation_failed: 'Incorrect Password',
     form_password_not_strong_enough: 'Your password is not strong enough.',
     passwordComplexity: {
       sentencePrefix: 'Your password must contain',
@@ -566,6 +587,8 @@ export const enUS: LocalizationResource = {
     },
     zxcvbn: {
       notEnough: 'Your password is not strong enough.',
+      couldBeStronger: 'Your password works, but could be stronger. Try adding more characters.',
+      goodPassword: 'Nice work. This is an excellent password.',
       warnings: {
         straightRow: 'Straight rows of keys on your keyboard are easy to guess.',
         keyPattern: 'Short keyboard patterns are easy to guess.',

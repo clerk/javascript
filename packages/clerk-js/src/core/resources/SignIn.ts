@@ -10,8 +10,9 @@ import type {
   PhoneCodeConfig,
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
-  ResetPasswordCodeFactorConfig,
+  ResetPasswordEmailCodeFactorConfig,
   ResetPasswordParams,
+  ResetPasswordPhoneCodeFactorConfig,
   SignInCreateParams,
   SignInFirstFactor,
   SignInIdentifier,
@@ -26,6 +27,7 @@ import type {
   Web3SignatureFactor,
 } from '@clerk/types';
 import type { AuthenticateWithWeb3Params } from '@clerk/types/src';
+import type { SamlConfig } from '@clerk/types/src';
 
 import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from '../../utils';
 import {
@@ -91,15 +93,17 @@ export class SignIn extends BaseResource implements SignInResource {
       case 'web3_metamask_signature':
         config = { web3WalletId: factor.web3WalletId } as Web3SignatureConfig;
         break;
-      case 'reset_password_code':
-        if (factor.emailAddressId) {
-          config = { emailAddressId: factor.emailAddressId } as ResetPasswordCodeFactorConfig;
-        }
-        if (factor.phoneNumberId) {
-          config = {
-            phoneNumberId: factor.phoneNumberId,
-          } as ResetPasswordCodeFactorConfig;
-        }
+      case 'reset_password_phone_code':
+        config = { phoneNumberId: factor.phoneNumberId } as ResetPasswordPhoneCodeFactorConfig;
+        break;
+      case 'reset_password_email_code':
+        config = { emailAddressId: factor.emailAddressId } as ResetPasswordEmailCodeFactorConfig;
+        break;
+      case 'saml':
+        config = {
+          redirectUrl: factor.redirectUrl,
+          actionCompleteRedirectUrl: factor.actionCompleteRedirectUrl,
+        } as SamlConfig;
         break;
       default:
         clerkInvalidStrategy('SignIn.prepareFirstFactor', factor.strategy);
@@ -169,12 +173,21 @@ export class SignIn extends BaseResource implements SignInResource {
 
   public authenticateWithRedirect = async (params: AuthenticateWithRedirectParams): Promise<void> => {
     const { strategy, redirectUrl, redirectUrlComplete, identifier } = params || {};
-    const { firstFactorVerification } = await this.create({
-      strategy,
-      identifier,
-      redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
-      actionCompleteRedirectUrl: redirectUrlComplete,
-    });
+
+    const { firstFactorVerification } =
+      strategy === 'saml' && this.id
+        ? await this.prepareFirstFactor({
+            strategy,
+            redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
+            actionCompleteRedirectUrl: redirectUrlComplete,
+          })
+        : await this.create({
+            strategy,
+            identifier,
+            redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
+            actionCompleteRedirectUrl: redirectUrlComplete,
+          });
+
     const { status, externalVerificationRedirectURL } = firstFactorVerification;
 
     if (status === 'unverified' && externalVerificationRedirectURL) {

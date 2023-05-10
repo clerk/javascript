@@ -1,13 +1,12 @@
-import type { EmailCodeFactor, PhoneCodeFactor } from '@clerk/types';
+import type { EmailCodeFactor, PhoneCodeFactor, ResetPasswordCodeFactor } from '@clerk/types';
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { useCoreClerk, useCoreSignIn, useOptions, useSignInContext } from '../../contexts';
-import type { LocalizationKey } from '../../customizables';
 import type { VerificationCodeCardProps } from '../../elements';
-import { VerificationCodeCard } from '../../elements';
-import { useCardState } from '../../elements/contexts';
+import { useCardState, VerificationCodeCard } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
+import type { LocalizationKey } from '../../localization';
 import { useRouter } from '../../router';
 import { handleError } from '../../utils';
 
@@ -15,12 +14,12 @@ export type SignInFactorOneCodeCard = Pick<
   VerificationCodeCardProps,
   'onShowAlternativeMethodsClicked' | 'showAlternativeMethods' | 'onBackLinkClicked'
 > & {
-  factor: EmailCodeFactor | PhoneCodeFactor;
+  factor: EmailCodeFactor | PhoneCodeFactor | ResetPasswordCodeFactor;
   factorAlreadyPrepared: boolean;
   onFactorPrepare: () => void;
 };
 
-type SignInFactorOneCodeFormProps = SignInFactorOneCodeCard & {
+export type SignInFactorOneCodeFormProps = SignInFactorOneCodeCard & {
   cardTitle: LocalizationKey;
   cardSubtitle: LocalizationKey;
   formTitle: LocalizationKey;
@@ -65,6 +64,8 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
             return setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignIn });
           case 'needs_second_factor':
             return navigate('../factor-two');
+          case 'needs_new_password':
+            return navigate('../reset-password');
           default:
             return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
         }

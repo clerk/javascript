@@ -1,7 +1,7 @@
 import type { UserResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 
-import { bindCreateFixtures, render, screen } from '../../../../testUtils';
+import { bindCreateFixtures, fireEvent, render, screen, waitFor } from '../../../../testUtils';
 import { PasswordPage } from '../PasswordPage';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
@@ -83,20 +83,58 @@ describe('PasswordPage', () => {
       const { userEvent } = render(<PasswordPage />, { wrapper });
 
       await userEvent.type(screen.getByLabelText(/new password/i), 'test');
-      await userEvent.type(screen.getByLabelText(/confirm password/i), 'test');
-      screen.getByText(/or more/i);
+      const confirmField = screen.getByLabelText(/confirm password/i);
+      await userEvent.type(confirmField, 'test');
+      fireEvent.blur(confirmField);
+      await waitFor(() => {
+        screen.getByText(/or more/i);
+      });
     });
 
-    it('results in error if the passwords do not match', async () => {
+    it('results in error if the passwords do not match and persists', async () => {
       const { wrapper } = await createFixtures(initConfig);
 
-      const { baseElement, userEvent } = render(<PasswordPage />, { wrapper });
+      const { userEvent } = render(<PasswordPage />, { wrapper });
 
       await userEvent.type(screen.getByLabelText(/new password/i), 'testewrewr');
-      await userEvent.type(screen.getByLabelText(/confirm password/i), 'testrwerrwqrwe');
-      await userEvent.click(baseElement); //so that error renders
-      screen.getByText(/match/i);
+      const confirmField = screen.getByLabelText(/confirm password/i);
+      await userEvent.type(confirmField, 'testrwerrwqrwe');
+      fireEvent.blur(confirmField);
+      await waitFor(() => {
+        screen.getByText(`Passwords don't match.`);
+      });
+
+      await userEvent.clear(confirmField);
+      await waitFor(() => {
+        screen.getByText(`Passwords don't match.`);
+      });
     });
+
+    it(`Displays "Password match" when password match and removes it if they stop`, async () => {
+      const { wrapper } = await createFixtures(initConfig);
+
+      const { userEvent } = render(<PasswordPage />, { wrapper });
+
+      const passwordField = screen.getByLabelText(/new password/i);
+      await userEvent.type(passwordField, 'testewrewr');
+      const confirmField = screen.getByLabelText(/confirm password/i);
+      expect(screen.queryByText(`Passwords match.`)).not.toBeInTheDocument();
+      await userEvent.type(confirmField, 'testewrewr');
+      await waitFor(() => {
+        screen.getByText(`Passwords match.`);
+      });
+
+      await userEvent.type(confirmField, 'testrwerrwqrwe');
+      await waitFor(() => {
+        expect(screen.queryByText(`Passwords match.`)).not.toBeInTheDocument();
+      });
+
+      await userEvent.type(passwordField, 'testrwerrwqrwe');
+      fireEvent.blur(confirmField);
+      await waitFor(() => {
+        screen.getByText(`Passwords match.`);
+      });
+    }, 10000);
 
     it('navigates to the root page upon pressing cancel', async () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);

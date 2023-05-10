@@ -79,6 +79,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'formFieldAction',
   'formFieldInput',
   'formFieldErrorText',
+  'formFieldWarningText',
+  'formFieldSuccessText',
+  'formFieldDirectionsText',
   'formFieldHintText',
   'formButtonRow',
   'formButtonPrimary',
@@ -143,6 +146,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'organizationPreviewMainIdentifier',
   'organizationPreviewSecondaryIdentifier',
 
+  'membersPageInviteButton',
   'organizationProfilePage',
 
   'identityPreview',
@@ -166,8 +170,14 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'tabListContainer',
 
   'selectButton',
+  'selectSearchInput',
   'selectButtonIcon',
   'selectOptionsContainer',
+  'selectOption',
+
+  'menuButton',
+  'menuList',
+  'menuItem',
 
   'loader',
   'loaderIcon',

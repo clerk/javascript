@@ -14,6 +14,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
       lg: { width: theme.sizes.$5, height: theme.sizes.$5 },
     },
     colorScheme: {
+      success: { color: theme.colors.$success500 },
       danger: { color: theme.colors.$danger500 },
       warning: { color: theme.colors.$warning500 },
       neutral: { color: theme.colors.$blackAlpha400 },

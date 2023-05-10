@@ -1,7 +1,9 @@
 import { noop } from '@clerk/shared';
 import type { PasswordSettingsData } from '@clerk/types';
-import { useCallback, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 
+import { localizationKeys, useLocalizations } from '../localization';
+import type { FormControlState } from '../utils';
 import { loadZxcvbn } from '../utils';
 import { usePasswordComplexity } from './usePasswordComplexity';
 import { usePasswordStrength } from './usePasswordStrength';
@@ -14,19 +16,24 @@ type UsePasswordConfig = PasswordSettingsData & {
 type UsePasswordCbs = {
   onValidationFailed?: (errorMessage: string | undefined) => void;
   onValidationSuccess?: () => void;
+  onValidationWarning?: (warningMessage: string) => void;
 };
 
+export const MIN_PASSWORD_LENGTH = 8;
+
 export const usePassword = (config: UsePasswordConfig, callbacks?: UsePasswordCbs) => {
-  const { onValidationFailed = noop, onValidationSuccess = noop } = callbacks || {};
+  const { onValidationFailed = noop, onValidationSuccess = noop, onValidationWarning = noop } = callbacks || {};
   const { strengthMeter, show_zxcvbn, complexity } = config;
   const { setPassword: setPasswordComplexity } = usePasswordComplexity(config);
   const { getScore } = usePasswordStrength();
   const hasZxcvbnDownloadRef = useRef(false);
 
   const reportSuccessOrError = useCallback(
-    (error: string | undefined) => {
+    (error: string | undefined, warning: string | undefined) => {
       if (error) {
         onValidationFailed(error);
+      } else if (warning) {
+        onValidationWarning(warning);
       } else {
         onValidationSuccess();
       }
@@ -38,6 +45,7 @@ export const usePassword = (config: UsePasswordConfig, callbacks?: UsePasswordCb
     (_password: string) => {
       let zxcvbnError = '';
       let complexityError = '';
+      let zxcvbnWarning = '';
 
       if (!complexity && !(strengthMeter && show_zxcvbn)) {
         return;
@@ -52,9 +60,10 @@ export const usePassword = (config: UsePasswordConfig, callbacks?: UsePasswordCb
         void loadZxcvbn().then(zxcvbn => {
           hasZxcvbnDownloadRef.current = true;
           const setPasswordScore = getScore(zxcvbn);
-          const { errorText } = setPasswordScore(_password);
+          const { errorText, warningText } = setPasswordScore(_password);
           zxcvbnError = errorText;
-          reportSuccessOrError(complexityError || zxcvbnError);
+          zxcvbnWarning = warningText;
+          reportSuccessOrError(complexityError || zxcvbnError, zxcvbnWarning);
         });
 
         if (!hasZxcvbnDownloadRef.current && complexityError) {
@@ -62,7 +71,7 @@ export const usePassword = (config: UsePasswordConfig, callbacks?: UsePasswordCb
         }
         return;
       }
-      reportSuccessOrError(complexityError || zxcvbnError);
+      reportSuccessOrError(complexityError || zxcvbnError, zxcvbnWarning);
     },
     [onValidationFailed, onValidationSuccess, strengthMeter, show_zxcvbn, complexity, getScore, setPasswordComplexity],
   );
@@ -70,5 +79,38 @@ export const usePassword = (config: UsePasswordConfig, callbacks?: UsePasswordCb
   return {
     setPassword,
     getScore,
+  };
+};
+
+export const useConfirmPassword = ({
+  passwordField,
+  confirmPasswordField,
+}: {
+  passwordField: FormControlState;
+  confirmPasswordField: FormControlState;
+}) => {
+  const { t } = useLocalizations();
+  const checkPasswordMatch = useCallback(
+    (confirmPassword: string) =>
+      passwordField.value.trim().length >= MIN_PASSWORD_LENGTH && passwordField.value === confirmPassword,
+    [passwordField.value],
+  );
+
+  const isPasswordMatch = useMemo(() => checkPasswordMatch(confirmPasswordField.value), [confirmPasswordField.value]);
+
+  const displayConfirmPasswordFeedback = useCallback(
+    (password: string) => {
+      if (checkPasswordMatch(password)) {
+        confirmPasswordField.setSuccessful(t(localizationKeys('formFieldError__matchingPasswords')));
+      } else {
+        confirmPasswordField.setError(t(localizationKeys('formFieldError__notMatchingPasswords')));
+      }
+    },
+    [confirmPasswordField.setError, confirmPasswordField.setSuccessful, t, checkPasswordMatch],
+  );
+
+  return {
+    displayConfirmPasswordFeedback,
+    isPasswordMatch,
   };
 };

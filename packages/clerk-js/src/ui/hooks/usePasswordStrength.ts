@@ -9,10 +9,11 @@ import type { zxcvbnFN } from '../utils';
 type UsePasswordStrengthCbs = {
   onValidationFailed?: (validationErrorMessages: string[], errorMessage: string) => void;
   onValidationSuccess?: () => void;
+  onValidationWarning?: (warningMessage: string) => void;
 };
 
 export const usePasswordStrength = (callbacks?: UsePasswordStrengthCbs) => {
-  const { onValidationFailed = noop, onValidationSuccess = noop } = callbacks || {};
+  const { onValidationFailed = noop, onValidationSuccess = noop, onValidationWarning = noop } = callbacks || {};
   const {
     userSettings: {
       passwordSettings: { min_zxcvbn_strength },
@@ -27,23 +28,28 @@ export const usePasswordStrength = (callbacks?: UsePasswordStrengthCbs) => {
       const result = zxcvbn(password);
       setZxcvbnResult(result);
 
-      let message = '';
+      let errorText = '';
+      let warningText = '';
       if (result?.feedback?.suggestions?.length > 0 && result.score < min_zxcvbn_strength) {
         const errors = [...result.feedback.suggestions];
         const fErrors = errors.map(er => t(localizationKeys(`unstable__errors.zxcvbn.suggestions.${er}` as any)));
         if (result.score < min_zxcvbn_strength) {
           fErrors.unshift(t(localizationKeys('unstable__errors.zxcvbn.notEnough')));
         }
-        message = fErrors.join(' ');
+        errorText = fErrors.join(' ');
         onValidationFailed(fErrors, fErrors.join(' '));
+      } else if (result.score >= min_zxcvbn_strength && result.score < 3) {
+        warningText = t(localizationKeys('unstable__errors.zxcvbn.couldBeStronger'));
+        onValidationWarning(warningText);
       } else if (result.score >= min_zxcvbn_strength) {
         onValidationSuccess?.();
       }
       return {
-        errorText: message,
+        errorText,
+        warningText,
       };
     },
-    [onValidationFailed, onValidationSuccess, min_zxcvbn_strength],
+    [onValidationFailed, onValidationSuccess, onValidationWarning, min_zxcvbn_strength],
   );
   return {
     getScore,

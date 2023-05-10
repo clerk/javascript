@@ -1,9 +1,11 @@
 import type { ClerkAPIError, LocalizationResource } from '@clerk/types';
 import React from 'react';
 
+import { useOptions } from '../contexts';
 import { readObjectPath } from '../utils';
 import type { GlobalTokens } from './applyTokensToString';
 import { applyTokensToString, useGlobalTokens } from './applyTokensToString';
+import { defaultResource } from './defaultEnglishResource';
 import type { LocalizationKey } from './localizationKeys';
 import { localizationKeys } from './localizationKeys';
 import { useParsedLocalizationResource } from './parseLocalization';
@@ -57,6 +59,7 @@ export const makeLocalizable = <P,>(Component: React.FunctionComponent<P>): Loca
 };
 
 export const useLocalizations = () => {
+  const { localization } = useOptions();
   const parsedResource = useParsedLocalizationResource();
   const globalTokens = useGlobalTokens();
 
@@ -86,7 +89,7 @@ export const useLocalizations = () => {
     );
   };
 
-  return { t, translateError };
+  return { t, translateError, locale: localization?.locale || defaultResource?.locale };
 };
 
 const localizationKeyAttribute = (localizationKey: LocalizationKey) => {

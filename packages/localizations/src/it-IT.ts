@@ -13,6 +13,7 @@ const commonTexts = {
 } as const;
 
 export const itIT: LocalizationResource = {
+  locale: 'it-IT',
   socialButtonsBlockButton: 'Continua con {{provider|titleize}}',
   dividerText: 'oppure',
   formFieldLabel__emailAddress: 'Indirizzo email',

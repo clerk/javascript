@@ -5,7 +5,8 @@ import type {
   OAuthStrategy,
   PasswordStrategy,
   PhoneCodeStrategy,
-  ResetPasswordCodeStrategy,
+  ResetPasswordEmailCodeStrategy,
+  ResetPasswordPhoneCodeStrategy,
   SamlStrategy,
   TOTPStrategy,
   Web3Strategy,
@@ -62,14 +63,24 @@ export type BackupCodeFactor = {
   strategy: BackupCodeStrategy;
 };
 
-export type ResetPasswordCodeFactor = {
-  strategy: ResetPasswordCodeStrategy;
-  emailAddressId?: string;
+export type ResetPasswordPhoneCodeFactor = {
+  strategy: ResetPasswordPhoneCodeStrategy;
+  phoneNumberId: string;
   safeIdentifier: string;
-  phoneNumberId?: string;
+  primary?: boolean;
 };
 
-export type ResetPasswordCodeFactorConfig = Omit<ResetPasswordCodeFactor, 'safeIdentifier'>;
+export type ResetPasswordEmailCodeFactor = {
+  strategy: ResetPasswordEmailCodeStrategy;
+  emailAddressId: string;
+  safeIdentifier: string;
+  primary?: boolean;
+};
+
+export type ResetPasswordCodeFactor = ResetPasswordEmailCodeFactor | ResetPasswordPhoneCodeFactor;
+
+export type ResetPasswordPhoneCodeFactorConfig = Omit<ResetPasswordPhoneCodeFactor, 'safeIdentifier'>;
+export type ResetPasswordEmailCodeFactorConfig = Omit<ResetPasswordEmailCodeFactor, 'safeIdentifier'>;
 
 export type EmailCodeConfig = Omit<EmailCodeFactor, 'safeIdentifier'>;
 export type EmailLinkConfig = Omit<EmailLinkFactor, 'safeIdentifier'> & {
@@ -125,7 +136,12 @@ export type BackupCodeAttempt = {
   code: string;
 };
 
-export type ResetPasswordCodeAttempt = {
-  strategy: ResetPasswordCodeStrategy;
+export type ResetPasswordPhoneCodeAttempt = {
+  strategy: ResetPasswordPhoneCodeStrategy;
+  code: string;
+};
+
+export type ResetPasswordEmailCodeAttempt = {
+  strategy: ResetPasswordEmailCodeStrategy;
   code: string;
 };

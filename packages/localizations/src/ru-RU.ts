@@ -13,6 +13,7 @@ const commonTexts = {
 } as const;
 
 export const ruRU: LocalizationResource = {
+  locale: 'ru-RU',
   socialButtonsBlockButton: 'Продолжить с помощью {{provider|titleize}}',
   dividerText: 'или',
   formFieldLabel__emailAddress: 'Почта',

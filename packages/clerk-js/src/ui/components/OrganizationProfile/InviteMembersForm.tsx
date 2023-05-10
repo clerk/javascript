@@ -53,7 +53,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
   });
 
   const {
-    props: { errorText, ...restEmailAddressProps },
+    props: { errorText, hasLostFocus, setError, successfulText, setSuccessful, ...restEmailAddressProps },
   } = emailAddressField;
 
   const roleField = useFormControl('role', 'basic_member', {
@@ -129,6 +129,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
             <Text localizationKey={localizationKeys('formFieldLabel__role')} />
             {/*// @ts-expect-error */}
             <Select
+              elementId='role'
               {...roleField.props}
               onChange={option => roleField.setValue(option.value)}
             >

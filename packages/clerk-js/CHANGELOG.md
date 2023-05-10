@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.39.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.39.0-staging.6...@clerk/clerk-js@4.39.0) (2023-05-04)
+
+**Note:** Version bump only for package @clerk/clerk-js
+
+## [4.39.0-staging.5](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.39.0-staging.4...@clerk/clerk-js@4.39.0-staging.5) (2023-05-04)
+
+### Features
+
+- **clerk-js,types:** Support sign in with SAML strategy ([6da395f](https://github.com/clerkinc/javascript/commit/6da395fd785467aa934896942408bdb5f64aa887))
+- **clerk-js,types:** Support sign up with SAML strategy ([6d9c93e](https://github.com/clerkinc/javascript/commit/6d9c93e9d782f17bbddde1e68c2ce977415b45db))
+- **clerk-js:** Use allowed special characters for password from environment ([dec0512](https://github.com/clerkinc/javascript/commit/dec05120c180e53595e87817a2f44ef62af0f4f1))
+
+### Bug Fixes
+
+- **clerk-js:** Escape `allowed_special_characters` from FAPI ([da6b683](https://github.com/clerkinc/javascript/commit/da6b6833d1351a529f40640e821adbc73d121d13))
+
+## [4.39.0-staging.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.39.0-staging.2...@clerk/clerk-js@4.39.0-staging.3) (2023-05-02)
+
+### Features
+
+- **clerk-js:** Add resetPasswordFlow to SignIn resource ([6155f5b](https://github.com/clerkinc/javascript/commit/6155f5bde6fe0a140bffb7d8087c2246716abf7e))
+- **clerk-js:** Create <ResetPasswordSuccess /> page ([3fbf8e7](https://github.com/clerkinc/javascript/commit/3fbf8e7157774412096ff432e622540ae2d96ef4))
+- **clerk-js:** Introduce Reset Password flow ([e903c4f](https://github.com/clerkinc/javascript/commit/e903c4f430ae629625177637bb14f965a37596e1))
+- **clerk-js:** Localize "Password don't match" field error ([c573599](https://github.com/clerkinc/javascript/commit/c573599a370d4f3925d0e8a87b37f28f157bb62b))
+- **clerk-js:** Prepare Reset password field for complexity and strength ([9736d94](https://github.com/clerkinc/javascript/commit/9736d94409593a26546b8a7b1a2dec7c023e61b1))
+- **clerk-js:** Reset password for first factor ([280b5df](https://github.com/clerkinc/javascript/commit/280b5df2428b790e679a04004461aadb2717ae2b))
+- **clerk-js:** Reset password MFA ([5978756](https://github.com/clerkinc/javascript/commit/5978756640bc5f5bb4726f72ca2e53ba43f009d6))
+
+### Bug Fixes
+
+- **clerk-js,types:** Remove after_sign_out_url as it not returned by FAPI ([#1121](https://github.com/clerkinc/javascript/issues/1121)) ([d87493d](https://github.com/clerkinc/javascript/commit/d87493d13e2c7a3ffbf37ba728e6cde7f6f14682))
+- **clerk-js:** Add error when preparing for reset_password_code ([7ac766e](https://github.com/clerkinc/javascript/commit/7ac766eacf5199944c271a87f81c045709ec3aa7))
+- **clerk-js:** Allow children to be passed in VerificationCodeCard ([eb556f8](https://github.com/clerkinc/javascript/commit/eb556f8a557c5371a56b0b0b72162fd63e85263f))
+- **clerk-js:** Password settings maximum allowed length ([bfcb799](https://github.com/clerkinc/javascript/commit/bfcb7993d156d548f35ee7274e7e023c866c01af))
+- **clerk-js:** Remove forgotten console.log ([823a0c0](https://github.com/clerkinc/javascript/commit/823a0c0c2e83cff1e4c2793994c6a4069881b568))
+- **clerk-js:** Update type of resetPasswordFlow in SignInResource ([637b791](https://github.com/clerkinc/javascript/commit/637b791b0086be35a67e7d8a6a0e7c42989296b5))
+- **clerk-js:** Use redirectWithAuth after multi session signOut ([928a206](https://github.com/clerkinc/javascript/commit/928a2067c10129b6d561473df062fabdee22e2d7))
+
 ### [4.38.3](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.38.3-staging.0...@clerk/clerk-js@4.38.3) (2023-04-19)
 
 **Note:** Version bump only for package @clerk/clerk-js

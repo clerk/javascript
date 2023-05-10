@@ -13,6 +13,7 @@ const commonTexts = {
 } as const;
 
 export const ptBR: LocalizationResource = {
+  locale: 'pt-BR',
   socialButtonsBlockButton: 'Continuar com {{provider|titleize}}',
   dividerText: 'ou',
   formFieldLabel__emailAddress: 'Seu e-mail',

@@ -4,8 +4,7 @@ import React from 'react';
 
 import { default as ClerkCtor } from '../../../core/clerk';
 import { Client, Environment } from '../../../core/resources';
-import { ComponentContext, EnvironmentProvider, OptionsProvider } from '../../contexts';
-import { CoreClerkContextWrapper } from '../../contexts/CoreClerkContextWrapper';
+import { ComponentContext, CoreClerkContextWrapper, EnvironmentProvider, OptionsProvider } from '../../contexts';
 import { AppearanceProvider } from '../../customizables';
 import { FlowMetadataProvider } from '../../elements';
 import { RouteContext } from '../../router';
@@ -26,11 +25,21 @@ const createInitialStateConfigParam = (baseEnvironment: EnvironmentJSON, baseCli
 type FParam = ReturnType<typeof createInitialStateConfigParam>;
 type ConfigFn = (f: FParam) => void;
 
-export const bindCreateFixtures = (componentName: Parameters<typeof unboundCreateFixtures>[0]) => {
-  return { createFixtures: unboundCreateFixtures(componentName) };
+export const bindCreateFixtures = (
+  componentName: Parameters<typeof unboundCreateFixtures>[0],
+  mockOpts?: {
+    router?: Parameters<typeof mockRouteContextValue>[0];
+  },
+) => {
+  return { createFixtures: unboundCreateFixtures(componentName, mockOpts) };
 };
 
-const unboundCreateFixtures = <N extends UnpackContext<typeof ComponentContext>['componentName']>(componentName: N) => {
+const unboundCreateFixtures = <N extends UnpackContext<typeof ComponentContext>['componentName']>(
+  componentName: N,
+  mockOpts?: {
+    router?: Parameters<typeof mockRouteContextValue>[0];
+  },
+) => {
   const createFixtures = async (...configFns: ConfigFn[]) => {
     const baseEnvironment = createBaseEnvironmentJSON();
     const baseClient = createBaseClientJSON();
@@ -54,7 +63,7 @@ const unboundCreateFixtures = <N extends UnpackContext<typeof ComponentContext>[
     await tempClerk.load();
     const clerkMock = mockClerkMethods(tempClerk as LoadedClerk);
     const optionsMock = {} as ClerkOptions;
-    const routerMock = mockRouteContextValue();
+    const routerMock = mockRouteContextValue(mockOpts?.router || {});
 
     const fixtures = {
       clerk: clerkMock,
