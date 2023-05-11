@@ -24,7 +24,7 @@
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "13.4.0",
     "@testing-library/user-event": "14.4.3",
-    "@types/glob-to-regexp": "^0.4.1",
+    "@types/glob-to-regexp": "0.4.1",
     "@types/js-cookie": "3.0.2",
     "jest": "*",
     "jest-environment-jsdom": "*",
