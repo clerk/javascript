@@ -9,6 +9,11 @@ export const API_VERSION = process.env.CLERK_API_VERSION || 'v1';
 export const API_KEY = process.env.CLERK_SECRET_KEY || process.env.CLERK_API_KEY || '';
 export const PUBLISHABLE_KEY = process.env.CLERK_PUBLISHABLE_KEY || '';
 
+export const DOMAIN = process.env.CLERK_DOMAIN || '';
+export const PROXY_URL = process.env.CLERK_PROXY_URL || '';
+export const SIGN_IN_URL = process.env.CLERK_SIGN_IN_URL || '';
+export const IS_SATELLITE = process.env.CLERK_IS_SATELLITE === 'true';
+
 /**
  * This needs to be a *named* function in order to support the older
  * new Clerk() syntax for v4 compatibility.
@@ -50,6 +55,10 @@ export const clerkClient = Clerk({
   apiKey: API_KEY,
   apiUrl: API_URL,
   apiVersion: API_VERSION,
+  domain: DOMAIN,
+  isSatellite: IS_SATELLITE,
+  publishableKey: PUBLISHABLE_KEY,
+  proxyUrl: PROXY_URL,
   userAgent: '@clerk/clerk-sdk-node',
 });
 
@@ -61,6 +70,7 @@ export const ClerkExpressRequireAuth = createClerkExpressRequireAuth({
   apiUrl: API_URL,
   apiKey: API_KEY,
   secretKey: API_KEY,
+  publishableKey: PUBLISHABLE_KEY,
 });
 
 export const ClerkExpressWithAuth = createClerkExpressWithAuth({
@@ -68,6 +78,7 @@ export const ClerkExpressWithAuth = createClerkExpressWithAuth({
   apiUrl: API_URL,
   apiKey: API_KEY,
   secretKey: API_KEY,
+  publishableKey: PUBLISHABLE_KEY,
 });
 
 /**
