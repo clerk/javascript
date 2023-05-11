@@ -565,7 +565,7 @@ export const enUS: LocalizationResource = {
   unstable__errors: {
     form_identifier_not_found: '',
     form_password_pwned:
-      'This password has been found as part of a breach and can not be used, please try another password instead',
+      'This password has been found as part of a breach and can not be used, please try another password instead.',
     form_username_invalid_length: '',
     form_param_format_invalid: '',
     form_password_length_too_short: '',
@@ -576,6 +576,8 @@ export const enUS: LocalizationResource = {
     form_identifier_exists: '',
     form_password_validation_failed: 'Incorrect Password',
     form_password_not_strong_enough: 'Your password is not strong enough.',
+    form_password_size_in_bytes_exceeded:
+      'Your password has exceeded the maximum number of bytes allowed, please shorten it or remove some special characters.',
     passwordComplexity: {
       sentencePrefix: 'Your password must contain',
       minimumLength: '{{length}} or more characters',
