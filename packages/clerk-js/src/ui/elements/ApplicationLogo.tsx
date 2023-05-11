@@ -29,10 +29,9 @@ type ApplicationLogoProps = PropsOfComponent<typeof Flex>;
 export const ApplicationLogo = (props: ApplicationLogoProps) => {
   const imageRef = React.useRef<HTMLImageElement>(null);
   const [loaded, setLoaded] = React.useState(false);
-  const { logoUrl, applicationName, homeUrl } = useEnvironment().displayConfig;
+  const { logoImageUrl, applicationName, homeUrl } = useEnvironment().displayConfig;
   const { parsedLayout } = useAppearance();
-  // TODO: Should we throw an error if logoImageUrl is not a valid url?
-  const imageSrc = parsedLayout.logoImageUrl || logoUrl;
+  const imageSrc = parsedLayout.logoImageUrl || logoImageUrl;
 
   if (!imageSrc) {
     return null;
