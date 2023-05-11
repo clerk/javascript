@@ -25,7 +25,14 @@ export const createClerkExpressWithAuth = (createOpts: CreateClerkExpressMiddlew
         return handleUnknownCase(res, requestState);
       }
       if (requestState.isInterstitial) {
-        const interstitial = await clerkClient.remotePrivateInterstitial();
+        const interstitial = clerkClient.localInterstitial({
+          frontendApi: requestState.frontendApi,
+          publishableKey: requestState.publishableKey,
+          proxyUrl: requestState.proxyUrl,
+          signInUrl: requestState.signInUrl,
+          isSatellite: requestState.isSatellite,
+          domain: requestState.domain,
+        });
         return handleInterstitialCase(res, requestState, interstitial);
       }
 

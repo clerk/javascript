@@ -67,7 +67,22 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
     });
   };
 
-  const localInterstitial = loadInterstitialFromLocal;
+  const localInterstitial = ({
+    frontendApi: runtimeFrontendApi,
+    publishableKey: runtimePublishableKey,
+    proxyUrl: runtimeProxyUrl,
+    isSatellite: runtimeIsSatellite,
+    domain: runtimeDomain,
+    ...rest
+  }: Omit<LoadInterstitialOptions, 'apiUrl'>) =>
+    loadInterstitialFromLocal({
+      ...rest,
+      frontendApi: runtimeFrontendApi || buildtimeFrontendApi,
+      proxyUrl: runtimeProxyUrl || buildProxyUrl,
+      publishableKey: runtimePublishableKey || buildtimePublishableKey,
+      isSatellite: runtimeIsSatellite || buildtimeIsSatellite,
+      domain: runtimeDomain || buildtimeDomain,
+    });
 
   const remotePublicInterstitial = ({
     frontendApi: runtimeFrontendApi,
