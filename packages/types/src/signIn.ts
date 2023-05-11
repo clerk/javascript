@@ -185,6 +185,7 @@ export type SignInCreateParams = (
 
 export type ResetPasswordParams = {
   password: string;
+  signOutOfOtherSessions?: boolean;
 };
 
 export interface SignInStartMagicLinkFlowParams extends StartMagicLinkFlowParams {
