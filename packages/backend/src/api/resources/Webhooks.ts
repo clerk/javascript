@@ -6,12 +6,17 @@ import type {
   SessionJSON,
   UserJSON,
 } from './JSON';
+import type { EmailJSON, SMSMessageJSON } from './JSON';
 
 type Webhook<EvtType, Data> = { type: EvtType; object: 'event'; data: Data };
 
 export type UserWebhookEvent =
   | Webhook<'user.created' | 'user.updated', UserJSON>
   | Webhook<'user.deleted', DeletedObjectJSON>;
+
+export type EmailWebhookEvent = Webhook<'email.created', EmailJSON>;
+
+export type SMSWebhookEvent = Webhook<'sms.created', SMSMessageJSON>;
 
 export type SessionWebhookEvent = Webhook<
   'session.created' | 'session.ended' | 'session.removed' | 'session.revoked',
@@ -35,6 +40,8 @@ export type OrganizationInvitationWebhookEvent = Webhook<
 export type WebhookEvent =
   | UserWebhookEvent
   | SessionWebhookEvent
+  | EmailWebhookEvent
+  | SMSWebhookEvent
   | OrganizationWebhookEvent
   | OrganizationMembershipWebhookEvent
   | OrganizationInvitationWebhookEvent;
