@@ -54,11 +54,34 @@ describe('ResetPassword', () => {
       await userEvent.click(screen.getByRole('button', { name: /Reset Password/i }));
       expect(fixtures.signIn.resetPassword).toHaveBeenCalledWith({
         password: 'testtest',
+        signOutOfOtherSessions: false,
       });
       expect(fixtures.router.navigate).toHaveBeenCalledWith(
         '../reset-password-success?createdSessionId=1234_session_id',
       );
     });
+
+    it('resets the password, does not require MFA and signs out of sessions', async () => {
+      const { wrapper, fixtures } = await createFixtures();
+      fixtures.signIn.resetPassword.mockResolvedValue({
+        status: 'complete',
+        createdSessionId: '1234_session_id',
+      } as SignInResource);
+      const { userEvent } = render(<ResetPassword />, { wrapper });
+
+      await userEvent.type(screen.getByLabelText(/New password/i), 'testtest');
+      await userEvent.type(screen.getByLabelText(/Confirm password/i), 'testtest');
+      await userEvent.click(screen.getByRole('checkbox', { name: /sign out of all other devices/i }));
+      await userEvent.click(screen.getByRole('button', { name: /Reset Password/i }));
+      expect(fixtures.signIn.resetPassword).toHaveBeenCalledWith({
+        password: 'testtest',
+        signOutOfOtherSessions: true,
+      });
+      expect(fixtures.router.navigate).toHaveBeenCalledWith(
+        '../reset-password-success?createdSessionId=1234_session_id',
+      );
+    });
+
     it('resets the password and requires MFA', async () => {
       const { wrapper, fixtures } = await createFixtures();
       fixtures.signIn.resetPassword.mockResolvedValue({

@@ -35,6 +35,11 @@ export const _ResetPassword = () => {
     enableErrorAfterBlur: true,
   });
 
+  const sessionsField = useFormControl('signOutOfOtherSessions', '', {
+    type: 'checkbox',
+    label: localizationKeys('formFieldLabel__signOutOfOtherSessions'),
+  });
+
   const { displayConfirmPasswordFeedback, isPasswordMatch } = useConfirmPassword({
     passwordField,
     confirmPasswordField: confirmField,
@@ -53,6 +58,7 @@ export const _ResetPassword = () => {
     try {
       const { status, createdSessionId } = await signIn.resetPassword({
         password: passwordField.value,
+        signOutOfOtherSessions: sessionsField.checked,
       });
 
       switch (status) {
@@ -103,6 +109,9 @@ export const _ResetPassword = () => {
                 return confirmField.props.onChange(e);
               }}
             />
+          </Form.ControlRow>
+          <Form.ControlRow elementId={sessionsField.id}>
+            <Form.Control {...sessionsField.props} />
           </Form.ControlRow>
           <Form.SubmitButton
             isDisabled={!canSubmit}
