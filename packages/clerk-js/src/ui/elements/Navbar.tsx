@@ -5,7 +5,7 @@ import React, { useEffect } from 'react';
 import type { LocalizationKey } from '../customizables';
 import { Button, Col, descriptors, Flex, Icon, localizationKeys, useLocalizations } from '../customizables';
 import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
-import { useNavigate, usePopover } from '../hooks';
+import { usePopover } from '../hooks';
 import { Menu } from '../icons';
 import { useRouter } from '../router';
 import type { PropsOfComponent } from '../styledSystem';
@@ -46,7 +46,7 @@ export const NavBar = (props: NavBarProps) => {
   const { contentRef, routes, header } = props;
   const [activeId, setActiveId] = React.useState<RouteId>(routes[0]['id']);
   const { close } = useNavbarContext();
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const { navigateToFlowStart } = useNavigateToFlowStart();
   const { t } = useLocalizations();
   const router = useRouter();

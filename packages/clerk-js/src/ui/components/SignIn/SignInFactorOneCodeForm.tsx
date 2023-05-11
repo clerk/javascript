@@ -19,7 +19,7 @@ export type SignInFactorOneCodeCard = Pick<
   onFactorPrepare: () => void;
 };
 
-type SignInFactorOneCodeFormProps = SignInFactorOneCodeCard & {
+export type SignInFactorOneCodeFormProps = SignInFactorOneCodeCard & {
   cardTitle: LocalizationKey;
   cardSubtitle: LocalizationKey;
   formTitle: LocalizationKey;

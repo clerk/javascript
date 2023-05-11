@@ -1,10 +1,10 @@
-import { useCallback, useRef } from 'react';
+import { useRef } from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser, useEnvironment } from '../../contexts';
-import { localizationKeys, useLocalizations } from '../../customizables';
+import { localizationKeys } from '../../customizables';
 import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
-import { MIN_PASSWORD_LENGTH, usePasswordComplexity } from '../../hooks';
+import { useConfirmPassword, usePasswordComplexity } from '../../hooks';
 import { handleError, useFormControl } from '../../utils';
 import { UserProfileBreadcrumbs } from './UserProfileNavbar';
 
@@ -31,7 +31,6 @@ export const PasswordPage = withCardStateProvider(() => {
     : localizationKeys('userProfile.passwordPage.title');
   const card = useCardState();
   const wizard = useWizard();
-  const { t } = useLocalizations();
 
   // Ensure that messages will not use the updated state of User after a password has been set or changed
   const successPagePropsRef = useRef<Parameters<typeof SuccessPage>[0]>({
@@ -70,23 +69,17 @@ export const PasswordPage = withCardStateProvider(() => {
     label: localizationKeys('formFieldLabel__signOutOfOtherSessions'),
   });
 
-  const isPasswordMatch =
-    passwordField.value.trim().length >= MIN_PASSWORD_LENGTH && passwordField.value === confirmField.value;
+  const { displayConfirmPasswordFeedback, isPasswordMatch } = useConfirmPassword({
+    passwordField,
+    confirmPasswordField: confirmField,
+  });
+
   const hasErrors = !!passwordField.errorText || !!confirmField.errorText;
   const canSubmit =
     (user.passwordEnabled ? currentPasswordField.value && isPasswordMatch : isPasswordMatch) && !hasErrors;
 
-  const checkPasswordMatch = useCallback(
-    (confirmPassword: string) => {
-      return passwordField.value && confirmPassword && passwordField.value !== confirmPassword
-        ? t(localizationKeys('formFieldError__notMatchingPasswords'))
-        : undefined;
-    },
-    [passwordField.value],
-  );
-
   const validateForm = () => {
-    confirmField.setError(checkPasswordMatch(confirmField.value));
+    displayConfirmPasswordFeedback(confirmField.value);
   };
 
   const updatePassword = async () => {
@@ -144,7 +137,7 @@ export const PasswordPage = withCardStateProvider(() => {
             <Form.Control
               {...confirmField.props}
               onChange={e => {
-                confirmField.setError(checkPasswordMatch(e.target.value));
+                displayConfirmPasswordFeedback(e.target.value);
                 return confirmField.props.onChange(e);
               }}
             />

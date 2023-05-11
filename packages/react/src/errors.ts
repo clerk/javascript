@@ -32,5 +32,5 @@ export function isMagicLinkError(err: any): err is MagicLinkError {
 export const invalidStateError =
   'Invalid state. Feel free to submit a bug or reach out to support here: https://clerk.com/support';
 
-export const unsupportedNonBrowserDomainFunction =
-  'Unsupported usage of domain. The usage of domain as function is not supported in non-browser environments.';
+export const unsupportedNonBrowserDomainOrProxyUrlFunction =
+  'Unsupported usage of domain or proxyUrl. The usage of domain or proxyUrl as function is not supported in non-browser environments.';

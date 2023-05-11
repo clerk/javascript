@@ -15,7 +15,8 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useCardState } from '../../elements/contexts';
-import { useLoadingStatus, useNavigate, usePasswordComplexity } from '../../hooks';
+import { useRouter } from '../../router';
+import { useLoadingStatus, usePasswordComplexity } from '../../hooks';
 import type { FormControlState } from '../../utils';
 import { buildRequest, handleError, useFormControl } from '../../utils';
 import { SignUpForm } from './SignUpForm';
@@ -30,7 +31,7 @@ function _SignUpStart(): JSX.Element {
   const signUp = useCoreSignUp();
   const { showOptionalFields } = useAppearance().parsedLayout;
   const { userSettings, displayConfig } = useEnvironment();
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const { attributes } = userSettings;
   const { setActive } = useCoreClerk();
   const ctx = useSignUpContext();

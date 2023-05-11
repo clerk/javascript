@@ -1,4 +1,4 @@
-import type { ResetPasswordCodeFactor, SignInFactor, SignInStrategy } from '@clerk/types';
+import type { ResetPasswordCodeFactor, SignInFactor } from '@clerk/types';
 import React from 'react';
 
 import { withRedirectToHomeSingleSessionGuard } from '../../common';
@@ -13,7 +13,7 @@ import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
 import { SignInFactorOneForgotPasswordCard } from './SignInFactorOneForgotPasswordCard';
 import { SignInFactorOnePasswordCard } from './SignInFactorOnePasswordCard';
 import { SignInFactorOnePhoneCodeCard } from './SignInFactorOnePhoneCodeCard';
-import { determineStartingSignInFactor, factorHasLocalStrategy } from './utils';
+import { determineStartingSignInFactor, factorHasLocalStrategy, isResetPasswordStrategy } from './utils';
 
 const factorKey = (factor: SignInFactor | null | undefined) => {
   if (!factor) {
@@ -28,8 +28,6 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
   }
   return key;
 };
-
-const isNotResetPasswordStrategy = (strategy: SignInStrategy) => strategy !== 'reset_password_code';
 
 export function _SignInFactorOne(): JSX.Element {
   const signIn = useCoreSignIn();
@@ -49,7 +47,7 @@ export function _SignInFactorOne(): JSX.Element {
   const { strategies: OAuthStrategies } = useEnabledThirdPartyProviders();
 
   const firstFactors = signIn.supportedFirstFactors.filter(
-    f => f.strategy !== currentFactor?.strategy && isNotResetPasswordStrategy(f.strategy),
+    f => f.strategy !== currentFactor?.strategy && !isResetPasswordStrategy(f.strategy),
   );
 
   const shouldAllowForAlternativeStrategies = firstFactors.length + OAuthStrategies.length > 0;
@@ -146,7 +144,7 @@ export function _SignInFactorOne(): JSX.Element {
           onShowAlternativeMethodsClicked={toggleAllStrategies}
         />
       );
-    case 'reset_password_code':
+    case 'reset_password_phone_code':
       return (
         <SignInFactorOneForgotPasswordCard
           factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
@@ -159,6 +157,26 @@ export function _SignInFactorOne(): JSX.Element {
               prevCurrentFactor: prev.currentFactor,
             }))
           }
+          cardTitle={localizationKeys('signIn.forgotPassword.title_phone')}
+          formSubtitle={localizationKeys('signIn.forgotPassword.formSubtitle_phone')}
+        />
+      );
+
+    case 'reset_password_email_code':
+      return (
+        <SignInFactorOneForgotPasswordCard
+          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+          onFactorPrepare={handleFactorPrepare}
+          factor={currentFactor}
+          onShowAlternativeMethodsClicked={toggleAllStrategies}
+          onBackLinkClicked={() =>
+            setFactor(prev => ({
+              currentFactor: prev.prevCurrentFactor,
+              prevCurrentFactor: prev.currentFactor,
+            }))
+          }
+          cardTitle={localizationKeys('signIn.forgotPassword.title_email')}
+          formSubtitle={localizationKeys('signIn.forgotPassword.formSubtitle_email')}
         />
       );
     default:

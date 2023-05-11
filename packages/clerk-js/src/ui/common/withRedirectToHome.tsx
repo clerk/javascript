@@ -6,7 +6,7 @@ import type { AvailableComponentProps } from '../../ui/types';
 import type { ComponentGuard } from '../../utils';
 import { noOrganizationExists, noUserExists, sessionExistsAndSingleSessionModeEnabled } from '../../utils';
 import { useCoreClerk, useEnvironment, useOptions } from '../contexts';
-import { useNavigate } from '../hooks';
+import { useRouter } from '../router';
 
 function withRedirectToHome<P extends AvailableComponentProps>(
   Component: ComponentType<P>,
@@ -17,7 +17,7 @@ function withRedirectToHome<P extends AvailableComponentProps>(
   Component.displayName = displayName;
 
   const HOC = (props: P) => {
-    const { navigate } = useNavigate();
+    const { navigate } = useRouter();
     const clerk = useCoreClerk();
     const environment = useEnvironment();
     const options = useOptions();

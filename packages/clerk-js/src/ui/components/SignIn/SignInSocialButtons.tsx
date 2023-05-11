@@ -6,12 +6,12 @@ import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { useCardState } from '../../elements/contexts';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
-import { useNavigate } from '../../hooks';
+import { useRouter } from '../../router';
 import { handleError } from '../../utils';
 
 export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
   const clerk = useCoreClerk();
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const card = useCardState();
   const { displayConfig } = useEnvironment();
   const ctx = useSignInContext();

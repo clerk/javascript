@@ -15,8 +15,8 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
   branded!: boolean;
   homeUrl!: string;
   instanceEnvironmentType!: string;
-  logoUrl!: string;
-  faviconUrl!: string;
+  faviconImageUrl!: string;
+  logoImageUrl!: string;
   preferredSignInStrategy!: PreferredSignInStrategy;
   signInUrl!: string;
   signUpUrl!: string;
@@ -45,8 +45,8 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     this.applicationName = data.application_name;
     this.theme = data.theme;
     this.preferredSignInStrategy = data.preferred_sign_in_strategy;
-    this.logoUrl = data.logo_url;
-    this.faviconUrl = data.favicon_url;
+    this.logoImageUrl = data.logo_image_url || data.logo_url;
+    this.faviconImageUrl = data.favicon_image_url || data.favicon_url;
     this.homeUrl = data.home_url;
     this.signInUrl = data.sign_in_url;
     this.signUpUrl = data.sign_up_url;

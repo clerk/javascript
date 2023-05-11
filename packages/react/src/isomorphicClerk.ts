@@ -26,7 +26,7 @@ import type {
 import type { BeforeEmitCallback } from '@clerk/types';
 import type { OrganizationProfileProps, OrganizationSwitcherProps } from '@clerk/types/src';
 
-import { unsupportedNonBrowserDomainFunction } from './errors';
+import { unsupportedNonBrowserDomainOrProxyUrlFunction } from './errors';
 import type {
   BrowserClerk,
   BrowserClerkConstructor,
@@ -55,7 +55,6 @@ export default class IsomorphicClerk {
   private readonly mode: 'browser' | 'server';
   private readonly frontendApi?: string;
   private readonly publishableKey?: string;
-  private readonly proxyUrl?: Clerk['proxyUrl'];
   private readonly options: IsomorphicClerkOptions;
   private readonly Clerk: ClerkProp;
   private clerkjs: BrowserClerk | HeadlessBrowserClerk | null = null;
@@ -75,6 +74,7 @@ export default class IsomorphicClerk {
 
   #loaded = false;
   #domain: DomainOrProxyUrl['domain'];
+  #proxyUrl: DomainOrProxyUrl['proxyUrl'];
 
   get loaded(): boolean {
     return this.#loaded;
@@ -99,16 +99,28 @@ export default class IsomorphicClerk {
       return handleValueOrFn(this.#domain, new URL(window.location.href), '');
     }
     if (typeof this.#domain === 'function') {
-      throw new Error(unsupportedNonBrowserDomainFunction);
+      throw new Error(unsupportedNonBrowserDomainOrProxyUrlFunction);
     }
     return this.#domain || '';
+  }
+
+  get proxyUrl(): string {
+    // This getter can run in environments where window is not available.
+    // In those cases we should expect and use proxy as a string
+    if (typeof window !== 'undefined' && window.location) {
+      return handleValueOrFn(this.#proxyUrl, new URL(window.location.href), '');
+    }
+    if (typeof this.#proxyUrl === 'function') {
+      throw new Error(unsupportedNonBrowserDomainOrProxyUrlFunction);
+    }
+    return this.#proxyUrl || '';
   }
 
   constructor(options: IsomorphicClerkOptions) {
     const { Clerk = null, frontendApi, publishableKey } = options || {};
     this.frontendApi = frontendApi;
     this.publishableKey = publishableKey;
-    this.proxyUrl = options?.proxyUrl;
+    this.#proxyUrl = options?.proxyUrl;
     this.#domain = options?.domain;
     this.options = options;
     this.Clerk = Clerk;

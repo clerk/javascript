@@ -15,8 +15,12 @@ export interface DisplayConfigJSON {
   branded: boolean;
   home_url: string;
   instance_environment_type: string;
+  /* @deprecated */
   logo_url: string;
+  /* @deprecated */
   favicon_url: string;
+  logo_image_url: string;
+  favicon_image_url: string;
   preferred_sign_in_strategy: PreferredSignInStrategy;
   sign_in_url: string;
   sign_up_url: string;
@@ -36,7 +40,6 @@ export interface DisplayConfigResource extends ClerkResource {
   afterSignInUrl: string;
   afterSignOutAllUrl: string;
   afterSignOutOneUrl: string;
-  afterSignOutUrl: string;
   afterSignUpUrl: string;
   afterSwitchSessionUrl: string;
   applicationName: string;
@@ -44,8 +47,8 @@ export interface DisplayConfigResource extends ClerkResource {
   branded: boolean;
   homeUrl: string;
   instanceEnvironmentType: string;
-  logoUrl: string;
-  faviconUrl: string;
+  logoImageUrl: string;
+  faviconImageUrl: string;
   preferredSignInStrategy: PreferredSignInStrategy;
   signInUrl: string;
   signUpUrl: string;

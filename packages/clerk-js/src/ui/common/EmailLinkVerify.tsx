@@ -4,8 +4,8 @@ import { isMagicLinkError, MagicLinkErrorCode } from '../../core/resources/Error
 import type { VerificationStatus } from '../../utils/getClerkQueryParam';
 import { completeSignUpFlow } from '../components/SignUp/util';
 import { useCoreClerk, useCoreSignUp } from '../contexts';
-import { useNavigate } from '../hooks/useNavigate';
 import type { LocalizationKey } from '../localization';
+import { useRouter } from '../router';
 import { sleep } from '../utils';
 import { EmailLinkStatusCard } from './EmailLinkStatusCard';
 
@@ -20,7 +20,7 @@ export type EmailLinkVerifyProps = {
 export const EmailLinkVerify = (props: EmailLinkVerifyProps) => {
   const { redirectUrl, redirectUrlComplete, verifyEmailPath, verifyPhonePath } = props;
   const { handleMagicLinkVerification } = useCoreClerk();
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const signUp = useCoreSignUp();
   const [verificationStatus, setVerificationStatus] = React.useState<VerificationStatus>('loading');
 

@@ -1,11 +1,11 @@
 import { Col, Icon, localizationKeys, useLocalizations } from '../../customizables';
-import { useNavigate } from '../../hooks';
 import { DotCircle } from '../../icons';
+import { useRouter } from '../../router';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
 import { UserProfileAccordion } from './UserProfileAccordion';
 
 export const MfaBackupCodeAccordion = () => {
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const { t } = useLocalizations();
 
   return (

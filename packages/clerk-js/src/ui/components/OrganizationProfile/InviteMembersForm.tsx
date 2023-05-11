@@ -13,9 +13,9 @@ import {
   TagInput,
   useCardState,
 } from '../../elements';
-import { useNavigate } from '../../hooks';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys, useLocalizations } from '../../localization';
+import { useRouter } from '../../router';
 import { handleError, roleLocalizationKey, useFormControl } from '../../utils';
 
 const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);
@@ -29,7 +29,7 @@ type InviteMembersFormProps = {
 };
 
 export const InviteMembersForm = (props: InviteMembersFormProps) => {
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const { onSuccess, onReset = () => navigate('..'), resetButtonLabel, organization } = props;
   const card = useCardState();
   const { t } = useLocalizations();
@@ -53,7 +53,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
   });
 
   const {
-    props: { errorText, hasLostFocus, setError, isSuccessful, setSuccessful, ...restEmailAddressProps },
+    props: { errorText, hasLostFocus, setError, successfulText, setSuccessful, ...restEmailAddressProps },
   } = emailAddressField;
 
   const roleField = useFormControl('role', 'basic_member', {

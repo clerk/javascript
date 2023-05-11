@@ -3,7 +3,7 @@ import type { ActiveSessionResource, UserButtonProps, UserResource } from '@cler
 import { windowNavigate } from '../../../utils/windowNavigate';
 import { useCoreClerk, useCoreSessionList } from '../../contexts';
 import { useCardState } from '../../elements';
-import { useNavigate } from '../../hooks';
+import { useRouter } from '../../router';
 import { sleep } from '../../utils';
 
 type UseMultisessionActionsParams = {
@@ -20,7 +20,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   const { setActive, signOut, openUserProfile } = useCoreClerk();
   const card = useCardState();
   const sessions = useCoreSessionList();
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const activeSessions = sessions.filter(s => s.status === 'active') as ActiveSessionResource[];
   const otherSessions = activeSessions.filter(s => s.user?.id !== opts.user?.id);
 
@@ -35,9 +35,11 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
 
   const handleManageAccountClicked = () => {
     if (opts.userProfileMode === 'navigation') {
-      return navigate(opts.userProfileUrl).finally(async () => {
-        await sleep(300);
-        opts.actionCompleteCallback?.();
+      return navigate(opts.userProfileUrl || '').finally(() => {
+        void (async () => {
+          await sleep(300);
+          opts.actionCompleteCallback?.();
+        })();
       });
     }
 

@@ -51,6 +51,7 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__organizationName: '',
   formFieldInputPlaceholder__organizationSlug: '',
   formFieldError__notMatchingPasswords: `Passwords don't match.`,
+  formFieldError__matchingPasswords: 'Passwords match.',
   formFieldAction__forgotPassword: 'Forgot password',
   formFieldHintText__optional: 'Optional',
   formButtonPrimary: 'Continue',
@@ -563,7 +564,8 @@ export const enUS: LocalizationResource = {
   },
   unstable__errors: {
     form_identifier_not_found: '',
-    form_password_pwned: '',
+    form_password_pwned:
+      'This password has been found as part of a breach and can not be used, please try another password instead',
     form_username_invalid_length: '',
     form_param_format_invalid: '',
     form_password_length_too_short: '',

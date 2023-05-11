@@ -1,6 +1,6 @@
 import type { RequestState } from '@clerk/backend';
 import { Clerk } from '@clerk/backend';
-import { createProxyUrl, handleValueOrFn, isHttpOrHttps } from '@clerk/shared';
+import { getRequestUrl, handleValueOrFn, isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from '@clerk/shared';
 
 import {
   noSecretKeyOrApiKeyError,
@@ -55,15 +55,19 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
     handleValueOrFn(opts.isSatellite, new URL(request.url)) ||
     false;
 
-  const relativeOrAbsoluteProxyUrl =
-    getEnvVariable('CLERK_PROXY_URL') || (context?.CLERK_PROXY_URL as string) || opts.proxyUrl || '';
+  const requestURL = getRequestUrl({
+    request,
+  });
+
+  const relativeOrAbsoluteProxyUrl = handleValueOrFn(
+    opts?.proxyUrl,
+    new URL(requestURL),
+    getEnvVariable('CLERK_PROXY_URL') || (context?.CLERK_PROXY_URL as string),
+  );
 
   let proxyUrl;
-  if (!!relativeOrAbsoluteProxyUrl && !isHttpOrHttps(relativeOrAbsoluteProxyUrl)) {
-    proxyUrl = createProxyUrl({
-      request,
-      relativePath: relativeOrAbsoluteProxyUrl,
-    });
+  if (isValidProxyUrl(relativeOrAbsoluteProxyUrl) && isProxyUrlRelative(relativeOrAbsoluteProxyUrl)) {
+    proxyUrl = new URL(relativeOrAbsoluteProxyUrl, requestURL).toString();
   } else {
     proxyUrl = relativeOrAbsoluteProxyUrl;
   }

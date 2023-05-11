@@ -10,6 +10,7 @@ import { useSupportEmail } from '../../hooks/useSupportEmail';
 import type { LocalizationKey } from '../../localization';
 import { useRouter } from '../../router';
 import { handleError } from '../../utils';
+import { isResetPasswordStrategy } from './utils';
 
 export type SignInFactorTwoCodeCard = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
   factor: PhoneCodeFactor | TOTPFactor;
@@ -53,7 +54,7 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
     : undefined;
 
   const isResettingPassword = (resource: SignInResource) =>
-    resource.firstFactorVerification?.strategy === 'reset_password_code' &&
+    isResetPasswordStrategy(resource.firstFactorVerification?.strategy) &&
     resource.firstFactorVerification?.status === 'verified';
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {

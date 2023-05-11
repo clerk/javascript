@@ -136,9 +136,9 @@ export default class Clerk implements ClerkInterface {
   public __internal_country?: string | null;
   public readonly frontendApi: string;
   public readonly publishableKey?: string;
-  public readonly proxyUrl?: ClerkInterface['proxyUrl'];
 
   #domain: DomainOrProxyUrl['domain'];
+  #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #authService: SessionCookieService | null = null;
   #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
   #componentControls?: ReturnType<MountComponentRenderer> | null;
@@ -179,6 +179,17 @@ export default class Clerk implements ClerkInterface {
     return '';
   }
 
+  get proxyUrl(): string {
+    if (inBrowser()) {
+      const _unfilteredProxy = handleValueOrFn(this.#proxyUrl, new URL(window.location.href));
+      if (!isValidProxyUrl(_unfilteredProxy)) {
+        errorThrower.throwInvalidProxyUrl({ url: _unfilteredProxy });
+      }
+      return proxyUrlToAbsoluteURL(_unfilteredProxy);
+    }
+    return '';
+  }
+
   get instanceType() {
     return this.#instanceType;
   }
@@ -186,14 +197,8 @@ export default class Clerk implements ClerkInterface {
   public constructor(key: string, options?: DomainOrProxyUrl) {
     key = (key || '').trim();
 
-    const _unfilteredProxy = options?.proxyUrl;
-
-    if (!isValidProxyUrl(_unfilteredProxy)) {
-      errorThrower.throwInvalidProxyUrl({ url: _unfilteredProxy });
-    }
-    this.proxyUrl = proxyUrlToAbsoluteURL(_unfilteredProxy);
-
     this.#domain = options?.domain;
+    this.#proxyUrl = options?.proxyUrl;
 
     if (isLegacyFrontendApiKey(key)) {
       if (!validateFrontendApi(key)) {

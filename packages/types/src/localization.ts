@@ -69,6 +69,7 @@ type _LocalizationResource = {
   formFieldInputPlaceholder__organizationName: LocalizationValue;
   formFieldInputPlaceholder__organizationSlug: LocalizationValue;
   formFieldError__notMatchingPasswords: LocalizationValue;
+  formFieldError__matchingPasswords: LocalizationValue;
   formFieldAction__forgotPassword: LocalizationValue;
   formFieldHintText__optional: LocalizationValue;
   formButtonPrimary: LocalizationValue;

@@ -482,19 +482,23 @@ export interface ClerkOptions {
   /** Optional support email for display in authentication screens */
   supportEmail?: string;
   touchSession?: boolean;
-  /**
-   * @experimental
-   */
-  isSatellite?: boolean | ((url: URL) => boolean);
   signInUrl?: string;
   signUpUrl?: string;
   afterSignInUrl?: string;
   afterSignUpUrl?: string;
+  allowedRedirectOrigins?: string[];
+  /**
+   * @experimental
+   */
+  isSatellite?: boolean | ((url: URL) => boolean);
   /**
    * @experimental
    */
   experimental_enableClerkImages?: boolean;
-  allowedRedirectOrigins?: string[];
+  /**
+   * @experimental
+   */
+  experimental_enableShimmerEffect?: boolean;
 }
 
 export interface Resources {

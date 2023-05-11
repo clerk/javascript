@@ -4,7 +4,7 @@ import { useCoreClerk, useSignUpContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import type { VerificationCodeCardProps } from '../../elements';
 import { VerificationCodeCard } from '../../elements';
-import { useNavigate } from '../../hooks/useNavigate';
+import { useRouter } from '../../router';
 import { completeSignUpFlow } from './util';
 
 type SignInFactorOneCodeFormProps = {
@@ -21,7 +21,7 @@ type SignInFactorOneCodeFormProps = {
 export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) => {
   const { navigateAfterSignUp } = useSignUpContext();
   const { setActive } = useCoreClerk();
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
 
   const goBack = () => {
     return navigate('../');

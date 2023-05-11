@@ -2,8 +2,8 @@ import type { PhoneNumberResource } from '@clerk/types';
 
 import { Badge, Col, Icon, localizationKeys } from '../../customizables';
 import { FormattedPhoneNumberText, useCardState } from '../../elements';
-import { useNavigate } from '../../hooks';
 import { Mobile } from '../../icons';
+import { useRouter } from '../../router';
 import { handleError } from '../../utils';
 import { LinkButtonWithDescription } from './LinkButtonWithDescription';
 import { UserProfileAccordion } from './UserProfileAccordion';
@@ -17,7 +17,7 @@ type MfaPhoneCodeAccordionProps = {
 };
 
 export const MfaPhoneCodeAccordion = ({ phone, showTOTP }: MfaPhoneCodeAccordionProps) => {
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const card = useCardState();
 
   const isDefault = !showTOTP && phone.defaultSecondFactor;

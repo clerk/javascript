@@ -7,8 +7,8 @@ import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from '.
 import { Flow, localizationKeys } from '../../customizables';
 import { VerificationLinkCard } from '../../elements';
 import { useCardState } from '../../elements/contexts';
-import { useNavigate } from '../../hooks';
 import { useMagicLink } from '../../hooks/useMagicLink';
+import { useRouter } from '../../router';
 import { handleError } from '../../utils';
 import { completeSignUpFlow } from './util';
 
@@ -18,7 +18,7 @@ export const SignUpEmailLinkCard = () => {
   const { navigateAfterSignUp } = signUpContext;
   const card = useCardState();
   const { displayConfig } = useEnvironment();
-  const { navigate } = useNavigate();
+  const { navigate } = useRouter();
   const { setActive } = useCoreClerk();
   const [showVerifyModal, setShowVerifyModal] = React.useState(false);
 
