@@ -4,10 +4,12 @@ import {
   appendAsQueryParams,
   buildURL,
   getAllETLDs,
+  getETLDPlusOneFromFrontendApi,
   getSearchParameterFromHash,
   hasBannedProtocol,
   hasExternalAccountSignUpError,
   isAccountsHostedPages,
+  isAllowedRedirectOrigin,
   isDataUri,
   isRedirectForFAPIInitiatedFlow,
   isValidUrl,
@@ -382,4 +384,44 @@ describe('isRedirectForFAPIInitiatedFlow(frontendAp: string, redirectUrl: string
       expect(isRedirectForFAPIInitiatedFlow(frontendApi, redirectUrl)).toEqual(expectedValue);
     },
   );
+});
+
+describe('getETLDPlusOneFromFrontendApi(frontendAp: string)', () => {
+  const testCases: Array<[string, string]> = [
+    ['clerk.foo.bar-53.lcl.dev', 'foo.bar-53.lcl.dev'],
+    ['clerk.clerk.com', 'clerk.com'],
+    ['clerk.foo.bar.co.uk', 'foo.bar.co.uk'],
+  ];
+
+  test.each(testCases)('frontendApi=(%s), expected value=(%s)', (frontendApi, expectedValue) => {
+    expect(getETLDPlusOneFromFrontendApi(frontendApi)).toEqual(expectedValue);
+  });
+});
+
+fdescribe('isAllowedRedirectOrigin', () => {
+  const cases: [string, string[], boolean][] = [
+    // base cases
+    ['https://clerk.com', ['https://www.clerk.com'], false],
+    ['https://www.clerk.com', ['https://www.clerk.com'], true],
+    // glob patterns
+    ['https://clerk.com', ['https://*.clerk.com'], false],
+    ['https://www.clerk.com', ['https://*.clerk.com'], true],
+    ['https://www.clerk.com/test', ['https://www.clerk.com/*'], true],
+    ['https://www.clerk.com/hello/test', ['https://www.clerk.com/*/test'], true],
+    ['https://www.clerk.com/hello/hello', ['https://www.clerk.com/*/test'], false],
+    // trailing slashes
+    ['https://www.clerk.com/', ['https://www.clerk.com'], true],
+    ['https://www.clerk.com', ['https://www.clerk.com'], true],
+    ['https://www.clerk.com/test', ['https://www.clerk.com'], false],
+    // multiple origins
+    ['https://www.clerk.com', ['https://www.test.dev', 'https://www.clerk.com'], true],
+    // relative urls
+    ['/relative', ['https://www.clerk.com'], true],
+    ['/relative/test', ['https://www.clerk.com'], true],
+    ['/', ['https://www.clerk.com'], true],
+  ];
+
+  test.each(cases)('isAllowedRedirectOrigin("%s","%s") === %s', (url, allowedOrigins, expected) => {
+    expect(isAllowedRedirectOrigin(url, allowedOrigins)).toEqual(expected);
+  });
 });

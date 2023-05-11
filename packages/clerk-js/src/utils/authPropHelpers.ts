@@ -3,7 +3,7 @@ import type { ClerkOptions, DisplayConfigResource } from '@clerk/types';
 import type { ParsedQs } from 'qs';
 import qs from 'qs';
 
-import { hasBannedProtocol, isValidUrl } from './index';
+import { hasBannedProtocol, isAllowedRedirectOrigin, isValidUrl } from './url';
 
 type PickRedirectionUrlKey = 'afterSignUpUrl' | 'afterSignInUrl' | 'signInUrl' | 'signUpUrl';
 
@@ -35,11 +35,27 @@ export const pickRedirectionProp = (
   const snakeCaseField = camelToSnake(key);
   const queryParamValue = queryParams?.[snakeCaseField];
 
+  const primaryQueryParamRedirectUrl = typeof queryParamValue === 'string' ? queryParamValue : undefined;
+  const secondaryQueryParamRedirectUrl =
+    accessRedirectUrl && typeof queryParams?.redirect_url === 'string' ? queryParams.redirect_url : undefined;
+
+  let queryParamUrl: string | undefined;
+  if (
+    primaryQueryParamRedirectUrl &&
+    isAllowedRedirectOrigin(primaryQueryParamRedirectUrl, options?.allowedRedirectOrigins)
+  ) {
+    queryParamUrl = primaryQueryParamRedirectUrl;
+  } else if (
+    secondaryQueryParamRedirectUrl &&
+    isAllowedRedirectOrigin(secondaryQueryParamRedirectUrl, options?.allowedRedirectOrigins)
+  ) {
+    queryParamUrl = secondaryQueryParamRedirectUrl;
+  }
+
   const url =
-    (typeof queryParamValue === 'string' ? queryParamValue : null) ||
-    (accessRedirectUrl && typeof queryParams?.redirect_url === 'string' ? queryParams?.redirect_url : null) ||
+    queryParamUrl ||
     ctx?.[key] ||
-    (accessRedirectUrl ? ctx?.redirectUrl : null) ||
+    (accessRedirectUrl ? ctx?.redirectUrl : undefined) ||
     options?.[key] ||
     displayConfig?.[key];
 
