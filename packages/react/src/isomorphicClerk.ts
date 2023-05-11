@@ -600,7 +600,15 @@ export default class IsomorphicClerk {
   handleRedirectCallback = (params: HandleOAuthCallbackParams): void => {
     const callback = () => this.clerkjs?.handleRedirectCallback(params);
     if (this.clerkjs && this.#loaded) {
-      void callback();
+      void callback()?.catch(() => {
+        // This error is caused when the host app is using React18
+        // and strictMode is enabled. This useEffects runs twice because
+        // the clerk-react ui components mounts, unmounts and mounts again
+        // so the clerk-js component loses its state because of the custom
+        // unmount callback we're using.
+        // This needs to be solved by tweaking the logic in uiComponents.tsx
+        // or by making handleRedirectCallback idempotent
+      });
     } else {
       this.premountMethodCalls.set('handleRedirectCallback', callback);
     }
