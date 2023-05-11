@@ -15,10 +15,10 @@ export interface DisplayConfigJSON {
   branded: boolean;
   home_url: string;
   instance_environment_type: string;
+  /* @deprecated */
   logo_url: string;
   /* @deprecated */
   favicon_url: string;
-  /* @deprecated */
   logo_image_url: string;
   favicon_image_url: string;
   preferred_sign_in_strategy: PreferredSignInStrategy;
