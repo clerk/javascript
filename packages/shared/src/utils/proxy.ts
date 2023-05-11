@@ -27,7 +27,9 @@ export function getRequestUrl({ request, relativePath }: { request: Request; rel
   const host = headers.get('X-Forwarded-Host') ?? headers.get('host') ?? (headers as any)['host'] ?? url.host;
 
   // X-Forwarded-Proto could be 'https, http'
-  const protocol =
+  let protocol =
     (headers.get('X-Forwarded-Proto') ?? (headers as any)['X-Forwarded-Proto'])?.split(',')[0] ?? url.protocol;
+  protocol = protocol.replace(/[:/]/, '');
+
   return new URL(relativePath || url.pathname, `${protocol}://${host}`);
 }
