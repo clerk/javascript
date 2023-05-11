@@ -23,12 +23,12 @@ export type OrganizationWebhookEvent =
   | Webhook<'organization.deleted', DeletedObjectJSON>;
 
 export type OrganizationMembershipWebhookEvent = Webhook<
-  'organizationMembership.created' | 'organizationMembership.accepted' | 'organizationMembership.revoked',
+  'organizationMembership.created' | 'organizationMembership.deleted' | 'organizationMembership.updated',
   OrganizationMembershipJSON
 >;
 
 export type OrganizationInvitationWebhookEvent = Webhook<
-  'organizationInvitation.created' | 'organizationInvitation.deleted' | 'organizationInvitation.updated',
+  'organizationInvitation.accepted' | 'organizationInvitation.created' | 'organizationInvitation.revoked',
   OrganizationInvitationJSON
 >;
 
