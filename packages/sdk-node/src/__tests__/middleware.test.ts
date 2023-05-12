@@ -15,6 +15,7 @@ const mockClerkClient = () => ({
   authenticateRequest: jest.fn(),
   remotePublicInterstitial: jest.fn(),
   remotePrivateInterstitial: jest.fn(),
+  localInterstitial: jest.fn(),
 });
 
 describe('ClerkExpressWithAuth', () => {
@@ -85,7 +86,7 @@ describe('ClerkExpressWithAuth', () => {
       isUnknown: false,
       toAuth: () => ({ sessionId: '1' }),
     } as unknown as RequestState);
-    clerkClient.remotePrivateInterstitial.mockResolvedValue('<html>interstitial</html>');
+    clerkClient.localInterstitial.mockReturnValue('<html>interstitial</html>');
 
     await createClerkExpressWithAuth({ clerkClient })()(req, res, mockNext as NextFunction);
 
@@ -164,7 +165,7 @@ describe('ClerkExpressRequireAuth', () => {
       isUnknown: false,
       toAuth: () => ({ sessionId: '1' }),
     } as unknown as RequestState);
-    clerkClient.remotePrivateInterstitial.mockResolvedValue('<html>interstitial</html>');
+    clerkClient.localInterstitial.mockReturnValue('<html>interstitial</html>');
 
     await createClerkExpressRequireAuth({ clerkClient })()(req, res, mockNext as NextFunction);
 
