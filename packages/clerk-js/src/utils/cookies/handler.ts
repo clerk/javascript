@@ -38,9 +38,9 @@ export const createCookieHandler = () => {
     return parseInt(clientUatCookie.get() || '0', 10);
   };
 
-  const setClientUatCookie = (client: ClientResource | undefined) => {
+  const setClientUatCookie = (client: ClientResource | undefined, options?: { sameSite: 'Lax' | 'Strict' }) => {
+    const sameSite = options?.sameSite || 'Strict';
     const expires = addYears(Date.now(), 1);
-    const sameSite = 'Strict';
     const secure = false;
 
     // '0' indicates the user is signed out

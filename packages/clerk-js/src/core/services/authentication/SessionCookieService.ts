@@ -12,12 +12,15 @@ export class SessionCookieService {
   private cookies: CookieHandler = createCookieHandler();
   private environment: EnvironmentResource | undefined;
   private poller: SessionCookiePoller | null = null;
+  private isSatellite = false;
 
   constructor(private clerk: Clerk) {
     // set cookie on token update
     eventBus.on(events.TokenUpdate, ({ token }) => {
       this.updateSessionCookie(token?.getRawString());
     });
+
+    this.isSatellite = clerk.isSatellite;
 
     this.refreshTokenOnVisibilityChange();
     this.startPollingForToken();
@@ -86,7 +89,9 @@ export class SessionCookieService {
 
   private setClientUatCookieForDevelopmentInstances() {
     if (this.environment && this.environment.isDevelopmentOrStaging() && this.inCustomDevelopmentDomain()) {
-      this.cookies.setClientUatCookie(this.clerk.client);
+      this.cookies.setClientUatCookie(this.clerk.client, {
+        sameSite: this.isSatellite ? 'Lax' : 'Strict',
+      });
     }
   }
 
