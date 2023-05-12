@@ -23,36 +23,36 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
   const { loadSession, loadUser, loadOrganization, authorizedParties } = opts;
 
   // Fetch environment variables across Remix runtimes.
-  // 1. First try from process.env if exists (Node).
-  // 2. Then try from globalThis (Cloudflare Workers).
-  // 3. Then from loader context (Cloudflare Pages).
-  // 4. Otherwise check if the user passed the key in the getAuth function or the rootAuthLoader.
-  const secretKey = getEnvVariable('CLERK_SECRET_KEY') || (context?.CLERK_SECRET_KEY as string) || opts.secretKey || '';
-  const apiKey = getEnvVariable('CLERK_API_KEY') || (context?.CLERK_API_KEY as string) || opts.apiKey || '';
+  // 1. First check if the user passed the key in the getAuth function or the rootAuthLoader.
+  // 2. Then try from process.env if exists (Node).
+  // 3. Then try from globalThis (Cloudflare Workers).
+  // 4. Then from loader context (Cloudflare Pages).
+  const secretKey = opts.secretKey || getEnvVariable('CLERK_SECRET_KEY') || (context?.CLERK_SECRET_KEY as string) || '';
+  const apiKey = opts.apiKey || getEnvVariable('CLERK_API_KEY') || (context?.CLERK_API_KEY as string) || '';
   if (!secretKey && !apiKey) {
     throw new Error(noSecretKeyOrApiKeyError);
   }
 
   const frontendApi =
-    getEnvVariable('CLERK_FRONTEND_API') || (context?.CLERK_FRONTEND_API as string) || opts.frontendApi || '';
+    opts.frontendApi || getEnvVariable('CLERK_FRONTEND_API') || (context?.CLERK_FRONTEND_API as string) || '';
 
   const publishableKey =
-    getEnvVariable('CLERK_PUBLISHABLE_KEY') || (context?.CLERK_PUBLISHABLE_KEY as string) || opts.publishableKey || '';
+    opts.publishableKey || getEnvVariable('CLERK_PUBLISHABLE_KEY') || (context?.CLERK_PUBLISHABLE_KEY as string) || '';
 
-  const jwtKey = getEnvVariable('CLERK_JWT_KEY') || (context?.CLERK_JWT_KEY as string) || opts.jwtKey;
+  const jwtKey = opts.jwtKey || getEnvVariable('CLERK_JWT_KEY') || (context?.CLERK_JWT_KEY as string);
 
   const apiUrl = getEnvVariable('CLERK_API_URL') || (context?.CLERK_API_URL as string);
 
   const domain =
+    handleValueOrFn(opts.domain, new URL(request.url)) ||
     getEnvVariable('CLERK_DOMAIN') ||
     (context?.CLERK_DOMAIN as string) ||
-    handleValueOrFn(opts.domain, new URL(request.url)) ||
     '';
 
   const isSatellite =
+    handleValueOrFn(opts.isSatellite, new URL(request.url)) ||
     getEnvVariable('CLERK_IS_SATELLITE') === 'true' ||
     (context?.CLERK_IS_SATELLITE as string) === 'true' ||
-    handleValueOrFn(opts.isSatellite, new URL(request.url)) ||
     false;
 
   const requestURL = getRequestUrl({
@@ -73,7 +73,7 @@ export function authenticateRequest(args: LoaderFunctionArgs, opts: RootAuthLoad
   }
 
   const signInUrl =
-    getEnvVariable('CLERK_SIGN_IN_URL') || (context?.CLERK_SIGN_IN_URL as string) || opts.signInUrl || '';
+    opts.signInUrl || getEnvVariable('CLERK_SIGN_IN_URL') || (context?.CLERK_SIGN_IN_URL as string) || '';
 
   if (isSatellite && !proxyUrl && !domain) {
     throw new Error(satelliteAndMissingProxyUrlAndDomain);
