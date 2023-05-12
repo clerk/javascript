@@ -19,6 +19,7 @@ exports[`constants from environment variables 1`] = `
     "EnableDebug": "x-clerk-debug",
     "ForwardedHost": "x-forwarded-host",
     "ForwardedPort": "x-forwarded-port",
+    "ForwardedProto": "x-forwarded-proto",
     "Host": "host",
     "Origin": "origin",
     "Referrer": "referer",

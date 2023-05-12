@@ -61,6 +61,10 @@ describe('authenticateRequest', () => {
       jwtKey: 'jwtKey',
       referrer: 'referer',
       userAgent: 'user-agent',
+      isSatellite: false,
+      proxyUrl: undefined,
+      signInUrl: '',
+      domain: '',
     });
   });
 });
