@@ -65,6 +65,7 @@ export enum AuthErrorReason {
   HeaderMissingCORS = 'header-missing-cors',
   HeaderMissingNonBrowser = 'header-missing-non-browser',
   SatelliteCookieNeedsSyncing = 'satellite-needs-syncing',
+  SatelliteReturnsFromPrimary = 'satellite-returns-from-primary',
   PrimaryRespondsToSyncing = 'primary-responds-to-syncing',
   StandardSignedIn = 'standard-signed-in',
   StandardSignedOut = 'standard-signed-out',

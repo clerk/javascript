@@ -5,6 +5,7 @@ export const DEV_BROWSER_SSO_JWT_PARAMETER = '__dev_session';
 export const DEV_BROWSER_SSO_JWT_HTTP_HEADER = 'Clerk-Cookie';
 
 export const CLERK_MODAL_STATE = '__clerk_modal_state';
+export const CLERK_REFERRER_PRIMARY = '__clerk_referrer_primary';
 export const CLERK_SYNCED = '__clerk_synced';
 export const CLERK_SATELLITE_URL = '__clerk_satellite_url';
 export const ERROR_CODES = {
