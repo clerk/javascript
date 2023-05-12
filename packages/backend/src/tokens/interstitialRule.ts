@@ -72,13 +72,12 @@ export const potentialFirstLoadInDevWhenUATMissing: InterstitialRule = options =
  * It is expected that a primary app will trigger a redirect back to the satellite app.
  */
 export const potentialRequestAfterSignInOrOutFromClerkHostedUiInDev: InterstitialRule = options => {
-  const { apiKey, secretKey, referrer, host, forwardedHost, forwardedPort, forwardedProto, isSatellite, searchParams } =
-    options;
+  const { apiKey, secretKey, referrer, host, forwardedHost, forwardedPort, forwardedProto } = options;
   const crossOriginReferrer =
     referrer && checkCrossOrigin({ originURL: new URL(referrer), host, forwardedHost, forwardedPort, forwardedProto });
   const key = secretKey || apiKey;
 
-  if (!isSatellite && !hasJustSynced(searchParams) && isDevelopmentFromApiKey(key) && crossOriginReferrer) {
+  if (isDevelopmentFromApiKey(key) && crossOriginReferrer) {
     return interstitial(options, AuthErrorReason.CrossOriginReferrer);
   }
   return undefined;
