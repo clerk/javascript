@@ -419,6 +419,10 @@ fdescribe('isAllowedRedirectOrigin', () => {
     ['/relative', ['https://www.clerk.com'], true],
     ['/relative/test', ['https://www.clerk.com'], true],
     ['/', ['https://www.clerk.com'], true],
+    // empty origins list for relative routes
+    ['/', [], true],
+    // empty origins list for absolute routes
+    ['https://www.clerk.com/', [], false],
   ];
 
   test.each(cases)('isAllowedRedirectOrigin("%s","%s") === %s', (url, allowedOrigins, expected) => {
