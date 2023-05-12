@@ -1,5 +1,4 @@
-import { deepSnakeToCamel } from '@clerk/shared';
-import { Poller } from '@clerk/shared';
+import { deepSnakeToCamel, Poller } from '@clerk/shared';
 import type {
   AttemptFirstFactorParams,
   AttemptSecondFactorParams,
@@ -25,8 +24,7 @@ import type {
   Web3SignatureConfig,
   Web3SignatureFactor,
 } from '@clerk/types';
-import type { AuthenticateWithWeb3Params } from '@clerk/types/src';
-import type { SamlConfig } from '@clerk/types/src';
+import type { AuthenticateWithWeb3Params, SamlConfig } from '@clerk/types/src';
 
 import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from '../../utils';
 import {
@@ -247,6 +245,7 @@ export class SignIn extends BaseResource implements SignInResource {
       this.secondFactorVerification = new Verification(data.second_factor_verification);
       this.createdSessionId = data.created_session_id;
       this.userData = deepSnakeToCamel(data.user_data) as UserData;
+      this.userData.experimental_imageUrl = data.user_data?.image_url;
     }
     return this;
   }

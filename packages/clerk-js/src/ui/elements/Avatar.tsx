@@ -35,21 +35,17 @@ export const Avatar = (props: AvatarProps) => {
   } = props;
   const { experimental_enableShimmerEffect } = useOptions();
   const [error, setError] = React.useState(false);
-  const avatarExists = hasAvatar(imageUrl);
-  let src;
-  if (!avatarExists) {
-    src = GRAVATAR_DEFAULT_AVATAR;
-  } else if (!optimize && imageUrl) {
+
+  let src = imageUrl;
+  if (src && !optimize) {
     const optimizedHeight = Math.max(imageFetchSize) * (isRetinaDisplay() ? 2 : 1);
-    const srcUrl = new URL(imageUrl);
+    const srcUrl = new URL(src);
     srcUrl.searchParams.append('height', optimizedHeight.toString());
     src = srcUrl.toString();
-  } else {
-    src = imageUrl;
   }
 
   const ImgOrFallback =
-    initials && (!avatarExists || error) ? (
+    initials && (!src || error) ? (
       <InitialsAvatarFallback initials={initials} />
     ) : (
       <Image
@@ -131,14 +127,3 @@ const InitialsAvatarFallback = (props: { initials: string }) => {
     </Text>
   );
 };
-
-const GRAVATAR_DEFAULT_AVATAR = 'https://www.gravatar.com/avatar?d=mp';
-const CLERK_IMAGE_URL_REGEX = /https:\/\/images\.(lcl)?clerk/i;
-
-// TODO: How do we want to handle this?
-export function hasAvatar(imageUrl: string | undefined | null): boolean {
-  if (!imageUrl) {
-    return false;
-  }
-  return CLERK_IMAGE_URL_REGEX.test(imageUrl) || !!imageUrl;
-}
