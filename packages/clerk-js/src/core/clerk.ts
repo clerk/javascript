@@ -72,6 +72,7 @@ import {
   noUserExists,
   pickRedirectionProp,
   removeClerkQueryParam,
+  replaceClerkQueryParam,
   sessionExistsAndSingleSessionModeEnabled,
   setDevBrowserJWTInURL,
   stripOrigin,
@@ -79,7 +80,7 @@ import {
   windowNavigate,
 } from '../utils';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
-import { CLERK_SATELLITE_URL, CLERK_SYNCED, ERROR_CODES } from './constants';
+import { CLERK_REFERRER_PRIMARY, CLERK_SATELLITE_URL, CLERK_SYNCED, ERROR_CODES } from './constants';
 import type { DevBrowserHandler } from './devBrowserHandler';
 import createDevBrowserHandler from './devBrowserHandler';
 import {
@@ -677,7 +678,7 @@ export default class Clerk implements ClerkInterface {
       return;
     }
     const searchParams = new URLSearchParams({
-      [CLERK_SYNCED]: 'true',
+      [CLERK_REFERRER_PRIMARY]: 'true',
     });
     const backToSatelliteUrl = buildURL(
       { base: getClerkQueryParam(CLERK_SATELLITE_URL) as string, searchParams },
@@ -1040,8 +1041,11 @@ export default class Clerk implements ClerkInterface {
   };
 
   #hasJustSynced = () => getClerkQueryParam(CLERK_SYNCED) === 'true';
-
   #clearJustSynced = () => removeClerkQueryParam(CLERK_SYNCED);
+
+  #isReturningFromPrimary = () => getClerkQueryParam(CLERK_REFERRER_PRIMARY) === 'true';
+
+  #replacePrimaryReferrerWithClerkSynced = () => replaceClerkQueryParam(CLERK_REFERRER_PRIMARY, CLERK_SYNCED, 'true');
 
   #buildSyncUrlForDevelopmentInstances = (): string => {
     const searchParams = new URLSearchParams({
@@ -1066,6 +1070,11 @@ export default class Clerk implements ClerkInterface {
   };
 
   #shouldSyncWithPrimary = (): boolean => {
+    if (this.#isReturningFromPrimary()) {
+      this.#replacePrimaryReferrerWithClerkSynced();
+      return false;
+    }
+
     if (this.#hasJustSynced()) {
       this.#clearJustSynced();
       return false;

@@ -12,6 +12,7 @@ type InterstitialRule = <T extends AuthenticateRequestOptions>(
 
 const shouldRedirectToSatelliteUrl = (qp?: URLSearchParams) => !!qp?.get('__clerk_satellite_url');
 const hasJustSynced = (qp?: URLSearchParams) => qp?.get('__clerk_synced') === 'true';
+const isReturningFromPrimary = (qp?: URLSearchParams) => qp?.get('__clerk_referrer_primary') === 'true';
 
 // In development or staging environments only, based on the request's
 // User Agent, detect non-browser requests (e.g. scripts). Since there
@@ -79,6 +80,17 @@ export const potentialRequestAfterSignInOrOutFromClerkHostedUiInDev: Interstitia
 
   if (isDevelopmentFromApiKey(key) && crossOriginReferrer) {
     return interstitial(options, AuthErrorReason.CrossOriginReferrer);
+  }
+  return undefined;
+};
+
+export const satelliteInDevReturningFromPrimary: InterstitialRule = options => {
+  const { apiKey, secretKey, isSatellite, searchParams } = options;
+
+  const key = secretKey || apiKey;
+
+  if (isSatellite && isReturningFromPrimary(searchParams) && isDevelopmentFromApiKey(key)) {
+    return interstitial(options, AuthErrorReason.SatelliteReturnsFromPrimary);
   }
   return undefined;
 };
