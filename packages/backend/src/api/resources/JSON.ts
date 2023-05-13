@@ -248,7 +248,7 @@ export interface SMSMessageJSON extends ClerkResourceJSON {
 
 export interface UserJSON extends ClerkResourceJSON {
   object: ObjectType.User;
-  username: string;
+  username: string | null;
   first_name: string;
   last_name: string;
   gender: string;
@@ -259,8 +259,8 @@ export interface UserJSON extends ClerkResourceJSON {
    */
   image_url: string;
   primary_email_address_id: string;
-  primary_phone_number_id: string;
-  primary_web3_wallet_id: string;
+  primary_phone_number_id: string | null;
+  primary_web3_wallet_id: string | null;
   password_enabled: boolean;
   totp_enabled: boolean;
   backup_code_enabled: boolean;
@@ -270,8 +270,8 @@ export interface UserJSON extends ClerkResourceJSON {
   phone_numbers: PhoneNumberJSON[];
   web3_wallets: Web3WalletJSON[];
   external_accounts: ExternalAccountJSON[];
-  external_id: string;
-  last_sign_in_at: number;
+  external_id: string | null;
+  last_sign_in_at: number | null;
   public_metadata: Record<string, unknown>;
   private_metadata: Record<string, unknown>;
   unsafe_metadata: Record<string, unknown>;
@@ -281,7 +281,7 @@ export interface UserJSON extends ClerkResourceJSON {
 
 export interface VerificationJSON extends ClerkResourceJSON {
   attempts?: number | null;
-  expire_at: number;
+  expire_at: number | null;
   external_verification_redirect_url?: string;
   nonce?: string | null;
   status: string;
