@@ -60,6 +60,7 @@ import {
   createPageLifecycle,
   errorThrower,
   getClerkQueryParam,
+  GlobalsAccessor,
   hasExternalAccountSignUpError,
   ignoreEventValue,
   inActiveBrowserTab,
@@ -164,14 +165,16 @@ export default class Clerk implements ClerkInterface {
 
   get isSatellite(): boolean {
     if (inBrowser()) {
-      return handleValueOrFn(this.#options.isSatellite, new URL(window.location.href), false);
+      return handleValueOrFn(this.#options.isSatellite, new URL(GlobalsAccessor.window.location.href), false);
     }
     return false;
   }
 
   get domain(): string {
     if (inBrowser()) {
-      const strippedDomainString = stripScheme(handleValueOrFn(this.#domain, new URL(window.location.href)));
+      const strippedDomainString = stripScheme(
+        handleValueOrFn(this.#domain, new URL(GlobalsAccessor.window.location.href)),
+      );
       if (this.#instanceType === 'production') {
         return addClerkPrefix(strippedDomainString);
       }
@@ -182,7 +185,7 @@ export default class Clerk implements ClerkInterface {
 
   get proxyUrl(): string {
     if (inBrowser()) {
-      const _unfilteredProxy = handleValueOrFn(this.#proxyUrl, new URL(window.location.href));
+      const _unfilteredProxy = handleValueOrFn(this.#proxyUrl, new URL(GlobalsAccessor.window.location.href));
       if (!isValidProxyUrl(_unfilteredProxy)) {
         errorThrower.throwInvalidProxyUrl({ url: _unfilteredProxy });
       }
@@ -501,13 +504,13 @@ export default class Clerk implements ClerkInterface {
 
     type SetActiveHook = () => void;
     const onBeforeSetActive: SetActiveHook =
-      typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
-        ? window.__unstable__onBeforeSetActive
+      GlobalsAccessor.inBrowser && typeof GlobalsAccessor.window.__unstable__onBeforeSetActive === 'function'
+        ? GlobalsAccessor.window.__unstable__onBeforeSetActive
         : noop;
 
     const onAfterSetActive: SetActiveHook =
-      typeof window !== 'undefined' && typeof window.__unstable__onAfterSetActive === 'function'
-        ? window.__unstable__onAfterSetActive
+      GlobalsAccessor.inBrowser && typeof GlobalsAccessor.window.__unstable__onAfterSetActive === 'function'
+        ? GlobalsAccessor.window.__unstable__onAfterSetActive
         : noop;
 
     if (typeof session === 'string') {
@@ -603,10 +606,10 @@ export default class Clerk implements ClerkInterface {
       return;
     }
 
-    const toURL = new URL(to, window.location.href);
+    const toURL = new URL(to, GlobalsAccessor.window.location.href);
     const customNavigate = this.#options.navigate;
 
-    if (toURL.origin !== window.location.origin || !customNavigate) {
+    if (toURL.origin !== GlobalsAccessor.window.location.origin || !customNavigate) {
       windowNavigate(toURL);
       return;
     }
@@ -620,9 +623,9 @@ export default class Clerk implements ClerkInterface {
       return to;
     }
 
-    const toURL = new URL(to, window.location.href);
+    const toURL = new URL(to, GlobalsAccessor.window.location.href);
 
-    if (toURL.origin === window.location.origin) {
+    if (toURL.origin === GlobalsAccessor.window.location.origin) {
       return toURL.href;
     }
 
@@ -1045,7 +1048,7 @@ export default class Clerk implements ClerkInterface {
 
   #buildSyncUrlForDevelopmentInstances = (): string => {
     const searchParams = new URLSearchParams({
-      [CLERK_SATELLITE_URL]: window.location.href,
+      [CLERK_SATELLITE_URL]: GlobalsAccessor.window.location.href,
     });
     return buildURL({ base: this.#options.signInUrl, searchParams }, { stringify: true });
   };
@@ -1060,7 +1063,7 @@ export default class Clerk implements ClerkInterface {
       primarySyncUrl = new URL(`/v1/client/sync`, `https://${this.domain}`);
     }
 
-    primarySyncUrl?.searchParams.append('redirect_url', window.location.href);
+    primarySyncUrl?.searchParams.append('redirect_url', GlobalsAccessor.window.location.href);
 
     return primarySyncUrl?.toString() || '';
   };
@@ -1154,7 +1157,9 @@ export default class Clerk implements ClerkInterface {
     this.#authService = new SessionCookieService(this);
     this.#pageLifecycle = createPageLifecycle();
 
-    const isInAccountsHostedPages = isAccountsHostedPages(window?.location.hostname);
+    const isInAccountsHostedPages = isAccountsHostedPages(
+      GlobalsAccessor.inBrowser ? GlobalsAccessor.window.location.hostname : undefined,
+    );
 
     this.#setupListeners();
 
@@ -1333,7 +1338,7 @@ export default class Clerk implements ClerkInterface {
     const opts: RedirectOptions = {
       afterSignInUrl: pickRedirectionProp('afterSignInUrl', { ctx: options, options: this.#options }, false),
       afterSignUpUrl: pickRedirectionProp('afterSignUpUrl', { ctx: options, options: this.#options }, false),
-      redirectUrl: options?.redirectUrl || window.location.href,
+      redirectUrl: options?.redirectUrl || GlobalsAccessor.window.location.href,
     };
 
     const signInOrUpUrl = pickRedirectionProp(
@@ -1354,7 +1359,7 @@ export default class Clerk implements ClerkInterface {
   }
 
   #redirectFAPIInitiatedFlow = async (): Promise<boolean> => {
-    const redirectUrl = new URLSearchParams(window.location.search).get('redirect_url');
+    const redirectUrl = new URLSearchParams(GlobalsAccessor.window.location.search).get('redirect_url');
     const isProdInstance = this.instanceType === 'production';
     const shouldRedirect = redirectUrl !== null && isRedirectForFAPIInitiatedFlow(this.frontendApi, redirectUrl);
 
@@ -1364,7 +1369,7 @@ export default class Clerk implements ClerkInterface {
 
     const userSignedIn = this.session;
     const signInUrl = this.#environment?.displayConfig.signInUrl;
-    const referrerIsSignInUrl = signInUrl && window.location.href.startsWith(signInUrl);
+    const referrerIsSignInUrl = signInUrl && GlobalsAccessor.window.location.href.startsWith(signInUrl);
 
     // don't redirect if user is not signed in and referrer is sign in url
     if (!userSignedIn && referrerIsSignInUrl) {

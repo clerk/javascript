@@ -26,5 +26,6 @@ export * from './web3';
 export * from './windowNavigate';
 export * from './componentGuards';
 export * from './queryStateParams';
+export * from './GlobalsAccessor';
 export * from './decodeBase16';
 export * from './authPropHelpers';

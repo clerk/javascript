@@ -47,5 +47,6 @@ module.exports = {
         ],
       },
     ],
+    'no-restricted-globals': ['error', { name: 'window' }, { name: 'document' }],
   },
 };
