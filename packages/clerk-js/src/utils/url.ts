@@ -361,7 +361,7 @@ export const isAllowedRedirectOrigin = (_url: string, allowedRedirectOrigins: st
     return true;
   }
 
-  const isAllowed = allowedRedirectOrigins.some(origin => globs.toRegexp(origin).test(trimTrailingSlash(url.href)));
+  const isAllowed = allowedRedirectOrigins.some(origin => globs.toRegexp(origin).test(trimTrailingSlash(url.origin)));
   if (!isAllowed) {
     console.warn(
       `Clerk: Redirect URL ${url} is not on one of the allowedRedirectOrigins, falling back to the default redirect URL.`,

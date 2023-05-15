@@ -406,13 +406,10 @@ fdescribe('isAllowedRedirectOrigin', () => {
     // glob patterns
     ['https://clerk.com', ['https://*.clerk.com'], false],
     ['https://www.clerk.com', ['https://*.clerk.com'], true],
-    ['https://www.clerk.com/test', ['https://www.clerk.com/*'], true],
-    ['https://www.clerk.com/hello/test', ['https://www.clerk.com/*/test'], true],
-    ['https://www.clerk.com/hello/hello', ['https://www.clerk.com/*/test'], false],
     // trailing slashes
     ['https://www.clerk.com/', ['https://www.clerk.com'], true],
     ['https://www.clerk.com', ['https://www.clerk.com'], true],
-    ['https://www.clerk.com/test', ['https://www.clerk.com'], false],
+    ['https://www.clerk.com/test', ['https://www.clerk.com'], true],
     // multiple origins
     ['https://www.clerk.com', ['https://www.test.dev', 'https://www.clerk.com'], true],
     // relative urls
