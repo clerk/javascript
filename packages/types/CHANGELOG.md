@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.36.1](https://github.com/clerkinc/javascript/compare/@clerk/types@3.36.0...@clerk/types@3.36.1) (2023-05-15)
+
+### Bug Fixes
+
+- **clerk-js,types:** Deprecate private imageUrl and use logoImageUrl ([#1176](https://github.com/clerkinc/javascript/issues/1176)) ([9c05c68](https://github.com/clerkinc/javascript/commit/9c05c685800119c8811bce5a7bb06cdb63dfbdf9))
+- **clerk-js,types:** Fix deprecation warning ([e8f5b48](https://github.com/clerkinc/javascript/commit/e8f5b485569d93fb82e33102ed2361674a4b6233))
+
 ## [3.36.0](https://github.com/clerkinc/javascript/compare/@clerk/types@3.36.0-staging.4...@clerk/types@3.36.0) (2023-05-04)
 
 **Note:** Version bump only for package @clerk/types
