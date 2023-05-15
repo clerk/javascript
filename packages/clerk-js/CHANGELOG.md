@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.39.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.39.0...@clerk/clerk-js@4.39.1) (2023-05-15)
+
+### Bug Fixes
+
+- **clerk-js,types:** Deprecate private imageUrl and use logoImageUrl ([#1176](https://github.com/clerkinc/javascript/issues/1176)) ([9c05c68](https://github.com/clerkinc/javascript/commit/9c05c685800119c8811bce5a7bb06cdb63dfbdf9))
+- **clerk-js:** Correctly populate experimental_imageUrl for signIn.userData ([860d5ed](https://github.com/clerkinc/javascript/commit/860d5ed34784a834530d540cf245a967d520aef1))
+
 ## [4.39.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.39.0-staging.6...@clerk/clerk-js@4.39.0) (2023-05-04)
 
 **Note:** Version bump only for package @clerk/clerk-js
