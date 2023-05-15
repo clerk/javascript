@@ -60,6 +60,7 @@ export const authenticateRequest = (opts: {
     isSatellite,
     domain,
     signInUrl,
+    searchParams: requestUrl.searchParams,
   });
 };
 export const handleUnknownCase = (res: ServerResponse, requestState: RequestState) => {

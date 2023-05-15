@@ -25,6 +25,7 @@ describe('authenticateRequest', () => {
         referer: 'referer',
         'user-agent': 'user-agent',
       },
+      url: '/whatever?__query=true',
     } as any as Request;
 
     const options = {
@@ -37,6 +38,9 @@ describe('authenticateRequest', () => {
     const secretKey = '';
     const frontendApi = 'frontendApi';
     const publishableKey = 'publishableKey';
+    const searchParams = new URLSearchParams();
+    searchParams.set('__query', 'true');
+
     await authenticateRequest({
       clerkClient: clerkClient as any,
       apiKey,
@@ -65,6 +69,7 @@ describe('authenticateRequest', () => {
       proxyUrl: undefined,
       signInUrl: '',
       domain: '',
+      searchParams,
     });
   });
 });
