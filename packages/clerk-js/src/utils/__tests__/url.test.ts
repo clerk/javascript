@@ -399,7 +399,7 @@ describe('getETLDPlusOneFromFrontendApi(frontendAp: string)', () => {
 });
 
 fdescribe('isAllowedRedirectOrigin', () => {
-  const cases: [string, string[], boolean][] = [
+  const cases: [string, string[] | undefined, boolean][] = [
     // base cases
     ['https://clerk.com', ['https://www.clerk.com'], false],
     ['https://www.clerk.com', ['https://www.clerk.com'], true],
@@ -420,6 +420,8 @@ fdescribe('isAllowedRedirectOrigin', () => {
     ['/', [], true],
     // empty origins list for absolute routes
     ['https://www.clerk.com/', [], false],
+    //undefined origins
+    ['https://www.clerk.com/', undefined, true],
   ];
 
   test.each(cases)('isAllowedRedirectOrigin("%s","%s") === %s', (url, allowedOrigins, expected) => {
