@@ -48,7 +48,7 @@ export const svSE: LocalizationResource = {
   formFieldInputPlaceholder__lastName: '',
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__organizationName: '',
-  formFieldAction__forgotPassword: 'Glömt lösenord',
+  formFieldAction__forgotPassword: 'Glömt lösenord?',
   formFieldHintText__optional: 'Valfritt',
   formButtonPrimary: 'Fortsätt',
   signInEnterPasswordTitle: 'Ange ditt lösenord',

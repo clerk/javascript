@@ -1,15 +1,14 @@
 import type { SignInFactor } from '@clerk/types';
 import React from 'react';
 
-import { useCoreSignIn } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import { ArrowBlockButton, Card, CardAlert, Footer, Header } from '../../elements';
 import { useCardState } from '../../elements/contexts';
-import { allStrategiesButtonsComparator, formatSafeIdentifier } from '../../utils';
-import { HavingTrouble } from './HavingTrouble';
+import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
+import { formatSafeIdentifier } from '../../utils';
 import { SignInSocialButtons } from './SignInSocialButtons';
-import { factorHasLocalStrategy } from './utils';
+import { withHavingTrouble } from './withHavingTrouble';
 
 export type AlternativeMethodsProps = {
   onBackLinkClick: React.MouseEventHandler | undefined;
@@ -17,35 +16,20 @@ export type AlternativeMethodsProps = {
   currentFactor: SignInFactor | undefined | null;
 };
 
+export type AlternativeMethodListProps = AlternativeMethodsProps & { onHavingTroubleClick: React.MouseEventHandler };
+
 export const AlternativeMethods = (props: AlternativeMethodsProps) => {
-  const [showHavingTrouble, setShowHavingTrouble] = React.useState(false);
-  const toggleHavingTrouble = React.useCallback(() => setShowHavingTrouble(s => !s), [setShowHavingTrouble]);
-
-  if (showHavingTrouble) {
-    return <HavingTrouble onBackLinkClick={toggleHavingTrouble} />;
-  }
-
-  return (
-    <AlternativeMethodsList
-      onBackLinkClick={props.onBackLinkClick}
-      onFactorSelected={props.onFactorSelected}
-      onHavingTroubleClick={toggleHavingTrouble}
-      currentFactor={props.currentFactor}
-    />
-  );
+  return withHavingTrouble(AlternativeMethodsList, {
+    ...props,
+  });
 };
 
-const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroubleClick: React.MouseEventHandler }) => {
+const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
   const { onBackLinkClick, onHavingTroubleClick, onFactorSelected } = props;
   const card = useCardState();
-  const { supportedFirstFactors } = useCoreSignIn();
-  const firstPartyFactors = supportedFirstFactors.filter(
-    f => !f.strategy.startsWith('oauth_') && !(f.strategy === props.currentFactor?.strategy),
-  );
-  const validFactors = firstPartyFactors
-    .filter(factor => factorHasLocalStrategy(factor))
-    .sort(allStrategiesButtonsComparator);
-
+  const { firstPartyFactors } = useAlternativeStrategies({
+    filterOutFactor: props?.currentFactor,
+  });
   return (
     <Flow.Part part='alternativeMethods'>
       <Card>
@@ -69,7 +53,7 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
             direction='col'
             gap={2}
           >
-            {validFactors.map((factor, i) => (
+            {firstPartyFactors.map((factor, i) => (
               <ArrowBlockButton
                 textLocalizationKey={getButtonLabel(factor)}
                 elementDescriptor={descriptors.alternativeMethodsBlockButton}
@@ -112,6 +96,10 @@ export function getButtonLabel(factor: SignInFactor): LocalizationKey {
       });
     case 'password':
       return localizationKeys('signIn.alternativeMethods.blockButton__password');
+    case 'reset_password_email_code':
+      return localizationKeys('signIn.forgotPasswordAlternativeMethods.blockButton__resetPassword');
+    case 'reset_password_phone_code':
+      return localizationKeys('signIn.forgotPasswordAlternativeMethods.blockButton__resetPassword');
     default:
       throw `Invalid sign in strategy: "${factor.strategy}"`;
   }

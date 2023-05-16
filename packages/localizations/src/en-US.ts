@@ -52,7 +52,7 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__organizationSlug: '',
   formFieldError__notMatchingPasswords: `Passwords don't match.`,
   formFieldError__matchingPasswords: 'Passwords match.',
-  formFieldAction__forgotPassword: 'Forgot password',
+  formFieldAction__forgotPassword: 'Forgot password?',
   formFieldHintText__optional: 'Optional',
   formButtonPrimary: 'Continue',
   signInEnterPasswordTitle: 'Enter your password',
@@ -137,6 +137,11 @@ export const enUS: LocalizationResource = {
       title: 'Enter your password',
       subtitle: 'to continue to {{applicationName}}',
       actionLink: 'Use another method',
+    },
+    forgotPasswordAlternativeMethods: {
+      title: 'Forgot Password?',
+      label__alternativeMethods: 'Or, sign in with another method.',
+      blockButton__resetPassword: 'Reset your password',
     },
     forgotPassword: {
       title_email: 'Check your email',

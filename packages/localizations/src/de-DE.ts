@@ -36,7 +36,7 @@ export const deDE: LocalizationResource = {
   formFieldInputPlaceholder__lastName: '',
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__organizationName: '',
-  formFieldAction__forgotPassword: 'Passwort vergessen',
+  formFieldAction__forgotPassword: 'Passwort vergessen?',
   formFieldHintText__optional: 'Optional',
   formButtonPrimary: 'Fortsetzen',
   signInEnterPasswordTitle: 'Geben Sie Ihr Passwort ein',

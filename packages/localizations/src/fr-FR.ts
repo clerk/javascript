@@ -36,7 +36,7 @@ export const frFR: LocalizationResource = {
   formFieldInputPlaceholder__lastName: '',
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__organizationName: '',
-  formFieldAction__forgotPassword: 'Mot de passe oublié',
+  formFieldAction__forgotPassword: 'Mot de passe oublié?',
   formFieldHintText__optional: 'Optionnel',
   formButtonPrimary: 'Continuer',
   signInEnterPasswordTitle: 'Tapez votre mot de passe',

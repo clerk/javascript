@@ -9,32 +9,22 @@ import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router/RouteContext';
 import { handleError, useFormControl } from '../../utils';
 import { HavingTrouble } from './HavingTrouble';
-import { isResetPasswordStrategy } from './utils';
+import { useResetPasswordFactor } from './useResetPasswordFactor';
 
 type SignInFactorOnePasswordProps = {
+  onForgotPasswordMethodClick: React.MouseEventHandler | undefined;
   onShowAlternativeMethodsClick: React.MouseEventHandler | undefined;
   onFactorPrepare: (f: ResetPasswordCodeFactor) => void;
 };
 
 const usePasswordControl = (props: SignInFactorOnePasswordProps) => {
-  const { onShowAlternativeMethodsClick, onFactorPrepare } = props;
-  const signIn = useCoreSignIn();
+  const { onForgotPasswordMethodClick, onShowAlternativeMethodsClick } = props;
+  const resetPasswordFactor = useResetPasswordFactor();
 
   const passwordControl = useFormControl('password', '', {
     type: 'password',
     label: localizationKeys('formFieldLabel__password'),
   });
-
-  const resetPasswordFactor = signIn.supportedFirstFactors.find(({ strategy }) => isResetPasswordStrategy(strategy)) as
-    | ResetPasswordCodeFactor
-    | undefined;
-
-  const goToForgotPassword = () => {
-    resetPasswordFactor &&
-      onFactorPrepare({
-        ...resetPasswordFactor,
-      });
-  };
 
   return {
     ...passwordControl,
@@ -42,8 +32,8 @@ const usePasswordControl = (props: SignInFactorOnePasswordProps) => {
       ...passwordControl.props,
       actionLabel:
         resetPasswordFactor || onShowAlternativeMethodsClick ? localizationKeys('formFieldAction__forgotPassword') : '',
-      onActionClicked: resetPasswordFactor
-        ? goToForgotPassword
+      onActionClicked: onForgotPasswordMethodClick
+        ? onForgotPasswordMethodClick
         : onShowAlternativeMethodsClick
         ? onShowAlternativeMethodsClick
         : () => null,
