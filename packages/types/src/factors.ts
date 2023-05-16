@@ -139,9 +139,11 @@ export type BackupCodeAttempt = {
 export type ResetPasswordPhoneCodeAttempt = {
   strategy: ResetPasswordPhoneCodeStrategy;
   code: string;
+  password?: string;
 };
 
 export type ResetPasswordEmailCodeAttempt = {
   strategy: ResetPasswordEmailCodeStrategy;
   code: string;
+  password?: string;
 };

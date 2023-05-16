@@ -169,7 +169,12 @@ export type SignInCreateParams = (
       identifier: string;
     }
   | {
-      strategy: PhoneCodeStrategy | EmailCodeStrategy | Web3Strategy;
+      strategy:
+        | PhoneCodeStrategy
+        | EmailCodeStrategy
+        | Web3Strategy
+        | ResetPasswordEmailCodeStrategy
+        | ResetPasswordPhoneCodeStrategy;
       identifier: string;
     }
   | {
