@@ -49,6 +49,7 @@ const {
   organizations,
   clients,
   allowlistIdentifiers,
+  domains,
 } = clerkClient;
 
 export {
@@ -62,6 +63,7 @@ export {
   organizations,
   clients,
   allowlistIdentifiers,
+  domains,
 };
 
 export default clerkClient;
