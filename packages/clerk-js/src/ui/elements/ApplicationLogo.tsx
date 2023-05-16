@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useEnvironment } from '../contexts';
+import { useEnvironment, useOptions } from '../contexts';
 import { descriptors, Flex, Image, useAppearance } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
 import { RouterLink } from './RouterLink';
@@ -29,9 +29,10 @@ type ApplicationLogoProps = PropsOfComponent<typeof Flex>;
 export const ApplicationLogo = (props: ApplicationLogoProps) => {
   const imageRef = React.useRef<HTMLImageElement>(null);
   const [loaded, setLoaded] = React.useState(false);
-  const { logoImageUrl, applicationName, homeUrl } = useEnvironment().displayConfig;
+  const { logoUrl, logoImageUrl, applicationName, homeUrl } = useEnvironment().displayConfig;
   const { parsedLayout } = useAppearance();
-  const imageSrc = parsedLayout.logoImageUrl || logoImageUrl;
+  const { experimental_enableClerkImages } = useOptions();
+  const imageSrc = parsedLayout.logoImageUrl || experimental_enableClerkImages ? logoImageUrl : logoUrl;
 
   if (!imageSrc) {
     return null;
