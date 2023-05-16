@@ -49,6 +49,8 @@ export interface DisplayConfigResource extends ClerkResource {
   instanceEnvironmentType: string;
   logoImageUrl: string;
   faviconImageUrl: string;
+  logoUrl: string;
+  faviconUrl: string;
   preferredSignInStrategy: PreferredSignInStrategy;
   signInUrl: string;
   signUpUrl: string;
