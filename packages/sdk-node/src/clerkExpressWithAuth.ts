@@ -25,14 +25,25 @@ export const createClerkExpressWithAuth = (createOpts: CreateClerkExpressMiddlew
         return handleUnknownCase(res, requestState);
       }
       if (requestState.isInterstitial) {
-        const interstitial = clerkClient.localInterstitial({
-          frontendApi: requestState.frontendApi,
-          publishableKey: requestState.publishableKey,
-          proxyUrl: requestState.proxyUrl,
-          signInUrl: requestState.signInUrl,
-          isSatellite: requestState.isSatellite,
-          domain: requestState.domain,
-        });
+        let interstitial;
+
+        /**
+         * This is a step for deprecating the usage of `remotePrivateInterstitial`
+         * For the multi-domain feature and when frontendApi is set prefer the localInterstitial
+         */
+        if (requestState.publishableKey || requestState.frontendApi) {
+          interstitial = clerkClient.localInterstitial({
+            frontendApi: requestState.frontendApi,
+            publishableKey: requestState.publishableKey,
+            proxyUrl: requestState.proxyUrl,
+            signInUrl: requestState.signInUrl,
+            isSatellite: requestState.isSatellite,
+            domain: requestState.domain,
+          });
+        } else {
+          interstitial = await clerkClient.remotePrivateInterstitial();
+        }
+
         return handleInterstitialCase(res, requestState, interstitial);
       }
 
