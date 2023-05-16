@@ -32,7 +32,8 @@ export const ApplicationLogo = (props: ApplicationLogoProps) => {
   const { logoUrl, logoImageUrl, applicationName, homeUrl } = useEnvironment().displayConfig;
   const { parsedLayout } = useAppearance();
   const { experimental_enableClerkImages } = useOptions();
-  const imageSrc = parsedLayout.logoImageUrl || experimental_enableClerkImages ? logoImageUrl : logoUrl;
+  const envLogoUrl = experimental_enableClerkImages ? logoImageUrl : logoUrl;
+  const imageSrc = parsedLayout.logoImageUrl || envLogoUrl;
 
   if (!imageSrc) {
     return null;
