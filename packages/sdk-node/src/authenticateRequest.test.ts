@@ -37,7 +37,15 @@ describe('authenticateRequest', () => {
     const secretKey = '';
     const frontendApi = 'frontendApi';
     const publishableKey = 'publishableKey';
-    await authenticateRequest(clerkClient as any, apiKey, secretKey, frontendApi, publishableKey, req, options);
+    await authenticateRequest({
+      clerkClient: clerkClient as any,
+      apiKey,
+      secretKey,
+      frontendApi,
+      publishableKey,
+      req,
+      options,
+    });
     expect(clerkClient.authenticateRequest).toHaveBeenCalledWith({
       authorizedParties: ['party1'],
       clientUat: 'token',
