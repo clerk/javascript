@@ -13,6 +13,7 @@ export default (QUnit: QUnit) => {
         'Clerk',
         'Client',
         'DeletedObject',
+        'Domains',
         'Email',
         'EmailAddress',
         'ExternalAccount',

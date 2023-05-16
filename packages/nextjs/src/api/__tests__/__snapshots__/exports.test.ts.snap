@@ -7,6 +7,7 @@ Array [
   "Clerk",
   "Client",
   "DeletedObject",
+  "Domains",
   "Email",
   "EmailAddress",
   "ExternalAccount",

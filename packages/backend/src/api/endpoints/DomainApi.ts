@@ -5,7 +5,7 @@ import { AbstractAPI } from './AbstractApi';
 const basePath = '/domains';
 
 export class DomainAPI extends AbstractAPI {
-  public deleteDomain(id: string) {
+  public async deleteDomain(id: string) {
     return this.request<Domains>({
       method: 'DELETE',
       path: joinPaths(basePath, id),
