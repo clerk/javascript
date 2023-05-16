@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [4.40.1](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.40.0-staging.4...@clerk/clerk-js@4.40.1) (2023-05-16)
+
+### Bug Fixes
+
+- **clerk-js:** Fix application logo src priority ([fa9534e](https://github.com/clerkinc/javascript/commit/fa9534e38538e0a01760f12db8d0f9df62fdef72))
+- **clerk-js:** Use experimental_enableClerkImages flag for application logo as well ([5215b30](https://github.com/clerkinc/javascript/commit/5215b30563f12e412e463babb4f0644e75e4f3d9))
+
 ## [4.40.0](https://github.com/clerkinc/javascript/compare/@clerk/clerk-js@4.40.0-staging.4...@clerk/clerk-js@4.40.0) (2023-05-15)
 
 **Note:** Version bump only for package @clerk/clerk-js

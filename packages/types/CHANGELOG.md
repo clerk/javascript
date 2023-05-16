@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.37.1](https://github.com/clerkinc/javascript/compare/@clerk/types@3.37.0-staging.3...@clerk/types@3.37.1) (2023-05-16)
+
+### Bug Fixes
+
+- **clerk-js:** Use experimental_enableClerkImages flag for application logo as well ([5215b30](https://github.com/clerkinc/javascript/commit/5215b30563f12e412e463babb4f0644e75e4f3d9))
+
 ## [3.37.0](https://github.com/clerkinc/javascript/compare/@clerk/types@3.37.0-staging.3...@clerk/types@3.37.0) (2023-05-15)
 
 **Note:** Version bump only for package @clerk/types
