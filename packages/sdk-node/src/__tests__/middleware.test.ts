@@ -73,7 +73,7 @@ describe('ClerkExpressWithAuth', () => {
     expect(mockNext).not.toBeCalled();
   });
 
-  it('should halt middleware execution and return interstitial response with 401 http code for unknown request state', async () => {
+  it('should halt middleware execution and return remote private interstitial response with 401 http code for unknown request state', async () => {
     const writeHeadSpy = jest.fn();
     const endSpy = jest.fn();
     const req = { cookies: {}, headers: {} } as Request;
@@ -85,6 +85,29 @@ describe('ClerkExpressWithAuth', () => {
       isInterstitial: true,
       isUnknown: false,
       toAuth: () => ({ sessionId: '1' }),
+    } as unknown as RequestState);
+    clerkClient.remotePrivateInterstitial.mockReturnValue('<html>interstitial</html>');
+
+    await createClerkExpressWithAuth({ clerkClient })()(req, res, mockNext as NextFunction);
+
+    expect(writeHeadSpy).toBeCalledWith(401, { 'Content-Type': 'text/html' });
+    expect(endSpy).toBeCalledWith('<html>interstitial</html>');
+    expect(mockNext).not.toBeCalled();
+  });
+
+  it('should halt middleware execution and return local interstitial response with 401 http code for unknown request state', async () => {
+    const writeHeadSpy = jest.fn();
+    const endSpy = jest.fn();
+    const req = { cookies: {}, headers: {} } as Request;
+    const res = { writeHead: writeHeadSpy, end: endSpy } as unknown as Response;
+
+    const clerkClient = mockClerkClient() as any;
+    clerkClient.authenticateRequest.mockReturnValue({
+      isSignedIn: false,
+      isInterstitial: true,
+      isUnknown: false,
+      toAuth: () => ({ sessionId: '1' }),
+      publishableKey: 'pk_12345',
     } as unknown as RequestState);
     clerkClient.localInterstitial.mockReturnValue('<html>interstitial</html>');
 
@@ -152,7 +175,7 @@ describe('ClerkExpressRequireAuth', () => {
     expect(mockNext).not.toBeCalled();
   });
 
-  it('should halt middleware execution and return interstitial response with 401 http code for unknown request state', async () => {
+  it('should halt middleware execution and return remote private interstitial response with 401 http code for unknown request state', async () => {
     const writeHeadSpy = jest.fn();
     const endSpy = jest.fn();
     const req = { cookies: {}, headers: {} } as Request;
@@ -165,9 +188,32 @@ describe('ClerkExpressRequireAuth', () => {
       isUnknown: false,
       toAuth: () => ({ sessionId: '1' }),
     } as unknown as RequestState);
-    clerkClient.localInterstitial.mockReturnValue('<html>interstitial</html>');
+    clerkClient.remotePrivateInterstitial.mockReturnValue('<html>interstitial</html>');
 
     await createClerkExpressRequireAuth({ clerkClient })()(req, res, mockNext as NextFunction);
+
+    expect(writeHeadSpy).toBeCalledWith(401, { 'Content-Type': 'text/html' });
+    expect(endSpy).toBeCalledWith('<html>interstitial</html>');
+    expect(mockNext).not.toBeCalled();
+  });
+
+  it('should halt middleware execution and return local interstitial response with 401 http code for unknown request state', async () => {
+    const writeHeadSpy = jest.fn();
+    const endSpy = jest.fn();
+    const req = { cookies: {}, headers: {} } as Request;
+    const res = { writeHead: writeHeadSpy, end: endSpy } as unknown as Response;
+
+    const clerkClient = mockClerkClient() as any;
+    clerkClient.authenticateRequest.mockReturnValue({
+      isSignedIn: false,
+      isInterstitial: true,
+      isUnknown: false,
+      toAuth: () => ({ sessionId: '1' }),
+      publishableKey: 'pk_12345',
+    } as unknown as RequestState);
+    clerkClient.localInterstitial.mockReturnValue('<html>interstitial</html>');
+
+    await createClerkExpressWithAuth({ clerkClient })()(req, res, mockNext as NextFunction);
 
     expect(writeHeadSpy).toBeCalledWith(401, { 'Content-Type': 'text/html' });
     expect(endSpy).toBeCalledWith('<html>interstitial</html>');
