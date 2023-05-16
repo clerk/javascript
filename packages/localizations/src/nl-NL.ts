@@ -46,7 +46,7 @@ export const nlNL: LocalizationResource = {
   formFieldInputPlaceholder__lastName: '',
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__organizationName: '',
-  formFieldAction__forgotPassword: 'Wachtwoord vergeten',
+  formFieldAction__forgotPassword: 'Wachtwoord vergeten?',
   formFieldHintText__optional: 'Optioneel',
   formButtonPrimary: 'Doorgaan',
   signInEnterPasswordTitle: 'Vul je wachtwoord in',

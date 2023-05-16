@@ -4,16 +4,18 @@ import React from 'react';
 import { withRedirectToHomeSingleSessionGuard } from '../../common';
 import { useCoreSignIn, useEnvironment } from '../../contexts';
 import { ErrorCard, LoadingCard, withCardStateProvider } from '../../elements';
-import { useEnabledThirdPartyProviders } from '../../hooks';
+import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import { AlternativeMethods } from './AlternativeMethods';
+import { ForgotPasswordAlternativeMethods } from './ForgotPasswordAlternativeMethods';
 import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
 import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
 import { SignInFactorOneForgotPasswordCard } from './SignInFactorOneForgotPasswordCard';
 import { SignInFactorOnePasswordCard } from './SignInFactorOnePasswordCard';
 import { SignInFactorOnePhoneCodeCard } from './SignInFactorOnePhoneCodeCard';
-import { determineStartingSignInFactor, factorHasLocalStrategy, isResetPasswordStrategy } from './utils';
+import { useResetPasswordFactor } from './useResetPasswordFactor';
+import { determineStartingSignInFactor, factorHasLocalStrategy } from './utils';
 
 const factorKey = (factor: SignInFactor | null | undefined) => {
   if (!factor) {
@@ -44,17 +46,17 @@ export function _SignInFactorOne(): JSX.Element {
     prevCurrentFactor: undefined,
   }));
 
-  const { strategies: OAuthStrategies } = useEnabledThirdPartyProviders();
-
-  const firstFactors = signIn.supportedFirstFactors.filter(
-    f => f.strategy !== currentFactor?.strategy && !isResetPasswordStrategy(f.strategy),
-  );
-
-  const shouldAllowForAlternativeStrategies = firstFactors.length + OAuthStrategies.length > 0;
+  const { hasAnyStrategy } = useAlternativeStrategies({
+    filterOutFactor: currentFactor,
+  });
 
   const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(
     () => !currentFactor || !factorHasLocalStrategy(currentFactor),
   );
+
+  const resetPasswordFactor = useResetPasswordFactor();
+
+  const [showForgotPasswordStrategies, setShowForgotPasswordStrategies] = React.useState(false);
 
   React.useEffect(() => {
     // Handle the case where a user lands on alternative methods screen,
@@ -75,7 +77,10 @@ export function _SignInFactorOne(): JSX.Element {
     );
   }
 
-  const toggleAllStrategies = shouldAllowForAlternativeStrategies ? () => setShowAllStrategies(s => !s) : undefined;
+  const toggleAllStrategies = hasAnyStrategy ? () => setShowAllStrategies(s => !s) : undefined;
+
+  const toggleForgotPasswordStrategies = () => setShowForgotPasswordStrategies(s => !s);
+
   const handleFactorPrepare = () => {
     lastPreparedFactorKeyRef.current = factorKey(currentFactor);
   };
@@ -84,14 +89,30 @@ export function _SignInFactorOne(): JSX.Element {
       currentFactor: factor,
       prevCurrentFactor: prev.currentFactor,
     }));
-    toggleAllStrategies?.();
   };
   if (showAllStrategies) {
     const canGoBack = factorHasLocalStrategy(currentFactor);
     return (
       <AlternativeMethods
         onBackLinkClick={canGoBack ? toggleAllStrategies : undefined}
-        onFactorSelected={selectFactor}
+        onFactorSelected={f => {
+          selectFactor(f);
+          toggleAllStrategies?.();
+        }}
+        currentFactor={currentFactor}
+      />
+    );
+  }
+
+  if (showForgotPasswordStrategies) {
+    const canGoBack = factorHasLocalStrategy(currentFactor);
+    return (
+      <ForgotPasswordAlternativeMethods
+        onBackLinkClick={canGoBack ? toggleForgotPasswordStrategies : undefined}
+        onFactorSelected={f => {
+          selectFactor(f);
+          toggleForgotPasswordStrategies();
+        }}
         currentFactor={currentFactor}
       />
     );
@@ -114,6 +135,7 @@ export function _SignInFactorOne(): JSX.Element {
               prevCurrentFactor: prev.currentFactor,
             }));
           }}
+          onForgotPasswordMethodClick={resetPasswordFactor ? toggleForgotPasswordStrategies : toggleAllStrategies}
           onShowAlternativeMethodsClick={toggleAllStrategies}
         />
       );
@@ -151,12 +173,13 @@ export function _SignInFactorOne(): JSX.Element {
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
-          onBackLinkClicked={() =>
+          onBackLinkClicked={() => {
             setFactor(prev => ({
               currentFactor: prev.prevCurrentFactor,
               prevCurrentFactor: prev.currentFactor,
-            }))
-          }
+            }));
+            toggleForgotPasswordStrategies();
+          }}
           cardTitle={localizationKeys('signIn.forgotPassword.title_phone')}
           formSubtitle={localizationKeys('signIn.forgotPassword.formSubtitle_phone')}
         />
@@ -169,12 +192,13 @@ export function _SignInFactorOne(): JSX.Element {
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
-          onBackLinkClicked={() =>
+          onBackLinkClicked={() => {
             setFactor(prev => ({
               currentFactor: prev.prevCurrentFactor,
               prevCurrentFactor: prev.currentFactor,
-            }))
-          }
+            }));
+            toggleForgotPasswordStrategies();
+          }}
           cardTitle={localizationKeys('signIn.forgotPassword.title_email')}
           formSubtitle={localizationKeys('signIn.forgotPassword.formSubtitle_email')}
         />
