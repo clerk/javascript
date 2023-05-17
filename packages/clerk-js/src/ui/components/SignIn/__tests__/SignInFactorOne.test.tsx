@@ -138,7 +138,7 @@ describe('SignInFactorOne', () => {
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
         await userEvent.click(screen.getByText(/Forgot password/i));
         screen.getByText('Use another method');
-        screen.getByText(`Send code to ${email}`);
+        screen.getByText(`Email code to ${email}`);
         expect(screen.queryByText('Sign in with your password')).not.toBeInTheDocument();
       });
 
@@ -490,8 +490,8 @@ describe('SignInFactorOne', () => {
 
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
-      screen.getByText(`Send code to ${email}`);
-      screen.getByText(`Send link to ${email}`);
+      screen.getByText(`Email code to ${email}`);
+      screen.getByText(`Email link to ${email}`);
       expect(screen.queryByText(`Sign in with your password`)).not.toBeInTheDocument();
     });
 
@@ -595,8 +595,8 @@ describe('SignInFactorOne', () => {
       );
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
-      screen.getByText(`Send link to ${email}`);
-      await userEvent.click(screen.getByText(`Send link to ${email}`));
+      screen.getByText(`Email link to ${email}`);
+      await userEvent.click(screen.getByText(`Email link to ${email}`));
       screen.getByText('Check your email');
       screen.getByText('Verification link');
     });
@@ -616,8 +616,8 @@ describe('SignInFactorOne', () => {
       } as any);
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
-      screen.getByText(`Send code to ${email}`);
-      await userEvent.click(screen.getByText(`Send code to ${email}`));
+      screen.getByText(`Email code to ${email}`);
+      await userEvent.click(screen.getByText(`Email code to ${email}`));
       screen.getByText('Check your email');
       screen.getByText('Verification code');
     });
@@ -636,8 +636,8 @@ describe('SignInFactorOne', () => {
       } as any);
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
-      screen.getByText(/Send code to \+/);
-      await userEvent.click(screen.getByText(/Send code to \+/));
+      screen.getByText(/code to \+/);
+      await userEvent.click(screen.getByText(/code to \+/));
       screen.getByText('Check your phone');
     });
 

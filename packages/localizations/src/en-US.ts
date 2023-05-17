@@ -215,9 +215,9 @@ export const enUS: LocalizationResource = {
     alternativeMethods: {
       title: 'Use another method',
       actionLink: 'Get help',
-      blockButton__emailLink: 'Send link to {{identifier}}',
-      blockButton__emailCode: 'Send code to {{identifier}}',
-      blockButton__phoneCode: 'Send code to {{identifier}}',
+      blockButton__emailLink: 'Email link to {{identifier}}',
+      blockButton__emailCode: 'Email code to {{identifier}}',
+      blockButton__phoneCode: 'Send SMS code to {{identifier}}',
       blockButton__password: 'Sign in with your password',
       blockButton__totp: 'Use your authenticator app',
       blockButton__backupCode: 'Use a backup code',
