@@ -2,7 +2,7 @@ import type { SignInFactor } from '@clerk/types';
 import React from 'react';
 
 import type { LocalizationKey } from '../../customizables';
-import { descriptors, Flex, Flow, Icon, localizationKeys } from '../../customizables';
+import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import { ArrowBlockButton, Card, CardAlert, Footer, Header } from '../../elements';
 import { useCardState } from '../../elements/contexts';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
@@ -56,7 +56,7 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
           >
             {firstPartyFactors.map((factor, i) => (
               <ArrowBlockButton
-                icon={getButtonIcon(factor)}
+                leftIcon={getButtonIcon(factor)}
                 textLocalizationKey={getButtonLabel(factor)}
                 elementDescriptor={descriptors.alternativeMethodsBlockButton}
                 textElementDescriptor={descriptors.alternativeMethodsBlockButtonText}
@@ -117,18 +117,5 @@ export function getButtonIcon(factor: SignInFactor) {
     password: LockClosedIcon,
   } as const;
 
-  const icon = icons[factor.strategy as keyof typeof icons];
-
-  if (!icon) {
-    return undefined;
-  }
-
-  return (
-    <Icon
-      icon={icon}
-      sx={theme => ({
-        color: theme.colors.$blackAlpha600,
-      })}
-    />
-  );
+  return icons[factor.strategy as keyof typeof icons];
 }

@@ -45,7 +45,7 @@ const ForgotPasswordAlternativeMethodsList = (props: AlternativeMethodListProps)
           gap={6}
         >
           <ArrowBlockButton
-            icon={getButtonIcon(resetPasswordFactor)}
+            leftIcon={getButtonIcon(resetPasswordFactor)}
             textLocalizationKey={getButtonLabel(resetPasswordFactor)}
             elementDescriptor={descriptors.alternativeMethodsBlockButton}
             textElementDescriptor={descriptors.alternativeMethodsBlockButtonText}
@@ -69,7 +69,7 @@ const ForgotPasswordAlternativeMethodsList = (props: AlternativeMethodListProps)
                 />
                 {firstPartyFactors.map((factor, i) => (
                   <ArrowBlockButton
-                    icon={getButtonIcon(factor)}
+                    leftIcon={getButtonIcon(factor)}
                     textLocalizationKey={getButtonLabel(factor)}
                     elementDescriptor={descriptors.alternativeMethodsBlockButton}
                     textElementDescriptor={descriptors.alternativeMethodsBlockButtonText}

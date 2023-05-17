@@ -7,9 +7,16 @@ import { ArrowRightIcon } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 
 type ArrowBlockButtonProps = PropsOfComponent<typeof Button> & {
+  /**
+   * @deprecated use leftIcon and leftIconSx instead
+   */
   icon?: React.ReactElement;
   rightIcon?: React.ComponentType;
   rightIconSx?: ThemableCssProp;
+  leftIcon?: React.ComponentType;
+  leftIconSx?: ThemableCssProp;
+  leftIconElementDescriptor?: ElementDescriptor;
+  leftIconElementId?: ElementId;
   badge?: React.ReactElement;
   textElementDescriptor?: ElementDescriptor;
   textElementId?: ElementId;
@@ -24,6 +31,10 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
   const {
     rightIcon = ArrowRightIcon,
     rightIconSx,
+    leftIcon,
+    leftIconSx,
+    leftIconElementId,
+    leftIconElementDescriptor,
     isLoading,
     icon,
     children,
@@ -38,10 +49,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
     ...rest
   } = props;
 
-  // TODO: Replace this with a simple Icon prop like left icon
-  // This was implemented this way to allow for setting its descriptor
-  // from the outside, but we can use `leftIconDescriptor` pattern instead
-  const leftIcon = icon
+  const deprecatedleftIcon = icon
     ? React.cloneElement(icon, {
         sx: [
           icon.props.sx,
@@ -76,7 +84,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
         props.sx,
       ]}
     >
-      {(leftIcon || isLoading) && (
+      {(deprecatedleftIcon || isLoading || leftIcon) && (
         <Flex
           as='span'
           center
@@ -89,8 +97,22 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
               sx={{ position: 'absolute' }}
               size={'sm'}
             />
+          ) : leftIcon ? (
+            <Icon
+              elementDescriptor={leftIconElementDescriptor}
+              elementId={leftIconElementId}
+              icon={leftIcon}
+              sx={[
+                theme => ({
+                  color: theme.colors.$blackAlpha600,
+                  width: theme.sizes.$4,
+                  position: 'absolute',
+                }),
+                leftIconSx,
+              ]}
+            />
           ) : (
-            leftIcon
+            deprecatedleftIcon
           )}
         </Flex>
       )}
@@ -136,5 +158,3 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
     </SimpleButton>
   );
 };
-
-// const;
