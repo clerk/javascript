@@ -2,10 +2,11 @@ import type { SignInFactor } from '@clerk/types';
 import React from 'react';
 
 import type { LocalizationKey } from '../../customizables';
-import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
+import { descriptors, Flex, Flow, Icon, localizationKeys } from '../../customizables';
 import { ArrowBlockButton, Card, CardAlert, Footer, Header } from '../../elements';
 import { useCardState } from '../../elements/contexts';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
+import { ChatAltIcon, Email, LinkIcon, LockClosedIcon, RequestAuthIcon } from '../../icons';
 import { formatSafeIdentifier } from '../../utils';
 import { SignInSocialButtons } from './SignInSocialButtons';
 import { withHavingTrouble } from './withHavingTrouble';
@@ -55,6 +56,7 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
           >
             {firstPartyFactors.map((factor, i) => (
               <ArrowBlockButton
+                icon={getButtonIcon(factor)}
                 textLocalizationKey={getButtonLabel(factor)}
                 elementDescriptor={descriptors.alternativeMethodsBlockButton}
                 textElementDescriptor={descriptors.alternativeMethodsBlockButtonText}
@@ -103,4 +105,30 @@ export function getButtonLabel(factor: SignInFactor): LocalizationKey {
     default:
       throw `Invalid sign in strategy: "${factor.strategy}"`;
   }
+}
+
+export function getButtonIcon(factor: SignInFactor) {
+  const icons = {
+    email_link: LinkIcon,
+    email_code: Email,
+    phone_code: ChatAltIcon,
+    reset_password_email_code: RequestAuthIcon,
+    reset_password_phone_code: RequestAuthIcon,
+    password: LockClosedIcon,
+  } as const;
+
+  const icon = icons[factor.strategy as keyof typeof icons];
+
+  if (!icon) {
+    return undefined;
+  }
+
+  return (
+    <Icon
+      icon={icon}
+      sx={theme => ({
+        color: theme.colors.$blackAlpha600,
+      })}
+    />
+  );
 }
