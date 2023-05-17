@@ -1,4 +1,4 @@
-import { camelToSnake, runWithExponentialBackOff } from '@clerk/shared';
+import { camelToSnake, isBrowserOnline, runWithExponentialBackOff } from '@clerk/shared';
 import type { Clerk, ClerkAPIErrorJSON, ClientJSON } from '@clerk/types';
 import qs from 'qs';
 
@@ -203,9 +203,11 @@ export default function createFapiClient(clerkInstance: Clerk): FapiClient {
           // retry only on GET requests for safety
           overwrittenRequestMethod === 'GET'
             ? await runWithExponentialBackOff(() => fetch(urlStr, fetchOpts), {
-                maxRetries: 6,
                 firstDelay: 500,
-                maxDelay: 5000,
+                maxDelay: 3000,
+                shouldRetry: (_: unknown, iterationsCount: number) => {
+                  return !isBrowserOnline() || iterationsCount < 4;
+                },
               })
             : await fetch(urlStr, fetchOpts);
       } else {
