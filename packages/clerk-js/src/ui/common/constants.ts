@@ -96,6 +96,19 @@ export function getWeb3ProviderData(name: Web3Provider): Web3ProviderData | unde
   return WEB3_PROVIDERS[name];
 }
 
+/**
+ * Returns the URL for a static SVG image
+ * using the old images.clerk.com service
+ * @deprecated In favor of iconImageUrl
+ */
 export function svgUrl(id: string): string {
   return `https://images.clerk.com/static/${id}.svg`;
+}
+
+/**
+ * Returns the URL for a static SVG image
+ * using the new img.clerk.com service
+ */
+export function iconImageUrl(id: string): string {
+  return `https://img.clerk.com/static/${id}.svg`;
 }
