@@ -3,7 +3,7 @@ import { ArrowBlockButton, Card, CardAlert, Footer, Header } from '../../element
 import { useCardState } from '../../elements/contexts';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import type { AlternativeMethodListProps, AlternativeMethodsProps } from './AlternativeMethods';
-import { getButtonLabel } from './AlternativeMethods';
+import { getButtonIcon, getButtonLabel } from './AlternativeMethods';
 import { SignInSocialButtons } from './SignInSocialButtons';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
 import { withHavingTrouble } from './withHavingTrouble';
@@ -45,6 +45,7 @@ const ForgotPasswordAlternativeMethodsList = (props: AlternativeMethodListProps)
           gap={6}
         >
           <ArrowBlockButton
+            icon={getButtonIcon(resetPasswordFactor)}
             textLocalizationKey={getButtonLabel(resetPasswordFactor)}
             elementDescriptor={descriptors.alternativeMethodsBlockButton}
             textElementDescriptor={descriptors.alternativeMethodsBlockButtonText}
@@ -68,6 +69,7 @@ const ForgotPasswordAlternativeMethodsList = (props: AlternativeMethodListProps)
                 />
                 {firstPartyFactors.map((factor, i) => (
                   <ArrowBlockButton
+                    icon={getButtonIcon(factor)}
                     textLocalizationKey={getButtonLabel(factor)}
                     elementDescriptor={descriptors.alternativeMethodsBlockButton}
                     textElementDescriptor={descriptors.alternativeMethodsBlockButtonText}
