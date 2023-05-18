@@ -175,13 +175,20 @@ export default (QUnit: QUnit) => {
     });
 
     test('executes a successful backend API request to delete a domain', async assert => {
-      fakeFetch = sinon.stub(runtime, 'fetch');
-      fakeFetch.onCall(0).returns(jsonOk({}, 204));
+      const domainId = 'dmn_123';
+      const fakeResponse = {
+        object: 'domain',
+        id: domainId,
+        deleted: true,
+      };
 
-      await apiClient.domains.deleteDomain('123123123');
+      fakeFetch = sinon.stub(runtime, 'fetch');
+      fakeFetch.onCall(0).returns(jsonOk(fakeResponse, 204));
+
+      await apiClient.domains.deleteDomain(domainId);
 
       assert.ok(
-        fakeFetch.calledOnceWith('https://api.clerk.test/v1/domains/123123123', {
+        fakeFetch.calledOnceWith(`https://api.clerk.test/v1/domains/${domainId}`, {
           method: 'DELETE',
           headers: {
             Authorization: 'Bearer deadbeef',

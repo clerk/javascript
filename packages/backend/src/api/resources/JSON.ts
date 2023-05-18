@@ -302,8 +302,3 @@ export interface DeletedObjectJSON {
   slug?: string;
   deleted: boolean;
 }
-
-export interface DomainJSON {
-  id: string;
-  name: string;
-}

@@ -1,6 +1,5 @@
 export * from './AllowlistIdentifier';
 export * from './Client';
-export * from './Domains';
 export * from './DeletedObject';
 export * from './Deserializer';
 export * from './Email';
