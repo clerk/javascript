@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { isDefaultProfileImage } from '../../../utils/user';
+import { isDefaultImage } from '../../../utils';
 import { useWizard, Wizard } from '../../common';
 import { useCoreUser, useEnvironment, useOptions } from '../../contexts';
 import { localizationKeys } from '../../customizables';
@@ -89,7 +89,7 @@ export const ProfilePage = withCardStateProvider(() => {
             user={user}
             onAvatarChange={uploadAvatar}
             onAvatarRemove={
-              !isDefaultProfileImage(experimental_enableClerkImages ? user.experimental_imageUrl : user.profileImageUrl)
+              !isDefaultImage(experimental_enableClerkImages ? user.experimental_imageUrl : user.profileImageUrl)
                 ? onAvatarRemove
                 : null
             }
