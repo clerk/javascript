@@ -47,7 +47,7 @@ export const ptBR: LocalizationResource = {
   formFieldInputPlaceholder__lastName: '',
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__organizationName: '',
-  formFieldAction__forgotPassword: 'Esqueceu a senha',
+  formFieldAction__forgotPassword: 'Esqueceu a senha?',
   formFieldHintText__optional: 'Opcional',
   formButtonPrimary: 'Continuar',
   signInEnterPasswordTitle: 'Insira sua senha',

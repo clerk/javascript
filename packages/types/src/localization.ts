@@ -156,6 +156,11 @@ type _LocalizationResource = {
       subtitle: LocalizationValue;
       actionLink: LocalizationValue;
     };
+    forgotPasswordAlternativeMethods: {
+      title: LocalizationValue;
+      label__alternativeMethods: LocalizationValue;
+      blockButton__resetPassword: LocalizationValue;
+    };
     forgotPassword: {
       title_email: LocalizationValue;
       title_phone: LocalizationValue;

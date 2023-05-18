@@ -486,7 +486,7 @@ export interface ClerkOptions {
   signUpUrl?: string;
   afterSignInUrl?: string;
   afterSignUpUrl?: string;
-  allowedRedirectOrigins?: string[];
+  allowedRedirectOrigins?: Array<string | RegExp>;
   /**
    * @experimental
    */

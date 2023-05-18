@@ -48,7 +48,7 @@ export const itIT: LocalizationResource = {
   formFieldInputPlaceholder__lastName: '',
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__organizationName: '',
-  formFieldAction__forgotPassword: 'Password dimenticata',
+  formFieldAction__forgotPassword: 'Password dimenticata?',
   formFieldHintText__optional: 'Opzionale',
   formButtonPrimary: 'Continua',
   signInEnterPasswordTitle: 'Inserisci la tua password',

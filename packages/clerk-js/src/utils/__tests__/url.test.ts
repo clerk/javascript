@@ -399,7 +399,7 @@ describe('getETLDPlusOneFromFrontendApi(frontendAp: string)', () => {
 });
 
 fdescribe('isAllowedRedirectOrigin', () => {
-  const cases: [string, string[] | undefined, boolean][] = [
+  const cases: [string, Array<string | RegExp> | undefined, boolean][] = [
     // base cases
     ['https://clerk.com', ['https://www.clerk.com'], false],
     ['https://www.clerk.com', ['https://www.clerk.com'], true],
@@ -410,6 +410,7 @@ fdescribe('isAllowedRedirectOrigin', () => {
     ['https://www.clerk.com/', ['https://www.clerk.com'], true],
     ['https://www.clerk.com', ['https://www.clerk.com'], true],
     ['https://www.clerk.com/test', ['https://www.clerk.com'], true],
+    ['https://www.clerk.com/test', ['https://www.clerk.com/'], true],
     // multiple origins
     ['https://www.clerk.com', ['https://www.test.dev', 'https://www.clerk.com'], true],
     // relative urls
@@ -422,6 +423,12 @@ fdescribe('isAllowedRedirectOrigin', () => {
     ['https://www.clerk.com/', [], false],
     //undefined origins
     ['https://www.clerk.com/', undefined, true],
+    // query params
+    ['https://www.clerk.com/foo?hello=1', ['https://www.clerk.com'], true],
+    ['https://www.clerk.com/foo?hello=1', ['https://www.clerk.com/'], true],
+    // regexp
+    ['https://www.clerk.com/foo?hello=1', [/https:\/\/www\.clerk\.com/], true],
+    ['https://test.clerk.com/foo?hello=1', [/https:\/\/www\.clerk\.com/], false],
   ];
 
   test.each(cases)('isAllowedRedirectOrigin("%s","%s") === %s', (url, allowedOrigins, expected) => {

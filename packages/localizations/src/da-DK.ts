@@ -50,7 +50,7 @@ export const daDK: LocalizationResource = {
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__organizationName: '',
   formFieldInputPlaceholder__organizationSlug: '',
-  formFieldAction__forgotPassword: 'Glemt adgangskode',
+  formFieldAction__forgotPassword: 'Glemt adgangskode?',
   formFieldHintText__optional: 'Valgfri',
   formButtonPrimary: 'Fortsæt',
   signInEnterPasswordTitle: 'Indtast din adgangskode',

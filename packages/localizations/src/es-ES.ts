@@ -48,7 +48,7 @@ export const esES: LocalizationResource = {
   formFieldInputPlaceholder__lastName: '',
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__organizationName: '',
-  formFieldAction__forgotPassword: 'Has olvidado tu contraseña',
+  formFieldAction__forgotPassword: 'Has olvidado tu contraseña?',
   formFieldHintText__optional: 'Opcional',
   formButtonPrimary: 'Continuar',
   signInEnterPasswordTitle: 'Ingresa tu contraseña',

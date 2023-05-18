@@ -136,13 +136,13 @@ describe('SignInFactorOne', () => {
           });
         });
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
-        await userEvent.click(screen.getByText('Forgot password'));
+        await userEvent.click(screen.getByText(/Forgot password/i));
         screen.getByText('Use another method');
-        screen.getByText(`Send code to ${email}`);
+        screen.getByText(`Email code to ${email}`);
         expect(screen.queryByText('Sign in with your password')).not.toBeInTheDocument();
       });
 
-      it('should render the Forgot Password component when clicking on "Forgot password" (email)', async () => {
+      it('should render the Forgot Password alternative methods component when clicking on "Forgot password" (email)', async () => {
         const { wrapper, fixtures } = await createFixtures(f => {
           f.withEmailAddress();
           f.withPassword();
@@ -156,7 +156,9 @@ describe('SignInFactorOne', () => {
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
 
         fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
-        await userEvent.click(screen.getByText('Forgot password'));
+        await userEvent.click(screen.getByText(/Forgot password/i));
+        screen.getByText('Forgot Password?');
+        await userEvent.click(screen.getByText('Reset your password'));
         screen.getByText('Check your email');
         screen.getByText('to reset your password');
       });
@@ -202,8 +204,10 @@ describe('SignInFactorOne', () => {
         });
         fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
-        await userEvent.click(screen.getByText('Forgot password'));
+        await userEvent.click(screen.getByText(/Forgot password/i));
+        screen.getByText('Forgot Password?');
 
+        await userEvent.click(screen.getByText('Reset your password'));
         screen.getByText('Check your phone');
         screen.getByText('Reset password code');
       });
@@ -224,7 +228,8 @@ describe('SignInFactorOne', () => {
           Promise.resolve({ status: 'needs_new_password' } as SignInResource),
         );
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
-        await userEvent.click(screen.getByText('Forgot password'));
+        await userEvent.click(screen.getByText(/Forgot password/i));
+        await userEvent.click(screen.getByText('Reset your password'));
         await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
         expect(fixtures.signIn.attemptFirstFactor).toHaveBeenCalledWith({
           strategy: 'reset_password_email_code',
@@ -250,7 +255,8 @@ describe('SignInFactorOne', () => {
           Promise.resolve({ status: 'needs_new_password' } as SignInResource),
         );
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
-        await userEvent.click(screen.getByText('Forgot password'));
+        await userEvent.click(screen.getByText(/Forgot password/i));
+        await userEvent.click(screen.getByText('Reset your password'));
         await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
         expect(fixtures.signIn.attemptFirstFactor).toHaveBeenCalledWith({
           strategy: 'reset_password_phone_code',
@@ -484,8 +490,8 @@ describe('SignInFactorOne', () => {
 
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
-      screen.getByText(`Send code to ${email}`);
-      screen.getByText(`Send link to ${email}`);
+      screen.getByText(`Email code to ${email}`);
+      screen.getByText(`Email link to ${email}`);
       expect(screen.queryByText(`Sign in with your password`)).not.toBeInTheDocument();
     });
 
@@ -589,8 +595,8 @@ describe('SignInFactorOne', () => {
       );
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
-      screen.getByText(`Send link to ${email}`);
-      await userEvent.click(screen.getByText(`Send link to ${email}`));
+      screen.getByText(`Email link to ${email}`);
+      await userEvent.click(screen.getByText(`Email link to ${email}`));
       screen.getByText('Check your email');
       screen.getByText('Verification link');
     });
@@ -610,8 +616,8 @@ describe('SignInFactorOne', () => {
       } as any);
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
-      screen.getByText(`Send code to ${email}`);
-      await userEvent.click(screen.getByText(`Send code to ${email}`));
+      screen.getByText(`Email code to ${email}`);
+      await userEvent.click(screen.getByText(`Email code to ${email}`));
       screen.getByText('Check your email');
       screen.getByText('Verification code');
     });
@@ -630,8 +636,8 @@ describe('SignInFactorOne', () => {
       } as any);
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
-      screen.getByText(/Send code to \+/);
-      await userEvent.click(screen.getByText(/Send code to \+/));
+      screen.getByText(/code to \+/);
+      await userEvent.click(screen.getByText(/code to \+/));
       screen.getByText('Check your phone');
     });
 
