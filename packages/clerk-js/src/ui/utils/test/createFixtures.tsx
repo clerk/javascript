@@ -4,7 +4,7 @@ import React from 'react';
 
 import { default as ClerkCtor } from '../../../core/clerk';
 import { Client, Environment } from '../../../core/resources';
-import { ComponentContext, CoreClerkContextWrapper, EnvironmentProvider, OptionsProvider } from '../../contexts';
+import { ComponentContext, CoreClerkContextWrapper, OptionsProvider } from '../../contexts';
 import { AppearanceProvider } from '../../customizables';
 import { FlowMetadataProvider } from '../../elements';
 import { RouteContext } from '../../router';
@@ -85,21 +85,21 @@ const unboundCreateFixtures = <N extends UnpackContext<typeof ComponentContext>[
       const { children } = props;
       return (
         <CoreClerkContextWrapper clerk={clerkMock}>
-          <EnvironmentProvider value={environmentMock}>
-            <OptionsProvider value={optionsMock}>
-              <RouteContext.Provider value={routerMock}>
-                <AppearanceProvider appearanceKey={'signIn'}>
-                  <FlowMetadataProvider flow={componentName as any}>
-                    <InternalThemeProvider>
-                      <ComponentContext.Provider value={{ ...componentContextProps, componentName }}>
-                        {children}
-                      </ComponentContext.Provider>
-                    </InternalThemeProvider>
-                  </FlowMetadataProvider>
-                </AppearanceProvider>
-              </RouteContext.Provider>
-            </OptionsProvider>
-          </EnvironmentProvider>
+          {/*<EnvironmentProvider value={environmentMock}>*/}
+          <OptionsProvider value={optionsMock}>
+            <RouteContext.Provider value={routerMock}>
+              <AppearanceProvider appearanceKey={'signIn'}>
+                <FlowMetadataProvider flow={componentName as any}>
+                  <InternalThemeProvider>
+                    <ComponentContext.Provider value={{ ...componentContextProps, componentName }}>
+                      {children}
+                    </ComponentContext.Provider>
+                  </InternalThemeProvider>
+                </FlowMetadataProvider>
+              </AppearanceProvider>
+            </RouteContext.Provider>
+          </OptionsProvider>
+          {/*</EnvironmentProvider>*/}
         </CoreClerkContextWrapper>
       );
     };
