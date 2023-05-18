@@ -31,7 +31,6 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
     organization: clerk.organization,
     lastOrganizationInvitation: null,
     lastOrganizationMember: null,
-    environment: clerk.__unstable__environment,
   });
 
   React.useEffect(() => {
@@ -41,7 +40,7 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
   const derivedState = deriveState(clerkLoaded, state, initialState);
   const clerkCtx = React.useMemo(() => ({ value: clerk }), [clerkLoaded]);
   const clientCtx = React.useMemo(() => ({ value: state.client }), [state.client]);
-  const envCtx = React.useMemo(() => ({ value: state.environment }), [state.environment]);
+  const envCtx = React.useMemo(() => ({ value: clerk.__unstable__environment }), [clerk.__unstable__environment]);
 
   const {
     sessionId,

@@ -589,6 +589,7 @@ export default class Clerk implements ClerkInterface {
         organization: this.organization,
         lastOrganizationInvitation: this.#lastOrganizationInvitation,
         lastOrganizationMember: this.#lastOrganizationMember,
+        environment: this.#environment,
       });
     }
 

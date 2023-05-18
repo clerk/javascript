@@ -3,6 +3,7 @@ import React from 'react';
 
 import { CoreClerkContext } from './CoreClerkContext';
 import { CoreClientContext } from './CoreClientContext';
+import { CoreEnvironmentContext } from './CoreEnvironmentContext';
 import { CoreOrganizationContext } from './CoreOrganizationContext';
 import { CoreSessionContext } from './CoreSessionContext';
 import { CoreUserContext } from './CoreUserContext';
@@ -33,6 +34,10 @@ export function CoreClerkContextWrapper(props: CoreClerkContextWrapperProps): JS
 
   const { client, session, user, organization } = state;
   const clerkCtx = React.useMemo(() => ({ value: clerk }), []);
+  const envCtx = React.useMemo(
+    () => ({ value: (clerk as any).__unstable__environment }),
+    [(clerk as any).__unstable__environment],
+  );
   const clientCtx = React.useMemo(() => ({ value: client }), [client]);
   const sessionCtx = React.useMemo(() => ({ value: session }), [session]);
   const userCtx = React.useMemo(() => ({ value: user }), [user]);
@@ -49,13 +54,15 @@ export function CoreClerkContextWrapper(props: CoreClerkContextWrapperProps): JS
 
   return (
     <CoreClerkContext.Provider value={clerkCtx}>
-      <CoreClientContext.Provider value={clientCtx}>
-        <CoreSessionContext.Provider value={sessionCtx}>
-          <CoreOrganizationContext.Provider value={organizationCtx}>
-            <CoreUserContext.Provider value={userCtx}>{props.children}</CoreUserContext.Provider>
-          </CoreOrganizationContext.Provider>
-        </CoreSessionContext.Provider>
-      </CoreClientContext.Provider>
+      <CoreEnvironmentContext.Provider value={envCtx}>
+        <CoreClientContext.Provider value={clientCtx}>
+          <CoreSessionContext.Provider value={sessionCtx}>
+            <CoreOrganizationContext.Provider value={organizationCtx}>
+              <CoreUserContext.Provider value={userCtx}>{props.children}</CoreUserContext.Provider>
+            </CoreOrganizationContext.Provider>
+          </CoreSessionContext.Provider>
+        </CoreClientContext.Provider>
+      </CoreEnvironmentContext.Provider>
     </CoreClerkContext.Provider>
   );
 }

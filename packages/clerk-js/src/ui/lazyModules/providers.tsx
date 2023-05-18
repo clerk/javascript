@@ -7,7 +7,6 @@ import type { ClerkComponentName } from './components';
 import { ClerkComponents } from './components';
 
 const CoreClerkContextWrapper = lazy(() => import('../contexts').then(m => ({ default: m.CoreClerkContextWrapper })));
-const EnvironmentProvider = lazy(() => import('../contexts').then(m => ({ default: m.EnvironmentProvider })));
 const OptionsProvider = lazy(() => import('../contexts').then(m => ({ default: m.OptionsProvider })));
 const AppearanceProvider = lazy(() => import('../customizables').then(m => ({ default: m.AppearanceProvider })));
 const VirtualRouter = lazy(() => import('../router').then(m => ({ default: m.VirtualRouter })));
@@ -21,9 +20,7 @@ type LazyProvidersProps = React.PropsWithChildren<{ clerk: any; environment: any
 export const LazyProviders = (props: LazyProvidersProps) => {
   return (
     <CoreClerkContextWrapper clerk={props.clerk}>
-      <EnvironmentProvider value={props.environment}>
-        <OptionsProvider value={props.options}>{props.children}</OptionsProvider>
-      </EnvironmentProvider>
+      <OptionsProvider value={props.options}>{props.children}</OptionsProvider>
     </CoreClerkContextWrapper>
   );
 };
