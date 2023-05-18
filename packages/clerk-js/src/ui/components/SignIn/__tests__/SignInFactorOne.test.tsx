@@ -138,6 +138,7 @@ describe('SignInFactorOne', () => {
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
         await userEvent.click(screen.getByText(/Forgot password/i));
         screen.getByText('Use another method');
+        expect(screen.queryByText('Or, sign in with another method.')).not.toBeInTheDocument();
         screen.getByText(`Email code to ${email}`);
         expect(screen.queryByText('Sign in with your password')).not.toBeInTheDocument();
       });
@@ -158,6 +159,7 @@ describe('SignInFactorOne', () => {
         fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
         await userEvent.click(screen.getByText(/Forgot password/i));
         screen.getByText('Forgot Password?');
+        screen.getByText('Or, sign in with another method.');
         await userEvent.click(screen.getByText('Reset your password'));
         screen.getByText('Check your email');
         screen.getByText('to reset your password');

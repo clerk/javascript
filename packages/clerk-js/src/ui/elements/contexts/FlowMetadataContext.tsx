@@ -23,6 +23,7 @@ type FlowMetadata = {
     | 'emailLinkVerify'
     | 'emailLinkStatus'
     | 'alternativeMethods'
+    | 'forgotPasswordMethods'
     | 'havingTrouble'
     | 'ssoCallback'
     | 'popover'
