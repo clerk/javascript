@@ -54,14 +54,14 @@ describe('ResetPassword', () => {
       await userEvent.click(screen.getByRole('button', { name: /Reset Password/i }));
       expect(fixtures.signIn.resetPassword).toHaveBeenCalledWith({
         password: 'testtest',
-        signOutOfOtherSessions: false,
+        signOutOfOtherSessions: true,
       });
       expect(fixtures.router.navigate).toHaveBeenCalledWith(
         '../reset-password-success?createdSessionId=1234_session_id',
       );
     });
 
-    it('resets the password, does not require MFA and signs out of sessions', async () => {
+    it('resets the password, does not require MFA and leaves sessions intact', async () => {
       const { wrapper, fixtures } = await createFixtures();
       fixtures.signIn.resetPassword.mockResolvedValue({
         status: 'complete',
@@ -75,7 +75,7 @@ describe('ResetPassword', () => {
       await userEvent.click(screen.getByRole('button', { name: /Reset Password/i }));
       expect(fixtures.signIn.resetPassword).toHaveBeenCalledWith({
         password: 'testtest',
-        signOutOfOtherSessions: true,
+        signOutOfOtherSessions: false,
       });
       expect(fixtures.router.navigate).toHaveBeenCalledWith(
         '../reset-password-success?createdSessionId=1234_session_id',

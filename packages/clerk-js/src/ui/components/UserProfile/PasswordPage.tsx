@@ -67,6 +67,7 @@ export const PasswordPage = withCardStateProvider(() => {
   const sessionsField = useFormControl('signOutOfOtherSessions', '', {
     type: 'checkbox',
     label: localizationKeys('formFieldLabel__signOutOfOtherSessions'),
+    defaultChecked: true,
   });
 
   const { displayConfirmPasswordFeedback, isPasswordMatch } = useConfirmPassword({

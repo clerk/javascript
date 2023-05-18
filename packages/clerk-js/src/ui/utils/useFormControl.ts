@@ -13,7 +13,7 @@ type Options = {
   label: string | LocalizationKey;
   placeholder?: string | LocalizationKey;
   options?: SelectOption[];
-  checked?: boolean;
+  defaultChecked?: boolean;
   enableErrorAfterBlur?: boolean;
   informationText?: string;
 } & (
@@ -33,6 +33,7 @@ type FieldStateProps<Id> = {
   id: Id;
   name: Id;
   value: string;
+  checked?: boolean;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
   onBlur: React.FocusEventHandler<HTMLInputElement>;
   onFocus: React.FocusEventHandler<HTMLInputElement>;
@@ -67,11 +68,12 @@ export const useFormControl = <Id extends string>(
     options: [],
     enableErrorAfterBlur: false,
     informationText: '',
+    defaultChecked: false,
   };
 
   const { translateError } = useLocalizations();
   const [value, setValueInternal] = React.useState<string>(initialState);
-  const [checked, setCheckedInternal] = React.useState<boolean>(opts?.checked || false);
+  const [checked, setCheckedInternal] = React.useState<boolean>(opts?.defaultChecked || false);
   const [errorText, setErrorText] = React.useState<string | undefined>(undefined);
   const [warningText, setWarningText] = React.useState('');
   const [successfulText, setSuccessfulText] = React.useState('');

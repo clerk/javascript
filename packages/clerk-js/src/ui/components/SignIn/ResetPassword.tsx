@@ -38,6 +38,7 @@ export const _ResetPassword = () => {
   const sessionsField = useFormControl('signOutOfOtherSessions', '', {
     type: 'checkbox',
     label: localizationKeys('formFieldLabel__signOutOfOtherSessions'),
+    defaultChecked: true,
   });
 
   const { displayConfirmPasswordFeedback, isPasswordMatch } = useConfirmPassword({
