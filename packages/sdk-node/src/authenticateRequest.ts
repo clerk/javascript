@@ -9,15 +9,16 @@ const parseCookies = (req: IncomingMessage) => {
   return cookie.parse(req.headers['cookie'] || '');
 };
 
-export const authenticateRequest = (
-  clerkClient: ReturnType<typeof Clerk>,
-  apiKey: string,
-  secretKey: string,
-  frontendApi: string,
-  publishableKey: string,
-  req: IncomingMessage,
-  options?: ClerkMiddlewareOptions,
-) => {
+export const authenticateRequest = (opts: {
+  clerkClient: ReturnType<typeof Clerk>;
+  apiKey: string;
+  secretKey: string;
+  frontendApi: string;
+  publishableKey: string;
+  req: IncomingMessage;
+  options?: ClerkMiddlewareOptions;
+}) => {
+  const { clerkClient, apiKey, secretKey, frontendApi, publishableKey, req, options } = opts;
   const cookies = parseCookies(req);
   const { jwtKey, authorizedParties } = options || {};
   return clerkClient.authenticateRequest({

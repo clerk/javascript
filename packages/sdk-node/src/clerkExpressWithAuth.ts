@@ -11,7 +11,7 @@ export const createClerkExpressWithAuth = (createOpts: CreateClerkExpressMiddlew
   const { clerkClient, frontendApi = '', apiKey = '', secretKey = '', publishableKey = '' } = createOpts;
   return (options: ClerkMiddlewareOptions = {}): MiddlewareWithAuthProp => {
     return async (req, res, next) => {
-      const requestState = await authenticateRequest(
+      const requestState = await authenticateRequest({
         clerkClient,
         apiKey,
         secretKey,
@@ -19,7 +19,7 @@ export const createClerkExpressWithAuth = (createOpts: CreateClerkExpressMiddlew
         publishableKey,
         req,
         options,
-      );
+      });
       decorateResponseWithObservabilityHeaders(res, requestState);
       if (requestState.isUnknown) {
         return handleUnknownCase(res, requestState);
