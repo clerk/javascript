@@ -395,7 +395,7 @@ describe('SignInFactorTwo', () => {
       fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
       const { userEvent } = render(<SignInFactorTwo />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
-      screen.getByText(/Email code to \+/i);
+      screen.getByText(/Send SMS code to \+/i);
       screen.getByText(/Use a backup code/i);
       screen.getByText(/Authenticator/i);
     });
@@ -414,7 +414,7 @@ describe('SignInFactorTwo', () => {
       fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
       const { userEvent } = render(<SignInFactorTwo />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
-      await userEvent.click(screen.getByText(/Email code to \+/i));
+      await userEvent.click(screen.getByText(/Send SMS code to \+/i));
       screen.getByText(/Check your phone/i);
     });
     it('shows the Authenticator app screen when clicking the Authenticator app method', async () => {
