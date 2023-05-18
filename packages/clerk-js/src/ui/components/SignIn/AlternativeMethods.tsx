@@ -2,19 +2,21 @@ import type { SignInFactor } from '@clerk/types';
 import React from 'react';
 
 import type { LocalizationKey } from '../../customizables';
-import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
+import { descriptors, Flex, Flow, localizationKeys, Text } from '../../customizables';
 import { ArrowBlockButton, Card, CardAlert, Footer, Header } from '../../elements';
 import { useCardState } from '../../elements/contexts';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { ChatAltIcon, Email, LinkIcon, LockClosedIcon, RequestAuthIcon } from '../../icons';
 import { formatSafeIdentifier } from '../../utils';
 import { SignInSocialButtons } from './SignInSocialButtons';
+import { useResetPasswordFactor } from './useResetPasswordFactor';
 import { withHavingTrouble } from './withHavingTrouble';
 
 export type AlternativeMethodsProps = {
   onBackLinkClick: React.MouseEventHandler | undefined;
   onFactorSelected: (factor: SignInFactor) => void;
   currentFactor: SignInFactor | undefined | null;
+  asForgotPassword?: boolean;
 };
 
 export type AlternativeMethodListProps = AlternativeMethodsProps & { onHavingTroubleClick: React.MouseEventHandler };
@@ -26,47 +28,75 @@ export const AlternativeMethods = (props: AlternativeMethodsProps) => {
 };
 
 const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
-  const { onBackLinkClick, onHavingTroubleClick, onFactorSelected } = props;
+  const { onBackLinkClick, onHavingTroubleClick, onFactorSelected, asForgotPassword = false } = props;
   const card = useCardState();
-  const { firstPartyFactors } = useAlternativeStrategies({
+  const resetPasswordFactor = useResetPasswordFactor();
+  const { firstPartyFactors, hasAnyStrategy } = useAlternativeStrategies({
     filterOutFactor: props?.currentFactor,
   });
+
   return (
-    <Flow.Part part='alternativeMethods'>
+    <Flow.Part part={asForgotPassword ? 'forgotPasswordMethods' : 'alternativeMethods'}>
       <Card>
         <CardAlert>{card.error}</CardAlert>
         <Header.Root>
           {onBackLinkClick && <Header.BackLink onClick={onBackLinkClick} />}
-          <Header.Title localizationKey={localizationKeys('signIn.alternativeMethods.title')} />
+          <Header.Title
+            localizationKey={localizationKeys(
+              asForgotPassword ? 'signIn.forgotPasswordAlternativeMethods.title' : 'signIn.alternativeMethods.title',
+            )}
+          />
         </Header.Root>
         {/*TODO: extract main in its own component */}
         <Flex
           direction='col'
           elementDescriptor={descriptors.main}
-          gap={8}
+          gap={6}
         >
-          <SignInSocialButtons
-            enableWeb3Providers
-            enableOAuthProviders
-          />
-          <Flex
-            elementDescriptor={descriptors.alternativeMethods}
-            direction='col'
-            gap={2}
-          >
-            {firstPartyFactors.map((factor, i) => (
-              <ArrowBlockButton
-                leftIcon={getButtonIcon(factor)}
-                textLocalizationKey={getButtonLabel(factor)}
-                elementDescriptor={descriptors.alternativeMethodsBlockButton}
-                textElementDescriptor={descriptors.alternativeMethodsBlockButtonText}
-                arrowElementDescriptor={descriptors.alternativeMethodsBlockButtonArrow}
-                key={i}
-                isDisabled={card.isLoading}
-                onClick={() => onFactorSelected(factor)}
-              />
-            ))}
-          </Flex>
+          {asForgotPassword && resetPasswordFactor && (
+            <ArrowBlockButton
+              leftIcon={getButtonIcon(resetPasswordFactor)}
+              textLocalizationKey={getButtonLabel(resetPasswordFactor)}
+              elementDescriptor={descriptors.alternativeMethodsBlockButton}
+              textElementDescriptor={descriptors.alternativeMethodsBlockButtonText}
+              arrowElementDescriptor={descriptors.alternativeMethodsBlockButtonArrow}
+              isDisabled={card.isLoading}
+              onClick={() => onFactorSelected(resetPasswordFactor)}
+            />
+          )}
+          {hasAnyStrategy && (
+            <>
+              {asForgotPassword && (
+                <Text
+                  localizationKey={localizationKeys(
+                    'signIn.forgotPasswordAlternativeMethods.label__alternativeMethods',
+                  )}
+                />
+              )}
+              <Flex
+                elementDescriptor={descriptors.alternativeMethods}
+                direction='col'
+                gap={2}
+              >
+                <SignInSocialButtons
+                  enableWeb3Providers
+                  enableOAuthProviders
+                />
+                {firstPartyFactors.map((factor, i) => (
+                  <ArrowBlockButton
+                    leftIcon={getButtonIcon(factor)}
+                    textLocalizationKey={getButtonLabel(factor)}
+                    elementDescriptor={descriptors.alternativeMethodsBlockButton}
+                    textElementDescriptor={descriptors.alternativeMethodsBlockButtonText}
+                    arrowElementDescriptor={descriptors.alternativeMethodsBlockButtonArrow}
+                    key={i}
+                    isDisabled={card.isLoading}
+                    onClick={() => onFactorSelected(factor)}
+                  />
+                ))}
+              </Flex>
+            </>
+          )}
         </Flex>
         <Footer.Root>
           <Footer.Action elementId='havingTrouble'>

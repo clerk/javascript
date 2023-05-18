@@ -8,7 +8,6 @@ import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import { AlternativeMethods } from './AlternativeMethods';
-import { ForgotPasswordAlternativeMethods } from './ForgotPasswordAlternativeMethods';
 import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
 import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
 import { SignInFactorOneForgotPasswordCard } from './SignInFactorOneForgotPasswordCard';
@@ -90,28 +89,18 @@ export function _SignInFactorOne(): JSX.Element {
       prevCurrentFactor: prev.currentFactor,
     }));
   };
-  if (showAllStrategies) {
+  if (showAllStrategies || showForgotPasswordStrategies) {
     const canGoBack = factorHasLocalStrategy(currentFactor);
+
+    const toggle = showAllStrategies ? toggleAllStrategies : toggleForgotPasswordStrategies;
+
     return (
       <AlternativeMethods
-        onBackLinkClick={canGoBack ? toggleAllStrategies : undefined}
+        asForgotPassword={showForgotPasswordStrategies}
+        onBackLinkClick={canGoBack ? toggle : undefined}
         onFactorSelected={f => {
           selectFactor(f);
-          toggleAllStrategies?.();
-        }}
-        currentFactor={currentFactor}
-      />
-    );
-  }
-
-  if (showForgotPasswordStrategies) {
-    const canGoBack = factorHasLocalStrategy(currentFactor);
-    return (
-      <ForgotPasswordAlternativeMethods
-        onBackLinkClick={canGoBack ? toggleForgotPasswordStrategies : undefined}
-        onFactorSelected={f => {
-          selectFactor(f);
-          toggleForgotPasswordStrategies();
+          toggle?.();
         }}
         currentFactor={currentFactor}
       />
