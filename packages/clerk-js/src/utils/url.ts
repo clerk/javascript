@@ -350,7 +350,7 @@ export function isRedirectForFAPIInitiatedFlow(frontendApi: string, redirectUrl:
   return frontendApi === url.host && frontendApiRedirectPaths.includes(path);
 }
 
-export const isAllowedRedirectOrigin = (_url: string, allowedRedirectOrigins: string[] | undefined) => {
+export const isAllowedRedirectOrigin = (_url: string, allowedRedirectOrigins: Array<string | RegExp> | undefined) => {
   if (!allowedRedirectOrigins) {
     return true;
   }
@@ -361,7 +361,10 @@ export const isAllowedRedirectOrigin = (_url: string, allowedRedirectOrigins: st
     return true;
   }
 
-  const isAllowed = allowedRedirectOrigins.some(origin => globs.toRegexp(origin).test(trimTrailingSlash(url.origin)));
+  const isAllowed = allowedRedirectOrigins
+    .map(origin => (typeof origin === 'string' ? globs.toRegexp(trimTrailingSlash(origin)) : origin))
+    .some(origin => origin.test(trimTrailingSlash(url.origin)));
+
   if (!isAllowed) {
     console.warn(
       `Clerk: Redirect URL ${url} is not on one of the allowedRedirectOrigins, falling back to the default redirect URL.`,
