@@ -1,6 +1,7 @@
 export * from './AbstractApi';
 export * from './AllowlistIdentifierApi';
 export * from './ClientApi';
+export * from './DomainApi';
 export * from './EmailAddressApi';
 export * from './EmailApi';
 export * from './InterstitialApi';

@@ -1,8 +1,8 @@
-export function jsonOk(body: unknown) {
+export function jsonOk(body: unknown, status = 200) {
   // Mock response object that satisfies the window.Response interface
   const mockResponse = {
     ok: true,
-    status: 200,
+    status,
     headers: {
       'Content-type': 'application/json',
     },

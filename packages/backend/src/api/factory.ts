@@ -1,6 +1,7 @@
 import {
   AllowlistIdentifierAPI,
   ClientAPI,
+  DomainAPI,
   EmailAddressAPI,
   EmailAPI,
   InterstitialAPI,
@@ -55,5 +56,6 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     signInTokens: new SignInTokenAPI(request),
     smsMessages: new SMSMessageAPI(request),
     users: new UserAPI(request),
+    domains: new DomainAPI(request),
   };
 }

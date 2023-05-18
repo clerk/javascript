@@ -173,5 +173,30 @@ export default (QUnit: QUnit) => {
         }),
       );
     });
+
+    test('executes a successful backend API request to delete a domain', async assert => {
+      const domainId = 'dmn_123';
+      const fakeResponse = {
+        object: 'domain',
+        id: domainId,
+        deleted: true,
+      };
+
+      fakeFetch = sinon.stub(runtime, 'fetch');
+      fakeFetch.onCall(0).returns(jsonOk(fakeResponse, 204));
+
+      await apiClient.domains.deleteDomain(domainId);
+
+      assert.ok(
+        fakeFetch.calledOnceWith(`https://api.clerk.test/v1/domains/${domainId}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: 'Bearer deadbeef',
+            'Content-Type': 'application/json',
+            'Clerk-Backend-SDK': '@clerk/backend',
+          },
+        }),
+      );
+    });
   });
 };
