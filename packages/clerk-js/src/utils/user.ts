@@ -10,9 +10,8 @@ export const getFullName = ({ firstName, lastName, name }: NameHelperParams) =>
 export const getInitials = ({ firstName, lastName, name }: NameHelperParams) =>
   [(firstName || '')[0], (lastName || '')[0]].join('').trim() || (name || '')[0];
 
-import type { UserResource } from '@clerk/types';
-
-import { decodeBase16 } from '../utils';
+import { isomorphicAtob } from '@clerk/shared';
+import type { EncodedImageData, UserResource } from '@clerk/types';
 
 export const getIdentifier = (user: Partial<UserResource>): string => {
   if (user.username) {
@@ -42,8 +41,9 @@ export const isDefaultProfileImage = (url: string) => {
 
   try {
     const encoded = new URL(url).pathname.replace('/', '');
-    const decoded = decodeBase16(encoded);
-    return decoded.includes('default');
+    const decoded = isomorphicAtob(encoded);
+    const obj = JSON.parse(decoded) as EncodedImageData;
+    return obj.type === 'default';
   } catch {
     return false;
   }
