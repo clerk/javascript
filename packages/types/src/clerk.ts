@@ -9,6 +9,7 @@ import type {
   UserProfileTheme,
 } from './appearance';
 import type { ClientResource } from './client';
+import type { EnvironmentResource } from './environment';
 import type { DisplayThemeJSON } from './json';
 import type { LocalizationResource } from './localization';
 import type { OAuthProvider, OAuthScope } from './oauth';
@@ -508,6 +509,7 @@ export interface Resources {
   organization?: OrganizationResource | null;
   lastOrganizationInvitation?: OrganizationInvitationResource | null;
   lastOrganizationMember?: OrganizationMembershipResource | null;
+  environment?: EnvironmentResource | null;
 }
 
 export type RoutingStrategy = 'path' | 'hash' | 'virtual';

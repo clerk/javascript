@@ -7,6 +7,7 @@ import type {
   CreateOrganizationParams,
   CreateOrganizationProps,
   DomainOrProxyUrl,
+  EnvironmentResource,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
   OrganizationMembershipResource,
@@ -296,7 +297,7 @@ export default class IsomorphicClerk {
     }
   }
 
-  get __unstable__environment(): any {
+  get __unstable__environment(): EnvironmentResource | undefined | null {
     if (this.clerkjs) {
       return (this.clerkjs as any).__unstable__environment;
       // TODO: add ssr condition

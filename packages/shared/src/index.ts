@@ -28,4 +28,6 @@ export {
   UserContext,
   useSessionContext,
   useUserContext,
+  EnvironmentContext,
+  useEnvironmentContext,
 } from './hooks/contexts';

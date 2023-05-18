@@ -1,6 +1,7 @@
 import type {
   ActiveSessionResource,
   ClientResource,
+  EnvironmentResource,
   LoadedClerk,
   OrganizationInvitationResource,
   OrganizationMembershipResource,
@@ -13,6 +14,9 @@ import { createContextAndHook } from './createContextAndHook';
 const [ClerkInstanceContext, useClerkInstanceContext] = createContextAndHook<LoadedClerk>('ClerkInstanceContext');
 const [UserContext, useUserContext] = createContextAndHook<UserResource | null | undefined>('UserContext');
 const [ClientContext, useClientContext] = createContextAndHook<ClientResource | null | undefined>('ClientContext');
+const [EnvironmentContext, useEnvironmentContext] = createContextAndHook<EnvironmentResource | null | undefined>(
+  'EnvironmentContext',
+);
 const [SessionContext, useSessionContext] = createContextAndHook<ActiveSessionResource | null | undefined>(
   'SessionContext',
 );
@@ -33,4 +37,6 @@ export {
   useSessionContext,
   ClerkInstanceContext,
   useClerkInstanceContext,
+  EnvironmentContext,
+  useEnvironmentContext,
 };

@@ -6,6 +6,7 @@ import type { IsomorphicClerkOptions } from '../types';
 import { deriveState } from '../utils/deriveState';
 import { AuthContext } from './AuthContext';
 import { ClientContext } from './ClientContext';
+import { EnvironmentContext } from './EnvironmentContext';
 import { IsomorphicClerkContext } from './IsomorphicClerkContext';
 import { OrganizationContext } from './OrganizationContext';
 import { SessionContext } from './SessionContext';
@@ -30,6 +31,7 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
     organization: clerk.organization,
     lastOrganizationInvitation: null,
     lastOrganizationMember: null,
+    environment: clerk.__unstable__environment,
   });
 
   React.useEffect(() => {
@@ -39,6 +41,7 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
   const derivedState = deriveState(clerkLoaded, state, initialState);
   const clerkCtx = React.useMemo(() => ({ value: clerk }), [clerkLoaded]);
   const clientCtx = React.useMemo(() => ({ value: state.client }), [state.client]);
+  const envCtx = React.useMemo(() => ({ value: state.environment }), [state.environment]);
 
   const {
     sessionId,
@@ -72,15 +75,17 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
   return (
     // @ts-expect-error
     <IsomorphicClerkContext.Provider value={clerkCtx}>
-      <ClientContext.Provider value={clientCtx}>
-        <SessionContext.Provider value={sessionCtx}>
-          <OrganizationContext.Provider value={organizationCtx}>
-            <AuthContext.Provider value={authCtx}>
-              <UserContext.Provider value={userCtx}>{children}</UserContext.Provider>
-            </AuthContext.Provider>
-          </OrganizationContext.Provider>
-        </SessionContext.Provider>
-      </ClientContext.Provider>
+      <EnvironmentContext.Provider value={envCtx}>
+        <ClientContext.Provider value={clientCtx}>
+          <SessionContext.Provider value={sessionCtx}>
+            <OrganizationContext.Provider value={organizationCtx}>
+              <AuthContext.Provider value={authCtx}>
+                <UserContext.Provider value={userCtx}>{children}</UserContext.Provider>
+              </AuthContext.Provider>
+            </OrganizationContext.Provider>
+          </SessionContext.Provider>
+        </ClientContext.Provider>
+      </EnvironmentContext.Provider>
     </IsomorphicClerkContext.Provider>
   );
 }
