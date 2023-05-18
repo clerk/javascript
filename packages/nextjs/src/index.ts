@@ -37,8 +37,9 @@ export {
 export {
   useUser,
   useAuth,
-  useSession,
   useClerk,
+  useEnvironment,
+  useSession,
   useSignIn,
   useSignUp,
   useSessionList,
