@@ -5,11 +5,3 @@ export interface ImageResource extends ClerkResource {
   name: string | null;
   publicUrl: string | null;
 }
-
-export interface EncodedImageData {
-  type: 'default' | 'proxy';
-  iid?: string;
-  rid?: string;
-  src?: string;
-  initials?: string;
-}

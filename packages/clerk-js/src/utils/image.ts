@@ -1,8 +1,18 @@
 import { isomorphicAtob } from '@clerk/shared';
-import type { EncodedImageData } from '@clerk/types';
+
+/**
+ * @private
+ */
+interface EncodedImageData {
+  type: 'default' | 'proxy';
+  iid?: string;
+  rid?: string;
+  src?: string;
+  initials?: string;
+}
 
 export const isDefaultImage = (url: string) => {
-  // Remove this check when renaming experimental_imageUrl to imageUrl
+  // TODO: Remove this check when renaming experimental_imageUrl to imageUrl
   if ((url || '').includes('gravatar')) {
     return true;
   }

@@ -89,9 +89,9 @@ export const ProfilePage = withCardStateProvider(() => {
             user={user}
             onAvatarChange={uploadAvatar}
             onAvatarRemove={
-              !isDefaultImage(experimental_enableClerkImages ? user.experimental_imageUrl : user.profileImageUrl)
-                ? onAvatarRemove
-                : null
+              isDefaultImage(experimental_enableClerkImages ? user.experimental_imageUrl : user.profileImageUrl)
+                ? null
+                : onAvatarRemove
             }
           />
           {showFirstName && (
