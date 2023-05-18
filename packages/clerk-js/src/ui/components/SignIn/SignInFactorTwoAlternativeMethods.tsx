@@ -80,7 +80,7 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
 export function getButtonLabel(factor: SignInFactor): LocalizationKey {
   switch (factor.strategy) {
     case 'phone_code':
-      return localizationKeys('signIn.alternativeMethods.blockButton__emailCode', {
+      return localizationKeys('signIn.alternativeMethods.blockButton__phoneCode', {
         identifier: formatSafeIdentifier(factor.safeIdentifier) || '',
       });
     case 'totp':
