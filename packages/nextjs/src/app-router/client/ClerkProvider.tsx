@@ -27,6 +27,10 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
         router.push(window.location.href);
       }
     };
+
+    window.__unstable__onAfterSetActive = () => {
+      router.refresh();
+    };
   }, []);
 
   const mergedProps = { ...props, navigate };
