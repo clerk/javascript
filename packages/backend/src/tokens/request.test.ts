@@ -49,6 +49,7 @@ function assertInterstitial(
     reason: AuthReason;
     isSatellite?: boolean;
     domain?: string;
+    signInUrl?: string;
   },
 ) {
   assert.propContains(requestState, {
@@ -286,6 +287,28 @@ export default (QUnit: QUnit) => {
         reason: AuthErrorReason.SatelliteCookieNeedsSyncing,
         isSatellite: true,
         domain: 'satellite.dev',
+      });
+      assert.equal(requestState.message, '');
+      assert.strictEqual(requestState.toAuth(), null);
+    });
+
+    test('returns interstitial when app is satellite, returns from primary and is dev instance [13y]', async assert => {
+      const sp = new URLSearchParams();
+      sp.set('__clerk_referrer_primary', 'true');
+      const requestState = await authenticateRequest({
+        ...defaultMockAuthenticateRequestOptions,
+        secretKey: 'sk_test_deadbeef',
+        signInUrl: 'http://primary.example/sign-in',
+        isSatellite: true,
+        domain: 'satellite.example',
+        searchParams: sp,
+      });
+
+      assertInterstitial(assert, requestState, {
+        reason: AuthErrorReason.SatelliteReturnsFromPrimary,
+        isSatellite: true,
+        domain: 'satellite.example',
+        signInUrl: 'http://primary.example/sign-in',
       });
       assert.equal(requestState.message, '');
       assert.strictEqual(requestState.toAuth(), null);
