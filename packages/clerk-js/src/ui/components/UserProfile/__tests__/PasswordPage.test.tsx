@@ -51,15 +51,16 @@ describe('PasswordPage', () => {
       await userEvent.click(screen.getByRole('button', { name: /continue/i }));
       expect(fixtures.clerk.user?.updatePassword).toHaveBeenCalledWith({
         newPassword: 'testtest',
-        signOutOfOtherSessions: false,
+        signOutOfOtherSessions: true,
       });
 
       expect(await screen.findByText(/has been set/i));
+      expect(await screen.findByText(/signed out/i));
       await userEvent.click(screen.getByRole('button', { name: /finish/i }));
       expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
     });
 
-    it('updates passwords and signs out of other sessions', async () => {
+    it('updates passwords and leave other sessions intact', async () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
 
       fixtures.clerk.user?.update.mockResolvedValue({} as UserResource);
@@ -71,10 +72,8 @@ describe('PasswordPage', () => {
       await userEvent.click(screen.getByRole('button', { name: /continue/i }));
       expect(fixtures.clerk.user?.updatePassword).toHaveBeenCalledWith({
         newPassword: 'testtest',
-        signOutOfOtherSessions: true,
+        signOutOfOtherSessions: false,
       });
-
-      expect(await screen.findByText(/signed out/i));
     });
 
     it('results in error if the password is too small', async () => {
