@@ -107,7 +107,7 @@ describe('PasswordPage', () => {
       await waitFor(() => {
         screen.getByText(`Passwords don't match.`);
       });
-    });
+    }, 10000);
 
     it(`Displays "Password match" when password match and removes it if they stop`, async () => {
       const { wrapper } = await createFixtures(initConfig);

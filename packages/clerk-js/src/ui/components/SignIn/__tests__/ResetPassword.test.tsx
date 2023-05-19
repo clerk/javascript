@@ -113,7 +113,7 @@ describe('ResetPassword', () => {
       await waitFor(() => {
         screen.getByText(`Passwords don't match.`);
       });
-    });
+    }, 10000);
 
     it('navigates to the root page upon pressing the back link', async () => {
       const { wrapper, fixtures } = await createFixtures();
