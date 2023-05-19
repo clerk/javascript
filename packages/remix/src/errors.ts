@@ -81,4 +81,4 @@ export const satelliteAndMissingProxyUrlAndDomain = createErrorMessage(
 
 export const satelliteAndMissingSignInUrl = createErrorMessage(`
 Invalid signInUrl. A satellite application requires a signInUrl for development instances.
-Check if signInUrl is missing from your configuration or it is not a absolute URL.`);
+Check if signInUrl is missing from your configuration or if it is not an absolute URL.`);

@@ -10,6 +10,32 @@ const parseCookies = (req: IncomingMessage) => {
   return cookie.parse(req.headers['cookie'] || '');
 };
 
+type ClerkClient = ReturnType<typeof Clerk>;
+
+export async function loadInterstitial({
+  clerkClient,
+  requestState,
+}: {
+  clerkClient: ClerkClient;
+  requestState: RequestState;
+}) {
+  /**
+   * When publishable key or frontendApi is present utilize the localInterstitial method
+   * and avoid the extra network call
+   */
+  if (requestState.publishableKey || requestState.frontendApi) {
+    return clerkClient.localInterstitial({
+      frontendApi: requestState.frontendApi,
+      publishableKey: requestState.publishableKey,
+      proxyUrl: requestState.proxyUrl,
+      signInUrl: requestState.signInUrl,
+      isSatellite: requestState.isSatellite,
+      domain: requestState.domain,
+    });
+  }
+  return await clerkClient.remotePrivateInterstitial();
+}
+
 export const authenticateRequest = (opts: {
   clerkClient: ReturnType<typeof Clerk>;
   apiKey: string;
@@ -116,6 +142,6 @@ const satelliteAndMissingProxyUrlAndDomain =
   'Missing domain and proxyUrl. A satellite application needs to specify a domain or a proxyUrl';
 const satelliteAndMissingSignInUrl = `
 Invalid signInUrl. A satellite application requires a signInUrl for development instances.
-Check if signInUrl is missing from your configuration or it is not a absolute URL.`;
+Check if signInUrl is missing from your configuration or if it is not an absolute URL.`;
 const missingProto =
-  "Cannot determine the request protocol. Please make sure you've set the X-Forwarded-Proto header with the request protocol (http or https).";
+  "Cannot determine the request protocol. Please ensure you've set the X-Forwarded-Proto header with the request protocol (http or https).";
