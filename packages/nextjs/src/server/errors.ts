@@ -10,7 +10,7 @@ Missing domain and proxyUrl. A satellite application needs to specify a domain o
 
 export const missingSignInUrlInDev = `
 Invalid signInUrl. A satellite application requires a signInUrl for development instances.
-Check if signInUrl is missing from your configuration or it is not a absolute URL
+Check if signInUrl is missing from your configuration or if it is not an absolute URL
 
 1) With middleware
    e.g. export default withClerkMiddleware(req => {...}, {signInUrl:'SOME_URL',isSatellite:true});
