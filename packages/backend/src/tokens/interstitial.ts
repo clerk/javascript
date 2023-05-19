@@ -87,6 +87,7 @@ export function loadInterstitialFromLocal(options: Omit<LoadInterstitialOptions,
                 try {
                     await Clerk.load({
                         isSatellite: ${isSatellite},
+                        isInterstitial: ${true},
                         signInUrl: ${signInUrl ? `'${signInUrl}'` : undefined}
                     });
                     if(Clerk.loaded){

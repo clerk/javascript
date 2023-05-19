@@ -487,6 +487,13 @@ export interface ClerkOptions {
   afterSignInUrl?: string;
   afterSignUpUrl?: string;
   allowedRedirectOrigins?: Array<string | RegExp>;
+
+  /**
+   * Indicates that clerk.js is will be loaded from interstitial
+   * Defaults to false
+   */
+  isInterstitial?: boolean;
+
   /**
    * @experimental
    */

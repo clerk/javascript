@@ -126,6 +126,7 @@ const defaultOptions: ClerkOptions = {
   signUpUrl: undefined,
   afterSignInUrl: undefined,
   afterSignUpUrl: undefined,
+  isInterstitial: false,
 };
 
 export default class Clerk implements ClerkInterface {
@@ -1045,7 +1046,13 @@ export default class Clerk implements ClerkInterface {
 
   #isReturningFromPrimary = () => getClerkQueryParam(CLERK_REFERRER_PRIMARY) === 'true';
 
-  #replacePrimaryReferrerWithClerkSynced = () => replaceClerkQueryParam(CLERK_REFERRER_PRIMARY, CLERK_SYNCED, 'true');
+  #replacePrimaryReferrerWithClerkSynced = () => {
+    if (this.#options.isInterstitial) {
+      replaceClerkQueryParam(CLERK_REFERRER_PRIMARY, CLERK_SYNCED, 'true');
+    } else {
+      removeClerkQueryParam(CLERK_REFERRER_PRIMARY);
+    }
+  };
 
   #buildSyncUrlForDevelopmentInstances = (): string => {
     const searchParams = new URLSearchParams({
