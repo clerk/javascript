@@ -44,7 +44,7 @@ export function detectUserAgentRobot(userAgent: string): boolean {
   return robots.test(userAgent);
 }
 
-export function isValidBrowserOnline(): boolean {
+export function isValidBrowser(): boolean {
   const navigator = window?.navigator;
   if (!inBrowser() || !navigator) {
     return false;
@@ -52,14 +52,7 @@ export function isValidBrowserOnline(): boolean {
 
   const isUserAgentRobot = detectUserAgentRobot(navigator?.userAgent);
   const isWebDriver = navigator?.webdriver;
-  const isNavigatorOnline = navigator?.onLine;
-
-  // Being extra safe with the experimental `connection` property, as it is not defined in all browsers
-  // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/connection#browser_compatibility
-  // @ts-ignore
-  const isExperimentalConnectionOnline = navigator?.connection?.rtt !== 0 && navigator?.connection?.downlink !== 0;
-
-  return !isUserAgentRobot && !isWebDriver && isExperimentalConnectionOnline && isNavigatorOnline;
+  return !isUserAgentRobot && !isWebDriver;
 }
 
 export function isBrowserOnline(): boolean {
@@ -75,4 +68,8 @@ export function isBrowserOnline(): boolean {
   // @ts-ignore
   const isExperimentalConnectionOnline = navigator?.connection?.rtt !== 0 && navigator?.connection?.downlink !== 0;
   return isExperimentalConnectionOnline && isNavigatorOnline;
+}
+
+export function isValidBrowserOnline(): boolean {
+  return isBrowserOnline() && isValidBrowser();
 }
