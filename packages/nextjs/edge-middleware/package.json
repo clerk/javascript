@@ -1,0 +1,5 @@
+{
+  "main": "../dist/cjs/edge-middleware/index.js",
+  "module": "../dist/esm/edge-middleware/index.js",
+  "types": "../dist/types/edge-middleware/index.d.ts"
+}
