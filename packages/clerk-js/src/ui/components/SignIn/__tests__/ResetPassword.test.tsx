@@ -42,6 +42,17 @@ describe('ResetPassword', () => {
     });
   });
 
+  it('renders a hidden identifier field', async () => {
+    const identifier = 'test@clerk.dev';
+    const { wrapper } = await createFixtures(f => {
+      f.startSignInWithEmailAddress({ identifier });
+    });
+    render(<ResetPassword />, { wrapper });
+
+    const identifierField: HTMLInputElement = screen.getByTestId('hidden-identifier');
+    expect(identifierField.value).toBe(identifier);
+  });
+
   describe('Actions', () => {
     it('resets the password and does not require MFA', async () => {
       const { wrapper, fixtures } = await createFixtures();
