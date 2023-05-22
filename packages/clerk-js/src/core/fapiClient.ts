@@ -199,6 +199,7 @@ export default function createFapiClient(clerkInstance: Clerk): FapiClient {
 
     try {
       if (beforeRequestCallbacksResult) {
+        const maxTries = isBrowserOnline() ? 4 : 11;
         response =
           // retry only on GET requests for safety
           overwrittenRequestMethod === 'GET'
@@ -206,7 +207,7 @@ export default function createFapiClient(clerkInstance: Clerk): FapiClient {
                 firstDelay: 500,
                 maxDelay: 3000,
                 shouldRetry: (_: unknown, iterationsCount: number) => {
-                  return !isBrowserOnline() || iterationsCount < 4;
+                  return iterationsCount < maxTries;
                 },
               })
             : await fetch(urlStr, fetchOpts);
