@@ -93,6 +93,10 @@ export interface ExternalAccountJSON extends ClerkResourceJSON {
   first_name: string;
   last_name: string;
   avatar_url: string;
+  /**
+   * @experimental
+   */
+  image_url: string;
   username: string | null;
   public_metadata: Record<string, unknown> | null;
   label: string | null;
