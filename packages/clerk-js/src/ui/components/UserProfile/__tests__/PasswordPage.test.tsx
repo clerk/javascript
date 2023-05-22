@@ -2,6 +2,7 @@ import type { UserResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 
 import { bindCreateFixtures, fireEvent, render, runFakeTimers, screen, waitFor } from '../../../../testUtils';
+import { ResetPassword } from '../../SignIn/ResetPassword';
 import { PasswordPage } from '../PasswordPage';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
@@ -37,6 +38,17 @@ describe('PasswordPage', () => {
 
     screen.getByRole('heading', { name: /change password/i });
     screen.getByLabelText(/current password/i);
+  });
+
+  it('renders a hidden identifier field', async () => {
+    const identifier = 'test@clerk.dev';
+    const { wrapper } = await createFixtures(f => {
+      f.startSignInWithEmailAddress({ identifier });
+    });
+    render(<ResetPassword />, { wrapper });
+
+    const identifierField: HTMLInputElement = screen.getByTestId('hidden-identifier');
+    expect(identifierField.value).toBe(identifier);
   });
 
   describe('Actions', () => {

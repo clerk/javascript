@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 
 import { useWizard, Wizard } from '../../common';
-import { useCoreUser, useEnvironment } from '../../contexts';
+import { useCoreSession, useCoreUser, useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { useConfirmPassword, usePasswordComplexity } from '../../hooks';
@@ -26,6 +26,7 @@ const generateSuccessPageText = (userHasPassword: boolean, sessionSignOut: boole
 
 export const PasswordPage = withCardStateProvider(() => {
   const user = useCoreUser();
+  const session = useCoreSession();
   const title = user.passwordEnabled
     ? localizationKeys('userProfile.passwordPage.changePasswordTitle')
     : localizationKeys('userProfile.passwordPage.title');
@@ -116,6 +117,14 @@ export const PasswordPage = withCardStateProvider(() => {
           onSubmit={updatePassword}
           onBlur={validateForm}
         >
+          {/* For password managers */}
+          <input
+            readOnly
+            id='identifier-field'
+            name='identifier'
+            value={session.publicUserData.identifier || ''}
+            style={{ display: 'none' }}
+          />
           {user.passwordEnabled && (
             <Form.ControlRow elementId={currentPasswordField.id}>
               <Form.Control
