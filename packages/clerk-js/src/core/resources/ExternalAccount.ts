@@ -20,6 +20,7 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
   firstName = '';
   lastName = '';
   avatarUrl = '';
+  experimental_imageUrl = '';
   username = '';
   publicMetadata = {};
   label = '';
@@ -52,6 +53,7 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
     this.providerUserId = data.provider_user_id;
     this.approvedScopes = data.approved_scopes;
     this.avatarUrl = data.avatar_url;
+    this.experimental_imageUrl = data.image_url;
     this.emailAddress = data.email_address;
     this.firstName = data.first_name;
     this.lastName = data.last_name;
