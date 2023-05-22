@@ -1,4 +1,1 @@
-<svg width="20" height="16" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M2 0C0.895431 0 0 0.895431 0 2V3H16V2C16 0.895431 15.1046 0 14 0H2Z" fill="currentColor"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M16 5H0V10C0 11.1046 0.895431 12 2 12H14C15.1046 12 16 11.1046 16 10V5ZM2 9C2 8.44771 2.44772 8 3 8H4C4.55228 8 5 8.44771 5 9C5 9.55229 4.55228 10 4 10H3C2.44772 10 2 9.55229 2 9ZM7 8C6.44772 8 6 8.44771 6 9C6 9.55229 6.44772 10 7 10H8C8.55228 10 9 9.55229 9 9C9 8.44771 8.55228 8 8 8H7Z" fill="currentColor"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="16" fill="none" viewBox="0 0 16 12"><path fill="currentColor" d="M2 0a2 2 0 0 0-2 2v1h16V2a2 2 0 0 0-2-2H2Z"/><path fill="currentColor" fill-rule="evenodd" d="M16 5H0v5c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V5ZM2 9c0-.6.4-1 1-1h1a1 1 0 1 1 0 2H3a1 1 0 0 1-1-1Zm5-1a1 1 0 1 0 0 2h1a1 1 0 1 0 0-2H7Z" clip-rule="evenodd"/></svg>
