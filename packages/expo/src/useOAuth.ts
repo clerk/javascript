@@ -52,7 +52,7 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
       startOAuthFlowParams.redirectUrl ||
       useOAuthParams.redirectUrl ||
       AuthSession.makeRedirectUri({
-        path: '/oauth-native-callback',
+        path: 'oauth-native-callback',
       });
 
     await signIn.create({ strategy, redirectUrl: oauthRedirectUrl });
