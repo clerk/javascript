@@ -45,7 +45,7 @@ type FieldStateProps<Id> = {
   setSuccessful: (message: string) => void;
   successfulText: string;
   isFocused: boolean;
-} & Options;
+} & Omit<Options, 'defaultChecked'>;
 
 export type FormControlState<Id = string> = FieldStateProps<Id> & {
   setError: (error: string | ClerkAPIError | undefined) => void;
@@ -124,6 +124,9 @@ export const useFormControl = <Id extends string>(
     opts.strengthMeter = opts.strengthMeter || false;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { defaultChecked, ...restOpts } = opts;
+
   const props = {
     id,
     name: id,
@@ -138,10 +141,10 @@ export const useFormControl = <Id extends string>(
     onBlur,
     onFocus,
     isFocused,
-    enableErrorAfterBlur: opts.enableErrorAfterBlur || false,
+    enableErrorAfterBlur: restOpts.enableErrorAfterBlur || false,
     setWarning,
     warningText,
-    ...opts,
+    ...restOpts,
   };
 
   return { props, ...props, setError, setValue, setChecked };
