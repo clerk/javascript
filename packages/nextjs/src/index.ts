@@ -28,6 +28,7 @@ export {
   OrganizationProfile,
   CreateOrganization,
   SignInButton,
+  SignOutButton,
 } from './client-boundary/uiComponents';
 
 /**

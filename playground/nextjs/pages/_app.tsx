@@ -1,7 +1,15 @@
 import '../styles/globals.css';
 import type { AppProps } from 'next/app';
 
-import { ClerkProvider, OrganizationSwitcher, SignInButton, UserButton } from '@clerk/nextjs';
+import {
+  ClerkProvider,
+  OrganizationSwitcher,
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  SignOutButton,
+  UserButton,
+} from '@clerk/nextjs';
 import { dark, neobrutalism, shadesOfPurple } from '@clerk/themes';
 import Link from 'next/link';
 import React, { useState } from 'react';
@@ -76,7 +84,14 @@ const AppBar = (props: AppBarProps) => {
       </select>
       <button onClick={props.onToggleDark}>toggle dark mode</button>
       <UserButton />
-      <SignInButton mode={'modal'} />
+
+      <SignedIn>
+        <SignOutButton />
+      </SignedIn>
+
+      <SignedOut>
+        <SignInButton mode={'modal'} />
+      </SignedOut>
     </div>
   );
 };
