@@ -34,6 +34,9 @@ function MyApp({ Component, pageProps }: AppProps) {
       appearance={{
         baseTheme: themes[selectedTheme],
         variables: { colorPrimary: '#f85656' },
+        layout: {
+          shimmer: true,
+        },
       }}
       {...pageProps}
     >

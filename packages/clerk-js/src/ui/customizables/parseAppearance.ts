@@ -41,6 +41,7 @@ const defaultLayout: ParsedLayout = {
   helpPageUrl: '',
   privacyPageUrl: '',
   termsPageUrl: '',
+  shimmer: false,
 };
 
 /**

@@ -1,7 +1,6 @@
 import { isRetinaDisplay } from '@clerk/shared';
 import React from 'react';
 
-import { useOptions } from '../contexts';
 import { Box, descriptors, Flex, Image, Text } from '../customizables';
 import type { ElementDescriptor } from '../customizables/elementDescriptors';
 import type { InternalTheme } from '../foundations';
@@ -33,7 +32,6 @@ export const Avatar = (props: AvatarProps) => {
     boxElementDescriptor,
     imageElementDescriptor,
   } = props;
-  const { experimental_enableShimmerEffect } = useOptions();
   const [error, setError] = React.useState(false);
 
   let src = imageUrl;
@@ -74,7 +72,7 @@ export const Avatar = (props: AvatarProps) => {
           backgroundColor: t.colors.$avatarBackground,
           backgroundClip: 'padding-box',
           position: 'relative',
-          boxShadow: experimental_enableShimmerEffect ? 'var(--cl-shimmer-hover-shadow)' : 'unset',
+          boxShadow: 'var(--cl-shimmer-hover-shadow)',
           transition: `box-shadow ${t.transitionDuration.$slower} ${t.transitionTiming.$easeOut}`,
         }),
         sx,
@@ -82,13 +80,12 @@ export const Avatar = (props: AvatarProps) => {
     >
       {ImgOrFallback}
 
-      {/**
+      {/* /**
        * This Box is the "shimmer" effect for the avatar.
        * The ":after" selector is responsible for the border shimmer animation.
        */}
       <Box
         sx={t => ({
-          display: experimental_enableShimmerEffect ? 'unset' : 'none',
           overflow: 'hidden',
           background: t.colors.$colorShimmer,
           position: 'absolute',
