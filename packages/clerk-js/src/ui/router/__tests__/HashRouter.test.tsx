@@ -1,4 +1,4 @@
-import { act, render, screen, userEvent } from '@clerk/shared/testUtils';
+import { render, screen, userEvent } from '@clerk/shared/testUtils';
 import React from 'react';
 
 import type Clerk from '../../../core/clerk';
@@ -71,9 +71,10 @@ describe('HashRouter', () => {
       window.location = new URL('https://www.example.com/hash#/foo');
     });
 
-    it('loads that path', async () => {
+    it('loads that path', () => {
       // Wrap this is an await because we need a state update with the path change
       render(<Tester />);
+
       expect(mockNavigate).not.toHaveBeenCalled();
       expect(screen.queryByText('Bar')).toBeInTheDocument();
     });
@@ -87,22 +88,20 @@ describe('HashRouter', () => {
 
     it('preserves the param for internal navigation', async () => {
       render(<Tester />);
-      await act(async () => {
-        const button = screen.getByRole('button', { name: /Internal/i });
-        expect(button).toBeInTheDocument();
-        await userEvent.click(button);
-      });
+
+      const button = screen.getByRole('button', { name: /Internal/i });
+      await userEvent.click(button);
+
       expect(window.location.hash).toBe('#/foo?preserved=1');
       expect(screen.queryByText('Bar')).toBeInTheDocument();
     });
 
     it('removes the param for external navigation', async () => {
       render(<Tester />);
-      await act(async () => {
-        const button = screen.getByRole('button', { name: /External/i });
-        expect(button).toBeInTheDocument();
-        await userEvent.click(button);
-      });
+
+      const button = screen.getByRole('button', { name: /External/i });
+      await userEvent.click(button);
+
       expect(mockNavigate).toHaveBeenNthCalledWith(1, 'https://www.example.com/external');
     });
   });

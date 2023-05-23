@@ -1,7 +1,7 @@
+import { render, userEvent, waitFor } from '@clerk/shared/testUtils';
 import type { MembershipRole, OrganizationMembershipResource, OrganizationResource } from '@clerk/types';
 import { describe, it, jest } from '@jest/globals';
 
-import { render, waitFor } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { OrganizationMembers } from '../OrganizationMembers';
 
@@ -48,8 +48,11 @@ describe('OrganizationMembers', () => {
     });
 
     const { getByText } = render(<OrganizationMembers />, { wrapper });
-    expect(getByText('Members')).toBeDefined();
-    expect(getByText('View and manage organization members')).toBeDefined();
+
+    await waitFor(() => {
+      expect(getByText('Members')).toBeDefined();
+      expect(getByText('View and manage organization members')).toBeDefined();
+    });
   });
 
   it('shows an invite button and invited tab if the current user is an admin', async () => {
@@ -59,8 +62,11 @@ describe('OrganizationMembers', () => {
     });
 
     const { getByText, getByRole } = render(<OrganizationMembers />, { wrapper });
-    expect(getByText('Invited')).toBeDefined();
-    expect(getByRole('button', { name: 'Invite' })).toBeDefined();
+
+    await waitFor(() => {
+      expect(getByText('Invited')).toBeDefined();
+      expect(getByRole('button', { name: 'Invite' })).toBeDefined();
+    });
   });
 
   it('does not show an invite button and invited tab if the current user is not an admin', async () => {
@@ -73,8 +79,11 @@ describe('OrganizationMembers', () => {
     });
 
     const { queryByRole, queryByText } = render(<OrganizationMembers />, { wrapper });
-    expect(queryByText('Invited')).toBeNull();
-    expect(queryByRole('button', { name: 'Invite' })).toBeNull();
+
+    await waitFor(() => {
+      expect(queryByText('Invited')).toBeNull();
+      expect(queryByRole('button', { name: 'Invite' })).toBeNull();
+    });
   });
 
   it('navigates to invite screen when user clicks on Invite button', async () => {
@@ -83,9 +92,12 @@ describe('OrganizationMembers', () => {
       f.withUser({ email_addresses: ['test@clerk.dev'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
     });
 
-    const { getByRole, userEvent } = render(<OrganizationMembers />, { wrapper });
+    const { getByRole } = render(<OrganizationMembers />, { wrapper });
     await userEvent.click(getByRole('button', { name: 'Invite' }));
-    expect(fixtures.router.navigate).toHaveBeenCalledWith('invite-members');
+
+    await waitFor(() => {
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('invite-members');
+    });
   });
 
   it('lists all the members of the Organization', async () => {
