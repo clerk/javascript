@@ -852,8 +852,21 @@ export default class Clerk implements ClerkInterface {
 
     const userNeedsToBeCreated = si.firstFactorVerificationStatus === 'transferable';
 
+    const isCaptchaEnabled = true; // TODO: replace this when environment field is ready
     if (userNeedsToBeCreated) {
-      const res = await signUp.create({ transfer: true });
+      const fields = {
+        transfer: true,
+      } as any;
+
+      if (isCaptchaEnabled) {
+        const captchaToken = getClerkQueryParam('__clerk_captcha_token');
+
+        if (captchaToken) {
+          fields.captchaToken = captchaToken;
+        }
+      }
+
+      const res = await signUp.create(fields);
       switch (res.status) {
         case 'complete':
           return this.setActive({

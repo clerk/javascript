@@ -9,6 +9,7 @@ const ClerkQueryParams = [
   CLERK_SYNCED,
   CLERK_SATELLITE_URL,
   CLERK_REFERRER_PRIMARY,
+  '__clerk_captcha_token',
 ] as const;
 
 type ClerkQueryParam = typeof ClerkQueryParams[number];
@@ -22,6 +23,7 @@ type ClerkQueryParamsToValuesMap = {
   __clerk_synced: string;
   __clerk_satellite_url: string;
   __clerk_referrer_primary: string;
+  __clerk_captcha_token: string;
 };
 
 export type VerificationStatus = 'expired' | 'failed' | 'loading' | 'verified' | 'verified_switch_tab';

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 
 import { ERROR_CODES } from '../../../core/constants';
 import { getClerkQueryParam } from '../../../utils/getClerkQueryParam';
@@ -41,6 +41,8 @@ function _SignUpStart(): JSX.Element {
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
   const [missingRequirementsWithTicket, setMissingRequirementsWithTicket] = React.useState(false);
+  const [captchaToken, setCaptchaToken] = useState('');
+  const isCaptchaEnabled = true; // TODO: replace this when environment field is ready
 
   const {
     userSettings: { passwordSettings },
@@ -139,6 +141,22 @@ function _SignUpStart(): JSX.Element {
     void handleTokenFlow();
   }, []);
 
+  const captchaRef = useRef(null);
+  React.useLayoutEffect(() => {
+    if (isCaptchaEnabled) {
+      void loadCaptcha().then(t => {
+        t.execute(captchaRef.current, {
+          sitekey: '1x00000000000000000000AA', // test sitekey
+          // sitekey: '0x4AAAAAAAFHxLeVBtmN8VhF', // staging sitekey
+          callback: function (token: string) {
+            setCaptchaToken(token);
+            console.log(`Challenge Success ${token}`);
+          },
+        });
+      });
+    }
+  }, []);
+
   React.useEffect(() => {
     async function handleOauthError() {
       const error = signUp.verifications.externalAccount.error;
@@ -199,6 +217,15 @@ function _SignUpStart(): JSX.Element {
       fieldsToSubmit.push(formState['phoneNumber']);
     }
 
+    if (isCaptchaEnabled) {
+      const captchaState = {
+        id: 'captchaToken',
+        value: captchaToken,
+      };
+
+      fieldsToSubmit.push(captchaState as any);
+    }
+
     card.setLoading();
     card.setError(undefined);
 
@@ -244,6 +271,14 @@ function _SignUpStart(): JSX.Element {
             to continue to {displayConfig.applicationName}
           </Header.Subtitle>
         </Header.Root>
+
+        {isCaptchaEnabled && (
+          <div
+            ref={captchaRef}
+            style={{ display: 'none' }}
+          />
+        )}
+
         <Flex
           direction='col'
           elementDescriptor={descriptors.main}
