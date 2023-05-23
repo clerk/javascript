@@ -1,11 +1,11 @@
 import type { Response } from 'express';
 
-import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
+import { ClerkExpressRequireAuth, clerkClient } from '@clerk/clerk-sdk-node';
 import { Router } from 'express';
 
 const router = Router();
 
-router.use(ClerkExpressRequireAuth());
+router.use(ClerkExpressRequireAuth({ clerkClient }));
 
 router.get('/me', async (req, reply: Response) => {
   return reply.json({ auth: req.auth });

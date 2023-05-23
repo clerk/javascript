@@ -14,6 +14,13 @@
         "request": "launch",
         "command": "npm run dev",
         "cwd": "${workspaceFolder}/playground/nextjs12"
+      },
+      {
+        "name": "playground/express: debug server",
+        "type": "node-terminal",
+        "request": "launch",
+        "command": "npm start",
+        "cwd": "${workspaceFolder}/playground/express"
       }
     ]
   }
