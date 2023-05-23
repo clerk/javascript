@@ -203,7 +203,12 @@ export const CodeControl = React.forwardRef<{ reset: any }, CodeControlProps>((p
           />
         )}
       </Flex>
-      <FormFeedback errorText={errorText} />
+      <FormFeedback
+        errorText={errorText}
+        elementDescriptors={{
+          error: descriptors.otpCodeFieldErrorText,
+        }}
+      />
     </Flex>
   );
 });

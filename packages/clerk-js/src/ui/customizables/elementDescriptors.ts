@@ -81,6 +81,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'formFieldErrorText',
   'formFieldWarningText',
   'formFieldSuccessText',
+  'formFieldInfoText',
   'formFieldDirectionsText',
   'formFieldHintText',
   'formButtonRow',

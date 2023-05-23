@@ -21,6 +21,7 @@ import {
   Text,
   useLocalizations,
 } from '../customizables';
+import type { ElementDescriptor } from '../customizables/elementDescriptors';
 import { useFieldMessageVisibility, usePrefersReducedMotion } from '../hooks';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { animations } from '../styledSystem';
@@ -114,20 +115,38 @@ const useCalculateErrorTextHeight = () => {
   };
 };
 
-export const FormFeedback = (
-  debouncedState: Partial<ReturnType<typeof useFormControlFeedback>['debounced'] & { id: FieldId }>,
-) => {
-  const { id } = debouncedState;
-  const errorMessage = useFieldMessageVisibility(debouncedState.errorText, 200);
-  const successMessage = useFieldMessageVisibility(debouncedState.successfulText, 200);
-  const informationMessage = useFieldMessageVisibility(debouncedState.informationText, 200);
-  const warningMessage = useFieldMessageVisibility(debouncedState.warningText, 200);
+type FormFeedbackDescriptorsKeys = 'error' | 'warning' | 'info' | 'success';
+
+type FormFeedbackProps = Partial<ReturnType<typeof useFormControlFeedback>['debounced'] & { id: FieldId }> & {
+  elementDescriptors?: Partial<Record<FormFeedbackDescriptorsKeys, ElementDescriptor>>;
+};
+
+export const FormFeedback = (props: FormFeedbackProps) => {
+  const { id, elementDescriptors } = props;
+  const errorMessage = useFieldMessageVisibility(props.errorText, 200);
+  const successMessage = useFieldMessageVisibility(props.successfulText, 200);
+  const informationMessage = useFieldMessageVisibility(props.informationText, 200);
+  const warningMessage = useFieldMessageVisibility(props.warningText, 200);
 
   const messageToDisplay = informationMessage || successMessage || errorMessage || warningMessage;
   const isSomeMessageVisible = !!messageToDisplay;
 
   const { calculateHeight, height } = useCalculateErrorTextHeight();
   const { getFormTextAnimation } = useFormTextAnimation();
+  const defaultElementDescriptors = {
+    error: descriptors.formFieldErrorText,
+    warning: descriptors.formFieldWarningText,
+    info: descriptors.formFieldInfoText,
+    success: descriptors.formFieldSuccessText,
+  };
+
+  const getElementProps = (type: FormFeedbackDescriptorsKeys) => {
+    const descriptor = (elementDescriptors?.[type] || defaultElementDescriptors[type]) as ElementDescriptor | undefined;
+    return {
+      elementDescriptor: descriptor,
+      elementId: id ? descriptor?.setId?.(id) : undefined,
+    };
+  };
 
   if (!isSomeMessageVisible) {
     return null;
@@ -141,20 +160,15 @@ export const FormFeedback = (
       }}
       sx={[
         getFormTextAnimation(
-          !!debouncedState.informationText ||
-            !!debouncedState.successfulText ||
-            !!debouncedState.errorText ||
-            !!debouncedState.warningText,
+          !!props.informationText || !!props.successfulText || !!props.errorText || !!props.warningText,
         ),
       ]}
     >
-      {/*Display the directions after is success message is unmounted*/}
+      {/*Display the directions after the success message is unmounted*/}
       {!successMessage && !warningMessage && !errorMessage && informationMessage && (
         <FormInfoText
           ref={calculateHeight}
-          sx={getFormTextAnimation(
-            !!debouncedState.informationText && !debouncedState?.successfulText && !debouncedState.warningText,
-          )}
+          sx={getFormTextAnimation(!!props.informationText && !props?.successfulText && !props.warningText)}
         >
           {informationMessage}
         </FormInfoText>
@@ -162,10 +176,9 @@ export const FormFeedback = (
       {/* Display the error message after the directions is unmounted*/}
       {errorMessage && (
         <FormErrorText
+          {...getElementProps('error')}
           ref={calculateHeight}
-          elementDescriptor={descriptors.formFieldErrorText}
-          elementId={descriptors.formFieldErrorText.setId(id)}
-          sx={getFormTextAnimation(!!debouncedState?.errorText)}
+          sx={getFormTextAnimation(!!props?.errorText)}
         >
           {errorMessage}
         </FormErrorText>
@@ -174,10 +187,9 @@ export const FormFeedback = (
       {/* Display the success message after the error message is unmounted*/}
       {!errorMessage && successMessage && (
         <FormSuccessText
+          {...getElementProps('success')}
           ref={calculateHeight}
-          elementDescriptor={descriptors.formFieldSuccessText}
-          elementId={descriptors.formFieldSuccessText.setId(id)}
-          sx={getFormTextAnimation(!!debouncedState?.successfulText)}
+          sx={getFormTextAnimation(!!props?.successfulText)}
         >
           {successMessage}
         </FormSuccessText>
@@ -185,10 +197,9 @@ export const FormFeedback = (
 
       {warningMessage && (
         <FormWarningText
+          {...getElementProps('warning')}
           ref={calculateHeight}
-          elementDescriptor={descriptors.formFieldWarningText}
-          elementId={descriptors.formFieldWarningText.setId(id)}
-          sx={getFormTextAnimation(!!debouncedState.warningText)}
+          sx={getFormTextAnimation(!!props.warningText)}
         >
           {warningMessage}
         </FormWarningText>

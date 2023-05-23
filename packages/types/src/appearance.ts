@@ -214,6 +214,7 @@ export type ElementsConfig = {
   formFieldErrorText: WithOptions<FieldId, ControlState, never>;
   formFieldWarningText: WithOptions<FieldId, ControlState, never>;
   formFieldSuccessText: WithOptions<FieldId, ControlState, never>;
+  formFieldInfoText: WithOptions<FieldId, ControlState, never>;
   formFieldDirectionsText: WithOptions<FieldId, ControlState, never>;
   formFieldHintText: WithOptions<FieldId, ControlState, never>;
   formButtonRow: WithOptions<never, ControlState | LoadingState, never>;
