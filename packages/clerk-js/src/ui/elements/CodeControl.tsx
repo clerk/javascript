@@ -1,9 +1,10 @@
 import React from 'react';
 
-import { descriptors, Flex, FormErrorText, Input, Spinner } from '../customizables';
+import { descriptors, Flex, Input, Spinner } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
 import { common } from '../styledSystem';
 import type { FormControlState } from '../utils';
+import { FormFeedback } from './FormControl';
 
 type UseCodeInputOptions = {
   length?: number;
@@ -202,7 +203,7 @@ export const CodeControl = React.forwardRef<{ reset: any }, CodeControlProps>((p
           />
         )}
       </Flex>
-      <FormErrorText elementDescriptor={descriptors.otpCodeFieldErrorText}>{errorText}</FormErrorText>
+      <FormFeedback errorText={errorText} />
     </Flex>
   );
 });
