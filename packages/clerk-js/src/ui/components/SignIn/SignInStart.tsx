@@ -33,6 +33,7 @@ import { SignInSocialButtons } from './SignInSocialButtons';
 
 export function _SignInStart(): JSX.Element {
   const card = useCardState();
+  const clerk = useCoreClerk();
   const status = useLoadingStatus();
   const { displayConfig, userSettings } = useEnvironment();
   const { setActive } = useCoreClerk();
@@ -288,7 +289,7 @@ export function _SignInStart(): JSX.Element {
             </Footer.ActionText>
             <Footer.ActionLink
               localizationKey={localizationKeys('signIn.start.actionLink')}
-              to={signUpUrl}
+              to={clerk.buildUrlWithAuth(signUpUrl)}
             >
               Sign up
             </Footer.ActionLink>
