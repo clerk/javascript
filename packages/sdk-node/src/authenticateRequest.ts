@@ -1,9 +1,9 @@
 import type { Clerk, RequestState } from '@clerk/backend';
 import { constants } from '@clerk/backend';
-import { handleValueOrFn, isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from '@clerk/shared';
 import cookie from 'cookie';
 import type { IncomingMessage, ServerResponse } from 'http';
 
+import { handleValueOrFn, isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from './shared';
 import type { ClerkMiddlewareOptions } from './types';
 
 const parseCookies = (req: IncomingMessage) => {
