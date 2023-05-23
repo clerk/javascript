@@ -128,7 +128,7 @@ export default SSRPage;
 
 ### Server API routes
 
-Importing `'gatsby-plugin-clerk/api'` gives acces to all the exports coming from `@clerk/sdk-node`. Example file `/api/hello.ts`:
+Importing `'gatsby-plugin-clerk/api'` gives access to all the exports coming from `@clerk/sdk-node`. Example file `/api/hello.ts`:
 
 ```ts
 import { clerkClient, withAuth } from 'gatsby-plugin-clerk/api';
