@@ -4,16 +4,25 @@ import { Clerk as _Clerk, decodeJwt, verifyToken as _verifyToken } from '@clerk/
 import { createClerkExpressRequireAuth } from './clerkExpressRequireAuth';
 import { createClerkExpressWithAuth } from './clerkExpressWithAuth';
 
-export const API_URL = process.env.CLERK_API_URL || 'https://api.clerk.dev';
-export const API_VERSION = process.env.CLERK_API_VERSION || 'v1';
-export const API_KEY = process.env.CLERK_SECRET_KEY || process.env.CLERK_API_KEY || '';
-export const PUBLISHABLE_KEY = process.env.CLERK_PUBLISHABLE_KEY || '';
+export const loadClientEnv = () => {
+  return {
+    publishableKey: process.env.CLERK_PUBLISHABLE_KEY || '',
+    frontendApi: process.env.CLERK_FRONTEND_API || '',
+  };
+};
 
-export const DOMAIN = process.env.CLERK_DOMAIN || '';
-export const PROXY_URL = process.env.CLERK_PROXY_URL || '';
-export const SIGN_IN_URL = process.env.CLERK_SIGN_IN_URL || '';
-export const IS_SATELLITE = process.env.CLERK_IS_SATELLITE === 'true';
-
+export const loadApiEnv = () => {
+  return {
+    secretKey: process.env.CLERK_SECRET_KEY || process.env.CLERK_API_KEY || '',
+    apiKey: process.env.CLERK_SECRET_KEY || process.env.CLERK_API_KEY || '',
+    apiUrl: process.env.CLERK_API_URL || 'https://api.clerk.dev',
+    apiVersion: process.env.CLERK_API_VERSION || 'v1',
+    domain: process.env.CLERK_DOMAIN || '',
+    proxyUrl: process.env.CLERK_PROXY_URL || '',
+    signInUrl: process.env.CLERK_SIGN_IN_URL || '',
+    isSatellite: process.env.CLERK_IS_SATELLITE === 'true',
+  };
+};
 /**
  * This needs to be a *named* function in order to support the older
  * new Clerk() syntax for v4 compatibility.
@@ -50,36 +59,39 @@ const createBasePropForRedwoodCompatibility = () => {
 
 export const createClerkClient = Clerk;
 
-export const clerkClient = Clerk({
-  secretKey: API_KEY,
-  apiKey: API_KEY,
-  apiUrl: API_URL,
-  apiVersion: API_VERSION,
-  domain: DOMAIN,
-  isSatellite: IS_SATELLITE,
-  publishableKey: PUBLISHABLE_KEY,
-  proxyUrl: PROXY_URL,
-  userAgent: '@clerk/clerk-sdk-node',
+let clerkClientSingleton = {} as unknown as ReturnType<typeof Clerk>;
+
+export const clerkClient = new Proxy(clerkClientSingleton, {
+  get(_target, property) {
+    const env = { ...loadApiEnv(), ...loadClientEnv() };
+    if (!env.secretKey) {
+      clerkClientSingleton = Clerk({
+        ...env,
+        userAgent: '@clerk/clerk-sdk-node',
+      });
+    }
+    // @ts-ignore
+    return clerkClientSingleton[property];
+  },
+  set() {
+    return false;
+  },
 });
 
 /**
  * Stand-alone express middlewares bound to the pre-initialised clerkClient
  */
-export const ClerkExpressRequireAuth = createClerkExpressRequireAuth({
-  clerkClient,
-  apiUrl: API_URL,
-  apiKey: API_KEY,
-  secretKey: API_KEY,
-  publishableKey: PUBLISHABLE_KEY,
-});
+export const ClerkExpressRequireAuth = (...args: any) => {
+  const env = { ...loadApiEnv(), ...loadClientEnv() };
+  const fn = createClerkExpressRequireAuth({ clerkClient, ...env });
+  return fn(...args);
+};
 
-export const ClerkExpressWithAuth = createClerkExpressWithAuth({
-  clerkClient,
-  apiUrl: API_URL,
-  apiKey: API_KEY,
-  secretKey: API_KEY,
-  publishableKey: PUBLISHABLE_KEY,
-});
+export const ClerkExpressWithAuth = (...args: any) => {
+  const env = { ...loadApiEnv(), ...loadClientEnv() };
+  const fn = createClerkExpressWithAuth({ clerkClient, ...env });
+  return fn(...args);
+};
 
 /**
  * Stand-alone setters bound to the pre-initialised clerkClient
