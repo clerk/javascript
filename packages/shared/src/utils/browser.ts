@@ -2,46 +2,40 @@ export function inBrowser(): boolean {
   return typeof window !== 'undefined';
 }
 
-export function detectUserAgentRobot(userAgent: string): boolean {
-  const robots = new RegExp(
-    (
-      [
-        /bot/,
-        /spider/,
-        /crawl/,
-        /APIs-Google/,
-        /AdsBot/,
-        /Googlebot/,
-        /mediapartners/,
-        /Google Favicon/,
-        /FeedFetcher/,
-        /Google-Read-Aloud/,
-        /DuplexWeb-Google/,
-        /googleweblight/,
-        /bing/,
-        /yandex/,
-        /baidu/,
-        /duckduck/,
-        /yahoo/,
-        /ecosia/,
-        /ia_archiver/,
-        /facebook/,
-        /instagram/,
-        /pinterest/,
-        /reddit/,
-        /slack/,
-        /twitter/,
-        /whatsapp/,
-        /youtube/,
-        /semrush/,
-      ] as RegExp[]
-    )
-      .map(r => r.source)
-      .join('|'),
-    'i',
-  );
+const botAgents = [
+  'bot',
+  'spider',
+  'crawl',
+  'APIs-Google',
+  'AdsBot',
+  'Googlebot',
+  'mediapartners',
+  'Google Favicon',
+  'FeedFetcher',
+  'Google-Read-Aloud',
+  'DuplexWeb-Google',
+  'googleweblight',
+  'bing',
+  'yandex',
+  'baidu',
+  'duckduck',
+  'yahoo',
+  'ecosia',
+  'ia_archiver',
+  'facebook',
+  'instagram',
+  'pinterest',
+  'reddit',
+  'slack',
+  'twitter',
+  'whatsapp',
+  'youtube',
+  'semrush',
+];
+const botAgentRegex = new RegExp(botAgents.join('|'), 'i');
 
-  return robots.test(userAgent);
+export function userAgentIsRobot(userAgent: string): boolean {
+  return !userAgent ? false : botAgentRegex.test(userAgent);
 }
 
 export function isValidBrowser(): boolean {
@@ -49,10 +43,7 @@ export function isValidBrowser(): boolean {
   if (!inBrowser() || !navigator) {
     return false;
   }
-
-  const isUserAgentRobot = detectUserAgentRobot(navigator?.userAgent);
-  const isWebDriver = navigator?.webdriver;
-  return !isUserAgentRobot && !isWebDriver;
+  return !userAgentIsRobot(navigator?.userAgent) && !navigator?.webdriver;
 }
 
 export function isBrowserOnline(): boolean {
