@@ -398,7 +398,7 @@ describe('getETLDPlusOneFromFrontendApi(frontendAp: string)', () => {
   });
 });
 
-fdescribe('isAllowedRedirectOrigin', () => {
+describe('isAllowedRedirectOrigin', () => {
   const cases: [string, Array<string | RegExp> | undefined, boolean][] = [
     // base cases
     ['https://clerk.com', ['https://www.clerk.com'], false],
@@ -431,7 +431,22 @@ fdescribe('isAllowedRedirectOrigin', () => {
     ['https://test.clerk.com/foo?hello=1', [/https:\/\/www\.clerk\.com/], false],
   ];
 
+  const warnMock = jest.spyOn(global.console, 'warn').mockImplementation();
+
+  beforeEach(() => warnMock.mockClear());
+  afterAll(() => warnMock.mockRestore());
+
   test.each(cases)('isAllowedRedirectOrigin("%s","%s") === %s', (url, allowedOrigins, expected) => {
     expect(isAllowedRedirectOrigin(url, allowedOrigins)).toEqual(expected);
+
+    if (!expected) {
+      const output = warnMock.mock.calls[0][0];
+
+      expect(warnMock).toHaveBeenCalledTimes(1);
+      expect(output.includes(new URL(url))).toBe(true);
+      expect(output).toMatch(/allowedRedirectOrigins/);
+    } else {
+      expect(warnMock).not.toHaveBeenCalled();
+    }
   });
 });
