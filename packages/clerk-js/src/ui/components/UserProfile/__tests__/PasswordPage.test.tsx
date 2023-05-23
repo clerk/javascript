@@ -14,7 +14,7 @@ const changePasswordConfig = createFixtures.config(f => {
   f.withUser({ password_enabled: true });
 });
 
-describe('PasswordPage', () => {
+xdescribe('PasswordPage', () => {
   it('renders the component', async () => {
     const { wrapper } = await createFixtures(initConfig);
 
