@@ -1,7 +1,6 @@
 type Milliseconds = number;
 
 type BackoffOptions = Partial<{
-  maxRetries: number;
   firstDelay: Milliseconds;
   maxDelay: Milliseconds;
   timeMultiple: number;
@@ -9,7 +8,6 @@ type BackoffOptions = Partial<{
 }>;
 
 const defaultOptions: Required<BackoffOptions> = {
-  maxRetries: 10,
   firstDelay: 125,
   maxDelay: 0,
   timeMultiple: 2,
@@ -43,25 +41,22 @@ export const runWithExponentialBackOff = async <T>(
   options: BackoffOptions = {},
 ): Promise<T> => {
   let iterationsCount = 0;
-  const { maxRetries, shouldRetry, firstDelay, maxDelay, timeMultiple } = {
+  const { shouldRetry, firstDelay, maxDelay, timeMultiple } = {
     ...defaultOptions,
     ...options,
   };
-  const maxRetriesReached = () => iterationsCount === maxRetries;
   const delay = createExponentialDelayAsyncFn({ firstDelay, maxDelay, timeMultiple });
 
-  while (!maxRetriesReached()) {
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
     try {
       return await callback();
     } catch (e) {
       iterationsCount++;
-      if (!shouldRetry(e, iterationsCount) || maxRetriesReached()) {
+      if (!shouldRetry(e, iterationsCount)) {
         throw e;
       }
       await delay();
     }
   }
-
-  // This should be impossible to reach, but it makes TS happy
-  throw new Error('Something went wrong');
 };

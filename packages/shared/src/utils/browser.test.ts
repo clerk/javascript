@@ -1,4 +1,4 @@
-import { detectUserAgentRobot, inBrowser, isValidBrowserOnline } from './browser';
+import { inBrowser, isValidBrowserOnline, userAgentIsRobot } from './browser';
 
 describe('inBrowser()', () => {
   it('returns true if window is defined', () => {
@@ -18,7 +18,7 @@ describe('detectUserAgentRobot', () => {
   ];
 
   it.each(botAgents)('returns true if User Agent name includes keyword that suggests automation/bot', agent => {
-    expect(detectUserAgentRobot(agent)).toBe(true);
+    expect(userAgentIsRobot(agent)).toBe(true);
   });
 
   const realAgents = [
@@ -30,7 +30,7 @@ describe('detectUserAgentRobot', () => {
   it.each(realAgents)(
     'returns false if User Agent name does not include keyword that suggests automation/bot',
     agent => {
-      expect(detectUserAgentRobot(agent)).toBe(false);
+      expect(userAgentIsRobot(agent)).toBe(false);
     },
   );
 });
