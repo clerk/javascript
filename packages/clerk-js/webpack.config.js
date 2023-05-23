@@ -66,13 +66,25 @@ const common = ({ mode }) => {
   };
 };
 
+/** @type { () => (import('webpack').RuleSetRule) }  */
 const svgLoader = () => {
   return {
     test: /\.svg$/,
-    use: ['@svgr/webpack'],
+    use: {
+      loader: '@svgr/webpack',
+      options: {
+        svgo: true,
+        svgoConfig: {
+          floatPrecision: 3,
+          transformPrecision: 1,
+          plugins: ['preset-default', 'removeDimensions', 'removeStyleElement'],
+        },
+      },
+    },
   };
 };
 
+/** @type { () => (import('webpack').RuleSetRule) } */
 const typescriptLoaderProd = () => {
   return {
     test: /\.(ts|js)x?$/,
@@ -86,6 +98,7 @@ const typescriptLoaderProd = () => {
   };
 };
 
+/** @type { () => (import('webpack').RuleSetRule) } */
 const typescriptLoaderDev = () => {
   return {
     test: /\.(ts|js)x?$/,
