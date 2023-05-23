@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 
-import { clerkClient, loadApiEnv, loadClientEnv } from './clerkClient';
+import { clerkClient } from './clerkClient';
 import { createClerkExpressRequireAuth } from './clerkExpressRequireAuth';
 import type { ClerkMiddlewareOptions, RequireAuthProp } from './types';
 import { runMiddleware } from './utils';
@@ -9,8 +9,7 @@ type ExpressApiHandlerRequireAuth<T = any> = (req: RequireAuthProp<Request>, res
 
 export function requireAuth(handler: ExpressApiHandlerRequireAuth, options?: ClerkMiddlewareOptions): any {
   return async (req: Request, res: Response) => {
-    const env = { ...loadApiEnv(), ...loadClientEnv() };
-    await runMiddleware(req, res, createClerkExpressRequireAuth({ clerkClient, ...env })(options));
+    await runMiddleware(req, res, createClerkExpressRequireAuth({ clerkClient })(options));
 
     return handler(req as RequireAuthProp<Request>, res);
   };

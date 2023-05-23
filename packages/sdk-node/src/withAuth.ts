@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 
-import { clerkClient, loadApiEnv, loadClientEnv } from './clerkClient';
+import { clerkClient } from './clerkClient';
 import { createClerkExpressWithAuth } from './clerkExpressWithAuth';
 import type { ClerkMiddlewareOptions, WithAuthProp } from './types';
 import { runMiddleware } from './utils';
@@ -13,8 +13,7 @@ export function withAuth<TRequest extends Request = Request, TResponse extends R
   options?: ClerkMiddlewareOptions,
 ): any {
   return async (req: TRequest, res: TResponse) => {
-    const env = { ...loadApiEnv(), ...loadClientEnv() };
-    await runMiddleware(req, res, createClerkExpressWithAuth({ clerkClient, ...env })(options));
+    await runMiddleware(req, res, createClerkExpressWithAuth({ clerkClient })(options));
 
     return handler(req as WithAuthProp<TRequest>, res);
   };
