@@ -194,9 +194,11 @@ describe('SignInFactorTwo', () => {
             status: 422,
           }),
         );
-        const { userEvent } = render(<SignInFactorTwo />, { wrapper });
-        await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-        await waitFor(() => expect(screen.getByText('Incorrect phone code')).toBeDefined());
+        await runFakeTimers(async () => {
+          const { userEvent } = render(<SignInFactorTwo />, { wrapper });
+          await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+          await waitFor(() => expect(screen.getByText('Incorrect phone code')).toBeDefined());
+        });
       }, 10000);
     });
 
@@ -250,9 +252,11 @@ describe('SignInFactorTwo', () => {
             status: 422,
           }),
         );
-        const { userEvent } = render(<SignInFactorTwo />, { wrapper });
-        await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-        await waitFor(() => expect(screen.getByText('Incorrect authenticator code')).toBeDefined());
+        await runFakeTimers(async () => {
+          const { userEvent } = render(<SignInFactorTwo />, { wrapper });
+          await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+          await waitFor(() => expect(screen.getByText('Incorrect authenticator code')).toBeDefined());
+        });
       }, 10000);
     });
 
@@ -338,10 +342,12 @@ describe('SignInFactorTwo', () => {
             status: 422,
           }),
         );
-        const { userEvent, getByLabelText, getByText } = render(<SignInFactorTwo />, { wrapper });
-        await userEvent.type(getByLabelText('Backup code'), '123456');
-        await userEvent.click(getByText('Continue'));
-        await waitFor(() => expect(screen.getByText('Incorrect backup code')).toBeDefined());
+        await runFakeTimers(async () => {
+          const { userEvent, getByLabelText, getByText } = render(<SignInFactorTwo />, { wrapper });
+          await userEvent.type(getByLabelText('Backup code'), '123456');
+          await userEvent.click(getByText('Continue'));
+          await waitFor(() => expect(screen.getByText('Incorrect backup code')).toBeDefined());
+        });
       }, 10000);
     });
   });
