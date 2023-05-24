@@ -54,9 +54,9 @@ export const UserPreview = (props: UserPreviewProps) => {
   const localizedTitle = t(title);
 
   const externalAccountImageUrl = experimental_enableClerkImages
-    ? externalAccount?.experimental_imageUrl
+    ? externalAccount?.imageUrl
     : externalAccount?.avatarUrl;
-  const userImageUrl = experimental_enableClerkImages ? user?.experimental_imageUrl : user?.profileImageUrl;
+  const userImageUrl = experimental_enableClerkImages ? user?.imageUrl : user?.profileImageUrl;
   const imageUrl = imageUrlProp || userImageUrl || externalAccountImageUrl;
 
   return (

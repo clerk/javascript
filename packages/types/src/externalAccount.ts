@@ -17,10 +17,7 @@ export interface ExternalAccountResource extends ClerkResource {
   firstName: string;
   lastName: string;
   avatarUrl: string;
-  /**
-   * @experimental
-   */
-  experimental_imageUrl: string;
+  imageUrl: string;
   username?: string;
   publicMetadata: Record<string, unknown>;
   label?: string;
