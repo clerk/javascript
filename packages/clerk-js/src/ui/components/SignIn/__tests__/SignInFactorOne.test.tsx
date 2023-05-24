@@ -186,10 +186,12 @@ describe('SignInFactorOne', () => {
             status: 422,
           }),
         );
-        const { userEvent } = render(<SignInFactorOne />, { wrapper });
-        await userEvent.type(screen.getByLabelText('Password'), '123456');
-        await userEvent.click(screen.getByText('Continue'));
-        await waitFor(() => expect(screen.getByText('Incorrect Password')).toBeDefined());
+        await runFakeTimers(async () => {
+          const { userEvent } = render(<SignInFactorOne />, { wrapper });
+          await userEvent.type(screen.getByLabelText('Password'), '123456');
+          await userEvent.click(screen.getByText('Continue'));
+          await waitFor(() => expect(screen.getByText('Incorrect Password')).toBeDefined());
+        });
       });
     });
 
@@ -397,9 +399,11 @@ describe('SignInFactorOne', () => {
             status: 422,
           }),
         );
-        const { userEvent } = render(<SignInFactorOne />, { wrapper });
-        await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-        await waitFor(() => expect(screen.getByText('Incorrect code')).toBeDefined());
+        await runFakeTimers(async () => {
+          const { userEvent } = render(<SignInFactorOne />, { wrapper });
+          await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+          await waitFor(() => expect(screen.getByText('Incorrect code')).toBeDefined());
+        });
       });
     });
 
@@ -474,9 +478,11 @@ describe('SignInFactorOne', () => {
             status: 422,
           }),
         );
-        const { userEvent } = render(<SignInFactorOne />, { wrapper });
-        await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-        await waitFor(() => expect(screen.getByText('Incorrect phone code')).toBeDefined());
+        await runFakeTimers(async () => {
+          const { userEvent } = render(<SignInFactorOne />, { wrapper });
+          await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
+          await waitFor(() => expect(screen.getByText('Incorrect phone code')).toBeDefined());
+        });
       });
     });
   });

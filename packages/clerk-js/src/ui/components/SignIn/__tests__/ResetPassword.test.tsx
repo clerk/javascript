@@ -1,7 +1,7 @@
 import type { SignInResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 
-import { bindCreateFixtures, fireEvent, render, screen, waitFor } from '../../../../testUtils';
+import { bindCreateFixtures, fireEvent, render, runFakeTimers, screen, waitFor } from '../../../../testUtils';
 import { ResetPassword } from '../ResetPassword';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
@@ -30,13 +30,15 @@ describe('ResetPassword', () => {
       }),
     );
 
-    render(<ResetPassword />, { wrapper });
-    screen.getByRole('heading', { name: /Reset password/i });
+    await runFakeTimers(async () => {
+      render(<ResetPassword />, { wrapper });
+      screen.getByRole('heading', { name: /Reset password/i });
 
-    const passwordField = screen.getByLabelText(/New password/i);
-    fireEvent.focus(passwordField);
-    await waitFor(() => {
-      screen.getByText(/Your password must contain 8 or more characters/i);
+      const passwordField = screen.getByLabelText(/New password/i);
+      fireEvent.focus(passwordField);
+      await waitFor(() => {
+        screen.getByText(/Your password must contain 8 or more characters/i);
+      });
     });
   });
 
@@ -99,19 +101,21 @@ describe('ResetPassword', () => {
     it('results in error if the passwords do not match and persists', async () => {
       const { wrapper } = await createFixtures();
 
-      const { userEvent } = render(<ResetPassword />, { wrapper });
+      await runFakeTimers(async () => {
+        const { userEvent } = render(<ResetPassword />, { wrapper });
 
-      await userEvent.type(screen.getByLabelText(/new password/i), 'testewrewr');
-      const confirmField = screen.getByLabelText(/confirm password/i);
-      await userEvent.type(confirmField, 'testrwerrwqrwe');
-      fireEvent.blur(confirmField);
-      await waitFor(() => {
-        screen.getByText(`Passwords don't match.`);
-      });
+        await userEvent.type(screen.getByLabelText(/new password/i), 'testewrewr');
+        const confirmField = screen.getByLabelText(/confirm password/i);
+        await userEvent.type(confirmField, 'testrwerrwqrwe');
+        fireEvent.blur(confirmField);
+        await waitFor(() => {
+          screen.getByText(`Passwords don't match.`);
+        });
 
-      await userEvent.clear(confirmField);
-      await waitFor(() => {
-        screen.getByText(`Passwords don't match.`);
+        await userEvent.clear(confirmField);
+        await waitFor(() => {
+          screen.getByText(`Passwords don't match.`);
+        });
       });
     }, 10000);
 
