@@ -4,10 +4,10 @@ import { Avatar } from '../elements';
 import type { PropsOfComponent } from '../styledSystem';
 
 type OrganizationAvatarProps = PropsOfComponent<typeof Avatar> &
-  Partial<Pick<OrganizationResource, 'name' | 'logoUrl' | 'imageUrl'>>;
+  Partial<Pick<OrganizationResource, 'name' | 'imageUrl'>>;
 
 export const OrganizationAvatar = (props: OrganizationAvatarProps) => {
-  const { name = '', logoUrl, imageUrl, ...rest } = props;
+  const { name = '', imageUrl, ...rest } = props;
   return (
     <Avatar
       title={name}
