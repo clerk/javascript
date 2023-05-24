@@ -51,9 +51,7 @@ export const UserPreview = (props: UserPreviewProps) => {
   const identifier = getIdentifier({ ...user }) || externalAccount?.accountIdentifier?.();
   const localizedTitle = t(title);
 
-  const externalAccountImageUrl = externalAccount?.imageUrl;
-  const userImageUrl = user?.imageUrl;
-  const imageUrl = imageUrlProp || userImageUrl || externalAccountImageUrl;
+  const imageUrl = imageUrlProp || user?.imageUrl || externalAccount?.imageUrl;
 
   return (
     <Flex
