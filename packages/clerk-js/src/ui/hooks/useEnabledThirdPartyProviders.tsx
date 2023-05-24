@@ -2,8 +2,7 @@ import type { OAuthProvider, OAuthStrategy, Web3Provider, Web3Strategy } from '@
 // TODO: This import shouldn't be part of @clerk/types
 import { OAUTH_PROVIDERS, WEB3_PROVIDERS } from '@clerk/types/src';
 
-import { iconImageUrl, svgUrl } from '../common/constants';
-import { useOptions } from '../contexts';
+import { iconImageUrl } from '../common/constants';
 import { useEnvironment } from '../contexts/EnvironmentContext';
 import { fromEntries } from '../utils';
 
@@ -37,25 +36,12 @@ const strategyToDisplayData: ThirdPartyStrategyToDataMap = fromEntries(
 
 export const useEnabledThirdPartyProviders = () => {
   const { socialProviderStrategies, web3FirstFactors, authenticatableSocialStrategies } = useEnvironment().userSettings;
-  const { experimental_enableClerkImages } = useOptions();
-
-  // TODO: remove this
-  // We don't care about the mutating the reference here
-  const tempStrategyToDisplayData = strategyToDisplayData;
-  const tempProviderToDisplayData = providerToDisplayData;
-  if (!experimental_enableClerkImages) {
-    Object.values(tempStrategyToDisplayData).forEach(strategy => (strategy.iconUrl = svgUrl(strategy.id)));
-    Object.keys(tempProviderToDisplayData).forEach(
-      // @ts-expect-error
-      provider => (tempProviderToDisplayData[provider].iconUrl = svgUrl(provider)),
-    );
-  }
 
   return {
     strategies: [...socialProviderStrategies, ...web3FirstFactors],
     web3Strategies: [...web3FirstFactors],
     authenticatableOauthStrategies: [...authenticatableSocialStrategies],
-    strategyToDisplayData: tempStrategyToDisplayData,
-    providerToDisplayData: tempProviderToDisplayData,
+    strategyToDisplayData: strategyToDisplayData,
+    providerToDisplayData: providerToDisplayData,
   };
 };

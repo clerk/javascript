@@ -2,7 +2,7 @@ import React from 'react';
 
 import { isDefaultImage } from '../../../utils';
 import { useWizard, Wizard } from '../../common';
-import { useCoreUser, useEnvironment, useOptions } from '../../contexts';
+import { useCoreUser, useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { ContentPage, Form, FormButtons, SuccessPage, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
@@ -19,7 +19,6 @@ export const ProfilePage = withCardStateProvider(() => {
   const showLastName = last_name.enabled;
   const userFirstName = user.firstName || '';
   const userLastName = user.lastName || '';
-  const { experimental_enableClerkImages } = useOptions();
 
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
 
@@ -88,11 +87,7 @@ export const ProfilePage = withCardStateProvider(() => {
           <UserProfileAvatarUploader
             user={user}
             onAvatarChange={uploadAvatar}
-            onAvatarRemove={
-              isDefaultImage(experimental_enableClerkImages ? user.imageUrl : user.profileImageUrl)
-                ? null
-                : onAvatarRemove
-            }
+            onAvatarRemove={isDefaultImage(user.imageUrl) ? null : onAvatarRemove}
           />
           {showFirstName && (
             <Form.ControlRow elementId={firstNameField.id}>
